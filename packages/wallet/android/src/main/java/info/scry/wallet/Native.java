@@ -11,31 +11,38 @@
 
 public class Native {
 
+    public class  Message {
+        public int err;
+        public byte[] data;
+    }
+
     static {
         System.loadLibrary("wallet");
     }
+    //todo mnemonic byte[]
 
     /*--------------------------助记词--------------------------*/
     //生成助记词（个数可选）
     //返回：助记词String
-    public static native boolean mnemonicGenerate(int count);
+    public static native byte[] mnemonicGenerate(int count);
 
     //恢复出 助记词， 根据加密json文件字串 + 密码，
     //返回：助记词String
-    public static native boolean mnemonicBackupMnemonic(String jsonStr, String pwd);
+    public static native byte[] mnemonicEncode(byte[] mn, byte[] pwd);
+
+    //恢复出 助记词， 根据加密json文件字串 + 密码，
+    //返回：助记词String
+    public static native byte[] mnemonicDecode(byte[] en, byte[] pwd);
 
     //重置密码， 根据加密json文件字串 + 旧密码 + 新密码，
     //返回：成功1、失败0
-    public static native boolean mnemonicResetPwd(String jsonStr, String oldPwd, String newPwd);
+    public static native byte[] mnemonicResetPwd(byte[] en, byte[] oldPwd, byte[] newPwd);
 
-    //导入助记词,创建keystore加密文件
-    //返回：成功1、失败0
-    public static native boolean mnemonicImportMnemonic(String mnemonic);
 
     /*--------------------------链相关--------------------------*/
     //获取链地址。区分链类型
     //返回：链地址String
-    public static native boolean chainGetAddress(int chainType);
+    public static native String[] chainGetAddress(byte[] mn, int[] chainType);
 
 /*    //获取交易记录。 区分链类型， 指定地址 指定条数
     //返回：链交易记录。
@@ -44,15 +51,15 @@ public class Native {
     /*--------------------------交易相关--------------------------*/
     //获取拼装原始交易，区分链类型
     //返回：未签名的交易 String
-    public static native String txMakeRawTx(int chainType, String from, String to, String value, String backupMsg);
+    public static native String eeeTxMakeRawTx(String from, String to, String value, String backupMsg);
 
     //获取签名后的交易信息，区分链类型
     //返回：签名后的交易 String
-    public static native String txSignTx(int chainType, String rawTx);
+    public static native String eeeTxSignTx(String rawTx);
 
     //广播交易，区分链类型
     //返回：广播成功1、 广播失败0
-    public static native boolean txBroascastTx(int chainType, String signedTx);
+    public static native boolean eeeTxBroascastTx(String signedTx);
 
 }
 
