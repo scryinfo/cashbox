@@ -1,0 +1,16 @@
+[package]
+name = "bc"
+version = "0.1.0"
+authors = ["Peace <peace@scry.info>"]
+edition = "2018"
+[lib]
+path="lib.rs"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+
+[workspace]
+members = [
+"wallet"
+]
