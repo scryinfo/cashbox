@@ -1,0 +1,9 @@
+/.idea
+/app/android/app/src/debug
+/app/pubspec.lock
+/bc/.idea
+/bc/Cargo.lock
+/bc/target
+/packages/wallet/.idea
+/packages/wallet/example/pubspec.lock
+/packages/wallet/pubspec.lock
