@@ -1,19 +1,31 @@
-/* é“¾ç±»å‹chaintTypeçº¦å®š
-    1-----BTC
-    2-----BTC_TEST
-    3-----ETH
-    4-----ETH_TEST
-    5-----EEE
-    6-----EEE_TEST
-    7-----EOS
-    8-----EOS_TEST
-* */
+package info.scry.wallet;
 
 public class Native {
+    //Á´ÀàĞÍ
+    private class ChainType {
+        public static final int BTC = 1;
+        public static final int BTC_TEST = 2;
+        public static final int ETH = 3;
+        public static final int ETH_TEST = 4;
+        public static final int EEE = 5;
+        public static final int EEE_TEST = 6;
+    }
 
-    public class  Message {
-        public int err;
+    //Í¨ĞÅÏûÏ¢
+    private class Message {
+        public int err;         //StatusCode×´Ì¬Âë
         public byte[] data;
+    }
+
+    //Í¨ĞÅÏûÏ¢ ×´Ì¬Âë
+    private class StatusCode {
+        public static final int OK = 200;                           //Õı³£
+        public static final int FAIL_TO_GENERATE_MNEMONIC = 100;    //Éú³ÉÖú¼Ç´ÊÊ§°Ü
+        public static final int PWD_IS_WRONG = 101;                 //ÃÜÂë´íÎó
+        public static final int FAIL_TO_RESET_PWD = 102;            //ÖØÖÃÃÜÂëÊ§°Ü
+        public static final int GAS_NOT_ENOUGH = 103;               //GAS·Ñ²»×ã
+        public static final int BROADCAST_OK = 104;                 //¹ã²¥ÉÏÁ´³É¹¦
+        public static final int BROADCAST_FAILURE = 105;            //¹ã²¥ÉÏÁ´Ê§°Ü
     }
 
     static {
@@ -21,64 +33,85 @@ public class Native {
     }
     //todo mnemonic byte[]
 
-    /*--------------------------åŠ©è®°è¯--------------------------*/
-    //ç”ŸæˆåŠ©è®°è¯ï¼ˆä¸ªæ•°å¯é€‰ï¼‰
-    //è¿”å›ï¼šåŠ©è®°è¯String
-    public static native byte[] mnemonicGenerate(int count);
+    /*------------------------------------------Öú¼Ç´Ê------------------------------------------*/
+    //Éú³ÉÖú¼Ç´Ê£¨¸öÊı¿ÉÑ¡£©
+    //·µ»Ø£ºString       "{ err:" + err +","+"data:"+ Öú¼Ç´Êbyte[]+" }"
+    public static native String mnemonicGenerate(int count);
 
-    //æ¢å¤å‡º åŠ©è®°è¯ï¼Œ æ ¹æ®åŠ å¯†jsonæ–‡ä»¶å­—ä¸² + å¯†ç ï¼Œ
-    //è¿”å›ï¼šåŠ©è®°è¯String
-    public static native byte[] mnemonicEncode(byte[] mn, byte[] pwd);
+    //¼ÓÃÜÖú¼Ç´Ê £¬ ¸ù¾İÖú¼Ç´Ê + ÃÜÂë£¬
+    //·µ»Ø£ºString       "{ err:" + err +","+"data:"+¼ÓÃÜºóµÄÖú¼Ç´Ê byte[]+" }"
+    public static native String mnemonicEncode(byte[] mn, byte[] pwd);
 
-    //æ¢å¤å‡º åŠ©è®°è¯ï¼Œ æ ¹æ®åŠ å¯†jsonæ–‡ä»¶å­—ä¸² + å¯†ç ï¼Œ
-    //è¿”å›ï¼šåŠ©è®°è¯String
-    public static native byte[] mnemonicDecode(byte[] en, byte[] pwd);
+    //½âÃÜÖú¼Ç´Ê £¬ ¸ù¾İ ¼ÓÃÜºóµÄÖú¼Ç´Ê×Ö´® + ÃÜÂë
+    //·µ»Ø£ºString        "{ err:" + err +","+"data:"+ Öú¼Ç´Ê byte[]+" }"
+    public static native String mnemonicDecode(byte[] en, byte[] pwd);
 
-    //é‡ç½®å¯†ç ï¼Œ æ ¹æ®åŠ å¯†jsonæ–‡ä»¶å­—ä¸² + æ—§å¯†ç  + æ–°å¯†ç ï¼Œ
-    //è¿”å›ï¼šæˆåŠŸ1ã€å¤±è´¥0
-    public static native byte[] mnemonicResetPwd(byte[] en, byte[] oldPwd, byte[] newPwd);
+    //ÖØÖÃÃÜÂë£¬ ¸ù¾İ ¼ÓÃÜºóµÄÖú¼Ç´Ê×Ö´® + ¾ÉÃÜÂë + ĞÂÃÜÂë£¬
+    //·µ»Ø£ºString        "{ err:" + err +","+"data:"+ Öú¼Ç´Ê byte[] +" }"
+    public static native String mnemonicResetPwd(byte[] en, byte[] oldPwd, byte[] newPwd);
 
-
-    /*--------------------------é“¾ç›¸å…³--------------------------*/
-    //è·å–é“¾åœ°å€ã€‚åŒºåˆ†é“¾ç±»å‹
-    //è¿”å›ï¼šé“¾åœ°å€String
+    /*------------------------------------------Á´Ïà¹Ø------------------------------------------*/
+    //»ñÈ¡Á´µØÖ·¡£Çø·ÖÁ´ÀàĞÍ
+    //·µ»Ø£ºÁ´µØÖ·String  "{ err:" + err +","+"data:"+ byte[]+" }"
+    //dataËµÃ÷£º "[{ chainType:0,address:0x123456789},{ chainType:1,address:0x987654321}]" ×ª³É byte[]
     public static native String[] chainGetAddress(byte[] mn, int[] chainType);
 
-/*    //è·å–äº¤æ˜“è®°å½•ã€‚ åŒºåˆ†é“¾ç±»å‹ï¼Œ æŒ‡å®šåœ°å€ æŒ‡å®šæ¡æ•°
-    //è¿”å›ï¼šé“¾äº¤æ˜“è®°å½•ã€‚
+    /* //»ñÈ¡½»Ò×¼ÇÂ¼¡£ Çø·ÖÁ´ÀàĞÍ£¬ Ö¸¶¨µØÖ· Ö¸¶¨ÌõÊı
+    //·µ»Ø£ºÁ´½»Ò×¼ÇÂ¼¡£
     public static native String chainGetTxHistory(int chainType, String targetAddress, int fromNum, int toNum);*/
 
-    /*--------------------------äº¤æ˜“ç›¸å…³--------------------------*/
-    //è·å–æ‹¼è£…åŸå§‹äº¤æ˜“ï¼ŒåŒºåˆ†é“¾ç±»å‹
-    //è¿”å›ï¼šæœªç­¾åçš„äº¤æ˜“ String
-    public static native String eeeTxMakeRawTx(String from, String to, String value, String backupMsg);
+    /*------------------------------------------½»Ò×Ïà¹Ø------------------------------------------*/
+    //ETH ½»Ò×Æ´×°¡£   ·µ»Ø£ºÎ´Ç©ÃûµÄ½»Ò× String¡£
+    //nonce¼ÇÂ¼Î»ÖÃ£¿£¿£¿
+    public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, String pwd, String fromAddress, String toAddress,
+                                                  String value, String backupMsg, String gasLimit, String gasPrice);
 
-    //è·å–ç­¾ååçš„äº¤æ˜“ä¿¡æ¯ï¼ŒåŒºåˆ†é“¾ç±»å‹
-    //è¿”å›ï¼šç­¾ååçš„äº¤æ˜“ String
-    public static native String eeeTxSignTx(String rawTx);
+    //ERC20 ½»Ò×Æ´×°¡£    ·µ»Ø£ºÎ´Ç©ÃûµÄ½»Ò× String
+    // nonce¼ÇÂ¼Î»ÖÃ£¿£¿£¿
+    public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, String pwd, String fromAddress, String contractAddress,
+                                                    String toAddress, String value, String backupMsg, String gasLimit, String gasPrice);
 
-    //å¹¿æ’­äº¤æ˜“ï¼ŒåŒºåˆ†é“¾ç±»å‹
-    //è¿”å›ï¼šå¹¿æ’­æˆåŠŸ1ã€ å¹¿æ’­å¤±è´¥0
-    public static native boolean eeeTxBroascastTx(String signedTx);
+    //´¦Àí½¨ÒéÓÅÏÈ¿¼ÂÇ£¬ÊµÏÖspvµÄ¿â´¦×ö¡£   ÄÜ¸ü·½±ã»ñÈ¡utxo,»¹ÓĞÕÒÁãµØÖ·Ñ¡Ôñ,ÕÒÁã½ğ¶î¡£
+    public static native byte[] btcTxMakeBTCRawTx(String[] from, String[] to, String value);
+
+    //EEE nonce»ñÈ¡
+    public static native String eeeGetTxNonce();
+
+    public static native byte[] eeeTxMakeRawTx(String from, String to, String nonce, String value, String backupMsg);
+
+    //»ñÈ¡Ç©ÃûºóµÄ½»Ò×ĞÅÏ¢£¬Çø·ÖÁ´ÀàĞÍ
+    //·µ»Ø£ºÇ©ÃûºóµÄ½»Ò× byte[]
+    public static native byte[] ethTxSignTx(String rawTx, byte[] encodeMne, String pwd);
+
+    public static native byte[] eeeTxSignTx(String rawTx, byte[] encodeMne, String pwd);
+
+    public static native byte[] btcTxSignTx(String rawTx, byte[] encodeMne, String pwd);
+
+    //¹ã²¥½»Ò×£¬Çø·ÖÁ´ÀàĞÍ
+    //·µ»Ø£º¹ã²¥³É¹¦1¡¢ ¹ã²¥Ê§°Ü0
+    public static native boolean ethTxBroascastTx([]byte signedTx);
+
+    public static native boolean btcTxBroascastTx([]byte signedTx);
+
+    public static native boolean eeeTxBroascastTx([]byte signedTx);
 
 }
 
 /*
-    fixd åŠ©è®°è¯ç‹¬ç«‹ç®¡ç†ï¼Œä¸€ä¸ªåŠ©è¯å¯ä»¥ç”Ÿæˆå¤šç§é“¾åœ°å€ï¼ˆeth,btc,eeeï¼‰
+    fixd Öú¼Ç´Ê¶ÀÁ¢¹ÜÀí£¬Ò»¸öÖú´Ê¿ÉÒÔÉú³É¶àÖÖÁ´µØÖ·£¨eth,btc,eee£©
 
-    fixd ç­¾åä»é’±åŒ…ä¸­ç‹¬ç«‹å‡ºæ¥
+    fixd Ç©Ãû´ÓÇ®°üÖĞ¶ÀÁ¢³öÀ´
 
-    fixd é“¾åŠŸèƒ½ï¼šå–åˆ°ä¸é’±åŒ…ç›¸å…³çš„åœ°å€äº¤æ˜“ï¼Œ
+    fixd Á´¹¦ÄÜ£ºÈ¡µ½ÓëÇ®°üÏà¹ØµÄµØÖ·½»Ò×£¬
 
-    fixd ç”Ÿæˆäº¤æ˜“ï¼ˆnoç­¾åï¼‰ï¼Œäº¤æ˜“ä¸Šé“¾åŠè¿‡ç¨‹
+    fixd Éú³É½»Ò×£¨noÇ©Ãû£©£¬½»Ò×ÉÏÁ´¼°¹ı³Ì
 
-         é“¾uiç‹¬ç«‹ç®¡ç†
+         Á´ui¶ÀÁ¢¹ÜÀí
 
-         äº¤æ˜“è®°å½•æœ¬åœ°å­˜æ”¾ï¼Œè·Ÿé“¾ä¸Šè®°å½•ä½ç½®ï¼Ÿï¼Ÿ
+         ½»Ò×¼ÇÂ¼±¾µØ´æ·Å£¬¸úÁ´ÉÏ¼ÇÂ¼Î»ÖÃ£¿£¿
 
-         é’±åŒ…åˆ—è¡¨åŠ è½½æ¥æºï¼Ÿ
+         Ç®°üÁĞ±í¼ÓÔØÀ´Ô´£¿
 
-         æœ¬åœ°æ•°æ®åº“ï¼š    ä¿å­˜æœ¬åœ°äº¤æ˜“è®°å½• + é’±åŒ…åˆ—è¡¨ï¼ˆæ–°å¢ã€åˆ é™¤ã€é’±åŒ…åã€è®¾å½“å‰é’±åŒ…ã€é’±åŒ…é“¾åœ°å€ã€é“¾ä¸Šä»£å¸ä¿¡æ¯ï¼‰
-         æ”¾åœ¨flutterä¿å­˜ï¼Œå¤„ç†
+         ±¾µØÊı¾İ¿â£º    ±£´æ±¾µØ½»Ò×¼ÇÂ¼ + Ç®°üÁĞ±í£¨ĞÂÔö¡¢É¾³ı¡¢Ç®°üÃû¡¢Éèµ±Ç°Ç®°ü¡¢Ç®°üÁ´µØÖ·¡¢Á´ÉÏ´ú±ÒĞÅÏ¢£©
+         ·ÅÔÚflutter±£´æ£¬´¦Àí
 */
-
