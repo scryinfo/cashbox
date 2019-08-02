@@ -1,8 +1,8 @@
 package info.scry.wallet;
 
 public class Native {
-    //Á´ÀàĞÍ
-    private class ChainType {
+    //é“¾ç±»å‹
+    private interface ChainType {
         public static final int BTC = 1;
         public static final int BTC_TEST = 2;
         public static final int ETH = 3;
@@ -11,107 +11,190 @@ public class Native {
         public static final int EEE_TEST = 6;
     }
 
-    //Í¨ĞÅÏûÏ¢
-    private class Message {
-        public int err;         //StatusCode×´Ì¬Âë
-        public byte[] data;
-    }
 
-    //Í¨ĞÅÏûÏ¢ ×´Ì¬Âë
-    private class StatusCode {
-        public static final int OK = 200;                           //Õı³£
-        public static final int FAIL_TO_GENERATE_MNEMONIC = 100;    //Éú³ÉÖú¼Ç´ÊÊ§°Ü
-        public static final int PWD_IS_WRONG = 101;                 //ÃÜÂë´íÎó
-        public static final int FAIL_TO_RESET_PWD = 102;            //ÖØÖÃÃÜÂëÊ§°Ü
-        public static final int GAS_NOT_ENOUGH = 103;               //GAS·Ñ²»×ã
-        public static final int BROADCAST_OK = 104;                 //¹ã²¥ÉÏÁ´³É¹¦
-        public static final int BROADCAST_FAILURE = 105;            //¹ã²¥ÉÏÁ´Ê§°Ü
+    //é€šä¿¡æ¶ˆæ¯ çŠ¶æ€ç 
+    private interface StatusCode {
+        public static final int OK = 200;                           //æ­£å¸¸
+        public static final int FAIL_TO_GENERATE_MNEMONIC = 100;    //ç”ŸæˆåŠ©è®°è¯å¤±è´¥
+        public static final int PWD_IS_WRONG = 101;                 //å¯†ç é”™è¯¯
+        public static final int FAIL_TO_RESET_PWD = 102;            //é‡ç½®å¯†ç å¤±è´¥
+        public static final int GAS_NOT_ENOUGH = 103;               //GASè´¹ä¸è¶³
+        public static final int BROADCAST_OK = 104;                 //å¹¿æ’­ä¸Šé“¾æˆåŠŸ
+        public static final int BROADCAST_FAILURE = 105;            //å¹¿æ’­ä¸Šé“¾å¤±è´¥
     }
 
     static {
         System.loadLibrary("wallet");
     }
-    //todo mnemonic byte[]
+        //todo mnemonic byte[]
+    //æ‰€æœ‰byte[]çš„å­—ç¬¦ä¸²ï¼Œç¼–ç ä¸ºutf-8 ï¼Ÿ
+    //è°ƒç”¨å‡½æ•°æ²¡æœ‰è¿”å›å€¼æ—¶ï¼Œè¿”å› int æ˜¯error code
+    //å¦‚æœæœ‰è¿”å›å€¼é‚£ä¹ˆï¼Œä½¿ç”¨ classè¿”å›ï¼Œ classä¸­æœ‰ä¸€ä¸ªå­—æ®µä¸º errorï¼Œè¡¨ç¤ºerror code,  å¦‚æœè¿”å›classæ²¡æœ‰åˆ›å»ºæˆåŠŸè¿”å› null
+    //æ‰€æœ‰çš„classéƒ½æä¾›ä¸€ä¸ªå‡½æ•°ï¼Œè®¾ç½®æ‰€æœ‰å€¼çš„åŠŸèƒ½ï¼ˆè¿™æ˜¯ä¸ºäº†å‡å°‘ä¸jvmäº¤äº’çš„æ¬¡æ•°ï¼‰
 
-    /*------------------------------------------Öú¼Ç´Ê------------------------------------------*/
-    //Éú³ÉÖú¼Ç´Ê£¨¸öÊı¿ÉÑ¡£©
-    //·µ»Ø£ºString       "{ err:" + err +","+"data:"+ Öú¼Ç´Êbyte[]+" }"
-    public static native String mnemonicGenerate(int count);
+    /*--------------------------åŠ©è®°è¯--------------------------*/
+    //ç”ŸæˆåŠ©è®°è¯ï¼ˆä¸ªæ•°å¯é€‰ï¼‰
+    public static class Mnemonic {
+        public int status;
+        public byte[] mn;
+        public String mnId; //todo mnIDçš„ç”Ÿæˆè§„åˆ™ï¼Ÿ uuid or hash
+    }
 
-    //¼ÓÃÜÖú¼Ç´Ê £¬ ¸ù¾İÖú¼Ç´Ê + ÃÜÂë£¬
-    //·µ»Ø£ºString       "{ err:" + err +","+"data:"+¼ÓÃÜºóµÄÖú¼Ç´Ê byte[]+" }"
-    public static native String mnemonicEncode(byte[] mn, byte[] pwd);
+    public static class Address {
+        public int chainType;
+        public String pubKey; //todo è¯´æ˜å…·ä½“æ ¼å¼
+        public String addr; //todo è¯´æ˜å…·ä½“æ ¼å¼
+        public byte[] priKey; //é™¤Exportæœ‰å€¼å¤–ï¼Œå…¶ä½™éƒ½æ²¡æœ‰å€¼
+    }
 
-    //½âÃÜÖú¼Ç´Ê £¬ ¸ù¾İ ¼ÓÃÜºóµÄÖú¼Ç´Ê×Ö´® + ÃÜÂë
-    //·µ»Ø£ºString        "{ err:" + err +","+"data:"+ Öú¼Ç´Ê byte[]+" }"
-    public static native String mnemonicDecode(byte[] en, byte[] pwd);
+    public static native Mnemonic mnemonicGenerate(int count);
 
-    //ÖØÖÃÃÜÂë£¬ ¸ù¾İ ¼ÓÃÜºóµÄÖú¼Ç´Ê×Ö´® + ¾ÉÃÜÂë + ĞÂÃÜÂë£¬
-    //·µ»Ø£ºString        "{ err:" + err +","+"data:"+ Öú¼Ç´Ê byte[] +" }"
-    public static native String mnemonicResetPwd(byte[] en, byte[] oldPwd, byte[] newPwd);
+    public static native Mnemonic mnemonicSave(byte[] mn, byte[] pwd); //éœ€è¦ç”Ÿæˆåœ°å€åŠå…¬é’¥ï¼Œå¹¶ä¿å­˜
 
-    /*------------------------------------------Á´Ïà¹Ø------------------------------------------*/
-    //»ñÈ¡Á´µØÖ·¡£Çø·ÖÁ´ÀàĞÍ
-    //·µ»Ø£ºÁ´µØÖ·String  "{ err:" + err +","+"data:"+ byte[]+" }"
-    //dataËµÃ÷£º "[{ chainType:0,address:0x123456789},{ chainType:1,address:0x987654321}]" ×ª³É byte[]
-    public static native String[] chainGetAddress(byte[] mn, int[] chainType);
+    //é‡ç½®å¯†ç , mmIdä¸ä¼šå˜
+    public static native int mnemonicResetPwd(String mnId, byte[] oldPwd, byte[] newPwd);
 
-    /* //»ñÈ¡½»Ò×¼ÇÂ¼¡£ Çø·ÖÁ´ÀàĞÍ£¬ Ö¸¶¨µØÖ· Ö¸¶¨ÌõÊı
-    //·µ»Ø£ºÁ´½»Ò×¼ÇÂ¼¡£
+    public static class MnemonicExport {
+        public int status;
+        public byte[] mn;
+        public String mnId;
+        public Address[] addrs;
+    }
+    public static native MnemonicExport mnemonicExport(String mnId, byte[] pwd);
+
+    public static class MnemonicAddresses {
+        public int status;
+        public Address[] addrs;
+    }
+    public static native MnemonicAddresses mnemonicAddresses(String mnId); //æ²¡æœ‰ private key
+
+    //è§£å¯†åï¼Œé‡æ–°ç”Ÿæˆæ‰€æœ‰çš„ public key and address
+    public static native MnemonicAddresses mnemonicDecodeAddresses(String mnId, byte[] pwd);
+
+
+    public static class MnemonicAddress {
+        public int status;
+        public Address addrs;
+    }
+    public static native MnemonicAddress mnemonicAddress(String mnId, int chainType); //æ²¡æœ‰ private key
+
+    //è§£å¯†åï¼Œé‡æ–°ç”Ÿæˆæ‰€æœ‰çš„ public key and address
+    public static native MnemonicAddress mnemonicDecodeAddress(String mnId, int chainType, byte[] pwd);
+
+
+    //è¯æ˜æ‹¥æœ‰ç§é’¥
+    public static class MnemonicProveOwn {
+        public String content;
+        public long ts;
+        public String hash; //hash256
+        public String signed; //
+        public String pubKey;
+        public String algorithm; //ä½¿ç”¨çš„ç­¾åç®—æ³•
+    }
+    public static native MnemonicProveOwn mnemonicProveOwn(String mnId);
+
+
+    //ç­¾åï¼Œ æ­¤æ–¹æ³•ä¼šè°ƒç”¨é“¾çš„ç‰¹åˆ«ä»£ç ï¼Œç”Ÿæˆhashè¿›è¡Œç­¾åï¼Œ è¿™é‡Œä¼ å…¥çš„æ˜¯åŸå§‹çš„äº¤æ˜“ä¿¡æ¯
+    public static native Message mnemonicSign(String rawTx, String mnId, int chainType,  byte[] pwd);
+
+
+
+
+    /*------------------------------------------é“¾ç›¸å…³------------------------------------------*/
+
+
+    /* //è·å–äº¤æ˜“è®°å½•ã€‚ åŒºåˆ†é“¾ç±»å‹ï¼Œ æŒ‡å®šåœ°å€ æŒ‡å®šæ¡æ•°
+    //è¿”å›ï¼šé“¾äº¤æ˜“è®°å½•ã€‚
     public static native String chainGetTxHistory(int chainType, String targetAddress, int fromNum, int toNum);*/
+	
+	
+	
+	/*--------------------------äº¤æ˜“ç›¸å…³  eee --------------------------*/
+    //ipAddress: 127.0.0.1:66,  è¿™é‡Œæœ‰åœ°å€æœ‰å¯ä»¥æ˜¯å¤šä¸ªï¼Œè¿™ä¸ªæš‚æ—¶å…ˆä½¿ç”¨ä¸€ä¸ª
+    public static class Handle {
+        public int status;
+        public long handle;
+    }
+    public static native Handle eeeOpen(String ipAddress, String chainId);
+    public static native int eeeClose(long handle);
 
-    /*------------------------------------------½»Ò×Ïà¹Ø------------------------------------------*/
-    //ETH ½»Ò×Æ´×°¡£   ·µ»Ø£ºÎ´Ç©ÃûµÄ½»Ò× String¡£
-    //nonce¼ÇÂ¼Î»ÖÃ£¿£¿£¿
+    public static class Message {
+        public int status;
+        public String msg;
+    }
+    //è·å–æ‹¼è£…åŸå§‹äº¤æ˜“ï¼ŒåŒºåˆ†é“¾ç±»å‹
+    //è¿”å›ï¼šæœªç­¾åçš„äº¤æ˜“ String, æ ¼å¼ä¸ºjsonæ ¼å¼
+    //ç¬¬ä¸€ä¸ªå‚æ•°ä¸º eeeOpen çš„è¿”å›å€¼
+    //å…·ä½“çš„å‚æ•°æ ¼å¼ï¼Œéœ€è¦ä¸Jermyä¸€èµ·ç¡®å®š
+    //msg: äº¤æ˜“
+    public static native Message eeeTransfer(long handle, String from, String to, String value, String extendMsg);
+
+    //msg: äº¤æ˜“
+    public static native Message eeeEnergyTransfer(long handle, String from, String to, String value, String extendMsg);
+
+    //è·å–ç­¾ååçš„äº¤æ˜“ä¿¡æ¯ï¼ŒåŒºåˆ†é“¾ç±»å‹
+    //è¿”å›ï¼šç­¾ååçš„äº¤æ˜“ String
+    //msg: ç­¾ååçš„äº¤æ˜“
+    //æ­¤æ–¹æ³•ä¼šç›´æ¥è°ƒç”¨åˆ°åŠ©è®°è¯çš„ç›¸å…³æ–¹æ³•
+    public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
+
+    //å¹¿æ’­äº¤æ˜“ï¼ŒåŒºåˆ†é“¾ç±»å‹
+    //msg:äº¤æ˜“ID
+    public static native Message eeeTxBroadcast(long handle, String signedTx);
+
+    //msg: balance
+    public static native Message eeeBalance(long handle, String addr);
+    //msg: energy balance
+    public static native Message eeeEnergyBalance(long handle, String addr);
+	
+	//EEE nonceè·å–
+    public static native String eeeGetTxNonce();
+
+
+    /*------------------------------------------äº¤æ˜“ç›¸å…³------------------------------------------*/
+    //ETH äº¤æ˜“æ‹¼è£…ã€‚   è¿”å›ï¼šæœªç­¾åçš„äº¤æ˜“ Stringã€‚
+    //nonceè®°å½•ä½ç½®ï¼Ÿï¼Ÿï¼Ÿ
     public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, String pwd, String fromAddress, String toAddress,
                                                   String value, String backupMsg, String gasLimit, String gasPrice);
 
-    //ERC20 ½»Ò×Æ´×°¡£    ·µ»Ø£ºÎ´Ç©ÃûµÄ½»Ò× String
-    // nonce¼ÇÂ¼Î»ÖÃ£¿£¿£¿
+    //ERC20 äº¤æ˜“æ‹¼è£…ã€‚    è¿”å›ï¼šæœªç­¾åçš„äº¤æ˜“ String
+    // nonceè®°å½•ä½ç½®ï¼Ÿï¼Ÿï¼Ÿ
     public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, String pwd, String fromAddress, String contractAddress,
                                                     String toAddress, String value, String backupMsg, String gasLimit, String gasPrice);
 
-    //´¦Àí½¨ÒéÓÅÏÈ¿¼ÂÇ£¬ÊµÏÖspvµÄ¿â´¦×ö¡£   ÄÜ¸ü·½±ã»ñÈ¡utxo,»¹ÓĞÕÒÁãµØÖ·Ñ¡Ôñ,ÕÒÁã½ğ¶î¡£
+    //å¤„ç†å»ºè®®ä¼˜å…ˆè€ƒè™‘ï¼Œå®ç°spvçš„åº“å¤„åšã€‚   èƒ½æ›´æ–¹ä¾¿è·å–utxo,è¿˜æœ‰æ‰¾é›¶åœ°å€é€‰æ‹©,æ‰¾é›¶é‡‘é¢ã€‚
     public static native byte[] btcTxMakeBTCRawTx(String[] from, String[] to, String value);
 
-    //EEE nonce»ñÈ¡
-    public static native String eeeGetTxNonce();
 
-    public static native byte[] eeeTxMakeRawTx(String from, String to, String nonce, String value, String backupMsg);
-
-    //»ñÈ¡Ç©ÃûºóµÄ½»Ò×ĞÅÏ¢£¬Çø·ÖÁ´ÀàĞÍ
-    //·µ»Ø£ºÇ©ÃûºóµÄ½»Ò× byte[]
+    //è·å–ç­¾ååçš„äº¤æ˜“ä¿¡æ¯ï¼ŒåŒºåˆ†é“¾ç±»å‹
+    //è¿”å›ï¼šç­¾ååçš„äº¤æ˜“ byte[]
     public static native byte[] ethTxSignTx(String rawTx, byte[] encodeMne, String pwd);
-
-    public static native byte[] eeeTxSignTx(String rawTx, byte[] encodeMne, String pwd);
 
     public static native byte[] btcTxSignTx(String rawTx, byte[] encodeMne, String pwd);
 
-    //¹ã²¥½»Ò×£¬Çø·ÖÁ´ÀàĞÍ
-    //·µ»Ø£º¹ã²¥³É¹¦1¡¢ ¹ã²¥Ê§°Ü0
-    public static native boolean ethTxBroascastTx([]byte signedTx);
+    //å¹¿æ’­äº¤æ˜“ï¼ŒåŒºåˆ†é“¾ç±»å‹
+    //è¿”å›ï¼šå¹¿æ’­æˆåŠŸ1ã€ å¹¿æ’­å¤±è´¥0
+    public static native boolean ethTxBroascastTx(byte[] signedTx);
 
-    public static native boolean btcTxBroascastTx([]byte signedTx);
-
-    public static native boolean eeeTxBroascastTx([]byte signedTx);
+    public static native boolean btcTxBroascastTx(byte[] signedTx);
 
 }
 
 /*
-    fixd Öú¼Ç´Ê¶ÀÁ¢¹ÜÀí£¬Ò»¸öÖú´Ê¿ÉÒÔÉú³É¶àÖÖÁ´µØÖ·£¨eth,btc,eee£©
+    fixd åŠ©è®°è¯ç‹¬ç«‹ç®¡ç†ï¼Œä¸€ä¸ªåŠ©è¯å¯ä»¥ç”Ÿæˆå¤šç§é“¾åœ°å€ï¼ˆeth,btc,eeeï¼‰
 
-    fixd Ç©Ãû´ÓÇ®°üÖĞ¶ÀÁ¢³öÀ´
+    fixd ç­¾åä»é’±åŒ…ä¸­ç‹¬ç«‹å‡ºæ¥
 
-    fixd Á´¹¦ÄÜ£ºÈ¡µ½ÓëÇ®°üÏà¹ØµÄµØÖ·½»Ò×£¬
+    fixd é“¾åŠŸèƒ½ï¼šå–åˆ°ä¸é’±åŒ…ç›¸å…³çš„åœ°å€äº¤æ˜“ï¼Œ
 
-    fixd Éú³É½»Ò×£¨noÇ©Ãû£©£¬½»Ò×ÉÏÁ´¼°¹ı³Ì
+    fixd ç”Ÿæˆäº¤æ˜“ï¼ˆnoç­¾åï¼‰ï¼Œäº¤æ˜“ä¸Šé“¾åŠè¿‡ç¨‹
 
-         Á´ui¶ÀÁ¢¹ÜÀí
+         é“¾uiç‹¬ç«‹ç®¡ç†
 
-         ½»Ò×¼ÇÂ¼±¾µØ´æ·Å£¬¸úÁ´ÉÏ¼ÇÂ¼Î»ÖÃ£¿£¿
+         äº¤æ˜“è®°å½•æœ¬åœ°å­˜æ”¾ï¼Œè·Ÿé“¾ä¸Šè®°å½•ä½ç½®ï¼Ÿï¼Ÿ
 
-         Ç®°üÁĞ±í¼ÓÔØÀ´Ô´£¿
+         é’±åŒ…åˆ—è¡¨åŠ è½½æ¥æºï¼Ÿ
 
-         ±¾µØÊı¾İ¿â£º    ±£´æ±¾µØ½»Ò×¼ÇÂ¼ + Ç®°üÁĞ±í£¨ĞÂÔö¡¢É¾³ı¡¢Ç®°üÃû¡¢Éèµ±Ç°Ç®°ü¡¢Ç®°üÁ´µØÖ·¡¢Á´ÉÏ´ú±ÒĞÅÏ¢£©
-         ·ÅÔÚflutter±£´æ£¬´¦Àí
+         æœ¬åœ°æ•°æ®åº“ï¼š    ä¿å­˜æœ¬åœ°äº¤æ˜“è®°å½• + é’±åŒ…åˆ—è¡¨ï¼ˆæ–°å¢ã€åˆ é™¤ã€é’±åŒ…åã€è®¾å½“å‰é’±åŒ…ã€é’±åŒ…é“¾åœ°å€ã€é“¾ä¸Šä»£å¸ä¿¡æ¯ï¼‰
+         æ”¾åœ¨flutterä¿å­˜ï¼Œå¤„ç†
 */
