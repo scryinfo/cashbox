@@ -51,6 +51,12 @@ public class Native {
 
     public static native Mnemonic mnemonicSave(byte[] mn, byte[] pwd); //需要生成地址及公钥，并保存
 
+    public static class Mnemonics {
+        public int status;
+        public String[] mnId;
+    }
+    public static native Mnemonic mnemonicList();
+
     //重置密码, mmId不会变
     public static native int mnemonicResetPwd(String mnId, byte[] oldPwd, byte[] newPwd);
 
