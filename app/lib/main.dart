@@ -30,11 +30,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() async {
-    var platformResult = await Walletassist.platformVersion;
-    print("platformresult is =>" + platformResult);
+    var mnemonicGenerate = await WalletAssist.mnemonicGenerate();
+    print("mnemonicGenerate is=>" + mnemonicGenerate.toString());
 
-    var mnemonicGenerate = await Walletassist.mnemonicGenerate();
-    print("mnemonicGenerate is=>" + mnemonicGenerate);
     setState(() {
       _counter++;
     });
