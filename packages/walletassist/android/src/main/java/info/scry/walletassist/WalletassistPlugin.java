@@ -9,6 +9,8 @@ import info.scry.walletassist.NativeLib.*;
 
 import android.util.Log;
 
+import java.util.HashMap;
+
 /**
  * WalletassistPlugin
  */
@@ -21,27 +23,20 @@ public class WalletassistPlugin implements MethodCallHandler {
         channel.setMethodCallHandler(new WalletassistPlugin());
     }
 
-//    public static class Mnemonic {
-//        public int status;
-//        public byte[] mn;
-//        public String mnId; //todo mnID的生成规则？ uuid or hash
-//    }
-
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-        if (call.method.equals("getPlatformVersion")) {
-            result.success("Android " + android.os.Build.VERSION.RELEASE);
-        } else if (call.method.equals("mnemonicGenerate")) {
-            Log.d("nativeLib=>", "begin in~~~");
-
-            Mnemonic mnemonic;
+        if (call.method.equals("mnemonicGenerate")) {
+            Mnemonic mnemonicCls = new NativeLib.Mnemonic();
             try {
-                NativeLib.mnemonicGenerate(12);
+                mnemonicCls = (NativeLib.Mnemonic) (NativeLib.mnemonicGenerate(12));
             } catch (Exception exception) {
                 Log.d("nativeLib=>", "exception is " + exception);
             }
-            //Log.d("nativeLib=>", "mnemonic" + mnemonic);
-            //result.success("mnemonicGenerate" + mnemonic);
+            HashMap hashMap = new HashMap();
+            hashMap.put("mn", mnemonicCls.mn);
+            hashMap.put("mnId", mnemonicCls.mnId);
+            hashMap.put("status", mnemonicCls.status);
+            result.success(hashMap);
         } else {
             result.notImplemented();
         }
