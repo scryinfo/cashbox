@@ -1,4 +1,4 @@
-/.idea
+*.idea
 /app/android/app/src/debug
 /app/pubspec.lock
 /bc/.idea
@@ -7,3 +7,6 @@
 /packages/wallet/.idea
 /packages/wallet/example/pubspec.lock
 /packages/wallet/pubspec.lock
+/packages/walletassist/android/.idea/
+/packages/walletassist/android/settings.gradle
+.gitignore.swp
