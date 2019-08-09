@@ -116,6 +116,8 @@ public class NativeLib {
     //签名， 此方法会调用链的特别代码，生成hash进行签名， 这里传入的是原始的交易信息
     public static native Message mnemonicSign(String rawTx, String mnId, int chainType, byte[] pwd);
 
+    /*------------------------------------------钱包管理相关------------------------------------------*/
+    public static native Message loadAllWalletList();
 
 
 

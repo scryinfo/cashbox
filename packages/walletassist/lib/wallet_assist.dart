@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 class WalletAssist {
   static const MethodChannel _channel = const MethodChannel('walletassist');
 
-  static Future<Map<dynamic, dynamic>> mnemonicGenerate() async {
+  static Future<Map<dynamic, dynamic>> mnemonicGenerate(count) async {
     Map<dynamic, dynamic> mneMap =
-        await _channel.invokeMethod('mnemonicGenerate');
+        await _channel.invokeMethod('mnemonicGenerate', {"count": count});
     return mneMap;
   }
 
@@ -21,9 +21,10 @@ class WalletAssist {
         await _channel.invokeMethod('getNowWallet');
     return allWalletList;
   }
+
   static Future<bool> setNowWallet(nowWallet) async {
     Map<dynamic, dynamic> allWalletList =
-        await _channel.invokeMethod('setNowWallet');
+        await _channel.invokeMethod('setNowWallet', nowWallet);
     return false;
   }
 
