@@ -10,10 +10,15 @@ edition = "2018"
 tiny-bip39 ="0.6.2"
 substrate-bip39 ="0.3.0"
 schnorrkel="0.1.1"
-rand = "0.6"
+rand = "0.7.0"
 log = "0.4.8"
 tiny-keccak = "1.5.0"
 hex="0.3.2"
+rusqlite = "0.20.0"
+
+scrypt = { version = "0.2", default-features = true }
+serde_json="1.0.40"
+scry-crypto = {version = "0.1.0",path="../bc-util/crypto"}
 
 # 这里编译存在版本问题，当前使用的master能够正常编译通过
 [dependencies.substrate-primitives]

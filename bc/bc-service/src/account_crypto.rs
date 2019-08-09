@@ -4,9 +4,6 @@ use substrate_bip39::mini_secret_from_entropy;
 use schnorrkel::keys::MiniSecretKey;
 use rand::{RngCore, rngs::OsRng};
 
-
-pub struct Ed25519;
-
 pub trait Crypto {
     type Seed: AsRef<[u8]> + AsMut<[u8]> + Sized + Default;
     type Pair: Pair;
@@ -23,7 +20,7 @@ pub trait Crypto {
     }
     fn generate_seed() -> Self::Seed {
         let mut seed: Self::Seed = Default::default();
-        OsRng::new().unwrap().fill_bytes(seed.as_mut());
+        OsRng.fill_bytes(seed.as_mut());
         seed
     }
     fn seed_from_phrase(phrase: &str, password: Option<&str>) -> Self::Seed;
@@ -73,7 +70,7 @@ pub trait Crypto {
     }
 }
 
-
+pub struct Ed25519;
 impl Crypto for Ed25519 {
     type Seed = [u8; 32];
     type Pair = ed25519::Pair;
