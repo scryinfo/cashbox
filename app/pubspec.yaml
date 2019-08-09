@@ -32,6 +32,9 @@ dependencies:
   fluttertoast: ^3.1.0
   #                    https://github.com/PonnamKarthik/FlutterToast
 
+  oktoast: ^2.2.0
+  # Toast插件 https://github.com/OpenFlutter/flutter_oktoast
+
   fluro: "^1.5.0"
   # 路由管理           https://github.com/theyakka/fluro
 
