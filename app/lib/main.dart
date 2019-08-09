@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:walletassist/walletassist.dart';
+import 'package:app/model/Mnemonic.dart';
 
 void main() => runApp(MyApp());
 
@@ -30,9 +31,12 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() async {
-    var mnemonicGenerate = await WalletAssist.mnemonicGenerate();
-    print("mnemonicGenerate is=>" + mnemonicGenerate.toString());
-
+    var mneMap = await WalletAssist.mnemonicGenerate();
+    Mnemonic mnemonic = new Mnemonic();
+    mnemonic.mn = mneMap["mn"];
+    mnemonic.mnId = mneMap["mnId"];
+    mnemonic.status = mneMap["status"];
+    print("mnemonic.status is " + mnemonic.status.toString());
     setState(() {
       _counter++;
     });
