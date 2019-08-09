@@ -21,7 +21,6 @@ class WalletAssist {
         await _channel.invokeMethod('getNowWallet');
     return allWalletList;
   }
-
   static Future<bool> setNowWallet(nowWallet) async {
     Map<dynamic, dynamic> allWalletList =
         await _channel.invokeMethod('setNowWallet');
