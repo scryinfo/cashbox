@@ -23,6 +23,23 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+  provide: ^1.0.2
+  # 状态管理           https://github.com/google/flutter-provide
+
+  dio: ^2.0.7
+  # 网络请求           https://github.com/flutterchina/dio
+
+  fluttertoast: ^3.1.0
+  #                    https://github.com/PonnamKarthik/FlutterToast
+
+  fluro: "^1.5.0"
+  # 路由管理           https://github.com/theyakka/fluro
+
+  webview_flutter: ^0.3.9+1
+  #   https://github.com/flutter/plugins/tree/master/packages/webview_flutter
+
+  qr_flutter: ^2.1.0
+  # 生成二维码         https://github.com/lukef/qr.flutter
 
   walletassist:
     path: ../packages/walletassist/
