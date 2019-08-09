@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'Chain.dart';
-import 'package:walletassist/walletassist.dart';
+import 'package:walletassist/wallet_assist.dart';
 
 class Wallet {
   String walletId; //钱包Id

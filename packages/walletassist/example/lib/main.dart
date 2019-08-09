@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:walletassist/walletassist.dart';
+import 'package:walletassist/wallet_assist.dart';
 
 void main() => runApp(MyApp());
 
