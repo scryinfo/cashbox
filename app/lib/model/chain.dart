@@ -1,5 +1,5 @@
 import 'Digit.dart';
-import 'package:walletassist/walletassist.dart';
+import 'package:walletassist/wallet_assist.dart';
 
 class Chain {
   String chainId; //链Id

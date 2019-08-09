@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:walletassist/walletassist.dart';
+import 'package:walletassist/wallet_assist.dart';
 import 'package:app/model/Mnemonic.dart';
 
 void main() => runApp(MyApp());

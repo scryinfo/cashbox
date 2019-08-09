@@ -1,4 +1,4 @@
-import 'package:walletassist/walletassist.dart';
+import 'package:walletassist/wallet_assist.dart';
 import '../model/Wallet.dart';
 import '../model/Chain.dart';
 
