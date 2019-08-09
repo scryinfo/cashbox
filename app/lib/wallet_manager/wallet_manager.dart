@@ -40,8 +40,9 @@ class WalletMgr {
   }
 
   //设置当前钱包 bool是否成功
-  Future<bool> setNowWallet(nowWallet) async {
-    var isSuccess = await WalletAssist.setNowWallet(nowWallet);
+  Future<bool> setNowWallet(Wallet nowWallet) async {
+    var isSuccess = await WalletAssist.setNowWallet(
+        {"walletId": nowWallet.walletId, "walletName": nowWallet.walletName});
     //todo 等待底层处理完成，更改 数据模型处。
     if (isSuccess) {
       this.nowWallet = nowWallet;
