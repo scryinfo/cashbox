@@ -9,7 +9,7 @@ class Digit {
   String contractAddress; //合约地址
   String urlImg; //代币图标icon地址
   bool isVisible; //是否可见
-  int decimals; //精度，小数点后的位数
+  int decimal; //精度，小数点后的位数
   Digit(chainId) {
     this.chainId = chainId;
   }

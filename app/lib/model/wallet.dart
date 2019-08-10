@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'Chain.dart';
-import 'package:walletassist/wallet_assist.dart';
+import 'package:wallet_manager/wallet_manager.dart';
 
 class Wallet {
   String walletId; //钱包Id
@@ -36,7 +36,7 @@ class Wallet {
 
   Future<bool> addChain(chain) async {
     //todo 数据格式
-    var isSuccess = await WalletAssist.addChain(chain);
+    var isSuccess = await WalletManager.addChain(chain);
     if (isSuccess) {
       chainList.add(chain);
     }
@@ -46,7 +46,7 @@ class Wallet {
   //todo show hide
   Future<bool> deleteChain(chain) async {
     //todo 数据格式
-    var isSuccess = await WalletAssist.deleteChain(chain);
+    var isSuccess = await WalletManager.deleteChain(chain);
     if (isSuccess) {
       chainList.remove(chain);
     }
