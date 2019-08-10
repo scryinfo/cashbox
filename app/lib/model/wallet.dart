@@ -11,27 +11,20 @@ class Wallet {
   String jsonFilePath; //私钥加密文件jsonFile路径
   String creationTime; //钱包创建时间
   List<Chain> chainList; //钱包内包含链列表
-
-  //todo 当前链
+  Chain nowChain;
 
   //todo load chain
 
-  //todo rename wallet
+  Future<bool> resetPwd(String newPwd, String oldPwd) async {
+    var isSuccess = await WalletManager.resetPwd(newPwd, oldPwd);
+    return null;
+  }
 
-  //todo reset password
+  Future<bool> rename(String walletName) async {
+    //todo 数据格式
+    var isSuccess = await WalletManager.rename(walletName, walletId);
 
-  Chain createNowWalletChain(chainType) {
-    Chain chainCls = Chain();
-    chainCls.walletId = walletId;
-    switch (chainType) {
-      case ChainType.ETH:
-        chainCls.chainType = ChainType.ETH;
-        break;
-      case ChainType.BTC:
-        chainCls.chainType = ChainType.BTC;
-        break;
-    }
-    return chainCls;
+    return null;
   }
 
   Future<bool> addChain(chain) async {
@@ -43,12 +36,37 @@ class Wallet {
     return isSuccess;
   }
 
-  //todo show hide
-  Future<bool> deleteChain(chain) async {
-    //todo 数据格式
-    var isSuccess = await WalletManager.deleteChain(chain);
+  Future<bool> showChain(String chainType) async {
+    var isSuccess = await WalletManager.showChain(walletId, chainType);
     if (isSuccess) {
-      chainList.remove(chain);
+      //todo 数据格式
+      //chainList.remove(chain);
+    }
+    return isSuccess;
+  }
+
+  Future<bool> hideChain(chainType) async {
+    var isSuccess = await WalletManager.hideChain(walletId, chainType);
+    if (isSuccess) {
+      //todo 数据格式
+      //chainList.remove(chain);
+    }
+    return null;
+  }
+
+  //获取当前链
+  Future<Chain> getNowChain() async {
+    var allWalletList = await WalletManager.getNowChain(walletId);
+    // todo 数据格式转换，返回
+    return null;
+  }
+
+  //设置当前链
+  Future<bool> setNowChain(chainType) async {
+    var isSuccess = await WalletManager.setNowChain(chainType);
+    //todo 等待底层处理完成，更改 数据模型处。
+    if (isSuccess) {
+      this.nowChain = nowChain;
     }
     return isSuccess;
   }
