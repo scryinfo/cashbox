@@ -1,5 +1,5 @@
 import 'Digit.dart';
-import 'package:walletassist/wallet_assist.dart';
+import 'package:wallet_manager/wallet_manager.dart';
 
 class Chain {
   String chainId; //链Id
@@ -16,7 +16,7 @@ class Chain {
   Future<bool> addDigit(Digit digit) async {
     digitsList.add(digit);
     //todo 数据格式
-    var isSuccess = await WalletAssist.addDigit(digit);
+    var isSuccess = await WalletManager.addDigit(digit);
     if (isSuccess) {
       digitsList.add(digit);
     }
@@ -25,7 +25,7 @@ class Chain {
 
   Future<bool> addDigitList(List<Digit> digitList) async {
     //todo db操作 原子性
-    var isSuccess = await WalletAssist.addDigitList(digitList);
+    var isSuccess = await WalletManager.addDigitList(digitList);
     if (isSuccess) {
       digitsList.addAll(digitList);
     }
@@ -34,7 +34,7 @@ class Chain {
 
   Future<bool> deleteDigit(digit) async {
     //todo db操作 原子性
-    var isSuccess = await WalletAssist.deleteDigit(digit);
+    var isSuccess = await WalletManager.deleteDigit(digit);
     if (isSuccess) {
       digitsList.remove(digit);
     }
