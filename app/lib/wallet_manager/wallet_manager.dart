@@ -25,6 +25,15 @@ class WalletMgr {
     return _instance;
   }
 
+  //todo 是否已经创创建
+
+  //
+
+  //todo export  ? manager / wallet
+
+  //todo import ? manager /wallet
+
+
   //从数据库 加载出 所有钱包数据
   Future<List<Wallet>> loadAllWalletList() async {
     var allWalletList = await WalletAssist.loadAllWalletList();
@@ -75,6 +84,8 @@ class WalletMgr {
     return null;
   }
 
+  //todo save wallet
+  //todo remove to wallet
   //助记词 + 密码 --->助记词导入钱包流程
   Future<Wallet> mnemonicSave(mnemonic, pwd) async {
     var isSuccess = await WalletAssist.mnemonicSave(mnemonic, pwd);

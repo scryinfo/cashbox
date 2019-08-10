@@ -5,11 +5,20 @@ import 'package:walletassist/wallet_assist.dart';
 class Wallet {
   String walletId; //钱包Id
   String walletName; //钱包名
-  Uint8List mnemonic; //助记词
+
+  Uint8List mnemonic; //助记词,
   Uint8List secretKey; //私钥
   String jsonFilePath; //私钥加密文件jsonFile路径
   String creationTime; //钱包创建时间
   List<Chain> chainList; //钱包内包含链列表
+
+  //todo 当前链
+
+  //todo load chain
+
+  //todo rename wallet
+
+  //todo reset password
 
   Chain createNowWalletChain(chainType) {
     Chain chainCls = Chain();
@@ -34,6 +43,7 @@ class Wallet {
     return isSuccess;
   }
 
+  //todo show hide
   Future<bool> deleteChain(chain) async {
     //todo 数据格式
     var isSuccess = await WalletAssist.deleteChain(chain);
