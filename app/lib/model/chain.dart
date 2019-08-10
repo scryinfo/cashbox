@@ -13,13 +13,39 @@ class Chain {
     return Digit(chainId);
   }
 
+  Future<bool> showDigit(String digitId) async {
+    var isSuccess = await WalletManager.showDigit(walletId, chainId, digitId);
+    if (isSuccess) {
+      //todo 数据格式
+      //chainList.remove(chain);
+    }
+    return isSuccess;
+  }
+
+  Future<bool> hideDigit(String digitId) async {
+    var isSuccess = await WalletManager.hideDigit(walletId, chainId, digitId);
+    if (isSuccess) {
+      //todo 数据格式
+      //chainList.remove(chain);
+    }
+    return isSuccess;
+  }
+
   Future<bool> addDigit(Digit digit) async {
     digitsList.add(digit);
     //todo 数据格式
-    var isSuccess = await WalletManager.addDigit(digit);
+/*    var isSuccess = await WalletManager.addDigit(
+        digit.digitId,
+        digit.chainId,
+        digit.address,
+        digit.balance,
+        digit.contractAddress,
+        digit.shortName,
+        digit.fullName,
+        digit.decimal);
     if (isSuccess) {
       digitsList.add(digit);
-    }
+    }*/
     return isSuccess;
   }
 
