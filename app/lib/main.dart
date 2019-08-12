@@ -1,12 +1,24 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:oktoast/oktoast.dart';
+import 'package:flutter/services.dart';
 import 'page/splash_page.dart';
 import 'package:fluro/fluro.dart';
 import 'routers/routers.dart';
 import 'routers/application.dart';
 import 'package:app/res/resources.dart';
 
-void main() => runApp(MyApp());
+
+void main() {
+  runApp(MyApp());
+  if (Platform.isAndroid) {
+    print("android platform~~~~");
+    // 以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，是为了在渲染后进行set赋值，覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。
+    SystemUiOverlayStyle systemUiOverlayStyle =
+        SystemUiOverlayStyle(statusBarColor: Colors.transparent);
+    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  }
+}
 
 class MyApp extends StatelessWidget {
   MyApp() {
@@ -17,19 +29,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OKToast(
-        child: MaterialApp(
-          title: "cashbox",
-          theme: ThemeData(
-            primaryColor: Colours.app_main,
-            scaffoldBackgroundColor: Colors.black26,
-          ),
-          home: SplashPage(),
-        ),
-        backgroundColor: Colors.black54,
-        textPadding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-        radius: 20.0,
-        position: ToastPosition.bottom);
+    return Container(
+      child: MaterialApp(
+        home: SplashPage(),
+      ),
+    );
   }
 }
