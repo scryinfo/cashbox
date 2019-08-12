@@ -60,7 +60,7 @@ class WalletMgr {
     return null;
   }
 
-  // 钱包导出。 恢复钱包
+  // 钱包导出。 恢复钱包   /* 此处有助记词生成。注意及时释放*/
   // apiNo:WM04
   Future<Wallet> exportWallet(String walletId, String pwd) async {
     var result = await WalletManager.exportWallet(walletId, pwd);

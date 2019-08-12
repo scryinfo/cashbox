@@ -13,6 +13,51 @@ class Chain {
     return Digit(chainId);
   }
 
+  //跟jni接口处，定义一致  NativeLib.ChainType
+  int chainTypeToInt(ChainType chainType) {
+    switch (chainType) {
+      case ChainType.BTC:
+        return 1;
+      case ChainType.BTC_TEST:
+        return 2;
+      case ChainType.ETH:
+        return 3;
+      case ChainType.ETH_TEST:
+        return 4;
+      case ChainType.EEE:
+        return 5;
+      case ChainType.EEE_TEST:
+        return 6;
+      default:
+        return 0;
+    }
+  }
+
+  ChainType intToChainType(int chainTypeInt) {
+    ChainType chainType;
+    switch (chainTypeInt) {
+      case 1:
+        chainType = ChainType.BTC;
+        break;
+      case 2:
+        chainType = ChainType.BTC_TEST;
+        break;
+      case 3:
+        chainType = ChainType.ETH;
+        break;
+      case 4:
+        chainType = ChainType.ETH_TEST;
+        break;
+      case 5:
+        chainType = ChainType.EEE;
+        break;
+      case 6:
+        chainType = ChainType.EEE_TEST;
+        break;
+    }
+    return chainType;
+  }
+
   // 显示代币
   // apiNo:WM14
   Future<bool> showDigit(String digitId) async {
@@ -75,7 +120,7 @@ class Chain {
   }
 }
 
-enum ChainType { ETH, BTC, EEE }
+enum ChainType { BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST }
 
 class ChainETH extends Chain {
   ChainETH(chainId, walletId) {
