@@ -15,27 +15,23 @@ class Wallet {
 
   //todo load chain
 
+  // 重置钱包密码
+  // apiNo:WM08
   Future<bool> resetPwd(String newPwd, String oldPwd) async {
-    var isSuccess = await WalletManager.resetPwd(newPwd, oldPwd);
+    var isSuccess = await WalletManager.resetPwd(walletId, newPwd, oldPwd);
     return null;
   }
 
+  // 重置钱包名
+  // apiNo:WM09
   Future<bool> rename(String walletName) async {
     //todo 数据格式
-    var isSuccess = await WalletManager.rename(walletName, walletId);
-
+    var isSuccess = await WalletManager.rename(walletId, walletName);
     return null;
   }
 
-  Future<bool> addChain(chain) async {
-    //todo 数据格式
-    var isSuccess = await WalletManager.addChain(chain);
-    if (isSuccess) {
-      chainList.add(chain);
-    }
-    return isSuccess;
-  }
-
+  // 显示链
+  // apiNo:WM10
   Future<bool> showChain(String chainType) async {
     var isSuccess = await WalletManager.showChain(walletId, chainType);
     if (isSuccess) {
@@ -45,6 +41,8 @@ class Wallet {
     return isSuccess;
   }
 
+  // 隐藏链
+  // apiNo:WM11
   Future<bool> hideChain(chainType) async {
     var isSuccess = await WalletManager.hideChain(walletId, chainType);
     if (isSuccess) {
@@ -54,16 +52,18 @@ class Wallet {
     return null;
   }
 
-  //获取当前链
+  // 获取当前链
+  // apiNo:WM12
   Future<Chain> getNowChain() async {
     var allWalletList = await WalletManager.getNowChain(walletId);
     // todo 数据格式转换，返回
     return null;
   }
 
-  //设置当前链
+  // 设置当前链
+  // apiNo:WM13
   Future<bool> setNowChain(chainType) async {
-    var isSuccess = await WalletManager.setNowChain(chainType);
+    var isSuccess = await WalletManager.setNowChain(walletId,chainType);
     //todo 等待底层处理完成，更改 数据模型处。
     if (isSuccess) {
       this.nowChain = nowChain;
