@@ -13,6 +13,8 @@ class Chain {
     return Digit(chainId);
   }
 
+  // 显示代币
+  // apiNo:WM14
   Future<bool> showDigit(String digitId) async {
     var isSuccess = await WalletManager.showDigit(walletId, chainId, digitId);
     if (isSuccess) {
@@ -22,6 +24,8 @@ class Chain {
     return isSuccess;
   }
 
+  // 隐藏代币
+  // apiNo:WM15
   Future<bool> hideDigit(String digitId) async {
     var isSuccess = await WalletManager.hideDigit(walletId, chainId, digitId);
     if (isSuccess) {
@@ -31,6 +35,7 @@ class Chain {
     return isSuccess;
   }
 
+  // 添加代币 todo 2.0 待确定数据格式
   Future<bool> addDigit(Digit digit) async {
     digitsList.add(digit);
     //todo 数据格式
@@ -46,9 +51,10 @@ class Chain {
     if (isSuccess) {
       digitsList.add(digit);
     }*/
-    return isSuccess;
+    return null;
   }
 
+  // 添加代币list todo 2.0 待确定数据格式
   Future<bool> addDigitList(List<Digit> digitList) async {
     //todo db操作 原子性
     var isSuccess = await WalletManager.addDigitList(digitList);
@@ -58,6 +64,7 @@ class Chain {
     return isSuccess;
   }
 
+  // 删除代币 todo 2.0 待确定数据格式
   Future<bool> deleteDigit(digit) async {
     //todo db操作 原子性
     var isSuccess = await WalletManager.deleteDigit(digit);
@@ -68,7 +75,7 @@ class Chain {
   }
 }
 
-enum ChainType { ETH, BTC }
+enum ChainType { ETH, BTC, EEE }
 
 class ChainETH extends Chain {
   ChainETH(chainId, walletId) {
@@ -88,4 +95,14 @@ class ChainBTC extends Chain {
 
   @override
   ChainType get chainType => ChainType.BTC;
+}
+
+class ChainEEE extends Chain {
+  ChainEEE(chainId, walletId) {
+    this.chainId = chainId;
+    this.walletId = walletId;
+  }
+
+  @override
+  ChainType get chainType => ChainType.EEE;
 }

@@ -24,19 +24,31 @@ class WalletMgr {
     return _instance;
   }
 
-  //是否已经有创建的钱包
-  Future<bool> isExistWallet() async {
-    //var isExist = await WalletAssist.isExistWallet();
-    //return isExist;
-    return null;
-  }
-
   // 创建助记词，待验证正确通过，由底层创建钱包完成，应用层做保存
+  // apiNo:MM00
   Future<Uint8List> createMnemonic(int count) async {
     var result = await WalletManager.mnemonicGenerate(count);
     return null;
   }
 
+  // 是否已有钱包
+  // apiNo:WM01
+  Future<bool> isContainWallet() async {
+    var isExist = await WalletManager.isContainWallet();
+    //'return isExist;
+    return null;
+  }
+
+  // 导出所有钱包
+  // apiNo:WM02
+  Future<List<Wallet>> loadAllWalletList() async {
+    var allWalletList = await WalletManager.loadAllWalletList();
+    // todo 数据格式转换，返回
+    return null;
+  }
+
+  // 保存钱包,钱包导入。  通过助记词创建钱包流程
+  // apiNo:WM03
   Future<Wallet> saveWallet(
       String walletName, String pwd, Uint8List mnemonic) async {
     Wallet wallet = Wallet();
@@ -48,29 +60,16 @@ class WalletMgr {
     return null;
   }
 
-  //钱包导出。 恢复钱包
-  Future<Wallet> exportWallet(String pwd, String walletId) async {
-    var result = await WalletManager.exportWallet(pwd, walletId);
+  // 钱包导出。 恢复钱包
+  // apiNo:WM04
+  Future<Wallet> exportWallet(String walletId, String pwd) async {
+    var result = await WalletManager.exportWallet(walletId, pwd);
     // todo result数据格式转换，返回
-    return null;
-  }
-
-  //钱包导入。  通过助记词创建钱包流程
-  Future<Wallet> importWallet(String mne, String pwd, String walletName) async {
-    var result = await WalletManager.importWallet(mne, pwd, walletName);
-    // todo result数据格式转换，返回
-    //allWalletList.add(result);
-    return null;
-  }
-
-  //从数据库 加载出 所有钱包数据
-  Future<List<Wallet>> loadAllWalletList() async {
-    var allWalletList = await WalletManager.loadAllWalletList();
-    // todo 数据格式转换，返回
     return null;
   }
 
   //获取当前钱包
+  // apiNo:WM05
   Future<Wallet> getNowWallet() async {
     var nowWallet = await WalletManager.getNowWallet();
     // todo 数据格式转换，返回
@@ -78,8 +77,9 @@ class WalletMgr {
   }
 
   //设置当前钱包 bool是否成功
+  //  apiNo:WM06
   Future<bool> setNowWallet(String walletId) async {
-    var isSuccess = await WalletManager.setNowWallet({"walletId": walletId});
+    var isSuccess = await WalletManager.setNowWallet(walletId);
     //todo 等待底层处理完成，更改 数据模型处。
     if (isSuccess) {
       this.nowWallet = nowWallet;
@@ -88,6 +88,7 @@ class WalletMgr {
   }
 
   //删除钱包。 钱包设置可删除，链设置隐藏。
+  // apiNo:WM07.
   Future<bool> deleteWallet(String walletId) async {
     var isSuccess = await WalletManager.deleteWallet(walletId);
     // db移除 todo 数据格式转换

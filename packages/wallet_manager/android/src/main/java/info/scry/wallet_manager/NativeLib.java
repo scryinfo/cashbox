@@ -57,6 +57,8 @@ public class NativeLib {
         public byte[] priKey; //除Export有值外，其余都没有值
     }
 
+    // 创建助记词，待验证正确通过，由底层创建钱包完成，应用层做保存
+    // apiNo:MM00
     public static native Mnemonic mnemonicGenerate(int count);
 
     public static native Mnemonic mnemonicSave(byte[] mn, byte[] pwd); //需要生成地址及公钥，并保存
@@ -150,9 +152,81 @@ public class NativeLib {
         public String imgUrl;
     }
 
+    public static class WalletState {
+        public int status;                    //通信消息状态码         200消息正常返回
+        public boolean isContainWallet;       //是否已有钱包           apiNo:WM01   1成功 0失败
+        public String walletId;               //当前钱包id             apiNo:WM05
+        public boolean isSetNowWallet;        //设置当前钱包,是否成功  apiNo:WM06   1成功 0失败
+        public boolean isDeletWallet;         //删除钱包是否成功       apiNo:WM07   1成功 0失败
+        public boolean isResetPwd;            //重置密码是否成功       apiNo:WM08   1成功 0失败
+        public boolean isRename;              //重置钱包名是否成功     apiNo:WM09   1成功 0失败
+        public boolean isShowChain;           //设置显示链,是否成功    apiNo:WM10   1成功 0失败
+        public boolean isHideChain;           //设置隐藏链,是否成功    apiNo:WM11   1成功 0失败
+        public int getNowChainType;           //获取当前链类型         apiNo:WM12   ChainType
+        public boolean isSetNowChain;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
+        public boolean isShowDigit;           //设置显示代币,是否成功  apiNo:WM14   1成功 0失败
+        public boolean isHideDigit;           //设置隐藏代币,是否成功  apiNo:WM15   1成功 0失败
+    }
+
+    // 是否已有钱包
+    // apiNo:WM01
+    public static native WalletState isContainWallet();
+
+    // 导出所有钱包
+    // apiNo:WM02
     public static native List<Wallet> WalletLoadAllWalletList();
 
-    public static native Wallet WalletCreateWallet(String walletName, String pwd);
+    // 保存钱包
+    // apiNo:WM03
+    public static native Wallet WalletSaveWallet(String walletName, String pwd, byte[] Mnemonic);
+
+    // 钱包导出。 恢复钱包
+    // apiNo:WM04
+    public static native Wallet exportWallet(String walletId, String pwd);
+
+    // 获取当前钱包
+    // apiNo:WM05
+    public static native WalletState getNowWallet();
+
+    // 设置当前钱包 bool是否成功
+    // apiNo:WM06
+    public static native WalletState setNowWallet(String walletId);
+
+    // 删除钱包。 钱包设置可删除，链设置隐藏。
+    // apiNo:WM07.
+    public static native WalletState deleteWallet(String walletId);
+
+    // 重置钱包密码。
+    // apiNo:WM08.
+    public static native WalletState resetPwd(String walletId, String newPwd, String oldPwd);
+
+    // 重置钱包名
+    // apiNo:WM09
+    public static native WalletState rename(String walletId, String walletName);
+
+    // 显示链
+    // apiNo:WM10
+    public static native WalletState showChain(String walletId, int chainType);
+
+    // 隐藏链
+    // apiNo:WM11
+    public static native WalletState hideChain(String walletId, int chainType);
+
+    // 获取当前链
+    // apiNo:WM12
+    public static native WalletState getNowChain(String walletId);
+
+    // 设置当前链
+    // apiNo:WM13
+    public static native WalletState setNowChain(String walletId, int chainType);
+
+    // 显示代币
+    // apiNo:WM14
+    public static native WalletState showDigit(String walletId, String chainId, String digitId);
+
+    // 隐藏代币
+    // apiNo:WM15
+    public static native WalletState hideDigit(String walletId, String chainId, String digitId);
 
     /*------------------------------------------链相关------------------------------------------*/
 
