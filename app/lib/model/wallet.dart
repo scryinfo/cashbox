@@ -6,8 +6,8 @@ class Wallet {
   String walletId; //钱包Id
   String walletName; //钱包名
 
-  Uint8List mnemonic; //助记词,
-  Uint8List secretKey; //私钥
+  Uint8List mnemonic; //助记词,                  /* 参数传递，及时释放*/
+  Uint8List secretKey; //私钥                    /* 参数传递，及时释放*/
   String jsonFilePath; //私钥加密文件jsonFile路径
   String creationTime; //钱包创建时间
   List<Chain> chainList; //钱包内包含链列表
@@ -32,7 +32,7 @@ class Wallet {
 
   // 显示链
   // apiNo:WM10
-  Future<bool> showChain(String chainType) async {
+  Future<bool> showChain(int chainType) async {
     var isSuccess = await WalletManager.showChain(walletId, chainType);
     if (isSuccess) {
       //todo 数据格式
@@ -43,7 +43,7 @@ class Wallet {
 
   // 隐藏链
   // apiNo:WM11
-  Future<bool> hideChain(chainType) async {
+  Future<bool> hideChain(int chainType) async {
     var isSuccess = await WalletManager.hideChain(walletId, chainType);
     if (isSuccess) {
       //todo 数据格式
@@ -62,8 +62,8 @@ class Wallet {
 
   // 设置当前链
   // apiNo:WM13
-  Future<bool> setNowChain(chainType) async {
-    var isSuccess = await WalletManager.setNowChain(walletId,chainType);
+  Future<bool> setNowChain(int chainType) async {
+    var isSuccess = await WalletManager.setNowChain(walletId, chainType);
     //todo 等待底层处理完成，更改 数据模型处。
     if (isSuccess) {
       this.nowChain = nowChain;

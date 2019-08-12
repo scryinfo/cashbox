@@ -84,12 +84,6 @@ class WalletManager {
     return null;
   }
 
-  static Future<bool> addChain(chain) async {
-    Map<dynamic, dynamic> allWalletList =
-        await _channel.invokeMethod('addChain', chain);
-    return null;
-  }
-
   // 重置钱包密码。
   // apiNo:WM08
   static Future<bool> resetPwd(
@@ -109,17 +103,17 @@ class WalletManager {
 
   // 显示链
   // apiNo:WM10
-  static Future<bool> showChain(walletId, chainType) async {
+  static Future<bool> showChain(String walletId, int chainType) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod(
-        'showChain', {"walletId": walletId, chainType: chainType});
+        'showChain', {"walletId": walletId, "chainType": chainType});
     return null;
   }
 
   // 隐藏链
   // apiNo:WM11
-  static Future<bool> hideChain(walletId, chainType) async {
+  static Future<bool> hideChain(String walletId, int chainType) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod(
-        'deleteChain', {"walletId": walletId, chainType: chainType});
+        'deleteChain', {"walletId": walletId, "chainType": chainType});
     return null;
   }
 
@@ -133,7 +127,7 @@ class WalletManager {
 
   // 设置当前链
   // apiNo:WM13
-  static Future<bool> setNowChain(String walletId, String chainType) async {
+  static Future<bool> setNowChain(String walletId, int chainType) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod(
         'setNowChain', {"walletId": walletId, "chainType": chainType});
     return false;
@@ -141,7 +135,8 @@ class WalletManager {
 
   // 显示代币
   // apiNo:WM14
-  static Future<bool> showDigit(walletId, chainId, digitId) async {
+  static Future<bool> showDigit(
+      String walletId, String chainId, String digitId) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod(
         'showDigit',
         {"walletId": walletId, "chainId": chainId, "digitId": digitId});
@@ -150,7 +145,8 @@ class WalletManager {
 
   // 隐藏代币
   // apiNo:WM15
-  static Future<bool> hideDigit(walletId, chainId, digitId) async {
+  static Future<bool> hideDigit(
+      String walletId, String chainId, String digitId) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod(
         'hideDigit',
         {"walletId": walletId, "chainId": chainId, "digitId": digitId});
