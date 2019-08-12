@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
         ),
         body: Container(
             alignment: Alignment.centerLeft,
-            child: new ListView(
+            child: new Column(
               children: <Widget>[ChainCard(), MiddleFuncCard()],
             )),
       ),
