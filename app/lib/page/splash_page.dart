@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import '../wallet_manager/wallet_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:app/page/home_page.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -13,7 +14,6 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _initWallet();
   }
@@ -24,7 +24,9 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (allWalletList.length > 0) {
+    ScreenUtil.instance = ScreenUtil(width: 90, height: 160)
+      ..init(context); //初始化宽高比    cashbox标注XXXHDPI@4x
+    if (allWalletList.length == 0) {
       print("goHomePage=>");
       return HomePage();
     } else {

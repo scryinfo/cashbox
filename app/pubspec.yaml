@@ -44,6 +44,12 @@ dependencies:
   qr_flutter: ^2.1.0
   # 生成二维码         https://github.com/lukef/qr.flutter
 
+  flutter_swiper: ^1.1.6
+  #                    https://github.com/jzoom/flutter_swiper
+
+  flutter_screenutil: ^0.5.3
+  # 屏幕适配           https://github.com/OpenFlutter/flutter_screenutil
+
   #walletassist:
   #  path: ../packages/walletassist/
   wallet_manager:
