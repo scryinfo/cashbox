@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import '../res/resources.dart';
 
 class ChainCard extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class _ChainCardState extends State<ChainCard>
     with AutomaticKeepAliveClientMixin {
   String moneyUnitStr = "USD";
   List<String> moneyUnitList = ["USD", "CNY", "KRW", "GBP", "JPY"];
+  List<String> chainTypeList = ["BTC", "ETH", "EEE"];
 
   @override
   bool get wantKeepAlive => true;
@@ -18,28 +20,30 @@ class _ChainCardState extends State<ChainCard>
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(image: AssetImage("assets/images/bg_card.png")),
-      ),
-      height: ScreenUtil().setHeight(42.5),
       width: ScreenUtil().setWidth(77.5),
+      height: ScreenUtil().setHeight(42.75),
       child: Swiper(
         itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return Text("666");
-          } else {
-            return SingleChildScrollView(
+          return SingleChildScrollView(
+            child: Container(
+              width: ScreenUtil().setWidth(77.5),
+              height: ScreenUtil().setHeight(42.75),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/bg_card.png"),
+                    fit: BoxFit.fill),
+              ),
               child: Column(
                 children: <Widget>[
-                  new Row(children: [
+                  new Column(children: [
                     GestureDetector(
                       onTap: () {
                         print("money unit is click~~~");
                       },
                       child: Padding(
                           padding: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(12.5),
-                              top: ScreenUtil().setWidth(6.25)),
+                              left: ScreenUtil().setWidth(10),
+                              top: ScreenUtil().setWidth(7)),
                           child: Row(children: <Widget>[
                             new Text(
                               moneyUnitStr,
@@ -93,14 +97,67 @@ class _ChainCardState extends State<ChainCard>
                                 }),
                           ])),
                     ),
+                    SizedBox(height: ScreenUtil().setHeight(5)),
+                    new Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                            child: Padding(
+                                padding: EdgeInsets.only(
+                                    left: ScreenUtil().setWidth(10)),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    print("clicked qr_code.png~~~");
+                                  },
+                                  child: Image.asset(
+                                      "assets/images/ic_card_qrcode.png"),
+                                ))),
+                        Container(
+                          alignment: Alignment.bottomLeft,
+                          constraints: BoxConstraints(
+                            maxWidth: ScreenUtil().setWidth(20.5),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: ScreenUtil().setWidth(1.5),
+                            ),
+                            child: GestureDetector(
+                                onTap: () {
+                                  print("clicked address~~~");
+                                },
+                                child: Text(
+                                  "0x566666666666666666666666666666666666666666666666",
+                                  textAlign: TextAlign.start,
+                                  style:
+                                      TextStyle(color: Colors.lightBlueAccent),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
+                          ),
+                        ),
+                        Container(
+                          child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: ScreenUtil().setWidth(12.5),
+                                  bottom: ScreenUtil().setWidth(0)),
+                              child: Text(
+                                chainTypeList[index],
+                                style: TextStyle(fontSize: 35),
+                              )),
+                        ),
+                      ],
+                    )
                   ]),
                 ],
               ),
-            );
-          }
+            ),
+          );
         },
-        itemCount: 2,
-        pagination: new SwiperPagination(),
+        itemCount: 3,
+        pagination: new SwiperPagination(
+            builder: SwiperPagination(
+          builder: SwiperPagination.dots,
+        )),
         autoplay: false,
       ),
     );
