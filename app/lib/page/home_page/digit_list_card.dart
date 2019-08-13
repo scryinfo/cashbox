@@ -30,7 +30,7 @@ class _DigitListCardState extends State<DigitListCard>
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: ScreenUtil().setHeight(60),
+      height: ScreenUtil().setHeight(78),
       width: ScreenUtil().setWidth(90),
       child: FutureBuilder(
         future: future,
@@ -62,14 +62,18 @@ class _DigitListCardState extends State<DigitListCard>
               return Column(
                 children: <Widget>[
                   Container(
-                    height: ScreenUtil().setHeight(19.25),
-                    child: Center(
+                    alignment: Alignment.center,
+                    height: ScreenUtil().setHeight(17),
+                    child: GestureDetector(
+                      onTap: () {
+                        print("click is " + index.toString());
+                      },
                       child: Row(
                         children: <Widget>[
                           Container(
                               child: Padding(
                             padding: EdgeInsets.only(
-                                left: ScreenUtil().setHeight(7)),
+                                left: ScreenUtil().setHeight(10)),
                             child: Image.asset("assets/images/ic_eth.png"),
                           )),
                           Container(
@@ -80,7 +84,11 @@ class _DigitListCardState extends State<DigitListCard>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       Container(
+                                        color: Colors.transparent,
+                                        padding: EdgeInsets.only(
+                                            top: ScreenUtil().setHeight(3)),
                                         width: ScreenUtil().setWidth(65),
+                                        height: ScreenUtil().setHeight(10),
                                         child: Stack(
                                           children: <Widget>[
                                             Align(
@@ -100,7 +108,7 @@ class _DigitListCardState extends State<DigitListCard>
                                             ),
                                             Align(
                                               alignment:
-                                                  FractionalOffset.bottomRight,
+                                                  FractionalOffset.topRight,
                                               child: Text(
                                                 "≈" +
                                                     refreshDataList[index]
@@ -114,7 +122,12 @@ class _DigitListCardState extends State<DigitListCard>
                                         ),
                                       ),
                                       Container(
+                                        padding: EdgeInsets.only(
+                                            top: ScreenUtil().setHeight(1)),
+                                        color: Colors.transparent,
                                         width: ScreenUtil().setWidth(65),
+                                        height: ScreenUtil().setHeight(7),
+                                        alignment: Alignment.center,
                                         child: Stack(
                                           children: <Widget>[
                                             Row(
@@ -143,7 +156,7 @@ class _DigitListCardState extends State<DigitListCard>
                                             ),
                                             Align(
                                               alignment:
-                                                  FractionalOffset.bottomRight,
+                                                  FractionalOffset.topRight,
                                               child: Text(
                                                 "-100",
                                                 style: TextStyle(
@@ -161,15 +174,16 @@ class _DigitListCardState extends State<DigitListCard>
                     ),
                   ),
                   Container(
-                      alignment: Alignment.topLeft,
-                      width: ScreenUtil().setWidth(75),
-                      height:ScreenUtil().setHeight(0.1),
-                      child: CustomPaint(
-                        foregroundPainter: MySeparatorLine(
-                          lineColor: Colors.blueAccent,
-                          width:  ScreenUtil().setWidth(75),
-                        ),
-                      ))
+                    alignment: Alignment.topLeft,
+                    width: ScreenUtil().setWidth(75),
+                    height: ScreenUtil().setHeight(0.1),
+                    child: CustomPaint(
+                      foregroundPainter: MySeparatorLine(
+                        lineColor: Colors.blueAccent,
+                        width: ScreenUtil().setWidth(75),
+                      ),
+                    ),
+                  )
                 ],
               );
             },
