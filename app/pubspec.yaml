@@ -50,8 +50,9 @@ dependencies:
   flutter_screenutil: ^0.5.3
   # 屏幕适配           https://github.com/OpenFlutter/flutter_screenutil
 
-  #walletassist:
-  #  path: ../packages/walletassist/
+  flutter_easyrefresh: ^2.0.2
+  # 上下拉刷新功能     https://github.com/xuelongqy/flutter_easyrefresh
+
   wallet_manager:
     path: ../packages/wallet_manager/
 dev_dependencies:
