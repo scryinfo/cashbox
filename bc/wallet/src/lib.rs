@@ -46,6 +46,11 @@ pub mod android {
             }
         }
     }
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_isContainWallet(env:JNIEnv, _: JClass)->jobject{
+        //调用获取所有钱包，查看返回值的情况
+        let wallet = bc_service::get_all_wallet();
+
+    }
     pub unsafe extern "C" fn Java_info_scry_walletassist_NativeLib_mnemonicSave(env: JNIEnv, _: JClass, mn:jbyteArray, pwd:jbyteArray)-> jobject {
 
     }
