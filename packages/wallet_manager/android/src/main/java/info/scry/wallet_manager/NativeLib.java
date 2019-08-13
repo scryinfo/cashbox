@@ -166,6 +166,7 @@ public class NativeLib {
         public boolean isSetNowChain;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
         public boolean isShowDigit;           //设置显示代币,是否成功  apiNo:WM14   1成功 0失败
         public boolean isHideDigit;           //设置隐藏代币,是否成功  apiNo:WM15   1成功 0失败
+        public String  message;               //错误信息，详细说明
     }
 
     // 是否已有钱包
