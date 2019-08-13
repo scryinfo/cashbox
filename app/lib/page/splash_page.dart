@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import '../wallet_manager/wallet_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:app/page/home_page.dart';
+import 'package:app/page/home_page/home_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SplashPage extends StatefulWidget {

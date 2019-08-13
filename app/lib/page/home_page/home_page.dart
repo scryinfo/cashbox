@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../widgets/chain_card.dart';
-import '../widgets/middle_func_card.dart';
-import '../res/resources.dart';
+import 'package:app/page/home_page/chain_card.dart';
+import 'package:app/page/home_page/middle_func_card.dart';
+import 'package:app/page/home_page/digit_list_card.dart';
+import '../../res/resources.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -28,7 +29,11 @@ class _HomePageState extends State<HomePage> {
         body: Container(
             alignment: Alignment.centerLeft,
             child: new Column(
-              children: <Widget>[ChainCard(), MiddleFuncCard()],
+              children: <Widget>[
+                ChainCard(),
+                MiddleFuncCard(),
+                DigitListCard(),
+              ],
             )),
       ),
     );
