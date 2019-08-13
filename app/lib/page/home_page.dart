@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../widgets/chain_card.dart';
 import '../widgets/middle_func_card.dart';
+import '../res/resources.dart';
 
 class HomePage extends StatefulWidget {
   @override
