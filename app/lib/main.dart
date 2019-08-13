@@ -33,6 +33,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         home: SplashPage(),
       ),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+            fit: BoxFit.fill,
+            image: AssetImage("assets/images/bg_graduate.png")),
+      ),
     );
   }
 }
