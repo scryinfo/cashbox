@@ -47,6 +47,23 @@ struct TbChain {
     update_time: String,
 }
 
+#[derive(Default, Deserialize)]
+struct TbWallet{
+    wallet_id:String,//助记词id
+    wallet_name:String,
+    selected:bool,
+    chain_id:i32,
+    address: String,
+    digit_id:i32,
+    contract_address:String,
+    short_name:String,
+    full_name:String,
+    balance:String,
+    isvisible:bool,
+    decimals: i16,
+    url_img:String
+}
+
 pub struct DataServiceProvider {
     //db_hander: Arc<Mutex<Connection>>,
     db_hander: Connection,
@@ -90,6 +107,7 @@ impl DataServiceProvider {
                     let provider = DataServiceProvider {
                         db_hander: conn,
                     };
+                    // TODO 在连接到助记词库 还需要 attach database  "钱包库"
                     Ok(provider)
                 }
                 Err(error) => {
@@ -151,18 +169,7 @@ impl DataServiceProvider {
         self.db_hander.transaction().map(|_| ()).map_err(|err| err.to_string())
     }
 
-    //当前该功能是返回所有的助记词
-    pub fn get_object_list(&self)->Vec<TbMnemonic>{
-        let sql ="select * from Mnemonic;";
-        let mut statement = self.db_hander.prepare(sql).unwrap();
-        let columns = columns_from_statement(&statement);
-        let mut res = from_rows_with_columns::<TbMnemonic,_>(statement.query(NO_PARAMS).unwrap(),&columns);
-        let mut vec = Vec::new();
-        while let Some(mn)= res.next(){
-            vec.push(mn)
-        }
-        vec
-    }
+
 
     pub fn update_mnemonic(&self, mn: TbMnemonic) -> Result<usize,String>{
         let mn_sql = "update Mnemonic set mnemonic=?1 where id=?2;";
@@ -171,6 +178,7 @@ impl DataServiceProvider {
             err.to_string()
         })
     }
+
     pub fn save_mnemonic_address(&mut self, mn: TbMnemonic, addr: TbAddress) -> Result<(), String> {
         let mn_sql = "insert into Mnemonic(id,mnemonic) values(?1,?2)";
         let address_sql = "insert into Address(mnemonic_id,chain_id,address,puk_key,status) values(?1,?2,?3,?4,?5)";
@@ -227,5 +235,64 @@ impl DataServiceProvider {
             println!("query error:{}", err.to_string());
             err.to_string()
         })
+    }
+    //考虑修改为查询所有指定条件的对象
+    pub fn query_selected_mnemonic(&self)->Result<TbMnemonic, String>{
+        //选中钱包 只有一个
+        let sql ="select * from Mnemonic where selected=1;";
+        self.db_hander.prepare(sql).map(|mut stmt| {
+            let mut rows = stmt.query(NO_PARAMS).unwrap();
+            {
+                let mut res = from_rows_ref::<TbMnemonic>(&mut rows);
+                let mnemonic = res.next().unwrap();
+                mnemonic
+            }
+        }).map_err(|err| {
+            println!("query error:{}", err.to_string());
+            err.to_string()
+        })
+    }
+    //当前该功能是返回所有的助记词
+    pub fn get_mnemonics(&self)->Vec<TbMnemonic>{
+        let sql ="select * from Mnemonic;";
+
+        let mut statement = self.db_hander.prepare(sql).unwrap();
+        let columns = columns_from_statement(&statement);
+        let mut res = from_rows_with_columns::<TbMnemonic,_>(statement.query(NO_PARAMS).unwrap(),&columns);
+        let mut vec = Vec::new();
+        while let Some(mn)= res.next(){
+            vec.push(mn)
+        }
+        vec
+    }
+
+    pub fn set_selected_mnemonic(&self,mn_id:&str)->Result<(),String>{
+        //需要先查询出那些助记词是被设置为当前选中，将其设置为取消选中，再将指定的id 设置为选中状态
+        let sql = "UPDATE Mnemonic set selected = 0 where id in (select id from Mnemonic WHERE selected=1);update Mnemonic set selected = 1 where id =:?;";
+        self.db_hander.execute(sql,&[mn_id]).map(|_|()).map_err(|err|err.to_string())
+    }
+    pub fn del_mnemonic(&self,mn_id:&str)->Result<(),String>{
+        let sql = "DELETE from Mnemonic WHERE id = :?; UPDATE Address set status = 0 WHERE mnemonic_id =:?;";
+        self.db_hander.execute(sql,&[mn_id]).map(|_|()).map_err(|err|err.to_string())
+    }
+    pub fn rename_mnemonic(&self,mn_id:&str,mn_name:&str)->Result<(),String>{
+        let sql = "UPDATE Mnemonic set fullname = :1 WHERE id=:2;";
+        self.db_hander.execute(sql,params![mn_name,mn_id]).map(|_|()).map_err(|err|err.to_string())
+
+    }
+
+    pub fn display_mnemonic_list(&self)->Vec<TbWallet>{
+        let all_mn = "select a.id as wallet_id,a.fullname as wallet_name,a.selected,b.id as chain_id,b.address,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
+ from Mnemonic a,wallet.Chain b,wallet.Address c,wallet.Digit d where a.id=c.mnemonic_id and c.chain_id = b.id and c.address=d.address and a.status =1 and c.status =1;";
+
+        let mut statement = self.db_hander.prepare(all_mn).unwrap();
+        let columns = columns_from_statement(&statement);
+        let mut res = from_rows_with_columns::<TbWallet,_>(statement.query(NO_PARAMS).unwrap(),&columns);
+        let mut vec = Vec::new();
+        while let Some(mn)= res.next(){
+            vec.push(mn)
+        }
+        vec
+
     }
 }
