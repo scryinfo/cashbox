@@ -8,7 +8,6 @@ import 'routers/routers.dart';
 import 'routers/application.dart';
 import 'package:app/res/resources.dart';
 
-
 void main() {
   runApp(MyApp());
   if (Platform.isAndroid) {
@@ -30,13 +29,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: MaterialApp(
-        home: SplashPage(),
-      ),
       decoration: BoxDecoration(
         image: DecorationImage(
             fit: BoxFit.fill,
             image: AssetImage("assets/images/bg_graduate.png")),
+      ),
+      child: MaterialApp(
+        home: SplashPage(),
       ),
     );
   }
