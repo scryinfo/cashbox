@@ -15,7 +15,7 @@ CREATE TABLE [main].[Mnemonic](
   [fullname] VARCHAR(32), 
   [mnemonic] VARCHAR(3072), 
   [selected] VARCHAR(1), 
-  [status] INT, 
+  [status] INT NOT NULL  DEFAULT 1,
   [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')), 
   [update_time] timestamp);
 

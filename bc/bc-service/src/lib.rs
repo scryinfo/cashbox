@@ -38,6 +38,8 @@ pub enum ChainType {
     EeeTest,
 }
 
+
+
 const SCRYPT_LOG_N: u8 = 18;
 const SCRYPT_P: u32 = 1;
 //u32 的数据类型为使用scrypt这个库中定义
@@ -91,10 +93,26 @@ pub struct Digit{
 //query all 满足条件的助记词（wallet）
 pub fn get_all_wallet()->Vec<TbMnemonic>{
     let instance = dataservice::DataServiceProvider::instance().unwrap();
-    instance.get_object_list()
+    instance.get_mnemonics()
 
 }
+pub fn get_current_wallet()->Result<Mnemonic,String>{
+    let instance = dataservice::DataServiceProvider::instance().unwrap();
+    instance.query_selected_mnemonic().map(|tb|Mnemonic{
+        mnid:tb.id,
+       status:StatusCode::OK,
+        mn:vec![],
+        chain_list:vec![],
+    }).map_err(|msg|msg)
+}
 
+pub fn set_current_wallet(walletid:&str){
+    let instance = dataservice::DataServiceProvider::instance().unwrap();
+}
+
+pub fn del_wallet(walletid:&str){
+    let instance = dataservice::DataServiceProvider::instance().unwrap();
+}
 fn address_from_mnemonic<T>(mn: &[u8]) -> Address where T: Crypto{
     let phrase = String::from_utf8(mn.to_vec()).expect("mn byte format convert to string is error!");
     info!("phrase is:{}", phrase);
@@ -219,7 +237,6 @@ pub fn save_mnemonic(wallet_name:String,mn: &[u8], password: &[u8]) -> Result<Mn
         }
     }
 }
-
 
 //定义输入keystore文件格式，用于转换json格式文件
 #[derive(Serialize,Deserialize)]
