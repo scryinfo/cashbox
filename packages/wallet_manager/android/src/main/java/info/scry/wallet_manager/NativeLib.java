@@ -56,49 +56,6 @@ public class NativeLib {
     // apiNo:MM00
     public static native Mnemonic mnemonicGenerate(int count);
 
-    public static native Mnemonic mnemonicSave(byte[] mn, byte[] pwd); //需要生成地址及公钥，并保存
-
-    public static class Mnemonics {
-        public int status;
-        public String[] mnId;
-    }
-
-    public static native Mnemonic mnemonicList();
-
-    //重置密码, mmId不会变
-    public static native int mnemonicResetPwd(String mnId, byte[] oldPwd, byte[] newPwd);
-
-    public static class MnemonicExport {
-        public int status;
-        public byte[] mn;
-        public String mnId;
-        public Address[] addrs;
-    }
-
-    public static native MnemonicExport mnemonicExport(String mnId, byte[] pwd);
-
-    public static class MnemonicAddresses {
-        public int status;
-        public Address[] addrs;
-    }
-
-    public static native MnemonicAddresses mnemonicAddresses(String mnId); //没有 private key
-
-    //解密后，重新生成所有的 public key and address
-    public static native MnemonicAddresses mnemonicDecodeAddresses(String mnId, byte[] pwd);
-
-
-    public static class MnemonicAddress {
-        public int status;
-        public Address addrs;
-    }
-
-    public static native MnemonicAddress mnemonicAddress(String mnId, int chainType); //没有 private key
-
-    //解密后，重新生成所有的 public key and address
-    public static native MnemonicAddress mnemonicDecodeAddress(String mnId, int chainType, byte[] pwd);
-
-
     //证明拥有私钥
     public static class MnemonicProveOwn {
         public String content;
@@ -110,7 +67,6 @@ public class NativeLib {
     }
 
     public static native MnemonicProveOwn mnemonicProveOwn(String mnId);
-
 
     //签名， 此方法会调用链的特别代码，生成hash进行签名， 这里传入的是原始的交易信息
     public static native Message mnemonicSign(String rawTx, String mnId, int chainType, byte[] pwd);
