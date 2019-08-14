@@ -45,7 +45,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 ArrayList arrayList = new ArrayList();
                 HashMap hashMap = new HashMap();
                 try {
-                    NativeLib.WalletLoadAllWalletList();
+                    NativeLib.loadAllWalletList();
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }

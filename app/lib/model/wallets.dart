@@ -3,23 +3,23 @@ import '../model/Wallet.dart';
 import 'dart:typed_data';
 
 //钱包管理
-class WalletMgr {
+class Wallets {
   List<Wallet> allWalletList = List();
   Wallet nowWallet;
 
   //工厂单例类实现
-  factory WalletMgr() => _getInstance();
+  factory Wallets() => _getInstance();
 
-  static WalletMgr get instance => _getInstance();
-  static WalletMgr _instance;
+  static Wallets get instance => _getInstance();
+  static Wallets _instance;
 
-  WalletMgr._internal() {
+  Wallets._internal() {
     //init data
   }
 
-  static WalletMgr _getInstance() {
+  static Wallets _getInstance() {
     if (_instance == null) {
-      _instance = new WalletMgr._internal();
+      _instance = new Wallets._internal();
     }
     return _instance;
   }
