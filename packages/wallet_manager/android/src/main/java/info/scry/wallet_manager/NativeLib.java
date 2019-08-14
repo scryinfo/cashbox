@@ -36,11 +36,6 @@ public class NativeLib {
     static {
         System.loadLibrary("wallet");
     }
-    //todo mnemonic byte[]
-    //所有byte[]的字符串，编码为utf-8 ？
-    //调用函数没有返回值时，返回 int 是error code
-    //如果有返回值那么，使用 class返回， class中有一个字段为 error，表示error code,  如果返回class没有创建成功返回 null
-    //所有的class都提供一个函数，设置所有值的功能（这是为了减少与jvm交互的次数）
 
     /*--------------------------助记词--------------------------*/
     //生成助记词（个数可选）
@@ -175,11 +170,11 @@ public class NativeLib {
 
     // 导出所有钱包
     // apiNo:WM02
-    public static native List<Wallet> WalletLoadAllWalletList();
+    public static native List<Wallet> loadAllWalletList();
 
     // 保存钱包
     // apiNo:WM03
-    public static native Wallet WalletSaveWallet(String walletName, String pwd, byte[] Mnemonic);
+    public static native Wallet saveWallet(String walletName, String pwd, byte[] Mnemonic);
 
     // 钱包导出。 恢复钱包
     // apiNo:WM04
