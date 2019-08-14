@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/page/home_page/home_page.dart';
+import 'package:app/page/home_page/left_drawer_card.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SplashPage extends StatefulWidget {
@@ -26,6 +27,8 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 90, height: 160)
       ..init(context); //初始化宽高比    cashbox标注XXXHDPI@4x
+
+    //todo 再区分链类型，加载 不同界面
     if (allWalletList.length == 0) {
       print("goHomePage=>");
       return HomePage();
