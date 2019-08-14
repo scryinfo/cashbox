@@ -5,6 +5,8 @@ import '../routers/router_handler.dart';
 class Routes {
   static String homePage = '/homepage';
   static String splashPage = '/splashpage';
+  static String publicPage = '/publicpage';
+  static String createWalletPage = '/createwalletpage';
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = new Handler(
@@ -14,5 +16,7 @@ class Routes {
 
     router.define(homePage, handler: homePageHandler);
     router.define(splashPage, handler: splashPageHandler);
+    router.define(publicPage, handler: publicPageHandler);
+    router.define(createWalletPage, handler: createWalletPageHandler);
   }
 }

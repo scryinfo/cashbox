@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
-import 'package:app/page/home_page/home_page.dart';
-import 'package:app/page/home_page/left_drawer_card.dart';
+import 'package:app/page/eee_page/eee_page.dart';
+import 'package:app/page/eee_page/left_drawer_card.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SplashPage extends StatefulWidget {
