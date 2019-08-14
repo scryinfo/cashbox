@@ -61,6 +61,10 @@ pub mod android {
     pub unsafe extern "C" fn Java_info_scry_walletassist_NativeLib_mnemonicResetPwd(env: JNIEnv, _: JClass, mn:jbyteArray, mnid:jstring, oldpwd:jbyteArray, newpwd:jbyteArray)->jint{
 
     }
+
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowWallet(env: JNIEnv, _: JClass)-> jobject {
+
+    }
 }
 
 
