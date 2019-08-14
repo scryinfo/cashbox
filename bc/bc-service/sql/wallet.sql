@@ -11,12 +11,11 @@ DROP TABLE IF EXISTS [main].[Address];
 
 /* Table structure [Address] */
 CREATE TABLE [main].[Address](
-  [id] INT PRIMARY KEY NOT NULL, 
+  [address] VARCHAR(64) PRIMARY KEY NOT NULL,
   [mnemonic_id] VARCHAR(64), 
-  [chain_id] INT, 
-  [address] VARCHAR(64), 
+  [chain_id] INT,
   [puk_key] VARCHAR(128), 
-  [status] INT, 
+  [status] INT NOT NULL  DEFAULT 1,
   [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')));
 
 /* Drop table [Chain] */
@@ -31,7 +30,8 @@ CREATE TABLE [main].[Chain](
   [address] VARCHAR(128), 
   [group_name] VARCHAR(32), 
   [next_id] INT, 
-  [selected] VARCHAR(1), 
+  [selected] VARCHAR(1),
+  [status] INT,
   [more_property] VARCHAR(1), 
   [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')), 
   [update_time] DATETIME);
@@ -42,7 +42,7 @@ DROP TABLE IF EXISTS [main].[Digit];
 /* Table structure [Digit] */
 CREATE TABLE [main].[Digit](
   [id] INT PRIMARY KEY NOT NULL, 
-  [address_id] INT, 
+  [address] VARCHAR(64),
   [contract_address] VARCHAR(128), 
   [short_name] VARCHAR(32), 
   [full_name] VARCHAR(32), 
@@ -50,8 +50,7 @@ CREATE TABLE [main].[Digit](
   [unit] VARCHAR(32), 
   [money] DECIMAL(32, 8), 
   [next_id] INT, 
-  [url_img] VARCHAR(1024), 
-  [mnemonic_id] VARCHAR(64), 
+  [url_img] VARCHAR(1024),
   [group_name] VARCHAR(32), 
   [selected] VARCHAR(1), 
   [decimals] INT, 
