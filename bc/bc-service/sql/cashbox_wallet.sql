@@ -1,15 +1,6 @@
-﻿/* Disable foreign keys */
-PRAGMA foreign_keys = 'off';
-
-/* Begin transaction */
+﻿PRAGMA foreign_keys = 'off';
 BEGIN;
-
-/* Database properties */
-
-/* Drop table [Address] */
 DROP TABLE IF EXISTS [main].[Address];
-
-/* Table structure [Address] */
 CREATE TABLE [main].[Address](
   [address] VARCHAR(64) PRIMARY KEY NOT NULL,
   [mnemonic_id] VARCHAR(64), 
@@ -17,11 +8,7 @@ CREATE TABLE [main].[Address](
   [puk_key] VARCHAR(128), 
   [status] INT NOT NULL  DEFAULT 1,
   [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')));
-
-/* Drop table [Chain] */
 DROP TABLE IF EXISTS [main].[Chain];
-
-/* Table structure [Chain] */
 CREATE TABLE [main].[Chain](
   [id] INT PRIMARY KEY NOT NULL, 
   [type] VARCHAR(32), 
@@ -35,11 +22,7 @@ CREATE TABLE [main].[Chain](
   [more_property] VARCHAR(1), 
   [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')), 
   [update_time] DATETIME);
-
-/* Drop table [Digit] */
 DROP TABLE IF EXISTS [main].[Digit];
-
-/* Table structure [Digit] */
 CREATE TABLE [main].[Digit](
   [id] INT PRIMARY KEY NOT NULL, 
   [address] VARCHAR(64),
@@ -57,11 +40,7 @@ CREATE TABLE [main].[Digit](
   [status] INT, 
   [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')), 
   [UPDATED_TIME] DATETIME);
-
-/* Drop table [TransferRecord] */
 DROP TABLE IF EXISTS [main].[TransferRecord];
-
-/* Table structure [TransferRecord] */
 CREATE TABLE [main].[TransferRecord](
   [id] VARCHAR(32) PRIMARY KEY NOT NULL, 
   [tx_record_hash] VARCHAR(64), 
@@ -75,9 +54,5 @@ CREATE TABLE [main].[TransferRecord](
   [extra_msg] VARCHAR(3072), 
   [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')), 
   [UPDATED_TIME] DATETIME);
-
-/* Commit transaction */
 COMMIT;
-
-/* Enable foreign keys */
 PRAGMA foreign_keys = 'on';
