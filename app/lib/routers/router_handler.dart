@@ -4,7 +4,8 @@ import 'package:fluro/fluro.dart';
 import '../page/splash_page.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import '../page/public_page/public_page.dart';
-import '../page/create_wallet_page/create_wallet_page.dart';
+import '../page/create_wallet_page/create_walletname_page.dart';
+import '../page/create_wallet_page/create_wallet_mnemonic_page.dart';
 
 Handler splashPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -22,5 +23,10 @@ Handler publicPageHandler = Handler(
 });
 Handler createWalletPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return CreateWalletPage();
+  return CreateWalletNamePage();
+});
+
+Handler createWalletMnemonicPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return CreateWalletMnemonicPage();
 });
