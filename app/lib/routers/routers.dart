@@ -6,7 +6,8 @@ class Routes {
   static String homePage = '/homepage';
   static String splashPage = '/splashpage';
   static String publicPage = '/publicpage';
-  static String createWalletPage = '/createwalletpage';
+  static String createWalletNamePage = '/createwalletnamepage';
+  static String createWalletMnemonicPage = '/createwalletmnemonicpage';
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = new Handler(
@@ -17,6 +18,8 @@ class Routes {
     router.define(homePage, handler: homePageHandler);
     router.define(splashPage, handler: splashPageHandler);
     router.define(publicPage, handler: publicPageHandler);
-    router.define(createWalletPage, handler: createWalletPageHandler);
+    router.define(createWalletNamePage, handler: createWalletPageHandler);
+    router.define(createWalletMnemonicPage,
+        handler: createWalletMnemonicPageHandler);
   }
 }
