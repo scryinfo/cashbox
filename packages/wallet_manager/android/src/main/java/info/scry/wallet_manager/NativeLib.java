@@ -1,12 +1,5 @@
 package info.scry.wallet_manager;
 
-import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class NativeLib {
