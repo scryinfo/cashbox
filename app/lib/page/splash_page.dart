@@ -3,6 +3,7 @@ import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/create_wallet_page/create_walletname_page.dart';
+import 'package:app/page/create_wallet_page/create_wallet_mnemonic_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SplashPage extends StatefulWidget {
@@ -31,7 +32,7 @@ class _SplashPageState extends State<SplashPage> {
     //todo 再区分链类型，加载 不同界面
     if (allWalletList.length == 0) {
       print("goHomePage=>");
-      return CreateWalletNamePage();
+      return CreateWalletMnemonicPage();
     } else {
       return Material(
         child: Text("this is splashpage"),
