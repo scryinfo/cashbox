@@ -130,11 +130,11 @@ public class NativeLib {
 
     // 保存钱包
     // apiNo:WM03
-    public static native Wallet saveWallet(String walletName, String pwd, byte[] Mnemonic);
+    public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic);
 
     // 钱包导出。 恢复钱包
     // apiNo:WM04
-    public static native Wallet exportWallet(String walletId, String pwd);
+    public static native Wallet exportWallet(String walletId, byte[] pwd);
 
     // 获取当前钱包
     // apiNo:WM05
@@ -150,7 +150,7 @@ public class NativeLib {
 
     // 重置钱包密码。
     // apiNo:WM08.
-    public static native WalletState resetPwd(String walletId, String newPwd, String oldPwd);
+    public static native WalletState resetPwd(String walletId, byte[] newPwd, byte[] oldPwd);
 
     // 重置钱包名
     // apiNo:WM09
@@ -237,12 +237,12 @@ public class NativeLib {
     /*------------------------------------------交易相关------------------------------------------*/
     //ETH 交易拼装。   返回：未签名的交易 String。
     //nonce记录位置？？？
-    public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, String pwd, String fromAddress, String toAddress,
+    public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String toAddress,
                                                   String value, String backupMsg, String gasLimit, String gasPrice);
 
     //ERC20 交易拼装。    返回：未签名的交易 String
     // nonce记录位置？？？
-    public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, String pwd, String fromAddress, String contractAddress,
+    public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String contractAddress,
                                                     String toAddress, String value, String backupMsg, String gasLimit, String gasPrice);
 
     //处理建议优先考虑，实现spv的库处做。   能更方便获取utxo,还有找零地址选择,找零金额。
@@ -251,9 +251,9 @@ public class NativeLib {
 
     //获取签名后的交易信息，区分链类型
     //返回：签名后的交易 byte[]
-    public static native byte[] ethTxSignTx(String rawTx, byte[] encodeMne, String pwd);
+    public static native byte[] ethTxSignTx(String rawTx, byte[] encodeMne, byte[] pwd);
 
-    public static native byte[] btcTxSignTx(String rawTx, byte[] encodeMne, String pwd);
+    public static native byte[] btcTxSignTx(String rawTx, byte[] encodeMne, byte[] pwd);
 
     //广播交易，区分链类型
     //返回：广播成功1、 广播失败0
