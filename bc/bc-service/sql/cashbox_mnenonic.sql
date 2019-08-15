@@ -1,15 +1,6 @@
-﻿/* Disable foreign keys */
-PRAGMA foreign_keys = 'off';
-
-/* Begin transaction */
+﻿PRAGMA foreign_keys = 'off';
 BEGIN;
-
-/* Database properties */
-
-/* Drop table [Mnemonic] */
 DROP TABLE IF EXISTS [main].[Mnemonic];
-
-/* Table structure [Mnemonic] */
 CREATE TABLE [main].[Mnemonic](
   [id] VARCHAR(64) PRIMARY KEY NOT NULL, 
   [fullname] VARCHAR(32), 
@@ -18,9 +9,5 @@ CREATE TABLE [main].[Mnemonic](
   [status] INT NOT NULL  DEFAULT 1,
   [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')), 
   [update_time] timestamp);
-
-/* Commit transaction */
 COMMIT;
-
-/* Enable foreign keys */
 PRAGMA foreign_keys = 'on';
