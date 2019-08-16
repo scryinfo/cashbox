@@ -7,7 +7,7 @@ use rusqlite::params;
 use serde_rusqlite::{from_rows_ref, from_rows_with_columns, columns_from_statement};
 
 
-const WALLET: [&'static str; 2] = ["cashbox_wallet", "cashbox_mnenonic"];
+const WALLET: [&'static str; 2] = ["cashbox_mnenonic.db","cashbox_wallet.db"];
 
 #[derive(Default, Deserialize)]
 pub struct TbMnemonic {
@@ -48,7 +48,7 @@ struct TbChain {
 }
 
 #[derive(Default, Deserialize)]
-struct TbWallet{
+pub struct TbWallet{
     wallet_id:String,//助记词id
     wallet_name:String,
     selected:bool,
@@ -68,8 +68,14 @@ pub struct DataServiceProvider {
     //db_hander: Arc<Mutex<Connection>>,
     db_hander: Connection,
 }
-
+impl Drop for DataServiceProvider{
+    fn drop(&mut self){
+        let detach_sql = "DETACH DATABASE 'wallet'";
+        &self.db_hander.execute(detach_sql,NO_PARAMS).expect("DETACH database error!");
+    }
+}
 impl DataServiceProvider {
+
     pub fn instance() -> Result<Self, String> {
 
         //2、若是不存在则执行sql脚本文件创建数据库
@@ -78,32 +84,40 @@ impl DataServiceProvider {
         //1、检查对应的数据库文件是否存在
         if fs::File::open(WALLET[0]).is_ok() && fs::File::open(WALLET[1]).is_ok() {
             //连接数据库
-            let conn = Connection::open(WALLET[1]).unwrap();
+            let conn = Connection::open(WALLET[0]).unwrap();
+            let attach_sql = format!("ATTACH DATABASE \"{}\" AS wallet;",WALLET[1]);
+            conn.execute(&attach_sql,NO_PARAMS).expect("attach database error!");
             let provider = DataServiceProvider {
                 db_hander: conn,
             };
             Ok(provider)
         } else {
             //创建数据库
-            match fs::read_dir("../../sql") {
+
+            // TODO这个地方需要在程序运行指定创建sql 脚本所在的目录，这一步需要到时根据运行环境指定
+            match fs::read_dir("sql") {
                 Ok(dir) => {
                     let mut i = 0;
                     // TODO 优化数据库初始化逻辑
                     for entry in dir {
                         let dir = entry.expect("open database sql file fail!");
                         let db_name = dir.file_name();
-                        println!("db name is:{:?}", db_name);
-                        let sql_script = fsutil::load_file(dir.path().to_str().unwrap()).unwrap();
+                       // println!("db name is:{:?},dir.path is:{}", db_name,dir.path().to_str().unwrap());
+                        let sql_script = fsutil::load_file(dir.path().to_str().unwrap()).expect("sql file not found");
+
                         let connect = Connection::open(WALLET[i]).unwrap();
+
                         //使用脚本文件创建数据表
                          connect.execute_batch(&String::from_utf8(sql_script).unwrap()).expect("execute sql script is error");
                         i = i + 1;
                         if connect.close().is_err() {
                             println!("connect close is error");
                         }
-
                     }
-                    let conn = Connection::open(WALLET[1]).unwrap();
+
+                    let conn = Connection::open(WALLET[0]).unwrap();
+                    let attach_sql = format!("ATTACH DATABASE \"{}\" AS wallet;",WALLET[1]);
+                    conn.execute(&attach_sql,NO_PARAMS).expect("attach database error!");
                     let provider = DataServiceProvider {
                         db_hander: conn,
                     };
@@ -116,53 +130,6 @@ impl DataServiceProvider {
                 }
             }
         }
-        /* match Connection::open_with_flags(db_path, OpenFlags::SQLITE_OPEN_READ_WRITE) {
-             Ok(conn) => {
-                 let provider = DataServiceProvider {
-                     db_hander: conn,
-                 };
-                 Ok(provider)
-             }
-             Err(err) => {
-
-                match err {
-                     Error::SqliteFailure(code, opt) => {
-                         match code.code {
-                             ErrorCode::CannotOpen => {
-                                 println!("can't find database file:{},will create it!",db_path);
-                                 let conncet = Connection::open(db_path).unwrap();
-                                 match fs::read_dir("../../sql"){
-                                     Ok(dir)=>{
-                                         for entry in dir{
-                                             let dir = entry.expect("open database sql file fail!");
-                                             let sql = fsutil::load_file(dir.path().to_str().unwrap());
-                                         }
-                                     },
-                                     Err(error)=>{
-
-                                     }
-                                 }
-                                 for i in fs::read_dir("../../sql"){
-
-                                 }
-                                 //create new database use default sql file;
-                                // conncet.execute_batch()
-                                 let provider = DataServiceProvider {
-                                     db_hander: conncet,
-                                 };
-                                 Ok(provider)
-                             }
-                             _ => {
-                                 Err(code.to_string())
-                             }
-                         }
-                     }
-                     _ => {
-                         Err(err.to_string())
-                     }
-                 }
-             }*/
-        /*}*/
     }
 
     pub fn tx_begin(&mut self) -> Result<(), String> {
@@ -181,45 +148,27 @@ impl DataServiceProvider {
 
     pub fn save_mnemonic_address(&mut self, mn: TbMnemonic, addr: TbAddress) -> Result<(), String> {
         let mn_sql = "insert into Mnemonic(id,mnemonic) values(?1,?2)";
-        let address_sql = "insert into Address(mnemonic_id,chain_id,address,puk_key,status) values(?1,?2,?3,?4,?5)";
+        let address_sql = "insert into wallet.Address(mnemonic_id,chain_id,address,puk_key,status) values(?1,?2,?3,?4,?5)";
         // TODO 增加事务的处理，这个的编码方式还需要修改 才能编译通过
         //let hander_tx = self.db_hander
 
         //  let mut tx = self.db_hander.transaction().unwrap();
-        {
-            self.db_hander.execute(mn_sql, params![mn.id,mn.mnemonic]).map_err(|err| {
-                let error_hint = format!("save mnemonic error");
-                err.to_string()
-                //Error::StatementChangedRows
-            });
-            self.db_hander.execute(address_sql, params![addr.mnemonic_id,addr.chain_id,addr.address,addr.pub_key,addr.status]).map_err(|err| {
-                println!("{}", err.to_string());
-                err.to_string()
-            });
-        }
 
-        /*  self.db_hander.transaction().map(|tx|{
-              self.db_hander.execute(mn_sql, params![mn.id,mn.mnemonic]).map_err(|err| {
-                  let error_hint = format!("save mnemonic error");
-                  Error::StatementChangedRows
-              });
-              self.db_hander.execute(address_sql, params![addr.mnemonic_id,addr.chain_id,addr.address,addr.pub_key,addr.status]).map_err(|err| {
-                  println!("{}", err.to_string());
-                  Error::StatementChangedRows
-              });
-          })
-  */
-        //tx.commit();
-        /*     match tx {
-                 Ok(tx)=>{
-
-                     //insert fail should deal rollback
-                     //else commit tx
-
-                 },
-                 Err(e)=>Err(e.to_string()),
-             }*/
-        Ok(())
+            match self.db_hander.execute(mn_sql, params![mn.id,mn.mnemonic]) {
+                Ok(_)=>{
+                    match self.db_hander.execute(address_sql, params![addr.mnemonic_id,addr.chain_id,addr.address,addr.pub_key,addr.status]) {
+                        Ok(_)=>{
+                            Ok(())
+                        },
+                        Err(e)=>{
+                            Err(e.to_string())
+                        }
+                    }
+                },
+                Err(e)=>{
+                   Err(e.to_string())
+                }
+            }
     }
     //这个地方 定义成通用的对象查询功能
     pub fn query_by_mnemonic_id(&self, id: &str) -> Result<TbMnemonic, String> {
