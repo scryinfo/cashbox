@@ -4,6 +4,7 @@ import '../../res/resources.dart';
 import '../../routers/application.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
+import '../../res/styles.dart';
 
 class LeftDrawerCard extends StatefulWidget {
   @override
@@ -172,9 +173,7 @@ class LeftDrawer {
               ],
             ),
           ),
-          SizedBox(
-            height: ScreenUtil().setHeight(7),
-          ),
+          Gaps.scaleVGap(7),
           Container(
             alignment: Alignment.center,
             child: Column(
@@ -228,9 +227,7 @@ class LeftDrawer {
               ],
             ),
           ),
-          SizedBox(
-            height: ScreenUtil().setHeight(7),
-          ),
+          Gaps.scaleVGap(7),
           Container(
             alignment: Alignment.center,
             child: Column(
@@ -284,9 +281,7 @@ class LeftDrawer {
               ],
             ),
           ),
-          SizedBox(
-            height: ScreenUtil().setHeight(7),
-          ),
+          Gaps.scaleVGap(7),
           Container(
             alignment: Alignment.center,
             child: Column(
@@ -340,9 +335,7 @@ class LeftDrawer {
               ],
             ),
           ),
-          SizedBox(
-            height: ScreenUtil().setHeight(7),
-          ),
+          Gaps.scaleVGap(7),
           Container(
             alignment: Alignment.center,
             child: Column(
@@ -396,9 +389,7 @@ class LeftDrawer {
               ],
             ),
           ),
-          SizedBox(
-            height: ScreenUtil().setHeight(7),
-          ),
+          Gaps.scaleVGap(7),
           Container(
             alignment: Alignment.center,
             child: Column(

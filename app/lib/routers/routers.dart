@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../routers/router_handler.dart';
 
 class Routes {
-  static String homePage = '/homepage';
+  static String eeePage = '/eeepage';
   static String splashPage = '/splashpage';
   static String publicPage = '/publicpage';
   static String createWalletNamePage = '/createwalletnamepage';
@@ -17,7 +17,7 @@ class Routes {
       print('ERROR====>ROUTE WAS NOT FONUND!!!');
     });
 
-    router.define(homePage, handler: homePageHandler);
+    router.define(eeePage, handler: eeePageHandler);
     router.define(splashPage, handler: splashPageHandler);
     router.define(publicPage, handler: publicPageHandler);
     router.define(createWalletNamePage, handler: createWalletPageHandler);

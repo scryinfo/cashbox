@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MySeparatorLine extends CustomPainter {
-  Color lineColor;
-  double width;
+  final Color lineColor;
+  final double width;
 
   MySeparatorLine({this.lineColor, this.width});
 

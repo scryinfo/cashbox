@@ -27,12 +27,12 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 90, height: 160)
-      ..init(context); //初始化宽高比    cashbox标注XXXHDPI@4x
+      ..init(context); //初始化屏幕 宽高比 ，以 cashbox标注XXXHDPI@4x
 
     //todo 再区分链类型，加载 不同界面
     if (allWalletList.length == 0) {
-      print("goHomePage=>");
-      return HomePage();
+      print("goEEEPage=>");
+      return EeePage();
     } else {
       return Material(
         child: Text("this is splashpage"),

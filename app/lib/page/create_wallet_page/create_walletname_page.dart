@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../routers/application.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
+import '../../res/styles.dart';
 
 class CreateWalletNamePage extends StatefulWidget {
   @override
@@ -74,25 +75,15 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              SizedBox(
-                height: ScreenUtil().setHeight(10),
-              ),
+              Gaps.scaleVGap(10),
               _buildWalletNameLayout(this),
-              SizedBox(
-                height: ScreenUtil().setHeight(8),
-              ),
+              Gaps.scaleVGap(8),
               _buildWalletPwdLayout(this),
-              SizedBox(
-                height: ScreenUtil().setHeight(8),
-              ),
+              Gaps.scaleVGap(8),
               _buildConfirmPwdLayout(this),
-              SizedBox(
-                height: ScreenUtil().setHeight(8),
-              ),
+              Gaps.scaleVGap(8),
               _buildChainChooseLayout(this),
-              SizedBox(
-                height: ScreenUtil().setHeight(8),
-              ),
+              Gaps.scaleVGap(8),
               Container(
                 alignment: Alignment.bottomCenter,
                 width: ScreenUtil().setWidth(41),
@@ -135,9 +126,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               ),
             ),
           ),
-          SizedBox(
-            height: ScreenUtil().setHeight(2),
-          ),
+          Gaps.scaleVGap(2),
           Container(
             alignment: Alignment.center,
             child: TextField(
@@ -187,9 +176,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               ),
             ),
           ),
-          SizedBox(
-            height: ScreenUtil().setHeight(2),
-          ),
+          Gaps.scaleVGap(2),
           Container(
             alignment: Alignment.center,
             child: TextField(
@@ -238,9 +225,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               ),
             ),
           ),
-          SizedBox(
-            height: ScreenUtil().setHeight(2),
-          ),
+          Gaps.scaleVGap(2),
           Container(
             alignment: Alignment.center,
             child: TextField(
