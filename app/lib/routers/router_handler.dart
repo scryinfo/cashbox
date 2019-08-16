@@ -14,9 +14,9 @@ Handler splashPageHandler = Handler(
   return SplashPage();
 });
 
-Handler homePageHandler = Handler(
+Handler eeePageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return HomePage();
+  return EeePage();
 });
 
 Handler publicPageHandler = Handler(

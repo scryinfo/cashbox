@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../widgets/app_bar.dart';
 import '../../routers/application.dart';
+import '../../res/styles.dart';
 
 class CreateWalletMnemonicPage extends StatefulWidget {
   @override
@@ -62,9 +63,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
         height: ScreenUtil().setWidth(160),
         child: Column(
           children: <Widget>[
-            SizedBox(
-              height: ScreenUtil().setHeight(10.75),
-            ),
+            Gaps.scaleVGap(10.75),
             Container(
               alignment: Alignment.topLeft,
               child: Text(
@@ -75,9 +74,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: ScreenUtil().setHeight(1.75),
-            ),
+            Gaps.scaleVGap(1.75),
             Container(
               alignment: Alignment.center,
               padding: EdgeInsets.only(left: 0, right: 0),
@@ -92,9 +89,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: ScreenUtil().setHeight(5.5),
-            ),
+            Gaps.scaleVGap(5.5),
             Container(
               width: ScreenUtil().setWidth(78.75),
               height: ScreenUtil().setHeight(40),
@@ -110,9 +105,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                 children: _buildRandomMnemonicBtn(),
               ),
             ),
-            SizedBox(
-              height: ScreenUtil().setHeight(6.2),
-            ),
+            Gaps.scaleVGap(6.2),
             Container(
               child: Row(
                 children: <Widget>[
@@ -136,9 +129,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: ScreenUtil().setWidth(42),
-                  ),
+                  Gaps.scaleHGap(42),
                   Container(
                     child: GestureDetector(
                       onTap: () {
@@ -155,9 +146,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                 ],
               ),
             ),
-            SizedBox(
-              height: ScreenUtil().setHeight(38.5),
-            ),
+            Gaps.scaleVGap(38),
             Container(
               alignment: Alignment.bottomCenter,
               width: ScreenUtil().setWidth(41),

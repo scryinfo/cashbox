@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:typed_data';
+import '../../res/styles.dart';
 
 class CreateWalletConfirmPage extends StatefulWidget {
   @override
@@ -55,9 +56,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
         height: ScreenUtil().setWidth(160),
         child: Column(
           children: <Widget>[
-            SizedBox(
-              height: ScreenUtil().setHeight(10.75),
-            ),
+            Gaps.scaleVGap(10.75),
             Container(
               alignment: Alignment.topLeft,
               child: Text(
@@ -68,9 +67,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: ScreenUtil().setHeight(1.75),
-            ),
+            Gaps.scaleVGap(1.75),
             Container(
               alignment: Alignment.center,
               padding: EdgeInsets.only(left: 0, right: 0),
@@ -85,9 +82,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: ScreenUtil().setHeight(5.5),
-            ),
+            Gaps.scaleVGap(5.5),
             Container(
               alignment: Alignment.center,
               width: ScreenUtil().setWidth(78.75),
@@ -101,9 +96,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
             Wrap(
               children: _buildRandomMnemonicBtn(),
             ),
-            SizedBox(
-              height: ScreenUtil().setHeight(10.5),
-            ),
+            Gaps.scaleVGap(10.5),
             Container(
               alignment: Alignment.bottomCenter,
               width: ScreenUtil().setWidth(41),

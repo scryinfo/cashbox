@@ -6,13 +6,12 @@ import 'package:app/page/eee_page/digit_list_card.dart';
 import '../../res/resources.dart';
 import '../eee_page/left_drawer_card.dart';
 
-
-class HomePage extends StatefulWidget {
+class EeePage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _EeePageState createState() => _EeePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _EeePageState extends State<EeePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,18 +35,6 @@ class _HomePageState extends State<HomePage> {
                   DigitListCard(),
                 ],
               ),
-/*              Container(
-                  color: Colors.blueAccent,
-                  width: ScreenUtil().setWidth(28),
-                  height: ScreenUtil().setHeight(8),
-                  margin: EdgeInsets.only(bottom: 5.0),
-                  child: FlatButton(
-                    color: Colors.white,
-                    child: Text(
-                      "添加以太代币",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ))*/
             ],
           )),
     );

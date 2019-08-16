@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'colors.dart';
 import 'dimens.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TextStyles {
   static const TextStyle textMain12 = TextStyle(
@@ -31,28 +32,19 @@ class TextStyles {
   static const TextStyle textBoldDark14 = TextStyle(
       fontSize: Dimens.font_sp14,
       color: Colours.text_dark,
-      fontWeight: FontWeight.bold
-  );
+      fontWeight: FontWeight.bold);
   static const TextStyle textBoldDark16 = TextStyle(
       fontSize: Dimens.font_sp16,
       color: Colours.text_dark,
-      fontWeight: FontWeight.bold
-  );
+      fontWeight: FontWeight.bold);
   static const TextStyle textBoldDark18 = TextStyle(
-    fontSize: Dimens.font_sp18,
-    color: Colours.text_dark,
-    fontWeight: FontWeight.bold
-  );
+      fontSize: Dimens.font_sp18,
+      color: Colours.text_dark,
+      fontWeight: FontWeight.bold);
   static const TextStyle textBoldDark24 = TextStyle(
-      fontSize: 24.0,
-      color: Colours.text_dark,
-      fontWeight: FontWeight.bold
-  );
+      fontSize: 24.0, color: Colours.text_dark, fontWeight: FontWeight.bold);
   static const TextStyle textBoldDark26 = TextStyle(
-      fontSize: 26.0,
-      color: Colours.text_dark,
-      fontWeight: FontWeight.bold
-  );
+      fontSize: 26.0, color: Colours.text_dark, fontWeight: FontWeight.bold);
   static const TextStyle textGray10 = TextStyle(
     fontSize: Dimens.font_sp10,
     color: Colours.text_gray,
@@ -81,11 +73,26 @@ class TextStyles {
 
 /// 间隔
 class Gaps {
+  ///根据ScreenUtil缩放比例的方法
+  static Widget scaleHGap(double width) {
+    return SizedBox(
+      width: ScreenUtil().setWidth(width),
+    );
+  }
+
+  ///根据ScreenUtil缩放比例的方法
+  static Widget scaleVGap(double height) {
+    return SizedBox(
+      height: ScreenUtil().setHeight(height),
+    );
+  }
+
   /// 水平间隔
   static const Widget hGap5 = SizedBox(width: Dimens.gap_dp5);
   static const Widget hGap10 = SizedBox(width: Dimens.gap_dp10);
   static const Widget hGap15 = SizedBox(width: Dimens.gap_dp15);
   static const Widget hGap16 = SizedBox(width: Dimens.gap_dp16);
+
   /// 垂直间隔
   static const Widget vGap5 = SizedBox(height: Dimens.gap_dp5);
   static const Widget vGap10 = SizedBox(height: Dimens.gap_dp10);
@@ -100,7 +107,7 @@ class Gaps {
   static const Widget hGap4 = SizedBox(width: 4.0);
   static const Widget hGap8 = SizedBox(width: 8.0);
   static const Widget hGap12 = SizedBox(width: 12.0);
-  
+
   static Widget line = Container(height: 0.6, color: Colours.line);
   static const Widget empty = SizedBox();
 }

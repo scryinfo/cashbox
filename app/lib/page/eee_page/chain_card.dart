@@ -97,7 +97,7 @@ class _ChainCardState extends State<ChainCard>
                                 }),
                           ])),
                     ),
-                    SizedBox(height: ScreenUtil().setHeight(5)),
+                    Gaps.scaleVGap(5),
                     new Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
