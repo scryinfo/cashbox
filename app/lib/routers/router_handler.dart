@@ -4,7 +4,7 @@ import 'package:fluro/fluro.dart';
 import '../page/splash_page.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import '../page/public_page/public_page.dart';
-import '../page/create_wallet_page/create_walletname_page.dart';
+import '../page/create_wallet_page/create_wallet_name_page.dart';
 import '../page/create_wallet_page/create_wallet_mnemonic_page.dart';
 import '../page/create_wallet_page/create_wallet_confirm_page.dart';
 import '../page/address_page/address_page.dart';

@@ -104,7 +104,9 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               color: Color.fromRGBO(26, 141, 198, 0.20),
               child: FlatButton(
                 onPressed: () {
-                  print("clicked the add wallet btn");
+                  if (_verifyMnemonicSame()) {
+                    print("clicked the add wallet btn");
+                  }
                   //Application.router.navigateTo(context, "createwalletconfirmpage");
                 },
                 child: Text(
@@ -121,6 +123,11 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
         ),
       ),
     );
+  }
+
+  bool _verifyMnemonicSame() {
+    //todo Verify mnemonic
+    return true;
   }
 
   Widget _buildVerifyInputMnemonic() {
