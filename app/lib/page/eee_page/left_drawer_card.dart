@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../res/resources.dart';
 import '../../routers/application.dart';
+import '../../routers/routers.dart';
+import '../../routers/fluro_navigator.dart';
 
 class LeftDrawerCard extends StatefulWidget {
   @override
@@ -66,7 +68,7 @@ class LeftDrawer {
                 ),
                 onTap: () {
                   print("it is ic_nav_public");
-                  Application.router.navigateTo(context, "publicpage");
+                  NavigatorUtils.push(context, Routes.publicPage);
                 }),
           ),
           Container(
@@ -85,7 +87,7 @@ class LeftDrawer {
                   ),
                 ),
                 onTap: () {
-                  Application.router.navigateTo(context, "createwalletpage");
+                  NavigatorUtils.push(context, Routes.createWalletNamePage);
                 }),
           ),
           Container(

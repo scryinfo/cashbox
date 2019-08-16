@@ -32,7 +32,7 @@ class _SplashPageState extends State<SplashPage> {
     //todo 再区分链类型，加载 不同界面
     if (allWalletList.length == 0) {
       print("goHomePage=>");
-      return CreateWalletMnemonicPage();
+      return HomePage();
     } else {
       return Material(
         child: Text("this is splashpage"),

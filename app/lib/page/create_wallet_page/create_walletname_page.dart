@@ -3,6 +3,8 @@ import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../routers/application.dart';
+import '../../routers/routers.dart';
+import '../../routers/fluro_navigator.dart';
 
 class CreateWalletNamePage extends StatefulWidget {
   @override
@@ -99,7 +101,8 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 child: FlatButton(
                   onPressed: () {
                     print("clicked the add wallet btn");
-                    Application.router.navigateTo(context,"createwalletmnemonicpage");
+                    NavigatorUtils.push(
+                        context, Routes.createWalletMnemonicPage);
                   },
                   child: Text(
                     "添加钱包",
@@ -275,46 +278,46 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
   static Widget _buildChainChooseLayout(context) {
     return Container(
         child: Column(
+      children: <Widget>[
+        Container(
+          alignment: Alignment.topLeft,
+          child: Text(
+            "选择创建链",
+            style: TextStyle(
+              color: Color.fromRGBO(255, 255, 255, 0.5),
+              fontSize: 13,
+            ),
+          ),
+        ),
+        Row(
           children: <Widget>[
             Container(
-              alignment: Alignment.topLeft,
-              child: Text(
-                "选择创建链",
-                style: TextStyle(
-                  color: Color.fromRGBO(255, 255, 255, 0.5),
-                  fontSize: 13,
-                ),
-              ),
-            ),
-            Row(
+                child: Row(
               children: <Widget>[
-                Container(
-                    child: Row(
-                      children: <Widget>[
-                        Checkbox(
-                          value: context._EeeChainChoosed,
-                          onChanged: (newValue) {
-                            context.setState(
-                                  () {
-                                print(" context._EeeChainChoosed=>" +
-                                    context._EeeChainChoosed.toString());
-                                context._EeeChainChoosed = newValue;
-                              },
-                            );
-                          },
-                        ),
-                        Text(
-                          "EEE",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    )),
+                Checkbox(
+                  value: context._EeeChainChoosed,
+                  onChanged: (newValue) {
+                    context.setState(
+                      () {
+                        print(" context._EeeChainChoosed=>" +
+                            context._EeeChainChoosed.toString());
+                        context._EeeChainChoosed = newValue;
+                      },
+                    );
+                  },
+                ),
+                Text(
+                  "EEE",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                  ),
+                ),
               ],
-            ),
+            )),
           ],
-        ));
+        ),
+      ],
+    ));
   }
 }
