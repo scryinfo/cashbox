@@ -25,9 +25,11 @@ class _MiddleFuncCard extends State<MiddleFuncCard> {
                 child: Row(
                   children: <Widget>[
                     new Padding(
-                        padding:
-                            EdgeInsets.only(right: ScreenUtil().setWidth(3.5)),
-                        child: Image.asset("assets/images/ic_transfer.png")),
+                      padding: EdgeInsets.only(
+                        right: ScreenUtil().setWidth(3.5),
+                      ),
+                      child: Image.asset("assets/images/ic_transfer.png"),
+                    ),
                     Text(
                       "转账",
                       style: TextStyle(color: Colors.lightBlueAccent),

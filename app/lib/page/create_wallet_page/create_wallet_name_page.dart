@@ -43,7 +43,10 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       return;
     }
   }
-
+  bool _verifyPwdSame(){
+    //todo  验证一致性
+    return true;
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -92,8 +95,10 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 child: FlatButton(
                   onPressed: () {
                     print("clicked the add wallet btn");
-                    NavigatorUtils.push(
-                        context, Routes.createWalletMnemonicPage);
+                    if(_verifyPwdSame()){
+                      NavigatorUtils.push(
+                          context, Routes.createWalletMnemonicPage);
+                    }
                   },
                   child: Text(
                     "添加钱包",

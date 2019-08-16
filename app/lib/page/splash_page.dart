@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/page/eee_page/eee_page.dart';
-import 'package:app/page/create_wallet_page/create_walletname_page.dart';
+import 'package:app/page/create_wallet_page/create_wallet_name_page.dart';
 import 'package:app/page/create_wallet_page/create_wallet_mnemonic_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

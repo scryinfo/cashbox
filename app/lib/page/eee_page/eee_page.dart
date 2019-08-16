@@ -21,7 +21,7 @@ class _EeePageState extends State<EeePage> {
         elevation: 0,
         brightness: Brightness.light,
         centerTitle: true,
-        title: Text("这是钱包"),
+        title: Text("这钱包名"),
       ),
       drawer: LeftDrawerCard(),
       body: Container(

@@ -142,7 +142,10 @@ class _ChainCardState extends State<ChainCard>
                                   bottom: ScreenUtil().setWidth(0)),
                               child: Text(
                                 chainTypeList[index],
-                                style: TextStyle(fontSize: 35),
+                                style: TextStyle(
+                                  fontSize: 35,
+                                  color: Color.fromRGBO(255, 255, 255, 0.1),
+                                ),
                               )),
                         ),
                       ],
@@ -153,7 +156,7 @@ class _ChainCardState extends State<ChainCard>
             ),
           );
         },
-        itemCount: 3,
+        itemCount: chainTypeList.length,
         pagination: new SwiperPagination(
             builder: SwiperPagination(
           builder: SwiperPagination.dots,

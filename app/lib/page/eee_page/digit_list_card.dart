@@ -73,20 +73,23 @@ class _DigitListCardState extends State<DigitListCard>
                           Container(
                               child: Padding(
                             padding: EdgeInsets.only(
-                                left: ScreenUtil().setHeight(10)),
+                              left: ScreenUtil().setHeight(10),
+                            ),
                             child: Image.asset("assets/images/ic_eth.png"),
                           )),
                           Container(
                               child: Padding(
                                   padding: EdgeInsets.only(
-                                      left: ScreenUtil().setHeight(3)),
+                                    left: ScreenUtil().setHeight(3),
+                                  ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       Container(
                                         color: Colors.transparent,
                                         padding: EdgeInsets.only(
-                                            top: ScreenUtil().setHeight(3)),
+                                          top: ScreenUtil().setHeight(3),
+                                        ),
                                         width: ScreenUtil().setWidth(65),
                                         height: ScreenUtil().setHeight(10),
                                         child: Stack(
@@ -123,7 +126,8 @@ class _DigitListCardState extends State<DigitListCard>
                                       ),
                                       Container(
                                         padding: EdgeInsets.only(
-                                            top: ScreenUtil().setHeight(1)),
+                                          top: ScreenUtil().setHeight(1),
+                                        ),
                                         color: Colors.transparent,
                                         width: ScreenUtil().setWidth(65),
                                         height: ScreenUtil().setHeight(7),
@@ -209,6 +213,7 @@ class _DigitListCardState extends State<DigitListCard>
   }
 
   Future<List<Digit>> getData() async {
+    //use mock data todo
     //walletManage.nowWallet.noChain.loadDigits()
     Digit digit = Digit("chainId001");
     for (var i = 0; i < 10; i++) {
