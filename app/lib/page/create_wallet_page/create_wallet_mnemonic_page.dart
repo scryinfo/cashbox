@@ -1,3 +1,4 @@
+import 'package:app/routers/fluro_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../widgets/app_bar.dart';
@@ -10,6 +11,28 @@ class CreateWalletMnemonicPage extends StatefulWidget {
 }
 
 class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
+  List<String> mnemonicList = [
+    "victory",
+    "october",
+    "off",
+    "drink ",
+    "shallow",
+    "actual",
+    "stone",
+    "decade",
+    "victory",
+    "october",
+    "off",
+    "drink "
+  ];
+  String walletName = "mockWalletName";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -75,200 +98,16 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
             Container(
               width: ScreenUtil().setWidth(78.75),
               height: ScreenUtil().setHeight(40),
-              color: Color.fromRGBO(255, 255, 255, 0.06),
-              child: Column(
-                //todo 更改助记词个数为动态，动态加载个数。
-                children: <Widget>[
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: FlatButton(
-                            child: Text(
-                              "666",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.9),
-                              ),
-                            ),
-                            onPressed: () {
-                              print("clicked btn text");
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(255, 255, 255, 0.06),
+                border: Border.all(
+                  width: 0.5,
+                  color: Colors.black87,
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Wrap(
+                children: _buildRandomMnemonicBtn(),
               ),
             ),
             SizedBox(
@@ -277,7 +116,10 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
             Container(
               child: Row(
                 children: <Widget>[
-                  Container(
+                  GestureDetector(
+                    onTap: () {
+                      _changeMnemonic();
+                    },
                     child: Row(
                       children: <Widget>[
                         Container(
@@ -298,10 +140,15 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                     width: ScreenUtil().setWidth(42),
                   ),
                   Container(
-                    child: Text(
-                      "二维码备份",
-                      style: TextStyle(
-                        color: Color.fromRGBO(255, 255, 255, 0.9),
+                    child: GestureDetector(
+                      onTap: () {
+                        _showAddressInQR(context);
+                      },
+                      child: Text(
+                        "二维码备份",
+                        style: TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 0.9),
+                        ),
                       ),
                     ),
                   ),
@@ -335,6 +182,57 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
           ],
         ),
       ),
+    );
+  }
+
+  List<Widget> _buildRandomMnemonicBtn() {
+    List<Widget> randomWidgetList = List.generate(mnemonicList.length, (index) {
+      return Container(
+        alignment: Alignment.center,
+        width: ScreenUtil().setWidth(18.75),
+        child: FlatButton(
+          child: Text(
+            mnemonicList[index].toString(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Color.fromRGBO(255, 255, 255, 0.9),
+              fontSize: 12,
+            ),
+          ),
+          onPressed: () {},
+        ),
+      );
+    });
+    return randomWidgetList;
+  }
+
+  _changeMnemonic() {
+    setState(() {
+      this.mnemonicList = [
+        "666666",
+        "666666",
+        "666666",
+        "666666",
+        "666666",
+        "666666",
+        "666666",
+        "666666",
+        "666666",
+        "666666",
+      ];
+    });
+  }
+
+  _showAddressInQR(context) {
+    String target = "addresspage?walletName=$walletName" +
+        "&title=" +
+        mnemonicList.join(",").trim().toString() +
+        "&content=" +
+        mnemonicList.join(" ");
+    NavigatorUtils.push(
+      context,
+      target,
     );
   }
 }

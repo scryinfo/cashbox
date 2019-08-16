@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
       ),
       child: MaterialApp(
         home: SplashPage(),
+        onGenerateRoute: Application.router.generator,
       ),
     );
   }

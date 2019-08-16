@@ -75,7 +75,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               alignment: Alignment.center,
               padding: EdgeInsets.only(left: 0, right: 0),
               child: Text(
-                "以下是钱包的助记词，抄写下来并导出至安全的地方存放。一旦丢失，无法找回。",
+                "请验证你保存的助记词，验证完成后程序不会保留您的信息。再次提醒，请务必保存好助记词",
                 textAlign: TextAlign.left,
                 maxLines: 2,
                 style: TextStyle(
@@ -136,6 +136,14 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
       padding: EdgeInsets.only(
         left: ScreenUtil().setWidth(5),
         right: ScreenUtil().setWidth(5),
+      ),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(255, 255, 255, 0.06),
+        border: Border.all(
+          width: 0.5,
+          color: Colors.black87,
+        ),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         this.verifyString,
