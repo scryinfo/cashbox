@@ -106,7 +106,9 @@ class LeftDrawer {
                     color: Colors.black,
                   ),
                 ),
-                onTap: () => {}),
+                onTap: () {
+                  NavigatorUtils.push(context, Routes.importWalletPage);
+                }),
           ),
         ],
       ),
