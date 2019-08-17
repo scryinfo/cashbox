@@ -202,7 +202,8 @@ public class NativeLib {
     //返回：未签名的交易 String, 格式为json格式
     //第一个参数为 eeeOpen 的返回值
     //具体的参数格式，需要与Jermy一起确定
-    //msg: 交易
+    //msg: 交易 
+    // TODO: 2019/8/17  交易方式待确定，待确定：哪边来做监听交易状态。
     public static native Message eeeTransfer(long handle, String from, String to, String value, String extendMsg);
 
     //msg: 交易
