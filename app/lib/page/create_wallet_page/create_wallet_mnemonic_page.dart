@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../widgets/app_bar.dart';
 import '../../routers/application.dart';
 import '../../res/styles.dart';
+import '../../routers/routers.dart';
 
 class CreateWalletMnemonicPage extends StatefulWidget {
   @override
@@ -155,8 +156,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
               child: FlatButton(
                 onPressed: () {
                   print("clicked the add wallet btn");
-                  Application.router
-                      .navigateTo(context, "createwalletconfirmpage");
+                  NavigatorUtils.push(context, Routes.createWalletConfirmPage);
                 },
                 child: Text(
                   "助记词已经记好",

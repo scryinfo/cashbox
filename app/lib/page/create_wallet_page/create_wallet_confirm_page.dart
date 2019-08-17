@@ -3,6 +3,10 @@ import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:typed_data';
 import '../../res/styles.dart';
+import '../../routers/routers.dart';
+import 'package:app/routers/fluro_navigator.dart';
+import '../../util/qr_scan_util.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CreateWalletConfirmPage extends StatefulWidget {
   @override
@@ -106,6 +110,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                 onPressed: () {
                   if (_verifyMnemonicSame()) {
                     print("clicked the add wallet btn");
+                    NavigatorUtils.push(context, Routes.eeePage);
                   }
                   //Application.router.navigateTo(context, "createwalletconfirmpage");
                 },
@@ -135,6 +140,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
       alignment: Alignment.center,
       padding: EdgeInsets.only(
         left: ScreenUtil().setWidth(5),
+        bottom: ScreenUtil().setWidth(5),
         right: ScreenUtil().setWidth(5),
       ),
       decoration: BoxDecoration(
@@ -145,14 +151,36 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
         ),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
-        this.verifyString,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 13,
-          wordSpacing: 5,
-        ),
-        maxLines: 3,
+      child: Stack(
+        children: <Widget>[
+          Align(
+            child: Text(
+              this.verifyString,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                wordSpacing: 5,
+              ),
+              maxLines: 3,
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: GestureDetector(
+              onTap: () async {
+                Future<String> qrResult = QrScanUtil.qrscan();
+                qrResult.then((t) {
+                  setState(() {
+                    this.verifyString = t.toString();
+                  });
+                }).catchError((e) {
+                  Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
+                });
+              },
+              child: Image.asset("assets/images/ic_scan.png"),
+            ),
+          ),
+        ],
       ),
     );
   }
