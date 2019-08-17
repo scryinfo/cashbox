@@ -17,6 +17,7 @@ public class NativeLib {
 
     //通信消息 状态码
     private interface StatusCode {
+        public static final int DYLIB_ERROR=-1; //动态库执行出错
         public static final int OK = 200;                           //正常
         public static final int FAIL_TO_GENERATE_MNEMONIC = 100;    //生成助记词失败
         public static final int PWD_IS_WRONG = 101;                 //密码错误
