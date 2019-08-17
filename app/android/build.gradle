@@ -13,12 +13,23 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url 'https://jitpack.io' }
     }
 }
 
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
+    // parker 0817
+    // Android dependency 'androidx.core:core' has different version for the compile (1.0.0-rc01) and runtime (1.0.2) classpath. You should manually set the same version via DependencyResolution
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'androidx.core' &&
+                    !details.requested.name.contains('androidx')) {
+                details.useVersion "1.0.2"
+            }
+        }
+    }
 }
 subprojects {
     project.evaluationDependsOn(':app')
