@@ -10,6 +10,7 @@ class Routes {
   static String createWalletMnemonicPage = '/createwalletmnemonicpage';
   static String createWalletConfirmPage = '/createwalletconfirmpage';
   static String addressPage = '/addresspage';
+  static String importWalletPage = '/importwalletpage';
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = new Handler(
@@ -27,5 +28,6 @@ class Routes {
     router.define(createWalletConfirmPage,
         handler: createWalletConfirmPageHandler);
     router.define(addressPage, handler: addressPageHandler);
+    router.define(importWalletPage, handler: importWalletPageHandler);
   }
 }
