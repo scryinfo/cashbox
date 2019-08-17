@@ -110,7 +110,11 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                 onPressed: () {
                   if (_verifyMnemonicSame()) {
                     print("clicked the add wallet btn");
-                    NavigatorUtils.push(context, Routes.eeePage);
+                    NavigatorUtils.push(
+                      context,
+                      Routes.eeePage,
+                      clearStack: true,
+                    );
                   }
                   //Application.router.navigateTo(context, "createwalletconfirmpage");
                 },

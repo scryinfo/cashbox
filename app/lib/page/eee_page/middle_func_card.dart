@@ -1,7 +1,9 @@
+import 'package:app/routers/fluro_navigator.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:app/routers/application.dart';
+import '../../routers/routers.dart';
 
 class MiddleFuncCard extends StatefulWidget {
   @override
@@ -38,6 +40,7 @@ class _MiddleFuncCard extends State<MiddleFuncCard> {
                 ),
                 onTap: () {
                   print("onTap is~~转账~");
+                  NavigatorUtils.push(context, Routes.transferEeePage);
                 },
               )),
           Container(
@@ -60,7 +63,16 @@ class _MiddleFuncCard extends State<MiddleFuncCard> {
                 ],
               ),
               onTap: () {
-                print("onTap is~~收款~");
+                String walletName = "mockWalletName";
+                String target = "addresspage?walletName=$walletName" +
+                    "&title=" +
+                    "testTitle" +
+                    "&content=" +
+                    "titleAddrress565216546465432651564654";
+                NavigatorUtils.push(
+                  context,
+                  target,
+                );
               },
             ),
           )

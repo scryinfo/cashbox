@@ -9,6 +9,7 @@ import '../page/create_wallet_page/create_wallet_mnemonic_page.dart';
 import '../page/create_wallet_page/create_wallet_confirm_page.dart';
 import '../page/address_page/address_page.dart';
 import '../page/import_wallet_page/import_wallet_page.dart';
+import '../page/transfer_eee_page/transfer_eee_page.dart';
 
 Handler splashPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -40,19 +41,26 @@ Handler createWalletConfirmPageHandler = Handler(
 });
 
 Handler addressPageHandler = Handler(handlerFunc: (context, params) {
-  String name = params['walletName']?.first;
-  String title = params['title']?.first;
-  String content = params['content']?.first;
+  print("router handler===>" + params['walletName']?.first + "||");
   print("router handler===>" +
       params['walletName']?.first +
       "||" +
       params['title']?.first +
       "||" +
       params['content']?.first);
+  String name = params['walletName']?.first;
+  String title = params['title']?.first;
+  String content = params['content']?.first;
+
   return AddressPage(name, title, content);
 });
 
 Handler importWalletPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ImportWalletPage();
+});
+
+Handler transferEeePageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return TransferEeePage();
 });
