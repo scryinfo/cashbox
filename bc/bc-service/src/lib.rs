@@ -8,12 +8,14 @@ use rand::RngCore;
 use scry_crypto::aes;
 use log::info;
 use tiny_keccak::Keccak;
-use crate::dataservice::TbMnemonic;
+use crate::dataservice::{TbMnemonic, TbWallet};
 
 pub mod account_crypto;
 pub mod dataservice;
 
+
 pub enum StatusCode {
+    DylibError = -1,
     OK = 200,
     //正常
     FailToGenerateMnemonic = 100,
@@ -36,8 +38,22 @@ pub enum ChainType {
     EthTest,
     EEE,
     EeeTest,
+    OTHER,
 }
 
+impl From<i16> for ChainType{
+    fn from(chain_type:i16)->Self{
+        match chain_type {
+            1 =>ChainType::BTC,
+            2=>ChainType::BtcTest,
+            3=>ChainType::ETH,
+            4=>ChainType::EthTest,
+            5=>ChainType::EEE,
+            6=>ChainType::EeeTest,
+            _=>ChainType::OTHER,
+        }
+    }
+}
 
 const SCRYPT_LOG_N: u8 = 18;
 const SCRYPT_P: u32 = 1;
@@ -68,7 +84,7 @@ pub struct Address {
 #[repr(C)]
 pub struct Chain {
     pub status: StatusCode,
-    pub chain_id: u16,
+    pub chain_id: String,
     pub wallet_id: String,
     pub chain_address: String,
     pub is_visible: bool,
@@ -80,11 +96,11 @@ pub struct Chain {
 pub struct Digit {
     pub status: StatusCode,
     pub digit_id: String,
-    pub chain_id: u16,
+    pub chain_id: String,
     pub address: String,
     pub contract_address: String,
     pub fullname: String,
-    pub shortname:String,
+    pub shortname: String,
     pub balance: String,
     pub is_visible: bool,
     pub decimal: i8,
@@ -99,10 +115,97 @@ pub struct Wallet {
     pub chain_list: Vec<Chain>,
 }
 
+/**
+  Wallet 结构说明：
+    一个助记词 对应的是一个钱包，在cashbox钱包软件中 可以同时管理多个钱包；
+    一个助记词 可以同时应用于多条链；
+    一条链，在基于链的应用上，存在多个合约地址的可能
+*/
+fn tbwallet_convert_to_wallet(tbwallets: Vec<TbWallet>) -> Vec<Wallet> {
+    let mut ret_data = Vec::new();
+
+    let mut last_wallet_id = String::new();
+    let mut last_chain_id = String::new();
+    let mut wallet_index = 0;
+    let mut chain_index = 0;
+
+    for tbwallet in tbwallets {
+        if last_wallet_id.ne(&tbwallet.wallet_id) {
+            let wallet = Wallet {
+                status: StatusCode::OK,
+                wallet_id: tbwallet.wallet_id.clone(),
+                wallet_name: tbwallet.wallet_name.clone(),
+                chain_list: Vec::new(),
+            };
+            last_wallet_id = tbwallet.wallet_id.clone();
+            wallet_index = wallet_index + 1;
+
+            //开始新的钱包，记录链的标识需要重新开始计算
+            last_chain_id = String::new();
+
+            ret_data.push(wallet);
+        }
+
+        if last_chain_id.ne(&tbwallet.chain_id) {
+            let chain = Chain {
+                status: StatusCode::OK,
+                chain_id: tbwallet.chain_id.clone(),
+                wallet_id: tbwallet.wallet_id,
+                chain_address: tbwallet.chain_address,
+                is_visible: tbwallet.isvisible,
+                chain_type:    ChainType::from(tbwallet.chain_type),
+                digit_list: Vec::new(),
+            };
+
+            let wallet = ret_data.get_mut(wallet_index-1).unwrap();
+
+            last_chain_id = tbwallet.chain_id.clone();
+
+            wallet.chain_list.push(chain);
+            chain_index = 0;
+        }
+
+        let digit_id = format!("{}",tbwallet.digit_id);
+        let digit = Digit {
+            status: StatusCode::OK,
+            digit_id: digit_id,
+            chain_id: tbwallet.chain_id,
+            address: tbwallet.address.clone(),
+            contract_address: tbwallet.contract_address.clone(),
+            fullname: tbwallet.full_name.clone(),
+            shortname: tbwallet.short_name.clone(),
+            balance: tbwallet.balance.clone(),
+            is_visible: tbwallet.isvisible,
+            decimal: tbwallet.decimals,
+            imgurl: tbwallet.url_img,
+        };
+        let wallet = ret_data.get_mut(wallet_index).unwrap();
+        let chain_list = wallet.chain_list.get_mut(chain_index).unwrap();
+        chain_list.digit_list.push(digit);
+        chain_index = chain_index + 1;
+    }
+    ret_data
+}
+
 //query all 满足条件的助记词（wallet）
-pub fn get_all_wallet() -> Vec<TbMnemonic> {
-    let instance = dataservice::DataServiceProvider::instance().unwrap();
-    instance.get_mnemonics()
+pub fn get_all_wallet() -> Result<Vec<Wallet>, String> {
+    match dataservice::DataServiceProvider::instance() {
+        Ok(provider) => {
+            let wallet = provider.display_mnemonic_list();
+            let data = tbwallet_convert_to_wallet(wallet);
+            Ok(data)
+        }
+        Err(e) => Err(e)
+    }
+}
+
+pub fn is_contain_wallet() -> Result<Vec<TbMnemonic>, String> {
+    match dataservice::DataServiceProvider::instance() {
+        Ok(provider) => {
+            Ok(provider.get_mnemonics())
+        }
+        Err(e) => Err(e)
+    }
 }
 
 pub fn get_current_wallet() -> Result<Mnemonic, String> {
@@ -191,20 +294,20 @@ pub fn save_mnemonic(wallet_name: &str, mn: &[u8], password: &[u8]) -> Result<Wa
     let instance = dataservice::DataServiceProvider::instance();
     match instance {
         Ok(mut dataservice) => {
-            match dataservice.save_mnemonic_address(mnemonic_save, address_save){
-                Ok(_)=>{
+            match dataservice.save_mnemonic_address(mnemonic_save, address_save) {
+                Ok(_) => {
                     Ok(Wallet {
                         status: StatusCode::OK,
-                        wallet_id:hex_mnemonic_id,
+                        wallet_id: hex_mnemonic_id,
                         wallet_name: wallet_name.to_string(),
                         chain_list: Vec::new(),
                     })
-                },
-                Err(e)=>{
+                }
+                Err(e) => {
                     Err(e.to_string())
                 }
             }
-        },
+        }
         Err(e) => {
             Err(e)
         }
