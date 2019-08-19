@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.content.Intent;
 
 import io.flutter.app.FlutterActivity;
+import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.view.FlutterView;
 
 import android.util.Log;
 
@@ -23,6 +25,7 @@ public class MainActivity extends FlutterActivity {
     private static final int REQUEST_CODE_QR_SCAN = 0;
     private Result mQRScanResult = null;
     private final String QR_SCAN_METHOD = "qr_scan_method";
+    private final String CHARGING_CHANNEL = "samples.flutter.io/charging";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,28 @@ public class MainActivity extends FlutterActivity {
                             }
                         }
                 );
+
+        // TODO: 2019/8/19 parker     EventChannel test code
+        //  native端，主动通知到 flutter
+        new EventChannel(getFlutterView(), CHARGING_CHANNEL).setStreamHandler(
+                new EventChannel.StreamHandler() {
+                    @Override
+                    public void onListen(Object o, EventChannel.EventSink eventSink) {
+                        //todo something
+                        eventSink.success(o);
+                        eventSink.error("error", "something is error", o);
+                        // errors参数：
+                        // this.code,
+                        // this.message,
+                        // this.details
+                    }
+
+                    @Override
+                    public void onCancel(Object o) {
+
+                    }
+                }
+        );
     }
 
     @Override
