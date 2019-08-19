@@ -12,6 +12,9 @@ class Routes {
   static String addressPage = '/addresspage';
   static String importWalletPage = '/importwalletpage';
   static String transferEeePage = '/transfereeepage';
+  static String minePage = '/minepage';
+  static String walletManagerListPage = '/walletmanagerlistpage';
+  static String walletManagerPage = '/walletmanagerpage';
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = new Handler(
@@ -31,5 +34,8 @@ class Routes {
     router.define(addressPage, handler: addressPageHandler);
     router.define(importWalletPage, handler: importWalletPageHandler);
     router.define(transferEeePage, handler: transferEeePageHandler);
+    router.define(minePage, handler: minePageHandler);
+    router.define(walletManagerListPage, handler: walletManagerListPageHandler);
+    router.define(walletManagerPage, handler: walletManagerPageHandler);
   }
 }
