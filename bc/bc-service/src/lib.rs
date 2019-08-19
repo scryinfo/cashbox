@@ -41,16 +41,16 @@ pub enum ChainType {
     OTHER,
 }
 
-impl From<i16> for ChainType{
-    fn from(chain_type:i16)->Self{
+impl From<i64> for ChainType {
+    fn from(chain_type: i64) -> Self {
         match chain_type {
-            1 =>ChainType::BTC,
-            2=>ChainType::BtcTest,
-            3=>ChainType::ETH,
-            4=>ChainType::EthTest,
-            5=>ChainType::EEE,
-            6=>ChainType::EeeTest,
-            _=>ChainType::OTHER,
+            1 => ChainType::BTC,
+            2 => ChainType::BtcTest,
+            3 => ChainType::ETH,
+            4 => ChainType::EthTest,
+            5 => ChainType::EEE,
+            6 => ChainType::EeeTest,
+            _ => ChainType::OTHER,
         }
     }
 }
@@ -86,9 +86,9 @@ pub struct Chain {
     pub status: StatusCode,
     pub chain_id: String,
     pub wallet_id: String,
-    pub chain_address: String,
-    pub is_visible: bool,
-    pub chain_type: ChainType,
+    pub chain_address: Option<String>,
+    pub is_visible: Option<bool>,
+    pub chain_type: Option<ChainType>,
     pub digit_list: Vec<Digit>,
 }
 
@@ -97,21 +97,22 @@ pub struct Digit {
     pub status: StatusCode,
     pub digit_id: String,
     pub chain_id: String,
-    pub address: String,
-    pub contract_address: String,
-    pub fullname: String,
-    pub shortname: String,
-    pub balance: String,
-    pub is_visible: bool,
-    pub decimal: i8,
-    pub imgurl: String,
+    pub address: Option<String>,
+    pub contract_address: Option<String>,
+    pub fullname: Option<String>,
+    pub shortname: Option<String>,
+    pub balance: Option<String>,
+    pub is_visible: Option<bool>,
+    pub decimal: Option<i64>,
+    pub imgurl: Option<String>,
 }
 
 #[repr(C)]
 pub struct Wallet {
     pub status: StatusCode,
     pub wallet_id: String,
-    pub wallet_name: String,
+    //这个值不会存在Null 的情况
+    pub wallet_name: Option<String>,
     pub chain_list: Vec<Chain>,
 }
 
@@ -124,21 +125,28 @@ pub struct Wallet {
 fn tbwallet_convert_to_wallet(tbwallets: Vec<TbWallet>) -> Vec<Wallet> {
     let mut ret_data = Vec::new();
 
-    let mut last_wallet_id = String::new();
+    let mut last_wallet_id = String::from("-1");
     let mut last_chain_id = String::new();
     let mut wallet_index = 0;
     let mut chain_index = 0;
-
+    //使用这种查询数据遍历方式 是依赖于查询出来的数据结构，数据库在做多表的级联时，会按照表的顺序来进行连接，
+    // 若要是在查询的时候 使用了某种字段排序，会将此结构打乱，后期可以考虑优化为使用MAP的方式来避免这个问题
     for tbwallet in tbwallets {
-        if last_wallet_id.ne(&tbwallet.wallet_id) {
+        let wallet_id = tbwallet.wallet_id.unwrap();
+        let chain_id = format!("{}", tbwallet.chain_id.unwrap());//chain id 不会存在为Null的情况
+        if last_wallet_id.ne(&wallet_id) {
             let wallet = Wallet {
                 status: StatusCode::OK,
-                wallet_id: tbwallet.wallet_id.clone(),
+                wallet_id: wallet_id.clone(),
                 wallet_name: tbwallet.wallet_name.clone(),
                 chain_list: Vec::new(),
             };
-            last_wallet_id = tbwallet.wallet_id.clone();
-            wallet_index = wallet_index + 1;
+            //使用last_wallet_id 标识上一个钱包id,当钱包发生变化的时候，表示当前迭代的数据是新钱包 需要更新wallet_index，标识当前处理的是哪个钱包
+            if last_wallet_id.ne("-1") {
+                //更新下一次需要
+                wallet_index = wallet_index + 1;
+            }
+            last_wallet_id = wallet_id.clone();
 
             //开始新的钱包，记录链的标识需要重新开始计算
             last_chain_id = String::new();
@@ -146,30 +154,35 @@ fn tbwallet_convert_to_wallet(tbwallets: Vec<TbWallet>) -> Vec<Wallet> {
             ret_data.push(wallet);
         }
 
-        if last_chain_id.ne(&tbwallet.chain_id) {
+        if last_chain_id.ne(&chain_id) {
             let chain = Chain {
                 status: StatusCode::OK,
-                chain_id: tbwallet.chain_id.clone(),
-                wallet_id: tbwallet.wallet_id,
+                chain_id: chain_id.clone(),
+                wallet_id: wallet_id,
                 chain_address: tbwallet.chain_address,
                 is_visible: tbwallet.isvisible,
-                chain_type:    ChainType::from(tbwallet.chain_type),
+                chain_type: {
+                    if tbwallet.chain_type.is_none() {
+                        None
+                    } else {
+                        Some(ChainType::from(tbwallet.chain_type.unwrap()))
+                    }
+                },
                 digit_list: Vec::new(),
             };
+            //获取当前的钱包序号
+            let wallet = ret_data.get_mut(wallet_index).unwrap();
 
-            let wallet = ret_data.get_mut(wallet_index-1).unwrap();
-
-            last_chain_id = tbwallet.chain_id.clone();
+            last_chain_id = chain_id.clone();
 
             wallet.chain_list.push(chain);
             chain_index = 0;
         }
-
-        let digit_id = format!("{}",tbwallet.digit_id);
+        let digit_id = format!("{}", tbwallet.digit_id.unwrap());
         let digit = Digit {
             status: StatusCode::OK,
             digit_id: digit_id,
-            chain_id: tbwallet.chain_id,
+            chain_id: chain_id,
             address: tbwallet.address.clone(),
             contract_address: tbwallet.contract_address.clone(),
             fullname: tbwallet.full_name.clone(),
@@ -192,8 +205,13 @@ pub fn get_all_wallet() -> Result<Vec<Wallet>, String> {
     match dataservice::DataServiceProvider::instance() {
         Ok(provider) => {
             let wallet = provider.display_mnemonic_list();
-            let data = tbwallet_convert_to_wallet(wallet);
-            Ok(data)
+            match wallet {
+                Ok(data) => {
+                    let data = tbwallet_convert_to_wallet(data);
+                    Ok(data)
+                }
+                Err(e) => Err(e),
+            }
         }
         Err(e) => Err(e)
     }
@@ -299,7 +317,7 @@ pub fn save_mnemonic(wallet_name: &str, mn: &[u8], password: &[u8]) -> Result<Wa
                     Ok(Wallet {
                         status: StatusCode::OK,
                         wallet_id: hex_mnemonic_id,
-                        wallet_name: wallet_name.to_string(),
+                        wallet_name: Some(wallet_name.to_string()),
                         chain_list: Vec::new(),
                     })
                 }
