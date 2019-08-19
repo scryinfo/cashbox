@@ -53,6 +53,9 @@ dependencies:
   flutter_easyrefresh: ^2.0.2
   # 上下拉刷新功能     https://github.com/xuelongqy/flutter_easyrefresh
 
+  web_socket_channel: ^1.0.15
+  # 通过socket通信     https://pub.dev/packages/web_socket_channel#-installing-tab-
+
   wallet_manager:
     path: ../packages/wallet_manager/
 dev_dependencies:
