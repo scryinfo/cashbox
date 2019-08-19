@@ -10,6 +10,9 @@ import '../page/create_wallet_page/create_wallet_confirm_page.dart';
 import '../page/address_page/address_page.dart';
 import '../page/import_wallet_page/import_wallet_page.dart';
 import '../page/transfer_eee_page/transfer_eee_page.dart';
+import '../page/mine_page/mine_page.dart';
+import '../page/wallet_manager_list_page/wallet_manager_list_page.dart';
+import '../page/wallet_manager_page/wallet_manage_page.dart';
 
 Handler splashPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -63,4 +66,19 @@ Handler importWalletPageHandler = Handler(
 Handler transferEeePageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return TransferEeePage();
+});
+
+Handler minePageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return MinePage();
+});
+
+Handler walletManagerListPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return WalletManagerListPage();
+});
+
+Handler walletManagerPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return WalletManagerPage();
 });

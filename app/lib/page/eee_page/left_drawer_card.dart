@@ -49,6 +49,7 @@ class LeftDrawer {
                   ),
                 ),
                 onTap: () {
+                  NavigatorUtils.push(context, Routes.minePage);
                   print("it is mine");
                 }),
           ),
