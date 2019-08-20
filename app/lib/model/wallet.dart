@@ -5,7 +5,7 @@ import 'package:wallet_manager/wallet_manager.dart';
 class Wallet {
   String walletId; //钱包Id
   String walletName; //钱包名
-
+  String money; //
   Uint8List mnemonic; //助记词,                  /* 参数传递，及时释放*/
   Uint8List secretKey; //私钥                    /* 参数传递，及时释放*/
   String jsonFilePath; //私钥加密文件jsonFile路径
