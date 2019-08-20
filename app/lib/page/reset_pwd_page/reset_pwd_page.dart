@@ -19,11 +19,6 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
   TextEditingController _oldPwdController = TextEditingController();
   TextEditingController _newPwdController = TextEditingController();
   TextEditingController _confirmPwdController = TextEditingController();
-  List walletList = [
-    "旧密码",
-    "新密码",
-    "再次输入新密码",
-  ];
 
   @override
   Widget build(BuildContext context) {
