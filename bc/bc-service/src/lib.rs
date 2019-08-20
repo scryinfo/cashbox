@@ -13,7 +13,7 @@ use crate::dataservice::{TbMnemonic, TbWallet};
 pub mod account_crypto;
 pub mod dataservice;
 
-
+#[derive(PartialEq)]
 pub enum StatusCode {
     DylibError = -1,
     OK = 200,
@@ -229,19 +229,35 @@ pub fn is_contain_wallet() -> Result<Vec<TbMnemonic>, String> {
 pub fn get_current_wallet() -> Result<Mnemonic, String> {
     let instance = dataservice::DataServiceProvider::instance().unwrap();
     instance.query_selected_mnemonic().map(|tb| Mnemonic {
-        mnid: tb.id,
+        mnid: tb.id.unwrap(),
         status: StatusCode::OK,
         mn: vec![],
         chain_list: vec![],
     }).map_err(|msg| msg)
 }
 
-pub fn set_current_wallet(walletid: &str) {
+pub fn set_current_wallet(walletid: &str)->Result<bool,String> {
     let instance = dataservice::DataServiceProvider::instance().unwrap();
+    match instance.set_selected_mnemonic(walletid){
+        Ok(_)=>Ok(true),
+        Err(error)=>Err(error.to_string())
+    }
 }
 
-pub fn del_wallet(walletid: &str) {
+pub fn del_wallet(walletid: &str)->Result<bool,String>  {
     let instance = dataservice::DataServiceProvider::instance().unwrap();
+    match instance.del_mnemonic(walletid){
+        Ok(_)=>Ok(true),
+        Err(error)=>Err(error.to_string())
+    }
+}
+
+pub fn rename_wallet(walletid: &str,wallet_name:&str)->Result<bool,String>  {
+    let instance = dataservice::DataServiceProvider::instance().unwrap();
+    match instance.rename_mnemonic(walletid,wallet_name){
+        Ok(_)=>Ok(true),
+        Err(error)=>Err(error.to_string())
+    }
 }
 
 fn address_from_mnemonic<T>(mn: &[u8]) -> Address where T: Crypto {
@@ -298,9 +314,9 @@ pub fn save_mnemonic(wallet_name: &str, mn: &[u8], password: &[u8]) -> Result<Wa
         ..Default::default()
     };
     let mnemonic_save = dataservice::TbMnemonic {
-        id: hex_mnemonic_id.clone(),
+        id: Some(hex_mnemonic_id.clone()),
         full_name: Some(wallet_name.to_string()),
-        mnemonic: keystore,
+        mnemonic: Some(keystore),
         ..Default::default()
     };
 
@@ -481,7 +497,8 @@ fn get_mnemonic_context(keystore: &str, old_psd: &[u8]) -> Result<Vec<u8>, Strin
 
 fn mnemonic_psd_update(mn: &TbMnemonic, old_psd: &[u8], new_psd: &[u8]) -> StatusCode {
     //获取原来的助记词
-    let context = get_mnemonic_context(mn.mnemonic.as_str(), old_psd);
+    let mnemonic = mn.mnemonic.clone().unwrap();
+    let context = get_mnemonic_context(mnemonic.as_str(), old_psd);
     match context {
         Ok(data) => {
             //使用新的密码进行加密
@@ -491,7 +508,7 @@ fn mnemonic_psd_update(mn: &TbMnemonic, old_psd: &[u8], new_psd: &[u8]) -> Statu
             let mnemonic_update = TbMnemonic {
                 id: mn.id.clone(),
                 full_name: None,
-                mnemonic: new_encrypt_mn,
+                mnemonic: Some(new_encrypt_mn),
                 ..Default::default()
             };
             match instance.update_mnemonic(mnemonic_update) {
@@ -519,8 +536,12 @@ pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Status
     let mnemonic = provider.query_by_mnemonic_id(mn_id);
     match mnemonic {
         Ok(mn) => {
+            if mn.is_some() {
+                mnemonic_psd_update(&mn.unwrap(), old_pwd, new_pwd)
+            }else {
+                StatusCode::FailToRestPwd
+            }
             //开始处理助记词逻辑
-            mnemonic_psd_update(&mn, old_pwd, new_pwd)
         }
         Err(e) => {
             //针对错误信息 是否提示更多原因？
