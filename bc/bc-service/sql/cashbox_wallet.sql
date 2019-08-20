@@ -10,7 +10,7 @@ CREATE TABLE [main].[Address](
   [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')));
 DROP TABLE IF EXISTS [main].[Chain];
 CREATE TABLE [main].[Chain](
-  [id] INT PRIMARY KEY NOT NULL, 
+  [id] INTEGER PRIMARY KEY NOT NULL,
   [type] VARCHAR(32), 
   [short_name] VARCHAR(32), 
   [full_name] VARCHAR(64), 
@@ -24,7 +24,7 @@ CREATE TABLE [main].[Chain](
   [update_time] DATETIME);
 DROP TABLE IF EXISTS [main].[Digit];
 CREATE TABLE [main].[Digit](
-  [id] INT PRIMARY KEY NOT NULL, 
+  [id] INTEGER PRIMARY KEY NOT NULL,
   [address] VARCHAR(64),
   [contract_address] VARCHAR(128), 
   [short_name] VARCHAR(32), 
@@ -54,5 +54,11 @@ CREATE TABLE [main].[TransferRecord](
   [extra_msg] VARCHAR(3072), 
   [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')), 
   [UPDATED_TIME] DATETIME);
+insert into Chain(id,short_name,full_name) Values(1,'BTC',"bitcoin");
+insert into Chain(id,short_name,full_name) Values(2,'BTC TEST',"bitcoin test");
+insert into Chain(id,short_name,full_name) Values(3,'ETH',"ethereum");
+insert into Chain(id,short_name,full_name) Values(4,'ETH TEST',"ethereum test");
+insert into Chain(id,short_name,full_name) Values(5,'EEE',"eee");
+insert into Chain(id,short_name,full_name) Values(6,'EEE TEST',"eee test");
 COMMIT;
 PRAGMA foreign_keys = 'on';
