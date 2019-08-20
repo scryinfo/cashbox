@@ -1,10 +1,11 @@
-use rusqlite::{Connection, NO_PARAMS};
+use rusqlite::{Connection, NO_PARAMS, Row, Error, RowIndex};
 
 use std::fs;
 use scry_fs_util as fsutil;
 
 use rusqlite::params;
-use serde_rusqlite::{from_rows_ref, from_rows_with_columns, columns_from_statement};
+use serde_rusqlite::{from_rows_ref, from_rows_with_columns, columns_from_statement, from_row, from_rows, from_rows_ref_with_columns};
+use rusqlite::types::{Type, FromSql};
 
 
 const WALLET: [&'static str; 2] = ["cashbox_mnenonic.db", "cashbox_wallet.db"];
@@ -47,7 +48,27 @@ struct TbChain {
     update_time: String,
 }
 
-#[derive(Default, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct TbWallet {
+    pub wallet_id: Option<String>,
+    //助记词id
+    pub wallet_name: Option<String>,
+    pub selected: Option<bool>,
+    pub chain_id: Option<i64>,
+    pub address: Option<String>,
+    pub digit_id: Option<i64>,
+    pub chain_type: Option<i64>,
+    pub chain_address: Option<String>,
+    pub contract_address: Option<String>,
+    pub short_name: Option<String>,
+    pub full_name: Option<String>,
+    pub balance: Option<String>,
+    pub isvisible: Option<bool>,
+    pub decimals: Option<i64>,
+    pub url_img: Option<String>,
+}
+
+/*#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct TbWallet {
     pub wallet_id: String,
     //助记词id
@@ -56,8 +77,8 @@ pub struct TbWallet {
     pub chain_id: String,
     pub address: String,
     pub digit_id: i32,
-    pub chain_type:i16,
-    pub chain_address:String,
+    pub chain_type: i16,
+    pub chain_address: String,
     pub contract_address: String,
     pub short_name: String,
     pub full_name: String,
@@ -65,6 +86,15 @@ pub struct TbWallet {
     pub isvisible: bool,
     pub decimals: i8,
     pub url_img: String,
+}*/
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct TestWallet {
+    pub wallet_id: Option<String>,
+    //助记词id
+    pub chain_id: Option<String>,
+    pub address:Option<String>,
+    pub chain_address: Option<String>,
 }
 
 pub struct DataServiceProvider {
@@ -80,6 +110,24 @@ impl Drop for DataServiceProvider {
 }
 
 impl DataServiceProvider {
+
+    fn get_row_data<index:RowIndex,T:FromSql>(row: &Row, index: index) -> Option<T>  {
+        match row.get(index) {
+            Ok(data) => {
+                let col_value: T = data;
+                Some(col_value)
+            }
+            Err(e) => {
+                match e {
+                    Error::InvalidColumnType(index, col, value) => None,
+                    _=> {
+                        None
+                    }
+                }
+            }
+        }
+    }
+
     pub fn instance() -> Result<Self, String> {
 
         //2、若是不存在则执行sql脚本文件创建数据库
@@ -150,18 +198,23 @@ impl DataServiceProvider {
     }
 
     pub fn save_mnemonic_address(&mut self, mn: TbMnemonic, addr: TbAddress) -> Result<(), String> {
-        let mn_sql = "insert into Mnemonic(id,mnemonic) values(?1,?2)";
-        let address_sql = "insert into wallet.Address(mnemonic_id,chain_id,address,puk_key,status) values(?1,?2,?3,?4,?5)";
+        let mn_sql = "insert into Mnemonic(id,mnemonic) values(?1,?2);";
+        let address_sql = "insert into wallet.Address(mnemonic_id,chain_id,address,puk_key,status) values(?1,?2,?3,?4,?5);";
+        let digit_account_sql = "insert into wallet.Digit(address) values(?1);";
         // TODO 增加事务的处理，这个的编码方式还需要修改 才能编译通过
         //let hander_tx = self.db_hander
+        // TODO 根据链的地址种类 对应的填写代币账户信息
 
         //  let mut tx = self.db_hander.transaction().unwrap();
-
+        //在保存地址的时候
         match self.db_hander.execute(mn_sql, params![mn.id,mn.mnemonic]) {
             Ok(_) => {
                 match self.db_hander.execute(address_sql, params![addr.mnemonic_id,addr.chain_id,addr.address,addr.pub_key,addr.status]) {
                     Ok(_) => {
-                        Ok(())
+                        match self.db_hander.execute(digit_account_sql, params![addr.address]) {
+                            Ok(_) => Ok(()),
+                            Err(e) => Err(e.to_string())
+                        }
                     }
                     Err(e) => {
                         Err(e.to_string())
@@ -234,17 +287,42 @@ impl DataServiceProvider {
         self.db_hander.execute(sql, params![mn_name,mn_id]).map(|_| ()).map_err(|err| err.to_string())
     }
 
-    pub fn display_mnemonic_list(&self) -> Vec<TbWallet> {
+    pub fn display_mnemonic_list(&self) -> Result<Vec<TbWallet>, String> {
         let all_mn = "select a.id as wallet_id,a.fullname as wallet_name,b.id as chain_id,d.address,b.address as chain_address,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
  from Mnemonic a,wallet.Chain b,wallet.Address c,wallet.Digit d where a.id=c.mnemonic_id and c.chain_id = b.id and c.address=d.address and a.status =1 and c.status =1;";
 
         let mut statement = self.db_hander.prepare(all_mn).unwrap();
         let columns = columns_from_statement(&statement);
-        let mut res = from_rows_with_columns::<TbWallet, _>(statement.query(NO_PARAMS).unwrap(), &columns);
-        let mut vec = Vec::new();
-        while let Some(mn) = res.next() {
-            vec.push(mn)
+        /*for column in columns {
+            println!("column value is:{}",column);
+        }*/
+        let mut rows = statement.query(NO_PARAMS).unwrap();
+
+        let mut tbwallets = Vec::new();
+        while let Some(row) = rows.next().unwrap() {
+
+            let tbwallet = TbWallet {
+                wallet_id: Self::get_row_data::<usize,String>(&row,0),
+                wallet_name: Self::get_row_data::<usize,String>(&row,1),
+                chain_id: Self::get_row_data::<usize,i64>(&row,2),
+                address: Self::get_row_data::<usize,String>(&row,3),
+                chain_address:Self::get_row_data::<usize,String>(&row,4),
+                selected: Self::get_row_data::<usize,bool>(&row,5),
+                chain_type: Self::get_row_data::<usize,i64>(&row,6),
+                digit_id: Self::get_row_data::<usize,i64>(&row,7),
+                contract_address: Self::get_row_data::<usize,String>(&row,8),
+                short_name: Self::get_row_data::<usize,String>(&row,9),
+                full_name: Self::get_row_data::<usize,String>(&row,10),
+                balance: Self::get_row_data::<usize,String>(&row,11),
+                isvisible: Self::get_row_data::<usize,bool>(&row,12),
+                decimals: Self::get_row_data::<usize,i64>(&row,13),
+                url_img: Self::get_row_data::<usize,String>(&row,14),
+            };
+            tbwallets.push(tbwallet);
+
         }
-        vec
+        println!("get data from database");
+        Ok(tbwallets)
+
     }
 }
