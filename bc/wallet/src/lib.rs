@@ -14,8 +14,8 @@ pub extern "C" fn mnemonicGenerate(count: c_int) -> *mut c_uchar {
 pub mod android {
     use super::*;
     use jni::JNIEnv;
-    use jni::objects::{JClass, JObject, JValue};
-    use jni::sys::{jint, jobject};
+    use jni::objects::{JClass,JString, JObject, JValue};
+    use jni::sys::{jint, jobject,jbyteArray};
     use bc_service::{StatusCode, Wallet};
 
     #[no_mangle]
@@ -48,8 +48,9 @@ pub mod android {
         }
     }
 
+    #[no_mangle]
+    #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_isContainWallet(env: JNIEnv, _: JClass) -> jobject {
-        //调用获取所有钱包，查看返回值的情况
         //调用获取所有钱包，查看返回值的情况
         let wallet = bc_service::is_contain_wallet();
         let state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("can't found NativeLib$WalletState class");
@@ -187,16 +188,19 @@ pub mod android {
                 for wallet in wallet_list {
                     let wallet_temp = wallet_jni_obj_util(&env, wallet);
                     let ss = wallet_temp.get(0).unwrap();
-                    // env.call_method(wallet_list_class_obj, "add", "(info/scry/wallet_manager/NativeLib$Chain;)Z", &[JValue::Object(*ss)]).expect("add wallet_temp is fail");
                     env.call_method(wallet_list_class_obj, "add", "(Ljava/lang/Object;)Z", &[JValue::Object(*ss)]).expect("add wallet_temp is fail");
                 }
             }
-            Err(String) => {}
+            Err(_msg) => {
+
+            }
         }
         *wallet_list_class_obj
     }
 
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveWallet(env: JNIEnv, _: JClass, mn: jbyteArray, pwd: jbyteArray) -> jobject {
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveWallet(env: JNIEnv, _: JClass, wallet_name: JString, pwd: jbyteArray, mnemonic: jbyteArray) -> jobject {
         let wallet_name: String = env.get_string(wallet_name).unwrap().into();
         let pwd = env.convert_byte_array(pwd).unwrap();
         let mnemonic = env.convert_byte_array(mnemonic).unwrap();
@@ -221,15 +225,101 @@ pub mod android {
     }
 
 
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_resetPwd(env: JNIEnv, _: JClass, mn: jbyteArray, mnid: jstring, oldpwd: jbyteArray, newpwd: jbyteArray) -> jint {}
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_resetPwd(env: JNIEnv, _: JClass, walletId: JString, newPwd: jbyteArray, oldPwd: jbyteArray) -> jobject {
+        let old_pwd = env.convert_byte_array(oldPwd).unwrap();
+        let new_pwd = env.convert_byte_array(newPwd).unwrap();
+        let wallet_id: String = env.get_string(walletId).unwrap().into();
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
 
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowWallet(env: JNIEnv, _: JClass) -> jobject {}
+        let status = bc_service::reset_mnemonic_pwd(wallet_id.as_str(), old_pwd.as_slice(), new_pwd.as_slice());
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
 
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_setNowWallet(env: JNIEnv, _: JClass) -> jobject {}
+        if status == StatusCode::OK {
+            env.set_field(state_obj, "isResetPwd", "Z", JValue::Bool(1 as u8)).expect("set isSetNowWallet value is error!");
+        } else {
+            env.set_field(state_obj, "isResetPwd", "Z", JValue::Bool(0 as u8)).expect("set isSetNowWallet value is error!");
+        }
+        *state_obj
+    }
 
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_deleteWallet(env: JNIEnv, _: JClass) -> jobject {}
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowWallet(env: JNIEnv, _: JClass) -> jobject {
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        match bc_service::get_current_wallet() {
+            Ok(mn) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(mn.mnid).unwrap()))).expect("set error msg value is error!");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            }
+        }
+        *state_obj
+    }
 
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_rename(env: JNIEnv, _: JClass) -> jobject {}
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_setNowWallet(env: JNIEnv, _: JClass, walletId: JString) -> jobject {
+        let wallet_id: String = env.get_string(walletId).unwrap().into();
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        match bc_service::set_current_wallet(wallet_id.as_str()) {
+            Ok(exist) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "isSetNowWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value is error!");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            }
+        }
+        *state_obj
+    }
+
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_deleteWallet(env: JNIEnv, _: JClass, walletId: JString) -> jobject {
+        let wallet_id: String = env.get_string(walletId).unwrap().into();
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        match bc_service::del_wallet(wallet_id.as_str()) {
+            Ok(exist) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "isDeletWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value is error!");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            }
+        }
+        *state_obj
+    }
+
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_rename(env: JNIEnv, _: JClass, walletId: JString, walletName: JString) -> jobject {
+        let wallet_id: String = env.get_string(walletId).unwrap().into();
+        let wallet_name: String = env.get_string(walletName).unwrap().into();
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        match bc_service::rename_wallet(wallet_id.as_str(), wallet_name.as_str()) {
+            Ok(exist) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "isRename", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value is error!");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            }
+        }
+        *state_obj
+    }
 }
 
 
