@@ -115,15 +115,15 @@ public class NativeLib {
     }
 
     // 是否已有钱包
-    // apiNo:WM01
+    // apiNo:WM01 fixed
     public static native WalletState isContainWallet();
 
     // 导出所有钱包
-    // apiNo:WM02
+    // apiNo:WM02 fixed
     public static native List<Wallet> loadAllWalletList();
 
     // 保存钱包
-    // apiNo:WM03
+    // apiNo:WM03 fixed
     public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic);
 
     // 钱包导出。 恢复钱包
@@ -131,23 +131,23 @@ public class NativeLib {
     public static native Wallet exportWallet(String walletId, byte[] pwd);
 
     // 获取当前钱包
-    // apiNo:WM05
+    // apiNo:WM05 fixed
     public static native WalletState getNowWallet();
 
     // 设置当前钱包 bool是否成功
-    // apiNo:WM06
+    // apiNo:WM06 fixed
     public static native WalletState setNowWallet(String walletId);
 
     // 删除钱包。 钱包设置可删除，链设置隐藏。
-    // apiNo:WM07.
+    // apiNo:WM07. fixed
     public static native WalletState deleteWallet(String walletId);
 
     // 重置钱包密码。
-    // apiNo:WM08.
+    // apiNo:WM08. fixed
     public static native WalletState resetPwd(String walletId, byte[] newPwd, byte[] oldPwd);
 
     // 重置钱包名
-    // apiNo:WM09
+    // apiNo:WM09 fixed
     public static native WalletState rename(String walletId, String walletName);
 
     // 显示链
