@@ -18,20 +18,20 @@ class WalletManagerListPage extends StatefulWidget {
 class _WalletManagerListPageState extends State<WalletManagerListPage> {
   List walletList = [
     "walletName1",
-    "walletName",
+    "walletName2",
     "walletName3",
     "walletName4",
     "walletName5",
-    "walletName1",
-    "walletName",
-    "walletName3",
-    "walletName4",
-    "walletName5",
-    "walletName1",
-    "walletName",
-    "walletName3",
-    "walletName4",
-    "walletName5",
+    "walletName6",
+    "walletName7",
+    "walletName8",
+    "walletName9",
+    "walletName10",
+    "walletName11",
+    "walletName12",
+    "walletName13",
+    "walletName14",
+    "walletName15",
   ];
 
   @override
@@ -40,7 +40,7 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "我的",
+          centerTitle: "钱包列表",
           backgroundColor: Colors.transparent,
         ),
         body: Container(

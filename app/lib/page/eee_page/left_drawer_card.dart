@@ -15,15 +15,18 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        width: ScreenUtil().setWidth(60),
-        height: ScreenUtil().setHeight(160),
-        color: Colors.white,
+      width: ScreenUtil().setWidth(60),
+      color: Colors.white,
+      child: Container(
         child: Column(
           children: <Widget>[
+            Gaps.scaleVGap(ScreenUtil().setHeight(1)),
             LeftDrawer._drawerAction(context),
-            LeftDrawer._drawWalletList(context),
+            LeftDrawer._drawerWalletList(context),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }
 
@@ -116,9 +119,14 @@ class LeftDrawer {
     );
   }
 
-  static Widget _drawWalletList(context) {
+  static Widget _drawerWalletList(context) {
+    //todo load data dynamic
+
+
+
+
     return Container(
-      height: ScreenUtil().setHeight(105),
+      height: ScreenUtil().setHeight(101),
       child: SingleChildScrollView(
           child: Column(
         children: <Widget>[
@@ -177,275 +185,6 @@ class LeftDrawer {
             ),
           ),
           Gaps.scaleVGap(7),
-          Container(
-            alignment: Alignment.center,
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "Greate Wallet",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      margin:
-                          EdgeInsets.only(left: ScreenUtil().setWidth(12.5)),
-                      child: Text(
-                        "≈63.0",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(4.5)),
-                      child: Image.asset("assets/images/ic_nav_enter.png"),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      height: ScreenUtil().setHeight(7.5),
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "ETH",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "BTC",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Gaps.scaleVGap(7),
-          Container(
-            alignment: Alignment.center,
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "Greate Wallet",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      margin:
-                          EdgeInsets.only(left: ScreenUtil().setWidth(12.5)),
-                      child: Text(
-                        "≈63.0",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(4.5)),
-                      child: Image.asset("assets/images/ic_nav_enter.png"),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      height: ScreenUtil().setHeight(7.5),
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "ETH",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "BTC",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Gaps.scaleVGap(7),
-          Container(
-            alignment: Alignment.center,
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "Greate Wallet",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      margin:
-                          EdgeInsets.only(left: ScreenUtil().setWidth(12.5)),
-                      child: Text(
-                        "≈63.0",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(4.5)),
-                      child: Image.asset("assets/images/ic_nav_enter.png"),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      height: ScreenUtil().setHeight(7.5),
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "ETH",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "BTC",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Gaps.scaleVGap(7),
-          Container(
-            alignment: Alignment.center,
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "Greate Wallet",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      margin:
-                          EdgeInsets.only(left: ScreenUtil().setWidth(12.5)),
-                      child: Text(
-                        "≈63.0",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(4.5)),
-                      child: Image.asset("assets/images/ic_nav_enter.png"),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      height: ScreenUtil().setHeight(7.5),
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "ETH",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "BTC",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Gaps.scaleVGap(7),
-          Container(
-            alignment: Alignment.center,
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "Greate Wallet",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      margin:
-                          EdgeInsets.only(left: ScreenUtil().setWidth(12.5)),
-                      child: Text(
-                        "≈63.0",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(4.5)),
-                      child: Image.asset("assets/images/ic_nav_enter.png"),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.center,
-                      height: ScreenUtil().setHeight(7.5),
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "ETH",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.only(left: ScreenUtil().setWidth(7)),
-                      child: Text(
-                        "BTC",
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
         ],
       )),
     );
