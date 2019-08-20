@@ -15,6 +15,9 @@ class Routes {
   static String minePage = '/minepage';
   static String walletManagerListPage = '/walletmanagerlistpage';
   static String walletManagerPage = '/walletmanagerpage';
+  static String resetPwdPage = '/resetpwdpage';
+  static String recoverWalletPage = '/recoverwalletpage';
+
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = new Handler(
@@ -37,5 +40,7 @@ class Routes {
     router.define(minePage, handler: minePageHandler);
     router.define(walletManagerListPage, handler: walletManagerListPageHandler);
     router.define(walletManagerPage, handler: walletManagerPageHandler);
+    router.define(resetPwdPage, handler: resetPwdPageHandler);
+    router.define(recoverWalletPage, handler: recoverWalletPageHandler);
   }
 }

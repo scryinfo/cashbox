@@ -13,6 +13,8 @@ import '../page/transfer_eee_page/transfer_eee_page.dart';
 import '../page/mine_page/mine_page.dart';
 import '../page/wallet_manager_list_page/wallet_manager_list_page.dart';
 import '../page/wallet_manager_page/wallet_manage_page.dart';
+import '../page/reset_pwd_page/reset_pwd_page.dart';
+import '../page/recover_wallet_page/recover_wallet_page.dart';
 
 Handler splashPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -81,4 +83,14 @@ Handler walletManagerListPageHandler = Handler(
 Handler walletManagerPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return WalletManagerPage();
+});
+
+Handler resetPwdPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return ResetPwdPage();
+});
+
+Handler recoverWalletPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return RecoverWalletPage();
 });

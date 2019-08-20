@@ -22,6 +22,16 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
     "walletName3",
     "walletName4",
     "walletName5",
+    "walletName1",
+    "walletName",
+    "walletName3",
+    "walletName4",
+    "walletName5",
+    "walletName1",
+    "walletName",
+    "walletName3",
+    "walletName4",
+    "walletName5",
   ];
 
   @override
@@ -34,8 +44,10 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
           backgroundColor: Colors.transparent,
         ),
         body: Container(
-          child: Wrap(
-            children: _buildWalletList(),
+          child: SingleChildScrollView(
+            child: Wrap(
+              children: _buildWalletList(),
+            ),
           ),
         ),
       ),
