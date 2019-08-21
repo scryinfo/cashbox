@@ -29,6 +29,7 @@ public class NativeLib {
 
     static {
         System.loadLibrary("wallet");
+        //System.loadLibrary("sqlite3");
     }
 
     /*--------------------------助记词--------------------------*/
