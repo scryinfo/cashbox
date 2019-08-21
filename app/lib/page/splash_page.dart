@@ -17,6 +17,7 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   var allWalletList = List();
+  bool _agreeServiceProtocol = true;
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _SplashPageState extends State<SplashPage> {
       ..init(context); //初始化屏幕 宽高比 ，以 cashbox标注XXXHDPI@4x
 
     //todo 再区分链类型，加载 不同界面
-    if (allWalletList.length == 0) {
+    if (allWalletList.length != 0) {
       print("goEEEPage=>");
       return EeePage();
     } else {
@@ -45,7 +46,8 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Widget _buildServiceWidget() {
-    return Container(
+    return Material(
+      child: Container(
         width: ScreenUtil().setWidth(90),
         height: ScreenUtil().setHeight(160),
         decoration: BoxDecoration(
@@ -123,28 +125,38 @@ class _SplashPageState extends State<SplashPage> {
               Container(
                 child: GestureDetector(
                   onTap: () {
-                    NavigatorUtils.push(context, Routes.createWalletNamePage);
+                    //NavigatorUtils.push(context, Routes.createWalletNamePage);
                   },
                   child: Container(
+                    width: ScreenUtil().setWidth(85),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        /*Checkbox(
-                          value: true,
+                        Checkbox(
+                          value: _agreeServiceProtocol,
                           onChanged: (newValue) {
                             setState(
-                              () {},
+                              () {
+                                _agreeServiceProtocol = newValue;
+                              },
                             );
                           },
-                        ),*/
-                        Text(
-                          "it is ok",
-                          style: TextStyle(
-                              decoration: TextDecoration.none,
-                              color: Colors.white70,
-                              fontSize: 15,
-                              fontStyle: FontStyle.normal),
-                        )
+                        ),
+                        Container(
+                            alignment: Alignment.centerLeft,
+                            height: ScreenUtil().setHeight(14),
+                            width: ScreenUtil().setWidth(70),
+                            child: Text(
+                              "我已仔细阅读并同意《服务协议》与《隐私条款》",
+                              style: TextStyle(
+                                  decoration: TextDecoration.none,
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.normal),
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                            )),
                       ],
                     ),
                   ),
@@ -152,6 +164,8 @@ class _SplashPageState extends State<SplashPage> {
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
