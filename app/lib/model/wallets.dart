@@ -43,6 +43,7 @@ class Wallets {
   // apiNo:WM02
   Future<List<Wallet>> loadAllWalletList() async {
     var allWalletList = await WalletManager.loadAllWalletList();
+    print("allWalleetList=>"+allWalletList.length.toString());
     // todo 数据格式转换，返回
     return null;
   }

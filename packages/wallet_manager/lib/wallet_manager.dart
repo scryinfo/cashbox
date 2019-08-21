@@ -25,9 +25,9 @@ class WalletManager {
   //导出所有钱包
   // apiNo:WM02
   static Future<Map<dynamic, dynamic>> loadAllWalletList() async {
-    Map<dynamic, dynamic> allWalletList =
-        await _channel.invokeMethod('loadAllWalletList');
-    return allWalletList;
+    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('loadAllWalletList');
+    print("allWalletList=>" + allWalletList.length.toString());
+    return null;
   }
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
