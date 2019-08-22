@@ -42,7 +42,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "添加钱包",
+          centerTitle: "验证钱包",
           backgroundColor: Colors.transparent,
         ),
         body: _buildConfirmMnemonic(),
@@ -60,14 +60,14 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
         height: ScreenUtil().setWidth(160),
         child: Column(
           children: <Widget>[
-            Gaps.scaleVGap(10.75),
+            Gaps.scaleVGap(6),
             Container(
               alignment: Alignment.topLeft,
               child: Text(
                 "备份助记词",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 13,
+                  fontSize: 15,
                 ),
               ),
             ),
@@ -76,7 +76,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               alignment: Alignment.center,
               padding: EdgeInsets.only(left: 0, right: 0),
               child: Text(
-                "请验证你保存的助记词，验证完成后程序不会保留您的信息。再次提醒，请务必保存好助记词",
+                "请点击验证你保存的助记词。再次提醒，程序不会保留您的隐私信息,请您务必保存好助记词",
                 textAlign: TextAlign.left,
                 maxLines: 2,
                 style: TextStyle(
@@ -109,14 +109,14 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               child: FlatButton(
                 onPressed: () {
                   if (_verifyMnemonicSame()) {
-                    print("clicked the add wallet btn");
                     NavigatorUtils.push(
                       context,
                       Routes.eeePage,
                       clearStack: true,
                     );
+                  } else {
+                    Fluttertoast.showToast(msg: "验证您输入助记词不一致，建议您重新生成新钱包");
                   }
-                  //Application.router.navigateTo(context, "createwalletconfirmpage");
                 },
                 child: Text(
                   "助记词确认验证",
@@ -136,7 +136,10 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
 
   bool _verifyMnemonicSame() {
     //todo Verify mnemonic
-    return true;
+    if (verifyString.isNotEmpty && verifyString.length > 1) {
+      return true;
+    }
+    return false;
   }
 
   Widget _buildVerifyInputMnemonic() {
