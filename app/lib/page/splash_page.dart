@@ -25,8 +25,8 @@ class _SplashPageState extends State<SplashPage> {
 
   void _initWallet() async {
     //todo test JNI
-    var allWalletList = await Wallets.instance.loadAllWalletList();
-    //await Wallets.instance.createMnemonic(12);
+    //var allWalletList = await Wallets.instance.loadAllWalletList();
+    await Wallets.instance.createMnemonic(12);
   }
 
   @override
