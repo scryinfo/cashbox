@@ -56,6 +56,9 @@ dependencies:
   web_socket_channel: ^1.0.15
   # 通过socket通信     https://pub.dev/packages/web_socket_channel#-installing-tab-
 
+  flutter_html: ^0.10.4
+  #                    https://github.com/Sub6Resources/flutter_html
+
   wallet_manager:
     path: ../packages/wallet_manager/
 dev_dependencies:

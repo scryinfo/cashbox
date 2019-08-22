@@ -41,11 +41,11 @@ class _SplashPageState extends State<SplashPage> {
       print("goEEEPage=>");
       return EeePage();
     } else {
-      return _buildServiceWidget();
+      return _buildLoadingWidget();
     }
   }
 
-  Widget _buildServiceWidget() {
+  Widget _buildLoadingWidget() {
     return Material(
       child: Container(
         width: ScreenUtil().setWidth(90),
@@ -121,33 +121,31 @@ class _SplashPageState extends State<SplashPage> {
                   ),
                 ),
               ),
-              Gaps.scaleVGap(6.5),
+              Gaps.scaleVGap(10),
               Container(
-                child: GestureDetector(
-                  onTap: () {
-                    //NavigatorUtils.push(context, Routes.createWalletNamePage);
-                  },
-                  child: Container(
-                    width: ScreenUtil().setWidth(85),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Checkbox(
-                          value: _agreeServiceProtocol,
-                          onChanged: (newValue) {
-                            setState(
-                              () {
-                                _agreeServiceProtocol = newValue;
-                              },
-                            );
-                          },
-                        ),
-                        Container(
-                            alignment: Alignment.centerLeft,
-                            height: ScreenUtil().setHeight(14),
-                            width: ScreenUtil().setWidth(70),
-                            child: Text(
-                              "我已仔细阅读并同意《服务协议》与《隐私条款》",
+                child: Container(
+                  width: ScreenUtil().setWidth(85),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Checkbox(
+                        value: _agreeServiceProtocol,
+                        onChanged: (newValue) {
+                          setState(
+                            () {
+                              _agreeServiceProtocol = newValue;
+                            },
+                          );
+                        },
+                      ),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        height: ScreenUtil().setHeight(14),
+                        width: ScreenUtil().setWidth(70),
+                        child: Row(
+                          children: <Widget>[
+                            Text(
+                              "我已仔细阅读并同意",
                               style: TextStyle(
                                   decoration: TextDecoration.none,
                                   color: Colors.white70,
@@ -156,9 +154,57 @@ class _SplashPageState extends State<SplashPage> {
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.center,
                               maxLines: 2,
-                            )),
-                      ],
-                    ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                NavigatorUtils.push(
+                                    context, Routes.serviceAgreementPage);
+                              },
+                              child: Text(
+                                "《服务协议》",
+                                style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.white70,
+                                    fontSize: 13,
+                                    fontStyle: FontStyle.normal),
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                              ),
+                            ),
+                            Text(
+                              "、",
+                              style: TextStyle(
+                                  decoration: TextDecoration.none,
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.normal),
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                print("clicked protocol");
+                                NavigatorUtils.push(
+                                    context, Routes.privacyStatementPage);
+                              },
+                              child: Text(
+                                "《隐私条款》",
+                                style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.white70,
+                                    fontSize: 13,
+                                    fontStyle: FontStyle.normal),
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

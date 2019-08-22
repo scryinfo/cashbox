@@ -17,6 +17,10 @@ class Routes {
   static String walletManagerPage = '/walletmanagerpage';
   static String resetPwdPage = '/resetpwdpage';
   static String recoverWalletPage = '/recoverwalletpage';
+  static String userServicePage = '/userservicepage';
+  static String privacyStatementPage = '/privacystatementpage';
+  static String serviceAgreementPage = '/serviceagreementpage';
+
 
 
   static void configureRoutes(Router router) {
@@ -42,5 +46,7 @@ class Routes {
     router.define(walletManagerPage, handler: walletManagerPageHandler);
     router.define(resetPwdPage, handler: resetPwdPageHandler);
     router.define(recoverWalletPage, handler: recoverWalletPageHandler);
+    router.define(privacyStatementPage, handler: privacyStatementHandler);
+    router.define(serviceAgreementPage, handler: serviceAgreementHandler);
   }
 }
