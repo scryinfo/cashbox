@@ -9,6 +9,7 @@ import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/create_wallet_page/create_wallet_name_page.dart';
 import 'package:app/page/create_wallet_page/create_wallet_mnemonic_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -75,6 +76,10 @@ class _SplashPageState extends State<SplashPage> {
               Container(
                 child: GestureDetector(
                   onTap: () {
+                    if (!_agreeServiceProtocol) {
+                      Fluttertoast.showToast(msg: "请确认勾选 同意服务协议与隐私条款");
+                      return;
+                    }
                     NavigatorUtils.push(context, Routes.createWalletNamePage);
                   },
                   child: Row(
@@ -100,6 +105,10 @@ class _SplashPageState extends State<SplashPage> {
               Container(
                 child: GestureDetector(
                   onTap: () {
+                    if (!_agreeServiceProtocol) {
+                      Fluttertoast.showToast(msg: "请确认勾选 同意服务协议与隐私条款");
+                      return;
+                    }
                     NavigatorUtils.push(context, Routes.importWalletPage);
                   },
                   child: Row(
