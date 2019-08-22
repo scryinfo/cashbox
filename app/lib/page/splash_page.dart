@@ -1,13 +1,10 @@
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/widgets.dart';
 import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/page/eee_page/eee_page.dart';
-import 'package:app/page/create_wallet_page/create_wallet_name_page.dart';
-import 'package:app/page/create_wallet_page/create_wallet_mnemonic_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -37,9 +34,8 @@ class _SplashPageState extends State<SplashPage> {
     ScreenUtil.instance = ScreenUtil(width: 90, height: 160)
       ..init(context); //初始化屏幕 宽高比 ，以 cashbox标注XXXHDPI@4x
 
-    //todo 再区分链类型，加载 不同界面
+    //todo 2.0  区分链类型，加载对应链界面
     if (allWalletList.length != 0) {
-      print("goEEEPage=>");
       return EeePage();
     } else {
       return _buildLoadingWidget();
@@ -194,7 +190,6 @@ class _SplashPageState extends State<SplashPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                print("clicked protocol");
                                 NavigatorUtils.push(
                                     context, Routes.privacyStatementPage);
                               },
