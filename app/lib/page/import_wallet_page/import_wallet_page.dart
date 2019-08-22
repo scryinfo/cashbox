@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../res/resources.dart';
-import '../../routers/application.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
@@ -19,18 +18,19 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   TextEditingController _walletNameController = TextEditingController();
   TextEditingController _pwdController = TextEditingController();
   TextEditingController _confirmPwdController = TextEditingController();
-  bool _EeeChainChoosed = true;
+  bool _eeeChainChoose = true;
   var mneString = "";
 
   @override
   void initState() {
     super.initState();
-    _walletNameController.addListener(_verifyMnemonic);
-    _pwdController.addListener(_verifyWalletName);
-    _confirmPwdController.addListener(_verifyPwd);
+    _walletNameController.addListener(_listenMnemonic);
+    _pwdController.addListener(_listenWalletName);
+    _confirmPwdController.addListener(_listenPwd);
   }
 
-  void _verifyMnemonic() {
+  //验证 助记词 不能为空
+  void _listenMnemonic() {
     String mnemonic = _mneController.text;
     if (mnemonic.isEmpty || mnemonic.length < 1) {
       Fluttertoast.showToast(msg: "助记词不能为空");
@@ -38,7 +38,8 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     }
   }
 
-  void _verifyWalletName() {
+  //验证 钱包名 不能为空
+  void _listenWalletName() {
     String name = _walletNameController.text;
     if (name.isEmpty || name.length < 1) {
       Fluttertoast.showToast(msg: "钱包名不能为空");
@@ -46,7 +47,8 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     }
   }
 
-  void _verifyPwd() {
+  //验证 钱包名 不能为空
+  void _listenPwd() {
     String pwd = _pwdController.text;
     if (pwd.isEmpty || pwd.length < 1) {
       Fluttertoast.showToast(msg: "密码不能为空");
@@ -86,16 +88,17 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
             fit: BoxFit.fill),
       ),
       child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: MyAppBar(
+          centerTitle: "导入钱包",
           backgroundColor: Colors.transparent,
-          appBar: MyAppBar(
-            centerTitle: "导入钱包",
-            backgroundColor: Colors.transparent,
-          ),
-          body: Container(
-            width: ScreenUtil().setWidth(90),
-            height: ScreenUtil().setHeight(160),
-            child: _buildImportWalletWidget(),
-          )),
+        ),
+        body: Container(
+          width: ScreenUtil().setWidth(90),
+          height: ScreenUtil().setHeight(160),
+          child: _buildImportWalletWidget(),
+        ),
+      ),
     );
   }
 
@@ -127,8 +130,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               child: FlatButton(
                 onPressed: () {
                   if (_verifyImportWallet()) {
-                    print("begin to import wallet");
-                    //todo
+                    //todo  JNI 创建，加入钱包的流程。
                     NavigatorUtils.push(
                       context,
                       Routes.eeePage,
@@ -150,11 +152,6 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
         ),
       ),
     );
-  }
-
-  bool _verifyPwdSame() {
-    //todo verify Pwd
-    return true;
   }
 
   Widget _buildMnemonicWidget() {
@@ -413,13 +410,11 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                 child: Row(
               children: <Widget>[
                 Checkbox(
-                  value: _EeeChainChoosed,
+                  value: _eeeChainChoose,
                   onChanged: (newValue) {
                     setState(
                       () {
-                        print(" context._EeeChainChoosed=>" +
-                            _EeeChainChoosed.toString());
-                        _EeeChainChoosed = newValue;
+                        _eeeChainChoose = newValue;
                       },
                     );
                   },
