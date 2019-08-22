@@ -2,7 +2,6 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../widgets/app_bar.dart';
-import '../../routers/application.dart';
 import '../../res/styles.dart';
 import '../../routers/routers.dart';
 
@@ -13,6 +12,7 @@ class CreateWalletMnemonicPage extends StatefulWidget {
 }
 
 class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
+  //todo mock data
   List<String> mnemonicList = [
     "victory",
     "october",
@@ -31,7 +31,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    // init JNI
     super.initState();
   }
 
@@ -197,6 +197,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
   }
 
   _changeMnemonic() {
+    //todo  JNI
     setState(() {
       this.mnemonicList = [
         "666666",
