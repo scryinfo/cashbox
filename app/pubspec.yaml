@@ -41,7 +41,7 @@ dependencies:
   webview_flutter: ^0.3.9+1
   #   https://github.com/flutter/plugins/tree/master/packages/webview_flutter
 
-  qr_flutter: ^2.1.0
+  qr_flutter: ^3.0.1
   # 生成二维码         https://github.com/lukef/qr.flutter
 
   flutter_swiper: ^1.1.6
