@@ -15,6 +15,8 @@ import '../page/wallet_manager_list_page/wallet_manager_list_page.dart';
 import '../page/wallet_manager_page/wallet_manage_page.dart';
 import '../page/reset_pwd_page/reset_pwd_page.dart';
 import '../page/recover_wallet_page/recover_wallet_page.dart';
+import 'package:app/page/user_protocol/privacy_statements_zh.dart';
+import 'package:app/page/user_protocol/service_agreement_zh.dart';
 
 Handler splashPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -94,3 +96,15 @@ Handler recoverWalletPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return RecoverWalletPage();
 });
+
+Handler privacyStatementHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return PrivacyStatementPage();
+});
+
+Handler serviceAgreementHandler = Handler(
+handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+return ServiceAgreementPage();
+});
+
+
