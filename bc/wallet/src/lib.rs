@@ -12,7 +12,6 @@ pub extern "C" fn mnemonicGenerate(count: c_int) -> *mut c_uchar {
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
-    use super::*;
     use jni::JNIEnv;
     use jni::objects::{JClass,JString, JObject, JValue};
     use jni::sys::{jint, jobject,jbyteArray};
@@ -59,9 +58,9 @@ pub mod android {
             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
                 if data.len() == 0 {
-                    env.set_field(state_obj, "isContainWallet", "Z", JValue::Int(0 as i32)).expect("set isContainWallet value is error!");
+                    env.set_field(state_obj, "isContainWallet", "Z", JValue::Bool(0 as u8)).expect("set isContainWallet value is error!");
                 } else {
-                    env.set_field(state_obj, "isContainWallet", "Z", JValue::Int(1 as i32)).expect("set isContainWallet value is error!");
+                    env.set_field(state_obj, "isContainWallet", "Z", JValue::Bool(1 as u8)).expect("set isContainWallet value is error!");
                 }
             }
             Err(e) => {
@@ -111,7 +110,7 @@ pub mod android {
 
             if chain.is_visible.is_some() {
                 let visible = chain.is_visible.unwrap();
-                env.set_field(chain_class_obj, "isVisible", "Z", JValue::Int(visible as i32)).expect("set digitId value is error!");
+                env.set_field(chain_class_obj, "isVisible", "Z", JValue::Bool(visible as u8)).expect("set digitId value is error!");
             }
             if chain.chain_type.is_some() {
                 let chain_type = chain.chain_type.unwrap();
@@ -146,7 +145,7 @@ pub mod android {
                 }
                 if digit.is_visible.is_some() {
                     let visible = digit.is_visible.unwrap();
-                    env.set_field(digit_class_obj, "isVisible", "I", JValue::Int(visible as i32)).expect("set isVisible value is error!");
+                    env.set_field(digit_class_obj, "isVisible", "Z", JValue::Bool(visible as u8)).expect("set isVisible value is error!");
                 }
                 if digit.decimal.is_some() {
                     let decimal = digit.decimal.unwrap();
@@ -217,7 +216,8 @@ pub mod android {
             Err(e) => {
                 let jobj = env.alloc_object(wallet_class).unwrap();
                 println!("msg:{}", e);
-                env.set_field(jobj, "status", "I", JValue::Int(0)).expect("find status type is error!");
+                env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
+              //  env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(e).unwrap()))).expect("set error msg value is error!");
                 *jobj
             }
         };
