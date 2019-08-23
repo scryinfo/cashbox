@@ -25,7 +25,7 @@ class WalletManager {
   //导出所有钱包
   // apiNo:WM02
   static Future<Map<dynamic, dynamic>> loadAllWalletList() async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('loadAllWalletList');
+    List<dynamic> allWalletList = await _channel.invokeMethod('loadAllWalletList');
     print("allWalletList=>" + allWalletList.length.toString());
     return null;
   }

@@ -50,7 +50,7 @@ dependencies:
   flutter_screenutil: ^0.5.3
   # 屏幕适配           https://github.com/OpenFlutter/flutter_screenutil
 
-  flutter_easyrefresh: ^2.0.2
+  flutter_easyrefresh: ^2.0.3
   # 上下拉刷新功能     https://github.com/xuelongqy/flutter_easyrefresh
 
   web_socket_channel: ^1.0.15

@@ -2,6 +2,7 @@ import 'package:app/model/rate.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:dio/dio.dart';
@@ -74,8 +75,8 @@ class _DigitListCardState extends State<DigitListCard>
                     height: ScreenUtil().setHeight(17),
                     child: GestureDetector(
                       onTap: () {
-                        print("click  digit is " + index.toString());
-                        NavigatorUtils.push(context, Routes.transactionHistoryPage);
+                        NavigatorUtils.push(
+                            context, Routes.transactionHistoryPage);
                       },
                       child: Row(
                         children: <Widget>[
