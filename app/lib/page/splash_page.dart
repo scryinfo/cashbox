@@ -26,7 +26,8 @@ class _SplashPageState extends State<SplashPage> {
   void _initWallet() async {
     //todo test JNI
     //var allWalletList = await Wallets.instance.loadAllWalletList();
-    await Wallets.instance.createMnemonic(12);
+
+    //await Wallets.instance.createMnemonic(12);
   }
 
   @override
@@ -35,7 +36,7 @@ class _SplashPageState extends State<SplashPage> {
       ..init(context); //初始化屏幕 宽高比 ，以 cashbox标注XXXHDPI@4x
 
     //todo 2.0  区分链类型，加载对应链界面
-    if (allWalletList.length != 0) {
+    if (allWalletList.length == 0) {
       return EeePage();
     } else {
       return _buildLoadingWidget();
