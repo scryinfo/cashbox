@@ -28,6 +28,7 @@ scry-fs-util = {version = "0.1.0",path="../bc-util/fs"}
 
 # 这里编译存在版本问题，当前使用的master能够正常编译通过
 [dependencies.substrate-primitives]
-git = 'https://github.com/paritytech/substrate.git'
+#git = 'https://github.com/paritytech/substrate.git'
+git = 'https://github.com/jeremymj/substrate'
 package = 'substrate-primitives'
-rev = '2e30b7321df0cc4dba525cfcf18df8438e12b830'
+#rev = '2e30b7321df0cc4dba525cfcf18df8438e12b830'
