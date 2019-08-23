@@ -1,3 +1,5 @@
+import 'package:app/model/rate.dart';
+
 class Digit {
   String digitId; //代币id
   String chainId; //链id
@@ -5,6 +7,7 @@ class Digit {
   String fullName; //全名
   String balance; //数量
   String money; //金额
+  DigitRate digitRate; //市场价格
   String address; //代币地址
   String contractAddress; //合约地址
   String urlImg; //代币图标icon地址

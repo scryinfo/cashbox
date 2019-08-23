@@ -20,6 +20,7 @@ class Routes {
   static String userServicePage = '/userservicepage';
   static String privacyStatementPage = '/privacystatementpage';
   static String serviceAgreementPage = '/serviceagreementpage';
+  static String transactionHistoryPage = '/transactionhistorypage';
 
 
 
@@ -48,5 +49,6 @@ class Routes {
     router.define(recoverWalletPage, handler: recoverWalletPageHandler);
     router.define(privacyStatementPage, handler: privacyStatementHandler);
     router.define(serviceAgreementPage, handler: serviceAgreementHandler);
+    router.define(transactionHistoryPage, handler: transactionHistoryHandler);
   }
 }
