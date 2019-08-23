@@ -1,3 +1,4 @@
+import 'package:app/routers/fluro_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -12,7 +13,7 @@ class _ChainCardState extends State<ChainCard>
     with AutomaticKeepAliveClientMixin {
   String moneyUnitStr = "USD";
   List<String> moneyUnitList = ["USD", "CNY", "KRW", "GBP", "JPY"];
-  List<String> chainTypeList = ["BTC", "ETH", "EEE"];
+  List<String> chainTypeList = ["EEE"]; //"BTC", "ETH",
 
   @override
   bool get wantKeepAlive => true;
@@ -102,16 +103,21 @@ class _ChainCardState extends State<ChainCard>
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         Container(
-                            child: Padding(
-                                padding: EdgeInsets.only(
-                                    left: ScreenUtil().setWidth(10)),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    print("clicked qr_code.png~~~");
-                                  },
-                                  child: Image.asset(
-                                      "assets/images/ic_card_qrcode.png"),
-                                ))),
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: ScreenUtil().setWidth(10)),
+                            child: GestureDetector(
+                              onTap: () {
+                                _navigatorToAddressPage(
+                                    "testWalletName",
+                                    "testTitle",
+                                    "testAddress0x666655554444333322221111000099998888777");
+                              },
+                              child: Image.asset(
+                                  "assets/images/ic_card_qrcode.png"),
+                            ),
+                          ),
+                        ),
                         Container(
                           alignment: Alignment.bottomLeft,
                           constraints: BoxConstraints(
@@ -122,31 +128,35 @@ class _ChainCardState extends State<ChainCard>
                               left: ScreenUtil().setWidth(1.5),
                             ),
                             child: GestureDetector(
-                                onTap: () {
-                                  print("clicked address~~~");
-                                },
-                                child: Text(
-                                  "0x566666666666666666666666666666666666666666666666",
-                                  textAlign: TextAlign.start,
-                                  style:
-                                      TextStyle(color: Colors.lightBlueAccent),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                )),
+                              onTap: () {
+                                _navigatorToAddressPage(
+                                    "testWalletName",
+                                    "testTitle",
+                                    "testAddress0x666655554444333322221111000099998888777");
+                              },
+                              child: Text(
+                                "0x566666666666666666666666666666666666666666666666",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(color: Colors.lightBlueAccent),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
                         ),
                         Container(
                           child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: ScreenUtil().setWidth(12.5),
-                                  bottom: ScreenUtil().setWidth(0)),
-                              child: Text(
-                                chainTypeList[index],
-                                style: TextStyle(
-                                  fontSize: 35,
-                                  color: Color.fromRGBO(255, 255, 255, 0.1),
-                                ),
-                              )),
+                            padding: EdgeInsets.only(
+                                left: ScreenUtil().setWidth(12.5),
+                                bottom: ScreenUtil().setWidth(0)),
+                            child: Text(
+                              chainTypeList[index],
+                              style: TextStyle(
+                                fontSize: 35,
+                                color: Color.fromRGBO(255, 255, 255, 0.1),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     )
@@ -158,11 +168,27 @@ class _ChainCardState extends State<ChainCard>
         },
         itemCount: chainTypeList.length,
         pagination: new SwiperPagination(
-            builder: SwiperPagination(
-          builder: SwiperPagination.dots,
-        )),
+          builder: SwiperPagination(
+            builder: SwiperPagination.rect, //切页面图标
+          ),
+        ),
         autoplay: false,
       ),
+    );
+  }
+
+  void _navigatorToAddressPage(
+      String walletName, String title, String content) {
+    String walletName = "mockWalletName";
+    String target = "addresspage?walletName=" +
+        walletName +
+        "&title=" +
+        title +
+        "&content=" +
+        content;
+    NavigatorUtils.push(
+      context,
+      target,
     );
   }
 }

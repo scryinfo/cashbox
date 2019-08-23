@@ -1,3 +1,6 @@
+import 'package:app/model/rate.dart';
+import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/routers/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
@@ -16,7 +19,8 @@ class DigitListCard extends StatefulWidget {
 class _DigitListCardState extends State<DigitListCard>
     with AutomaticKeepAliveClientMixin {
   Future future;
-  List<Digit> refreshDataList = [];
+  List<Digit> walletDataList = [];
+  List<Digit> showDataList = [];
 
   @override
   bool get wantKeepAlive => true;
@@ -36,8 +40,12 @@ class _DigitListCardState extends State<DigitListCard>
         future: future,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
+            print("snapshot.error==>" + snapshot.error.toString());
             return Center(
-              child: Text("数据加载出错了，请尝试重新加载!~"),
+              child: Text(
+                "数据加载出错了，请尝试重新加载!~",
+                style: TextStyle(color: Colors.white70),
+              ),
             );
           }
           if (snapshot.hasData) {
@@ -66,7 +74,8 @@ class _DigitListCardState extends State<DigitListCard>
                     height: ScreenUtil().setHeight(17),
                     child: GestureDetector(
                       onTap: () {
-                        print("click is " + index.toString());
+                        print("click  digit is " + index.toString());
+                        NavigatorUtils.push(context, Routes.transactionHistoryPage);
                       },
                       child: Row(
                         children: <Widget>[
@@ -98,11 +107,9 @@ class _DigitListCardState extends State<DigitListCard>
                                               alignment: new FractionalOffset(
                                                   0.0, 0.0),
                                               child: Text(
-                                                refreshDataList[index]
-                                                        .shortName +
+                                                showDataList[index].shortName +
                                                     "*" +
-                                                    refreshDataList[index]
-                                                        .balance,
+                                                    showDataList[index].balance,
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 15,
@@ -113,9 +120,7 @@ class _DigitListCardState extends State<DigitListCard>
                                               alignment:
                                                   FractionalOffset.topRight,
                                               child: Text(
-                                                "≈" +
-                                                    refreshDataList[index]
-                                                        .money,
+                                                "≈" + showDataList[index].money,
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 16),
@@ -137,7 +142,11 @@ class _DigitListCardState extends State<DigitListCard>
                                             Row(
                                               children: <Widget>[
                                                 Text(
-                                                  "\$3217.986",
+                                                  showDataList[index]
+                                                              .digitRate !=
+                                                          null
+                                                      ? "223"
+                                                      : "113",
                                                   style: TextStyle(
                                                     color:
                                                         Colors.lightBlueAccent,
@@ -191,20 +200,26 @@ class _DigitListCardState extends State<DigitListCard>
                 ],
               );
             },
-            childCount: refreshDataList.length,
+            childCount: showDataList.length,
           ),
         ),
       ],
       onLoad: () async {
         await Future.delayed(Duration(seconds: 2), () {
           setState(() {
+            //todo 根据 JNI walletlist每次refreshDataList +15条显示数据
+
             Digit digit = Digit("chainId008");
             for (var i = 0; i < 10; i++) {
               digit.shortName = "BTC";
               digit.fullName = "Bitcoin";
               digit.balance = "15";
               digit.money = "63.15";
-              refreshDataList.add(digit);
+              var digitRate = DigitRate();
+              //digitRate.volume = 0.035;
+              digitRate.changeHourly = 0.096;
+              digit.digitRate = digitRate;
+              showDataList.add(digit);
             }
           });
         });
@@ -214,16 +229,22 @@ class _DigitListCardState extends State<DigitListCard>
 
   Future<List<Digit>> getData() async {
     //use mock data todo
-    //walletManage.nowWallet.noChain.loadDigits()
+    //walletDataList = walletManage.nowWallet.noChain.loadDigits()
+    //showDataList = walletDataList[10];
+
     Digit digit = Digit("chainId001");
     for (var i = 0; i < 10; i++) {
       digit.shortName = "ETH";
       digit.fullName = "ETHereum";
       digit.balance = "15";
       digit.money = "666";
-      refreshDataList.add(digit);
+      var digitRate = DigitRate();
+      digitRate.volume = 0.035;
+      digitRate.changeHourly = 0.096;
+      digit.digitRate = digitRate;
+      showDataList.add(digit);
     }
     //todo mock data to test
-    return refreshDataList;
+    return showDataList;
   }
 }
