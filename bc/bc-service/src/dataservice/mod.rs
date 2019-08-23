@@ -1,12 +1,8 @@
-use rusqlite::{Connection, NO_PARAMS, Row, Error, RowIndex};
-
 use std::fs;
+use log::info;
+
 use scry_fs_util as fsutil;
-
-use rusqlite::params;
-//use serde_rusqlite::{from_rows_ref, from_rows_with_columns, columns_from_statement, from_row, from_rows, from_rows_ref_with_columns};
-use rusqlite::types::{Type, FromSql};
-
+use sqlite::{Connection, Statement, State, Type, Cursor, Value, Readable};
 
 const WALLET: [&'static str; 2] = ["cashbox_mnenonic.db", "cashbox_wallet.db"];
 
@@ -84,45 +80,80 @@ pub struct DataServiceProvider {
 impl Drop for DataServiceProvider {
     fn drop(&mut self) {
         let detach_sql = "DETACH DATABASE 'wallet'";
-        &self.db_hander.execute(detach_sql, NO_PARAMS).expect("DETACH database error!");
+        &self.db_hander.execute(detach_sql).expect("DETACH database error!");
     }
 }
 
 impl DataServiceProvider {
-    fn get_row_data<index: RowIndex, T: FromSql>(row: &Row, index: index) -> Option<T> {
-        match row.get(index) {
-            Ok(data) => {
-                let col_value: T = data;
-                Some(col_value)
-            }
-            Err(e) => {
-                match e {
-                    Error::InvalidColumnType(index, col, value) => None,
-                    _ => {
-                        None
-                    }
+/*    fn get_row_data<T:Readable>(row: &Statement, index: usize) -> Option<T> {
+        match row.kind(index) {
+            row_type => {
+                if row_type != Type::Null {
+                    let data: T = row.read::<T>(index);
+                    Some(data)
+                } else {
+                    None
                 }
             }
+            _ => None,
+        }*/
+        /*
+                match row.get(index) {
+                    Ok(data) => {
+                        let col_value: T = data;
+                        Some(col_value)
+                    }
+                    Err(e) => {
+                        match e {
+                            Error::InvalidColumnType(index, col, value) => None,
+                            _ => {
+                                None
+                            }
+                        }
+                    }
+                }*/
+  /*  }*/
+  /*  fn get_tbmnemonic(statement: &mut Statement) -> Option<TbMnemonic> {
+        match statement.next() {
+            Ok(state) => {
+                if state == State::Row {
+                    let mnemonic = TbMnemonic {
+                        id: Self::get_row_data::<String>(statement, 0),
+                        full_name: Self::get_row_data::<String>(statement, 1),
+                        mnemonic: Self::get_row_data::<String>(statement, 2),
+                        selected: Self::get_row_data::<i64>(statement, 3),
+                        status: Self::get_row_data::<i64>(statement, 4),
+                        create_time: Self::get_row_data::<String>(statement, 5),
+                        update_time: Self::get_row_data::<String>(statement, 6),
+                    };
+                    Some(mnemonic)
+                } else {
+                    None
+                }
+            }
+            Err(e) => {
+                info!("get_tbmnemonic:{}", e.to_string());
+                None
+            }
         }
-    }
-
-    fn get_tbmnemonic_from_rows(row: Option<&Row>) -> Option<TbMnemonic> {
-        if row.is_some() {
-            let row_data = row.unwrap();
-            let mnemonic = TbMnemonic {
-                id: Self::get_row_data::<usize, String>(&row_data, 0),
-                full_name: Self::get_row_data::<usize, String>(&row_data, 1),
-                mnemonic: Self::get_row_data::<usize, String>(&row_data, 2),
-                selected: Self::get_row_data::<usize, bool>(&row_data, 3),
-                status: Self::get_row_data::<usize, i64>(&row_data, 4),
-                create_time: Self::get_row_data::<usize, String>(&row_data, 5),
-                update_time: Self::get_row_data::<usize, String>(&row_data, 6),
-            };
-            Some(mnemonic)
-        } else {
-            None
-        }
-    }
+    }*/
+    /*   fn get_tbmnemonic_from_rows(row: Option<&Row>) -> Option<TbMnemonic> {
+           if row.is_some() {
+               let row_data = row.unwrap();
+               let mnemonic = TbMnemonic {
+                   id: Self::get_row_data::<usize, String>(&row_data, 0),
+                   full_name: Self::get_row_data::<usize, String>(&row_data, 1),
+                   mnemonic: Self::get_row_data::<usize, String>(&row_data, 2),
+                   selected: Self::get_row_data::<usize, bool>(&row_data, 3),
+                   status: Self::get_row_data::<usize, i64>(&row_data, 4),
+                   create_time: Self::get_row_data::<usize, String>(&row_data, 5),
+                   update_time: Self::get_row_data::<usize, String>(&row_data, 6),
+               };
+               Some(mnemonic)
+           } else {
+               None
+           }
+       }*/
 
     pub fn instance() -> Result<Self, String> {
 
@@ -132,16 +163,15 @@ impl DataServiceProvider {
         //1、检查对应的数据库文件是否存在
         if fs::File::open(WALLET[0]).is_ok() && fs::File::open(WALLET[1]).is_ok() {
             //连接数据库
-            let conn = Connection::open(WALLET[0]).unwrap();
+            let conn = sqlite::open(WALLET[0]).unwrap();
             let attach_sql = format!("ATTACH DATABASE \"{}\" AS wallet;", WALLET[1]);
-            conn.execute(&attach_sql, NO_PARAMS).expect("attach database error!");
+            conn.execute(&attach_sql).expect("attach database error!");
             let provider = DataServiceProvider {
                 db_hander: conn,
             };
             Ok(provider)
         } else {
             //创建数据库
-
             // TODO这个地方需要在程序运行指定创建sql 脚本所在的目录，这一步需要到时根据运行环境指定
             match fs::read_dir("sql") {
                 Ok(dir) => {
@@ -156,16 +186,16 @@ impl DataServiceProvider {
                         let connect = Connection::open(WALLET[i]).unwrap();
 
                         //使用脚本文件创建数据表
-                        connect.execute_batch(&String::from_utf8(sql_script).unwrap()).expect("execute sql script is error");
+                        connect.execute(&String::from_utf8(sql_script).unwrap()).expect("execute sql script is error");
                         i = i + 1;
-                        if connect.close().is_err() {
+                      /*  if connect..is_err() {
                             println!("connect close is error");
-                        }
+                        }*/
                     }
 
                     let conn = Connection::open(WALLET[0]).unwrap();
                     let attach_sql = format!("ATTACH DATABASE \"{}\" AS wallet;", WALLET[1]);
-                    conn.execute(&attach_sql, NO_PARAMS).expect("attach database error!");
+                    conn.execute(&attach_sql).expect("attach database error!");
                     let provider = DataServiceProvider {
                         db_hander: conn,
                     };
@@ -181,27 +211,70 @@ impl DataServiceProvider {
     }
 
     pub fn tx_begin(&mut self) -> Result<(), String> {
-        self.db_hander.transaction().map(|_| ()).map_err(|err| err.to_string())
+        self.db_hander.execute("begin;").map(|_| ()).map_err(|err| err.to_string())
     }
 
 
-    pub fn update_mnemonic(&self, mn: TbMnemonic) -> Result<usize, String> {
-        let mn_sql = "update Mnemonic set mnemonic=?1 where id=?2;";
-        self.db_hander.execute(mn_sql, params![mn.mnemonic,mn.id]).map_err(|err| {
-            let error_hint = format!("save mnemonic error");
-            err.to_string()
-        })
+    pub fn update_mnemonic(&self, mn: TbMnemonic) -> Result<(), String> {
+        let mn_sql = "update Mnemonic set mnemonic=? where id=?;";
+        let mut statement = self.db_hander.prepare(mn_sql).expect("sql statement is error!");
+        statement.bind(1, mn.mnemonic.unwrap().as_str()).expect(" mnemonic  bind error");
+        statement.bind(2, mn.id.unwrap().as_str()).expect("mn id bind error");
+        match statement.next() {
+            Ok(_state) => {
+                Ok(())
+            }
+            Err(e) => Err(e.to_string())
+        }
     }
 
     pub fn save_mnemonic_address(&mut self, mn: TbMnemonic, addr: TbAddress) -> Result<(), String> {
-        let mn_sql = "insert into Mnemonic(id,mnemonic) values(?1,?2);";
-        let address_sql = "insert into wallet.Address(mnemonic_id,chain_id,address,puk_key,status) values(?1,?2,?3,?4,?5);";
-        let digit_account_sql = "insert into wallet.Digit(address) values(?1);";
+        let mn_sql = "insert into Mnemonic(id,mnemonic) values(?,?);";
+        let address_sql = "insert into wallet.Address(mnemonic_id,chain_id,address,puk_key,status) values(?,?,?,?,?);";
+        let digit_account_sql = "insert into wallet.Digit(address) values(?);";
         // TODO 增加事务的处理，这个的编码方式还需要修改 才能编译通过
         //let hander_tx = self.db_hander
         // TODO 根据链的地址种类 对应的填写代币账户信息
 
         //  let mut tx = self.db_hander.transaction().unwrap();
+
+        match self.db_hander.prepare(mn_sql){
+            Ok(mut stat)=>{
+                stat.bind(1,mn.id.unwrap().as_str()).expect("save_mnemonic_address bind mn id error");
+                stat.bind(2,mn.mnemonic.unwrap().as_str()).expect("save_mnemonic_address bind mnemonic error");
+                match stat.next() {
+                    Ok(_)=>{
+                        match self.db_hander.prepare(address_sql) {
+                            Ok(mut address_stat)=>{
+                                address_stat.bind(1,addr.mnemonic_id.as_str()).expect("save_mnemonic_address bind addr.mnemonic_id ");
+                                address_stat.bind(2,addr.chain_id as i64).expect("save_mnemonic_address bind addr.chain_id ");
+                                address_stat.bind(3,addr.address.as_str()).expect("save_mnemonic_address bind addr.address ");
+                                address_stat.bind(4,addr.pub_key.as_str()).expect("save_mnemonic_address bind addr.pub_key ");
+                                address_stat.bind(5,addr.status as i64).expect("save_mnemonic_address  bind addr.status ");
+                                match address_stat.next() {
+                                    Ok(_)=>{
+                                      match self.db_hander.prepare(digit_account_sql) {
+                                          Ok(mut digit_stat)=>{
+                                              digit_stat.bind(1,addr.address.as_str()).expect("save_mnemonic_address digit_stat bind addr.address ");
+                                              digit_stat.next().expect("exec digit insert error");
+                                              Ok(())
+                                          },
+                                          Err(e)=>Err(e.to_string())
+                                      }
+                                    },
+                                    Err(e)=>Err(e.to_string())
+                                }
+                            },
+                            Err(e)=>Err(e.to_string())
+                        }
+                    },
+                    Err(e)=>Err(e.to_string())
+                }
+            },
+            Err(e)=>Err(e.to_string())
+        }
+
+/*
         //在保存地址的时候
         match self.db_hander.execute(mn_sql, params![mn.id,mn.mnemonic]) {
             Ok(_) => {
@@ -220,108 +293,155 @@ impl DataServiceProvider {
             Err(e) => {
                 Err(e.to_string())
             }
-        }
+        }*/
     }
 
     //这个地方 定义成通用的对象查询功能
-    pub fn query_by_mnemonic_id(&self, id: &str) -> Result<Option<TbMnemonic>, String> {
-        let query_sql = "select * from Mnemonic where id = :1";
+    pub fn query_by_mnemonic_id(&self, id: &str) -> Option<TbMnemonic> {
+        let query_sql = "select * from Mnemonic where id = ?";
         let mut statement = self.db_hander.prepare(query_sql).unwrap();
-        let mut rows = statement.query(params![id]).unwrap();
-        match rows.next() {
-            Ok(row) => {
-                let ret =Self::get_tbmnemonic_from_rows(row);
-                Ok(ret)
+        statement.bind(1,id).expect("query_by_mnemonic_id bind id");
+        let mut cursor = statement.cursor();
+
+        match cursor.next().unwrap() {
+            Some(value) => {
+                let mnemonic = TbMnemonic {
+                    id: value[0].as_string().map(|str| String::from(str)),
+                    full_name: value[1].as_string().map(|str| String::from(str)),
+                    mnemonic: value[2].as_string().map(|str| String::from(str)),
+                    selected: value[3].as_integer().map(|num| if num == 1 { true } else { false }),
+                    status: value[4].as_integer(),
+                    create_time: value[5].as_string().map(|str| String::from(str)),
+                    update_time: value[6].as_string().map(|str| String::from(str)),
+                };
+                Some(mnemonic)
             }
-            Err(err) => {
-                Err(err.to_string())
+            None => {
+                None
             }
         }
     }
 
-//考虑修改为查询所有指定条件的对象
-pub fn query_selected_mnemonic(&self) -> Result<TbMnemonic, String> {
-    //选中钱包 只有一个
-    let sql = "select * from Mnemonic where selected=1;";
-    self.db_hander.prepare(sql).map(|mut stmt| {
-        let mut rows = stmt.query(NO_PARAMS).unwrap();
-        let row = rows.next().unwrap(); //必须存在一个指定的钱包
+    //考虑修改为查询所有指定条件的对象
+    pub fn query_selected_mnemonic(&self) -> Result<TbMnemonic, String> {
+        //选中钱包 只有一个
+        let sql = "select * from Mnemonic where selected=1;";
 
-        let ret =Self::get_tbmnemonic_from_rows(row);
-        ret.unwrap()
-    }).map_err(|err| {
-        println!("query error:{}", err.to_string());
-        err.to_string()
-    })
-}
-
-//当前该功能是返回所有的助记词
-pub fn get_mnemonics(&self) -> Vec<TbMnemonic> {
-    let sql = "select * from Mnemonic WHERE status = 1;";
-
-    let mut statement = self.db_hander.prepare(sql).unwrap();
-    let mut rows = statement.query(NO_PARAMS).unwrap();
-
-    let mut vec = Vec::new();
-    while let mn = rows.next().unwrap() {
-        let mn = Self::get_tbmnemonic_from_rows(mn);
-        if mn.is_some() {
-            vec.push(mn.unwrap())
-        }
+        self.db_hander.prepare(sql).map(|stmt| {
+            let mut rows = stmt.cursor();
+            let cursor = rows.next().unwrap().unwrap(); //必须存在一个指定的钱包
+            let mnemonic = TbMnemonic {
+                id: cursor[0].as_string().map(|str| String::from(str)),
+                full_name: cursor[1].as_string().map(|str| String::from(str)),
+                mnemonic: cursor[2].as_string().map(|str| String::from(str)),
+                selected: cursor[3].as_integer().map(|num| if num == 1 { true } else { false }),
+                status: cursor[4].as_integer(),
+                create_time: cursor[5].as_string().map(|str| String::from(str)),
+                update_time: cursor[6].as_string().map(|str| String::from(str)),
+            };
+            mnemonic
+        }).map_err(|err| {
+            println!("query error:{}", err.to_string());
+            err.to_string()
+        })
     }
-    vec
-}
 
-pub fn set_selected_mnemonic(&self, mn_id: &str) -> Result<(), String> {
-    //需要先查询出那些助记词是被设置为当前选中，将其设置为取消选中，再将指定的id 设置为选中状态
-    let sql = "UPDATE Mnemonic set selected = 0 where id in (select id from Mnemonic WHERE selected=1);";
-    self.db_hander.execute(sql, NO_PARAMS).expect("exec sql is error!");
-    let set_select_sql = "update Mnemonic set selected = 1 where id =:1;";
-    self.db_hander.execute(set_select_sql, &[mn_id]).map(|_| ()).map_err(|err| err.to_string())
-}
+    //当前该功能是返回所有的助记词
+    pub fn get_mnemonics(&self) -> Vec<TbMnemonic> {
+        let sql = "select * from Mnemonic WHERE status = 1;";
 
-pub fn del_mnemonic(&self, mn_id: &str) -> Result<(), String> {
-    let sql = "DELETE from Mnemonic WHERE id = :1; ";
-    self.db_hander.execute(sql, &[mn_id]).expect("exec sql is error");
-    let update_address = "UPDATE Address set status = 0 WHERE mnemonic_id =:2;";
-    self.db_hander.execute(update_address, &[mn_id]).map(|_| ()).map_err(|err| err.to_string())
-}
+        let mut cursor = self.db_hander.prepare(sql).unwrap().cursor();
+        let mut vec = Vec::new();
+        while let Some(row) = cursor.next().unwrap() {
+            let mnemonic = TbMnemonic {
+                id: row[0].as_string().map(|str| String::from(str)),
+                full_name: row[1].as_string().map(|str| String::from(str)),
+                mnemonic: row[2].as_string().map(|str| String::from(str)),
+                selected: row[3].as_integer().map(|num| if num == 1 { true } else { false }),
+                status: row[4].as_integer(),
+                create_time: row[5].as_string().map(|str| String::from(str)),
+                update_time: row[6].as_string().map(|str| String::from(str)),
+            };
+            vec.push(mnemonic)
+        }
+        vec
+    }
 
-pub fn rename_mnemonic(&self, mn_id: &str, mn_name: &str) -> Result<(), String> {
-    let sql = "UPDATE Mnemonic set fullname = :1 WHERE id=:2;";
-    self.db_hander.execute(sql, params![mn_name,mn_id]).map(|_| ()).map_err(|err| err.to_string())
-}
+    pub fn set_selected_mnemonic(&self, mn_id: &str) -> Result<(), String> {
+        //需要先查询出那些助记词是被设置为当前选中，将其设置为取消选中，再将指定的id 设置为选中状态
+        let sql = "UPDATE Mnemonic set selected = 0 where id in (select id from Mnemonic WHERE selected=1);";
+        self.db_hander.execute(sql).expect("exec sql is error!");
+        let set_select_sql = "update Mnemonic set selected = 1 where id =?;";
+        self.db_hander.prepare(set_select_sql).map(|mut stat| {
+            stat.bind(1, mn_id).expect("set_selected_mnemonic bind mn_id");
+            stat.next().expect("exec set_selected_mnemonic error");
+            ()
+        }).map_err(|err| err.to_string())
+        // self.db_hander.execute(set_select_sql, &[mn_id]).map(|_| ()).map_err(|err| err.to_string())
+    }
 
-pub fn display_mnemonic_list(&self) -> Result<Vec<TbWallet>, String> {
-    let all_mn = "select a.id as wallet_id,a.fullname as wallet_name,b.id as chain_id,d.address,b.address as chain_address,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
+    pub fn del_mnemonic(&self, mn_id: &str) -> Result<(), String> {
+        let sql = "DELETE from Mnemonic WHERE id = ?; ";
+        let update_address = "UPDATE Address set status = 0 WHERE mnemonic_id =?;";
+        match self.db_hander.prepare(sql){
+            Ok(mut stat)=>{
+                stat.bind(1,mn_id).expect("del_mnemonic bind mn_id");
+                stat.next().expect("exec del_mnemonic");
+                match self.db_hander.prepare(update_address){
+                    Ok(mut stat)=>{
+                        stat.bind(1,mn_id).expect("del_mnemonic update_address bind mn_id");
+                        stat.next().expect("exec del_mnemonic update_address");
+                        Ok(())
+                    },
+                    Err(e)=>{
+                       Err(e.to_string())
+                    }
+                }
+            },
+            Err(e)=>Err(e.to_string())
+        }
+
+    }
+
+    pub fn rename_mnemonic(&self, mn_id: &str, mn_name: &str) -> Result<(), String> {
+        let sql = "UPDATE Mnemonic set fullname = ? WHERE id=?;";
+
+        self.db_hander.prepare(sql).map(|mut stat| {
+            stat.bind(1, mn_name).expect("rename_mnemonic bind mn name");
+            stat.bind(2, mn_id).expect("rename_mnemonic bind mn id");
+            stat.next().expect("exec rename_mnemonic");
+            ()
+        }).map_err(|err| err.to_string())
+    }
+
+    pub fn display_mnemonic_list(&self) -> Result<Vec<TbWallet>, String> {
+        let all_mn = "select a.id as wallet_id,a.fullname as wallet_name,b.id as chain_id,d.address,b.address as chain_address,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
  from Mnemonic a,wallet.Chain b,wallet.Address c,wallet.Digit d where a.id=c.mnemonic_id and c.chain_id = b.id and c.address=d.address and a.status =1 and c.status =1;";
 
-    let mut statement = self.db_hander.prepare(all_mn).unwrap();
-    // let columns = columns_from_statement(&statement);
+        let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
 
-    let mut rows = statement.query(NO_PARAMS).unwrap();
 
-    let mut tbwallets = Vec::new();
-    while let Some(row) = rows.next().unwrap() {
-        let tbwallet = TbWallet {
-            wallet_id: Self::get_row_data::<usize, String>(&row, 0),
-            wallet_name: Self::get_row_data::<usize, String>(&row, 1),
-            chain_id: Self::get_row_data::<usize, i64>(&row, 2),
-            address: Self::get_row_data::<usize, String>(&row, 3),
-            chain_address: Self::get_row_data::<usize, String>(&row, 4),
-            selected: Self::get_row_data::<usize, bool>(&row, 5),
-            chain_type: Self::get_row_data::<usize, i64>(&row, 6),
-            digit_id: Self::get_row_data::<usize, i64>(&row, 7),
-            contract_address: Self::get_row_data::<usize, String>(&row, 8),
-            short_name: Self::get_row_data::<usize, String>(&row, 9),
-            full_name: Self::get_row_data::<usize, String>(&row, 10),
-            balance: Self::get_row_data::<usize, String>(&row, 11),
-            isvisible: Self::get_row_data::<usize, bool>(&row, 12),
-            decimals: Self::get_row_data::<usize, i64>(&row, 13),
-            url_img: Self::get_row_data::<usize, String>(&row, 14),
-        };
-        tbwallets.push(tbwallet);
+        let mut tbwallets = Vec::new();
+        while let Some(row) = cursor.next().unwrap() {
+            let tbwallet = TbWallet {
+                wallet_id: row[0].as_string().map(|str| String::from(str)),
+                wallet_name: row[1].as_string().map(|str| String::from(str)),
+                chain_id: row[2].as_integer(),
+                address: row[3].as_string().map(|str| String::from(str)),
+                chain_address: row[4].as_string().map(|str| String::from(str)),
+                selected: row[5].as_integer().map(|num| if num == 1 { true } else { false }),
+                chain_type: row[6].as_integer(),
+                digit_id: row[7].as_integer(),
+                contract_address: row[8].as_string().map(|str| String::from(str)),
+                short_name: row[9].as_string().map(|str| String::from(str)),
+                full_name: row[10].as_string().map(|str| String::from(str)),
+                balance: row[11].as_string().map(|str| String::from(str)),
+                isvisible: row[12].as_integer().map(|num| if num == 1 { true } else { false }),
+                decimals: row[13].as_integer(),
+                url_img: row[14].as_string().map(|str| String::from(str)),
+            };
+            tbwallets.push(tbwallet);
+        }
+        Ok(tbwallets)
     }
-    Ok(tbwallets)
-}
 }
