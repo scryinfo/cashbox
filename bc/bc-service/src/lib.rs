@@ -535,15 +535,11 @@ pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Status
     //查询出对应id的助记词
     let mnemonic = provider.query_by_mnemonic_id(mn_id);
     match mnemonic {
-        Ok(mn) => {
-            if mn.is_some() {
-                mnemonic_psd_update(&mn.unwrap(), old_pwd, new_pwd)
-            }else {
-                StatusCode::FailToRestPwd
-            }
+        Some(mn) => {
+            mnemonic_psd_update(&mn, old_pwd, new_pwd)
             //开始处理助记词逻辑
         }
-        Err(e) => {
+        None => {
             //针对错误信息 是否提示更多原因？
             StatusCode::FailToRestPwd
         }
