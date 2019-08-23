@@ -55,7 +55,7 @@ impl From<i64> for ChainType {
     }
 }
 
-const SCRYPT_LOG_N: u8 = 18;
+const SCRYPT_LOG_N: u8 = 5;//调试 将迭代次数降低
 const SCRYPT_P: u32 = 1;
 //u32 的数据类型为使用scrypt这个库中定义
 const SCRYPT_R: u32 = 8;
