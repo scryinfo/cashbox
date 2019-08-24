@@ -7,17 +7,17 @@ import android.content.Intent;
 import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
-import io.flutter.plugins.GeneratedPluginRegistrant;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.view.FlutterView;
 
 import android.util.Log;
 
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.common.Constant;
+
+import java.io.IOException;
 
 public class MainActivity extends FlutterActivity {
 
@@ -26,6 +26,7 @@ public class MainActivity extends FlutterActivity {
     private Result mQRScanResult = null;
     private final String QR_SCAN_METHOD = "qr_scan_method";
     private final String CHARGING_CHANNEL = "samples.flutter.io/charging";
+    private final String FLUTTER_LOG_CHANNEL = "android_log";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,17 @@ public class MainActivity extends FlutterActivity {
                                     Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
                                     startActivityForResult(intent, REQUEST_CODE_QR_SCAN);
                                 }
+                            }
+                        }
+                );
+
+        //flutter处 log日志保存
+        new MethodChannel(getFlutterView(), FLUTTER_LOG_CHANNEL)
+                .setMethodCallHandler(
+                        new MethodCallHandler() {
+                            @Override
+                            public void onMethodCall(MethodCall call, Result result) {
+                                logPrint(call);
                             }
                         }
                 );
@@ -70,6 +82,28 @@ public class MainActivity extends FlutterActivity {
                     }
                 }
         );
+    }
+
+    private void logPrint(MethodCall call) {
+        String tag = call.argument("tag");
+        String message = call.argument("msg");
+        switch (call.method) {
+            case "logV":
+                Log.v(tag, message);
+                break;
+            case "logD":
+                Log.d(tag, message);
+                break;
+            case "logI":
+                Log.i(tag, message);
+                break;
+            case "logW":
+                Log.w(tag, message);
+                break;
+            case "logE":
+                Log.e(tag, message);
+                break;
+        }
     }
 
     @Override
