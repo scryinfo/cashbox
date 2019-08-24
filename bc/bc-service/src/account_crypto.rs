@@ -81,7 +81,7 @@ impl Crypto for Ed25519 {
     fn pair_from_suri(suri: &str, password_override: Option<&str>) -> Self::Pair {
         ed25519::Pair::from_legacy_string(suri, password_override)
     }
-    fn pair_from_seed(seed: &Self::Seed) -> Self::Pair { ed25519::Pair::from_seed(seed.clone()) }
+    fn pair_from_seed(seed: &Self::Seed) -> Self::Pair { ed25519::Pair::from_seed(&seed.clone()) }
     fn ss58_from_pair(pair: &Self::Pair) -> String { pair.public().to_ss58check() }
     fn public_from_pair(pair: &Self::Pair) -> Vec<u8> { (&pair.public().0[..]).to_owned() }
     fn seed_from_pair(pair: &Self::Pair) -> Option<&Self::Seed> { Some(pair.seed()) }
