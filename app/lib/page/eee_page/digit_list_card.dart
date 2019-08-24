@@ -51,6 +51,9 @@ class _DigitListCardState extends State<DigitListCard>
           }
           if (snapshot.hasData) {
             return Container(
+              padding: EdgeInsets.only(
+                  left: ScreenUtil().setWidth(3),
+                  right: ScreenUtil().setWidth(3)),
               child: _makeRefreshWidgets(snapshot),
             );
           } else {
@@ -73,6 +76,10 @@ class _DigitListCardState extends State<DigitListCard>
                   Container(
                     alignment: Alignment.center,
                     height: ScreenUtil().setHeight(17),
+                    margin: EdgeInsets.only(
+                      left: ScreenUtil().setWidth(3),
+                      right: ScreenUtil().setWidth(3),
+                    ),
                     child: GestureDetector(
                       onTap: () {
                         NavigatorUtils.push(
@@ -81,12 +88,8 @@ class _DigitListCardState extends State<DigitListCard>
                       child: Row(
                         children: <Widget>[
                           Container(
-                              child: Padding(
-                            padding: EdgeInsets.only(
-                              left: ScreenUtil().setHeight(10),
-                            ),
                             child: Image.asset("assets/images/ic_eth.png"),
-                          )),
+                          ),
                           Container(
                               child: Padding(
                                   padding: EdgeInsets.only(
