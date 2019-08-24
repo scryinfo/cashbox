@@ -26,9 +26,9 @@ class Wallets {
 
   // 创建助记词，待验证正确通过，由底层创建钱包完成，应用层做保存
   // apiNo:MM00
-  Future<Uint8List> createMnemonic(int count) async {
+  Future<Mnemonic> createMnemonic(int count) async {
     var result = await WalletManager.mnemonicGenerate(count);
-    return null;
+    return result;
   }
 
   // 是否已有钱包
@@ -51,7 +51,7 @@ class Wallets {
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
   // apiNo:WM03
   Future<Wallet> saveWallet(
-      String walletName, String pwd, Uint8List mnemonic) async {
+      String walletName, Uint8List pwd, Uint8List mnemonic) async {
     Wallet wallet = Wallet();
     var result = await WalletManager.saveWallet(walletName, pwd, mnemonic);
     // 创建钱包接口，传参数 钱包名walletname+密码pwd，底层操作，创建好钱包、链、代币。
