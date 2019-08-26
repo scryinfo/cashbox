@@ -1,11 +1,12 @@
 use std::fs;
-use log::info;
+use log::{info, error};
+use std::env;
 
-use sqlite::Connection;
+use sqlite::{Connection, State};
 
-const TB_MNEMONIC: &'static str = "cashbox_mnenonic.db";
+const TB_MNEMONIC: &'static str = r#"/data/data/com.example.app/files/cashbox_mnenonic.db"#;
 
-const TB_WALLET: &'static str = "cashbox_wallet.db";
+const TB_WALLET: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet.db"#;
 
 mod table_desc;
 
@@ -67,15 +68,6 @@ pub struct TbWallet {
     pub url_img: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct TestWallet {
-    pub wallet_id: Option<String>,
-    //助记词id
-    pub chain_id: Option<String>,
-    pub address: Option<String>,
-    pub chain_address: Option<String>,
-}
-
 pub struct DataServiceProvider {
     db_hander: Connection,
 }
@@ -93,30 +85,63 @@ impl DataServiceProvider {
         if fs::File::open(TB_MNEMONIC).is_err() || fs::File::open(TB_WALLET).is_err() {
             //2、若是不存在则执行sql脚本文件创建数据库
             {
+                //先创建目录
+                let create_hint = fs::File::create(TB_MNEMONIC).map_err(|e| format!("TB_MNEMONIC path create error:{},path:{}", e.to_string(), TB_MNEMONIC));
+
+                if create_hint.is_err() {
+                    return Err(create_hint.unwrap_err());
+                }
                 let mnemonic_sql = table_desc::get_cashbox_mnenonic_sql();
-                match Connection::open(TB_MNEMONIC) {
+
+                let mn_database_hint = match Connection::open(TB_MNEMONIC) {
                     Ok(connect) => {
                         match connect.execute(mnemonic_sql) {
                             Ok(_) => { Ok(()) }
-                            Err(e) => Err(e.to_string())
+                            Err(e) => {
+                                let hint = format!("mnemonic_sql exec error:{}", e.to_string());
+                                Err(hint)
+                            }
                         }
                     }
-                    Err(e) => Err(e.to_string())
+                    Err(e) => {
+                        let hint = format!("open TB_MNEMONIC create error:{}", e.to_string());
+                        Err(hint)
+                    }
                 };
+                if mn_database_hint.is_err() {
+                    return Err(mn_database_hint.unwrap_err())
+                }
             }
             //create wallet table
             {
-                let wallet_sql = table_desc::get_cashbox_wallet_sql();
 
-                match Connection::open(TB_WALLET) {
+                //先创建目录
+                let wallet_file_hint = fs::File::create(TB_WALLET).map_err(|e| format!("TB_MNEMONIC path create error:{}", e.to_string()));
+
+                if wallet_file_hint.is_err() {
+                    return Err(wallet_file_hint.unwrap_err());
+                }
+
+                let wallet_sql = table_desc::get_cashbox_wallet_sql();
+                let crate_wallet_hint = match Connection::open(TB_WALLET) {
                     Ok(connect) => {
                         match connect.execute(wallet_sql) {
                             Ok(_) => { Ok(()) }
-                            Err(e) => Err(e.to_string())
+                            Err(e) => {
+                                let hint = format!("wallet_sql create error:{}", e.to_string());
+                                Err(e.to_string())
+                            }
                         }
                     }
-                    Err(e) => Err(e.to_string())
+                    Err(e) => {
+                        let hint = format!("open TB_WALLET create error:{}", e.to_string());
+                        Err(hint)
+                    }
                 };
+                if crate_wallet_hint.is_err() {
+                    let hint = format!("TB_WALLET database create:{}", wallet_file_hint.unwrap_err());
+                    return Err(hint);
+                }
             }
         }
 
@@ -124,15 +149,22 @@ impl DataServiceProvider {
         match Connection::open(TB_MNEMONIC) {
             Ok(conn) => {
                 let attach_sql = format!("ATTACH DATABASE \"{}\" AS wallet;", TB_WALLET);
-                conn.execute(&attach_sql).expect("attach database error!");
-                let provider = DataServiceProvider {
-                    db_hander: conn,
-                };
-                // TODO 在连接到助记词库 还需要 attach database  "钱包库"
-                //3,返回实例
-                Ok(provider)
+                match conn.execute(&attach_sql) {
+                    Ok(_) => {
+                        let provider = DataServiceProvider {
+                            db_hander: conn,
+                        };
+                        Ok(provider)
+                    }
+                    Err(e) => {
+                        Err(format!("ATTACH DATABASE error:{}", e.to_string()))
+                    }
+                }
             }
-            Err(e) => Err(e.to_string())
+            Err(e) => {
+                let hint = format!("open TB_MNEMONIC error:{}", e.to_string());
+                Err(hint)
+            }
         }
     }
 
@@ -146,6 +178,7 @@ impl DataServiceProvider {
         let mut statement = self.db_hander.prepare(mn_sql).expect("sql statement is error!");
         statement.bind(1, mn.mnemonic.unwrap().as_str()).expect(" mnemonic  bind error");
         statement.bind(2, mn.id.unwrap().as_str()).expect("mn id bind error");
+
         match statement.next() {
             Ok(_state) => {
                 Ok(())
@@ -159,11 +192,7 @@ impl DataServiceProvider {
         let address_sql = "insert into wallet.Address(mnemonic_id,chain_id,address,puk_key,status) values(?,?,?,?,?);";
         let digit_account_sql = "insert into wallet.Digit(address) values(?);";
         // TODO 增加事务的处理，这个的编码方式还需要修改 才能编译通过
-        //let hander_tx = self.db_hander
         // TODO 根据链的地址种类 对应的填写代币账户信息
-
-        //  let mut tx = self.db_hander.transaction().unwrap();
-
         match self.db_hander.prepare(mn_sql) {
             Ok(mut stat) => {
                 stat.bind(1, mn.id.unwrap().as_str()).expect("save_mnemonic_address bind mn id error");
@@ -246,7 +275,7 @@ impl DataServiceProvider {
             };
             mnemonic
         }).map_err(|err| {
-            println!("query error:{}", err.to_string());
+            error!("query error:{}", err.to_string());
             err.to_string()
         })
     }
@@ -309,13 +338,24 @@ impl DataServiceProvider {
 
     pub fn rename_mnemonic(&self, mn_id: &str, mn_name: &str) -> Result<(), String> {
         let sql = "UPDATE Mnemonic set fullname = ? WHERE id=?;";
-
-        self.db_hander.prepare(sql).map(|mut stat| {
-            stat.bind(1, mn_name).expect("rename_mnemonic bind mn name");
-            stat.bind(2, mn_id).expect("rename_mnemonic bind mn id");
-            stat.next().expect("exec rename_mnemonic");
-            ()
-        }).map_err(|err| err.to_string())
+        match self.db_hander.prepare(sql) {
+            Ok(mut stat) => {
+                let bind_mn_name = stat.bind(1, mn_name).map_err(|e| format!("rename_mnemonic bind mn name,{}", e.to_string()));
+                if bind_mn_name.is_err() {
+                    return Err(bind_mn_name.unwrap_err());
+                }
+                let bind_mn_id = stat.bind(2, mn_id).map_err(|e| format!("rename_mnemonic bind mn id,{}", e.to_string()));
+                if bind_mn_id.is_err(){
+                    return  Err(bind_mn_id.unwrap_err());
+                }
+                let exec = stat.next().map_err(|e|format!("exec rename_mnemonic,{}",e.to_string()));
+                if exec.is_err() {
+                   return Err(exec.unwrap_err());
+                }
+                Ok(())
+            },
+            Err(e)=>Err(e.to_string())
+        }
     }
 
     pub fn display_mnemonic_list(&self) -> Result<Vec<TbWallet>, String> {
