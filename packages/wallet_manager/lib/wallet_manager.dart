@@ -20,10 +20,11 @@ class WalletManager {
 
   // 是否已有钱包
   // apiNo:WM01
-  static Future<Map<dynamic, dynamic>> isContainWallet() async {
-    Map<dynamic, dynamic> mneMap =
+  static Future<bool> isContainWallet() async {
+    Map<dynamic, dynamic> containMap =
         await _channel.invokeMethod('isContainWallet');
-    return mneMap;
+    var isContain = containMap["isContainWallet"];
+    return isContain;
   }
 
   //从数据库 加载出 所有钱包数据
@@ -56,18 +57,18 @@ class WalletManager {
 
   //获取当前钱包
   // apiNo:WM05
-  static Future<Map<dynamic, dynamic>> getNowWallet() async {
-    Map<dynamic, dynamic> nowWallet =
+  static Future<String> getNowWallet() async {
+    String nowWalletId =
         await _channel.invokeMethod('getNowWallet');
-    return nowWallet;
+    return nowWalletId;
   }
 
   //设置当前钱包 bool是否成功
   //  apiNo:WM06
   static Future<bool> setNowWallet(String walletId) async {
-    Map<dynamic, dynamic> allWalletList =
+    bool isSuccess =
         await _channel.invokeMethod('setNowWallet', {"walletId": walletId});
-    return false;
+    return isSuccess;
   }
 
   static Future<Map<dynamic, dynamic>> mnemonicSave(mnemonic, pwd) async {
@@ -84,19 +85,19 @@ class WalletManager {
 
   //删除钱包。 钱包设置可删除，链设置隐藏。
   // apiNo:WM07
-  static Future<bool> deleteWallet(walletId) async {
-    Map<dynamic, dynamic> allWalletList =
-        await _channel.invokeMethod('deleteWallet', walletId);
-    return null;
+  static Future<bool> deleteWallet(String walletId) async {
+    bool isSuccess =
+        await _channel.invokeMethod('deleteWallet', {"walletId": walletId});
+    return isSuccess;
   }
 
   // 重置钱包密码。
   // apiNo:WM08
   static Future<bool> resetPwd(
-      String walletId, String newPwd, String oldPwd) async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod(
+      String walletId, Uint8List newPwd, Uint8List oldPwd) async {
+   bool isSuccess = await _channel.invokeMethod(
         'resetPwd', {"walletId": walletId, "newPwd": newPwd, "oldPwd": oldPwd});
-    return null;
+    return isSuccess;
   }
 
   // 重置钱包名

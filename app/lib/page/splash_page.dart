@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../test/wallet_manager_test.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -27,12 +28,19 @@ class _SplashPageState extends State<SplashPage> {
 
   void _initWallet() async {
     //todo test JNI
-    var mnemonic = await Wallets.instance.createMnemonic(12);
-    var wallet = await Wallets.instance.saveWallet("thisWalletName", Uint8List.fromList("666".codeUnits), mnemonic.mn);
+
+    //WalletManagerTest.saveWallet();
+    //WalletManagerTest.isContainWallet();
+    //WalletManagerTest.loadAllWalletList();
+    //WalletManagerTest.setNowWallet();
+    //WalletManagerTest.getNowWallet();
+    //WalletManagerTest.deleteWallet();
+    //WalletManagerTest.resetPwd();
+
+    //var mnemonic = await Wallets.instance.createMnemonic(12);
+    //var wallet = await Wallets.instance.saveWallet("thisWalletName", Uint8List.fromList("666".codeUnits), mnemonic.mn);
     //var isContainWallet = await Wallets.instance.isContainWallet();
     //var allWalletList = await Wallets.instance.loadAllWalletList();
-
-    //await Wallets.instance.createMnemonic(12);
   }
 
   @override
