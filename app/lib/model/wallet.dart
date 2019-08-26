@@ -17,9 +17,9 @@ class Wallet {
 
   // 重置钱包密码
   // apiNo:WM08
-  Future<bool> resetPwd(String newPwd, String oldPwd) async {
+  Future<bool> resetPwd(Uint8List newPwd, Uint8List oldPwd) async {
     var isSuccess = await WalletManager.resetPwd(walletId, newPwd, oldPwd);
-    return null;
+    return isSuccess;
   }
 
   // 重置钱包名
