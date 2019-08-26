@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -25,6 +27,9 @@ class _SplashPageState extends State<SplashPage> {
 
   void _initWallet() async {
     //todo test JNI
+    var mnemonic = await Wallets.instance.createMnemonic(12);
+    var wallet = await Wallets.instance.saveWallet("thisWalletName", Uint8List.fromList("666".codeUnits), mnemonic.mn);
+    //var isContainWallet = await Wallets.instance.isContainWallet();
     //var allWalletList = await Wallets.instance.loadAllWalletList();
 
     //await Wallets.instance.createMnemonic(12);

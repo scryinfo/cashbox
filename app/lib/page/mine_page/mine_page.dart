@@ -96,7 +96,7 @@ class _MinePageState extends State<MinePage> {
             ),
             GestureDetector(
               onTap: () {
-                print("click 关于我们");
+                NavigatorUtils.push(context, Routes.aboutUsPage);
               },
               child: ItemOfListWidget(
                 leftText: "关于我们",
