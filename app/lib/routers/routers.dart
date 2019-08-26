@@ -18,7 +18,6 @@ class Routes {
   static String walletManagerPage = '/walletmanagerpage';
   static String resetPwdPage = '/resetpwdpage';
   static String recoverWalletPage = '/recoverwalletpage';
-  static String userServicePage = '/userservicepage';
   static String privacyStatementPage = '/privacystatementpage';
   static String serviceAgreementPage = '/serviceagreementpage';
   static String transactionHistoryPage = '/transactionhistorypage';

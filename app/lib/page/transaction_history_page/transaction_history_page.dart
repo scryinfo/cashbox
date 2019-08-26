@@ -254,7 +254,6 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   }
 
   Widget _makeTxItemWidget(index) {
-    print("showDataList.length,===>" + showDataList.length.toString());
     return Container(
       width: ScreenUtil().setHeight(90),
       alignment: Alignment.center,
