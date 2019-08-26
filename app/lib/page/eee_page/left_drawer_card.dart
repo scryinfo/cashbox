@@ -42,7 +42,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
             _drawerAction(),
             Gaps.scaleVGap(ScreenUtil().setHeight(1)),
             Container(
-              height: ScreenUtil().setHeight(98),
+              height: ScreenUtil().setHeight(95),
               child: SingleChildScrollView(
                 child: Wrap(
                   children: _drawerWalletList(),

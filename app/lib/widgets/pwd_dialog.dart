@@ -3,24 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // 定制化不同  dialog  样式
-class PwdDialog extends StatefulWidget {
+
+class PwdDialog extends StatelessWidget {
   final String title;
   final String hintContent;
   final String hintInput;
+  final Function onPressed;
 
-  PwdDialog(this.title, this.hintContent, this.hintInput);
-
-  @override
-  State<StatefulWidget> createState() =>
-      _PwdDialog(title, hintContent, hintInput);
-}
-
-class _PwdDialog extends State<PwdDialog> {
-  final String title;
-  final String hintContent;
-  final String hintInput;
-
-  _PwdDialog(this.title, this.hintContent, this.hintInput);
+  PwdDialog({this.title, this.hintContent, this.hintInput, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +81,7 @@ class _PwdDialog extends State<PwdDialog> {
         new FlatButton(
           child: new Text('确定'),
           onPressed: () {
-            Navigator.of(context).pop(); //关闭对话框
+            onPressed();
           },
         ),
         new FlatButton(

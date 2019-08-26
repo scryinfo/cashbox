@@ -72,6 +72,7 @@ public class NativeLib {
         public String walletId;
         public String walletName;
         public List<Chain> chainList;
+        public String message;
     }
 
     public static class Chain {

@@ -54,7 +54,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
           centerTitle: ""
-              "交易信息",
+              "交易记录",
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -254,13 +254,13 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   }
 
   Widget _makeTxItemWidget(index) {
-    print("showDataList.length,===>" + showDataList.length.toString());
     return Container(
       width: ScreenUtil().setHeight(90),
       alignment: Alignment.center,
       child: GestureDetector(
         onTap: () {
-          print("click tap is ");
+          print("click tap is " + index.toString());
+          NavigatorUtils.push(context, Routes.transactionEeeDetailPage);
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

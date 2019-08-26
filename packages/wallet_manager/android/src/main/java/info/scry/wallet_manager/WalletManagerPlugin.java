@@ -25,7 +25,31 @@ public class WalletManagerPlugin implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         switch (call.method) {
-            case "createNewWallet":
+            case "isContainWallet":
+                Log.d("nativeLib=>", "isContainWallet is enter =>");
+                WalletState walletState = new NativeLib.WalletState();
+                try {
+                    walletState = (NativeLib.WalletState) (NativeLib.isContainWallet());
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Log.d("nativeLib=>", "isContainWallet is =>" + walletState.isContainWallet);
+            case "saveWallet":
+                Wallet wallet = new NativeLib.Wallet();
+                Log.d("nativeLib=>", "saveWallet is enter =>");
+                try {
+                    wallet = (NativeLib.Wallet) (NativeLib.saveWallet((String)(call.argument("walletName")),(byte[])(call.argument("pwd")),(byte[])(call.argument("mnemonic"))));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Log.d("nativeLib=>", "saveWallet.status is =>" + wallet.status);
+                Log.d("nativeLib=>", "saveWallet.walletNmae is =>" + wallet.walletName);
+                Log.d("nativeLib=>", "saveWallet.walletNmae is =>" + wallet.message);
+                HashMap hashMap = new HashMap();
+                hashMap.put("status", wallet.status);
+                hashMap.put("walletId", wallet.walletId);
+                hashMap.put("walletName", wallet.walletName);
+                result.success(hashMap);
                 break;
             case "mnemonicGenerate": {
                 Mnemonic mnemonicCls = new NativeLib.Mnemonic();
@@ -34,16 +58,16 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
-                HashMap hashMap = new HashMap();
-                hashMap.put("mn", mnemonicCls.mn);
-                hashMap.put("mnId", mnemonicCls.mnId);
-                hashMap.put("status", mnemonicCls.status);
-                result.success(hashMap);
+                HashMap hashMap1 = new HashMap();
+                hashMap1.put("mn", mnemonicCls.mn);
+                hashMap1.put("mnId", mnemonicCls.mnId);
+                hashMap1.put("status", mnemonicCls.status);
+                result.success(hashMap1);
                 break;
             }
             case "loadAllWalletList":
                 ArrayList arrayList = new ArrayList();
-                HashMap hashMap = new HashMap();
+                HashMap hashMap2 = new HashMap();
                 try {
                     NativeLib.loadAllWalletList();
                 } catch (Exception exception) {
