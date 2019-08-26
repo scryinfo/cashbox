@@ -12,6 +12,7 @@ class Routes {
   static String addressPage = '/addresspage';
   static String importWalletPage = '/importwalletpage';
   static String transferEeePage = '/transfereeepage';
+
   static String minePage = '/minepage';
   static String walletManagerListPage = '/walletmanagerlistpage';
   static String walletManagerPage = '/walletmanagerpage';
@@ -21,8 +22,8 @@ class Routes {
   static String privacyStatementPage = '/privacystatementpage';
   static String serviceAgreementPage = '/serviceagreementpage';
   static String transactionHistoryPage = '/transactionhistorypage';
-
-
+  static String transactionEeeDetailPage = '/transactioneeedetailpage';
+  static String aboutUsPage = '/aboutuspage';
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = new Handler(
@@ -40,6 +41,7 @@ class Routes {
     router.define(createWalletConfirmPage,
         handler: createWalletConfirmPageHandler);
     router.define(addressPage, handler: addressPageHandler);
+    router.define(aboutUsPage, handler: aboutUsPageHandler);
     router.define(importWalletPage, handler: importWalletPageHandler);
     router.define(transferEeePage, handler: transferEeePageHandler);
     router.define(minePage, handler: minePageHandler);
@@ -50,5 +52,7 @@ class Routes {
     router.define(privacyStatementPage, handler: privacyStatementHandler);
     router.define(serviceAgreementPage, handler: serviceAgreementHandler);
     router.define(transactionHistoryPage, handler: transactionHistoryHandler);
+    router.define(transactionEeeDetailPage,
+        handler: transactionEeeDetailHandler);
   }
 }
