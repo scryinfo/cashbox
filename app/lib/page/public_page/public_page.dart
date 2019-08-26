@@ -1,4 +1,6 @@
+import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PublicPage extends StatefulWidget {
@@ -9,23 +11,36 @@ class PublicPage extends StatefulWidget {
 class _PublicPageState extends State<PublicPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: new AppBar(
-        backgroundColor: Colors.black26,
-        leading: new IconButton(
-            icon: new Icon(Icons.keyboard_arrow_left),
-            onPressed: () {
-              Navigator.maybePop(context);
-            }),
-        centerTitle: true,
-        title: new Text("公告"),
-      ),
-      body: Container(
-        height: 900,
-        child: WebView(
-          initialUrl: "https://cashbox.scry.info/public",
-          javascriptMode: JavascriptMode.unrestricted,
+    return Material(
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("assets/images/bg_graduate.png"),
+              fit: BoxFit.fill),
         ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: MyAppBar(
+            centerTitle: "公告",
+            backgroundColor: Colors.transparent,
+          ),
+          body: Container(
+            color: Colors.transparent,
+            child: _buildWebViewWidget(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWebViewWidget() {
+    return Container(
+      color: Colors.transparent,
+      width: ScreenUtil().setWidth(90),
+      height: ScreenUtil().setHeight(160),
+      child: WebView(
+        initialUrl: "https://cashbox.scry.info/public",
+        javascriptMode: JavascriptMode.unrestricted,
       ),
     );
   }

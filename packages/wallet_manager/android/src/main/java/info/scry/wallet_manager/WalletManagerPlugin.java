@@ -44,7 +44,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 Log.d("nativeLib=>", "saveWallet.status is =>" + wallet.status);
                 Log.d("nativeLib=>", "saveWallet.walletNmae is =>" + wallet.walletName);
-                Log.d("nativeLib=>", "saveWallet.walletNmae is =>" + wallet.message);
+                Log.d("nativeLib=>", "saveWallet.message is =>" + wallet.message);
                 HashMap hashMap = new HashMap();
                 hashMap.put("status", wallet.status);
                 hashMap.put("walletId", wallet.walletId);
