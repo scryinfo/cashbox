@@ -25,32 +25,6 @@ public class WalletManagerPlugin implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         switch (call.method) {
-            case "isContainWallet":
-                Log.d("nativeLib=>", "isContainWallet is enter =>");
-                WalletState walletState = new NativeLib.WalletState();
-                try {
-                    walletState = (NativeLib.WalletState) (NativeLib.isContainWallet());
-                } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
-                }
-                Log.d("nativeLib=>", "isContainWallet is =>" + walletState.isContainWallet);
-            case "saveWallet":
-                Wallet wallet = new NativeLib.Wallet();
-                Log.d("nativeLib=>", "saveWallet is enter =>");
-                try {
-                    wallet = (NativeLib.Wallet) (NativeLib.saveWallet((String)(call.argument("walletName")),(byte[])(call.argument("pwd")),(byte[])(call.argument("mnemonic"))));
-                } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
-                }
-                Log.d("nativeLib=>", "saveWallet.status is =>" + wallet.status);
-                Log.d("nativeLib=>", "saveWallet.walletNmae is =>" + wallet.walletName);
-                Log.d("nativeLib=>", "saveWallet.walletNmae is =>" + wallet.message);
-                HashMap hashMap = new HashMap();
-                hashMap.put("status", wallet.status);
-                hashMap.put("walletId", wallet.walletId);
-                hashMap.put("walletName", wallet.walletName);
-                result.success(hashMap);
-                break;
             case "mnemonicGenerate": {
                 Mnemonic mnemonicCls = new NativeLib.Mnemonic();
                 try {
@@ -65,20 +39,120 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(hashMap1);
                 break;
             }
-            case "loadAllWalletList":
-                ArrayList arrayList = new ArrayList();
-                HashMap hashMap2 = new HashMap();
+            case "saveWallet": {
+                Wallet wallet = new NativeLib.Wallet();
+                Log.d("nativeLib=>", "saveWallet is enter =>");
                 try {
-                    NativeLib.loadAllWalletList();
+                    wallet = (NativeLib.Wallet) (NativeLib.saveWallet((String) (call.argument("walletName")), (byte[]) (call.argument("pwd")), (byte[]) (call.argument("mnemonic"))));
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
+                Log.d("nativeLib=>", "saveWallet.status is =>" + wallet.status);
+                Log.d("nativeLib=>", "saveWallet.walletNmae is =>" + wallet.walletName);
+                Log.d("nativeLib=>", "saveWallet.message is =>" + wallet.message);
+                Log.d("nativeLib=>", "saveWallet.chainList.size() is =>" + wallet.chainList.size());//todo 暂时无链部分
+                HashMap hashMap = new HashMap();
+                hashMap.put("status", wallet.status);
+                hashMap.put("walletId", wallet.walletId);
+                hashMap.put("walletName", wallet.walletName);
+                result.success(hashMap);
+                break;
+            }
+            case "isContainWallet": {
+                Log.d("nativeLib=>", "isContainWallet is enter =>");
+                WalletState walletState = new NativeLib.WalletState();
+                try {
+                    walletState = (NativeLib.WalletState) (NativeLib.isContainWallet());
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Log.d("nativeLib=>", "isContainWallet.status is =>" + walletState.status);
+                Log.d("nativeLib=>", "isContainWallet is =>" + walletState.isContainWallet);
+                HashMap hashMap = new HashMap();
+                hashMap.put("isContainWallet", walletState.isContainWallet);
+                result.success(hashMap);
+                break;
+            }
+            case "loadAllWalletList": {
+                List<Wallet> arrayList = new ArrayList<Wallet>();
+                HashMap hashMap2 = new HashMap();
+                try {
+                    arrayList = NativeLib.loadAllWalletList();
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Log.d("nativeLib=>", "arrayList.size() is =>" + arrayList.size());
+                for (int i = 0; i < arrayList.size(); i++) {
+                    Wallet wallet = new Wallet();
+                    //arrayList.get(i).walletName;
+                    Log.d("nativeLib=>", "arrayList.get(i) is =>" + arrayList.get(i).toString());
+                    Log.d("nativeLib=>", "arrayList.get(i).walletId is =>" + arrayList.get(i).walletId);
+                    Log.d("nativeLib=>", "arrayList.get(i).walletName is =>" + arrayList.get(i).walletName);
+                }
                 result.success(arrayList);
                 break;
-            case "setNowWallet":
-                String walletId = call.argument("walletId");
-                //todo 传参 调用 流程
+            }
+            case "setNowWallet": {
+                WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.setNowWallet((String) (call.argument("walletId")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                if (walletState.status == 200) {
+                    result.success(walletState.isSetNowWallet);
+                } else {
+                    result.error("something wrong", "", "");
+                }
                 break;
+            }
+
+            case "getNowWallet": {
+                WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.getNowWallet();
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                if (walletState.status == 200) {
+                    result.success(walletState.walletId);
+                } else {
+                    result.error("something wrong", "", "");
+                }
+                break;
+            }
+
+            case "deleteWallet": {
+                WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.deleteWallet((String) (call.argument("walletId")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                if (walletState.status == 200) {
+                    Log.d("nativeLib=>", "walletState.status is " + walletState.status);
+                    result.success(walletState.isDeletWallet);
+                } else {
+                    result.error("something wrong", "", "");
+                }
+                break;
+            }
+            case "resetPwd": {
+                WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.resetPwd((String) (call.argument("walletId")), (byte[]) (call.argument("newPwd")), (byte[]) (call.argument("oldPwd")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                if (walletState.status == 200) {
+                    Log.d("nativeLib=>", "walletState.status is " + walletState.status);
+                    result.success(walletState.isResetPwd);
+                } else {
+                    result.error("something wrong", "", "");
+                }
+                break;
+            }
+
             default:
                 result.notImplemented();
                 break;
