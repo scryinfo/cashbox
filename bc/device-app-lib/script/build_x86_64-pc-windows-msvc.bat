@@ -3,5 +3,6 @@ set VCPKGRS_DYNAMIC=1
 #set RUSTFLAGS=-Ctarget-feature=+crt-static
 #set VCPKG_ROOT=D:/tools/vcpkg
 rustup default stable-msvc
+cd ..
 cargo build --target %HOST_TAG%
 
