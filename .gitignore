@@ -9,4 +9,5 @@
 /packages/wallet/pubspec.lock
 /packages/walletassist/android/.idea/
 /packages/walletassist/android/settings.gradle
+/packages/wallet_manager/android/src/main/jniLibs/*
 .gitignore.swp
