@@ -35,15 +35,13 @@ class Wallets {
   // apiNo:WM01
   Future<bool> isContainWallet() async {
     var isExist = await WalletManager.isContainWallet();
-    //'return isExist;
-    return null;
+    return isExist;
   }
 
   // 导出所有钱包
   // apiNo:WM02
   Future<List<Wallet>> loadAllWalletList() async {
     var allWalletList = await WalletManager.loadAllWalletList();
-    print("allWalleetList=>"+allWalletList.length.toString());
     // todo 数据格式转换，返回
     return null;
   }
@@ -71,10 +69,10 @@ class Wallets {
 
   //获取当前钱包
   // apiNo:WM05
-  Future<Wallet> getNowWallet() async {
-    var nowWallet = await WalletManager.getNowWallet();
+  Future<String> getNowWallet() async {
+    var walletId = await WalletManager.getNowWallet();
     // todo 数据格式转换，返回
-    return null;
+    return walletId;
   }
 
   //设置当前钱包 bool是否成功
