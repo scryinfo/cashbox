@@ -1,10 +1,10 @@
 #[macro_use]
 extern crate serde_derive;
 
-pub mod account_generate;
-pub mod walletstore;
+pub mod wallet_crypto;
+pub mod model;
 pub mod module;
-
+pub mod wallet_db;
 
 #[derive(PartialEq)]
 pub enum StatusCode {
