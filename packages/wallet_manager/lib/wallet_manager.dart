@@ -7,15 +7,10 @@ class WalletManager {
 
   // 创建助记词，待验证正确通过，由底层创建钱包完成，应用层做保存
   // apiNo:MM00
-  static Future<Mnemonic> mnemonicGenerate(count) async {
+  static Future<Map<dynamic, dynamic>> mnemonicGenerate(count) async {
     Map<dynamic, dynamic> mneMap =
         await _channel.invokeMethod('mnemonicGenerate', {"count": count});
-    Mnemonic mnemonic = new Mnemonic();
-    mnemonic.mn = mneMap["mn"];
-    mnemonic.mnId = mneMap["mnId"];
-    mnemonic.status = mneMap["status"];
-    print("mn is ===>" + mnemonic.mn.toString());
-    return mnemonic;
+    return mneMap;
   }
 
   // 是否已有钱包
@@ -30,11 +25,10 @@ class WalletManager {
   //从数据库 加载出 所有钱包数据
   //导出所有钱包
   // apiNo:WM02
-  static Future<Map<dynamic, dynamic>> loadAllWalletList() async {
+  static Future<List<dynamic>> loadAllWalletList() async {
     List<dynamic> allWalletList =
         await _channel.invokeMethod('loadAllWalletList');
-    print("allWalletList=>" + allWalletList.length.toString());
-    return null;
+    return allWalletList;
   }
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
@@ -58,8 +52,7 @@ class WalletManager {
   //获取当前钱包
   // apiNo:WM05
   static Future<String> getNowWallet() async {
-    String nowWalletId =
-        await _channel.invokeMethod('getNowWallet');
+    String nowWalletId = await _channel.invokeMethod('getNowWallet');
     return nowWalletId;
   }
 
@@ -95,7 +88,8 @@ class WalletManager {
   // apiNo:WM08
   static Future<bool> resetPwd(
       String walletId, Uint8List newPwd, Uint8List oldPwd) async {
-   bool isSuccess = await _channel.invokeMethod(
+    print("begin to resetPwd==>");
+    bool isSuccess = await _channel.invokeMethod(
         'resetPwd', {"walletId": walletId, "newPwd": newPwd, "oldPwd": oldPwd});
     return isSuccess;
   }
@@ -179,27 +173,5 @@ class WalletManager {
     Map<dynamic, dynamic> allWalletList =
         await _channel.invokeMethod('deleteDigit', digit);
     return null;
-  }
-}
-
-class Mnemonic {
-  Uint8List mn;
-  String mnId;
-  int status;
-
-  Mnemonic({this.mn, this.mnId, this.status});
-
-  Mnemonic.fromJson(Map<String, dynamic> json) {
-    mn = json['mn'];
-    mnId = json['mnId'];
-    status = json['status'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['mn'] = this.mn;
-    data['mnId'] = this.mnId;
-    data['status'] = this.status;
-    return data;
   }
 }

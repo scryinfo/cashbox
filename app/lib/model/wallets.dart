@@ -1,3 +1,4 @@
+import 'package:app/model/mnemonic.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 import '../model/Wallet.dart';
 import 'dart:typed_data';
@@ -27,8 +28,12 @@ class Wallets {
   // 创建助记词，待验证正确通过，由底层创建钱包完成，应用层做保存
   // apiNo:MM00
   Future<Mnemonic> createMnemonic(int count) async {
-    var result = await WalletManager.mnemonicGenerate(count);
-    return result;
+    var resultMap = await WalletManager.mnemonicGenerate(count);
+    var mnemonic = Mnemonic();
+    mnemonic.mn = resultMap["mn"];
+    mnemonic.mnId = resultMap["mnId"];
+    mnemonic.status = resultMap["status"];
+    return mnemonic;
   }
 
   // 是否已有钱包
@@ -41,9 +46,18 @@ class Wallets {
   // 导出所有钱包
   // apiNo:WM02
   Future<List<Wallet>> loadAllWalletList() async {
-    var allWalletList = await WalletManager.loadAllWalletList();
-    // todo 数据格式转换，返回
-    return null;
+    var allWalletList = List<Wallet>();
+    var jniList = await WalletManager.loadAllWalletList();
+    print("jniList=====>" + jniList.toString());
+    if (jniList.isNotEmpty) {
+      for (var i = 0; i < jniList.length; i++) {
+        var walletM = Wallet();
+        walletM.walletName = jniList[i]["walletName"].toString();
+        walletM.walletId = jniList[i]["walletId"].toString();
+        allWalletList.add(walletM);
+      }
+    }
+    return allWalletList;
   }
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
