@@ -3,7 +3,7 @@ use std::os::raw::{c_uchar, c_int};
 #[no_mangle]
 pub extern "C" fn mnemonicGenerate(count: c_int) -> *mut c_uchar {
 
-    let mut mn = bc_service::module::wallet::crate_mnemonic::<bc_service::account_generate::Ed25519>(count as u8);
+    let mut mn = wallet::module::wallet::crate_mnemonic::<wallet::account_generate::Ed25519>(count as u8);
 
     return mn.mnid.as_mut_ptr();
 }
@@ -15,12 +15,12 @@ pub mod android {
     use jni::JNIEnv;
     use jni::objects::{JClass,JString, JObject, JValue};
     use jni::sys::{jint, jobject,jbyteArray};
-    use bc_service::StatusCode;
-    use bc_service::module::Wallet;
+    use wallet::StatusCode;
+    use wallet::module::Wallet;
 
     #[no_mangle]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_mnemonicGenerate(env: JNIEnv, _: JClass, count: jint) -> jobject {
-        let mnemonic = bc_service::module::wallet::crate_mnemonic::<bc_service::account_generate::Ed25519>(count as u8);
+        let mnemonic = wallet::module::wallet::crate_mnemonic::<wallet::account_generate::Ed25519>(count as u8);
         let mn_byte = env.byte_array_from_slice(mnemonic.mn.as_slice()).unwrap();
         let mn_object = JObject::from(mn_byte);
 
@@ -37,11 +37,7 @@ pub mod android {
                 env.set_field(jobj, "mn", "[B", JValue::Object(mn_object)).expect("find mn type is error!");//返回数组
                 *jobj
             }
-            Err(err) => {
-                let exception = env.find_class("java/lang/Exception").unwrap();
-                //  let err_info = mn_class.unwrap_err();
-                env.throw_new(exception, err.to_string());
-
+            Err(_err) => {
                 let exception_object = env.byte_array_from_slice("calss not found".as_bytes()).unwrap();
                 exception_object
             }
@@ -52,7 +48,7 @@ pub mod android {
     #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_isContainWallet(env: JNIEnv, _: JClass) -> jobject {
         //调用获取所有钱包，查看返回值的情况
-        let wallet = bc_service::module::wallet::is_contain_wallet();
+        let wallet = wallet::module::wallet::is_contain_wallet();
         let state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("can't found NativeLib$WalletState class");
         let state_obj = env.alloc_object(state_class).expect("create state_obj instance is error!");
         match wallet {
@@ -178,7 +174,7 @@ pub mod android {
     #[no_mangle]
     #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_loadAllWalletList(env: JNIEnv, _: JClass) -> jobject {
-        let wallet_list = bc_service::module::wallet::get_all_wallet();
+        let wallet_list = wallet::module::wallet::get_all_wallet();
 
         let wallet_list_class = env.find_class("java/util/ArrayList").expect("find list type is error");
         let wallet_list_class_obj = env.alloc_object(wallet_list_class).expect("create chain_list_class instance is error!");
@@ -207,7 +203,7 @@ pub mod android {
 
         let wallet_class = env.find_class("info/scry/wallet_manager/NativeLib$Wallet").expect("can't found NativeLib$Wallet class");
 
-        let wallet = bc_service::module::wallet::save_mnemonic(wallet_name.as_str(), mnemonic.as_slice(), pwd.as_slice());
+        let wallet = wallet::module::wallet::save_mnemonic(wallet_name.as_str(), mnemonic.as_slice(), pwd.as_slice());
         let ret_obj = match wallet {
             Ok(wallet) => {
                 let vec_obj = wallet_jni_obj_util(&env, wallet);
@@ -235,7 +231,7 @@ pub mod android {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
 
-        let status = bc_service::module::wallet::reset_mnemonic_pwd(wallet_id.as_str(), old_pwd.as_slice(), new_pwd.as_slice());
+        let status = wallet::module::wallet::reset_mnemonic_pwd(wallet_id.as_str(), old_pwd.as_slice(), new_pwd.as_slice());
         env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
 
         if status == StatusCode::OK {
@@ -251,7 +247,7 @@ pub mod android {
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowWallet(env: JNIEnv, _: JClass) -> jobject {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
-        match bc_service::module::wallet::get_current_wallet() {
+        match wallet::module::wallet::get_current_wallet() {
             Ok(mn) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
                 env.set_field(state_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(mn.mnid).unwrap()))).expect("set error msg value is error!");
@@ -270,7 +266,7 @@ pub mod android {
         let wallet_id: String = env.get_string(walletId).unwrap().into();
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
-        match bc_service::module::wallet::set_current_wallet(wallet_id.as_str()) {
+        match wallet::module::wallet::set_current_wallet(wallet_id.as_str()) {
             Ok(exist) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
                 env.set_field(state_obj, "isSetNowWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value is error!");
@@ -289,7 +285,7 @@ pub mod android {
         let wallet_id: String = env.get_string(walletId).unwrap().into();
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
-        match bc_service::module::wallet::del_wallet(wallet_id.as_str()) {
+        match wallet::module::wallet::del_wallet(wallet_id.as_str()) {
             Ok(exist) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
                 env.set_field(state_obj, "isDeletWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value is error!");
@@ -309,7 +305,7 @@ pub mod android {
         let wallet_name: String = env.get_string(walletName).unwrap().into();
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
-        match bc_service::module::wallet::rename_wallet(wallet_id.as_str(), wallet_name.as_str()) {
+        match wallet::module::wallet::rename_wallet(wallet_id.as_str(), wallet_name.as_str()) {
             Ok(exist) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
                 env.set_field(state_obj, "isRename", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value is error!");
