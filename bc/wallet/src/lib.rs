@@ -26,12 +26,12 @@ pub enum StatusCode {
 
 pub enum ChainType {
     BTC = 1,
-    BtcTest,
-    ETH,
-    EthTest,
-    EEE,
-    EeeTest,
-    OTHER,
+    BtcTest =2,
+    ETH = 3,
+    EthTest =4,
+    EEE = 5,
+    EeeTest =6,
+    OTHER = 7,
 }
 
 impl From<i64> for ChainType {
