@@ -55,10 +55,3 @@ pub struct TbWallet {
     pub decimals: Option<i64>,
     pub url_img: Option<String>,
 }
-
-mod table_desc;
-
-pub mod db_helper;
-pub mod wallet;
-
-pub use db_helper::DataServiceProvider;

@@ -1,5 +1,5 @@
 [package]
-name = "device-app-lib"
+name = "device_app_lib"
 version = "0.1.0"
 authors = ["Peace <peace@scry.info>"]
 edition = "2018"
@@ -14,7 +14,7 @@ crate-type = ["cdylib"]
 #crate-type = ["dylib"]
 
 [dependencies]
-wallet={path="../wallet"}
+wallets={path="../wallets"}
 
 [target.'cfg(target_os="android")'.dependencies]
 #jni = { version = "0.13", default-features = false }

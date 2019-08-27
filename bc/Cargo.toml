@@ -12,8 +12,8 @@ crate-type = ["cdylib"]
 
 [workspace]
 members = [
-"wallet",
-"device-app-lib",
+"wallets",
+"device_app_lib",
 ]
 
 [dependencies]
