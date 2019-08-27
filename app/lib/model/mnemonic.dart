@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 class Mnemonic {
   Uint8List mn;
-  int mnId;
+  String mnId;
   int status;
 
   Mnemonic({this.mn, this.mnId, this.status});
