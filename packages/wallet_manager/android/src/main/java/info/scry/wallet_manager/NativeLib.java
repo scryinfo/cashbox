@@ -17,7 +17,7 @@ public class NativeLib {
 
     //通信消息 状态码
     private interface StatusCode {
-        public static final int DYLIB_ERROR=-1; //动态库执行出错
+        public static final int DYLIB_ERROR = -1; //动态库执行出错
         public static final int OK = 200;                           //正常
         public static final int FAIL_TO_GENERATE_MNEMONIC = 100;    //生成助记词失败
         public static final int PWD_IS_WRONG = 101;                 //密码错误
@@ -32,7 +32,7 @@ public class NativeLib {
         //System.loadLibrary("sqlite3");
     }
 
-    /*--------------------------助记词--------------------------*/
+    /*--------------------------------------------助记词--------------------------------------------*/
     //生成助记词（个数可选）
     public static class Mnemonic {
         public int status;
@@ -71,26 +71,75 @@ public class NativeLib {
         public int status;  //状态码
         public String walletId;
         public String walletName;
-        public List<Chain> chainList;
+        public EeeChain eeeChain;
+        public EthChain ethChain;
+        public BtcChain btcChain;
         public String message;
     }
 
-    public static class Chain {
+    public static class EeeChain {
         public int status;  //状态码
         public String chainId;
         public String walletId;
         public String chainAddress;
         public boolean isVisible;
-        public List<Digit> digitList;
+        public List<EeeDigit> digitList;
         public ChainType chainType;
     }
 
-    public static class Digit {
+    public static class EeeDigit {
         public int status;  //状态码
         public String digitId;
         public String chainId;
         public String address;
         public String contractAddress;
+        public String shortName;
+        public String fullName;
+        public String balance;
+        public boolean isVisible;
+        public int decimal;
+        public String imgUrl;
+    }
+
+    public static class EthChain {
+        public int status;  //状态码
+        public String chainId;
+        public String walletId;
+        public String chainAddress;
+        public boolean isVisible;
+        public List<EthDigit> digitList;
+        public ChainType chainType;
+    }
+
+    public static class EthDigit {
+        public int status;  //状态码
+        public String digitId;
+        public String chainId;
+        public String address;
+        public String contractAddress;
+        public String shortName;
+        public String fullName;
+        public String balance;
+        public boolean isVisible;
+        public int decimal;
+        public String imgUrl;
+    }
+
+    public static class BtcChain {
+        public int status;  //状态码
+        public String chainId;
+        public String walletId;
+        public String chainAddress;
+        public boolean isVisible;
+        public List<BtcDigit> digitList;
+        public ChainType chainType;
+    }
+
+    public static class BtcDigit {
+        public int status;  //状态码
+        public String digitId;
+        public String chainId;
+        public String address;
         public String shortName;
         public String fullName;
         public String balance;
@@ -113,7 +162,7 @@ public class NativeLib {
         public boolean isSetNowChain;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
         public boolean isShowDigit;           //设置显示代币,是否成功  apiNo:WM14   1成功 0失败
         public boolean isHideDigit;           //设置隐藏代币,是否成功  apiNo:WM15   1成功 0失败
-        public String  message;               //错误信息，详细说明
+        public String message;                //错误信息，详细说明
     }
 
     // 是否已有钱包
