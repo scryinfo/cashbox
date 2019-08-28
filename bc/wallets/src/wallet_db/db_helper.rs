@@ -93,19 +93,4 @@ impl DataServiceProvider {
         self.db_hander.execute("commit;").map(|_| ()).map_err(|err| err.to_string())
     }
 
-/*
-    pub fn update_mnemonic(&self, mn: TbMnemonic) -> Result<(), String> {
-        let mn_sql = "update Mnemonic set mnemonic=? where id=?;";
-        let mut statement = self.db_hander.prepare(mn_sql).expect("sql statement is error!");
-        statement.bind(1, mn.mnemonic.unwrap().as_str()).expect(" mnemonic  bind error");
-        statement.bind(2, mn.id.unwrap().as_str()).expect("mn id bind error");
-
-        match statement.next() {
-            Ok(_state) => {
-                Ok(())
-            }
-            Err(e) => Err(e.to_string())
-        }
-    }*/
-
 }

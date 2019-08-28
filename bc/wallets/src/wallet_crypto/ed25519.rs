@@ -1,6 +1,6 @@
+use super::*;
 use substrate_primitives::{ed25519, Pair, crypto::Ss58Codec};
-use crate::account_generate::Crypto;
-use crate::account_generate::sr25519::Sr25519;
+
 
 pub struct Ed25519;
 

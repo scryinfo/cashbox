@@ -1,8 +1,9 @@
-use super::*;
-use super::DataServiceProvider;
 use log::error;
-impl DataServiceProvider{
 
+use crate::model::wallet_store::{TbMnemonic, TbAddress, TbWallet};
+use crate::wallet_db::db_helper::DataServiceProvider;
+
+impl DataServiceProvider {
     pub fn update_mnemonic(&self, mn: TbMnemonic) -> Result<(), String> {
         let mn_sql = "update Mnemonic set mnemonic=? where id=?;";
         let mut statement = self.db_hander.prepare(mn_sql).expect("sql statement is error!");
@@ -41,7 +42,7 @@ impl DataServiceProvider{
                                         match self.db_hander.prepare(digit_account_sql) {
                                             Ok(mut digit_stat) => {
                                                 digit_stat.bind(1, addr.address.as_str()).expect("save_mnemonic_address digit_stat bind addr.address ");
-                                                digit_stat.next().expect("exec digit insert error");
+                                                digit_stat.next().expect("exec chain insert error");
                                                 Ok(())
                                             }
                                             Err(e) => Err(e.to_string())
@@ -187,7 +188,7 @@ impl DataServiceProvider{
             Err(e) => Err(e.to_string())
         }
     }
-
+    // TODO 不同的链有不同的 digit 格式，后续在处理的时候 需要优化
     pub fn display_mnemonic_list(&self) -> Result<Vec<TbWallet>, String> {
         let all_mn = "select a.id as wallet_id,a.fullname as wallet_name,b.id as chain_id,d.address,b.address as chain_address,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
  from Mnemonic a,wallet.Chain b,wallet.Address c,wallet.Digit d where a.id=c.mnemonic_id and c.chain_id = b.id and c.address=d.address and a.status =1 and c.status =1;";
@@ -195,7 +196,7 @@ impl DataServiceProvider{
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
         while let Some(row) = cursor.next().unwrap() {
-            println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(),row[1].as_string());
+            println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
             let tbwallet = TbWallet {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
