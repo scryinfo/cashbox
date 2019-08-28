@@ -6,6 +6,8 @@ class Routes {
   static String eeePage = '/eeepage';
   static String splashPage = '/splashpage';
   static String publicPage = '/publicpage';
+  static String dappPage = '/dapppage';
+  static String dappDemoPage = '/dappdemopage';
   static String createWalletNamePage = '/createwalletnamepage';
   static String createWalletMnemonicPage = '/createwalletmnemonicpage';
   static String createWalletConfirmPage = '/createwalletconfirmpage';
@@ -33,6 +35,8 @@ class Routes {
     router.define(eeePage, handler: eeePageHandler);
     router.define(splashPage, handler: splashPageHandler);
     router.define(publicPage, handler: publicPageHandler);
+    router.define(dappPage, handler: dappPageHandler);
+    router.define(dappDemoPage, handler: dappDemoPageHandler);
     router.define(createWalletNamePage, handler: createWalletPageHandler);
 
     router.define(createWalletMnemonicPage,

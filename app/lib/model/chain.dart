@@ -10,7 +10,7 @@ class Chain {
   ChainType chainType;
 
   Digit createNowChainDigit() {
-    return Digit(chainId);
+    return Digit();
   }
 
   //跟jni接口处，定义一致  NativeLib.ChainType

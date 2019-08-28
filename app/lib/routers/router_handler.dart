@@ -20,6 +20,8 @@ import 'package:app/page/user_protocol/privacy_statements_zh.dart';
 import 'package:app/page/user_protocol/service_agreement_zh.dart';
 import 'package:app/page/transaction_detail_page/eee_transactin_detail_page.dart';
 import '../page/about_us_page/about_us_page.dart';
+import 'package:app/demo/dapp_webview_demo.dart';
+import 'package:app/page/dapp_page/dapp_page.dart';
 
 Handler splashPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -35,6 +37,17 @@ Handler publicPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return PublicPage();
 });
+
+Handler dappPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return DappPage();
+});
+
+Handler dappDemoPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return DappWebviewDemo();
+});
+
 Handler createWalletPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return CreateWalletNamePage();

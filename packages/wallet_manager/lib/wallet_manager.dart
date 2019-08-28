@@ -43,7 +43,7 @@ class WalletManager {
 
   // 钱包导出。 恢复钱包
   // apiNo:WM04
-  static Future<Map<dynamic, dynamic>> exportWallet(walletId, pwd) async {
+  static Future<Map<dynamic, dynamic>> exportWallet(String walletId, Uint8List pwd) async {
     Map<dynamic, dynamic> wallet = await _channel
         .invokeMethod('exportWallet', {pwd: pwd, walletId: walletId});
     return wallet;

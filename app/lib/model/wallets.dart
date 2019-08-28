@@ -52,12 +52,12 @@ class Wallets {
     if (jniList.isNotEmpty) {
       for (var i = 0; i < jniList.length; i++) {
         var walletM = Wallet();
-        walletM.walletName = jniList[i]["walletName"].toString();
-        walletM.walletId = jniList[i]["walletId"].toString();
-        allWalletList.add(walletM);
+        //walletM.walletName = jniList[i]["walletName"].toString();
+        //walletM.walletId = jniList[i]["walletId"].toString();
+        //allWalletList.add(walletM);
       }
     }
-    return allWalletList;
+    return null;
   }
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
@@ -75,7 +75,7 @@ class Wallets {
 
   // 钱包导出。 恢复钱包   /* 此处有助记词生成。注意及时释放*/
   // apiNo:WM04
-  Future<Wallet> exportWallet(String walletId, String pwd) async {
+  Future<Wallet> exportWallet(String walletId, Uint8List pwd) async {
     var result = await WalletManager.exportWallet(walletId, pwd);
     // todo result数据格式转换，返回
     return null;

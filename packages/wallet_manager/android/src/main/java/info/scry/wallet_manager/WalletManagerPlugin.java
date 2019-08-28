@@ -10,6 +10,7 @@ import info.scry.wallet_manager.NativeLib.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 
 import android.util.Log;
 
@@ -25,6 +26,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         switch (call.method) {
+            // apiNo:MM00
             case "mnemonicGenerate": {
                 Mnemonic mnemonicCls = new NativeLib.Mnemonic();
                 try {
@@ -39,6 +41,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(hashMap1);
                 break;
             }
+            // apiNo:WM03
             case "saveWallet": {
                 Wallet wallet = new NativeLib.Wallet();
                 Log.d("nativeLib=>", "saveWallet is enter =>");
@@ -50,7 +53,6 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "saveWallet.status is =>" + wallet.status);
                 Log.d("nativeLib=>", "saveWallet.walletNmae is =>" + wallet.walletName);
                 Log.d("nativeLib=>", "saveWallet.message is =>" + wallet.message);
-                Log.d("nativeLib=>", "saveWallet.chainList.size() is =>" + wallet.chainList.size());//todo 暂时无链部分
                 HashMap hashMap = new HashMap();
                 hashMap.put("status", wallet.status);
                 hashMap.put("walletId", wallet.walletId);
@@ -58,6 +60,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(hashMap);
                 break;
             }
+            // apiNo:WM01
             case "isContainWallet": {
                 Log.d("nativeLib=>", "isContainWallet is enter =>");
                 WalletState walletState = new NativeLib.WalletState();
@@ -73,25 +76,65 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(hashMap);
                 break;
             }
+            // apiNo:WM02
             case "loadAllWalletList": {
-                List<Wallet> arrayList = new ArrayList<Wallet>();
-                HashMap hashMap2 = new HashMap();
+                List<Map<String, Object>> resultWalletList = new ArrayList<>();  ///返回数据，拼装List<Map>
+                List<Wallet> walletList = new ArrayList<Wallet>();               ///JNI拿到的数据List<Wallet>
                 try {
-                    arrayList = NativeLib.loadAllWalletList();
+                    walletList = NativeLib.loadAllWalletList();
+                    Log.d("nativeLib=>", "walletList.size() is =>" + walletList.size());
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
-                Log.d("nativeLib=>", "arrayList.size() is =>" + arrayList.size());
-                for (int i = 0; i < arrayList.size(); i++) {
-                    Wallet wallet = new Wallet();
-                    //arrayList.get(i).walletName;
-                    Log.d("nativeLib=>", "arrayList.get(i) is =>" + arrayList.get(i).toString());
-                    Log.d("nativeLib=>", "arrayList.get(i).walletId is =>" + arrayList.get(i).walletId);
-                    Log.d("nativeLib=>", "arrayList.get(i).walletName is =>" + arrayList.get(i).walletName);
+                if (walletList.isEmpty() || walletList.size() == 0) {
+                    result.success(resultWalletList); ///empty wallet
                 }
-                result.success(arrayList);
+                for (int i = 0; i < walletList.size(); i++) {
+                    Map<String, Object> walletMap = new HashMap<String, Object>();
+
+                    walletMap.put("walletId", walletList.get(i).walletId);
+                    walletMap.put("walletName", walletList.get(i).walletName);
+
+                    List<Map<String, Object>> resultEeeChain = new ArrayList<>();
+                    List<EeeDigit> eeeDigitList = walletList.get(i).eeeChain.digitList;
+                    for (int j = 0; j < eeeDigitList.size(); j++) {
+                        Map<String, Object> digitMap = new HashMap<String, Object>();
+                        digitMap.put("status", eeeDigitList.get(j).status);
+                        digitMap.put("digitId", eeeDigitList.get(j).digitId);
+                        digitMap.put("chainId", eeeDigitList.get(j).chainId);
+                        digitMap.put("address", eeeDigitList.get(j).address);
+                        digitMap.put("contractAddress", eeeDigitList.get(j).contractAddress);
+                        digitMap.put("shortName", eeeDigitList.get(j).shortName);
+                        digitMap.put("fullName", eeeDigitList.get(j).fullName);
+                        digitMap.put("balance", eeeDigitList.get(j).balance);
+                        digitMap.put("isVisible", eeeDigitList.get(j).isVisible);
+                        digitMap.put("decimal", eeeDigitList.get(j).decimal);
+                        digitMap.put("imgUrl", eeeDigitList.get(j).imgUrl);
+                        Log.d("nativeLib=>", "digitList.get(d).address is ===>" + eeeDigitList.get(j).address);
+                        Log.d("nativeLib=>", "digitList.get(d).shortName is ===>" + eeeDigitList.get(j).shortName);
+                        resultEeeChain.add(digitMap);
+                    }
+
+                    List<Map<String, Object>> resultEthChain = new ArrayList<>();
+                    List<EthDigit> ethDigitList = walletList.get(i).ethChain.digitList;
+                    for (int j = 0; j < ethDigitList.size(); j++) {
+                        //todo
+                    }
+
+                    List<Map<String, Object>> resultBtcChain = new ArrayList<>();
+                    List<BtcDigit> btcDigitList = walletList.get(i).btcChain.digitList;
+                    for (int j = 0; j < btcDigitList.size(); j++) {
+                        //todo
+                    }
+                    walletMap.put("eeeChain", resultEeeChain);
+                    walletMap.put("ethChain", resultEthChain);
+                    walletMap.put("btcChain", resultBtcChain);
+                    resultWalletList.add(walletMap);
+                }
+                result.success(resultWalletList);
                 break;
             }
+            // apiNo:WM06
             case "setNowWallet": {
                 WalletState walletState = new WalletState();
                 try {
@@ -106,7 +149,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 break;
             }
-
+            // apiNo:WM05
             case "getNowWallet": {
                 WalletState walletState = new WalletState();
                 try {
@@ -121,8 +164,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 break;
             }
-
+            // apiNo:WM07
             case "deleteWallet": {
+                Log.d("nativeLib=>", "begin to deleteWallet =>");
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.deleteWallet((String) (call.argument("walletId")));
@@ -137,7 +181,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 break;
             }
+            // apiNo:WM08
             case "resetPwd": {
+                Log.d("nativeLib=>", "begin to resetPwd =>");
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.resetPwd((String) (call.argument("walletId")), (byte[]) (call.argument("newPwd")), (byte[]) (call.argument("oldPwd")));
@@ -152,7 +198,68 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 break;
             }
+            // apiNo:WM04
+            case "exportWallet": {
+                Log.d("nativeLib=>", "begin to exportWallet =>");
+                Wallet wallet = new Wallet();
+                try {
+                    wallet = NativeLib.exportWallet((String) (call.argument("walletId")), (byte[]) (call.argument("pwd")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                if (wallet.status == 200) {
+                    Log.d("nativeLib=>", "walletState.status is " + wallet.status);
+                    //todo
 
+                    //result.success(wallet.isResetPwd);
+                } else {
+                    result.error("something wrong", "", "");
+                }
+
+                break;
+            }
+            // apiNo:WM09 fixed
+            case "rename": {
+                Log.d("nativeLib=>", "begin to rename =>");
+                WalletState walletState = new WalletState();
+                break;
+            }
+            // apiNo:WM10
+            case "showChain": {
+                Log.d("nativeLib=>", "begin to showChain =>");
+                WalletState walletState = new WalletState();
+                break;
+            }
+            // apiNo:WM11
+            case "hideChain": {
+                Log.d("nativeLib=>", "begin to hideChain =>");
+                WalletState walletState = new WalletState();
+                break;
+            }
+            // apiNo:WM12
+            case "getNowChain": {
+                Log.d("nativeLib=>", "begin to getNowChain =>");
+                WalletState walletState = new WalletState();
+                break;
+            }
+            // apiNo:WM13
+            case "setNowChain": {
+                Log.d("nativeLib=>", "begin to setNowChain =>");
+                WalletState walletState = new WalletState();
+                break;
+            }
+            // apiNo:WM14
+            case "showDigit": {
+                Log.d("nativeLib=>", "begin to showDigit =>");
+                WalletState walletState = new WalletState();
+                break;
+            }
+            // apiNo:WM15
+            case "hideDigit": {
+                Log.d("nativeLib=>", "begin to hideDigit =>");
+                WalletState walletState = new WalletState();
+                break;
+            }
             default:
                 result.notImplemented();
                 break;

@@ -105,6 +105,26 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
             height: ScreenUtil().setHeight(12),
             child: new ListTile(
                 leading: new Image.asset(
+                  "assets/images/ic_nav_public.png",
+                  width: ScreenUtil().setWidth(6),
+                  height: ScreenUtil().setWidth(6),
+                ),
+                title: new Text(
+                  'Dapp',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+                onTap: () {
+                  print("it is ic_nav_public");
+                  NavigatorUtils.push(context, Routes.dappDemoPage);
+                }),
+          ),
+          Container(
+            alignment: Alignment.center,
+            height: ScreenUtil().setHeight(12),
+            child: new ListTile(
+                leading: new Image.asset(
                   "assets/images/ic_nav_add.png",
                   width: ScreenUtil().setWidth(6),
                   height: ScreenUtil().setWidth(6),
