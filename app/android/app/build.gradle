@@ -47,7 +47,7 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
-        //todo parker 8005 test  .so problem
+        //todo parker 0805 test  .so problem
         debug {
             ndk {
                 //这里要加上，否则debug包会出问题,后面三个为可选，x86建议加上不然部分模拟器回报错

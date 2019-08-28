@@ -38,7 +38,7 @@ dependencies:
   fluro: "^1.5.0"
   # 路由管理           https://github.com/theyakka/fluro
 
-  webview_flutter: ^0.3.9+1
+  webview_flutter: ^0.3.13
   #   https://github.com/flutter/plugins/tree/master/packages/webview_flutter
 
   qr_flutter: ^3.0.1
