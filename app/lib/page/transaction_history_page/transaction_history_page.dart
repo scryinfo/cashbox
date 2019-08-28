@@ -30,7 +30,8 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   Future<List<Digit>> getData() async {
     //todo mock data to test
     for (var i = 0; i < 10; i++) {
-      Digit digit = Digit("chainId001");
+      Digit digit = Digit();
+      digit.chainId = "chainId001";
       digit.shortName = "ETH" + i.toString();
       print("digit.shortName=>" + digit.shortName);
       digit.fullName = "ETHereum";

@@ -37,10 +37,6 @@ class _SplashPageState extends State<SplashPage> {
     //WalletManagerTest.deleteWallet();
     //WalletManagerTest.resetPwd();
 
-    //var mnemonic = await Wallets.instance.createMnemonic(12);
-    //var wallet = await Wallets.instance.saveWallet("thisWalletName", Uint8List.fromList("666".codeUnits), mnemonic.mn);
-    //var isContainWallet = await Wallets.instance.isContainWallet();
-    //var allWalletList = await Wallets.instance.loadAllWalletList();
   }
 
   @override
