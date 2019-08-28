@@ -45,7 +45,7 @@ Handler dappPageHandler = Handler(
 
 Handler dappDemoPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return DappWebviewDemo();
+  return DAppWebViewDemo();
 });
 
 Handler createWalletPageHandler = Handler(

@@ -6,12 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class DappWebviewDemo extends StatefulWidget {
+class DAppWebViewDemo extends StatefulWidget {
   @override
-  _DappWebviewDemoState createState() => _DappWebviewDemoState();
+  _DAppWebViewDemoState createState() => _DAppWebViewDemoState();
 }
 
-class _DappWebviewDemoState extends State<DappWebviewDemo> {
+class _DAppWebViewDemoState extends State<DAppWebViewDemo> {
   WebViewController _controller;
 
   @override
@@ -26,7 +26,7 @@ class _DappWebviewDemoState extends State<DappWebviewDemo> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: MyAppBar(
-            centerTitle: "公告",
+            centerTitle: "DApp",
             backgroundColor: Colors.transparent,
           ),
           body: Container(
@@ -45,30 +45,41 @@ class _DappWebviewDemoState extends State<DappWebviewDemo> {
       height: ScreenUtil().setHeight(160),
       child: WebView(
         initialUrl: "http://192.168.1.4:8080/",
-        javascriptMode: JavascriptMode.unrestricted, //JS执行模式 是否允许JS执行
+        javascriptMode: JavascriptMode.unrestricted,
+        //JS执行模式 是否允许JS执行
         onWebViewCreated: (controller) {
           _controller = controller;
         },
+        onPageFinished: (String url) {
+          _controller
+              .evaluateJavascript('"callJs(' "onPageFinished" ')"')
+              .then((result) {});
+        },
         javascriptChannels: <JavascriptChannel>[
           JavascriptChannel(
-              name: "NativePwdDialog",
-              onMessageReceived: (JavascriptMessage message) {
-                print("参数======>： ${message.message}");
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return PwdDialog(
-                        title: "恢复钱包",
-                        hintContent:
-                            "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
-                        hintInput: "请输入钱包密码",
-                        onPressed: () {
-                          //todo
-                          print("to do verify pwd，recover wallet");
-                        });
-                  },
-                );
-              }),
+            name: "NativePwdDialog",
+            onMessageReceived: (JavascriptMessage message) {
+              print("从webview传回来的参数======>： ${message.message}");
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return PwdDialog(
+                      title: "钱包密码",
+                      hintContent:
+                          "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
+                      hintInput: "请输入钱包密码",
+                      onPressed: (value) {
+                        //todo  扫描结果值 传回给js
+                        //todo    parker 0828
+                        print("to do verify pwd，recover wallet===>" + value);
+                        _controller
+                            .evaluateJavascript('"callJs(' "canshu" ')"')
+                            .then((result) {});
+                      });
+                },
+              );
+            },
+          ),
           JavascriptChannel(
               name: "NativeQrScan",
               onMessageReceived: (JavascriptMessage message) {
@@ -84,6 +95,9 @@ class _DappWebviewDemoState extends State<DappWebviewDemo> {
                 });
               }),
         ].toSet(),
+        navigationDelegate: (NavigationRequest request) {
+          return NavigationDecision.navigate;
+        },
       ),
     );
   }

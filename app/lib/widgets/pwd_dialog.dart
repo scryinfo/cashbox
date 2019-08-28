@@ -1,7 +1,8 @@
 import 'package:app/res/resources.dart';
+import 'package:app/routers/fluro_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 // 定制化不同  dialog  样式
 
 class PwdDialog extends StatelessWidget {
@@ -11,6 +12,8 @@ class PwdDialog extends StatelessWidget {
   final Function onPressed;
 
   PwdDialog({this.title, this.hintContent, this.hintInput, this.onPressed});
+
+  TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +70,7 @@ class PwdDialog extends StatelessWidget {
                   ),
                   focusColor: Colors.black45,
                 ),
+                controller: _controller,
                 autofocus: true,
               ),
             ),
@@ -81,7 +85,13 @@ class PwdDialog extends StatelessWidget {
         new FlatButton(
           child: new Text('确定'),
           onPressed: () {
-            onPressed();
+
+            if (_controller.text.isEmpty){
+              Fluttertoast.showToast(msg:"请输入${title}");
+              return;
+            }
+            onPressed(_controller.text);
+            NavigatorUtils.goBack(context);
           },
         ),
         new FlatButton(

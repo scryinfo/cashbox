@@ -42,7 +42,7 @@ class _PublicPageState extends State<PublicPage> {
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(160),
       child: WebView(
-        initialUrl: "http://192.168.1.4:8080/",
+        initialUrl: "https://cashbox.scry.info/public",
         javascriptMode: JavascriptMode.unrestricted, //JS执行模式 是否允许JS执行
         onWebViewCreated: (controller) {
           _controller = controller;
