@@ -33,6 +33,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
   Widget build(BuildContext context) {
     return Container(
       width: ScreenUtil().setWidth(60),
+      height: ScreenUtil().setHeight(160),
       color: Colors.white,
       child: Container(
         color: Colors.transparent,
@@ -42,7 +43,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
             _drawerAction(),
             Gaps.scaleVGap(ScreenUtil().setHeight(1)),
             Container(
-              height: ScreenUtil().setHeight(95),
+              height: ScreenUtil().setHeight(82),
               child: SingleChildScrollView(
                 child: Wrap(
                   children: _drawerWalletList(),
@@ -57,7 +58,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
 
   Widget _drawerAction() {
     return Container(
-      height: ScreenUtil().setHeight(53.75),
+      height: ScreenUtil().setHeight(63.75),
       child: Column(
         children: <Widget>[
           Container(
