@@ -93,4 +93,6 @@ impl DataServiceProvider {
         self.db_hander.execute("commit;").map(|_| ()).map_err(|err| err.to_string())
     }
 
+   // fn get_taget_data<T>(data:T)->T
+
 }

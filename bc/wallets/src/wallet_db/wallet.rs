@@ -7,8 +7,8 @@ impl DataServiceProvider {
     pub fn update_mnemonic(&self, mn: TbMnemonic) -> Result<(), String> {
         let mn_sql = "update Mnemonic set mnemonic=? where id=?;";
         let mut statement = self.db_hander.prepare(mn_sql).expect("sql statement is error!");
-        statement.bind(1, mn.mnemonic.unwrap().as_str()).expect(" mnemonic  bind error");
-        statement.bind(2, mn.id.unwrap().as_str()).expect("mn id bind error");
+        statement.bind(1, mn.mnemonic.as_str()).expect(" mnemonic  bind error");
+        statement.bind(2, mn.id.as_str()).expect("mn id bind error");
 
         match statement.next() {
             Ok(_state) => {
@@ -26,8 +26,8 @@ impl DataServiceProvider {
         // TODO 根据链的地址种类 对应的填写代币账户信息
         match self.db_hander.prepare(mn_sql) {
             Ok(mut stat) => {
-                stat.bind(1, mn.id.unwrap().as_str()).expect("save_mnemonic_address bind mn id error");
-                stat.bind(2, mn.mnemonic.unwrap().as_str()).expect("save_mnemonic_address bind mnemonic error");
+                stat.bind(1, mn.id.as_str()).expect("save_mnemonic_address bind mn id error");
+                stat.bind(2, mn.mnemonic.as_str()).expect("save_mnemonic_address bind mnemonic error");
                 match stat.next() {
                     Ok(_) => {
                         match self.db_hander.prepare(address_sql) {
@@ -71,12 +71,12 @@ impl DataServiceProvider {
         match cursor.next().unwrap() {
             Some(value) => {
                 let mnemonic = TbMnemonic {
-                    id: value[0].as_string().map(|str| String::from(str)),
+                    id: String::from(value[0].as_string().unwrap()),
                     full_name: value[1].as_string().map(|str| String::from(str)),
-                    mnemonic: value[2].as_string().map(|str| String::from(str)),
+                    mnemonic: String::from(value[2].as_string().unwrap()),
                     selected: value[3].as_integer().map(|num| if num == 1 { true } else { false }),
-                    status: value[4].as_integer(),
-                    create_time: value[5].as_string().map(|str| String::from(str)),
+                    status: value[4].as_integer().unwrap(),
+                    create_time: String::from(value[5].as_string().unwrap()),
                     update_time: value[6].as_string().map(|str| String::from(str)),
                 };
                 Some(mnemonic)
@@ -96,12 +96,12 @@ impl DataServiceProvider {
             let mut rows = stmt.cursor();
             let cursor = rows.next().unwrap().unwrap(); //必须存在一个指定的钱包
             let mnemonic = TbMnemonic {
-                id: cursor[0].as_string().map(|str| String::from(str)),
+                id: String::from(cursor[0].as_string().unwrap()),
                 full_name: cursor[1].as_string().map(|str| String::from(str)),
-                mnemonic: cursor[2].as_string().map(|str| String::from(str)),
+                mnemonic: String::from(cursor[2].as_string().unwrap()),
                 selected: cursor[3].as_integer().map(|num| if num == 1 { true } else { false }),
-                status: cursor[4].as_integer(),
-                create_time: cursor[5].as_string().map(|str| String::from(str)),
+                status: cursor[4].as_integer().unwrap(),
+                create_time: String::from(cursor[5].as_string().unwrap()),
                 update_time: cursor[6].as_string().map(|str| String::from(str)),
             };
             mnemonic
@@ -119,12 +119,12 @@ impl DataServiceProvider {
         let mut vec = Vec::new();
         while let Some(row) = cursor.next().unwrap() {
             let mnemonic = TbMnemonic {
-                id: row[0].as_string().map(|str| String::from(str)),
+                id: String::from(row[0].as_string().unwrap()),
                 full_name: row[1].as_string().map(|str| String::from(str)),
-                mnemonic: row[2].as_string().map(|str| String::from(str)),
+                mnemonic: String::from(row[2].as_string().unwrap()),
                 selected: row[3].as_integer().map(|num| if num == 1 { true } else { false }),
-                status: row[4].as_integer(),
-                create_time: row[5].as_string().map(|str| String::from(str)),
+                status: row[4].as_integer().unwrap(),
+                create_time: String::from(row[5].as_string().unwrap()),
                 update_time: row[6].as_string().map(|str| String::from(str)),
             };
             vec.push(mnemonic)
