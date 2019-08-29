@@ -80,7 +80,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               title: "删除钱包",
               hintContent: "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。",
               hintInput: "请输入钱包密码",
-              onPressed: () {
+              onPressed: (value) {
                 //todo
                 print("to do verify pwd,delete wallet");
               },
@@ -179,7 +179,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                   title: "恢复钱包",
                   hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
                   hintInput: "请输入钱包密码",
-                  onPressed: () {
+                  onPressed: (value) {
                     //todo
                     print("to do verify pwd，recover wallet");
                   });
