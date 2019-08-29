@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/pwd_dialog.dart';
@@ -47,13 +48,11 @@ class _DAppWebViewDemoState extends State<DAppWebViewDemo> {
         initialUrl: "http://192.168.1.4:8080/",
         javascriptMode: JavascriptMode.unrestricted,
         //JS执行模式 是否允许JS执行
-        onWebViewCreated: (controller) {
-          _controller = controller;
+        onWebViewCreated: (webViewController) {
+          _controller = webViewController;
         },
         onPageFinished: (String url) {
-          _controller
-              .evaluateJavascript('"callJs(' "onPageFinished" ')"')
-              .then((result) {});
+          print('Page finished loading: $url');
         },
         javascriptChannels: <JavascriptChannel>[
           JavascriptChannel(
@@ -64,18 +63,19 @@ class _DAppWebViewDemoState extends State<DAppWebViewDemo> {
                 context: context,
                 builder: (BuildContext context) {
                   return PwdDialog(
-                      title: "钱包密码",
-                      hintContent:
-                          "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
-                      hintInput: "请输入钱包密码",
-                      onPressed: (value) {
-                        //todo  扫描结果值 传回给js
-                        //todo    parker 0828
-                        print("to do verify pwd，recover wallet===>" + value);
-                        _controller
-                            .evaluateJavascript('"callJs(' "canshu" ')"')
-                            .then((result) {});
-                      });
+                    title: "钱包密码",
+                    hintContent:
+                        "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
+                    hintInput: "请输入钱包密码",
+                    onPressed: (value) {
+                      //method 1 方法回调ok
+                      _controller
+                          ?.evaluateJavascript('callJs("$value")')
+                          ?.then((result) {});
+                      //method 2 字段回调ok
+                      //_controller?.evaluateJavascript('window.qrresult=" $value "')?.then((result) {});
+                    },
+                  );
                 },
               );
             },
@@ -85,11 +85,9 @@ class _DAppWebViewDemoState extends State<DAppWebViewDemo> {
               onMessageReceived: (JavascriptMessage message) {
                 Future<String> qrResult = QrScanUtil.qrscan();
                 qrResult.then((t) {
-                  setState(() {
-                    Fluttertoast.showToast(
-                        msg: "qrScan result is ===>" + t.toString());
-                    print("qrScan result is ===>" + t.toString());
-                  });
+                  _controller
+                      ?.evaluateJavascript('callJs("$t")')
+                      ?.then((result) {});
                 }).catchError((e) {
                   Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
                 });
