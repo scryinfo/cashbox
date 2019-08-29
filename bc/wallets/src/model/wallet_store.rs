@@ -1,11 +1,11 @@
 #[derive(Default, Deserialize)]
 pub struct TbMnemonic {
-    pub  id: Option<String>,
+    pub  id: String,
     pub full_name: Option<String>,
-    pub mnemonic: Option<String>,
+    pub mnemonic: String,
     pub selected: Option<bool>,
-    pub status: Option<i64>,
-    pub create_time: Option<String>,
+    pub status: i64,
+    pub create_time: String,
     pub update_time: Option<String>,
 }
 
