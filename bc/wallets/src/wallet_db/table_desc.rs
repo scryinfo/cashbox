@@ -24,7 +24,8 @@ pub fn get_cashbox_wallet_sql() -> String {
     [more_property] VARCHAR(1),
     [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
     [update_time] DATETIME);
-    DROP TABLE IF EXISTS [main].[Digit];
+
+    DROP TABLE IF EXISTS [main].[EthDigit];
     CREATE TABLE [main].[Digit](
         [id] INTEGER PRIMARY KEY NOT NULL,
     [address] VARCHAR(64),
@@ -42,6 +43,45 @@ pub fn get_cashbox_wallet_sql() -> String {
     [status] INT,
     [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
     [UPDATED_TIME] DATETIME);
+
+    DROP TABLE IF EXISTS [main].[BtcDigit];
+    CREATE TABLE [main].[Digit](
+        [id] INTEGER PRIMARY KEY NOT NULL,
+    [address] VARCHAR(64),
+    [contract_address] VARCHAR(128),
+    [short_name] VARCHAR(32),
+    [full_name] VARCHAR(32),
+    [balance] VARCHAR(32),
+    [unit] VARCHAR(32),
+    [money] DECIMAL(32, 8),
+    [next_id] INT,
+    [url_img] VARCHAR(1024),
+    [group_name] VARCHAR(32),
+    [selected] VARCHAR(1),
+    [decimals] INT,
+    [status] INT,
+    [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
+    [UPDATED_TIME] DATETIME);
+
+    DROP TABLE IF EXISTS [main].[EeeDigit];
+    CREATE TABLE [main].[Digit](
+        [id] INTEGER PRIMARY KEY NOT NULL,
+    [address] VARCHAR(64),
+    [contract_address] VARCHAR(128),
+    [short_name] VARCHAR(32),
+    [full_name] VARCHAR(32),
+    [balance] VARCHAR(32),
+    [unit] VARCHAR(32),
+    [money] DECIMAL(32, 8),
+    [next_id] INT,
+    [url_img] VARCHAR(1024),
+    [group_name] VARCHAR(32),
+    [selected] VARCHAR(1),
+    [decimals] INT,
+    [status] INT,
+    [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
+    [UPDATED_TIME] DATETIME);
+
     DROP TABLE IF EXISTS [main].[TransferRecord];
     CREATE TABLE [main].[TransferRecord](
         [id] VARCHAR(32) PRIMARY KEY NOT NULL,

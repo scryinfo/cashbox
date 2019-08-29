@@ -3,7 +3,7 @@ use std::os::raw::{c_uchar, c_int};
 #[no_mangle]
 pub extern "C" fn mnemonicGenerate(count: c_int) -> *mut c_uchar {
 
-    let mut mn = wallets::module::wallet::crate_mnemonic::<wallets::wallet_crypto::Ed25519>(count as u8);
+    let mut mn = wallets::module::wallet::crate_mnemonic(count as u8);
 
     return mn.mnid.as_mut_ptr();
 }
@@ -20,7 +20,7 @@ pub mod android {
 
     #[no_mangle]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_mnemonicGenerate(env: JNIEnv, _: JClass, count: jint) -> jobject {
-        let mnemonic = wallets::module::wallet::crate_mnemonic::<wallets::wallet_crypto::Ed25519>(count as u8);
+        let mnemonic = wallets::module::wallet::crate_mnemonic(count as u8);
         let mn_byte = env.byte_array_from_slice(mnemonic.mn.as_slice()).unwrap();
         let mn_object = JObject::from(mn_byte);
 
@@ -78,23 +78,23 @@ pub mod android {
 
         let wallet_id = env.new_string(wallet.wallet_id).unwrap();
         let wallet_id_obj = JObject::from(wallet_id);
-        let list = wallet.chain_list;
+        let eee_list = wallet.eee_chain;
 
         // find List util
-        let chain_list_class = env.find_class("java/util/ArrayList").expect("find chain type is error");
-        let digit_list_class = env.find_class("java/util/ArrayList").expect("find chain type is error");
+        let eee_chain_list_class = env.find_class("java/util/ArrayList").expect("find chain type is error");
+        let eee_digit_list_class = env.find_class("java/util/ArrayList").expect("find chain type is error");
 
-        let chain_list_class_obj = env.alloc_object(chain_list_class).expect("create chain_list_class instance is error!");
-        env.call_method(chain_list_class_obj, "<init>", "()V", &[]).expect("chain class_obj init method is exec");
+        let eee_chain_list_class_obj = env.alloc_object(eee_chain_list_class).expect("create chain_list_class instance is error!");
+        env.call_method(eee_chain_list_class_obj, "<init>", "()V", &[]).expect("chain class_obj init method is exec");
 
         //find Chain Class define
-        let chain_class = env.find_class("info/scry/wallet_manager/NativeLib$Chain").expect("chain class find error");
+        let eee_chain_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeChain").expect("chain class find error");
 
         //find Digit Class define
-        let digit_class = env.find_class("info/scry/wallet_manager/NativeLib$Digit").expect("Digit class not found");
+        let eee_digit_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeDigit").expect("Digit class not found");
 
-        for chain in list {
-            let chain_class_obj = env.alloc_object(chain_class).expect("create chain_class instance is error!");
+        for chain in eee_list {
+            let chain_class_obj = env.alloc_object(eee_chain_class).expect("create chain_class instance is error!");
             env.set_field(chain_class_obj, "status", "I", JValue::Int(chain.status as i32)).expect("set status value is error!");
             let chain_id_str = format!("{}", chain.chain_id);
 
@@ -115,12 +115,12 @@ pub mod android {
             }
 
             //每一条链下存在多个代币，需要使用List来存储
-            let digit_list_obj = env.alloc_object(digit_list_class).expect("create digit_list_obj instance is error!");
+            let digit_list_obj = env.alloc_object(eee_digit_list_class).expect("create digit_list_obj instance is error!");
             env.call_method(digit_list_obj, "<init>", "()V", &[]).expect("chain chain obj init method is exec");
 
             for digit in chain.digit_list {
                 //实例化 chain
-                let digit_class_obj = env.alloc_object(digit_class).expect("create chain instance is error!");
+                let digit_class_obj = env.alloc_object(eee_digit_class).expect("create chain instance is error!");
                 //设置digit 属性
                 env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("set status value is error!");
 
@@ -155,7 +155,7 @@ pub mod android {
 
                 env.call_method(digit_list_obj, "add", "(Ljava/lang/Object;)Z", &[digit_class_obj.into()]).expect("add chain instance is fail");
             }
-            env.call_method(chain_list_class_obj, "add", "(Ljava/lang/Object;)Z", &[chain_class_obj.into()]).expect("add chain instance is fail");
+            env.call_method(eee_chain_list_class_obj, "add", "(Ljava/lang/Object;)Z", &[chain_class_obj.into()]).expect("add chain instance is fail");
         }
 
         env.set_field(jobj, "status", "I", JValue::Int(wallet.status as i32)).expect("find status type is error!");
@@ -166,7 +166,9 @@ pub mod android {
             env.set_field(jobj, "walletName", "Ljava/lang/String;", JValue::Object(wallet_name_obj)).expect("find walletName type is error!");
         }
 
-        env.set_field(jobj, "chainList", "Ljava/util/List;", JValue::Object(chain_list_class_obj)).expect("find chainList type is error!");
+        env.set_field(jobj, "eeeChain", "Ljava/util/List;", JValue::Object(eee_chain_list_class_obj)).expect("find chainList type is error!");
+        env.set_field(jobj, "ethChain", "Ljava/util/List;", JValue::Object(eee_chain_list_class_obj)).expect("find chainList type is error!");
+        env.set_field(jobj, "btcChain", "Ljava/util/List;", JValue::Object(eee_chain_list_class_obj)).expect("find chainList type is error!");
         container.push(jobj);
         container
     }
