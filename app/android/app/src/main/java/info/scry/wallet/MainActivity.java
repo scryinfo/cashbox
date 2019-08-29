@@ -113,9 +113,12 @@ public class MainActivity extends FlutterActivity {
         if (requestCode == REQUEST_CODE_QR_SCAN) {
             if (data != null && resultCode == RESULT_OK) {
                 String scanResultString = data.getStringExtra(Constant.CODED_CONTENT);
+                if (scanResultString == null) {
+                    scanResultString = "";
+                }
                 mQRScanResult.success(scanResultString);
             } else {
-                mQRScanResult.error("there is something wrong,data is ===>", data.toString(), "");
+                mQRScanResult.error("resultCode is ===>", "" + resultCode, "");
             }
         } else {
             Log.d("MainActivity", "unknown method result,requestCode is===>" + requestCode);
