@@ -1,4 +1,3 @@
-
 import 'package:flutter/services.dart';
 
 class QrScanUtil {
@@ -6,6 +5,9 @@ class QrScanUtil {
 
   static Future<String> qrscan() async {
     String callbackResult = await methodPlugin.invokeMethod('qr_scan_method');
+    if (callbackResult.isEmpty) {
+      callbackResult = "";
+    }
     return callbackResult;
   }
 }
