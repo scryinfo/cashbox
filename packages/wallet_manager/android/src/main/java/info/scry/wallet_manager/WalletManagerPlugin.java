@@ -46,7 +46,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Wallet wallet = new NativeLib.Wallet();
                 Log.d("nativeLib=>", "saveWallet is enter =>");
                 try {
-                    wallet = (NativeLib.Wallet) (NativeLib.saveWallet((String) (call.argument("walletName")), (byte[]) (call.argument("pwd")), (byte[]) (call.argument("mnemonic"))));
+                    //wallet = (NativeLib.Wallet) (NativeLib.saveWallet((String) (call.argument("walletName")), (byte[]) (call.argument("pwd")), (byte[]) (call.argument("mnemonic"))));
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
