@@ -1,4 +1,4 @@
-use substrate_primitives::{ hexdisplay::HexDisplay, Pair,crypto::Ss58Codec};
+use substrate_primitives::{hexdisplay::HexDisplay, Pair, crypto::Ss58Codec};
 use bip39::{Mnemonic, MnemonicType, Language};
 use rand::{RngCore, rngs::OsRng};
 use scry_crypto::aes;
@@ -162,7 +162,7 @@ pub trait Crypto {
         serde_json::to_string(&store_data).unwrap()
     }
 
-    fn get_mnemonic_context(keystore: &str, old_psd: &[u8]) -> Result<Vec<u8>, String> {
+    fn get_mnemonic_context(keystore: &str, password: &[u8]) -> Result<Vec<u8>, String> {
         let store: Result<KeyStore, _> = serde_json::from_str(keystore);
         if store.is_err() {
             return Err("keystore convert serde_json error".into());
@@ -185,7 +185,7 @@ pub trait Crypto {
         let hex_salt = kdfparams.salt;
 
         let salt = hex::decode(hex_salt).unwrap();
-        scrypt(old_psd, salt.as_slice(), &params, &mut key)
+        scrypt(password, salt.as_slice(), &params, &mut key)
             .expect("32 bytes always satisfy output length requirements");
 
         //开始构造对称解密所需要的参数
@@ -225,7 +225,12 @@ pub trait Crypto {
         }
     }
 }
+
+
+
+
 mod ed25519;
 mod sr25519;
+
 pub use sr25519::Sr25519;
 pub use ed25519::Ed25519;
