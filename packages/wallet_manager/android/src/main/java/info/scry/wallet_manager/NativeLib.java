@@ -14,6 +14,10 @@ public class NativeLib {
         public static final int EEE_TEST = 6;
     }
 
+    private interface WalletType{
+        public static final int TEST_WALLET = 0;
+        public static final int WALLET = 1;
+    }
 
     //通信消息 状态码
     private interface StatusCode {
@@ -175,7 +179,7 @@ public class NativeLib {
 
     // 保存钱包
     // apiNo:WM03 fixed
-    public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic);
+    public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic,WalletType walletType);
 
     // 钱包导出。 恢复钱包
     // apiNo:WM04
