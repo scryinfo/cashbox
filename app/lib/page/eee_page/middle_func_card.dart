@@ -39,7 +39,6 @@ class _MiddleFuncCard extends State<MiddleFuncCard> {
                   ],
                 ),
                 onTap: () {
-                  print("onTap is~~转账~");
                   NavigatorUtils.push(context, Routes.transferEeePage);
                 },
               )),

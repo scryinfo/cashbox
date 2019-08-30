@@ -1,3 +1,4 @@
+import 'package:app/util/log_util.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import '../routers/router_handler.dart';
@@ -27,9 +28,10 @@ class Routes {
   static String aboutUsPage = '/aboutuspage';
 
   static void configureRoutes(Router router) {
-    router.notFoundHandler = new Handler(
+    router.notFoundHandler = Handler(
         handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       print('ERROR====>ROUTE WAS NOT FONUND!!!');
+      LogUtil.e("Routers error is=>", "noFoundHandler");
     });
 
     router.define(eeePage, handler: eeePageHandler);

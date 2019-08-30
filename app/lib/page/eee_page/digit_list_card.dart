@@ -1,6 +1,7 @@
 import 'package:app/model/rate.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
@@ -38,6 +39,8 @@ class _DigitListCardState extends State<DigitListCard>
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             print("snapshot.error==>" + snapshot.error.toString());
+            LogUtil.e("digitList future snapshot.hasError is +>",
+                snapshot.error.toString());
             return Center(
               child: Text(
                 "数据加载出错了，请尝试重新加载!~",
