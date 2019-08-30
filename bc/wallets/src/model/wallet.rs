@@ -10,13 +10,14 @@ pub struct Mnemonic {
 }
 
 #[repr(C)]
+#[derive(Default)]
 pub struct Wallet {
     pub status: StatusCode,
     pub wallet_id: String,
     //这个值不会存在Null 的情况
     pub wallet_name: Option<String>,
     pub eee_chain: Vec<chain::EeeChain>,
-    pub eth_chain: Vec<chain::EthChain>,
+    pub eth_chain: chain::EthChain,
     pub btc_chain: Vec<chain::BtcChain>,
 }
 

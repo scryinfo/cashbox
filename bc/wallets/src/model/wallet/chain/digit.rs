@@ -1,6 +1,7 @@
 use super::*;
 
 #[repr(C)]
+#[derive(Clone)]
 pub struct EeeDigit {
     pub status: StatusCode,
     pub digit_id: String,
@@ -16,6 +17,7 @@ pub struct EeeDigit {
 }
 
 #[repr(C)]
+#[derive(Clone)]
 pub struct EthDigit {
     pub status: StatusCode,
     pub digit_id: String,
@@ -31,6 +33,7 @@ pub struct EthDigit {
 }
 
 #[repr(C)]
+#[derive(Clone)]
 pub struct BtcDigit {
     pub status: StatusCode,
     pub digit_id: String,

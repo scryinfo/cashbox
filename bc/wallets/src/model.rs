@@ -9,7 +9,7 @@ pub mod wallet_store;
 pub use wallet::{Wallet,Mnemonic};
 pub use wallet::chain::{BtcChain,EthChain,EeeChain};
 pub use wallet::chain::digit::{EeeDigit,EthDigit,BtcDigit};
-pub use wallet_store::{TbAddress,TbWallet,TbMnemonic};
+pub use wallet_store::{TbAddress,WalletObj};
 
 pub struct Address {
     pub chain_type: ChainType,

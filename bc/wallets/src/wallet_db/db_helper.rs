@@ -2,8 +2,11 @@ use std::{fs, path};
 use sqlite::{Connection};
 
 
-const TB_MNEMONIC: &'static str = r#"/data/data/com.example.app/files/cashbox_mnenonic.db"#;
-const TB_WALLET: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet.db"#;
+/*const TB_WALLET: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet.db"#;
+const TB_WALLET_DETAIL: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet_detail.db"#;*/
+
+const TB_WALLET: &'static str = r#"cashbox_wallet.db"#;
+const TB_WALLET_DETAIL: &'static str = r#"cashbox_wallet_detail.db"#;
 
 /*const TB_MNEMONIC: &'static str = r#"./cashbox_mnenonic.db"#;
 const TB_WALLET: &'static str = r#"./cashbox_wallet.db"#;*/
@@ -38,7 +41,7 @@ pub struct DataServiceProvider {
 
 impl Drop for DataServiceProvider {
     fn drop(&mut self) {
-        let detach_sql = "DETACH DATABASE 'wallet'";
+        let detach_sql = "DETACH DATABASE 'detail'";
         &self.db_hander.execute(detach_sql).expect("DETACH database error!");
     }
 }
@@ -47,25 +50,25 @@ impl DataServiceProvider {
 
     pub fn instance() -> Result<Self, String> {
         //1、检查对应的数据库文件是否存在
-        if fs::File::open(TB_MNEMONIC).is_err() || fs::File::open(TB_WALLET).is_err() {
+        if fs::File::open(TB_WALLET_DETAIL).is_err() || fs::File::open(TB_WALLET).is_err() {
             //2、若是不存在则执行sql脚本文件创建数据库
-            let mnemonic_sql = super::table_desc::get_cashbox_mnenonic_sql();
-            let mn_database_hint = create_teble(TB_MNEMONIC, mnemonic_sql.as_str());
+            let mnemonic_sql = super::table_desc::get_cashbox_wallet_sql();
+            let mn_database_hint = create_teble(TB_WALLET, mnemonic_sql.as_str());
             if mn_database_hint.is_err() {
                 return Err(mn_database_hint.unwrap_err());
             }
             //create wallet table
-            let wallet_sql = super::table_desc::get_cashbox_wallet_sql();
-            let crate_wallet_hint = create_teble(TB_WALLET, wallet_sql.as_str());
+            let wallet_sql = super::table_desc::get_cashbox_wallet_detail_sql();
+            let crate_wallet_hint = create_teble(TB_WALLET_DETAIL, wallet_sql.as_str());
             if crate_wallet_hint.is_err() {
                 return Err(crate_wallet_hint.unwrap_err());
             }
         }
 
         //start connect mnemonic database
-        match Connection::open(TB_MNEMONIC) {
+        match Connection::open(TB_WALLET) {
             Ok(conn) => {
-                let attach_sql = format!("ATTACH DATABASE \"{}\" AS wallet;", TB_WALLET);
+                let attach_sql = format!("ATTACH DATABASE \"{}\" AS detail;", TB_WALLET_DETAIL);
                 match conn.execute(&attach_sql) {
                     Ok(_) => {
                         let provider = DataServiceProvider {
