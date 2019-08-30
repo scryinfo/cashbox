@@ -37,6 +37,7 @@ class _MinePageState extends State<MinePage> {
         Gaps.scaleVGap(5),
         //_buildMoneyUnitWidget(),
         _buildWalletListWidget(),
+        _buildTestWalletWidget(),
         //_buildLanguageChooseWidget(),
         _buildAboutUsWidget(),
         _buildVersionCheckWidget(),
@@ -89,6 +90,18 @@ class _MinePageState extends State<MinePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTestWalletWidget() {
+    return GestureDetector(
+      onTap: () {
+        print("click 测试钱包");
+        NavigatorUtils.push(context, Routes.createTestWalletPage);
+      },
+      child: ItemOfListWidget(
+        leftText: "测试钱包",
       ),
     );
   }
