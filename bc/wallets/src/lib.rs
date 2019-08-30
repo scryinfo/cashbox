@@ -24,7 +24,11 @@ pub enum StatusCode {
     //广播上链成功
     BroadcastFailure,  //广播上链失败
 }
+impl Default for StatusCode{
+    fn default() -> Self { StatusCode::OK }
+}
 
+#[derive(PartialEq,Clone)]
 pub enum ChainType {
     BTC = 1,
     BtcTest =2,
@@ -33,6 +37,10 @@ pub enum ChainType {
     EEE = 5,
     EeeTest =6,
     OTHER = 7,
+}
+
+impl Default for ChainType{
+    fn default() -> Self { ChainType::OTHER }
 }
 
 impl From<i64> for ChainType {

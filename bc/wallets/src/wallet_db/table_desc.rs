@@ -1,18 +1,20 @@
-pub fn get_cashbox_wallet_sql() -> String {
+pub fn get_cashbox_wallet_detail_sql() -> String {
     let sql = r#"
     PRAGMA foreign_keys = 'off';
     BEGIN;
     DROP TABLE IF EXISTS [main].[Address];
     CREATE TABLE [main].[Address](
-        [address] VARCHAR(64) PRIMARY KEY NOT NULL,
-    [mnemonic_id] VARCHAR(64),
-    [chain_id] INT,
-    [puk_key] VARCHAR(128),
+    [address_id] VARCHAR(64) PRIMARY KEY NOT NULL,
+    [wallet_id] VARCHAR(64) NOT NULL,
+    [chain_id] INT NOT NULL,
+    [address] VARCHAR(64) NOT NULL,
+    [puk_key] VARCHAR(128) NOT NULL,
     [status] INT NOT NULL  DEFAULT 1,
     [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')));
+
     DROP TABLE IF EXISTS [main].[Chain];
     CREATE TABLE [main].[Chain](
-        [id] INTEGER PRIMARY KEY NOT NULL,
+    [id] INTEGER PRIMARY KEY NOT NULL,
     [type] VARCHAR(32),
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(64),
@@ -26,9 +28,9 @@ pub fn get_cashbox_wallet_sql() -> String {
     [update_time] DATETIME);
 
     DROP TABLE IF EXISTS [main].[EthDigit];
-    CREATE TABLE [main].[Digit](
-        [id] INTEGER PRIMARY KEY NOT NULL,
-    [address] VARCHAR(64),
+    CREATE TABLE [main].[EthDigit](
+    [id] INTEGER PRIMARY KEY NOT NULL,
+    [address_id] VARCHAR(64),
     [contract_address] VARCHAR(128),
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(32),
@@ -45,9 +47,9 @@ pub fn get_cashbox_wallet_sql() -> String {
     [UPDATED_TIME] DATETIME);
 
     DROP TABLE IF EXISTS [main].[BtcDigit];
-    CREATE TABLE [main].[Digit](
-        [id] INTEGER PRIMARY KEY NOT NULL,
-    [address] VARCHAR(64),
+    CREATE TABLE [main].[BtcDigit](
+    [id] INTEGER PRIMARY KEY NOT NULL,
+    [address_id] VARCHAR(64),
     [contract_address] VARCHAR(128),
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(32),
@@ -64,9 +66,9 @@ pub fn get_cashbox_wallet_sql() -> String {
     [UPDATED_TIME] DATETIME);
 
     DROP TABLE IF EXISTS [main].[EeeDigit];
-    CREATE TABLE [main].[Digit](
-        [id] INTEGER PRIMARY KEY NOT NULL,
-    [address] VARCHAR(64),
+    CREATE TABLE [main].[EeeDigit](
+    [id] INTEGER PRIMARY KEY NOT NULL,
+    [address_id] VARCHAR(64),
     [contract_address] VARCHAR(128),
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(32),
@@ -84,7 +86,7 @@ pub fn get_cashbox_wallet_sql() -> String {
 
     DROP TABLE IF EXISTS [main].[TransferRecord];
     CREATE TABLE [main].[TransferRecord](
-        [id] VARCHAR(32) PRIMARY KEY NOT NULL,
+    [id] VARCHAR(32) PRIMARY KEY NOT NULL,
     [tx_record_hash] VARCHAR(64),
     [chain_id] INT,
     [tx_from] VARCHAR(64),
@@ -96,6 +98,7 @@ pub fn get_cashbox_wallet_sql() -> String {
     [extra_msg] VARCHAR(3072),
     [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
     [UPDATED_TIME] DATETIME);
+
     insert into Chain(id,short_name,full_name) Values(1,'BTC',"bitcoin");
     insert into Chain(id,short_name,full_name) Values(2,'BTC TEST',"bitcoin test");
     insert into Chain(id,short_name,full_name) Values(3,'ETH',"ethereum");
@@ -108,15 +111,17 @@ pub fn get_cashbox_wallet_sql() -> String {
     String::from(sql)
 }
 
-pub fn get_cashbox_mnenonic_sql() -> String {
+pub fn get_cashbox_wallet_sql() -> String {
     let mnenonic_sql = r#"
         PRAGMA foreign_keys = 'off';
         BEGIN;
-        DROP TABLE IF EXISTS [main].[Mnemonic];
-        CREATE TABLE [main].[Mnemonic](
-          [id] VARCHAR(64) PRIMARY KEY NOT NULL,
+        DROP TABLE IF EXISTS [main].[Wallet];
+        CREATE TABLE [main].[Wallet](
+          [wallet_id] VARCHAR(64) PRIMARY KEY NOT NULL,
+          [mn_digest] VARCHAR(64) NOT NULL,
           [fullname] VARCHAR(32),
           [mnemonic] VARCHAR(3072),
+          [wallet_type] INT NOT NULL  DEFAULT 1,
           [selected] VARCHAR(1),
           [status] INT NOT NULL  DEFAULT 1,
           [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),

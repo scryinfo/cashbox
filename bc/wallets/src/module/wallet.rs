@@ -3,9 +3,11 @@ use log::error;
 
 use crate::{StatusCode, wallet_db};
 use crate::model::Address;
-use super::model::{EeeChain, EeeDigit, TbWallet, TbMnemonic, TbAddress, Wallet, Mnemonic};
+use super::model::{EeeChain, EeeDigit, WalletObj, TbAddress, Wallet, Mnemonic};
 use std::collections::HashMap;
-use crate::wallet_crypto::{Sr25519, Crypto};
+use crate::wallet_crypto::{Crypto};
+use uuid::Uuid;
+use crate::model::wallet_store::TbWallet;
 //use wallet_crypto_impl::WalletCryptoUtil;
 
 /**
@@ -14,7 +16,7 @@ use crate::wallet_crypto::{Sr25519, Crypto};
     一个助记词 可以同时应用于多条链；
     一条链，在基于链的应用上，存在多个合约地址的可能
 */
-fn tbwallet_convert_to_wallet(tbwallets: Vec<TbWallet>) -> Vec<Wallet> {
+fn tbwallet_convert_to_wallet(tbwallets: Vec<WalletObj>) -> Vec<Wallet> {
     let mut ret_data = Vec::new();
 
     let mut last_wallet_id = String::from("-1");
@@ -32,9 +34,7 @@ fn tbwallet_convert_to_wallet(tbwallets: Vec<TbWallet>) -> Vec<Wallet> {
                 status: StatusCode::OK,
                 wallet_id: wallet_id.clone(),
                 wallet_name: tbwallet.wallet_name.clone(),
-                eee_chain: Vec::new(),
-                eth_chain: Vec::new(),
-                btc_chain: Vec::new(),
+                ..Default::default()
             };
             //使用last_wallet_id 标识上一个钱包id,当钱包发生变化的时候，表示当前迭代的数据是新钱包 需要更新wallet_index，标识当前处理的是哪个钱包
             if last_wallet_id.ne("-1") {
@@ -107,18 +107,16 @@ pub btc_chain: Vec<chain::BtcChain>,*/
 
 fn get_wallet_info() -> HashMap<String, Wallet> {
     let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-    let mn = instance.get_mnemonics();
+    let mn = instance.get_wallets();
     let mut wallet_map = HashMap::new();
     for item in mn {
         let wallet = Wallet {
             status: StatusCode::OK,
-            wallet_id: item.id.clone(),
+            wallet_id: item.wallet_id.clone(),
             wallet_name: item.full_name,
-            eee_chain: vec![],
-            eth_chain: vec![],
-            btc_chain: vec![],
+            ..Default::default()
         };
-        wallet_map.insert(item.id, wallet);
+        wallet_map.insert(item.wallet_id, wallet);
     }
     wallet_map
 }
@@ -144,7 +142,7 @@ fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
 
                 //不同的钱包 具有相同的链id 要增加钱包的记录
                 //同一个钱包 具有相同的链id  只要增加代币的记录
-                //同一个钱包 具有不同的链id 要增加链的记录
+                //同一个钱包 具有不同的链id 要增加链的记录（这种情况 业务暂时不支持，代码保留在这）
 
                 if last_wallet_id.ne(&wallet_id) {
 
@@ -152,7 +150,9 @@ fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
                     last_wallet_id = wallet_id.clone();
                     //开始新的钱包，记录链的标识需要重新开始计算
                     last_chain_id = String::new();
+
                 }
+                //现在的业务是一个钱包，只有这一种类型的链，比如 Eth 只存在主链 没有另外的链，以下判断可以不需要
                 if last_chain_id.ne(&chain_id) {
                     //这个地方需要重新来处理链的关系
                     let chain = EeeChain {
@@ -205,18 +205,25 @@ pub fn get_all_wallet() -> Result<Vec<Wallet>, String> {
     let  wallet_info_map = get_wallet_info();
 
     let eee_data = get_eee_chain_data().expect("get eee data");
+    let eth_data = chain::get_eth_chain_data().expect("get eee data");
 
     let mut target = vec![];
+
     for (walletid, eee_chain) in eee_data {
         //从eee 链查询出来的钱包信息肯定存在
         let wallet_info = wallet_info_map.get(walletid.as_str()).unwrap();
+
+
+        let eth_chain = eth_data.get(walletid.as_str()).unwrap();
+        let eth_data =  eth_chain[0].clone();
+
         let wallet = Wallet {
             status: wallet_info.status.clone(),
             wallet_id: wallet_info.wallet_id.clone(),
             wallet_name: wallet_info.wallet_name.clone(),
             eee_chain,
-            eth_chain: vec![],
-            btc_chain: vec![],
+            eth_chain:  eth_chain[0].clone(),
+            ..Default::default()
         };
 
         target.push(wallet);
@@ -225,27 +232,28 @@ pub fn get_all_wallet() -> Result<Vec<Wallet>, String> {
 
 }
 
-pub fn is_contain_wallet() -> Result<Vec<TbMnemonic>, String> {
+pub fn is_contain_wallet() -> Result<Vec<TbWallet>, String> {
     match wallet_db::db_helper::DataServiceProvider::instance() {
         Ok(provider) => {
-            Ok(provider.get_mnemonics())
+            Ok(provider.get_wallets())
         }
         Err(e) => Err(e)
     }
 }
 
-pub fn get_current_wallet() -> Result<Mnemonic, String> {
+pub fn get_current_wallet() -> Result<Wallet, String> {
     let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-    instance.query_selected_mnemonic().map(|tb| Mnemonic {
-        mnid: tb.id,
-        status: StatusCode::OK,
-        mn: vec![],
+    instance.query_selected_wallet().map(|tb| Wallet {
+        wallet_id: tb.wallet_id,
+        wallet_name:tb.full_name,
+        status:StatusCode::OK,
+        ..Default::default()
     }).map_err(|msg| msg)
 }
 
 pub fn set_current_wallet(walletid: &str) -> Result<bool, String> {
     let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-    match instance.set_selected_mnemonic(walletid) {
+    match instance.set_selected_wallet(walletid) {
         Ok(_) => Ok(true),
         Err(error) => Err(error.to_string())
     }
@@ -267,8 +275,8 @@ pub fn rename_wallet(walletid: &str, wallet_name: &str) -> Result<bool, String> 
     }
 }
 
-
-fn address_from_mnemonic(mn: &[u8]) -> Address {
+//根据生成钱包的类型，需要创建对应的地址
+fn address_from_mnemonic(mn: &[u8],wallet_type:i64) -> Address {
     let phrase = String::from_utf8(mn.to_vec()).expect("mn byte format convert to string is error!");
     //这个地方 根据支持链的种类 分别生成对应的地址
 
@@ -307,35 +315,46 @@ pub fn crate_mnemonic(num: u8) -> Mnemonic{
     }
 }
 
-pub fn save_mnemonic(wallet_name: &str, mn: &[u8], password: &[u8]) -> Result<Wallet, String> {
+//pub fn save_mnemonic(wallet_name: &str, mn: &[u8], password: &[u8]) -> Result<Wallet, String> {
+pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8],wallet_type:i64) -> Result<Wallet, String> {
 
     //获取助记词对应链的地址、公钥
-    let address = address_from_mnemonic(mn);
+    let address = address_from_mnemonic(mn,wallet_type);
 
-    let mut mnemonic_id = [0u8; 32];
+    let mut mnd_digest = [0u8; 32];
     {
         let mut keccak = tiny_keccak::Keccak::new_keccak256();
         keccak.update(mn);
-        keccak.finalize(&mut mnemonic_id);
+        keccak.finalize(&mut mnd_digest);
     }
 
     let keystore = wallet_crypto::Sr25519::encrypt_mnemonic(mn, password);
 
     println!("key store detail is:{}", keystore);
-    let hex_mnemonic_id = hex::encode(mnemonic_id);
+    let hex_mnd_digest = hex::encode(mnd_digest);
+
+    let wallet_id = Uuid::new_v4().to_string();
+    //用于存放构造完成的地址对象
+    let mut address_vec = vec![];
+    //需要根据链 构造不同的地址
     let address_save = TbAddress {
-        id: 0,
-        mnemonic_id: hex_mnemonic_id.clone(),
+        address_id: Uuid::new_v4().to_string(),
+        wallet_id: wallet_id.clone(),
         chain_id: address.chain_type as i16,
         address: address.addr,
         pub_key: address.pubkey,
         status: 1,
         ..Default::default()
     };
-    let mnemonic_save = model::wallet_store::TbMnemonic {
-        id: hex_mnemonic_id.clone(),
+
+    address_vec.push(address_save);
+
+    let wallet_save = model::wallet_store::TbWallet {
+        wallet_id: wallet_id.clone(),
+        mn_digest:hex_mnd_digest,
         full_name: Some(wallet_name.to_string()),
         mnemonic: keystore,
+        wallet_type,
         ..Default::default()
     };
 
@@ -347,15 +366,14 @@ pub fn save_mnemonic(wallet_name: &str, mn: &[u8], password: &[u8]) -> Result<Wa
     let instance = wallet_db::db_helper::DataServiceProvider::instance();
     match instance {
         Ok(mut dataservice) => {
-            match dataservice.save_mnemonic_address(mnemonic_save, address_save) {
+            match dataservice.save_wallet_address(wallet_save, address_vec) {
                 Ok(_) => {
+                    //在保存成功后，需要将钱包数据返回回去
                     Ok(Wallet {
                         status: StatusCode::OK,
-                        wallet_id: hex_mnemonic_id,
+                        wallet_id: wallet_id,
                         wallet_name: Some(wallet_name.to_string()),
-                        eee_chain: vec![],
-                        eth_chain: vec![],
-                        btc_chain: vec![],
+                        ..Default::default()
                     })
                 }
                 Err(e) => {
@@ -369,9 +387,9 @@ pub fn save_mnemonic(wallet_name: &str, mn: &[u8], password: &[u8]) -> Result<Wa
     }
 }
 
-fn mnemonic_psd_update(mn: &TbMnemonic, old_psd: &[u8], new_psd: &[u8]) -> StatusCode {
+fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> StatusCode {
     //获取原来的助记词
-    let mnemonic = mn.mnemonic.clone();
+    let mnemonic = wallet.mnemonic.clone();
     let context = wallet_crypto::Sr25519::get_mnemonic_context(mnemonic.as_str(), old_psd);
     match context {
         Ok(data) => {
@@ -379,13 +397,13 @@ fn mnemonic_psd_update(mn: &TbMnemonic, old_psd: &[u8], new_psd: &[u8]) -> Statu
             let new_encrypt_mn = wallet_crypto::Sr25519::encrypt_mnemonic(&data[..], new_psd);
             let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
             //构造需要升级的助记词对象，先只修改指定的字段，后续再根据需求完善
-            let mnemonic_update = TbMnemonic {
-                id: mn.id.clone(),
-                full_name: None,
+            let wallet_update = TbWallet {
+                wallet_id: wallet.wallet_id.clone(),
+                full_name: wallet.full_name.clone(),
                 mnemonic: new_encrypt_mn,
                 ..Default::default()
             };
-            match instance.update_mnemonic(mnemonic_update) {
+            match instance.update_wallet(wallet_update) {
                 Ok(_) => {
                     StatusCode::OK
                 }
@@ -407,7 +425,7 @@ pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Status
     // TODO 处理实例获取失败的异常
     let provider = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
     //查询出对应id的助记词
-    let mnemonic = provider.query_by_mnemonic_id(mn_id);
+    let mnemonic = provider.query_by_wallet_id(mn_id);
     match mnemonic {
         Some(mn) => {
             mnemonic_psd_update(&mn, old_pwd, new_pwd)

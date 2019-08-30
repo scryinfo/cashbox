@@ -1,8 +1,10 @@
 #[derive(Default, Deserialize)]
-pub struct TbMnemonic {
-    pub  id: String,
+pub struct TbWallet {
+    pub  wallet_id: String,
+    pub mn_digest:String,
     pub full_name: Option<String>,
     pub mnemonic: String,
+    pub wallet_type:i64,
     pub selected: Option<bool>,
     pub status: i64,
     pub create_time: String,
@@ -11,8 +13,8 @@ pub struct TbMnemonic {
 
 #[derive(Default)]
 pub struct TbAddress {
-    pub  id: i32,
-    pub  mnemonic_id: String,
+    pub  address_id: String,
+    pub  wallet_id: String,
     pub  chain_id: i16,
     pub  address: String,
     pub  pub_key: String,
@@ -37,7 +39,7 @@ struct TbChain {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct TbWallet {
+pub struct WalletObj {
     pub wallet_id: Option<String>,
     //助记词id
     pub wallet_name: Option<String>,
