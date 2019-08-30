@@ -1,6 +1,6 @@
 use crate::wallet_db::db_helper::DataServiceProvider;
 use crate::model::WalletObj;
-
+use log::debug;
 impl DataServiceProvider{
 
     pub fn display_eee_chain(&self) -> Result<Vec<WalletObj>, String> {
@@ -9,8 +9,9 @@ impl DataServiceProvider{
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
+
         while let Some(row) = cursor.next().unwrap() {
-            println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
+           // println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
@@ -35,12 +36,12 @@ impl DataServiceProvider{
 
     pub fn display_eth_chain(&self) -> Result<Vec<WalletObj>, String> {
         let all_mn = " select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.address as chain_address,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
- from Wallet a,detail.Chain b,detail.Address c,detail.EeeDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
+ from Wallet a,detail.Chain b,detail.Address c,detail.EthDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
         while let Some(row) = cursor.next().unwrap() {
-            println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
+          //  println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
@@ -65,12 +66,13 @@ impl DataServiceProvider{
 
     pub fn display_btc_chain(&self) -> Result<Vec<WalletObj>, String> {
         let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.address as chain_address,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
- from Wallet a,detail.Chain b,detail.Address c,detail.EeeDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
+ from Wallet a,detail.Chain b,detail.Address c,detail.BtcDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
+        debug!("get wallet item is:{}", tbwallets.len());
         while let Some(row) = cursor.next().unwrap() {
-            println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
+          //  println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),

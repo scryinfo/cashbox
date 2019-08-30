@@ -3,12 +3,11 @@ use log::error;
 
 use crate::{StatusCode, wallet_db};
 use crate::model::Address;
-use super::model::{EeeChain, EeeDigit, WalletObj, TbAddress, Wallet, Mnemonic};
+use super::model::{EeeChain, EeeDigit, TbAddress, Wallet, Mnemonic};
 use std::collections::HashMap;
 use crate::wallet_crypto::{Crypto};
 use uuid::Uuid;
 use crate::model::wallet_store::TbWallet;
-//use wallet_crypto_impl::WalletCryptoUtil;
 
 /**
   Wallet 结构说明：
@@ -16,94 +15,6 @@ use crate::model::wallet_store::TbWallet;
     一个助记词 可以同时应用于多条链；
     一条链，在基于链的应用上，存在多个合约地址的可能
 */
-fn tbwallet_convert_to_wallet(tbwallets: Vec<WalletObj>) -> Vec<Wallet> {
-    let mut ret_data = Vec::new();
-
-    let mut last_wallet_id = String::from("-1");
-    let mut last_chain_id = String::new();
-    let mut wallet_index = 0;
-    let mut chain_index = 0;
-    //使用这种查询数据遍历方式 是依赖于查询出来的数据结构，数据库在做多表的级联时，会按照表的顺序来进行连接，
-    // 若要是在查询的时候 使用了某种字段排序，会将此结构打乱，后期可以考虑优化为使用MAP的方式来避免这个问题
-    for tbwallet in tbwallets {
-        let wallet_id = tbwallet.wallet_id.unwrap();
-        let chain_id = format!("{}", tbwallet.chain_id.unwrap());//chain id 不会存在为Null的情况
-        println!("tbwallet_convert_to_wallet wallet name:{:?}", tbwallet.wallet_name);
-        if last_wallet_id.ne(&wallet_id) {
-            let wallet = Wallet {
-                status: StatusCode::OK,
-                wallet_id: wallet_id.clone(),
-                wallet_name: tbwallet.wallet_name.clone(),
-                ..Default::default()
-            };
-            //使用last_wallet_id 标识上一个钱包id,当钱包发生变化的时候，表示当前迭代的数据是新钱包 需要更新wallet_index，标识当前处理的是哪个钱包
-            if last_wallet_id.ne("-1") {
-                //更新下一次需要
-                wallet_index = wallet_index + 1;
-            }
-            last_wallet_id = wallet_id.clone();
-
-            //开始新的钱包，记录链的标识需要重新开始计算
-            last_chain_id = String::new();
-
-            ret_data.push(wallet);
-        }
-
-        if last_chain_id.ne(&chain_id) {
-            //这个地方需要重新来处理链的关系
-            let chain = EeeChain {
-                status: StatusCode::OK,
-                chain_id: chain_id.clone(),
-                wallet_id: wallet_id,
-                chain_address: tbwallet.chain_address,
-                is_visible: tbwallet.isvisible,
-                chain_type: {
-                    if tbwallet.chain_type.is_none() {
-                        None
-                    } else {
-                        Some(ChainType::from(tbwallet.chain_type.unwrap()))
-                    }
-                },
-                digit_list: Vec::new(),
-            };
-            //获取当前的钱包序号
-            let wallet = ret_data.get_mut(wallet_index).unwrap();
-
-            last_chain_id = chain_id.clone();
-
-            wallet.eee_chain.push(chain);
-            chain_index = 0;
-        }
-        let digit_id = format!("{}", tbwallet.digit_id.unwrap());
-        let digit = EeeDigit {
-            status: StatusCode::OK,
-            digit_id: digit_id,
-            chain_id: chain_id,
-            address: tbwallet.address.clone(),
-            contract_address: tbwallet.contract_address.clone(),
-            fullname: tbwallet.full_name.clone(),
-            shortname: tbwallet.short_name.clone(),
-            balance: tbwallet.balance.clone(),
-            is_visible: tbwallet.isvisible,
-            decimal: tbwallet.decimals,
-            imgurl: tbwallet.url_img,
-        };
-        let wallet = ret_data.get_mut(wallet_index).unwrap();
-        let chain_list = wallet.eee_chain.get_mut(chain_index).unwrap();
-        chain_list.digit_list.push(digit);
-        chain_index = chain_index + 1;
-    }
-    ret_data
-}
-
-/*pub status: StatusCode,
-pub wallet_id: String,
-//这个值不会存在Null 的情况
-pub wallet_name: Option<String>,
-pub eee_chain: Vec<chain::EeeChain>,
-pub eth_chain: Vec<chain::EthChain>,
-pub btc_chain: Vec<chain::BtcChain>,*/
-
 
 fn get_wallet_info() -> HashMap<String, Wallet> {
     let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
@@ -114,6 +25,7 @@ fn get_wallet_info() -> HashMap<String, Wallet> {
             status: StatusCode::OK,
             wallet_id: item.wallet_id.clone(),
             wallet_name: item.full_name,
+            wallet_type:item.wallet_type,
             ..Default::default()
         };
         wallet_map.insert(item.wallet_id, wallet);
@@ -125,13 +37,9 @@ fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
     let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
 
     let eee_chain = instance.display_eee_chain();
-
+    //println!("return eee chain data");
     let mut last_wallet_id = String::from("-1");
-
-    let mut last_chain_id = String::new();
-
     let mut chain_index = 0;
-
     let mut eee_map = HashMap::new();
 
     match eee_chain {
@@ -139,7 +47,7 @@ fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
             for tbwallet in tbwallets {
                 let wallet_id = tbwallet.wallet_id.unwrap();
                 let chain_id = format!("{}", tbwallet.chain_id.unwrap());//chain id 不会存在为Null的情况
-
+               // println!("chain id is {}",chain_id);
                 //不同的钱包 具有相同的链id 要增加钱包的记录
                 //同一个钱包 具有相同的链id  只要增加代币的记录
                 //同一个钱包 具有不同的链id 要增加链的记录（这种情况 业务暂时不支持，代码保留在这）
@@ -148,13 +56,7 @@ fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
 
                     //使用last_wallet_id 标识上一个钱包id,当钱包发生变化的时候，表示当前迭代的数据是新钱包 需要更新wallet_index，标识当前处理的是哪个钱包
                     last_wallet_id = wallet_id.clone();
-                    //开始新的钱包，记录链的标识需要重新开始计算
-                    last_chain_id = String::new();
 
-                }
-                //现在的业务是一个钱包，只有这一种类型的链，比如 Eth 只存在主链 没有另外的链，以下判断可以不需要
-                if last_chain_id.ne(&chain_id) {
-                    //这个地方需要重新来处理链的关系
                     let chain = EeeChain {
                         status: StatusCode::OK,
                         chain_id: chain_id.clone(),
@@ -170,12 +72,15 @@ fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
                         },
                         digit_list: Vec::new(),
                     };
+                    //现在一个钱包下 一种类型的链 只有一条
+                    chain_index = 0;
                     //记录该链在钱包下的序号，因为usize 不能为负数，所有在这个地方先使用+1 来标识一个钱包下链的顺序
-                    chain_index = chain_index + 1;
-                    last_chain_id = chain_id.clone();
+                  //  chain_index = chain_index + 1;
+                   // last_chain_id = chain_id.clone();
                     eee_map.insert(wallet_id.clone(), vec![chain]);
                 }
                 let digit_id = format!("{}", tbwallet.digit_id.unwrap());
+               // println!("digit id is {}",digit_id);
                 let digit = EeeDigit {
                     status: StatusCode::OK,
                     digit_id: digit_id,
@@ -191,7 +96,7 @@ fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
                 };
                 let vec_eee_chain = eee_map.get_mut(wallet_id.as_str()).unwrap();
 
-                let chain_list = vec_eee_chain.get_mut(chain_index - 1).unwrap();
+                let chain_list = vec_eee_chain.get_mut(chain_index).unwrap();
                 chain_list.digit_list.push(digit);
             }
             Ok(eee_map)
@@ -205,28 +110,45 @@ pub fn get_all_wallet() -> Result<Vec<Wallet>, String> {
     let  wallet_info_map = get_wallet_info();
 
     let eee_data = get_eee_chain_data().expect("get eee data");
-    let eth_data = chain::get_eth_chain_data().expect("get eee data");
-
+    let eth_data = chain::get_eth_chain_data().expect("get eth data");
+    let btc_data = chain::get_btc_chain_data().expect("get eth data");
     let mut target = vec![];
 
-    for (walletid, eee_chain) in eee_data {
-        //从eee 链查询出来的钱包信息肯定存在
-        let wallet_info = wallet_info_map.get(walletid.as_str()).unwrap();
-
-
-        let eth_chain = eth_data.get(walletid.as_str()).unwrap();
-        let eth_data =  eth_chain[0].clone();
-
-        let wallet = Wallet {
-            status: wallet_info.status.clone(),
-            wallet_id: wallet_info.wallet_id.clone(),
-            wallet_name: wallet_info.wallet_name.clone(),
-            eee_chain,
-            eth_chain:  eth_chain[0].clone(),
-            ..Default::default()
+    for (wallet_id,wallet) in wallet_info_map {
+        let wallet_obj = Wallet{
+          status:wallet.status.clone(),
+            wallet_id:wallet_id.clone(),
+            wallet_name:wallet.wallet_name.clone(),
+            wallet_type:wallet.wallet_type.clone(),
+            eee_chain:{
+                let eee_option = eee_data.get(wallet_id.as_str());
+                if eee_option.is_some() {
+                    let eee_chain = eee_option.unwrap()[0].clone();
+                    Some(eee_chain)
+                }else {
+                    None
+                }
+            },
+            eth_chain:{
+                let eth_option = eth_data.get(wallet_id.as_str());
+                if eth_option.is_some() {
+                    let eee_chain = eth_option.unwrap()[0].clone();
+                    Some(eee_chain)
+                }else {
+                    None
+                }
+            },
+            btc_chain:{
+                let btc_option = btc_data.get(wallet_id.as_str());
+                if btc_option.is_some() {
+                    let btc_chain = btc_option.unwrap()[0].clone();
+                    Some(btc_chain)
+                }else {
+                    None
+                }
+            },
         };
-
-        target.push(wallet);
+        target.push(wallet_obj);
     }
     Ok(target)
 
@@ -278,12 +200,8 @@ pub fn rename_wallet(walletid: &str, wallet_name: &str) -> Result<bool, String> 
 //根据生成钱包的类型，需要创建对应的地址
 fn address_from_mnemonic(mn: &[u8],wallet_type:i64) -> Address {
     let phrase = String::from_utf8(mn.to_vec()).expect("mn byte format convert to string is error!");
-    //这个地方 根据支持链的种类 分别生成对应的地址
-
-   // let seed = WalletCryptoUtil::seed_from_phrase::<Sr25519>(&phrase, None);
-   // let pair = WalletCryptoUtil::pair_from_seed::<Sr25519>(&seed);
-   // let address = WalletCryptoUtil::ss58_from_pair::<Sr25519>(&pair);
-   // let puk_key = WalletCryptoUtil::public_from_pair::<Sr25519>(&pair);
+    // TODO 这个地方 根据支持链的种类 分别生成对应的地址
+    println!("will create wallet type is:{}",wallet_type);
 
     let seed = wallet_crypto::Sr25519::seed_from_phrase(&phrase, None);
     let pair =wallet_crypto::Sr25519::pair_from_seed(&seed);
@@ -327,11 +245,24 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8],wallet_type:i
         keccak.update(mn);
         keccak.finalize(&mut mnd_digest);
     }
+    let hex_mnd_digest = hex::encode(mnd_digest);
+    let instance = wallet_db::db_helper::DataServiceProvider::instance();
+    let mut dbhelper=  match instance {
+        Ok(dbhelper)=>dbhelper,
+        Err(e)=> return Err(e)
+    };
+
+    if wallet_type==1 {
+        if dbhelper.query_by_wallet_digest(hex_mnd_digest.as_str()).is_some(){
+            let msg = format!("this wallet is exist");
+            return Err(msg)
+        }
+    }
 
     let keystore = wallet_crypto::Sr25519::encrypt_mnemonic(mn, password);
 
     println!("key store detail is:{}", keystore);
-    let hex_mnd_digest = hex::encode(mnd_digest);
+
 
     let wallet_id = Uuid::new_v4().to_string();
     //用于存放构造完成的地址对象
@@ -363,31 +294,25 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8],wallet_type:i
     //保存助记词到数据库
     //保存公钥，地址到数据库
     //关闭事务
-    let instance = wallet_db::db_helper::DataServiceProvider::instance();
-    match instance {
-        Ok(mut dataservice) => {
-            match dataservice.save_wallet_address(wallet_save, address_vec) {
-                Ok(_) => {
-                    //在保存成功后，需要将钱包数据返回回去
-                    Ok(Wallet {
-                        status: StatusCode::OK,
-                        wallet_id: wallet_id,
-                        wallet_name: Some(wallet_name.to_string()),
-                        ..Default::default()
-                    })
-                }
-                Err(e) => {
-                    Err(e.to_string())
-                }
-            }
+
+    match dbhelper.save_wallet_address(wallet_save, address_vec) {
+        Ok(_) => {
+            //在保存成功后，需要将钱包数据返回回去
+            Ok(Wallet {
+                status: StatusCode::OK,
+                wallet_id: wallet_id,
+                wallet_type:wallet_type,
+                wallet_name: Some(wallet_name.to_string()),
+                ..Default::default()
+            })
         }
         Err(e) => {
-            Err(e)
+            Err(e.to_string())
         }
     }
 }
 
-fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> StatusCode {
+fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> Result<StatusCode,String> {
     //获取原来的助记词
     let mnemonic = wallet.mnemonic.clone();
     let context = wallet_crypto::Sr25519::get_mnemonic_context(mnemonic.as_str(), old_psd);
@@ -405,22 +330,22 @@ fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> Sta
             };
             match instance.update_wallet(wallet_update) {
                 Ok(_) => {
-                    StatusCode::OK
+                    Ok(StatusCode::OK)
                 }
                 Err(msg) => {
                     error!("update error,{}:", msg);
-                    StatusCode::FailToRestPwd
+                    Err(msg)
                 }
             }
         }
         Err(msg) => {
             error!("update error,{}:", msg);
-            StatusCode::FailToRestPwd
+            Err(msg)
         }
     }
 }
 
-pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> StatusCode{
+pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Result<StatusCode,String>{
     // TODO 检查密码规则是否满足要求
     // TODO 处理实例获取失败的异常
     let provider = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
@@ -428,12 +353,15 @@ pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Status
     let mnemonic = provider.query_by_wallet_id(mn_id);
     match mnemonic {
         Some(mn) => {
-            mnemonic_psd_update(&mn, old_pwd, new_pwd)
-            //开始处理助记词逻辑
+           match mnemonic_psd_update(&mn, old_pwd, new_pwd){
+               Ok(_)=>Ok(StatusCode::OK),
+               Err(msg)=>Err(msg),
+           }
         }
         None => {
             //针对错误信息 是否提示更多原因？
-            StatusCode::FailToRestPwd
+           let msg = format!("wallet {} is not exist",mn_id);
+            Err(msg)
         }
     }
 }
