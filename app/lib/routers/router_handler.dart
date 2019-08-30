@@ -64,7 +64,6 @@ Handler createWalletConfirmPageHandler = Handler(
 });
 
 Handler addressPageHandler = Handler(handlerFunc: (context, params) {
-  print("router handler===>" + params['walletName']?.first + "||");
   print("router handler===>" +
       params['walletName']?.first +
       "||" +

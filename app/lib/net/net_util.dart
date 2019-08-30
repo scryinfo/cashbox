@@ -1,3 +1,4 @@
+import 'package:app/util/log_util.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
 
@@ -19,6 +20,7 @@ Future request(url, {formData}) async {
       throw Exception('后端接口出现异常，请检测代码和服务器情况.........');
     }
   } catch (e) {
+    LogUtil.e("net_util request() error is", "${e}");
     return print('ERROR:======>${e}');
   }
 }
@@ -31,8 +33,10 @@ Future download(url, savePath) async {
         ContentType.parse("application/x-www-form-urlencoded");
     response = await Dio().download(url, savePath);
     print("downloadHttp response==>" + response.toString());
+    LogUtil.d("net_util download() response is", "${response}");
     return response;
   } catch (e) {
+    LogUtil.e("net_util download() error is", "${e}");
     print("downloadHttp error is" + e);
   }
 }

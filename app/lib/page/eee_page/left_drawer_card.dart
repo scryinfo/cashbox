@@ -78,7 +78,6 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                 ),
                 onTap: () {
                   NavigatorUtils.push(context, Routes.minePage);
-                  print("it is mine");
                 }),
           ),
           Container(
@@ -97,7 +96,6 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   ),
                 ),
                 onTap: () {
-                  print("it is ic_nav_public");
                   NavigatorUtils.push(context, Routes.publicPage);
                 }),
           ),
@@ -117,7 +115,6 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   ),
                 ),
                 onTap: () {
-                  print("it is ic_nav_public");
                   NavigatorUtils.push(context, Routes.dappDemoPage);
                 }),
           ),
