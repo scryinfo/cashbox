@@ -22,6 +22,7 @@ import 'package:app/page/transaction_detail_page/eee_transactin_detail_page.dart
 import '../page/about_us_page/about_us_page.dart';
 import 'package:app/demo/dapp_webview_demo.dart';
 import 'package:app/page/dapp_page/dapp_page.dart';
+import 'package:app/page/create_test_wallet_page/create_test_wallet_page.dart';
 
 Handler splashPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -135,4 +136,9 @@ Handler transactionEeeDetailHandler = Handler(
 Handler aboutUsPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return AboutUsPage();
+});
+
+Handler createTestWalletHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return CreateTestWalletPage();
 });

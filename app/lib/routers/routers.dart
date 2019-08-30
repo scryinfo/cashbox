@@ -26,6 +26,7 @@ class Routes {
   static String transactionHistoryPage = '/transactionhistorypage';
   static String transactionEeeDetailPage = '/transactioneeedetailpage';
   static String aboutUsPage = '/aboutuspage';
+  static String createTestWalletPage = '/createtestwalletpage';
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = Handler(
@@ -59,5 +60,6 @@ class Routes {
     router.define(transactionHistoryPage, handler: transactionHistoryHandler);
     router.define(transactionEeeDetailPage,
         handler: transactionEeeDetailHandler);
+    router.define(createTestWalletPage, handler: createTestWalletHandler);
   }
 }
