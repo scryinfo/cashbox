@@ -1,19 +1,37 @@
-import 'package:app/res/resources.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../res/resources.dart';
 
-class ProgressDialog extends StatefulWidget {
-//  final String title;
-//  final String hintContent;
-//  final String hintInput;
+class ProgressDialog extends Dialog {
+  ProgressDialog({Key key, this.hintText}) : super(key: key);
 
-  @override
-  _ProgressDialogState createState() => _ProgressDialogState();
-}
+  final String hintText;
 
-class _ProgressDialogState extends State<ProgressDialog> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Material(
+      type: MaterialType.transparency,
+      child: Center(
+        child: Container(
+          height: 88.0,
+          width: 120.0,
+          decoration: ShapeDecoration(
+              color: Color(0xFF3A3A3A),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)))),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              CupertinoActivityIndicator(radius: 14.0),
+              Gaps.vGap8,
+              Text(
+                hintText,
+                style: TextStyle(color: Colors.white),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
