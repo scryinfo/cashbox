@@ -14,9 +14,9 @@ public class NativeLib {
         public static final int EEE_TEST = 6;
     }
 
-    private interface WalletType{
-        public static final int TEST_WALLET = 0;
-        public static final int WALLET = 1;
+    public enum WalletType{
+        TEST_WALLET,
+        WALLET
     }
 
     //通信消息 状态码
@@ -75,6 +75,7 @@ public class NativeLib {
         public int status;  //状态码
         public String walletId;
         public String walletName;
+        public WalletType walletType;
         public EeeChain eeeChain;
         public EthChain ethChain;
         public BtcChain btcChain;
