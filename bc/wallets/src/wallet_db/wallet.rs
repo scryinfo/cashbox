@@ -1,4 +1,4 @@
-use log::{error, debug};
+use log::{error};
 
 use crate::model::wallet_store::{TbAddress, WalletObj, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
@@ -59,11 +59,11 @@ impl DataServiceProvider {
                             Ok(_) => {
                                 // TODO 后续来完善需要更新的数据详情
                                 let eee_digit_account_sql = format!("insert into detail.EeeDigit(address_id) values('{}');", addr.address_id);
-                                let eth_digit_account_sql = format!("insert into detail.EthDigit(address_id) values('{}');", addr.address_id);
-                                let btc_digit_account_sql = format!("insert into detail.BtcDigit(address_id) values('{}');", addr.address_id);
+                               //let eth_digit_account_sql = format!("insert into detail.EthDigit(address_id) values('{}');", addr.address_id);
+                                //let btc_digit_account_sql = format!("insert into detail.BtcDigit(address_id) values('{}');", addr.address_id);
                                 self.db_hander.execute(eee_digit_account_sql).expect("update selected state");
-                                self.db_hander.execute(eth_digit_account_sql).expect("update selected state");
-                                self.db_hander.execute(btc_digit_account_sql).expect("update selected state");
+                                //self.db_hander.execute(eth_digit_account_sql).expect("update selected state");
+                                //self.db_hander.execute(btc_digit_account_sql).expect("update selected state");
                                 /*   match self.db_hander.prepare(digit_account_sql) {
                                        Ok(mut digit_stat) => {
                                            digit_stat.bind(1, addr.address_id.as_str()).expect("save_mnemonic_address digit_stat bind addr.address ");
@@ -79,6 +79,9 @@ impl DataServiceProvider {
                 }
                 Err(e) => Err(e.to_string())
             };
+            if save_address_flag.is_err() {
+                // TODO 添加事务的处理
+            }
         }
         Ok(())
     }
@@ -88,6 +91,34 @@ impl DataServiceProvider {
         let query_sql = "select * from Wallet where wallet_id = ?";
         let mut statement = self.db_hander.prepare(query_sql).unwrap();
         statement.bind(1, id).expect("query_by_mnemonic_id bind id");
+        let mut cursor = statement.cursor();
+
+        match cursor.next().unwrap() {
+            Some(value) => {
+                let wallet = TbWallet {
+                    wallet_id: String::from(value[0].as_string().unwrap()),
+                    mn_digest: String::from(value[1].as_string().unwrap()),
+                    full_name: value[2].as_string().map(|str| String::from(str)),
+                    mnemonic: String::from(value[3].as_string().unwrap()),
+                    wallet_type: value[4].as_integer().unwrap(),
+                    selected: value[5].as_integer().map(|num| if num == 1 { true } else { false }),
+                    status: value[6].as_integer().unwrap(),
+                    create_time: String::from(value[7].as_string().unwrap()),
+                    update_time: value[8].as_string().map(|str| String::from(str)),
+                };
+                Some(wallet)
+            }
+            None => {
+                None
+            }
+        }
+    }
+
+    //这个地方 定义成通用的对象查询功能
+    pub fn query_by_wallet_digest(&self, digest: &str) -> Option<TbWallet> {
+        let query_sql = "select * from Wallet where mn_digest = ?";
+        let mut statement = self.db_hander.prepare(query_sql).unwrap();
+        statement.bind(1, digest).expect("query_by_mnemonic_id bind id");
         let mut cursor = statement.cursor();
 
         match cursor.next().unwrap() {

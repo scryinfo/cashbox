@@ -8,9 +8,6 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
     let eth_chain = instance.display_eee_chain();
 
     let mut last_wallet_id = String::from("-1");
-
-    let mut last_chain_id = String::new();
-
     let mut chain_index = 0;
 
     let mut eth_map = HashMap::new();
@@ -29,12 +26,8 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
 
                     //使用last_wallet_id 标识上一个钱包id,当钱包发生变化的时候，表示当前迭代的数据是新钱包 需要更新wallet_index，标识当前处理的是哪个钱包
                     last_wallet_id = wallet_id.clone();
-                    //开始新的钱包，记录链的标识需要重新开始计算
-                    last_chain_id = String::new();
 
-                }
-                //现在的业务是一个钱包，只有这一种类型的链，比如 Eth 只存在主链 没有另外的链，以下判断可以不需要
-                if last_chain_id.ne(&chain_id) {
+                    //现在的业务是一个钱包，只有这一种类型的链，比如 Eth 只存在主链 没有另外的链，以下判断可以不需要
                     //这个地方需要重新来处理链的关系
                     let chain = EthChain {
                         status: StatusCode::OK,
@@ -52,8 +45,7 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
                         digit_list: Vec::new(),
                     };
                     //记录该链在钱包下的序号，因为usize 不能为负数，所有在这个地方先使用+1 来标识一个钱包下链的顺序
-                    chain_index = chain_index + 1;
-                    last_chain_id = chain_id.clone();
+                    chain_index = 0;
                     eth_map.insert(wallet_id.clone(), vec![chain]);
                 }
                 let digit_id = format!("{}", tbwallet.digit_id.unwrap());
@@ -72,7 +64,7 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
                 };
                 let vec_eth_chain = eth_map.get_mut(wallet_id.as_str()).unwrap();
 
-                let chain_list = vec_eth_chain.get_mut(chain_index - 1).unwrap();
+                let chain_list = vec_eth_chain.get_mut(chain_index).unwrap();
                 chain_list.digit_list.push(digit);
             }
             Ok(eth_map)
@@ -87,9 +79,6 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
     let btc_chain = instance.display_btc_chain();
 
     let mut last_wallet_id = String::from("-1");
-
-    let mut last_chain_id = String::new();
-
     let mut chain_index = 0;
 
     let mut btc_map = HashMap::new();
@@ -109,11 +98,6 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
                     //使用last_wallet_id 标识上一个钱包id,当钱包发生变化的时候，表示当前迭代的数据是新钱包 需要更新wallet_index，标识当前处理的是哪个钱包
                     last_wallet_id = wallet_id.clone();
                     //开始新的钱包，记录链的标识需要重新开始计算
-                    last_chain_id = String::new();
-
-                }
-                //现在的业务是一个钱包，只有这一种类型的链，比如 Eth 只存在主链 没有另外的链，以下判断可以不需要
-                if last_chain_id.ne(&chain_id) {
                     //这个地方需要重新来处理链的关系
                     let chain = BtcChain {
                         status: StatusCode::OK,
@@ -131,8 +115,7 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
                         digit_list: Vec::new(),
                     };
                     //记录该链在钱包下的序号，因为usize 不能为负数，所有在这个地方先使用+1 来标识一个钱包下链的顺序
-                    chain_index = chain_index + 1;
-                    last_chain_id = chain_id.clone();
+                    chain_index = 0;
                     btc_map.insert(wallet_id.clone(), vec![chain]);
                 }
                 let digit_id = format!("{}", tbwallet.digit_id.unwrap());
@@ -151,7 +134,7 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
                 };
                 let vec_eth_chain = btc_map.get_mut(wallet_id.as_str()).unwrap();
 
-                let chain_list = vec_eth_chain.get_mut(chain_index - 1).unwrap();
+                let chain_list = vec_eth_chain.get_mut(chain_index).unwrap();
                 chain_list.digit_list.push(digit);
             }
             Ok(btc_map)
