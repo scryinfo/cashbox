@@ -33,17 +33,22 @@ class WalletManager {
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
   // apiNo:WM03
-  static Future<Map<dynamic, dynamic>> saveWallet(
-      String walletName, Uint8List pwd, Uint8List mnemonic) async {
-    Map<dynamic, dynamic> wallet = await _channel.invokeMethod('saveWallet',
-        {"walletName": walletName, "pwd": pwd, "mnemonic": mnemonic});
+  static Future<Map<dynamic, dynamic>> saveWallet(String walletName,
+      Uint8List pwd, Uint8List mnemonic, int walletType) async {
+    Map<dynamic, dynamic> wallet = await _channel.invokeMethod('saveWallet', {
+      "walletName": walletName,
+      "pwd": pwd,
+      "mnemonic": mnemonic,
+      "walletType": walletType
+    });
     print("saveWallet===>" + wallet["walletName"]);
     return null;
   }
 
   // 钱包导出。 恢复钱包
   // apiNo:WM04
-  static Future<Map<dynamic, dynamic>> exportWallet(String walletId, Uint8List pwd) async {
+  static Future<Map<dynamic, dynamic>> exportWallet(
+      String walletId, Uint8List pwd) async {
     Map<dynamic, dynamic> wallet = await _channel
         .invokeMethod('exportWallet', {pwd: pwd, walletId: walletId});
     return wallet;

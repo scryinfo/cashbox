@@ -207,10 +207,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
+                Log.d("nativeLib=>", "wallet.status is " + wallet.status);
                 if (wallet.status == 200) {
-                    Log.d("nativeLib=>", "walletState.status is " + wallet.status);
                     //todo
-
                     //result.success(wallet.isResetPwd);
                 } else {
                     result.error("something wrong", "", "");
@@ -222,6 +221,18 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "rename": {
                 Log.d("nativeLib=>", "begin to rename =>");
                 WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.rename((String) (call.argument("walletId")), (String) (call.argument("walletName")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Log.d("nativeLib=>", "walletState.status is " + walletState.status);
+                if (walletState.status == 200) {
+                    //todo
+                    result.success(walletState.isRename);
+                } else {
+                    result.error("something wrong", "", "");
+                }
                 break;
             }
             // apiNo:WM10

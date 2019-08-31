@@ -62,10 +62,20 @@ class Wallets {
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
   // apiNo:WM03
-  Future<Wallet> saveWallet(
-      String walletName, Uint8List pwd, Uint8List mnemonic) async {
+  Future<Wallet> saveWallet(String walletName, Uint8List pwd,
+      Uint8List mnemonic, WalletType walletType) async {
     Wallet wallet = Wallet();
-    var result = await WalletManager.saveWallet(walletName, pwd, mnemonic);
+    int walletTypeToInt = 0;
+    switch (walletType) {
+      case WalletType.WALLET:
+        walletTypeToInt = 0;
+        break;
+      default:
+        walletTypeToInt = 1;
+        break;
+    }
+    var result = await WalletManager.saveWallet(
+        walletName, pwd, mnemonic, walletTypeToInt);
     // 创建钱包接口，传参数 钱包名walletname+密码pwd，底层操作，创建好钱包、链、代币。
     // 返回是否创建钱包成功，跟钱包上所有关联的信息。
     // todo result数据格式转换，返回
