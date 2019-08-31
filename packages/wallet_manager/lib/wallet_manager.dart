@@ -41,7 +41,7 @@ class WalletManager {
       "mnemonic": mnemonic,
       "walletType": walletType
     });
-    print("saveWallet===>" + wallet["walletName"]);
+    print("saveWallet exec finished===>");
     return null;
   }
 
