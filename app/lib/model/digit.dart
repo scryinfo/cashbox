@@ -1,6 +1,6 @@
 import 'package:app/model/rate.dart';
 
-class Digit {
+abstract class Digit {
   String digitId; //代币id
   String chainId; //链id
   String shortName; //缩写名称
@@ -15,25 +15,10 @@ class Digit {
   String lastTxInfo; //链上最后一笔交易
 }
 
-class EeeDigit extends Digit {
-  EeeDigit(digitId, chainId) {
-    this.chainId = chainId;
-    this.digitId = digitId;
-  }
-}
+class EeeDigit extends Digit {}
 
-class BtcDigit extends Digit {
-  BtcDigit(digitId, chainId) {
-    this.chainId = chainId;
-    this.digitId = digitId;
-  }
-}
+class BtcDigit extends Digit {}
 
 class EthDigit extends Digit {
-  EthDigit(digitId, chainId) {
-    this.chainId = chainId;
-    this.digitId = digitId;
-  }
-
   String contractAddress; //合约地址
 }

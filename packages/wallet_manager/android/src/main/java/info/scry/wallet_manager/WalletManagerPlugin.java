@@ -64,7 +64,6 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM01
             case "isContainWallet": {
-                Log.d("nativeLib=>", "isContainWallet is enter =>");
                 WalletState walletState = new NativeLib.WalletState();
                 try {
                     walletState = (NativeLib.WalletState) (NativeLib.isContainWallet());
@@ -96,12 +95,18 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                     walletMap.put("walletId", walletList.get(i).walletId);
                     walletMap.put("walletName", walletList.get(i).walletName);
-                    walletMap.put("walletType", walletList.get(i).walletType);
+                    //walletMap.put("walletType", walletList.get(i).walletType);
                     walletMap.put("nowChainId", walletList.get(i).nowChainId);
                     walletMap.put("creationTime", walletList.get(i).creationTime);
 
-                    /*---------------------组装eee链上数据 start-------------------------*/
+                    /*-------------------------组装eee链上数据 start-------------------------*/
                     Map<String, Object> resultEeeChain = new HashMap<>();
+                    resultEeeChain.put("chainAddress", walletList.get(i).eeeChain.chainAddress);
+                    resultEeeChain.put("chainId", walletList.get(i).eeeChain.chainId);
+                    resultEeeChain.put("chainType", walletList.get(i).eeeChain.chainType);
+                    resultEeeChain.put("isVisible", walletList.get(i).eeeChain.isVisible);
+                    resultEeeChain.put("status", walletList.get(i).eeeChain.status);
+                    resultEeeChain.put("walletId", walletList.get(i).eeeChain.walletId);
                     List<Map<String, Object>> eeeChainDigitList = new ArrayList<>();
                     List<EeeDigit> eeeDigitList = walletList.get(i).eeeChain.digitList;
                     for (int j = 0; j < eeeDigitList.size(); j++) {
@@ -120,16 +125,10 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         eeeChainDigitList.add(digitMap);
                     }
                     resultEeeChain.put("eeeChainDigitList", eeeChainDigitList);
-                    resultEeeChain.put("chainAddress", walletList.get(i).eeeChain.chainAddress);
-                    resultEeeChain.put("chainId", walletList.get(i).eeeChain.chainId);
-                    resultEeeChain.put("chainType", walletList.get(i).eeeChain.chainType);
-                    resultEeeChain.put("isVisible", walletList.get(i).eeeChain.isVisible);
-                    resultEeeChain.put("status", walletList.get(i).eeeChain.status);
-                    resultEeeChain.put("walletId", walletList.get(i).eeeChain.walletId);
-                    /*--------------------组装eee链上数据 end--------------------------*/
+                    Log.d("nativeLib=>", "组装完EEE result resultEeeChain is ===>" + resultEeeChain.toString());
+                    /*-------------------------组装eee链上数据 end---------------------------*/
 
-                    Log.d("nativeLib=>", "resultEeeChain is ===>" + resultEeeChain.toString());
-
+                    /*-------------------------组装ETH链上数据 start-------------------------*/
                     List<Map<String, Object>> resultEthChain = new ArrayList<>();
                     if (walletList.get(i).ethChain != null) {
                         List<EthDigit> ethDigitList = walletList.get(i).ethChain.digitList;
@@ -137,7 +136,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                             //todo
                         }
                     }
+                    /*-------------------------组装ETH链上数据 end---------------------------*/
 
+                    /*-------------------------组装BTC链上数据 start-------------------------*/
                     List<Map<String, Object>> resultBtcChain = new ArrayList<>();
                     if (walletList.get(i).btcChain != null) {
                         List<BtcDigit> btcDigitList = walletList.get(i).btcChain.digitList;
@@ -145,13 +146,16 @@ public class WalletManagerPlugin implements MethodCallHandler {
                             //todo
                         }
                     }
+                    /*-------------------------组装BTC链上数据 end -------------------------*/
 
-                    /*---------------------每个钱包再加入组装好的各条链的信息-------------------------*/
+                    ///每个钱包再加入组装好的各条链的信息
                     walletMap.put("eeeChain", resultEeeChain);
                     walletMap.put("ethChain", resultEthChain);
                     walletMap.put("btcChain", resultBtcChain);
+
+                    ///钱包列表，加入拼装好的钱包
                     resultWalletList.add(walletMap);
-                    Log.d("nativeLib=>", "resultWalletList is ===>" + resultWalletList.toString());
+                    Log.d("nativeLib=>", "拼装好的钱包  resultWalletList is ===>" + resultWalletList.toString());
                 }
                 result.success(resultWalletList);
                 break;

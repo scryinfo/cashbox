@@ -1,6 +1,8 @@
 import 'dart:typed_data';
-import 'chain.dart';
+
 import 'package:wallet_manager/wallet_manager.dart';
+
+import 'Chain.dart';
 
 enum WalletType { TEST_WALLET, WALLET } //0,1
 
@@ -12,8 +14,9 @@ class Wallet {
   Uint8List secretKey; //私钥                    /* 参数传递，及时释放*/
   String jsonFilePath; //私钥加密文件jsonFile路径
   String creationTime; //钱包创建时间
-  List<Chain> chainList; //钱包内包含链列表
+  List<Chain> chainList = []; //钱包内包含链列表
   String nowChainId; //钱包内，当前链chainId
+  WalletType walletType;
 
   //todo load chain
 
