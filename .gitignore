@@ -1,3 +1,4 @@
+!.gitkeep
 *.idea
 /app/android/app/src/debug
 /app/pubspec.lock
