@@ -14,7 +14,7 @@ public class NativeLib {
         public static final int EEE_TEST = 6;
     }
 
-    public enum WalletType{
+    public enum WalletType {
         TEST_WALLET,
         WALLET
     }
@@ -180,7 +180,7 @@ public class NativeLib {
 
     // 保存钱包
     // apiNo:WM03 fixed
-    public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic,WalletType walletType);
+    public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic, int walletType);
 
     // 钱包导出。 恢复钱包
     // apiNo:WM04

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 
 class WalletManagerTest {
@@ -11,8 +12,8 @@ class WalletManagerTest {
   //fixed  todo chainList
   static void saveWallet() async {
     var mnemonic = await Wallets.instance.createMnemonic(12);
-    var wallet = await Wallets.instance.saveWallet(
-        "thisWall33etName", Uint8List.fromList("666".codeUnits), mnemonic.mn);
+    var wallet = await Wallets.instance.saveWallet("thisWall33etName",
+        Uint8List.fromList("666".codeUnits), mnemonic.mn, WalletType.WALLET);
   }
 
   //fixed
@@ -46,9 +47,12 @@ class WalletManagerTest {
 
   static void resetPwd() async {
     var allWalletList = await Wallets.instance.loadAllWalletList();
-    print("wallet_manager_test allWalletList=>" + allWalletList.length.toString());
+    print("wallet_manager_test allWalletList=>" +
+        allWalletList.length.toString());
     print("wallet_manager_test allWalletList=>" + allWalletList[0].toString());
-    var isSuccess = allWalletList[0].resetPwd(Uint8List.fromList("777".codeUnits),Uint8List.fromList("666".codeUnits));
+    var isSuccess = allWalletList[0].resetPwd(
+        Uint8List.fromList("777".codeUnits),
+        Uint8List.fromList("666".codeUnits));
     print("wallet_manager_test resetPwd=>" + isSuccess.toString());
   }
 }

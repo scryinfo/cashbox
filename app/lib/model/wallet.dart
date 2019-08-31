@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import 'chain.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 
+enum WalletType { TEST_WALLET, WALLET } //0,1
+
 class Wallet {
   String walletId; //钱包Id
   String walletName; //钱包名
