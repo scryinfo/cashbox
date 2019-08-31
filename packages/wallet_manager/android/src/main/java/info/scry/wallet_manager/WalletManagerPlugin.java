@@ -97,6 +97,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     walletMap.put("walletId", walletList.get(i).walletId);
                     walletMap.put("walletName", walletList.get(i).walletName);
                     walletMap.put("walletType", walletList.get(i).walletType);
+                    walletMap.put("nowChainId", walletList.get(i).nowChainId);
+                    walletMap.put("creationTime", walletList.get(i).creationTime);
 
                     /*---------------------组装eee链上数据 start-------------------------*/
                     Map<String, Object> resultEeeChain = new HashMap<>();
