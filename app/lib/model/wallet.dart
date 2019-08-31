@@ -13,7 +13,7 @@ class Wallet {
   String jsonFilePath; //私钥加密文件jsonFile路径
   String creationTime; //钱包创建时间
   List<Chain> chainList; //钱包内包含链列表
-  Chain nowChain;
+  String nowChainId; //钱包内，当前链chainId
 
   //todo load chain
 
@@ -68,7 +68,7 @@ class Wallet {
     var isSuccess = await WalletManager.setNowChain(walletId, chainType);
     //todo 等待底层处理完成，更改 数据模型处。
     if (isSuccess) {
-      this.nowChain = nowChain;
+      //todo
     }
     return isSuccess;
   }

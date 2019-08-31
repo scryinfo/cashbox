@@ -80,6 +80,8 @@ public class NativeLib {
         public EthChain ethChain;
         public BtcChain btcChain;
         public String message;
+        public String nowChainId; //当前链id
+        public String createTime; //钱包创建时间,单位：秒
     }
 
     public static class EeeChain {

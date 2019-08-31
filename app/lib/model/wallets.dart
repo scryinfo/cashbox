@@ -52,9 +52,10 @@ class Wallets {
     if (jniList.isNotEmpty) {
       for (var i = 0; i < jniList.length; i++) {
         var walletM = Wallet();
-        //walletM.walletName = jniList[i]["walletName"].toString();
-        //walletM.walletId = jniList[i]["walletId"].toString();
-        //allWalletList.add(walletM);
+        walletM.walletName = jniList[i]["walletName"].toString();
+        walletM.walletId = jniList[i]["walletId"].toString();
+        print("wallets walletM is=======>" + i.toString() + "||" + walletM.toString());
+        allWalletList.add(walletM);
       }
     }
     return null;
