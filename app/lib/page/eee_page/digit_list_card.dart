@@ -86,7 +86,7 @@ class _DigitListCardState extends State<DigitListCard>
               () {
                 //todo 根据 JNI walletlist每次refreshDataList +15条显示数据
                 for (var i = 0; i < 10; i++) {
-                  Digit digit = Digit();
+                  Digit digit = EthDigit();
                   digit.chainId = "BTC66666";
                   digit.shortName = "BTC" + i.toString();
                   digit.fullName = "Bitcoin";
@@ -238,7 +238,7 @@ class _DigitListCardState extends State<DigitListCard>
     //walletDataList = walletManage.nowWallet.noChain.loadDigits()
     //showDataList = walletDataList[10];
     for (var i = 0; i < 10; i++) {
-      Digit digit = Digit();
+      Digit digit = EthDigit();
       digit.chainId = "BTC66666";
       digit.shortName = "ETH" + i.toString();
       digit.fullName = "ETHereum";

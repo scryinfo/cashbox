@@ -1,7 +1,11 @@
 import 'package:app/model/mnemonic.dart';
+import 'package:app/model/wallet.dart';
 import 'package:wallet_manager/wallet_manager.dart';
-import '../model/wallet.dart';
+
 import 'dart:typed_data';
+
+import 'Chain.dart';
+import 'Digit.dart';
 
 //钱包管理
 class Wallets {
@@ -48,17 +52,51 @@ class Wallets {
   Future<List<Wallet>> loadAllWalletList() async {
     var allWalletList = List<Wallet>();
     var jniList = await WalletManager.loadAllWalletList();
-    print("jniList=====>" + jniList.toString());
+    print("dart ==> jniList=====>" + jniList.toString());
     if (jniList.isNotEmpty) {
       for (var i = 0; i < jniList.length; i++) {
         var walletM = Wallet();
         walletM.walletName = jniList[i]["walletName"].toString();
         walletM.walletId = jniList[i]["walletId"].toString();
-        print("wallets walletM is=======>" + i.toString() + "||" + walletM.toString());
+        //walletM.walletType = jniList[i]["walletType"];//todo 数据格式更改
+        walletM.nowChainId = jniList[i]["nowChainId"].toString();
+        walletM.creationTime = jniList[i]["creationTime"].toString();
+
+        var eeeChain = jniList[i]["eeeChain"];
+
+        Chain chainEeeM = ChainEEE();
+        chainEeeM.chainId = eeeChain["chainId"];
+        chainEeeM.chainAddress = eeeChain["chainAddress"];
+        chainEeeM.chainType = eeeChain["chainType"];
+        chainEeeM.isVisible = eeeChain["isVisible"];
+        chainEeeM.walletId = eeeChain["walletId"];
+
+        List eeeChainDigitList = eeeChain["eeeChainDigitList"];
+        for (var j = 0; j < eeeChainDigitList.length; j++) {
+          var digit = eeeChainDigitList[j];
+          Digit digitM = EeeDigit();
+          digitM.digitId = digit["digitId"];
+          digitM.chainId = digit["chainId"];
+          digitM.address = digit["address"];
+          digitM.shortName = digit["shortName"];
+          digitM.fullName = digit["fullName"];
+          digitM.balance = digit["balance"];
+          digitM.isVisible = digit["isVisible"];
+          digitM.decimal = digit["decimal"];
+          digitM.urlImg = digit["imgUrl"];
+
+          ///将digit 添加到digitList里面
+          chainEeeM.digitsList.add(digitM);
+        }
+
+        ///将chain 添加到chainList里面
+        walletM.chainList.add(chainEeeM);
+
+        ///将wallet 添加到walletList里面
         allWalletList.add(walletM);
       }
     }
-    return null;
+    return allWalletList;
   }
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程

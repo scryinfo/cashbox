@@ -1,17 +1,14 @@
-import 'digit.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 
-class Chain {
+import 'Digit.dart';
+
+abstract class Chain {
   String chainId; //链Id
   String walletId; //钱包Id
   String chainAddress; //链地址
-  List<Digit> digitsList;
+  List<Digit> digitsList = [];
   bool isVisible = true; //默认链可见
   ChainType chainType;
-
-  Digit createNowChainDigit() {
-    return Digit();
-  }
 
   //跟jni接口处，定义一致  NativeLib.ChainType
   int chainTypeToInt(ChainType chainType) {
@@ -142,12 +139,4 @@ class ChainBTC extends Chain {
   ChainType get chainType => ChainType.BTC;
 }
 
-class ChainEEE extends Chain {
-  ChainEEE(chainId, walletId) {
-    this.chainId = chainId;
-    this.walletId = walletId;
-  }
-
-  @override
-  ChainType get chainType => ChainType.EEE;
-}
+class ChainEEE extends Chain {}
