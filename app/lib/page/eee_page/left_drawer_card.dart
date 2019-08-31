@@ -1,4 +1,4 @@
-import 'package:app/model/Wallet.dart';
+import 'package:app/model/wallet.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

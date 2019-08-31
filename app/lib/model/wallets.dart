@@ -1,6 +1,6 @@
 import 'package:app/model/mnemonic.dart';
 import 'package:wallet_manager/wallet_manager.dart';
-import '../model/Wallet.dart';
+import '../model/wallet.dart';
 import 'dart:typed_data';
 
 //钱包管理

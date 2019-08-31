@@ -1,5 +1,5 @@
 import 'dart:typed_data';
-import 'Chain.dart';
+import 'chain.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 
 class Wallet {
