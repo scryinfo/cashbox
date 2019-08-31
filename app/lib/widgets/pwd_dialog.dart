@@ -85,13 +85,11 @@ class PwdDialog extends StatelessWidget {
         new FlatButton(
           child: new Text('确定'),
           onPressed: () {
-
-            if (_controller.text.isEmpty){
-              Fluttertoast.showToast(msg:"请输入${title}");
+            if (_controller.text.isEmpty) {
+              Fluttertoast.showToast(msg: "请输入${title}");
               return;
             }
             onPressed(_controller.text);
-            NavigatorUtils.goBack(context);
           },
         ),
         new FlatButton(

@@ -1,35 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../../res/resources.dart';
-import '../../routers/application.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
-import 'package:app/util/qr_scan_util.dart';
 import '../../widgets/list_item.dart';
 import '../../widgets/pwd_dialog.dart';
 
-class WalletManagerPage extends StatefulWidget {
-  @override
-  _WalletManagerPageState createState() => _WalletManagerPageState();
-}
+class WalletManagerPage extends StatelessWidget {
+  final List funcList = ["重置密码", "备份钱包"]; //todo 2.0 "编辑链",
+  final List funcRouter = [Routes.resetPwdPage, Routes.recoverWalletPage];
+  static final String DELETE_WALLET = "删除钱包";
+  final TextEditingController _walletNameController = TextEditingController();
 
-class _WalletManagerPageState extends State<WalletManagerPage> {
-  List funcList = ["重置密码", "备份钱包"]; //todo 2.0 "编辑链",
-  List funcRouter = [Routes.resetPwdPage, Routes.recoverWalletPage];
-  static const String DELETE_WALLET = "删除钱包";
-  TextEditingController _walletNameController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _walletNameController.text = "666"; //todo init walletName
-  }
+  void _initData() {}
 
   @override
   Widget build(BuildContext context) {
+    _initData();
+    return _buildWalletManagerLayout(context);
+  }
+
+  Widget _buildWalletManagerLayout(BuildContext context) {
     return Container(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -43,34 +36,30 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
             FocusScope.of(context).requestFocus(FocusNode());
             //todo 更改钱包名
           },
-          child: _buildWalletManagerWidget(),
+          child: Container(
+              width: ScreenUtil().setWidth(90),
+              height: ScreenUtil().setHeight(160),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: AssetImage("assets/images/bg_graduate.png"),
+                ),
+              ),
+              child: Column(
+                children: <Widget>[
+                  Gaps.scaleVGap(5),
+                  _buildWalletNameWidget(context),
+                  _buildResetPwdWidget(context),
+                  _buildRecoverWalletWidget(context),
+                  _buildDeleteWalletWidget(context),
+                ],
+              )),
         ),
       ),
     );
   }
 
-  Widget _buildWalletManagerWidget() {
-    return Container(
-        width: ScreenUtil().setWidth(90),
-        height: ScreenUtil().setHeight(160),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            fit: BoxFit.fill,
-            image: AssetImage("assets/images/bg_graduate.png"),
-          ),
-        ),
-        child: Column(
-          children: <Widget>[
-            Gaps.scaleVGap(5),
-            _buildWalletNameWidget(),
-            _buildResetPwdWidget(),
-            _buildRecoverWalletWidget(),
-            _buildDeleteWalletWidget(),
-          ],
-        ));
-  }
-
-  Widget _buildDeleteWalletWidget() {
+  Widget _buildDeleteWalletWidget(context) {
     return GestureDetector(
       onTap: () {
         showDialog(
@@ -101,7 +90,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
     );
   }
 
-  Widget _buildWalletNameWidget() {
+  Widget _buildWalletNameWidget(context) {
     return Container(
       child: Column(
         children: <Widget>[
@@ -146,7 +135,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
     );
   }
 
-  Widget _buildResetPwdWidget() {
+  Widget _buildResetPwdWidget(context) {
     return Container(
       child: GestureDetector(
         onTap: () {
@@ -168,7 +157,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
     );
   }
 
-  Widget _buildRecoverWalletWidget() {
+  Widget _buildRecoverWalletWidget(context) {
     return Container(
       child: GestureDetector(
         onTap: () {
@@ -176,16 +165,23 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
             context: context,
             builder: (BuildContext context) {
               return PwdDialog(
-                  title: "恢复钱包",
-                  hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
-                  hintInput: "请输入钱包密码",
-                  onPressed: (value) {
-                    //todo
-                    print("to do verify pwd，recover wallet");
-                  });
+                title: "恢复钱包",
+                hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
+                hintInput: "请输入钱包密码",
+                onPressed: (value) {
+                  //todo
+                  print("to do verify pwd，recover wallet======>");
+                  try {
+                    NavigatorUtils.push(context, Routes.recoverWalletPage);
+                  } on Exception catch (e) {
+                    print(
+                        "buildRecoverWalletWidget error is =>" + e.toString());
+                  }
+                },
+              );
             },
           );
-          //NavigatorUtils.push(context, Routes.recoverWalletPage);
+          //
         },
         child: Container(
           child: Column(
@@ -201,30 +197,5 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
         ),
       ),
     );
-  }
-
-  List<Widget> _buildWalletFuncList() {
-    List<Widget> walletFuncList = List.generate(funcList.length, (index) {
-      return Container(
-        child: GestureDetector(
-          onTap: () {
-            NavigatorUtils.push(context, funcRouter[index]);
-          },
-          child: Container(
-            child: Column(
-              children: <Widget>[
-                Gaps.scaleVGap(5),
-                Container(
-                  child: ItemOfListWidget(
-                    leftText: funcList[index],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    });
-    return walletFuncList;
   }
 }
