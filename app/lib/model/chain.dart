@@ -1,4 +1,4 @@
-import 'Digit.dart';
+import 'digit.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 
 class Chain {

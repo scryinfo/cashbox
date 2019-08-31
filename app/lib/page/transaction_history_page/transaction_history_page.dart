@@ -1,4 +1,4 @@
-import 'package:app/model/Digit.dart';
+import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
