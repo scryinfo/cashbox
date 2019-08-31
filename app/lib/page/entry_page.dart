@@ -11,12 +11,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../test/wallet_manager_test.dart';
 
-class SplashPage extends StatefulWidget {
+class EntryPage extends StatefulWidget {
   @override
-  _SplashPageState createState() => _SplashPageState();
+  _EntryPageState createState() => _EntryPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _EntryPageState extends State<EntryPage> {
   var allWalletList = List();
   bool _agreeServiceProtocol = true;
   bool isContainWallet = false;
