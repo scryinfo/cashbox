@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
-import '../page/splash_page.dart';
+import '../page/entry_page.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import '../page/public_page/public_page.dart';
 import '../page/create_wallet_page/create_wallet_name_page.dart';
@@ -24,9 +24,9 @@ import 'package:app/demo/dapp_webview_demo.dart';
 import 'package:app/page/dapp_page/dapp_page.dart';
 import 'package:app/page/create_test_wallet_page/create_test_wallet_page.dart';
 
-Handler splashPageHandler = Handler(
+Handler entryPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return SplashPage();
+  return EntryPage();
 });
 
 Handler eeePageHandler = Handler(
