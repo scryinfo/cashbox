@@ -80,7 +80,8 @@ public class NativeLib {
         public EthChain ethChain;
         public BtcChain btcChain;
         public String message;
-        public String nowChainId; //当前链id
+        public String nowChainId;   //当前链id
+        public boolean nowWallet    //是不是当前钱包
         public String creationTime; //钱包创建时间,单位：秒
     }
 
