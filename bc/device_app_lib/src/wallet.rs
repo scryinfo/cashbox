@@ -124,7 +124,7 @@ pub mod android {
 
         env.set_field(jobj, "creationTime", "Ljava/lang/String;", JValue::Object(wallet_create_time_obj)).expect("find creationTime ");
         env.set_field(jobj, "nowChainId", "Ljava/lang/String;", JValue::Object(display_chain_id__obj)).expect("nowChainId");
-        env.set_field(jobj, "nowWallet", "Z", JValue::Bool(wallet.selected as u8)).expect("set isVisible value is error!");
+        env.set_field(jobj, "isNowWallet", "Z", JValue::Bool(wallet.selected as u8)).expect("set isVisible value is error!");
 
         let wallet_type_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletType").expect("NativeLib$WalletType ");
 
