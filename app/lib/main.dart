@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'page/splash_page.dart';
+import 'page/entry_page.dart';
 import 'package:fluro/fluro.dart';
 import 'routers/routers.dart';
 import 'routers/application.dart';
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       child: MaterialApp(
-        home: SplashPage(),
+        home: EntryPage(),
         onGenerateRoute: Application.router.generator,
       ),
     );
