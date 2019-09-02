@@ -169,6 +169,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
             alignment: Alignment.center,
             child: TextField(
               textAlign: TextAlign.start,
+              obscureText: true,
               style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
@@ -218,6 +219,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
             alignment: Alignment.center,
             child: TextField(
               textAlign: TextAlign.start,
+              obscureText: true,
               style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),

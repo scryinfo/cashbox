@@ -98,6 +98,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                     walletMap.put("walletId", walletList.get(i).walletId);
                     walletMap.put("walletName", walletList.get(i).walletName);
+                    walletMap.put("nowWallet", walletList.get(i).nowWallet);
+                    Log.d("nativeLib=>", "nowWallet is =>" + walletList.get(i).nowWallet + "");
                     //walletMap.put("walletType", walletList.get(i).walletType);
                     walletMap.put("nowChainId", walletList.get(i).nowChainId);
                     walletMap.put("creationTime", walletList.get(i).creationTime);

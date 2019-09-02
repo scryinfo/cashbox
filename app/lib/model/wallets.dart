@@ -62,13 +62,13 @@ class Wallets {
         //walletM.walletType = jniList[i]["walletType"];//todo 数据格式更改
         walletM.nowChainId = jniList[i]["nowChainId"].toString();
         walletM.creationTime = jniList[i]["creationTime"].toString();
-
+        walletM.isNowWallet = jniList[i]["nowWallet"];
         var eeeChain = jniList[i]["eeeChain"];
 
         Chain chainEeeM = ChainEEE();
         chainEeeM.chainId = eeeChain["chainId"];
         chainEeeM.chainAddress = eeeChain["chainAddress"];
-        chainEeeM.chainType = eeeChain["chainType"];
+        chainEeeM.chainType = chainEeeM.intToChainType(eeeChain["chainType"]);
         chainEeeM.isVisible = eeeChain["isVisible"];
         chainEeeM.walletId = eeeChain["walletId"];
 
