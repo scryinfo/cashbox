@@ -1,12 +1,15 @@
 import 'dart:io';
 
+import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'page/entry_page.dart';
 import 'package:fluro/fluro.dart';
 import 'routers/routers.dart';
 import 'routers/application.dart';
 import 'package:app/res/resources.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,17 +31,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          fit: BoxFit.fill,
-          image: AssetImage("assets/images/bg_graduate.png"),
-        ),
-      ),
-      child: MaterialApp(
-        home: EntryPage(),
-        onGenerateRoute: Application.router.generator,
-      ),
-    );
+    return MultiProvider(
+        providers: [
+          /// 注册数据状态管理
+          ChangeNotifierProvider(
+            builder: (_) => CreateWalletProcessProvide(),
+          ),
+        ],
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.fill,
+              image: AssetImage("assets/images/bg_graduate.png"),
+            ),
+          ),
+          child: MaterialApp(
+            home: EntryPage(),
+            onGenerateRoute: Application.router.generator,
+          ),
+        ));
   }
 }

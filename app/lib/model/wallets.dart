@@ -43,8 +43,9 @@ class Wallets {
   // 是否已有钱包
   // apiNo:WM01
   Future<bool> isContainWallet() async {
-    var isExist = await WalletManager.isContainWallet();
-    return isExist;
+    var containWalletMap = await WalletManager.isContainWallet();
+    var isContainWallet = containWalletMap["isContainWallet"];
+    return isContainWallet;
   }
 
   // 导出所有钱包
@@ -101,9 +102,8 @@ class Wallets {
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
   // apiNo:WM03
-  Future<Wallet> saveWallet(String walletName, Uint8List pwd,
-      Uint8List mnemonic, WalletType walletType) async {
-    Wallet wallet = Wallet();
+  Future<bool> saveWallet(String walletName, Uint8List pwd, Uint8List mnemonic,
+      WalletType walletType) async {
     int walletTypeToInt = 0;
     switch (walletType) {
       case WalletType.WALLET:
@@ -113,13 +113,12 @@ class Wallets {
         walletTypeToInt = 1;
         break;
     }
-    var result = await WalletManager.saveWallet(
+    var isSuccessMap = await WalletManager.saveWallet(
         walletName, pwd, mnemonic, walletTypeToInt);
-    // 创建钱包接口，传参数 钱包名walletname+密码pwd，底层操作，创建好钱包、链、代币。
-    // 返回是否创建钱包成功，跟钱包上所有关联的信息。
-    // todo result数据格式转换，返回
-    allWalletList.add(wallet);
-    return null;
+    if (isSuccessMap["status"] == 200) {
+      return true;
+    }
+    return false;
   }
 
   // 钱包导出。 恢复钱包   /* 此处有助记词生成。注意及时释放*/

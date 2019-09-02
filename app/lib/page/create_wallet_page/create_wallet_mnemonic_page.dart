@@ -1,6 +1,11 @@
+import 'package:app/model/mnemonic.dart';
+import 'package:app/model/wallets.dart';
+import 'package:app/provide/create_wallet_process_provide.dart';
+import 'package:app/routers/application.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
 import '../../res/styles.dart';
 import '../../routers/routers.dart';
@@ -12,27 +17,32 @@ class CreateWalletMnemonicPage extends StatefulWidget {
 }
 
 class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
-  //todo mock data
-  List<String> mnemonicList = [
-    "victory",
-    "october",
-    "off",
-    "drink ",
-    "shallow",
-    "actual",
-    "stone",
-    "decade",
-    "victory",
-    "october",
-    "off",
-    "drink "
-  ];
-  String walletName = "mockWalletName";
+  var mnemonicModel = Mnemonic();
+  String walletName = "";
+  List<String> mnemonicList = [];
+  final String qrHintInfo = "这是您助记词信息生成的二维码";
 
   @override
-  void initState() {
-    // init JNI
+  initState() {
     super.initState();
+    _loadMnemonicData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  _loadMnemonicData() async {
+    mnemonicModel = await Wallets.instance.createMnemonic(12);
+    print("mnemonic createWalletMnemonicPage===>" +
+        String.fromCharCodes(mnemonicModel.mn));
+    setState(() {
+      mnemonicList = String.fromCharCodes(mnemonicModel.mn).split(" ");
+      walletName = Provider.of<CreateWalletProcessProvide>(context).walletName;
+    });
+    Provider.of<CreateWalletProcessProvide>(context)
+        .setMnemonic(mnemonicModel.mn);
   }
 
   @override
@@ -112,7 +122,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                 children: <Widget>[
                   GestureDetector(
                     onTap: () {
-                      _changeMnemonic();
+                      _loadMnemonicData();
                     },
                     child: Row(
                       children: <Widget>[
@@ -134,7 +144,8 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                   Container(
                     child: GestureDetector(
                       onTap: () {
-                        _showAddressInQR(context);
+                        _showAddressInQR(context, walletName, qrHintInfo,
+                            mnemonicList.join(" ").toString());
                       },
                       child: Text(
                         "二维码备份",
@@ -156,6 +167,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
               child: FlatButton(
                 onPressed: () {
                   print("clicked the add wallet btn");
+
                   NavigatorUtils.push(context, Routes.createWalletConfirmPage);
                 },
                 child: Text(
@@ -196,33 +208,16 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
     return randomWidgetList;
   }
 
-  _changeMnemonic() {
-    //todo  JNI
-    setState(() {
-      this.mnemonicList = [
-        "666666",
-        "666666",
-        "666666",
-        "666666",
-        "666666",
-        "666666",
-        "666666",
-        "666666",
-        "666666",
-        "666666",
-      ];
-    });
-  }
-
-  _showAddressInQR(context) {
-    String target = "addresspage?walletName=$walletName" +
+  _showAddressInQR(BuildContext context, String walletName, String qrHintInfo,
+      String mnemonicString) {
+    String target = "addresspage?walletName=" +
+        "${walletName}" +
         "&title=" +
-        mnemonicList.join(",").trim().toString() +
+        "" + //todo 中文参数显示异常
         "&content=" +
-        mnemonicList.join(" ");
-    NavigatorUtils.push(
-      context,
-      target,
-    );
+        "${mnemonicString}";
+    print("target==>" + target);
+    Application.router.navigateTo(context, "$target");
+    //NavigatorUtils.push(context,target,);
   }
 }

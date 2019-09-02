@@ -1,4 +1,8 @@
+import 'dart:typed_data';
+
+import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -72,6 +76,10 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               child: FlatButton(
                 onPressed: () {
                   if (_verifyToCreateWallet()) {
+                    Provider.of<CreateWalletProcessProvide>(context)
+                        .setWalletName(_nameController.text);
+                    Provider.of<CreateWalletProcessProvide>(context).setPwd(
+                        Uint8List.fromList(_pwdController.text.codeUnits));
                     NavigatorUtils.push(
                         context, Routes.createWalletMnemonicPage);
                   }

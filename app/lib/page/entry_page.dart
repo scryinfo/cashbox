@@ -28,8 +28,10 @@ class _EntryPageState extends State<EntryPage> {
   }
 
   void _initWallet() async {
-    //todo test JNI
     isContainWallet = await Wallets.instance.isContainWallet();
+    setState(() {
+      isContainWallet = isContainWallet;
+    });
     //WalletManagerTest.saveWallet();
     //WalletManagerTest.isContainWallet();
     //WalletManagerTest.loadAllWalletList();
