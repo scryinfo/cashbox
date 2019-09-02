@@ -1,3 +1,5 @@
+import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:app/page/eee_page/chain_card.dart';
@@ -12,6 +14,27 @@ class EeePage extends StatefulWidget {
 }
 
 class _EeePageState extends State<EeePage> {
+  List<Wallet> walletList;
+  Wallet nowWallet;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initData();
+  }
+
+  void initData() async {
+    walletList = await Wallets().loadAllWalletList();
+    print("initData walletlist.length===>" + walletList.length.toString());
+    walletList.forEach((wallet) {
+      print("wallet is " + wallet.isNowWallet.toString());
+    });
+    setState(() {
+      this.walletList = walletList;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

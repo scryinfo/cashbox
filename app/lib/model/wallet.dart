@@ -17,7 +17,7 @@ class Wallet {
   List<Chain> chainList = []; //钱包内包含链列表
   String nowChainId; //钱包内，当前链chainId
   WalletType walletType;
-
+  bool isNowWallet; //是否是当前钱包
   //todo load chain
 
   // 重置钱包密码

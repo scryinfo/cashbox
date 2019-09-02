@@ -24,13 +24,18 @@ class _EntryPageState extends State<EntryPage> {
   @override
   void initState() {
     super.initState();
-    _initWallet();
   }
 
-  void _initWallet() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    checkContainWallet();
+  }
+
+  void checkContainWallet() async {
     isContainWallet = await Wallets.instance.isContainWallet();
     setState(() {
-      isContainWallet = isContainWallet;
+      this.isContainWallet = isContainWallet;
     });
     //WalletManagerTest.saveWallet();
     //WalletManagerTest.isContainWallet();
