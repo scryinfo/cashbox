@@ -15,11 +15,10 @@ class WalletManager {
 
   // 是否已有钱包
   // apiNo:WM01
-  static Future<bool> isContainWallet() async {
+  static Future<Map<dynamic, dynamic>> isContainWallet() async {
     Map<dynamic, dynamic> containMap =
         await _channel.invokeMethod('isContainWallet');
-    var isContain = containMap["isContainWallet"];
-    return isContain;
+    return containMap;
   }
 
   //从数据库 加载出 所有钱包数据
@@ -35,14 +34,14 @@ class WalletManager {
   // apiNo:WM03
   static Future<Map<dynamic, dynamic>> saveWallet(String walletName,
       Uint8List pwd, Uint8List mnemonic, int walletType) async {
-    Map<dynamic, dynamic> wallet = await _channel.invokeMethod('saveWallet', {
+    Map<dynamic, dynamic> isSuccessMap =
+        await _channel.invokeMethod('saveWallet', {
       "walletName": walletName,
       "pwd": pwd,
       "mnemonic": mnemonic,
       "walletType": walletType
     });
-    print("saveWallet exec finished===>");
-    return null;
+    return isSuccessMap;
   }
 
   // 钱包导出。 恢复钱包

@@ -1,4 +1,8 @@
+import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
+import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:typed_data';
@@ -15,21 +19,28 @@ class CreateWalletConfirmPage extends StatefulWidget {
 }
 
 class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
-  List<String> mnemonicList = [
-    "victory",
-    "october",
-    "off",
-    "drink ",
-    "shallow",
-    "actual",
-    "stone",
-    "decade",
-    "victory",
-    "october",
-    "off",
-    "drink "
-  ];
+  List<String> mnemonicList = [];
   var verifyString = "";
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    initData();
+  }
+
+  initData() {
+    setState(() {
+      mnemonicList = String.fromCharCodes(
+              Provider.of<CreateWalletProcessProvide>(context).mnemonic)
+          .split(" ");
+      mnemonicList.sort((left, right) => left.length.compareTo(right.length));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,8 +118,11 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               height: ScreenUtil().setHeight(9),
               color: Color.fromRGBO(26, 141, 198, 0.20),
               child: FlatButton(
-                onPressed: () {
-                  if (_verifyMnemonicSame()) {
+                onPressed: () async {
+                  var isSuccess = await _verifyMnemonicSame();
+                  if (isSuccess) {
+                    Provider.of<CreateWalletProcessProvide>(context)
+                        .emptyData(); /**创建钱包完成，清楚内存关于助记词的记录信息*/
                     NavigatorUtils.push(
                       context,
                       Routes.eeePage,
@@ -134,12 +148,29 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
     );
   }
 
-  bool _verifyMnemonicSame() {
-    //todo Verify mnemonic
-    if (verifyString.isNotEmpty && verifyString.length > 1) {
-      return true;
+  Future<bool> _verifyMnemonicSame() async {
+    if (verifyString.isNotEmpty &&
+        Provider.of<CreateWalletProcessProvide>(context).mnemonic != 0) {
+      if (verifyString.trim() ==
+          String.fromCharCodes(
+                  Provider.of<CreateWalletProcessProvide>(context).mnemonic)
+              .trim()) {
+        var isSuccess = await Wallets.instance.saveWallet(
+            Provider.of<CreateWalletProcessProvide>(context).walletName,
+            Provider.of<CreateWalletProcessProvide>(context).pwd,
+            Provider.of<CreateWalletProcessProvide>(context).mnemonic,
+            WalletType.WALLET);
+        if (isSuccess) {
+          return true;
+        } else {
+          Fluttertoast.showToast(msg: "钱包创建过程，出现位置错误，请重新尝试创建");
+          return false;
+        }
+      }
+      return false;
+    } else {
+      return false;
     }
-    return false;
   }
 
   Widget _buildVerifyInputMnemonic() {

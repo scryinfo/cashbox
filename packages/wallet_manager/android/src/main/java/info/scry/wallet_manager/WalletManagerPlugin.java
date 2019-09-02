@@ -51,14 +51,13 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
+                Log.d("nativeLib=>", "saveWallet is =>" + wallet);
                 Log.d("nativeLib=>", "saveWallet.status is =>" + wallet.status);
-                Log.d("nativeLib=>", "saveWallet.walletNmae is =>" + wallet.walletName);
+                Log.d("nativeLib=>", "saveWallet.walletName is =>" + wallet.walletName);
                 Log.d("nativeLib=>", "saveWallet.walletId is =>" + wallet.walletId);
                 Log.d("nativeLib=>", "saveWallet.message is =>" + wallet.message);
                 HashMap hashMap = new HashMap();
-                hashMap.put("status", wallet.status);
-                hashMap.put("walletId", wallet.walletId);
-                hashMap.put("walletName", wallet.walletName);
+                hashMap.put("status", wallet.status);  ///todo 后续空时间调整，返回类型不用wallet，只需状态码。
                 result.success(hashMap);
                 break;
             }
@@ -73,8 +72,12 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "isContainWallet.status is =>" + walletState.status);
                 Log.d("nativeLib=>", "isContainWallet is =>" + walletState.isContainWallet);
                 HashMap hashMap = new HashMap();
-                hashMap.put("isContainWallet", walletState.isContainWallet);
-                result.success(hashMap);
+                if (walletState.status == 200) {
+                    hashMap.put("isContainWallet", walletState.isContainWallet);
+                    result.success(hashMap);
+                } else {
+                    result.error("isContainWallet", "isContainWallet api error", "");
+                }
                 break;
             }
             // apiNo:WM02
