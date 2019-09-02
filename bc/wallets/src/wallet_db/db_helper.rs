@@ -8,8 +8,6 @@ const TB_WALLET_DETAIL: &'static str = r#"/data/data/com.example.app/files/cashb
 /*const TB_WALLET: &'static str = r#"cashbox_wallet.db"#;
 const TB_WALLET_DETAIL: &'static str = r#"cashbox_wallet_detail.db"#;*/
 
-/*const TB_MNEMONIC: &'static str = r#"./cashbox_mnenonic.db"#;
-const TB_WALLET: &'static str = r#"./cashbox_wallet.db"#;*/
 fn create_teble(table_name: &str, table_desc: &str) -> Result<(), String> {
     // TODO 检查参数是否合理
     //先创建对应的文件路径
@@ -96,6 +94,11 @@ impl DataServiceProvider {
         self.db_hander.execute("commit;").map(|_| ()).map_err(|err| err.to_string())
     }
 
-   // fn get_taget_data<T>(data:T)->T
-
+   pub fn get_bool_value(value:&str)->bool{
+        if value.eq("1") {
+            true
+        }else {
+            false
+        }
+    }
 }

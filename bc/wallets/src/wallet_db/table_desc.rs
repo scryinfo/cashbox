@@ -10,12 +10,13 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [address] VARCHAR(64) NOT NULL,
     [puk_key] VARCHAR(128) NOT NULL,
     [status] INT NOT NULL  DEFAULT 1,
-    [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')));
+    [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
+    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')));
 
     DROP TABLE IF EXISTS [main].[Chain];
     CREATE TABLE [main].[Chain](
     [id] INTEGER PRIMARY KEY NOT NULL,
-    [type] VARCHAR(32),
+    [type] INT,
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(64),
     [address] VARCHAR(128),
@@ -24,7 +25,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [selected] VARCHAR(1),
     [status] INT,
     [more_property] VARCHAR(1),
-    [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
+    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [update_time] DATETIME);
 
     DROP TABLE IF EXISTS [main].[EthDigit];
@@ -40,10 +41,10 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [next_id] INT,
     [url_img] VARCHAR(1024),
     [group_name] VARCHAR(32),
-    [selected] VARCHAR(1),
+    [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
     [decimals] INT,
     [status] INT,
-    [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
+    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [UPDATED_TIME] DATETIME);
 
     DROP TABLE IF EXISTS [main].[BtcDigit];
@@ -59,10 +60,10 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [next_id] INT,
     [url_img] VARCHAR(1024),
     [group_name] VARCHAR(32),
-    [selected] VARCHAR(1),
+    [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
     [decimals] INT,
     [status] INT,
-    [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
+    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [UPDATED_TIME] DATETIME);
 
     DROP TABLE IF EXISTS [main].[EeeDigit];
@@ -78,10 +79,10 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [next_id] INT,
     [url_img] VARCHAR(1024),
     [group_name] VARCHAR(32),
-    [selected] VARCHAR(1),
+    [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
     [decimals] INT,
     [status] INT,
-    [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
+    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [UPDATED_TIME] DATETIME);
 
     DROP TABLE IF EXISTS [main].[TransferRecord];
@@ -96,7 +97,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [status] VARCHAR(32),
     [is_initiator] VARCHAR(1),
     [extra_msg] VARCHAR(3072),
-    [CREATED_TIME] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
+    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [UPDATED_TIME] DATETIME);
 
     insert into Chain(id,short_name,full_name) Values(1,'BTC',"bitcoin");
@@ -105,6 +106,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     insert into Chain(id,short_name,full_name) Values(4,'ETH TEST',"ethereum test");
     insert into Chain(id,short_name,full_name) Values(5,'EEE',"eee");
     insert into Chain(id,short_name,full_name) Values(6,'EEE TEST',"eee test");
+    update Chain set type=5,address='eee.com' WHERE id = 5;
     COMMIT;
     PRAGMA foreign_keys = 'on';
     "#;
@@ -124,7 +126,8 @@ pub fn get_cashbox_wallet_sql() -> String {
           [wallet_type] INT NOT NULL  DEFAULT 1,
           [selected] VARCHAR(1),
           [status] INT NOT NULL  DEFAULT 1,
-          [create_time] timestamp NOT NULL DEFAULT (DATETIME ('now', 'localtime')),
+          [display_chain_id] INT NOT NULL,
+          [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
           [update_time] timestamp);
         COMMIT;
         PRAGMA foreign_keys = 'on';

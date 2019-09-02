@@ -7,6 +7,7 @@ pub struct TbWallet {
     pub wallet_type:i64,
     pub selected: Option<bool>,
     pub status: i64,
+    pub display_chain_id:i64,
     pub create_time: String,
     pub update_time: Option<String>,
 }
@@ -19,6 +20,7 @@ pub struct TbAddress {
     pub  address: String,
     pub  pub_key: String,
     pub  status: i8,
+    pub  is_visible:bool,
     pub create_time: String,
     pub update_time: String,
 }
@@ -53,7 +55,8 @@ pub struct WalletObj {
     pub short_name: Option<String>,
     pub full_name: Option<String>,
     pub balance: Option<String>,
-    pub isvisible: Option<bool>,
+    pub digit_is_visible: Option<bool>,
     pub decimals: Option<i64>,
     pub url_img: Option<String>,
+    pub chain_is_visible:Option<bool>,
 }

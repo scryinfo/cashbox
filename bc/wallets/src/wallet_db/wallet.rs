@@ -19,7 +19,7 @@ impl DataServiceProvider {
     }
 
     pub fn save_wallet_address(&mut self, mn: TbWallet, addrs: Vec<TbAddress>) -> Result<(), String> {
-        let wallet_sql = "INSERT into Wallet(wallet_id,mn_digest,fullname,mnemonic,wallet_type)VALUES(?,?,?,?,?)";
+        let wallet_sql = "INSERT into Wallet(wallet_id,mn_digest,fullname,mnemonic,wallet_type,display_chain_id)VALUES(?,?,?,?,?,?)";
         let address_sql = "insert into detail.Address(address_id,wallet_id,chain_id,address,puk_key,status) values(?,?,?,?,?,?);";
 
         // TODO 增加事务的处理，这个的编码方式还需要修改 才能编译通过
@@ -31,6 +31,7 @@ impl DataServiceProvider {
                 stat.bind(3, mn.full_name.unwrap().as_str()).expect("full_name bind mn id error");
                 stat.bind(4, mn.mnemonic.as_str()).expect("mnemonic bind mn id error");
                 stat.bind(5, mn.wallet_type).expect("wallet_type bind mn id error");
+                stat.bind(6, mn.display_chain_id as i64).expect("display_chain_id  value set ");
 
                 match stat.next() {
                     Ok(_) => {
@@ -58,19 +59,24 @@ impl DataServiceProvider {
                         match address_stat.next() {
                             Ok(_) => {
                                 // TODO 后续来完善需要更新的数据详情
-                                let eee_digit_account_sql = format!("insert into detail.EeeDigit(address_id) values('{}');", addr.address_id);
+                               // let eee_digit_account_sql = format!("insert into detail.EeeDigit(address_id) values('{}');", addr.address_id);
+                                let eee_digit_account_sql = "INSERT INTO detail.EeeDigit(address_id,full_name,short_name,decimals,balance)VALUES(?,?,?,?,?);";
                                //let eth_digit_account_sql = format!("insert into detail.EthDigit(address_id) values('{}');", addr.address_id);
                                 //let btc_digit_account_sql = format!("insert into detail.BtcDigit(address_id) values('{}');", addr.address_id);
-                                self.db_hander.execute(eee_digit_account_sql).expect("update selected state");
+                                //self.db_hander.execute(eee_digit_account_sql).expect("update selected state");
                                 //self.db_hander.execute(eth_digit_account_sql).expect("update selected state");
                                 //self.db_hander.execute(btc_digit_account_sql).expect("update selected state");
-                                /*   match self.db_hander.prepare(digit_account_sql) {
+                                   match self.db_hander.prepare(eee_digit_account_sql) {
                                        Ok(mut digit_stat) => {
-                                           digit_stat.bind(1, addr.address_id.as_str()).expect("save_mnemonic_address digit_stat bind addr.address ");
+                                           digit_stat.bind(1, addr.address_id.as_str()).expect("digit_account_sql  bind addr.address ");
+                                           digit_stat.bind(2, "eee").expect("digit_account_sql  bind addr.address ");
+                                           digit_stat.bind(3, "eee").expect("digit_account_sql bind addr.address ");
+                                           digit_stat.bind(4, 18).expect("digit_account_sql  bind addr.address ");
+                                           digit_stat.bind(5, 0).expect("digit_account_sql  bind addr.address ");
                                            digit_stat.next().expect("exec chain insert error");
                                        }
                                        Err(e) => return Err(e.to_string())
-                                   }*/
+                                   }
                             }
                             Err(e) => return Err(e.to_string())
                         }
@@ -101,10 +107,11 @@ impl DataServiceProvider {
                     full_name: value[2].as_string().map(|str| String::from(str)),
                     mnemonic: String::from(value[3].as_string().unwrap()),
                     wallet_type: value[4].as_integer().unwrap(),
-                    selected: value[5].as_integer().map(|num| if num == 1 { true } else { false }),
+                    selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
                     status: value[6].as_integer().unwrap(),
-                    create_time: String::from(value[7].as_string().unwrap()),
-                    update_time: value[8].as_string().map(|str| String::from(str)),
+                    display_chain_id:value[7].as_integer().unwrap().into(),
+                    create_time: format!("{}",value[8].as_integer().unwrap()),
+                    update_time: value[9].as_string().map(|str| String::from(str)),
                 };
                 Some(wallet)
             }
@@ -129,10 +136,11 @@ impl DataServiceProvider {
                     full_name: value[2].as_string().map(|str| String::from(str)),
                     mnemonic: String::from(value[3].as_string().unwrap()),
                     wallet_type: value[4].as_integer().unwrap(),
-                    selected: value[5].as_integer().map(|num| if num == 1 { true } else { false }),
+                    selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
                     status: value[6].as_integer().unwrap(),
-                    create_time: String::from(value[7].as_string().unwrap()),
-                    update_time: value[8].as_string().map(|str| String::from(str)),
+                    display_chain_id:value[7].as_integer().unwrap().into(),
+                    create_time: format!("{}",value[8].as_integer().unwrap()),
+                    update_time: value[9].as_string().map(|str| String::from(str)),
                 };
                 Some(wallet)
             }
@@ -156,10 +164,11 @@ impl DataServiceProvider {
                 full_name: value[2].as_string().map(|str| String::from(str)),
                 mnemonic: String::from(value[3].as_string().unwrap()),
                 wallet_type: value[4].as_integer().unwrap(),
-                selected: value[5].as_integer().map(|num| if num == 1 { true } else { false }),
+                selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
                 status: value[6].as_integer().unwrap(),
-                create_time: String::from(value[7].as_string().unwrap()),
-                update_time: value[8].as_string().map(|str| String::from(str)),
+                display_chain_id:value[7].as_integer().unwrap().into(),
+                create_time: format!("{}",value[8].as_integer().unwrap()),
+                update_time: value[9].as_string().map(|str| String::from(str)),
             };
             wallet
         }).map_err(|err| {
@@ -182,11 +191,12 @@ impl DataServiceProvider {
                 mnemonic:
                     String::from(cursor[3].as_string().unwrap()),
                 wallet_type: cursor[4].as_integer().unwrap(),
-                selected: cursor[5].as_integer().map(|num| if num == 1 { true } else { false }),
+                selected: cursor[5].as_string().map(|value| Self::get_bool_value(value)),
 
                 status:cursor[6].as_integer().unwrap(),
-                create_time: String::from(cursor[7].as_string().unwrap()),
-                update_time:cursor[8].as_string().map(|data| String::from(data)),
+                display_chain_id:cursor[7].as_integer().unwrap().into(),
+                create_time: format!("{}",cursor[8].as_integer().unwrap()),
+                update_time:cursor[9].as_string().map(|data| String::from(data)),
             };
             vec.push(wallet)
         }
@@ -256,23 +266,23 @@ impl DataServiceProvider {
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
         while let Some(row) = cursor.next().unwrap() {
-            println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
                 chain_id: row[2].as_integer(),
                 address: row[3].as_string().map(|str| String::from(str)),
                 chain_address: row[4].as_string().map(|str| String::from(str)),
-                selected: row[5].as_integer().map(|num| if num == 1 { true } else { false }),
+                selected: row[5].as_string().map(|value| Self::get_bool_value(value)),
                 chain_type: row[6].as_integer(),
                 digit_id: row[7].as_integer(),
                 contract_address: row[8].as_string().map(|str| String::from(str)),
                 short_name: row[9].as_string().map(|str| String::from(str)),
                 full_name: row[10].as_string().map(|str| String::from(str)),
                 balance: row[11].as_string().map(|str| String::from(str)),
-                isvisible: row[12].as_integer().map(|num| if num == 1 { true } else { false }),
+                digit_is_visible: row[12].as_string().map(|value| Self::get_bool_value(value)),
                 decimals: row[13].as_integer(),
                 url_img: row[14].as_string().map(|str| String::from(str)),
+                chain_is_visible:row[15].as_string().map(|value| Self::get_bool_value(value)),
             };
             tbwallets.push(tbwallet);
         }
