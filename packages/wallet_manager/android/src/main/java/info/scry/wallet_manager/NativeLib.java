@@ -92,7 +92,7 @@ public class NativeLib {
         public String chainAddress;
         public boolean isVisible;
         public List<EeeDigit> digitList;
-        public ChainType chainType;
+        public int chainType;
     }
 
     public static class EeeDigit {
@@ -116,7 +116,7 @@ public class NativeLib {
         public String chainAddress;
         public boolean isVisible;
         public List<EthDigit> digitList;
-        public ChainType chainType;
+        public int chainType;
     }
 
     public static class EthDigit {
@@ -140,7 +140,7 @@ public class NativeLib {
         public String chainAddress;
         public boolean isVisible;
         public List<BtcDigit> digitList;
-        public ChainType chainType;
+        public int chainType;
     }
 
     public static class BtcDigit {
