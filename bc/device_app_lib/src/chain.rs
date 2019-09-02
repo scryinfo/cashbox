@@ -2,6 +2,7 @@ use jni::JNIEnv;
 use jni::objects::{JObject, JValue};
 use wallets::model::{EeeChain,BtcChain,EthChain};
 
+
 pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObject<'a>{
     let eee_digit_list_class = env.find_class("java/util/ArrayList").expect("find chain type is error");
     let eee_digit_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeDigit").expect("Digit class not found");
@@ -9,9 +10,8 @@ pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObje
     let chain_class_obj = env.alloc_object(eee_chain_class).expect("create chain_class instance is error!");
     env.set_field(chain_class_obj, "status", "I", JValue::Int(eee_chain.status as i32)).expect("set status value is error!");
     let chain_id_str = format!("{}", eee_chain.chain_id);
-
     env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("set chainId value is error!");
-    env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.wallet_id).unwrap()))).expect("set digitId value is error!");
+    env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.wallet_id).unwrap()))).expect("walletId");
 
     if eee_chain.chain_address.is_some() {
         env.set_field(chain_class_obj, "chainAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.chain_address.unwrap()).unwrap()))).expect("set status value is error!");
@@ -19,11 +19,13 @@ pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObje
 
     if eee_chain.is_visible.is_some() {
         let visible = eee_chain.is_visible.unwrap();
-        env.set_field(chain_class_obj, "isVisible", "Z", JValue::Bool(visible as u8)).expect("set digitId value is error!");
+        env.set_field(chain_class_obj, "isVisible", "Z", JValue::Bool(visible as u8)).expect("get_eee_chain_obj is_visible");
+    }else{
+        println!("eee_chain.is_visible is none");
     }
     if eee_chain.chain_type.is_some() {
         let chain_type = eee_chain.chain_type.unwrap();
-        env.set_field(chain_class_obj, "chainType", "I", JValue::Int(chain_type as i32)).expect("set digitId value is error!");
+        env.set_field(chain_class_obj, "chainType", "I", JValue::Int(chain_type as i32)).expect("get_eee_chain_obj chain_type");
     }
     //每一条链下存在多个代币，需要使用List来存储
     let digit_list_obj = env.alloc_object(eee_digit_list_class).expect("create digit_list_obj instance is error!");
@@ -36,6 +38,7 @@ pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObje
         env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("set status value is error!");
 
         env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("set digitId value is error!");
+        env.set_field(digit_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.chain_id).unwrap()))).expect("set digitId value is error!");
         if digit.address.is_some() {
             env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.address.unwrap()).unwrap()))).expect("set address value is error!");
         }
@@ -49,6 +52,7 @@ pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObje
             env.set_field(digit_class_obj, "fullName", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.fullname.unwrap()).unwrap()))).expect("set fullName value is error!");
         }
         if digit.balance.is_some() {
+
             env.set_field(digit_class_obj, "balance", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.balance.unwrap()).unwrap()))).expect("set balance value is error!");
         }
         if digit.is_visible.is_some() {
@@ -60,7 +64,7 @@ pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObje
             env.set_field(digit_class_obj, "decimal", "I", JValue::Int(decimal as i32)).expect("set decimal value is error!");
         }
 
-        if digit.decimal.is_some() {
+        if digit.imgurl.is_some() {
             env.set_field(digit_class_obj, "imgUrl", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.imgurl.unwrap()).unwrap()))).expect("set imgUrl value is error!");
         }
 
@@ -88,11 +92,11 @@ pub fn get_eth_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eth_chain:EthChain)->JObje
 
     if eth_chain.is_visible.is_some() {
         let visible = eth_chain.is_visible.unwrap();
-        env.set_field(chain_class_obj, "isVisible", "Z", JValue::Bool(visible as u8)).expect("set digitId value is error!");
+        env.set_field(chain_class_obj, "isVisible", "Z", JValue::Bool(visible as u8)).expect("get_eth_chain_obj is_visible");
     }
     if eth_chain.chain_type.is_some() {
         let chain_type = eth_chain.chain_type.unwrap();
-        env.set_field(chain_class_obj, "chainType", "I", JValue::Int(chain_type as i32)).expect("set digitId value is error!");
+        env.set_field(chain_class_obj, "chainType", "I", JValue::Int(chain_type as i32)).expect("get_eth_chain_obj chain_type ");
     }
     //每一条链下存在多个代币，需要使用List来存储
     let digit_list_obj = env.alloc_object(eth_digit_list_class).expect("create digit_list_obj instance is error!");
@@ -129,7 +133,7 @@ pub fn get_eth_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eth_chain:EthChain)->JObje
             env.set_field(digit_class_obj, "decimal", "I", JValue::Int(decimal as i32)).expect("set decimal value is error!");
         }
 
-        if digit.decimal.is_some() {
+        if digit.imgurl.is_some() {
             env.set_field(digit_class_obj, "imgUrl", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.imgurl.unwrap()).unwrap()))).expect("set imgUrl value is error!");
         }
 
@@ -197,7 +201,7 @@ pub fn get_btc_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,btc_chain:BtcChain)->JObje
             env.set_field(digit_class_obj, "decimal", "I", JValue::Int(decimal as i32)).expect("set decimal value is error!");
         }
 
-        if digit.decimal.is_some() {
+        if digit.imgurl.is_some() {
             env.set_field(digit_class_obj, "imgUrl", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.imgurl.unwrap()).unwrap()))).expect("set imgUrl value is error!");
         }
 
