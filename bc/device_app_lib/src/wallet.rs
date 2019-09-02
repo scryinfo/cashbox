@@ -72,6 +72,7 @@ pub mod android {
         *state_obj
     }
 
+
     #[no_mangle]
     #[allow(non_snake_case)]
     fn wallet_jni_obj_util<'a, 'b>(env: &'a JNIEnv<'b>, wallet: Wallet) -> Vec<JObject<'a>> {
@@ -81,18 +82,21 @@ pub mod android {
 
         let wallet_id = env.new_string(wallet.wallet_id.clone()).unwrap();
         let wallet_id_obj = JObject::from(wallet_id);
+        let display_chain_id_str = env.new_string(format!("{}",wallet.display_chain_id)).unwrap();
+        let  display_chain_id__obj = JObject::from(display_chain_id_str);
 
+        let wallet_create_time = env.new_string(wallet.create_time.clone()).unwrap();
+        let wallet_create_time_obj = JObject::from(wallet_create_time);
         let eee_chain = wallet.eee_chain;
         match eee_chain {
             Some(eee_chain)=>{
-                let chain_class_obj = chain::get_eee_chain_obj(env,eee_chain);
+                let chain_class_obj =chain::get_eee_chain_obj(env,eee_chain);
                 env.set_field(jobj, "eeeChain", "Linfo/scry/wallet_manager/NativeLib$EeeChain;", JValue::Object(chain_class_obj)).expect("set eee_chain");
             },
             None=>{
                 info!("eee_chain not used");
             }
         }
-
         let eth_chain = wallet.eth_chain;
         match eth_chain {
             Some(eth_chain)=>{
@@ -106,6 +110,7 @@ pub mod android {
         let btc_chain = wallet.btc_chain;
         match btc_chain {
             Some(btc_chain)=>{
+                println!("begin get_btc_chain_obj");
                 let chain_class_obj = chain::get_btc_chain_obj(env,btc_chain);
                 env.set_field(jobj, "btcChain", "Linfo/scry/wallet_manager/NativeLib$BtcChain;", JValue::Object(chain_class_obj)).expect("set btc_chain");
             },
@@ -116,6 +121,10 @@ pub mod android {
 
         env.set_field(jobj, "status", "I", JValue::Int(wallet.status as i32)).expect("find status type is error!");
         env.set_field(jobj, "walletId", "Ljava/lang/String;", JValue::Object(wallet_id_obj)).expect("find walletId type is error!");
+
+        env.set_field(jobj, "creationTime", "Ljava/lang/String;", JValue::Object(wallet_create_time_obj)).expect("find creationTime ");
+        env.set_field(jobj, "nowChainId", "Ljava/lang/String;", JValue::Object(display_chain_id__obj)).expect("nowChainId");
+        env.set_field(jobj, "nowWallet", "Z", JValue::Bool(wallet.selected as u8)).expect("set isVisible value is error!");
 
         let wallet_type_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletType").expect("NativeLib$WalletType ");
 
@@ -168,17 +177,17 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveWallet(env: JNIEnv, _: JClass, wallet_name: JString, pwd: jbyteArray, mnemonic: jbyteArray, wallet_type: JObject) -> jobject {
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveWallet(env: JNIEnv, _: JClass, wallet_name: JString, pwd: jbyteArray, mnemonic: jbyteArray, wallet_type: jint) -> jobject {
         let wallet_name: String = env.get_string(wallet_name).unwrap().into();
         let pwd = env.convert_byte_array(pwd).unwrap();
         let mnemonic = env.convert_byte_array(mnemonic).unwrap();
 
-        let value = env.call_method(wallet_type,"ordinal","()I",&[]).expect("get type value error");
+        /*let value = env.call_method(wallet_type,"ordinal","()I",&[]).expect("get type value error");
         let wallet_type_value = value.i().unwrap();
-        println!("wallet type value is {}",wallet_type_value);
+        println!("wallet type value is {}",wallet_type_value);*/
         let wallet_class = env.find_class("info/scry/wallet_manager/NativeLib$Wallet").expect("can't found NativeLib$Wallet class");
 
-        let wallet = wallets::module::wallet::create_wallet(wallet_name.as_str(), mnemonic.as_slice(), pwd.as_slice(), wallet_type_value as i64);
+        let wallet = wallets::module::wallet::create_wallet(wallet_name.as_str(), mnemonic.as_slice(), pwd.as_slice(), wallet_type as i64);
         let ret_obj = match wallet {
             Ok(wallet) => {
                 let vec_obj = wallet_jni_obj_util(&env, wallet);
