@@ -9,9 +9,6 @@ import 'package:app/util/log_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:app/page/eee_page/chain_card.dart';
-import 'package:app/page/eee_page/middle_func_card.dart';
-import 'package:app/page/eee_page/digit_list_card.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -97,19 +94,20 @@ class _EeePageState extends State<EeePage> {
       ),
       drawer: LeftDrawerCard(), //左侧抽屉栏
       body: Container(
-          alignment: Alignment.centerLeft,
-          child: Stack(
-            children: <Widget>[
-              new Column(
-                children: <Widget>[
-                  _buildChainCard(),
-                  _buildMiddleFuncCard(),
-                  _buildDigitListCard(),
-                  //DigitListCard(),
-                ],
-              ),
-            ],
-          )),
+        alignment: Alignment.centerLeft,
+        child: Stack(
+          children: <Widget>[
+            new Column(
+              children: <Widget>[
+                _buildChainCard(), //链卡片swipe
+                _buildMiddleFuncCard(), //功能位置
+                _buildDigitListCard(), //代币列表
+                //DigitListCard(),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
