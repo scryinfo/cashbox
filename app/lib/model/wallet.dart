@@ -75,4 +75,14 @@ class Wallet {
     }
     return isSuccess;
   }
+
+  Chain getChainByChainId(String chainId) {
+    Chain nowChain;
+    chainList.forEach((chain) {
+      if (chainId == chain.chainId) {
+        nowChain = chain;
+      }
+    });
+    return nowChain;
+  }
 }
