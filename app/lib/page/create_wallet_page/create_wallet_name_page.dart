@@ -45,12 +45,12 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
           centerTitle: "创建钱包",
           backgroundColor: Colors.transparent,
         ),
-        body: _buildCreateWalletWidget(),
+        body: _buildCreateWalletLayout(),
       ),
     );
   }
 
-  Widget _buildCreateWalletWidget() {
+  Widget _buildCreateWalletLayout() {
     return Container(
       padding: EdgeInsets.only(
         left: ScreenUtil().setWidth(5),
@@ -60,47 +60,53 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         child: Column(
           children: <Widget>[
             Gaps.scaleVGap(10),
-            _buildWalletNameLayout(),
+            _buildWalletNameWidget(),
             Gaps.scaleVGap(8),
-            _buildWalletPwdLayout(),
+            _buildWalletPwdWidget(),
             Gaps.scaleVGap(8),
-            _buildConfirmPwdLayout(),
+            _buildConfirmPwdWidget(),
             Gaps.scaleVGap(8),
-            _buildChainChooseLayout(),
+            _buildChainChooseWidget(),
             Gaps.scaleVGap(8),
-            Container(
-              alignment: Alignment.bottomCenter,
-              width: ScreenUtil().setWidth(41),
-              height: ScreenUtil().setHeight(9),
-              color: Color.fromRGBO(26, 141, 198, 0.20),
-              child: FlatButton(
-                onPressed: () {
-                  if (_verifyToCreateWallet()) {
-                    Provider.of<CreateWalletProcessProvide>(context)
-                        .setWalletName(_nameController.text);
-                    Provider.of<CreateWalletProcessProvide>(context).setPwd(
-                        Uint8List.fromList(_pwdController.text.codeUnits));
-                    NavigatorUtils.push(
-                        context, Routes.createWalletMnemonicPage);
-                  }
-                },
-                child: Text(
-                  "添加钱包",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.blue,
-                    letterSpacing: 0.03,
-                  ),
-                ),
-              ),
-            ),
+            _buildCreateBtnWidget(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildWalletNameLayout() {
+  Widget _buildCreateBtnWidget() {
+    return Container(
+      alignment: Alignment.bottomCenter,
+      width: ScreenUtil().setWidth(41),
+      height: ScreenUtil().setHeight(9),
+      color: Color.fromRGBO(26, 141, 198, 0.20),
+      child: FlatButton(
+        onPressed: () {
+          if (_verifyToCreateWallet()) {
+            Provider.of<CreateWalletProcessProvide>(context)
+                .setWalletName(_nameController.text);
+            Provider.of<CreateWalletProcessProvide>(context)
+                .setPwd(Uint8List.fromList(_pwdController.text.codeUnits));
+            NavigatorUtils.push(context, Routes.createWalletMnemonicPage);
+          }
+        },
+        child: Container(
+          width: ScreenUtil().setWidth(41),
+          child: Text(
+            "添加钱包",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.blue,
+              letterSpacing: 0.03,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWalletNameWidget() {
     return Container(
       child: Column(
         children: <Widget>[
@@ -150,7 +156,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
     );
   }
 
-  Widget _buildWalletPwdLayout() {
+  Widget _buildWalletPwdWidget() {
     return Container(
       child: Column(
         children: <Widget>[
@@ -200,7 +206,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
     );
   }
 
-  Widget _buildConfirmPwdLayout() {
+  Widget _buildConfirmPwdWidget() {
     return Container(
       child: Column(
         children: <Widget>[
@@ -250,7 +256,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
     );
   }
 
-  Widget _buildChainChooseLayout() {
+  Widget _buildChainChooseWidget() {
     return Container(
         child: Column(
       children: <Widget>[

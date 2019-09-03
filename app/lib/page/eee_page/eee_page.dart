@@ -46,8 +46,9 @@ class _EeePageState extends State<EeePage> {
     print("eee_page => initData walletlist.length===>" +
         walletList.length.toString());
     this.walletList.forEach((wallet) {
-      print("eee_page => wallet is isNowWallet===> " +
-          wallet.isNowWallet.toString());
+      print("eee_page => is isNowWallet===> " + wallet.isNowWallet.toString());
+      print("eee_page => wallet.walletId===> " + wallet.walletId.toString());
+      print("eee_page =>wallet.walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
         setState(
           () {
