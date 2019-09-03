@@ -1,3 +1,7 @@
+import 'dart:typed_data';
+
+import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -128,14 +132,22 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               height: ScreenUtil().setHeight(9),
               color: Color.fromRGBO(26, 141, 198, 0.20),
               child: FlatButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_verifyImportWallet()) {
-                    //todo  JNI 创建，加入钱包的流程。
-                    NavigatorUtils.push(
-                      context,
-                      Routes.eeePage,
-                      clearStack: true,
-                    );
+                    var isSuccess = await Wallets.instance.saveWallet(
+                        _walletNameController.text,
+                        Uint8List.fromList("woshi密码".codeUnits),
+                        Uint8List.fromList(_mneController.text.codeUnits),
+                        WalletType.WALLET);
+                    if (isSuccess) {
+                      NavigatorUtils.push(
+                        context,
+                        Routes.eeePage,
+                        clearStack: true,
+                      );
+                    } else {
+                      Fluttertoast.showToast(msg: "助记词验证失败，请重新检查你输入的信息");
+                    }
                   }
                 },
                 child: Text(
