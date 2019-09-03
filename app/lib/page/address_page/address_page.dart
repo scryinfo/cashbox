@@ -24,7 +24,7 @@ class AddressPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: walletName != null ? walletName : "",
+          centerTitle: walletName?? "",
           backgroundColor: Colors.transparent,
         ),
         body: Container(

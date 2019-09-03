@@ -76,7 +76,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       Fluttertoast.showToast(msg: "有部分内容为空，请填写完整信息");
       return false;
     }
-    if (pwd.toString().compareTo(confirmPwd.toString()) != 0) {
+    if (pwd.toString() == confirmPwd.toString()) {
       Fluttertoast.showToast(msg: "两次输入密码不一致!!!");
       return false;
     }

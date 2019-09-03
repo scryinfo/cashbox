@@ -50,7 +50,8 @@ class Wallets {
 
   // 导出所有钱包
   // apiNo:WM02
-  Future<List<Wallet>> loadAllWalletList(bool isForceLoadFromJni) async {
+  Future<List<Wallet>> loadAllWalletList(
+      {bool isForceLoadFromJni = false}) async {
     if (!isForceLoadFromJni) {
       return allWalletList;
     }

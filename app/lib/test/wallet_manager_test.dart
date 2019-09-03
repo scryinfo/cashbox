@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:app/model/wallet.dart';
-import 'package:app/model/Wallets.dart';
+import 'package:app/model/wallets.dart';
 
 class WalletManagerTest {
   //fixed
@@ -23,7 +23,7 @@ class WalletManagerTest {
   }
 
   static void loadAllWalletList() async {
-    var allWalletList = await Wallets.instance.loadAllWalletList(true);
+    await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
   }
 
   static void getNowWallet() async {
@@ -46,7 +46,8 @@ class WalletManagerTest {
   }
 
   static void resetPwd() async {
-    var allWalletList = await Wallets.instance.loadAllWalletList(true);
+    var allWalletList =
+        await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     print("wallet_manager_test allWalletList=>" +
         allWalletList.length.toString());
     print("wallet_manager_test allWalletList=>" + allWalletList[0].toString());

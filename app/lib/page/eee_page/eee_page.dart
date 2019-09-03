@@ -42,7 +42,8 @@ class _EeePageState extends State<EeePage> {
   }
 
   void initData() async {
-    this.walletList = await Wallets.instance.loadAllWalletList(true);
+    this.walletList =
+        await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     print("eee_page => initData walletlist.length===>" +
         walletList.length.toString());
     this.walletList.forEach((wallet) {
@@ -264,9 +265,8 @@ class _EeePageState extends State<EeePage> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    displayDigitsList[index].digitRate != null
-                                        ? "0"
-                                        : "0", //市场单价
+                                    displayDigitsList[index].digitRate ??
+                                        "0", //市场单价
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: 10,

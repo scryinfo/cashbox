@@ -328,7 +328,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       return false;
     }
     //验证：两次密码一致
-    if (_confirmPwdController.text.compareTo(_pwdController.text) != 0) {
+    if (_confirmPwdController.text == _pwdController.text) {
       Fluttertoast.showToast(msg: "确认密码不一致，请重新输入");
       return false;
     }

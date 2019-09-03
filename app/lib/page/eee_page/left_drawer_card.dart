@@ -28,7 +28,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
   void initData() async {
     walletList = [];
     walletList =
-        await Wallets.instance.loadAllWalletList(false); //在首页加载后，已经掉过接口了,拿缓存就行
+        await Wallets.instance.loadAllWalletList(); //在首页加载后，已经掉过接口了,拿缓存就行
     setState(() {
       this.walletList = walletList;
     });
