@@ -1,6 +1,10 @@
+import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
+import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 import '../../routers/application.dart';
 import '../../routers/routers.dart';
@@ -16,23 +20,20 @@ class WalletManagerListPage extends StatefulWidget {
 }
 
 class _WalletManagerListPageState extends State<WalletManagerListPage> {
-  List walletList = [
-    "walletName1",
-    "walletName2",
-    "walletName3",
-    "walletName4",
-    "walletName5",
-    "walletName6",
-    "walletName7",
-    "walletName8",
-    "walletName9",
-    "walletName10",
-    "walletName11",
-    "walletName12",
-    "walletName13",
-    "walletName14",
-    "walletName15",
-  ];
+  List<Wallet> walletList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+
+  void initData() async {
+    walletList = await Wallets.instance.loadAllWalletList(false);
+    setState(() {
+      this.walletList = walletList;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +61,10 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
       return Container(
         child: GestureDetector(
           onTap: () {
+            Provider.of<WalletManagerProvide>(context)
+                .setWalletName(walletList[index].walletName);
+            Provider.of<WalletManagerProvide>(context)
+                .setWalletId(walletList[index].walletId);
             NavigatorUtils.push(context, Routes.walletManagerPage);
           },
           child: Container(
@@ -68,7 +73,7 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
                 Gaps.scaleVGap(5),
                 Container(
                   child: ItemOfListWidget(
-                    leftText: walletList[index],
+                    leftText: walletList[index].walletName,
                   ),
                 ),
               ],

@@ -1,5 +1,7 @@
+import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
@@ -13,13 +15,18 @@ class WalletManagerPage extends StatelessWidget {
   final List funcRouter = [Routes.resetPwdPage, Routes.recoverWalletPage];
   static final String DELETE_WALLET = "删除钱包";
   final TextEditingController _walletNameController = TextEditingController();
-
-  void _initData() {}
+  String walletId;
+  String walletName;
 
   @override
   Widget build(BuildContext context) {
-    _initData();
+    _initData(context);
     return _buildWalletManagerLayout(context);
+  }
+
+  void _initData(BuildContext context) {
+    walletId = Provider.of<WalletManagerProvide>(context).walletId;
+    walletName = Provider.of<WalletManagerProvide>(context).walletName;
   }
 
   Widget _buildWalletManagerLayout(BuildContext context) {
@@ -101,7 +108,7 @@ class WalletManagerPage extends StatelessWidget {
             child: Text(
               "钱包名",
               style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
+                color: Color.fromRGBO(255, 255, 255, 1),
                 fontSize: 15,
               ),
             ),
@@ -117,6 +124,11 @@ class WalletManagerPage extends StatelessWidget {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
+                labelText: walletName,
+                labelStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
                 contentPadding: EdgeInsets.only(
                     left: ScreenUtil().setWidth(2),
                     top: ScreenUtil().setHeight(8)),

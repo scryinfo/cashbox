@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app/provide/create_wallet_process_provide.dart';
+import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +38,9 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(
             builder: (_) => CreateWalletProcessProvide(),
           ),
+          ChangeNotifierProvider(
+            builder: (_) => WalletManagerProvide(),
+          )
         ],
         child: Container(
           decoration: BoxDecoration(
