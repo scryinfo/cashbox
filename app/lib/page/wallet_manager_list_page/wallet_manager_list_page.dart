@@ -29,7 +29,7 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
   }
 
   void initData() async {
-    walletList = await Wallets.instance.loadAllWalletList(false);
+    walletList = await Wallets.instance.loadAllWalletList();
     setState(() {
       this.walletList = walletList;
     });

@@ -150,7 +150,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
 
   Future<bool> _verifyMnemonicSame() async {
     if (verifyString.isNotEmpty &&
-        Provider.of<CreateWalletProcessProvide>(context).mnemonic != 0) {
+        Provider.of<CreateWalletProcessProvide>(context).mnemonic.length != 0) {
       if (verifyString.trim() ==
           String.fromCharCodes(
                   Provider.of<CreateWalletProcessProvide>(context).mnemonic)
