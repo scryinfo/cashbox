@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:wallet_manager/wallet_manager.dart';
 
-import 'Chain.dart';
+import 'chain.dart';
 
 enum WalletType { TEST_WALLET, WALLET } //0,1
 
