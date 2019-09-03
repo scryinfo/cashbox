@@ -1,8 +1,10 @@
+import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../res/resources.dart';
 import '../../routers/application.dart';
 import '../../routers/routers.dart';
@@ -26,14 +28,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
   void initData() async {
     walletList = [];
     walletList =
-        await Wallets.instance.loadAllWalletList(false); //首页加载后，左侧拿缓存就行
-    print("leftDrawerCardState  == walletList.length===>" +
-        walletList.length.toString());
-    walletList.forEach((wallet) {
-      print("leftDrawerCardState wallet is ===>" + wallet.walletId);
-      print("leftDrawerCardState wallet.chainList.toString===>" +
-          wallet.chainList.length.toString());
-    });
+        await Wallets.instance.loadAllWalletList(false); //在首页加载后，已经掉过接口了,拿缓存就行
     setState(() {
       this.walletList = walletList;
     });
@@ -50,7 +45,9 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
         child: Column(
           children: <Widget>[
             Gaps.scaleVGap(ScreenUtil().setHeight(1)),
-            _drawerAction(),
+            Container(
+              child: _drawerAction(),
+            ),
             Gaps.scaleVGap(ScreenUtil().setHeight(1)),
             Container(
               height: ScreenUtil().setHeight(82),
@@ -180,10 +177,17 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
               Container(
                 padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
                 child: GestureDetector(
-                  onTap: () {
-                    print("wallet index is " + walletList[index].walletId);
-                    NavigatorUtils.push(context, Routes.eeePage,
-                        clearStack: true);
+                  onTap: () async {
+                    print("wallet index is===> " + walletList[index].walletId);
+
+                    var isSuccess = await Wallets.instance
+                        .setNowWallet(walletList[index].walletId);
+                    if (isSuccess) {
+                      NavigatorUtils.push(context, Routes.eeePage,
+                          clearStack: true);
+                    } else {
+                      Fluttertoast.showToast(msg: "钱包切换失败，请重新打开切换");
+                    }
                   },
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -235,27 +239,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
-                                  alignment: Alignment.center,
-                                  height: ScreenUtil().setHeight(7.5),
-                                  child: Text(
-                                    "ETH",
-                                    style: TextStyle(
-                                        color: Color(0xFF57CAF2), fontSize: 12),
-                                  ),
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  margin: EdgeInsets.only(
-                                      left: ScreenUtil().setWidth(7)),
-                                  child: Text(
-                                    "BTC",
-                                    style: TextStyle(
-                                        color: Color(0xFF57CAF2), fontSize: 12),
-                                  ),
-                                ),
-                              ],
+                              children: _buildChainListCard(walletList[index]),
                             ),
                           ],
                         ),
@@ -281,23 +265,19 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
     return walletListWidget;
   }
 
-  Widget _buildChainListCard() {
-    List<Widget> chainsList = walletList.forEach((wallet) {
-      print("buildChainListCard wallet.chainList.toString===>" +
-          wallet.chainList.length.toString());
-      List.generate(wallet.chainList.length, (index) {
-        return Container(
-          alignment: Alignment.center,
-          height: ScreenUtil().setHeight(7.5),
-          child: Text(
-            "ETH",
-            style: TextStyle(color: Color(0xFF57CAF2), fontSize: 12),
-          ),
-        );
-      });
+  List<Widget> _buildChainListCard(Wallet wallet) {
+    List<Widget> chainsList = List.generate(wallet.chainList.length, (index) {
+      Chain nowChain = wallet.chainList[index];
+      return Container(
+        alignment: Alignment.centerLeft,
+        height: ScreenUtil().setHeight(7.5),
+        width: ScreenUtil().setWidth(10),
+        child: Text(
+          nowChain.chainTypeToValue(nowChain.chainType),
+          style: TextStyle(color: Color(0xFF57CAF2), fontSize: 12),
+        ),
+      );
     });
-    return Wrap(
-      children: chainsList,
-    );
+    return chainsList;
   }
 }

@@ -1,6 +1,8 @@
 import 'package:wallet_manager/wallet_manager.dart';
 
-import 'Digit.dart';
+import 'digit.dart';
+
+enum ChainType { BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST }
 
 abstract class Chain {
   String chainId; //链Id
@@ -9,6 +11,25 @@ abstract class Chain {
   List<Digit> digitsList = [];
   bool isVisible = true; //默认链可见
   ChainType chainType;
+
+  String chainTypeToValue(ChainType chainType) {
+    switch (chainType) {
+      case ChainType.BTC:
+        return "BTC";
+      case ChainType.BTC_TEST:
+        return "BTC_TEST";
+      case ChainType.ETH:
+        return "ETH";
+      case ChainType.ETH_TEST:
+        return "ETH_TEST";
+      case ChainType.EEE:
+        return "EEE";
+      case ChainType.EEE_TEST:
+        return "EEE_TEST";
+      default:
+        return "UNKNOWN";
+    }
+  }
 
   //跟jni接口处，定义一致  NativeLib.ChainType
   int chainTypeToInt(ChainType chainType) {
@@ -116,8 +137,6 @@ abstract class Chain {
     return isSuccess;
   }
 }
-
-enum ChainType { BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST }
 
 class ChainETH extends Chain {
   ChainETH(chainId, walletId) {

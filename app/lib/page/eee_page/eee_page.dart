@@ -1,5 +1,5 @@
-import 'package:app/model/Chain.dart';
-import 'package:app/model/Digit.dart';
+import 'package:app/model/chain.dart';
+import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
@@ -43,17 +43,19 @@ class _EeePageState extends State<EeePage> {
 
   void initData() async {
     this.walletList = await Wallets.instance.loadAllWalletList(true);
-    print("initData walletlist.length===>" + walletList.length.toString());
+    print("eee_page => initData walletlist.length===>" +
+        walletList.length.toString());
     this.walletList.forEach((wallet) {
-      print("wallet is isNowWallet===> " + wallet.isNowWallet.toString());
+      print("eee_page => wallet is isNowWallet===> " +
+          wallet.isNowWallet.toString());
       if (wallet.isNowWallet == true) {
         setState(
           () {
             this.nowWallet = wallet;
             this.walletName = nowWallet.walletName;
             this.nowChain = nowWallet.getChainByChainId(nowWallet.nowChainId);
-            print(
-                "nowChain setState chainAddress=====>" + nowChain.chainAddress);
+            print("eee_page =>  nowChain setState chainAddress=====>" +
+                nowChain.chainAddress);
             this.nowChainAddress = nowChain.chainAddress;
             this.nowChainDigitsList = nowChain.digitsList;
           },

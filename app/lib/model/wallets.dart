@@ -4,8 +4,8 @@ import 'package:wallet_manager/wallet_manager.dart';
 
 import 'dart:typed_data';
 
-import 'Chain.dart';
-import 'Digit.dart';
+import 'chain.dart';
+import 'digit.dart';
 
 //钱包管理
 class Wallets {
