@@ -131,7 +131,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         eeeChainDigitList.add(digitMap);
                     }
                     resultEeeChain.put("eeeChainDigitList", eeeChainDigitList);
-                    Log.d("nativeLib=>", "组装完EEE result resultEeeChain is ===>" + resultEeeChain.toString());
+                    Log.d("nativeLib=>", "组装完EEE链 result resultEeeChain is ===>" + resultEeeChain.toString());
                     /*-------------------------组装eee链上数据 end---------------------------*/
 
                     /*-------------------------组装ETH链上数据 start-------------------------*/
@@ -161,7 +161,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                     ///钱包列表，加入拼装好的钱包
                     resultWalletList.add(walletMap);
-                    Log.d("nativeLib=>", "拼装好的钱包  resultWalletList is ===>" + resultWalletList.toString());
+                    Log.d("nativeLib=>", "拼装好的钱包一个钱包  resultWalletList is ===>" + resultWalletList.toString());
                 }
                 result.success(resultWalletList);
                 break;
