@@ -50,8 +50,11 @@ class Wallets {
 
   // 导出所有钱包
   // apiNo:WM02
-  Future<List<Wallet>> loadAllWalletList() async {
-    var allWalletList = List<Wallet>();
+  Future<List<Wallet>> loadAllWalletList(bool isForceLoadFromJni) async {
+    if (!isForceLoadFromJni) {
+      return allWalletList;
+    }
+    allWalletList = [];
     var jniList = await WalletManager.loadAllWalletList();
     print("dart ==> jniList=====>" + jniList.toString());
     if (jniList.isNotEmpty) {
@@ -89,6 +92,7 @@ class Wallets {
           ///将digit 添加到digitList里面
           chainEeeM.digitsList.add(digitM);
         }
+        //todo    BTC 和 ETH 链信息还没有加入
 
         ///将chain 添加到chainList里面
         walletM.chainList.add(chainEeeM);

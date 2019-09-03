@@ -1,4 +1,5 @@
 import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,14 +20,23 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < 9; i++) {
-      var wallet1 = Wallet();
-      wallet1.walletId = "walletId" + i.toString();
-      wallet1.money = "≈ \$664466" + i.toString();
-      wallet1.walletName = "walletName";
-      walletList.add(wallet1);
-    }
-    //todo 初始化walletlist
+    initData();
+  }
+
+  void initData() async {
+    walletList = [];
+    walletList =
+        await Wallets.instance.loadAllWalletList(false); //首页加载后，左侧拿缓存就行
+    print("leftDrawerCardState  == walletList.length===>" +
+        walletList.length.toString());
+    walletList.forEach((wallet) {
+      print("leftDrawerCardState wallet is ===>" + wallet.walletId);
+      print("leftDrawerCardState wallet.chainList.toString===>" +
+          wallet.chainList.length.toString());
+    });
+    setState(() {
+      this.walletList = walletList;
+    });
   }
 
   @override
@@ -194,7 +204,9 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                                   width: ScreenUtil().setWidth(25),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    walletList[index].walletId,
+                                    walletList[index] != null
+                                        ? walletList[index].walletName
+                                        : "",
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                     maxLines: 1,
@@ -205,7 +217,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                                   margin: EdgeInsets.only(
                                       left: ScreenUtil().setWidth(3)),
                                   child: Text(
-                                    walletList[index].money,
+                                    "0", //walletList[index].money,
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                     maxLines: 1,
@@ -267,5 +279,25 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
           ));
     });
     return walletListWidget;
+  }
+
+  Widget _buildChainListCard() {
+    List<Widget> chainsList = walletList.forEach((wallet) {
+      print("buildChainListCard wallet.chainList.toString===>" +
+          wallet.chainList.length.toString());
+      List.generate(wallet.chainList.length, (index) {
+        return Container(
+          alignment: Alignment.center,
+          height: ScreenUtil().setHeight(7.5),
+          child: Text(
+            "ETH",
+            style: TextStyle(color: Color(0xFF57CAF2), fontSize: 12),
+          ),
+        );
+      });
+    });
+    return Wrap(
+      children: chainsList,
+    );
   }
 }
