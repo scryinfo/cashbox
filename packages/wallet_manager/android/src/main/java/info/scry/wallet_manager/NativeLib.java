@@ -198,8 +198,8 @@ public class NativeLib {
     public static native WalletState setNowWallet(String walletId);
 
     // 删除钱包。 钱包设置可删除，链设置隐藏。
-    // apiNo:WM07 fixed - fixed
-    public static native WalletState deleteWallet(String walletId);
+    // apiNo:WM07
+    public static native WalletState deleteWallet(String walletId, byte[] pwd);
 
     // 重置钱包密码。
     // apiNo:WM08 fixed

@@ -155,17 +155,12 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                     opacity: displayRenameBtn,
                     child: RaisedButton(
                       onPressed: () async {
-                        print("materialButton===> is clicked");
-                        Wallet chooseWallet = Wallets.instance
-                            .getWalletByWalletId(
-                                Provider.of<WalletManagerProvide>(context)
-                                    .walletId);
-                        bool isRenameSuccess =
-                            await chooseWallet.rename(walletName);
+                        Wallet chooseWallet = await Wallets.instance.getWalletByWalletId(Provider.of<WalletManagerProvide>(context).walletId);
+                        bool isRenameSuccess = await chooseWallet.rename(_walletNameController.text);
                         if (isRenameSuccess) {
                           Fluttertoast.showToast(msg: "钱包名称修改成功");
                           setState(() {
-                            walletName = walletName;
+                            walletName = _walletNameController.text;
                             displayRenameBtn = 0.0;
                           });
                         } else {
@@ -227,8 +222,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                   try {
                     NavigatorUtils.push(context, Routes.recoverWalletPage);
                   } on Exception catch (e) {
-                    print(
-                        "buildRecoverWalletWidget error is =>" + e.toString());
+                    print("buildRecoverWalletWidget error is =>" + e.toString());
                   }
                 },
               );

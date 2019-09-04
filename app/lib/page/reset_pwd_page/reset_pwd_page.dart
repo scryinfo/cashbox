@@ -1,6 +1,12 @@
+import 'dart:typed_data';
+
+import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
+import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 import '../../routers/application.dart';
 import '../../routers/routers.dart';
@@ -62,11 +68,18 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 height: ScreenUtil().setHeight(9),
                 color: Color.fromRGBO(26, 141, 198, 0.20),
                 child: FlatButton(
-                  onPressed: () {
-                    print("clicked the add wallet btn");
+                  onPressed: () async {
                     if (_verifyPwdSame()) {
-                      NavigatorUtils.push(context, Routes.eeePage,
-                          clearStack: true);
+                      String walletId = Provider
+                          .of<WalletManagerProvide>(context)
+                          .walletId;
+                      Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
+                      String pwd = _oldPwdController.text.toString();
+                      print("reset_pwd_page==>" + pwd.codeUnits.toString()); //[B@6922d7e
+                      await wallet.resetPwd(
+                          Uint8List.fromList(_newPwdController.text.codeUnits), Uint8List.fromList(_oldPwdController.text.codeUnits));
+
+                      NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                     }
                   },
                   child: Text(
@@ -109,9 +122,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 //labelText: "请输入钱包名",
                 labelStyle: TextStyle(
                   color: Colors.white,
@@ -159,9 +170,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
@@ -208,9 +217,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
@@ -234,16 +241,14 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
     );
   }
 
-  void _verifyPwd() {
-    String pwd = _newPwdController.text;
-    if (pwd.isEmpty || pwd.length < 1) {
-      Fluttertoast.showToast(msg: "密码不能为空");
-      return;
-    }
-  }
-
   bool _verifyPwdSame() {
-    //todo  验证一致性 ,do change pwd
+    if (_oldPwdController.text.isEmpty || _newPwdController.text.isEmpty || _confirmPwdController.text.isEmpty) {
+      Fluttertoast.showToast(msg: "信息不能为空，请检查后重新尝试");
+      return false;
+    } else if (_newPwdController.text != _confirmPwdController.text) {
+      Fluttertoast.showToast(msg: "两次输入的密码不一致，请重新查证");
+      return false;
+    }
     return true;
   }
 }
