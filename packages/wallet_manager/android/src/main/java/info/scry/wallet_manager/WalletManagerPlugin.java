@@ -259,9 +259,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
                 Log.d("nativeLib=>", "walletState.status is " + walletState.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                resultMap.put("isRename", walletState.isRename);
                 if (walletState.status == 200) {
-                    //todo
-                    result.success(walletState.isRename);
+                    result.success(resultMap);
                 } else {
                     result.error("something wrong", "", "");
                 }

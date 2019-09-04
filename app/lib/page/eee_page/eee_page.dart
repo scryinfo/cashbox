@@ -265,7 +265,7 @@ class _EeePageState extends State<EeePage> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    displayDigitsList[index].digitRate ??
+                                    displayDigitsList[index].digitRate.price.toString() ??
                                         "0", //市场单价
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,

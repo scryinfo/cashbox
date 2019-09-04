@@ -30,9 +30,15 @@ class Wallet {
   // 重置钱包名
   // apiNo:WM09
   Future<bool> rename(String walletName) async {
-    //todo 数据格式
-    var isSuccess = await WalletManager.rename(walletId, walletName);
-    return null;
+    var walletRenameMap = await WalletManager.rename(walletId, walletName);
+    var status = walletRenameMap["status"];
+    print("rename reuslt =====>" + status.runtimeType.toString());
+    if (status == 200) {
+      this.walletName = walletName; //jni操作完成，更改model
+      return walletRenameMap["isRename"];
+    } else {
+      return false;
+    }
   }
 
   // 显示链
