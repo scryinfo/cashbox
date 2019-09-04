@@ -100,10 +100,11 @@ class WalletManager {
 
   // 重置钱包名
   // apiNo:WM09
-  static Future<bool> rename(String walletName, String walletId) async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod(
+  static Future<Map<dynamic, dynamic>> rename(
+      String walletName, String walletId) async {
+    Map<dynamic, dynamic> walletRenameMap = await _channel.invokeMethod(
         'rename', {"walletName": walletName, "walletId": walletId});
-    return null;
+    return walletRenameMap;
   }
 
   // 显示链

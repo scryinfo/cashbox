@@ -142,6 +142,16 @@ class Wallets {
     return walletId;
   }
 
+  Wallet getWalletByWalletId(String walletId) {
+    Wallet chooseWallet;
+    allWalletList.forEach((wallet) {
+      if (walletId == wallet.walletId) {
+        chooseWallet = wallet;
+      }
+    });
+    return chooseWallet;
+  }
+
   //设置当前钱包 bool是否成功
   //  apiNo:WM06
   Future<bool> setNowWallet(String walletId) async {
