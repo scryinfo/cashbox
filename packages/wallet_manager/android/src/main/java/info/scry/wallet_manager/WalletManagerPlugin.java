@@ -73,7 +73,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "isContainWallet is =>" + walletState.isContainWallet);
                 HashMap hashMap = new HashMap();
                 if (walletState.status == 200) {
+                    hashMap.put("status", walletState.status);
                     hashMap.put("isContainWallet", walletState.isContainWallet);
+                    hashMap.put("message", walletState.message);
                     result.success(hashMap);
                 } else {
                     result.error("isContainWallet", "isContainWallet api error", "");
@@ -94,40 +96,43 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     result.success(resultWalletList); ///empty wallet
                 }
                 for (int i = 0; i < walletList.size(); i++) {
+                    int walletIndex = i;
                     Map<String, Object> walletMap = new HashMap<String, Object>();
 
-                    walletMap.put("walletId", walletList.get(i).walletId);
-                    walletMap.put("walletName", walletList.get(i).walletName);
-                    walletMap.put("isNowWallet", walletList.get(i).isNowWallet);
-                    Log.d("nativeLib=>", "nowWallet is =>" + walletList.get(i).isNowWallet + "");
+                    walletMap.put("walletId", walletList.get(walletIndex).walletId);
+                    walletMap.put("walletName", walletList.get(walletIndex).walletName);
+                    walletMap.put("isNowWallet", walletList.get(walletIndex).isNowWallet);
+                    Log.d("nativeLib=>", "isNowWallet is =>" + walletList.get(walletIndex).isNowWallet + "");
                     //walletMap.put("walletType", walletList.get(i).walletType);
-                    Log.d("nativeLib=>", "nowChainId is =>" + walletList.get(i).nowChainId);
-                    walletMap.put("nowChainId", walletList.get(i).nowChainId);
-                    walletMap.put("creationTime", walletList.get(i).creationTime);
+                    Log.d("nativeLib=>", "nowChainId is =>" + walletList.get(walletIndex).nowChainId);
+                    walletMap.put("nowChainId", walletList.get(walletIndex).nowChainId);
+                    walletMap.put("creationTime", walletList.get(walletIndex).creationTime);
 
                     /*-------------------------组装eee链上数据 start-------------------------*/
                     Map<String, Object> resultEeeChain = new HashMap<>();
-                    resultEeeChain.put("chainAddress", walletList.get(i).eeeChain.chainAddress);
-                    resultEeeChain.put("chainId", walletList.get(i).eeeChain.chainId);
-                    resultEeeChain.put("chainType", walletList.get(i).eeeChain.chainType);
-                    resultEeeChain.put("isVisible", walletList.get(i).eeeChain.isVisible);
-                    resultEeeChain.put("status", walletList.get(i).eeeChain.status);
-                    resultEeeChain.put("walletId", walletList.get(i).eeeChain.walletId);
+                    resultEeeChain.put("chainAddress", walletList.get(walletIndex).eeeChain.chainAddress);
+                    resultEeeChain.put("chainId", walletList.get(walletIndex).eeeChain.chainId);
+                    resultEeeChain.put("chainType", walletList.get(walletIndex).eeeChain.chainType);
+                    resultEeeChain.put("isVisible", walletList.get(walletIndex).eeeChain.isVisible);
+                    resultEeeChain.put("status", walletList.get(walletIndex).eeeChain.status);
+                    resultEeeChain.put("walletId", walletList.get(walletIndex).eeeChain.walletId);
                     List<Map<String, Object>> eeeChainDigitList = new ArrayList<>();
-                    List<EeeDigit> eeeDigitList = walletList.get(i).eeeChain.digitList;
+                    List<EeeDigit> eeeDigitList = walletList.get(walletIndex).eeeChain.digitList;
                     for (int j = 0; j < eeeDigitList.size(); j++) {
+                        int digitIndex = j;
                         Map<String, Object> digitMap = new HashMap<String, Object>();
-                        digitMap.put("status", eeeDigitList.get(j).status);
-                        digitMap.put("digitId", eeeDigitList.get(j).digitId);
-                        digitMap.put("chainId", eeeDigitList.get(j).chainId);
-                        digitMap.put("address", eeeDigitList.get(j).address);
-                        digitMap.put("contractAddress", eeeDigitList.get(j).contractAddress);
-                        digitMap.put("shortName", eeeDigitList.get(j).shortName);
-                        digitMap.put("fullName", eeeDigitList.get(j).fullName);
-                        digitMap.put("balance", eeeDigitList.get(j).balance);
-                        digitMap.put("isVisible", eeeDigitList.get(j).isVisible);
-                        digitMap.put("decimal", eeeDigitList.get(j).decimal);
-                        digitMap.put("imgUrl", eeeDigitList.get(j).imgUrl);
+
+                        digitMap.put("status", eeeDigitList.get(digitIndex).status);
+                        digitMap.put("digitId", eeeDigitList.get(digitIndex).digitId);
+                        digitMap.put("chainId", eeeDigitList.get(digitIndex).chainId);
+                        digitMap.put("address", eeeDigitList.get(digitIndex).address);
+                        digitMap.put("contractAddress", eeeDigitList.get(digitIndex).contractAddress);
+                        digitMap.put("shortName", eeeDigitList.get(digitIndex).shortName);
+                        digitMap.put("fullName", eeeDigitList.get(digitIndex).fullName);
+                        digitMap.put("balance", eeeDigitList.get(digitIndex).balance);
+                        digitMap.put("isVisible", eeeDigitList.get(digitIndex).isVisible);
+                        digitMap.put("decimal", eeeDigitList.get(digitIndex).decimal);
+                        digitMap.put("imgUrl", eeeDigitList.get(digitIndex).imgUrl);
                         eeeChainDigitList.add(digitMap);
                     }
                     resultEeeChain.put("eeeChainDigitList", eeeChainDigitList);
@@ -136,8 +141,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                     /*-------------------------组装ETH链上数据 start-------------------------*/
                     List<Map<String, Object>> resultEthChain = new ArrayList<>();
-                    if (walletList.get(i).ethChain != null) {
-                        List<EthDigit> ethDigitList = walletList.get(i).ethChain.digitList;
+                    if (walletList.get(walletIndex).ethChain != null) {
+                        List<EthDigit> ethDigitList = walletList.get(walletIndex).ethChain.digitList;
                         for (int j = 0; j < ethDigitList.size(); j++) {
                             //todo
                         }
@@ -146,8 +151,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                     /*-------------------------组装BTC链上数据 start-------------------------*/
                     List<Map<String, Object>> resultBtcChain = new ArrayList<>();
-                    if (walletList.get(i).btcChain != null) {
-                        List<BtcDigit> btcDigitList = walletList.get(i).btcChain.digitList;
+                    if (walletList.get(walletIndex).btcChain != null) {
+                        List<BtcDigit> btcDigitList = walletList.get(walletIndex).btcChain.digitList;
                         for (int j = 0; j < btcDigitList.size(); j++) {
                             //todo
                         }
@@ -161,7 +166,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                     ///钱包列表，加入拼装好的钱包
                     resultWalletList.add(walletMap);
-                    Log.d("nativeLib=>", "拼装好的钱包一个钱包  resultWalletList is ===>" + resultWalletList.toString());
+                    Log.d("nativeLib=>", "拼装好一个 walletMap  index is===>" + walletIndex + " ||  walletMap  is ===>" + walletMap.toString());
+                    Log.d("nativeLib=>", "拼装好zong内部钱包个数.siez()is===>" + resultWalletList.size() + " || resultWalletList is ===>" + resultWalletList.toString());
                 }
                 result.success(resultWalletList);
                 break;
@@ -201,7 +207,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "begin to deleteWallet =>");
                 WalletState walletState = new WalletState();
                 try {
-                    walletState = NativeLib.deleteWallet((String) (call.argument("walletId")));
+                    walletState = NativeLib.deleteWallet((String) (call.argument("walletId")), (byte[]) (call.argument("pwd")));
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
@@ -218,12 +224,19 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "begin to resetPwd =>");
                 WalletState walletState = new WalletState();
                 try {
-                    walletState = NativeLib.resetPwd((String) (call.argument("walletId")), (byte[]) (call.argument("newPwd")), (byte[]) (call.argument("oldPwd")));
+                    walletState = NativeLib.resetPwd((String) (call.argument("walletId")), "q".getBytes(), "q".getBytes());
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
+                Log.d("nativeLib=>", "walletState.status is " + walletState.status);
+                Log.d("nativeLib=>", "walletState.isResetPwd is " + walletState.isResetPwd);
+                Log.d("nativeLib=>", "walletState.message is " + walletState.message);
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                resultMap.put("isResetPwd", walletState.isResetPwd);
+                resultMap.put("message", walletState.message);
+
                 if (walletState.status == 200) {
-                    Log.d("nativeLib=>", "walletState.status is " + walletState.status);
                     result.success(walletState.isResetPwd);
                 } else {
                     result.error("something wrong", "", "");
@@ -249,9 +262,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                 break;
             }
-            // apiNo:WM09 fixed
+            // apiNo:WM09
             case "rename": {
                 Log.d("nativeLib=>", "begin to rename =>");
+                Log.d("nativeLib=>", "new walletName is =>" + (String) (call.argument("walletName")));
+                Log.d("nativeLib=>", " walletId is =>" + (String) (call.argument("walletId")));
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.rename((String) (call.argument("walletId")), (String) (call.argument("walletName")));
@@ -259,6 +274,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
                 Log.d("nativeLib=>", "walletState.status is " + walletState.status);
+                Log.d("nativeLib=>", "walletState.isRename is " + walletState.isRename);
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
                 resultMap.put("isRename", walletState.isRename);

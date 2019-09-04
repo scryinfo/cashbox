@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/model/wallet.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -37,9 +38,7 @@ class _EntryPageState extends State<EntryPage> {
     setState(() {
       this.isContainWallet = isContainWallet;
     });
-    //WalletManagerTest.saveWallet();
-    //WalletManagerTest.isContainWallet();
-    //WalletManagerTest.loadAllWalletList();
+    //await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     //WalletManagerTest.setNowWallet();
     //WalletManagerTest.getNowWallet();
     //WalletManagerTest.deleteWallet();
@@ -65,9 +64,7 @@ class _EntryPageState extends State<EntryPage> {
         width: ScreenUtil().setWidth(90),
         height: ScreenUtil().setHeight(160),
         decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage("assets/images/bg_loading.png"),
-              fit: BoxFit.fill),
+          image: DecorationImage(image: AssetImage("assets/images/bg_loading.png"), fit: BoxFit.fill),
         ),
         child: Container(
           alignment: Alignment.center,
@@ -125,11 +122,7 @@ class _EntryPageState extends State<EntryPage> {
             Gaps.scaleHGap(2.5),
             Text(
               "添加钱包",
-              style: TextStyle(
-                  decoration: TextDecoration.none,
-                  color: Colors.blue,
-                  fontSize: 15,
-                  fontStyle: FontStyle.normal),
+              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: 15, fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -156,11 +149,7 @@ class _EntryPageState extends State<EntryPage> {
             Gaps.scaleHGap(2.5),
             Text(
               "导入钱包",
-              style: TextStyle(
-                  decoration: TextDecoration.none,
-                  color: Colors.blue,
-                  fontSize: 15,
-                  fontStyle: FontStyle.normal),
+              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: 15, fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -193,11 +182,7 @@ class _EntryPageState extends State<EntryPage> {
                 children: <Widget>[
                   Text(
                     "我已仔细阅读并同意",
-                    style: TextStyle(
-                        decoration: TextDecoration.none,
-                        color: Colors.white70,
-                        fontSize: 13,
-                        fontStyle: FontStyle.normal),
+                    style: TextStyle(decoration: TextDecoration.none, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -208,11 +193,7 @@ class _EntryPageState extends State<EntryPage> {
                     },
                     child: Text(
                       "《服务协议》",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.white70,
-                          fontSize: 13,
-                          fontStyle: FontStyle.normal),
+                      style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       maxLines: 2,
@@ -220,11 +201,7 @@ class _EntryPageState extends State<EntryPage> {
                   ),
                   Text(
                     "、",
-                    style: TextStyle(
-                        decoration: TextDecoration.none,
-                        color: Colors.white70,
-                        fontSize: 13,
-                        fontStyle: FontStyle.normal),
+                    style: TextStyle(decoration: TextDecoration.none, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -235,11 +212,7 @@ class _EntryPageState extends State<EntryPage> {
                     },
                     child: Text(
                       "《隐私条款》",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.white70,
-                          fontSize: 13,
-                          fontStyle: FontStyle.normal),
+                      style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       maxLines: 2,

@@ -25,11 +25,17 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print("执行了一次_WalletManagerListPageState didChange()");
     initData();
   }
 
   void initData() async {
-    walletList = await Wallets.instance.loadAllWalletList();
+    walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //改钱包属性后，需要重新刷新同步数据，如改钱包名。
     setState(() {
       this.walletList = walletList;
     });
@@ -56,15 +62,12 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
   }
 
   List<Widget> _buildWalletList() {
-    List<Widget> walletListWidgetList =
-        List.generate(walletList.length, (index) {
+    List<Widget> walletListWidgetList = List.generate(walletList.length, (index) {
       return Container(
         child: GestureDetector(
           onTap: () {
-            Provider.of<WalletManagerProvide>(context)
-                .setWalletName(walletList[index].walletName);
-            Provider.of<WalletManagerProvide>(context)
-                .setWalletId(walletList[index].walletId);
+            Provider.of<WalletManagerProvide>(context).setWalletName(walletList[index].walletName);
+            Provider.of<WalletManagerProvide>(context).setWalletId(walletList[index].walletId);
             NavigatorUtils.push(context, Routes.walletManagerPage);
           },
           child: Container(

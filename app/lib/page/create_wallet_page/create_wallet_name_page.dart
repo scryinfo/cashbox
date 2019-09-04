@@ -35,9 +35,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(160),
       decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/images/bg_loading.png"),
-            fit: BoxFit.fill),
+        image: DecorationImage(image: AssetImage("assets/images/bg_loading.png"), fit: BoxFit.fill),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -84,10 +82,8 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       child: FlatButton(
         onPressed: () {
           if (_verifyToCreateWallet()) {
-            Provider.of<CreateWalletProcessProvide>(context)
-                .setWalletName(_nameController.text);
-            Provider.of<CreateWalletProcessProvide>(context)
-                .setPwd(Uint8List.fromList(_pwdController.text.codeUnits));
+            Provider.of<CreateWalletProcessProvide>(context).setWalletName(_nameController.text);
+            Provider.of<CreateWalletProcessProvide>(context).setPwd(Uint8List.fromList(_pwdController.text.codeUnits));
             NavigatorUtils.push(context, Routes.createWalletMnemonicPage);
           }
         },
@@ -129,9 +125,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 //labelText: "请输入钱包名",
                 labelStyle: TextStyle(
                   color: Colors.white,
@@ -180,9 +174,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
@@ -230,9 +222,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
@@ -328,7 +318,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       return false;
     }
     //验证：两次密码一致
-    if (_confirmPwdController.text == _pwdController.text) {
+    if (_confirmPwdController.text != _pwdController.text) {
       Fluttertoast.showToast(msg: "确认密码不一致，请重新输入");
       return false;
     }

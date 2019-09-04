@@ -76,7 +76,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       Fluttertoast.showToast(msg: "有部分内容为空，请填写完整信息");
       return false;
     }
-    if (pwd.toString() == confirmPwd.toString()) {
+    if (pwd.toString() != confirmPwd.toString()) {
       Fluttertoast.showToast(msg: "两次输入密码不一致!!!");
       return false;
     }
@@ -87,9 +87,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/images/bg_graduate.png"),
-            fit: BoxFit.fill),
+        image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -134,11 +132,8 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               child: FlatButton(
                 onPressed: () async {
                   if (_verifyImportWallet()) {
-                    var isSuccess = await Wallets.instance.saveWallet(
-                        _walletNameController.text,
-                        Uint8List.fromList("woshi密码".codeUnits),
-                        Uint8List.fromList(_mneController.text.codeUnits),
-                        WalletType.WALLET);
+                    var isSuccess = await Wallets.instance.saveWallet(_walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
+                        Uint8List.fromList(_mneController.text.codeUnits), WalletType.WALLET);
                     if (isSuccess) {
                       NavigatorUtils.push(
                         context,
@@ -278,9 +273,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
@@ -327,9 +320,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
@@ -376,9 +367,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),

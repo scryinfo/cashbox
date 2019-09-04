@@ -142,7 +142,7 @@ class Wallets {
     return walletId;
   }
 
-  Wallet getWalletByWalletId(String walletId) {
+  Future<Wallet> getWalletByWalletId(String walletId) async{
     Wallet chooseWallet;
     allWalletList.forEach((wallet) {
       if (walletId == wallet.walletId) {
