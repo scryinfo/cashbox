@@ -99,6 +99,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     int walletIndex = i;
                     Map<String, Object> walletMap = new HashMap<String, Object>();
 
+                    walletMap.put("status", walletList.get(walletIndex).status);
                     walletMap.put("walletId", walletList.get(walletIndex).walletId);
                     walletMap.put("walletName", walletList.get(walletIndex).walletName);
                     walletMap.put("isNowWallet", walletList.get(walletIndex).isNowWallet);

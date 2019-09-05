@@ -49,7 +49,7 @@ class Wallets {
     if (status == 200) {
       return containWalletMap["isContainWallet"];
     } else {
-      LogUtil.e("isContainWallet", "error is =>" + message.toString());
+      LogUtil.e("isContainWallet=>", "error status is=>" + containWalletMap["status"].toString() + "||message is=>" + message.toString());
       return false;
     }
   }
@@ -57,61 +57,70 @@ class Wallets {
   // 导出所有钱包
   // apiNo:WM02
   Future<List<Wallet>> loadAllWalletList({bool isForceLoadFromJni = false}) async {
+    ///判是否需要重新从JNI再获取一次，加载过就是有缓存的。
     if (!isForceLoadFromJni) {
       return allWalletList;
     }
     allWalletList = [];
     var jniList = await WalletManager.loadAllWalletList();
-    print("dart ==> jniList=====>" + jniList.toString());
-    if (jniList.isNotEmpty) {
-      for (var i = 0; i < jniList.length; i++) {
-        var walletM = Wallet();
-        walletM.walletName = jniList[i]["walletName"].toString();
-        walletM.walletId = jniList[i]["walletId"].toString();
-        //walletM.walletType = jniList[i]["walletType"];//todo 数据格式更改
-        walletM.nowChainId = jniList[i]["nowChainId"].toString();
-        walletM.creationTime = jniList[i]["creationTime"].toString();
-        walletM.isNowWallet = jniList[i]["isNowWallet"];
-        var eeeChain = jniList[i]["eeeChain"];
-
-        Chain chainEeeM = ChainEEE();
-        chainEeeM.chainId = eeeChain["chainId"];
-        chainEeeM.chainAddress = eeeChain["chainAddress"];
-        chainEeeM.chainType = chainEeeM.intToChainType(eeeChain["chainType"]);
-        chainEeeM.isVisible = eeeChain["isVisible"];
-        chainEeeM.walletId = eeeChain["walletId"];
-
-        List eeeChainDigitList = eeeChain["eeeChainDigitList"];
-        for (var j = 0; j < eeeChainDigitList.length; j++) {
-          var digit = eeeChainDigitList[j];
-          Digit digitM = EeeDigit();
-          digitM.digitId = digit["digitId"];
-          digitM.chainId = digit["chainId"];
-          digitM.address = digit["address"];
-          digitM.shortName = digit["shortName"];
-          digitM.fullName = digit["fullName"];
-          digitM.balance = digit["balance"];
-          digitM.isVisible = digit["isVisible"];
-          digitM.decimal = digit["decimal"];
-          digitM.urlImg = digit["imgUrl"];
-
-          ///将digit 添加到digitList里面
-          chainEeeM.digitsList.add(digitM);
-        }
-        //todo    BTC 和 ETH 链信息还没有加入
-
-        ///将chain 添加到chainList里面
-        walletM.chainList.add(chainEeeM);
-
-        ///将wallet 添加到walletList里面
-        allWalletList.add(walletM);
-      }
+    if (jniList == null || jniList.isEmpty || jniList.length == 0) {
+      return allWalletList;
     }
+    print("loadAllWalletList  => jniList is=====>" + jniList.toString());
+    for (var i = 0; i < jniList.length; i++) {
+      var walletIndex = i;
+      var walletM = Wallet();
+      int walletStatus = jniList[walletIndex]["status"];
+      if (walletStatus == null || walletStatus != 200) {
+        LogUtil.e("loadAllWalletList=>", "error status code is" + walletStatus.toString() + "||message is=>" + jniList[walletIndex]["message"]);
+        continue; //这个钱包数据有问题，跳过取下个wallet
+      }
+      walletM.walletName = jniList[walletIndex]["walletName"].toString();
+      walletM.walletId = jniList[walletIndex]["walletId"].toString();
+      //walletM.walletType = jniList[walletIndex]["walletType"];//todo 数据格式更改
+      walletM.nowChainId = jniList[walletIndex]["nowChainId"].toString();
+      walletM.creationTime = jniList[walletIndex]["creationTime"].toString();
+      walletM.isNowWallet = jniList[walletIndex]["isNowWallet"];
+      var eeeChain = jniList[walletIndex]["eeeChain"];
+
+      Chain chainEeeM = ChainEEE();
+      chainEeeM.chainId = eeeChain["chainId"]; //todo 优化代码,build链式添加信息
+      chainEeeM.chainAddress = eeeChain["chainAddress"];
+      chainEeeM.chainType = chainEeeM.intToChainType(eeeChain["chainType"]);
+      chainEeeM.isVisible = eeeChain["isVisible"];
+      chainEeeM.walletId = eeeChain["walletId"];
+
+      List eeeChainDigitList = eeeChain["eeeChainDigitList"];
+      for (var j = 0; j < eeeChainDigitList.length; j++) {
+        var digitInfoMap = eeeChainDigitList[j];
+        Digit digitM = EeeDigit();
+        digitM.digitId = digitInfoMap["digitId"];
+        digitM.chainId = digitInfoMap["chainId"];
+        digitM.address = digitInfoMap["address"];
+        digitM.shortName = digitInfoMap["shortName"];
+        digitM.fullName = digitInfoMap["fullName"];
+        digitM.balance = digitInfoMap["balance"];
+        digitM.isVisible = digitInfoMap["isVisible"];
+        digitM.decimal = digitInfoMap["decimal"];
+        digitM.urlImg = digitInfoMap["imgUrl"];
+
+        ///将digit 添加到digitList里面
+        chainEeeM.digitsList.add(digitM);
+      }
+      //todo    BTC 和 ETH 链信息还没有加入
+
+      ///将chain 添加到chainList里面
+      walletM.chainList.add(chainEeeM);
+
+      ///将wallet 添加到walletList里面
+      allWalletList.add(walletM);
+    }
+
     return allWalletList;
   }
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
-  // apiNo:WM03
+  // apiNo:WM03           //todo 2.0 优化saveWallet接口，返回值类型
   Future<bool> saveWallet(String walletName, Uint8List pwd, Uint8List mnemonic, WalletType walletType) async {
     int walletTypeToInt = 0;
     switch (walletType) {
@@ -122,8 +131,8 @@ class Wallets {
         walletTypeToInt = 1;
         break;
     }
-    var isSuccessMap = await WalletManager.saveWallet(walletName, pwd, mnemonic, walletTypeToInt);
-    if (isSuccessMap["status"] == 200) {
+    var saveWalletMap = await WalletManager.saveWallet(walletName, pwd, mnemonic, walletTypeToInt);
+    if (saveWalletMap["status"] == 200) {
       return true;
     }
     return false;
