@@ -1,15 +1,14 @@
+import 'dart:typed_data';
+
+import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../res/resources.dart';
-import '../../routers/application.dart';
-import '../../routers/routers.dart';
-import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
-import 'package:app/util/qr_scan_util.dart';
-import '../../widgets/list_item.dart';
 
 class RecoverWalletPage extends StatefulWidget {
   @override
@@ -17,23 +16,6 @@ class RecoverWalletPage extends StatefulWidget {
 }
 
 class _RecoverWalletPageState extends State<RecoverWalletPage> {
-  List mnemonicList = [
-    "october",
-    "shallow",
-    "october",
-    "shallow",
-    "october",
-    "shallow",
-    "october",
-    "shallow",
-    "october",
-    "shallow",
-    "october",
-    "shallow",
-    "october",
-    "shallow",
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,9 +31,7 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
         body: Container(
           alignment: Alignment.center,
           width: ScreenUtil().setWidth(78.5),
-          margin: EdgeInsets.only(
-              left: ScreenUtil().setWidth(5.5),
-              right: ScreenUtil().setWidth(5.5)),
+          margin: EdgeInsets.only(left: ScreenUtil().setWidth(5.5), right: ScreenUtil().setWidth(5.5)),
           child: Column(
             children: <Widget>[
               Gaps.scaleVGap(5),
@@ -101,19 +81,21 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
               ),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Text(
-              mnemonicList.join(" "),
-              style: TextStyle(
-                color: Colors.white,
-                wordSpacing: 5,
+            child: Center(
+              child: Text(
+                String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic) ?? "",
+                style: TextStyle(
+                  color: Colors.white,
+                  wordSpacing: 5,
+                ),
+                maxLines: 4,
               ),
-              maxLines: 4,
             ),
           ),
           Gaps.scaleVGap(8),
           Container(
             child: QrImage(
-              data: "666 666 666 666 666",
+              data: String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic),
               size: ScreenUtil().setWidth(38),
               backgroundColor: Colors.white,
             ),

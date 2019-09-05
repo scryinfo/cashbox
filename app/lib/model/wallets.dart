@@ -140,10 +140,9 @@ class Wallets {
 
   // 钱包导出。 恢复钱包   /* 此处有助记词生成。注意及时释放*/
   // apiNo:WM04
-  Future<Wallet> exportWallet(String walletId, Uint8List pwd) async {
-    var result = await WalletManager.exportWallet(walletId, pwd);
-    // todo result数据格式转换，返回
-    return null;
+  Future<Map> exportWallet(String walletId, Uint8List pwd) async {
+    Map mnemonicMap = await WalletManager.exportWallet(walletId, pwd);
+    return mnemonicMap;
   }
 
   //获取当前钱包

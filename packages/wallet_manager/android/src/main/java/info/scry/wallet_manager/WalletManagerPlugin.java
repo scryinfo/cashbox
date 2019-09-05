@@ -253,6 +253,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 resultMap.put("status", mnemonic.status);
                 resultMap.put("mnId", mnemonic.mnId);
                 resultMap.put("mn", mnemonic.mn);
+                resultMap.put("message", mnemonic.message);
                 result.success(resultMap);
                 break;
             }
