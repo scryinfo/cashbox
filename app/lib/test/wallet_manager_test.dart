@@ -12,8 +12,7 @@ class WalletManagerTest {
   //fixed  todo chainList
   static void saveWallet() async {
     var mnemonic = await Wallets.instance.createMnemonic(12);
-    var wallet = await Wallets.instance.saveWallet("thisWall33etName",
-        Uint8List.fromList("666".codeUnits), mnemonic, WalletType.WALLET);
+    var wallet = await Wallets.instance.saveWallet("thisWall33etName", Uint8List.fromList("666".codeUnits), mnemonic, WalletType.WALLET);
   }
 
   //fixed
@@ -32,28 +31,22 @@ class WalletManagerTest {
   }
 
   static void setNowWallet() async {
-    var isSuccess = await Wallets.instance.setNowWallet(
-        "fe3b3751739df1e3de9fd4fda4572c61877aef5b6761edd0ae417ca952779a4f");
+    var isSuccess = await Wallets.instance.setNowWallet("fe3b3751739df1e3de9fd4fda4572c61877aef5b6761edd0ae417ca952779a4f");
     //fe3b3751739df1e3de9fd4fda4572c61877aef5b6761edd0ae417ca952779a4f
     print("wallet_manager_test setNowWallet=>" + isSuccess.toString());
   }
 
   static void deleteWallet() async {
-    var isSuccess = await Wallets.instance.deleteWallet(
-        "fe3b3751739df1e3de9fd4fda4572c61877aef5b6761edd0ae417ca952779a4f");
+    //var isSuccess = await Wallets.instance.deleteWallet("fe3b3751739df1e3de9fd4fda4572c61877aef5b6761edd0ae417ca952779a4f");
     //fe3b3751739df1e3de9fd4fda4572c61877aef5b6761edd0ae417ca952779a4f
-    print("wallet_manager_test deleteWallet=>" + isSuccess.toString());
+    //print("wallet_manager_test deleteWallet=>" + isSuccess.toString());
   }
 
   static void resetPwd() async {
-    var allWalletList =
-        await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
-    print("wallet_manager_test allWalletList=>" +
-        allWalletList.length.toString());
+    var allWalletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
+    print("wallet_manager_test allWalletList=>" + allWalletList.length.toString());
     print("wallet_manager_test allWalletList=>" + allWalletList[0].toString());
-    var isSuccess = allWalletList[0].resetPwd(
-        Uint8List.fromList("777".codeUnits),
-        Uint8List.fromList("666".codeUnits));
+    var isSuccess = allWalletList[0].resetPwd(Uint8List.fromList("777".codeUnits), Uint8List.fromList("666".codeUnits));
     print("wallet_manager_test resetPwd=>" + isSuccess.toString());
   }
 }

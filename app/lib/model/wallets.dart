@@ -179,14 +179,18 @@ class Wallets {
 
   //删除钱包。 钱包设置可删除，链设置隐藏。
   // apiNo:WM07.
-  Future<bool> deleteWallet(String walletId) async {
-    var isSuccess = await WalletManager.deleteWallet(walletId);
+  Future<Map> deleteWallet(String walletId, Uint8List pwd) async {
+    Map deleteWalletMap = await WalletManager.deleteWallet(walletId, pwd);
+    print("deleteWallet===========>" + deleteWalletMap.toString());
     // db移除 todo 数据格式转换
-    Wallet wallet;
-    if (isSuccess) {
+    int status = deleteWalletMap["status"];
+    bool isSuccess = deleteWalletMap["isDeletWallet"];
+    if (status != null && status == 200 && isSuccess) {
       // 数据模型层移除
-      allWalletList.remove(wallet);
+      allWalletList.remove(getWalletByWalletId(walletId));
+      return deleteWalletMap;
+    } else {
+      return deleteWalletMap;
     }
-    return isSuccess;
   }
 }

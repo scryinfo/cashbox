@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
+import 'package:app/util/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -219,6 +222,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                 onPressed: (value) {
                   //todo
                   print("to do verify pwd，recover wallet======>");
+
                   try {
                     NavigatorUtils.push(context, Routes.recoverWalletPage);
                   } on Exception catch (e) {
@@ -256,9 +260,18 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               title: "删除钱包",
               hintContent: "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。",
               hintInput: "请输入钱包密码",
-              onPressed: (value) {
-                //todo
+              onPressed: (value) async {
+                Map deleteMap = await Wallets.instance.deleteWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
                 print("to do verify pwd,delete wallet");
+                int status = deleteMap["status"];
+                bool isSuccess = deleteMap["isDeletWallet"];
+                if (status == 200 && isSuccess) {
+                  Fluttertoast.showToast(msg: "钱包删除成功");
+                  NavigatorUtils.push(context, Routes.entryPage);
+                } else {
+                  LogUtil.e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
+                  Fluttertoast.showToast(msg: "密码错误，钱包删除失败");
+                }
               },
             );
           },
