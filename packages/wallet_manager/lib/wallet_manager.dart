@@ -62,9 +62,9 @@ class WalletManager {
 
   //删除钱包。 钱包设置可删除，链设置隐藏。
   // apiNo:WM07
-  static Future<bool> deleteWallet(String walletId) async {
-    bool isSuccess = await _channel.invokeMethod('deleteWallet', {"walletId": walletId});
-    return isSuccess;
+  static Future<Map> deleteWallet(String walletId, Uint8List pwd) async {
+    Map deleteWalletMap = await _channel.invokeMethod('deleteWallet', {"walletId": walletId, "pwd": pwd});
+    return deleteWalletMap;
   }
 
   // 重置钱包密码。

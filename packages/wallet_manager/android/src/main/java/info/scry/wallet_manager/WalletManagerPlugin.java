@@ -208,12 +208,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
-                if (walletState.status == 200) {
-                    Log.d("nativeLib=>", "walletState.status is " + walletState.status);
-                    result.success(walletState.isDeletWallet);
-                } else {
-                    result.error("something wrong", "", "");
-                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                resultMap.put("isDeletWallet", walletState.isDeletWallet);
+                resultMap.put("message", walletState.message);
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM08
