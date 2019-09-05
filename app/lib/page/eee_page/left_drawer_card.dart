@@ -27,8 +27,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
 
   void initData() async {
     walletList = [];
-    walletList =
-        await Wallets.instance.loadAllWalletList(); //在首页加载后，已经掉过接口了,拿缓存就行
+    walletList = await Wallets.instance.loadAllWalletList(); //在首页加载后，已经掉过接口了,拿缓存就行
     setState(() {
       this.walletList = walletList;
     });
@@ -179,14 +178,11 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                 child: GestureDetector(
                   onTap: () async {
                     print("wallet index is===> " + walletList[index].walletId);
-
-                    var isSuccess = await Wallets.instance
-                        .setNowWallet(walletList[index].walletId);
+                    bool isSuccess = await Wallets.instance.setNowWallet(walletList[index].walletId);
                     if (isSuccess) {
-                      NavigatorUtils.push(context, Routes.eeePage,
-                          clearStack: true);
+                      NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                     } else {
-                      Fluttertoast.showToast(msg: "钱包切换失败，请重新打开切换");
+                      Fluttertoast.showToast(msg: "钱包切换失败，请重新打开钱包，尝试切换");
                     }
                   },
                   child: Column(
@@ -208,32 +204,25 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                                   width: ScreenUtil().setWidth(25),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    walletList[index] != null
-                                        ? walletList[index].walletName
-                                        : "",
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 12),
+                                    walletList[index] != null ? walletList[index].walletName : "",
+                                    style: TextStyle(color: Colors.grey, fontSize: 12),
                                     maxLines: 1,
                                   ),
                                 ),
                                 Container(
                                   width: ScreenUtil().setWidth(18),
-                                  margin: EdgeInsets.only(
-                                      left: ScreenUtil().setWidth(3)),
+                                  margin: EdgeInsets.only(left: ScreenUtil().setWidth(3)),
                                   child: Text(
                                     "0", //walletList[index].money,
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 12),
+                                    style: TextStyle(color: Colors.grey, fontSize: 12),
                                     maxLines: 1,
                                     textAlign: TextAlign.center,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(
-                                      left: ScreenUtil().setWidth(1)),
-                                  child: Image.asset(
-                                      "assets/images/ic_nav_enter.png"),
+                                  margin: EdgeInsets.only(left: ScreenUtil().setWidth(1)),
+                                  child: Image.asset("assets/images/ic_nav_enter.png"),
                                 ),
                               ],
                             ),

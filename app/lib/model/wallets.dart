@@ -32,7 +32,7 @@ class Wallets {
   // 创建助记词，待验证正确通过，由底层创建钱包完成，应用层做保存
   // apiNo:MM00
   Future<Uint8List> createMnemonic(int count) async {
-    var resultMap = await WalletManager.mnemonicGenerate(count);
+    Map resultMap = await WalletManager.mnemonicGenerate(count);
     if (resultMap["status"] != null && resultMap["status"] == 200) {
       return resultMap["mn"];
     } else {
@@ -43,9 +43,9 @@ class Wallets {
   // 是否已有钱包
   // apiNo:WM01
   Future<bool> isContainWallet() async {
-    var containWalletMap = await WalletManager.isContainWallet();
-    var status = containWalletMap["status"];
-    var message = containWalletMap["message"];
+    Map containWalletMap = await WalletManager.isContainWallet();
+    int status = containWalletMap["status"];
+    String message = containWalletMap["message"];
     if (status == 200) {
       return containWalletMap["isContainWallet"];
     } else {
@@ -62,14 +62,14 @@ class Wallets {
       return allWalletList;
     }
     allWalletList = [];
-    var jniList = await WalletManager.loadAllWalletList();
+    List jniList = await WalletManager.loadAllWalletList();
     if (jniList == null || jniList.isEmpty || jniList.length == 0) {
       return allWalletList;
     }
     print("loadAllWalletList  => jniList is=====>" + jniList.toString());
-    for (var i = 0; i < jniList.length; i++) {
-      var walletIndex = i;
-      var walletM = Wallet();
+    for (int i = 0; i < jniList.length; i++) {
+      int walletIndex = i;
+      Wallet walletM = Wallet();
       int walletStatus = jniList[walletIndex]["status"];
       if (walletStatus == null || walletStatus != 200) {
         LogUtil.e("loadAllWalletList=>", "error status code is" + walletStatus.toString() + "||message is=>" + jniList[walletIndex]["message"]);
@@ -91,8 +91,8 @@ class Wallets {
       chainEeeM.walletId = eeeChain["walletId"];
 
       List eeeChainDigitList = eeeChain["eeeChainDigitList"];
-      for (var j = 0; j < eeeChainDigitList.length; j++) {
-        var digitInfoMap = eeeChainDigitList[j];
+      for (int j = 0; j < eeeChainDigitList.length; j++) {
+        Map digitInfoMap = eeeChainDigitList[j];
         Digit digitM = EeeDigit();
         digitM.digitId = digitInfoMap["digitId"];
         digitM.chainId = digitInfoMap["chainId"];
@@ -131,7 +131,7 @@ class Wallets {
         walletTypeToInt = 1;
         break;
     }
-    var saveWalletMap = await WalletManager.saveWallet(walletName, pwd, mnemonic, walletTypeToInt);
+    Map saveWalletMap = await WalletManager.saveWallet(walletName, pwd, mnemonic, walletTypeToInt);
     if (saveWalletMap["status"] == 200) {
       return true;
     }
@@ -167,12 +167,14 @@ class Wallets {
   //设置当前钱包 bool是否成功
   //  apiNo:WM06
   Future<bool> setNowWallet(String walletId) async {
-    var isSuccess = await WalletManager.setNowWallet(walletId);
-    //todo 等待底层处理完成，更改 数据模型处。
-    if (isSuccess) {
-      this.nowWallet = nowWallet;
+    Map setNowWalletMap = await WalletManager.setNowWallet(walletId);
+    int status = setNowWalletMap["status"];
+    if (status != null && status == 200) {
+      return setNowWalletMap["isSetNowWallet"];
+    } else {
+      LogUtil.e("setNowWallet=>", "error status code is" + status.toString() + "||message is=>" + setNowWalletMap["message"]);
+      return false;
     }
-    return isSuccess;
   }
 
   //删除钱包。 钱包设置可删除，链设置隐藏。

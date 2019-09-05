@@ -55,9 +55,9 @@ class WalletManager {
 
   //设置当前钱包 bool是否成功
   //  apiNo:WM06
-  static Future<bool> setNowWallet(String walletId) async {
-    bool isSuccess = await _channel.invokeMethod('setNowWallet', {"walletId": walletId});
-    return isSuccess;
+  static Future<Map<dynamic, dynamic>> setNowWallet(String walletId) async {
+    Map<dynamic, dynamic> isSetNowWalletMap = await _channel.invokeMethod('setNowWallet', {"walletId": walletId});
+    return isSetNowWalletMap;
   }
 
   //删除钱包。 钱包设置可删除，链设置隐藏。

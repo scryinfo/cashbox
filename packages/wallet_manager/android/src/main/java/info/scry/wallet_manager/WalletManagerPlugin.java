@@ -72,14 +72,10 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "isContainWallet.status is =>" + walletState.status);
                 Log.d("nativeLib=>", "isContainWallet is =>" + walletState.isContainWallet);
                 HashMap hashMap = new HashMap();
-                if (walletState.status == 200) {
-                    hashMap.put("status", walletState.status);
-                    hashMap.put("isContainWallet", walletState.isContainWallet);
-                    hashMap.put("message", walletState.message);
-                    result.success(hashMap);
-                } else {
-                    result.error("isContainWallet", "isContainWallet api error", "");
-                }
+                hashMap.put("status", walletState.status);
+                hashMap.put("isContainWallet", walletState.isContainWallet);
+                hashMap.put("message", walletState.message);
+                result.success(hashMap);
                 break;
             }
             // apiNo:WM02
@@ -181,11 +177,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
-                if (walletState.status == 200) {
-                    result.success(walletState.isSetNowWallet);
-                } else {
-                    result.error("something wrong", "", "");
-                }
+                HashMap hashMap = new HashMap();
+                hashMap.put("status", walletState.status);
+                hashMap.put("isSetNowWallet", walletState.isSetNowWallet);
+                hashMap.put("message", walletState.message);
+                result.success(hashMap);
                 break;
             }
             // apiNo:WM05
