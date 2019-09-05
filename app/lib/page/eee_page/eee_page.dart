@@ -42,10 +42,8 @@ class _EeePageState extends State<EeePage> {
   }
 
   void initData() async {
-    this.walletList =
-        await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
-    print("eee_page => initData walletlist.length===>" +
-        walletList.length.toString());
+    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
+    print("eee_page => initData walletlist.length===>" + walletList.length.toString());
     this.walletList.forEach((wallet) {
       print("eee_page => is isNowWallet===> " + wallet.isNowWallet.toString());
       print("eee_page => wallet.walletId===> " + wallet.walletId.toString());
@@ -56,8 +54,7 @@ class _EeePageState extends State<EeePage> {
             this.nowWallet = wallet;
             this.walletName = nowWallet.walletName;
             this.nowChain = nowWallet.getChainByChainId(nowWallet.nowChainId);
-            print("eee_page =>  nowChain setState chainAddress=====>" +
-                nowChain.chainAddress);
+            print("eee_page =>  nowChain setState chainAddress=====>" + nowChain.chainAddress);
             this.nowChainAddress = nowChain.chainAddress;
             this.nowChainDigitsList = nowChain.digitsList;
           },
@@ -97,7 +94,10 @@ class _EeePageState extends State<EeePage> {
         elevation: 0,
         brightness: Brightness.light,
         centerTitle: true,
-        title: Text(walletName == null ? "" : walletName),
+        title: Text(
+          walletName ?? walletName,
+          style: TextStyle(fontSize: 20),
+        ),
       ),
       drawer: LeftDrawerCard(), //左侧抽屉栏
       body: Container(
@@ -128,8 +128,7 @@ class _EeePageState extends State<EeePage> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             print("snapshot.error==>" + snapshot.error.toString());
-            LogUtil.e("digitList future snapshot.hasError is +>",
-                snapshot.error.toString());
+            LogUtil.e("digitList future snapshot.hasError is +>", snapshot.error.toString());
             return Center(
               child: Text(
                 "数据加载出错了，请尝试重新加载!~",
@@ -139,9 +138,7 @@ class _EeePageState extends State<EeePage> {
           }
           if (snapshot.hasData) {
             return Container(
-              padding: EdgeInsets.only(
-                  left: ScreenUtil().setWidth(3),
-                  right: ScreenUtil().setWidth(3)),
+              padding: EdgeInsets.only(left: ScreenUtil().setWidth(3), right: ScreenUtil().setWidth(3)),
               child: _digitListWidgets(snapshot),
             );
           } else {
@@ -231,9 +228,7 @@ class _EeePageState extends State<EeePage> {
                               Align(
                                 alignment: new FractionalOffset(0.0, 0.0),
                                 child: Text(
-                                  displayDigitsList[index].shortName +
-                                      " * " +
-                                      displayDigitsList[index].balance,
+                                  displayDigitsList[index].shortName + " * " + displayDigitsList[index].balance,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,
@@ -245,8 +240,7 @@ class _EeePageState extends State<EeePage> {
                                 child: Text(
                                   "≈" + moneyUnitStr + " " + "0",
                                   //"≈" + displayDigitsList[index].money,
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 16),
+                                  style: TextStyle(color: Colors.white, fontSize: 16),
                                 ),
                               ),
                             ],
@@ -265,21 +259,17 @@ class _EeePageState extends State<EeePage> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    displayDigitsList[index].digitRate.price.toString() ??
-                                        "0", //市场单价
+                                    displayDigitsList[index].digitRate.price.toString() ?? "0", //市场单价
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: 10,
                                     ),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.only(
-                                        left: ScreenUtil().setWidth(2.5)),
+                                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                     child: Text(
                                       "0%", //市场价格波动
-                                      style: TextStyle(
-                                          color: Colors.yellowAccent,
-                                          fontSize: 10),
+                                      style: TextStyle(color: Colors.yellowAccent, fontSize: 10),
                                     ),
                                   )
                                 ],
@@ -288,8 +278,7 @@ class _EeePageState extends State<EeePage> {
                                 alignment: FractionalOffset.topRight,
                                 child: Text(
                                   "0", //最近一笔交易记录
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.greenAccent),
+                                  style: TextStyle(fontSize: 10, color: Colors.greenAccent),
                                 ),
                               ),
                             ],
@@ -328,6 +317,7 @@ class _EeePageState extends State<EeePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
+              alignment: Alignment.center,
               width: ScreenUtil().setWidth(30),
               height: ScreenUtil().setHeight(10),
               child: GestureDetector(
@@ -341,13 +331,12 @@ class _EeePageState extends State<EeePage> {
                     ),
                     Text(
                       "转账",
-                      style: TextStyle(color: Colors.lightBlueAccent),
+                      style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
                     )
                   ],
                 ),
                 onTap: () {
-                  NavigatorUtils.push(context,
-                      Routes.transferEeePage); //todo 目前只有eee，后续有多个代币时需要区分
+                  NavigatorUtils.push(context, Routes.transferEeePage); //todo 目前只有eee，后续有多个代币时需要区分
                 },
               )),
           Container(
@@ -356,16 +345,12 @@ class _EeePageState extends State<EeePage> {
             child: GestureDetector(
               child: Row(
                 children: <Widget>[
-                  new Padding(
-                      padding:
-                          EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
-                      child: Image.asset("assets/images/ic_receive.png")),
+                  new Padding(padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)), child: Image.asset("assets/images/ic_receive.png")),
                   Padding(
-                      padding:
-                          EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
+                      padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
                       child: Text(
                         "收款",
-                        style: TextStyle(color: Colors.lightBlueAccent),
+                        style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
                       )),
                 ],
               ),
@@ -391,13 +376,9 @@ class _EeePageState extends State<EeePage> {
               alignment: Alignment.centerLeft,
               width: ScreenUtil().setWidth(40),
               height: ScreenUtil().setHeight(42.75),
-              padding: EdgeInsets.only(
-                  left: ScreenUtil().setWidth(8.5),
-                  top: ScreenUtil().setHeight(10)),
+              padding: EdgeInsets.only(left: ScreenUtil().setWidth(8.5), top: ScreenUtil().setHeight(10)),
               decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("assets/images/bg_card.png"),
-                    fit: BoxFit.fill),
+                image: DecorationImage(image: AssetImage("assets/images/bg_card.png"), fit: BoxFit.fill),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -432,69 +413,66 @@ class _EeePageState extends State<EeePage> {
         child: Container(
           height: ScreenUtil().setHeight(7),
           alignment: Alignment.center,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  height: ScreenUtil().setHeight(7),
-                  width: ScreenUtil().setWidth(30),
-                  alignment: Alignment.centerLeft,
-                  child: new Text(
-                    moneyUnitStr + " 1234567",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+          child: Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+            Container(
+              height: ScreenUtil().setHeight(7),
+              width: ScreenUtil().setWidth(30),
+              alignment: Alignment.centerLeft,
+              child: new Text(
+                moneyUnitStr + " 1234567",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
                 ),
-                Gaps.scaleHGap(1),
-                Container(
-                  height: ScreenUtil().setHeight(7),
-                  child: new PopupMenuButton<String>(
-                      color: Colors.black12,
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuItem<String>>[
-                            new PopupMenuItem<String>(
-                                value: 'USD',
-                                child: new Text(
-                                  'USD',
-                                  style: new TextStyle(color: Colors.white),
-                                )),
-                            new PopupMenuItem<String>(
-                                value: 'CNY',
-                                child: new Text(
-                                  'CNY',
-                                  style: new TextStyle(color: Colors.white),
-                                )),
-                            new PopupMenuItem<String>(
-                                value: 'KRW',
-                                child: new Text(
-                                  'KRW',
-                                  style: new TextStyle(color: Colors.white),
-                                )),
-                            new PopupMenuItem<String>(
-                                value: 'GBP',
-                                child: new Text(
-                                  'GBP',
-                                  style: new TextStyle(color: Colors.white),
-                                )),
-                            new PopupMenuItem<String>(
-                                value: 'JPY',
-                                child: new Text(
-                                  'JPY',
-                                  style: new TextStyle(color: Colors.white),
-                                ))
-                          ],
-                      onSelected: (String value) {
-                        setState(() {
-                          moneyUnitStr = value;
-                        });
-                      }),
-                ),
-              ]),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Gaps.scaleHGap(1),
+            Container(
+              height: ScreenUtil().setHeight(7),
+              child: new PopupMenuButton<String>(
+                  color: Colors.black12,
+                  icon: Icon(Icons.keyboard_arrow_down),
+                  itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+                        new PopupMenuItem<String>(
+                            value: 'USD',
+                            child: new Text(
+                              'USD',
+                              style: new TextStyle(color: Colors.white),
+                            )),
+                        new PopupMenuItem<String>(
+                            value: 'CNY',
+                            child: new Text(
+                              'CNY',
+                              style: new TextStyle(color: Colors.white),
+                            )),
+                        new PopupMenuItem<String>(
+                            value: 'KRW',
+                            child: new Text(
+                              'KRW',
+                              style: new TextStyle(color: Colors.white),
+                            )),
+                        new PopupMenuItem<String>(
+                            value: 'GBP',
+                            child: new Text(
+                              'GBP',
+                              style: new TextStyle(color: Colors.white),
+                            )),
+                        new PopupMenuItem<String>(
+                            value: 'JPY',
+                            child: new Text(
+                              'JPY',
+                              style: new TextStyle(color: Colors.white),
+                            ))
+                      ],
+                  onSelected: (String value) {
+                    setState(() {
+                      moneyUnitStr = value;
+                    });
+                  }),
+            ),
+          ]),
         ),
       ),
     );
@@ -517,42 +495,37 @@ class _EeePageState extends State<EeePage> {
             child: Image.asset("assets/images/ic_card_qrcode.png"),
           ),
         ),
+        Gaps.scaleHGap(1.5),
         Container(
           alignment: Alignment.bottomLeft,
           constraints: BoxConstraints(
             maxWidth: ScreenUtil().setWidth(20.5),
           ),
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: ScreenUtil().setWidth(1.5),
-            ),
-            child: GestureDetector(
-              onTap: () {
-                if (walletName.isEmpty || nowChainAddress.isEmpty) {
-                  return;
-                }
-                _navigatorToAddressPage(walletName, "address", nowChainAddress);
-              },
-              child: Text(
-                nowChainAddress,
-                textAlign: TextAlign.start,
-                style: TextStyle(color: Colors.lightBlueAccent),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+          child: GestureDetector(
+            onTap: () {
+              if (walletName.isEmpty || nowChainAddress.isEmpty) {
+                return;
+              }
+              _navigatorToAddressPage(walletName, "address", nowChainAddress);
+            },
+            child: Text(
+              nowChainAddress,
+              textAlign: TextAlign.start,
+              style: TextStyle(color: Colors.lightBlueAccent),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
+        Gaps.scaleHGap(15.5),
         Container(
-          child: Padding(
-            padding: EdgeInsets.only(
-                left: ScreenUtil().setWidth(12.5),
-                bottom: ScreenUtil().setWidth(0)),
+          child: Container(
             child: Text(
               chainTypeList[index],
               style: TextStyle(
-                fontSize: 35,
+                fontSize: 45,
                 color: Color.fromRGBO(255, 255, 255, 0.1),
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -561,14 +534,8 @@ class _EeePageState extends State<EeePage> {
     ));
   }
 
-  void _navigatorToAddressPage(
-      String walletName, String title, String content) {
-    String target = "addresspage?walletName=" +
-        walletName +
-        "&title=" +
-        title +
-        "&content=" +
-        content;
+  void _navigatorToAddressPage(String walletName, String title, String content) {
+    String target = "addresspage?walletName=" + walletName + "&title=" + title + "&content=" + content;
     NavigatorUtils.push(
       context,
       target,
