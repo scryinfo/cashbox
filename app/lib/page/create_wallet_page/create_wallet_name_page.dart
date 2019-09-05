@@ -112,7 +112,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               "钱包名称",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: 16,
               ),
             ),
           ),
@@ -160,7 +160,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               "密码",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: 16,
               ),
             ),
           ),
@@ -208,7 +208,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               "再次输入密码",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: 16,
               ),
             ),
           ),
@@ -256,7 +256,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
             "选择创建链",
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.5),
-              fontSize: 13,
+              fontSize: 16,
             ),
           ),
         ),

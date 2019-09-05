@@ -14,8 +14,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class CreateWalletConfirmPage extends StatefulWidget {
   @override
-  _CreateWalletConfirmPageState createState() =>
-      _CreateWalletConfirmPageState();
+  _CreateWalletConfirmPageState createState() => _CreateWalletConfirmPageState();
 }
 
 class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
@@ -35,10 +34,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
 
   initData() {
     setState(() {
-      mnemonicList = String.fromCharCodes(
-              Provider.of<CreateWalletProcessProvide>(context).mnemonic)
-          .split(" ");
-      mnemonicList.sort((left, right) => left.length.compareTo(right.length));
+      mnemonicList = String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic).split(" ");
+      mnemonicList.sort((left, right) => left.length.compareTo(right.length)); //乱序显示 助记词
     });
   }
 
@@ -46,9 +43,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/images/bg_graduate.png"),
-            fit: BoxFit.fill),
+        image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -75,10 +70,10 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
             Container(
               alignment: Alignment.topLeft,
               child: Text(
-                "备份助记词",
+                "验证备份助记词",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 15,
+                  fontSize: 18,
                 ),
               ),
             ),
@@ -87,7 +82,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               alignment: Alignment.center,
               padding: EdgeInsets.only(left: 0, right: 0),
               child: Text(
-                "请点击验证你保存的助记词。再次提醒，程序不会保留您的隐私信息,请您务必保存好助记词",
+                "请输入验证你保存的助记词顺序。再次提醒，程序不会保留您的隐私信息,请您务必保存好助记词",
                 textAlign: TextAlign.left,
                 maxLines: 2,
                 style: TextStyle(
@@ -121,8 +116,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                 onPressed: () async {
                   var isSuccess = await _verifyMnemonicSame();
                   if (isSuccess) {
-                    Provider.of<CreateWalletProcessProvide>(context)
-                        .emptyData(); /**创建钱包完成，清楚内存关于助记词的记录信息*/
+                    Provider.of<CreateWalletProcessProvide>(context).emptyData();    /**创建钱包完成，清楚内存关于助记词的记录信息*/
                     NavigatorUtils.push(
                       context,
                       Routes.eeePage,
@@ -149,17 +143,10 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   }
 
   Future<bool> _verifyMnemonicSame() async {
-    if (verifyString.isNotEmpty &&
-        Provider.of<CreateWalletProcessProvide>(context).mnemonic.length != 0) {
-      if (verifyString.trim() ==
-          String.fromCharCodes(
-                  Provider.of<CreateWalletProcessProvide>(context).mnemonic)
-              .trim()) {
-        var isSuccess = await Wallets.instance.saveWallet(
-            Provider.of<CreateWalletProcessProvide>(context).walletName,
-            Provider.of<CreateWalletProcessProvide>(context).pwd,
-            Provider.of<CreateWalletProcessProvide>(context).mnemonic,
-            WalletType.WALLET);
+    if (verifyString.isNotEmpty && Provider.of<CreateWalletProcessProvide>(context).mnemonic.length != 0) {
+      if (verifyString.trim() == String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic).trim()) {
+        var isSuccess = await Wallets.instance.saveWallet(Provider.of<CreateWalletProcessProvide>(context).walletName,
+            Provider.of<CreateWalletProcessProvide>(context).pwd, Provider.of<CreateWalletProcessProvide>(context).mnemonic, WalletType.WALLET);
         if (isSuccess) {
           return true;
         } else {
@@ -196,7 +183,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               this.verifyString,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 13,
+                fontSize: 14,
                 wordSpacing: 5,
               ),
               maxLines: 3,
@@ -240,8 +227,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
           ),
           onPressed: () {
             setState(() {
-              this.verifyString =
-                  this.verifyString + mnemonicList[index].toString() + " ";
+              this.verifyString = this.verifyString + mnemonicList[index].toString() + " ";
               mnemonicList.removeAt(index);
             });
           },
