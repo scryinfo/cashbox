@@ -185,9 +185,9 @@ public class NativeLib {
     // apiNo:WM03 fixed
     public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic, int walletType);
 
-    // 钱包导出。 恢复钱包
+    // 钱包导出。 恢复钱包助记词
     // apiNo:WM04
-    public static native Wallet exportWallet(String walletId, byte[] pwd);
+    public static native Mnemonic exportWallet(String walletId, byte[] pwd);
 
     // 获取当前钱包
     // apiNo:WM05 fixed -           //loadAllWallet可替代
