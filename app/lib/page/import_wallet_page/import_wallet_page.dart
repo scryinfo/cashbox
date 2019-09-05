@@ -171,7 +171,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               "助记词",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: 16,
               ),
             ),
           ),
@@ -188,7 +188,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.7),
-                      fontSize: 12,
+                      fontSize: 15,
                     ),
                     maxLines: 4,
                     decoration: InputDecoration(
@@ -208,7 +208,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                       hintText: "请输入助记词",
                       hintStyle: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.7),
-                        fontSize: 12,
+                        fontSize: 14,
                       ),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black87),
@@ -225,7 +225,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   alignment: Alignment.bottomRight,
                   height: ScreenUtil().setHeight(30),
                   padding: EdgeInsets.only(
-                    bottom: ScreenUtil().setHeight(3),
+                    bottom: ScreenUtil().setHeight(5),
                     right: ScreenUtil().setWidth(3),
                   ),
                   child: GestureDetector(
@@ -260,7 +260,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               "钱包名称",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: 16,
               ),
             ),
           ),
@@ -307,7 +307,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               "密码",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: 16,
               ),
             ),
           ),
@@ -354,7 +354,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               "确认密码",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: 16,
               ),
             ),
           ),

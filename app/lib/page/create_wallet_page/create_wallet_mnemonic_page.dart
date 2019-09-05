@@ -74,25 +74,26 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
         height: ScreenUtil().setWidth(160),
         child: Column(
           children: <Widget>[
-            Gaps.scaleVGap(10.75),
+            Gaps.scaleVGap(8.75),
             Container(
               alignment: Alignment.topLeft,
               child: Text(
                 "备份助记词",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 13,
+                  fontSize: 18,
                 ),
               ),
             ),
             Gaps.scaleVGap(1.75),
             Container(
-              alignment: Alignment.center,
+              alignment: Alignment.centerLeft,
               padding: EdgeInsets.only(left: 0, right: 0),
               child: Text(
-                "以下是钱包的助记词，抄写下来并导出至安全的地方存放。一旦丢失，无法找回。",
+                """以下是钱包的助记词，请您务必认真抄写下来并导出至安全的地方存放。
+注意：一旦丢失，无法找回。""",
                 textAlign: TextAlign.left,
-                maxLines: 2,
+                maxLines: 4,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 13,
@@ -121,6 +122,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
             Gaps.scaleVGap(6.2),
             Container(
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   GestureDetector(
                     onTap: () {
@@ -199,7 +201,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.9),
-              fontSize: 12,
+              fontSize: 14,
             ),
           ),
           onPressed: () {},
