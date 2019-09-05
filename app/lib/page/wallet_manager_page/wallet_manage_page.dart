@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/util/log_util.dart';
 import 'package:flutter/material.dart';
@@ -219,20 +220,21 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                 title: "恢复钱包",
                 hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
                 hintInput: "请输入钱包密码",
-                onPressed: (value) {
-                  //todo
-                  print("to do verify pwd，recover wallet======>");
-
-                  try {
+                onPressed: (value) async {
+                  Map mnemonicMap = await Wallets.instance.exportWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
+                  int status = mnemonicMap["status"];
+                  if (status == 200) {
+                    Provider.of<CreateWalletProcessProvide>(context).setMnemonic(mnemonicMap["mn"]);
+                    mnemonicMap = null; //跟助记词相关,用完置空
                     NavigatorUtils.push(context, Routes.recoverWalletPage);
-                  } on Exception catch (e) {
-                    print("buildRecoverWalletWidget error is =>" + e.toString());
+                  } else {
+                    LogUtil.e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
+                    Fluttertoast.showToast(msg: "密码错误，钱包恢复失败");
                   }
                 },
               );
             },
           );
-          //
         },
         child: Container(
           child: Column(
