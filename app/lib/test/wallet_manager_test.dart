@@ -13,7 +13,7 @@ class WalletManagerTest {
   static void saveWallet() async {
     var mnemonic = await Wallets.instance.createMnemonic(12);
     var wallet = await Wallets.instance.saveWallet("thisWall33etName",
-        Uint8List.fromList("666".codeUnits), mnemonic.mn, WalletType.WALLET);
+        Uint8List.fromList("666".codeUnits), mnemonic, WalletType.WALLET);
   }
 
   //fixed

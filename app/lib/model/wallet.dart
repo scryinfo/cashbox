@@ -7,6 +7,7 @@ import 'chain.dart';
 enum WalletType { TEST_WALLET, WALLET } //0,1
 
 class Wallet {
+  int status; //接口数据，返回状态码
   String walletId; //钱包Id
   String walletName; //钱包名
   String money; //
