@@ -42,6 +42,7 @@ public class NativeLib {
         public int status;
         public byte[] mn;
         public String mnId; //todo mnID的生成规则？ uuid or hash
+        public String message;  //错误信息，详细说明
     }
 
     public static class Address {
