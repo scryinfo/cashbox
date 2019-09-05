@@ -2,6 +2,10 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
+/*
+*   功能说明： WalletManager只负责 定义接口&&中转数据。
+*   具体 数据内异常判断、数据获取，均由dart数据模型层再做处理。
+*/
 class WalletManager {
   static const MethodChannel _channel = const MethodChannel('wallet_manager');
 
@@ -38,7 +42,7 @@ class WalletManager {
   // 钱包导出。 恢复钱包
   // apiNo:WM04
   static Future<Map<dynamic, dynamic>> exportWallet(String walletId, Uint8List pwd) async {
-    Map<dynamic, dynamic> wallet = await _channel.invokeMethod('exportWallet', {pwd: pwd, walletId: walletId});
+    Map<dynamic, dynamic> wallet = await _channel.invokeMethod('exportWallet', {"pwd": pwd, "walletId": walletId});
     return wallet;
   }
 
@@ -54,16 +58,6 @@ class WalletManager {
   static Future<bool> setNowWallet(String walletId) async {
     bool isSuccess = await _channel.invokeMethod('setNowWallet', {"walletId": walletId});
     return isSuccess;
-  }
-
-  static Future<Map<dynamic, dynamic>> mnemonicSave(mnemonic, pwd) async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('mnemonicSave', {"mnemonic": mnemonic, "pwd": pwd});
-    return null;
-  }
-
-  static Future<Map<dynamic, dynamic>> mnemonicExport(mnemonic, pwd) async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('mnemonicExport', {"mnemonic": mnemonic, "pwd": pwd});
-    return null;
   }
 
   //删除钱包。 钱包设置可删除，链设置隐藏。

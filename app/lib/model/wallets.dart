@@ -1,5 +1,5 @@
-import 'package:app/model/mnemonic.dart';
 import 'package:app/model/wallet.dart';
+import 'package:app/util/log_util.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 
 import 'dart:typed_data';
@@ -31,27 +31,32 @@ class Wallets {
 
   // 创建助记词，待验证正确通过，由底层创建钱包完成，应用层做保存
   // apiNo:MM00
-  Future<Mnemonic> createMnemonic(int count) async {
+  Future<Uint8List> createMnemonic(int count) async {
     var resultMap = await WalletManager.mnemonicGenerate(count);
-    var mnemonic = Mnemonic();
-    mnemonic.mn = resultMap["mn"];
-    mnemonic.mnId = resultMap["mnId"];
-    mnemonic.status = resultMap["status"];
-    return mnemonic;
+    if (resultMap["status"] != null && resultMap["status"] == 200) {
+      return resultMap["mn"];
+    } else {
+      return null;
+    }
   }
 
   // 是否已有钱包
   // apiNo:WM01
   Future<bool> isContainWallet() async {
     var containWalletMap = await WalletManager.isContainWallet();
-    var isContainWallet = containWalletMap["isContainWallet"];
-    return isContainWallet;
+    var status = containWalletMap["status"];
+    var message = containWalletMap["message"];
+    if (status == 200) {
+      return containWalletMap["isContainWallet"];
+    } else {
+      LogUtil.e("isContainWallet", "error is =>" + message.toString());
+      return false;
+    }
   }
 
   // 导出所有钱包
   // apiNo:WM02
-  Future<List<Wallet>> loadAllWalletList(
-      {bool isForceLoadFromJni = false}) async {
+  Future<List<Wallet>> loadAllWalletList({bool isForceLoadFromJni = false}) async {
     if (!isForceLoadFromJni) {
       return allWalletList;
     }
@@ -107,8 +112,7 @@ class Wallets {
 
   // 保存钱包,钱包导入。  通过助记词创建钱包流程
   // apiNo:WM03
-  Future<bool> saveWallet(String walletName, Uint8List pwd, Uint8List mnemonic,
-      WalletType walletType) async {
+  Future<bool> saveWallet(String walletName, Uint8List pwd, Uint8List mnemonic, WalletType walletType) async {
     int walletTypeToInt = 0;
     switch (walletType) {
       case WalletType.WALLET:
@@ -118,8 +122,7 @@ class Wallets {
         walletTypeToInt = 1;
         break;
     }
-    var isSuccessMap = await WalletManager.saveWallet(
-        walletName, pwd, mnemonic, walletTypeToInt);
+    var isSuccessMap = await WalletManager.saveWallet(walletName, pwd, mnemonic, walletTypeToInt);
     if (isSuccessMap["status"] == 200) {
       return true;
     }
@@ -142,7 +145,7 @@ class Wallets {
     return walletId;
   }
 
-  Future<Wallet> getWalletByWalletId(String walletId) async{
+  Future<Wallet> getWalletByWalletId(String walletId) async {
     Wallet chooseWallet;
     allWalletList.forEach((wallet) {
       if (walletId == wallet.walletId) {

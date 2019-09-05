@@ -3,6 +3,7 @@ import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/routers/application.dart';
 import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/util/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -12,12 +13,10 @@ import '../../routers/routers.dart';
 
 class CreateWalletMnemonicPage extends StatefulWidget {
   @override
-  _CreateWalletMnemonicPageState createState() =>
-      _CreateWalletMnemonicPageState();
+  _CreateWalletMnemonicPageState createState() => _CreateWalletMnemonicPageState();
 }
 
 class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
-  var mnemonicModel = Mnemonic();
   String walletName = "";
   List<String> mnemonicList = [];
   final String qrHintInfo = "这是您助记词信息生成的二维码";
@@ -34,24 +33,25 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
   }
 
   _loadMnemonicData() async {
-    mnemonicModel = await Wallets.instance.createMnemonic(12);
-    print("mnemonic createWalletMnemonicPage===>" +
-        String.fromCharCodes(mnemonicModel.mn));
+    var mnemonic = await Wallets.instance.createMnemonic(12);
+    if (mnemonic == null) {
+      LogUtil.e("CreateWalletMnemonicPage=>", "mnemonic is null");
+      return;
+    }
+    print("mnemonic createWalletMnemonicPage===>" + String.fromCharCodes(mnemonic));
     setState(() {
-      mnemonicList = String.fromCharCodes(mnemonicModel.mn).split(" ");
+      mnemonicList = String.fromCharCodes(mnemonic).split(" ");
       walletName = Provider.of<CreateWalletProcessProvide>(context).walletName;
     });
-    Provider.of<CreateWalletProcessProvide>(context)
-        .setMnemonic(mnemonicModel.mn);
+    Provider.of<CreateWalletProcessProvide>(context).setMnemonic(mnemonic);
+    mnemonic = null; //助记词，用完就释放
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/images/bg_graduate.png"),
-            fit: BoxFit.fill),
+        image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -144,8 +144,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                   Container(
                     child: GestureDetector(
                       onTap: () {
-                        _showAddressInQR(context, walletName, qrHintInfo,
-                            mnemonicList.join(" ").toString());
+                        _showAddressInQR(context, walletName, qrHintInfo, mnemonicList.join(" ").toString());
                       },
                       child: Text(
                         "二维码备份",
@@ -208,8 +207,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
     return randomWidgetList;
   }
 
-  _showAddressInQR(BuildContext context, String walletName, String qrHintInfo,
-      String mnemonicString) {
+  _showAddressInQR(BuildContext context, String walletName, String qrHintInfo, String mnemonicString) {
     String target = "addresspage?walletName=" +
         "${walletName}" +
         "&title=" +

@@ -246,20 +246,18 @@ public class WalletManagerPlugin implements MethodCallHandler {
             // apiNo:WM04
             case "exportWallet": {
                 Log.d("nativeLib=>", "begin to exportWallet =>");
-                Wallet wallet = new Wallet();
+                Mnemonic mnemonic = new Mnemonic();
                 try {
-                    wallet = NativeLib.exportWallet((String) (call.argument("walletId")), (byte[]) (call.argument("pwd")));
+                    mnemonic = NativeLib.exportWallet((String) (call.argument("walletId")), (byte[]) (call.argument("pwd")));
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
-                Log.d("nativeLib=>", "wallet.status is " + wallet.status);
-                if (wallet.status == 200) {
-                    //todo
-                    //result.success(wallet.isResetPwd);
-                } else {
-                    result.error("something wrong", "", "");
-                }
-
+                Log.d("nativeLib=>", "mnemonic.status is " + mnemonic.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", mnemonic.status);
+                resultMap.put("mnId", mnemonic.mnId);
+                resultMap.put("mn", mnemonic.mn);
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM09
@@ -278,11 +276,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
                 resultMap.put("isRename", walletState.isRename);
-                if (walletState.status == 200) {
-                    result.success(resultMap);
-                } else {
-                    result.error("something wrong", "", "");
-                }
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM10
