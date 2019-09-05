@@ -24,7 +24,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
   @override
   initState() {
     super.initState();
-    _loadMnemonicData();
+    _initMnemonicData();
   }
 
   @override
@@ -32,7 +32,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
     super.didChangeDependencies();
   }
 
-  _loadMnemonicData() async {
+  _initMnemonicData() async {
     var mnemonic = await Wallets.instance.createMnemonic(12);
     if (mnemonic == null) {
       LogUtil.e("CreateWalletMnemonicPage=>", "mnemonic is null");
@@ -44,7 +44,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
       walletName = Provider.of<CreateWalletProcessProvide>(context).walletName;
     });
     Provider.of<CreateWalletProcessProvide>(context).setMnemonic(mnemonic);
-    mnemonic = null; //助记词，用完就释放
+    mnemonic = null; /*助记词，用完就释放*/
   }
 
   @override
@@ -112,8 +112,10 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                 ),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: Wrap(
-                children: _buildRandomMnemonicBtn(),
+              child: Center(
+                child: Wrap(
+                  children: _buildRandomMnemonicBtn(),
+                ),
               ),
             ),
             Gaps.scaleVGap(6.2),
@@ -122,7 +124,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                 children: <Widget>[
                   GestureDetector(
                     onTap: () {
-                      _loadMnemonicData();
+                      _initMnemonicData();
                     },
                     child: Row(
                       children: <Widget>[
