@@ -269,7 +269,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                 bool isSuccess = deleteMap["isDeletWallet"];
                 if (status == 200 && isSuccess) {
                   Fluttertoast.showToast(msg: "钱包删除成功");
-                  NavigatorUtils.push(context, Routes.entryPage);
+                  NavigatorUtils.push(context, Routes.entryPage, clearStack: true);
                 } else {
                   LogUtil.e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
                   Fluttertoast.showToast(msg: "密码错误，钱包删除失败");
