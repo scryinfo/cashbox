@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,6 +13,15 @@ class Utils {
   static Future<ClipboardData> getCopyMsg() async {
     return Clipboard.getData(Clipboard.kTextPlain);
   }
+
+  //记录方法执行耗时
+  static int recordExecuteTime(Function f) {
+    var start = DateTime.now();
+    f();
+    var end = DateTime.now();
+    var duration = end.difference(start);
+    return duration.inSeconds;
+  }
 }
 
 /// 默认dialog背景色为半透明黑色，这里修改源码改为透明
@@ -22,14 +33,11 @@ Future<T> showTransparentDialog<T>({
   final ThemeData theme = Theme.of(context, shadowThemeOnly: true);
   return showGeneralDialog(
     context: context,
-    pageBuilder: (BuildContext buildContext, Animation<double> animation,
-        Animation<double> secondaryAnimation) {
+    pageBuilder: (BuildContext buildContext, Animation<double> animation, Animation<double> secondaryAnimation) {
       final Widget pageChild = Builder(builder: builder);
       return SafeArea(
         child: Builder(builder: (BuildContext context) {
-          return theme != null
-              ? Theme(data: theme, child: pageChild)
-              : pageChild;
+          return theme != null ? Theme(data: theme, child: pageChild) : pageChild;
         }),
       );
     },
@@ -41,11 +49,7 @@ Future<T> showTransparentDialog<T>({
   );
 }
 
-Widget _buildMaterialDialogTransitions(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child) {
+Widget _buildMaterialDialogTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
   return FadeTransition(
     opacity: CurvedAnimation(
       parent: animation,
