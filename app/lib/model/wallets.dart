@@ -36,6 +36,7 @@ class Wallets {
     if (resultMap["status"] != null && resultMap["status"] == 200) {
       return resultMap["mn"];
     } else {
+      LogUtil.e("createMnemonic=>", "error status is=>" + resultMap["status"].toString() + "||message is=>" + resultMap["message"].toString());
       return null;
     }
   }
@@ -75,34 +76,38 @@ class Wallets {
         LogUtil.e("loadAllWalletList=>", "error status code is" + walletStatus.toString() + "||message is=>" + jniList[walletIndex]["message"]);
         continue; //这个钱包数据有问题，跳过取下个wallet
       }
-      walletM.walletName = jniList[walletIndex]["walletName"].toString();
-      walletM.walletId = jniList[walletIndex]["walletId"].toString();
-      //walletM.walletType = jniList[walletIndex]["walletType"];//todo 数据格式更改
-      walletM.nowChainId = jniList[walletIndex]["nowChainId"].toString();
-      walletM.creationTime = jniList[walletIndex]["creationTime"].toString();
-      walletM.isNowWallet = jniList[walletIndex]["isNowWallet"];
+      walletM
+        ..walletName = jniList[walletIndex]["walletName"].toString()
+        ..walletId = jniList[walletIndex]["walletId"].toString()
+        ..nowChainId = jniList[walletIndex]["nowChainId"].toString()
+        ..creationTime = jniList[walletIndex]["creationTime"].toString()
+        ..isNowWallet = jniList[walletIndex]["isNowWallet"];
+      //..walletType = jniList[walletIndex]["walletType"];//todo 数据格式更改
+
       var eeeChain = jniList[walletIndex]["eeeChain"];
 
       Chain chainEeeM = ChainEEE();
-      chainEeeM.chainId = eeeChain["chainId"]; //todo 优化代码,build链式添加信息
-      chainEeeM.chainAddress = eeeChain["chainAddress"];
-      chainEeeM.chainType = chainEeeM.intToChainType(eeeChain["chainType"]);
-      chainEeeM.isVisible = eeeChain["isVisible"];
-      chainEeeM.walletId = eeeChain["walletId"];
+      chainEeeM
+        ..chainId = eeeChain["chainId"]
+        ..chainAddress = eeeChain["chainAddress"]
+        ..chainType = chainEeeM.intToChainType(eeeChain["chainType"])
+        ..isVisible = eeeChain["isVisible"]
+        ..walletId = eeeChain["walletId"];
 
       List eeeChainDigitList = eeeChain["eeeChainDigitList"];
       for (int j = 0; j < eeeChainDigitList.length; j++) {
         Map digitInfoMap = eeeChainDigitList[j];
         Digit digitM = EeeDigit();
-        digitM.digitId = digitInfoMap["digitId"];
-        digitM.chainId = digitInfoMap["chainId"];
-        digitM.address = digitInfoMap["address"];
-        digitM.shortName = digitInfoMap["shortName"];
-        digitM.fullName = digitInfoMap["fullName"];
-        digitM.balance = digitInfoMap["balance"];
-        digitM.isVisible = digitInfoMap["isVisible"];
-        digitM.decimal = digitInfoMap["decimal"];
-        digitM.urlImg = digitInfoMap["imgUrl"];
+        digitM
+          ..digitId = digitInfoMap["digitId"]
+          ..chainId = digitInfoMap["chainId"]
+          ..address = digitInfoMap["address"]
+          ..shortName = digitInfoMap["shortName"]
+          ..fullName = digitInfoMap["fullName"]
+          ..balance = digitInfoMap["balance"]
+          ..isVisible = digitInfoMap["isVisible"]
+          ..decimal = digitInfoMap["decimal"]
+          ..urlImg = digitInfoMap["urlImg"];
 
         ///将digit 添加到digitList里面
         chainEeeM.digitsList.add(digitM);
@@ -146,10 +151,9 @@ class Wallets {
   }
 
   //获取当前钱包
-  // apiNo:WM05
+  // apiNo:WM05  //todo 接口命名优化  getNowWalletId()
   Future<String> getNowWallet() async {
     var walletId = await WalletManager.getNowWallet();
-    // todo 数据格式转换，返回
     return walletId;
   }
 
@@ -181,7 +185,6 @@ class Wallets {
   Future<Map> deleteWallet(String walletId, Uint8List pwd) async {
     Map deleteWalletMap = await WalletManager.deleteWallet(walletId, pwd);
     print("deleteWallet===========>" + deleteWalletMap.toString());
-    // db移除 todo 数据格式转换
     int status = deleteWalletMap["status"];
     bool isSuccess = deleteWalletMap["isDeletWallet"];
     if (status != null && status == 200 && isSuccess) {
@@ -189,6 +192,7 @@ class Wallets {
       allWalletList.remove(getWalletByWalletId(walletId));
       return deleteWalletMap;
     } else {
+      LogUtil.e("deleteWallet=>", "error status code is" + status.toString() + "||message is=>" + deleteWalletMap["message"]);
       return deleteWalletMap;
     }
   }
