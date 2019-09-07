@@ -24,17 +24,28 @@ class Wallet {
 
   // 重置钱包密码
   // apiNo:WM08
-  Future<bool> resetPwd(Uint8List newPwd, Uint8List oldPwd) async {
-    var isSuccess = await WalletManager.resetPwd(walletId, newPwd, oldPwd);
-    return isSuccess;
+  Future<Map> resetPwd(Uint8List newPwd, Uint8List oldPwd) async {
+    Map resetPwdMap = await WalletManager.resetPwd(walletId, newPwd, oldPwd);
+    int status = resetPwdMap["status"];
+    if (status == null) {
+      LogUtil.e("resetPwd=>", "not find status code");
+      return null;
+    }
+    if (status == 200) {
+      return resetPwdMap;
+    } else {
+      String message = resetPwdMap["message"];
+      LogUtil.e("isContainWallet=>", "error status is=>" + status.toString() + "||message is=>" + message.toString());
+    }
+    return resetPwdMap;
   }
 
   // 重置钱包名
   // apiNo:WM09
   Future<bool> rename(String walletName) async {
-    var walletRenameMap = await WalletManager.rename(walletId, walletName);
-    var status = walletRenameMap["status"];
-    var message = walletRenameMap["message"];
+    Map walletRenameMap = await WalletManager.rename(walletId, walletName);
+    int status = walletRenameMap["status"];
+    String message = walletRenameMap["message"];
     if (status == null) {
       LogUtil.e("rename=>", "not find status code");
       return false;
