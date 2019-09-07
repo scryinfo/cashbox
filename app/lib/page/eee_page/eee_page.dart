@@ -44,7 +44,9 @@ class _EeePageState extends State<EeePage> {
   void initData() async {
     this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     print("eee_page => initData walletlist.length===>" + walletList.length.toString());
-    this.walletList.forEach((wallet) {
+    for (int i = 0; i < walletList.length; i++) {
+      int index = i;
+      Wallet wallet = walletList[index];
       print("eee_page => is isNowWallet===> " + wallet.isNowWallet.toString());
       print("eee_page => wallet.walletId===> " + wallet.walletId.toString());
       print("eee_page =>wallet.walletName===>" + wallet.walletName.toString());
@@ -59,8 +61,9 @@ class _EeePageState extends State<EeePage> {
             this.nowChainDigitsList = nowChain.digitsList;
           },
         );
+        break; //找到，终止循环
       }
-    });
+    }
     setState(() {
       this.walletList = walletList;
     });

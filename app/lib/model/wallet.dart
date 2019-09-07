@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/util/log_util.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 
 import 'chain.dart';
@@ -33,11 +34,16 @@ class Wallet {
   Future<bool> rename(String walletName) async {
     var walletRenameMap = await WalletManager.rename(walletId, walletName);
     var status = walletRenameMap["status"];
-    print("rename reuslt =====>" + status.runtimeType.toString());
+    var message = walletRenameMap["message"];
+    if (status == null) {
+      LogUtil.e("rename=>", "not find status code");
+      return false;
+    }
     if (status == 200) {
       this.walletName = walletName; //jni操作完成，更改model
       return walletRenameMap["isRename"];
     } else {
+      LogUtil.e("isContainWallet=>", "error status is=>" + walletRenameMap["status"].toString() + "||message is=>" + message.toString());
       return false;
     }
   }
@@ -85,11 +91,13 @@ class Wallet {
 
   Chain getChainByChainId(String chainId) {
     Chain nowChain;
-    chainList.forEach((chain) {
-      if (chainId == chain.chainId) {
+    for (int i = 0; i < chainList.length; i++) {
+      Chain chain = chainList[i];
+      if (chain.chainId == chainId) {
         nowChain = chain;
+        break;
       }
-    });
+    }
     return nowChain;
   }
 }
