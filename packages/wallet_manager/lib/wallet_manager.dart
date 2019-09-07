@@ -69,10 +69,10 @@ class WalletManager {
 
   // 重置钱包密码。
   // apiNo:WM08
-  static Future<bool> resetPwd(String walletId, Uint8List newPwd, Uint8List oldPwd) async {
+  static Future<Map> resetPwd(String walletId, Uint8List newPwd, Uint8List oldPwd) async {
     print("begin to resetPwd==>");
-    bool isSuccess = await _channel.invokeMethod('resetPwd', {"walletId": walletId, "newPwd": newPwd, "oldPwd": oldPwd});
-    return isSuccess;
+    Map resetPwdMap = await _channel.invokeMethod('resetPwd', {"walletId": walletId, "newPwd": newPwd, "oldPwd": oldPwd});
+    return resetPwdMap;
   }
 
   // 重置钱包名

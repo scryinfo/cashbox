@@ -232,11 +232,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 resultMap.put("isResetPwd", walletState.isResetPwd);
                 resultMap.put("message", walletState.message);
 
-                if (walletState.status == 200) {
-                    result.success(walletState.isResetPwd);
-                } else {
-                    result.error("something wrong", "", "");
-                }
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM04

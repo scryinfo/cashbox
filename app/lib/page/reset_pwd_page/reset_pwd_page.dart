@@ -70,16 +70,23 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 child: FlatButton(
                   onPressed: () async {
                     if (_verifyPwdSame()) {
-                      String walletId = Provider
-                          .of<WalletManagerProvide>(context)
-                          .walletId;
+                      String walletId = Provider.of<WalletManagerProvide>(context).walletId;
                       Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
                       String pwd = _oldPwdController.text.toString();
                       print("reset_pwd_page==>" + pwd.codeUnits.toString()); //[B@6922d7e
-                      await wallet.resetPwd(
+                      Map resetPwdMap = await wallet.resetPwd(
                           Uint8List.fromList(_newPwdController.text.codeUnits), Uint8List.fromList(_oldPwdController.text.codeUnits));
-
-                      NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
+                      if (resetPwdMap == null) {
+                        Fluttertoast.showToast(msg: "重置密码出现位置错误，请重新打开尝试");
+                        return;
+                      } else {
+                        if (resetPwdMap["status"] == 200 && resetPwdMap["isResetPwd"]) {
+                          Fluttertoast.showToast(msg: "重置密码成功，请您保存好你的密码，丢失无法找回");
+                          NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
+                        } else {
+                          Fluttertoast.showToast(msg: "重置密码失败，详细信息" + resetPwdMap["message"]);
+                        }
+                      }
                     }
                   },
                   child: Text(
