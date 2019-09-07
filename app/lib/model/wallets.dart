@@ -33,7 +33,12 @@ class Wallets {
   // apiNo:MM00
   Future<Uint8List> createMnemonic(int count) async {
     Map resultMap = await WalletManager.mnemonicGenerate(count);
-    if (resultMap["status"] != null && resultMap["status"] == 200) {
+    int status = resultMap["status"];
+    if (status == null) {
+      LogUtil.e("createMnemonic=>", "not find status code");
+      return null;
+    }
+    if (resultMap["status"] == 200) {
       return resultMap["mn"];
     } else {
       LogUtil.e("createMnemonic=>", "error status is=>" + resultMap["status"].toString() + "||message is=>" + resultMap["message"].toString());
@@ -47,6 +52,10 @@ class Wallets {
     Map containWalletMap = await WalletManager.isContainWallet();
     int status = containWalletMap["status"];
     String message = containWalletMap["message"];
+    if (status == null) {
+      LogUtil.e("isContainWallet=>", "not find status code");
+      return false;
+    }
     if (status == 200) {
       return containWalletMap["isContainWallet"];
     } else {
@@ -137,6 +146,10 @@ class Wallets {
         break;
     }
     Map saveWalletMap = await WalletManager.saveWallet(walletName, pwd, mnemonic, walletTypeToInt);
+    if (saveWalletMap["status"] == null) {
+      LogUtil.e("saveWallet=>", "not find status code");
+      return false;
+    }
     if (saveWalletMap["status"] == 200) {
       return true;
     }
@@ -159,11 +172,13 @@ class Wallets {
 
   Future<Wallet> getWalletByWalletId(String walletId) async {
     Wallet chooseWallet;
-    allWalletList.forEach((wallet) {
-      if (walletId == wallet.walletId) {
-        chooseWallet = wallet;
+    for (int i = 0; i < allWalletList.length; i++) {
+      int index = i;
+      if (allWalletList[index].walletId == walletId) {
+        chooseWallet = allWalletList[index];
+        break; //找到，终止循环
       }
-    });
+    }
     return chooseWallet;
   }
 
@@ -172,7 +187,11 @@ class Wallets {
   Future<bool> setNowWallet(String walletId) async {
     Map setNowWalletMap = await WalletManager.setNowWallet(walletId);
     int status = setNowWalletMap["status"];
-    if (status != null && status == 200) {
+    if (status == null) {
+      LogUtil.e("setNowWallet=>", "not find status code");
+      return false;
+    }
+    if (status == 200) {
       return setNowWalletMap["isSetNowWallet"];
     } else {
       LogUtil.e("setNowWallet=>", "error status code is" + status.toString() + "||message is=>" + setNowWalletMap["message"]);
@@ -184,10 +203,13 @@ class Wallets {
   // apiNo:WM07.
   Future<Map> deleteWallet(String walletId, Uint8List pwd) async {
     Map deleteWalletMap = await WalletManager.deleteWallet(walletId, pwd);
-    print("deleteWallet===========>" + deleteWalletMap.toString());
     int status = deleteWalletMap["status"];
     bool isSuccess = deleteWalletMap["isDeletWallet"];
-    if (status != null && status == 200 && isSuccess) {
+    if (status == null) {
+      LogUtil.e("deleteWallet=>", "not find status code");
+      return null;
+    }
+    if (status == 200 && isSuccess) {
       // 数据模型层移除
       allWalletList.remove(getWalletByWalletId(walletId));
       return deleteWalletMap;
