@@ -8,8 +8,7 @@ class ItemOfListWidget extends StatefulWidget {
   ItemOfListWidget({Key key, @required this.leftText}) : super(key: key);
 
   @override
-  _ItemOfListWidgetState createState() =>
-      _ItemOfListWidgetState(leftText: leftText);
+  _ItemOfListWidgetState createState() => _ItemOfListWidgetState(leftText: leftText);
 }
 
 class _ItemOfListWidgetState extends State<ItemOfListWidget> {
@@ -34,7 +33,7 @@ class _ItemOfListWidgetState extends State<ItemOfListWidget> {
               leftText,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 15,
+                fontSize: ScreenUtil().setSp(3.5),
               ),
               textAlign: TextAlign.start,
             ),
