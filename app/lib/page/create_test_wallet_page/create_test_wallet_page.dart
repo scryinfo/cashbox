@@ -1,3 +1,8 @@
+import 'dart:typed_data';
+
+import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,9 +19,17 @@ class CreateTestWalletPage extends StatefulWidget {
 }
 
 class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
-  String mnemonicString =
-      "memonic ,memonic ,memonic ,memonic ,memonic ,memonic ,memonic ,memonic ,memonic";
+  String mnemonicString = "";
   bool _eeeChainChoose = true;
+  final testWalletName = "测试钱包";
+  final walletNameTitle = "钱包名";
+  final TextEditingController _pwdController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    changeMnemonic();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +40,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "测试钱包",
+          centerTitle: "创建测试钱包",
           backgroundColor: Colors.transparent,
         ),
         body: _buildTestWalletWidget(),
@@ -40,44 +53,47 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       alignment: Alignment.center,
       width: ScreenUtil().setWidth(80),
       height: ScreenUtil().setHeight(160),
-      margin: EdgeInsets.only(
-          left: ScreenUtil().setWidth(5), right: ScreenUtil().setWidth(5)),
-      child: Column(
-        children: <Widget>[
-          Gaps.scaleVGap(2),
-          Container(
-            width: ScreenUtil().setWidth(80),
-            child: Text(
-              """测试钱包 助记词:""",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 13,
+      margin: EdgeInsets.only(left: ScreenUtil().setWidth(5), right: ScreenUtil().setWidth(5)),
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Gaps.scaleVGap(2),
+            Container(
+              width: ScreenUtil().setWidth(80),
+              child: Text(
+                """测试钱包 助记词:""",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: ScreenUtil().setSp(4),
+                ),
               ),
             ),
-          ),
-          Gaps.scaleVGap(1.5),
-          Container(
-            width: ScreenUtil().setWidth(80),
-            child: Text(
-              """注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。""",
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 10,
+            Gaps.scaleVGap(1.5),
+            Container(
+              width: ScreenUtil().setWidth(80),
+              child: Text(
+                """注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。""",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: ScreenUtil().setSp(3),
+                ),
+                maxLines: 2,
               ),
-              maxLines: 2,
             ),
-          ),
-          Gaps.scaleVGap(2.5),
-          _buildVerifyInputMnemonic(),
-          Gaps.scaleVGap(2),
-          _buildChangeMnemonicWidget(),
-          Gaps.scaleVGap(5),
-          _buildWalletNameWidget(),
-          Gaps.scaleVGap(5),
-          _buildChainChooseLayout(),
-          Gaps.scaleVGap(5),
-          _buildCreateBtn(),
-        ],
+            Gaps.scaleVGap(2.5),
+            _buildVerifyInputMnemonic(),
+            Gaps.scaleVGap(4),
+            _buildChangeMnemonicWidget(),
+            Gaps.scaleVGap(5),
+            _buildWalletNameWidget(),
+            Gaps.scaleVGap(5),
+            _buildPwdWidget(),
+            Gaps.scaleVGap(5),
+            _buildChainChooseLayout(),
+            Gaps.scaleVGap(12),
+            _buildCreateBtn(),
+          ],
+        ),
       ),
     );
   }
@@ -107,7 +123,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                 mnemonicString,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 13,
+                  fontSize: ScreenUtil().setSp(3),
                   wordSpacing: 5,
                 ),
                 maxLines: 3,
@@ -141,7 +157,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       alignment: Alignment.bottomRight,
       child: GestureDetector(
         onTap: () {
-          print("click to change mnemonic");
+          changeMnemonic();
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -168,21 +184,69 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
         child: Row(
           children: <Widget>[
             Text(
-              "钱包名: ",
+              walletNameTitle + ":",
               style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
+                color: Color.fromRGBO(255, 255, 255, 0.6),
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
+            Gaps.scaleHGap(0.5),
             Text(
-              "测试钱包",
+              testWalletName,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: 14,
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ],
         ));
+  }
+
+  Widget _buildPwdWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "钱包密码",
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.6),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(2),
+          Container(
+            alignment: Alignment.center,
+            child: TextField(
+              textAlign: TextAlign.start,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                fillColor: Color.fromRGBO(101, 98, 98, 0.50),
+                filled: true,
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
+                labelStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                hintText: "请设置钱包密码",
+                hintStyle: TextStyle(
+                  color: Color.fromRGBO(255, 255, 255, 0.7),
+                  fontSize: ScreenUtil.instance.setSp(3),
+                ),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black87),
+                  borderRadius: BorderRadius.circular(
+                    ScreenUtil().setWidth(1.0),
+                  ),
+                ),
+              ),
+              controller: _pwdController,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildChainChooseLayout() {
@@ -194,8 +258,8 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
             child: Text(
               "选择创建链",
               style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                color: Color.fromRGBO(255, 255, 255, 0.6),
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -221,7 +285,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                             "EEE_TEST",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 13,
+                              fontSize: ScreenUtil.instance.setSp(3),
                             ),
                           ),
                         ],
@@ -244,9 +308,8 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       height: ScreenUtil().setHeight(9),
       color: Color.fromRGBO(26, 141, 198, 0.20),
       child: FlatButton(
-        onPressed: () {
-          //todo create TestWallet
-          print("clicked to create test wallet");
+        onPressed: () async {
+          _createTestWallet();
         },
         child: Text(
           "添加钱包",
@@ -254,9 +317,46 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           style: TextStyle(
             color: Colors.blue,
             letterSpacing: 0.03,
+            fontSize: ScreenUtil.instance.setSp(3.2),
           ),
         ),
       ),
     );
+  }
+
+  void changeMnemonic() async {
+    var mnemonic = await Wallets.instance.createMnemonic(12);
+    if (mnemonic == null) {
+      LogUtil.e("CreateWalletMnemonicPage=>", "mnemonic is null");
+      return;
+    }
+    setState(() {
+      mnemonicString = String.fromCharCodes(mnemonic);
+    });
+  }
+
+  bool _verifyPwdAndMnemonic() {
+    //助记词密码不为空
+    if (_pwdController.text.isEmpty || _pwdController.text.length <= 0 || mnemonicString.isEmpty || mnemonicString.length <= 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  _createTestWallet() async {
+    bool isOk = _verifyPwdAndMnemonic();
+    if (!isOk) {
+      Fluttertoast.showToast(msg: "助记词和密码不能为空");
+      return;
+    }
+    var isSuccess = await Wallets.instance.saveWallet(
+        testWalletName, Uint8List.fromList(_pwdController.text.codeUnits), Uint8List.fromList(mnemonicString.codeUnits), WalletType.TEST_WALLET);
+    if (isSuccess) {
+      Fluttertoast.showToast(msg: "测试钱包创建完成，切记注意区分钱包类型");
+      NavigatorUtils.push(context, Routes.entryPage, clearStack: true);
+    } else {
+      Fluttertoast.showToast(msg: "测试钱包创建失败，请检查你输入的数据是否正确");
+    }
   }
 }
