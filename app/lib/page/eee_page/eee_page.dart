@@ -72,16 +72,18 @@ class _EeePageState extends State<EeePage> {
 
   Future<List<Digit>> initDigitListData() async {
     for (var i = 0; i < nowChainDigitsList.length; i++) {
-      Digit digit = EeeDigit();
-      digit.chainId = nowChainDigitsList[i].chainId;
-      digit.shortName = nowChainDigitsList[i].shortName;
-      digit.fullName = nowChainDigitsList[i].fullName;
-      digit.balance = nowChainDigitsList[i].balance;
-      //digit.money = nowChainDigitsList[i].money;  todo
       var digitRate = DigitRate();
       digitRate.volume = 0.035;
       digitRate.changeHourly = 0.096;
-      digit.digitRate = digitRate;
+
+      Digit digit = EeeDigit();
+      digit
+        ..chainId = nowChainDigitsList[i].chainId
+        ..shortName = nowChainDigitsList[i].shortName
+        ..fullName = nowChainDigitsList[i].fullName
+        ..balance = nowChainDigitsList[i].balance
+        ..digitRate = digitRate; //todo
+      //..money =  nowChainDigitsList[i].money;
       displayDigitsList.add(digit);
     }
     return displayDigitsList;
