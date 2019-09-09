@@ -84,7 +84,6 @@ class _EeePageState extends State<EeePage> {
       digit.digitRate = digitRate;
       displayDigitsList.add(digit);
     }
-    //todo mock data to test
     return displayDigitsList;
   }
 
@@ -234,7 +233,7 @@ class _EeePageState extends State<EeePage> {
                                   displayDigitsList[index].shortName + " * " + displayDigitsList[index].balance,
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 15,
+                                    fontSize: ScreenUtil.instance.setSp(3),
                                   ),
                                 ),
                               ),
@@ -243,7 +242,7 @@ class _EeePageState extends State<EeePage> {
                                 child: Text(
                                   "≈" + moneyUnitStr + " " + "0",
                                   //"≈" + displayDigitsList[index].money,
-                                  style: TextStyle(color: Colors.white, fontSize: 16),
+                                  style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
                                 ),
                               ),
                             ],
@@ -262,17 +261,17 @@ class _EeePageState extends State<EeePage> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    displayDigitsList[index].digitRate.price.toString() ?? "0", //市场单价
+                                    displayDigitsList[index].digitRate.price ?? "0", //市场单价
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
-                                      fontSize: 10,
+                                      fontSize: ScreenUtil.instance.setSp(2.5),
                                     ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                     child: Text(
                                       "0%", //市场价格波动
-                                      style: TextStyle(color: Colors.yellowAccent, fontSize: 10),
+                                      style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
                                     ),
                                   )
                                 ],
@@ -281,7 +280,7 @@ class _EeePageState extends State<EeePage> {
                                 alignment: FractionalOffset.topRight,
                                 child: Text(
                                   "0", //最近一笔交易记录
-                                  style: TextStyle(fontSize: 10, color: Colors.greenAccent),
+                                  style: TextStyle(fontSize: ScreenUtil.instance.setSp(2.5), color: Colors.greenAccent),
                                 ),
                               ),
                             ],
