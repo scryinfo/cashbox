@@ -43,7 +43,12 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           centerTitle: "创建测试钱包",
           backgroundColor: Colors.transparent,
         ),
-        body: _buildTestWalletWidget(),
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+          ),
+          child: _buildTestWalletWidget(),
+        ),
       ),
     );
   }

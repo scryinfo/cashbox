@@ -13,6 +13,10 @@ class AboutUsPage extends StatefulWidget {
 }
 
 class _AboutUsPageState extends State<AboutUsPage> {
+  final aboutUsTitle = "关于我们";
+  final privacyProtocol = "隐私条款";
+  final serviceProtocol = "服务协议";
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,11 +26,13 @@ class _AboutUsPageState extends State<AboutUsPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: ""
-              "关于我们",
+          centerTitle: aboutUsTitle,
           backgroundColor: Colors.transparent,
         ),
         body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+          ),
           child: _buildTxDetailWidget(),
         ),
       ),
@@ -37,14 +43,14 @@ class _AboutUsPageState extends State<AboutUsPage> {
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
-          Gaps.scaleVGap(5),
+          Gaps.scaleVGap(8),
           Container(
             child: Image.asset("assets/images/ic_logo.png"),
           ),
           Container(
             child: Image.asset("assets/images/ic_logotxt.png"),
           ),
-          Gaps.scaleVGap(5),
+          Gaps.scaleVGap(8),
           Container(
             margin: EdgeInsets.only(
               left: ScreenUtil().setWidth(8),
@@ -55,7 +61,10 @@ class _AboutUsPageState extends State<AboutUsPage> {
     是一款由 Scry Info Private Ltd. 运营的钱包，致力于为 Scry Dapps 提供支持 Scry Token 的安全钱包。Scry Cashbox 钱包本身不收取任何费用，一切费用来自公链系统
     gas。Scry Cashbox
     将会不断完善，正式版本还将提供支持以太系统的 ERC20 token，BTC 底层系统的系列 token 等，旨在为每一位用户提供安全、简单的钱包。""",
-              style: TextStyle(color: Colors.white, fontSize: 12),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: ScreenUtil.instance.setSp(3.2),
+              ),
             ),
           ),
           Gaps.scaleVGap(5),
@@ -64,7 +73,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
               NavigatorUtils.push(context, Routes.privacyStatementPage);
             },
             child: ItemOfListWidget(
-              leftText: "隐私条款",
+              leftText: privacyProtocol,
             ),
           ),
           GestureDetector(
@@ -72,7 +81,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
               NavigatorUtils.push(context, Routes.serviceAgreementPage);
             },
             child: ItemOfListWidget(
-              leftText: "服务协议",
+              leftText: serviceProtocol,
             ),
           ),
         ],
