@@ -546,7 +546,7 @@ class _EeePageState extends State<EeePage> {
   }
 
   void _navigatorToQrInfoPage(String title, String hintInfo, String content) {
-    print("_navigatorToAddressPage=>" + "target info is" + "addresspage?title=" + title + "&hintInfo=" + hintInfo + "&content=" + content);
+    print("_navigatorToQrInfoPage=>" + "target info is" + "addresspage?title=" + title + "&hintInfo=" + hintInfo + "&content=" + content);
     //暂用 数据状态管理 处理， 路由功能fluro中文传值会有问题。
     Provider.of<QrInfoProvide>(context).setTitle(title);
     Provider.of<QrInfoProvide>(context).setHintInfo(hintInfo);

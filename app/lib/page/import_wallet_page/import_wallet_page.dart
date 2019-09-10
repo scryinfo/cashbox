@@ -33,56 +33,6 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     _confirmPwdController.addListener(_listenPwd);
   }
 
-  //验证 助记词 不能为空
-  void _listenMnemonic() {
-    String mnemonic = _mneController.text;
-    if (mnemonic.isEmpty || mnemonic.length < 1) {
-      Fluttertoast.showToast(msg: "助记词不能为空");
-      return;
-    }
-  }
-
-  //验证 钱包名 不能为空
-  void _listenWalletName() {
-    String name = _walletNameController.text;
-    if (name.isEmpty || name.length < 1) {
-      Fluttertoast.showToast(msg: "钱包名不能为空");
-      return;
-    }
-  }
-
-  //验证 钱包名 不能为空
-  void _listenPwd() {
-    String pwd = _pwdController.text;
-    if (pwd.isEmpty || pwd.length < 1) {
-      Fluttertoast.showToast(msg: "密码不能为空");
-      return;
-    }
-  }
-
-  bool _verifyImportWallet() {
-    String mnemonic = _mneController.text;
-    String walletName = _walletNameController.text;
-    String pwd = _pwdController.text;
-    String confirmPwd = _confirmPwdController.text;
-    if (mnemonic.isEmpty ||
-        mnemonic.length < 1 ||
-        walletName.isEmpty ||
-        walletName.length < 1 ||
-        pwd.isEmpty ||
-        pwd.length < 1 ||
-        confirmPwd.isEmpty ||
-        confirmPwd.length < 1) {
-      Fluttertoast.showToast(msg: "有部分内容为空，请填写完整信息");
-      return false;
-    }
-    if (pwd.toString() != confirmPwd.toString()) {
-      Fluttertoast.showToast(msg: "两次输入密码不一致!!!");
-      return false;
-    }
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -124,6 +74,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
             _buildConfirmPwdWidget(),
             Gaps.scaleVGap(5),
             _buildChainChooseLayout(),
+            Gaps.scaleVGap(8),
             Container(
               alignment: Alignment.bottomCenter,
               width: ScreenUtil().setWidth(41),
@@ -131,19 +82,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               color: Color.fromRGBO(26, 141, 198, 0.20),
               child: FlatButton(
                 onPressed: () async {
-                  if (_verifyImportWallet()) {
-                    var isSuccess = await Wallets.instance.saveWallet(_walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
-                        Uint8List.fromList(_mneController.text.codeUnits), WalletType.WALLET);
-                    if (isSuccess) {
-                      NavigatorUtils.push(
-                        context,
-                        Routes.eeePage,
-                        clearStack: true,
-                      );
-                    } else {
-                      Fluttertoast.showToast(msg: "助记词验证失败，请重新检查你输入的信息");
-                    }
-                  }
+                  _checkAndDoImportWallet();
                 },
                 child: Text(
                   "导入钱包",
@@ -151,6 +90,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   style: TextStyle(
                     color: Colors.blue,
                     letterSpacing: 0.03,
+                    fontSize: ScreenUtil.instance.setSp(3.5),
                   ),
                 ),
               ),
@@ -433,5 +373,72 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
         ),
       ],
     ));
+  }
+
+  //验证 助记词 不能为空
+  void _listenMnemonic() {
+    String mnemonic = _mneController.text;
+    if (mnemonic.isEmpty || mnemonic.length < 1) {
+      Fluttertoast.showToast(msg: "助记词不能为空");
+      return;
+    }
+  }
+
+  //验证 钱包名 不能为空
+  void _listenWalletName() {
+    String name = _walletNameController.text;
+    if (name.isEmpty || name.length < 1) {
+      Fluttertoast.showToast(msg: "钱包名不能为空");
+      return;
+    }
+  }
+
+  //验证 钱包名 不能为空
+  void _listenPwd() {
+    String pwd = _pwdController.text;
+    if (pwd.isEmpty || pwd.length < 1) {
+      Fluttertoast.showToast(msg: "密码不能为空");
+      return;
+    }
+  }
+
+  bool _verifyImportWallet() {
+    String mnemonic = _mneController.text;
+    String walletName = _walletNameController.text;
+    String pwd = _pwdController.text;
+    String confirmPwd = _confirmPwdController.text;
+    if (mnemonic.isEmpty ||
+        mnemonic.length < 1 ||
+        walletName.isEmpty ||
+        walletName.length < 1 ||
+        pwd.isEmpty ||
+        pwd.length < 1 ||
+        confirmPwd.isEmpty ||
+        confirmPwd.length < 1) {
+      Fluttertoast.showToast(msg: "有部分内容为空，请填写完整信息");
+      return false;
+    }
+    if (pwd.toString() != confirmPwd.toString()) {
+      Fluttertoast.showToast(msg: "两次输入密码不一致!!!");
+      return false;
+    }
+    return true;
+  }
+
+
+  Future _checkAndDoImportWallet() async {
+    if (_verifyImportWallet()) {
+      var isSuccess = await Wallets.instance.saveWallet(_walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
+          Uint8List.fromList(_mneController.text.codeUnits), WalletType.WALLET);
+      if (isSuccess) {
+        NavigatorUtils.push(
+          context,
+          Routes.eeePage,
+          clearStack: true,
+        );
+      } else {
+        Fluttertoast.showToast(msg: "助记词验证失败，请重新检查你输入的信息");
+      }
+    }
   }
 }
