@@ -100,6 +100,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
             style: TextStyle(
               color: Colors.blue,
               letterSpacing: 0.03,
+              fontSize: ScreenUtil.instance.setSp(3.5),
             ),
           ),
         ),
@@ -116,8 +117,8 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
             child: Text(
               "钱包名称",
               style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 16,
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -162,10 +163,10 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "密码",
+              "钱包密码",
               style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 16,
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -212,8 +213,8 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
             child: Text(
               "再次输入密码",
               style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 16,
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -260,8 +261,8 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
           child: Text(
             "选择创建链",
             style: TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 0.5),
-              fontSize: 16,
+              color: Color.fromRGBO(255, 255, 255, 0.85),
+              fontSize: ScreenUtil.instance.setSp(3.5),
             ),
           ),
         ),
