@@ -12,7 +12,7 @@ class Routes {
   static String createWalletNamePage = '/createwalletnamepage';
   static String createWalletMnemonicPage = '/createwalletmnemonicpage';
   static String createWalletConfirmPage = '/createwalletconfirmpage';
-  static String addressPage = '/addresspage';
+  static String qrInfoPage = '/qrinfopage';
   static String importWalletPage = '/importwalletpage';
   static String transferEeePage = '/transfereeepage';
 
@@ -29,8 +29,7 @@ class Routes {
   static String createTestWalletPage = '/createtestwalletpage';
 
   static void configureRoutes(Router router) {
-    router.notFoundHandler = Handler(
-        handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    router.notFoundHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       print('ERROR====>ROUTE WAS NOT FONUND!!!');
       LogUtil.e("Routers error is=>", "noFoundHandler");
     });
@@ -42,11 +41,9 @@ class Routes {
     router.define(dappDemoPage, handler: dappDemoPageHandler);
     router.define(createWalletNamePage, handler: createWalletPageHandler);
 
-    router.define(createWalletMnemonicPage,
-        handler: createWalletMnemonicPageHandler);
-    router.define(createWalletConfirmPage,
-        handler: createWalletConfirmPageHandler);
-    router.define(addressPage, handler: addressPageHandler);
+    router.define(createWalletMnemonicPage, handler: createWalletMnemonicPageHandler);
+    router.define(createWalletConfirmPage, handler: createWalletConfirmPageHandler);
+    router.define(qrInfoPage, handler: qrInfoPageHandler);
     router.define(aboutUsPage, handler: aboutUsPageHandler);
     router.define(importWalletPage, handler: importWalletPageHandler);
     router.define(transferEeePage, handler: transferEeePageHandler);
@@ -58,8 +55,7 @@ class Routes {
     router.define(privacyStatementPage, handler: privacyStatementHandler);
     router.define(serviceAgreementPage, handler: serviceAgreementHandler);
     router.define(transactionHistoryPage, handler: transactionHistoryHandler);
-    router.define(transactionEeeDetailPage,
-        handler: transactionEeeDetailHandler);
+    router.define(transactionEeeDetailPage, handler: transactionEeeDetailHandler);
     router.define(createTestWalletPage, handler: createTestWalletHandler);
   }
 }

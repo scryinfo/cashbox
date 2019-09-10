@@ -3,6 +3,7 @@ import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 import '../eee_page/left_drawer_card.dart';
 
@@ -106,6 +108,9 @@ class _EeePageState extends State<EeePage> {
       drawer: LeftDrawerCard(), //左侧抽屉栏
       body: Container(
         alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(
+          image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+        ),
         child: Stack(
           children: <Widget>[
             new Column(
@@ -359,7 +364,7 @@ class _EeePageState extends State<EeePage> {
                 ],
               ),
               onTap: () {
-                _navigatorToAddressPage(walletName, "address", nowChainAddress);
+                _navigatorToQrInfoPage(walletName, "链地址信息", nowChainAddress);
               },
             ),
           )
@@ -423,7 +428,7 @@ class _EeePageState extends State<EeePage> {
               width: ScreenUtil().setWidth(30),
               alignment: Alignment.centerLeft,
               child: new Text(
-                moneyUnitStr + " 1234567",
+                moneyUnitStr + " 0.00000",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -436,45 +441,46 @@ class _EeePageState extends State<EeePage> {
             Container(
               height: ScreenUtil().setHeight(7),
               child: new PopupMenuButton<String>(
-                  color: Colors.black12,
-                  icon: Icon(Icons.keyboard_arrow_down),
-                  itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-                        new PopupMenuItem<String>(
-                            value: 'USD',
-                            child: new Text(
-                              'USD',
-                              style: new TextStyle(color: Colors.white),
-                            )),
-                        new PopupMenuItem<String>(
-                            value: 'CNY',
-                            child: new Text(
-                              'CNY',
-                              style: new TextStyle(color: Colors.white),
-                            )),
-                        new PopupMenuItem<String>(
-                            value: 'KRW',
-                            child: new Text(
-                              'KRW',
-                              style: new TextStyle(color: Colors.white),
-                            )),
-                        new PopupMenuItem<String>(
-                            value: 'GBP',
-                            child: new Text(
-                              'GBP',
-                              style: new TextStyle(color: Colors.white),
-                            )),
-                        new PopupMenuItem<String>(
-                            value: 'JPY',
-                            child: new Text(
-                              'JPY',
-                              style: new TextStyle(color: Colors.white),
-                            ))
-                      ],
-                  onSelected: (String value) {
-                    setState(() {
-                      moneyUnitStr = value;
-                    });
-                  }),
+                color: Colors.black12,
+                icon: Icon(Icons.keyboard_arrow_down),
+                itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+                  new PopupMenuItem<String>(
+                      value: 'USD',
+                      child: new Text(
+                        'USD',
+                        style: new TextStyle(color: Colors.white),
+                      )),
+                  new PopupMenuItem<String>(
+                      value: 'CNY',
+                      child: new Text(
+                        'CNY',
+                        style: new TextStyle(color: Colors.white),
+                      )),
+                  new PopupMenuItem<String>(
+                      value: 'KRW',
+                      child: new Text(
+                        'KRW',
+                        style: new TextStyle(color: Colors.white),
+                      )),
+                  new PopupMenuItem<String>(
+                      value: 'GBP',
+                      child: new Text(
+                        'GBP',
+                        style: new TextStyle(color: Colors.white),
+                      )),
+                  new PopupMenuItem<String>(
+                      value: 'JPY',
+                      child: new Text(
+                        'JPY',
+                        style: new TextStyle(color: Colors.white),
+                      ))
+                ],
+                onSelected: (String value) {
+                  setState(() {
+                    moneyUnitStr = value;
+                  });
+                },
+              ),
             ),
           ]),
         ),
@@ -485,64 +491,67 @@ class _EeePageState extends State<EeePage> {
   //链卡片 地址address
   Widget _chainCardAddressWidget(index) {
     return Container(
-        child: new Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          child: GestureDetector(
-            onTap: () {
-              if (walletName.isEmpty || nowChainAddress.isEmpty) {
-                return;
-              }
-              _navigatorToAddressPage(walletName, "address", nowChainAddress);
-            },
-            child: Image.asset("assets/images/ic_card_qrcode.png"),
-          ),
-        ),
-        Gaps.scaleHGap(1.5),
-        Container(
-          alignment: Alignment.bottomLeft,
-          constraints: BoxConstraints(
-            maxWidth: ScreenUtil().setWidth(20.5),
-          ),
-          child: GestureDetector(
-            onTap: () {
-              if (walletName.isEmpty || nowChainAddress.isEmpty) {
-                return;
-              }
-              _navigatorToAddressPage(walletName, "address", nowChainAddress);
-            },
-            child: Text(
-              nowChainAddress,
-              textAlign: TextAlign.start,
-              style: TextStyle(color: Colors.lightBlueAccent),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+      child: new Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            child: GestureDetector(
+              onTap: () {
+                if (walletName.isEmpty || nowChainAddress.isEmpty) {
+                  return;
+                }
+                _navigatorToQrInfoPage(walletName, "链地址信息", nowChainAddress);
+              },
+              child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
           ),
-        ),
-        Gaps.scaleHGap(15.5),
-        Container(
-          child: Container(
-            child: Text(
-              chainTypeList[index],
-              style: TextStyle(
-                fontSize: 45,
-                color: Color.fromRGBO(255, 255, 255, 0.1),
-                fontWeight: FontWeight.bold,
+          Gaps.scaleHGap(1.5),
+          Container(
+            alignment: Alignment.bottomLeft,
+            constraints: BoxConstraints(
+              maxWidth: ScreenUtil().setWidth(20.5),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                if (walletName.isEmpty || nowChainAddress.isEmpty) {
+                  return;
+                }
+                _navigatorToQrInfoPage(walletName, "链地址信息", nowChainAddress);
+              },
+              child: Text(
+                nowChainAddress,
+                textAlign: TextAlign.start,
+                style: TextStyle(color: Colors.lightBlueAccent),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
-        ),
-      ],
-    ));
+          Gaps.scaleHGap(15.5),
+          Container(
+            child: Container(
+              child: Text(
+                chainTypeList[index],
+                style: TextStyle(
+                  fontSize: 45,
+                  color: Color.fromRGBO(255, 255, 255, 0.1),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  void _navigatorToAddressPage(String walletName, String title, String content) {
-    String target = "addresspage?walletName=" + walletName + "&title=" + title + "&content=" + content;
-    NavigatorUtils.push(
-      context,
-      target,
-    );
+  void _navigatorToQrInfoPage(String title, String hintInfo, String content) {
+    print("_navigatorToAddressPage=>" + "target info is" + "addresspage?title=" + title + "&hintInfo=" + hintInfo + "&content=" + content);
+    //暂用 数据状态管理 处理， 路由功能fluro中文传值会有问题。
+    Provider.of<QrInfoProvide>(context).setTitle(title);
+    Provider.of<QrInfoProvide>(context).setHintInfo(hintInfo);
+    Provider.of<QrInfoProvide>(context).setContent(content);
+
+    NavigatorUtils.push(context, Routes.qrInfoPage);
   }
 }

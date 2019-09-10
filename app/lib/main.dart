@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app/provide/create_wallet_process_provide.dart';
+import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +44,9 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider(
             builder: (_) => WalletManagerProvide(),
+          ),
+          ChangeNotifierProvider(
+            builder: (_) => QrInfoProvide(),
           )
         ],
         child: Container(

@@ -116,7 +116,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                 onPressed: () async {
                   var isSuccess = await _verifyMnemonicSame();
                   if (isSuccess) {
-                    Provider.of<CreateWalletProcessProvide>(context).emptyData();    /**创建钱包完成，清楚内存关于助记词的记录信息*/
+                    Provider.of<CreateWalletProcessProvide>(context).emptyData(); /**创建钱包完成，清楚内存关于助记词的记录信息*/
                     NavigatorUtils.push(
                       context,
                       Routes.eeePage,
@@ -235,5 +235,11 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
       );
     });
     return randomWidgetList;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    Provider.of<CreateWalletProcessProvide>(context).emptyData(); /**创建钱包完成，清楚内存关于助记词的记录信息*/
   }
 }
