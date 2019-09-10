@@ -37,6 +37,9 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
           backgroundColor: Colors.transparent,
         ),
         body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+          ),
           child: _buildResetPwdWidget(),
         ),
       ),

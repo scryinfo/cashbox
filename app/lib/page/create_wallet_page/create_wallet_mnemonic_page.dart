@@ -1,6 +1,7 @@
 import 'package:app/model/mnemonic.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
+import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/routers/application.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/util/log_util.dart';
@@ -212,14 +213,10 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
   }
 
   _showAddressInQR(BuildContext context, String walletName, String qrHintInfo, String mnemonicString) {
-    String target = "addresspage?walletName=" +
-        "${walletName}" +
-        "&title=" +
-        "" + //todo 中文参数显示异常
-        "&content=" +
-        "${mnemonicString}";
-    print("target==>" + target);
-    Application.router.navigateTo(context, "$target");
-    //NavigatorUtils.push(context,target,);
+    //暂用 数据状态管理 处理， 路由功能fluro中文传值会有问题。
+    Provider.of<QrInfoProvide>(context).setTitle(walletName);
+    Provider.of<QrInfoProvide>(context).setHintInfo(qrHintInfo);
+    Provider.of<QrInfoProvide>(context).setContent(mnemonicString);
+    NavigatorUtils.push(context, Routes.qrInfoPage);
   }
 }

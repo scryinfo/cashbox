@@ -25,6 +25,11 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _pwdController.addListener(_listenWalletName); //监听密码 输入框
     _confirmPwdController.addListener(_listenPwd); //监听确认密码 输入框
   }

@@ -23,7 +23,12 @@ class _MinePageState extends State<MinePage> {
           centerTitle: "我的",
           backgroundColor: Colors.transparent,
         ),
-        body: _buildMineWidget(),
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+          ),
+          child: _buildMineWidget(),
+        ),
       ),
     );
   }

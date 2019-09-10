@@ -38,11 +38,6 @@ class _EntryPageState extends State<EntryPage> {
     setState(() {
       this.isContainWallet = isContainWallet;
     });
-    //await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
-    //WalletManagerTest.setNowWallet();
-    //WalletManagerTest.getNowWallet();
-    //WalletManagerTest.deleteWallet();
-    //WalletManagerTest.resetPwd();
   }
 
   @override

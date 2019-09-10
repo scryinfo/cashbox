@@ -135,10 +135,4 @@ class _QrInfoPageState extends State<QrInfoPage> {
       ),
     );
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-    Provider.of<QrInfoProvide>(context).emptyData(); //用完重置数据，防乱串
-  }
 }

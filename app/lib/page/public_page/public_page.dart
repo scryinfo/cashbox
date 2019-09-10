@@ -17,9 +17,7 @@ class _PublicPageState extends State<PublicPage> {
     return Material(
       child: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage("assets/images/bg_graduate.png"),
-              fit: BoxFit.fill),
+          image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
         ),
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -28,7 +26,9 @@ class _PublicPageState extends State<PublicPage> {
             backgroundColor: Colors.transparent,
           ),
           body: Container(
-            color: Colors.transparent,
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+            ),
             child: _buildWebViewWidget(),
           ),
         ),
