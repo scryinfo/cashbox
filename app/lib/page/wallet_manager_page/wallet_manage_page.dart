@@ -213,28 +213,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
     return Container(
       child: GestureDetector(
         onTap: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return PwdDialog(
-                title: "恢复钱包",
-                hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
-                hintInput: "请输入钱包密码",
-                onPressed: (value) async {
-                  Map mnemonicMap = await Wallets.instance.exportWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
-                  int status = mnemonicMap["status"];
-                  if (status == 200) {
-                    Provider.of<CreateWalletProcessProvide>(context).setMnemonic(mnemonicMap["mn"]);
-                    mnemonicMap = null; //跟助记词相关,用完置空
-                    NavigatorUtils.push(context, Routes.recoverWalletPage);
-                  } else {
-                    LogUtil.e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
-                    Fluttertoast.showToast(msg: "密码错误，钱包恢复失败");
-                  }
-                },
-              );
-            },
-          );
+          _showRecoverDialog(context);
         },
         child: Container(
           child: Column(
@@ -255,29 +234,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
   Widget _buildDeleteWalletWidget(context) {
     return GestureDetector(
       onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return PwdDialog(
-              title: "删除钱包",
-              hintContent: "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。",
-              hintInput: "请输入钱包密码",
-              onPressed: (value) async {
-                Map deleteMap = await Wallets.instance.deleteWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
-                print("to do verify pwd,delete wallet");
-                int status = deleteMap["status"];
-                bool isSuccess = deleteMap["isDeletWallet"];
-                if (status == 200 && isSuccess) {
-                  Fluttertoast.showToast(msg: "钱包删除成功");
-                  NavigatorUtils.push(context, Routes.entryPage, clearStack: true);
-                } else {
-                  LogUtil.e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
-                  Fluttertoast.showToast(msg: "密码错误，钱包删除失败");
-                }
-              },
-            );
-          },
-        );
+        _showDeleteDialog(context);
       },
       child: Column(
         children: <Widget>[
@@ -289,6 +246,57 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PwdDialog(
+          title: "删除钱包",
+          hintContent: "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。",
+          hintInput: "请输入钱包密码",
+          onPressed: (value) async {
+            Map deleteMap = await Wallets.instance.deleteWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
+            print("to do verify pwd,delete wallet");
+            int status = deleteMap["status"];
+            bool isSuccess = deleteMap["isDeletWallet"];
+            if (status == 200 && isSuccess) {
+              Fluttertoast.showToast(msg: "钱包删除成功");
+              NavigatorUtils.push(context, Routes.entryPage, clearStack: true);
+            } else {
+              LogUtil.e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
+              Fluttertoast.showToast(msg: "密码错误，钱包删除失败");
+            }
+          },
+        );
+      },
+    );
+  }
+
+  void _showRecoverDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PwdDialog(
+          title: "恢复钱包",
+          hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
+          hintInput: "请输入钱包密码",
+          onPressed: (value) async {
+            Map mnemonicMap = await Wallets.instance.exportWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
+            int status = mnemonicMap["status"];
+            if (status == 200) {
+              Provider.of<CreateWalletProcessProvide>(context).setMnemonic(mnemonicMap["mn"]);
+              mnemonicMap = null; //跟助记词相关,用完置空
+              NavigatorUtils.push(context, Routes.recoverWalletPage);
+            } else {
+              LogUtil.e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
+              Fluttertoast.showToast(msg: "密码错误，钱包恢复失败");
+            }
+          },
+        );
+      },
     );
   }
 }
