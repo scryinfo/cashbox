@@ -50,11 +50,11 @@ class _EntryPageState extends State<EntryPage> {
           future: future,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              print("snapshot.error==>" + snapshot.error.toString());
-              LogUtil.e("digitList future snapshot.hasError is +>", snapshot.error.toString());
+              print("entryPage snapshot.error==>" + snapshot.error.toString());
+              LogUtil.e("entryPage future snapshot.hasError is +>", snapshot.error.toString());
               return Center(
                 child: Text(
-                  "数据加载出错了，请尝试重新加载!~",
+                  "钱包应用加载出错了，请尝试重新打开!~",
                   style: TextStyle(color: Colors.white70),
                 ),
               );
@@ -110,16 +110,12 @@ class _EntryPageState extends State<EntryPage> {
 
   Widget _buildLogoWidget() {
     return Container(
-      //width: ScreenUtil().setWidth(13),
-      //height: ScreenUtil().setHeight(13),
       child: Image.asset("assets/images/ic_logo.png"),
     );
   }
 
   Widget _buildLogoTextWidget() {
     return Container(
-      //width: ScreenUtil().setWidth(48),
-      //height: ScreenUtil().setHeight(15),
       child: Image.asset("assets/images/ic_logotxt.png"),
     );
   }
