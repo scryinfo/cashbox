@@ -1,22 +1,30 @@
+import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/util/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class AddressPage extends StatelessWidget {
-  final String walletName;
-  final String title;
-  final String content;
+class QrInfoPage extends StatefulWidget {
+  @override
+  _QrInfoPageState createState() => _QrInfoPageState();
+}
 
-  const AddressPage(
-    this.walletName,
-    this.title,
-    @required this.content,
-  );
+class _QrInfoPageState extends State<QrInfoPage> {
+  String title;
+  String hintInfo;
+  String content;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    title = Provider.of<QrInfoProvide>(context).title;
+    hintInfo = Provider.of<QrInfoProvide>(context).hintInfo;
+    content = Provider.of<QrInfoProvide>(context).content;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +32,7 @@ class AddressPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: walletName?? "",
+          centerTitle: title ?? "",
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -33,8 +41,8 @@ class AddressPage extends StatelessWidget {
           alignment: Alignment.center,
           child: Column(
             children: <Widget>[
+              Gaps.scaleVGap(3),
               Container(
-                margin: EdgeInsets.only(top: 7.25),
                 width: ScreenUtil().setWidth(78.75),
                 height: ScreenUtil().setWidth(94.25),
                 decoration: BoxDecoration(
@@ -58,10 +66,10 @@ class AddressPage extends StatelessWidget {
                         ),
                         height: ScreenUtil().setHeight(6.25),
                         child: Text(
-                          title,
+                          hintInfo ?? "",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 13,
+                            fontSize: ScreenUtil.instance.setSp(3.5),
                           ),
                         ),
                       ),
@@ -71,7 +79,7 @@ class AddressPage extends StatelessWidget {
                           top: ScreenUtil().setHeight(3.75),
                         ),
                         child: QrImage(
-                          data: content,
+                          data: content ?? " ",
                           size: ScreenUtil().setWidth(52.25),
                         ),
                       ),
@@ -86,11 +94,12 @@ class AddressPage extends StatelessWidget {
                             Fluttertoast.showToast(msg: "地址已经成功拷贝!~~~");
                           },
                           child: Text(
-                            content,
+                            content ?? "",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 13,
+                              fontSize: ScreenUtil.instance.setSp(3.5),
                             ),
+                            maxLines: 3,
                           ),
                         ),
                       ),
@@ -98,7 +107,7 @@ class AddressPage extends StatelessWidget {
                   ),
                 ),
               ),
-              Gaps.scaleVGap(5),
+              Gaps.scaleVGap(10),
               Container(
                 alignment: Alignment.bottomCenter,
                 width: ScreenUtil().setWidth(41),
@@ -115,6 +124,7 @@ class AddressPage extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.blue,
                       letterSpacing: 0.03,
+                      fontSize: ScreenUtil.instance.setSp(3.5),
                     ),
                   ),
                 ),
@@ -124,5 +134,11 @@ class AddressPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    Provider.of<QrInfoProvide>(context).emptyData(); //用完重置数据，防乱串
   }
 }
