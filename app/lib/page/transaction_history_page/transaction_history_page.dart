@@ -98,7 +98,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               "6462314.0",
               textAlign: TextAlign.end,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: ScreenUtil.instance.setSp(4),
                 color: Colors.white,
               ),
               overflow: TextOverflow.ellipsis,
@@ -112,7 +112,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               "ETH",
               textAlign: TextAlign.end,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: ScreenUtil.instance.setSp(3.5),
                 color: Colors.white,
               ),
               overflow: TextOverflow.ellipsis,
@@ -126,7 +126,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               "≈" + "\$" + "6300.111311111",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: ScreenUtil.instance.setSp(3),
                 color: Colors.lightBlueAccent,
               ),
               maxLines: 1,
@@ -145,6 +145,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 "转账",
                 style: TextStyle(
                   color: Colors.lightBlue,
+                  fontSize: ScreenUtil.instance.setSp(3.5),
                 ),
               ),
             ),
@@ -172,6 +173,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       "交易记录",
                       style: TextStyle(
                         color: Colors.white70,
+                        fontSize: ScreenUtil.instance.setSp(3.5),
                       ),
                     ),
                   ),
@@ -200,9 +202,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         children: <Widget>[
           Container(
             height: ScreenUtil().setHeight(100),
-            padding: EdgeInsets.only(
-                left: ScreenUtil().setWidth(5),
-                right: ScreenUtil().setWidth(5)),
+            padding: EdgeInsets.only(left: ScreenUtil().setWidth(5), right: ScreenUtil().setWidth(5)),
             child: FutureBuilder(
               future: future,
               builder: (context, snapshot) {
@@ -216,7 +216,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 } else {
                   return Text(
                     "暂时没有历史交易记录",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: ScreenUtil.instance.setSp(4),
+                    ),
                   );
                 }
               },
@@ -280,8 +283,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         showDataList[index].shortName,
-                        style:
-                            TextStyle(color: Colors.greenAccent, fontSize: 14),
+                        style: TextStyle(
+                          color: Colors.greenAccent,
+                          fontSize: ScreenUtil.instance.setSp(3.5),
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -292,8 +297,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       child: Text(
                         "0xD235654678891316546516879",
                         style: TextStyle(
-                            color: Color.fromRGBO(255, 255, 255, 0.7),
-                            fontSize: 13),
+                          color: Color.fromRGBO(255, 255, 255, 0.7),
+                          fontSize: ScreenUtil.instance.setSp(3),
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -316,7 +322,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "* 发送中",
-                        style: TextStyle(color: Colors.white, fontSize: 10),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil.instance.setSp(2.5),
+                        ),
                         textAlign: TextAlign.start,
                       ),
                     ),
@@ -325,7 +334,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       width: ScreenUtil().setWidth(30),
                       child: Text(
                         "2019.07.01",
-                        style: TextStyle(color: Colors.white, fontSize: 10),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil.instance.setSp(2.5),
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.end,
