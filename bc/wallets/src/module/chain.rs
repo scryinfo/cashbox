@@ -223,3 +223,11 @@ pub fn show_chain(walletid: &str,wallet_type: i64) -> Result<bool, String> {
         Err(error) => Err(error.to_string())
     }
 }
+
+pub fn hide_chain(walletid: &str,wallet_type: i64) -> Result<bool, String> {
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+    match instance.hide_chain(walletid,wallet_type) {
+        Ok(_) => Ok(true),
+        Err(error) => Err(error.to_string())
+    }
+}

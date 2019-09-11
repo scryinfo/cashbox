@@ -121,4 +121,26 @@ from Wallet a,detail.Chain b,detail.Address c,detail.BtcDigit d where a.wallet_i
         }
     }
 
+    pub fn hide_chain(&mut self, walletid: &str, wallet_type: i64) -> Result<(), String> {
+        let sql = "UPDATE Address set is_visible = 0 WHERE wallet_id=? and chain_id=?;";
+        match self.db_hander.prepare(sql) {
+            Ok(mut stat) => {
+                let bind_wallet_id = stat.bind(1, walletid).map_err(|e| format!("hide_chain bind walletid,{}", e.to_string()));
+                if bind_wallet_id.is_err() {
+                    return Err(bind_wallet_id.unwrap_err());
+                }
+
+                let bind_wallet_type = stat.bind(2, wallet_type).map_err(|e| format!("hide_chain bind wallet_type,{}", e.to_string()));
+                if bind_wallet_type.is_err() {
+                    return Err(bind_wallet_type.unwrap_err());
+                }
+                let exec = stat.next().map_err(|e| format!("exec hide_chain,{}", e.to_string()));
+                if exec.is_err() {
+                    return Err(exec.unwrap_err());
+                }
+                Ok(())
+            }
+            Err(e) => Err(e.to_string())
+        }
+    }
 }
