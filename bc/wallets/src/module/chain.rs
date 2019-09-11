@@ -215,3 +215,11 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
         Err(e) => Err(e)
     }
 }
+
+pub fn show_chain(walletid: &str,wallet_type: i64) -> Result<bool, String> {
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+    match instance.show_chain(walletid,wallet_type) {
+        Ok(_) => Ok(true),
+        Err(error) => Err(error.to_string())
+    }
+}
