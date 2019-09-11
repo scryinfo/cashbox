@@ -167,7 +167,7 @@ public class NativeLib {
         public boolean isRename;              //重置钱包名是否成功     apiNo:WM09   1成功 0失败
         public boolean isShowChain;           //设置显示链,是否成功    apiNo:WM10   1成功 0失败
         public boolean isHideChain;           //设置隐藏链,是否成功    apiNo:WM11   1成功 0失败
-        public int getNowChainType;           //获取当前链类型         apiNo:WM12   ChainType
+        public int nowChainType;              //获取当前链类型         apiNo:WM12   int
         public boolean isSetNowChainType;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
         public boolean isShowDigit;           //设置显示代币,是否成功  apiNo:WM14   1成功 0失败
         public boolean isHideDigit;           //设置隐藏代币,是否成功  apiNo:WM15   1成功 0失败
