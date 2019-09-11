@@ -1,8 +1,8 @@
 use jni::JNIEnv;
-use jni::objects::{JObject, JValue};
+use jni::objects::{JObject, JValue,JClass,JString};
 use wallets::model::{EeeChain,BtcChain,EthChain};
-
-
+use std::os::raw::{c_uchar, c_int};
+use jni::sys::{jint, jobject, jbyteArray};
 pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObject<'a>{
     let eee_digit_list_class = env.find_class("java/util/ArrayList").expect("find chain type is error");
     let eee_digit_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeDigit").expect("Digit class not found");
@@ -209,4 +209,25 @@ pub fn get_btc_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,btc_chain:BtcChain)->JObje
     }
     env.set_field(chain_class_obj,"digitList","Ljava/util/List;",JValue::Object(digit_list_obj)).expect("set digitList");
     chain_class_obj
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_showChain(env: JNIEnv, _: JClass, walletId: JString, wallet_type: jint) -> jobject {
+
+    let wallet_id: String = env.get_string(walletId).unwrap().into();
+    let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
+    let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+
+    match wallets::module::chain::show_chain(wallet_id.as_str(), wallet_type as i64) {
+        Ok(code) => {
+            env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type is error!");
+            env.set_field(state_obj, "showChain", "Z", JValue::Bool(1 as u8)).expect("set showChain value is error!");
+        },
+        Err(msg) => {
+            env.set_field(state_obj, "showChain", "Z", JValue::Bool(0 as u8)).expect("set showChain value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+        }
+    }
+    *state_obj
 }
