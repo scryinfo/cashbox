@@ -269,19 +269,42 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
                 resultMap.put("isRename", walletState.isRename);
+                resultMap.put("message", walletState.message);
                 result.success(resultMap);
                 break;
             }
             // apiNo:WM10
             case "showChain": {
                 Log.d("nativeLib=>", "begin to showChain =>");
+                Log.d("nativeLib=>", "walletId is =>" + (String) (call.argument("walletId")));
                 WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.showChain((String) (call.argument("walletId")), (int) (call.argument("chainType")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                resultMap.put("isShowChain", walletState.isShowChain);
+                resultMap.put("message", walletState.message);
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM11
             case "hideChain": {
                 Log.d("nativeLib=>", "begin to hideChain =>");
+                Log.d("nativeLib=>", "walletId is =>" + (String) (call.argument("walletId")));
                 WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.hideChain((String) (call.argument("walletId")), (int) (call.argument("chainType")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                resultMap.put("isHideChain", walletState.isHideChain);
+                resultMap.put("message", walletState.message);
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM12

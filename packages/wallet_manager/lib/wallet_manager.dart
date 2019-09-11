@@ -84,15 +84,17 @@ class WalletManager {
 
   // 显示链
   // apiNo:WM10
-  static Future<bool> showChain(String walletId, int chainType) async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('showChain', {"walletId": walletId, "chainType": chainType});
-    return null;
+  static Future<Map<dynamic, dynamic>> showChain(String walletId, int chainType) async {
+    Map<dynamic, dynamic> showChainMap = await _channel.invokeMethod('showChain', {"walletId": walletId, "chainType": chainType});
+    print("showChain  showChainMap=>" + showChainMap.toString());
+    return showChainMap;
   }
 
   // 隐藏链
   // apiNo:WM11
   static Future<bool> hideChain(String walletId, int chainType) async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('deleteChain', {"walletId": walletId, "chainType": chainType});
+    Map<dynamic, dynamic> hideChainMap = await _channel.invokeMethod('deleteChain', {"walletId": walletId, "chainType": chainType});
+    print("hideChain  hideChainMap=>" + hideChainMap.toString());
     return null;
   }
 

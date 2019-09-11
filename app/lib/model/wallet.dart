@@ -62,12 +62,20 @@ class Wallet {
   // 显示链
   // apiNo:WM10
   Future<bool> showChain(int chainType) async {
-    var isSuccess = await WalletManager.showChain(walletId, chainType);
-    if (isSuccess) {
-      //todo 数据格式
-      //chainList.remove(chain);
-    }
-    return isSuccess;
+    Map showChainMap = await WalletManager.showChain(walletId, chainType);
+    print("showChain  showChainMap=>" + showChainMap.toString());
+    int status = showChainMap["status"];
+    String message = showChainMap["message"];
+    bool isShowChain = showChainMap["message"];
+    print("showChain  status=>" + status.toString());
+    print("showChain  message=>" + message.toString());
+    print("showChain  isShowChain=>" + isShowChain.toString());
+
+    //if (isSuccess) {
+    //todo 数据格式
+    //chainList.remove(chain);
+    //}
+    return null;
   }
 
   // 隐藏链

@@ -37,29 +37,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          /// 注册数据状态管理
-          ChangeNotifierProvider(
-            builder: (_) => CreateWalletProcessProvide(),
+      providers: [
+        /// 注册数据状态管理
+        ChangeNotifierProvider(
+          builder: (_) => CreateWalletProcessProvide(),
+        ),
+        ChangeNotifierProvider(
+          builder: (_) => WalletManagerProvide(),
+        ),
+        ChangeNotifierProvider(
+          builder: (_) => QrInfoProvide(),
+        )
+      ],
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.fill,
+            image: AssetImage("assets/images/bg_graduate.png"),
           ),
-          ChangeNotifierProvider(
-            builder: (_) => WalletManagerProvide(),
-          ),
-          ChangeNotifierProvider(
-            builder: (_) => QrInfoProvide(),
-          )
-        ],
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              fit: BoxFit.fill,
-              image: AssetImage("assets/images/bg_graduate.png"),
-            ),
-          ),
-          child: MaterialApp(
-            home: EntryPage(),
-            onGenerateRoute: Application.router.generator,
-          ),
-        ));
+        ),
+        child: MaterialApp(
+          home: EntryPage(),
+          onGenerateRoute: Application.router.generator,
+        ),
+      ),
+    );
   }
 }

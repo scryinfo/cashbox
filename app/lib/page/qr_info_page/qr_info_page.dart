@@ -97,7 +97,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
                             content ?? "",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: ScreenUtil.instance.setSp(3.5),
+                              fontSize: ScreenUtil.instance.setSp(3),
                             ),
                             maxLines: 3,
                           ),
