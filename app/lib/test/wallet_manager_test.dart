@@ -49,4 +49,13 @@ class WalletManagerTest {
     var isSuccess = allWalletList[0].resetPwd(Uint8List.fromList("777".codeUnits), Uint8List.fromList("666".codeUnits));
     print("wallet_manager_test resetPwd=>" + isSuccess.toString());
   }
+
+  static void showChain(walletId,chainType) async {
+    Wallet wallet = await Wallets.instance.getWalletByWalletId("ebe38fd2-30ee-4a10-a890-44cc391253bf");
+    await  wallet.showChain(chainType);
+  }
+  static void hideChain(walletId,chainType) async {
+    Wallet wallet = await Wallets.instance.getWalletByWalletId("ebe38fd2-30ee-4a10-a890-44cc391253bf");
+    await  wallet.hideChain(chainType);
+  }
 }
