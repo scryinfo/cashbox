@@ -168,7 +168,7 @@ public class NativeLib {
         public boolean isShowChain;           //设置显示链,是否成功    apiNo:WM10   1成功 0失败
         public boolean isHideChain;           //设置隐藏链,是否成功    apiNo:WM11   1成功 0失败
         public int getNowChainType;           //获取当前链类型         apiNo:WM12   ChainType
-        public boolean isSetNowChain;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
+        public boolean isSetNowChainType;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
         public boolean isShowDigit;           //设置显示代币,是否成功  apiNo:WM14   1成功 0失败
         public boolean isHideDigit;           //设置隐藏代币,是否成功  apiNo:WM15   1成功 0失败
         public String message;                //错误信息，详细说明
@@ -211,20 +211,20 @@ public class NativeLib {
     public static native WalletState rename(String walletId, String walletName);
 
     // 显示链
-    // apiNo:WM10
+    // apiNo:WM10 fixed
     public static native WalletState showChain(String walletId, int chainType);
 
     // 隐藏链
-    // apiNo:WM11
+    // apiNo:WM11 fixed
     public static native WalletState hideChain(String walletId, int chainType);
 
     // 获取当前链
     // apiNo:WM12
-    public static native WalletState getNowChain(String walletId);
+    public static native WalletState getNowChainType(String walletId);
 
     // 设置当前链
     // apiNo:WM13
-    public static native WalletState setNowChain(String walletId, int chainType);
+    public static native WalletState setNowChainType(String walletId, int chainType);
 
     // 显示代币
     // apiNo:WM14
