@@ -231,3 +231,19 @@ pub fn hide_chain(walletid: &str,wallet_type: i64) -> Result<bool, String> {
         Err(error) => Err(error.to_string())
     }
 }
+
+pub fn get_now_chain_type(walletid: &str) -> Result<i64, String> {
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+    match instance.get_now_chain_type(walletid) {
+        Ok(data) => Ok(data),
+        Err(error) => Err(error.to_string())
+    }
+}
+
+pub fn set_now_chain_type(walletid: &str,chain_type: i64) -> Result<bool, String> {
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+    match instance.set_now_chain_type(walletid,chain_type) {
+        Ok(_) => Ok(true),
+        Err(error) => Err(error.to_string())
+    }
+}

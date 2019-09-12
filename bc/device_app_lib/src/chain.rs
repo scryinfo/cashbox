@@ -252,3 +252,42 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideChain(env:
     }
     *state_obj
 }
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowChainType(env: JNIEnv, _: JClass, walletId: JString) -> jobject {
+    let wallet_id: String = env.get_string(walletId).unwrap().into();
+    let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
+    let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+    match wallets::module::chain::get_now_chain_type(wallet_id.as_str()) {
+        Ok(code) => {
+            env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type is error!");
+            env.set_field(state_obj, "getNowChainType", "I", JValue::Int(code as i32)).expect("get nowChainType value is error!");
+        },
+        Err(msg) => {
+            //env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+        }
+    }
+    *state_obj
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_setNowChainType(env: JNIEnv, _: JClass, walletId: JString,chain_type: jint) -> jobject {
+    let wallet_id: String = env.get_string(walletId).unwrap().into();
+
+    let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
+    let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+    match wallets::module::chain::set_now_chain_type(wallet_id.as_str(),chain_type as i64) {
+        Ok(code) => {
+            env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type is error!");
+            env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(1 as u8)).expect("setNowChainType value is error!");
+        },
+        Err(msg) => {
+            env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(0 as u8)).expect("setNowChainType value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+        }
+    }
+    *state_obj
+}
