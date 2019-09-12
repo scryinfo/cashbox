@@ -17,6 +17,8 @@ import 'package:flutter/rendering.dart';
 void main() {
   //debugPaintLayerBordersEnabled=true;测试样式边界用
   //debugPaintBaselinesEnabled=true;
+  ///强制竖屏
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   runApp(MyApp());
   if (Platform.isAndroid) {
