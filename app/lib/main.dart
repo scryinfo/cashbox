@@ -15,6 +15,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized(); //确保WidgetsFlutterBinding被初始化 把widget跟flutter绑定在一起。
   //debugPaintLayerBordersEnabled=true;测试样式边界用
   //debugPaintBaselinesEnabled=true;
   ///强制竖屏
