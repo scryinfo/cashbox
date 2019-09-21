@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
@@ -23,13 +24,11 @@ class WalletManagerPage extends StatefulWidget {
 }
 
 class _WalletManagerPageState extends State<WalletManagerPage> {
-  final List funcList = ["重置密码", "备份钱包"]; //todo 2.0 "编辑链",
   final List funcRouter = [Routes.resetPwdPage, Routes.recoverWalletPage];
-  static final String DELETE_WALLET = "删除钱包";
   final TextEditingController _walletNameController = TextEditingController();
   String walletId;
   String walletName;
-  double displayRenameBtn = 0.0;
+  double opacityRenameBtn = 0.0;
 
   @override
   void initState() {
@@ -51,9 +50,9 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
   void _listenWalletName() {
     String newWalletName = _walletNameController.text;
     if (newWalletName != walletName) {
-      this.displayRenameBtn = 1.0;
+      this.opacityRenameBtn = 1.0;
     } else {
-      this.displayRenameBtn = 0.0;
+      this.opacityRenameBtn = 0.0;
     }
   }
 
@@ -156,7 +155,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                   height: ScreenUtil().setHeight(8),
                   padding: EdgeInsets.all(0),
                   child: Opacity(
-                    opacity: displayRenameBtn,
+                    opacity: opacityRenameBtn,
                     child: RaisedButton(
                       onPressed: () async {
                         Wallet chooseWallet = await Wallets.instance.getWalletByWalletId(Provider.of<WalletManagerProvide>(context).walletId);
@@ -165,7 +164,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                           Fluttertoast.showToast(msg: "钱包名称修改成功");
                           setState(() {
                             walletName = _walletNameController.text;
-                            displayRenameBtn = 0.0;
+                            opacityRenameBtn = 0.0;
                           });
                         } else {
                           Fluttertoast.showToast(msg: "钱包名称更改失败");
@@ -199,7 +198,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               Gaps.scaleVGap(5),
               Container(
                 child: ItemOfListWidget(
-                  leftText: "重置密码",
+                  leftText: S.of(context).reset_pwd,
                 ),
               ),
             ],
@@ -221,7 +220,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               Gaps.scaleVGap(5),
               Container(
                 child: ItemOfListWidget(
-                  leftText: "恢复钱包",
+                  leftText: S.of(context).recover_wallet,
                 ),
               ),
             ],
@@ -241,7 +240,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           Gaps.scaleVGap(5),
           Container(
             child: ItemOfListWidget(
-              leftText: DELETE_WALLET,
+              leftText: S.of(context).delete_wallet,
             ),
           ),
         ],
@@ -254,20 +253,20 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
       context: context,
       builder: (BuildContext context) {
         return PwdDialog(
-          title: "删除钱包",
-          hintContent: "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。",
-          hintInput: "请输入钱包密码",
+          title: S.of(context).delete_wallet,
+          hintContent: S.of(context).delete_wallet_hint,
+          hintInput: S.of(context).pls_input_wallet_pwd,
           onPressed: (value) async {
             Map deleteMap = await Wallets.instance.deleteWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
             print("to do verify pwd,delete wallet");
             int status = deleteMap["status"];
             bool isSuccess = deleteMap["isDeletWallet"];
             if (status == 200 && isSuccess) {
-              Fluttertoast.showToast(msg: "钱包删除成功");
+              Fluttertoast.showToast(msg: S.of(context).success_in_delete_wallet);
               NavigatorUtils.push(context, Routes.entryPage, clearStack: true);
             } else {
               LogUtil.e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
-              Fluttertoast.showToast(msg: "密码错误，钱包删除失败");
+              Fluttertoast.showToast(msg: S.of(context).wrong_pwd_failure_in_delete_wallet);
             }
           },
         );
@@ -280,9 +279,9 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
       context: context,
       builder: (BuildContext context) {
         return PwdDialog(
-          title: "恢复钱包",
-          hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
-          hintInput: "请输入钱包密码",
+          title: S.of(context).recover_wallet,
+          hintContent: S.of(context).recover_wallet_hint,
+          hintInput: S.of(context).pls_input_wallet_pwd,
           onPressed: (value) async {
             Map mnemonicMap = await Wallets.instance.exportWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
             int status = mnemonicMap["status"];
@@ -292,7 +291,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               NavigatorUtils.push(context, Routes.recoverWalletPage);
             } else {
               LogUtil.e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
-              Fluttertoast.showToast(msg: "密码错误，钱包恢复失败");
+              Fluttertoast.showToast(msg: S.of(context).wrong_pwd_failure_in_recover_wallet_hint);
             }
           },
         );
