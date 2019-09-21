@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -6,8 +7,7 @@ import '../../res/resources.dart';
 
 class EeeTransactionDetailPage extends StatefulWidget {
   @override
-  _EeeTransactionDetailPageState createState() =>
-      _EeeTransactionDetailPageState();
+  _EeeTransactionDetailPageState createState() => _EeeTransactionDetailPageState();
 }
 
 class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
@@ -20,8 +20,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: ""
-              "交易详情",
+          centerTitle: S.of(context).transaction_detail,
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -63,7 +62,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "转出地址:",
+              S.of(context).transfer_from_address,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 14,
@@ -93,7 +92,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "转入地址:",
+              S.of(context).transfer_to_address,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 14,
@@ -123,7 +122,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "交易数额:",
+              S.of(context).transaction_amount,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 14,
@@ -153,7 +152,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "交易时间戳:",
+              S.of(context).transaction_timestamp,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 14,

@@ -82,5 +82,10 @@
   "rewrite_new_pwd_format_hint": "再次输入新密码",
   "unknown_error_in_reset_pwd": "重置密码出现位置错误，请重新打开尝试",
   "success_reset_pwd_hint": "重置密码成功，请您保存好你的密码，丢失无法找回",
-  "failure_reset_pwd_hint": "重置密码失败，详细信息"
+  "failure_reset_pwd_hint": "重置密码失败，详细信息",
+  "transaction_detail": "交易详情",
+  "transfer_from_address": "转出地址:",
+  "transfer_to_address": "转入地址:",
+  "transaction_amount": "交易数额",
+  "transaction_timestamp": "交易时间戳"
 }

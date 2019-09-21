@@ -89,7 +89,12 @@ class S implements WidgetsLocalizations {
   String get success_to_copy_info => "地址已经成功拷贝!~~~";
   String get test_wallet_and_mnemonic => "测试钱包 助记词:";
   String get test_wallet_title => "测试钱包";
+  String get transaction_amount => "交易数额";
+  String get transaction_detail => "交易详情";
+  String get transaction_timestamp => "交易时间戳";
   String get transfer => "转账";
+  String get transfer_from_address => "转出地址:";
+  String get transfer_to_address => "转入地址:";
   String get unknown_error_in_create_wallet => "钱包创建过程，出现位置错误，请重新尝试创建";
   String get unknown_error_in_reset_pwd => "重置密码出现位置错误，请重新打开尝试";
   String get unknown_error_in_scan_qr_code => "扫描发生未知失败，请重新尝试";
