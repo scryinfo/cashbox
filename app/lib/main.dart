@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:app/generated/i18n.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'page/entry_page.dart';
 import 'package:fluro/fluro.dart';
@@ -60,6 +62,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
         child: MaterialApp(
+          localizationsDelegates: const [S.delegate,GlobalMaterialLocalizations.delegate,GlobalWidgetsLocalizations.delegate,],
+          supportedLocales: S.delegate.supportedLocales,
           home: EntryPage(),
           onGenerateRoute: Application.router.generator,
         ),
