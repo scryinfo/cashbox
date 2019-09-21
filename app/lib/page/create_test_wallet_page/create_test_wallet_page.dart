@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/util/log_util.dart';
@@ -21,8 +22,6 @@ class CreateTestWalletPage extends StatefulWidget {
 class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   String mnemonicString = "";
   bool _eeeChainChoose = true;
-  final testWalletName = "测试钱包";
-  final walletNameTitle = "钱包名";
   final TextEditingController _pwdController = TextEditingController();
 
   @override
@@ -40,7 +39,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "创建测试钱包",
+          centerTitle: S.of(context).create_test_wallet,
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -66,7 +65,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
             Container(
               width: ScreenUtil().setWidth(80),
               child: Text(
-                """测试钱包 助记词:""",
+                S.of(context).test_wallet_and_mnemonic,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil().setSp(4),
@@ -77,7 +76,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
             Container(
               width: ScreenUtil().setWidth(80),
               child: Text(
-                """注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。""",
+                S.of(context).judge_the_difference_between_two_wallet,
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: ScreenUtil().setSp(3),
@@ -144,7 +143,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                       this.mnemonicString = t.toString();
                     });
                   }).catchError((e) {
-                    Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
+                    Fluttertoast.showToast(msg: S.of(context).qr_scan_unknown_error);
                   });
                 },
                 child: Image.asset("assets/images/ic_scan.png"),
@@ -172,7 +171,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
             ),
             Container(
               child: Text(
-                "换一组",
+                S.of(context).change_another_group,
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -185,26 +184,27 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
 
   Widget _buildWalletNameWidget() {
     return Container(
-        width: ScreenUtil().setWidth(80),
-        child: Row(
-          children: <Widget>[
-            Text(
-              walletNameTitle + ":",
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.5),
-              ),
+      width: ScreenUtil().setWidth(80),
+      child: Row(
+        children: <Widget>[
+          Text(
+            S.of(context).wallet_name + ":",
+            style: TextStyle(
+              color: Color.fromRGBO(255, 255, 255, 0.6),
+              fontSize: ScreenUtil.instance.setSp(3.5),
             ),
-            Gaps.scaleHGap(0.5),
-            Text(
-              testWalletName,
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
-              ),
+          ),
+          Gaps.scaleHGap(0.5),
+          Text(
+            S.of(context).test_wallet_title,
+            style: TextStyle(
+              color: Color.fromRGBO(255, 255, 255, 0.9),
+              fontSize: ScreenUtil.instance.setSp(3.5),
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildPwdWidget() {
@@ -214,7 +214,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "钱包密码",
+              S.of(context).wallet_pwd,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -234,7 +234,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: "请设置钱包密码",
+                hintText: S.of(context).pls_set_wallet_pwd,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -261,7 +261,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "选择创建链",
+              S.of(context).choose_multi_chain,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -287,7 +287,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                             },
                           ),
                           Text(
-                            "EEE_TEST",
+                            S.of(context).eee_chain_test,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: ScreenUtil.instance.setSp(3),
@@ -317,7 +317,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           _createTestWallet();
         },
         child: Text(
-          "添加钱包",
+          S.of(context).add_wallet,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.blue,
@@ -352,16 +352,16 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   _createTestWallet() async {
     bool isOk = _verifyPwdAndMnemonic();
     if (!isOk) {
-      Fluttertoast.showToast(msg: "助记词和密码不能为空");
+      Fluttertoast.showToast(msg: S.of(context).mne_pwd_not_allow_is_null);
       return;
     }
-    var isSuccess = await Wallets.instance.saveWallet(
-        testWalletName, Uint8List.fromList(_pwdController.text.codeUnits), Uint8List.fromList(mnemonicString.codeUnits), WalletType.TEST_WALLET);
+    var isSuccess = await Wallets.instance.saveWallet(S.of(context).test_wallet_title, Uint8List.fromList(_pwdController.text.codeUnits),
+        Uint8List.fromList(mnemonicString.codeUnits), WalletType.TEST_WALLET);
     if (isSuccess) {
-      Fluttertoast.showToast(msg: "测试钱包创建完成，切记注意区分钱包类型");
+      Fluttertoast.showToast(msg: S.of(context).success_create_test_wallet);
       NavigatorUtils.push(context, Routes.entryPage, clearStack: true);
     } else {
-      Fluttertoast.showToast(msg: "测试钱包创建失败，请检查你输入的数据是否正确");
+      Fluttertoast.showToast(msg: S.of(context).failure_create_test_wallet);
     }
   }
 }

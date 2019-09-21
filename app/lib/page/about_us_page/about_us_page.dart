@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/widgets/app_bar.dart';
@@ -13,9 +14,6 @@ class AboutUsPage extends StatefulWidget {
 }
 
 class _AboutUsPageState extends State<AboutUsPage> {
-  final aboutUsTitle = "关于我们";
-  final privacyProtocol = "隐私条款";
-  final serviceProtocol = "服务协议";
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +24,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: aboutUsTitle,
+          centerTitle: S.of(context).about_us_title,
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -73,7 +71,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
               NavigatorUtils.push(context, Routes.privacyStatementPage);
             },
             child: ItemOfListWidget(
-              leftText: privacyProtocol,
+              leftText: S.of(context).privacy_protocol_title,
             ),
           ),
           GestureDetector(
@@ -81,7 +79,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
               NavigatorUtils.push(context, Routes.serviceAgreementPage);
             },
             child: ItemOfListWidget(
-              leftText: serviceProtocol,
+              leftText: S.of(context).service_protocol_title,
             ),
           ),
         ],

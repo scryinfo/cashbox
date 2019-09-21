@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -54,7 +55,7 @@ class _EntryPageState extends State<EntryPage> {
               LogUtil.e("entryPage future snapshot.hasError is +>", snapshot.error.toString());
               return Center(
                 child: Text(
-                  "钱包应用加载出错了，请尝试重新打开!~",
+                  S.of(context).wallet_load_error,
                   style: TextStyle(color: Colors.white70),
                 ),
               );
@@ -125,7 +126,7 @@ class _EntryPageState extends State<EntryPage> {
       child: GestureDetector(
         onTap: () {
           if (!_agreeServiceProtocol) {
-            Fluttertoast.showToast(msg: "请确认勾选 同意服务协议与隐私条款");
+            Fluttertoast.showToast(msg: S.of(context).make_sure_service_protocol);
             return;
           }
           NavigatorUtils.push(context, Routes.createWalletNamePage);
@@ -152,7 +153,7 @@ class _EntryPageState extends State<EntryPage> {
       child: GestureDetector(
         onTap: () {
           if (!_agreeServiceProtocol) {
-            Fluttertoast.showToast(msg: "请确认勾选 同意服务协议与隐私条款");
+            Fluttertoast.showToast(msg: S.of(context).make_sure_service_protocol);
             return;
           }
           NavigatorUtils.push(context, Routes.importWalletPage);
@@ -198,7 +199,7 @@ class _EntryPageState extends State<EntryPage> {
               child: Row(
                 children: <Widget>[
                   Text(
-                    "我已仔细阅读并同意",
+                    S.of(context).agree_service_prefix,
                     style: TextStyle(decoration: TextDecoration.none, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
@@ -209,7 +210,7 @@ class _EntryPageState extends State<EntryPage> {
                       NavigatorUtils.push(context, Routes.serviceAgreementPage);
                     },
                     child: Text(
-                      "《服务协议》",
+                      S.of(context).service_protocol_tag,
                       style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
@@ -228,7 +229,7 @@ class _EntryPageState extends State<EntryPage> {
                       NavigatorUtils.push(context, Routes.privacyStatementPage);
                     },
                     child: Text(
-                      "《隐私条款》",
+                      S.of(context).privacy_protocol_tag,
                       style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,

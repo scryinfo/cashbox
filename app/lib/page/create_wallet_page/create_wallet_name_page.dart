@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/generated/i18n.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +46,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "创建钱包",
+          centerTitle: S.of(context).create_wallet,
           backgroundColor: Colors.transparent,
         ),
         body: _buildCreateWalletLayout(),
@@ -95,7 +96,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         child: Container(
           width: ScreenUtil().setWidth(41),
           child: Text(
-            "添加钱包",
+            S.of(context).add_wallet,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.blue,
@@ -115,7 +116,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "钱包名称",
+              S.of(context).wallet_name,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -132,11 +133,10 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
                 contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
-                //labelText: "请输入钱包名",
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: "请输入钱包名",
+                hintText: S.of(context).pls_input_wallet_name,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -163,7 +163,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "钱包密码",
+              S.of(context).wallet_pwd,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -184,7 +184,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: "建议大于8位，英文、数字混合",
+                hintText: S.of(context).advice_pwd_format,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -211,7 +211,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "再次输入密码",
+              S.of(context).pls_pwd_again,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -259,7 +259,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         Container(
           alignment: Alignment.topLeft,
           child: Text(
-            "选择创建链",
+            S.of(context).choose_multi_chain,
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.85),
               fontSize: ScreenUtil.instance.setSp(3.5),
@@ -299,7 +299,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
   void _listenWalletName() {
     String name = _nameController.text;
     if (name.isEmpty || name.length < 1) {
-      Fluttertoast.showToast(msg: "钱包名不能为空");
+      Fluttertoast.showToast(msg: S.of(context).wallet_name_not_null);
       return;
     }
   }
@@ -307,7 +307,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
   void _listenPwd() {
     String pwd = _pwdController.text;
     if (pwd.isEmpty || pwd.length < 1) {
-      Fluttertoast.showToast(msg: "密码不能为空");
+      Fluttertoast.showToast(msg: S.of(context).pwd_not_null);
       return;
     }
   }
@@ -320,17 +320,17 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         _pwdController.text.length < 1 ||
         _confirmPwdController.text.isEmpty ||
         _confirmPwdController.text.length < 1) {
-      Fluttertoast.showToast(msg: "有信息为空，请补全信息");
+      Fluttertoast.showToast(msg: S.of(context).some_info_is_null);
       return false;
     }
     //验证：两次密码一致
     if (_confirmPwdController.text != _pwdController.text) {
-      Fluttertoast.showToast(msg: "确认密码不一致，请重新输入");
+      Fluttertoast.showToast(msg: S.of(context).pwd_is_not_same);
       return false;
     }
     //验证：勾选 链
     if (!_eeeChainChoose) {
-      Fluttertoast.showToast(msg: "请确认勾选创建EEE链");
+      Fluttertoast.showToast(msg: S.of(context).pls_ensure_eee_chain);
       return false;
     }
     return true;
