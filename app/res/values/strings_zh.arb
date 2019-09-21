@@ -1,5 +1,6 @@
 {
   "app_title": "App标题 zh",
   "main_title": "主标题 zh",
-  "message_tip": "message zh"
+  "message_tip": "message zh",
+  "wallet_load_error": "钱包应用加载出错了，请尝试重新打开!~"
 }
