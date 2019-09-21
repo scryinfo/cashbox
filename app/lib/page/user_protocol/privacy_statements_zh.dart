@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -10,7 +11,7 @@ class PrivacyStatementPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: MyAppBar(
-        centerTitle: "隐私条款",
+        centerTitle: S.of(context).privacy_protocol_title,
         backgroundColor: Colors.transparent,
       ),
       body: _buildUserService(),
@@ -449,8 +450,7 @@ class PrivacyStatementPage extends StatelessWidget {
 </html>
 """,
           padding: EdgeInsets.all(8.0),
-          defaultTextStyle:
-              TextStyle(fontFamily: 'serif', color: Colors.white70),
+          defaultTextStyle: TextStyle(fontFamily: 'serif', color: Colors.white70),
           linkStyle: const TextStyle(
             color: Colors.redAccent,
           ),

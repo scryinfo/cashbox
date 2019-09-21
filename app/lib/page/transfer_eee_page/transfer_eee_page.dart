@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,14 +24,12 @@ class _TransferEeePageState extends State<TransferEeePage> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/images/bg_graduate.png"),
-            fit: BoxFit.fill),
+        image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "钱包转账",
+          centerTitle: S.of(context).wallet_transfer,
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -81,7 +80,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                   }
                 },
                 child: Text(
-                  "点击转账",
+                  S.of(context).click_to_transfer,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.blue,
@@ -103,7 +102,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "对方收款地址",
+              S.of(context).receive_address,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 13,
@@ -113,7 +112,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
           Gaps.scaleVGap(2),
           Container(
             alignment: Alignment.center,
-            //height: ScreenUtil().setHeight(30),
             child: Stack(
               children: <Widget>[
                 Container(
@@ -140,7 +138,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                         color: Colors.white,
                         height: ScreenUtil().setHeight(40),
                       ),
-                      hintText: "请输入收款地址",
+                      hintText: S.of(context).pls_input_receive_address,
                       hintStyle: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.7),
                         fontSize: 12,
@@ -171,7 +169,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                           toAddrString = t.toString();
                         });
                       }).catchError((e) {
-                        Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
+                        Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code);
                       });
                     },
                     child: Image.asset("assets/images/ic_scan.png"),
@@ -192,7 +190,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "转账数额",
+              S.of(context).transaction_amount,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 13,
@@ -208,13 +206,11 @@ class _TransferEeePageState extends State<TransferEeePage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: "请输入转账数额",
+                hintText: S.of(context).pls_input_transaction_amount,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -241,7 +237,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "密码",
+              S.of(context).pwd,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 13,
@@ -257,13 +253,11 @@ class _TransferEeePageState extends State<TransferEeePage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(8)),
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: "请输入钱包密码",
+                hintText: S.of(context).pls_input_wallet_pwd,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,

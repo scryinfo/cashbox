@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
@@ -47,7 +48,7 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "钱包列表",
+          centerTitle: S.of(context).wallet_list,
           backgroundColor: Colors.transparent,
         ),
         body: Container(

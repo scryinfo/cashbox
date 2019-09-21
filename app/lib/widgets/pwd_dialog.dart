@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:flutter/material.dart';
@@ -87,17 +88,17 @@ class PwdDialog extends StatelessWidget {
       ),
       actions: <Widget>[
         new FlatButton(
-          child: new Text('确定'),
+          child: new Text(S.of(context).confirm),
           onPressed: () {
             if (_controller.text.isEmpty) {
-              Fluttertoast.showToast(msg: "请输入${title}");
+              Fluttertoast.showToast(msg: S.of(context).pls_input + "${title}");
               return;
             }
             onPressed(_controller.text);
           },
         ),
         new FlatButton(
-          child: new Text('取消'),
+          child: new Text(S.of(context).cancel),
           onPressed: () {
             Navigator.of(context).pop();
           },

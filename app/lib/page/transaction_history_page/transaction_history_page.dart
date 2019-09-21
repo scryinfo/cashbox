@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -54,8 +55,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: ""
-              "交易记录",
+          centerTitle: S.of(context).transaction_history,
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -142,7 +142,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 NavigatorUtils.push(context, Routes.transferEeePage);
               },
               child: Text(
-                "转账",
+                S.of(context).transfer,
                 style: TextStyle(
                   color: Colors.lightBlue,
                   fontSize: ScreenUtil.instance.setSp(3.5),
@@ -170,7 +170,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   Container(
                     width: ScreenUtil().setWidth(18),
                     child: Text(
-                      "交易记录",
+                      S.of(context).transaction_history,
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: ScreenUtil.instance.setSp(3.5),
@@ -207,7 +207,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               future: future,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Text("数据加载失败,请查看网络状况，可尝试下拉刷新");
+                  return Text(S.of(context).fail_to_load_data_hint);
                 }
                 if (snapshot.hasData) {
                   return Container(
@@ -215,7 +215,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   );
                 } else {
                   return Text(
-                    "暂时没有历史交易记录",
+                    S.of(context).no_tx_history,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: ScreenUtil.instance.setSp(4),
