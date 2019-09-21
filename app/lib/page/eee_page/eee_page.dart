@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
@@ -140,7 +141,7 @@ class _EeePageState extends State<EeePage> {
             LogUtil.e("digitList future snapshot.hasError is +>", snapshot.error.toString());
             return Center(
               child: Text(
-                "数据加载出错了，请尝试重新加载!~",
+                S.of(context).failure_to_load_data_pls_retry,
                 style: TextStyle(color: Colors.white70),
               ),
             );
@@ -339,7 +340,7 @@ class _EeePageState extends State<EeePage> {
                       child: Image.asset("assets/images/ic_transfer.png"),
                     ),
                     Text(
-                      "转账",
+                      S.of(context).transfer,
                       style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
                     )
                   ],
@@ -358,13 +359,13 @@ class _EeePageState extends State<EeePage> {
                   Padding(
                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
                       child: Text(
-                        "收款",
+                        S.of(context).receive,
                         style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
                       )),
                 ],
               ),
               onTap: () {
-                _navigatorToQrInfoPage(walletName, "链地址信息", nowChainAddress);
+                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, nowChainAddress);
               },
             ),
           )
@@ -500,7 +501,7 @@ class _EeePageState extends State<EeePage> {
                 if (walletName.isEmpty || nowChainAddress.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(walletName, "链地址信息", nowChainAddress);
+                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, nowChainAddress);
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
@@ -516,7 +517,7 @@ class _EeePageState extends State<EeePage> {
                 if (walletName.isEmpty || nowChainAddress.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(walletName, "链地址信息", nowChainAddress);
+                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, nowChainAddress);
               },
               child: Text(
                 nowChainAddress,

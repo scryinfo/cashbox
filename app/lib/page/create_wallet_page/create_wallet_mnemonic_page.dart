@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/mnemonic.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
@@ -20,7 +21,6 @@ class CreateWalletMnemonicPage extends StatefulWidget {
 class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
   String walletName = "";
   List<String> mnemonicList = [];
-  final String qrHintInfo = "这是您助记词信息生成的二维码";
 
   @override
   initState() {
@@ -57,7 +57,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "添加钱包",
+          centerTitle: S.of(context).create_wallet,
           backgroundColor: Colors.transparent,
         ),
         body: _buildCreateWalletMnemonic(),
@@ -79,7 +79,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
             Container(
               alignment: Alignment.topLeft,
               child: Text(
-                "备份助记词",
+                S.of(context).backup_mnemonic,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -91,8 +91,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.only(left: 0, right: 0),
               child: Text(
-                """以下是钱包的助记词，请您务必认真抄写下来并导出至安全的地方存放。
-注意：一旦丢失，无法找回。""",
+                S.of(context).mnemonic_info_hint,
                 textAlign: TextAlign.left,
                 maxLines: 4,
                 style: TextStyle(
@@ -136,7 +135,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                         ),
                         Container(
                           child: Text(
-                            "换一组",
+                            S.of(context).change_another_group,
                             style: TextStyle(
                               color: Color.fromRGBO(255, 255, 255, 0.9),
                             ),
@@ -149,10 +148,10 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                   Container(
                     child: GestureDetector(
                       onTap: () {
-                        _showAddressInQR(context, walletName, qrHintInfo, mnemonicList.join(" ").toString());
+                        _showAddressInQR(context, walletName, S.of(context).mnemonic_qr_info, mnemonicList.join(" ").toString());
                       },
                       child: Text(
-                        "二维码备份",
+                        S.of(context).qr_backup,
                         style: TextStyle(
                           color: Color.fromRGBO(255, 255, 255, 0.9),
                         ),
@@ -175,7 +174,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                   NavigatorUtils.push(context, Routes.createWalletConfirmPage);
                 },
                 child: Text(
-                  "助记词已经记好",
+                  S.of(context).mnemonic_backup_ok,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.blue,

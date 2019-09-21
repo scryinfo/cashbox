@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
@@ -77,7 +78,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  '我的',
+                  S.of(context).mine,
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -96,7 +97,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  '公告',
+                  S.of(context).public,
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -115,7 +116,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  'Dapp',
+                  S.of(context).dapp,
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -134,7 +135,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  '添加钱包',
+                  S.of(context).create_wallet,
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -153,7 +154,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  '导入钱包',
+                  S.of(context).import_wallet,
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -182,7 +183,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                     if (isSuccess) {
                       NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                     } else {
-                      Fluttertoast.showToast(msg: "钱包切换失败，请重新打开钱包，尝试切换");
+                      Fluttertoast.showToast(msg: S.of(context).failure_to_change_wallet);
                     }
                   },
                   child: Column(
