@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -20,7 +21,7 @@ class _MinePageState extends State<MinePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "我的",
+          centerTitle: S.of(context).mine,
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -66,7 +67,7 @@ class _MinePageState extends State<MinePage> {
               alignment: Alignment.centerLeft,
               margin: EdgeInsets.only(left: ScreenUtil().setWidth(8)),
               child: Text(
-                "货币管理",
+                S.of(context).currency_manage,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,
@@ -106,7 +107,7 @@ class _MinePageState extends State<MinePage> {
         NavigatorUtils.push(context, Routes.createTestWalletPage);
       },
       child: ItemOfListWidget(
-        leftText: "测试钱包",
+        leftText: S.of(context).test_wallet_title,
       ),
     );
   }
@@ -118,7 +119,7 @@ class _MinePageState extends State<MinePage> {
         NavigatorUtils.push(context, Routes.walletManagerListPage);
       },
       child: ItemOfListWidget(
-        leftText: "钱包列表",
+        leftText: S.of(context).wallet_list,
       ),
     );
   }
@@ -130,7 +131,7 @@ class _MinePageState extends State<MinePage> {
         print("click 语言选择");
       },
       child: ItemOfListWidget(
-        leftText: "语言选择",
+        leftText: S.of(context).language_choose,
       ),
     );
   }
@@ -141,7 +142,7 @@ class _MinePageState extends State<MinePage> {
         NavigatorUtils.push(context, Routes.aboutUsPage);
       },
       child: ItemOfListWidget(
-        leftText: "关于我们",
+        leftText: S.of(context).about_us_title,
       ),
     );
   }
@@ -149,10 +150,10 @@ class _MinePageState extends State<MinePage> {
   Widget _buildVersionCheckWidget() {
     return GestureDetector(
       onTap: () {
-        Fluttertoast.showToast(msg: "当前已是最新版本，暂无更新");
+        Fluttertoast.showToast(msg: S.of(context).no_new_version_hint);
       },
       child: ItemOfListWidget(
-        leftText: "版本更新",
+        leftText: S.of(context).version_update,
       ),
     );
   }

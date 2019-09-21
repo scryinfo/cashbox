@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/generated/i18n.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,8 +25,7 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: ""
-              "备份钱包",
+          centerTitle: S.of(context).backup_wallet,
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -51,7 +51,7 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              "抄下你的钱包助记词",
+              S.of(context).write_down_mnemonic,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: 14,
@@ -61,7 +61,7 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
           Gaps.scaleVGap(3),
           Container(
             child: Text(
-              "助记词用于恢复钱包或者重置钱包密码，将它准确抄到纸上，切记安全保存到你知道的安全地方。",
+              S.of(context).backup_mnemonic_hint_info,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: 11,

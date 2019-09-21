@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
@@ -32,8 +33,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: ""
-              "重置密码",
+          centerTitle: S.of(context).reset_pwd,
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -75,7 +75,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                     _checkAndResetPwd();
                   },
                   child: Text(
-                    "确定更改",
+                    S.of(context).ensure_to_change,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.blue,
@@ -115,7 +115,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
                 contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
-                hintText: "请输入旧密码",
+                hintText: S.of(context).pls_input_old_pwd,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -142,7 +142,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "新密码",
+              S.of(context).new_pwd,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -162,7 +162,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: "请输入新密码，建议大于8位，英文、数字混合",
+                hintText: S.of(context).new_pwd_format_hint,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -189,7 +189,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "再次输入新密码",
+              S.of(context).rewrite_new_pwd_format_hint,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -209,7 +209,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: "再次输入新密码，进行验证",
+                hintText: S.of(context).rewrite_new_pwd_format_hint,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -231,10 +231,10 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
 
   bool _verifyPwdSame() {
     if (_oldPwdController.text.isEmpty || _newPwdController.text.isEmpty || _confirmPwdController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "信息不能为空，请检查后重新尝试");
+      Fluttertoast.showToast(msg: S.of(context).some_info_is_null);
       return false;
     } else if (_newPwdController.text != _confirmPwdController.text) {
-      Fluttertoast.showToast(msg: "两次输入的密码不一致，请重新查证");
+      Fluttertoast.showToast(msg: S.of(context).pwd_is_not_same);
       return false;
     }
     return true;
@@ -244,19 +244,17 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
     if (_verifyPwdSame()) {
       String walletId = Provider.of<WalletManagerProvide>(context).walletId;
       Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
-      String pwd = _oldPwdController.text.toString();
-      print("reset_pwd_page==>" + pwd.codeUnits.toString()); //[B@6922d7e
       Map resetPwdMap =
           await wallet.resetPwd(Uint8List.fromList(_newPwdController.text.codeUnits), Uint8List.fromList(_oldPwdController.text.codeUnits));
       if (resetPwdMap == null) {
-        Fluttertoast.showToast(msg: "重置密码出现位置错误，请重新打开尝试");
+        Fluttertoast.showToast(msg: S.of(context).unknown_error_in_reset_pwd);
         return;
       } else {
         if (resetPwdMap["status"] == 200 && resetPwdMap["isResetPwd"]) {
-          Fluttertoast.showToast(msg: "重置密码成功，请您保存好你的密码，丢失无法找回");
+          Fluttertoast.showToast(msg: S.of(context).success_reset_pwd_hint);
           NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
         } else {
-          Fluttertoast.showToast(msg: "重置密码失败，详细信息" + resetPwdMap["message"]);
+          Fluttertoast.showToast(msg: S.of(context).failure_reset_pwd_hint + resetPwdMap["message"]);
         }
       }
     }
