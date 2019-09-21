@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
@@ -48,7 +49,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: "验证钱包",
+          centerTitle: S.of(context).verify_wallet,
           backgroundColor: Colors.transparent,
         ),
         body: _buildConfirmMnemonic(),
@@ -70,7 +71,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
             Container(
               alignment: Alignment.topLeft,
               child: Text(
-                "验证备份助记词",
+                S.of(context).verify_backup_mnemonic,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -82,7 +83,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               alignment: Alignment.center,
               padding: EdgeInsets.only(left: 0, right: 0),
               child: Text(
-                "请输入验证你保存的助记词顺序。再次提醒，程序不会保留您的隐私信息,请您务必保存好助记词",
+                S.of(context).verify_mnemonic_order,
                 textAlign: TextAlign.left,
                 maxLines: 2,
                 style: TextStyle(
@@ -123,11 +124,11 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                       clearStack: true,
                     );
                   } else {
-                    Fluttertoast.showToast(msg: "验证您输入助记词不一致，建议您重新生成新钱包");
+                    Fluttertoast.showToast(msg: S.of(context).mnemonic_order_wrong);
                   }
                 },
                 child: Text(
-                  "助记词确认验证",
+                  S.of(context).verify_mnemonic_info,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.blue,
@@ -150,7 +151,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
         if (isSuccess) {
           return true;
         } else {
-          Fluttertoast.showToast(msg: "钱包创建过程，出现位置错误，请重新尝试创建");
+          Fluttertoast.showToast(msg: S.of(context).unknown_error_in_create_wallet);
           return false;
         }
       }
@@ -199,7 +200,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                     this.verifyString = t.toString();
                   });
                 }).catchError((e) {
-                  Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
+                  Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code);
                 });
               },
               child: Image.asset("assets/images/ic_scan.png"),
