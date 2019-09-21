@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,7 +23,7 @@ class _PublicPageState extends State<PublicPage> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: MyAppBar(
-            centerTitle: "公告",
+            centerTitle: S.of(context).public,
             backgroundColor: Colors.transparent,
           ),
           body: Container(
