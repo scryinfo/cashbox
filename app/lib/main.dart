@@ -62,7 +62,11 @@ class MyApp extends StatelessWidget {
           ),
         ),
         child: MaterialApp(
-          localizationsDelegates: const [S.delegate,GlobalMaterialLocalizations.delegate,GlobalWidgetsLocalizations.delegate,],
+          localizationsDelegates: const [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
           supportedLocales: S.delegate.supportedLocales,
           home: EntryPage(),
           onGenerateRoute: Application.router.generator,
