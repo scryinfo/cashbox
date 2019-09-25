@@ -101,7 +101,7 @@ class S implements WidgetsLocalizations {
   String get success_create_test_wallet => "测试钱包创建完成，切记注意区分钱包类型";
   String get success_in_delete_wallet => "钱包删除成功";
   String get success_reset_pwd_hint => "重置密码成功，请您保存好你的密码，丢失无法找回";
-  String get success_to_copy_info => "地址已经成功拷贝!~~~";
+  String get success_to_copy_info => "信息已经成功拷贝!~~~";
   String get test_wallet_and_mnemonic => "测试钱包 助记词:";
   String get test_wallet_title => "测试钱包";
   String get transaction_amount => "交易数额";
@@ -307,7 +307,7 @@ class $zh extends S {
   @override
   String get test_wallet_and_mnemonic => "测试钱包 助记词:";
   @override
-  String get success_to_copy_info => "地址已经成功拷贝!~~~";
+  String get success_to_copy_info => "信息已经成功拷贝!~~~";
   @override
   String get pwd_is_not_same => "确认密码不一致，请重新输入";
   @override
