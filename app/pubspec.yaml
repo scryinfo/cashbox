@@ -93,17 +93,17 @@ flutter:
     - assets/images/3.0x/
 
     # todo 调试本地加载html、js、css资源
-    - assets/dist/index.html
-    - assets/dist/favicon.ico
-    - assets/dist/css/
-    - assets/dist/css/app.6af8ca07.css
-    - assets/dist/img/
-    - assets/dist/img/logo.82b9c7a5.png
-    - assets/dist/js/
-    - assets/dist/js/app.3d2e7c44.js
-    - assets/dist/js/app.3d2e7c44.js.map
-    - assets/dist/js/chunk-vendors.12262d8c.js
-    - assets/dist/js/chunk-vendors.12262d8c.js.map
+    #- assets/dist/index.html
+    #- assets/dist/favicon.ico
+    #- assets/dist/css/
+    #- assets/dist/css/app.6af8ca07.css
+    #- assets/dist/img/
+    #- assets/dist/img/logo.82b9c7a5.png
+    #- assets/dist/js/
+    #- assets/dist/js/app.3d2e7c44.js
+    #- assets/dist/js/app.3d2e7c44.js.map
+    #- assets/dist/js/chunk-vendors.12262d8c.js
+    #- assets/dist/js/chunk-vendors.12262d8c.js.map
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
