@@ -92,18 +92,61 @@ flutter:
     - assets/images/2.0x/
     - assets/images/3.0x/
 
-    # todo 调试本地加载html、js、css资源
-    #- assets/dist/index.html
-    #- assets/dist/favicon.ico
-    #- assets/dist/css/
-    #- assets/dist/css/app.6af8ca07.css
-    #- assets/dist/img/
-    #- assets/dist/img/logo.82b9c7a5.png
-    #- assets/dist/js/
-    #- assets/dist/js/app.3d2e7c44.js
-    #- assets/dist/js/app.3d2e7c44.js.map
-    #- assets/dist/js/chunk-vendors.12262d8c.js
-    #- assets/dist/js/chunk-vendors.12262d8c.js.map
+    # 调试本地加载html、js、css资源
+    - assets/dist/index.html
+    - assets/dist/favicon.ico
+    - assets/dist/css/
+    - assets/dist/css/app.d1ef3f91.css
+    - assets/dist/css/chunk-3ccb90a5.eeeae9dd.css
+    - assets/dist/css/chunk-3f404fda.5dc6038d.css
+    - assets/dist/css/chunk-03e5d714.abd4c747.css
+    - assets/dist/css/chunk-5fdaea22.e344b822.css
+    - assets/dist/css/chunk-7bc6c730.6d60904c.css
+    - assets/dist/css/chunk-13b95ad6.be6d7df1.css
+    - assets/dist/css/chunk-36aa337e.5eff998f.css
+    - assets/dist/css/chunk-46ab0072.871e940b.css
+    - assets/dist/css/chunk-52ff6fa1.5eff998f.css
+    - assets/dist/css/chunk-755ef151.da2c6692.css
+    - assets/dist/css/chunk-824dc81a.027888a9.css
+    - assets/dist/css/chunk-2555fecd.530d1489.css
+    - assets/dist/css/chunk-7802ea0f.bf0d77ea.css
+    - assets/dist/css/chunk-b987a392.530d1489.css
+    - assets/dist/css/chunk-c137a1f4.da2c6692.css
+    - assets/dist/css/chunk-vendors.eb61c1c4.css
+
+    - assets/dist/js/
+    - assets/dist/js/app.d0bb7cf2.js
+    - assets/dist/js/app.d0bb7cf2.js.map
+    - assets/dist/js/chunk-2d0a347d.a14f0f51.js
+    - assets/dist/js/chunk-2d0a347d.a14f0f51.js.map
+    - assets/dist/js/chunk-2d0aba49.7f27c930.js
+    - assets/dist/js/chunk-2d0ae94a.34242390.js
+    - assets/dist/js/chunk-2d0b343e.6c9fa6b9.js
+    - assets/dist/js/chunk-2d0be08d.9cd53db5.js
+    - assets/dist/js/chunk-2d0be69e.bda33526.js
+    - assets/dist/js/chunk-2d0f0670.09bc6ffd.js
+    - assets/dist/js/chunk-2d2073f4.f0920041.js
+    - assets/dist/js/chunk-3ccb90a5.ae30abe5.js
+    - assets/dist/js/chunk-3f7f3d72.22e21c7c.js
+    - assets/dist/js/chunk-3f404fda.f2700ecf.js
+    - assets/dist/js/chunk-03e5d714.eab3edce.js
+    - assets/dist/js/chunk-5fdaea22.3836e4a2.js
+    - assets/dist/js/chunk-7bc6c730.f776ac04.js
+    - assets/dist/js/chunk-13b95ad6.ccdf9228.js
+    - assets/dist/js/chunk-36aa337e.b1fc456f.js
+    - assets/dist/js/chunk-46ab0072.0d4e3e18.js
+    - assets/dist/js/chunk-52ff6fa1.25b48375.js
+    - assets/dist/js/chunk-163e4152.2ab011fa.js
+    - assets/dist/js/chunk-755ef151.50b23bb2.js
+    - assets/dist/js/chunk-824dc81a.22668aa1.js
+    - assets/dist/js/chunk-2555fecd.d2387407.js
+    - assets/dist/js/chunk-7802ea0f.1d0c1eed.js
+    - assets/dist/js/chunk-231726db.9c8cee07.js
+    - assets/dist/js/chunk-b987a392.3bd70222.js
+    - assets/dist/js/chunk-c137a1f4.83655ee5.js
+    - assets/dist/js/chunk-vendors.82c9746d.js
+    - assets/dist/js/pdfjsWorker.be2d1d43.js
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

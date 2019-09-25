@@ -69,7 +69,7 @@
   "language_choose": "语言选择",
   "version_update": "版本更新",
   "no_new_version_hint": "当前已是最新版本，暂无更新",
-  "success_to_copy_info": "地址已经成功拷贝!~~~",
+  "success_to_copy_info": "信息已经成功拷贝!~~~",
   "click_to_copy_address": "点击复制地址!",
   "backup_wallet": "备份钱包!",
   "recover_wallet": "恢复钱包",
