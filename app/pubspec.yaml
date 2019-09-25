@@ -45,6 +45,8 @@ dependencies:
   webview_flutter: ^0.3.13
   #   https://github.com/flutter/plugins/tree/master/packages/webview_flutter
 
+  flutter_webview_plugin: ^0.3.8
+
   qr_flutter: ^3.0.1
   # 生成二维码         https://github.com/lukef/qr.flutter
 
@@ -89,12 +91,19 @@ flutter:
     - assets/images/
     - assets/images/2.0x/
     - assets/images/3.0x/
-    - assets/html/
+
     # todo 调试本地加载html、js、css资源
-    # - assets/local_web_asset/
-    # - assets/local_web_asset/css/
-    # - assets/local_web_asset/js/
-    # - assets/local_web_asset/img/
+    - assets/dist/index.html
+    - assets/dist/favicon.ico
+    - assets/dist/css/
+    - assets/dist/css/app.6af8ca07.css
+    - assets/dist/img/
+    - assets/dist/img/logo.82b9c7a5.png
+    - assets/dist/js/
+    - assets/dist/js/app.3d2e7c44.js
+    - assets/dist/js/app.3d2e7c44.js.map
+    - assets/dist/js/chunk-vendors.12262d8c.js
+    - assets/dist/js/chunk-vendors.12262d8c.js.map
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
