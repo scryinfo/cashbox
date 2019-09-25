@@ -96,7 +96,7 @@ class _EntryPageState extends State<EntryPage> {
               _buildLogoWidget(),
               //Gaps.scaleVGap(2.5),
               _buildLogoTextWidget(),
-              Gaps.scaleVGap(26.5),
+              Gaps.scaleVGap(28.5),
               _buildCreateWalletWidget(),
               Gaps.scaleVGap(6.5),
               _buildImportWalletWidget(),
@@ -140,7 +140,7 @@ class _EntryPageState extends State<EntryPage> {
             Gaps.scaleHGap(2.5),
             Text(
               "添加钱包",
-              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: 15, fontStyle: FontStyle.normal),
+              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -167,7 +167,7 @@ class _EntryPageState extends State<EntryPage> {
             Gaps.scaleHGap(2.5),
             Text(
               "导入钱包",
-              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: 15, fontStyle: FontStyle.normal),
+              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -200,7 +200,7 @@ class _EntryPageState extends State<EntryPage> {
                 children: <Widget>[
                   Text(
                     S.of(context).agree_service_prefix,
-                    style: TextStyle(decoration: TextDecoration.none, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
+                    style: TextStyle(decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -211,7 +211,7 @@ class _EntryPageState extends State<EntryPage> {
                     },
                     child: Text(
                       S.of(context).service_protocol_tag,
-                      style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
+                      style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       maxLines: 2,
@@ -219,7 +219,7 @@ class _EntryPageState extends State<EntryPage> {
                   ),
                   Text(
                     "、",
-                    style: TextStyle(decoration: TextDecoration.none, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
+                    style: TextStyle(decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -230,7 +230,7 @@ class _EntryPageState extends State<EntryPage> {
                     },
                     child: Text(
                       S.of(context).privacy_protocol_tag,
-                      style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: 13, fontStyle: FontStyle.normal),
+                      style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       maxLines: 2,
