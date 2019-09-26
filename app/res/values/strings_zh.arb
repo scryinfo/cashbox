@@ -107,5 +107,6 @@
   "pls_input_receive_address": "请输入收款地址",
   "confirm": "确定",
   "cancel": "取消",
-  "pls_input": "请输入"
+  "pls_input": "请输入",
+  "scan": "扫一扫"
 }

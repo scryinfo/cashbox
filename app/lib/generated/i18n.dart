@@ -95,6 +95,7 @@ class S implements WidgetsLocalizations {
   String get recover_wallet_hint => "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。";
   String get reset_pwd => "重置密码";
   String get rewrite_new_pwd_format_hint => "再次输入新密码";
+  String get scan => "扫一扫";
   String get service_protocol_tag => "《服务协议》";
   String get service_protocol_title => "服务协议";
   String get some_info_is_null => "有信息为空，请补全信息";
@@ -246,6 +247,8 @@ class $zh extends S {
   String get transaction_amount => "交易数额";
   @override
   String get recover_wallet => "恢复钱包";
+  @override
+  String get scan => "扫一扫";
   @override
   String get eee_chain_test => "EEE_TEST";
   @override

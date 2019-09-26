@@ -2,6 +2,7 @@ import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -49,8 +50,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
               child: _drawerAction(),
             ),
             Gaps.scaleVGap(ScreenUtil().setHeight(1)),
-            Container(
-              height: ScreenUtil().setHeight(82),
+            Expanded(
               child: SingleChildScrollView(
                 child: Wrap(
                   children: _drawerWalletList(),
@@ -65,12 +65,12 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
 
   Widget _drawerAction() {
     return Container(
-      height: ScreenUtil().setHeight(63.75),
+      height: ScreenUtil().setHeight(66.75),
       child: Column(
         children: <Widget>[
           Container(
             alignment: Alignment.center,
-            height: ScreenUtil().setHeight(12),
+            height: ScreenUtil().setHeight(11),
             child: new ListTile(
                 leading: new Image.asset(
                   "assets/images/ic_nav_mine.png",
@@ -89,7 +89,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
           ),
           Container(
             alignment: Alignment.center,
-            height: ScreenUtil().setHeight(12),
+            height: ScreenUtil().setHeight(11),
             child: new ListTile(
                 leading: new Image.asset(
                   "assets/images/ic_nav_public.png",
@@ -108,7 +108,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
           ),
           Container(
             alignment: Alignment.center,
-            height: ScreenUtil().setHeight(12),
+            height: ScreenUtil().setHeight(11),
             child: new ListTile(
                 leading: new Image.asset(
                   "assets/images/ic_nav_public.png",
@@ -127,7 +127,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
           ),
           Container(
             alignment: Alignment.center,
-            height: ScreenUtil().setHeight(12),
+            height: ScreenUtil().setHeight(11),
             child: new ListTile(
                 leading: new Image.asset(
                   "assets/images/ic_nav_add.png",
@@ -146,7 +146,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
           ),
           Container(
             alignment: Alignment.center,
-            height: ScreenUtil().setHeight(12),
+            height: ScreenUtil().setHeight(11),
             child: new ListTile(
                 leading: new Image.asset(
                   "assets/images/ic_nav_import.png",
@@ -161,6 +161,26 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                 ),
                 onTap: () {
                   NavigatorUtils.push(context, Routes.importWalletPage);
+                }),
+          ),
+          Container(
+            alignment: Alignment.center,
+            height: ScreenUtil().setHeight(11),
+            child: new ListTile(
+                leading: new Image.asset(
+                  "assets/images/ic_scan_left.png",
+                  width: ScreenUtil().setWidth(4.5),
+                  height: ScreenUtil().setWidth(4.5),
+                ),
+                title: new Text(
+                  S.of(context).scan,
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+                onTap: () async {
+                  String qrInfo = await QrScanUtil.qrscan();
+                  print("qrInfo===>" + qrInfo);
                 }),
           ),
         ],
@@ -206,7 +226,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     walletList[index] != null ? walletList[index].walletName : "",
-                                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                                    style: TextStyle(color: Colors.grey, fontSize: ScreenUtil.instance.setSp(3)),
                                     maxLines: 1,
                                   ),
                                 ),
@@ -215,7 +235,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                                   margin: EdgeInsets.only(left: ScreenUtil().setWidth(3)),
                                   child: Text(
                                     "0", //walletList[index].money,
-                                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                                    style: TextStyle(color: Colors.grey, fontSize: ScreenUtil.instance.setSp(3)),
                                     maxLines: 1,
                                     textAlign: TextAlign.center,
                                     overflow: TextOverflow.ellipsis,
@@ -264,7 +284,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
         width: ScreenUtil().setWidth(10),
         child: Text(
           nowChain.chainTypeToValue(nowChain.chainType),
-          style: TextStyle(color: Color(0xFF57CAF2), fontSize: 12),
+          style: TextStyle(color: Color(0xFF57CAF2), fontSize: ScreenUtil.instance.setSp(3)),
         ),
       );
     });
