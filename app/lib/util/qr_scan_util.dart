@@ -62,7 +62,7 @@ class QrScanUtil {
       case "66": //substrate链
         //todo 1、输入密码
         //todo 2、调用给substrate交易签名的JNI
-
+        var waitSignTx = paramMap["v"]; //待签名交易信息
         break;
       default:
         LogUtil.e("QrScanUtil", "unknown chainType ======>" + chainType);
