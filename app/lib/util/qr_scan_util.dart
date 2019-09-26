@@ -1,7 +1,11 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/provide/sign_info_provide.dart';
+import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/routers/routers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 import 'log_util.dart';
 
@@ -97,11 +101,10 @@ class QrScanUtil {
       case "60": //ETH
         break;
       case "66": //substrate链
-        //todo 1、输入密码
-
-        //todo 2、调用给substrate交易签名的JNI
         var waitSignTx = paramMap["v"]; //待签名交易信息
-        print("wait to sing info is======>" + waitSignTx);
+        Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitSignTx);
+        NavigatorUtils.push(context, Routes.signTxPage);
+        paramMap = null; //置空扫描数据
         break;
       default:
         Fluttertoast.showToast(msg: S.of(context).not_sure_chain_type);
