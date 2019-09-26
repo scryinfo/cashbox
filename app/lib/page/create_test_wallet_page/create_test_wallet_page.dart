@@ -137,7 +137,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
               alignment: Alignment.bottomRight,
               child: GestureDetector(
                 onTap: () async {
-                  Future<String> qrResult = QrScanUtil.qrscan();
+                  Future<String> qrResult = QrScanUtil.instance.qrscan();
                   qrResult.then((t) {
                     setState(() {
                       this.mnemonicString = t.toString();

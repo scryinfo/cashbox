@@ -69,6 +69,8 @@ class S implements WidgetsLocalizations {
   String get new_pwd_format_hint => "请输入新密码，建议大于8位，英文、数字混合";
   String get no_new_version_hint => "当前已是最新版本，暂无更新";
   String get no_tx_history => "暂时没有历史交易记录";
+  String get not_sure_chain_type => "不确定是哪条链,请检查二维码链类型信息";
+  String get not_sure_operation_type => "不确定操作类型,请检查二维码链操作类型信息";
   String get old_pwd => "旧密码";
   String get pls_ensure_eee_chain => "请确认勾选创建EEE链";
   String get pls_ensure_pwd_is_same => "请确认两次输入密码一致";
@@ -88,6 +90,9 @@ class S implements WidgetsLocalizations {
   String get pwd_is_not_same => "确认密码不一致，请重新输入";
   String get pwd_not_null => "密码不能为空";
   String get qr_backup => "二维码备份";
+  String get qr_info_is_null => "二维码信息为空";
+  String get qr_info_is_out_of_date => "二维码信息过期或有效期信息有误，请检查二维码信息";
+  String get qr_info_is_wrong => "不能识别二维码信息参数";
   String get qr_scan_unknown_error => "扫描发生未知失败，请重新尝试";
   String get receive => "收款";
   String get receive_address => "对方收款地址";

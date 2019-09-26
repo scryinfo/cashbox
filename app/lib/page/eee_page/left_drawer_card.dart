@@ -179,8 +179,8 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   ),
                 ),
                 onTap: () async {
-                  String qrInfo = await QrScanUtil.qrscan();
-                  print("qrInfo===>" + qrInfo);
+                  String qrInfo = await QrScanUtil.instance.qrscan();
+                  QrScanUtil.instance.checkQrInfo(qrInfo,context);
                 }),
           ),
         ],
