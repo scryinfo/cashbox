@@ -194,7 +194,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
             alignment: Alignment.bottomRight,
             child: GestureDetector(
               onTap: () async {
-                Future<String> qrResult = QrScanUtil.qrscan();
+                Future<String> qrResult = QrScanUtil.instance.qrscan();
                 qrResult.then((t) {
                   setState(() {
                     this.verifyString = t.toString();

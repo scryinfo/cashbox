@@ -108,5 +108,10 @@
   "confirm": "确定",
   "cancel": "取消",
   "pls_input": "请输入",
-  "scan": "扫一扫"
+  "scan": "扫一扫",
+  "qr_info_is_null": "二维码信息为空",
+  "qr_info_is_wrong": "不能识别二维码信息参数",
+  "qr_info_is_out_of_date": "二维码信息过期或有效期信息有误，请检查二维码信息",
+  "not_sure_chain_type": "不确定是哪条链,请检查二维码链类型信息",
+  "not_sure_operation_type": "不确定操作类型,请检查二维码链操作类型信息"
 }

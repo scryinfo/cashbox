@@ -83,7 +83,7 @@ class _DAppWebViewDemoState extends State<DAppWebViewDemo> {
           JavascriptChannel(
               name: "NativeQrScan",
               onMessageReceived: (JavascriptMessage message) {
-                Future<String> qrResult = QrScanUtil.qrscan();
+                Future<String> qrResult = QrScanUtil.instance.qrscan();
                 qrResult.then((t) {
                   _controller
                       ?.evaluateJavascript('callJs("$t")')

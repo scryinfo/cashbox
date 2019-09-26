@@ -171,7 +171,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   ),
                   child: GestureDetector(
                     onTap: () async {
-                      Future<String> qrResult = QrScanUtil.qrscan();
+                      Future<String> qrResult = QrScanUtil.instance.qrscan();
                       qrResult.then((t) {
                         setState(() {
                           mneString = t.toString();

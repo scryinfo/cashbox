@@ -65,7 +65,7 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
             JavascriptChannel(
                 name: "NativeQrScan",
                 onMessageReceived: (JavascriptMessage message) {
-                  Future<String> qrResult = QrScanUtil.qrscan();
+                  Future<String> qrResult = QrScanUtil.instance.qrscan();
                   qrResult.then((t) {
                     Fluttertoast.showToast(msg: "扫描j结果是======> $t");
                     _controller
