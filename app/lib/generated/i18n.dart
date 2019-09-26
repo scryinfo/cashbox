@@ -34,6 +34,7 @@ class S implements WidgetsLocalizations {
   String get change_another_group => "换一组";
   String get choose_multi_chain => "选择创建链";
   String get click_to_copy_address => "点击复制地址!";
+  String get click_to_sign => "点击签名";
   String get click_to_transfer => "点击转账";
   String get confirm => "确定";
   String get create_test_wallet => "创建测试钱包";
@@ -51,6 +52,8 @@ class S implements WidgetsLocalizations {
   String get failure_to_change_wallet => "钱包切换失败，请重新打开钱包，尝试切换";
   String get failure_to_load_data_pls_retry => "数据加载出错了，请尝试重新加载!~";
   String get import_wallet => "导入钱包";
+  String get info_sign => "信息签名";
+  String get info_sign_hint => "请确认选择对应钱包后，输入密码进行签名";
   String get input_format_hint => "建议8-24位，英文数字混合";
   String get judge_the_difference_between_two_wallet => "注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。";
   String get language_choose => "语言选择";
@@ -89,6 +92,7 @@ class S implements WidgetsLocalizations {
   String get pwd => "密码";
   String get pwd_is_not_same => "确认密码不一致，请重新输入";
   String get pwd_not_null => "密码不能为空";
+  String get pwd_verify => "密码验证";
   String get qr_backup => "二维码备份";
   String get qr_info_is_null => "二维码信息为空";
   String get qr_info_is_out_of_date => "二维码信息过期或有效期信息有误，请检查二维码信息";
@@ -127,6 +131,7 @@ class S implements WidgetsLocalizations {
   String get verify_mnemonic_order => "请输入验证你保存的助记词顺序。再次提醒，程序不会保留您的隐私信息,请您务必保存好助记词";
   String get verify_wallet => "验证钱包";
   String get version_update => "版本更新";
+  String get wait_to_sign_info => "待签名信息";
   String get wallet_list => "钱包列表";
   String get wallet_load_error => "钱包应用加载出错了，请尝试重新打开!~";
   String get wallet_name => "钱包名";

@@ -1,3 +1,4 @@
+import 'package:app/page/sign_tx_page/sign_tx_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
@@ -110,4 +111,7 @@ Handler aboutUsPageHandler = Handler(handlerFunc: (BuildContext context, Map<Str
 
 Handler createTestWalletHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return CreateTestWalletPage();
+});
+Handler signTxPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return SignTxPage();
 });

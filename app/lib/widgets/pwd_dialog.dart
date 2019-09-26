@@ -33,53 +33,55 @@ class PwdDialog extends StatelessWidget {
       content: Container(
         margin: EdgeInsets.only(left: 7, right: 6),
         padding: EdgeInsets.only(left: 3),
-        height: ScreenUtil().setHeight(23),
-        child: Column(
-          children: <Widget>[
-            Gaps.scaleVGap(1),
-            Container(
-              child: Text(
-                hintContent,
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: ScreenUtil.instance.setSp(2.5),
+        height: ScreenUtil().setHeight(18),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Gaps.scaleVGap(1),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  hintContent,
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    color: Color.fromRGBO(0, 0, 0, 0.8),
+                    fontSize: ScreenUtil.instance.setSp(2.5),
+                  ),
                 ),
               ),
-            ),
-            Gaps.scaleVGap(3),
-            Container(
-              padding: EdgeInsets.all(0),
-              //height: ScreenUtil().setHeight(15),
-              //color: Colors.red,
-              child: TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  fillColor: Color.fromRGBO(101, 98, 98, 0.7),
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black87),
-                    borderRadius: BorderRadius.circular(
-                      ScreenUtil().setWidth(1.0),
+              Gaps.scaleVGap(3),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: TextField(
+                  obscureText: true,
+                  textAlign: TextAlign.start,
+                  decoration: InputDecoration(
+                    fillColor: Color.fromRGBO(101, 98, 98, 0.7),
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black87),
+                      borderRadius: BorderRadius.circular(
+                        ScreenUtil().setWidth(1.0),
+                      ),
                     ),
+                    hintText: hintInput,
+                    hintStyle: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 0.7),
+                      fontSize: ScreenUtil.instance.setSp(3),
+                    ),
+                    contentPadding: EdgeInsets.only(
+                      left: ScreenUtil().setWidth(2),
+                      top: ScreenUtil().setHeight(2),
+                      bottom: ScreenUtil().setHeight(2),
+                    ),
+                    focusColor: Colors.black45,
                   ),
-                  contentPadding: EdgeInsets.only(
-                    left: ScreenUtil().setWidth(2),
-                    top: ScreenUtil().setHeight(3),
-                    bottom: ScreenUtil().setHeight(3),
-                  ),
-                  hintText: hintInput,
-                  hintStyle: TextStyle(
-                    color: Color.fromRGBO(0, 0, 0, 0.7),
-                    fontSize: ScreenUtil.instance.setSp(3),
-                  ),
-                  focusColor: Colors.black45,
+                  controller: _controller,
+                  autofocus: true,
                 ),
-                controller: _controller,
-                autofocus: true,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       contentTextStyle: TextStyle(

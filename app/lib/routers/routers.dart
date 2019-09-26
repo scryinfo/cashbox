@@ -27,6 +27,7 @@ class Routes {
   static String transactionEeeDetailPage = '/transactioneeedetailpage';
   static String aboutUsPage = '/aboutuspage';
   static String createTestWalletPage = '/createtestwalletpage';
+  static String signTxPage = '/signtxpage';
 
   static void configureRoutes(Router router) {
     router.notFoundHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -57,5 +58,6 @@ class Routes {
     router.define(transactionHistoryPage, handler: transactionHistoryHandler);
     router.define(transactionEeeDetailPage, handler: transactionEeeDetailHandler);
     router.define(createTestWalletPage, handler: createTestWalletHandler);
+    router.define(signTxPage, handler: signTxPageHandler);
   }
 }
