@@ -267,7 +267,8 @@ public class NativeLib {
     public static native Message eeeTransfer(long handle, String from, String to, String value, String extendMsg);
 
     //msg: 交易
-    public static native Message eeeEnergyTransfer(long handle, String from, String to, String value, String extendMsg);
+   // public static native Message eeeEnergyTransfer(long handle, String from, String to, String value, String extendMsg);
+    public static native Message eeeEnergyTransfer(String from, byte[] pwd,String to, String value, String extendMsg);
 
     //获取签名后的交易信息，区分链类型
     //返回：签名后的交易 String
