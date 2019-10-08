@@ -1,4 +1,4 @@
-use substrate_primitives::{hexdisplay::HexDisplay, Pair, crypto::Ss58Codec};
+use substrate_primitives::{hexdisplay::HexDisplay,Public,Pair, crypto::Ss58Codec};
 use bip39::{Mnemonic, MnemonicType, Language};
 use rand::{RngCore, rngs::OsRng};
 use scry_crypto::aes;
@@ -48,7 +48,9 @@ struct KdfParams {
 
 pub trait Crypto {
     type Seed: AsRef<[u8]> + AsMut<[u8]> + Sized + Default;
-    type Pair: Pair;
+    type Pair: Pair<Public=Self::Public>;
+    type Public: Public + Ss58Codec + AsRef<[u8]> + std::hash::Hash;
+
     fn generate_phrase(num: u8) -> String {
         let mn_type = match num {
             12 => MnemonicType::Words12,
@@ -67,8 +69,14 @@ pub trait Crypto {
     }
     fn seed_from_phrase(phrase: &str, password: Option<&str>) -> Self::Seed;
     fn pair_from_seed(seed: &Self::Seed) -> Self::Pair;
-    fn pair_from_suri(phrase: &str, password: Option<&str>) -> Self::Pair {
-        Self::pair_from_seed(&Self::seed_from_phrase(phrase, password))
+    fn pair_from_phrase(phrase: &str, password: Option<&str>) -> Self::Pair{
+        let seed = Self::seed_from_phrase(phrase, password);
+        let pair = Self::pair_from_seed(&seed);
+        pair
+    }
+    fn pair_from_suri(suri: &str, password: Option<&str>) -> Self::Pair {
+        Self::Pair::from_string(suri, password).expect("Invalid phrase")
+        //Self::pair_from_seed(&Self::seed_from_phrase(phrase, password))
     }
     fn ss58_from_pair(pair: &Self::Pair) -> String;
     fn public_from_pair(pair: &Self::Pair) -> Vec<u8>;
@@ -224,6 +232,7 @@ pub trait Crypto {
             }
         }
     }
+    fn sign(phrase:&str,msg:&[u8])->[u8;64];
 }
 
 

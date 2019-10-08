@@ -6,6 +6,7 @@ pub mod wallet_crypto;
 pub mod model;
 pub mod module;
 pub mod wallet_db;
+pub mod wallet_rpc;
 
 #[derive(PartialEq,Clone)]
 pub enum StatusCode {
@@ -61,13 +62,67 @@ impl From<i64> for ChainType {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::crate_mnemonic;
-    use crate::account_crypto::Ed25519;
-    use crate::account_crypto::Sr25519;
+    use crate::wallet_crypto::Crypto;
+    use hex;
+    use std::sync::mpsc;
+    use futures::Future;
+    use jsonrpc_core::Notification;
+    use substrate_primitives::crypto::Pair;
 
     #[test]
     fn verify_mnemonic_create() {
-        println!("{}", module::wallet::crate_mnemonic::<Ed25519>(18));
-        println!("{}", module::wallet::crate_mnemonic::<Sr25519>(18));
+        let mnemonic = wallet_crypto::Sr25519::generate_phrase(18);
+        let data = "substrate sign method test";
+        println!("data length is:{}",data.len());
+        let data = wallet_crypto::Ed25519::sign(&mnemonic,data.as_bytes());
+
+        println!("{}",hex::encode(data.to_vec().as_slice()));
+       // wallet_crypto::Sr25519::print_from_phrase(&mnemonic,None);
+
+    }
+
+    #[test]
+    fn rpc_account_nonce_test(){
+        let (send_tx, recv_tx) = mpsc::channel();
+        let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
+        let mnemonic = "swarm grace knock race flip unveil pyramid reveal shoot vehicle renew axis";
+        let to = "5DATag245rFG8PvCHnSpntLMhF9xvKZQPyshaAFhSiMMcFpU";
+      //  let seed =  wallet_crypto::Sr25519::seed_from_phrase(mnemonic,None);
+        //let pair = wallet_crypto::Sr25519::pair_from_suri(&mnemonic,None);
+        let pair = wallet_crypto::Sr25519::pair_from_suri("//Alice",None);
+        println!("public:{}",&pair.public());
+        let index = wallet_rpc::substrate::account_nonce(&mut substrate_client,&pair.public());
+        println!("index:{}",index);
+
+        let msg = recv_tx.recv().unwrap();
+        let msg = msg.into_text().unwrap();
+        let des: Notification = serde_json::from_str(&msg).unwrap();
+        let des: serde_json::Map<String, serde_json::Value> = des.params.parse().unwrap();
+        let sub_id = &des["subscription"];
+        println!(
+            "----subscribe extrinsic return sub_id:{:?}----result:{:?}---",
+            sub_id, des["result"]
+        );
+        assert_eq!(1,2);
+    }
+
+    #[test]
+    fn rpc_func_test(){
+        let (send_tx, recv_tx) = mpsc::channel();
+        let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
+        let mnemonic = "mirror craft oil voice there pizza quarter void inhale snack vacant kingdom force erupt congress wing correct bargain";
+
+        let to = "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy";
+        let ret = wallet_rpc::transfer(&mut substrate_client,  mnemonic,to,"200");
+
+        match ret {
+            Ok(data)=>{
+                println!("signed data is: {}",data);
+                wallet_rpc::submit_data(&mut substrate_client,data);
+            },
+            Err(msg)=>{
+                println!("error {}",msg);
+            }
+        }
     }
 }

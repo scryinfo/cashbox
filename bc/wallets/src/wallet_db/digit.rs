@@ -1,10 +1,8 @@
 use crate::wallet_db::db_helper::DataServiceProvider;
-use crate::model::WalletObj;
-use log::debug;
 
 impl DataServiceProvider {
     fn check_chain_type(chainid: &str) -> String {
-        let mut digit_table_type = "";
+        let digit_table_type;
         match chainid {
             "1" => {
                 digit_table_type = "detail.BtcDigit";
@@ -32,7 +30,7 @@ impl DataServiceProvider {
         return digit_table_type.to_string();
     }
 
-    pub fn change_visible(&mut self, walletid: &str, chainid: &str, digitid: &str, isvisibleflag: i64) -> Result<(), String> {
+    pub fn change_visible(&mut self, walletid: &str, chainid: &str, _digitid: &str, isvisibleflag: i64) -> Result<(), String> {
         let get_address_id_sql = "select address_id from detail.Address WHERE wallet_id=? and chain_id=?;";
         let mut address_state = self.db_hander.prepare(get_address_id_sql).unwrap();
         address_state.bind(1, walletid).expect("walletid is error!");
@@ -44,7 +42,7 @@ impl DataServiceProvider {
                 let data = value.unwrap();
                 address_id = data[0].as_string().unwrap();
             }
-            Err(e) => {}
+            Err(_e) => {}
         }
         let show_digit_sql = format!("{} {} {} {} {}", "UPDATE", Self::check_chain_type(chainid), "set is_visible = ", isvisibleflag, "WHERE address_id=? ;");
         let mut show_digit_state = self.db_hander.prepare(show_digit_sql).unwrap();
