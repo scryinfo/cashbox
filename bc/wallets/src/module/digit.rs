@@ -1,7 +1,4 @@
 use super::*;
-use super::model::*;
-use std::collections::HashMap;
-
 
 pub fn show_digit(walletid: &str, chainid: &str, digitid: &str) -> Result<bool, String> {
     let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();

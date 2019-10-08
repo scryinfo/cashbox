@@ -1,6 +1,41 @@
 use super::*;
 use super::model::*;
+
+use std::sync::mpsc;
+use crate::wallet_crypto::Crypto;
 use std::collections::HashMap;
+
+pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<String,String>{
+
+    match module::wallet::find_keystore_wallet_from_address(from,ChainType::EEE) {
+        Ok(keystore)=>{
+            match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
+                Ok(mnemonic) => {
+                    //密码验证通过
+
+                    let (send_tx, recv_tx) = mpsc::channel();
+                    let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
+                    let mn = String::from_utf8(mnemonic).unwrap();
+                    let signed_data = wallet_rpc::transfer(&mut substrate_client,  &mn,to,amount);
+                    match signed_data {
+                        Ok(data)=>{
+                            println!("signed data is: {}",data);
+                           let ret_value  = wallet_rpc::submit_data(&mut substrate_client,data);
+                           let str_value = format!("{}",ret_value);
+                            Ok(str_value)
+                        },
+                        Err(msg)=>{
+                            Err(msg)
+                        }
+                    }
+
+                }
+                Err(msg) => Err(msg),
+            }
+        },
+       Err(msg)=>{Err(msg)}
+    }
+}
 
 
 pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {

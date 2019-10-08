@@ -7,29 +7,62 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+url = "2.1.0"
+futures = "0.1"
+parking_lot = "0.7"
 tiny-bip39 ="0.6.2"
+codec = { package = "parity-scale-codec", version = "1.0.0" }
 substrate-bip39 ="0.3.0"
-schnorrkel="0.1.1"
+schnorrkel="0.8.5"
 rand = "0.7.0"
 rand_core = "0.5.0"
 log = "0.4.8"
 tiny-keccak = "1.5.0"
 hex="0.3.2"
-#rusqlite = "0.19.0"
 sqlite="0.25.0"
-#serde_rusqlite="0.20.0"
 serde_derive = "1.0.98"
 serde="1.0"
+serde_json = "1.0"
 uuid = { version = "0.7", features = ["serde", "v4"] }
 
 scrypt = { version = "0.2", default-features = true }
-serde_json="1.0.40"
 scry-crypto = {version = "0.1.0",path="../util/crypto"}
 scry-fs-util = {version = "0.1.0",path="../util/fs"}
+jsonrpc-ws-server = { git = "https://github.com/paritytech/jsonrpc.git" }
+jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc.git" }
 
 # 这里编译存在版本问题，当前使用的master能够正常编译通过
 [dependencies.substrate-primitives]
-#git = 'https://github.com/paritytech/substrate.git'
-git = 'https://github.com/jeremymj/substrate'
+git = 'https://github.com/paritytech/substrate.git'
+#git = 'https://github.com/jeremymj/substrate'
 package = 'substrate-primitives'
-#rev = '2e30b7321df0cc4dba525cfcf18df8438e12b830'
+rev = 'bc9d55f738db72d35b6dfdf9dad7bf2d82204665'
+
+
+[dependencies.node-primitives]
+git = 'https://github.com/paritytech/substrate.git'
+rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+
+[dependencies.node-runtime]
+git = 'https://github.com/paritytech/substrate.git'
+rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+
+[dependencies.system]
+package = "srml-system"
+git = 'https://github.com/paritytech/substrate.git'
+rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+
+[dependencies.balances]
+package = "srml-balances"
+git = 'https://github.com/paritytech/substrate.git'
+rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+
+[dependencies.sr-primitives]
+git = 'https://github.com/paritytech/substrate.git'
+rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+
+[dependencies.srml-support]
+ git = "https://github.com/paritytech/substrate.git"
+ package = "srml-support"
+ rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+

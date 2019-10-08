@@ -1,4 +1,6 @@
-use log::{error};
+use super::*;
+use log::error;
+use ChainType;
 
 use crate::model::wallet_store::{TbAddress, WalletObj, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
@@ -59,24 +61,24 @@ impl DataServiceProvider {
                         match address_stat.next() {
                             Ok(_) => {
                                 // TODO 后续来完善需要更新的数据详情
-                               // let eee_digit_account_sql = format!("insert into detail.EeeDigit(address_id) values('{}');", addr.address_id);
+                                // let eee_digit_account_sql = format!("insert into detail.EeeDigit(address_id) values('{}');", addr.address_id);
                                 let eee_digit_account_sql = "INSERT INTO detail.EeeDigit(address_id,full_name,short_name,decimals,balance)VALUES(?,?,?,?,?);";
-                               //let eth_digit_account_sql = format!("insert into detail.EthDigit(address_id) values('{}');", addr.address_id);
+                                //let eth_digit_account_sql = format!("insert into detail.EthDigit(address_id) values('{}');", addr.address_id);
                                 //let btc_digit_account_sql = format!("insert into detail.BtcDigit(address_id) values('{}');", addr.address_id);
                                 //self.db_hander.execute(eee_digit_account_sql).expect("update selected state");
                                 //self.db_hander.execute(eth_digit_account_sql).expect("update selected state");
                                 //self.db_hander.execute(btc_digit_account_sql).expect("update selected state");
-                                   match self.db_hander.prepare(eee_digit_account_sql) {
-                                       Ok(mut digit_stat) => {
-                                           digit_stat.bind(1, addr.address_id.as_str()).expect("digit_account_sql  bind addr.address ");
-                                           digit_stat.bind(2, "eee").expect("digit_account_sql  bind addr.address ");
-                                           digit_stat.bind(3, "eee").expect("digit_account_sql bind addr.address ");
-                                           digit_stat.bind(4, 18).expect("digit_account_sql  bind addr.address ");
-                                           digit_stat.bind(5, 0).expect("digit_account_sql  bind addr.address ");
-                                           digit_stat.next().expect("exec chain insert error");
-                                       }
-                                       Err(e) => return Err(e.to_string())
-                                   }
+                                match self.db_hander.prepare(eee_digit_account_sql) {
+                                    Ok(mut digit_stat) => {
+                                        digit_stat.bind(1, addr.address_id.as_str()).expect("digit_account_sql  bind addr.address ");
+                                        digit_stat.bind(2, "eee").expect("digit_account_sql  bind addr.address ");
+                                        digit_stat.bind(3, "eee").expect("digit_account_sql bind addr.address ");
+                                        digit_stat.bind(4, 18).expect("digit_account_sql  bind addr.address ");
+                                        digit_stat.bind(5, 0).expect("digit_account_sql  bind addr.address ");
+                                        digit_stat.next().expect("exec chain insert error");
+                                    }
+                                    Err(e) => return Err(e.to_string())
+                                }
                             }
                             Err(e) => return Err(e.to_string())
                         }
@@ -109,8 +111,8 @@ impl DataServiceProvider {
                     wallet_type: value[4].as_integer().unwrap(),
                     selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
                     status: value[6].as_integer().unwrap(),
-                    display_chain_id:value[7].as_integer().unwrap().into(),
-                    create_time: format!("{}",value[8].as_integer().unwrap()),
+                    display_chain_id: value[7].as_integer().unwrap().into(),
+                    create_time: format!("{}", value[8].as_integer().unwrap()),
                     update_time: value[9].as_string().map(|str| String::from(str)),
                 };
                 Some(wallet)
@@ -138,8 +140,8 @@ impl DataServiceProvider {
                     wallet_type: value[4].as_integer().unwrap(),
                     selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
                     status: value[6].as_integer().unwrap(),
-                    display_chain_id:value[7].as_integer().unwrap().into(),
-                    create_time: format!("{}",value[8].as_integer().unwrap()),
+                    display_chain_id: value[7].as_integer().unwrap().into(),
+                    create_time: format!("{}", value[8].as_integer().unwrap()),
                     update_time: value[9].as_string().map(|str| String::from(str)),
                 };
                 Some(wallet)
@@ -166,8 +168,8 @@ impl DataServiceProvider {
                 wallet_type: value[4].as_integer().unwrap(),
                 selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
                 status: value[6].as_integer().unwrap(),
-                display_chain_id:value[7].as_integer().unwrap().into(),
-                create_time: format!("{}",value[8].as_integer().unwrap()),
+                display_chain_id: value[7].as_integer().unwrap().into(),
+                create_time: format!("{}", value[8].as_integer().unwrap()),
                 update_time: value[9].as_string().map(|str| String::from(str)),
             };
             wallet
@@ -175,6 +177,35 @@ impl DataServiceProvider {
             error!("query error:{}", err.to_string());
             err.to_string()
         })
+    }
+
+    pub fn get_wallet_by_address(&self, address: &str, chain_type: ChainType) -> Option<TbWallet> {
+        let query_sql = "SELECT a.* from Wallet a,detail.Address b,detail.Chain c WHERE b.chain_id = c.id and b.wallet_id = a.wallet_id and b.address = ? and c.type=?;";
+        let mut statement = self.db_hander.prepare(query_sql).unwrap();
+        statement.bind(1, address).expect("get_wallet_by_address bind address");
+        statement.bind(2, chain_type as i64).expect("get_wallet_by_address chain_type");
+        let mut cursor = statement.cursor();
+
+        match cursor.next().unwrap() {
+            Some(value) => {
+                let wallet = TbWallet {
+                    wallet_id: String::from(value[0].as_string().unwrap()),
+                    mn_digest: String::from(value[1].as_string().unwrap()),
+                    full_name: value[2].as_string().map(|str| String::from(str)),
+                    mnemonic: String::from(value[3].as_string().unwrap()),
+                    wallet_type: value[4].as_integer().unwrap(),
+                    selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
+                    status: value[6].as_integer().unwrap(),
+                    display_chain_id: value[7].as_integer().unwrap().into(),
+                    create_time: format!("{}", value[8].as_integer().unwrap()),
+                    update_time: value[9].as_string().map(|str| String::from(str)),
+                };
+                Some(wallet)
+            }
+            None => {
+                None
+            }
+        }
     }
 
     //当前该功能是返回所有的钱包
@@ -189,14 +220,14 @@ impl DataServiceProvider {
                 mn_digest: String::from(cursor[1].as_string().unwrap()),
                 full_name: cursor[2].as_string().map(|str| String::from(str)),
                 mnemonic:
-                    String::from(cursor[3].as_string().unwrap()),
+                String::from(cursor[3].as_string().unwrap()),
                 wallet_type: cursor[4].as_integer().unwrap(),
                 selected: cursor[5].as_string().map(|value| Self::get_bool_value(value)),
 
-                status:cursor[6].as_integer().unwrap(),
-                display_chain_id:cursor[7].as_integer().unwrap().into(),
-                create_time: format!("{}",cursor[8].as_integer().unwrap()),
-                update_time:cursor[9].as_string().map(|data| String::from(data)),
+                status: cursor[6].as_integer().unwrap(),
+                display_chain_id: cursor[7].as_integer().unwrap().into(),
+                create_time: format!("{}", cursor[8].as_integer().unwrap()),
+                update_time: cursor[9].as_string().map(|data| String::from(data)),
             };
             vec.push(wallet)
         }
@@ -282,7 +313,7 @@ impl DataServiceProvider {
                 digit_is_visible: row[12].as_string().map(|value| Self::get_bool_value(value)),
                 decimals: row[13].as_integer(),
                 url_img: row[14].as_string().map(|str| String::from(str)),
-                chain_is_visible:row[15].as_string().map(|value| Self::get_bool_value(value)),
+                chain_is_visible: row[15].as_string().map(|value| Self::get_bool_value(value)),
             };
             tbwallets.push(tbwallet);
         }

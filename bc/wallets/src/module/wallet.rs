@@ -161,6 +161,21 @@ fn address_from_mnemonic(mn: &[u8], wallet_type: i64) -> Address {
     }
 }
 
+pub fn find_keystore_wallet_from_address(address:&str,chain_type:ChainType)-> Result<String,String>{
+    let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+    let tbwallet = instance.get_wallet_by_address(address,chain_type);
+   match tbwallet {
+     Some(tbwallet) => {
+         Ok(tbwallet.mnemonic)
+        }
+        None => {
+            let msg = format!("keystore {} not found",address);
+            Err(msg)
+        }
+
+   }
+}
+
 pub fn crate_mnemonic(num: u8) -> Mnemonic {
     let mnemonic = wallet_crypto::Sr25519::generate_phrase(num);
     let mut kecck = tiny_keccak::Keccak::new_keccak256();
@@ -179,6 +194,8 @@ pub fn crate_mnemonic(num: u8) -> Mnemonic {
         mnid: hex::encode(mnemonic_id),
     }
 }
+
+
 
 pub fn export_mnemonic(wallet_id:&str,password: &[u8]) -> Result<Mnemonic,String>{
     let provider = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
@@ -339,3 +356,18 @@ pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Result
         }
     }
 }
+
+
+pub fn raw_tx_sign(raw_tx:&[u8],wallet_id:&str,psw:&[u8])->Result<String,String>{
+    let mnemonic = module::wallet::export_mnemonic(wallet_id,psw);
+    match mnemonic {
+        Ok(mnemonic)=>{
+            let mn = String::from_utf8(mnemonic.mn).unwrap();
+            let sign_data = wallet_crypto::Sr25519::sign(&mn,raw_tx);
+            // TODO 返回签名后的消息格式需要确定
+            Ok(hex::encode(&sign_data[..]))
+        },
+        Err(info)=>Err(info)
+    }
+}
+
