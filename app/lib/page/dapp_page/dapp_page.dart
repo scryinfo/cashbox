@@ -1,3 +1,4 @@
+import 'package:app/util/native_file_system_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +65,17 @@ class _DappPageState extends State<DappPage> {
                     _controller?.evaluateJavascript('nativeScanResult("$t")')?.then((result) {});
                   }).catchError((e) {
                     Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
+                  });
+                }),
+            JavascriptChannel(
+                name: "NativeChooseFile",
+                onMessageReceived: (JavascriptMessage message) {
+                  Future<String> filePath = NativeFileSystemUtils.instance.getFileSystem();
+                  filePath.then((t) {
+                    Fluttertoast.showToast(msg: "选择的文件路劲是======> $t");  //todo 10/08
+                    //_controller?.evaluateJavascript('nativeScanResult("$t")')?.then((result) {});
+                  }).catchError((e) {
+                    Fluttertoast.showToast(msg: "选择文件中发生未知失败，请重新尝试");
                   });
                 }),
           ].toSet(),
