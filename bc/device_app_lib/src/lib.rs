@@ -2,6 +2,7 @@
 pub mod wallet;
 pub mod chain;
 pub mod digit;
+pub mod substrate;
 
 #[cfg(test)]
 mod tests {

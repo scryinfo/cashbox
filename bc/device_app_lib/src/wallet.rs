@@ -90,7 +90,7 @@ pub mod android {
         let eee_chain = wallet.eee_chain;
         match eee_chain {
             Some(eee_chain) => {
-                let chain_class_obj = chain::get_eee_chain_obj(env, eee_chain);
+                let chain_class_obj = chain::android::get_eee_chain_obj(env, eee_chain);
                 env.set_field(jobj, "eeeChain", "Linfo/scry/wallet_manager/NativeLib$EeeChain;", JValue::Object(chain_class_obj)).expect("set eee_chain");
             },
             None => {
@@ -100,7 +100,7 @@ pub mod android {
         let eth_chain = wallet.eth_chain;
         match eth_chain {
             Some(eth_chain) => {
-                let chain_class_obj = chain::get_eth_chain_obj(env, eth_chain);
+                let chain_class_obj = chain::android::get_eth_chain_obj(env, eth_chain);
                 env.set_field(jobj, "ethChain", "Linfo/scry/wallet_manager/NativeLib$EthChain;", JValue::Object(chain_class_obj)).expect("set eth_chain");
             },
             None => {
@@ -111,7 +111,7 @@ pub mod android {
         match btc_chain {
             Some(btc_chain) => {
                 println!("begin get_btc_chain_obj");
-                let chain_class_obj = chain::get_btc_chain_obj(env, btc_chain);
+                let chain_class_obj = chain::android::get_btc_chain_obj(env, btc_chain);
                 env.set_field(jobj, "btcChain", "Linfo/scry/wallet_manager/NativeLib$BtcChain;", JValue::Object(chain_class_obj)).expect("set btc_chain");
             },
             None => {
