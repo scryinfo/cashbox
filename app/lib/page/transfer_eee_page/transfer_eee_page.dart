@@ -66,11 +66,13 @@ class _TransferEeePageState extends State<TransferEeePage> {
           children: [
             Gaps.scaleVGap(5),
             _buildToAddrWidget(),
-            Gaps.scaleVGap(8),
+            Gaps.scaleVGap(5),
             _buildValueWidget(),
-            Gaps.scaleVGap(8),
+            Gaps.scaleVGap(5),
             _buildPwdWidget(),
-            Gaps.scaleVGap(8),
+            Gaps.scaleVGap(5),
+            _buildMsgWidget(),
+            Gaps.scaleVGap(15),
             Container(
               alignment: Alignment.bottomCenter,
               width: ScreenUtil().setWidth(41),
@@ -83,9 +85,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
                     Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
                     ChainEEE chainEEE = wallet.getChainByChainType(ChainType.EEE);
                     //todo 1009
-                    chainEEE.eeeEnergyTransfer("5FYmQQAcL3LyRM215UjXKZhDVBWens66BEL5SoN4qw4JQeuB", Uint8List.fromList(_pwdController.text.codeUnits), _toAddrController.text,
-                        _valueController.text, _extendMsgController.text);
-
+                    Map map = await chainEEE.eeeEnergyTransfer("5FYmQQAcL3LyRM215UjXKZhDVBWens66BEL5SoN4qw4JQeuB",
+                        Uint8List.fromList(_pwdController.text.codeUnits), _toAddrController.text, _valueController.text, _extendMsgController.text);
                     //NavigatorUtils.push(
                     //  context,
                     //  Routes.eeePage,
@@ -119,7 +120,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
               S.of(context).receive_address,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: ScreenUtil.instance.setSp(3),
               ),
             ),
           ),
@@ -130,12 +131,12 @@ class _TransferEeePageState extends State<TransferEeePage> {
               children: <Widget>[
                 Container(
                   alignment: Alignment.center,
-                  height: ScreenUtil().setHeight(12),
+                  height: ScreenUtil().setHeight(13),
                   child: TextField(
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.7),
-                      fontSize: 12,
+                      fontSize: ScreenUtil.instance.setSp(3.5),
                     ),
                     maxLines: 1,
                     decoration: InputDecoration(
@@ -144,18 +145,19 @@ class _TransferEeePageState extends State<TransferEeePage> {
                       contentPadding: EdgeInsets.only(
                         left: ScreenUtil().setHeight(3),
                         right: ScreenUtil().setWidth(10),
-                        top: ScreenUtil().setHeight(3),
-                        bottom: ScreenUtil().setHeight(3),
+                        top: ScreenUtil().setHeight(5),
+                        bottom: ScreenUtil().setHeight(5),
                       ),
                       labelText: toAddrString,
                       labelStyle: TextStyle(
                         color: Colors.white,
                         height: ScreenUtil().setHeight(40),
+                        fontSize: ScreenUtil.instance.setSp(3),
                       ),
                       hintText: S.of(context).pls_input_receive_address,
                       hintStyle: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.7),
-                        fontSize: 12,
+                        fontSize: ScreenUtil.instance.setSp(3),
                       ),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black87),
@@ -207,12 +209,13 @@ class _TransferEeePageState extends State<TransferEeePage> {
               S.of(context).transaction_amount,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: ScreenUtil.instance.setSp(3),
               ),
             ),
           ),
           Gaps.scaleVGap(2),
           Container(
+            height: ScreenUtil().setHeight(13),
             alignment: Alignment.center,
             child: TextField(
               textAlign: TextAlign.start,
@@ -220,14 +223,16 @@ class _TransferEeePageState extends State<TransferEeePage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
+                contentPadding:
+                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil.instance.setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
+                  fontSize: ScreenUtil.instance.setSp(3),
                 ),
                 hintText: S.of(context).pls_input_transaction_amount,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: 12,
+                  fontSize: ScreenUtil.instance.setSp(3),
                 ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black87),
@@ -254,27 +259,29 @@ class _TransferEeePageState extends State<TransferEeePage> {
               S.of(context).pwd,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 13,
+                fontSize: ScreenUtil.instance.setSp(3),
               ),
             ),
           ),
           Gaps.scaleVGap(2),
           Container(
             alignment: Alignment.center,
+            height: ScreenUtil().setHeight(13),
             child: TextField(
               textAlign: TextAlign.start,
               style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
+                contentPadding:
+                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
                 hintText: S.of(context).pls_input_wallet_pwd,
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: 12,
+                  fontSize: ScreenUtil.instance.setSp(3.5),
                 ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black87),
@@ -284,6 +291,55 @@ class _TransferEeePageState extends State<TransferEeePage> {
                 ),
               ),
               controller: _pwdController,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMsgWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              S.of(context).extend_msg,
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(2),
+          Container(
+            alignment: Alignment.center,
+            height: ScreenUtil().setHeight(13),
+            child: TextField(
+              textAlign: TextAlign.start,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                fillColor: Color.fromRGBO(101, 98, 98, 0.50),
+                filled: true,
+                contentPadding:
+                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
+                labelStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                hintText: S.of(context).hint_extend_msg_option,
+                hintStyle: TextStyle(
+                  color: Color.fromRGBO(255, 255, 255, 0.7),
+                  fontSize: ScreenUtil.instance.setSp(3.5),
+                ),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black87),
+                  borderRadius: BorderRadius.circular(
+                    ScreenUtil().setWidth(1.0),
+                  ),
+                ),
+              ),
+              controller: _extendMsgController,
             ),
           ),
         ],

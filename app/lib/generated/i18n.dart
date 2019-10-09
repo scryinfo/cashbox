@@ -46,11 +46,13 @@ class S implements WidgetsLocalizations {
   String get eee_chain_test => "EEE_TEST";
   String get ensure_pwd => "确认密码";
   String get ensure_to_change => "确定更改";
+  String get extend_msg => "备注信息";
   String get fail_to_load_data_hint => "数据加载失败,请检查网络状况，可尝试下拉刷新";
   String get failure_create_test_wallet => "测试钱包创建失败，请检查你输入的数据是否正确";
   String get failure_reset_pwd_hint => "重置密码失败，详细信息";
   String get failure_to_change_wallet => "钱包切换失败，请重新打开钱包，尝试切换";
   String get failure_to_load_data_pls_retry => "数据加载出错了，请尝试重新加载!~";
+  String get hint_extend_msg_option => "添加交易备注信息(可选)";
   String get import_wallet => "导入钱包";
   String get info_sign => "信息签名";
   String get info_sign_hint => "请确认选择对应钱包后，输入密码进行签名";
@@ -122,7 +124,7 @@ class S implements WidgetsLocalizations {
   String get transfer_from_address => "转出地址:";
   String get transfer_to_address => "转入地址:";
   String get tx_transferring => "交易发送中";
-  String get unknown_error_in_create_wallet => "钱包创建过程，出现位置错误，请重新尝试创建";
+  String get unknown_error_in_create_wallet => "钱包创建过程，出现未知错误，请重新尝试创建";
   String get unknown_error_in_reset_pwd => "重置密码出现位置错误，请重新打开尝试";
   String get unknown_error_in_scan_qr_code => "扫描发生未知失败，请重新尝试";
   String get verify_backup_mnemonic => "验证备份助记词";
@@ -308,6 +310,8 @@ class $zh extends S {
   @override
   String get delete_wallet => "删除钱包";
   @override
+  String get extend_msg => "备注信息";
+  @override
   String get mnemonic_order_wrong => "验证您输入助记词不一致，建议您重新生成新钱包";
   @override
   String get about_us_title => "关于我们";
@@ -344,7 +348,7 @@ class $zh extends S {
   @override
   String get backup_mnemonic => "备份助记词";
   @override
-  String get unknown_error_in_create_wallet => "钱包创建过程，出现位置错误，请重新尝试创建";
+  String get unknown_error_in_create_wallet => "钱包创建过程，出现未知错误，请重新尝试创建";
   @override
   String get change_another_group => "换一组";
   @override

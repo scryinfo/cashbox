@@ -161,8 +161,9 @@ class ChainBTC extends Chain {
 }
 
 class ChainEEE extends Chain {
-  eeeEnergyTransfer(String from, Uint8List pwd, String to, String value, String extendMsg) async {
+  Future<Map<dynamic, dynamic>> eeeEnergyTransfer(String from, Uint8List pwd, String to, String value, String extendMsg) async {
     Map map = await WalletManager.eeeEnergyTransfer(from, pwd, to, value, extendMsg);
     print("map");
+    return map;
   }
 }
