@@ -143,4 +143,10 @@ class WalletManager {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('deleteDigit', digit);
     return null;
   }
+
+  static Future<Map<dynamic, dynamic>>  eeeEnergyTransfer(String from, Uint8List pwd, String to, String value, String extendMsg) async {
+    Map<dynamic, dynamic> eeeEnergyMap =
+        await _channel.invokeMethod('eeeEnergyTransfer', {"from": from, "pwd": pwd, "to": to, "value": value, "extendMsg": extendMsg});
+    return eeeEnergyMap;
+  }
 }

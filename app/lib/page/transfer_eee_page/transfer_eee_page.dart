@@ -1,7 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:app/generated/i18n.dart';
+import 'package:app/model/chain.dart';
+import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
+import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 import '../../routers/application.dart';
 import '../../routers/routers.dart';
@@ -18,6 +25,8 @@ class TransferEeePage extends StatefulWidget {
 class _TransferEeePageState extends State<TransferEeePage> {
   TextEditingController _toAddrController = TextEditingController();
   TextEditingController _valueController = TextEditingController();
+  TextEditingController _pwdController = TextEditingController();
+  TextEditingController _extendMsgController = TextEditingController();
   String toAddrString;
 
   @override
@@ -68,15 +77,20 @@ class _TransferEeePageState extends State<TransferEeePage> {
               height: ScreenUtil().setHeight(9),
               color: Color.fromRGBO(26, 141, 198, 0.20),
               child: FlatButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_verifyTransferInfo()) {
-                    print("begin to import wallet");
-                    //todo
-                    NavigatorUtils.push(
-                      context,
-                      Routes.eeePage,
-                      clearStack: true,
-                    );
+                    String walletId = await Wallets.instance.getNowWallet();
+                    Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
+                    ChainEEE chainEEE = wallet.getChainByChainType(ChainType.EEE);
+                    //todo 1009
+                    chainEEE.eeeEnergyTransfer("5FYmQQAcL3LyRM215UjXKZhDVBWens66BEL5SoN4qw4JQeuB", Uint8List.fromList(_pwdController.text.codeUnits), _toAddrController.text,
+                        _valueController.text, _extendMsgController.text);
+
+                    //NavigatorUtils.push(
+                    //  context,
+                    //  Routes.eeePage,
+                    //  clearStack: true,
+                    //);
                   }
                 },
                 child: Text(
@@ -269,7 +283,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                   ),
                 ),
               ),
-              controller: _valueController,
+              controller: _pwdController,
             ),
           ),
         ],

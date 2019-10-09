@@ -45,7 +45,7 @@
   "verify_mnemonic_order": "请输入验证你保存的助记词顺序。再次提醒，程序不会保留您的隐私信息,请您务必保存好助记词",
   "mnemonic_order_wrong": "验证您输入助记词不一致，建议您重新生成新钱包",
   "verify_mnemonic_info": "助记词确认验证",
-  "unknown_error_in_create_wallet": "钱包创建过程，出现位置错误，请重新尝试创建",
+  "unknown_error_in_create_wallet": "钱包创建过程，出现未知错误，请重新尝试创建",
   "unknown_error_in_scan_qr_code": "扫描发生未知失败，请重新尝试",
   "failure_to_load_data_pls_retry": "数据加载出错了，请尝试重新加载!~",
   "transfer": "转账",
