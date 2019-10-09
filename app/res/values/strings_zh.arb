@@ -108,5 +108,6 @@
   "confirm": "确定",
   "cancel": "取消",
   "pls_input": "请输入",
-  "scan": "扫一扫"
+  "scan": "扫一扫",
+  "extend_msg": "备注信息"
 }

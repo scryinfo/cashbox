@@ -118,5 +118,7 @@
   "wait_to_sign_info": "待签名信息",
   "info_sign_hint": "请确认选择对应钱包后，输入密码进行签名",
   "pwd_verify": "密码验证",
-  "click_to_sign": "点击签名"
+  "click_to_sign": "点击签名",
+  "extend_msg": "备注信息",
+  "hint_extend_msg_option": "添加交易备注信息(可选)"
 }
