@@ -119,4 +119,16 @@ class Wallet {
     }
     return nowChain;
   }
+
+  Chain getChainByChainType(ChainType chainType) {
+    Chain nowChain;
+    for (int i = 0; i < chainList.length; i++) {
+      Chain chain = chainList[i];
+      if (chain.chainType == chainType) {
+        nowChain = chain;
+        break;
+      }
+    }
+    return nowChain;
+  }
 }

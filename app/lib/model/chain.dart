@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:wallet_manager/wallet_manager.dart';
 
 import 'digit.dart';
@@ -102,7 +104,7 @@ abstract class Chain {
   Future<bool> addDigit(Digit digit) async {
     digitsList.add(digit);
     //todo 数据格式
-/*    var isSuccess = await WalletManager.addDigit(
+    /*    var isSuccess = await WalletManager.addDigit(
         digit.digitId,
         digit.chainId,
         digit.address,
@@ -158,4 +160,9 @@ class ChainBTC extends Chain {
   ChainType get chainType => ChainType.BTC;
 }
 
-class ChainEEE extends Chain {}
+class ChainEEE extends Chain {
+  eeeEnergyTransfer(String from, Uint8List pwd, String to, String value, String extendMsg) async {
+    Map map = await WalletManager.eeeEnergyTransfer(from, pwd, to, value, extendMsg);
+    print("map");
+  }
+}
