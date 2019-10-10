@@ -361,7 +361,25 @@ public class WalletManagerPlugin implements MethodCallHandler {
                             (String) (call.argument("value")), (String) (call.argument("extendMsg"))
                     );
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    Log.d("nativeLib=>", "eeeEnergyTransfer exception is " + exception);
+                }
+                Log.d("nativeLib=>", "message.status is " + message.status);
+                Log.d("nativeLib=>", "message.msg is " + message.msg.toString());
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                resultMap.put("msg", message.msg);
+                result.success(resultMap);
+                break;
+            }
+            case "eeeTxSign": {
+                Log.d("nativeLib=>", "eeeEnergyTransfer =>");
+                Message message = new Message();
+                try {
+                    message = NativeLib.eeeTxSign((String) (call.argument("rawTx")),
+                            (String) (call.argument("mnId")),
+                            (byte[]) (call.argument("pwd")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "eeeTxSign exception is " + exception);
                 }
                 Log.d("nativeLib=>", "message.status is " + message.status);
                 Log.d("nativeLib=>", "message.msg is " + message.msg.toString());

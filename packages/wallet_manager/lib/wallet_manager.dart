@@ -122,13 +122,13 @@ class WalletManager {
   // 隐藏代币
   // apiNo:WM15
   static Future<bool> hideDigit(String walletId, String chainId, String digitId) async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('hideDigit', {"walletId": walletId, "chainId": chainId, "digitId": digitId});
+    Map<dynamic, dynamic> hideDigitMap = await _channel.invokeMethod('hideDigit', {"walletId": walletId, "chainId": chainId, "digitId": digitId});
     return null;
   }
 
   // 添加代币 todo 2.0 待确定数据格式
   static Future<bool> addDigit(digit) async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('addDigit', digit);
+    Map<dynamic, dynamic> addDigitMap = await _channel.invokeMethod('addDigit', digit);
     return null;
   }
 
@@ -144,9 +144,16 @@ class WalletManager {
     return null;
   }
 
-  static Future<Map<dynamic, dynamic>>  eeeEnergyTransfer(String from, Uint8List pwd, String to, String value, String extendMsg) async {
+  //转账 能量 fixed
+  static Future<Map<dynamic, dynamic>> eeeEnergyTransfer(String from, Uint8List pwd, String to, String value, String extendMsg) async {
     Map<dynamic, dynamic> eeeEnergyMap =
         await _channel.invokeMethod('eeeEnergyTransfer', {"from": from, "pwd": pwd, "to": to, "value": value, "extendMsg": extendMsg});
     return eeeEnergyMap;
+  }
+
+  //信息签名
+  static Future<Map<dynamic, dynamic>> eeeTxSign(String walletId, Uint8List pwd, String rawTx) async {
+    Map<dynamic, dynamic> eeeTxSignMap = await _channel.invokeMethod("eeeTxSign", {"rawTx": rawTx, "mnId": walletId, "pwd": pwd});
+    return eeeTxSignMap;
   }
 }

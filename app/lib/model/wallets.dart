@@ -218,4 +218,15 @@ class Wallets {
       return deleteWalletMap;
     }
   }
+
+  eeeTxSign(String walletId, Uint8List pwd, String rawTx) async {
+    Map eeeTxSignMap = await WalletManager.eeeTxSign(walletId, pwd, rawTx);
+    //todo 1010 parker
+    int status = eeeTxSignMap["status"];
+    if (status == null) {
+      LogUtil.e("eeeTxSign=>", "not find status code");
+      return null;
+    }
+    return eeeTxSignMap;
+  }
 }
