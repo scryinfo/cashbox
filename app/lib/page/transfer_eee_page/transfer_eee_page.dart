@@ -84,7 +84,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                     String walletId = await Wallets.instance.getNowWallet();
                     Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
                     ChainEEE chainEEE = wallet.getChainByChainType(ChainType.EEE);
-                    //todo 1009
+                    //todo 1009 parker
                     Map map = await chainEEE.eeeEnergyTransfer("5FYmQQAcL3LyRM215UjXKZhDVBWens66BEL5SoN4qw4JQeuB",
                         Uint8List.fromList(_pwdController.text.codeUnits), _toAddrController.text, _valueController.text, _extendMsgController.text);
                     //NavigatorUtils.push(

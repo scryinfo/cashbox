@@ -1,9 +1,15 @@
+import 'dart:typed_data';
+
+import 'package:app/model/wallets.dart';
+import 'package:app/provide/wallet_manager_provide.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/native_file_system_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class DappPage extends StatefulWidget {
@@ -25,7 +31,7 @@ class _DappPageState extends State<DappPage> {
         child: WebView(
           initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
           //initialUrl: "file:///android_asset/flutter_assets/assets/dist-one/dist-one-index.html",
-          //initialUrl: "http://127.0.0.1:8080/html/index.html",
+          //initialUrl: "http://192.168.1.4:8080/",
           javascriptMode: JavascriptMode.unrestricted,
 
           //JS执行模式 是否允许JS执行
@@ -37,7 +43,7 @@ class _DappPageState extends State<DappPage> {
             JavascriptChannel(
               name: "NativePwdDialog",
               onMessageReceived: (JavascriptMessage message) {
-                print("从webview传回来的参数======>： ${message.message}");
+                print("NativePwdDialog 从webview传回来的参数======>： ${message.message}");
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -47,7 +53,7 @@ class _DappPageState extends State<DappPage> {
                       hintInput: "请输入钱包密码",
                       onPressed: (value) {
                         //method 1 方法回调ok
-                        _controller?.evaluateJavascript('callJs("$value")')?.then((result) {});//todo change callback func name
+                        _controller?.evaluateJavascript('callJs("$value")')?.then((result) {}); //todo change callback func name
                         //method 2 字段回调ok
                         //_controller?.evaluateJavascript('window.qrresult=" $value "')?.then((result) {});
                       },
@@ -72,11 +78,42 @@ class _DappPageState extends State<DappPage> {
                 onMessageReceived: (JavascriptMessage message) {
                   Future<String> filePath = NativeFileSystemUtils.instance.getFileSystem();
                   filePath.then((t) {
-                    Fluttertoast.showToast(msg: "选择的文件路劲是======> $t");  //todo 10/08
+                    Fluttertoast.showToast(msg: "选择的文件路劲是======> $t"); //todo 10/08 parker
                     //_controller?.evaluateJavascript('nativeScanResult("$t")')?.then((result) {});
                   }).catchError((e) {
                     Fluttertoast.showToast(msg: "选择文件中发生未知失败，请重新尝试");
                   });
+                }),
+            JavascriptChannel(
+                name: "NativeSignMsg",
+                onMessageReceived: (JavascriptMessage message) {
+                  print("NativeSignMsg 从ebview传回来的参数======>： ${message.message}");
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return PwdDialog(
+                        title: "钱包密码",
+                        hintContent: "提示：请输入您的密码，对交易信息进行签名。 ",
+                        hintInput: "请输入钱包密码",
+                        onPressed: (pwd) {
+                          Map map = Wallets.instance.eeeTxSign(Provider.of<WalletManagerProvide>(context).walletId, Uint8List.fromList(pwd.codeUints),
+                              message.message.toString()); //todo check params is right  1010 parker
+                          if (map == null) {
+                            Fluttertoast.showToast(msg: "交易签名出现未知错误");
+                            return;
+                          }
+                          if (map["status"] == 200) {
+                            Fluttertoast.showToast(msg: "交易签名 成功");
+                            return;
+                          } else {
+                            Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
+                            LogUtil.e("NativeSignMsg=>", "tx sign failure,message is===>" + map["message"]);
+                            return;
+                          }
+                        },
+                      );
+                    },
+                  );
                 }),
           ].toSet(),
           navigationDelegate: (NavigationRequest request) {
