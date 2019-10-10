@@ -1,3 +1,5 @@
+import 'package:app/demo/flutter_webview_plugin_demo.dart';
+import 'package:app/demo/local_html_webview_demo.dart';
 import 'package:app/page/sign_tx_page/sign_tx_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
@@ -114,4 +116,8 @@ Handler createTestWalletHandler = Handler(handlerFunc: (BuildContext context, Ma
 });
 Handler signTxPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return SignTxPage();
+});
+
+Handler flutterWebViewPluginHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return FlutterWebViewPluginDemo();
 });

@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
+import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/native_file_system_util.dart';
 import 'package:app/util/qr_scan_util.dart';
@@ -114,6 +115,12 @@ class _DappPageState extends State<DappPage> {
                       );
                     },
                   );
+                }),
+            JavascriptChannel(
+                name: "NativeGoBack",
+                onMessageReceived: (JavascriptMessage message) {
+                  print("NativeSignMsg 从NativeGoBack传回来的参数======>： ${message.message}");
+                  NavigatorUtils.goBack(context);
                 }),
           ].toSet(),
           navigationDelegate: (NavigationRequest request) {

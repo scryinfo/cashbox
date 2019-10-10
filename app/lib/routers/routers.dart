@@ -9,6 +9,7 @@ class Routes {
   static String publicPage = '/publicpage';
   static String dappPage = '/dapppage';
   static String dappDemoPage = '/dappdemopage';
+  static String webViewPluginPage = '/webviewpluginpage';
   static String createWalletNamePage = '/createwalletnamepage';
   static String createWalletMnemonicPage = '/createwalletmnemonicpage';
   static String createWalletConfirmPage = '/createwalletconfirmpage';
@@ -59,5 +60,6 @@ class Routes {
     router.define(transactionEeeDetailPage, handler: transactionEeeDetailHandler);
     router.define(createTestWalletPage, handler: createTestWalletHandler);
     router.define(signTxPage, handler: signTxPageHandler);
+    router.define(webViewPluginPage, handler: flutterWebViewPluginHandler);
   }
 }
