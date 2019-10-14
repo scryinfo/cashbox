@@ -3,7 +3,7 @@ import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:scry_webview/scry_webview.dart';
 
 class PublicPage extends StatefulWidget {
   @override

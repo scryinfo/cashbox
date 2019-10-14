@@ -53,22 +53,6 @@ public class MainActivity extends FlutterActivity {
                             }
                         }
                 );
-        new MethodChannel(getFlutterView(), FILE_SYSTEM_CHANNEL)
-                .setMethodCallHandler(
-                        new MethodCallHandler() {
-                            @Override
-                            public void onMethodCall(MethodCall call, Result result) {
-                                if (call.method.toString().equals(FILE_SYSTEM_METHOD)) {
-                                    mFlutterChannelResult = result;
-                                    Log.d("MainActivity", "begin to call getFileSystem=================>");
-                                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                                    intent.setType("*/*");
-                                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                                    startActivityForResult(intent, REQUEST_CODE_FILE_SYSTEM);
-                                }
-                            }
-                        }
-                );
         //flutter处 log日志保存
         new MethodChannel(getFlutterView(), FLUTTER_LOG_CHANNEL)
                 .setMethodCallHandler(
@@ -139,18 +123,8 @@ public class MainActivity extends FlutterActivity {
             } else {
                 mFlutterChannelResult.error("resultCode is ===>", "" + resultCode, "");
             }
-        }else if(requestCode == REQUEST_CODE_FILE_SYSTEM){
-            if (data != null && resultCode == RESULT_OK) {
-                //1、在原生应用处获得目标filepath，将地址传给flutter层
-                //2、由flutter层，再根据filepath
-                Uri uri = data.getData();
-                Log.d("MainActivity", "result getFileSystem is=================>"+uri.toString());
-                mFlutterChannelResult.success(uri.toString());
-            }else{
-                mFlutterChannelResult.error("resultCode is ===>", "" + resultCode, "");
-            }
         } else {
-            Log.d("MainActivity", "unknown method result,requestCode is===>" + requestCode);
+            Log.d("MainActivity", "unknown method result, requestCode is=========>" + requestCode);
         }
     }
 }
