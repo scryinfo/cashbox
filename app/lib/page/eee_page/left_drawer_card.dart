@@ -122,7 +122,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   ),
                 ),
                 onTap: () {
-                  NavigatorUtils.push(context, Routes.webViewPluginPage);
+                  NavigatorUtils.push(context, Routes.dappPage);
                 }),
           ),
           Container(

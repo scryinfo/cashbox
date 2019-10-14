@@ -59,6 +59,7 @@ public class MainActivity extends FlutterActivity {
                             @Override
                             public void onMethodCall(MethodCall call, Result result) {
                                 if (call.method.toString().equals(FILE_SYSTEM_METHOD)) {
+                                    mFlutterChannelResult = result;
                                     Log.d("MainActivity", "begin to call getFileSystem=================>");
                                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                                     intent.setType("*/*");
