@@ -21,11 +21,11 @@ class NativeFileSystemUtils {
   }
 
   Future<String> getFileSystem() async {
-    String callbackResult = await methodPlugin.invokeMethod('file_system_method');
-    if (callbackResult.isEmpty) {
-      callbackResult = "";
+    String filePath = await methodPlugin.invokeMethod('file_system_method');
+    print("filePath is ============>" + filePath);
+    if (filePath.isEmpty) {
+      filePath = "";
     }
-    return callbackResult;
+    return filePath;
   }
-
 }

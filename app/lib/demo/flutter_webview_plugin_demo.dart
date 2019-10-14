@@ -33,7 +33,7 @@ class _FlutterWebViewPluginDemo extends State<FlutterWebViewPluginDemo> {
         width: ScreenUtil.instance.setWidth(90),
         height: ScreenUtil.instance.setHeight(160),
         color: Colors.blueAccent,
-        child: WebviewScaffold(
+        child: WebviewScaffold(   //说明：WebViewScaffold 没法跟js交互
           //url: "file:///android_asset/flutter_assets/assets/dist/index.html",
           url: "http://192.168.1.4:8080/",
           appBar: AppBar(
