@@ -42,9 +42,6 @@ dependencies:
   fluro: "^1.5.0"
   # 路由管理           https://github.com/theyakka/fluro
 
-  webview_flutter: ^0.3.13
-  #   https://github.com/flutter/plugins/tree/master/packages/webview_flutter
-
   flutter_webview_plugin: ^0.3.8
 
   qr_flutter: ^3.0.1
@@ -71,6 +68,12 @@ dependencies:
 
   wallet_manager:
     path: ../packages/wallet_manager/
+
+  # fork   修改官方插件webview_flutter
+  # 基于   ^0.3.13版本   https://github.com/flutter/plugins/tree/master/packages/webview_flutter
+  scry_webview:
+    path: ../packages/scry_webview/
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

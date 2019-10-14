@@ -12,3 +12,5 @@
 /packages/walletassist/android/settings.gradle
 packages/wallet_manager/android/src/main/jniLibs/arm64/*.so
 .gitignore.swp
+packages/wallet_manager/android/src/main/jniLibs/arm64-v8a/.gitkeep
+git

@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:scry_webview/scry_webview.dart';
 
 class DappPage extends StatefulWidget {
   @override
@@ -24,17 +24,17 @@ class _DappPageState extends State<DappPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("html demo")),
       body: Container(
         width: ScreenUtil.instance.setWidth(90),
         height: ScreenUtil.instance.setHeight(160),
         color: Colors.blueAccent,
         child: WebView(
-          initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
+          //initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
           //initialUrl: "file:///android_asset/flutter_assets/assets/dist-one/dist-one-index.html",
-          //initialUrl: "http://192.168.1.4:8080/",
+          initialUrl: "http://192.168.1.4:8080/",
           javascriptMode: JavascriptMode.unrestricted,
-
+          userAgent:
+              "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
           //JS执行模式 是否允许JS执行
           onWebViewCreated: (WebViewController webViewController) {
             _controller = webViewController;
@@ -72,17 +72,6 @@ class _DappPageState extends State<DappPage> {
                     _controller?.evaluateJavascript('nativeScanResult("$t")')?.then((result) {});
                   }).catchError((e) {
                     Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
-                  });
-                }),
-            JavascriptChannel(
-                name: "NativeChooseFile",
-                onMessageReceived: (JavascriptMessage message) {
-                  Future<String> filePath = NativeFileSystemUtils.instance.getFileSystem();
-                  filePath.then((t) {
-                    Fluttertoast.showToast(msg: "选择的文件路劲是======> $t"); //todo 10/08 parker
-                    //_controller?.evaluateJavascript('nativeScanResult("$t")')?.then((result) {});
-                  }).catchError((e) {
-                    Fluttertoast.showToast(msg: "选择文件中发生未知失败，请重新尝试");
                   });
                 }),
             JavascriptChannel(
