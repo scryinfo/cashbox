@@ -14,3 +14,8 @@ packages/wallet_manager/android/src/main/jniLibs/arm64/*.so
 .gitignore.swp
 packages/wallet_manager/android/src/main/jniLibs/arm64-v8a/.gitkeep
 git
+.DS_Store
+demo/btcwallet/.idea
+demo/btcwallet/target
+demo/btcwallet/Cargo.lock
+
