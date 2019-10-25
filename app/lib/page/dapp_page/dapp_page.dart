@@ -27,9 +27,8 @@ class _DappPageState extends State<DappPage> {
       body: Container(
         width: ScreenUtil.instance.setWidth(90),
         height: ScreenUtil.instance.setHeight(160),
-        color: Colors.blueAccent,
         child: Container(
-          margin: EdgeInsets.only(top: ScreenUtil.instance.setHeight(3)), //todo temp method
+          margin: EdgeInsets.only(top: ScreenUtil.instance.setHeight(4.5)),
           child: WebView(
             //initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
             //initialUrl: "file:///android_asset/flutter_assets/assets/dist-one/dist-one-index.html",
