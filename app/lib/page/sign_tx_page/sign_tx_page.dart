@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/widgets/pwd_dialog.dart';
@@ -111,8 +112,16 @@ class _SignTxPageState extends State<SignTxPage> {
           hintInput: S.of(context).pls_input_wallet_pwd,
           onPressed: (value) async {
             print("_showPwdDialog   pwd is =========>" + value);
-            NavigatorUtils.goBack(context);
             //todo JNI调用签名功能
+            //Map map = Wallets.instance.eeeTxSign(Provider.of<WalletManagerProvide>(context).walletId,
+            //    Uint8List.fromList(value.codeUints), _waitToSignInfo.toString());
+            //todo 完成签名，以二维码信息展示签名后交易信息。
+            Provider.of<QrInfoProvide>(context).setTitle("标题shi");
+            Provider.of<QrInfoProvide>(context).setHintInfo("woshi提示");
+            Provider.of<QrInfoProvide>(context).setContent("签名结果内容");
+
+            NavigatorUtils.push(context, Routes.qrInfoPage);
+            //NavigatorUtils.goBack(context);
           },
         );
       },

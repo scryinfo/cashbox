@@ -95,6 +95,7 @@ class _DappPageState extends State<DappPage> {
                             }
                             if (map["status"] == 200) {
                               Fluttertoast.showToast(msg: "交易签名 成功");
+                              //todo 传回给 webveiw 签名后的结果，webview负责处理是否上链广播交易信息
                               return;
                             } else {
                               Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
