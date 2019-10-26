@@ -116,8 +116,8 @@ class _SignTxPageState extends State<SignTxPage> {
             //Map map = Wallets.instance.eeeTxSign(Provider.of<WalletManagerProvide>(context).walletId,
             //    Uint8List.fromList(value.codeUints), _waitToSignInfo.toString());
             //todo 完成签名，以二维码信息展示签名后交易信息。
-            Provider.of<QrInfoProvide>(context).setTitle("标题shi");
-            Provider.of<QrInfoProvide>(context).setHintInfo("woshi提示");
+            Provider.of<QrInfoProvide>(context).setTitle("wo是标题");
+            Provider.of<QrInfoProvide>(context).setHintInfo("woshi签名结果提示");
             Provider.of<QrInfoProvide>(context).setContent("签名结果内容");
 
             NavigatorUtils.push(context, Routes.qrInfoPage);
