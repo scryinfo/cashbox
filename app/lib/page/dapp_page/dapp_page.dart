@@ -122,23 +122,27 @@ class _DappPageState extends State<DappPage> {
                 hintContent: "提示：请输入您的密码，对交易信息进行签名。 ",
                 hintInput: "请输入钱包密码",
                 onPressed: (pwd) {
-                  Map map = Wallets.instance.eeeTxSign(Provider.of<WalletManagerProvide>(context).walletId, Uint8List.fromList(pwd.codeUints),
-                      message.message.toString()); //todo check params is right  1010 parker
-                  if (map == null) {
-                    Fluttertoast.showToast(msg: "交易签名出现未知错误");
-                    return;
-                  }
-                  if (map["status"] == 200) {
-                    Fluttertoast.showToast(msg: "交易签名 成功");
-                    var result = " mock result ";
-                    //todo 签名完成后的结果，传回给 webveiw。 webview负责处理是否上链广播交易
-                    _controller?.evaluateJavascript('nativeSignMsgToJsResult("$result")')?.then((result) {});
-                    return;
-                  } else {
-                    Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
-                    LogUtil.e("NativeSignMsg=>", "tx sign failure,message is===>" + map["message"]);
-                    return;
-                  }
+                  //todo : mock data,直接返回签名后假数据
+                  _controller?.evaluateJavascript('nativeSignMsgToJsResult("直接返回mock假数据  签名证书上链功能部分")')?.then((result) {});
+                  NavigatorUtils.goBack(context);
+                  //todo parker 10/28
+                  //Map map = Wallets.instance.eeeTxSign(Provider.of<WalletManagerProvide>(context).walletId, Uint8List.fromList(pwd.codeUints),
+                  //    message.message.toString()); //todo check params is right  1010 parker
+                  //if (map == null) {
+                  //  Fluttertoast.showToast(msg: "交易签名出现未知错误");
+                  //  return;
+                  //}
+                  //if (map["status"] == 200) {
+                  //  Fluttertoast.showToast(msg: "交易签名 成功");
+                  //  var result = " mock result ";
+                  //  //todo 签名完成后的结果，传回给 webveiw。 webview负责处理是否上链广播交易
+                  //  _controller?.evaluateJavascript('nativeSignMsgToJsResult("$result")')?.then((result) {});
+                  //  return;
+                  //} else {
+                  //  Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
+                  //  LogUtil.e("NativeSignMsg=>", "tx sign failure,message is===>" + map["message"]);
+                  //  return;
+                  //}
                 },
               );
             },
