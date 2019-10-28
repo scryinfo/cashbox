@@ -97,10 +97,14 @@ class _DappPageState extends State<DappPage> {
         name: "NativeQrScanAndPwdAndSignToQR",
         onMessageReceived: (JavascriptMessage message) {
           Future<String> qrResult = QrScanUtil.instance.qrscan();
-          qrResult.then((waitSignTx) {
-            Fluttertoast.showToast(msg: "扫描j结果是======> $waitSignTx");
-            // wait to sign QR info
-            Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitSignTx);
+          qrResult.then((qrInfo) {
+            Map paramsMap = QrScanUtil.instance.checkQrInfoByDiamondSignAndQr(qrInfo, context);
+            if (paramsMap == null) {
+              Fluttertoast.showToast(msg: "扫描内容结果不符合diamond Dapp规则");
+              return;
+            }
+            var waitToSignInfo = "dtt=" + paramsMap["dtt"] + ";" + "v=" + paramsMap["v"]; //待签名交易信息
+            Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
             NavigatorUtils.push(context, Routes.signTxPage);
           }).catchError((e) {
             Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
