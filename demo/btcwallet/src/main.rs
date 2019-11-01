@@ -2,6 +2,12 @@ mod constructor;
 mod chaindb;
 mod error;
 mod headercache;
+mod p2p;
+mod downstream;
+mod timeout;
+mod dispatcher;
+mod headerdownload;
+mod ping;
 
 use log::warn;
 
