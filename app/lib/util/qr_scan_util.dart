@@ -37,74 +37,100 @@ class QrScanUtil {
     return callbackResult;
   }
 
-  checkQrInfo(String qrInfo, BuildContext context) {
+  Map checkQrInfoByDiamondSignAndQr(String qrInfo, BuildContext context) {
     if (qrInfo.isEmpty) {
       Fluttertoast.showToast(msg: S.of(context).qr_info_is_null);
-      return;
+      return null;
     }
     //------------拼装url里面的参数------------
     var paramIndex = qrInfo.indexOf("?");
     if (paramIndex <= 0 || paramIndex == qrInfo.length - 1) {
       Fluttertoast.showToast(msg: S.of(context).qr_info_is_wrong); //信息里面没? 或者就一个?
-      return;
+      return null;
     }
     List paramsList = qrInfo.substring(paramIndex + 1).split("&");
-    Map paramMap = Map();
+    Map paramsMap = Map();
     paramsList.forEach((oneParamStr) {
       int oneParamIndex = oneParamStr.indexOf("=");
       if (oneParamIndex < 0) {
         return;
       }
       var key = oneParamStr.substring(0, oneParamIndex);
-      if (!paramMap.containsKey(key)) {
+      if (!paramsMap.containsKey(key)) {
         var value = oneParamStr.toString().substring(oneParamStr.indexOf("=") + 1, oneParamStr.length);
-        paramMap[key] = value;
+        paramsMap[key] = value;
       }
     });
+
+    if (paramsMap.isEmpty) {
+      Fluttertoast.showToast(msg: S.of(context).qr_info_is_wrong); //信息里面没? 或者就一个?
+      return null;
+    }
     //------------检查参数------------
     print("begin verify timestamp======>");
-    if (!paramMap.containsKey("tl") || !verifyTimeStamp(paramMap["tl"])) {
+    if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
       Fluttertoast.showToast(msg: S.of(context).qr_info_is_out_of_date);
-      return; //有效期有问题
+      return null; //有效期有问题
     }
     print("begin verify chainType======>");
-    if (!paramMap.containsKey("ct")) {
+    if (!paramsMap.containsKey("ct")) {
       Fluttertoast.showToast(msg: S.of(context).not_sure_chain_type);
-      return; //不知道是哪条链
+      return null; //不知道是哪条链
+    }
+    print("begin verify v======>");
+    if (!paramsMap.containsKey("v")) {
+      //Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
+      return null; //不知道内容是什么
     }
     print("begin verify ot======>");
-    if (!paramMap.containsKey("ot")) {
+    if (!paramsMap.containsKey("ot")) {
       Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
-      return; //不知道要做什么操作
+      return null; //不知道要做什么操作
     }
-    var operationType = paramMap["ot"];
-    switch (operationType) {
-      case "t":
+    var operationType = paramsMap["ot"];
+    if (operationType == "ds" && paramsMap.containsKey("dtt") && paramsMap.containsKey("v")) {
+      //确认是签名类型，且信息足够
+      return paramsMap;
+    }
+    return null;
+    /*    switch (operationType) {
+      case "t": //转账类型
         break;
-      case "ds":
-        print("begin to doSignTx======>");
-        doSignTx(paramMap, context);
+      case "ds": //给dapp签名类型
+        print("begin to do dapp SignTx======>");
+        return paramsMap;
+        //doSignTx(paramsMap, context);
         break;
       default:
         Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
         LogUtil.e("QrScanUtil", "unknown operation type ======>" + operationType);
         break;
-    }
+    }*/
   }
 
-  //签名
-  doSignTx(Map paramMap, BuildContext context) {
-    var chainType = paramMap["ct"];
+  //签名  abandon （重新设计，让给你单一，扫描功能类就只负责扫码）
+  doSignTx(Map paramsMap, BuildContext context) {
+    var chainType = paramsMap["ct"];
     switch (chainType) {
       case "0": //BTC
         break;
       case "60": //ETH
         break;
       case "66": //substrate链
-        var waitSignTx = paramMap["v"]; //待签名交易信息
-        Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitSignTx);
+        if (paramsMap.containsKey("dt") && paramsMap["dt"] == "0") {
+          //0代表diamond项目
+          var dtt = paramsMap["dtt"]; //签名操作类型 标识  01：授权原始地址  02：授权业务员
+          var value = paramsMap["v"]; //待签名交易信息
+          var waitToSignInfo = dtt + value; //待签名交易信息
+          Fluttertoast.showToast(msg: "waitToSignInfo is ===>" + waitToSignInfo);
+          print("wait to sign info is=======>" + waitToSignInfo);
+          Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
+        } else {
+          var waitSignTx = paramsMap["v"]; //待签名交易信息
+          Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitSignTx);
+        }
         NavigatorUtils.push(context, Routes.signTxPage);
-        paramMap = null; //置空扫描数据
+        paramsMap = null; //置空扫描数据
         break;
       default:
         Fluttertoast.showToast(msg: S.of(context).not_sure_chain_type);
