@@ -2,38 +2,33 @@
 use std::sync::{Arc, RwLock};
 use log::{info, error};
 use crate::error::SPVError;
-use std::path::Path;
-use rusqlite::{Connection, NO_PARAMS};
 use bitcoin_hashes::sha256d;
 use bitcoin::{Network, BitcoinHash, BlockHeader};
 use bitcoin::blockdata::constants::genesis_block;
 use crate::headercache::{HeaderCache, StoredHeader, CachedHeader};
+use rustorm::{Pool, EntityManager};
 
 /// Shared handle to a database storing the block chain
 /// protected by an RwLock
 pub type SharedChainDB = Arc<RwLock<ChainDB>>;
 
 pub struct ChainDB {
-    db: Connection,
+    db: EntityManager,
     headercache: HeaderCache,
     network: Network,
 }
 
+/// 只使用持久化数据库，原版是使用持久化数据库和内存数据库可选的
 impl ChainDB {
-    /// Create an in-memory database instance
-    pub fn mem_db(network: Network) -> Result<ChainDB, SPVError> {
-        info!("working with in memory chain db");
-        let db = Connection::open_in_memory()?;
-        let headercache = HeaderCache::new(network);
-        Ok(ChainDB { db, headercache, network })
-    }
-
     /// Create or open a persistent database instance identified by the path
     /// genesis_block --> 创世块
     ///
-    pub fn persistent_db(path: &Path, network: Network) -> Result<ChainDB, SPVError> {
-        info!("working with persistent chain db ");
-        let db = Connection::open(path)?;
+    pub fn persistent_db(network: Network) -> Result<ChainDB, SPVError> {
+        info!("working with persistent sqlite3 db ");
+        let mut pool = Pool::new();
+//        #[cfg(feature = "with-sqlite")]
+        let db_url = "sqlite://spv.db";
+        let db = pool.em(db_url)?;
         let headercache = HeaderCache::new(network);
         Ok(ChainDB { db, headercache, network })
     }
