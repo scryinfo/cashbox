@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use crate::wallet_crypto::Crypto;
 use uuid::Uuid;
 use crate::model::wallet_store::TbWallet;
+use codec::{Encode,Decode};
 
 /**
   Wallet 结构说明：
@@ -357,13 +358,24 @@ pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Result
     }
 }
 
+#[derive(Encode, Decode)]
+struct RawTx{
+    func_data:Vec<u8>,
+    index:u32,
+    genesisHash:Vec<u8>,
+    version:u32,
+}
 
-pub fn raw_tx_sign(raw_tx:&[u8],wallet_id:&str,psw:&[u8])->Result<String,String>{
+pub fn raw_tx_sign(raw_tx:&str,wallet_id:&str,psw:&[u8])->Result<String,String>{
+    let tx_encode_data = hex::decode(raw_tx).unwrap();
+    // TODO 这个地方需要使用大小端编码？
+    let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
     let mnemonic = module::wallet::export_mnemonic(wallet_id,psw);
     match mnemonic {
         Ok(mnemonic)=>{
             let mn = String::from_utf8(mnemonic.mn).unwrap();
-            let sign_data = wallet_crypto::Sr25519::sign(&mn,raw_tx);
+            let tx_data = & mut &tx.func_data[..];
+            let sign_data = wallet_crypto::Sr25519::sign(&mn,tx_data);
             // TODO 返回签名后的消息格式需要确定
             Ok(hex::encode(&sign_data[..]))
         },

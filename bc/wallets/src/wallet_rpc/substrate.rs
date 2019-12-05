@@ -3,9 +3,9 @@ use serde_json::Value;
 use std::convert::Into;
 use codec::{Compact, Decode, Encode};
 use node_runtime::{Runtime,VERSION};
-use substrate_primitives::{sr25519, crypto::{Pair, Ss58Codec}};
+use substrate_primitives::{sr25519,H256,crypto::{Pair, Ss58Codec}};
 use sr_primitives::generic::Era;
-use node_primitives::AccountId;
+use node_primitives::{AccountId};
 use srml_support::storage::StorageMap;
 
 pub fn genesis_hash(client: &mut Rpc) -> Hash {
@@ -46,23 +46,12 @@ pub fn account_nonce(client: &mut Rpc, account_id: &AccountId) -> u64 {
 }
 
 pub fn transfer(client: &mut Rpc, mnemonic: &str, to: &str, amount: &str) -> Result<String, String> {
-    let extra = |i: Index, f: Balance| {
-        (
-            system::CheckVersion::<Runtime>::new(),
-            system::CheckGenesis::<Runtime>::new(),
-            system::CheckEra::<Runtime>::from(Era::Immortal),
-            system::CheckNonce::<Runtime>::from(i),
-            system::CheckWeight::<Runtime>::new(),
-            balances::TakeFees::<Runtime>::from(f),
-        )
-    };
 
     //let signer = wallet_crypto::Sr25519::pair_from_suri("//Alice", None);
     let signer = wallet_crypto::Sr25519::pair_from_phrase(mnemonic, None);
 
-    println!("pair detail:{}", signer.public());
-    let from_pub = wallet_crypto::Sr25519::ss58_from_pair(&signer);
-    println!("from_pub:{}", from_pub);
+   /* let from_pub = wallet_crypto::Sr25519::ss58_from_pair(&signer);
+    println!("from_pub:{}", from_pub);*/
     let genesis_hash = genesis_hash(client);
 
     let index = account_nonce(client, &signer.public());
@@ -74,10 +63,30 @@ pub fn transfer(client: &mut Rpc, mnemonic: &str, to: &str, amount: &str) -> Res
 
     let function = Call::Balances(BalancesCall::transfer(to.into(), amount));
 
+    let result = tx_sign(mnemonic, &genesis_hash, index, function);
+    // println!("{}", result);
+    Ok(result)
+}
+
+fn tx_sign(mnemonic: &str, genesis_hash: &H256, index: u64, function: Call) -> String {
+    let signer = wallet_crypto::Sr25519::pair_from_phrase(mnemonic, None);
+    println!("pair detail:{}", signer.public());
+    //let from_pub = wallet_crypto::Sr25519::ss58_from_pair(&signer);
+
+    let extra = |i: Index, f: Balance| {
+        (
+            system::CheckVersion::<Runtime>::new(),
+            system::CheckGenesis::<Runtime>::new(),
+            system::CheckEra::<Runtime>::from(Era::Immortal),
+            system::CheckNonce::<Runtime>::from(i),
+            system::CheckWeight::<Runtime>::new(),
+            balances::TakeFees::<Runtime>::from(f),
+        )
+    };
     let raw_payload = (
         function,
         extra(index as u32, 0),
-        (VERSION.spec_version as u32,&genesis_hash, &genesis_hash),
+        (VERSION.spec_version as u32, &genesis_hash, &genesis_hash),
     );
     let signature = raw_payload.using_encoded(|payload| if payload.len() > 256 {
         signer.sign(&blake2_256(payload)[..])
@@ -92,6 +101,5 @@ pub fn transfer(client: &mut Rpc, mnemonic: &str, to: &str, amount: &str) -> Res
         extra(index as u32, 0),
     );
     let result = format!("0x{}", hex::encode(&extrinsic.encode()));
-   // println!("{}", result);
-    Ok(result)
+    result
 }
