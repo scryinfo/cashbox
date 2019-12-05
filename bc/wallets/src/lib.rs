@@ -93,7 +93,8 @@ mod tests {
         println!("public:{}",&pair.public());
         let index = wallet_rpc::substrate::account_nonce(&mut substrate_client,&pair.public());
         println!("index:{}",index);
-
+        assert_eq!(index,0);
+        // 用于保持连接，接收从链上返回来的数据
         let msg = recv_tx.recv().unwrap();
         let msg = msg.into_text().unwrap();
         let des: Notification = serde_json::from_str(&msg).unwrap();
@@ -103,7 +104,7 @@ mod tests {
             "----subscribe extrinsic return sub_id:{:?}----result:{:?}---",
             sub_id, des["result"]
         );
-        assert_eq!(1,2);
+
     }
 
     #[test]
