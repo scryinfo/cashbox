@@ -1,5 +1,5 @@
 use super::*;
-use substrate_primitives::{ed25519, Pair, crypto::Ss58Codec, blake2_256};
+use sp_core::{ed25519, Pair, crypto::Ss58Codec, blake2_256};
 
 
 pub struct Ed25519;

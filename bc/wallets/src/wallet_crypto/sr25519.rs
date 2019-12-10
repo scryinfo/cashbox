@@ -1,6 +1,5 @@
 use super::*;
-use substrate_primitives::{crypto::Ss58Codec};
-use substrate_primitives::sr25519;
+use sp_core::{sr25519,crypto::Ss58Codec};
 use bip39::{Mnemonic, Language};
 use substrate_bip39::mini_secret_from_entropy;
 

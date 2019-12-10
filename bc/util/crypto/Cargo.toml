@@ -6,6 +6,6 @@ edition = "2018"
 
 [dependencies]
 hex = "0.3"
-ring = "^0.14.0"
+ring = "0.16.9"
 rand="0.4.3"
 rust-crypto = "0.2"
