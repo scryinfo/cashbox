@@ -44,7 +44,7 @@ impl DataServiceProvider {
             }
             Err(_e) => {}
         }
-        let show_digit_sql = format!("{} {} {} {} {}", "UPDATE", Self::check_chain_type(chainid), "set is_visible = ", isvisibleflag, "WHERE address_id=? ;");
+        let show_digit_sql = format!("UPDATE {} set is_visible = {} WHERE address_id=?;", Self::check_chain_type(chainid),isvisibleflag);
         let mut show_digit_state = self.db_hander.prepare(show_digit_sql).unwrap();
         show_digit_state.bind(1, address_id).expect("address_id is error!");
         match show_digit_state.cursor().next() {

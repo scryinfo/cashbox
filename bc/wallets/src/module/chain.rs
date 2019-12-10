@@ -28,7 +28,6 @@ pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<Stri
                             Err(msg)
                         }
                     }
-
                 }
                 Err(msg) => Err(msg),
             }
@@ -65,7 +64,8 @@ pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
                         status: StatusCode::OK,
                         chain_id: chain_id.clone(),
                         wallet_id: wallet_id.clone(),
-                        chain_address: tbwallet.chain_address,
+                        address: tbwallet.address.unwrap(),
+                        domain:tbwallet.domain,
                         is_visible: {
                             tbwallet.chain_is_visible
                         },
@@ -91,7 +91,6 @@ pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
                     status: StatusCode::OK,
                     digit_id: digit_id,
                     chain_id: chain_id,
-                    address: tbwallet.address.clone(),
                     contract_address: tbwallet.contract_address.clone(),
                     fullname: tbwallet.full_name.clone(),
                     shortname: tbwallet.short_name.clone(),
@@ -141,7 +140,8 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
                         status: StatusCode::OK,
                         chain_id: chain_id.clone(),
                         wallet_id: wallet_id.clone(),
-                        chain_address: tbwallet.chain_address,
+                        address: tbwallet.address.unwrap(),
+                        domain:tbwallet.domain,
                         is_visible: tbwallet.chain_is_visible,
                         chain_type: {
                             if tbwallet.chain_type.is_none() {
@@ -161,7 +161,7 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
                     status: StatusCode::OK,
                     digit_id: digit_id,
                     chain_id: chain_id,
-                    address: tbwallet.address.clone(),
+                  //  address: tbwallet.address.clone(),
                     contract_address: tbwallet.contract_address.clone(),
                     fullname: tbwallet.full_name.clone(),
                     shortname: tbwallet.short_name.clone(),
@@ -211,7 +211,8 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
                         status: StatusCode::OK,
                         chain_id: chain_id.clone(),
                         wallet_id: wallet_id.clone(),
-                        chain_address: tbwallet.chain_address,
+                        address: tbwallet.address.unwrap(),
+                        domain:tbwallet.domain,
                         is_visible: tbwallet.chain_is_visible,
                         chain_type: {
                             if tbwallet.chain_type.is_none() {
@@ -231,7 +232,7 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
                     status: StatusCode::OK,
                     digit_id: digit_id,
                     chain_id: chain_id,
-                    address: tbwallet.address.clone(),
+                   // address: tbwallet.address.clone(),
                     contract_address: tbwallet.contract_address.clone(),
                     fullname: tbwallet.full_name.clone(),
                     shortname: tbwallet.short_name.clone(),

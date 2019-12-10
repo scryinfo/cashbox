@@ -19,7 +19,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [type] INT,
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(64),
-    [address] VARCHAR(128),
+    [domain] VARCHAR(128),
     [group_name] VARCHAR(32),
     [next_id] INT,
     [selected] VARCHAR(1),
@@ -106,7 +106,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     insert into Chain(id,short_name,full_name) Values(4,'ETH TEST',"ethereum test");
     insert into Chain(id,short_name,full_name) Values(5,'EEE',"eee");
     insert into Chain(id,short_name,full_name) Values(6,'EEE TEST',"eee test");
-    update Chain set type=5,address='eee.com' WHERE id = 5;
+    update Chain set type=5,domain='eee.com' WHERE id = 5;
     COMMIT;
     PRAGMA foreign_keys = 'on';
     "#;
