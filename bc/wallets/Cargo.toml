@@ -32,37 +32,48 @@ jsonrpc-ws-server = { git = "https://github.com/paritytech/jsonrpc.git" }
 jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc.git" }
 
 # 这里编译存在版本问题，当前使用的master能够正常编译通过
-[dependencies.substrate-primitives]
-git = 'https://github.com/paritytech/substrate.git'
-#git = 'https://github.com/jeremymj/substrate'
-package = 'substrate-primitives'
-rev = 'bc9d55f738db72d35b6dfdf9dad7bf2d82204665'
-
-
 [dependencies.node-primitives]
 git = 'https://github.com/paritytech/substrate.git'
-rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+#git = 'https://github.com/jeremymj/substrate'
+package = 'node-primitives'
+rev = 'fc6914cdb8c322cea8a4591bbf9566dd23bfd143'
+
+
+[dependencies.sp-core]
+git = 'https://github.com/paritytech/substrate.git'
+rev = "fc6914cdb8c322cea8a4591bbf9566dd23bfd143"
 
 [dependencies.node-runtime]
 git = 'https://github.com/paritytech/substrate.git'
-rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+rev = "fc6914cdb8c322cea8a4591bbf9566dd23bfd143"
 
 [dependencies.system]
-package = "srml-system"
+package = "frame-system"
 git = 'https://github.com/paritytech/substrate.git'
-rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+rev = "fc6914cdb8c322cea8a4591bbf9566dd23bfd143"
+
+[dependencies.transaction-payment]
+package = "pallet-transaction-payment"
+git = 'https://github.com/paritytech/substrate.git'
+rev = "fc6914cdb8c322cea8a4591bbf9566dd23bfd143"
 
 [dependencies.balances]
-package = "srml-balances"
+package = "pallet-balances"
 git = 'https://github.com/paritytech/substrate.git'
-rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+rev = "fc6914cdb8c322cea8a4591bbf9566dd23bfd143"
 
-[dependencies.sr-primitives]
+#transaction-payment = { package = "pallet-transaction-payment", path = "../../../frame/transaction-payment", default-features = false }
+[dependencies.sp-runtime]
 git = 'https://github.com/paritytech/substrate.git'
-rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+rev = "fc6914cdb8c322cea8a4591bbf9566dd23bfd143"
 
-[dependencies.srml-support]
+[dependencies.pallet-indices]
+git = 'https://github.com/paritytech/substrate.git'
+rev = "fc6914cdb8c322cea8a4591bbf9566dd23bfd143"
+
+[dependencies.frame-support]
  git = "https://github.com/paritytech/substrate.git"
- package = "srml-support"
- rev = "bc9d55f738db72d35b6dfdf9dad7bf2d82204665"
+ package = "frame-support"
+ #rev = "60f2b7d5ea93452e905682a1305961a8dfd41811"
+ rev = "fc6914cdb8c322cea8a4591bbf9566dd23bfd143"
 
