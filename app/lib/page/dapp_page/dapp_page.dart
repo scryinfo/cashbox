@@ -50,6 +50,7 @@ class _DappPageState extends State<DappPage> {
               return NavigationDecision.navigate;
             },
             onPageFinished: (String url) {
+              _controller?.evaluateJavascript('nativeChainAddressToJsResult("666666777")')?.then((result) {}); //传钱包EEE链地址给DApp记录保存
               print('Page finished loading================================>: $url');
             },
           ),
@@ -114,6 +115,11 @@ class _DappPageState extends State<DappPage> {
         name: "NativeSignMsgToJs",
         onMessageReceived: (JavascriptMessage message) {
           print("NativeSignMsg 从Webview传回来的参数======>： ${message.message}");
+          /*先将字符串转成json*/
+          //Map<String, dynamic> jsonMap = jsonDecode(message.message);
+          /*将Json转成实体类*/
+          //TransactionModel txModel=TransactionModel.fromJson(jsonMap);
+          /*取值*/
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -122,6 +128,9 @@ class _DappPageState extends State<DappPage> {
                 hintContent: "提示：请输入您的密码，对交易信息进行签名。 ",
                 hintInput: "请输入钱包密码",
                 onPressed: (pwd) {
+                  //传递签名参数， 钱包id + 密码 + 待签名操作
+                  //Map map = Wallets.instance.eeeTxSign(Provider.of<WalletManagerProvide>(context).walletId, Uint8List.fromList(pwd.codeUints),message.message),
+
                   //todo : mock data,直接返回签名后假数据
                   _controller?.evaluateJavascript('nativeSignMsgToJsResult("直接返回mock假数据  签名证书上链功能部分")')?.then((result) {});
                   NavigatorUtils.goBack(context);
