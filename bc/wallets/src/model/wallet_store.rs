@@ -50,7 +50,7 @@ pub struct WalletObj {
     pub address: Option<String>,
     pub digit_id: Option<i64>,
     pub chain_type: Option<i64>,
-    pub chain_address: Option<String>,
+    pub domain: Option<String>,
     pub contract_address: Option<String>,
     pub short_name: Option<String>,
     pub full_name: Option<String>,

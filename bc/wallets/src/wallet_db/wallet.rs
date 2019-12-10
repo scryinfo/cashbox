@@ -302,7 +302,7 @@ impl DataServiceProvider {
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
                 chain_id: row[2].as_integer(),
                 address: row[3].as_string().map(|str| String::from(str)),
-                chain_address: row[4].as_string().map(|str| String::from(str)),
+                domain: row[4].as_string().map(|str| String::from(str)),
                 selected: row[5].as_string().map(|value| Self::get_bool_value(value)),
                 chain_type: row[6].as_integer(),
                 digit_id: row[7].as_integer(),
