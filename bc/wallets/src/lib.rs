@@ -67,7 +67,7 @@ mod tests {
     use std::sync::mpsc;
     use futures::Future;
     use jsonrpc_core::Notification;
-    use substrate_primitives::crypto::Pair;
+    use sp_core::crypto::{Pair,AccountId32};
 
     #[test]
     fn verify_mnemonic_create() {
@@ -78,7 +78,6 @@ mod tests {
 
         println!("{}",hex::encode(data.to_vec().as_slice()));
        // wallet_crypto::Sr25519::print_from_phrase(&mnemonic,None);
-
     }
 
     #[test]
@@ -91,7 +90,8 @@ mod tests {
         //let pair = wallet_crypto::Sr25519::pair_from_suri(&mnemonic,None);
         let pair = wallet_crypto::Sr25519::pair_from_suri("//Alice",None);
         println!("public:{}",&pair.public());
-        let index = wallet_rpc::substrate::account_nonce(&mut substrate_client,&pair.public());
+
+        let index = wallet_rpc::substrate::account_nonce(&mut substrate_client,AccountId32::from(pair.public().0));
         println!("index:{}",index);
         assert_eq!(index,0);
         // 用于保持连接，接收从链上返回来的数据
@@ -104,7 +104,6 @@ mod tests {
             "----subscribe extrinsic return sub_id:{:?}----result:{:?}---",
             sub_id, des["result"]
         );
-
     }
 
     #[test]
@@ -112,10 +111,8 @@ mod tests {
         let (send_tx, recv_tx) = mpsc::channel();
         let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
         let mnemonic = "mirror craft oil voice there pizza quarter void inhale snack vacant kingdom force erupt congress wing correct bargain";
-
         let to = "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy";
         let ret = wallet_rpc::transfer(&mut substrate_client,  mnemonic,to,"200");
-
         match ret {
             Ok(data)=>{
                 println!("signed data is: {}",data);
@@ -125,5 +122,11 @@ mod tests {
                 println!("error {}",msg);
             }
         }
+    }
+
+    #[test]
+    fn wallet_tx_sign_test(){
+        let msg = r#"0x7901041102ffb8abbe0682086df6012967b2f56aaa2e365d974c77414a34359cfbdd67ce01fe0082841e00d0270328c9d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d6400000000000000000000000000000001000000f05f30efbfbdefbfbddf8defbfbdefbfbdcf80efbfbdefbfbd1855efbfbd1defbfbdc7b4efbfbdefbfbdefbfbd67efbfbdefbfbd4722522aefbfbd2627c6000000"#;
+        //module::wallet::raw_tx_sign()
     }
 }

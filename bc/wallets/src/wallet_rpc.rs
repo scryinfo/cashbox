@@ -2,15 +2,16 @@ use super::*;
 use std::sync::mpsc;
 use futures::Future;
 use ws::{Rpc, RpcError};
-use substrate_primitives::{blake2_256,hexdisplay::HexDisplay};
-use serde_json::json;
+use sp_core::{blake2_256,hexdisplay::HexDisplay,};
 use node_primitives::{Balance, Index, Hash};
+use serde_json::json;
 use node_runtime::{Call, UncheckedExtrinsic, BalancesCall};
 use wallet_crypto::Crypto;
 
 mod ws;
 pub mod substrate;
 pub use substrate::transfer;
+pub use substrate::tx_sign;
 
 pub fn substrate_thread(
     send_tx: mpsc::Sender<jsonrpc_ws_server::ws::Message>,

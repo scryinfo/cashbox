@@ -1,4 +1,4 @@
-use substrate_primitives::{hexdisplay::HexDisplay,Public,Pair, crypto::Ss58Codec};
+use sp_core::{hexdisplay::HexDisplay,Public,Pair, crypto::Ss58Codec};
 use bip39::{Mnemonic, MnemonicType, Language};
 use rand::{RngCore, rngs::OsRng};
 use scry_crypto::aes;
