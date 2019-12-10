@@ -17,9 +17,10 @@ pub mod android {
         let chain_id_str = format!("{}", eee_chain.chain_id);
         env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("set chainId value is error!");
         env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.wallet_id).unwrap()))).expect("walletId");
+        env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.address).unwrap()))).expect("address");
 
-        if eee_chain.chain_address.is_some() {
-            env.set_field(chain_class_obj, "chainAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.chain_address.unwrap()).unwrap()))).expect("set status value is error!");
+        if eee_chain.domain.is_some() {
+            env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.chain_address.unwrap()).unwrap()))).expect("set domain value is error!");
         }
 
         if eee_chain.is_visible.is_some() {
@@ -44,9 +45,9 @@ pub mod android {
 
             env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("set digitId value is error!");
             env.set_field(digit_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.chain_id).unwrap()))).expect("set digitId value is error!");
-            if digit.address.is_some() {
+          /*  if digit.address.is_some() {
                 env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.address.unwrap()).unwrap()))).expect("set address value is error!");
-            }
+            }*/
             if digit.contract_address.is_some() {
                 env.set_field(digit_class_obj, "contractAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.contract_address.unwrap()).unwrap()))).expect("set contractAddress value is error!");
             }
@@ -90,9 +91,10 @@ pub mod android {
 
         env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("set chainId value is error!");
         env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.wallet_id).unwrap()))).expect("set digitId value is error!");
+        env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.address).unwrap()))).expect("set digitId value is error!");
 
-        if eth_chain.chain_address.is_some() {
-            env.set_field(chain_class_obj, "chainAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.chain_address.unwrap()).unwrap()))).expect("set status value is error!");
+        if eth_chain.domain.is_some() {
+            env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.domain.unwrap()).unwrap()))).expect("set domain value is error!");
         }
 
         if eth_chain.is_visible.is_some() {
@@ -114,9 +116,9 @@ pub mod android {
             env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("set status value is error!");
 
             env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("set digitId value is error!");
-            if digit.address.is_some() {
+         /*   if digit.address.is_some() {
                 env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.address.unwrap()).unwrap()))).expect("set address value is error!");
-            }
+            }*/
             if digit.contract_address.is_some() {
                 env.set_field(digit_class_obj, "contractAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.contract_address.unwrap()).unwrap()))).expect("set contractAddress value is error!");
             }
@@ -158,9 +160,10 @@ pub mod android {
         let chain_id_str = format!("{}", btc_chain.chain_id);
         env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("set chainId value is error!");
         env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.wallet_id).unwrap()))).expect("set digitId value is error!");
+        env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address).unwrap()))).expect("set digitId value is error!");
 
-        if btc_chain.chain_address.is_some() {
-            env.set_field(chain_class_obj, "chainAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.chain_address.unwrap()).unwrap()))).expect("set status value is error!");
+        if btc_chain.domain.is_some() {
+            env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.domain.unwrap()).unwrap()))).expect("set domain value is error!");
         }
 
         if btc_chain.is_visible.is_some() {
@@ -182,9 +185,9 @@ pub mod android {
             env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("set status value is error!");
 
             env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("set digitId value is error!");
-            if digit.address.is_some() {
+          /*  if digit.address.is_some() {
                 env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.address.unwrap()).unwrap()))).expect("set address value is error!");
-            }
+            }*/
             if digit.contract_address.is_some() {
                 env.set_field(digit_class_obj, "contractAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.contract_address.unwrap()).unwrap()))).expect("set contractAddress value is error!");
             }

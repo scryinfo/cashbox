@@ -114,7 +114,8 @@ public class NativeLib {
         public int status;  //状态码
         public String chainId;
         public String walletId;
-        public String chainAddress;
+        public String address;      //链地址
+        public String domain;       //节点域名IP
         public boolean isVisible;
         public List<EthDigit> digitList;
         public int chainType;
@@ -124,7 +125,6 @@ public class NativeLib {
         public int status;  //状态码
         public String digitId;
         public String chainId;
-        public String address;
         public String contractAddress;
         public String shortName;
         public String fullName;
@@ -138,7 +138,8 @@ public class NativeLib {
         public int status;  //状态码
         public String chainId;
         public String walletId;
-        public String chainAddress;
+        public String address;      //链地址
+        public String domain;       //节点域名IP
         public boolean isVisible;
         public List<BtcDigit> digitList;
         public int chainType;
@@ -148,7 +149,6 @@ public class NativeLib {
         public int status;  //状态码
         public String digitId;
         public String chainId;
-        public String address;
         public String shortName;
         public String fullName;
         public String balance;
