@@ -87,11 +87,12 @@ public class NativeLib {
     }
 
     public static class EeeChain {
-        public int status;  //状态码
+        public int status;          //状态码
         public String chainId;
         public String walletId;
-        public String chainAddress;
-        public boolean isVisible;
+        public String address;      //链地址
+        public String domain;       //节点域名IP
+        public boolean isVisible;   //链是否显示
         public List<EeeDigit> digitList;
         public int chainType;
     }
@@ -100,7 +101,6 @@ public class NativeLib {
         public int status;  //状态码
         public String digitId;
         public String chainId;
-        public String address;
         public String contractAddress;
         public String shortName;
         public String fullName;
