@@ -164,10 +164,16 @@ class Wallets {
   }
 
   //获取当前钱包
-  // apiNo:WM05  //todo 接口命名优化  getNowWalletId()
+  // apiNo:WM05
   Future<String> getNowWalletId() async {
     var walletId = await WalletManager.getNowWalletId();
     return walletId;
+  }
+
+  Future<Wallet> getNowWalletModel() async {
+    String walletId = await getNowWalletId();
+    Wallet walletModel = await getWalletByWalletId(walletId);
+    return walletModel;
   }
 
   Future<Wallet> getWalletByWalletId(String walletId) async {
