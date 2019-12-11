@@ -25,9 +25,9 @@ class WalletManagerTest {
     await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
   }
 
-  static void getNowWallet() async {
-    var getNowWallet = await Wallets.instance.getNowWallet();
-    print("wallet_manager_test getNowWallet=>" + getNowWallet.toString());
+  static void getNowWalletId() async {
+    var getNowWallet = await Wallets.instance.getNowWalletId();
+    print("wallet_manager_test getNowWalletId=>" + getNowWallet.toString());
   }
 
   static void setNowWallet() async {

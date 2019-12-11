@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:app/model/chain.dart';
+import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
@@ -49,8 +51,11 @@ class _DappPageState extends State<DappPage> {
               print("navigationDelegate ===============================>:  $request");
               return NavigationDecision.navigate;
             },
-            onPageFinished: (String url) {
-              _controller?.evaluateJavascript('nativeChainAddressToJsResult("666666777")')?.then((result) {}); //传钱包EEE链地址给DApp记录保存
+            onPageFinished: (String url) async {
+              String walletId = await Wallets.instance.getNowWalletId();
+              Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
+              String chainEEEAddress = wallet.getChainByChainType(ChainType.EEE).chainAddress;
+              _controller?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')?.then((result) {}); //传钱包EEE链地址给DApp记录保存
               print('Page finished loading================================>: $url');
             },
           ),
@@ -72,11 +77,14 @@ class _DappPageState extends State<DappPage> {
               title: "钱包密码",
               hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
               hintInput: "请输入钱包密码",
-              onPressed: (value) {
-                //method 1 方法回调ok
-                _controller?.evaluateJavascript('callJs("$value")')?.then((result) {}); //todo change callback func name
-                //method 2 字段回调ok
-                //_controller?.evaluateJavascript('window.qrresult=" $value "')?.then((result) {});
+              onPressed: (String value) async {
+                //var pwdFormat = value.codeUnits;
+                //String walletId = await Wallets.instance.getNowWalletId();
+                //Map map = await Wallets.instance.eeeTxSign(walletId, Uint8List.fromList(pwdFormat), message.message);
+                //if (map != null) {
+                //  var signResult = map["msg"];
+                //  _controller?.evaluateJavascript('callJs("$signResult")')?.then((result) {}); //todo change callback func name
+                //}
               },
             );
           },
@@ -115,11 +123,6 @@ class _DappPageState extends State<DappPage> {
         name: "NativeSignMsgToJs",
         onMessageReceived: (JavascriptMessage message) {
           print("NativeSignMsg 从Webview传回来的参数======>： ${message.message}");
-          /*先将字符串转成json*/
-          //Map<String, dynamic> jsonMap = jsonDecode(message.message);
-          /*将Json转成实体类*/
-          //TransactionModel txModel=TransactionModel.fromJson(jsonMap);
-          /*取值*/
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -127,31 +130,19 @@ class _DappPageState extends State<DappPage> {
                 title: "钱包密码",
                 hintContent: "提示：请输入您的密码，对交易信息进行签名。 ",
                 hintInput: "请输入钱包密码",
-                onPressed: (pwd) {
+                onPressed: (pwd) async {
                   //传递签名参数， 钱包id + 密码 + 待签名操作
-                  //Map map = Wallets.instance.eeeTxSign(Provider.of<WalletManagerProvide>(context).walletId, Uint8List.fromList(pwd.codeUints),message.message),
-
-                  //todo : mock data,直接返回签名后假数据
-                  _controller?.evaluateJavascript('nativeSignMsgToJsResult("直接返回mock假数据  签名证书上链功能部分")')?.then((result) {});
-                  NavigatorUtils.goBack(context);
-                  //todo parker 10/28
-                  //Map map = Wallets.instance.eeeTxSign(Provider.of<WalletManagerProvide>(context).walletId, Uint8List.fromList(pwd.codeUints),
-                  //    message.message.toString()); //todo check params is right  1010 parker
-                  //if (map == null) {
-                  //  Fluttertoast.showToast(msg: "交易签名出现未知错误");
-                  //  return;
-                  //}
-                  //if (map["status"] == 200) {
-                  //  Fluttertoast.showToast(msg: "交易签名 成功");
-                  //  var result = " mock result ";
-                  //  //todo 签名完成后的结果，传回给 webveiw。 webview负责处理是否上链广播交易
-                  //  _controller?.evaluateJavascript('nativeSignMsgToJsResult("$result")')?.then((result) {});
-                  //  return;
-                  //} else {
-                  //  Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
-                  //  LogUtil.e("NativeSignMsg=>", "tx sign failure,message is===>" + map["message"]);
-                  //  return;
-                  //}
+                  var pwdFormat = pwd.codeUnits;
+                  String walletId = await Wallets.instance.getNowWalletId();
+                  Map map = await Wallets.instance.eeeTxSign(walletId, Uint8List.fromList(pwdFormat), message.message);
+                  if (map != null) {
+                    var signResult = map["msg"];
+                    Fluttertoast.showToast(msg: "交易签名 成功");
+                    _controller?.evaluateJavascript('nativeSignMsgToJsResult("$signResult")')?.then((result) {});
+                  } else {
+                    Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
+                    LogUtil.e("NativeSignMsg=>", "tx sign failure,message is===>" + map["message"]);
+                  }
                 },
               );
             },

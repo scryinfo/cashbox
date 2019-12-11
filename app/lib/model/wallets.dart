@@ -165,8 +165,8 @@ class Wallets {
 
   //获取当前钱包
   // apiNo:WM05  //todo 接口命名优化  getNowWalletId()
-  Future<String> getNowWallet() async {
-    var walletId = await WalletManager.getNowWallet();
+  Future<String> getNowWalletId() async {
+    var walletId = await WalletManager.getNowWalletId();
     return walletId;
   }
 
@@ -219,14 +219,14 @@ class Wallets {
     }
   }
 
-  eeeTxSign(String walletId, Uint8List pwd, String rawTx) async {
+  Future<Map> eeeTxSign(String walletId, Uint8List pwd, String rawTx) async {
     Map eeeTxSignMap = await WalletManager.eeeTxSign(walletId, pwd, rawTx);
-    //todo 1010 parker
     int status = eeeTxSignMap["status"];
-    if (status == null) {
-      LogUtil.e("eeeTxSign=>", "not find status code");
+    if (status == null || status != 200) {
+      LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
       return null;
+    } else {
+      return eeeTxSignMap;
     }
-    return eeeTxSignMap;
   }
 }

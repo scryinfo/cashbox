@@ -48,7 +48,7 @@ class WalletManager {
 
   //获取当前钱包
   // apiNo:WM05
-  static Future<String> getNowWallet() async {
+  static Future<String> getNowWalletId() async {
     String nowWalletId = await _channel.invokeMethod('getNowWallet');
     return nowWalletId;
   }

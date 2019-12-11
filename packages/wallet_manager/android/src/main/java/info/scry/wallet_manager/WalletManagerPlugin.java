@@ -114,7 +114,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     /*-------------------------组装eee链上数据 start-------------------------*/
                     Map<String, Object> resultEeeChain = new HashMap<>();
                     resultEeeChain.put("chainAddress",
-                            walletList.get(walletIndex).eeeChain.chainAddress);
+                            walletList.get(walletIndex).eeeChain.address);
                     resultEeeChain.put("chainId", walletList.get(walletIndex).eeeChain.chainId);
                     resultEeeChain.put("chainType", walletList.get(walletIndex).eeeChain.chainType);
                     resultEeeChain.put("isVisible", walletList.get(walletIndex).eeeChain.isVisible);
@@ -129,7 +129,6 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         digitMap.put("status", eeeDigitList.get(digitIndex).status);
                         digitMap.put("digitId", eeeDigitList.get(digitIndex).digitId);
                         digitMap.put("chainId", eeeDigitList.get(digitIndex).chainId);
-                        digitMap.put("address", eeeDigitList.get(digitIndex).address);
                         digitMap.put("contractAddress",
                                 eeeDigitList.get(digitIndex).contractAddress);
                         digitMap.put("shortName", eeeDigitList.get(digitIndex).shortName);
@@ -372,8 +371,10 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 break;
             }
             case "eeeTxSign": {
-                Log.d("nativeLib=>", "eeeEnergyTransfer =>");
+                Log.d("nativeLib=>", "eeeEnergyTransfer is enter =>");
                 Message message = new Message();
+                Log.d("nativeLib=>",
+                        (String) (call.argument("rawTx")) + "||" + (String) (call.argument("mnId")) + "||" + call.argument("pwd"));
                 try {
                     message = NativeLib.eeeTxSign((String) (call.argument("rawTx")),
                             (String) (call.argument("mnId")),
