@@ -52,8 +52,7 @@ class _DappPageState extends State<DappPage> {
               return NavigationDecision.navigate;
             },
             onPageFinished: (String url) async {
-              String walletId = await Wallets.instance.getNowWalletId();
-              Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
+              Wallet wallet = await Wallets.instance.getNowWalletModel();
               String chainEEEAddress = wallet.getChainByChainType(ChainType.EEE).chainAddress;
               _controller?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')?.then((result) {}); //传钱包EEE链地址给DApp记录保存
               print('Page finished loading================================>: $url');

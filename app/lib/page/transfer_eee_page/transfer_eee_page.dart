@@ -81,8 +81,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
               child: FlatButton(
                 onPressed: () async {
                   if (_verifyTransferInfo()) {
-                    String walletId = await Wallets.instance.getNowWalletId();
-                    Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
+                    Wallet wallet = await Wallets.instance.getNowWalletModel();
                     ChainEEE chainEEE = wallet.getChainByChainType(ChainType.EEE);
                     //todo 1009 parker
                     Map map = await chainEEE.eeeEnergyTransfer("5FYmQQAcL3LyRM215UjXKZhDVBWens66BEL5SoN4qw4JQeuB",
