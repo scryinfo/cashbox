@@ -20,7 +20,7 @@ pub mod android {
         env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.address).unwrap()))).expect("address");
 
         if eee_chain.domain.is_some() {
-            env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.chain_address.unwrap()).unwrap()))).expect("set domain value is error!");
+            env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.domain.unwrap()).unwrap()))).expect("set domain value is error!");
         }
 
         if eee_chain.is_visible.is_some() {
