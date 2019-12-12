@@ -277,6 +277,12 @@ public class NativeLib {
     //此方法会直接调用到助记词的相关方法
     public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
 
+    //针对普通数据的签名，获取签名后的信息，区分链类型
+    //返回：签名后的原始数据
+    //msg: hex格式的签名信息
+    //此方法会直接调用到助记词的相关方法
+    public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
+
     //广播交易，区分链类型
     //msg:交易ID
     public static native Message eeeTxBroadcast(long handle, String signedTx);
