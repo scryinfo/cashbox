@@ -93,19 +93,6 @@ class QrScanUtil {
       return paramsMap;
     }
     return null;
-    /*    switch (operationType) {
-      case "t": //转账类型
-        break;
-      case "ds": //给dapp签名类型
-        print("begin to do dapp SignTx======>");
-        return paramsMap;
-        //doSignTx(paramsMap, context);
-        break;
-      default:
-        Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
-        LogUtil.e("QrScanUtil", "unknown operation type ======>" + operationType);
-        break;
-    }*/
   }
 
   //签名  abandon （重新设计，让给你单一，扫描功能类就只负责扫码）

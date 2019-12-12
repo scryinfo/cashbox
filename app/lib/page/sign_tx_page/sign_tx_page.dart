@@ -1,24 +1,19 @@
 import 'dart:typed_data';
 
 import 'package:app/generated/i18n.dart';
-import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
-import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
-import '../../routers/application.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
-import 'package:app/util/qr_scan_util.dart';
-import '../../widgets/list_item.dart';
 
 class SignTxPage extends StatefulWidget {
   @override
@@ -112,16 +107,24 @@ class _SignTxPageState extends State<SignTxPage> {
           hintInput: S.of(context).pls_input_wallet_pwd,
           onPressed: (value) async {
             print("_showPwdDialog   pwd is =========>" + value);
-            //todo JNI调用签名功能
-            //Map map = Wallets.instance.eeeTxSign(Provider.of<WalletManagerProvide>(context).walletId,
-            //    Uint8List.fromList(value.codeUints), _waitToSignInfo.toString());
-            //todo 完成签名，以二维码信息展示签名后交易信息。
-            Provider.of<QrInfoProvide>(context).setTitle("wo是标题");
-            Provider.of<QrInfoProvide>(context).setHintInfo("woshi签名结果提示");
-            Provider.of<QrInfoProvide>(context).setContent("签名结果内容");
-
-            NavigatorUtils.push(context, Routes.qrInfoPage);
-            //NavigatorUtils.goBack(context);
+            String walletId = await Wallets.instance.getNowWalletId();
+            Map map = await Wallets.instance.eeeTxSign(walletId, Uint8List.fromList(value.codeUints), _waitToSignInfo.toString());
+            if (map.containsKey("status")) {
+              int status = map["status"];
+              if (status == null || status != 200) {
+                Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
+                NavigatorUtils.goBack(context);
+                return null;
+              } else {
+                Provider.of<QrInfoProvide>(context).setTitle("签名结果");
+                Provider.of<QrInfoProvide>(context).setHintInfo("签名成功，如下是签名结果信息");
+                String signedMsg = map["signedInfo"];
+                Provider.of<QrInfoProvide>(context).setContent(signedMsg);
+                NavigatorUtils.push(context, Routes.qrInfoPage);
+              }
+            } else {
+              Fluttertoast.showToast(msg: "签名失败，请重新检查您的签名信息和密码");
+            }
           },
         );
       },

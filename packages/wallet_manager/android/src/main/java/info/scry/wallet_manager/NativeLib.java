@@ -19,9 +19,9 @@ public class NativeLib {
         WALLET
     }
 
-    //通信消息 状态码
+    //通信消息 状态码  （StatusCode 仅用来约定两端状态标识，不用在方法传参上）
     private interface StatusCode {
-        public static final int DYLIB_ERROR = -1; //动态库执行出错
+        public static final int DYLIB_ERROR = -1;                   //动态库执行出错
         public static final int OK = 200;                           //正常
         public static final int FAIL_TO_GENERATE_MNEMONIC = 100;    //生成助记词失败
         public static final int PWD_IS_WRONG = 101;                 //密码错误
@@ -33,7 +33,6 @@ public class NativeLib {
 
     static {
         System.loadLibrary("wallet");
-        //System.loadLibrary("sqlite3");
     }
 
     /*--------------------------------------------助记词--------------------------------------------*/
@@ -135,7 +134,7 @@ public class NativeLib {
     }
 
     public static class BtcChain {
-        public int status;  //状态码
+        public int status;          //状态码
         public String chainId;
         public String walletId;
         public String address;      //链地址
@@ -146,7 +145,7 @@ public class NativeLib {
     }
 
     public static class BtcDigit {
-        public int status;  //状态码
+        public int status;           //状态码
         public String digitId;
         public String chainId;
         public String shortName;
@@ -254,8 +253,9 @@ public class NativeLib {
     public static native int eeeClose(long handle);
 
     public static class Message {
-        public int status;
-        public String msg;
+        public int status;                  //通信消息 状态码StatusCode 200成功
+        public String message;              //详细错误信息
+        public String signedInfo;           //签名后信息
     }
 
     //获取拼装原始交易，区分链类型
@@ -267,8 +267,9 @@ public class NativeLib {
     public static native Message eeeTransfer(long handle, String from, String to, String value, String extendMsg);
 
     //msg: 交易
-   // public static native Message eeeEnergyTransfer(long handle, String from, String to, String value, String extendMsg);
-    public static native Message eeeEnergyTransfer(String from, byte[] pwd,String to, String value, String extendMsg);
+    // public static native Message eeeEnergyTransfer(long handle, String from, String to, String
+    // value, String extendMsg);
+    public static native Message eeeEnergyTransfer(String from, byte[] pwd, String to, String value, String extendMsg);
 
     //获取签名后的交易信息，区分链类型
     //返回：签名后的交易 String
@@ -293,13 +294,13 @@ public class NativeLib {
     /*------------------------------------------交易相关------------------------------------------*/
     //ETH 交易拼装。   返回：未签名的交易 String。
     //nonce记录位置？？？
-    public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String toAddress,
-                                                  String value, String backupMsg, String gasLimit, String gasPrice);
+    public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String toAddress, String value,
+                                                  String backupMsg, String gasLimit, String gasPrice);
 
     //ERC20 交易拼装。    返回：未签名的交易 String
     // nonce记录位置？？？
-    public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String contractAddress,
-                                                    String toAddress, String value, String backupMsg, String gasLimit, String gasPrice);
+    public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String contractAddress, String toAddress,
+                                                    String value, String backupMsg, String gasLimit, String gasPrice);
 
     //处理建议优先考虑，实现spv的库处做。   能更方便获取utxo,还有找零地址选择,找零金额。
     public static native byte[] btcTxMakeBTCRawTx(String[] from, String[] to, String value);

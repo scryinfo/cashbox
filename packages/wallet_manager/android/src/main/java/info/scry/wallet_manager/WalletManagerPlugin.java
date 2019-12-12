@@ -386,7 +386,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "message.msg is " + message.msg.toString());
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
-                resultMap.put("msg", message.msg);
+                resultMap.put("signedInfo", message.signedInfo);
                 result.success(resultMap);
                 break;
             }
