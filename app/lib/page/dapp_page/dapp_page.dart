@@ -3,13 +3,9 @@ import 'dart:typed_data';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
-import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
-import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/log_util.dart';
-import 'package:app/util/native_file_system_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
@@ -66,31 +62,6 @@ class _DappPageState extends State<DappPage> {
   Set<JavascriptChannel> makeJsChannelsSet() {
     List<JavascriptChannel> jsChannelList = [];
     jsChannelList.add(JavascriptChannel(
-      name: "NativePwdDialog",
-      onMessageReceived: (JavascriptMessage message) {
-        print("NativePwdDialog 从webview传回来的参数======>： ${message.message}");
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return PwdDialog(
-              title: "钱包密码",
-              hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
-              hintInput: "请输入钱包密码",
-              onPressed: (String value) async {
-                //var pwdFormat = value.codeUnits;
-                //String walletId = await Wallets.instance.getNowWalletId();
-                //Map map = await Wallets.instance.eeeTxSign(walletId, Uint8List.fromList(pwdFormat), message.message);
-                //if (map != null) {
-                //  var signResult = map["msg"];
-                //  _controller?.evaluateJavascript('callJs("$signResult")')?.then((result) {}); //todo change callback func name
-                //}
-              },
-            );
-          },
-        );
-      },
-    ));
-    jsChannelList.add(JavascriptChannel(
         name: "NativeQrScanToJs",
         onMessageReceived: (JavascriptMessage message) {
           Future<String> qrResult = QrScanUtil.instance.qrscan();
@@ -101,8 +72,9 @@ class _DappPageState extends State<DappPage> {
             Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
           });
         }));
+
     jsChannelList.add(JavascriptChannel(
-        name: "NativeQrScanAndPwdAndSignToQR",
+        name: "NativeQrScanAndPwdAndSignToQR", //备注。在此执行scan,在sign_tx_page执行pwdAndSign，后toQR
         onMessageReceived: (JavascriptMessage message) {
           Future<String> qrResult = QrScanUtil.instance.qrscan();
           qrResult.then((qrInfo) {
@@ -118,6 +90,7 @@ class _DappPageState extends State<DappPage> {
             Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
           });
         }));
+
     jsChannelList.add(JavascriptChannel(
         name: "NativeSignMsgToJs",
         onMessageReceived: (JavascriptMessage message) {
@@ -130,29 +103,36 @@ class _DappPageState extends State<DappPage> {
                 hintContent: "提示：请输入您的密码，对交易信息进行签名。 ",
                 hintInput: "请输入钱包密码",
                 onPressed: (pwd) async {
-                  //传递签名参数， 钱包id + 密码 + 待签名操作
                   var pwdFormat = pwd.codeUnits;
                   String walletId = await Wallets.instance.getNowWalletId();
                   Map map = await Wallets.instance.eeeTxSign(walletId, Uint8List.fromList(pwdFormat), message.message);
-                  if (map != null) {
-                    var signResult = map["msg"];
-                    Fluttertoast.showToast(msg: "交易签名 成功");
-                    _controller?.evaluateJavascript('nativeSignMsgToJsResult("$signResult")')?.then((result) {});
+                  if (map.containsKey("status")) {
+                    int status = map["status"];
+                    if (status == null || status != 200) {
+                      Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
+                      NavigatorUtils.goBack(context);
+                      return null;
+                    } else {
+                      var signResult = map["signedInfo"];
+                      Fluttertoast.showToast(msg: "交易签名 成功");
+                      _controller?.evaluateJavascript('nativeSignMsgToJsResult("$signResult")')?.then((result) {});
+                    }
                   } else {
-                    Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
-                    LogUtil.e("NativeSignMsg=>", "tx sign failure,message is===>" + map["message"]);
+                    Fluttertoast.showToast(msg: "交易签名 失败");
                   }
                 },
               );
             },
           );
         }));
+
     jsChannelList.add(JavascriptChannel(
         name: "NativeGoBack",
         onMessageReceived: (JavascriptMessage message) {
           print("NativeSignMsg 从NativeGoBack传回来的参数======>： ${message.message}");
           NavigatorUtils.goBack(context);
         }));
+
     return jsChannelList.toSet();
   }
 }

@@ -230,9 +230,7 @@ class Wallets {
     int status = eeeTxSignMap["status"];
     if (status == null || status != 200) {
       LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
-      return null;
-    } else {
-      return eeeTxSignMap;
     }
+    return eeeTxSignMap;
   }
 }
