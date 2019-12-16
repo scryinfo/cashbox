@@ -66,7 +66,7 @@ class _DappPageState extends State<DappPage> {
         onMessageReceived: (JavascriptMessage message) {
           Future<String> qrResult = QrScanUtil.instance.qrscan();
           qrResult.then((t) {
-            Fluttertoast.showToast(msg: "扫描j结果是======> $t");
+            Fluttertoast.showToast(msg: "NativeQrScanToJs 扫描j结果是======> $t");
             _controller?.evaluateJavascript('nativeQrScanToJsResult("$t")')?.then((result) {});
           }).catchError((e) {
             Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
