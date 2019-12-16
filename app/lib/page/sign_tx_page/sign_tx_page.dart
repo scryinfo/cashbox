@@ -109,7 +109,11 @@ class _SignTxPageState extends State<SignTxPage> {
             print("_showPwdDialog   pwd is =========>" + value);
             String walletId = await Wallets.instance.getNowWalletId();
             var pwdFormat = value.codeUnits;
-            Map map = await Wallets.instance.eeeSign(walletId, Uint8List.fromList(pwdFormat), _waitToSignInfo.toString());
+            var separateIndex = _waitToSignInfo.indexOf(";");
+            var param2 = _waitToSignInfo.substring(separateIndex + 1, _waitToSignInfo.length);
+            var keyValueIndex = param2.indexOf("=");
+            var waitToSignInfo = param2.substring(keyValueIndex + 1, param2.length);
+            Map map = await Wallets.instance.eeeSign(walletId, Uint8List.fromList(pwdFormat), waitToSignInfo.toString());
             if (map.containsKey("status")) {
               int status = map["status"];
               if (status == null || status != 200) {
@@ -119,8 +123,7 @@ class _SignTxPageState extends State<SignTxPage> {
               } else {
                 Provider.of<QrInfoProvide>(context).setTitle("签名结果");
                 Provider.of<QrInfoProvide>(context).setHintInfo("签名成功，如下是签名结果信息");
-                String signedMsg = map["signedInfo"];
-                Provider.of<QrInfoProvide>(context).setContent(signedMsg);
+                Provider.of<QrInfoProvide>(context).setContent(_waitToSignInfo);
                 NavigatorUtils.push(context, Routes.qrInfoPage);
               }
             } else {

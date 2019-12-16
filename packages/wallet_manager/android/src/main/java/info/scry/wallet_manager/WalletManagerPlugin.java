@@ -403,12 +403,15 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Log.d("nativeLib=>", "eeeSign exception is " + exception);
                 }
                 Log.d("nativeLib=>", "message.status is " + message.status);
-                Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
-                Log.d("nativeLib=>", "message.message is " + message.message.toString());
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
-                resultMap.put("signedInfo", message.signedInfo);
-                resultMap.put("message", message.message);
+                if (message.status == 200) {
+                    resultMap.put("signedInfo", message.signedInfo);
+                    Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
+                } else {
+                    resultMap.put("message", message.message);
+                    Log.d("nativeLib=>", "message.message is " + message.message.toString());
+                }
                 result.success(resultMap);
                 break;
             }
