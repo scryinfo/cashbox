@@ -18,11 +18,11 @@ pub mod android {
         match wallets::module::wallet::raw_tx_sign(&raw_tx,&wallet_id,pwd.as_slice()){
             Ok(data)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set isSetNowWallet value is error!");
-                env.set_field(state_obj, "msg", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value is error!");
             },
             Err(msg)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set isSetNowWallet value is error!");
-                env.set_field(state_obj, "msg", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
@@ -40,11 +40,11 @@ pub mod android {
         match wallets::module::wallet::raw_sign(&raw_tx,&wallet_id,pwd.as_slice()){
             Ok(data)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set isSetNowWallet value is error!");
-                env.set_field(state_obj, "msg", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value is error!");
             },
             Err(msg)=>{
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set isSetNowWallet value is error!");
-                env.set_field(state_obj, "msg", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set eeeSign value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
@@ -64,11 +64,11 @@ pub mod android {
         match wallets::module::chain::eee_tranfer_energy(&from,&to,&value,pwd.as_slice()){
             Ok(data)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set isSetNowWallet value is error!");
-                env.set_field(state_obj, "msg", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "energyTransferInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value is error!");
             },
             Err(msg)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set isSetNowWallet value is error!");
-                env.set_field(state_obj, "msg", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
