@@ -256,6 +256,7 @@ public class NativeLib {
         public int status;                  //通信消息 状态码StatusCode 200成功
         public String message;              //详细错误信息
         public String signedInfo;           //签名后信息
+        public String energyTransferInfo;   //转能量结果hash
     }
 
     //获取拼装原始交易，区分链类型
