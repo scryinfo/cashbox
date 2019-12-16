@@ -233,4 +233,13 @@ class Wallets {
     }
     return eeeTxSignMap;
   }
+
+  Future<Map> eeeSign(String walletId, Uint8List pwd, String rawTx) async {
+    Map eeeTxSignMap = await WalletManager.eeeSign(walletId, pwd, rawTx);
+    int status = eeeTxSignMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
+    }
+    return eeeTxSignMap;
+  }
 }

@@ -134,7 +134,7 @@ class QrScanUtil {
     print("qrTimeStamp===>" + qrTimeStamp);
     print("qrTimeStamp===>" + qrTimeStamp.runtimeType.toString());
     int qrTime = int.parse(qrTimeStamp);
-    if (qrTime > nowTimeStamp) {
+    if (qrTime * 1000 > nowTimeStamp) {
       return true; //数据正常，且还在有效期内
     }
     return false;

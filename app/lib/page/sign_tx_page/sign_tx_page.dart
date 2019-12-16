@@ -108,7 +108,8 @@ class _SignTxPageState extends State<SignTxPage> {
           onPressed: (value) async {
             print("_showPwdDialog   pwd is =========>" + value);
             String walletId = await Wallets.instance.getNowWalletId();
-            Map map = await Wallets.instance.eeeTxSign(walletId, Uint8List.fromList(value.codeUints), _waitToSignInfo.toString());
+            var pwdFormat = value.codeUnits;
+            Map map = await Wallets.instance.eeeSign(walletId, Uint8List.fromList(pwdFormat), _waitToSignInfo.toString());
             if (map.containsKey("status")) {
               int status = map["status"];
               if (status == null || status != 200) {

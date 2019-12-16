@@ -363,10 +363,10 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Log.d("nativeLib=>", "eeeEnergyTransfer exception is " + exception);
                 }
                 Log.d("nativeLib=>", "message.status is " + message.status);
-                Log.d("nativeLib=>", "message.msg is " + message.msg.toString());
+                Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
-                resultMap.put("msg", message.msg);
+                resultMap.put("signedInfo", message.signedInfo);
                 result.success(resultMap);
                 break;
             }
@@ -383,10 +383,32 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Log.d("nativeLib=>", "eeeTxSign exception is " + exception);
                 }
                 Log.d("nativeLib=>", "message.status is " + message.status);
-                Log.d("nativeLib=>", "message.msg is " + message.msg.toString());
+                Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 resultMap.put("signedInfo", message.signedInfo);
+                result.success(resultMap);
+                break;
+            }
+            case "eeeSign": {
+                Log.d("nativeLib=>", "eeeSign is enter =>");
+                Message message = new Message();
+                Log.d("nativeLib=>",
+                        (String) (call.argument("rawTx")) + "||" + (String) (call.argument("mnId")) + "||" + call.argument("pwd"));
+                try {
+                    message = NativeLib.eeeSign((String) (call.argument("rawTx")),
+                            (String) (call.argument("mnId")),
+                            (byte[]) (call.argument("pwd")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "eeeSign exception is " + exception);
+                }
+                Log.d("nativeLib=>", "message.status is " + message.status);
+                Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
+                Log.d("nativeLib=>", "message.message is " + message.message.toString());
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                resultMap.put("signedInfo", message.signedInfo);
+                resultMap.put("message", message.message);
                 result.success(resultMap);
                 break;
             }
