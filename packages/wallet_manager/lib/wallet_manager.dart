@@ -156,4 +156,9 @@ class WalletManager {
     Map<dynamic, dynamic> eeeTxSignMap = await _channel.invokeMethod("eeeTxSign", {"rawTx": rawTx, "mnId": walletId, "pwd": pwd});
     return eeeTxSignMap;
   }
+
+  static Future<Map<dynamic, dynamic>> eeeSign(String walletId, Uint8List pwd, String rawTx) async {
+    Map<dynamic, dynamic> eeeTxSignMap = await _channel.invokeMethod("eeeSign", {"rawTx": rawTx, "mnId": walletId, "pwd": pwd});
+    return eeeTxSignMap;
+  }
 }
