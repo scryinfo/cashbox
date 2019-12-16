@@ -392,13 +392,17 @@ pub fn raw_tx_sign(raw_tx:&str,wallet_id:&str,psw:&[u8])->Result<String,String>{
 //用于针对普通数据签名 传入的数据 hex格式数据
 pub fn raw_sign(raw_data:&str,wallet_id:&str,psw:&[u8])->Result<String,String> {
     let raw_data = raw_data.get(2..).unwrap();// remove `0x`
-    let tx_encode_data = hex::decode(raw_data).unwrap();
+    let tx_encode_data = hex::decode(raw_data);
+    if tx_encode_data.is_err() {
+        let info = format!("{},{}",tx_encode_data.unwrap_err().to_string(),raw_data);
+        return Err(info);
+    }
     // TODO 这个地方需要使用大小端编码？
     let mnemonic = module::wallet::export_mnemonic(wallet_id, psw);
     match mnemonic {
         Ok(mnemonic) => {
             let mn = String::from_utf8(mnemonic.mn).unwrap();
-            let sign_data = wallet_crypto::Sr25519::sign(&mn, &tx_encode_data[..]);
+            let sign_data = wallet_crypto::Sr25519::sign(&mn, &tx_encode_data.unwrap()[..]);
             // TODO 返回签名后的消息格式需要确定
             let hex_data =  format!("0x{}",hex::encode(&sign_data[..]));
             Ok(hex_data)
