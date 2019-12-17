@@ -36,9 +36,14 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
                 HashMap hashMap1 = new HashMap();
-                hashMap1.put("mn", mnemonicCls.mn);
-                hashMap1.put("mnId", mnemonicCls.mnId);
+
                 hashMap1.put("status", mnemonicCls.status);
+                if (mnemonicCls.status == 200) {
+                    hashMap1.put("mn", mnemonicCls.mn);
+                    hashMap1.put("mnId", mnemonicCls.mnId);
+                } else {
+                    hashMap1.put("message", mnemonicCls.message);
+                }
                 result.success(hashMap1);
                 break;
             }
@@ -76,8 +81,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "isContainWallet is =>" + walletState.isContainWallet);
                 HashMap hashMap = new HashMap();
                 hashMap.put("status", walletState.status);
-                hashMap.put("isContainWallet", walletState.isContainWallet);
-                hashMap.put("message", walletState.message);
+                if (walletState.status == 200) {
+                    hashMap.put("isContainWallet", walletState.isContainWallet);
+                } else {
+                    hashMap.put("message", walletState.message);
+                }
                 result.success(hashMap);
                 break;
             }
@@ -192,8 +200,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 HashMap hashMap = new HashMap();
                 hashMap.put("status", walletState.status);
-                hashMap.put("isSetNowWallet", walletState.isSetNowWallet);
-                hashMap.put("message", walletState.message);
+                if (walletState.status == 200) {
+                    hashMap.put("isSetNowWallet", walletState.isSetNowWallet);
+                } else {
+                    hashMap.put("message", walletState.message);
+                }
                 result.success(hashMap);
                 break;
             }
@@ -224,8 +235,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
-                resultMap.put("isDeletWallet", walletState.isDeletWallet);
-                resultMap.put("message", walletState.message);
+                if (walletState.status == 200) {
+                    resultMap.put("isDeletWallet", walletState.isDeletWallet);
+                } else {
+                    resultMap.put("message", walletState.message);
+                }
                 result.success(resultMap);
                 break;
             }
@@ -244,9 +258,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "walletState.message is " + walletState.message);
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
-                resultMap.put("isResetPwd", walletState.isResetPwd);
-                resultMap.put("message", walletState.message);
-
+                if (walletState.status == 200) {
+                    resultMap.put("isResetPwd", walletState.isResetPwd);
+                } else {
+                    resultMap.put("message", walletState.message);
+                }
                 result.success(resultMap);
                 break;
             }
@@ -263,9 +279,12 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "mnemonic.status is " + mnemonic.status);
                 Map resultMap = new HashMap();
                 resultMap.put("status", mnemonic.status);
-                resultMap.put("mnId", mnemonic.mnId);
-                resultMap.put("mn", mnemonic.mn);
-                resultMap.put("message", mnemonic.message);
+                if (mnemonic.status == 200) {
+                    resultMap.put("mnId", mnemonic.mnId);
+                    resultMap.put("mn", mnemonic.mn);
+                } else {
+                    resultMap.put("message", mnemonic.message);
+                }
                 result.success(resultMap);
                 break;
             }
@@ -286,8 +305,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "walletState.isRename is " + walletState.isRename);
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
-                resultMap.put("isRename", walletState.isRename);
-                resultMap.put("message", walletState.message);
+                if (walletState.status == 200) {
+                    resultMap.put("isRename", walletState.isRename);
+                } else {
+                    resultMap.put("message", walletState.message);
+                }
                 result.success(resultMap);
                 break;
             }
@@ -304,8 +326,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
-                resultMap.put("isShowChain", walletState.isShowChain);
-                resultMap.put("message", walletState.message);
+                if (walletState.status == 200) {
+                    resultMap.put("isShowChain", walletState.isShowChain);
+                } else {
+                    resultMap.put("message", walletState.message);
+                }
                 result.success(resultMap);
                 break;
             }
@@ -322,8 +347,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
-                resultMap.put("isHideChain", walletState.isHideChain);
-                resultMap.put("message", walletState.message);
+                if (walletState.status == 200) {
+                    resultMap.put("isHideChain", walletState.isHideChain);
+                } else {
+                    resultMap.put("message", walletState.message);
+                }
                 result.success(resultMap);
                 break;
             }
@@ -371,7 +399,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 break;
             }
             case "eeeTxSign": {
-                Log.d("nativeLib=>", "eeeEnergyTransfer is enter =>");
+                Log.d("nativeLib=>", "eeeTxSign is enter =>");
                 Message message = new Message();
                 Log.d("nativeLib=>",
                         (String) (call.argument("rawTx")) + "||" + (String) (call.argument("mnId")) + "||" + call.argument("pwd"));
@@ -386,7 +414,13 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
-                resultMap.put("signedInfo", message.signedInfo);
+                if (message.status == 200) {
+                    resultMap.put("signedInfo", message.signedInfo);
+                    Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
+                } else {
+                    resultMap.put("message", message.message);
+                    Log.d("nativeLib=>", "message.message is " + message.message.toString());
+                }
                 result.success(resultMap);
                 break;
             }
