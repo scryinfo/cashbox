@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:app/generated/i18n.dart';
+import 'package:app/model/chain.dart';
+import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
@@ -123,7 +125,11 @@ class _SignTxPageState extends State<SignTxPage> {
               } else {
                 Provider.of<QrInfoProvide>(context).setTitle("签名结果");
                 Provider.of<QrInfoProvide>(context).setHintInfo("签名成功，如下是签名结果信息");
-                Provider.of<QrInfoProvide>(context).setContent(_waitToSignInfo);
+                String walletId = await Wallets.instance.getNowWalletId();
+                Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
+                String chainEEEAddress = wallet.getChainByChainType(ChainType.EEE).chainAddress;
+                var content = _waitToSignInfo + ";addr=" + chainEEEAddress; // ***//回调结构 dtt=01;v=123;addr=0x6821
+                Provider.of<QrInfoProvide>(context).setContent(content);
                 NavigatorUtils.push(context, Routes.qrInfoPage);
               }
             } else {
