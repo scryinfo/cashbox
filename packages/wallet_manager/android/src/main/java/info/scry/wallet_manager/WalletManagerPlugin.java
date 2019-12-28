@@ -407,11 +407,10 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     message = NativeLib.eeeTxSign((String) (call.argument("rawTx")),
                             (String) (call.argument("mnId")),
                             (byte[]) (call.argument("pwd")));
+                    Log.d("nativeLib=>", "message.message is " + message.message.toString());
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "eeeTxSign exception is " + exception);
                 }
-                Log.d("nativeLib=>", "message.status is " + message.status);
-                Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 if (message.status == 200) {
@@ -419,7 +418,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
-                    Log.d("nativeLib=>", "message.message is " + message.message.toString());
+                    Log.d("nativeLib=>", "message.status is " + message.status);
                 }
                 result.success(resultMap);
                 break;
