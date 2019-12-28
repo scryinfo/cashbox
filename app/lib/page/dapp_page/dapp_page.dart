@@ -81,6 +81,7 @@ class _DappPageState extends State<DappPage> {
             Map paramsMap = QrScanUtil.instance.checkQrInfoByDiamondSignAndQr(qrInfo, context);
             if (paramsMap == null) {
               Fluttertoast.showToast(msg: "扫描内容结果不符合diamond Dapp规则");
+              NavigatorUtils.goBack(context);
               return;
             }
             var waitToSignInfo = "dtt=" + paramsMap["dtt"] + ";" + "v=" + paramsMap["v"]; //待签名交易信息
@@ -115,10 +116,13 @@ class _DappPageState extends State<DappPage> {
                     } else {
                       var signResult = map["signedInfo"];
                       Fluttertoast.showToast(msg: "交易签名 成功");
-                      _controller?.evaluateJavascript('nativeSignMsgToJsResult("$signResult")')?.then((result) {});
+                      _controller?.evaluateJavascript('nativeSignMsgToJsResult("$signResult")')?.then((result) {
+                        NavigatorUtils.goBack(context); //签名完成，关了密码弹框
+                      });
                     }
                   } else {
                     Fluttertoast.showToast(msg: "交易签名 失败");
+                    NavigatorUtils.goBack(context);
                   }
                 },
               );
