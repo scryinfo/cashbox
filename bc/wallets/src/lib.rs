@@ -112,7 +112,7 @@ mod tests {
         let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
         let mnemonic = "mirror craft oil voice there pizza quarter void inhale snack vacant kingdom force erupt congress wing correct bargain";
         let to = "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy";
-        let ret = wallet_rpc::transfer(&mut substrate_client,  mnemonic,to,"200");
+        let ret = wallet_rpc::transfer(&mut substrate_client,  mnemonic,to,"200000000000000");
         match ret {
             Ok(data)=>{
                 println!("signed data is: {}",data);

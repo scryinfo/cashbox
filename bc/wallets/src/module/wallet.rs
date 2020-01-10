@@ -379,8 +379,9 @@ pub fn raw_tx_sign(raw_tx:&str,wallet_id:&str,psw:&[u8])->Result<String,String>{
     match mnemonic {
         Ok(mnemonic)=>{
             let mn = String::from_utf8(mnemonic.mn).unwrap();
-            let mut_data = &mut &tx_encode_data[0..tx_encode_data.len()-40];
-            let extrinsic = node_runtime::UncheckedExtrinsic::decode(mut_data).unwrap();
+            let func_data = tx.func_data;
+            //let mut_data = &mut &tx_encode_data[0..tx_encode_data.len()-40];
+            let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &func_data[..]).unwrap();
             let sign_data = wallet_rpc::tx_sign(&mn,tx.genesis_hash,tx.index,extrinsic.function);
             // TODO 返回签名后的消息格式需要确定
            // Ok(hex::encode(&sign_data[..]))
