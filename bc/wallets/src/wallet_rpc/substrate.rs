@@ -58,7 +58,7 @@ pub fn transfer(client: &mut Rpc, mnemonic: &str, to: &str, amount: &str) -> Res
     Ok(result)
 }
 
-pub fn tx_sign(mnemonic: &str, genesis_hash: H256, index: u32, function: Call) -> String where {
+pub fn tx_sign(mnemonic: &str, genesis_hash: H256, index: u32, function: Call) -> String {
     let signer = wallet_crypto::Sr25519::pair_from_phrase(mnemonic, None);
    let extra = |i: Index, f: Balance| {
         (
