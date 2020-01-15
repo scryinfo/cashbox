@@ -346,7 +346,7 @@ class _EeePageState extends State<EeePage> {
                   ],
                 ),
                 onTap: () {
-                  NavigatorUtils.push(context, Routes.transferEeePage); //todo 目前只有eee，后续有多个代币时需要区分
+                  NavigatorUtils.push(context, Routes.transferEthPage);
                 },
               )),
           Container(

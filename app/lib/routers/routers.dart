@@ -15,7 +15,7 @@ class Routes {
   static String createWalletConfirmPage = '/createwalletconfirmpage';
   static String qrInfoPage = '/qrinfopage';
   static String importWalletPage = '/importwalletpage';
-  static String transferEeePage = '/transfereeepage';
+  static String transferEthPage = '/transferethpage';
 
   static String minePage = '/minepage';
   static String walletManagerListPage = '/walletmanagerlistpage';
@@ -48,7 +48,7 @@ class Routes {
     router.define(qrInfoPage, handler: qrInfoPageHandler);
     router.define(aboutUsPage, handler: aboutUsPageHandler);
     router.define(importWalletPage, handler: importWalletPageHandler);
-    router.define(transferEeePage, handler: transferEeePageHandler);
+    router.define(transferEthPage, handler: transferEthPageHandler);
     router.define(minePage, handler: minePageHandler);
     router.define(walletManagerListPage, handler: walletManagerListPageHandler);
     router.define(walletManagerPage, handler: walletManagerPageHandler);

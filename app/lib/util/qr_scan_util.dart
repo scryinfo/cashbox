@@ -1,5 +1,6 @@
 import 'package:app/generated/i18n.dart';
 import 'package:app/provide/sign_info_provide.dart';
+import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:flutter/services.dart';
@@ -35,6 +36,79 @@ class QrScanUtil {
       callbackResult = "";
     }
     return callbackResult;
+  }
+
+  Map checkScryCityTransfer(String qrInfo, BuildContext context) {
+    if (qrInfo.isEmpty) {
+      Fluttertoast.showToast(msg: S.of(context).qr_info_is_null);
+      return null;
+    }
+    //--------------------------拼装url里面的参数-----------------------
+    var paramIndex = qrInfo.indexOf("?");
+    if (paramIndex <= 0 || paramIndex == qrInfo.length - 1) {
+      Fluttertoast.showToast(msg: S.of(context).qr_info_is_wrong); //信息里面没? 或者就一个?
+      return null;
+    }
+    List paramsList = qrInfo.substring(paramIndex + 1).split("&");
+    Map paramsMap = Map();
+    paramsList.forEach((oneParamStr) {
+      int oneParamIndex = oneParamStr.indexOf("=");
+      if (oneParamIndex < 0) {
+        return;
+      }
+      var key = oneParamStr.substring(0, oneParamIndex);
+      if (!paramsMap.containsKey(key)) {
+        var value = oneParamStr.toString().substring(oneParamIndex + 1, oneParamStr.length);
+        paramsMap[key] = value;
+      }
+    });
+    if (paramsMap.isEmpty) {
+      Fluttertoast.showToast(msg: S.of(context).qr_info_is_wrong); //信息里面没? 或者就一个?
+      return null;
+    }
+    //--------------------------检查参数-----------------------
+    print("begin verify timestamp======>");
+    if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
+      Fluttertoast.showToast(msg: S.of(context).qr_info_is_out_of_date);
+      return null; //有效期有问题
+    }
+    print("begin verify chainType======>");
+    if (!paramsMap.containsKey("ct") || paramsMap["ct"] != "60") {
+      Fluttertoast.showToast(msg: S.of(context).not_sure_chain_type);
+      return null; //不知道是哪条链
+    }
+    print("begin verify ot======>");
+    if (!paramsMap.containsKey("ot") || paramsMap["ot"] != "t") {
+      Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
+      return null; //不知道要做什么操作
+    }
+
+    print("begin verify contract address======>");
+    if (!paramsMap.containsKey("ca") || paramsMap["ca"] != "t") {
+      Fluttertoast.showToast(msg: "合约地址不匹配");
+      return null; //不知道要做什么操作
+    }
+
+    print("begin verify To Address======>");
+    if (!paramsMap.containsKey("ta")) {
+      Fluttertoast.showToast(msg: "缺少转账目的地址");
+      return null; //不知道要做什么操作
+    }
+
+    print("begin verify values======>");
+    if (!paramsMap.containsKey("v") || paramsMap["v"] < 0) {
+      //Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
+      return null; //不清楚 转账多少
+    }
+
+    var toAddress = paramsMap["ta"];
+    var backup = paramsMap["bu"];
+    var value = paramsMap["v"];
+    Provider.of<TransactionProvide>(context).setToAddress(toAddress);
+    Provider.of<TransactionProvide>(context).setValue(value);
+    Provider.of<TransactionProvide>(context).setBackup(backup);
+
+    return paramsMap;
   }
 
   Map checkQrInfoByDiamondSignAndQr(String qrInfo, BuildContext context) {
