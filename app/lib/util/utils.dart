@@ -22,6 +22,18 @@ class Utils {
     var duration = end.difference(start);
     return duration.inSeconds;
   }
+
+  //double类型的值，取后面几位小数
+  static double formatDouble(double num, int position) {
+    if ((num.toString().length - num.toString().lastIndexOf(".") - 1) < position) {
+      //小数点后有几位小数
+      print("< position===>" + num.toStringAsFixed(position).substring(0, num.toString().lastIndexOf(".") + position + 1));
+      return double.parse(num.toStringAsFixed(position).substring(0, num.toString().lastIndexOf(".") + position + 1));
+    } else {
+      print("> position===>" + num.toString().substring(0, num.toString().lastIndexOf(".") + position + 1));
+      return double.parse(num.toString().substring(0, num.toString().lastIndexOf(".") + position + 1));
+    }
+  }
 }
 
 /// 默认dialog背景色为半透明黑色，这里修改源码改为透明
