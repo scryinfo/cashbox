@@ -139,7 +139,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             child: FlatButton(
               color: Color.fromRGBO(26, 141, 198, 0.2),
               onPressed: () {
-                NavigatorUtils.push(context, Routes.transferEeePage);
+                NavigatorUtils.push(context, Routes.transferEthPage);
               },
               child: Text(
                 S.of(context).transfer,

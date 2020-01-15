@@ -12,7 +12,7 @@ import '../page/create_wallet_page/create_wallet_mnemonic_page.dart';
 import '../page/create_wallet_page/create_wallet_confirm_page.dart';
 import '../page/qr_info_page/qr_info_page.dart';
 import '../page/import_wallet_page/import_wallet_page.dart';
-import '../page/transfer_eee_page/transfer_eee_page.dart';
+import '../page/transfer_eth_page/transfer_eth_page.dart';
 import '../page/mine_page/mine_page.dart';
 import '../page/wallet_manager_list_page/wallet_manager_list_page.dart';
 import '../page/wallet_manager_page/wallet_manage_page.dart';
@@ -67,8 +67,8 @@ Handler importWalletPageHandler = Handler(handlerFunc: (BuildContext context, Ma
   return ImportWalletPage();
 });
 
-Handler transferEeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return TransferEeePage();
+Handler transferEthPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return TransferEthPage();
 });
 
 Handler minePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

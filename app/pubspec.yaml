@@ -96,6 +96,7 @@ flutter:
     - assets/images/3.0x/
 
     # 调试本地加载html、js、css资源
+    - assets/dist/
     - assets/dist/index.html
     - assets/dist/favicon.ico
     - assets/dist/css/

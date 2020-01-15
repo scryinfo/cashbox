@@ -11,6 +11,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'page/entry_page.dart';
 import 'package:fluro/fluro.dart';
+import 'provide/transaction_provide.dart';
 import 'routers/routers.dart';
 import 'routers/application.dart';
 import 'package:app/res/resources.dart';
@@ -19,8 +20,8 @@ import 'package:flutter/rendering.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); //确保WidgetsFlutterBinding被初始化 把widget跟flutter绑定在一起。
-  //debugPaintLayerBordersEnabled=true;测试样式边界用
-  //debugPaintBaselinesEnabled=true;
+ //  debugPaintLayerBordersEnabled=true; //测试样式边界用
+ //  debugPaintBaselinesEnabled=true;
   ///强制竖屏
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
@@ -56,6 +57,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           builder: (_) => SignInfoProvide(),
+        ),
+        ChangeNotifierProvider(
+          builder: (_) => TransactionProvide(),
         ),
       ],
       child: Container(
