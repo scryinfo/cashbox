@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:app/generated/i18n.dart';
+import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/util/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -27,15 +29,30 @@ class _TransferEthPageState extends State<TransferEthPage> {
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
   String arrowIcon = "assets/images/ic_collapse.png";
-  double mMaxGasFee = 0.0009;
-  double mMinGasFee = 0.00003;
-  double mGasFeeValue = 0.00021;
-  double mMaxGasPrice = 30;
-  double mMinGasPrice = 1;
-  double mGasPriceValue = 3;
-  double mMaxGasLimit = 300000;
-  double mMinGasLimit = 21000;
-  double mGasLimitValue = 25000;
+  double mMaxGasPrice;
+  double mMinGasPrice;
+  double mMaxGasLimit;
+  double mMinGasLimit;
+  double mGasPriceValue;
+  double mGasLimitValue;
+  double mMaxGasFee;
+  double mMinGasFee;
+  double mGasFeeValue;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    initGasConfig();
+    mMaxGasPrice = GlobalConfig.getMaxGasPrice("eth");
+    mMinGasPrice = GlobalConfig.getMinGasPrice("eth");
+    mMaxGasLimit = GlobalConfig.getMaxGasLimit("eth");
+    mMinGasLimit = GlobalConfig.getMinGasLimit("eth");
+    mGasPriceValue = GlobalConfig.getDefaultGasPrice("eth");
+    mGasLimitValue = GlobalConfig.getDefaultGasLimit("eth");
+    mMaxGasFee = mMaxGasLimit * mMaxGasPrice / (1000 * 1000 * 1000);
+    mMinGasFee = mMinGasLimit * mMinGasPrice / (1000 * 1000 * 1000);
+    mGasFeeValue = mGasLimitValue * mGasPriceValue / (1000 * 1000 * 1000);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +79,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
     return true;
   }
 
+  void initGasConfig() {}
+
   Widget _buildTransferEeeWidget() {
     return Container(
       width: ScreenUtil().setWidth(80),
@@ -79,10 +98,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
             Gaps.scaleVGap(5),
             _buildPwdWidget(),
             Gaps.scaleVGap(5),
-            _buildMsgWidget(),
-            Gaps.scaleVGap(5),
             _buildGasFeeWidget(),
-            _buildExactGasDetailWidget(),
+            Gaps.scaleVGap(5),
+            _buildHideDetailWidget(),
             Gaps.scaleVGap(15),
             Container(
               alignment: Alignment.bottomCenter,
@@ -144,7 +162,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     alignment: Alignment.topRight,
                     width: ScreenUtil.instance.setWidth(40),
                     child: Text(
-                      mGasFeeValue.toString() + "eth",
+                      Utils.formatDouble(mGasFeeValue, 8).toString() + "eth",
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
                         fontSize: ScreenUtil.instance.setSp(3),
@@ -166,7 +184,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               overlayColor: Colors.blueAccent,
             ),
             child: new Container(
-              margin: const EdgeInsets.all(10.0),
+              margin: EdgeInsets.only(left: ScreenUtil.getInstance().setWidth(2)),
               child: new Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -175,7 +193,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     mMinGasFee.toString(),
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.8),
-                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontSize: ScreenUtil.instance.setSp(2.3),
                     ),
                   ),
                   new Expanded(
@@ -184,10 +202,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     max: mMaxGasFee,
                     onChanged: (double value) {
                       setState(() {
-                        mGasFeeValue = value;
+                        mGasFeeValue = Utils.formatDouble(value, 6);
                         print("mGasFeeValue===>" + mGasFeeValue.toString());
                       });
                     },
+                    divisions: 100,
                     //不想出现刻度和气泡,删除这个属性就可以了，自己实验
                     label: '$mGasFeeValue',
                     value: mGasFeeValue,
@@ -196,7 +215,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     mMaxGasFee.toString(),
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.8),
-                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontSize: ScreenUtil.instance.setSp(2.3),
                     ),
                   ),
                 ],
@@ -221,12 +240,12 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 children: <Widget>[
                   Container(
                     alignment: Alignment.topRight,
-                    width: ScreenUtil.instance.setWidth(70),
+                    width: ScreenUtil.instance.setWidth(75),
                     child: Text(
-                      "详细设置",
+                      "高级设置",
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.8),
-                        fontSize: ScreenUtil.instance.setSp(2.5),
+                        fontSize: ScreenUtil.instance.setSp(2.3),
                       ),
                     ),
                   ),
@@ -236,12 +255,13 @@ class _TransferEthPageState extends State<TransferEthPage> {
                   ),
                 ],
               )),
-        )
+        ),
+        Gaps.scaleVGap(5),
       ],
     ));
   }
 
-  Widget _buildExactGasDetailWidget() {
+  Widget _buildHideDetailWidget() {
     return AnimatedOpacity(
       duration: Duration(milliseconds: 300),
       opacity: isShowExactGas ? 1.0 : 0.0,
@@ -270,7 +290,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             alignment: Alignment.topRight,
                             width: ScreenUtil.instance.setWidth(40),
                             child: Text(
-                              mGasPriceValue.toString() + " wei",
+                              Utils.formatDouble(mGasPriceValue, 8).toString() + " wei",
                               style: TextStyle(
                                 color: Color.fromRGBO(255, 255, 255, 0.5),
                                 fontSize: ScreenUtil.instance.setSp(2.5),
@@ -301,7 +321,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             mMinGasPrice.toString() + "Gwei",
                             style: TextStyle(
                               color: Color.fromRGBO(255, 255, 255, 0.8),
-                              fontSize: ScreenUtil.instance.setSp(3),
+                              fontSize: ScreenUtil.instance.setSp(2.3),
                             ),
                           ),
                           new Expanded(
@@ -311,9 +331,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             onChanged: (double value) {
                               setState(() {
                                 mGasPriceValue = value;
-                                print("mGasPriceValue===>" + mGasPriceValue.toString());
+                                mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
+                                print("===>" + mGasPriceValue.toString() + "||===>" + mGasFeeValue.toString());
                               });
                             },
+                            divisions: 100,
                             //不想出现刻度和气泡,删除这个属性就可以了，自己实验
                             label: '$mGasPriceValue',
                             value: mGasPriceValue,
@@ -322,7 +344,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             mMaxGasPrice.toString() + "Gwei",
                             style: TextStyle(
                               color: Color.fromRGBO(255, 255, 255, 0.8),
-                              fontSize: ScreenUtil.instance.setSp(3),
+                              fontSize: ScreenUtil.instance.setSp(2.3),
                             ),
                           ),
                         ],
@@ -385,7 +407,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             mMinGasLimit.toString(),
                             style: TextStyle(
                               color: Color.fromRGBO(255, 255, 255, 0.8),
-                              fontSize: ScreenUtil.instance.setSp(3),
+                              fontSize: ScreenUtil.instance.setSp(2.3),
                             ),
                           ),
                           new Expanded(
@@ -395,9 +417,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             onChanged: (double value) {
                               setState(() {
                                 mGasLimitValue = value;
-                                print("mGasLimitValue===>" + mGasLimitValue.toString());
+                                mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
+                                print("===>" + mGasLimitValue.toString() + "||===>" + mGasFeeValue.toString());
                               });
                             },
+                            divisions: 100,
                             //不想出现刻度和气泡,删除这个属性就可以了，自己实验
                             label: '$mGasLimitValue',
                             value: mGasLimitValue,
@@ -406,7 +430,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             mMaxGasLimit.toString(),
                             style: TextStyle(
                               color: Color.fromRGBO(255, 255, 255, 0.8),
-                              fontSize: ScreenUtil.instance.setSp(3),
+                              fontSize: ScreenUtil.instance.setSp(2.3),
                             ),
                           ),
                         ],
@@ -415,6 +439,52 @@ class _TransferEthPageState extends State<TransferEthPage> {
                   ),
                 ),
               ],
+            ),
+            Container(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      S.of(context).extend_msg,
+                      style: TextStyle(
+                        color: Color.fromRGBO(255, 255, 255, 0.5),
+                        fontSize: ScreenUtil.instance.setSp(3),
+                      ),
+                    ),
+                  ),
+                  Gaps.scaleVGap(2),
+                  Container(
+                    alignment: Alignment.center,
+                    height: ScreenUtil().setHeight(13),
+                    child: TextField(
+                      textAlign: TextAlign.start,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        fillColor: Color.fromRGBO(101, 98, 98, 0.50),
+                        filled: true,
+                        contentPadding:
+                            EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
+                        labelStyle: TextStyle(
+                          color: Colors.white,
+                        ),
+                        hintText: S.of(context).hint_extend_msg_option,
+                        hintStyle: TextStyle(
+                          color: Color.fromRGBO(255, 255, 255, 0.7),
+                          fontSize: ScreenUtil.instance.setSp(3.5),
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black87),
+                          borderRadius: BorderRadius.circular(
+                            ScreenUtil().setWidth(1.0),
+                          ),
+                        ),
+                      ),
+                      controller: _extendMsgController,
+                    ),
+                  ),
+                ],
+              ),
             )
           ],
         ),
@@ -603,55 +673,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 ),
               ),
               controller: _pwdController,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMsgWidget() {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.topLeft,
-            child: Text(
-              S.of(context).extend_msg,
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
-              ),
-            ),
-          ),
-          Gaps.scaleVGap(2),
-          Container(
-            alignment: Alignment.center,
-            height: ScreenUtil().setHeight(13),
-            child: TextField(
-              textAlign: TextAlign.start,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                fillColor: Color.fromRGBO(101, 98, 98, 0.50),
-                filled: true,
-                contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
-                labelStyle: TextStyle(
-                  color: Colors.white,
-                ),
-                hintText: S.of(context).hint_extend_msg_option,
-                hintStyle: TextStyle(
-                  color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: ScreenUtil.instance.setSp(3.5),
-                ),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black87),
-                  borderRadius: BorderRadius.circular(
-                    ScreenUtil().setWidth(1.0),
-                  ),
-                ),
-              ),
-              controller: _extendMsgController,
             ),
           ),
         ],
