@@ -27,10 +27,8 @@ class Utils {
   static double formatDouble(double num, int position) {
     if ((num.toString().length - num.toString().lastIndexOf(".") - 1) < position) {
       //小数点后有几位小数
-      print("< position===>" + num.toStringAsFixed(position).substring(0, num.toString().lastIndexOf(".") + position + 1));
       return double.parse(num.toStringAsFixed(position).substring(0, num.toString().lastIndexOf(".") + position + 1));
     } else {
-      print("> position===>" + num.toString().substring(0, num.toString().lastIndexOf(".") + position + 1));
       return double.parse(num.toString().substring(0, num.toString().lastIndexOf(".") + position + 1));
     }
   }
