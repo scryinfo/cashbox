@@ -5,10 +5,16 @@ import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/provide/transaction_provide.dart';
+import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/routers/routers.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/utils.dart';
+import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
@@ -20,12 +26,12 @@ class TransferEthPage extends StatefulWidget {
 }
 
 class _TransferEthPageState extends State<TransferEthPage> {
-  TextEditingController _toAddrController = TextEditingController();
-  TextEditingController _valueController = TextEditingController();
-  TextEditingController _pwdController = TextEditingController();
-  TextEditingController _extendMsgController = TextEditingController();
-  String toAddrString;
+  TextEditingController _toAddressController = TextEditingController();
+  TextEditingController _txValueController = TextEditingController();
+  TextEditingController _backupMsgController = TextEditingController();
+  String toAddressValue;
   bool isShowExactGas = false;
+  int standardAddressLength = 42; //以太坊标准地址42位
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
   String arrowIcon = "assets/images/ic_collapse.png";
@@ -42,7 +48,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    initGasConfig();
+    initDataConfig();
     mMaxGasPrice = GlobalConfig.getMaxGasPrice("eth");
     mMinGasPrice = GlobalConfig.getMinGasPrice("eth");
     mMaxGasLimit = GlobalConfig.getMaxGasLimit("eth");
@@ -76,10 +82,27 @@ class _TransferEthPageState extends State<TransferEthPage> {
   }
 
   bool _verifyTransferInfo() {
+    if (_toAddressController.text.trim() == "") {
+      Fluttertoast.showToast(msg: "请检查对方地址不能为空");
+      return false;
+    }
+    // todo 暂时放开
+    // if (_toAddressController.text.length != standardAddressLength) {
+    //   Fluttertoast.showToast(msg: "对方地址格式 有问题");
+    //   return false;
+    // }
+    if (_txValueController.text.trim() == "" || int.parse(_txValueController.text.trim()) <= 0) {
+      Fluttertoast.showToast(msg: "转账数额不能为空，或者小于0");
+      return false;
+    }
     return true;
   }
 
-  void initGasConfig() {}
+  void initDataConfig() {
+    _txValueController.text = Provider.of<TransactionProvide>(context).txValue;
+    _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress;
+    _backupMsgController.text = Provider.of<TransactionProvide>(context).backup;
+  }
 
   Widget _buildTransferEeeWidget() {
     return Container(
@@ -92,14 +115,12 @@ class _TransferEthPageState extends State<TransferEthPage> {
         child: Column(
           children: [
             Gaps.scaleVGap(5),
-            _buildToAddrWidget(),
+            _buildToAddressWidget(),
             Gaps.scaleVGap(5),
             _buildValueWidget(),
             Gaps.scaleVGap(5),
-            _buildPwdWidget(),
-            Gaps.scaleVGap(5),
             _buildGasFeeWidget(),
-            Gaps.scaleVGap(5),
+            Gaps.scaleVGap(3),
             _buildHideDetailWidget(),
             Gaps.scaleVGap(15),
             Container(
@@ -110,16 +131,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               child: FlatButton(
                 onPressed: () async {
                   if (_verifyTransferInfo()) {
-                    Wallet wallet = await Wallets.instance.getNowWalletModel();
-                    ChainEEE chainEEE = wallet.getChainByChainType(ChainType.EEE);
-                    //todo 1009 parker
-                    Map map = await chainEEE.eeeEnergyTransfer("5FYmQQAcL3LyRM215UjXKZhDVBWens66BEL5SoN4qw4JQeuB",
-                        Uint8List.fromList(_pwdController.text.codeUnits), _toAddrController.text, _valueController.text, _extendMsgController.text);
-                    //NavigatorUtils.push(
-                    //  context,
-                    //  Routes.eeePage,
-                    //  clearStack: true,
-                    //);
+                    _showPwdDialog(context);
                   }
                 },
                 child: Text(
@@ -223,6 +235,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
             ),
           ),
         ),
+        Gaps.scaleVGap(1),
         Container(
           child: GestureDetector(
               onTap: () async {
@@ -233,7 +246,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
                   } else {
                     arrowIcon = arrowUpIcon;
                   }
-                  print("isShowExactGas=-=====>" + isShowExactGas.toString());
                 });
               },
               child: Row(
@@ -262,237 +274,239 @@ class _TransferEthPageState extends State<TransferEthPage> {
   }
 
   Widget _buildHideDetailWidget() {
-    return isShowExactGas? AnimatedOpacity(
-      duration: Duration(milliseconds: 300),
-      opacity: isShowExactGas ? 1.0 : 0.0,
-      child: Container(
-        child: Column(
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                Container(
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                      child: Row(
-                        children: <Widget>[
-                          Container(
-                            width: ScreenUtil.instance.setWidth(40),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Gas Price",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.5),
-                                fontSize: ScreenUtil.instance.setSp(2.5),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment.topRight,
-                            width: ScreenUtil.instance.setWidth(40),
-                            child: Text(
-                              Utils.formatDouble(mGasPriceValue, 8).toString() + " wei",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.5),
-                                fontSize: ScreenUtil.instance.setSp(2.5),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    )),
-                Container(
-                  child: SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.pink,
-                      activeTickMarkColor: Colors.white,
-                      inactiveTickMarkColor: Colors.white,
-                      inactiveTrackColor: Colors.white70,
-                      valueIndicatorColor: Colors.grey,
-                      thumbColor: Colors.white,
-                      overlayColor: Colors.pink,
-                    ),
-                    child: new Container(
-                      margin: const EdgeInsets.only(left: 10.0, right: 10),
-                      child: new Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          new Text(
-                            mMinGasPrice.toString() + "Gwei",
-                            style: TextStyle(
-                              color: Color.fromRGBO(255, 255, 255, 0.8),
-                              fontSize: ScreenUtil.instance.setSp(2.3),
-                            ),
-                          ),
-                          new Expanded(
-                              child: new Slider(
-                            min: mMinGasPrice,
-                            max: mMaxGasPrice,
-                            onChanged: (double value) {
-                              setState(() {
-                                mGasPriceValue = value;
-                                mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
-                                print("===>" + mGasPriceValue.toString() + "||===>" + mGasFeeValue.toString());
-                              });
-                            },
-                            divisions: 100,
-                            //不想出现刻度和气泡,删除这个属性就可以了，自己实验
-                            label: '$mGasPriceValue',
-                            value: mGasPriceValue,
-                          )),
-                          new Text(
-                            mMaxGasPrice.toString() + "Gwei",
-                            style: TextStyle(
-                              color: Color.fromRGBO(255, 255, 255, 0.8),
-                              fontSize: ScreenUtil.instance.setSp(2.3),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              children: <Widget>[
-                Container(
-                    alignment: Alignment.topLeft,
-                    child: Container(
-                      child: Row(
-                        children: <Widget>[
-                          Container(
-                            width: ScreenUtil.instance.setWidth(40),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Gas Limit",
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.5),
-                                fontSize: ScreenUtil.instance.setSp(2.5),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment.topRight,
-                            width: ScreenUtil.instance.setWidth(40),
-                            child: Text(
-                              mGasLimitValue.toString(),
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.5),
-                                fontSize: ScreenUtil.instance.setSp(2.5),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    )),
-                Container(
-                  child: SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.pink,
-                      activeTickMarkColor: Colors.white,
-                      inactiveTickMarkColor: Colors.white,
-                      inactiveTrackColor: Colors.white70,
-                      valueIndicatorColor: Colors.grey,
-                      thumbColor: Colors.white,
-                      overlayColor: Colors.pink,
-                    ),
-                    child: new Container(
-                      margin: const EdgeInsets.only(left: 10.0, right: 10),
-                      child: new Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          new Text(
-                            mMinGasLimit.toString(),
-                            style: TextStyle(
-                              color: Color.fromRGBO(255, 255, 255, 0.8),
-                              fontSize: ScreenUtil.instance.setSp(2.3),
-                            ),
-                          ),
-                          new Expanded(
-                              child: new Slider(
-                            min: mMinGasLimit,
-                            max: mMaxGasLimit,
-                            onChanged: (double value) {
-                              setState(() {
-                                mGasLimitValue = value;
-                                mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
-                                print("===>" + mGasLimitValue.toString() + "||===>" + mGasFeeValue.toString());
-                              });
-                            },
-                            divisions: 100,
-                            //不想出现刻度和气泡,删除这个属性就可以了，自己实验
-                            label: '$mGasLimitValue',
-                            value: mGasLimitValue,
-                          )),
-                          new Text(
-                            mMaxGasLimit.toString(),
-                            style: TextStyle(
-                              color: Color.fromRGBO(255, 255, 255, 0.8),
-                              fontSize: ScreenUtil.instance.setSp(2.3),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Container(
+    return isShowExactGas
+        ? AnimatedOpacity(
+            duration: Duration(milliseconds: 300),
+            opacity: isShowExactGas ? 1.0 : 0.0,
+            child: Container(
               child: Column(
                 children: <Widget>[
-                  Container(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      S.of(context).extend_msg,
-                      style: TextStyle(
-                        color: Color.fromRGBO(255, 255, 255, 0.5),
-                        fontSize: ScreenUtil.instance.setSp(3),
-                      ),
-                    ),
-                  ),
-                  Gaps.scaleVGap(2),
-                  Container(
-                    alignment: Alignment.center,
-                    height: ScreenUtil().setHeight(13),
-                    child: TextField(
-                      textAlign: TextAlign.start,
-                      style: TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        fillColor: Color.fromRGBO(101, 98, 98, 0.50),
-                        filled: true,
-                        contentPadding:
-                            EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
-                        labelStyle: TextStyle(
-                          color: Colors.white,
-                        ),
-                        hintText: S.of(context).hint_extend_msg_option,
-                        hintStyle: TextStyle(
-                          color: Color.fromRGBO(255, 255, 255, 0.7),
-                          fontSize: ScreenUtil.instance.setSp(3.5),
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black87),
-                          borderRadius: BorderRadius.circular(
-                            ScreenUtil().setWidth(1.0),
+                  Column(
+                    children: <Widget>[
+                      Container(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  width: ScreenUtil.instance.setWidth(40),
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "Gas Price",
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(255, 255, 255, 0.5),
+                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  alignment: Alignment.topRight,
+                                  width: ScreenUtil.instance.setWidth(40),
+                                  child: Text(
+                                    Utils.formatDouble(mGasPriceValue, 8).toString() + " wei",
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(255, 255, 255, 0.5),
+                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )),
+                      Container(
+                        child: SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            activeTrackColor: Colors.pink,
+                            activeTickMarkColor: Colors.white,
+                            inactiveTickMarkColor: Colors.white,
+                            inactiveTrackColor: Colors.white70,
+                            valueIndicatorColor: Colors.grey,
+                            thumbColor: Colors.white,
+                            overlayColor: Colors.pink,
+                          ),
+                          child: new Container(
+                            margin: const EdgeInsets.only(left: 10.0, right: 10),
+                            child: new Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                new Text(
+                                  mMinGasPrice.toString() + "Gwei",
+                                  style: TextStyle(
+                                    color: Color.fromRGBO(255, 255, 255, 0.8),
+                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                  ),
+                                ),
+                                new Expanded(
+                                    child: new Slider(
+                                  min: mMinGasPrice,
+                                  max: mMaxGasPrice,
+                                  onChanged: (double value) {
+                                    setState(() {
+                                      mGasPriceValue = value;
+                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
+                                      print("===>" + mGasPriceValue.toString() + "||===>" + mGasFeeValue.toString());
+                                    });
+                                  },
+                                  divisions: 100,
+                                  //不想出现刻度和气泡,删除这个属性就可以了，自己实验
+                                  label: '$mGasPriceValue',
+                                  value: mGasPriceValue,
+                                )),
+                                new Text(
+                                  mMaxGasPrice.toString() + "Gwei",
+                                  style: TextStyle(
+                                    color: Color.fromRGBO(255, 255, 255, 0.8),
+                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                      controller: _extendMsgController,
-                    ),
+                    ],
                   ),
+                  Column(
+                    children: <Widget>[
+                      Container(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  width: ScreenUtil.instance.setWidth(40),
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "Gas Limit",
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(255, 255, 255, 0.5),
+                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  alignment: Alignment.topRight,
+                                  width: ScreenUtil.instance.setWidth(40),
+                                  child: Text(
+                                    mGasLimitValue.toString(),
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(255, 255, 255, 0.5),
+                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )),
+                      Container(
+                        child: SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            activeTrackColor: Colors.pink,
+                            activeTickMarkColor: Colors.white,
+                            inactiveTickMarkColor: Colors.white,
+                            inactiveTrackColor: Colors.white70,
+                            valueIndicatorColor: Colors.grey,
+                            thumbColor: Colors.white,
+                            overlayColor: Colors.pink,
+                          ),
+                          child: new Container(
+                            margin: const EdgeInsets.only(left: 10.0, right: 10),
+                            child: new Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                new Text(
+                                  mMinGasLimit.toString(),
+                                  style: TextStyle(
+                                    color: Color.fromRGBO(255, 255, 255, 0.8),
+                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                  ),
+                                ),
+                                new Expanded(
+                                    child: new Slider(
+                                  min: mMinGasLimit,
+                                  max: mMaxGasLimit,
+                                  onChanged: (double value) {
+                                    setState(() {
+                                      mGasLimitValue = value;
+                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
+                                      print("===>" + mGasLimitValue.toString() + "||===>" + mGasFeeValue.toString());
+                                    });
+                                  },
+                                  divisions: 100,
+                                  //不想出现刻度和气泡,删除这个属性就可以了，自己实验
+                                  label: '$mGasLimitValue',
+                                  value: mGasLimitValue,
+                                )),
+                                new Text(
+                                  mMaxGasLimit.toString(),
+                                  style: TextStyle(
+                                    color: Color.fromRGBO(255, 255, 255, 0.8),
+                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            S.of(context).extend_msg,
+                            style: TextStyle(
+                              color: Color.fromRGBO(255, 255, 255, 0.5),
+                              fontSize: ScreenUtil.instance.setSp(3),
+                            ),
+                          ),
+                        ),
+                        Gaps.scaleVGap(2),
+                        Container(
+                          alignment: Alignment.center,
+                          height: ScreenUtil().setHeight(13),
+                          child: TextField(
+                            textAlign: TextAlign.start,
+                            style: TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              fillColor: Color.fromRGBO(101, 98, 98, 0.50),
+                              filled: true,
+                              contentPadding: EdgeInsets.only(
+                                  left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
+                              labelStyle: TextStyle(
+                                color: Colors.white,
+                              ),
+                              hintText: S.of(context).hint_extend_msg_option,
+                              hintStyle: TextStyle(
+                                color: Color.fromRGBO(255, 255, 255, 0.7),
+                                fontSize: ScreenUtil.instance.setSp(3.5),
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.black87),
+                                borderRadius: BorderRadius.circular(
+                                  ScreenUtil().setWidth(1.0),
+                                ),
+                              ),
+                            ),
+                            controller: _backupMsgController,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
-            )
-          ],
-        ),
-      ),
-    ) : Gaps.scaleHGap(1);
+            ),
+          )
+        : Gaps.scaleHGap(1);
   }
 
-  Widget _buildToAddrWidget() {
+  Widget _buildToAddressWidget() {
     return Container(
       child: Column(
         children: <Widget>[
@@ -530,7 +544,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                         top: ScreenUtil().setHeight(5),
                         bottom: ScreenUtil().setHeight(5),
                       ),
-                      labelText: toAddrString,
+                      labelText: toAddressValue,
                       labelStyle: TextStyle(
                         color: Colors.white,
                         height: ScreenUtil().setHeight(40),
@@ -548,7 +562,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                         ),
                       ),
                     ),
-                    controller: _toAddrController,
+                    controller: _toAddressController,
                   ),
                 ),
                 Container(
@@ -564,7 +578,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                       Future<String> qrResult = QrScanUtil.instance.qrscan();
                       qrResult.then((t) {
                         setState(() {
-                          toAddrString = t.toString();
+                          toAddressValue = t.toString();
                         });
                       }).catchError((e) {
                         Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code);
@@ -623,7 +637,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                   ),
                 ),
               ),
-              controller: _valueController,
+              controller: _txValueController,
             ),
           ),
         ],
@@ -631,52 +645,33 @@ class _TransferEthPageState extends State<TransferEthPage> {
     );
   }
 
-  Widget _buildPwdWidget() {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.topLeft,
-            child: Text(
-              S.of(context).pwd,
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
-              ),
-            ),
-          ),
-          Gaps.scaleVGap(2),
-          Container(
-            alignment: Alignment.center,
-            height: ScreenUtil().setHeight(13),
-            child: TextField(
-              textAlign: TextAlign.start,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                fillColor: Color.fromRGBO(101, 98, 98, 0.50),
-                filled: true,
-                contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
-                labelStyle: TextStyle(
-                  color: Colors.white,
-                ),
-                hintText: S.of(context).pls_input_wallet_pwd,
-                hintStyle: TextStyle(
-                  color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: ScreenUtil.instance.setSp(3.5),
-                ),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black87),
-                  borderRadius: BorderRadius.circular(
-                    ScreenUtil().setWidth(1.0),
-                  ),
-                ),
-              ),
-              controller: _pwdController,
-            ),
-          ),
-        ],
-      ),
+  void _showPwdDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PwdDialog(
+          title: "钱包密码",
+          hintContent: "提示：请输入您的密码,进行签名操作。",
+          hintInput: "请输入钱包密码",
+          onPressed: (value) async {
+            print("_showPwdDialog pwd is ===>" + value);
+
+            //todo 密码拿到，准备交易签名
+            _toAddressController.text.toString();
+            _txValueController.text.toString();
+            _backupMsgController.text.toString();
+
+            Wallet wallet = await Wallets.instance.getNowWalletModel();
+            ChainETH chainETH = wallet.getChainByChainType(ChainType.ETH);
+
+            // NavigatorUtils.push(
+            //   context,
+            //   Routes.eeePage,
+            //   clearStack: true,
+            // );
+          },
+        );
+      },
     );
   }
 }
