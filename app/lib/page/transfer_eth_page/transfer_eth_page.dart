@@ -91,7 +91,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
     //   Fluttertoast.showToast(msg: "对方地址格式 有问题");
     //   return false;
     // }
-    if (_txValueController.text.trim() == "" || int.parse(_txValueController.text.trim()) <= 0) {
+    if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
       Fluttertoast.showToast(msg: "转账数额不能为空，或者小于0");
       return false;
     }
