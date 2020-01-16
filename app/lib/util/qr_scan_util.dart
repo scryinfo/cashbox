@@ -1,4 +1,5 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/global_config/global_config.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -38,7 +39,7 @@ class QrScanUtil {
     return callbackResult;
   }
 
-  Map checkScryCityTransfer(String qrInfo, BuildContext context) {
+  Map checkByScryCityTransfer(String qrInfo, BuildContext context) {
     if (qrInfo.isEmpty) {
       Fluttertoast.showToast(msg: S.of(context).qr_info_is_null);
       return null;
@@ -67,6 +68,7 @@ class QrScanUtil {
       return null;
     }
     //--------------------------检查参数-----------------------
+    print("paramsMap======>" + paramsMap.toString());
     print("begin verify timestamp======>");
     if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
       Fluttertoast.showToast(msg: S.of(context).qr_info_is_out_of_date);
@@ -84,7 +86,7 @@ class QrScanUtil {
     }
 
     print("begin verify contract address======>");
-    if (!paramsMap.containsKey("ca") || paramsMap["ca"] != "t") {
+    if (!paramsMap.containsKey("ca") || paramsMap["ca"].toLowerCase() != GlobalConfig.DddTestNetContractAddress.toLowerCase()) {
       Fluttertoast.showToast(msg: "合约地址不匹配");
       return null; //不知道要做什么操作
     }
@@ -96,8 +98,8 @@ class QrScanUtil {
     }
 
     print("begin verify values======>");
-    if (!paramsMap.containsKey("v") || paramsMap["v"] < 0) {
-      //Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
+    if (!paramsMap.containsKey("v") || double.parse(paramsMap["v"]) < 0) {
+      Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
       return null; //不清楚 转账多少
     }
 
@@ -107,7 +109,9 @@ class QrScanUtil {
     Provider.of<TransactionProvide>(context).setToAddress(toAddress);
     Provider.of<TransactionProvide>(context).setValue(value);
     Provider.of<TransactionProvide>(context).setBackup(backup);
-
+    {
+      NavigatorUtils.push(context, Routes.transferEthPage);
+    }
     return paramsMap;
   }
 
@@ -205,9 +209,8 @@ class QrScanUtil {
       return false; //时间戳有问题，
     }
     int nowTimeStamp = DateTime.now().millisecondsSinceEpoch; //当前时间戳
-    print("qrTimeStamp===>" + qrTimeStamp);
-    print("qrTimeStamp===>" + qrTimeStamp.runtimeType.toString());
     int qrTime = int.parse(qrTimeStamp);
+    print("qrTimeStamp===>" + qrTimeStamp + " || nowTimeStamp===>" + nowTimeStamp.toString());
     if (qrTime * 1000 > nowTimeStamp) {
       return true; //数据正常，且还在有效期内
     }
