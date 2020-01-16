@@ -262,7 +262,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   }
 
   Widget _buildHideDetailWidget() {
-    return AnimatedOpacity(
+    return isShowExactGas? AnimatedOpacity(
       duration: Duration(milliseconds: 300),
       opacity: isShowExactGas ? 1.0 : 0.0,
       child: Container(
@@ -489,7 +489,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
           ],
         ),
       ),
-    );
+    ) : Gaps.scaleHGap(1);
   }
 
   Widget _buildToAddrWidget() {
