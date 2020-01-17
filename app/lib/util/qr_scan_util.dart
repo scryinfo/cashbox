@@ -86,7 +86,7 @@ class QrScanUtil {
     }
 
     print("begin verify contract address======>");
-    if (!paramsMap.containsKey("ca") || paramsMap["ca"].toLowerCase() != GlobalConfig.DddTestNetContractAddress.toLowerCase()) {
+    if (!paramsMap.containsKey("ca") || paramsMap["ca"].toLowerCase() != DddTestNetContractAddress.toLowerCase()) {
       Fluttertoast.showToast(msg: "合约地址不匹配");
       return null; //不知道要做什么操作
     }
