@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'chain.dart';
 import 'digit.dart';
+import 'ffi/wallet_ffi.dart';
 
 //钱包管理
 class Wallets {
@@ -232,6 +233,13 @@ class Wallets {
       LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
     }
     return eeeTxSignMap;
+  }
+
+  Future<Map> ethTxSign(String walletId, String fromAddress, String toAddress, String value, String backup, Uint8List pwd) async {
+    WalletFFI.assembleEthTx(walletId, value, fromAddress, toAddress, backup); //todo ffi assemble TX
+    // todo Sign assemble Tx
+
+    return Map();
   }
 
   Future<Map> eeeSign(String walletId, Uint8List pwd, String rawTx) async {

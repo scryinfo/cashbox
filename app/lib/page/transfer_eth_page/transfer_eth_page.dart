@@ -653,17 +653,16 @@ class _TransferEthPageState extends State<TransferEthPage> {
           title: "钱包密码",
           hintContent: "提示：请输入您的密码,进行签名操作。",
           hintInput: "请输入钱包密码",
-          onPressed: (value) async {
-            print("_showPwdDialog pwd is ===>" + value);
+          onPressed: (String pwd) async {
+            print("_showPwdDialog pwd is ===>" + pwd);
 
-            //todo 密码拿到，准备交易签名
-            _toAddressController.text.toString();
-            _txValueController.text.toString();
-            _backupMsgController.text.toString();
-
-            Wallet wallet = await Wallets.instance.getNowWalletModel();
-            ChainETH chainETH = wallet.getChainByChainType(ChainType.ETH);
-
+            Wallet walletModel = await Wallets.instance.getNowWalletModel();
+            ChainETH chainETH = walletModel.getChainByChainType(ChainType.ETH);
+            String fromAddress = chainETH.chainAddress;
+            String walletId = await Wallets.instance.getNowWalletId();
+            // todo  FFI拼接好交易 TODO  再去 签名功能动态库签名
+            Wallets.instance.ethTxSign(walletId, fromAddress, _toAddressController.text.toString(), _txValueController.text,
+                _backupMsgController.text, Uint8List.fromList(pwd.codeUnits));
             // NavigatorUtils.push(
             //   context,
             //   Routes.eeePage,
