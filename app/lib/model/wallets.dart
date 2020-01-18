@@ -237,13 +237,13 @@ class Wallets {
 
   Future<Map> ethTxSign(String walletId, String fromAddress, String toAddress, String value, String backup, Uint8List pwd) async {
     WalletFFI walletFFI = new WalletFFI();
-    Map ethTxSignMap = await WalletManager.ethTxSign(walletId, pwd, txResultString);
     // todo ffi  assemble TX
     var txResultString = walletFFI.assembleEthTx(walletId, value, fromAddress, toAddress, backup);
     if (txResultString.isEmpty || txResultString.trim() == "") {
       LogUtil.e("ethTxSign=======>", "txResultString.isEmpty");
-      return ethTxSignMap;
+      return new Map();
     }
+    Map ethTxSignMap = await WalletManager.ethTxSign(walletId, pwd, txResultString);
     // todo Sign assembled TxInfo
     int status = ethTxSignMap["status"];
     if (status == null || status != 200) {
