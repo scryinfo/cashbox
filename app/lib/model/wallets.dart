@@ -236,10 +236,20 @@ class Wallets {
   }
 
   Future<Map> ethTxSign(String walletId, String fromAddress, String toAddress, String value, String backup, Uint8List pwd) async {
-    WalletFFI.assembleEthTx(walletId, value, fromAddress, toAddress, backup); //todo ffi assemble TX
-    // todo Sign assemble Tx
-
-    return Map();
+    WalletFFI walletFFI = new WalletFFI();
+    Map ethTxSignMap = await WalletManager.ethTxSign(walletId, pwd, txResultString);
+    // todo ffi  assemble TX
+    var txResultString = walletFFI.assembleEthTx(walletId, value, fromAddress, toAddress, backup);
+    if (txResultString.isEmpty || txResultString.trim() == "") {
+      LogUtil.e("ethTxSign=======>", "txResultString.isEmpty");
+      return ethTxSignMap;
+    }
+    // todo Sign assembled TxInfo
+    int status = ethTxSignMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethTxSignMap["message"]);
+    }
+    return ethTxSignMap;
   }
 
   Future<Map> eeeSign(String walletId, Uint8List pwd, String rawTx) async {

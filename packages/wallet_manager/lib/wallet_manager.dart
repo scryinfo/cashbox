@@ -157,6 +157,12 @@ class WalletManager {
     return eeeTxSignMap;
   }
 
+  //Eth交易签名
+  static Future<Map<dynamic, dynamic>> ethTxSign(String walletId, Uint8List pwd, String rawTx) async {
+    Map<dynamic, dynamic> ethTxSignMap = await _channel.invokeMethod("ethTxSign", {"rawTx": rawTx, "mnId": walletId, "pwd": pwd});
+    return ethTxSignMap;
+  }
+
   static Future<Map<dynamic, dynamic>> eeeSign(String walletId, Uint8List pwd, String rawTx) async {
     Map<dynamic, dynamic> eeeTxSignMap = await _channel.invokeMethod("eeeSign", {"rawTx": rawTx, "mnId": walletId, "pwd": pwd});
     return eeeTxSignMap;
