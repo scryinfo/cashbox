@@ -257,6 +257,7 @@ public class NativeLib {
         public String message;              //详细错误信息
         public String signedInfo;           //签名后信息
         public String energyTransferInfo;   //转能量结果hash
+        public String ethSignedInfo;        //签名eth交易 所得信息
     }
 
     //获取拼装原始交易，区分链类型
@@ -292,6 +293,11 @@ public class NativeLib {
 
 
     /*------------------------------------------交易相关------------------------------------------*/
+
+    // Eth 交易签名。签名结果是：交易类型
+    public static native Message ethTxSign(String rawTx, String mnId, byte[] pwd);
+
+
     //ETH 交易拼装。   返回：未签名的交易 String。
     //nonce记录位置？？？
     public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String toAddress, String value,
