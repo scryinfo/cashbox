@@ -27,13 +27,12 @@ Future<String> loadErc20Balance(String address) async {
   return null;
 }
 
-Future<List> loadEthTxHistory(String address) async {
-  var modelArray = [];
+Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
+  List<EthTransactionModel> modelArray = [];
   try {
     var res = await request(assembleEthTxListUrl("0xa4512ca7618d8d12a30C28979153aB09809ED7fD"));
     print("Eth_Tx_List=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
-      print("Eth_Tx_List res.result.=====================>" + res["result"].length.toString());
       for (var i = 0; i < res["result"].length; i++) {
         var ethTxModel = new EthTransactionModel();
         ethTxModel

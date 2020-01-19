@@ -1,6 +1,5 @@
 import 'package:app/generated/i18n.dart';
 import 'package:app/model/digit.dart';
-import 'package:app/model/rate.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -28,31 +27,23 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     future = getData(); //todo initData
   }
 
-  Future<List<Digit>> getData() async {
+  Future<List<EthTransactionModel>> getData() async {
     try {
       ethTxListModel = await loadEthTxHistory("");
-    } catch (e) {
-      print("loadEthTxHistory e===>" + e);
+      print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
+    } catch (onError) {
+      print("onError===>" + "$onError");
     }
     print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
-    //todo mock data to test
-    for (var i = 0; i < 10; i++) {
-      Digit digit = EeeDigit();
-      digit.chainId = "chainId001";
-      digit.shortName = "ETH" + i.toString();
-      digit.fullName = "ETHereum";
-      digit.balance = "15";
-      digit.money = "666";
-      var digitRate = DigitRate();
-      digitRate.volume = 0.035;
-      digitRate.changeHourly = 0.096;
-      digit.digitRate = digitRate;
-      showDataList.add(digit);
-    }
-    return showDataList;
+    return ethTxListModel;
   }
 
   @override
@@ -250,7 +241,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 child: _makeTxItemWidget(index),
               );
             },
-            childCount: showDataList.length,
+            childCount: ethTxListModel.length,
           ),
         ),
       ],
@@ -290,7 +281,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        showDataList[index].shortName,
+                        ethTxListModel[index].value,
                         style: TextStyle(
                           color: Colors.greenAccent,
                           fontSize: ScreenUtil.instance.setSp(3.5),
@@ -303,7 +294,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                     Container(
                       width: ScreenUtil().setWidth(30),
                       child: Text(
-                        "0x132135431",
+                        ethTxListModel[index].hash,
                         style: TextStyle(
                           color: Color.fromRGBO(255, 255, 255, 0.7),
                           fontSize: ScreenUtil.instance.setSp(3),
@@ -329,7 +320,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "* 发送中",
+                        ethTxListModel[index].txreceipt_status,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: ScreenUtil.instance.setSp(2.5),
@@ -341,7 +332,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                     Container(
                       width: ScreenUtil().setWidth(30),
                       child: Text(
-                        "2019.07.01",
+                        ethTxListModel[index].timeStamp,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: ScreenUtil.instance.setSp(2.5),
