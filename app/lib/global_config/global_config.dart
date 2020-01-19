@@ -31,6 +31,7 @@ class GlobalConfig {
   }
 }
 
+const Eth_Unit = 1000000000000000000; // 18位
 const DddMainNetContractAddress = "0x9F5F3CFD7a32700C93F971637407ff17b91c7342";
 const DddTestNetContractAddress = "0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e";
 

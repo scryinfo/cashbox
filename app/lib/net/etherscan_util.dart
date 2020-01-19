@@ -31,21 +31,18 @@ Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
   List<EthTransactionModel> modelArray = [];
   try {
     var res = await request(assembleEthTxListUrl("0xa4512ca7618d8d12a30C28979153aB09809ED7fD"));
-    print("Eth_Tx_List=====================>" + res.toString());
+    print("loadEthTxHistory=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       for (var i = 0; i < res["result"].length; i++) {
         var ethTxModel = new EthTransactionModel();
         ethTxModel
-          ..blockNumber = (res["result"][i]["blockNumber"])
           ..blockNumber = res["result"][i]["blockNumber"]
-          ..timeStamp = res["result"][i]["timeStamp"]
           ..hash = res["result"][i]["hash"]
           ..nonce = res["result"][i]["nonce"]
           ..blockHash = res["result"][i]["blockHash"]
           ..transactionIndex = res["result"][i]["transactionIndex"]
           ..from = res["result"][i]["from"]
           ..to = res["result"][i]["to"]
-          ..value = res["result"][i]["value"]
           ..gas = res["result"][i]["gas"]
           ..gasPrice = res["result"][i]["gasPrice"]
           ..isError = res["result"][i]["isError"]
@@ -55,6 +52,13 @@ Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
           ..cumulativeGasUsed = res["result"][i]["cumulativeGasUsed"]
           ..gasUsed = res["result"][i]["gasUsed"]
           ..confirmations = res["result"][i]["confirmations"];
+        ethTxModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
+        ethTxModel.value = (int.parse(res["result"][i]["value"]) / Eth_Unit).toString();
+        if (res["result"][i]["isError"] == "0") {
+          ethTxModel.isError = "交易成功";
+        } else {
+          ethTxModel.isError = "交易失败";
+        }
         modelArray.add(ethTxModel);
       }
       return modelArray;
