@@ -126,7 +126,7 @@ mod tests {
 
     #[test]
     fn wallet_tx_sign_test(){
-        let msg = r#"0x7901041102ffb8abbe0682086df6012967b2f56aaa2e365d974c77414a34359cfbdd67ce01fe0082841e00d0270328c9d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d6400000000000000000000000000000001000000f05f30efbfbdefbfbddf8defbfbdefbfbdcf80efbfbdefbfbd1855efbfbd1defbfbdc7b4efbfbdefbfbdefbfbd67efbfbdefbfbd4722522aefbfbd2627c6000000"#;
+        let _msg = r#"0x7901041102ffb8abbe0682086df6012967b2f56aaa2e365d974c77414a34359cfbdd67ce01fe0082841e00d0270328c9d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d6400000000000000000000000000000001000000f05f30efbfbdefbfbddf8defbfbdefbfbdcf80efbfbdefbfbd1855efbfbd1defbfbdc7b4efbfbdefbfbdefbfbd67efbfbdefbfbd4722522aefbfbd2627c6000000"#;
         //module::wallet::raw_tx_sign()
     }
 }
