@@ -433,7 +433,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       if (isSuccess) {
         NavigatorUtils.push(
           context,
-          Routes.eeePage,
+          Routes.ethPage,
           clearStack: true,
         );
       } else {

@@ -6,7 +6,7 @@ import 'package:app/util/log_util.dart';
 import 'package:flutter/widgets.dart';
 import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
-import 'package:app/page/eee_page/eee_page.dart';
+import 'package:app/page/eth_page/eth_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -63,7 +63,7 @@ class _EntryPageState extends State<EntryPage> {
             if (snapshot.hasData) {
               bool isContainWallet = snapshot.data;
               if (isContainWallet) {
-                return EeePage(); //已有钱包  || todo 2.0  区分链类型，加载对应链界面
+                return EthPage(); //已有钱包  || todo 2.0  区分链类型，加载对应链界面
               } else {
                 return _buildProtocolLayout();
               }
@@ -140,7 +140,8 @@ class _EntryPageState extends State<EntryPage> {
             Gaps.scaleHGap(2.5),
             Text(
               "添加钱包",
-              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
+              style:
+                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -167,7 +168,8 @@ class _EntryPageState extends State<EntryPage> {
             Gaps.scaleHGap(2.5),
             Text(
               "导入钱包",
-              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
+              style:
+                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -200,7 +202,8 @@ class _EntryPageState extends State<EntryPage> {
                 children: <Widget>[
                   Text(
                     S.of(context).agree_service_prefix,
-                    style: TextStyle(decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
+                    style: TextStyle(
+                        decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -211,7 +214,11 @@ class _EntryPageState extends State<EntryPage> {
                     },
                     child: Text(
                       S.of(context).service_protocol_tag,
-                      style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.white70,
+                          fontSize: ScreenUtil.instance.setSp(3),
+                          fontStyle: FontStyle.normal),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       maxLines: 2,
@@ -219,7 +226,8 @@ class _EntryPageState extends State<EntryPage> {
                   ),
                   Text(
                     "、",
-                    style: TextStyle(decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
+                    style: TextStyle(
+                        decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -230,7 +238,11 @@ class _EntryPageState extends State<EntryPage> {
                     },
                     child: Text(
                       S.of(context).privacy_protocol_tag,
-                      style: TextStyle(decoration: TextDecoration.underline, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.white70,
+                          fontSize: ScreenUtil.instance.setSp(3),
+                          fontStyle: FontStyle.normal),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       maxLines: 2,

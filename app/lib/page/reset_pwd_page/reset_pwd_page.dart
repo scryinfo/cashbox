@@ -252,7 +252,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
       } else {
         if (resetPwdMap["status"] == 200 && resetPwdMap["isResetPwd"]) {
           Fluttertoast.showToast(msg: S.of(context).success_reset_pwd_hint);
-          NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
+          NavigatorUtils.push(context, Routes.ethPage, clearStack: true);
         } else {
           Fluttertoast.showToast(msg: S.of(context).failure_reset_pwd_hint + resetPwdMap["message"]);
         }

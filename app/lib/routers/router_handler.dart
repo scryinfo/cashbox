@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
 import '../page/entry_page.dart';
-import 'package:app/page/eee_page/eee_page.dart';
+import 'package:app/page/eth_page/eth_page.dart';
 import '../page/public_page/public_page.dart';
 import '../page/create_wallet_page/create_wallet_name_page.dart';
 import '../page/create_wallet_page/create_wallet_mnemonic_page.dart';
@@ -31,8 +31,8 @@ Handler entryPageHandler = Handler(handlerFunc: (BuildContext context, Map<Strin
   return EntryPage();
 });
 
-Handler eeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return EeePage();
+Handler ethPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return EthPage();
 });
 
 Handler publicPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

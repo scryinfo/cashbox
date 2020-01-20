@@ -201,7 +201,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                     print("wallet index is===> " + walletList[index].walletId);
                     bool isSuccess = await Wallets.instance.setNowWallet(walletList[index].walletId);
                     if (isSuccess) {
-                      NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
+                      NavigatorUtils.push(context, Routes.ethPage, clearStack: true);
                     } else {
                       Fluttertoast.showToast(msg: S.of(context).failure_to_change_wallet);
                     }
