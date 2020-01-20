@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../routers/router_handler.dart';
 
 class Routes {
-  static String eeePage = '/eeepage';
+  static String ethPage = '/ethpage';
   static String entryPage = '/entrypage';
   static String publicPage = '/publicpage';
   static String dappPage = '/dapppage';
@@ -36,7 +36,7 @@ class Routes {
       LogUtil.e("Routers error is=>", "noFoundHandler");
     });
 
-    router.define(eeePage, handler: eeePageHandler);
+    router.define(ethPage, handler: ethPageHandler);
     router.define(entryPage, handler: entryPageHandler);
     router.define(publicPage, handler: publicPageHandler);
     router.define(dappPage, handler: dappPageHandler);

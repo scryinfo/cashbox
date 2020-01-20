@@ -23,22 +23,21 @@ class TransactionHistoryPage extends StatefulWidget {
 
 class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   Future txListFuture;
-  Future balanceFuture;
   List<Digit> walletDataList = [];
   List<Digit> showDataList = [];
   List<EthTransactionModel> ethTxListModel = [];
-  String balanceInfo = "";
+  String balanceInfo = "0.00";
 
   @override
   void initState() {
     super.initState();
+    txListFuture = getTxListData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    txListFuture = getTxListData();
-    balanceFuture = getBalanceData();
+    getBalanceData();
   }
 
   @override
@@ -59,15 +58,17 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     );
   }
 
-  Future<String> getBalanceData() async {
+  getBalanceData() async {
     try {
       balanceInfo = await loadEthBalance(GlobalConfig.Eth_Address);
       print("balanceInfo===>" + balanceInfo.toString());
     } catch (onError) {
       print("onError===>" + "$onError");
+      this.balanceInfo = "0";
     }
-    print("balanceInfo=====================>" + balanceInfo.toString());
-    return balanceInfo;
+    setState(() {
+      this.balanceInfo = balanceInfo;
+    });
   }
 
   Future<List<EthTransactionModel>> getTxListData() async {
@@ -87,44 +88,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       child: Column(
         children: <Widget>[
           Gaps.scaleVGap(1),
-          _buildBalanceWidget(),
+          _buildDigitBalanceWidget(),
           Gaps.scaleVGap(7),
           _buildDigitTxTitleWidget(),
           Gaps.scaleVGap(5),
           _buildDigitTxHistoryWidget(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBalanceWidget() {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.only(left: ScreenUtil().setWidth(5), right: ScreenUtil().setWidth(5)),
-            child: FutureBuilder(
-              future: balanceFuture,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Text(S.of(context).fail_to_load_data_hint);
-                }
-                if (snapshot.hasData) {
-                  return Container(
-                    child: _buildDigitBalanceWidget(),
-                  );
-                } else {
-                  return Text(
-                    S.of(context).no_tx_history,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.instance.setSp(4),
-                    ),
-                  );
-                }
-              },
-            ),
-          )
         ],
       ),
     );
@@ -137,14 +105,14 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Gaps.scaleHGap(3),
+          Gaps.scaleHGap(5),
           Container(
-            alignment: Alignment.centerRight,
-            width: ScreenUtil().setWidth(18),
+            alignment: Alignment.centerLeft,
+            width: ScreenUtil().setWidth(23),
             height: ScreenUtil().setHeight(8),
             child: Text(
               balanceInfo,
-              textAlign: TextAlign.end,
+              textAlign:  TextAlign.start,
               style: TextStyle(
                 fontSize: ScreenUtil.instance.setSp(4),
                 color: Colors.white,
@@ -198,7 +166,6 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               ),
             ),
           ),
-          Gaps.scaleHGap(6),
         ],
       ),
     );
@@ -263,7 +230,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   );
                 } else {
                   return Text(
-                    S.of(context).no_tx_history,
+                    "数据加载中...",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: ScreenUtil.instance.setSp(4),

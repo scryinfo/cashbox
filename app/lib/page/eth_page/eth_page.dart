@@ -17,14 +17,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
-import '../eee_page/left_drawer_card.dart';
+import '../eth_page/left_drawer_card.dart';
 
-class EeePage extends StatefulWidget {
+class EthPage extends StatefulWidget {
   @override
-  _EeePageState createState() => _EeePageState();
+  _EthPageState createState() => _EthPageState();
 }
 
-class _EeePageState extends State<EeePage> {
+class _EthPageState extends State<EthPage> {
   List<Wallet> walletList = [];
   Wallet nowWallet = Wallet();
 
@@ -46,20 +46,20 @@ class _EeePageState extends State<EeePage> {
 
   void initData() async {
     this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
-    print("eee_page => initData walletlist.length===>" + walletList.length.toString());
+    print("eth_page => initData walletlist.length===>" + walletList.length.toString());
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
       Wallet wallet = walletList[index];
-      print("eee_page => is isNowWallet===> " + wallet.isNowWallet.toString());
-      print("eee_page => wallet.walletId===> " + wallet.walletId.toString());
-      print("eee_page =>wallet.walletName===>" + wallet.walletName.toString());
+      print("eth_page => is isNowWallet===> " + wallet.isNowWallet.toString());
+      print("eth_page => wallet.walletId===> " + wallet.walletId.toString());
+      print("eth_page =>wallet.walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
         setState(
           () {
             this.nowWallet = wallet;
             this.walletName = nowWallet.walletName;
             this.nowChain = nowWallet.getChainByChainId(nowWallet.nowChainId);
-            print("eee_page =>  nowChain setState chainAddress=====>" + nowChain.chainAddress);
+            print("eth_page =>  nowChain setState chainAddress=====>" + nowChain.chainAddress);
             this.nowChainAddress = nowChain.chainAddress;
             this.nowChainDigitsList = nowChain.digitsList;
           },
