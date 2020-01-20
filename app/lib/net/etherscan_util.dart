@@ -7,8 +7,8 @@ Future<String> loadEthBalance(String address) async {
   var res = await request(assembleEthBalanceUrl(address));
   print("loadEthBalance res=====================>" + res.toString());
   if (res != null && (res as Map).containsKey("result")) {
-    print("Eth_Balance res.result.=====================>" + res["result"].toString());
-    return res["result"].toString();
+    print("Eth_Balance res.result.=====================>" + (int.parse(res["result"]) / Eth_Unit).toString());
+    return (int.parse(res["result"]) / Eth_Unit).toString();
   }
   return null;
 }
