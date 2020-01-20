@@ -1,8 +1,10 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/provide/transaction_provide.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 
 class EeeTransactionDetailPage extends StatefulWidget {
@@ -49,6 +51,14 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
             _buildTxValueWidget(),
             Gaps.scaleVGap(5),
             _buildTimeStampWidget(),
+            Gaps.scaleVGap(5),
+            _buildGasUsedWidget(),
+            Gaps.scaleVGap(5),
+            _buildGasPriceWidget(),
+            Gaps.scaleVGap(5),
+            _buildInputMsgWidget(),
+            Gaps.scaleVGap(5),
+            _buildNonceMsgWidget(),
           ],
         ),
       ),
@@ -64,8 +74,8 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
             child: Text(
               S.of(context).transfer_from_address,
               style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 14,
+                color: Color.fromRGBO(255, 255, 255, 0.7),
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -73,10 +83,10 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              "asdafasddddddddddddfsadf",
+              Provider.of<TransactionProvide>(context).fromAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: 12,
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -95,7 +105,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               S.of(context).transfer_to_address,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 14,
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -103,10 +113,10 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              "asdafasddddddddddddfsadf",
+              Provider.of<TransactionProvide>(context).toAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: 12,
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -125,7 +135,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               S.of(context).transaction_amount,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 14,
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -133,10 +143,10 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              "666666.6546",
+              Provider.of<TransactionProvide>(context).txValue,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: 12,
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -155,7 +165,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               S.of(context).transaction_timestamp,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: 14,
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -163,10 +173,130 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              "20190909-08:50:50",
+              Provider.of<TransactionProvide>(context).timeStamp,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: 12,
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGasUsedWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "gas消耗",
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(1),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              Provider.of<TransactionProvide>(context).gasUsed,
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGasPriceWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "gas price",
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(1),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              Provider.of<TransactionProvide>(context).gasPrice,
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputMsgWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "交易备注",
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(1),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              Provider.of<TransactionProvide>(context).backup,
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNonceMsgWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "nonce值",
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(1),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              Provider.of<TransactionProvide>(context).nonce,
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
