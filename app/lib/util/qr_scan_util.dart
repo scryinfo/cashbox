@@ -1,5 +1,6 @@
 import 'package:app/generated/i18n.dart';
 import 'package:app/global_config/global_config.dart';
+import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -106,9 +107,10 @@ class QrScanUtil {
     var toAddress = paramsMap["ta"];
     var backup = paramsMap["bu"];
     var value = paramsMap["v"];
-    Provider.of<TransactionProvide>(context).setToAddress(toAddress);
-    Provider.of<TransactionProvide>(context).setValue(value);
-    Provider.of<TransactionProvide>(context).setBackup(backup);
+    Provider.of<TransactionProvide>(context)
+      ..setToAddress(toAddress)
+      ..setValue(value)
+      ..setBackup(backup);
     {
       NavigatorUtils.push(context, Routes.transferEthPage);
     }

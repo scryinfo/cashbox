@@ -1,7 +1,9 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/global_config/global_config.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/net/etherscan_util.dart';
+import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/widgets/app_bar.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 
 class TransactionHistoryPage extends StatefulWidget {
@@ -37,7 +40,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   Future<List<EthTransactionModel>> getData() async {
     try {
-      ethTxListModel = await loadEthTxHistory("");
+      ethTxListModel = await loadEthTxHistory(GlobalConfig.Eth_Address);
       print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
     } catch (onError) {
       print("onError===>" + "$onError");
@@ -263,6 +266,17 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       child: GestureDetector(
         onTap: () {
           print("click tap is " + index.toString());
+
+          Provider.of<TransactionProvide>(context)
+            ..empty()
+            ..setFromAddress(ethTxListModel[index].from)
+            ..setToAddress(ethTxListModel[index].to)
+            ..setValue(ethTxListModel[index].value)
+            ..setBackup(ethTxListModel[index].input)
+            ..setGas(ethTxListModel[index].gas)
+            ..setGasPrice(ethTxListModel[index].gasPrice)
+            ..setConfirmations(ethTxListModel[index].confirmations);
+
           NavigatorUtils.push(context, Routes.transactionEeeDetailPage);
         },
         child: Column(

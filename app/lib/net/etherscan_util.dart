@@ -4,7 +4,7 @@ import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'net_util.dart';
 
 Future<String> loadEthBalance(String address) async {
-  var res = await request(assembleEthBalanceUrl("0xa4512ca7618d8d12a30C28979153aB09809ED7fD"));
+  var res = await request(assembleEthBalanceUrl(address));
   print("loadEthBalance res=====================>" + res.toString());
   if (res != null && (res as Map).containsKey("result")) {
     print("Eth_Balance res.result.=====================>" + res["result"].toString());
@@ -15,7 +15,7 @@ Future<String> loadEthBalance(String address) async {
 
 Future<String> loadErc20Balance(String address) async {
   try {
-    var res = await request(assembleErc20BalanceUrl("0xa4512ca7618d8d12a30C28979153aB09809ED7fD"));
+    var res = await request(assembleErc20BalanceUrl(address));
     print("Erc20_Balance=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       print("Erc20_Balance res.result.=====================>" + res["result"].toString());
@@ -30,7 +30,7 @@ Future<String> loadErc20Balance(String address) async {
 Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
   List<EthTransactionModel> modelArray = [];
   try {
-    var res = await request(assembleEthTxListUrl("0xa4512ca7618d8d12a30C28979153aB09809ED7fD"));
+    var res = await request(assembleEthTxListUrl(address));
     print("loadEthTxHistory=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       for (var i = 0; i < res["result"].length; i++) {
@@ -53,7 +53,12 @@ Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
           ..gasUsed = res["result"][i]["gasUsed"]
           ..confirmations = res["result"][i]["confirmations"];
         ethTxModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
-        ethTxModel.value = (int.parse(res["result"][i]["value"]) / Eth_Unit).toString();
+
+        if (res["result"][i]["from"].trim().toLowerCase() == address.trim().toLowerCase()) {
+          ethTxModel.value = "-" + (int.parse(res["result"][i]["value"]) / Eth_Unit).toString();
+        } else {
+          ethTxModel.value = "+" + (int.parse(res["result"][i]["value"]) / Eth_Unit).toString();
+        }
         if (res["result"][i]["isError"] == "0") {
           ethTxModel.isError = "交易成功";
         } else {
@@ -75,7 +80,7 @@ Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
 Future<List> loadErc20TxHistory(String address) async {
   var modelArray = [];
   try {
-    var res = await request(assembleErc20TxListUrl("0xa4512ca7618d8d12a30C28979153aB09809ED7fD"));
+    var res = await request(assembleErc20TxListUrl(address));
     print("loadErc20TxHistory=====================>" + res.toString());
     return modelArray;
   } catch (e) {
