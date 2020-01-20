@@ -22,10 +22,12 @@ class TransactionHistoryPage extends StatefulWidget {
 }
 
 class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
-  Future future;
+  Future txListFuture;
+  Future balanceFuture;
   List<Digit> walletDataList = [];
   List<Digit> showDataList = [];
   List<EthTransactionModel> ethTxListModel = [];
+  String balanceInfo = "";
 
   @override
   void initState() {
@@ -35,18 +37,8 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    future = getData(); //todo initData
-  }
-
-  Future<List<EthTransactionModel>> getData() async {
-    try {
-      ethTxListModel = await loadEthTxHistory(GlobalConfig.Eth_Address);
-      print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
-    } catch (onError) {
-      print("onError===>" + "$onError");
-    }
-    print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
-    return ethTxListModel;
+    txListFuture = getTxListData();
+    balanceFuture = getBalanceData();
   }
 
   @override
@@ -67,13 +59,35 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     );
   }
 
+  Future<String> getBalanceData() async {
+    try {
+      balanceInfo = await loadEthBalance(GlobalConfig.Eth_Address);
+      print("balanceInfo===>" + balanceInfo.toString());
+    } catch (onError) {
+      print("onError===>" + "$onError");
+    }
+    print("balanceInfo=====================>" + balanceInfo.toString());
+    return balanceInfo;
+  }
+
+  Future<List<EthTransactionModel>> getTxListData() async {
+    try {
+      ethTxListModel = await loadEthTxHistory(GlobalConfig.Eth_Address);
+      print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
+    } catch (onError) {
+      print("onError===>" + "$onError");
+    }
+    print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
+    return ethTxListModel;
+  }
+
   Widget _buildTxHistoryWidget() {
     return Container(
       width: ScreenUtil().setWidth(90),
       child: Column(
         children: <Widget>[
           Gaps.scaleVGap(1),
-          _buildDigitBalanceWidget(),
+          _buildBalanceWidget(),
           Gaps.scaleVGap(7),
           _buildDigitTxTitleWidget(),
           Gaps.scaleVGap(5),
@@ -83,10 +97,42 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     );
   }
 
+  Widget _buildBalanceWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(left: ScreenUtil().setWidth(5), right: ScreenUtil().setWidth(5)),
+            child: FutureBuilder(
+              future: balanceFuture,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text(S.of(context).fail_to_load_data_hint);
+                }
+                if (snapshot.hasData) {
+                  return Container(
+                    child: _buildDigitBalanceWidget(),
+                  );
+                } else {
+                  return Text(
+                    S.of(context).no_tx_history,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: ScreenUtil.instance.setSp(4),
+                    ),
+                  );
+                }
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildDigitBalanceWidget() {
     return Container(
       color: Color.fromRGBO(101, 98, 98, 0.12),
-      width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(20.5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -94,10 +140,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           Gaps.scaleHGap(3),
           Container(
             alignment: Alignment.centerRight,
-            width: ScreenUtil().setWidth(25),
+            width: ScreenUtil().setWidth(18),
             height: ScreenUtil().setHeight(8),
             child: Text(
-              "6462314.0",
+              balanceInfo,
               textAlign: TextAlign.end,
               style: TextStyle(
                 fontSize: ScreenUtil.instance.setSp(4),
@@ -206,7 +252,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             height: ScreenUtil().setHeight(100),
             padding: EdgeInsets.only(left: ScreenUtil().setWidth(5), right: ScreenUtil().setWidth(5)),
             child: FutureBuilder(
-              future: future,
+              future: txListFuture,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Text(S.of(context).fail_to_load_data_hint);
