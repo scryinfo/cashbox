@@ -275,7 +275,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             ..setBackup(ethTxListModel[index].input)
             ..setGas(ethTxListModel[index].gas)
             ..setGasPrice(ethTxListModel[index].gasPrice)
-            ..setConfirmations(ethTxListModel[index].confirmations);
+            ..setGasUsed(ethTxListModel[index].gasUsed)
+            ..setTimeStamp(ethTxListModel[index].timeStamp)
+            ..setNonce(ethTxListModel[index].nonce);
 
           NavigatorUtils.push(context, Routes.transactionEeeDetailPage);
         },
