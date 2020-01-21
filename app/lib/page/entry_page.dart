@@ -10,6 +10,8 @@ import 'package:app/page/eth_page/eth_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'dapp_page/dapp_page.dart';
+
 class EntryPage extends StatefulWidget {
   @override
   _EntryPageState createState() => _EntryPageState();
@@ -63,7 +65,7 @@ class _EntryPageState extends State<EntryPage> {
             if (snapshot.hasData) {
               bool isContainWallet = snapshot.data;
               if (isContainWallet) {
-                return EthPage(); //已有钱包  || todo 2.0  区分链类型，加载对应链界面
+                return DappPage(); // todo  标记，先版本，直接进入到Dapp diamond页面处
               } else {
                 return _buildProtocolLayout();
               }
