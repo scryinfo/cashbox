@@ -15,6 +15,7 @@ class TransactionProvide with ChangeNotifier {
   String _cumulativeGasUsed;
   String _gasUsed;
   String _confirmations;
+  String _balance;
 
   void empty() {
     _toAddress = "";
@@ -26,6 +27,14 @@ class TransactionProvide with ChangeNotifier {
     _gasPrice = "";
     _timeStamp = "";
     _nonce = "";
+    _confirmations = "";
+    _balance = "";
+  }
+
+  String get balance => _balance;
+
+  setBalance(String value) {
+    _balance = value;
   }
 
   String get fromAddress => _fromAddress;
