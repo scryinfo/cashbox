@@ -93,42 +93,53 @@ class Wallets {
         ..creationTime = jniList[walletIndex]["creationTime"].toString()
         ..isNowWallet = jniList[walletIndex]["isNowWallet"];
       //..walletType = jniList[walletIndex]["walletType"];//todo 数据格式更改
-
-      var eeeChain = jniList[walletIndex]["eeeChain"];
-
-      Chain chainEeeM = ChainEEE();
-      chainEeeM
-        ..chainId = eeeChain["chainId"]
-        ..chainAddress = eeeChain["chainAddress"]
-        ..chainType = chainEeeM.intToChainType(eeeChain["chainType"])
-        ..isVisible = eeeChain["isVisible"]
-        ..walletId = eeeChain["walletId"];
-
-      List eeeChainDigitList = eeeChain["eeeChainDigitList"];
-      for (int j = 0; j < eeeChainDigitList.length; j++) {
-        Map digitInfoMap = eeeChainDigitList[j];
-        Digit digitM = EeeDigit();
-        digitM
-          ..digitId = digitInfoMap["digitId"]
-          ..chainId = digitInfoMap["chainId"]
-          ..address = digitInfoMap["address"]
-          ..shortName = digitInfoMap["shortName"]
-          ..fullName = digitInfoMap["fullName"]
-          ..balance = digitInfoMap["balance"]
-          ..isVisible = digitInfoMap["isVisible"]
-          ..decimal = digitInfoMap["decimal"]
-          ..urlImg = digitInfoMap["urlImg"];
-
-        ///将digit 添加到digitList里面
-        chainEeeM.digitsList.add(digitM);
+      {
+        var eeeChain = jniList[walletIndex]["eeeChain"];
+        Chain chainEeeM = ChainEEE();
+        chainEeeM
+          ..chainId = eeeChain["chainId"]
+          ..chainAddress = eeeChain["chainAddress"]
+          ..chainType = chainEeeM.intToChainType(eeeChain["chainType"])
+          ..isVisible = eeeChain["isVisible"]
+          ..walletId = eeeChain["walletId"];
+        List eeeChainDigitList = eeeChain["eeeChainDigitList"];
+        for (int j = 0; j < eeeChainDigitList.length; j++) {
+          Map digitInfoMap = eeeChainDigitList[j];
+          Digit digitM = EeeDigit();
+          digitM
+            ..digitId = digitInfoMap["digitId"]
+            ..chainId = digitInfoMap["chainId"]
+            ..contractAddress = digitInfoMap["address"]
+            ..shortName = digitInfoMap["shortName"]
+            ..fullName = digitInfoMap["fullName"]
+            ..balance = digitInfoMap["balance"]
+            ..isVisible = digitInfoMap["isVisible"]
+            ..decimal = digitInfoMap["decimal"]
+            ..urlImg = digitInfoMap["urlImg"];
+          chainEeeM.digitsList.add(digitM);
+        }
+        walletM.chainList.add(chainEeeM); ////将chain 添加到chainList里面
       }
-      //todo    BTC 和 ETH 链信息还没有加入
+      {
+        //ETH
+        Chain chainEthM = ChainETH();
+        var ethChain = jniList[walletIndex]["ethChain"];
+        chainEthM
+          ..chainId = ethChain["chainId"]
+          ..chainAddress = ethChain["chainAddress"]
+          ..chainType = chainEthM.intToChainType(ethChain["chainType"])
+          ..isVisible = true
+          ..walletId = jniList[walletIndex]["walletId"];
+        //todo add digit to ETH chain
 
-      ///将chain 添加到chainList里面
-      walletM.chainList.add(chainEeeM);
+      }
+      //todo    BTC 链信息还没有加入
+      {
+        //BTC
+      }
 
-      ///将wallet 添加到walletList里面
-      allWalletList.add(walletM);
+      allWalletList.add(walletM); ////将wallet 添加到walletList里面
+
     }
 
     return allWalletList;

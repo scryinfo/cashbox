@@ -141,11 +141,6 @@ abstract class Chain {
 }
 
 class ChainETH extends Chain {
-  ChainETH(chainId, walletId) {
-    this.chainId = chainId;
-    this.walletId = walletId;
-  }
-
   @override
   ChainType get chainType => ChainType.ETH;
 }

@@ -5,6 +5,7 @@ import 'package:app/model/rate.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/qr_info_provide.dart';
+import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
@@ -152,7 +153,13 @@ class _EthPageState extends State<EthPage> {
               child: _digitListWidgets(snapshot),
             );
           } else {
-            return Text("something wrong");
+            return Container(
+              alignment: Alignment.topCenter,
+              child: Text(
+                "",
+                style: TextStyle(color: Colors.white70),
+              ),
+            );
           }
         },
       ),
@@ -211,6 +218,12 @@ class _EthPageState extends State<EthPage> {
           ),
           child: GestureDetector(
             onTap: () {
+              {
+                Provider.of<TransactionProvide>(context)
+                  ..setDigitName(displayDigitsList[index].shortName)
+                  ..setBalance(displayDigitsList[index].balance)
+                  ..setContractAddress(displayDigitsList[index].contractAddress);
+              }
               NavigatorUtils.push(context, Routes.transactionHistoryPage);
             },
             child: Row(
