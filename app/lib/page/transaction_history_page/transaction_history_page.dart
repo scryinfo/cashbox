@@ -73,7 +73,8 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   Future<List<EthTransactionModel>> getTxListData() async {
     try {
-      ethTxListModel = await loadEthTxHistory(GlobalConfig.Eth_Address);
+      //ethTxListModel = await loadEthTxHistory(GlobalConfig.Eth_Address);//todo
+      ethTxListModel = await loadEthTxHistory("");//todo
       print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
     } catch (onError) {
       print("onError===>" + "$onError");
