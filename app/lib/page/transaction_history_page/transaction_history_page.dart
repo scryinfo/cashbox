@@ -60,7 +60,8 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   getBalanceData() async {
     try {
-      balanceInfo = await loadEthBalance(GlobalConfig.Eth_Address);
+      //balanceInfo = await loadEthBalance(GlobalConfig.Eth_Address);
+      balanceInfo = await loadEthBalance(""); //todo
       print("balanceInfo===>" + balanceInfo.toString());
     } catch (onError) {
       print("onError===>" + "$onError");
