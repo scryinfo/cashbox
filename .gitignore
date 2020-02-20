@@ -16,6 +16,17 @@ packages/wallet_manager/android/src/main/jniLibs/arm64-v8a/.gitkeep
 git
 .DS_Store
 demo/btcwallet/.idea
-demo/btcwallet/target
-demo/btcwallet/Cargo.lock
+demo/btcwallet/.DS_Store
+demo/btcwallet/murmel/.DS_Store
+demo/btcwallet/murmel/target
+demo/btcwallet/murmel/client.db.0.bc
+demo/btcwallet/murmel/client.db.0.bl
+demo/btcwallet/murmel/client.db.0.tb
+demo/btcwallet/murmel/client.db.0.lg
+demo/btcwallet/murmel/client_sqlite.sqlite
+demo/btcwallet/murmel/NOTICE
+demo/btcwallet/murmel/bitcoin/.DS_Store
+demo/btcwallet/murmel/bitcoin/target
+
+
 
