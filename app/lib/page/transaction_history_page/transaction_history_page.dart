@@ -28,14 +28,14 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
   String fromAddress = "";
-  String balance = "";
+  String contractAddress = "";
 
   @override
   void initState() {
     super.initState();
     {
-      fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-      balance = Provider.of<TransactionProvide>(context).balance;
+      // fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+      // contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
     }
 
     txListFuture = getTxListData();
@@ -67,8 +67,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   getBalanceData() async {
     try {
-      //balanceInfo = await loadEthBalance(GlobalConfig.Eth_Address);
-      balanceInfo = await loadEthBalance(""); //todo
+      if(contractAddress.trim()==""){
+        balanceInfo = await loadEthBalance(fromAddress);
+      }else{
+        balanceInfo = await loadErc20Balance(fromAddress,contractAddress);
+      }
       print("balanceInfo===>" + balanceInfo.toString());
     } catch (onError) {
       print("onError===>" + "$onError");
@@ -81,8 +84,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   Future<List<EthTransactionModel>> getTxListData() async {
     try {
-      //ethTxListModel = await loadEthTxHistory(GlobalConfig.Eth_Address);//todo
-      ethTxListModel = await loadEthTxHistory("");//todo
+      if(contractAddress.trim()==""){
+        ethTxListModel = await loadEthTxHistory(fromAddress);
+      }else{
+        ethTxListModel = await loadErc20TxHistory(fromAddress,contractAddress);
+      }
       print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
     } catch (onError) {
       print("onError===>" + "$onError");
@@ -120,7 +126,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             width: ScreenUtil().setWidth(23),
             height: ScreenUtil().setHeight(8),
             child: Text(
-              balanceInfo,
+              "balanceInfo" ,
               textAlign:  TextAlign.start,
               style: TextStyle(
                 fontSize: ScreenUtil.instance.setSp(4),
