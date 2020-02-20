@@ -1,33 +1,37 @@
 class GlobalConfig {
-  static Map<String, double> maxGasLimitMap = {"eth": 30000, "ddd": 300000};
-  static Map<String, double> minGasLimitMap = {"eth": 21000, "ddd": 35000};
-  static Map<String, double> defaultGasLimitMap = {"eth": 21000, "ddd": 70000};
-  static Map<String, double> maxGasPriceMap = {"eth": 30, "ddd": 20};
-  static Map<String, double> minGasPriceMap = {"eth": 2, "ddd": 2};
-  static Map<String, double> defaultGasPriceMap = {"eth": 9, "ddd": 6};
+  static const EthGasLimitKey="eth";
+  static const Erc20GasLimitKey="eth";
+  static const EthGasPriceKey="eth";
+  static const Erc20GasPriceKey="eth";
+  static Map<String, double> maxGasLimitMap = {EthGasLimitKey: 30000, Erc20GasLimitKey: 300000};
+  static Map<String, double> minGasLimitMap = {EthGasLimitKey: 21000, Erc20GasLimitKey: 35000};
+  static Map<String, double> defaultGasLimitMap = {EthGasLimitKey: 21000, Erc20GasLimitKey: 70000};
+  static Map<String, double> maxGasPriceMap = {EthGasPriceKey: 30, Erc20GasPriceKey: 20};
+  static Map<String, double> minGasPriceMap = {EthGasPriceKey: 2, Erc20GasPriceKey: 2};
+  static Map<String, double> defaultGasPriceMap = {EthGasPriceKey: 9, Erc20GasPriceKey: 6};
 
   static double getMaxGasLimit(String digitName) {
-    return maxGasLimitMap[digitName.toLowerCase()];
+    return maxGasLimitMap[digitName];
   }
 
   static double getMinGasLimit(String digitName) {
-    return minGasLimitMap[digitName.toLowerCase()];
+    return minGasLimitMap[digitName];
   }
 
   static double getDefaultGasLimit(String digitName) {
-    return defaultGasLimitMap[digitName.toLowerCase()];
+    return defaultGasLimitMap[digitName];
   }
 
   static double getMaxGasPrice(String digitName) {
-    return maxGasPriceMap[digitName.toLowerCase()];
+    return maxGasPriceMap[digitName];
   }
 
   static double getMinGasPrice(String digitName) {
-    return minGasPriceMap[digitName.toLowerCase()];
+    return minGasPriceMap[digitName];
   }
 
   static double getDefaultGasPrice(String digitName) {
-    return defaultGasPriceMap[digitName.toLowerCase()];
+    return defaultGasPriceMap[digitName];
   }
 }
 

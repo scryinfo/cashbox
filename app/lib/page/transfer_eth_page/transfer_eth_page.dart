@@ -44,20 +44,46 @@ class _TransferEthPageState extends State<TransferEthPage> {
   double mMaxGasFee;
   double mMinGasFee;
   double mGasFeeValue;
+  String fromAddress = "";
+  String contractAddress = "";
+  
+  @override
+  void initState() {
+    super.initState();
+    {
+       fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+       contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+    }
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     initDataConfig();
-    mMaxGasPrice = GlobalConfig.getMaxGasPrice("eth");
-    mMinGasPrice = GlobalConfig.getMinGasPrice("eth");
-    mMaxGasLimit = GlobalConfig.getMaxGasLimit("eth");
-    mMinGasLimit = GlobalConfig.getMinGasLimit("eth");
-    mGasPriceValue = GlobalConfig.getDefaultGasPrice("eth");
-    mGasLimitValue = GlobalConfig.getDefaultGasLimit("eth");
+    if(contractAddress.trim()!=""){
+      mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.Erc20GasPriceKey);
+      mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.Erc20GasPriceKey);
+      mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.Erc20GasLimitKey);
+      mMinGasLimit = GlobalConfig.getMinGasLimit(GlobalConfig.Erc20GasLimitKey);
+      mGasPriceValue = GlobalConfig.getDefaultGasPrice(GlobalConfig.Erc20GasPriceKey);
+      mGasLimitValue = GlobalConfig.getDefaultGasLimit(GlobalConfig.Erc20GasLimitKey);
+    }else{
+      mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.EthGasPriceKey);
+      mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.EthGasPriceKey);
+      mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.EthGasLimitKey);
+      mMinGasLimit = GlobalConfig.getMinGasLimit(GlobalConfig.EthGasLimitKey);
+      mGasPriceValue = GlobalConfig.getDefaultGasPrice(GlobalConfig.EthGasPriceKey);
+      mGasLimitValue = GlobalConfig.getDefaultGasLimit(GlobalConfig.EthGasLimitKey);
+    }
     mMaxGasFee = mMaxGasLimit * mMaxGasPrice / (1000 * 1000 * 1000);
     mMinGasFee = mMinGasLimit * mMinGasPrice / (1000 * 1000 * 1000);
     mGasFeeValue = mGasLimitValue * mGasPriceValue / (1000 * 1000 * 1000);
+  }
+
+  void initDataConfig() {
+    _txValueController.text = Provider.of<TransactionProvide>(context).txValue;
+    _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress;
+    _backupMsgController.text = Provider.of<TransactionProvide>(context).backup;
   }
 
   @override
@@ -96,12 +122,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
       return false;
     }
     return true;
-  }
-
-  void initDataConfig() {
-    _txValueController.text = Provider.of<TransactionProvide>(context).txValue;
-    _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress;
-    _backupMsgController.text = Provider.of<TransactionProvide>(context).backup;
   }
 
   Widget _buildTransferEeeWidget() {
