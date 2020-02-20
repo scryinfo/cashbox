@@ -27,10 +27,17 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<Digit> showDataList = [];
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
+  String fromAddress = "";
+  String balance = "";
 
   @override
   void initState() {
     super.initState();
+    {
+      fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+      balance = Provider.of<TransactionProvide>(context).balance;
+    }
+
     txListFuture = getTxListData();
   }
 

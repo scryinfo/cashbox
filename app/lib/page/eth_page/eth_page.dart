@@ -80,7 +80,7 @@ class _EthPageState extends State<EthPage> {
       digitRate.volume = 0.035;
       digitRate.changeHourly = 0.096;
 
-      Digit digit = EeeDigit();
+      Digit digit = EthDigit();
       digit
         ..chainId = nowChainDigitsList[i].chainId
         ..shortName = nowChainDigitsList[i].shortName
@@ -222,6 +222,7 @@ class _EthPageState extends State<EthPage> {
                 Provider.of<TransactionProvide>(context)
                   ..setDigitName(displayDigitsList[index].shortName)
                   ..setBalance(displayDigitsList[index].balance)
+                  ..setFromAddress(nowChainAddress)//todo  eth地址，等动态库协调一直结构？
                   ..setContractAddress(displayDigitsList[index].contractAddress);
               }
               NavigatorUtils.push(context, Routes.transactionHistoryPage);
