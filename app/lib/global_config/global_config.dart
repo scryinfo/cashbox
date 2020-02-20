@@ -65,8 +65,8 @@ String assembleEthBalanceUrl(String address) {
 
 const Erc20_Balance = "http://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=";
 //http://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=0x57d90b64a1a57749b0f932f1a3395792e12e7055&address=0xe04f27eb70e025b78871a2ad7eabe85e61212761&tag=latest&apikey=YourApiKeyToken
-String assembleErc20BalanceUrl(String address) {
-  return Erc20_Balance + DddMainNetContractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+String assembleErc20BalanceUrl(String address,{String contractAddress=DddMainNetContractAddress}) {
+  return Erc20_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
 }
 
 const Eth_Tx_List = "http://api-cn.etherscan.com/api?module=account&action=txlist&address=";
@@ -77,7 +77,7 @@ String assembleEthTxListUrl(String address) {
 
 const Erc20_Tx_List = "http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=";
 //http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2&address=0x4e83362442b8d1bec281594cea3050c8eb01311c&page=1&offset=100&sort=asc&apikey=YourApiKeyToken
-String assembleErc20TxListUrl(String address) {
+String assembleErc20TxListUrl(String address,{String contractAddress=DddMainNetContractAddress}) {
   //http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0xa4512ca7618d8d12a30C28979153aB09809ED7fD&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-  return Erc20_Tx_List + DddMainNetContractAddress + "&address=" + address + "&page=1&offset=100&sort=asc&apikey=" + ETHERSCAN_API_KEY;
+  return Erc20_Tx_List + contractAddress + "&address=" + address + "&page=1&offset=100&sort=asc&apikey=" + ETHERSCAN_API_KEY;
 }
