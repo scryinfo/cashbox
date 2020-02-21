@@ -54,20 +54,17 @@ impl EthTxHelper {
         }
     }
 }
-pub fn get_erc20_transfer_data(address:&str,value:u128)->Result<Vec<u8>,String>{
+pub fn get_erc20_transfer_data(address:&str,value:&str)->Result<Vec<u8>,String>{
     let bytecode = include_bytes!("build/Erc20.abi");
     let helper = EthTxHelper::load(&bytecode[..]);
-    //convert address to bytes
-    let mut address_bytes = [0u8; 20];
     let mut index =0;
     if address.starts_with("0x") {
         index = 2;
     }
+    let value = U256::from_dec_str(value).unwrap();
     //TODO 检查地址可能带来的错误
-   // address.get(index).map(|Some(address_hex)|hex::decode(address_hex).map(|bytes| address_bytes.clone_from_slice(&bytes)));
-    address_bytes.clone_from_slice(hex::decode(address.get(index.. ).unwrap()).unwrap().as_slice());
-    let address = types::Address::try_from(address_bytes);
-    helper.encode_contract_input("transfer", (address.unwrap(), value))
+    let address =    H160::from_slice(hex::decode(address.get(index..).unwrap()).unwrap().as_slice());
+    helper.encode_contract_input("transfer", (address, value))
 }
 
 /// Description of a Transaction, pending or in the chain.
@@ -173,30 +170,28 @@ fn pri_from_mnemonic_test() {
 
 #[test]
 fn erc20_transfer_data_test() {
-    let data = get_erc20_transfer_data("5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c",2000);
+    let data = get_erc20_transfer_data("5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c","2000");
     println!("{:?}", data);
 }
 
 #[test]
 fn eth_rawtx_sign_test(){
-    let to_account="0xba32523d54ad70c8cd0b96443c4de607137af313";
-    let nonce = U256::from_dec_str("10").unwrap();
-    let amount = U256::from_dec_str("200").unwrap();
-    let gas_limit = U256::from_dec_str("137").unwrap();
-    let gas_price = U256::from_dec_str("211").unwrap();
-    let addition ="tx test";
-    let to =    H160::from_slice(hex::decode(to_account.get(2..).unwrap()).unwrap().as_slice());
 
-    let rawtx =  RawTransaction{
-        nonce: nonce,
-        to: Some(to),//针对转账操作,to不能为空
-        value: amount,
-        gas_price: gas_price,
-        gas: gas_limit,
-        data: addition.as_bytes().to_vec(),
-    };
+    let json = r#" {
+            "nonce": "0x0",
+            "gasPrice": "0x4a817c800",
+            "gas": "0x5208",
+            "to": "0x7b02dca46711be2664310f4fe322c8bd35a9bd2a",
+            "value": "0xde0b6b3a7640000",
+            "data": []
+        }"#;
+    let chain_id = Some(3);
+    let mut rawtx : RawTransaction = serde_json::from_str(json).expect("tx format");
+    let addition ="tx test";
+    rawtx.data = addition.as_bytes().to_vec();
+
     let words = "pulp second side simple clinic step salad enact only mixed address paddle";
     let pri = pri_from_mnemonic(words,None).unwrap();
-    let signed_data = rawtx.sign(&pri,Some(3));
+    let signed_data = rawtx.sign(&pri,chain_id);
     println!("signed data:{:?}",hex::encode(signed_data));
 }
