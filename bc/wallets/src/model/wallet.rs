@@ -1,4 +1,6 @@
 use super::*;
+use serde::export::fmt::Debug;
+use std::fmt;
 
 pub mod chain;
 
@@ -23,6 +25,12 @@ pub struct Wallet {
     pub eee_chain: Option<chain::EeeChain>,
     pub eth_chain: Option<chain::EthChain>,
     pub btc_chain: Option<chain::BtcChain>,
+}
+
+impl fmt::Debug for Wallet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Wallet {{ status: {}, wallet_id: {},wallet_type:{},wallet_name:{:?} }}", self.status.clone() as u32, self.wallet_id,self.wallet_type,self.wallet_name)
+    }
 }
 
 

@@ -12,6 +12,7 @@ pub use wallet::chain::{BtcChain,EthChain,EeeChain};
 pub use wallet::chain::digit::{EeeDigit,EthDigit,BtcDigit};
 pub use wallet_store::{TbAddress,WalletObj};
 
+#[derive(Debug,Clone)]
 pub struct Address {
     pub chain_type: ChainType,
     pub pubkey: String,

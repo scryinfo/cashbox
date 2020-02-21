@@ -4,7 +4,7 @@ use super::model::*;
 use std::sync::mpsc;
 use crate::wallet_crypto::Crypto;
 use std::collections::HashMap;
-use ethereum_types::{U256, U128};
+use ethereum_types::{H160,U256, U128};
 
 pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<String,String>{
 
@@ -47,9 +47,10 @@ pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<Stri
 /// gasLimit 这笔交易最大允许的gas消耗
 /// gasPrice 指定gas的价格
 /// data 备注消息（当交易确认后，能够在区块上查看到）
-pub fn eth_raw_transfer_sign(from_account:&str,to_account:&str,amount:&str,psw: &[u8], nonce:&str,gasLimit:&str, gasPrice:&str,data:Option<String>,chian_id:u64)->Result<String,String>{
+/// chain_id: ETH的链类型
+pub fn eth_raw_transfer_sign(from_account:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, chain_id:u64) ->Result<String,String>{
     //
-    match module::wallet::find_keystore_wallet_from_address(from_account,ChainType::ETH) {
+    match module::wallet::find_keystore_wallet_from_address(from_account, ChainType::ETH) {
         Ok(keystore)=>{
             match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
@@ -58,9 +59,9 @@ pub fn eth_raw_transfer_sign(from_account:&str,to_account:&str,amount:&str,psw: 
 
                     let nonce = U256::from_dec_str(nonce).unwrap();
                     let amount = U256::from_dec_str(amount).unwrap();
-                    let gas_limit = U256::from_dec_str(gasLimit).unwrap();
-                    let gas_price = U256::from_dec_str(gasPrice).unwrap();
-                    let to =    H160::from_slice(hex::decode(to_account.get(2..).unwrap()).unwrap().as_slice());
+                    let gas_limit = U256::from_dec_str(gas_limit).unwrap();
+                    let gas_price = U256::from_dec_str(gas_price).unwrap();
+                    let to = H160::from_slice(hex::decode(to_account.get(2..).unwrap()).unwrap().as_slice());
                     let data =  match data {
                             Some(data)=>data.as_bytes().to_vec(),
                             None=>vec![]
@@ -98,7 +99,7 @@ pub fn eth_raw_transfer_sign(from_account:&str,to_account:&str,amount:&str,psw: 
 /// gasLimit 这笔交易最大允许的gas消耗
 /// gasPrice 指定gas的价格
 /// data 备注消息（还需要再确认一下，当转erc20 token时 这个字段是否还有效？）
-pub fn eth_raw_erc20_transfer_sign(from_account:&str,contract_address:&str,to_account:&str,amount:&str,psw: &[u8],nonce:&str,gasLimit:&str, gasPrice:&str,data:Option<String>,chian_id:u64)->Result<String,String>{
+pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, chain_id:u64) ->Result<String,String>{
 
     match module::wallet::find_keystore_wallet_from_address(from_account,ChainType::EEE) {
         Ok(keystore)=>{
@@ -108,10 +109,11 @@ pub fn eth_raw_erc20_transfer_sign(from_account:&str,contract_address:&str,to_ac
 
                     //todo 输入的数量都是整数？
                     let nonce = U256::from_dec_str(nonce).unwrap();
-                    let amount = U128::from_dec_str(amount).unwrap();
-                    let gas_limit = U256::from_dec_str(gasLimit).unwrap();
-                    let gas_price = U256::from_dec_str(gasPrice).unwrap();
-                    let to =    H160::from_slice(hex::decode(to_account.get(2..).unwrap()).unwrap().as_slice());
+                   // let amount = U128::from_dec_str(amount).unwrap();
+                    let gas_limit = U256::from_dec_str(gas_limit).unwrap();
+                    let gas_price = U256::from_dec_str(gas_price).unwrap();
+                   // let to =    H160::from_slice(hex::decode(to_account.get(2..).unwrap()).unwrap().as_slice());
+                    let contract_address =    H160::from_slice(hex::decode(contract_address.get(2..).unwrap()).unwrap().as_slice());
                     //todo 增加错误处理
                     let encode_data = ethtx::get_erc20_transfer_data(to_account,amount).unwrap();
                     let data =  match data {
@@ -121,8 +123,8 @@ pub fn eth_raw_erc20_transfer_sign(from_account:&str,contract_address:&str,to_ac
 
                     let rawtx =  ethtx::RawTransaction{
                         nonce: nonce,
-                        to: Some(to),//针对调用合约,to不能为空
-                        value: U256::from_dec_str("0"),
+                        to: Some(contract_address),//针对调用合约,to不能为空
+                        value: U256::from_dec_str("0").unwrap(),
                         gas_price: gas_price,
                         gas: gas_limit,
                         data:encode_data,
