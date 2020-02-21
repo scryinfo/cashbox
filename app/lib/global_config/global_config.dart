@@ -85,3 +85,9 @@ String assembleErc20TxListUrl(String address,{String contractAddress=DddMainNetC
   //http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0xa4512ca7618d8d12a30C28979153aB09809ED7fD&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
   return Erc20_Tx_List + contractAddress + "&address=" + address + "&page=1&offset=100&sort=asc&apikey=" + ETHERSCAN_API_KEY;
 }
+
+const Eth_Tx_Account = "http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
+//http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=0x2910543af39aba0cd09dbb2d50200b3e800a63d2&tag=latest&apikey=YourApiKeyToken
+String assembleTxAccount(String address) {
+  return Eth_Tx_Account + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+}
