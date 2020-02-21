@@ -46,7 +46,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   double mGasFeeValue;
   String fromAddress = "";
   String contractAddress = "";
-  
+
   @override
   void initState() {
     super.initState();
@@ -676,9 +676,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd);
 
-            Wallet walletModel = await Wallets.instance.getNowWalletModel();
-            ChainETH chainETH = walletModel.getChainByChainType(ChainType.ETH);
-            String fromAddress = chainETH.chainAddress;
+            //Wallet walletModel = await Wallets.instance.getNowWalletModel();
+            //ChainETH chainETH = walletModel.getChainByChainType(ChainType.ETH);
+            //String fromAddress = chainETH.chainAddress;
             String walletId = await Wallets.instance.getNowWalletId();
             // todo  FFI拼接好交易 TODO  再去 签名功能动态库签名
             Wallets.instance.ethTxSign(walletId, fromAddress, _toAddressController.text.toString(), _txValueController.text,
