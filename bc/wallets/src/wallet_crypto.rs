@@ -46,6 +46,7 @@ struct KdfParams {
     p: u32,
 }
 
+
 pub trait Crypto {
     type Seed: AsRef<[u8]> + AsMut<[u8]> + Sized + Default;
     type Pair: Pair<Public=Self::Public>;
@@ -234,9 +235,6 @@ pub trait Crypto {
     }
     fn sign(phrase:&str,msg:&[u8])->[u8;64];
 }
-
-
-
 
 mod ed25519;
 mod sr25519;

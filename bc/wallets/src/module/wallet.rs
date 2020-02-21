@@ -12,7 +12,7 @@ use codec::{Encode,Decode};
 use sp_core::H256;
 //use node_runtime::Call;
 
-pub mod ethereum;
+//pub mod ethereum;
 /**
   Wallet 结构说明：
     一个助记词 对应的是一个钱包，在cashbox钱包软件中 可以同时管理多个钱包；

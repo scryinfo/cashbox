@@ -4,6 +4,7 @@ use super::model::*;
 use std::sync::mpsc;
 use crate::wallet_crypto::Crypto;
 use std::collections::HashMap;
+use ethereum_types::{U256, U128};
 
 pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<String,String>{
 
@@ -36,6 +37,108 @@ pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<Stri
     }
 }
 
+
+///ETH交易签名
+/// from_account: 转出账户
+/// to_account: 转入账户
+/// amount：转出的ETH数量
+/// psw 转出账户钱包keystore解密密码
+///  nonce  转出账户当前的nonce值
+/// gasLimit 这笔交易最大允许的gas消耗
+/// gasPrice 指定gas的价格
+/// data 备注消息（当交易确认后，能够在区块上查看到）
+pub fn eth_raw_transfer_sign(from_account:&str,to_account:&str,amount:&str,psw: &[u8], nonce:&str,gasLimit:&str, gasPrice:&str,data:Option<String>,chian_id:u64)->Result<String,String>{
+    //
+    match module::wallet::find_keystore_wallet_from_address(from_account,ChainType::ETH) {
+        Ok(keystore)=>{
+            match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
+                Ok(mnemonic) => {
+                    //密码验证通过开始拼接交易签名数据
+                    //todo 输入的数量都是整数？
+
+                    let nonce = U256::from_dec_str(nonce).unwrap();
+                    let amount = U256::from_dec_str(amount).unwrap();
+                    let gas_limit = U256::from_dec_str(gasLimit).unwrap();
+                    let gas_price = U256::from_dec_str(gasPrice).unwrap();
+                    let to =    H160::from_slice(hex::decode(to_account.get(2..).unwrap()).unwrap().as_slice());
+                    let data =  match data {
+                            Some(data)=>data.as_bytes().to_vec(),
+                            None=>vec![]
+                        };
+
+                   let rawtx =  ethtx::RawTransaction{
+                        nonce: nonce,
+                        to: Some(to),//针对转账操作,to不能为空
+                        value: amount,
+                        gas_price: gas_price,
+                        gas: gas_limit,
+                        data,
+                    };
+                    //todo 增加对错误的处理
+                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None).unwrap();
+
+                    //todo 增加链id ,从助记词生成私钥 secp256k1
+                   let tx_signed =  rawtx.sign(&pri_key,Some(chain_id));
+                    Ok(hex::encode(tx_signed))
+                }
+                Err(msg) => Err(msg),
+            }
+        },
+        Err(msg)=>{Err(msg)}
+    }
+}
+
+///ETH ERC20 转账交易签名  当前钱包针对ERC20只提供转账功能
+/// from_account: 转出账户
+/// contract_address: 合约地址（代币合约地址）
+/// to_account: 转入账户
+/// amount：转出的erc20 token数量
+/// psw 转出账户钱包keystore解密密码
+///  nonce  转出账户当前的nonce值
+/// gasLimit 这笔交易最大允许的gas消耗
+/// gasPrice 指定gas的价格
+/// data 备注消息（还需要再确认一下，当转erc20 token时 这个字段是否还有效？）
+pub fn eth_raw_erc20_transfer_sign(from_account:&str,contract_address:&str,to_account:&str,amount:&str,psw: &[u8],nonce:&str,gasLimit:&str, gasPrice:&str,data:Option<String>,chian_id:u64)->Result<String,String>{
+
+    match module::wallet::find_keystore_wallet_from_address(from_account,ChainType::EEE) {
+        Ok(keystore)=>{
+            match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
+                Ok(mnemonic) => {
+                    //密码验证通过
+
+                    //todo 输入的数量都是整数？
+                    let nonce = U256::from_dec_str(nonce).unwrap();
+                    let amount = U128::from_dec_str(amount).unwrap();
+                    let gas_limit = U256::from_dec_str(gasLimit).unwrap();
+                    let gas_price = U256::from_dec_str(gasPrice).unwrap();
+                    let to =    H160::from_slice(hex::decode(to_account.get(2..).unwrap()).unwrap().as_slice());
+                    //todo 增加错误处理
+                    let encode_data = ethtx::get_erc20_transfer_data(to_account,amount).unwrap();
+                    let data =  match data {
+                        Some(data)=>data.as_bytes().to_vec(),
+                        None=>vec![]
+                    };
+
+                    let rawtx =  ethtx::RawTransaction{
+                        nonce: nonce,
+                        to: Some(to),//针对调用合约,to不能为空
+                        value: U256::from_dec_str("0"),
+                        gas_price: gas_price,
+                        gas: gas_limit,
+                        data:encode_data,
+                    };
+                    //todo 增加对错误的处理
+                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None).unwrap();
+                    //todo 增加链id ,从助记词生成私钥 secp256k1
+                    let tx_signed =  rawtx.sign(&pri_key,Some(chain_id));
+                    Ok(hex::encode(tx_signed))
+                }
+                Err(msg) => Err(msg),
+            }
+        },
+        Err(msg)=>{Err(msg)}
+    }
+}
 
 pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
     let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
