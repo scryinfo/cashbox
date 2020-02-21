@@ -5,6 +5,7 @@ import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -676,13 +677,20 @@ class _TransferEthPageState extends State<TransferEthPage> {
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd);
 
-            //Wallet walletModel = await Wallets.instance.getNowWalletModel();
-            //ChainETH chainETH = walletModel.getChainByChainType(ChainType.ETH);
+            Wallet walletModel = await Wallets.instance.getNowWalletModel();
+            ChainETH chainETH = walletModel.getChainByChainType(ChainType.ETH);
             //String fromAddress = chainETH.chainAddress;
             String walletId = await Wallets.instance.getNowWalletId();
-            // todo  FFI拼接好交易 TODO  再去 签名功能动态库签名
-            Wallets.instance.ethTxSign(walletId, fromAddress, _toAddressController.text.toString(), _txValueController.text,
-                _backupMsgController.text, Uint8List.fromList(pwd.codeUnits));
+            String nonce = await loadTxAccount(fromAddress);
+            if(nonce==null||nonce.trim()==""){
+              print("取的nonce值有问题");
+              return;
+            }
+            // todo  链类型处理
+            // todo  gas费单位统一
+            var result = Wallets.instance.ethTxSign(walletId, chainETH.chainTypeToInt(ChainType.ETH), fromAddress, _toAddressController.text.toString(),
+                contractAddress, _txValueController.text, _backupMsgController.text, Uint8List.fromList(pwd.codeUnits),
+                mGasFeeValue.toString(), mGasLimitValue.toString(), nonce);
             // NavigatorUtils.push(
             //   context,
             //   Routes.eeePage,
