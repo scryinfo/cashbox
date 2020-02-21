@@ -33,6 +33,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   String toAddressValue;
   bool isShowExactGas = false;
   int standardAddressLength = 42; //以太坊标准地址42位
+  int eth2gasUnit = 1000*1000*1000;   // 1 ETH = 1e9gwei (10的九次方) = 1e18gwei
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
   String arrowIcon = "assets/images/ic_collapse.png";
@@ -51,10 +52,10 @@ class _TransferEthPageState extends State<TransferEthPage> {
   @override
   void initState() {
     super.initState();
-    {
-       fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-       contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
-    }
+    // {
+    //    fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+    //    contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+    // }
   }
 
   @override
@@ -76,9 +77,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
       mGasPriceValue = GlobalConfig.getDefaultGasPrice(GlobalConfig.EthGasPriceKey);
       mGasLimitValue = GlobalConfig.getDefaultGasLimit(GlobalConfig.EthGasLimitKey);
     }
-    mMaxGasFee = mMaxGasLimit * mMaxGasPrice / (1000 * 1000 * 1000);
-    mMinGasFee = mMinGasLimit * mMinGasPrice / (1000 * 1000 * 1000);
-    mGasFeeValue = mGasLimitValue * mGasPriceValue / (1000 * 1000 * 1000);
+    mMaxGasFee = mMaxGasLimit * mMaxGasPrice / eth2gasUnit;
+    mMinGasFee = mMinGasLimit * mMinGasPrice / eth2gasUnit;
+    mGasFeeValue = mGasLimitValue * mGasPriceValue / eth2gasUnit;
   }
 
   void initDataConfig() {
@@ -365,7 +366,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   onChanged: (double value) {
                                     setState(() {
                                       mGasPriceValue = value;
-                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
+                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
                                       print("===>" + mGasPriceValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
@@ -451,7 +452,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   onChanged: (double value) {
                                     setState(() {
                                       mGasLimitValue = value;
-                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
+                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
                                       print("===>" + mGasLimitValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
@@ -679,7 +680,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
             Wallet walletModel = await Wallets.instance.getNowWalletModel();
             ChainETH chainETH = walletModel.getChainByChainType(ChainType.ETH);
-            //String fromAddress = chainETH.chainAddress;
             String walletId = await Wallets.instance.getNowWalletId();
             String nonce = await loadTxAccount(fromAddress);
             if(nonce==null||nonce.trim()==""){

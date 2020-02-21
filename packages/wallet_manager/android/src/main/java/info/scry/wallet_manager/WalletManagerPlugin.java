@@ -426,7 +426,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "ethTxSign": {
                 Log.d("nativeLib=>", "ethTxSign is enter =>");
                 Message message = new Message();
-                message = NativeLib.eeeTxSign((String) (call.argument("mnId")),
+                message = NativeLib.ethTxSign((String) (call.argument("mnId")),
                         (int) (call.argument("chainType")),
                         (String) (call.argument("fromAddress")),
                         (String) (call.argument("toAddress")),
