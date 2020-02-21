@@ -35,7 +35,7 @@ pub enum EthChainId{
     ROPSTEN=3,
     RINKEBY=4,
 }
-#[derive(PartialEq,Clone)]
+#[derive(PartialEq,Clone,Debug)]
 pub enum ChainType {
     BTC = 1,
     BtcTest =2,
@@ -91,7 +91,7 @@ mod tests {
         let (send_tx, recv_tx) = mpsc::channel();
         let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
         let mnemonic = "swarm grace knock race flip unveil pyramid reveal shoot vehicle renew axis";
-        let to = "5DATag245rFG8PvCHnSpntLMhF9xvKZQPyshaAFhSiMMcFpU";
+        let _to = "5DATag245rFG8PvCHnSpntLMhF9xvKZQPyshaAFhSiMMcFpU";
       //  let seed =  wallet_crypto::Sr25519::seed_from_phrase(mnemonic,None);
         //let pair = wallet_crypto::Sr25519::pair_from_suri(&mnemonic,None);
         let pair = wallet_crypto::Sr25519::pair_from_suri("//Alice",None);
