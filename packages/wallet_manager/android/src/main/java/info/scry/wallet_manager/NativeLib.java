@@ -295,8 +295,8 @@ public class NativeLib {
     /*------------------------------------------交易相关------------------------------------------*/
 
     // Eth 交易签名。签名结果是：交易类型
-    public static native Message ethTxSign(String rawTx, String mnId, byte[] pwd);
-
+    // 说明： gasPrice单位：     gaslimit单位：
+    public static native Message ethTxSign(String mnId, String fromAddress,String toAddress,String contractAddress, String value,String backup,  byte[] pwd, String gasPrice,String gasLimit);
 
     //ETH 交易拼装。   返回：未签名的交易 String。
     //nonce记录位置？？？
@@ -310,11 +310,6 @@ public class NativeLib {
 
     //处理建议优先考虑，实现spv的库处做。   能更方便获取utxo,还有找零地址选择,找零金额。
     public static native byte[] btcTxMakeBTCRawTx(String[] from, String[] to, String value);
-
-
-    //获取签名后的交易信息，区分链类型
-    //返回：签名后的交易 byte[]
-    public static native byte[] ethTxSignTx(String rawTx, byte[] encodeMne, byte[] pwd);
 
     public static native byte[] btcTxSignTx(String rawTx, byte[] encodeMne, byte[] pwd);
 
