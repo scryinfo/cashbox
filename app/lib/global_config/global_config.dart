@@ -1,3 +1,7 @@
+/*
+*     1 ETH = 1e9gwei (10的九次方) = 1e18 wei
+* */
+
 class GlobalConfig {
   static const EthGasLimitKey="eth";
   static const Erc20GasLimitKey="eth";

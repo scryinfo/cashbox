@@ -37,7 +37,6 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       // fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
       // contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
     }
-
     txListFuture = getTxListData();
   }
 
