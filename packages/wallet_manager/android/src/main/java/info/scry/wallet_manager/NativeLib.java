@@ -9,7 +9,7 @@ public class NativeLib {
         public static final int BTC = 1;
         public static final int BTC_TEST = 2;
         public static final int ETH = 3;
-        public static final int ETH_TEST = 4;
+        public static final int ETH_TEST = 4;   //Ropsten 用这条测试链
         public static final int EEE = 5;
         public static final int EEE_TEST = 6;
     }
@@ -296,7 +296,8 @@ public class NativeLib {
 
     // Eth 交易签名。签名结果是：交易类型
     // 说明： gasPrice单位：     gaslimit单位：
-    public static native Message ethTxSign(String mnId, String fromAddress,String toAddress,String contractAddress, String value,String backup,  byte[] pwd, String gasPrice,String gasLimit,String nonce);
+    // 链类型int   1：正式链     3：测试链（Ropsten）
+    public static native Message ethTxSign(String mnId, int chainType,String fromAddress,String toAddress,String contractAddress, String value,String backup,  byte[] pwd, String gasPrice,String gasLimit,String nonce);
 
     //ETH 交易拼装。   返回：未签名的交易 String。
     //nonce记录位置？？？
