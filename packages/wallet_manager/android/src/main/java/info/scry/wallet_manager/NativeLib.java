@@ -296,7 +296,7 @@ public class NativeLib {
 
     // Eth 交易签名。签名结果是：交易类型
     // 说明： gasPrice单位：     gaslimit单位：
-    public static native Message ethTxSign(String mnId, String fromAddress,String toAddress,String contractAddress, String value,String backup,  byte[] pwd, String gasPrice,String gasLimit);
+    public static native Message ethTxSign(String mnId, String fromAddress,String toAddress,String contractAddress, String value,String backup,  byte[] pwd, String gasPrice,String gasLimit,String nonce);
 
     //ETH 交易拼装。   返回：未签名的交易 String。
     //nonce记录位置？？？
