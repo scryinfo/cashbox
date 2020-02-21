@@ -57,27 +57,19 @@ impl DataServiceProvider {
                         address_stat.bind(4, addr.address.as_str()).expect("save_mnemonic_address bind addr.address ");
                         address_stat.bind(5, addr.pub_key.as_str()).expect("save_mnemonic_address bind addr.pub_key ");
                         address_stat.bind(6, addr.status as i64).expect("save_mnemonic_address  bind addr.status ");
-
+                       // address_stat.next();
                         match address_stat.next() {
                             Ok(_) => {
                                 // TODO 后续来完善需要更新的数据详情
-                                // let eee_digit_account_sql = format!("insert into detail.EeeDigit(address_id) values('{}');", addr.address_id);
-                                let eee_digit_account_sql = "INSERT INTO detail.EeeDigit(address_id,full_name,short_name,decimals,balance)VALUES(?,?,?,?,?);";
-                                //let eth_digit_account_sql = format!("insert into detail.EthDigit(address_id) values('{}');", addr.address_id);
-                                //let btc_digit_account_sql = format!("insert into detail.BtcDigit(address_id) values('{}');", addr.address_id);
-                                //self.db_hander.execute(eee_digit_account_sql).expect("update selected state");
-                                //self.db_hander.execute(eth_digit_account_sql).expect("update selected state");
-                                //self.db_hander.execute(btc_digit_account_sql).expect("update selected state");
-                                match self.db_hander.prepare(eee_digit_account_sql) {
-                                    Ok(mut digit_stat) => {
-                                        digit_stat.bind(1, addr.address_id.as_str()).expect("digit_account_sql  bind addr.address ");
-                                        digit_stat.bind(2, "eee").expect("digit_account_sql  bind addr.address ");
-                                        digit_stat.bind(3, "eee").expect("digit_account_sql bind addr.address ");
-                                        digit_stat.bind(4, 18).expect("digit_account_sql  bind addr.address ");
-                                        digit_stat.bind(5, 0).expect("digit_account_sql  bind addr.address ");
-                                        digit_stat.next().expect("exec chain insert error");
-                                    }
-                                    Err(e) => return Err(e.to_string())
+                                address_stat.reset();
+                                if  addr.chain_id==5||addr.chain_id==6  {//添加eth 或者eth test相关地址代币
+                                    let eth_digit_account_sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id)VALUES({},'{}');",1,addr.address_id);
+                                    println!("{}",eth_digit_account_sql);
+                                    self.db_hander.execute(eth_digit_account_sql).expect("update eee digit");
+                                }
+                                if addr.chain_id==3||addr.chain_id==4 {//添加eth 或者eth test相关地址代币
+                                    let eth_digit_account_sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id)VALUES({},'{}');",2,addr.address_id);
+                                    self.db_hander.execute(eth_digit_account_sql).expect("update eth digit");
                                 }
                             }
                             Err(e) => return Err(e.to_string())
