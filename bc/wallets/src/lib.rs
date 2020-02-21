@@ -30,6 +30,12 @@ impl Default for StatusCode{
 }
 
 #[derive(PartialEq,Clone)]
+pub enum EthChainId{
+    MAIN=1,
+    ROPSTEN=3,
+    RINKEBY=4,
+}
+#[derive(PartialEq,Clone)]
 pub enum ChainType {
     BTC = 1,
     BtcTest =2,

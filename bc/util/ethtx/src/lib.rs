@@ -6,10 +6,24 @@ use std::convert::TryFrom;
 use ethereum_types::{U256, H160};
 use rlp::RlpStream;
 use secp256k1::{key::SecretKey, Message, Secp256k1};
+use bip39::{Mnemonic, MnemonicType, Language,Seed};
 
-pub mod contract;
+mod contract;
 mod types;
 mod error;
+
+// 从助记词恢复私钥
+pub fn pri_from_mnemonic(phrase:&str,psd:Option<Vec<u8>>)->Option<Vec<u8>>{
+    let mnemonic = Mnemonic::from_phrase(phrase, Language::English).unwrap();
+    let psd = {
+        match psd {
+            Some(data)=>String::from_utf8(data).unwrap(),
+            None=>String::from(""),
+        }
+    };
+    let seed = Seed::new(&mnemonic,&psd);
+    seed.as_bytes().get(0..32).map(|data|data.to_vec())
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct EthTxHelper {
@@ -24,7 +38,7 @@ impl EthTxHelper {
         }
     }
 
-    fn encode_contract_input<P>(&self, method: &str, params: P) -> Result<String, String> where P: contract::tokens::Tokenize {
+    fn encode_contract_input<P>(&self, method: &str, params: P) -> Result<Vec<u8>, String> where P: contract::tokens::Tokenize {
         let data = self.abi.function(method).and_then(|function| {
             for input in function.inputs.iter() {
                 println!("{:?}", input);
@@ -34,13 +48,13 @@ impl EthTxHelper {
         //let data = self.abi.unwrap().function(method).and_then(|function| function.encode_input(&params.into_tokens()));
         match data {
             Ok(bytes) => {
-                Ok(hex::encode(bytes))
+                Ok(bytes)
             }
             Err(err) => Err(err.to_string())
         }
     }
 }
-pub fn get_erc20_transfer_data(address:&str,value:u128)->Result<String,String>{
+pub fn get_erc20_transfer_data(address:&str,value:u128)->Result<Vec<u8>,String>{
     let bytecode = include_bytes!("build/Erc20.abi");
     let helper = EthTxHelper::load(&bytecode[..]);
     //convert address to bytes
@@ -125,7 +139,7 @@ impl RawTransaction {
     }
 }
 
-pub fn keccak(s: &[u8]) -> [u8; 32] {
+ fn keccak(s: &[u8]) -> [u8; 32] {
     let mut result = [0u8; 32];
     tiny_keccak::Keccak::keccak256(s, &mut result);
     result
@@ -152,20 +166,37 @@ fn ecdsa_sign(hash: &[u8], private_key: &[u8], chain_id: u64) -> EcdsaSig {
 
 
 #[test]
-fn env_test() {
-    assert_eq!(2 + 2, 4);
+fn pri_from_mnemonic_test() {
+    let words = "pulp second side simple clinic step salad enact only mixed address paddle";
+    pri_from_mnemonic(words,None);
 }
 
 #[test]
-fn erc20_transfer_test() {
-    /*let bytecode = include_bytes!("build/Erc20.abi");
-    let helper = EthTxHelper::load(&bytecode[..]);
-    let mut bytes = [0u8; 20];
-    bytes.clone_from_slice(hex::decode("5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c").unwrap().as_slice());
-
-    let address = types::Address::try_from(bytes);
-    let data = helper.encode_contract_input("transfer", (address.unwrap(), 255u32));
-    println!("{:?}", data);*/
+fn erc20_transfer_data_test() {
     let data = get_erc20_transfer_data("5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c",2000);
     println!("{:?}", data);
+}
+
+#[test]
+fn eth_rawtx_sign_test(){
+    let to_account="0xba32523d54ad70c8cd0b96443c4de607137af313";
+    let nonce = U256::from_dec_str("10").unwrap();
+    let amount = U256::from_dec_str("200").unwrap();
+    let gas_limit = U256::from_dec_str("137").unwrap();
+    let gas_price = U256::from_dec_str("211").unwrap();
+    let addition ="tx test";
+    let to =    H160::from_slice(hex::decode(to_account.get(2..).unwrap()).unwrap().as_slice());
+
+    let rawtx =  RawTransaction{
+        nonce: nonce,
+        to: Some(to),//针对转账操作,to不能为空
+        value: amount,
+        gas_price: gas_price,
+        gas: gas_limit,
+        data: addition.as_bytes().to_vec(),
+    };
+    let words = "pulp second side simple clinic step salad enact only mixed address paddle";
+    let pri = pri_from_mnemonic(words,None).unwrap();
+    let signed_data = rawtx.sign(&pri,Some(3));
+    println!("signed data:{:?}",hex::encode(signed_data));
 }
