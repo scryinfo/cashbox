@@ -4,8 +4,16 @@ use log::debug;
 
 impl DataServiceProvider {
     pub fn display_eee_chain(&self) -> Result<Vec<WalletObj>, String> {
-        let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,c.is_visible as chain_is_visible
+     /*   let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,c.is_visible as chain_is_visible
  from Wallet a,detail.Chain b,detail.Address c,detail.EeeDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
+*/
+
+        let all_mn =   "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.*,c.is_visible as chain_is_visible
+         from Wallet a,detail.Chain b,detail.Address c,
+        ( select digit_id,contract_address,short_name,full_name,balance,detail.DigitBase.is_visible as digit_is_visible,decimals,url_img from detail.DigitUseDetail ,detail.DigitBase
+         where digit_id = id and group_name !='ETH' and group_name !='BTC'
+         ) as d
+         where a.wallet_id=c.wallet_id and c.chain_id = b.id and a.status =1 and c.status =1 and b.id in (5,6);";
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
@@ -36,8 +44,16 @@ impl DataServiceProvider {
     }
 
     pub fn display_eth_chain(&self) -> Result<Vec<WalletObj>, String> {
-        let all_mn = " select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,c.is_visible as chain_is_visible
+       /* let all_mn = " select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,c.is_visible as chain_is_visible
  from Wallet a,detail.Chain b,detail.Address c,detail.EthDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
+*/
+        let all_mn =   "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.*,c.is_visible as chain_is_visible
+         from Wallet a,detail.Chain b,detail.Address c,
+        ( select digit_id,contract_address,short_name,full_name,balance,detail.DigitBase.is_visible as digit_is_visible,decimals,url_img from detail.DigitUseDetail ,detail.DigitBase
+         where digit_id = id and group_name !='EEE' and group_name !='BTC'
+         ) as d
+         where a.wallet_id=c.wallet_id and c.chain_id = b.id and a.status =1 and c.status =1 and b.id in (3,4);";
+
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
@@ -67,8 +83,15 @@ impl DataServiceProvider {
     }
 
     pub fn display_btc_chain(&self) -> Result<Vec<WalletObj>, String> {
-        let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,c.is_visible as chain_is_visible
+      /*  let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,c.is_visible as chain_is_visible
 from Wallet a,detail.Chain b,detail.Address c,detail.BtcDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
+*/
+        let all_mn =   "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.*,c.is_visible as chain_is_visible
+         from Wallet a,detail.Chain b,detail.Address c,
+        ( select digit_id,contract_address,short_name,full_name,balance,detail.DigitBase.is_visible as digit_is_visible,decimals,url_img from detail.DigitUseDetail ,detail.DigitBase
+         where digit_id = id and group_name !='ETH' and group_name !='EEE'
+         ) as d
+         where a.wallet_id=c.wallet_id and c.chain_id = b.id and a.status =1 and c.status =1 and b.id in (1,2);";
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();

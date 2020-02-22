@@ -88,13 +88,13 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [UPDATED_TIME] DATETIME);
 
-    insert into Chain(id,short_name,full_name) Values(1,'BTC',"bitcoin");
-    insert into Chain(id,short_name,full_name) Values(2,'BTC TEST',"bitcoin test");
-    insert into Chain(id,short_name,full_name) Values(3,'ETH',"ethereum");
-    insert into Chain(id,short_name,full_name) Values(4,'ETH TEST',"ethereum test");
-    insert into Chain(id,short_name,full_name) Values(5,'EEE',"eee");
-    insert into Chain(id,short_name,full_name) Values(6,'EEE TEST',"eee test");
-    update Chain set type=5,domain='eee.com' WHERE id = 5;
+    insert into Chain(id,short_name,full_name,type,domain) Values(1,'BTC',"bitcoin",1,"");
+    insert into Chain(id,short_name,full_name,type,domain) Values(2,'BTC TEST',"bitcoin test",2,"");
+    insert into Chain(id,short_name,full_name,type,domain) Values(3,'ETH',"ethereum",3,"");
+    insert into Chain(id,short_name,full_name,type,domain) Values(4,'ETH TEST',"ethereum test",4,"");
+    insert into Chain(id,short_name,full_name,type,domain) Values(5,'EEE',"eee",5,"");
+    insert into Chain(id,short_name,full_name,type,domain) Values(6,'EEE TEST',"eee test",6,"");
+  /*  update Chain set type=5,domain='eee.com' WHERE id = 5;*/
     /*digit基础数据插入EEE代币*/
     insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible') values("default","EEE","EEE",12,"EEE",1);
     /*digit基础数据插入ETH代币*/

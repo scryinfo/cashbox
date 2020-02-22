@@ -214,8 +214,7 @@ impl DataServiceProvider {
                 wallet_id: String::from(cursor[0].as_string().unwrap()),
                 mn_digest: String::from(cursor[1].as_string().unwrap()),
                 full_name: cursor[2].as_string().map(|str| String::from(str)),
-                mnemonic:
-                String::from(cursor[3].as_string().unwrap()),
+                mnemonic: String::from(cursor[3].as_string().unwrap()),
                 wallet_type: cursor[4].as_integer().unwrap(),
                 selected: cursor[5].as_string().map(|value| Self::get_bool_value(value)),
 
@@ -284,7 +283,7 @@ impl DataServiceProvider {
             Err(e) => Err(e.to_string())
         }
     }
-    // TODO 不同的链有不同的 digit 格式，后续在处理的时候 需要优化
+    // TODO 不同的链有不同的 digit 格式，后续在处理的时候 需要优化 当前没有使用这个函数??
     pub fn display_mnemonic_list(&self) -> Result<Vec<WalletObj>, String> {
         let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.address as chain_address,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
  from Wallet a,detail.Chain b,detail.Address c,detail.EeeDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
