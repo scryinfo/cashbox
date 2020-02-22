@@ -65,14 +65,17 @@ const httpHeaders = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36'
 };
 
-const Eth_Balance = "http://api-cn.etherscan.com/api?module=account&action=balance&address=";
-//http://api-cn.etherscan.com/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=YourApiKeyTokens
-String assembleEthBalanceUrl(String address) {
-  return Eth_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+const Eth_MainNet_Balance = "http://api-cn.etherscan.com/api?module=account&action=balance&address=";
+const Eth_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account&action=balance&address=";
+//http://api-cn.etherscan.com/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+//https://api-ropsten.etherscan.io/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+String assembleEthBalanceUrl(String address,String netType=Eth_MainNet_Balance) {
+  return netType + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
 }
 
 const Erc20_Balance = "http://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=";
-//http://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=0x57d90b64a1a57749b0f932f1a3395792e12e7055&address=0xe04f27eb70e025b78871a2ad7eabe85e61212761&tag=latest&apikey=YourApiKeyToken
+//http://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0xe04f27eb70e025b78871a2ad7eabe85e61212761&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+//http://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e&address=0xe04f27eb70e025b78871a2ad7eabe85e61212761&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 String assembleErc20BalanceUrl(String address,{String contractAddress=DddMainNetContractAddress}) {
   return Erc20_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
 }
