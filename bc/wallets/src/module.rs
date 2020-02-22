@@ -11,3 +11,9 @@ fn create_wallet_test() {
     let wallet = wallet::create_wallet("wallet test", mnemonic.as_bytes(), "123456".as_bytes(), 1);
     println!("{:?}", wallet);
 }
+
+#[test]
+fn load_wallet_test(){
+    let wallets =wallet::get_all_wallet();
+    println!("load wallet:{:?}", wallets);
+}
