@@ -48,7 +48,7 @@ pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<Stri
 /// gasPrice 指定gas的价格
 /// data 备注消息（当交易确认后，能够在区块上查看到）
 /// chain_id: ETH的链类型
-pub fn eth_raw_transfer_sign(from_account:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, chain_id:u64) ->Result<String,String>{
+pub fn eth_raw_transfer_sign(from_account:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, chain_type:u64) ->Result<String,String>{
     //
     match module::wallet::find_keystore_wallet_from_address(from_account, ChainType::ETH) {
         Ok(keystore)=>{
@@ -79,8 +79,8 @@ pub fn eth_raw_transfer_sign(from_account:&str, to_account:&str, amount:&str, ps
                     let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None).unwrap();
 
                     //todo 增加链id ,从助记词生成私钥 secp256k1
-                   let tx_signed =  rawtx.sign(&pri_key,Some(chain_id));
-                    Ok(hex::encode(tx_signed))
+                   let tx_signed =  rawtx.sign(&pri_key,eth_chain_type(chain_type));
+                    Ok(format!("0x{}",hex::encode(tx_signed)))
                 }
                 Err(msg) => Err(msg),
             }
@@ -88,7 +88,13 @@ pub fn eth_raw_transfer_sign(from_account:&str, to_account:&str, amount:&str, ps
         Err(msg)=>{Err(msg)}
     }
 }
-
+fn eth_chain_type(chain_type:u64)->Option<u64>{
+    if chain_type==3 {
+        Some(1)
+    }else {
+        Some(3)
+    }
+}
 ///ETH ERC20 转账交易签名  当前钱包针对ERC20只提供转账功能
 /// from_account: 转出账户
 /// contract_address: 合约地址（代币合约地址）
@@ -99,14 +105,13 @@ pub fn eth_raw_transfer_sign(from_account:&str, to_account:&str, amount:&str, ps
 /// gasLimit 这笔交易最大允许的gas消耗
 /// gasPrice 指定gas的价格
 /// data 备注消息（还需要再确认一下，当转erc20 token时 这个字段是否还有效？）
-pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, chain_id:u64) ->Result<String,String>{
+pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, chain_type:u64) ->Result<String,String>{
 
-    match module::wallet::find_keystore_wallet_from_address(from_account,ChainType::EEE) {
+    match module::wallet::find_keystore_wallet_from_address(from_account,ChainType::ETH) {
         Ok(keystore)=>{
             match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过
-
                     //todo 输入的数量都是整数？
                     let nonce = U256::from_dec_str(nonce).unwrap();
                    // let amount = U128::from_dec_str(amount).unwrap();
@@ -116,10 +121,6 @@ pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:&str, to_
                     let contract_address =    H160::from_slice(hex::decode(contract_address.get(2..).unwrap()).unwrap().as_slice());
                     //todo 增加错误处理
                     let encode_data = ethtx::get_erc20_transfer_data(to_account,amount).unwrap();
-                    let data =  match data {
-                        Some(data)=>data.as_bytes().to_vec(),
-                        None=>vec![]
-                    };
 
                     let rawtx =  ethtx::RawTransaction{
                         nonce: nonce,
@@ -132,8 +133,8 @@ pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:&str, to_
                     //todo 增加对错误的处理
                     let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None).unwrap();
                     //todo 增加链id ,从助记词生成私钥 secp256k1
-                    let tx_signed =  rawtx.sign(&pri_key,Some(chain_id));
-                    Ok(hex::encode(tx_signed))
+                    let tx_signed =  rawtx.sign(&pri_key,eth_chain_type(chain_type));
+                    Ok(format!("0x{}",hex::encode(tx_signed)))
                 }
                 Err(msg) => Err(msg),
             }
