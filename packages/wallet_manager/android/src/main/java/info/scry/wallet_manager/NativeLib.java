@@ -296,7 +296,7 @@ public class NativeLib {
 
     // Eth 交易签名。签名结果是：交易类型
     // 说明： gasPrice单位：gwei     gaslimit单位：gwei       （1 ETH = 1e9 gwei (10的九次方)）
-    // 链类型int   3：正式链     4：测试链（Ropsten）
+    //       链类型int   3：正式链   4：测试链（Ropsten）
     public static native Message ethTxSign(String mnId, int chainType,String fromAddress,String toAddress,String contractAddress, String value,String backup,  byte[] pwd, String gasPrice,String gasLimit,String nonce);
 
     //ETH 交易拼装。   返回：未签名的交易 String。
