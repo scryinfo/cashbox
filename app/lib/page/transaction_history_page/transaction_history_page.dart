@@ -28,22 +28,23 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
   String fromAddress = "";
+  //String fromAddress = "0xa4512ca7618d8d12a30C28979153aB09809ED7fD";
   String contractAddress = "";
 
   @override
   void initState() {
     super.initState();
-    {
-      // fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-      // contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
-    }
-    txListFuture = getTxListData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    {
+      // fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+      // contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+    }
     getBalanceData();
+    txListFuture = getTxListData();
   }
 
   @override
@@ -93,6 +94,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       print("onError===>" + "$onError");
     }
     print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
+    setState(() {
+      this.ethTxListModel = ethTxListModel;
+    });
     return ethTxListModel;
   }
 
@@ -125,7 +129,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             width: ScreenUtil().setWidth(23),
             height: ScreenUtil().setHeight(8),
             child: Text(
-              "balanceInfo" ,
+              balanceInfo ,
               textAlign:  TextAlign.start,
               style: TextStyle(
                 fontSize: ScreenUtil.instance.setSp(4),
@@ -208,12 +212,15 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   ),
                   Gaps.scaleHGap(45),
                   Container(
-                    child: Text(
-                      "2018.07",
-                      style: TextStyle(
-                        color: Colors.white70,
+                    child: Opacity(
+                      opacity: 0,  //todo 通过时间筛选交易，暂不显示
+                      child: Text(
+                        "2018.07",
+                        style: TextStyle(
+                          color: Colors.white70,
+                        ),
+                        textAlign: TextAlign.end,
                       ),
-                      textAlign: TextAlign.end,
                     ),
                   ),
                   Gaps.scaleHGap(6),
