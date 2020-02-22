@@ -33,8 +33,9 @@ fn create_teble(table_name: &str, table_desc: &str) -> Result<(), String> {
     }
 }
 
+//导入代币基础数据 目前默认是在创建数据库的时候调用
 fn init_digit_base_data(table_name: &str) -> Result<(), String> {
-    let digit_base_insert_sql = "insert into DigitBase('contract_address','type','short_name','full_name','decimals','group_name','url_img') values(?,?,?,?,?,?,?); ";
+    let digit_base_insert_sql = "insert into DigitBase('contract_address','type','short_name','full_name','decimals','group_name','url_img','is_visible') values(?,?,?,?,?,?,?,?); ";
     let bytecode = include_bytes!("res/chainEthFile.json");
     //todo 错误处理
     let mut index =0;
@@ -54,10 +55,12 @@ fn init_digit_base_data(table_name: &str) -> Result<(), String> {
                 state.bind(5, digit.decimal).map_err(|e| format!("set digit decimal,{}", e.to_string()));
                 state.bind(6, "ETH").map_err(|e| format!("set digit group name,{}", e.to_string()));
 
+
                 match digit.url_img {
                     Some(url)=> state.bind(7,url.as_str()),
                     None=> state.bind(7,""),
                 };
+                state.bind(8, 0 as i64).map_err(|e| format!("set digit is visible,{}", e.to_string()));
                 state.next();
                 state.reset();
             }
