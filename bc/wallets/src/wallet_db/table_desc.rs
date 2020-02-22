@@ -96,11 +96,11 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     insert into Chain(id,short_name,full_name) Values(6,'EEE TEST',"eee test");
     update Chain set type=5,domain='eee.com' WHERE id = 5;
     /*digit基础数据插入EEE代币*/
-    insert into DigitBase('type','short_name','full_name','decimals','group_name') values("default","EEE","EEE",12,"EEE");
+    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible') values("default","EEE","EEE",12,"EEE",1);
     /*digit基础数据插入ETH代币*/
-    insert into DigitBase('type','short_name','full_name','decimals','group_name') values("default","ETH","ethereum",18,"ETH");
+    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible') values("default","ETH","ethereum",18,"ETH",1);
     /*digit基础数据插入BTC代币*/
-    insert into DigitBase('type','short_name','full_name','decimals','group_name') values("default","BTC","bitcoin",18,"BTC");
+    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible') values("default","BTC","bitcoin",18,"BTC",1);
     COMMIT;
     PRAGMA foreign_keys = 'on';
     "#;

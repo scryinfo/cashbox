@@ -62,7 +62,7 @@ impl DataServiceProvider {
                             Ok(_) => {
                                 // TODO 后续来完善需要更新的数据详情
                                 address_stat.reset();
-                                if  addr.chain_id==5||addr.chain_id==6  {//添加eth 或者eth test相关地址代币
+                                if  addr.chain_id==5||addr.chain_id==6  {//添加eee 或者eee test相关地址代币
                                     let eth_digit_account_sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id)VALUES({},'{}');",1,addr.address_id);
                                     println!("{}",eth_digit_account_sql);
                                     self.db_hander.execute(eth_digit_account_sql).expect("update eee digit");
@@ -70,6 +70,9 @@ impl DataServiceProvider {
                                 if addr.chain_id==3||addr.chain_id==4 {//添加eth 或者eth test相关地址代币
                                     let eth_digit_account_sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id)VALUES({},'{}');",2,addr.address_id);
                                     self.db_hander.execute(eth_digit_account_sql).expect("update eth digit");
+                                    //在插入eth的时候 添加ddd 代币 //默认在每个钱包，只要启用ETH都包含这个代币
+                                    let insert_ddd_digit =  format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase a where a.contract_address like '0x9F5F3CFD7a32700C93F971637407ff17b91c7342';",addr.address_id);
+                                    self.db_hander.execute(insert_ddd_digit).expect("update eee digit");
                                 }
                             }
                             Err(e) => return Err(e.to_string())
