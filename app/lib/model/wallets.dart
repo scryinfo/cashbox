@@ -131,7 +131,23 @@ class Wallets {
           ..isVisible = true
           ..walletId = jniList[walletIndex]["walletId"];
         //todo add digit to ETH chain
-
+        List ethChainDigitList = ethChain["ethChainDigitList"];
+        for (int j = 0; j < ethChainDigitList.length; j++) {
+          Map digitInfoMap = ethChainDigitList[j];
+          Digit digitM = EthDigit();
+          digitM
+            ..digitId = digitInfoMap["digitId"]
+            ..chainId = digitInfoMap["chainId"]
+            ..contractAddress = digitInfoMap["address"]
+            ..shortName = digitInfoMap["shortName"]
+            ..fullName = digitInfoMap["fullName"]
+            ..balance = digitInfoMap["balance"]
+            ..isVisible = digitInfoMap["isVisible"]
+            ..decimal = digitInfoMap["decimal"]
+            ..urlImg = digitInfoMap["urlImg"];
+          chainEthM.digitsList.add(digitM);
+        }
+        walletM.chainList.add(chainEthM);
       }
       //todo    BTC 链信息还没有加入
       {
@@ -246,7 +262,6 @@ class Wallets {
     return eeeTxSignMap;
   }
 
-  // todo gaslimit gasPrice
   Future<Map> ethTxSign(String walletId, int chainType,String fromAddress, String toAddress, String contractAddress,
       String value, String backup, Uint8List pwd, String gasPrice,String gasLimit,String nonce) async {
     // WalletFFI walletFFI = new WalletFFI();
