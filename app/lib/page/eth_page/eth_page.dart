@@ -86,7 +86,7 @@ class _EthPageState extends State<EthPage> {
     }else{ //有展示数据，继续往里添加
       if(nowChainDigitsList.length-displayDigitsList.length>singleDigitCount){ //剩余的超过一页
         addDigitToDisplayList(singleDigitCount);
-      }else{//剩余的不够一页，全给加入进去。
+      }else{ //剩余的不够一页，全给加入进去。
         addDigitToDisplayList(nowChainDigitsList.length-displayDigitsList.length);
       }
     }
@@ -212,7 +212,7 @@ class _EthPageState extends State<EthPage> {
                 if (displayDigitsList.length < nowChainDigitsList.length) {
                   // 从JNI加载的数据还有没显示完的，继续将nowChainDigitsList剩余数据，
                   // 添加到 displayDigitsList里面做展示
-                  // loadDisplayDigitListData();
+                  loadDisplayDigitListData();  //下拉刷新的时候，加载新digit到displayDigitsList
                 } else {
                   //todo ，继续调jni获取，或者提示已经没数据了。 根据是否jni分页处理来决定。
                 }
