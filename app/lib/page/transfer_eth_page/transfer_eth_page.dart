@@ -52,23 +52,23 @@ class _TransferEthPageState extends State<TransferEthPage> {
   @override
   void initState() {
     super.initState();
-    initDataConfig();
   }
 
   void initDataConfig() {
-    _txValueController.text = Provider.of<TransactionProvide>(context).txValue;
-    _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress;
-    _backupMsgController.text = Provider.of<TransactionProvide>(context).backup;
     {
        fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
        contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
     }
+    _txValueController.text = Provider.of<TransactionProvide>(context).txValue ??"";
+    _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress??"";
+    _backupMsgController.text = Provider.of<TransactionProvide>(context).backup??"";
   }
 
   @override
   void didChangeDependencies() {
+    initDataConfig();
     super.didChangeDependencies();
-    if(contractAddress.trim()!=""){
+    if(contractAddress !=null && contractAddress.trim()!=""){
       mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.Erc20GasPriceKey);
       mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.Erc20GasPriceKey);
       mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.Erc20GasLimitKey);

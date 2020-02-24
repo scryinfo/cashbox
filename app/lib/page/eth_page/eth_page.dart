@@ -16,6 +16,7 @@ import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 import '../eth_page/left_drawer_card.dart';
@@ -48,6 +49,7 @@ class _EthPageState extends State<EthPage> {
   void initData() async {
     this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     print("eth_page => initData walletlist.length===>" + walletList.length.toString());
+    Fluttertoast.showToast(msg: "this.walletList.length.toString===>"+this.walletList.length.toString());
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
       Wallet wallet = walletList[index];
