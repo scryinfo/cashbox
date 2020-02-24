@@ -29,7 +29,7 @@ class EthPage extends StatefulWidget {
 class _EthPageState extends State<EthPage> {
   List<Wallet> walletList = [];
   Wallet nowWallet = Wallet();
-
+  static int singleDigitCount = 20;   //单页面显示20条数据，一次下拉刷新更新20条
   String moneyUnitStr = "USD";
   List<String> moneyUnitList = ["USD", "CNY", "KRW", "GBP", "JPY"];
   List<String> chainTypeList = ["EEE"]; //"BTC", "ETH",
@@ -73,11 +73,28 @@ class _EthPageState extends State<EthPage> {
     setState(() {
       this.walletList = walletList;
     });
-    future = initDigitListData();
+    future = loadDisplayDigitListData();
   }
 
-  Future<List<Digit>> initDigitListData() async {
-    for (var i = 0; i < nowChainDigitsList.length; i++) {
+  Future<List<Digit>> loadDisplayDigitListData() async {
+    if(displayDigitsList.length== 0){//没有展示数据
+      if(nowChainDigitsList.length < singleDigitCount){ //加载到的不够一页，全展示
+        addDigitToDisplayList(nowChainDigitsList.length);
+      }else{ //超一页，展示singleDigitCount个。
+        addDigitToDisplayList(singleDigitCount);
+      }
+    }else{ //有展示数据，继续往里添加
+      if(nowChainDigitsList.length-displayDigitsList.length>singleDigitCount){ //剩余的超过一页
+        addDigitToDisplayList(singleDigitCount);
+      }else{//剩余的不够一页，全给加入进去。
+        addDigitToDisplayList(nowChainDigitsList.length-displayDigitsList.length);
+      }
+    }
+    return displayDigitsList;
+  }
+
+  List<Digit> addDigitToDisplayList(int targetCount){
+    for (var i = displayDigitsList.length; i < targetCount; i++) {
       var digitRate = DigitRate();
       digitRate.volume = 0.035;
       digitRate.changeHourly = 0.096;
@@ -191,10 +208,11 @@ class _EthPageState extends State<EthPage> {
           () {
             setState(
               () {
-                //todo 根据 JNI walletlist每次refreshDataList +15条显示数据
+                //todo 根据 JNI walletList每次refreshDataList +singleDigitCount 条显示数据
                 if (displayDigitsList.length < nowChainDigitsList.length) {
                   // 从JNI加载的数据还有没显示完的，继续将nowChainDigitsList剩余数据，
                   // 添加到 displayDigitsList里面做展示
+                  // loadDisplayDigitListData();
                 } else {
                   //todo ，继续调jni获取，或者提示已经没数据了。 根据是否jni分页处理来决定。
                 }
