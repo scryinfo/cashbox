@@ -13,6 +13,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 
@@ -84,10 +85,12 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
   Future<List<EthTransactionModel>> getTxListData() async {
     try {
-      if(contractAddress.trim()==""){
+      if(contractAddress.trim()==""&&(fromAddress.trim()!="")){
         ethTxListModel = await loadEthTxHistory(fromAddress);
-      }else{
+      }else if(fromAddress.trim()!=""){
         ethTxListModel = await loadErc20TxHistory(fromAddress,contractAddress);
+      }else{
+        Fluttertoast.showToast(msg: "地址信息为空，请再检查");
       }
       print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
     } catch (onError) {
@@ -129,7 +132,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             width: ScreenUtil().setWidth(23),
             height: ScreenUtil().setHeight(8),
             child: Text(
-              balanceInfo ,
+              balanceInfo ?? "0.00" ,
               textAlign:  TextAlign.start,
               style: TextStyle(
                 fontSize: ScreenUtil.instance.setSp(4),
