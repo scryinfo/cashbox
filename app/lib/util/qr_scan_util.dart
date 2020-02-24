@@ -40,7 +40,7 @@ class QrScanUtil {
     return callbackResult;
   }
 
-  Map checkByScryCityTransfer(String qrInfo, BuildContext context) {
+  checkByScryCityTransfer(String qrInfo, BuildContext context) {
     if (qrInfo.isEmpty) {
       Fluttertoast.showToast(msg: S.of(context).qr_info_is_null);
       return null;
@@ -114,7 +114,6 @@ class QrScanUtil {
     {
       NavigatorUtils.push(context, Routes.transferEthPage);
     }
-    return paramsMap;
   }
 
   Map checkQrInfoByDiamondSignAndQr(String qrInfo, BuildContext context) {
