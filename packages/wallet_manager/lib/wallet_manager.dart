@@ -107,21 +107,21 @@ class WalletManager {
 
   // 设置当前链
   // apiNo:WM13
-  static Future<bool> setNowChain(String walletId, int chainType) async {
+  static Future<Map<dynamic, dynamic>> setNowChain(String walletId, int chainType) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('setNowChain', {"walletId": walletId, "chainType": chainType});
-    return false;
+    return allWalletList;
   }
 
   // 显示代币
   // apiNo:WM14
-  static Future<bool> showDigit(String walletId, String chainId, String digitId) async {
+  static Future<Map<dynamic, dynamic>> showDigit(String walletId, String chainId, String digitId) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('showDigit', {"walletId": walletId, "chainId": chainId, "digitId": digitId});
-    return null;
+    return allWalletList;
   }
 
   // 隐藏代币
   // apiNo:WM15
-  static Future<bool> hideDigit(String walletId, String chainId, String digitId) async {
+  static Future<Map<dynamic, dynamic>> hideDigit(String walletId, String chainId, String digitId) async {
     Map<dynamic, dynamic> hideDigitMap = await _channel.invokeMethod('hideDigit', {"walletId": walletId, "chainId": chainId, "digitId": digitId});
     return null;
   }
