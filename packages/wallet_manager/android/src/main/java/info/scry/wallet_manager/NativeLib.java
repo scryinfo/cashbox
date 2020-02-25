@@ -6,6 +6,7 @@ public class NativeLib {
 
     //链类型
     private interface ChainType {
+        public static final int UNKNOWN = 0;
         public static final int BTC = 1;
         public static final int BTC_TEST = 2;
         public static final int ETH = 3;
