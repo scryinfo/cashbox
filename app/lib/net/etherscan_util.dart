@@ -47,10 +47,10 @@ Future<String> loadErc20Balance(String ethAddress,String contractAddress) async 
   return null;
 }
 
-Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
+Future<List<EthTransactionModel>> loadEthTxHistory(String address,{String offset}) async {
   List<EthTransactionModel> modelArray = [];
   try {
-    var res = await request(assembleEthTxListUrl(address));
+    var res = await request(assembleEthTxListUrl(address,offset: offset));
     print("loadEthTxHistory=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       for (var i = 0; i < res["result"].length; i++) {
@@ -97,10 +97,10 @@ Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
 }
 
 //todo
-Future<List> loadErc20TxHistory(String address,String contractAddress) async {
+Future<List> loadErc20TxHistory(String address,String contractAddress,{String offset}) async {
   var modelArray = [];
   try {
-    var res = await request(assembleErc20TxListUrl(address,contractAddress: contractAddress));
+    var res = await request(assembleErc20TxListUrl(address,contractAddress: contractAddress,offset: offset));
     print("loadErc20TxHistory=====================>" + res.toString());
     //todo 解析成 erc20的格式
     return modelArray;
