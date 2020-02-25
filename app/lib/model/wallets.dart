@@ -109,7 +109,8 @@ class Wallets {
           digitM
             ..digitId = digitInfoMap["digitId"]
             ..chainId = digitInfoMap["chainId"]
-            ..contractAddress = digitInfoMap["address"]
+            ..contractAddress = digitInfoMap["contractAddress"]
+            ..address = digitInfoMap["address"]
             ..shortName = digitInfoMap["shortName"]
             ..fullName = digitInfoMap["fullName"]
             ..balance = digitInfoMap["balance"]
@@ -138,7 +139,8 @@ class Wallets {
           digitM
             ..digitId = digitInfoMap["digitId"]
             ..chainId = digitInfoMap["chainId"]
-            ..contractAddress = digitInfoMap["address"]
+            ..contractAddress = digitInfoMap["contractAddress"]
+            ..address = digitInfoMap["address"]
             ..shortName = digitInfoMap["shortName"]
             ..fullName = digitInfoMap["fullName"]
             ..balance = digitInfoMap["balance"]
