@@ -57,16 +57,14 @@ class _EthPageState extends State<EthPage> {
       print("eth_page => wallet.walletId===> " + wallet.walletId.toString());
       print("eth_page =>wallet.walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
-        setState(
-          () {
+        setState(() {
             this.nowWallet = wallet;
             this.walletName = nowWallet.walletName;
-            this.nowChain = nowWallet.getChainByChainId(nowWallet.nowChainId);
+            this.nowChain = nowWallet.getChainByChainType(ChainType.ETH);
             print("eth_page =>  nowChain setState chainAddress=====>" + nowChain.chainAddress);
             this.nowChainAddress = nowChain.chainAddress;
             this.nowChainDigitsList = nowChain.digitsList;
-          },
-        );
+          });
         break; //找到，终止循环
       }
     }
