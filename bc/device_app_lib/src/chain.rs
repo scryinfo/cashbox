@@ -3,6 +3,7 @@
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
+    use ethereum_types::{H160,U256};
     use jni::JNIEnv;
     use jni::objects::{JObject, JValue,JClass,JString};
     use wallets::model::{EeeChain,BtcChain,EthChain};
@@ -313,30 +314,60 @@ pub mod android {
         let from_address: String = env.get_string(fromAddress).unwrap().into();
         //接收方账户地址
         let to_address: String = env.get_string(toAddress).unwrap().into();
+        let to_address = {
+            if to_address.is_empty() {
+                None
+            }else{
+                let to = H160::from_slice(hex::decode(to_address.get(2..).unwrap()).unwrap().as_slice());
+                Some(to)
+            }
+        };
         //调用合约地址
         let contract_address: String = env.get_string(contractAddress).unwrap().into();
         //转帐金额 这里都用这个参数来表示
-        let value: String = env.get_string(value).unwrap().into();
+        let amount = {
+            let value_str: String = env.get_string(value).unwrap().into();
+            wallets::convert_token(&value_str,18).unwrap()
+        };
         //附加参数
         let data: String = env.get_string(backup).unwrap().into();
-        //gas价格
-        let gas_price: String = env.get_string(gasPrice).unwrap().into();
-        //允许最大消耗gas数量
-        let gas_limit: String = env.get_string(gasLimit).unwrap().into();
-        //当前交易的nonce值
-        let nonce: String = env.get_string(nonce).unwrap().into();
-        //使用私钥确认码
-        let pwd = env.convert_byte_array(pwd).unwrap();
         let data = if data.is_empty(){
             None
         }else {
             Some(data)
         };
+
+        //gas价格
+        let gas_price: U256 = {
+            let price_str: String = env.get_string(gasPrice).unwrap().into();
+            wallets::convert_token(&price_str,9).unwrap()
+            //U256::from_dec_str(&price_str).unwrap()
+        };
+        //允许最大消耗gas数量
+        let gas_limit: U256 = {
+            let  gas_limit_str: String= env.get_string(gasLimit).unwrap().into();
+            U256::from_dec_str(&gas_limit_str).unwrap()
+        };
+        //当前交易的nonce值
+        let nonce: U256 = {
+            let nonce_str:String = env.get_string(nonce).unwrap().into();
+            let nonce =  if nonce_str.starts_with("0x") {
+                let nonce_u64 = u64::from_str_radix(&nonce_str.get(2..).unwrap(),16);
+                format!("{}",nonce_u64.unwrap())
+            }else{
+                nonce_str
+            };
+            U256::from_dec_str(&nonce).unwrap()
+        };
+
+        //使用私钥确认码
+        let pwd = env.convert_byte_array(pwd).unwrap();
         //合约地址为空，是普通ETH转账
         let signed_ret =  if contract_address.is_empty(){
-            wallets::module::chain::eth_raw_transfer_sign(&from_address,&to_address,&value,&pwd,&nonce,&gas_limit,&gas_price,data,chainType as u64)
+            wallets::module::chain::eth_raw_transfer_sign(&from_address,to_address,amount,&pwd,nonce,gas_limit,gas_price,data,chainType as u64)
         }else {
-            wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address,&contract_address,&to_address,&value,&pwd,&nonce,&gas_limit,&gas_price,data,chainType as u64)
+            let contract_address = H160::from_slice(hex::decode(contract_address.get(2..).unwrap()).unwrap().as_slice());
+            wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address,contract_address,to_address.unwrap(),amount,&pwd,nonce,gas_limit,gas_price,data,chainType as u64)
         };
 
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_state_class is error");
