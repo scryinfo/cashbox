@@ -359,12 +359,39 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "getNowChain": {
                 Log.d("nativeLib=>", "begin to getNowChain =>");
                 WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.getNowChainType((String) (call.argument("walletId")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                if (walletState.status == 200) {
+                    resultMap.put("getNowChainType", walletState.getNowChainType);
+                } else {
+                    resultMap.put("message", walletState.message);
+                }
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM13
             case "setNowChain": {
                 Log.d("nativeLib=>", "begin to setNowChain =>");
                 WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.setNowChainType((String) (call.argument("walletId")),
+                            (int) (call.argument("chainType")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                if (walletState.status == 200) {
+                    resultMap.put("isSetNowChain", walletState.isSetNowChain);
+                } else {
+                    resultMap.put("message", walletState.message);
+                }
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM14
