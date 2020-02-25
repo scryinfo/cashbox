@@ -97,14 +97,14 @@ class Wallet {
     String message = getNowChainMap["message"];
     if (status == null) {
       LogUtil.e("getNowChain=>", "not find status code");
-      return 0;
+      return 0;//0===UNKNOWN
     }
     if (status == 200) {
       this.walletName = walletName; //jni操作完成，更改model
       return getNowChainMap["getNowChainType"];
     } else {
       LogUtil.e("getNowChain=>", "error status is=>" + getNowChainMap["status"].toString() + "||message is=>" + message.toString());
-      return 0;
+      return 0;//0===UNKNOWN
     }
   }
 
@@ -112,11 +112,16 @@ class Wallet {
   // apiNo:WM13
   Future<bool> setNowChain(int chainType) async {
     Map setNowChainMap = await WalletManager.setNowChain(walletId, chainType);
-    // todo 等待底层处理完成，更改 数据模型处。
-    // if (isSuccess) {
-    //   //todo
-    // }
-    return false;
+    int status = setNowChainMap["status"];
+    bool isSetNowChain = setNowChainMap["isSetNowChain"];
+    if(status ==null){
+      return false;
+    }
+    if(status==200){
+      return isSetNowChain;
+    }else{
+      return false;
+    }
   }
 
   Chain getChainByChainId(String chainId) {
