@@ -28,6 +28,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<Digit> showDataList = [];
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
+  String digitName = "ETH";
   //String fromAddress = "";
   String fromAddress = "0xa4512ca7618d8d12a30C28979153aB09809ED7fD";
   String contractAddress = "";
@@ -45,6 +46,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     {
       // fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
       // contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+      // digitName = Provider.of<TransactionProvide>(context).digitName;
     }
     getBalanceData();
     txListFuture = getTxListData();
@@ -129,51 +131,59 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          Gaps.scaleHGap(7),
+          Container(
+            width:  ScreenUtil().setWidth(50),
+            //color: Colors.amberAccent,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.centerLeft,
+                  height: ScreenUtil().setHeight(8),
+                  child: Text(
+                    balanceInfo ?? "0.0000" ,
+                    textAlign:  TextAlign.start,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.instance.setSp(4),
+                      color: Colors.white,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                Gaps.scaleHGap(0.5),
+                Container(
+                  width: ScreenUtil().setWidth(8),
+                  child: Text(
+                    digitName,
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.instance.setSp(3.5),
+                      color: Colors.white,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                Gaps.scaleHGap(0.5),
+                Container(
+                  width: ScreenUtil().setWidth(15),
+                  child: Text(
+                    "≈" + "\$" + "6300.111311111",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.instance.setSp(3),
+                      color: Colors.lightBlueAccent,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Gaps.scaleHGap(5),
-          Container(
-            alignment: Alignment.centerLeft,
-            width: ScreenUtil().setWidth(23),
-            height: ScreenUtil().setHeight(8),
-            child: Text(
-              balanceInfo ?? "0.00" ,
-              textAlign:  TextAlign.start,
-              style: TextStyle(
-                fontSize: ScreenUtil.instance.setSp(4),
-                color: Colors.white,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          Gaps.scaleHGap(0.5),
-          Container(
-            width: ScreenUtil().setWidth(8),
-            child: Text(
-              "ETH",
-              textAlign: TextAlign.end,
-              style: TextStyle(
-                fontSize: ScreenUtil.instance.setSp(3.5),
-                color: Colors.white,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          Gaps.scaleHGap(0.5),
-          Container(
-            width: ScreenUtil().setWidth(15),
-            child: Text(
-              "≈" + "\$" + "6300.111311111",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: ScreenUtil.instance.setSp(3),
-                color: Colors.lightBlueAccent,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Gaps.scaleHGap(10),
           Container(
             //height: ScreenUtil().setHeight(8),
             child: FlatButton(
