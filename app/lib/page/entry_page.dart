@@ -1,4 +1,5 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/page/transaction_history_page/transaction_history_page.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -9,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:app/page/eth_page/eth_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'dapp_page/dapp_page.dart';
 
 class EntryPage extends StatefulWidget {
@@ -65,19 +65,22 @@ class _EntryPageState extends State<EntryPage> {
             if (snapshot.hasData) {
               bool isContainWallet = snapshot.data;
               if (isContainWallet) {
-                return DappPage(); // todo  标记，先版本，直接进入到Dapp diamond页面处
+                //return DappPage(); // todo  标记，先版本，直接进入到Dapp diamond页面处
+                return EthPage();
+                // return TransactionHistoryPage();
               } else {
                 return _buildProtocolLayout();
               }
             }
-            return Container(
+            return TransactionHistoryPage();
+            /*return Container(
               width: ScreenUtil().setWidth(90),
               height: ScreenUtil().setHeight(160),
               decoration: BoxDecoration(
                 image: DecorationImage(image: AssetImage("assets/images/bg_loading.png"), fit: BoxFit.fill),
               ),
               child: null,
-            );
+            );*/
           }),
     );
   }

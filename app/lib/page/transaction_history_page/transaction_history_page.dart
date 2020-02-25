@@ -28,9 +28,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<Digit> showDataList = [];
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
-  String fromAddress = "";
-  //String fromAddress = "0xa4512ca7618d8d12a30C28979153aB09809ED7fD";
+  //String fromAddress = "";
+  String fromAddress = "0xa4512ca7618d8d12a30C28979153aB09809ED7fD";
   String contractAddress = "";
+  int displayTxOffset=0;
+  int refreshAddCount=20;
 
   @override
   void initState() {
@@ -84,11 +86,12 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   }
 
   Future<List<EthTransactionModel>> getTxListData() async {
+    displayTxOffset = displayTxOffset+refreshAddCount; //每次增加refreshAddCount个
     try {
       if(contractAddress.trim()==""&&(fromAddress.trim()!="")){
-        ethTxListModel = await loadEthTxHistory(fromAddress);
+        ethTxListModel = await loadEthTxHistory(fromAddress,offset:displayTxOffset.toString());
       }else if(fromAddress.trim()!=""){
-        ethTxListModel = await loadErc20TxHistory(fromAddress,contractAddress);
+        ethTxListModel = await loadErc20TxHistory(fromAddress,contractAddress,offset:displayTxOffset.toString());
       }else{
         Fluttertoast.showToast(msg: "地址信息为空，请再检查");
       }
@@ -286,10 +289,17 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         ),
       ],
       onLoad: () async {
-        await Future.delayed(Duration(seconds: 2), () {
-          print("onLoad");
+        await Future.delayed(Duration(seconds: 2), ()async {
+          print("refresh onLoad======>");
+          if(this.ethTxListModel.length < displayTxOffset){
+            //展示的，比上次请求加载到的少，说明没了
+            Fluttertoast.showToast(msg: "您的 交易记录 已经加载完了！");
+            return;
+          }
+          var ethTxListModel = await getTxListData();
+
           setState(() {
-            //todo add Data
+            this.ethTxListModel = ethTxListModel;
           });
         });
       },
