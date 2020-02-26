@@ -16,6 +16,10 @@ use chaindb::SharedChainDB;
 use bitcoin::network::message::NetworkMessage::GetBlocks;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use db::SharedSQLite;
+use bitcoin_hashes::hex::FromHex;
+use bitcoin_hashes::hex::ToHex;
+use bitcoin_hashes::hash160;
+use bitcoin_hashes::Hash;
 
 
 pub struct GetData {
@@ -30,7 +34,7 @@ impl GetData {
     pub fn new(sqlite: SharedSQLite, chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
-        let mut getdata = GetData { chaindb, p2p, timeout ,sqlite };
+        let mut getdata = GetData { chaindb, p2p, timeout, sqlite };
 
         thread::Builder::new().name("GetData".to_string()).spawn(move || { getdata.run(receiver) }).unwrap();
 
@@ -86,13 +90,9 @@ impl GetData {
     // 先发送FilterLoad 然后发送get_data 才可以收获过滤后的数据
     fn get_data(&mut self, peer: PeerId) -> Result<(), Error> {
         info!("发送getdata 消息");
-        //这个消息应该提供一个外界传入块的方法
-        //
-        //let inventory = Inventory::new(InvType::FilteredBlock, "000000000000b731f2eef9e8c63173adfb07e41bd53eb0ef0a6b720d6cb6dea4");
         // todo 现在插入测试块
         // let inventory = Inventory::new(InvType::FilteredBlock, "000000000001b31b8a35d9b7d2e3ad7909055683b82d4a7d4029386f7149ede8");
-        // 插入随便一个块
-        let inventory = Inventory::new(InvType::FilteredBlock, "000000000001b31b8a35d9b7d2e3ad7909055683b82d4a7d4029386f7149ede8");
+        let inventory = Inventory::new(InvType::FilteredBlock, "0000000000010c356814c19e842166c501cbb7d691b0c816a24a5a666ff4499a");
         self.p2p.send_network(peer, NetworkMessage::GetData(vec![inventory]));
         Ok(())
     }
@@ -106,7 +106,26 @@ impl GetData {
 
     ///处理tx返回值
     fn tx(&mut self, tx: &Transaction, peer: PeerId) -> Result<(), Error> {
-        info!("{:#?}", tx);
+        info!("Tx {:#?}", tx.clone());
+        let tx_hash = &tx.bitcoin_hash();
+        info!("tx_hash {:#?}", &tx_hash);
+        let vouts = tx.clone().output;
+        for vout in vouts {
+            let script = vout.script_pubkey;
+            if script.is_p2sh() {
+                let asm = script.asm();
+                println!("tx script_pubkey asm {:?}", asm);
+            }
+        }
         Ok(())
+    }
+
+    ///计算hash160
+    fn hash160(&self, public_key: &str) {
+        // 从公钥出发
+        let public_key = "0291EE52A0E0C22DB9772F237F4271EA6F9330D92B242FB3C621928774C560B699";
+        let decode: Vec<u8> = FromHex::from_hex(public_key).expect("Invalid public key");
+        let hash = hash160::Hash::hash(&decode[..]);
+        println!("hash------------ {:?}", hash.to_hex());
     }
 }

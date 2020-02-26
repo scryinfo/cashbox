@@ -17,7 +17,7 @@ pub struct FilterLoadMessage {
     ///A random value to add to the seed value in the hash function used by the bloom filter.
     pub n_tweak: u32,
     ///A set of flags that control how matched items are added to the filter.
-    pub n_flags: bool,
+    pub n_flags: u8,
 }
 
 impl_consensus_encoding!(FilterLoadMessage, filter, n_hash_functions, n_tweak, n_flags);
@@ -94,7 +94,7 @@ impl FilterLoadMessage {
             filter: v_data.into_vec(),
             n_hash_functions,
             n_tweak: 0,
-            n_flags: false,
+            n_flags: 1,
         }
     }
 
@@ -126,7 +126,7 @@ mod test {
             filter: vec![0xb5, 0x0f],
             n_hash_functions: 11,
             n_tweak: 0,
-            n_flags: false,
+            n_flags: 0,
         };
 
         let raw_filterload = RawNetworkMessage {
@@ -167,4 +167,5 @@ mod test {
     fn calculate_filter_test() {
         FilterLoadMessage::calculate_filter("03BDBDB81926E8AFD621E7362352748FC500F81266A3F39F75450ACAE6FAA1A458");
     }
+
 }

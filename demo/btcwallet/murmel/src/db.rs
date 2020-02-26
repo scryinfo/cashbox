@@ -22,6 +22,9 @@ impl SQLite {
             CREATE TABLE IF NOT EXISTS block_hash(block_hash TEXT,scaned INT);
             "
         ).expect("Create table block_hash error");
+        sqlite.execute(
+            "create table if not exists utxo(txhash TEXT,value TEXT,spendable INT)"
+        ).expect("Create table tx error");
         Arc::new(Mutex::new(sqlite))
     }
 
