@@ -1,0 +1,23 @@
+[package]
+name = "ethtx"
+version = "0.1.0"
+authors = ["jeremy <jm140915@hotmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ethabi = "11.0.0"
+derive_more = "0.99.1"
+hex="0.4.0"
+ethereum-types = "0.8.0"
+tiny-bip39="0.7.0"
+serde = { version = "1.0.90", features = ["derive"] }
+serde_json = "1.0.39"
+serde_derive = "1.0.90"
+
+rustc-hex = "2.0.1"
+arrayvec = "0.5.0"
+rlp = "0.4"
+secp256k1 = {version = "0.16", features = ["recovery"] }
+tiny-keccak = "1.5.0"

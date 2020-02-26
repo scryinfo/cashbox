@@ -6,10 +6,11 @@ public class NativeLib {
 
     //链类型
     private interface ChainType {
+        public static final int UNKNOWN = 0;
         public static final int BTC = 1;
         public static final int BTC_TEST = 2;
         public static final int ETH = 3;
-        public static final int ETH_TEST = 4;
+        public static final int ETH_TEST = 4;   //Ropsten 用这条测试链
         public static final int EEE = 5;
         public static final int EEE_TEST = 6;
     }
@@ -166,7 +167,7 @@ public class NativeLib {
         public boolean isRename;              //重置钱包名是否成功     apiNo:WM09   1成功 0失败
         public boolean isShowChain;           //设置显示链,是否成功    apiNo:WM10   1成功 0失败
         public boolean isHideChain;           //设置隐藏链,是否成功    apiNo:WM11   1成功 0失败
-        public int getnNowChainType;          //获取当前链类型         apiNo:WM12   int
+        public int getNowChainType;           //获取当前链类型         apiNo:WM12   int
         public boolean isSetNowChain;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
         public boolean isShowDigit;           //设置显示代币,是否成功  apiNo:WM14   1成功 0失败
         public boolean isHideDigit;           //设置隐藏代币,是否成功  apiNo:WM15   1成功 0失败
@@ -295,8 +296,9 @@ public class NativeLib {
     /*------------------------------------------交易相关------------------------------------------*/
 
     // Eth 交易签名。签名结果是：交易类型
-    public static native Message ethTxSign(String rawTx, String mnId, byte[] pwd);
-
+    // 说明： gasPrice单位：gwei     gaslimit单位：gwei       （1 ETH = 1e9 gwei (10的九次方)）
+    //       链类型int: 1：正式链   3：测试链（Ropsten）,17 dev
+    public static native Message ethTxSign(String mnId, int chainType,String fromAddress,String toAddress,String contractAddress, String value,String backup,  byte[] pwd, String gasPrice,String gasLimit,String nonce,int decimal);
 
     //ETH 交易拼装。   返回：未签名的交易 String。
     //nonce记录位置？？？
@@ -310,11 +312,6 @@ public class NativeLib {
 
     //处理建议优先考虑，实现spv的库处做。   能更方便获取utxo,还有找零地址选择,找零金额。
     public static native byte[] btcTxMakeBTCRawTx(String[] from, String[] to, String value);
-
-
-    //获取签名后的交易信息，区分链类型
-    //返回：签名后的交易 byte[]
-    public static native byte[] ethTxSignTx(String rawTx, byte[] encodeMne, byte[] pwd);
 
     public static native byte[] btcTxSignTx(String rawTx, byte[] encodeMne, byte[] pwd);
 

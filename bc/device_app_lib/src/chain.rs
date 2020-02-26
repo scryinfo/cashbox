@@ -3,11 +3,14 @@
 #[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
+    use ethereum_types::{H160,U256};
     use jni::JNIEnv;
     use jni::objects::{JObject, JValue,JClass,JString};
     use wallets::model::{EeeChain,BtcChain,EthChain};
     use std::os::raw::{c_uchar, c_int};
     use jni::sys::{jint, jobject, jbyteArray};
+    use wallets::StatusCode;
+
     pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObject<'a>{
         let eee_digit_list_class = env.find_class("java/util/ArrayList").expect("find chain type is error");
         let eee_digit_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeDigit").expect("Digit class not found");
@@ -294,6 +297,90 @@ pub mod android {
             },
             Err(msg) => {
                 env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(0 as u8)).expect("setNowChainType value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            }
+        }
+        *state_obj
+    }
+
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env: JNIEnv, _: JClass, walletId:JString,chainType:jint, fromAddress:JString,
+                                                                                toAddress:JString, contractAddress:JString, value:JString, backup:JString, pwd:jbyteArray,
+                                                                                gasPrice:JString,gasLimit:JString,nonce:JString,decimal:jint) -> jobject {
+        //使用的钱包id
+        let _wallet_id: String = env.get_string(walletId).unwrap().into();
+        //发送方账户地址 通过wallet id 能够关联起来
+        let from_address: String = env.get_string(fromAddress).unwrap().into();
+        //接收方账户地址
+        let to_address: String = env.get_string(toAddress).unwrap().into();
+        let to_address = {
+            if to_address.is_empty() {
+                None
+            }else{
+                let to = H160::from_slice(hex::decode(to_address.get(2..).unwrap()).unwrap().as_slice());
+                Some(to)
+            }
+        };
+        //调用合约地址
+        let contract_address: String = env.get_string(contractAddress).unwrap().into();
+        //转帐金额 这里都用这个参数来表示
+        let amount = {
+            let value_str: String = env.get_string(value).unwrap().into();
+            //不同的代币，会有不同的精度？？
+            wallets::convert_token(&value_str,decimal).unwrap()
+        };
+        //附加参数
+        let data: String = env.get_string(backup).unwrap().into();
+        let data = if data.is_empty(){
+            None
+        }else {
+            Some(data)
+        };
+
+        //gas价格
+        let gas_price: U256 = {
+            let price_str: String = env.get_string(gasPrice).unwrap().into();
+            //使用单位的是gwei,这点是确定的
+            wallets::convert_token(&price_str,9).unwrap()
+            //U256::from_dec_str(&price_str).unwrap()
+        };
+        //允许最大消耗gas数量
+        let gas_limit: U256 = {
+            let  gas_limit_str: String= env.get_string(gasLimit).unwrap().into();
+            U256::from_dec_str(&gas_limit_str).unwrap()
+        };
+        //当前交易的nonce值
+        let nonce: U256 = {
+            let nonce_str:String = env.get_string(nonce).unwrap().into();
+            let nonce =  if nonce_str.starts_with("0x") {
+                let nonce_u64 = u64::from_str_radix(&nonce_str.get(2..).unwrap(),16);
+                format!("{}",nonce_u64.unwrap())
+            }else{
+                nonce_str
+            };
+            U256::from_dec_str(&nonce).unwrap()
+        };
+
+        //使用私钥确认码
+        let pwd = env.convert_byte_array(pwd).unwrap();
+        //合约地址为空，是普通ETH转账
+        let signed_ret =  if contract_address.is_empty(){
+            wallets::module::chain::eth_raw_transfer_sign(&from_address,to_address,amount,&pwd,nonce,gas_limit,gas_price,data,chainType as u64)
+        }else {
+            let contract_address = H160::from_slice(hex::decode(contract_address.get(2..).unwrap()).unwrap().as_slice());
+            wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address,contract_address,to_address.unwrap(),amount,&pwd,nonce,gas_limit,gas_price,data,chainType as u64)
+        };
+
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_state_class is error");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        match signed_ret{
+            Ok(data)=>{
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set isSetNowWallet value is error!");
+                env.set_field(state_obj, "ethSignedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value is error!");
+            },
+            Err(msg)=>{
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set isSetNowWallet value is error!");
                 env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
             }
         }

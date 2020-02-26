@@ -8,6 +8,8 @@ pub mod module;
 pub mod wallet_db;
 pub mod wallet_rpc;
 
+pub use ethtx::convert_token;
+
 #[derive(PartialEq,Clone)]
 pub enum StatusCode {
     DylibError = -1,
@@ -30,6 +32,12 @@ impl Default for StatusCode{
 }
 
 #[derive(PartialEq,Clone)]
+pub enum EthChainId{
+    MAIN=1,
+    ROPSTEN=3,
+    RINKEBY=4,
+}
+#[derive(PartialEq,Clone,Debug)]
 pub enum ChainType {
     BTC = 1,
     BtcTest =2,
@@ -75,7 +83,6 @@ mod tests {
         let data = "substrate sign method test";
         println!("data length is:{}",data.len());
         let data = wallet_crypto::Ed25519::sign(&mnemonic,data.as_bytes());
-
         println!("{}",hex::encode(data.to_vec().as_slice()));
        // wallet_crypto::Sr25519::print_from_phrase(&mnemonic,None);
     }
@@ -85,7 +92,7 @@ mod tests {
         let (send_tx, recv_tx) = mpsc::channel();
         let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
         let mnemonic = "swarm grace knock race flip unveil pyramid reveal shoot vehicle renew axis";
-        let to = "5DATag245rFG8PvCHnSpntLMhF9xvKZQPyshaAFhSiMMcFpU";
+        let _to = "5DATag245rFG8PvCHnSpntLMhF9xvKZQPyshaAFhSiMMcFpU";
       //  let seed =  wallet_crypto::Sr25519::seed_from_phrase(mnemonic,None);
         //let pair = wallet_crypto::Sr25519::pair_from_suri(&mnemonic,None);
         let pair = wallet_crypto::Sr25519::pair_from_suri("//Alice",None);
@@ -124,9 +131,4 @@ mod tests {
         }
     }
 
-    #[test]
-    fn wallet_tx_sign_test(){
-        let _msg = r#"0x7901041102ffb8abbe0682086df6012967b2f56aaa2e365d974c77414a34359cfbdd67ce01fe0082841e00d0270328c9d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d6400000000000000000000000000000001000000f05f30efbfbdefbfbddf8defbfbdefbfbdcf80efbfbdefbfbd1855efbfbd1defbfbdc7b4efbfbdefbfbdefbfbd67efbfbdefbfbd4722522aefbfbd2627c6000000"#;
-        //module::wallet::raw_tx_sign()
-    }
 }

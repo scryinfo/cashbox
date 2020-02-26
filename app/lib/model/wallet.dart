@@ -91,21 +91,37 @@ class Wallet {
 
   // 获取当前链
   // apiNo:WM12
-  Future<Chain> getNowChain() async {
-    var allWalletList = await WalletManager.getNowChain(walletId);
-    // todo 数据格式转换，返回
-    return null;
+  Future<int> getNowChain() async {
+    Map getNowChainMap = await WalletManager.getNowChain(walletId);
+    int status = getNowChainMap["status"];
+    String message = getNowChainMap["message"];
+    if (status == null) {
+      LogUtil.e("getNowChain=>", "not find status code");
+      return 0;//0===UNKNOWN
+    }
+    if (status == 200) {
+      this.walletName = walletName; //jni操作完成，更改model
+      return getNowChainMap["getNowChainType"];
+    } else {
+      LogUtil.e("getNowChain=>", "error status is=>" + getNowChainMap["status"].toString() + "||message is=>" + message.toString());
+      return 0;//0===UNKNOWN
+    }
   }
 
   // 设置当前链
   // apiNo:WM13
   Future<bool> setNowChain(int chainType) async {
-    var isSuccess = await WalletManager.setNowChain(walletId, chainType);
-    //todo 等待底层处理完成，更改 数据模型处。
-    if (isSuccess) {
-      //todo
+    Map setNowChainMap = await WalletManager.setNowChain(walletId, chainType);
+    int status = setNowChainMap["status"];
+    bool isSetNowChain = setNowChainMap["isSetNowChain"];
+    if(status ==null){
+      return false;
     }
-    return isSuccess;
+    if(status==200){
+      return isSetNowChain;
+    }else{
+      return false;
+    }
   }
 
   Chain getChainByChainId(String chainId) {

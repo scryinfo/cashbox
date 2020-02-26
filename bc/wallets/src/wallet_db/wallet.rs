@@ -57,27 +57,22 @@ impl DataServiceProvider {
                         address_stat.bind(4, addr.address.as_str()).expect("save_mnemonic_address bind addr.address ");
                         address_stat.bind(5, addr.pub_key.as_str()).expect("save_mnemonic_address bind addr.pub_key ");
                         address_stat.bind(6, addr.status as i64).expect("save_mnemonic_address  bind addr.status ");
-
+                       // address_stat.next();
                         match address_stat.next() {
                             Ok(_) => {
                                 // TODO 后续来完善需要更新的数据详情
-                                // let eee_digit_account_sql = format!("insert into detail.EeeDigit(address_id) values('{}');", addr.address_id);
-                                let eee_digit_account_sql = "INSERT INTO detail.EeeDigit(address_id,full_name,short_name,decimals,balance)VALUES(?,?,?,?,?);";
-                                //let eth_digit_account_sql = format!("insert into detail.EthDigit(address_id) values('{}');", addr.address_id);
-                                //let btc_digit_account_sql = format!("insert into detail.BtcDigit(address_id) values('{}');", addr.address_id);
-                                //self.db_hander.execute(eee_digit_account_sql).expect("update selected state");
-                                //self.db_hander.execute(eth_digit_account_sql).expect("update selected state");
-                                //self.db_hander.execute(btc_digit_account_sql).expect("update selected state");
-                                match self.db_hander.prepare(eee_digit_account_sql) {
-                                    Ok(mut digit_stat) => {
-                                        digit_stat.bind(1, addr.address_id.as_str()).expect("digit_account_sql  bind addr.address ");
-                                        digit_stat.bind(2, "eee").expect("digit_account_sql  bind addr.address ");
-                                        digit_stat.bind(3, "eee").expect("digit_account_sql bind addr.address ");
-                                        digit_stat.bind(4, 18).expect("digit_account_sql  bind addr.address ");
-                                        digit_stat.bind(5, 0).expect("digit_account_sql  bind addr.address ");
-                                        digit_stat.next().expect("exec chain insert error");
-                                    }
-                                    Err(e) => return Err(e.to_string())
+                                address_stat.reset();
+                                if  addr.chain_id==5||addr.chain_id==6  {//添加eee 或者eee test相关地址代币
+                                    let eth_digit_account_sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id)VALUES({},'{}');",1,addr.address_id);
+                                    println!("{}",eth_digit_account_sql);
+                                    self.db_hander.execute(eth_digit_account_sql).expect("update eee digit");
+                                }
+                                if addr.chain_id==3||addr.chain_id==4 {//添加eth 或者eth test相关地址代币
+                                    let eth_digit_account_sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id)VALUES({},'{}');",2,addr.address_id);
+                                    self.db_hander.execute(eth_digit_account_sql).expect("update eth digit");
+                                    //在插入eth的时候 添加ddd 代币 //默认在每个钱包，只要启用ETH都包含这个代币
+                                    let insert_ddd_digit =  format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase a where a.contract_address like '0x9F5F3CFD7a32700C93F971637407ff17b91c7342';",addr.address_id);
+                                    self.db_hander.execute(insert_ddd_digit).expect("update eee digit");
                                 }
                             }
                             Err(e) => return Err(e.to_string())
@@ -219,8 +214,7 @@ impl DataServiceProvider {
                 wallet_id: String::from(cursor[0].as_string().unwrap()),
                 mn_digest: String::from(cursor[1].as_string().unwrap()),
                 full_name: cursor[2].as_string().map(|str| String::from(str)),
-                mnemonic:
-                String::from(cursor[3].as_string().unwrap()),
+                mnemonic: String::from(cursor[3].as_string().unwrap()),
                 wallet_type: cursor[4].as_integer().unwrap(),
                 selected: cursor[5].as_string().map(|value| Self::get_bool_value(value)),
 
@@ -289,7 +283,7 @@ impl DataServiceProvider {
             Err(e) => Err(e.to_string())
         }
     }
-    // TODO 不同的链有不同的 digit 格式，后续在处理的时候 需要优化
+    // TODO 不同的链有不同的 digit 格式，后续在处理的时候 需要优化 当前没有使用这个函数??
     pub fn display_mnemonic_list(&self) -> Result<Vec<WalletObj>, String> {
         let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.address as chain_address,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
  from Wallet a,detail.Chain b,detail.Address c,detail.EeeDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
