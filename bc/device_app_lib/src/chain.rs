@@ -307,7 +307,7 @@ pub mod android {
     #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env: JNIEnv, _: JClass, walletId:JString,chainType:jint, fromAddress:JString,
                                                                                 toAddress:JString, contractAddress:JString, value:JString, backup:JString, pwd:jbyteArray,
-                                                                                gasPrice:JString,gasLimit:JString,nonce:JString) -> jobject {
+                                                                                gasPrice:JString,gasLimit:JString,nonce:JString,decimal:jint) -> jobject {
         //使用的钱包id
         let _wallet_id: String = env.get_string(walletId).unwrap().into();
         //发送方账户地址 通过wallet id 能够关联起来
@@ -327,7 +327,8 @@ pub mod android {
         //转帐金额 这里都用这个参数来表示
         let amount = {
             let value_str: String = env.get_string(value).unwrap().into();
-            wallets::convert_token(&value_str,18).unwrap()
+            //不同的代币，会有不同的精度？？
+            wallets::convert_token(&value_str,decimal).unwrap()
         };
         //附加参数
         let data: String = env.get_string(backup).unwrap().into();
@@ -340,6 +341,7 @@ pub mod android {
         //gas价格
         let gas_price: U256 = {
             let price_str: String = env.get_string(gasPrice).unwrap().into();
+            //使用单位的是gwei,这点是确定的
             wallets::convert_token(&price_str,9).unwrap()
             //U256::from_dec_str(&price_str).unwrap()
         };
