@@ -107,21 +107,21 @@ class WalletManager {
 
   // 设置当前链
   // apiNo:WM13
-  static Future<bool> setNowChain(String walletId, int chainType) async {
+  static Future<Map<dynamic, dynamic>> setNowChain(String walletId, int chainType) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('setNowChain', {"walletId": walletId, "chainType": chainType});
-    return false;
+    return allWalletList;
   }
 
   // 显示代币
   // apiNo:WM14
-  static Future<bool> showDigit(String walletId, String chainId, String digitId) async {
+  static Future<Map<dynamic, dynamic>> showDigit(String walletId, String chainId, String digitId) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('showDigit', {"walletId": walletId, "chainId": chainId, "digitId": digitId});
-    return null;
+    return allWalletList;
   }
 
   // 隐藏代币
   // apiNo:WM15
-  static Future<bool> hideDigit(String walletId, String chainId, String digitId) async {
+  static Future<Map<dynamic, dynamic>> hideDigit(String walletId, String chainId, String digitId) async {
     Map<dynamic, dynamic> hideDigitMap = await _channel.invokeMethod('hideDigit', {"walletId": walletId, "chainId": chainId, "digitId": digitId});
     return null;
   }
@@ -158,8 +158,21 @@ class WalletManager {
   }
 
   //Eth交易签名
-  static Future<Map<dynamic, dynamic>> ethTxSign(String walletId, Uint8List pwd, String rawTx) async {
-    Map<dynamic, dynamic> ethTxSignMap = await _channel.invokeMethod("ethTxSign", {"rawTx": rawTx, "mnId": walletId, "pwd": pwd});
+  static Future<Map<dynamic, dynamic>> ethTxSign(String mnId, int chainType,String fromAddress, String toAddress, String contractAddress,
+      String value, String backup, Uint8List pwd, String gasPrice,String gasLimit,String nonce) async {
+    Map<dynamic, dynamic> ethTxSignMap =
+        await _channel.invokeMethod("ethTxSign", {"mnId": mnId,
+          "chainType": chainType,
+          "fromAddress": fromAddress,
+          "toAddress": toAddress,
+          "contractAddress": contractAddress,
+          "value": value,
+          "backup": backup,
+          "pwd": pwd,
+          "gasPrice": gasPrice,
+          "gasLimit": gasLimit,
+          "nonce": nonce
+    });
     return ethTxSignMap;
   }
 

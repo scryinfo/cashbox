@@ -5,6 +5,7 @@ import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -32,6 +33,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   String toAddressValue;
   bool isShowExactGas = false;
   int standardAddressLength = 42; //以太坊标准地址42位
+  int eth2gasUnit = 1000*1000*1000;   // 1 ETH = 1e9gwei (10的九次方) = 1e18gwei
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
   String arrowIcon = "assets/images/ic_collapse.png";
@@ -46,21 +48,27 @@ class _TransferEthPageState extends State<TransferEthPage> {
   double mGasFeeValue;
   String fromAddress = "";
   String contractAddress = "";
-  
+
   @override
   void initState() {
     super.initState();
+  }
+
+  void initDataConfig() {
     {
        fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
        contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
     }
+    _txValueController.text = Provider.of<TransactionProvide>(context).txValue ??"";
+    _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress??"";
+    _backupMsgController.text = Provider.of<TransactionProvide>(context).backup??"";
   }
 
   @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
     initDataConfig();
-    if(contractAddress.trim()!=""){
+    super.didChangeDependencies();
+    if(contractAddress !=null && contractAddress.trim()!=""){
       mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.Erc20GasPriceKey);
       mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.Erc20GasPriceKey);
       mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.Erc20GasLimitKey);
@@ -75,15 +83,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
       mGasPriceValue = GlobalConfig.getDefaultGasPrice(GlobalConfig.EthGasPriceKey);
       mGasLimitValue = GlobalConfig.getDefaultGasLimit(GlobalConfig.EthGasLimitKey);
     }
-    mMaxGasFee = mMaxGasLimit * mMaxGasPrice / (1000 * 1000 * 1000);
-    mMinGasFee = mMinGasLimit * mMinGasPrice / (1000 * 1000 * 1000);
-    mGasFeeValue = mGasLimitValue * mGasPriceValue / (1000 * 1000 * 1000);
-  }
-
-  void initDataConfig() {
-    _txValueController.text = Provider.of<TransactionProvide>(context).txValue;
-    _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress;
-    _backupMsgController.text = Provider.of<TransactionProvide>(context).backup;
+    mMaxGasFee = mMaxGasLimit * mMaxGasPrice / eth2gasUnit;
+    mMinGasFee = mMinGasLimit * mMinGasPrice / eth2gasUnit;
+    mGasFeeValue = mGasLimitValue * mGasPriceValue / eth2gasUnit;
   }
 
   @override
@@ -364,7 +366,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   onChanged: (double value) {
                                     setState(() {
                                       mGasPriceValue = value;
-                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
+                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
                                       print("===>" + mGasPriceValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
@@ -450,7 +452,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   onChanged: (double value) {
                                     setState(() {
                                       mGasLimitValue = value;
-                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / (1000 * 1000 * 1000);
+                                      mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
                                       print("===>" + mGasLimitValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
@@ -678,11 +680,17 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
             Wallet walletModel = await Wallets.instance.getNowWalletModel();
             ChainETH chainETH = walletModel.getChainByChainType(ChainType.ETH);
-            String fromAddress = chainETH.chainAddress;
             String walletId = await Wallets.instance.getNowWalletId();
-            // todo  FFI拼接好交易 TODO  再去 签名功能动态库签名
-            Wallets.instance.ethTxSign(walletId, fromAddress, _toAddressController.text.toString(), _txValueController.text,
-                _backupMsgController.text, Uint8List.fromList(pwd.codeUnits));
+            String nonce = await loadTxAccount(fromAddress);
+            if(nonce==null||nonce.trim()==""){
+              print("取的nonce值有问题");
+              return;
+            }
+            // todo  链类型处理
+            // todo  gas费单位统一
+            var result = Wallets.instance.ethTxSign(walletId, chainETH.chainTypeToInt(ChainType.ETH), fromAddress, _toAddressController.text.toString(),
+                contractAddress, _txValueController.text, _backupMsgController.text, Uint8List.fromList(pwd.codeUnits),
+                mGasFeeValue.toString(), mGasLimitValue.toString(), nonce);
             // NavigatorUtils.push(
             //   context,
             //   Routes.eeePage,

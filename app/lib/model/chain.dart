@@ -4,7 +4,7 @@ import 'package:wallet_manager/wallet_manager.dart';
 
 import 'digit.dart';
 
-enum ChainType { BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST }
+enum ChainType { UNKNOWN, BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST }
 
 abstract class Chain {
   String chainId; //链Id
@@ -81,23 +81,23 @@ abstract class Chain {
   // 显示代币
   // apiNo:WM14
   Future<bool> showDigit(String digitId) async {
-    var isSuccess = await WalletManager.showDigit(walletId, chainId, digitId);
-    if (isSuccess) {
-      //todo 数据格式
-      //chainList.remove(chain);
-    }
-    return isSuccess;
+    Map showDigitMap = await WalletManager.showDigit(walletId, chainId, digitId);
+    // if (isSuccess) {
+    //   //todo 数据格式
+    //   //chainList.remove(chain);
+    // }
+    return null;
   }
 
   // 隐藏代币
   // apiNo:WM15
   Future<bool> hideDigit(String digitId) async {
-    var isSuccess = await WalletManager.hideDigit(walletId, chainId, digitId);
-    if (isSuccess) {
-      //todo 数据格式
-      //chainList.remove(chain);
-    }
-    return isSuccess;
+    Map hideDigitMap = await WalletManager.hideDigit(walletId, chainId, digitId);
+    // if (isSuccess) {
+    //   //todo 数据格式
+    //   //chainList.remove(chain);
+    // }
+    return null;
   }
 
   // 添加代币 todo 2.0 待确定数据格式

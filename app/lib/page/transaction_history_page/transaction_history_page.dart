@@ -13,6 +13,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 
@@ -27,24 +28,28 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<Digit> showDataList = [];
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
-  String fromAddress = "";
+  String digitName = "ETH";
+  //String fromAddress = "";
+  String fromAddress = "0xa4512ca7618d8d12a30C28979153aB09809ED7fD";
   String contractAddress = "";
+  int displayTxOffset=0;
+  int refreshAddCount=20;
 
   @override
   void initState() {
     super.initState();
-    {
-      // fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-      // contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
-    }
-
-    txListFuture = getTxListData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    {
+      // fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+      // contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+      // digitName = Provider.of<TransactionProvide>(context).digitName;
+    }
     getBalanceData();
+    txListFuture = getTxListData();
   }
 
   @override
@@ -83,17 +88,23 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   }
 
   Future<List<EthTransactionModel>> getTxListData() async {
+    displayTxOffset = displayTxOffset+refreshAddCount; //每次增加refreshAddCount个
     try {
-      if(contractAddress.trim()==""){
-        ethTxListModel = await loadEthTxHistory(fromAddress);
+      if(contractAddress.trim()==""&&(fromAddress.trim()!="")){
+        ethTxListModel = await loadEthTxHistory(fromAddress,offset:displayTxOffset.toString());
+      }else if(fromAddress.trim()!=""){
+        ethTxListModel = await loadErc20TxHistory(fromAddress,contractAddress,offset:displayTxOffset.toString());
       }else{
-        ethTxListModel = await loadErc20TxHistory(fromAddress,contractAddress);
+        Fluttertoast.showToast(msg: "地址信息为空，请再检查");
       }
       print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
     } catch (onError) {
       print("onError===>" + "$onError");
     }
     print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
+    setState(() {
+      this.ethTxListModel = ethTxListModel;
+    });
     return ethTxListModel;
   }
 
@@ -120,51 +131,59 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          Gaps.scaleHGap(7),
+          Container(
+            width:  ScreenUtil().setWidth(50),
+            //color: Colors.amberAccent,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.centerLeft,
+                  height: ScreenUtil().setHeight(8),
+                  child: Text(
+                    balanceInfo ?? "0.0000" ,
+                    textAlign:  TextAlign.start,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.instance.setSp(4),
+                      color: Colors.white,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                Gaps.scaleHGap(0.5),
+                Container(
+                  width: ScreenUtil().setWidth(8),
+                  child: Text(
+                    digitName,
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.instance.setSp(3.5),
+                      color: Colors.white,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                Gaps.scaleHGap(0.5),
+                Container(
+                  width: ScreenUtil().setWidth(15),
+                  child: Text(
+                    "≈" + "\$" + "6300.111311111",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: ScreenUtil.instance.setSp(3),
+                      color: Colors.lightBlueAccent,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Gaps.scaleHGap(5),
-          Container(
-            alignment: Alignment.centerLeft,
-            width: ScreenUtil().setWidth(23),
-            height: ScreenUtil().setHeight(8),
-            child: Text(
-              "balanceInfo" ,
-              textAlign:  TextAlign.start,
-              style: TextStyle(
-                fontSize: ScreenUtil.instance.setSp(4),
-                color: Colors.white,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          Gaps.scaleHGap(0.5),
-          Container(
-            width: ScreenUtil().setWidth(8),
-            child: Text(
-              "ETH",
-              textAlign: TextAlign.end,
-              style: TextStyle(
-                fontSize: ScreenUtil.instance.setSp(3.5),
-                color: Colors.white,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          Gaps.scaleHGap(0.5),
-          Container(
-            width: ScreenUtil().setWidth(15),
-            child: Text(
-              "≈" + "\$" + "6300.111311111",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: ScreenUtil.instance.setSp(3),
-                color: Colors.lightBlueAccent,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Gaps.scaleHGap(10),
           Container(
             //height: ScreenUtil().setHeight(8),
             child: FlatButton(
@@ -209,12 +228,15 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   ),
                   Gaps.scaleHGap(45),
                   Container(
-                    child: Text(
-                      "2018.07",
-                      style: TextStyle(
-                        color: Colors.white70,
+                    child: Opacity(
+                      opacity: 0,  //todo 通过时间筛选交易，暂不显示
+                      child: Text(
+                        "2018.07",
+                        style: TextStyle(
+                          color: Colors.white70,
+                        ),
+                        textAlign: TextAlign.end,
                       ),
-                      textAlign: TextAlign.end,
                     ),
                   ),
                   Gaps.scaleHGap(6),
@@ -277,10 +299,17 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         ),
       ],
       onLoad: () async {
-        await Future.delayed(Duration(seconds: 2), () {
-          print("onLoad");
+        await Future.delayed(Duration(seconds: 2), ()async {
+          print("refresh onLoad======>");
+          if(this.ethTxListModel.length < displayTxOffset){
+            //展示的，比上次请求加载到的少，说明没了
+            Fluttertoast.showToast(msg: "您的 交易记录 已经加载完了！");
+            return;
+          }
+          var ethTxListModel = await getTxListData();
+
           setState(() {
-            //todo add Data
+            this.ethTxListModel = ethTxListModel;
           });
         });
       },

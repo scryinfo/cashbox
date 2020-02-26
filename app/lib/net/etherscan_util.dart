@@ -3,12 +3,32 @@ import 'package:app/model/tx_model/eth_transaction_model.dart';
 
 import 'net_util.dart';
 
+//nonce === txAccount
+Future<String> loadTxAccount(String address) async{
+  try {
+    var res = await request(assembleTxAccount(address));
+    print("loadNonce res=====================>" + res.toString());
+    if (res != null && (res as Map).containsKey("result")) {
+      print("Erc20_Balance res.result.=====================>" +
+          res["result"].toString());
+      return res["result"].toString();
+    }
+  } catch (e) {
+    return null;
+  }
+  return null;
+}
+
 Future<String> loadEthBalance(String address) async {
-  var res = await request(assembleEthBalanceUrl(address));
-  print("loadEthBalance res=====================>" + res.toString());
-  if (res != null && (res as Map).containsKey("result")) {
-    print("Eth_Balance res.result.=====================>" + (int.parse(res["result"]) / Eth_Unit).toString());
-    return (int.parse(res["result"]) / Eth_Unit).toString();
+  try {
+    var res = await request(assembleEthBalanceUrl(address));
+    print("loadEthBalance res=====================>" + res.toString());
+    if (res != null && (res as Map).containsKey("result")) {
+      print("Eth_Balance res.result.=====================>" + (int.parse(res["result"]) / Eth_Unit).toString());
+      return (int.parse(res["result"]) / Eth_Unit).toString();
+    }
+  } catch (e) {
+    return null;
   }
   return null;
 }
@@ -27,10 +47,10 @@ Future<String> loadErc20Balance(String ethAddress,String contractAddress) async 
   return null;
 }
 
-Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
+Future<List<EthTransactionModel>> loadEthTxHistory(String address,{String offset}) async {
   List<EthTransactionModel> modelArray = [];
   try {
-    var res = await request(assembleEthTxListUrl(address));
+    var res = await request(assembleEthTxListUrl(address,offset: offset));
     print("loadEthTxHistory=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       for (var i = 0; i < res["result"].length; i++) {
@@ -77,10 +97,10 @@ Future<List<EthTransactionModel>> loadEthTxHistory(String address) async {
 }
 
 //todo
-Future<List> loadErc20TxHistory(String address,String contractAddress) async {
+Future<List> loadErc20TxHistory(String address,String contractAddress,{String offset}) async {
   var modelArray = [];
   try {
-    var res = await request(assembleErc20TxListUrl(address,contractAddress: contractAddress));
+    var res = await request(assembleErc20TxListUrl(address,contractAddress: contractAddress,offset: offset));
     print("loadErc20TxHistory=====================>" + res.toString());
     //todo 解析成 erc20的格式
     return modelArray;
@@ -89,3 +109,4 @@ Future<List> loadErc20TxHistory(String address,String contractAddress) async {
     return [];
   }
 }
+

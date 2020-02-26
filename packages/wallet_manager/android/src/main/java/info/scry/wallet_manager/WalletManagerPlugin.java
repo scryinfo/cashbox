@@ -359,12 +359,39 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "getNowChain": {
                 Log.d("nativeLib=>", "begin to getNowChain =>");
                 WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.getNowChainType((String) (call.argument("walletId")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                if (walletState.status == 200) {
+                    resultMap.put("getNowChainType", walletState.getNowChainType);
+                } else {
+                    resultMap.put("message", walletState.message);
+                }
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM13
             case "setNowChain": {
                 Log.d("nativeLib=>", "begin to setNowChain =>");
                 WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.setNowChainType((String) (call.argument("walletId")),
+                            (int) (call.argument("chainType")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                if (walletState.status == 200) {
+                    resultMap.put("isSetNowChain", walletState.isSetNowChain);
+                } else {
+                    resultMap.put("message", walletState.message);
+                }
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM14
@@ -411,6 +438,32 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "eeeTxSign exception is " + exception);
                 }
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                if (message.status == 200) {
+                    resultMap.put("signedInfo", message.signedInfo);
+                    Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
+                } else {
+                    resultMap.put("message", message.message);
+                    Log.d("nativeLib=>", "message.status is " + message.status);
+                }
+                result.success(resultMap);
+                break;
+            }
+            case "ethTxSign": {
+                Log.d("nativeLib=>", "ethTxSign is enter =>");
+                Message message = new Message();
+                message = NativeLib.ethTxSign((String) (call.argument("mnId")),
+                        (int) (call.argument("chainType")),
+                        (String) (call.argument("fromAddress")),
+                        (String) (call.argument("toAddress")),
+                        (String) (call.argument("contractAddress")),
+                        (String) (call.argument("value")),
+                        (String) (call.argument("backup")),
+                        (byte[]) (call.argument("pwd")),
+                        (String) (call.argument("gasPrice")),
+                        (String) (call.argument("gasLimit")),
+                        (String) (call.argument("nonce")));
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 if (message.status == 200) {

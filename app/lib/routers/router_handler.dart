@@ -21,7 +21,7 @@ import '../page/recover_wallet_page/recover_wallet_page.dart';
 import '../page/transaction_history_page/transaction_history_page.dart';
 import 'package:app/page/user_protocol/privacy_statements_zh.dart';
 import 'package:app/page/user_protocol/service_agreement_zh.dart';
-import 'package:app/page/transaction_detail_page/eee_transactin_detail_page.dart';
+import 'package:app/page/transaction_detail_page/eth_transactin_detail_page.dart';
 import '../page/about_us_page/about_us_page.dart';
 import 'package:app/demo/dapp_webview_demo.dart';
 import 'package:app/page/dapp_page/dapp_page.dart';

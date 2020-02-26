@@ -109,7 +109,8 @@ class Wallets {
           digitM
             ..digitId = digitInfoMap["digitId"]
             ..chainId = digitInfoMap["chainId"]
-            ..contractAddress = digitInfoMap["address"]
+            ..contractAddress = digitInfoMap["contractAddress"]
+            ..address = digitInfoMap["address"]
             ..shortName = digitInfoMap["shortName"]
             ..fullName = digitInfoMap["fullName"]
             ..balance = digitInfoMap["balance"]
@@ -131,7 +132,24 @@ class Wallets {
           ..isVisible = true
           ..walletId = jniList[walletIndex]["walletId"];
         //todo add digit to ETH chain
-
+        List ethChainDigitList = ethChain["ethChainDigitList"];
+        for (int j = 0; j < ethChainDigitList.length; j++) {
+          Map digitInfoMap = ethChainDigitList[j];
+          Digit digitM = EthDigit();
+          digitM
+            ..digitId = digitInfoMap["digitId"]
+            ..chainId = digitInfoMap["chainId"]
+            ..contractAddress = digitInfoMap["contractAddress"]
+            ..address = digitInfoMap["address"]
+            ..shortName = digitInfoMap["shortName"]
+            ..fullName = digitInfoMap["fullName"]
+            ..balance = digitInfoMap["balance"]
+            ..isVisible = digitInfoMap["isVisible"]
+            ..decimal = digitInfoMap["decimal"]
+            ..urlImg = digitInfoMap["urlImg"];
+          chainEthM.digitsList.add(digitM);
+        }
+        walletM.chainList.add(chainEthM);
       }
       //todo    BTC 链信息还没有加入
       {
@@ -246,15 +264,16 @@ class Wallets {
     return eeeTxSignMap;
   }
 
-  Future<Map> ethTxSign(String walletId, String fromAddress, String toAddress, String value, String backup, Uint8List pwd) async {
-    WalletFFI walletFFI = new WalletFFI();
-    // todo ffi  assemble TX
-    var txResultString = walletFFI.assembleEthTx(walletId, value, fromAddress, toAddress, backup);
-    if (txResultString.isEmpty || txResultString.trim() == "") {
-      LogUtil.e("ethTxSign=======>", "txResultString.isEmpty");
-      return new Map();
-    }
-    Map ethTxSignMap = await WalletManager.ethTxSign(walletId, pwd, txResultString);
+  Future<Map> ethTxSign(String walletId, int chainType,String fromAddress, String toAddress, String contractAddress,
+      String value, String backup, Uint8List pwd, String gasPrice,String gasLimit,String nonce) async {
+    // WalletFFI walletFFI = new WalletFFI();
+    // // todo ffi  assemble TX
+    // var txResultString = walletFFI.assembleEthTx(walletId, value, fromAddress, toAddress, backup);
+    // if (txResultString.isEmpty || txResultString.trim() == "") {
+    //   LogUtil.e("ethTxSign=======>", "txResultString.isEmpty");
+    //   return new Map();
+    // }
+    Map ethTxSignMap = await WalletManager.ethTxSign(walletId, chainType,fromAddress,toAddress,contractAddress,value,backup,pwd,  gasPrice,gasLimit,nonce);
     // todo Sign assembled TxInfo
     int status = ethTxSignMap["status"];
     if (status == null || status != 200) {
