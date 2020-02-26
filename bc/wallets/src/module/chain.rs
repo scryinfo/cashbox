@@ -115,7 +115,7 @@ pub fn eth_raw_transfer_sign(from_address:&str, to_address:Option<H160>, amount:
 /// gasPrice 指定gas的价格
 /// data 备注消息（还需要再确认一下，当转erc20 token时 这个字段是否还有效？）
 //pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, eth_chain_id:u64) ->Result<String,String>{
-pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:H160, to_account:H160, amount:U256, psw: &[u8], nonce:U256, gas_limit:U256, gas_price:U256, data:Option<String>, eth_chain_id:u64) ->Result<String,String>{
+pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:H160, to_account:Option<H160>, amount:U256, psw: &[u8], nonce:U256, gas_limit:U256, gas_price:U256, data:Option<String>, eth_chain_id:u64) ->Result<String,String>{
 
     match module::wallet::find_keystore_wallet_from_address(from_account,ChainType::ETH) {
         Ok(keystore)=>{
@@ -123,7 +123,9 @@ pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:H160, to_
                 Ok(mnemonic) => {
                     //密码验证通过
                     //todo 增加错误处理
-                    let encode_data = ethtx::get_erc20_transfer_data(to_account,amount).unwrap();
+
+                    //调用合约 是否允许transfer 目标地址为空?
+                    let encode_data = ethtx::get_erc20_transfer_data(to_account.unwrap(),amount).unwrap();
 
                     let rawtx =  ethtx::RawTransaction{
                         nonce: nonce,

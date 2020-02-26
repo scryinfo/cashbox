@@ -21,6 +21,8 @@ use tiny_keccak::Keccak;
     一条链，在基于链的应用上，存在多个合约地址的可能
 */
 
+const DEFAULT_CHAIN_TYPE :ChainType = ChainType::ETH;
+
 fn get_wallet_info() -> HashMap<String, Wallet> {
     let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
     let mn = instance.get_wallets();
@@ -40,7 +42,6 @@ fn get_wallet_info() -> HashMap<String, Wallet> {
     }
     wallet_map
 }
-
 
 //query all 满足条件的助记词（wallet）
 pub fn get_all_wallet() -> Result<Vec<Wallet>, String> {
@@ -235,7 +236,6 @@ pub fn crate_mnemonic(num: u8) -> Mnemonic {
     }
 }
 
-
 pub fn export_mnemonic(wallet_id: &str, password: &[u8]) -> Result<Mnemonic, String> {
     let provider = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
     //查询出对应id的助记词
@@ -269,21 +269,27 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
     dbg!(eee_address.clone());
     let eth_address = address_from_mnemonic(mn,ChainType::ETH).expect("get eth address");
     dbg!(eth_address.clone());
-    let mut mnd_digest = [0u8; 32];
+    //进行两次hash计算
+    let mut mn_digest = [0u8; 32];
     {
-        let mut keccak = tiny_keccak::Keccak::new_keccak256();
-        keccak.update(mn);
-        keccak.finalize(&mut mnd_digest);
+        let mut temp = [0u8; 32];
+        let mut keccak_first = tiny_keccak::Keccak::new_keccak256();
+        keccak_first.update(mn);
+        keccak_first.finalize(&mut temp);
+
+        let mut keccak_sec = tiny_keccak::Keccak::new_keccak256();
+        keccak_sec.update(&temp);
+        keccak_sec.finalize(&mut mn_digest);
     }
-    let hex_mnd_digest = hex::encode(mnd_digest);
+    let hex_mn_digest = hex::encode(mn_digest);
     let instance = wallet_db::db_helper::DataServiceProvider::instance();
     let mut dbhelper = match instance {
         Ok(dbhelper) => dbhelper,
         Err(e) => return Err(e)
     };
-
+    //正式链，助记词只能导入一次
     if wallet_type == 1 {
-        if dbhelper.query_by_wallet_digest(hex_mnd_digest.as_str()).is_some() {
+        if dbhelper.query_by_wallet_digest(hex_mn_digest.as_str()).is_some() {
             let msg = format!("this wallet is exist");
             return Err(msg);
         }
@@ -321,10 +327,10 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
 
     let wallet_save = model::wallet_store::TbWallet {
         wallet_id: wallet_id.clone(),
-        mn_digest: hex_mnd_digest,
+        mn_digest: hex_mn_digest,
         full_name: Some(wallet_name.to_string()),
         mnemonic: keystore,
-        display_chain_id: ChainType::EEE as i64,
+        display_chain_id: DEFAULT_CHAIN_TYPE as i64,//设置默认显示链类型
         wallet_type,
         ..Default::default()
     };

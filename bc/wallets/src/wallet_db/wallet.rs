@@ -28,12 +28,12 @@ impl DataServiceProvider {
         // TODO 根据链的地址种类 对应的填写代币账户信息
         let save_wallet_flag = match self.db_hander.prepare(wallet_sql) {
             Ok(mut stat) => {
-                stat.bind(1, mn.wallet_id.as_str()).expect("wallet_id bind mn id error");
-                stat.bind(2, mn.mn_digest.as_str()).expect("mn_digest bind mn id error");
-                stat.bind(3, mn.full_name.unwrap().as_str()).expect("full_name bind mn id error");
-                stat.bind(4, mn.mnemonic.as_str()).expect("mnemonic bind mn id error");
-                stat.bind(5, mn.wallet_type).expect("wallet_type bind mn id error");
-                stat.bind(6, mn.display_chain_id as i64).expect("display_chain_id  value set ");
+                stat.bind(1, mn.wallet_id.as_str()).expect("wallet_id bind mn id");
+                stat.bind(2, mn.mn_digest.as_str()).expect("mn_digest bind mn id");
+                stat.bind(3, mn.full_name.unwrap().as_str()).expect("full_name bind mn id");
+                stat.bind(4, mn.mnemonic.as_str()).expect("mnemonic bind mn id");
+                stat.bind(5, mn.wallet_type).expect("wallet_type bind mn id");
+                stat.bind(6, mn.display_chain_id as i64).expect("display_chain_id");
 
                 match stat.next() {
                     Ok(_) => {
