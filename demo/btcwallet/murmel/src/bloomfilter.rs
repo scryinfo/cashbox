@@ -112,6 +112,6 @@ fn calculate_filter() -> FilterLoadMessage {
 //            n_tweak: 0,
 //            n_flags: false,
 //        }
-    // 公钥
-    FilterLoadMessage::calculate_filter("03BDBDB81926E8AFD621E7362352748FC500F81266A3F39F75450ACAE6FAA1A458")
+    // 公钥 66位
+    FilterLoadMessage::calculate_filter("0291EE52A0E0C22DB9772F237F4271EA6F9330D92B242FB3C621928774C560B699")
 }

@@ -317,7 +317,7 @@ impl P2PConfig<NetworkMessage, RawNetworkMessage> for BitcoinP2PConfig {
             nonce: self.nonce,
             user_agent: self.user_agent.clone(),
             start_height: self.height.load(Ordering::Relaxed) as i32,
-            relay: true,
+            relay: false,
         })
     }
 

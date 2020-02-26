@@ -768,6 +768,7 @@ mod test {
     use consensus::encode::{deserialize, serialize};
     use blockdata::opcodes;
     use util::key::PublicKey;
+    use hashes::hex::ToHex;
 
     #[test]
     fn script() {
@@ -1085,5 +1086,17 @@ mod test {
 		let spending = hex_decode("010000000001011f97548fbbe7a0db7588a66e18d803d0089315aa7d4cc28360b6ec50ef36718a0100000000ffffffff02df1776000000000017a9146c002a686959067f4866b8fb493ad7970290ab728757d29f0000000000220020701a8d401c84fb13e6baf169d59684e17abd9fa216c8cc5b9fc63d622ff8c58d04004730440220565d170eed95ff95027a69b313758450ba84a01224e1f7f130dda46e94d13f8602207bdd20e307f062594022f12ed5017bbf4a055a06aea91c10110a0e3bb23117fc014730440220647d2dc5b15f60bc37dc42618a370b2a1490293f9e5c8464f53ec4fe1dfe067302203598773895b4b16d37485cbe21b337f4e4b650739880098c592553add7dd4355016952210375e00eb72e29da82b89367947f29ef34afb75e8654f6ea368e0acdfd92976b7c2103a1b26313f430c4b15bb1fdce663207659d8cac749a0e53d70eff01874496feff2103c96d495bfdd5ba4145e3e046fee45e84a8a48ad05bd8dbb395c011a32cf9f88053ae00000000").unwrap();
 		spent.verify(0, 18393430, spending.as_slice()).unwrap();
 	}
+
+    #[test]
+    fn build_script_test() {
+        // 测试自己的脚本  dfaxxx为hash160计算结果
+        let script = Builder::new().push_opcode(opcodes::all::OP_DUP)
+                                   .push_opcode(opcodes::all::OP_HASH160)
+                                   .push_slice(&hex_decode("dfa0d6f68ada97595dac908c2d9821650e385a10").unwrap())
+                                   .push_opcode(opcodes::all::OP_EQUALVERIFY)
+                                   .push_opcode(opcodes::all::OP_CHECKSIG)
+                                   .into_script();
+        println!("{:?}",script.to_hex());
+    }
 }
 
