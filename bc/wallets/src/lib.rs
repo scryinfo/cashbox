@@ -2,7 +2,6 @@
 extern crate serde_derive;
 
 pub mod wallet_crypto;
-//pub mod wallet_crypto_impl;
 pub mod model;
 pub mod module;
 pub mod wallet_db;

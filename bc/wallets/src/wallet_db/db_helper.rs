@@ -106,7 +106,7 @@ impl DataServiceProvider {
             if init_digit.is_err() {
                 return Err(init_digit.unwrap_err());
             }
-            println!("init digit is over!");
+           // println!("init digit is over!");
         }
 
         //start connect mnemonic database
