@@ -155,6 +155,75 @@ fn ecdsa_sign(hash: &[u8], private_key: &[u8], chain_id: u64) -> EcdsaSig {
     }
 }
 
+pub fn convert_token(value:&str,decimal:usize)->Option<U256>{
+    //判断需要转化的数是否为浮点数
+    match value.find(".") {
+        Some(index) => {
+            let integer_part = value.get(0..index).unwrap();
+            let integer_part_256 = U256::from_dec_str(integer_part).unwrap();
+            let integer_part_wei = integer_part_256.checked_mul(U256::exp10(decimal)).unwrap();
+            //获取小数部分，只保留指定精度部分数据
+            let max_distace = if value.len()-index<=decimal{
+                value.len()
+            }else {
+                index+1+decimal
+            };
+            let decimal_part = value.get((index + 1)..max_distace).unwrap();
+            let decimal_part_256 = U256::from_dec_str(decimal_part).unwrap();
+            //将小数点去掉后，还需要在末尾添加0的个数
+            let base = U256::exp10(decimal-decimal_part.len());
+            let decimal_part_wei = decimal_part_256.checked_mul(base).unwrap();
+            integer_part_wei.checked_add(decimal_part_wei)
+        },
+        None => {
+            let integer_part = U256::from_dec_str(value).unwrap();
+            let integer_part_wei = integer_part.checked_mul(U256::exp10(decimal));
+            integer_part_wei
+        }
+    }
+}
+
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
+struct ContractFunc{
+    func_name:String,
+    address:String,
+    value:String,
+
+}
+//将目前只解析erc20 transfer 方法
+fn decode_tranfer_data(input:&str)->Result<String,String>{
+    if !input.starts_with("0x"){
+        return Err("data format error".to_string());
+    }
+    //0xa9059cbb 为transfer前缀
+    //判断是否为普通data
+    if input.starts_with("0xa9059cbb")&&((input.len()-10)%64==0) {
+        //满足这种情况的，认为是合约参数
+        let start_len = 2+8;
+        let addr = input.get((start_len+24)..start_len+64).unwrap();
+        let value = {
+            let value_bytes= hex::decode(input.get(start_len+64..start_len+64*2).unwrap()).unwrap();
+            println!("value_bytes:{:?}",value_bytes);
+            //大端?
+            let value_u256 = U256::from_big_endian(&value_bytes);
+            format!("{}",value_u256)
+        };
+
+        let func = ContractFunc{
+            func_name:"transfer".to_string(),
+            address:format!("0x{}",addr),
+            value,
+        };
+        Ok(serde_json::to_string(&func).unwrap())
+    }else {
+        match hex::decode(input){
+            Ok(data)=>String::from_utf8(data).map_err(|err| err.to_string()),
+            Err(data)=>Ok(input.to_string())
+        }
+    }
+
+}
+
 
 #[test]
 fn pri_from_mnemonic_test() {
@@ -164,8 +233,20 @@ fn pri_from_mnemonic_test() {
 
 #[test]
 fn erc20_transfer_data_test() {
-    let data = get_erc20_transfer_data("5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c","2000");
-    println!("{:?}", data);
+    let address = H160::from_slice(hex::decode("5A0b54D5dc17e0AadC383d2db43B0a0D3E029c4c").unwrap().as_slice());
+    let value = U256::from_dec_str("2000").unwrap();
+    match get_erc20_transfer_data(address,value){
+        Ok(data)=>{
+            println!("erc20 data:{}",hex::encode(data))
+        },
+        Err(e)=>println!("{}",e.to_string())
+    }
+}
+
+#[test]
+fn decode_tranfer_data_test(){
+    let ret = decode_tranfer_data("0xa9059cbb0000000000000000000000005a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c00000000000000000000000000000000000000000000000000000000000007d0");
+    println!("{:?}",ret);
 }
 
 #[test]
@@ -198,38 +279,11 @@ fn eth_rawtx_sign_test(){
 
 #[test]
 fn input_data_test(){
-    let bytes = hex::decode("68656c6c6f").unwrap();
-    println!("{:?}",String::from_utf8(bytes));
+    let bytes = hex::decode("6162630000000000000000000000000000000000000000000000000000000000").unwrap();
+    println!("{}",String::from_utf8(bytes).unwrap());
 }
 
 
-pub fn convert_token(value:&str,decimal:usize)->Option<U256>{
-    //判断需要转化的数是否为浮点数
-    match value.find(".") {
-        Some(index) => {
-            let integer_part = value.get(0..index).unwrap();
-            let integer_part_256 = U256::from_dec_str(integer_part).unwrap();
-            let integer_part_wei = integer_part_256.checked_mul(U256::exp10(decimal)).unwrap();
-            //获取小数部分，只保留指定精度部分数据
-            let max_distace = if value.len()-index<=decimal{
-                value.len()
-            }else {
-                index+1+decimal
-            };
-            let decimal_part = value.get((index + 1)..max_distace).unwrap();
-            let decimal_part_256 = U256::from_dec_str(decimal_part).unwrap();
-            //将小数点去掉后，还需要在末尾添加0的个数
-            let base = U256::exp10(decimal-decimal_part.len());
-            let decimal_part_wei = decimal_part_256.checked_mul(base).unwrap();
-            integer_part_wei.checked_add(decimal_part_wei)
-        },
-        None => {
-            let integer_part = U256::from_dec_str(value).unwrap();
-            let integer_part_wei = integer_part.checked_mul(U256::exp10(decimal));
-            integer_part_wei
-        }
-    }
-}
 
 #[test]
 fn dec_prase_test() {
