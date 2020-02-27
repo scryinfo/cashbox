@@ -2,11 +2,11 @@ use std::{fs, path};
 use sqlite::Connection;
 
 
-const TB_WALLET: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet.db"#;
-const TB_WALLET_DETAIL: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet_detail.db"#;
+//const TB_WALLET: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet.db"#;
+//const TB_WALLET_DETAIL: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet_detail.db"#;
 
-//const TB_WALLET: &'static str = r#"cashbox_wallet.db"#;
-//const TB_WALLET_DETAIL: &'static str = r#"cashbox_wallet_detail.db"#;
+const TB_WALLET: &'static str = r#"cashbox_wallet.db"#;
+const TB_WALLET_DETAIL: &'static str = r#"cashbox_wallet_detail.db"#;
 
 fn create_teble(table_name: &str, table_desc: &str) -> Result<(), String> {
     // TODO 检查参数是否合理

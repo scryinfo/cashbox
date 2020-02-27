@@ -46,6 +46,20 @@ struct KdfParams {
     p: u32,
 }
 
+pub trait  Keccak256<T>{
+    fn keccak256(&self) -> T
+        where T: Sized;
+}
+
+impl <T> Keccak256<[u8;32]> for T where T:AsRef<[u8]>{
+    fn keccak256(&self)->[u8;32]{
+        let mut keccak = Keccak::new_keccak256();
+        let mut result = [0u8; 32];
+        keccak.update(self.as_ref());
+        keccak.finalize(&mut result);
+        result
+    }
+}
 
 pub trait Crypto {
     type Seed: AsRef<[u8]> + AsMut<[u8]> + Sized + Default;
@@ -203,6 +217,13 @@ pub trait Crypto {
         let ciphertext = hex::decode(hex_ciphertext).unwrap();
 
         //要校验输入的密钥导出的对称密钥是否正确，将导出密钥的16到32位数据，与加密后的内容拼接，计算出的摘要值与文本中保存的hash进行对比
+        //let mut account_msg = [0u8;16+ciphertext.len()];
+       /* let mut account_msg =Vec::new();
+            account_msg.clone_from_slice(&key[16..]);
+        //account_msg.clone_from_slice(&key[16..]);
+        account_msg.append(&ciphertext[..]);
+        let hex_mac_from_password =  account_msg.keccak256();*/
+
         let mut keccak = Keccak::new_keccak256();
         keccak.update(&key[16..]);
         keccak.update(&ciphertext[..]);
