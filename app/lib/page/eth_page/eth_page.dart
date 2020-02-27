@@ -4,6 +4,7 @@ import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -37,8 +38,8 @@ class _EthPageState extends State<EthPage> {
   String nowChainAddress = "";
   String walletName = "";
   Future future;
-  List<Digit> nowChainDigitsList = []; //区分处理，代币很多， 分批展示
-  List<Digit> displayDigitsList = []; //区分处理，代币很多， 分批展示
+  List<Digit> nowChainDigitsList = []; //链上获取到的所有代币数据
+  List<Digit> displayDigitsList = [];  //当前分页展示的固定代币数量信息
 
   @override
   void initState() {
@@ -53,16 +54,12 @@ class _EthPageState extends State<EthPage> {
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
       Wallet wallet = walletList[index];
-      print("eth_page => is isNowWallet===> " + wallet.isNowWallet.toString());
-      print("eth_page => wallet.walletId===> " + wallet.walletId.toString());
-      print("eth_page =>wallet.walletName===>" + wallet.walletName.toString());
+      print("isNowWallet===>" + wallet.isNowWallet.toString() + wallet.walletId.toString() + "walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
         setState(() {
           this.nowWallet = wallet;
           this.walletName = nowWallet.walletName;
           this.nowChain = nowWallet.getChainByChainType(ChainType.ETH);
-          print("eth_page =>  nowChain setState chainAddress=====>" + nowChain.chainAddress);
-          print("eth_page =>  nowChain.digitsList.length.toString() =====>" + nowChain.digitsList.length.toString());
           this.nowChainAddress = nowChain.chainAddress;
           this.nowChainDigitsList = nowChain.digitsList;
         });
@@ -73,6 +70,29 @@ class _EthPageState extends State<EthPage> {
       this.walletList = walletList;
     });
     future = loadDisplayDigitListData();
+  }
+
+  loadDigitBalance() async {
+    print("loadDigitBalance is enter ===>" + displayDigitsList.length.toString());
+    if (displayDigitsList.length == 0) {
+      return;
+    } else {
+      for (var i = 0; i < displayDigitsList.length; i++) {
+        print("loadDigitBalance    displayDigitsList[i].contractAddress===>" +
+            this.displayDigitsList[i].contractAddress.toString() +
+            "||" +
+            this.displayDigitsList[i].address.toString());
+        String balance;
+        if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
+          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress);
+          print("erc20 balance==>" + balance.toString());
+        } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
+          balance = await loadEthBalance("0xa4512ca7618d8d12a30C28979153aB09809ED7fD");
+          print("eth balance==>" + balance.toString());
+        } else {}
+        this.displayDigitsList[i].balance = balance ?? "0.00";
+      }
+    }
   }
 
   Future<List<Digit>> loadDisplayDigitListData() async {
@@ -95,6 +115,7 @@ class _EthPageState extends State<EthPage> {
         addDigitToDisplayList(nowChainDigitsList.length - displayDigitsList.length);
       }
     }
+    await loadDigitBalance();
     return displayDigitsList;
   }
 
@@ -110,6 +131,8 @@ class _EthPageState extends State<EthPage> {
         ..shortName = nowChainDigitsList[i].shortName
         ..fullName = nowChainDigitsList[i].fullName
         ..balance = nowChainDigitsList[i].balance
+        ..contractAddress = nowChainDigitsList[i].contractAddress
+        ..address = nowChainDigitsList[i].address
         ..digitRate = digitRate; //todo
       //..money =  nowChainDigitsList[i].money;
       displayDigitsList.add(digit);
@@ -171,7 +194,7 @@ class _EthPageState extends State<EthPage> {
               ),
             );
           }
-          if (snapshot.hasData) {
+          if (snapshot.hasData && this.displayDigitsList.length > 0) {
             return Container(
               padding: EdgeInsets.only(left: ScreenUtil().setWidth(3), right: ScreenUtil().setWidth(3)),
               child: _digitListWidgets(snapshot),
@@ -277,7 +300,7 @@ class _EthPageState extends State<EthPage> {
                               Align(
                                 alignment: new FractionalOffset(0.0, 0.0),
                                 child: Text(
-                                  displayDigitsList[index].shortName + " * " + displayDigitsList[index].balance,
+                                  (displayDigitsList[index].shortName ?? "") + " * " + (displayDigitsList[index].balance ?? "0.00"),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: ScreenUtil.instance.setSp(3),
