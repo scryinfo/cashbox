@@ -11,6 +11,7 @@ class TransactionProvide with ChangeNotifier {
   String _timeStamp;
   String _nonce;
   String _hash;
+  int _decimal;
   String _contractAddress;
   String _cumulativeGasUsed;
   String _gasUsed;
@@ -23,6 +24,8 @@ class TransactionProvide with ChangeNotifier {
     _backup = "";
     _digitName = "";
     _fromAddress = "";
+    _hash = "";
+    _decimal = 0;
     _gas = "";
     _gasPrice = "";
     _timeStamp = "";
@@ -41,6 +44,12 @@ class TransactionProvide with ChangeNotifier {
 
   void setFromAddress(String value) {
     _fromAddress = value;
+  }
+
+  int get decimal => _decimal;
+
+  void setDecimal(int value) {
+    _decimal = value;
   }
 
   String get nonce => _nonce;

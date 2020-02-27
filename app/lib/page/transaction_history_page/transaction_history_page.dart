@@ -1,5 +1,4 @@
 import 'package:app/generated/i18n.dart';
-import 'package:app/global_config/global_config.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/net/etherscan_util.dart';
@@ -29,26 +28,25 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
   String digitName = "ETH";
-  //String fromAddress = "";
   String fromAddress = "0xa4512ca7618d8d12a30C28979153aB09809ED7fD";
   String contractAddress = "";
-  int displayTxOffset=0;
-  int refreshAddCount=20;
+  int displayTxOffset = 0;
+  int refreshAddCount = 20;
 
   @override
   void initState() {
     super.initState();
+    {
+      fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+      contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+      digitName = Provider.of<TransactionProvide>(context).digitName;
+    }
+    getBalanceData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    {
-      // fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-      // contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
-      // digitName = Provider.of<TransactionProvide>(context).digitName;
-    }
-    getBalanceData();
     txListFuture = getTxListData();
   }
 
@@ -68,44 +66,6 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         ),
       ),
     );
-  }
-
-  getBalanceData() async {
-    try {
-      if(contractAddress.trim()==""){
-        balanceInfo = await loadEthBalance(fromAddress);
-      }else{
-        balanceInfo = await loadErc20Balance(fromAddress,contractAddress);
-      }
-      print("balanceInfo===>" + balanceInfo.toString());
-    } catch (onError) {
-      print("onError===>" + "$onError");
-      this.balanceInfo = "0";
-    }
-    setState(() {
-      this.balanceInfo = balanceInfo;
-    });
-  }
-
-  Future<List<EthTransactionModel>> getTxListData() async {
-    displayTxOffset = displayTxOffset+refreshAddCount; //每次增加refreshAddCount个
-    try {
-      if(contractAddress.trim()==""&&(fromAddress.trim()!="")){
-        ethTxListModel = await loadEthTxHistory(fromAddress,offset:displayTxOffset.toString());
-      }else if(fromAddress.trim()!=""){
-        ethTxListModel = await loadErc20TxHistory(fromAddress,contractAddress,offset:displayTxOffset.toString());
-      }else{
-        Fluttertoast.showToast(msg: "地址信息为空，请再检查");
-      }
-      print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
-    } catch (onError) {
-      print("onError===>" + "$onError");
-    }
-    print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
-    setState(() {
-      this.ethTxListModel = ethTxListModel;
-    });
-    return ethTxListModel;
   }
 
   Widget _buildTxHistoryWidget() {
@@ -133,7 +93,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         children: <Widget>[
           Gaps.scaleHGap(7),
           Container(
-            width:  ScreenUtil().setWidth(50),
+            width: ScreenUtil().setWidth(50),
             //color: Colors.amberAccent,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -142,8 +102,8 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   alignment: Alignment.centerLeft,
                   height: ScreenUtil().setHeight(8),
                   child: Text(
-                    balanceInfo ?? "0.0000" ,
-                    textAlign:  TextAlign.start,
+                    balanceInfo ?? "0.0000",
+                    textAlign: TextAlign.start,
                     style: TextStyle(
                       fontSize: ScreenUtil.instance.setSp(4),
                       color: Colors.white,
@@ -229,7 +189,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   Gaps.scaleHGap(45),
                   Container(
                     child: Opacity(
-                      opacity: 0,  //todo 通过时间筛选交易，暂不显示
+                      opacity: 0, //todo 通过时间筛选交易，暂不显示
                       child: Text(
                         "2018.07",
                         style: TextStyle(
@@ -299,9 +259,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         ),
       ],
       onLoad: () async {
-        await Future.delayed(Duration(seconds: 2), ()async {
+        await Future.delayed(Duration(seconds: 2), () async {
           print("refresh onLoad======>");
-          if(this.ethTxListModel.length < displayTxOffset){
+          if (this.ethTxListModel.length < displayTxOffset) {
             //展示的，比上次请求加载到的少，说明没了
             Fluttertoast.showToast(msg: "您的 交易记录 已经加载完了！");
             return;
@@ -435,5 +395,43 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         ),
       ),
     );
+  }
+
+  getBalanceData() async {
+    try {
+      if (contractAddress.trim() == "") {
+        balanceInfo = await loadEthBalance(fromAddress);
+      } else {
+        balanceInfo = await loadErc20Balance(fromAddress, contractAddress);
+      }
+      print("balanceInfo===>" + balanceInfo.toString());
+    } catch (onError) {
+      print("onError===>" + "$onError");
+      this.balanceInfo = "0";
+    }
+    setState(() {
+      this.balanceInfo = balanceInfo;
+    });
+  }
+
+  Future<List<EthTransactionModel>> getTxListData() async {
+    displayTxOffset = displayTxOffset + refreshAddCount; //每次增加refreshAddCount个
+    try {
+      if (contractAddress.trim() == "" && (fromAddress.trim() != "")) {
+        ethTxListModel = await loadEthTxHistory(fromAddress, offset: displayTxOffset.toString());
+      } else if (fromAddress.trim() != "") {
+        ethTxListModel = await loadErc20TxHistory(fromAddress, contractAddress, offset: displayTxOffset.toString());
+      } else {
+        Fluttertoast.showToast(msg: "地址信息为空，请再检查");
+      }
+      print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
+    } catch (onError) {
+      print("onError===>" + "$onError");
+    }
+    print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
+    setState(() {
+      this.ethTxListModel = ethTxListModel;
+    });
+    return ethTxListModel;
   }
 }

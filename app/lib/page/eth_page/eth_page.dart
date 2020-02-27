@@ -39,7 +39,7 @@ class _EthPageState extends State<EthPage> {
   String walletName = "";
   Future future;
   List<Digit> nowChainDigitsList = []; //链上获取到的所有代币数据
-  List<Digit> displayDigitsList = [];  //当前分页展示的固定代币数量信息
+  List<Digit> displayDigitsList = []; //当前分页展示的固定代币数量信息
 
   @override
   void initState() {
@@ -128,6 +128,7 @@ class _EthPageState extends State<EthPage> {
       Digit digit = EthDigit();
       digit
         ..chainId = nowChainDigitsList[i].chainId
+        ..decimal = nowChainDigitsList[i].decimal
         ..shortName = nowChainDigitsList[i].shortName
         ..fullName = nowChainDigitsList[i].fullName
         ..balance = nowChainDigitsList[i].balance
@@ -270,7 +271,8 @@ class _EthPageState extends State<EthPage> {
                 Provider.of<TransactionProvide>(context)
                   ..setDigitName(displayDigitsList[index].shortName)
                   ..setBalance(displayDigitsList[index].balance)
-                  ..setFromAddress(nowChainAddress) //todo  eth地址，等动态库协调一直结构？
+                  ..setDecimal(displayDigitsList[index].decimal)
+                  ..setFromAddress(nowChainAddress)
                   ..setContractAddress(displayDigitsList[index].contractAddress);
               }
               NavigatorUtils.push(context, Routes.transactionHistoryPage);

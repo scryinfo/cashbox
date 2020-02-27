@@ -159,7 +159,8 @@ class WalletManager {
 
   //Eth交易签名
   static Future<Map<dynamic, dynamic>> ethTxSign(String mnId, int chainType, String fromAddress, String toAddress, String contractAddress,
-      String value, String backup, Uint8List pwd, String gasPrice, String gasLimit, String nonce) async {
+      String value, String backup, Uint8List pwd, String gasPrice, String gasLimit, String nonce,
+      {int decimal = 18}) async {
     Map<dynamic, dynamic> ethTxSignMap = await _channel.invokeMethod("ethTxSign", {
       "mnId": mnId,
       "chainType": chainType,
@@ -171,7 +172,8 @@ class WalletManager {
       "pwd": pwd,
       "gasPrice": gasPrice,
       "gasLimit": gasLimit,
-      "nonce": nonce
+      "nonce": nonce,
+      "decimal": decimal
     });
     return ethTxSignMap;
   }
