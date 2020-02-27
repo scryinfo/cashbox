@@ -4,39 +4,36 @@ use log::debug;
 
 impl DataServiceProvider {
     pub fn display_eee_chain(&self) -> Result<Vec<WalletObj>, String> {
-     /*   let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,c.is_visible as chain_is_visible
- from Wallet a,detail.Chain b,detail.Address c,detail.EeeDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
-*/
 
-        let all_mn =   "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.*,c.is_visible as chain_is_visible
-         from Wallet a,detail.Chain b,detail.Address c,
-        ( select digit_id,contract_address,short_name,full_name,balance,detail.DigitBase.is_visible as digit_is_visible,decimals,url_img from detail.DigitUseDetail ,detail.DigitBase
+        let all_mn =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
+			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
+	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (5,6)) e,
+	 ( select * from detail.DigitUseDetail,detail.DigitBase
          where digit_id = id and group_name !='ETH' and group_name !='BTC'
-         ) as d
-         where a.wallet_id=c.wallet_id and c.chain_id = b.id and a.status =1 and c.status =1 and b.id in (5,6);";
+         ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id;";
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
 
         while let Some(row) = cursor.next().unwrap() {
-            // println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
                 chain_id: row[2].as_integer(),
                 address: row[3].as_string().map(|str| String::from(str)),
-                domain: row[4].as_string().map(|str| String::from(str)),
-                selected: row[5].as_string().map(|value| Self::get_bool_value(value)),
-                chain_type: row[6].as_integer(),
-                digit_id: row[7].as_integer(),
-                contract_address: row[8].as_string().map(|str| String::from(str)),
-                short_name: row[9].as_string().map(|str| String::from(str)),
-                full_name: row[10].as_string().map(|str| String::from(str)),
-                balance: row[11].as_string().map(|str| String::from(str)),
-                digit_is_visible: row[12].as_string().map(|value| Self::get_bool_value(value)),
-                decimals: row[13].as_integer(),
-                url_img: row[14].as_string().map(|str| String::from(str)),
-                chain_is_visible: row[15].as_string().map(|value| Self::get_bool_value(value)),
+                selected: row[4].as_string().map(|value| Self::get_bool_value(value)),
+                chain_is_visible: row[5].as_string().map(|value| Self::get_bool_value(value)),
+                domain: row[6].as_string().map(|str| String::from(str)),
+                chain_type: row[7].as_integer(),
+                digit_id: row[8].as_integer(),
+                contract_address: row[9].as_string().map(|str| String::from(str)),
+                short_name: row[10].as_string().map(|str| String::from(str)),
+                full_name: row[11].as_string().map(|str| String::from(str)),
+                balance: row[12].as_string().map(|str| String::from(str)),
+                digit_is_visible: row[13].as_string().map(|value| Self::get_bool_value(value)),
+                decimals: row[14].as_integer(),
+                url_img: row[15].as_string().map(|str| String::from(str)),
+
             };
             tbwallets.push(tbwallet);
         }
@@ -44,38 +41,35 @@ impl DataServiceProvider {
     }
 
     pub fn display_eth_chain(&self) -> Result<Vec<WalletObj>, String> {
-       /* let all_mn = " select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,c.is_visible as chain_is_visible
- from Wallet a,detail.Chain b,detail.Address c,detail.EthDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
-*/
-        let all_mn =   "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.*,c.is_visible as chain_is_visible
-         from Wallet a,detail.Chain b,detail.Address c,
-        ( select digit_id,contract_address,short_name,full_name,balance,detail.DigitBase.is_visible as digit_is_visible,decimals,url_img from detail.DigitUseDetail ,detail.DigitBase
-         where digit_id = id and group_name !='EEE' and group_name !='BTC'
-         ) as d
-         where a.wallet_id=c.wallet_id and c.chain_id = b.id and a.status =1 and c.status =1 and b.id in (3,4);";
+      //这个sql语句关联表较多
+        let all_mn =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
+			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
+	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (3,4)) e,
+	 ( select * from detail.DigitUseDetail,detail.DigitBase where digit_id = id and group_name !='EEE' and group_name !='BTC') as d,detail.Chain f
+         where e.address_id = d.address_id and e.chain_id = f.id;";
 
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
         while let Some(row) = cursor.next().unwrap() {
-            //  println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
                 chain_id: row[2].as_integer(),
                 address: row[3].as_string().map(|str| String::from(str)),
-                domain: row[4].as_string().map(|str| String::from(str)),
-                selected: row[5].as_string().map(|value| Self::get_bool_value(value)),
-                chain_type: row[6].as_integer(),
-                digit_id: row[7].as_integer(),
-                contract_address: row[8].as_string().map(|str| String::from(str)),
-                short_name: row[9].as_string().map(|str| String::from(str)),
-                full_name: row[10].as_string().map(|str| String::from(str)),
-                balance: row[11].as_string().map(|str| String::from(str)),
-                digit_is_visible: row[12].as_string().map(|value| Self::get_bool_value(value)),
-                decimals: row[13].as_integer(),
-                url_img: row[14].as_string().map(|str| String::from(str)),
-                chain_is_visible: row[15].as_string().map(|value| Self::get_bool_value(value)),
+                selected: row[4].as_string().map(|value| Self::get_bool_value(value)),
+                chain_is_visible: row[5].as_string().map(|value| Self::get_bool_value(value)),
+                domain: row[6].as_string().map(|str| String::from(str)),
+                chain_type: row[7].as_integer(),
+                digit_id: row[8].as_integer(),
+                contract_address: row[9].as_string().map(|str| String::from(str)),
+                short_name: row[10].as_string().map(|str| String::from(str)),
+                full_name: row[11].as_string().map(|str| String::from(str)),
+                balance: row[12].as_string().map(|str| String::from(str)),
+                digit_is_visible: row[13].as_string().map(|value| Self::get_bool_value(value)),
+                decimals: row[14].as_integer(),
+                url_img: row[15].as_string().map(|str| String::from(str)),
+
             };
             tbwallets.push(tbwallet);
         }
@@ -83,38 +77,36 @@ impl DataServiceProvider {
     }
 
     pub fn display_btc_chain(&self) -> Result<Vec<WalletObj>, String> {
-      /*  let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,c.is_visible as chain_is_visible
-from Wallet a,detail.Chain b,detail.Address c,detail.BtcDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
-*/
-        let all_mn =   "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.domain,a.selected,b.type as chian_type,d.*,c.is_visible as chain_is_visible
-         from Wallet a,detail.Chain b,detail.Address c,
-        ( select digit_id,contract_address,short_name,full_name,balance,detail.DigitBase.is_visible as digit_is_visible,decimals,url_img from detail.DigitUseDetail ,detail.DigitBase
-         where digit_id = id and group_name !='ETH' and group_name !='EEE'
-         ) as d
-         where a.wallet_id=c.wallet_id and c.chain_id = b.id and a.status =1 and c.status =1 and b.id in (1,2);";
+
+        let all_mn =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
+			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
+	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (1,2)) e,
+	 ( select * from detail.DigitUseDetail,detail.DigitBase
+         where digit_id = id and group_name !='EEE' and group_name !='ETH'
+         ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id;";
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
         let mut tbwallets = Vec::new();
         debug!("get wallet item is:{}", tbwallets.len());
         while let Some(row) = cursor.next().unwrap() {
-            //  println!("query wallet_id {:?},wallet_name:{:?}", row[0].as_string(), row[1].as_string());
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
                 chain_id: row[2].as_integer(),
                 address: row[3].as_string().map(|str| String::from(str)),
-                domain: row[4].as_string().map(|str| String::from(str)),
-                selected: row[5].as_string().map(|value| Self::get_bool_value(value)),
-                chain_type: row[6].as_integer(),
-                digit_id: row[7].as_integer(),
-                contract_address: row[8].as_string().map(|str| String::from(str)),
-                short_name: row[9].as_string().map(|str| String::from(str)),
-                full_name: row[10].as_string().map(|str| String::from(str)),
-                balance: row[11].as_string().map(|str| String::from(str)),
-                digit_is_visible: row[12].as_string().map(|value| Self::get_bool_value(value)),
-                decimals: row[13].as_integer(),
-                url_img: row[14].as_string().map(|str| String::from(str)),
-                chain_is_visible: row[15].as_string().map(|value| Self::get_bool_value(value)),
+                selected: row[4].as_string().map(|value| Self::get_bool_value(value)),
+                chain_is_visible: row[5].as_string().map(|value| Self::get_bool_value(value)),
+                domain: row[6].as_string().map(|str| String::from(str)),
+                chain_type: row[7].as_integer(),
+                digit_id: row[8].as_integer(),
+                contract_address: row[9].as_string().map(|str| String::from(str)),
+                short_name: row[10].as_string().map(|str| String::from(str)),
+                full_name: row[11].as_string().map(|str| String::from(str)),
+                balance: row[12].as_string().map(|str| String::from(str)),
+                digit_is_visible: row[13].as_string().map(|value| Self::get_bool_value(value)),
+                decimals: row[14].as_integer(),
+                url_img: row[15].as_string().map(|str| String::from(str)),
+
             };
             tbwallets.push(tbwallet);
         }

@@ -49,7 +49,7 @@ pub mod android {
             env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("set digitId value is error!");
             env.set_field(digit_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.chain_id).unwrap()))).expect("set digitId value is error!");
 
-           // env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.address.clone()).unwrap()))).expect("set address value is error!");
+            // env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.address.clone()).unwrap()))).expect("set address value is error!");
 
             if digit.contract_address.is_some() {
                 env.set_field(digit_class_obj, "contractAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.contract_address.unwrap()).unwrap()))).expect("set contractAddress value is error!");
@@ -90,9 +90,9 @@ pub mod android {
         let eth_chain_class = env.find_class("info/scry/wallet_manager/NativeLib$EthChain").expect("get_eth_chain_obj NativeLib$EthChain class");
         let chain_class_obj = env.alloc_object(eth_chain_class).expect("get_eth_chain_obj  eth_chain_class");
         env.set_field(chain_class_obj, "status", "I", JValue::Int(eth_chain.status as i32)).expect("get_eth_chain_obj set status value");
-        let chain_id_str = format!("{}", eth_chain.chain_id);
+        //let chain_id_str = format!("{}", eth_chain.chain_id);
 
-        env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("get_eth_chain_obj set chainId value");
+        env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.chain_id).unwrap()))).expect("get_eth_chain_obj set chainId value");
         env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.wallet_id).unwrap()))).expect("get_eth_chain_obj set walletId value");
         env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.address).unwrap()))).expect("get_eth_chain_obj set address value");
 
@@ -117,11 +117,11 @@ pub mod android {
             let digit_class_obj = env.alloc_object(eth_digit_class).expect("eth_digit_class create chain instance");
             //设置digit 属性
             env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("get_eth_chain_obj set status value");
-
+            env.set_field(digit_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.chain_id).unwrap()))).expect("get_eth_chain_obj set chainId value");
             env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("get_eth_chain_obj set digitId value");
-         /*   if digit.address.is_some() {
-                env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.address.unwrap()).unwrap()))).expect("get_eth_chain_obj set address value");
-            }*/
+            /*   if digit.address.is_some() {
+                   env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.address.unwrap()).unwrap()))).expect("get_eth_chain_obj set address value");
+               }*/
             if digit.contract_address.is_some() {
                 env.set_field(digit_class_obj, "contractAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.contract_address.unwrap()).unwrap()))).expect("get_eth_chain_obj set contractAddress value");
             }
@@ -189,11 +189,11 @@ pub mod android {
 
             env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("get_btc_chain_obj set digitId value");
             //这个值可优化
-           // env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address.clone()).unwrap()))).expect("get_btc_chain_obj set address value");
+            // env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address.clone()).unwrap()))).expect("get_btc_chain_obj set address value");
 
-         /*   if digit.contract_address.is_some() {
-                env.set_field(digit_class_obj, "contractAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.contract_address.unwrap()).unwrap()))).expect("get_btc_chain_obj set contractAddress value");
-            }*/
+            /*   if digit.contract_address.is_some() {
+                   env.set_field(digit_class_obj, "contractAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.contract_address.unwrap()).unwrap()))).expect("get_btc_chain_obj set contractAddress value");
+               }*/
             if digit.shortname.is_some() {
                 env.set_field(digit_class_obj, "shortName", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.shortname.unwrap()).unwrap()))).expect("get_btc_chain_obj set shortName value");
             }
@@ -316,7 +316,7 @@ pub mod android {
         let to_address = {
             if to_address.is_empty() {
                 None
-            }else{
+            } else {
                 let to = H160::from_slice(hex::decode(&to_address[2..]).unwrap().as_slice());
                 Some(to)
             }
@@ -327,13 +327,13 @@ pub mod android {
         let amount = {
             let value_str: String = env.get_string(value).unwrap().into();
             //不同的代币，会有不同的精度？？
-            wallets::convert_token(&value_str,decimal as usize).unwrap()
+            wallets::convert_token(&value_str, decimal as usize).unwrap()
         };
         //附加参数
         let data: String = env.get_string(backup).unwrap().into();
-        let data = if data.is_empty(){
+        let data = if data.is_empty() {
             None
-        }else {
+        } else {
             Some(data)
         };
 
@@ -341,44 +341,56 @@ pub mod android {
         let gas_price: U256 = {
             let price_str: String = env.get_string(gasPrice).unwrap().into();
             //使用单位的是gwei,这点是确定的
-            wallets::convert_token(&price_str,9).unwrap()
+            wallets::convert_token(&price_str, 9).unwrap()
             //U256::from_dec_str(&price_str).unwrap()
         };
         //允许最大消耗gas数量
         let gas_limit: U256 = {
-            let  gas_limit_str: String= env.get_string(gasLimit).unwrap().into();
+            let gas_limit_str: String = env.get_string(gasLimit).unwrap().into();
             U256::from_dec_str(&gas_limit_str).unwrap()
         };
         //当前交易的nonce值
         let nonce: U256 = {
-            let nonce_str:String = env.get_string(nonce).unwrap().into();
-            let nonce =  if nonce_str.starts_with("0x") {
-                let nonce_u64 = u64::from_str_radix(&nonce_str[2..],16);
-                format!("{}",nonce_u64.unwrap())
-            }else{
+            let nonce_str: String = env.get_string(nonce).unwrap().into();
+            let nonce = if nonce_str.starts_with("0x") {
+                let nonce_u64 = u64::from_str_radix(&nonce_str[2..], 16);
+                format!("{}", nonce_u64.unwrap())
+            } else {
                 nonce_str
             };
             U256::from_dec_str(&nonce).unwrap()
         };
 
+        //chain type转换 当前钱包里面默认只使用 3、4来表示以太坊 主链和测试链，这里为方便测试，将链类型id 做如下转换 3->1,4->3,其余的保持不变
+
+        let chain_type = {
+            if chainType == 3 {
+                1
+            } else if chainType == 4 {
+                3
+            } else {
+                chainType
+            }
+        };
+
         //使用私钥确认码
         let pwd = env.convert_byte_array(pwd).unwrap();
         //合约地址为空，是普通ETH转账
-        let signed_ret =  if contract_address.is_empty(){
-            wallets::module::chain::eth_raw_transfer_sign(&from_address,to_address,amount,&pwd,nonce,gas_limit,gas_price,data,chainType as u64)
-        }else {
+        let signed_ret = if contract_address.is_empty() {
+            wallets::module::chain::eth_raw_transfer_sign(&from_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_type as u64)
+        } else {
             let contract_address = H160::from_slice(hex::decode(&contract_address[2..]).unwrap().as_slice());
-            wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address,contract_address,to_address,amount,&pwd,nonce,gas_limit,gas_price,data,chainType as u64)
+            wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address, contract_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_type as u64)
         };
 
         let wallet_message_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_message_class");
         let state_obj = env.alloc_object(wallet_message_class).expect("state_obj");
-        match signed_ret{
-            Ok(data)=>{
+        match signed_ret {
+            Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");
                 env.set_field(state_obj, "ethSignedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set ethSignedInfo");
             },
-            Err(msg)=>{
+            Err(msg) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set status");
                 env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set message");
             }
