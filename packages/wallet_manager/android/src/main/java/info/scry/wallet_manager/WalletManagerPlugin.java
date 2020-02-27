@@ -106,7 +106,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 for (int i = 0; i < walletList.size(); i++) {
                     int walletIndex = i;
                     Map<String, Object> walletMap = new HashMap<String, Object>();
-
+                    Log.d("nativeLib=>",
+                            "walletList.get(walletIndex) =>" + walletList.get(walletIndex).toString());
                     walletMap.put("status", walletList.get(walletIndex).status);
                     walletMap.put("walletId", walletList.get(walletIndex).walletId);
                     walletMap.put("walletName", walletList.get(walletIndex).walletName);
@@ -153,14 +154,42 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     /*-------------------------组装eee链上数据 end---------------------------*/
 
                     /*-------------------------组装ETH链上数据 start-------------------------*/
-                    List<Map<String, Object>> resultEthChain = new ArrayList<>();
+                    Map<String, Object> resultEthChain = new HashMap<>();
+                    resultEthChain.put("chainAddress",
+                            walletList.get(walletIndex).ethChain.address);
+                    Log.d("nativeLib=>", "Eth链 chainAddresss ===>" + walletList.get(walletIndex).ethChain.address.toString());
+                    resultEthChain.put("chainId", walletList.get(walletIndex).ethChain.chainId);
+                    resultEthChain.put("chainType", walletList.get(walletIndex).ethChain.chainType);
+                    resultEthChain.put("isVisible", walletList.get(walletIndex).ethChain.isVisible);
+                    resultEthChain.put("status", walletList.get(walletIndex).ethChain.status);
+                    resultEthChain.put("walletId", walletList.get(walletIndex).ethChain.walletId);
                     if (walletList.get(walletIndex).ethChain != null) {
                         List<EthDigit> ethDigitList =
                                 walletList.get(walletIndex).ethChain.digitList;
+                        List<Map<String, Object>> ethChainDigitList = new ArrayList<>();
                         for (int j = 0; j < ethDigitList.size(); j++) {
                             //todo
+                            int digitIndex = j;
+                            Map<String, Object> digitMap = new HashMap<String, Object>();
+
+                            digitMap.put("status", ethDigitList.get(digitIndex).status);
+                            digitMap.put("digitId", ethDigitList.get(digitIndex).digitId);
+                            digitMap.put("chainId", ethDigitList.get(digitIndex).chainId);
+                            digitMap.put("contractAddress",
+                                    ethDigitList.get(digitIndex).contractAddress);
+                            digitMap.put("shortName", ethDigitList.get(digitIndex).shortName);
+                            digitMap.put("fullName", ethDigitList.get(digitIndex).fullName);
+                            digitMap.put("balance", ethDigitList.get(digitIndex).balance);
+                            digitMap.put("isVisible", ethDigitList.get(digitIndex).isVisible);
+                            digitMap.put("decimal", ethDigitList.get(digitIndex).decimal);
+                            digitMap.put("imgUrl", ethDigitList.get(digitIndex).imgUrl);
+                            ethChainDigitList.add(digitMap);
                         }
+                        Log.d("nativeLib=>", "Eth链 ethChainDigitList.toString() ===>" +ethChainDigitList.toString());
+                        resultEthChain.put("ethChainDigitList", ethChainDigitList);
                     }
+                    Log.d("nativeLib=>",
+                            "组装完ETh链 result resultEthChain is ===>" + resultEthChain.toString());
                     /*-------------------------组装ETH链上数据 end---------------------------*/
 
                     /*-------------------------组装BTC链上数据 start-------------------------*/
@@ -463,7 +492,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         (byte[]) (call.argument("pwd")),
                         (String) (call.argument("gasPrice")),
                         (String) (call.argument("gasLimit")),
-                        (String) (call.argument("nonce")));
+                        (String) (call.argument("nonce")),
+                        (int) (call.argument("decimal")));
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 if (message.status == 200) {
