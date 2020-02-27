@@ -33,7 +33,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   String toAddressValue;
   bool isShowExactGas = false;
   int standardAddressLength = 42; //以太坊标准地址42位
-  int eth2gasUnit = 1000*1000*1000;   // 1 ETH = 1e9gwei (10的九次方) = 1e18gwei
+  int eth2gasUnit = 1000 * 1000 * 1000; // 1 ETH = 1e9 gwei (10的九次方) = 1e18 wei
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
   String arrowIcon = "assets/images/ic_collapse.png";
@@ -48,6 +48,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   double mGasFeeValue;
   String fromAddress = "";
   String contractAddress = "";
+  int decimal = 0;
 
   @override
   void initState() {
@@ -56,26 +57,27 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   void initDataConfig() {
     {
-       fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-       contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+      fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+      contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+      decimal = Provider.of<TransactionProvide>(context).decimal;
     }
-    _txValueController.text = Provider.of<TransactionProvide>(context).txValue ??"";
-    _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress??"";
-    _backupMsgController.text = Provider.of<TransactionProvide>(context).backup??"";
+    _txValueController.text = Provider.of<TransactionProvide>(context).txValue ?? "";
+    _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress ?? "";
+    _backupMsgController.text = Provider.of<TransactionProvide>(context).backup ?? "";
   }
 
   @override
   void didChangeDependencies() {
-    initDataConfig();
     super.didChangeDependencies();
-    if(contractAddress !=null && contractAddress.trim()!=""){
+    initDataConfig();
+    if (contractAddress != null && contractAddress.trim() != "") {
       mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.Erc20GasPriceKey);
       mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.Erc20GasPriceKey);
       mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.Erc20GasLimitKey);
       mMinGasLimit = GlobalConfig.getMinGasLimit(GlobalConfig.Erc20GasLimitKey);
       mGasPriceValue = GlobalConfig.getDefaultGasPrice(GlobalConfig.Erc20GasPriceKey);
       mGasLimitValue = GlobalConfig.getDefaultGasLimit(GlobalConfig.Erc20GasLimitKey);
-    }else{
+    } else {
       mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.EthGasPriceKey);
       mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.EthGasPriceKey);
       mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.EthGasLimitKey);
@@ -682,15 +684,25 @@ class _TransferEthPageState extends State<TransferEthPage> {
             ChainETH chainETH = walletModel.getChainByChainType(ChainType.ETH);
             String walletId = await Wallets.instance.getNowWalletId();
             String nonce = await loadTxAccount(fromAddress);
-            if(nonce==null||nonce.trim()==""){
+            if (nonce == null || nonce.trim() == "") {
               print("取的nonce值有问题");
               return;
             }
             // todo  链类型处理
             // todo  gas费单位统一
-            var result = Wallets.instance.ethTxSign(walletId, chainETH.chainTypeToInt(ChainType.ETH), fromAddress, _toAddressController.text.toString(),
-                contractAddress, _txValueController.text, _backupMsgController.text, Uint8List.fromList(pwd.codeUnits),
-                mGasFeeValue.toString(), mGasLimitValue.toString(), nonce);
+            var result = Wallets.instance.ethTxSign(
+                walletId,
+                chainETH.chainTypeToInt(ChainType.ETH),
+                fromAddress,
+                _toAddressController.text.toString(),
+                contractAddress,
+                _txValueController.text,
+                _backupMsgController.text,
+                Uint8List.fromList(pwd.codeUnits),
+                mGasFeeValue.toString(),
+                mGasLimitValue.toString(),
+                nonce,
+                decimal: decimal);
             // NavigatorUtils.push(
             //   context,
             //   Routes.eeePage,
