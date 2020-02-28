@@ -168,7 +168,12 @@ impl HeaderDownload {
                                 // POW is ok, stored top chaindb
                                 some_new = true;
                                 // save block hash into sqlite table "block_hash"
-                                SQLite::insert_block(&self.sqlite,header.clone().bitcoin_hash().to_hex());
+                                let sqlite = self.sqlite.lock().unwrap();
+                                let header_clone = header.clone();
+                                sqlite.insert_block(
+                                    header_clone.bitcoin_hash().to_hex(),
+                                    header_clone.time.to_string()
+                                );
                                 if let Some(forwards) = forwards {
                                     moved_tip = Some(forwards.last().unwrap().clone());
                                 }
