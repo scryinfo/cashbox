@@ -1,4 +1,5 @@
 import 'package:app/global_config/global_config.dart';
+import 'package:app/model/chain.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 
 import 'net_util.dart';
@@ -32,9 +33,9 @@ Future<String> loadEthBalance(String address) async {
   return null;
 }
 
-Future<String> loadErc20Balance(String ethAddress, String contractAddress) async {
+Future<String> loadErc20Balance(String ethAddress, String contractAddress, {ChainType chainType = ChainType.ETH}) async {
   try {
-    var res = await request(assembleErc20BalanceUrl(ethAddress, contractAddress: contractAddress));
+    var res = await request(assembleErc20BalanceUrl(ethAddress, contractAddress: contractAddress, chainType: chainType));
     print("Erc20_Balance=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       print("Erc20_Balance res.result.=====================>" + res["result"].toString());
