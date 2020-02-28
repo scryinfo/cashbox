@@ -15,8 +15,8 @@ public class NativeLib {
     }
 
     public enum WalletType {
-        TEST_WALLET,
-        WALLET
+        TEST_WALLET,        // 0
+        WALLET              // 1
     }
 
     //通信消息 状态码  （StatusCode 仅用来约定两端状态标识，不用在方法传参上）
@@ -291,7 +291,7 @@ public class NativeLib {
     public static native List<Wallet> loadAllWalletList();
 
     // 保存钱包
-    // apiNo:WM03 fixed
+    // apiNo:WM03 fixed                                     //   TEST_WALLET 0        WALLET 1
     public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic, int walletType);
 
     // 钱包导出。 恢复钱包助记词

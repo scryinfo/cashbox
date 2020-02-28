@@ -168,13 +168,17 @@ class Wallets {
   Future<bool> saveWallet(String walletName, Uint8List pwd, Uint8List mnemonic, WalletType walletType) async {
     int walletTypeToInt = 0;
     switch (walletType) {
-      case WalletType.WALLET:
+      case WalletType.TEST_WALLET:
         walletTypeToInt = 0;
+        break;
+      case WalletType.WALLET:
+        walletTypeToInt = 1;
         break;
       default:
         walletTypeToInt = 1;
         break;
     }
+
     Map saveWalletMap = await WalletManager.saveWallet(walletName, pwd, mnemonic, walletTypeToInt);
     if (saveWalletMap["status"] == null) {
       LogUtil.e("saveWallet=>", "not find status code");

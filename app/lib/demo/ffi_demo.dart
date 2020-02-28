@@ -1,4 +1,4 @@
-import 'dart:ffi' as ffi;
+/*import 'dart:ffi' as ffi;
 import 'dart:io' show Platform;
 
 typedef hello_world_func = ffi.Void Function();
@@ -27,4 +27,4 @@ class FfiDemoClass {
   static AssembleEthTx(String walletId, String value, String fromAddress, String toAddress) {
 
   }
-}
+}*/
