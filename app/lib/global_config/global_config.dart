@@ -2,6 +2,8 @@
 *     1 ETH = 1e9gwei (10的九次方) = 1e18 wei
 * */
 
+import 'package:app/model/chain.dart';
+
 class GlobalConfig {
   static const EthGasLimitKey = "eth";
   static const Erc20GasLimitKey = "eth";
@@ -78,9 +80,14 @@ const Erc20_Balance = "https://api-cn.etherscan.com/api?module=account&action=to
 const Erc20_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=";
 //http://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0xe04f27eb70e025b78871a2ad7eabe85e61212761&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 //https://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-String assembleErc20BalanceUrl(String address, {String contractAddress, String netType = Erc20_Balance}) {
-  print("===================>" + netType + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
-  return netType + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+String assembleErc20BalanceUrl(String address, {String contractAddress, ChainType chainType = ChainType.ETH}) {
+  if (chainType == ChainType.ETH_TEST) {
+    print("===================>" + Erc20_TestNet_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
+    return Erc20_TestNet_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+  } else {
+    print("===================>" + Erc20_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
+    return Erc20_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+  }
 }
 
 const Eth_Tx_List = "https://api-cn.etherscan.com/api?module=account&action=txlist&address=";

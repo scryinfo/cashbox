@@ -28,7 +28,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
   String digitName = "ETH";
-  String fromAddress = "0xa4512ca7618d8d12a30C28979153aB09809ED7fD";
+  String fromAddress = "";
   String contractAddress = "";
   int displayTxOffset = 0;
   int refreshAddCount = 20;

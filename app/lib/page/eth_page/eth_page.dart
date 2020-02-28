@@ -84,10 +84,14 @@ class _EthPageState extends State<EthPage> {
             this.displayDigitsList[i].address.toString());
         String balance;
         if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
-          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress);
+          if (nowChain.chainType == ChainType.ETH) {
+            balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, chainType: ChainType.ETH);
+          } else {
+            balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, chainType: ChainType.ETH_TEST);
+          }
           print("erc20 balance==>" + balance.toString());
         } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
-          balance = await loadEthBalance("0xa4512ca7618d8d12a30C28979153aB09809ED7fD");
+          balance = await loadEthBalance(nowChainAddress);
           print("eth balance==>" + balance.toString());
         } else {}
         this.displayDigitsList[i].balance = balance ?? "0.00";
