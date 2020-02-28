@@ -36,17 +36,17 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   @override
   void initState() {
     super.initState();
-    {
-      fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-      contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
-      digitName = Provider.of<TransactionProvide>(context).digitName;
-    }
-    getBalanceData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    {
+      //fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+      contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+      digitName = Provider.of<TransactionProvide>(context).digitName;
+      balanceInfo = Provider.of<TransactionProvide>(context).balance;
+    }
     txListFuture = getTxListData();
   }
 
@@ -397,27 +397,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     );
   }
 
-  getBalanceData() async {
-    try {
-      if (contractAddress.trim() == "") {
-        balanceInfo = await loadEthBalance(fromAddress);
-      } else {
-        balanceInfo = await loadErc20Balance(fromAddress, contractAddress);
-      }
-      print("balanceInfo===>" + balanceInfo.toString());
-    } catch (onError) {
-      print("onError===>" + "$onError");
-      this.balanceInfo = "0";
-    }
-    setState(() {
-      this.balanceInfo = balanceInfo;
-    });
-  }
-
   Future<List<EthTransactionModel>> getTxListData() async {
     displayTxOffset = displayTxOffset + refreshAddCount; //每次增加refreshAddCount个
     try {
-      if (contractAddress.trim() == "" && (fromAddress.trim() != "")) {
+      if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress.trim() != "")) {
         ethTxListModel = await loadEthTxHistory(fromAddress, offset: displayTxOffset.toString());
       } else if (fromAddress.trim() != "") {
         ethTxListModel = await loadErc20TxHistory(fromAddress, contractAddress, offset: displayTxOffset.toString());
