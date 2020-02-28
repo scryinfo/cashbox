@@ -71,9 +71,14 @@ const Eth_MainNet_Balance = "https://api-cn.etherscan.com/api?module=account&act
 const Eth_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account&action=balance&address=";
 //http://api-cn.etherscan.com/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 //https://api-ropsten.etherscan.io/api?module=account&action=balance&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-String assembleEthBalanceUrl(String address, {String netType = Eth_MainNet_Balance}) {
-  print("===================>" + netType + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
-  return netType + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+String assembleEthBalanceUrl(String address, {ChainType chainType = ChainType.ETH}) {
+  if (chainType == ChainType.ETH_TEST) {
+    print("===================>" + Eth_MainNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
+    return Eth_MainNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+  } else {
+    print("===================>" + Eth_TestNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
+    return Eth_TestNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+  }
 }
 
 const Erc20_Balance = "https://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=";
@@ -96,44 +101,60 @@ const Eth_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account
 //https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 String assembleEthTxListUrl(String address,
     {String contractAddress,
-    String netType = Eth_Tx_List,
+    ChainType chainType = ChainType.ETH,
     String startBlock = "0",
     String endBlock = "99999999",
     String page = "1",
     String offset = "20"}) {
-  print("url==>" +
-      netType +
-      address +
-      "&startblock=" +
-      startBlock +
-      "&endblock=" +
-      endBlock +
-      "&page=" +
-      page +
-      "&offset=" +
-      offset +
-      "&sort=desc&apikey=" +
-      ETHERSCAN_API_KEY);
-  return netType +
-      address +
-      "&startblock=" +
-      startBlock +
-      "&endblock=" +
-      endBlock +
-      "&page=" +
-      page +
-      "&offset=" +
-      offset +
-      "&sort=desc&apikey=" +
-      ETHERSCAN_API_KEY;
+  if (chainType == ChainType.ETH_TEST) {
+    return Eth_TestNet_Tx_List +
+        address +
+        "&startblock=" +
+        startBlock +
+        "&endblock=" +
+        endBlock +
+        "&page=" +
+        page +
+        "&offset=" +
+        offset +
+        "&sort=desc&apikey=" +
+        ETHERSCAN_API_KEY;
+  } else {
+    return Eth_Tx_List +
+        address +
+        "&startblock=" +
+        startBlock +
+        "&endblock=" +
+        endBlock +
+        "&page=" +
+        page +
+        "&offset=" +
+        offset +
+        "&sort=desc&apikey=" +
+        ETHERSCAN_API_KEY;
+  }
 }
 
 const Erc20_Tx_List = "http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=";
 const Erc20_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=";
 //http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 //https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-String assembleErc20TxListUrl(String address, {String contractAddress, String netType = Erc20_Tx_List, String page = "1", String offset = "20"}) {
-  return netType + contractAddress + "&address=" + address + "&page=" + page + "&offset=" + offset + "&sort=desc&apikey=" + ETHERSCAN_API_KEY;
+String assembleErc20TxListUrl(String address,
+    {ChainType chainType = ChainType.ETH, String contractAddress, String page = "1", String offset = "20"}) {
+  if (chainType == ChainType.ETH_TEST) {
+    return Erc20_TestNet_Tx_List +
+        contractAddress +
+        "&address=" +
+        address +
+        "&page=" +
+        page +
+        "&offset=" +
+        offset +
+        "&sort=desc&apikey=" +
+        ETHERSCAN_API_KEY;
+  } else {
+    return Erc20_Tx_List + contractAddress + "&address=" + address + "&page=" + page + "&offset=" + offset + "&sort=desc&apikey=" + ETHERSCAN_API_KEY;
+  }
 }
 
 const Eth_Tx_Account = "http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";

@@ -72,7 +72,7 @@ class _EntryPageState extends State<EntryPage> {
                 return _buildProtocolLayout();
               }
             }
-            return TransactionHistoryPage();
+            return _buildProtocolLayout();
             /*return Container(
               width: ScreenUtil().setWidth(90),
               height: ScreenUtil().setHeight(160),
