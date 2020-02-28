@@ -20,14 +20,13 @@ class CreateTestWalletPage extends StatefulWidget {
 }
 
 class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
-  String mnemonicString = "";
   bool _eeeChainChoose = true;
   final TextEditingController _pwdController = TextEditingController();
+  final TextEditingController _mnemonicController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    changeMnemonic();
   }
 
   @override
@@ -123,11 +122,15 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
         child: Stack(
           children: <Widget>[
             Align(
-              child: Text(
-                mnemonicString,
+              child: TextField(
+                controller: _mnemonicController,
+                textAlign: TextAlign.start,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                ),
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: ScreenUtil().setSp(3),
+                  fontSize: ScreenUtil().setSp(3.5),
                   wordSpacing: 5,
                 ),
                 maxLines: 3,
@@ -140,7 +143,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                   Future<String> qrResult = QrScanUtil.instance.qrscan();
                   qrResult.then((t) {
                     setState(() {
-                      this.mnemonicString = t.toString();
+                      _mnemonicController.text = t.toString();
                     });
                   }).catchError((e) {
                     Fluttertoast.showToast(msg: S.of(context).qr_scan_unknown_error);
@@ -336,13 +339,13 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       return;
     }
     setState(() {
-      mnemonicString = String.fromCharCodes(mnemonic);
+      _mnemonicController.text = String.fromCharCodes(mnemonic);
     });
   }
 
   bool _verifyPwdAndMnemonic() {
     //助记词密码不为空
-    if (_pwdController.text.isEmpty || _pwdController.text.length <= 0 || mnemonicString.isEmpty || mnemonicString.length <= 0) {
+    if (_pwdController.text.isEmpty || _pwdController.text.length <= 0 || _mnemonicController.text.isEmpty || _mnemonicController.text.length <= 0) {
       return false;
     } else {
       return true;
@@ -356,7 +359,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       return;
     }
     var isSuccess = await Wallets.instance.saveWallet(S.of(context).test_wallet_title, Uint8List.fromList(_pwdController.text.codeUnits),
-        Uint8List.fromList(mnemonicString.codeUnits), WalletType.TEST_WALLET);
+        Uint8List.fromList(_mnemonicController.text.codeUnits), WalletType.TEST_WALLET);
     if (isSuccess) {
       Fluttertoast.showToast(msg: S.of(context).success_create_test_wallet);
       NavigatorUtils.push(context, Routes.entryPage, clearStack: true);
