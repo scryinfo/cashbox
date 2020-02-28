@@ -59,7 +59,7 @@ class _EthPageState extends State<EthPage> {
         setState(() {
           this.nowWallet = wallet;
           this.walletName = nowWallet.walletName;
-          this.nowChain = nowWallet.getChainByChainType(ChainType.ETH);
+          this.nowChain = this.nowWallet.getChainByChainId(this.nowWallet.nowChainId);
           this.nowChainAddress = nowChain.chainAddress;
           this.nowChainDigitsList = nowChain.digitsList;
         });
