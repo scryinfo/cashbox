@@ -80,38 +80,17 @@ impl BloomFilter {
     }
 
 
-    /// get headers this peer is ahead of us
-    /// 发送消息的地方，这里需要自己组装自己关心的filterload
-    /// 改过，不行的话害的还得回去对照
-    /// 第一句或许需要改
-    /// 经过试验，不可以直接跟在后面发，需要像目前这样，搞一个单独的发送机制。
+    /// 每个节点军需要发送filter load message
     fn send_filter(&mut self, peer: PeerId, filter: &FilterLoadMessage) -> Result<(), Error> {
-//        if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::Headers) {
-//            return Ok(());
-//        }
 
-        info!("发送filterload消息");
+        info!("send filter loaded message");
         self.p2p.send_network(peer, NetworkMessage::FilterLoad(filter.to_owned()));
         Ok(())
     }
 
-    ///模仿的headerdownload里的逻辑
-    ///数据应该是从run中的 Incoming中获取的,（这个Incoming是Reciver获取的结果）
-    ///原来的header获取的是下载头 这边其实需要的是MerkerBlock或者是TX (这两后续可能还是需要在rust-bitcoin中添加)
-    /// 逻辑需要修改
-    fn headers(&mut self, headers: &Vec<BlockHeader>, peer: PeerId) -> Result<(), Error> {
-        self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
-        Ok(())
-    }
 }
 
 fn calculate_filter() -> FilterLoadMessage {
-//        let filterload = FilterLoadMessage {
-//            filter: vec![0xb5, 0x0f],
-//            n_hash_functions: 11,
-//            n_tweak: 0,
-//            n_flags: false,
-//        }
     // 公钥 66位
     FilterLoadMessage::calculate_filter("0291EE52A0E0C22DB9772F237F4271EA6F9330D92B242FB3C621928774C560B699")
 }

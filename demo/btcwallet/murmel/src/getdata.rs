@@ -88,11 +88,13 @@ impl GetData {
 
     // 获取数据
     // 先发送FilterLoad 然后发送get_data 才可以收获过滤后的数据
+    // 批量发送 block_hash
     fn get_data(&mut self, peer: PeerId) -> Result<(), Error> {
         info!("发送getdata 消息");
+        self.hash160("");
         // todo 现在插入测试块
         // let inventory = Inventory::new(InvType::FilteredBlock, "000000000001b31b8a35d9b7d2e3ad7909055683b82d4a7d4029386f7149ede8");
-        let inventory = Inventory::new(InvType::FilteredBlock, "0000000000010c356814c19e842166c501cbb7d691b0c816a24a5a666ff4499a");
+        let inventory = Inventory::new(InvType::FilteredBlock, "00000000000001a50f9fc434fa799b138cedc97389b074bdc598f9b097486135");
         self.p2p.send_network(peer, NetworkMessage::GetData(vec![inventory]));
         Ok(())
     }
@@ -122,10 +124,10 @@ impl GetData {
 
     ///计算hash160
     fn hash160(&self, public_key: &str) {
-        // 从公钥出发
+        // 公钥 66位
         let public_key = "0291EE52A0E0C22DB9772F237F4271EA6F9330D92B242FB3C621928774C560B699";
         let decode: Vec<u8> = FromHex::from_hex(public_key).expect("Invalid public key");
         let hash = hash160::Hash::hash(&decode[..]);
-        println!("hash------------ {:?}", hash.to_hex());
+        warn!("hash 160{:?}", hash.to_hex());
     }
 }

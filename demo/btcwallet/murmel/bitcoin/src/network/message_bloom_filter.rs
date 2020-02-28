@@ -8,6 +8,11 @@ use bitvec::prelude::*;
 
 
 ///the message filterload
+/// n_flags
+///     0: BLOOM_UPDATE_NONE
+///     1: BLOOM_UPDATE_ALL
+///     2: BLOOM_UPDATE_P2PUBKEY_ONLY
+///
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct FilterLoadMessage {
     ///The filter itself is simply a bit field of arbitrary byte-aligned size. The maximum size is 36,000 bytes.
@@ -66,6 +71,7 @@ impl FilterLoadMessage {
     ///     n: n elements input into filter
     ///     elements: address, tx, block
     /// beacause we use SPV wallets we always have one input n == 1
+    /// default n_flags 1
     pub fn calculate_filter(elements: &str) -> Self {
         let n = 1f64;
         let n_filter_bytes = (-1f64 / (LN_2 * LN_2) * n * P.log(E)) / 8f64;
@@ -80,14 +86,12 @@ impl FilterLoadMessage {
         let mut data_to_hash = hex_decode(elements).expect("parse hex error");
         //大小端序的问题，翻转一下
         data_to_hash.reverse();
-        println!("{:02x?}", &data_to_hash);
 
         println!("n_filter_bytes {:?}", &n_filter_bytes);
         for i in 0..n_hash_functions {
             let n_index = FilterLoadMessage::bloom_hash(i, &data_to_hash, n_filter_bytes);
             // Set the bit at nIndex to 1
             v_data.set(n_index as usize, true);
-            println!("result_bytes {:02x?}", &v_data.clone().into_vec());
         }
 
         Self {

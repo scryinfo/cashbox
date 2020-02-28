@@ -33,6 +33,7 @@ use std::{
     time::SystemTime,
 };
 use murmel::db::SQLite;
+use std::sync::{Arc, Mutex};
 
 pub fn main() {
     if find_opt("help") {
@@ -99,8 +100,9 @@ pub fn main() {
             Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap()
         };
 
-    let sqlite = SQLite::open_db();
-    let mut spv = Constructor::new(network, listen, chaindb, sqlite).unwrap();
+    let sqlite = SQLite::open_db(network);
+    let shared_sqlite = Arc::new(Mutex::new(sqlite));
+    let mut spv = Constructor::new(network, listen, chaindb, shared_sqlite).unwrap();
     spv.run(network, peers, connections).expect("can not start node");
 }
 

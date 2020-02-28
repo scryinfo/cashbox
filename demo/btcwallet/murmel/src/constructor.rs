@@ -84,7 +84,7 @@ impl Constructor {
     }
 
     /// Construct the stack
-    pub fn new(network: Network, listen: Vec<SocketAddr>, chaindb: SharedChainDB, sqlite: SharedSQLite) -> Result<Constructor, Error> {
+    pub fn new(network: Network, listen: Vec<SocketAddr>, chaindb: SharedChainDB, shared_sqlite: SharedSQLite) -> Result<Constructor, Error> {
         const BACK_PRESSURE: usize = 10;
 
         let (to_dispatcher, from_p2p) = mpsc::sync_channel(BACK_PRESSURE);
@@ -108,7 +108,7 @@ impl Constructor {
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
 
-        dispatcher.add_listener(HeaderDownload::new(sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone(), lightning.clone()));
+        dispatcher.add_listener(HeaderDownload::new(shared_sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone(), lightning.clone()));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
 
@@ -120,7 +120,7 @@ impl Constructor {
         dispatcher.add_listener(BloomFilter::new(p2p_control.clone(), timeout.clone()));
 
         info!("我自己发起了GetData");
-        dispatcher.add_listener(GetData::new(sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone()));
+        dispatcher.add_listener(GetData::new(shared_sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone()));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));
