@@ -20,7 +20,8 @@ class CreateTestWalletPage extends StatefulWidget {
 }
 
 class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
-  bool _eeeChainChoose = true;
+  bool _isChooseEeeChain = true;
+  bool _isChooseEthChain = true;
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _mnemonicController = TextEditingController();
 
@@ -276,21 +277,47 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
               Container(
                 child: Row(
                   children: <Widget>[
-                    Container(
+                    /*Container(
+                        child: Opacity(
+                      opacity: 0,
                       child: Row(
                         children: <Widget>[
                           Checkbox(
-                            value: _eeeChainChoose,
+                            value: _isChooseEeeChain,
                             onChanged: (newValue) {
                               setState(
                                 () {
-                                  _eeeChainChoose = newValue;
+                                  _isChooseEeeChain = newValue;
                                 },
                               );
                             },
                           ),
                           Text(
                             S.of(context).eee_chain_test,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: ScreenUtil.instance.setSp(3),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+                    Gaps.scaleHGap(5),                    */
+                    Container(
+                      child: Row(
+                        children: <Widget>[
+                          Checkbox(
+                            value: _isChooseEthChain,
+                            onChanged: (newValue) {
+                              setState(
+                                () {
+                                  _isChooseEthChain = newValue;
+                                },
+                              );
+                            },
+                          ),
+                          Text(
+                            S.of(context).eth_test_chain_name, //eth_test_chain_name
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: ScreenUtil.instance.setSp(3),
