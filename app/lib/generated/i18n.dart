@@ -46,6 +46,8 @@ class S implements WidgetsLocalizations {
   String get eee_chain_test => "EEE_TEST";
   String get ensure_pwd => "确认密码";
   String get ensure_to_change => "确定更改";
+  String get eth_chain_name => "ETH";
+  String get eth_test_chain_name => "EEE_TEST";
   String get extend_msg => "备注信息";
   String get fail_to_load_data_hint => "数据加载失败,请检查网络状况，可尝试下拉刷新";
   String get failure_create_test_wallet => "测试钱包创建失败，请检查你输入的数据是否正确";
@@ -234,7 +236,7 @@ class $zh extends S {
   @override
   String get pls_input_mnemonic => "请输入助记词";
   @override
-  String get wallet_name => "钱包名";
+  String get wallet_name => "钱包名称";
   @override
   String get pwd_not_null => "密码不能为空";
   @override
@@ -334,6 +336,8 @@ class $zh extends S {
   @override
   String get verify_mnemonic_info => "助记词确认验证";
   @override
+  String get eth_chain_name => "ETH";
+  @override
   String get transfer => "转账";
   @override
   String get rewrite_new_pwd_format_hint => "再次输入新密码";
@@ -343,6 +347,8 @@ class $zh extends S {
   String get ensure_pwd => "确认密码";
   @override
   String get pls_input_wallet_name => "请输入钱包名";
+  @override
+  String get eth_test_chain_name => "EEE_TEST";
   @override
   String get create_test_wallet => "创建测试钱包";
   @override
