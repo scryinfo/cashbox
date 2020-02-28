@@ -425,21 +425,17 @@ struct RawTx {
 
 pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> Result<String, String> {
     let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
-
     let tx_encode_data = hex::decode(raw_tx).unwrap();
     // TODO 这个地方需要使用大小端编码？
     let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
-
     let mnemonic = module::wallet::export_mnemonic(wallet_id, psw);
     match mnemonic {
         Ok(mnemonic) => {
             let mn = String::from_utf8(mnemonic.mn).unwrap();
-            let func_data = tx.func_data;
-            //let mut_data = &mut &tx_encode_data[0..tx_encode_data.len()-40];
-            let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &func_data[..]).unwrap();
+            let mut_data = &mut &tx_encode_data[0..tx_encode_data.len()-40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
+            let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..]).expect("UncheckedExtrinsic");
             let sign_data = wallet_rpc::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function);
             // TODO 返回签名后的消息格式需要确定
-            // Ok(hex::encode(&sign_data[..]))
             Ok(sign_data)
         }
         Err(info) => Err(info)
