@@ -68,7 +68,7 @@ const httpHeaders = {
 const Eth_MainNet_Balance = "https://api-cn.etherscan.com/api?module=account&action=balance&address=";
 const Eth_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account&action=balance&address=";
 //http://api-cn.etherscan.com/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-//https://api-ropsten.etherscan.io/api?module=account&action=balance&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+//https://api-ropsten.etherscan.io/api?module=account&action=balance&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 String assembleEthBalanceUrl(String address, {String netType = Eth_MainNet_Balance}) {
   print("===================>" + netType + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
   return netType + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
@@ -77,7 +77,7 @@ String assembleEthBalanceUrl(String address, {String netType = Eth_MainNet_Balan
 const Erc20_Balance = "https://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=";
 const Erc20_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=";
 //http://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0xe04f27eb70e025b78871a2ad7eabe85e61212761&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-//http://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e&address=0xe04f27eb70e025b78871a2ad7eabe85e61212761&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+//https://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 String assembleErc20BalanceUrl(String address, {String contractAddress, String netType = Erc20_Balance}) {
   print("===================>" + netType + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
   return netType + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
@@ -86,7 +86,7 @@ String assembleErc20BalanceUrl(String address, {String contractAddress, String n
 const Eth_Tx_List = "https://api-cn.etherscan.com/api?module=account&action=txlist&address=";
 const Eth_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=";
 //http://api-cn.etherscan.com/api?module=account&action=txlist&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-//http://api-cn.etherscan.com/api?module=account&action=txlist&address=0xa4512ca7618d8d12a30C28979153aB09809ED7fD&startblock=0&endblock=999999&page=1&offset=20&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+//https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 String assembleEthTxListUrl(String address,
     {String contractAddress,
     String netType = Eth_Tx_List,
@@ -123,7 +123,8 @@ String assembleEthTxListUrl(String address,
 
 const Erc20_Tx_List = "http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=";
 const Erc20_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=";
-//http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0xa4512ca7618d8d12a30C28979153aB09809ED7fD&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+//http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+//https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 String assembleErc20TxListUrl(String address, {String contractAddress, String netType = Erc20_Tx_List, String page = "1", String offset = "20"}) {
   return netType + contractAddress + "&address=" + address + "&page=" + page + "&offset=" + offset + "&sort=desc&apikey=" + ETHERSCAN_API_KEY;
 }
@@ -131,6 +132,7 @@ String assembleErc20TxListUrl(String address, {String contractAddress, String ne
 const Eth_Tx_Account = "http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
 const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=";
 //http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=0x2910543af39aba0cd09dbb2d50200b3e800a63d2&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+//https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 String assembleTxAccount(String address, {String netType = Eth_Tx_Account}) {
   return netType + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
 }
