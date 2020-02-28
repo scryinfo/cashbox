@@ -19,9 +19,9 @@ Future<String> loadTxAccount(String address) async {
   return null;
 }
 
-Future<String> loadEthBalance(String address) async {
+Future<String> loadEthBalance(String address, ChainType chainType) async {
   try {
-    var res = await request(assembleEthBalanceUrl(address));
+    var res = await request(assembleEthBalanceUrl(address, chainType: chainType));
     print("loadEthBalance res=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       print("Eth_Balance res.result.=====================>" + (int.parse(res["result"]) / Eth_Unit).toString());
@@ -33,7 +33,7 @@ Future<String> loadEthBalance(String address) async {
   return null;
 }
 
-Future<String> loadErc20Balance(String ethAddress, String contractAddress, {ChainType chainType = ChainType.ETH}) async {
+Future<String> loadErc20Balance(String ethAddress, String contractAddress, ChainType chainType) async {
   try {
     var res = await request(assembleErc20BalanceUrl(ethAddress, contractAddress: contractAddress, chainType: chainType));
     print("Erc20_Balance=====================>" + res.toString());

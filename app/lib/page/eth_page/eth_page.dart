@@ -84,14 +84,10 @@ class _EthPageState extends State<EthPage> {
             this.displayDigitsList[i].address.toString());
         String balance;
         if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
-          if (nowChain.chainType == ChainType.ETH) {
-            balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, chainType: ChainType.ETH);
-          } else {
-            balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, chainType: ChainType.ETH_TEST);
-          }
+          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, nowChain.chainType);
           print("erc20 balance==>" + balance.toString());
         } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
-          balance = await loadEthBalance(nowChainAddress);
+          balance = await loadEthBalance(nowChainAddress, nowChain.chainType);
           print("eth balance==>" + balance.toString());
         } else {}
         this.displayDigitsList[i].balance = balance ?? "0.00";
@@ -208,7 +204,7 @@ class _EthPageState extends State<EthPage> {
             return Container(
               alignment: Alignment.topCenter,
               child: Text(
-                "",
+                "代币信息为空",
                 style: TextStyle(color: Colors.white70),
               ),
             );
