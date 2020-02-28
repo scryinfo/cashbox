@@ -57,20 +57,6 @@ pub fn eth_raw_transfer_sign(from_address:&str, to_address:Option<H160>, amount:
                 Ok(mnemonic) => {
                     //密码验证通过开始拼接交易签名数据
                     //todo 输入的数量都是整数？
-
-                   /* let nonce = U256::from_dec_str(nonce).unwrap();
-                    let amount = U256::from_dec_str(amount).unwrap();
-                    let gas_limit = U256::from_dec_str(gas_limit).unwrap();*/
-                   // let gas_price = U256::from_dec_str(gas_price).unwrap();
-                  /*  let to = {
-                        if to_address.is_empty() {
-                            None
-                        }else{
-                            let to = H160::from_slice(hex::decode(to_address.get(2..).unwrap()).unwrap().as_slice());
-                            Some(to)
-                        }
-                    };*/
-
                     let data =  match data {
                             Some(data)=>data.as_bytes().to_vec(),
                             None=>vec![]
@@ -97,13 +83,7 @@ pub fn eth_raw_transfer_sign(from_address:&str, to_address:Option<H160>, amount:
         Err(msg)=>{Err(msg)}
     }
 }
-/*fn eth_chain_type(chain_type:u64)->Option<u64>{
-    if chain_type==3 {
-        Some(1)
-    }else {
-        Some(3)
-    }
-}*/
+
 ///ETH ERC20 转账交易签名  当前钱包针对ERC20只提供转账功能
 /// from_account: 转出账户
 /// contract_address: 合约地址（代币合约地址）
@@ -125,8 +105,12 @@ pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:H160, to_
                     //todo 增加错误处理
 
                     //调用合约 是否允许transfer 目标地址为空?
-                    let encode_data = ethtx::get_erc20_transfer_data(to_account.unwrap(),amount).unwrap();
-
+                    let mut encode_data = ethtx::get_erc20_transfer_data(to_account.unwrap(),amount).unwrap();
+                    //添加合约交易备注信息
+                    if data.is_some() {
+                        let mut addition = data.unwrap().as_bytes().to_vec();
+                        encode_data.append(&mut addition);
+                    }
                     let rawtx =  ethtx::RawTransaction{
                         nonce: nonce,
                         to: Some(contract_address),//针对调用合约,to不能为空
