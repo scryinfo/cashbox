@@ -7,6 +7,7 @@ use ethereum_types::{U256, H160};
 use rlp::RlpStream;
 use secp256k1::{key::SecretKey, Message, Secp256k1};
 use bip39::{Mnemonic, MnemonicType, Language,Seed};
+use tiny_hderive::bip32::ExtendedPrivKey;
 use std::ops::Mul;
 
 mod contract;
@@ -14,7 +15,7 @@ mod types;
 mod error;
 
 // 从助记词恢复私钥
-pub fn pri_from_mnemonic(phrase:&str,psd:Option<Vec<u8>>)->Option<Vec<u8>>{
+pub fn pri_from_mnemonic(phrase:&str,psd:Option<Vec<u8>>)->Vec<u8>{
     let mnemonic = Mnemonic::from_phrase(phrase, Language::English).unwrap();
     let psd = {
         match psd {
@@ -22,8 +23,12 @@ pub fn pri_from_mnemonic(phrase:&str,psd:Option<Vec<u8>>)->Option<Vec<u8>>{
             None=>String::from(""),
         }
     };
-    let seed = Seed::new(&mnemonic,&psd);
-    seed.as_bytes().get(0..32).map(|data|data.to_vec())
+    let seed = Seed::new(&mnemonic,&psd);//
+    let ext_key = ExtendedPrivKey::derive(&seed.as_bytes(), "m/44'/60'/0'/0/0").unwrap();
+    ext_key.secret().to_vec()
+   // let ext =
+   // ext.secret().to_vec()
+    //seed.as_bytes().get(0..32).map(|data|data.to_vec())
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -274,7 +279,8 @@ fn eth_rawtx_sign_test(){
     let pri = "4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
     let signed_data = rawtx.sign(&hex::decode(pri).unwrap(),chain_id);
     //let signed_str = String::from_utf8(signed_data);
-    println!("signed data:{:?}",hex::encode(signed_data));
+    println!("signed byte len is:{},data detail:{:?}",signed_data.len(),signed_data);
+    println!("signed hex data:{:?}",hex::encode(signed_data));
 }
 
 #[test]
