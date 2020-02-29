@@ -49,12 +49,10 @@ pub fn transfer(client: &mut Rpc, mnemonic: &str, to: &str, amount: &str) -> Res
     let signer_account_id = AccountId::from(signer.public().0);
     let index = account_nonce(client, signer_account_id);
     let amount = str::parse::<Balance>(amount).unwrap();
-    println!("index:{}",index);
-   let index =index;
-  let to_account_id=  AccountId::from_ss58check(to).expect("Invalid 'to' ss58check");
+    let index =index;
+    let to_account_id=  AccountId::from_ss58check(to).expect("Invalid 'to' ss58check");
     let function = Call::Balances(BalancesCall::transfer(pallet_indices::address::Address::Id(to_account_id), amount));
     let result = tx_sign(mnemonic, genesis_hash, index as u32, function);
-    // println!("{}", result);
     Ok(result)
 }
 
@@ -77,7 +75,6 @@ pub fn tx_sign(mnemonic: &str, genesis_hash: H256, index: u32, function: Call) -
         extra(index, 0),
         (VERSION.spec_version as u32, &genesis_hash, &genesis_hash),
     );*/
-    println!(" VERSION.spec_version:{}", VERSION.spec_version);
     let raw_payload = SignedPayload::from_raw(
         function,
         extra(index, 0),
