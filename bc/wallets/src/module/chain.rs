@@ -13,7 +13,6 @@ pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<Stri
             match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过
-
                     let (send_tx, recv_tx) = mpsc::channel();
                     let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
                     let mn = String::from_utf8(mnemonic).unwrap();
@@ -71,7 +70,7 @@ pub fn eth_raw_transfer_sign(from_address:&str, to_address:Option<H160>, amount:
                         data,
                     };
                     //todo 增加对错误的处理
-                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None).unwrap();
+                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None);
 
                     //todo 增加链id ,从助记词生成私钥 secp256k1
                    let tx_signed =  rawtx.sign(&pri_key,Some(eth_chain_id));
@@ -120,7 +119,7 @@ pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:H160, to_
                         data:encode_data,
                     };
                     //todo 增加对错误的处理
-                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None).unwrap();
+                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None);
                     //todo 增加链id ,从助记词生成私钥 secp256k1
                     let tx_signed =  rawtx.sign(&pri_key,Some(eth_chain_id));
                     Ok(format!("0x{}",hex::encode(tx_signed)))

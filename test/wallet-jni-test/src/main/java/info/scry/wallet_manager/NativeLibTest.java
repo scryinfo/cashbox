@@ -26,19 +26,16 @@ public class NativeLibTest {
        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         for (NativeLib.Wallet wallet:wallets) {
             System.out.println("wallet detail "+wallet.toString());
-           /* NativeLib.Mnemonic mnemonic1 =  NativeLib.exportWallet(wallet.walletId,"123456".getBytes());
-            System.out.println("wallet id:"+wallet.walletId+"mnemonic:"+new String(mnemonic1.mn)+",eth address:"+wallet.ethChain.address+"");*/
+            NativeLib.Mnemonic mnemonic1 =  NativeLib.exportWallet(wallet.walletId,"123456".getBytes());
+            System.out.println("wallet id:"+wallet.walletId+"mnemonic:"+new String(mnemonic1.mn)+",eth address:"+wallet.ethChain.address+"");
+            System.out.println("\n");
         }
-
         eeeTxsign();
-
-
 
     }
 
     public static void eeeTxsign(){
-        String rawtx = "0x98040600ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27de5c00000000061df517b7b9a19b42e9b43c3860eb73fab8b99ff40f4db3ab670c70b7c423fa604000000";
-        //String rawtx = "0xfd04041102ff94bb1a9de291528db4832c8268b6b5203fc4ed3d57ff63da2348aa2033fd4d85000220bcbe5104d208e5840a313239393036353131320000000000887b22676961223a2231323939303635313132222c226361726174223a22312e3536222c22636f6c6f72223a2248222c22636c6172697479223a22565332222c22637574223a22457863656c6c656e74222c2268617368223a2238636636323565302d303137362d343632392d613963642d323931613339363362306231222c226d7367223a22227d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000061df517b7b9a19b42e9b43c3860eb73fab8b99ff40f4db3ab670c70b7c423fa6c6000000";
+        String rawtx = "0x410284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d017226452e1ab7a1e8047943569deadba0d8213c2c79207c56738eb8bdb5f0883a23f158bd2ad82a02b3905e3ab8ec3138e1e8f17b2a384b2e1f20fbbfd74a16010004000600ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0b0040e59c30120100000058c346ad6597993d5fd0ba9d3dba24f630ecdef2094b303ad84eef93c49401e804000000";
         NativeLib.Message msg = NativeLib.eeeTxSign(rawtx,"77888f3c-2574-4a24-8a75-d168f6376f40","123456".getBytes());
         System.out.println(msg.toString());
     }
