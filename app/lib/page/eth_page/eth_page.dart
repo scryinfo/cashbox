@@ -59,7 +59,13 @@ class _EthPageState extends State<EthPage> {
         setState(() {
           this.nowWallet = wallet;
           this.walletName = nowWallet.walletName;
-          this.nowChain = this.nowWallet.getChainByChainId(this.nowWallet.nowChainId);
+          print("nowWallet.walletType======>" + nowWallet.walletType.toString());
+          if (nowWallet.walletType == WalletType.WALLET) {
+            this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
+          } else {
+            this.nowChain = this.nowWallet.getChainByChainType(ChainType.EEE_TEST);
+          }
+          print("this.nowChain======>" + this.nowChain.toString());
           this.nowChainAddress = nowChain.chainAddress;
           this.nowChainDigitsList = nowChain.digitsList;
         });
@@ -202,7 +208,7 @@ class _EthPageState extends State<EthPage> {
             );
           } else {
             return Container(
-              alignment: Alignment.topCenter,
+              alignment: Alignment.center,
               child: Text(
                 "代币信息为空",
                 style: TextStyle(color: Colors.white70),

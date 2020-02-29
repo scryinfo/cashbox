@@ -4,7 +4,7 @@ import 'package:wallet_manager/wallet_manager.dart';
 
 import 'digit.dart';
 
-enum ChainType { UNKNOWN, BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST }
+enum ChainType { UNKNOWN, BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST } /*标记：定义需要与JNI处保持一致*/
 
 abstract class Chain {
   String chainId; //链Id

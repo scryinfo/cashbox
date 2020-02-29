@@ -86,6 +86,12 @@ class Wallets {
         LogUtil.e("loadAllWalletList=>", "error status code is" + walletStatus.toString() + "||message is=>" + jniList[walletIndex]["message"]);
         continue; //这个钱包数据有问题，跳过取下个wallet
       }
+      int walletType = jniList[walletIndex]["walletType"];
+      if (walletType == 0) {
+        walletM.walletType = WalletType.TEST_WALLET;
+      } else {
+        walletM.walletType = WalletType.WALLET;
+      }
       walletM
         ..walletName = jniList[walletIndex]["walletName"].toString()
         ..walletId = jniList[walletIndex]["walletId"].toString()

@@ -108,6 +108,13 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Map<String, Object> walletMap = new HashMap<String, Object>();
                     Log.d("nativeLib=>",
                             "walletList.get(walletIndex) =>" + walletList.get(walletIndex).toString());
+                    Log.d("nativeLib=>",
+                            "walletList.get(walletIndex).walletType is ===>" + walletList.get(walletIndex).walletType);
+                    if (walletList.get(walletIndex).walletType == WalletType.TEST_WALLET) {
+                        walletMap.put("walletType", 0);
+                    } else {
+                        walletMap.put("walletType", 1);
+                    }
                     walletMap.put("status", walletList.get(walletIndex).status);
                     walletMap.put("walletId", walletList.get(walletIndex).walletId);
                     walletMap.put("walletName", walletList.get(walletIndex).walletName);
@@ -157,7 +164,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Map<String, Object> resultEthChain = new HashMap<>();
                     resultEthChain.put("chainAddress",
                             walletList.get(walletIndex).ethChain.address);
-                    Log.d("nativeLib=>", "Eth链 chainAddresss ===>" + walletList.get(walletIndex).ethChain.address.toString());
+                    Log.d("nativeLib=>",
+                            "Eth链 chainAddresss ===>" + walletList.get(walletIndex).ethChain.address.toString());
                     resultEthChain.put("chainId", walletList.get(walletIndex).ethChain.chainId);
                     resultEthChain.put("chainType", walletList.get(walletIndex).ethChain.chainType);
                     resultEthChain.put("isVisible", walletList.get(walletIndex).ethChain.isVisible);
@@ -185,7 +193,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                             digitMap.put("imgUrl", ethDigitList.get(digitIndex).imgUrl);
                             ethChainDigitList.add(digitMap);
                         }
-                        Log.d("nativeLib=>", "Eth链 ethChainDigitList.toString() ===>" +ethChainDigitList.toString());
+                        Log.d("nativeLib=>",
+                                "Eth链 ethChainDigitList.toString() ===>" + ethChainDigitList.toString());
                         resultEthChain.put("ethChainDigitList", ethChainDigitList);
                     }
                     Log.d("nativeLib=>",
