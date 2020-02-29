@@ -5,6 +5,8 @@
 /bc/.idea
 /bc/Cargo.lock
 /bc/target
+*.db
+/test/wallet-jni-test/target/
 /packages/wallet/.idea
 /packages/wallet/example/pubspec.lock
 /packages/wallet/pubspec.lock
