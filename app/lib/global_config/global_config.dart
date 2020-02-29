@@ -139,8 +139,7 @@ const Erc20_Tx_List = "http://api-cn.etherscan.com/api?module=account&action=tok
 const Erc20_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=";
 //http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 //https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-String assembleErc20TxListUrl(String address,
-    {ChainType chainType = ChainType.ETH, String contractAddress, String page = "1", String offset = "20"}) {
+String assembleErc20TxListUrl(String address, ChainType chainType, {String contractAddress, String page = "1", String offset = "20"}) {
   if (chainType == ChainType.ETH_TEST) {
     return Erc20_TestNet_Tx_List +
         contractAddress +
@@ -161,6 +160,10 @@ const Eth_Tx_Account = "http://api-cn.etherscan.com/api?module=proxy&action=eth_
 const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=";
 //http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=0x2910543af39aba0cd09dbb2d50200b3e800a63d2&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 //https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-String assembleTxAccount(String address, {String netType = Eth_Tx_Account}) {
-  return netType + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+String assembleTxAccount(String address, ChainType chainType) {
+  if (chainType == ChainType.ETH) {
+    return Eth_Tx_Account + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+  } else {
+    return Eth_TestNet_Tx_Account + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+  }
 }

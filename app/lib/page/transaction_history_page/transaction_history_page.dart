@@ -1,4 +1,5 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/net/etherscan_util.dart';
@@ -30,6 +31,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   String digitName = "ETH";
   String fromAddress = "";
   String contractAddress = "";
+  ChainType chainType = ChainType.UNKNOWN;
   int displayTxOffset = 0;
   int refreshAddCount = 20;
 
@@ -46,6 +48,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
       digitName = Provider.of<TransactionProvide>(context).digitName;
       balanceInfo = Provider.of<TransactionProvide>(context).balance;
+      chainType = Provider.of<TransactionProvide>(context).chainType;
     }
     txListFuture = getTxListData();
   }
@@ -401,9 +404,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     displayTxOffset = displayTxOffset + refreshAddCount; //每次增加refreshAddCount个
     try {
       if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress.trim() != "")) {
-        ethTxListModel = await loadEthTxHistory(fromAddress, offset: displayTxOffset.toString());
+        ethTxListModel = await loadEthTxHistory(fromAddress, chainType, offset: displayTxOffset.toString());
       } else if (fromAddress.trim() != "") {
-        ethTxListModel = await loadErc20TxHistory(fromAddress, contractAddress, offset: displayTxOffset.toString());
+        ethTxListModel = await loadErc20TxHistory(fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
       } else {
         Fluttertoast.showToast(msg: "地址信息为空，请再检查");
       }

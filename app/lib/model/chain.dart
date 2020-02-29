@@ -34,7 +34,7 @@ abstract class Chain {
   }
 
   //跟jni接口处，定义一致  NativeLib.ChainType
-  int chainTypeToInt(ChainType chainType) {
+  static int chainTypeToInt(ChainType chainType) {
     switch (chainType) {
       case ChainType.BTC:
         return 1;

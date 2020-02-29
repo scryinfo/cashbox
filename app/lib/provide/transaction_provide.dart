@@ -1,3 +1,4 @@
+import 'package:app/model/chain.dart';
 import 'package:flutter/foundation.dart';
 
 class TransactionProvide with ChangeNotifier {
@@ -17,6 +18,7 @@ class TransactionProvide with ChangeNotifier {
   String _gasUsed;
   String _confirmations;
   String _balance;
+  ChainType _chainType;
 
   void empty() {
     _toAddress = "";
@@ -32,6 +34,13 @@ class TransactionProvide with ChangeNotifier {
     _nonce = "";
     _confirmations = "";
     _balance = "";
+    _chainType = ChainType.UNKNOWN;
+  }
+
+  ChainType get chainType => _chainType;
+
+  setChainType(ChainType value) {
+    _chainType = value;
   }
 
   String get balance => _balance;
