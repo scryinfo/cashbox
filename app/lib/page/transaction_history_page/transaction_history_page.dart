@@ -225,6 +225,15 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   return Text(S.of(context).fail_to_load_data_hint);
                 }
                 if (snapshot.hasData) {
+                  if(ethTxListModel.length==0){
+                    return Container(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        "暂无历史交易记录",
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    );
+                  }
                   return Container(
                     child: _makeRefreshWidgets(snapshot),
                   );
