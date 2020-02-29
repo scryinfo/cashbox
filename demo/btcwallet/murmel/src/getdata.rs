@@ -112,6 +112,7 @@ impl GetData {
         let tx_hash = &tx.bitcoin_hash();
         info!("tx_hash {:#?}", &tx_hash);
         let vouts = tx.clone().output;
+        let index = 0;
         for vout in vouts {
             let script = vout.script_pubkey;
             if script.is_p2sh() {
