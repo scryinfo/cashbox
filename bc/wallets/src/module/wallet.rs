@@ -153,7 +153,7 @@ pub fn rename_wallet(walletid: &str, wallet_name: &str) -> Result<bool, String> 
 }
 
 //根据生成钱包的类型，需要创建对应的地址
-fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, String> {
+pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, String> {
     let phrase = String::from_utf8(mn.to_vec()).expect("mn byte format convert to string is error!");
     // TODO 这个地方 根据支持链的种类 分别生成对应的地址
     match wallet_type  {
@@ -171,7 +171,7 @@ fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, S
         }
         ChainType::ETH | ChainType::EthTest => {
             //todo 错误处理
-            let secret_byte = ethtx::pri_from_mnemonic(&phrase, None).unwrap();
+            let secret_byte = ethtx::pri_from_mnemonic(&phrase, None);
             let context = Secp256k1::new();
             let secret = SecretKey::from_slice(&secret_byte);
             if secret.is_err() {
@@ -193,7 +193,7 @@ fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, S
     }
 }
 //从非压缩公钥生成ETH地址
-pub fn generate_eth_address(puk_byte: &[u8]) -> String {
+ fn generate_eth_address(puk_byte: &[u8]) -> String {
     let mut keccak = Keccak::new_keccak256();
     let mut public_key_hash = [0u8; 32];
     keccak.update(puk_byte);
@@ -425,7 +425,7 @@ struct RawTx {
 
 pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> Result<String, String> {
     let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
-    let tx_encode_data = hex::decode(raw_tx).unwrap();
+    let tx_encode_data = hex::decode(raw_tx).expect("hex decode");
     // TODO 这个地方需要使用大小端编码？
     let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
     let mnemonic = module::wallet::export_mnemonic(wallet_id, psw);
