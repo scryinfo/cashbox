@@ -105,7 +105,7 @@ class Wallets {
         chainEeeM
           ..chainId = eeeChain["chainId"]
           ..chainAddress = eeeChain["chainAddress"]
-          ..chainType = chainEeeM.intToChainType(eeeChain["chainType"])
+          ..chainType = Chain.intToChainType(eeeChain["chainType"])
           ..isVisible = eeeChain["isVisible"]
           ..walletId = eeeChain["walletId"];
         List eeeChainDigitList = eeeChain["eeeChainDigitList"];
@@ -134,7 +134,7 @@ class Wallets {
         chainEthM
           ..chainId = ethChain["chainId"]
           ..chainAddress = ethChain["chainAddress"]
-          ..chainType = chainEthM.intToChainType(ethChain["chainType"])
+          ..chainType = Chain.intToChainType(ethChain["chainType"])
           ..isVisible = true
           ..walletId = jniList[walletIndex]["walletId"];
         //todo add digit to ETH chain

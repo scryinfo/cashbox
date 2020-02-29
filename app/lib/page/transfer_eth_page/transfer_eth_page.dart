@@ -105,7 +105,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
         body: Container(
           width: ScreenUtil().setWidth(90),
           height: ScreenUtil().setHeight(160),
-          child: _buildTransferEeeWidget(),
+          child: _buildTransferEthWidget(),
         ),
       ),
     );
@@ -128,7 +128,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
     return true;
   }
 
-  Widget _buildTransferEeeWidget() {
+  Widget _buildTransferEthWidget() {
     return Container(
       width: ScreenUtil().setWidth(80),
       padding: EdgeInsets.only(

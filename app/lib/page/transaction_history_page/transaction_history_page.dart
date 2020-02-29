@@ -42,7 +42,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     {
-      //fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
+      fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
       contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
       digitName = Provider.of<TransactionProvide>(context).digitName;
       balanceInfo = Provider.of<TransactionProvide>(context).balance;
