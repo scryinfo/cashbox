@@ -506,8 +506,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 if (message.status == 200) {
-                    resultMap.put("signedInfo", message.signedInfo);
-                    Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
+                    resultMap.put("signedInfo", message.ethSignedInfo);
+                    Log.d("nativeLib=>", "message.signedInfo is " + message.ethSignedInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
                     Log.d("nativeLib=>", "message.status is " + message.status);
