@@ -116,7 +116,7 @@ String assembleEthTxListUrl(String address,
         "&page=" +
         page +
         "&offset=" +
-        offset +
+        offset.toString() +
         "&sort=desc&apikey=" +
         ETHERSCAN_API_KEY;
   } else {
@@ -127,9 +127,9 @@ String assembleEthTxListUrl(String address,
         "&endblock=" +
         endBlock +
         "&page=" +
-        page +
+        page.toString() +
         "&offset=" +
-        offset +
+        offset.toString() +
         "&sort=desc&apikey=" +
         ETHERSCAN_API_KEY;
   }
@@ -139,20 +139,29 @@ const Erc20_Tx_List = "http://api-cn.etherscan.com/api?module=account&action=tok
 const Erc20_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=";
 //http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 //https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&page=1&offset=100&sort=asc&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-String assembleErc20TxListUrl(String address, ChainType chainType, {String contractAddress, String page = "1", String offset = "20"}) {
-  if (chainType == ChainType.ETH_TEST) {
+String assembleErc20TxListUrl(String address, {ChainType chainType, String contractAddress, String page = "1", String offset = "20"}) {
+  if (chainType.toString() == ChainType.ETH_TEST.toString()) {
     return Erc20_TestNet_Tx_List +
         contractAddress +
         "&address=" +
         address +
         "&page=" +
-        page +
+        page.toString() +
         "&offset=" +
-        offset +
+        offset.toString() +
+        "&sort=desc&apikey=" +
+        ETHERSCAN_API_KEY.toString();
+  } else {
+    return Erc20_Tx_List +
+        contractAddress +
+        "&address=" +
+        address +
+        "&page=" +
+        page.toString() +
+        "&offset=" +
+        offset.toString() +
         "&sort=desc&apikey=" +
         ETHERSCAN_API_KEY;
-  } else {
-    return Erc20_Tx_List + contractAddress + "&address=" + address + "&page=" + page + "&offset=" + offset + "&sort=desc&apikey=" + ETHERSCAN_API_KEY;
   }
 }
 

@@ -365,7 +365,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        ethTxListModel[index].isError,
+                        ethTxListModel[index].isError??"",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: ScreenUtil.instance.setSp(2.5),

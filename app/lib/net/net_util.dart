@@ -2,7 +2,7 @@ import 'package:app/util/log_util.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
 
-Future request(url, {formData}) async {
+Future request(String url, {formData}) async {
   try {
     //print('开始获取数据...............');
     Response response;
