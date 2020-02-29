@@ -26,6 +26,7 @@ use hammersbald;
 use std::convert;
 use std::fmt;
 use std::io;
+use db::SQLite;
 
 /// An error class to offer a unified error interface upstream
 pub enum Error {
@@ -56,7 +57,9 @@ pub enum Error {
     /// Handshake failure
     Handshake,
     /// lost connection
-    Lost(String)
+    Lost(String),
+    /// SQLite error
+    SQLite(sqlite::Error),
 }
 
 impl std::error::Error for Error {
@@ -76,6 +79,7 @@ impl std::error::Error for Error {
             Error::Serialize(ref err) => err.description(),
             Error::Handshake => "handshake",
             Error::Lost(ref s) => s,
+            Error::SQLite(ref err) => err.description(),
         }
     }
 
@@ -95,6 +99,7 @@ impl std::error::Error for Error {
             Error::Serialize(ref err) => Some(err),
             Error::Handshake => None,
             Error::Lost(_) => None,
+            Error::SQLite(ref err) => Some(err),
         }
     }
 }
@@ -113,13 +118,14 @@ impl fmt::Display for Error {
             Error::UnknownUTXO => {
                 use std::error::Error;
                 write!(f, "{}", self.description())
-            },
+            }
             Error::Lost(ref s) |
             Error::Downstream(ref s) => write!(f, "{}", s),
             Error::IO(ref err) => write!(f, "IO error: {}", err),
             Error::Util(ref err) => write!(f, "Util error: {}", err),
             Error::Hammersbald(ref err) => write!(f, "Hammersbald error: {}", err),
             Error::Serialize(ref err) => write!(f, "Serialize error: {}", err),
+            Error::SQLite(ref err) => write!(f, "SQLite error: {}", err),
         }
     }
 }
@@ -181,3 +187,4 @@ impl convert::From<bip158::Error> for Error {
         }
     }
 }
+
