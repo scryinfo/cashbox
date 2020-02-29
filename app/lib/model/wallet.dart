@@ -5,7 +5,7 @@ import 'package:wallet_manager/wallet_manager.dart';
 
 import 'chain.dart';
 
-enum WalletType { TEST_WALLET, WALLET } //0,1
+enum WalletType { TEST_WALLET, WALLET } //0,1  /*标记：定义需要与JNI处保持一致*/
 
 class Wallet {
   int status; //接口数据，返回状态码
