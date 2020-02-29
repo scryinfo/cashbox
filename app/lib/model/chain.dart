@@ -53,9 +53,10 @@ abstract class Chain {
     }
   }
 
-  ChainType intToChainType(int chainTypeInt) {
+  static ChainType intToChainType(int chainTypeInt) {
     ChainType chainType;
     switch (chainTypeInt) {
+      /*标记：定义需要与JNI处保持一致*/
       case 1:
         chainType = ChainType.BTC;
         break;
@@ -74,6 +75,8 @@ abstract class Chain {
       case 6:
         chainType = ChainType.EEE_TEST;
         break;
+      default:
+        chainType = ChainType.UNKNOWN;
     }
     return chainType;
   }
