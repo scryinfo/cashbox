@@ -31,6 +31,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   TextEditingController _txValueController = TextEditingController();
   TextEditingController _backupMsgController = TextEditingController();
   String toAddressValue;
+  ChainType chainType;
   bool isShowExactGas = false;
   int standardAddressLength = 42; //以太坊标准地址42位
   int eth2gasUnit = 1000 * 1000 * 1000; // 1 ETH = 1e9 gwei (10的九次方) = 1e18 wei
@@ -60,6 +61,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
       contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
       decimal = Provider.of<TransactionProvide>(context).decimal;
+      chainType = Provider.of<TransactionProvide>(context).chainType;
     }
     _txValueController.text = Provider.of<TransactionProvide>(context).txValue ?? "";
     _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress ?? "";
@@ -679,20 +681,16 @@ class _TransferEthPageState extends State<TransferEthPage> {
           hintInput: "请输入钱包密码",
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd);
-
-            Wallet walletModel = await Wallets.instance.getNowWalletModel();
-            ChainETH chainETH = walletModel.getChainByChainType(ChainType.ETH);
             String walletId = await Wallets.instance.getNowWalletId();
-            String nonce = await loadTxAccount(fromAddress);
+            String nonce = await loadTxAccount(fromAddress, chainType);
             if (nonce == null || nonce.trim() == "") {
               print("取的nonce值有问题");
+              Fluttertoast.showToast(msg: "取的nonce值有问题");
               return;
             }
-            // todo  链类型处理
-            // todo  gas费单位统一
             var result = Wallets.instance.ethTxSign(
                 walletId,
-                chainETH.chainTypeToInt(ChainType.ETH),
+                Chain.chainTypeToInt(chainType),
                 fromAddress,
                 _toAddressController.text.toString(),
                 contractAddress,
@@ -703,6 +701,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 mGasLimitValue.toString(),
                 nonce,
                 decimal: decimal);
+            //todo 处理eth签名结果
             // NavigatorUtils.push(
             //   context,
             //   Routes.eeePage,

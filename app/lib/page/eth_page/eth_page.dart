@@ -279,6 +279,7 @@ class _EthPageState extends State<EthPage> {
                   ..setBalance(displayDigitsList[index].balance)
                   ..setDecimal(displayDigitsList[index].decimal)
                   ..setFromAddress(nowChainAddress)
+                  ..setChainType(nowChain.chainType)
                   ..setContractAddress(displayDigitsList[index].contractAddress);
               }
               NavigatorUtils.push(context, Routes.transactionHistoryPage);
