@@ -148,6 +148,9 @@ Future<String> sendRawTx(ChainType chainType, String rawTx) async {
   try {
     var res = await request(assembleSendRawTx(chainType, rawTx));
     print("sendRawTx res==>" + res.toString());
+    if (res != null && (res as Map).containsKey("result")) {
+      return res["result"];
+    }
     return "";
   } catch (e) {
     print("sendRawTx error is ====>" + e);
