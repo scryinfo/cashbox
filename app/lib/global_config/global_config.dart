@@ -176,3 +176,21 @@ String assembleTxAccount(String address, ChainType chainType) {
     return Eth_TestNet_Tx_Account + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
   }
 }
+
+const Eth_Send_RawTx = "https://api.etherscan.io/api?module=proxy&action=eth_sendRawTransaction&hex=";
+const Eth_TestNet_Send_RawTx = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_sendRawTransaction&hex=";
+//https://api-cn.etherscan.io/api?module=proxy&action=eth_sendRawTransaction&hex???=&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+//https://api-ropsten.etherscan.io/api?module=proxy&action=eth_sendRawTransaction&hex=???&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+String assembleSendRawTx(ChainType chainType, String hexRawTx, {String apiKey = ETHERSCAN_API_KEY}) {
+  if (chainType == ChainType.ETH_TEST) {
+    return Eth_Send_RawTx + hexRawTx + "&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1";
+  } else {
+    return Eth_TestNet_Send_RawTx + hexRawTx + "&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1";
+  }
+}
+//0xf8b940850165a0bc008301117094aa638fca332190b63be1605baefde1df0b3b031e80b853a9059cbb000000000000000000000000c0c4824527ffb27a51034cea1e37840ed69a5f1e000000000000000000000000000000000000000000008d3e16970bd7637c00007468697320697320616464206d73672aa0daa7efa85dedd64fb1a5a244524cf9a90f1004da24a319b7b34edea44b2f560fa011d391a96f65ce811627e01298bb81543490857ce1fe453ed0424111f1046f3c
+//{
+//jsonrpc: "2.0",
+//result: "0x1019fff289b9880fc6ef65a65658f43fa3200613e360c209757f4cb2afedf77f",
+//id: 1
+//}

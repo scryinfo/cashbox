@@ -143,3 +143,14 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(String address, String cont
     return [];
   }
 }
+
+Future<String> sendRawTx(ChainType chainType, String rawTx) async {
+  try {
+    var res = await request(assembleSendRawTx(chainType, rawTx));
+    print("sendRawTx res==>" + res.toString());
+    return "";
+  } catch (e) {
+    print("sendRawTx error is ====>" + e);
+    return "";
+  }
+}
