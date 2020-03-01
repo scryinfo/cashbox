@@ -1,6 +1,7 @@
 import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
+import 'package:app/util/utils.dart';
 import 'dart:convert';
 import 'net_util.dart';
 
@@ -10,13 +11,19 @@ Future<String> loadTxAccount(String address, ChainType chainType) async {
     var res = await request(assembleTxAccount(address, chainType));
     print("loadNonce res=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
-      print("Erc20_Balance res.result.=====================>" + res["result"].toString());
-      return res["result"].toString();
+      //说明由于infura目前接口返回的是如 0x085f这种格式。需处理掉开头0x。 后转十六进制 成 十进制
+      if (res["result"] != null && (res["result"].toString().startsWith("0x") || res["result"].toString().startsWith("0X"))) {
+        return Utils.hexToInt(res["result"].toString().substring("0x".length)).toString();
+      } else {
+        return null;
+      }
+    } else {
+      return null;
     }
   } catch (e) {
+    print("loadTxAccount error is ===>" + e.toString());
     return null;
   }
-  return null;
 }
 
 Future<String> loadEthBalance(String address, ChainType chainType) async {
