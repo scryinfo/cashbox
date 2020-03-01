@@ -63,9 +63,10 @@ class _EthPageState extends State<EthPage> {
           if (nowWallet.walletType == WalletType.WALLET) {
             this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
           } else {
-            this.nowChain = this.nowWallet.getChainByChainType(ChainType.EEE_TEST);
+            this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST); //todo change chaintype
           }
           print("this.nowChain======>" + this.nowChain.toString());
+          this.nowChain.chainType = ChainType.ETH; //TODO remove 临时测试用
           this.nowChainAddress = nowChain.chainAddress;
           this.nowChainDigitsList = nowChain.digitsList;
         });
@@ -76,6 +77,7 @@ class _EthPageState extends State<EthPage> {
       this.walletList = walletList;
     });
     future = loadDisplayDigitListData();
+    loadDigitBalance();
   }
 
   loadDigitBalance() async {
@@ -99,6 +101,9 @@ class _EthPageState extends State<EthPage> {
         this.displayDigitsList[i].balance = balance ?? "0.00";
       }
     }
+    setState(() {
+      this.displayDigitsList = displayDigitsList;
+    });
   }
 
   Future<List<Digit>> loadDisplayDigitListData() async {
@@ -121,7 +126,6 @@ class _EthPageState extends State<EthPage> {
         addDigitToDisplayList(nowChainDigitsList.length - displayDigitsList.length);
       }
     }
-    await loadDigitBalance();
     return displayDigitsList;
   }
 
