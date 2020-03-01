@@ -28,3 +28,10 @@ class FfiDemoClass {
 
   }
 }*/
+// WalletFFI walletFFI = new WalletFFI();
+// // todo ffi  assemble TX
+// var txResultString = walletFFI.assembleEthTx(walletId, value, fromAddress, toAddress, backup);
+// if (txResultString.isEmpty || txResultString.trim() == "") {
+//   LogUtil.e("ethTxSign=======>", "txResultString.isEmpty");
+//   return new Map();
+// }

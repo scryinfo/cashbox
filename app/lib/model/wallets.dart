@@ -277,17 +277,9 @@ class Wallets {
   Future<Map> ethTxSign(String walletId, int chainType, String fromAddress, String toAddress, String contractAddress, String value, String backup,
       Uint8List pwd, String gasPrice, String gasLimit, String nonce,
       {int decimal = 18}) async {
-    // WalletFFI walletFFI = new WalletFFI();
-    // // todo ffi  assemble TX
-    // var txResultString = walletFFI.assembleEthTx(walletId, value, fromAddress, toAddress, backup);
-    // if (txResultString.isEmpty || txResultString.trim() == "") {
-    //   LogUtil.e("ethTxSign=======>", "txResultString.isEmpty");
-    //   return new Map();
-    // }
     Map ethTxSignMap = await WalletManager.ethTxSign(
         walletId, chainType, fromAddress, toAddress, contractAddress, value, backup, pwd, gasPrice, gasLimit, nonce,
         decimal: decimal);
-    // todo Sign assembled TxInfo
     int status = ethTxSignMap["status"];
     if (status == null || status != 200) {
       LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethTxSignMap["message"]);
