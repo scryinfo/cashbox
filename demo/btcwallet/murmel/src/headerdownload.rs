@@ -174,6 +174,10 @@ impl HeaderDownload {
                                     header_clone.bitcoin_hash().to_hex(),
                                     header_clone.time.to_string()
                                 );
+                                sqlite.update_newest_header(
+                                    header_clone.bitcoin_hash().to_hex(),
+                                    header_clone.time.to_string()
+                                );
                                 if let Some(forwards) = forwards {
                                     moved_tip = Some(forwards.last().unwrap().clone());
                                 }

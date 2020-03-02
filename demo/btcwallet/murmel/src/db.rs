@@ -5,10 +5,11 @@
 //!
 use std::sync::{Arc, Mutex};
 use sqlite::{State, Value, Statement};
-use bitcoin::Network;
+use bitcoin::{Network, BitcoinHash};
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::secp256k1::ecdh::SharedSecret;
 use error;
+use bitcoin::hashes::hex::ToHex;
 
 pub type SharedSQLite = Arc<Mutex<SQLite>>;
 
@@ -27,7 +28,7 @@ impl SQLite {
             "
         ).expect("Create table block_hash error");
         sqlite.execute(
-            "create table if not exists utxo(txhash TEXT,script TEXT, value REAL, vout INT);"
+            "create table if not exists utxos(txhash TEXT,script TEXT, value REAL, vout INT);"
         ).expect("Create table tx error");
         sqlite.execute(
             "create table if not exists newest_hash(key TEXT,block_hash TEXT,timestamp TEXT);"
@@ -40,7 +41,18 @@ impl SQLite {
 
     /// 查询上次初始化进度
     pub fn init(&mut self) {
-        let newest = self.query_newset_header(NEWEST_KEY);
+        let (block_hash, timestamp) = self.query_newest_header(NEWEST_KEY);
+        if block_hash.is_none() {
+            let genesis = genesis_block(self.network).header;
+            let block_hash = genesis.bitcoin_hash().to_hex();
+            let timestamp = genesis.time.to_string();
+            info!("scanned newest block from genesis {:?}", &block_hash);
+            self.insert_newest_header(block_hash, timestamp);
+        }
+
+        let block_hash = block_hash.expect("No block");
+        let timestamp = timestamp.expect("No timestamp");
+        info!("scanned block from restore block {:?}", &block_hash);
     }
 
     //存储区块头
@@ -65,32 +77,52 @@ impl SQLite {
         ).expect("bind ERR");
     }
 
-    //查询最新进度
-    pub fn query_newset_header(&self, key: &str) -> Option<String> {
+    //查询最新进度s
+    pub fn query_newest_header(&self, key: &str) -> (Option<String>, Option<String>) {
         let mut statement = self.connection.prepare(
             "SELECT * FROM newest_hash WHERE key = ?"
         ).expect("query_new error");
         statement.bind(1, key).expect("query newest error");
-        let mut result: Option<String> = None;
         while let State::Row = statement.next().unwrap() {
-            result = match statement.read::<String>(0) {
-                Ok(hash) => Some(hash),
-                Err(_) => None,
-            }
+            let block_hash = statement.read::<String>(0).expect("query block hash error");
+            let timestamp = statement.read::<String>(1).expect("query block hash error");
+            return (Some(block_hash), Some(timestamp));
         }
-        result
+        (None, None)
+    }
+
+    //插入最新进度
+    pub fn insert_newest_header(&self, block_hash: String, timestamp: String) {
+        let mut statement = self.connection.prepare(
+            "INSERT INTO newest_hash VALUES(?, ?, ?)"
+        ).expect("PREPARE ERR");
+        statement.bind(1, NEWEST_KEY).unwrap();
+        statement.bind(2, block_hash.as_str()).unwrap();
+        statement.bind(3, timestamp.as_str()).unwrap();
+        statement.next().expect("insert newest_header error");
+    }
+
+    //更新最新进度
+    pub fn update_newest_header(&self, block_hash: String,timestamp: String) {
+        let mut statement = self.connection.prepare(
+            "UPDATE newest_hash SET block_hash = ?, timestamp = ? WHERE key = ?"
+        ).expect("PREPARE ERR");
+        statement.bind(1, block_hash.as_str()).unwrap();
+        statement.bind(2, timestamp.as_str()).unwrap();
+        statement.bind(3, NEWEST_KEY).unwrap();
+        statement.next().expect("insert newest_header error");
     }
 
     //存储 utxo
-    pub fn insert_utxo(&self, tx: String, script: String, value: f64, vout: i64) {
+    pub fn insert_utxo(&self, txhash: String, script: String, value: f64, vout: i64) {
         let mut statement = self.connection.prepare(
             "INSERT INTO utxo VALUES(?,?,?,?)"
         ).expect("insert utxo error");
-        statement.bind(1, tx.as_str()).expect("bind statement error");
+        statement.bind(1, txhash.as_str()).expect("bind statement error");
         statement.bind(2, script.as_str()).expect("bind statement error");
         statement.bind(3, value).expect("bind statement error");
         statement.bind(4, vout).expect("bind statement error");
-        statement.next().expect("insert utxo error");
+        statement.next().expect("insert utxos error");
     }
 }
 
