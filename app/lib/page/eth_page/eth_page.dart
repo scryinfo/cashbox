@@ -1,4 +1,5 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
@@ -65,8 +66,7 @@ class _EthPageState extends State<EthPage> {
           } else {
             this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST); //todo change chaintype
           }
-          print("this.nowChain======>" + this.nowChain.toString());
-          this.nowChain.chainType = ChainType.ETH; //TODO remove 临时测试用
+          print("this.nowChain.chainType======>" + this.nowChain.chainType.toString());
           this.nowChainAddress = nowChain.chainAddress;
           this.nowChainDigitsList = nowChain.digitsList;
         });
@@ -92,10 +92,12 @@ class _EthPageState extends State<EthPage> {
             this.displayDigitsList[i].address.toString());
         String balance;
         if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
-          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, nowChain.chainType);
+          print(" nowChain.chainType===>" + this.nowChain.chainType.toString());
+          balance =
+              await loadErc20Balance(nowChainAddress, DddTestNetContractAddress, ChainType.ETH_TEST); //todo ChainType && ContractAddress temple test
           print("erc20 balance==>" + balance.toString());
         } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
-          balance = await loadEthBalance(nowChainAddress, nowChain.chainType);
+          balance = await loadEthBalance(nowChainAddress, ChainType.ETH_TEST); //todo ChainType temple test
           print("eth balance==>" + balance.toString());
         } else {}
         this.displayDigitsList[i].balance = balance ?? "0.00";
