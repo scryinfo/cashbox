@@ -192,7 +192,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "gas消耗",
+              S.of(context).gas_used,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -222,7 +222,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "gas price",
+              S.of(context).gas_price,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -252,7 +252,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "交易备注",
+              S.of(context).tx_backup,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -282,7 +282,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "nonce值",
+              S.of(context).nonce_value,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -307,7 +307,6 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
 
   @override
   void deactivate() {
-    // TODO: implement deactivate
     super.deactivate();
     Provider.of<TransactionProvide>(context).empty();
   }

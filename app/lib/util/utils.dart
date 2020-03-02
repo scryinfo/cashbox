@@ -23,13 +23,13 @@ class Utils {
     return duration.inSeconds;
   }
 
-  //double类型的值，取后面几位小数
-  static double formatDouble(double num, int position) {
-    if ((num.toString().length - num.toString().lastIndexOf(".") - 1) < position) {
+  //double类型的值，取后面几位小数。  默认进度:8
+  static double formatDouble(double num, {int precision = 8}) {
+    if ((num.toString().length - num.toString().lastIndexOf(".") - 1) < precision) {
       //小数点后有几位小数
-      return double.parse(num.toStringAsFixed(position).substring(0, num.toString().lastIndexOf(".") + position + 1));
+      return double.parse(num.toStringAsFixed(precision).substring(0, num.toString().lastIndexOf(".") + precision + 1));
     } else {
-      return double.parse(num.toString().substring(0, num.toString().lastIndexOf(".") + position + 1));
+      return double.parse(num.toString().substring(0, num.toString().lastIndexOf(".") + precision + 1));
     }
   }
 
@@ -52,7 +52,6 @@ class Utils {
     }
     return val;
   }
-
 }
 
 /// 默认dialog背景色为半透明黑色，这里修改源码改为透明

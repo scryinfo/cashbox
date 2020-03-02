@@ -98,7 +98,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              "旧密码",
+              S.of(context).old_pwd,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),

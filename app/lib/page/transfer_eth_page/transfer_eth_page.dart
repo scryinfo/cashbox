@@ -33,8 +33,10 @@ class _TransferEthPageState extends State<TransferEthPage> {
   String toAddressValue;
   ChainType chainType;
   bool isShowExactGas = false;
+  int precision = 8; //小数位精度
   int standardAddressLength = 42; //以太坊标准地址42位
   int eth2gasUnit = 1000 * 1000 * 1000; // 1 ETH = 1e9 gwei (10的九次方) = 1e18 wei
+  String Gwei = "Gwei";
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
   String arrowIcon = "assets/images/ic_collapse.png";
@@ -49,6 +51,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   double mGasFeeValue;
   String fromAddress = "";
   String contractAddress = "";
+  String digitName = "";
   int decimal = 0;
 
   @override
@@ -115,7 +118,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   bool _verifyTransferInfo() {
     if (_toAddressController.text.trim() == "") {
-      Fluttertoast.showToast(msg: "请检查对方地址不能为空");
+      Fluttertoast.showToast(msg: S.of(context).to_address_null.toString());
       return false;
     }
     // todo 暂时放开
@@ -124,7 +127,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
     //   return false;
     // }
     if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
-      Fluttertoast.showToast(msg: "转账数额不能为空，或者小于0");
+      Fluttertoast.showToast(msg: S.of(context).tx_value_is_0.toString());
       return false;
     }
     return true;
@@ -189,7 +192,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     width: ScreenUtil.instance.setWidth(40),
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "矿工费",
+                      S.of(context).mine_fee,
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
                         fontSize: ScreenUtil.instance.setSp(3),
@@ -200,7 +203,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     alignment: Alignment.topRight,
                     width: ScreenUtil.instance.setWidth(40),
                     child: Text(
-                      Utils.formatDouble(mGasFeeValue, 8).toString() + "eth",
+                      Utils.formatDouble(mGasFeeValue, precision: precision).toString() + (digitName ?? ""),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
                         fontSize: ScreenUtil.instance.setSp(3),
@@ -240,7 +243,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     max: mMaxGasFee,
                     onChanged: (double value) {
                       setState(() {
-                        mGasFeeValue = Utils.formatDouble(value, 6);
+                        mGasFeeValue = Utils.formatDouble(value, precision: precision);
                         print("mGasFeeValue===>" + mGasFeeValue.toString());
                       });
                     },
@@ -280,7 +283,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     alignment: Alignment.topRight,
                     width: ScreenUtil.instance.setWidth(75),
                     child: Text(
-                      "高级设置",
+                      S.of(context).high_setting.toString(),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.8),
                         fontSize: ScreenUtil.instance.setSp(2.3),
@@ -318,7 +321,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   width: ScreenUtil.instance.setWidth(40),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    "Gas Price",
+                                    S.of(context).gas_price.toString(),
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
                                       fontSize: ScreenUtil.instance.setSp(2.5),
@@ -329,7 +332,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   alignment: Alignment.topRight,
                                   width: ScreenUtil.instance.setWidth(40),
                                   child: Text(
-                                    Utils.formatDouble(mGasPriceValue, 8).toString() + " wei",
+                                    Utils.formatDouble(mGasPriceValue, precision: precision).toString() + " wei",
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
                                       fontSize: ScreenUtil.instance.setSp(2.5),
@@ -357,7 +360,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 new Text(
-                                  mMinGasPrice.toString() + "Gwei",
+                                  mMinGasPrice.toString() + Gwei,
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
                                     fontSize: ScreenUtil.instance.setSp(2.3),
@@ -380,7 +383,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   value: mGasPriceValue,
                                 )),
                                 new Text(
-                                  mMaxGasPrice.toString() + "Gwei",
+                                  mMaxGasPrice.toString() + Gwei,
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
                                     fontSize: ScreenUtil.instance.setSp(2.3),
@@ -404,7 +407,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   width: ScreenUtil.instance.setWidth(40),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    "Gas Limit",
+                                    S.of(context).gas_limit.toString(),
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
                                       fontSize: ScreenUtil.instance.setSp(2.5),
@@ -676,9 +679,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
       context: context,
       builder: (BuildContext context) {
         return PwdDialog(
-          title: "钱包密码",
-          hintContent: "提示：请输入您的密码,进行签名操作。",
-          hintInput: "请输入钱包密码",
+          title: S.of(context).wallet_pwd.toString(),
+          hintContent: S.of(context).input_pwd_hint_detail.toString(),
+          hintInput: S.of(context).input_pwd_hint.toString(),
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd);
             String walletId = await Wallets.instance.getNowWalletId();
