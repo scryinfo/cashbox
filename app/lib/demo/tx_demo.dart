@@ -19,17 +19,25 @@ class _TransactionDemoState extends State<TransactionDemo> {
   }
 
   void testFormTxAndSign() async {
-    String form = "0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4";
-    String to = "0xc0c4824527ffb27a51034cea1e37840ed69a5f1e";
-    String nonce = await loadTxAccount(form, ChainType.ETH_TEST);
-    print("nonce ===>" + nonce);
+    String form = "0xc0c4824527ffb27a51034cea1e37840ed69a5f1e";
+    String to = "0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4";
+    String nonce;
+    try {
+      nonce = await loadTxAccount(form, ChainType.ETH_TEST);
+      print("nonce ===>" + nonce);
+    } on FormatException catch (e) {
+      print("ArgumentError===>" + e.toString());
+    } catch (e) {
+      print("e===>" + e);
+    }
+
     if (nonce == null) {
       print("loadTxAccount nonce is null");
       return;
     }
     await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     Map map = await Wallets.instance.ethTxSign(
-        "a0b74f42-d119-421e-be2b-d28cae52d458",
+        "21dec360-e93e-47eb-8372-0234919bfd83",
         //walletid
         4,
         //eth_test
@@ -39,9 +47,9 @@ class _TransactionDemoState extends State<TransactionDemo> {
         //to
         "0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e",
         //contractaddress
-        "666999",
+        "1.6543",
         //value
-        "this is add msg",
+        "ddd",
         //back
         Uint8List.fromList("q".codeUnits),
         "6",
@@ -50,6 +58,7 @@ class _TransactionDemoState extends State<TransactionDemo> {
         //gasLimit
         nonce,
         decimal: 18);
+    print("nonce ===>" + nonce);
     print("result===>" + map.toString());
     print("result===>" + map["status"].toString());
     print("result===>" + map["signedInfo"]);
