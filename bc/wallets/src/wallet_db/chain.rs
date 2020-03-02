@@ -3,6 +3,12 @@ use crate::model::WalletObj;
 use log::debug;
 
 impl DataServiceProvider {
+
+    pub fn get_available_chain(){
+        //查询当前可用链类型，当前
+        let sql = 	 "select id,type from detail.chain where selected=1 and status=1;";
+    }
+
     pub fn display_eee_chain(&self) -> Result<Vec<WalletObj>, String> {
 
         let all_mn =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
@@ -41,12 +47,14 @@ impl DataServiceProvider {
     }
 
     pub fn display_eth_chain(&self) -> Result<Vec<WalletObj>, String> {
-      //这个sql语句关联表较多
+      //这个sql语句关联表较多 关联逻辑： 查询出当前钱包有效钱包，这里是不区分主链或者测试链钱包 得到一个子表 e
+        // 查询出当前地址使用详情跟代币的关联情况，得到子表 d
+        // 最后和表f做自然连接，根据筛选条件找出符合要求的结果
         let all_mn =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
 			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
-	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (3,4)) e,
-	 ( select * from detail.DigitUseDetail,detail.DigitBase where digit_id = id and group_name !='EEE' and group_name !='BTC') as d,detail.Chain f
-         where e.address_id = d.address_id and e.chain_id = f.id;";
+	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and a.status=1 and b.status =1 and b.chain_id in (3,4)) e,
+	 ( select * from detail.DigitUseDetail a,detail.DigitBase b where a.digit_id = b.id  and b.status = 1 and group_name !='EEE' and group_name !='BTC') as d,detail.Chain f
+         where e.address_id = d.address_id and e.chain_id = f.id and f.status = 1;";
 
 
         let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();

@@ -5,6 +5,16 @@ use ChainType;
 use crate::model::wallet_store::{TbAddress, WalletObj, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
 
+fn chain_id_convert_group_name(chain_id:i16)->Option<(i64,String)>{
+    match chain_id {
+        3=>Some((1,"ETH".to_string())),
+        4=>Some((0,"ETH".to_string())),
+        5=>Some((1,"EEE".to_string())),
+        6=>Some((0,"EEE".to_string())),
+        _=>None
+    }
+}
+
 impl DataServiceProvider {
     pub fn update_wallet(&self, wallet: TbWallet) -> Result<(), String> {
         let mn_sql = "update Wallet set mnemonic=? where wallet_id=?;";
@@ -23,7 +33,6 @@ impl DataServiceProvider {
     pub fn save_wallet_address(&mut self, mn: TbWallet, addrs: Vec<TbAddress>) -> Result<(), String> {
         let wallet_sql = "INSERT into Wallet(wallet_id,mn_digest,fullname,mnemonic,wallet_type,display_chain_id)VALUES(?,?,?,?,?,?)";
         let address_sql = "insert into detail.Address(address_id,wallet_id,chain_id,address,puk_key,status) values(?,?,?,?,?,?);";
-
         // TODO 增加事务的处理，这个的编码方式还需要修改 才能编译通过
         // TODO 根据链的地址种类 对应的填写代币账户信息
         let save_wallet_flag = match self.db_hander.prepare(wallet_sql) {
@@ -47,6 +56,7 @@ impl DataServiceProvider {
             }
             Err(e) => Err(e.to_string())
         };
+
         if save_wallet_flag.is_ok() {
             let save_address_flag = match self.db_hander.prepare(address_sql) {
                 Ok(mut address_stat) => {
@@ -62,7 +72,14 @@ impl DataServiceProvider {
                             Ok(_) => {
                                 // TODO 后续来完善需要更新的数据详情
                                 address_stat.reset();
-                                if  addr.chain_id==5||addr.chain_id==6  {//添加eee 或者eee test相关地址代币
+
+                             //
+                                // todo 处理chain_id异常
+                                let convert_ret = chain_id_convert_group_name(addr.chain_id).unwrap();
+                                let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase where status =1 and is_visible =1 and type={} and group_name = '{}';",addr.address_id,convert_ret.0,convert_ret.1);
+                                self.db_hander.execute(sql).expect("update eee digit");
+
+                              /*  if  addr.chain_id==5||addr.chain_id==6  {//添加eee 或者eee test相关地址代币
                                     let eth_digit_account_sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id)VALUES({},'{}');",1,addr.address_id);
                                     println!("{}",eth_digit_account_sql);
                                     self.db_hander.execute(eth_digit_account_sql).expect("update eee digit");
@@ -73,7 +90,7 @@ impl DataServiceProvider {
                                     //在插入eth的时候 添加ddd 代币 //默认在每个钱包，只要启用ETH都包含这个代币
                                     let insert_ddd_digit =  format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase a where a.contract_address like '0x9F5F3CFD7a32700C93F971637407ff17b91c7342';",addr.address_id);
                                     self.db_hander.execute(insert_ddd_digit).expect("update eee digit");
-                                }
+                                }*/
                             }
                             Err(e) => return Err(e.to_string())
                         }
@@ -84,6 +101,7 @@ impl DataServiceProvider {
             };
             if save_address_flag.is_err() {
                 // TODO 添加事务的处理
+                println!("save address error:{:?}",save_address_flag.unwrap_err());
             }
         }
         Ok(())
