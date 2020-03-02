@@ -127,5 +127,14 @@
   "input_pwd_hint_detail": "提示：请输入您的密码，对交易信息进行签名。",
   "tx_sign_failure": "交易签名 失败",
   "tx_sign_success": "交易签名 成功",
-  "digit_info_null": "代币信息为空"
+  "digit_info_null": "代币信息为空",
+  "gas_used": "gas消耗",
+  "gas_price": "Gas Price",
+  "gas_limit": "Gas Limit",
+  "tx_backup": "交易备注",
+  "nonce_value": "nonce值",
+  "to_address_null": "请检查对方地址不能为空",
+  "tx_value_is_0": "转账数额不能为空，或者小于0",
+  "mine_fee": "矿工费",
+  "high_setting": "高级设置"
 }

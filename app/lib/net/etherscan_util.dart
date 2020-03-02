@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import 'package:app/generated/i18n.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
@@ -15,7 +13,7 @@ Future<String> loadTxAccount(String address, ChainType chainType) async {
     var res = await request(assembleTxAccount(address, chainType));
     print("loadNonce res=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
-      //说明由于infura目前接口返回的是如 0x085f这种格式。需处理掉开头0x。 后转十六进制 成 十进制
+      //说明由于 infura||etherscan 目前接口返回的是 如:0x085f这种格式。需处理掉开头0x。 后转十六进制 成 十进制
       if (res["result"] != null && (res["result"].toString().startsWith("0x") || res["result"].toString().startsWith("0X"))) {
         return Utils.hexToInt(res["result"].toString().substring("0x".length)).toString();
       } else {

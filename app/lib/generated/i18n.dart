@@ -60,6 +60,10 @@ class S implements WidgetsLocalizations {
   String get failure_to_change_wallet => "钱包切换失败，请重新打开钱包，尝试切换";
   String get failure_to_load_data_pls_retry => "数据加载出错了，请尝试重新加载!~";
   String get finish_load_tx_history => "您的 交易记录 已经加载完了！";
+  String get gas_limit => "Gas Limit";
+  String get gas_price => "Gas Price";
+  String get gas_used => "gas消耗";
+  String get high_setting => "高级设置";
   String get hint_extend_msg_option => "添加交易备注信息(可选)";
   String get import_wallet => "导入钱包";
   String get info_sign => "信息签名";
@@ -73,6 +77,7 @@ class S implements WidgetsLocalizations {
   String get make_sure_service_protocol => "请确认勾选 同意服务协议与隐私条款";
   String get message_tip => "message";
   String get mine => "我的";
+  String get mine_fee => "矿工费";
   String get mne_pwd_not_allow_is_null => "助记词和密码不能为空";
   String get mnemonic => "助记词";
   String get mnemonic_backup_ok => "助记词已经记好";
@@ -84,6 +89,7 @@ class S implements WidgetsLocalizations {
   String get new_pwd_format_hint => "请输入新密码，建议大于8位，英文、数字混合";
   String get no_new_version_hint => "当前已是最新版本，暂无更新";
   String get no_tx_history => "暂时没有历史交易记录";
+  String get nonce_value => "nonce值";
   String get not_exist_tx_history => "暂无历史交易记录...";
   String get not_follow_diamond_rule => "扫描内容结果不符合diamond Dapp规则";
   String get not_sure_chain_type => "不确定是哪条链,请检查二维码链类型信息";
@@ -130,6 +136,7 @@ class S implements WidgetsLocalizations {
   String get success_to_copy_info => "信息已经成功拷贝!~~~";
   String get test_wallet_and_mnemonic => "测试钱包 助记词:";
   String get test_wallet_title => "测试钱包";
+  String get to_address_null => "请检查对方地址不能为空";
   String get transaction_amount => "交易数额";
   String get transaction_detail => "交易详情";
   String get transaction_history => "交易记录";
@@ -137,11 +144,13 @@ class S implements WidgetsLocalizations {
   String get transfer => "转账";
   String get transfer_from_address => "转出地址:";
   String get transfer_to_address => "转入地址:";
+  String get tx_backup => "交易备注";
   String get tx_failure => "交易失败";
   String get tx_sign_failure => "交易签名 失败";
   String get tx_sign_success => "交易签名 成功";
   String get tx_success => "交易成功";
   String get tx_transferring => "交易发送中";
+  String get tx_value_is_0 => "转账数额不能为空，或者小于0";
   String get unknown_error_in_create_wallet => "钱包创建过程，出现未知错误，请重新尝试创建";
   String get unknown_error_in_reset_pwd => "重置密码出现位置错误，请重新打开尝试";
   String get unknown_error_in_scan_qr_code => "扫描发生未知失败，请重新尝试";
@@ -236,6 +245,8 @@ class $zh extends S {
   @override
   String get delete_wallet_hint => "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。";
   @override
+  String get nonce_value => "nonce值";
+  @override
   String get success_in_delete_wallet => "钱包删除成功";
   @override
   String get click_to_transfer => "点击转账";
@@ -247,6 +258,8 @@ class $zh extends S {
   String get verify_failure_to_mnemonic => "助记词验证失败，请重新检查你输入的信息";
   @override
   String get create_wallet => "创建钱包";
+  @override
+  String get mine_fee => "矿工费";
   @override
   String get service_protocol_tag => "《服务协议》";
   @override
@@ -288,6 +301,8 @@ class $zh extends S {
   @override
   String get no_tx_history => "暂时没有历史交易记录";
   @override
+  String get tx_value_is_0 => "转账数额不能为空，或者小于0";
+  @override
   String get failure_to_load_data_pls_retry => "数据加载出错了，请尝试重新加载!~";
   @override
   String get agree_service_prefix => "我已仔细阅读并同意";
@@ -296,6 +311,8 @@ class $zh extends S {
   @override
   String get failure_create_test_wallet => "测试钱包创建失败，请检查你输入的数据是否正确";
   @override
+  String get gas_limit => "Gas Limit";
+  @override
   String get not_exist_tx_history => "暂无历史交易记录...";
   @override
   String get receive_address => "对方收款地址";
@@ -303,6 +320,8 @@ class $zh extends S {
   String get mine => "我的";
   @override
   String get receive => "收款";
+  @override
+  String get tx_backup => "交易备注";
   @override
   String get backup_mnemonic_hint_info => "助记词用于恢复钱包或者重置钱包密码，将它准确抄到纸上，切记安全保存到你知道的安全地方。";
   @override
@@ -362,6 +381,8 @@ class $zh extends S {
   @override
   String get transaction_detail => "交易详情";
   @override
+  String get gas_price => "Gas Price";
+  @override
   String get pls_input_old_pwd => "请输入旧密码";
   @override
   String get verify_mnemonic_info => "助记词确认验证";
@@ -381,6 +402,8 @@ class $zh extends S {
   String get not_follow_diamond_rule => "扫描内容结果不符合diamond Dapp规则";
   @override
   String get pls_input_wallet_name => "请输入钱包名";
+  @override
+  String get to_address_null => "请检查对方地址不能为空";
   @override
   String get eth_test_chain_name => "EEE_TEST";
   @override
@@ -428,6 +451,8 @@ class $zh extends S {
   @override
   String get pls_pwd_again => "请再次输入密码";
   @override
+  String get gas_used => "gas消耗";
+  @override
   String get reset_pwd => "重置密码";
   @override
   String get old_pwd => "旧密码";
@@ -453,6 +478,8 @@ class $zh extends S {
   String get pls_input => "请输入";
   @override
   String get success_reset_pwd_hint => "重置密码成功，请您保存好你的密码，丢失无法找回";
+  @override
+  String get high_setting => "高级设置";
   @override
   String get eee_token_name => "EEE";
   @override
