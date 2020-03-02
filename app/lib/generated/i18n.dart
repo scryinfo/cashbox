@@ -23,6 +23,7 @@ class S implements WidgetsLocalizations {
 
   String get about_us_title => "关于我们";
   String get add_wallet => "添加钱包";
+  String get address_empty => "地址信息为空，请再检查";
   String get advice_pwd_format => "建议大于8位，英文、数字混合";
   String get agree_service_prefix => "我已仔细阅读并同意";
   String get app_title => "App标题";
@@ -41,24 +42,31 @@ class S implements WidgetsLocalizations {
   String get create_wallet => "创建钱包";
   String get currency_manage => "货币管理";
   String get dapp => "Dapp";
+  String get data_loading => "数据加载中...";
   String get delete_wallet => "删除钱包";
   String get delete_wallet_hint => "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。";
+  String get digit_info_null => "代币信息为空";
   String get eee_chain_test => "EEE_TEST";
+  String get eee_token_name => "EEE";
   String get ensure_pwd => "确认密码";
   String get ensure_to_change => "确定更改";
   String get eth_chain_name => "ETH";
   String get eth_test_chain_name => "EEE_TEST";
+  String get eth_token_name => "ETH";
   String get extend_msg => "备注信息";
   String get fail_to_load_data_hint => "数据加载失败,请检查网络状况，可尝试下拉刷新";
   String get failure_create_test_wallet => "测试钱包创建失败，请检查你输入的数据是否正确";
   String get failure_reset_pwd_hint => "重置密码失败，详细信息";
   String get failure_to_change_wallet => "钱包切换失败，请重新打开钱包，尝试切换";
   String get failure_to_load_data_pls_retry => "数据加载出错了，请尝试重新加载!~";
+  String get finish_load_tx_history => "您的 交易记录 已经加载完了！";
   String get hint_extend_msg_option => "添加交易备注信息(可选)";
   String get import_wallet => "导入钱包";
   String get info_sign => "信息签名";
   String get info_sign_hint => "请确认选择对应钱包后，输入密码进行签名";
   String get input_format_hint => "建议8-24位，英文数字混合";
+  String get input_pwd_hint => "请输入钱包密码";
+  String get input_pwd_hint_detail => "提示：请输入您的密码，对交易信息进行签名。";
   String get judge_the_difference_between_two_wallet => "注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。";
   String get language_choose => "语言选择";
   String get main_title => "主标题";
@@ -76,9 +84,12 @@ class S implements WidgetsLocalizations {
   String get new_pwd_format_hint => "请输入新密码，建议大于8位，英文、数字混合";
   String get no_new_version_hint => "当前已是最新版本，暂无更新";
   String get no_tx_history => "暂时没有历史交易记录";
+  String get not_exist_tx_history => "暂无历史交易记录...";
+  String get not_follow_diamond_rule => "扫描内容结果不符合diamond Dapp规则";
   String get not_sure_chain_type => "不确定是哪条链,请检查二维码链类型信息";
   String get not_sure_operation_type => "不确定操作类型,请检查二维码链操作类型信息";
   String get old_pwd => "旧密码";
+  String get pls_ensure_confirm_pwd => "请确认两次输入密码一致";
   String get pls_ensure_eee_chain => "请确认勾选创建EEE链";
   String get pls_ensure_pwd_is_same => "请确认两次输入密码一致";
   String get pls_input => "请输入";
@@ -109,6 +120,7 @@ class S implements WidgetsLocalizations {
   String get reset_pwd => "重置密码";
   String get rewrite_new_pwd_format_hint => "再次输入新密码";
   String get scan => "扫一扫";
+  String get scan_qr_unknown_error => "扫描发生未知失败，请重新尝试";
   String get service_protocol_tag => "《服务协议》";
   String get service_protocol_title => "服务协议";
   String get some_info_is_null => "有信息为空，请补全信息";
@@ -125,6 +137,10 @@ class S implements WidgetsLocalizations {
   String get transfer => "转账";
   String get transfer_from_address => "转出地址:";
   String get transfer_to_address => "转入地址:";
+  String get tx_failure => "交易失败";
+  String get tx_sign_failure => "交易签名 失败";
+  String get tx_sign_success => "交易签名 成功";
+  String get tx_success => "交易成功";
   String get tx_transferring => "交易发送中";
   String get unknown_error_in_create_wallet => "钱包创建过程，出现未知错误，请重新尝试创建";
   String get unknown_error_in_reset_pwd => "重置密码出现位置错误，请重新打开尝试";
@@ -250,11 +266,15 @@ class $zh extends S {
   @override
   String get test_wallet_title => "测试钱包";
   @override
+  String get pls_ensure_confirm_pwd => "请确认两次输入密码一致";
+  @override
   String get mnemonic_qr_info => "这是您助记词信息生成的二维码";
   @override
   String get pwd => "密码";
   @override
   String get wallet_load_error => "钱包应用加载出错了，请尝试重新打开!~";
+  @override
+  String get data_loading => "数据加载中...";
   @override
   String get mnemonic_info_hint => "以下是钱包的助记词，请您务必认真抄写下来并导出至安全的地方存放。\n注意：一旦丢失，无法找回。";
   @override
@@ -276,6 +296,8 @@ class $zh extends S {
   @override
   String get failure_create_test_wallet => "测试钱包创建失败，请检查你输入的数据是否正确";
   @override
+  String get not_exist_tx_history => "暂无历史交易记录...";
+  @override
   String get receive_address => "对方收款地址";
   @override
   String get mine => "我的";
@@ -292,6 +314,8 @@ class $zh extends S {
   @override
   String get pls_ensure_pwd_is_same => "请确认两次输入密码一致";
   @override
+  String get digit_info_null => "代币信息为空";
+  @override
   String get confirm => "确定";
   @override
   String get wallet_name_not_null => "钱包名不能为空";
@@ -306,7 +330,13 @@ class $zh extends S {
   @override
   String get wrong_pwd_failure_in_delete_wallet => "密码错误，钱包删除失败";
   @override
+  String get eth_token_name => "ETH";
+  @override
   String get wrong_pwd_failure_in_recover_wallet_hint => "密码错误，钱包恢复失败";
+  @override
+  String get tx_sign_success => "交易签名 成功";
+  @override
+  String get input_pwd_hint_detail => "提示：请输入您的密码，对交易信息进行签名。";
   @override
   String get chain_address_info => "链地址信息";
   @override
@@ -346,6 +376,10 @@ class $zh extends S {
   @override
   String get ensure_pwd => "确认密码";
   @override
+  String get tx_sign_failure => "交易签名 失败";
+  @override
+  String get not_follow_diamond_rule => "扫描内容结果不符合diamond Dapp规则";
+  @override
   String get pls_input_wallet_name => "请输入钱包名";
   @override
   String get eth_test_chain_name => "EEE_TEST";
@@ -353,6 +387,8 @@ class $zh extends S {
   String get create_test_wallet => "创建测试钱包";
   @override
   String get backup_mnemonic => "备份助记词";
+  @override
+  String get address_empty => "地址信息为空，请再检查";
   @override
   String get unknown_error_in_create_wallet => "钱包创建过程，出现未知错误，请重新尝试创建";
   @override
@@ -364,6 +400,10 @@ class $zh extends S {
   @override
   String get pls_input_receive_address => "请输入收款地址";
   @override
+  String get scan_qr_unknown_error => "扫描发生未知失败，请重新尝试";
+  @override
+  String get finish_load_tx_history => "您的 交易记录 已经加载完了！";
+  @override
   String get version_update => "版本更新";
   @override
   String get public => "公告";
@@ -371,6 +411,8 @@ class $zh extends S {
   String get pls_ensure_eee_chain => "请确认勾选创建EEE链";
   @override
   String get new_pwd_format_hint => "请输入新密码，建议大于8位，英文、数字混合";
+  @override
+  String get input_pwd_hint => "请输入钱包密码";
   @override
   String get mnemonic_is_not_null => "助记词不能为空";
   @override
@@ -390,6 +432,10 @@ class $zh extends S {
   @override
   String get old_pwd => "旧密码";
   @override
+  String get tx_success => "交易成功";
+  @override
+  String get tx_failure => "交易失败";
+  @override
   String get ensure_to_change => "确定更改";
   @override
   String get service_protocol_title => "服务协议";
@@ -407,6 +453,8 @@ class $zh extends S {
   String get pls_input => "请输入";
   @override
   String get success_reset_pwd_hint => "重置密码成功，请您保存好你的密码，丢失无法找回";
+  @override
+  String get eee_token_name => "EEE";
   @override
   String get unknown_error_in_scan_qr_code => "扫描发生未知失败，请重新尝试";
   @override

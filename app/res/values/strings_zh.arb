@@ -111,5 +111,21 @@
   "cancel": "取消",
   "pls_input": "请输入",
   "scan": "扫一扫",
-  "extend_msg": "备注信息"
+  "extend_msg": "备注信息",
+  "tx_success": "交易成功",
+  "tx_failure": "交易失败",
+  "address_empty": "地址信息为空，请再检查",
+  "finish_load_tx_history": "您的 交易记录 已经加载完了！",
+  "data_loading": "数据加载中...",
+  "not_exist_tx_history": "暂无历史交易记录...",
+  "pls_ensure_confirm_pwd": "请确认两次输入密码一致",
+  "eee_token_name": "EEE",
+  "eth_token_name": "ETH",
+  "scan_qr_unknown_error": "扫描发生未知失败，请重新尝试",
+  "not_follow_diamond_rule": "扫描内容结果不符合diamond Dapp规则",
+  "input_pwd_hint": "请输入钱包密码",
+  "input_pwd_hint_detail": "提示：请输入您的密码，对交易信息进行签名。",
+  "tx_sign_failure": "交易签名 失败",
+  "tx_sign_success": "交易签名 成功",
+  "digit_info_null": "代币信息为空"
 }

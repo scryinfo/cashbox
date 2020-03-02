@@ -232,7 +232,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: "请确认两次输入密码一致",
+                hintText: S.of(context).pls_ensure_confirm_pwd.toString(),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -282,7 +282,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                   },
                 ),
                 Text(
-                  "EEE",
+                  S.of(context).eth_token_name,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 13,

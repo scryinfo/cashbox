@@ -214,7 +214,7 @@ class _EthPageState extends State<EthPage> {
             return Container(
               alignment: Alignment.center,
               child: Text(
-                "代币信息为空",
+                S.of(context).digit_info_null.toString(),
                 style: TextStyle(color: Colors.white70),
               ),
             );
