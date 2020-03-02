@@ -1,3 +1,4 @@
+import 'package:app/demo/tx_demo.dart';
 import 'package:app/generated/i18n.dart';
 import 'package:app/page/transaction_history_page/transaction_history_page.dart';
 import 'package:app/res/resources.dart';
@@ -31,7 +32,7 @@ class _EntryPageState extends State<EntryPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _initData(); //case 删除钱包后，没钱包，回到entryPage
+    _initData(); //case : 删除钱包后，没钱包，回到entryPage
   }
 
   void _initData() async {
@@ -65,22 +66,14 @@ class _EntryPageState extends State<EntryPage> {
             if (snapshot.hasData) {
               bool isContainWallet = snapshot.data;
               if (isContainWallet) {
-                //return DappPage(); // todo  标记，先版本，直接进入到Dapp diamond页面处
+                //return DappPage(); // todo 版本说明，直接进入到Dapp diamond页面处
+                //return TransactionDemo();
                 return EthPage();
-                // return TransactionHistoryPage();
               } else {
                 return _buildProtocolLayout();
               }
             }
             return _buildProtocolLayout();
-            /*return Container(
-              width: ScreenUtil().setWidth(90),
-              height: ScreenUtil().setHeight(160),
-              decoration: BoxDecoration(
-                image: DecorationImage(image: AssetImage("assets/images/bg_loading.png"), fit: BoxFit.fill),
-              ),
-              child: null,
-            );*/
           }),
     );
   }
@@ -144,7 +137,7 @@ class _EntryPageState extends State<EntryPage> {
             ),
             Gaps.scaleHGap(2.5),
             Text(
-              "添加钱包",
+              S.of(context).add_wallet,
               style:
                   TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
             ),
@@ -172,7 +165,7 @@ class _EntryPageState extends State<EntryPage> {
             ),
             Gaps.scaleHGap(2.5),
             Text(
-              "导入钱包",
+              S.of(context).import_wallet,
               style:
                   TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
             ),

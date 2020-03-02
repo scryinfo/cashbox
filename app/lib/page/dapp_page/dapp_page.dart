@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
@@ -31,9 +32,9 @@ class _DappPageState extends State<DappPage> {
         child: Container(
           margin: EdgeInsets.only(top: ScreenUtil.instance.setHeight(4.5)),
           child: WebView(
-            initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
+            //initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
             //initialUrl: "file:///android_asset/flutter_assets/assets/dist-one/dist-one-index.html",
-            //initialUrl: "http://192.168.1.4:8080/",
+            initialUrl: "http://192.168.1.4:8080/",
             javascriptMode: JavascriptMode.unrestricted,
             userAgent:
                 "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
@@ -48,10 +49,16 @@ class _DappPageState extends State<DappPage> {
               return NavigationDecision.navigate;
             },
             onPageFinished: (String url) async {
+              await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
               Wallet wallet = await Wallets.instance.getNowWalletModel();
-              String chainEEEAddress = wallet.getChainByChainType(ChainType.EEE).chainAddress;
-              _controller?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')?.then((result) {}); //传钱包EEE链地址给DApp记录保存
-              print('Page finished loading================================>: $url');
+              Chain chainEEE = wallet.getChainByChainType(ChainType.EEE);
+              if (chainEEE != null && chainEEE.chainAddress != null && chainEEE.chainAddress.trim() != "") {
+                String chainEEEAddress = chainEEE.chainAddress;
+                _controller?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')?.then((result) {}); //传钱包EEE链地址给DApp记录保存
+                print('Page finished loading================================>: $url');
+              } else {
+                print('Page finished loading================================>:address is null');
+              }
             },
           ),
         ),
@@ -68,7 +75,7 @@ class _DappPageState extends State<DappPage> {
           qrResult.then((t) {
             _controller?.evaluateJavascript('nativeQrScanToJsResult("$t")')?.then((result) {});
           }).catchError((e) {
-            Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
+            Fluttertoast.showToast(msg: S.of(context).scan_qr_unknown_error.toString());
           });
         }));
 
@@ -79,7 +86,7 @@ class _DappPageState extends State<DappPage> {
           qrResult.then((qrInfo) {
             Map paramsMap = QrScanUtil.instance.checkQrInfoByDiamondSignAndQr(qrInfo, context);
             if (paramsMap == null) {
-              Fluttertoast.showToast(msg: "扫描内容结果不符合diamond Dapp规则");
+              Fluttertoast.showToast(msg: S.of(context).not_follow_diamond_rule.toString());
               NavigatorUtils.goBack(context);
               return;
             }
@@ -87,7 +94,7 @@ class _DappPageState extends State<DappPage> {
             Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
             NavigatorUtils.push(context, Routes.signTxPage);
           }).catchError((e) {
-            Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
+            Fluttertoast.showToast(msg: S.of(context).scan_qr_unknown_error.toString());
           });
         }));
 
@@ -99,9 +106,9 @@ class _DappPageState extends State<DappPage> {
             context: context,
             builder: (BuildContext context) {
               return PwdDialog(
-                title: "钱包密码",
-                hintContent: "提示：请输入您的密码，对交易信息进行签名。 ",
-                hintInput: "请输入钱包密码",
+                title: S.of(context).wallet_pwd.toString(),
+                hintContent: S.of(context).input_pwd_hint_detail.toString(),
+                hintInput: S.of(context).input_pwd_hint.toString(),
                 onPressed: (pwd) async {
                   var pwdFormat = pwd.codeUnits;
                   String walletId = await Wallets.instance.getNowWalletId();
@@ -109,18 +116,18 @@ class _DappPageState extends State<DappPage> {
                   if (map.containsKey("status")) {
                     int status = map["status"];
                     if (status == null || status != 200) {
-                      Fluttertoast.showToast(msg: "交易签名 失败" + map["message"]);
+                      Fluttertoast.showToast(msg: S.of(context).tx_sign_failure.toString() + map["message"]);
                       NavigatorUtils.goBack(context);
                       return null;
                     } else {
                       var signResult = map["signedInfo"];
-                      Fluttertoast.showToast(msg: "交易签名 成功");
+                      Fluttertoast.showToast(msg: S.of(context).tx_sign_success.toString());
                       _controller?.evaluateJavascript('nativeSignMsgToJsResult("$signResult")')?.then((result) {
                         NavigatorUtils.goBack(context); //签名完成，关了密码弹框
                       });
                     }
                   } else {
-                    Fluttertoast.showToast(msg: "交易签名 失败");
+                    Fluttertoast.showToast(msg: S.of(context).tx_sign_failure.toString());
                     NavigatorUtils.goBack(context);
                   }
                 },

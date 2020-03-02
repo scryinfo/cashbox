@@ -1,7 +1,11 @@
+import 'dart:js';
+
+import 'package:app/generated/i18n.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/util/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 import 'net_util.dart';
 
@@ -54,7 +58,7 @@ Future<String> loadErc20Balance(String ethAddress, String contractAddress, Chain
   return null;
 }
 
-Future<List<EthTransactionModel>> loadEthTxHistory(String address, ChainType chainType, {String offset}) async {
+Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String address, ChainType chainType, {String offset}) async {
   List<EthTransactionModel> modelArray = [];
   try {
     var res = await request(assembleEthTxListUrl(address, offset: offset, chainType: chainType));
@@ -87,9 +91,9 @@ Future<List<EthTransactionModel>> loadEthTxHistory(String address, ChainType cha
           ethTxModel.value = "+" + (int.parse(res["result"][i]["value"]) / Eth_Unit).toString();
         }
         if (res["result"][i]["isError"] == "0") {
-          ethTxModel.isError = "交易成功";
+          ethTxModel.isError = S.of(context).tx_success.toString();
         } else {
-          ethTxModel.isError = "交易失败";
+          ethTxModel.isError = S.of(context).tx_failure.toString();
         }
         modelArray.add(ethTxModel);
       }
@@ -103,7 +107,8 @@ Future<List<EthTransactionModel>> loadEthTxHistory(String address, ChainType cha
   }
 }
 
-Future<List<EthTransactionModel>> loadErc20TxHistory(String address, String contractAddress, ChainType chainType, {String offset}) async {
+Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, String address, String contractAddress, ChainType chainType,
+    {String offset}) async {
   List<EthTransactionModel> modelArray = [];
   try {
     var res = await request(assembleErc20TxListUrl(address, contractAddress: contractAddress, chainType: chainType, offset: offset));
@@ -133,7 +138,7 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(String address, String cont
         } else {
           ethTxModel.value = "+" + (double.parse(res["result"][i]["value"]) / Eth_Unit).toString();
         }
-        ethTxModel.isError = "交易成功"; //erc拿到的都会是交易成功的记录
+        ethTxModel.isError = S.of(context).tx_success.toString(); //erc拿到的都会是交易成功的记录
         modelArray.add(ethTxModel);
       }
     }

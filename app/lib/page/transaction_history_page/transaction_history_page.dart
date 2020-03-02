@@ -225,11 +225,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   return Text(S.of(context).fail_to_load_data_hint);
                 }
                 if (snapshot.hasData) {
-                  if(ethTxListModel.length==0){
+                  if (ethTxListModel.length == 0) {
                     return Container(
                       alignment: Alignment.topCenter,
                       child: Text(
-                        "暂无历史交易记录",
+                        S.of(context).not_exist_tx_history.toString(),
                         style: TextStyle(color: Colors.white70),
                       ),
                     );
@@ -239,7 +239,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   );
                 } else {
                   return Text(
-                    "数据加载中...",
+                    S.of(context).data_loading.toString(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: ScreenUtil.instance.setSp(4),
@@ -275,11 +275,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           print("refresh onLoad======>");
           if (this.ethTxListModel.length < displayTxOffset) {
             //展示的，比上次请求加载到的少，说明没了
-            Fluttertoast.showToast(msg: "您的 交易记录 已经加载完了！");
+            Fluttertoast.showToast(msg: S.of(context).finish_load_tx_history.toString());
             return;
           }
           var ethTxListModel = await getTxListData();
-
           setState(() {
             this.ethTxListModel = ethTxListModel;
           });
@@ -294,8 +293,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       alignment: Alignment.center,
       child: GestureDetector(
         onTap: () {
-          print("click tap is " + index.toString());
-
+          print("click tap intex is ===>" + index.toString());
           Provider.of<TransactionProvide>(context)
             ..empty()
             ..setFromAddress(ethTxListModel[index].from)
@@ -307,7 +305,6 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             ..setGasUsed(ethTxListModel[index].gasUsed)
             ..setTimeStamp(ethTxListModel[index].timeStamp)
             ..setNonce(ethTxListModel[index].nonce);
-
           NavigatorUtils.push(context, Routes.transactionEeeDetailPage);
         },
         child: Column(
@@ -326,7 +323,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        ethTxListModel[index].value,
+                        ethTxListModel[index].value ?? "",
                         style: TextStyle(
                           color: Colors.greenAccent,
                           fontSize: ScreenUtil.instance.setSp(3.5),
@@ -365,7 +362,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        ethTxListModel[index].isError??"",
+                        ethTxListModel[index].isError ?? "",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: ScreenUtil.instance.setSp(2.5),
@@ -413,11 +410,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     displayTxOffset = displayTxOffset + refreshAddCount; //每次增加refreshAddCount个
     try {
       if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress.trim() != "")) {
-        ethTxListModel = await loadEthTxHistory(fromAddress, chainType, offset: displayTxOffset.toString());
+        ethTxListModel = await loadEthTxHistory(context, fromAddress, chainType, offset: displayTxOffset.toString());
       } else if (fromAddress.trim() != "") {
-        ethTxListModel = await loadErc20TxHistory(fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
+        ethTxListModel = await loadErc20TxHistory(context, fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
       } else {
-        Fluttertoast.showToast(msg: "地址信息为空，请再检查");
+        Fluttertoast.showToast(msg: S.of(context).address_empty.toString());
       }
       print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
     } catch (onError) {
