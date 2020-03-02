@@ -39,8 +39,8 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [domain] VARCHAR(128),
     [group_name] VARCHAR(32),
     [next_id] INT,
-    [selected] VARCHAR(1),
-    [status] INT,
+    [selected] VARCHAR(1) NOT NULL DEFAULT 1,
+    [status] INT NOT NULL  DEFAULT 1,
     [more_property] VARCHAR(1),
     [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [update_time] DATETIME);
@@ -49,7 +49,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     CREATE TABLE [main].[DigitBase](
     [id] INTEGER PRIMARY KEY NOT NULL,
     [contract_address] VARCHAR(64),
-	[type] VARCHAR(32),
+	[type] INT  NOT NULL,
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(32),
     [next_id] INT,
@@ -58,7 +58,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
     [decimals] INT,
 	[unit]  VARCHAR(32),
-    [status] INT,
+    [status] INT NOT NULL  DEFAULT 0,
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [UPDATED_TIME] DATETIME);
 
@@ -88,19 +88,22 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [UPDATED_TIME] DATETIME);
 
-    insert into Chain(id,short_name,full_name,type,domain) Values(1,'BTC',"bitcoin",1,"");
-    insert into Chain(id,short_name,full_name,type,domain) Values(2,'BTC TEST',"bitcoin test",2,"");
+    insert into Chain(id,short_name,full_name,type,domain,selected) Values(1,'BTC',"bitcoin",1,"",0);
+    insert into Chain(id,short_name,full_name,type,domain,selected) Values(2,'BTC TEST',"bitcoin test",2,"",0);
     insert into Chain(id,short_name,full_name,type,domain) Values(3,'ETH',"ethereum",3,"");
     insert into Chain(id,short_name,full_name,type,domain) Values(4,'ETH TEST',"ethereum test",4,"");
     insert into Chain(id,short_name,full_name,type,domain) Values(5,'EEE',"eee",5,"");
     insert into Chain(id,short_name,full_name,type,domain) Values(6,'EEE TEST',"eee test",6,"");
   /*  update Chain set type=5,domain='eee.com' WHERE id = 5;*/
     /*digit基础数据插入EEE代币*/
-    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible') values("default","EEE","EEE",12,"EEE",1);
+    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(1,"EEE","EEE",12,"EEE",1,1);
+    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(0,"EEE Test","EEE test",12,"EEE",1,1);
     /*digit基础数据插入ETH代币*/
-    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible') values("default","ETH","ethereum",18,"ETH",1);
+    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(1,"ETH","ethereum",18,"ETH",1,1);
+    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(0,"ETH Test","ethereum test",18,"ETH",1,1);
     /*digit基础数据插入BTC代币*/
-    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible') values("default","BTC","bitcoin",18,"BTC",1);
+    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(1,"BTC","bitcoin",18,"BTC",1,1);
+    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(0,"BTC Test","bitcoin test",18,"BTC",1,1);
     COMMIT;
     PRAGMA foreign_keys = 'on';
     "#;

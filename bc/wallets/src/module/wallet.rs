@@ -264,11 +264,20 @@ pub fn export_mnemonic(wallet_id: &str, password: &[u8]) -> Result<Mnemonic, Str
 
 pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type: i64) -> Result<Wallet, String> {
 
+    //todo 不同钱包类型地址生成
     //获取助记词对应链的地址、公钥
-    let eee_address = address_from_mnemonic(mn,ChainType::EEE).expect("get eee address");
-    dbg!(eee_address.clone());
-    let eth_address = address_from_mnemonic(mn,ChainType::ETH).expect("get eth address");
-    dbg!(eth_address.clone());
+    let eee_address = if wallet_type ==1 {
+        address_from_mnemonic(mn,ChainType::EEE).expect("get eee address")
+    }else {
+        address_from_mnemonic(mn,ChainType::EeeTest).expect("get eee address")
+    };
+    log::debug!("add new wallet:{:?}",eee_address.clone());
+    let eth_address= if wallet_type==1 {
+        address_from_mnemonic(mn,ChainType::ETH).expect("get eee address")
+    }else {
+        address_from_mnemonic(mn,ChainType::EthTest).expect("get eee address")
+    };
+    log::debug!("add new wallet:{:?}",eth_address.clone());
     //进行两次hash计算
     let mut mn_digest = [0u8; 32];
     {
@@ -294,13 +303,10 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
             return Err(msg);
         }
     }
-
     let keystore = wallet_crypto::Sr25519::encrypt_mnemonic(mn, password);
-
     let wallet_id = Uuid::new_v4().to_string();
     //用于存放构造完成的地址对象
     let mut address_vec = vec![];
-
     //构造EEE链地址
     let address_eee = TbAddress {
         address_id: Uuid::new_v4().to_string(),
@@ -343,6 +349,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
 
     match dbhelper.save_wallet_address(wallet_save, address_vec) {
         Ok(_) => {
+            println!("add new wallet:{}",wallet_id);
             let wallet = dbhelper.query_by_wallet_id(wallet_id.as_str()).unwrap();
             //在保存成功后，需要将钱包数据返回回去
             Ok(Wallet {

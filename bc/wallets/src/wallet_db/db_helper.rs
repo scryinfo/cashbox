@@ -1,12 +1,15 @@
 use std::{fs, path};
 use sqlite::Connection;
 
-
+#[cfg(target_os="android")]
 const TB_WALLET: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet.db"#;
+#[cfg(target_os="android")]
 const TB_WALLET_DETAIL: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet_detail.db"#;
 
-//const TB_WALLET: &'static str = r#"cashbox_wallet.db"#;
-//const TB_WALLET_DETAIL: &'static str = r#"cashbox_wallet_detail.db"#;
+#[cfg(any(target_os="linux",target_os="windows"))]
+const TB_WALLET: &'static str = r#"cashbox_wallet.db"#;
+#[cfg(any(target_os="linux",target_os="windows"))]
+const TB_WALLET_DETAIL: &'static str = r#"cashbox_wallet_detail.db"#;
 
 fn create_teble(table_name: &str, table_desc: &str) -> Result<(), String> {
     // TODO 检查参数是否合理
@@ -47,7 +50,11 @@ fn init_digit_base_data(table_name: &str) -> Result<(), String> {
            // println!("digits:{:?}",digits);
             for digit in digits {
                 state.bind(1, digit.address.as_str()).map_err(|e| format!("set digit address,{}", e.to_string()));
-                state.bind(2, digit.digit_type.as_str()).map_err(|e| format!("set digit address,{}", e.to_string()));
+
+                let digit_type = if digit.digit_type.eq("default") {
+                    1
+                }else { 0 };
+                state.bind(2, digit_type as i64).map_err(|e| format!("set digit address,{}", e.to_string()));
                 //设置短名称
                 state.bind(3, digit.symbol.as_str()).map_err(|e| format!("set digit symbol,{}", e.to_string()));
                 //设置长名称 这里由于数据不足，短名称和长名称相同
@@ -64,6 +71,9 @@ fn init_digit_base_data(table_name: &str) -> Result<(), String> {
                 state.next();
                 state.reset();
             }
+            //设置默认代币状态
+            let update_digit_status = "update DigitBase set status =1,is_visible =1 where full_name like 'DDD';";
+            connect.execute(update_digit_status).expect("update_digit_status");
             connect.execute("commit;");
             Ok(())
         }
@@ -106,7 +116,6 @@ impl DataServiceProvider {
             if init_digit.is_err() {
                 return Err(init_digit.unwrap_err());
             }
-           // println!("init digit is over!");
         }
 
         //start connect mnemonic database
