@@ -28,6 +28,7 @@ Future<String> loadTxAccount(String address, ChainType chainType) async {
   }
 }
 
+//返回根据Eth_Unit数量级，转换后的格式
 Future<String> loadEthBalance(String address, ChainType chainType) async {
   try {
     var res = await request(assembleEthBalanceUrl(address, chainType: chainType));
@@ -42,15 +43,17 @@ Future<String> loadEthBalance(String address, ChainType chainType) async {
   return null;
 }
 
-Future<String> loadErc20Balance(String ethAddress, String contractAddress, ChainType chainType) async {
+Future<String> loadErc20Balance(String ethAddress, String contractAddress, ChainType chainType, {int decimal = 18}) async {
   try {
-    var res = await request(assembleErc20BalanceUrl(ethAddress, contractAddress: contractAddress, chainType: chainType));
+    var res = await request(assembleErc20BalanceUrl(ethAddress, contractAddress, chainType));
     print("Erc20_Balance=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
-      print("Erc20_Balance res.result.=====================>" + res["result"].toString());
-      return res["result"].toString();
+      print("Erc20_Balance res.result=====================>" + res["result"].toString());
+      String balance = ((BigInt.parse(res["result"])) / Utils.mathPow(10, decimal)).toString();
+      return balance;
     }
   } catch (e) {
+    print("e=====================>" + e.toString());
     return null;
   }
   return null;

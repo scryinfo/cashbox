@@ -73,11 +73,11 @@ const Eth_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account
 //https://api-ropsten.etherscan.io/api?module=account&action=balance&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 String assembleEthBalanceUrl(String address, {ChainType chainType = ChainType.ETH}) {
   if (chainType == ChainType.ETH_TEST) {
-    print("===================>" + Eth_MainNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
-    return Eth_MainNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
-  } else {
     print("===================>" + Eth_TestNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
     return Eth_TestNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
+  } else {
+    print("===================>" + Eth_MainNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
+    return Eth_MainNet_Balance + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
   }
 }
 
@@ -85,7 +85,8 @@ const Erc20_Balance = "https://api-cn.etherscan.com/api?module=account&action=to
 const Erc20_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=";
 //http://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0xe04f27eb70e025b78871a2ad7eabe85e61212761&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 //https://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
-String assembleErc20BalanceUrl(String address, {String contractAddress, ChainType chainType = ChainType.ETH}) {
+//https://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0x9F5F3CFD7a32700C93F971637407ff17b91c7342&address=0xc0c4824527ffb27a51034cea1e37840ed69a5f1e&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
+String assembleErc20BalanceUrl(String address, String contractAddress, ChainType chainType) {
   if (chainType == ChainType.ETH_TEST) {
     print("===================>" + Erc20_TestNet_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
     return Erc20_TestNet_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;

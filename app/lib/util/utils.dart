@@ -52,6 +52,16 @@ class Utils {
     }
     return val;
   }
+
+  //指数方法math.pow(x,y)
+  static BigInt mathPow(int x, int y) {
+    BigInt result = BigInt.from(1);
+    while (y != 0) {
+      result = result * BigInt.from(x);
+      y--;
+    }
+    return result;
+  }
 }
 
 /// 默认dialog背景色为半透明黑色，这里修改源码改为透明
