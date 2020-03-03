@@ -3,16 +3,14 @@ import 'dart:typed_data';
 import 'package:app/generated/i18n.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
-import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
-import 'package:app/routers/routers.dart';
-import 'package:app/util/log_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -667,6 +665,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 ),
               ),
               controller: _txValueController,
+              inputFormatters: [
+                WhitelistingTextInputFormatter(RegExp("[0-9]")), //只能输入汉字或者字母或数字
+              ],
             ),
           ),
         ],
@@ -689,9 +690,10 @@ class _TransferEthPageState extends State<TransferEthPage> {
             if (nonce == null || nonce.trim() == "") {
               print("取的nonce值有问题");
               Fluttertoast.showToast(msg: "取的nonce值有问题");
+              NavigatorUtils.goBack(context);
               return;
             }
-            var result = Wallets.instance.ethTxSign(
+            Map result = await Wallets.instance.ethTxSign(
                 walletId,
                 Chain.chainTypeToInt(chainType),
                 fromAddress,
@@ -700,10 +702,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 _txValueController.text,
                 _backupMsgController.text,
                 Uint8List.fromList(pwd.codeUnits),
-                mGasFeeValue.toString(),
-                mGasLimitValue.toString(),
+                mGasPriceValue.toInt().toString(),
+                mGasPriceValue.toInt().toString(),
                 nonce,
                 decimal: decimal);
+            print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"]);
             //todo 处理eth签名结果
             // NavigatorUtils.push(
             //   context,

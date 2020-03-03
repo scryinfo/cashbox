@@ -172,8 +172,10 @@ const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=prox
 //https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=0x412cf1c28a02ea8136c691e498ff97ca4ab43ae4&tag=latest&apikey=XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1
 String assembleTxAccount(String address, ChainType chainType) {
   if (chainType == ChainType.ETH) {
+    print("assembleTxAccount url===>" + Eth_Tx_Account + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
     return Eth_Tx_Account + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
   } else {
+    print("assembleTxAccount url===>" + Eth_TestNet_Tx_Account + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY);
     return Eth_TestNet_Tx_Account + address + "&tag=latest&apikey=" + ETHERSCAN_API_KEY;
   }
 }
