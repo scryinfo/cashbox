@@ -87,22 +87,34 @@ impl GetData {
     }
 
     // 获取数据
-    // 先发送FilterLoad 然后发送get_data 才可以收获过滤后的数据
     // 批量发送 block_hash
     fn get_data(&mut self, peer: PeerId) -> Result<(), Error> {
-        info!("发送getdata 消息");
         self.hash160("");
-        // todo 现在插入测试块
+        let sqlite = self.sqlite.lock().expect("sqlite open error");
+        let (block_hash, timestamp) = sqlite.init();
+        let block_hashes = sqlite.query_header(timestamp);
+        let mut inventory_vec = vec![];
+        for block_hash in block_hashes {
+            let inventory = Inventory::new(InvType::FilteredBlock, block_hash.as_str());
+            inventory_vec.push(inventory);
+        }
+
         // let inventory = Inventory::new(InvType::FilteredBlock, "000000000001b31b8a35d9b7d2e3ad7909055683b82d4a7d4029386f7149ede8");
-        let inventory = Inventory::new(InvType::FilteredBlock, "00000000000001a50f9fc434fa799b138cedc97389b074bdc598f9b097486135");
-        self.p2p.send_network(peer, NetworkMessage::GetData(vec![inventory]));
+        self.p2p.send_network(peer, NetworkMessage::GetData(inventory_vec));
         Ok(())
     }
 
-    ///模仿的headerdownload里的逻辑
     fn merkleblock(&mut self, merkleblock: &MerkleBlockMessage, peer: PeerId) -> Result<(), Error> {
         self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
-        info!("{:#?}", merkleblock);
+        let block_hash = merkleblock.bitcoin_hash().to_hex();
+        let timestamp = merkleblock.timestamp;
+        info!("got merkleblock {:?}", &block_hash);
+        info!("got merkleblock {:?}", merkleblock);
+        {
+            let sqlite = self.sqlite.lock().expect("open connection error!");
+            sqlite.update_newest_header(block_hash, timestamp.to_string());
+        }
+        self.get_data(peer)?;
         Ok(())
     }
 
