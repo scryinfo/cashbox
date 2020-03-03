@@ -51,7 +51,7 @@ android {
         debug {
             ndk {
                 //这里要加上，否则debug包会出问题,后面三个为可选，x86建议加上不然部分模拟器回报错
-                abiFilters "armeabi" ,"armeabi-v7a","arm64-v8a", "x86", "arm64"
+                abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "arm64"
             }
         }
     }
@@ -64,6 +64,22 @@ android {
 
 }
 
+// 处理support版本和build tools版本的问题，如果运行没有问题则无需配置
+/*java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object android.os.BaseBundle.get(java.lang.String)' on a null object reference
+    Rejecting re-init on previously-failed class java.lang.Class<androidx.core.view.ViewCompat$OnUnhandledKeyEventListenerWrapper>: java.lang.NoClassDefFoundError: Failed resolution of: Landroid/view/View$OnUnhandledKeyEventListener;*/
+// todo android8.0以下会有此问题。 项目里面扫描签名处出现问题
+// todo 暂未解决 下面方法未起作用
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == 'com.android.support') {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion '27.+'
+            }
+        }
+    }
+}
+
 flutter {
     source '../..'
 }
@@ -73,13 +89,12 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     /*添加依赖*/
-    implementation 'com.android.support:appcompat-v7:24.2.1'
     implementation 'com.android.support:design:24.2.1'
     implementation 'com.android.support:support-v4:24.2.1'
     implementation 'com.android.support:recyclerview-v7:24.2.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    /*java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object android.os.BaseBundle.get(java.lang.String)' on a null object reference
+    Rejecting re-init on previously-failed class java.lang.Class<androidx.core.view.ViewCompat$OnUnhandledKeyEventListenerWrapper>: java.lang.NoClassDefFoundError: Failed resolution of: Landroid/view/View$OnUnhandledKeyEventListener;*/
+    implementation 'com.android.support:appcompat-v7:27.+'
     implementation 'com.github.yuzhiqiang1993:zxing:2.2.5'
-
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
