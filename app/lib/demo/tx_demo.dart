@@ -37,7 +37,7 @@ class _TransactionDemoState extends State<TransactionDemo> {
     }
     await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     Map map = await Wallets.instance.ethTxSign(
-        "21dec360-e93e-47eb-8372-0234919bfd83",
+        "79d0dbf4-da6c-425e-b590-a3268993833f",
         //walletid
         4,
         //eth_test
