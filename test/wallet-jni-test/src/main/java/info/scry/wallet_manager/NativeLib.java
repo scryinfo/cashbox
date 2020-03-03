@@ -367,6 +367,7 @@ public class NativeLib {
         public String signedInfo;           //签名后信息
         public String energyTransferInfo;   //转能量结果hash
         public String ethSignedInfo;        //签名eth交易 所得信息
+        public String inputInfo;            //附加信息
 
         @Override
         public String toString() {
@@ -376,9 +377,13 @@ public class NativeLib {
                     ", signedInfo='" + signedInfo + '\'' +
                     ", energyTransferInfo='" + energyTransferInfo + '\'' +
                     ", ethSignedInfo='" + ethSignedInfo + '\'' +
+                    ", inputInfo='" + inputInfo + '\'' +
                     '}';
         }
     }
+
+
+
 
     //获取拼装原始交易，区分链类型
     //返回：未签名的交易 String, 格式为json格式
@@ -439,6 +444,10 @@ public class NativeLib {
     public static native boolean ethTxBroascastTx(byte[] signedTx);
 
     public static native boolean btcTxBroascastTx(byte[] signedTx);
+    //更新代币余额
+    public static native Message updateDigitBalance(String address,String digitId,String balance);
+    //解码交易附加信息
+    public static native Message decodeAdditionData(String input);
 
 }
 
