@@ -287,6 +287,22 @@ JNIEXPORT jboolean JNICALL Java_info_scry_wallet_1manager_NativeLib_ethTxBroasca
 JNIEXPORT jboolean JNICALL Java_info_scry_wallet_1manager_NativeLib_btcTxBroascastTx
   (JNIEnv *, jclass, jbyteArray);
 
+/*
+ * Class:     info_scry_wallet_manager_NativeLib
+ * Method:    updateDigitBalance
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Linfo/scry/wallet_manager/NativeLib/Message;
+ */
+JNIEXPORT jobject JNICALL Java_info_scry_wallet_1manager_NativeLib_updateDigitBalance
+  (JNIEnv *, jclass, jstring, jstring, jstring);
+
+/*
+ * Class:     info_scry_wallet_manager_NativeLib
+ * Method:    decodeAdditionData
+ * Signature: (Ljava/lang/String;)Linfo/scry/wallet_manager/NativeLib/Message;
+ */
+JNIEXPORT jobject JNICALL Java_info_scry_wallet_1manager_NativeLib_decodeAdditionData
+  (JNIEnv *, jclass, jstring);
+
 #ifdef __cplusplus
 }
 #endif
