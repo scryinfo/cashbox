@@ -104,6 +104,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 Container(
                   alignment: Alignment.centerLeft,
                   height: ScreenUtil().setHeight(8),
+                  width: ScreenUtil().setWidth(25),
                   child: Text(
                     balanceInfo ?? "0.0000",
                     textAlign: TextAlign.start,
@@ -130,17 +131,20 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   ),
                 ),
                 Gaps.scaleHGap(0.5),
-                Container(
-                  width: ScreenUtil().setWidth(15),
-                  child: Text(
-                    "≈" + "\$" + "6300.111311111",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: ScreenUtil.instance.setSp(3),
-                      color: Colors.lightBlueAccent,
+                Opacity(
+                  opacity: 1, //todo 暂时不显示 价格
+                  child: Container(
+                    width: ScreenUtil().setWidth(15),
+                    child: Text(
+                      "≈" + "\$" + "6300.111311111",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: ScreenUtil.instance.setSp(3),
+                        color: Colors.lightBlueAccent,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -295,7 +299,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         onTap: () {
           print("click tap intex is ===>" + index.toString());
           Provider.of<TransactionProvide>(context)
-            ..empty()
+            ..emptyPartialRecord()
             ..setFromAddress(ethTxListModel[index].from)
             ..setToAddress(ethTxListModel[index].to)
             ..setValue(ethTxListModel[index].value)
@@ -425,5 +429,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       this.ethTxListModel = ethTxListModel;
     });
     return ethTxListModel;
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    Provider.of<TransactionProvide>(context).emptyPartialRecord();
   }
 }

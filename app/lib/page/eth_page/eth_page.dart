@@ -97,12 +97,11 @@ class _EthPageState extends State<EthPage> {
           balance = await loadEthBalance(nowChainAddress, this.nowChain.chainType);
           print("eth balance==>" + balance.toString());
         } else {}
-        this.displayDigitsList[i].balance = balance ?? "0.00";
+        setState(() {
+          this.displayDigitsList[i].balance = balance ?? "0.00";
+        });
       }
     }
-    setState(() {
-      this.displayDigitsList = displayDigitsList;
-    });
   }
 
   Future<List<Digit>> loadDisplayDigitListData() async {

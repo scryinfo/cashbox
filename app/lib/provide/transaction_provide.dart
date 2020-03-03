@@ -20,12 +20,10 @@ class TransactionProvide with ChangeNotifier {
   String _balance;
   ChainType _chainType;
 
-  void empty() {
+  void emptyPartialRecord() {
     _toAddress = "";
     _txValue = "";
     _backup = "";
-    _digitName = "";
-    _fromAddress = "";
     _hash = "";
     _decimal = 0;
     _gas = "";
@@ -33,8 +31,6 @@ class TransactionProvide with ChangeNotifier {
     _timeStamp = "";
     _nonce = "";
     _confirmations = "";
-    _balance = "";
-    _chainType = ChainType.UNKNOWN;
   }
 
   ChainType get chainType => _chainType;
