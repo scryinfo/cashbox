@@ -5,14 +5,16 @@ use crate::{StatusCode, wallet_db};
 use crate::model::Address;
 use super::model::{TbAddress, Wallet, Mnemonic};
 use std::collections::HashMap;
-use crate::wallet_crypto::Crypto;
+use crate::wallet_crypto::{Crypto, Keccak256};
 use uuid::Uuid;
 use crate::model::wallet_store::TbWallet;
 use codec::{Encode, Decode};
 use sp_core::H256;
-use secp256k1::key::{PublicKey, SecretKey};
-use secp256k1::{Message, Secp256k1};
-use tiny_keccak::Keccak;
+
+use secp256k1::{
+    Secp256k1,
+    key::{PublicKey, SecretKey},
+};
 
 /**
   Wallet 结构说明：
@@ -21,7 +23,6 @@ use tiny_keccak::Keccak;
     一条链，在基于链的应用上，存在多个合约地址的可能
 */
 
-const DEFAULT_CHAIN_TYPE :ChainType = ChainType::ETH;
 
 fn get_wallet_info() -> HashMap<String, Wallet> {
     let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
@@ -152,11 +153,12 @@ pub fn rename_wallet(walletid: &str, wallet_name: &str) -> Result<bool, String> 
     }
 }
 
+
 //根据生成钱包的类型，需要创建对应的地址
-pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, String> {
+ fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, String> {
     let phrase = String::from_utf8(mn.to_vec()).expect("mn byte format convert to string is error!");
     // TODO 这个地方 根据支持链的种类 分别生成对应的地址
-    match wallet_type  {
+    match wallet_type {
         ChainType::EEE | ChainType::EeeTest => {
             let seed = wallet_crypto::Sr25519::seed_from_phrase(&phrase, None);
             let pair = wallet_crypto::Sr25519::pair_from_seed(&seed);
@@ -189,18 +191,16 @@ pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Addres
             };
             Ok(address)
         }
-        _ =>Err(String::from("default not impl!")),
+        _ => Err(String::from("default not impl!")),
     }
 }
+
 //从非压缩公钥生成ETH地址
- fn generate_eth_address(puk_byte: &[u8]) -> String {
-    let mut keccak = Keccak::new_keccak256();
-    let mut public_key_hash = [0u8; 32];
-    keccak.update(puk_byte);
-    keccak.finalize(&mut public_key_hash);
-    let address = hex::encode(&public_key_hash[12..]);
-    let address_final = format!("0x{}", address);
-    address_final
+fn generate_eth_address(puk_byte: &[u8]) -> String {
+    let public_key_hash = puk_byte.keccak256();
+    let address_str = hex::encode(&public_key_hash[12..]);
+    let address = format!("0x{}", address_str);
+    address
 }
 
 pub fn find_keystore_wallet_from_address(address: &str, chain_type: ChainType) -> Result<String, String> {
@@ -219,7 +219,9 @@ pub fn find_keystore_wallet_from_address(address: &str, chain_type: ChainType) -
 
 pub fn crate_mnemonic(num: u8) -> Mnemonic {
     let mnemonic = wallet_crypto::Sr25519::generate_phrase(num);
-    let mut kecck = tiny_keccak::Keccak::new_keccak256();
+    let mn_id_hash = mnemonic.as_bytes().keccak256();
+    let mnemonic_id = mn_id_hash.keccak256();
+    /*let mut kecck = tiny_keccak::Keccak::new_keccak256();
     let mut mnemonic_id_first = [0u8; 32];
     kecck.update(mnemonic.as_bytes());
     kecck.finalize(&mut mnemonic_id_first);
@@ -227,7 +229,7 @@ pub fn crate_mnemonic(num: u8) -> Mnemonic {
     let mut kecck = tiny_keccak::Keccak::new_keccak256();
     let mut mnemonic_id = [0u8; 32];
     kecck.update(&mnemonic_id_first);
-    kecck.finalize(&mut mnemonic_id);
+    kecck.finalize(&mut mnemonic_id);*/
 
     Mnemonic {
         status: StatusCode::OK,
@@ -261,104 +263,93 @@ pub fn export_mnemonic(wallet_id: &str, password: &[u8]) -> Result<Mnemonic, Str
     }
 }
 
+fn generate_chain_address(wallet_id: &str, mn: &[u8], wallet_type: i64) -> Vec<TbAddress> {
+    //获取当前钱包哪些链可用
+    let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+    let chains = instance.get_available_chain();
+    let mut address_vec = vec![];
+    for chain in chains {
+        let chian_type = ChainType::from(chain);
+        let address = match chian_type {
+            ChainType::ETH | ChainType::EEE => {
+                if wallet_type == 0 {
+                    continue;
+                }
+                address_from_mnemonic(mn, chian_type).expect("get eee address")
+            }
+            ChainType::EthTest | ChainType::EeeTest => {
+                if wallet_type == 1 {
+                    continue;
+                }
+                address_from_mnemonic(mn, chian_type).expect("get eee address")
+            }
+            _ => unimplemented!()
+        };
+        let address_temp = TbAddress {
+            address_id: Uuid::new_v4().to_string(),
+            wallet_id: wallet_id.to_string(),
+            chain_id: address.chain_type as i16,
+            address: address.addr,
+            pub_key: address.pubkey,
+            status: 1,
+            ..Default::default()
+        };
+        address_vec.push(address_temp);
+    }
+    address_vec
+}
 
 pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type: i64) -> Result<Wallet, String> {
-
-    //todo 不同钱包类型地址生成
-    //获取助记词对应链的地址、公钥
-    let eee_address = if wallet_type ==1 {
-        address_from_mnemonic(mn,ChainType::EEE).expect("get eee address")
-    }else {
-        address_from_mnemonic(mn,ChainType::EeeTest).expect("get eee address")
+    let default_chain_type = if wallet_type == 1 {
+        ChainType::ETH
+    } else {
+        ChainType::EthTest
     };
-    log::debug!("add new wallet:{:?}",eee_address.clone());
-    let eth_address= if wallet_type==1 {
-        address_from_mnemonic(mn,ChainType::ETH).expect("get eee address")
-    }else {
-        address_from_mnemonic(mn,ChainType::EthTest).expect("get eee address")
-    };
-    log::debug!("add new wallet:{:?}",eth_address.clone());
-    //进行两次hash计算
-    let mut mn_digest = [0u8; 32];
-    {
-        let mut temp = [0u8; 32];
-        let mut keccak_first = tiny_keccak::Keccak::new_keccak256();
-        keccak_first.update(mn);
-        keccak_first.finalize(&mut temp);
 
-        let mut keccak_sec = tiny_keccak::Keccak::new_keccak256();
-        keccak_sec.update(&temp);
-        keccak_sec.finalize(&mut mn_digest);
-    }
-    let hex_mn_digest = hex::encode(mn_digest);
+    //todo 数据库实例优化
     let instance = wallet_db::db_helper::DataServiceProvider::instance();
     let mut dbhelper = match instance {
         Ok(dbhelper) => dbhelper,
         Err(e) => return Err(e)
     };
     //正式链，助记词只能导入一次
+    let hex_mn_digest = hex::encode(mn.keccak256());
+
     if wallet_type == 1 {
         if dbhelper.query_by_wallet_digest(hex_mn_digest.as_str()).is_some() {
             let msg = format!("this wallet is exist");
             return Err(msg);
         }
     }
+
     let keystore = wallet_crypto::Sr25519::encrypt_mnemonic(mn, password);
     let wallet_id = Uuid::new_v4().to_string();
-    //用于存放构造完成的地址对象
-    let mut address_vec = vec![];
-    //构造EEE链地址
-    let address_eee = TbAddress {
-        address_id: Uuid::new_v4().to_string(),
-        wallet_id: wallet_id.clone(),
-        chain_id: eee_address.chain_type as i16,
-        address: eee_address.addr,
-        pub_key: eee_address.pubkey,
-        status: 1,
-        ..Default::default()
-    };
-    //构造ETH地址
-    let address_eth = TbAddress {
-        address_id: Uuid::new_v4().to_string(),
-        wallet_id: wallet_id.clone(),
-        chain_id: eth_address.chain_type as i16,
-        address: eth_address.addr,
-        pub_key: eth_address.pubkey,
-        status: 1,
-        ..Default::default()
-    };
-
-    address_vec.push(address_eee);
-    address_vec.push(address_eth);
+    let address: Vec<TbAddress> = generate_chain_address(&wallet_id, mn, wallet_type);
 
     let wallet_save = model::wallet_store::TbWallet {
         wallet_id: wallet_id.clone(),
         mn_digest: hex_mn_digest,
         full_name: Some(wallet_name.to_string()),
         mnemonic: keystore,
-        display_chain_id: DEFAULT_CHAIN_TYPE as i64,//设置默认显示链类型
+        display_chain_id: default_chain_type.clone() as i64,//设置默认显示链类型
         wallet_type,
         ..Default::default()
     };
-
     //构造助记词保存结构
     // 开启事务
     //保存助记词到数据库
     //保存公钥，地址到数据库
     //关闭事务
-
-    match dbhelper.save_wallet_address(wallet_save, address_vec) {
+    match dbhelper.save_wallet_address(wallet_save, address) {
         Ok(_) => {
-            println!("add new wallet:{}",wallet_id);
-            let wallet = dbhelper.query_by_wallet_id(wallet_id.as_str()).unwrap();
+            log::debug!("add new wallet:{}", wallet_id);
             //在保存成功后，需要将钱包数据返回回去
             Ok(Wallet {
                 status: StatusCode::OK,
-                wallet_id: wallet.wallet_id,
-                wallet_type: wallet.wallet_type,
+                wallet_id,
+                wallet_type,
                 wallet_name: Some(wallet_name.to_string()),
-                display_chain_id: wallet.display_chain_id,
-                create_time: wallet.create_time,
+                display_chain_id: default_chain_type as i64,//设置默认显示链类型
                 ..Default::default()
             })
         }
@@ -439,7 +430,7 @@ pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> Result<String, 
     match mnemonic {
         Ok(mnemonic) => {
             let mn = String::from_utf8(mnemonic.mn).unwrap();
-            let mut_data = &mut &tx_encode_data[0..tx_encode_data.len()-40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
+            let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
             let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..]).expect("UncheckedExtrinsic");
             let sign_data = wallet_rpc::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function);
             // TODO 返回签名后的消息格式需要确定

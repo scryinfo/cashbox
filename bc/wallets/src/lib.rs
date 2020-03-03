@@ -7,6 +7,10 @@ pub mod module;
 pub mod wallet_db;
 pub mod wallet_rpc;
 
+mod error;
+
+pub use error::WalletError;
+
 pub use ethtx::convert_token;
 
 #[derive(PartialEq,Clone)]
@@ -65,11 +69,10 @@ impl From<i64> for ChainType {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::wallet_crypto::Crypto;
+    use crate::wallet_crypto::{Crypto, Keccak256};
     use hex;
     use std::sync::mpsc;
     use futures::Future;
@@ -141,6 +144,14 @@ mod tests {
         let mnemonic = "cost impact napkin never sword civil shell tank sibling steel certain valve";
        let address =  module::wallet::address_from_mnemonic(mnemonic.as_bytes(),ChainType::ETH);
         assert_eq!("0x2f96570cf17258de7562b91c0ddd1ee7b95542ef",address.unwrap().addr);
+    }
+
+    #[test]
+    fn hash_test(){
+        let value = b"hello test";
+        let data = value.as_ref();
+        println!("{:?}",data.keccak256());
+
     }
 
 }
