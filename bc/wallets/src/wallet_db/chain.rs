@@ -4,9 +4,17 @@ use log::debug;
 
 impl DataServiceProvider {
 
-    pub fn get_available_chain(){
+    pub fn get_available_chain(&self)->Vec<i64>{
         //查询当前可用链类型，当前
-        let sql = 	 "select id,type from detail.chain where selected=1 and status=1;";
+        let sql = "select type from detail.chain where selected=1 and status=1;";
+
+        let mut cursor = self.db_hander.prepare(sql).unwrap().cursor();
+        let mut chain_type = Vec::new();
+        while let Some(row) = cursor.next().unwrap() {
+           let type_id =  row[0].as_integer().unwrap();
+            chain_type.push(type_id);
+        }
+        chain_type
     }
 
     pub fn display_eee_chain(&self) -> Result<Vec<WalletObj>, String> {
@@ -166,7 +174,20 @@ impl DataServiceProvider {
             Err(e) => Err(e.to_string())
         }
     }
+    pub fn update_balance(&mut self,address:&str,digit_id:&str,balance:&str)-> Result<bool, String>{
 
+        let sql = "update detail.DigitUseDetail set balance = ? where digit_id = ? and address_id = (select address_id from detail.address where address = ?);";
+        let mut state = self.db_hander.prepare(sql).unwrap();
+        state.bind(1,balance).expect("get_now_chain_type is error!");
+        state.bind(1,digit_id).expect("get_now_chain_type is error!");
+        state.bind(1,address).expect("get_now_chain_type is error!");
+        match state.cursor().next() {
+            Ok(_) => {
+                Ok(true)
+            }
+            Err(e) => Err(e.to_string())
+        }
+    }
     pub fn get_now_chain_type(&mut self, walletid: &str) -> Result<i64, String> {
         let query_sql = "select display_chain_id from Wallet where wallet_id = ?";
 

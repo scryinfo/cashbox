@@ -6,6 +6,7 @@ use crate::wallet_crypto::Crypto;
 use std::collections::HashMap;
 use ethereum_types::{H160,U256, U128};
 
+
 pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<String,String>{
 
     match module::wallet::find_keystore_wallet_from_address(from,ChainType::EEE) {
@@ -377,3 +378,20 @@ pub fn set_now_chain_type(walletid: &str,chain_type: i64) -> Result<bool, String
         Err(error) => Err(error.to_string())
     }
 }
+
+pub fn update_digit_balance(address:&str,digit_id:&str,balance:&str)-> Result<bool, String>{
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+    match instance.update_balance(address,digit_id,balance) {
+        Ok(_) => Ok(true),
+        Err(error) => Err(error.to_string())
+    }
+}
+//解析eth交易添加的附加信息
+pub fn decode_eth_data(input:&str)->Result<String,String>{
+    if input.is_empty() {
+       return Ok("".to_string());
+    }
+    ethtx::decode_tranfer_data(input)
+}
+
+

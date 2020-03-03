@@ -1,5 +1,4 @@
 use super::*;
-use serde::export::fmt::Debug;
 use std::fmt;
 
 pub mod chain;

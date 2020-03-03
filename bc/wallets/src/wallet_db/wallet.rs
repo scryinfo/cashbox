@@ -5,6 +5,7 @@ use ChainType;
 use crate::model::wallet_store::{TbAddress, WalletObj, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
 
+//根据链id,转换为对应的链类型和分组名称
 fn chain_id_convert_group_name(chain_id:i16)->Option<(i64,String)>{
     match chain_id {
         3=>Some((1,"ETH".to_string())),
@@ -46,6 +47,7 @@ impl DataServiceProvider {
 
                 match stat.next() {
                     Ok(_) => {
+
                         //检查当前钱包 是否只有一个，若是只有一个钱包，则设置它为当前钱包
                         let update_selected = format!("UPDATE Wallet set selected = ( case WHEN (SELECT count(*) FROM Wallet)==1 then 1 else 0 end ) WHERE wallet_id= '{}'", mn.wallet_id);
                         self.db_hander.execute(update_selected).expect("update selected state");
@@ -60,6 +62,7 @@ impl DataServiceProvider {
         if save_wallet_flag.is_ok() {
             let save_address_flag = match self.db_hander.prepare(address_sql) {
                 Ok(mut address_stat) => {
+                    println!("addr length is:{}",addrs.len());
                     for addr in addrs {
                         address_stat.bind(1, addr.address_id.as_str()).expect("save_mnemonic_address  bind addr.status ");
                         address_stat.bind(2, addr.wallet_id.as_str()).expect("save_mnemonic_address bind addr.mnemonic_id ");
@@ -67,30 +70,17 @@ impl DataServiceProvider {
                         address_stat.bind(4, addr.address.as_str()).expect("save_mnemonic_address bind addr.address ");
                         address_stat.bind(5, addr.pub_key.as_str()).expect("save_mnemonic_address bind addr.pub_key ");
                         address_stat.bind(6, addr.status as i64).expect("save_mnemonic_address  bind addr.status ");
-                       // address_stat.next();
                         match address_stat.next() {
                             Ok(_) => {
                                 // TODO 后续来完善需要更新的数据详情
                                 address_stat.reset();
-
-                             //
                                 // todo 处理chain_id异常
+                                println!("chain type id:{}",addr.chain_id);
                                 let convert_ret = chain_id_convert_group_name(addr.chain_id).unwrap();
+                                println!("type:{},group name:{}",convert_ret.0,convert_ret.1);
                                 let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase where status =1 and is_visible =1 and type={} and group_name = '{}';",addr.address_id,convert_ret.0,convert_ret.1);
                                 self.db_hander.execute(sql).expect("update eee digit");
 
-                              /*  if  addr.chain_id==5||addr.chain_id==6  {//添加eee 或者eee test相关地址代币
-                                    let eth_digit_account_sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id)VALUES({},'{}');",1,addr.address_id);
-                                    println!("{}",eth_digit_account_sql);
-                                    self.db_hander.execute(eth_digit_account_sql).expect("update eee digit");
-                                }
-                                if addr.chain_id==3||addr.chain_id==4 {//添加eth 或者eth test相关地址代币
-                                    let eth_digit_account_sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id)VALUES({},'{}');",2,addr.address_id);
-                                    self.db_hander.execute(eth_digit_account_sql).expect("update eth digit");
-                                    //在插入eth的时候 添加ddd 代币 //默认在每个钱包，只要启用ETH都包含这个代币
-                                    let insert_ddd_digit =  format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase a where a.contract_address like '0x9F5F3CFD7a32700C93F971637407ff17b91c7342';",addr.address_id);
-                                    self.db_hander.execute(insert_ddd_digit).expect("update eee digit");
-                                }*/
                             }
                             Err(e) => return Err(e.to_string())
                         }
@@ -101,7 +91,7 @@ impl DataServiceProvider {
             };
             if save_address_flag.is_err() {
                 // TODO 添加事务的处理
-                println!("save address error:{:?}",save_address_flag.unwrap_err());
+                log::error!("save address error:{:?}",save_address_flag.unwrap_err());
             }
         }
         Ok(())
