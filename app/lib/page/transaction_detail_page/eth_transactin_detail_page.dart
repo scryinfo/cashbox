@@ -304,10 +304,4 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
       ),
     );
   }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    Provider.of<TransactionProvide>(context).empty();
-  }
 }
