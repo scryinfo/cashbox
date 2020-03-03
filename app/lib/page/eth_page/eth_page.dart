@@ -34,7 +34,7 @@ class _EthPageState extends State<EthPage> {
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
   String moneyUnitStr = "USD";
   List<String> moneyUnitList = ["USD", "CNY", "KRW", "GBP", "JPY"];
-  List<String> chainTypeList = ["EEE"]; //"BTC", "ETH",
+  List<String> chainTypeList = ["ETH"]; //"BTC", "ETH",
   Chain nowChain;
   String nowChainAddress = "";
   String walletName = "";
@@ -60,13 +60,11 @@ class _EthPageState extends State<EthPage> {
         setState(() {
           this.nowWallet = wallet;
           this.walletName = nowWallet.walletName;
-          print("nowWallet.walletType======>" + nowWallet.walletType.toString());
           if (nowWallet.walletType == WalletType.WALLET) {
             this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
           } else {
-            this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST); //todo change chaintype
+            this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST);
           }
-          print("this.nowChain.chainType======>" + this.nowChain.chainType.toString());
           this.nowChainAddress = nowChain.chainAddress;
           this.nowChainDigitsList = nowChain.digitsList;
         });
@@ -93,11 +91,10 @@ class _EthPageState extends State<EthPage> {
         String balance;
         if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
           print(" nowChain.chainType===>" + this.nowChain.chainType.toString());
-          balance =
-              await loadErc20Balance(nowChainAddress, DddTestNetContractAddress, ChainType.ETH_TEST); //todo ChainType && ContractAddress temple test
+          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, this.nowChain.chainType);
           print("erc20 balance==>" + balance.toString());
         } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
-          balance = await loadEthBalance(nowChainAddress, ChainType.ETH_TEST); //todo ChainType temple test
+          balance = await loadEthBalance(nowChainAddress, this.nowChain.chainType);
           print("eth balance==>" + balance.toString());
         } else {}
         this.displayDigitsList[i].balance = balance ?? "0.00";
