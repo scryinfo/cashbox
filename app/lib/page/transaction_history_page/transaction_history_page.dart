@@ -283,9 +283,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             return;
           }
           var ethTxListModel = await getTxListData();
-          setState(() {
-            this.ethTxListModel = ethTxListModel;
-          });
+          if (ethTxListModel != null && ethTxListModel.length > 0) {
+            setState(() {
+              this.ethTxListModel = ethTxListModel;
+            });
+          }
         });
       },
     );
