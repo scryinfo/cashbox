@@ -14,29 +14,39 @@ public class NativeLibTest {
 
         System.out.println("********************start jni func test***************************************");
 
-       Random random = new Random(1);
-        while (NativeLib.loadAllWalletList().size()<3){
+        decodeTest();
+
+    }
+
+    public static void walletGenerateTest(){
+        Random random = new Random(1);
+        while (NativeLib.loadAllWalletList().size()<2){
             NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(12);
             System.out.println(mnemonic.mnId);
-            int  r = random.nextInt(100);
-            NativeLib.Wallet wallet =  NativeLib.saveWallet("wallet_hello"+r ,"123456".getBytes(),mnemonic.mn,1);
+            int  r = random.nextInt(1000);
+            NativeLib.Wallet wallet =  NativeLib.saveWallet("wallet_hello"+r ,"123456".getBytes(),mnemonic.mn,0);
             System.out.println(wallet.toString());
         }
+    }
+    public static void walletExportTest(){
         //钱包导出
-       List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         for (NativeLib.Wallet wallet:wallets) {
             System.out.println("wallet detail "+wallet.toString());
             NativeLib.Mnemonic mnemonic1 =  NativeLib.exportWallet(wallet.walletId,"123456".getBytes());
             System.out.println("wallet id:"+wallet.walletId+"mnemonic:"+new String(mnemonic1.mn)+",eth address:"+wallet.ethChain.address+"");
             System.out.println("\n");
         }
-        eeeTxsign();
-
     }
 
     public static void eeeTxsign(){
         String rawtx = "0x410284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d017226452e1ab7a1e8047943569deadba0d8213c2c79207c56738eb8bdb5f0883a23f158bd2ad82a02b3905e3ab8ec3138e1e8f17b2a384b2e1f20fbbfd74a16010004000600ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0b0040e59c30120100000058c346ad6597993d5fd0ba9d3dba24f630ecdef2094b303ad84eef93c49401e804000000";
         NativeLib.Message msg = NativeLib.eeeTxSign(rawtx,"77888f3c-2574-4a24-8a75-d168f6376f40","123456".getBytes());
+        System.out.println(msg.toString());
+    }
+
+    public static void decodeTest(){
+       NativeLib.Message msg =  NativeLib.decodeAdditionData("0xa9059cbb000000000000000000000000c0c4824527ffb27a51034cea1e37840ed69a5f1e00000000000000000000000000000000000000000000000000000000000a2d77646464");
         System.out.println(msg.toString());
     }
 
