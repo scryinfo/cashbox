@@ -1,10 +1,12 @@
 //! mod for bloom filter message
-use hashes::sha256d;
 use std::f64::consts::{E, LN_2};
 use hex::decode as hex_decode;
 use fasthash::murmur3;
 use std::num::Wrapping;
 use bitvec::prelude::*;
+use BitcoinHash;
+use hashes::{sha256d, Hash};
+use consensus::Encodable;
 
 
 ///the message filterload
@@ -31,18 +33,35 @@ impl_consensus_encoding!(FilterLoadMessage, filter, n_hash_functions, n_tweak, n
 /// https://en.bitcoin.it/wiki/Protocol_documentation#filterload.2C_filteradd.2C_filterclear.2C_merkleblock
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct MerkleBlockMessage {
-    version: i32,
-    prev_block: sha256d::Hash,
-    merkle_root: sha256d::Hash,
-    timestamp: u32,
-    bits: u32,
-    nonce: u32,
-    total_transactions: u32,
-    hashes: Vec<sha256d::Hash>,
-    flags: Vec<u8>,
+    ///version
+    pub version: i32,
+    ///prev_block
+    pub prev_block: sha256d::Hash,
+    ///merkleblock
+    pub merkle_root: sha256d::Hash,
+    ///timestamp
+    pub timestamp: u32,
+    ///nbits
+    pub bits: u32,
+    ///nonce
+    pub nonce: u32,
+    ///total_transactions
+    pub total_transactions: u32,
+    ///hashes in merkleblock
+    pub hashes: Vec<sha256d::Hash>,
+    ///flags vector
+    pub flags: Vec<u8>,
 }
 
 impl_consensus_encoding!(MerkleBlockMessage, version, prev_block, merkle_root, timestamp, bits, nonce, total_transactions, hashes, flags);
+
+impl BitcoinHash for MerkleBlockMessage {
+    fn bitcoin_hash(&self) -> sha256d::Hash {
+        let mut enc = sha256d::Hash::engine();
+        self.consensus_encode(&mut enc).unwrap();
+        sha256d::Hash::from_engine(enc)
+    }
+}
 
 /// max bytes in filter
 pub const BYTES_MAX: f64 = 36000f64;
@@ -171,5 +190,4 @@ mod test {
     fn calculate_filter_test() {
         FilterLoadMessage::calculate_filter("03BDBDB81926E8AFD621E7362352748FC500F81266A3F39F75450ACAE6FAA1A458");
     }
-
 }
