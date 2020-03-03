@@ -98,7 +98,6 @@ class Wallets {
         ..nowChainId = jniList[walletIndex]["nowChainId"].toString()
         ..creationTime = jniList[walletIndex]["creationTime"].toString()
         ..isNowWallet = jniList[walletIndex]["isNowWallet"];
-      //..walletType = jniList[walletIndex]["walletType"];//todo 数据格式更改
       {
         var eeeChain = jniList[walletIndex]["eeeChain"];
         Chain chainEeeM = ChainEEE();
@@ -129,7 +128,7 @@ class Wallets {
       }
       {
         //ETH
-        Chain chainEthM = ChainETH();
+        ChainETH chainEthM = ChainETH();
         var ethChain = jniList[walletIndex]["ethChain"];
         chainEthM
           ..chainId = ethChain["chainId"]
@@ -137,7 +136,6 @@ class Wallets {
           ..chainType = Chain.intToChainType(ethChain["chainType"])
           ..isVisible = true
           ..walletId = jniList[walletIndex]["walletId"];
-        //todo add digit to ETH chain
         List ethChainDigitList = ethChain["ethChainDigitList"];
         for (int j = 0; j < ethChainDigitList.length; j++) {
           Map digitInfoMap = ethChainDigitList[j];
@@ -163,7 +161,6 @@ class Wallets {
       }
 
       allWalletList.add(walletM); ////将wallet 添加到walletList里面
-
     }
 
     return allWalletList;
