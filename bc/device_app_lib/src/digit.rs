@@ -7,7 +7,7 @@ pub mod android {
     use jni::objects::{JObject, JValue,JClass,JString};
     use wallets::model::{EeeChain,BtcChain,EthChain};
     use std::os::raw::{c_uchar, c_int};
-    use jni::sys::{jint, jobject, jbyteArray};
+    use jni::sys::jobject;
 
     #[no_mangle]
     #[allow(non_snake_case)]
@@ -25,7 +25,7 @@ pub mod android {
             },
             Err(msg) => {
                 env.set_field(state_obj, "isShowDigit", "Z", JValue::Bool(0 as u8)).expect("showDigit value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
@@ -47,7 +47,7 @@ pub mod android {
             },
             Err(msg) => {
                 env.set_field(state_obj, "isHideDigit", "Z", JValue::Bool(0 as u8)).expect("showDigit value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
