@@ -2,17 +2,17 @@
 extern crate serde_derive;
 
 use ethabi::Contract;
-use std::convert::TryFrom;
 use ethereum_types::{U256, H160};
 use rlp::RlpStream;
 use secp256k1::{key::SecretKey, Message, Secp256k1};
-use bip39::{Mnemonic, MnemonicType, Language,Seed};
+use bip39::{Mnemonic, Language,Seed};
 use tiny_hderive::bip32::ExtendedPrivKey;
-use std::ops::Mul;
 
 mod contract;
 mod types;
 mod error;
+
+pub use error::Error;
 
 // 从助记词恢复私钥
 pub fn pri_from_mnemonic(phrase:&str,psd:Option<Vec<u8>>)->Vec<u8>{
@@ -41,23 +41,14 @@ impl EthTxHelper {
         }
     }
 
-    fn encode_contract_input<P>(&self, method: &str, params: P) -> Result<Vec<u8>, String> where P: contract::tokens::Tokenize {
+    fn encode_contract_input<P>(&self, method: &str, params: P) -> Result<Vec<u8>, error::Error> where P: contract::tokens::Tokenize {
         let data = self.abi.function(method).and_then(|function| {
-            for input in function.inputs.iter() {
-                println!("{:?}", input);
-            }
             function.encode_input(&params.into_tokens())
-        });
-        //let data = self.abi.unwrap().function(method).and_then(|function| function.encode_input(&params.into_tokens()));
-        match data {
-            Ok(bytes) => {
-                Ok(bytes)
-            }
-            Err(err) => Err(err.to_string())
-        }
+        })?;
+        Ok(data)
     }
 }
-pub fn get_erc20_transfer_data(address:H160,value:U256)->Result<Vec<u8>,String>{
+pub fn get_erc20_transfer_data(address:H160,value:U256)->Result<Vec<u8>,error::Error>{
     let bytecode = include_bytes!("build/Erc20.abi");
     let helper = EthTxHelper::load(&bytecode[..]);
     helper.encode_contract_input("transfer", (address, value))
@@ -194,9 +185,9 @@ struct ContractFunc{
 
 }
 //将目前只解析erc20 transfer 方法
-pub fn decode_tranfer_data(input:&str)->Result<String,String>{
+pub fn decode_tranfer_data(input:&str)->Result<String,error::Error>{
     if !input.starts_with("0x"){
-        return Err("data format error".to_string());
+        return Err(error::Error::Decoder("data format error".to_string()));
     }
     //0xa9059cbb 为transfer前缀
     //当前只解析附加数据
@@ -206,10 +197,12 @@ pub fn decode_tranfer_data(input:&str)->Result<String,String>{
     }else {
         input.get(2..).unwrap()
     };
-    match hex::decode(addition){
+    let data = hex::decode(addition)?;
+   Ok(String::from_utf8(data)?)
+  /*  match hex::decode(addition){
         Ok(data)=>String::from_utf8(data).map_err(|err| err.to_string()),
         Err(err)=>Ok(err.to_string())
-    }
+    }*/
 
     //判断是否为普通data
 /*    if input.starts_with("0xa9059cbb") {

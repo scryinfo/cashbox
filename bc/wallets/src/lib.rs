@@ -84,6 +84,7 @@ mod tests {
         let mnemonic = wallet_crypto::Sr25519::generate_phrase(18);
         let data = "substrate sign method test";
         println!("data length is:{}",data.len());
+        let s = String::new();
         let data = wallet_crypto::Ed25519::sign(&mnemonic,data.as_bytes());
         println!("{}",hex::encode(data.to_vec().as_slice()));
        // wallet_crypto::Sr25519::print_from_phrase(&mnemonic,None);

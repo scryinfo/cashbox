@@ -4,36 +4,35 @@ use super::model::*;
 use std::sync::mpsc;
 use crate::wallet_crypto::Crypto;
 use std::collections::HashMap;
-use ethereum_types::{H160,U256, U128};
+use ethereum_types::{H160, U256};
 
 
-pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<String,String>{
-
-    match module::wallet::find_keystore_wallet_from_address(from,ChainType::EEE) {
-        Ok(keystore)=>{
+pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str, psw: &[u8]) -> Result<String, WalletError> {
+    match module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE) {
+        Ok(keystore) => {
             match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过
-                    let (send_tx, recv_tx) = mpsc::channel();
+                    let (send_tx, _recv_tx) = mpsc::channel();
                     let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
                     let mn = String::from_utf8(mnemonic).unwrap();
-                    let signed_data = wallet_rpc::transfer(&mut substrate_client,  &mn,to,amount);
+                    let signed_data = wallet_rpc::transfer(&mut substrate_client, &mn, to, amount);
                     match signed_data {
-                        Ok(data)=>{
-                            println!("signed data is: {}",data);
-                           let ret_value  = wallet_rpc::submit_data(&mut substrate_client,data);
-                           let str_value = format!("{}",ret_value);
+                        Ok(data) => {
+                            log::debug!("signed data is: {}", data);
+                            let ret_value = wallet_rpc::submit_data(&mut substrate_client, data);
+                            let str_value = format!("{}", ret_value);
                             Ok(str_value)
-                        },
-                        Err(msg)=>{
-                            Err(msg)
+                        }
+                        Err(msg) => {
+                            Err(WalletError::Custom(msg))
                         }
                     }
                 }
                 Err(msg) => Err(msg),
             }
-        },
-       Err(msg)=>{Err(msg)}
+        }
+        Err(msg) => { Err(msg.into()) }
     }
 }
 
@@ -48,21 +47,20 @@ pub fn eee_tranfer_energy(from:&str,to:&str,amount:&str,psw: &[u8])->Result<Stri
 /// gasPrice 指定gas的价格
 /// data 备注消息（当交易确认后，能够在区块上查看到）
 /// chain_id: ETH的链类型
-//pub fn eth_raw_transfer_sign(from_account:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, eth_chain_id:u64) ->Result<String,String>{
-pub fn eth_raw_transfer_sign(from_address:&str, to_address:Option<H160>, amount:U256, psw: &[u8], nonce:U256, gas_limit:U256, gas_price:U256, data:Option<String>, eth_chain_id:u64) ->Result<String,String>{
+pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> Result<String, WalletError> {
     //
     match module::wallet::find_keystore_wallet_from_address(from_address, ChainType::ETH) {
-        Ok(keystore)=>{
+        Ok(keystore) => {
             match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过开始拼接交易签名数据
                     //todo 输入的数量都是整数？
-                    let data =  match data {
-                            Some(data)=>data.as_bytes().to_vec(),
-                            None=>vec![]
-                        };
+                    let data = match data {
+                        Some(data) => data.as_bytes().to_vec(),
+                        None => vec![]
+                    };
 
-                   let rawtx =  ethtx::RawTransaction{
+                    let rawtx = ethtx::RawTransaction {
                         nonce: nonce,
                         to: to_address,//针对转账操作,to不能为空,若为空表示发布合约
                         value: amount,
@@ -71,16 +69,16 @@ pub fn eth_raw_transfer_sign(from_address:&str, to_address:Option<H160>, amount:
                         data,
                     };
                     //todo 增加对错误的处理
-                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None);
+                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(), None);
 
                     //todo 增加链id ,从助记词生成私钥 secp256k1
-                   let tx_signed =  rawtx.sign(&pri_key,Some(eth_chain_id));
-                    Ok(format!("0x{}",hex::encode(tx_signed)))
+                    let tx_signed = rawtx.sign(&pri_key, Some(eth_chain_id));
+                    Ok(format!("0x{}", hex::encode(tx_signed)))
                 }
                 Err(msg) => Err(msg),
             }
-        },
-        Err(msg)=>{Err(msg)}
+        }
+        Err(msg) => { Err(msg) }
     }
 }
 
@@ -95,51 +93,51 @@ pub fn eth_raw_transfer_sign(from_address:&str, to_address:Option<H160>, amount:
 /// gasPrice 指定gas的价格
 /// data 备注消息（还需要再确认一下，当转erc20 token时 这个字段是否还有效？）
 //pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, eth_chain_id:u64) ->Result<String,String>{
-pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:H160, to_account:Option<H160>, amount:U256, psw: &[u8], nonce:U256, gas_limit:U256, gas_price:U256, data:Option<String>, eth_chain_id:u64) ->Result<String,String>{
-
-    match module::wallet::find_keystore_wallet_from_address(from_account,ChainType::ETH) {
-        Ok(keystore)=>{
+pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, to_account: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> Result<String, WalletError> {
+    //调用erc20合约 to_account 不能为空
+    if to_account.is_none() {
+        return Err(WalletError::Custom("to account is not allown empty".to_string()));
+    }
+    match module::wallet::find_keystore_wallet_from_address(from_account, ChainType::ETH) {
+        Ok(keystore) => {
             match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过
                     //todo 增加错误处理
-
                     //调用合约 是否允许transfer 目标地址为空?
-                    let mut encode_data = ethtx::get_erc20_transfer_data(to_account.unwrap(),amount).unwrap();
+                    let mut encode_data = ethtx::get_erc20_transfer_data(to_account.unwrap(), amount).unwrap();
                     //添加合约交易备注信息
                     if data.is_some() {
                         let mut addition = data.unwrap().as_bytes().to_vec();
                         encode_data.append(&mut addition);
                     }
-                    let rawtx =  ethtx::RawTransaction{
+                    let rawtx = ethtx::RawTransaction {
                         nonce: nonce,
                         to: Some(contract_address),//针对调用合约,to不能为空
                         value: U256::from_dec_str("0").unwrap(),
                         gas_price: gas_price,
                         gas: gas_limit,
-                        data:encode_data,
+                        data: encode_data,
                     };
                     //todo 增加对错误的处理
-                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(),None);
+                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(), None);
                     //todo 增加链id ,从助记词生成私钥 secp256k1
-                    let tx_signed =  rawtx.sign(&pri_key,Some(eth_chain_id));
-                    Ok(format!("0x{}",hex::encode(tx_signed)))
+                    let tx_signed = rawtx.sign(&pri_key, Some(eth_chain_id));
+                    Ok(format!("0x{}", hex::encode(tx_signed)))
                 }
                 Err(msg) => Err(msg),
             }
-        },
-        Err(msg)=>{Err(msg)}
+        }
+        Err(msg) => { Err(msg) }
     }
 }
 
-pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-
+pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, WalletError> {
+    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
     let eee_chain = instance.display_eee_chain();
     let mut last_wallet_id = String::from("-1");
     let mut chain_index = 0;
     let mut eee_map = HashMap::new();
-
     match eee_chain {
         Ok(tbwallets) => {
             for tbwallet in tbwallets {
@@ -149,18 +147,15 @@ pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
                 //不同的钱包 具有相同的链id 要增加钱包的记录
                 //同一个钱包 具有相同的链id  只要增加代币的记录
                 //同一个钱包 具有不同的链id 要增加链的记录（这种情况 业务暂时不支持，代码保留在这）
-
                 if last_wallet_id.ne(&wallet_id) {
-
                     //使用last_wallet_id 标识上一个钱包id,当钱包发生变化的时候，表示当前迭代的数据是新钱包 需要更新wallet_index，标识当前处理的是哪个钱包
                     last_wallet_id = wallet_id.clone();
-
                     let chain = EeeChain {
                         status: StatusCode::OK,
                         chain_id: chain_id.clone(),
                         wallet_id: wallet_id.clone(),
                         address: tbwallet.address.unwrap(),
-                        domain:tbwallet.domain,
+                        domain: tbwallet.domain,
                         is_visible: {
                             tbwallet.chain_is_visible
                         },
@@ -181,7 +176,6 @@ pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
                     eee_map.insert(wallet_id.clone(), vec![chain]);
                 }
                 let digit_id = format!("{}", tbwallet.digit_id.unwrap());
-                // println!("digit id is {}",digit_id);
                 let digit = EeeDigit {
                     status: StatusCode::OK,
                     digit_id: digit_id,
@@ -205,11 +199,9 @@ pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, String> {
     }
 }
 
-pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-
+pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, WalletError> {
+    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
     let eth_chain = instance.display_eth_chain();
-
     let mut last_wallet_id = String::from("-1");
     let mut chain_index = 0;
 
@@ -236,7 +228,7 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
                         chain_id: chain_id.clone(),
                         wallet_id: wallet_id.clone(),
                         address: tbwallet.address.unwrap(),
-                        domain:tbwallet.domain,
+                        domain: tbwallet.domain,
                         is_visible: tbwallet.chain_is_visible,
                         chain_type: {
                             if tbwallet.chain_type.is_none() {
@@ -256,7 +248,7 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
                     status: StatusCode::OK,
                     digit_id: digit_id,
                     chain_id: chain_id,
-                  //  address: tbwallet.address.clone(),
+                    //  address: tbwallet.address.clone(),
                     contract_address: tbwallet.contract_address.clone(),
                     fullname: tbwallet.full_name.clone(),
                     shortname: tbwallet.short_name.clone(),
@@ -272,12 +264,12 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, String> {
             }
             Ok(eth_map)
         }
-        Err(e) => Err(e)
+        Err(e) => Err(e.into())
     }
 }
 
-pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, WalletError> {
+    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
 
     let btc_chain = instance.display_btc_chain();
 
@@ -307,7 +299,7 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
                         chain_id: chain_id.clone(),
                         wallet_id: wallet_id.clone(),
                         address: tbwallet.address.unwrap(),
-                        domain:tbwallet.domain,
+                        domain: tbwallet.domain,
                         is_visible: tbwallet.chain_is_visible,
                         chain_type: {
                             if tbwallet.chain_type.is_none() {
@@ -327,7 +319,7 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
                     status: StatusCode::OK,
                     digit_id: digit_id,
                     chain_id: chain_id,
-                   // address: tbwallet.address.clone(),
+                    // address: tbwallet.address.clone(),
                     contract_address: tbwallet.contract_address.clone(),
                     fullname: tbwallet.full_name.clone(),
                     shortname: tbwallet.short_name.clone(),
@@ -343,55 +335,41 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, String> {
             }
             Ok(btc_map)
         }
-        Err(e) => Err(e)
+        Err(e) => Err(e.into())
     }
 }
 
-pub fn show_chain(walletid: &str,wallet_type: i64) -> Result<bool, String> {
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-    match instance.show_chain(walletid,wallet_type) {
-        Ok(_) => Ok(true),
-        Err(error) => Err(error.to_string())
-    }
+pub fn show_chain(walletid: &str, wallet_type: i64) -> Result<bool, WalletError> {
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+    instance.show_chain(walletid, wallet_type)
 }
 
-pub fn hide_chain(walletid: &str,wallet_type: i64) -> Result<bool, String> {
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-    match instance.hide_chain(walletid,wallet_type) {
-        Ok(_) => Ok(true),
-        Err(error) => Err(error.to_string())
-    }
+pub fn hide_chain(walletid: &str, wallet_type: i64) -> Result<bool, WalletError> {
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+    instance.hide_chain(walletid, wallet_type)
 }
 
-pub fn get_now_chain_type(walletid: &str) -> Result<i64, String> {
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-    match instance.get_now_chain_type(walletid) {
-        Ok(data) => Ok(data),
-        Err(error) => Err(error.to_string())
-    }
+pub fn get_now_chain_type(walletid: &str) -> Result<i64, WalletError> {
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+    instance.get_now_chain_type(walletid)
 }
 
-pub fn set_now_chain_type(walletid: &str,chain_type: i64) -> Result<bool, String> {
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-    match instance.set_now_chain_type(walletid,chain_type) {
-        Ok(_) => Ok(true),
-        Err(error) => Err(error.to_string())
-    }
+pub fn set_now_chain_type(walletid: &str, chain_type: i64) -> Result<bool, WalletError> {
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+    instance.set_now_chain_type(walletid, chain_type)
 }
 
-pub fn update_digit_balance(address:&str,digit_id:&str,balance:&str)-> Result<bool, String>{
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-    match instance.update_balance(address,digit_id,balance) {
-        Ok(_) => Ok(true),
-        Err(error) => Err(error.to_string())
-    }
+pub fn update_digit_balance(address: &str, digit_id: &str, balance: &str) -> Result<bool, WalletError> {
+    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+    instance.update_balance(address, digit_id, balance)
 }
+
 //解析eth交易添加的附加信息
-pub fn decode_eth_data(input:&str)->Result<String,String>{
+pub fn decode_eth_data(input: &str) -> Result<String, WalletError> {
     if input.is_empty() {
-       return Ok("".to_string());
+        return Ok("".to_string());
     }
-    ethtx::decode_tranfer_data(input)
+    ethtx::decode_tranfer_data(input).map_err(|error| error.into())
 }
 
 
