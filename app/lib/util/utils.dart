@@ -64,6 +64,15 @@ class Utils {
     }
     return result;
   }
+
+  //以以太坊地址格式，检查字符串格式是否符合. 长度42  0x开头
+  static bool checkByEthAddressFormat(String address) {
+    const ethStandardAddressLength = 42; //以太坊标准地址42位
+    if (address.isNotEmpty && (address.length == ethStandardAddressLength) && (address.toLowerCase().startsWith("0x"))) {
+      return true;
+    }
+    return false;
+  }
 }
 
 /// 默认dialog背景色为半透明黑色，这里修改源码改为透明

@@ -576,6 +576,20 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
+            case "updateDigitBalance": {
+                Log.d("nativeLib=>", "updateDigitBalance is enter =>");
+                //todo 可以考虑:不用返回是否更新成功 状态
+                Message message = new Message();
+                Log.d("nativeLib=>", (String) (call.argument("input")));
+                try {
+                    NativeLib.updateDigitBalance((String) (call.argument("address")),
+                            (String) (call.argument("digitId")), (String) (call.argument("balance"
+                            )));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "decodeAdditionData exception is " + exception);
+                }
+                break;
+            }
             default:
                 result.notImplemented();
                 break;

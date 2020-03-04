@@ -187,4 +187,9 @@ class WalletManager {
     Map<dynamic, dynamic> decodeMap = await _channel.invokeMethod("decodeAdditionData", {"input": input});
     return decodeMap;
   }
+
+  static updateDigitBalance(String address, String digitId, String balance) async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateDigitBalance", {"address": address, "digitId": digitId, "balance": balance});
+    return updateMap;
+  }
 }
