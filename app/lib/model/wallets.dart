@@ -1,5 +1,6 @@
 import 'package:app/model/wallet.dart';
 import 'package:app/util/log_util.dart';
+import 'package:app/util/utils.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 
 import 'dart:typed_data';
@@ -303,5 +304,20 @@ class Wallets {
       LogUtil.e("decodeAdditionData=>", "error status code is" + status.toString() + "||message is=>" + decodeMap["message"].toString());
     }
     return decodeMap;
+  }
+
+  //数据库 更新余额信息
+  updateDigitBalance(String address, String digitId, String balance) {
+    if (!Utils.checkByEthAddressFormat(address)) {
+      return;
+    }
+    try {
+      if (double.parse(balance) < 0) {
+        return;
+      }
+    } catch (e) {
+      LogUtil.e("updateDigitBalance=>", "error status code is" + e.toString());
+    }
+    WalletManager.updateDigitBalance(address, digitId, balance);
   }
 }

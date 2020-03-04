@@ -33,7 +33,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
   ChainType chainType;
   bool isShowExactGas = false;
   int precision = 8; //小数位精度
-  int standardAddressLength = 42; //以太坊标准地址42位
   int eth2gasUnit = 1000 * 1000 * 1000; // 1 ETH = 1e9 gwei (10的九次方) = 1e18 wei
   String Gwei = "Gwei";
   String arrowDownIcon = "assets/images/ic_expand.png";
@@ -742,9 +741,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
       Fluttertoast.showToast(msg: S.of(context).to_address_null.toString(), timeInSecForIos: 3);
       return false;
     }
-    // todo 暂时放开
-    // if (_toAddressController.text.length != standardAddressLength) {
-    //   Fluttertoast.showToast(msg: "对方地址格式 有问题",timeInSecForIos: 3);
+    // todo 暂时放开 debug不检查
+    // if (!Utils.checkByEthAddressFormat(_toAddressController.text)) {
+    //   Fluttertoast.showToast(msg: "对方地址格式 有问题", timeInSecForIos: 5);
     //   return false;
     // }
     if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
