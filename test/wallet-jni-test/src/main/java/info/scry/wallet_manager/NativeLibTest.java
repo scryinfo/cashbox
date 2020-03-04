@@ -14,7 +14,7 @@ public class NativeLibTest {
 
         System.out.println("********************start jni func test***************************************");
 
-        decodeTest();
+        eeeTxsign();
 
     }
 
@@ -41,7 +41,7 @@ public class NativeLibTest {
 
     public static void eeeTxsign(){
         String rawtx = "0x410284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d017226452e1ab7a1e8047943569deadba0d8213c2c79207c56738eb8bdb5f0883a23f158bd2ad82a02b3905e3ab8ec3138e1e8f17b2a384b2e1f20fbbfd74a16010004000600ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0b0040e59c30120100000058c346ad6597993d5fd0ba9d3dba24f630ecdef2094b303ad84eef93c49401e804000000";
-        NativeLib.Message msg = NativeLib.eeeTxSign(rawtx,"77888f3c-2574-4a24-8a75-d168f6376f40","123456".getBytes());
+        NativeLib.Message msg = NativeLib.eeeTxSign(rawtx,"72ae6480-ce42-4dff-abf6-6777f76d3203","123456".getBytes());
         System.out.println(msg.toString());
     }
 

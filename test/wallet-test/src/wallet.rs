@@ -204,7 +204,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_resetPwd(env: 
         },
         Err(msg) => {
             env.set_field(state_obj, "isResetPwd", "Z", JValue::Bool(0 as u8)).expect("set isSetNowWallet value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
@@ -261,7 +261,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_deleteWallet(e
         }
         Err(msg) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
@@ -281,7 +281,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_rename(env: JN
         }
         Err(msg) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
@@ -308,7 +308,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_exportWallet(e
             *jobj
         },
         Err(e) => {
-            let msg = env.new_string(e).unwrap();
+            let msg = env.new_string(e.to_string()).unwrap();
             let msg_obj = JObject::from(msg);
             env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");//返回数字
             env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(msg_obj)).expect("find status type is error!");//返回数字
