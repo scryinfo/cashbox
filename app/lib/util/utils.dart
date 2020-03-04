@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:app/util/log_util.dart';
+import 'package:app/widgets/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -97,4 +99,24 @@ Widget _buildMaterialDialogTransitions(BuildContext context, Animation<double> a
     ),
     child: child,
   );
+}
+
+//
+void showProgressDialog(context, message, {bool outsideDismiss: false, bool backKeyPop: true}) {
+  try {
+    showTransparentDialog(
+        context: context,
+        barrierDismissible: outsideDismiss, //点击周围，要不要取消dialog显示。进度条的选 false
+        builder: (_) {
+          return WillPopScope(
+            onWillPop: () async {
+              // 拦截到返回键，证明dialog被手动关闭
+              return Future.value(backKeyPop);
+            },
+            child: ProgressDialog(hintText: message),
+          );
+        });
+  } catch (e) {
+    LogUtil.e("showProgressDialog error is =>", e);
+  }
 }
