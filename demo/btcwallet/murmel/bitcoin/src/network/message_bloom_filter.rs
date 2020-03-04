@@ -106,7 +106,6 @@ impl FilterLoadMessage {
         //大小端序的问题，翻转一下
         data_to_hash.reverse();
 
-        println!("n_filter_bytes {:?}", &n_filter_bytes);
         for i in 0..n_hash_functions {
             let n_index = FilterLoadMessage::bloom_hash(i, &data_to_hash, n_filter_bytes);
             // Set the bit at nIndex to 1
