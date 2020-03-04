@@ -1,35 +1,38 @@
 use crate::wallet_db::db_helper::DataServiceProvider;
 use crate::model::WalletObj;
 use log::debug;
+use crate::WalletError;
 
 impl DataServiceProvider {
 
-    pub fn get_available_chain(&self)->Vec<i64>{
+    pub fn get_available_chain(&self)->Result<Vec<i64>,WalletError>{
         //查询当前可用链类型，当前
         let sql = "select type from detail.chain where selected=1 and status=1;";
 
-        let mut cursor = self.db_hander.prepare(sql).unwrap().cursor();
+        let  stat = self.db_hander.prepare(sql)?;
+        let mut cursor= stat.cursor();
         let mut chain_type = Vec::new();
-        while let Some(row) = cursor.next().unwrap() {
+        while let Some(row) = cursor.next()? {
            let type_id =  row[0].as_integer().unwrap();
             chain_type.push(type_id);
         }
-        chain_type
+        Ok(chain_type)
     }
 
-    pub fn display_eee_chain(&self) -> Result<Vec<WalletObj>, String> {
+    pub fn display_eee_chain(&self) -> Result<Vec<WalletObj>, WalletError> {
 
-        let all_mn =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
+        let all_data =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
 			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (5,6)) e,
 	 ( select * from detail.DigitUseDetail,detail.DigitBase
          where digit_id = id and group_name !='ETH' and group_name !='BTC'
          ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id;";
 
-        let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
+        let  stat = self.db_hander.prepare(all_data)?;
+        let mut cursor= stat.cursor();
         let mut tbwallets = Vec::new();
 
-        while let Some(row) = cursor.next().unwrap() {
+        while let Some(row) = cursor.next()? {
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
@@ -54,7 +57,7 @@ impl DataServiceProvider {
         Ok(tbwallets)
     }
 
-    pub fn display_eth_chain(&self) -> Result<Vec<WalletObj>, String> {
+    pub fn display_eth_chain(&self) -> Result<Vec<WalletObj>, WalletError> {
       //这个sql语句关联表较多 关联逻辑： 查询出当前钱包有效钱包，这里是不区分主链或者测试链钱包 得到一个子表 e
         // 查询出当前地址使用详情跟代币的关联情况，得到子表 d
         // 最后和表f做自然连接，根据筛选条件找出符合要求的结果
@@ -65,9 +68,10 @@ impl DataServiceProvider {
          where e.address_id = d.address_id and e.chain_id = f.id and f.status = 1;";
 
 
-        let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
+        let  stat = self.db_hander.prepare(all_mn)?;
+        let mut cursor= stat.cursor();
         let mut tbwallets = Vec::new();
-        while let Some(row) = cursor.next().unwrap() {
+        while let Some(row) = cursor.next()?{
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
@@ -92,7 +96,7 @@ impl DataServiceProvider {
         Ok(tbwallets)
     }
 
-    pub fn display_btc_chain(&self) -> Result<Vec<WalletObj>, String> {
+    pub fn display_btc_chain(&self) -> Result<Vec<WalletObj>, WalletError> {
 
         let all_mn =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
 			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
@@ -101,10 +105,11 @@ impl DataServiceProvider {
          where digit_id = id and group_name !='EEE' and group_name !='ETH'
          ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id;";
 
-        let mut cursor = self.db_hander.prepare(all_mn).unwrap().cursor();
+        let state = self.db_hander.prepare(all_mn)?;
+        let mut cursor = state.cursor();
         let mut tbwallets = Vec::new();
         debug!("get wallet item is:{}", tbwallets.len());
-        while let Some(row) = cursor.next().unwrap() {
+        while let Some(row) = cursor.next()? {
             let tbwallet = WalletObj {
                 wallet_id: row[0].as_string().map(|str| String::from(str)),
                 wallet_name: row[1].as_string().map(|str| String::from(str)),
@@ -129,102 +134,44 @@ impl DataServiceProvider {
         Ok(tbwallets)
     }
 
-    pub fn show_chain(&mut self, walletid: &str, wallet_type: i64) -> Result<(), String> {
+    pub fn show_chain(&mut self, walletid: &str, wallet_type: i64) -> Result<bool, WalletError> {
         let sql = "UPDATE Address set is_visible = 1 WHERE wallet_id=? and chain_id=?;";
-        match self.db_hander.prepare(sql) {
-            Ok(mut stat) => {
-                let bind_wallet_id = stat.bind(1, walletid).map_err(|e| format!("show_chain bind walletid,{}", e.to_string()));
-                if bind_wallet_id.is_err() {
-                    return Err(bind_wallet_id.unwrap_err());
-                }
+        let mut stat = self.db_hander.prepare(sql)?;
+         stat.bind(1, walletid)?;
+         stat.bind(2, wallet_type)?;
+         stat.next().map(|_|true).map_err(|err|err.into())
 
-                let bind_wallet_type = stat.bind(2, wallet_type).map_err(|e| format!("show_chain bind wallet_type,{}", e.to_string()));
-                if bind_wallet_type.is_err() {
-                    return Err(bind_wallet_type.unwrap_err());
-                }
-                let exec = stat.next().map_err(|e| format!("exec show_chain,{}", e.to_string()));
-                if exec.is_err() {
-                    return Err(exec.unwrap_err());
-                }
-                Ok(())
-            }
-            Err(e) => Err(e.to_string())
-        }
     }
 
-    pub fn hide_chain(&mut self, walletid: &str, wallet_type: i64) -> Result<(), String> {
+    pub fn hide_chain(&mut self, walletid: &str, wallet_type: i64) -> Result<bool, WalletError> {
         let sql = "UPDATE Address set is_visible = 0 WHERE wallet_id=? and chain_id=?;";
-        match self.db_hander.prepare(sql) {
-            Ok(mut stat) => {
-                let bind_wallet_id = stat.bind(1, walletid).map_err(|e| format!("hide_chain bind walletid,{}", e.to_string()));
-                if bind_wallet_id.is_err() {
-                    return Err(bind_wallet_id.unwrap_err());
-                }
+        let mut stat = self.db_hander.prepare(sql)?;
+        stat.bind(1, walletid)?;
+        stat.bind(2, wallet_type)?;
+        stat.next().map(|_|true).map_err(|err|err.into())
 
-                let bind_wallet_type = stat.bind(2, wallet_type).map_err(|e| format!("hide_chain bind wallet_type,{}", e.to_string()));
-                if bind_wallet_type.is_err() {
-                    return Err(bind_wallet_type.unwrap_err());
-                }
-                let exec = stat.next().map_err(|e| format!("exec hide_chain,{}", e.to_string()));
-                if exec.is_err() {
-                    return Err(exec.unwrap_err());
-                }
-                Ok(())
-            }
-            Err(e) => Err(e.to_string())
-        }
     }
-    pub fn update_balance(&mut self,address:&str,digit_id:&str,balance:&str)-> Result<bool, String>{
+    pub fn update_balance(&mut self,address:&str,digit_id:&str,balance:&str)-> Result<bool, WalletError>{
 
         let sql = "update detail.DigitUseDetail set balance = ? where digit_id = ? and address_id = (select address_id from detail.address where address = ?);";
-        let mut state = self.db_hander.prepare(sql).unwrap();
-        state.bind(1,balance).expect("get_now_chain_type is error!");
-        state.bind(1,digit_id).expect("get_now_chain_type is error!");
-        state.bind(1,address).expect("get_now_chain_type is error!");
-        match state.cursor().next() {
-            Ok(_) => {
-                Ok(true)
-            }
-            Err(e) => Err(e.to_string())
-        }
+        let mut state = self.db_hander.prepare(sql)?;
+        state.bind(1,balance)?;
+        state.bind(1,digit_id)?;
+        state.bind(1,address)?;
+        state.cursor().next().map(|_|true).map_err(|e|e.into())
     }
-    pub fn get_now_chain_type(&mut self, walletid: &str) -> Result<i64, String> {
+    pub fn get_now_chain_type(&mut self, walletid: &str) -> Result<i64, WalletError> {
         let query_sql = "select display_chain_id from Wallet where wallet_id = ?";
-
-        let mut state = self.db_hander.prepare(query_sql).unwrap();
-        state.bind(1,walletid).expect("get_now_chain_type is error!");
-
-        match state.cursor().next() {
-            Ok(value) => {
-                let data = value.unwrap();
-                Ok(data[0].as_integer().unwrap())
-            }
-            Err(e) => Err(e.to_string())
-        }
+        let mut state = self.db_hander.prepare(query_sql)?;
+        state.bind(1,walletid)?;
+        state.cursor().next().map(|value| value.unwrap()[0].as_integer().unwrap() ).map_err(|e|e.into())
     }
 
-    pub fn set_now_chain_type(&mut self, walletid: &str, chain_type: i64) -> Result<(), String> {
+    pub fn set_now_chain_type(&mut self, walletid: &str, chain_type: i64) -> Result<bool, WalletError> {
         let sql = "UPDATE Wallet set display_chain_id = ? WHERE wallet_id=?;";
-
-        match self.db_hander.prepare(sql) {
-            Ok(mut stat) => {
-                let bind_chain_type = stat.bind(1, chain_type).map_err(|e| format!("set_now_chain_type bind wallet_type,{}", e.to_string()));
-                if bind_chain_type.is_err() {
-                    return Err(bind_chain_type.unwrap_err());
-                }
-
-                let bind_wallet_id = stat.bind(2, walletid).map_err(|e| format!("set_now_chain_type bind walletid,{}", e.to_string()));
-                if bind_wallet_id.is_err() {
-                    return Err(bind_wallet_id.unwrap_err());
-                }
-
-                let exec = stat.next().map_err(|e| format!("exec set_now_chain_type,{}", e.to_string()));
-                if exec.is_err() {
-                    return Err(exec.unwrap_err());
-                }
-                Ok(())
-            }
-            Err(e) => Err(e.to_string())
-        }
+       let mut stat =  self.db_hander.prepare(sql)?;
+        stat.bind(1, chain_type)?;
+        stat.bind(2, walletid)?;
+        stat.next().map(|_|true).map_err(|err|err.into())
     }
 }

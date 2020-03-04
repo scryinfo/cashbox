@@ -185,15 +185,17 @@ pub trait Crypto {
         serde_json::to_string(&store_data).unwrap()
     }
 
-    fn get_mnemonic_context(keystore: &str, password: &[u8]) -> Result<Vec<u8>, String> {
-        let store: Result<KeyStore, _> = serde_json::from_str(keystore);
-        if store.is_err() {
+    fn get_mnemonic_context(keystore: &str, password: &[u8]) -> Result<Vec<u8>, WalletError> {
+      //  let store: Result<KeyStore, _> = serde_json::from_str(keystore);
+        let store: KeyStore = serde_json::from_str(keystore)?;
+
+        /*if store.is_err() {
             return Err("keystore convert serde_json error".into());
-        }
+        }*/
         //对称加密密钥
         let mut key = vec![0u8; 32];
 
-        let store = store.unwrap();
+      //  let store = store.unwrap();
         let crypto = store.crypto;
         let cipher = crypto.cipher;
         let kdfparams: KdfParams = crypto.kdfparams;
@@ -207,14 +209,14 @@ pub trait Crypto {
         let params = ScryptParams::new(log_n, r, p).unwrap();
         let hex_salt = kdfparams.salt;
 
-        let salt = hex::decode(hex_salt).unwrap();
+        let salt = hex::decode(hex_salt)?;
         scrypt(password, salt.as_slice(), &params, &mut key)
             .expect("32 bytes always satisfy output length requirements");
 
         //开始构造对称解密所需要的参数
         let hex_ciphertext: &str = &crypto.ciphertext;
 
-        let ciphertext = hex::decode(hex_ciphertext).unwrap();
+        let ciphertext = hex::decode(hex_ciphertext)?;
 
         //要校验输入的密钥导出的对称密钥是否正确，将导出密钥的16到32位数据，与加密后的内容拼接，计算出的摘要值与文本中保存的hash进行对比
         //let mut account_msg = [0u8;16+ciphertext.len()];
@@ -233,12 +235,12 @@ pub trait Crypto {
 
         let hex_mac = crypto.mac;
         if !hex_mac.eq(&hex::encode(hex_mac_from_password)) {
-            return Err("input password is not correct!".to_owned());
+            return Err(WalletError::Custom("input password is not correct!".to_owned()));
         }
 
         let cipherparams = &crypto.cipherparams;
         let hex_iv = &cipherparams.iv;
-        let iv = hex::decode(hex_iv).unwrap();
+        let iv = hex::decode(hex_iv)?;
 
         let cipher_method = match cipher.as_str() {
             "aes-128-ctr" => aes::EncryptMethod::Aes128Ctr,
@@ -250,7 +252,7 @@ pub trait Crypto {
         match mnemonic_content {
             Ok(mnemonic_content) => Ok(mnemonic_content),
             Err(e) => {
-                Err(e)
+                Err(WalletError::Custom(e))
             }
         }
     }
@@ -262,3 +264,4 @@ mod sr25519;
 
 pub use sr25519::Sr25519;
 pub use ed25519::Ed25519;
+use crate::WalletError;
