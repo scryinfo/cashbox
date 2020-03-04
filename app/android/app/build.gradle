@@ -69,7 +69,7 @@ android {
     Rejecting re-init on previously-failed class java.lang.Class<androidx.core.view.ViewCompat$OnUnhandledKeyEventListenerWrapper>: java.lang.NoClassDefFoundError: Failed resolution of: Landroid/view/View$OnUnhandledKeyEventListener;*/
 // todo android8.0以下会有此问题。 项目里面扫描签名处出现问题
 // todo 暂未解决 下面方法未起作用
-configurations.all {
+/*configurations.all {
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         def requested = details.requested
         if (requested.group == 'com.android.support') {
@@ -78,7 +78,7 @@ configurations.all {
             }
         }
     }
-}
+}*/
 
 flutter {
     source '../..'
@@ -95,6 +95,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     /*java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.Object android.os.BaseBundle.get(java.lang.String)' on a null object reference
     Rejecting re-init on previously-failed class java.lang.Class<androidx.core.view.ViewCompat$OnUnhandledKeyEventListenerWrapper>: java.lang.NoClassDefFoundError: Failed resolution of: Landroid/view/View$OnUnhandledKeyEventListener;*/
-    implementation 'com.android.support:appcompat-v7:27.+'
+    implementation 'com.android.support:appcompat-v7:26.+'
     implementation 'com.github.yuzhiqiang1993:zxing:2.2.5'
 }
