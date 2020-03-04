@@ -30,6 +30,7 @@ class S implements WidgetsLocalizations {
   String get backup_mnemonic => "备份助记词";
   String get backup_mnemonic_hint_info => "助记词用于恢复钱包或者重置钱包密码，将它准确抄到纸上，切记安全保存到你知道的安全地方。";
   String get backup_wallet => "备份钱包!";
+  String get balance_is_less => "当前账户余额不足！";
   String get cancel => "取消";
   String get chain_address_info => "链地址信息";
   String get change_another_group => "换一组";
@@ -154,6 +155,7 @@ class S implements WidgetsLocalizations {
   String get unknown_error_in_create_wallet => "钱包创建过程，出现未知错误，请重新尝试创建";
   String get unknown_error_in_reset_pwd => "重置密码出现位置错误，请重新打开尝试";
   String get unknown_error_in_scan_qr_code => "扫描发生未知失败，请重新尝试";
+  String get unknown_in_value => "转账数额出现位置问题，请重新检查输入的数额！";
   String get verify_backup_mnemonic => "验证备份助记词";
   String get verify_failure_to_mnemonic => "助记词验证失败，请重新检查你输入的信息";
   String get verify_mnemonic_info => "助记词确认验证";
@@ -321,6 +323,8 @@ class $zh extends S {
   @override
   String get receive => "收款";
   @override
+  String get unknown_in_value => "转账数额出现位置问题，请重新检查输入的数额！";
+  @override
   String get tx_backup => "交易备注";
   @override
   String get backup_mnemonic_hint_info => "助记词用于恢复钱包或者重置钱包密码，将它准确抄到纸上，切记安全保存到你知道的安全地方。";
@@ -440,6 +444,8 @@ class $zh extends S {
   String get mnemonic_is_not_null => "助记词不能为空";
   @override
   String get add_wallet => "添加钱包";
+  @override
+  String get balance_is_less => "当前账户余额不足！";
   @override
   String get mnemonic_backup_ok => "助记词已经记好";
   @override

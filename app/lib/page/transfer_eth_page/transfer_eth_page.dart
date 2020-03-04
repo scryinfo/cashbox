@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:app/generated/i18n.dart';
@@ -7,6 +8,7 @@ import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/routers/routers.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
@@ -47,9 +49,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
   double mMaxGasFee;
   double mMinGasFee;
   double mGasFeeValue;
+  String digitBalance = "";
   String fromAddress = "";
   String contractAddress = "";
   String digitName = "";
+  String nonce = "";
   int decimal = 0;
 
   @override
@@ -57,16 +61,18 @@ class _TransferEthPageState extends State<TransferEthPage> {
     super.initState();
   }
 
-  void initDataConfig() {
+  void initDataConfig() async {
     {
       fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
       contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
       decimal = Provider.of<TransactionProvide>(context).decimal;
       chainType = Provider.of<TransactionProvide>(context).chainType;
+      digitBalance = Provider.of<TransactionProvide>(context).balance;
     }
     _txValueController.text = Provider.of<TransactionProvide>(context).txValue ?? "";
     _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress ?? "";
     _backupMsgController.text = Provider.of<TransactionProvide>(context).backup ?? "";
+    nonce = await loadTxAccount(fromAddress, chainType);
   }
 
   @override
@@ -114,23 +120,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
     );
   }
 
-  bool _verifyTransferInfo() {
-    if (_toAddressController.text.trim() == "") {
-      Fluttertoast.showToast(msg: S.of(context).to_address_null.toString());
-      return false;
-    }
-    // todo 暂时放开
-    // if (_toAddressController.text.length != standardAddressLength) {
-    //   Fluttertoast.showToast(msg: "对方地址格式 有问题");
-    //   return false;
-    // }
-    if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
-      Fluttertoast.showToast(msg: S.of(context).tx_value_is_0.toString());
-      return false;
-    }
-    return true;
-  }
-
   Widget _buildTransferEthWidget() {
     return Container(
       width: ScreenUtil().setWidth(80),
@@ -157,7 +146,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               color: Color.fromRGBO(26, 141, 198, 0.20),
               child: FlatButton(
                 onPressed: () async {
-                  if (_verifyTransferInfo()) {
+                  if (_verifyTransferInfo() && _verifyNonce()) {
                     _showPwdDialog(context);
                   }
                 },
@@ -608,7 +597,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                           toAddressValue = t.toString();
                         });
                       }).catchError((e) {
-                        Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code);
+                        Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code, timeInSecForIos: 3);
                       });
                     },
                     child: Image.asset("assets/images/ic_scan.png"),
@@ -643,6 +632,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
             child: TextField(
               textAlign: TextAlign.start,
               style: TextStyle(color: Colors.white),
+              autofocus: false,
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
@@ -666,7 +656,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               ),
               controller: _txValueController,
               inputFormatters: [
-                WhitelistingTextInputFormatter(RegExp("[0-9]")), //只能输入汉字或者字母或数字
+                WhitelistingTextInputFormatter(RegExp("[0-9.]")), //只能输入 数字 或 小数点.
               ],
             ),
           ),
@@ -686,36 +676,88 @@ class _TransferEthPageState extends State<TransferEthPage> {
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd);
             String walletId = await Wallets.instance.getNowWalletId();
-            String nonce = await loadTxAccount(fromAddress, chainType);
-            if (nonce == null || nonce.trim() == "") {
-              print("取的nonce值有问题");
-              Fluttertoast.showToast(msg: "取的nonce值有问题");
-              NavigatorUtils.goBack(context);
-              return;
-            }
             Map result = await Wallets.instance.ethTxSign(
                 walletId,
                 Chain.chainTypeToInt(chainType),
                 fromAddress,
                 _toAddressController.text.toString(),
-                contractAddress,
+                contractAddress ?? "",
                 _txValueController.text,
                 _backupMsgController.text,
                 Uint8List.fromList(pwd.codeUnits),
                 mGasPriceValue.toInt().toString(),
-                mGasPriceValue.toInt().toString(),
+                mGasLimitValue.toInt().toString(),
                 nonce,
                 decimal: decimal);
             print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"]);
-            //todo 处理eth签名结果
-            // NavigatorUtils.push(
-            //   context,
-            //   Routes.eeePage,
-            //   clearStack: true,
-            // );
+            if (result["status"] != null && result["status"] == 200) {
+              Fluttertoast.showToast(msg: "签名成功！ 交易发送上链中", timeInSecForIos: 3);
+              sendRawTx2Chain(result["ethSignedInfo"].toString());
+            } else {
+              Fluttertoast.showToast(msg: "交易签名失败", timeInSecForIos: 5);
+              NavigatorUtils.goBack(context);
+            }
           },
         );
       },
     );
+  }
+
+  void sendRawTx2Chain(String rawTx) async {
+    NavigatorUtils.goBack(context);
+    showProgressDialog(context, "交易发送上链中");
+    String txHash = await sendRawTx(ChainType.ETH_TEST, rawTx);
+    print("after broadcast txHash is===>" + txHash);
+    if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
+      Fluttertoast.showToast(msg: "交易上链 成功", timeInSecForIos: 5);
+    } else {
+      Fluttertoast.showToast(msg: "交易上链 失败", timeInSecForIos: 5);
+    }
+    {
+      const timeout = Duration(seconds: 20);
+      Timer(timeout, () {
+        Navigator.pop(context); //让showProgressDialog弹框，至少显示两秒
+      });
+      NavigatorUtils.goBack(context);
+    }
+  }
+
+  bool _verifyNonce() {
+    if (nonce == null || nonce.trim() == "") {
+      print("取的nonce值有问题");
+      Fluttertoast.showToast(msg: "取的nonce值有问题", timeInSecForIos: 3);
+      NavigatorUtils.goBack(context);
+      return false;
+    }
+    return true;
+  }
+
+  bool _verifyTransferInfo() {
+    if (_toAddressController.text.trim() == "") {
+      Fluttertoast.showToast(msg: S.of(context).to_address_null.toString(), timeInSecForIos: 3);
+      return false;
+    }
+    // todo 暂时放开
+    // if (_toAddressController.text.length != standardAddressLength) {
+    //   Fluttertoast.showToast(msg: "对方地址格式 有问题",timeInSecForIos: 3);
+    //   return false;
+    // }
+    if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
+      Fluttertoast.showToast(msg: S.of(context).tx_value_is_0.toString(), timeInSecForIos: 3);
+      return false;
+    }
+    //判断余额 是否大于转账额度
+    if (_txValueController.text.isNotEmpty) {
+      try {
+        if (double.parse(digitBalance) < double.parse(_txValueController.text)) {
+          Fluttertoast.showToast(msg: S.of(context).balance_is_less);
+          return false;
+        }
+      } catch (e) {
+        Fluttertoast.showToast(msg: S.of(context).unknown_in_value);
+        return false;
+      }
+    }
+    return true;
   }
 }
