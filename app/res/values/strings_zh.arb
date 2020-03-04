@@ -136,5 +136,7 @@
   "to_address_null": "请检查对方地址不能为空",
   "tx_value_is_0": "转账数额不能为空，或者小于0",
   "mine_fee": "矿工费",
-  "high_setting": "高级设置"
+  "high_setting": "高级设置",
+  "balance_is_less": "当前账户余额不足！",
+  "unknown_in_value": "转账数额出现位置问题，请重新检查输入的数额！"
 }
