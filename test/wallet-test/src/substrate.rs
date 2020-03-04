@@ -18,7 +18,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTxSign(env: JNIEnv
         },
         Err(msg)=>{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set isSetNowWallet value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
@@ -40,7 +40,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeSign(env: JNIEnv, 
         },
         Err(msg)=>{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set eeeSign value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
@@ -64,7 +64,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeEnergyTransfer(env
         },
         Err(msg)=>{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set isSetNowWallet value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj

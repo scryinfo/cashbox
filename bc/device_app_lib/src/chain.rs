@@ -236,7 +236,7 @@ pub mod android {
             },
             Err(msg) => {
                 env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(0 as u8)).expect("set isShowChain value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
@@ -257,7 +257,7 @@ pub mod android {
             },
             Err(msg) => {
                 env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
@@ -279,7 +279,7 @@ pub mod android {
             },
             Err(msg)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set message");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
             }
         }
         *state_obj
@@ -301,7 +301,7 @@ pub mod android {
             },
             Err(msg)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set message");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
             }
         }
         *state_obj
@@ -320,7 +320,7 @@ pub mod android {
             },
             Err(msg) => {
                 //env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
@@ -340,7 +340,7 @@ pub mod android {
             },
             Err(msg) => {
                 env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(0 as u8)).expect("isSetNowChain");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set message");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
             }
         }
         *state_obj
@@ -436,7 +436,7 @@ pub mod android {
             },
             Err(msg) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set status");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set message");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
             }
         }
         *state_obj

@@ -19,7 +19,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_showDigit(env:
         },
         Err(msg) => {
             env.set_field(state_obj, "isShowDigit", "Z", JValue::Bool(0 as u8)).expect("showDigit value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
@@ -41,7 +41,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideDigit(env:
         },
         Err(msg) => {
             env.set_field(state_obj, "isHideDigit", "Z", JValue::Bool(0 as u8)).expect("showDigit value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
