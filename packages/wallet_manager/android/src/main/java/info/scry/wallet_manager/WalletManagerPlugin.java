@@ -491,13 +491,19 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "ethTxSign": {
                 Log.d("nativeLib=>", "ethTxSign is enter =>");
                 Message message = new Message();
-                Log.d("nativeLib=>", "ethTxSign is enter =>"+(call.argument("mnId")).toString());
-                Log.d("nativeLib=>", "ethTxSign is enter =>"+(call.argument("chainType")).toString());
-                Log.d("nativeLib=>", "ethTxSign is enter =>"+(call.argument("fromAddress")).toString());
-                Log.d("nativeLib=>", "ethTxSign is enter =>"+(call.argument("toAddress")).toString());
-                Log.d("nativeLib=>", "ethTxSign is enter =>"+(call.argument("contractAddress")).toString());
-                Log.d("nativeLib=>", "ethTxSign is enter =>"+(call.argument("gasPrice")).toString());
-                Log.d("nativeLib=>", "ethTxSign is enter =>"+(call.argument("gasLimit")).toString());
+                Log.d("nativeLib=>", "ethTxSign is enter =>" + (call.argument("mnId")).toString());
+                Log.d("nativeLib=>",
+                        "ethTxSign is enter =>" + (call.argument("chainType")).toString());
+                Log.d("nativeLib=>",
+                        "ethTxSign is enter =>" + (call.argument("fromAddress")).toString());
+                Log.d("nativeLib=>",
+                        "ethTxSign is enter =>" + (call.argument("toAddress")).toString());
+                Log.d("nativeLib=>",
+                        "ethTxSign is enter =>" + (call.argument("contractAddress")).toString());
+                Log.d("nativeLib=>",
+                        "ethTxSign is enter =>" + (call.argument("gasPrice")).toString());
+                Log.d("nativeLib=>",
+                        "ethTxSign is enter =>" + (call.argument("gasLimit")).toString());
                 message = NativeLib.ethTxSign((String) (call.argument("mnId")),
                         (int) (call.argument("chainType")),
                         (String) (call.argument("fromAddress")),
@@ -541,6 +547,28 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 if (message.status == 200) {
                     resultMap.put("signedInfo", message.signedInfo);
                     Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
+                } else {
+                    resultMap.put("message", message.message);
+                    Log.d("nativeLib=>", "message.message is " + message.message.toString());
+                }
+                result.success(resultMap);
+                break;
+            }
+            case "decodeAdditionData": {
+                Log.d("nativeLib=>", "decodeAdditionData is enter =>");
+                Message message = new Message();
+                Log.d("nativeLib=>", (String) (call.argument("input")));
+                try {
+                    message = NativeLib.eeeSign((String) (call.argument("input")));
+                } catch (Exception exception) {
+                    Log.d("nativeLib=>", "decodeAdditionData exception is " + exception);
+                }
+                Log.d("nativeLib=>", "message.status is " + message.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                if (message.status == 200) {
+                    resultMap.put("inputInfo", message.inputInfo);
+                    Log.d("nativeLib=>", "message.inputInfo is " + message.inputInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
                     Log.d("nativeLib=>", "message.message is " + message.message.toString());

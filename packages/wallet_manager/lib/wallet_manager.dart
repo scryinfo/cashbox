@@ -182,4 +182,9 @@ class WalletManager {
     Map<dynamic, dynamic> eeeTxSignMap = await _channel.invokeMethod("eeeSign", {"rawTx": rawTx, "mnId": walletId, "pwd": pwd});
     return eeeTxSignMap;
   }
+
+  static decodeAdditionData(String input) async {
+    Map<dynamic, dynamic> decodeMap = await _channel.invokeMethod("decodeAdditionData", {"input": input});
+    return decodeMap;
+  }
 }

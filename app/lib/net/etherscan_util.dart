@@ -2,6 +2,7 @@ import 'package:app/generated/i18n.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
+import 'package:app/model/wallets.dart';
 import 'package:app/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
@@ -79,13 +80,22 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
           ..gasPrice = res["result"][i]["gasPrice"]
           ..isError = res["result"][i]["isError"]
           ..txreceipt_status = res["result"][i]["txreceipt_status"]
-          ..input = res["result"][i]["input"]
           ..contractAddress = res["result"][i]["contractAddress"]
           ..cumulativeGasUsed = res["result"][i]["cumulativeGasUsed"]
           ..gasUsed = res["result"][i]["gasUsed"]
           ..confirmations = res["result"][i]["confirmations"];
+        ethTxModel.input = res["result"][i]["input"].toString();
+        /* todo 等动态库实现decodeAdditionData 接口后放开
+        try {
+          Map map = await Wallets.instance.decodeAdditionData(res["result"][i]["input"].toString());
+          if (map != null && (map["status"] == 200)) {
+            ethTxModel.input = map["inputInfo"].toString();
+          }
+        } catch (e) {
+          ethTxModel.input = "";
+          print("etherScanUtil happen error===>" + e.toString());
+        }*/
         ethTxModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
-
         if (res["result"][i]["from"].trim().toLowerCase() == address.trim().toLowerCase()) {
           ethTxModel.value = "-" + (int.parse(res["result"][i]["value"]) / Eth_Unit).toString();
         } else {

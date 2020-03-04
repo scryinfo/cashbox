@@ -292,4 +292,16 @@ class Wallets {
     }
     return eeeTxSignMap;
   }
+
+  Future<Map> decodeAdditionData(String inputData) async {
+    if (inputData == null || inputData.trim() == "") {
+      return null;
+    }
+    Map decodeMap = await WalletManager.decodeAdditionData(inputData);
+    int status = decodeMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("decodeAdditionData=>", "error status code is" + status.toString() + "||message is=>" + decodeMap["message"].toString());
+    }
+    return decodeMap;
+  }
 }
