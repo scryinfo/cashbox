@@ -8,7 +8,7 @@ import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
-import 'package:app/routers/routers.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
   TextEditingController _toAddressController = TextEditingController();
   TextEditingController _txValueController = TextEditingController();
   TextEditingController _backupMsgController = TextEditingController();
-  String toAddressValue;
   ChainType chainType;
   bool isShowExactGas = false;
   int precision = 8; //小数位精度
@@ -139,27 +138,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
             Gaps.scaleVGap(3),
             _buildHideDetailWidget(),
             Gaps.scaleVGap(15),
-            Container(
-              alignment: Alignment.bottomCenter,
-              width: ScreenUtil().setWidth(41),
-              height: ScreenUtil().setHeight(9),
-              color: Color.fromRGBO(26, 141, 198, 0.20),
-              child: FlatButton(
-                onPressed: () async {
-                  if (_verifyTransferInfo() && _verifyNonce()) {
-                    _showPwdDialog(context);
-                  }
-                },
-                child: Text(
-                  S.of(context).click_to_transfer,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.blue,
-                    letterSpacing: 0.03,
-                  ),
-                ),
-              ),
-            ),
+            _buildTransferBtnWidget(),
           ],
         ),
       ),
@@ -273,7 +252,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                       S.of(context).high_setting.toString(),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.8),
-                        fontSize: ScreenUtil.instance.setSp(2.3),
+                        fontSize: ScreenUtil.instance.setSp(2.5),
                       ),
                     ),
                   ),
@@ -560,7 +539,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
                         top: ScreenUtil().setHeight(5),
                         bottom: ScreenUtil().setHeight(5),
                       ),
-                      labelText: toAddressValue,
                       labelStyle: TextStyle(
                         color: Colors.white,
                         height: ScreenUtil().setHeight(40),
@@ -583,24 +561,27 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 ),
                 Container(
                   //color: Colors.blue,
+                  //width: ScreenUtil.getInstance().setWidth(13),
                   alignment: Alignment.bottomRight,
                   height: ScreenUtil().setHeight(12),
                   padding: EdgeInsets.only(
-                    bottom: ScreenUtil().setHeight(3),
-                    right: ScreenUtil().setWidth(3),
+                    bottom: ScreenUtil().setHeight(1),
+                    right: ScreenUtil().setWidth(1),
                   ),
-                  child: GestureDetector(
-                    onTap: () async {
-                      Future<String> qrResult = QrScanUtil.instance.qrscan();
-                      qrResult.then((t) {
+                  child: IconButton(
+                    onPressed: () async {
+                      try {
+                        String qrResult = await QrScanUtil.instance.qrscan();
+                        print("qrResult===>" + qrResult.toString());
                         setState(() {
-                          toAddressValue = t.toString();
+                          _toAddressController.text = qrResult.toString();
                         });
-                      }).catchError((e) {
+                      } catch (e) {
+                        LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
                         Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code, timeInSecForIos: 3);
-                      });
+                      }
                     },
-                    child: Image.asset("assets/images/ic_scan.png"),
+                    icon: Image.asset("assets/images/ic_scan.png"),
                   ),
                 ),
               ],
@@ -661,6 +642,30 @@ class _TransferEthPageState extends State<TransferEthPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTransferBtnWidget() {
+    return Container(
+      alignment: Alignment.bottomCenter,
+      width: ScreenUtil().setWidth(41),
+      height: ScreenUtil().setHeight(9),
+      color: Color.fromRGBO(26, 141, 198, 0.20),
+      child: FlatButton(
+        onPressed: () async {
+          if (_verifyTransferInfo() && _verifyNonce()) {
+            _showPwdDialog(context);
+          }
+        },
+        child: Text(
+          S.of(context).click_to_transfer,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.blue,
+            letterSpacing: 0.03,
+          ),
+        ),
       ),
     );
   }
