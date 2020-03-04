@@ -232,7 +232,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_showChain(env:
         },
         Err(msg) => {
             env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(0 as u8)).expect("set isShowChain value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
@@ -253,7 +253,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideChain(env:
         },
         Err(msg) => {
             env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
@@ -272,7 +272,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowChainTyp
         },
         Err(msg) => {
             //env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
         }
     }
     *state_obj
@@ -292,7 +292,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_setNowChainTyp
         },
         Err(msg) => {
             env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(0 as u8)).expect("isSetNowChain");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set message");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
         }
     }
     *state_obj
@@ -315,7 +315,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDigitBal
         },
         Err(msg)=>{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set message");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
         }
     }
     *state_obj
@@ -337,7 +337,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAddition
         },
         Err(msg)=>{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set message");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
         }
     }
     *state_obj
@@ -434,7 +434,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env:
         },
         Err(msg)=>{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set message");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
         }
     }
     *state_obj

@@ -26,6 +26,8 @@ pub enum Error {
     /// web3 internal error
     #[display(fmt = "Internal Web3 error")]
     Internal,
+
+
 }
 
 impl std::error::Error for Error {
@@ -43,6 +45,31 @@ impl From<SerdeError> for Error {
         Error::Decoder(format!("{:?}", err))
     }
 }
+
+impl  From<ethabi::Error> for Error{
+    fn from(err: ethabi::Error) -> Self {
+        Error::Decoder(format!("{:?}", err))
+    }
+}
+
+impl From<hex::FromHexError> for Error{
+    fn from(err: hex::FromHexError) -> Self {
+        Error::Decoder(format!("{:?}", err))
+    }
+}
+impl From<std::string::FromUtf8Error> for Error{
+    fn from(err: std::string::FromUtf8Error) -> Self {
+        Error::Decoder(format!("{:?}", err))
+    }
+}
+
+/*
+impl From<std::string::FromUtf8Error> for Error {
+    fn from(err: std::string::FromUtf8Error) -> Self {
+        Error::Utf8(err)
+    }
+}
+*/
 
 impl Clone for Error {
     fn clone(&self) -> Self {
