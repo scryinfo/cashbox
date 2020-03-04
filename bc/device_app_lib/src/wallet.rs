@@ -218,7 +218,7 @@ pub mod android {
             },
             Err(msg) => {
                 env.set_field(state_obj, "isResetPwd", "Z", JValue::Bool(0 as u8)).expect("set isSetNowWallet value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
@@ -275,7 +275,7 @@ pub mod android {
             }
             Err(msg) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
@@ -295,7 +295,7 @@ pub mod android {
             }
             Err(msg) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }
         *state_obj
@@ -322,8 +322,7 @@ pub mod android {
                 *jobj
             },
             Err(e) => {
-                let msg = env.new_string(e).unwrap();
-                let msg_obj = JObject::from(msg);
+                let msg_obj = JObject::from(env.new_string(e.to_string()).unwrap());
                 env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");//返回数字
                 env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(msg_obj)).expect("find status type is error!");//返回数字
                 *jobj
