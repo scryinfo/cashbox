@@ -94,15 +94,9 @@ class _EthPageState extends State<EthPage> {
           setState(() {
             print("this.displayDigitsList[i].shortName=>" + rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["price"].toString());
             this.displayDigitsList[i].digitRate
-              ..name = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["name"]
-              ..symbol = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["symbol"]
-              ..price = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["price"]
-              ..high = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["high"]
-              ..low = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["low"]
-              ..histHigh = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["histHigh"]
-              ..timestamps = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["timestamps"]
-              ..volume = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["volume"]
-              ..changeHourly = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["changeHourly"];
+              ..price = rate.getPrice(this.displayDigitsList[i])
+              ..changeHourly = rate.getChangeHourly(this.displayDigitsList[i]);
+            //this.displayDigitsList[i].money = rate.getMoney(this.displayDigitsList[i]).toString();
           });
         } else {
           print("digitName is not exist===>" + this.displayDigitsList[i].shortName);
@@ -352,7 +346,7 @@ class _EthPageState extends State<EthPage> {
                               Align(
                                 alignment: FractionalOffset.topRight,
                                 child: Text(
-                                  "≈" + moneyUnitStr + " " + "0",
+                                  "≈" + moneyUnitStr + " " + (displayDigitsList[index].money ?? "0.0"),
                                   //"≈" + displayDigitsList[index].money,
                                   style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
                                 ),
