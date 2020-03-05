@@ -127,6 +127,7 @@ class _EthPageState extends State<EthPage> {
         } else {}
         setState(() {
           this.displayDigitsList[i].balance = balance ?? "0.00";
+          this.displayDigitsList[i].money = Rate.instance.getMoney(this.displayDigitsList[i]).toStringAsFixed(4);
         });
       }
     }
@@ -167,8 +168,7 @@ class _EthPageState extends State<EthPage> {
         ..balance = nowChainDigitsList[i].balance
         ..contractAddress = nowChainDigitsList[i].contractAddress
         ..address = nowChainDigitsList[i].address
-        ..digitRate = digitRate; //todo
-      //..money =  nowChainDigitsList[i].money;
+        ..digitRate = digitRate;
       displayDigitsList.add(digit);
     }
     return displayDigitsList;
@@ -345,10 +345,15 @@ class _EthPageState extends State<EthPage> {
                               ),
                               Align(
                                 alignment: FractionalOffset.topRight,
-                                child: Text(
-                                  "≈" + moneyUnitStr + " " + (displayDigitsList[index].money ?? "0.0"),
-                                  //"≈" + displayDigitsList[index].money,
-                                  style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
+                                child: Container(
+                                  width: ScreenUtil.instance.setWidth(20),
+                                  child: Text(
+                                    "≈" + moneyUnitStr + " " + (displayDigitsList[index].money ?? "0.0"),
+                                    maxLines: 1,
+                                    softWrap: true,
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
+                                  ),
                                 ),
                               ),
                             ],
