@@ -559,7 +559,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Message message = new Message();
                 Log.d("nativeLib=>", (String) (call.argument("input")));
                 try {
-                    message = NativeLib.eeeSign((String) (call.argument("input")));
+                    message = NativeLib.decodeAdditionData((String) (call.argument("input")));
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "decodeAdditionData exception is " + exception);
                 }
