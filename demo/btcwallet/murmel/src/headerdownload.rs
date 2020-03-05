@@ -55,8 +55,6 @@ impl HeaderDownload {
     }
 
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
-        //let sqlite = SQLite::open_db();
-        //sqlite.init();
         loop {
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
                 if let Err(e) = match msg {
