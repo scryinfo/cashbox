@@ -43,6 +43,7 @@ impl GetData {
 
     //循环处理消息
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
+        let hash160 = self.hash160("");
         loop {
             //这个方法是消息接收端，也就是channel的一个出口，Message的一个消耗端
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
@@ -63,9 +64,13 @@ impl GetData {
                     PeerMessage::Incoming(pid, msg) => {
                         match msg {
                             // 接受数据的地方
-                            // 根据bip37 发送filter 发送getdata 接受到merkleblock 和 tx 所以这里处理merkleblock 和 tx
+                            NetworkMessage::Headers(ref headers) => { //
+                                //hooks
+                                self.get_data(pid).expect("get_data failed");
+                                Ok(())
+                            }
                             NetworkMessage::MerkleBlock(ref merkleblock) => if self.is_serving_blocks(pid) { self.merkleblock(merkleblock, pid) } else { Ok(()) },
-                            NetworkMessage::Tx(ref tx) => if self.is_serving_blocks(pid) { self.tx(tx, pid) } else { Ok(()) },
+                            NetworkMessage::Tx(ref tx) => if self.is_serving_blocks(pid) { self.tx(tx, pid, hash160.clone()) } else { Ok(()) },
                             NetworkMessage::Ping(_) => { Ok(()) }
                             _ => { Ok(()) }
                         }
@@ -89,16 +94,17 @@ impl GetData {
     // 获取数据
     // 批量发送 block_hash
     fn get_data(&mut self, peer: PeerId) -> Result<(), Error> {
-        self.hash160("");
         let sqlite = self.sqlite.lock().expect("sqlite open error");
         let (block_hash, timestamp) = sqlite.init();
         let block_hashes = sqlite.query_header(timestamp);
+        if block_hashes.len() == 0 {
+            return Ok(());
+        }
         let mut inventory_vec = vec![];
         for block_hash in block_hashes {
             let inventory = Inventory::new(InvType::FilteredBlock, block_hash.as_str());
             inventory_vec.push(inventory);
         }
-
         // let inventory = Inventory::new(InvType::FilteredBlock, "000000000001b31b8a35d9b7d2e3ad7909055683b82d4a7d4029386f7149ede8");
         self.p2p.send_network(peer, NetworkMessage::GetData(inventory_vec));
         Ok(())
@@ -106,10 +112,10 @@ impl GetData {
 
     fn merkleblock(&mut self, merkleblock: &MerkleBlockMessage, peer: PeerId) -> Result<(), Error> {
         self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
-        let block_hash = merkleblock.bitcoin_hash().to_hex();
+        let block_hash = merkleblock.prev_block.to_hex();
         let timestamp = merkleblock.timestamp;
-        info!("got merkleblock {:?}", &block_hash);
-        info!("got merkleblock {:?}", merkleblock);
+
+        println!("got merkleblock {:?}", merkleblock);
         {
             let sqlite = self.sqlite.lock().expect("open connection error!");
             sqlite.update_newest_header(block_hash, timestamp.to_string());
@@ -119,28 +125,36 @@ impl GetData {
     }
 
     ///处理tx返回值
-    fn tx(&mut self, tx: &Transaction, peer: PeerId) -> Result<(), Error> {
-        info!("Tx {:#?}", tx.clone());
+    fn tx(&mut self, tx: &Transaction, peer: PeerId, hash160: String) -> Result<(), Error> {
+        let sqlite = self.sqlite.lock().expect("open connection error!");
+        println!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
-        info!("tx_hash {:#?}", &tx_hash);
         let vouts = tx.clone().output;
-        let index = 0;
+        let mut index = 0;
         for vout in vouts {
+            index += 1;
             let script = vout.script_pubkey;
             if script.is_p2sh() {
                 let asm = script.asm();
-                println!("tx script_pubkey asm {:?}", asm);
+                let mut iter = asm.split_ascii_whitespace();
+                iter.next();
+                iter.next();
+                let current_hash = iter.next().unwrap_or(" ");
+                if current_hash.eq(hash160.as_str()) {
+                    sqlite.insert_utxo(tx_hash.to_hex(), asm.clone(), vout.value.to_string(), index);
+                }
             }
         }
         Ok(())
     }
 
     ///计算hash160
-    fn hash160(&self, public_key: &str) {
+    fn hash160(&self, public_key: &str) -> String {
         // 公钥 66位
         let public_key = "0291EE52A0E0C22DB9772F237F4271EA6F9330D92B242FB3C621928774C560B699";
         let decode: Vec<u8> = FromHex::from_hex(public_key).expect("Invalid public key");
         let hash = hash160::Hash::hash(&decode[..]);
-        warn!("hash 160{:?}", hash.to_hex());
+        warn!("HASH160 {:?}", hash.to_hex());
+        hash.to_hex()
     }
 }
