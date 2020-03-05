@@ -71,7 +71,7 @@ impl SQLite {
     //查询未扫描区块头 返回相应数据 以时间戳为依据
     pub fn query_header(&self, timestamp: String) -> Vec<String> {
         let mut statement = self.connection.prepare(
-            "SELECT * FROM block_hash WHERE timestamp >= ? LIMIT 2000"
+            "SELECT * FROM block_hash WHERE timestamp >= ? LIMIT 30000"
         ).expect("query_header PREPARE ERR");
         statement.bind(
             1,
@@ -82,7 +82,7 @@ impl SQLite {
             let block_hash = statement.read::<String>(0).unwrap();
             block_hashes.push(block_hash);
         }
-        println!("block_hash vec {:?}",block_hashes.clone());
+        //println!("block_hash vec {:?}",block_hashes.clone());
         block_hashes
     }
 

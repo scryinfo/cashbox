@@ -49,14 +49,13 @@ impl GetData {
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
-                        if self.is_serving_blocks(pid) {
+                        // if self.is_serving_blocks(pid) {
                             trace!("serving blocks peer={}", pid);
                             //发起请求 GetData
-                            //这个地方应该不需要循环请求 但是先这样
                             self.get_data(pid)
-                        } else {
-                            Ok(())
-                        }
+                        // } else {
+                        //     Ok(())
+                        // }
                     }
                     PeerMessage::Disconnected(_, _) => {
                         Ok(())
@@ -97,9 +96,7 @@ impl GetData {
         let sqlite = self.sqlite.lock().expect("sqlite open error");
         let (block_hash, timestamp) = sqlite.init();
         let block_hashes = sqlite.query_header(timestamp);
-        if block_hashes.len() == 0 {
-            return Ok(());
-        }
+
         let mut inventory_vec = vec![];
         for block_hash in block_hashes {
             let inventory = Inventory::new(InvType::FilteredBlock, block_hash.as_str());
