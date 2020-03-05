@@ -71,7 +71,7 @@ impl SQLite {
     //查询未扫描区块头 返回相应数据 以时间戳为依据
     pub fn query_header(&self, timestamp: String) -> Vec<String> {
         let mut statement = self.connection.prepare(
-            "SELECT * FROM block_hash WHERE timestamp >= ? LIMIT 200"
+            "SELECT * FROM block_hash WHERE timestamp >= ? LIMIT 2000"
         ).expect("query_header PREPARE ERR");
         statement.bind(
             1,
@@ -82,7 +82,7 @@ impl SQLite {
             let block_hash = statement.read::<String>(0).unwrap();
             block_hashes.push(block_hash);
         }
-        println!("block_hash vec {:#?}",block_hashes.clone());
+        println!("block_hash vec {:?}",block_hashes.clone());
         block_hashes
     }
 
@@ -123,13 +123,13 @@ impl SQLite {
     }
 
     //存储 utxo
-    pub fn insert_utxo(&self, txhash: String, script: String, value: f64, vout: i64) {
+    pub fn insert_utxo(&self, txhash: String, script: String, value: String, vout: i64) {
         let mut statement = self.connection.prepare(
             "INSERT INTO utxo VALUES(?,?,?,?)"
         ).expect("insert utxo error");
         statement.bind(1, txhash.as_str()).expect("bind statement error");
         statement.bind(2, script.as_str()).expect("bind statement error");
-        statement.bind(3, value).expect("bind statement error");
+        statement.bind(3, value.as_str()).expect("bind statement error");
         statement.bind(4, vout).expect("bind statement error");
         statement.next().expect("insert utxos error");
     }
