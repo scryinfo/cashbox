@@ -1,11 +1,11 @@
 import 'package:app/generated/i18n.dart';
-import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
+import 'package:app/net/rate_util.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -76,6 +76,40 @@ class _EthPageState extends State<EthPage> {
     });
     future = loadDisplayDigitListData();
     loadDigitBalance();
+    loadDigitRateInfo();
+  }
+
+  loadDigitRateInfo() async {
+    if (displayDigitsList.length == 0) {
+      return;
+    } else {
+      Rate rate = await loadDigitRate();
+      if (rate == null) {
+        return;
+      }
+      for (var i = 0; i < displayDigitsList.length; i++) {
+        print("rate.digitRateMap.length ===>" + rate.digitRateMap.length.toString());
+        if (this.displayDigitsList[i].shortName.toUpperCase() != null &&
+            (rate.digitRateMap.containsKey(this.displayDigitsList[i].shortName.toUpperCase()))) {
+          setState(() {
+            print("this.displayDigitsList[i].shortName=>" + rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["price"].toString());
+            this.displayDigitsList[i].digitRate
+              ..name = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["name"]
+              ..symbol = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["symbol"]
+              ..price = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["price"]
+              ..high = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["high"]
+              ..low = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["low"]
+              ..histHigh = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["histHigh"]
+              ..timestamps = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["timestamps"]
+              ..volume = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["volume"]
+              ..changeHourly = rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["changeHourly"];
+          });
+        } else {
+          print("digitName is not exist===>" + this.displayDigitsList[i].shortName);
+          LogUtil.w("digitName is not exist===>", this.displayDigitsList[i].shortName);
+        }
+      }
+    }
   }
 
   loadDigitBalance() async {
@@ -130,9 +164,6 @@ class _EthPageState extends State<EthPage> {
   List<Digit> addDigitToDisplayList(int targetCount) {
     for (var i = displayDigitsList.length; i < targetCount; i++) {
       var digitRate = DigitRate();
-      digitRate.volume = 0.035;
-      digitRate.changeHourly = 0.096;
-
       Digit digit = EthDigit();
       digit
         ..chainId = nowChainDigitsList[i].chainId
@@ -342,7 +373,7 @@ class _EthPageState extends State<EthPage> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    displayDigitsList[index].digitRate.price ?? "0", //市场单价
+                                    displayDigitsList[index].digitRate.price.toString() ?? "0", //市场单价
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: ScreenUtil.instance.setSp(2.5),
@@ -351,7 +382,7 @@ class _EthPageState extends State<EthPage> {
                                   Padding(
                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                     child: Text(
-                                      "0%", //市场价格波动
+                                      displayDigitsList[index].digitRate.getChangeHour ?? "0%", //市场价格波动
                                       style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
                                     ),
                                   )

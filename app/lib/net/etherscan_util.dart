@@ -5,7 +5,6 @@ import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/util/utils.dart';
 import 'package:flutter/cupertino.dart';
-import 'dart:convert';
 import 'net_util.dart';
 
 //nonce === txAccount
@@ -39,6 +38,7 @@ Future<String> loadEthBalance(String address, ChainType chainType) async {
       return (int.parse(res["result"]) / Eth_Unit).toString();
     }
   } catch (e) {
+    print("loadEthBalance error================>" + e.toString());
     return null;
   }
   return null;
@@ -54,7 +54,7 @@ Future<String> loadErc20Balance(String ethAddress, String contractAddress, Chain
       return balance;
     }
   } catch (e) {
-    print("e=====================>" + e.toString());
+    print("loadErc20Balance error================>" + e.toString());
     return null;
   }
   return null;
@@ -169,19 +169,5 @@ Future<String> sendRawTx(ChainType chainType, String rawTx) async {
   } catch (e) {
     print("sendRawTx error is ====>" + e);
     return "";
-  }
-}
-
-Future<List> loadDigitRate() async {
-  try {
-    var res = await request(RatePath);
-    print("loadDigitRate res==>" + res.toString());
-    if (res != null && (res as Map).containsKey("data") && (res["data"] as Map).containsKey("prices")) {
-      return res["data"]["prices"];
-    }
-    return [];
-  } catch (e) {
-    print("sendRawTx error is ====>" + e);
-    return [];
   }
 }

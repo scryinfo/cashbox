@@ -46,7 +46,7 @@ const DddMainNetContractAddress = "0x9F5F3CFD7a32700C93F971637407ff17b91c7342";
 const DddTestNetContractAddress = "0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e";
 
 const RatePath = "https://cashbox.scry.info/cashbox/api/market/pricerate";
-const PublicPath = "https://cashbox.scry.info/cashbox/api/market/pricerate";
+const PublicPath = "https://cashbox.scry.info/public";
 const ETHERSCAN_API_KEY = "XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1";
 
 const Infura_Rpc_Path = "https://mainnet.infura.io/shJbKSyfdvONq9czbypb";
