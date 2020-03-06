@@ -36,15 +36,12 @@ class Rate {
     this.nowLegalCurrency = nowLegalCurrency;
   }
 
-  double getNowLegalCurrency(String legal) {
-    return this.legalMap[legal];
+  String getNowLegalCurrency() {
+    return this.nowLegalCurrency;
   }
 
-  double getMoney(Digit digit) {
-    if (digit.balance == null) {
-      return 0.0;
-    }
-    return getPrice(digit) * double.parse(digit.balance);
+  getNowLegalCurrencyRate() {
+    return this.legalMap[this.nowLegalCurrency];
   }
 
   double getChangeHourly(Digit digit) {
@@ -69,10 +66,20 @@ class Rate {
   }
 
   double getPrice(Digit digit) {
+    //法币对应单价
     if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
       return 0.0;
     }
-    return instance.digitRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[nowLegalCurrency];
+    print("price===>" + instance.digitRateMap[digit.shortName.toUpperCase()]["price"].toString());
+    print("instance.legalMap[getNowLegalCurrency()]" + getNowLegalCurrency() + "||" + instance.legalMap[getNowLegalCurrency()].toString());
+    return instance.digitRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[getNowLegalCurrency()];
+  }
+
+  double getMoney(Digit digit) {
+    if (digit.balance == null) {
+      return 0.0;
+    }
+    return getPrice(digit) * double.parse(digit.balance);
   }
 
   double getHigh(Digit digit) {
