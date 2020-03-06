@@ -33,6 +33,7 @@ class _EthPageState extends State<EthPage> {
   Wallet nowWallet = Wallet();
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
   String moneyUnitStr = "USD";
+  num nowWalletAmount = 0.00; //当前钱包内代币总市价
   List<String> moneyUnitList = [];
   List<String> chainTypeList = ["ETH"]; //"BTC", "ETH",
   Chain nowChain;
@@ -145,7 +146,9 @@ class _EthPageState extends State<EthPage> {
   loadDigitMoney() {
     for (var i = 0; i < displayDigitsList.length; i++) {
       var index = i;
+      nowWalletAmount = 0;
       setState(() {
+        nowWalletAmount = nowWalletAmount + Rate.instance.getMoney(displayDigitsList[index]);
         displayDigitsList[index].money = Rate.instance.getMoney(displayDigitsList[index]).toStringAsFixed(3);
       });
     }
@@ -551,7 +554,7 @@ class _EthPageState extends State<EthPage> {
               width: ScreenUtil().setWidth(30),
               alignment: Alignment.centerLeft,
               child: new Text(
-                moneyUnitStr + " 0.00000",
+                moneyUnitStr + nowWalletAmount.toStringAsFixed(4) ?? "0.00",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
