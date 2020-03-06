@@ -84,7 +84,6 @@ impl GetUXTOs {
 
     /// 发送消息的地方
     /// 从这里开始扫描区块，获取相关的block
-    ///
     fn get_headers(&mut self, peer: PeerId) -> Result<(), Error> {
         info!("发送getdata 消息");
         //这个消息应该提供一个外界传入tx的方法
@@ -94,9 +93,6 @@ impl GetUXTOs {
     }
 
     ///模仿的headerdownload里的逻辑
-    ///数据应该是从run中的 Incoming中获取的,（这个Incoming是Reciver获取的结果）
-    ///原来的header获取的是下载头 这边其实需要的是MerkerBlock或者是TX (这两后续可能还是需要在rust-bitcoin中添加)
-    /// 逻辑需要修改
     fn headers(&mut self, merkleblock: &MerkleBlockMessage, peer: PeerId) -> Result<(), Error> {
         self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
         info!("{:#?}", merkleblock);
