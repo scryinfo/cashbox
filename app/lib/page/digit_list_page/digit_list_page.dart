@@ -46,8 +46,7 @@ class _DigitListPageState extends State<DigitListPage> {
       nowChainDigitsList = nowChain.digitsList;
     }
     await loadDisplayDigitListData();
-    // await loadDigitBalance();  //todo
-    print("displayDigitsList.length===>" + displayDigitsList.length.toString());
+    loadDigitBalance(); //检查balance值为空的digit，给重新再尝试加载一次
   }
 
   @override
@@ -133,10 +132,9 @@ class _DigitListPageState extends State<DigitListPage> {
           child: GestureDetector(
             onTap: () {
               {
-                // print("displayDigitsList[index].balance===>" + displayDigitsList[index].balance); todo
                 Provider.of<TransactionProvide>(context)
                   ..setDigitName(displayDigitsList[index].shortName)
-                  // ..setBalance(displayDigitsList[index].balance) //todo
+                  ..setBalance(displayDigitsList[index].balance)
                   ..setDecimal(displayDigitsList[index].decimal)
                   ..setFromAddress(nowChain.chainAddress)
                   ..setChainType(nowChain.chainType)
@@ -150,29 +148,18 @@ class _DigitListPageState extends State<DigitListPage> {
                   child: Image.asset("assets/images/ic_eth.png"),
                 ),
                 Container(
-                  child: Container(
-                    padding: EdgeInsets.only(
-                      left: ScreenUtil().setHeight(3),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          color: Colors.transparent,
-                          padding: EdgeInsets.only(
-                            top: ScreenUtil().setHeight(3),
-                          ),
-                          width: ScreenUtil().setWidth(30),
-                          height: ScreenUtil().setHeight(10),
-                          child: Text(
-                            displayDigitsList[index].shortName ?? "",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: ScreenUtil.instance.setSp(3.5),
-                            ),
-                          ),
-                        ),
-                      ],
+                  color: Colors.transparent,
+                  padding: EdgeInsets.only(
+                    top: ScreenUtil().setHeight(3),
+                    left: ScreenUtil().setHeight(3),
+                  ),
+                  width: ScreenUtil().setWidth(30),
+                  height: ScreenUtil().setHeight(10),
+                  child: Text(
+                    displayDigitsList[index].shortName ?? "",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: ScreenUtil.instance.setSp(3.5),
                     ),
                   ),
                 ),
@@ -196,26 +183,18 @@ class _DigitListPageState extends State<DigitListPage> {
   }
 
   loadDigitBalance() async {
-    print("loadDigitBalance is enter ===>" + displayDigitsList.length.toString());
     if (displayDigitsList == null || displayDigitsList.length == 0) {
       return;
     } else {
       for (var i = 0; i < displayDigitsList.length; i++) {
-        print("loadDigitBalance    displayDigitsList[i].contractAddress===>" +
-            this.displayDigitsList[i].contractAddress.toString() +
-            "||" +
-            this.displayDigitsList[i].address.toString());
         if (this.displayDigitsList[i].balance != null && (this.displayDigitsList[i].balance.trim() != "0")) {
           continue; //这个有balance值了，不用取了
         }
         String balance;
         if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
-          print(" nowChain.chainType===>" + this.nowChain.chainType.toString());
           balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, this.nowChain.chainType);
-          print("erc20 balance==>" + balance.toString());
         } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
           balance = await loadEthBalance(nowChainAddress, this.nowChain.chainType);
-          print("eth balance==>" + balance.toString());
         } else {}
         setState(() {
           this.displayDigitsList[i].balance = balance ?? "0.00";
@@ -251,6 +230,7 @@ class _DigitListPageState extends State<DigitListPage> {
     for (var i = displayDigitsList.length; i < targetCount; i++) {
       var digitRate = DigitRate();
       Digit digit = EthDigit();
+      print("addDigitToDisplayList nowChainDigitsList[i].balance===>" + nowChainDigitsList[i].balance.toString());
       digit
         ..chainId = nowChainDigitsList[i].chainId
         ..decimal = nowChainDigitsList[i].decimal
