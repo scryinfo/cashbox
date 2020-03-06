@@ -137,8 +137,9 @@ class _EthPageState extends State<EthPage> {
           balance = await loadEthBalance(nowChainAddress, this.nowChain.chainType);
           print("eth balance==>" + balance.toString());
         } else {}
+        nowChain.digitsList[i].balance = balance ?? "0";
         setState(() {
-          this.displayDigitsList[i].balance = balance ?? "0.00";
+          this.displayDigitsList[i].balance = nowChain.digitsList[i].balance;
         });
       }
       loadDigitMoney(); //有余额了再去计算money值
