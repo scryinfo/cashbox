@@ -18,7 +18,7 @@ class Rate {
 
   Map digitRateMap = Map<String, DigitRate>();
   Map legalMap = Map<String, double>();
-  String nowLegalCurrent = "USD";
+  String nowLegalCurrency = "USD";
 
   setDigitRateMap(Map digitRateMap) {
     this.digitRateMap = digitRateMap;
@@ -32,8 +32,8 @@ class Rate {
     return List.from(this.legalMap.keys);
   }
 
-  String setNowLegalCurrency() {
-    return this.nowLegalCurrent;
+  setNowLegalCurrency(String nowLegalCurrency) {
+    this.nowLegalCurrency = nowLegalCurrency;
   }
 
   double getNowLegalCurrency(String legal) {
@@ -72,7 +72,7 @@ class Rate {
     if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
       return 0.0;
     }
-    return instance.digitRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[nowLegalCurrent];
+    return instance.digitRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[nowLegalCurrency];
   }
 
   double getHigh(Digit digit) {

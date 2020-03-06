@@ -33,7 +33,7 @@ class _EthPageState extends State<EthPage> {
   Wallet nowWallet = Wallet();
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
   String moneyUnitStr = "USD";
-  List<String> moneyUnitList = ["USD", "CNY", "KRW", "GBP", "JPY"];
+  List<String> moneyUnitList = [];
   List<String> chainTypeList = ["ETH"]; //"BTC", "ETH",
   Chain nowChain;
   String nowChainAddress = "";
@@ -57,17 +57,15 @@ class _EthPageState extends State<EthPage> {
       Wallet wallet = walletList[index];
       print("isNowWallet===>" + wallet.isNowWallet.toString() + wallet.walletId.toString() + "walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
-        setState(() {
-          this.nowWallet = wallet;
-          this.walletName = nowWallet.walletName;
-          if (nowWallet.walletType == WalletType.WALLET) {
-            this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
-          } else {
-            this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST);
-          }
-          this.nowChainAddress = nowChain.chainAddress;
-          this.nowChainDigitsList = nowChain.digitsList;
-        });
+        this.nowWallet = wallet;
+        this.walletName = nowWallet.walletName;
+        if (nowWallet.walletType == WalletType.WALLET) {
+          this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
+        } else {
+          this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST);
+        }
+        this.nowChainAddress = nowChain.chainAddress;
+        this.nowChainDigitsList = nowChain.digitsList;
         break; //找到，终止循环
       }
     }
@@ -76,14 +74,26 @@ class _EthPageState extends State<EthPage> {
     });
     future = loadDisplayDigitListData();
     loadDigitBalance();
+    loadLegalCurrency();
     loadDigitRateInfo();
+  }
+
+  loadLegalCurrency() async {
+    Rate rate = await loadRateInstance();
+    if (rate == null) {
+      return;
+    }
+    this.moneyUnitList = rate.getAllSupportLegalCurrency();
+    setState(() {
+      this.moneyUnitList = this.moneyUnitList;
+    });
   }
 
   loadDigitRateInfo() async {
     if (displayDigitsList.length == 0) {
       return;
     } else {
-      Rate rate = await loadDigitRate();
+      Rate rate = await loadRateInstance();
       if (rate == null) {
         return;
       }
@@ -96,7 +106,6 @@ class _EthPageState extends State<EthPage> {
             this.displayDigitsList[i].digitRate
               ..price = rate.getPrice(this.displayDigitsList[i])
               ..changeHourly = rate.getChangeHourly(this.displayDigitsList[i]);
-            //this.displayDigitsList[i].money = rate.getMoney(this.displayDigitsList[i]).toString();
           });
         } else {
           print("digitName is not exist===>" + this.displayDigitsList[i].shortName);
@@ -547,39 +556,9 @@ class _EthPageState extends State<EthPage> {
               child: new PopupMenuButton<String>(
                 color: Colors.black12,
                 icon: Icon(Icons.keyboard_arrow_down),
-                itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-                  new PopupMenuItem<String>(
-                      value: 'USD',
-                      child: new Text(
-                        'USD',
-                        style: new TextStyle(color: Colors.white),
-                      )),
-                  new PopupMenuItem<String>(
-                      value: 'CNY',
-                      child: new Text(
-                        'CNY',
-                        style: new TextStyle(color: Colors.white),
-                      )),
-                  new PopupMenuItem<String>(
-                      value: 'KRW',
-                      child: new Text(
-                        'KRW',
-                        style: new TextStyle(color: Colors.white),
-                      )),
-                  new PopupMenuItem<String>(
-                      value: 'GBP',
-                      child: new Text(
-                        'GBP',
-                        style: new TextStyle(color: Colors.white),
-                      )),
-                  new PopupMenuItem<String>(
-                      value: 'JPY',
-                      child: new Text(
-                        'JPY',
-                        style: new TextStyle(color: Colors.white),
-                      ))
-                ],
+                itemBuilder: (BuildContext context) => _makePopMenuList(),
                 onSelected: (String value) {
+                  Rate.instance.setNowLegalCurrency(moneyUnitStr);
                   setState(() {
                     moneyUnitStr = value;
                   });
@@ -590,6 +569,18 @@ class _EthPageState extends State<EthPage> {
         ),
       ),
     );
+  }
+
+  List<PopupMenuItem<String>> _makePopMenuList() {
+    List<PopupMenuItem<String>> popMenuList = List.generate(moneyUnitList.length, (index) {
+      return PopupMenuItem<String>(
+          value: moneyUnitList[index] ?? "",
+          child: new Text(
+            moneyUnitList[index] ?? "",
+            style: new TextStyle(color: Colors.white),
+          ));
+    });
+    return popMenuList;
   }
 
   //链卡片 地址address
