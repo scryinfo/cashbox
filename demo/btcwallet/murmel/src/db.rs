@@ -1,7 +1,5 @@
 //! mod for sqlite
 //!
-//! block_hash table record all block_hash from blockchain
-//! scanned == 0 not scanned yet
 //!
 use std::sync::{Arc, Mutex};
 use sqlite::{State, Value, Statement};
@@ -24,7 +22,7 @@ impl SQLite {
         sqlite.set_busy_timeout(3000).unwrap();
         sqlite.execute(
             "
-            CREATE TABLE IF NOT EXISTS block_hash(block_hash TEXT,scaned TEXT,timestamp TEXT);
+            CREATE TABLE IF NOT EXISTS block_hash(block_hash TEXT,scanned TEXT,timestamp TEXT);
             "
         ).expect("Create table block_hash error");
         sqlite.execute(
@@ -71,7 +69,7 @@ impl SQLite {
     //查询未扫描区块头 返回相应数据 以时间戳为依据
     pub fn query_header(&self, timestamp: String) -> Vec<String> {
         let mut statement = self.connection.prepare(
-            "SELECT * FROM block_hash WHERE timestamp >= ? LIMIT 30000"
+            "SELECT * FROM block_hash WHERE timestamp >= ? AND  scanned <= 10 LIMIT 10000"
         ).expect("query_header PREPARE ERR");
         statement.bind(
             1,
@@ -82,7 +80,13 @@ impl SQLite {
             let block_hash = statement.read::<String>(0).unwrap();
             block_hashes.push(block_hash);
         }
-        //println!("block_hash vec {:?}",block_hashes.clone());
+
+        let mut statement2 = self.connection.prepare(
+            "UPDATE block_hash SET scanned = scanned + 1 WHERE timestamp >= ? AND scanned <= 10 LIMIT 10000"
+        ).expect("update scan ERR");
+        statement2.bind(1, timestamp.as_str()).expect("bind ERR");
+        statement2.next().expect("update scanned ERR");
+
         block_hashes
     }
 

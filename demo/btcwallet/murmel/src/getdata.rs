@@ -2,7 +2,7 @@
 //! loadfilter message do not get any response.
 //! we get response here
 use bitcoin::network::message::NetworkMessage;
-use p2p::{P2PControlSender, PeerMessageSender, PeerMessageReceiver, PeerMessage, PeerId, SERVICE_BLOCKS, P2PControl};
+use p2p::{P2PControlSender, PeerMessageSender, PeerMessageReceiver, PeerMessage, PeerId, SERVICE_BLOCKS, P2PControl, SERVICE_BLOOM};
 use timeout::{ExpectedReply, SharedTimeout};
 use std::sync::mpsc;
 use std::thread;
@@ -49,13 +49,13 @@ impl GetData {
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
-                        // if self.is_serving_blocks(pid) {
+                        if self.is_serving_blocks(pid) {
                             trace!("serving blocks peer={}", pid);
                             //发起请求 GetData
                             self.get_data(pid)
-                        // } else {
-                        //     Ok(())
-                        // }
+                        } else {
+                            Ok(())
+                        }
                     }
                     PeerMessage::Disconnected(_, _) => {
                         Ok(())
@@ -68,7 +68,13 @@ impl GetData {
                                 self.get_data(pid).expect("get_data failed");
                                 Ok(())
                             }
-                            NetworkMessage::MerkleBlock(ref merkleblock) => if self.is_serving_blocks(pid) { self.merkleblock(merkleblock, pid) } else { Ok(()) },
+                            NetworkMessage::MerkleBlock(ref merkleblock) =>
+                                //if self.is_serving_blocks(pid) {
+                                {
+                                    self.merkleblock(merkleblock, pid).unwrap();
+                                    Ok(())
+                                }
+                                //} else { Ok(()) },
                             NetworkMessage::Tx(ref tx) => if self.is_serving_blocks(pid) { self.tx(tx, pid, hash160.clone()) } else { Ok(()) },
                             NetworkMessage::Ping(_) => { Ok(()) }
                             _ => { Ok(()) }
@@ -85,7 +91,7 @@ impl GetData {
 
     fn is_serving_blocks(&self, peer: PeerId) -> bool {
         if let Some(peer_version) = self.p2p.peer_version(peer) {
-            return peer_version.services & SERVICE_BLOCKS != 0;
+            return peer_version.services & SERVICE_BLOOM != 0;
         }
         false
     }
@@ -93,6 +99,9 @@ impl GetData {
     // 获取数据
     // 批量发送 block_hash
     fn get_data(&mut self, peer: PeerId) -> Result<(), Error> {
+        // if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::MerkleBlock) {
+        //     return Ok(());
+        // }
         let sqlite = self.sqlite.lock().expect("sqlite open error");
         let (block_hash, timestamp) = sqlite.init();
         let block_hashes = sqlite.query_header(timestamp);
@@ -102,7 +111,6 @@ impl GetData {
             let inventory = Inventory::new(InvType::FilteredBlock, block_hash.as_str());
             inventory_vec.push(inventory);
         }
-        // let inventory = Inventory::new(InvType::FilteredBlock, "000000000001b31b8a35d9b7d2e3ad7909055683b82d4a7d4029386f7149ede8");
         self.p2p.send_network(peer, NetworkMessage::GetData(inventory_vec));
         Ok(())
     }
@@ -112,7 +120,7 @@ impl GetData {
         let block_hash = merkleblock.prev_block.to_hex();
         let timestamp = merkleblock.timestamp;
 
-        println!("got merkleblock {:?}", merkleblock);
+        println!("got merkleblock {:#?}", merkleblock);
         {
             let sqlite = self.sqlite.lock().expect("open connection error!");
             sqlite.update_newest_header(block_hash, timestamp.to_string());
@@ -138,7 +146,12 @@ impl GetData {
                 iter.next();
                 let current_hash = iter.next().unwrap_or(" ");
                 if current_hash.eq(hash160.as_str()) {
-                    sqlite.insert_utxo(tx_hash.to_hex(), asm.clone(), vout.value.to_string(), index);
+                    sqlite.insert_utxo(
+                        tx_hash.to_hex(),
+                        asm.clone(),
+                        vout.value.to_string(),
+                        index,
+                    );
                 }
             }
         }

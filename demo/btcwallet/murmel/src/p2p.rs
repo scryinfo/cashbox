@@ -66,6 +66,8 @@ pub const SERVICE_BLOCKS:u64 = 1;
 pub const SERVICE_WITNESS:u64 =  1 << 3;
 /// require filters
 pub const SERVICE_FILTERS:u64 = 1 << 6;
+/// require filters
+pub const SERVICE_BLOOM:u64 = 1 << 2;
 /// A peer's Id
 #[derive(Hash, Eq, PartialEq, Copy, Clone)]
 pub struct PeerId {
@@ -303,7 +305,8 @@ impl P2PConfig<NetworkMessage, RawNetworkMessage> for BitcoinP2PConfig {
         } else {
             SERVICE_BLOCKS + SERVICE_WITNESS +
                 // announce that this node is capable of serving BIP157 messages
-                SERVICE_FILTERS
+                SERVICE_FILTERS + SERVICE_BLOOM
+
         };
 
         // build message
