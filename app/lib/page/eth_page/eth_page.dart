@@ -59,6 +59,7 @@ class _EthPageState extends State<EthPage> {
       print("isNowWallet===>" + wallet.isNowWallet.toString() + wallet.walletId.toString() + "walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
         this.nowWallet = wallet;
+        Wallets.instance.setNowWallet(wallet.walletId);
         this.walletName = nowWallet.walletName;
         if (nowWallet.walletType == WalletType.WALLET) {
           this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
@@ -471,7 +472,7 @@ class _EthPageState extends State<EthPage> {
                   ],
                 ),
                 onTap: () {
-                  NavigatorUtils.push(context, Routes.transferEthPage);
+                  NavigatorUtils.push(context, Routes.digitListPage);
                 },
               )),
           Container(
