@@ -148,4 +148,10 @@ class Wallet {
     }
     return nowChain;
   }
+
+  Future<Chain> getNowChain() async {
+    ChainType chainType = await getNowChainType();
+    Chain chain = getChainByChainType(chainType);
+    return chain;
+  }
 }

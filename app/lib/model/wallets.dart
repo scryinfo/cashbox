@@ -243,6 +243,10 @@ class Wallets {
     }
   }
 
+  setNowWalletM(Wallet walletM) async {
+    this.nowWallet = walletM;
+  }
+
   //删除钱包。 钱包设置可删除，链设置隐藏。
   // apiNo:WM07.
   Future<Map> deleteWallet(String walletId, Uint8List pwd) async {

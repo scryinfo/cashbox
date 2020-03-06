@@ -1,5 +1,6 @@
 import 'package:app/demo/flutter_webview_plugin_demo.dart';
 import 'package:app/demo/local_html_webview_demo.dart';
+import 'package:app/page/digit_list_page/digit_list_page.dart';
 import 'package:app/page/sign_tx_page/sign_tx_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
@@ -49,6 +50,10 @@ Handler dappDemoPageHandler = Handler(handlerFunc: (BuildContext context, Map<St
 
 Handler createWalletPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return CreateWalletNamePage();
+});
+
+Handler digitListPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return DigitListPage();
 });
 
 Handler createWalletMnemonicPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
