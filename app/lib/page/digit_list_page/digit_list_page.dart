@@ -1,11 +1,15 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
+import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -24,8 +28,8 @@ class _DigitListPageState extends State<DigitListPage> {
   Wallet nowWalletM;
   Chain nowChain;
   String nowChainAddress = "";
-  List<Digit> nowChainDigitsList;
-  List<Digit> displayDigitsList;
+  List<Digit> nowChainDigitsList = [];
+  List<Digit> displayDigitsList = [];
 
   @override
   void initState() {
@@ -36,18 +40,46 @@ class _DigitListPageState extends State<DigitListPage> {
   initData() async {
     nowWalletM = Wallets.instance.nowWallet;
     if (nowWalletM != null) {
-      nowChain = await nowWalletM.getNowChain();
+      nowChain = nowWalletM.getNowChainM();
     }
     if (nowChain != null) {
       nowChainDigitsList = nowChain.digitsList;
     }
+    await loadDisplayDigitListData();
+    // await loadDigitBalance();  //todo
+    print("displayDigitsList.length===>" + displayDigitsList.length.toString());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+      width: ScreenUtil().setWidth(90),
+      height: ScreenUtil().setHeight(120),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: MyAppBar(
+          centerTitle: S.of(context).digit_list_title,
+          backgroundColor: Colors.transparent,
+        ),
+        body: Container(
+            child: Column(
+          children: <Widget>[Gaps.scaleVGap(5), _digitListAreaWidgets()],
+        )),
+      ),
+    );
   }
 
+  Widget _digitListAreaWidgets() {
+    return Container(
+        height: ScreenUtil().setHeight(78),
+        width: ScreenUtil().setWidth(90),
+        child: Container(
+          padding: EdgeInsets.only(left: ScreenUtil().setWidth(3), right: ScreenUtil().setWidth(3)),
+          child: _digitListWidgets(),
+        ));
+  }
+
+  //代币列表layout
   Widget _digitListWidgets() {
     return EasyRefresh.custom(
       footer: BallPulseFooter(),
@@ -101,13 +133,14 @@ class _DigitListPageState extends State<DigitListPage> {
           child: GestureDetector(
             onTap: () {
               {
+                // print("displayDigitsList[index].balance===>" + displayDigitsList[index].balance); todo
                 Provider.of<TransactionProvide>(context)
                   ..setDigitName(displayDigitsList[index].shortName)
-                  ..setBalance(displayDigitsList[index].balance)
+                  // ..setBalance(displayDigitsList[index].balance) //todo
                   ..setDecimal(displayDigitsList[index].decimal)
-                  ..setFromAddress(nowChainAddress)
+                  ..setFromAddress(nowChain.chainAddress)
                   ..setChainType(nowChain.chainType)
-                  ..setContractAddress(displayDigitsList[index].contractAddress);
+                  ..setContractAddress(displayDigitsList[index].contractAddress ?? "");
               }
               NavigatorUtils.push(context, Routes.transactionHistoryPage);
             },
@@ -121,7 +154,7 @@ class _DigitListPageState extends State<DigitListPage> {
                     padding: EdgeInsets.only(
                       left: ScreenUtil().setHeight(3),
                     ),
-                    child: Column(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Container(
@@ -129,73 +162,14 @@ class _DigitListPageState extends State<DigitListPage> {
                           padding: EdgeInsets.only(
                             top: ScreenUtil().setHeight(3),
                           ),
-                          width: ScreenUtil().setWidth(65),
+                          width: ScreenUtil().setWidth(30),
                           height: ScreenUtil().setHeight(10),
-                          child: Stack(
-                            children: <Widget>[
-                              Align(
-                                alignment: new FractionalOffset(0.0, 0.0),
-                                child: Text(
-                                  (displayDigitsList[index].shortName ?? "") + " * " + (displayDigitsList[index].balance ?? "0.00"),
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: ScreenUtil.instance.setSp(3),
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                alignment: FractionalOffset.topRight,
-                                child: Container(
-                                  padding: EdgeInsets.all(0.0),
-                                  width: ScreenUtil.instance.setWidth(30),
-                                  child: Text(
-                                    "≈" + "moneyUnitStr" + " " + displayDigitsList[index].money ?? "0.00",
-                                    maxLines: 2,
-                                    overflow: TextOverflow.visible,
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(
-                            top: ScreenUtil().setHeight(1),
-                          ),
-                          color: Colors.transparent,
-                          width: ScreenUtil().setWidth(65),
-                          height: ScreenUtil().setHeight(7),
-                          alignment: Alignment.center,
-                          child: Stack(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Text(
-                                    displayDigitsList[index].digitRate.price.toString() ?? "0", //市场单价
-                                    style: TextStyle(
-                                      color: Colors.lightBlueAccent,
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
-                                    child: Text(
-                                      displayDigitsList[index].digitRate.getChangeHour ?? "0%", //市场价格波动
-                                      style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Align(
-                                alignment: FractionalOffset.topRight,
-                                child: Text(
-                                  "0", //最近一笔交易记录
-                                  style: TextStyle(fontSize: ScreenUtil.instance.setSp(2.5), color: Colors.greenAccent),
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            displayDigitsList[index].shortName ?? "",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: ScreenUtil.instance.setSp(3.5),
+                            ),
                           ),
                         ),
                       ],
@@ -219,6 +193,35 @@ class _DigitListPageState extends State<DigitListPage> {
         )
       ],
     );
+  }
+
+  loadDigitBalance() async {
+    print("loadDigitBalance is enter ===>" + displayDigitsList.length.toString());
+    if (displayDigitsList == null || displayDigitsList.length == 0) {
+      return;
+    } else {
+      for (var i = 0; i < displayDigitsList.length; i++) {
+        print("loadDigitBalance    displayDigitsList[i].contractAddress===>" +
+            this.displayDigitsList[i].contractAddress.toString() +
+            "||" +
+            this.displayDigitsList[i].address.toString());
+        if (this.displayDigitsList[i].balance != null && (this.displayDigitsList[i].balance.trim() != "0")) {
+          continue; //这个有balance值了，不用取了
+        }
+        String balance;
+        if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
+          print(" nowChain.chainType===>" + this.nowChain.chainType.toString());
+          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, this.nowChain.chainType);
+          print("erc20 balance==>" + balance.toString());
+        } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
+          balance = await loadEthBalance(nowChainAddress, this.nowChain.chainType);
+          print("eth balance==>" + balance.toString());
+        } else {}
+        setState(() {
+          this.displayDigitsList[i].balance = balance ?? "0.00";
+        });
+      }
+    }
   }
 
   Future<List<Digit>> loadDisplayDigitListData() async {

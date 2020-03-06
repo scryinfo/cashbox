@@ -47,6 +47,7 @@ class S implements WidgetsLocalizations {
   String get delete_wallet => "删除钱包";
   String get delete_wallet_hint => "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。";
   String get digit_info_null => "代币信息为空";
+  String get digit_list_title => "代币列表";
   String get eee_chain_test => "EEE_TEST";
   String get eee_token_name => "EEE";
   String get ensure_pwd => "确认密码";
@@ -286,6 +287,8 @@ class $zh extends S {
   String get mnemonic_qr_info => "这是您助记词信息生成的二维码";
   @override
   String get pwd => "密码";
+  @override
+  String get digit_list_title => "代币列表";
   @override
   String get wallet_load_error => "钱包应用加载出错了，请尝试重新打开!~";
   @override
