@@ -70,8 +70,6 @@ class Rate {
     if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
       return 0.0;
     }
-    print("price===>" + instance.digitRateMap[digit.shortName.toUpperCase()]["price"].toString());
-    print("instance.legalMap[getNowLegalCurrency()]" + getNowLegalCurrency() + "||" + instance.legalMap[getNowLegalCurrency()].toString());
     return instance.digitRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[getNowLegalCurrency()];
   }
 

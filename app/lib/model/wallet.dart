@@ -18,6 +18,7 @@ class Wallet {
   String creationTime; //钱包创建时间
   List<Chain> chainList = []; //钱包内包含链列表
   String nowChainId; //钱包内，当前链chainId
+  Chain nowChain;
   WalletType walletType;
   bool isNowWallet; //是否是当前钱包
   //todo load chain
@@ -123,6 +124,14 @@ class Wallet {
     } else {
       return false;
     }
+  }
+
+  setNowChainM(Chain chain) async {
+    nowChain = chain;
+  }
+
+  Chain getNowChainM() {
+    return nowChain;
   }
 
   Chain getChainByChainId(String chainId) {

@@ -9,7 +9,7 @@ abstract class Digit {
   int decimal; //精度，小数点后的位数
   String money = "0"; //金额 = 市场价格rate * 数量balance
   String address; //代币地址
-  String contractAddress; //代币合约地址
+  String contractAddress=""; //代币合约地址
   String urlImg; //代币图标icon地址
   bool isVisible; //代币是否可见
   DigitRate digitRate; //市场价格

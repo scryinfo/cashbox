@@ -59,13 +59,14 @@ class _EthPageState extends State<EthPage> {
       print("isNowWallet===>" + wallet.isNowWallet.toString() + wallet.walletId.toString() + "walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
         this.nowWallet = wallet;
-        Wallets.instance.setNowWallet(wallet.walletId);
         this.walletName = nowWallet.walletName;
         if (nowWallet.walletType == WalletType.WALLET) {
           this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
         } else {
           this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST);
         }
+        Wallets.instance.setNowWalletM(wallet);
+        wallet.setNowChainM(nowChain);
         this.nowChainAddress = nowChain.chainAddress;
         this.nowChainDigitsList = nowChain.digitsList;
         break; //找到，终止循环
@@ -119,7 +120,7 @@ class _EthPageState extends State<EthPage> {
 
   loadDigitBalance() async {
     print("loadDigitBalance is enter ===>" + displayDigitsList.length.toString());
-    if (displayDigitsList.length == 0) {
+    if (displayDigitsList == null || displayDigitsList.length == 0) {
       return;
     } else {
       for (var i = 0; i < displayDigitsList.length; i++) {
