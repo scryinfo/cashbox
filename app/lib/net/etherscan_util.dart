@@ -28,14 +28,15 @@ Future<String> loadTxAccount(String address, ChainType chainType) async {
   }
 }
 
-//返回根据Eth_Unit数量级，转换后的格式
+//返回根据 1、Eth_Unit数量级，转换后的格式
+//        2、balance只保留小数点后4位
 Future<String> loadEthBalance(String address, ChainType chainType) async {
   try {
     var res = await request(assembleEthBalanceUrl(address, chainType: chainType));
     print("loadEthBalance res=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       print("Eth_Balance res.result.=====================>" + (int.parse(res["result"]) / Eth_Unit).toString());
-      return (int.parse(res["result"]) / Eth_Unit).toString();
+      return (int.parse(res["result"]) / Eth_Unit).toStringAsFixed(4);
     }
   } catch (e) {
     print("loadEthBalance error================>" + e.toString());
@@ -44,13 +45,15 @@ Future<String> loadEthBalance(String address, ChainType chainType) async {
   return null;
 }
 
+//返回根据 1、Utils.mathPow(10, decimal)数量级，转换后的格式
+//        2、balance只保留小数点后 4位
 Future<String> loadErc20Balance(String ethAddress, String contractAddress, ChainType chainType, {int decimal = 18}) async {
   try {
     var res = await request(assembleErc20BalanceUrl(ethAddress, contractAddress, chainType));
     print("Erc20_Balance=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       print("Erc20_Balance res.result=====================>" + res["result"].toString());
-      String balance = ((BigInt.parse(res["result"])) / Utils.mathPow(10, decimal)).toString();
+      String balance = ((BigInt.parse(res["result"])) / Utils.mathPow(10, decimal)).toStringAsFixed(4);
       return balance;
     }
   } catch (e) {

@@ -136,9 +136,18 @@ class _EthPageState extends State<EthPage> {
         } else {}
         setState(() {
           this.displayDigitsList[i].balance = balance ?? "0.00";
-          this.displayDigitsList[i].money = Rate.instance.getMoney(this.displayDigitsList[i]).toStringAsFixed(4);
         });
       }
+      loadDigitMoney(); //有余额了再去计算money值
+    }
+  }
+
+  loadDigitMoney() {
+    for (var i = 0; i < displayDigitsList.length; i++) {
+      var index = i;
+      setState(() {
+        displayDigitsList[index].money = Rate.instance.getMoney(displayDigitsList[index]).toStringAsFixed(3);
+      });
     }
   }
 
@@ -355,11 +364,12 @@ class _EthPageState extends State<EthPage> {
                               Align(
                                 alignment: FractionalOffset.topRight,
                                 child: Container(
-                                  width: ScreenUtil.instance.setWidth(20),
+                                  padding: EdgeInsets.all(0.0),
+                                  width: ScreenUtil.instance.setWidth(30),
                                   child: Text(
-                                    "≈" + moneyUnitStr + " " + (displayDigitsList[index].money ?? "0.0"),
-                                    maxLines: 1,
-                                    softWrap: true,
+                                    "≈" + moneyUnitStr + " " + displayDigitsList[index].money ?? "0.00",
+                                    maxLines: 2,
+                                    overflow: TextOverflow.visible,
                                     textAlign: TextAlign.right,
                                     style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
                                   ),
@@ -558,7 +568,8 @@ class _EthPageState extends State<EthPage> {
                 icon: Icon(Icons.keyboard_arrow_down),
                 itemBuilder: (BuildContext context) => _makePopMenuList(),
                 onSelected: (String value) {
-                  Rate.instance.setNowLegalCurrency(moneyUnitStr);
+                  Rate.instance.setNowLegalCurrency(value);
+                  this.loadDigitMoney();
                   setState(() {
                     moneyUnitStr = value;
                   });
