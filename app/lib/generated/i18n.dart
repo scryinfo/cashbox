@@ -38,6 +38,7 @@ class S implements WidgetsLocalizations {
   String get click_to_copy_address => "点击复制地址!";
   String get click_to_sign => "点击签名";
   String get click_to_transfer => "点击转账";
+  String get compile_wallet_name => "编辑";
   String get confirm => "确定";
   String get create_test_wallet => "创建测试钱包";
   String get create_wallet => "创建钱包";
@@ -57,6 +58,7 @@ class S implements WidgetsLocalizations {
   String get eth_token_name => "ETH";
   String get extend_msg => "备注信息";
   String get fail_to_load_data_hint => "数据加载失败,请检查网络状况，可尝试下拉刷新";
+  String get failure_change_wallet_name => "钱包名称修改 失败！";
   String get failure_create_test_wallet => "测试钱包创建失败，请检查你输入的数据是否正确";
   String get failure_reset_pwd_hint => "重置密码失败，详细信息";
   String get failure_to_change_wallet => "钱包切换失败，请重新打开钱包，尝试切换";
@@ -133,6 +135,7 @@ class S implements WidgetsLocalizations {
   String get service_protocol_tag => "《服务协议》";
   String get service_protocol_title => "服务协议";
   String get some_info_is_null => "有信息为空，请补全信息";
+  String get success_change_wallet_name => "钱包名称修改 成功！";
   String get success_create_test_wallet => "测试钱包创建完成，切记注意区分钱包类型";
   String get success_in_delete_wallet => "钱包删除成功";
   String get success_reset_pwd_hint => "重置密码成功，请您保存好你的密码，丢失无法找回";
@@ -167,6 +170,7 @@ class S implements WidgetsLocalizations {
   String get wait_to_sign_info => "待签名信息";
   String get wallet_list => "钱包列表";
   String get wallet_load_error => "钱包应用加载出错了，请尝试重新打开!~";
+  String get wallet_manager => "钱包管理";
   String get wallet_name => "钱包名";
   String get wallet_name_not_null => "钱包名不能为空";
   String get wallet_pwd => "钱包密码";
@@ -253,6 +257,8 @@ class $zh extends S {
   @override
   String get success_in_delete_wallet => "钱包删除成功";
   @override
+  String get failure_change_wallet_name => "钱包名称修改成功！";
+  @override
   String get click_to_transfer => "点击转账";
   @override
   String get new_pwd => "新密码";
@@ -289,6 +295,8 @@ class $zh extends S {
   @override
   String get pwd => "密码";
   @override
+  String get load_finish_wallet_digit => "当前钱包选中的代币已加载完！";
+  @override
   String get digit_list_title => "代币列表";
   @override
   String get wallet_load_error => "钱包应用加载出错了，请尝试重新打开!~";
@@ -314,6 +322,8 @@ class $zh extends S {
   String get agree_service_prefix => "我已仔细阅读并同意";
   @override
   String get verify_wallet => "验证钱包";
+  @override
+  String get success_change_wallet_name => "钱包名称修改成功！";
   @override
   String get failure_create_test_wallet => "测试钱包创建失败，请检查你输入的数据是否正确";
   @override
@@ -393,6 +403,8 @@ class $zh extends S {
   @override
   String get pls_input_old_pwd => "请输入旧密码";
   @override
+  String get compile_wallet_name => "编辑";
+  @override
   String get verify_mnemonic_info => "助记词确认验证";
   @override
   String get eth_chain_name => "ETH";
@@ -462,6 +474,8 @@ class $zh extends S {
   String get pls_pwd_again => "请再次输入密码";
   @override
   String get gas_used => "gas消耗";
+  @override
+  String get wallet_manager => "钱包管理";
   @override
   String get reset_pwd => "重置密码";
   @override

@@ -151,5 +151,9 @@
   "balance_is_less": "当前账户余额不足！",
   "unknown_in_value": "转账数额出现位置问题，请重新检查输入的数额！",
   "digit_list_title": "代币列表",
-  "load_finish_wallet_digit": "当前钱包选中的代币已加载完！"
+  "load_finish_wallet_digit": "当前钱包选中的代币已加载完！",
+  "success_change_wallet_name": "钱包名称修改 成功！",
+  "failure_change_wallet_name": "钱包名称修改 失败！",
+  "wallet_manager": "钱包管理",
+  "compile_wallet_name": "编辑"
 }
