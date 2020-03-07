@@ -110,8 +110,15 @@ class DigitRate {
 
   String get getChangeHour {
     if (changeHourly > 0) {
-      return (changeHourly * 100.0).toString() + "%" + "↑";
+      return (changeHourly * 100.0).toStringAsFixed(5) + "%" + "↑";
     }
-    return (changeHourly * 100.0).toString() + "%" + "↓";
+    return (changeHourly * 100.0).toStringAsFixed(5) + "%" + "↓";
+  }
+
+  double getPrice(String legalCurrency) {
+    if (!Rate.instance.legalMap.containsKey(legalCurrency)) {
+      return 0.00;
+    }
+    return this.price * (Rate.instance.legalMap[legalCurrency]);
   }
 }

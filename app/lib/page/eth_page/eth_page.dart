@@ -107,6 +107,7 @@ class _EthPageState extends State<EthPage> {
           setState(() {
             print("this.displayDigitsList[i].shortName=>" + rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["price"].toString());
             this.displayDigitsList[i].digitRate
+              ..symbol = rate.getSymbol(this.displayDigitsList[i])
               ..price = rate.getPrice(this.displayDigitsList[i])
               ..changeHourly = rate.getChangeHourly(this.displayDigitsList[i]);
           });
@@ -395,7 +396,7 @@ class _EthPageState extends State<EthPage> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    displayDigitsList[index].digitRate.price.toString() ?? "0", //市场单价
+                                    moneyUnitStr + " " + (displayDigitsList[index].digitRate.getPrice(moneyUnitStr).toStringAsFixed(5) ?? "0"), //市场单价
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: ScreenUtil.instance.setSp(2.5),
