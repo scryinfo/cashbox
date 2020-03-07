@@ -139,5 +139,6 @@
   "high_setting": "高级设置",
   "balance_is_less": "当前账户余额不足！",
   "unknown_in_value": "转账数额出现位置问题，请重新检查输入的数额！",
-  "digit_list_title": "代币列表"
+  "digit_list_title": "代币列表",
+  "当前钱包选中的代币已加载完！": "代币列表"
 }

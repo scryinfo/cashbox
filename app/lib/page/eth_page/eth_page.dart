@@ -292,18 +292,16 @@ class _EthPageState extends State<EthPage> {
         await Future.delayed(
           Duration(seconds: 2),
           () {
-            setState(
-              () {
-                //todo 根据 JNI walletList每次refreshDataList +singleDigitCount 条显示数据
-                if (displayDigitsList.length < nowChainDigitsList.length) {
-                  // 从JNI加载的数据还有没显示完的，继续将nowChainDigitsList剩余数据，
-                  // 添加到 displayDigitsList里面做展示
-                  loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
-                } else {
-                  //todo ，继续调jni获取，或者提示已经没数据了。 根据是否jni分页处理来决定。
-                }
-              },
-            );
+            setState(() {
+              if (displayDigitsList.length < nowChainDigitsList.length) {
+                // 从JNI加载的数据(nowChain.digitList),还有没显示完的，继续将nowChainDigitsList剩余数据，
+                // 添加到 displayDigitsList里面做展示
+                loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
+              } else {
+                Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
+                return;
+              }
+            });
           },
         );
       },
