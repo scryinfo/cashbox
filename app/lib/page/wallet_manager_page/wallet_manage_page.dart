@@ -28,11 +28,13 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
   final TextEditingController _walletNameController = TextEditingController();
   String walletId;
   String walletName;
-  double opacityRenameBtn = 0.0;
+  String compileBtnText;
+  double opacityRenameBtn = 0.7;
 
   @override
   void initState() {
     super.initState();
+    _walletNameController.addListener(_listenWalletName);
   }
 
   @override
@@ -44,16 +46,22 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
   void _initData(BuildContext context) {
     walletId = Provider.of<WalletManagerProvide>(context).walletId;
     walletName = Provider.of<WalletManagerProvide>(context).walletName;
-    _walletNameController.addListener(_listenWalletName);
   }
 
   void _listenWalletName() {
     String newWalletName = _walletNameController.text;
-    if (newWalletName != walletName) {
-      this.opacityRenameBtn = 1.0;
+    print("_listenWalletName===>" + newWalletName + "||" + walletName);
+    if (newWalletName == walletName || newWalletName.trim() == "") {
+      opacityRenameBtn = 0.7;
+      compileBtnText = S.of(context).compile_wallet_name.toString();
     } else {
-      this.opacityRenameBtn = 0.0;
+      opacityRenameBtn = 1.0;
+      compileBtnText = S.of(context).confirm.toString();
     }
+    setState(() {
+      compileBtnText = compileBtnText;
+      opacityRenameBtn = opacityRenameBtn;
+    });
   }
 
   @override
@@ -66,15 +74,14 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: ""
-              "钱包管理",
+          centerTitle: S.of(context).wallet_manager,
           backgroundColor: Colors.transparent,
         ),
         body: GestureDetector(
           onTap: () async {
-            //FocusScope.of(context).requestFocus(FocusNode());
+            FocusScope.of(context).requestFocus(FocusNode());
             //todo 更改钱包名
-            //print("wallet_manage_page  begin to do something=======>");
+            _listenWalletName();
           },
           child: Container(
             width: ScreenUtil().setWidth(90),
@@ -109,16 +116,16 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
             width: ScreenUtil().setWidth(80),
             padding: EdgeInsets.only(left: ScreenUtil().setWidth(3)),
             child: Text(
-              "钱包名",
+              S.of(context).wallet_name,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 1),
-                fontSize: 15,
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
           Gaps.scaleVGap(2),
           Container(
-            width: ScreenUtil().setWidth(75),
+            width: ScreenUtil().setWidth(78),
             alignment: Alignment.center,
             child: Row(
               children: <Widget>[
@@ -151,7 +158,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                 ),
                 Gaps.scaleHGap(1.5),
                 Container(
-                  width: ScreenUtil().setWidth(13),
+                  width: ScreenUtil().setWidth(15),
                   height: ScreenUtil().setHeight(8),
                   padding: EdgeInsets.all(0),
                   child: Opacity(
@@ -161,18 +168,18 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                         Wallet chooseWallet = await Wallets.instance.getWalletByWalletId(Provider.of<WalletManagerProvide>(context).walletId);
                         bool isRenameSuccess = await chooseWallet.rename(_walletNameController.text);
                         if (isRenameSuccess) {
-                          Fluttertoast.showToast(msg: "钱包名称修改成功");
+                          Fluttertoast.showToast(msg: S.of(context).success_change_wallet_name.toString());
                           setState(() {
                             walletName = _walletNameController.text;
-                            opacityRenameBtn = 0.0;
+                            opacityRenameBtn = 0.7;
                           });
                         } else {
-                          Fluttertoast.showToast(msg: "钱包名称更改失败");
+                          Fluttertoast.showToast(msg: S.of(context).failure_change_wallet_name.toString());
                         }
                       },
-                      color: Colors.transparent,
+                      color: Colors.white30,
                       child: Text(
-                        "确认",
+                        compileBtnText ?? S.of(context).compile_wallet_name,
                         style: TextStyle(color: Colors.white70, fontSize: 15),
                       ),
                     ),
