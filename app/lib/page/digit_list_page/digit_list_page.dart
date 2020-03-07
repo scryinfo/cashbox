@@ -16,6 +16,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class DigitListPage extends StatefulWidget {
@@ -99,18 +100,18 @@ class _DigitListPageState extends State<DigitListPage> {
         await Future.delayed(
           Duration(seconds: 2),
           () {
-            setState(
-              () {
-                //todo 根据 JNI walletList每次refreshDataList +singleDigitCount 条显示数据
-                if (displayDigitsList.length < nowChainDigitsList.length) {
-                  // 从JNI加载的数据还有没显示完的，继续将nowChainDigitsList剩余数据，
-                  // 添加到 displayDigitsList里面做展示
-                  loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
-                } else {
-                  //todo ，继续调jni获取，或者提示已经没数据了。 根据是否jni分页处理来决定。
-                }
-              },
-            );
+            setState(() {
+              if (displayDigitsList.length < nowChainDigitsList.length) {
+                // 从JNI加载的数据(nowChain.digitList),还有没显示完的，继续将nowChainDigitsList剩余数据，
+                // 添加到 displayDigitsList里面做展示
+                loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
+              } else {
+                // todo 2.0。 功能：加载代币列表，可选择添加erc20代币。 代币列表下拉刷新。
+                // 继续调jni获取，或者提示已经没数据了。 根据是否jni分页处理来决定。
+                Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
+                return;
+              }
+            });
           },
         );
       },

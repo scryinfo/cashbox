@@ -75,6 +75,7 @@ class S implements WidgetsLocalizations {
   String get input_pwd_hint_detail => "提示：请输入您的密码，对交易信息进行签名。";
   String get judge_the_difference_between_two_wallet => "注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。";
   String get language_choose => "语言选择";
+  String get load_finish_wallet_digit => "当前钱包选中的代币已加载完！";
   String get main_title => "主标题";
   String get make_sure_service_protocol => "请确认勾选 同意服务协议与隐私条款";
   String get message_tip => "message";
