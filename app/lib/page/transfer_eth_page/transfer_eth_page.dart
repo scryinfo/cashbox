@@ -723,7 +723,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 decimal: decimal);
             print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"].toString());
             if (result["status"] != null && result["status"] == 200) {
-              Fluttertoast.showToast(msg: "签名成功！ 交易发送上链中", timeInSecForIos: 3);
+              Fluttertoast.showToast(msg: "签名成功！ 交易发送上链中", timeInSecForIos: 5);
               sendRawTx2Chain(result["ethSignedInfo"].toString());
             } else {
               Fluttertoast.showToast(msg: "交易签名失败", timeInSecForIos: 5);
@@ -741,16 +741,16 @@ class _TransferEthPageState extends State<TransferEthPage> {
     String txHash = await sendRawTx(ChainType.ETH_TEST, rawTx);
     print("after broadcast txHash is===>" + txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
-      Fluttertoast.showToast(msg: "交易上链 成功", timeInSecForIos: 5);
+      Fluttertoast.showToast(msg: "交易上链 成功", timeInSecForIos: 8);
     } else {
-      Fluttertoast.showToast(msg: "交易上链 失败", timeInSecForIos: 5);
+      Fluttertoast.showToast(msg: "交易上链 失败", timeInSecForIos: 8);
     }
     {
-      const timeout = Duration(seconds: 20);
+      const timeout = Duration(seconds: 5);
       Timer(timeout, () {
         Navigator.pop(context); //让showProgressDialog弹框，至少显示两秒
+        NavigatorUtils.goBack(context);
       });
-      NavigatorUtils.goBack(context);
     }
   }
 
