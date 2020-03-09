@@ -20,6 +20,7 @@ use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::Hash;
+use hooks::HooksMessage;
 
 
 pub struct GetData {
@@ -28,13 +29,14 @@ pub struct GetData {
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     sqlite: SharedSQLite,
+    hook_receiver: mpsc::Receiver<HooksMessage>,
 }
 
 impl GetData {
-    pub fn new(sqlite: SharedSQLite, chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>) -> PeerMessageSender<NetworkMessage> {
+    pub fn new(sqlite: SharedSQLite, chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>, hook_receiver: mpsc::Receiver<HooksMessage>) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
-        let mut getdata = GetData { chaindb, p2p, timeout, sqlite };
+        let mut getdata = GetData { chaindb, p2p, timeout, sqlite, hook_receiver };
 
         thread::Builder::new().name("GetData".to_string()).spawn(move || { getdata.run(receiver) }).unwrap();
 
@@ -44,9 +46,10 @@ impl GetData {
     //循环处理消息
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
         let hash160 = self.hash160("");
+        let mut merkle_vec = vec![];
         loop {
             //这个方法是消息接收端，也就是channel的一个出口，Message的一个消耗端
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {
@@ -62,19 +65,18 @@ impl GetData {
                     }
                     PeerMessage::Incoming(pid, msg) => {
                         match msg {
-                            // 接受数据的地方
-                            NetworkMessage::Headers(ref headers) => { //
-                                //hooks
-                                self.get_data(pid).expect("get_data failed");
-                                Ok(())
-                            }
                             NetworkMessage::MerkleBlock(ref merkleblock) =>
-                                //if self.is_serving_blocks(pid) {
-                                {
-                                    self.merkleblock(merkleblock, pid).unwrap();
+                                if self.is_serving_blocks(pid) {
+                                    if merkle_vec.len() <= 100 {
+                                        merkle_vec.push(merkleblock.clone());
+                                    } else {
+                                        self.merkleblock(&merkle_vec, pid).expect("merkle block vector failed");
+                                        merkle_vec.clear();
+                                    }
                                     Ok(())
-                                }
-                                //} else { Ok(()) },
+                                } else {
+                                    Ok(())
+                                },
                             NetworkMessage::Tx(ref tx) => if self.is_serving_blocks(pid) { self.tx(tx, pid, hash160.clone()) } else { Ok(()) },
                             NetworkMessage::Ping(_) => { Ok(()) }
                             _ => { Ok(()) }
@@ -83,6 +85,18 @@ impl GetData {
                     _ => { Ok(()) }
                 } {
                     error!("Error processing headers: {}", e);
+                }
+            }
+
+            while let Ok(msg) = self.hook_receiver.recv_timeout(Duration::from_millis(1000)) {
+                match msg {
+                    HooksMessage::ReceivedHeaders(pid) => {
+                        warn!("hooks for received headers");
+                        self.get_data(pid).expect("GOT HOOKS error");
+                    }
+                    HooksMessage::Others => {
+                        ()
+                    }
                 }
             }
             self.timeout.lock().unwrap().check(vec!(ExpectedReply::MerkleBlock));
@@ -99,12 +113,13 @@ impl GetData {
     // 获取数据
     // 批量发送 block_hash
     fn get_data(&mut self, peer: PeerId) -> Result<(), Error> {
-        // if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::MerkleBlock) {
-        //     return Ok(());
-        // }
+        if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::MerkleBlock) {
+            return Ok(());
+        }
         let sqlite = self.sqlite.lock().expect("sqlite open error");
-        let (block_hash, timestamp) = sqlite.init();
+        let (_block_hash, timestamp) = sqlite.init();
         let block_hashes = sqlite.query_header(timestamp);
+        if block_hashes.len() == 0 { return Ok(()); }
 
         let mut inventory_vec = vec![];
         for block_hash in block_hashes {
@@ -115,12 +130,14 @@ impl GetData {
         Ok(())
     }
 
-    fn merkleblock(&mut self, merkleblock: &MerkleBlockMessage, peer: PeerId) -> Result<(), Error> {
+    fn merkleblock(&mut self, merkle_vec: &Vec<MerkleBlockMessage>, peer: PeerId) -> Result<(), Error> {
         self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
+        warn!("got a vec of 100 merkleblock");
+        let merkleblock = merkle_vec.last().unwrap();
         let block_hash = merkleblock.prev_block.to_hex();
         let timestamp = merkleblock.timestamp;
 
-        println!("got merkleblock {:#?}", merkleblock);
+        println!("got 100 merkleblock {:#?}", merkleblock);
         {
             let sqlite = self.sqlite.lock().expect("open connection error!");
             sqlite.update_newest_header(block_hash, timestamp.to_string());
@@ -130,7 +147,7 @@ impl GetData {
     }
 
     ///处理tx返回值
-    fn tx(&mut self, tx: &Transaction, peer: PeerId, hash160: String) -> Result<(), Error> {
+    fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
         let sqlite = self.sqlite.lock().expect("open connection error!");
         println!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
@@ -139,20 +156,18 @@ impl GetData {
         for vout in vouts {
             index += 1;
             let script = vout.script_pubkey;
-            if script.is_p2sh() {
-                let asm = script.asm();
-                let mut iter = asm.split_ascii_whitespace();
-                iter.next();
-                iter.next();
-                let current_hash = iter.next().unwrap_or(" ");
-                if current_hash.eq(hash160.as_str()) {
-                    sqlite.insert_utxo(
-                        tx_hash.to_hex(),
-                        asm.clone(),
-                        vout.value.to_string(),
-                        index,
-                    );
-                }
+            let asm = script.asm();
+            let mut iter = asm.split_ascii_whitespace();
+            iter.next();
+            iter.next();
+            let current_hash = iter.next().unwrap_or(" ");
+            if current_hash.eq(hash160.as_str()) {
+                sqlite.insert_utxo(
+                    tx_hash.to_hex(),
+                    asm.clone(),
+                    vout.value.to_string(),
+                    index,
+                );
             }
         }
         Ok(())
