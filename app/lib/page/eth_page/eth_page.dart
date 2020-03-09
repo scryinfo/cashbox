@@ -105,7 +105,6 @@ class _EthPageState extends State<EthPage> {
         if (this.displayDigitsList[i].shortName.toUpperCase() != null &&
             (rate.digitRateMap.containsKey(this.displayDigitsList[i].shortName.toUpperCase()))) {
           setState(() {
-            print("this.displayDigitsList[i].shortName=>" + rate.digitRateMap[this.displayDigitsList[i].shortName.toUpperCase()]["price"].toString());
             this.displayDigitsList[i].digitRate
               ..symbol = rate.getSymbol(this.displayDigitsList[i])
               ..price = rate.getPrice(this.displayDigitsList[i])
@@ -134,9 +133,11 @@ class _EthPageState extends State<EthPage> {
           print(" nowChain.chainType===>" + this.nowChain.chainType.toString());
           balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, this.nowChain.chainType);
           print("erc20 balance==>" + balance.toString());
+          Wallets.instance.updateDigitBalance(this.displayDigitsList[i].contractAddress, this.displayDigitsList[i].digitId, balance ?? "");
         } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
           balance = await loadEthBalance(nowChainAddress, this.nowChain.chainType);
           print("eth balance==>" + balance.toString());
+          Wallets.instance.updateDigitBalance(nowChainAddress, this.displayDigitsList[i].digitId, balance ?? "");
         } else {}
         nowChain.digitsList[i].balance = balance ?? "0";
         setState(() {
