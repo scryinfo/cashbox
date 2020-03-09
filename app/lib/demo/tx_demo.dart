@@ -61,7 +61,7 @@ class _TransactionDemoState extends State<TransactionDemo> {
     print("nonce ===>" + nonce);
     print("result===>" + map.toString());
     print("result===>" + map["status"].toString());
-    print("result===>" + map["signedInfo"]);
+    print("result===>" + map["signedInfo"].toString());
     testBroadcastTxToChain(map["signedInfo"]);
   }
 
