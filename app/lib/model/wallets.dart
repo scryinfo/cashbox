@@ -316,7 +316,7 @@ class Wallets {
       return;
     }
     try {
-      if (double.parse(balance) < 0) {
+      if (double.parse(balance) <= 0 || balance.trim() == "") {
         return;
       }
     } catch (e) {

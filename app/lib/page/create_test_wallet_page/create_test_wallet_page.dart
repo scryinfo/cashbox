@@ -28,6 +28,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   @override
   void initState() {
     super.initState();
+    changeMnemonic();
   }
 
   @override
