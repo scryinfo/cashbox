@@ -48,8 +48,13 @@ pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str, psw: &[u8]) -> Res
 /// data 备注消息（当交易确认后，能够在区块上查看到）
 /// chain_id: ETH的链类型
 pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> Result<String, WalletError> {
-    //
-    match module::wallet::find_keystore_wallet_from_address(from_address, ChainType::ETH) {
+    //由于在开发过程中会使用开发链做测试，当前钱包没有生成开发模式下的链地址，默认使用测试模式
+    let chain_type = if eth_chain_id==1 {
+        ChainType::ETH
+    }else {
+        ChainType::EthTest
+    };
+    match module::wallet::find_keystore_wallet_from_address(from_address, chain_type) {
         Ok(keystore) => {
             match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
@@ -98,7 +103,13 @@ pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, t
     if to_account.is_none() {
         return Err(WalletError::Custom("to account is not allown empty".to_string()));
     }
-    match module::wallet::find_keystore_wallet_from_address(from_account, ChainType::ETH) {
+    //由于在开发过程中会使用开发链做测试，当前钱包没有生成开发模式下的链地址，默认使用测试模式
+    let chain_type = if eth_chain_id==1 {
+        ChainType::ETH
+    }else {
+        ChainType::EthTest
+    };
+    match module::wallet::find_keystore_wallet_from_address(from_account, chain_type) {
         Ok(keystore) => {
             match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
