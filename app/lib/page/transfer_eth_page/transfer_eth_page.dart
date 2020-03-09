@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:app/generated/i18n.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
+import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -66,6 +67,30 @@ class _TransferEthPageState extends State<TransferEthPage> {
       decimal = Provider.of<TransactionProvide>(context).decimal;
       chainType = Provider.of<TransactionProvide>(context).chainType;
       digitBalance = Provider.of<TransactionProvide>(context).balance;
+    }
+    if (digitBalance == null || fromAddress == null || chainType == null) {
+      Wallet walletM = await Wallets.instance.getNowWalletModel();
+      if (digitBalance == null) {
+        List displayDigitsList = walletM.nowChain.digitsList;
+        for (var i = 0; i < displayDigitsList.length; i++) {
+          if (contractAddress != null &&
+              contractAddress.trim() != "" &&
+              displayDigitsList[i].contractAddress != null &&
+              (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
+            digitBalance = await loadErc20Balance(walletM.nowChain.chainAddress, displayDigitsList[i].contractAddress, walletM.nowChain.chainType);
+            break;
+          }
+        }
+      }
+      if (fromAddress == null || fromAddress.trim() == "") {
+        fromAddress = walletM.getChainByChainType(ChainType.ETH_TEST).chainAddress;
+      }
+      if (chainType == null) {
+        chainType = walletM.nowChain.chainType;
+      }
+      if (decimal == null) {
+        decimal = 18;
+      }
     }
     _txValueController.text = Provider.of<TransactionProvide>(context).txValue ?? "";
     _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress ?? "";
@@ -678,7 +703,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
           hintContent: S.of(context).input_pwd_hint_detail.toString(),
           hintInput: S.of(context).input_pwd_hint.toString(),
           onPressed: (String pwd) async {
-            print("_showPwdDialog pwd is ===>" + pwd);
+            print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
             String walletId = await Wallets.instance.getNowWalletId();
             Map result = await Wallets.instance.ethTxSign(
                 walletId,
