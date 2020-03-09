@@ -105,9 +105,11 @@ class QrScanUtil {
     }
 
     var toAddress = paramsMap["ta"];
+    var contractAddress = paramsMap["ca"];
     var backup = paramsMap["bu"];
     var value = paramsMap["v"];
     Provider.of<TransactionProvide>(context)
+      ..setContractAddress(contractAddress)
       ..setToAddress(toAddress)
       ..setValue(value)
       ..setBackup(backup);
