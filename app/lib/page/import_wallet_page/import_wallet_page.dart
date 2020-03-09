@@ -362,7 +362,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   },
                 ),
                 Text(
-                  "EEE",
+                  "ETH",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 13,
