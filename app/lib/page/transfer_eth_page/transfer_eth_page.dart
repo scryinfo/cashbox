@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:app/generated/i18n.dart';
@@ -49,6 +50,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   double mMinGasFee;
   double mGasFeeValue;
   String digitBalance = "";
+  String ethBalance = "";
   String fromAddress = "";
   String contractAddress = "";
   String digitName = "";
@@ -68,30 +70,31 @@ class _TransferEthPageState extends State<TransferEthPage> {
       chainType = Provider.of<TransactionProvide>(context).chainType;
       digitBalance = Provider.of<TransactionProvide>(context).balance;
     }
-    if (digitBalance == null || fromAddress == null || chainType == null) {
-      Wallet walletM = await Wallets.instance.getNowWalletModel();
-      if (digitBalance == null) {
-        List displayDigitsList = walletM.nowChain.digitsList;
-        for (var i = 0; i < displayDigitsList.length; i++) {
-          if (contractAddress != null &&
-              contractAddress.trim() != "" &&
-              displayDigitsList[i].contractAddress != null &&
-              (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
-            digitBalance = await loadErc20Balance(walletM.nowChain.chainAddress, displayDigitsList[i].contractAddress, walletM.nowChain.chainType);
-            break;
-          }
-        }
-      }
-      if (fromAddress == null || fromAddress.trim() == "") {
-        fromAddress = walletM.getChainByChainType(ChainType.ETH_TEST).chainAddress;
-      }
-      if (chainType == null) {
-        chainType = walletM.nowChain.chainType;
-      }
-      if (decimal == null) {
-        decimal = 18;
+
+    Wallet walletM = await Wallets.instance.getNowWalletModel();
+    Chain nowChain = walletM.getChainByChainType(ChainType.ETH_TEST);
+    List displayDigitsList = nowChain.digitsList;
+    ethBalance = await loadEthBalance(nowChain.chainAddress, ChainType.ETH_TEST);
+    for (var i = 0; i < displayDigitsList.length; i++) {
+      if (digitBalance == null &&
+          contractAddress != null &&
+          contractAddress.trim() != "" &&
+          displayDigitsList[i].contractAddress != null &&
+          (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
+        digitBalance = await loadErc20Balance(nowChain.chainAddress, displayDigitsList[i].contractAddress, ChainType.ETH_TEST);
+        break;
       }
     }
+    if (fromAddress == null || fromAddress.trim() == "") {
+      fromAddress = nowChain.chainAddress;
+    }
+    if (chainType == null) {
+      chainType = nowChain.chainType;
+    }
+    if (decimal == null) {
+      decimal = 18;
+    }
+    print("ethBalance===>" + ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
     _txValueController.text = Provider.of<TransactionProvide>(context).txValue ?? "";
     _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress ?? "";
     _backupMsgController.text = Provider.of<TransactionProvide>(context).backup ?? "";
@@ -718,7 +721,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 mGasLimitValue.toInt().toString(),
                 nonce,
                 decimal: decimal);
-            print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"]);
+            print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"].toString());
             if (result["status"] != null && result["status"] == 200) {
               Fluttertoast.showToast(msg: "签名成功！ 交易发送上链中", timeInSecForIos: 3);
               sendRawTx2Chain(result["ethSignedInfo"].toString());
@@ -784,6 +787,17 @@ class _TransferEthPageState extends State<TransferEthPage> {
         }
       } catch (e) {
         Fluttertoast.showToast(msg: S.of(context).unknown_in_value);
+        return false;
+      }
+    }
+    if (ethBalance.isNotEmpty) {
+      try {
+        if (double.parse(ethBalance) <= 0) {
+          Fluttertoast.showToast(msg: "账户以太坊余额，不足支付gas费");
+          return false;
+        }
+      } catch (e) {
+        Fluttertoast.showToast(msg: "账户以太坊余额出现错误:" + e.toString());
         return false;
       }
     }

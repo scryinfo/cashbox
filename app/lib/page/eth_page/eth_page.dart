@@ -187,6 +187,7 @@ class _EthPageState extends State<EthPage> {
       var digitRate = DigitRate();
       Digit digit = EthDigit();
       digit
+        ..digitId = nowChainDigitsList[i].digitId
         ..chainId = nowChainDigitsList[i].chainId
         ..decimal = nowChainDigitsList[i].decimal
         ..shortName = nowChainDigitsList[i].shortName
