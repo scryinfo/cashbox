@@ -13,11 +13,11 @@ Future<Rate> loadRateInstance() async {
       var legalRateMap = (res["data"]["rates"] as Map);
       // todo 2.0 说明，访问接口https://data.block.cc/api/v3 数据返回的rate值（法币间汇率）有问题，
       // 目前暂时写死（法币间汇率）展示
-      legalRateMap["CNY"] = 7.00;
-      legalRateMap["EUR"] = 0.885;
-      legalRateMap["GBP"] = 0.785;
-      legalRateMap["JAY"] = 107.675;
-      legalRateMap["KRW"] = 1159.108;
+      legalRateMap["CNY"] = 6.92;
+      legalRateMap["EUR"] = 0.881679;
+      legalRateMap["GBP"] = 0.765212;
+      legalRateMap["JPY"] = 103.9849366;
+      legalRateMap["KRW"] = 900;
       legalRateMap["USD"] = 1;
       resultRate.setLegalMap(legalRateMap);
       return resultRate;

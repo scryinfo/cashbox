@@ -46,7 +46,12 @@ const DddMainNetContractAddress = "0x9F5F3CFD7a32700C93F971637407ff17b91c7342";
 const DddTestNetContractAddress = "0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e";
 
 const RatePath = "https://cashbox.scry.info/cashbox/api/market/pricerate";
+//https://data.gateio.life/api2/1/marketlist  免费gateio接口，无法币rate
 //const RatePath = "http://40.73.35.55:8089/cashbox/api/market/pricerate";
+/*{  免费版一月10k访问量，todo 待定
+  https://data.block.cc/api/v1/price?api_key=
+  https://data.block.cc/api/v1/exchange_rate?api_key=
+}*/
 const PublicPath = "https://cashbox.scry.info/public";
 const ETHERSCAN_API_KEY = "XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1";
 
