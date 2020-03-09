@@ -13,8 +13,11 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-
-        eeeTxsign();
+       // walletGenerateTest();
+       // walletExportTest();
+        // eeeTxsign();
+        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+        contract_test(wallets);
 
     }
 
@@ -40,7 +43,7 @@ public class NativeLibTest {
     }
 
     public static void eeeTxsign(){
-        String rawtx = "0x410284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d017226452e1ab7a1e8047943569deadba0d8213c2c79207c56738eb8bdb5f0883a23f158bd2ad82a02b3905e3ab8ec3138e1e8f17b2a384b2e1f20fbbfd74a16010004000600ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0b0040e59c30120100000058c346ad6597993d5fd0ba9d3dba24f630ecdef2094b303ad84eef93c49401e804000000";
+        String rawtx = "0xd00411030f00404c948b3203029435776b349a5506857e7aafbd735966b7171b7044664866f43b818b9eef14d3a866bd100222ff18030000003f4bea2466b9e7d477e58c9c6b79aa2fbb2010ccc03aae14c0e2075cc31a571304000000";
         NativeLib.Message msg = NativeLib.eeeTxSign(rawtx,"72ae6480-ce42-4dff-abf6-6777f76d3203","123456".getBytes());
         System.out.println(msg.toString());
     }
@@ -78,21 +81,26 @@ public class NativeLibTest {
         System.out.println("chain id is:"+chain_id_dec);
         //构造接口测试参数
         TxObj tx = new TxObj();
-        tx.setMmId("c6089566-e60a-446b-afad-dd91f34568a8");
+        int decimal = 18;
+        tx.setMmId(wallets.get(0).walletId);
         tx.setChainType(chain_id_dec);
         tx.setFromAddress(default_address);
         tx.setToAddress(target_address);
-        tx.setValue("100000000000");
+        tx.setValue("1.6543");
         tx.setContractAddress("");//0xee35211c4d9126d520bbfeaf3cfee5fe7b86f221
-        tx.setGasPrice("21480");
-        tx.setGasLimit("8000000");
+        tx.setGasPrice("6");
+        tx.setGasLimit("70000");
         tx.setNonce(nonce);
         tx.setAdditional("hello");
         tx.setPsw("123456".getBytes());
         System.out.println("**************普通ETH交易测试******************");
         //交易签名
         NativeLib.Message msg = NativeLib.ethTxSign(tx.getMmId(),tx.getChainType(),tx.getFromAddress(),tx.getToAddress(),tx.getContractAddress(),
-                tx.getValue(),tx.getAdditional(),tx.getPsw(),tx.getGasPrice(),tx.getGasLimit(),tx.getNonce());
+                tx.getValue(),tx.getAdditional(),tx.getPsw(),tx.getGasPrice(),tx.getGasLimit(),tx.getNonce(),18);
+        if (msg.status!=200){
+            System.out.println(msg.message);
+            return;
+        }
         System.out.println("eth raw signed data is:"+msg.ethSignedInfo);
         //交易发送上链
         String hash =  client.invoke("eth_sendRawTransaction",new Object[]{msg.ethSignedInfo},String.class);
@@ -114,7 +122,7 @@ public class NativeLibTest {
         tx.setAdditional(contract_str);//附加数据为合约bytes
 
         NativeLib.Message deploy_contract = NativeLib.ethTxSign(tx.getMmId(),tx.getChainType(),tx.getFromAddress(),tx.getToAddress(),tx.getContractAddress(),
-                tx.getValue(),tx.getAdditional(),tx.getPsw(),tx.getGasPrice(),tx.getGasLimit(),tx.getNonce());
+                tx.getValue(),tx.getAdditional(),tx.getPsw(),tx.getGasPrice(),tx.getGasLimit(),tx.getNonce(),decimal);
         String deploy_contract_hash =  client.invoke("eth_sendRawTransaction",new Object[]{deploy_contract.ethSignedInfo},String.class);
         System.out.println("tx result :"+deploy_contract_hash);
         //交易详情查看
@@ -130,7 +138,7 @@ public class NativeLibTest {
         tx.setToAddress(target_address);
         //合约调用签名
         NativeLib.Message contract_invoke_msg = NativeLib.ethTxSign(tx.getMmId(),tx.getChainType(),tx.getFromAddress(),tx.getToAddress(),tx.getContractAddress(),
-                tx.getValue(),tx.getAdditional(),tx.getPsw(),tx.getGasPrice(),tx.getGasLimit(),tx.getNonce());
+                tx.getValue(),tx.getAdditional(),tx.getPsw(),tx.getGasPrice(),tx.getGasLimit(),tx.getNonce(),decimal);
         String contract_invoke_result_hash =  client.invoke("eth_sendRawTransaction",new Object[]{contract_invoke_msg.ethSignedInfo},String.class);
         System.out.println("contract_invoke_result_hash :"+contract_invoke_result_hash);
 

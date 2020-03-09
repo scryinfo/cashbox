@@ -148,7 +148,7 @@ pub fn rename_wallet(walletid: &str, wallet_name: &str) -> Result<bool, WalletEr
 
 
 //根据生成钱包的类型，需要创建对应的地址
-fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, WalletError> {
+pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, WalletError> {
     let phrase = String::from_utf8(mn.to_vec())?;
     // TODO 这个地方 根据支持链的种类 分别生成对应的地址
     match wallet_type {

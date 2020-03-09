@@ -87,7 +87,6 @@ mod tests {
         let s = String::new();
         let data = wallet_crypto::Ed25519::sign(&mnemonic,data.as_bytes());
         println!("{}",hex::encode(data.to_vec().as_slice()));
-       // wallet_crypto::Sr25519::print_from_phrase(&mnemonic,None);
     }
 
     #[test]
@@ -136,7 +135,7 @@ mod tests {
 
     #[test]
     fn func_sign_test(){
-        let rawtx = "0x410284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d017226452e1ab7a1e8047943569deadba0d8213c2c79207c56738eb8bdb5f0883a23f158bd2ad82a02b3905e3ab8ec3138e1e8f17b2a384b2e1f20fbbfd74a16010004000600ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0b0040e59c30120100000058c346ad6597993d5fd0ba9d3dba24f630ecdef2094b303ad84eef93c49401e804000000";
+        let rawtx = "0x410284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0122b11275067a35d4b6ebae6be86b55404ea5b9f2a3c75714d6c7b2efbffb9d3975b4c9acc19569a2f1f34300ecdb5190f9f3c43af201fb396959d8c3ba18ca030000000600ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0b0040e59c301200000000eeb761fc521f62ad8de15f6e58804767eaf577c599e0df9e4246b4a7fc85178504000000";
         module::wallet::raw_tx_sign(rawtx,"77888f3c-2574-4a24-8a75-d168f6376f40","123456".as_bytes());
     }
 
