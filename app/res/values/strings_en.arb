@@ -22,7 +22,7 @@
   "choose_multi_chain": "选择创建链",
   "eee_chain_test": "EEE_TEST",
   "eth_chain_name": "ETH",
-  "eth_test_chain_name": "EEE_TEST",
+  "eth_test_chain_name": "ETH_TEST",
   "add_wallet": "添加钱包",
   "create_wallet": "创建钱包",
   "mne_pwd_not_allow_is_null": "助记词和密码不能为空",

@@ -54,7 +54,7 @@ class S implements WidgetsLocalizations {
   String get ensure_pwd => "确认密码";
   String get ensure_to_change => "确定更改";
   String get eth_chain_name => "ETH";
-  String get eth_test_chain_name => "EEE_TEST";
+  String get eth_test_chain_name => "ETH_TEST";
   String get eth_token_name => "ETH";
   String get extend_msg => "备注信息";
   String get fail_to_load_data_hint => "数据加载失败,请检查网络状况，可尝试下拉刷新";
@@ -425,7 +425,7 @@ class $zh extends S {
   @override
   String get to_address_null => "请检查对方地址不能为空";
   @override
-  String get eth_test_chain_name => "EEE_TEST";
+  String get eth_test_chain_name => "ETH_TEST";
   @override
   String get create_test_wallet => "创建测试钱包";
   @override
