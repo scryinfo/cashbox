@@ -67,7 +67,7 @@ impl BloomFilter {
                     error!("Error processing headers: {}", e);
                 }
             }
-            self.timeout.lock().unwrap().check(vec!(ExpectedReply::MerkleBlock));
+            self.timeout.lock().unwrap().check(vec!(ExpectedReply::Nonce));
         }
     }
 

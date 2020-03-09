@@ -34,6 +34,7 @@ use timeout::{ExpectedReply, SharedTimeout};
 use downstream::SharedDownstream;
 use db::{SharedSQLite, SQLite};
 use bitcoin_hashes::hex::ToHex;
+use hooks::HooksMessage;
 
 pub struct HeaderDownload {
     p2p: P2PControlSender<NetworkMessage>,
@@ -41,13 +42,14 @@ pub struct HeaderDownload {
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     downstream: SharedDownstream,
     sqlite: SharedSQLite,
+    hook_sender: mpsc::SyncSender<HooksMessage>,
 }
 
 impl HeaderDownload {
-    pub fn new(sqlite: SharedSQLite, chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>, downstream: SharedDownstream) -> PeerMessageSender<NetworkMessage> {
+    pub fn new(sqlite: SharedSQLite, chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>, downstream: SharedDownstream, hook_sender: mpsc::SyncSender<HooksMessage>) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
-        let mut headerdownload = HeaderDownload { chaindb, p2p, timeout, downstream, sqlite };
+        let mut headerdownload = HeaderDownload { chaindb, p2p, timeout, downstream, sqlite, hook_sender };
 
         thread::Builder::new().name("header download".to_string()).spawn(move || { headerdownload.run(receiver) }).unwrap();
 
@@ -56,7 +58,7 @@ impl HeaderDownload {
 
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
         loop {
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {
@@ -170,7 +172,7 @@ impl HeaderDownload {
                                 let header_clone = header.clone();
                                 sqlite.insert_block(
                                     header_clone.bitcoin_hash().to_hex(),
-                                    header_clone.time.to_string()
+                                    header_clone.time.to_string(),
                                 );
                                 if let Some(forwards) = forwards {
                                     moved_tip = Some(forwards.last().unwrap().clone());
@@ -214,6 +216,8 @@ impl HeaderDownload {
 
             if let Some(new_tip) = moved_tip {
                 info!("received {} headers new tip={} from peer={}", headers.len(), new_tip, peer);
+                //hooks for new headers
+                self.hook_sender.send(HooksMessage::ReceivedHeaders(peer.clone())).expect("HOOKS ERROR");
                 self.p2p.send(P2PControl::Height(height));
             } else {
                 debug!("received {} known or orphan headers [{} .. {}] from peer={}", headers.len(), headers[0].bitcoin_hash(), headers[headers.len() - 1].bitcoin_hash(), peer);

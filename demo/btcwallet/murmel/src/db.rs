@@ -69,7 +69,7 @@ impl SQLite {
     //查询未扫描区块头 返回相应数据 以时间戳为依据
     pub fn query_header(&self, timestamp: String) -> Vec<String> {
         let mut statement = self.connection.prepare(
-            "SELECT * FROM block_hash WHERE timestamp >= ? AND  scanned <= 10 LIMIT 10000"
+            "SELECT * FROM block_hash WHERE timestamp >= ? AND  scanned <= 5 LIMIT 1000"
         ).expect("query_header PREPARE ERR");
         statement.bind(
             1,
@@ -82,7 +82,7 @@ impl SQLite {
         }
 
         let mut statement2 = self.connection.prepare(
-            "UPDATE block_hash SET scanned = scanned + 1 WHERE timestamp >= ? AND scanned <= 10 LIMIT 10000"
+            "UPDATE block_hash SET scanned = scanned + 1 WHERE timestamp >= ? AND scanned <= 5 LIMIT 1000"
         ).expect("update scan ERR");
         statement2.bind(1, timestamp.as_str()).expect("bind ERR");
         statement2.next().expect("update scanned ERR");

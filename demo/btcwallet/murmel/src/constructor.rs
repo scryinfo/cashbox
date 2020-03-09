@@ -89,6 +89,8 @@ impl Constructor {
 
         let (to_dispatcher, from_p2p) = mpsc::sync_channel(BACK_PRESSURE);
 
+        let (hook_sender, hook_receiver) = mpsc::sync_channel(BACK_PRESSURE);
+
         let p2pconfig = BitcoinP2PConfig {
             network,
             nonce: thread_rng().next_u64(),
@@ -108,19 +110,14 @@ impl Constructor {
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
 
-        dispatcher.add_listener(HeaderDownload::new(shared_sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone(), lightning.clone()));
+        dispatcher.add_listener(HeaderDownload::new(shared_sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone(), lightning.clone(), hook_sender));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
-
-        //添加新的监听 布隆过滤器有关的消息
-        //在这里add_listener的时候，链接已经建立了（Version 和 verack 已经发送）
-        //我们需要FilterLoad getdata 回来的数据是merkleblock
-        //考虑消息何时发，何时结束。
-        info!("我自己发起了FilterLoad");
+        info!("send FilterLoad");
         dispatcher.add_listener(BloomFilter::new(p2p_control.clone(), timeout.clone()));
 
-        info!("我自己发起了GetData");
-        dispatcher.add_listener(GetData::new(shared_sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone()));
+        info!("send GetData");
+        dispatcher.add_listener(GetData::new(shared_sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone(), hook_receiver));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));

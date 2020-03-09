@@ -61,5 +61,6 @@ pub mod bloomfilter;
 pub mod getdata;
 pub mod db;
 pub mod utxo;
+pub mod hooks;
 
 pub use error::Error;
