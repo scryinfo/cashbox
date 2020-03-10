@@ -210,7 +210,7 @@ class _EthPageState extends State<EthPage> {
         brightness: Brightness.light,
         centerTitle: true,
         title: Text(
-          walletName ?? walletName,
+          walletName ?? "",
           style: TextStyle(fontSize: 20),
         ),
       ),
@@ -413,12 +413,14 @@ class _EthPageState extends State<EthPage> {
                                 ],
                               ),
                               Align(
-                                alignment: FractionalOffset.topRight,
-                                child: Text(
-                                  "0", //最近一笔交易记录
-                                  style: TextStyle(fontSize: ScreenUtil.instance.setSp(2.5), color: Colors.greenAccent),
-                                ),
-                              ),
+                                  alignment: FractionalOffset.topRight,
+                                  child: Opacity(
+                                    opacity: 0,
+                                    child: Text(
+                                      "0", //最近一笔交易记录
+                                      style: TextStyle(fontSize: ScreenUtil.instance.setSp(2.5), color: Colors.greenAccent),
+                                    ),
+                                  )),
                             ],
                           ),
                         ),
@@ -517,7 +519,7 @@ class _EthPageState extends State<EthPage> {
               alignment: Alignment.centerLeft,
               width: ScreenUtil().setWidth(40),
               height: ScreenUtil().setHeight(42.75),
-              padding: EdgeInsets.only(left: ScreenUtil().setWidth(8.5), top: ScreenUtil().setHeight(10)),
+              padding: EdgeInsets.only(left: ScreenUtil().setWidth(8.5), top: ScreenUtil().setHeight(11)),
               decoration: BoxDecoration(
                 image: DecorationImage(image: AssetImage("assets/images/bg_card.png"), fit: BoxFit.fill),
               ),
@@ -525,7 +527,7 @@ class _EthPageState extends State<EthPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   _chainCardMoneyWidget(),
-                  Gaps.scaleVGap(10),
+                  Gaps.scaleVGap(8),
                   _chainCardAddressWidget(index),
                 ],
               ),
@@ -556,8 +558,9 @@ class _EthPageState extends State<EthPage> {
           alignment: Alignment.center,
           child: Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
             Container(
+              //constraints: BoxConstraints(maxWidth:ScreenUtil().setWidth(30)),
               height: ScreenUtil().setHeight(7),
-              width: ScreenUtil().setWidth(30),
+              //width: ScreenUtil().setWidth(30),
               alignment: Alignment.centerLeft,
               child: new Text(
                 moneyUnitStr + nowWalletAmount.toStringAsFixed(4) ?? "0.00",
