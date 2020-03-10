@@ -226,7 +226,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     walletList[index] != null ? walletList[index].walletName : "",
-                                    style: TextStyle(color: Colors.grey, fontSize: ScreenUtil.instance.setSp(3)),
+                                    style: TextStyle(color: Colors.black87, fontSize: ScreenUtil.instance.setSp(3)),
                                     maxLines: 1,
                                   ),
                                 ),
@@ -234,7 +234,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                                   width: ScreenUtil().setWidth(18),
                                   margin: EdgeInsets.only(left: ScreenUtil().setWidth(3)),
                                   child: Text(
-                                    "0", //walletList[index].money,
+                                    walletList[index].accountMoney ?? "0",
                                     style: TextStyle(color: Colors.grey, fontSize: ScreenUtil.instance.setSp(3)),
                                     maxLines: 1,
                                     textAlign: TextAlign.center,
@@ -278,15 +278,19 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
   List<Widget> _buildChainListCard(Wallet wallet) {
     List<Widget> chainsList = List.generate(wallet.chainList.length, (index) {
       Chain nowChain = wallet.chainList[index];
-      return Container(
-        alignment: Alignment.centerLeft,
-        height: ScreenUtil().setHeight(7.5),
-        width: ScreenUtil().setWidth(10),
-        child: Text(
-          nowChain.chainTypeToValue(nowChain.chainType),
-          style: TextStyle(color: Color(0xFF57CAF2), fontSize: ScreenUtil.instance.setSp(3)),
-        ),
-      );
+      if (nowChain.chainType == ChainType.ETH_TEST || nowChain.chainType == ChainType.ETH) {
+        //todo 2.0 目前手动写死，只加载eth链,不显示加载EEE链
+        return Container(
+          alignment: Alignment.centerLeft,
+          height: ScreenUtil().setHeight(7.5),
+          width: ScreenUtil().setWidth(15),
+          child: Text(
+            nowChain.chainTypeToValue(nowChain.chainType),
+            style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.instance.setSp(3)),
+          ),
+        );
+      }
+      return Container();
     });
     return chainsList;
   }

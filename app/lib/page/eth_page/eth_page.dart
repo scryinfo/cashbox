@@ -152,6 +152,7 @@ class _EthPageState extends State<EthPage> {
       nowWalletAmount = 0;
       setState(() {
         nowWalletAmount = nowWalletAmount + Rate.instance.getMoney(displayDigitsList[index]);
+        nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
         displayDigitsList[index].money = Rate.instance.getMoney(displayDigitsList[index]).toStringAsFixed(3);
       });
     }
