@@ -11,7 +11,7 @@ class Wallet {
   int status; //接口数据，返回状态码
   String walletId; //钱包Id
   String walletName; //钱包名
-  String money; //
+  String accountMoney; // 当前钱包 当前链 代币总余额
   Uint8List mnemonic; //助记词,                  /* 参数传递，及时释放*/
   Uint8List secretKey; //私钥                    /* 参数传递，及时释放*/
   String jsonFilePath; //私钥加密文件jsonFile路径
