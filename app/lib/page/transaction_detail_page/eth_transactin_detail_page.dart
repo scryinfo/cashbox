@@ -295,7 +295,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              Provider.of<TransactionProvide>(context).backup,
+              Provider.of<TransactionProvide>(context).backup ?? "",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil.instance.setSp(3.5),
