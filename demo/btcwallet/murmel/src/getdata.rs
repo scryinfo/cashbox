@@ -65,7 +65,7 @@ impl GetData {
                     }
                     PeerMessage::Incoming(pid, msg) => {
                         match msg {
-                            NetworkMessage::MerkleBlock(ref merkleblock) =>
+                            NetworkMessage::MerkleBlock(ref merkleblock) => {
                                 if self.is_serving_blocks(pid) {
                                     if merkle_vec.len() <= 100 {
                                         merkle_vec.push(merkleblock.clone());
@@ -76,7 +76,8 @@ impl GetData {
                                     Ok(())
                                 } else {
                                     Ok(())
-                                },
+                                }
+                            }
                             NetworkMessage::Tx(ref tx) => if self.is_serving_blocks(pid) { self.tx(tx, pid, hash160.clone()) } else { Ok(()) },
                             NetworkMessage::Ping(_) => { Ok(()) }
                             _ => { Ok(()) }
@@ -146,34 +147,37 @@ impl GetData {
         Ok(())
     }
 
+
     ///处理tx返回值
     fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
         let sqlite = self.sqlite.lock().expect("open connection error!");
         println!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;
-        let mut index = 0;
+        let mut index = -1;
         for vout in vouts {
             index += 1;
             let script = vout.script_pubkey;
-            let asm = script.asm();
-            let mut iter = asm.split_ascii_whitespace();
-            iter.next();
-            iter.next();
-            let current_hash = iter.next().unwrap_or(" ");
-            if current_hash.eq(hash160.as_str()) {
-                sqlite.insert_utxo(
-                    tx_hash.to_hex(),
-                    asm.clone(),
-                    vout.value.to_string(),
-                    index,
-                );
+            if script.is_p2pkh() {
+                let asm = script.asm();
+                let mut iter = asm.split_ascii_whitespace();
+                iter.next();
+                iter.next();
+                iter.next();
+                let current_hash = iter.next().unwrap_or(" ");
+                if current_hash.eq(hash160.as_str()) {
+                    sqlite.insert_utxo(
+                        tx_hash.to_hex(),
+                        asm.clone(),
+                        vout.value.to_string(),
+                        index,
+                    );
+                }
             }
         }
         Ok(())
     }
 
-    ///计算hash160
     fn hash160(&self, public_key: &str) -> String {
         // 公钥 66位
         let public_key = "0291EE52A0E0C22DB9772F237F4271EA6F9330D92B242FB3C621928774C560B699";

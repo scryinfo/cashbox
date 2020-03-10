@@ -129,7 +129,7 @@ impl SQLite {
     //存储 utxo
     pub fn insert_utxo(&self, txhash: String, script: String, value: String, vout: i64) {
         let mut statement = self.connection.prepare(
-            "INSERT INTO utxo VALUES(?,?,?,?)"
+            "INSERT INTO utxos VALUES(?,?,?,?)"
         ).expect("insert utxo error");
         statement.bind(1, txhash.as_str()).expect("bind statement error");
         statement.bind(2, script.as_str()).expect("bind statement error");
