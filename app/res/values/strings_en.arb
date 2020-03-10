@@ -155,5 +155,6 @@
   "success_change_wallet_name": "钱包名称修改 成功！",
   "failure_change_wallet_name": "钱包名称修改 失败！",
   "wallet_manager": "钱包管理",
-  "compile_wallet_name": "编辑"
+  "compile_wallet_name": "编辑",
+  "tx_hash": "交易hash"
 }

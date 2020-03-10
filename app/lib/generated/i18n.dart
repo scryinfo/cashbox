@@ -152,6 +152,7 @@ class S implements WidgetsLocalizations {
   String get transfer_to_address => "转入地址:";
   String get tx_backup => "交易备注";
   String get tx_failure => "交易失败";
+  String get tx_hash => "交易hash";
   String get tx_sign_failure => "交易签名 失败";
   String get tx_sign_success => "交易签名 成功";
   String get tx_success => "交易成功";
@@ -348,6 +349,8 @@ class $zh extends S {
   String get backup_wallet => "备份钱包!";
   @override
   String get pls_input_wallet_pwd => "请输入钱包密码";
+  @override
+  String get tx_hash => "交易hash";
   @override
   String get pls_ensure_pwd_is_same => "请确认两次输入密码一致";
   @override
