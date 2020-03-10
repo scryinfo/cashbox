@@ -140,7 +140,7 @@ class _DappPageState extends State<DappPage> {
         name: "NativeGoBack",
         onMessageReceived: (JavascriptMessage message) {
           print("NativeSignMsg 从NativeGoBack传回来的参数======>： ${message.message}");
-          NavigatorUtils.push(context, Routes.ethPage);
+          NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
         }));
 
     return jsChannelList.toSet();

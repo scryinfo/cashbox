@@ -2,11 +2,13 @@ import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 import '../../routers/application.dart';
 import '../../routers/routers.dart';
@@ -201,7 +203,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                     print("wallet index is===> " + walletList[index].walletId);
                     bool isSuccess = await Wallets.instance.setNowWallet(walletList[index].walletId);
                     if (isSuccess) {
-                      NavigatorUtils.push(context, Routes.ethPage, clearStack: true);
+                      NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
                     } else {
                       Fluttertoast.showToast(msg: S.of(context).failure_to_change_wallet);
                     }

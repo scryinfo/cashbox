@@ -160,10 +160,11 @@ class Wallets {
       {
         //BTC
       }
-
+      if (walletM.isNowWallet) {
+        this.nowWallet = walletM;
+      }
       allWalletList.add(walletM); ////将wallet 添加到walletList里面
     }
-
     return allWalletList;
   }
 
@@ -236,15 +237,20 @@ class Wallets {
       return false;
     }
     if (status == 200) {
+      //改model层数据
+      this.allWalletList.forEach((w) {
+        if (w.walletId.toLowerCase() == walletId.toLowerCase()) {
+          w.isNowWallet = true;
+          this.nowWallet = w;
+        } else {
+          w.isNowWallet = false;
+        }
+      });
       return setNowWalletMap["isSetNowWallet"];
     } else {
       LogUtil.e("setNowWallet=>", "error status code is" + status.toString() + "||message is=>" + setNowWalletMap["message"]);
       return false;
     }
-  }
-
-  setNowWalletM(Wallet walletM) async {
-    this.nowWallet = walletM;
   }
 
   //删除钱包。 钱包设置可删除，链设置隐藏。
