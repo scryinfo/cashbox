@@ -137,7 +137,6 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, Strin
           ..to = res["result"][i]["to"]
           ..gas = res["result"][i]["gas"]
           ..gasPrice = res["result"][i]["gasPrice"]
-          ..isError = res["result"][i]["isError"]
           ..txreceipt_status = res["result"][i]["txreceipt_status"]
           ..input = res["result"][i]["input"]
           ..contractAddress = res["result"][i]["contractAddress"]
@@ -150,7 +149,9 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, Strin
         } else {
           ethTxModel.value = "+" + (double.parse(res["result"][i]["value"]) / Eth_Unit).toString();
         }
-        ethTxModel.isError = S.of(context).tx_success.toString(); //erc拿到的都会是交易成功的记录
+        // ..isError = res["result"][i]["isError"]
+        // 当前接口，erc20代币拿到的都会是交易成功的记录
+        ethTxModel.isError = S.of(context).tx_success.toString();
         modelArray.add(ethTxModel);
       }
     }

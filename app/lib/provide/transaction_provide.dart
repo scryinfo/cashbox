@@ -18,6 +18,7 @@ class TransactionProvide with ChangeNotifier {
   String _gasUsed;
   String _confirmations;
   String _balance;
+  String _money;
   ChainType _chainType;
 
   void emptyPartialRecord() {
@@ -43,6 +44,12 @@ class TransactionProvide with ChangeNotifier {
 
   setBalance(String value) {
     _balance = value;
+  }
+
+  String get money => _money;
+
+  setMoney(String value) {
+    _money = value;
   }
 
   String get fromAddress => _fromAddress;

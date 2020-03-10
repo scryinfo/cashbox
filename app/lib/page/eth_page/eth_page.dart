@@ -52,7 +52,6 @@ class _EthPageState extends State<EthPage> {
   void initData() async {
     this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     print("eth_page => initData walletlist.length===>" + walletList.length.toString());
-    Fluttertoast.showToast(msg: "this.walletList.length.toString===>" + this.walletList.length.toString());
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
       Wallet wallet = walletList[index];
@@ -328,6 +327,7 @@ class _EthPageState extends State<EthPage> {
                 Provider.of<TransactionProvide>(context)
                   ..setDigitName(displayDigitsList[index].shortName)
                   ..setBalance(displayDigitsList[index].balance)
+                  ..setMoney(displayDigitsList[index].money)
                   ..setDecimal(displayDigitsList[index].decimal)
                   ..setFromAddress(nowChainAddress)
                   ..setChainType(nowChain.chainType)

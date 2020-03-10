@@ -1,6 +1,7 @@
 import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
+import 'package:app/model/rate.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -28,6 +29,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<Digit> showDataList = [];
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
+  String moneyInfo = "0.00";
   String digitName = "ETH";
   String fromAddress = "";
   String contractAddress = "";
@@ -48,6 +50,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
       digitName = Provider.of<TransactionProvide>(context).digitName;
       balanceInfo = Provider.of<TransactionProvide>(context).balance;
+      moneyInfo = Provider.of<TransactionProvide>(context).money;
       chainType = Provider.of<TransactionProvide>(context).chainType;
     }
     txListFuture = getTxListData();
@@ -65,13 +68,13 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           backgroundColor: Colors.transparent,
         ),
         body: Container(
-          child: _buildTxHistoryWidget(),
+          child: _buildTxHistoryLayout(),
         ),
       ),
     );
   }
 
-  Widget _buildTxHistoryWidget() {
+  Widget _buildTxHistoryLayout() {
     return Container(
       width: ScreenUtil().setWidth(90),
       child: Column(
@@ -96,7 +99,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         children: <Widget>[
           Gaps.scaleHGap(7),
           Container(
-            width: ScreenUtil().setWidth(50),
+            width: ScreenUtil().setWidth(53),
             //color: Colors.amberAccent,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -104,19 +107,19 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 Container(
                   alignment: Alignment.centerLeft,
                   height: ScreenUtil().setHeight(8),
-                  width: ScreenUtil().setWidth(25),
+                  constraints: BoxConstraints(maxWidth: ScreenUtil().setWidth(18)),
                   child: Text(
                     balanceInfo ?? "0.0000",
                     textAlign: TextAlign.start,
                     style: TextStyle(
-                      fontSize: ScreenUtil.instance.setSp(4),
+                      fontSize: ScreenUtil.instance.setSp(4.2),
                       color: Colors.white,
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                 ),
-                Gaps.scaleHGap(0.5),
+                Gaps.scaleHGap(0.3),
                 Container(
                   width: ScreenUtil().setWidth(8),
                   child: Text(
@@ -132,12 +135,12 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 ),
                 Gaps.scaleHGap(0.5),
                 Opacity(
-                  opacity: 1, //todo 暂时不显示 价格
+                  opacity: 1,
                   child: Container(
-                    width: ScreenUtil().setWidth(15),
+                    width: ScreenUtil().setWidth(25),
                     child: Text(
-                      "≈" + "\$" + "6300.111311111",
-                      textAlign: TextAlign.center,
+                      "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + moneyInfo ?? "",
+                      textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: ScreenUtil.instance.setSp(3),
                         color: Colors.lightBlueAccent,
@@ -150,7 +153,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               ],
             ),
           ),
-          Gaps.scaleHGap(5),
+          Gaps.scaleHGap(3),
           Container(
             //height: ScreenUtil().setHeight(8),
             child: FlatButton(
@@ -219,6 +222,18 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       width: ScreenUtil().setWidth(90),
       child: Column(
         children: <Widget>[
+          Container(
+            alignment: Alignment.bottomLeft,
+            width: ScreenUtil().setWidth(90),
+            height: ScreenUtil().setHeight(0.1),
+            child: CustomPaint(
+              foregroundPainter: MySeparatorLine(
+                lineColor: Colors.blueAccent,
+                width: ScreenUtil().setWidth(90),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(5),
           Container(
             height: ScreenUtil().setHeight(100),
             padding: EdgeInsets.only(left: ScreenUtil().setWidth(5), right: ScreenUtil().setWidth(5)),
@@ -348,7 +363,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                           fontSize: ScreenUtil.instance.setSp(3),
                         ),
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        overflow: TextOverflow.clip,
                       ),
                     ),
                   ],
@@ -370,7 +385,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       child: Text(
                         ethTxListModel[index].isError ?? "",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: (ethTxListModel[index].isError == S.of(context).tx_success) ? Colors.white70 : Colors.redAccent,
                           fontSize: ScreenUtil.instance.setSp(2.5),
                         ),
                         textAlign: TextAlign.start,
@@ -382,7 +397,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       child: Text(
                         ethTxListModel[index].timeStamp,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.white70,
                           fontSize: ScreenUtil.instance.setSp(2.5),
                         ),
                         maxLines: 1,
