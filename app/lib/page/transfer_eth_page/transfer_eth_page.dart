@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:app/generated/i18n.dart';
@@ -56,6 +55,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   String digitName = "";
   String nonce = "";
   int decimal = 0;
+  Chain nowChain;
 
   @override
   void initState() {
@@ -70,21 +70,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
       chainType = Provider.of<TransactionProvide>(context).chainType;
       digitBalance = Provider.of<TransactionProvide>(context).balance;
     }
-
     Wallet walletM = await Wallets.instance.getNowWalletModel();
-    Chain nowChain = walletM.getChainByChainType(ChainType.ETH_TEST);
-    List displayDigitsList = nowChain.digitsList;
-    ethBalance = await loadEthBalance(nowChain.chainAddress, ChainType.ETH_TEST);
-    for (var i = 0; i < displayDigitsList.length; i++) {
-      if (digitBalance == null &&
-          contractAddress != null &&
-          contractAddress.trim() != "" &&
-          displayDigitsList[i].contractAddress != null &&
-          (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
-        digitBalance = await loadErc20Balance(nowChain.chainAddress, displayDigitsList[i].contractAddress, ChainType.ETH_TEST);
-        break;
-      }
-    }
+    nowChain = walletM.getChainByChainType(ChainType.ETH_TEST);
     if (fromAddress == null || fromAddress.trim() == "") {
       fromAddress = nowChain.chainAddress;
     }
@@ -94,11 +81,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
     if (decimal == null) {
       decimal = 18;
     }
-    print("ethBalance===>" + ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
     _txValueController.text = Provider.of<TransactionProvide>(context).txValue ?? "";
     _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress ?? "";
     _backupMsgController.text = Provider.of<TransactionProvide>(context).backup ?? "";
-    nonce = await loadTxAccount(fromAddress, chainType);
   }
 
   @override
@@ -674,23 +659,30 @@ class _TransferEthPageState extends State<TransferEthPage> {
   }
 
   Widget _buildTransferBtnWidget() {
-    return Container(
-      alignment: Alignment.bottomCenter,
-      width: ScreenUtil().setWidth(41),
-      height: ScreenUtil().setHeight(9),
-      color: Color.fromRGBO(26, 141, 198, 0.20),
-      child: FlatButton(
-        onPressed: () async {
-          if (_verifyTransferInfo() && _verifyNonce()) {
-            _showPwdDialog(context);
-          }
-        },
-        child: Text(
-          S.of(context).click_to_transfer,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.blue,
-            letterSpacing: 0.03,
+    return GestureDetector(
+      onTap: () async {
+        showProgressDialog(context, "信息格式检查中，请稍等");
+        var verifyTxInfoResult = await _verifyTransferInfo();
+        var verifyNonceResult = await _verifyNonce();
+        NavigatorUtils.goBack(context);
+        if (verifyTxInfoResult && verifyNonceResult) {
+          _showPwdDialog(context);
+        }
+      },
+      child: Container(
+        alignment: Alignment.bottomCenter,
+        width: ScreenUtil().setWidth(41),
+        height: ScreenUtil().setHeight(9),
+        color: Color.fromRGBO(26, 141, 198, 0.20),
+        child: FlatButton(
+          onPressed: () async {},
+          child: Text(
+            S.of(context).click_to_transfer,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.blue,
+              letterSpacing: 0.03,
+            ),
           ),
         ),
       ),
@@ -754,17 +746,18 @@ class _TransferEthPageState extends State<TransferEthPage> {
     }
   }
 
-  bool _verifyNonce() {
+  Future<bool> _verifyNonce() async {
+    nonce = await loadTxAccount(fromAddress, chainType);
     if (nonce == null || nonce.trim() == "") {
       print("取的nonce值有问题");
-      Fluttertoast.showToast(msg: "取的nonce值有问题", timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: "本次交易的nonce值有问题，请检查网络重新尝试", timeInSecForIos: 8);
       NavigatorUtils.goBack(context);
       return false;
     }
     return true;
   }
 
-  bool _verifyTransferInfo() {
+  Future<bool> _verifyTransferInfo() async {
     if (_toAddressController.text.trim() == "") {
       Fluttertoast.showToast(msg: S.of(context).to_address_null.toString(), timeInSecForIos: 3);
       return false;
@@ -779,6 +772,17 @@ class _TransferEthPageState extends State<TransferEthPage> {
       return false;
     }
     //判断余额 是否大于转账额度
+    List displayDigitsList = nowChain.digitsList;
+    for (var i = 0; i < displayDigitsList.length; i++) {
+      if (digitBalance == null &&
+          contractAddress != null &&
+          contractAddress.trim() != "" &&
+          displayDigitsList[i].contractAddress != null &&
+          (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
+        digitBalance = await loadErc20Balance(nowChain.chainAddress, displayDigitsList[i].contractAddress, ChainType.ETH_TEST);
+        break;
+      }
+    }
     if (_txValueController.text.isNotEmpty) {
       try {
         if (double.parse(digitBalance) < double.parse(_txValueController.text)) {
@@ -790,6 +794,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
         return false;
       }
     }
+    //eth erc20都要判断,ethBalance是否够交gas费
+    ethBalance = await loadEthBalance(nowChain.chainAddress, ChainType.ETH_TEST);
+    print("ethBalance===>" + ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
     if (ethBalance.isNotEmpty) {
       try {
         if (double.parse(ethBalance) <= 0) {
@@ -800,6 +807,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
         Fluttertoast.showToast(msg: "账户以太坊余额出现错误:" + e.toString());
         return false;
       }
+    } else {
+      Fluttertoast.showToast(msg: "检查支付gas费失败，请重新打开尝试.");
+      return false;
     }
     return true;
   }

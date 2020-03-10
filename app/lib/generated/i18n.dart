@@ -74,7 +74,7 @@ class S implements WidgetsLocalizations {
   String get info_sign_hint => "请确认选择对应钱包后，输入密码进行签名";
   String get input_format_hint => "建议8-24位，英文数字混合";
   String get input_pwd_hint => "请输入钱包密码";
-  String get input_pwd_hint_detail => "提示：请输入您的密码，对交易信息进行签名。";
+  String get input_pwd_hint_detail => "提示：请输入您的密码，对交易信息进行签名。并将发送上链";
   String get judge_the_difference_between_two_wallet => "注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。";
   String get language_choose => "语言选择";
   String get load_finish_wallet_digit => "当前钱包选中的代币已加载完！";
@@ -146,7 +146,7 @@ class S implements WidgetsLocalizations {
   String get transaction_amount => "交易数额";
   String get transaction_detail => "交易详情";
   String get transaction_history => "交易记录";
-  String get transaction_timestamp => "交易时间戳";
+  String get transaction_timestamp => "交易时间";
   String get transfer => "转账";
   String get transfer_from_address => "转出地址:";
   String get transfer_to_address => "转入地址:";
@@ -376,7 +376,7 @@ class $zh extends S {
   @override
   String get tx_sign_success => "交易签名 成功";
   @override
-  String get input_pwd_hint_detail => "提示：请输入您的密码，对交易信息进行签名。";
+  String get input_pwd_hint_detail => "提示：请输入您的密码，对交易信息进行签名。并将发送上链";
   @override
   String get chain_address_info => "链地址信息";
   @override
@@ -492,7 +492,7 @@ class $zh extends S {
   @override
   String get service_protocol_title => "服务协议";
   @override
-  String get transaction_timestamp => "交易时间戳";
+  String get transaction_timestamp => "交易时间";
   @override
   String get wallet_pwd => "钱包密码";
   @override
