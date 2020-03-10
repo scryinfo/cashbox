@@ -431,11 +431,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       var isSuccess = await Wallets.instance.saveWallet(_walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
           Uint8List.fromList(_mneController.text.codeUnits), WalletType.WALLET);
       if (isSuccess) {
-        NavigatorUtils.push(
-          context,
-          Routes.ethPage,
-          clearStack: true,
-        );
+        NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
       } else {
         Fluttertoast.showToast(msg: S.of(context).verify_failure_to_mnemonic);
       }

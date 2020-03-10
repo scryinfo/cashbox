@@ -8,6 +8,7 @@ import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
+import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
@@ -24,6 +25,10 @@ import '../../res/resources.dart';
 import '../eth_page/left_drawer_card.dart';
 
 class EthPage extends StatefulWidget {
+  const EthPage({Key key, this.isForceLoadFromJni}) : super(key: key);
+
+  final bool isForceLoadFromJni; //是否强制重新加载钱包信息
+
   @override
   _EthPageState createState() => _EthPageState();
 }
@@ -50,8 +55,9 @@ class _EthPageState extends State<EthPage> {
   }
 
   void initData() async {
-    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
-    print("eth_page => initData walletlist.length===>" + walletList.length.toString());
+    bool isForceLoadFromJni = widget.isForceLoadFromJni;
+    if (isForceLoadFromJni == null) isForceLoadFromJni = true;
+    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: isForceLoadFromJni);
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
       Wallet wallet = walletList[index];
@@ -64,7 +70,6 @@ class _EthPageState extends State<EthPage> {
         } else {
           this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST);
         }
-        Wallets.instance.setNowWalletM(wallet);
         wallet.setNowChainM(nowChain);
         this.nowChainAddress = nowChain.chainAddress;
         this.nowChainDigitsList = nowChain.digitsList;
