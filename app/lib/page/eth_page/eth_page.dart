@@ -139,9 +139,8 @@ class _EthPageState extends State<EthPage> {
           print("eth balance==>" + balance.toString());
           Wallets.instance.updateDigitBalance(nowChainAddress, this.displayDigitsList[i].digitId, balance ?? "");
         } else {}
-        nowChain.digitsList[i].balance = balance ?? "0";
         setState(() {
-          this.displayDigitsList[i].balance = nowChain.digitsList[i].balance;
+          this.displayDigitsList[i].balance = balance ?? "0";
         });
       }
       loadDigitMoney(); //有余额了再去计算money值
@@ -455,33 +454,36 @@ class _EthPageState extends State<EthPage> {
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
+          GestureDetector(
+            child: Container(
               alignment: Alignment.center,
               width: ScreenUtil().setWidth(30),
               height: ScreenUtil().setHeight(10),
-              child: GestureDetector(
-                child: Row(
-                  children: <Widget>[
-                    new Padding(
-                      padding: EdgeInsets.only(
-                        right: ScreenUtil().setWidth(3.5),
-                      ),
-                      child: Image.asset("assets/images/ic_transfer.png"),
+              color: Colors.transparent,
+              child: Row(
+                children: <Widget>[
+                  new Padding(
+                    padding: EdgeInsets.only(
+                      right: ScreenUtil().setWidth(3.5),
                     ),
-                    Text(
-                      S.of(context).transfer,
-                      style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
-                    )
-                  ],
-                ),
-                onTap: () {
-                  NavigatorUtils.push(context, Routes.digitListPage);
-                },
-              )),
-          Container(
-            width: ScreenUtil().setWidth(30),
-            height: ScreenUtil().setHeight(10),
-            child: GestureDetector(
+                    child: Image.asset("assets/images/ic_transfer.png"),
+                  ),
+                  Text(
+                    S.of(context).transfer,
+                    style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
+                  )
+                ],
+              ),
+            ),
+            onTap: () {
+              NavigatorUtils.push(context, Routes.digitListPage);
+            },
+          ),
+          GestureDetector(
+            child: Container(
+              width: ScreenUtil().setWidth(30),
+              height: ScreenUtil().setHeight(10),
+              color: Colors.transparent,
               child: Row(
                 children: <Widget>[
                   new Padding(padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)), child: Image.asset("assets/images/ic_receive.png")),
@@ -493,10 +495,10 @@ class _EthPageState extends State<EthPage> {
                       )),
                 ],
               ),
-              onTap: () {
-                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, nowChainAddress);
-              },
             ),
+            onTap: () {
+              _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, nowChainAddress);
+            },
           )
         ],
       ),
