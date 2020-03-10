@@ -99,7 +99,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         children: <Widget>[
           Gaps.scaleHGap(7),
           Container(
-            width: ScreenUtil().setWidth(53),
+            width: ScreenUtil().setWidth(55),
             //color: Colors.amberAccent,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -121,7 +121,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 ),
                 Gaps.scaleHGap(0.3),
                 Container(
-                  width: ScreenUtil().setWidth(8),
+                  width: ScreenUtil().setWidth(10),
                   child: Text(
                     digitName,
                     textAlign: TextAlign.end,
@@ -153,7 +153,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               ],
             ),
           ),
-          Gaps.scaleHGap(3),
+          Gaps.scaleHGap(1),
           Container(
             //height: ScreenUtil().setHeight(8),
             child: FlatButton(
@@ -320,6 +320,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             ..setFromAddress(ethTxListModel[index].from)
             ..setToAddress(ethTxListModel[index].to)
             ..setValue(ethTxListModel[index].value)
+            ..setHash(ethTxListModel[index].hash)
             ..setBackup(ethTxListModel[index].input)
             ..setGas(ethTxListModel[index].gas)
             ..setGasPrice(ethTxListModel[index].gasPrice)

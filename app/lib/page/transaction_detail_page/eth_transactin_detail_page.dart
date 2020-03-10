@@ -50,6 +50,8 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
             Gaps.scaleVGap(5),
             _buildTxValueWidget(),
             Gaps.scaleVGap(5),
+            _buildTxHashWidget(),
+            Gaps.scaleVGap(5),
             _buildTimeStampWidget(),
             Gaps.scaleVGap(5),
             _buildGasUsedWidget(),
@@ -144,6 +146,36 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
             alignment: Alignment.centerLeft,
             child: Text(
               Provider.of<TransactionProvide>(context).txValue,
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTxHashWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              S.of(context).tx_hash,
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(1),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              Provider.of<TransactionProvide>(context).hash,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil.instance.setSp(3.5),
