@@ -119,7 +119,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               S.of(context).wallet_name,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil.instance.setSp(4),
               ),
             ),
           ),

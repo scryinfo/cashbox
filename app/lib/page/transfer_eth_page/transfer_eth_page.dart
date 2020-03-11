@@ -770,11 +770,13 @@ class _TransferEthPageState extends State<TransferEthPage> {
       Fluttertoast.showToast(msg: S.of(context).to_address_null.toString(), timeInSecForIos: 3);
       return false;
     }
-    // todo 暂时放开 debug不检查
-    // if (!Utils.checkByEthAddressFormat(_toAddressController.text)) {
-    //   Fluttertoast.showToast(msg: "对方地址格式 有问题", timeInSecForIos: 5);
-    //   return false;
-    // }
+    if (!GlobalConfig.isDebugVersion) {
+      // release版本做格式检查
+      if (!Utils.checkByEthAddressFormat(_toAddressController.text)) {
+        Fluttertoast.showToast(msg: "对方地址格式 有问题", timeInSecForIos: 5);
+        return false;
+      }
+    }
     if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
       Fluttertoast.showToast(msg: S.of(context).tx_value_is_0.toString(), timeInSecForIos: 3);
       return false;
