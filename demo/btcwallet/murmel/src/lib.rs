@@ -43,6 +43,7 @@ extern crate rand;
 
 #[cfg(feature="lightning")] extern crate lightning;
 extern crate sqlite;
+extern crate bitcoin_wallet;
 
 #[cfg(feature="lightning")] mod lightning;
 mod headercache;
@@ -62,5 +63,6 @@ pub mod getdata;
 pub mod db;
 pub mod utxo;
 pub mod hooks;
+pub mod walletlib;
 
 pub use error::Error;

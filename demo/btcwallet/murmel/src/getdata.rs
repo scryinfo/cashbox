@@ -67,6 +67,12 @@ impl GetData {
                         match msg {
                             NetworkMessage::MerkleBlock(ref merkleblock) => {
                                 if self.is_serving_blocks(pid) {
+                                    {
+                                        let block_hash = merkleblock.prev_block.to_hex();
+                                        let timestamp = merkleblock.timestamp;
+                                        let sqlite = self.sqlite.lock().expect("open connection error!");
+                                        sqlite.update_newest_header(block_hash, timestamp.to_string());
+                                    }
                                     if merkle_vec.len() <= 100 {
                                         merkle_vec.push(merkleblock.clone());
                                     } else {
@@ -112,7 +118,6 @@ impl GetData {
     }
 
     // 获取数据
-    // 批量发送 block_hash
     fn get_data(&mut self, peer: PeerId) -> Result<(), Error> {
         if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::MerkleBlock) {
             return Ok(());
@@ -135,14 +140,7 @@ impl GetData {
         self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
         warn!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
-        let block_hash = merkleblock.prev_block.to_hex();
-        let timestamp = merkleblock.timestamp;
-
         println!("got 100 merkleblock {:#?}", merkleblock);
-        {
-            let sqlite = self.sqlite.lock().expect("open connection error!");
-            sqlite.update_newest_header(block_hash, timestamp.to_string());
-        }
         self.get_data(peer)?;
         Ok(())
     }
@@ -178,8 +176,8 @@ impl GetData {
         Ok(())
     }
 
+    ///计算hash160
     fn hash160(&self, public_key: &str) -> String {
-        // 公钥 66位
         let public_key = "0291EE52A0E0C22DB9772F237F4271EA6F9330D92B242FB3C621928774C560B699";
         let decode: Vec<u8> = FromHex::from_hex(public_key).expect("Invalid public key");
         let hash = hash160::Hash::hash(&decode[..]);
