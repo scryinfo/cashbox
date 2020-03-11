@@ -675,7 +675,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
         height: ScreenUtil().setHeight(9),
         color: Color.fromRGBO(26, 141, 198, 0.20),
         child: FlatButton(
-          onPressed: () async {},
           child: Text(
             S.of(context).click_to_transfer,
             textAlign: TextAlign.center,
