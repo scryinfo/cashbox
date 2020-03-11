@@ -139,24 +139,6 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
     );
   }
 
-  Future<bool> _verifyMnemonicSame() async {
-    if (verifyString.isNotEmpty && Provider.of<CreateWalletProcessProvide>(context).mnemonic.length != 0) {
-      if (verifyString.trim() == String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic).trim()) {
-        var isSuccess = await Wallets.instance.saveWallet(Provider.of<CreateWalletProcessProvide>(context).walletName,
-            Provider.of<CreateWalletProcessProvide>(context).pwd, Provider.of<CreateWalletProcessProvide>(context).mnemonic, WalletType.WALLET);
-        if (isSuccess) {
-          return true;
-        } else {
-          Fluttertoast.showToast(msg: S.of(context).unknown_error_in_create_wallet);
-          return false;
-        }
-      }
-      return false;
-    } else {
-      return false;
-    }
-  }
-
   Widget _buildVerifyInputMnemonic() {
     return Container(
       alignment: Alignment.center,
@@ -232,6 +214,24 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
       );
     });
     return randomWidgetList;
+  }
+
+  Future<bool> _verifyMnemonicSame() async {
+    if (verifyString.isNotEmpty && Provider.of<CreateWalletProcessProvide>(context).mnemonic.length != 0) {
+      if (verifyString.trim() == String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic).trim()) {
+        var isSuccess = await Wallets.instance.saveWallet(Provider.of<CreateWalletProcessProvide>(context).walletName,
+            Provider.of<CreateWalletProcessProvide>(context).pwd, Provider.of<CreateWalletProcessProvide>(context).mnemonic, WalletType.WALLET);
+        if (isSuccess) {
+          return true;
+        } else {
+          Fluttertoast.showToast(msg: S.of(context).unknown_error_in_create_wallet);
+          return false;
+        }
+      }
+      return false;
+    } else {
+      return false;
+    }
   }
 
   @override

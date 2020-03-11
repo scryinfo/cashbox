@@ -88,7 +88,7 @@ class S implements WidgetsLocalizations {
   String get mnemonic_backup_ok => "助记词已经记好";
   String get mnemonic_info_hint => "以下是钱包的助记词，请您务必认真抄写下来并导出至安全的地方存放。\n注意：一旦丢失，无法找回。";
   String get mnemonic_is_not_null => "助记词不能为空";
-  String get mnemonic_order_wrong => "验证您输入助记词不一致，建议您重新生成新钱包";
+  String get mnemonic_order_wrong => "验证您输入助记词不一致，请重新检查输入内容，或重新生成新钱包";
   String get mnemonic_qr_info => "这是您助记词信息生成的二维码";
   String get new_pwd => "新密码";
   String get new_pwd_format_hint => "请输入新密码，建议大于8位，英文、数字混合";
@@ -102,7 +102,7 @@ class S implements WidgetsLocalizations {
   String get old_pwd => "旧密码";
   String get pls_ensure_confirm_pwd => "请确认两次输入密码一致";
   String get pls_ensure_eee_chain => "请确认勾选创建EEE链";
-  String get pls_ensure_pwd_is_same => "请确认两次输入密码一致";
+  String get pls_ensure_pwd_is_same => "再次您的输入密码，确保一致";
   String get pls_input => "请输入";
   String get pls_input_mnemonic => "请输入助记词";
   String get pls_input_old_pwd => "请输入旧密码";
@@ -110,7 +110,7 @@ class S implements WidgetsLocalizations {
   String get pls_input_transaction_amount => "请输入转账数额";
   String get pls_input_wallet_name => "请输入钱包名";
   String get pls_input_wallet_pwd => "请输入钱包密码";
-  String get pls_pwd_again => "请再次输入密码";
+  String get pls_pwd_again => "再次输入密码";
   String get pls_set_wallet_pwd => "请设置钱包密码";
   String get privacy_protocol_tag => "《隐私条款》";
   String get privacy_protocol_title => "隐私条款";
@@ -163,7 +163,7 @@ class S implements WidgetsLocalizations {
   String get unknown_error_in_reset_pwd => "重置密码出现位置错误，请重新打开尝试";
   String get unknown_error_in_scan_qr_code => "扫描发生未知失败，请重新尝试";
   String get unknown_in_value => "转账数额出现位置问题，请重新检查输入的数额！";
-  String get verify_backup_mnemonic => "验证备份助记词";
+  String get verify_backup_mnemonic => "验证助记词";
   String get verify_failure_to_mnemonic => "助记词验证失败，请重新检查你输入的信息";
   String get verify_mnemonic_info => "助记词确认验证";
   String get verify_mnemonic_order => "请输入验证你保存的助记词顺序。再次提醒，程序不会保留您的隐私信息,请您务必保存好助记词";
@@ -243,7 +243,7 @@ class $zh extends S {
   @override
   String get qr_backup => "二维码备份";
   @override
-  String get verify_backup_mnemonic => "验证备份助记词";
+  String get verify_backup_mnemonic => "验证助记词";
   @override
   String get wallet_transfer => "钱包转账";
   @override
@@ -353,7 +353,7 @@ class $zh extends S {
   @override
   String get tx_hash => "交易hash";
   @override
-  String get pls_ensure_pwd_is_same => "请确认两次输入密码一致";
+  String get pls_ensure_pwd_is_same => "再次您的输入密码，确保一致";
   @override
   String get digit_info_null => "代币信息为空";
   @override
@@ -385,7 +385,7 @@ class $zh extends S {
   @override
   String get extend_msg => "备注信息";
   @override
-  String get mnemonic_order_wrong => "验证您输入助记词不一致，建议您重新生成新钱包";
+  String get mnemonic_order_wrong => "验证您输入助记词不一致，请重新检查输入内容，或重新生成新钱包";
   @override
   String get about_us_title => "关于我们";
   @override
@@ -477,7 +477,7 @@ class $zh extends S {
   @override
   String get transaction_history => "交易记录";
   @override
-  String get pls_pwd_again => "请再次输入密码";
+  String get pls_pwd_again => "再次输入密码";
   @override
   String get gas_used => "gas消耗";
   @override
