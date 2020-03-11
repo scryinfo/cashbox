@@ -187,9 +187,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 children: <Widget>[
                   Gaps.scaleHGap(5),
                   Container(
-                    width: ScreenUtil().setWidth(18),
+                    width: ScreenUtil().setWidth(22),
                     child: Text(
-                      S.of(context).transaction_history,
+                      S.of(context).transaction_history_record,
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: ScreenUtil.instance.setSp(3.5),

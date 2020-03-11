@@ -146,6 +146,7 @@ class S implements WidgetsLocalizations {
   String get transaction_amount => "交易数额";
   String get transaction_detail => "交易详情";
   String get transaction_history => "交易记录";
+  String get transaction_history_record => "交易历史记录";
   String get transaction_timestamp => "交易时间";
   String get transfer => "转账";
   String get transfer_from_address => "转出地址:";
@@ -465,6 +466,8 @@ class $zh extends S {
   String get add_wallet => "添加钱包";
   @override
   String get balance_is_less => "当前账户余额不足！";
+  @override
+  String get transaction_history_record => "交易历史记录";
   @override
   String get mnemonic_backup_ok => "助记词已经记好";
   @override
