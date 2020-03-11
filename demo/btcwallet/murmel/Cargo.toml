@@ -83,5 +83,6 @@ version = "3.0.2"
 
 [dependencies]
 sqlite = "0.25.0"
+bitcoin-wallet = "1.1.0"
 
 
