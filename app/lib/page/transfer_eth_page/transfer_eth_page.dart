@@ -71,7 +71,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
       digitBalance = Provider.of<TransactionProvide>(context).balance;
     }
     Wallet walletM = await Wallets.instance.getNowWalletModel();
-    nowChain = walletM.getChainByChainType(ChainType.ETH_TEST);
+    if (GlobalConfig.isDebugVersion) {
+      nowChain = walletM.getChainByChainType(ChainType.ETH_TEST);
+    } else {
+      nowChain = walletM.nowChain;
+    }
     if (fromAddress == null || fromAddress.trim() == "") {
       fromAddress = nowChain.chainAddress;
     }
@@ -717,7 +721,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               Fluttertoast.showToast(msg: "签名成功！ 交易发送上链中", timeInSecForIos: 5);
               sendRawTx2Chain(result["ethSignedInfo"].toString());
             } else {
-              Fluttertoast.showToast(msg: "交易签名失败", timeInSecForIos: 5);
+              Fluttertoast.showToast(msg: "交易签名失败,请检查你输入的密码!", timeInSecForIos: 6);
               NavigatorUtils.goBack(context);
             }
           },
@@ -729,7 +733,12 @@ class _TransferEthPageState extends State<TransferEthPage> {
   void sendRawTx2Chain(String rawTx) async {
     NavigatorUtils.goBack(context);
     showProgressDialog(context, "交易发送上链中");
-    String txHash = await sendRawTx(ChainType.ETH_TEST, rawTx);
+    String txHash;
+    if (GlobalConfig.isDebugVersion) {
+      txHash = await sendRawTx(ChainType.ETH_TEST, rawTx);
+    } else {
+      txHash = await sendRawTx(nowChain.chainType, rawTx);
+    }
     print("after broadcast txHash is===>" + txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
       Fluttertoast.showToast(msg: "交易上链 成功", timeInSecForIos: 8);
@@ -778,7 +787,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
           contractAddress.trim() != "" &&
           displayDigitsList[i].contractAddress != null &&
           (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
-        digitBalance = await loadErc20Balance(nowChain.chainAddress, displayDigitsList[i].contractAddress, ChainType.ETH_TEST);
+        if (GlobalConfig.isDebugVersion) {
+          digitBalance = await loadErc20Balance(nowChain.chainAddress, displayDigitsList[i].contractAddress, ChainType.ETH_TEST);
+        } else {
+          digitBalance = await loadErc20Balance(nowChain.chainAddress, displayDigitsList[i].contractAddress, nowChain.chainType);
+        }
         break;
       }
     }
@@ -794,7 +807,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
       }
     }
     //eth erc20都要判断,ethBalance是否够交gas费
-    ethBalance = await loadEthBalance(nowChain.chainAddress, ChainType.ETH_TEST);
+    if (GlobalConfig.isDebugVersion) {
+      ethBalance = await loadEthBalance(nowChain.chainAddress, ChainType.ETH_TEST);
+    } else {
+      ethBalance = await loadEthBalance(nowChain.chainAddress, nowChain.chainType);
+    }
     print("ethBalance===>" + ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
     if (ethBalance.isNotEmpty) {
       try {

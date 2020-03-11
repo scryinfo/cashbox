@@ -16,6 +16,8 @@ class GlobalConfig {
   static Map<String, double> minGasPriceMap = {EthGasPriceKey: 2, Erc20GasPriceKey: 2};
   static Map<String, double> defaultGasPriceMap = {EthGasPriceKey: 9, Erc20GasPriceKey: 6};
 
+  static bool isDebugVersion = true; //全局开关，控制是否用 测试链
+
   static double getMaxGasLimit(String digitName) {
     return maxGasLimitMap[digitName];
   }
