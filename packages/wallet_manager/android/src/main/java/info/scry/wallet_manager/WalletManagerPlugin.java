@@ -121,7 +121,6 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     walletMap.put("isNowWallet", walletList.get(walletIndex).isNowWallet);
                     Log.d("nativeLib=>",
                             "isNowWallet is =>" + walletList.get(walletIndex).isNowWallet + "");
-                    //walletMap.put("walletType", walletList.get(i).walletType);
                     Log.d("nativeLib=>",
                             "nowChainId is =>" + walletList.get(walletIndex).nowChainId);
                     walletMap.put("nowChainId", walletList.get(walletIndex).nowChainId);
@@ -176,7 +175,6 @@ public class WalletManagerPlugin implements MethodCallHandler {
                                 walletList.get(walletIndex).ethChain.digitList;
                         List<Map<String, Object>> ethChainDigitList = new ArrayList<>();
                         for (int j = 0; j < ethDigitList.size(); j++) {
-                            //todo
                             int digitIndex = j;
                             Map<String, Object> digitMap = new HashMap<String, Object>();
 
@@ -219,7 +217,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                     ///钱包列表，加入拼装好的钱包
                     resultWalletList.add(walletMap);
-                    Log.d("nativeLib=>", "拼装好一个 walletMap  index is===>" + walletIndex + " ||  " +"walletMap  is ===>" + walletMap.toString());
+                    Log.d("nativeLib=>",
+                            "拼装好一个 walletMap  index is===>" + walletIndex + " ||  " + "walletMap " +
+                                    " is ===>" + walletMap.toString());
                     Log.d("nativeLib=>",
                             "拼装好zong内部钱包个数.siez()is===>" + resultWalletList.size() + " || " +
                                     "resultWalletList is ===>" + resultWalletList.toString());
@@ -286,7 +286,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.resetPwd((String) (call.argument("walletId")),
-                            "q".getBytes(), "q".getBytes());
+                            (byte[]) (call.argument("newPwd")),
+                            (byte[]) (call.argument("oldPwd")));
                 } catch (Exception exception) {
                     Log.d("nativeLib=>", "exception is " + exception);
                 }
@@ -503,8 +504,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         "ethTxSign is enter =>" + (call.argument("value")).toString());
                 Log.d("nativeLib=>",
                         "ethTxSign is enter =>" + (call.argument("gasPrice")).toString());
-                Log.d("nativeLib=>","ethTxSign is enter =>" + (call.argument("gasLimit")).toString());
-                Log.d("nativeLib=>","ethTxSign is enter =>" + ((int)(call.argument("decimal"))));
+                Log.d("nativeLib=>",
+                        "ethTxSign is enter =>" + (call.argument("gasLimit")).toString());
+                Log.d("nativeLib=>", "ethTxSign is enter =>" + ((int) (call.argument("decimal"))));
                 message = NativeLib.ethTxSign((String) (call.argument("mnId")),
                         (int) (call.argument("chainType")),
                         (String) (call.argument("fromAddress")),
@@ -579,7 +581,6 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             case "updateDigitBalance": {
                 Log.d("nativeLib=>", "updateDigitBalance is enter =>");
-                //todo 可以考虑:不用返回是否更新成功 状态
                 Message message = new Message();
                 Log.d("nativeLib=>", (String) (call.argument("address")));
                 Log.d("nativeLib=>", (String) (call.argument("digitId")));
