@@ -100,6 +100,7 @@
   "pls_input_transaction_amount": "请输入转账数额",
   "transaction_timestamp": "交易时间",
   "transaction_history": "交易记录",
+  "transaction_history_record": "交易历史记录",
   "fail_to_load_data_hint": "数据加载失败,请检查网络状况，可尝试下拉刷新",
   "no_tx_history": "暂时没有历史交易记录",
   "tx_transferring": "交易发送中",

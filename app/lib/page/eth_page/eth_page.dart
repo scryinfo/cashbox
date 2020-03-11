@@ -143,6 +143,7 @@ class _EthPageState extends State<EthPage> {
           print("eth balance==>" + balance.toString());
           Wallets.instance.updateDigitBalance(nowChainAddress, this.displayDigitsList[i].digitId, balance ?? "");
         } else {}
+        this.nowChainDigitsList[i].balance = balance ?? "0";
         setState(() {
           this.displayDigitsList[i].balance = balance ?? "0";
         });
@@ -155,10 +156,12 @@ class _EthPageState extends State<EthPage> {
     for (var i = 0; i < displayDigitsList.length; i++) {
       var index = i;
       nowWalletAmount = 0;
+      var money = Rate.instance.getMoney(displayDigitsList[index]).toStringAsFixed(3);
+      this.nowChainDigitsList[i].money = money;
       setState(() {
         nowWalletAmount = nowWalletAmount + Rate.instance.getMoney(displayDigitsList[index]);
         nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
-        displayDigitsList[index].money = Rate.instance.getMoney(displayDigitsList[index]).toStringAsFixed(3);
+        displayDigitsList[index].money = money;
       });
     }
   }
@@ -484,6 +487,8 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
             onTap: () {
+              Provider.of<TransactionProvide>(context)
+                ..setChainType(nowChain.chainType);
               NavigatorUtils.push(context, Routes.digitListPage);
             },
           ),

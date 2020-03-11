@@ -9,6 +9,7 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,6 @@ class _DigitListPageState extends State<DigitListPage> {
       nowChainDigitsList = nowChain.digitsList;
     }
     await loadDisplayDigitListData();
-    loadDigitBalance(); //检查balance值为空的digit，给重新再尝试加载一次
   }
 
   @override
@@ -132,7 +132,7 @@ class _DigitListPageState extends State<DigitListPage> {
           ),
           child: GestureDetector(
             onTap: () {
-              {
+              try {
                 Provider.of<TransactionProvide>(context)
                   ..setDigitName(displayDigitsList[index].shortName)
                   ..setBalance(displayDigitsList[index].balance)
@@ -140,6 +140,9 @@ class _DigitListPageState extends State<DigitListPage> {
                   ..setFromAddress(nowChain.chainAddress)
                   ..setChainType(nowChain.chainType)
                   ..setContractAddress(displayDigitsList[index].contractAddress ?? "");
+              } catch (e) {
+                print("digit_list_page点击传值出现位置错误===>" + e.toString());
+                LogUtil.e("digit_list_page", e.toString());
               }
               NavigatorUtils.push(context, Routes.transactionHistoryPage);
             },
@@ -181,27 +184,6 @@ class _DigitListPageState extends State<DigitListPage> {
         )
       ],
     );
-  }
-
-  loadDigitBalance() async {
-    if (displayDigitsList == null || displayDigitsList.length == 0) {
-      return;
-    } else {
-      for (var i = 0; i < displayDigitsList.length; i++) {
-        if (this.displayDigitsList[i].balance != null && (this.displayDigitsList[i].balance.trim() != "0")) {
-          continue; //这个有balance值了，不用取了
-        }
-        String balance;
-        if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
-          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, this.nowChain.chainType);
-        } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
-          balance = await loadEthBalance(nowChainAddress, this.nowChain.chainType);
-        } else {}
-        setState(() {
-          this.displayDigitsList[i].balance = balance ?? "0.00";
-        });
-      }
-    }
   }
 
   Future<List<Digit>> loadDisplayDigitListData() async {
