@@ -1,6 +1,5 @@
 package info.scry.wallet;
 
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
@@ -18,7 +17,6 @@ import android.util.Log;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.common.Constant;
 
-import java.io.IOException;
 
 public class MainActivity extends FlutterActivity {
 
@@ -92,19 +90,19 @@ public class MainActivity extends FlutterActivity {
         String message = call.argument("msg");
         switch (call.method) {
             case "logV":
-                Log.v(tag, message);
+                ScryLog.v(tag, message);
                 break;
             case "logD":
-                Log.d(tag, message);
+                ScryLog.d(tag, message);
                 break;
             case "logI":
-                Log.i(tag, message);
+                ScryLog.i(tag, message);
                 break;
             case "logW":
-                Log.w(tag, message);
+                ScryLog.w(tag, message);
                 break;
             case "logE":
-                Log.e(tag, message);
+                ScryLog.e(tag, message);
                 break;
         }
     }
