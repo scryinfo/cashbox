@@ -6,6 +6,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import info.scry.wallet_manager.NativeLib.*;
+import info.scry.wallet_manager.ScryWalletLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     mnemonicCls =
                             (NativeLib.Mnemonic) (NativeLib.mnemonicGenerate((int) (call.argument("count"))));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 HashMap hashMap1 = new HashMap();
 
@@ -50,20 +51,20 @@ public class WalletManagerPlugin implements MethodCallHandler {
             // apiNo:WM03
             case "saveWallet": {
                 Wallet wallet = new NativeLib.Wallet();
-                Log.d("nativeLib=>", "saveWallet is enter =>");
+                ScryWalletLog.d("nativeLib=>", "saveWallet is enter =>");
                 try {
                     wallet = (NativeLib.Wallet) (NativeLib.saveWallet((String) (call.argument(
                             "walletName")),
                             (byte[]) (call.argument("pwd")), (byte[]) (call.argument("mnemonic"))
                             , (int) (call.argument("walletType"))));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
-                Log.d("nativeLib=>", "saveWallet is =>" + wallet);
-                Log.d("nativeLib=>", "saveWallet.status is =>" + wallet.status);
-                Log.d("nativeLib=>", "saveWallet.walletName is =>" + wallet.walletName);
-                Log.d("nativeLib=>", "saveWallet.walletId is =>" + wallet.walletId);
-                Log.d("nativeLib=>", "saveWallet.message is =>" + wallet.message);
+                ScryWalletLog.d("nativeLib=>", "saveWallet is =>" + wallet);
+                ScryWalletLog.d("nativeLib=>", "saveWallet.status is =>" + wallet.status);
+                ScryWalletLog.d("nativeLib=>", "saveWallet.walletName is =>" + wallet.walletName);
+                ScryWalletLog.d("nativeLib=>", "saveWallet.walletId is =>" + wallet.walletId);
+                ScryWalletLog.d("nativeLib=>", "saveWallet.message is =>" + wallet.message);
                 HashMap hashMap = new HashMap();
                 hashMap.put("status", wallet.status);  ///todo 后续空时间调整，返回类型不用wallet，只需状态码。
                 result.success(hashMap);
@@ -75,10 +76,10 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 try {
                     walletState = (NativeLib.WalletState) (NativeLib.isContainWallet());
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "isContainWallet exception is " + exception);
                 }
-                Log.d("nativeLib=>", "isContainWallet.status is =>" + walletState.status);
-                Log.d("nativeLib=>", "isContainWallet is =>" + walletState.isContainWallet);
+                ScryWalletLog.d("nativeLib=>", "isContainWallet.status is =>" + walletState.status);
+                ScryWalletLog.d("nativeLib=>", "isContainWallet is =>" + walletState.isContainWallet);
                 HashMap hashMap = new HashMap();
                 hashMap.put("status", walletState.status);
                 if (walletState.status == 200) {
@@ -96,9 +97,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 // <Wallet>
                 try {
                     walletList = NativeLib.loadAllWalletList();
-                    Log.d("nativeLib=>", "walletList.size() is =>" + walletList.size());
+                    ScryWalletLog.d("nativeLib=>", "walletList.size() is =>" + walletList.size());
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 if (walletList.isEmpty() || walletList.size() == 0) {
                     result.success(resultWalletList); ///empty wallet
@@ -106,9 +107,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 for (int i = 0; i < walletList.size(); i++) {
                     int walletIndex = i;
                     Map<String, Object> walletMap = new HashMap<String, Object>();
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "walletList.get(walletIndex) =>" + walletList.get(walletIndex).toString());
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "walletList.get(walletIndex).walletType is ===>" + walletList.get(walletIndex).walletType);
                     if (walletList.get(walletIndex).walletType == WalletType.TEST_WALLET) {
                         walletMap.put("walletType", 0);
@@ -119,9 +120,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     walletMap.put("walletId", walletList.get(walletIndex).walletId);
                     walletMap.put("walletName", walletList.get(walletIndex).walletName);
                     walletMap.put("isNowWallet", walletList.get(walletIndex).isNowWallet);
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "isNowWallet is =>" + walletList.get(walletIndex).isNowWallet + "");
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "nowChainId is =>" + walletList.get(walletIndex).nowChainId);
                     walletMap.put("nowChainId", walletList.get(walletIndex).nowChainId);
                     walletMap.put("creationTime", walletList.get(walletIndex).creationTime);
@@ -155,7 +156,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         eeeChainDigitList.add(digitMap);
                     }
                     resultEeeChain.put("eeeChainDigitList", eeeChainDigitList);
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "组装完EEE链 result resultEeeChain is ===>" + resultEeeChain.toString());
                     /*-------------------------组装eee链上数据 end---------------------------*/
 
@@ -163,7 +164,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     Map<String, Object> resultEthChain = new HashMap<>();
                     resultEthChain.put("chainAddress",
                             walletList.get(walletIndex).ethChain.address);
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "Eth链 chainAddresss ===>" + walletList.get(walletIndex).ethChain.address.toString());
                     resultEthChain.put("chainId", walletList.get(walletIndex).ethChain.chainId);
                     resultEthChain.put("chainType", walletList.get(walletIndex).ethChain.chainType);
@@ -191,11 +192,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                             digitMap.put("imgUrl", ethDigitList.get(digitIndex).imgUrl);
                             ethChainDigitList.add(digitMap);
                         }
-                        Log.d("nativeLib=>",
+                        ScryWalletLog.d("nativeLib=>",
                                 "Eth链 ethChainDigitList.toString() ===>" + ethChainDigitList.toString());
                         resultEthChain.put("ethChainDigitList", ethChainDigitList);
                     }
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "组装完ETh链 result resultEthChain is ===>" + resultEthChain.toString());
                     /*-------------------------组装ETH链上数据 end---------------------------*/
 
@@ -217,10 +218,10 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                     ///钱包列表，加入拼装好的钱包
                     resultWalletList.add(walletMap);
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "拼装好一个 walletMap  index is===>" + walletIndex + " ||  " + "walletMap " +
                                     " is ===>" + walletMap.toString());
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "拼装好zong内部钱包个数.siez()is===>" + resultWalletList.size() + " || " +
                                     "resultWalletList is ===>" + resultWalletList.toString());
                 }
@@ -233,7 +234,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 try {
                     walletState = NativeLib.setNowWallet((String) (call.argument("walletId")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 HashMap hashMap = new HashMap();
                 hashMap.put("status", walletState.status);
@@ -251,7 +252,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 try {
                     walletState = NativeLib.getNowWallet();
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 if (walletState.status == 200) {
                     result.success(walletState.walletId);
@@ -262,13 +263,13 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM07
             case "deleteWallet": {
-                Log.d("nativeLib=>", "begin to deleteWallet =>");
+                ScryWalletLog.d("nativeLib=>", "begin to deleteWallet =>");
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.deleteWallet((String) (call.argument("walletId")),
                             (byte[]) (call.argument("pwd")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
@@ -282,18 +283,18 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM08
             case "resetPwd": {
-                Log.d("nativeLib=>", "begin to resetPwd =>");
+                ScryWalletLog.d("nativeLib=>", "begin to resetPwd =>");
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.resetPwd((String) (call.argument("walletId")),
                             (byte[]) (call.argument("newPwd")),
                             (byte[]) (call.argument("oldPwd")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
-                Log.d("nativeLib=>", "walletState.status is " + walletState.status);
-                Log.d("nativeLib=>", "walletState.isResetPwd is " + walletState.isResetPwd);
-                Log.d("nativeLib=>", "walletState.message is " + walletState.message);
+                ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
+                ScryWalletLog.d("nativeLib=>", "walletState.isResetPwd is " + walletState.isResetPwd);
+                ScryWalletLog.d("nativeLib=>", "walletState.message is " + walletState.message);
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
                 if (walletState.status == 200) {
@@ -306,15 +307,15 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM04
             case "exportWallet": {
-                Log.d("nativeLib=>", "begin to exportWallet =>");
+                ScryWalletLog.d("nativeLib=>", "begin to exportWallet =>");
                 Mnemonic mnemonic = new Mnemonic();
                 try {
                     mnemonic = NativeLib.exportWallet((String) (call.argument("walletId")),
                             (byte[]) (call.argument("pwd")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
-                Log.d("nativeLib=>", "mnemonic.status is " + mnemonic.status);
+                ScryWalletLog.d("nativeLib=>", "mnemonic.status is " + mnemonic.status);
                 Map resultMap = new HashMap();
                 resultMap.put("status", mnemonic.status);
                 if (mnemonic.status == 200) {
@@ -328,19 +329,19 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM09
             case "rename": {
-                Log.d("nativeLib=>", "begin to rename =>");
-                Log.d("nativeLib=>", "new walletName is =>" + (String) (call.argument("walletName"
+                ScryWalletLog.d("nativeLib=>", "begin to rename =>");
+                ScryWalletLog.d("nativeLib=>", "new walletName is =>" + (String) (call.argument("walletName"
                 )));
-                Log.d("nativeLib=>", " walletId is =>" + (String) (call.argument("walletId")));
+                ScryWalletLog.d("nativeLib=>", " walletId is =>" + (String) (call.argument("walletId")));
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.rename((String) (call.argument("walletId")),
                             (String) (call.argument("walletName")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
-                Log.d("nativeLib=>", "walletState.status is " + walletState.status);
-                Log.d("nativeLib=>", "walletState.isRename is " + walletState.isRename);
+                ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
+                ScryWalletLog.d("nativeLib=>", "walletState.isRename is " + walletState.isRename);
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
                 if (walletState.status == 200) {
@@ -353,14 +354,14 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM10
             case "showChain": {
-                Log.d("nativeLib=>", "begin to showChain =>");
-                Log.d("nativeLib=>", "walletId is =>" + (String) (call.argument("walletId")));
+                ScryWalletLog.d("nativeLib=>", "begin to showChain =>");
+                ScryWalletLog.d("nativeLib=>", "walletId is =>" + (String) (call.argument("walletId")));
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.showChain((String) (call.argument("walletId")),
                             (int) (call.argument("chainType")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
@@ -374,14 +375,14 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM11
             case "hideChain": {
-                Log.d("nativeLib=>", "begin to hideChain =>");
-                Log.d("nativeLib=>", "walletId is =>" + (String) (call.argument("walletId")));
+                ScryWalletLog.d("nativeLib=>", "begin to hideChain =>");
+                ScryWalletLog.d("nativeLib=>", "walletId is =>" + (String) (call.argument("walletId")));
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.hideChain((String) (call.argument("walletId")),
                             (int) (call.argument("chainType")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
@@ -395,12 +396,12 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM12
             case "getNowChain": {
-                Log.d("nativeLib=>", "begin to getNowChain =>");
+                ScryWalletLog.d("nativeLib=>", "begin to getNowChain =>");
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.getNowChainType((String) (call.argument("walletId")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
@@ -414,13 +415,13 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM13
             case "setNowChain": {
-                Log.d("nativeLib=>", "begin to setNowChain =>");
+                ScryWalletLog.d("nativeLib=>", "begin to setNowChain =>");
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.setNowChainType((String) (call.argument("walletId")),
                             (int) (call.argument("chainType")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
@@ -434,18 +435,18 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             // apiNo:WM14
             case "showDigit": {
-                Log.d("nativeLib=>", "begin to showDigit =>");
+                ScryWalletLog.d("nativeLib=>", "begin to showDigit =>");
                 WalletState walletState = new WalletState();
                 break;
             }
             // apiNo:WM15
             case "hideDigit": {
-                Log.d("nativeLib=>", "begin to hideDigit =>");
+                ScryWalletLog.d("nativeLib=>", "begin to hideDigit =>");
                 WalletState walletState = new WalletState();
                 break;
             }
             case "eeeEnergyTransfer": {
-                Log.d("nativeLib=>", "eeeEnergyTransfer =>");
+                ScryWalletLog.d("nativeLib=>", "eeeEnergyTransfer =>");
                 Message message = new Message();
                 try {
                     message = NativeLib.eeeEnergyTransfer((String) (call.argument("from")),
@@ -453,10 +454,10 @@ public class WalletManagerPlugin implements MethodCallHandler {
                             (String) (call.argument("value")), (String) (call.argument("extendMsg"))
                     );
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "eeeEnergyTransfer exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "eeeEnergyTransfer exception is " + exception);
                 }
-                Log.d("nativeLib=>", "message.status is " + message.status);
-                Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
+                ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
+                ScryWalletLog.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 resultMap.put("signedInfo", message.signedInfo);
@@ -464,49 +465,49 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 break;
             }
             case "eeeTxSign": {
-                Log.d("nativeLib=>", "eeeTxSign is enter =>");
+                ScryWalletLog.d("nativeLib=>", "eeeTxSign is enter =>");
                 Message message = new Message();
-                Log.d("nativeLib=>",
+                ScryWalletLog.d("nativeLib=>",
                         (String) (call.argument("rawTx")) + "||" + (String) (call.argument("mnId")) + "||" + call.argument("pwd"));
                 try {
                     message = NativeLib.eeeTxSign((String) (call.argument("rawTx")),
                             (String) (call.argument("mnId")),
                             (byte[]) (call.argument("pwd")));
-                    Log.d("nativeLib=>", "message.message is " + message.message.toString());
+                    ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "eeeTxSign exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "eeeTxSign exception is " + exception);
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 if (message.status == 200) {
                     resultMap.put("signedInfo", message.signedInfo);
-                    Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
+                    ScryWalletLog.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
-                    Log.d("nativeLib=>", "message.status is " + message.status);
+                    ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
                 }
                 result.success(resultMap);
                 break;
             }
             case "ethTxSign": {
-                Log.d("nativeLib=>", "ethTxSign is enter =>");
+                ScryWalletLog.d("nativeLib=>", "ethTxSign is enter =>");
                 Message message = new Message();
-                Log.d("nativeLib=>", "ethTxSign is enter =>" + (call.argument("mnId")).toString());
-                Log.d("nativeLib=>",
+                ScryWalletLog.d("nativeLib=>", "ethTxSign is enter =>" + (call.argument("mnId")).toString());
+                ScryWalletLog.d("nativeLib=>",
                         "ethTxSign is enter =>" + (call.argument("chainType")).toString());
-                Log.d("nativeLib=>",
+                ScryWalletLog.d("nativeLib=>",
                         "ethTxSign is enter =>" + (call.argument("fromAddress")).toString());
-                Log.d("nativeLib=>",
+                ScryWalletLog.d("nativeLib=>",
                         "ethTxSign is enter =>" + (call.argument("toAddress")).toString());
-                Log.d("nativeLib=>",
+                ScryWalletLog.d("nativeLib=>",
                         "ethTxSign is enter =>" + (call.argument("contractAddress")).toString());
-                Log.d("nativeLib=>",
+                ScryWalletLog.d("nativeLib=>",
                         "ethTxSign is enter =>" + (call.argument("value")).toString());
-                Log.d("nativeLib=>",
+                ScryWalletLog.d("nativeLib=>",
                         "ethTxSign is enter =>" + (call.argument("gasPrice")).toString());
-                Log.d("nativeLib=>",
+                ScryWalletLog.d("nativeLib=>",
                         "ethTxSign is enter =>" + (call.argument("gasLimit")).toString());
-                Log.d("nativeLib=>", "ethTxSign is enter =>" + ((int) (call.argument("decimal"))));
+                ScryWalletLog.d("nativeLib=>", "ethTxSign is enter =>" + ((int) (call.argument("decimal"))));
                 message = NativeLib.ethTxSign((String) (call.argument("mnId")),
                         (int) (call.argument("chainType")),
                         (String) (call.argument("fromAddress")),
@@ -523,74 +524,74 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 resultMap.put("status", message.status);
                 if (message.status == 200) {
                     resultMap.put("ethSignedInfo", message.ethSignedInfo);
-                    Log.d("nativeLib=>",
+                    ScryWalletLog.d("nativeLib=>",
                             "message.signedInfo is " + message.ethSignedInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
-                    Log.d("nativeLib=>", "message.status is " + message.status);
+                    ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
                 }
                 result.success(resultMap);
                 break;
             }
             case "eeeSign": {
-                Log.d("nativeLib=>", "eeeSign is enter =>");
+                ScryWalletLog.d("nativeLib=>", "eeeSign is enter =>");
                 Message message = new Message();
-                Log.d("nativeLib=>",
+                ScryWalletLog.d("nativeLib=>",
                         (String) (call.argument("rawTx")) + "||" + (String) (call.argument("mnId")) + "||" + call.argument("pwd"));
                 try {
                     message = NativeLib.eeeSign((String) (call.argument("rawTx")),
                             (String) (call.argument("mnId")),
                             (byte[]) (call.argument("pwd")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "eeeSign exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "eeeSign exception is " + exception);
                 }
-                Log.d("nativeLib=>", "message.status is " + message.status);
+                ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 if (message.status == 200) {
                     resultMap.put("signedInfo", message.signedInfo);
-                    Log.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
+                    ScryWalletLog.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
-                    Log.d("nativeLib=>", "message.message is " + message.message.toString());
+                    ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
                 }
                 result.success(resultMap);
                 break;
             }
             case "decodeAdditionData": {
-                Log.d("nativeLib=>", "decodeAdditionData is enter =>");
+                ScryWalletLog.d("nativeLib=>", "decodeAdditionData is enter =>");
                 Message message = new Message();
-                Log.d("nativeLib=>", (String) (call.argument("input")));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("input")));
                 try {
                     message = NativeLib.decodeAdditionData((String) (call.argument("input")));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "decodeAdditionData exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "decodeAdditionData exception is " + exception);
                 }
-                Log.d("nativeLib=>", "message.status is " + message.status);
+                ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 if (message.status == 200) {
                     resultMap.put("inputInfo", message.inputInfo);
-                    Log.d("nativeLib=>", "message.inputInfo is " + message.inputInfo.toString());
+                    ScryWalletLog.d("nativeLib=>", "message.inputInfo is " + message.inputInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
-                    Log.d("nativeLib=>", "message.message is " + message.message.toString());
+                    ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
                 }
                 result.success(resultMap);
                 break;
             }
             case "updateDigitBalance": {
-                Log.d("nativeLib=>", "updateDigitBalance is enter =>");
+                ScryWalletLog.d("nativeLib=>", "updateDigitBalance is enter =>");
                 Message message = new Message();
-                Log.d("nativeLib=>", (String) (call.argument("address")));
-                Log.d("nativeLib=>", (String) (call.argument("digitId")));
-                Log.d("nativeLib=>", (String) (call.argument("balance")));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("address")));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("digitId")));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("balance")));
                 try {
                     NativeLib.updateDigitBalance((String) (call.argument("address")),
                             (String) (call.argument("digitId")), (String) (call.argument("balance"
                             )));
                 } catch (Exception exception) {
-                    Log.d("nativeLib=>", "decodeAdditionData exception is " + exception);
+                    ScryWalletLog.d("nativeLib=>", "decodeAdditionData exception is " + exception);
                 }
                 break;
             }
