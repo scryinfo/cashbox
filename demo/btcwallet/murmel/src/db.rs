@@ -26,11 +26,14 @@ impl SQLite {
             "
         ).expect("Create table block_hash error");
         sqlite.execute(
-            "create table if not exists utxos(txhash TEXT,script TEXT, value REAL, vout INT);"
-        ).expect("Create table tx error");
-        sqlite.execute(
             "create table if not exists newest_hash(key TEXT,block_hash TEXT,timestamp TEXT);"
         ).expect("Create newest_hash table error");
+        sqlite.execute(
+            "create table if not exists tx_input(tx TEXT primary key not null ,sig_script TEXT, prev_tx TEXT, prev_vout INT, sequence INT);"
+        ).expect("Create tx_input table error");
+        sqlite.execute(
+            "create table if not exists tx_output(tx TEXT primary key not null ,script TEXT, value REAL, vin INT);"
+        ).expect("Create tx_output table error");
         Self {
             connection: sqlite,
             network,
@@ -67,7 +70,7 @@ impl SQLite {
     }
 
     //查询未扫描区块头 返回相应数据 以时间戳为依据
-    pub fn query_header(&self, timestamp: String) -> Vec<String> {
+    pub fn query_header(&self, timestamp: String, add: bool) -> Vec<String> {
         let mut statement = self.connection.prepare(
             "SELECT * FROM block_hash WHERE timestamp >= ? AND  scanned <= 5 LIMIT 1000"
         ).expect("query_header PREPARE ERR");
@@ -81,11 +84,13 @@ impl SQLite {
             block_hashes.push(block_hash);
         }
 
-        let mut statement2 = self.connection.prepare(
-            "UPDATE block_hash SET scanned = scanned + 1 WHERE timestamp >= ? AND scanned <= 5 LIMIT 1000"
-        ).expect("update scan ERR");
-        statement2.bind(1, timestamp.as_str()).expect("bind ERR");
-        statement2.next().expect("update scanned ERR");
+        if add {
+            let mut statement2 = self.connection.prepare(
+                "UPDATE block_hash SET scanned = scanned + 1 WHERE timestamp >= ? AND scanned <= 5 LIMIT 1000"
+            ).expect("update scan ERR");
+            statement2.bind(1, timestamp.as_str()).expect("bind ERR");
+            statement2.next().expect("update scanned ERR");
+        }
 
         block_hashes
     }
@@ -126,12 +131,25 @@ impl SQLite {
         statement.next().expect("insert newest_header error");
     }
 
-    //存储 utxo
-    pub fn insert_utxo(&self, txhash: String, script: String, value: String, vout: i64) {
+    //存储 txin
+    pub fn insert_txin(&self, tx: String, sig_script: String, prev_tx: String, prev_vout: String, sequence: String) {
         let mut statement = self.connection.prepare(
-            "INSERT INTO utxos VALUES(?,?,?,?)"
+            "INSERT OR IGNORE INTO tx_input VALUES(?,?,?,?,?)"
+        ).expect("insert txin error");
+        statement.bind(1, tx.as_str()).expect("bind statement error");
+        statement.bind(2, sig_script.as_str()).expect("bind statement error");
+        statement.bind(3, prev_tx.as_str()).expect("bind statement error");
+        statement.bind(4, prev_vout.as_str()).expect("bind statement error");
+        statement.bind(5, sequence.as_str()).expect("bind statement error");
+        statement.next().expect("insert utxos error");
+    }
+
+    //存储 txout
+    pub fn insert_txout(&self, tx: String, script: String, value: String, vout: i64) {
+        let mut statement = self.connection.prepare(
+            "INSERT OR IGNORE INTO tx_output VALUES(?,?,?,?)"
         ).expect("insert utxo error");
-        statement.bind(1, txhash.as_str()).expect("bind statement error");
+        statement.bind(1, tx.as_str()).expect("bind statement error");
         statement.bind(2, script.as_str()).expect("bind statement error");
         statement.bind(3, value.as_str()).expect("bind statement error");
         statement.bind(4, vout).expect("bind statement error");
