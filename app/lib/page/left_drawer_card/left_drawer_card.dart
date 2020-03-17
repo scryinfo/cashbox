@@ -287,7 +287,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
           height: ScreenUtil().setHeight(7.5),
           width: ScreenUtil().setWidth(15),
           child: Text(
-            nowChain.chainTypeToValue(nowChain.chainType),
+            Chain.chainTypeToValue(nowChain.chainType),
             style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.instance.setSp(3)),
           ),
         );
