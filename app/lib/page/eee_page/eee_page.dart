@@ -9,6 +9,7 @@ import 'package:app/net/rate_util.dart';
 import 'package:app/page/left_drawer_card/left_drawer_card.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
+import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
@@ -23,16 +24,17 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 
-class EthPage extends StatefulWidget {
-  const EthPage({Key key, this.isForceLoadFromJni}) : super(key: key);
+
+class EeePage extends StatefulWidget {
+  const EeePage({Key key, this.isForceLoadFromJni}) : super(key: key);
 
   final bool isForceLoadFromJni; //是否强制重新加载钱包信息
 
   @override
-  _EthPageState createState() => _EthPageState();
+  _EeePageState createState() => _EeePageState();
 }
 
-class _EthPageState extends State<EthPage> {
+class _EeePageState extends State<EeePage> {
   List<Wallet> walletList = [];
   Wallet nowWallet = Wallet();
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
@@ -64,15 +66,15 @@ class _EthPageState extends State<EthPage> {
       if (wallet.isNowWallet == true) {
         this.nowWallet = wallet;
         this.nowWallet.chainList.forEach((item) {
-          if (item.chainType == ChainType.ETH || item.chainType == ChainType.ETH_TEST) {
+          if (item.chainType == ChainType.EEE || item.chainType == ChainType.EEE_TEST) {
             chainTypeList.add(Chain.chainTypeToValue(item.chainType));
           }
         });
         this.walletName = nowWallet.walletName;
         if (nowWallet.walletType == WalletType.WALLET) {
-          this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
+          this.nowChain = this.nowWallet.getChainByChainType(ChainType.EEE);
         } else {
-          this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST);
+          this.nowChain = this.nowWallet.getChainByChainType(ChainType.EEE_TEST);
         }
         wallet.setNowChainM(nowChain);
         this.nowChainAddress = nowChain.chainAddress;
@@ -85,92 +87,9 @@ class _EthPageState extends State<EthPage> {
       this.walletList = walletList;
     });
     future = loadDisplayDigitListData();
-    LogUtil.d("begin init dart log==================>", "dart log  init");
-    loadDigitBalance();
-    loadLegalCurrency();
-    loadDigitRateInfo();
+    LogUtil.d("log init==================>", "dart init");
   }
 
-  loadLegalCurrency() async {
-    Rate rate = await loadRateInstance();
-    if (rate == null) {
-      return;
-    }
-    this.moneyUnitList = rate.getAllSupportLegalCurrency();
-    setState(() {
-      this.moneyUnitList = this.moneyUnitList;
-    });
-  }
-
-  loadDigitRateInfo() async {
-    if (displayDigitsList.length == 0) {
-      return;
-    } else {
-      Rate rate = await loadRateInstance();
-      if (rate == null) {
-        return;
-      }
-      for (var i = 0; i < displayDigitsList.length; i++) {
-        print("rate.digitRateMap.length ===>" + rate.digitRateMap.length.toString());
-        if (this.displayDigitsList[i].shortName.toUpperCase() != null &&
-            (rate.digitRateMap.containsKey(this.displayDigitsList[i].shortName.toUpperCase()))) {
-          setState(() {
-            this.displayDigitsList[i].digitRate
-              ..symbol = rate.getSymbol(this.displayDigitsList[i])
-              ..price = rate.getPrice(this.displayDigitsList[i])
-              ..changeHourly = rate.getChangeHourly(this.displayDigitsList[i]);
-          });
-        } else {
-          print("digitName is not exist===>" + this.displayDigitsList[i].shortName);
-          LogUtil.w("digitName is not exist===>", this.displayDigitsList[i].shortName);
-        }
-      }
-    }
-  }
-
-  loadDigitBalance() async {
-    print("loadDigitBalance is enter ===>" + displayDigitsList.length.toString());
-    if (displayDigitsList == null || displayDigitsList.length == 0) {
-      return;
-    } else {
-      for (var i = 0; i < displayDigitsList.length; i++) {
-        print("loadDigitBalance    displayDigitsList[i].contractAddress===>" +
-            this.displayDigitsList[i].contractAddress.toString() +
-            "||" +
-            this.displayDigitsList[i].address.toString());
-        String balance;
-        if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
-          print(" nowChain.chainType===>" + this.nowChain.chainType.toString());
-          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, this.nowChain.chainType);
-          print("erc20 balance==>" + balance.toString());
-          Wallets.instance.updateDigitBalance(this.displayDigitsList[i].contractAddress, this.displayDigitsList[i].digitId, balance ?? "");
-        } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
-          balance = await loadEthBalance(nowChainAddress, this.nowChain.chainType);
-          print("eth balance==>" + balance.toString());
-          Wallets.instance.updateDigitBalance(nowChainAddress, this.displayDigitsList[i].digitId, balance ?? "");
-        } else {}
-        this.nowChainDigitsList[i].balance = balance ?? "0";
-        setState(() {
-          this.displayDigitsList[i].balance = balance ?? "0";
-        });
-      }
-      loadDigitMoney(); //有余额了再去计算money值
-    }
-  }
-
-  loadDigitMoney() {
-    for (var i = 0; i < displayDigitsList.length; i++) {
-      var index = i;
-      nowWalletAmount = 0;
-      var money = Rate.instance.getMoney(displayDigitsList[index]).toStringAsFixed(3);
-      this.nowChainDigitsList[i].money = money;
-      setState(() {
-        nowWalletAmount = nowWalletAmount + Rate.instance.getMoney(displayDigitsList[index]);
-        nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
-        displayDigitsList[index].money = money;
-      });
-    }
-  }
 
   Future<List<Digit>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
@@ -198,7 +117,7 @@ class _EthPageState extends State<EthPage> {
   List<Digit> addDigitToDisplayList(int targetCount) {
     for (var i = displayDigitsList.length; i < targetCount; i++) {
       var digitRate = DigitRate();
-      Digit digit = EthDigit();
+      Digit digit = EeeDigit();
       digit
         ..digitId = nowChainDigitsList[i].digitId
         ..chainId = nowChainDigitsList[i].chainId
@@ -597,7 +516,6 @@ class _EthPageState extends State<EthPage> {
                 itemBuilder: (BuildContext context) => _makePopMenuList(),
                 onSelected: (String value) {
                   Rate.instance.setNowLegalCurrency(value);
-                  this.loadDigitMoney();
                   setState(() {
                     moneyUnitStr = value;
                   });

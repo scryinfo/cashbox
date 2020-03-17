@@ -14,7 +14,7 @@ abstract class Chain {
   bool isVisible = true; //默认链可见
   ChainType chainType;
 
-  String chainTypeToValue(ChainType chainType) {
+  static String chainTypeToValue(ChainType chainType) {
     switch (chainType) {
       case ChainType.BTC:
         return "BTC";
@@ -29,7 +29,7 @@ abstract class Chain {
       case ChainType.EEE_TEST:
         return "EEE_TEST";
       default:
-        return "UNKNOWN";
+        return ""; //UNKNOWN
     }
   }
 
