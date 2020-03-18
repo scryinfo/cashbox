@@ -5,6 +5,7 @@ import '../routers/router_handler.dart';
 
 class Routes {
   static String ethPage = '/ethpage';
+  static String eeePage = '/eeepage';
   static String entryPage = '/entrypage';
   static String publicPage = '/publicpage';
   static String dappPage = '/dapppage';
@@ -38,6 +39,7 @@ class Routes {
     });
 
     router.define(ethPage, handler: ethPageHandler);
+    router.define(eeePage, handler: eeePageHandler);
     router.define(entryPage, handler: entryPageHandler);
     router.define(publicPage, handler: publicPageHandler);
     router.define(dappPage, handler: dappPageHandler);
