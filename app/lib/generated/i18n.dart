@@ -164,7 +164,7 @@ class S implements WidgetsLocalizations {
   String get unknown_error_in_scan_qr_code => "扫描发生未知失败，请重新尝试";
   String get unknown_in_value => "转账数额出现位置问题，请重新检查输入的数额！";
   String get verify_backup_mnemonic => "验证助记词";
-  String get verify_failure_to_mnemonic => "助记词验证失败，请重新检查你输入的信息";
+  String get verify_failure_to_mnemonic => "助记词验证失败，请重新检查你输入的信息,或当前钱包已存在";
   String get verify_mnemonic_info => "助记词确认验证";
   String get verify_mnemonic_order => "请输入验证你保存的助记词顺序。再次提醒，程序不会保留您的隐私信息,请您务必保存好助记词";
   String get verify_wallet => "验证钱包";
@@ -267,7 +267,7 @@ class $zh extends S {
   @override
   String get privacy_protocol_title => "隐私条款";
   @override
-  String get verify_failure_to_mnemonic => "助记词验证失败，请重新检查你输入的信息";
+  String get verify_failure_to_mnemonic => "助记词验证失败，请重新检查你输入的信息,或当前钱包已存在";
   @override
   String get create_wallet => "创建钱包";
   @override

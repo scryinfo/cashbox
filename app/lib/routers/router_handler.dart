@@ -1,6 +1,7 @@
 import 'package:app/demo/flutter_webview_plugin_demo.dart';
 import 'package:app/demo/local_html_webview_demo.dart';
 import 'package:app/page/digit_list_page/digit_list_page.dart';
+import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/sign_tx_page/sign_tx_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
@@ -35,6 +36,10 @@ Handler entryPageHandler = Handler(handlerFunc: (BuildContext context, Map<Strin
 Handler ethPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   bool isForceLoadFromJni = params['isForceLoadFromJni'].first == 'true';
   return EthPage(isForceLoadFromJni: isForceLoadFromJni);
+});
+
+Handler eeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return EeePage();
 });
 
 Handler publicPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
