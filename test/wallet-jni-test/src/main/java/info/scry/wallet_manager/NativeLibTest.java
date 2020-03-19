@@ -13,21 +13,24 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-       // walletGenerateTest();
+       walletGenerateTest();
        // walletExportTest();
         // eeeTxsign();
         List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
-        contract_test(wallets);
+        System.out.println(wallets.size());
+        System.out.println(wallets.toString());
+     //   contract_test(wallets);
+
 
     }
 
     public static void walletGenerateTest(){
         Random random = new Random(1);
-        while (NativeLib.loadAllWalletList().size()<2){
+        while (NativeLib.loadAllWalletList().size()<4){
             NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(12);
             System.out.println(mnemonic.mnId);
             int  r = random.nextInt(1000);
-            NativeLib.Wallet wallet =  NativeLib.saveWallet("wallet_hello"+r ,"123456".getBytes(),mnemonic.mn,0);
+            NativeLib.Wallet wallet =  NativeLib.saveWallet("wallet_hello"+r ,"123456".getBytes(),mnemonic.mn,1);
             System.out.println(wallet.toString());
         }
     }
