@@ -115,10 +115,11 @@ impl DataServiceProvider {
     }
 
     //这个地方 定义成通用的对象查询功能
-    pub fn query_by_wallet_digest(&self, digest: &str) -> Option<TbWallet> {
-        let query_sql = "select * from Wallet where mn_digest = ?";
+    pub fn query_by_wallet_digest(&self, digest: &str,wallet_type:i64) -> Option<TbWallet> {
+        let query_sql = "select * from Wallet where mn_digest = ? and wallet_type = ?";
         let mut statement = self.db_hander.prepare(query_sql).unwrap();
         statement.bind(1, digest).expect("query_by_mnemonic_id bind id");
+        statement.bind(2, wallet_type).expect("query_by_mnemonic_id bind id");
         let mut cursor = statement.cursor();
 
         match cursor.next().unwrap() {

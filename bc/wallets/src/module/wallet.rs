@@ -279,7 +279,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
     //正式链，助记词只能导入一次
     let hex_mn_digest = hex::encode(mn.keccak256());
     if wallet_type == 1 {
-        if dbhelper.query_by_wallet_digest(hex_mn_digest.as_str()).is_some() {
+        if dbhelper.query_by_wallet_digest(hex_mn_digest.as_str(),wallet_type).is_some() {
             let msg = format!("this wallet is exist");
             return Err(WalletError::Custom(msg));
         }
