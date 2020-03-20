@@ -446,6 +446,11 @@ class _EeePageState extends State<EeePage> {
 
   //链卡片
   Widget _buildChainCard() {
+    if (chainTypeList.isEmpty) {
+      return Container(
+        child: null,
+      );
+    }
     return Container(
       width: ScreenUtil().setWidth(77.5),
       height: ScreenUtil().setHeight(42.75),
@@ -471,7 +476,7 @@ class _EeePageState extends State<EeePage> {
             ),
           );
         },
-        itemCount: chainTypeList.length,
+        itemCount: chainTypeList.isNotEmpty ? chainTypeList.length : 0,
         pagination: new SwiperPagination(
           builder: SwiperPagination(
             builder: SwiperPagination.rect, //切页面图标
