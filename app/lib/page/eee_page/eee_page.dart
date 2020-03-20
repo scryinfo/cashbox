@@ -24,7 +24,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 
-
 class EeePage extends StatefulWidget {
   const EeePage({Key key, this.isForceLoadFromJni}) : super(key: key);
 
@@ -83,13 +82,11 @@ class _EeePageState extends State<EeePage> {
       }
     }
     setState(() {
-      this.chainTypeList = chainTypeList;
       this.walletList = walletList;
     });
     future = loadDisplayDigitListData();
     LogUtil.d("log init==================>", "dart init");
   }
-
 
   Future<List<Digit>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
@@ -158,7 +155,8 @@ class _EeePageState extends State<EeePage> {
             new Column(
               children: <Widget>[
                 _buildChainCard(), //链卡片swipe
-                _buildMiddleFuncCard(), //功能位置
+                //_buildMiddleFuncCard(), //功能位置
+                Gaps.scaleVGap(5),
                 _buildDigitListCard(), //代币列表
                 //DigitListCard(),
               ],
@@ -257,17 +255,17 @@ class _EeePageState extends State<EeePage> {
           ),
           child: GestureDetector(
             onTap: () {
-              {
-                Provider.of<TransactionProvide>(context)
-                  ..setDigitName(displayDigitsList[index].shortName)
-                  ..setBalance(displayDigitsList[index].balance)
-                  ..setMoney(displayDigitsList[index].money)
-                  ..setDecimal(displayDigitsList[index].decimal)
-                  ..setFromAddress(nowChainAddress)
-                  ..setChainType(nowChain.chainType)
-                  ..setContractAddress(displayDigitsList[index].contractAddress);
-              }
-              NavigatorUtils.push(context, Routes.transactionHistoryPage);
+              // {
+              //   Provider.of<TransactionProvide>(context)
+              //     ..setDigitName(displayDigitsList[index].shortName)
+              //     ..setBalance(displayDigitsList[index].balance)
+              //     ..setMoney(displayDigitsList[index].money)
+              //     ..setDecimal(displayDigitsList[index].decimal)
+              //     ..setFromAddress(nowChainAddress)
+              //     ..setChainType(nowChain.chainType)
+              //     ..setContractAddress(displayDigitsList[index].contractAddress);
+              // }
+              // NavigatorUtils.push(context, Routes.transactionHistoryPage);
             },
             child: Row(
               children: <Widget>[
@@ -331,17 +329,21 @@ class _EeePageState extends State<EeePage> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    moneyUnitStr + " " + (displayDigitsList[index].digitRate.getPrice(moneyUnitStr).toStringAsFixed(5) ?? "0"), //市场单价
+                                    moneyUnitStr + " 0.00 ", //市场单价
+                                    //moneyUnitStr + " " + (displayDigitsList[index].digitRate.getPrice(moneyUnitStr).toStringAsFixed(5) ?? "0"), //市场单价
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: ScreenUtil.instance.setSp(2.5),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
-                                    child: Text(
-                                      displayDigitsList[index].digitRate.getChangeHour ?? "0%", //市场价格波动
-                                      style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
+                                  Opacity(
+                                    opacity: 0,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
+                                      child: Text(
+                                        displayDigitsList[index].digitRate.getChangeHour ?? "0%", //市场价格波动
+                                        style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
+                                      ),
                                     ),
                                   )
                                 ],

@@ -473,7 +473,6 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     message = NativeLib.eeeTxSign((String) (call.argument("rawTx")),
                             (String) (call.argument("mnId")),
                             (byte[]) (call.argument("pwd")));
-                    ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "eeeTxSign exception is " + exception);
                 }
@@ -484,7 +483,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     ScryWalletLog.d("nativeLib=>", "message.signedInfo is " + message.signedInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
-                    ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
+                    ScryWalletLog.d("nativeLib=>", "message.status is " + message.status+"||message.message is " + message.message.toString());
                 }
                 result.success(resultMap);
                 break;
