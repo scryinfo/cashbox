@@ -210,6 +210,9 @@ class Wallets {
   }
 
   Future<Wallet> getNowWalletModel() async {
+    if (nowWallet != null) {
+      return nowWallet;
+    }
     String walletId = await getNowWalletId();
     Wallet walletModel = await getWalletByWalletId(walletId);
     return walletModel;
