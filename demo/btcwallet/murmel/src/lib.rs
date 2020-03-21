@@ -40,6 +40,7 @@ extern crate serde;
 extern crate lru_cache;
 extern crate mio;
 extern crate rand;
+extern crate hex;
 
 #[cfg(feature="lightning")] extern crate lightning;
 extern crate sqlite;
