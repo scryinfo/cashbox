@@ -85,4 +85,7 @@ version = "3.0.2"
 sqlite = "0.25.0"
 bitcoin-wallet = "1.1.0"
 
+[dependencies.hex]
+version = "=0.3.2"
+
 
