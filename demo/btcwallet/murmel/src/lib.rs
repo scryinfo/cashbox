@@ -62,8 +62,8 @@ pub mod constructor;
 pub mod bloomfilter;
 pub mod getdata;
 pub mod db;
-pub mod utxo;
 pub mod hooks;
 pub mod walletlib;
+pub mod broadcast;
 
 pub use error::Error;
