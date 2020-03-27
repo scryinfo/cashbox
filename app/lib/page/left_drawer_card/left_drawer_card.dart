@@ -281,8 +281,12 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
   List<Widget> _buildChainListCard(Wallet wallet) {
     List<Widget> chainsList = List.generate(wallet.chainList.length, (index) {
       Chain nowChain = wallet.chainList[index];
-      if (nowChain.chainType == ChainType.ETH_TEST || nowChain.chainType == ChainType.ETH) {
-        //todo 2.0 目前手动写死，只加载eth链,不显示加载EEE链
+      //todo 2.0 目前diamond项目，hard code 只加载EEE链,不显示加载ETH链
+      if (nowChain.chainType == ChainType.EEE || nowChain.chainType == ChainType.EEE_TEST) {
+        /*
+          if (nowChain.chainType == ChainType.ETH_TEST || nowChain.chainType == ChainType.ETH) {
+            todo 2.0 手动写死，只加载eth链,不显示加载EEE链
+        */
         return Container(
           alignment: Alignment.centerLeft,
           height: ScreenUtil().setHeight(7.5),
