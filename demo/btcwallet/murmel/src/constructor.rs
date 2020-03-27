@@ -59,6 +59,7 @@ use bloomfilter::BloomFilter;
 use getdata::GetData;
 use sqlite::Connection;
 use db::{SharedSQLite, SQLite};
+use broadcast::Broadcast;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -118,6 +119,9 @@ impl Constructor {
 
         info!("send GetData");
         dispatcher.add_listener(GetData::new(shared_sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone(), hook_receiver));
+
+        info!("Broadcast TX");
+        dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone()));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));
