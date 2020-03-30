@@ -13,7 +13,7 @@ pub use error::WalletError;
 
 pub use ethtx::convert_token;
 
-#[derive(PartialEq,Clone)]
+#[derive(PartialEq, Clone)]
 pub enum StatusCode {
     DylibError = -1,
     OK = 200,
@@ -30,28 +30,30 @@ pub enum StatusCode {
     //广播上链成功
     BroadcastFailure,  //广播上链失败
 }
-impl Default for StatusCode{
+
+impl Default for StatusCode {
     fn default() -> Self { StatusCode::OK }
 }
 
-#[derive(PartialEq,Clone)]
-pub enum EthChainId{
-    MAIN=1,
-    ROPSTEN=3,
-    RINKEBY=4,
+#[derive(PartialEq, Clone)]
+pub enum EthChainId {
+    MAIN = 1,
+    ROPSTEN = 3,
+    RINKEBY = 4,
 }
-#[derive(PartialEq,Clone,Debug)]
+
+#[derive(PartialEq, Clone, Debug)]
 pub enum ChainType {
     BTC = 1,
-    BtcTest =2,
+    BtcTest = 2,
     ETH = 3,
-    EthTest =4,
+    EthTest = 4,
     EEE = 5,
-    EeeTest =6,
+    EeeTest = 6,
     OTHER = 7,
 }
 
-impl Default for ChainType{
+impl Default for ChainType {
     fn default() -> Self { ChainType::OTHER }
 }
 
@@ -77,32 +79,32 @@ mod tests {
     use std::sync::mpsc;
     use futures::Future;
     use jsonrpc_core::Notification;
-    use sp_core::crypto::{Pair,AccountId32};
+    use sp_core::crypto::{Pair, AccountId32};
 
     #[test]
     fn verify_mnemonic_create() {
         let mnemonic = wallet_crypto::Sr25519::generate_phrase(18);
         let data = "substrate sign method test";
-        println!("data length is:{}",data.len());
+        println!("data length is:{}", data.len());
         let s = String::new();
-        let data = wallet_crypto::Ed25519::sign(&mnemonic,data.as_bytes());
-        println!("{}",hex::encode(data.to_vec().as_slice()));
+        let data = wallet_crypto::Ed25519::sign(&mnemonic, data.as_bytes());
+        println!("{}", hex::encode(data.to_vec().as_slice()));
     }
 
     #[test]
-    fn rpc_account_nonce_test(){
+    fn rpc_account_nonce_test() {
         let (send_tx, recv_tx) = mpsc::channel();
         let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
         let mnemonic = "swarm grace knock race flip unveil pyramid reveal shoot vehicle renew axis";
         let _to = "5DATag245rFG8PvCHnSpntLMhF9xvKZQPyshaAFhSiMMcFpU";
-      //  let seed =  wallet_crypto::Sr25519::seed_from_phrase(mnemonic,None);
+        //  let seed =  wallet_crypto::Sr25519::seed_from_phrase(mnemonic,None);
         //let pair = wallet_crypto::Sr25519::pair_from_suri(&mnemonic,None);
-        let pair = wallet_crypto::Sr25519::pair_from_suri("//Alice",None);
-        println!("public:{}",&pair.public());
+        let pair = wallet_crypto::Sr25519::pair_from_suri("//Alice", None);
+        println!("public:{}", &pair.public());
 
-        let index = wallet_rpc::substrate::account_nonce(&mut substrate_client,AccountId32::from(pair.public().0));
-        println!("index:{}",index);
-        assert_eq!(index,0);
+        let index = wallet_rpc::substrate::account_nonce(&mut substrate_client, AccountId32::from(pair.public().0));
+        println!("index:{}", index);
+        assert_eq!(index, 0);
         // 用于保持连接，接收从链上返回来的数据
         let msg = recv_tx.recv().unwrap();
         let msg = msg.into_text().unwrap();
@@ -116,42 +118,48 @@ mod tests {
     }
 
     #[test]
-    fn rpc_func_test(){
+    fn rpc_func_test() {
         let (send_tx, recv_tx) = mpsc::channel();
         let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
         let mnemonic = "mirror craft oil voice there pizza quarter void inhale snack vacant kingdom force erupt congress wing correct bargain";
         let to = "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy";
-        let ret = wallet_rpc::transfer(&mut substrate_client,  mnemonic,to,"200000000000000");
+        let ret = wallet_rpc::transfer(&mut substrate_client, mnemonic, to, "200000000000000");
         match ret {
-            Ok(data)=>{
-                println!("signed data is: {}",data);
-                wallet_rpc::submit_data(&mut substrate_client,data);
-            },
-            Err(msg)=>{
-                println!("error {}",msg);
+            Ok(data) => {
+                println!("signed data is: {}", data);
+                wallet_rpc::submit_data(&mut substrate_client, data);
+            }
+            Err(msg) => {
+                println!("error {}", msg);
             }
         }
     }
 
     #[test]
-    fn func_sign_test(){
-        let rawtx = "0x410284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0122b11275067a35d4b6ebae6be86b55404ea5b9f2a3c75714d6c7b2efbffb9d3975b4c9acc19569a2f1f34300ecdb5190f9f3c43af201fb396959d8c3ba18ca030000000600ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0b0040e59c301200000000eeb761fc521f62ad8de15f6e58804767eaf577c599e0df9e4246b4a7fc85178504000000";
-        module::wallet::raw_tx_sign(rawtx,"77888f3c-2574-4a24-8a75-d168f6376f40","123456".as_bytes());
+    fn get_runtime_version_test() {
+        let (send_tx, recv_tx) = mpsc::channel();
+        let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
+        let runtime_version = wallet_rpc::substrate::runtime_version(&mut substrate_client);
+        println!("runtime_version:{:?}", runtime_version);
     }
 
     #[test]
-    fn generate_address_from_mnemonic_test(){
+    fn func_sign_test() {
+        let rawtx = "0xac040400ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0b0040e59c301200000000412b837b680ceebb60b1b1e137598b361899022220661778564b60ab048d362401000000";
+        module::wallet::raw_tx_sign(rawtx, "9328ebd6-c205-439d-a016-ebe6ab1e5408", "123456".as_bytes());
+    }
+
+    #[test]
+    fn generate_address_from_mnemonic_test() {
         let mnemonic = "cost impact napkin never sword civil shell tank sibling steel certain valve";
-       let address =  module::wallet::address_from_mnemonic(mnemonic.as_bytes(),ChainType::ETH);
-        assert_eq!("0x2f96570cf17258de7562b91c0ddd1ee7b95542ef",address.unwrap().addr);
+        let address = module::wallet::address_from_mnemonic(mnemonic.as_bytes(), ChainType::ETH);
+        assert_eq!("0x2f96570cf17258de7562b91c0ddd1ee7b95542ef", address.unwrap().addr);
     }
 
     #[test]
-    fn hash_test(){
+    fn hash_test() {
         let value = b"hello test";
         let data = value.as_ref();
-        println!("{:?}",data.keccak256());
-
+        println!("{:?}", data.keccak256());
     }
-
 }
