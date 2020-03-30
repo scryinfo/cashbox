@@ -1,5 +1,4 @@
 use std::io;
-use std::error;
 use std::fmt;
 
 #[derive(Debug)]
@@ -30,7 +29,8 @@ impl fmt::Display for WalletError{
     }
 }
 
-impl error::Error for WalletError {
+//impl error::Error for WalletError {
+/*impl Display for WalletError {
     fn description(&self) -> &str {
         // Both underlying errors already impl `Error`, so we defer to their
         // implementations.
@@ -44,7 +44,7 @@ impl error::Error for WalletError {
             WalletError::NotExist=>"not exist",
         }
     }
-}
+}*/
 
 impl From<sqlite::Error> for WalletError{
     fn from(err: sqlite::Error) -> WalletError {

@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate serde_derive;
 use log::debug;
-use std::error::Error;
 use std::fs::{File, DirBuilder};
 use std::io::prelude::*;
 use std::path::Path;
@@ -40,7 +39,7 @@ pub fn write_file(filename: &str, data: &[u8]) -> Result<bool, String> {
     let mut file = match File::create(&path) {
         Err(why) => {
             // TODO 针对文件创建失败的处理方法，还需要再完善
-            panic!("couldn't create {}: {}", display, why.description());
+            panic!("couldn't create {}: {}", display, why.to_string());
         }
         Ok(file) => file,
     };
