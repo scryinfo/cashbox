@@ -118,12 +118,12 @@ public class ScryWalletLog {
         }
         //Log.i("创建文件","创建文件");
         File file = new File(dirsFile.toString(), needWriteFiel + MYLOGFILEName);//
-        Log.d("ScryLog================>", file.getAbsolutePath());
         // MYLOG_PATH_SDCARD_DIR
         if (!file.exists()) {
             try {
                 //在指定的文件夹中创建文件
                 file.createNewFile();
+                Log.d("ScryLog not exist,begin to create================>", file.getAbsolutePath());
             } catch (Exception e) {
             }
         }

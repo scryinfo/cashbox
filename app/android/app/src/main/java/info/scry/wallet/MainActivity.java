@@ -1,5 +1,8 @@
 package info.scry.wallet;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
@@ -16,7 +19,7 @@ import android.util.Log;
 
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.common.Constant;
-
+import static java.lang.System.out;
 
 public class MainActivity extends FlutterActivity {
 
@@ -29,13 +32,16 @@ public class MainActivity extends FlutterActivity {
     private final String FILE_SYSTEM_METHOD = "file_system_method";
     private final String CHARGING_CHANNEL = "samples.flutter.io/charging";
     private final String FLUTTER_LOG_CHANNEL = "android_log";
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        checkApplicationVersion();
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {//API>21,设置状态栏颜色透明
             getWindow().setStatusBarColor(0);
         }
+        System.out.println("begin checkApplicationVersion================>"+ "it is enter");
         GeneratedPluginRegistrant.registerWith(this);
 
         new MethodChannel(getFlutterView(), QR_SCAN_CHANNEL)
@@ -57,6 +63,7 @@ public class MainActivity extends FlutterActivity {
                         new MethodCallHandler() {
                             @Override
                             public void onMethodCall(MethodCall call, Result result) {
+                                System.out.println("begin logPrint================>"+ "it is enter");
                                 logPrint(call);
                             }
                         }
@@ -83,6 +90,24 @@ public class MainActivity extends FlutterActivity {
                     }
                 }
         );
+    }
+
+    private void checkApplicationVersion() {
+        int version = getVersionCode(this);
+        ScryLog.v("checkVersion init====>", String.valueOf(version));
+        //todo 比对verion是否一致，下载升级app
+    }
+
+    private int getVersionCode(Context context) {
+        int version = 0;
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            PackageInfo packInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            version = packInfo.versionCode;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return version;
     }
 
     private void logPrint(MethodCall call) {
