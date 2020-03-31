@@ -7,7 +7,6 @@ use sp_core::{H256, crypto::{Pair, AccountId32 as AccountId, Ss58Codec}};
 use sp_runtime::{generic::Era};
 use frame_support::{storage::StorageMap};
 
-//use indices::In
 pub fn genesis_hash(client: &mut Rpc) -> Hash {
     client
         .request::<Hash>("chain_getBlockHash", vec![json!(0 as u64)])
@@ -17,7 +16,7 @@ pub fn genesis_hash(client: &mut Rpc) -> Hash {
 }
 
 pub fn account_nonce(client: &mut Rpc, account_id: AccountId) -> u64 {
-     let final_key = <system::AccountNonce<Runtime>>::hashed_key_for(account_id);
+     let final_key = <system::Account<Runtime>>::hashed_key_for(account_id);
       let key = format!("0x{:}", HexDisplay::from(&final_key));
       let nonce = client
           .request::<Value>("state_getStorage", vec![json!(key)])
@@ -51,7 +50,9 @@ pub fn transfer(client: &mut Rpc, mnemonic: &str, to: &str, amount: &str) -> Res
     let amount = str::parse::<Balance>(amount).unwrap();
     let index =index;
     let to_account_id=  AccountId::from_ss58check(to).expect("Invalid 'to' ss58check");
+ /*   sp_core::crypto::AccountId32*/
     let function = Call::Balances(BalancesCall::transfer(pallet_indices::address::Address::Id(to_account_id), amount));
+   // let function = Call::Balances(BalancesCall::transfer(to_account_id, amount));
     let result = tx_sign(mnemonic, genesis_hash, index as u32, function);
     Ok(result)
 }
@@ -88,12 +89,7 @@ pub fn tx_sign(mnemonic: &str, genesis_hash: H256, index: u32, function: Call) -
             (),
         ),
     );
-   /* let signature = raw_payload.using_encoded(|payload| if payload.len() > 256 {
-        signer.sign(&blake2_256(payload)[..])
-    } else {
-        println!("Signing {}", HexDisplay::from(&payload));
-        signer.sign(payload)
-    });*/
+
     let signature = raw_payload.using_encoded(|payload| signer.sign(payload));
 
    let signer_account_id= AccountId::from(signer.public().0);
