@@ -17,6 +17,12 @@ import io.flutter.plugin.common.MethodChannel.Result;
 
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
+import com.allenliu.versionchecklib.v2.AllenVersionChecker;
+import com.allenliu.versionchecklib.v2.builder.DownloadBuilder;
+import com.allenliu.versionchecklib.v2.builder.UIData;
+import com.allenliu.versionchecklib.v2.callback.RequestVersionListener;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.common.Constant;
 
@@ -63,8 +69,12 @@ public class MainActivity extends FlutterActivity {
                         new MethodCallHandler() {
                             @Override
                             public void onMethodCall(MethodCall call, Result result) {
-                                checkApplicationVersion();
                                 logPrint(call);
+                                try {
+                                    checkApplicationVersion();
+                                } catch (Exception e) {
+                                    ScryLog.e("checkApplicationVersion appear error", e.toString());
+                                }
                             }
                         }
                 );
@@ -97,13 +107,36 @@ public class MainActivity extends FlutterActivity {
         ScryLog.v("checkVersion init================>", String.valueOf(nowVersion));
         //todo 从服务器获取版本号，比对verion是否一致，下载升级app
         int serverVersion = nowVersion + 1;
+        String serverUrl = ""; //todo
         if (serverVersion > nowVersion) {
-            downloadServerApk();
+            downloadServerApk(serverUrl);
         }
     }
 
-    private void downloadServerApk() {
+    private void downloadServerApk(String requestUrl) {
+        AllenVersionChecker
+                .getInstance()
+                .requestVersion()
+                .setRequestUrl(requestUrl)
+                .request(new RequestVersionListener() {
+                    @Nullable
+                    @Override
+                    public UIData onRequestVersionSuccess(DownloadBuilder downloadBuilder,
+                                                          String result) {
+                        //get the data response from server,parse,get the `downloadUlr` and some
+                        // other ui date
+                        //...
+                        //return null if you dont want to update application
+                        String downloadUrl = "";
+                        return UIData.create().setDownloadUrl(downloadUrl);
+                    }
 
+                    @Override
+                    public void onRequestVersionFailure(String message) {
+
+                    }
+                })
+                .executeMission(MainActivity.this); //.executeMission(context);
     }
 
     private int getVersionCode(Context context) {
