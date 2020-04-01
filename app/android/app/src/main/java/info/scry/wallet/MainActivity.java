@@ -71,7 +71,7 @@ public class MainActivity extends FlutterActivity {
                             public void onMethodCall(MethodCall call, Result result) {
                                 logPrint(call);
                                 try {
-                                    checkApplicationVersion();
+                                    // checkApplicationVersion(); //todo 待验证，暂不放开
                                 } catch (Exception e) {
                                     ScryLog.e("checkApplicationVersion appear error", e.toString());
                                 }
