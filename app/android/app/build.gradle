@@ -97,4 +97,6 @@ dependencies {
     Rejecting re-init on previously-failed class java.lang.Class<androidx.core.view.ViewCompat$OnUnhandledKeyEventListenerWrapper>: java.lang.NoClassDefFoundError: Failed resolution of: Landroid/view/View$OnUnhandledKeyEventListener;*/
     implementation 'com.android.support:appcompat-v7:26.+'
     implementation 'com.github.yuzhiqiang1993:zxing:2.2.5'
+    //实现版本升级 工具库
+    implementation 'com.github.AlexLiuSheng:CheckVersionLib:2.2.3'
 }
