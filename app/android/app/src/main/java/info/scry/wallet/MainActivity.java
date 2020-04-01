@@ -19,6 +19,7 @@ import android.util.Log;
 
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.common.Constant;
+
 import static java.lang.System.out;
 
 public class MainActivity extends FlutterActivity {
@@ -36,12 +37,10 @@ public class MainActivity extends FlutterActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        checkApplicationVersion();
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {//API>21,设置状态栏颜色透明
             getWindow().setStatusBarColor(0);
         }
-        System.out.println("begin checkApplicationVersion================>"+ "it is enter");
         GeneratedPluginRegistrant.registerWith(this);
 
         new MethodChannel(getFlutterView(), QR_SCAN_CHANNEL)
@@ -51,7 +50,8 @@ public class MainActivity extends FlutterActivity {
                             public void onMethodCall(MethodCall call, Result result) {
                                 if (call.method.toString().equals(QR_SCAN_METHOD)) {
                                     mFlutterChannelResult = result;
-                                    Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+                                    Intent intent = new Intent(MainActivity.this,
+                                            CaptureActivity.class);
                                     startActivityForResult(intent, REQUEST_CODE_QR_SCAN);
                                 }
                             }
@@ -63,7 +63,7 @@ public class MainActivity extends FlutterActivity {
                         new MethodCallHandler() {
                             @Override
                             public void onMethodCall(MethodCall call, Result result) {
-                                System.out.println("begin logPrint================>"+ "it is enter");
+                                checkApplicationVersion();
                                 logPrint(call);
                             }
                         }
@@ -93,9 +93,17 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void checkApplicationVersion() {
-        int version = getVersionCode(this);
-        ScryLog.v("checkVersion init====>", String.valueOf(version));
-        //todo 比对verion是否一致，下载升级app
+        int nowVersion = getVersionCode(this);
+        ScryLog.v("checkVersion init================>", String.valueOf(nowVersion));
+        //todo 从服务器获取版本号，比对verion是否一致，下载升级app
+        int serverVersion = nowVersion + 1;
+        if (serverVersion > nowVersion) {
+            downloadServerApk();
+        }
+    }
+
+    private void downloadServerApk() {
+
     }
 
     private int getVersionCode(Context context) {
