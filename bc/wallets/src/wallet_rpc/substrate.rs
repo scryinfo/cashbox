@@ -5,14 +5,14 @@ use sp_core::{H256, crypto::{Pair, Ss58Codec}};
 
 use frame_support::{storage::StorageMap};
 
-use codec::{Decode, Encode};
-use node_primitives::{AccountId, Balance, Index, Signature};
+use codec::Encode;
+use node_runtime::{AccountId, Balance, Index, Signature};
 use node_runtime::{Call, Runtime};
 //use node_runtime::Indices;
 //use sp_core::{crypto::Ss58Codec, ecdsa, ed25519, H256, Pair, sr25519};
 use sp_core::{ ecdsa, ed25519, sr25519};
 pub use sp_runtime::generic::{Era, SignedPayload, UncheckedExtrinsic};
-pub use sp_runtime::traits::{IdentifyAccount, StaticLookup, Verify};
+pub use sp_runtime::traits::{IdentifyAccount, Verify};
 use crate::wallet_crypto::Crypto;
 
 //pub type Address = <Indices as StaticLookup>::Source;
@@ -21,8 +21,6 @@ type AccountPublic = <Signature as Verify>::Signer;
 type SignatureOf<C> = <<C as Crypto>::Pair as Pair>::Signature;
 type PublicOf<C> = <<C as Crypto>::Pair as Pair>::Public;
 pub type UncheckedExtrinsicV4 = sp_runtime::generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
-
-
 
 trait SignatureT: AsRef<[u8]> + AsMut<[u8]> + Default {
     /// Converts the signature into a runtime account signature, if possible. If not possible, bombs out.
@@ -143,10 +141,7 @@ pub fn account_nonce(client: &mut Rpc, account_id: AccountId) -> u64 {
             let temp = &mut index_target[0..4];
               temp.copy_from_slice(blob.as_slice());
           }
-
           let index = u64::from_le_bytes(index_target);
-          //let index: Result<u64,_> = Decode::decode(&mut blob.as_slice());
-          //index.expect("get index")
           index
       } else {
           0
@@ -173,43 +168,4 @@ pub fn tx_sign(mnemonic: &str, genesis_hash: H256, index: u32, function: Call,ve
     let extrinsic = generate_signed_extrinsic::<wallet_crypto::Sr25519>(function, index, signer, genesis_hash,version);
     let result = format!("0x{}", hex::encode(&extrinsic.encode()));
     result
-   /*let extra = |i: Index, f: Balance| {
-        (
-            system::CheckVersion::<Runtime>::new(),
-            system::CheckGenesis::<Runtime>::new(),
-            system::CheckEra::<Runtime>::from(Era::Immortal),
-            system::CheckNonce::<Runtime>::from(i),
-            system::CheckWeight::<Runtime>::new(),
-            transaction_payment::ChargeTransactionPayment::<Runtime>::from(f),
-            Default::default(),
-        )
-    };
-
-    let raw_payload = SignedPayload::from_raw(
-        function,
-        extra(index, 0),
-        (
-            version,
-            genesis_hash,
-            genesis_hash,
-            (),
-            (),
-            (),
-            (),
-        ),
-    );
-
-    let signature = raw_payload.using_encoded(|payload| signer.sign(payload));
-
-   let signer_account_id= AccountId::from(signer.public().0);
-    let (function, extra, _) = raw_payload.deconstruct();
-
-    let extrinsic = UncheckedExtrinsic::new_signed(
-        function,
-        pallet_indices::address::Address::Id(signer_account_id),
-        sp_runtime::MultiSignature::Sr25519(signature),
-        extra,
-    );*/
-  /*  let result = format!("0x{}", hex::encode(&extrinsic.encode()));
-    result*/
 }

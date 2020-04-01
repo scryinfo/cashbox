@@ -35,16 +35,17 @@ jsonrpc-ws-server = { git = "https://github.com/paritytech/jsonrpc.git" }
 jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc.git" }
 
 # 这里编译存在版本问题，当前使用的master能够正常编译通过
-[dependencies.node-primitives]
+#[dependencies.node-primitives]
 #git = 'https://github.com/paritytech/substrate.git'
 #package = 'node-primitives'
 #rev = 'b443ddad65f2ffed68db4973b7b78231c6fc3674'
-path="../../../eee/substrate/bin/node/primitives/"
+#path="../../../eee/substrate/bin/node/primitives/"
 
 [dependencies.sp-core]
 #git = 'https://github.com/paritytech/substrate.git'
 #rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../eee/substrate/primitives/core/"
+
 
 [dependencies.node-runtime]
 #git = 'https://github.com/paritytech/substrate.git'
@@ -58,24 +59,25 @@ package = "frame-system"
 #rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../eee/substrate/frame/system/"
 
+
 [dependencies.transaction-payment]
 package = "pallet-transaction-payment"
 #git = 'https://github.com/paritytech/substrate.git'
 #rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../eee/substrate/frame/transaction-payment/"
 
+
 [dependencies.balances]
 package = "pallet-balances"
 #git = 'https://github.com/paritytech/substrate.git'
 #rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-
 path = "../../../eee/substrate/frame/balances/"
+
 
 [dependencies.pallet-contracts]
 package = "pallet-contracts"
 #git = 'https://github.com/paritytech/substrate.git'
 #rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-
 path = "../../../eee/substrate/frame/contracts/"
 
 [dependencies.sp-runtime]
@@ -83,14 +85,8 @@ path = "../../../eee/substrate/frame/contracts/"
 #rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../eee/substrate/primitives/runtime/"
 
-[dependencies.pallet-indices]
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-
-path = "../../../eee/substrate/frame/indices/"
-
 [dependencies.frame-support]
- #git = "https://github.com/paritytech/substrate.git"
- package = "frame-support"
- #rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
- path = "../../../eee/substrate/frame/support/"
+#git = "https://github.com/paritytech/substrate.git"
+package = "frame-support"
+#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
+path = "../../../eee/substrate/frame/support/"
