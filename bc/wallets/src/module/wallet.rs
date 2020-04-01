@@ -369,8 +369,6 @@ pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> Result<String, 
             let mn = String::from_utf8(mnemonic.mn).unwrap();
             let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
           // let mut_data = &tx.func_data[..];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
-            println!("func data:{:?}",mut_data);
-
             let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..]).expect("UncheckedExtrinsic");
             let sign_data = wallet_rpc::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function,tx.version);
             // TODO 返回签名后的消息格式需要确定
