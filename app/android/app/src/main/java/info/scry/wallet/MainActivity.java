@@ -113,8 +113,16 @@ public class MainActivity extends FlutterActivity {
         }
     }
 
-    private void downloadServerApk(String requestUrl) {
+    private void downloadServerApk(String downloadUrl) {
+        //https://github.com/AlexLiuSheng/CheckVersionLib
         AllenVersionChecker
+                .getInstance()
+                .downloadOnly(
+                        UIData.create().setDownloadUrl(downloadUrl)
+                )
+                .executeMission(context);
+
+        /*AllenVersionChecker
                 .getInstance()
                 .requestVersion()
                 .setRequestUrl(requestUrl)
@@ -130,13 +138,12 @@ public class MainActivity extends FlutterActivity {
                         String downloadUrl = "";
                         return UIData.create().setDownloadUrl(downloadUrl);
                     }
-
                     @Override
                     public void onRequestVersionFailure(String message) {
 
                     }
                 })
-                .executeMission(MainActivity.this); //.executeMission(context);
+                .executeMission(MainActivity.this); //.executeMission(context);*/
     }
 
     private int getVersionCode(Context context) {
