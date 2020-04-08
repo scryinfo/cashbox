@@ -362,7 +362,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   },
                 ),
                 Text(
-                  "ETH",
+                  S.of(context).eee_token_name,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 13,
