@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:app/global_config/global_config.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Utils {
   ///复制信息
@@ -72,6 +75,46 @@ class Utils {
       return true;
     }
     return false;
+  }
+
+  // 获取应用文档 对应路径
+  static Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  // 返回应用文档路径对应File
+  static Future<File> get _localFile async {
+    final appPath = await _localPath;
+    var directory = new Directory('$appPath');
+    var isDirectoryExists = await directory.exists();
+    if (!isDirectoryExists) {
+      await directory.create();
+    }
+    final file = new File('$appPath' + "/" + GlobalConfig.diamondCaFileName);
+    var isFileExists = await file.exists();
+    if (!isFileExists) {
+      await file.create();
+    }
+    return file;
+  }
+
+  //读取文件中的数据
+  static Future<String> readFile() async {
+    try {
+      final file = await _localFile;
+      String data = await file.readAsString();
+      print(data);
+      return data;
+    } catch (e) {
+      return "error";
+    }
+  }
+
+  //将数据存储到文件中
+  static Future<File> writeFile(String data) async {
+    final file = await _localFile;
+    return file.writeAsString(data);
   }
 }
 
