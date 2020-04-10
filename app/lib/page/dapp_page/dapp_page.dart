@@ -8,6 +8,7 @@ import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/qr_scan_util.dart';
+import 'package:app/util/utils.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,8 +33,8 @@ class _DappPageState extends State<DappPage> {
         child: Container(
           margin: EdgeInsets.only(top: ScreenUtil.instance.setHeight(4.5)),
           child: WebView(
-            initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
-            //initialUrl: "http://192.168.1.3:8080/",
+            //initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
+            initialUrl: "http://192.168.1.3:8080/",
             javascriptMode: JavascriptMode.unrestricted,
             userAgent:
                 "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
@@ -143,6 +144,27 @@ class _DappPageState extends State<DappPage> {
           NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
         }));
 
+    jsChannelList.add(JavascriptChannel(
+        name: "NativeEditOrLoadCA",
+        onMessageReceived: (JavascriptMessage message) async {
+          print("NativeEditOrLoadCA 传回来的参数======>： ${message.message}");
+          if (message.message == null || message.message.trim() == "") {
+            String caInfo = await loadDiamondCa();
+            _controller?.evaluateJavascript('nativeCAInfo("$caInfo")')?.then((result) {});
+          } else {
+            editDiamondCaToFile(message.message);
+          }
+        }));
+
     return jsChannelList.toSet();
+  }
+
+  Future<String> loadDiamondCa() async {
+    var resultCA = await Utils.readFile();
+    return resultCA;
+  }
+
+  editDiamondCaToFile(String caInfo) {
+    Utils.writeFile(caInfo);
   }
 }

@@ -18,6 +18,9 @@ class GlobalConfig {
 
   static bool isDebugVersion = true; //全局开关，控制是否用 测试链
 
+  //保存dapp 合约地址信息
+  static String diamondCaFileName = "contract_address.txt";
+
   static double getMaxGasLimit(String digitName) {
     return maxGasLimitMap[digitName];
   }
