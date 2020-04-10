@@ -33,8 +33,8 @@ class _DappPageState extends State<DappPage> {
         child: Container(
           margin: EdgeInsets.only(top: ScreenUtil.instance.setHeight(4.5)),
           child: WebView(
-            //initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
-            initialUrl: "http://192.168.1.3:8080/",
+            initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
+            //initialUrl: "http://192.168.1.3:8080/",
             javascriptMode: JavascriptMode.unrestricted,
             userAgent:
                 "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
