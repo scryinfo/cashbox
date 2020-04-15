@@ -198,9 +198,10 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
+                color: walletList[index].isNowWallet ? Color.fromRGBO(60, 72, 88, 0.5) : Colors.transparent,
                 child: GestureDetector(
                   onTap: () async {
-                    print("wallet index is===> " + walletList[index].walletId);
+                    print("wallet index is===> " + walletList[index].walletId + "|| isNowWallet===>" + walletList[index].isNowWallet.toString());
                     bool isSuccess = await Wallets.instance.setNowWallet(walletList[index].walletId);
                     if (isSuccess) {
                       //NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
