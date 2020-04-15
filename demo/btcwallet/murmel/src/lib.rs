@@ -45,6 +45,7 @@ extern crate hex;
 #[cfg(feature="lightning")] extern crate lightning;
 extern crate sqlite;
 extern crate bitcoin_wallet;
+extern crate jni;
 
 #[cfg(feature="lightning")] mod lightning;
 mod headercache;
@@ -65,5 +66,8 @@ pub mod db;
 pub mod hooks;
 pub mod walletlib;
 pub mod broadcast;
+pub mod jniapi;
 
 pub use error::Error;
+
+//*****************************for jni api

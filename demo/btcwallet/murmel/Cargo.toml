@@ -25,6 +25,8 @@ repository = "https://github.com/rust-bitcoin/murmel/"
 [lib]
 name = "murmel"
 path = "src/lib.rs"
+crate_type = ["cdylib", "rlib"]
+
 [dependencies.bitcoin]
 version = "0.21"
 features = ["serde"]
@@ -87,5 +89,8 @@ bitcoin-wallet = "1.1.0"
 
 [dependencies.hex]
 version = "=0.3.2"
+
+[dependencies.jni]
+version = "0.16.0"
 
 
