@@ -193,12 +193,12 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
     List<Widget> randomWidgetList = List.generate(mnemonicList.length, (index) {
       return Container(
         alignment: Alignment.center,
-        width: ScreenUtil().setWidth(18.75),
+        width: ScreenUtil().setWidth(25),
+        color: Colors.black26,
         child: FlatButton(
           child: Text(
             mnemonicList[index].toString(),
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.9),
               fontSize: 14,
