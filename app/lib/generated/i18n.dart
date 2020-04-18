@@ -44,6 +44,7 @@ class S implements WidgetsLocalizations {
   String get create_wallet => "创建钱包";
   String get currency_manage => "货币管理";
   String get dapp => "Dapp";
+  String get dapp_sign_hint_content => "提示：请输入钱包密码对操作进行签名。\n当前执行签名的地址为：";
   String get data_loading => "数据加载中...";
   String get delete_wallet => "删除钱包";
   String get delete_wallet_hint => "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。";
@@ -330,6 +331,8 @@ class $zh extends S {
   String get failure_create_test_wallet => "测试钱包创建失败，请检查你输入的数据是否正确";
   @override
   String get gas_limit => "Gas Limit";
+  @override
+  String get dapp_sign_hint_content => "提示：请输入钱包密码对操作进行签名。\n当前执行签名的地址为：";
   @override
   String get not_exist_tx_history => "暂无历史交易记录...";
   @override

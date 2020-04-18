@@ -126,6 +126,7 @@
   "not_follow_diamond_rule": "扫描内容结果不符合diamond Dapp规则",
   "input_pwd_hint": "请输入钱包密码",
   "input_pwd_hint_detail": "提示：请输入您的密码，对交易信息进行签名。并将发送上链",
+  "dapp_sign_hint_content": "提示：请输入钱包密码对操作进行签名。\n当前执行签名的地址为：",
   "tx_sign_failure": "交易签名 失败",
   "tx_sign_success": "交易签名 成功",
   "digit_info_null": "代币信息为空",

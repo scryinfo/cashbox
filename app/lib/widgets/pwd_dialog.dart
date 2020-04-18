@@ -33,13 +33,14 @@ class PwdDialog extends StatelessWidget {
       content: Container(
         margin: EdgeInsets.only(left: 7, right: 6),
         padding: EdgeInsets.only(left: 3),
-        height: ScreenUtil().setHeight(18),
+        height: ScreenUtil().setHeight(20),
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
               Gaps.scaleVGap(1),
               Container(
                 alignment: Alignment.centerLeft,
+                height: ScreenUtil().setHeight(8),
                 child: Text(
                   hintContent,
                   textAlign: TextAlign.start,
@@ -49,7 +50,7 @@ class PwdDialog extends StatelessWidget {
                   ),
                 ),
               ),
-              Gaps.scaleVGap(3),
+              Gaps.scaleVGap(1),
               Container(
                 alignment: Alignment.centerLeft,
                 child: TextField(

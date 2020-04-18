@@ -23,6 +23,7 @@ class DappPage extends StatefulWidget {
 
 class _DappPageState extends State<DappPage> {
   WebViewController _controller;
+  Chain chainEEE;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,7 @@ class _DappPageState extends State<DappPage> {
             onPageFinished: (String url) async {
               await Wallets.instance.loadAllWalletList(isForceLoadFromJni: false);
               Wallet wallet = await Wallets.instance.getNowWalletModel();
-              Chain chainEEE = wallet.getChainByChainType(ChainType.EEE);
+              chainEEE = wallet.getChainByChainType(ChainType.EEE);
               if (chainEEE != null && chainEEE.chainAddress != null && chainEEE.chainAddress.trim() != "") {
                 String chainEEEAddress = chainEEE.chainAddress;
                 _controller?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')?.then((result) {}); //传钱包EEE链地址给DApp记录保存
@@ -107,7 +108,7 @@ class _DappPageState extends State<DappPage> {
             builder: (BuildContext context) {
               return PwdDialog(
                 title: S.of(context).wallet_pwd.toString(),
-                hintContent: S.of(context).input_pwd_hint_detail.toString(),
+                hintContent: S.of(context).dapp_sign_hint_content + chainEEE.chainAddress ?? "",
                 hintInput: S.of(context).input_pwd_hint.toString(),
                 onPressed: (pwd) async {
                   var pwdFormat = pwd.codeUnits;
