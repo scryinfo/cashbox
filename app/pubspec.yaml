@@ -42,7 +42,9 @@ dependencies:
   fluro: "^1.5.0"
   # 路由管理           https://github.com/theyakka/fluro
 
-  flutter_webview_plugin: ^0.3.8
+  flutter_webview_plugin: ^0.3.11
+
+  # webview_flutter: ^0.3.20
 
   qr_flutter: ^3.0.1
   # 生成二维码         https://github.com/lukef/qr.flutter
@@ -103,72 +105,72 @@ flutter:
     - assets/dist/favicon.ico
     - assets/dist/css/
 
-    - assets/dist/css/app.d5cd5057.css
-    - assets/dist/css/chunk-1ca8cff0.16e73747.css
+    - assets/dist/css/app.8438eb8f.css
     - assets/dist/css/chunk-3c73c545.d9d1abd1.css
-    - assets/dist/css/chunk-3cc3dfe0.dcab0a25.css
-    - assets/dist/css/chunk-4a4c3950.59631908.css
-    - assets/dist/css/chunk-5c046820.9f8c91c4.css
-    - assets/dist/css/chunk-7c04f6d8.6ba88a51.css
-    - assets/dist/css/chunk-27ea28aa.56d796c0.css
+    - assets/dist/css/chunk-04a771f3.db209814.css
+    - assets/dist/css/chunk-5c1075a7.d0db19fd.css
+    - assets/dist/css/chunk-5c47763c.c1638421.css
+    - assets/dist/css/chunk-5e71539c.56d796c0.css
+    - assets/dist/css/chunk-7b98b2f4.dcab0a25.css
     - assets/dist/css/chunk-28b0895b.31e05759.css
     - assets/dist/css/chunk-41a84540.4cabed04.css
     - assets/dist/css/chunk-50ff9b08.a01e42be.css
     - assets/dist/css/chunk-050c4e48.d0ec725b.css
-    - assets/dist/css/chunk-59ef27e6.eb79bae3.css
+    - assets/dist/css/chunk-71c7c258.289a938e.css
     - assets/dist/css/chunk-252eb0ed.bca7d3ee.css
+    - assets/dist/css/chunk-283d7ba2.48780133.css
     - assets/dist/css/chunk-491b6139.35d551d3.css
+    - assets/dist/css/chunk-7911ca39.eb79bae3.css
+    - assets/dist/css/chunk-10758d68.b364cc79.css
+    - assets/dist/css/chunk-73302c7f.889ea9b8.css
     - assets/dist/css/chunk-73843dc0.030eb7c7.css
-    - assets/dist/css/chunk-38210059.de58248e.css
-    - assets/dist/css/chunk-57877892.d0db19fd.css
-    - assets/dist/css/chunk-b01a230c.889ea9b8.css
-    - assets/dist/css/chunk-bc8f4c2e.0954c167.css
+    - assets/dist/css/chunk-b973479c.47c506f2.css
+    - assets/dist/css/chunk-c7f405ae.829fe5ef.css
+    - assets/dist/css/chunk-cd0bdc6c.ca681335.css
     - assets/dist/css/chunk-cd663524.9a018fdf.css
-    - assets/dist/css/chunk-ed091cf2.e53b4760.css
-    - assets/dist/css/chunk-f92cd5f8.0ca3a141.css
-    - assets/dist/css/chunk-vendors.3dfaf396.css
+    - assets/dist/css/chunk-vendors.567c9a63.css
 
     - assets/dist/js/
-    - assets/dist/js/app.7f1e3d68.js
-    - assets/dist/js/chunk-1ca8cff0.1946e455.js
-    - assets/dist/js/chunk-2d0a347d.9bcbabd0.js
-    - assets/dist/js/chunk-2d0a5191.be37089f.js
-    - assets/dist/js/chunk-2d0ab4d9.9e1261f1.js
-    - assets/dist/js/chunk-2d0aba49.7e7c4c44.js
-    - assets/dist/js/chunk-2d0ae94a.11ee3939.js
+    - assets/dist/js/app.50d01877.js
+    - assets/dist/js/chunk-2d0a347d.4e9a5a98.js
+    - assets/dist/js/chunk-2d0a5191.c1b598d8.js
+    - assets/dist/js/chunk-2d0ab4d9.c7411b20.js
+    - assets/dist/js/chunk-2d0aba49.d74c56be.js
+    - assets/dist/js/chunk-2d0ae94a.ad0d6935.js
     - assets/dist/js/chunk-2d0b3a10.45a2660c.js
     - assets/dist/js/chunk-2d0b211c.4a5ba289.js
     - assets/dist/js/chunk-2d0be08d.d6f0d226.js
-    - assets/dist/js/chunk-2d0c9500.6cc09484.js
-    - assets/dist/js/chunk-2d0cbe86.1ec5de9b.js
-    - assets/dist/js/chunk-2d0d6783.82d43005.js
+    - assets/dist/js/chunk-2d0c9500.078582a5.js
+    - assets/dist/js/chunk-2d0cbe86.974b231f.js
+    - assets/dist/js/chunk-2d0d6783.870f179a.js
     - assets/dist/js/chunk-2d0e48f0.f80d4685.js
-    - assets/dist/js/chunk-2d2073f4.d91b34df.js
-    - assets/dist/js/chunk-2d221502.b945f3e4.js
-    - assets/dist/js/chunk-2d229052.47174446.js
+    - assets/dist/js/chunk-2d2073f4.485712b5.js
+    - assets/dist/js/chunk-2d221502.c982c874.js
+    - assets/dist/js/chunk-2d229052.0d3cb103.js
     - assets/dist/js/chunk-3c73c545.838bcb15.js
-    - assets/dist/js/chunk-3cc3dfe0.e9cc4e78.js
-    - assets/dist/js/chunk-4a4c3950.c7394da7.js
-    - assets/dist/js/chunk-5c046820.140815f3.js
-    - assets/dist/js/chunk-7c04f6d8.2654a714.js
-    - assets/dist/js/chunk-27ea28aa.45af13ac.js
+    - assets/dist/js/chunk-04a771f3.78afe7b2.js
+    - assets/dist/js/chunk-5c1075a7.67c68580.js
+    - assets/dist/js/chunk-5c47763c.f00f10f9.js
+    - assets/dist/js/chunk-5e71539c.71528655.js
+    - assets/dist/js/chunk-7b98b2f4.917c835b.js
     - assets/dist/js/chunk-28b0895b.d10794a6.js
     - assets/dist/js/chunk-41a84540.24ca6d02.js
     - assets/dist/js/chunk-50ff9b08.9fb503d8.js
     - assets/dist/js/chunk-050c4e48.01a668ce.js
-    - assets/dist/js/chunk-59ef27e6.b29aae03.js
+    - assets/dist/js/chunk-71c7c258.d724e7a5.js
     - assets/dist/js/chunk-252eb0ed.ab2c12d6.js
+    - assets/dist/js/chunk-283d7ba2.516f1a17.js
     - assets/dist/js/chunk-491b6139.e58f70f3.js
+    - assets/dist/js/chunk-7911ca39.b98ca27b.js
+    - assets/dist/js/chunk-10758d68.aa0b700f.js
+    - assets/dist/js/chunk-73302c7f.e3ed4476.js
     - assets/dist/js/chunk-73843dc0.9792ed7d.js
-    - assets/dist/js/chunk-749967f3.a5cff4a0.js
-    - assets/dist/js/chunk-38210059.72e1612a.js
-    - assets/dist/js/chunk-57877892.bef8bfeb.js
-    - assets/dist/js/chunk-b01a230c.1db328a9.js
-    - assets/dist/js/chunk-bc8f4c2e.90a4f149.js
+    - assets/dist/js/chunk-749967f3.e317a03a.js
+    - assets/dist/js/chunk-b973479c.1320398c.js
+    - assets/dist/js/chunk-c7f405ae.3f2cc83d.js
+    - assets/dist/js/chunk-cd0bdc6c.47c7896a.js
     - assets/dist/js/chunk-cd663524.d9769ca4.js
-    - assets/dist/js/chunk-ed091cf2.2dd005cb.js
-    - assets/dist/js/chunk-f92cd5f8.cb57e2a0.js
-    - assets/dist/js/chunk-vendors.baf66047.js
+    - assets/dist/js/chunk-vendors.83ad5fcd.js
     - assets/dist/js/pdfjsWorker.9781b62d.js
 
 
