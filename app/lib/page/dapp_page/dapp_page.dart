@@ -76,7 +76,7 @@ class _DappPageState extends State<DappPage> {
           qrResult.then((t) {
             _controller?.evaluateJavascript('nativeQrScanToJsResult("$t")')?.then((result) {});
           }).catchError((e) {
-            Fluttertoast.showToast(msg: S.of(context).scan_qr_unknown_error.toString());
+            // Fluttertoast.showToast(msg: S.of(context).scan_qr_unknown_error.toString());
           });
         }));
 
@@ -95,7 +95,7 @@ class _DappPageState extends State<DappPage> {
             Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
             NavigatorUtils.push(context, Routes.signTxPage);
           }).catchError((e) {
-            Fluttertoast.showToast(msg: S.of(context).scan_qr_unknown_error.toString());
+            // Fluttertoast.showToast(msg: S.of(context).scan_qr_unknown_error.toString());
           });
         }));
 
