@@ -282,7 +282,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                   },
                 ),
                 Text(
-                  S.of(context).eth_token_name,
+                  S.of(context).eee_token_name,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 13,
