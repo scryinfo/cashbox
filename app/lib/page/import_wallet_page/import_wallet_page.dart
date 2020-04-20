@@ -24,7 +24,6 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   TextEditingController _pwdController = TextEditingController();
   TextEditingController _confirmPwdController = TextEditingController();
   bool _eeeChainChoose = true;
-  var mneString = "";
 
   @override
   void initState() {
@@ -141,7 +140,6 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                         top: ScreenUtil().setHeight(7),
                         bottom: ScreenUtil().setHeight(7),
                       ),
-                      labelText: mneString,
                       labelStyle: TextStyle(
                         color: Colors.white,
                         height: ScreenUtil().setHeight(40),
@@ -174,7 +172,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                       Future<String> qrResult = QrScanUtil.instance.qrscan();
                       qrResult.then((t) {
                         setState(() {
-                          mneString = t.toString();
+                          _mneController.text = t.toString();
                         });
                       }).catchError((e) {
                         Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code);
