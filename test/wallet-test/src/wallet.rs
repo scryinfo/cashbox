@@ -179,10 +179,12 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveWallet(env
         }
         Err(e) => {
             let jobj = env.alloc_object(wallet_class).unwrap();
-            println!("msg:{}", e);
-            env.set_field(jobj, "status", "I", JValue::Int(0)).expect("find status type is error!");
+            env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
+            env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(e.to_string()).unwrap()))).expect("set error msg value is error!");
             *jobj
         }
+
+
     };
     ret_obj
 }
