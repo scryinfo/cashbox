@@ -33,18 +33,18 @@ impl DataServiceProvider {
         // TODO 根据链的地址种类 对应的填写代币账户信息
         let save_wallet_flag = match self.db_hander.prepare(wallet_sql) {
             Ok(mut stat) => {
-                stat.bind(1, mn.wallet_id.as_str()).expect("wallet_id bind mn id");
-                stat.bind(2, mn.mn_digest.as_str()).expect("mn_digest bind mn id");
-                stat.bind(3, mn.full_name.unwrap().as_str()).expect("full_name bind mn id");
-                stat.bind(4, mn.mnemonic.as_str()).expect("mnemonic bind mn id");
-                stat.bind(5, mn.wallet_type).expect("wallet_type bind mn id");
-                stat.bind(6, mn.display_chain_id as i64).expect("display_chain_id");
+                stat.bind(1, mn.wallet_id.as_str())?;
+                stat.bind(2, mn.mn_digest.as_str())?;
+                stat.bind(3, mn.full_name.unwrap().as_str())?;
+                stat.bind(4, mn.mnemonic.as_str())?;
+                stat.bind(5, mn.wallet_type)?;
+                stat.bind(6, mn.display_chain_id as i64)?;
 
                 match stat.next() {
                     Ok(_) => {
                         //检查当前钱包 是否只有一个，若是只有一个钱包，则设置它为当前钱包
                         let update_selected = format!("UPDATE Wallet set selected = ( case WHEN (SELECT count(*) FROM Wallet)==1 then 1 else 0 end ) WHERE wallet_id= '{}'", mn.wallet_id);
-                        self.db_hander.execute(update_selected).expect("update selected state");
+                        self.db_hander.execute(update_selected)?;
                         Ok(())
                     }
                     Err(e) => Err(e.to_string())
@@ -58,12 +58,12 @@ impl DataServiceProvider {
                 Ok(mut address_stat) => {
                     log::info!("addr length is:{}",addrs.len());
                     for addr in addrs {
-                        address_stat.bind(1, addr.address_id.as_str()).expect("save_mnemonic_address  bind addr.status ");
-                        address_stat.bind(2, addr.wallet_id.as_str()).expect("save_mnemonic_address bind addr.mnemonic_id ");
-                        address_stat.bind(3, addr.chain_id as i64).expect("save_mnemonic_address bind addr.chain_id ");
-                        address_stat.bind(4, addr.address.as_str()).expect("save_mnemonic_address bind addr.address ");
-                        address_stat.bind(5, addr.pub_key.as_str()).expect("save_mnemonic_address bind addr.pub_key ");
-                        address_stat.bind(6, addr.status as i64).expect("save_mnemonic_address  bind addr.status ");
+                        address_stat.bind(1, addr.address_id.as_str())?;
+                        address_stat.bind(2, addr.wallet_id.as_str())?;
+                        address_stat.bind(3, addr.chain_id as i64)?;
+                        address_stat.bind(4, addr.address.as_str())?;
+                        address_stat.bind(5, addr.pub_key.as_str())?;
+                        address_stat.bind(6, addr.status as i64)?;
                         address_stat.next()?;
                         address_stat.reset()?;
                         log::debug!("chain type id:{}",addr.chain_id);

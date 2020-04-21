@@ -153,7 +153,7 @@ pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Addres
     // TODO 这个地方 根据支持链的种类 分别生成对应的地址
     match wallet_type {
         ChainType::EEE | ChainType::EeeTest => {
-            let seed = wallet_crypto::Sr25519::seed_from_phrase(&phrase, None);
+            let seed = wallet_crypto::Sr25519::seed_from_phrase(&phrase, None).unwrap();
             let pair = wallet_crypto::Sr25519::pair_from_seed(&seed);
             let address = wallet_crypto::Sr25519::ss58_from_pair(&pair);
             let puk_key = wallet_crypto::Sr25519::public_from_pair(&pair);
@@ -166,14 +166,14 @@ pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Addres
         }
         ChainType::ETH | ChainType::EthTest => {
             //todo 错误处理
-            let secret_byte = ethtx::pri_from_mnemonic(&phrase, None);
+            let secret_byte = ethtx::pri_from_mnemonic(&phrase, None)?;
             let context = Secp256k1::new();
-            let secret = SecretKey::from_slice(&secret_byte);
-            if secret.is_err() {
+            let secret = SecretKey::from_slice(&secret_byte)?;
+          /*  if secret.is_err() {
                 let msg = format!("SecretKey recover error,detail:{}", secret.unwrap_err());
                 return Err(WalletError::Custom(msg));
-            }
-            let public_key = PublicKey::from_secret_key(&context, &secret.unwrap());
+            }*/
+            let public_key = PublicKey::from_secret_key(&context, &secret);
             //一个是非压缩公钥 用于地址生成
             let puk_uncompressed = &public_key.serialize_uncompressed()[..];
             let address_final = generate_eth_address(&puk_uncompressed[1..]);
@@ -366,11 +366,11 @@ pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> Result<String, 
     let mnemonic = module::wallet::export_mnemonic(wallet_id, psw);
     match mnemonic {
         Ok(mnemonic) => {
-            let mn = String::from_utf8(mnemonic.mn).unwrap();
+            let mn = String::from_utf8(mnemonic.mn)?;
             let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
           // let mut_data = &tx.func_data[..];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
-            let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..]).expect("UncheckedExtrinsic");
-            let sign_data = wallet_rpc::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function,tx.version);
+            let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..])?;
+            let sign_data = wallet_rpc::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function,tx.version)?;
             // TODO 返回签名后的消息格式需要确定
             Ok(sign_data)
         }
@@ -387,7 +387,7 @@ pub fn raw_sign(raw_data: &str, wallet_id: &str, psw: &[u8]) -> Result<String, W
     match mnemonic {
         Ok(mnemonic) => {
             let mn = String::from_utf8(mnemonic.mn)?;
-            let sign_data = wallet_crypto::Sr25519::sign(&mn, &tx_encode_data[..]);
+            let sign_data = wallet_crypto::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();
             // TODO 返回签名后的消息格式需要确定
             let hex_data = format!("0x{}", hex::encode(&sign_data[..]));
             Ok(hex_data)

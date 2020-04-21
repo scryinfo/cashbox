@@ -15,7 +15,7 @@ pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str, psw: &[u8]) -> Res
                     //密码验证通过
                     let (send_tx, _recv_tx) = mpsc::channel();
                     let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
-                    let mn = String::from_utf8(mnemonic).unwrap();
+                    let mn = String::from_utf8(mnemonic)?;
                     let signed_data = wallet_rpc::transfer(&mut substrate_client, &mn, to, amount);
                     match signed_data {
                         Ok(data) => {
@@ -25,7 +25,7 @@ pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str, psw: &[u8]) -> Res
                             Ok(str_value)
                         }
                         Err(msg) => {
-                            Err(WalletError::Custom(msg))
+                            Err(msg)
                         }
                     }
                 }
@@ -74,7 +74,7 @@ pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amoun
                         data,
                     };
                     //todo 增加对错误的处理
-                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(), None);
+                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic)?, None)?;
 
                     //todo 增加链id ,从助记词生成私钥 secp256k1
                     let tx_signed = rawtx.sign(&pri_key, Some(eth_chain_id));
@@ -116,7 +116,7 @@ pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, t
                     //密码验证通过
                     //todo 增加错误处理
                     //调用合约 是否允许transfer 目标地址为空?
-                    let mut encode_data = ethtx::get_erc20_transfer_data(to_account.unwrap(), amount).unwrap();
+                    let mut encode_data = ethtx::get_erc20_transfer_data(to_account.unwrap(), amount)?;
                     //添加合约交易备注信息
                     if data.is_some() {
                         let mut addition = data.unwrap().as_bytes().to_vec();
@@ -131,7 +131,7 @@ pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, t
                         data: encode_data,
                     };
                     //todo 增加对错误的处理
-                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic).unwrap(), None);
+                    let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic)?, None)?;
                     //todo 增加链id ,从助记词生成私钥 secp256k1
                     let tx_signed = rawtx.sign(&pri_key, Some(eth_chain_id));
                     Ok(format!("0x{}", hex::encode(tx_signed)))

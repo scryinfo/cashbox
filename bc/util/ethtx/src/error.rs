@@ -26,6 +26,9 @@ pub enum Error {
     /// web3 internal error
     #[display(fmt = "Internal Web3 error")]
     Internal,
+    #[display(fmt = "other lib: {}", _0)]
+    #[from(ignore)]
+    Other(String),
 
 
 }
@@ -34,11 +37,29 @@ impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         use self::Error::*;
         match *self {
-            Unreachable | Decoder(_) | InvalidResponse(_) | Transport(_) | Internal => None,
+            Unreachable | Decoder(_) | InvalidResponse(_) | Transport(_) | Internal|Other(_) => None,
             Io(ref e) => Some(e),
         }
     }
 }
+
+/*impl fmt::Display for Error{
+
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::Io(ref err)=>err.fmt(f),
+            Error::Sqlite(ref err)=>err.fmt(f),
+            Error::EthTx(ref err)=>err.fmt(f),
+            Error::Serde(ref err)=>err.fmt(f),
+            WalletError::Public(err)=>write!(f, "sp_core Public error: {:?}", err),
+            WalletError::ScaleCodec(ref err)=>err.fmt(f),
+            WalletError::NotExist=>write!(f,"value not exist"),
+            WalletError::Custom(err) => write!(f, "wallet custom error: {}", err),
+            WalletError::Decode(err) => write!(f, "wallet decode error: {}", err),
+        }
+
+    }
+}*/
 
 impl From<SerdeError> for Error {
     fn from(err: SerdeError) -> Self {
@@ -63,13 +84,17 @@ impl From<std::string::FromUtf8Error> for Error{
     }
 }
 
-/*
-impl From<std::string::FromUtf8Error> for Error {
-    fn from(err: std::string::FromUtf8Error) -> Self {
-        Error::Utf8(err)
+impl From<tiny_hderive::Error> for Error {
+    fn from(err: tiny_hderive::Error) -> Self {
+        Error::Other(format!("{:?}", err))
     }
 }
-*/
+impl From<failure::Error> for Error{
+    fn from(err: failure::Error)->Self{
+        Error::Other(format!("{:?}", err))
+    }
+}
+
 
 impl Clone for Error {
     fn clone(&self) -> Self {
@@ -81,6 +106,7 @@ impl Clone for Error {
             Transport(s) => Transport(s.clone()),
             Io(e) => Io(IoError::from(e.kind())),
             Internal => Internal,
+            Other(s)=>Other(s.clone()),
         }
     }
 }

@@ -9,6 +9,9 @@ pub enum WalletError{
     Decode(String),
     EthTx(ethtx::Error),
     Serde(serde_json::Error),
+    Public(sp_core::crypto::PublicError),
+    ScaleCodec(codec::Error),
+    Secp256k1(secp256k1::Error),
     NotExist,
 
 }
@@ -21,6 +24,9 @@ impl fmt::Display for WalletError{
             WalletError::Sqlite(ref err)=>err.fmt(f),
             WalletError::EthTx(ref err)=>err.fmt(f),
             WalletError::Serde(ref err)=>err.fmt(f),
+            WalletError::Public(err)=>write!(f, "sp_core Public error: {:?}", err),
+            WalletError::ScaleCodec(ref err)=>err.fmt(f),
+            WalletError::Secp256k1(ref err)=>err.fmt(f),
             WalletError::NotExist=>write!(f,"value not exist"),
             WalletError::Custom(err) => write!(f, "wallet custom error: {}", err),
             WalletError::Decode(err) => write!(f, "wallet decode error: {}", err),
@@ -28,23 +34,6 @@ impl fmt::Display for WalletError{
 
     }
 }
-
-//impl error::Error for WalletError {
-/*impl Display for WalletError {
-    fn description(&self) -> &str {
-        // Both underlying errors already impl `Error`, so we defer to their
-        // implementations.
-        match self {
-            WalletError::Io(ref err) => err.description(),
-            WalletError::Sqlite(ref err) => err.description(),
-            WalletError::EthTx(ref err) => err.description(),
-            WalletError::Serde(ref err) => err.description(),
-            WalletError::Custom(err) => err,
-            WalletError::Decode(err) => err,
-            WalletError::NotExist=>"not exist",
-        }
-    }
-}*/
 
 impl From<sqlite::Error> for WalletError{
     fn from(err: sqlite::Error) -> WalletError {
@@ -78,6 +67,45 @@ impl From<hex::FromHexError> for WalletError{
 
 impl From<std::string::FromUtf8Error> for WalletError{
     fn from(err: std::string::FromUtf8Error) -> Self {
+        WalletError::Decode(format!("{:?}", err))
+    }
+}
+impl From<failure::Error> for WalletError{
+    fn from(err: failure::Error)->Self{
+        WalletError::Custom(format!("{:?}", err))
+    }
+}
+impl From<substrate_bip39::Error> for WalletError{
+    fn from(err: substrate_bip39::Error)->Self{
+        WalletError::Custom(format!("{:?}", err))
+    }
+}
+
+impl From<sp_core::crypto::SecretStringError> for WalletError{
+    fn from(err: sp_core::crypto::SecretStringError)->Self{
+        WalletError::Custom(format!("{:?}", err))
+    }
+}
+
+impl  From<sp_core::crypto::PublicError> for WalletError {
+    fn from(err: sp_core::crypto::PublicError) -> Self {
+        WalletError::Public(err)
+    }
+}
+
+impl From<codec::Error> for WalletError{
+    fn from(err:codec::Error) -> Self {
+        WalletError::ScaleCodec(err)
+    }
+}
+
+impl From<secp256k1::Error> for WalletError{
+    fn from(err:secp256k1::Error) -> Self {
+        WalletError::Secp256k1(err)
+    }
+}
+impl From<std::num::ParseIntError> for WalletError{
+    fn from(err:std::num::ParseIntError) -> Self {
         WalletError::Decode(format!("{:?}", err))
     }
 }

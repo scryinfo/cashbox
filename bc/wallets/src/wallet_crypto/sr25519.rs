@@ -10,31 +10,23 @@ impl Crypto for Sr25519 {
     type Pair = sr25519::Pair;
     type Public = sr25519::Public;
 
-    fn seed_from_phrase(phrase: &str, password: Option<&str>) -> Self::Seed {
-        mini_secret_from_entropy(
-            Mnemonic::from_phrase(phrase, Language::English)
-                .unwrap_or_else(|_|
-                    panic!("Phrase is not a valid BIP-39 phrase: \n    {}", phrase)
-                )
-                .entropy(),
-            password.unwrap_or(""),
-        )
-            .expect("32 bytes can always build a key; qed")
-            .to_bytes()
+    fn seed_from_phrase(phrase: &str, password: Option<&str>) -> Result<Self::Seed,WalletError> {
+        let mnemonic = Mnemonic::from_phrase(phrase, Language::English)?;
+        Ok(mini_secret_from_entropy(mnemonic.entropy(),password.unwrap_or(""))?.to_bytes())
     }
     fn pair_from_seed(seed: &Self::Seed) -> Self::Pair {
-        Pair::from_seed_slice(seed).expect("key is always the correct size; qed")
+        Pair::from_seed_slice(seed).expect("pair_from_seed")
 
     }
-    fn pair_from_suri(suri: &str, password: Option<&str>) -> Self::Pair {
-        sr25519::Pair::from_string(suri, password).expect("Invalid phrase")
+    fn pair_from_suri(suri: &str, password: Option<&str>) -> Result<Self::Pair,WalletError>{
+        Ok(sr25519::Pair::from_string(suri, password)?)
     }
     fn ss58_from_pair(pair: &Self::Pair) -> String { pair.public().to_ss58check() }
     fn public_from_pair(pair: &Self::Pair) -> Vec<u8> { (&pair.public().0[..]).to_owned() }
 
-    fn sign(phrase: &str,msg:&[u8])->[u8;64]{
-        let seed = Self::seed_from_phrase(phrase,None);
+    fn sign(phrase: &str,msg:&[u8])->Result<[u8;64],WalletError>{
+        let seed = Self::seed_from_phrase(phrase,None)?;
         let pair = Self::pair_from_seed(&seed);
-        pair.sign(msg).0
+        Ok(pair.sign(msg).0)
     }
 }

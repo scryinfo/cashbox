@@ -15,17 +15,17 @@ mod error;
 pub use error::Error;
 
 // 从助记词恢复私钥
-pub fn pri_from_mnemonic(phrase:&str,psd:Option<Vec<u8>>)->Vec<u8>{
-    let mnemonic = Mnemonic::from_phrase(phrase, Language::English).unwrap();
+pub fn pri_from_mnemonic(phrase:&str,psd:Option<Vec<u8>>)->Result<Vec<u8>,error::Error>{
+    let mnemonic = Mnemonic::from_phrase(phrase, Language::English)?;
     let psd = {
         match psd {
-            Some(data)=>String::from_utf8(data).unwrap(),
+            Some(data)=>String::from_utf8(data)?,
             None=>String::from(""),
         }
     };
     let seed = Seed::new(&mnemonic,&psd);//
-    let ext_key = ExtendedPrivKey::derive(&seed.as_bytes(), "m/44'/60'/0'/0/0").unwrap();
-    ext_key.secret().to_vec()
+    let ext_key = ExtendedPrivKey::derive(&seed.as_bytes(), "m/44'/60'/0'/0/0")?;
+    Ok(ext_key.secret().to_vec())
 }
 
 #[derive(Clone, Debug, PartialEq)]

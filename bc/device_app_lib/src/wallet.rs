@@ -193,7 +193,7 @@ pub mod android {
             }
             Err(e) => {
                 let jobj = env.alloc_object(wallet_class).unwrap();
-                env.set_field(jobj, "status", "I", JValue::Int(0)).expect("find status type is error!");
+                env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
                 env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(e.to_string()).unwrap()))).expect("set error msg value is error!");
                 *jobj
             }

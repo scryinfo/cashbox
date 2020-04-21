@@ -82,16 +82,15 @@ pub trait Crypto {
         OsRng.fill_bytes(seed.as_mut());
         seed
     }
-    fn seed_from_phrase(phrase: &str, password: Option<&str>) -> Self::Seed;
-    fn pair_from_seed(seed: &Self::Seed) -> Self::Pair;
-    fn pair_from_phrase(phrase: &str, password: Option<&str>) -> Self::Pair{
-        let seed = Self::seed_from_phrase(phrase, password);
+    fn seed_from_phrase(phrase: &str, password: Option<&str>) -> Result<Self::Seed,WalletError>;
+    fn pair_from_seed(seed: &Self::Seed) ->  Self::Pair;
+    fn pair_from_phrase(phrase: &str, password: Option<&str>) -> Result<Self::Pair,WalletError>{
+        let seed = Self::seed_from_phrase(phrase, password)?;
         let pair = Self::pair_from_seed(&seed);
-        pair
+        Ok(pair)
     }
-    fn pair_from_suri(suri: &str, password: Option<&str>) -> Self::Pair {
-        Self::Pair::from_string(suri, password).expect("Invalid phrase")
-        //Self::pair_from_seed(&Self::seed_from_phrase(phrase, password))
+    fn pair_from_suri(suri: &str, password: Option<&str>) -> Result<Self::Pair,WalletError> {
+        Ok(Self::Pair::from_string(suri, password)?)
     }
     fn ss58_from_pair(pair: &Self::Pair) -> String;
     fn public_from_pair(pair: &Self::Pair) -> Vec<u8>;
@@ -105,14 +104,21 @@ pub trait Crypto {
         );
     }
     fn print_from_phrase(phrase: &str, password: Option<&str>) {
-        let seed = Self::seed_from_phrase(phrase, password);
-        let pair = Self::pair_from_seed(&seed);
-        println!("Phrase `{}` is account:\n  Seed: 0x{}\n  Public key (hex): 0x{}\n  Address (SS58): {}",
-                 phrase,
-                 HexDisplay::from(&seed.as_ref()),
-                 HexDisplay::from(&Self::public_from_pair(&pair)),
-                 Self::ss58_from_pair(&pair)
-        );
+
+        match Self::seed_from_phrase(phrase, password){
+            Ok(seed)=>{
+                let pair = Self::pair_from_seed(&seed);
+                println!("Phrase `{}` is account:\n  Seed: 0x{}\n  Public key (hex): 0x{}\n  Address (SS58): {}",
+                         phrase,
+                         HexDisplay::from(&seed.as_ref()),
+                         HexDisplay::from(&Self::public_from_pair(&pair)),
+                         Self::ss58_from_pair(&pair)
+                );
+            },
+            Err(e)=>{
+                println!("print_from_phrase:{}",e)
+            }
+        }
     }
     fn print_from_uri(uri: &str, password: Option<&str>) where <Self::Pair as Pair>::Public: Sized + Ss58Codec + AsRef<[u8]> {
         if let Ok(pair) = Self::Pair::from_string(uri, password) {
@@ -256,7 +262,7 @@ pub trait Crypto {
             }
         }
     }
-    fn sign(phrase:&str,msg:&[u8])->[u8;64];
+    fn sign(phrase:&str,msg:&[u8])->Result<[u8;64],WalletError>;
 }
 
 mod ed25519;
