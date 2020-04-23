@@ -5,7 +5,8 @@ import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:scry_webview/scry_webview.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+//import 'package:scry_webview/scry_webview.dart';
 
 class DAppWebViewDemo extends StatefulWidget {
   @override
@@ -45,7 +46,7 @@ class _DAppWebViewDemoState extends State<DAppWebViewDemo> {
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(160),
       child: WebView(
-        initialUrl: "http://192.168.1.4:8080/",
+        initialUrl: "http://192.168.1.3:8080/",
         javascriptMode: JavascriptMode.unrestricted,
         //JS执行模式 是否允许JS执行
         onWebViewCreated: (webViewController) {

@@ -1,3 +1,4 @@
+import 'package:app/demo/dapp_webview_demo.dart';
 import 'package:app/demo/tx_demo.dart';
 import 'package:app/generated/i18n.dart';
 import 'package:app/page/eee_page/eee_page.dart';
@@ -70,6 +71,7 @@ class _EntryPageState extends State<EntryPage> {
                 //return DappPage(); // todo 版本说明，直接进入到Dapp diamond页面处
                 //return TransactionDemo();
                 //return EthPage();
+                //return DAppWebViewDemo();
                 return EeePage();    //版本说明：提供eee界面，可以看账户信息address，和切换钱包
               } else {
                 return _buildProtocolLayout();
