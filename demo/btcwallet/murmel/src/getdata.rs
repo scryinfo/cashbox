@@ -47,7 +47,7 @@ impl GetData {
     //循环处理消息
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
         let hash160 = self.hash160("");
-        //let mut merkle_vec = vec![];
+        let mut merkle_vec = vec![];
         loop {
             //这个方法是消息接收端，也就是channel的一个出口，Message的一个消耗端
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
@@ -66,26 +66,26 @@ impl GetData {
                     }
                     PeerMessage::Incoming(pid, msg) => {
                         match msg {
-                            // NetworkMessage::MerkleBlock(ref merkleblock) => {
-                            //     if self.is_serving_blocks(pid) {
-                            //         {
-                            //             let block_hash = merkleblock.prev_block.to_hex();
-                            //             let timestamp = merkleblock.timestamp;
-                            //             let sqlite = self.sqlite.lock().expect("open connection error!");
-                            //             sqlite.update_newest_header(block_hash, timestamp.to_string());
-                            //         }
-                            //         if merkle_vec.len() <= 100 {
-                            //             merkle_vec.push(merkleblock.clone());
-                            //         } else {
-                            //             self.merkleblock(&merkle_vec, pid).expect("merkle block vector failed");
-                            //             merkle_vec.clear();
-                            //         }
-                            //         Ok(())
-                            //     } else {
-                            //         Ok(())
-                            //     }
-                            // }
-                            NetworkMessage::MerkleBlock(ref merkleblock) => if self.is_serving_blocks(pid) { self.merkleblock(merkleblock, pid) } else { Ok(()) },
+                            NetworkMessage::MerkleBlock(ref merkleblock) => {
+                                if self.is_serving_blocks(pid) {
+                                    {
+                                        let block_hash = merkleblock.prev_block.to_hex();
+                                        let timestamp = merkleblock.timestamp;
+                                        let sqlite = self.sqlite.lock().expect("open connection error!");
+                                        sqlite.update_newest_header(block_hash, timestamp.to_string());
+                                    }
+
+                                    if merkle_vec.len() <= 100 {
+                                        merkle_vec.push(merkleblock.clone());
+                                    } else {
+                                        self.merkleblock(&merkle_vec, pid).expect("merkle block vector failed");
+                                        merkle_vec.clear();
+                                    }
+                                    Ok(())
+                                } else {
+                                    Ok(())
+                                }
+                            }
                             NetworkMessage::Tx(ref tx) => if self.is_serving_blocks(pid) { self.tx(tx, pid, hash160.clone()) } else { Ok(()) },
                             NetworkMessage::Ping(_) => { Ok(()) }
                             _ => { Ok(()) }
@@ -121,40 +121,29 @@ impl GetData {
 
     // 获取数据
     fn get_data(&mut self, peer: PeerId, add: bool) -> Result<(), Error> {
-        // if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::MerkleBlock) {
-        //     return Ok(());
-        // }
-        // let sqlite = self.sqlite.lock().expect("sqlite open error");
-        // let (_block_hash, timestamp) = sqlite.init();
-        // let block_hashes = sqlite.query_header(timestamp, add);
-        // if block_hashes.len() == 0 { return Ok(()); }
-        //
-        // let mut inventory_vec = vec![];
-        // for block_hash in block_hashes {
-        //     let inventory = Inventory::new(InvType::FilteredBlock, block_hash.as_str());
-        //     inventory_vec.push(inventory);
-        // }
-        // self.p2p.send_network(peer, NetworkMessage::GetData(inventory_vec));
-        // Ok(())
+        if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::MerkleBlock) {
+            return Ok(());
+        }
+        let sqlite = self.sqlite.lock().expect("sqlite open error");
+        let (_block_hash, timestamp) = sqlite.init();
+        let block_hashes = sqlite.query_header(timestamp, add);
+        if block_hashes.len() == 0 { return Ok(()); }
 
-        let inventory = Inventory::new(InvType::FilteredBlock, "0000000000123ac6e7e450436958701cefba061662ea3e80f33cfc846637bb34");
-        self.p2p.send_network(peer, NetworkMessage::GetData(vec![inventory]));
+        let mut inventory_vec = vec![];
+        for block_hash in block_hashes {
+            let inventory = Inventory::new(InvType::FilteredBlock, block_hash.as_str());
+            inventory_vec.push(inventory);
+        }
+        self.p2p.send_network(peer, NetworkMessage::GetData(inventory_vec));
         Ok(())
     }
 
-    // fn merkleblock(&mut self, merkle_vec: &Vec<MerkleBlockMessage>, peer: PeerId) -> Result<(), Error> {
-    //     self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
-    //     warn!("got a vec of 100 merkleblock");
-    //     let merkleblock = merkle_vec.last().unwrap();
-    //     println!("got 100 merkleblock {:#?}", merkleblock);
-    //     self.get_data(peer, true)?;
-    //     Ok(())
-    // }
-
-    ///模仿的headerdownload里的逻辑
-    fn merkleblock(&mut self, merkleblock: &MerkleBlockMessage, peer: PeerId) -> Result<(), Error> {
+    fn merkleblock(&mut self, merkle_vec: &Vec<MerkleBlockMessage>, peer: PeerId) -> Result<(), Error> {
         self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
-        info!("{:#?}", merkleblock);
+        warn!("got a vec of 100 merkleblock");
+        let merkleblock = merkle_vec.last().unwrap();
+        println!("got 100 merkleblock {:#?}", merkleblock);
+        self.get_data(peer, true)?;
         Ok(())
     }
 

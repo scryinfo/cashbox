@@ -15,10 +15,6 @@ use std::sync::{Arc, Mutex};
 use constructor::Constructor;
 use db::SQLite;
 
-pub fn main() {
-    println!("It works")
-}
-
 #[no_mangle]
 pub extern "system" fn Java_JniApi_launch(env: JNIEnv,
 // This is the class that owns our static method. It's not going to be used,
