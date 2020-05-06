@@ -99,4 +99,5 @@ dependencies {
     implementation 'com.github.yuzhiqiang1993:zxing:2.2.5'
     //实现版本升级 工具库
     implementation 'com.github.AlexLiuSheng:CheckVersionLib:2.2.3'
+    implementation 'com.google.code.gson:gson:2.8.6'
 }

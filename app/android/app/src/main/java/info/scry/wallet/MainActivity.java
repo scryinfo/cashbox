@@ -26,6 +26,8 @@ import com.allenliu.versionchecklib.v2.callback.RequestVersionListener;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.common.Constant;
 
+import com.google.gson.Gson;
+
 import static java.lang.System.out;
 
 public class MainActivity extends FlutterActivity {
@@ -103,50 +105,59 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void checkApplicationVersion() {
-        int nowVersion = getVersionCode(this);
+        int nowVersion = getNowVersionCode(this);
         ScryLog.v("checkVersion init================>", String.valueOf(nowVersion));
-        //todo 从服务器获取版本号，比对verion是否一致，下载升级app
-        int serverVersion = nowVersion + 1;
-        String serverUrl = ""; //todo
-        if (serverVersion > nowVersion) {
-            downloadServerApk(serverUrl);
-        }
+        this.compareVersionAndUpgrade(nowVersion);
     }
 
-    private void downloadServerApk(String downloadUrl) {
+
+    private void compareVersionAndUpgrade(int nowVersion) {
         //https://github.com/AlexLiuSheng/CheckVersionLib
+        String versionUrl = "http://192.168.1.3:8080/checkVersion"; //todo
+        String downloadUrl = "http://192.168.1.3:8080/downloadApk"; //todo
         AllenVersionChecker
                 .getInstance()
-                .downloadOnly(
-                        UIData.create().setDownloadUrl(downloadUrl)
-                )
-                .executeMission(context);
-
-        /*AllenVersionChecker
-                .getInstance()
                 .requestVersion()
-                .setRequestUrl(requestUrl)
+                .setRequestUrl(versionUrl)
                 .request(new RequestVersionListener() {
                     @Nullable
                     @Override
-                    public UIData onRequestVersionSuccess(DownloadBuilder downloadBuilder,
-                                                          String result) {
+                    public UIData onRequestVersionSuccess(DownloadBuilder downloadBuilder, String result) {
+                        ScryLog.v("onRequest==========>", result.toString());
+                        try {
+                            Gson gs = new Gson();
+                            AppVersionModel jsonObject = gs.fromJson(result, AppVersionModel.class);
+                            int status = jsonObject.getCode(); //todo
+                            int serverVersion = Integer.parseInt(jsonObject.getVersion());
+                            //if (status == NetStatus.Success) {
+                            if (serverVersion > nowVersion) {
+                                //todo 执行下载更新
+                                ScryLog.v("begin to setDownloadUrl================>", downloadUrl);
+                                return UIData.create().setDownloadUrl(downloadUrl);
+                            }
+                            //}
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            ScryLog.v("JSONException e================>", e.toString());
+                        }
+                        return null;
                         //get the data response from server,parse,get the `downloadUlr` and some
                         // other ui date
                         //...
                         //return null if you dont want to update application
-                        String downloadUrl = "";
-                        return UIData.create().setDownloadUrl(downloadUrl);
+                        // String downloadUrl = "";
+                        // return UIData.create().setDownloadUrl(downloadUrl);
                     }
+
                     @Override
                     public void onRequestVersionFailure(String message) {
-
+                        ScryLog.v("onRequestVersionFailure message================>", message.toString());
                     }
                 })
-                .executeMission(MainActivity.this); //.executeMission(context);*/
+                .executeMission(MainActivity.this); //.executeMission(context);
     }
 
-    private int getVersionCode(Context context) {
+    private int getNowVersionCode(Context context) {
         int version = 0;
         try {
             PackageManager packageManager = context.getPackageManager();
