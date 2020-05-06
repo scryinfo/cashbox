@@ -15,7 +15,18 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-import android.util.Log;
+import com.allenliu.versionchecklib.v2.callback.CustomDownloadingDialogListener;
+
+import android.widget.ProgressBar;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+
+import info.scry.utils.ScryLog;
+import info.scry.ui.BaseDialog;
+
+import android.app.Dialog;
+
+import info.scry.model.AppVersionModel;
 
 import androidx.annotation.Nullable;
 
@@ -109,7 +120,9 @@ public class MainActivity extends FlutterActivity {
         String downloadUrl = "http://192.168.1.3:8080/downloadApk"; //todo
 
         double nowVersion = getNowVersionCode(this);
-        //https://github.com/AlexLiuSheng/CheckVersionLib
+        /*
+            https://github.com/AlexLiuSheng/CheckVersionLib
+            */
         AllenVersionChecker
                 .getInstance()
                 .requestVersion()
@@ -118,31 +131,41 @@ public class MainActivity extends FlutterActivity {
                     @Nullable
                     @Override
                     public UIData onRequestVersionSuccess(DownloadBuilder downloadBuilder, String result) {
-                        ScryLog.v("onRequest==========>", result.toString());
+                        downloadBuilder.setCustomDownloadingDialogListener(new CustomDownloadingDialogListener() {
+                            @Override
+                            public Dialog getCustomDownloadingDialog(Context context, int progress, UIData versionBundle) {
+                                BaseDialog baseDialog = new BaseDialog(context, R.style.BaseDialog, R.layout.custom_download_layout);
+                                return baseDialog;
+                            }
+
+                            @Override
+                            public void updateUI(Dialog dialog, int progress, UIData versionBundle) {
+                                TextView tvProgress = dialog.findViewById(R.id.tv_progress);
+                                ProgressBar progressBar = dialog.findViewById(R.id.pb);
+                                progressBar.setProgress(progress);
+                                tvProgress.setText(getString(R.string.versionchecklib_progress, progress));
+                            }
+                        });
                         try {
                             Gson gs = new Gson();
                             AppVersionModel jsonObject = gs.fromJson(result, AppVersionModel.class);
                             int statusCode = jsonObject.getCode(); //todo
                             double serverVersion = jsonObject.getVersion();
-                            //if (statusCode == NetStatus.Success) {
-                            if (serverVersion > nowVersion) {
-                                //todo 执行下载更新
-                                ScryLog.v("begin to setDownloadUrl================>", downloadUrl);
-                                return UIData.create().setTitle("新版本升级提示").setContent("检测到新版本：" + serverVersion + "，点击确认即可更新体验新版本特性")
-                                        .setDownloadUrl(downloadUrl);
+                            if (statusCode == AppVersionModel.Success) {
+                                if (serverVersion > nowVersion) {
+                                    //执行下载更新
+                                    ScryLog.v("begin to setDownloadUrl================>", downloadUrl);
+                                    return UIData.create().setTitle("新版本升级提示").setContent("检测到新版本：" + serverVersion + "，点击确认即可更新体验新版本特性")
+                                            .setDownloadUrl(downloadUrl);
+                                }
+                            } else {
+                                //todo 服务器没有正常返回 提示
                             }
-                            //}
                         } catch (Exception e) {
                             e.printStackTrace();
                             ScryLog.v("JSONException e================>", e.toString());
                         }
                         return null;
-                        //get the data response from server,parse,get the `downloadUlr` and some
-                        // other ui date
-                        //...
-                        //return null if you dont want to update application
-                        // String downloadUrl = "";
-                        // return UIData.create().setDownloadUrl(downloadUrl);
                     }
 
                     @Override
@@ -202,7 +225,7 @@ public class MainActivity extends FlutterActivity {
                 mFlutterChannelResult.error("resultCode is ===>", "" + resultCode, "");
             }
         } else {
-            Log.d("MainActivity", "unknown method result, requestCode is=========>" + requestCode);
+            ScryLog.e("MainActivity", "unknown method result, requestCode is=========>" + requestCode);
         }
     }
 }

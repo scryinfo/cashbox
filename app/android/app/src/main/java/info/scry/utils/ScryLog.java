@@ -1,4 +1,4 @@
-package info.scry.wallet;
+package info.scry.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

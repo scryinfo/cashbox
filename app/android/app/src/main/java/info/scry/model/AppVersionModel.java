@@ -1,8 +1,10 @@
-package info.scry.wallet;
+package info.scry.model;
 
 public class AppVersionModel {
     private double version;
     private int code;
+    public static final int Success = 0;
+    public static final int Failure = 1;
 
     public double getVersion() {
         return version;
