@@ -1,14 +1,14 @@
 package info.scry.wallet;
 
 public class AppVersionModel {
-    private String version;
+    private double version;
     private int code;
 
-    public String getVersion() {
+    public double getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 

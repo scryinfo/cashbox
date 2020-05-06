@@ -73,7 +73,7 @@ public class MainActivity extends FlutterActivity {
                             public void onMethodCall(MethodCall call, Result result) {
                                 logPrint(call);
                                 try {
-                                    // checkApplicationVersion(); //todo 待验证，暂不放开
+                                    // checkAndUpgradeVersion();  //todo 待验证，暂不放开
                                 } catch (Exception e) {
                                     ScryLog.e("checkApplicationVersion appear error", e.toString());
                                 }
@@ -104,17 +104,12 @@ public class MainActivity extends FlutterActivity {
         );
     }
 
-    private void checkApplicationVersion() {
-        int nowVersion = getNowVersionCode(this);
-        ScryLog.v("checkVersion init================>", String.valueOf(nowVersion));
-        this.compareVersionAndUpgrade(nowVersion);
-    }
-
-
-    private void compareVersionAndUpgrade(int nowVersion) {
-        //https://github.com/AlexLiuSheng/CheckVersionLib
+    private void checkAndUpgradeVersion() {
         String versionUrl = "http://192.168.1.3:8080/checkVersion"; //todo
         String downloadUrl = "http://192.168.1.3:8080/downloadApk"; //todo
+
+        double nowVersion = getNowVersionCode(this);
+        //https://github.com/AlexLiuSheng/CheckVersionLib
         AllenVersionChecker
                 .getInstance()
                 .requestVersion()
@@ -127,13 +122,14 @@ public class MainActivity extends FlutterActivity {
                         try {
                             Gson gs = new Gson();
                             AppVersionModel jsonObject = gs.fromJson(result, AppVersionModel.class);
-                            int status = jsonObject.getCode(); //todo
-                            int serverVersion = Integer.parseInt(jsonObject.getVersion());
-                            //if (status == NetStatus.Success) {
+                            int statusCode = jsonObject.getCode(); //todo
+                            double serverVersion = jsonObject.getVersion();
+                            //if (statusCode == NetStatus.Success) {
                             if (serverVersion > nowVersion) {
                                 //todo 执行下载更新
                                 ScryLog.v("begin to setDownloadUrl================>", downloadUrl);
-                                return UIData.create().setDownloadUrl(downloadUrl);
+                                return UIData.create().setTitle("新版本升级提示").setContent("检测到新版本：" + serverVersion + "，点击确认即可更新体验新版本特性")
+                                        .setDownloadUrl(downloadUrl);
                             }
                             //}
                         } catch (Exception e) {
@@ -157,16 +153,16 @@ public class MainActivity extends FlutterActivity {
                 .executeMission(MainActivity.this); //.executeMission(context);
     }
 
-    private int getNowVersionCode(Context context) {
-        int version = 0;
+    private double getNowVersionCode(Context context) {
+        double nowVersion = 0;
         try {
             PackageManager packageManager = context.getPackageManager();
             PackageInfo packInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
-            version = packInfo.versionCode;
+            nowVersion = packInfo.versionCode;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return version;
+        return nowVersion;
     }
 
     private void logPrint(MethodCall call) {
