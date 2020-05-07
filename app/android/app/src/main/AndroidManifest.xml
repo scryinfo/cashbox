@@ -18,7 +18,7 @@
         android:name="io.flutter.app.FlutterApplication"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
-        android:label="Flutter.Cashbox"
+        android:label="Cashbox"
         xmlns:tools="http://schemas.android.com/tools"
         tools:replace="label">
         <activity
