@@ -147,5 +147,6 @@
   "failure_change_wallet_name": "钱包名称修改成功！",
   "wallet_manager": "钱包管理",
   "compile_wallet_name": "编辑",
-  "tx_hash": "交易hash"
+  "tx_hash": "交易hash",
+  "digit_manage": "代币管理"
 }

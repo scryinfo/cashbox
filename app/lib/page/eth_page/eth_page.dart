@@ -230,6 +230,8 @@ class _EthPageState extends State<EthPage> {
       ),
       drawer: LeftDrawerCard(), //左侧抽屉栏
       body: Container(
+        width: ScreenUtil.instance.setWidth(90),
+        height: ScreenUtil.instance.setHeight(160),
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(
           image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
@@ -244,8 +246,42 @@ class _EthPageState extends State<EthPage> {
                 //DigitListCard(),
               ],
             ),
+            Positioned(
+              bottom: ScreenUtil.instance.setHeight(5),
+              child: _buildAddDigitButton(),
+            )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAddDigitButton() {
+    return Container(
+      width: ScreenUtil.instance.setWidth(90),
+      height: ScreenUtil.instance.setHeight(9),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            color: Color.fromRGBO(26, 141, 198, 0.40),
+            child: FlatButton(
+              child: Text(
+                S.of(context).digit_manage,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.blue,
+                  letterSpacing: 0.03,
+                  fontSize: ScreenUtil.instance.setSp(3.2),
+                ),
+              ),
+              onPressed: () {
+                NavigatorUtils.push(context, Routes.digitManagePage);
+              },
+            ),
+          )
+        ],
       ),
     );
   }

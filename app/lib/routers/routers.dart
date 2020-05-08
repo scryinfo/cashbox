@@ -18,6 +18,7 @@ class Routes {
   static String importWalletPage = '/importwalletpage';
   static String transferEthPage = '/transferethpage';
   static String digitListPage = '/digitlistpage';
+  static String digitManagePage = '/digitmanagepage';
   static String searchDigitPage = '/searchdigitpage';
 
   static String minePage = '/minepage';
@@ -47,6 +48,7 @@ class Routes {
     router.define(dappDemoPage, handler: dappDemoPageHandler);
     router.define(createWalletNamePage, handler: createWalletPageHandler);
     router.define(digitListPage, handler: digitListPageHandler);
+    router.define(digitManagePage, handler: digitManageHandler);
     router.define(searchDigitPage, handler: searchDigitPageHandler);
 
     router.define(createWalletMnemonicPage, handler: createWalletMnemonicPageHandler);

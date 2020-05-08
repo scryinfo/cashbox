@@ -84,6 +84,9 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
               hintText: "digitName",
               hintStyle: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
             ),
+            onSubmitted: (value) {
+              print("onSubmitted is ===>"+value);
+            },
             //文本对齐方式(即光标初始位置)
             textAlign: TextAlign.start,
             style: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white)));
@@ -91,7 +94,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
 
   Widget _digitListAreaWidgets() {
     return Container(
-        height: ScreenUtil().setHeight(78),
+        height: ScreenUtil().setHeight(70),
         width: ScreenUtil().setWidth(90),
         child: Container(
           padding: EdgeInsets.only(left: ScreenUtil().setWidth(3), right: ScreenUtil().setWidth(3)),

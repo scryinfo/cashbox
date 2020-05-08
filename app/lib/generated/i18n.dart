@@ -50,6 +50,7 @@ class S implements WidgetsLocalizations {
   String get delete_wallet_hint => "提示：请保存好您的助记词。钱包删除后，cashbox不会再私自记录该钱包的任何信息。";
   String get digit_info_null => "代币信息为空";
   String get digit_list_title => "代币列表";
+  String get digit_manage => "代币管理";
   String get eee_chain_test => "EEE_TEST";
   String get eee_token_name => "EEE";
   String get ensure_pwd => "确认密码";
@@ -347,6 +348,8 @@ class $zh extends S {
   String get tx_backup => "交易备注";
   @override
   String get backup_mnemonic_hint_info => "助记词用于恢复钱包或者重置钱包密码，将它准确抄到纸上，切记安全保存到你知道的安全地方。";
+  @override
+  String get digit_manage => "代币管理";
   @override
   String get app_title => "App标题";
   @override
