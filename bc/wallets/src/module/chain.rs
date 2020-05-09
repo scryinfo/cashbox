@@ -1,8 +1,7 @@
 use super::*;
 use super::model::*;
 
-use std::sync::mpsc;
-use crate::wallet_crypto::Crypto;
+use substratetx::Crypto;
 use std::collections::HashMap;
 use ethereum_types::{H160, U256, H256};
 
@@ -10,7 +9,8 @@ use ethereum_types::{H160, U256, H256};
 pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str,genesis_hash: &str, index: u32,runtime_version:u32, psw: &[u8]) -> Result<String, WalletError> {
     match module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE) {
         Ok(keystore) => {
-            match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
+            //todo 使用优化的错误返回方式
+            match substratetx::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过
                     let mn = String::from_utf8(mnemonic)?;
@@ -18,18 +18,18 @@ pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str,genesis_hash: &str,
                     let mut genesis_h256 = [0u8;32];
                     genesis_h256.clone_from_slice( genesis_hash_bytes.as_slice());
 
-                    let signed_data = wallet_rpc::transfer( &mn, to, amount,H256(genesis_h256),index,runtime_version);
+                    let signed_data = substratetx::transfer( &mn, to, amount,H256(genesis_h256),index,runtime_version);
                     match signed_data {
                         Ok(data) => {
                            log::debug!("signed data is: {}", data);
                             Ok(data)
                         }
                         Err(msg) => {
-                            Err(msg)
+                            Err(msg.into())
                         }
                     }
                 }
-                Err(msg) => Err(msg),
+                Err(msg) => Err(msg.into()),
             }
         }
         Err(msg) => { Err(msg.into()) }
@@ -56,7 +56,7 @@ pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amoun
     };
     match module::wallet::find_keystore_wallet_from_address(from_address, chain_type) {
         Ok(keystore) => {
-            match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
+            match substratetx::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过开始拼接交易签名数据
                     //todo 输入的数量都是整数？
@@ -80,7 +80,7 @@ pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amoun
                     let tx_signed = rawtx.sign(&pri_key, Some(eth_chain_id));
                     Ok(format!("0x{}", hex::encode(tx_signed)))
                 }
-                Err(msg) => Err(msg),
+                Err(msg) => Err(msg.into()),
             }
         }
         Err(msg) => { Err(msg) }
@@ -111,7 +111,8 @@ pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, t
     };
     match module::wallet::find_keystore_wallet_from_address(from_account, chain_type) {
         Ok(keystore) => {
-            match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
+            //todo 使用?方式来处理错误
+            match substratetx::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过
                     //todo 增加错误处理
@@ -136,7 +137,7 @@ pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, t
                     let tx_signed = rawtx.sign(&pri_key, Some(eth_chain_id));
                     Ok(format!("0x{}", hex::encode(tx_signed)))
                 }
-                Err(msg) => Err(msg),
+                Err(msg) => Err(msg.into()),
             }
         }
         Err(msg) => { Err(msg) }

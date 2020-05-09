@@ -14,6 +14,8 @@ pub enum Error {
     HexError(hex::FromHexError),
     #[display(fmt = "serde json error: {:?}", _0)]
     Serde(serde_json::Error),
+    #[display(fmt = "codec error: {:?}", _0)]
+    ScaleCodec(codec::Error),
 }
 
 /*impl std::error::Error for Error {
@@ -60,5 +62,17 @@ impl  From<hex::FromHexError> for Error {
 impl  From<serde_json::error::Error> for Error {
     fn from(err: serde_json::error::Error) -> Self {
         Error::Serde(err)
+    }
+}
+
+impl From<std::num::ParseIntError> for Error {
+    fn from(err: std::num::ParseIntError) -> Self {
+        Error::Custom(format!("{:?}", err))
+    }
+}
+
+impl From<codec::Error> for Error{
+    fn from(err:codec::Error) -> Self {
+        Error::ScaleCodec(err)
     }
 }

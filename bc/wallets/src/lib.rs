@@ -1,11 +1,9 @@
 #[macro_use]
 extern crate serde_derive;
 
-pub mod wallet_crypto;
 pub mod model;
 pub mod module;
 pub mod wallet_db;
-pub mod wallet_rpc;
 
 mod error;
 
@@ -74,79 +72,27 @@ impl From<i64> for ChainType {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::wallet_crypto::{Crypto, Keccak256};
+    use substratetx::{Keccak256, Crypto};
     use hex;
-    use std::sync::mpsc;
-    use futures::Future;
-    use jsonrpc_core::Notification;
-    use sp_core::crypto::{Pair, AccountId32};
 
     #[test]
     fn verify_mnemonic_create() {
-        let mnemonic = wallet_crypto::Sr25519::generate_phrase(18);
+        let mnemonic = substratetx::Sr25519::generate_phrase(18);
         let data = "substrate sign method test";
-        println!("data length is:{}", data.len());
         let s = String::new();
-        let data = wallet_crypto::Ed25519::sign(&mnemonic, data.as_bytes());
-        println!("{}", hex::encode(data.to_vec().as_slice()));
-    }
-
-    #[test]
-    fn rpc_account_nonce_test() {
-        let (send_tx, recv_tx) = mpsc::channel();
-        let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
-        let mnemonic = "swarm grace knock race flip unveil pyramid reveal shoot vehicle renew axis";
-        let _to = "5DATag245rFG8PvCHnSpntLMhF9xvKZQPyshaAFhSiMMcFpU";
-        //  let seed =  wallet_crypto::Sr25519::seed_from_phrase(mnemonic,None);
-        //let pair = wallet_crypto::Sr25519::pair_from_suri(&mnemonic,None);
-        let pair = wallet_crypto::Sr25519::pair_from_suri("//Alice", None);
-        println!("public:{}", &pair.public());
-
-        let index = wallet_rpc::substrate::account_nonce(&mut substrate_client, AccountId32::from(pair.public().0));
-        println!("index:{}", index);
-        assert_eq!(index, 0);
-        // 用于保持连接，接收从链上返回来的数据
-        let msg = recv_tx.recv().unwrap();
-        let msg = msg.into_text().unwrap();
-        let des: Notification = serde_json::from_str(&msg).unwrap();
-        let des: serde_json::Map<String, serde_json::Value> = des.params.parse().unwrap();
-        let sub_id = &des["subscription"];
-        println!(
-            "----subscribe extrinsic return sub_id:{:?}----result:{:?}---",
-            sub_id, des["result"]
-        );
-    }
-
-    #[test]
-    fn rpc_func_test() {
-        let (send_tx, recv_tx) = mpsc::channel();
-        let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
-        let mnemonic = "mirror craft oil voice there pizza quarter void inhale snack vacant kingdom force erupt congress wing correct bargain";
-        let to = "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy";
-        let ret = wallet_rpc::transfer(&mut substrate_client, mnemonic, to, "200000000000000");
-        match ret {
-            Ok(data) => {
-                println!("signed data is: {}", data);
-                wallet_rpc::submit_data(&mut substrate_client, data);
-            }
-            Err(msg) => {
-                println!("error {}", msg);
-            }
+        match substratetx::Ed25519::sign(&mnemonic, data.as_bytes()) {
+            Ok(signed_data) => println!("{}", hex::encode(&signed_data[..])),
+            Err(e) => println!("{}", e.to_string()),
         }
-    }
-
-    #[test]
-    fn get_runtime_version_test() {
-        let (send_tx, recv_tx) = mpsc::channel();
-        let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
-        let runtime_version = wallet_rpc::substrate::runtime_version(&mut substrate_client);
-        println!("runtime_version:{:?}", runtime_version);
     }
 
     #[test]
     fn func_sign_test() {
         let rawtx = "0xac040600ff0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea300b0040e59c301200000000979d3bb306ed9fbd5d6ae1eade033b81ae12a5c5d5aa32781153579d7f6d5504ed000000";
-        module::wallet::raw_tx_sign(rawtx, "9328ebd6-c205-439d-a016-ebe6ab1e5408", "123456".as_bytes());
+        match module::wallet::raw_tx_sign(rawtx, "9328ebd6-c205-439d-a016-ebe6ab1e5408", "123456".as_bytes()) {
+            Ok(signed_data) => println!("tx sign result {}", signed_data),
+            Err(e) => println!("{}", e.to_string()),
+        }
     }
 
     #[test]

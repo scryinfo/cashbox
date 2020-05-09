@@ -8,8 +8,9 @@ pub enum WalletError{
     Custom(String),
     Decode(String),
     EthTx(ethtx::Error),
+    SubstrateTx(substratetx::error::Error),
     Serde(serde_json::Error),
-    Public(sp_core::crypto::PublicError),
+   // Public(sp_core::crypto::PublicError),
     ScaleCodec(codec::Error),
     Secp256k1(secp256k1::Error),
     NotExist,
@@ -23,8 +24,9 @@ impl fmt::Display for WalletError{
             WalletError::Io(ref err)=>err.fmt(f),
             WalletError::Sqlite(ref err)=>err.fmt(f),
             WalletError::EthTx(ref err)=>err.fmt(f),
+            WalletError::SubstrateTx(ref err)=>err.fmt(f),
             WalletError::Serde(ref err)=>err.fmt(f),
-            WalletError::Public(err)=>write!(f, "sp_core Public error: {:?}", err),
+           // WalletError::Public(err)=>write!(f, "sp_core Public error: {:?}", err),
             WalletError::ScaleCodec(ref err)=>err.fmt(f),
             WalletError::Secp256k1(ref err)=>err.fmt(f),
             WalletError::NotExist=>write!(f,"value not exist"),
@@ -75,23 +77,6 @@ impl From<failure::Error> for WalletError{
         WalletError::Custom(format!("{:?}", err))
     }
 }
-impl From<substrate_bip39::Error> for WalletError{
-    fn from(err: substrate_bip39::Error)->Self{
-        WalletError::Custom(format!("{:?}", err))
-    }
-}
-
-impl From<sp_core::crypto::SecretStringError> for WalletError{
-    fn from(err: sp_core::crypto::SecretStringError)->Self{
-        WalletError::Custom(format!("{:?}", err))
-    }
-}
-
-impl  From<sp_core::crypto::PublicError> for WalletError {
-    fn from(err: sp_core::crypto::PublicError) -> Self {
-        WalletError::Public(err)
-    }
-}
 
 impl From<codec::Error> for WalletError{
     fn from(err:codec::Error) -> Self {
@@ -109,4 +94,12 @@ impl From<std::num::ParseIntError> for WalletError{
         WalletError::Decode(format!("{:?}", err))
     }
 }
+
+impl From<substratetx::error::Error> for WalletError{
+    fn from(err:substratetx::error::Error) -> Self {
+        WalletError::SubstrateTx(err)
+    }
+}
+
+
 

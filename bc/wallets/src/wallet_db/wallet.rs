@@ -5,8 +5,6 @@ use ChainType;
 use crate::model::wallet_store::{TbAddress, WalletObj, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
 
-const ETH_DIGIT_FILE:&'static str = r#"res/chainEthFile.json"#;
-
 //根据链id,转换为对应的链类型和分组名称
 fn chain_id_convert_group_name(chain_id: i16) -> Option<(i64, String)> {
     match chain_id {

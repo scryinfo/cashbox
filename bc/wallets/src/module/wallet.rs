@@ -1,19 +1,19 @@
 use super::*;
 
 use crate::{StatusCode, wallet_db};
-use crate::model::Address;
-use super::model::{TbAddress, Wallet, Mnemonic};
+use super::model::{TbAddress,Address, Wallet, Mnemonic};
 use std::collections::HashMap;
-use crate::wallet_crypto::{Crypto, Keccak256};
 use uuid::Uuid;
 use crate::model::wallet_store::TbWallet;
 use codec::{Encode, Decode};
-use sp_core::H256;
-
+use ethereum_types::H256;
 use secp256k1::{
     Secp256k1,
     key::{PublicKey, SecretKey},
 };
+
+use substratetx::Crypto;
+use substratetx::Keccak256;
 
 /// Wallet 结构说明：
 ///  一个助记词 对应的是一个钱包，在cashbox钱包软件中 可以同时管理多个钱包；
@@ -123,7 +123,7 @@ pub fn del_wallet(walletid: &str, psd: &[u8]) -> Result<bool, WalletError> {
     //查询出对应id的助记词
     match provider.query_by_wallet_id(walletid) {
         Some(mn) => {
-            match wallet_crypto::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), psd) {
+            match substratetx::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), psd) {
                 Ok(_) => {
                     //密码验证通过
                     match provider.del_mnemonic(walletid) {
@@ -131,7 +131,7 @@ pub fn del_wallet(walletid: &str, psd: &[u8]) -> Result<bool, WalletError> {
                         Err(msg) => Err(msg),
                     }
                 }
-                Err(msg) => Err(msg),
+                Err(msg) => Err(msg.into()),
             }
         }
         None => {
@@ -153,10 +153,10 @@ pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Addres
     // TODO 这个地方 根据支持链的种类 分别生成对应的地址
     match wallet_type {
         ChainType::EEE | ChainType::EeeTest => {
-            let seed = wallet_crypto::Sr25519::seed_from_phrase(&phrase, None).unwrap();
-            let pair = wallet_crypto::Sr25519::pair_from_seed(&seed);
-            let address = wallet_crypto::Sr25519::ss58_from_pair(&pair);
-            let puk_key = wallet_crypto::Sr25519::public_from_pair(&pair);
+            let seed = substratetx::Sr25519::seed_from_phrase(&phrase, None).unwrap();
+            let pair = substratetx::Sr25519::pair_from_seed(&seed);
+            let address = substratetx::Sr25519::ss58_from_pair(&pair);
+            let puk_key = substratetx::Sr25519::public_from_pair(&pair);
             let address = Address {
                 chain_type: wallet_type,
                 pubkey: hex::encode(puk_key),
@@ -203,7 +203,7 @@ pub fn find_keystore_wallet_from_address(address: &str, chain_type: ChainType) -
 }
 
 pub fn crate_mnemonic(num: u8) -> Mnemonic {
-    let mnemonic = wallet_crypto::Sr25519::generate_phrase(num);
+    let mnemonic = substratetx::Sr25519::generate_phrase(num);
     let mn_id_hash = mnemonic.as_bytes().keccak256();
     let mnemonic_id = mn_id_hash.keccak256();
     Mnemonic {
@@ -218,11 +218,11 @@ pub fn export_mnemonic(wallet_id: &str, password: &[u8]) -> Result<Mnemonic, Wal
     //查询出对应id的助记词
     match provider.query_by_wallet_id(wallet_id) {
         Some(mn) => {
-            wallet_crypto::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), password).map(|mnemonic| Mnemonic {
+            substratetx::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), password).map(|mnemonic| Mnemonic {
                 status: StatusCode::OK,
                 mn: mnemonic,
                 mnid: String::from(wallet_id),
-            })
+            }).map_err(|e|e.into())
         }
         None => {
             let msg = format!("wallet {} not found", wallet_id);
@@ -285,7 +285,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
         }
     }
 
-    let keystore = wallet_crypto::Sr25519::encrypt_mnemonic(mn, password);
+    let keystore = substratetx::Sr25519::encrypt_mnemonic(mn, password);
     let wallet_id = Uuid::new_v4().to_string();
     let address: Vec<TbAddress> = generate_chain_address(&wallet_id, mn, wallet_type)?;
 
@@ -317,9 +317,9 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
 fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> Result<StatusCode, WalletError> {
     //获取原来的助记词
     let mnemonic = wallet.mnemonic.clone();
-    let context = wallet_crypto::Sr25519::get_mnemonic_context(mnemonic.as_str(), old_psd)?;
+    let context = substratetx::Sr25519::get_mnemonic_context(mnemonic.as_str(), old_psd)?;
     //使用新的密码进行加密
-    let new_encrypt_mn = wallet_crypto::Sr25519::encrypt_mnemonic(&context[..], new_psd);
+    let new_encrypt_mn = substratetx::Sr25519::encrypt_mnemonic(&context[..], new_psd);
 
     //构造需要升级的助记词对象，先只修改指定的字段，后续再根据需求完善
     let wallet_update = TbWallet {
@@ -359,6 +359,7 @@ struct RawTx {
 }
 
 pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> Result<String, WalletError> {
+    //todo 交易构造接口重构
     let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
     let  tx_encode_data = hex::decode(raw_tx)?;
     // TODO 这个地方需要使用大小端编码？
@@ -369,8 +370,9 @@ pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> Result<String, 
             let mn = String::from_utf8(mnemonic.mn)?;
             let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
           // let mut_data = &tx.func_data[..];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
-            let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..])?;
-            let sign_data = wallet_rpc::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function,tx.version)?;
+            /*let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..])?;
+            let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function,tx.version)?;*/
+            let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index,mut_data,tx.version)?;
             // TODO 返回签名后的消息格式需要确定
             Ok(sign_data)
         }
@@ -387,7 +389,7 @@ pub fn raw_sign(raw_data: &str, wallet_id: &str, psw: &[u8]) -> Result<String, W
     match mnemonic {
         Ok(mnemonic) => {
             let mn = String::from_utf8(mnemonic.mn)?;
-            let sign_data = wallet_crypto::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();
+            let sign_data = substratetx::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();
             // TODO 返回签名后的消息格式需要确定
             let hex_data = format!("0x{}", hex::encode(&sign_data[..]));
             Ok(hex_data)
