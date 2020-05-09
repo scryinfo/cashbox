@@ -10,10 +10,6 @@ edition = "2018"
 url = "2.1.0"
 futures = "0.1"
 parking_lot = "0.7"
-tiny-bip39 ="0.7.0"
-codec = { package = "parity-scale-codec", version = "1.2.0" }
-substrate-bip39 ="0.3.0"
-schnorrkel="0.8.5"
 rand = "0.7.0"
 rand_core = "0.5.0"
 log = "0.4.8"
@@ -27,61 +23,9 @@ failure="0.1.3"
 uuid = { version = "0.7", features = ["serde", "v4"] }
 ethereum-types = "0.8.0"
 secp256k1 = {version = "0.16", features = ["recovery"] }
-
+codec = { package = "parity-scale-codec", version = "1.2.0" }
 scrypt = { version = "0.2", default-features = true }
 scry-crypto = {version = "0.1.0",path="../util/crypto"}
 scry-fs-util = {version = "0.1.0",path="../util/fs"}
+substratetx = {version = "0.1.0",path="../util/substratetx"}
 ethtx = {version = "0.1.0",path="../util/ethtx"}
-jsonrpc-ws-server = { git = "https://github.com/paritytech/jsonrpc.git" }
-jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc.git" }
-
-
-[dependencies.sp-core]
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-path = "../../../eee/demo/substrate/primitives/core/"
-
-
-[dependencies.node-runtime]
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-package = "node-template-runtime"
-path="../../../eee/demo/substrate/bin/node-template/runtime/"
-
-[dependencies.system]
-package = "frame-system"
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-path = "../../../eee/demo/substrate/frame/system/"
-
-
-[dependencies.transaction-payment]
-package = "pallet-transaction-payment"
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-path = "../../../eee/demo/substrate/frame/transaction-payment/"
-
-
-[dependencies.balances]
-package = "pallet-balances"
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-path = "../../../eee/demo/substrate/frame/balances/"
-
-
-[dependencies.pallet-contracts]
-package = "pallet-contracts"
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-path = "../../../eee/demo/substrate/frame/contracts/"
-
-[dependencies.sp-runtime]
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-path = "../../../eee/demo/substrate/primitives/runtime/"
-
-[dependencies.frame-support]
-#git = "https://github.com/paritytech/substrate.git"
-package = "frame-support"
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
-path = "../../../eee/demo/substrate/frame/support/"
