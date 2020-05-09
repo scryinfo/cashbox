@@ -79,10 +79,8 @@ impl DataServiceProvider {
             let wallet_sql = super::table_desc::get_cashbox_wallet_detail_sql();
             create_teble(TB_WALLET_DETAIL, wallet_sql.as_str())?;
             //加载基础数据
-          let init_digit =  init_digit_base_data(TB_WALLET_DETAIL);
-            if init_digit.is_err() {
-                return Err(init_digit.unwrap_err());
-            }
+           init_digit_base_data(TB_WALLET_DETAIL)?;
+
         }
         //start connect mnemonic database
         let conn = Connection::open(TB_WALLET)?;
@@ -98,6 +96,10 @@ impl DataServiceProvider {
 
     pub fn tx_commint(&mut self) -> Result<(), WalletError> {
         self.db_hander.execute("commit;").map(|_| ()).map_err(|err| err.into())
+    }
+
+    pub fn tx_rollback(&mut self) -> Result<(), WalletError> {
+        self.db_hander.execute("rollback;").map(|_| ()).map_err(|err| err.into())
     }
 
     pub fn get_bool_value(value: &str) -> bool {

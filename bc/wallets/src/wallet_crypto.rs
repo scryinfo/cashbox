@@ -195,9 +195,6 @@ pub trait Crypto {
       //  let store: Result<KeyStore, _> = serde_json::from_str(keystore);
         let store: KeyStore = serde_json::from_str(keystore)?;
 
-        /*if store.is_err() {
-            return Err("keystore convert serde_json error".into());
-        }*/
         //对称加密密钥
         let mut key = vec![0u8; 32];
 

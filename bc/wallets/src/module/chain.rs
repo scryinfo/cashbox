@@ -4,25 +4,25 @@ use super::model::*;
 use std::sync::mpsc;
 use crate::wallet_crypto::Crypto;
 use std::collections::HashMap;
-use ethereum_types::{H160, U256};
+use ethereum_types::{H160, U256, H256};
 
-
-pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str, psw: &[u8]) -> Result<String, WalletError> {
+// 转EEE链代币
+pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str,genesis_hash: &str, index: u32,runtime_version:u32, psw: &[u8]) -> Result<String, WalletError> {
     match module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE) {
         Ok(keystore) => {
             match wallet_crypto::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过
-                    let (send_tx, _recv_tx) = mpsc::channel();
-                    let mut substrate_client = wallet_rpc::substrate_thread(send_tx).unwrap();
                     let mn = String::from_utf8(mnemonic)?;
-                    let signed_data = wallet_rpc::transfer(&mut substrate_client, &mn, to, amount);
+                    let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap())?;
+                    let mut genesis_h256 = [0u8;32];
+                    genesis_h256.clone_from_slice( genesis_hash_bytes.as_slice());
+
+                    let signed_data = wallet_rpc::transfer( &mn, to, amount,H256(genesis_h256),index,runtime_version);
                     match signed_data {
                         Ok(data) => {
-                            log::debug!("signed data is: {}", data);
-                            let ret_value = wallet_rpc::submit_data(&mut substrate_client, data);
-                            let str_value = format!("{}", ret_value);
-                            Ok(str_value)
+                           log::debug!("signed data is: {}", data);
+                            Ok(data)
                         }
                         Err(msg) => {
                             Err(msg)

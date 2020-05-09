@@ -100,63 +100,10 @@ type SignedExtra = (
     )
 }
 
-
-pub fn genesis_hash(client: &mut Rpc) -> Hash {
-    client
-        .request::<Hash>("chain_getBlockHash", vec![json!(0 as u64)])
-        .wait()
-        .unwrap()
-        .unwrap()
-}
-
-pub fn runtime_version(client: &mut Rpc)->u32{
-    let version = client
-        .request::<Value>("state_getRuntimeVersion", vec![])
-        .wait()
-        .unwrap()
-        .unwrap();
-    let spec_version = version.get("specVersion");
-    if spec_version.is_none(){
-        return 0;
-    }else {
-        return spec_version.unwrap().as_u64().unwrap() as u32;
-    }
-
-}
-
-pub fn account_nonce(client: &mut Rpc, account_id: AccountId) -> u64 {
-     let final_key = <system::Account<Runtime>>::hashed_key_for(account_id);
-      let key = format!("0x{:}", HexDisplay::from(&final_key));
-      let nonce = client
-          .request::<Value>("state_getStorage", vec![json!(key)])
-          .wait();
-      let nonce =nonce.expect("get value from Result<Value> result");
-      let nonce =nonce.expect("get value from Value result");
-      if nonce.is_string() {
-          let nonce = nonce.as_str().unwrap();
-          let blob = hex::decode(&nonce[2..]).unwrap();
-          let mut index_target =[0u8;8];
-          {
-            let temp = &mut index_target[0..4];
-              temp.copy_from_slice(blob.as_slice());
-          }
-          let index = u64::from_le_bytes(index_target);
-          index
-      } else {
-          0
-      }
-}
-
-pub fn transfer(client: &mut Rpc, mnemonic: &str, to: &str, amount: &str) -> Result<String, WalletError> {
-    let signer = wallet_crypto::Sr25519::pair_from_phrase(mnemonic, None)?;
-    let genesis_hash = genesis_hash(client);
-    let signer_account_id = AccountId::from(signer.public().0);
-    let index = account_nonce(client, signer_account_id);
-    let amount = str::parse::<Balance>(amount)?;
-    let runtime_version = runtime_version(client);
+pub fn transfer( mnemonic: &str, to: &str, amount: &str,genesis_hash: H256, index: u32,runtime_version:u32)-> Result<String, WalletError>{
+    //todo 考虑将交易的生成与交易的签名分成两个步骤，在交易生成环节可以计算出当前交易所需要的手续费，提示用户针对这次转账共需要消耗多少balance?
     let to_account_id=  AccountId::from_ss58check(to)?;
- /*   sp_core::crypto::AccountId32*/
-    //let function = Call::Balances(BalancesCall::transfer(pallet_indices::address::Address::Id(to_account_id), amount));
+    let amount = str::parse::<Balance>(amount)?;
     let function = Call::Balances(BalancesCall::transfer(to_account_id, amount));
     let result = tx_sign(mnemonic, genesis_hash, index as u32, function,runtime_version)?;
     Ok(result)

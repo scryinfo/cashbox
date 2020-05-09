@@ -35,12 +35,6 @@ ethtx = {version = "0.1.0",path="../util/ethtx"}
 jsonrpc-ws-server = { git = "https://github.com/paritytech/jsonrpc.git" }
 jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc.git" }
 
-# 这里编译存在版本问题，当前使用的master能够正常编译通过
-#[dependencies.node-primitives]
-#git = 'https://github.com/paritytech/substrate.git'
-#package = 'node-primitives'
-#rev = 'b443ddad65f2ffed68db4973b7b78231c6fc3674'
-#path="../../../eee/substrate/bin/node/primitives/"
 
 [dependencies.sp-core]
 #git = 'https://github.com/paritytech/substrate.git'
