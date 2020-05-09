@@ -7,7 +7,7 @@ Future request(String url, {formData}) async {
     print('开始获取数据...............' + url);
     Response response;
     Dio dio = new Dio();
-    dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
+    //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
     if (formData == null) {
       response = await dio.post(url);
     } else {
@@ -30,7 +30,7 @@ Future download(url, savePath) async {
   try {
     Response response;
     Dio dio = new Dio();
-    dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
+    //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
     response = await Dio().download(url, savePath);
     print("downloadHttp response==>" + response.toString());
     LogUtil.d("net_util download() response is", "${response}");

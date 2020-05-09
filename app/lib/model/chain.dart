@@ -83,24 +83,26 @@ abstract class Chain {
 
   // 显示代币
   // apiNo:WM14
-  Future<bool> showDigit(String digitId) async {
-    Map showDigitMap = await WalletManager.showDigit(walletId, chainId, digitId);
-    // if (isSuccess) {
-    //   //todo 数据格式
-    //   //chainList.remove(chain);
-    // }
-    return null;
+  Future<bool> showDigit(Digit digit) async {
+    Map showDigitMap = await WalletManager.showDigit(walletId, chainId, digit.digitId);
+    int status = showDigitMap["status"];
+    if (status == 200) {
+      digit.isVisible = true;
+      return true; //执行成功
+    }
+    return false; //执行失败
   }
 
   // 隐藏代币
   // apiNo:WM15
-  Future<bool> hideDigit(String digitId) async {
-    Map hideDigitMap = await WalletManager.hideDigit(walletId, chainId, digitId);
-    // if (isSuccess) {
-    //   //todo 数据格式
-    //   //chainList.remove(chain);
-    // }
-    return null;
+  Future<bool> hideDigit(Digit digit) async {
+    Map hideDigitMap = await WalletManager.hideDigit(walletId, chainId, digit.digitId);
+    int status = hideDigitMap["status"];
+    if (status == 200) {
+      digit.isVisible = false;
+      return true; //执行成功
+    }
+    return false;
   }
 
   // 添加代币 todo 2.0 待确定数据格式

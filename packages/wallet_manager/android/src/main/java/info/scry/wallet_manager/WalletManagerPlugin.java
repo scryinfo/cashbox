@@ -442,12 +442,32 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "showDigit": {
                 ScryWalletLog.d("nativeLib=>", "begin to showDigit =>");
                 WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.showDigit((String) (call.argument("walletId")), (String) (call.argument("chainId")),
+                            (String) (call.argument("digitId")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "showDigit exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                resultMap.put("isShowDigit", walletState.isShowDigit);
+                result.success(resultMap);
                 break;
             }
             // apiNo:WM15
             case "hideDigit": {
                 ScryWalletLog.d("nativeLib=>", "begin to hideDigit =>");
                 WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.hideDigit((String) (call.argument("walletId")), (String) (call.argument("chainId")),
+                            (String) (call.argument("digitId")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "hideDigit exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                resultMap.put("isHideDigit", walletState.isHideDigit);
+                result.success(resultMap);
                 break;
             }
             case "eeeEnergyTransfer": {

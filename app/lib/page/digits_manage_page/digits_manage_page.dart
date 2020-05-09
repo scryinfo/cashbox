@@ -134,12 +134,21 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             right: ScreenUtil().setWidth(3),
           ),
           child: GestureDetector(
-            onTap: () {
-              //todo 改变保存代币状态      digit.isVisible
+            onTap: () async {
               print("click to 改变保存代币状态");
-              setState(() {
-                displayDigitsList[index].isVisible = !displayDigitsList[index].isVisible;
-              });
+              var isExecutorSuccess = false;
+              if (displayDigitsList[index].isVisible) {
+                isExecutorSuccess = await nowChain.hideDigit(displayDigitsList[index]);
+              } else {
+                isExecutorSuccess = await nowChain.showDigit(displayDigitsList[index]);
+              }
+              if (isExecutorSuccess) {
+                setState(() {
+                  displayDigitsList[index].isVisible = !displayDigitsList[index].isVisible;
+                });
+              } else {
+                Fluttertoast.showToast(msg: "执行状态保存，出问题了");
+              }
             },
             child: Row(
               children: <Widget>[
