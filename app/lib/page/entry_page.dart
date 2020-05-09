@@ -7,6 +7,7 @@ import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,8 @@ class _EntryPageState extends State<EntryPage> {
   bool _agreeServiceProtocol = true;
   bool isContainWallet = false;
   Future future;
+  String languageValue;
+  List<String> languageList = ["中文", "English"];
 
   @override
   void initState() {
@@ -70,9 +73,9 @@ class _EntryPageState extends State<EntryPage> {
               if (isContainWallet) {
                 //return DappPage(); // todo 版本说明，直接进入到Dapp diamond页面处
                 //return TransactionDemo();
-                //return EthPage();
+                return EthPage();
                 //return DAppWebViewDemo();
-                return EeePage();    //版本说明：提供eee界面，可以看账户信息address，和切换钱包
+                //return EeePage();    //版本说明：提供eee界面，可以看账户信息address，和切换钱包
               } else {
                 return _buildProtocolLayout();
               }
@@ -94,7 +97,9 @@ class _EntryPageState extends State<EntryPage> {
           alignment: Alignment.center,
           child: Column(
             children: <Widget>[
-              Gaps.scaleVGap(30),
+              Gaps.scaleVGap(10),
+              _buildChangeLanguageWidget(),
+              Gaps.scaleVGap(20),
               _buildLogoWidget(),
               //Gaps.scaleVGap(2.5),
               _buildLogoTextWidget(),
@@ -109,6 +114,61 @@ class _EntryPageState extends State<EntryPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildChangeLanguageWidget() {
+    return Container(
+      margin: EdgeInsets.only(left: ScreenUtil.instance.setWidth(50)),
+      width: ScreenUtil.instance.setWidth(25),
+      color: Color.fromRGBO(0, 0, 0, 0.05),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Text(languageValue,style: TextStyle(color: Colors.white30),),
+          PopupMenuButton<String>(
+            color: Colors.black12,
+            icon: Icon(Icons.keyboard_arrow_down),
+            itemBuilder: (BuildContext context) => _makePopMenuList(),
+            onSelected: (String value) {
+              setState(() {
+                languageValue = value;
+              });
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  List<PopupMenuItem<String>> _makePopMenuList() {
+    List<PopupMenuItem<String>> popMenuList = List.generate(languageList.length, (index) {
+      return PopupMenuItem<String>(
+          value: languageList[index] ?? "",
+          child: new Text(
+            languageList[index] ?? "",
+            style: new TextStyle(color: Colors.white54),
+          ));
+    });
+    return popMenuList;
+  }
+
+  languageItem() {
+    var items = List<DropdownMenuItem<String>>();
+    items.add(DropdownMenuItem(
+      child: Text(
+        "中文",
+        style: TextStyle(color: Colors.black54),
+      ),
+      value: "中文",
+    ));
+    items.add(DropdownMenuItem(
+      child: Text(
+        "English",
+        style: TextStyle(color: Colors.black54),
+      ),
+      value: "English",
+    ));
+    return items;
   }
 
   Widget _buildLogoWidget() {
