@@ -299,7 +299,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_setNowChainTyp
 }
 
 
-#[no_mangle]
+/*#[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDigitBalance(env: JNIEnv, _: JClass, address: JString,digitId: JString,balance:JString) -> jobject {
 
@@ -319,7 +319,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDigitBal
         }
     }
     *state_obj
-}
+}*/
 
 
 #[no_mangle]

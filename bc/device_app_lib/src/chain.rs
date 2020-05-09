@@ -263,7 +263,7 @@ pub mod android {
         *state_obj
     }
 
-    #[no_mangle]
+  /*  #[no_mangle]
     #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDigitBalance(env: JNIEnv, _: JClass, address: JString,digitId: JString,balance:JString) -> jobject {
 
@@ -283,7 +283,7 @@ pub mod android {
             }
         }
         *state_obj
-    }
+    }*/
 
 
     #[no_mangle]

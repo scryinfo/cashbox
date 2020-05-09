@@ -8,6 +8,7 @@ pub mod android {
     use wallets::model::{EeeChain,BtcChain,EthChain};
     use std::os::raw::{c_uchar, c_int};
     use jni::sys::jobject;
+    use wallets::StatusCode;
 
     #[no_mangle]
     #[allow(non_snake_case)]
@@ -47,6 +48,28 @@ pub mod android {
             },
             Err(msg) => {
                 env.set_field(state_obj, "isHideDigit", "Z", JValue::Bool(0 as u8)).expect("showDigit value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
+            }
+        }
+        *state_obj
+    }
+
+
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDigitBalance(env: JNIEnv, _: JClass, address: JString,digitId: JString,balance: JString) -> jobject {
+        let address: String = env.get_string(address).unwrap().into();
+        let digitId: String = env.get_string(digitId).unwrap().into();
+        let balance: String = env.get_string(balance).unwrap().into();
+
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_state_class is error");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        match wallets::module::digit::update_balance(&address,&digitId,&balance){
+            Ok(data)=>{
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status value is error!");
+            },
+            Err(msg)=>{
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status value is error!");
                 env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }

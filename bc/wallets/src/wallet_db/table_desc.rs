@@ -66,7 +66,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     CREATE TABLE [main].[DigitUseDetail](
     [digit_id] INTEGER ,
     [address_id] VARCHAR(64) ,
-	[balance] VARCHAR(32),
+	[balance] VARCHAR(32) NOT NULL DEFAULT 0,
     [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
     [status] INT NOT NULL DEFAULT 1,
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),

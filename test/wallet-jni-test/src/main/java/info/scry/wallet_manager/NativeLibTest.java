@@ -16,17 +16,20 @@ public class NativeLibTest {
       // walletGenerateTest();
        // walletExportTest();
         // eeeTxsign();
-     /*   List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+      //  walletSaveTest();
+        updateBalance();
+        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         System.out.println(wallets.size());
-        System.out.println(wallets.toString());*/
-        walletSaveTest();
-
-
+        System.out.println(wallets.toString());
     }
 
+    public static  void  updateBalance(){
+      NativeLib.Message msg = NativeLib.updateDigitBalance("0x6be9fd93ecce9ade568b7eadf382635e109ce0d2","3","600");
+        System.out.println(msg);
+    }
     public static void walletSaveTest(){
-
-        NativeLib.Wallet wallet =  NativeLib.saveWallet("wallet_hello" ,"123456".getBytes(),"hello test".getBytes(),1);
+        NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(15);
+        NativeLib.Wallet wallet =  NativeLib.saveWallet("wallet_hello" ,"123456".getBytes(),mnemonic.mn,1);
         System.out.println(wallet.toString());
     }
 
