@@ -151,15 +151,7 @@ impl DataServiceProvider {
         stat.next().map(|_|true).map_err(|err|err.into())
 
     }
-    pub fn update_balance(&mut self,address:&str,digit_id:&str,balance:&str)-> Result<bool, WalletError>{
 
-        let sql = "update detail.DigitUseDetail set balance = ? where digit_id = ? and address_id = (select address_id from detail.address where address = ?);";
-        let mut state = self.db_hander.prepare(sql)?;
-        state.bind(1,balance)?;
-        state.bind(1,digit_id)?;
-        state.bind(1,address)?;
-        state.cursor().next().map(|_|true).map_err(|e|e.into())
-    }
     pub fn get_now_chain_type(&mut self, walletid: &str) -> Result<i64, WalletError> {
         let query_sql = "select display_chain_id from Wallet where wallet_id = ?";
         let mut state = self.db_hander.prepare(query_sql)?;

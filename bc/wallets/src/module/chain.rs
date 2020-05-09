@@ -371,11 +371,6 @@ pub fn set_now_chain_type(walletid: &str, chain_type: i64) -> Result<bool, Walle
     instance.set_now_chain_type(walletid, chain_type)
 }
 
-pub fn update_digit_balance(address: &str, digit_id: &str, balance: &str) -> Result<bool, WalletError> {
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
-    instance.update_balance(address, digit_id, balance)
-}
-
 //解析eth交易添加的附加信息
 pub fn decode_eth_data(input: &str) -> Result<String, WalletError> {
     if input.is_empty() {
