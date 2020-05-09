@@ -3,6 +3,7 @@ import 'package:app/demo/tx_demo.dart';
 import 'package:app/generated/i18n.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/transaction_history_page/transaction_history_page.dart';
+import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:app/page/eth_page/eth_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'dapp_page/dapp_page.dart';
 
 class EntryPage extends StatefulWidget {
@@ -26,8 +28,8 @@ class _EntryPageState extends State<EntryPage> {
   bool _agreeServiceProtocol = true;
   bool isContainWallet = false;
   Future future;
-  String languageValue;
-  List<String> languageList = ["中文", "English"];
+  String languageValue = "";
+  List<String> languageList = ["zh", "en"];
 
   @override
   void initState() {
@@ -77,15 +79,15 @@ class _EntryPageState extends State<EntryPage> {
                 //return DAppWebViewDemo();
                 //return EeePage();    //版本说明：提供eee界面，可以看账户信息address，和切换钱包
               } else {
-                return _buildProtocolLayout();
+                return _buildProtocolLayout(context);
               }
             }
-            return _buildProtocolLayout();
+            return _buildProtocolLayout(context);
           }),
     );
   }
 
-  Widget _buildProtocolLayout() {
+  Widget _buildProtocolLayout(context) {
     return Material(
       child: Container(
         width: ScreenUtil().setWidth(90),
@@ -98,7 +100,7 @@ class _EntryPageState extends State<EntryPage> {
           child: Column(
             children: <Widget>[
               Gaps.scaleVGap(10),
-              _buildChangeLanguageWidget(),
+              _buildChangeLanguageWidget(context),
               Gaps.scaleVGap(20),
               _buildLogoWidget(),
               //Gaps.scaleVGap(2.5),
@@ -116,7 +118,7 @@ class _EntryPageState extends State<EntryPage> {
     );
   }
 
-  Widget _buildChangeLanguageWidget() {
+  Widget _buildChangeLanguageWidget(context) {
     return Container(
       margin: EdgeInsets.only(left: ScreenUtil.instance.setWidth(50)),
       width: ScreenUtil.instance.setWidth(25),
@@ -124,7 +126,10 @@ class _EntryPageState extends State<EntryPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          Text(languageValue,style: TextStyle(color: Colors.white30),),
+          Text(
+            languageValue,
+            style: TextStyle(color: Colors.white30),
+          ),
           PopupMenuButton<String>(
             color: Colors.black12,
             icon: Icon(Icons.keyboard_arrow_down),
@@ -133,6 +138,10 @@ class _EntryPageState extends State<EntryPage> {
               setState(() {
                 languageValue = value;
               });
+              //todo 监测这种方案,能不能实现更改语言
+              print("languageValue===》" + value);
+              print("WalletManagerProvide===》" + Provider.of<WalletManagerProvide>(context).locale);
+              Provider.of<WalletManagerProvide>(context).setLocale(languageValue);
             },
           )
         ],
@@ -150,25 +159,6 @@ class _EntryPageState extends State<EntryPage> {
           ));
     });
     return popMenuList;
-  }
-
-  languageItem() {
-    var items = List<DropdownMenuItem<String>>();
-    items.add(DropdownMenuItem(
-      child: Text(
-        "中文",
-        style: TextStyle(color: Colors.black54),
-      ),
-      value: "中文",
-    ));
-    items.add(DropdownMenuItem(
-      child: Text(
-        "English",
-        style: TextStyle(color: Colors.black54),
-      ),
-      value: "English",
-    ));
-    return items;
   }
 
   Widget _buildLogoWidget() {

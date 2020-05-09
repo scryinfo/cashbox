@@ -88,7 +88,7 @@ class _EthPageState extends State<EthPage> {
     LogUtil.d("begin init dart log==================>", "dart log  init");
     loadDigitBalance();
     loadLegalCurrency();
-    loadDigitRateInfo();
+    //loadDigitRateInfo();   //todo
   }
 
   loadLegalCurrency() async {

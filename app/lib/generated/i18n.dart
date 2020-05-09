@@ -22,7 +22,7 @@ class S implements WidgetsLocalizations {
   TextDirection get textDirection => TextDirection.ltr;
 
   String get about_us_title => "关于我们";
-  String get add_wallet => "添加钱包";
+  String get add_wallet => "Add Wallet";
   String get address_empty => "地址信息为空，请再检查";
   String get advice_pwd_format => "建议大于8位，英文、数字混合";
   String get agree_service_prefix => "我已仔细阅读并同意";
@@ -71,7 +71,7 @@ class S implements WidgetsLocalizations {
   String get gas_used => "gas消耗";
   String get high_setting => "高级设置";
   String get hint_extend_msg_option => "添加交易备注信息(可选)";
-  String get import_wallet => "导入钱包";
+  String get import_wallet => "import wallet";
   String get info_sign => "信息签名";
   String get info_sign_hint => "请确认选择对应钱包后，输入密码进行签名";
   String get input_format_hint => "建议8-24位，英文数字混合";

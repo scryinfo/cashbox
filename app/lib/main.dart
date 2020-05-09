@@ -20,8 +20,8 @@ import 'package:flutter/rendering.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); //确保WidgetsFlutterBinding被初始化 把widget跟flutter绑定在一起。
- //  debugPaintLayerBordersEnabled=true; //测试样式边界用
- //  debugPaintBaselinesEnabled=true;
+  //  debugPaintLayerBordersEnabled=true; //测试样式边界用
+  //  debugPaintBaselinesEnabled=true;
   ///强制竖屏
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
@@ -76,7 +76,15 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
           ],
           supportedLocales: S.delegate.supportedLocales,
-          home: EntryPage(),
+          home: Builder(
+            builder: (BuildContext context) {
+              return Localizations.override(
+                context: context,
+                locale: Provider.of<WalletManagerProvide>(context).locale == "en" ? Locale('en', '') : Locale('zh', ''), //todo
+                child: EntryPage(),
+              );
+            },
+          ),
           onGenerateRoute: Application.router.generator,
         ),
       ),
