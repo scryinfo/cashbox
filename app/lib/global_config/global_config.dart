@@ -2,6 +2,8 @@
 *     1 ETH = 1e9gwei (10的九次方) = 1e18 wei
 * */
 
+import 'dart:ui';
+
 import 'package:app/model/chain.dart';
 
 class GlobalConfig {
@@ -17,6 +19,22 @@ class GlobalConfig {
   static Map<String, double> defaultGasPriceMap = {EthGasPriceKey: 9, Erc20GasPriceKey: 6};
 
   static bool isDebugVersion = true; //全局开关，控制是否用 测试链
+
+  static String savedLocaleKey = "savedLocaleKey"; //默认语言中文；
+  static String defaultLocaleKey = "zh"; //默认语言中文；
+  static String zhLocale = "zh"; //
+  static String enLocale = "en"; //
+
+  static Locale loadLocale(String locale) {
+    switch (locale) {
+      case 'zh':
+        return Locale('zh', '');
+      case 'en':
+        return Locale('en', '');
+      default:
+        return Locale('zh', '');
+    }
+  }
 
   //保存dapp 合约地址信息
   static String diamondCaFileName = "contract_address.txt";

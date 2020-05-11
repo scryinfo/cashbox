@@ -1,6 +1,7 @@
 import 'package:app/demo/dapp_webview_demo.dart';
 import 'package:app/demo/tx_demo.dart';
 import 'package:app/generated/i18n.dart';
+import 'package:app/global_config/global_config.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/transaction_history_page/transaction_history_page.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
@@ -8,6 +9,8 @@ import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
+import 'package:app/util/sharedpreference_util.dart';
+import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:app/model/wallets.dart';
@@ -29,7 +32,7 @@ class _EntryPageState extends State<EntryPage> {
   bool isContainWallet = false;
   Future future;
   String languageValue = "";
-  List<String> languageList = ["zh", "en"];
+  List<String> languageList = [];
 
   @override
   void initState() {
@@ -43,6 +46,9 @@ class _EntryPageState extends State<EntryPage> {
   }
 
   void _initData() async {
+    languageList = [];
+    languageList.add(GlobalConfig.zhLocale);
+    languageList.add(GlobalConfig.enLocale);
     future = _checkIsContainWallet();
   }
 
@@ -134,14 +140,15 @@ class _EntryPageState extends State<EntryPage> {
             color: Colors.black12,
             icon: Icon(Icons.keyboard_arrow_down),
             itemBuilder: (BuildContext context) => _makePopMenuList(),
-            onSelected: (String value) {
+            onSelected: (String value) async {
               setState(() {
                 languageValue = value;
               });
-              //todo 监测这种方案,能不能实现更改语言
-              print("languageValue===》" + value);
-              print("WalletManagerProvide===》" + Provider.of<WalletManagerProvide>(context).locale);
+              print("spUtil locale save is ===》" + languageValue);
+              var spUtil = await SharedPreferenceUtil.instance;
+              spUtil.setString(GlobalConfig.savedLocaleKey, languageValue);
               Provider.of<WalletManagerProvide>(context).setLocale(languageValue);
+              RestartWidget.restartApp(context);
             },
           )
         ],
