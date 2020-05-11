@@ -31,8 +31,9 @@ class _EntryPageState extends State<EntryPage> {
   bool _agreeServiceProtocol = true;
   bool isContainWallet = false;
   Future future;
-  String languageValue = "";
+  String languageTextValue = "";
   List<String> languageList = [];
+  Map<String, String> languageMap = {};
 
   @override
   void initState() {
@@ -49,10 +50,14 @@ class _EntryPageState extends State<EntryPage> {
     languageList = [];
     languageList.add(GlobalConfig.zhLocale);
     languageList.add(GlobalConfig.enLocale);
+    languageMap = {};
+    languageMap.addAll({GlobalConfig.zhLocale: "中文", GlobalConfig.enLocale: "English"});
     future = _checkIsContainWallet();
   }
 
   Future<bool> _checkIsContainWallet() async {
+    var spUtil = await SharedPreferenceUtil.instance;
+    languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
     isContainWallet = await Wallets.instance.isContainWallet();
     return isContainWallet;
   }
@@ -133,8 +138,8 @@ class _EntryPageState extends State<EntryPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           Text(
-            languageValue,
-            style: TextStyle(color: Colors.white30),
+            languageTextValue,
+            style: TextStyle(color: Colors.lightBlue),
           ),
           PopupMenuButton<String>(
             color: Colors.black12,
@@ -142,12 +147,11 @@ class _EntryPageState extends State<EntryPage> {
             itemBuilder: (BuildContext context) => _makePopMenuList(),
             onSelected: (String value) async {
               setState(() {
-                languageValue = value;
+                this.languageTextValue = languageMap[value];
               });
-              print("spUtil locale save is ===》" + languageValue);
               var spUtil = await SharedPreferenceUtil.instance;
-              spUtil.setString(GlobalConfig.savedLocaleKey, languageValue);
-              Provider.of<WalletManagerProvide>(context).setLocale(languageValue);
+              spUtil.setString(GlobalConfig.savedLocaleKey, value);
+              Provider.of<WalletManagerProvide>(context).setLocale(value);
               RestartWidget.restartApp(context);
             },
           )
@@ -161,7 +165,7 @@ class _EntryPageState extends State<EntryPage> {
       return PopupMenuItem<String>(
           value: languageList[index] ?? "",
           child: new Text(
-            languageList[index] ?? "",
+            languageMap[languageList[index]] ?? "",
             style: new TextStyle(color: Colors.white54),
           ));
     });
