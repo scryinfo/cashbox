@@ -13,16 +13,20 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-      // walletGenerateTest();
+       //walletGenerateTest();
        // walletExportTest();
         // eeeTxsign();
       //  walletSaveTest();
-        updateBalance();
+       // updateBalance();
+        addDigitTest();
         List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
-        System.out.println(wallets.size());
         System.out.println(wallets.toString());
     }
 
+    public static void  addDigitTest(){
+        NativeLib.WalletState state =  NativeLib.addDigit("bc520f80-c86a-45ac-baad-099a524ff3e0","3","NNN Times","NNN","0x7be9fd92ecce9ade568b7eadf382635e109ce0d2",18);
+        System.out.println(state);
+    }
     public static  void  updateBalance(){
       NativeLib.Message msg = NativeLib.updateDigitBalance("0x6be9fd93ecce9ade568b7eadf382635e109ce0d2","3","600");
         System.out.println(msg);

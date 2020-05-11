@@ -153,6 +153,14 @@ JNIEXPORT jobject JNICALL Java_info_scry_wallet_1manager_NativeLib_hideDigit
 
 /*
  * Class:     info_scry_wallet_manager_NativeLib
+ * Method:    addDigit
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Linfo/scry/wallet_manager/NativeLib/WalletState;
+ */
+JNIEXPORT jobject JNICALL Java_info_scry_wallet_1manager_NativeLib_addDigit
+  (JNIEnv *, jclass, jstring, jstring, jstring, jstring, jstring, jint);
+
+/*
+ * Class:     info_scry_wallet_manager_NativeLib
  * Method:    eeeOpen
  * Signature: (Ljava/lang/String;Ljava/lang/String;)Linfo/scry/wallet_manager/NativeLib/Handle;
  */
@@ -234,10 +242,10 @@ JNIEXPORT jstring JNICALL Java_info_scry_wallet_1manager_NativeLib_eeeGetTxNonce
 /*
  * Class:     info_scry_wallet_manager_NativeLib
  * Method:    ethTxSign
- * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Linfo/scry/wallet_manager/NativeLib/Message;
+ * Signature: (Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BLjava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Linfo/scry/wallet_manager/NativeLib/Message;
  */
 JNIEXPORT jobject JNICALL Java_info_scry_wallet_1manager_NativeLib_ethTxSign
-  (JNIEnv *, jclass, jstring, jint, jstring, jstring, jstring, jstring, jstring, jbyteArray, jstring, jstring, jstring);
+  (JNIEnv *, jclass, jstring, jint, jstring, jstring, jstring, jstring, jstring, jbyteArray, jstring, jstring, jstring, jint);
 
 /*
  * Class:     info_scry_wallet_manager_NativeLib

@@ -279,7 +279,29 @@ public class NativeLib {
         public boolean isSetNowChain;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
         public boolean isShowDigit;           //设置显示代币,是否成功  apiNo:WM14   1成功 0失败
         public boolean isHideDigit;           //设置隐藏代币,是否成功  apiNo:WM15   1成功 0失败
+        public boolean isAddDigit;            //添加代币,是否成功      apiNo:WM16   1成功 0失败
         public String message;                //错误信息，详细说明
+
+        @Override
+        public String toString() {
+            return "WalletState{" +
+                    "status=" + status +
+                    ", isContainWallet=" + isContainWallet +
+                    ", walletId='" + walletId + '\'' +
+                    ", isSetNowWallet=" + isSetNowWallet +
+                    ", isDeletWallet=" + isDeletWallet +
+                    ", isResetPwd=" + isResetPwd +
+                    ", isRename=" + isRename +
+                    ", isShowChain=" + isShowChain +
+                    ", isHideChain=" + isHideChain +
+                    ", getnNowChainType=" + getnNowChainType +
+                    ", isSetNowChain=" + isSetNowChain +
+                    ", isShowDigit=" + isShowDigit +
+                    ", isHideDigit=" + isHideDigit +
+                    ", isAddDigit=" + isAddDigit +
+                    ", message='" + message + '\'' +
+                    '}';
+        }
     }
 
     // 是否已有钱包
@@ -341,6 +363,9 @@ public class NativeLib {
     // 隐藏代币
     // apiNo:WM15
     public static native WalletState hideDigit(String walletId, String chainId, String digitId);
+
+    // 增加代币
+    public static native WalletState addDigit(String walletId, String chainId, String fullName, String shortName, String contractAddress, int decimal);
 
     /*------------------------------------------链相关------------------------------------------*/
 

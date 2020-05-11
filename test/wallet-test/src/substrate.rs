@@ -57,15 +57,6 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeEnergyTransfer(env
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_state_class is error");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
 
-    /*match wallets::module::chain::eee_tranfer_energy(&from,&to,&value,pwd.as_slice()){
-        Ok(data)=>{
-            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set isSetNowWallet value is error!");
-            env.set_field(state_obj, "energyTransferInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value is error!");
-        },
-        Err(msg)=>{
-            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set isSetNowWallet value is error!");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
-        }
-    }*/
+
     *state_obj
 }
