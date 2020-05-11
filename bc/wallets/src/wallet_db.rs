@@ -5,3 +5,5 @@ pub mod table_desc;
 pub mod wallet;
 pub mod chain;
 pub mod digit;
+
+pub use table_desc::DigitExport;

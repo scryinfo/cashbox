@@ -146,7 +146,6 @@ pub fn rename_wallet(walletid: &str, wallet_name: &str) -> Result<bool, WalletEr
     instance.rename_mnemonic(walletid, wallet_name).map(|_| true)
 }
 
-
 //根据生成钱包的类型，需要创建对应的地址
 pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, WalletError> {
     let phrase = String::from_utf8(mn.to_vec())?;
@@ -169,10 +168,6 @@ pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Addres
             let secret_byte = ethtx::pri_from_mnemonic(&phrase, None)?;
             let context = Secp256k1::new();
             let secret = SecretKey::from_slice(&secret_byte)?;
-          /*  if secret.is_err() {
-                let msg = format!("SecretKey recover error,detail:{}", secret.unwrap_err());
-                return Err(WalletError::Custom(msg));
-            }*/
             let public_key = PublicKey::from_secret_key(&context, &secret);
             //一个是非压缩公钥 用于地址生成
             let puk_uncompressed = &public_key.serialize_uncompressed()[..];
@@ -397,6 +392,8 @@ pub fn raw_sign(raw_data: &str, wallet_id: &str, psw: &[u8]) -> Result<String, W
         Err(info) => Err(info)
     }
 }
+
+//todo 增加通过钱包id查询钱包的实现
 
 
 

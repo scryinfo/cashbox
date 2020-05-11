@@ -1,5 +1,5 @@
 
-/// Description of a Transaction, pending or in the chain.
+/// Description of a Digit
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
 pub struct DigitExport {
     /// Nonce
@@ -13,6 +13,8 @@ pub struct DigitExport {
     /// Input data
     #[serde(rename = "urlImg")]
     pub url_img: Option<String>,
+
+    pub short_name:Option<String>,
 }
 
 pub fn get_cashbox_wallet_detail_sql() -> String {
@@ -49,7 +51,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     CREATE TABLE [main].[DigitBase](
     [id] INTEGER PRIMARY KEY NOT NULL,
     [contract_address] VARCHAR(64),
-	[type] INT  NOT NULL,
+	[chain_id] INT  NOT NULL,
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(32),
     [next_id] INT,

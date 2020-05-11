@@ -90,15 +90,15 @@ impl DataServiceProvider {
         }).map_err(|err|err.into())
     }
 
-    pub fn tx_begin(&mut self) -> Result<(), WalletError> {
+    pub fn tx_begin(&self) -> Result<(), WalletError> {
         self.db_hander.execute("begin;").map(|_| ()).map_err(|err| err.into())
     }
 
-    pub fn tx_commint(&mut self) -> Result<(), WalletError> {
+    pub fn tx_commint(&self) -> Result<(), WalletError> {
         self.db_hander.execute("commit;").map(|_| ()).map_err(|err| err.into())
     }
 
-    pub fn tx_rollback(&mut self) -> Result<(), WalletError> {
+    pub fn tx_rollback(&self) -> Result<(), WalletError> {
         self.db_hander.execute("rollback;").map(|_| ()).map_err(|err| err.into())
     }
 

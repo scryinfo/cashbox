@@ -30,7 +30,6 @@ pub enum Error {
     #[from(ignore)]
     Other(String),
 
-
 }
 
 impl std::error::Error for Error {
@@ -42,24 +41,6 @@ impl std::error::Error for Error {
         }
     }
 }
-
-/*impl fmt::Display for Error{
-
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Error::Io(ref err)=>err.fmt(f),
-            Error::Sqlite(ref err)=>err.fmt(f),
-            Error::EthTx(ref err)=>err.fmt(f),
-            Error::Serde(ref err)=>err.fmt(f),
-            WalletError::Public(err)=>write!(f, "sp_core Public error: {:?}", err),
-            WalletError::ScaleCodec(ref err)=>err.fmt(f),
-            WalletError::NotExist=>write!(f,"value not exist"),
-            WalletError::Custom(err) => write!(f, "wallet custom error: {}", err),
-            WalletError::Decode(err) => write!(f, "wallet decode error: {}", err),
-        }
-
-    }
-}*/
 
 impl From<SerdeError> for Error {
     fn from(err: SerdeError) -> Self {

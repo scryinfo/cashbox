@@ -7,7 +7,7 @@ pub mod android {
     use jni::objects::{JObject, JValue,JClass,JString};
     use wallets::model::{EeeChain,BtcChain,EthChain};
     use std::os::raw::{c_uchar, c_int};
-    use jni::sys::jobject;
+    use jni::sys::{jobject,jint};
     use wallets::StatusCode;
 
     #[no_mangle]
@@ -54,6 +54,38 @@ pub mod android {
         *state_obj
     }
 
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_addDigit(env: JNIEnv, _: JClass, walletId:JString, chainId:JString,fullName:JString, shortName:JString, contractAddress:JString, decimal:jint) -> jobject{
+        let wallet_id: String = env.get_string(walletId).unwrap().into();
+        let chain_id: String = env.get_string(chainId).unwrap().into();
+        let fullName: String = env.get_string(fullName).unwrap().into();
+        let shortName: String = env.get_string(shortName).unwrap().into();
+        let contractAddress: String = env.get_string(contractAddress).unwrap().into();
+        //根据链类型转换对应的代币类型
+        let digit = wallets::wallet_db::DigitExport{
+            address: contractAddress,
+            symbol: fullName,
+            decimal: decimal as i64,
+            digit_type:   if chain_id.eq("3") { "default".to_string()}else{"test".to_string()},
+            url_img: None,
+            short_name: Some(shortName),
+        };
+
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        match wallets::module::digit::add_wallet_digit(&wallet_id,&chain_id,digit){
+            Ok(_) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "isAddDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value is error!");
+            },
+            Err(msg) => {
+                env.set_field(state_obj, "isAddDigit", "Z", JValue::Bool(0 as u8)).expect("showDigit value is error!");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
+            }
+        }
+        *state_obj
+    }
 
     #[no_mangle]
     #[allow(non_snake_case)]

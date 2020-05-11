@@ -287,7 +287,7 @@ impl DataServiceProvider {
         Ok(tbwallets)
     }
     pub fn init_data(&mut self) -> Result<(), WalletError> {
-        self.tx_begin();
+      /*  self.tx_begin();
         //初始化钱包数据
 
         //初始化代币数据
@@ -297,35 +297,7 @@ impl DataServiceProvider {
             self.tx_rollback();
             return Err(err);
         }
-        Ok(())
-    }
-
-    fn init_digit_base_data(&self,digits:Vec<table_desc::DigitExport>)->Result<(),WalletError>{
-        let digit_base_insert_sql = "insert into detail.DigitBase('contract_address','type','short_name','full_name','decimals','group_name','url_img','is_visible') values(?,?,?,?,?,?,?,?); ";
-        let mut state = self.db_hander.prepare(digit_base_insert_sql)?;
-
-        for digit in digits {
-            state.bind(1, digit.address.as_str())?;
-            let digit_type = if digit.digit_type.eq("default") {1 }else { 0 };
-            state.bind(2, digit_type as i64)?;
-            //设置短名称
-            state.bind(3, digit.symbol.as_str())?;
-            //设置长名称 这里由于数据不足，短名称和长名称相同
-            state.bind(4, digit.symbol.as_str())?;
-            state.bind(5, digit.decimal)?;
-            state.bind(6, "ETH")?;
-
-            match digit.url_img {
-                Some(url)=> state.bind(7,url.as_str())?,
-                None=> state.bind(7,"")?,
-            };
-            state.bind(8, 0 as i64)?;
-            state.next()?;
-            state.reset()?;
-        }
-        //设置默认代币状态
-        let update_digit_status = "update DigitBase set status =1,is_visible =1 where full_name like 'DDD';";
-        self.db_hander.execute(update_digit_status)?;
+        */
         Ok(())
     }
 }
