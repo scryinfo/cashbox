@@ -159,19 +159,19 @@ public class NativeLib {
 
     public static class WalletState {
         public int status;                    //通信消息状态码         200消息正常返回
-        public boolean isContainWallet;       //是否已有钱包           apiNo:WM01   1成功 0失败
-        public String walletId;               //当前钱包id             apiNo:WM05
-        public boolean isSetNowWallet;        //设置当前钱包,是否成功  apiNo:WM06   1成功 0失败
-        public boolean isDeletWallet;         //删除钱包是否成功       apiNo:WM07   1成功 0失败
-        public boolean isResetPwd;            //重置密码是否成功       apiNo:WM08   1成功 0失败
-        public boolean isRename;              //重置钱包名是否成功     apiNo:WM09   1成功 0失败
-        public boolean isShowChain;           //设置显示链,是否成功    apiNo:WM10   1成功 0失败
-        public boolean isHideChain;           //设置隐藏链,是否成功    apiNo:WM11   1成功 0失败
+        public boolean isContainWallet;       //是否已有钱包          apiNo:WM01   执行状态：1成功 0失败
+        public String walletId;               //当前钱包id            apiNo:WM05
+        public boolean isSetNowWallet;        //设置当前钱包,是否成功  apiNo:WM06   执行状态：1成功 0失败
+        public boolean isDeletWallet;         //删除钱包是否成功       apiNo:WM07   执行状态： 1成功 0失败
+        public boolean isResetPwd;            //重置密码是否成功       apiNo:WM08   执行状态： 1成功 0失败
+        public boolean isRename;              //重置钱包名是否成功     apiNo:WM09   执行状态： 1成功 0失败
+        public boolean isShowChain;           //设置显示链,是否成功    apiNo:WM10   执行状态： 1成功 0失败
+        public boolean isHideChain;           //设置隐藏链,是否成功    apiNo:WM11   执行状态： 1成功 0失败
         public int getNowChainType;           //获取当前链类型         apiNo:WM12   int
-        public boolean isSetNowChain;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
-        public boolean isShowDigit;           //设置显示代币,是否成功  apiNo:WM14   1成功 0失败
-        public boolean isHideDigit;           //设置隐藏代币,是否成功  apiNo:WM15   1成功 0失败
-        public boolean isAddDigit;            //添加代币,是否成功      apiNo:WM16   1成功 0失败
+        public boolean isSetNowChain;         //设置当前链,是否成功     apiNo:WM13   执行状态： 1成功 0失败
+        public boolean isShowDigit;           //设置显示代币,是否成功   apiNo:WM14   执行状态： 1成功 0失败
+        public boolean isHideDigit;           //设置隐藏代币,是否成功   apiNo:WM15   执行状态： 1成功 0失败
+        public boolean isAddDigit;            //添加代币,是否成功       apiNo:WM16   执行状态： 1成功 0失败
         public String message;                //错误信息，详细说明
     }
 
