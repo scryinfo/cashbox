@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use ethereum_types::{H160, U256, H256};
 
 // 转EEE链代币
-pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str,genesis_hash: &str, index: u32,runtime_version:u32, psw: &[u8]) -> Result<String, WalletError> {
+pub fn eee_transfer(from: &str, to: &str, amount: &str,genesis_hash: &str, index: u32,runtime_version:u32, psw: &[u8]) -> Result<String, WalletError> {
     match module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE) {
         Ok(keystore) => {
             //todo 使用优化的错误返回方式
@@ -31,9 +31,9 @@ pub fn eee_tranfer_energy(from: &str, to: &str, amount: &str,genesis_hash: &str,
                 }
                 Err(msg) => Err(msg.into()),
             }
-        }
-        Err(msg) => { Err(msg.into()) }
-    }
+       }
+   Err(msg) => { Err(msg.into()) }
+ }
 }
 
 

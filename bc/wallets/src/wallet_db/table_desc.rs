@@ -51,7 +51,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     CREATE TABLE [main].[DigitBase](
     [id] INTEGER PRIMARY KEY NOT NULL,
     [contract_address] VARCHAR(64),
-	[chain_id] INT  NOT NULL,
+	[type] INT  NOT NULL,
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(32),
     [next_id] INT,

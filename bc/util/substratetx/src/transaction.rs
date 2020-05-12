@@ -9,7 +9,7 @@ pub use sp_runtime::{
     generic::{Era, SignedPayload, UncheckedExtrinsic},
     traits::{IdentifyAccount, Verify},
 };
-
+use std::ops::Mul;
 use crypto::Crypto;
 
 //pub type Address = <Indices as StaticLookup>::Source;
@@ -101,8 +101,13 @@ pub fn transfer( mnemonic: &str, to: &str, amount: &str,genesis_hash: H256, inde
     //todo 考虑将交易的生成与交易的签名分成两个步骤，在交易生成环节可以计算出当前交易所需要的手续费，提示用户针对这次转账共需要消耗多少balance?
     let to_account_id=  AccountId::from_ss58check(to)?;
     let amount = str::parse::<Balance>(amount)?;
+    //构造转账 call function
     let function = Call::Balances(BalancesCall::transfer(to_account_id, amount)).encode();
-    let result = tx_sign(mnemonic, genesis_hash, index as u32, &function,runtime_version)?;
+    //为了能够在签名时将数据解码出来，需要为function 计算对应的前缀
+    let mut prefix = calculate_prefix(function.len());
+    prefix.extend_from_slice(&function);
+
+    let result = tx_sign(mnemonic, genesis_hash, index as u32, &prefix,runtime_version)?;
     Ok(result)
 }
 
@@ -112,4 +117,23 @@ pub fn tx_sign(mnemonic: &str, genesis_hash: H256, index: u32, func_data:&[u8],v
     let extrinsic = generate_signed_extrinsic::<crypto::Sr25519>(extrinsic.function, index, signer, genesis_hash,version);
     let result = format!("0x{}", hex::encode(&extrinsic.encode()));
     Ok(result)
+}
+
+//TODO do该计算方法是通过数字找出来的规律，这样构造出来的数据 能够在链上验证，背后的理论知识还需要再去源码中查找！
+fn calculate_prefix(func_len: usize) -> Vec<u8> {
+    //交易版本号需要占一个字节
+    let mut num = (func_len + 1).mul(4);
+    let func_base_num = num;
+    let mut add_num: usize = 0;
+    while num > 255 {
+        num = num >> 8;
+        add_num = add_num + 1;
+    }
+    let mut prefix_vec = vec![];
+    let num = func_base_num + add_num;
+    let prefix_le_bytes: [u8; 8] = num.to_le_bytes();
+    let zeros_num = (num.leading_zeros() / 8) as usize;
+    prefix_vec.extend_from_slice(&prefix_le_bytes[0..8 - zeros_num]);
+    prefix_vec.push(4u8);
+    prefix_vec
 }

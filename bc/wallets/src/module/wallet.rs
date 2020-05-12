@@ -352,7 +352,7 @@ struct RawTx {
     genesis_hash: H256,
     version: u32,
 }
-
+// 这个函数用于外部拼接好的交易，比如通过js方式构造的交易
 pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> Result<String, WalletError> {
     //todo 交易构造接口重构
     let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
