@@ -1,13 +1,8 @@
 import 'package:app/generated/i18n.dart';
-import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
-import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
-import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
-import 'package:app/routers/fluro_navigator.dart';
-import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
@@ -17,7 +12,6 @@ import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 
 class DigitsManagePage extends StatefulWidget {
   @override
@@ -26,9 +20,6 @@ class DigitsManagePage extends StatefulWidget {
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
-  Wallet nowWalletM;
-  Chain nowChain;
-  String nowChainAddress = "";
   List<Digit> nowChainDigitsList = [];
   List<Digit> displayDigitsList = [];
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
@@ -41,14 +32,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   initData() async {
-    nowWalletM = Wallets.instance.nowWallet;
-    if (nowWalletM != null) {
-      nowChain = nowWalletM.getNowChainM();
-    }
-    if (nowChain != null) {
-      //todo  根据链类型，去访问后台代币列表,获得 nowChainDigitsList
-      nowChainDigitsList = nowChain.digitsList;
-    }
+    nowChainDigitsList = Wallets.instance.nowWallet.getNowChainM().digitsList;
     await loadDisplayDigitListData();
   }
 
@@ -105,7 +89,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           () {
             setState(() {
               if (displayDigitsList.length < nowChainDigitsList.length) {
-                // 从JNI加载的数据(nowChain.digitList),还有没显示完的，继续将nowChainDigitsList剩余数据，
+                // 从JNI加载的数据(nowWalletM.getNowChainM().digitList),还有没显示完的，继续将nowChainDigitsList剩余数据，
                 // 添加到 displayDigitsList里面做展示
                 loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
               } else {
@@ -137,9 +121,9 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               onTap: () async {
                 var isExecutorSuccess = false;
                 if (displayDigitsList[index].isVisible) {
-                  isExecutorSuccess = await nowChain.hideDigit(displayDigitsList[index]);
+                  isExecutorSuccess = await Wallets.instance.nowWallet.getNowChainM().hideDigit(displayDigitsList[index]);
                 } else {
-                  isExecutorSuccess = await nowChain.showDigit(displayDigitsList[index]);
+                  isExecutorSuccess = await Wallets.instance.nowWallet.getNowChainM().showDigit(displayDigitsList[index]);
                 }
                 if (isExecutorSuccess) {
                   setState(() {
@@ -157,7 +141,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                     Container(
                       width: ScreenUtil().setWidth(10),
                       height: ScreenUtil().setWidth(10),
-                      child: displayDigitsList[index].isVisible ? addWidget : checkedWidget,
+                      child: displayDigitsList[index].isVisible ? checkedWidget : addWidget,
                     ),
                     Container(
                       width: ScreenUtil().setWidth(10),
