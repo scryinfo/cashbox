@@ -20,8 +20,9 @@ class DigitsManagePage extends StatefulWidget {
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
-  List<Digit> nowChainDigitsList = [];
-  List<Digit> displayDigitsList = [];
+  List<Digit> nowChainDigitsList = []; //当前链的代币列表
+  List<Digit> serverDigitsList = []; //服务器接口上的代币列表
+  List<Digit> displayDigitsList = []; //页面展示的代币列表数据
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
 
@@ -38,21 +39,38 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: ScreenUtil().setWidth(90),
-      height: ScreenUtil().setHeight(120),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: MyAppBar(
-          centerTitle: S.of(context).digit_list_title,
-          backgroundColor: Colors.transparent,
+    return WillPopScope(
+        child: Container(
+          width: ScreenUtil().setWidth(90),
+          height: ScreenUtil().setHeight(120),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              leading: GestureDetector(
+                  onTap: () {
+                    backAndReloadData();
+                  },
+                  child: Image.asset("assets/images/ic_eth.png")),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              brightness: Brightness.light,
+              centerTitle: true,
+              title: Text(
+                S.of(context).digit_list_title ?? "",
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+            body: Container(
+                child: Column(
+              children: <Widget>[Gaps.scaleVGap(5), _digitListAreaWidgets()],
+            )),
+          ),
         ),
-        body: Container(
-            child: Column(
-          children: <Widget>[Gaps.scaleVGap(5), _digitListAreaWidgets()],
-        )),
-      ),
-    );
+        onWillPop: () {
+          print("touch ed back keyboard");
+          backAndReloadData();
+          Navigator.pop(context);
+        });
   }
 
   Widget _digitListAreaWidgets() {
@@ -126,6 +144,12 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   isExecutorSuccess = await Wallets.instance.nowWallet.getNowChainM().showDigit(displayDigitsList[index]);
                 }
                 if (isExecutorSuccess) {
+                  Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
+                    if (element.shortName == displayDigitsList[index].shortName) {
+                      element.isVisible = displayDigitsList[index].isVisible;
+                    }
+                    print("digit_manage_page digit.shortname===>" + element.shortName + "||element.isVisible===>" + element.isVisible.toString());
+                  });
                   setState(() {
                     displayDigitsList[index].isVisible = displayDigitsList[index].isVisible;
                   });
@@ -181,6 +205,11 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         )
       ],
     );
+  }
+
+  //
+  backAndReloadData() {
+    // enter page reload  nowWallet.nowChain.digitList
   }
 
   Future<List<Digit>> loadDisplayDigitListData() async {
