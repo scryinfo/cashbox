@@ -40,7 +40,6 @@ class _EthPageState extends State<EthPage> {
   num nowWalletAmount = 0.00; //当前钱包内代币总市价
   List<String> moneyUnitList = [];
   List<String> chainTypeList = []; //"BTC", "ETH",
-  Chain nowChain;
   String nowChainAddress = "";
   String walletName = "";
   Future future;
@@ -64,19 +63,19 @@ class _EthPageState extends State<EthPage> {
       if (wallet.isNowWallet == true) {
         this.nowWallet = wallet;
         this.nowWallet.chainList.forEach((item) {
-          if (item.chainType == ChainType.ETH || item.chainType == ChainType.ETH_TEST) {
-            chainTypeList.add(Chain.chainTypeToValue(item.chainType));
-          }
+          //if (item.chainType == ChainType.ETH || item.chainType == ChainType.ETH_TEST) {
+          chainTypeList.add(Chain.chainTypeToValue(item.chainType));
+          //}
         });
         this.walletName = nowWallet.walletName;
-        if (nowWallet.walletType == WalletType.WALLET) {
-          this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
-        } else {
-          this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST);
-        }
-        wallet.setNowChainM(nowChain);
-        this.nowChainAddress = nowChain.chainAddress;
-        this.nowChainDigitsList = nowChain.digitsList;
+        // if (nowWallet.walletType == WalletType.WALLET) {
+        //   this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH);
+        // } else if (nowWallet.walletType == WalletType.TEST_WALLET) {
+        //   this.nowChain = this.nowWallet.getChainByChainType(ChainType.ETH_TEST);
+        // }
+        print("nowChain initData =====>" + this.nowWallet.nowChain.chainType.toString());
+        this.nowChainAddress = this.nowWallet.nowChain.chainAddress;
+        this.nowChainDigitsList = this.nowWallet.nowChain.digitsList;
         break; //找到，终止循环
       }
     }
@@ -140,12 +139,12 @@ class _EthPageState extends State<EthPage> {
             this.displayDigitsList[i].address.toString());
         String balance;
         if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
-          print(" nowChain.chainType===>" + this.nowChain.chainType.toString());
-          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, this.nowChain.chainType);
+          print(" nowChain.chainType===>" + this.nowWallet.nowChain.chainType.toString());
+          balance = await loadErc20Balance(nowChainAddress, this.displayDigitsList[i].contractAddress, this.nowWallet.nowChain.chainType);
           print("erc20 balance==>" + balance.toString());
           Wallets.instance.updateDigitBalance(this.displayDigitsList[i].contractAddress, this.displayDigitsList[i].digitId, balance ?? "");
         } else if (nowChainAddress != null && nowChainAddress.trim() != "") {
-          balance = await loadEthBalance(nowChainAddress, this.nowChain.chainType);
+          balance = await loadEthBalance(nowChainAddress, this.nowWallet.nowChain.chainType);
           print("eth balance==>" + balance.toString());
           Wallets.instance.updateDigitBalance(nowChainAddress, this.displayDigitsList[i].digitId, balance ?? "");
         } else {}
@@ -381,7 +380,7 @@ class _EthPageState extends State<EthPage> {
                   ..setMoney(displayDigitsList[index].money)
                   ..setDecimal(displayDigitsList[index].decimal)
                   ..setFromAddress(nowChainAddress)
-                  ..setChainType(nowChain.chainType)
+                  ..setChainType(this.nowWallet.nowChain.chainType)
                   ..setContractAddress(displayDigitsList[index].contractAddress);
               }
               NavigatorUtils.push(context, Routes.transactionHistoryPage);
@@ -529,7 +528,7 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
             onTap: () {
-              Provider.of<TransactionProvide>(context)..setChainType(nowChain.chainType);
+              Provider.of<TransactionProvide>(context)..setChainType(this.nowWallet.nowChain.chainType);
               NavigatorUtils.push(context, Routes.digitListPage);
             },
           ),
@@ -585,6 +584,15 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
           );
+        },
+        onIndexChanged: (index) {
+          setState(() {
+            this.nowWallet.nowChain = this.nowWallet.chainList[index];
+            this.nowChainAddress = this.nowWallet.nowChain.chainAddress;
+            this.nowChainDigitsList = this.nowWallet.nowChain.digitsList;
+            this.displayDigitsList = [];
+            loadDisplayDigitListData();
+          });
         },
         itemCount: chainTypeList.length,
         pagination: new SwiperPagination(

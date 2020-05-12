@@ -162,6 +162,7 @@ class Wallets {
       }
       if (walletM.isNowWallet) {
         this.nowWallet = walletM;
+        this.nowWallet.nowChain = this.nowWallet.getChainByChainId(this.nowWallet.nowChainId);
       }
       allWalletList.add(walletM); ////将wallet 添加到walletList里面
     }
