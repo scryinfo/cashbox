@@ -272,11 +272,15 @@ public class NativeLib {
     //第一个参数为 eeeOpen 的返回值
     //具体的参数格式，需要与Jermy一起确定
     //msg: 交易 
-    // TODO: 2019/8/17  交易方式待确定，待确定：哪边来做监听交易状态。
-    public static native Message eeeTransfer(long handle, String from, String to, String value, String extendMsg);
+    // TODO: 2019/8/17  交易方式待确定，待确定：哪边来做监听交易状态。 目前链转账模块不支持备注填写，若后续需要支持备注功能，将会重新编写转账模块，
+    //  增加新的接口，不会影响老版本APP的使用
+    // 关于eee相关的数据获取，交易提取，全部由客户端来操作，底层不对网络进行操作；
+    // 底层直接构造一个签名好的转账交易，通过Message字段中signedInfo属性传回可以直接提交的到链的信息
+    //注意：vaule 在转账中使用默认单位: unit,精度为10^12， 即 1 unit =1000_000_000_000
+    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index,int runtime_version,byte[] pwd);
 
     //msg: 交易
-    // public static native Message eeeEnergyTransfer(long handle, String from, String to, String value, String extendMsg);
+    //TODO 该接口的使用还需要重新规划
     public static native Message eeeEnergyTransfer(String from, byte[] pwd, String to, String value, String extendMsg);
 
     // 签名结果是：交易类型
