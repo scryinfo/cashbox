@@ -123,7 +123,7 @@ class WalletManager {
   // apiNo:WM15
   static Future<Map<dynamic, dynamic>> hideDigit(String walletId, String chainId, String digitId) async {
     Map<dynamic, dynamic> hideDigitMap = await _channel.invokeMethod('hideDigit', {"walletId": walletId, "chainId": chainId, "digitId": digitId});
-    return null;
+    return hideDigitMap;
   }
 
   // 添加代币 todo 2.0 待确定数据格式

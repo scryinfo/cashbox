@@ -84,11 +84,14 @@ abstract class Chain {
   // 显示代币
   // apiNo:WM14
   Future<bool> showDigit(Digit digit) async {
+    print("showDigit    walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
     Map showDigitMap = await WalletManager.showDigit(walletId, chainId, digit.digitId);
     int status = showDigitMap["status"];
     if (status == 200) {
       digit.isVisible = true;
       return true; //执行成功
+    } else {
+      print("status===>" + status.toString());
     }
     return false; //执行失败
   }
@@ -96,11 +99,14 @@ abstract class Chain {
   // 隐藏代币
   // apiNo:WM15
   Future<bool> hideDigit(Digit digit) async {
+    print("hideDigit        walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
     Map hideDigitMap = await WalletManager.hideDigit(walletId, chainId, digit.digitId);
     int status = hideDigitMap["status"];
     if (status == 200) {
       digit.isVisible = false;
       return true; //执行成功
+    } else {
+      print("status===>" + status.toString());
     }
     return false;
   }

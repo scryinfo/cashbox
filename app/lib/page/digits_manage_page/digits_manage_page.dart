@@ -227,6 +227,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       print("addDigitToDisplayList nowChainDigitsList[i].balance===>" + nowChainDigitsList[i].balance.toString());
       digit
         ..chainId = nowChainDigitsList[i].chainId
+        ..digitId = nowChainDigitsList[i].digitId
         ..decimal = nowChainDigitsList[i].decimal
         ..shortName = nowChainDigitsList[i].shortName
         ..fullName = nowChainDigitsList[i].fullName
