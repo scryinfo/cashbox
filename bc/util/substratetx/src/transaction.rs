@@ -100,7 +100,8 @@ fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C:
 pub fn transfer( mnemonic: &str, to: &str, amount: &str,genesis_hash: H256, index: u32,runtime_version:u32)-> Result<String, error::Error>{
     //todo 考虑将交易的生成与交易的签名分成两个步骤，在交易生成环节可以计算出当前交易所需要的手续费，提示用户针对这次转账共需要消耗多少balance?
     let to_account_id=  AccountId::from_ss58check(to)?;
-    let amount = str::parse::<Balance>(amount)?;
+   // let amount = str::parse::<Balance>(amount)?;
+    let amount =  balance_unit_convert(amount,12).unwrap();
     //构造转账 call function
     let function = Call::Balances(BalancesCall::transfer(to_account_id, amount)).encode();
     //为了能够在签名时将数据解码出来，需要为function 计算对应的前缀
@@ -136,4 +137,38 @@ fn calculate_prefix(func_len: usize) -> Vec<u8> {
     prefix_vec.extend_from_slice(&prefix_le_bytes[0..8 - zeros_num]);
     prefix_vec.push(4u8);
     prefix_vec
+}
+//todo 处理转换失败的情况，将option 转换为result来表示
+fn balance_unit_convert(amount:&str,decimal:usize) ->Option<u128>{
+    match amount.find(".") {
+        Some(index) => {
+            let integer_part = amount.get(0..index).unwrap();
+            //默认输入的数字在u128 表示的范围内
+            let integer_part_data = str::parse::<Balance>(integer_part).unwrap();
+            let integer_part_u128 = integer_part_data.checked_mul(10_u128.pow(decimal as u32)).unwrap();
+            //获取小数部分，只保留指定精度部分数据
+            //max_distace 用于截取小数部分的长度
+            let max_distace = if amount.len() - index <= decimal {
+                amount.len()
+            } else {
+                index + 1 + decimal
+            };
+            let decimal_part = amount.get((index + 1)..max_distace).unwrap();
+            let decimal_part_data = str::parse::<Balance>(decimal_part).unwrap();
+            //将小数点去掉后，还需要在末尾添加0的个数
+            let add_zero = decimal - decimal_part.len();
+            let base = 10_u128.pow(add_zero as u32);
+            let decimal_part_u128 = decimal_part_data.checked_mul(base).unwrap();
+            integer_part_u128.checked_add(decimal_part_u128)
+        },
+        None => {
+            let amount = str::parse::<Balance>(amount).unwrap();
+            amount.checked_mul(10_u128.pow(decimal as u32))
+        }
+    }
+}
+
+#[test]
+fn balance_unit_convert_test() {
+    println!("{:?}",balance_unit_convert("200.02",12));
 }
