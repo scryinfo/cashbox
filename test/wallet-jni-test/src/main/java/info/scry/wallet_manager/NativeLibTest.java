@@ -13,14 +13,15 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-       //walletGenerateTest();
+      // walletGenerateTest();
        // walletExportTest();
+        eeeTransferTest();
         // eeeTxsign();
       //  walletSaveTest();
        // updateBalance();
-        addDigitTest();
-        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
-        System.out.println(wallets.toString());
+       // addDigitTest();
+       // List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+        //System.out.println(wallets.toString());
     }
 
     public static void  addDigitTest(){
@@ -62,6 +63,18 @@ public class NativeLibTest {
         String rawtx = "0xd00411030f00404c948b3203029435776b349a5506857e7aafbd735966b7171b7044664866f43b818b9eef14d3a866bd100222ff18030000003f4bea2466b9e7d477e58c9c6b79aa2fbb2010ccc03aae14c0e2075cc31a571304000000";
         NativeLib.Message msg = NativeLib.eeeTxSign(rawtx,"72ae6480-ce42-4dff-abf6-6777f76d3203","123456".getBytes());
         System.out.println(msg.toString());
+    }
+
+    public static void eeeTransferTest(){
+        String from = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
+        String to = "5GGzGJR54YNjMKhaYt6hHV3o99FZ6JKYEDCrzUg1HCz1tWPa";
+        String value = "200000000000000";
+        String genesisHash = "0xabb0f2e62dfab481623438e14b5e1d4114a6e9a2f0d3f5e83f9192276e50cf34";
+        int index = 1;
+        int runtimeVersion = 1;
+        NativeLib.Message msg = NativeLib.eeeTransfer(from,to,value,genesisHash,index,runtimeVersion,"123456".getBytes());
+        System.out.println(msg);
+
     }
 
     public static void decodeTest(){

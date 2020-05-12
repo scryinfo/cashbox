@@ -416,7 +416,7 @@ public class NativeLib {
     //具体的参数格式，需要与Jermy一起确定
     //msg: 交易 
     // TODO: 2019/8/17  交易方式待确定，待确定：哪边来做监听交易状态。
-    public static native Message eeeTransfer(long handle, String from, String to, String value, String extendMsg);
+    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index,int runtime_version,byte[] pwd);
 
     //msg: 交易
     // public static native Message eeeEnergyTransfer(long handle, String from, String to, String value, String extendMsg);
