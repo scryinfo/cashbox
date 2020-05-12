@@ -263,28 +263,6 @@ pub mod android {
         *state_obj
     }
 
-  /*  #[no_mangle]
-    #[allow(non_snake_case)]
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDigitBalance(env: JNIEnv, _: JClass, address: JString,digitId: JString,balance:JString) -> jobject {
-
-        let address: String = env.get_string(address).unwrap().into();
-        let digitId: String = env.get_string(digitId).unwrap().into();
-        let balance: String = env.get_string(balance).unwrap().into();
-
-        let message_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("updateDigitBalance NativeLib$Message");
-        let state_obj = env.alloc_object(message_class).expect("updateDigitBalance create state_obj");
-        match wallets::module::chain::update_digit_balance(address.as_str(),digitId.as_str(),balance.as_str()) {
-            Ok(data)=>{
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");
-            },
-            Err(msg)=>{
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
-            }
-        }
-        *state_obj
-    }*/
-
 
     #[no_mangle]
     #[allow(non_snake_case)]

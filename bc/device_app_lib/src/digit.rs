@@ -20,8 +20,8 @@ pub mod android {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
         match wallets::module::digit::show_digit(wallet_id.as_str(),chain_id.as_str(),digit_id.as_str()) {
-            Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type is error!");
+            Ok(_code) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
                 env.set_field(state_obj, "isShowDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value is error!");
             },
             Err(msg) => {
@@ -43,11 +43,11 @@ pub mod android {
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
         match wallets::module::digit::hide_digit(wallet_id.as_str(),chain_id.as_str(),digit_id.as_str()) {
             Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "isHideDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "isHideDigit", "Z", JValue::Bool(1 as u8)).expect("hideDigit value is error!");
             },
             Err(msg) => {
-                env.set_field(state_obj, "isHideDigit", "Z", JValue::Bool(0 as u8)).expect("showDigit value is error!");
+                env.set_field(state_obj, "isHideDigit", "Z", JValue::Bool(0 as u8)).expect("hideDigit value is error!");
                 env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
             }
         }
