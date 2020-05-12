@@ -87,11 +87,13 @@ abstract class Chain {
     print("showDigit    walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
     Map showDigitMap = await WalletManager.showDigit(walletId, chainId, digit.digitId);
     int status = showDigitMap["status"];
+    bool isShowDigit = showDigitMap["isShowDigit"];
     if (status == 200) {
-      digit.isVisible = true;
-      return true; //执行成功
-    } else {
-      print("status===>" + status.toString());
+      if (isShowDigit) {
+        //执行成功
+        digit.isVisible = true;
+        return isShowDigit;
+      }
     }
     return false; //执行失败
   }
@@ -102,11 +104,12 @@ abstract class Chain {
     print("hideDigit        walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
     Map hideDigitMap = await WalletManager.hideDigit(walletId, chainId, digit.digitId);
     int status = hideDigitMap["status"];
+    bool isHideDigit = hideDigitMap["isHideDigit"];
     if (status == 200) {
-      digit.isVisible = false;
-      return true; //执行成功
-    } else {
-      print("status===>" + status.toString());
+      if (isHideDigit == true) {
+        digit.isVisible = false;
+        return isHideDigit; //执行成功
+      }
     }
     return false;
   }

@@ -134,53 +134,55 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             right: ScreenUtil().setWidth(3),
           ),
           child: GestureDetector(
-            onTap: () async {
-              print("click to 改变保存代币状态");
-              var isExecutorSuccess = false;
-              if (displayDigitsList[index].isVisible) {
-                isExecutorSuccess = await nowChain.hideDigit(displayDigitsList[index]);
-              } else {
-                isExecutorSuccess = await nowChain.showDigit(displayDigitsList[index]);
-              }
-              if (isExecutorSuccess) {
-                setState(() {
-                  displayDigitsList[index].isVisible = !displayDigitsList[index].isVisible;
-                });
-              } else {
-                Fluttertoast.showToast(msg: "执行状态保存，出问题了");
-              }
-            },
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: ScreenUtil().setWidth(10),
-                  height: ScreenUtil().setWidth(10),
-                  child: displayDigitsList[index].isVisible ? addWidget : checkedWidget,
-                ),
-                Container(
-                  width: ScreenUtil().setWidth(10),
-                  height: ScreenUtil().setWidth(10),
-                  child: Image.asset("assets/images/ic_eth.png"),
-                ),
-                Container(
-                  color: Colors.transparent,
-                  padding: EdgeInsets.only(
-                    top: ScreenUtil().setHeight(3),
-                    left: ScreenUtil().setHeight(3),
-                  ),
-                  width: ScreenUtil().setWidth(30),
-                  height: ScreenUtil().setHeight(10),
-                  child: Text(
-                    displayDigitsList[index].shortName ?? "",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.instance.setSp(3.5),
+              onTap: () async {
+                var isExecutorSuccess = false;
+                if (displayDigitsList[index].isVisible) {
+                  isExecutorSuccess = await nowChain.hideDigit(displayDigitsList[index]);
+                } else {
+                  isExecutorSuccess = await nowChain.showDigit(displayDigitsList[index]);
+                }
+                if (isExecutorSuccess) {
+                  setState(() {
+                    displayDigitsList[index].isVisible = displayDigitsList[index].isVisible;
+                  });
+                } else {
+                  Fluttertoast.showToast(msg: "执行状态保存，出问题了");
+                }
+              },
+              child: Container(
+                width: ScreenUtil().setWidth(80),
+                color: Colors.transparent,
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: ScreenUtil().setWidth(10),
+                      height: ScreenUtil().setWidth(10),
+                      child: displayDigitsList[index].isVisible ? addWidget : checkedWidget,
                     ),
-                  ),
+                    Container(
+                      width: ScreenUtil().setWidth(10),
+                      height: ScreenUtil().setWidth(10),
+                      child: Image.asset("assets/images/ic_eth.png"),
+                    ),
+                    Container(
+                      color: Colors.transparent,
+                      padding: EdgeInsets.only(
+                        top: ScreenUtil().setHeight(3),
+                        left: ScreenUtil().setHeight(3),
+                      ),
+                      width: ScreenUtil().setWidth(30),
+                      height: ScreenUtil().setHeight(10),
+                      child: Text(
+                        displayDigitsList[index].shortName ?? "",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil.instance.setSp(3.5),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              )),
         ),
         Container(
           alignment: Alignment.topLeft,
