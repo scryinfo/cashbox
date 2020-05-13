@@ -12,18 +12,18 @@ pub mod android {
     use wallets::StatusCode;
 
     pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObject<'a>{
-        let eee_digit_list_class = env.find_class("java/util/ArrayList").expect("find chain type is error");
-        let eee_digit_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeDigit").expect("Digit class not found");
-        let eee_chain_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeChain").expect("chain class find error");
-        let chain_class_obj = env.alloc_object(eee_chain_class).expect("create chain_class instance is error!");
-        env.set_field(chain_class_obj, "status", "I", JValue::Int(eee_chain.status as i32)).expect("set status value is error!");
+        let eee_digit_list_class = env.find_class("java/util/ArrayList").expect("find ArrayList");
+        let eee_digit_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeDigit").expect("NativeLib$EeeDigit class");
+        let eee_chain_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeChain").expect("NativeLib$EeeChain class");
+        let chain_class_obj = env.alloc_object(eee_chain_class).expect("create eee_chain_class instance");
+        env.set_field(chain_class_obj, "status", "I", JValue::Int(eee_chain.status as i32)).expect("set status value");
         let chain_id_str = format!("{}", eee_chain.chain_id);
-        env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("set chainId value is error!");
+        env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("set chainId value");
         env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.wallet_id).unwrap()))).expect("walletId");
         env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.address.clone()).unwrap()))).expect("address");
 
         if eee_chain.domain.is_some() {
-            env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.domain.unwrap()).unwrap()))).expect("set domain value is error!");
+            env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.domain.unwrap()).unwrap()))).expect("set domain value");
         }
 
         if eee_chain.is_visible.is_some() {
@@ -37,44 +37,44 @@ pub mod android {
             env.set_field(chain_class_obj, "chainType", "I", JValue::Int(chain_type as i32)).expect("get_eee_chain_obj chain_type");
         }
         //每一条链下存在多个代币，需要使用List来存储
-        let digit_list_obj = env.alloc_object(eee_digit_list_class).expect("create digit_list_obj instance is error!");
+        let digit_list_obj = env.alloc_object(eee_digit_list_class).expect("create digit_list_obj instance");
         env.call_method(digit_list_obj, "<init>", "()V", &[]).expect("chain chain obj init method is exec");
 
         for digit in eee_chain.digit_list {
             //实例化 chain
-            let digit_class_obj = env.alloc_object(eee_digit_class).expect("create chain instance is error!");
+            let digit_class_obj = env.alloc_object(eee_digit_class).expect("create eee_digit_class instance");
             //设置digit 属性
-            env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("set status value is error!");
+            env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("set status value");
 
-            env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("set digitId value is error!");
-            env.set_field(digit_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.chain_id).unwrap()))).expect("set digitId value is error!");
+            env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("set digitId value");
+            env.set_field(digit_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.chain_id).unwrap()))).expect("set chainId value");
 
-            // env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.address.clone()).unwrap()))).expect("set address value is error!");
+            // env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.address.clone()).unwrap()))).expect("set address value");
 
             if digit.contract_address.is_some() {
-                env.set_field(digit_class_obj, "contractAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.contract_address.unwrap()).unwrap()))).expect("set contractAddress value is error!");
+                env.set_field(digit_class_obj, "contractAddress", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.contract_address.unwrap()).unwrap()))).expect("set contractAddress value");
             }
             if digit.shortname.is_some() {
-                env.set_field(digit_class_obj, "shortName", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.shortname.unwrap()).unwrap()))).expect("set shortName value is error!");
+                env.set_field(digit_class_obj, "shortName", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.shortname.unwrap()).unwrap()))).expect("set shortName value");
             }
             if digit.fullname.is_some() {
-                env.set_field(digit_class_obj, "fullName", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.fullname.unwrap()).unwrap()))).expect("set fullName value is error!");
+                env.set_field(digit_class_obj, "fullName", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.fullname.unwrap()).unwrap()))).expect("set fullName value");
             }
             if digit.balance.is_some() {
 
-                env.set_field(digit_class_obj, "balance", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.balance.unwrap()).unwrap()))).expect("set balance value is error!");
+                env.set_field(digit_class_obj, "balance", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.balance.unwrap()).unwrap()))).expect("set balance value");
             }
             if digit.is_visible.is_some() {
                 let visible = digit.is_visible.unwrap();
-                env.set_field(digit_class_obj, "isVisible", "Z", JValue::Bool(visible as u8)).expect("set isVisible value is error!");
+                env.set_field(digit_class_obj, "isVisible", "Z", JValue::Bool(visible as u8)).expect("set isVisible value");
             }
             if digit.decimal.is_some() {
                 let decimal = digit.decimal.unwrap();
-                env.set_field(digit_class_obj, "decimal", "I", JValue::Int(decimal as i32)).expect("set decimal value is error!");
+                env.set_field(digit_class_obj, "decimal", "I", JValue::Int(decimal as i32)).expect("set decimal value");
             }
 
             if digit.imgurl.is_some() {
-                env.set_field(digit_class_obj, "imgUrl", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.imgurl.unwrap()).unwrap()))).expect("set imgUrl value is error!");
+                env.set_field(digit_class_obj, "imgUrl", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.imgurl.unwrap()).unwrap()))).expect("set imgUrl value");
             }
 
             env.call_method(digit_list_obj, "add", "(Ljava/lang/Object;)Z", &[digit_class_obj.into()]).expect("add chain instance is fail");
@@ -227,16 +227,16 @@ pub mod android {
 
         let wallet_id: String = env.get_string(walletId).unwrap().into();
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
-        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
 
         match wallets::module::chain::show_chain(wallet_id.as_str(), wallet_type as i64) {
             Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(1 as u8)).expect("set isShowChain value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type");
+                env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(1 as u8)).expect("set isShowChain value");
             },
             Err(msg) => {
-                env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(0 as u8)).expect("set isShowChain value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(0 as u8)).expect("set isShowChain value");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value");
             }
         }
         *state_obj
@@ -247,17 +247,17 @@ pub mod android {
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideChain(env: JNIEnv, _: JClass, walletId: JString, wallet_type: jint) -> jobject {
 
         let wallet_id: String = env.get_string(walletId).unwrap().into();
-        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
-        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
 
         match wallets::module::chain::hide_chain(wallet_id.as_str(), wallet_type as i64) {
             Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(1 as u8)).expect("set isHideChain value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type");
+                env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(1 as u8)).expect("set isHideChain value");
             },
             Err(msg) => {
-                env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
             }
         }
         *state_obj
@@ -289,16 +289,16 @@ pub mod android {
     #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowChainType(env: JNIEnv, _: JClass, walletId: JString) -> jobject {
         let wallet_id: String = env.get_string(walletId).unwrap().into();
-        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
-        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
         match wallets::module::chain::get_now_chain_type(wallet_id.as_str()) {
             Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "getNowChainType", "I", JValue::Int(code as i32)).expect("get nowChainType value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type");
+                env.set_field(state_obj, "getNowChainType", "I", JValue::Int(code as i32)).expect("get nowChainType value");
             },
             Err(msg) => {
-                //env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
+                //env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error message");
             }
         }
         *state_obj

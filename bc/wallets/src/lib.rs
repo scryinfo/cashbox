@@ -10,6 +10,8 @@ mod error;
 pub use error::WalletError;
 
 pub use ethtx::convert_token;
+pub use substratetx::account_info_key;
+
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
 #[derive(PartialEq, Clone)]

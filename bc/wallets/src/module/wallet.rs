@@ -90,6 +90,7 @@ pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
     Ok(target)
 }
 
+//todo 优化返回结果
 pub fn is_contain_wallet() -> Result<Vec<TbWallet>, String> {
     match wallet_db::DataServiceProvider::instance() {
         Ok(provider) => {

@@ -34,9 +34,9 @@ pub mod android {
         match mn_class {
             Ok(class) => {
                 let jobj = env.alloc_object(class).unwrap();
-                env.set_field(jobj, "mnId", "Ljava/lang/String;", JValue::Object(mn_id_obj)).expect("find mnId type is error!");//返回字符串
-                env.set_field(jobj, "status", "I", JValue::Int(mnemonic.status as i32)).expect("find status type is error!");//返回数字
-                env.set_field(jobj, "mn", "[B", JValue::Object(mn_object)).expect("find mn type is error!");//返回数组
+                env.set_field(jobj, "mnId", "Ljava/lang/String;", JValue::Object(mn_id_obj)).expect("find mnId type ");//返回字符串
+                env.set_field(jobj, "status", "I", JValue::Int(mnemonic.status as i32)).expect("find status type");//返回数字
+                env.set_field(jobj, "mn", "[B", JValue::Object(mn_object)).expect("find mn type");//返回数组
                 *jobj
             }
             Err(_err) => {
@@ -53,20 +53,20 @@ pub mod android {
         //调用获取所有钱包，查看返回值的情况
         let wallet = wallets::module::wallet::is_contain_wallet();
         let state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("can't found NativeLib$WalletState class");
-        let state_obj = env.alloc_object(state_class).expect("create state_obj instance is error!");
+        let state_obj = env.alloc_object(state_class).expect("create state_obj instance ");
         match wallet {
             Ok(data) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
                 if data.len() == 0 {
-                    env.set_field(state_obj, "isContainWallet", "Z", JValue::Bool(0 as u8)).expect("set isContainWallet value is error!");
+                    env.set_field(state_obj, "isContainWallet", "Z", JValue::Bool(0 as u8)).expect("set isContainWallet value");
                 } else {
-                    env.set_field(state_obj, "isContainWallet", "Z", JValue::Bool(1 as u8)).expect("set isContainWallet value is error!");
+                    env.set_field(state_obj, "isContainWallet", "Z", JValue::Bool(1 as u8)).expect("set isContainWallet value ");
                 }
             }
             Err(e) => {
                 println!("isContainWallet method error:{}", e);
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(e).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type ");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(e).unwrap()))).expect("isContainWallet set message ");
             }
         }
         *state_obj
@@ -119,12 +119,12 @@ pub mod android {
             }
         }
 
-        env.set_field(jobj, "status", "I", JValue::Int(wallet.status as i32)).expect("find status type is error!");
-        env.set_field(jobj, "walletId", "Ljava/lang/String;", JValue::Object(wallet_id_obj)).expect("find walletId type is error!");
+        env.set_field(jobj, "status", "I", JValue::Int(wallet.status as i32)).expect("find status type ");
+        env.set_field(jobj, "walletId", "Ljava/lang/String;", JValue::Object(wallet_id_obj)).expect("find walletId type ");
 
         env.set_field(jobj, "creationTime", "Ljava/lang/String;", JValue::Object(wallet_create_time_obj)).expect("find creationTime ");
         env.set_field(jobj, "nowChainId", "Ljava/lang/String;", JValue::Object(display_chain_id__obj)).expect("nowChainId");
-        env.set_field(jobj, "isNowWallet", "Z", JValue::Bool(wallet.selected as u8)).expect("set isVisible value is error!");
+        env.set_field(jobj, "isNowWallet", "Z", JValue::Bool(wallet.selected as u8)).expect("set isVisible value ");
 
         let wallet_type_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletType").expect("NativeLib$WalletType ");
 
@@ -145,7 +145,7 @@ pub mod android {
         if wallet.wallet_name.is_some() {
             let wallet_name = env.new_string(wallet.wallet_name.unwrap()).unwrap();
             let wallet_name_obj = JObject::from(wallet_name);
-            env.set_field(jobj, "walletName", "Ljava/lang/String;", JValue::Object(wallet_name_obj)).expect("find walletName type is error!");
+            env.set_field(jobj, "walletName", "Ljava/lang/String;", JValue::Object(wallet_name_obj)).expect("find walletName type ");
         }
         container.push(jobj);
         container
@@ -156,15 +156,15 @@ pub mod android {
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_loadAllWalletList(env: JNIEnv, _: JClass) -> jobject {
         let wallet_list = wallets::module::wallet::get_all_wallet();
 
-        let wallet_list_class = env.find_class("java/util/ArrayList").expect("find chain type is error");
-        let wallet_list_class_obj = env.alloc_object(wallet_list_class).expect("create chain_list_class instance is error!");
-        env.call_method(wallet_list_class_obj, "<init>", "()V", &[]).expect("wallet_list_class_obj init method is exec");
+        let wallet_list_class = env.find_class("java/util/ArrayList").expect("find ArrayList type");
+        let wallet_list_class_obj = env.alloc_object(wallet_list_class).expect("create chain_list_class instance ");
+        env.call_method(wallet_list_class_obj, "<init>", "()V", &[]).expect("wallet_list_class_obj init ArrayList");
         match wallet_list {
             Ok(wallet_list) => {
                 for wallet in wallet_list {
                     let wallet_temp = wallet_jni_obj_util(&env, wallet);
                     let ss = wallet_temp.get(0).unwrap();
-                    env.call_method(wallet_list_class_obj, "add", "(Ljava/lang/Object;)Z", &[JValue::Object(*ss)]).expect("add wallet_temp is fail");
+                    env.call_method(wallet_list_class_obj, "add", "(Ljava/lang/Object;)Z", &[JValue::Object(*ss)]).expect("add wallet");
                 }
             }
             Err(_msg) => {}
@@ -179,9 +179,6 @@ pub mod android {
         let pwd = env.convert_byte_array(pwd).unwrap();
         let mnemonic = env.convert_byte_array(mnemonic).unwrap();
 
-        /*let value = env.call_method(wallet_type,"ordinal","()I",&[]).expect("get type value error");
-        let wallet_type_value = value.i().unwrap();
-        println!("wallet type value is {}",wallet_type_value);*/
         let wallet_class = env.find_class("info/scry/wallet_manager/NativeLib$Wallet").expect("can't found NativeLib$Wallet class");
 
         let wallet = wallets::module::wallet::create_wallet(wallet_name.as_str(), mnemonic.as_slice(), pwd.as_slice(), wallet_type as i64);
@@ -193,8 +190,8 @@ pub mod android {
             }
             Err(e) => {
                 let jobj = env.alloc_object(wallet_class).unwrap();
-                env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-                env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(e.to_string()).unwrap()))).expect("set error msg value is error!");
+                env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set saveWallet StatusCode ");
+                env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(e.to_string()).unwrap()))).expect("set saveWallet message");
                 *jobj
             }
         };
@@ -208,17 +205,18 @@ pub mod android {
         let old_pwd = env.convert_byte_array(oldPwd).unwrap();
         let new_pwd = env.convert_byte_array(newPwd).unwrap();
         let wallet_id: String = env.get_string(walletId).unwrap().into();
-        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
-        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$WalletState instance ");
 
         match wallets::module::wallet::reset_mnemonic_pwd(wallet_id.as_str(), old_pwd.as_slice(), new_pwd.as_slice()) {
             Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "isResetPwd", "Z", JValue::Bool(1 as u8)).expect("set isSetNowWallet value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("resetPwd StatusCode ");
+                env.set_field(state_obj, "isResetPwd", "Z", JValue::Bool(1 as u8)).expect("set isSetNowWallet value ");
             },
             Err(msg) => {
-                env.set_field(state_obj, "isResetPwd", "Z", JValue::Bool(0 as u8)).expect("set isSetNowWallet value is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("resetPwd StatusCode ");
+                env.set_field(state_obj, "isResetPwd", "Z", JValue::Bool(0 as u8)).expect("set isSetNowWallet value ");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg");
             }
         }
         *state_obj
@@ -228,15 +226,15 @@ pub mod android {
     #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowWallet(env: JNIEnv, _: JClass) -> jobject {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
-        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
         match wallets::module::wallet::get_current_wallet() {
             Ok(wallet) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(wallet.wallet_id).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
+                env.set_field(state_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(wallet.wallet_id).unwrap()))).expect("set getNowWallet walletId value ");
             }
             Err(msg) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type ");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set getNowWallet  message value ");
             }
         }
         *state_obj
@@ -246,16 +244,16 @@ pub mod android {
     #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_setNowWallet(env: JNIEnv, _: JClass, walletId: JString) -> jobject {
         let wallet_id: String = env.get_string(walletId).unwrap().into();
-        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
-        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
         match wallets::module::wallet::set_current_wallet(wallet_id.as_str()) {
             Ok(exist) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "isSetNowWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
+                env.set_field(state_obj, "isSetNowWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value ");
             }
             Err(msg) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type ");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg).unwrap()))).expect("set setNowWallet message");
             }
         }
         *state_obj
@@ -266,16 +264,16 @@ pub mod android {
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_deleteWallet(env: JNIEnv, _: JClass, walletId: JString, psd: jbyteArray) -> jobject {
         let wallet_id: String = env.get_string(walletId).unwrap().into();
         let passwd = env.convert_byte_array(psd).unwrap();
-        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
-        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
         match wallets::module::wallet::del_wallet(wallet_id.as_str(), passwd.as_slice()) {
             Ok(exist) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "isDeletWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
+                env.set_field(state_obj, "isDeletWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value ");
             }
             Err(msg) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type ");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set deleteWallet message value ");
             }
         }
         *state_obj
@@ -286,16 +284,16 @@ pub mod android {
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_rename(env: JNIEnv, _: JClass, walletId: JString, walletName: JString) -> jobject {
         let wallet_id: String = env.get_string(walletId).unwrap().into();
         let wallet_name: String = env.get_string(walletName).unwrap().into();
-        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
-        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance is error!");
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
         match wallets::module::wallet::rename_wallet(wallet_id.as_str(), wallet_name.as_str()) {
             Ok(exist) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "isRename", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
+                env.set_field(state_obj, "isRename", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value ");
             }
             Err(msg) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value is error!");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find rename StatusCode");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message value ");
             }
         }
         *state_obj
@@ -316,15 +314,15 @@ pub mod android {
                 let mn_object = JObject::from(mn_byte);
                 let mnid = env.new_string(mnemonic.mnid).unwrap();
                 let mn_id_obj = JObject::from(mnid);
-                env.set_field(jobj, "mnId", "Ljava/lang/String;", JValue::Object(mn_id_obj)).expect("find mnId type is error!");//返回字符串
-                env.set_field(jobj, "status", "I", JValue::Int(mnemonic.status as i32)).expect("find status type is error!");//返回数字
-                env.set_field(jobj, "mn", "[B", JValue::Object(mn_object)).expect("find mn type is error!");//返回数组
+                env.set_field(jobj, "mnId", "Ljava/lang/String;", JValue::Object(mn_id_obj)).expect("find mnId type ");//返回字符串
+                env.set_field(jobj, "status", "I", JValue::Int(mnemonic.status as i32)).expect("find status type ");//返回数字
+                env.set_field(jobj, "mn", "[B", JValue::Object(mn_object)).expect("find mn type ");//返回数组
                 *jobj
             },
             Err(e) => {
                 let msg_obj = JObject::from(env.new_string(e.to_string()).unwrap());
-                env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type is error!");//返回数字
-                env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(msg_obj)).expect("find status type is error!");//返回数字
+                env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type ");//返回数字
+                env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(msg_obj)).expect("find status type ");//返回数字
                 *jobj
             }
         }

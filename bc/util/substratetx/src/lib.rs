@@ -9,4 +9,6 @@ pub use crypto::Ed25519;
 pub use crypto::Keccak256;
 pub use crypto::Crypto;
 pub use transaction::tx_sign;
-pub use transaction::transfer;
+pub use transaction::{transfer,account_info_key};
+
+

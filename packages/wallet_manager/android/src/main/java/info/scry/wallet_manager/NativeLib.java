@@ -265,6 +265,7 @@ public class NativeLib {
         public String energyTransferInfo;   //转能量结果hash
         public String ethSignedInfo;        //签名eth交易 所得信息
         public String inputInfo;            //附加信息
+        public String accountKeyInfo;       //账户存储key
     }
 
     //获取拼装原始交易，区分链类型
@@ -299,8 +300,10 @@ public class NativeLib {
     //msg: energy balance
     public static native Message eeeEnergyBalance(long handle, String addr);
 
-    //EEE nonce获取
-    public static native String eeeGetTxNonce();
+    //EEE 账号信息对应的key,输入待查询的地址，比如：5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4，
+    // 返回编码后的key:0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
+    //构造jsonrpc 请求数据格式{"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
+    public static native Message eeeAccountInfoKey(String addr);
 
 
     /*------------------------------------------交易相关------------------------------------------*/

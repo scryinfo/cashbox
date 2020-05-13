@@ -3,12 +3,14 @@ use codec::{Encode,Decode};
 use node_runtime::{AccountId, Balance, Index, Signature,Call, Runtime,BalancesCall};
 use sp_core::{
     H256,ecdsa, ed25519, sr25519,
-    crypto::{Pair, Ss58Codec}
+    crypto::{Pair, Ss58Codec},
+    hexdisplay::HexDisplay
 };
 pub use sp_runtime::{
     generic::{Era, SignedPayload, UncheckedExtrinsic},
     traits::{IdentifyAccount, Verify},
 };
+use frame_support::storage::StorageMap;
 use std::ops::Mul;
 use crypto::Crypto;
 
@@ -168,7 +170,33 @@ fn balance_unit_convert(amount:&str,decimal:usize) ->Option<u128>{
     }
 }
 
+pub fn account_info_key(account_id:&str)->Result<String,error::Error>{
+    let account_id=  AccountId::from_ss58check(account_id)?;
+    let final_key =  <system::Account<Runtime>>::hashed_key_for(account_id);
+    let key = format!("0x{:}", HexDisplay::from(&final_key));
+    println!("key is:{}",key);
+    Ok(key)
+}
+
 #[test]
 fn balance_unit_convert_test() {
     println!("{:?}",balance_unit_convert("200.02",12));
+}
+
+#[test]
+fn account_info_key_test(){
+println!("{:?}",account_info_key("5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4"));
+}
+
+#[test]
+fn decode_test(){
+    let nonce = "0x0b00000000002ed2523097f2d21d02000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+    let blob = hex::decode(&nonce[2..10]).unwrap();
+    let mut index_target =[0u8;8];
+    {
+        let temp = &mut index_target[0..4];
+        temp.copy_from_slice(blob.as_slice());
+    }
+    let index = u64::from_le_bytes(index_target);
+    println!("{:?}",index);
 }
