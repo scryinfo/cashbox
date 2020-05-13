@@ -69,3 +69,22 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIE
     }
     *state_obj
 }
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeAccountInfoKey(env: JNIEnv, _class: JClass, address: JString) -> jobject {
+    let account: String = env.get_string(address).unwrap().into();
+    let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_msg_class");
+    let state_obj = env.alloc_object(wallet_msg_class).expect("create wallet_msg_class instance");
+    match wallets::account_info_key(&account) {
+        Ok(key) => {
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status value");
+            env.set_field(state_obj, "accountKeyInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(key).unwrap()))).expect("set accountKeyInfo value");
+        }
+        Err(msg) => {
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status value");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value");
+        }
+    }
+    *state_obj
+}

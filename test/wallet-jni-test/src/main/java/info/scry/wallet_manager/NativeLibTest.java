@@ -16,6 +16,7 @@ public class NativeLibTest {
       // walletGenerateTest();
        // walletExportTest();
         eeeTransferTest();
+        eeeAccountInfoKeyTest();
         // eeeTxsign();
       //  walletSaveTest();
        // updateBalance();
@@ -63,6 +64,11 @@ public class NativeLibTest {
         String rawtx = "0xd00411030f00404c948b3203029435776b349a5506857e7aafbd735966b7171b7044664866f43b818b9eef14d3a866bd100222ff18030000003f4bea2466b9e7d477e58c9c6b79aa2fbb2010ccc03aae14c0e2075cc31a571304000000";
         NativeLib.Message msg = NativeLib.eeeTxSign(rawtx,"72ae6480-ce42-4dff-abf6-6777f76d3203","123456".getBytes());
         System.out.println(msg.toString());
+    }
+
+    public static void eeeAccountInfoKeyTest(){
+        NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4");
+        System.out.println(msg);
     }
 
     public static void eeeTransferTest(){
