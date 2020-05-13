@@ -79,6 +79,7 @@ class S implements WidgetsLocalizations {
   String get input_pwd_hint_detail => "提示：请输入您的密码，对交易信息进行签名。并将发送上链";
   String get judge_the_difference_between_two_wallet => "注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。";
   String get language_choose => "语言选择";
+  String get load_data_error => "数据加载出现错误，请重新尝试";
   String get load_finish_wallet_digit => "当前钱包选中的代币已加载完！";
   String get main_title => "主标题";
   String get make_sure_service_protocol => "请确认勾选 同意服务协议与隐私条款";
@@ -182,34 +183,6 @@ class S implements WidgetsLocalizations {
   String get write_down_mnemonic => "抄下你的钱包助记词!";
   String get wrong_pwd_failure_in_delete_wallet => "密码错误，钱包删除失败";
   String get wrong_pwd_failure_in_recover_wallet_hint => "密码错误，钱包恢复失败";
-}
-
-class $ko extends S {
-  const $ko();
-
-  @override
-  TextDirection get textDirection => TextDirection.ltr;
-
-  @override
-  String get app_title => "App标题 ko";
-  @override
-  String get message_tip => "message ko";
-  @override
-  String get main_title => "主标题 ko";
-}
-
-class $jp extends S {
-  const $jp();
-
-  @override
-  TextDirection get textDirection => TextDirection.ltr;
-
-  @override
-  String get app_title => "App标题 jp";
-  @override
-  String get message_tip => "message jp";
-  @override
-  String get main_title => "主标题 jp";
 }
 
 class $en extends S {
@@ -318,6 +291,8 @@ class $zh extends S {
   String get eee_chain_test => "EEE_TEST";
   @override
   String get no_tx_history => "暂时没有历史交易记录";
+  @override
+  String get load_data_error => "数据加载出现错误，请重新尝试";
   @override
   String get tx_value_is_0 => "转账数额不能为空，或者小于0";
   @override
@@ -529,8 +504,6 @@ class GeneratedLocalizationsDelegate extends LocalizationsDelegate<S> {
 
   List<Locale> get supportedLocales {
     return const <Locale>[
-      Locale("ko", ""),
-      Locale("jp", ""),
       Locale("en", ""),
       Locale("zh", ""),
     ];
@@ -557,12 +530,6 @@ class GeneratedLocalizationsDelegate extends LocalizationsDelegate<S> {
     final String lang = getLang(locale);
     if (lang != null) {
       switch (lang) {
-        case "ko":
-          S.current = const $ko();
-          return SynchronousFuture<S>(S.current);
-        case "jp":
-          S.current = const $jp();
-          return SynchronousFuture<S>(S.current);
         case "en":
           S.current = const $en();
           return SynchronousFuture<S>(S.current);

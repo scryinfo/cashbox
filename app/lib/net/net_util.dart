@@ -13,7 +13,7 @@ Future request(String url, {formData}) async {
     } else {
       response = await dio.post(url, data: formData);
     }
-    print("response===>" + response.toString());
+    // print("response===>" + response.toString());
     if (response.statusCode == 200) {
       return response.data;
     } else {

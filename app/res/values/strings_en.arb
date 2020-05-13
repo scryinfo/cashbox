@@ -108,6 +108,7 @@
   "click_to_transfer": "点击转账",
   "receive_address": "对方收款地址",
   "pls_input_receive_address": "请输入收款地址",
+  "load_data_error": "数据加载出现错误，请重新尝试",
   "confirm": "确定",
   "cancel": "取消",
   "pls_input": "请输入",
