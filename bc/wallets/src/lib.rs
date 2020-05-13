@@ -10,6 +10,7 @@ mod error;
 pub use error::WalletError;
 
 pub use ethtx::convert_token;
+pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
 #[derive(PartialEq, Clone)]
 pub enum StatusCode {

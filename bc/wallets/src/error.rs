@@ -33,7 +33,6 @@ impl fmt::Display for WalletError{
             WalletError::Custom(err) => write!(f, "wallet custom error: {}", err),
             WalletError::Decode(err) => write!(f, "wallet decode error: {}", err),
         }
-
     }
 }
 

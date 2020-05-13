@@ -17,16 +17,15 @@ fn chain_id_convert_group_name(chain_id: i16) -> Option<(i64, String)> {
 }
 
 impl DataServiceProvider {
-    pub fn update_wallet(&self, wallet: TbWallet) -> Result<bool, WalletError> {
+    pub fn update_wallet(&self, wallet: TbWallet) -> WalletResult<bool> {
         let mn_sql = "update Wallet set mnemonic=? where wallet_id=?;";
         let mut statement = self.db_hander.prepare(mn_sql)?;
         statement.bind(1, wallet.mnemonic.as_str())?;
         statement.bind(2, wallet.wallet_id.as_str())?;
-        statement.next().map(|_| true).map_err(|err|err.into())
-
+        statement.next().map(|_| true).map_err(|err| err.into())
     }
 
-    pub fn save_wallet_address(&mut self, mn: TbWallet, addrs: Vec<TbAddress>) -> Result<(), WalletError> {
+    pub fn save_wallet_address(&mut self, mn: TbWallet, addrs: Vec<TbAddress>) -> WalletResult<()> {
         let wallet_sql = "INSERT into Wallet(wallet_id,mn_digest,fullname,mnemonic,wallet_type,display_chain_id)VALUES(?,?,?,?,?,?)";
         let address_sql = "insert into detail.Address(address_id,wallet_id,chain_id,address,puk_key,status) values(?,?,?,?,?,?);";
         // TODO 增加事务的处理，这个的编码方式还需要修改 才能编译通过
@@ -115,7 +114,7 @@ impl DataServiceProvider {
     }
 
     //这个地方 定义成通用的对象查询功能
-    pub fn query_by_wallet_digest(&self, digest: &str,wallet_type:i64) -> Option<TbWallet> {
+    pub fn query_by_wallet_digest(&self, digest: &str, wallet_type: i64) -> Option<TbWallet> {
         let query_sql = "select * from Wallet where mn_digest = ? and wallet_type = ?";
         let mut statement = self.db_hander.prepare(query_sql).unwrap();
         statement.bind(1, digest).expect("query_by_mnemonic_id bind id");
@@ -145,7 +144,7 @@ impl DataServiceProvider {
     }
 
     //考虑修改为查询所有指定条件的对象
-    pub fn query_selected_wallet(&self) -> Result<TbWallet, String> {
+    pub fn query_selected_wallet(&self) -> WalletResult<TbWallet> {
         //选中钱包 只有一个
         let sql = "select * from Wallet where selected=1;";
 
@@ -167,11 +166,11 @@ impl DataServiceProvider {
             wallet
         }).map_err(|err| {
             error!("query error:{}", err.to_string());
-            err.to_string()
+            err.into()
         })
     }
 
-    pub fn get_wallet_by_address(&self, address: &str, chain_type: ChainType) -> Result<TbWallet,WalletError> {
+    pub fn get_wallet_by_address(&self, address: &str, chain_type: ChainType) -> WalletResult<TbWallet> {
         let query_sql = "SELECT a.* from Wallet a,detail.Address b,detail.Chain c WHERE b.chain_id = c.id and b.wallet_id = a.wallet_id and b.address = ? and c.type=?;";
         let mut statement = self.db_hander.prepare(query_sql)?;
         statement.bind(1, address).expect("get_wallet_by_address bind address");
@@ -194,7 +193,7 @@ impl DataServiceProvider {
                 Ok(wallet)
             }
             None => {
-               Err(WalletError::NotExist)
+                Err(WalletError::NotExist)
             }
         }
     }
@@ -224,20 +223,19 @@ impl DataServiceProvider {
         vec
     }
 
-    pub fn set_selected_wallet(&self, wallet_id: &str) -> Result<(), String> {
+    pub fn set_selected_wallet(&self, wallet_id: &str) -> WalletResult<()> {
         //需要先查询出那些助记词是被设置为当前选中，将其设置为取消选中，再将指定的id 设置为选中状态
         let sql = "UPDATE Wallet set selected = 0 where wallet_id in (select wallet_id from Wallet WHERE selected=1);";
-        self.db_hander.execute(sql).expect("exec sql is error!");
+        self.db_hander.execute(sql)?;
         let set_select_sql = "update Wallet set selected = 1 where wallet_id =?;";
-        self.db_hander.prepare(set_select_sql).map(|mut stat| {
-            stat.bind(1, wallet_id).expect("set_selected_mnemonic bind mn_id");
-            stat.next().expect("exec set_selected_mnemonic error");
-            ()
-        }).map_err(|err| err.to_string())
+        let mut stat = self.db_hander.prepare(set_select_sql)?;
+        stat.bind(1, wallet_id)?;
+        stat.next()?;
+        Ok(())
     }
 
     //todo 完善删除钱包逻辑
-    pub fn del_mnemonic(&self, mn_id: &str) -> Result<(), WalletError> {
+    pub fn del_mnemonic(&self, mn_id: &str) -> WalletResult<()> {
         let sql = "DELETE from Wallet WHERE wallet_id = ?; ";
         let update_address = "UPDATE Address set status = 0 WHERE wallet_id =?;";
         let mut stat = self.db_hander.prepare(sql)?;
@@ -245,23 +243,23 @@ impl DataServiceProvider {
         stat.next()?;
         let mut stat = self.db_hander.prepare(update_address)?;
         stat.bind(1, mn_id)?;
-        stat.next().map(|_|()).map_err(|err|err.into())
+        stat.next().map(|_| ()).map_err(|err| err.into())
     }
 
-    pub fn rename_mnemonic(&self, mn_id: &str, mn_name: &str) -> Result<(), WalletError> {
+    pub fn rename_mnemonic(&self, mn_id: &str, mn_name: &str) -> WalletResult<()> {
         let sql = "UPDATE Wallet set fullname = ? WHERE wallet_id=?;";
         let mut stat = self.db_hander.prepare(sql)?;
         stat.bind(1, mn_name)?;
         stat.bind(2, mn_id)?;
-        stat.next().map(|_|()).map_err(|err|err.into())
+        stat.next().map(|_| ()).map_err(|err| err.into())
     }
     // TODO 不同的链有不同的 digit 格式，后续在处理的时候 需要优化 当前没有使用这个函数??
-    pub fn display_mnemonic_list(&self) -> Result<Vec<WalletObj>, WalletError> {
+    pub fn display_mnemonic_list(&self) -> WalletResult<Vec<WalletObj>> {
         let all_mn = "select a.wallet_id,a.fullname as wallet_name,b.id as chain_id,c.address,b.address as chain_address,a.selected,b.type as chian_type,d.id as digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.selected as isvisible,d.decimals,d.url_img
  from Wallet a,detail.Chain b,detail.Address c,detail.EeeDigit d where a.wallet_id=c.wallet_id and c.chain_id = b.id and c.address_id=d.address_id and a.status =1 and c.status =1;";
 
         let stat = self.db_hander.prepare(all_mn)?;
-        let mut cursor =stat.cursor();
+        let mut cursor = stat.cursor();
         let mut tbwallets = Vec::new();
         while let Some(row) = cursor.next()? {
             let tbwallet = WalletObj {
@@ -286,18 +284,18 @@ impl DataServiceProvider {
         }
         Ok(tbwallets)
     }
-    pub fn init_data(&mut self) -> Result<(), WalletError> {
-      /*  self.tx_begin();
-        //初始化钱包数据
+    pub fn init_data(&mut self) -> WalletResult<()> {
+        /*  self.tx_begin();
+          //初始化钱包数据
 
-        //初始化代币数据
-        let bytecode = include_bytes!("res/chainEthFile.json");
-        let digits = serde_json::from_slice::<Vec<table_desc::DigitExport>>(&bytecode[..])?;
-        if let Err(err) = self.init_digit_base_data(digits){
-            self.tx_rollback();
-            return Err(err);
-        }
-        */
+          //初始化代币数据
+          let bytecode = include_bytes!("res/chainEthFile.json");
+          let digits = serde_json::from_slice::<Vec<table_desc::DigitExport>>(&bytecode[..])?;
+          if let Err(err) = self.init_digit_base_data(digits){
+              self.tx_rollback();
+              return Err(err);
+          }
+          */
         Ok(())
     }
 }

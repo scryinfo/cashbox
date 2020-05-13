@@ -60,8 +60,3 @@ pub struct WalletObj {
     pub url_img: Option<String>,
     pub chain_is_visible:Option<bool>,
 }
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct DigitItem{
-
-}

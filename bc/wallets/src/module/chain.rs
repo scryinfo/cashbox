@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use ethereum_types::{H160, U256, H256};
 
 // 转EEE链代币
-pub fn eee_transfer(from: &str, to: &str, amount: &str,genesis_hash: &str, index: u32,runtime_version:u32, psw: &[u8]) -> Result<String, WalletError> {
+pub fn eee_transfer(from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, psw: &[u8]) -> WalletResult<String> {
     match module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE) {
         Ok(keystore) => {
             //todo 使用优化的错误返回方式
@@ -15,13 +15,13 @@ pub fn eee_transfer(from: &str, to: &str, amount: &str,genesis_hash: &str, index
                     //密码验证通过
                     let mn = String::from_utf8(mnemonic)?;
                     let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap())?;
-                    let mut genesis_h256 = [0u8;32];
-                    genesis_h256.clone_from_slice( genesis_hash_bytes.as_slice());
+                    let mut genesis_h256 = [0u8; 32];
+                    genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
 
-                    let signed_data = substratetx::transfer( &mn, to, amount,H256(genesis_h256),index,runtime_version);
+                    let signed_data = substratetx::transfer(&mn, to, amount, H256(genesis_h256), index, runtime_version);
                     match signed_data {
                         Ok(data) => {
-                           log::debug!("signed data is: {}", data);
+                            log::debug!("signed data is: {}", data);
                             Ok(data)
                         }
                         Err(msg) => {
@@ -31,9 +31,9 @@ pub fn eee_transfer(from: &str, to: &str, amount: &str,genesis_hash: &str, index
                 }
                 Err(msg) => Err(msg.into()),
             }
-       }
-   Err(msg) => { Err(msg.into()) }
- }
+        }
+        Err(msg) => { Err(msg.into()) }
+    }
 }
 
 
@@ -47,11 +47,11 @@ pub fn eee_transfer(from: &str, to: &str, amount: &str,genesis_hash: &str, index
 /// gasPrice 指定gas的价格
 /// data 备注消息（当交易确认后，能够在区块上查看到）
 /// chain_id: ETH的链类型
-pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> Result<String, WalletError> {
+pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> WalletResult<String> {
     //由于在开发过程中会使用开发链做测试，当前钱包没有生成开发模式下的链地址，默认使用测试模式
-    let chain_type = if eth_chain_id==1 {
+    let chain_type = if eth_chain_id == 1 {
         ChainType::ETH
-    }else {
+    } else {
         ChainType::EthTest
     };
     match module::wallet::find_keystore_wallet_from_address(from_address, chain_type) {
@@ -98,15 +98,15 @@ pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amoun
 /// gasPrice 指定gas的价格
 /// data 备注消息（还需要再确认一下，当转erc20 token时 这个字段是否还有效？）
 //pub fn eth_raw_erc20_transfer_sign(from_account:&str, contract_address:&str, to_account:&str, amount:&str, psw: &[u8], nonce:&str, gas_limit:&str, gas_price:&str, data:Option<String>, eth_chain_id:u64) ->Result<String,String>{
-pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, to_account: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> Result<String, WalletError> {
+pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, to_account: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> WalletResult<String> {
     //调用erc20合约 to_account 不能为空
     if to_account.is_none() {
         return Err(WalletError::Custom("to account is not allown empty".to_string()));
     }
     //由于在开发过程中会使用开发链做测试，当前钱包没有生成开发模式下的链地址，默认使用测试模式
-    let chain_type = if eth_chain_id==1 {
+    let chain_type = if eth_chain_id == 1 {
         ChainType::ETH
-    }else {
+    } else {
         ChainType::EthTest
     };
     match module::wallet::find_keystore_wallet_from_address(from_account, chain_type) {
@@ -144,8 +144,8 @@ pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, t
     }
 }
 
-pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, WalletError> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn get_eee_chain_data() -> WalletResult<HashMap<String, Vec<EeeChain>>> {
+    let instance = wallet_db::DataServiceProvider::instance()?;
     let eee_chain = instance.display_eee_chain();
     let mut last_wallet_id = String::from("-1");
     let mut chain_index = 0;
@@ -211,8 +211,8 @@ pub fn get_eee_chain_data() -> Result<HashMap<String, Vec<EeeChain>>, WalletErro
     }
 }
 
-pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, WalletError> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn get_eth_chain_data() -> WalletResult<HashMap<String, Vec<EthChain>>> {
+    let instance = wallet_db::DataServiceProvider::instance()?;
     let eth_chain = instance.display_eth_chain();
     let mut last_wallet_id = String::from("-1");
     let mut chain_index = 0;
@@ -280,8 +280,8 @@ pub fn get_eth_chain_data() -> Result<HashMap<String, Vec<EthChain>>, WalletErro
     }
 }
 
-pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, WalletError> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn get_btc_chain_data() -> WalletResult<HashMap<String, Vec<BtcChain>>> {
+    let instance = wallet_db::DataServiceProvider::instance()?;
 
     let btc_chain = instance.display_btc_chain();
 
@@ -351,28 +351,28 @@ pub fn get_btc_chain_data() -> Result<HashMap<String, Vec<BtcChain>>, WalletErro
     }
 }
 
-pub fn show_chain(walletid: &str, wallet_type: i64) -> Result<bool, WalletError> {
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn show_chain(walletid: &str, wallet_type: i64) -> WalletResult<bool> {
+    let mut instance = wallet_db::DataServiceProvider::instance()?;
     instance.show_chain(walletid, wallet_type)
 }
 
-pub fn hide_chain(walletid: &str, wallet_type: i64) -> Result<bool, WalletError> {
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn hide_chain(walletid: &str, wallet_type: i64) -> WalletResult<bool> {
+    let mut instance = wallet_db::DataServiceProvider::instance()?;
     instance.hide_chain(walletid, wallet_type)
 }
 
-pub fn get_now_chain_type(walletid: &str) -> Result<i64, WalletError> {
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn get_now_chain_type(walletid: &str) -> WalletResult<i64> {
+    let mut instance = wallet_db::DataServiceProvider::instance()?;
     instance.get_now_chain_type(walletid)
 }
 
-pub fn set_now_chain_type(walletid: &str, chain_type: i64) -> Result<bool, WalletError> {
-    let mut instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn set_now_chain_type(walletid: &str, chain_type: i64) -> WalletResult<bool> {
+    let mut instance = wallet_db::DataServiceProvider::instance()?;
     instance.set_now_chain_type(walletid, chain_type)
 }
 
 //解析eth交易添加的附加信息
-pub fn decode_eth_data(input: &str) -> Result<String, WalletError> {
+pub fn decode_eth_data(input: &str) -> WalletResult<String> {
     if input.is_empty() {
         return Ok("".to_string());
     }

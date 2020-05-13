@@ -1,10 +1,10 @@
 use super::*;
 
 use crate::{StatusCode, wallet_db};
-use super::model::{TbAddress,Address, Wallet, Mnemonic};
+use model::{TbAddress,Address, Wallet, Mnemonic};
 use std::collections::HashMap;
 use uuid::Uuid;
-use crate::model::wallet_store::TbWallet;
+use model::wallet_store::TbWallet;
 use codec::{Encode, Decode};
 use ethereum_types::H256;
 use secp256k1::{
@@ -12,8 +12,7 @@ use secp256k1::{
     key::{PublicKey, SecretKey},
 };
 
-use substratetx::Crypto;
-use substratetx::Keccak256;
+use substratetx::{Crypto,Keccak256};
 
 /// Wallet 结构说明：
 ///  一个助记词 对应的是一个钱包，在cashbox钱包软件中 可以同时管理多个钱包；
@@ -21,7 +20,7 @@ use substratetx::Keccak256;
 ///  一条链，在基于链的应用上，存在多个合约地址的可能
 
 fn get_wallet_info() -> HashMap<String, Wallet> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+    let instance = wallet_db::DataServiceProvider::instance().unwrap();
     let mn = instance.get_wallets();
     let mut wallet_map = HashMap::new();
     for item in mn {
@@ -41,7 +40,7 @@ fn get_wallet_info() -> HashMap<String, Wallet> {
 }
 
 //query all 满足条件的助记词（wallet）
-pub fn get_all_wallet() -> Result<Vec<Wallet>, WalletError> {
+pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
     let wallet_info_map = get_wallet_info();
 
     let eee_data = chain::get_eee_chain_data()?;
@@ -59,7 +58,7 @@ pub fn get_all_wallet() -> Result<Vec<Wallet>, WalletError> {
             selected: wallet.selected,
             create_time: wallet.create_time,
             eee_chain: {
-                let eee_option = eee_data.get(wallet_id.as_str());
+                let eee_option = eee_data.get(&wallet_id);
                 if eee_option.is_some() {
                     let eee_chain = eee_option.unwrap()[0].clone();
                     Some(eee_chain)
@@ -68,7 +67,7 @@ pub fn get_all_wallet() -> Result<Vec<Wallet>, WalletError> {
                 }
             },
             eth_chain: {
-                let eth_option = eth_data.get(wallet_id.as_str());
+                let eth_option = eth_data.get(&wallet_id);
                 if eth_option.is_some() {
                     let eth_chain = eth_option.unwrap()[0].clone();
                     Some(eth_chain)
@@ -77,7 +76,7 @@ pub fn get_all_wallet() -> Result<Vec<Wallet>, WalletError> {
                 }
             },
             btc_chain: {
-                let btc_option = btc_data.get(wallet_id.as_str());
+                let btc_option = btc_data.get(&wallet_id);
                 if btc_option.is_some() {
                     let btc_chain = btc_option.unwrap()[0].clone();
                     Some(btc_chain)
@@ -92,7 +91,7 @@ pub fn get_all_wallet() -> Result<Vec<Wallet>, WalletError> {
 }
 
 pub fn is_contain_wallet() -> Result<Vec<TbWallet>, String> {
-    match wallet_db::db_helper::DataServiceProvider::instance() {
+    match wallet_db::DataServiceProvider::instance() {
         Ok(provider) => {
             Ok(provider.get_wallets())
         }
@@ -100,8 +99,8 @@ pub fn is_contain_wallet() -> Result<Vec<TbWallet>, String> {
     }
 }
 
-pub fn get_current_wallet() -> Result<Wallet, String> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
+pub fn get_current_wallet() -> WalletResult<Wallet> {
+    let instance = wallet_db::DataServiceProvider::instance()?;
     instance.query_selected_wallet().map(|tb| Wallet {
         wallet_id: tb.wallet_id,
         wallet_name: tb.full_name,
@@ -110,16 +109,13 @@ pub fn get_current_wallet() -> Result<Wallet, String> {
     }).map_err(|msg| msg)
 }
 
-pub fn set_current_wallet(walletid: &str) -> Result<bool, String> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance().unwrap();
-    match instance.set_selected_wallet(walletid) {
-        Ok(_) => Ok(true),
-        Err(error) => Err(error.to_string())
-    }
+pub fn set_current_wallet(walletid: &str) -> WalletResult<bool> {
+    let instance = wallet_db::DataServiceProvider::instance()?;
+    instance.set_selected_wallet(walletid).map(|_| true).map_err(|error|error.into())
 }
 
-pub fn del_wallet(walletid: &str, psd: &[u8]) -> Result<bool, WalletError> {
-    let provider = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn del_wallet(walletid: &str, psd: &[u8]) -> WalletResult<bool> {
+    let provider = wallet_db::DataServiceProvider::instance()?;
     //查询出对应id的助记词
     match provider.query_by_wallet_id(walletid) {
         Some(mn) => {
@@ -141,13 +137,13 @@ pub fn del_wallet(walletid: &str, psd: &[u8]) -> Result<bool, WalletError> {
     }
 }
 
-pub fn rename_wallet(walletid: &str, wallet_name: &str) -> Result<bool, WalletError> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn rename_wallet(walletid: &str, wallet_name: &str) -> WalletResult<bool> {
+    let instance = wallet_db::DataServiceProvider::instance()?;
     instance.rename_mnemonic(walletid, wallet_name).map(|_| true)
 }
 
 //根据生成钱包的类型，需要创建对应的地址
-pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> Result<Address, WalletError> {
+pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> WalletResult<Address> {
     let phrase = String::from_utf8(mn.to_vec())?;
     // TODO 这个地方 根据支持链的种类 分别生成对应的地址
     match wallet_type {
@@ -192,8 +188,8 @@ fn generate_eth_address(puk_byte: &[u8]) -> String {
     address
 }
 
-pub fn find_keystore_wallet_from_address(address: &str, chain_type: ChainType) -> Result<String, WalletError> {
-    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn find_keystore_wallet_from_address(address: &str, chain_type: ChainType) -> WalletResult<String> {
+    let instance = wallet_db::DataServiceProvider::instance()?;
     instance.get_wallet_by_address(address, chain_type).map(|tbwallet| tbwallet.mnemonic)
 }
 
@@ -208,8 +204,8 @@ pub fn crate_mnemonic(num: u8) -> Mnemonic {
     }
 }
 
-pub fn export_mnemonic(wallet_id: &str, password: &[u8]) -> Result<Mnemonic, WalletError> {
-    let provider = wallet_db::db_helper::DataServiceProvider::instance()?;
+pub fn export_mnemonic(wallet_id: &str, password: &[u8]) -> WalletResult<Mnemonic> {
+    let provider = wallet_db::DataServiceProvider::instance()?;
     //查询出对应id的助记词
     match provider.query_by_wallet_id(wallet_id) {
         Some(mn) => {
@@ -226,9 +222,9 @@ pub fn export_mnemonic(wallet_id: &str, password: &[u8]) -> Result<Mnemonic, Wal
     }
 }
 
-fn generate_chain_address(wallet_id: &str, mn: &[u8], wallet_type: i64) -> Result<Vec<TbAddress>,WalletError> {
+fn generate_chain_address(wallet_id: &str, mn: &[u8], wallet_type: i64) -> WalletResult<Vec<TbAddress>> {
     //获取当前钱包哪些链可用
-    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+    let instance = wallet_db::DataServiceProvider::instance()?;
     let chains = instance.get_available_chain()?;//错误处理demo
     let mut address_vec = vec![];
     for chain in chains {
@@ -262,7 +258,7 @@ fn generate_chain_address(wallet_id: &str, mn: &[u8], wallet_type: i64) -> Resul
     Ok(address_vec)
 }
 
-pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type: i64) -> Result<Wallet, WalletError> {
+pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type: i64) -> WalletResult<Wallet> {
     let default_chain_type = if wallet_type == 1 {
         ChainType::ETH
     } else {
@@ -270,7 +266,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
     };
 
     //todo 数据库实例优化
-    let mut dbhelper = wallet_db::db_helper::DataServiceProvider::instance()?;
+    let mut dbhelper = wallet_db::DataServiceProvider::instance()?;
     //正式链，助记词只能导入一次
     let hex_mn_digest = hex::encode(mn.keccak256());
     if wallet_type == 1 {
@@ -309,7 +305,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
         })
 }
 
-fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> Result<StatusCode, WalletError> {
+fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> WalletResult<StatusCode> {
     //获取原来的助记词
     let mnemonic = wallet.mnemonic.clone();
     let context = substratetx::Sr25519::get_mnemonic_context(mnemonic.as_str(), old_psd)?;
@@ -323,14 +319,14 @@ fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> Res
         mnemonic: new_encrypt_mn,
         ..Default::default()
     };
-    let instance = wallet_db::db_helper::DataServiceProvider::instance()?;
+    let instance = wallet_db::DataServiceProvider::instance()?;
     instance.update_wallet(wallet_update).map(|_| StatusCode::OK).map_err(|err| err.into())
 }
 
-pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Result<StatusCode, WalletError> {
+pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> WalletResult<StatusCode> {
     // TODO 检查密码规则是否满足要求
     // TODO 处理实例获取失败的异常
-    let provider = wallet_db::db_helper::DataServiceProvider::instance()?;
+    let provider = wallet_db::DataServiceProvider::instance()?;
     //查询出对应id的助记词
     let mnemonic = provider.query_by_wallet_id(mn_id);
     match mnemonic {
@@ -353,44 +349,34 @@ struct RawTx {
     version: u32,
 }
 // 这个函数用于外部拼接好的交易，比如通过js方式构造的交易
-pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> Result<String, WalletError> {
+pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
     //todo 交易构造接口重构
     let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
     let  tx_encode_data = hex::decode(raw_tx)?;
     // TODO 这个地方需要使用大小端编码？
     let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
-    let mnemonic = module::wallet::export_mnemonic(wallet_id, psw);
-    match mnemonic {
-        Ok(mnemonic) => {
-            let mn = String::from_utf8(mnemonic.mn)?;
-            let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
-          // let mut_data = &tx.func_data[..];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
-            /*let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..])?;
-            let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function,tx.version)?;*/
-            let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index,mut_data,tx.version)?;
-            // TODO 返回签名后的消息格式需要确定
-            Ok(sign_data)
-        }
-        Err(info) => Err(info)
-    }
+    let mnemonic = module::wallet::export_mnemonic(wallet_id, psw)?;
+    let mn = String::from_utf8(mnemonic.mn)?;
+    let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
+    // let mut_data = &tx.func_data[..];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
+    /*let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..])?;
+    let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function,tx.version)?;*/
+    let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index,mut_data,tx.version)?;
+    // TODO 返回签名后的消息格式需要确定
+    Ok(sign_data)
 }
 
 //用于针对普通数据签名 传入的数据 hex格式数据
-pub fn raw_sign(raw_data: &str, wallet_id: &str, psw: &[u8]) -> Result<String, WalletError> {
+pub fn raw_sign(raw_data: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
     let raw_data = raw_data.get(2..).unwrap();// remove `0x`
     let tx_encode_data = hex::decode(raw_data)?;
     // TODO 这个地方需要使用大小端编码？
-    let mnemonic = module::wallet::export_mnemonic(wallet_id, psw);
-    match mnemonic {
-        Ok(mnemonic) => {
-            let mn = String::from_utf8(mnemonic.mn)?;
-            let sign_data = substratetx::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();
-            // TODO 返回签名后的消息格式需要确定
-            let hex_data = format!("0x{}", hex::encode(&sign_data[..]));
-            Ok(hex_data)
-        }
-        Err(info) => Err(info)
-    }
+    let mnemonic = module::wallet::export_mnemonic(wallet_id, psw)?;
+    let mn = String::from_utf8(mnemonic.mn)?;
+    let sign_data = substratetx::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();
+    // TODO 返回签名后的消息格式需要确定
+    let hex_data = format!("0x{}", hex::encode(&sign_data[..]));
+    Ok(hex_data)
 }
 
 //todo 增加通过钱包id查询钱包的实现

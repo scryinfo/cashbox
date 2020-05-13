@@ -1,6 +1,7 @@
+use super::*;
+
 use std::{fs, path};
 use sqlite::Connection;
-use crate::WalletError;
 
 #[cfg(target_os="android")]
 const TB_WALLET: &'static str = r#"/data/data/com.example.app/files/cashbox_wallet.db"#;
@@ -12,7 +13,7 @@ const TB_WALLET: &'static str = r#"cashbox_wallet.db"#;
 #[cfg(any(target_os="linux",target_os="windows"))]
 const TB_WALLET_DETAIL: &'static str = r#"cashbox_wallet_detail.db"#;
 
-fn create_teble(table_name: &str, table_desc: &str) -> Result<(), WalletError> {
+fn create_teble(table_name: &str, table_desc: &str) -> WalletResult<()> {
     // TODO 检查参数是否合理
     //先创建对应的文件路径
     if !path::Path::new(table_name).exists() {
@@ -23,7 +24,7 @@ fn create_teble(table_name: &str, table_desc: &str) -> Result<(), WalletError> {
 }
 
 //导入代币基础数据 目前默认是在创建数据库的时候调用
-fn init_digit_base_data(table_name: &str) -> Result<(), WalletError> {
+fn init_digit_base_data(table_name: &str) -> WalletResult<()> {
     let digit_base_insert_sql = "insert into DigitBase('contract_address','type','short_name','full_name','decimals','group_name','url_img','is_visible') values(?,?,?,?,?,?,?,?); ";
     let bytecode = include_bytes!("res/chainEthFile.json");
     //todo 错误处理
@@ -69,7 +70,7 @@ impl Drop for DataServiceProvider {
 }
 
 impl DataServiceProvider {
-    pub fn instance() -> Result<Self, WalletError> {
+    pub fn instance() -> WalletResult<Self> {
         //1、检查对应的数据库文件是否存在
         if fs::File::open(TB_WALLET_DETAIL).is_err() || fs::File::open(TB_WALLET).is_err() {
             //2、若是不存在则执行sql脚本文件创建数据库
@@ -90,15 +91,15 @@ impl DataServiceProvider {
         }).map_err(|err|err.into())
     }
 
-    pub fn tx_begin(&self) -> Result<(), WalletError> {
+    pub fn tx_begin(&self) -> WalletResult<()> {
         self.db_hander.execute("begin;").map(|_| ()).map_err(|err| err.into())
     }
 
-    pub fn tx_commint(&self) -> Result<(), WalletError> {
+    pub fn tx_commint(&self) -> WalletResult<()> {
         self.db_hander.execute("commit;").map(|_| ()).map_err(|err| err.into())
     }
 
-    pub fn tx_rollback(&self) -> Result<(), WalletError> {
+    pub fn tx_rollback(&self) -> WalletResult<()> {
         self.db_hander.execute("rollback;").map(|_| ()).map_err(|err| err.into())
     }
 
