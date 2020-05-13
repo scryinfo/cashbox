@@ -11,8 +11,17 @@ abstract class Chain {
   String walletId; //钱包Id
   String chainAddress; //链地址
   List<Digit> digitsList = [];
+  List<Digit> visibleDigitsList = []; //可见代币列表：digit.isVisible = true类型
   bool isVisible = true; //默认链可见
   ChainType chainType;
+
+  List<Digit> getVisibleDigitList() {
+    var tempList = this.digitsList;
+    tempList.retainWhere((element) {
+      return element.isVisible;
+    });
+    return tempList;
+  }
 
   static String chainTypeToValue(ChainType chainType) {
     switch (chainType) {
