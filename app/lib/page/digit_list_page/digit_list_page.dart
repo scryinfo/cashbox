@@ -42,7 +42,7 @@ class _DigitListPageState extends State<DigitListPage> {
   initData() async {
     nowWalletM = Wallets.instance.nowWallet;
     if (nowWalletM != null) {
-      nowChain = nowWalletM.getNowChainM();
+      nowChain = nowWalletM.nowChain;
     }
     if (nowChain != null) {
       nowChainDigitsList = nowChain.digitsList;

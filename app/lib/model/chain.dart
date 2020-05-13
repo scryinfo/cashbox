@@ -16,7 +16,7 @@ abstract class Chain {
   ChainType chainType;
 
   List<Digit> getVisibleDigitList() {
-    var tempList = this.digitsList;
+    var tempList = this.digitsList.map((e) => e).toList();
     tempList.retainWhere((element) {
       return element.isVisible;
     });

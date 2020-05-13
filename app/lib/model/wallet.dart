@@ -130,9 +130,6 @@ class Wallet {
     nowChain = chain;
   }
 
-  Chain getNowChainM() {
-    return nowChain;
-  }
 
   Chain getChainByChainId(String chainId) {
     Chain nowChain;

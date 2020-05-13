@@ -75,16 +75,14 @@ class _EthPageState extends State<EthPage> {
         this.nowWallet = wallet;
         this.walletName = nowWallet.walletName;
         //todo 查看是否需要 判钱包类型 测试处理
-        print("nowChain initData =====>" + this.nowWallet.nowChain.chainType.toString());
         break; //找到，终止循环
       }
     }
+    this.allVisibleDigitsList = this.nowWallet.nowChain.getVisibleDigitList(); //init data
+    digitListFuture = loadDisplayDigitListData();
     setState(() {
       this.walletList = walletList;
     });
-    print("this.nowWallet.nowChain.getVisibleDigitList()===>" + this.nowWallet.nowChain.getVisibleDigitList().length.toString());
-    this.allVisibleDigitsList = this.nowWallet.nowChain.getVisibleDigitList(); //init data
-    digitListFuture = loadDisplayDigitListData();
     loadDigitBalance();
     loadLegalCurrency();
     //loadDigitRateInfo(); //todo
@@ -573,6 +571,7 @@ class _EthPageState extends State<EthPage> {
               return Text(S.of(context).load_data_error);
             }
             if (snapshot.hasData) {
+              print("this.nowWallet.chainList.length===>" + this.nowWallet.chainList.length.toString());
               return Swiper(
                 itemBuilder: (BuildContext context, int index) {
                   return SingleChildScrollView(
@@ -710,7 +709,7 @@ class _EthPageState extends State<EthPage> {
           Container(
             alignment: Alignment.bottomLeft,
             constraints: BoxConstraints(
-              maxWidth: ScreenUtil().setWidth(20.5),
+              maxWidth: ScreenUtil().setWidth(25.5),
             ),
             child: GestureDetector(
               onTap: () {
@@ -728,9 +727,11 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
           ),
-          Gaps.scaleHGap(15.5),
+          Gaps.scaleHGap(4.5),
           Container(
+            color: Colors.transparent,
             child: Container(
+              width: ScreenUtil.instance.setWidth(28),
               child: Text(
                 Chain.chainTypeToValue(this.nowWallet.nowChain.chainType),
                 style: TextStyle(
@@ -738,6 +739,8 @@ class _EthPageState extends State<EthPage> {
                   color: Color.fromRGBO(255, 255, 255, 0.1),
                   fontWeight: FontWeight.bold,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.clip,
               ),
             ),
           ),
