@@ -3,9 +3,12 @@ import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/res/styles.dart';
+import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
+import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
@@ -33,44 +36,44 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   initData() async {
-    nowChainDigitsList = Wallets.instance.nowWallet.getNowChainM().digitsList;
+    nowChainDigitsList = Wallets.instance.nowWallet.nowChain.digitsList;
     await loadDisplayDigitListData();
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        child: Container(
-          width: ScreenUtil().setWidth(90),
-          height: ScreenUtil().setHeight(120),
-          child: Scaffold(
+      child: Container(
+        width: ScreenUtil().setWidth(90),
+        height: ScreenUtil().setHeight(120),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            leading: GestureDetector(
+                onTap: () {
+                  backAndReloadData();
+                },
+                child: Image.asset("assets/images/ic_back.png")),
             backgroundColor: Colors.transparent,
-            appBar: AppBar(
-              leading: GestureDetector(
-                  onTap: () {
-                    backAndReloadData();
-                  },
-                  child: Image.asset("assets/images/ic_eth.png")),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              brightness: Brightness.light,
-              centerTitle: true,
-              title: Text(
-                S.of(context).digit_list_title ?? "",
-                style: TextStyle(fontSize: 20),
-              ),
+            elevation: 0,
+            brightness: Brightness.light,
+            centerTitle: true,
+            title: Text(
+              S.of(context).digit_list_title ?? "",
+              style: TextStyle(fontSize: 20),
             ),
-            body: Container(
-                child: Column(
-              children: <Widget>[Gaps.scaleVGap(5), _digitListAreaWidgets()],
-            )),
           ),
+          body: Container(
+              child: Column(
+            children: <Widget>[Gaps.scaleVGap(5), _digitListAreaWidgets()],
+          )),
         ),
-        onWillPop: () {
-          print("touch ed back keyboard");
-          backAndReloadData();
-          Navigator.pop(context);
-        });
+      ),
+      onWillPop: () {
+        backAndReloadData();
+        Navigator.pop(context);
+      },
+    );
   }
 
   Widget _digitListAreaWidgets() {
@@ -139,9 +142,9 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               onTap: () async {
                 var isExecutorSuccess = false;
                 if (displayDigitsList[index].isVisible) {
-                  isExecutorSuccess = await Wallets.instance.nowWallet.getNowChainM().hideDigit(displayDigitsList[index]);
+                  isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.hideDigit(displayDigitsList[index]);
                 } else {
-                  isExecutorSuccess = await Wallets.instance.nowWallet.getNowChainM().showDigit(displayDigitsList[index]);
+                  isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
                 }
                 if (isExecutorSuccess) {
                   Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
@@ -210,6 +213,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   //
   backAndReloadData() {
     // enter page reload  nowWallet.nowChain.digitList
+    RestartWidget.restartApp(context); //todo 方式待优化
+    //NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
   }
 
   Future<List<Digit>> loadDisplayDigitListData() async {
