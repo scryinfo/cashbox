@@ -70,6 +70,9 @@ dependencies:
   shared_preferences: ^0.5.7+1
   #https://github.com/flutter/plugins
 
+  json_rpc_2: ^2.1.1
+  #https://github.com/dart-lang/json_rpc_2
+
   ffi: ^0.1.3
 
 
