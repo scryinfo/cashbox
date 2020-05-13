@@ -25,6 +25,8 @@ class GlobalConfig {
   static String zhLocale = "zh"; //
   static String enLocale = "en"; //
 
+  static String ipAddress = "ws://47.108.146.67:9944";
+
   static Locale loadLocale(String locale) {
     switch (locale) {
       case 'zh':

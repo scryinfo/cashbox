@@ -25,6 +25,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
   List<Digit> nowChainDigitsList = []; //当前链的代币列表
   List<Digit> serverDigitsList = []; //服务器接口上的代币列表
+  List<Digit> allDisplayDigitsList = []; //界面所有可展示的代币： nowChainDigitsList + serverDigitsList
   List<Digit> displayDigitsList = []; //页面展示的代币列表数据
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
@@ -37,7 +38,17 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
 
   initData() async {
     nowChainDigitsList = Wallets.instance.nowWallet.nowChain.digitsList;
-    await loadDisplayDigitListData();
+    addToAllDisplayDigitsList(nowChainDigitsList);
+    await loadDisplayDigitListData(); //先显示本地已有的代币
+    await loadServerDigitListData(); //服务器可信任代币列表
+  }
+
+  addToAllDisplayDigitsList(List<Digit> newDigitList) {
+    newDigitList.forEach((element) {
+      if (!allDisplayDigitsList.contains(element.shortName == element.shortName)) {
+        allDisplayDigitsList.add(element);
+      }
+    });
   }
 
   @override
@@ -145,6 +156,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.hideDigit(displayDigitsList[index]);
                 } else {
                   isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
+                  //todo 确认要保存到本地digit模型中
+                  Wallets.instance.nowWallet.nowChain.addDigit(Wallets.instance.nowWallet.walletId, displayDigitsList[index]);
                 }
                 if (isExecutorSuccess) {
                   Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
@@ -217,24 +230,26 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     //NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
   }
 
+  Future<List<Digit>> loadServerDigitListData() async {}
+
   Future<List<Digit>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
       //没有展示数据
-      if (nowChainDigitsList.length < singleDigitCount) {
+      if (allDisplayDigitsList.length < singleDigitCount) {
         //加载到的不够一页，全展示
-        addDigitToDisplayList(nowChainDigitsList.length);
+        addDigitToDisplayList(allDisplayDigitsList.length);
       } else {
         //超一页，展示singleDigitCount个。
         addDigitToDisplayList(singleDigitCount);
       }
     } else {
       //有展示数据，继续往里添加
-      if (nowChainDigitsList.length - displayDigitsList.length > singleDigitCount) {
+      if (allDisplayDigitsList.length - displayDigitsList.length > singleDigitCount) {
         //剩余的超过一页
         addDigitToDisplayList(singleDigitCount);
       } else {
         //剩余的不够一页，全给加入进去。
-        addDigitToDisplayList(nowChainDigitsList.length - displayDigitsList.length);
+        addDigitToDisplayList(allDisplayDigitsList.length - displayDigitsList.length);
       }
     }
     return displayDigitsList;
@@ -244,17 +259,17 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     for (var i = displayDigitsList.length; i < targetCount; i++) {
       var digitRate = DigitRate();
       Digit digit = EthDigit();
-      print("addDigitToDisplayList nowChainDigitsList[i].balance===>" + nowChainDigitsList[i].balance.toString());
+      print("addDigitToDisplayList allDisplayDigitsList[i].balance===>" + allDisplayDigitsList[i].balance.toString());
       digit
-        ..chainId = nowChainDigitsList[i].chainId
-        ..digitId = nowChainDigitsList[i].digitId
-        ..decimal = nowChainDigitsList[i].decimal
-        ..shortName = nowChainDigitsList[i].shortName
-        ..fullName = nowChainDigitsList[i].fullName
-        ..balance = nowChainDigitsList[i].balance
-        ..contractAddress = nowChainDigitsList[i].contractAddress
-        ..address = nowChainDigitsList[i].address
-        ..isVisible = nowChainDigitsList[i].isVisible
+        ..chainId = allDisplayDigitsList[i].chainId
+        ..digitId = allDisplayDigitsList[i].digitId
+        ..decimal = allDisplayDigitsList[i].decimal
+        ..shortName = allDisplayDigitsList[i].shortName
+        ..fullName = allDisplayDigitsList[i].fullName
+        ..balance = allDisplayDigitsList[i].balance
+        ..contractAddress = allDisplayDigitsList[i].contractAddress
+        ..address = allDisplayDigitsList[i].address
+        ..isVisible = allDisplayDigitsList[i].isVisible
         ..digitRate = digitRate;
       displayDigitsList.add(digit);
     }

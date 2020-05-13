@@ -126,10 +126,18 @@ class WalletManager {
     return hideDigitMap;
   }
 
-  // 添加代币 todo 2.0 待确定数据格式
-  static Future<bool> addDigit(digit) async {
-    Map<dynamic, dynamic> addDigitMap = await _channel.invokeMethod('addDigit', digit);
-    return null;
+  // 添加代币
+  static Future<Map<dynamic, dynamic>> addDigit(
+      String walletId, String chainId, String fullName, String shortName, String contractAddress, int decimal) async {
+    Map<dynamic, dynamic> addDigitMap = await _channel.invokeMethod('addDigit', {
+      "walletId": walletId,
+      "chainId": chainId,
+      "fullName": fullName,
+      "shortName": shortName,
+      "contractAddress": contractAddress,
+      "decimal": decimal,
+    });
+    return addDigitMap;
   }
 
   // 添加代币list todo 2.0 待确定数据格式

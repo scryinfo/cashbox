@@ -620,12 +620,46 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("digitId")));
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("balance")));
                 try {
-                    NativeLib.updateDigitBalance((String) (call.argument("address")),
+                    message = NativeLib.updateDigitBalance((String) (call.argument("address")),
                             (String) (call.argument("digitId")), (String) (call.argument("balance"
                             )));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "decodeAdditionData exception is " + exception);
                 }
+                break;
+            }
+            case "addDigit": {
+                ScryWalletLog.d("nativeLib=>", "addDigit is enter =>");
+                WalletState walletState = new WalletState();
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("walletId")));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("chainId")));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("fullName")));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("shortName")));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("contractAddress")));
+                ScryWalletLog.d("nativeLib=>", ((int) (call.argument("decimal"))));
+                try {
+                    walletState = NativeLib.addDigit((String) (call.argument("walletId")),
+                            (String) (call.argument("chainId")),
+                            (String) (call.argument("fullName")),
+                            (String) (call.argument("shortName")),
+                            (String) (call.argument("contractAddress")),
+                            (int) (call.argument("decimal")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "decodeAdditionData exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                if (walletState.status == 200) {
+                    resultMap.put("isAddDigit", walletState.isAddDigit);
+                    ScryWalletLog.d("nativeLib=>",
+                            "message.isAddDigit is " + walletState.isAddDigit);
+                } else {
+                    resultMap.put("message", walletState.message);
+                    ScryWalletLog.d("nativeLib=>",
+                            "walletState.message is " + walletState.message.toString());
+                }
+                result.success(resultMap);
                 break;
             }
             default:

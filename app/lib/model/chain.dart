@@ -124,22 +124,17 @@ abstract class Chain {
   }
 
   // 添加代币 todo 2.0 待确定数据格式
-  Future<bool> addDigit(Digit digit) async {
-    digitsList.add(digit);
-    //todo 数据格式
-    /*    var isSuccess = await WalletManager.addDigit(
-        digit.digitId,
-        digit.chainId,
-        digit.address,
-        digit.balance,
-        digit.contractAddress,
-        digit.shortName,
-        digit.fullName,
-        digit.decimal);
-    if (isSuccess) {
-      digitsList.add(digit);
-    }*/
-    return null;
+  Future<bool> addDigit(String walletId, Digit digit) async {
+    Map addDigitMap = await WalletManager.addDigit(walletId, digit.chainId, digit.fullName, digit.shortName, digit.contractAddress, digit.decimal);
+    int status = addDigitMap["status"];
+    bool isAddDigit = addDigitMap["isAddDigit"];
+    if (status == 200) {
+      if (isAddDigit) {
+        digitsList.add(digit);
+        return isAddDigit;
+      }
+    }
+    return false;
   }
 
   // 添加代币list todo 2.0 待确定数据格式
