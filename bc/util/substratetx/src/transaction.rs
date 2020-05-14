@@ -174,8 +174,24 @@ pub fn account_info_key(account_id:&str)->Result<String,error::Error>{
     let account_id=  AccountId::from_ss58check(account_id)?;
     let final_key =  <system::Account<Runtime>>::hashed_key_for(account_id);
     let key = format!("0x{:}", HexDisplay::from(&final_key));
-    println!("key is:{}",key);
     Ok(key)
+}
+
+
+pub fn decode_account_info(info:&str)->Result<EeeAccountInfo,error::Error>{
+    if !info.starts_with("0x") {
+        return Err(error::Error::Custom("input data format error,please start with '0x'".to_string()))
+    }
+    let state_vec = hex::decode(info.get(2..).unwrap())?;
+    let  state = system::AccountInfo::<Index,balances::AccountData<Balance>>::decode(&mut &state_vec.as_slice()[..])?;
+    Ok(EeeAccountInfo{
+        nonce:state.nonce,
+        refcount:state.refcount as u32,
+        free: state.data.free.to_string(),
+        reserved: state.data.reserved.to_string(),
+        misc_frozen: state.data.misc_frozen.to_string(),
+        fee_frozen: state.data.fee_frozen.to_string()
+    })
 }
 
 #[test]
@@ -191,6 +207,7 @@ println!("{:?}",account_info_key("5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8
 #[test]
 fn decode_test(){
     let nonce = "0x0b00000000002ed2523097f2d21d02000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+
     let blob = hex::decode(&nonce[2..10]).unwrap();
     let mut index_target =[0u8;8];
     {
@@ -199,4 +216,11 @@ fn decode_test(){
     }
     let index = u64::from_le_bytes(index_target);
     println!("{:?}",index);
+}
+
+#[test]
+fn decode_account_info_test(){
+    let state_str = "0x0b00000000002ed2523097f2d21d02000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+    let info = decode_account_info(state_str);
+    println!("account info:{:?}",info);
 }
