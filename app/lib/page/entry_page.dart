@@ -138,7 +138,7 @@ class _EntryPageState extends State<EntryPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           Text(
-            languageTextValue,
+            languageTextValue??"",
             style: TextStyle(color: Colors.lightBlue),
           ),
           PopupMenuButton<String>(

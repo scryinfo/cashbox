@@ -14,7 +14,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -58,8 +58,10 @@ dependencies:
   flutter_easyrefresh: ^2.0.3
   # 上下拉刷新功能     https://github.com/xuelongqy/flutter_easyrefresh
 
-  web_socket_channel: ^1.0.15
+  web_socket_channel: ^1.1.0
   # 通过socket通信     https://pub.dev/packages/web_socket_channel#-installing-tab-
+
+  stream_channel: ">=1.1.0 <3.0.0"
 
   flutter_html: ^0.10.4
   #                    https://github.com/Sub6Resources/flutter_html
@@ -71,7 +73,7 @@ dependencies:
   #https://github.com/flutter/plugins
 
   json_rpc_2: ^2.1.1
-  #https://github.com/dart-lang/json_rpc_2
+  #         https://github.com/dart-lang/json_rpc_2
 
   ffi: ^0.1.3
 

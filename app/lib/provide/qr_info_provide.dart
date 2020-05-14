@@ -5,6 +5,7 @@ class QrInfoProvide with ChangeNotifier {
   String _title;
   String _hintInfo;
   String _content;
+  String _btnContent;
 
   get title => _title;
 
@@ -12,11 +13,14 @@ class QrInfoProvide with ChangeNotifier {
 
   get content => _content;
 
+  get btnContent => _btnContent;
+
   /*检查每次调用完毕，清理数据记录*/
   void emptyData() {
     this._title = null;
     this._hintInfo = null;
     this._content = null;
+    this._btnContent = null;
   }
 
   void setTitle(String title) {
@@ -29,5 +33,9 @@ class QrInfoProvide with ChangeNotifier {
 
   void setContent(String content) {
     this._content = content;
+  }
+
+  void setBtnContent(String content) {
+    this._btnContent = content;
   }
 }

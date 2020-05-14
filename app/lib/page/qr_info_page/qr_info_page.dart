@@ -18,6 +18,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
   String title;
   String hintInfo;
   String content;
+  String btnContent;
 
   @override
   void didChangeDependencies() {
@@ -25,6 +26,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
     title = Provider.of<QrInfoProvide>(context).title;
     hintInfo = Provider.of<QrInfoProvide>(context).hintInfo;
     content = Provider.of<QrInfoProvide>(context).content;
+    btnContent = Provider.of<QrInfoProvide>(context).btnContent;
   }
 
   @override
