@@ -6,6 +6,10 @@ use bitcoin::{Network, PublicKey, Address, Transaction, TxIn, OutPoint, Script, 
 use jni::JNIEnv;
 use jni::objects::{JClass, JString, JValue, JObject};
 use jni::sys::jobject;
+use bitcoin_hashes::hex::FromHex;
+use bitcoin_hashes::hex::ToHex;
+use bitcoin_hashes::hash160;
+use bitcoin_hashes::Hash;
 
 
 const PASSPHRASE: &str = "";
@@ -41,41 +45,49 @@ pub fn create_address(master: &mut MasterAccount, path: (u32, u32)) -> (PublicKe
 //create transaction
 //value : the bitcoin value you want to spend  the unit is "Satoshi"
 //     1 bitcoin == 100 million satoshi  100 000 000
-//address_str： is the target address string ,means the address you wanna to spend for the transaction
-pub fn create_translation(value: u64, address_str: &str, master: MasterAccount) -> Transaction {
-    //  对比utxo 和 value的差值
-    //  如果不够,考虑报错
-    //  构建话费的交易信息 第一段硬编码的txid代表 utxo
-    //  本次交易不带签名
-    //  out 中的script_pubkey 代表目标地址的公钥 todo
-    let mut spending_transaction = Transaction {
-        input: vec![
-            TxIn {
-                previous_output: OutPoint {
-                    txid: sha256d::Hash::from_hex("d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916").unwrap(),
-                    vout: 1,
-                },
-                sequence: RBF,
-                witness: Vec::new(),
-                script_sig: Script::new(),
-            }
-        ],
-        output: vec![
-            TxOut {
-                script_pubkey: target.script_pubkey(),
-                value: 21000,
-            },
-        ],
-        lock_time: 0,
-        version: 2,
-    };
+//target： is the target address string ,means the address you wanna to spend for the transaction
+// pub fn create_translation(value: u64, target: &str, master: MasterAccount) -> Transaction {
+//     //  对比utxo 和 value的差值
+//     //  如果不够,考虑报错
+//     //  构建话费的交易信息 第一段硬编码的txid代表 utxo
+//     //  本次交易不带签名
+//     //  out 中的script_pubkey 代表目标地址的公钥 todo
+//     let mut spending_transaction = Transaction {
+//         input: vec![
+//             TxIn {
+//                 previous_output: OutPoint {
+//                     txid: sha256d::Hash::from_hex("d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916").unwrap(),
+//                     vout: 1,
+//                 },
+//                 sequence: RBF,
+//                 witness: Vec::new(),
+//                 script_sig: Script::new(),
+//             }
+//         ],
+//         output: vec![
+//             TxOut {
+//                 script_pubkey: target.script_pubkey(),
+//                 value: 21000,
+//             },
+//         ],
+//         lock_time: 0,
+//         version: 2,
+//     };
+//
+//     // 需要拼装输入的script_sig
+//     master.sign(&mut spending_transaction, SigHashType::All,
+//                 &(|_| Some(input_transaction.output[0].clone())),
+//                 &mut unlocker).expect("can not sign");
+//
+//     spending_transaction
+// }
 
-    // 需要拼装输入的script_sig
-    master.sign(&mut spending_transaction, SigHashType::All,
-                &(|_| Some(input_transaction.output[0].clone())),
-                &mut unlocker).expect("can not sign");
-
-    spending_transaction
+///计算hash160
+pub fn hash160( public_key: &str) -> String {
+    let decode: Vec<u8> = FromHex::from_hex(public_key).expect("Invalid public key");
+    let hash = hash160::Hash::hash(&decode[..]);
+    warn!("HASH160 {:?}", hash.to_hex());
+    hash.to_hex()
 }
 
 //#[no_mangle]

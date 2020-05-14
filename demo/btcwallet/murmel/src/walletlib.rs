@@ -28,14 +28,16 @@ pub fn create_master() -> Transaction {
     // get next legacy receiver address
     let source = master.get_mut((0, 0)).unwrap().next_key().unwrap().address.clone();
     let public_key = master.get_mut((0, 0)).unwrap().next_key().unwrap().public.clone();
-    println!("{:?}", source);
-    println!("{:?}", public_key);
+    println!("source {:?}", source);
+    println!("public_key {:?}", public_key);
 
     let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 1, 10).unwrap();
     master.add_account(account);
     // get next legacy receiver address
     let target = master.get_mut((0, 1)).unwrap().next_key().unwrap().address.clone();
-    println!("{:?}", target);
+    let target_pubkey = master.get_mut((0, 0)).unwrap().next_key().unwrap().public.clone();
+    println!("target address {:?}", target);
+    println!("target pub key {:?}", target_pubkey);
 
     const RBF: u32 = 0xffffffff - 2;
 
@@ -86,6 +88,9 @@ pub fn create_master() -> Transaction {
 mod test {
     use walletlib::create_master;
     use bitcoin::consensus::serialize;
+    use jniapi::create_translation::hash160;
+    use bitcoin::Address;
+    use std::str::FromStr;
 
     #[test]
     pub fn fee_test() {
@@ -93,10 +98,12 @@ mod test {
         let ser = serialize(&tx);
         println!("{:?}", ser.len());
 
-        let bytes:f32 = 1.0*148f32+34.0*1.0+10.0f32;
-        let sto = bytes*0.675;
-        println!("{:?}",sto)
+        let bytes: f32 = 1.0 * 148f32 + 34.0 * 1.0 + 10.0f32;
+        let sto = bytes * 0.675;
+        println!("{:?}", sto);
 
+        let target = Address::from_str("n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk").unwrap();
+        println!("target {:?}", target.script_pubkey());
     }
 }
 
