@@ -394,6 +394,7 @@ public class NativeLib {
         public String ethSignedInfo;        //签名eth交易 所得信息
         public String inputInfo;            //附加信息
         public String accountKeyInfo;       //账户存储key
+        public AccountInfo accountInfo;     //账户信息
 
         @Override
         public String toString() {
@@ -405,12 +406,32 @@ public class NativeLib {
                     ", ethSignedInfo='" + ethSignedInfo + '\'' +
                     ", inputInfo='" + inputInfo + '\'' +
                     ", accountKeyInfo='" + accountKeyInfo + '\'' +
+                    ", accountInfo=" + accountInfo +
                     '}';
         }
     }
 
+    //定义EEE 链账户信息
+    public static class AccountInfo{
+        public int nonce;                // The number of transactions this account has sent.
+        public int refcount;             //The number of other modules that currently depend on this account's existence.
+        public String free;              //可自由支配的余额
+        public String reserved;          //保留的余额，这里面的余额 表示参加需要的活动，目前链上还未设计这相关业务
+        public String misc_frozen;      // The amount that `free` may not drop below when withdrawing for *anything except transaction fee payment*.
+        public String fee_frozen;       //The amount that `free` may not drop below when withdrawing specifically for transaction fee payment.
 
-
+        @Override
+        public String toString() {
+            return "AccountInfo{" +
+                    "nonce=" + nonce +
+                    ", refcount=" + refcount +
+                    ", free='" + free + '\'' +
+                    ", reserved='" + reserved + '\'' +
+                    ", misc_frozen='" + misc_frozen + '\'' +
+                    ", fee_frozen='" + fee_frozen + '\'' +
+                    '}';
+        }
+    }
 
     //获取拼装原始交易，区分链类型
     //返回：未签名的交易 String, 格式为json格式
@@ -445,6 +466,12 @@ public class NativeLib {
     //构造jsonrpc 请求数据格式{"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
     public static native Message eeeAccountInfoKey(String addr);
 
+    /**
+     * 解码从链上查询回来的账户信息
+     * @param encodeData 输入十六进制格式数据  ‘0x’
+     * @return 若格式正确，返回status 200,Message中accountInfo字段包含详情，若格式错误，msg字段包含错误信息
+     */
+    public static native Message decodeAccountInfo(String encodeData);
 
     /*------------------------------------------交易相关------------------------------------------*/
 

@@ -15,8 +15,9 @@ public class NativeLibTest {
         System.out.println("********************start jni func test***************************************");
       // walletGenerateTest();
        // walletExportTest();
-        eeeTransferTest();
+        //eeeTransferTest();
         eeeAccountInfoKeyTest();
+        decodeAccountInfoTest();
         // eeeTxsign();
       //  walletSaveTest();
        // updateBalance();
@@ -67,7 +68,12 @@ public class NativeLibTest {
     }
 
     public static void eeeAccountInfoKeyTest(){
-        NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4");
+        NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty");
+        System.out.println(msg);
+    }
+
+    public static void decodeAccountInfoTest(){
+        NativeLib.Message msg = NativeLib.decodeAccountInfo("0x000000000100405f2954c5c535360000000000000000c040b571e8030000000000000000000000c16ff2862300000000000000000000000000000000000000000000000000");
         System.out.println(msg);
     }
 
