@@ -3,9 +3,13 @@
 use bitcoin_wallet::account::{MasterAccount, Account, AccountAddressType, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
 use bitcoin::{Network, PublicKey, Address, Transaction, TxIn, OutPoint, Script, TxOut, SigHashType};
+use jni::JNIEnv;
+use jni::objects::{JClass, JString, JValue, JObject};
+use jni::sys::jobject;
 
 
 const PASSPHRASE: &str = "";
+const RBF: u32 = 0xffffffff - 2;
 
 // mnemonic words
 pub fn create_master_by_mnemonic(mnemonic_str: &str, network: Network) -> MasterAccount {
@@ -34,12 +38,11 @@ pub fn create_address(master: &mut MasterAccount, path: (u32, u32)) -> (PublicKe
     (public_key, source)
 }
 
-// create transaction
-// value : the bitcoin value you want to spend  the unit is "Satoshi"
-//      1 bitcoin = 100 million satoshi  100 000 000
-// address_str： is the target address string ,means the address you wanna to spend for the transaction
+//create transaction
+//value : the bitcoin value you want to spend  the unit is "Satoshi"
+//     1 bitcoin == 100 million satoshi  100 000 000
+//address_str： is the target address string ,means the address you wanna to spend for the transaction
 pub fn create_translation(value: u64, address_str: &str, master: MasterAccount) -> Transaction {
-    //  todo 查询utxo
     //  对比utxo 和 value的差值
     //  如果不够,考虑报错
     //  构建话费的交易信息 第一段硬编码的txid代表 utxo
@@ -75,4 +78,18 @@ pub fn create_translation(value: u64, address_str: &str, master: MasterAccount) 
     spending_transaction
 }
 
-// todo calculate tx fee
+//#[no_mangle]
+// pub extern "system" fn Java_JniApi_creat_1master(env: JNIEnv, _: JClass, mnemonic_str: JString) -> jobject {
+//     let mnemonic_str = env.get_string(mnemonic_str).unwrap();
+//
+//     let message_class = env.find_class("JniApi$StatusMessage").expect("can't find class JniApi$StatusCode");
+//     let message_obj = env.alloc_object(message_class).expect("create message instance error");
+//
+//     env.set_field(message_obj, "code", "I", JValue::Int(200)).expect("set code error");
+//     env.set_field(message_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("Rust".to_string()).unwrap()))).expect("set error msg value is error!");
+//
+//
+//     message_obj.into_inner()
+// }
+
+// calculate tx fee
