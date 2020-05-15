@@ -43,6 +43,7 @@ class _EthPageState extends State<EthPage> {
   Future digitListFuture;
   List<Digit> allVisibleDigitsList = []; //当前链所有可见代币列表
   List<Digit> displayDigitsList = []; //当前分页展示的固定代币数量信息
+  num chainIndex = 0; //当前链的下标
 
   @override
   void initState() {
@@ -80,6 +81,8 @@ class _EthPageState extends State<EthPage> {
     }
     this.allVisibleDigitsList = this.nowWallet.nowChain.getVisibleDigitList(); //init data
     digitListFuture = loadDisplayDigitListData();
+    chainIndex = this.nowWallet.chainList.indexOf(this.nowWallet.nowChain);
+    print("chainIndex=======>" + chainIndex.toString());
     setState(() {
       this.walletList = walletList;
     });
@@ -571,9 +574,11 @@ class _EthPageState extends State<EthPage> {
               return Text(S.of(context).load_data_error);
             }
             if (snapshot.hasData) {
-              print("this.nowWallet.chainList.length===>" + this.nowWallet.chainList.length.toString());
+              print("this.nowWallet.chainList.length snapshot.hasData===>" + this.nowWallet.chainList.length.toString());
               return Swiper(
                 itemBuilder: (BuildContext context, int index) {
+                  print("itemBuilder length====>" + this.nowWallet.chainList.length.toString());
+                  print("itemBuilder index====>" + index.toString() + "||" + this.nowWallet.chainList[index].chainType.toString());
                   return SingleChildScrollView(
                     child: Container(
                       alignment: Alignment.centerLeft,
@@ -594,14 +599,20 @@ class _EthPageState extends State<EthPage> {
                     ),
                   );
                 },
-                onIndexChanged: (index) {
-                  setState(() {
-                    this.nowWallet.nowChain = this.nowWallet.chainList[index];
-                    this.nowWallet.nowChain.chainAddress = this.nowWallet.nowChain.chainAddress;
-                    this.allVisibleDigitsList = this.nowWallet.nowChain.getVisibleDigitList(); //init data
-                    this.displayDigitsList = [];
-                    loadDisplayDigitListData();
-                  });
+                index: chainIndex,
+                onIndexChanged: (index) async {
+                  print("onIndexChanged index======>" + index.toString() + "||" + this.nowWallet.chainList[index].chainType.toString());
+                  bool isSetNowChain = await this.nowWallet.setNowChain(this.nowWallet.chainList[index]);
+                  print("isSetNowChain===>" + isSetNowChain.toString());
+                  if (isSetNowChain) {
+                    setState(() {
+                      this.chainIndex = index;
+                      this.nowWallet.nowChain.chainAddress = this.nowWallet.nowChain.chainAddress;
+                      this.allVisibleDigitsList = this.nowWallet.nowChain.getVisibleDigitList(); //init data
+                      this.displayDigitsList = [];
+                      loadDisplayDigitListData();
+                    });
+                  }
                   loadDigitBalance();
                   //loadDigitRateInfo();//todo
                 },
@@ -614,15 +625,7 @@ class _EthPageState extends State<EthPage> {
                 autoplay: false,
               );
             }
-            return Swiper(
-                itemCount: 1,
-                itemBuilder: (BuildContext context, int index) {
-                  return SingleChildScrollView(
-                    child: Container(
-                      child: Text(""),
-                    ),
-                  );
-                });
+            return Text("");
           }),
     );
   }
@@ -690,6 +693,15 @@ class _EthPageState extends State<EthPage> {
 
   //链卡片 地址address
   Widget _chainCardAddressWidget(index) {
+    print("nowChian===>" + this.nowWallet.nowChain.toString() + "||");
+    print("_chainCardAddressWidget index======>" +
+        index.toString() +
+        "||" +
+        this.nowWallet.chainList[index].chainType.toString() +
+        "||" +
+        Chain.chainTypeToValue(this.nowWallet.nowChain.chainType) +
+        "||" +
+        this.nowWallet.chainList[index].chainAddress.toString());
     return Container(
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.start,

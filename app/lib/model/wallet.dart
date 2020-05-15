@@ -112,16 +112,22 @@ class Wallet {
 
   // 设置当前链
   // apiNo:WM13
-  Future<bool> setNowChain(int chainType) async {
-    Map setNowChainMap = await WalletManager.setNowChain(walletId, chainType);
+  Future<bool> setNowChain(Chain chain) async {
+    int chainTypeInt = Chain.chainTypeToInt(chain.chainType);
+    print("walletid===>" + walletId + "||chainTypeInt===>" + chainTypeInt.toString());
+    Map setNowChainMap = await WalletManager.setNowChain(walletId, chainTypeInt);
     int status = setNowChainMap["status"];
     bool isSetNowChain = setNowChainMap["isSetNowChain"];
+    print("status===>" + status.toString());
+    print("isSetNowChain===>" + setNowChainMap["isSetNowChain"].toString());
     if (status == null) {
       return false;
     }
     if (status == 200) {
+      nowChain = chain;
       return isSetNowChain;
     } else {
+      print("status===>" + setNowChainMap["message"].toString());
       return false;
     }
   }
@@ -129,7 +135,6 @@ class Wallet {
   setNowChainM(Chain chain) async {
     nowChain = chain;
   }
-
 
   Chain getChainByChainId(String chainId) {
     Chain nowChain;
