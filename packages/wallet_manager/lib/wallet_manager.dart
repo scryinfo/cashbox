@@ -200,4 +200,14 @@ class WalletManager {
     Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateDigitBalance", {"address": address, "digitId": digitId, "balance": balance});
     return updateMap;
   }
+
+  static eeeAccountInfoKey(String address) async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("eeeAccountInfoKey", {"address": address});
+    return updateMap;
+  }
+
+  static decodeAccountInfo(String encodeData) async {
+    Map<dynamic, dynamic> decodeMap = await _channel.invokeMethod("decodeAccountInfo", {"encodeData": encodeData});
+    return decodeMap;
+  }
 }

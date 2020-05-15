@@ -662,6 +662,50 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
+            case "eeeAccountInfoKey": {
+                ScryWalletLog.d("nativeLib=>", "eeeAccountInfoKey is enter =>");
+                Message message = new Message();
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("address")));
+                try {
+                    message = NativeLib.eeeAccountInfoKey((String) (call.argument("address")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "eeeAccountInfoKey exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                if (message.status == 200) {
+                    resultMap.put("accountKeyInfo", message.accountKeyInfo);
+                    ScryWalletLog.d("nativeLib=>",
+                            "message.accountKeyInfo is " + message.accountKeyInfo.toString());
+                } else {
+                    resultMap.put("message", message.message);
+                    ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
+                }
+                result.success(resultMap);
+                break;
+            }
+            case "decodeAccountInfo": {
+                ScryWalletLog.d("nativeLib=>", "decodeAccountInfo is enter =>");
+                Message message = new Message();
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("encodeData")));
+                try {
+                    message = NativeLib.decodeAccountInfo((String) (call.argument("encodeData")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "decodeAccountInfo exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                if (message.status == 200) {
+                    resultMap.put("accountKeyInfo", message.accountKeyInfo);
+                    ScryWalletLog.d("nativeLib=>",
+                            "message.accountKeyInfo is " + message.accountKeyInfo.toString());
+                } else {
+                    resultMap.put("message", message.message);
+                    ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
+                }
+                result.success(resultMap);
+                break;
+            }
             default:
                 result.notImplemented();
                 break;

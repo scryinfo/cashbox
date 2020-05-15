@@ -334,4 +334,15 @@ class Wallets {
     }
     WalletManager.updateDigitBalance(address, digitId, balance);
   }
+
+  //
+  eeeAccountInfoKey(String address) async {
+    Map eeeAccountMap = await WalletManager.eeeAccountInfoKey(address);
+  }
+
+  //
+  decodeAccountInfo(String encodeData) async {
+    Map eeeAccountMap = await WalletManager.decodeAccountInfo(encodeData);
+  }
+
 }
