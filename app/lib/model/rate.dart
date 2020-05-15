@@ -44,6 +44,7 @@ class Rate {
     return this.legalMap[this.nowLegalCurrency];
   }
 
+  //todo 待rate后台接口确认后，替换成changeDaily
   double getChangeHourly(Digit digit) {
     if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
       return 0.0;
@@ -106,8 +107,8 @@ class DigitRate {
   double histLow = 0.0;
   int timestamps = 0;
   int volume = 0;
-  double changeHourly = 0.00;
-
+  double changeHourly = 0.00; //todo 待rate后台接口确认后，替换成changeDaily
+  //todo 待rate后台接口确认后，替换成changeDaily
   String get getChangeHour {
     if (changeHourly > 0) {
       return (changeHourly * 100.0).toStringAsFixed(5) + "%" + "↑";
