@@ -93,7 +93,9 @@ class _EntryPageState extends State<EntryPage> {
                 return _buildProtocolLayout(context);
               }
             }
-            return _buildProtocolLayout(context);
+            return Container(
+              child: Text(""),
+            );
           }),
     );
   }
@@ -138,7 +140,7 @@ class _EntryPageState extends State<EntryPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           Text(
-            languageTextValue??"",
+            languageTextValue ?? "",
             style: TextStyle(color: Colors.lightBlue),
           ),
           PopupMenuButton<String>(

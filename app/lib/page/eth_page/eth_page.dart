@@ -619,7 +619,7 @@ class _EthPageState extends State<EthPage> {
                 itemBuilder: (BuildContext context, int index) {
                   return SingleChildScrollView(
                     child: Container(
-                      child: Text(S.of(context).data_loading),
+                      child: Text(""),
                     ),
                   );
                 });
