@@ -238,6 +238,15 @@ public class NativeLib {
     // 增加代币
     // apiNo:WM16
     public static native WalletState addDigit(String walletId, String chainId, String fullName, String shortName, String contractAddress, int decimal);
+    // 0515 meeting
+    // 1、addDigit区分处理
+    // 2、digit数据结构增加字段 是否是自定义
+    // 3、查询代币列表，分页
+    // 4、检查更新的口子（parker）
+    // 5、ip等配置文件，配置流程。（parker）
+
+
+
 
     /*------------------------------------------链相关------------------------------------------*/
 
@@ -270,7 +279,7 @@ public class NativeLib {
     }
 
     //定义EEE 链账户信息
-    public static class AccountInfo{
+    public static class AccountInfo {
         public int nonce;                // The number of transactions this account has sent.
         public int refcount;             //The number of other modules that currently depend on this account's existence.
         public String free;              //可自由支配的余额
@@ -289,7 +298,7 @@ public class NativeLib {
     // 关于eee相关的数据获取，交易提取，全部由客户端来操作，底层不对网络进行操作；
     // 底层直接构造一个签名好的转账交易，通过Message字段中signedInfo属性传回可以直接提交的到链的信息
     //注意：vaule 在转账中使用默认单位: unit,精度为10^12， 即 1 unit =1000_000_000_000
-    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index,int runtime_version,byte[] pwd);
+    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version, byte[] pwd);
 
     //msg: 交易
     //TODO 该接口的使用还需要重新规划
@@ -312,12 +321,14 @@ public class NativeLib {
     public static native Message eeeEnergyBalance(long handle, String addr);
 
     //EEE 账号信息对应的key,输入待查询的地址，比如：5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4，
-    // 返回编码后的key:0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
+    // 返回编码后的key
+    // :0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
     //构造jsonrpc 请求数据格式{"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
     public static native Message eeeAccountInfoKey(String addr);
 
     /**
      * 解码从链上查询回来的账户信息
+     *
      * @param encodeData 输入十六进制格式数据  ‘0x’
      * @return 若格式正确，返回status 200,Message中accountInfo字段包含详情，若格式错误，msg字段包含错误信息
      */
