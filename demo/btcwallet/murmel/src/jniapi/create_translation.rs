@@ -10,6 +10,9 @@ use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::Hash;
+use std::str::FromStr;
+use bitcoin::blockdata::script::Builder;
+use bitcoin::blockdata::opcodes;
 
 
 const PASSPHRASE: &str = "";
@@ -51,7 +54,8 @@ pub fn create_address(master: &mut MasterAccount, path: (u32, u32)) -> (PublicKe
 //     //  如果不够,考虑报错
 //     //  构建话费的交易信息 第一段硬编码的txid代表 utxo
 //     //  本次交易不带签名
-//     //  out 中的script_pubkey 代表目标地址的公钥 todo
+//     let target = Address::from_str(target).unwrap();
+//
 //     let mut spending_transaction = Transaction {
 //         input: vec![
 //             TxIn {
@@ -74,9 +78,17 @@ pub fn create_address(master: &mut MasterAccount, path: (u32, u32)) -> (PublicKe
 //         version: 2,
 //     };
 //
+//
+//     let input_script = Builder::new().push_opcode(opcodes::all::OP_DUP)
+//                                .push_opcode(opcodes::all::OP_HASH160)
+//                                .push_slice(&hex_decode("44af04fb17f6d79b93513e49c79c15ca29d56290").unwrap())
+//                                .push_opcode(opcodes::all::OP_EQUALVERIFY)
+//                                .push_opcode(opcodes::all::OP_CHECKSIG)
+//                                .into_script();
+//
 //     // 需要拼装输入的script_sig
 //     master.sign(&mut spending_transaction, SigHashType::All,
-//                 &(|_| Some(input_transaction.output[0].clone())),
+//                 &(|_| Some(input_script.output[0].clone())),
 //                 &mut unlocker).expect("can not sign");
 //
 //     spending_transaction

@@ -25,11 +25,12 @@ pub fn create_master() -> Transaction {
     let mut unlocker = Unlocker::new_for_master(&master, PASSPHRASE).unwrap();
     let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
     master.add_account(account);
-    // get next legacy receiver address
+
     let source = master.get_mut((0, 0)).unwrap().next_key().unwrap().address.clone();
     let public_key = master.get_mut((0, 0)).unwrap().next_key().unwrap().public.clone();
-    println!("source {:?}", source);
+    println!("source {:?}", &source);
     println!("public_key {:?}", public_key);
+    println!("script_pubkey {:?}", source.script_pubkey());
 
     let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 1, 10).unwrap();
     master.add_account(account);
@@ -103,7 +104,7 @@ mod test {
         println!("{:?}", sto);
 
         let target = Address::from_str("n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk").unwrap();
-        println!("target {:?}", target.script_pubkey());
+        println!("target {:?}", target);
     }
 }
 
