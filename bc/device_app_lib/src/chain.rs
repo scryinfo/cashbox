@@ -230,8 +230,8 @@ pub mod android {
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
 
         match wallets::module::chain::show_chain(wallet_id.as_str(), wallet_type as i64) {
-            Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type");
+            Ok(_) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
                 env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(1 as u8)).expect("set isShowChain value");
             },
             Err(msg) => {
@@ -251,8 +251,8 @@ pub mod android {
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
 
         match wallets::module::chain::hide_chain(wallet_id.as_str(), wallet_type as i64) {
-            Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type");
+            Ok(_) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
                 env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(1 as u8)).expect("set isHideChain value");
             },
             Err(msg) => {
@@ -293,11 +293,11 @@ pub mod android {
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
         match wallets::module::chain::get_now_chain_type(wallet_id.as_str()) {
             Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("find status type");
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
                 env.set_field(state_obj, "getNowChainType", "I", JValue::Int(code as i32)).expect("get nowChainType value");
             },
             Err(msg) => {
-                //env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value");
+                //env.set_field(state_obj, "status", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value");
                 env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error message");
             }
         }
@@ -312,8 +312,8 @@ pub mod android {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("setNowChainType wallet_state_class");
         let state_obj = env.alloc_object(wallet_state_class).expect("setNowChainType create state_obj");
         match wallets::module::chain::set_now_chain_type(wallet_id.as_str(),chain_type as i64) {
-            Ok(code) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(code as i32)).expect("setNowChainType status");
+            Ok(_) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");
                 env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(1 as u8)).expect("setNowChainType isSetNowChain");
             },
             Err(msg) => {

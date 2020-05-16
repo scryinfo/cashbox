@@ -58,13 +58,19 @@ pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
             selected: wallet.selected,
             create_time: wallet.create_time,
             eee_chain: {
-                let eee_option = eee_data.get(&wallet_id);
+               // eee_data.get(&wallet_id).
+                if let Some(eee_data)= eee_data.get(&wallet_id){
+                    Some(eee_data[0].clone())
+                }else {
+                    None
+                }
+               /* let eee_option = eee_data.get(&wallet_id);
                 if eee_option.is_some() {
                     let eee_chain = eee_option.unwrap()[0].clone();
                     Some(eee_chain)
                 } else {
                     None
-                }
+                }*/
             },
             eth_chain: {
                 let eth_option = eth_data.get(&wallet_id);

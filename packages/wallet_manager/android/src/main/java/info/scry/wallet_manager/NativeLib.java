@@ -172,6 +172,8 @@ public class NativeLib {
         public boolean isShowDigit;           //设置显示代币,是否成功   apiNo:WM14   执行状态： 1成功 0失败
         public boolean isHideDigit;           //设置隐藏代币,是否成功   apiNo:WM15   执行状态： 1成功 0失败
         public boolean isAddDigit;            //添加代币,是否成功       apiNo:WM16   执行状态： 1成功 0失败
+        public boolean isUpdateDigitBalance;  //更新拥有代币的数量,是否成功   执行状态： 1成功 0失败
+
         public String message;                //错误信息，详细说明
     }
 
@@ -246,7 +248,12 @@ public class NativeLib {
     // 5、ip等配置文件，配置流程。（parker）
 
 
+    public static class Digit {
+        public String id;
+        public String logUrl;
+    }
 
+    public static native Message addDigitTest(Digit digit);
 
     /*------------------------------------------链相关------------------------------------------*/
 
@@ -364,8 +371,14 @@ public class NativeLib {
 
     public static native boolean btcTxBroascastTx(byte[] signedTx);
 
-    //更新代币余额
-    public static native Message updateDigitBalance(String address, String digitId, String balance);
+    /**
+     * 更新地址对应代币的余额
+     * @param address 链地址
+     * @param digitId  代币id
+     * @param balance 代币数量  传递进去的代币单位怎么来确定？
+     * @return  更新钱包代币结果， 使用 isUpdateDigitBalance来标识操作结果
+     */
+    public static native WalletState updateDigitBalance(String address, String digitId, String balance);
 
     //解码交易附加信息
     public static native Message decodeAdditionData(String input);

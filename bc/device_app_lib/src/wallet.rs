@@ -209,7 +209,7 @@ pub mod android {
         let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$WalletState instance ");
 
         match wallets::module::wallet::reset_mnemonic_pwd(wallet_id.as_str(), old_pwd.as_slice(), new_pwd.as_slice()) {
-            Ok(code) => {
+            Ok(_code) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("resetPwd StatusCode ");
                 env.set_field(state_obj, "isResetPwd", "Z", JValue::Bool(1 as u8)).expect("set isSetNowWallet value ");
             },
