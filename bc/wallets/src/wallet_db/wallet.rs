@@ -69,7 +69,7 @@ impl DataServiceProvider {
                         // todo 处理chain_id异常
                         let convert_ret = chain_id_convert_group_name(addr.chain_id).unwrap();
                         log::debug!("type:{},group name:{}",convert_ret.0,convert_ret.1);
-                        let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase where status =1 and is_visible =1 and type={} and group_name = '{}';", addr.address_id, convert_ret.0, convert_ret.1);
+                        let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase where status =1 and is_visible =1 and chain_type={} and group_name = '{}';", addr.address_id, convert_ret.0, convert_ret.1);
                         self.db_hander.execute(sql)?;
                     }
                     Ok(())
@@ -270,7 +270,7 @@ impl DataServiceProvider {
                 domain: row[4].as_string().map(|str| String::from(str)),
                 selected: row[5].as_string().map(|value| Self::get_bool_value(value)),
                 chain_type: row[6].as_integer(),
-                digit_id: row[7].as_integer(),
+                digit_id: row[7].as_string().map(|str| String::from(str)),
                 contract_address: row[8].as_string().map(|str| String::from(str)),
                 short_name: row[9].as_string().map(|str| String::from(str)),
                 full_name: row[10].as_string().map(|str| String::from(str)),
@@ -283,19 +283,5 @@ impl DataServiceProvider {
             tbwallets.push(tbwallet);
         }
         Ok(tbwallets)
-    }
-    pub fn init_data(&mut self) -> WalletResult<()> {
-        /*  self.tx_begin();
-          //初始化钱包数据
-
-          //初始化代币数据
-          let bytecode = include_bytes!("res/chainEthFile.json");
-          let digits = serde_json::from_slice::<Vec<table_desc::DigitExport>>(&bytecode[..])?;
-          if let Err(err) = self.init_digit_base_data(digits){
-              self.tx_rollback();
-              return Err(err);
-          }
-          */
-        Ok(())
     }
 }

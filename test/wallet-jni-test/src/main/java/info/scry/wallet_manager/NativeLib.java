@@ -279,6 +279,7 @@ public class NativeLib {
         public boolean isHideDigit;           //设置隐藏代币,是否成功   apiNo:WM15   执行状态： 1成功 0失败
         public boolean isAddDigit;            //添加代币,是否成功       apiNo:WM16   执行状态： 1成功 0失败
         public boolean isUpdateDigitBalance;  //更新拥有代币的数量,是否成功   执行状态： 1成功 0失败
+        public boolean isInitWalletBasicData;  //初始化数据基础数据,是否成功   执行状态： 1成功 0失败
 
         public String message;                //错误信息，详细说明
 
@@ -300,13 +301,20 @@ public class NativeLib {
                     ", isHideDigit=" + isHideDigit +
                     ", isAddDigit=" + isAddDigit +
                     ", isUpdateDigitBalance=" + isUpdateDigitBalance +
+                    ", isInitWalletBasicData=" + isInitWalletBasicData +
                     ", message='" + message + '\'' +
                     '}';
         }
     }
 
-    // 是否已有钱包
-    // apiNo:WM01 fixed - fixed
+    /**
+     * 初始化钱包数据文件，加载基础数据
+     *
+     * @return// 是否已有钱包
+     */
+    public static native WalletState initWalletBasicData();
+    
+     // apiNo:WM01 fixed - fixed
     public static native WalletState isContainWallet();
 
     // 导出所有钱包
@@ -501,10 +509,11 @@ public class NativeLib {
 
     /**
      * 更新地址对应代币的余额
+     *
      * @param address 链地址
-     * @param digitId  代币id
+     * @param digitId 代币id
      * @param balance 代币数量  传递进去的代币单位怎么来确定？
-     * @return  更新钱包代币结果， 使用 isUpdateDigitBalance来标识操作结果
+     * @return 更新钱包代币结果， 使用 isUpdateDigitBalance来标识操作结果
      */
     public static native WalletState updateDigitBalance(String address, String digitId, String balance);
 

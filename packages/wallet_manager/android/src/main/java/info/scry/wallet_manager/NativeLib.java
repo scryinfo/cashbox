@@ -173,10 +173,16 @@ public class NativeLib {
         public boolean isHideDigit;           //设置隐藏代币,是否成功   apiNo:WM15   执行状态： 1成功 0失败
         public boolean isAddDigit;            //添加代币,是否成功       apiNo:WM16   执行状态： 1成功 0失败
         public boolean isUpdateDigitBalance;  //更新拥有代币的数量,是否成功   执行状态： 1成功 0失败
+        public boolean isInitWalletBasicData;  //初始化数据基础数据,是否成功   执行状态： 1成功 0失败
 
         public String message;                //错误信息，详细说明
     }
 
+    /**
+     * 初始化钱包数据文件，加载基础数据
+     * @return
+     */
+    public static native WalletState initWalletBasicData();
     // 是否已有钱包
     // apiNo:WM01 fixed - fixed
     public static native WalletState isContainWallet();

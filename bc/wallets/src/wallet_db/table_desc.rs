@@ -2,15 +2,14 @@
 /// Description of a Digit
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
 pub struct DigitExport {
-    /// Nonce
     pub address: String,
-    /// Recipient (None when contract creation)
+
     pub symbol: String,
-    /// Transfered value
+
     pub decimal: i64,
     #[serde(rename = "type")]
     pub digit_type: String,
-    /// Input data
+
     #[serde(rename = "urlImg")]
     pub url_img: Option<String>,
 
@@ -45,13 +44,13 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [status] INT NOT NULL  DEFAULT 1,
     [more_property] VARCHAR(1),
     [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [update_time] DATETIME);
+    [update_time] timestamp);
 
    DROP TABLE IF EXISTS [main].[DigitBase];
     CREATE TABLE [main].[DigitBase](
-    [id] INTEGER PRIMARY KEY NOT NULL,
+    [id] VARCHAR(40) PRIMARY KEY NOT NULL,
     [contract_address] VARCHAR(64),
-	[type] INT  NOT NULL,
+	[chain_type] INT  NOT NULL,
     [short_name] VARCHAR(32),
     [full_name] VARCHAR(32),
     [next_id] INT,
@@ -60,9 +59,11 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
     [decimals] INT,
 	[unit]  VARCHAR(32),
+	[is_basic] VARCHAR(1) NOT NULL  DEFAULT 0,
+	[is_default] VARCHAR(1) NOT NULL  DEFAULT 0,
     [status] INT NOT NULL  DEFAULT 0,
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [UPDATED_TIME] DATETIME);
+    [UPDATED_TIME] timestamp);
 
     DROP TABLE IF EXISTS [main].[DigitUseDetail];
     CREATE TABLE [main].[DigitUseDetail](
@@ -72,8 +73,31 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
     [status] INT NOT NULL DEFAULT 1,
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [UPDATED_TIME] DATETIME,
+    [UPDATED_TIME] timestamp,
 	primary key(digit_id,address_id));
+
+    DROP TABLE IF EXISTS [main].[CertifiDigitBase];
+     CREATE TABLE [main].[CertifiDigitBase] (
+        [id]  VARCHAR (40),
+        [contract]      VARCHAR (64),
+        [accept_id]     VARCHAR (32),
+        [symbol]        VARCHAR (32),
+        [name]  VARCHAR (32),
+        [publisher]     VARCHAR (32),
+        [project]       VARCHAR (32),
+        [logo_url]      VARCHAR (1024),
+        [logo_bytes]    VARCHAR (3072),
+        [decimal]       INT,
+        [gas_limit]     INT,
+        [mark]  VARCHAR (512),
+        [status]        INT,
+        [is_default]    VARCHAR (1) NOT NULL DEFAULT 0,
+        [is_visible]    VARCHAR (1) NOT NULL DEFAULT 1,
+        [CREATED_TIME]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
+        [UPDATED_TIME]  timestamp,
+        [version]       INT,
+        PRIMARY KEY(`id`)
+);
 
     DROP TABLE IF EXISTS [main].[TransferRecord];
     CREATE TABLE [main].[TransferRecord](
@@ -88,7 +112,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [is_initiator] VARCHAR(1),
     [extra_msg] VARCHAR(3072),
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [UPDATED_TIME] DATETIME);
+    [UPDATED_TIME] timestamp);
 
     insert into Chain(id,short_name,full_name,type,domain,selected) Values(1,'BTC',"bitcoin",1,"",0);
     insert into Chain(id,short_name,full_name,type,domain,selected) Values(2,'BTC TEST',"bitcoin test",2,"",0);
@@ -96,16 +120,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     insert into Chain(id,short_name,full_name,type,domain) Values(4,'ETH TEST',"ethereum test",4,"");
     insert into Chain(id,short_name,full_name,type,domain) Values(5,'EEE',"eee",5,"");
     insert into Chain(id,short_name,full_name,type,domain) Values(6,'EEE TEST',"eee test",6,"");
-  /*  update Chain set type=5,domain='eee.com' WHERE id = 5;*/
-    /*digit基础数据插入EEE代币*/
-    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(1,"EEE","EEE",12,"EEE",1,1);
-    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(0,"EEE Test","EEE test",12,"EEE",1,1);
-    /*digit基础数据插入ETH代币*/
-    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(1,"ETH","ethereum",18,"ETH",1,1);
-    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(0,"ETH Test","ethereum test",18,"ETH",1,1);
-    /*digit基础数据插入BTC代币*/
-    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(1,"BTC","bitcoin",18,"BTC",1,1);
-    insert into DigitBase('type','short_name','full_name','decimals','group_name','is_visible','status') values(0,"BTC Test","bitcoin test",18,"BTC",1,1);
+
     COMMIT;
     PRAGMA foreign_keys = 'on';
     "#;

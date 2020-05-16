@@ -29,39 +29,66 @@ impl DataServiceProvider {
         update_sql_state.bind(3, address)?;
         update_sql_state.next().map(|_|true).map_err(|e|e.into())
     }
-
-    fn add_digits(&self,digits:Vec<table_desc::DigitExport>)->WalletResult<()>{
-        let digit_base_insert_sql = "insert into detail.DigitBase('contract_address','type','short_name','full_name','decimals','group_name','url_img','is_visible') values(?,?,?,?,?,?,?,?); ";
-        let mut state = self.db_hander.prepare(digit_base_insert_sql)?;
-
+    //添加代币
+    fn add_digits(&self,digits:Vec<model::DigitExport>)->WalletResult<()>{
+        let insert_sql = "insert into detail.DigitBase(id,contract_address,chain_type,group_name,short_name,full_name,url_img,decimals,is_basic,is_default,status)values(?,?,?,?,?,?,?,?,?,?,?);";
+        let mut insert_basic_statement = self.db_hander.prepare(insert_sql)?;
         for digit in digits {
-            state.bind(1, digit.address.as_str())?;
-            let digit_type = if digit.digit_type.eq("default") {1 }else { 0 };
-            state.bind(2, digit_type as i64)?;
-            //设置短名称
-            state.bind(3, digit.symbol.as_str())?;
-            //设置长名称 这里由于数据不足，短名称和长名称相同
-            state.bind(4, digit.symbol.as_str())?;
-            state.bind(5, digit.decimal)?;
-            state.bind(6, "ETH")?;
-
-            match digit.url_img {
-                Some(url)=> state.bind(7,url.as_str())?,
-                None=> state.bind(7,"")?,
-            };
-            state.bind(8, 0 as i64)?;
-            state.next()?;
-            state.reset()?;
+            if let Some(id) = digit.id {
+                insert_basic_statement.bind(1,id.as_str())?;
+            }else {
+                insert_basic_statement.bind(1,uuid::Uuid::new_v4().to_string().as_str())?;
+            }
+            insert_basic_statement.bind(2,digit.contract_address.unwrap_or("".to_string()).as_str());
+            //代币类型 是正式连还是测试链
+            insert_basic_statement.bind(3, self.is_main_chain(&digit.chain_type))?;
+            insert_basic_statement.bind(4,digit.group_name.unwrap_or("ETH".to_string()).as_str());
+            insert_basic_statement.bind(5,digit.short_name.as_str());
+            insert_basic_statement.bind(6,digit.full_name.as_str());
+            insert_basic_statement.bind(7,digit.img_url.unwrap_or("".to_string()).as_str());
+            insert_basic_statement.bind(8,digit.decimal);
+            insert_basic_statement.bind(9,digit.is_basic.unwrap_or(false) as i64)?;//设置状态，默认为显示
+            insert_basic_statement.bind(10,digit.is_default.unwrap_or(true) as i64)?;//设置增加的代币 是否为默认代币
+            insert_basic_statement.bind(11,digit.status.unwrap_or(1))?;//最基础的代币（链上代币）
+            insert_basic_statement.next()?;
+            insert_basic_statement.reset()?;
         }
-        //设置默认代币状态
         Ok(())
     }
 
-    fn set_default_digit(&self)->WalletResult<()>{
-        let update_digit_status = "update DigitBase set status =1,is_visible =1 where full_name like 'DDD';";
-        self.db_hander.execute(update_digit_status)?;
-        Ok(())
+    //添加认证代币，供界面展示使用
+    fn update_certified_token(){
+
     }
+
+    //转换链类型
+    fn is_main_chain(&self,chain_type:&str)->i64{
+        match chain_type{
+            "ETH"=>1,
+            "default"=>1,
+            "ETH_TEST"=>0,
+            "test"=>0,
+            _=>1,
+        }
+    }
+
+   pub fn init_basic_digit(&self)->WalletResult<()>{
+        let bytecode = include_bytes!("res/chainTokenFile.json");
+        //todo 错误处理
+        let digits = serde_json::from_slice::<Vec<model::DigitExport>>(&bytecode[..])?;
+        self.add_digits(digits)
+    }
+
+    /// 更新默认代币逻辑
+    /// 将原添加的默认代币状态更新为非默认代币的状态，开始更新代币
+    pub fn update_default_digit(&self,digits:Vec<model::DigitExport>)->WalletResult<()>{
+        //检查待添加的默认代币是否已经存在，若存在，
+        //todo 精细化处理默认代币的情况，当前先使用简单粗暴的方式将已经添加的默认代币直接删除，再将新的代币插入数据库表
+        let delete_sql = "delete from  detail.DigitBase where is_basic = 0 and is_default =1;";
+        self.db_hander.execute(delete_sql)?;
+        self.add_digits(digits)
+    }
+
     pub fn add_digit(&self,wallet_id:&str,chain_id:&str,digit_item:table_desc::DigitExport)->WalletResult<()>{
         // 查看代币是否存在,这里规定新增的代币合约地址不会重复
         let count_sql = "select count(*) from detail.DigitBase where contract_address = ?;";
@@ -81,7 +108,7 @@ impl DataServiceProvider {
         let value =  cursor.next().unwrap().ok_or(WalletError::NotExist)?;
         let address_id = value[0].as_string().unwrap();
         //添加代币
-        self.add_digits(vec![digit_item.clone()])?;
+  /*      self.add_digits(vec![digit_item.clone()])?;*/
         let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase where  contract_address = '{}';", address_id, digit_item.address);
         self.db_hander.execute(sql).map_err(|e|e.into())
     }

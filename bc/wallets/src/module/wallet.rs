@@ -1,7 +1,7 @@
 use super::*;
 
 use crate::{StatusCode, wallet_db};
-use model::{TbAddress,Address, Wallet, Mnemonic};
+use model::{TbAddress, Address, Wallet, Mnemonic};
 use std::collections::HashMap;
 use uuid::Uuid;
 use model::wallet_store::TbWallet;
@@ -12,7 +12,7 @@ use secp256k1::{
     key::{PublicKey, SecretKey},
 };
 
-use substratetx::{Crypto,Keccak256};
+use substratetx::{Crypto, Keccak256};
 
 /// Wallet 结构说明：
 ///  一个助记词 对应的是一个钱包，在cashbox钱包软件中 可以同时管理多个钱包；
@@ -39,6 +39,7 @@ fn get_wallet_info() -> HashMap<String, Wallet> {
     wallet_map
 }
 
+
 //query all 满足条件的助记词（wallet）
 pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
     let wallet_info_map = get_wallet_info();
@@ -57,39 +58,9 @@ pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
             display_chain_id: wallet.display_chain_id,
             selected: wallet.selected,
             create_time: wallet.create_time,
-            eee_chain: {
-               // eee_data.get(&wallet_id).
-                if let Some(eee_data)= eee_data.get(&wallet_id){
-                    Some(eee_data[0].clone())
-                }else {
-                    None
-                }
-               /* let eee_option = eee_data.get(&wallet_id);
-                if eee_option.is_some() {
-                    let eee_chain = eee_option.unwrap()[0].clone();
-                    Some(eee_chain)
-                } else {
-                    None
-                }*/
-            },
-            eth_chain: {
-                let eth_option = eth_data.get(&wallet_id);
-                if eth_option.is_some() {
-                    let eth_chain = eth_option.unwrap()[0].clone();
-                    Some(eth_chain)
-                } else {
-                    None
-                }
-            },
-            btc_chain: {
-                let btc_option = btc_data.get(&wallet_id);
-                if btc_option.is_some() {
-                    let btc_chain = btc_option.unwrap()[0].clone();
-                    Some(btc_chain)
-                } else {
-                    None
-                }
-            },
+            eee_chain: eee_data.get(&wallet_id).map(|data| data[0].clone()),//当出现Some这种情况，表示肯定存在值且vec len 不为0
+            eth_chain: eth_data.get(&wallet_id).map(|data| data[0].clone()),
+            btc_chain: btc_data.get(&wallet_id).map(|data| data[0].clone()),
         };
         target.push(wallet_obj);
     }
@@ -118,7 +89,7 @@ pub fn get_current_wallet() -> WalletResult<Wallet> {
 
 pub fn set_current_wallet(walletid: &str) -> WalletResult<bool> {
     let instance = wallet_db::DataServiceProvider::instance()?;
-    instance.set_selected_wallet(walletid).map(|_| true).map_err(|error|error.into())
+    instance.set_selected_wallet(walletid).map(|_| true).map_err(|error| error.into())
 }
 
 pub fn del_wallet(walletid: &str, psd: &[u8]) -> WalletResult<bool> {
@@ -220,7 +191,7 @@ pub fn export_mnemonic(wallet_id: &str, password: &[u8]) -> WalletResult<Mnemoni
                 status: StatusCode::OK,
                 mn: mnemonic,
                 mnid: String::from(wallet_id),
-            }).map_err(|e|e.into())
+            }).map_err(|e| e.into())
         }
         None => {
             let msg = format!("wallet {} not found", wallet_id);
@@ -277,7 +248,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
     //正式链，助记词只能导入一次
     let hex_mn_digest = hex::encode(mn.keccak256());
     if wallet_type == 1 {
-        if dbhelper.query_by_wallet_digest(hex_mn_digest.as_str(),wallet_type).is_some() {
+        if dbhelper.query_by_wallet_digest(hex_mn_digest.as_str(), wallet_type).is_some() {
             let msg = format!("this wallet is exist");
             return Err(WalletError::Custom(msg));
         }
@@ -301,15 +272,22 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
     //保存助记词到数据库
     //保存公钥，地址到数据库
     //关闭事务
+    dbhelper.tx_begin()?;
     dbhelper.save_wallet_address(wallet_save, address)
-        .map(|_| Wallet {
-            status: StatusCode::OK,
-            wallet_id,
-            wallet_type,
-            wallet_name: Some(wallet_name.to_string()),
-            display_chain_id: default_chain_type as i64,//设置默认显示链类型
-            ..Default::default()
-        })
+        .map(|_| {
+            dbhelper.tx_commint();
+            Wallet {
+                status: StatusCode::OK,
+                wallet_id,
+                wallet_type,
+                wallet_name: Some(wallet_name.to_string()),
+                display_chain_id: default_chain_type as i64,//设置默认显示链类型
+                ..Default::default()
+            }
+        }).map_err(|err| {
+        dbhelper.tx_rollback();
+        err
+    })
 }
 
 fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> WalletResult<StatusCode> {
@@ -348,18 +326,19 @@ pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Wallet
     }
 }
 
-#[derive(Encode, Decode,Debug)]
+#[derive(Encode, Decode, Debug)]
 struct RawTx {
     func_data: Vec<u8>,
     index: u32,
     genesis_hash: H256,
     version: u32,
 }
+
 // 这个函数用于外部拼接好的交易，比如通过js方式构造的交易
 pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
     //todo 交易构造接口重构
     let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
-    let  tx_encode_data = hex::decode(raw_tx)?;
+    let tx_encode_data = hex::decode(raw_tx)?;
     // TODO 这个地方需要使用大小端编码？
     let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
     let mnemonic = module::wallet::export_mnemonic(wallet_id, psw)?;
@@ -368,7 +347,7 @@ pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<St
     // let mut_data = &tx.func_data[..];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
     /*let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..])?;
     let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function,tx.version)?;*/
-    let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index,mut_data,tx.version)?;
+    let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, mut_data, tx.version)?;
     // TODO 返回签名后的消息格式需要确定
     Ok(sign_data)
 }

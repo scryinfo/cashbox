@@ -13,8 +13,9 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-      // walletGenerateTest();
-      //  walletExportTest();
+        // System.out.println(NativeLib.initWalletBasicData());
+       walletGenerateTest();
+        walletExportTest();
       //  eeeTransferTest();
        // eeeAccountInfoKeyTest();
        // decodeAccountInfoTest();
@@ -23,7 +24,9 @@ public class NativeLibTest {
       //  updateBalance();
        // addDigitTest();
        // List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
-        //System.out.println(wallets.toString());
+        //System.out.println("wallet size is:"+wallets.size());
+       // System.out.println(wallets.toString());
+
     }
 
     public static void  addDigitTest(){

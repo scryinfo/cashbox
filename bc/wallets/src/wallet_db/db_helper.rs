@@ -23,7 +23,9 @@ fn create_teble(table_name: &str, table_desc: &str) -> WalletResult<()> {
     connect.execute(table_desc).map_err(|e| e.into())
 }
 
-//导入代币基础数据 目前默认是在创建数据库的时候调用
+
+
+/*//导入代币基础数据 目前默认是在创建数据库的时候调用
 fn init_digit_base_data(table_name: &str) -> WalletResult<()> {
     let digit_base_insert_sql = "insert into DigitBase('contract_address','type','short_name','full_name','decimals','group_name','url_img','is_visible') values(?,?,?,?,?,?,?,?); ";
     let bytecode = include_bytes!("res/chainEthFile.json");
@@ -57,7 +59,7 @@ fn init_digit_base_data(table_name: &str) -> WalletResult<()> {
     connect.execute(update_digit_status)?;
     connect.execute("commit;")?;
     Ok(())
-}
+}*/
 pub struct DataServiceProvider {
     pub db_hander: Connection,
 }
@@ -70,8 +72,7 @@ impl Drop for DataServiceProvider {
 }
 
 impl DataServiceProvider {
-    pub fn instance() -> WalletResult<Self> {
-        //1、检查对应的数据库文件是否存在
+   pub fn init()->WalletResult<()> {
         if fs::File::open(TB_WALLET_DETAIL).is_err() || fs::File::open(TB_WALLET).is_err() {
             //2、若是不存在则执行sql脚本文件创建数据库
             let mnemonic_sql = super::table_desc::get_cashbox_wallet_sql();
@@ -79,11 +80,16 @@ impl DataServiceProvider {
             //create wallet table
             let wallet_sql = super::table_desc::get_cashbox_wallet_detail_sql();
             create_teble(TB_WALLET_DETAIL, wallet_sql.as_str())?;
-            //加载基础数据
-           init_digit_base_data(TB_WALLET_DETAIL)?;
-
+            Ok(())
+        }else {
+           Err(WalletError::Custom("Database file has created".to_string()))
         }
-        //start connect mnemonic database
+    }
+    pub fn instance() -> WalletResult<Self> {
+        //1、检查对应的数据库文件是否存在
+        if fs::File::open(TB_WALLET_DETAIL).is_err() || fs::File::open(TB_WALLET).is_err() {
+          return Err(WalletError::Custom("Database file not exist,please run init() method first!".to_string()));
+        }
         let conn = Connection::open(TB_WALLET)?;
         let attach_sql = format!("ATTACH DATABASE \"{}\" AS detail;", TB_WALLET_DETAIL);
         conn.execute(&attach_sql).map(|_|DataServiceProvider{
