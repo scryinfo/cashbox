@@ -13,6 +13,7 @@ use bitcoin_hashes::Hash;
 use std::str::FromStr;
 use bitcoin::blockdata::script::Builder;
 use bitcoin::blockdata::opcodes;
+use bitcoin_hashes::sha256d;
 
 
 const PASSPHRASE: &str = "";
@@ -31,71 +32,68 @@ pub fn create_master_by_mnemonic(mnemonic_str: &str, network: Network) -> Master
     master
 }
 
+// add account to master
 // create address by default  path（0，0）；
 // default PASSPHRASE = ""
 // default AccountAddressType = p2pkh
-pub fn create_address(master: &mut MasterAccount, path: (u32, u32)) -> (PublicKey, Address) {
-    let path_clone = path.clone();
-    let (account_number, sub_account_number) = path_clone;
+pub fn add_account(master: &mut MasterAccount, path: (u32, u32)) {
+    let (account_number, sub_account_number) = path;
     let mut unlocker = Unlocker::new_for_master(master, PASSPHRASE).unwrap();
     let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, account_number, sub_account_number, 10).unwrap();
     master.add_account(account);
-    let source = master.get_mut(path).unwrap().next_key().unwrap().address.clone();
-    let public_key = master.get_mut(path).unwrap().next_key().unwrap().public.clone();
-    (public_key, source)
 }
 
 //create transaction
 //value : the bitcoin value you want to spend  the unit is "Satoshi"
 //     1 bitcoin == 100 million satoshi  100 000 000
 //target： is the target address string ,means the address you wanna to spend for the transaction
-// pub fn create_translation(value: u64, target: &str, master: MasterAccount) -> Transaction {
-//     //  对比utxo 和 value的差值
-//     //  如果不够,考虑报错
-//     //  构建话费的交易信息 第一段硬编码的txid代表 utxo
-//     //  本次交易不带签名
-//     let target = Address::from_str(target).unwrap();
-//
-//     let mut spending_transaction = Transaction {
-//         input: vec![
-//             TxIn {
-//                 previous_output: OutPoint {
-//                     txid: sha256d::Hash::from_hex("d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916").unwrap(),
-//                     vout: 1,
-//                 },
-//                 sequence: RBF,
-//                 witness: Vec::new(),
-//                 script_sig: Script::new(),
-//             }
-//         ],
-//         output: vec![
-//             TxOut {
-//                 script_pubkey: target.script_pubkey(),
-//                 value: 21000,
-//             },
-//         ],
-//         lock_time: 0,
-//         version: 2,
-//     };
-//
-//
-//     let input_script = Builder::new().push_opcode(opcodes::all::OP_DUP)
-//                                .push_opcode(opcodes::all::OP_HASH160)
-//                                .push_slice(&hex_decode("44af04fb17f6d79b93513e49c79c15ca29d56290").unwrap())
-//                                .push_opcode(opcodes::all::OP_EQUALVERIFY)
-//                                .push_opcode(opcodes::all::OP_CHECKSIG)
-//                                .into_script();
-//
-//     // 需要拼装输入的script_sig
-//     master.sign(&mut spending_transaction, SigHashType::All,
-//                 &(|_| Some(input_script.output[0].clone())),
-//                 &mut unlocker).expect("can not sign");
-//
-//     spending_transaction
-// }
+pub fn create_translation(value: u64, target: &str, master: &mut MasterAccount, path: (u32, u32)) -> Transaction {
+    //  对比utxo 和 value的差值
+    //  如果不够,考虑报错
+    //  构建话费的交易信息 第一段硬编码的txid代表 utxo
+    //  本次交易不带签名
+    let mut unlocker = Unlocker::new_for_master(&master, PASSPHRASE).unwrap();
+    let source = master.get_mut((0, 0)).unwrap().next_key().unwrap().address.clone();
+    let target = Address::from_str(target).unwrap();
+
+    //a transaction that spend spend spend source to target
+    let mut spending_transaction = Transaction {
+        input: vec![
+            TxIn {
+                previous_output: OutPoint {
+                    txid: sha256d::Hash::from_hex("d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916").unwrap(),
+                    vout: 1,
+                },
+                sequence: RBF,
+                witness: Vec::new(),
+                script_sig: Script::new(),
+            }
+        ],
+        output: vec![
+            TxOut {
+                script_pubkey: target.script_pubkey(),
+                value: 21000,
+            },
+        ],
+        lock_time: 0,
+        version: 2,
+    };
+
+    // 需要拼装输入的script_sig
+    master.sign(&mut spending_transaction, SigHashType::All,
+                &(|_| Some(
+                    TxOut {
+                        value: 21000,
+                        script_pubkey: source.script_pubkey(),
+                    }
+                )),
+                &mut unlocker).expect("can not sign");
+
+    spending_transaction
+}
 
 ///计算hash160
-pub fn hash160( public_key: &str) -> String {
+pub fn hash160(public_key: &str) -> String {
     let decode: Vec<u8> = FromHex::from_hex(public_key).expect("Invalid public key");
     let hash = hash160::Hash::hash(&decode[..]);
     warn!("HASH160 {:?}", hash.to_hex());
@@ -117,3 +115,28 @@ pub fn hash160( public_key: &str) -> String {
 // }
 
 // calculate tx fee
+
+
+mod test {
+    use walletlib::create_master;
+    use bitcoin::consensus::serialize;
+    use jniapi::create_translation::{hash160, create_master_by_mnemonic, add_account, create_translation};
+    use bitcoin::{Address, Network};
+    use std::str::FromStr;
+
+    #[test]
+    pub fn tx() {
+        let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
+        let mut master = create_master_by_mnemonic(
+            words,
+            Network::Testnet);
+        add_account(&mut master, (0, 0));
+        let tx = create_translation(
+            21000,
+            "n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk",
+            &mut master,
+            (0, 0),
+        );
+        println!("tx {:#?}", tx);
+    }
+}

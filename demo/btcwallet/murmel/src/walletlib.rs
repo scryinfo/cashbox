@@ -98,6 +98,7 @@ mod test {
         let tx = create_master();
         let ser = serialize(&tx);
         println!("{:?}", ser.len());
+        println!("{:#?}", tx);
 
         let bytes: f32 = 1.0 * 148f32 + 34.0 * 1.0 + 10.0f32;
         let sto = bytes * 0.675;
