@@ -132,10 +132,6 @@ class Wallet {
     }
   }
 
-  setNowChainM(Chain chain) async {
-    nowChain = chain;
-  }
-
   Chain getChainByChainId(String chainId) {
     Chain nowChain;
     for (int i = 0; i < chainList.length; i++) {

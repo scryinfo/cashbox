@@ -75,7 +75,7 @@ class _EeePageState extends State<EeePage> {
         } else {
           this.nowChain = this.nowWallet.getChainByChainType(ChainType.EEE_TEST);
         }
-        wallet.setNowChainM(nowChain);
+        Wallets.instance.nowWallet.setNowChainType(nowChain);
         this.nowChainAddress = nowChain.chainAddress;
         this.nowChainDigitsList = nowChain.digitsList;
         break; //找到，终止循环
