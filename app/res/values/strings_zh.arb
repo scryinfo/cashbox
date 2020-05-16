@@ -1,7 +1,4 @@
 {
-  "app_title": "App标题",
-  "main_title": "主标题",
-  "message_tip": "message",
   "wallet_load_error": "钱包应用加载出错了，请尝试重新打开!~",
   "make_sure_service_protocol": "请确认勾选 同意服务协议与隐私条款",
   "agree_service_prefix": "我已仔细阅读并同意",
