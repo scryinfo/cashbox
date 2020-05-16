@@ -6,6 +6,7 @@ public class NativeLib {
 
     //链类型
     private interface ChainType {
+        public static final int UNKNOWN = 0;
         public static final int BTC = 1;
         public static final int BTC_TEST = 2;
         public static final int ETH = 3;
@@ -15,8 +16,8 @@ public class NativeLib {
     }
 
     public enum WalletType {
-        TEST_WALLET,        // 0
-        WALLET              // 1
+        TEST_WALLET,
+        WALLET
     }
 
     //通信消息 状态码  （StatusCode 仅用来约定两端状态标识，不用在方法传参上）
@@ -102,7 +103,6 @@ public class NativeLib {
         }
     }
 
-
     public static class EeeChain {
         public int status;          //状态码
         public String chainId;
@@ -127,8 +127,6 @@ public class NativeLib {
                     '}';
         }
     }
-
-
 
     public static class EeeDigit {
         public int status;  //状态码
@@ -267,19 +265,21 @@ public class NativeLib {
 
     public static class WalletState {
         public int status;                    //通信消息状态码         200消息正常返回
-        public boolean isContainWallet;       //是否已有钱包           apiNo:WM01   1成功 0失败
-        public String walletId;               //当前钱包id             apiNo:WM05
-        public boolean isSetNowWallet;        //设置当前钱包,是否成功  apiNo:WM06   1成功 0失败
-        public boolean isDeletWallet;         //删除钱包是否成功       apiNo:WM07   1成功 0失败
-        public boolean isResetPwd;            //重置密码是否成功       apiNo:WM08   1成功 0失败
-        public boolean isRename;              //重置钱包名是否成功     apiNo:WM09   1成功 0失败
-        public boolean isShowChain;           //设置显示链,是否成功    apiNo:WM10   1成功 0失败
-        public boolean isHideChain;           //设置隐藏链,是否成功    apiNo:WM11   1成功 0失败
-        public int getnNowChainType;          //获取当前链类型         apiNo:WM12   int
-        public boolean isSetNowChain;         //设置当前链,是否成功    apiNo:WM13   1成功 0失败
-        public boolean isShowDigit;           //设置显示代币,是否成功  apiNo:WM14   1成功 0失败
-        public boolean isHideDigit;           //设置隐藏代币,是否成功  apiNo:WM15   1成功 0失败
-        public boolean isAddDigit;            //添加代币,是否成功      apiNo:WM16   1成功 0失败
+        public boolean isContainWallet;       //是否已有钱包          apiNo:WM01   执行状态：1成功 0失败
+        public String walletId;               //当前钱包id            apiNo:WM05
+        public boolean isSetNowWallet;        //设置当前钱包,是否成功  apiNo:WM06   执行状态：1成功 0失败
+        public boolean isDeletWallet;         //删除钱包是否成功       apiNo:WM07   执行状态： 1成功 0失败
+        public boolean isResetPwd;            //重置密码是否成功       apiNo:WM08   执行状态： 1成功 0失败
+        public boolean isRename;              //重置钱包名是否成功     apiNo:WM09   执行状态： 1成功 0失败
+        public boolean isShowChain;           //设置显示链,是否成功    apiNo:WM10   执行状态： 1成功 0失败
+        public boolean isHideChain;           //设置隐藏链,是否成功    apiNo:WM11   执行状态： 1成功 0失败
+        public int getNowChainType;           //获取当前链类型         apiNo:WM12   int
+        public boolean isSetNowChain;         //设置当前链,是否成功     apiNo:WM13   执行状态： 1成功 0失败
+        public boolean isShowDigit;           //设置显示代币,是否成功   apiNo:WM14   执行状态： 1成功 0失败
+        public boolean isHideDigit;           //设置隐藏代币,是否成功   apiNo:WM15   执行状态： 1成功 0失败
+        public boolean isAddDigit;            //添加代币,是否成功       apiNo:WM16   执行状态： 1成功 0失败
+        public boolean isUpdateDigitBalance;  //更新拥有代币的数量,是否成功   执行状态： 1成功 0失败
+
         public String message;                //错误信息，详细说明
 
         @Override
@@ -294,11 +294,12 @@ public class NativeLib {
                     ", isRename=" + isRename +
                     ", isShowChain=" + isShowChain +
                     ", isHideChain=" + isHideChain +
-                    ", getnNowChainType=" + getnNowChainType +
+                    ", getNowChainType=" + getNowChainType +
                     ", isSetNowChain=" + isSetNowChain +
                     ", isShowDigit=" + isShowDigit +
                     ", isHideDigit=" + isHideDigit +
                     ", isAddDigit=" + isAddDigit +
+                    ", isUpdateDigitBalance=" + isUpdateDigitBalance +
                     ", message='" + message + '\'' +
                     '}';
         }
@@ -313,7 +314,7 @@ public class NativeLib {
     public static native List<Wallet> loadAllWalletList();
 
     // 保存钱包
-    // apiNo:WM03 fixed                                     //   TEST_WALLET 0        WALLET 1
+    // apiNo:WM03 fixed
     public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic, int walletType);
 
     // 钱包导出。 恢复钱包助记词
@@ -365,7 +366,22 @@ public class NativeLib {
     public static native WalletState hideDigit(String walletId, String chainId, String digitId);
 
     // 增加代币
+    // apiNo:WM16
     public static native WalletState addDigit(String walletId, String chainId, String fullName, String shortName, String contractAddress, int decimal);
+    // 0515 meeting
+    // 1、addDigit区分处理
+    // 2、digit数据结构增加字段 是否是自定义
+    // 3、查询代币列表，分页
+    // 4、检查更新的口子（parker）
+    // 5、ip等配置文件，配置流程。（parker）
+
+
+    public static class Digit {
+        public String id;
+        public String logUrl;
+    }
+
+    public static native Message addDigitTest(Digit digit);
 
     /*------------------------------------------链相关------------------------------------------*/
 
@@ -395,54 +411,32 @@ public class NativeLib {
         public String inputInfo;            //附加信息
         public String accountKeyInfo;       //账户存储key
         public AccountInfo accountInfo;     //账户信息
-
-        @Override
-        public String toString() {
-            return "Message{" +
-                    "status=" + status +
-                    ", message='" + message + '\'' +
-                    ", signedInfo='" + signedInfo + '\'' +
-                    ", energyTransferInfo='" + energyTransferInfo + '\'' +
-                    ", ethSignedInfo='" + ethSignedInfo + '\'' +
-                    ", inputInfo='" + inputInfo + '\'' +
-                    ", accountKeyInfo='" + accountKeyInfo + '\'' +
-                    ", accountInfo=" + accountInfo +
-                    '}';
-        }
     }
 
     //定义EEE 链账户信息
-    public static class AccountInfo{
+    public static class AccountInfo {
         public int nonce;                // The number of transactions this account has sent.
         public int refcount;             //The number of other modules that currently depend on this account's existence.
         public String free;              //可自由支配的余额
         public String reserved;          //保留的余额，这里面的余额 表示参加需要的活动，目前链上还未设计这相关业务
         public String misc_frozen;      // The amount that `free` may not drop below when withdrawing for *anything except transaction fee payment*.
         public String fee_frozen;       //The amount that `free` may not drop below when withdrawing specifically for transaction fee payment.
-
-        @Override
-        public String toString() {
-            return "AccountInfo{" +
-                    "nonce=" + nonce +
-                    ", refcount=" + refcount +
-                    ", free='" + free + '\'' +
-                    ", reserved='" + reserved + '\'' +
-                    ", misc_frozen='" + misc_frozen + '\'' +
-                    ", fee_frozen='" + fee_frozen + '\'' +
-                    '}';
-        }
     }
 
     //获取拼装原始交易，区分链类型
     //返回：未签名的交易 String, 格式为json格式
     //第一个参数为 eeeOpen 的返回值
     //具体的参数格式，需要与Jermy一起确定
-    //msg: 交易 
-    // TODO: 2019/8/17  交易方式待确定，待确定：哪边来做监听交易状态。
-    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index,int runtime_version,byte[] pwd);
+    //msg: 交易
+    // TODO: 2019/8/17  交易方式待确定，待确定：哪边来做监听交易状态。 目前链转账模块不支持备注填写，若后续需要支持备注功能，将会重新编写转账模块，
+    //  增加新的接口，不会影响老版本APP的使用
+    // 关于eee相关的数据获取，交易提取，全部由客户端来操作，底层不对网络进行操作；
+    // 底层直接构造一个签名好的转账交易，通过Message字段中signedInfo属性传回可以直接提交的到链的信息
+    //注意：vaule 在转账中使用默认单位: unit,精度为10^12， 即 1 unit =1000_000_000_000
+    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version, byte[] pwd);
 
     //msg: 交易
-    // public static native Message eeeEnergyTransfer(long handle, String from, String to, String value, String extendMsg);
+    //TODO 该接口的使用还需要重新规划
     public static native Message eeeEnergyTransfer(String from, byte[] pwd, String to, String value, String extendMsg);
 
     // 签名结果是：交易类型
@@ -462,12 +456,14 @@ public class NativeLib {
     public static native Message eeeEnergyBalance(long handle, String addr);
 
     //EEE 账号信息对应的key,输入待查询的地址，比如：5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4，
-    // 返回编码后的key:0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
+    // 返回编码后的key
+    // :0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
     //构造jsonrpc 请求数据格式{"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
     public static native Message eeeAccountInfoKey(String addr);
 
     /**
      * 解码从链上查询回来的账户信息
+     *
      * @param encodeData 输入十六进制格式数据  ‘0x’
      * @return 若格式正确，返回status 200,Message中accountInfo字段包含详情，若格式错误，msg字段包含错误信息
      */
@@ -477,8 +473,10 @@ public class NativeLib {
 
     // Eth 交易签名。签名结果是：交易类型
     // 说明： gasPrice单位：gwei     gaslimit单位：gwei       （1 ETH = 1e9 gwei (10的九次方)）
-    // 链类型int   3：正式链     4：测试链（Ropsten）
-    public static native Message ethTxSign(String mnId, int chainType,String fromAddress,String toAddress,String contractAddress, String value,String backup,  byte[] pwd, String gasPrice,String gasLimit,String nonce,int decimal);
+    //       gasPrice 和 gasLimit 传值时， 传整数类型字符串。如：“1000”，非“100.0”
+    //       链类型int: 3：正式链   4：测试链（Ropsten）,目前只使用这两种测试链
+    public static native Message ethTxSign(String mnId, int chainType, String fromAddress, String toAddress, String contractAddress, String value,
+                                           String backup, byte[] pwd, String gasPrice, String gasLimit, String nonce, int decimal);
 
     //ETH 交易拼装。   返回：未签名的交易 String。
     //nonce记录位置？？？
@@ -500,10 +498,19 @@ public class NativeLib {
     public static native boolean ethTxBroascastTx(byte[] signedTx);
 
     public static native boolean btcTxBroascastTx(byte[] signedTx);
-    //更新代币余额
-    public static native Message updateDigitBalance(String address,String digitId,String balance);
+
+    /**
+     * 更新地址对应代币的余额
+     * @param address 链地址
+     * @param digitId  代币id
+     * @param balance 代币数量  传递进去的代币单位怎么来确定？
+     * @return  更新钱包代币结果， 使用 isUpdateDigitBalance来标识操作结果
+     */
+    public static native WalletState updateDigitBalance(String address, String digitId, String balance);
+
     //解码交易附加信息
     public static native Message decodeAdditionData(String input);
+
 
 }
 

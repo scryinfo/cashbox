@@ -14,13 +14,13 @@ public class NativeLibTest {
 
         System.out.println("********************start jni func test***************************************");
       // walletGenerateTest();
-       // walletExportTest();
-        //eeeTransferTest();
-        eeeAccountInfoKeyTest();
-        decodeAccountInfoTest();
+      //  walletExportTest();
+      //  eeeTransferTest();
+       // eeeAccountInfoKeyTest();
+       // decodeAccountInfoTest();
         // eeeTxsign();
       //  walletSaveTest();
-       // updateBalance();
+      //  updateBalance();
        // addDigitTest();
        // List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         //System.out.println(wallets.toString());
@@ -31,7 +31,7 @@ public class NativeLibTest {
         System.out.println(state);
     }
     public static  void  updateBalance(){
-      NativeLib.Message msg = NativeLib.updateDigitBalance("0x6be9fd93ecce9ade568b7eadf382635e109ce0d2","3","600");
+      NativeLib.WalletState msg = NativeLib.updateDigitBalance("0x6be9fd93ecce9ade568b7eadf382635e109ce0d2","3","600");
         System.out.println(msg);
     }
     public static void walletSaveTest(){
@@ -82,11 +82,10 @@ public class NativeLibTest {
         String to = "5GGzGJR54YNjMKhaYt6hHV3o99FZ6JKYEDCrzUg1HCz1tWPa";
         String value = "200000000000000";
         String genesisHash = "0xabb0f2e62dfab481623438e14b5e1d4114a6e9a2f0d3f5e83f9192276e50cf34";
-        int index = 1;
+        int index = 3;
         int runtimeVersion = 1;
         NativeLib.Message msg = NativeLib.eeeTransfer(from,to,value,genesisHash,index,runtimeVersion,"123456".getBytes());
         System.out.println(msg);
-
     }
 
     public static void decodeTest(){

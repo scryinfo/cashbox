@@ -1,7 +1,7 @@
 // 用于实现对各个模块的封装，实现ios、android jni接口的封装
 use ethereum_types::{H160,U256, U128};
-
 use wallets::StatusCode;
+use jni::JNIEnv;
 
 pub mod wallet;
 pub mod chain;
