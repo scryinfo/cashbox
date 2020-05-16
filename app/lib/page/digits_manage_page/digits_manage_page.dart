@@ -22,12 +22,10 @@ class DigitsManagePage extends StatefulWidget {
 }
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
-  static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
-  List<Digit> allNowChainDigitsList = []; //当前链的代币列表
-  List<Digit> visibleNowChainDigitsList = []; //当前链可见的代币列表 isVisible = true;
+  int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
   List<Digit> serverDigitsList = []; //服务器接口上的代币列表
-  List<Digit> allDisplayDigitsList = []; //界面所有可展示的代币： nowChainDigitsList + serverDigitsList
-  List<Digit> displayDigitsList = []; //页面展示的代币列表数据
+  List<Digit> allDisplayDigitsList = []; //界面所有可用来展示的代币： (Wallets.instance.nowWallet.nowChain.digitsList) + serverDigitsList
+  List<Digit> displayDigitsList = []; //单签页面展示的代币数据
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
 
@@ -38,25 +36,55 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   initData() async {
-    visibleNowChainDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList();
-    allNowChainDigitsList = Wallets.instance.nowWallet.nowChain.digitsList;
-    addToAllDisplayDigitsList(allNowChainDigitsList);
-
-    await loadNativeAllDigitListData(); //先显示本地所有的已有代币
+    addToAllDisplayDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1、可见代币显示在前面 isVisible = true;
+    addToAllDisplayDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
+    print("allDisplayDigitsList.length====>" + allDisplayDigitsList.length.toString());
     /*{
-      //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表
+      //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表。
+      //todo 替换 ===》 2、本地已有代币列表
       await loadServerDigitListData(); //服务器可信任代币列表
     }*/
+    displayDigitsList = await loadDisplayDigitListData();
   }
 
-  loadNativeAllDigitListData() {}
-
   addToAllDisplayDigitsList(List<Digit> newDigitList) {
-    newDigitList.forEach((element) {
-      if (!allDisplayDigitsList.contains(element.shortName == element.shortName)) {
-        allDisplayDigitsList.add(element);
+    if (allDisplayDigitsList != null && allDisplayDigitsList.length == 0) {
+      allDisplayDigitsList.addAll(newDigitList);
+      return;
+    }
+    for (num i = 0; i < newDigitList.length; i++) {
+      var element = newDigitList[i];
+      if (element.contractAddress != null && element.contractAddress.isNotEmpty) {
+        //erc20
+        bool isExistErc20 = false;
+        for (num index = 0; index < allDisplayDigitsList.length; index++) {
+          var digit = allDisplayDigitsList[index];
+          if ((digit.contractAddress != null) && (element.contractAddress != null) && (digit.contractAddress == element.contractAddress)) {
+            print("digit.contractAddress=>" + digit.contractAddress + "||element.contractAddress===>" + element.contractAddress);
+            isExistErc20 = true;
+            break;
+          }
+        }
+        print("isExistErc20 ===>" + isExistErc20.toString());
+        if (!isExistErc20) {
+          allDisplayDigitsList.add(element);
+        }
+      } else {
+        bool isExistDigit = false;
+        for (num index = 0; index < allDisplayDigitsList.length; index++) {
+          var digit = allDisplayDigitsList[index];
+          if ((digit.shortName != null) && (element.shortName != null) && (digit.shortName == element.shortName)) {
+            print("digit.shortName=>" + digit.shortName + "||element.shortName===>" + element.shortName);
+            isExistDigit = true;
+            break;
+          }
+        }
+        print("isExistDigit ===>" + isExistDigit.toString());
+        if (!isExistDigit) {
+          allDisplayDigitsList.add(element);
+        }
       }
-    });
+    }
   }
 
   @override
@@ -91,6 +119,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       onWillPop: () {
         backAndReloadData();
         Navigator.pop(context);
+        return Future.value(true);
       },
     );
   }
@@ -128,8 +157,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           Duration(seconds: 2),
           () {
             setState(() {
-              if (displayDigitsList.length < nowChainDigitsList.length) {
-                // 从JNI加载的数据(nowWalletM.getNowChainM().digitList),还有没显示完的，继续将nowChainDigitsList剩余数据，
+              if (displayDigitsList.length < allDisplayDigitsList.length) {
+                // allDisplayDigitsList 的数据(nowWalletM.getNowChainM().digitList),还有没显示完的，allDisplayDigitsList，
                 // 添加到 displayDigitsList里面做展示
                 loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
               } else {
