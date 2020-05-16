@@ -34,7 +34,6 @@ class EthPage extends StatefulWidget {
 
 class _EthPageState extends State<EthPage> {
   List<Wallet> walletList = [];
-  Wallet nowWallet = Wallet();
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
   String moneyUnitStr = "USD";
   num nowWalletAmount = 0.00; //当前钱包内代币总市价
@@ -73,15 +72,14 @@ class _EthPageState extends State<EthPage> {
       Wallet wallet = walletList[index];
       print("isNowWallet===>" + wallet.isNowWallet.toString() + wallet.walletId.toString() + "walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
-        this.nowWallet = wallet;
-        this.walletName = nowWallet.walletName;
+        this.walletName = Wallets.instance.nowWallet.walletName;
         //todo 查看是否需要 判钱包类型 测试处理
         break; //找到，终止循环
       }
     }
-    this.allVisibleDigitsList = this.nowWallet.nowChain.getVisibleDigitList(); //init data
+    this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
     digitListFuture = loadDisplayDigitListData();
-    chainIndex = this.nowWallet.chainList.indexOf(this.nowWallet.nowChain);
+    chainIndex = Wallets.instance.nowWallet.chainList.indexOf(Wallets.instance.nowWallet.nowChain);
     print("chainIndex=======>" + chainIndex.toString());
     setState(() {
       this.walletList = walletList;
@@ -142,13 +140,13 @@ class _EthPageState extends State<EthPage> {
         String balance;
         if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
           balance = await loadErc20Balance(
-              this.nowWallet.nowChain.chainAddress, this.displayDigitsList[i].contractAddress, this.nowWallet.nowChain.chainType);
+              Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[i].contractAddress, Wallets.instance.nowWallet.nowChain.chainType);
           print("erc20 balance==>" + balance.toString());
           Wallets.instance.updateDigitBalance(this.displayDigitsList[i].contractAddress, this.displayDigitsList[i].digitId, balance ?? "");
-        } else if (this.nowWallet.nowChain.chainAddress != null && this.nowWallet.nowChain.chainAddress.trim() != "") {
-          balance = await loadEthBalance(this.nowWallet.nowChain.chainAddress, this.nowWallet.nowChain.chainType);
+        } else if (Wallets.instance.nowWallet.nowChain.chainAddress != null && Wallets.instance.nowWallet.nowChain.chainAddress.trim() != "") {
+          balance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
           print("eth balance==>" + balance.toString());
-          Wallets.instance.updateDigitBalance(this.nowWallet.nowChain.chainAddress, this.displayDigitsList[i].digitId, balance ?? "");
+          Wallets.instance.updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[i].digitId, balance ?? "");
         } else {}
         allVisibleDigitsList[i].balance = balance ?? "0";
         setState(() {
@@ -168,7 +166,7 @@ class _EthPageState extends State<EthPage> {
       allVisibleDigitsList[i].money = money;
       setState(() {
         nowWalletAmount = nowWalletAmount + Rate.instance.getMoney(displayDigitsList[index]);
-        nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
+        Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
         displayDigitsList[index].money = money;
       });
     }
@@ -383,8 +381,8 @@ class _EthPageState extends State<EthPage> {
                   ..setBalance(displayDigitsList[index].balance)
                   ..setMoney(displayDigitsList[index].money)
                   ..setDecimal(displayDigitsList[index].decimal)
-                  ..setFromAddress(this.nowWallet.nowChain.chainAddress)
-                  ..setChainType(this.nowWallet.nowChain.chainType)
+                  ..setFromAddress(Wallets.instance.nowWallet.nowChain.chainAddress)
+                  ..setChainType(Wallets.instance.nowWallet.nowChain.chainType)
                   ..setContractAddress(displayDigitsList[index].contractAddress);
               }
               NavigatorUtils.push(context, Routes.transactionHistoryPage);
@@ -532,7 +530,7 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
             onTap: () {
-              Provider.of<TransactionProvide>(context)..setChainType(this.nowWallet.nowChain.chainType);
+              Provider.of<TransactionProvide>(context)..setChainType(Wallets.instance.nowWallet.nowChain.chainType);
               NavigatorUtils.push(context, Routes.digitListPage);
             },
           ),
@@ -554,7 +552,7 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
             onTap: () {
-              _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, this.nowWallet.nowChain.chainAddress);
+              _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, Wallets.instance.nowWallet.nowChain.chainAddress);
             },
           )
         ],
@@ -574,11 +572,11 @@ class _EthPageState extends State<EthPage> {
               return Text(S.of(context).load_data_error);
             }
             if (snapshot.hasData) {
-              print("this.nowWallet.chainList.length snapshot.hasData===>" + this.nowWallet.chainList.length.toString());
+              print("Wallets.instance.nowWallet.chainList.length snapshot.hasData===>" + Wallets.instance.nowWallet.chainList.length.toString());
               return Swiper(
                 itemBuilder: (BuildContext context, int index) {
-                  print("itemBuilder length====>" + this.nowWallet.chainList.length.toString());
-                  print("itemBuilder index====>" + index.toString() + "||" + this.nowWallet.chainList[index].chainType.toString());
+                  print("itemBuilder length====>" + Wallets.instance.nowWallet.chainList.length.toString());
+                  print("itemBuilder index====>" + index.toString() + "||" + Wallets.instance.nowWallet.chainList[index].chainType.toString());
                   return SingleChildScrollView(
                     child: Container(
                       alignment: Alignment.centerLeft,
@@ -601,14 +599,15 @@ class _EthPageState extends State<EthPage> {
                 },
                 index: chainIndex,
                 onIndexChanged: (index) async {
-                  print("onIndexChanged index======>" + index.toString() + "||" + this.nowWallet.chainList[index].chainType.toString());
-                  bool isSetNowChain = await this.nowWallet.setNowChainType(this.nowWallet.chainList[index]);
+                  print("onIndexChanged index======>" + index.toString() + "||" + Wallets.instance.nowWallet.chainList[index].chainType.toString());
+                  bool isSetNowChain = await Wallets.instance.nowWallet.setNowChainType(Wallets.instance.nowWallet.chainList[index]);
                   print("isSetNowChain===>" + isSetNowChain.toString());
+                  print("Wallets.instance.nowWallet.nowChain.chainType===>" + Wallets.instance.nowWallet.nowChain.chainType.toString());
                   if (isSetNowChain) {
                     setState(() {
                       this.chainIndex = index;
-                      this.nowWallet.nowChain.chainAddress = this.nowWallet.nowChain.chainAddress;
-                      this.allVisibleDigitsList = this.nowWallet.nowChain.getVisibleDigitList(); //init data
+                      Wallets.instance.nowWallet.nowChain.chainAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
+                      this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
                       this.displayDigitsList = [];
                       loadDisplayDigitListData();
                     });
@@ -616,7 +615,7 @@ class _EthPageState extends State<EthPage> {
                   loadDigitBalance();
                   //loadDigitRateInfo();//todo
                 },
-                itemCount: this.nowWallet.chainList.length,
+                itemCount: Wallets.instance.nowWallet.chainList.length,
                 pagination: new SwiperPagination(
                   builder: SwiperPagination(
                     builder: SwiperPagination.rect, //切页面图标
@@ -693,15 +692,15 @@ class _EthPageState extends State<EthPage> {
 
   //链卡片 地址address
   Widget _chainCardAddressWidget(index) {
-    print("nowChian===>" + this.nowWallet.nowChain.toString() + "||");
+    print("nowChian===>" + Wallets.instance.nowWallet.nowChain.toString() + "||");
     print("_chainCardAddressWidget index======>" +
         index.toString() +
         "||" +
-        this.nowWallet.chainList[index].chainType.toString() +
+        Wallets.instance.nowWallet.chainList[index].chainType.toString() +
         "||" +
-        Chain.chainTypeToValue(this.nowWallet.nowChain.chainType) +
+        Chain.chainTypeToValue(Wallets.instance.nowWallet.nowChain.chainType) +
         "||" +
-        this.nowWallet.chainList[index].chainAddress.toString());
+        Wallets.instance.nowWallet.chainList[index].chainAddress.toString());
     return Container(
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -709,10 +708,10 @@ class _EthPageState extends State<EthPage> {
           Container(
             child: GestureDetector(
               onTap: () {
-                if (walletName.isEmpty || this.nowWallet.nowChain.chainAddress.isEmpty) {
+                if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, this.nowWallet.nowChain.chainAddress);
+                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, Wallets.instance.nowWallet.nowChain.chainAddress);
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
@@ -725,13 +724,13 @@ class _EthPageState extends State<EthPage> {
             ),
             child: GestureDetector(
               onTap: () {
-                if (walletName.isEmpty || this.nowWallet.nowChain.chainAddress.isEmpty) {
+                if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, this.nowWallet.nowChain.chainAddress);
+                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, Wallets.instance.nowWallet.nowChain.chainAddress);
               },
               child: Text(
-                this.nowWallet.nowChain.chainAddress,
+                Wallets.instance.nowWallet.nowChain.chainAddress,
                 textAlign: TextAlign.start,
                 style: TextStyle(color: Colors.lightBlueAccent),
                 maxLines: 1,
@@ -745,7 +744,7 @@ class _EthPageState extends State<EthPage> {
             child: Container(
               width: ScreenUtil.instance.setWidth(28),
               child: Text(
-                Chain.chainTypeToValue(this.nowWallet.nowChain.chainType),
+                Chain.chainTypeToValue(Wallets.instance.nowWallet.nowChain.chainType),
                 style: TextStyle(
                   fontSize: 45,
                   color: Color.fromRGBO(255, 255, 255, 0.1),
