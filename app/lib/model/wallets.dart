@@ -321,18 +321,28 @@ class Wallets {
   }
 
   //数据库 更新余额信息
-  updateDigitBalance(String address, String digitId, String balance) {
+  Future<Map> updateDigitBalance(String address, String digitId, String balance) async {
     if (!Utils.checkByEthAddressFormat(address)) {
-      return;
+      return null;
     }
     try {
       if (double.parse(balance) <= 0 || balance.trim() == "") {
-        return;
+        return null;
       }
     } catch (e) {
       LogUtil.e("updateDigitBalance=>", "error status code is" + e.toString());
     }
-    WalletManager.updateDigitBalance(address, digitId, balance);
+    Map updateMap = await WalletManager.updateDigitBalance(address, digitId, balance);
+    int status = updateMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("updateDigitBalance=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+    } else {
+      var index = this.nowWallet.nowChain.digitsList.indexWhere((element) => (element.digitId == digitId));
+      if (index != -1) {
+        this.nowWallet.nowChain.digitsList[index].balance = balance;
+      }
+    }
+    return updateMap;
   }
 
   //
@@ -344,5 +354,4 @@ class Wallets {
   decodeAccountInfo(String encodeData) async {
     Map eeeAccountMap = await WalletManager.decodeAccountInfo(encodeData);
   }
-
 }

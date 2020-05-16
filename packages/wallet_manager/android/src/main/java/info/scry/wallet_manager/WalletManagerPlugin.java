@@ -430,6 +430,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 Map resultMap = new HashMap();
                 ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
+                ScryWalletLog.d("nativeLib=>", "walletState.message is " + walletState.message);
                 resultMap.put("status", walletState.status);
                 if (walletState.status == 200) {
                     resultMap.put("isSetNowChain", walletState.isSetNowChain);
@@ -616,17 +617,30 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             case "updateDigitBalance": {
                 ScryWalletLog.d("nativeLib=>", "updateDigitBalance is enter =>");
-                Message message = new Message();
+                WalletState walletState = new WalletState();
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("address")));
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("digitId")));
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("balance")));
                 try {
-                    message = NativeLib.updateDigitBalance((String) (call.argument("address")),
+                    walletState = NativeLib.updateDigitBalance((String) (call.argument("address")),
                             (String) (call.argument("digitId")), (String) (call.argument("balance"
                             )));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "decodeAdditionData exception is " + exception);
                 }
+                ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                if (walletState.status == 200) {
+                    resultMap.put("isUpdateDigitBalance", walletState.isUpdateDigitBalance);
+                    ScryWalletLog.d("nativeLib=>",
+                            "message.isUpdateDigitBalance is " + walletState.isUpdateDigitBalance);
+                } else {
+                    resultMap.put("message", walletState.message);
+                    ScryWalletLog.d("nativeLib=>",
+                            "message.message is " + walletState.message.toString());
+                }
+                result.success(resultMap);
                 break;
             }
             case "addDigit": {
