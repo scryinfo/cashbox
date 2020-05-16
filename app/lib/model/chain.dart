@@ -11,16 +11,24 @@ abstract class Chain {
   String walletId; //钱包Id
   String chainAddress; //链地址
   List<Digit> digitsList = [];
-  List<Digit> visibleDigitsList = []; //可见代币列表：digit.isVisible = true类型
+  List<Digit> _visibleDigitsList = [];
   bool isVisible = true; //默认链可见
   ChainType chainType;
 
+  //可见代币列表：digit.isVisible = true类型
   List<Digit> getVisibleDigitList() {
+    if (_visibleDigitsList != null && _visibleDigitsList.length != 0) {
+      return _visibleDigitsList;
+    }
+    _visibleDigitsList = [];
     var tempList = this.digitsList.map((e) => e).toList();
     tempList.retainWhere((element) {
+      if (element.isVisible) {
+        _visibleDigitsList.add(element);
+      }
       return element.isVisible;
     });
-    return tempList;
+    return _visibleDigitsList;
   }
 
   static String chainTypeToValue(ChainType chainType) {

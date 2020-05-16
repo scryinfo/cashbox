@@ -23,7 +23,8 @@ class DigitsManagePage extends StatefulWidget {
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
-  List<Digit> nowChainDigitsList = []; //当前链的代币列表
+  List<Digit> allNowChainDigitsList = []; //当前链的代币列表
+  List<Digit> visibleNowChainDigitsList = []; //当前链可见的代币列表 isVisible = true;
   List<Digit> serverDigitsList = []; //服务器接口上的代币列表
   List<Digit> allDisplayDigitsList = []; //界面所有可展示的代币： nowChainDigitsList + serverDigitsList
   List<Digit> displayDigitsList = []; //页面展示的代币列表数据
@@ -37,11 +38,18 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   initData() async {
-    nowChainDigitsList = Wallets.instance.nowWallet.nowChain.digitsList;
-    addToAllDisplayDigitsList(nowChainDigitsList);
-    await loadDisplayDigitListData(); //先显示本地已有的代币
-    await loadServerDigitListData(); //服务器可信任代币列表
+    visibleNowChainDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList();
+    allNowChainDigitsList = Wallets.instance.nowWallet.nowChain.digitsList;
+    addToAllDisplayDigitsList(allNowChainDigitsList);
+
+    await loadNativeAllDigitListData(); //先显示本地所有的已有代币
+    /*{
+      //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表
+      await loadServerDigitListData(); //服务器可信任代币列表
+    }*/
   }
+
+  loadNativeAllDigitListData() {}
 
   addToAllDisplayDigitsList(List<Digit> newDigitList) {
     newDigitList.forEach((element) {

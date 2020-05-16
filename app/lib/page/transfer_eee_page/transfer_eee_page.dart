@@ -16,7 +16,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
 
   initData() {
     print("initData=======>");
-    Wallets.instance.nowWallet.
   }
 
   @override
