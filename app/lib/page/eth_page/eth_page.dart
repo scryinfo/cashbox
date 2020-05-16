@@ -602,7 +602,7 @@ class _EthPageState extends State<EthPage> {
                 index: chainIndex,
                 onIndexChanged: (index) async {
                   print("onIndexChanged index======>" + index.toString() + "||" + this.nowWallet.chainList[index].chainType.toString());
-                  bool isSetNowChain = await this.nowWallet.setNowChain(this.nowWallet.chainList[index]);
+                  bool isSetNowChain = await this.nowWallet.setNowChainType(this.nowWallet.chainList[index]);
                   print("isSetNowChain===>" + isSetNowChain.toString());
                   if (isSetNowChain) {
                     setState(() {

@@ -107,8 +107,8 @@ class WalletManager {
 
   // 设置当前链
   // apiNo:WM13
-  static Future<Map<dynamic, dynamic>> setNowChain(String walletId, int chainType) async {
-    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('setNowChain', {"walletId": walletId, "chainType": chainType});
+  static Future<Map<dynamic, dynamic>> setNowChainType(String walletId, int chainType) async {
+    Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('setNowChainType', {"walletId": walletId, "chainType": chainType});
     return allWalletList;
   }
 

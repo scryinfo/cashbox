@@ -419,7 +419,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 break;
             }
             // apiNo:WM13
-            case "setNowChain": {
+            case "setNowChainType": {
                 ScryWalletLog.d("nativeLib=>", "begin to setNowChain =>");
                 WalletState walletState = new WalletState();
                 try {
@@ -429,6 +429,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     ScryWalletLog.d("nativeLib=>", "exception is " + exception);
                 }
                 Map resultMap = new HashMap();
+                ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
                 resultMap.put("status", walletState.status);
                 if (walletState.status == 200) {
                     resultMap.put("isSetNowChain", walletState.isSetNowChain);
