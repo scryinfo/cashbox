@@ -210,15 +210,6 @@ class Wallets {
     return walletId;
   }
 
-  Future<Wallet> getNowWalletModel() async {
-    if (nowWallet != null) {
-      return nowWallet;
-    }
-    String walletId = await getNowWalletId();
-    Wallet walletModel = await getWalletByWalletId(walletId);
-    return walletModel;
-  }
-
   Future<Wallet> getWalletByWalletId(String walletId) async {
     Wallet chooseWallet;
     for (int i = 0; i < allWalletList.length; i++) {

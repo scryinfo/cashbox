@@ -51,7 +51,7 @@ class _DappPageState extends State<DappPage> {
             },
             onPageFinished: (String url) async {
               await Wallets.instance.loadAllWalletList(isForceLoadFromJni: false);
-              nowWallet = await Wallets.instance.getNowWalletModel();
+              nowWallet = Wallets.instance.nowWallet;
               Chain chainEEE = nowWallet.getChainByChainType(ChainType.EEE);
               if (chainEEE != null && chainEEE.chainAddress != null && chainEEE.chainAddress.trim() != "") {
                 String chainEEEAddress = chainEEE.chainAddress;

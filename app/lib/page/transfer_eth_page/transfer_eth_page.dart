@@ -70,7 +70,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       chainType = Provider.of<TransactionProvide>(context).chainType;
       digitBalance = Provider.of<TransactionProvide>(context).balance;
     }
-    Wallet walletM = await Wallets.instance.getNowWalletModel();
+    Wallet walletM = Wallets.instance.nowWallet;
     if (GlobalConfig.isDebugVersion) {
       nowChain = walletM.getChainByChainType(ChainType.ETH_TEST);
     } else {
