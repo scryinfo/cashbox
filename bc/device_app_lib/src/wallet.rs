@@ -327,6 +327,25 @@ pub mod android {
             }
         }
     }
+
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_initWalletBasicData(env: JNIEnv, _: JClass) -> jobject {
+
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
+        match wallets::wallet_db::init_wallet_database() {
+            Ok(_) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
+                env.set_field(state_obj, "isInitWalletBasicData", "Z", JValue::Bool(1 as u8)).expect("set isInitWalletBasicData value ");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find rename StatusCode");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message value ");
+            }
+        }
+        *state_obj
+    }
 }
 
 #[cfg(test)]

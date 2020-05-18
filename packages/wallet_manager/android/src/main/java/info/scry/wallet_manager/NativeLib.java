@@ -188,7 +188,7 @@ public class NativeLib {
         public String logoUrl;
         public String logoBytes;
         public int decimal;
-        public String gasLimit;
+        public int gasLimit;
         public String contract;
         public String acceptId;
         public String chainType;
@@ -198,14 +198,13 @@ public class NativeLib {
         public int version;
     }
 
-    public static AuthList{
+    public static class AuthList{
         public int status;//动态库调用结果
         public String message;      //错误信息，详细说明
         public int count;//总条数
         public int startItem;//其实条数
         public List<EthToken> authDigit;
     }
-
 
     /**
      * 初始化钱包数据文件，加载基础数据
@@ -295,7 +294,7 @@ public class NativeLib {
      * @param pageSize  当前最多取多少条
      * @return
      */
-    public static native AuthList getAuthDigitList(int startItem,int pageSize);
+    public static native AuthList getAuthDigitList(int chain_type,int startItem,int pageSize);
 
     /*------------------------------------------链相关------------------------------------------*/
 

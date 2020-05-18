@@ -13,9 +13,11 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-        // System.out.println(NativeLib.initWalletBasicData());
-       walletGenerateTest();
-        walletExportTest();
+       //  System.out.println(NativeLib.initWalletBasicData());
+     //  walletGenerateTest();
+       // walletExportTest();
+        //updateAuthListTest();
+        getAuthDigitListTest();
       //  eeeTransferTest();
        // eeeAccountInfoKeyTest();
        // decodeAccountInfoTest();
@@ -29,6 +31,32 @@ public class NativeLibTest {
 
     }
 
+    public static void updateAuthListTest(){
+        String json = "[{\n" +
+                "\t\"id\": \"eth_chain_ddd_test\",\n" +
+                "\t\"symbol\": \"DDD\",\n" +
+                "\t\"name\": \"scryinfo ddd\",\n" +
+                "\t\"publisher\": \"scryinfo\",\n" +
+                "\t\"project\": \"scryinfo\",\n" +
+                "\t\"logoUrl\": \"scry.info\",\n" +
+                "\t\"logoBytes\": \"DDD\",\n" +
+                "\t\"decimal\": 18,\n" +
+                "\t\"gasLimit\": 523654,\n" +
+                "\t\"contract\": \"0x2aef987\",\n" +
+                "\t\"acceptId\": \"0x3aef987\",\n" +
+                "\t\"chainType\": \"test\",\n" +
+                "\t\"mark\": \"test\",\n" +
+                "\t\"updateTime\": 158748557,\n" +
+                "\t\"createTime\": 158965444,\n" +
+                "\t\"version\": 12\n" +
+                "}]";
+        NativeLib.WalletState state = NativeLib.updateAuthDigitList(json);
+        System.out.println(state);
+    }
+    public static void getAuthDigitListTest(){
+       NativeLib.AuthList list =  NativeLib.getAuthDigitList(1,0,50);
+        System.out.println(list);
+    }
     public static void  addDigitTest(){
         NativeLib.WalletState state =  NativeLib.addDigit("bc520f80-c86a-45ac-baad-099a524ff3e0","3","NNN Times","NNN","0x7be9fd92ecce9ade568b7eadf382635e109ce0d2",18);
         System.out.println(state);

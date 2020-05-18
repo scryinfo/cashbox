@@ -29,6 +29,10 @@ pub fn add_wallet_digit(wallet_id:&str,chain_id:&str,digit:DigitExport)-> Wallet
     }
 
 }
+pub fn query_auth_digit(start:u32,page_size:u32)->WalletResult<model::DigitList>{
+    let instance = wallet_db::DataServiceProvider::instance()?;
+    instance.get_auth_digit_by_page(start,page_size)
+}
 
 //接收客户端传递过来的认证代币列表,将数据更新到认证代币列表中
 //todo 根据传递进来的代币属于测试链还是主链分别处理

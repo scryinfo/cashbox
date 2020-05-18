@@ -280,6 +280,7 @@ public class NativeLib {
         public boolean isAddDigit;            //添加代币,是否成功       apiNo:WM16   执行状态： 1成功 0失败
         public boolean isUpdateDigitBalance;  //更新拥有代币的数量,是否成功   执行状态： 1成功 0失败
         public boolean isInitWalletBasicData;  //初始化数据基础数据,是否成功   执行状态： 1成功 0失败
+        public boolean isUpdateAuthDigit;  //初始化数据基础数据,是否成功   执行状态： 1成功 0失败
 
         public String message;                //错误信息，详细说明
 
@@ -302,7 +303,68 @@ public class NativeLib {
                     ", isAddDigit=" + isAddDigit +
                     ", isUpdateDigitBalance=" + isUpdateDigitBalance +
                     ", isInitWalletBasicData=" + isInitWalletBasicData +
+                    ", isUpdateAuthDigit=" + isUpdateAuthDigit +
                     ", message='" + message + '\'' +
+                    '}';
+        }
+    }
+
+    public static class EthToken{
+        public String id;
+        public String symbol;
+        public String name;
+        public String publisher;
+        public String project;
+        public String logoUrl;
+        public String logoBytes;
+        public int decimal;
+        public int gasLimit;
+        public String contract;
+        public String acceptId;
+        public String chainType;
+        public String mark;
+        public int updateTime;
+        public int createTime;
+        public int version;
+
+        @Override
+        public String toString() {
+            return "EthToken{" +
+                    "id='" + id + '\'' +
+                    ", symbol='" + symbol + '\'' +
+                    ", name='" + name + '\'' +
+                    ", publisher='" + publisher + '\'' +
+                    ", project='" + project + '\'' +
+                    ", logoUrl='" + logoUrl + '\'' +
+                    ", logoBytes='" + logoBytes + '\'' +
+                    ", decimal=" + decimal +
+                    ", gasLimit=" + gasLimit +
+                    ", contract='" + contract + '\'' +
+                    ", acceptId='" + acceptId + '\'' +
+                    ", chainType='" + chainType + '\'' +
+                    ", mark='" + mark + '\'' +
+                    ", updateTime=" + updateTime +
+                    ", createTime=" + createTime +
+                    ", version=" + version +
+                    '}';
+        }
+    }
+
+    public static class AuthList{
+        public int status;//动态库调用结果
+        public String message;      //错误信息，详细说明
+        public int count;//总条数
+        public int startItem;//其实条数
+        public List<EthToken> authDigit;
+
+        @Override
+        public String toString() {
+            return "AuthList{" +
+                    "status=" + status +
+                    ", message='" + message + '\'' +
+                    ", count=" + count +
+                    ", startItem=" + startItem +
+                    ", authDigit=" + authDigit +
                     '}';
         }
     }
@@ -383,13 +445,20 @@ public class NativeLib {
     // 4、检查更新的口子（parker）
     // 5、ip等配置文件，配置流程。（parker）
 
+    /**
+     * 更新信任代币
+     * @param digitData 从服务端获取的认证代币的列表，json格式数据
+     * @return
+     */
+    public static native WalletState updateAuthDigitList(String digitData);
 
-    public static class Digit {
-        public String id;
-        public String logUrl;
-    }
-
-    public static native Message addDigitTest(Digit digit);
+    /**
+     * 查询认证代币列表
+     * @param startItem 开始条数
+     * @param pageSize  当前最多取多少条
+     * @return
+     */
+    public static native AuthList getAuthDigitList(int chain_type,int startItem,int pageSize);
 
     /*------------------------------------------链相关------------------------------------------*/
 

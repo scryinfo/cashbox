@@ -126,8 +126,8 @@ impl DataServiceProvider {
             update_digit_statement.bind(12,digit.gas_limit);
             update_digit_statement.bind(13,digit.mark.as_str());
             update_digit_statement.bind(14,digit.version);
-            update_digit_statement.bind(15,digit.create_time.as_str());
-            update_digit_statement.bind(16,digit.update_time.as_str());
+            update_digit_statement.bind(15,digit.create_time);
+            update_digit_statement.bind(16,digit.update_time);
             update_digit_statement.next()?;
             update_digit_statement.reset()?;
         }
@@ -159,15 +159,18 @@ impl DataServiceProvider {
         self.db_hander.execute(sql).map_err(|e|e.into())
     }
 
-
-
-    pub fn get_auth_digit_by_page(&self,page:u32,page_size:u32)->WalletResult<Vec<model::AuthDigit>>{
-        let start = (page-1)*page_size;
+    pub fn get_auth_digit_by_page(&self,start_item:u32,page_size:u32)->WalletResult<model::DigitList>{
         //当前假设存放的所有代币都能够有机会返回,计算总共有多少条
         //todo 怎么来处理这个总数的问题呢？
         let count_digit_item = "select count(*) from detail.AuthDigitBase;";
+        let mut state = self.db_hander.prepare(count_digit_item)?;
+        state.next().unwrap();
+        let count = state.read::<i64>(0).unwrap() as u32;
+        let offset = if count<(start_item+page_size) {
+          count-start_item
+        }else { page_size };
         //返回指定条数的代币
-        let select_digit = format!("select * from detail.AuthDigitBase limit {} offset {};",page_size,start);
+        let select_digit = format!("select * from detail.AuthDigitBase limit {} offset {};",offset,start_item);
         let mut state = self.db_hander.prepare(select_digit)?;
 
         let mut auth_digits = Vec::with_capacity(page_size as usize);
@@ -186,12 +189,15 @@ impl DataServiceProvider {
                 decimal: state.read::<i64>(10).unwrap(),
                 gas_limit:state.read::<i64>(11).unwrap(),
                 mark: state.read::<String>(12).unwrap(),
-                create_time: state.read::<String>(16).unwrap(),
-                update_time: state.read::<String>(17).unwrap(),
+                create_time: state.read::<i64>(16).unwrap(),
+                update_time: state.read::<i64>(17).unwrap(),
                 version: state.read::<i64>(18).unwrap(),
             };
             auth_digits.push(row_data);
         }
-        Ok(auth_digits)
+        Ok( model::DigitList{
+            count,
+            auth_digit:auth_digits,
+        })
     }
 }

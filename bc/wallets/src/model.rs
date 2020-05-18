@@ -68,12 +68,17 @@ pub struct AuthDigit{
     pub mark:String,
     pub version:i64,
     #[serde(rename = "createTime")]
-    pub create_time:String,
+    pub create_time:i64,
     #[serde(rename = "updateTime")]
-    pub update_time:String,
+    pub update_time:i64,
 
 }
 
+#[derive(Debug, Default, Clone)]
+pub struct DigitList{
+    pub count:u32,
+    pub auth_digit:Vec<AuthDigit>,
+}
 #[derive(Debug,Clone)]
 pub  struct DigitItem{
     pub digit_id: Option<String>,
