@@ -23,8 +23,9 @@ class DigitsManagePage extends StatefulWidget {
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
   int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
+  List<Digit> nativeDigitsList = []; //本地的代币列表
   List<Digit> serverDigitsList = []; //服务器接口上的代币列表
-  List<Digit> allDisplayDigitsList = []; //界面所有可用来展示的代币： (Wallets.instance.nowWallet.nowChain.digitsList) + serverDigitsList
+  List<Digit> allAvailableDigitsList = []; //界面所有可用来展示的代币： (Wallets.instance.nowWallet.nowChain.digitsList) + serverDigitsList
   List<Digit> displayDigitsList = []; //单签页面展示的代币数据
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
@@ -36,55 +37,20 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   initData() async {
-    addToAllDisplayDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1、可见代币显示在前面 isVisible = true;
-    addToAllDisplayDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
-    print("allDisplayDigitsList.length====>" + allDisplayDigitsList.length.toString());
-    /*{
+    addToAllAvailableDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1、可见代币显示在前面 isVisible = true;
+    addToAllAvailableDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
+    print("allAvailableDigitsList.length====>" + allAvailableDigitsList.length.toString());
+    addToAllAvailableDigitsList(serverDigitsList);
+    if (false) {
+      //todo
       //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表。
       //todo 替换 ===》 2、本地已有代币列表
-      await loadServerDigitListData(); //服务器可信任代币列表
-    }*/
+      serverDigitsList = await loadServerDigitListData(); //服务器可信任代币列表
+      updateNativeDigitListVersion(serverDigitsList);
+    } else {
+      nativeDigitsList = await loadNativeDigitListData(); //todo
+    }
     displayDigitsList = await loadDisplayDigitListData();
-  }
-
-  addToAllDisplayDigitsList(List<Digit> newDigitList) {
-    if (allDisplayDigitsList != null && allDisplayDigitsList.length == 0) {
-      allDisplayDigitsList.addAll(newDigitList);
-      return;
-    }
-    for (num i = 0; i < newDigitList.length; i++) {
-      var element = newDigitList[i];
-      if (element.contractAddress != null && element.contractAddress.isNotEmpty) {
-        //erc20
-        bool isExistErc20 = false;
-        for (num index = 0; index < allDisplayDigitsList.length; index++) {
-          var digit = allDisplayDigitsList[index];
-          if ((digit.contractAddress != null) && (element.contractAddress != null) && (digit.contractAddress == element.contractAddress)) {
-            print("digit.contractAddress=>" + digit.contractAddress + "||element.contractAddress===>" + element.contractAddress);
-            isExistErc20 = true;
-            break;
-          }
-        }
-        print("isExistErc20 ===>" + isExistErc20.toString());
-        if (!isExistErc20) {
-          allDisplayDigitsList.add(element);
-        }
-      } else {
-        bool isExistDigit = false;
-        for (num index = 0; index < allDisplayDigitsList.length; index++) {
-          var digit = allDisplayDigitsList[index];
-          if ((digit.shortName != null) && (element.shortName != null) && (digit.shortName == element.shortName)) {
-            print("digit.shortName=>" + digit.shortName + "||element.shortName===>" + element.shortName);
-            isExistDigit = true;
-            break;
-          }
-        }
-        print("isExistDigit ===>" + isExistDigit.toString());
-        if (!isExistDigit) {
-          allDisplayDigitsList.add(element);
-        }
-      }
-    }
   }
 
   @override
@@ -157,8 +123,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           Duration(seconds: 2),
           () {
             setState(() {
-              if (displayDigitsList.length < allDisplayDigitsList.length) {
-                // allDisplayDigitsList 的数据(nowWalletM.getNowChainM().digitList),还有没显示完的，allDisplayDigitsList，
+              if (displayDigitsList.length < allAvailableDigitsList.length) {
+                // allAvailableDigitsList 的数据(nowWalletM.getNowChainM().digitList),还有没显示完的，allAvailableDigitsList，
                 // 添加到 displayDigitsList里面做展示
                 loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
               } else {
@@ -260,33 +226,76 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     );
   }
 
-  //
-  backAndReloadData() {
-    // enter page reload  nowWallet.nowChain.digitList
-    RestartWidget.restartApp(context); //todo 方式待优化
-    //NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
+  updateNativeDigitListVersion(List<Digit> serverDigitList) {}
+
+  addToAllAvailableDigitsList(List<Digit> newDigitList) {
+    if (allAvailableDigitsList != null && allAvailableDigitsList.length == 0) {
+      allAvailableDigitsList.addAll(newDigitList);
+      return;
+    }
+    for (num i = 0; i < newDigitList.length; i++) {
+      var element = newDigitList[i];
+      if (element.contractAddress != null && element.contractAddress.isNotEmpty) {
+        //erc20
+        bool isExistErc20 = false;
+        for (num index = 0; index < allAvailableDigitsList.length; index++) {
+          var digit = allAvailableDigitsList[index];
+          if ((digit.contractAddress != null) && (element.contractAddress != null) && (digit.contractAddress == element.contractAddress)) {
+            print("digit.contractAddress=>" + digit.contractAddress + "||element.contractAddress===>" + element.contractAddress);
+            isExistErc20 = true;
+            break;
+          }
+        }
+        print("isExistErc20 ===>" + isExistErc20.toString());
+        if (!isExistErc20) {
+          allAvailableDigitsList.add(element);
+        }
+      } else {
+        bool isExistDigit = false;
+        for (num index = 0; index < allAvailableDigitsList.length; index++) {
+          var digit = allAvailableDigitsList[index];
+          if ((digit.shortName != null) && (element.shortName != null) && (digit.shortName == element.shortName)) {
+            print("digit.shortName=>" + digit.shortName + "||element.shortName===>" + element.shortName);
+            isExistDigit = true;
+            break;
+          }
+        }
+        print("isExistDigit ===>" + isExistDigit.toString());
+        if (!isExistDigit) {
+          allAvailableDigitsList.add(element);
+        }
+      }
+    }
   }
 
-  Future<List<Digit>> loadServerDigitListData() async {}
+  Future<List<Digit>> loadNativeDigitListData() async {
+    //todo 等sql接口实现
+    //Wallets.instance.loadNativeDigitListRecord(Wallets.instance.nowWallet.walletId,Wallets.instance.nowWallet.nowChain.chainId,0,100);
+    return [];
+  }
+
+  Future<List<Digit>> loadServerDigitListData() async {
+    return [];
+  }
 
   Future<List<Digit>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
       //没有展示数据
-      if (allDisplayDigitsList.length < singleDigitCount) {
+      if (allAvailableDigitsList.length < singleDigitCount) {
         //加载到的不够一页，全展示
-        addDigitToDisplayList(allDisplayDigitsList.length);
+        addDigitToDisplayList(allAvailableDigitsList.length);
       } else {
         //超一页，展示singleDigitCount个。
         addDigitToDisplayList(singleDigitCount);
       }
     } else {
       //有展示数据，继续往里添加
-      if (allDisplayDigitsList.length - displayDigitsList.length > singleDigitCount) {
+      if (allAvailableDigitsList.length - displayDigitsList.length > singleDigitCount) {
         //剩余的超过一页
         addDigitToDisplayList(singleDigitCount);
       } else {
         //剩余的不够一页，全给加入进去。
-        addDigitToDisplayList(allDisplayDigitsList.length - displayDigitsList.length);
+        addDigitToDisplayList(allAvailableDigitsList.length - displayDigitsList.length);
       }
     }
     return displayDigitsList;
@@ -296,20 +305,24 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     for (var i = displayDigitsList.length; i < targetCount; i++) {
       var digitRate = DigitRate();
       Digit digit = EthDigit();
-      print("addDigitToDisplayList allDisplayDigitsList[i].balance===>" + allDisplayDigitsList[i].balance.toString());
+      print("addDigitToDisplayList allAvailableDigitsList[i].balance===>" + allAvailableDigitsList[i].balance.toString());
       digit
-        ..chainId = allDisplayDigitsList[i].chainId
-        ..digitId = allDisplayDigitsList[i].digitId
-        ..decimal = allDisplayDigitsList[i].decimal
-        ..shortName = allDisplayDigitsList[i].shortName
-        ..fullName = allDisplayDigitsList[i].fullName
-        ..balance = allDisplayDigitsList[i].balance
-        ..contractAddress = allDisplayDigitsList[i].contractAddress
-        ..address = allDisplayDigitsList[i].address
-        ..isVisible = allDisplayDigitsList[i].isVisible
+        ..chainId = allAvailableDigitsList[i].chainId
+        ..digitId = allAvailableDigitsList[i].digitId
+        ..decimal = allAvailableDigitsList[i].decimal
+        ..shortName = allAvailableDigitsList[i].shortName
+        ..fullName = allAvailableDigitsList[i].fullName
+        ..balance = allAvailableDigitsList[i].balance
+        ..contractAddress = allAvailableDigitsList[i].contractAddress
+        ..address = allAvailableDigitsList[i].address
+        ..isVisible = allAvailableDigitsList[i].isVisible
         ..digitRate = digitRate;
       displayDigitsList.add(digit);
     }
     return displayDigitsList;
+  }
+
+  backAndReloadData() {
+    RestartWidget.restartApp(context); //由于widget模式，虚拟dom与activity区分。不走生命周期，重改key，重新加载
   }
 }

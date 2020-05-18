@@ -210,4 +210,25 @@ class WalletManager {
     Map<dynamic, dynamic> decodeMap = await _channel.invokeMethod("decodeAccountInfo", {"encodeData": encodeData});
     return decodeMap;
   }
+
+  //分页获取（startIndex + offset） 本地代币列表中的数据
+  static loadNativeDigitListRecord(String walletId, int chainType, int startIndex, int offset) async {
+    Map<dynamic, dynamic> nativeDigitMap = await _channel.invokeMethod("", {"": ""}); //todo
+    return nativeDigitMap;
+  }
+
+  //在 当前钱包、当前链下，增加新代币的数据模型
+  static addDigitToChainModel(String walletId, int chainType, int decimal, String fullName, String shortName) {
+    //todo
+  }
+
+  //代币列表版本更新后，更改代币列表内容 todo
+  static add2NativeDigitListRecord(String walletId, int chainType, int decimal, String fullName, String shortName) {
+    //todo
+  }
+
+  //代币本地查询，条件：（代币名称 + 合约地址）
+  static queryNativeDigitListRecord(String queryParam) {
+    //todo
+  }
 }

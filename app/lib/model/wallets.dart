@@ -345,4 +345,23 @@ class Wallets {
   decodeAccountInfo(String encodeData) async {
     Map eeeAccountMap = await WalletManager.decodeAccountInfo(encodeData);
   }
+
+  loadNativeDigitListRecord(String walletId, int chainType, int startIndex, int offset) async {
+    Map eeeAccountMap = await WalletManager.loadNativeDigitListRecord(walletId, chainType, startIndex, offset);
+  }
+
+  addDigitToChainModel(String walletId, int chainType, int decimal, String fullName, String shortName) async {
+    //todo 参数待定
+    Map addDigitModelMap = await WalletManager.addDigitToChainModel(walletId, chainType, decimal, fullName, shortName);
+  }
+
+  add2NativeDigitListRecord(String walletId, int chainType, int decimal, String fullName, String shortName) async {
+    //todo 参数待定
+    Map addNativeDigitListRecordMap = await WalletManager.add2NativeDigitListRecord(walletId, chainType, decimal, fullName, shortName);
+  }
+
+  queryNativeDigitListRecord(String queryParam) async {
+    //todo 待定
+    Map queryDigitListRecordMap = await WalletManager.queryNativeDigitListRecord(queryParam);
+  }
 }
