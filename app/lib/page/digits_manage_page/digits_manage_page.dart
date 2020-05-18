@@ -3,6 +3,7 @@ import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/res/styles.dart';
+import 'package:app/routers/application.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
@@ -51,6 +52,9 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       nativeDigitsList = await loadNativeDigitListData(); //todo
     }
     displayDigitsList = await loadDisplayDigitListData();
+    setState(() {
+      this.displayDigitsList = displayDigitsList;
+    });
   }
 
   @override
@@ -75,6 +79,14 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               S.of(context).digit_list_title ?? "",
               style: TextStyle(fontSize: 20),
             ),
+            actions: <Widget>[
+              GestureDetector(
+                onTap: () {
+                  NavigatorUtils.push(context, Routes.searchDigitPage);
+                },
+                child: Image.asset("assets/images/ic_search.png"),
+              )
+            ],
           ),
           body: Container(
               child: Column(
@@ -305,7 +317,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     for (var i = displayDigitsList.length; i < targetCount; i++) {
       var digitRate = DigitRate();
       Digit digit = EthDigit();
-      print("addDigitToDisplayList allAvailableDigitsList[i].balance===>" + allAvailableDigitsList[i].balance.toString());
+      print("addDigitToDisplayList allAvailableDigitsList[i].shortName===>" + allAvailableDigitsList[i].shortName.toString());
       digit
         ..chainId = allAvailableDigitsList[i].chainId
         ..digitId = allAvailableDigitsList[i].digitId
