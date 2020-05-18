@@ -12,6 +12,7 @@ import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
@@ -244,80 +245,61 @@ class _EntryPageState extends State<EntryPage> {
 
   Widget _buildProtocolCheckBoxWidget() {
     return Container(
-      child: Container(
-        width: ScreenUtil().setWidth(85),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Checkbox(
-              value: _agreeServiceProtocol,
-              onChanged: (newValue) {
-                setState(
-                  () {
-                    _agreeServiceProtocol = newValue;
-                  },
-                );
-              },
-            ),
-            Container(
+      width: ScreenUtil().setWidth(85),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Checkbox(
+            value: _agreeServiceProtocol,
+            onChanged: (newValue) {
+              setState(
+                () {
+                  _agreeServiceProtocol = newValue;
+                },
+              );
+            },
+          ),
+          Container(
               alignment: Alignment.centerLeft,
               height: ScreenUtil().setHeight(14),
               width: ScreenUtil().setWidth(70),
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    S.of(context).agree_service_prefix,
+              child: RichText(
+                text: TextSpan(children: <TextSpan>[
+                  TextSpan(
+                    text: S.of(context).agree_service_prefix,
                     style: TextStyle(
                         decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      NavigatorUtils.push(context, Routes.serviceAgreementPage);
-                    },
-                    child: Text(
-                      S.of(context).service_protocol_tag,
+                  TextSpan(
+                      text: S.of(context).service_protocol_tag,
                       style: TextStyle(
                           decoration: TextDecoration.underline,
                           color: Colors.white70,
                           fontSize: ScreenUtil.instance.setSp(3),
                           fontStyle: FontStyle.normal),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                    ),
-                  ),
-                  Text(
-                    "、",
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          NavigatorUtils.push(context, Routes.serviceAgreementPage);
+                        }),
+                  TextSpan(
+                    text: "、",
                     style: TextStyle(
                         decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      NavigatorUtils.push(context, Routes.privacyStatementPage);
-                    },
-                    child: Text(
-                      S.of(context).privacy_protocol_tag,
+                  TextSpan(
+                      text: S.of(context).privacy_protocol_tag,
                       style: TextStyle(
                           decoration: TextDecoration.underline,
                           color: Colors.white70,
                           fontSize: ScreenUtil.instance.setSp(3),
                           fontStyle: FontStyle.normal),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          NavigatorUtils.push(context, Routes.privacyStatementPage);
+                        }),
+                ]),
+              )),
+        ],
       ),
     );
   }
