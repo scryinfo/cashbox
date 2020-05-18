@@ -2,11 +2,7 @@ import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/wallet.dart';
-import 'package:app/model/wallets.dart';
-import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
-import 'package:app/routers/fluro_navigator.dart';
-import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 
 class SearchDigitPage extends StatefulWidget {
   @override
@@ -23,7 +18,6 @@ class SearchDigitPage extends StatefulWidget {
 }
 
 class _SearchDigitPageState extends State<SearchDigitPage> {
-  List<Digit> nowChainDigitsList = [];
   List<Digit> displayDigitsList = [];
   Wallet nowWalletM;
   Chain nowChain;
@@ -42,39 +36,54 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
       height: ScreenUtil().setHeight(120),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(title: _searchInputWidget(), backgroundColor: Colors.transparent, actions: <Widget>[
-          Container(
-              width: ScreenUtil.instance.setWidth(10),
-              child: Row(
-                children: <Widget>[
-                  RichText(
-                    text: TextSpan(children: <TextSpan>[
-                      TextSpan(
-                          text: S.of(context).cancel,
-                          style: TextStyle(
-                              decoration: TextDecoration.none,
-                              color: Colors.white70,
-                              fontSize: ScreenUtil.instance.setSp(3),
-                              fontStyle: FontStyle.normal),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              print("onTap event");
-                              _searchContentController.text = "";
-                            }),
-                    ]),
-                  ),
-                ],
-              )),
-        ]),
+        appBar: AppBar(
+            title: buildSearchInputWidget(),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            brightness: Brightness.light,
+            actions: <Widget>[
+              buildCancelWidget(),
+            ]),
         body: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+            ),
             child: Column(
-          children: <Widget>[Gaps.scaleVGap(5), _digitListAreaWidgets()],
-        )),
+              children: <Widget>[
+                Gaps.scaleVGap(5),
+                buildDigitListAreaWidgets(),
+              ],
+            )),
       ),
     );
   }
 
-  Widget _searchInputWidget() {
+  Widget buildCancelWidget() {
+    return Container(
+        width: ScreenUtil.instance.setWidth(10),
+        child: Row(
+          children: <Widget>[
+            RichText(
+              text: TextSpan(children: <TextSpan>[
+                TextSpan(
+                    text: S.of(context).cancel,
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Colors.white70,
+                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontStyle: FontStyle.normal,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        _searchContentController.text = "";
+                      }),
+              ]),
+            ),
+          ],
+        ));
+  }
+
+  Widget buildSearchInputWidget() {
     return Container(
       width: ScreenUtil.instance.setWidth(60),
       //修饰黑色背景与圆角
@@ -85,48 +94,41 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
       ),
       alignment: Alignment.center,
       height: ScreenUtil.instance.setHeight(8),
-      child: buildTextField(),
+      child: buildSearchTextFieldWidget(),
     );
   }
 
-  Widget buildTextField() {
+  Widget buildSearchTextFieldWidget() {
     return Container(
         child: TextField(
-            cursorColor: Colors.white,
-            //设置光标
-            decoration: InputDecoration(
-              contentPadding: new EdgeInsets.only(bottom: ScreenUtil.instance.setHeight(2.5)),
-              border: InputBorder.none,
-              icon: IconButton(
-                  icon: ImageIcon(
-                    AssetImage(
-                      "assets/images/ic_search.png",
-                    ),
-                  ),
-                  onPressed: () {
-                    _searchDigit(_searchContentController.text);
-                  }),
-              hintText: "请输入代币名称或合约地址",
-              hintStyle: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
+      cursorColor: Colors.white,
+      //设置光标
+      decoration: InputDecoration(
+        contentPadding: new EdgeInsets.only(bottom: ScreenUtil.instance.setHeight(2.5)),
+        border: InputBorder.none,
+        icon: IconButton(
+            icon: ImageIcon(
+              AssetImage(
+                "assets/images/ic_search.png",
+              ),
             ),
-            onSubmitted: (value) {
-              _searchDigit(value);
-            },
-            controller: _searchContentController,
-            //文本对齐方式(即光标初始位置)
-            textAlign: TextAlign.start,
-            style: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white)));
+            onPressed: () {
+              _searchDigit(_searchContentController.text);
+            }),
+        hintText: "请输入代币名称或合约地址",
+        hintStyle: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
+      ),
+      onSubmitted: (value) {
+        _searchDigit(value);
+      },
+      controller: _searchContentController,
+      //文本对齐方式(即光标初始位置)
+      textAlign: TextAlign.start,
+      style: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
+    ));
   }
 
-  _searchDigit(String param) {
-    print("onSubmitted is ===>" + param);
-    if (param == null || param.isEmpty) {
-      return false;
-    }
-    Wallets.instance.queryNativeDigitListRecord(param);
-  }
-
-  Widget _digitListAreaWidgets() {
+  Widget buildDigitListAreaWidgets() {
     return Container(
         height: ScreenUtil().setHeight(70),
         width: ScreenUtil().setWidth(90),
@@ -157,18 +159,9 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
         await Future.delayed(
           Duration(seconds: 2),
           () {
-            // setState(() {
-            //   if (displayDigitsList.length < nowChainDigitsList.length) {
-            //     // 从JNI加载的数据(nowChain.digitList),还有没显示完的，继续将nowChainDigitsList剩余数据，
-            //     // 添加到 displayDigitsList里面做展示
-            //     loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
-            //   } else {
-            //     // todo 2.0。 功能：加载代币列表，可选择添加erc20代币。 代币列表下拉刷新。
-            //     // 继续调jni获取，或者提示已经没数据了。 根据是否jni分页处理来决定。
-            //     Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
-            //     return;
-            //   }
-            // });
+            setState(() {
+              this.displayDigitsList = displayDigitsList;
+            });
           },
         );
       },
@@ -190,18 +183,11 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
           child: GestureDetector(
             onTap: () {
               try {
-                Provider.of<TransactionProvide>(context)
-                  ..setDigitName(displayDigitsList[index].shortName)
-                  ..setBalance(displayDigitsList[index].balance)
-                  ..setDecimal(displayDigitsList[index].decimal)
-                  ..setFromAddress(nowChain.chainAddress)
-                  ..setChainType(nowChain.chainType)
-                  ..setContractAddress(displayDigitsList[index].contractAddress ?? "");
+                // todo 保存 或者 更改显示状态
               } catch (e) {
                 print("digit_list_page点击传值出现位置错误===>" + e.toString());
                 LogUtil.e("digit_list_page", e.toString());
               }
-              NavigatorUtils.push(context, Routes.transactionHistoryPage);
             },
             child: Row(
               children: <Widget>[
@@ -241,5 +227,17 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
         )
       ],
     );
+  }
+
+  _searchDigit(String param) {
+    print("onSubmitted is ===>" + param);
+    if (param == null || param.isEmpty) {
+      return false;
+    }
+    // todo 执行查找接口
+    //Wallets.instance.queryNativeDigitListRecord(param);
+    setState(() {
+      //this.displayDigitsList = [];
+    });
   }
 }

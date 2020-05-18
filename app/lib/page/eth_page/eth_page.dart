@@ -139,8 +139,8 @@ class _EthPageState extends State<EthPage> {
             this.displayDigitsList[i].address.toString());
         String balance;
         if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
-          balance = await loadErc20Balance(
-              Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[i].contractAddress, Wallets.instance.nowWallet.nowChain.chainType);
+          balance = await loadErc20Balance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[i].contractAddress,
+              Wallets.instance.nowWallet.nowChain.chainType);
           print("erc20 balance==>" + balance.toString());
           Wallets.instance.updateDigitBalance(this.displayDigitsList[i].contractAddress, this.displayDigitsList[i].digitId, balance ?? "");
         } else if (Wallets.instance.nowWallet.nowChain.chainAddress != null && Wallets.instance.nowWallet.nowChain.chainAddress.trim() != "") {

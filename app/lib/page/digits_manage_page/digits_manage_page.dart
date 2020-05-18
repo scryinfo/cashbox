@@ -80,18 +80,28 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               style: TextStyle(fontSize: 20),
             ),
             actions: <Widget>[
-              GestureDetector(
-                onTap: () {
-                  NavigatorUtils.push(context, Routes.searchDigitPage);
-                },
-                child: Image.asset("assets/images/ic_search.png"),
+              Container(
+                width: ScreenUtil.instance.setWidth(10),
+                child: Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        NavigatorUtils.push(context, Routes.searchDigitPage);
+                      },
+                      child: Image.asset("assets/images/ic_search.png"),
+                    )
+                  ],
+                ),
               )
             ],
           ),
           body: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+              ),
               child: Column(
-            children: <Widget>[Gaps.scaleVGap(5), _digitListAreaWidgets()],
-          )),
+                children: <Widget>[Gaps.scaleVGap(1), _digitListAreaWidgets()],
+              )),
         ),
       ),
       onWillPop: () {
