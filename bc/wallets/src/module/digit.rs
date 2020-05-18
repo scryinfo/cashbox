@@ -16,6 +16,7 @@ pub fn update_balance(address: &str, digit_id: &str,balance:&str)-> WalletResult
     instance.update_digit_balance(address,digit_id,balance)
 }
 
+
 pub fn add_wallet_digit(wallet_id:&str,chain_id:&str,digit:DigitExport)-> WalletResult<()>{
     let instance = wallet_db::DataServiceProvider::instance()?;
     instance.tx_begin()?;
@@ -28,3 +29,17 @@ pub fn add_wallet_digit(wallet_id:&str,chain_id:&str,digit:DigitExport)-> Wallet
     }
 
 }
+
+//接收客户端传递过来的认证代币列表,将数据更新到认证代币列表中
+//todo 根据传递进来的代币属于测试链还是主链分别处理
+pub fn update_auth_digit(digits:Vec<model::AuthDigit>)->WalletResult<()>{
+    let instance = wallet_db::DataServiceProvider::instance()?;
+    instance.tx_begin()?;
+    //当前采用全量更新手段，直接删除存在的代币,更新新的代币
+    match instance.update_certification_digit(digits) {
+        Ok(())=>instance.tx_commint(),
+        Err(e)=>instance.tx_rollback(),
+    }
+}
+
+

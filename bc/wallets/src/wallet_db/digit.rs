@@ -1,4 +1,5 @@
 use  super::*;
+use sqlite::State;
 
 impl DataServiceProvider {
 
@@ -89,6 +90,51 @@ impl DataServiceProvider {
         self.add_digits(digits)
     }
 
+   /* [id]  VARCHAR (40),
+    [contract]      VARCHAR (64),
+    [accept_id]     VARCHAR (32),
+    [symbol]        VARCHAR (32),
+    [name]  VARCHAR (32),
+    [publisher]     VARCHAR (32),
+    [project]       VARCHAR (32),
+    [logo_url]      VARCHAR (1024),
+    [logo_bytes]    VARCHAR (3072),
+    [decimal]       INT,
+    [gas_limit]     INT,
+    [mark]  VARCHAR (512),
+    [CREATED_TIME]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
+    [UPDATED_TIME]  timestamp,
+    [version]       INT,*/
+
+  pub fn update_certification_digit(&self,digits:Vec<model::AuthDigit>)->WalletResult<()>{
+        let delete_sql = "delete from detail.AuthDigitBase;";
+        self.db_hander.execute(delete_sql)?;
+        let insert_sql = "insert into detail.AuthDigitBase(id,chain_type,contract,accept_id,symbol,name,publisher,project,logo_url,logo_bytes,decimal,gas_limit,mark,version,CREATED_TIME,UPDATED_TIME)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+        let mut update_digit_statement = self.db_hander.prepare(insert_sql)?;
+        for digit in digits {
+            update_digit_statement.bind(1,digit.id.as_str());
+            update_digit_statement.bind(2,digit.chain_type.as_str());
+            update_digit_statement.bind(3,digit.contract.as_str());
+            update_digit_statement.bind(4,digit.accept_id.as_str());
+            update_digit_statement.bind(5,digit.symbol.as_str());
+            update_digit_statement.bind(6,digit.name.as_str());
+            update_digit_statement.bind(7,digit.publisher.as_str());
+            update_digit_statement.bind(8,digit.project.as_str());
+            update_digit_statement.bind(9,digit.logo_url.as_str());
+            update_digit_statement.bind(10,digit.logo_bytes.as_str());//需要前端传过来的为bytes格式
+            update_digit_statement.bind(11,digit.decimal);
+            update_digit_statement.bind(12,digit.gas_limit);
+            update_digit_statement.bind(13,digit.mark.as_str());
+            update_digit_statement.bind(14,digit.version);
+            update_digit_statement.bind(15,digit.create_time.as_str());
+            update_digit_statement.bind(16,digit.update_time.as_str());
+            update_digit_statement.next()?;
+            update_digit_statement.reset()?;
+        }
+        Ok(())
+
+    }
+
     pub fn add_digit(&self,wallet_id:&str,chain_id:&str,digit_item:table_desc::DigitExport)->WalletResult<()>{
         // 查看代币是否存在,这里规定新增的代币合约地址不会重复
         let count_sql = "select count(*) from detail.DigitBase where contract_address = ?;";
@@ -111,5 +157,41 @@ impl DataServiceProvider {
   /*      self.add_digits(vec![digit_item.clone()])?;*/
         let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase where  contract_address = '{}';", address_id, digit_item.address);
         self.db_hander.execute(sql).map_err(|e|e.into())
+    }
+
+
+
+    pub fn get_auth_digit_by_page(&self,page:u32,page_size:u32)->WalletResult<Vec<model::AuthDigit>>{
+        let start = (page-1)*page_size;
+        //当前假设存放的所有代币都能够有机会返回,计算总共有多少条
+        //todo 怎么来处理这个总数的问题呢？
+        let count_digit_item = "select count(*) from detail.AuthDigitBase;";
+        //返回指定条数的代币
+        let select_digit = format!("select * from detail.AuthDigitBase limit {} offset {};",page_size,start);
+        let mut state = self.db_hander.prepare(select_digit)?;
+
+        let mut auth_digits = Vec::with_capacity(page_size as usize);
+        while let State::Row = state.next().unwrap() {
+            let row_data = model::AuthDigit{
+                id: state.read::<String>(0).unwrap(),
+                chain_type: state.read::<String>(1).unwrap(),
+                contract: state.read::<String>(2).unwrap(),
+                accept_id: state.read::<String>(3).unwrap(),
+                symbol: state.read::<String>(4).unwrap(),
+                name: state.read::<String>(5).unwrap(),
+                publisher: state.read::<String>(6).unwrap(),
+                project: state.read::<String>(7).unwrap(),
+                logo_url: state.read::<String>(8).unwrap(),
+                logo_bytes: state.read::<String>(9).unwrap(),
+                decimal: state.read::<i64>(10).unwrap(),
+                gas_limit:state.read::<i64>(11).unwrap(),
+                mark: state.read::<String>(12).unwrap(),
+                create_time: state.read::<String>(16).unwrap(),
+                update_time: state.read::<String>(17).unwrap(),
+                version: state.read::<i64>(18).unwrap(),
+            };
+            auth_digits.push(row_data);
+        }
+        Ok(auth_digits)
     }
 }

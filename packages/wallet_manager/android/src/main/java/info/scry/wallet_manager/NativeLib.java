@@ -174,9 +174,38 @@ public class NativeLib {
         public boolean isAddDigit;            //添加代币,是否成功       apiNo:WM16   执行状态： 1成功 0失败
         public boolean isUpdateDigitBalance;  //更新拥有代币的数量,是否成功   执行状态： 1成功 0失败
         public boolean isInitWalletBasicData;  //初始化数据基础数据,是否成功   执行状态： 1成功 0失败
+        public boolean isUpdateAuthDigit;  //初始化数据基础数据,是否成功   执行状态： 1成功 0失败
 
         public String message;                //错误信息，详细说明
     }
+
+    public static class EthToken{
+        public String id;
+        public String symbol;
+        public String name;
+        public String publisher;
+        public String project;
+        public String logoUrl;
+        public String logoBytes;
+        public int decimal;
+        public String gasLimit;
+        public String contract;
+        public String acceptId;
+        public String chainType;
+        public String mark;
+        public int updateTime;
+        public int createTime;
+        public int version;
+    }
+
+    public static AuthList{
+        public int status;//动态库调用结果
+        public String message;      //错误信息，详细说明
+        public int count;//总条数
+        public int startItem;//其实条数
+        public List<EthToken> authDigit;
+    }
+
 
     /**
      * 初始化钱包数据文件，加载基础数据
@@ -253,13 +282,20 @@ public class NativeLib {
     // 4、检查更新的口子（parker）
     // 5、ip等配置文件，配置流程。（parker）
 
+    /**
+     * 更新信任代币
+     * @param digitData 从服务端获取的认证代币的列表，json格式数据
+     * @return
+     */
+    public static native WalletState updateAuthDigitList(String digitData);
 
-    public static class Digit {
-        public String id;
-        public String logUrl;
-    }
-
-    public static native Message addDigitTest(Digit digit);
+    /**
+     * 查询认证代币列表
+     * @param startItem 开始条数
+     * @param pageSize  当前最多取多少条
+     * @return
+     */
+    public static native AuthList getAuthDigitList(int startItem,int pageSize);
 
     /*------------------------------------------链相关------------------------------------------*/
 

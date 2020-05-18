@@ -16,7 +16,10 @@ wallets={path="../../bc/wallets"}
 log = "0.4.8"
 ethereum-types = "0.8.0"
 jni = "0.13"
-hex = "*"
+serde_derive = "1.0.98"
+serde="1.0"
+serde_json = "1.0"
+hex="0.4.2"
 
 #[target.'cfg(target_os="android")'.dependencies]
 

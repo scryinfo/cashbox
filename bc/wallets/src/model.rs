@@ -47,7 +47,7 @@ pub struct DigitExport{
 /// Description of a Digit
 /// 用于认证代币的导入
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
-pub struct CertifiDigit{
+pub struct AuthDigit{
     pub id:String,
     pub contract:String,
     #[serde(rename = "acceptId")]
@@ -62,9 +62,9 @@ pub struct CertifiDigit{
     pub logo_url:String,
     #[serde(rename = "logoBytes")]
     pub logo_bytes:String,
-    pub decimal:String,
+    pub decimal:i64,
     #[serde(rename = "gasLimit")]
-    pub gas_limit:String,
+    pub gas_limit:i64,
     pub mark:String,
     pub version:i64,
     #[serde(rename = "createTime")]

@@ -76,9 +76,10 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [UPDATED_TIME] timestamp,
 	primary key(digit_id,address_id));
 
-    DROP TABLE IF EXISTS [main].[CertifiDigitBase];
-     CREATE TABLE [main].[CertifiDigitBase] (
+    DROP TABLE IF EXISTS [main].[AuthDigitBase];
+     CREATE TABLE [main].[AuthDigitBase] (
         [id]  VARCHAR (40),
+        [chain_type]    VARCHAR (32),
         [contract]      VARCHAR (64),
         [accept_id]     VARCHAR (32),
         [symbol]        VARCHAR (32),
