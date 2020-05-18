@@ -721,6 +721,12 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
+            case "initWalletBasicData": {
+                ScryWalletLog.d("nativeLib=>", "initWalletBasicData is enter =>");
+                //todo
+                NativeLib.initWalletBasicData();
+                break;
+            }
             default:
                 result.notImplemented();
                 break;

@@ -66,6 +66,11 @@ class Wallets {
     }
   }
 
+  initWalletBasicData(){
+    WalletManager.initWalletBasicData();
+  }
+
+
   // 导出所有钱包
   // apiNo:WM02
   Future<List<Wallet>> loadAllWalletList({bool isForceLoadFromJni = false}) async {

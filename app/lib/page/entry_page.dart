@@ -53,6 +53,8 @@ class _EntryPageState extends State<EntryPage> {
     languageList.add(GlobalConfig.enLocale);
     languageMap = {};
     languageMap.addAll({GlobalConfig.zhLocale: "中文", GlobalConfig.enLocale: "English"});
+    // todo
+    Wallets.instance.initWalletBasicData();
     future = _checkIsContainWallet();
   }
 

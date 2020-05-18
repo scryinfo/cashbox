@@ -23,6 +23,11 @@ class WalletManager {
     return containMap;
   }
 
+  static Future<Map<dynamic, dynamic>> initWalletBasicData() async {
+    Map<dynamic, dynamic> containMap = await _channel.invokeMethod('initWalletBasicData');
+    return containMap;
+  }
+
   //从数据库 加载出 所有钱包数据
   //导出所有钱包
   // apiNo:WM02
@@ -212,8 +217,8 @@ class WalletManager {
   }
 
   //分页获取（startIndex + offset） 本地代币列表中的数据
-  static loadNativeDigitListRecord(String walletId, int chainType, int startIndex, int offset) async {
-    Map<dynamic, dynamic> nativeDigitMap = await _channel.invokeMethod("", {"": ""}); //todo
+  static loadNativeDigitListRecord(int chainType, int startIndex, int offset) async {
+    Map<dynamic, dynamic> nativeDigitMap = await _channel.invokeMethod("getAuthDigitList", {"startIndex": startIndex, "pageSize": offset}); //todo
     return nativeDigitMap;
   }
 

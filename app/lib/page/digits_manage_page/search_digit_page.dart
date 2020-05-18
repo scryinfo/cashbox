@@ -75,6 +75,10 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
+                        if (_searchContentController.text == "") {
+                          Navigator.pop(context);
+                          return;
+                        }
                         _searchContentController.text = "";
                       }),
               ]),
