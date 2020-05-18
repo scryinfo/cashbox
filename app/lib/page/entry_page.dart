@@ -57,7 +57,7 @@ class _EntryPageState extends State<EntryPage> {
 
   Future<bool> _checkIsContainWallet() async {
     var spUtil = await SharedPreferenceUtil.instance;
-    languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
+    languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)] ?? languageMap[GlobalConfig.zhLocale];
     isContainWallet = await Wallets.instance.isContainWallet();
     return isContainWallet;
   }
