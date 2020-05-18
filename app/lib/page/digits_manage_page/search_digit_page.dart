@@ -2,6 +2,7 @@ import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -27,6 +28,12 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
   Wallet nowWalletM;
   Chain nowChain;
   TextEditingController _searchContentController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _searchContentController.text = "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,18 +104,26 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                     ),
                   ),
                   onPressed: () {
-                    print("click search icon");
+                    _searchDigit(_searchContentController.text);
                   }),
-              hintText: "digitName",
+              hintText: "请输入代币名称或合约地址",
               hintStyle: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
             ),
             onSubmitted: (value) {
-              print("onSubmitted is ===>" + value);
+              _searchDigit(value);
             },
             controller: _searchContentController,
             //文本对齐方式(即光标初始位置)
             textAlign: TextAlign.start,
             style: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white)));
+  }
+
+  _searchDigit(String param) {
+    print("onSubmitted is ===>" + param);
+    if (param == null || param.isEmpty) {
+      return false;
+    }
+    Wallets.instance.queryNativeDigitListRecord(param);
   }
 
   Widget _digitListAreaWidgets() {

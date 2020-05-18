@@ -347,7 +347,7 @@ class Wallets {
   }
 
   loadNativeDigitListRecord(String walletId, int chainType, int startIndex, int offset) async {
-    Map eeeAccountMap = await WalletManager.loadNativeDigitListRecord(walletId, chainType, startIndex, offset);
+    Map eeeAccountMap = await WalletManager.loadNativeDigitListRecord(chainType, startIndex, offset);
   }
 
   addDigitToChainModel(String walletId, int chainType, int decimal, String fullName, String shortName) async {
@@ -363,5 +363,6 @@ class Wallets {
   queryNativeDigitListRecord(String queryParam) async {
     //todo 待定
     Map queryDigitListRecordMap = await WalletManager.queryNativeDigitListRecord(queryParam);
+    return queryDigitListRecordMap;
   }
 }
