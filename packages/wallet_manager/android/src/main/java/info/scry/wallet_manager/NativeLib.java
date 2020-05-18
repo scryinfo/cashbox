@@ -175,6 +175,7 @@ public class NativeLib {
         public boolean isUpdateDigitBalance;  //更新拥有代币的数量,是否成功   执行状态： 1成功 0失败
         public boolean isInitWalletBasicData;  //初始化数据基础数据,是否成功   执行状态： 1成功 0失败
         public boolean isUpdateAuthDigit;  //初始化数据基础数据,是否成功   执行状态： 1成功 0失败
+        public boolean isUpdateDefaultDigit;  //更新默认代币,是否成功   执行状态： 1成功 0失败
 
         public String message;                //错误信息，详细说明
     }
@@ -287,6 +288,13 @@ public class NativeLib {
      * @return
      */
     public static native WalletState updateAuthDigitList(String digitData);
+
+    /**
+     * 更新默认代币
+     * @param digitData 从服务端获取的认证代币的列表，json格式数据
+     * @return
+     */
+    public static native WalletState updateDefaultDigitList(String digitData);
 
     /**
      * 查询认证代币列表

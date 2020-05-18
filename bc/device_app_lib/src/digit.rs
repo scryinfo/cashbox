@@ -111,6 +111,26 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDefaultDigitList(env: JNIEnv, _: JClass, digit_data: JString) -> jobject {
+        let digit_data: String = env.get_string(digit_data).unwrap().into();
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
+
+        let digits =  serde_json::from_slice::<Vec<wallets::model::DigitExport>>(digit_data.as_bytes()).expect("decode digit_data");
+        match wallets::module::digit::update_default_digit(digits){
+            Ok(_)=>{
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status value ");
+                env.set_field(state_obj, "isUpdateDefaultDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value ");
+            },
+            Err(msg)=>{
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status value ");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value ");
+            }
+        }
+        *state_obj
+    }
+    #[no_mangle]
+    #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateAuthDigitList(env: JNIEnv, _: JClass, digit_data: JString) -> jobject {
         let digit_data: String = env.get_string(digit_data).unwrap().into();
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");

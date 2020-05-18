@@ -17,7 +17,8 @@ public class NativeLibTest {
      //  walletGenerateTest();
        // walletExportTest();
         //updateAuthListTest();
-        getAuthDigitListTest();
+        //getAuthDigitListTest();
+        updateDefaultDigitTest();
       //  eeeTransferTest();
        // eeeAccountInfoKeyTest();
        // decodeAccountInfoTest();
@@ -29,6 +30,15 @@ public class NativeLibTest {
         //System.out.println("wallet size is:"+wallets.size());
        // System.out.println(wallets.toString());
 
+    }
+
+    public static void updateDefaultDigitTest(){
+        String json = "[\n" +
+                "{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":18,\"chainType\":\"ETH\"},\n" +
+                "{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":18,\"chainType\":\"ETH_TEST\"}\n" +
+                "]";
+        NativeLib.WalletState state = NativeLib.updateDefaultDigitList(json);
+        System.out.println(state);
     }
 
     public static void updateAuthListTest(){

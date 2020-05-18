@@ -90,22 +90,6 @@ impl DataServiceProvider {
         self.add_digits(digits)
     }
 
-   /* [id]  VARCHAR (40),
-    [contract]      VARCHAR (64),
-    [accept_id]     VARCHAR (32),
-    [symbol]        VARCHAR (32),
-    [name]  VARCHAR (32),
-    [publisher]     VARCHAR (32),
-    [project]       VARCHAR (32),
-    [logo_url]      VARCHAR (1024),
-    [logo_bytes]    VARCHAR (3072),
-    [decimal]       INT,
-    [gas_limit]     INT,
-    [mark]  VARCHAR (512),
-    [CREATED_TIME]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [UPDATED_TIME]  timestamp,
-    [version]       INT,*/
-
   pub fn update_certification_digit(&self,digits:Vec<model::AuthDigit>)->WalletResult<()>{
         let delete_sql = "delete from detail.AuthDigitBase;";
         self.db_hander.execute(delete_sql)?;
