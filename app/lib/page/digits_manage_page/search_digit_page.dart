@@ -1,3 +1,4 @@
+import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/wallet.dart';
@@ -8,6 +9,7 @@ import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
@@ -24,6 +26,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
   List<Digit> displayDigitsList = [];
   Wallet nowWalletM;
   Chain nowChain;
+  TextEditingController _searchContentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +36,28 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(title: _searchInputWidget(), backgroundColor: Colors.transparent, actions: <Widget>[
-          Row(
-            children: <Widget>[
-              Container(
-                width: ScreenUtil.instance.setWidth(10),
-                child: Text("取消"),
-              )
-            ],
-          )
+          Container(
+              width: ScreenUtil.instance.setWidth(10),
+              child: Row(
+                children: <Widget>[
+                  RichText(
+                    text: TextSpan(children: <TextSpan>[
+                      TextSpan(
+                          text: S.of(context).cancel,
+                          style: TextStyle(
+                              decoration: TextDecoration.none,
+                              color: Colors.white70,
+                              fontSize: ScreenUtil.instance.setSp(3),
+                              fontStyle: FontStyle.normal),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              print("onTap event");
+                              _searchContentController.text = "";
+                            }),
+                    ]),
+                  ),
+                ],
+              )),
         ]),
         body: Container(
             child: Column(
@@ -68,9 +85,10 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
   Widget buildTextField() {
     return Container(
         child: TextField(
-            cursorColor: Colors.white, //设置光标
+            cursorColor: Colors.white,
+            //设置光标
             decoration: InputDecoration(
-              contentPadding: new EdgeInsets.only( bottom: ScreenUtil.instance.setHeight(2.5)),
+              contentPadding: new EdgeInsets.only(bottom: ScreenUtil.instance.setHeight(2.5)),
               border: InputBorder.none,
               icon: IconButton(
                   icon: ImageIcon(
@@ -85,8 +103,9 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
               hintStyle: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
             ),
             onSubmitted: (value) {
-              print("onSubmitted is ===>"+value);
+              print("onSubmitted is ===>" + value);
             },
+            controller: _searchContentController,
             //文本对齐方式(即光标初始位置)
             textAlign: TextAlign.start,
             style: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white)));
