@@ -24,7 +24,7 @@ impl DataServiceProvider {
         let all_data =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
 			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (5,6)) e,
-	 ( select * from detail.DigitUseDetail,detail.DigitBase
+	 ( select * from detail.DigitUseDetail,detail.DefaultDigitBase
          where digit_id = id and group_name !='ETH' and group_name !='BTC'
          ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id;";
 
@@ -64,7 +64,7 @@ impl DataServiceProvider {
         let all_mn =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
 			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and a.status=1 and b.status =1 and b.chain_id in (3,4)) e,
-	 ( select * from detail.DigitUseDetail a,detail.DigitBase b where a.digit_id = b.id  and b.status = 1 and group_name !='EEE' and group_name !='BTC') as d,detail.Chain f
+	 ( select * from detail.DigitUseDetail a,detail.DefaultDigitBase b where a.digit_id = b.id  and b.status = 1 and group_name !='EEE' and group_name !='BTC') as d,detail.Chain f
          where e.address_id = d.address_id and e.chain_id = f.id and f.status = 1;";
         let  stat = self.db_hander.prepare(all_mn)?;
         let mut cursor= stat.cursor();
@@ -99,7 +99,7 @@ impl DataServiceProvider {
         let all_mn =   "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
 			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (1,2)) e,
-	 ( select * from detail.DigitUseDetail,detail.DigitBase
+	 ( select * from detail.DigitUseDetail,detail.DefaultDigitBase
          where digit_id = id and group_name !='EEE' and group_name !='ETH'
          ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id;";
 

@@ -282,7 +282,7 @@ public class NativeLib {
         public boolean isInitWalletBasicData;  //初始化数据基础数据,是否成功   执行状态： 1成功 0失败
         public boolean isUpdateAuthDigit;     //更新认证代币,是否成功   执行状态： 1成功 0失败
         public boolean isUpdateDefaultDigit;  //更新默认代币,是否成功   执行状态： 1成功 0失败
-
+        public boolean isAddNonAuthDigit;     //添加自定义代币,是否成功   执行状态： 1成功 0失败
         public String message;                //错误信息，详细说明
 
         @Override
@@ -306,6 +306,7 @@ public class NativeLib {
                     ", isInitWalletBasicData=" + isInitWalletBasicData +
                     ", isUpdateAuthDigit=" + isUpdateAuthDigit +
                     ", isUpdateDefaultDigit=" + isUpdateDefaultDigit +
+                    ", isAddNonAuthDigit=" + isAddNonAuthDigit +
                     ", message='" + message + '\'' +
                     '}';
         }
@@ -447,6 +448,7 @@ public class NativeLib {
     // 4、检查更新的口子（parker）
     // 5、ip等配置文件，配置流程。（parker）
 
+    public static native WalletState addNonAuthDigit(String digitData);
     /**
      * 更新默认代币
      * @param digitData 从服务端获取的认证代币的列表，json格式数据

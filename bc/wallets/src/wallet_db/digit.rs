@@ -32,7 +32,7 @@ impl DataServiceProvider {
     }
     //添加代币
     fn add_digits(&self,digits:Vec<model::DigitExport>)->WalletResult<()>{
-        let insert_sql = "insert into detail.DigitBase(id,contract_address,chain_type,group_name,short_name,full_name,url_img,decimals,is_basic,is_default,status)values(?,?,?,?,?,?,?,?,?,?,?);";
+        let insert_sql = "insert into detail.DefaultDigitBase(id,contract_address,chain_type,group_name,short_name,full_name,url_img,decimals,is_basic,is_default,status)values(?,?,?,?,?,?,?,?,?,?,?);";
         let mut insert_basic_statement = self.db_hander.prepare(insert_sql)?;
         for digit in digits {
             if let Some(id) = digit.id {
@@ -57,11 +57,6 @@ impl DataServiceProvider {
         Ok(())
     }
 
-    //添加认证代币，供界面展示使用
-    fn update_certified_token(){
-
-    }
-
     //转换链类型
     fn is_main_chain(&self,chain_type:&str)->i64{
         match chain_type{
@@ -70,6 +65,13 @@ impl DataServiceProvider {
             "ETH_TEST"=>0,
             "test"=>0,
             _=>1,
+        }
+    }
+    fn convert_chain_type(&self,chain_type:i64)->String{
+        match chain_type{
+            1=>"ETH".into(),
+            0=>"ETH_TEST".into(),
+            _=>"ETH".into(),
         }
     }
 
@@ -85,33 +87,54 @@ impl DataServiceProvider {
     pub fn update_default_digit(&self,digits:Vec<model::DigitExport>)->WalletResult<()>{
         //检查待添加的默认代币是否已经存在，若存在，
         //todo 精细化处理默认代币的情况，当前先使用简单粗暴的方式将已经添加的默认代币直接删除，再将新的代币插入数据库表
-        let delete_sql = "delete from  detail.DigitBase where is_basic = 0 and is_default =1;";
+        let delete_sql = "delete from  detail.DefaultDigitBase where is_basic = 0 and is_default =1;";
         self.db_hander.execute(delete_sql)?;
         self.add_digits(digits)
     }
 
-  pub fn update_certification_digit(&self,digits:Vec<model::AuthDigit>)->WalletResult<()>{
-        let delete_sql = "delete from detail.AuthDigitBase;";
-        self.db_hander.execute(delete_sql)?;
-        let insert_sql = "insert into detail.AuthDigitBase(id,chain_type,contract,accept_id,symbol,name,publisher,project,logo_url,logo_bytes,decimal,gas_limit,mark,version,CREATED_TIME,UPDATED_TIME)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+  pub fn update_certification_digit(&self,digits:Vec<model::AuthDigit>,is_default:bool)->WalletResult<()>{
+        //当更新的为认证代币时。需要删除原来已经存在的代币
+        if is_default {
+              let delete_sql = format!("delete from detail.DigitBase where is_default = {};",is_default as u16);
+              println!("delete sql:{}",delete_sql);
+              self.db_hander.execute(delete_sql)?;
+
+        }else{
+            //添加自定义代币，需要检查该代币是否已经存在
+            let select_sql = "select count(*) from detail.DigitBase where contract = ?;";
+            let mut select_sql_statement = self.db_hander.prepare(select_sql)?;
+            for digit in digits.clone() {
+                select_sql_statement.bind(1,digit.contract.as_str())?;
+                select_sql_statement.next()?;
+                let count = select_sql_statement.read::<i64>(0).unwrap() as u32;
+                if count>0 {
+                    return Err(WalletError::Custom(format!("digit {} exist!",digit.contract)))
+                }
+            }
+        }
+
+        let insert_sql = "insert into detail.DigitBase(id,chain_type,contract,accept_id,symbol,name,publisher,project,logo_url,logo_bytes,decimal,gas_limit,mark,version,CREATED_TIME,UPDATED_TIME,is_default)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         let mut update_digit_statement = self.db_hander.prepare(insert_sql)?;
+        // todo 检查代币之间的关系  新增的认证代币是否为已经存在的非认证代币？新增的非认证代币若为存在的认证代币则直接返回
         for digit in digits {
-            update_digit_statement.bind(1,digit.id.as_str());
-            update_digit_statement.bind(2,digit.chain_type.as_str());
-            update_digit_statement.bind(3,digit.contract.as_str());
-            update_digit_statement.bind(4,digit.accept_id.as_str());
-            update_digit_statement.bind(5,digit.symbol.as_str());
-            update_digit_statement.bind(6,digit.name.as_str());
-            update_digit_statement.bind(7,digit.publisher.as_str());
-            update_digit_statement.bind(8,digit.project.as_str());
-            update_digit_statement.bind(9,digit.logo_url.as_str());
-            update_digit_statement.bind(10,digit.logo_bytes.as_str());//需要前端传过来的为bytes格式
-            update_digit_statement.bind(11,digit.decimal);
-            update_digit_statement.bind(12,digit.gas_limit);
-            update_digit_statement.bind(13,digit.mark.as_str());
-            update_digit_statement.bind(14,digit.version);
-            update_digit_statement.bind(15,digit.create_time);
-            update_digit_statement.bind(16,digit.update_time);
+            update_digit_statement.bind(1,digit.id.as_str())?;
+            update_digit_statement.bind(2,self.is_main_chain(digit.chain_type.as_str()))?;
+            update_digit_statement.bind(3,digit.contract.as_str())?;
+            update_digit_statement.bind(4,digit.accept_id.as_str())?;
+            update_digit_statement.bind(5,digit.symbol.as_str())?;
+            update_digit_statement.bind(6,digit.name.as_str())?;
+            update_digit_statement.bind(7,digit.publisher.as_str())?;
+            update_digit_statement.bind(8,digit.project.as_str())?;
+            update_digit_statement.bind(9,digit.logo_url.as_str())?;
+            update_digit_statement.bind(10,digit.logo_bytes.as_str())?;//需要前端传过来的为bytes格式
+            update_digit_statement.bind(11,digit.decimal)?;
+            update_digit_statement.bind(12,digit.gas_limit)?;
+            update_digit_statement.bind(13,digit.mark.as_str())?;
+            update_digit_statement.bind(14,digit.version)?;
+            update_digit_statement.bind(15,digit.create_time)?;
+            update_digit_statement.bind(16,digit.update_time)?;
+            update_digit_statement.bind(17,is_default as i64)?;
+
             update_digit_statement.next()?;
             update_digit_statement.reset()?;
         }
@@ -143,25 +166,26 @@ impl DataServiceProvider {
         self.db_hander.execute(sql).map_err(|e|e.into())
     }
 
-    pub fn get_auth_digit_by_page(&self,start_item:u32,page_size:u32)->WalletResult<model::DigitList>{
+    pub fn get_auth_digit_by_page(&self,chain_type:u32,start_item:u32,page_size:u32)->WalletResult<model::DigitList>{
         //当前假设存放的所有代币都能够有机会返回,计算总共有多少条
         //todo 怎么来处理这个总数的问题呢？
-        let count_digit_item = "select count(*) from detail.AuthDigitBase;";
+        let count_digit_item = "select count(*) from detail.DigitBase where chain_type = ?;";
         let mut state = self.db_hander.prepare(count_digit_item)?;
+        state.bind(1,chain_type as i64)?;
         state.next().unwrap();
         let count = state.read::<i64>(0).unwrap() as u32;
         let offset = if count<(start_item+page_size) {
           count-start_item
         }else { page_size };
         //返回指定条数的代币
-        let select_digit = format!("select * from detail.AuthDigitBase limit {} offset {};",offset,start_item);
+        let select_digit = format!("select * from detail.DigitBase where chain_type = {} limit {} offset {};",chain_type,offset,start_item);
         let mut state = self.db_hander.prepare(select_digit)?;
 
         let mut auth_digits = Vec::with_capacity(page_size as usize);
         while let State::Row = state.next().unwrap() {
             let row_data = model::AuthDigit{
                 id: state.read::<String>(0).unwrap(),
-                chain_type: state.read::<String>(1).unwrap(),
+                chain_type: self.convert_chain_type(state.read::<i64>(1).unwrap()),
                 contract: state.read::<String>(2).unwrap(),
                 accept_id: state.read::<String>(3).unwrap(),
                 symbol: state.read::<String>(4).unwrap(),

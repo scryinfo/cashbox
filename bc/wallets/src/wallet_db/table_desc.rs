@@ -46,8 +46,8 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
     [update_time] timestamp);
 
-   DROP TABLE IF EXISTS [main].[DigitBase];
-    CREATE TABLE [main].[DigitBase](
+   DROP TABLE IF EXISTS [main].[DefaultDigitBase];
+    CREATE TABLE [main].[DefaultDigitBase](
     [id] VARCHAR(40) PRIMARY KEY NOT NULL,
     [contract_address] VARCHAR(64),
 	[chain_type] INT  NOT NULL,
@@ -76,10 +76,10 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [UPDATED_TIME] timestamp,
 	primary key(digit_id,address_id));
 
-    DROP TABLE IF EXISTS [main].[AuthDigitBase];
-     CREATE TABLE [main].[AuthDigitBase] (
+    DROP TABLE IF EXISTS [main].[DigitBase];
+     CREATE TABLE [main].[DigitBase] (
         [id]  VARCHAR (40),
-        [chain_type]    VARCHAR (32),
+        [chain_type]    INT  NOT NULL,
         [contract]      VARCHAR (64),
         [accept_id]     VARCHAR (32),
         [symbol]        VARCHAR (32),
