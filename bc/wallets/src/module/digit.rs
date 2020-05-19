@@ -17,10 +17,10 @@ pub fn update_balance(address: &str, digit_id: &str,balance:&str)-> WalletResult
 }
 
 
-pub fn add_wallet_digit(wallet_id:&str,chain_id:&str,digit:DigitExport)-> WalletResult<()>{
+pub fn add_wallet_digit(wallet_id:&str,chain_id:&str,digit_id:&str)-> WalletResult<()>{
     let instance = wallet_db::DataServiceProvider::instance()?;
     instance.tx_begin()?;
-    match instance.add_digit(wallet_id,chain_id,digit){
+    match instance.add_digit(wallet_id,chain_id,digit_id){
         Ok(_)=>instance.tx_commint(),
         Err(err)=>{
             instance.tx_rollback()?;
@@ -42,7 +42,10 @@ pub fn update_auth_digit(digits:Vec<model::AuthDigit>,is_auth:bool,chain_type:Op
     //当前采用全量更新手段，直接删除存在的代币,更新新的代币
     match instance.update_certification_digit(digits,is_auth) {
         Ok(())=>instance.tx_commint(),
-        Err(e)=>instance.tx_rollback(),
+        Err(e)=>{
+            instance.tx_rollback()?;
+            Err(e)
+        },
     }
 }
 

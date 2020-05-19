@@ -67,7 +67,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
 
     DROP TABLE IF EXISTS [main].[DigitUseDetail];
     CREATE TABLE [main].[DigitUseDetail](
-    [digit_id] INTEGER ,
+    [digit_id] VARCHAR (40) ,
     [address_id] VARCHAR(64) ,
 	[balance] VARCHAR(32) NOT NULL DEFAULT 0,
     [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,

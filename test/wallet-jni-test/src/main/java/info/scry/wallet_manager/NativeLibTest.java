@@ -13,12 +13,15 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-        // System.out.println(NativeLib.initWalletBasicData());
-     //  walletGenerateTest();
+       //  System.out.println(NativeLib.initWalletBasicData());
+      //  walletGenerateTest();
        // walletExportTest();
-        // updateAuthListTest();
+         //updateAuthListTest();
+
+       // addNonAuthDigitTest();
         getAuthDigitListTest();
-      //  updateDefaultDigitTest();
+        addDigitTest();
+      // updateDefaultDigitTest();
       //  eeeTransferTest();
        // eeeAccountInfoKeyTest();
        // decodeAccountInfoTest();
@@ -26,9 +29,12 @@ public class NativeLibTest {
       //  walletSaveTest();
       //  updateBalance();
        // addDigitTest();
-       // List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
-        //System.out.println("wallet size is:"+wallets.size());
-       // System.out.println(wallets.toString());
+        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+        for (NativeLib.Wallet wallet:wallets){
+            System.out.println("***********************");
+            System.out.println(wallet.toString());
+        }
+
 
     }
 
@@ -40,7 +46,28 @@ public class NativeLibTest {
         NativeLib.WalletState state = NativeLib.updateDefaultDigitList(json);
         System.out.println(state);
     }
-
+    public static void addNonAuthDigitTest(){
+        String json = "[{\n" +
+                "\t\"id\": \"\",\n" +
+                "\t\"symbol\": \"AAAA\",\n" +
+                "\t\"name\": \"scryinfo aaa\",\n" +
+                "\t\"publisher\": \"scryinfo\",\n" +
+                "\t\"project\": \"scryinfo\",\n" +
+                "\t\"logoUrl\": \"scry.info\",\n" +
+                "\t\"logoBytes\": \"aaa\",\n" +
+                "\t\"decimal\": 18,\n" +
+                "\t\"gasLimit\": 523654,\n" +
+                "\t\"contract\": \"0x5a895efacf987\",\n" +
+                "\t\"acceptId\": \"0x3aef987\",\n" +
+                "\t\"chainType\": \"ETH\",\n" +
+                "\t\"mark\": \"test\",\n" +
+                "\t\"updateTime\": 158748557,\n" +
+                "\t\"createTime\": 158965444,\n" +
+                "\t\"version\": 12\n" +
+                "}]";
+        NativeLib.WalletState state = NativeLib.addNonAuthDigit(json);
+        System.out.println(state);
+    }
     public static void updateAuthListTest(){
         String json = "[{\n" +
                 "\t\"id\": \"eth_chain_ddd_test\",\n" +
@@ -63,12 +90,13 @@ public class NativeLibTest {
         NativeLib.WalletState state = NativeLib.updateAuthDigitList(json);
         System.out.println(state);
     }
+
     public static void getAuthDigitListTest(){
-       NativeLib.AuthList list =  NativeLib.getAuthDigitList(0,0,50);
+       NativeLib.AuthList list =  NativeLib.getAuthDigitList(1,0,50);
         System.out.println(list);
     }
     public static void  addDigitTest(){
-        NativeLib.WalletState state =  NativeLib.addDigit("bc520f80-c86a-45ac-baad-099a524ff3e0","3","NNN Times","NNN","0x7be9fd92ecce9ade568b7eadf382635e109ce0d2",18);
+        NativeLib.WalletState state =  NativeLib.addDigit("718f10dc-39bc-4a32-bf72-5b5c221c8df2","3","4ea09f1b-f793-4bd3-aaeb-0a6ddf22454a");
         System.out.println(state);
     }
     public static  void  updateBalance(){
@@ -83,7 +111,7 @@ public class NativeLibTest {
 
     public static void walletGenerateTest(){
         Random random = new Random(1);
-        while (NativeLib.loadAllWalletList().size()<4){
+        while (NativeLib.loadAllWalletList().size()<2){
             NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(12);
             System.out.println(mnemonic.mnId);
             int  r = random.nextInt(1000);

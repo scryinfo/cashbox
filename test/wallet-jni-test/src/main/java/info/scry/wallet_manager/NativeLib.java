@@ -440,7 +440,7 @@ public class NativeLib {
 
     // 增加代币
     // apiNo:WM16
-    public static native WalletState addDigit(String walletId, String chainId, String fullName, String shortName, String contractAddress, int decimal);
+    public static native WalletState addDigit(String walletId, String chainId, String digitId);
     // 0515 meeting
     // 1、addDigit区分处理
     // 2、digit数据结构增加字段 是否是自定义
