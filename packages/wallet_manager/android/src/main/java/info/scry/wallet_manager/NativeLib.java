@@ -273,15 +273,18 @@ public class NativeLib {
     // apiNo:WM15
     public static native WalletState hideDigit(String walletId, String chainId, String digitId);
 
-    // 增加代币
+    // 增加代币，这个接口是将代币库里面的代币添加到默认列表，提供钱包管理代币余额
     // apiNo:WM16
-    public static native WalletState addDigit(String walletId, String chainId, String fullName, String shortName, String contractAddress, int decimal);
+    public static native WalletState addDigit(String walletId, String chainId, String digitId);
     // 0515 meeting
     // 1、addDigit区分处理
     // 2、digit数据结构增加字段 是否是自定义
     // 3、查询代币列表，分页
     // 4、检查更新的口子（parker）
     // 5、ip等配置文件，配置流程。（parker）
+
+
+
 
     /**
      * 添加非认证代币
@@ -298,7 +301,7 @@ public class NativeLib {
 
     /**
      * 更新默认代币
-     * @param digitData 从服务端获取的认证代币的列表，json格式数据
+     * @param digitData 从服务端获取的默认代币的列表，json格式数据
      * @return
      */
     public static native WalletState updateDefaultDigitList(String digitData);

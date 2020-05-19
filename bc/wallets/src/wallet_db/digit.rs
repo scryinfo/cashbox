@@ -117,7 +117,9 @@ impl DataServiceProvider {
         let mut update_digit_statement = self.db_hander.prepare(insert_sql)?;
         // todo 检查代币之间的关系  新增的认证代币是否为已经存在的非认证代币？新增的非认证代币若为存在的认证代币则直接返回
         for digit in digits {
-            update_digit_statement.bind(1,digit.id.as_str())?;
+            //todo 当新增的代币id不存在
+            let id = if digit.id.is_empty() { uuid::Uuid::new_v4().to_string()}else { digit.id };
+            update_digit_statement.bind(1,id.as_str())?;
             update_digit_statement.bind(2,self.is_main_chain(digit.chain_type.as_str()))?;
             update_digit_statement.bind(3,digit.contract.as_str())?;
             update_digit_statement.bind(4,digit.accept_id.as_str())?;
@@ -142,16 +144,32 @@ impl DataServiceProvider {
 
     }
 
-    pub fn add_digit(&self,wallet_id:&str,chain_id:&str,digit_item:table_desc::DigitExport)->WalletResult<()>{
+
+    pub fn add_digit(&self,wallet_id:&str,chain_id:&str,digit_id:&str)->WalletResult<()>{
         // 查看代币是否存在,这里规定新增的代币合约地址不会重复
-        let count_sql = "select count(*) from detail.DigitBase where contract_address = ?;";
-        let mut count_statement = self.db_hander.prepare(count_sql)?;
-        count_statement.bind(1,digit_item.address.as_str())?;
-        count_statement.next()?;
-        let count = count_statement.read::<i64>(0)?;
-        if count!=0 {
-            return Err(WalletError::Custom("Digit already exist".to_string()))
-        }
+        let digit_detail_sql = "select contract,chain_type,symbol,name,logo_url,decimal from detail.DigitBase where id = ?;";
+        let mut count_statement = self.db_hander.prepare(digit_detail_sql)?;
+        count_statement.bind(1,digit_id)?;
+       if let State::Done = count_statement.next().unwrap(){
+           return Err(WalletError::Custom("digit id not exist".to_string()))
+       }else {
+
+         let new_default_digit = model::DigitExport{
+               id: Some(digit_id.to_string()),
+               contract_address: Some(count_statement.read::<String>(0).unwrap()),
+               short_name: count_statement.read::<String>(2).unwrap(),
+               full_name: count_statement.read::<String>(3).unwrap(),
+               group_name: Some("ETH".to_string()),
+               decimal: count_statement.read::<i64>(5).unwrap(),
+               chain_type: self.convert_chain_type(count_statement.read::<i64>(1).unwrap()),
+               img_url: Some(count_statement.read::<String>(4).unwrap()),
+               is_basic: None,
+               is_default: Some(false),
+               status: None
+           };
+           self.update_default_digit(vec![new_default_digit]);
+       }
+
         //获取钱包对应的地址id,目前只支持以太坊代币
         let address_id = "select address_id from detail.Address a where a.wallet_id = ? and a.chain_id = ?;";
         let mut statement = self.db_hander.prepare(address_id)?;
@@ -161,8 +179,10 @@ impl DataServiceProvider {
         let value =  cursor.next().unwrap().ok_or(WalletError::NotExist)?;
         let address_id = value[0].as_string().unwrap();
         //添加代币
-  /*      self.add_digits(vec![digit_item.clone()])?;*/
-        let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DigitBase where  contract_address = '{}';", address_id, digit_item.address);
+     //   self.add_digits(vec![digit_item.clone()])?;
+       // let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DefaultDigitBase where  contract_address = '{}';", address_id, digit_item.address);
+        let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) values('{}','{}');", digit_id,address_id);
+        println!("insert useDetail:{}",sql);
         self.db_hander.execute(sql).map_err(|e|e.into())
     }
 
