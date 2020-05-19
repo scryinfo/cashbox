@@ -1,4 +1,5 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallets.dart';
@@ -16,6 +17,7 @@ import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:convert' as convert;
 
 class DigitsManagePage extends StatefulWidget {
   @override
@@ -30,6 +32,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   List<Digit> displayDigitsList = []; //单签页面展示的代币数据
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
+  int nativeDigitIndex = 0;
+  int offset = 100;
 
   @override
   void initState() {
@@ -41,15 +45,14 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     addToAllAvailableDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1、可见代币显示在前面 isVisible = true;
     addToAllAvailableDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
     print("allAvailableDigitsList.length====>" + allAvailableDigitsList.length.toString());
-    addToAllAvailableDigitsList(serverDigitsList);
-    if (false) {
+    {
       //todo
       //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表。
       //todo 替换 ===》 2、本地已有代币列表
       serverDigitsList = await loadServerDigitListData(); //服务器可信任代币列表
-      updateNativeDigitListVersion(serverDigitsList);
-    } else {
-      nativeDigitsList = await loadNativeDigitListData(); //todo
+      await updateNativeDigitListVersion("");
+      nativeDigitsList = await getNativeAuthDigitList();
+      //addToAllAvailableDigitsList(nativeDigitsList);
     }
     displayDigitsList = await loadDisplayDigitListData();
     setState(() {
@@ -248,7 +251,33 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     );
   }
 
-  updateNativeDigitListVersion(List<Digit> serverDigitList) {}
+  updateNativeDigitListVersion(String jsonString) async {
+    //todo test api code
+    var obj = [
+      {
+        "id": "eth_chain_ddd_test0",
+        "symbol": "parker0",
+        "name": "scryinfo parker0",
+        "publisher": "scryinfo",
+        "project": "scryinfo",
+        "logoUrl": "scry.info",
+        "logoBytes": "parker",
+        "decimal": 18,
+        "gasLimit": 523654,
+        "contract": "0x2aef987",
+        "acceptId": "0x3aef987",
+        "chainType": "ETH",
+        "mark": "test",
+        "updateTime": 158748557,
+        "createTime": 158965444,
+        "version": 12,
+      },
+    ];
+    String jsonString = convert.jsonEncode(obj);
+    var updateMap = await Wallets.instance.updateAuthDigitList(jsonString);
+    print("updateMap[status]=====>" + updateMap["status"].toString());
+    print("updateMap[isUpdateAuthDigit]=====>" + updateMap["isUpdateAuthDigit"].toString());
+  }
 
   addToAllAvailableDigitsList(List<Digit> newDigitList) {
     if (allAvailableDigitsList != null && allAvailableDigitsList.length == 0) {
@@ -290,10 +319,9 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     }
   }
 
-  Future<List<Digit>> loadNativeDigitListData() async {
-    //todo 等sql接口实现
-    //Wallets.instance.loadNativeDigitListRecord(Wallets.instance.nowWallet.walletId,Wallets.instance.nowWallet.nowChain.chainId,0,100);
-    return [];
+  Future<List<Digit>> getNativeAuthDigitList() async {
+    nativeDigitsList = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, offset);
+    return nativeDigitsList;
   }
 
   Future<List<Digit>> loadServerDigitListData() async {

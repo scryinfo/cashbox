@@ -350,8 +350,8 @@ class Wallets {
     Map eeeAccountMap = await WalletManager.decodeAccountInfo(encodeData);
   }
 
-  loadNativeDigitListRecord(String walletId, int chainType, int startIndex, int offset) async {
-    Map eeeAccountMap = await WalletManager.loadNativeDigitListRecord(chainType, startIndex, offset);
+  getNativeAuthList(String walletId, int chainType, int startIndex, int offset) async {
+    Map eeeAccountMap = await WalletManager.getNativeAuthList(chainType, startIndex, offset);
   }
 
   addDigitToChainModel(String walletId, int chainType, int decimal, String fullName, String shortName) async {
@@ -379,30 +379,47 @@ class Wallets {
     return updateMap;
   }
 
-  getAuthDigitList(int chainType, int startIndex, int pageSize) async {
-    Map updateMap = await WalletManager.getAuthDigitList(chainType, startIndex, pageSize);
+  Future<List> getNativeAuthDigitList(Chain chain, int startIndex, int pageSize) async {
+    List resultAuthDigitList = [];
+    Map updateMap = await WalletManager.getNativeAuthDigitList(Chain.chainTypeToInt(chain.chainType), startIndex, pageSize);
     int status = updateMap["status"];
     print("getAuthDigitList status==>" + status.toString());
     if (status == null || status != 200) {
       LogUtil.e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+      return [];
     }
     int count = updateMap["count"];
     int startItem = updateMap["startItem"];
     List authDigitList = updateMap["authDigit"];
-    print("count=====>" + count.toString());
-    print("startItem=====>" + startItem.toString());
-    print("length=====>" + authDigitList.length.toString());
+    print("count=====>" + count.toString() + "startItem=====>" + startItem.toString());
+    print("count=====>" + count.toString() + "startItem=====>" + startItem.toString() + "length=====>" + authDigitList.length.toString());
 
     authDigitList.forEach((element) {
       var name = element["name"];
       var decimal = element["decimal"];
       var contract = element["contract"];
       var symbol = element["symbol"];
-      print("name=====>" + name);
-      print("decimal=====>" + decimal.toString());
-      print("contract=====>" + contract);
-      print("symbol=====>" + symbol);
+      print("name=====>" + name + "decimal=====>" + decimal.toString() + "contract=====>" + contract + "symbol=====>" + symbol);
+      switch (chain.chainType) {
+        case ChainType.ETH:
+        case ChainType.ETH_TEST:
+          Digit ethDigit = new EthDigit();
+          ethDigit.shortName = name;
+          ethDigit.decimal = decimal;
+          ethDigit.contractAddress = contract;
+          resultAuthDigitList.add(ethDigit);
+          break;
+        case ChainType.BTC:
+        case ChainType.BTC_TEST:
+          break;
+        case ChainType.EEE:
+
+        case ChainType.EEE_TEST:
+          break;
+        default:
+          break;
+      }
     });
-    return updateMap;
+    return resultAuthDigitList;
   }
 }

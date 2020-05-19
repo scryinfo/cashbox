@@ -217,7 +217,7 @@ class WalletManager {
   }
 
   //分页获取（startIndex + offset） 本地代币列表中的数据
-  static loadNativeDigitListRecord(int chainType, int startIndex, int offset) async {
+  static getNativeAuthList(int chainType, int startIndex, int offset) async {
     Map<dynamic, dynamic> nativeDigitMap = await _channel.invokeMethod("getAuthDigitList", {"startIndex": startIndex, "pageSize": offset}); //todo
     return nativeDigitMap;
   }
@@ -244,7 +244,7 @@ class WalletManager {
   }
 
   // 获取本地认证代币列表
-  static getAuthDigitList(int chainType, int startIndex, int pageSize) async {
+  static getNativeAuthDigitList(int chainType, int startIndex, int pageSize) async {
     Map<dynamic, dynamic> updateMap =
         await _channel.invokeMethod("getAuthDigitList", {"chainType": chainType, "startIndex": startIndex, "pageSize": pageSize});
     return updateMap;
