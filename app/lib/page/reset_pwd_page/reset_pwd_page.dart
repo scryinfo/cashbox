@@ -111,6 +111,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
             child: TextField(
               textAlign: TextAlign.start,
               style: TextStyle(color: Colors.white),
+              obscureText: true,
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
@@ -155,6 +156,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
             child: TextField(
               textAlign: TextAlign.start,
               style: TextStyle(color: Colors.white),
+              obscureText: true,
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
@@ -202,6 +204,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
             child: TextField(
               textAlign: TextAlign.start,
               style: TextStyle(color: Colors.white),
+              obscureText: true,
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
