@@ -66,10 +66,9 @@ class Wallets {
     }
   }
 
-  initWalletBasicData(){
+  initWalletBasicData() {
     WalletManager.initWalletBasicData();
   }
-
 
   // 导出所有钱包
   // apiNo:WM02
@@ -369,5 +368,41 @@ class Wallets {
     //todo 待定
     Map queryDigitListRecordMap = await WalletManager.queryNativeDigitListRecord(queryParam);
     return queryDigitListRecordMap;
+  }
+
+  updateAuthDigitList(String digitData) async {
+    Map updateMap = await WalletManager.updateAuthDigitList(digitData);
+    int status = updateMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+    }
+    return updateMap;
+  }
+
+  getAuthDigitList(int chainType, int startIndex, int pageSize) async {
+    Map updateMap = await WalletManager.getAuthDigitList(chainType, startIndex, pageSize);
+    int status = updateMap["status"];
+    print("getAuthDigitList status==>" + status.toString());
+    if (status == null || status != 200) {
+      LogUtil.e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+    }
+    int count = updateMap["count"];
+    int startItem = updateMap["startItem"];
+    List authDigitList = updateMap["authDigit"];
+    print("count=====>" + count.toString());
+    print("startItem=====>" + startItem.toString());
+    print("length=====>" + authDigitList.length.toString());
+
+    authDigitList.forEach((element) {
+      var name = element["name"];
+      var decimal = element["decimal"];
+      var contract = element["contract"];
+      var symbol = element["symbol"];
+      print("name=====>" + name);
+      print("decimal=====>" + decimal.toString());
+      print("contract=====>" + contract);
+      print("symbol=====>" + symbol);
+    });
+    return updateMap;
   }
 }
