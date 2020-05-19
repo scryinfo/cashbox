@@ -216,12 +216,6 @@ class WalletManager {
     return decodeMap;
   }
 
-  //分页获取（startIndex + offset） 本地代币列表中的数据
-  static getNativeAuthList(int chainType, int startIndex, int offset) async {
-    Map<dynamic, dynamic> nativeDigitMap = await _channel.invokeMethod("getAuthDigitList", {"startIndex": startIndex, "pageSize": offset}); //todo
-    return nativeDigitMap;
-  }
-
   //在 当前钱包、当前链下，增加新代币的数据模型
   static addDigitToChainModel(String walletId, int chainType, int decimal, String fullName, String shortName) {
     //todo
@@ -243,7 +237,7 @@ class WalletManager {
     return updateMap;
   }
 
-  // 获取本地认证代币列表
+  // 获取本地认证代币列表  分页获取（startIndex + offset）
   static getNativeAuthDigitList(int chainType, int startIndex, int pageSize) async {
     Map<dynamic, dynamic> updateMap =
         await _channel.invokeMethod("getAuthDigitList", {"chainType": chainType, "startIndex": startIndex, "pageSize": pageSize});

@@ -350,10 +350,6 @@ class Wallets {
     Map eeeAccountMap = await WalletManager.decodeAccountInfo(encodeData);
   }
 
-  getNativeAuthList(String walletId, int chainType, int startIndex, int offset) async {
-    Map eeeAccountMap = await WalletManager.getNativeAuthList(chainType, startIndex, offset);
-  }
-
   addDigitToChainModel(String walletId, int chainType, int decimal, String fullName, String shortName) async {
     //todo 参数待定
     Map addDigitModelMap = await WalletManager.addDigitToChainModel(walletId, chainType, decimal, fullName, shortName);

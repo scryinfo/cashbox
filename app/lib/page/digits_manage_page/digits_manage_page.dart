@@ -25,7 +25,6 @@ class DigitsManagePage extends StatefulWidget {
 }
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
-  int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
   List<Digit> nativeDigitsList = []; //本地的代币列表
   List<Digit> serverDigitsList = []; //服务器接口上的代币列表
   List<Digit> allAvailableDigitsList = []; //界面所有可用来展示的代币： (Wallets.instance.nowWallet.nowChain.digitsList) + serverDigitsList
@@ -33,7 +32,9 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
   int nativeDigitIndex = 0;
-  int offset = 100;
+  int onePageOffSet = 50; //单页面显示20条数据，一次下拉刷新更新20条
+  int maxAuthTokenCount = 0; //本地authToken总个数
+  bool isLoadAuthDigitFinish = false;
 
   @override
   void initState() {
@@ -51,7 +52,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       //todo 替换 ===》 2、本地已有代币列表
       serverDigitsList = await loadServerDigitListData(); //服务器可信任代币列表
       await updateNativeDigitListVersion("");
-      nativeDigitsList = await getNativeAuthDigitList();
+      nativeDigitsList = await getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
       //addToAllAvailableDigitsList(nativeDigitsList);
     }
     displayDigitsList = await loadDisplayDigitListData();
@@ -319,9 +320,24 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     }
   }
 
-  Future<List<Digit>> getNativeAuthDigitList() async {
-    nativeDigitsList = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, offset);
-    return nativeDigitsList;
+  Future<List<Digit>> getNativeAuthDigitList(Chain chain, int nativeDigitIndex, int onePageOffSet) async {
+    // if (nativeDigitIndex == maxAuthTokenCount) {
+    //   print("记录的认证代币已经加载完了");
+    //   return [];
+    // }
+    List tempDigitsList = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
+    //  todo 记录count
+    //  maxAuthTokenCount = 1000
+    if (onePageOffSet == tempDigitsList.length) {
+      nativeDigitIndex = nativeDigitIndex + onePageOffSet;
+      print("还有未加载完的认证代币，分页是：===》" + nativeDigitIndex.toString());
+    } else {
+      nativeDigitIndex = nativeDigitIndex + tempDigitsList.length;
+      print("认证列表的代币，加载完了===》" + nativeDigitIndex.toString());
+      //todo 标识处，认证列表 加载完了
+      isLoadAuthDigitFinish = true;
+    }
+    return tempDigitsList;
   }
 
   Future<List<Digit>> loadServerDigitListData() async {
@@ -331,28 +347,27 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   Future<List<Digit>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
       //没有展示数据
-      if (allAvailableDigitsList.length < singleDigitCount) {
-        //加载到的不够一页，全展示
-        addDigitToDisplayList(allAvailableDigitsList.length);
-      } else {
-        //超一页，展示singleDigitCount个。
-        addDigitToDisplayList(singleDigitCount);
-      }
+      addDigitToDisplayList(onePageOffSet);
     } else {
       //有展示数据，继续往里添加
-      if (allAvailableDigitsList.length - displayDigitsList.length > singleDigitCount) {
-        //剩余的超过一页
-        addDigitToDisplayList(singleDigitCount);
-      } else {
-        //剩余的不够一页，全给加入进去。
-        addDigitToDisplayList(allAvailableDigitsList.length - displayDigitsList.length);
+      if (displayDigitsList.length < allAvailableDigitsList.length) {
+        addDigitToDisplayList(onePageOffSet);
+      }
+      if (displayDigitsList.length == allAvailableDigitsList.length) {
+        List pageDigitsList = await getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
+        await addToAllAvailableDigitsList(pageDigitsList);
+        addDigitToDisplayList(onePageOffSet);
       }
     }
     return displayDigitsList;
   }
 
   List<Digit> addDigitToDisplayList(int targetCount) {
-    for (var i = displayDigitsList.length; i < targetCount; i++) {
+    var resultCount = targetCount;
+    if ((allAvailableDigitsList.length - displayDigitsList.length) < targetCount) {
+      resultCount = allAvailableDigitsList.length - displayDigitsList.length;
+    }
+    for (var i = displayDigitsList.length; i < resultCount; i++) {
       var digitRate = DigitRate();
       Digit digit = EthDigit();
       print("addDigitToDisplayList allAvailableDigitsList[i].shortName===>" + allAvailableDigitsList[i].shortName.toString());
