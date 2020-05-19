@@ -13,12 +13,12 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-       //  System.out.println(NativeLib.initWalletBasicData());
+        // System.out.println(NativeLib.initWalletBasicData());
      //  walletGenerateTest();
        // walletExportTest();
-        //updateAuthListTest();
-        //getAuthDigitListTest();
-        updateDefaultDigitTest();
+        // updateAuthListTest();
+        getAuthDigitListTest();
+      //  updateDefaultDigitTest();
       //  eeeTransferTest();
        // eeeAccountInfoKeyTest();
        // decodeAccountInfoTest();
@@ -64,7 +64,7 @@ public class NativeLibTest {
         System.out.println(state);
     }
     public static void getAuthDigitListTest(){
-       NativeLib.AuthList list =  NativeLib.getAuthDigitList(1,0,50);
+       NativeLib.AuthList list =  NativeLib.getAuthDigitList(0,0,50);
         System.out.println(list);
     }
     public static void  addDigitTest(){
