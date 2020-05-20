@@ -103,6 +103,8 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/config/local_config.json
+
     - assets/images/
     - assets/images/2.0x/
     - assets/images/3.0x/
