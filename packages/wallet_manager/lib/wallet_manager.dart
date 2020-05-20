@@ -229,10 +229,17 @@ class WalletManager {
     return updateMap;
   }
 
+  // //本地 列表中 未经过认证的代币，如用户自编写的erc20。todo 现版本用不到
+  // static getNativeUnAuthDigitList(int chainType, bool isAuth, int startIndex, int pageSize) async {
+  //   Map<dynamic, dynamic> updateMap =
+  //       await _channel.invokeMethod("getDigitList", {"chainType": chainType, "isAuth": false, "startIndex": startIndex, "pageSize": pageSize});
+  //   return updateMap;
+  // }
+
   // 获取本地认证代币列表  分页获取（startIndex + offset）
   static getNativeAuthDigitList(int chainType, int startIndex, int pageSize) async {
     Map<dynamic, dynamic> updateMap =
-        await _channel.invokeMethod("getAuthDigitList", {"chainType": chainType, "startIndex": startIndex, "pageSize": pageSize});
+        await _channel.invokeMethod("getDigitList", {"chainType": chainType, "isAuth": true, "startIndex": startIndex, "pageSize": pageSize});
     return updateMap;
   }
 }

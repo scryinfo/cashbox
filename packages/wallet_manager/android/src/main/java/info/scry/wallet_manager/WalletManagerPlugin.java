@@ -744,20 +744,20 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-            case "getAuthDigitList": {
+            case "getDigitList": {
                 ScryWalletLog.d("nativeLib=>", "getAuthDigitList is enter =>");
-                AuthList authList = new AuthList();
+                DigitList authList = new DigitList();
                 try {
-                    authList = NativeLib.getAuthDigitList((int) (call.argument("chainType")), (int) (call.argument("startIndex")),
-                            (int) (call.argument("pageSize")));
+                    authList = NativeLib.getDigitList((int) (call.argument("chainType")), (boolean) (call.argument("isAuth")), (int) (call.argument(
+                            "startIndex")), (int) (call.argument("pageSize")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "getAuthDigitList exception is " + exception);
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", authList.status);
                 if (authList.status == 200) {
-                    ScryWalletLog.d("nativeLib=>", "count " + authList.count + "startItem " + authList.startItem + "size==> " + authList.authDigit.size());
-                    List<EthToken> authDigitList = authList.authDigit;
+                    ScryWalletLog.d("nativeLib=>", "count " + authList.count + "startItem " + authList.startItem + "size==> " + authList.ethTokens.size());
+                    List<EthToken> authDigitList = authList.ethTokens;
                     if (authDigitList.isEmpty() || authDigitList.size() == 0) {
                         result.success(resultMap); ///empty wallet
                     }
