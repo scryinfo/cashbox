@@ -648,17 +648,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 WalletState walletState = new WalletState();
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("walletId")));
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("chainId")));
-                ScryWalletLog.d("nativeLib=>", (String) (call.argument("fullName")));
-                ScryWalletLog.d("nativeLib=>", (String) (call.argument("shortName")));
-                ScryWalletLog.d("nativeLib=>", (String) (call.argument("contractAddress")));
-                ScryWalletLog.d("nativeLib=>", ((int) (call.argument("decimal"))));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("digitId")));
                 try {
                     walletState = NativeLib.addDigit((String) (call.argument("walletId")),
                             (String) (call.argument("chainId")),
-                            (String) (call.argument("fullName")),
-                            (String) (call.argument("shortName")),
-                            (String) (call.argument("contractAddress")),
-                            (int) (call.argument("decimal")));
+                            (String) (call.argument("digitId")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "decodeAdditionData exception is " + exception);
                 }

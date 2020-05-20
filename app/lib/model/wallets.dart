@@ -375,19 +375,19 @@ class Wallets {
     return updateMap;
   }
 
-  Future<List> getNativeAuthDigitList(Chain chain, int startIndex, int pageSize) async {
+  Future<Map> getNativeAuthDigitList(Chain chain, int startIndex, int pageSize) async {
+    Map resultMap = Map();
     List resultAuthDigitList = [];
     Map updateMap = await WalletManager.getNativeAuthDigitList(Chain.chainTypeToInt(chain.chainType), startIndex, pageSize);
     int status = updateMap["status"];
     print("getAuthDigitList status==>" + status.toString());
     if (status == null || status != 200) {
       LogUtil.e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
-      return [];
+      return null;
     }
     int count = updateMap["count"];
     int startItem = updateMap["startItem"];
     List authDigitList = updateMap["authDigit"];
-    print("count=====>" + count.toString() + "startItem=====>" + startItem.toString());
     print("count=====>" + count.toString() + "startItem=====>" + startItem.toString() + "length=====>" + authDigitList.length.toString());
 
     authDigitList.forEach((element) {
@@ -416,6 +416,9 @@ class Wallets {
           break;
       }
     });
-    return resultAuthDigitList;
+    resultMap["authDigit"] = resultAuthDigitList;
+    resultMap["count"] = count;
+    resultMap["startItem"] = startItem;
+    return resultMap;
   }
 }

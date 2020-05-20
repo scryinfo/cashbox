@@ -133,7 +133,7 @@ abstract class Chain {
 
   // 添加代币 todo 2.0 待确定数据格式
   Future<bool> addDigit(String walletId, Digit digit) async {
-    Map addDigitMap = await WalletManager.addDigit(walletId, digit.chainId, digit.fullName, digit.shortName, digit.contractAddress, digit.decimal);
+    Map addDigitMap = await WalletManager.addDigit(walletId, digit.chainId, digit.digitId);
     int status = addDigitMap["status"];
     bool isAddDigit = addDigitMap["isAddDigit"];
     if (status == 200) {

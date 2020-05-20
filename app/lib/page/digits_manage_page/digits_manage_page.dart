@@ -1,14 +1,10 @@
 import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
-import 'package:app/model/rate.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/res/styles.dart';
-import 'package:app/routers/application.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/log_util.dart';
-import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,10 +21,7 @@ class DigitsManagePage extends StatefulWidget {
 }
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
-  List<Digit> nativeDigitsList = []; //本地的代币列表
-  List<Digit> serverDigitsList = []; //服务器接口上的代币列表
-  List<Digit> allAvailableDigitsList = []; //界面所有可用来展示的代币： (Wallets.instance.nowWallet.nowChain.digitsList) + serverDigitsList
-  List<Digit> displayDigitsList = []; //单签页面展示的代币数据
+  List<Digit> displayDigitsList = []; //页面展示的代币=nowWallet.nowChain.digitsList(本链已有，visible显示在前面) + nativeAuthDigitsList(分页认证代币)
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
   int nativeDigitIndex = 0;
@@ -43,19 +36,17 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   initData() async {
-    addToAllAvailableDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1、可见代币显示在前面 isVisible = true;
-    addToAllAvailableDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
-    print("allAvailableDigitsList.length====>" + allAvailableDigitsList.length.toString());
+    addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1、可见代币显示在前面 isVisible = true;
+    addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
+    print("initData displayDigitsList.length====>" + displayDigitsList.length.toString());
     {
-      //todo
       //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表。
       //todo 替换 ===》 2、本地已有代币列表
-      serverDigitsList = await loadServerDigitListData(); //服务器可信任代币列表
-      await updateNativeDigitListVersion("");
-      nativeDigitsList = await getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
-      //addToAllAvailableDigitsList(nativeDigitsList);
+      //await updateNativeDigitListVersion(loadServerDigitListData());//服务器可信任代币列表
+      var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
+
+      addToDisplayDigitsList(tempNativeAuthDigitsList);
     }
-    displayDigitsList = await loadDisplayDigitListData();
     setState(() {
       this.displayDigitsList = displayDigitsList;
     });
@@ -147,19 +138,17 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         //代币列表栏，下拉 刷新||加载 数据。
         await Future.delayed(
           Duration(seconds: 2),
-          () {
-            setState(() {
-              if (displayDigitsList.length < allAvailableDigitsList.length) {
-                // allAvailableDigitsList 的数据(nowWalletM.getNowChainM().digitList),还有没显示完的，allAvailableDigitsList，
-                // 添加到 displayDigitsList里面做展示
-                loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
-              } else {
-                // todo 2.0。 功能：加载代币列表，可选择添加erc20代币。 代币列表下拉刷新。
-                // 继续调jni获取，或者提示已经没数据了。 根据是否jni分页处理来决定。
-                Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
-                return;
-              }
-            });
+          () async {
+            if (isLoadAuthDigitFinish) {
+              Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
+              return;
+            }
+            List tempList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
+            if (tempList == null || tempList.length == 0) {
+              Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
+              return;
+            }
+            addToDisplayDigitsList(tempList);
           },
         );
       },
@@ -280,18 +269,15 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     print("updateMap[isUpdateAuthDigit]=====>" + updateMap["isUpdateAuthDigit"].toString());
   }
 
-  addToAllAvailableDigitsList(List<Digit> newDigitList) {
-    if (allAvailableDigitsList != null && allAvailableDigitsList.length == 0) {
-      allAvailableDigitsList.addAll(newDigitList);
-      return;
-    }
+  //加入到展示列表displayDigitsList中
+  addToDisplayDigitsList(List<Digit> newDigitList) {
     for (num i = 0; i < newDigitList.length; i++) {
       var element = newDigitList[i];
       if (element.contractAddress != null && element.contractAddress.isNotEmpty) {
         //erc20
         bool isExistErc20 = false;
-        for (num index = 0; index < allAvailableDigitsList.length; index++) {
-          var digit = allAvailableDigitsList[index];
+        for (num index = 0; index < displayDigitsList.length; index++) {
+          var digit = displayDigitsList[index];
           if ((digit.contractAddress != null) && (element.contractAddress != null) && (digit.contractAddress == element.contractAddress)) {
             print("digit.contractAddress=>" + digit.contractAddress + "||element.contractAddress===>" + element.contractAddress);
             isExistErc20 = true;
@@ -300,12 +286,12 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         }
         print("isExistErc20 ===>" + isExistErc20.toString());
         if (!isExistErc20) {
-          allAvailableDigitsList.add(element);
+          displayDigitsList.add(element);
         }
       } else {
         bool isExistDigit = false;
-        for (num index = 0; index < allAvailableDigitsList.length; index++) {
-          var digit = allAvailableDigitsList[index];
+        for (num index = 0; index < displayDigitsList.length; index++) {
+          var digit = displayDigitsList[index];
           if ((digit.shortName != null) && (element.shortName != null) && (digit.shortName == element.shortName)) {
             print("digit.shortName=>" + digit.shortName + "||element.shortName===>" + element.shortName);
             isExistDigit = true;
@@ -314,77 +300,32 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         }
         print("isExistDigit ===>" + isExistDigit.toString());
         if (!isExistDigit) {
-          allAvailableDigitsList.add(element);
+          displayDigitsList.add(element);
         }
       }
     }
   }
 
-  Future<List<Digit>> getNativeAuthDigitList(Chain chain, int nativeDigitIndex, int onePageOffSet) async {
-    // if (nativeDigitIndex == maxAuthTokenCount) {
-    //   print("记录的认证代币已经加载完了");
-    //   return [];
-    // }
-    List tempDigitsList = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
-    //  todo 记录count
-    //  maxAuthTokenCount = 1000
+  Future<List<Digit>> getAuthDigitList(Chain chain, int nativeDigitIndex, int onePageOffSet) async {
+    Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
+    if (nativeAuthMap == null) {
+      print("加载本地认证列表失败===》");
+      return [];
+    }
+    maxAuthTokenCount = nativeAuthMap["count"];
+    List tempDigitsList = nativeAuthMap["authDigit"];
     if (onePageOffSet == tempDigitsList.length) {
       nativeDigitIndex = nativeDigitIndex + onePageOffSet;
-      print("还有未加载完的认证代币，分页是：===》" + nativeDigitIndex.toString());
+      print("还有未加载完的认证代币，分页是下标是：===》" + nativeDigitIndex.toString());
     } else {
       nativeDigitIndex = nativeDigitIndex + tempDigitsList.length;
-      print("认证列表的代币，加载完了===》" + nativeDigitIndex.toString());
-      //todo 标识处，认证列表 加载完了
+      print("认证列表的代币，加载完了 下标===》" + nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;
     }
+    if (tempDigitsList == null || tempDigitsList.length == 0) {
+      return [];
+    }
     return tempDigitsList;
-  }
-
-  Future<List<Digit>> loadServerDigitListData() async {
-    return [];
-  }
-
-  Future<List<Digit>> loadDisplayDigitListData() async {
-    if (displayDigitsList.length == 0) {
-      //没有展示数据
-      addDigitToDisplayList(onePageOffSet);
-    } else {
-      //有展示数据，继续往里添加
-      if (displayDigitsList.length < allAvailableDigitsList.length) {
-        addDigitToDisplayList(onePageOffSet);
-      }
-      if (displayDigitsList.length == allAvailableDigitsList.length) {
-        List pageDigitsList = await getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
-        await addToAllAvailableDigitsList(pageDigitsList);
-        addDigitToDisplayList(onePageOffSet);
-      }
-    }
-    return displayDigitsList;
-  }
-
-  List<Digit> addDigitToDisplayList(int targetCount) {
-    var resultCount = targetCount;
-    if ((allAvailableDigitsList.length - displayDigitsList.length) < targetCount) {
-      resultCount = allAvailableDigitsList.length - displayDigitsList.length;
-    }
-    for (var i = displayDigitsList.length; i < resultCount; i++) {
-      var digitRate = DigitRate();
-      Digit digit = EthDigit();
-      print("addDigitToDisplayList allAvailableDigitsList[i].shortName===>" + allAvailableDigitsList[i].shortName.toString());
-      digit
-        ..chainId = allAvailableDigitsList[i].chainId
-        ..digitId = allAvailableDigitsList[i].digitId
-        ..decimal = allAvailableDigitsList[i].decimal
-        ..shortName = allAvailableDigitsList[i].shortName
-        ..fullName = allAvailableDigitsList[i].fullName
-        ..balance = allAvailableDigitsList[i].balance
-        ..contractAddress = allAvailableDigitsList[i].contractAddress
-        ..address = allAvailableDigitsList[i].address
-        ..isVisible = allAvailableDigitsList[i].isVisible
-        ..digitRate = digitRate;
-      displayDigitsList.add(digit);
-    }
-    return displayDigitsList;
   }
 
   backAndReloadData() {
