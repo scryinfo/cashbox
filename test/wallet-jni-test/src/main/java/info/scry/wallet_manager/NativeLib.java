@@ -353,21 +353,21 @@ public class NativeLib {
         }
     }
 
-    public static class AuthList{
+    public static class DigitList{
         public int status;//动态库调用结果
         public String message;      //错误信息，详细说明
         public int count;//总条数
-        public int startItem;//其实条数
-        public List<EthToken> authDigit;
+        public int startItem;//起始条数
+        public List<EthToken> ethTokens;
 
         @Override
         public String toString() {
-            return "AuthList{" +
+            return "DigitList{" +
                     "status=" + status +
                     ", message='" + message + '\'' +
                     ", count=" + count +
                     ", startItem=" + startItem +
-                    ", authDigit=" + authDigit +
+                    ", ethTokens=" + ethTokens +
                     '}';
         }
     }
@@ -468,7 +468,16 @@ public class NativeLib {
      * @param pageSize  当前最多取多少条
      * @return
      */
-    public static native AuthList getAuthDigitList(int chain_type,int startItem,int pageSize);
+    public static native DigitList getDigitList(int chainType,boolean isAuth,int startItem,int pageSize);
+
+    /**
+     * 查看代币信息
+     * @param chainType 链类型
+     * @param name 代币名称，可以是缩写，也可以是全称(该字段提供模糊查询)
+     * @param contract_addr 合约地址（该字段必须输入准确的地址）
+     * @return
+     */
+    public static native DigitList queryDigit(int chainType,String name,String contract_addr);
 
 
 

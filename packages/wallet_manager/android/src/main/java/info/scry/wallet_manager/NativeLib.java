@@ -200,16 +200,16 @@ public class NativeLib {
         public int version;
     }
 
-    public static class AuthList{
+    public static class DigitList{
         public int status;//动态库调用结果
         public String message;      //错误信息，详细说明
         public int count;//总条数
-        public int startItem;//其实条数
-        public List<EthToken> authDigit;
+        public int startItem;//起始条数
+        public List<EthToken> ethTokens;
     }
 
     /**
-     * 初始化钱包数据文件，加载基础数据
+     * 初始化钱包数据文件，创建数据库文件，导入预定义默认数据
      * @return
      */
     public static native WalletState initWalletBasicData();
@@ -221,8 +221,14 @@ public class NativeLib {
     // apiNo:WM02 fixed
     public static native List<Wallet> loadAllWalletList();
 
-    // 保存钱包
-    // apiNo:WM03 fixed
+    /**
+     * 保存钱包 apiNo:WM03 fixed
+     * @param walletName 钱包名称
+     * @param pwd  密码
+     * @param Mnemonic 助记词
+     * @param walletType 钱包类型  1 正式钱包 0 测试钱包
+     * @return
+     */
     public static native Wallet saveWallet(String walletName, byte[] pwd, byte[] Mnemonic, int walletType);
 
     // 钱包导出。 恢复钱包助记词
@@ -267,23 +273,26 @@ public class NativeLib {
 
     // 显示代币
     // apiNo:WM14
-    public static native WalletState showDigit(String walletId, String chainId, String digitId);
+    public static native WalletState showDigit(String walletId, String chainType, String digitId);
 
     // 隐藏代币
     // apiNo:WM15
-    public static native WalletState hideDigit(String walletId, String chainId, String digitId);
+    public static native WalletState hideDigit(String walletId, String chainType, String digitId);
 
-    // 增加代币，这个接口是将代币库里面的代币添加到默认列表，提供钱包管理代币余额
-    // apiNo:WM16
-    public static native WalletState addDigit(String walletId, String chainId, String digitId);
+    /**
+     * 增加代币，这个接口是将代币库里面的代币添加到默认列表，提供钱包管理代币余额 apiNo:WM16
+     * @param walletId 钱包id
+     * @param chainType 链类型
+     * @param digitId 代币id
+     * @return
+     */
+    public static native WalletState addDigit(String walletId, String chainType, String digitId);
     // 0515 meeting
     // 1、addDigit区分处理
     // 2、digit数据结构增加字段 是否是自定义
     // 3、查询代币列表，分页
     // 4、检查更新的口子（parker）
     // 5、ip等配置文件，配置流程。（parker）
-
-
 
 
     /**
@@ -308,11 +317,22 @@ public class NativeLib {
 
     /**
      * 查询认证代币列表
+     * @param chain_type 链类型， 使用 ChainType中定义的编号
+     * @param isAuth 是否为认证代币
      * @param startItem 开始条数
      * @param pageSize  当前最多取多少条
      * @return
      */
-    public static native AuthList getAuthDigitList(int chain_type,int startItem,int pageSize);
+    public static native DigitList getDigitList(int chainType,boolean isAuth,int startItem,int pageSize);
+
+    /**
+     * 查询代币信息
+     * @param chainType 链类型
+     * @param name 代币名称，可以是缩写，也可以是全称(该字段提供模糊查询)
+     * @param contract_addr 合约地址（该字段必须输入准确的地址）
+     * @return
+     */
+    public static native DigitList queryDigit(int chainType,String name,String contract_addr);
 
     /*------------------------------------------链相关------------------------------------------*/
 

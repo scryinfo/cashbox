@@ -29,9 +29,17 @@ pub fn add_wallet_digit(wallet_id:&str,chain_id:&str,digit_id:&str)-> WalletResu
     }
 
 }
-pub fn query_auth_digit(chain_type:u32,start:u32,page_size:u32)->WalletResult<model::DigitList>{
+pub fn query_auth_digit(chain_type:i64,is_auth:bool,start:i64,page_size:i64)->WalletResult<model::DigitList>{
     let instance = wallet_db::DataServiceProvider::instance()?;
-    instance.get_auth_digit_by_page(chain_type,start,page_size)
+    instance.get_digit_by_page(chain_type,is_auth,start,page_size)
+}
+
+pub fn query_digit(chain_type:i64,name:Option<String>,contract_addr:Option<String>)->WalletResult<model::DigitList>{
+    let instance = wallet_db::DataServiceProvider::instance()?;
+    if name.is_none() && contract_addr.is_none() {
+       return Err(WalletError::Custom("Query conditions is empty".to_string()));
+    }
+    instance.query_digit(chain_type,name,contract_addr)
 }
 
 //接收客户端传递过来的认证代币列表,将数据更新到认证代币列表中

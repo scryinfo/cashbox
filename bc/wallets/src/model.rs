@@ -79,30 +79,3 @@ pub struct DigitList{
     pub count:u32,
     pub auth_digit:Vec<AuthDigit>,
 }
-#[derive(Debug,Clone)]
-pub  struct DigitItem{
-    pub digit_id: Option<String>,
-    pub contract_address: Option<String>,
-    pub chain_id: i64,
-    pub short_name: Option<String>,
-    pub full_name: Option<String>,
-    pub is_visible: Option<bool>,
-    pub decimal: Option<i64>,
-    pub imgurl: Option<String>,
-}
-
-impl Default for DigitItem{
-    fn default() -> Self {
-        DigitItem{
-            digit_id:None,
-            contract_address:None,
-            chain_id:DEFALUE_DIDIT_CHAIN_ID,
-            short_name:None,
-            full_name:None,
-            is_visible:Some(true),
-            decimal:Some(18),
-            imgurl:None,
-        }
-    }
-}
-

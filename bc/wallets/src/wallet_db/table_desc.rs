@@ -92,7 +92,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
         [gas_limit]     INT,
         [mark]  VARCHAR (512),
         [status]        INT NOT NULL DEFAULT 1,
-        [is_default]    VARCHAR (1) NOT NULL DEFAULT 0,
+        [is_auth]    VARCHAR (1) NOT NULL DEFAULT 0,
         [is_visible]    VARCHAR (1) NOT NULL DEFAULT 1,
         [CREATED_TIME]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
         [UPDATED_TIME]  timestamp,

@@ -13,14 +13,14 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-       //  System.out.println(NativeLib.initWalletBasicData());
-      //  walletGenerateTest();
+        // System.out.println(NativeLib.initWalletBasicData());
+       // walletGenerateTest();
        // walletExportTest();
-         //updateAuthListTest();
-
+      //  updateAuthListTest();
        // addNonAuthDigitTest();
-        getAuthDigitListTest();
-        addDigitTest();
+        //getAuthDigitListTest();
+        queryDigitTest();
+       // addDigitTest();
       // updateDefaultDigitTest();
       //  eeeTransferTest();
        // eeeAccountInfoKeyTest();
@@ -28,14 +28,11 @@ public class NativeLibTest {
         // eeeTxsign();
       //  walletSaveTest();
       //  updateBalance();
-       // addDigitTest();
         List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         for (NativeLib.Wallet wallet:wallets){
             System.out.println("***********************");
             System.out.println(wallet.toString());
         }
-
-
     }
 
     public static void updateDefaultDigitTest(){
@@ -92,7 +89,11 @@ public class NativeLibTest {
     }
 
     public static void getAuthDigitListTest(){
-       NativeLib.AuthList list =  NativeLib.getAuthDigitList(1,0,50);
+       NativeLib.DigitList list =  NativeLib.getDigitList(4,true,0,50);
+        System.out.println(list);
+    }
+    public static void queryDigitTest(){
+        NativeLib.DigitList list =  NativeLib.queryDigit(3,"sc","0x5a895efacf987");
         System.out.println(list);
     }
     public static void  addDigitTest(){
