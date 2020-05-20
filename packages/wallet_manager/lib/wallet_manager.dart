@@ -218,11 +218,6 @@ class WalletManager {
     //todo
   }
 
-  //代币本地查询，条件：（代币名称 + 合约地址）
-  static queryNativeDigitListRecord(String queryParam) {
-    //todo
-  }
-
   //更新 本地存储的 认证代币列表（全量更新）
   static updateAuthDigitList(String digitData) async {
     Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateAuthDigitList", {"digitData": digitData});
@@ -240,6 +235,13 @@ class WalletManager {
   static getNativeAuthDigitList(int chainType, int startIndex, int pageSize) async {
     Map<dynamic, dynamic> updateMap =
         await _channel.invokeMethod("getDigitList", {"chainType": chainType, "isAuth": true, "startIndex": startIndex, "pageSize": pageSize});
+    return updateMap;
+  }
+
+  //代币查询 范围（名称 + 合约地址）
+  static queryDigit(int chainType, String name, String contract_addr) async {
+    Map<dynamic, dynamic> updateMap =
+        await _channel.invokeMethod("queryDigit", {"chainType": chainType, "name": name, "contract_addr": contract_addr});
     return updateMap;
   }
 }

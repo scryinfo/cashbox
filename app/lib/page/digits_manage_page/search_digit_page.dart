@@ -2,6 +2,7 @@ import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/wallet.dart';
+import 'package:app/model/wallets.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
@@ -233,15 +234,23 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
     );
   }
 
-  _searchDigit(String param) {
-    print("onSubmitted is ===>" + param);
-    if (param == null || param.isEmpty) {
-      return false;
-    }
+  _searchDigit(String param) async {
     // todo 执行查找接口
-    //Wallets.instance.queryNativeDigitListRecord(param);
-    setState(() {
-      //this.displayDigitsList = [];
-    });
+    Map queryMap = await Wallets.instance.queryDigit(Wallets.instance.nowWallet.nowChain, param);
+    var status = queryMap["status"];
+    if (status != null && status == 200) {
+      print("_searchDigit  status===>" + queryMap["status"].toString());
+      print("_searchDigit  count===>" + queryMap["count"].toString());
+      List tempList = queryMap["authDigit"];
+      if (tempList != null && tempList.length > 0) {
+        setState(() {
+          this.displayDigitsList = tempList;
+        });
+      } else {
+        print("搜索结果为空===>");
+      }
+    } else {
+      print("搜索出现问题了===>" + status.toString());
+    }
   }
 }

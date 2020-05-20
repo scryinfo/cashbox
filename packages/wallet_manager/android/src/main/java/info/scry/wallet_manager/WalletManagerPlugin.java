@@ -795,7 +795,56 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-
+            case "queryDigit":
+                ScryWalletLog.d("nativeLib=>", "queryDigit is enter ===>");
+                DigitList authList = new DigitList();
+                try {
+                    authList = NativeLib.queryDigit((int) (call.argument("chainType")), (String) (call.argument("name")), (String) (call.argument(
+                            "contract_addr")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "queryDigit exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", authList.status);
+                if (authList.status == 200) {
+                    ScryWalletLog.d("nativeLib=>", "count " + authList.count + "startItem " + authList.startItem + "size==> " + authList.ethTokens.size());
+                    List<EthToken> authDigitList = authList.ethTokens;
+                    if (authDigitList.isEmpty() || authDigitList.size() == 0) {
+                        result.success(resultMap); ///empty wallet
+                    }
+                    resultMap.put("count", authList.count);
+                    resultMap.put("startItem", authList.startItem);
+                    List<Map<String, Object>> resultAuthDigitList = new ArrayList<>();
+                    for (int i = 0; i < authDigitList.size(); i++) {
+                        Map digitMap = new HashMap();
+                        int index = i;
+                        EthToken authDigit = authDigitList.get(index);
+                        digitMap.put("id", authDigit.id);
+                        digitMap.put("symbol", authDigit.symbol);
+                        digitMap.put("name", authDigit.name);
+                        digitMap.put("publisher", authDigit.publisher);
+                        digitMap.put("project", authDigit.project);
+                        digitMap.put("logoUrl", authDigit.logoUrl);
+                        digitMap.put("logoBytes", authDigit.logoBytes);
+                        digitMap.put("decimal", authDigit.decimal);
+                        digitMap.put("gasLimit", authDigit.gasLimit);
+                        digitMap.put("contract", authDigit.contract);
+                        digitMap.put("acceptId", authDigit.acceptId);
+                        digitMap.put("chainType", authDigit.chainType);
+                        digitMap.put("mark", authDigit.mark);
+                        digitMap.put("updateTime", authDigit.updateTime);
+                        digitMap.put("createTime", authDigit.createTime);
+                        digitMap.put("version", authDigit.version);
+                        resultAuthDigitList.add(digitMap);
+                        //ScryWalletLog.d("nativeLib=>", "resultAuthDigitList.add(authDigit) ==> " + digitMap.toString());
+                    }
+                    resultMap.put("authDigit", resultAuthDigitList);
+                } else {
+                    resultMap.put("message", authList.message);
+                    ScryWalletLog.d("nativeLib=>", "authList.message is " + authList.message.toString());
+                }
+                result.success(resultMap);
+                break;
             default:
                 result.notImplemented();
                 break;
