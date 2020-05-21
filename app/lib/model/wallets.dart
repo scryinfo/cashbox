@@ -351,14 +351,11 @@ class Wallets {
     Map eeeAccountMap = await WalletManager.decodeAccountInfo(encodeData);
   }
 
-  addDigitToChainModel(String walletId, int chainType, int decimal, String fullName, String shortName) async {
-    //todo 参数待定
-    Map addDigitModelMap = await WalletManager.addDigitToChainModel(walletId, chainType, decimal, fullName, shortName);
-  }
-
-  add2NativeDigitListRecord(String walletId, int chainType, int decimal, String fullName, String shortName) async {
-    //todo 参数待定
-    Map addNativeDigitListRecordMap = await WalletManager.add2NativeDigitListRecord(walletId, chainType, decimal, fullName, shortName);
+  //在 当前钱包、当前链下，增加新代币的数据模型
+  addDigitToChainModel(String walletId, int chainType, String digitId) async {
+    Map addDigitModelMap = await WalletManager.addDigitToChainModel(walletId, chainType, digitId);
+    //todo if（status ==200） 在digitList增加这个代币mode
+    return addDigitModelMap;
   }
 
   updateAuthDigitList(String digitData) async {

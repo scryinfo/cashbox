@@ -188,7 +188,13 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
           child: GestureDetector(
             onTap: () {
               try {
-                // todo 保存 或者 更改显示状态
+                // todo 保存 或者 更改显示状态 接口功能待验证
+                //
+                Wallets.instance.addDigitToChainModel(Wallets.instance.nowWallet.walletId,
+                    Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), displayDigitsList[index].digitId);
+                setState(() {
+                  displayDigitsList[index].isVisible = true;
+                });
               } catch (e) {
                 print("digit_list_page点击传值出现位置错误===>" + e.toString());
                 LogUtil.e("digit_list_page", e.toString());

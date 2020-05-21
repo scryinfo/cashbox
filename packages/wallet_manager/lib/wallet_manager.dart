@@ -209,13 +209,9 @@ class WalletManager {
   }
 
   //在 当前钱包、当前链下，增加新代币的数据模型
-  static addDigitToChainModel(String walletId, int chainType, int decimal, String fullName, String shortName) {
-    //todo
-  }
-
-  //代币列表版本更新后，更改代币列表内容 todo
-  static add2NativeDigitListRecord(String walletId, int chainType, int decimal, String fullName, String shortName) {
-    //todo
+  static addDigitToChainModel(String walletId, int chainType, String digitId) async {
+    Map<dynamic, dynamic> decodeMap = await _channel.invokeMethod("addDigit", {"walletId": walletId, "chainType": chainType, "digitId": digitId});
+    return decodeMap;
   }
 
   //更新 本地存储的 认证代币列表（全量更新）
