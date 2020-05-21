@@ -7,7 +7,6 @@ pub mod android {
     use jni::JNIEnv;
     use jni::objects::{JObject, JValue,JClass,JString};
     use wallets::model::{EeeChain,BtcChain,EthChain};
-    use std::os::raw::{c_uchar, c_int};
     use jni::sys::{jint, jobject, jbyteArray};
     use wallets::StatusCode;
 

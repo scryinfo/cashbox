@@ -7,14 +7,13 @@ use wallets::StatusCode;
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_showDigit(env: JNIEnv, _: JClass, walletId: JString,chainId: JString,digitId: JString) -> jobject {
+pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_showDigit(env: JNIEnv, _: JClass, walletId: JString,chainId: jint,digitId: JString) -> jobject {
     let wallet_id: String = env.get_string(walletId).unwrap().into();
-    let chain_id: String = env.get_string(chainId).unwrap().into();
     let digit_id: String = env.get_string(digitId).unwrap().into();
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    match wallets::module::digit::show_digit(wallet_id.as_str(),chain_id.as_str(),digit_id.as_str()) {
+    match wallets::module::digit::show_digit(wallet_id.as_str(),chainId as i64,digit_id.as_str()) {
         Ok(_code) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
             env.set_field(state_obj, "isShowDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value");
@@ -29,14 +28,13 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_showDigit(env:
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideDigit(env: JNIEnv, _: JClass, walletId: JString,chainId: JString,digitId: JString) -> jobject {
+pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideDigit(env: JNIEnv, _: JClass, walletId: JString,chainId: jint,digitId: JString) -> jobject {
     let wallet_id: String = env.get_string(walletId).unwrap().into();
-    let chain_id: String = env.get_string(chainId).unwrap().into();
     let digit_id: String = env.get_string(digitId).unwrap().into();
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    match wallets::module::digit::hide_digit(wallet_id.as_str(),chain_id.as_str(),digit_id.as_str()) {
+    match wallets::module::digit::hide_digit(wallet_id.as_str(),chainId as i64,digit_id.as_str()) {
         Ok(_) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
             env.set_field(state_obj, "isHideDigit", "Z", JValue::Bool(1 as u8)).expect("hideDigit value ");
@@ -51,14 +49,13 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideDigit(env:
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_addDigit(env: JNIEnv, _: JClass, walletId:JString, chainId:JString,digit_id:JString) -> jobject{
+pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_addDigit(env: JNIEnv, _: JClass, walletId:JString, chainId:jint,digit_id:JString) -> jobject{
     let wallet_id: String = env.get_string(walletId).unwrap().into();
-    let chain_id: String = env.get_string(chainId).unwrap().into();
     let digit_id: String = env.get_string(digit_id).unwrap().into();
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    match wallets::module::digit::add_wallet_digit(&wallet_id,&chain_id,&digit_id){
+    match wallets::module::digit::add_wallet_digit(&wallet_id,chainId as i64,&digit_id){
         Ok(_) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
             env.set_field(state_obj, "isAddDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value ");
@@ -100,7 +97,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDefaultD
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
 
-    let digits =  serde_json::from_slice::<Vec<wallets::model::DigitExport>>(digit_data.as_bytes());
+    let digits =  serde_json::from_slice::<Vec<wallets::model::DefaultDigit>>(digit_data.as_bytes());
     if let Ok(digits) = digits{
         match wallets::module::digit::update_default_digit(digits){
             Ok(_)=>{
@@ -126,7 +123,17 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateAuthDigi
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
 
-    let digits =  serde_json::from_slice::<Vec<wallets::model::AuthDigit>>(digit_data.as_bytes());
+   /* serde_json::from_slice::<Vec<wallets::model::EthToken>>(digit_data.as_bytes())
+        .and_then(|digits|wallets::module::digit::update_auth_digit(digits,true,None).map_err(|err| err.into()))
+        .map(|data|{
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status value ");
+            env.set_field(state_obj, "isUpdateAuthDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value ");
+    }).map_err(|err|{
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status value ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(err.to_string()).unwrap()))).expect("set error msg value ");
+    });
+*/
+    let digits =  serde_json::from_slice::<Vec<wallets::model::EthToken>>(digit_data.as_bytes());
     if let Ok(digits) = digits{
         match wallets::module::digit::update_auth_digit(digits,true,None){
             Ok(_)=>{
@@ -154,7 +161,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_addNonAuthDigi
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
 
-    let digits =  serde_json::from_slice::<Vec<wallets::model::AuthDigit>>(digit_data.as_bytes());
+    let digits =  serde_json::from_slice::<Vec<wallets::model::EthToken>>(digit_data.as_bytes());
     if let Ok(digits) = digits{
         match wallets::module::digit::update_auth_digit(digits,false,None){
             Ok(_)=>{
@@ -187,7 +194,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getDigitList(e
             env.call_method(array_list_obj, "<init>", "()V", &[]).expect("array_list_obj init method is exec");
 
             let eth_token_class = env.find_class("info/scry/wallet_manager/NativeLib$EthToken").expect("find NativeLib$EthToken class");
-            for datum in data.auth_digit {
+            for datum in data.eth_tokens {
                 let eth_token_class_obj = env.alloc_object(eth_token_class).expect("alloc eth_token_class object");
                 //设置digit 属性
                 env.set_field(eth_token_class_obj, "id", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(datum.id).unwrap()))).expect("eth_token_class_obj set id value");
@@ -239,7 +246,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_queryDigit(env
             env.call_method(array_list_obj, "<init>", "()V", &[]).expect("array_list_obj init method is exec");
 
             let eth_token_class = env.find_class("info/scry/wallet_manager/NativeLib$EthToken").expect("find NativeLib$EthToken class");
-            for datum in data.auth_digit {
+            for datum in data.eth_tokens {
                 let eth_token_class_obj = env.alloc_object(eth_token_class).expect("alloc eth_token_class object");
                 //设置digit 属性
                 env.set_field(eth_token_class_obj, "id", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(datum.id).unwrap()))).expect("eth_token_class_obj set id value");

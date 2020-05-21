@@ -97,7 +97,7 @@ public class NativeLibTest {
         System.out.println(list);
     }
     public static void  addDigitTest(){
-        NativeLib.WalletState state =  NativeLib.addDigit("718f10dc-39bc-4a32-bf72-5b5c221c8df2","3","4ea09f1b-f793-4bd3-aaeb-0a6ddf22454a");
+        NativeLib.WalletState state =  NativeLib.addDigit("718f10dc-39bc-4a32-bf72-5b5c221c8df2",3,"4ea09f1b-f793-4bd3-aaeb-0a6ddf22454a");
         System.out.println(state);
     }
     public static  void  updateBalance(){

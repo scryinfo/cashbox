@@ -272,6 +272,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
     //保存助记词到数据库
     //保存公钥，地址到数据库
     //关闭事务
+    //todo 闭包中怎么处理错误返回值
     dbhelper.tx_begin()?;
     dbhelper.save_wallet_address(wallet_save, address)
         .map(|_| {
@@ -310,7 +311,6 @@ fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> Wal
 
 pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> WalletResult<StatusCode> {
     // TODO 检查密码规则是否满足要求
-    // TODO 处理实例获取失败的异常
     let provider = wallet_db::DataServiceProvider::instance()?;
     //查询出对应id的助记词
     let mnemonic = provider.query_by_wallet_id(mn_id);

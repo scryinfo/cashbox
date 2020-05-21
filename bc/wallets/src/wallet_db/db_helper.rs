@@ -74,10 +74,10 @@ impl Drop for DataServiceProvider {
 impl DataServiceProvider {
    pub fn init()->WalletResult<()> {
         if fs::File::open(TB_WALLET_DETAIL).is_err() || fs::File::open(TB_WALLET).is_err() {
-            //2、若是不存在则执行sql脚本文件创建数据库
+            //create wallet table
             let mnemonic_sql = super::table_desc::get_cashbox_wallet_sql();
             create_teble(TB_WALLET, mnemonic_sql.as_str())?;
-            //create wallet table
+            //create wallet detail table
             let wallet_sql = super::table_desc::get_cashbox_wallet_detail_sql();
             create_teble(TB_WALLET_DETAIL, wallet_sql.as_str())?;
             Ok(())
@@ -86,11 +86,12 @@ impl DataServiceProvider {
         }
     }
     pub fn instance() -> WalletResult<Self> {
-        //1、检查对应的数据库文件是否存在
+        //check database file is exist
         if fs::File::open(TB_WALLET_DETAIL).is_err() || fs::File::open(TB_WALLET).is_err() {
           return Err(WalletError::Custom("Database file not exist,please run init() method first!".to_string()));
         }
         let conn = Connection::open(TB_WALLET)?;
+        //attach wallet detail
         let attach_sql = format!("ATTACH DATABASE \"{}\" AS detail;", TB_WALLET_DETAIL);
         conn.execute(&attach_sql).map(|_|DataServiceProvider{
             db_hander:conn,
@@ -109,7 +110,7 @@ impl DataServiceProvider {
         self.db_hander.execute("rollback;").map(|_| ()).map_err(|err| err.into())
     }
 
-    pub fn get_bool_value(value: &str) -> bool {
+   pub  fn get_bool_value(value: &str) -> bool {
         if value.eq("1") {
             true
         } else {

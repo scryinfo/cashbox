@@ -1,5 +1,6 @@
 use std::io;
 use std::fmt;
+use std::error::Error;
 
 #[derive(Debug)]
 pub enum WalletError{
@@ -32,6 +33,24 @@ impl fmt::Display for WalletError{
             WalletError::NotExist=>write!(f,"value not exist"),
             WalletError::Custom(err) => write!(f, "wallet custom error: {}", err),
             WalletError::Decode(err) => write!(f, "wallet decode error: {}", err),
+        }
+    }
+}
+
+/*fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+    use self::Error::*;
+    match *self {
+        Unreachable | Decoder(_) | InvalidResponse(_) | Transport(_) | Internal|Other(_) => None,
+        Io(ref e) => Some(e),
+    }
+}*/
+
+impl Error for WalletError{
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match *self{
+            WalletError::Custom(_)|WalletError::NotExist=>None,
+            WalletError::Io(ref err)=>Some(err),
+            _ => None,
         }
     }
 }

@@ -24,7 +24,7 @@ pub struct Address {
 /// Description of a Digit
 /// 用于默认代币的导入
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
-pub struct DigitExport{
+pub struct DefaultDigit {
     pub id:Option<String>,
     #[serde(rename = "contractAddress")]
     pub contract_address: Option<String>,
@@ -47,7 +47,7 @@ pub struct DigitExport{
 /// Description of a Digit
 /// 用于认证代币的导入
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
-pub struct AuthDigit{
+pub struct EthToken {
     pub id:String,
     pub contract:String,
     #[serde(rename = "acceptId")]
@@ -77,5 +77,5 @@ pub struct AuthDigit{
 #[derive(Debug, Default, Clone)]
 pub struct DigitList{
     pub count:u32,
-    pub auth_digit:Vec<AuthDigit>,
+    pub eth_tokens:Vec<EthToken>,
 }

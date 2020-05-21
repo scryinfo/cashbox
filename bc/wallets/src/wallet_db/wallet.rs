@@ -77,7 +77,6 @@ impl DataServiceProvider {
                 Err(e) => Err(e.to_string())
             };
             if save_address_flag.is_err() {
-                // TODO 添加事务的处理
                 log::error!("save address error:{:?}",save_address_flag.unwrap_err());
             }
         }

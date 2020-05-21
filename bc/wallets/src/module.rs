@@ -26,7 +26,7 @@ fn update_default_digit_test() {
 {"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"eth_test_token_pre_id_DDD","decimal":18,"chainType":"ETH_TEST"}
 ]"#;
 
-    let digits =  serde_json::from_slice::<Vec<model::DigitExport>>(default.as_bytes()).unwrap();
+    let digits =  serde_json::from_slice::<Vec<model::DefaultDigit>>(default.as_bytes()).unwrap();
     let helper = wallet_db::DataServiceProvider::instance().unwrap();
     helper.tx_begin();
     let _result = match helper.update_default_digit(digits) {

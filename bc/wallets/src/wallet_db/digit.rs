@@ -1,10 +1,9 @@
 use  super::*;
-use sqlite::State;
-use failure::_core::option::Option::Some;
+use sqlite::{State,Statement};
 
 impl DataServiceProvider {
 
-    pub fn change_visible(&self, walletid: &str, chainid: &str, digitid: &str, is_visible_flag: i64) -> WalletResult<bool> {
+    pub fn change_visible(&self, walletid: &str, chainid: i64, digitid: &str, is_visible_flag: i64) -> WalletResult<bool> {
 
         let show_digit_sql =  "UPDATE detail.DigitUseDetail set is_visible = ? WHERE digit_id = ? and address_id = ( select address_id from detail.Address WHERE wallet_id=? and chain_id=?);";
         let mut show_digit_state = self.db_hander.prepare(show_digit_sql)?;
@@ -15,11 +14,11 @@ impl DataServiceProvider {
         show_digit_state.next().map(|_|true).map_err(|e|e.into())
 
     }
-    pub fn show_digit(&self, walletid: &str, chainid: &str, digitid: &str) -> WalletResult<bool> {
+    pub fn show_digit(&self, walletid: &str, chainid: i64, digitid: &str) -> WalletResult<bool> {
         return self.change_visible(walletid, chainid, digitid, 1);
     }
 
-    pub fn hide_digit(&self, walletid: &str, chainid: &str, digitid: &str) -> WalletResult<bool> {
+    pub fn hide_digit(&self, walletid: &str, chainid: i64, digitid: &str) -> WalletResult<bool> {
         return self.change_visible(walletid, chainid, digitid, 0);
     }
 
@@ -32,7 +31,7 @@ impl DataServiceProvider {
         update_sql_state.next().map(|_|true).map_err(|e|e.into())
     }
     //添加代币
-    fn add_digits(&self,digits:Vec<model::DigitExport>)->WalletResult<()>{
+    fn add_default_digits(&self, digits:Vec<model::DefaultDigit>) ->WalletResult<()>{
         let insert_sql = "insert into detail.DefaultDigitBase(id,contract_address,chain_type,group_name,short_name,full_name,url_img,decimals,is_basic,is_default,status)values(?,?,?,?,?,?,?,?,?,?,?);";
         let mut insert_basic_statement = self.db_hander.prepare(insert_sql)?;
         for digit in digits {
@@ -58,48 +57,30 @@ impl DataServiceProvider {
         Ok(())
     }
 
-    //转换链类型
-    fn is_main_chain(&self,chain_type:&str)->i64{
-        match chain_type{
-            "ETH"=>3,
-            "default"=>3,
-            "ETH_TEST"=>4,
-            "test"=>4,
-            _=>3,
-        }
-    }
-    fn convert_chain_type(&self,chain_type:i64)->String{
-        match chain_type{
-            3=>"ETH".into(),
-            4=>"ETH_TEST".into(),
-            _=>"ETH".into(),
-        }
-    }
+
 
    pub fn init_basic_digit(&self)->WalletResult<()>{
         let bytecode = include_bytes!("res/chainTokenFile.json");
         //todo 错误处理
-        let digits = serde_json::from_slice::<Vec<model::DigitExport>>(&bytecode[..])?;
-        self.add_digits(digits)
+        let digits = serde_json::from_slice::<Vec<model::DefaultDigit>>(&bytecode[..])?;
+        self.add_default_digits(digits)
     }
 
     /// 更新默认代币逻辑
     /// 将原添加的默认代币状态更新为非默认代币的状态，开始更新代币
-    pub fn update_default_digit(&self,digits:Vec<model::DigitExport>)->WalletResult<()>{
+    pub fn update_default_digit(&self, digits:Vec<model::DefaultDigit>) ->WalletResult<()>{
         //检查待添加的默认代币是否已经存在，若存在，
         //todo 精细化处理默认代币的情况，当前先使用简单粗暴的方式将已经添加的默认代币直接删除，再将新的代币插入数据库表
         let delete_sql = "delete from  detail.DefaultDigitBase where is_basic = 0 and is_default =1;";
         self.db_hander.execute(delete_sql)?;
-        self.add_digits(digits)
+        self.add_default_digits(digits)
     }
 
-  pub fn update_certification_digit(&self, digits:Vec<model::AuthDigit>, is_auth:bool) ->WalletResult<()>{
+  pub fn update_digit_base(&self, digits:Vec<model::EthToken>, is_auth:bool) ->WalletResult<()>{
         //当更新的为认证代币时。需要删除原来已经存在的代币
         if is_auth {
               let delete_sql = format!("delete from detail.DigitBase where is_auth = {};", is_auth as u16);
-              println!("delete sql:{}",delete_sql);
               self.db_hander.execute(delete_sql)?;
-
         }else{
             //添加自定义代币，需要检查该代币是否已经存在
             let select_sql = "select count(*) from detail.DigitBase where contract = ?;";
@@ -144,8 +125,8 @@ impl DataServiceProvider {
         Ok(())
     }
 
-
-    pub fn add_digit(&self,wallet_id:&str,chain_id:&str,digit_id:&str)->WalletResult<()>{
+    //从代币库中取信息，更新默认代币
+    pub fn add_digit_from_base(&self, wallet_id:&str, chain_id:i64, digit_id:&str) ->WalletResult<()>{
         //todo 判断需要添加的代币对应的链类型是否与传递进来的链类型一致
         // 查看代币是否存在,这里规定新增的代币合约地址不会重复
         let digit_detail_sql = "select contract,chain_type,symbol,name,logo_url,decimal from detail.DigitBase where id = ?;";
@@ -154,8 +135,7 @@ impl DataServiceProvider {
        if let State::Done = count_statement.next().unwrap(){
            return Err(WalletError::Custom("digit id not exist".to_string()))
        }else {
-
-         let new_default_digit = model::DigitExport{
+         let new_default_digit = model::DefaultDigit {
                id: Some(digit_id.to_string()),
                contract_address: Some(count_statement.read::<String>(0).unwrap()),
                short_name: count_statement.read::<String>(2).unwrap(),
@@ -168,7 +148,7 @@ impl DataServiceProvider {
                is_default: Some(false),
                status: None
            };
-           self.update_default_digit(vec![new_default_digit]);
+           self.update_default_digit(vec![new_default_digit])?;
        }
 
         //获取钱包对应的地址id,目前只支持以太坊代币
@@ -194,9 +174,7 @@ impl DataServiceProvider {
         state.bind(2,is_auth as i64)?;
         state.next().unwrap();
         let count = state.read::<i64>(0).unwrap();
-        let offset = if count<(start_item+page_size) {
-          count-start_item
-        }else { page_size };
+        let offset = if count<(start_item+page_size) {count-start_item}else { page_size };
         //返回指定条数的代币
         let select_digit = "select * from detail.DigitBase where chain_type = ? and is_auth =? limit ? offset ?;";
         let mut state = self.db_hander.prepare(select_digit)?;
@@ -205,31 +183,10 @@ impl DataServiceProvider {
         state.bind(3,offset)?;
         state.bind(4,start_item)?;
 
-        let mut auth_digits = Vec::with_capacity(page_size as usize);
-        while let State::Row = state.next().unwrap() {
-            let row_data = model::AuthDigit{
-                id: state.read::<String>(0).unwrap(),
-                chain_type: self.convert_chain_type(state.read::<i64>(1).unwrap()),
-                contract: state.read::<String>(2).unwrap(),
-                accept_id: state.read::<String>(3).unwrap(),
-                symbol: state.read::<String>(4).unwrap(),
-                name: state.read::<String>(5).unwrap(),
-                publisher: state.read::<String>(6).unwrap(),
-                project: state.read::<String>(7).unwrap(),
-                logo_url: state.read::<String>(8).unwrap(),
-                logo_bytes: state.read::<String>(9).unwrap(),
-                decimal: state.read::<i64>(10).unwrap(),
-                gas_limit:state.read::<i64>(11).unwrap(),
-                mark: state.read::<String>(12).unwrap(),
-                create_time: state.read::<i64>(16).unwrap(),
-                update_time: state.read::<i64>(17).unwrap(),
-                version: state.read::<i64>(18).unwrap(),
-            };
-            auth_digits.push(row_data);
-        }
+        let digits = self.fetch_tokens(state);
         Ok( model::DigitList{
-            count:count as u32,
-            auth_digit:auth_digits,
+            count: digits.len() as u32,
+            eth_tokens: digits,
         })
     }
     // 这个条件查询和分页查询可以合并，当前在输入条件限制下不会出现需要分页的情况
@@ -241,16 +198,11 @@ impl DataServiceProvider {
         if name.is_some(){
             select_digit.push_str("and symbol||name like ?")
         }
-
-        println!("query sql is:{}",select_digit);
-
         let mut state = self.db_hander.prepare(select_digit)?;
         state.bind(1,chain_type)?;
         //Todo 能够优化写法吗
-
         if let Some(addr) = contract_addr.clone(){
             state.bind(2,addr.as_str())?;
-
         }
         if let Some(name)=name{
             let query_name = format!("%{}%",name);
@@ -259,12 +211,18 @@ impl DataServiceProvider {
             }else {
                 state.bind(3,query_name.as_str())?;
             }
-
         }
+        let auth_digits = self.fetch_tokens(state);
+        Ok( model::DigitList{
+            count:auth_digits.len() as u32,
+            eth_tokens:auth_digits,
+        })
+    }
 
-        let mut auth_digits = Vec::with_capacity(16 as usize);
+    fn fetch_tokens(&self, mut state: Statement) -> Vec<model::EthToken> {
+        let mut auth_digits = Vec::with_capacity(32 as usize);
         while let State::Row = state.next().unwrap() {
-            let row_data = model::AuthDigit{
+            let row_data = model::EthToken {
                 id: state.read::<String>(0).unwrap(),
                 chain_type: self.convert_chain_type(state.read::<i64>(1).unwrap()),
                 contract: state.read::<String>(2).unwrap(),
@@ -276,7 +234,7 @@ impl DataServiceProvider {
                 logo_url: state.read::<String>(8).unwrap(),
                 logo_bytes: state.read::<String>(9).unwrap(),
                 decimal: state.read::<i64>(10).unwrap(),
-                gas_limit:state.read::<i64>(11).unwrap(),
+                gas_limit: state.read::<i64>(11).unwrap(),
                 mark: state.read::<String>(12).unwrap(),
                 create_time: state.read::<i64>(16).unwrap(),
                 update_time: state.read::<i64>(17).unwrap(),
@@ -284,9 +242,24 @@ impl DataServiceProvider {
             };
             auth_digits.push(row_data);
         }
-        Ok( model::DigitList{
-            count:auth_digits.len() as u32,
-            auth_digit:auth_digits,
-        })
+        auth_digits
+    }
+
+    //转换链类型
+    fn is_main_chain(&self,chain_type:&str)->i64{
+        match chain_type{
+            "ETH"=>3,
+            "default"=>3,
+            "ETH_TEST"=>4,
+            "test"=>4,
+            _=>3,
+        }
+    }
+    fn convert_chain_type(&self,chain_type:i64)->String{
+        match chain_type{
+            3=>"ETH".into(),
+            4=>"ETH_TEST".into(),
+            _=>"ETH".into(),
+        }
     }
 }

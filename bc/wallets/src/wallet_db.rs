@@ -17,7 +17,8 @@ pub fn init_wallet_database()->WalletResult<()>{
   match helper.init_basic_digit(){
       Ok(_)=> helper.tx_commint(),
       Err(err)=>{
-          helper.tx_rollback()
+          helper.tx_rollback()?;
+          Err(err)
       }
   }
 }
