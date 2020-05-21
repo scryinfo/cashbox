@@ -13,27 +13,30 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-        // System.out.println(NativeLib.initWalletBasicData());
+       //  System.out.println(NativeLib.initWalletBasicData());
+       // updateDefaultDigitTest();
        // walletGenerateTest();
        // walletExportTest();
       //  updateAuthListTest();
-       // addNonAuthDigitTest();
-        //getAuthDigitListTest();
-        queryDigitTest();
-       // addDigitTest();
-      // updateDefaultDigitTest();
+      //  addNonAuthDigitTest();
+      //  getAuthDigitListTest();
+      //  queryDigitTest();
+       //  addDigitTest();
+
       //  eeeTransferTest();
        // eeeAccountInfoKeyTest();
        // decodeAccountInfoTest();
         // eeeTxsign();
       //  walletSaveTest();
       //  updateBalance();
+       // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
         List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         for (NativeLib.Wallet wallet:wallets){
             System.out.println("***********************");
             System.out.println(wallet.toString());
         }
     }
+
 
     public static void updateDefaultDigitTest(){
         String json = "[\n" +
@@ -89,7 +92,7 @@ public class NativeLibTest {
     }
 
     public static void getAuthDigitListTest(){
-       NativeLib.DigitList list =  NativeLib.getDigitList(4,true,0,50);
+       NativeLib.DigitList list =  NativeLib.getDigitList(3,false,0,50);
         System.out.println(list);
     }
     public static void queryDigitTest(){
@@ -97,7 +100,7 @@ public class NativeLibTest {
         System.out.println(list);
     }
     public static void  addDigitTest(){
-        NativeLib.WalletState state =  NativeLib.addDigit("718f10dc-39bc-4a32-bf72-5b5c221c8df2",3,"4ea09f1b-f793-4bd3-aaeb-0a6ddf22454a");
+        NativeLib.WalletState state =  NativeLib.addDigit("1dc467b0-0a0b-423a-a304-30cbe1d30380",3,"c8339952-f70e-4626-b269-fdc8fcb06bf4");
         System.out.println(state);
     }
     public static  void  updateBalance(){

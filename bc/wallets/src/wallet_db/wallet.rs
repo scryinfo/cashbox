@@ -1,7 +1,7 @@
 use super::*;
-use log::error;
-use ChainType;
 
+use ChainType;
+use sqlite::{State,Statement};
 use crate::model::wallet_store::{TbAddress, WalletObj, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
 
@@ -70,6 +70,7 @@ impl DataServiceProvider {
                         let convert_ret = chain_id_convert_group_name(addr.chain_id).unwrap();
                         log::debug!("type:{},group name:{}",convert_ret.0,convert_ret.1);
                         let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DefaultDigitBase where status =1 and is_visible =1 and chain_type={} and group_name = '{}';", addr.address_id, convert_ret.0, convert_ret.1);
+                       println!("insert DigitUseDetail {}",sql);
                         self.db_hander.execute(sql)?;
                     }
                     Ok(())
@@ -83,90 +84,26 @@ impl DataServiceProvider {
         Ok(())
     }
 
-    //这个地方 定义成通用的对象查询功能
     pub fn query_by_wallet_id(&self, id: &str) -> Option<TbWallet> {
         let query_sql = "select * from Wallet where wallet_id = ?";
         let mut statement = self.db_hander.prepare(query_sql).unwrap();
         statement.bind(1, id).expect("query_by_mnemonic_id bind id");
-        let mut cursor = statement.cursor();
-
-        match cursor.next().unwrap() {
-            Some(value) => {
-                let wallet = TbWallet {
-                    wallet_id: String::from(value[0].as_string().unwrap()),
-                    mn_digest: String::from(value[1].as_string().unwrap()),
-                    full_name: value[2].as_string().map(|str| String::from(str)),
-                    mnemonic: String::from(value[3].as_string().unwrap()),
-                    wallet_type: value[4].as_integer().unwrap(),
-                    selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
-                    status: value[6].as_integer().unwrap(),
-                    display_chain_id: value[7].as_integer().unwrap().into(),
-                    create_time: format!("{}", value[8].as_integer().unwrap()),
-                    update_time: value[9].as_string().map(|str| String::from(str)),
-                };
-                Some(wallet)
-            }
-            None => {
-                None
-            }
-        }
+        self.query_wallet(&mut statement).ok()
     }
 
-    //这个地方 定义成通用的对象查询功能
     pub fn query_by_wallet_digest(&self, digest: &str, wallet_type: i64) -> Option<TbWallet> {
         let query_sql = "select * from Wallet where mn_digest = ? and wallet_type = ?";
         let mut statement = self.db_hander.prepare(query_sql).unwrap();
         statement.bind(1, digest).expect("query_by_mnemonic_id bind id");
         statement.bind(2, wallet_type).expect("query_by_mnemonic_id bind id");
-        let mut cursor = statement.cursor();
-
-        match cursor.next().unwrap() {
-            Some(value) => {
-                let wallet = TbWallet {
-                    wallet_id: String::from(value[0].as_string().unwrap()),
-                    mn_digest: String::from(value[1].as_string().unwrap()),
-                    full_name: value[2].as_string().map(|str| String::from(str)),
-                    mnemonic: String::from(value[3].as_string().unwrap()),
-                    wallet_type: value[4].as_integer().unwrap(),
-                    selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
-                    status: value[6].as_integer().unwrap(),
-                    display_chain_id: value[7].as_integer().unwrap().into(),
-                    create_time: format!("{}", value[8].as_integer().unwrap()),
-                    update_time: value[9].as_string().map(|str| String::from(str)),
-                };
-                Some(wallet)
-            }
-            None => {
-                None
-            }
-        }
+        self.query_wallet(&mut statement).ok()
     }
 
-    //考虑修改为查询所有指定条件的对象
     pub fn query_selected_wallet(&self) -> WalletResult<TbWallet> {
         //选中钱包 只有一个
         let sql = "select * from Wallet where selected=1;";
-
-        self.db_hander.prepare(sql).map(|stmt| {
-            let mut rows = stmt.cursor();
-            let value = rows.next().unwrap().unwrap(); //必须存在一个指定的钱包
-            let wallet = TbWallet {
-                wallet_id: String::from(value[0].as_string().unwrap()),
-                mn_digest: String::from(value[1].as_string().unwrap()),
-                full_name: value[2].as_string().map(|str| String::from(str)),
-                mnemonic: String::from(value[3].as_string().unwrap()),
-                wallet_type: value[4].as_integer().unwrap(),
-                selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
-                status: value[6].as_integer().unwrap(),
-                display_chain_id: value[7].as_integer().unwrap().into(),
-                create_time: format!("{}", value[8].as_integer().unwrap()),
-                update_time: value[9].as_string().map(|str| String::from(str)),
-            };
-            wallet
-        }).map_err(|err| {
-            error!("query error:{}", err.to_string());
-            err.into()
-        })
+        let mut statement = self.db_hander.prepare(sql)?;
+        self.query_wallet(&mut statement)
     }
 
     pub fn get_wallet_by_address(&self, address: &str, chain_type: ChainType) -> WalletResult<TbWallet> {
@@ -174,52 +111,43 @@ impl DataServiceProvider {
         let mut statement = self.db_hander.prepare(query_sql)?;
         statement.bind(1, address).expect("get_wallet_by_address bind address");
         statement.bind(2, chain_type as i64).expect("get_wallet_by_address chain_type");
+        self.query_wallet(&mut statement)
+    }
 
-        match statement.cursor().next().unwrap() {
-            Some(value) => {
-                let wallet = TbWallet {
-                    wallet_id: String::from(value[0].as_string().unwrap()),
-                    mn_digest: String::from(value[1].as_string().unwrap()),
-                    full_name: value[2].as_string().map(|str| String::from(str)),
-                    mnemonic: String::from(value[3].as_string().unwrap()),
-                    wallet_type: value[4].as_integer().unwrap(),
-                    selected: value[5].as_string().map(|value| Self::get_bool_value(value)),
-                    status: value[6].as_integer().unwrap(),
-                    display_chain_id: value[7].as_integer().unwrap().into(),
-                    create_time: format!("{}", value[8].as_integer().unwrap()),
-                    update_time: value[9].as_string().map(|str| String::from(str)),
-                };
-                Ok(wallet)
-            }
-            None => {
-                Err(WalletError::NotExist)
-            }
+    fn query_wallet(&self,statement: &mut Statement)->WalletResult<TbWallet> {
+        let wallets = self.get_wallets_from_database(statement);
+        if wallets.len()>0 {
+            Ok(wallets[0].clone())
+        }else {
+            Err(WalletError::NotExist)
         }
+    }
+
+    fn get_wallets_from_database(&self,statement: &mut Statement) -> Vec<TbWallet> {
+        let mut wallets = Vec::new();
+        while let State::Row = statement.next().unwrap() {
+            let wallet = TbWallet {
+                wallet_id:statement.read::<String>(0).unwrap(),
+                mn_digest: statement.read::<String>(1).unwrap(),
+                full_name: statement.read::<String>(2).ok(),
+                mnemonic: statement.read::<String>(3).unwrap(),
+                wallet_type: statement.read::<i64>(4).unwrap(),
+                selected: statement.read::<i64>(5).map(|value|value==1).ok(),
+                status: statement.read::<i64>(6).unwrap(),
+                display_chain_id:  statement.read::<i64>(7).unwrap(),
+                create_time: statement.read::<String>(8).unwrap(),
+                update_time: statement.read::<String>(9).ok(),
+            };
+            wallets.push(wallet);
+        }
+        wallets
     }
 
     //当前该功能是返回所有的钱包
     pub fn get_wallets(&self) -> Vec<TbWallet> {
         let sql = "select * from Wallet WHERE status = 1;";
-
-        let mut cursor = self.db_hander.prepare(sql).unwrap().cursor();
-        let mut vec = Vec::new();
-        while let Some(cursor) = cursor.next().unwrap() {
-            let wallet = TbWallet {
-                wallet_id: String::from(cursor[0].as_string().unwrap()),
-                mn_digest: String::from(cursor[1].as_string().unwrap()),
-                full_name: cursor[2].as_string().map(|str| String::from(str)),
-                mnemonic: String::from(cursor[3].as_string().unwrap()),
-                wallet_type: cursor[4].as_integer().unwrap(),
-                selected: cursor[5].as_string().map(|value| Self::get_bool_value(value)),
-
-                status: cursor[6].as_integer().unwrap(),
-                display_chain_id: cursor[7].as_integer().unwrap().into(),
-                create_time: format!("{}", cursor[8].as_integer().unwrap()),
-                update_time: cursor[9].as_string().map(|data| String::from(data)),
-            };
-            vec.push(wallet)
-        }
-        vec
+        let mut statement = self.db_hander.prepare(sql).unwrap();
+        self.get_wallets_from_database(&mut statement)
     }
 
     pub fn set_selected_wallet(&self, wallet_id: &str) -> WalletResult<()> {
@@ -233,7 +161,7 @@ impl DataServiceProvider {
         Ok(())
     }
 
-    //todo 完善删除钱包逻辑
+    //todo 完善删除钱包逻辑  若是删除的当前钱包，当前选择钱包逻辑怎么来确定？
     pub fn del_mnemonic(&self, mn_id: &str) -> WalletResult<()> {
         let sql = "DELETE from Wallet WHERE wallet_id = ?; ";
         let update_address = "UPDATE Address set status = 0 WHERE wallet_id =?;";

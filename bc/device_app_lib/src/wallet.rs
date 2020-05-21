@@ -267,9 +267,9 @@ pub mod android {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
         match wallets::module::wallet::del_wallet(wallet_id.as_str(), passwd.as_slice()) {
-            Ok(exist) => {
+            Ok(_) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
-                env.set_field(state_obj, "isDeletWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value ");
+                env.set_field(state_obj, "isDeletWallet", "Z", JValue::Bool(true as u8)).expect("set isSetNowWallet value ");
             }
             Err(msg) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type ");

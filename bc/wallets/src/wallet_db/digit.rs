@@ -102,7 +102,7 @@ impl DataServiceProvider {
             //todo 当新增的代币id不存在
             let id = if digit.id.is_empty() { uuid::Uuid::new_v4().to_string()}else { digit.id };
             update_digit_statement.bind(1,id.as_str())?;
-            update_digit_statement.bind(2,self.is_main_chain(digit.chain_type.as_str()))?;
+            update_digit_statement.bind(2,self.chain_name_to_chain_number(digit.chain_type.as_str()))?;
             update_digit_statement.bind(3,digit.contract.as_str())?;
             update_digit_statement.bind(4,digit.accept_id.as_str())?;
             update_digit_statement.bind(5,digit.symbol.as_str())?;
@@ -245,13 +245,26 @@ impl DataServiceProvider {
         auth_digits
     }
 
-    //转换链类型
+    //转换链类型,是正式链还是测试链
     fn is_main_chain(&self,chain_type:&str)->i64{
+        match chain_type{
+            "ETH"=>1,
+            "default"=>1,
+            "ETH_TEST"=>0,
+            "test"=>0,
+            _=>1,
+        }
+    }
+
+
+    fn chain_name_to_chain_number(&self,chain_type:&str)->i64{
         match chain_type{
             "ETH"=>3,
             "default"=>3,
             "ETH_TEST"=>4,
             "test"=>4,
+            "EEE"=>5,
+            "EEE_TEST"=>6,
             _=>3,
         }
     }

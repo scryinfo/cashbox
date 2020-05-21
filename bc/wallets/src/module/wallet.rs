@@ -92,27 +92,20 @@ pub fn set_current_wallet(walletid: &str) -> WalletResult<bool> {
     instance.set_selected_wallet(walletid).map(|_| true).map_err(|error| error.into())
 }
 
-pub fn del_wallet(walletid: &str, psd: &[u8]) -> WalletResult<bool> {
+pub fn del_wallet(walletid: &str, psd: &[u8]) -> WalletResult<()> {
     let provider = wallet_db::DataServiceProvider::instance()?;
     //查询出对应id的助记词
-    match provider.query_by_wallet_id(walletid) {
-        Some(mn) => {
-            match substratetx::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), psd) {
-                Ok(_) => {
-                    //密码验证通过
-                    match provider.del_mnemonic(walletid) {
-                        Ok(_) => Ok(true),
-                        Err(msg) => Err(msg),
-                    }
-                }
-                Err(msg) => Err(msg.into()),
-            }
-        }
-        None => {
-            let msg = format!("wallet {} not found", walletid);
-            Err(WalletError::Custom(msg))
-        }
-    }
+    provider.query_by_wallet_id(walletid).ok_or_else(||WalletError::NotExist)
+        .and_then(|mn|substratetx::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), psd).map_err(|e|e.into()))
+        .and_then(|_data|   provider.tx_begin())
+        .and_then(|()|{
+            provider.del_mnemonic(walletid)
+        })
+        .and_then(|_| provider.tx_commint())
+        .map_err(|err|{
+            let _ = provider.tx_rollback();
+            err
+        })
 }
 
 pub fn rename_wallet(walletid: &str, wallet_name: &str) -> WalletResult<bool> {
@@ -162,8 +155,7 @@ pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> WalletResult<
 fn generate_eth_address(puk_byte: &[u8]) -> String {
     let public_key_hash = puk_byte.keccak256();
     let address_str = hex::encode(&public_key_hash[12..]);
-    let address = format!("0x{}", address_str);
-    address
+    format!("0x{}", address_str)
 }
 
 pub fn find_keystore_wallet_from_address(address: &str, chain_type: ChainType) -> WalletResult<String> {
@@ -271,12 +263,11 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
     // 开启事务
     //保存助记词到数据库
     //保存公钥，地址到数据库
-    //关闭事务
-    //todo 闭包中怎么处理错误返回值
+    //提交事务
     dbhelper.tx_begin()?;
     dbhelper.save_wallet_address(wallet_save, address)
+        .map(|_| dbhelper.tx_commint())
         .map(|_| {
-            dbhelper.tx_commint();
             Wallet {
                 status: StatusCode::OK,
                 wallet_id,
@@ -286,7 +277,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
                 ..Default::default()
             }
         }).map_err(|err| {
-        dbhelper.tx_rollback();
+        let _ =  dbhelper.tx_rollback();
         err
     })
 }
@@ -313,16 +304,11 @@ pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> Wallet
     // TODO 检查密码规则是否满足要求
     let provider = wallet_db::DataServiceProvider::instance()?;
     //查询出对应id的助记词
-    let mnemonic = provider.query_by_wallet_id(mn_id);
-    match mnemonic {
-        Some(mn) => {
-            mnemonic_psd_update(&mn, old_pwd, new_pwd).map(|_| StatusCode::OK)
-        }
-        None => {
-            //针对错误信息 是否提示更多原因？
-            let msg = format!("wallet {} is not exist", mn_id);
-            Err(WalletError::Custom(msg))
-        }
+    if let Some(mn) = provider.query_by_wallet_id(mn_id) {
+        mnemonic_psd_update(&mn, old_pwd, new_pwd).map(|_| StatusCode::OK)
+    } else {
+        let msg = format!("wallet {} is not exist", mn_id);
+        Err(WalletError::Custom(msg))
     }
 }
 
@@ -364,8 +350,6 @@ pub fn raw_sign(raw_data: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<Str
     let hex_data = format!("0x{}", hex::encode(&sign_data[..]));
     Ok(hex_data)
 }
-
-//todo 增加通过钱包id查询钱包的实现
 
 
 

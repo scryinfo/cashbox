@@ -43,7 +43,7 @@ pub fn query_digit(chain_type:i64,name:Option<String>,contract_addr:Option<Strin
 
 //接收客户端传递过来的认证代币列表,将数据更新到认证代币列表中
 //todo 根据传递进来的代币属于测试链还是主链分别处理
-pub fn update_auth_digit(digits:Vec<model::EthToken>, is_auth:bool, chain_type:Option<String>) ->WalletResult<()>{
+pub fn update_auth_digit(digits:Vec<model::EthToken>, is_auth:bool, _chain_type:Option<String>) ->WalletResult<()>{
     let instance = wallet_db::DataServiceProvider::instance()?;
     instance.tx_begin()?;
     //当前采用全量更新手段，直接删除存在的代币,更新新的代币
@@ -63,7 +63,7 @@ pub fn update_default_digit(digits:Vec<model::DefaultDigit>) ->WalletResult<()>{
     match helper.update_default_digit(digits) {
         Ok(())=> helper.tx_commint(),
         Err(e)=> {
-            helper.tx_rollback();
+            helper.tx_rollback()?;
             Err(e)
         },
     }

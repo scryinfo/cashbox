@@ -26,7 +26,7 @@ impl DataServiceProvider {
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (5,6)) e,
 	 ( select * from detail.DigitUseDetail,detail.DefaultDigitBase
          where digit_id = id and group_name !='ETH' and group_name !='BTC'
-         ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id;";
+         ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id  order by wallet_id desc;";
 
         let  stat = self.db_hander.prepare(all_data)?;
         let mut cursor= stat.cursor();
@@ -101,7 +101,7 @@ impl DataServiceProvider {
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (1,2)) e,
 	 ( select * from detail.DigitUseDetail,detail.DefaultDigitBase
          where digit_id = id and group_name !='EEE' and group_name !='ETH'
-         ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id;";
+         ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id order by wallet_id desc;";
 
         let state = self.db_hander.prepare(all_mn)?;
         let mut cursor = state.cursor();
@@ -132,7 +132,7 @@ impl DataServiceProvider {
         Ok(tbwallets)
     }
 
-    pub fn show_chain(&mut self, walletid: &str, wallet_type: i64) -> WalletResult<bool> {
+    pub fn show_chain(&self, walletid: &str, wallet_type: i64) -> WalletResult<bool> {
         let sql = "UPDATE Address set is_visible = 1 WHERE wallet_id=? and chain_id=?;";
         let mut stat = self.db_hander.prepare(sql)?;
          stat.bind(1, walletid)?;
@@ -141,7 +141,7 @@ impl DataServiceProvider {
 
     }
 
-    pub fn hide_chain(&mut self, walletid: &str, wallet_type: i64) -> WalletResult<bool> {
+    pub fn hide_chain(&self, walletid: &str, wallet_type: i64) -> WalletResult<bool> {
         let sql = "UPDATE Address set is_visible = 0 WHERE wallet_id=? and chain_id=?;";
         let mut stat = self.db_hander.prepare(sql)?;
         stat.bind(1, walletid)?;
@@ -150,14 +150,14 @@ impl DataServiceProvider {
 
     }
 
-    pub fn get_now_chain_type(&mut self, walletid: &str) -> WalletResult<i64> {
+    pub fn get_now_chain_type(&self, walletid: &str) -> WalletResult<i64> {
         let query_sql = "select display_chain_id from Wallet where wallet_id = ?";
         let mut state = self.db_hander.prepare(query_sql)?;
         state.bind(1,walletid)?;
         state.cursor().next().map(|value| value.unwrap()[0].as_integer().unwrap() ).map_err(|e|e.into())
     }
 
-    pub fn set_now_chain_type(&mut self, walletid: &str, chain_type: i64) -> WalletResult<bool> {
+    pub fn set_now_chain_type(&self, walletid: &str, chain_type: i64) -> WalletResult<bool> {
         let sql = "UPDATE Wallet set display_chain_id = ? WHERE wallet_id=?;";
        let mut stat =  self.db_hander.prepare(sql)?;
         stat.bind(1, chain_type)?;

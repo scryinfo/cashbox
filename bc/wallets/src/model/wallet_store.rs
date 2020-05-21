@@ -1,4 +1,4 @@
-#[derive(Default, Deserialize)]
+#[derive(Default,Clone, Deserialize)]
 pub struct TbWallet {
     pub  wallet_id: String,
     pub mn_digest:String,
