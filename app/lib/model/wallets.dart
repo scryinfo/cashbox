@@ -36,7 +36,7 @@ class Wallets {
   initWalletBasicData() async {
     var spUtil = await SharedPreferenceUtil.instance;
     var isFinishInit = spUtil.getBool(GlobalConfig.isInitAppConfig);
-    if (!isFinishInit) {
+    if (isFinishInit == null || !isFinishInit) {
       SharedPreferenceUtil.initVersion(); //初始化 接口ip、版本信息等 到本地文件保存
     }
     WalletManager.initWalletBasicData(); //初始化数据库部分数据

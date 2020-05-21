@@ -51,7 +51,9 @@ public class MainActivity extends FlutterActivity {
     private final String QR_SCAN_METHOD = "qr_scan_method";
     private final String FILE_SYSTEM_METHOD = "file_system_method";
     private final String CHARGING_CHANNEL = "samples.flutter.io/charging";
-    private final String FLUTTER_LOG_CHANNEL = "android_log";
+    private final String FLUTTER_LOG_CHANNEL = "android_log_channel";
+    private final String UPGRADE_APP_CHANNEL = "upgrade_app_channel";
+    private final String UPGRADE_APP_METHOD = "upgrade_app_method";
     Context context;
 
     @Override
@@ -83,10 +85,25 @@ public class MainActivity extends FlutterActivity {
                             @Override
                             public void onMethodCall(MethodCall call, Result result) {
                                 logPrint(call);
-                                try {
-                                    // checkAndUpgradeVersion();  //todo 待验证，暂不放开
-                                } catch (Exception e) {
-                                    ScryLog.e("checkApplicationVersion appear error", e.toString());
+                            }
+                        }
+                );
+
+        //flutter处 通知版本升级
+        new MethodChannel(getFlutterView(), UPGRADE_APP_CHANNEL)
+                .setMethodCallHandler(
+                        new MethodCallHandler() {
+                            @Override
+                            public void onMethodCall(MethodCall call, Result result) {
+                                String downloadurl = call.argument("downloadurl");
+                                if (call.method.toString().equals(UPGRADE_APP_METHOD)) {
+                                    try {
+                                        checkAndUpgradeVersion(downloadurl);  //todo 待验证，暂不放开
+                                    } catch (Exception e) {
+                                        ScryLog.e("checkApplicationVersion appear error", e.toString());
+                                    }
+                                } else {
+                                    ScryLog.e("call.method.toString() not equal===>", call.method.toString());
                                 }
                             }
                         }
@@ -115,7 +132,7 @@ public class MainActivity extends FlutterActivity {
         );
     }
 
-    private void checkAndUpgradeVersion() {
+    private void checkAndUpgradeVersion(String loadUrl) {
         String versionUrl = "http://192.168.1.3:8080/checkVersion"; //todo
         String downloadUrl = "http://192.168.1.3:8080/downloadApk"; //todo
 

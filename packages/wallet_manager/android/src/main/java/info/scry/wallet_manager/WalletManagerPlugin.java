@@ -445,7 +445,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 ScryWalletLog.d("nativeLib=>", "begin to showDigit =>");
                 WalletState walletState = new WalletState();
                 try {
-                    walletState = NativeLib.showDigit((String) (call.argument("walletId")), (String) (call.argument("chainId")),
+                    walletState = NativeLib.showDigit((String) (call.argument("walletId")), (int) (call.argument("chainType")),
                             (String) (call.argument("digitId")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "showDigit exception is " + exception);
@@ -461,7 +461,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 ScryWalletLog.d("nativeLib=>", "begin to hideDigit =>");
                 WalletState walletState = new WalletState();
                 try {
-                    walletState = NativeLib.hideDigit((String) (call.argument("walletId")), (String) (call.argument("chainId")),
+                    walletState = NativeLib.hideDigit((String) (call.argument("walletId")), (int) (call.argument("chainType")),
                             (String) (call.argument("digitId")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "hideDigit exception is " + exception);
@@ -647,11 +647,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 ScryWalletLog.d("nativeLib=>", "addDigit is enter =>");
                 WalletState walletState = new WalletState();
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("walletId")));
-                ScryWalletLog.d("nativeLib=>", (String) (call.argument("chainId")));
+                ScryWalletLog.d("nativeLib=>", (int) (call.argument("chainType")));
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("digitId")));
                 try {
                     walletState = NativeLib.addDigit((String) (call.argument("walletId")),
-                            (String) (call.argument("chainId")),
+                            (int) (call.argument("chainType")),
                             (String) (call.argument("digitId")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "decodeAdditionData exception is " + exception);

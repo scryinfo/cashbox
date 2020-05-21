@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 class LogUtil {
-  static const perform = const MethodChannel("android_log");
+  static const perform = const MethodChannel("android_log_channel");
 
   static void v(String tag, String message) {
     perform.invokeMethod('logV', {'tag': tag, 'msg': message});
