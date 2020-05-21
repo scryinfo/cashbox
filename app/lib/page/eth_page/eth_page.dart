@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:app/generated/i18n.dart';
+import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
+import 'package:app/net/net_util.dart';
 import 'package:app/net/rate_util.dart';
 import 'package:app/page/left_drawer_card/left_drawer_card.dart';
 import 'package:app/provide/qr_info_provide.dart';
@@ -20,6 +24,7 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 
@@ -87,12 +92,20 @@ class _EthPageState extends State<EthPage> {
     loadDigitBalance();
     loadLegalCurrency();
     //loadDigitRateInfo(); //todo
-    loadServeConfigInfo();
+    //loadServeConfigInfo(); //todo 去获取服务器端的 配置信息
   }
 
-  loadServeConfigInfo() {
+  loadServeConfigInfo() async {
     //去服务器端拿回配置信息，对比进行检查等操作。
     //todo  此处：1、检查是否需要进行应用 版本升级
+    var serveResult = await request(GlobalConfig.serveConfigIp);
+    print("loadServeConfigInfo info ====>" + serveResult.toString());
+    var jsonObject = json.decode(serveResult);
+    print("loadServeConfigInfo jsonObject===>" + jsonObject.toString());
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String version = packageInfo.version; //版本号
+    String buildNumber = packageInfo.buildNumber; //版本构建号
+    print("packageInfo version===>" + version + "||buildNumber===>" + buildNumber);
   }
 
   loadLegalCurrency() async {

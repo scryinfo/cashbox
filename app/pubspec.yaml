@@ -72,6 +72,9 @@ dependencies:
   shared_preferences: ^0.5.7+1
   #https://github.com/flutter/plugins
 
+  package_info: ^0.4.0+18
+  #yingyongbanben
+
   json_rpc_2: ^2.1.1
   #         https://github.com/dart-lang/json_rpc_2
 

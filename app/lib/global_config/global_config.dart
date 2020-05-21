@@ -27,6 +27,7 @@ class GlobalConfig {
 
   //static String ipAddress = "ws://47.108.146.67:9933";
   static String ipAddress = "ws://40.73.75.224:9933";
+  static String serveConfigIp = "ws://40.73.75.224:9933";
 
   static String isInitAppConfig = "is_init_app_config_key";
   static String rateDigitIpKey = "rate_digit_ip_key";
