@@ -102,7 +102,7 @@ abstract class Chain {
   // apiNo:WM14
   Future<bool> showDigit(Digit digit) async {
     print("showDigit    walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
-    Map showDigitMap = await WalletManager.showDigit(walletId, chainId, digit.digitId);
+    Map showDigitMap = await WalletManager.showDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
     int status = showDigitMap["status"];
     bool isShowDigit = showDigitMap["isShowDigit"];
     if (status == 200) {
@@ -119,7 +119,7 @@ abstract class Chain {
   // apiNo:WM15
   Future<bool> hideDigit(Digit digit) async {
     print("hideDigit        walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
-    Map hideDigitMap = await WalletManager.hideDigit(walletId, chainId, digit.digitId);
+    Map hideDigitMap = await WalletManager.hideDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
     int status = hideDigitMap["status"];
     bool isHideDigit = hideDigitMap["isHideDigit"];
     if (status == 200) {
@@ -133,7 +133,7 @@ abstract class Chain {
 
   // 添加代币 todo 2.0 待确定数据格式
   Future<bool> addDigit(String walletId, Digit digit) async {
-    Map addDigitMap = await WalletManager.addDigit(walletId, digit.chainId, digit.digitId);
+    Map addDigitMap = await WalletManager.addDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
     int status = addDigitMap["status"];
     bool isAddDigit = addDigitMap["isAddDigit"];
     if (status == 200) {
