@@ -758,12 +758,13 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 if (authList.status == 200) {
                     ScryWalletLog.d("nativeLib=>", "count " + authList.count + "startItem " + authList.startItem + "size==> " + authList.ethTokens.size());
                     List<EthToken> authDigitList = authList.ethTokens;
-                    if (authDigitList.isEmpty() || authDigitList.size() == 0) {
-                        result.success(resultMap); ///empty wallet
-                    }
                     resultMap.put("count", authList.count);
                     resultMap.put("startItem", authList.startItem);
                     List<Map<String, Object>> resultAuthDigitList = new ArrayList<>();
+                    if (authDigitList == null || authDigitList.size() == 0) {
+                        result.success(resultMap); ///empty wallet
+                        resultMap.put("authDigit", resultAuthDigitList);
+                    }
                     for (int i = 0; i < authDigitList.size(); i++) {
                         Map digitMap = new HashMap();
                         int index = i;

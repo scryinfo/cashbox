@@ -3,6 +3,7 @@ import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/net/net_util.dart';
 import 'package:app/provide/server_config_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -51,11 +52,16 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       // if (double.parse(localAuthDigitListVersion) > double.parse(authDigitListVersion)) {
       //   //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表
       //   //todo 替换 ======> 2、本地已有代币列表
-      //   //await updateNativeDigitListVersion(loadServerDigitListData());//服务器可信任代币列表
+      //   String authDigitListUrl = spUtil.getString(GlobalConfig.authDigitListKey);
+      //   await updateNativeDigitListVersion(loadServerDigitListData(authDigitListUrl)); //服务器可信任代币列表
       // }
-      var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
+      // String authDigitListUrl = spUtil.getString(GlobalConfig.authDigitListKey);
+      // var serverResult = await loadServerDigitListData(authDigitListUrl);
+      // print("serverResult===>" + serverResult.toString());
+      // await updateNativeDigitListVersion(serverResult.toString()); //服务器可信任代币列表
+      //var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
 
-      addToDisplayDigitsList(tempNativeAuthDigitsList);
+      //addToDisplayDigitsList(tempNativeAuthDigitsList);
     }
     setState(() {
       this.displayDigitsList = displayDigitsList;
@@ -251,9 +257,25 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     );
   }
 
-  updateNativeDigitListVersion(String jsonString) async {
+  loadServerDigitListData(String authUrl) async {
+    if (authUrl == null || authUrl.isEmpty) {
+      print("loadServerDigitListData authUrl is null===>");
+      return "";
+    }
+    var result = await request(authUrl);
+    if (result["code"] != null && result["code"] == 0) {
+      return result["data"];
+    }
+    return "";
+  }
+
+  updateNativeDigitListVersion(String param) async {
+    if (param == null || param.isEmpty || (param.trim() == "")) {
+      print("param is empty======>" + param);
+      return;
+    }
     //todo test api code
-    var obj = [
+    /*var obj = [
       {
         "id": "eth_chain_ddd_test0",
         "symbol": "parker0",
@@ -273,14 +295,18 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         "version": 12,
       },
     ];
-    String jsonString = convert.jsonEncode(obj);
-    var updateMap = await Wallets.instance.updateAuthDigitList(jsonString);
+    String jsonString = convert.jsonEncode(obj);*/
+    var updateMap = await Wallets.instance.updateAuthDigitList(param);
     print("updateMap[status]=====>" + updateMap["status"].toString());
     print("updateMap[isUpdateAuthDigit]=====>" + updateMap["isUpdateAuthDigit"].toString());
   }
 
   //加入到展示列表displayDigitsList中
   addToDisplayDigitsList(List<Digit> newDigitList) {
+    if (newDigitList == null || newDigitList.length == 0) {
+      print("addToDisplayDigitsList newDigitList is null");
+      return;
+    }
     for (num i = 0; i < newDigitList.length; i++) {
       var element = newDigitList[i];
       if (element.contractAddress != null && element.contractAddress.isNotEmpty) {
@@ -324,6 +350,11 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     }
     maxAuthTokenCount = nativeAuthMap["count"];
     List tempDigitsList = nativeAuthMap["authDigit"];
+    if (tempDigitsList == null || tempDigitsList.length == 0) {
+      print("认证列表的代币，加载完了 下标===》" + nativeDigitIndex.toString());
+      isLoadAuthDigitFinish = true;
+      return [];
+    }
     if (onePageOffSet == tempDigitsList.length) {
       nativeDigitIndex = nativeDigitIndex + onePageOffSet;
       print("还有未加载完的认证代币，分页是下标是：===》" + nativeDigitIndex.toString());
@@ -331,9 +362,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       nativeDigitIndex = nativeDigitIndex + tempDigitsList.length;
       print("认证列表的代币，加载完了 下标===》" + nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;
-    }
-    if (tempDigitsList == null || tempDigitsList.length == 0) {
-      return [];
     }
     return tempDigitsList;
   }
