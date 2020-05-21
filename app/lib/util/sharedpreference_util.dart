@@ -14,13 +14,13 @@ class SharedPreferenceUtil {
 
   static initVersion() async {
     var spUtil = await SharedPreferenceUtil.instance;
-    spUtil.setString(GlobalConfig.rateDigitIpKey, GlobalConfig.rateDigitIpValue);
-    spUtil.setString(GlobalConfig.authDigitListKey, GlobalConfig.authDigitListValue);
-    spUtil.setString(GlobalConfig.defaultDigitListKey, GlobalConfig.defaultDigitListValue);
-    spUtil.setString(GlobalConfig.scryXkey, GlobalConfig.scryXValue);
-    spUtil.setString(GlobalConfig.cashboxVersionKey, GlobalConfig.cashboxVersionValue);
-    spUtil.setString(GlobalConfig.cashboxDownloadIpKey, GlobalConfig.cashboxDownloadIpValue);
-    spUtil.setString(GlobalConfig.publicIpKey, GlobalConfig.publicIpValue);
+    spUtil.setString(GlobalConfig.rateDigitIpKey, GlobalConfig.rateDigitIpDefaultValue);
+    spUtil.setString(GlobalConfig.authDigitListKey, GlobalConfig.authDigitListDefaultValue);
+    spUtil.setString(GlobalConfig.defaultDigitListKey, GlobalConfig.defaultDigitListDefaultValue);
+    spUtil.setString(GlobalConfig.scryXkey, GlobalConfig.scryXDefaultValue);
+    spUtil.setString(GlobalConfig.cashboxVersionKey, GlobalConfig.cashboxVersionDefaultValue);
+    spUtil.setString(GlobalConfig.cashboxDownloadIpKey, GlobalConfig.cashboxDownloadIpDefaultValue);
+    spUtil.setString(GlobalConfig.publicIpKey, GlobalConfig.publicIpDefaultValue);
     spUtil.setBool(GlobalConfig.isInitAppConfig, true);
   }
 }

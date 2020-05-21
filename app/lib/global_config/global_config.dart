@@ -31,19 +31,19 @@ class GlobalConfig {
 
   static String isInitAppConfig = "is_init_app_config_key";
   static String rateDigitIpKey = "rate_digit_ip_key";
-  static String rateDigitIpValue = "http://40.73.35.55:8080/inner_api/market/pricerate";
+  static String rateDigitIpDefaultValue = "http://40.73.35.55:8080/inner_api/market/pricerate";
   static String authDigitListKey = "auth_digit_list_key";
-  static String authDigitListValue = "auth_digit_list_key"; //todo
+  static String authDigitListDefaultValue = "auth_digit_list_key"; //todo
   static String defaultDigitListKey = "default_digit_list_key";
-  static String defaultDigitListValue = "default_digit_list_key"; //todo
+  static String defaultDigitListDefaultValue = "default_digit_list_key"; //todo
   static String scryXkey = "scry_x_key";
-  static String scryXValue = "ws://40.73.75.224:9933"; //todo
+  static String scryXDefaultValue = "ws://40.73.75.224:9933"; //todo
   static String cashboxVersionKey = "cashbox_version_key";
-  static String cashboxVersionValue = "1.0.0"; //todo
+  static String cashboxVersionDefaultValue = "1.0.0"; //todo
   static String cashboxDownloadIpKey = "cashbox_download_ip_key";
-  static String cashboxDownloadIpValue = ""; //todo
+  static String cashboxDownloadIpDefaultValue = ""; //todo
   static String publicIpKey = "public__ip_key";
-  static String publicIpValue = "https://cashbox.scry.info/public"; //todo
+  static String publicIpDefaultValue = "https://cashbox.scry.info/public"; //todo
 
   static Locale loadLocale(String locale) {
     switch (locale) {

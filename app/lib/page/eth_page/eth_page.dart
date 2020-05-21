@@ -96,7 +96,7 @@ class _EthPageState extends State<EthPage> {
   }
 
   loadServeConfigInfo() async {
-    //去服务器端拿回配置信息，对比进行检查等操作。
+    //去服务器端拿回配置信息，对比进行检查等操作。 加载到ServerConfigProvide保存
     //todo  此处：1、检查是否需要进行应用 版本升级
     var serveResult = await request(GlobalConfig.serveConfigIp);
     print("loadServeConfigInfo info ====>" + serveResult.toString());

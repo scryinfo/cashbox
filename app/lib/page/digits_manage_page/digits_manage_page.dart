@@ -1,10 +1,13 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/provide/server_config_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,6 +17,8 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert' as convert;
+
+import 'package:provider/provider.dart';
 
 class DigitsManagePage extends StatefulWidget {
   @override
@@ -40,9 +45,14 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
     print("initData displayDigitsList.length====>" + displayDigitsList.length.toString());
     {
-      //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表。
-      //todo 替换 ===》 2、本地已有代币列表
-      //await updateNativeDigitListVersion(loadServerDigitListData());//服务器可信任代币列表
+      // var spUtil = await SharedPreferenceUtil.instance;
+      // var localAuthDigitListVersion = spUtil.getString(GlobalConfig.authDigitListKey);
+      // var authDigitListVersion = Provider.of<ServerConfigProvide>(context).authDigitListVersion;
+      // if (double.parse(localAuthDigitListVersion) > double.parse(authDigitListVersion)) {
+      //   //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表
+      //   //todo 替换 ======> 2、本地已有代币列表
+      //   //await updateNativeDigitListVersion(loadServerDigitListData());//服务器可信任代币列表
+      // }
       var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
 
       addToDisplayDigitsList(tempNativeAuthDigitsList);

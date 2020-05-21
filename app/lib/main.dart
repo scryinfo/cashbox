@@ -5,6 +5,7 @@ import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
+import 'package:app/provide/server_config_provide.dart';
 import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +83,9 @@ class _MyApp extends State<MyApp> {
         ),
         ChangeNotifierProvider(
           builder: (_) => TransactionProvide(),
+        ),
+        ChangeNotifierProvider(
+          builder: (_) => ServerConfigProvide(),
         ),
       ],
       child: Container(
