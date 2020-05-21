@@ -44,16 +44,20 @@ class _EntryPageState extends State<EntryPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _initData(); //case : 删除钱包后，没钱包，回到entryPage
+    initWalletBasicData(); //case : 删除钱包后，没钱包，回到entryPage
   }
 
-  void _initData() async {
+  void initWalletBasicData() async {
     languageList = [];
     languageList.add(GlobalConfig.zhLocale);
     languageList.add(GlobalConfig.enLocale);
     languageMap = {};
     languageMap.addAll({GlobalConfig.zhLocale: "中文", GlobalConfig.enLocale: "English"});
-    // todo
+    /*  初始化 到 本地文件
+        1、接口ip、版本信息等 到本地文件保存
+        2、数据库信息等
+        3、应用语言类型（中、英文）
+        */
     Wallets.instance.initWalletBasicData();
     future = _checkIsContainWallet();
   }

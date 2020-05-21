@@ -21,5 +21,6 @@ class SharedPreferenceUtil {
     spUtil.setString(GlobalConfig.cashboxVersionKey, GlobalConfig.cashboxVersionValue);
     spUtil.setString(GlobalConfig.cashboxDownloadIpKey, GlobalConfig.cashboxDownloadIpValue);
     spUtil.setString(GlobalConfig.publicIpKey, GlobalConfig.publicIpValue);
+    spUtil.setBool(GlobalConfig.isInitAppConfig, true);
   }
 }

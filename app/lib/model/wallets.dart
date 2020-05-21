@@ -1,6 +1,7 @@
 import 'package:app/global_config/global_config.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/util/log_util.dart';
+import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 
@@ -30,6 +31,15 @@ class Wallets {
       _instance = new Wallets._internal();
     }
     return _instance;
+  }
+
+  initWalletBasicData() async {
+    var spUtil = await SharedPreferenceUtil.instance;
+    var isFinishInit = spUtil.getBool(GlobalConfig.isInitAppConfig);
+    if (!isFinishInit) {
+      SharedPreferenceUtil.initVersion(); //初始化 接口ip、版本信息等 到本地文件保存
+    }
+    WalletManager.initWalletBasicData(); //初始化数据库部分数据
   }
 
   // 创建助记词，待验证正确通过，由底层创建钱包完成，应用层做保存
@@ -65,10 +75,6 @@ class Wallets {
       LogUtil.e("isContainWallet=>", "error status is=>" + containWalletMap["status"].toString() + "||message is=>" + message.toString());
       return false;
     }
-  }
-
-  initWalletBasicData() {
-    WalletManager.initWalletBasicData();
   }
 
   // 导出所有钱包

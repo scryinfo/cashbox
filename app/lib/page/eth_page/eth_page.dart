@@ -87,6 +87,12 @@ class _EthPageState extends State<EthPage> {
     loadDigitBalance();
     loadLegalCurrency();
     //loadDigitRateInfo(); //todo
+    loadServeConfigInfo();
+  }
+
+  loadServeConfigInfo() {
+    //去服务器端拿回配置信息，对比进行检查等操作。
+    //todo  此处：1、检查是否需要进行应用 版本升级
   }
 
   loadLegalCurrency() async {
