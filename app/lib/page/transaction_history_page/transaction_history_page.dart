@@ -3,6 +3,7 @@ import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
+import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -159,7 +160,19 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             child: FlatButton(
               color: Color.fromRGBO(26, 141, 198, 0.2),
               onPressed: () {
-                NavigatorUtils.push(context, Routes.transferEthPage);
+                switch (Wallets.instance.nowWallet.nowChain.chainType) {
+                  case ChainType.ETH:
+                  case ChainType.ETH_TEST:
+                    NavigatorUtils.push(context, Routes.transferEthPage);
+                    break;
+                  case ChainType.EEE:
+                  case ChainType.EEE_TEST:
+                    NavigatorUtils.push(context, Routes.transferEeePage);
+                    break;
+                  default:
+                    NavigatorUtils.push(context, Routes.transferEthPage);
+                    break;
+                }
               },
               child: Text(
                 S.of(context).transfer,
