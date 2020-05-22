@@ -33,7 +33,7 @@ pub struct DefaultDigit {
     #[serde(rename = "fullName")]
     pub full_name: String,
     pub group_name: Option<String>,
-    pub decimal: i64,
+    pub decimal: String,//todo 修改为数字型
     #[serde(rename = "chainType")]
     pub chain_type:String,
     #[serde(rename = "urlImg")]
@@ -49,28 +49,31 @@ pub struct DefaultDigit {
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
 pub struct EthToken {
     pub id:String,
+    #[serde(rename = "contractAddress")]
     pub contract:String,
     #[serde(rename = "acceptId")]
-    pub accept_id:String,
+    pub accept_id:Option<String>,
     #[serde(rename = "chainType")]
     pub chain_type:String,
+    #[serde(rename = "shortName")]
     pub symbol:String,//简写名称
+    #[serde(rename = "fullName")]
     pub name:String,//完整的名称
-    pub publisher:String,
-    pub project:String,
-    #[serde(rename = "logoUrl")]
+    pub publisher:Option<String>,
+    pub project:Option<String>,
+    #[serde(rename = "urlImg")]
     pub logo_url:String,
     #[serde(rename = "logoBytes")]
-    pub logo_bytes:String,
-    pub decimal:i64,
+    pub logo_bytes:Option<String>,
+    pub decimal:String,
     #[serde(rename = "gasLimit")]
-    pub gas_limit:i64,
-    pub mark:String,
-    pub version:i64,
+    pub gas_limit:Option<i64>,
+    pub mark:Option<String>,
+    pub version:Option<i64>,
     #[serde(rename = "createTime")]
-    pub create_time:i64,
+    pub create_time:Option<i64>,
     #[serde(rename = "updateTime")]
-    pub update_time:i64,
+    pub update_time:Option<i64>,
 
 }
 

@@ -70,7 +70,6 @@ impl DataServiceProvider {
                         let convert_ret = chain_id_convert_group_name(addr.chain_id).unwrap();
                         log::debug!("type:{},group name:{}",convert_ret.0,convert_ret.1);
                         let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DefaultDigitBase where status =1 and is_visible =1 and chain_type={} and group_name = '{}';", addr.address_id, convert_ret.0, convert_ret.1);
-                       println!("insert DigitUseDetail {}",sql);
                         self.db_hander.execute(sql)?;
                     }
                     Ok(())

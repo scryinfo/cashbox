@@ -13,15 +13,15 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-       //  System.out.println(NativeLib.initWalletBasicData());
+        // System.out.println(NativeLib.initWalletBasicData());
        // updateDefaultDigitTest();
-       // walletGenerateTest();
+      //  walletGenerateTest();
        // walletExportTest();
-      //  updateAuthListTest();
+       //  updateAuthListTest();
       //  addNonAuthDigitTest();
       //  getAuthDigitListTest();
-      //  queryDigitTest();
-       //  addDigitTest();
+        //  queryDigitTest();
+         addDigitTest();
 
       //  eeeTransferTest();
        // eeeAccountInfoKeyTest();
@@ -40,53 +40,19 @@ public class NativeLibTest {
 
     public static void updateDefaultDigitTest(){
         String json = "[\n" +
-                "{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":18,\"chainType\":\"ETH\"},\n" +
-                "{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":18,\"chainType\":\"ETH_TEST\"}\n" +
+                "{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},\n" +
+                "{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"}\n" +
                 "]";
         NativeLib.WalletState state = NativeLib.updateDefaultDigitList(json);
         System.out.println(state);
     }
     public static void addNonAuthDigitTest(){
-        String json = "[{\n" +
-                "\t\"id\": \"\",\n" +
-                "\t\"symbol\": \"AAAA\",\n" +
-                "\t\"name\": \"scryinfo aaa\",\n" +
-                "\t\"publisher\": \"scryinfo\",\n" +
-                "\t\"project\": \"scryinfo\",\n" +
-                "\t\"logoUrl\": \"scry.info\",\n" +
-                "\t\"logoBytes\": \"aaa\",\n" +
-                "\t\"decimal\": 18,\n" +
-                "\t\"gasLimit\": 523654,\n" +
-                "\t\"contract\": \"0x5a895efacf987\",\n" +
-                "\t\"acceptId\": \"0x3aef987\",\n" +
-                "\t\"chainType\": \"ETH\",\n" +
-                "\t\"mark\": \"test\",\n" +
-                "\t\"updateTime\": 158748557,\n" +
-                "\t\"createTime\": 158965444,\n" +
-                "\t\"version\": 12\n" +
-                "}]";
+        String json = "[{\"contractAddress\":\"0xcc638fca332190b63be1605baefde1df0b3b026e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_token_pre_id_AAA\",\"decimal\":\"\",\"chainType\":\"ETH\"}]";
         NativeLib.WalletState state = NativeLib.addNonAuthDigit(json);
         System.out.println(state);
     }
     public static void updateAuthListTest(){
-        String json = "[{\n" +
-                "\t\"id\": \"eth_chain_ddd_test\",\n" +
-                "\t\"symbol\": \"DDD\",\n" +
-                "\t\"name\": \"scryinfo ddd\",\n" +
-                "\t\"publisher\": \"scryinfo\",\n" +
-                "\t\"project\": \"scryinfo\",\n" +
-                "\t\"logoUrl\": \"scry.info\",\n" +
-                "\t\"logoBytes\": \"DDD\",\n" +
-                "\t\"decimal\": 18,\n" +
-                "\t\"gasLimit\": 523654,\n" +
-                "\t\"contract\": \"0x2aef987\",\n" +
-                "\t\"acceptId\": \"0x3aef987\",\n" +
-                "\t\"chainType\": \"test\",\n" +
-                "\t\"mark\": \"test\",\n" +
-                "\t\"updateTime\": 158748557,\n" +
-                "\t\"createTime\": 158965444,\n" +
-                "\t\"version\": 12\n" +
-                "}]";
+        String json = "[{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"\",\"chainType\":\"ETH_TEST\"}]";
         NativeLib.WalletState state = NativeLib.updateAuthDigitList(json);
         System.out.println(state);
     }
@@ -100,7 +66,7 @@ public class NativeLibTest {
         System.out.println(list);
     }
     public static void  addDigitTest(){
-        NativeLib.WalletState state =  NativeLib.addDigit("1dc467b0-0a0b-423a-a304-30cbe1d30380",3,"c8339952-f70e-4626-b269-fdc8fcb06bf4");
+        NativeLib.WalletState state =  NativeLib.addDigit("fa85ced1-ec1b-4c2e-8e1f-e5cd4e1da4d2",3,"eth_token_pre_id_AAA");
         System.out.println(state);
     }
     public static  void  updateBalance(){

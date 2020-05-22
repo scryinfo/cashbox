@@ -60,7 +60,7 @@ pub fn update_default_digit(digits:Vec<model::DefaultDigit>) ->WalletResult<()>{
     let helper = wallet_db::DataServiceProvider::instance()?;
     helper.tx_begin()?;
     //当前采用全量更新手段，直接删除存在的代币,更新新的代币
-    match helper.update_default_digit(digits) {
+    match helper.update_default_digits(digits) {
         Ok(())=> helper.tx_commint(),
         Err(e)=> {
             helper.tx_rollback()?;

@@ -3,7 +3,7 @@
     "shortName": "EEE",
     "fullName": "EEE",
     "group_name": "EEE",
-    "decimal": 12,
+    "decimal": "12",
     "chainType": "default",
     "urlImg":"",
     "is_basic": true
@@ -12,7 +12,7 @@
     "shortName": "EEE Test",
     "fullName": "EEE Test",
     "group_name": "EEE",
-    "decimal": 12,
+    "decimal": "12",
     "chainType": "test",
     "urlImg":"",
     "is_basic": true
@@ -21,7 +21,7 @@
     "shortName": "ETH ",
     "fullName": "Ethereum",
     "group_name": "ETH",
-    "decimal": 18,
+    "decimal": "18",
     "chainType": "default",
     "is_basic": true
   },
@@ -29,7 +29,7 @@
     "shortName": "ETH Test",
     "fullName": "Ethereum Test",
     "group_name": "ETH",
-    "decimal": 18,
+    "decimal": "18",
     "chainType": "test",
     "is_basic": true
   },
@@ -37,7 +37,7 @@
     "shortName": "BTC",
     "fullName": "Bitcoin",
     "group_name": "BTC",
-    "decimal": 18,
+    "decimal": "18",
     "chainType": "default",
     "is_basic": true
   },
@@ -45,7 +45,7 @@
     "shortName": "BTC Test",
     "fullName": "Bitcoin Test",
     "group_name": "BTC",
-    "decimal": 18,
+    "decimal": "18",
     "chainType": "test",
     "is_basic": true
   }

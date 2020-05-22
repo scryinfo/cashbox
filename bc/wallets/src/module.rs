@@ -29,7 +29,7 @@ fn update_default_digit_test() {
     let digits =  serde_json::from_slice::<Vec<model::DefaultDigit>>(default.as_bytes()).unwrap();
     let helper = wallet_db::DataServiceProvider::instance().unwrap();
     helper.tx_begin();
-    let _result = match helper.update_default_digit(digits) {
+    let _result = match helper.update_default_digits(digits) {
         Ok(_) => {
             helper.tx_commint();
             println!("update default basic data is over!");

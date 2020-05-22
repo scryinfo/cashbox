@@ -47,10 +47,10 @@ impl DataServiceProvider {
             insert_basic_statement.bind(5,digit.short_name.as_str())?;
             insert_basic_statement.bind(6,digit.full_name.as_str())?;
             insert_basic_statement.bind(7,digit.img_url.unwrap_or("".to_string()).as_str())?;
-            insert_basic_statement.bind(8,digit.decimal)?;
-            insert_basic_statement.bind(9,digit.is_basic.unwrap_or(false) as i64)?;//设置状态，默认为显示
+            insert_basic_statement.bind(8,digit.decimal.as_str().parse::<i64>().unwrap_or(18))?;
+            insert_basic_statement.bind(9,digit.is_basic.unwrap_or(false) as i64)?;//最基础的代币（链上代币）
             insert_basic_statement.bind(10,digit.is_default.unwrap_or(true) as i64)?;//设置增加的代币 是否为默认代币
-            insert_basic_statement.bind(11,digit.status.unwrap_or(1))?;//最基础的代币（链上代币）
+            insert_basic_statement.bind(11,digit.status.unwrap_or(1))?;//是否显示等状态
             insert_basic_statement.next()?;
             insert_basic_statement.reset()?;
         }
@@ -67,14 +67,16 @@ impl DataServiceProvider {
     }
 
     /// 更新默认代币逻辑
-    /// 将原添加的默认代币状态更新为非默认代币的状态，开始更新代币
-    pub fn update_default_digit(&self, digits:Vec<model::DefaultDigit>) ->WalletResult<()>{
+    /// 将原添加的默认代币状态更新为非默认代币的状态，开始更新代币  这个接口用于批量的从外部导入数据
+    pub fn update_default_digits(&self, digits:Vec<model::DefaultDigit>) ->WalletResult<()>{
         //检查待添加的默认代币是否已经存在，若存在，
         //todo 精细化处理默认代币的情况，当前先使用简单粗暴的方式将已经添加的默认代币直接删除，再将新的代币插入数据库表
         let delete_sql = "delete from  detail.DefaultDigitBase where is_basic = 0 and is_default =1;";
         self.db_hander.execute(delete_sql)?;
         self.add_default_digits(digits)
     }
+
+
 
   pub fn update_digit_base(&self, digits:Vec<model::EthToken>, is_auth:bool) ->WalletResult<()>{
         //当更新的为认证代币时。需要删除原来已经存在的代币
@@ -95,7 +97,7 @@ impl DataServiceProvider {
             }
         }
 
-        let insert_sql = "insert into detail.DigitBase(id,chain_type,contract,accept_id,symbol,name,publisher,project,logo_url,logo_bytes,decimal,gas_limit,mark,version,CREATED_TIME,UPDATED_TIME,is_auth)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+        let insert_sql = "insert into detail.DigitBase(id,chain_type,contract,accept_id,symbol,name,publisher,project,logo_url,logo_bytes,decimal,gas_limit,is_auth)values(?,?,?,?,?,?,?,?,?,?,?,?,?);";
         let mut update_digit_statement = self.db_hander.prepare(insert_sql)?;
         // todo 检查代币之间的关系  新增的认证代币是否为已经存在的非认证代币？新增的非认证代币若为存在的认证代币则直接返回
         for digit in digits {
@@ -104,20 +106,16 @@ impl DataServiceProvider {
             update_digit_statement.bind(1,id.as_str())?;
             update_digit_statement.bind(2,self.chain_name_to_chain_number(digit.chain_type.as_str()))?;
             update_digit_statement.bind(3,digit.contract.as_str())?;
-            update_digit_statement.bind(4,digit.accept_id.as_str())?;
+            update_digit_statement.bind(4,digit.accept_id.unwrap_or("".to_string()).as_str())?;
             update_digit_statement.bind(5,digit.symbol.as_str())?;
             update_digit_statement.bind(6,digit.name.as_str())?;
-            update_digit_statement.bind(7,digit.publisher.as_str())?;
-            update_digit_statement.bind(8,digit.project.as_str())?;
+            update_digit_statement.bind(7,digit.publisher.unwrap_or("".to_string()).as_str())?;
+            update_digit_statement.bind(8,digit.project.unwrap_or("".to_string()).as_str())?;
             update_digit_statement.bind(9,digit.logo_url.as_str())?;
-            update_digit_statement.bind(10,digit.logo_bytes.as_str())?;//需要前端传过来的为bytes格式
-            update_digit_statement.bind(11,digit.decimal)?;
-            update_digit_statement.bind(12,digit.gas_limit)?;
-            update_digit_statement.bind(13,digit.mark.as_str())?;
-            update_digit_statement.bind(14,digit.version)?;
-            update_digit_statement.bind(15,digit.create_time)?;
-            update_digit_statement.bind(16,digit.update_time)?;
-            update_digit_statement.bind(17, is_auth as i64)?;
+            update_digit_statement.bind(10,digit.logo_bytes.unwrap_or("".to_string()).as_str())?;//需要前端传过来的为bytes格式
+            update_digit_statement.bind(11,digit.decimal.as_str().parse::<i64>().unwrap_or(18))?;
+            update_digit_statement.bind(12,digit.gas_limit.unwrap_or(0))?;
+            update_digit_statement.bind(13, is_auth as i64)?;
 
             update_digit_statement.next()?;
             update_digit_statement.reset()?;
@@ -141,14 +139,15 @@ impl DataServiceProvider {
                short_name: count_statement.read::<String>(2).unwrap(),
                full_name: count_statement.read::<String>(3).unwrap(),
                group_name: Some("ETH".to_string()),
-               decimal: count_statement.read::<i64>(5).unwrap(),
+               decimal: count_statement.read::<String>(5).unwrap(),
                chain_type: self.convert_chain_type(count_statement.read::<i64>(1).unwrap()),
                img_url: Some(count_statement.read::<String>(4).unwrap()),
                is_basic: None,
                is_default: Some(false),
                status: None
            };
-           self.update_default_digit(vec![new_default_digit])?;
+           //新增一条默认代币
+           self.add_default_digits(vec![new_default_digit])?;
        }
 
         //获取钱包对应的地址id,目前只支持以太坊代币
@@ -226,19 +225,19 @@ impl DataServiceProvider {
                 id: state.read::<String>(0).unwrap(),
                 chain_type: self.convert_chain_type(state.read::<i64>(1).unwrap()),
                 contract: state.read::<String>(2).unwrap(),
-                accept_id: state.read::<String>(3).unwrap(),
+                accept_id: state.read::<String>(3).ok(),
                 symbol: state.read::<String>(4).unwrap(),
                 name: state.read::<String>(5).unwrap(),
-                publisher: state.read::<String>(6).unwrap(),
-                project: state.read::<String>(7).unwrap(),
+                publisher: state.read::<String>(6).ok(),
+                project: state.read::<String>(7).ok(),
                 logo_url: state.read::<String>(8).unwrap(),
-                logo_bytes: state.read::<String>(9).unwrap(),
-                decimal: state.read::<i64>(10).unwrap(),
-                gas_limit: state.read::<i64>(11).unwrap(),
-                mark: state.read::<String>(12).unwrap(),
-                create_time: state.read::<i64>(16).unwrap(),
-                update_time: state.read::<i64>(17).unwrap(),
-                version: state.read::<i64>(18).unwrap(),
+                logo_bytes: state.read::<String>(9).ok(),
+                decimal: state.read::<String>(10).unwrap(),
+                gas_limit: state.read::<i64>(11).ok(),
+                mark: state.read::<String>(12).ok(),
+                create_time: state.read::<i64>(16).ok(),
+                update_time: state.read::<i64>(17).ok(),
+                version: state.read::<i64>(18).ok(),
             };
             auth_digits.push(row_data);
         }
