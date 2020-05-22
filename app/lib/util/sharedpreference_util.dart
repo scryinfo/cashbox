@@ -17,7 +17,7 @@ class SharedPreferenceUtil {
     spUtil.setString(GlobalConfig.rateDigitIpKey, GlobalConfig.rateDigitIpDefaultValue);
     spUtil.setString(GlobalConfig.authDigitsIpKey, GlobalConfig.authDigitsIpDefaultValue);
     spUtil.setString(GlobalConfig.defaultDigitsKey, GlobalConfig.defaultDigitsDefaultValue);
-    spUtil.setString(GlobalConfig.scryXkey, GlobalConfig.scryXDefaultValue);
+    spUtil.setString(GlobalConfig.scryXIpKey, GlobalConfig.scryXIpDefaultValue);
     spUtil.setString(GlobalConfig.cashboxVersionKey, GlobalConfig.cashboxVersionDefaultValue);
     spUtil.setString(GlobalConfig.cashboxDownloadIpKey, GlobalConfig.cashboxDownloadIpDefaultValue);
     spUtil.setString(GlobalConfig.publicIpKey, GlobalConfig.publicIpDefaultValue);

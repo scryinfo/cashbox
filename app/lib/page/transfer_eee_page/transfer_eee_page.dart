@@ -1,5 +1,6 @@
 import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -266,6 +267,18 @@ class _TransferEeePageState extends State<TransferEeePage> {
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
             String walletId = await Wallets.instance.getNowWalletId();
+            //todo 待测试
+            var eeeAccountMap = await Wallets.instance.eeeAccountInfoKey(chainAddress);
+            int status = eeeAccountMap["status"];
+            if (status == null || status != 200) {
+              print("net 获取eee参数失败 status" + eeeAccountMap["message"]);
+              return;
+            }
+            var accountKeyInfo = eeeAccountMap["accountKeyInfo"];
+            ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+            var storageData = await scryXNetUtil.loadScryXStorage(accountKeyInfo);
+            //todo 判断scryX链上返回的状态
+            Wallets.instance.decodeAccountInfo(storageData);
           },
         );
       },

@@ -37,8 +37,8 @@ class GlobalConfig {
   static String authDigitsIpDefaultValue = "http://40.73.35.55:8080/inner_api/token/erc20/authlist";
   static String defaultDigitsKey = "default_digit_list_key";
   static String defaultDigitsDefaultValue = "http://40.73.35.55:8080/inner_api/token/erc20/defaultlist";
-  static String scryXkey = "scry_x_key";
-  static String scryXDefaultValue = "ws://40.73.75.224:9933";
+  static String scryXIpKey = "scry_x_key";
+  static String scryXIpDefaultValue = "ws://40.73.75.224:9933";
   static String cashboxVersionKey = "cashbox_version_key";
   static String cashboxVersionDefaultValue = "1.0.0";
   static String cashboxDownloadIpKey = "cashbox_download_ip_key";
