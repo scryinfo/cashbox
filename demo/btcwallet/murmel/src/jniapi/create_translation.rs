@@ -83,7 +83,7 @@ pub fn create_translation(value: u64, target: &str, master: &mut MasterAccount, 
     master.sign(&mut spending_transaction, SigHashType::All,
                 &(|_| Some(
                     TxOut {
-                        value: 21000,
+                        value: 22000,
                         script_pubkey: source.script_pubkey(),
                     }
                 )),
@@ -114,7 +114,22 @@ pub fn hash160(public_key: &str) -> String {
 //     message_obj.into_inner()
 // }
 
-// calculate tx fee
+#[no_mangle]
+pub extern "system" fn Java_JniApi_creat_1master(env: JNIEnv, _: JClass, mnemonic_str: JString) -> jobject {
+    let mnemonic_str = env.get_string(mnemonic_str).unwrap().to_str().unwrap();
+    let mut master = create_master_by_mnemonic(
+        words,
+        Network::Testnet
+    );
+    add_account(&mut master, (0, 0));
+    let tx = create_translation(
+        21000,
+        "n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk",
+        &mut master,
+        (0, 0),
+    );
+
+}
 
 
 mod test {
