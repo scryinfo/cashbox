@@ -5,6 +5,7 @@ import 'package:app/page/digits_manage_page/digits_manage_page.dart';
 import 'package:app/page/digits_manage_page/search_digit_page.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/sign_tx_page/sign_tx_page.dart';
+import 'package:app/page/transfer_eee_page/transfer_eee_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
@@ -90,6 +91,10 @@ Handler importWalletPageHandler = Handler(handlerFunc: (BuildContext context, Ma
 
 Handler transferEthPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return TransferEthPage();
+});
+
+Handler transferEeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return TransferEeePage();
 });
 
 Handler minePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
