@@ -44,24 +44,41 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   initData() async {
     addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1、可见代币显示在前面 isVisible = true;
     addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
-    print("initData displayDigitsList.length====>" + displayDigitsList.length.toString());
+    print("initData() displayDigitsList.length====>" + displayDigitsList.length.toString());
     {
-      // var spUtil = await SharedPreferenceUtil.instance;
-      // var localAuthDigitListVersion = spUtil.getString(GlobalConfig.authDigitListKey);
-      // var authDigitListVersion = Provider.of<ServerConfigProvide>(context).authDigitListVersion;
-      // if (double.parse(localAuthDigitListVersion) > double.parse(authDigitListVersion)) {
-      //   //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表
-      //   //todo 替换 ======> 2、本地已有代币列表
-      //   String authDigitListUrl = spUtil.getString(GlobalConfig.authDigitListKey);
-      //   await updateNativeDigitListVersion(loadServerDigitListData(authDigitListUrl)); //服务器可信任代币列表
-      // }
-      // String authDigitListUrl = spUtil.getString(GlobalConfig.authDigitListKey);
-      // var serverResult = await loadServerDigitListData(authDigitListUrl);
-      // print("serverResult===>" + serverResult.toString());
-      // await updateNativeDigitListVersion(serverResult.toString()); //服务器可信任代币列表
-      //var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
-
-      //addToDisplayDigitsList(tempNativeAuthDigitsList);
+      var spUtil = await SharedPreferenceUtil.instance;
+      var localDigitsVersion = spUtil.getString(GlobalConfig.authDigitsVersionKey);
+      var serverDigitsVersion = Provider.of<ServerConfigProvide>(context).authDigitListVersion;
+      var serverDigitsIp = Provider.of<ServerConfigProvide>(context).authDigitListIp;
+      var localDigitListIP = spUtil.getString(GlobalConfig.authDigitsIpKey);
+      if (localDigitsVersion == null || localDigitsVersion == "") {
+        //本地没有认证代币版本号，没加载过
+        if (serverDigitsIp != null && serverDigitsIp != "") {
+          var param = await loadServerDigitsData(serverDigitsIp);
+          await updateNativeAuthDigitList(param); //保存代币：服务器可信任代币列表ip
+        } else {
+          var param = await loadServerDigitsData(localDigitListIP);
+          await updateNativeAuthDigitList(param); //保存代币：本地初始记录的代币列表ip
+        }
+        spUtil.setString(GlobalConfig.authDigitsVersionKey, serverDigitsVersion); //保存server端，拿到的版本号Version
+      } else {
+        //本地有版本号，检查更新,且有服务端版本号信息
+        if (serverDigitsVersion != null && serverDigitsVersion != "") {
+          if (double.parse(localDigitsVersion) < double.parse(serverDigitsVersion)) {
+            //server端有新版本出现
+            //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表
+            //todo 替换 ======> 2、本地已有代币列表
+            if (serverDigitsIp != null && serverDigitsIp != "") {
+              //有服务端代币ip地址
+              var param = await loadServerDigitsData(serverDigitsIp);
+              await updateNativeAuthDigitList(param); //保存代币：服务器可信任代币列表ip
+              spUtil.setString(GlobalConfig.authDigitsVersionKey, serverDigitsVersion); //保存server端，拿到的版本号
+            }
+          }
+        }
+      }
+      var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
+      addToDisplayDigitsList(tempNativeAuthDigitsList);
     }
     setState(() {
       this.displayDigitsList = displayDigitsList;
@@ -257,19 +274,20 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     );
   }
 
-  loadServerDigitListData(String authUrl) async {
+  Future<String> loadServerDigitsData(String authUrl) async {
     if (authUrl == null || authUrl.isEmpty) {
-      print("loadServerDigitListData authUrl is null===>");
+      print("loadServerDigitsData authUrl is null===>");
       return "";
     }
     var result = await request(authUrl);
     if (result["code"] != null && result["code"] == 0) {
-      return result["data"];
+      print("loadServerDigitsData result.code=>" + result["data"].toString());
+      return result["data"].toString();
     }
     return "";
   }
 
-  updateNativeDigitListVersion(String param) async {
+  updateNativeAuthDigitList(String param) async {
     if (param == null || param.isEmpty || (param.trim() == "")) {
       print("param is empty======>" + param);
       return;

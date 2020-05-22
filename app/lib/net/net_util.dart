@@ -15,6 +15,7 @@ Future request(String url, {formData}) async {
     }
     // print("response===>" + response.toString());
     if (response.statusCode == 200) {
+      print("net 访问返回数据结果是：" + response.data.toString());
       return response.data;
     } else {
       print("后端接口出现异常，请检测代码和服务器情况.........");

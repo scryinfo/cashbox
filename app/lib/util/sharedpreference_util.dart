@@ -15,8 +15,8 @@ class SharedPreferenceUtil {
   static initVersion() async {
     var spUtil = await SharedPreferenceUtil.instance;
     spUtil.setString(GlobalConfig.rateDigitIpKey, GlobalConfig.rateDigitIpDefaultValue);
-    spUtil.setString(GlobalConfig.authDigitListKey, GlobalConfig.authDigitListDefaultValue);
-    spUtil.setString(GlobalConfig.defaultDigitListKey, GlobalConfig.defaultDigitListDefaultValue);
+    spUtil.setString(GlobalConfig.authDigitsIpKey, GlobalConfig.authDigitsIpDefaultValue);
+    spUtil.setString(GlobalConfig.defaultDigitsKey, GlobalConfig.defaultDigitsDefaultValue);
     spUtil.setString(GlobalConfig.scryXkey, GlobalConfig.scryXDefaultValue);
     spUtil.setString(GlobalConfig.cashboxVersionKey, GlobalConfig.cashboxVersionDefaultValue);
     spUtil.setString(GlobalConfig.cashboxDownloadIpKey, GlobalConfig.cashboxDownloadIpDefaultValue);

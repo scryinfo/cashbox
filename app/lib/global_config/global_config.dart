@@ -32,10 +32,11 @@ class GlobalConfig {
   static String isInitAppConfig = "is_init_app_config_key";
   static String rateDigitIpKey = "rate_digit_ip_key";
   static String rateDigitIpDefaultValue = "http://40.73.35.55:8080/inner_api/market/pricerate";
-  static String authDigitListKey = "auth_digit_list_key";
-  static String authDigitListDefaultValue = "http://40.73.35.55:8080/inner_api/token/erc20/authlist";
-  static String defaultDigitListKey = "default_digit_list_key";
-  static String defaultDigitListDefaultValue = "http://40.73.35.55:8080/inner_api/token/erc20/defaultlist";
+  static String authDigitsVersionKey = "auth_digit_list_version_key";
+  static String authDigitsIpKey = "auth_digit_list_key";
+  static String authDigitsIpDefaultValue = "http://40.73.35.55:8080/inner_api/token/erc20/authlist";
+  static String defaultDigitsKey = "default_digit_list_key";
+  static String defaultDigitsDefaultValue = "http://40.73.35.55:8080/inner_api/token/erc20/defaultlist";
   static String scryXkey = "scry_x_key";
   static String scryXDefaultValue = "ws://40.73.75.224:9933";
   static String cashboxVersionKey = "cashbox_version_key";
