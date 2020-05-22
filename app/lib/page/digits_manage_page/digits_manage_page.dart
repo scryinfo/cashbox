@@ -206,11 +206,31 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                 if (displayDigitsList[index].isVisible) {
                   isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.hideDigit(displayDigitsList[index]);
                 } else {
-                  isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
-                  //todo 确认要保存到本地digit模型中
-                  Wallets.instance.nowWallet.nowChain.addDigit(Wallets.instance.nowWallet.walletId, displayDigitsList[index]);
+                  //不可见，执行可见show操作
+                  bool isDigitExist = false;
+                  Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
+                    if (element.digitId == displayDigitsList[index].digitId) {
+                      isDigitExist = true;
+                    }
+                  });
+                  if (isDigitExist) {
+                    isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
+                  } else {
+                    // todo 保存 或者 更改显示状态 接口功能待验证
+                    // 保存到本地Chain下的digit中 （底层 + model）
+                    var addDigitMap = await Wallets.instance.addDigitToChainModel(
+                        Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
+                    int status = addDigitMap["status"];
+                    if (status == null || status != 200) {
+                      Fluttertoast.showToast(msg: "执行状态保存，出问题了,请重新尝试");
+                      print("addDigitToChainModel failure==" + addDigitMap["message"]);
+                    } else {
+                      isExecutorSuccess = true;
+                    }
+                  }
                 }
                 if (isExecutorSuccess) {
+                  //底层执行成功，上层刷新 显示数据
                   Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
                     if (element.shortName == displayDigitsList[index].shortName) {
                       element.isVisible = displayDigitsList[index].isVisible;

@@ -186,15 +186,20 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
             right: ScreenUtil().setWidth(3),
           ),
           child: GestureDetector(
-            onTap: () {
+            onTap: () async {
               try {
                 // todo 保存 或者 更改显示状态 接口功能待验证
-                //
-                Wallets.instance.addDigitToChainModel(Wallets.instance.nowWallet.walletId,
-                    Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), displayDigitsList[index].digitId);
-                setState(() {
-                  displayDigitsList[index].isVisible = true;
-                });
+                var addDigitMap = await Wallets.instance
+                    .addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
+                int status = addDigitMap["status"];
+                if (status != null && status == 200) {
+                  setState(() {
+                    displayDigitsList[index].isVisible = true;
+                  });
+                } else {
+                  print("addDigitToChainModel appear error:" + addDigitMap["message"]);
+                  return;
+                }
               } catch (e) {
                 print("digit_list_page点击传值出现位置错误===>" + e.toString());
                 LogUtil.e("digit_list_page", e.toString());

@@ -350,17 +350,25 @@ class Wallets {
   //
   eeeAccountInfoKey(String address) async {
     Map eeeAccountMap = await WalletManager.eeeAccountInfoKey(address);
+    return eeeAccountMap;
   }
 
   //
   decodeAccountInfo(String encodeData) async {
     Map eeeAccountMap = await WalletManager.decodeAccountInfo(encodeData);
+    return eeeAccountMap;
   }
 
   //在 当前钱包、当前链下，增加新代币的数据模型
-  addDigitToChainModel(String walletId, int chainType, String digitId) async {
-    Map addDigitModelMap = await WalletManager.addDigitToChainModel(walletId, chainType, digitId);
-    //todo if（status ==200） 在digitList增加这个代币mode
+  addDigitToChainModel(String walletId, Chain chain, String digitId) async {
+    Map addDigitModelMap =
+        await WalletManager.addDigitToChainModel(walletId, Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), digitId);
+    int status = addDigitModelMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("addDigitModelMap=>", "error status code is" + status.toString() + "||message is=>" + addDigitModelMap["message"].toString());
+    } else {
+      Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //在digitList增加这个代币model,重新加载
+    }
     return addDigitModelMap;
   }
 

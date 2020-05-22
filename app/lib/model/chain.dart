@@ -130,40 +130,6 @@ abstract class Chain {
     }
     return false;
   }
-
-  // 添加代币 todo 2.0 待确定数据格式
-  Future<bool> addDigit(String walletId, Digit digit) async {
-    Map addDigitMap = await WalletManager.addDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
-    int status = addDigitMap["status"];
-    bool isAddDigit = addDigitMap["isAddDigit"];
-    if (status == 200) {
-      if (isAddDigit) {
-        digitsList.add(digit);
-        return isAddDigit;
-      }
-    }
-    return false;
-  }
-
-  // 添加代币list todo 2.0 待确定数据格式
-  Future<bool> addDigitList(List<Digit> digitList) async {
-    //todo db操作 原子性
-    var isSuccess = await WalletManager.addDigitList(digitList);
-    if (isSuccess) {
-      digitsList.addAll(digitList);
-    }
-    return isSuccess;
-  }
-
-  // 删除代币 todo 2.0 待确定数据格式
-  Future<bool> deleteDigit(digit) async {
-    //todo db操作 原子性
-    var isSuccess = await WalletManager.deleteDigit(digit);
-    if (isSuccess) {
-      digitsList.remove(digit);
-    }
-    return isSuccess;
-  }
 }
 
 class ChainETH extends Chain {}
