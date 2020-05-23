@@ -21,9 +21,9 @@ class GlobalConfig {
   static bool isDebugVersion = true; //全局开关，控制是否用 测试链
 
   static String savedLocaleKey = "savedLocaleKey"; //默认语言中文；
-  static String defaultLocaleKey = "zh"; //默认语言中文；
+  static String defaultLocaleValue = "zh"; //默认语言中文；
   static String zhLocale = "zh"; //
-  static String enLocale = "en"; //
+  static String enLocale = "en_US"; //
 
   //static String ipAddress = "ws://47.108.146.67:9933";
   static String ipAddress = "ws://40.73.75.224:9933";

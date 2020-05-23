@@ -18,6 +18,7 @@ import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
 import 'package:app/page/eth_page/eth_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'dapp_page/dapp_page.dart';
@@ -44,7 +45,7 @@ class _EntryPageState extends State<EntryPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    initWalletBasicData(); //case : 删除钱包后，没钱包，回到entryPage
+    initWalletBasicData(); //case : 删除钱包后，没钱包，回到entryPage，每次检查一下
   }
 
   void initWalletBasicData() async {
@@ -64,7 +65,8 @@ class _EntryPageState extends State<EntryPage> {
 
   Future<bool> _checkIsContainWallet() async {
     var spUtil = await SharedPreferenceUtil.instance;
-    languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)] ?? languageMap[GlobalConfig.zhLocale];
+    print("initData  _checkIsContainWallet GlobalConfig.savedLocaleKey===>" + spUtil.getString(GlobalConfig.savedLocaleKey));
+    languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
     isContainWallet = await Wallets.instance.isContainWallet();
     return isContainWallet;
   }
@@ -83,7 +85,7 @@ class _EntryPageState extends State<EntryPage> {
               LogUtil.e("entryPage future snapshot.hasError is +>", snapshot.error.toString());
               return Center(
                 child: Text(
-                  S.of(context).wallet_load_error,
+                  translate('wallet_load_error'),
                   style: TextStyle(color: Colors.white70),
                 ),
               );
@@ -158,10 +160,10 @@ class _EntryPageState extends State<EntryPage> {
               setState(() {
                 this.languageTextValue = languageMap[value];
               });
+              print("changeLocale===>" + value);
+              changeLocale(context, value);
               var spUtil = await SharedPreferenceUtil.instance;
               spUtil.setString(GlobalConfig.savedLocaleKey, value);
-              Provider.of<WalletManagerProvide>(context).setLocale(value);
-              RestartWidget.restartApp(context);
             },
           )
         ],
@@ -198,7 +200,7 @@ class _EntryPageState extends State<EntryPage> {
       child: GestureDetector(
         onTap: () {
           if (!_agreeServiceProtocol) {
-            Fluttertoast.showToast(msg: S.of(context).make_sure_service_protocol);
+            Fluttertoast.showToast(msg: translate('make_sure_service_protocol'));
             return;
           }
           NavigatorUtils.push(context, Routes.createWalletNamePage);
@@ -211,7 +213,7 @@ class _EntryPageState extends State<EntryPage> {
             ),
             Gaps.scaleHGap(2.5),
             Text(
-              S.of(context).add_wallet,
+              translate('add_wallet'),
               style:
                   TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
             ),
@@ -226,7 +228,7 @@ class _EntryPageState extends State<EntryPage> {
       child: GestureDetector(
         onTap: () {
           if (!_agreeServiceProtocol) {
-            Fluttertoast.showToast(msg: S.of(context).make_sure_service_protocol);
+            Fluttertoast.showToast(msg: translate('make_sure_service_protocol'));
             return;
           }
           NavigatorUtils.push(context, Routes.importWalletPage);
@@ -239,7 +241,7 @@ class _EntryPageState extends State<EntryPage> {
             ),
             Gaps.scaleHGap(2.5),
             Text(
-              S.of(context).import_wallet,
+              translate('import_wallet'),
               style:
                   TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
             ),
@@ -272,12 +274,12 @@ class _EntryPageState extends State<EntryPage> {
               child: RichText(
                 text: TextSpan(children: <TextSpan>[
                   TextSpan(
-                    text: S.of(context).agree_service_prefix,
+                    text: translate('agree_service_prefix'),
                     style: TextStyle(
                         decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
-                      text: S.of(context).service_protocol_tag,
+                      text: translate('service_protocol_tag'),
                       style: TextStyle(
                           decoration: TextDecoration.underline,
                           color: Colors.white70,
@@ -293,7 +295,7 @@ class _EntryPageState extends State<EntryPage> {
                         decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
-                      text: S.of(context).privacy_protocol_tag,
+                      text: translate('privacy_protocol_tag'),
                       style: TextStyle(
                           decoration: TextDecoration.underline,
                           color: Colors.white70,

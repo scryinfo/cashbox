@@ -11,6 +11,7 @@ import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import 'global_config/global_config.dart';
 import 'page/entry_page.dart';
@@ -20,14 +21,18 @@ import 'routers/routers.dart';
 import 'routers/application.dart';
 import 'package:flutter/rendering.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized(); //确保WidgetsFlutterBinding被初始化 把widget跟flutter绑定在一起。
   //  debugPaintLayerBordersEnabled=true; //测试样式边界用
   //  debugPaintBaselinesEnabled=true;
   ///强制竖屏
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-  runApp(MyApp());
+  var delegate =
+      await LocalizationDelegate.create(fallbackLocale: GlobalConfig.enLocale, supportedLocales: [GlobalConfig.enLocale, GlobalConfig.zhLocale]);
+
+  runApp(LocalizedApp(delegate, MyApp()));
+
   if (Platform.isAndroid) {
     /*以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，是为了在渲染后进行set赋值，
     覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。*/
@@ -42,8 +47,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
-  var savedLocale = GlobalConfig.defaultLocaleKey;
-
   _MyApp() {
     final router = Router();
     Routes.configureRoutes(router);
@@ -51,21 +54,26 @@ class _MyApp extends State<MyApp> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     initData();
   }
 
   initData() async {
     var spUtil = await SharedPreferenceUtil.instance;
-    savedLocale = spUtil.getString(GlobalConfig.savedLocaleKey) ?? GlobalConfig.defaultLocaleKey;
-    setState(() {
-      this.savedLocale = savedLocale;
-    });
+    var savedLocale = spUtil.getString(GlobalConfig.savedLocaleKey);
+    if (savedLocale == null || savedLocale == "") {
+      savedLocale = GlobalConfig.defaultLocaleValue;
+      spUtil.setString(GlobalConfig.savedLocaleKey, savedLocale);
+    }
+    print("initData  savedLocale-===>" + savedLocale);
+    changeLocale(context, savedLocale);
   }
 
   @override
   Widget build(BuildContext context) {
+    var localizationDelegate = LocalizedApp.of(context).delegate;
+
     return MultiProvider(
       providers: [
         /// 注册数据状态管理
@@ -95,24 +103,13 @@ class _MyApp extends State<MyApp> {
             image: AssetImage("assets/images/bg_graduate.png"),
           ),
         ),
-        child: RestartWidget(
-          childWidget: MaterialApp(
-            localizationsDelegates: const [
-              S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-            ],
-            supportedLocales: S.delegate.supportedLocales,
-            home: Builder(
-              builder: (BuildContext context) {
-                var tempLocale = Provider.of<WalletManagerProvide>(context).locale;
-                return Localizations.override(
-                  context: context,
-                  locale: (tempLocale == "" || tempLocale == null) ? Locale(savedLocale, '') : GlobalConfig.loadLocale(tempLocale),
-                  child: EntryPage(),
-                );
-              },
-            ),
+        child: LocalizationProvider(
+          state: LocalizationProvider.of(context).state,
+          child: MaterialApp(
+            localizationsDelegates: [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, localizationDelegate],
+            supportedLocales: localizationDelegate.supportedLocales,
+            locale: localizationDelegate.currentLocale,
+            home: EntryPage(),
             onGenerateRoute: Application.router.generator,
           ),
         ),
