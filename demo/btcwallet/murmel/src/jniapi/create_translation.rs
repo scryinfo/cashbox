@@ -5,7 +5,7 @@ use bitcoin_wallet::mnemonic::Mnemonic;
 use bitcoin::{Network, PublicKey, Address, Transaction, TxIn, OutPoint, Script, TxOut, SigHashType};
 use jni::JNIEnv;
 use jni::objects::{JClass, JString, JValue, JObject};
-use jni::sys::jobject;
+use jni::sys::{jobject, jdouble};
 use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::hash160;
@@ -14,22 +14,22 @@ use std::str::FromStr;
 use bitcoin::blockdata::script::Builder;
 use bitcoin::blockdata::opcodes;
 use bitcoin_hashes::sha256d;
+use bitcoin_wallet::error::Error;
 
 
 const PASSPHRASE: &str = "";
 const RBF: u32 = 0xffffffff - 2;
 
 // mnemonic words
-pub fn create_master_by_mnemonic(mnemonic_str: &str, network: Network) -> MasterAccount {
+pub fn create_master_by_mnemonic(mnemonic_str: &str, network: Network) -> Result<MasterAccount, Error> {
     let mnemonic = Mnemonic::from_str(mnemonic_str).expect("don't have right mnemonic");
-    let master = MasterAccount::from_mnemonic(
+    MasterAccount::from_mnemonic(
         &mnemonic,
         0,
         network,
         PASSPHRASE,
         None,
-    ).expect("Did not create master correctly");
-    master
+    )
 }
 
 // add account to master
@@ -115,20 +115,37 @@ pub fn hash160(public_key: &str) -> String {
 // }
 
 #[no_mangle]
-pub extern "system" fn Java_JniApi_creat_1master(env: JNIEnv, _: JClass, mnemonic_str: JString) -> jobject {
-    let mnemonic_str = env.get_string(mnemonic_str).unwrap().to_str().unwrap();
-    let mut master = create_master_by_mnemonic(
-        words,
-        Network::Testnet
-    );
-    add_account(&mut master, (0, 0));
-    let tx = create_translation(
-        21000,
-        "n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk",
-        &mut master,
-        (0, 0),
+#[allow(non_snake_case)]
+pub extern "system" fn Java_JniApi_creat_1transaction(env: JNIEnv, _: JClass, mnemonic_str: JString, value: jdouble) -> jobject {
+    let mnemonic_str = env.get_string(mnemonic_str).unwrap();
+    let mnemonic_str = mnemonic_str.to_str().unwrap();
+    let master = create_master_by_mnemonic(
+        mnemonic_str,
+        Network::Testnet,
     );
 
+    let message_class = env.find_class("JniApi$StatusMessage").expect("can't find class JniApi$StatusCode");
+    let message_obj = env.alloc_object(message_class).expect("create message instance error");
+    match master.unwrap() {
+        ref mut master => {
+            add_account(master, (0, 0));
+            let tx = create_translation(
+                value as u64,
+                "n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk",
+                master,
+                (0, 0),
+            );
+            println!("tx {:#?}", tx);
+            env.set_field(message_obj, "code", "I", JValue::Int(200)).expect("set code error");
+            env.set_field(message_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("Build Transaction success".to_string()).unwrap()))).expect("set error msg value is error!");
+        }
+        _ => {
+            env.set_field(message_obj, "code", "I", JValue::Int(102)).expect("set code error");
+            env.set_field(message_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("Build Transaction failure".to_string()).unwrap()))).expect("set error msg value is error!");
+        }
+    }
+
+    message_obj.into_inner()
 }
 
 
@@ -142,16 +159,18 @@ mod test {
     #[test]
     pub fn tx() {
         let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
-        let mut master = create_master_by_mnemonic(
+        let  master = create_master_by_mnemonic(
             words,
-            Network::Testnet);
-        add_account(&mut master, (0, 0));
-        let tx = create_translation(
-            21000,
-            "n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk",
-            &mut master,
-            (0, 0),
+            Network::Testnet,
         );
-        println!("tx {:#?}", tx);
+
+        add_account(&mut master.unwrap(), (0, 0));
+        // let tx = create_translation(
+        //     21000,
+        //     "n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk",
+        //      &mut master.unwrap(),
+        //     (0, 0),
+        // );
+        // println!("tx {:#?}", tx);
     }
 }
