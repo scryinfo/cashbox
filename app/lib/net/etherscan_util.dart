@@ -5,6 +5,7 @@ import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/util/utils.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'net_util.dart';
 
 const Eth_Tx_Account = "http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
@@ -186,9 +187,9 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
           ethTxModel.value = "+" + (int.parse(res["result"][i]["value"]) / Eth_Unit).toString();
         }
         if (res["result"][i]["isError"] == "0") {
-          ethTxModel.isError = S.of(context).tx_success.toString();
+          ethTxModel.isError = translate('tx_success').toString();
         } else {
-          ethTxModel.isError = S.of(context).tx_failure.toString();
+          ethTxModel.isError = translate('tx_failure').toString();
         }
         modelArray.add(ethTxModel);
       }
@@ -264,7 +265,7 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, Strin
         }
         // ..isError = res["result"][i]["isError"]
         // 当前接口，erc20代币拿到的都会是交易成功的记录
-        ethTxModel.isError = S.of(context).tx_success.toString();
+        ethTxModel.isError = translate('tx_success').toString();
         modelArray.add(ethTxModel);
       }
     }

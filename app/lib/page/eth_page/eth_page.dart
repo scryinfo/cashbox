@@ -23,6 +23,7 @@ import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
@@ -288,7 +289,7 @@ class _EthPageState extends State<EthPage> {
             color: Color.fromRGBO(26, 141, 198, 0.40),
             child: FlatButton(
               child: Text(
-                S.of(context).digit_manage,
+                translate('digit_manage'),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.blue,
@@ -319,7 +320,7 @@ class _EthPageState extends State<EthPage> {
             LogUtil.e("digitList future snapshot.hasError is +>", snapshot.error.toString());
             return Center(
               child: Text(
-                S.of(context).failure_to_load_data_pls_retry,
+                translate('failure_to_load_data_pls_retry'),
                 style: TextStyle(color: Colors.white70),
               ),
             );
@@ -333,7 +334,7 @@ class _EthPageState extends State<EthPage> {
             return Container(
               alignment: Alignment.center,
               child: Text(
-                S.of(context).digit_info_null.toString(),
+                translate('digit_info_null').toString(),
                 style: TextStyle(color: Colors.white70),
               ),
             );
@@ -370,7 +371,7 @@ class _EthPageState extends State<EthPage> {
                 // 下拉刷新的时候，加载新digit到displayDigitsList
                 loadDisplayDigitListData();
               } else {
-                Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
+                Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
                 return;
               }
             });
@@ -542,7 +543,7 @@ class _EthPageState extends State<EthPage> {
                     child: Image.asset("assets/images/ic_transfer.png"),
                   ),
                   Text(
-                    S.of(context).transfer,
+                    translate('transfer'),
                     style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
                   )
                 ],
@@ -564,14 +565,14 @@ class _EthPageState extends State<EthPage> {
                   Padding(
                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
                       child: Text(
-                        S.of(context).receive,
+                        translate('receive'),
                         style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
                       )),
                 ],
               ),
             ),
             onTap: () {
-              _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, Wallets.instance.nowWallet.nowChain.chainAddress);
+              _navigatorToQrInfoPage(walletName, translate('chain_address_info'), Wallets.instance.nowWallet.nowChain.chainAddress);
             },
           )
         ],
@@ -588,7 +589,7 @@ class _EthPageState extends State<EthPage> {
           future: digitListFuture,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Text(S.of(context).load_data_error);
+              return Text(translate('load_data_error'));
             }
             if (snapshot.hasData) {
               print("Wallets.instance.nowWallet.chainList.length snapshot.hasData===>" + Wallets.instance.nowWallet.chainList.length.toString());
@@ -730,7 +731,7 @@ class _EthPageState extends State<EthPage> {
                 if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, Wallets.instance.nowWallet.nowChain.chainAddress);
+                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), Wallets.instance.nowWallet.nowChain.chainAddress);
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
@@ -746,7 +747,7 @@ class _EthPageState extends State<EthPage> {
                 if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, Wallets.instance.nowWallet.nowChain.chainAddress);
+                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), Wallets.instance.nowWallet.nowChain.chainAddress);
               },
               child: Text(
                 Wallets.instance.nowWallet.nowChain.chainAddress,

@@ -8,6 +8,7 @@ import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/util/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
@@ -64,7 +65,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).wallet_manager,
+          centerTitle: translate('wallet_manager'),
           backgroundColor: Colors.transparent,
         ),
         body: GestureDetector(
@@ -104,7 +105,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
             width: ScreenUtil().setWidth(80),
             padding: EdgeInsets.only(left: ScreenUtil().setWidth(3)),
             child: Text(
-              S.of(context).wallet_name,
+              translate('wallet_name'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 1),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -168,23 +169,23 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                         }
                         bool isRenameSuccess = await chooseWallet.rename(_walletNameController.text);
                         if (isRenameSuccess) {
-                          Fluttertoast.showToast(msg: S.of(context).success_change_wallet_name.toString());
+                          Fluttertoast.showToast(msg: translate('success_change_wallet_name').toString());
                           setState(() {
                             isNameEditable = false;
                             walletName = _walletNameController.text;
                           });
                         } else {
-                          Fluttertoast.showToast(msg: S.of(context).failure_change_wallet_name.toString());
+                          Fluttertoast.showToast(msg: translate('failure_change_wallet_name').toString());
                         }
                       },
                       color: Colors.white30,
                       child: isNameEditable
                           ? Text(
-                              S.of(context).confirm,
+                              translate('confirm'),
                               style: TextStyle(color: Colors.white70, fontSize: 15),
                             )
                           : Text(
-                              S.of(context).compile_wallet_name,
+                              translate('compile_wallet_name'),
                               style: TextStyle(color: Colors.white70, fontSize: 15),
                             ),
                     ),
@@ -210,7 +211,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               Gaps.scaleVGap(5),
               Container(
                 child: ItemOfListWidget(
-                  leftText: S.of(context).reset_pwd,
+                  leftText: translate('reset_pwd'),
                 ),
               ),
             ],
@@ -232,7 +233,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               Gaps.scaleVGap(5),
               Container(
                 child: ItemOfListWidget(
-                  leftText: S.of(context).recover_wallet,
+                  leftText: translate('recover_wallet'),
                 ),
               ),
             ],
@@ -252,7 +253,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           Gaps.scaleVGap(5),
           Container(
             child: ItemOfListWidget(
-              leftText: S.of(context).delete_wallet,
+              leftText: translate('delete_wallet'),
             ),
           ),
         ],
@@ -265,20 +266,20 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
       context: context,
       builder: (BuildContext context) {
         return PwdDialog(
-          title: S.of(context).delete_wallet,
-          hintContent: S.of(context).delete_wallet_hint,
-          hintInput: S.of(context).pls_input_wallet_pwd,
+          title: translate('delete_wallet'),
+          hintContent: translate('delete_wallet_hint'),
+          hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
             Map deleteMap = await Wallets.instance.deleteWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
             print("to do verify pwd,delete wallet");
             int status = deleteMap["status"];
             bool isSuccess = deleteMap["isDeletWallet"];
             if (status == 200 && isSuccess) {
-              Fluttertoast.showToast(msg: S.of(context).success_in_delete_wallet);
+              Fluttertoast.showToast(msg: translate('success_in_delete_wallet'));
               NavigatorUtils.push(context, Routes.entryPage, clearStack: true);
             } else {
               LogUtil.e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
-              Fluttertoast.showToast(msg: S.of(context).wrong_pwd_failure_in_delete_wallet);
+              Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_delete_wallet'));
             }
           },
         );
@@ -291,9 +292,9 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
       context: context,
       builder: (BuildContext context) {
         return PwdDialog(
-          title: S.of(context).recover_wallet,
-          hintContent: S.of(context).recover_wallet_hint,
-          hintInput: S.of(context).pls_input_wallet_pwd,
+          title: translate('recover_wallet'),
+          hintContent: translate('recover_wallet_hint'),
+          hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
             Map mnemonicMap = await Wallets.instance.exportWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
             int status = mnemonicMap["status"];
@@ -303,7 +304,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               NavigatorUtils.push(context, Routes.recoverWalletPage);
             } else {
               LogUtil.e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
-              Fluttertoast.showToast(msg: S.of(context).wrong_pwd_failure_in_recover_wallet_hint);
+              Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_recover_wallet_hint'));
             }
           },
         );

@@ -8,6 +8,7 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/util/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
 import '../../res/styles.dart';
@@ -57,7 +58,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).create_wallet,
+          centerTitle: translate('create_wallet'),
           backgroundColor: Colors.transparent,
         ),
         body: _buildCreateWalletMnemonic(),
@@ -79,7 +80,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
             Container(
               alignment: Alignment.topLeft,
               child: Text(
-                S.of(context).backup_mnemonic,
+                translate('backup_mnemonic'),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -91,7 +92,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.only(left: 0, right: 0),
               child: Text(
-                S.of(context).mnemonic_info_hint,
+                translate('mnemonic_info_hint'),
                 textAlign: TextAlign.left,
                 maxLines: 4,
                 style: TextStyle(
@@ -135,7 +136,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                         ),
                         Container(
                           child: Text(
-                            S.of(context).change_another_group,
+                            translate('change_another_group'),
                             style: TextStyle(
                               color: Color.fromRGBO(255, 255, 255, 0.9),
                             ),
@@ -148,10 +149,10 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                   Container(
                     child: GestureDetector(
                       onTap: () {
-                        _showAddressInQR(context, walletName, S.of(context).mnemonic_qr_info, mnemonicList.join(" ").toString());
+                        _showAddressInQR(context, walletName, translate('mnemonic_qr_info'), mnemonicList.join(" ").toString());
                       },
                       child: Text(
-                        S.of(context).qr_backup,
+                        translate('qr_backup'),
                         style: TextStyle(
                           color: Color.fromRGBO(255, 255, 255, 0.9),
                         ),
@@ -174,7 +175,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                   NavigatorUtils.push(context, Routes.createWalletConfirmPage);
                 },
                 child: Text(
-                  S.of(context).mnemonic_backup_ok,
+                  translate('mnemonic_backup_ok'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.blue,

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class SearchDigitPage extends StatefulWidget {
   @override
@@ -67,7 +68,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
             RichText(
               text: TextSpan(children: <TextSpan>[
                 TextSpan(
-                    text: S.of(context).cancel,
+                    text: translate('cancel'),
                     style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Colors.white70,

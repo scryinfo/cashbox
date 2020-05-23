@@ -17,6 +17,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
@@ -58,7 +59,7 @@ class _DigitListPageState extends State<DigitListPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).digit_list_title,
+          centerTitle: translate('digit_list_title'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -108,7 +109,7 @@ class _DigitListPageState extends State<DigitListPage> {
               } else {
                 // todo 2.0。 功能：加载代币列表，可选择添加erc20代币。 代币列表下拉刷新。
                 // 继续调jni获取，或者提示已经没数据了。 根据是否jni分页处理来决定。
-                Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
+                Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
                 return;
               }
             });

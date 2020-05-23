@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
@@ -52,7 +53,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).wallet_transfer,
+          centerTitle: translate('wallet_transfer'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -93,7 +94,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).receive_address,
+              translate('receive_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3),
@@ -129,7 +130,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                         height: ScreenUtil().setHeight(40),
                         fontSize: ScreenUtil.instance.setSp(3),
                       ),
-                      hintText: S.of(context).pls_input_receive_address,
+                      hintText: translate('pls_input_receive_address'),
                       hintStyle: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.7),
                         fontSize: ScreenUtil.instance.setSp(3),
@@ -163,7 +164,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                         });
                       } catch (e) {
                         LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
-                        Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code, timeInSecForIos: 3);
+                        Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
                       }
                     },
                     icon: Image.asset("assets/images/ic_scan.png"),
@@ -184,7 +185,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).transaction_amount,
+              translate('transaction_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3),
@@ -208,7 +209,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                   color: Colors.white,
                   fontSize: ScreenUtil.instance.setSp(3),
                 ),
-                hintText: S.of(context).pls_input_transaction_amount,
+                hintText: translate('pls_input_transaction_amount'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -244,7 +245,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
         color: Color.fromRGBO(26, 141, 198, 0.20),
         child: FlatButton(
           child: Text(
-            S.of(context).click_to_transfer,
+            translate('click_to_transfer'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.blue,
@@ -261,9 +262,9 @@ class _TransferEeePageState extends State<TransferEeePage> {
       context: context,
       builder: (BuildContext context) {
         return PwdDialog(
-          title: S.of(context).wallet_pwd.toString(),
-          hintContent: S.of(context).input_pwd_hint_detail.toString(),
-          hintInput: S.of(context).input_pwd_hint.toString(),
+          title: translate('wallet_pwd').toString(),
+          hintContent: translate('input_pwd_hint_detail').toString(),
+          hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
             String walletId = await Wallets.instance.getNowWalletId();

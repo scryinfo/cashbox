@@ -4,6 +4,7 @@ import 'package:app/model/wallets.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
@@ -48,7 +49,7 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).wallet_list,
+          centerTitle: translate('wallet_list'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(

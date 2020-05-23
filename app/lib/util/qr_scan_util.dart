@@ -7,6 +7,7 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
@@ -42,13 +43,13 @@ class QrScanUtil {
 
   checkByScryCityTransfer(String qrInfo, BuildContext context) {
     if (qrInfo.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).qr_info_is_null);
+      Fluttertoast.showToast(msg: translate('qr_info_is_null'));
       return null;
     }
     //--------------------------拼装url里面的参数-----------------------
     var paramIndex = qrInfo.indexOf("?");
     if (paramIndex <= 0 || paramIndex == qrInfo.length - 1) {
-      Fluttertoast.showToast(msg: S.of(context).qr_info_is_wrong); //信息里面没? 或者就一个?
+      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //信息里面没? 或者就一个?
       return null;
     }
     List paramsList = qrInfo.substring(paramIndex + 1).split("&");
@@ -65,24 +66,24 @@ class QrScanUtil {
       }
     });
     if (paramsMap.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).qr_info_is_wrong); //信息里面没? 或者就一个?
+      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //信息里面没? 或者就一个?
       return null;
     }
     //--------------------------检查参数-----------------------
     print("paramsMap======>" + paramsMap.toString());
     print("begin verify timestamp======>");
     if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
-      Fluttertoast.showToast(msg: S.of(context).qr_info_is_out_of_date);
+      Fluttertoast.showToast(msg: translate('qr_info_is_out_of_date'));
       return null; //有效期有问题
     }
     print("begin verify chainType======>");
     if (!paramsMap.containsKey("ct") || paramsMap["ct"] != "60") {
-      Fluttertoast.showToast(msg: S.of(context).not_sure_chain_type);
+      Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
       return null; //不知道是哪条链
     }
     print("begin verify ot======>");
     if (!paramsMap.containsKey("ot") || paramsMap["ot"] != "t") {
-      Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
+      Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
       return null; //不知道要做什么操作
     }
 
@@ -100,7 +101,7 @@ class QrScanUtil {
 
     print("begin verify values======>");
     if (!paramsMap.containsKey("v") || double.parse(paramsMap["v"]) < 0) {
-      Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
+      Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
       return null; //不清楚 转账多少
     }
 
@@ -120,13 +121,13 @@ class QrScanUtil {
 
   Map checkQrInfoByDiamondSignAndQr(String qrInfo, BuildContext context) {
     if (qrInfo.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).qr_info_is_null);
+      Fluttertoast.showToast(msg: translate('qr_info_is_null'));
       return null;
     }
     //------------拼装url里面的参数------------
     var paramIndex = qrInfo.indexOf("?");
     if (paramIndex <= 0 || paramIndex == qrInfo.length - 1) {
-      Fluttertoast.showToast(msg: S.of(context).qr_info_is_wrong); //信息里面没? 或者就一个?
+      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //信息里面没? 或者就一个?
       return null;
     }
     List paramsList = qrInfo.substring(paramIndex + 1).split("&");
@@ -144,28 +145,28 @@ class QrScanUtil {
     });
 
     if (paramsMap.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).qr_info_is_wrong); //信息里面没? 或者就一个?
+      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //信息里面没? 或者就一个?
       return null;
     }
     //------------检查参数------------
     print("begin verify timestamp======>");
     if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
-      Fluttertoast.showToast(msg: S.of(context).qr_info_is_out_of_date);
+      Fluttertoast.showToast(msg: translate('qr_info_is_out_of_date'));
       return null; //有效期有问题
     }
     print("begin verify chainType======>");
     if (!paramsMap.containsKey("ct")) {
-      Fluttertoast.showToast(msg: S.of(context).not_sure_chain_type);
+      Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
       return null; //不知道是哪条链
     }
     print("begin verify v======>");
     if (!paramsMap.containsKey("v")) {
-      //Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
+      //Fluttertoast.showToast(msg: translate('not_sure_operation_type);
       return null; //不知道内容是什么
     }
     print("begin verify ot======>");
     if (!paramsMap.containsKey("ot")) {
-      Fluttertoast.showToast(msg: S.of(context).not_sure_operation_type);
+      Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
       return null; //不知道要做什么操作
     }
     var operationType = paramsMap["ot"];
@@ -201,7 +202,7 @@ class QrScanUtil {
         paramsMap = null; //置空扫描数据
         break;
       default:
-        Fluttertoast.showToast(msg: S.of(context).not_sure_chain_type);
+        Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
         LogUtil.e("QrScanUtil", "unknown chainType ======>" + chainType);
         break;
     }

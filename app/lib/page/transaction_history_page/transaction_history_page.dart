@@ -15,6 +15,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
@@ -65,7 +66,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).transaction_history,
+          centerTitle: translate('transaction_history'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -175,7 +176,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 }
               },
               child: Text(
-                S.of(context).transfer,
+                translate('transfer'),
                 style: TextStyle(
                   color: Colors.lightBlue,
                   fontSize: ScreenUtil.instance.setSp(3.5),
@@ -202,7 +203,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   Container(
                     width: ScreenUtil().setWidth(22),
                     child: Text(
-                      S.of(context).transaction_history_record,
+                      translate('transaction_history_record'),
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: ScreenUtil.instance.setSp(3.5),
@@ -254,14 +255,14 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               future: txListFuture,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Text(S.of(context).fail_to_load_data_hint);
+                  return Text(translate('fail_to_load_data_hint'));
                 }
                 if (snapshot.hasData) {
                   if (ethTxListModel.length == 0) {
                     return Container(
                       alignment: Alignment.topCenter,
                       child: Text(
-                        S.of(context).not_exist_tx_history.toString(),
+                        translate('not_exist_tx_history').toString(),
                         style: TextStyle(color: Colors.white70),
                       ),
                     );
@@ -271,7 +272,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   );
                 } else {
                   return Text(
-                    S.of(context).data_loading.toString(),
+                    translate('data_loading').toString(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: ScreenUtil.instance.setSp(4),
@@ -307,7 +308,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           print("refresh onLoad======>");
           if (this.ethTxListModel.length < displayTxOffset) {
             //展示的，比上次请求加载到的少，说明没了
-            Fluttertoast.showToast(msg: S.of(context).finish_load_tx_history.toString());
+            Fluttertoast.showToast(msg: translate('finish_load_tx_history').toString());
             return;
           }
           var ethTxListModel = await getTxListData();
@@ -399,7 +400,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       child: Text(
                         ethTxListModel[index].isError ?? "",
                         style: TextStyle(
-                          color: (ethTxListModel[index].isError == S.of(context).tx_success) ? Colors.white70 : Colors.redAccent,
+                          color: (ethTxListModel[index].isError == translate('tx_success')) ? Colors.white70 : Colors.redAccent,
                           fontSize: ScreenUtil.instance.setSp(2.5),
                         ),
                         textAlign: TextAlign.start,
@@ -449,7 +450,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       } else if (fromAddress.trim() != "") {
         ethTxListModel = await loadErc20TxHistory(context, fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
       } else {
-        Fluttertoast.showToast(msg: S.of(context).address_empty.toString());
+        Fluttertoast.showToast(msg: translate('address_empty').toString());
       }
       print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
     } catch (onError) {

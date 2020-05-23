@@ -7,6 +7,7 @@ import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../res/resources.dart';
 import '../../routers/routers.dart';
@@ -40,7 +41,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).create_test_wallet,
+          centerTitle: translate('create_test_wallet'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -66,7 +67,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
             Container(
               width: ScreenUtil().setWidth(80),
               child: Text(
-                S.of(context).test_wallet_and_mnemonic,
+                translate('test_wallet_and_mnemonic'),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil().setSp(4),
@@ -77,7 +78,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
             Container(
               width: ScreenUtil().setWidth(80),
               child: Text(
-                S.of(context).judge_the_difference_between_two_wallet,
+                translate('judge_the_difference_between_two_wallet'),
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: ScreenUtil().setSp(3),
@@ -148,7 +149,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                       _mnemonicController.text = t.toString();
                     });
                   }).catchError((e) {
-                    Fluttertoast.showToast(msg: S.of(context).qr_scan_unknown_error);
+                    Fluttertoast.showToast(msg: translate('qr_scan_unknown_error'));
                   });
                 },
                 child: Image.asset("assets/images/ic_scan.png"),
@@ -176,7 +177,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
             ),
             Container(
               child: Text(
-                S.of(context).change_another_group,
+                translate('change_another_group'),
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -193,7 +194,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       child: Row(
         children: <Widget>[
           Text(
-            S.of(context).wallet_name + ":",
+            translate('wallet_name') + ":",
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.6),
               fontSize: ScreenUtil.instance.setSp(3.5),
@@ -201,7 +202,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           ),
           Gaps.scaleHGap(0.5),
           Text(
-            S.of(context).test_wallet_title,
+            translate('test_wallet_title'),
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.9),
               fontSize: ScreenUtil.instance.setSp(3.5),
@@ -219,7 +220,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).wallet_pwd,
+              translate('wallet_pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -239,7 +240,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: S.of(context).pls_set_wallet_pwd,
+                hintText: translate('pls_set_wallet_pwd'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -266,7 +267,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).choose_multi_chain,
+              translate('choose_multi_chain'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -294,7 +295,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                             },
                           ),
                           Text(
-                            S.of(context).eee_chain_test,
+                            translate('eee_chain_test,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: ScreenUtil.instance.setSp(3),
@@ -318,7 +319,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                             },
                           ),
                           Text(
-                            S.of(context).eth_test_chain_name, //eth_test_chain_name
+                            translate('eth_test_chain_name'), //eth_test_chain_name
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: ScreenUtil.instance.setSp(3),
@@ -348,7 +349,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           _createTestWallet();
         },
         child: Text(
-          S.of(context).add_wallet,
+          translate('add_wallet'),
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.blue,
@@ -383,16 +384,16 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   _createTestWallet() async {
     bool isOk = _verifyPwdAndMnemonic();
     if (!isOk) {
-      Fluttertoast.showToast(msg: S.of(context).mne_pwd_not_allow_is_null);
+      Fluttertoast.showToast(msg: translate('mne_pwd_not_allow_is_null'));
       return;
     }
-    var isSuccess = await Wallets.instance.saveWallet(S.of(context).test_wallet_title, Uint8List.fromList(_pwdController.text.codeUnits),
+    var isSuccess = await Wallets.instance.saveWallet(translate('test_wallet_title'), Uint8List.fromList(_pwdController.text.codeUnits),
         Uint8List.fromList(_mnemonicController.text.codeUnits), WalletType.TEST_WALLET);
     if (isSuccess) {
-      Fluttertoast.showToast(msg: S.of(context).success_create_test_wallet);
+      Fluttertoast.showToast(msg: translate('success_create_test_wallet'));
       NavigatorUtils.push(context, Routes.entryPage, clearStack: true);
     } else {
-      Fluttertoast.showToast(msg: S.of(context).failure_create_test_wallet);
+      Fluttertoast.showToast(msg: translate('failure_create_test_wallet'));
     }
   }
 }

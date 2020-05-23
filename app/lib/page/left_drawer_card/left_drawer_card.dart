@@ -7,6 +7,7 @@ import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
@@ -80,7 +81,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  S.of(context).mine,
+                  translate('mine'),
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -99,7 +100,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  S.of(context).public,
+                  translate('public'),
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -118,7 +119,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  S.of(context).dapp,
+                  translate('dapp'),
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -137,7 +138,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  S.of(context).create_wallet,
+                  translate('create_wallet'),
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -156,7 +157,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
-                  S.of(context).import_wallet,
+                  translate('import_wallet'),
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -175,7 +176,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   height: ScreenUtil().setWidth(4.5),
                 ),
                 title: new Text(
-                  S.of(context).scan,
+                  translate('scan'),
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -207,7 +208,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                       //NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
                       NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                     } else {
-                      Fluttertoast.showToast(msg: S.of(context).failure_to_change_wallet, timeInSecForIos: 8);
+                      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), timeInSecForIos: 8);
                     }
                   },
                   child: Column(

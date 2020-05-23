@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert' as convert;
 
@@ -104,7 +105,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             brightness: Brightness.light,
             centerTitle: true,
             title: Text(
-              S.of(context).digit_list_title ?? "",
+              translate('digit_list_title') ?? "",
               style: TextStyle(fontSize: 20),
             ),
             actions: <Widget>[
@@ -173,12 +174,12 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           Duration(seconds: 2),
           () async {
             if (isLoadAuthDigitFinish) {
-              Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
+              Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
               return;
             }
             List tempList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
             if (tempList == null || tempList.length == 0) {
-              Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
+              Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
               return;
             }
             addToDisplayDigitsList(tempList);

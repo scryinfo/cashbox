@@ -20,6 +20,7 @@ import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
@@ -180,7 +181,7 @@ class _EeePageState extends State<EeePage> {
             LogUtil.e("digitList future snapshot.hasError is +>", snapshot.error.toString());
             return Center(
               child: Text(
-                S.of(context).failure_to_load_data_pls_retry,
+                translate('failure_to_load_data_pls_retry'),
                 style: TextStyle(color: Colors.white70),
               ),
             );
@@ -194,7 +195,7 @@ class _EeePageState extends State<EeePage> {
             return Container(
               alignment: Alignment.center,
               child: Text(
-                S.of(context).digit_info_null.toString(),
+                translate('digit_info_null').toString(),
                 style: TextStyle(color: Colors.white70),
               ),
             );
@@ -231,7 +232,7 @@ class _EeePageState extends State<EeePage> {
                 // 添加到 displayDigitsList里面做展示
                 loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
               } else {
-                Fluttertoast.showToast(msg: S.of(context).load_finish_wallet_digit.toString());
+                Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
                 return;
               }
             });
@@ -407,7 +408,7 @@ class _EeePageState extends State<EeePage> {
                     child: Image.asset("assets/images/ic_transfer.png"),
                   ),
                   Text(
-                    S.of(context).transfer,
+                    translate('transfer'),
                     style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
                   )
                 ],
@@ -429,14 +430,14 @@ class _EeePageState extends State<EeePage> {
                   Padding(
                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
                       child: Text(
-                        S.of(context).receive,
+                        translate('receive'),
                         style: TextStyle(color: Colors.lightBlueAccent, fontSize: 18),
                       )),
                 ],
               ),
             ),
             onTap: () {
-              _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, nowChainAddress);
+              _navigatorToQrInfoPage(walletName, translate('chain_address_info'), nowChainAddress);
             },
           )
         ],
@@ -559,7 +560,7 @@ class _EeePageState extends State<EeePage> {
                 if (walletName.isEmpty || nowChainAddress.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, nowChainAddress);
+                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), nowChainAddress);
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
@@ -575,7 +576,7 @@ class _EeePageState extends State<EeePage> {
                 if (walletName.isEmpty || nowChainAddress.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(walletName, S.of(context).chain_address_info, nowChainAddress);
+                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), nowChainAddress);
               },
               child: Text(
                 nowChainAddress,

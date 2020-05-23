@@ -6,6 +6,7 @@ import 'package:app/model/wallets.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../res/resources.dart';
 import '../../routers/routers.dart';
@@ -42,7 +43,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).import_wallet,
+          centerTitle: translate('import_wallet'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -85,7 +86,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   _checkAndDoImportWallet();
                 },
                 child: Text(
-                  S.of(context).import_wallet,
+                  translate('import_wallet'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.blue,
@@ -108,7 +109,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).mnemonic,
+              translate('mnemonic'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 16,
@@ -144,7 +145,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                         color: Colors.white,
                         height: ScreenUtil().setHeight(40),
                       ),
-                      hintText: S.of(context).pls_input_mnemonic,
+                      hintText: translate('pls_input_mnemonic'),
                       hintStyle: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.7),
                         fontSize: 14,
@@ -175,7 +176,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                           _mneController.text = t.toString();
                         });
                       }).catchError((e) {
-                        Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code);
+                        Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'));
                       });
                     },
                     child: Image.asset("assets/images/ic_scan.png"),
@@ -196,7 +197,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).wallet_name,
+              translate('wallet_name'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 16,
@@ -216,7 +217,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: S.of(context).pls_input_wallet_name,
+                hintText: translate('pls_input_wallet_name'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -243,7 +244,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).pwd,
+              translate('pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 16,
@@ -264,7 +265,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: S.of(context).input_format_hint,
+                hintText: translate('input_format_hint'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -291,7 +292,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).ensure_pwd,
+              translate('ensure_pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: 16,
@@ -312,7 +313,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: S.of(context).pls_pwd_again,
+                hintText: translate('pls_pwd_again'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -339,7 +340,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
         Container(
           alignment: Alignment.topLeft,
           child: Text(
-            S.of(context).choose_multi_chain,
+            translate('choose_multi_chain'),
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.5),
               fontSize: 13,
@@ -362,7 +363,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   },
                 ),
                 Text(
-                  S.of(context).eee_token_name,
+                  translate('eth_token_name'), //todo
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 13,
@@ -380,7 +381,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   void _listenMnemonic() {
     String mnemonic = _mneController.text;
     if (mnemonic.isEmpty || mnemonic.length < 1) {
-      Fluttertoast.showToast(msg: S.of(context).mnemonic_is_not_null);
+      Fluttertoast.showToast(msg: translate('mnemonic_is_not_null'));
       return;
     }
   }
@@ -389,7 +390,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   void _listenWalletName() {
     String name = _walletNameController.text;
     if (name.isEmpty || name.length < 1) {
-      Fluttertoast.showToast(msg: S.of(context).wallet_name_not_null);
+      Fluttertoast.showToast(msg: translate('wallet_name_not_null'));
       return;
     }
   }
@@ -398,7 +399,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   void _listenPwd() {
     String pwd = _pwdController.text;
     if (pwd.isEmpty || pwd.length < 1) {
-      Fluttertoast.showToast(msg: S.of(context).pwd_not_null);
+      Fluttertoast.showToast(msg: translate('pwd_not_null'));
       return;
     }
   }
@@ -416,11 +417,11 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
         pwd.length < 1 ||
         confirmPwd.isEmpty ||
         confirmPwd.length < 1) {
-      Fluttertoast.showToast(msg: S.of(context).some_info_is_null);
+      Fluttertoast.showToast(msg: translate('some_info_is_null'));
       return false;
     }
     if (pwd.toString() != confirmPwd.toString()) {
-      Fluttertoast.showToast(msg: S.of(context).pwd_is_not_same);
+      Fluttertoast.showToast(msg: translate('pwd_is_not_same'));
       return false;
     }
     return true;
@@ -431,10 +432,9 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       var isSuccess = await Wallets.instance.saveWallet(_walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
           Uint8List.fromList(_mneController.text.codeUnits), WalletType.WALLET);
       if (isSuccess) {
-        //NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
-        NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
+        NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
       } else {
-        Fluttertoast.showToast(msg: S.of(context).verify_failure_to_mnemonic);
+        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'));
       }
     }
   }

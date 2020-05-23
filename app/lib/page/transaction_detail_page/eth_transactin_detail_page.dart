@@ -4,6 +4,7 @@ import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 
@@ -22,7 +23,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).transaction_detail,
+          centerTitle: translate('transaction_detail'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -74,7 +75,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).transfer_from_address,
+              translate('transfer_from_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.7),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -104,7 +105,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).transfer_to_address,
+              translate('transfer_to_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -134,7 +135,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).transaction_amount,
+              translate('transaction_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -164,7 +165,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).tx_hash,
+              translate('tx_hash'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -194,7 +195,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).transaction_timestamp,
+              translate('transaction_timestamp'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -224,7 +225,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).gas_used,
+              translate('gas_used'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -254,7 +255,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).gas_price,
+              translate('gas_price'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -284,7 +285,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).tx_backup,
+              translate('tx_backup'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -314,7 +315,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).nonce_value,
+              translate('nonce_value'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),

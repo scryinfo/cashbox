@@ -9,6 +9,7 @@ import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
@@ -36,7 +37,7 @@ class _SignTxPageState extends State<SignTxPage> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: MyAppBar(
-        centerTitle: S.of(context).info_sign,
+        centerTitle: translate('info_sign'),
         backgroundColor: Colors.transparent,
       ),
       body: _buildWaitToSignLayout(),
@@ -57,7 +58,7 @@ class _SignTxPageState extends State<SignTxPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              S.of(context).wait_to_sign_info,
+              translate('wait_to_sign_info'),
               style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
             ),
           ),
@@ -85,7 +86,7 @@ class _SignTxPageState extends State<SignTxPage> {
               },
               color: Color.fromRGBO(26, 141, 198, 0.20),
               child: Text(
-                S.of(context).click_to_sign,
+                translate('click_to_sign'),
                 style: TextStyle(
                   color: Colors.blue,
                   letterSpacing: 0.03,
@@ -104,9 +105,9 @@ class _SignTxPageState extends State<SignTxPage> {
       context: context,
       builder: (BuildContext context) {
         return PwdDialog(
-          title: S.of(context).pwd_verify,
-          hintContent: S.of(context).info_sign_hint,
-          hintInput: S.of(context).pls_input_wallet_pwd,
+          title: translate('pwd_verify'),
+          hintContent: translate('info_sign_hint'),
+          hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
             print("_showPwdDialog   pwd is =========>" + value);
             String walletId = await Wallets.instance.getNowWalletId();

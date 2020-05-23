@@ -3,6 +3,7 @@ import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -49,7 +50,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).verify_wallet,
+          centerTitle: translate('verify_wallet'),
           backgroundColor: Colors.transparent,
         ),
         body: _buildConfirmMnemonic(),
@@ -71,7 +72,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
             Container(
               alignment: Alignment.topLeft,
               child: Text(
-                S.of(context).verify_backup_mnemonic,
+                translate('verify_backup_mnemonic'),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -83,7 +84,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               alignment: Alignment.center,
               padding: EdgeInsets.only(left: 0, right: 0),
               child: Text(
-                S.of(context).verify_mnemonic_order,
+                translate('verify_mnemonic_order'),
                 textAlign: TextAlign.left,
                 maxLines: 2,
                 style: TextStyle(
@@ -121,11 +122,11 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                     //NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
                     NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                   } else {
-                    Fluttertoast.showToast(msg: S.of(context).mnemonic_order_wrong);
+                    Fluttertoast.showToast(msg: translate('mnemonic_order_wrong'));
                   }
                 },
                 child: Text(
-                  S.of(context).verify_mnemonic_info,
+                  translate('verify_mnemonic_info'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.blue,
@@ -179,7 +180,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                     this.verifyString = t.toString();
                   });
                 }).catchError((e) {
-                  Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code);
+                  Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'));
                 });
               },
               child: Image.asset("assets/images/ic_scan.png"),
@@ -225,7 +226,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
         if (isSuccess) {
           return true;
         } else {
-          Fluttertoast.showToast(msg: S.of(context).unknown_error_in_create_wallet);
+          Fluttertoast.showToast(msg: translate('unknown_error_in_create_wallet'));
           return false;
         }
       }

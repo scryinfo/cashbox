@@ -3,6 +3,7 @@ import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:html/dom.dart' as dom;
 
 class PrivacyStatementPage extends StatelessWidget {
@@ -11,7 +12,7 @@ class PrivacyStatementPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: MyAppBar(
-        centerTitle: S.of(context).privacy_protocol_title,
+        centerTitle: translate('privacy_protocol_title'),
         backgroundColor: Colors.transparent,
       ),
       body: _buildUserService(),

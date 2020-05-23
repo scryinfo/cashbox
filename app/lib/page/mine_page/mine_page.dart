@@ -1,6 +1,7 @@
 import 'package:app/generated/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../res/resources.dart';
 import '../../routers/routers.dart';
@@ -21,7 +22,7 @@ class _MinePageState extends State<MinePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).mine,
+          centerTitle: translate('mine'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -67,7 +68,7 @@ class _MinePageState extends State<MinePage> {
               alignment: Alignment.centerLeft,
               margin: EdgeInsets.only(left: ScreenUtil().setWidth(8)),
               child: Text(
-                S.of(context).currency_manage,
+                translate('currency_manage'),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,
@@ -107,7 +108,7 @@ class _MinePageState extends State<MinePage> {
         NavigatorUtils.push(context, Routes.createTestWalletPage);
       },
       child: ItemOfListWidget(
-        leftText: S.of(context).test_wallet_title,
+        leftText: translate('test_wallet_title'),
       ),
     );
   }
@@ -119,7 +120,7 @@ class _MinePageState extends State<MinePage> {
         NavigatorUtils.push(context, Routes.walletManagerListPage);
       },
       child: ItemOfListWidget(
-        leftText: S.of(context).wallet_list,
+        leftText: translate('wallet_list'),
       ),
     );
   }
@@ -131,7 +132,7 @@ class _MinePageState extends State<MinePage> {
         print("click 语言选择");
       },
       child: ItemOfListWidget(
-        leftText: S.of(context).language_choose,
+        leftText: translate('language_choose'),
       ),
     );
   }
@@ -142,7 +143,7 @@ class _MinePageState extends State<MinePage> {
         NavigatorUtils.push(context, Routes.aboutUsPage);
       },
       child: ItemOfListWidget(
-        leftText: S.of(context).about_us_title,
+        leftText: translate('about_us_title'),
       ),
     );
   }
@@ -150,10 +151,10 @@ class _MinePageState extends State<MinePage> {
   Widget _buildVersionCheckWidget() {
     return GestureDetector(
       onTap: () {
-        Fluttertoast.showToast(msg: S.of(context).no_new_version_hint);
+        Fluttertoast.showToast(msg: translate('no_new_version_hint'));
       },
       child: ItemOfListWidget(
-        leftText: S.of(context).version_update,
+        leftText: translate('version_update'),
       ),
     );
   }

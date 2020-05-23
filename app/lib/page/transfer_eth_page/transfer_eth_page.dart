@@ -15,6 +15,7 @@ import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
@@ -123,7 +124,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).wallet_transfer,
+          centerTitle: translate('wallet_transfer'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -174,7 +175,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     width: ScreenUtil.instance.setWidth(40),
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      S.of(context).mine_fee,
+                      translate('mine_fee'),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
                         fontSize: ScreenUtil.instance.setSp(3),
@@ -265,7 +266,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     alignment: Alignment.topRight,
                     width: ScreenUtil.instance.setWidth(75),
                     child: Text(
-                      S.of(context).high_setting.toString(),
+                      translate('high_setting').toString(),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.8),
                         fontSize: ScreenUtil.instance.setSp(2.5),
@@ -303,7 +304,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   width: ScreenUtil.instance.setWidth(40),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    S.of(context).gas_price.toString(),
+                                    translate('gas_price').toString(),
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
                                       fontSize: ScreenUtil.instance.setSp(2.5),
@@ -389,7 +390,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   width: ScreenUtil.instance.setWidth(40),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    S.of(context).gas_limit.toString(),
+                                    translate('gas_limit').toString(),
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
                                       fontSize: ScreenUtil.instance.setSp(2.5),
@@ -470,7 +471,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                         Container(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            S.of(context).extend_msg,
+                            translate('extend_msg'),
                             style: TextStyle(
                               color: Color.fromRGBO(255, 255, 255, 0.5),
                               fontSize: ScreenUtil.instance.setSp(3),
@@ -492,7 +493,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                               labelStyle: TextStyle(
                                 color: Colors.white,
                               ),
-                              hintText: S.of(context).hint_extend_msg_option,
+                              hintText: translate('hint_extend_msg_option'),
                               hintStyle: TextStyle(
                                 color: Color.fromRGBO(255, 255, 255, 0.7),
                                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -524,7 +525,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).receive_address,
+              translate('receive_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3),
@@ -560,7 +561,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                         height: ScreenUtil().setHeight(40),
                         fontSize: ScreenUtil.instance.setSp(3),
                       ),
-                      hintText: S.of(context).pls_input_receive_address,
+                      hintText: translate('pls_input_receive_address'),
                       hintStyle: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.7),
                         fontSize: ScreenUtil.instance.setSp(3),
@@ -594,7 +595,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                         });
                       } catch (e) {
                         LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
-                        Fluttertoast.showToast(msg: S.of(context).unknown_error_in_scan_qr_code, timeInSecForIos: 3);
+                        Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
                       }
                     },
                     icon: Image.asset("assets/images/ic_scan.png"),
@@ -615,7 +616,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).transaction_amount,
+              translate('transaction_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3),
@@ -639,7 +640,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                   color: Colors.white,
                   fontSize: ScreenUtil.instance.setSp(3),
                 ),
-                hintText: S.of(context).pls_input_transaction_amount,
+                hintText: translate('pls_input_transaction_amount'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -680,7 +681,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
         color: Color.fromRGBO(26, 141, 198, 0.20),
         child: FlatButton(
           child: Text(
-            S.of(context).click_to_transfer,
+            translate('click_to_transfer'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.blue,
@@ -697,9 +698,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
       context: context,
       builder: (BuildContext context) {
         return PwdDialog(
-          title: S.of(context).wallet_pwd.toString(),
-          hintContent: S.of(context).input_pwd_hint_detail.toString(),
-          hintInput: S.of(context).input_pwd_hint.toString(),
+          title: translate('wallet_pwd').toString(),
+          hintContent: translate('input_pwd_hint_detail').toString(),
+          hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
             String walletId = await Wallets.instance.getNowWalletId();
@@ -767,7 +768,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   Future<bool> _verifyTransferInfo() async {
     if (_toAddressController.text.trim() == "") {
-      Fluttertoast.showToast(msg: S.of(context).to_address_null.toString(), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('to_address_null').toString(), timeInSecForIos: 3);
       return false;
     }
     if (!GlobalConfig.isDebugVersion) {
@@ -778,7 +779,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       }
     }
     if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
-      Fluttertoast.showToast(msg: S.of(context).tx_value_is_0.toString(), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), timeInSecForIos: 3);
       return false;
     }
     //判断余额 是否大于转账额度
@@ -800,11 +801,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
     if (_txValueController.text.isNotEmpty) {
       try {
         if (double.parse(digitBalance) < double.parse(_txValueController.text)) {
-          Fluttertoast.showToast(msg: S.of(context).balance_is_less);
+          Fluttertoast.showToast(msg: translate('balance_is_less'));
           return false;
         }
       } catch (e) {
-        Fluttertoast.showToast(msg: S.of(context).unknown_in_value);
+        Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;
       }
     }

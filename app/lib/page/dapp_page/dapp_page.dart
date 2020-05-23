@@ -12,6 +12,7 @@ import 'package:app/util/utils.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:scry_webview/scry_webview.dart';
@@ -76,7 +77,7 @@ class _DappPageState extends State<DappPage> {
           qrResult.then((t) {
             _controller?.evaluateJavascript('nativeQrScanToJsResult("$t")')?.then((result) {});
           }).catchError((e) {
-            // Fluttertoast.showToast(msg: S.of(context).scan_qr_unknown_error.toString());
+            // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
           });
         }));
 
@@ -87,7 +88,7 @@ class _DappPageState extends State<DappPage> {
           qrResult.then((qrInfo) {
             Map paramsMap = QrScanUtil.instance.checkQrInfoByDiamondSignAndQr(qrInfo, context);
             if (paramsMap == null) {
-              Fluttertoast.showToast(msg: S.of(context).not_follow_diamond_rule.toString());
+              Fluttertoast.showToast(msg: translate('not_follow_diamond_rule').toString());
               NavigatorUtils.goBack(context);
               return;
             }
@@ -95,7 +96,7 @@ class _DappPageState extends State<DappPage> {
             Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
             NavigatorUtils.push(context, Routes.signTxPage);
           }).catchError((e) {
-            // Fluttertoast.showToast(msg: S.of(context).scan_qr_unknown_error.toString());
+            // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
           });
         }));
 
@@ -107,9 +108,9 @@ class _DappPageState extends State<DappPage> {
             context: context,
             builder: (BuildContext context) {
               return PwdDialog(
-                title: S.of(context).wallet_pwd.toString(),
-                hintContent: S.of(context).dapp_sign_hint_content + nowWallet.walletName ?? "",
-                hintInput: S.of(context).input_pwd_hint.toString(),
+                title: translate('wallet_pwd').toString(),
+                hintContent: translate('dapp_sign_hint_content') + nowWallet.walletName ?? "",
+                hintInput: translate('input_pwd_hint').toString(),
                 onPressed: (pwd) async {
                   var pwdFormat = pwd.codeUnits;
                   String walletId = await Wallets.instance.getNowWalletId();
@@ -117,18 +118,18 @@ class _DappPageState extends State<DappPage> {
                   if (map.containsKey("status")) {
                     int status = map["status"];
                     if (status == null || status != 200) {
-                      Fluttertoast.showToast(msg: S.of(context).tx_sign_failure.toString() + map["message"]);
+                      Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
                       NavigatorUtils.goBack(context);
                       return null;
                     } else {
                       var signResult = map["signedInfo"];
-                      Fluttertoast.showToast(msg: S.of(context).tx_sign_success.toString());
+                      Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
                       _controller?.evaluateJavascript('nativeSignMsgToJsResult("$signResult")')?.then((result) {
                         NavigatorUtils.goBack(context); //签名完成，关了密码弹框
                       });
                     }
                   } else {
-                    Fluttertoast.showToast(msg: S.of(context).tx_sign_failure.toString());
+                    Fluttertoast.showToast(msg: translate('tx_sign_failure').toString());
                     NavigatorUtils.goBack(context);
                   }
                 },

@@ -3,6 +3,7 @@ import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 // 定制化不同  dialog  样式
 
@@ -91,17 +92,17 @@ class PwdDialog extends StatelessWidget {
       ),
       actions: <Widget>[
         new FlatButton(
-          child: new Text(S.of(context).confirm),
+          child: new Text(translate('confirm')),
           onPressed: () {
             if (_controller.text.isEmpty) {
-              Fluttertoast.showToast(msg: S.of(context).pls_input + "${title}");
+              Fluttertoast.showToast(msg: translate('pls_input') + "${title}");
               return;
             }
             onPressed(_controller.text);
           },
         ),
         new FlatButton(
-          child: new Text(S.of(context).cancel),
+          child: new Text(translate('cancel')),
           onPressed: () {
             Navigator.of(context).pop();
           },

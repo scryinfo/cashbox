@@ -3,6 +3,7 @@ import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/util/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
@@ -94,7 +95,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
                         child: GestureDetector(
                           onLongPress: () async {
                             Utils.copyMsg(content);
-                            Fluttertoast.showToast(msg: S.of(context).success_to_copy_info);
+                            Fluttertoast.showToast(msg: translate('success_to_copy_info'));
                           },
                           child: Text(
                             content ?? "",
@@ -119,10 +120,10 @@ class _QrInfoPageState extends State<QrInfoPage> {
                 child: FlatButton(
                   onPressed: () {
                     Utils.copyMsg(content);
-                    Fluttertoast.showToast(msg: S.of(context).success_to_copy_info);
+                    Fluttertoast.showToast(msg: translate('success_to_copy_info'));
                   },
                   child: Text(
-                    S.of(context).click_to_copy_address,
+                    translate('click_to_copy_address'),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.blue,

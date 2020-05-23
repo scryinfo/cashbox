@@ -6,6 +6,7 @@ import 'package:app/model/wallets.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
@@ -33,7 +34,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).reset_pwd,
+          centerTitle: translate('reset_pwd'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -75,7 +76,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                     _checkAndResetPwd();
                   },
                   child: Text(
-                    S.of(context).ensure_to_change,
+                    translate('ensure_to_change'),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.blue,
@@ -98,7 +99,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).old_pwd,
+              translate('old_pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -116,7 +117,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
                 contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
-                hintText: S.of(context).pls_input_old_pwd,
+                hintText: translate('pls_input_old_pwd'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -143,7 +144,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).new_pwd,
+              translate('new_pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -164,7 +165,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: S.of(context).new_pwd_format_hint,
+                hintText: translate('new_pwd_format_hint'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -191,7 +192,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).rewrite_new_pwd_format_hint,
+              translate('rewrite_new_pwd_format_hint'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -212,7 +213,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: S.of(context).rewrite_new_pwd_format_hint,
+                hintText: translate('rewrite_new_pwd_format_hint'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: ScreenUtil.instance.setSp(3),
@@ -234,10 +235,10 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
 
   bool _verifyPwdSame() {
     if (_oldPwdController.text.isEmpty || _newPwdController.text.isEmpty || _confirmPwdController.text.isEmpty) {
-      Fluttertoast.showToast(msg: S.of(context).some_info_is_null);
+      Fluttertoast.showToast(msg: translate('some_info_is_null'));
       return false;
     } else if (_newPwdController.text != _confirmPwdController.text) {
-      Fluttertoast.showToast(msg: S.of(context).pwd_is_not_same);
+      Fluttertoast.showToast(msg: translate('pwd_is_not_same'));
       return false;
     }
     return true;
@@ -250,15 +251,15 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
       Map resetPwdMap =
           await wallet.resetPwd(Uint8List.fromList(_newPwdController.text.codeUnits), Uint8List.fromList(_oldPwdController.text.codeUnits));
       if (resetPwdMap == null) {
-        Fluttertoast.showToast(msg: S.of(context).unknown_error_in_reset_pwd);
+        Fluttertoast.showToast(msg: translate('unknown_error_in_reset_pwd'));
         return;
       } else {
         if (resetPwdMap["status"] == 200 && resetPwdMap["isResetPwd"]) {
-          Fluttertoast.showToast(msg: S.of(context).success_reset_pwd_hint);
+          Fluttertoast.showToast(msg: translate('success_reset_pwd_hint'));
           NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
           //NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
         } else {
-          Fluttertoast.showToast(msg: S.of(context).failure_reset_pwd_hint + resetPwdMap["message"]);
+          Fluttertoast.showToast(msg: translate('failure_reset_pwd_hint') + resetPwdMap["message"]);
         }
       }
     }

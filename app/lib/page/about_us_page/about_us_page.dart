@@ -6,6 +6,7 @@ import 'package:app/widgets/list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../../res/resources.dart';
 
 class AboutUsPage extends StatefulWidget {
@@ -14,7 +15,6 @@ class AboutUsPage extends StatefulWidget {
 }
 
 class _AboutUsPageState extends State<AboutUsPage> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,7 +24,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).about_us_title,
+          centerTitle: translate('about_us_title'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -71,7 +71,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
               NavigatorUtils.push(context, Routes.privacyStatementPage);
             },
             child: ItemOfListWidget(
-              leftText: S.of(context).privacy_protocol_title,
+              leftText: translate('privacy_protocol_title'),
             ),
           ),
           GestureDetector(
@@ -79,7 +79,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
               NavigatorUtils.push(context, Routes.serviceAgreementPage);
             },
             child: ItemOfListWidget(
-              leftText: S.of(context).service_protocol_title,
+              leftText: translate('service_protocol_title'),
             ),
           ),
         ],

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:app/generated/i18n.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -46,7 +47,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).create_wallet,
+          centerTitle: translate('create_wallet'),
           backgroundColor: Colors.transparent,
         ),
         body: _buildCreateWalletLayout(),
@@ -96,7 +97,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         child: Container(
           width: ScreenUtil().setWidth(41),
           child: Text(
-            S.of(context).add_wallet,
+            translate('add_wallet'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.blue,
@@ -116,7 +117,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).wallet_name,
+              translate('wallet_name'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil.instance.setSp(4),
@@ -136,7 +137,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: S.of(context).pls_input_wallet_name,
+                hintText: translate('pls_input_wallet_name'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -163,7 +164,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).wallet_pwd,
+              translate('wallet_pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -184,7 +185,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: S.of(context).advice_pwd_format,
+                hintText: translate('advice_pwd_format'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -211,7 +212,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              S.of(context).pls_pwd_again,
+              translate('pls_pwd_again'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -232,7 +233,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 labelStyle: TextStyle(
                   color: Colors.white,
                 ),
-                hintText: S.of(context).pls_ensure_confirm_pwd.toString(),
+                hintText: translate('pls_ensure_confirm_pwd'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
                   fontSize: 12,
@@ -259,7 +260,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         Container(
           alignment: Alignment.topLeft,
           child: Text(
-            S.of(context).choose_multi_chain,
+            translate('choose_multi_chain'),
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.85),
               fontSize: ScreenUtil.instance.setSp(3.5),
@@ -282,7 +283,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                   },
                 ),
                 Text(
-                  S.of(context).eee_token_name,
+                  translate('eee_token_name'),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 13,
@@ -299,7 +300,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
   void _listenWalletName() {
     String name = _nameController.text;
     if (name.isEmpty || name.length < 1) {
-      Fluttertoast.showToast(msg: S.of(context).wallet_name_not_null);
+      Fluttertoast.showToast(msg: translate('wallet_name_not_null'));
       return;
     }
   }
@@ -307,7 +308,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
   void _listenPwd() {
     String pwd = _pwdController.text;
     if (pwd.isEmpty || pwd.length < 1) {
-      Fluttertoast.showToast(msg: S.of(context).pwd_not_null);
+      Fluttertoast.showToast(msg: translate('pwd_not_null'));
       return;
     }
   }
@@ -320,17 +321,17 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         _pwdController.text.length < 1 ||
         _confirmPwdController.text.isEmpty ||
         _confirmPwdController.text.length < 1) {
-      Fluttertoast.showToast(msg: S.of(context).some_info_is_null);
+      Fluttertoast.showToast(msg: translate('some_info_is_null'));
       return false;
     }
     //验证：两次密码一致
     if (_confirmPwdController.text != _pwdController.text) {
-      Fluttertoast.showToast(msg: S.of(context).pwd_is_not_same);
+      Fluttertoast.showToast(msg: translate('pwd_is_not_same'));
       return false;
     }
     //验证：勾选 链
     if (!_eeeChainChoose) {
-      Fluttertoast.showToast(msg: S.of(context).pls_ensure_eee_chain);
+      Fluttertoast.showToast(msg: translate('pls_ensure_eee_chain'));
       return false;
     }
     return true;

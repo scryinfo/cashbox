@@ -4,6 +4,7 @@ import 'package:app/generated/i18n.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -25,7 +26,7 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: MyAppBar(
-          centerTitle: S.of(context).backup_wallet,
+          centerTitle: translate('backup_wallet'),
           backgroundColor: Colors.transparent,
         ),
         body: Container(
@@ -51,7 +52,7 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              S.of(context).write_down_mnemonic,
+              translate('write_down_mnemonic'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: 14,
@@ -61,7 +62,7 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
           Gaps.scaleVGap(3),
           Container(
             child: Text(
-              S.of(context).backup_mnemonic_hint_info,
+              translate('backup_mnemonic_hint_info'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: 11,
