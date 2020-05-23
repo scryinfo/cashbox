@@ -97,7 +97,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           appBar: AppBar(
             leading: GestureDetector(
                 onTap: () {
-                  backAndReloadData();
+                  NavigatorUtils.goBack(context);
                 },
                 child: Image.asset("assets/images/ic_back.png")),
             backgroundColor: Colors.transparent,
@@ -134,9 +134,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         ),
       ),
       onWillPop: () {
-        backAndReloadData();
-        Navigator.pop(context);
-        return Future.value(true);
+        NavigatorUtils.goBack(context);
       },
     );
   }
@@ -302,8 +300,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     }
     var result = await request(authUrl);
     if (result["code"] != null && result["code"] == 0) {
-      print("loadServerDigitsData result.code=>" + result["data"].toString());
-      return result["data"].toString();
+      print("loadServerDigitsData result.code=>" + convert.jsonEncode(result["data"]));
+      return convert.jsonEncode(result["data"]).toString();
     }
     return "";
   }
@@ -313,31 +311,9 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       print("param is empty======>" + param);
       return;
     }
-    //todo test api code
-    /*var obj = [
-      {
-        "id": "eth_chain_ddd_test0",
-        "symbol": "parker0",
-        "name": "scryinfo parker0",
-        "publisher": "scryinfo",
-        "project": "scryinfo",
-        "logoUrl": "scry.info",
-        "logoBytes": "parker",
-        "decimal": 18,
-        "gasLimit": 523654,
-        "contract": "0x2aef987",
-        "acceptId": "0x3aef987",
-        "chainType": "ETH",
-        "mark": "test",
-        "updateTime": 158748557,
-        "createTime": 158965444,
-        "version": 12,
-      },
-    ];
-    String jsonString = convert.jsonEncode(obj);*/
+    print("updateNativeAuthDigitList  param=====>" + param.toString());
     var updateMap = await Wallets.instance.updateAuthDigitList(param);
-    print("updateMap[status]=====>" + updateMap["status"].toString());
-    print("updateMap[isUpdateAuthDigit]=====>" + updateMap["isUpdateAuthDigit"].toString());
+    print("updateMap[isUpdateAuthDigit]=====>" + updateMap["status"].toString() + updateMap["isUpdateAuthDigit"].toString());
   }
 
   //加入到展示列表displayDigitsList中
@@ -403,9 +379,5 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       isLoadAuthDigitFinish = true;
     }
     return tempDigitsList;
-  }
-
-  backAndReloadData() {
-    RestartWidget.restartApp(context); //由于widget模式，虚拟dom与activity区分。不走生命周期，重改key，重新加载
   }
 }
