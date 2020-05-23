@@ -301,7 +301,10 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     var result = await request(authUrl);
     if (result["code"] != null && result["code"] == 0) {
       print("loadServerDigitsData result.code=>" + convert.jsonEncode(result["data"]));
-      return convert.jsonEncode(result["data"]).toString();
+      //return convert.jsonEncode(result["data"]).toString();
+      //TODO 测试用
+      return '[{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
+      //return "";
     }
     return "";
   }
@@ -364,7 +367,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       return [];
     }
     maxAuthTokenCount = nativeAuthMap["count"];
-    List tempDigitsList = nativeAuthMap["authDigit"];
+    List<Digit> tempDigitsList = nativeAuthMap["authDigit"];
     if (tempDigitsList == null || tempDigitsList.length == 0) {
       print("认证列表的代币，加载完了 下标===》" + nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;

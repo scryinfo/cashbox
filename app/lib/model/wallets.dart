@@ -395,7 +395,7 @@ class Wallets {
     resultMap["count"] = count;
     resultMap["startItem"] = startItem;
     List authDigitList = updateMap["authDigit"];
-    List resultAuthDigitList = [];
+    List<Digit> resultAuthDigitList = [];
     if (authDigitList == null || authDigitList.length == 0) {
       resultMap["authDigit"] = resultAuthDigitList;
       print("count=====>" + count.toString() + "startItem=====>" + startItem.toString());
