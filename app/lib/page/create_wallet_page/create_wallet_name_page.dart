@@ -18,7 +18,7 @@ class CreateWalletNamePage extends StatefulWidget {
 }
 
 class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
-  bool _eeeChainChoose = true;
+  bool _ethChainChoose = true;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
@@ -273,17 +273,17 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 child: Row(
               children: <Widget>[
                 Checkbox(
-                  value: _eeeChainChoose,
+                  value: _ethChainChoose,
                   onChanged: (newValue) {
                     setState(
                       () {
-                        _eeeChainChoose = newValue;
+                        _ethChainChoose = newValue;
                       },
                     );
                   },
                 ),
                 Text(
-                  translate('eee_token_name'),
+                  translate('eth_token_name'),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 13,
@@ -330,8 +330,8 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       return false;
     }
     //验证：勾选 链
-    if (!_eeeChainChoose) {
-      Fluttertoast.showToast(msg: translate('pls_ensure_eee_chain'));
+    if (!_ethChainChoose) {
+      Fluttertoast.showToast(msg: translate('pls_ensure_eth_chain'));
       return false;
     }
     return true;

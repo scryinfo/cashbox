@@ -34,6 +34,7 @@
   "some_info_is_null": "Please fill all information",
   "pwd_is_not_same": "Confirmation password is wrong, please type it again",
   "pls_ensure_eee_chain": "Please confirm to create EEE chain",
+  "pls_ensure_eth_chain": "Please confirm to create ETH chain",
   "mnemonic_qr_info": "QR made from you information",
   "backup_mnemonic": "Backup mnemonics",
   "mnemonic_info_hint": "The following are the mnemonic words of the wallet, please be sure to copy them carefully and export them to a safe place for storage.\nNote: Once lost, it cannot be recovered.",

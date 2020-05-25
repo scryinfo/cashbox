@@ -102,6 +102,7 @@ class S implements WidgetsLocalizations {
   String get old_pwd => "Old password";
   String get pls_ensure_confirm_pwd => "Please confirm consistency of your password";
   String get pls_ensure_eee_chain => "Please confirm to create EEE chain";
+  String get pls_ensure_eth_chain => "Please confirm to create ETH chain";
   String get pls_ensure_pwd_is_same => "Please input your password again and ensure consistency";
   String get pls_input => "Please input";
   String get pls_input_mnemonic => "Please input mnemonics";
@@ -390,6 +391,8 @@ class $zh extends S {
   String get transaction_detail => "交易详情";
   @override
   String get gas_price => "Gas Price";
+  @override
+  String get pls_ensure_eth_chain => "请确认勾选创建ETH链";
   @override
   String get pls_input_old_pwd => "请输入旧密码";
   @override

@@ -205,8 +205,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                     print("wallet index is===> " + walletList[index].walletId + "|| isNowWallet===>" + walletList[index].isNowWallet.toString());
                     bool isSuccess = await Wallets.instance.setNowWallet(walletList[index].walletId);
                     if (isSuccess) {
-                      //NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
-                      NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
+                      NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
                     } else {
                       Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), timeInSecForIos: 8);
                     }
@@ -283,23 +282,15 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
   List<Widget> _buildChainListCard(Wallet wallet) {
     List<Widget> chainsList = List.generate(wallet.chainList.length, (index) {
       Chain nowChain = wallet.chainList[index];
-      //todo 2.0 目前diamond项目，hard code 只加载EEE链,不显示加载ETH链
-      if (nowChain.chainType == ChainType.EEE || nowChain.chainType == ChainType.EEE_TEST) {
-        /*
-          if (nowChain.chainType == ChainType.ETH_TEST || nowChain.chainType == ChainType.ETH) {
-            todo 2.0 手动写死，只加载eth链,不显示加载EEE链
-        */
-        return Container(
-          alignment: Alignment.centerLeft,
-          height: ScreenUtil().setHeight(7.5),
-          width: ScreenUtil().setWidth(15),
-          child: Text(
-            Chain.chainTypeToValue(nowChain.chainType),
-            style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.instance.setSp(3)),
-          ),
-        );
-      }
-      return Container();
+      return Container(
+        alignment: Alignment.centerLeft,
+        height: ScreenUtil().setHeight(7.5),
+        width: ScreenUtil().setWidth(15),
+        child: Text(
+          Chain.chainTypeToValue(nowChain.chainType),
+          style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.instance.setSp(3)),
+        ),
+      );
     });
     return chainsList;
   }

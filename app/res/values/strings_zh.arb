@@ -34,6 +34,7 @@
   "some_info_is_null": "有信息为空，请补全信息",
   "pwd_is_not_same": "确认密码不一致，请重新输入",
   "pls_ensure_eee_chain": "请确认勾选创建EEE链",
+  "pls_ensure_eth_chain": "请确认勾选创建ETH链",
   "mnemonic_qr_info": "这是您助记词信息生成的二维码",
   "backup_mnemonic": "备份助记词",
   "mnemonic_info_hint": "以下是钱包的助记词，请您务必认真抄写下来并导出至安全的地方存放。\n注意：一旦丢失，无法找回。",
