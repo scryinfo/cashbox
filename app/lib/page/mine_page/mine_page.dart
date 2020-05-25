@@ -47,7 +47,6 @@ class _MinePageState extends State<MinePage> {
         _buildTestWalletWidget(),
         //_buildLanguageChooseWidget(),
         _buildAboutUsWidget(),
-        _buildVersionCheckWidget(),
       ]),
     );
   }
@@ -144,17 +143,6 @@ class _MinePageState extends State<MinePage> {
       },
       child: ItemOfListWidget(
         leftText: translate('about_us_title'),
-      ),
-    );
-  }
-
-  Widget _buildVersionCheckWidget() {
-    return GestureDetector(
-      onTap: () {
-        Fluttertoast.showToast(msg: translate('no_new_version_hint'));
-      },
-      child: ItemOfListWidget(
-        leftText: translate('version_update'),
       ),
     );
   }

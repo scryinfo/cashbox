@@ -29,6 +29,7 @@ class Routes {
   static String recoverWalletPage = '/recoverwalletpage';
   static String privacyStatementPage = '/privacystatementpage';
   static String serviceAgreementPage = '/serviceagreementpage';
+  static String qaInfoPage = '/qainfopage';
   static String transactionHistoryPage = '/transactionhistorypage';
   static String transactionEeeDetailPage = '/transactioneeedetailpage';
   static String aboutUsPage = '/aboutuspage';
@@ -66,6 +67,7 @@ class Routes {
     router.define(recoverWalletPage, handler: recoverWalletPageHandler);
     router.define(privacyStatementPage, handler: privacyStatementHandler);
     router.define(serviceAgreementPage, handler: serviceAgreementHandler);
+    router.define(qaInfoPage, handler: qaInfoHandler);
     router.define(transactionHistoryPage, handler: transactionHistoryHandler);
     router.define(transactionEeeDetailPage, handler: transactionEeeDetailHandler);
     router.define(createTestWalletPage, handler: createTestWalletHandler);

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../res/resources.dart';
 
 class AboutUsPage extends StatefulWidget {
@@ -80,6 +81,16 @@ class _AboutUsPageState extends State<AboutUsPage> {
             },
             child: ItemOfListWidget(
               leftText: translate('service_protocol_title'),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Fluttertoast.showToast(msg: translate('no_new_version_hint'));
+              // todo check app version
+              // NavigatorUtils.push(context, Routes.qaInfoPage);
+            },
+            child: ItemOfListWidget(
+              leftText: translate('version_update'),
             ),
           ),
         ],

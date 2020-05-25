@@ -6,6 +6,7 @@ import 'package:app/page/digits_manage_page/search_digit_page.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/sign_tx_page/sign_tx_page.dart';
 import 'package:app/page/transfer_eee_page/transfer_eee_page.dart';
+import 'package:app/page/user_protocol/qa_info_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
@@ -123,6 +124,10 @@ Handler privacyStatementHandler = Handler(handlerFunc: (BuildContext context, Ma
 
 Handler serviceAgreementHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ServiceAgreementPage();
+});
+
+Handler qaInfoHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return QaInfoPage();
 });
 
 Handler transactionHistoryHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
