@@ -47,6 +47,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
     print("initData() displayDigitsList.length====>" + displayDigitsList.length.toString());
     {
+      /*   todo 1.0 暂时不做，写死预置代币数据
       var spUtil = await SharedPreferenceUtil.instance;
       var localDigitsVersion = spUtil.getString(GlobalConfig.authDigitsVersionKey);
       var serverDigitsVersion = Provider.of<ServerConfigProvide>(context).authDigitListVersion;
@@ -76,6 +77,21 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               spUtil.setString(GlobalConfig.authDigitsVersionKey, serverDigitsVersion); //保存server端，拿到的版本号
             }
           }
+        }
+      }*/
+      {
+        //todo 1.0 写死，预置代币
+        var digitParam =
+            '[{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
+        await updateNativeAuthDigitList(digitParam);
+        var addDigitMap = await Wallets.instance
+            .addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, "3");
+        int status = addDigitMap["status"];
+        if (status == null || status != 200) {
+          Fluttertoast.showToast(msg: "执行状态保存，出问题了,请重新尝试");
+          print("addDigitToChainModel failure==" + addDigitMap["message"]);
+        } else {
+          print("addDigitToChainModel successful==");
         }
       }
       var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);

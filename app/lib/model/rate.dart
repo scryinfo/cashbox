@@ -16,7 +16,7 @@ class Rate {
     // 可初始化参数
   }
 
-  Map digitRateMap = Map<String, DigitRate>();
+  Map<String, DigitRate> digitRateMap = Map<String, DigitRate>();
   Map legalMap = Map<String, double>();
   String nowLegalCurrency = "USD";
 
@@ -24,7 +24,7 @@ class Rate {
     this.digitRateMap = digitRateMap;
   }
 
-  setLegalMap(Map map) {
+  setLegalMap(map) {
     this.legalMap = map;
   }
 
@@ -45,33 +45,34 @@ class Rate {
   }
 
   //todo 待rate后台接口确认后，替换成changeDaily
-  double getChangeHourly(Digit digit) {
-    if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
+  double getChangeDaily(Digit digit) {
+    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return this.digitRateMap[digit.shortName.toUpperCase()]["changeHourly"];
+    return this.digitRateMap[digit.shortName.trim().toUpperCase()].changeDaily;
   }
 
   String getName(Digit digit) {
-    if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
+    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return "";
     }
-    return this.digitRateMap[digit.shortName.toUpperCase()]["name"];
+    return this.digitRateMap[digit.shortName.trim().toUpperCase()].name;
   }
 
   String getSymbol(Digit digit) {
-    if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
+    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return "";
     }
-    return this.digitRateMap[digit.shortName.toUpperCase()]["symbol"];
+    return this.digitRateMap[digit.shortName.trim().toUpperCase()].symbol;
   }
 
   double getPrice(Digit digit) {
     //法币对应单价
-    if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
+    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return instance.digitRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[getNowLegalCurrency()];
+    return instance.digitRateMap[digit.shortName.trim().toUpperCase()].price * instance.legalMap[getNowLegalCurrency()];
+    //return instance.digitRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[getNowLegalCurrency()];
   }
 
   double getMoney(Digit digit) {
@@ -82,17 +83,19 @@ class Rate {
   }
 
   double getHigh(Digit digit) {
-    if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
+    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return instance.digitRateMap[digit.shortName.toUpperCase()]["high"];
+    return instance.digitRateMap[digit.shortName.trim().toUpperCase()].high;
+    //return instance.digitRateMap[digit.shortName.toUpperCase()]["high"];
   }
 
   double getLow(Digit digit) {
-    if (!digitRateMap.containsKey(digit.shortName.toUpperCase())) {
+    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return instance.digitRateMap[digit.shortName.toUpperCase()]["low"];
+    return instance.digitRateMap[digit.shortName.trim().toUpperCase()].low;
+    //return instance.digitRateMap[digit.shortName.toUpperCase()]["low"];
   }
 }
 
@@ -106,14 +109,14 @@ class DigitRate {
   double histHigh = 0.0;
   double histLow = 0.0;
   int timestamps = 0;
-  int volume = 0;
-  double changeHourly = 0.00; //todo 待rate后台接口确认后，替换成changeDaily
+  double volume = 0;
+  double changeDaily = 0.00; //todo 待rate后台接口确认后，替换成changeDaily
   //todo 待rate后台接口确认后，替换成changeDaily
-  String get getChangeHour {
-    if (changeHourly > 0) {
-      return (changeHourly * 100.0).toStringAsFixed(5) + "%" + "↑";
+  String get getChangeDaily {
+    if (changeDaily > 0) {
+      return (changeDaily * 100.0).toStringAsFixed(5) + "%" + "↑";
     }
-    return (changeHourly * 100.0).toStringAsFixed(5) + "%" + "↓";
+    return (changeDaily * 100.0).toStringAsFixed(5) + "%" + "↓";
   }
 
   double getPrice(String legalCurrency) {

@@ -11,7 +11,7 @@ abstract class Digit {
   String address; //代币地址
   String contractAddress = ""; //代币合约地址
   String urlImg; //代币图标icon地址
-  bool isVisible; //代币是否可见
+  bool isVisible = true; //代币是否可见
   DigitRate digitRate; //市场价格
   String lastTxInfo; //链上最后一笔交易
 }

@@ -72,7 +72,21 @@ class _EthPageState extends State<EthPage> {
   void initData() async {
     bool isForceLoadFromJni = widget.isForceLoadFromJni;
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;
-    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: isForceLoadFromJni);
+    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
+    {
+      //todo 1.0 写死，预置DDD代币
+      var digitParam =
+          '[{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
+      await updateNativeAuthDigitList(digitParam);
+      var addDigitMap = await Wallets.instance.addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, "3");
+      int status = addDigitMap["status"];
+      if (status == null || status != 200) {
+        print("addDigitToChainModel failure==" + addDigitMap["message"]);
+      } else {
+        print("addDigitToChainModel successful==");
+      }
+    }
+    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
       Wallet wallet = walletList[index];
@@ -92,8 +106,19 @@ class _EthPageState extends State<EthPage> {
     });
     loadDigitBalance();
     loadLegalCurrency();
-    //loadDigitRateInfo(); //todo
+    loadDigitRateInfo();
     //loadServeConfigInfo(); //todo 去获取服务器端的 配置信息
+  }
+
+  //todo 保存预置代币 version1.0写死，后续移除
+  updateNativeAuthDigitList(String param) async {
+    if (param == null || param.isEmpty || (param.trim() == "")) {
+      print("param is empty======>" + param);
+      return;
+    }
+    print("updateNativeAuthDigitList  param=====>" + param.toString());
+    var updateMap = await Wallets.instance.updateAuthDigitList(param);
+    print("updateMap[isUpdateAuthDigit]=====>" + updateMap["status"].toString() + updateMap["isUpdateAuthDigit"].toString());
   }
 
   loadServeConfigInfo() async {
@@ -129,19 +154,20 @@ class _EthPageState extends State<EthPage> {
       if (rate == null) {
         return;
       }
+      List<String> rateKeys = rate.digitRateMap.keys.toList();
       for (var i = 0; i < displayDigitsList.length; i++) {
-        print("rate.digitRateMap.length ===>" + rate.digitRateMap.length.toString());
-        if (this.displayDigitsList[i].shortName.toUpperCase() != null &&
-            (rate.digitRateMap.containsKey(this.displayDigitsList[i].shortName.toUpperCase()))) {
+        int index = i;
+        if ((this.displayDigitsList[index].shortName.toUpperCase() != null) &&
+            (rateKeys.contains(this.displayDigitsList[index].shortName.toUpperCase().trim().toString()))) {
           setState(() {
-            this.displayDigitsList[i].digitRate
-              ..symbol = rate.getSymbol(this.displayDigitsList[i])
-              ..price = rate.getPrice(this.displayDigitsList[i])
-              ..changeHourly = rate.getChangeHourly(this.displayDigitsList[i]);
+            this.displayDigitsList[index].digitRate
+              ..symbol = rate.getSymbol(this.displayDigitsList[index])
+              ..price = rate.getPrice(this.displayDigitsList[index])
+              ..changeDaily = rate.getChangeDaily(this.displayDigitsList[index]);
           });
         } else {
-          print("digitName is not exist===>" + this.displayDigitsList[i].shortName);
-          LogUtil.w("digitName is not exist===>", this.displayDigitsList[i].shortName);
+          print("digitName is not exist===>" + this.displayDigitsList[index].shortName);
+          LogUtil.w("digitName is not exist===>", this.displayDigitsList[index].shortName);
         }
       }
     }
@@ -267,10 +293,11 @@ class _EthPageState extends State<EthPage> {
                 //DigitListCard(),
               ],
             ),
+            /* todo 1.0 不设置增加代币入口
             Positioned(
               bottom: ScreenUtil.instance.setHeight(5),
               child: _buildAddDigitButton(),
-            )
+            )*/
           ],
         ),
       ),
@@ -478,7 +505,7 @@ class _EthPageState extends State<EthPage> {
                                   Padding(
                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                     child: Text(
-                                      displayDigitsList[index].digitRate.getChangeHour ?? "0%", //市场价格波动
+                                      displayDigitsList[index].digitRate.getChangeDaily ?? "0%", //市场价格波动
                                       style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
                                     ),
                                   )
@@ -633,7 +660,7 @@ class _EthPageState extends State<EthPage> {
                     });
                   }
                   loadDigitBalance();
-                  //loadDigitRateInfo();//todo
+                  loadDigitRateInfo();
                 },
                 itemCount: Wallets.instance.nowWallet.chainList.length,
                 pagination: new SwiperPagination(

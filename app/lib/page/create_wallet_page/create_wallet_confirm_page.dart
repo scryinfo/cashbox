@@ -119,8 +119,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                   var isSuccess = await _verifyMnemonicSame();
                   if (isSuccess) {
                     Provider.of<CreateWalletProcessProvide>(context).emptyData(); /**创建钱包完成，清楚内存关于助记词的记录信息*/
-                    //NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
-                    NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
+                    NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
+                    //NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                   } else {
                     Fluttertoast.showToast(msg: translate('mnemonic_order_wrong'));
                   }

@@ -342,7 +342,7 @@ class _EeePageState extends State<EeePage> {
                                     child: Padding(
                                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                       child: Text(
-                                        displayDigitsList[index].digitRate.getChangeHour ?? "0%", //市场价格波动
+                                        displayDigitsList[index].digitRate.getChangeDaily ?? "0%", //市场价格波动
                                         style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
                                       ),
                                     ),

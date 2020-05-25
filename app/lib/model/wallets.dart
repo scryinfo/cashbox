@@ -110,7 +110,8 @@ class Wallets {
         ..nowChainId = jniList[walletIndex]["nowChainId"].toString()
         ..creationTime = jniList[walletIndex]["creationTime"].toString()
         ..isNowWallet = jniList[walletIndex]["isNowWallet"];
-      {
+      //  todo version1.0不加scryx链的展示
+      /*{
         var eeeChain = jniList[walletIndex]["eeeChain"];
         Chain chainEeeM = ChainEEE();
         chainEeeM
@@ -137,7 +138,7 @@ class Wallets {
           chainEeeM.digitsList.add(digitM);
         }
         walletM.chainList.add(chainEeeM); ////将chain 添加到chainList里面
-      }
+      }*/
       {
         //ETH
         ChainETH chainEthM = ChainETH();
@@ -415,6 +416,7 @@ class Wallets {
           ethDigit.shortName = name;
           ethDigit.decimal = decimal;
           ethDigit.contractAddress = contract;
+          ethDigit.isVisible = false; //从代币列表加载的，先设置不可见，跟本地chain下对比后，再判是否visible
           resultAuthDigitList.add(ethDigit);
           break;
         case ChainType.BTC:
