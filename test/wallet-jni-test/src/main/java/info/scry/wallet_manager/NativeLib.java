@@ -514,6 +514,20 @@ public class NativeLib {
         public String inputInfo;            //附加信息
         public String accountKeyInfo;       //账户存储key
         public AccountInfo accountInfo;     //账户信息
+
+        @Override
+        public String toString() {
+            return "Message{" +
+                    "status=" + status +
+                    ", message='" + message + '\'' +
+                    ", signedInfo='" + signedInfo + '\'' +
+                    ", energyTransferInfo='" + energyTransferInfo + '\'' +
+                    ", ethSignedInfo='" + ethSignedInfo + '\'' +
+                    ", inputInfo='" + inputInfo + '\'' +
+                    ", accountKeyInfo='" + accountKeyInfo + '\'' +
+                    ", accountInfo=" + accountInfo +
+                    '}';
+        }
     }
 
     //定义EEE 链账户信息
@@ -524,6 +538,18 @@ public class NativeLib {
         public String reserved;          //保留的余额，这里面的余额 表示参加需要的活动，目前链上还未设计这相关业务
         public String misc_frozen;      // The amount that `free` may not drop below when withdrawing for *anything except transaction fee payment*.
         public String fee_frozen;       //The amount that `free` may not drop below when withdrawing specifically for transaction fee payment.
+
+        @Override
+        public String toString() {
+            return "AccountInfo{" +
+                    "nonce=" + nonce +
+                    ", refcount=" + refcount +
+                    ", free='" + free + '\'' +
+                    ", reserved='" + reserved + '\'' +
+                    ", misc_frozen='" + misc_frozen + '\'' +
+                    ", fee_frozen='" + fee_frozen + '\'' +
+                    '}';
+        }
     }
 
     //获取拼装原始交易，区分链类型

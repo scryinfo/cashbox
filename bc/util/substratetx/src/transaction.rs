@@ -10,7 +10,7 @@ pub use sp_runtime::{
     generic::{Era, SignedPayload, UncheckedExtrinsic},
     traits::{IdentifyAccount, Verify},
 };
-use frame_support::storage::StorageMap;
+use frame_support::storage::{StorageMap,StorageValue};
 use std::ops::Mul;
 use crypto::Crypto;
 
@@ -177,6 +177,10 @@ pub fn account_info_key(account_id:&str)->Result<String,error::Error>{
     Ok(key)
 }
 
+pub fn event_key()->String{
+    let final_key = <system::Events<Runtime>>::hashed_key();
+     format!("0x{:}", HexDisplay::from(&final_key))
+}
 
 pub fn decode_account_info(info:&str)->Result<EeeAccountInfo,error::Error>{
     if !info.starts_with("0x") {

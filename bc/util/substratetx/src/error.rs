@@ -18,17 +18,16 @@ pub enum Error {
     ScaleCodec(codec::Error),
 }
 
-/*impl std::error::Error for Error {
+impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         use self::Error::*;
-        match *self {
-            Custom(_)|HexError(_)|Serde(_) => None,
-            Bip39(ref e)=> Some(e),
-            Public(ref e)=> Some(e),
-            SecretString(ref e)=> Some(e),
+        match self {
+            Serde( err)=>Some(err),
+            HexError(err)=>Some(err),
+            _ => None
         }
     }
-}*/
+}
 
 impl From<failure::Error> for Error{
     fn from(err: failure::Error)->Self{

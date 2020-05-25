@@ -18,5 +18,10 @@ pub struct EeeAccountInfo{
     pub fee_frozen: String,
 }
 
+#[test]
+fn event_key_test(){
+    println!("hash key:{}",transaction::event_key());
+}
+
 
 

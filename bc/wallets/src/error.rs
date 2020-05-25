@@ -11,7 +11,6 @@ pub enum WalletError{
     EthTx(ethtx::Error),
     SubstrateTx(substratetx::error::Error),
     Serde(serde_json::Error),
-   // Public(sp_core::crypto::PublicError),
     ScaleCodec(codec::Error),
     Secp256k1(secp256k1::Error),
     NotExist,
@@ -27,7 +26,6 @@ impl fmt::Display for WalletError{
             WalletError::EthTx(ref err)=>err.fmt(f),
             WalletError::SubstrateTx(ref err)=>err.fmt(f),
             WalletError::Serde(ref err)=>err.fmt(f),
-           // WalletError::Public(err)=>write!(f, "sp_core Public error: {:?}", err),
             WalletError::ScaleCodec(ref err)=>err.fmt(f),
             WalletError::Secp256k1(ref err)=>err.fmt(f),
             WalletError::NotExist=>write!(f,"value not exist"),
@@ -37,19 +35,13 @@ impl fmt::Display for WalletError{
     }
 }
 
-/*fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-    use self::Error::*;
-    match *self {
-        Unreachable | Decoder(_) | InvalidResponse(_) | Transport(_) | Internal|Other(_) => None,
-        Io(ref e) => Some(e),
-    }
-}*/
-
 impl Error for WalletError{
     fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match *self{
-            WalletError::Custom(_)|WalletError::NotExist=>None,
+        match self{
             WalletError::Io(ref err)=>Some(err),
+            WalletError::Serde(error)=>Some(error),
+            WalletError::EthTx(error)=>Some(error),
+            WalletError::SubstrateTx(error)=>Some(error),
             _ => None,
         }
     }

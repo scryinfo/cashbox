@@ -21,20 +21,20 @@ public class NativeLibTest {
       //  addNonAuthDigitTest();
       //  getAuthDigitListTest();
         //  queryDigitTest();
-         addDigitTest();
+       //  addDigitTest();
 
       //  eeeTransferTest();
-       // eeeAccountInfoKeyTest();
-       // decodeAccountInfoTest();
+      // eeeAccountInfoKeyTest();
+        decodeAccountInfoTest();
         // eeeTxsign();
       //  walletSaveTest();
       //  updateBalance();
        // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
-        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+      /*  List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         for (NativeLib.Wallet wallet:wallets){
             System.out.println("***********************");
             System.out.println(wallet.toString());
-        }
+        }*/
     }
 
 
@@ -107,12 +107,12 @@ public class NativeLibTest {
     }
 
     public static void eeeAccountInfoKeyTest(){
-        NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty");
+        NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
         System.out.println(msg);
     }
 
     public static void decodeAccountInfoTest(){
-        NativeLib.Message msg = NativeLib.decodeAccountInfo("0x000000000100405f2954c5c535360000000000000000c040b571e8030000000000000000000000c16ff2862300000000000000000000000000000000000000000000000000");
+        NativeLib.Message msg = NativeLib.decodeAccountInfo("0x000000000000809bfddd0616000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
         System.out.println(msg);
     }
 
