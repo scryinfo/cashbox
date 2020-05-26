@@ -49,7 +49,7 @@
   "click_to_sign": "点击签名",
   "pwd_verify": "密码验证",
   "info_sign_hint": "请输入密码进行签名",
-  "hint_extend_msg_option": "待签名信息如下",
+  "hint_extend_msg_option": "可添加交易备注信息",
   "mnemonic_backup_ok": "助记词已经记好",
   "verify_wallet": "验证钱包",
   "verify_backup_mnemonic": "验证助记词",

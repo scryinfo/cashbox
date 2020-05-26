@@ -49,7 +49,7 @@
   "click_to_sign": "click to sign message",
   "pwd_verify": "verify password",
   "info_sign_hint": "please input password to sign this message",
-  "hint_extend_msg_option": "as follow is wait to sign message",
+  "hint_extend_msg_option": "could add some backup message",
   "mnemonic_backup_ok": "Mnemonics have been well kept",
   "verify_wallet": "Verify wallet",
   "verify_backup_mnemonic": "Verify mnemonics",

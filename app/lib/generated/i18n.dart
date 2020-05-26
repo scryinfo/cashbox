@@ -69,7 +69,7 @@ class S implements WidgetsLocalizations {
   String get gas_price => "Gas Price";
   String get gas_used => "Gas consume";
   String get high_setting => "More settings";
-  String get hint_extend_msg_option => "as follow is wait to sign message";
+  String get hint_extend_msg_option => "could add some backup message";
   String get import_wallet => "import wallet";
   String get info_sign => "Sign follow message";
   String get info_sign_hint => "please input password to sign this message";
@@ -260,7 +260,7 @@ class $zh extends S {
   @override
   String get advice_pwd_format => "建议大于8位，英文、数字混合";
   @override
-  String get hint_extend_msg_option => "待签名信息如下";
+  String get hint_extend_msg_option => "可添加交易备注信息";
   @override
   String get info_sign_hint => "请输入密码进行签名";
   @override

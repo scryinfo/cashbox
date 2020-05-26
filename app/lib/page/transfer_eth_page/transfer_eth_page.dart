@@ -496,8 +496,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
                               ),
                               hintText: translate('hint_extend_msg_option'),
                               hintStyle: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.7),
-                                fontSize: ScreenUtil.instance.setSp(3.5),
+                                color: Color.fromRGBO(255, 255, 255, 0.6),
+                                fontSize: ScreenUtil.instance.setSp(3),
                               ),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black87),
