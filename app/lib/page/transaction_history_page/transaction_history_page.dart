@@ -10,6 +10,7 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
@@ -101,60 +102,36 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         children: <Widget>[
           Gaps.scaleHGap(7),
           Container(
-            width: ScreenUtil().setWidth(55),
-            //color: Colors.amberAccent,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  alignment: Alignment.centerLeft,
-                  height: ScreenUtil().setHeight(8),
-                  constraints: BoxConstraints(maxWidth: ScreenUtil().setWidth(18)),
-                  child: Text(
-                    balanceInfo ?? "0.0000",
-                    textAlign: TextAlign.start,
+              width: ScreenUtil().setWidth(55),
+              //color: Colors.amberAccent,
+              child: SingleChildScrollView(
+                child: RichText(
+                    text: TextSpan(children: <TextSpan>[
+                  TextSpan(
+                    text: balanceInfo ?? "0.0000",
                     style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Colors.white,
                       fontSize: ScreenUtil.instance.setSp(4.2),
-                      color: Colors.white,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                Gaps.scaleHGap(0.3),
-                Container(
-                  width: ScreenUtil().setWidth(10),
-                  child: Text(
-                    digitName ?? "*",
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      fontSize: ScreenUtil.instance.setSp(3.5),
-                      color: Colors.white,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                Gaps.scaleHGap(0.5),
-                Opacity(
-                  opacity: 1,
-                  child: Container(
-                    width: ScreenUtil().setWidth(25),
-                    child: Text(
-                      "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: ScreenUtil.instance.setSp(3),
-                        color: Colors.lightBlueAccent,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      fontStyle: FontStyle.normal,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
+                  TextSpan(
+                    text: " ",
+                  ),
+                  TextSpan(
+                    text: digitName ?? "*",
+                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3.5), fontStyle: FontStyle.normal),
+                  ),
+                  TextSpan(
+                    text: " ",
+                  ),
+                  TextSpan(
+                    text: "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
+                    style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil.instance.setSp(3.5), fontStyle: FontStyle.normal),
+                  ),
+                ])),
+              )),
           Gaps.scaleHGap(1),
           Container(
             //height: ScreenUtil().setHeight(8),
