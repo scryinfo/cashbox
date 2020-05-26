@@ -26,10 +26,12 @@ impl DataServiceProvider {
     }
 
     pub fn save_wallet_address(&mut self, mn: TbWallet, addrs: Vec<TbAddress>) -> WalletResult<()> {
-        let wallet_sql = "INSERT into Wallet(wallet_id,mn_digest,fullname,mnemonic,wallet_type,display_chain_id)VALUES(?,?,?,?,?,?)";
+        let update_selected = "UPDATE Wallet set selected = 0 where wallet_id = (SELECT wallet_id FROM Wallet where selected==1 )";
+        let wallet_sql = "INSERT into Wallet(wallet_id,mn_digest,fullname,mnemonic,wallet_type,display_chain_id,selected)VALUES(?,?,?,?,?,?,?)";
         let address_sql = "insert into detail.Address(address_id,wallet_id,chain_id,address,puk_key,status) values(?,?,?,?,?,?);";
-        // TODO 增加事务的处理，这个的编码方式还需要修改 才能编译通过
-        // TODO 根据链的地址种类 对应的填写代币账户信息
+
+        self.db_hander.execute(update_selected)?;
+
         let save_wallet_flag = match self.db_hander.prepare(wallet_sql) {
             Ok(mut stat) => {
                 stat.bind(1, mn.wallet_id.as_str())?;
@@ -38,18 +40,10 @@ impl DataServiceProvider {
                 stat.bind(4, mn.mnemonic.as_str())?;
                 stat.bind(5, mn.wallet_type)?;
                 stat.bind(6, mn.display_chain_id as i64)?;
-
-                match stat.next() {
-                    Ok(_) => {
-                        //检查当前钱包 是否只有一个，若是只有一个钱包，则设置它为当前钱包
-                        let update_selected = format!("UPDATE Wallet set selected = ( case WHEN (SELECT count(*) FROM Wallet)==1 then 1 else 0 end ) WHERE wallet_id= '{}'", mn.wallet_id);
-                        self.db_hander.execute(update_selected)?;
-                        Ok(())
-                    }
-                    Err(e) => Err(e.to_string())
-                }
+                stat.bind(7, true as i64)?;
+                stat.next()
             }
-            Err(e) => Err(e.to_string())
+            Err(e) => Err(e.into())
         };
 
         if save_wallet_flag.is_ok() {
@@ -144,7 +138,7 @@ impl DataServiceProvider {
 
     //当前该功能是返回所有的钱包
     pub fn get_wallets(&self) -> Vec<TbWallet> {
-        let sql = "select * from Wallet WHERE status = 1;";
+        let sql = "select * from Wallet WHERE status = 1 order by create_time desc;";
         let mut statement = self.db_hander.prepare(sql).unwrap();
         self.get_wallets_from_database(&mut statement)
     }
@@ -164,12 +158,23 @@ impl DataServiceProvider {
     pub fn del_mnemonic(&self, mn_id: &str) -> WalletResult<()> {
         let sql = "DELETE from Wallet WHERE wallet_id = ?; ";
         let update_address = "UPDATE Address set status = 0 WHERE wallet_id =?;";
+        let check_select_wallet = "select count(*) from wallet where selected=1;";
+
         let mut stat = self.db_hander.prepare(sql)?;
         stat.bind(1, mn_id)?;
         stat.next()?;
         let mut stat = self.db_hander.prepare(update_address)?;
         stat.bind(1, mn_id)?;
-        stat.next().map(|_| ()).map_err(|err| err.into())
+        stat.next()?;
+        let mut stat = self.db_hander.prepare(check_select_wallet)?;
+        stat.next()?;
+        if let Ok(count) = stat.read::<i64>(0){
+            if count==0 {
+                let update_selected_sql = "update Wallet set selected = 1 where wallet_id = (select wallet_id from  Wallet order by create_time desc limit 1 offset 0);";
+                self.db_hander.execute(update_selected_sql)?;
+            }
+        }
+        Ok(())
     }
 
     pub fn rename_mnemonic(&self, mn_id: &str, mn_name: &str) -> WalletResult<()> {

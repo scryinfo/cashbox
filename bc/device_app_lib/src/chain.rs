@@ -328,12 +328,20 @@ pub mod android {
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env: JNIEnv, _: JClass, walletId:JString,chainType:jint, fromAddress:JString,
                                                                                 toAddress:JString, contractAddress:JString, value:JString, backup:JString, pwd:jbyteArray,
                                                                                 gasPrice:JString,gasLimit:JString,nonce:JString,decimal:jint) -> jobject {
+
+        let wallet_message_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_message_class");
+        let state_obj = env.alloc_object(wallet_message_class).expect("state_obj");
+
         //使用的钱包id
         let _wallet_id: String = env.get_string(walletId).unwrap().into();
         //发送方账户地址 通过wallet id 能够关联起来
         let from_address: String = env.get_string(fromAddress).unwrap().into();
         //接收方账户地址
         let to_address: String = env.get_string(toAddress).unwrap().into();
+
+
+
+
         let to_address = {
             if to_address.is_empty() {
                 None
@@ -404,8 +412,7 @@ pub mod android {
             wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address, contract_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_type as u64)
         };
 
-        let wallet_message_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_message_class");
-        let state_obj = env.alloc_object(wallet_message_class).expect("state_obj");
+
         match signed_ret {
             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");

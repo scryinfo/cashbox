@@ -176,6 +176,22 @@ pub fn convert_token(value:&str,decimal:usize)->Option<U256>{
     }
 }
 
+pub fn address_legal(address:&str) ->bool{
+    let address= address.trim().to_lowercase();
+    if address.is_empty()||!address.starts_with("0x")||address.len()!=42 {
+        return false;
+    }
+    let chars = address.get(2..).unwrap().chars();
+    for c in chars {
+
+        if !(('a'<=c&&c<='z')||('0'<=c&&c<='9')){
+            log::error!("illegal {}",c);
+            return false;
+        }
+    }
+    true
+}
+
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
 struct ContractFunc{
     func_name:String,
@@ -244,16 +260,16 @@ fn erc20_transfer_data_test() {
     let value = U256::from_dec_str("2000").unwrap();
     match get_erc20_transfer_data(address,value){
         Ok(data)=>{
-            println!("erc20 data:{}",hex::encode(data))
+            assert_eq!("a9059cbb0000000000000000000000005a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c00000000000000000000000000000000000000000000000000000000000007d0".to_string(),hex::encode(data));
         },
-        Err(e)=>println!("{}",e.to_string())
+        Err(e)=>log::error!("{}",e.to_string())
     }
 }
 
 #[test]
 fn decode_tranfer_data_test(){
     let ret = decode_tranfer_data("0xa9059cbb000000000000000000000000c0c4824527ffb27a51034cea1e37840ed69a5f1e00000000000000000000000000000000000000000000000000000000000a2d77646464");
-    println!("{:?}",ret);
+    assert_eq!(Ok("ddd".to_string()),ret);
 }
 
 #[test]
@@ -274,35 +290,29 @@ fn eth_rawtx_sign_test(){
     //rawtx.data = addition.as_bytes().to_vec();
    // rawtx.data = contract_byte;
    // rawtx.to = None;
-//
     let words = "pulp second side simple clinic step salad enact only mixed address paddle";
-    let pri_from_mn = pri_from_mnemonic(words,None);
-    println!("pri_from_mn:{:?}",hex::encode(pri_from_mn));
+    let pri_from_mn = pri_from_mnemonic(words,None).unwrap();
+    assert_eq!("c6e2fcde7a2713e20cb92f23e11f6d7ac5601124d38ba0eea3bf538a030c9365".to_string(),hex::encode(pri_from_mn));
     let pri = "4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
     let signed_data = rawtx.sign(&hex::decode(pri).unwrap(),chain_id);
-    //let signed_str = String::from_utf8(signed_data);
-    println!("signed byte len is:{},data detail:{:?}",signed_data.len(),signed_data);
-    println!("signed hex data:{:?}",hex::encode(signed_data));
-}
-
-#[test]
-fn input_data_test(){
-    let bytes = hex::decode("6162630000000000000000000000000000000000000000000000000000000000").unwrap();
-    println!("{}",String::from_utf8(bytes).unwrap());
+    assert_eq!("f86d068504a817c800837a1200941c9baedc94600b2d1c8a6d2bad1744e6182f300e880de0b6b3a76400008046a07e2c71664464b95fab4b1706785c244d86cef96b5e5c186a314c63306cfe9c54a0637c605b6004bb244cbea9bc69e18b7bd18b491c3794e17e31a0c932592bb476".to_string(),hex::encode(signed_data))
 }
 
 
 
 #[test]
 fn dec_prase_test() {
-    let ret1 = convert_token("123", 18);
-    println!("ret:{:?}", ret1);
-    let ret2 = convert_token("123.123456789", 18);
-    println!("ret:{:?}", ret2);
-    let ret3 = convert_token("123.012345678901234567", 18);
-    println!("ret:{:?}", ret3);
-    let ret4 = convert_token("123.01234567890123456789", 18);
-    println!("ret:{:?}", ret4);
+    assert_eq!( U256::from_dec_str("123000000000000000000").ok(), convert_token("123", 18));
+    assert_eq!( U256::from_dec_str("123123456789000000000").ok(), convert_token("123.123456789", 18));
+    assert_eq!(U256::from_dec_str("123012345678901234567").ok(), convert_token("123.012345678901234567", 18));
+    assert_eq!(U256::from_dec_str("123012345678901234567").ok(), convert_token("123.01234567890123456789", 18));
+}
+
+#[test]
+fn address_format_legal_test(){
+    assert_eq!(false, address_legal("1b5b5f3c5d"));
+    assert_eq!(true, address_legal("0x72f901b5b5f3c5d599bfcdda667b5b4716e3c46c"));
+    assert_eq!(true, address_legal("0x7+f901b5b5f3c5d599bfcdda667b5b4716e3c46c"));
 }
 
 

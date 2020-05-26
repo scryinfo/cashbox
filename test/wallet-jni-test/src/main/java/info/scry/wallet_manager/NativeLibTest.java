@@ -13,28 +13,28 @@ public class NativeLibTest {
 
 
         System.out.println("********************start jni func test***************************************");
-        // System.out.println(NativeLib.initWalletBasicData());
+       //  System.out.println(NativeLib.initWalletBasicData());
        // updateDefaultDigitTest();
-      //  walletGenerateTest();
+       // walletGenerateTest();
        // walletExportTest();
        //  updateAuthListTest();
       //  addNonAuthDigitTest();
       //  getAuthDigitListTest();
         //  queryDigitTest();
        //  addDigitTest();
-
+        delWalletTest();
       //  eeeTransferTest();
       // eeeAccountInfoKeyTest();
-        decodeAccountInfoTest();
+     //   decodeAccountInfoTest();
         // eeeTxsign();
       //  walletSaveTest();
       //  updateBalance();
        // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
-      /*  List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         for (NativeLib.Wallet wallet:wallets){
             System.out.println("***********************");
             System.out.println(wallet.toString());
-        }*/
+        }
     }
 
 
@@ -81,13 +81,16 @@ public class NativeLibTest {
 
     public static void walletGenerateTest(){
         Random random = new Random(1);
-        while (NativeLib.loadAllWalletList().size()<2){
+        while (NativeLib.loadAllWalletList().size()<4){
             NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(12);
             System.out.println(mnemonic.mnId);
             int  r = random.nextInt(1000);
             NativeLib.Wallet wallet =  NativeLib.saveWallet("wallet_hello"+r ,"123456".getBytes(),mnemonic.mn,1);
             System.out.println(wallet.toString());
         }
+    }
+    public static void delWalletTest(){
+        System.out.println(NativeLib.deleteWallet("b7bcc633-8565-4611-a926-402668286c01","123456".getBytes()));
     }
     public static void walletExportTest(){
         //钱包导出

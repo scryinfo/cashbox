@@ -1,5 +1,5 @@
 use super::*;
-use codec::{Encode,Decode};
+
 use node_runtime::{AccountId, Balance, Index, Signature,Call, Runtime,BalancesCall};
 use sp_core::{
     H256,ecdsa, ed25519, sr25519,
@@ -175,11 +175,6 @@ pub fn account_info_key(account_id:&str)->Result<String,error::Error>{
     let final_key =  <system::Account<Runtime>>::hashed_key_for(account_id);
     let key = format!("0x{:}", HexDisplay::from(&final_key));
     Ok(key)
-}
-
-pub fn event_key()->String{
-    let final_key = <system::Events<Runtime>>::hashed_key();
-     format!("0x{:}", HexDisplay::from(&final_key))
 }
 
 pub fn decode_account_info(info:&str)->Result<EeeAccountInfo,error::Error>{
