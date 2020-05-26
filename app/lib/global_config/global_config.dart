@@ -18,8 +18,6 @@ class GlobalConfig {
   static Map<String, double> minGasPriceMap = {EthGasPriceKey: 2, Erc20GasPriceKey: 2};
   static Map<String, double> defaultGasPriceMap = {EthGasPriceKey: 9, Erc20GasPriceKey: 6};
 
-  static bool isDebugVersion = true; //全局开关，控制是否用 测试链
-
   static String savedLocaleKey = "savedLocaleKey"; //默认语言中文；
   static String defaultLocaleValue = "zh"; //默认语言中文；
   static String zhLocale = "zh"; //

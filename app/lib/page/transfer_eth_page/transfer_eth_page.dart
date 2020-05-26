@@ -56,7 +56,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
   String digitName = "";
   String nonce = "";
   int decimal = 0;
-  Chain nowChain;
 
   @override
   void initState() {
@@ -71,17 +70,11 @@ class _TransferEthPageState extends State<TransferEthPage> {
       chainType = Provider.of<TransactionProvide>(context).chainType;
       digitBalance = Provider.of<TransactionProvide>(context).balance;
     }
-    Wallet walletM = Wallets.instance.nowWallet;
-    if (GlobalConfig.isDebugVersion) {
-      nowChain = walletM.getChainByChainType(ChainType.ETH_TEST);
-    } else {
-      nowChain = walletM.nowChain;
-    }
     if (fromAddress == null || fromAddress.trim() == "") {
-      fromAddress = nowChain.chainAddress;
+      fromAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
     }
     if (chainType == null) {
-      chainType = nowChain.chainType;
+      chainType = Wallets.instance.nowWallet.nowChain.chainType;
     }
     if (decimal == null) {
       decimal = 18;
@@ -735,12 +728,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   void sendRawTx2Chain(String rawTx) async {
     NavigatorUtils.goBack(context);
     showProgressDialog(context, "交易发送上链中");
-    String txHash;
-    if (GlobalConfig.isDebugVersion) {
-      txHash = await sendRawTx(ChainType.ETH_TEST, rawTx);
-    } else {
-      txHash = await sendRawTx(nowChain.chainType, rawTx);
-    }
+    String txHash = await sendRawTx(Wallets.instance.nowWallet.nowChain.chainType, rawTx);
     print("after broadcast txHash is===>" + txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
       Fluttertoast.showToast(msg: "交易上链 成功", timeInSecForIos: 8);
@@ -772,30 +760,26 @@ class _TransferEthPageState extends State<TransferEthPage> {
       Fluttertoast.showToast(msg: translate('to_address_null').toString(), timeInSecForIos: 3);
       return false;
     }
-    if (!GlobalConfig.isDebugVersion) {
-      // release版本做格式检查
-      if (!Utils.checkByEthAddressFormat(_toAddressController.text)) {
-        Fluttertoast.showToast(msg: "对方地址格式 有问题", timeInSecForIos: 5);
-        return false;
-      }
+
+    if (!Utils.checkByEthAddressFormat(_toAddressController.text)) {
+      Fluttertoast.showToast(msg: "对方地址格式 有问题", timeInSecForIos: 5);
+      return false;
     }
+
     if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
       Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), timeInSecForIos: 3);
       return false;
     }
     //判断余额 是否大于转账额度
-    List displayDigitsList = nowChain.digitsList;
+    List displayDigitsList = Wallets.instance.nowWallet.nowChain.digitsList;
     for (var i = 0; i < displayDigitsList.length; i++) {
       if (digitBalance == null &&
           contractAddress != null &&
           contractAddress.trim() != "" &&
           displayDigitsList[i].contractAddress != null &&
           (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
-        if (GlobalConfig.isDebugVersion) {
-          digitBalance = await loadErc20Balance(nowChain.chainAddress, displayDigitsList[i].contractAddress, ChainType.ETH_TEST);
-        } else {
-          digitBalance = await loadErc20Balance(nowChain.chainAddress, displayDigitsList[i].contractAddress, nowChain.chainType);
-        }
+        digitBalance = await loadErc20Balance(
+            Wallets.instance.nowWallet.nowChain.chainAddress, displayDigitsList[i].contractAddress, Wallets.instance.nowWallet.nowChain.chainType);
         break;
       }
     }
@@ -810,12 +794,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
         return false;
       }
     }
-    //eth erc20都要判断,ethBalance是否够交gas费
-    if (GlobalConfig.isDebugVersion) {
-      ethBalance = await loadEthBalance(nowChain.chainAddress, ChainType.ETH_TEST);
-    } else {
-      ethBalance = await loadEthBalance(nowChain.chainAddress, nowChain.chainType);
-    }
+    ethBalance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
     print("ethBalance===>" + ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
     if (ethBalance.isNotEmpty) {
       try {
