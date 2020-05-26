@@ -662,9 +662,13 @@ class _TransferEthPageState extends State<TransferEthPage> {
       onTap: () async {
         showProgressDialog(context, "信息格式检查中，请稍等");
         var verifyTxInfoResult = await _verifyTransferInfo();
+        if (!verifyTxInfoResult) {
+          NavigatorUtils.goBack(context);
+          return;
+        }
         var verifyNonceResult = await _verifyNonce();
         NavigatorUtils.goBack(context);
-        if (verifyTxInfoResult && verifyNonceResult) {
+        if (verifyNonceResult) {
           _showPwdDialog(context);
         }
       },
