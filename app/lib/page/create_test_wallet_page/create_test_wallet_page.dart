@@ -25,10 +25,12 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   bool _isChooseEthChain = true;
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _mnemonicController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _nameController.text = translate('test_wallet_title');
     changeMnemonic();
   }
 
@@ -190,22 +192,44 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
 
   Widget _buildWalletNameWidget() {
     return Container(
-      width: ScreenUtil().setWidth(80),
-      child: Row(
+      child: Column(
         children: <Widget>[
-          Text(
-            translate('wallet_name') + ":",
-            style: TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 0.6),
-              fontSize: ScreenUtil.instance.setSp(3.5),
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              translate('wallet_name'),
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil.instance.setSp(4),
+              ),
             ),
           ),
-          Gaps.scaleHGap(0.5),
-          Text(
-            translate('test_wallet_title'),
-            style: TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 0.9),
-              fontSize: ScreenUtil.instance.setSp(3.5),
+          Gaps.scaleVGap(2),
+          Container(
+            alignment: Alignment.center,
+            child: TextField(
+              textAlign: TextAlign.start,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                fillColor: Color.fromRGBO(101, 98, 98, 0.50),
+                filled: true,
+                contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(8)),
+                labelStyle: TextStyle(
+                  color: Colors.white,
+                ),
+                // hintText: translate('pls_input_wallet_name'),
+                hintStyle: TextStyle(
+                  color: Color.fromRGBO(255, 255, 255, 0.7),
+                  fontSize: 12,
+                ),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black87),
+                  borderRadius: BorderRadius.circular(
+                    ScreenUtil().setWidth(1.0),
+                  ),
+                ),
+              ),
+              controller: _nameController,
             ),
           ),
         ],
@@ -373,6 +397,14 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
     });
   }
 
+  bool _verifyWalletName() {
+    if (_nameController.text.isEmpty || _nameController.text.length <= 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   bool _verifyPwdAndMnemonic() {
     //助记词密码不为空
     if (_pwdController.text.isEmpty || _pwdController.text.length <= 0 || _mnemonicController.text.isEmpty || _mnemonicController.text.length <= 0) {
@@ -383,12 +415,17 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   }
 
   _createTestWallet() async {
+    bool isNameOk = _verifyWalletName();
+    if (!isNameOk) {
+      Fluttertoast.showToast(msg: translate('wallet_name_not_allow_is_null'));
+      return;
+    }
     bool isOk = _verifyPwdAndMnemonic();
     if (!isOk) {
       Fluttertoast.showToast(msg: translate('mne_pwd_not_allow_is_null'));
       return;
     }
-    var isSuccess = await Wallets.instance.saveWallet(translate('test_wallet_title'), Uint8List.fromList(_pwdController.text.codeUnits),
+    var isSuccess = await Wallets.instance.saveWallet(_nameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
         Uint8List.fromList(_mnemonicController.text.codeUnits), WalletType.TEST_WALLET);
     if (isSuccess) {
       Fluttertoast.showToast(msg: translate('success_create_test_wallet'));

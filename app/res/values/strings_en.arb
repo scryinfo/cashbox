@@ -23,6 +23,7 @@
   "add_wallet": "Add Wallet",
   "create_wallet": "Create wallet",
   "mne_pwd_not_allow_is_null": "Mnemonics and password cannot be empty",
+  "wallet_name_not_allow_is_null": "WalletName cannot be empty",
   "success_create_test_wallet": "Test wallet created, please note the wallet type",
   "failure_create_test_wallet": "Test wallet failed, please check whether your data is valid",
   "pls_input_wallet_name": "Please input wallet name",

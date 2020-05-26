@@ -175,6 +175,7 @@ class S implements WidgetsLocalizations {
   String get wallet_load_error => "Failed to load Cashbox, please retry it";
   String get wallet_manager => "Wallet management";
   String get wallet_name => "Wallet name";
+  String get wallet_name_not_allow_is_null => "WalletName cannot be empty";
   String get wallet_name_not_null => "Wallet name cannot be empty";
   String get wallet_pwd => "Wallet password";
   String get wallet_transfer => "Wallet transfer";
@@ -199,6 +200,8 @@ class $zh extends S {
   String get cancel => "取消";
   @override
   String get judge_the_difference_between_two_wallet => "注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。";
+  @override
+  String get wallet_name_not_allow_is_null => "钱包名不能为空";
   @override
   String get failure_reset_pwd_hint => "重置密码失败，详细信息";
   @override

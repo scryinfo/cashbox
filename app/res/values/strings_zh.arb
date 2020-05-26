@@ -23,6 +23,7 @@
   "add_wallet": "添加钱包",
   "create_wallet": "创建钱包",
   "mne_pwd_not_allow_is_null": "助记词和密码不能为空",
+  "wallet_name_not_allow_is_null": "钱包名不能为空",
   "success_create_test_wallet": "测试钱包 创建成功，切记注意区分钱包类型",
   "failure_create_test_wallet": "测试钱包 创建失败，请检查你输入的数据是否正确",
   "pls_input_wallet_name": "请输入钱包名",
