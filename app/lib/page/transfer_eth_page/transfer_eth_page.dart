@@ -249,6 +249,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
         ),
         Gaps.scaleVGap(1),
         Container(
+          color: Colors.transparent,
           child: GestureDetector(
               onTap: () async {
                 setState(() {

@@ -32,7 +32,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
   String moneyInfo = "0.00";
-  String digitName = "ETH";
+  String digitName = "";
   String fromAddress = "";
   String contractAddress = "";
   ChainType chainType = ChainType.UNKNOWN;
@@ -125,7 +125,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 Container(
                   width: ScreenUtil().setWidth(10),
                   child: Text(
-                    digitName,
+                    digitName ?? "*",
                     textAlign: TextAlign.end,
                     style: TextStyle(
                       fontSize: ScreenUtil.instance.setSp(3.5),

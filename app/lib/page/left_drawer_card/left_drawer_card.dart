@@ -109,7 +109,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   NavigatorUtils.push(context, Routes.publicPage);
                 }),
           ),
-          Container(
+          /*Container(
             alignment: Alignment.center,
             height: ScreenUtil().setHeight(11),
             child: new ListTile(
@@ -127,7 +127,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                 onTap: () {
                   NavigatorUtils.push(context, Routes.dappPage);
                 }),
-          ),
+          ),*/
           Container(
             alignment: Alignment.center,
             height: ScreenUtil().setHeight(11),
