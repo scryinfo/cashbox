@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:package_info/package_info.dart';
 import '../../res/resources.dart';
 
 class AboutUsPage extends StatefulWidget {
@@ -16,6 +17,22 @@ class AboutUsPage extends StatefulWidget {
 }
 
 class _AboutUsPageState extends State<AboutUsPage> {
+  var appVersion = "";
+
+  @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+
+  initData() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    appVersion = packageInfo.version;
+    setState(() {
+      this.appVersion = appVersion;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -48,6 +65,13 @@ class _AboutUsPageState extends State<AboutUsPage> {
           ),
           Container(
             child: Image.asset("assets/images/ic_logotxt.png"),
+          ),
+          Container(
+            child: Text(
+              appVersion,
+              style:
+                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
+            ),
           ),
           Gaps.scaleVGap(8),
           Container(
