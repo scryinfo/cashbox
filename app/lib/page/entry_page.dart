@@ -45,6 +45,7 @@ class _EntryPageState extends State<EntryPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    future = _checkIsContainWallet();
     initWalletBasicData(); //case : 删除钱包后，没钱包，回到entryPage，每次检查一下
   }
 
@@ -60,7 +61,6 @@ class _EntryPageState extends State<EntryPage> {
         3、应用语言类型（中、英文）
         */
     await Wallets.instance.initWalletBasicData();
-    future = _checkIsContainWallet();
   }
 
   Future<bool> _checkIsContainWallet() async {
