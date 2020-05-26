@@ -59,7 +59,7 @@ class _EntryPageState extends State<EntryPage> {
         2、数据库信息等
         3、应用语言类型（中、英文）
         */
-    Wallets.instance.initWalletBasicData();
+    await Wallets.instance.initWalletBasicData();
     future = _checkIsContainWallet();
   }
 
