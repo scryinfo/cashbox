@@ -20,7 +20,7 @@ class UpgradeAppUtil {
     return _instance;
   }
 
-  static doUpgradeApp(String downloadUrl) {
-    methodPlugin.invokeMethod('upgradeApp', {'downloadurl': downloadUrl});
+  static doUpgradeApp(String downloadUrl, {String serverVersion = "*.0.0"}) {
+    methodPlugin.invokeMethod('upgrade_app_method', {'downloadurl': downloadUrl, 'serverVersion': serverVersion});
   }
 }

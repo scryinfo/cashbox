@@ -96,9 +96,10 @@ public class MainActivity extends FlutterActivity {
                             @Override
                             public void onMethodCall(MethodCall call, Result result) {
                                 String downloadurl = call.argument("downloadurl");
+                                String serverVersion = call.argument("serverVersion");
                                 if (call.method.toString().equals(UPGRADE_APP_METHOD)) {
                                     try {
-                                        checkAndUpgradeVersion(downloadurl);  //todo 待验证，暂不放开
+                                        checkAndUpgradeVersion(downloadurl, serverVersion);  //todo 待验证，暂不放开
                                     } catch (Exception e) {
                                         ScryLog.e("checkApplicationVersion appear error", e.toString());
                                     }
@@ -132,14 +133,21 @@ public class MainActivity extends FlutterActivity {
         );
     }
 
-    private void checkAndUpgradeVersion(String loadUrl) {
-        String versionUrl = "http://192.168.1.3:8080/checkVersion"; //todo
-        String downloadUrl = "http://192.168.1.3:8080/downloadApk"; //todo
-
+    private void checkAndUpgradeVersion(String loadUrl, String serverVersion) {
+        ScryLog.v("begin to checkAndUpgradeVersion================>", loadUrl);
         double nowVersion = getNowVersionCode(this);
         /*
             https://github.com/AlexLiuSheng/CheckVersionLib
             */
+        AllenVersionChecker
+                .getInstance()
+                .downloadOnly(
+                        UIData.create().setTitle("新版本升级提示").setContent("检测到新版本：" + serverVersion + "，点击确认即可更新体验新版本特性").setDownloadUrl(loadUrl)
+                )
+                .executeMission(MainActivity.this);
+        /*
+        String versionUrl = "http://192.168.1.3:8080/checkVersion"; //todo
+        String downloadUrl = "http://192.168.1.3:8080/downloadApk"; //todo
         AllenVersionChecker
                 .getInstance()
                 .requestVersion()
@@ -190,7 +198,7 @@ public class MainActivity extends FlutterActivity {
                         ScryLog.v("onRequestVersionFailure message================>", message.toString());
                     }
                 })
-                .executeMission(MainActivity.this); //.executeMission(context);
+                .executeMission(MainActivity.this);*/
     }
 
     private double getNowVersionCode(Context context) {
