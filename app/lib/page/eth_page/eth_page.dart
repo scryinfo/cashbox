@@ -16,6 +16,7 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
+import 'package:app/util/upgrade_app_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -107,7 +108,7 @@ class _EthPageState extends State<EthPage> {
     loadDigitBalance();
     loadLegalCurrency();
     loadDigitRateInfo();
-    //loadServeConfigInfo(); //todo 去获取服务器端的 配置信息
+    loadServeConfigInfo(); //todo 去获取服务器端的 配置信息
   }
 
   //todo 保存预置代币 version1.0写死，后续移除
@@ -124,14 +125,17 @@ class _EthPageState extends State<EthPage> {
   loadServeConfigInfo() async {
     //去服务器端拿回配置信息，对比进行检查等操作。 加载到ServerConfigProvide保存
     //todo  此处：1、检查是否需要进行应用 版本升级
-    var serveResult = await request(GlobalConfig.serveConfigIp);
+    var serveResult = await request(GlobalConfig.serveVersionIp);
     print("loadServeConfigInfo info ====>" + serveResult.toString());
-    var jsonObject = json.decode(serveResult);
-    print("loadServeConfigInfo jsonObject===>" + jsonObject.toString());
+    if (serveResult != null) {
+      var jsonObject = json.decode(serveResult);
+      print("loadServeConfigInfo jsonObject===>" + jsonObject.toString());
+    }
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String version = packageInfo.version; //版本号
+    String version = packageInfo.version; //版本号 todo remove 本地不用保存version号，需要时获取
     String buildNumber = packageInfo.buildNumber; //版本构建号
     print("packageInfo version===>" + version + "||buildNumber===>" + buildNumber);
+    UpgradeAppUtil.doUpgradeApp("testDonwload url", serverVersion: "666777");
   }
 
   loadLegalCurrency() async {

@@ -14,13 +14,19 @@ class SharedPreferenceUtil {
 
   static initVersion() async {
     var spUtil = await SharedPreferenceUtil.instance;
-    spUtil.setString(GlobalConfig.rateDigitIpKey, GlobalConfig.rateDigitIpDefaultValue);
-    spUtil.setString(GlobalConfig.authDigitsIpKey, GlobalConfig.authDigitsIpDefaultValue);
-    spUtil.setString(GlobalConfig.defaultDigitsKey, GlobalConfig.defaultDigitsDefaultValue);
-    spUtil.setString(GlobalConfig.scryXIpKey, GlobalConfig.scryXIpDefaultValue);
-    spUtil.setString(GlobalConfig.cashboxVersionKey, GlobalConfig.cashboxVersionDefaultValue);
-    spUtil.setString(GlobalConfig.cashboxDownloadIpKey, GlobalConfig.cashboxDownloadIpDefaultValue);
-    spUtil.setString(GlobalConfig.publicIpKey, GlobalConfig.publicIpDefaultValue);
+    {
+      //版本信息
+      spUtil.setString(GlobalConfig.cashboxVersionKey, GlobalConfig.cashboxVersionDefaultValue);
+      spUtil.setString(GlobalConfig.cashboxDownloadIpKey, GlobalConfig.cashboxDownloadIpDefaultValue);
+    }
+    {
+      //配置信息
+      spUtil.setString(GlobalConfig.rateDigitIpKey, GlobalConfig.rateDigitIpDefaultValue);
+      spUtil.setString(GlobalConfig.authDigitsIpKey, GlobalConfig.authDigitsIpDefaultValue);
+      spUtil.setString(GlobalConfig.defaultDigitsKey, GlobalConfig.defaultDigitsDefaultValue);
+      spUtil.setString(GlobalConfig.scryXIpKey, GlobalConfig.scryXIpDefaultValue);
+      spUtil.setString(GlobalConfig.publicIpKey, GlobalConfig.publicIpDefaultValue);
+    }
     spUtil.setBool(GlobalConfig.isInitAppConfig, true);
   }
 }
