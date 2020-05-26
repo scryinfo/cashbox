@@ -33,6 +33,7 @@ class S implements WidgetsLocalizations {
   String get cancel => "Cancel";
   String get chain_address_info => "Address information";
   String get change_another_group => "Change another group";
+  String get check_data_format => "Checking tx data format,please wait a moment";
   String get choose_multi_chain => "Select to create chain type";
   String get click_to_copy_address => "Tap to copy address!";
   String get click_to_sign => "click to sign message";
@@ -268,6 +269,8 @@ class $zh extends S {
   String get info_sign_hint => "请输入密码进行签名";
   @override
   String get input_format_hint => "建议8-24位，英文数字混合";
+  @override
+  String get check_data_format => "信息格式检查中，请稍等";
   @override
   String get click_to_copy_address => "点击复制地址!";
   @override

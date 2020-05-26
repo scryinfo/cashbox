@@ -660,7 +660,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   Widget _buildTransferBtnWidget() {
     return GestureDetector(
       onTap: () async {
-        showProgressDialog(context, "信息格式检查中，请稍等");
+        showProgressDialog(context, translate("check_data_format"));
         var verifyTxInfoResult = await _verifyTransferInfo();
         if (!verifyTxInfoResult) {
           NavigatorUtils.goBack(context);

@@ -235,7 +235,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
   Widget _buildTransferBtnWidget() {
     return GestureDetector(
       onTap: () async {
-        showProgressDialog(context, "信息格式检查中，请稍等");
+        showProgressDialog(context, translate("check_data_format"));
         NavigatorUtils.goBack(context);
       },
       child: Container(

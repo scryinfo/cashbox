@@ -159,5 +159,6 @@
   "wallet_manager": "Wallet management",
   "compile_wallet_name": "Edit",
   "tx_hash": "Transaction hash",
-  "digit_manage": "Token management"
+  "digit_manage": "Token management",
+  "check_data_format": "Checking tx data format,please wait a moment"
 }

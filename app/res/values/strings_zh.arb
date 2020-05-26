@@ -159,5 +159,6 @@
   "wallet_manager": "钱包管理",
   "compile_wallet_name": "编辑",
   "tx_hash": "交易hash",
-  "digit_manage": "代币管理"
+  "digit_manage": "代币管理",
+  "check_data_format": "信息格式检查中，请稍等"
 }
