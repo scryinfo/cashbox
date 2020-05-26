@@ -6,6 +6,7 @@ import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/routers/application.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/util/log_util.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -145,19 +146,24 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                       ],
                     ),
                   ),
-                  Gaps.scaleHGap(42),
+                  Gaps.scaleHGap(22),
                   Container(
                     child: GestureDetector(
-                      onTap: () {
-                        _showAddressInQR(context, walletName, translate('mnemonic_qr_info'), mnemonicList.join(" ").toString());
-                      },
-                      child: Text(
-                        translate('qr_backup'),
-                        style: TextStyle(
-                          color: Color.fromRGBO(255, 255, 255, 0.9),
-                        ),
-                      ),
-                    ),
+                        onTap: () {
+                          _showAddressInQR(context, walletName, translate('mnemonic_qr_info'), mnemonicList.join(" ").toString());
+                        },
+                        child: Container(
+                          width: ScreenUtil.instance.setWidth(20),
+                          child: Text(
+                            translate('qr_backup'),
+                            maxLines: 2,
+                            overflow: TextOverflow.visible,
+                            textAlign: TextAlign.end,
+                            style: TextStyle(
+                              color: Color.fromRGBO(255, 255, 255, 0.9),
+                            ),
+                          ),
+                        )),
                   ),
                 ],
               ),

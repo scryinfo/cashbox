@@ -35,7 +35,7 @@ class QrScanUtil {
 
   Future<String> qrscan() async {
     String callbackResult = await methodPlugin.invokeMethod('qr_scan_method');
-    if (callbackResult.isEmpty) {
+    if (callbackResult == null || callbackResult.isEmpty) {
       callbackResult = "";
     }
     return callbackResult;

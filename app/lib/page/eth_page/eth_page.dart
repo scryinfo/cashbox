@@ -87,6 +87,7 @@ class _EthPageState extends State<EthPage> {
         print("addDigitToChainModel successful==");
       }
     }
+    this.walletList = [];
     this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
@@ -108,7 +109,7 @@ class _EthPageState extends State<EthPage> {
     loadDigitBalance();
     loadLegalCurrency();
     loadDigitRateInfo();
-    loadServeConfigInfo(); //todo 去获取服务器端的 配置信息
+    //loadServeConfigInfo(); //todo 去获取服务器端的 配置信息
   }
 
   //todo 保存预置代币 version1.0写死，后续移除

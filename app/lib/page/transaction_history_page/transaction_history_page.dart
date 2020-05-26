@@ -141,7 +141,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   child: Container(
                     width: ScreenUtil().setWidth(25),
                     child: Text(
-                      "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + moneyInfo ?? "",
+                      "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: ScreenUtil.instance.setSp(3),
@@ -455,6 +455,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
     } catch (onError) {
       print("onError===>" + "$onError");
+    }
+    if (ethTxListModel == null || ethTxListModel.length == 0) {
+      ethTxListModel = [];
     }
     print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
     setState(() {
