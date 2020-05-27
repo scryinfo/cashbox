@@ -408,6 +408,7 @@ class Wallets {
       var decimal = element["decimal"];
       var contract = element["contract"];
       var symbol = element["symbol"];
+      var digitId = element["id"];
       print("name=====>" + name + "decimal=====>" + decimal.toString() + "contract=====>" + contract + "symbol=====>" + symbol);
       switch (chain.chainType) {
         case ChainType.ETH:
@@ -416,6 +417,7 @@ class Wallets {
           ethDigit.shortName = name;
           ethDigit.decimal = decimal;
           ethDigit.contractAddress = contract;
+          ethDigit.digitId = digitId;
           ethDigit.isVisible = false; //从代币列表加载的，先设置不可见，跟本地chain下对比后，再判是否visible
           resultAuthDigitList.add(ethDigit);
           break;

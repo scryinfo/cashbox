@@ -82,7 +82,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       {
         //todo 1.0 写死，预置代币
         var digitParam =
-            '[{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
+            '[{"contractAddress":"0x9F5F3CFD7a32700C93F971637407ff17b91c7342","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
         await updateNativeAuthDigitList(digitParam);
         var addDigitMap = await Wallets.instance
             .addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, "3");

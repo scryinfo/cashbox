@@ -722,7 +722,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 break;
             }
             case "updateAuthDigitList": {
-                ScryWalletLog.d("nativeLib=>", "updateAuthDigitList is enter =>");
+                ScryWalletLog.d("nativeLib=>", "updateAuthDigitList is enter =>"+call.argument("digitData").toString());
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.updateAuthDigitList((String) (call.argument("digitData")));

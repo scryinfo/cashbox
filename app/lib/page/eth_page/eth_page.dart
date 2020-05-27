@@ -75,16 +75,28 @@ class _EthPageState extends State<EthPage> {
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;
     this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     {
-      //todo 1.0 写死，预置DDD代币
+      //todo 1.0 写死，预置DDD代币，正式链 和 测试链,后续移除
       var digitParam =
-          '[{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
+          '[{"contractAddress":"0x9F5F3CFD7a32700C93F971637407ff17b91c7342","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"},{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"4","decimal":"","chainType":"ETH_TEST"}]';
       await updateNativeAuthDigitList(digitParam);
-      var addDigitMap = await Wallets.instance.addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, "3");
-      int status = addDigitMap["status"];
-      if (status == null || status != 200) {
-        print("addDigitToChainModel failure==" + addDigitMap["message"]);
-      } else {
-        print("addDigitToChainModel successful==");
+      Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, 0, singleDigitCount);
+      if (nativeAuthMap != null && nativeAuthMap["authDigit"] != null && nativeAuthMap["authDigit"].length != 0) {
+        List<Digit> tempDigitsList = nativeAuthMap["authDigit"];
+        print("||tempDigitsList.length.toStrin===>" + tempDigitsList.length.toString());
+        for (int i = 0; i < tempDigitsList.length; i++) {
+          var element = tempDigitsList[i];
+          if ((element.contractAddress.trim().toUpperCase() == DddMainNetContractAddress.toUpperCase()) ||
+              (element.contractAddress.trim().toUpperCase() == DddTestNetContractAddress.toUpperCase())) {
+            var addDigitMap = await Wallets.instance
+                .addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, element.digitId);
+            int status = addDigitMap["status"];
+            if (status == null || status != 200) {
+              print("addDigitToChainModel failure==" + addDigitMap["message"]);
+            } else {
+              print("addDigitToChainModel successful==");
+            }
+          }
+        }
       }
     }
     this.walletList = [];
