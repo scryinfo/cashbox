@@ -2,6 +2,7 @@ import 'package:app/global_config/global_config.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/list_item.dart';
 import 'package:flutter/material.dart';
@@ -52,9 +53,14 @@ class LanguageChoosePage extends StatelessWidget {
       }
       return Container(
         child: GestureDetector(
-          onTap: () {
+          onTap: () async {
             print("click 切换语言");
-            changeLocale(context, keysList[index]);
+            {
+              changeLocale(context, keysList[index]);
+              var spUtil = await SharedPreferenceUtil.instance;
+              spUtil.setString(GlobalConfig.savedLocaleKey, keysList[index]);
+            }
+            NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
           },
           child: Container(
             width: ScreenUtil().setWidth(90),

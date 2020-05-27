@@ -160,9 +160,11 @@ class _EntryPageState extends State<EntryPage> {
                 this.languageTextValue = languageMap[value];
               });
               print("changeLocale===>" + value);
-              changeLocale(context, value);
-              var spUtil = await SharedPreferenceUtil.instance;
-              spUtil.setString(GlobalConfig.savedLocaleKey, value);
+              {
+                changeLocale(context, value);
+                var spUtil = await SharedPreferenceUtil.instance;
+                spUtil.setString(GlobalConfig.savedLocaleKey, value);
+              }
             },
           )
         ],

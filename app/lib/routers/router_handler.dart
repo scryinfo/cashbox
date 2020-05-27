@@ -39,7 +39,12 @@ Handler entryPageHandler = Handler(handlerFunc: (BuildContext context, Map<Strin
 });
 
 Handler ethPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  bool isForceLoadFromJni = params['isForceLoadFromJni'].first == 'true';
+  bool isForceLoadFromJni = false;
+  if (params['isForceLoadFromJni'] == null || params['isForceLoadFromJni'].first == null) {
+    isForceLoadFromJni = false;
+  } else {
+    isForceLoadFromJni = params['isForceLoadFromJni'].first == 'true';
+  }
   return EthPage(isForceLoadFromJni: isForceLoadFromJni);
 });
 
