@@ -30,7 +30,7 @@ void main() async {
 
   var delegate = await LocalizationDelegate.create(
     fallbackLocale: GlobalConfig.enLocale,
-    supportedLocales: GlobalConfig.globalLanguageList,
+    supportedLocales: GlobalConfig.globalLanguageMap.keys.toList(),
   );
 
   runApp(LocalizedApp(delegate, MyApp()));

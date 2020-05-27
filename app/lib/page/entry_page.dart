@@ -34,7 +34,7 @@ class _EntryPageState extends State<EntryPage> {
   bool isContainWallet = false;
   Future future;
   String languageTextValue = "";
-  List<String> languageList = [];
+  List<String> languagesKeyList = [];
   Map<String, String> languageMap = {};
 
   @override
@@ -50,8 +50,8 @@ class _EntryPageState extends State<EntryPage> {
   }
 
   void initWalletBasicData() async {
-    languageList = [];
-    languageList = GlobalConfig.globalLanguageList;
+    languagesKeyList = [];
+    languagesKeyList = GlobalConfig.globalLanguageMap.keys.toList();
     languageMap = {};
     languageMap.addAll(GlobalConfig.globalLanguageMap);
     /*  初始化 到 本地文件
@@ -171,11 +171,11 @@ class _EntryPageState extends State<EntryPage> {
   }
 
   List<PopupMenuItem<String>> _makePopMenuList() {
-    List<PopupMenuItem<String>> popMenuList = List.generate(languageList.length, (index) {
+    List<PopupMenuItem<String>> popMenuList = List.generate(languagesKeyList.length, (index) {
       return PopupMenuItem<String>(
-          value: languageList[index] ?? "",
+          value: languagesKeyList[index] ?? "",
           child: new Text(
-            languageMap[languageList[index]] ?? "",
+            languageMap[languagesKeyList[index]] ?? "",
             style: new TextStyle(color: Colors.white54),
           ));
     });

@@ -1,3 +1,4 @@
+import 'package:app/global_config/global_config.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -41,43 +42,58 @@ class LanguageChoosePage extends StatelessWidget {
   }
 
   _buildEnglishWidget(context) {
-    return GestureDetector(
-      onTap: () {
-        print("click 切换语言");
-        changeLocale(context, "en_US");
-      },
-      child: Container(
-        width: ScreenUtil().setWidth(90),
-        height: ScreenUtil().setHeight(13.5),
-        child: Stack(
-          children: <Widget>[
-            Container(
-              color: Colors.transparent,
-              alignment: Alignment.centerLeft,
-              margin: EdgeInsets.only(left: ScreenUtil().setWidth(8)),
-              child: Text(
-                "中文",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: ScreenUtil().setSp(3.5),
+    List<String> valuesList = GlobalConfig.globalLanguageMap.values.toList();
+    List<String> keysList = GlobalConfig.globalLanguageMap.keys.toList();
+    List<Widget> languageWidgetList = List.generate(valuesList.length, (index) {
+      bool isSelectedLanguage = false;
+      Locale myLocale = Localizations.localeOf(context);
+      if (myLocale.toString() == keysList[index].toString()) {
+        isSelectedLanguage = true;
+      }
+      return Container(
+        child: GestureDetector(
+          onTap: () {
+            print("click 切换语言");
+            changeLocale(context, keysList[index]);
+          },
+          child: Container(
+            width: ScreenUtil().setWidth(90),
+            height: ScreenUtil().setHeight(13.5),
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  color: Colors.transparent,
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.only(left: ScreenUtil().setWidth(8)),
+                  child: Text(
+                    valuesList[index] ?? "",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: ScreenUtil().setSp(3.5),
+                    ),
+                    textAlign: TextAlign.start,
+                  ),
                 ),
-                textAlign: TextAlign.start,
-              ),
+                !isSelectedLanguage
+                    ? Text("")
+                    : Container(
+                        margin: EdgeInsets.only(
+                          right: ScreenUtil().setWidth(7),
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Image.asset("assets/images/ic_checked.png"),
+                        ),
+                      ),
+              ],
             ),
-            Container(
-              margin: EdgeInsets.only(
-                right: ScreenUtil().setWidth(7),
-              ),
-              child: Align(
-                //color: Colors.blue,
-                alignment: Alignment.centerRight,
-                //margin: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
-                child: Image.asset("assets/images/ic_enter.png"),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      );
+    });
+
+    return Column(
+      children: languageWidgetList,
     );
   }
 }

@@ -22,7 +22,6 @@ class GlobalConfig {
   static String defaultLocaleValue = "zh"; //默认语言中文；
   static String zhLocale = "zh"; //
   static String enLocale = "en_US"; //
-  static List<String> globalLanguageList = [zhLocale, enLocale];
   static Map<String, String> globalLanguageMap = {GlobalConfig.zhLocale: "中文", GlobalConfig.enLocale: "English"};
 
   //static String ipAddress = "ws://47.108.146.67:9933";
