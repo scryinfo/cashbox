@@ -368,7 +368,7 @@ class Wallets {
     if (status == null || status != 200) {
       LogUtil.e("addDigitModelMap=>", "error status code is" + status.toString() + "||message is=>" + addDigitModelMap["message"].toString());
     } else {
-      Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //在digitList增加这个代币model,重新加载
+      await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //在digitList增加这个代币model,重新加载
     }
     return addDigitModelMap;
   }
