@@ -86,7 +86,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           _buildDigitBalanceWidget(),
           Gaps.scaleVGap(7),
           _buildDigitTxTitleWidget(),
-          Gaps.scaleVGap(5),
+          Gaps.scaleVGap(4),
           _buildDigitTxHistoryWidget(),
         ],
       ),
