@@ -1,7 +1,14 @@
 #[macro_use]
 extern crate serde_derive;
 
+use sp_core::{
+    H256,ecdsa, ed25519, sr25519,
+    crypto::{Pair, Ss58Codec},
+    hexdisplay::HexDisplay
+};
 use codec::{Encode,Decode};
+use node_runtime::{AccountId, Balance,Event, Index, Signature,Call, Runtime,BalancesCall};
+use system::Phase;
 
 mod crypto;
 mod transaction;
@@ -9,6 +16,8 @@ pub mod error;
 
 pub use crypto::{Sr25519,Ed25519,Keccak256,Crypto};
 pub use transaction::{tx_sign,transfer,decode_account_info,account_info_key};
+
+use std::sync::mpsc::channel;
 
 /// 用于传递账户信息解码后的结果，这里使用默认的单位？
 #[derive(Clone,Debug,Default)]
@@ -22,14 +31,60 @@ pub struct EeeAccountInfo{
 }
 
 
-#[test]
-fn data_decode(){
-    let encode_event = r#"0x1400000000000000c0257a090000000002000000010000000000000000000000000002000000020000000302d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27dea990fcb7e9600adcf735a69d7bbcbaa62e52d2eb26125381379a91558fe083b00c06e31d910010000000000000000000000020000000c06609ba3070101000000000000000000000000020000000000c0769f0b00000000000000"#;
-    let enent_bytes = hex::decode(encode_event.get(2..).unwrap()).unwrap();
-    println!("{:?}",enent_bytes);
-
-    let res = Decode::decode::<system::EventRecord<balances::Transfer,String>>(enent_bytes);
+pub struct TransferEvent{
+    pub index:u32,
+    pub from:Option<String>,
+    pub to:Option<String>,
+    pub value:Option<String>,
+    pub result:Option<bool>,
 }
+
+
+// 通知事件数据 使用hex 方式编码的字符串  传递解析的交易详情，交易结果
+fn event_decode(event_data:&str,blackhash:&str,account:&str) {
+    let enents_bytes = hex::decode(event_data.get(2..).unwrap()).unwrap();
+    println!("{:?}", enents_bytes);
+    let events = Vec::<system::EventRecord<Event, H256>>::decode(&mut &enents_bytes[..]);
+    for record in events {
+        for event in record {
+            //todo 将索引与区块交易中的索引关联起来，怎么来确定交易索引与交易结果之间的关系？
+            if let  Phase::ApplyExtrinsic(index) = event.phase{
+                println!("extrinsic index is:{:?}", index);
+            }
+            match event.event {
+                Event::balances(be) => {
+                    match &be {
+                        balances::RawEvent::Transfer(transactor, dest, value) => {
+                            println!("Transactor: {}", transactor);
+                            println!("Destination: {}", dest);
+                            println!("Value: {:?}", value);
+                            // return;
+                        }
+                        _ => {
+                            log::error!("ignoring unsupported balances event");
+                        }
+                    }
+                },
+                Event::system(se) => {
+                    match &se {
+                        system::RawEvent::ExtrinsicSuccess(dispath) => println!("ExtrinsicSuccess:{:?}", dispath),
+                        system::RawEvent::ExtrinsicFailed(err, info) => {
+                            println!("ExtrinsicFailed:{:?},{:?}", err, info)
+                        },
+                        _ => log::error!("ignoring unsupported balances event")
+                    }
+                },
+                _ => log::error!("ignoring unsupported balances event")
+            }
+        }
+    }
+}
+
+#[test]
+fn data_decode_test(){
+    let encode_event = r#"0x0800000000000000102700000101000001000000000103050340420f00000100"#;
+        event_decode(encode_event,"","");
+    }
 
 
 

@@ -1,11 +1,7 @@
 use super::*;
 
-use node_runtime::{AccountId, Balance, Index, Signature,Call, Runtime,BalancesCall};
-use sp_core::{
-    H256,ecdsa, ed25519, sr25519,
-    crypto::{Pair, Ss58Codec},
-    hexdisplay::HexDisplay
-};
+
+
 pub use sp_runtime::{
     generic::{Era, SignedPayload, UncheckedExtrinsic},
     traits::{IdentifyAccount, Verify},
@@ -102,7 +98,6 @@ fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C:
 pub fn transfer( mnemonic: &str, to: &str, amount: &str,genesis_hash: H256, index: u32,runtime_version:u32)-> Result<String, error::Error>{
     //todo 考虑将交易的生成与交易的签名分成两个步骤，在交易生成环节可以计算出当前交易所需要的手续费，提示用户针对这次转账共需要消耗多少balance?
     let to_account_id=  AccountId::from_ss58check(to)?;
-   // let amount = str::parse::<Balance>(amount)?;
     let amount =  balance_unit_convert(amount,12).unwrap();
     //构造转账 call function
     let function = Call::Balances(BalancesCall::transfer(to_account_id, amount)).encode();
@@ -200,7 +195,7 @@ fn balance_unit_convert_test() {
 
 #[test]
 fn account_info_key_test(){
-println!("{:?}",account_info_key("5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4"));
+assert_eq!("0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e".to_string(),account_info_key("5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4").unwrap());
 }
 
 #[test]
