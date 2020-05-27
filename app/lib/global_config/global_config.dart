@@ -43,7 +43,7 @@ class GlobalConfig {
   static String cashboxDownloadIpKey = "cashbox_download_ip_key";
   static String cashboxDownloadIpDefaultValue = ""; //todo
   static String publicIpKey = "public__ip_key";
-  static String publicIpDefaultValue = "https://cashbox.scry.info/public";
+  static String publicIpDefaultValue = "http://40.73.35.55:9010/web_app/pub";
 
   static Locale loadLocale(String locale) {
     switch (locale) {
