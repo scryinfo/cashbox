@@ -45,7 +45,7 @@ class _MinePageState extends State<MinePage> {
         //_buildMoneyUnitWidget(),
         _buildWalletListWidget(),
         _buildTestWalletWidget(),
-        //_buildLanguageChooseWidget(),
+        _buildLanguageChooseWidget(),
         _buildAboutUsWidget(),
       ]),
     );
@@ -129,6 +129,7 @@ class _MinePageState extends State<MinePage> {
     return GestureDetector(
       onTap: () {
         print("click 语言选择");
+        NavigatorUtils.push(context, Routes.languageChoosePage);
       },
       child: ItemOfListWidget(
         leftText: translate('language_choose'),

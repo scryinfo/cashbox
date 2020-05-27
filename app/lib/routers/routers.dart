@@ -24,6 +24,7 @@ class Routes {
 
   static String minePage = '/minepage';
   static String walletManagerListPage = '/walletmanagerlistpage';
+  static String languageChoosePage = '/languagechoosepage';
   static String walletManagerPage = '/walletmanagerpage';
   static String resetPwdPage = '/resetpwdpage';
   static String recoverWalletPage = '/recoverwalletpage';
@@ -62,6 +63,7 @@ class Routes {
     router.define(transferEeePage, handler: transferEeePageHandler);
     router.define(minePage, handler: minePageHandler);
     router.define(walletManagerListPage, handler: walletManagerListPageHandler);
+    router.define(languageChoosePage, handler: languageChoosePageHandler);
     router.define(walletManagerPage, handler: walletManagerPageHandler);
     router.define(resetPwdPage, handler: resetPwdPageHandler);
     router.define(recoverWalletPage, handler: recoverWalletPageHandler);

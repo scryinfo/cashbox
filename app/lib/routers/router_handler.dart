@@ -4,6 +4,7 @@ import 'package:app/page/digit_list_page/digit_list_page.dart';
 import 'package:app/page/digits_manage_page/digits_manage_page.dart';
 import 'package:app/page/digits_manage_page/search_digit_page.dart';
 import 'package:app/page/eee_page/eee_page.dart';
+import 'package:app/page/language_choose_page/language_choose_page.dart';
 import 'package:app/page/sign_tx_page/sign_tx_page.dart';
 import 'package:app/page/transfer_eee_page/transfer_eee_page.dart';
 import 'package:app/page/user_protocol/qa_info_page.dart';
@@ -104,6 +105,10 @@ Handler minePageHandler = Handler(handlerFunc: (BuildContext context, Map<String
 
 Handler walletManagerListPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return WalletManagerListPage();
+});
+
+Handler languageChoosePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return LanguageChoosePage();
 });
 
 Handler walletManagerPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

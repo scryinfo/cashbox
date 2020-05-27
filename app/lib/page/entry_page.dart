@@ -51,10 +51,9 @@ class _EntryPageState extends State<EntryPage> {
 
   void initWalletBasicData() async {
     languageList = [];
-    languageList.add(GlobalConfig.zhLocale);
-    languageList.add(GlobalConfig.enLocale);
+    languageList = GlobalConfig.globalLanguageList;
     languageMap = {};
-    languageMap.addAll({GlobalConfig.zhLocale: "中文", GlobalConfig.enLocale: "English"});
+    languageMap.addAll(GlobalConfig.globalLanguageMap);
     /*  初始化 到 本地文件
         1、接口ip、版本信息等 到本地文件保存
         2、数据库信息等

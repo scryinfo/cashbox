@@ -28,8 +28,10 @@ void main() async {
   ///强制竖屏
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-  var delegate =
-      await LocalizationDelegate.create(fallbackLocale: GlobalConfig.enLocale, supportedLocales: [GlobalConfig.enLocale, GlobalConfig.zhLocale]);
+  var delegate = await LocalizationDelegate.create(
+    fallbackLocale: GlobalConfig.enLocale,
+    supportedLocales: GlobalConfig.globalLanguageList,
+  );
 
   runApp(LocalizedApp(delegate, MyApp()));
 
