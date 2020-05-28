@@ -41,7 +41,7 @@ class UpgradeAppUtil {
         print("confirmLatest=====>" + resultObj["confirmLatest"].toString());
         var latestVersion = resultObj["latestApk"]["apkVersion"].toString();
         if (latestVersion != null && latestVersion.isNotEmpty) {
-          UpgradeAppUtil.doUpgradeApp(GlobalConfig.latestVersionIp, serverVersion: latestVersion);
+          _doUpgradeApp(GlobalConfig.latestVersionIp, latestVersion);
           return true;
         }
       }
@@ -51,7 +51,7 @@ class UpgradeAppUtil {
     return false;
   }
 
-  static doUpgradeApp(String downloadUrl, {String serverVersion = "*.0.0"}) {
+  _doUpgradeApp(String downloadUrl, String serverVersion) {
     methodPlugin.invokeMethod('upgrade_app_method', {'downloadurl': downloadUrl, 'serverVersion': serverVersion});
   }
 }
