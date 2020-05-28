@@ -26,7 +26,8 @@ class GlobalConfig {
 
   //static String ipAddress = "ws://47.108.146.67:9933";
   static String ipAddress = "ws://40.73.75.224:9933";
-  static String versionCheckIp = "http://40.73.35.55:8080/cashbox/api/apkOpen/checkupdate";
+  static String versionCheckIp = "http://40.73.35.55:9002/cashbox/api/apkOpen/checkupdate";
+  static String latestVersionIp = "http://40.73.35.55:9002/cashbox/api/apkOpen/downloadlatest";
 
   static String isInitAppConfig = "is_init_app_config_key";
   static String rateDigitIpKey = "rate_digit_ip_key";
