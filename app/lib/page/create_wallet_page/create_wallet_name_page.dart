@@ -97,7 +97,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         child: Container(
           width: ScreenUtil().setWidth(41),
           child: Text(
-            translate('add_wallet'),
+            translate('create_wallet'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.blue,

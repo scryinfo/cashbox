@@ -71,14 +71,14 @@ class S implements WidgetsLocalizations {
   String get gas_used => "Gas consume";
   String get high_setting => "More settings";
   String get hint_extend_msg_option => "could add some backup message";
-  String get import_wallet => "import wallet";
+  String get import_wallet => "Import wallet";
   String get info_sign => "Sign follow message";
   String get info_sign_hint => "please input password to sign this message";
   String get input_format_hint => "Better 8-24 digits, with letters and numbers";
   String get input_pwd_hint => "Please input wallet password";
   String get input_pwd_hint_detail => "Note: please input your password and sign the transaction info, send it on chain";
   String get judge_the_difference_between_two_wallet => "Note: The tokens on the test chain can be used in this test wallet. Please distinguish the difference from the official chain.";
-  String get language_choose => "language selection";
+  String get language_choose => "Language selection";
   String get load_data_error => "Data loading error, please retry it";
   String get load_finish_wallet_digit => "Selected tokens have been loaded！";
   String get make_sure_service_protocol => "Please agree to the service agreement and privacy policy";

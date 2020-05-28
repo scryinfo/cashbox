@@ -68,7 +68,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
 
   Widget _drawerAction() {
     return Container(
-      height: ScreenUtil().setHeight(66.75),
+      height: ScreenUtil().setHeight(56.75),
       child: Column(
         children: <Widget>[
           Container(
@@ -166,7 +166,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   NavigatorUtils.push(context, Routes.importWalletPage);
                 }),
           ),
-          Container(
+          /*Container(
             alignment: Alignment.center,
             height: ScreenUtil().setHeight(11),
             child: new ListTile(
@@ -185,7 +185,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                   String qrInfo = await QrScanUtil.instance.qrscan();
                   QrScanUtil.instance.checkByScryCityTransfer(qrInfo, context);
                 }),
-          ),
+          ),*/
         ],
       ),
     );
