@@ -1,0 +1,9 @@
+<resources>
+    <string name="versionchecklib_confirm">Commit</string>
+    <string name="versionchecklib_cancel">Cancel</string>
+    <string name="versionchecklib_retry">Retry</string>
+    <string name="versionchecklib_progress">%d/100</string>
+    <string name="new_version_title">Upgrade new VersionHint</string>
+    <string name="search_new_version">This is latest Version：</string>
+    <string name="search_new_version_end">，please click confirm to upgrade your current app</string>
+</resources>

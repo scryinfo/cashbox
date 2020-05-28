@@ -1,3 +1,9 @@
 <resources>
+    <string name="versionchecklib_confirm">确认</string>
+    <string name="versionchecklib_cancel">取消</string>
+    <string name="versionchecklib_retry">重试</string>
     <string name="versionchecklib_progress">%d/100</string>
+    <string name="new_version_title">新版本升级提示</string>
+    <string name="search_new_version">检测到新版本：</string>
+    <string name="search_new_version_end">，点击确认即可更新体验新版本特性</string>
 </resources>

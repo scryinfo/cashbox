@@ -142,7 +142,7 @@ public class MainActivity extends FlutterActivity {
         AllenVersionChecker
                 .getInstance()
                 .downloadOnly(
-                        UIData.create().setTitle("新版本升级提示").setContent("检测到新版本：" + serverVersion + "，点击确认即可更新体验新版本特性").setDownloadUrl(loadUrl)
+                        UIData.create().setTitle(getString(R.string.new_version_title)).setContent(getString(R.string.search_new_version) + serverVersion + getString(R.string.search_new_version_end)).setDownloadUrl(loadUrl)
                 )
                 .executeMission(MainActivity.this);
         /*

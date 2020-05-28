@@ -26,7 +26,7 @@ class GlobalConfig {
 
   //static String ipAddress = "ws://47.108.146.67:9933";
   static String ipAddress = "ws://40.73.75.224:9933";
-  static String serveVersionIp = "ws://40.73.75.224:9933"; //todo 待定
+  static String versionCheckIp = "http://40.73.35.55:8080/cashbox/api/apkOpen/checkupdate";
 
   static String isInitAppConfig = "is_init_app_config_key";
   static String rateDigitIpKey = "rate_digit_ip_key";
@@ -38,8 +38,6 @@ class GlobalConfig {
   static String defaultDigitsDefaultValue = "http://40.73.35.55:8080/inner_api/token/erc20/defaultlist";
   static String scryXIpKey = "scry_x_key";
   static String scryXIpDefaultValue = "ws://40.73.75.224:9933";
-  static String cashboxVersionKey = "cashbox_version_key";
-  static String cashboxVersionDefaultValue = "1.0.0";
   static String cashboxDownloadIpKey = "cashbox_download_ip_key";
   static String cashboxDownloadIpDefaultValue = ""; //todo
   static String publicIpKey = "public__ip_key";

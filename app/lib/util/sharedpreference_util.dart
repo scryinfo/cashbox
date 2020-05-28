@@ -16,7 +16,6 @@ class SharedPreferenceUtil {
     var spUtil = await SharedPreferenceUtil.instance;
     {
       //版本信息
-      spUtil.setString(GlobalConfig.cashboxVersionKey, GlobalConfig.cashboxVersionDefaultValue);
       spUtil.setString(GlobalConfig.cashboxDownloadIpKey, GlobalConfig.cashboxDownloadIpDefaultValue);
     }
     {
