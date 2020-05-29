@@ -717,12 +717,29 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             case "initWalletBasicData": {
                 ScryWalletLog.d("nativeLib=>", "initWalletBasicData is enter =>");
-                //todo
-                NativeLib.initWalletBasicData();
+                WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.initWalletBasicData();
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "initWalletBasicData exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                if (walletState.status == 200) {
+                    resultMap.put("isInitWalletBasicData", walletState.isInitWalletBasicData);
+                    ScryWalletLog.d("nativeLib=>",
+                            "walletState.isInitWalletBasicData is " + walletState.isInitWalletBasicData);
+                } else {
+                    resultMap.put("message", walletState.message);
+                    ScryWalletLog.d("nativeLib=>",
+                            "initWalletBasicData walletState.message is " + walletState.message.toString());
+                }
+                result.success(resultMap);
                 break;
             }
             case "updateAuthDigitList": {
-                ScryWalletLog.d("nativeLib=>", "updateAuthDigitList is enter =>"+call.argument("digitData").toString());
+                ScryWalletLog.d("nativeLib=>", "updateAuthDigitList is enter =>" + call.argument("digitData").toString());
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.updateAuthDigitList((String) (call.argument("digitData")));
@@ -770,7 +787,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         result.success(resultMap); ///empty wallet
                         resultMap.put("authDigit", resultAuthDigitList);
                     }
-                    ScryWalletLog.d("nativeLib=>", "authDigitList is ==> "+authDigitList.size());
+                    ScryWalletLog.d("nativeLib=>", "authDigitList is ==> " + authDigitList.size());
                     for (int i = 0; i < authDigitList.size(); i++) {
                         Map digitMap = new HashMap();
                         int index = i;

@@ -43,10 +43,10 @@ class _EntryPageState extends State<EntryPage> {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
+    await initWalletBasicData(); //case : 删除钱包后，没钱包，回到entryPage，每次检查一下
     future = _checkIsContainWallet();
-    initWalletBasicData(); //case : 删除钱包后，没钱包，回到entryPage，每次检查一下
   }
 
   void initWalletBasicData() async {
