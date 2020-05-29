@@ -82,3 +82,12 @@ pub struct DigitList{
     pub count:u32,
     pub eth_tokens:Vec<EthToken>,
 }
+
+#[derive(Debug, Default, Clone)]
+pub struct SyncStatus{
+    pub account:String,
+    pub block_hash:String,
+    pub block_num:i64,
+    pub chain_type:i64,
+}
+

@@ -10,7 +10,7 @@ mod error;
 pub use error::WalletError;
 
 pub use ethtx::{convert_token,address_legal as eth_address_legal};
-pub use substratetx::{account_info_key,decode_account_info};
+pub use substratetx::{account_info_key,decode_account_info,event_decode};
 
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
 

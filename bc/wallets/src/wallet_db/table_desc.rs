@@ -103,17 +103,27 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     DROP TABLE IF EXISTS [main].[TransferRecord];
     CREATE TABLE [main].[TransferRecord](
     [id] VARCHAR(32) PRIMARY KEY NOT NULL,
-    [tx_record_hash] VARCHAR(64),
+    [block_hash] VARCHAR(72),
     [chain_id] INT,
-    [tx_from] VARCHAR(64),
-    [tx_to] VARCHAR(64),
+    [tx_index] INT,
+    [tx_from] VARCHAR(48),
+    [tx_to] VARCHAR(48),
     [amount] VARCHAR(32),
     [unit] VARCHAR(32),
-    [status] VARCHAR(32),
-    [is_initiator] VARCHAR(1),
-    [extra_msg] VARCHAR(3072),
+    [status] int,
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [UPDATED_TIME] timestamp);
+    [UPDATED_TIME] timestamp
+);
+
+    DROP TABLE IF EXISTS [main].[AccountInfoSyncProg];
+    CREATE TABLE [main].[AccountInfoSyncProg](
+    [account] VARCHAR(48) PRIMARY KEY NOT NULL,
+    [chain_type] INT,
+    [block_num] INT,
+    [block_hash] VARCHAR(72),
+    [update_time] timestamp NOT NULL DEFAULT (strftime('%s','now'))
+);
+
 
     insert into Chain(id,short_name,full_name,type,domain,selected) Values(1,'BTC',"bitcoin",1,"",0);
     insert into Chain(id,short_name,full_name,type,domain,selected) Values(2,'BTC TEST',"bitcoin test",2,"",0);

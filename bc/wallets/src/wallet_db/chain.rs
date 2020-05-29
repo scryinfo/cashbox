@@ -1,7 +1,10 @@
 use super::*;
 
-use crate::model::WalletObj;
+use crate::model::{WalletObj, SyncStatus};
 use log::debug;
+use sqlite::{State,Statement};
+
+use substratetx::TransferEvent;
 
 impl DataServiceProvider {
 
@@ -163,5 +166,48 @@ impl DataServiceProvider {
         stat.bind(1, chain_type)?;
         stat.bind(2, walletid)?;
         stat.next().map(|_|true).map_err(|err|err.into())
+    }
+    pub fn save_transfer_event(&self,block_hash:&str,event:&TransferEvent)-> WalletResult<bool>{
+
+        let insert_sql = "insert into detail.TransferRecord(id,block_hash,chain_id,tx_index,tx_from,tx_to,amount,status)values(?,?,?,?,?,?,?,?);";
+        let mut stat =  self.db_hander.prepare(insert_sql)?;
+        stat.bind(1,  uuid::Uuid::new_v4().to_string().as_str())?;
+        stat.bind(2, block_hash)?;
+        stat.bind(3,3 as i64)?;//todo 链id 需要灵活调整
+        stat.bind(4, event.index as i64)?;
+        stat.bind(5, event.from.as_ref().unwrap().as_str())?;
+        stat.bind(6, event.to.as_ref().unwrap().as_str())?;
+        stat.bind(7, event.value.unwrap() as i64)?;
+        stat.bind(8, event.result as i64)?;
+        stat.next().map(|_|true).map_err(|err|err.into())
+    }
+
+   pub fn update_account_sync(&self,account:&str,chain_type:i32,block_num:u32,block_hash:&str)-> WalletResult<()>{
+       let insert_sql = "insert into detail.AccountInfoSyncProg(account,chain_type,block_num,block_hash)values(?,?,?,?) ON CONFLICT(account) DO UPDATE set block_num = ? and block_hash=?;";
+       let mut stat =  self.db_hander.prepare(insert_sql)?;
+       stat.bind(1,  account)?;
+       stat.bind(2, chain_type as i64)?;
+       stat.bind(3,block_num as i64)?;//todo 链id 需要灵活调整
+       stat.bind(4, block_hash)?;
+       stat.bind(5, block_num as i64)?;
+       stat.bind(6, block_hash)?;
+       stat.next().map(|_|()).map_err(|err|err.into())
+   }
+
+    pub fn get_sync_status(&self)-> WalletResult<Vec<SyncStatus>>{
+        let select_sql = "select account,chain_type,block_num,block_hash from detail.AccountInfoSyncProg;";
+        let mut select_stat =  self.db_hander.prepare(select_sql)?;
+        let mut status_vec = Vec::new();
+        while let State::Row = select_stat.next().unwrap() {
+            println!("select stat:{:?}",select_stat.read::<String>(4));
+           let status =  SyncStatus{
+                account: select_stat.read::<String>(1).unwrap(),
+                chain_type: select_stat.read::<i64>(2).unwrap(),
+                block_num: select_stat.read::<i64>(3).unwrap(),
+                block_hash:select_stat.read::<String>(4).unwrap()
+            };
+            status_vec.push(status);
+        }
+        Ok(status_vec)
     }
 }

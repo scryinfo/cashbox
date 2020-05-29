@@ -3,17 +3,13 @@ package info.scry.wallet_manager;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
-
         System.out.println("********************start jni func test***************************************");
-       //  System.out.println(NativeLib.initWalletBasicData());
+       // System.out.println(NativeLib.initWalletBasicData());
        // updateDefaultDigitTest();
        // walletGenerateTest();
        // walletExportTest();
@@ -22,19 +18,23 @@ public class NativeLibTest {
       //  getAuthDigitListTest();
         //  queryDigitTest();
        //  addDigitTest();
-        delWalletTest();
+        //delWalletTest();
+        //getHeaderTest();
+        //updateEeeSyncRecordTest();
+      //  storage_query_test();
+        getEeeSyncRecordTest();
       //  eeeTransferTest();
       // eeeAccountInfoKeyTest();
-     //   decodeAccountInfoTest();
+      // decodeAccountInfoTest();
         // eeeTxsign();
       //  walletSaveTest();
       //  updateBalance();
        // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
-        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+      /*  List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         for (NativeLib.Wallet wallet:wallets){
             System.out.println("***********************");
             System.out.println(wallet.toString());
-        }
+        }*/
     }
 
 
@@ -110,12 +110,13 @@ public class NativeLibTest {
     }
 
     public static void eeeAccountInfoKeyTest(){
+       // NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
         NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
         System.out.println(msg);
     }
 
     public static void decodeAccountInfoTest(){
-        NativeLib.Message msg = NativeLib.decodeAccountInfo("0x000000000000809bfddd0616000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+        NativeLib.Message msg = NativeLib.decodeAccountInfo("0x0c0000000000aedd314ae1f1d21d02000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
         System.out.println(msg);
     }
 
@@ -133,6 +134,73 @@ public class NativeLibTest {
     public static void decodeTest(){
        NativeLib.Message msg =  NativeLib.decodeAdditionData("0xa9059cbb000000000000000000000000c0c4824527ffb27a51034cea1e37840ed69a5f1e00000000000000000000000000000000000000000000000000000000000a2d77646464");
         System.out.println(msg.toString());
+    }
+
+    public static void getHeaderTest() throws Throwable {
+        Map header =new  HashMap<String,String>();
+        String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
+        header.put("Content-Type","application/json");
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://47.108.146.67:9933"), header);
+        //获取当前最新区块hash
+        Header new_header =  client.invoke("chain_getHeader",new Object[]{ },Header.class);
+        Integer number = Integer.parseInt(new_header.number.substring(2),16);
+        System.out.println(number);
+    }
+
+    public static void getEeeSyncRecordTest(){
+        System.out.println(NativeLib.getEeeSyncRecord());
+    }
+    public static void storage_query_test()throws Throwable{
+        Map header =new  HashMap<String,String>();
+        String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
+        header.put("Content-Type","application/json");
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://47.108.146.67:9933"), header);
+
+        Header current_header =  client.invoke("chain_getHeader",new Object[]{ },Header.class);
+        //获取当前最新的区块的编号
+        Integer number = Integer.parseInt(current_header.number.substring(2),16);
+
+        String account_1 = "5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4";
+        String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
+        NativeLib.Message key1 = NativeLib.eeeAccountInfoKey(account_1);
+        NativeLib.Message key2 = NativeLib.eeeAccountInfoKey(account_2);
+        System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
+        int queryNumberInterval = 3000;
+        int query_times = number/queryNumberInterval;
+        String endBlockHash = "";//获取最后的blockhash
+        int endBlockNumber = 0;
+        for (int i=0;i<query_times;i++){
+            //1-3000 3001-6000
+            //测试
+            if(i==2){
+                break;
+            }
+            String startBlockHash =  client.invoke("chain_getBlockHash",new Object[]{ i*queryNumberInterval+1},String.class);
+             endBlockNumber = i==(query_times-1)?number:(i+1)*queryNumberInterval;
+            //获取当次查询存储状态的截止区块hash
+             endBlockHash =  client.invoke("chain_getBlockHash",new Object[]{ endBlockNumber },String.class);
+            // System.out.println("genesisHash:"+genesisHash+",currentHash:"+currentHash);
+
+            StorageChange[] storage =  client.invoke("state_queryStorage",new Object[]{ new String[]{key1.accountKeyInfo},startBlockHash,endBlockHash},StorageChange[].class);
+            for (StorageChange item:storage){
+                System.out.println("***************"+i+"*****************");
+                //读取状态变化的详情
+                System.out.println("block hash:"+item.block+",changes:"+item.changes.toString());
+                String event_detal =  client.invoke("state_getStorage",new Object[]{ eventKeyPrefix,item.block},String.class);
+                NativeLib.Message msg =  NativeLib.decodeEventDetail("5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4",event_detal,item.block);
+                System.out.println("save result:"+msg);
+            }
+        }
+      //  System.out.println("endBlockNumber:"+endBlockNumber);
+        NativeLib.Message update_result = NativeLib.updateEeeSyncRecord(account_1,5,endBlockNumber,endBlockHash.substring(2));
+            System.out.println(update_result);
+    }
+    public static void updateEeeSyncRecordTest() {
+        String account_1 = "5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4";
+        int number = 6000;
+        String endBlockHash ="0x738c2f78b2ee8cde07a7591ec6bd25c56d13bd0f0b262a767888a70fc0933839";
+        NativeLib.Message update_result = NativeLib.updateEeeSyncRecord(account_1,5,number,endBlockHash);
+        System.out.println(update_result);
     }
 
     public static void contract_test(List<NativeLib.Wallet> wallets) throws Throwable {
@@ -554,4 +622,113 @@ public class NativeLibTest {
                     '}';
         }
     }
+
+    public static class StorageChange{
+        private String block;
+        private List<List<String>> changes;
+
+        public String getBlock() {
+            return block;
+        }
+
+        public void setBlock(String block) {
+            this.block = block;
+        }
+
+        public List<List<String>> getChanges() {
+            return changes;
+        }
+
+        public void setChanges(List<List<String>> changes) {
+            this.changes = changes;
+        }
+
+        @Override
+        public String toString() {
+            return "StorageChange{" +
+                    "block='" + block + '\'' +
+                    ", changes=" + changes +
+                    '}';
+        }
+
+    }
+
+    public static class  DigestItem{
+        private String[] logs;
+
+        public String[] getLogs() {
+            return logs;
+        }
+
+        public void setLogs(String[] logs) {
+            this.logs = logs;
+        }
+
+        @Override
+        public String toString() {
+            return "DigestItem{" +
+                    "logs=" + Arrays.toString(logs) +
+                    '}';
+        }
+    }
+
+    public static class Header{
+        private DigestItem digest;
+        private String extrinsicsRoot;
+        private String number;
+        private String parentHash;
+        private String stateRoot;
+
+        public DigestItem getDigest() {
+            return digest;
+        }
+
+        public void setDigest(DigestItem digest) {
+            this.digest = digest;
+        }
+
+        public String getExtrinsicsRoot() {
+            return extrinsicsRoot;
+        }
+
+        public void setExtrinsicsRoot(String extrinsicsRoot) {
+            this.extrinsicsRoot = extrinsicsRoot;
+        }
+
+        public String getNumber() {
+            return number;
+        }
+
+        public void setNumber(String number) {
+            this.number = number;
+        }
+
+        public String getParentHash() {
+            return parentHash;
+        }
+
+        public void setParentHash(String parentHash) {
+            this.parentHash = parentHash;
+        }
+
+        public String getStateRoot() {
+            return stateRoot;
+        }
+
+        public void setStateRoot(String stateRoot) {
+            this.stateRoot = stateRoot;
+        }
+
+        @Override
+        public String toString() {
+            return "Header{" +
+                    "digest=" + digest +
+                    ", extrinsicsRoot='" + extrinsicsRoot + '\'' +
+                    ", number='" + number + '\'' +
+                    ", parentHash='" + parentHash + '\'' +
+                    ", stateRoot='" + stateRoot + '\'' +
+                    '}';
+        }
+    }
+
 }

@@ -529,6 +529,37 @@ public class NativeLib {
                     '}';
         }
     }
+    public static class SyncStatus {
+        public int status;                  //通信消息 状态码StatusCode 200成功
+        public String message;              //详细错误信息
+        public List<AccountRecord> records;
+
+        @Override
+        public String toString() {
+            return "SyncStatus{" +
+                    "status=" + status +
+                    ", message='" + message + '\'' +
+                    ", records=" + records +
+                    '}';
+        }
+    }
+
+    public static class AccountRecord{
+        public String account;
+        public int chainType;
+        public int blockNum;
+        public String blockHash;
+
+        @Override
+        public String toString() {
+            return "AccountRecord{" +
+                    "account='" + account + '\'' +
+                    ", chainType=" + chainType +
+                    ", blockNum=" + blockNum +
+                    ", blockHash='" + blockHash + '\'' +
+                    '}';
+        }
+    }
 
     //定义EEE 链账户信息
     public static class AccountInfo {
@@ -589,6 +620,13 @@ public class NativeLib {
     // :0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
     //构造jsonrpc 请求数据格式{"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
     public static native Message eeeAccountInfoKey(String addr);
+
+    public static native Message decodeEventDetail(String accountId,String eventDetail,String blockHash);
+    //用于记录当前同步到的区块号
+    public static native Message updateEeeSyncRecord(String account,int chain_type,int block_num,String block_hash);
+    //获取当前已经同步的到的区块号
+    public static native SyncStatus getEeeSyncRecord();
+
 
     /**
      * 解码从链上查询回来的账户信息

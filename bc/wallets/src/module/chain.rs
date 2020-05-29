@@ -340,4 +340,24 @@ pub fn decode_eth_data(input: &str) -> WalletResult<String> {
     ethtx::decode_tranfer_data(input).map_err(|error| error.into())
 }
 
+pub fn save_eee_tx_record(account:&str,blockhash:&str,event_data:&str)->WalletResult<()>{
+    let event_obj = substratetx::event_decode(event_data,blockhash,account);
+    let instance = wallet_db::DataServiceProvider::instance()?;
+    for (key,value) in &event_obj {
+        if value.from.is_some(){
+            instance.save_transfer_event(blockhash,value)?;
+        }
+    }
+    Ok(())
+}
+pub fn update_eee_sync_record(account:&str,chain_type:i32,block_num:u32,block_hash:&str)->WalletResult<()>{
+    let instance = wallet_db::DataServiceProvider::instance()?;
+    instance.update_account_sync(account,chain_type,block_num,block_hash)
+}
+
+pub fn get_eee_sync_status()->WalletResult<Vec<SyncStatus>>{
+    let instance = wallet_db::DataServiceProvider::instance()?;
+    //是否要区分链类型
+    instance.get_sync_status()
+}
 
