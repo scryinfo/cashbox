@@ -100,19 +100,18 @@ pub fn hash160(public_key: &str) -> String {
     hash.to_hex()
 }
 
-//#[no_mangle]
-// pub extern "system" fn Java_JniApi_creat_1master(env: JNIEnv, _: JClass, mnemonic_str: JString) -> jobject {
-//     let mnemonic_str = env.get_string(mnemonic_str).unwrap();
-//
-//     let message_class = env.find_class("JniApi$StatusMessage").expect("can't find class JniApi$StatusCode");
-//     let message_obj = env.alloc_object(message_class).expect("create message instance error");
-//
-//     env.set_field(message_obj, "code", "I", JValue::Int(200)).expect("set code error");
-//     env.set_field(message_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("Rust".to_string()).unwrap()))).expect("set error msg value is error!");
-//
-//
-//     message_obj.into_inner()
-// }
+#[no_mangle]
+pub extern "system" fn Java_JniApi_creat_1master(env: JNIEnv, _: JClass, mnemonic_str: JString) -> jobject {
+    let mnemonic_str = env.get_string(mnemonic_str).unwrap();
+
+    let message_class = env.find_class("JniApi$StatusMessage").expect("can't find class JniApi$StatusCode");
+    let message_obj = env.alloc_object(message_class).expect("create message instance error");
+
+    env.set_field(message_obj, "code", "I", JValue::Int(200)).expect("set code error");
+    env.set_field(message_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("Rust".to_string()).unwrap()))).expect("set error msg value is error!");
+
+    message_obj.into_inner()
+}
 
 #[no_mangle]
 #[allow(non_snake_case)]
