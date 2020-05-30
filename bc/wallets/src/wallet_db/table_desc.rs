@@ -105,6 +105,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [id] VARCHAR(32) PRIMARY KEY NOT NULL,
     [block_hash] VARCHAR(72),
     [chain_id] INT,
+    [account] VARCHAR(48),
     [tx_index] INT,
     [tx_from] VARCHAR(48),
     [tx_to] VARCHAR(48),

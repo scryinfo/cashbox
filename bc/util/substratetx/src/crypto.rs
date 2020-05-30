@@ -47,7 +47,7 @@ struct KdfParams {
     p: u32,
 }
 
-pub trait  Keccak256<T>{
+/*pub trait  Keccak256<T>{
     fn keccak256(&self) -> T
         where T: Sized;
 }
@@ -60,7 +60,7 @@ impl <T> Keccak256<[u8;32]> for T where T:AsRef<[u8]>{
         keccak.finalize(&mut result);
         result
     }
-}
+}*/
 
 pub trait Crypto {
     type Seed: AsRef<[u8]> + AsMut<[u8]> + Sized + Default;

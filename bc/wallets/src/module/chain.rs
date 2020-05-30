@@ -340,12 +340,17 @@ pub fn decode_eth_data(input: &str) -> WalletResult<String> {
     ethtx::decode_tranfer_data(input).map_err(|error| error.into())
 }
 
-pub fn save_eee_tx_record(account:&str,blockhash:&str,event_data:&str)->WalletResult<()>{
+pub fn save_eee_tx_record(account:&str,blockhash:&str,event_data:&str,extrinsics:&str)->WalletResult<()>{
     let event_obj = substratetx::event_decode(event_data,blockhash,account);
+
+    let extrinsics_hash = substratetx::decode_extrinsics(extrinsics);
+    //区块交易事件 肯定存在时间戳的设置
+    //let timestamp = extrinsics_hash
     let instance = wallet_db::DataServiceProvider::instance()?;
     for (key,value) in &event_obj {
         if value.from.is_some(){
-            instance.save_transfer_event(blockhash,value)?;
+            let extrinsic_hash = extrinsics_hash.get(&key).unwrap();
+            instance.save_transfer_event(account,blockhash,value)?;
         }
     }
     Ok(())

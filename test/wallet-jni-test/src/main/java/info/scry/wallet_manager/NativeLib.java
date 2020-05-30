@@ -1,6 +1,7 @@
 package info.scry.wallet_manager;
 
 import java.util.List;
+import java.util.Map;
 
 public class NativeLib {
 
@@ -532,7 +533,7 @@ public class NativeLib {
     public static class SyncStatus {
         public int status;                  //通信消息 状态码StatusCode 200成功
         public String message;              //详细错误信息
-        public List<AccountRecord> records;
+        public Map<String,AccountRecord> records;
 
         @Override
         public String toString() {
@@ -621,7 +622,7 @@ public class NativeLib {
     //构造jsonrpc 请求数据格式{"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
     public static native Message eeeAccountInfoKey(String addr);
 
-    public static native Message decodeEventDetail(String accountId,String eventDetail,String blockHash);
+    public static native Message decodeEventDetail(String accountId,String eventDetail,String blockHash,String extrinsics);
     //用于记录当前同步到的区块号
     public static native Message updateEeeSyncRecord(String account,int chain_type,int block_num,String block_hash);
     //获取当前已经同步的到的区块号

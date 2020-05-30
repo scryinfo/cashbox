@@ -1,6 +1,6 @@
 use super::*;
 
-use crate::model::{WalletObj, SyncStatus};
+use model::{WalletObj, SyncStatus};
 use log::debug;
 use sqlite::{State,Statement};
 
@@ -9,14 +9,13 @@ use substratetx::TransferEvent;
 impl DataServiceProvider {
 
     pub fn get_available_chain(&self)->WalletResult<Vec<i64>>{
-        //查询当前可用链类型，当前
+        //查询当前可用链类型，启用了哪些链
         let sql = "select type from detail.chain where selected=1 and status=1;";
-
         let  stat = self.db_hander.prepare(sql)?;
         let mut cursor= stat.cursor();
         let mut chain_type = Vec::new();
         while let Some(row) = cursor.next()? {
-           let type_id =  row[0].as_integer().unwrap();//能查询出来，则存在值
+           let type_id =  row[0].as_integer().unwrap();//存储的值类型为 i64 是明确的
             chain_type.push(type_id);
         }
         Ok(chain_type)
@@ -53,7 +52,6 @@ impl DataServiceProvider {
                 digit_is_visible: row[13].as_string().map(|value| Self::get_bool_value(value)),
                 decimals: row[14].as_integer(),
                 url_img: row[15].as_string().map(|str| String::from(str)),
-
             };
             tbwallets.push(tbwallet);
         }
@@ -90,7 +88,6 @@ impl DataServiceProvider {
                 digit_is_visible: row[13].as_string().map(|value| Self::get_bool_value(value)),
                 decimals: row[14].as_integer(),
                 url_img: row[15].as_string().map(|str| String::from(str)),
-
             };
             tbwallets.push(tbwallet);
         }
@@ -167,9 +164,9 @@ impl DataServiceProvider {
         stat.bind(2, walletid)?;
         stat.next().map(|_|true).map_err(|err|err.into())
     }
-    pub fn save_transfer_event(&self,block_hash:&str,event:&TransferEvent)-> WalletResult<bool>{
+    pub fn save_transfer_event(&self,account:&str,block_hash:&str,event:&TransferEvent)-> WalletResult<bool>{
 
-        let insert_sql = "insert into detail.TransferRecord(id,block_hash,chain_id,tx_index,tx_from,tx_to,amount,status)values(?,?,?,?,?,?,?,?);";
+        let insert_sql = "insert into detail.TransferRecord(id,block_hash,chain_id,tx_index,tx_from,tx_to,amount,status,account)values(?,?,?,?,?,?,?,?,?);";
         let mut stat =  self.db_hander.prepare(insert_sql)?;
         stat.bind(1,  uuid::Uuid::new_v4().to_string().as_str())?;
         stat.bind(2, block_hash)?;
@@ -179,32 +176,32 @@ impl DataServiceProvider {
         stat.bind(6, event.to.as_ref().unwrap().as_str())?;
         stat.bind(7, event.value.unwrap() as i64)?;
         stat.bind(8, event.result as i64)?;
+        stat.bind(9, account)?;
         stat.next().map(|_|true).map_err(|err|err.into())
     }
 
    pub fn update_account_sync(&self,account:&str,chain_type:i32,block_num:u32,block_hash:&str)-> WalletResult<()>{
-       let insert_sql = "insert into detail.AccountInfoSyncProg(account,chain_type,block_num,block_hash)values(?,?,?,?) ON CONFLICT(account) DO UPDATE set block_num = ? and block_hash=?;";
+       //let insert_sql = "insert into detail.AccountInfoSyncProg(account,chain_type,block_num,block_hash)values(?,?,?,?) ON CONFLICT(account) DO UPDATE set block_num = ? and block_hash=?;";
+       let insert_sql = "INSERT OR REPLACE into detail.AccountInfoSyncProg(account,chain_type,block_num,block_hash)values(?,?,?,?);";
        let mut stat =  self.db_hander.prepare(insert_sql)?;
+        println!("block_num:{},block_hash:{}",block_num,block_hash);
        stat.bind(1,  account)?;
        stat.bind(2, chain_type as i64)?;
        stat.bind(3,block_num as i64)?;//todo 链id 需要灵活调整
        stat.bind(4, block_hash)?;
-       stat.bind(5, block_num as i64)?;
-       stat.bind(6, block_hash)?;
        stat.next().map(|_|()).map_err(|err|err.into())
    }
 
     pub fn get_sync_status(&self)-> WalletResult<Vec<SyncStatus>>{
-        let select_sql = "select account,chain_type,block_num,block_hash from detail.AccountInfoSyncProg;";
+       let select_sql = "select account,chain_type,block_num,block_hash from detail.AccountInfoSyncProg;";
         let mut select_stat =  self.db_hander.prepare(select_sql)?;
         let mut status_vec = Vec::new();
         while let State::Row = select_stat.next().unwrap() {
-            println!("select stat:{:?}",select_stat.read::<String>(4));
            let status =  SyncStatus{
-                account: select_stat.read::<String>(1).unwrap(),
-                chain_type: select_stat.read::<i64>(2).unwrap(),
-                block_num: select_stat.read::<i64>(3).unwrap(),
-                block_hash:select_stat.read::<String>(4).unwrap()
+                account: select_stat.read::<String>(0).unwrap(),
+                chain_type: select_stat.read::<i64>(1).unwrap(),
+                block_num: select_stat.read::<i64>(2).unwrap(),
+                block_hash:select_stat.read::<String>(3).unwrap()
             };
             status_vec.push(status);
         }

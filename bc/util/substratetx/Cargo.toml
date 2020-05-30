@@ -20,7 +20,7 @@ serde_derive = "1.0.98"
 serde="1.0"
 serde_json = "1.0"
 derive_more = "0.99.1"
-
+blake2-rfc="0.2.18"
 scrypt = { version = "0.2", default-features = true }
 scry-crypto = {version = "0.1.0",path="../crypto"}
 codec = { package = "parity-scale-codec", version = "1.2.0" }

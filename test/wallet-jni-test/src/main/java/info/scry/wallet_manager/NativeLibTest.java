@@ -1,6 +1,8 @@
 package info.scry.wallet_manager;
 
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.*;
@@ -9,7 +11,7 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-       // System.out.println(NativeLib.initWalletBasicData());
+        System.out.println(NativeLib.initWalletBasicData());
        // updateDefaultDigitTest();
        // walletGenerateTest();
        // walletExportTest();
@@ -21,8 +23,8 @@ public class NativeLibTest {
         //delWalletTest();
         //getHeaderTest();
         //updateEeeSyncRecordTest();
-      //  storage_query_test();
-        getEeeSyncRecordTest();
+        storage_query_test();
+      //  getEeeSyncRecordTest();
       //  eeeTransferTest();
       // eeeAccountInfoKeyTest();
       // decodeAccountInfoTest();
@@ -152,48 +154,73 @@ public class NativeLibTest {
     }
     public static void storage_query_test()throws Throwable{
         Map header =new  HashMap<String,String>();
+        //通知事件编码  常量
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
+        //需要查询交易的目标账号
+        String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
+
         header.put("Content-Type","application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://47.108.146.67:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://127.0.0.1:9933"), header);
 
         Header current_header =  client.invoke("chain_getHeader",new Object[]{ },Header.class);
         //获取当前最新的区块的编号
         Integer number = Integer.parseInt(current_header.number.substring(2),16);
+        System.out.println("latest block number is:"+number);
+        NativeLib.SyncStatus status = NativeLib.getEeeSyncRecord();
 
-        String account_1 = "5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4";
-        String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
+        NativeLib.AccountRecord accountRecord =  status.records.get(account_1);
+
+        int startBlockNumber = accountRecord==null?0:accountRecord.blockNum;
+
         NativeLib.Message key1 = NativeLib.eeeAccountInfoKey(account_1);
         NativeLib.Message key2 = NativeLib.eeeAccountInfoKey(account_2);
-        System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
+       // System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
+        //每次查询区块间隔
         int queryNumberInterval = 3000;
-        int query_times = number/queryNumberInterval;
+        //当前需要查询的次数， 向上取整
+        int query_times = (number-startBlockNumber)/queryNumberInterval+1;
+
+
         String endBlockHash = "";//获取最后的blockhash
         int endBlockNumber = 0;
         for (int i=0;i<query_times;i++){
             //1-3000 3001-6000
-            //测试
-            if(i==2){
-                break;
-            }
-            String startBlockHash =  client.invoke("chain_getBlockHash",new Object[]{ i*queryNumberInterval+1},String.class);
-             endBlockNumber = i==(query_times-1)?number:(i+1)*queryNumberInterval;
+
+            //当次查询的起始区块编号
+            int currentStartBlockNum = startBlockNumber+i*queryNumberInterval+1;
+
+            String startBlockHash =  client.invoke("chain_getBlockHash",new Object[]{currentStartBlockNum},String.class);
+            System.out.println("currentStartBlockNum:"+currentStartBlockNum+",startBlockHash:"+startBlockHash);
+             endBlockNumber = i==(query_times-1)?number:(i+1)*queryNumberInterval+startBlockNumber;
             //获取当次查询存储状态的截止区块hash
              endBlockHash =  client.invoke("chain_getBlockHash",new Object[]{ endBlockNumber },String.class);
-            // System.out.println("genesisHash:"+genesisHash+",currentHash:"+currentHash);
-
+             //查询账号在改区块范围内状态改变的历史
             StorageChange[] storage =  client.invoke("state_queryStorage",new Object[]{ new String[]{key1.accountKeyInfo},startBlockHash,endBlockHash},StorageChange[].class);
             for (StorageChange item:storage){
-                System.out.println("***************"+i+"*****************");
                 //读取状态变化的详情
-                System.out.println("block hash:"+item.block+",changes:"+item.changes.toString());
+           //     System.out.println("block hash:"+item.block+",changes:"+item.changes.toString());
+                Block block_detal =  client.invoke("chain_getBlock",new Object[]{ item.block},Block.class);
+
+                String extrinsicsDetail = new JSONArray(Arrays.asList(block_detal.block.extrinsics)).toString();
+                System.out.println("block_detal:"+ extrinsicsDetail);
+                //JSONArray
                 String event_detal =  client.invoke("state_getStorage",new Object[]{ eventKeyPrefix,item.block},String.class);
-                NativeLib.Message msg =  NativeLib.decodeEventDetail("5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4",event_detal,item.block);
-                System.out.println("save result:"+msg);
+                //解码获取回来的通知详情解码，若包含转账交易，则将交易详情存储在数据库中
+                NativeLib.Message msg =  NativeLib.decodeEventDetail(account_1,event_detal,item.block,extrinsicsDetail);
+                if(msg.status!=200){
+                    System.out.println(msg.message);
+                }
             }
+            System.out.println("start update sync record,endBlockNumber is:"+endBlockNumber+",endBlockHash is"+endBlockHash);
+            //更新当前查询的区块数
+            NativeLib.Message update_result = NativeLib.updateEeeSyncRecord(account_1,5,endBlockNumber,endBlockHash);
+            if(update_result.status!=200){
+                System.out.println("update message is:"+update_result.message);
+            }
+
         }
-      //  System.out.println("endBlockNumber:"+endBlockNumber);
-        NativeLib.Message update_result = NativeLib.updateEeeSyncRecord(account_1,5,endBlockNumber,endBlockHash.substring(2));
-            System.out.println(update_result);
+
     }
     public static void updateEeeSyncRecordTest() {
         String account_1 = "5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4";
@@ -668,6 +695,65 @@ public class NativeLibTest {
         public String toString() {
             return "DigestItem{" +
                     "logs=" + Arrays.toString(logs) +
+                    '}';
+        }
+    }
+
+    public static class BlockDetail{
+        private Header header;
+        private String[] extrinsics;
+
+        public Header getHeader() {
+            return header;
+        }
+
+        public void setHeader(Header header) {
+            this.header = header;
+        }
+
+        public String[] getExtrinsics() {
+            return extrinsics;
+        }
+
+        public void setExtrinsics(String[] extrinsics) {
+            this.extrinsics = extrinsics;
+        }
+
+        @Override
+        public String toString() {
+            return "BlockDetail{" +
+                    "header=" + header +
+                    ", extrinsics=" + Arrays.toString(extrinsics) +
+                    '}';
+        }
+    }
+
+    public static class Block{
+        private BlockDetail block;
+        private String justification;
+
+
+        public BlockDetail getBlock() {
+            return block;
+        }
+
+        public void setBlock(BlockDetail block) {
+            this.block = block;
+        }
+
+        public String getJustification() {
+            return justification;
+        }
+
+        public void setJustification(String justification) {
+            this.justification = justification;
+        }
+
+        @Override
+        public String toString() {
+            return "Block{" +
+                    "block=" + block +
+                    ", justification='" + justification + '\'' +
                     '}';
         }
     }

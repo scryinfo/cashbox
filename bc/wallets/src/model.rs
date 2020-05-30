@@ -1,7 +1,6 @@
 // 该模块用于定义module database 层级之间的交互对象的定义
 
 use super::*;
-
 //用于定义与device_app_lib交互的数据格式
 pub mod wallet;
 //用于定义数据存储的结构

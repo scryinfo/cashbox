@@ -9,16 +9,31 @@ use sp_core::{
 use codec::{Encode,Decode};
 use node_runtime::{AccountId, Balance,Event, Index, Signature,Call, Runtime,BalancesCall};
 use system::Phase;
+use tiny_keccak::Keccak;
 
 mod crypto;
 mod transaction;
 pub mod error;
 
-pub use crypto::{Sr25519,Ed25519,Keccak256,Crypto};
+pub use crypto::{Sr25519,Ed25519,Crypto};
 pub use transaction::{tx_sign,transfer,decode_account_info,account_info_key};
 
-use std::sync::mpsc::channel;
 use std::collections::HashMap;
+
+pub trait  Keccak256<T>{
+    fn keccak256(&self) -> T
+        where T: Sized;
+}
+
+impl <T> Keccak256<[u8;32]> for T where T:AsRef<[u8]>{
+    fn keccak256(&self)->[u8;32]{
+        let mut keccak = Keccak::new_keccak256();
+        let mut result = [0u8; 32];
+        keccak.update(self.as_ref());
+        keccak.finalize(&mut result);
+        result
+    }
+}
 
 /// 用于传递账户信息解码后的结果，这里使用默认的单位？
 #[derive(Clone,Debug,Default)]
@@ -101,6 +116,39 @@ pub fn event_decode(event_data:&str,blockhash:&str,account:&str)->HashMap<u32,Tr
         }
     }
     all_extrinsic
+}
+
+pub fn decode_extrinsics(extrinsics_json:&str)->HashMap<u32,String>{
+    //todo 增加对错误的处理
+    let json_data:Vec<String>   = serde_json::from_str(extrinsics_json).unwrap();
+    let mut map = HashMap::new();
+    for index in 0..json_data.len() {
+        let extrinsic_encode_bytes = hex::decode(json_data[index].get(2..).unwrap()).unwrap();
+        let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &extrinsic_encode_bytes[..]).unwrap();
+        let extrinsic_func_byte =   extrinsic.encode();
+        let blake2_result =blake2_rfc::blake2b::blake2b(32, &[], &extrinsic_func_byte);
+        let hash = blake2_result.as_bytes();
+        map.insert(index as u32,hex::encode(hash));
+    }
+    map
+}
+
+#[test]
+fn decode_extrinsics_test(){
+
+    let data = r#"["0x280402000b00adc5647201","0x3d0284d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0154c32d047e9629b33ad92c12920b60e722ab60aa9138e94a1f98ddd8c4e81f742eb8769f0177a011bcec4d6febf2290121b94ced49642abcbd38aa170f13c48fb60218000400306721211d5404bd9da88e0204360a1a9ab8b87c66c1bc2fcdd37f3c2222cc200b0060b7986c88"]"#;
+    let json_data:Vec<String>   = serde_json::from_str(data).unwrap();
+    println!("{:?}",json_data.len());
+    let extrinsics = "0x280402000b00adc5647201";
+   // let timestamp =  extrinsics.parse::<u64>().unwrap();
+    let enents_bytes = hex::decode(extrinsics.get(2..).unwrap()).unwrap();
+    let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &enents_bytes[..]).unwrap();
+    let extrinsic_byte =   extrinsic.encode();
+    println!("extrinsic_byte:{:?}",extrinsic_byte);
+    let blake2_result =blake2_rfc::blake2b::blake2b(32, &[], &extrinsic_byte);
+    let hash = blake2_result.as_bytes();
+    println!("extrinsic_byte hash hex:{:?}",hex::encode(hash));
+
 }
 
 #[test]
