@@ -164,27 +164,27 @@ impl DataServiceProvider {
         stat.bind(2, walletid)?;
         stat.next().map(|_|true).map_err(|err|err.into())
     }
-    pub fn save_transfer_event(&self,account:&str,block_hash:&str,event:&TransferEvent)-> WalletResult<bool>{
-
-        let insert_sql = "insert into detail.TransferRecord(id,block_hash,chain_id,tx_index,tx_from,tx_to,amount,status,account)values(?,?,?,?,?,?,?,?,?);";
+    pub fn save_transfer_event(&self,tx_hash:&str,account:&str,block_hash:&str,event:&TransferEvent,timestamp:&str)-> WalletResult<bool>{
+        println!("save_transfer_event:tx_hash {},timestamp {}",tx_hash,timestamp);
+        let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,tx_index,tx_from,tx_to,amount,status,account,tx_timestamp)values(?,?,?,?,?,?,?,?,?,?);";
         let mut stat =  self.db_hander.prepare(insert_sql)?;
-        stat.bind(1,  uuid::Uuid::new_v4().to_string().as_str())?;
-        stat.bind(2, block_hash)?;
+        stat.bind(1,  tx_hash)?;//交易hash
+        stat.bind(2, block_hash)?;//区块hash
         stat.bind(3,3 as i64)?;//todo 链id 需要灵活调整
         stat.bind(4, event.index as i64)?;
-        stat.bind(5, event.from.as_ref().unwrap().as_str())?;
-        stat.bind(6, event.to.as_ref().unwrap().as_str())?;
+        stat.bind(5, event.from.as_ref().unwrap().as_str())?;//交易发起账户
+        stat.bind(6, event.to.as_ref().unwrap().as_str())?;//交易接收账户
         stat.bind(7, event.value.unwrap() as i64)?;
         stat.bind(8, event.result as i64)?;
-        stat.bind(9, account)?;
+        stat.bind(9, account)?;//同步账户
+        stat.bind(10, timestamp)?;//交易上链时间
         stat.next().map(|_|true).map_err(|err|err.into())
     }
 
    pub fn update_account_sync(&self,account:&str,chain_type:i32,block_num:u32,block_hash:&str)-> WalletResult<()>{
-       //let insert_sql = "insert into detail.AccountInfoSyncProg(account,chain_type,block_num,block_hash)values(?,?,?,?) ON CONFLICT(account) DO UPDATE set block_num = ? and block_hash=?;";
+
        let insert_sql = "INSERT OR REPLACE into detail.AccountInfoSyncProg(account,chain_type,block_num,block_hash)values(?,?,?,?);";
        let mut stat =  self.db_hander.prepare(insert_sql)?;
-        println!("block_num:{},block_hash:{}",block_num,block_hash);
        stat.bind(1,  account)?;
        stat.bind(2, chain_type as i64)?;
        stat.bind(3,block_num as i64)?;//todo 链id 需要灵活调整

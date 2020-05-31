@@ -157,7 +157,7 @@ public class NativeLibTest {
         //通知事件编码  常量
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //需要查询交易的目标账号
-        String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        String account_1 = "5GGzGJR54YNjMKhaYt6hHV3o99FZ6JKYEDCrzUg1HCz1tWPa";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type","application/json");
@@ -197,12 +197,20 @@ public class NativeLibTest {
              endBlockHash =  client.invoke("chain_getBlockHash",new Object[]{ endBlockNumber },String.class);
              //查询账号在改区块范围内状态改变的历史
             StorageChange[] storage =  client.invoke("state_queryStorage",new Object[]{ new String[]{key1.accountKeyInfo},startBlockHash,endBlockHash},StorageChange[].class);
+            System.out.println("*********************StorageChange start**************");
+            System.out.println(storage.toString());
+            System.out.println("*********************StorageChange end**************");
             for (StorageChange item:storage){
                 //读取状态变化的详情
-           //     System.out.println("block hash:"+item.block+",changes:"+item.changes.toString());
-                Block block_detal =  client.invoke("chain_getBlock",new Object[]{ item.block},Block.class);
-
-                String extrinsicsDetail = new JSONArray(Arrays.asList(block_detal.block.extrinsics)).toString();
+               System.out.println("block hash:"+item.block+",changes:"+item.changes.toString());
+                Block block_detail =  client.invoke("chain_getBlock",new Object[]{ item.block},Block.class);
+                List tx_list = Arrays.asList(block_detail.block.extrinsics);
+               //todo 为什么会存在只有时间戳的区块被取回来？
+                if (tx_list.size()==1){
+                    System.out.println("ignore this block:"+block_detail.toString());
+                    continue;
+                }
+                String extrinsicsDetail = new JSONArray(tx_list).toString();
                 System.out.println("block_detal:"+ extrinsicsDetail);
                 //JSONArray
                 String event_detal =  client.invoke("state_getStorage",new Object[]{ eventKeyPrefix,item.block},String.class);

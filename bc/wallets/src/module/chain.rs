@@ -59,7 +59,6 @@ pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amoun
             match substratetx::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过开始拼接交易签名数据
-                    //todo 输入的数量都是整数？
                     let data = match data {
                         Some(data) => data.as_bytes().to_vec(),
                         None => vec![]
@@ -73,7 +72,6 @@ pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amoun
                         gas: gas_limit,
                         data,
                     };
-                    //todo 增加对错误的处理
                     let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic)?, None)?;
 
                     //todo 增加链id ,从助记词生成私钥 secp256k1
@@ -110,16 +108,14 @@ pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, t
     };
     match module::wallet::find_keystore_wallet_from_address(from_account, chain_type) {
         Ok(keystore) => {
-            //todo 使用?方式来处理错误
             match substratetx::Sr25519::get_mnemonic_context(&keystore, psw) {
                 Ok(mnemonic) => {
                     //密码验证通过
-                    //todo 增加错误处理
                     //调用合约 是否允许transfer 目标地址为空?
                     let mut encode_data = ethtx::get_erc20_transfer_data(to_account.unwrap(), amount)?;
                     //添加合约交易备注信息
-                    if data.is_some() {
-                        let mut addition = data.unwrap().as_bytes().to_vec();
+                    if let Some(addition_str) = data{
+                        let mut addition =addition_str.as_bytes().to_vec();
                         encode_data.append(&mut addition);
                     }
                     let rawtx = ethtx::RawTransaction {
@@ -345,12 +341,13 @@ pub fn save_eee_tx_record(account:&str,blockhash:&str,event_data:&str,extrinsics
 
     let extrinsics_hash = substratetx::decode_extrinsics(extrinsics);
     //区块交易事件 肯定存在时间戳的设置
-    //let timestamp = extrinsics_hash
+    let timestamp = extrinsics_hash.get(&0).unwrap();//获取时间戳
     let instance = wallet_db::DataServiceProvider::instance()?;
     for (key,value) in &event_obj {
+        println!("value {:?}",value);
         if value.from.is_some(){
-            let extrinsic_hash = extrinsics_hash.get(&key).unwrap();
-            instance.save_transfer_event(account,blockhash,value)?;
+            let tx_hash = extrinsics_hash.get(&key).unwrap();
+            instance.save_transfer_event(tx_hash,account,blockhash,value,timestamp)?;
         }
     }
     Ok(())

@@ -339,9 +339,6 @@ pub mod android {
         //接收方账户地址
         let to_address: String = env.get_string(toAddress).unwrap().into();
 
-
-
-
         let to_address = {
             if to_address.is_empty() {
                 None

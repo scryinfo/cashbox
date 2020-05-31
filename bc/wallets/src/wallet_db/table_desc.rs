@@ -102,7 +102,7 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
 
     DROP TABLE IF EXISTS [main].[TransferRecord];
     CREATE TABLE [main].[TransferRecord](
-    [id] VARCHAR(32) PRIMARY KEY NOT NULL,
+    [tx_hash]  VARCHAR(72) PRIMARY KEY NOT NULL,
     [block_hash] VARCHAR(72),
     [chain_id] INT,
     [account] VARCHAR(48),
@@ -112,8 +112,8 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     [amount] VARCHAR(32),
     [unit] VARCHAR(32),
     [status] int,
-    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [UPDATED_TIME] timestamp
+    [tx_timestamp] timestamp NOT NULL,
+    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now'))
 );
 
     DROP TABLE IF EXISTS [main].[AccountInfoSyncProg];
