@@ -374,6 +374,18 @@ public class NativeLib {
         public String fee_frozen;       //The amount that `free` may not drop below when withdrawing specifically for transaction fee payment.
     }
 
+    public static class SyncStatus {
+        public int status;                  //通信消息 状态码StatusCode 200成功
+        public String message;              //详细错误信息
+        public Map<String, AccountRecord> records;
+    }
+
+    public static class AccountRecord {
+        public String account;
+        public int chainType;
+        public int blockNum;
+        public String blockHash;
+    }
     //获取拼装原始交易，区分链类型
     //返回：未签名的交易 String, 格式为json格式
     //第一个参数为 eeeOpen 的返回值
@@ -419,6 +431,33 @@ public class NativeLib {
      * @return 若格式正确，返回status 200,Message中accountInfo字段包含详情，若格式错误，msg字段包含错误信息
      */
     public static native Message decodeAccountInfo(String encodeData);
+
+    /**
+     *保存在指定区块上的交易详情(当前只关注转账交易)
+     * @param accountId  交易的账号（目标账号，即我们关注的账号）
+     * @param eventDetail 通知详情
+     * @param blockHash 区块hash
+     * @param extrinsics 区块中包含的交易详情
+     * @return
+     */
+
+    public static native Message saveExtrinsicDetail(String accountId,String eventDetail,String blockHash,String extrinsics);
+
+    /**
+     * 记录当前同步到的区块号,用于下次触发更新时的起始位置
+     * @param account 同步的账号
+     * @param chain_type 链类型（当前针对eee来说只存在一种类型）
+     * @param block_num 当前同步到的区块号
+     * @param block_hash 区块号对应的hash
+     * @return
+     */
+    public static native Message updateEeeSyncRecord(String account,int chain_type,int block_num,String block_hash);
+
+    /**
+     * 获取当前同步状态
+     * @return
+     */
+    public static native SyncStatus getEeeSyncRecord();
 
     /*------------------------------------------交易相关------------------------------------------*/
 

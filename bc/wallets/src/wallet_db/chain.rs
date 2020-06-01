@@ -3,8 +3,7 @@ use super::*;
 use model::{WalletObj, SyncStatus};
 use log::debug;
 use sqlite::{State,Statement};
-
-use substratetx::TransferEvent;
+use substratetx::TransferDetail;
 
 impl DataServiceProvider {
 
@@ -164,20 +163,20 @@ impl DataServiceProvider {
         stat.bind(2, walletid)?;
         stat.next().map(|_|true).map_err(|err|err.into())
     }
-    pub fn save_transfer_event(&self,tx_hash:&str,account:&str,block_hash:&str,event:&TransferEvent,timestamp:&str)-> WalletResult<bool>{
-        println!("save_transfer_event:tx_hash {},timestamp {}",tx_hash,timestamp);
+    pub fn save_transfer_detail(&self,account:&str,blockhash:&str,tx_detail:&TransferDetail,timestamp:u64,is_successful:bool)-> WalletResult<bool>{
         let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,tx_index,tx_from,tx_to,amount,status,account,tx_timestamp)values(?,?,?,?,?,?,?,?,?,?);";
         let mut stat =  self.db_hander.prepare(insert_sql)?;
-        stat.bind(1,  tx_hash)?;//交易hash
-        stat.bind(2, block_hash)?;//区块hash
+        stat.bind(1,  tx_detail.hash.as_ref().unwrap().as_str())?;//交易hash
+        stat.bind(2, blockhash)?;//区块hash
         stat.bind(3,3 as i64)?;//todo 链id 需要灵活调整
-        stat.bind(4, event.index as i64)?;
-        stat.bind(5, event.from.as_ref().unwrap().as_str())?;//交易发起账户
-        stat.bind(6, event.to.as_ref().unwrap().as_str())?;//交易接收账户
-        stat.bind(7, event.value.unwrap() as i64)?;
-        stat.bind(8, event.result as i64)?;
+        stat.bind(4, tx_detail.index.unwrap() as i64)?;
+        stat.bind(5, tx_detail.from.as_ref().unwrap().as_str())?;//交易发起账户
+        stat.bind(6, tx_detail.to.as_ref().unwrap().as_str())?;//交易接收账户
+        //value 为u128类型，数据库不支持这种类型，转码为字符串来表示
+        stat.bind(7,  format!("{}",tx_detail.value.unwrap()).as_str())?;
+        stat.bind(8, is_successful as i64)?;
         stat.bind(9, account)?;//同步账户
-        stat.bind(10, timestamp)?;//交易上链时间
+        stat.bind(10, timestamp as i64)?;//交易上链时间
         stat.next().map(|_|true).map_err(|err|err.into())
     }
 

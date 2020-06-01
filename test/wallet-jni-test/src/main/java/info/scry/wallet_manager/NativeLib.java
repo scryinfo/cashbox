@@ -622,7 +622,7 @@ public class NativeLib {
     //构造jsonrpc 请求数据格式{"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
     public static native Message eeeAccountInfoKey(String addr);
 
-    public static native Message decodeEventDetail(String accountId,String eventDetail,String blockHash,String extrinsics);
+    public static native Message saveExtrinsicDetail(String accountId,String eventDetail,String blockHash,String extrinsics);
     //用于记录当前同步到的区块号
     public static native Message updateEeeSyncRecord(String account,int chain_type,int block_num,String block_hash);
     //获取当前已经同步的到的区块号

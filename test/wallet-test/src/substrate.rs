@@ -124,7 +124,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAccountInfo(env
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeEventDetail(env: JNIEnv, _class: JClass, account_id: JString,event_detail: JString,block_hash:JString,extrinsics:JString) -> jobject {
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveExtrinsicDetail(env: JNIEnv, _class: JClass, account_id: JString,event_detail: JString,block_hash:JString,extrinsics:JString) -> jobject {
     let account_id: String = env.get_string(account_id).unwrap().into();
     let encode_event_info: String = env.get_string(event_detail).unwrap().into();
     let block_hash: String = env.get_string(block_hash).unwrap().into();

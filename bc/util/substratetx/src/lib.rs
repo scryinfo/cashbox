@@ -46,110 +46,96 @@ pub struct EeeAccountInfo{
     pub fee_frozen: String,
 }
 
+//设计成option，当交易为设置区块时间的交易，就不存在签名
 #[derive(Default,Debug)]
-pub struct TransferEvent{
-    pub index:u32,
-    pub from:Option<String>,
-    pub to:Option<String>,
+pub struct TransferDetail{
+    pub index:Option<u32>,//签名账户对应的交易nonce
+    pub from:Option<String>,//签名账户 从哪个账户转出balance
+    pub to:Option<String>,//目的账户，接收balance的账户
     pub value:Option<u128>,
-    pub result:bool,
+    pub hash:Option<String>,
+    pub timestamp:Option<u64>,
 }
 
-impl TransferEvent{
-    fn update_transfer_detail(&mut self,from:&str,to:&str,value:u128){
-        self.from = Some(from.into());
-        self.to = Some(to.into());
-        self.value = Some(value.into());
-    }
-    fn update_result(&mut self,is_successful:bool){
-        self.result = is_successful;
-    }
-}
 
-// 通知事件数据 使用hex 方式编码的字符串  传递解析的交易详情，交易结果
-pub fn event_decode(event_data:&str,blockhash:&str,account:&str)->HashMap<u32,TransferEvent> {
+// 通知事件数据 使用hex 方式编码的字符串,将通知事件的结果与交易关联起来
+pub fn event_decode(event_data:&str,_blockhash:&str,_account:&str)->HashMap<u32,bool> {
     let enents_bytes = hex::decode(event_data.get(2..).unwrap()).unwrap();
     let events = Vec::<system::EventRecord<Event, H256>>::decode(&mut &enents_bytes[..]);
-    let mut all_extrinsic = HashMap::with_capacity(8);
+    let mut tx_result = HashMap::with_capacity(8);
     for record in events {
         for event in record {
             //todo 将索引与区块交易中的索引关联起来，怎么来确定交易索引与交易结果之间的关系？
-            let index = if let  Phase::ApplyExtrinsic(index) = event.phase{
-                index
-            }else { 0 };
-            let mut ex = TransferEvent{
-                index,
-                ..Default::default()
-            };
+            let index = if let  Phase::ApplyExtrinsic(index) = event.phase{index}else { 0 };
+            //todo 当交易失败，不会存在该通知记录
             match event.event {
-
-                Event::balances(be) => {
-                    match &be {
-                        balances::RawEvent::Transfer(transactor, dest, value) => {
-                            ex.update_transfer_detail(&transactor.to_ss58check(),&dest.to_ss58check(),*value);
-                            all_extrinsic.entry(index).or_insert(ex);
-                        }
-                        _ => {
-                            log::error!("ignoring unsupported balances event");
-                        }
-                    }
-                },
                 Event::system(se) => {
-                    if index==0 {
-                        continue
-                    }
                     match &se {
-                        system::RawEvent::ExtrinsicSuccess(dispath) => {
-                            ex.update_result(true);
-                            all_extrinsic.entry(index).and_modify(|event|event.result = true).or_insert(ex);
+                        system::RawEvent::ExtrinsicSuccess(_dispath) => {
+                            tx_result.insert(index,true);
                         },
                         system::RawEvent::ExtrinsicFailed(err, info) => {
-                            ex.update_result(false);
-                            all_extrinsic.entry(index).and_modify(|event|event.result = false).or_insert(ex);
-
+                            tx_result.insert(index,false);
                         },
-                        _ => log::error!("ignoring unsupported balances event")
+                        _ => log::error!("ignoring unsupported  system event")
                     }
                 },
-                _ => log::error!("ignoring unsupported balances event")
+                _ => log::error!("ignoring unsupported event")
             }
         }
     }
-    all_extrinsic
+    tx_result
 }
-
-pub fn decode_extrinsics(extrinsics_json:&str)->HashMap<u32,String>{
+pub fn decode_extrinsics(extrinsics_json:&str,target_account:&str)->Result<HashMap<u32,TransferDetail>,error::Error>{
+    let target_account = AccountId::from_ss58check(target_account)?;
     //todo 增加对错误的处理
-    let json_data:Vec<String>   = serde_json::from_str(extrinsics_json).unwrap();
+    let json_data:Vec<String>   = serde_json::from_str(extrinsics_json)?;
     let mut map = HashMap::new();
     for index in 0..json_data.len() {
-        let extrinsic_encode_bytes = hex::decode(json_data[index].get(2..).unwrap()).unwrap();
-        let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &extrinsic_encode_bytes[..]).unwrap();
-        match extrinsic.clone().function {
+        let extrinsic_encode_bytes = hex::decode(json_data[index].get(2..).unwrap())?;
+        let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &extrinsic_encode_bytes[..])?;
+        let mut tx = TransferDetail::default();
+        match &extrinsic.function {
             Call::Timestamp(set(date,))=> {
-                map.insert(index as u32,format!("{}",date));
-                ()
+                tx.timestamp = Some(*date);
+                map.insert(index as u32,tx);
             }
-            Call::Balances(transfercall(_to,_vaule))=>{
+            Call::Balances(transfercall(to,vaule))=>{//需要将交易发送者的信息关联出来
+                if let Some((account,_,(_,_,_,nonce,_,_,_))) = &extrinsic.signature{
+                    if !target_account.ge(to)&&!target_account.ge(&account){
+                        continue
+                    }
+                    tx.value = Some(*vaule);
+                    tx.to = Some(to.to_ss58check());
+                    tx.from = Some(account.to_ss58check());
+                    tx.index = Some(nonce.get_value());
+                }
+
                 let extrinsic_func_byte =   extrinsic.encode();
                 let blake2_result =blake2_rfc::blake2b::blake2b(32, &[], &extrinsic_func_byte);
                 let hash = blake2_result.as_bytes();
-                map.insert(index as u32,format!("0x{}",hex::encode(hash)));
+                tx.hash = Some(format!("0x{}",hex::encode(hash)));
+               map.insert(index as u32,tx);
             },
-            _=> println!("extrinsic.function:{:?}",extrinsic.function)
+            _=> println!(" extrinsic.function")
         }
     }
-    map
+    Ok(map)
 }
 
 #[test]
 fn decode_extrinsics_test(){
 
     let data = r#"["0x280402000b00adc5647201","0x3d0284d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0154c32d047e9629b33ad92c12920b60e722ab60aa9138e94a1f98ddd8c4e81f742eb8769f0177a011bcec4d6febf2290121b94ced49642abcbd38aa170f13c48fb60218000400306721211d5404bd9da88e0204360a1a9ab8b87c66c1bc2fcdd37f3c2222cc200b0060b7986c88"]"#;
-    let res = decode_extrinsics(data);
-    for (index,hash) in &res {
-        println!("index:{},tx hash is:{}",index,hash);
+    match decode_extrinsics(data,"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy"){
+        Ok(res)=>{
+            for (index,hash) in &res {
+                println!("index:{},tx hash is:{:?}",index,hash);
+            }
+        },
+        Err(msg)=>println!("error info {}",msg)
     }
+
 
 }
 

@@ -157,7 +157,7 @@ public class NativeLibTest {
         //通知事件编码  常量
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //需要查询交易的目标账号
-        String account_1 = "5GGzGJR54YNjMKhaYt6hHV3o99FZ6JKYEDCrzUg1HCz1tWPa";
+        String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type","application/json");
@@ -215,7 +215,7 @@ public class NativeLibTest {
                 //JSONArray
                 String event_detal =  client.invoke("state_getStorage",new Object[]{ eventKeyPrefix,item.block},String.class);
                 //解码获取回来的通知详情解码，若包含转账交易，则将交易详情存储在数据库中
-                NativeLib.Message msg =  NativeLib.decodeEventDetail(account_1,event_detal,item.block,extrinsicsDetail);
+                NativeLib.Message msg =  NativeLib.saveExtrinsicDetail(account_1,event_detal,item.block,extrinsicsDetail);
                 if(msg.status!=200){
                     System.out.println(msg.message);
                 }
@@ -331,6 +331,7 @@ public class NativeLibTest {
         System.out.println("tx_detail:"+contract_invoke_result_detail.toString());
     }
 
+    //以下类型为测试使用，方便数据的解析
     public static class TxObj{
         private String mmId;
         private Integer chainType;
@@ -657,6 +658,7 @@ public class NativeLibTest {
                     '}';
         }
     }
+
 
     public static class StorageChange{
         private String block;

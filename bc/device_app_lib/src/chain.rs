@@ -408,8 +408,6 @@ pub mod android {
             let contract_address = H160::from_slice(hex::decode(&contract_address[2..]).unwrap().as_slice());
             wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address, contract_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_type as u64)
         };
-
-
         match signed_ret {
             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");

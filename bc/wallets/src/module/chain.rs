@@ -337,18 +337,17 @@ pub fn decode_eth_data(input: &str) -> WalletResult<String> {
 }
 
 pub fn save_eee_tx_record(account:&str,blockhash:&str,event_data:&str,extrinsics:&str)->WalletResult<()>{
-    let event_obj = substratetx::event_decode(event_data,blockhash,account);
+    let event_res = substratetx::event_decode(event_data,blockhash,account);
 
-    let extrinsics_hash = substratetx::decode_extrinsics(extrinsics);
+    let extrinsics_map = substratetx::decode_extrinsics(extrinsics,account)?;
     //区块交易事件 肯定存在时间戳的设置
-    let timestamp = extrinsics_hash.get(&0).unwrap();//获取时间戳
+    let tx_time = extrinsics_map.get(&0).unwrap();//获取时间戳
     let instance = wallet_db::DataServiceProvider::instance()?;
-    for (key,value) in &event_obj {
-        println!("value {:?}",value);
-        if value.from.is_some(){
-            let tx_hash = extrinsics_hash.get(&key).unwrap();
-            instance.save_transfer_event(tx_hash,account,blockhash,value,timestamp)?;
-        }
+    for index   in 1..extrinsics_map.len() {
+        let  index= index as u32;
+        let transfer_detail = extrinsics_map.get(&index).unwrap();
+        let is_successful = event_res.get(&index).unwrap();
+        instance.save_transfer_detail(account,blockhash,transfer_detail,tx_time.timestamp.unwrap(),*is_successful)?;
     }
     Ok(())
 }
