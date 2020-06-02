@@ -129,7 +129,7 @@
   "finish_load_tx_history": "您的 交易记录 已经加载完了！",
   "data_loading": "数据加载中...",
   "load_data_error": "数据加载出现错误，请重新尝试",
-  "not_exist_tx_history": "暂无历史交易记录...",
+  "not_exist_tx_history": "暂无历史交易记录.",
   "pls_ensure_confirm_pwd": "请确认两次输入密码一致",
   "eee_token_name": "EEE",
   "eth_token_name": "ETH",

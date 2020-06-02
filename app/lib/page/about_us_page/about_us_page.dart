@@ -82,9 +82,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
             ),
             child: Text(
               """Scry Cashbox
-    是一款由 Scry Info Private Ltd. 运营的钱包，致力于为 Scry Dapps 提供支持 Scry Token 的安全钱包。Scry Cashbox 钱包本身不收取任何费用，一切费用来自公链系统
-    gas。Scry Cashbox
-    将会不断完善，正式版本还将提供支持以太系统的 ERC20 token，BTC 底层系统的系列 token 等，旨在为每一位用户提供安全、简单的钱包。""",
+    是一款由 Scry Info Private Ltd. 运营的钱包，致力于为 Scry Dapps 提供支持 Scry Token 的安全钱包。Scry Cashbox 钱包本身不收取任何费用，一切费用来自公链系统gas。Scry Cashbox将会不断完善，正式版本还将提供支持以太系统的 ERC20 token，BTC 底层系统的系列 token 等，旨在为每一位用户提供安全、简单的钱包。""",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: ScreenUtil.instance.setSp(3.2),

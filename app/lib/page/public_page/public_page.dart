@@ -26,7 +26,7 @@ class _PublicPageState extends State<PublicPage> {
           backgroundColor: Colors.transparent,
           appBar: MyAppBar(
             centerTitle: translate('public'),
-            backgroundColor: Colors.blueGrey,
+            backgroundColor: Colors.black12,
           ),
           body: Container(
             decoration: BoxDecoration(

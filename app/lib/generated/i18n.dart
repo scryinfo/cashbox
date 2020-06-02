@@ -96,7 +96,7 @@ class S implements WidgetsLocalizations {
   String get no_new_version_hint => "The current version is the latest version";
   String get no_tx_history => "No history records now";
   String get nonce_value => "Nonce value";
-  String get not_exist_tx_history => "No transaction records now...";
+  String get not_exist_tx_history => "No transaction records now.";
   String get not_follow_diamond_rule => "The result do not  comply with diamond Dapp rules";
   String get not_sure_chain_type => "please check your chain type message";
   String get not_sure_operation_type => "please check your operation type";
@@ -328,7 +328,7 @@ class $zh extends S {
   @override
   String get qr_info_is_wrong => "二维码信息不符合格式";
   @override
-  String get not_exist_tx_history => "暂无历史交易记录...";
+  String get not_exist_tx_history => "暂无历史交易记录.";
   @override
   String get receive_address => "对方收款地址";
   @override
