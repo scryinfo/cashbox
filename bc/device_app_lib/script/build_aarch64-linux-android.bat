@@ -6,7 +6,7 @@ set batPath=%~dp0
 
 set TOOLCHAIN=%NDK%/toolchains/llvm/prebuilt/windows-x86_64
 set AR=%TOOLCHAIN%/bin/%HOST_TAG%-ar.exe
-set CC=%TOOLCHAIN%/bin/%HOST_TAG%24-clang.cmd
+set CC=%TOOLCHAIN%/bin/%HOST_TAG%28-clang.cmd
 set CXX=%TOOLCHAIN%/bin/%HOST_TAG%-clang++.cmd
 rustup default stable-gnu
 cd %batPath%/..

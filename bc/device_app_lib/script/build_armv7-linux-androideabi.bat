@@ -6,7 +6,7 @@ set batPath=%~dp0
 
 set TOOLCHAIN=%NDK%/toolchains/llvm/prebuilt/windows-x86_64
 set AR=%TOOLCHAIN%/bin/arm-linux-androideabi-ar.exe
-set CC=%TOOLCHAIN%/bin/armv7a-linux-androideabi24-clang.cmd
+set CC=%TOOLCHAIN%/bin/armv7a-linux-androideabi28-clang.cmd
 set CXX=%TOOLCHAIN%/bin/armv7a-linux-androideabi24-clang++.cmd
 rustup default stable-gnu
 cd %batPath%/..
