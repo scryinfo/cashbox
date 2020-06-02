@@ -50,6 +50,7 @@ class _EthPageState extends State<EthPage> {
   List<Digit> allVisibleDigitsList = []; //当前链所有可见代币列表
   List<Digit> displayDigitsList = []; //当前分页展示的固定代币数量信息
   num chainIndex = 0; //当前链的下标
+  Rate rateInstance;
 
   @override
   void initState() {
@@ -151,20 +152,20 @@ class _EthPageState extends State<EthPage> {
     if (displayDigitsList.length == 0) {
       return;
     } else {
-      Rate rate = await loadRateInstance();
-      if (rate == null) {
+      rateInstance = await loadRateInstance();
+      if (rateInstance == null) {
         return;
       }
-      List<String> rateKeys = rate.digitRateMap.keys.toList();
+      List<String> rateKeys = rateInstance.digitRateMap.keys.toList();
       for (var i = 0; i < displayDigitsList.length; i++) {
         int index = i;
         if ((this.displayDigitsList[index].shortName.toUpperCase() != null) &&
             (rateKeys.contains(this.displayDigitsList[index].shortName.toUpperCase().trim().toString()))) {
           setState(() {
             this.displayDigitsList[index].digitRate
-              ..symbol = rate.getSymbol(this.displayDigitsList[index])
-              ..price = rate.getPrice(this.displayDigitsList[index])
-              ..changeDaily = rate.getChangeDaily(this.displayDigitsList[index]);
+              ..symbol = rateInstance.getSymbol(this.displayDigitsList[index])
+              ..price = rateInstance.getPrice(this.displayDigitsList[index])
+              ..changeDaily = rateInstance.getChangeDaily(this.displayDigitsList[index]);
           });
         } else {
           print("digitName is not exist===>" + this.displayDigitsList[index].shortName);
@@ -497,7 +498,11 @@ class _EthPageState extends State<EthPage> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    moneyUnitStr + " " + (displayDigitsList[index].digitRate.getPrice(moneyUnitStr).toStringAsFixed(5) ?? "0"), //市场单价
+                                    moneyUnitStr +
+                                        " " +
+                                        (rateInstance == null
+                                            ? ""
+                                            : rateInstance.getPrice(displayDigitsList[index]).toStringAsFixed(5) ?? "0"), //市场单价
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: ScreenUtil.instance.setSp(2.5),

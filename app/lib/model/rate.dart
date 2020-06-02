@@ -44,7 +44,6 @@ class Rate {
     return this.legalMap[this.nowLegalCurrency];
   }
 
-  //todo 待rate后台接口确认后，替换成changeDaily
   double getChangeDaily(Digit digit) {
     if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
@@ -110,19 +109,12 @@ class DigitRate {
   double histLow = 0.0;
   int timestamps = 0;
   double volume = 0;
-  double changeDaily = 0.00; //todo 待rate后台接口确认后，替换成changeDaily
-  //todo 待rate后台接口确认后，替换成changeDaily
+  double changeDaily = 0.00;
+
   String get getChangeDaily {
     if (changeDaily > 0) {
       return (changeDaily * 100.0).toStringAsFixed(5) + "%" + "↑";
     }
     return (changeDaily * 100.0).toStringAsFixed(5) + "%" + "↓";
-  }
-
-  double getPrice(String legalCurrency) {
-    if (!Rate.instance.legalMap.containsKey(legalCurrency)) {
-      return 0.00;
-    }
-    return this.price * (Rate.instance.legalMap[legalCurrency]);
   }
 }
