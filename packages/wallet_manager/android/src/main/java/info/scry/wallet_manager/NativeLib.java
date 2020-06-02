@@ -1,6 +1,7 @@
 package info.scry.wallet_manager;
 
 import java.util.List;
+import java.util.Map;
 
 public class NativeLib {
 

@@ -7,7 +7,9 @@ import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/language_choose_page/language_choose_page.dart';
 import 'package:app/page/sign_tx_page/sign_tx_page.dart';
 import 'package:app/page/transfer_eee_page/transfer_eee_page.dart';
+import 'package:app/page/user_protocol/privacy_statements_page.dart';
 import 'package:app/page/user_protocol/qa_info_page.dart';
+import 'package:app/page/user_protocol/service_agreement_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
@@ -26,8 +28,7 @@ import '../page/wallet_manager_page/wallet_manage_page.dart';
 import '../page/reset_pwd_page/reset_pwd_page.dart';
 import '../page/recover_wallet_page/recover_wallet_page.dart';
 import '../page/transaction_history_page/transaction_history_page.dart';
-import 'package:app/page/user_protocol/privacy_statements_zh.dart';
-import 'package:app/page/user_protocol/service_agreement_zh.dart';
+
 import 'package:app/page/transaction_detail_page/eth_transactin_detail_page.dart';
 import '../page/about_us_page/about_us_page.dart';
 import 'package:app/demo/dapp_webview_demo.dart';
