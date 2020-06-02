@@ -43,6 +43,8 @@ class GlobalConfig {
   static String cashboxDownloadIpDefaultValue = ""; //todo
   static String publicIpKey = "public__ip_key";
   static String publicIpDefaultValue = "http://40.73.35.55:9010/web_app/pub";
+  static String currencyKey = "currency_key"; //选择的法币 usd || cny等
+  static String currencyDefaultValue = "USD";
 
   static Locale loadLocale(String locale) {
     switch (locale) {

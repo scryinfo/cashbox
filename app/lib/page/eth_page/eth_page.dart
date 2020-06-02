@@ -16,6 +16,7 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
+import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/util/upgrade_app_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,7 @@ class EthPage extends StatefulWidget {
 class _EthPageState extends State<EthPage> {
   List<Wallet> walletList = [];
   static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
-  String moneyUnitStr = "USD";
+  String moneyUnitStr = "";
   num nowWalletAmount = 0.00; //当前钱包内代币总市价
   List<String> moneyUnitList = [];
   String walletName = "";
@@ -72,6 +73,16 @@ class _EthPageState extends State<EthPage> {
   }
 
   void initData() async {
+    {
+      var spUtil = await SharedPreferenceUtil.instance;
+      var currency = spUtil.getString(GlobalConfig.currencyKey);
+      if (currency == null || currency == "") {
+        moneyUnitStr = GlobalConfig.currencyDefaultValue;
+      } else {
+        moneyUnitStr = currency;
+      }
+    }
+
     bool isForceLoadFromJni = widget.isForceLoadFromJni;
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;
     this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
@@ -716,12 +727,14 @@ class _EthPageState extends State<EthPage> {
                 color: Colors.black12,
                 icon: Icon(Icons.keyboard_arrow_down),
                 itemBuilder: (BuildContext context) => _makePopMenuList(),
-                onSelected: (String value) {
+                onSelected: (String value) async {
                   Rate.instance.setNowLegalCurrency(value);
-                  //this.loadDigitMoney();//todo
                   setState(() {
                     moneyUnitStr = value;
                   });
+                  this.loadDigitMoney();
+                  var spUtil = await SharedPreferenceUtil.instance;
+                  spUtil.setString(GlobalConfig.currencyKey, value);
                 },
               ),
             ),

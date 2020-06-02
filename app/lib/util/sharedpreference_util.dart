@@ -26,6 +26,10 @@ class SharedPreferenceUtil {
       spUtil.setString(GlobalConfig.scryXIpKey, GlobalConfig.scryXIpDefaultValue);
       spUtil.setString(GlobalConfig.publicIpKey, GlobalConfig.publicIpDefaultValue);
     }
+    {
+      //选择的法币是： （usd cny jpy）
+      spUtil.setString(GlobalConfig.currencyKey, GlobalConfig.currencyDefaultValue);
+    }
     spUtil.setBool(GlobalConfig.isInitAppConfig, true);
   }
 }
