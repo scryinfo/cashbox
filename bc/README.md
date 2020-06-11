@@ -46,7 +46,7 @@ cashbox钱包的核心功能都在[wallets](./wallets)实现，为快速理解�
 这个目录的作用主要起桥接作用，连接java与rust实现的功能。代码结构按照钱包、链、代币方式来组织。由于要满足在Android端上通过JNI方式调用，需要按照JNI格式来读取、构造参数。这部分涉及到交叉编译，更多详情查看[帮助文档](https://github.com/scryinfo/cashbox/tree/master/bc/device_app_lib)。
 
 ## 调试
-为提高开发效率，测试编写的功能是否符合满足跨平台接口调用定义，在test路径下创建了满足x86平台调用的项目，使用方式[查看文档](../../test/readme.md)
+为提高开发效率，测试编写的功能是否符合满足跨平台接口调用定义，在test路径下创建了满足x86平台调用的项目，使用方式[查看文档](../../test/)
 
 **注意**：由于使用数据库来维护钱包中的数据关系，这里引入了[Sqlite](https://www.sqlite.org/index.html)这种文件类型数据库，使用的依赖版本选择为[sqlite](https://docs.rs/sqlite/0.25.3/sqlite/index.html),虽然在后期使用过程中感觉不够精简(还需要做进一步的封装)，但是当时选用这个crate的原因如下:
 
