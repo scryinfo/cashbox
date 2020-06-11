@@ -3,7 +3,7 @@ use super::*;
 pub mod digit;
 
 #[repr(C)]
-#[derive(Clone,Default)]
+#[derive(Clone, Default)]
 pub struct EeeChain {
     pub status: StatusCode,
     pub chain_id: String,
@@ -16,7 +16,7 @@ pub struct EeeChain {
 }
 
 #[repr(C)]
-#[derive(Clone,Default)]
+#[derive(Clone, Default)]
 pub struct EthChain {
     pub status: StatusCode,
     pub chain_id: String,
@@ -30,7 +30,7 @@ pub struct EthChain {
 
 
 #[repr(C)]
-#[derive(Clone,Default)]
+#[derive(Clone, Default)]
 pub struct BtcChain {
     pub status: StatusCode,
     pub chain_id: String,

@@ -13,7 +13,7 @@ public class NativeLibTest {
         System.out.println("********************start jni func test***************************************");
         System.out.println(NativeLib.initWalletBasicData());
        // updateDefaultDigitTest();
-       // walletGenerateTest();
+        walletGenerateTest();
        // walletExportTest();
        //  updateAuthListTest();
       //  addNonAuthDigitTest();
@@ -23,7 +23,7 @@ public class NativeLibTest {
         //delWalletTest();
         //getHeaderTest();
         //updateEeeSyncRecordTest();
-        storage_query_test();
+      //  storage_query_test();
       //  getEeeSyncRecordTest();
       //  eeeTransferTest();
       // eeeAccountInfoKeyTest();
@@ -32,11 +32,11 @@ public class NativeLibTest {
       //  walletSaveTest();
       //  updateBalance();
        // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
-      /*  List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+        List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
         for (NativeLib.Wallet wallet:wallets){
             System.out.println("***********************");
             System.out.println(wallet.toString());
-        }*/
+        }
     }
 
 

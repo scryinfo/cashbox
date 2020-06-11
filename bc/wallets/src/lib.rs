@@ -14,6 +14,7 @@ pub use substratetx::{account_info_key,decode_account_info,event_decode};
 
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
+// Todo 是否将产生的错误，统一的使用错误码的形式向上层传递？
 #[derive(PartialEq, Clone)]
 pub enum StatusCode {
     DylibError = -1,
@@ -22,14 +23,6 @@ pub enum StatusCode {
     FailToGenerateMnemonic = 100,
     //生成助记词失败
     PwdIsWrong,
-    //密码错误
-    FailToRestPwd,
-    //重置密码失败
-    GasNotEnough,
-    //GAS费不足
-    BroadcastOk,
-    //广播上链成功
-    BroadcastFailure,  //广播上链失败
 }
 
 impl Default for StatusCode {
@@ -38,6 +31,7 @@ impl Default for StatusCode {
 
 #[derive(PartialEq, Clone)]
 pub enum EthChainId {
+    //以太坊链类型编号，用于签名环节
     MAIN = 1,
     ROPSTEN = 3,
     RINKEBY = 4,
@@ -45,6 +39,7 @@ pub enum EthChainId {
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum ChainType {
+    //用于区别钱包支持的链类型
     BTC = 1,
     BtcTest = 2,
     ETH = 3,
@@ -52,10 +47,6 @@ pub enum ChainType {
     EEE = 5,
     EeeTest = 6,
     OTHER = 7,
-}
-
-impl Default for ChainType {
-    fn default() -> Self { ChainType::OTHER }
 }
 
 impl From<i64> for ChainType {
@@ -79,7 +70,8 @@ mod tests {
     use hex;
 
     #[test]
-    fn verify_mnemonic_create() {
+    fn mnemonic_create_test() {
+        //助记词创建测试、签名测试
         let mnemonic = substratetx::Sr25519::generate_phrase(18);
         let data = "substrate sign method test";
         let s = String::new();
@@ -106,10 +98,10 @@ mod tests {
         let genesis_hash = "0xabb0f2e62dfab481623438e14b5e1d4114a6e9a2f0d3f5e83f9192276e50cf34";
         let index = 0;
         let runtime_version = 1;
-
         let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap()).unwrap();
         let mut genesis_h256 = [0u8;32];
         genesis_h256.clone_from_slice( genesis_hash_bytes.as_slice());
+        // todo 涉及到数据库访问 需要进行一系列数据准备才能正常测试
         match module::chain::eee_transfer(from,to,value,genesis_hash,index,runtime_version,"123456".as_bytes()){
             Ok(sign_str)=>{
                 println!("{}",sign_str);
@@ -128,7 +120,6 @@ mod tests {
     #[test]
     fn hash_test() {
         let value = b"hello test";
-        let data = value.as_ref();
-        println!("{:?}", data.keccak256());
+        assert_eq!([170, 115, 193, 218, 74, 30, 249, 68, 140, 137, 187, 52, 75, 195, 104, 186, 126, 177, 145, 42, 1, 235, 111, 78, 77, 249, 217, 64, 177, 207, 44, 170], (&value[..]).keccak256());
     }
 }

@@ -11,7 +11,7 @@ pub use wallet::chain::{BtcChain,EthChain,EeeChain};
 pub use wallet::chain::digit::{EeeDigit,EthDigit,BtcDigit};
 pub use wallet_store::{TbAddress,WalletObj};
 
-const DEFALUE_DIDIT_CHAIN_ID :i64= 3;
+/*const DEFALUE_DIDIT_CHAIN_ID :i64= 3;*/
 
 #[derive(Debug,Clone)]
 pub struct Address {

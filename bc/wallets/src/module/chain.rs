@@ -114,8 +114,8 @@ pub fn eth_raw_erc20_transfer_sign(from_account: &str, contract_address: H160, t
                     //调用合约 是否允许transfer 目标地址为空?
                     let mut encode_data = ethtx::get_erc20_transfer_data(to_account.unwrap(), amount)?;
                     //添加合约交易备注信息
-                    if let Some(addition_str) = data{
-                        let mut addition =addition_str.as_bytes().to_vec();
+                    if let Some(addition_str) = data {
+                        let mut addition = addition_str.as_bytes().to_vec();
                         encode_data.append(&mut addition);
                     }
                     let rawtx = ethtx::RawTransaction {
@@ -150,7 +150,7 @@ pub fn get_eee_chain_data() -> WalletResult<HashMap<String, Vec<EeeChain>>> {
                 let wallet_id = tbwallet.wallet_id.unwrap();
                 let chain_id = format!("{}", tbwallet.chain_id.unwrap());//chain id 不会存在为Null的情况
 
-                if !eee_map.contains_key(&wallet_id){
+                if !eee_map.contains_key(&wallet_id) {
                     let chain = EeeChain {
                         status: StatusCode::OK,
                         chain_id: chain_id.clone(),
@@ -170,7 +170,7 @@ pub fn get_eee_chain_data() -> WalletResult<HashMap<String, Vec<EeeChain>>> {
                         digit_list: Vec::new(),
                     };
                     //现在一个钱包下 一种类型的链 只有一条
-                   // chain_index = 0;
+                    // chain_index = 0;
                     eee_map.insert(wallet_id.clone(), vec![chain]);
                 }
                 let digit_id = format!("{}", tbwallet.digit_id.unwrap());
@@ -200,7 +200,7 @@ pub fn get_eee_chain_data() -> WalletResult<HashMap<String, Vec<EeeChain>>> {
 pub fn get_eth_chain_data() -> WalletResult<HashMap<String, Vec<EthChain>>> {
     let instance = wallet_db::DataServiceProvider::instance()?;
     let eth_chain = instance.display_eth_chain();
-   // let mut chain_index = 0;
+    // let mut chain_index = 0;
     let mut eth_map = HashMap::new();
     match eth_chain {
         Ok(tbwallets) => {
@@ -208,7 +208,7 @@ pub fn get_eth_chain_data() -> WalletResult<HashMap<String, Vec<EthChain>>> {
                 let wallet_id = tbwallet.wallet_id.unwrap();
                 let chain_id = format!("{}", tbwallet.chain_id.unwrap());//chain id 不会存在为Null的情况
 
-               if !eth_map.contains_key(&wallet_id){
+                if !eth_map.contains_key(&wallet_id) {
                     let chain = EthChain {
                         status: StatusCode::OK,
                         chain_id: chain_id.clone(),
@@ -255,7 +255,7 @@ pub fn get_eth_chain_data() -> WalletResult<HashMap<String, Vec<EthChain>>> {
 pub fn get_btc_chain_data() -> WalletResult<HashMap<String, Vec<BtcChain>>> {
     let instance = wallet_db::DataServiceProvider::instance()?;
     let btc_chain = instance.display_btc_chain();
-   // let mut chain_index = 0;
+    // let mut chain_index = 0;
 
     let mut btc_map = HashMap::new();
     match btc_chain {
@@ -263,7 +263,7 @@ pub fn get_btc_chain_data() -> WalletResult<HashMap<String, Vec<BtcChain>>> {
             for tbwallet in tbwallets {
                 let wallet_id = tbwallet.wallet_id.unwrap();
                 let chain_id = format!("{}", tbwallet.chain_id.unwrap());//chain id 不会存在为Null的情况
-                if !btc_map.contains_key(&wallet_id){
+                if !btc_map.contains_key(&wallet_id) {
                     //这个地方需要重新来处理链的关系
                     let chain = BtcChain {
                         status: StatusCode::OK,
@@ -336,27 +336,28 @@ pub fn decode_eth_data(input: &str) -> WalletResult<String> {
     ethtx::decode_tranfer_data(input).map_err(|error| error.into())
 }
 
-pub fn save_eee_tx_record(account:&str,blockhash:&str,event_data:&str,extrinsics:&str)->WalletResult<()>{
-    let event_res = substratetx::event_decode(event_data,blockhash,account);
+pub fn save_eee_tx_record(account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
+    let event_res = substratetx::event_decode(event_data, blockhash, account);
 
-    let extrinsics_map = substratetx::decode_extrinsics(extrinsics,account)?;
+    let extrinsics_map = substratetx::decode_extrinsics(extrinsics, account)?;
     //区块交易事件 肯定存在时间戳的设置
     let tx_time = extrinsics_map.get(&0).unwrap();//获取时间戳
     let instance = wallet_db::DataServiceProvider::instance()?;
-    for index   in 1..extrinsics_map.len() {
-        let  index= index as u32;
+    for index in 1..extrinsics_map.len() {
+        let index = index as u32;
         let transfer_detail = extrinsics_map.get(&index).unwrap();
         let is_successful = event_res.get(&index).unwrap();
-        instance.save_transfer_detail(account,blockhash,transfer_detail,tx_time.timestamp.unwrap(),*is_successful)?;
+        instance.save_transfer_detail(account, blockhash, transfer_detail, tx_time.timestamp.unwrap(), *is_successful)?;
     }
     Ok(())
 }
-pub fn update_eee_sync_record(account:&str,chain_type:i32,block_num:u32,block_hash:&str)->WalletResult<()>{
+
+pub fn update_eee_sync_record(account: &str, chain_type: i32, block_num: u32, block_hash: &str) -> WalletResult<()> {
     let instance = wallet_db::DataServiceProvider::instance()?;
-    instance.update_account_sync(account,chain_type,block_num,block_hash)
+    instance.update_account_sync(account, chain_type, block_num, block_hash)
 }
 
-pub fn get_eee_sync_status()->WalletResult<Vec<SyncStatus>>{
+pub fn get_eee_sync_status() -> WalletResult<Vec<SyncStatus>> {
     let instance = wallet_db::DataServiceProvider::instance()?;
     //是否要区分链类型
     instance.get_sync_status()

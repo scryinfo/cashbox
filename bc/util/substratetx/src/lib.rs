@@ -74,7 +74,7 @@ pub fn event_decode(event_data:&str,_blockhash:&str,_account:&str)->HashMap<u32,
                         system::RawEvent::ExtrinsicSuccess(_dispath) => {
                             tx_result.insert(index,true);
                         },
-                        system::RawEvent::ExtrinsicFailed(err, info) => {
+                        system::RawEvent::ExtrinsicFailed(_err, _info) => {
                             tx_result.insert(index,false);
                         },
                         _ => log::error!("ignoring unsupported  system event")

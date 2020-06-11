@@ -1,7 +1,7 @@
 use super::*;
 
 use ChainType;
-use sqlite::{State,Statement};
+use sqlite::{State, Statement};
 use crate::model::wallet_store::{TbAddress, WalletObj, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
 
@@ -29,11 +29,17 @@ impl DataServiceProvider {
         let update_selected = "UPDATE Wallet set selected = 0 where wallet_id = (SELECT wallet_id FROM Wallet where selected==1 )";
         let wallet_sql = "INSERT into Wallet(wallet_id,mn_digest,fullname,mnemonic,wallet_type,display_chain_id,selected)VALUES(?,?,?,?,?,?,?)";
         let address_sql = "insert into detail.Address(address_id,wallet_id,chain_id,address,puk_key,status) values(?,?,?,?,?,?);";
-
         self.db_hander.execute(update_selected)?;
+
+      //  let paramter = params![mn.wallet_id.as_str(),mn.mn_digest.as_str(),mn.full_name.unwrap().as_str(),mn.mnemonic.as_str(),mn.wallet_type,mn.display_chain_id as i64,true as i64];
+      //  let paramter = [mn.wallet_id.as_str(),mn.mn_digest.as_str(),mn.full_name.unwrap().as_str(),mn.mnemonic.as_str(),mn.wallet_type,mn.display_chain_id as i64,true as i64];
+     //   let save_wallet_flag =  wallet_db::execute(wallet_sql,&paramter);
 
         let save_wallet_flag = match self.db_hander.prepare(wallet_sql) {
             Ok(mut stat) => {
+
+                println!("statement count is:{}",stat.count());
+              //  stat.bind::<String>(1,mn.wallet_id.as_str())?;
                 stat.bind(1, mn.wallet_id.as_str())?;
                 stat.bind(2, mn.mn_digest.as_str())?;
                 stat.bind(3, mn.full_name.unwrap().as_str())?;
@@ -107,27 +113,27 @@ impl DataServiceProvider {
         self.query_wallet(&mut statement)
     }
 
-    fn query_wallet(&self,statement: &mut Statement)->WalletResult<TbWallet> {
+    fn query_wallet(&self, statement: &mut Statement) -> WalletResult<TbWallet> {
         let wallets = self.get_wallets_from_database(statement);
-        if wallets.len()>0 {
+        if wallets.len() > 0 {
             Ok(wallets[0].clone())
-        }else {
+        } else {
             Err(WalletError::NotExist)
         }
     }
 
-    fn get_wallets_from_database(&self,statement: &mut Statement) -> Vec<TbWallet> {
+    fn get_wallets_from_database(&self, statement: &mut Statement) -> Vec<TbWallet> {
         let mut wallets = Vec::new();
         while let State::Row = statement.next().unwrap() {
             let wallet = TbWallet {
-                wallet_id:statement.read::<String>(0).unwrap(),
+                wallet_id: statement.read::<String>(0).unwrap(),
                 mn_digest: statement.read::<String>(1).unwrap(),
                 full_name: statement.read::<String>(2).ok(),
                 mnemonic: statement.read::<String>(3).unwrap(),
                 wallet_type: statement.read::<i64>(4).unwrap(),
-                selected: statement.read::<i64>(5).map(|value|value==1).ok(),
+                selected: statement.read::<i64>(5).map(|value| value == 1).ok(),
                 status: statement.read::<i64>(6).unwrap(),
-                display_chain_id:  statement.read::<i64>(7).unwrap(),
+                display_chain_id: statement.read::<i64>(7).unwrap(),
                 create_time: statement.read::<String>(8).unwrap(),
                 update_time: statement.read::<String>(9).ok(),
             };
@@ -168,8 +174,8 @@ impl DataServiceProvider {
         stat.next()?;
         let mut stat = self.db_hander.prepare(check_select_wallet)?;
         stat.next()?;
-        if let Ok(count) = stat.read::<i64>(0){
-            if count==0 {
+        if let Ok(count) = stat.read::<i64>(0) {
+            if count == 0 {
                 let update_selected_sql = "update Wallet set selected = 1 where wallet_id = (select wallet_id from  Wallet order by create_time desc limit 1 offset 0);";
                 self.db_hander.execute(update_selected_sql)?;
             }
