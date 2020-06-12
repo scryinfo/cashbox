@@ -31,16 +31,16 @@ impl DataServiceProvider {
         let address_sql = "insert into detail.Address(address_id,wallet_id,chain_id,address,puk_key,status) values(?,?,?,?,?,?);";
         self.db_hander.execute(update_selected)?;
 
+
       //  let paramter = params![mn.wallet_id.as_str(),mn.mn_digest.as_str(),mn.full_name.unwrap().as_str(),mn.mnemonic.as_str(),mn.wallet_type,mn.display_chain_id as i64,true as i64];
       //  let paramter = [mn.wallet_id.as_str(),mn.mn_digest.as_str(),mn.full_name.unwrap().as_str(),mn.mnemonic.as_str(),mn.wallet_type,mn.display_chain_id as i64,true as i64];
-     //   let save_wallet_flag =  wallet_db::execute(wallet_sql,&paramter);
+      //   let save_wallet_flag =  wallet_db::execute(wallet_sql,&paramter);
 
         let save_wallet_flag = match self.db_hander.prepare(wallet_sql) {
             Ok(mut stat) => {
 
-                println!("statement count is:{}",stat.count());
-              //  stat.bind::<String>(1,mn.wallet_id.as_str())?;
                 stat.bind(1, mn.wallet_id.as_str())?;
+                //stat.bind(1, &Value::String(mn.wallet_id.into()))?;
                 stat.bind(2, mn.mn_digest.as_str())?;
                 stat.bind(3, mn.full_name.unwrap().as_str())?;
                 stat.bind(4, mn.mnemonic.as_str())?;

@@ -4,11 +4,12 @@ bc是blockchain的简称，为cashbox钱包提供链相关功能实现，通过�
 
 ## 开发环境搭建
 
-### rust编译
+### rust编译环境
 
 bc功能是使用`rust`实现，程序编译需要依赖rust的编译环境。关于rust编译环境的搭建，可以[点击这里](https://www.rust-lang.org/tools/install),官方提供了各种安装方式的安装教程。建议使用脚本一键安装，为确保能够快速安装成功，**需要将命令行开启代理**。
+[这里有一个关于rust简短的介绍](./rust_brief_introduction.md)
 
-### 动态库编译
+### 动态库编译环境
 
 使用rust提供的工具能够快速的搭建交叉编译环境，为不同的硬件平台提供满足要求的动态库。当前bc中只提供了针对`Android`平台的接口封装，编译Android的目标库需要搭建NDK开发环境，使用版本为 [NDK21](https://developer.android.com/ndk/downloads?hl=zh-cn)。根据操作系统类型选择对应的版本下载对应的版本即可；
 关于搭建使用Rust来搭建Android、IOS交叉编译环境，[参考这里](https://dev.to/robertohuertasm/rust-once-and-share-it-with-android-ios-and-flutter-286o)。
