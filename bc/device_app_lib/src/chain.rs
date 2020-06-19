@@ -332,8 +332,6 @@ pub mod android {
         let wallet_message_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_message_class");
         let state_obj = env.alloc_object(wallet_message_class).expect("state_obj");
 
-        //使用的钱包id
-        let _wallet_id: String = env.get_string(walletId).unwrap().into();
         //发送方账户地址 通过wallet id 能够关联起来
         let from_address: String = env.get_string(fromAddress).unwrap().into();
         //接收方账户地址
@@ -352,7 +350,7 @@ pub mod android {
         //转帐金额 这里都用这个参数来表示
         let amount = {
             let value_str: String = env.get_string(value).unwrap().into();
-            //不同的代币，会有不同的精度？？
+            //不同的代币，会有不同的精度
             wallets::convert_token(&value_str, decimal as usize).unwrap()
         };
         //附加参数
@@ -366,9 +364,8 @@ pub mod android {
         //gas价格
         let gas_price: U256 = {
             let price_str: String = env.get_string(gasPrice).unwrap().into();
-            //使用单位的是gwei,这点是确定的
+            //使用单位的是gwei,这是确定的
             wallets::convert_token(&price_str, 9).unwrap()
-            //U256::from_dec_str(&price_str).unwrap()
         };
         //允许最大消耗gas数量
         let gas_limit: U256 = {
@@ -387,26 +384,25 @@ pub mod android {
             U256::from_dec_str(&nonce).unwrap()
         };
 
-        //chain type转换 当前钱包里面默认只使用 3、4来表示以太坊 主链和测试链，这里为方便测试，将链类型id 做如下转换 3->1,4->3,其余的保持不变
-
-        let chain_type = {
+        //当前钱包默认只使用 3、4来表示以太坊 主链和测试链，根据chain type转换为以太坊标准定义的chain_id,做如下转换 3->1,4->3,其余的保持不变
+        let chain_id = {
             if chainType == 3 {
                 1
             } else if chainType == 4 {
                 3
-            } else {
+            } else {//针对这种情况，是用于在开发过程中使用另外的链类型来测试
                 chainType
             }
         };
 
         //使用私钥确认码
         let pwd = env.convert_byte_array(pwd).unwrap();
-        //合约地址为空，是普通ETH转账
+        //合约地址为空，是普通ETH转账 或者部署合约
         let signed_ret = if contract_address.is_empty() {
-            wallets::module::chain::eth_raw_transfer_sign(&from_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_type as u64)
+            wallets::module::chain::eth_raw_transfer_sign(&from_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_id as u64)
         } else {
             let contract_address = H160::from_slice(hex::decode(&contract_address[2..]).unwrap().as_slice());
-            wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address, contract_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_type as u64)
+            wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address, contract_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_id as u64)
         };
         match signed_ret {
             Ok(data) => {
