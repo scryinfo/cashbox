@@ -1,6 +1,7 @@
 import 'package:app/global_config/global_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// 利用本地文件，存储信息。 key:value。  android部分实现是sharedPreference，ios实现是NSUserDefaults
 class SharedPreferenceUtil {
   static Future<SharedPreferences> get instance => _getInstance();
   static Future<SharedPreferences> _instance;

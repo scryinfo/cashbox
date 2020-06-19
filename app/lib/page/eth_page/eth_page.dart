@@ -104,6 +104,7 @@ class _EthPageState extends State<EthPage> {
             int status = addDigitMap["status"];
             if (status == null || status != 200) {
               print("addDigitToChainModel failure==" + addDigitMap["message"]);
+              LogUtil.e("addDigitToChainModel error is", addDigitMap["message"]);
             } else {
               print("addDigitToChainModel successful==");
             }

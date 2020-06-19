@@ -69,7 +69,7 @@ class _MyApp extends State<MyApp> {
       spUtil.setString(GlobalConfig.savedLocaleKey, savedLocale);
     }
     print("initData  savedLocale-===>" + savedLocale);
-    changeLocale(context, savedLocale);
+    changeLocale(context, savedLocale); //更改应用语言 english chinese
   }
 
   @override
@@ -78,7 +78,7 @@ class _MyApp extends State<MyApp> {
 
     return MultiProvider(
       providers: [
-        /// 注册数据状态管理
+        /// 注册数据状态管理，类似vuex实现
         ChangeNotifierProvider(
           builder: (_) => CreateWalletProcessProvide(),
         ),
@@ -111,6 +111,8 @@ class _MyApp extends State<MyApp> {
             localizationsDelegates: [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, localizationDelegate],
             supportedLocales: localizationDelegate.supportedLocales,
             locale: localizationDelegate.currentLocale,
+
+            ///页面入口
             home: EntryPage(),
             onGenerateRoute: Application.router.generator,
           ),
