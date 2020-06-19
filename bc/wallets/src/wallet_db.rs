@@ -1,6 +1,4 @@
 use super::*;
-use std::borrow::Cow;
-use sqlite::{Bindable, Value};
 
 mod db_helper;
 
