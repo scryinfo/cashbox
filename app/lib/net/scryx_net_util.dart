@@ -18,8 +18,13 @@ class ScryXNetUtil {
       "id": 1,
       "jsonrpc": "2.0"
     };
-    var resultInfo = await request(netUrl, formData: paramObj);
-    return resultInfo;
+    try {
+      var resultInfo = await request(netUrl, formData: paramObj);
+      return resultInfo;
+    } catch (e) {
+      print("loadScryXStorage error is ===>" + e.toString());
+      return null;
+    }
   }
 
   loadScryXRuntimeVersion() async {
@@ -34,8 +39,13 @@ class ScryXNetUtil {
       "id": 1,
       "jsonrpc": "2.0"
     };
-    var resultInfo = await request(netUrl, formData: paramObj);
-    return resultInfo;
+    try {
+      var resultInfo = await request(netUrl, formData: paramObj);
+      return resultInfo;
+    } catch (e) {
+      print("loadScryXRuntimeVersion error is ===>" + e.toString());
+      return null;
+    }
   }
 
   loadScryXBlockHash() async {
@@ -50,8 +60,13 @@ class ScryXNetUtil {
       "id": 1,
       "jsonrpc": "2.0"
     };
-    var resultInfo = await request(netUrl, formData: paramObj);
-    return resultInfo;
+    try {
+      var resultInfo = await request(netUrl, formData: paramObj);
+      return resultInfo;
+    } catch (e) {
+      print("loadScryXBlockHash error is ===>" + e.toString());
+      return null;
+    }
   }
 
   submitExtrinsic(txInfo) async {
@@ -66,7 +81,12 @@ class ScryXNetUtil {
       "id": 1,
       "jsonrpc": "2.0"
     };
-    var resultInfo = await request(netUrl, formData: paramObj);
-    return resultInfo;
+    try {
+      var resultInfo = await request(netUrl, formData: paramObj);
+      return resultInfo;
+    } catch (e) {
+      print("submitExtrinsic error is ===>" + e.toString());
+      return null;
+    }
   }
 }

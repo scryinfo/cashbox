@@ -29,28 +29,33 @@ class UpgradeAppUtil {
     String appVersion = packageInfo.version;
     String buildNumber = packageInfo.buildNumber; //版本构建号
     print("packageInfo appVersion===>" + appVersion + "||buildNumber===>" + buildNumber);
-    var serveResult = await request(GlobalConfig.versionCheckIp, formData: {"ApkVersion": appVersion});
-    print("checkAppUpgrade info ====>" + serveResult.toString());
-    if ((serveResult != null) && (serveResult["code"] == 0)) {
-      var resultObj = serveResult["data"];
-      if (resultObj == null || resultObj["confirmLatest"] == null) {
-        print("resultObj is wrong=====>");
-        return false;
-      }
-      if (!resultObj["confirmLatest"]) {
-        print("confirmLatest=====>" + resultObj["confirmLatest"].toString());
-        var latestVersion = resultObj["latestApk"]["apkVersion"].toString();
-        if (latestVersion != null && latestVersion.isNotEmpty) {
-          _doUpgradeApp(GlobalConfig.latestVersionIp, latestVersion);
-          return true;
+    try {
+      var serveResult = await request(GlobalConfig.versionCheckIp, formData: {"ApkVersion": appVersion});
+      if ((serveResult != null) && (serveResult["code"] == 0)) {
+        var resultObj = serveResult["data"];
+        if (resultObj == null || resultObj["confirmLatest"] == null) {
+          print("resultObj is wrong=====>");
+          return false;
         }
+        if (!resultObj["confirmLatest"]) {
+          print("confirmLatest=====>" + resultObj["confirmLatest"].toString());
+          var latestVersion = resultObj["latestApk"]["apkVersion"].toString();
+          if (latestVersion != null && latestVersion.isNotEmpty) {
+            _doUpgradeApp(GlobalConfig.latestVersionIp, latestVersion);
+            return true;
+          }
+        }
+      } else {
+        print("checkAppUpgrade serve check failure ====>");
       }
-    } else {
-      print("checkAppUpgrade serve check failure ====>");
+    } catch (e) {
+      print("checkAppUpgrade error is ===>" + e.toString());
+      return false;
     }
     return false;
   }
 
+  //通知到android/ios 原生部分，去升级
   _doUpgradeApp(String downloadUrl, String serverVersion) {
     methodPlugin.invokeMethod('upgrade_app_method', {'downloadurl': downloadUrl, 'serverVersion': serverVersion});
   }

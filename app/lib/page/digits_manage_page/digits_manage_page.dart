@@ -84,8 +84,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         var digitParam =
             '[{"contractAddress":"0x9F5F3CFD7a32700C93F971637407ff17b91c7342","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
         await updateNativeAuthDigitList(digitParam);
-        var addDigitMap = await Wallets.instance
-            .addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, "3");
+        var addDigitMap = await Wallets.instance.addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, "3");
         int status = addDigitMap["status"];
         if (status == null || status != 200) {
           Fluttertoast.showToast(msg: "执行状态保存，出问题了,请重新尝试");
@@ -314,13 +313,18 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       print("loadServerDigitsData authUrl is null===>");
       return "";
     }
-    var result = await request(authUrl);
-    if (result["code"] != null && result["code"] == 0) {
-      print("loadServerDigitsData result.code=>" + convert.jsonEncode(result["data"]));
-      //return convert.jsonEncode(result["data"]).toString();
-      //TODO 测试用
-      return '[{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
-      //return "";
+    try {
+      var result = await request(authUrl);
+      if (result["code"] != null && result["code"] == 0) {
+        print("loadServerDigitsData result.code=>" + convert.jsonEncode(result["data"]));
+        //return convert.jsonEncode(result["data"]).toString();
+        //TODO 测试用
+        return '[{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
+        //return "";
+      }
+    } catch (e) {
+      print("loadServerDigitsData error is ===>" + e.toString());
+      return null;
     }
     return "";
   }
