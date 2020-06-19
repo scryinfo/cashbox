@@ -172,12 +172,12 @@ pub fn find_keystore_wallet_from_address(address: &str, chain_type: ChainType) -
 
 pub fn crate_mnemonic(num: u8) -> Mnemonic {
     let mnemonic = substratetx::Sr25519::generate_phrase(num);
-    let mn_id_hash = mnemonic.as_bytes().keccak256();
-    let mnemonic_id = mn_id_hash.keccak256();
+   /* let mn_id_hash = mnemonic.as_bytes().keccak256();
+    let mnemonic_id = mn_id_hash.keccak256();*/
     Mnemonic {
         status: StatusCode::OK,
         mn: mnemonic.as_bytes().to_vec(),
-        mnid: hex::encode(mnemonic_id),
+        mnid: "".into(),
     }
 }
 
@@ -236,20 +236,23 @@ fn generate_chain_address(wallet_id: &str, mn: &[u8], wallet_type: i64) -> Walle
 }
 
 pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type: i64) -> WalletResult<Wallet> {
+    //指定默认链类型
     let default_chain_type = if wallet_type == 1 {
         ChainType::ETH
     } else {
         ChainType::EthTest
     };
 
-    //todo 数据库实例优化
     let mut dbhelper = wallet_db::DataServiceProvider::instance()?;
-    //正式链，助记词只能导入一次
-    let hex_mn_digest = hex::encode(mn.keccak256());
+    let hex_mn_digest = {
+        let hash_first = mn.keccak256();
+        hex::encode((&hash_first[..]).keccak256())
+    };
+
+    //正式链，助记词只能导入一次,通过hash是否存在判断是否导入
     if wallet_type == 1 {
         if dbhelper.query_by_wallet_digest(hex_mn_digest.as_str(), wallet_type).is_some() {
-            let msg = format!("this wallet is exist");
-            return Err(WalletError::Custom(msg));
+            return Err(WalletError::Custom(format!("this wallet is exist")));
         }
     }
 
@@ -257,6 +260,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
     let wallet_id = Uuid::new_v4().to_string();
     let address: Vec<TbAddress> = generate_chain_address(&wallet_id, mn, wallet_type)?;
 
+    //构造钱包保存结构
     let wallet_save = model::wallet_store::TbWallet {
         wallet_id: wallet_id.clone(),
         mn_digest: hex_mn_digest,
@@ -266,14 +270,12 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
         wallet_type,
         ..Default::default()
     };
-    //构造助记词保存结构
+
     // 开启事务
-    //保存助记词到数据库
-    //保存公钥，地址到数据库
-    //提交事务
     dbhelper.tx_begin()?;
+    //保存钱包信息到数据库
     dbhelper.save_wallet_address(wallet_save, address)
-        .map(|_| dbhelper.tx_commint())
+        .map(|_| dbhelper.tx_commint()) //提交事务
         .map(|_| {
             Wallet {
                 status: StatusCode::OK,
