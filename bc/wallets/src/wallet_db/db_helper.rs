@@ -39,10 +39,10 @@ impl DataServiceProvider {
         if fs::File::open(TB_WALLET_DETAIL).is_err() || fs::File::open(TB_WALLET).is_err() {
             //create wallet table
             let mnemonic_sql = super::table_desc::get_cashbox_wallet_sql();
-            create_teble(TB_WALLET, mnemonic_sql.as_str())?;
+            create_teble(TB_WALLET, mnemonic_sql)?;
             //create wallet detail table
             let wallet_sql = super::table_desc::get_cashbox_wallet_detail_sql();
-            create_teble(TB_WALLET_DETAIL, wallet_sql.as_str())?;
+            create_teble(TB_WALLET_DETAIL, wallet_sql)?;
             Ok(())
         } else {
             Err(WalletError::Custom("Database file has created".to_string()))

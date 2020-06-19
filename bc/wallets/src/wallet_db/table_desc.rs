@@ -16,7 +16,7 @@ pub struct DigitExport {
     pub short_name:Option<String>,
 }
 
-pub fn get_cashbox_wallet_detail_sql() -> String {
+pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     let sql = r#"
     PRAGMA foreign_keys = 'off';
     BEGIN;
@@ -136,10 +136,11 @@ pub fn get_cashbox_wallet_detail_sql() -> String {
     COMMIT;
     PRAGMA foreign_keys = 'on';
     "#;
-    String::from(sql)
+    sql
+    // String::from(sql)
 }
 
-pub fn get_cashbox_wallet_sql() -> String {
+pub fn get_cashbox_wallet_sql() -> &'static str {
     let mnenonic_sql = r#"
         PRAGMA foreign_keys = 'off';
         BEGIN;
@@ -158,5 +159,6 @@ pub fn get_cashbox_wallet_sql() -> String {
         COMMIT;
         PRAGMA foreign_keys = 'on';
     "#;
-    String::from(mnenonic_sql)
+    mnenonic_sql
+    //String::from(mnenonic_sql)
 }
