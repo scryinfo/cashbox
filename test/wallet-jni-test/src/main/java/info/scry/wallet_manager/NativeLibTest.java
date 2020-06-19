@@ -11,9 +11,9 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-        System.out.println(NativeLib.initWalletBasicData());
+       // System.out.println(NativeLib.initWalletBasicData());
        // updateDefaultDigitTest();
-        walletGenerateTest();
+      //  walletGenerateTest();
        // walletExportTest();
        //  updateAuthListTest();
       //  addNonAuthDigitTest();
@@ -29,10 +29,12 @@ public class NativeLibTest {
       // eeeAccountInfoKeyTest();
       // decodeAccountInfoTest();
         // eeeTxsign();
+
       //  walletSaveTest();
       //  updateBalance();
        // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
         List<NativeLib.Wallet> wallets  = NativeLib.loadAllWalletList();
+      //  contract_test(wallets);
         for (NativeLib.Wallet wallet:wallets){
             System.out.println("***********************");
             System.out.println(wallet.toString());
@@ -87,7 +89,7 @@ public class NativeLibTest {
             NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(12);
             System.out.println(mnemonic.mnId);
             int  r = random.nextInt(1000);
-            NativeLib.Wallet wallet =  NativeLib.saveWallet("wallet_hello"+r ,"123456".getBytes(),mnemonic.mn,1);
+            NativeLib.Wallet wallet =  NativeLib.saveWallet("wallet_hello"+r ,"123456".getBytes(),mnemonic.mn,0);
             System.out.println(wallet.toString());
         }
     }

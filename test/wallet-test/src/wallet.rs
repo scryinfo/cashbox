@@ -61,9 +61,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_isContainWalle
 
 #[no_mangle]
 #[allow(non_snake_case)]
-fn wallet_jni_obj_util<'a, 'b>(env: &'a JNIEnv<'b>, wallet: Wallet) -> Vec<JObject<'a>> {
+fn wallet_jni_obj_util<'a, 'b>(env: &'a JNIEnv<'b>, wallet: Wallet) -> JObject<'a> {
     let wallet_class = env.find_class("info/scry/wallet_manager/NativeLib$Wallet").expect("can't found NativeLib$Wallet class");
-    let mut container = Vec::new();
     let jobj = env.alloc_object(wallet_class).unwrap();
 
     let wallet_id = env.new_string(wallet.wallet_id.clone()).unwrap();
@@ -73,36 +72,20 @@ fn wallet_jni_obj_util<'a, 'b>(env: &'a JNIEnv<'b>, wallet: Wallet) -> Vec<JObje
 
     let wallet_create_time = env.new_string(wallet.create_time.clone()).unwrap();
     let wallet_create_time_obj = JObject::from(wallet_create_time);
-    let eee_chain = wallet.eee_chain;
-    match eee_chain {
-        Some(eee_chain) => {
-            let chain_class_obj = chain::get_eee_chain_obj(env, eee_chain);
-            env.set_field(jobj, "eeeChain", "Linfo/scry/wallet_manager/NativeLib$EeeChain;", JValue::Object(chain_class_obj)).expect("set eee_chain");
-        },
-        None => {
-            info!("eee_chain not used");
-        }
+
+    if let Some(eee_chain) = wallet.eee_chain{
+        let chain_class_obj = chain::get_eee_chain_obj(env, eee_chain);
+        env.set_field(jobj, "eeeChain", "Linfo/scry/wallet_manager/NativeLib$EeeChain;", JValue::Object(chain_class_obj)).expect("set eee_chain");
     }
-    let eth_chain = wallet.eth_chain;
-    match eth_chain {
-        Some(eth_chain) => {
-            let chain_class_obj = chain::get_eth_chain_obj(env, eth_chain);
-            env.set_field(jobj, "ethChain", "Linfo/scry/wallet_manager/NativeLib$EthChain;", JValue::Object(chain_class_obj)).expect("set eth_chain");
-        },
-        None => {
-            info!("eth_chain not used");
-        }
+
+    if let Some(eth_chain) =  wallet.eth_chain{
+        let chain_class_obj = chain::get_eth_chain_obj(env, eth_chain);
+        env.set_field(jobj, "ethChain", "Linfo/scry/wallet_manager/NativeLib$EthChain;", JValue::Object(chain_class_obj)).expect("set eth_chain");
     }
-    let btc_chain = wallet.btc_chain;
-    match btc_chain {
-        Some(btc_chain) => {
-            println!("begin get_btc_chain_obj");
-            let chain_class_obj = chain::get_btc_chain_obj(env, btc_chain);
-            env.set_field(jobj, "btcChain", "Linfo/scry/wallet_manager/NativeLib$BtcChain;", JValue::Object(chain_class_obj)).expect("set btc_chain");
-        },
-        None => {
-            info!("btc_chain not used");
-        }
+
+    if let Some(btc_chain) = wallet.btc_chain{
+        let chain_class_obj = chain::get_btc_chain_obj(env, btc_chain);
+        env.set_field(jobj, "btcChain", "Linfo/scry/wallet_manager/NativeLib$BtcChain;", JValue::Object(chain_class_obj)).expect("set btc_chain");
     }
 
     env.set_field(jobj, "status", "I", JValue::Int(wallet.status as i32)).expect("find status type ");
@@ -133,8 +116,7 @@ fn wallet_jni_obj_util<'a, 'b>(env: &'a JNIEnv<'b>, wallet: Wallet) -> Vec<JObje
         let wallet_name_obj = JObject::from(wallet_name);
         env.set_field(jobj, "walletName", "Ljava/lang/String;", JValue::Object(wallet_name_obj)).expect("find walletName type ");
     }
-    container.push(jobj);
-    container
+    jobj
 }
 
 #[no_mangle]
@@ -149,8 +131,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_loadAllWalletL
         Ok(wallet_list) => {
             for wallet in wallet_list {
                 let wallet_temp = wallet_jni_obj_util(&env, wallet);
-                let ss = wallet_temp.get(0).unwrap();
-                env.call_method(wallet_list_class_obj, "add", "(Ljava/lang/Object;)Z", &[JValue::Object(*ss)]).expect("add wallet");
+                env.call_method(wallet_list_class_obj, "add", "(Ljava/lang/Object;)Z", &[JValue::Object(wallet_temp)]).expect("add wallet");
             }
         }
         Err(_msg) => {}
@@ -170,9 +151,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveWallet(env
     let wallet = wallets::module::wallet::create_wallet(wallet_name.as_str(), mnemonic.as_slice(), pwd.as_slice(), wallet_type as i64);
     let ret_obj = match wallet {
         Ok(wallet) => {
-            let vec_obj = wallet_jni_obj_util(&env, wallet);
-            let Obj = vec_obj.get(0).unwrap();
-            **Obj
+          let obj = wallet_jni_obj_util(&env, wallet);
+            *obj
         }
         Err(e) => {
             let jobj = env.alloc_object(wallet_class).unwrap();
