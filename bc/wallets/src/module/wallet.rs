@@ -87,9 +87,15 @@ pub fn get_current_wallet() -> WalletResult<Wallet> {
     }).map_err(|msg| msg)
 }
 
-pub fn set_current_wallet(walletid: &str) -> WalletResult<bool> {
+pub fn set_current_wallet(walletid: &str) -> WalletResult<()> {
     let instance = wallet_db::DataServiceProvider::instance()?;
-    instance.set_selected_wallet(walletid).map(|_| true).map_err(|error| error.into())
+    instance.tx_begin()?;
+    instance.set_selected_wallet(walletid)
+        .and_then(|_| instance.tx_commint())
+        .map_err(|error|{
+            instance.tx_rollback();
+            error.into()
+        })
 }
 
 pub fn del_wallet(walletid: &str, psd: &[u8]) -> WalletResult<()> {
