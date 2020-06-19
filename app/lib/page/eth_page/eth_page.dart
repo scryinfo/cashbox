@@ -119,7 +119,6 @@ class _EthPageState extends State<EthPage> {
       print("isNowWallet===>" + wallet.isNowWallet.toString() + wallet.walletId.toString() + "walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
         this.walletName = Wallets.instance.nowWallet.walletName;
-        //todo 查看是否需要 判钱包类型 测试处理
         break; //找到，终止循环
       }
     }
@@ -147,6 +146,7 @@ class _EthPageState extends State<EthPage> {
     print("updateMap[isUpdateAuthDigit]=====>" + updateMap["status"].toString() + updateMap["isUpdateAuthDigit"].toString());
   }
 
+  //处理显示法币 usd、cny等
   loadLegalCurrency() async {
     Rate rate = await loadRateInstance();
     if (rate == null) {
@@ -158,7 +158,7 @@ class _EthPageState extends State<EthPage> {
     });
   }
 
-  //市场价格 变化（每小时）
+  //市场价格信息 （每小时的变化等）
   loadDigitRateInfo() async {
     if (displayDigitsList.length == 0) {
       return;
@@ -186,6 +186,7 @@ class _EthPageState extends State<EthPage> {
     }
   }
 
+  //代币余额
   loadDigitBalance() async {
     print("loadDigitBalance is enter ===>" + displayDigitsList.length.toString());
     if (displayDigitsList == null || displayDigitsList.length == 0) {
@@ -231,6 +232,7 @@ class _EthPageState extends State<EthPage> {
     }
   }
 
+  //展示代币列表
   Future<List<Digit>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
       //没有展示数据
