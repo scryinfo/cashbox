@@ -235,7 +235,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_setNowWallet(e
     match wallets::module::wallet::set_current_wallet(wallet_id.as_str()) {
         Ok(exist) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
-            env.set_field(state_obj, "isSetNowWallet", "Z", JValue::Bool(exist as u8)).expect("set isSetNowWallet value ");
+            env.set_field(state_obj, "isSetNowWallet", "Z", JValue::Bool(1 as u8)).expect("set isSetNowWallet value ");
         }
         Err(msg) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type ");

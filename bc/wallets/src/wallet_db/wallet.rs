@@ -160,16 +160,27 @@ impl DataServiceProvider {
         Ok(())
     }
 
-    //todo 完善删除钱包逻辑  若是删除的当前钱包，当前选择钱包逻辑怎么来确定？
+
     pub fn del_mnemonic(&self, mn_id: &str) -> WalletResult<()> {
-        let sql = "DELETE from Wallet WHERE wallet_id = ?; ";
-        let update_address = "UPDATE Address set status = 0 WHERE wallet_id =?;";
+        //删除钱包表中的对应记录
+        let sql = "delete from Wallet WHERE wallet_id = ?; ";
+        //删除代币相关记录 需要先删除记录详情
+        let delete_digit_detail = "delete from detail.DigitUseDetail where address_id in (select address_id from detail.Address where wallet_id =?) ;";
+        //删除地址中的记录
+        let delete_address = "delete from detail.Address WHERE wallet_id =?;";
+
+        //检测是否删除到当前钱包
         let check_select_wallet = "select count(*) from wallet where selected=1;";
 
         let mut stat = self.db_hander.prepare(sql)?;
         stat.bind(1, mn_id)?;
         stat.next()?;
-        let mut stat = self.db_hander.prepare(update_address)?;
+
+        let mut stat = self.db_hander.prepare(delete_digit_detail)?;
+        stat.bind(1, mn_id)?;
+        stat.next()?;
+
+        let mut stat = self.db_hander.prepare(delete_address)?;
         stat.bind(1, mn_id)?;
         stat.next()?;
         let mut stat = self.db_hander.prepare(check_select_wallet)?;

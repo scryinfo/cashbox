@@ -110,6 +110,7 @@ pub fn del_wallet(walletid: &str, psd: &[u8]) -> WalletResult<()> {
         .and_then(|_| provider.tx_commint())
         .map_err(|err|{
             let _ = provider.tx_rollback();
+            //返回以上任意一个链式调用发生的错误
             err
         })
 }
