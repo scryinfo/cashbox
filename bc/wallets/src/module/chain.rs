@@ -6,8 +6,50 @@ use std::collections::HashMap;
 use ethereum_types::{H160, U256, H256};
 
 //后续修改名称为ScryX?
+pub struct EEE{}
+impl EEE{
+   pub fn generate_transfer(&self,from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, psw: &[u8]) -> WalletResult<String> {
+        let keystore = module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE)?;
+        let mnemonic = substratetx::Sr25519::get_mnemonic_context(&keystore, psw)?;
+        //密码验证通过
+        let mn = String::from_utf8(mnemonic)?;
+        let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap())?;
+        let mut genesis_h256 = [0u8; 32];
+        genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
+        let signed_data = substratetx::transfer(&mn, to, amount, H256(genesis_h256), index, runtime_version)?;
+        log::debug!("signed data is: {}", signed_data);
+        Ok(signed_data)
+    }
+
+    pub fn save_tx_record(&self,account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
+        let event_res = substratetx::event_decode(event_data, blockhash, account);
+
+        let extrinsics_map = substratetx::decode_extrinsics(extrinsics, account)?;
+        //区块交易事件 肯定存在时间戳的设置
+        let tx_time = extrinsics_map.get(&0).unwrap();//获取时间戳
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        for index in 1..extrinsics_map.len() {
+            let index = index as u32;
+            let transfer_detail = extrinsics_map.get(&index).unwrap();
+            let is_successful = event_res.get(&index).unwrap();
+            instance.save_transfer_detail(account, blockhash, transfer_detail, tx_time.timestamp.unwrap(), *is_successful)?;
+        }
+        Ok(())
+    }
+
+    pub fn update_sync_record(&self,account: &str, chain_type: i32, block_num: u32, block_hash: &str) -> WalletResult<()> {
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        instance.update_account_sync(account, chain_type, block_num, block_hash)
+    }
+
+    pub fn get_sync_status(&self) -> WalletResult<Vec<SyncStatus>> {
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        //是否要区分链类型
+        instance.get_sync_status()
+    }
+}
 // 转EEE链代币
-pub fn eee_transfer(from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, psw: &[u8]) -> WalletResult<String> {
+/*pub fn eee_transfer(from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, psw: &[u8]) -> WalletResult<String> {
     let keystore = module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE)?;
     let mnemonic = substratetx::Sr25519::get_mnemonic_context(&keystore, psw)?;
     //密码验证通过
@@ -18,7 +60,7 @@ pub fn eee_transfer(from: &str, to: &str, amount: &str, genesis_hash: &str, inde
     let signed_data = substratetx::transfer(&mn, to, amount, H256(genesis_h256), index, runtime_version)?;
     log::debug!("signed data is: {}", signed_data);
     Ok(signed_data)
-}
+}*/
 
 ///ETH交易签名
 /// from_account: 转出账户
@@ -98,7 +140,8 @@ fn eth_tx_sign(from_address: &str, psw: &[u8], raw_transaction: ethtx::RawTransa
 
 pub fn get_eee_chain_data() -> WalletResult<HashMap<String, Vec<EeeChain>>> {
     let instance = wallet_db::DataServiceProvider::instance()?;
-    let eee_chain = instance.display_eee_chain();
+    //这里获取的数据部分测试链、正式连
+    let eee_chain = instance.display_chain_detail(ChainType::EEE);
     let mut eee_map = HashMap::new();
     match eee_chain {
         Ok(tbwallets) => {
@@ -153,9 +196,10 @@ pub fn get_eee_chain_data() -> WalletResult<HashMap<String, Vec<EeeChain>>> {
     }
 }
 
+
 pub fn get_eth_chain_data() -> WalletResult<HashMap<String, Vec<EthChain>>> {
     let instance = wallet_db::DataServiceProvider::instance()?;
-    let eth_chain = instance.display_eth_chain();
+    let eth_chain = instance.display_chain_detail(ChainType::ETH);
     // let mut chain_index = 0;
     let mut eth_map = HashMap::new();
     match eth_chain {
@@ -187,8 +231,8 @@ pub fn get_eth_chain_data() -> WalletResult<HashMap<String, Vec<EthChain>>> {
                 let digit_id = format!("{}", tbwallet.digit_id.unwrap());
                 let digit = EthDigit {
                     status: StatusCode::OK,
-                    digit_id: digit_id,
-                    chain_id: chain_id,
+                    digit_id,
+                    chain_id,
                     contract_address: tbwallet.contract_address.clone(),
                     fullname: tbwallet.full_name.clone(),
                     shortname: tbwallet.short_name.clone(),
@@ -210,7 +254,7 @@ pub fn get_eth_chain_data() -> WalletResult<HashMap<String, Vec<EthChain>>> {
 
 pub fn get_btc_chain_data() -> WalletResult<HashMap<String, Vec<BtcChain>>> {
     let instance = wallet_db::DataServiceProvider::instance()?;
-    let btc_chain = instance.display_btc_chain();
+    let btc_chain = instance.display_chain_detail(ChainType::BTC);
     // let mut chain_index = 0;
 
     let mut btc_map = HashMap::new();
@@ -292,7 +336,7 @@ pub fn decode_eth_data(input: &str) -> WalletResult<String> {
     ethtx::decode_tranfer_data(input).map_err(|error| error.into())
 }
 
-pub fn save_eee_tx_record(account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
+/*pub fn save_eee_tx_record(account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
     let event_res = substratetx::event_decode(event_data, blockhash, account);
 
     let extrinsics_map = substratetx::decode_extrinsics(extrinsics, account)?;
@@ -306,8 +350,9 @@ pub fn save_eee_tx_record(account: &str, blockhash: &str, event_data: &str, extr
         instance.save_transfer_detail(account, blockhash, transfer_detail, tx_time.timestamp.unwrap(), *is_successful)?;
     }
     Ok(())
-}
+}*/
 
+/*
 pub fn update_eee_sync_record(account: &str, chain_type: i32, block_num: u32, block_hash: &str) -> WalletResult<()> {
     let instance = wallet_db::DataServiceProvider::instance()?;
     instance.update_account_sync(account, chain_type, block_num, block_hash)
@@ -318,4 +363,5 @@ pub fn get_eee_sync_status() -> WalletResult<Vec<SyncStatus>> {
     //是否要区分链类型
     instance.get_sync_status()
 }
+*/
 

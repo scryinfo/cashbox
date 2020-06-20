@@ -18,8 +18,71 @@ impl DataServiceProvider {
         }
         Ok(chain_type)
     }
+    pub fn display_chain_detail(&self, chain_type: ChainType) -> WalletResult<Vec<WalletObj>> {
+        //这个sql语句关联表较多 关联逻辑： 查询出当前钱包有效钱包，这里是不区分主链或者测试链钱包 得到一个子表 e
+        // 查询出当前地址使用详情跟代币的关联情况，得到子表 d
+        // 最后和表f做自然连接，根据筛选条件找出符合要求的结果
+      let query_sql =  match chain_type {
+            ChainType::EthTest | ChainType::ETH => {
+           "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
+			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
+	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and a.status=1 and b.status =1 and b.chain_id in (3,4)) e,
+	 ( select * from detail.DigitUseDetail a,detail.DefaultDigitBase b where a.digit_id = b.id  and b.status = 1 and group_name !='EEE' and group_name !='BTC') as d,detail.Chain f
+         where e.address_id = d.address_id and e.chain_id = f.id and f.status = 1;" }
+            ChainType::EeeTest | ChainType::EEE => {
+        "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
+			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
+	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (5,6)) e,
+	 ( select * from detail.DigitUseDetail,detail.DefaultDigitBase
+         where digit_id = id and group_name !='ETH' and group_name !='BTC'
+         ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id  order by wallet_id desc;" },
+            ChainType::BtcTest | ChainType::BTC => {
+             "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
+			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
+	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (1,2)) e,
+	 ( select * from detail.DigitUseDetail,detail.DefaultDigitBase
+         where digit_id = id and group_name !='EEE' and group_name !='ETH'
+         ) as d,detail.Chain f where e.address_id = d.address_id and e.chain_id = f.id order by wallet_id desc;" },
+            _ => ""
+        };
+        if query_sql.is_empty() {
+            Err(WalletError::NotExist)
+        }else {
+            self.query_wallet_obj(query_sql)
+        }
+    }
+    //根据传递进来的sql 查询钱包关联数据
+    fn query_wallet_obj(&self, sql: &str) -> WalletResult<Vec<WalletObj>> {
+        let stat = self.db_hander.prepare(sql)?;
+        let mut cursor = stat.cursor();
+        let mut tbwallets = Vec::new();
 
-    pub fn display_eee_chain(&self) -> WalletResult<Vec<WalletObj>> {
+        while let Some(row) = cursor.next()? {
+            let tbwallet = WalletObj {
+                wallet_id: row[0].as_string().map(|str| String::from(str)),
+                wallet_name: row[1].as_string().map(|str| String::from(str)),
+                chain_id: row[2].as_integer(),
+                address: row[3].as_string().map(|str| String::from(str)),
+                selected: row[4].as_string().map(|value| Self::get_bool_value(value)),
+                chain_is_visible: row[5].as_string().map(|value| Self::get_bool_value(value)),
+                domain: row[6].as_string().map(|str| String::from(str)),
+                chain_type: row[7].as_integer(),
+                digit_id: row[8].as_string().map(|str| String::from(str)),
+                contract_address: row[9].as_string().map(|str| String::from(str)),
+                short_name: row[10].as_string().map(|str| String::from(str)),
+                full_name: row[11].as_string().map(|str| String::from(str)),
+                balance: row[12].as_string().map(|str| String::from(str)),
+                digit_is_visible: row[13].as_string().map(|value| Self::get_bool_value(value)),
+                decimals: row[14].as_integer(),
+                url_img: row[15].as_string().map(|str| String::from(str)),
+            };
+            tbwallets.push(tbwallet);
+        }
+        Ok(tbwallets)
+    }
+
+
+   /* pub fn display_eee_chain(&self) -> WalletResult<Vec<WalletObj>> {
         let all_data = "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
 			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (5,6)) e,
@@ -126,7 +189,7 @@ impl DataServiceProvider {
             tbwallets.push(tbwallet);
         }
         Ok(tbwallets)
-    }
+    }*/
 
     pub fn show_chain(&self, walletid: &str, wallet_type: i64) -> WalletResult<bool> {
         let sql = "UPDATE Address set is_visible = 1 WHERE wallet_id=? and chain_id=?;";

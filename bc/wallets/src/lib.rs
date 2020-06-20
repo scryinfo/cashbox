@@ -102,7 +102,8 @@ mod tests {
         let mut genesis_h256 = [0u8; 32];
         genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
         // 涉及到数据库访问 需要进行一系列数据准备才能正常测试
-        match module::chain::eee_transfer(from, to, value, genesis_hash, index, runtime_version, "123456".as_bytes()) {
+        let eee = module::chain::EEE{};
+        match eee.generate_transfer(from, to, value, genesis_hash, index, runtime_version, "123456".as_bytes()) {
             Ok(sign_str) => {
                 println!("{}", sign_str);
             }

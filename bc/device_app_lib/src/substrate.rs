@@ -62,7 +62,8 @@ pub mod android {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("findNativeLib$Message");
         let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
         //  使用钱包方式来构造交易，用户交易index不会达到强制转换造成溢出的问题这个交易量
-        match wallets::module::chain::eee_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, pwd.as_slice()) {
+        let eee = wallets::module::chain::EEE{};
+        match eee.generate_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, pwd.as_slice()) {
             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");
@@ -133,7 +134,8 @@ pub mod android {
         let block_extrinsics: String = env.get_string(extrinsics).unwrap().into();
         let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
         let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
-        match wallets::module::chain::save_eee_tx_record(&account_id,&block_hash,&encode_event_info,&block_extrinsics) {
+        let eee = wallets::module::chain::EEE{};
+        match eee.save_tx_record(&account_id,&block_hash,&encode_event_info,&block_extrinsics) {
             Ok(_key) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
             }
@@ -153,7 +155,9 @@ pub mod android {
 
         let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
         let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
-        match wallets::module::chain::update_eee_sync_record(&account,chain_type,block_num as u32,&block_hash) {
+        let eee =wallets::module::chain::EEE{};
+
+        match eee.update_sync_record(&account,chain_type,block_num as u32,&block_hash) {
             Ok(_key) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
             }
@@ -174,7 +178,8 @@ pub mod android {
         let map_class = env.find_class("java/util/HashMap").expect("HashMap");
         let map_obj = env.alloc_object(map_class).expect("array_list_class");
         env.call_method(map_obj, "<init>", "()V", &[]).expect("array_list_obj init method is exec");
-        match wallets::module::chain::get_eee_sync_status() {
+        let eee = wallets::module::chain::EEE{};
+        match eee.get_sync_status() {
             Ok(sync_records)=> {
                 let account_record_class = env.find_class("info/scry/wallet_manager/NativeLib$AccountRecord").expect("find NativeLib$EthToken class");
                 for record in sync_records {
