@@ -2,7 +2,7 @@ use super::*;
 
 use ChainType;
 use sqlite::{State, Statement};
-use crate::model::wallet_store::{TbAddress, WalletObj, TbWallet};
+use crate::model::wallet_store::{TbAddress, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
 
 //根据链id,转换为对应的链类型和分组名称

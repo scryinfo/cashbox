@@ -1,7 +1,6 @@
 use super::*;
 
 use model::{WalletObj, SyncStatus};
-use log::debug;
 use sqlite::State;
 use substratetx::TransferDetail;
 
