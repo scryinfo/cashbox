@@ -16,7 +16,8 @@ pub mod android {
 
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
         let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
-        match wallets::module::wallet::raw_tx_sign(&raw_tx, &wallet_id, pwd.as_slice()) {
+        let eee = wallets::module::EEE{};
+        match eee.raw_tx_sign(&raw_tx, &wallet_id, pwd.as_slice()) {
             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode ");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set signedInfo");
@@ -38,7 +39,8 @@ pub mod android {
 
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-        match wallets::module::wallet::raw_sign(&raw_tx, &wallet_id, pwd.as_slice()) {
+        let eee = wallets::module::EEE{};
+        match eee.raw_sign(&raw_tx, &wallet_id, pwd.as_slice()) {
             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("eeeSign set StatusCode value");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value ");

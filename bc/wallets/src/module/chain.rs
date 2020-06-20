@@ -3,7 +3,16 @@ use super::model::*;
 
 use substratetx::Crypto;
 use std::collections::HashMap;
+use codec::{Encode, Decode};
 use ethereum_types::{H160, U256, H256};
+
+#[derive(Encode, Decode, Debug)]
+struct RawTx {
+    func_data: Vec<u8>,
+    index: u32,
+    genesis_hash: H256,
+    version: u32,
+}
 
 //后续修改名称为ScryX?
 pub struct EEE {}
@@ -12,7 +21,7 @@ impl Chain for EEE{}
 
 impl EEE {
     pub fn generate_transfer(&self, from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, psw: &[u8]) -> WalletResult<String> {
-        let keystore = module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE)?;
+        let keystore = find_keystore_wallet_from_address(from, ChainType::EEE)?;
         let mnemonic = substratetx::Sr25519::get_mnemonic_context(&keystore, psw)?;
         //密码验证通过
         let mn = String::from_utf8(mnemonic)?;
@@ -26,7 +35,6 @@ impl EEE {
 
     pub fn save_tx_record(&self, account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
         let event_res = substratetx::event_decode(event_data, blockhash, account);
-
         let extrinsics_map = substratetx::decode_extrinsics(extrinsics, account)?;
         //区块交易事件 肯定存在时间戳的设置
         let tx_time = extrinsics_map.get(&0).unwrap();//获取时间戳
@@ -108,6 +116,30 @@ impl EEE {
             Err(e) => Err(e)
         }
     }
+    // 这个函数用于外部拼接好的交易，比如通过js方式构造的交易
+    pub fn raw_tx_sign(&self, raw_tx: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
+        let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
+        let tx_encode_data = hex::decode(raw_tx)?;
+        let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
+        let wallet = model::Wallet::default();
+        let mnemonic = wallet.export_mnemonic(wallet_id, psw)?;
+        let mn = String::from_utf8(mnemonic.mn)?;
+        let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
+        let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, mut_data, tx.version)?;
+        Ok(sign_data)
+    }
+
+    //用于针对普通数据签名 传入的数据 hex格式数据
+    pub fn raw_sign(&self, raw_data: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
+        let raw_data = raw_data.get(2..).unwrap();// remove `0x`
+        let tx_encode_data = hex::decode(raw_data)?;
+        let wallet = model::Wallet::default();
+        let mnemonic = wallet.export_mnemonic(wallet_id, psw)?;
+        let mn = String::from_utf8(mnemonic.mn)?;
+        let sign_data = substratetx::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();
+        let hex_data = format!("0x{}", hex::encode(&sign_data[..]));
+        Ok(hex_data)
+    }
 }
 
 pub struct Ethereum {}
@@ -178,7 +210,7 @@ impl Ethereum {
         } else {
             ChainType::EthTest
         };
-        let keystore = module::wallet::find_keystore_wallet_from_address(from_address, chain_type)?;
+        let keystore = find_keystore_wallet_from_address(from_address, chain_type)?;
         //密码验证
         let mnemonic = substratetx::Sr25519::get_mnemonic_context(&keystore, psw)?;
         //返回签名使用的私钥
@@ -331,5 +363,10 @@ pub trait Chain{
         instance.set_now_chain_type(walletid, chain_type)
     }
 }
+pub fn find_keystore_wallet_from_address(address: &str, chain_type: ChainType) -> WalletResult<String> {
+    let instance = wallet_db::DataServiceProvider::instance()?;
+    instance.get_wallet_by_address(address, chain_type).map(|tbwallet| tbwallet.mnemonic)
+}
+
 
 

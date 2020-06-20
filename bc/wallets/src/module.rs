@@ -1,7 +1,7 @@
 use super::*;
 
 mod chain;
-pub mod digit;
+mod digit;
 pub mod wallet;
 
 pub use chain::{Chain,Ethereum,EEE,Bitcoin};

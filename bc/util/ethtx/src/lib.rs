@@ -4,7 +4,7 @@ extern crate serde_derive;
 use ethabi::Contract;
 use ethereum_types::{U256, H160};
 use rlp::RlpStream;
-use secp256k1::{key::SecretKey, Message, Secp256k1};
+use secp256k1::{Message, Secp256k1, key::{PublicKey, SecretKey},};
 use bip39::{Mnemonic, Language,Seed};
 use tiny_hderive::bip32::ExtendedPrivKey;
 
@@ -26,6 +26,19 @@ pub fn pri_from_mnemonic(phrase:&str,psd:Option<Vec<u8>>)->Result<Vec<u8>,error:
     let seed = Seed::new(&mnemonic,&psd);//
     let ext_key = ExtendedPrivKey::derive(&seed.as_bytes(), "m/44'/60'/0'/0/0")?;
     Ok(ext_key.secret().to_vec())
+}
+//从非压缩公钥生成ETH地址
+pub fn generate_eth_address(secret_byte: &[u8]) -> Result<(String,String),error::Error> {
+    let context = Secp256k1::new();
+    //todo 增加错误处理
+    let secret = SecretKey::from_slice(&secret_byte)?;
+    let public_key = PublicKey::from_secret_key(&context, &secret);
+    //一个是非压缩公钥 用于地址生成
+    let puk_uncompressed = &public_key.serialize_uncompressed()[..];
+    let public_key_hash =  keccak(&puk_uncompressed[1..]);
+    let address_str = hex::encode(&public_key_hash[12..]);
+    let puk_str = hex::encode(&public_key.serialize()[..]);
+    Ok((format!("0x{}", address_str),format!("0x{}", puk_str)))
 }
 
 #[derive(Clone, Debug, PartialEq)]

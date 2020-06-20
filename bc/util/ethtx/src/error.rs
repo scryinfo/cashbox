@@ -29,6 +29,8 @@ pub enum Error {
     #[display(fmt = "other lib: {}", _0)]
     #[from(ignore)]
     Other(String),
+    #[display(fmt = "secp256k1 error: {}", _0)]
+    Secp256k1(secp256k1::Error),
 
 }
 
@@ -38,6 +40,7 @@ impl std::error::Error for Error {
         match *self {
             Unreachable | Decoder(_) | InvalidResponse(_) | Transport(_) | Internal|Other(_) => None,
             Io(ref e) => Some(e),
+            Secp256k1(ref e)=>Some(e),
         }
     }
 }
@@ -75,6 +78,11 @@ impl From<failure::Error> for Error{
         Error::Other(format!("{:?}", err))
     }
 }
+/*impl From<secp256k1::Error> for Error{
+    fn from(err:secp256k1::Error) -> Self {
+        Error::Secp256k1(err)
+    }
+}*/
 
 
 impl Clone for Error {
@@ -86,6 +94,7 @@ impl Clone for Error {
             InvalidResponse(s) => InvalidResponse(s.clone()),
             Transport(s) => Transport(s.clone()),
             Io(e) => Io(IoError::from(e.kind())),
+            Secp256k1(e) => Secp256k1(e.clone()),
             Internal => Internal,
             Other(s)=>Other(s.clone()),
         }

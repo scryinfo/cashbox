@@ -14,7 +14,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_showDigit(env:
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    match wallets::module::digit::show_digit(wallet_id.as_str(),chainId as i64,digit_id.as_str()) {
+    let eth = wallets::module::Ethereum{};
+    match eth.show_digit(wallet_id.as_str(),chainId as i64,digit_id.as_str()) {
         Ok(_code) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
             env.set_field(state_obj, "isShowDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value");
@@ -35,7 +36,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideDigit(env:
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    match wallets::module::digit::hide_digit(wallet_id.as_str(),chainId as i64,digit_id.as_str()) {
+    let eth = wallets::module::Ethereum{};
+    match eth.hide_digit(wallet_id.as_str(),chainId as i64,digit_id.as_str()) {
         Ok(_) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
             env.set_field(state_obj, "isHideDigit", "Z", JValue::Bool(1 as u8)).expect("hideDigit value ");
@@ -56,7 +58,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_addDigit(env: 
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    match wallets::module::digit::add_wallet_digit(&wallet_id,chainId as i64,&digit_id){
+    let eth = wallets::module::Ethereum{};
+    match eth.add_wallet_digit(&wallet_id,chainId as i64,&digit_id){
         Ok(_) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
             env.set_field(state_obj, "isAddDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value ");
@@ -78,7 +81,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDigitBal
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    match wallets::module::digit::update_balance(&address,&digitId,&balance){
+    let eth = wallets::module::Ethereum{};
+    match eth.update_balance(&address,&digitId,&balance){
         Ok(_)=>{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status value ");
             env.set_field(state_obj, "isUpdateDigitBalance", "Z", JValue::Bool(1 as u8)).expect("showDigit value ");
@@ -100,7 +104,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateDefaultD
 
     let digits =  serde_json::from_slice::<Vec<wallets::model::DefaultDigit>>(digit_data.as_bytes());
     if let Ok(digits) = digits{
-        match wallets::module::digit::update_default_digit(digits){
+        let eth = wallets::module::Ethereum{};
+        match eth.update_default_digit(digits){
             Ok(_)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status value ");
                 env.set_field(state_obj, "isUpdateDefaultDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value ");
@@ -126,7 +131,10 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateAuthDigi
 
     let _ = serde_json::from_slice::<Vec<wallets::model::EthToken>>(digit_data.as_bytes())
         .map_err(|err|WalletError::Serde(err))
-        .and_then(|digits|wallets::module::digit::update_auth_digit(digits,true,None).map_err(|err| err.into()))
+        .and_then(|digits|{
+            let eth = wallets::module::Ethereum{};
+            eth.update_auth_digit(digits,true,None).map_err(|err| err.into())
+        })
         .map(|_data|{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status value ");
             env.set_field(state_obj, "isUpdateAuthDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value "); })
@@ -148,7 +156,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_addNonAuthDigi
 
     let digits =  serde_json::from_slice::<Vec<wallets::model::EthToken>>(digit_data.as_bytes());
     if let Ok(digits) = digits{
-        match wallets::module::digit::update_auth_digit(digits,false,None){
+        let eth = wallets::module::Ethereum{};
+        match eth.update_auth_digit(digits,false,None){
             Ok(_)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status value ");
                 env.set_field(state_obj, "isAddNonAuthDigit", "Z", JValue::Bool(1 as u8)).expect("showDigit value ");
@@ -172,7 +181,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getDigitList(e
     let auth_list_class = env.find_class("info/scry/wallet_manager/NativeLib$DigitList").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(auth_list_class).expect("create auth_list_class instance ");
     //todo 增加对链类型的判断
-    match wallets::module::digit::query_auth_digit(chain_type as i64,is_auth != 0,start_item as i64,page_size as i64){
+    let eth = wallets::module::Ethereum{};
+    match eth.query_auth_digit(chain_type as i64,is_auth != 0,start_item as i64,page_size as i64){
         Ok(data)=> get_jni_token_list(&env, state_obj, data),
         Err(msg)=>{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status value ");
@@ -193,7 +203,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_queryDigit(env
     let auth_list_class = env.find_class("info/scry/wallet_manager/NativeLib$DigitList").expect("find wallet_state_class ");
     let state_obj = env.alloc_object(auth_list_class).expect("create auth_list_class instance ");
 
-    match wallets::module::digit::query_digit(chain_type as i64,query_name,query_contract){
+    let eth = wallets::module::Ethereum{};
+    match eth.query_digit(chain_type as i64,query_name,query_contract){
         Ok(data)=> get_jni_token_list(&env, state_obj, data),
         Err(msg)=>{
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status value ");

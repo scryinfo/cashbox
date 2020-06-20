@@ -11,10 +11,10 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-       // System.out.println(NativeLib.initWalletBasicData());
+     //   System.out.println(NativeLib.initWalletBasicData());
        // updateDefaultDigitTest();
-      //  walletGenerateTest();
-       // walletExportTest();
+        walletGenerateTest();
+        walletExportTest();
        //  updateAuthListTest();
       //  addNonAuthDigitTest();
       //  getAuthDigitListTest();
