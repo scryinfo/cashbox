@@ -43,10 +43,12 @@ fn get_wallet_info() -> HashMap<String, Wallet> {
 //query all 满足条件的助记词（wallet）
 pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
     let wallet_info_map = get_wallet_info();
-
-    let eee_data = chain::get_eee_chain_data()?;
-    let eth_data = chain::get_eth_chain_data()?;
-    let btc_data = chain::get_btc_chain_data()?;
+    let eee_obj = chain::EEE{};
+    let eee_data = eee_obj.get_chain_data()?;
+    let eth_obj = chain::Ethereum{};
+    let eth_data =   eth_obj.get_chain_data()?;
+    let btc_obj = chain::Bitcoin{};
+    let btc_data = btc_obj.get_chain_data()?;
     let mut target = vec![];
 
     for (wallet_id, wallet) in wallet_info_map {

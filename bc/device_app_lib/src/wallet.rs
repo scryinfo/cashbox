@@ -17,7 +17,6 @@ pub mod android {
     use jni::sys::{jint, jobject, jbyteArray};
     use wallets::StatusCode;
     use wallets::model::Wallet;
-    use log::info;
     use crate::chain;
 
     #[no_mangle]

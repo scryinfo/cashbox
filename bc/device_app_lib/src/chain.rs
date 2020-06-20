@@ -9,6 +9,7 @@ pub mod android {
     use wallets::model::{EeeChain,BtcChain,EthChain};
     use jni::sys::{jint, jobject, jbyteArray};
     use wallets::StatusCode;
+    use wallets::module::Chain;
 
     pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObject<'a>{
         let eee_digit_list_class = env.find_class("java/util/ArrayList").expect("find ArrayList");
@@ -228,7 +229,7 @@ pub mod android {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
 
-        match wallets::module::chain::show_chain(wallet_id.as_str(), wallet_type as i64) {
+        match wallets::module::EEE::show_chain(wallet_id.as_str(), wallet_type as i64) {
             Ok(_) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
                 env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(1 as u8)).expect("set isShowChain value");
@@ -249,7 +250,7 @@ pub mod android {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
 
-        match wallets::module::chain::hide_chain(wallet_id.as_str(), wallet_type as i64) {
+        match wallets::module::EEE::hide_chain(wallet_id.as_str(), wallet_type as i64) {
             Ok(_) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
                 env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(1 as u8)).expect("set isHideChain value");
@@ -266,12 +267,11 @@ pub mod android {
     #[no_mangle]
     #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAdditionData(env: JNIEnv, _: JClass, input: JString) -> jobject {
-
         let input: String = env.get_string(input).unwrap().into();
-
         let message_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("decodeAdditionData NativeLib$Message");
         let state_obj = env.alloc_object(message_class).expect("decodeAdditionData create state_obj");
-        match wallets::module::chain::decode_eth_data(input.as_str()) {
+        let eth = wallets::module::Ethereum{};
+        match eth.decode_data(input.as_str()) {
             Ok(data)=>{
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");
                 env.set_field(state_obj, "inputInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set inputInfo");
@@ -290,7 +290,7 @@ pub mod android {
         let wallet_id: String = env.get_string(walletId).unwrap().into();
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
-        match wallets::module::chain::get_now_chain_type(wallet_id.as_str()) {
+        match wallets::module::EEE::get_now_chain_type(wallet_id.as_str()) {
             Ok(code) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
                 env.set_field(state_obj, "getNowChainType", "I", JValue::Int(code as i32)).expect("get nowChainType value");
@@ -310,7 +310,7 @@ pub mod android {
 
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("setNowChainType wallet_state_class");
         let state_obj = env.alloc_object(wallet_state_class).expect("setNowChainType create state_obj");
-        match wallets::module::chain::set_now_chain_type(wallet_id.as_str(),chain_type as i64) {
+        match wallets::module::EEE::set_now_chain_type(wallet_id.as_str(),chain_type as i64) {
             Ok(_) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");
                 env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(1 as u8)).expect("setNowChainType isSetNowChain");
@@ -325,7 +325,7 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env: JNIEnv, _: JClass, walletId:JString,chainType:jint, fromAddress:JString,
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env: JNIEnv, _: JClass, _walletId:JString,chainType:jint, fromAddress:JString,
                                                                                 toAddress:JString, contractAddress:JString, value:JString, backup:JString, pwd:jbyteArray,
                                                                                 gasPrice:JString,gasLimit:JString,nonce:JString,decimal:jint) -> jobject {
 
@@ -398,11 +398,12 @@ pub mod android {
         //使用私钥确认码
         let pwd = env.convert_byte_array(pwd).unwrap();
         //合约地址为空，是普通ETH转账 或者部署合约
+        let ethereum = wallets::module::Ethereum{};
         let signed_ret = if contract_address.is_empty() {
-            wallets::module::chain::eth_raw_transfer_sign(&from_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_id as u64)
+            ethereum.raw_transfer_sign(&from_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_id as u64)
         } else {
             let contract_address = H160::from_slice(hex::decode(&contract_address[2..]).unwrap().as_slice());
-            wallets::module::chain::eth_raw_erc20_transfer_sign(&from_address, contract_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_id as u64)
+            ethereum.raw_erc20_transfer_sign(&from_address, contract_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_id as u64)
         };
         match signed_ret {
             Ok(data) => {
