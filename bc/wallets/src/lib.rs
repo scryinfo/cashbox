@@ -9,12 +9,11 @@ mod error;
 
 pub use error::WalletError;
 
-pub use ethtx::{convert_token,address_legal as eth_address_legal};
-pub use substratetx::{account_info_key,decode_account_info,event_decode};
+pub use ethtx::{convert_token, address_legal as eth_address_legal};
+pub use substratetx::{account_info_key, decode_account_info, event_decode};
 
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
-// Todo 是否将产生的错误，统一的使用错误码的形式向上层传递？
 #[derive(PartialEq, Clone)]
 pub enum StatusCode {
     DylibError = -1,
@@ -89,24 +88,25 @@ mod tests {
             Err(e) => println!("{}", e.to_string()),
         }
     }
+
     #[test]
     fn transfer_test() {
         let mnemonic = "settle essay unique empty neutral pistol essence monkey combine service gun burden";
         let from = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
-        let  to = "5GGzGJR54YNjMKhaYt6hHV3o99FZ6JKYEDCrzUg1HCz1tWPa";
+        let to = "5GGzGJR54YNjMKhaYt6hHV3o99FZ6JKYEDCrzUg1HCz1tWPa";
         let value = "200000000000000";
         let genesis_hash = "0xabb0f2e62dfab481623438e14b5e1d4114a6e9a2f0d3f5e83f9192276e50cf34";
         let index = 0;
         let runtime_version = 1;
         let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap()).unwrap();
-        let mut genesis_h256 = [0u8;32];
-        genesis_h256.clone_from_slice( genesis_hash_bytes.as_slice());
-        // todo 涉及到数据库访问 需要进行一系列数据准备才能正常测试
-        match module::chain::eee_transfer(from,to,value,genesis_hash,index,runtime_version,"123456".as_bytes()){
-            Ok(sign_str)=>{
-                println!("{}",sign_str);
-            },
-            Err(err)=>println!("{}",err)
+        let mut genesis_h256 = [0u8; 32];
+        genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
+        // 涉及到数据库访问 需要进行一系列数据准备才能正常测试
+        match module::chain::eee_transfer(from, to, value, genesis_hash, index, runtime_version, "123456".as_bytes()) {
+            Ok(sign_str) => {
+                println!("{}", sign_str);
+            }
+            Err(err) => println!("{}", err)
         }
     }
 

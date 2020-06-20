@@ -8,8 +8,6 @@ pub mod chain;
 pub mod digit;
 
 pub use db_helper::DataServiceProvider;
-pub use wallet_db::table_desc::DigitExport;
-
 
 //创建数据库表。导入默认数据等操作
 pub fn init_wallet_database() -> WalletResult<()> {
@@ -24,7 +22,6 @@ pub fn init_wallet_database() -> WalletResult<()> {
         }
     }
 }
-
 
 
 #[test]

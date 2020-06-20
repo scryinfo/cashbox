@@ -251,7 +251,6 @@ pub trait Crypto {
             "aes-256-ctr" => aes::EncryptMethod::Aes256Ctr,
             _ => aes::EncryptMethod::Aes256Ctr,//默认使用这种方式加密
         };
-        //TODO 针对解密出现的异常还需要进一步的处理
         let mnemonic_content = aes::decrypt(cipher_method, ciphertext.as_slice(), key.as_slice(), iv.as_slice());
         match mnemonic_content {
             Ok(mnemonic_content) => Ok(mnemonic_content),

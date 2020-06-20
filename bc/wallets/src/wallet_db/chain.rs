@@ -164,7 +164,7 @@ impl DataServiceProvider {
         let mut stat = self.db_hander.prepare(insert_sql)?;
         stat.bind(1, tx_detail.hash.as_ref().unwrap().as_str())?;//交易hash
         stat.bind(2, blockhash)?;//区块hash
-        stat.bind(3, 3 as i64)?;//todo 链id 需要灵活调整
+        stat.bind(3, 3 as i64)?;// 链id需要灵活调整
         stat.bind(4, tx_detail.index.unwrap() as i64)?;
         stat.bind(5, tx_detail.from.as_ref().unwrap().as_str())?;//交易发起账户
         stat.bind(6, tx_detail.to.as_ref().unwrap().as_str())?;//交易接收账户
@@ -181,7 +181,7 @@ impl DataServiceProvider {
         let mut stat = self.db_hander.prepare(insert_sql)?;
         stat.bind(1, account)?;
         stat.bind(2, chain_type as i64)?;
-        stat.bind(3, block_num as i64)?;//todo 链id 需要灵活调整
+        stat.bind(3, block_num as i64)?;
         stat.bind(4, block_hash)?;
         stat.next().map(|_| ()).map_err(|err| err.into())
     }

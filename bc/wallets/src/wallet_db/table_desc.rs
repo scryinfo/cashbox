@@ -1,21 +1,3 @@
-
-/// Description of a Digit
-#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
-pub struct DigitExport {
-    pub address: String,
-
-    pub symbol: String,
-
-    pub decimal: i64,
-    #[serde(rename = "type")]
-    pub digit_type: String,
-
-    #[serde(rename = "urlImg")]
-    pub url_img: Option<String>,
-
-    pub short_name:Option<String>,
-}
-
 pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     let sql = r#"
     PRAGMA foreign_keys = 'off';
@@ -137,7 +119,6 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     PRAGMA foreign_keys = 'on';
     "#;
     sql
-    // String::from(sql)
 }
 
 pub fn get_cashbox_wallet_sql() -> &'static str {
@@ -160,5 +141,4 @@ pub fn get_cashbox_wallet_sql() -> &'static str {
         PRAGMA foreign_keys = 'on';
     "#;
     mnenonic_sql
-    //String::from(mnenonic_sql)
 }

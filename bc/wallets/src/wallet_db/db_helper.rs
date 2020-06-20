@@ -14,7 +14,6 @@ const TB_WALLET: &'static str = r#"cashbox_wallet.db"#;
 const TB_WALLET_DETAIL: &'static str = r#"cashbox_wallet_detail.db"#;
 
 fn create_teble(table_name: &str, table_desc: &str) -> WalletResult<()> {
-    // TODO 检查参数是否合理
     //先创建对应的文件路径
     if !path::Path::new(table_name).exists() {
         fs::File::create(table_name)?;

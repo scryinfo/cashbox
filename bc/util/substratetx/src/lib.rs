@@ -88,7 +88,6 @@ pub fn event_decode(event_data:&str,_blockhash:&str,_account:&str)->HashMap<u32,
 }
 pub fn decode_extrinsics(extrinsics_json:&str,target_account:&str)->Result<HashMap<u32,TransferDetail>,error::Error>{
     let target_account = AccountId::from_ss58check(target_account)?;
-    //todo 增加对错误的处理
     let json_data:Vec<String>   = serde_json::from_str(extrinsics_json)?;
     let mut map = HashMap::new();
     for index in 0..json_data.len() {

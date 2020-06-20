@@ -5,37 +5,20 @@ use substratetx::Crypto;
 use std::collections::HashMap;
 use ethereum_types::{H160, U256, H256};
 
+//后续修改名称为ScryX?
 // 转EEE链代币
 pub fn eee_transfer(from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, psw: &[u8]) -> WalletResult<String> {
-    match module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE) {
-        Ok(keystore) => {
-            //todo 使用优化的错误返回方式
-            match substratetx::Sr25519::get_mnemonic_context(&keystore, psw) {
-                Ok(mnemonic) => {
-                    //密码验证通过
-                    let mn = String::from_utf8(mnemonic)?;
-                    let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap())?;
-                    let mut genesis_h256 = [0u8; 32];
-                    genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
-
-                    let signed_data = substratetx::transfer(&mn, to, amount, H256(genesis_h256), index, runtime_version);
-                    match signed_data {
-                        Ok(data) => {
-                            log::debug!("signed data is: {}", data);
-                            Ok(data)
-                        }
-                        Err(msg) => {
-                            Err(msg.into())
-                        }
-                    }
-                }
-                Err(msg) => Err(msg.into()),
-            }
-        }
-        Err(msg) => { Err(msg.into()) }
-    }
+    let keystore = module::wallet::find_keystore_wallet_from_address(from, ChainType::EEE)?;
+    let mnemonic = substratetx::Sr25519::get_mnemonic_context(&keystore, psw)?;
+    //密码验证通过
+    let mn = String::from_utf8(mnemonic)?;
+    let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap())?;
+    let mut genesis_h256 = [0u8; 32];
+    genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
+    let signed_data = substratetx::transfer(&mn, to, amount, H256(genesis_h256), index, runtime_version)?;
+    log::debug!("signed data is: {}", signed_data);
+    Ok(signed_data)
 }
-
 
 ///ETH交易签名
 /// from_account: 转出账户
@@ -48,7 +31,6 @@ pub fn eee_transfer(from: &str, to: &str, amount: &str, genesis_hash: &str, inde
 /// data 备注消息（当交易确认后，能够在区块上查看到）
 /// chain_id: ETH的链类型
 pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> WalletResult<String> {
-
     let data = match data {
         Some(data) => data.as_bytes().to_vec(),
         None => vec![]
@@ -62,7 +44,7 @@ pub fn eth_raw_transfer_sign(from_address: &str, to_address: Option<H160>, amoun
         data,
     };
 
-    eth_tx_sign(from_address,psw,rawtx,eth_chain_id)
+    eth_tx_sign(from_address, psw, rawtx, eth_chain_id)
 }
 
 ///ETH ERC20 转账交易签名  当前钱包针对ERC20只提供转账功能
@@ -95,9 +77,10 @@ pub fn eth_raw_erc20_transfer_sign(from_address: &str, contract_address: H160, t
         gas: gas_limit,
         data: encode_data,
     };
-    eth_tx_sign(from_address,psw,rawtx,eth_chain_id)
+    eth_tx_sign(from_address, psw, rawtx, eth_chain_id)
 }
- fn eth_tx_sign(from_address: &str,psw: &[u8], raw_transaction:ethtx::RawTransaction, eth_chain_id: u64)->WalletResult<String>{
+
+fn eth_tx_sign(from_address: &str, psw: &[u8], raw_transaction: ethtx::RawTransaction, eth_chain_id: u64) -> WalletResult<String> {
     //由于在开发过程中会使用开发链做测试，当前钱包没有生成开发模式下的链地址，默认使用测试模式
     let chain_type = if eth_chain_id == 1 {
         ChainType::ETH

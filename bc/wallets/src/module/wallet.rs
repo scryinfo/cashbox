@@ -67,7 +67,6 @@ pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
     Ok(target)
 }
 
-//todo 优化返回结果
 pub fn is_contain_wallet() -> Result<Vec<TbWallet>, String> {
     match wallet_db::DataServiceProvider::instance() {
         Ok(provider) => {
@@ -92,7 +91,7 @@ pub fn set_current_wallet(walletid: &str) -> WalletResult<()> {
     instance.tx_begin()?;
     instance.set_selected_wallet(walletid)
         .and_then(|_| instance.tx_commint())
-        .map_err(|error|{
+        .map_err(|error| {
             instance.tx_rollback();
             error.into()
         })
@@ -101,14 +100,14 @@ pub fn set_current_wallet(walletid: &str) -> WalletResult<()> {
 pub fn del_wallet(walletid: &str, psd: &[u8]) -> WalletResult<()> {
     let provider = wallet_db::DataServiceProvider::instance()?;
     //查询出对应id的助记词
-    provider.query_by_wallet_id(walletid).ok_or_else(||WalletError::NotExist)
-        .and_then(|mn|substratetx::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), psd).map_err(|e|e.into()))
-        .and_then(|_data|   provider.tx_begin())
-        .and_then(|()|{
+    provider.query_by_wallet_id(walletid).ok_or_else(|| WalletError::NotExist)
+        .and_then(|mn| substratetx::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), psd).map_err(|e| e.into()))
+        .and_then(|_data| provider.tx_begin())
+        .and_then(|()| {
             provider.del_mnemonic(walletid)
         })
         .and_then(|_| provider.tx_commint())
-        .map_err(|err|{
+        .map_err(|err| {
             let _ = provider.tx_rollback();
             //返回以上任意一个链式调用发生的错误
             err
@@ -123,7 +122,7 @@ pub fn rename_wallet(walletid: &str, wallet_name: &str) -> WalletResult<bool> {
 //根据生成钱包的类型，需要创建对应的地址
 pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> WalletResult<Address> {
     let phrase = String::from_utf8(mn.to_vec())?;
-    // TODO 这个地方 根据支持链的种类 分别生成对应的地址
+
     match wallet_type {
         ChainType::EEE | ChainType::EeeTest => {
             let seed = substratetx::Sr25519::seed_from_phrase(&phrase, None).unwrap();
@@ -138,7 +137,7 @@ pub fn address_from_mnemonic(mn: &[u8], wallet_type: ChainType) -> WalletResult<
             Ok(address)
         }
         ChainType::ETH | ChainType::EthTest => {
-            //todo 错误处理
+
             let secret_byte = ethtx::pri_from_mnemonic(&phrase, None)?;
             let context = Secp256k1::new();
             let secret = SecretKey::from_slice(&secret_byte)?;
@@ -172,8 +171,8 @@ pub fn find_keystore_wallet_from_address(address: &str, chain_type: ChainType) -
 
 pub fn crate_mnemonic(num: u8) -> Mnemonic {
     let mnemonic = substratetx::Sr25519::generate_phrase(num);
-   /* let mn_id_hash = mnemonic.as_bytes().keccak256();
-    let mnemonic_id = mn_id_hash.keccak256();*/
+    /* let mn_id_hash = mnemonic.as_bytes().keccak256();
+     let mnemonic_id = mn_id_hash.keccak256();*/
     Mnemonic {
         status: StatusCode::OK,
         mn: mnemonic.as_bytes().to_vec(),
@@ -286,7 +285,7 @@ pub fn create_wallet(wallet_name: &str, mn: &[u8], password: &[u8], wallet_type:
                 ..Default::default()
             }
         }).map_err(|err| {
-        let _ =  dbhelper.tx_rollback();
+        let _ = dbhelper.tx_rollback();
         err
     })
 }
@@ -310,7 +309,6 @@ fn mnemonic_psd_update(wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> Wal
 }
 
 pub fn reset_mnemonic_pwd(mn_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> WalletResult<StatusCode> {
-    // TODO 检查密码规则是否满足要求
     let provider = wallet_db::DataServiceProvider::instance()?;
     //查询出对应id的助记词
     if let Some(mn) = provider.query_by_wallet_id(mn_id) {
@@ -331,19 +329,13 @@ struct RawTx {
 
 // 这个函数用于外部拼接好的交易，比如通过js方式构造的交易
 pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
-    //todo 交易构造接口重构
     let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
     let tx_encode_data = hex::decode(raw_tx)?;
-    // TODO 这个地方需要使用大小端编码？
     let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
     let mnemonic = module::wallet::export_mnemonic(wallet_id, psw)?;
     let mn = String::from_utf8(mnemonic.mn)?;
     let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
-    // let mut_data = &tx.func_data[..];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
-    /*let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &mut_data[..])?;
-    let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, extrinsic.function,tx.version)?;*/
     let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, mut_data, tx.version)?;
-    // TODO 返回签名后的消息格式需要确定
     Ok(sign_data)
 }
 
@@ -351,11 +343,9 @@ pub fn raw_tx_sign(raw_tx: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<St
 pub fn raw_sign(raw_data: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
     let raw_data = raw_data.get(2..).unwrap();// remove `0x`
     let tx_encode_data = hex::decode(raw_data)?;
-    // TODO 这个地方需要使用大小端编码？
     let mnemonic = module::wallet::export_mnemonic(wallet_id, psw)?;
     let mn = String::from_utf8(mnemonic.mn)?;
     let sign_data = substratetx::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();
-    // TODO 返回签名后的消息格式需要确定
     let hex_data = format!("0x{}", hex::encode(&sign_data[..]));
     Ok(hex_data)
 }
