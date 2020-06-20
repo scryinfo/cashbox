@@ -14,11 +14,41 @@ use secp256k1::{
 
 use substratetx::{Crypto, Keccak256};
 
+impl Wallet{
+    pub fn get_all(&self) -> WalletResult<Vec<Wallet>> {
+        let wallet_info_map = get_wallet_info();
+        let eee_obj = chain::EEE{};
+        let eee_data = eee_obj.get_chain_data()?;
+        let eth_obj = chain::Ethereum{};
+        let eth_data =   eth_obj.get_chain_data()?;
+        let btc_obj = chain::Bitcoin{};
+        let btc_data = btc_obj.get_chain_data()?;
+        let mut target = vec![];
+
+        for (wallet_id, wallet) in wallet_info_map {
+            let wallet_obj = Wallet {
+                status: wallet.status.clone(),
+                wallet_id: wallet_id.clone(),
+                wallet_name: wallet.wallet_name.clone(),
+                wallet_type: wallet.wallet_type.clone(),
+                display_chain_id: wallet.display_chain_id,
+                selected: wallet.selected,
+                create_time: wallet.create_time,
+                eee_chain: eee_data.get(&wallet_id).map(|data| data[0].clone()),//当出现Some这种情况，表示肯定存在值且vec len 不为0
+                eth_chain: eth_data.get(&wallet_id).map(|data| data[0].clone()),
+                btc_chain: btc_data.get(&wallet_id).map(|data| data[0].clone()),
+            };
+            target.push(wallet_obj);
+        }
+        Ok(target)
+    }
+}
+
 /// Wallet 结构说明：
 ///  一个助记词 对应的是一个钱包，在cashbox钱包软件中 可以同时管理多个钱包；
 /// 一个助记词 可以同时应用于多条链；
 ///  一条链，在基于链的应用上，存在多个合约地址的可能
-
+//struct Wallet{}
 fn get_wallet_info() -> HashMap<String, Wallet> {
     let instance = wallet_db::DataServiceProvider::instance().unwrap();
     let mn = instance.get_wallets();
@@ -41,7 +71,7 @@ fn get_wallet_info() -> HashMap<String, Wallet> {
 
 
 //query all 满足条件的助记词（wallet）
-pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
+/*pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
     let wallet_info_map = get_wallet_info();
     let eee_obj = chain::EEE{};
     let eee_data = eee_obj.get_chain_data()?;
@@ -67,7 +97,7 @@ pub fn get_all_wallet() -> WalletResult<Vec<Wallet>> {
         target.push(wallet_obj);
     }
     Ok(target)
-}
+}*/
 
 pub fn is_contain_wallet() -> Result<Vec<TbWallet>, String> {
     match wallet_db::DataServiceProvider::instance() {
