@@ -7,22 +7,22 @@
 - [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
 flutter官方启动教程如下：
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), 包含教程、示例、移动端开发的说明和api相关。
+
+- [online documentation](https://flutter.dev/docs) 包含教程、示例、移动端开发的说明和api相关。
 
 
 cashbox目录结构说明：
  主要分为三个目录:
-    1、app --- 用flutter开发钱包的主体功能代码。
-    2、bc --- 提供生成动态库。 可以提供加密、解密、私钥生成、保存等底层独立的安全的相关功能。
-    3、packages --- 功能插件，帮助扩展app处的功能，如提供钱包管理功能，webview功能。
+- [1、app --- 用flutter开发钱包的主体功能代码。]
+- [2、bc --- 提供生成动态库。 可以提供加密、解密、私钥生成、保存等底层独立的安全的相关功能。]
+- [3、packages --- 功能插件，帮助扩展app处的功能，如提供钱包管理功能，webview功能。]
 
 ---目录app之下，项目结构说明------------------------------
-    android： android部分代码实现。创建flutter项目时，会自动生成这部分。
-    ios：ios部分代码实现。创建flutter项目时，会自动生成这部分。
-    res： 多语言字段配置文件。由插件flutter_localizations生成。
-    test： 测试代码部分。
-    lib目录下，结构说明：
+- [ android： android部分代码实现。创建flutter项目时，会自动生成这部分。]
+- [ ios：ios部分代码实现。创建flutter项目时，会自动生成这部分。]
+- [ res： 多语言字段配置文件。由插件flutter_localizations生成。]
+- [ test： 测试代码部分。]
+- [ lib目录下，结构说明：]
         ---demo        功能调研测试代码
         ---generated   多语言插件，对应生成dart文件
         ---model       数据结构层
