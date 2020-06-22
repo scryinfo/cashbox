@@ -25,7 +25,7 @@
 -  res： 多语言字段配置文件。由插件flutter_localizations生成。
 -  test： 测试代码部分。
 -  lib目录下，结构说明：
-        ---demo        功能调研测试代码
+--        ---demo        功能调研测试代码
         ---generated   多语言插件，对应生成dart文件
         ---model       数据结构层
         ---net         网络访问工具
