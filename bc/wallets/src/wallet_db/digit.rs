@@ -2,7 +2,7 @@ use super::*;
 use sqlite::{State, Statement};
 
 impl DataServiceProvider {
-     fn change_visible(&self, walletid: &str, chainid: i64, digitid: &str, is_visible_flag: i64) -> WalletResult<bool> {
+    fn change_visible(&self, walletid: &str, chainid: i64, digitid: &str, is_visible_flag: i64) -> WalletResult<bool> {
         let show_digit_sql = "UPDATE detail.DigitUseDetail set is_visible = ? WHERE digit_id = ? and address_id = ( select address_id from detail.Address WHERE wallet_id=? and chain_id=?);";
         let mut show_digit_state = self.db_hander.prepare(show_digit_sql)?;
         show_digit_state.bind(1, is_visible_flag)?;
@@ -12,11 +12,11 @@ impl DataServiceProvider {
         show_digit_state.next().map(|_| true).map_err(|e| e.into())
     }
     pub fn show_digit(&self, walletid: &str, chainid: i64, digitid: &str) -> WalletResult<bool> {
-         self.change_visible(walletid, chainid, digitid, 1)
+        self.change_visible(walletid, chainid, digitid, 1)
     }
 
     pub fn hide_digit(&self, walletid: &str, chainid: i64, digitid: &str) -> WalletResult<bool> {
-         self.change_visible(walletid, chainid, digitid, 0)
+        self.change_visible(walletid, chainid, digitid, 0)
     }
 
     pub fn update_digit_balance(self, address: &str, digit_id: &str, value: &str) -> WalletResult<bool> {
@@ -37,13 +37,13 @@ impl DataServiceProvider {
             } else {
                 insert_basic_statement.bind(1, uuid::Uuid::new_v4().to_string().as_str())?;
             }
-            insert_basic_statement.bind(2, digit.contract_address.unwrap_or_else(||"".to_string()).as_str())?;
+            insert_basic_statement.bind(2, digit.contract_address.unwrap_or_else(|| "".to_string()).as_str())?;
             //代币类型 是正式连还是测试链
             insert_basic_statement.bind(3, self.is_main_chain(&digit.chain_type))?;
-            insert_basic_statement.bind(4, digit.group_name.unwrap_or_else(||"ETH".to_string()).as_str())?;
+            insert_basic_statement.bind(4, digit.group_name.unwrap_or_else(|| "ETH".to_string()).as_str())?;
             insert_basic_statement.bind(5, digit.short_name.as_str())?;
             insert_basic_statement.bind(6, digit.full_name.as_str())?;
-            insert_basic_statement.bind(7, digit.img_url.unwrap_or_else(||"".to_string()).as_str())?;
+            insert_basic_statement.bind(7, digit.img_url.unwrap_or_else(|| "".to_string()).as_str())?;
             insert_basic_statement.bind(8, digit.decimal.as_str().parse::<i64>().unwrap_or(18))?;
             insert_basic_statement.bind(9, digit.is_basic.unwrap_or(false) as i64)?;//最基础的代币（链上代币）
             insert_basic_statement.bind(10, digit.is_default.unwrap_or(true) as i64)?;//设置增加的代币 是否为默认代币
@@ -96,13 +96,13 @@ impl DataServiceProvider {
             update_digit_statement.bind(1, id.as_str())?;
             update_digit_statement.bind(2, self.chain_name_to_chain_number(digit.chain_type.as_str()))?;
             update_digit_statement.bind(3, digit.contract.as_str())?;
-            update_digit_statement.bind(4, digit.accept_id.unwrap_or_else(||"".to_string()).as_str())?;
+            update_digit_statement.bind(4, digit.accept_id.unwrap_or_else(|| "".to_string()).as_str())?;
             update_digit_statement.bind(5, digit.symbol.as_str())?;
             update_digit_statement.bind(6, digit.name.as_str())?;
-            update_digit_statement.bind(7, digit.publisher.unwrap_or_else(||"".to_string()).as_str())?;
-            update_digit_statement.bind(8, digit.project.unwrap_or_else(||"".to_string()).as_str())?;
+            update_digit_statement.bind(7, digit.publisher.unwrap_or_else(|| "".to_string()).as_str())?;
+            update_digit_statement.bind(8, digit.project.unwrap_or_else(|| "".to_string()).as_str())?;
             update_digit_statement.bind(9, digit.logo_url.as_str())?;
-            update_digit_statement.bind(10, digit.logo_bytes.unwrap_or_else(||"".to_string()).as_str())?;//需要前端传过来的为bytes格式
+            update_digit_statement.bind(10, digit.logo_bytes.unwrap_or_else(|| "".to_string()).as_str())?;//需要前端传过来的为bytes格式
             update_digit_statement.bind(11, digit.decimal.as_str().parse::<i64>().unwrap_or(18))?;
             update_digit_statement.bind(12, digit.gas_limit.unwrap_or(0))?;
             update_digit_statement.bind(13, is_auth as i64)?;

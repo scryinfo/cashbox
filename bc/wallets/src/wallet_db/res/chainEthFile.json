@@ -4,13 +4,13 @@
     "symbol": "DDD",
     "decimal": 18,
     "type": "default",
-    "urlImg":"locale://ic_ddd.png"
+    "urlImg": "locale://ic_ddd.png"
   },
   {
     "address": "0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e",
     "symbol": "DDD",
     "decimal": 18,
     "type": "test",
-    "urlImg":"locale://ic_ddd.png"
+    "urlImg": "locale://ic_ddd.png"
   }
 ]

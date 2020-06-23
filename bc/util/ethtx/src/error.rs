@@ -38,9 +38,9 @@ impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         use self::Error::*;
         match *self {
-            Unreachable | Decoder(_) | InvalidResponse(_) | Transport(_) | Internal|Other(_) => None,
+            Unreachable | Decoder(_) | InvalidResponse(_) | Transport(_) | Internal | Other(_) => None,
             Io(ref e) => Some(e),
-            Secp256k1(ref e)=>Some(e),
+            Secp256k1(ref e) => Some(e),
         }
     }
 }
@@ -51,18 +51,19 @@ impl From<SerdeError> for Error {
     }
 }
 
-impl  From<ethabi::Error> for Error{
+impl From<ethabi::Error> for Error {
     fn from(err: ethabi::Error) -> Self {
         Error::Decoder(format!("{:?}", err))
     }
 }
 
-impl From<hex::FromHexError> for Error{
+impl From<hex::FromHexError> for Error {
     fn from(err: hex::FromHexError) -> Self {
         Error::Decoder(format!("{:?}", err))
     }
 }
-impl From<std::string::FromUtf8Error> for Error{
+
+impl From<std::string::FromUtf8Error> for Error {
     fn from(err: std::string::FromUtf8Error) -> Self {
         Error::Decoder(format!("{:?}", err))
     }
@@ -73,8 +74,9 @@ impl From<tiny_hderive::Error> for Error {
         Error::Other(format!("{:?}", err))
     }
 }
-impl From<failure::Error> for Error{
-    fn from(err: failure::Error)->Self{
+
+impl From<failure::Error> for Error {
+    fn from(err: failure::Error) -> Self {
         Error::Other(format!("{:?}", err))
     }
 }
@@ -90,7 +92,7 @@ impl Clone for Error {
             Io(e) => Io(IoError::from(e.kind())),
             Secp256k1(e) => Secp256k1(*e),
             Internal => Internal,
-            Other(s)=>Other(s.clone()),
+            Other(s) => Other(s.clone()),
         }
     }
 }

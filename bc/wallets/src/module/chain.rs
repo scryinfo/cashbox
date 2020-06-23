@@ -14,7 +14,7 @@ struct RawTx {
     version: u32,
 }
 
-//后续修改名称为ScryX?
+//后续修改名称为ScryX?,当前开源版本还不支持该模块的功能调用
 pub struct EEE;
 
 impl Chain for EEE {}
@@ -160,7 +160,7 @@ impl Ethereum {
     /// data 备注消息（当交易确认后，能够在区块上查看到）
     /// chain_id: ETH的链类型
     pub fn raw_transfer_sign(&self, from_address: &str, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> WalletResult<String> {
-   // pub fn raw_transfer_sign(&self, from_address: &str, raw_tx:RawTransaction, psw: &[u8], eth_chain_id: u64) -> WalletResult<String> {
+        // pub fn raw_transfer_sign(&self, from_address: &str, raw_tx:RawTransaction, psw: &[u8], eth_chain_id: u64) -> WalletResult<String> {
         let data = match data {
             Some(data) => data.as_bytes().to_vec(),
             None => vec![]
@@ -287,6 +287,7 @@ impl Ethereum {
     }
 }
 
+//bitcoin 相关功能还未集成进来
 pub struct Bitcoin;
 
 impl Chain for Bitcoin {}

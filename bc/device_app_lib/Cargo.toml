@@ -9,9 +9,9 @@ build = "build.rs"
 [lib]
 path="src/lib.rs"
 name="wallet"
-#crate-type = ["staticlib"]
+
 crate-type = ["cdylib"]
-#crate-type = ["dylib"]
+
 
 [dependencies]
 wallets={path="../wallets"}

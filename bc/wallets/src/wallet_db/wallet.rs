@@ -93,7 +93,7 @@ impl DataServiceProvider {
     //返回满足条件的钱包信息，该函数只返回一个元素
     fn query_wallet(&self, statement: &mut Statement) -> WalletResult<TbWallet> {
         let wallets = self.get_wallets_from_database(statement);
-        if !wallets.is_empty(){
+        if !wallets.is_empty() {
             Ok(wallets[0].clone())
         } else {
             Err(WalletError::NotExist)

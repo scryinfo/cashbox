@@ -1,5 +1,5 @@
 pub fn get_cashbox_wallet_detail_sql() -> &'static str {
-  r#"
+    r#"
     PRAGMA foreign_keys = 'off';
     BEGIN;
     DROP TABLE IF EXISTS [main].[Address];
@@ -127,7 +127,7 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
 }
 
 pub fn get_cashbox_wallet_sql() -> &'static str {
-   r#"
+    r#"
         PRAGMA foreign_keys = 'off';
         BEGIN;
         DROP TABLE IF EXISTS [main].[Wallet];

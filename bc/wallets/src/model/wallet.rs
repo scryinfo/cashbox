@@ -15,12 +15,12 @@ pub struct Mnemonic {
 pub struct Wallet {
     pub status: StatusCode,
     pub wallet_id: String,
-    pub wallet_type:i64,
+    pub wallet_type: i64,
     //这个值不会存在Null 的情况
     pub wallet_name: Option<String>,
-    pub display_chain_id:i64,
-    pub selected:bool,
-    pub create_time:String,
+    pub display_chain_id: i64,
+    pub selected: bool,
+    pub create_time: String,
     pub eee_chain: Option<EeeChain>,
     pub eth_chain: Option<EthChain>,
     pub btc_chain: Option<BtcChain>,
@@ -28,7 +28,7 @@ pub struct Wallet {
 
 impl fmt::Debug for Wallet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Wallet {{ status: {}, wallet_id: {},wallet_type:{},wallet_name:{:?} }}", self.status.clone() as u32, self.wallet_id,self.wallet_type,self.wallet_name)
+        write!(f, "Wallet {{ status: {}, wallet_id: {},wallet_type:{},wallet_name:{:?} }}", self.status.clone() as u32, self.wallet_id, self.wallet_type, self.wallet_name)
     }
 }
 

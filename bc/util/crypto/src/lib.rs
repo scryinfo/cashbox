@@ -13,7 +13,7 @@ pub mod aes {
     //选用指定的加密方式，为传入的数据使用对称方式加密
     pub fn encrypt(medthod: EncryptMethod, data: &[u8], key: &[u8], iv: &[u8]) -> Result<Vec<u8>, String> {
         let mut encryptor = match medthod {
-            EncryptMethod::Aes128Ctr => aes::ctr(aes::KeySize::KeySize128,&key[0..16], iv),
+            EncryptMethod::Aes128Ctr => aes::ctr(aes::KeySize::KeySize128, &key[0..16], iv),
             EncryptMethod::Aes256Ctr => aes::ctr(aes::KeySize::KeySize256, key, iv),
         };
         let mut final_result = Vec::<u8>::new();
@@ -45,7 +45,7 @@ pub mod aes {
                    encrypted_data: &[u8],
                    key: &[u8],
                    iv: &[u8],
-    ) -> Result<Vec<u8>,String> {
+    ) -> Result<Vec<u8>, String> {
         let mut decryptor = match medthod {
             EncryptMethod::Aes128Ctr => aes::ctr(aes::KeySize::KeySize128, &key[0..16], iv),
             EncryptMethod::Aes256Ctr => aes::ctr(aes::KeySize::KeySize256, key, iv),
@@ -55,7 +55,7 @@ pub mod aes {
         let mut buffer = [0; 4096];
         let mut write_buffer = buffer::RefWriteBuffer::new(&mut buffer);
         loop {
-            let result =  decryptor
+            let result = decryptor
                 .decrypt(&mut read_buffer, &mut write_buffer, true).unwrap();
             final_result.extend(
                 write_buffer

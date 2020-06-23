@@ -35,7 +35,6 @@ impl Wallet {
         Ok(target)
     }
 
-
     pub fn crate_mnemonic(&self, num: u8) -> Mnemonic {
         let mnemonic = substratetx::Sr25519::generate_phrase(num);
         Mnemonic {
@@ -184,7 +183,6 @@ impl Wallet {
         let context = substratetx::Sr25519::get_mnemonic_context(mnemonic.as_str(), old_psd)?;
         //使用新的密码进行加密
         let new_encrypt_mn = substratetx::Sr25519::encrypt_mnemonic(&context[..], new_psd);
-
         //构造需要升级的助记词对象，先只修改指定的字段，后续再根据需求完善
         let wallet_update = TbWallet {
             wallet_id: wallet.wallet_id.clone(),
@@ -262,10 +260,10 @@ impl Wallet {
         }
     }
 
-    /// Wallet 结构说明：
-///  一个助记词 对应的是一个钱包，在cashbox钱包软件中 可以同时管理多个钱包；
-/// 一个助记词 可以同时应用于多条链；
-///  一条链，在基于链的应用上，存在多个合约地址的可能
+    // Wallet 结构说明：
+    //  一个助记词 对应的是一个钱包，在cashbox钱包软件中 可以同时管理多个钱包；
+    // 一个助记词 可以同时应用于多条链；
+    //  一条链，在基于链的应用上，存在多个合约地址的可能
     fn get_wallet_info(&self) -> HashMap<String, Wallet> {
         let instance = wallet_db::DataServiceProvider::instance().unwrap();
         let mn = instance.get_wallets();

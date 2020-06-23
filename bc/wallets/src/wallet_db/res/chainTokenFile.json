@@ -5,7 +5,7 @@
     "group_name": "EEE",
     "decimal": "12",
     "chainType": "default",
-    "urlImg":"",
+    "urlImg": "",
     "is_basic": true
   },
   {
@@ -14,7 +14,7 @@
     "group_name": "EEE",
     "decimal": "12",
     "chainType": "test",
-    "urlImg":"",
+    "urlImg": "",
     "is_basic": true
   },
   {
