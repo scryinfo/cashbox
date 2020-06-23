@@ -384,9 +384,6 @@ public class NativeLib {
     //获取拼装原始交易，区分链类型
     //返回：未签名的交易 String, 格式为json格式
     //第一个参数为 eeeOpen 的返回值
-    //具体的参数格式，需要与Jermy一起确定
-    //msg: 交易 
-    // TODO: 2019/8/17  交易方式待确定，待确定：哪边来做监听交易状态。 目前链转账模块不支持备注填写，若后续需要支持备注功能，将会重新编写转账模块，
     //  增加新的接口，不会影响老版本APP的使用
     // 关于eee相关的数据获取，交易提取，全部由客户端来操作，底层不对网络进行操作；
     // 底层直接构造一个签名好的转账交易，通过Message字段中signedInfo属性传回可以直接提交的到链的信息
@@ -469,7 +466,6 @@ public class NativeLib {
                                                   String backupMsg, String gasLimit, String gasPrice);
 
     //ERC20 交易拼装。    返回：未签名的交易 String
-    // nonce记录位置？？？
     public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String contractAddress, String toAddress,
                                                     String value, String backupMsg, String gasLimit, String gasPrice);
 
