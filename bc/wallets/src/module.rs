@@ -11,13 +11,15 @@ pub use chain::{Chain,Ethereum,EEE,Bitcoin};
 fn create_wallet_test() {
     let mnemonic = "swarm grace knock race flip unveil pyramid reveal shoot vehicle renew axis";
     wallet_db::init_wallet_database();
-    let wallet = wallet::create_wallet("wallet test", mnemonic.as_bytes(), "123456".as_bytes(), 1);
+    let wallet = model::Wallet::default();
+    let wallet = wallet.create_wallet("wallet test", mnemonic.as_bytes(), "123456".as_bytes(), 1);
     println!("{:?}", wallet);
 }
 
 #[test]
 fn load_wallet_test(){
-    let wallets =wallet::get_all_wallet();
+    let wallet = model::Wallet::default();
+    let wallets =wallet.get_all();
     println!("load wallet:{:?}", wallets);
 }
 

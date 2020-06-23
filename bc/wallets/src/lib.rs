@@ -16,12 +16,10 @@ pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
 #[derive(PartialEq, Clone)]
 pub enum StatusCode {
-    DylibError = -1,
-    OK = 200,
-    //正常
-    FailToGenerateMnemonic = 100,
-    //生成助记词失败
-    PwdIsWrong,
+    DylibError = -1,//由于外部输入参数造成的错误
+    OK = 200,//正常
+    FailToGenerateMnemonic = 100,//生成助记词失败
+    PwdIsWrong,//密码错误
 }
 
 impl Default for StatusCode {
@@ -82,8 +80,14 @@ mod tests {
 
     #[test]
     fn func_sign_test() {
+        //初始化数据库
+        wallet_db::init_wallet_database();
+        //创建钱包实例
+        let wallet_instance = model::Wallet::default();
+        let mnemonic = wallet_instance.crate_mnemonic(15);
         let rawtx = "0xac040600ff0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea300b0040e59c301200000000979d3bb306ed9fbd5d6ae1eade033b81ae12a5c5d5aa32781153579d7f6d5504ed000000";
-        match module::wallet::raw_tx_sign(rawtx, "9328ebd6-c205-439d-a016-ebe6ab1e5408", "123456".as_bytes()) {
+        let eee = module::EEE{};
+        match eee.raw_tx_sign(rawtx, "9328ebd6-c205-439d-a016-ebe6ab1e5408", "123456".as_bytes()) {
             Ok(signed_data) => println!("tx sign result {}", signed_data),
             Err(e) => println!("{}", e.to_string()),
         }
@@ -109,18 +113,5 @@ mod tests {
             }
             Err(err) => println!("{}", err)
         }
-    }
-
-    #[test]
-    fn generate_address_from_mnemonic_test() {
-        let mnemonic = "cost impact napkin never sword civil shell tank sibling steel certain valve";
-        let address = module::wallet::address_from_mnemonic(mnemonic.as_bytes(), ChainType::ETH);
-        assert_eq!("0x2f96570cf17258de7562b91c0ddd1ee7b95542ef", address.unwrap().addr);
-    }
-
-    #[test]
-    fn hash_test() {
-        let value = b"hello test";
-        assert_eq!([170, 115, 193, 218, 74, 30, 249, 68, 140, 137, 187, 52, 75, 195, 104, 186, 126, 177, 145, 42, 1, 235, 111, 78, 77, 249, 217, 64, 177, 207, 44, 170], (&value[..]).keccak256());
     }
 }

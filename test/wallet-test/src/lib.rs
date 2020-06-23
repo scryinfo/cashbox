@@ -5,12 +5,3 @@ use jni::JNIEnv;
 pub mod wallet;
 pub mod chain;
 pub mod digit;
-pub mod substrate;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}

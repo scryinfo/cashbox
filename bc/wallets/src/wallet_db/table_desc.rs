@@ -11,7 +11,8 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     [puk_key] VARCHAR(128) NOT NULL,
     [status] INT NOT NULL  DEFAULT 1,
     [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
-    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')));
+    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now'))
+    );
 
     DROP TABLE IF EXISTS [main].[Chain];
     CREATE TABLE [main].[Chain](
@@ -25,8 +26,8 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     [selected] VARCHAR(1) NOT NULL DEFAULT 1,
     [status] INT NOT NULL  DEFAULT 1,
     [more_property] VARCHAR(1),
-    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [update_time] timestamp);
+    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now'))
+    );
 
    DROP TABLE IF EXISTS [main].[DefaultDigitBase];
     CREATE TABLE [main].[DefaultDigitBase](
@@ -44,8 +45,9 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
 	[is_basic] VARCHAR(1) NOT NULL  DEFAULT 0,
 	[is_default] VARCHAR(1) NOT NULL  DEFAULT 0,
     [status] INT NOT NULL  DEFAULT 0,
-    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [UPDATED_TIME] timestamp);
+    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now'))
+    );
+
 
     DROP TABLE IF EXISTS [main].[DigitUseDetail];
     CREATE TABLE [main].[DigitUseDetail](
@@ -55,7 +57,7 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
     [status] INT NOT NULL DEFAULT 1,
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [UPDATED_TIME] timestamp,
+    [UPDATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
 	primary key(digit_id,address_id));
 
     DROP TABLE IF EXISTS [main].[DigitBase];
@@ -77,7 +79,7 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
         [is_auth]    VARCHAR (1) NOT NULL DEFAULT 0,
         [is_visible]    VARCHAR (1) NOT NULL DEFAULT 1,
         [CREATED_TIME]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
-        [UPDATED_TIME]  timestamp,
+        [UPDATED_TIME]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
         [version]       INT,
         PRIMARY KEY(`id`)
 );
@@ -107,6 +109,10 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     [update_time] timestamp NOT NULL DEFAULT (strftime('%s','now'))
 );
 
+     create trigger update_digit_detail_trigger after update on DigitUseDetail
+      begin
+        update DigitUseDetail set UPDATED_TIME = strftime('%s','now') where digit_id = new.digit_id and address_id = new.address_id ;
+      end;
 
     insert into Chain(id,short_name,full_name,type,domain,selected) Values(1,'BTC',"bitcoin",1,"",0);
     insert into Chain(id,short_name,full_name,type,domain,selected) Values(2,'BTC TEST',"bitcoin test",2,"",0);
@@ -136,7 +142,12 @@ pub fn get_cashbox_wallet_sql() -> &'static str {
           [status] INT NOT NULL  DEFAULT 1,
           [display_chain_id] INT NOT NULL,
           [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-          [update_time] timestamp);
+          [update_time] timestamp NOT NULL DEFAULT (strftime('%s','now')));
+
+          create trigger update_time_trigger after update on Wallet
+          begin
+            update Wallet set update_time = strftime('%s','now') where wallet_id = new.wallet_id;
+          end;
         COMMIT;
         PRAGMA foreign_keys = 'on';
     "#;
