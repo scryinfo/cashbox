@@ -110,7 +110,7 @@ public class MainActivity extends FlutterActivity {
                         }
                 );
 
-        // TODO: 2019/8/19 parker     EventChannel test code
+        //  EventChannel test code
         //  native端，主动通知到 flutter
         new EventChannel(getFlutterView(), CHARGING_CHANNEL).setStreamHandler(
                 new EventChannel.StreamHandler() {
@@ -135,7 +135,6 @@ public class MainActivity extends FlutterActivity {
 
     private void checkAndUpgradeVersion(String loadUrl, String serverVersion) {
         ScryLog.v("begin to checkAndUpgradeVersion================>", loadUrl);
-        double nowVersion = getNowVersionCode(this);
         /*
             https://github.com/AlexLiuSheng/CheckVersionLib
             */
@@ -145,72 +144,6 @@ public class MainActivity extends FlutterActivity {
                         UIData.create().setTitle(getString(R.string.new_version_title)).setContent(getString(R.string.search_new_version) + serverVersion + getString(R.string.search_new_version_end)).setDownloadUrl(loadUrl)
                 )
                 .executeMission(MainActivity.this);
-        /*
-        String versionUrl = "http://192.168.1.3:8080/checkVersion"; //todo
-        String downloadUrl = "http://192.168.1.3:8080/downloadApk"; //todo
-        AllenVersionChecker
-                .getInstance()
-                .requestVersion()
-                .setRequestUrl(versionUrl)
-                .request(new RequestVersionListener() {
-                    @Nullable
-                    @Override
-                    public UIData onRequestVersionSuccess(DownloadBuilder downloadBuilder, String result) {
-                        downloadBuilder.setCustomDownloadingDialogListener(new CustomDownloadingDialogListener() {
-                            @Override
-                            public Dialog getCustomDownloadingDialog(Context context, int progress, UIData versionBundle) {
-                                BaseDialog baseDialog = new BaseDialog(context, R.style.BaseDialog, R.layout.custom_download_layout);
-                                return baseDialog;
-                            }
-
-                            @Override
-                            public void updateUI(Dialog dialog, int progress, UIData versionBundle) {
-                                TextView tvProgress = dialog.findViewById(R.id.tv_progress);
-                                ProgressBar progressBar = dialog.findViewById(R.id.pb);
-                                progressBar.setProgress(progress);
-                                tvProgress.setText(getString(R.string.versionchecklib_progress, progress));
-                            }
-                        });
-                        try {
-                            Gson gs = new Gson();
-                            AppVersionModel jsonObject = gs.fromJson(result, AppVersionModel.class);
-                            int statusCode = jsonObject.getCode(); //todo
-                            double serverVersion = jsonObject.getVersion();
-                            if (statusCode == AppVersionModel.Success) {
-                                if (serverVersion > nowVersion) {
-                                    //执行下载更新
-                                    ScryLog.v("begin to setDownloadUrl================>", downloadUrl);
-                                    return UIData.create().setTitle("新版本升级提示").setContent("检测到新版本：" + serverVersion + "，点击确认即可更新体验新版本特性")
-                                            .setDownloadUrl(downloadUrl);
-                                }
-                            } else {
-                                //todo 服务器没有正常返回 提示
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            ScryLog.v("JSONException e================>", e.toString());
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    public void onRequestVersionFailure(String message) {
-                        ScryLog.v("onRequestVersionFailure message================>", message.toString());
-                    }
-                })
-                .executeMission(MainActivity.this);*/
-    }
-
-    private double getNowVersionCode(Context context) {
-        double nowVersion = 0;
-        try {
-            PackageManager packageManager = context.getPackageManager();
-            PackageInfo packInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
-            nowVersion = packInfo.versionCode;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return nowVersion;
     }
 
     private void logPrint(MethodCall call) {
