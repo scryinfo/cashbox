@@ -1,6 +1,4 @@
-import 'package:app/generated/i18n.dart';
-import 'package:app/global_config/global_config.dart';
-import 'package:app/model/tx_model/eth_transaction_model.dart';
+import 'package:app/global_config/vendor_global_config.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
