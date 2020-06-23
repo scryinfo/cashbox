@@ -2,14 +2,14 @@
 本项目为一款开源钱包 Cashbox，主要是实现移动端平台(android、ios)功能的开发。
 
 ## 技术选型说明
-Cashbox钱包技术选型上，上层ui部分用flutter来实现，用rust编写的动态库，来实现底层的钱包管理、加密等功能。
+Cashbox钱包技术选型上，上层ui部分用flutter来实现，底层用rust语言，编译动态库来实现钱包管理、加密等功能。
 
 ### 环境和配置
-#### 预配置信息（功能可选，不用的参数或接口，可先屏蔽掉）
--  定位到全项目中，搜索用到VendorGlobalConfig的地方，都需要替换成开发者自己，对应功能的ip。
+#### 预配置信息（功能可选，根据开发者需求可增、删、改配置，主要是跟VendorGlobalConfig相关）
+-  在global_config目录下，创建vendor_global_config.dart文件。  在全项目中，搜索用到VendorGlobalConfig的地方，都需要替换成开发者自己，对应功能的ip。
 -  申请测试币，和注册[etherscan](https://etherscan.io/)开发api。在etherscan_util文件中配置你的apikey
--  添加一些需要的默认配置信息，如法币对应价格的后端ip，其他公共接口ip等。位置在：app/lib/util/sharedpreference_util.dart
 -  更改获取对应法币价格的接口。位置在app/lib/net/rate_util.dart。
+-  添加一些需要的默认配置信息，如法币对应价格的后端ip，其他公共接口ip等。位置在：app/lib/util/sharedpreference_util.dart
 
 #### 环境安装
 -  安装开发工具[AndroidStudio](https://developer.android.com/studio/index.html)

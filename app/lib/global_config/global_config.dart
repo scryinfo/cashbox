@@ -4,18 +4,18 @@
 
 class GlobalConfig {
   ///应用语言配置
-  static String savedLocaleKey = "savedLocaleKey"; //默认语言中文；
-  static String defaultLocaleValue = "zh"; //默认语言中文；
+  static const savedLocaleKey = "savedLocaleKey"; //默认语言中文；
+  static const defaultLocaleValue = "zh"; //默认语言中文；
   static Map<String, String> globalLanguageMap = {"zh": "中文", "en_US": "English"};
 
   ///下面配置信息，以key-value形式，用本地文件，做信息持久保存
-  static String isInitAppConfig = "is_init_app_config_key"; //是否初始化了app配置信息
+  static const isInitAppConfig = "is_init_app_config_key"; //是否初始化了app配置信息
 
-  static String currencyKey = "currency_key"; //选择的法币 usd || cny等
+  static const currencyKey = "currency_key"; //选择的法币 usd || cny等
   static String currencyDefaultValue = "USD";
 
   ///dapp 保存合约地址信息
-  static String dappCaKey1 = "dapp_ca_key_1";
+  static const dappCaKey1 = "dapp_ca_key_1";
 
   ///eth相关gas费配置
   static const EthGasLimitKey = "eth";
@@ -55,7 +55,6 @@ class GlobalConfig {
 }
 
 const Eth_Unit = 1000000000000000000; // 18位
-
 
 const httpHeaders = {
   'Accept': 'application/json, text/plain, */*',
