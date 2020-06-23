@@ -12,11 +12,11 @@ impl DataServiceProvider {
         show_digit_state.next().map(|_| true).map_err(|e| e.into())
     }
     pub fn show_digit(&self, walletid: &str, chainid: i64, digitid: &str) -> WalletResult<bool> {
-        return self.change_visible(walletid, chainid, digitid, 1);
+         self.change_visible(walletid, chainid, digitid, 1)
     }
 
     pub fn hide_digit(&self, walletid: &str, chainid: i64, digitid: &str) -> WalletResult<bool> {
-        return self.change_visible(walletid, chainid, digitid, 0);
+         self.change_visible(walletid, chainid, digitid, 0)
     }
 
     pub fn update_digit_balance(self, address: &str, digit_id: &str, value: &str) -> WalletResult<bool> {
@@ -37,13 +37,13 @@ impl DataServiceProvider {
             } else {
                 insert_basic_statement.bind(1, uuid::Uuid::new_v4().to_string().as_str())?;
             }
-            insert_basic_statement.bind(2, digit.contract_address.unwrap_or("".to_string()).as_str())?;
+            insert_basic_statement.bind(2, digit.contract_address.unwrap_or_else(||"".to_string()).as_str())?;
             //代币类型 是正式连还是测试链
             insert_basic_statement.bind(3, self.is_main_chain(&digit.chain_type))?;
-            insert_basic_statement.bind(4, digit.group_name.unwrap_or("ETH".to_string()).as_str())?;
+            insert_basic_statement.bind(4, digit.group_name.unwrap_or_else(||"ETH".to_string()).as_str())?;
             insert_basic_statement.bind(5, digit.short_name.as_str())?;
             insert_basic_statement.bind(6, digit.full_name.as_str())?;
-            insert_basic_statement.bind(7, digit.img_url.unwrap_or("".to_string()).as_str())?;
+            insert_basic_statement.bind(7, digit.img_url.unwrap_or_else(||"".to_string()).as_str())?;
             insert_basic_statement.bind(8, digit.decimal.as_str().parse::<i64>().unwrap_or(18))?;
             insert_basic_statement.bind(9, digit.is_basic.unwrap_or(false) as i64)?;//最基础的代币（链上代币）
             insert_basic_statement.bind(10, digit.is_default.unwrap_or(true) as i64)?;//设置增加的代币 是否为默认代币
@@ -96,13 +96,13 @@ impl DataServiceProvider {
             update_digit_statement.bind(1, id.as_str())?;
             update_digit_statement.bind(2, self.chain_name_to_chain_number(digit.chain_type.as_str()))?;
             update_digit_statement.bind(3, digit.contract.as_str())?;
-            update_digit_statement.bind(4, digit.accept_id.unwrap_or("".to_string()).as_str())?;
+            update_digit_statement.bind(4, digit.accept_id.unwrap_or_else(||"".to_string()).as_str())?;
             update_digit_statement.bind(5, digit.symbol.as_str())?;
             update_digit_statement.bind(6, digit.name.as_str())?;
-            update_digit_statement.bind(7, digit.publisher.unwrap_or("".to_string()).as_str())?;
-            update_digit_statement.bind(8, digit.project.unwrap_or("".to_string()).as_str())?;
+            update_digit_statement.bind(7, digit.publisher.unwrap_or_else(||"".to_string()).as_str())?;
+            update_digit_statement.bind(8, digit.project.unwrap_or_else(||"".to_string()).as_str())?;
             update_digit_statement.bind(9, digit.logo_url.as_str())?;
-            update_digit_statement.bind(10, digit.logo_bytes.unwrap_or("".to_string()).as_str())?;//需要前端传过来的为bytes格式
+            update_digit_statement.bind(10, digit.logo_bytes.unwrap_or_else(||"".to_string()).as_str())?;//需要前端传过来的为bytes格式
             update_digit_statement.bind(11, digit.decimal.as_str().parse::<i64>().unwrap_or(18))?;
             update_digit_statement.bind(12, digit.gas_limit.unwrap_or(0))?;
             update_digit_statement.bind(13, is_auth as i64)?;
@@ -179,7 +179,7 @@ impl DataServiceProvider {
     }
     // 这个条件查询和分页查询可以合并，当前在输入条件限制下不会出现需要分页的情况
     pub fn query_digit(&self, chain_type: i64, name: Option<String>, contract_addr: Option<String>) -> WalletResult<model::DigitList> {
-        let mut select_digit = format!("select * from detail.DigitBase where chain_type =? ");
+        let mut select_digit = "select * from detail.DigitBase where chain_type =? ".to_string();
         if contract_addr.is_some() {
             select_digit.push_str("and contract = ? ")
         }

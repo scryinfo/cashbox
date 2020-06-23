@@ -5,10 +5,12 @@ impl Ethereum {
     pub fn add_wallet_digit(&self, wallet_id: &str, chain_id: i64, digit_id: &str) -> WalletResult<()> {
         let instance = wallet_db::DataServiceProvider::instance()?;
         instance.tx_begin()?;
-        instance.add_digit_from_base(wallet_id, chain_id, digit_id)
+       instance.add_digit_from_base(wallet_id, chain_id, digit_id)
             .and_then(|_| instance.tx_commint())
             .map_err(|error| {
-                instance.tx_rollback();
+               if let Err(rollback_err) = instance.tx_rollback(){
+                   log::error!("rollback error:{}",rollback_err.to_string());
+               }
                 //需要往上层返回错误信息，不处理tx_rollback是否返回Error
                 error
             })

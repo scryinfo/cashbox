@@ -1,5 +1,5 @@
 pub fn get_cashbox_wallet_detail_sql() -> &'static str {
-    let sql = r#"
+  r#"
     PRAGMA foreign_keys = 'off';
     BEGIN;
     DROP TABLE IF EXISTS [main].[Address];
@@ -123,12 +123,11 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
 
     COMMIT;
     PRAGMA foreign_keys = 'on';
-    "#;
-    sql
+    "#
 }
 
 pub fn get_cashbox_wallet_sql() -> &'static str {
-    let mnenonic_sql = r#"
+   r#"
         PRAGMA foreign_keys = 'off';
         BEGIN;
         DROP TABLE IF EXISTS [main].[Wallet];
@@ -150,6 +149,5 @@ pub fn get_cashbox_wallet_sql() -> &'static str {
           end;
         COMMIT;
         PRAGMA foreign_keys = 'on';
-    "#;
-    mnenonic_sql
+    "#
 }

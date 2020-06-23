@@ -163,7 +163,7 @@ fn ecdsa_sign(hash: &[u8], private_key: &[u8], chain_id: u64) -> EcdsaSig {
 //根据精度，将字符串输入的数量转换为最小进度来表示
 pub fn convert_token(value:&str,decimal:usize)->Option<U256>{
     //判断需要转化的数是否为浮点数
-    match value.find(".") {
+    match value.find('.') {
         Some(index) => {
             let integer_part = value.get(0..index).unwrap();
             let integer_part_256 = U256::from_dec_str(integer_part).unwrap();

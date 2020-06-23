@@ -8,7 +8,7 @@ pub mod android {
     use jni::objects::{JObject, JValue,JClass,JString};
     use wallets::model::{EeeChain,BtcChain,EthChain};
     use jni::sys::{jint, jobject, jbyteArray};
-    use wallets::StatusCode;
+    use wallets::{StatusCode, RawTransaction};
     use wallets::module::Chain;
 
     pub fn get_eee_chain_obj<'a, 'b>(env:  &'a JNIEnv<'b>,eee_chain:EeeChain)->JObject<'a>{
@@ -399,6 +399,7 @@ pub mod android {
         let pwd = env.convert_byte_array(pwd).unwrap();
         //合约地址为空，是普通ETH转账 或者部署合约
         let ethereum = wallets::module::Ethereum{};
+
         let signed_ret = if contract_address.is_empty() {
             ethereum.raw_transfer_sign(&from_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_id as u64)
         } else {
@@ -510,11 +511,12 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAccountInfo(env: JNIEnv, _class: JClass, encode_info: JString) -> jobject {
-        let encode_info: String = env.get_string(encode_info).unwrap().into();
+    pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAccountInfo(env: JNIEnv, _class: JClass, _encode_info: JString) -> jobject {
+
         let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
 
         let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
+       /* let encode_info: String = env.get_string(encode_info).unwrap().into();
         match wallets::decode_account_info(&encode_info) {
             Ok(account_info) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
@@ -534,7 +536,7 @@ pub mod android {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set StatusCode value");
                 env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message value");
             }
-        }
+        }*/
         *state_obj
     }
 

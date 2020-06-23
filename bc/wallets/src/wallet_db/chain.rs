@@ -58,22 +58,22 @@ impl DataServiceProvider {
 
         while let Some(row) = cursor.next()? {
             let tbwallet = WalletObj {
-                wallet_id: row[0].as_string().map(|str| String::from(str)),
-                wallet_name: row[1].as_string().map(|str| String::from(str)),
+                wallet_id: row[0].as_string().map( String::from),
+                wallet_name: row[1].as_string().map( String::from),
                 chain_id: row[2].as_integer(),
-                address: row[3].as_string().map(|str| String::from(str)),
+                address: row[3].as_string().map(String::from),
                 selected: row[4].as_string().map(|value| Self::get_bool_value(value)),
                 chain_is_visible: row[5].as_string().map(|value| Self::get_bool_value(value)),
-                domain: row[6].as_string().map(|str| String::from(str)),
+                domain: row[6].as_string().map(String::from),
                 chain_type: row[7].as_integer(),
-                digit_id: row[8].as_string().map(|str| String::from(str)),
-                contract_address: row[9].as_string().map(|str| String::from(str)),
-                short_name: row[10].as_string().map(|str| String::from(str)),
-                full_name: row[11].as_string().map(|str| String::from(str)),
-                balance: row[12].as_string().map(|str| String::from(str)),
+                digit_id: row[8].as_string().map(String::from),
+                contract_address: row[9].as_string().map(String::from),
+                short_name: row[10].as_string().map(String::from),
+                full_name: row[11].as_string().map(String::from),
+                balance: row[12].as_string().map( String::from),
                 digit_is_visible: row[13].as_string().map(|value| Self::get_bool_value(value)),
                 decimals: row[14].as_integer(),
-                url_img: row[15].as_string().map(|str| String::from(str)),
+                url_img: row[15].as_string().map(String::from),
             };
             tbwallets.push(tbwallet);
         }

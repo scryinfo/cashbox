@@ -1,15 +1,14 @@
 #[macro_use]
 extern crate serde_derive;
+mod error;
 
 pub mod model;
 pub mod module;
 pub mod wallet_db;
 
-mod error;
-
 pub use error::WalletError;
 
-pub use ethtx::{convert_token, address_legal as eth_address_legal};
+pub use ethtx::{RawTransaction,convert_token, address_legal as eth_address_legal};
 pub use substratetx::{account_info_key, decode_account_info, event_decode};
 
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
@@ -17,8 +16,8 @@ pub type WalletResult<T> = std::result::Result<T, WalletError>;
 #[derive(PartialEq, Clone)]
 pub enum StatusCode {
     DylibError = -1,//由于外部输入参数造成的错误
-    OK = 200,//正常
     FailToGenerateMnemonic = 100,//生成助记词失败
+    OK = 200,//正常
     PwdIsWrong,//密码错误
 }
 
@@ -28,7 +27,7 @@ impl Default for StatusCode {
 
 #[derive(PartialEq, Clone)]
 pub enum EthChainId {
-    //以太坊链类型编号，用于签名环节
+    //以太坊链类型编号，用于签名过程
     MAIN = 1,
     ROPSTEN = 3,
     RINKEBY = 4,

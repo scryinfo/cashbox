@@ -1,4 +1,4 @@
-use sp_core::{hexdisplay::HexDisplay,Public,Pair, crypto::Ss58Codec};
+use sp_core::{hexdisplay::HexDisplay, Public, Pair, crypto::Ss58Codec};
 use bip39::{Mnemonic, MnemonicType, Language};
 use rand::{RngCore, rngs::OsRng};
 use scry_crypto::aes;
@@ -47,21 +47,6 @@ struct KdfParams {
     p: u32,
 }
 
-/*pub trait  Keccak256<T>{
-    fn keccak256(&self) -> T
-        where T: Sized;
-}
-
-impl <T> Keccak256<[u8;32]> for T where T:AsRef<[u8]>{
-    fn keccak256(&self)->[u8;32]{
-        let mut keccak = Keccak::new_keccak256();
-        let mut result = [0u8; 32];
-        keccak.update(self.as_ref());
-        keccak.finalize(&mut result);
-        result
-    }
-}*/
-
 pub trait Crypto {
     type Seed: AsRef<[u8]> + AsMut<[u8]> + Sized + Default;
     type Pair: Pair<Public=Self::Public>;
@@ -83,14 +68,14 @@ pub trait Crypto {
         OsRng.fill_bytes(seed.as_mut());
         seed
     }
-    fn seed_from_phrase(phrase: &str, password: Option<&str>) -> Result<Self::Seed,Error>;
-    fn pair_from_seed(seed: &Self::Seed) ->  Self::Pair;
-    fn pair_from_phrase(phrase: &str, password: Option<&str>) -> Result<Self::Pair,Error>{
+    fn seed_from_phrase(phrase: &str, password: Option<&str>) -> Result<Self::Seed, Error>;
+    fn pair_from_seed(seed: &Self::Seed) -> Self::Pair;
+    fn pair_from_phrase(phrase: &str, password: Option<&str>) -> Result<Self::Pair, Error> {
         let seed = Self::seed_from_phrase(phrase, password)?;
         let pair = Self::pair_from_seed(&seed);
         Ok(pair)
     }
-    fn pair_from_suri(suri: &str, password: Option<&str>) -> Result<Self::Pair,Error> {
+    fn pair_from_suri(suri: &str, password: Option<&str>) -> Result<Self::Pair, Error> {
         Ok(Self::Pair::from_string(suri, password)?)
     }
     fn ss58_from_pair(pair: &Self::Pair) -> String;
@@ -105,9 +90,8 @@ pub trait Crypto {
         );
     }
     fn print_from_phrase(phrase: &str, password: Option<&str>) {
-
-        match Self::seed_from_phrase(phrase, password){
-            Ok(seed)=>{
+        match Self::seed_from_phrase(phrase, password) {
+            Ok(seed) => {
                 let pair = Self::pair_from_seed(&seed);
                 println!("Phrase `{}` is account:\n  Seed: 0x{}\n  Public key (hex): 0x{}\n  Address (SS58): {}",
                          phrase,
@@ -115,9 +99,9 @@ pub trait Crypto {
                          HexDisplay::from(&Self::public_from_pair(&pair)),
                          Self::ss58_from_pair(&pair)
                 );
-            },
-            Err(e)=>{
-                println!("print_from_phrase:{}",e)
+            }
+            Err(e) => {
+                println!("print_from_phrase:{}", e)
             }
         }
     }
@@ -259,7 +243,7 @@ pub trait Crypto {
             }
         }
     }
-    fn sign(phrase:&str,msg:&[u8])->Result<[u8;64],Error>;
+    fn sign(phrase: &str, msg: &[u8]) -> Result<[u8; 64], Error>;
 }
 
 mod ed25519;

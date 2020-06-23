@@ -22,43 +22,44 @@ impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         use self::Error::*;
         match self {
-            Serde( err)=>Some(err),
-            HexError(err)=>Some(err),
+            Serde(err) => Some(err),
+            HexError(err) => Some(err),
             _ => None
         }
     }
 }
 
-impl From<failure::Error> for Error{
-    fn from(err: failure::Error)->Self{
+impl From<failure::Error> for Error {
+    fn from(err: failure::Error) -> Self {
         Error::Custom(format!("{:?}", err))
     }
 }
-impl From<substrate_bip39::Error> for Error{
-    fn from(err: substrate_bip39::Error)->Self{
+
+impl From<substrate_bip39::Error> for Error {
+    fn from(err: substrate_bip39::Error) -> Self {
         Error::Bip39(err)
     }
 }
 
-impl From<sp_core::crypto::SecretStringError> for Error{
-    fn from(err: sp_core::crypto::SecretStringError)->Self{
+impl From<sp_core::crypto::SecretStringError> for Error {
+    fn from(err: sp_core::crypto::SecretStringError) -> Self {
         Error::SecretString(err)
     }
 }
 
-impl  From<sp_core::crypto::PublicError> for Error {
+impl From<sp_core::crypto::PublicError> for Error {
     fn from(err: sp_core::crypto::PublicError) -> Self {
         Error::Public(err)
     }
 }
 
-impl  From<hex::FromHexError> for Error {
+impl From<hex::FromHexError> for Error {
     fn from(err: hex::FromHexError) -> Self {
         Error::HexError(err)
     }
 }
 
-impl  From<serde_json::error::Error> for Error {
+impl From<serde_json::error::Error> for Error {
     fn from(err: serde_json::error::Error) -> Self {
         Error::Serde(err)
     }
@@ -70,8 +71,8 @@ impl From<std::num::ParseIntError> for Error {
     }
 }
 
-impl From<codec::Error> for Error{
-    fn from(err:codec::Error) -> Self {
+impl From<codec::Error> for Error {
+    fn from(err: codec::Error) -> Self {
         Error::ScaleCodec(err)
     }
 }

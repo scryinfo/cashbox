@@ -78,12 +78,6 @@ impl From<failure::Error> for Error{
         Error::Other(format!("{:?}", err))
     }
 }
-/*impl From<secp256k1::Error> for Error{
-    fn from(err:secp256k1::Error) -> Self {
-        Error::Secp256k1(err)
-    }
-}*/
-
 
 impl Clone for Error {
     fn clone(&self) -> Self {
@@ -94,7 +88,7 @@ impl Clone for Error {
             InvalidResponse(s) => InvalidResponse(s.clone()),
             Transport(s) => Transport(s.clone()),
             Io(e) => Io(IoError::from(e.kind())),
-            Secp256k1(e) => Secp256k1(e.clone()),
+            Secp256k1(e) => Secp256k1(*e),
             Internal => Internal,
             Other(s)=>Other(s.clone()),
         }

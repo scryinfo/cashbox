@@ -4,14 +4,14 @@ use std::{fs, path};
 use sqlite::Connection;
 
 #[cfg(target_os = "android")]
-const TB_WALLET: &'static str = r#"/data/data/cashbox.scry.info/files/cashbox_wallet.db"#;
+const TB_WALLET: &str = r#"/data/data/cashbox.scry.info/files/cashbox_wallet.db"#;
 #[cfg(target_os = "android")]
-const TB_WALLET_DETAIL: &'static str = r#"/data/data/cashbox.scry.info/files/cashbox_wallet_detail.db"#;
+const TB_WALLET_DETAIL: &str = r#"/data/data/cashbox.scry.info/files/cashbox_wallet_detail.db"#;
 
 #[cfg(any(target_os = "linux", target_os = "windows"))]
-const TB_WALLET: &'static str = r#"cashbox_wallet.db"#;
+const TB_WALLET: &str = r#"cashbox_wallet.db"#;
 #[cfg(any(target_os = "linux", target_os = "windows"))]
-const TB_WALLET_DETAIL: &'static str = r#"cashbox_wallet_detail.db"#;
+const TB_WALLET_DETAIL: &str = r#"cashbox_wallet_detail.db"#;
 
 fn create_teble(table_name: &str, table_desc: &str) -> WalletResult<()> {
     //先创建对应的文件路径
@@ -20,15 +20,14 @@ fn create_teble(table_name: &str, table_desc: &str) -> WalletResult<()> {
     }
     let connect = Connection::open(table_name)?;
     //在执行数据库表创建过程中出现错误，需要将对应的文件删除掉
-    if let Err(e) =  connect.execute(table_desc){
-        if let Err(msg) = fs::remove_file(table_name){
+    if let Err(e) = connect.execute(table_desc) {
+        if let Err(msg) = fs::remove_file(table_name) {
             log::error!("create table:{}",msg.to_string());
         }
-        return Err(e.into())
-    }else {
+        Err(e.into())
+    } else {
         Ok(())
     }
-
 }
 
 pub struct DataServiceProvider {
@@ -38,7 +37,7 @@ pub struct DataServiceProvider {
 impl Drop for DataServiceProvider {
     fn drop(&mut self) {
         let detach_sql = "DETACH DATABASE 'detail'";
-        &self.db_hander.execute(detach_sql).expect("DETACH database error!");
+        self.db_hander.execute(detach_sql).expect("DETACH database error!");
     }
 }
 
@@ -82,10 +81,6 @@ impl DataServiceProvider {
     }
 
     pub fn get_bool_value(value: &str) -> bool {
-        if value.eq("1") {
-            true
-        } else {
-            false
-        }
+        value.eq("1")
     }
 }

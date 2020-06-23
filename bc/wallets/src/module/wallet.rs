@@ -22,7 +22,7 @@ impl Wallet {
                 status: wallet.status.clone(),
                 wallet_id: wallet_id.clone(),
                 wallet_name: wallet.wallet_name.clone(),
-                wallet_type: wallet.wallet_type.clone(),
+                wallet_type: wallet.wallet_type,
                 display_chain_id: wallet.display_chain_id,
                 selected: wallet.selected,
                 create_time: wallet.create_time,
@@ -81,8 +81,10 @@ impl Wallet {
         instance.set_selected_wallet(walletid)
             .and_then(|_| instance.tx_commint())
             .map_err(|error| {
-                instance.tx_rollback();
-                error.into()
+                if let Err(rollback_err) = instance.tx_rollback() {
+                    log::error!("rollback error:{}",rollback_err.to_string());
+                }
+                error
             })
     }
 
@@ -120,12 +122,9 @@ impl Wallet {
             let hash_first = mn.keccak256();
             hex::encode((&hash_first[..]).keccak256())
         };
-
         //正式链，助记词只能导入一次,通过hash是否存在判断是否导入
-        if wallet_type == 1 {
-            if dbhelper.query_by_wallet_digest(hex_mn_digest.as_str(), wallet_type).is_some() {
-                return Err(WalletError::Custom(format!("this wallet is exist")));
-            }
+        if wallet_type == 1 && dbhelper.query_by_wallet_digest(hex_mn_digest.as_str(), wallet_type).is_some() {
+            return Err(WalletError::Custom("this wallet is exist".to_string()));
         }
 
         let keystore = substratetx::Sr25519::encrypt_mnemonic(mn, password);
@@ -194,7 +193,7 @@ impl Wallet {
             ..Default::default()
         };
         let instance = wallet_db::DataServiceProvider::instance()?;
-        instance.update_wallet(wallet_update).map(|_| StatusCode::OK).map_err(|err| err.into())
+        instance.update_wallet(wallet_update).map(|_| StatusCode::OK).map_err(|err| err)
     }
 
     fn generate_address(&self, wallet_id: &str, mn: &[u8], wallet_type: i64) -> WalletResult<Vec<TbAddress>> {
@@ -236,6 +235,7 @@ impl Wallet {
     fn address_from_mnemonic(&self, mn: &[u8], wallet_type: ChainType) -> WalletResult<Address> {
         let phrase = String::from_utf8(mn.to_vec())?;
         match wallet_type {
+            //当前版本不支持功能
             ChainType::EEE | ChainType::EeeTest => {
                 let seed = substratetx::Sr25519::seed_from_phrase(&phrase, None).unwrap();
                 let pair = substratetx::Sr25519::pair_from_seed(&seed);
