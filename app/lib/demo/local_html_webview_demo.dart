@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
@@ -24,17 +23,13 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
         height: ScreenUtil.instance.setHeight(160),
         color: Colors.blueAccent,
         child: WebView(
-          //initialUrl: "",
           initialUrl: "http://192.168.1.4:8080",
           //initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
-          //initialUrl: "file:///android_asset/flutter_assets/assets/dist-one/dist-one-index.html",
-          //initialUrl: "http://127.0.0.1:8080/html/index.html",
           javascriptMode: JavascriptMode.unrestricted,
 
           //JS执行模式 是否允许JS执行
           onWebViewCreated: (WebViewController webViewController) {
             _controller = webViewController;
-            //_loadHtmlFromAssets(_controller); //载入本地html文件
           },
           javascriptChannels: <JavascriptChannel>[
             JavascriptChannel(

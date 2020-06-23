@@ -9,7 +9,6 @@ class Routes {
   static String entryPage = '/entrypage';
   static String publicPage = '/publicpage';
   static String dappPage = '/dapppage';
-  static String dappDemoPage = '/dappdemopage';
   static String webViewPluginPage = '/webviewpluginpage';
   static String createWalletNamePage = '/createwalletnamepage';
   static String createWalletMnemonicPage = '/createwalletmnemonicpage';
@@ -48,7 +47,6 @@ class Routes {
     router.define(entryPage, handler: entryPageHandler);
     router.define(publicPage, handler: publicPageHandler);
     router.define(dappPage, handler: dappPageHandler);
-    router.define(dappDemoPage, handler: dappDemoPageHandler);
     router.define(createWalletNamePage, handler: createWalletPageHandler);
     router.define(digitListPage, handler: digitListPageHandler);
     router.define(digitManagePage, handler: digitManageHandler);

@@ -28,10 +28,8 @@ import '../page/wallet_manager_page/wallet_manage_page.dart';
 import '../page/reset_pwd_page/reset_pwd_page.dart';
 import '../page/recover_wallet_page/recover_wallet_page.dart';
 import '../page/transaction_history_page/transaction_history_page.dart';
-
 import 'package:app/page/transaction_detail_page/eth_transactin_detail_page.dart';
 import '../page/about_us_page/about_us_page.dart';
-import 'package:app/demo/dapp_webview_demo.dart';
 import 'package:app/page/dapp_page/dapp_page.dart';
 import 'package:app/page/create_test_wallet_page/create_test_wallet_page.dart';
 
@@ -61,9 +59,6 @@ Handler dappPageHandler = Handler(handlerFunc: (BuildContext context, Map<String
   return DappPage();
 });
 
-Handler dappDemoPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return DAppWebViewDemo();
-});
 
 Handler createWalletPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return CreateWalletNamePage();
