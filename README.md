@@ -4,13 +4,19 @@
 ## 技术选型说明
 Cashbox钱包技术选型上，上层ui部分用flutter来实现，用rust编写的动态库，来实现底层的钱包管理、加密等功能。
 
-### 环境安装 和 项目运行
+### 环境和配置
+#### 预配置信息（功能可选，不用的参数或接口，可先屏蔽掉）
+-  定位到全项目中，搜索用到VendorGlobalConfig的地方，都需要替换成开发者自己，对应功能的ip。
+-  申请测试币，和注册[etherscan](https://etherscan.io/)开发api。在etherscan_util文件中配置你的apikey
+-  添加一些需要的默认配置信息，如法币对应价格的后端ip，其他公共接口ip等。位置在：app/lib/util/sharedpreference_util.dart
+-  更改获取对应法币价格的接口。位置在app/lib/net/rate_util.dart。
+
+#### 环境安装
 -  安装开发工具[AndroidStudio](https://developer.android.com/studio/index.html)
 -  安装[flutter SDK](https://flutterchina.club/get-started/install/)
 -  编译动态库，具体在[bc](https://github.com/scryinfo/cashbox/blob/master/bc/README.md)（由rust语言编写），目录下有详细说明动态库的生成流程。
--  申请测试币，和注册[etherscan](https://etherscan.io/)开发api。在etherscan_util文件中配置你的apikey
--  添加一些需要的默认配置信息，如法币对应价格的后端ip，其他公共接口ip等。位置在：app/lib/util/sharedpreference_util.dart
 
+### 项目运行
    - 以android为例： 将编译好的动态库。 放在对应目录packages/wallet_manager/android/src/main/jniLibs/arm64-v8a下。
    - 进入到app目录下，先执行flutter pub get 同步依赖的工具包。
    - 电脑连接上android设备后， 执行flutter run    可运行起开发版的android应用。

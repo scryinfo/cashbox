@@ -1,16 +1,9 @@
-import 'package:app/demo/dapp_webview_demo.dart';
-import 'package:app/demo/tx_demo.dart';
-import 'package:app/generated/i18n.dart';
 import 'package:app/global_config/global_config.dart';
-import 'package:app/page/eee_page/eee_page.dart';
-import 'package:app/page/transaction_history_page/transaction_history_page.dart';
-import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
-import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
@@ -20,8 +13,6 @@ import 'package:app/page/eth_page/eth_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
-import 'dapp_page/dapp_page.dart';
 
 class EntryPage extends StatefulWidget {
   @override

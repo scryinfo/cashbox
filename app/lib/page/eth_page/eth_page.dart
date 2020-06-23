@@ -1,14 +1,11 @@
-import 'dart:convert';
-
-import 'package:app/generated/i18n.dart';
 import 'package:app/global_config/global_config.dart';
+import 'package:app/global_config/vendor_global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
-import 'package:app/net/net_util.dart';
 import 'package:app/net/rate_util.dart';
 import 'package:app/page/left_drawer_card/left_drawer_card.dart';
 import 'package:app/provide/qr_info_provide.dart';
@@ -27,7 +24,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 

@@ -1,10 +1,8 @@
-import 'package:app/generated/i18n.dart';
-import 'package:app/global_config/global_config.dart';
+import 'package:app/global_config/vendor_global_config.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scry_webview/scry_webview.dart';
 
 class PublicPage extends StatefulWidget {
@@ -45,7 +43,7 @@ class _PublicPageState extends State<PublicPage> {
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(160),
       child: WebView(
-        initialUrl: GlobalConfig.publicIpDefaultValue,
+        initialUrl: VendorGlobalConfig.publicIpDefaultValue,
         javascriptMode: JavascriptMode.unrestricted, //JS执行模式 是否允许JS执行
         onWebViewCreated: (controller) {
           _controller = controller;

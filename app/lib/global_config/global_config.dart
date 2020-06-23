@@ -3,6 +3,21 @@
 * */
 
 class GlobalConfig {
+  ///应用语言配置
+  static String savedLocaleKey = "savedLocaleKey"; //默认语言中文；
+  static String defaultLocaleValue = "zh"; //默认语言中文；
+  static Map<String, String> globalLanguageMap = {"zh": "中文", "en_US": "English"};
+
+  ///下面配置信息，以key-value形式，用本地文件，做信息持久保存
+  static String isInitAppConfig = "is_init_app_config_key"; //是否初始化了app配置信息
+
+  static String currencyKey = "currency_key"; //选择的法币 usd || cny等
+  static String currencyDefaultValue = "USD";
+
+  ///dapp 保存合约地址信息
+  static String dappCaKey1 = "dapp_ca_key_1";
+
+  ///eth相关gas费配置
   static const EthGasLimitKey = "eth";
   static const Erc20GasLimitKey = "eth";
   static const EthGasPriceKey = "eth";
@@ -13,35 +28,6 @@ class GlobalConfig {
   static Map<String, double> maxGasPriceMap = {EthGasPriceKey: 30, Erc20GasPriceKey: 20};
   static Map<String, double> minGasPriceMap = {EthGasPriceKey: 2, Erc20GasPriceKey: 2};
   static Map<String, double> defaultGasPriceMap = {EthGasPriceKey: 9, Erc20GasPriceKey: 6};
-
-  static String savedLocaleKey = "savedLocaleKey"; //默认语言中文；
-  static String defaultLocaleValue = "zh"; //默认语言中文；
-  static Map<String, String> globalLanguageMap = {"zh": "中文", "en_US": "English"};
-
-  //static String ipAddress = "ws://47.108.146.67:9933";
-  static String ipAddress = "ws://40.73.75.224:9933";
-  static String versionCheckIp = "http://40.73.35.55:9002/cashbox/api/apkOpen/checkupdate";
-  static String latestVersionIp = "http://40.73.35.55:9002/cashbox/api/apkOpen/downloadlatest";
-
-  static String isInitAppConfig = "is_init_app_config_key";
-  static String rateDigitIpKey = "rate_digit_ip_key";
-  static String rateDigitIpDefaultValue = "http://40.73.35.55:8080/inner_api/market/pricerate";
-  static String authDigitsVersionKey = "auth_digit_list_version_key";
-  static String authDigitsIpKey = "auth_digit_list_key";
-  static String authDigitsIpDefaultValue = "http://40.73.35.55:8080/inner_api/token/erc20/authlist";
-  static String defaultDigitsKey = "default_digit_list_key";
-  static String defaultDigitsDefaultValue = "http://40.73.35.55:8080/inner_api/token/erc20/defaultlist";
-  static String scryXIpKey = "scry_x_key";
-  static String scryXIpDefaultValue = "ws://40.73.75.224:9933";
-  static String cashboxDownloadIpKey = "cashbox_download_ip_key";
-  static String cashboxDownloadIpDefaultValue = ""; //todo
-  static String publicIpKey = "public__ip_key";
-  static String publicIpDefaultValue = "http://40.73.35.55:9010/web_app/pub";
-  static String currencyKey = "currency_key"; //选择的法币 usd || cny等
-  static String currencyDefaultValue = "USD";
-
-  //保存dapp 合约地址信息
-  static String dappCaKey1 = "dapp_ca_key_1";
 
   static double getMaxGasLimit(String digitName) {
     return maxGasLimitMap[digitName];
@@ -69,16 +55,7 @@ class GlobalConfig {
 }
 
 const Eth_Unit = 1000000000000000000; // 18位
-const DddMainNetContractAddress = "0x9F5F3CFD7a32700C93F971637407ff17b91c7342";
-const DddTestNetContractAddress = "0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e";
 
-const RatePath = "http://40.73.35.55:8080/inner_api/market/pricerate";
-const PublicPath = "https://cashbox.scry.info/public";
-const ETHERSCAN_API_KEY = "XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1";
-
-const Infura_Rpc_Path = "https://mainnet.infura.io/shJbKSyfdvONq9czbypb";
-const Parker_Infura_RPC = "https://mainnet.infura.io/v3/8d21395d2a73485096ca061252314e78";
-const Parker_Infura_WSS = "wss://mainnet.infura.io/ws/v3/8d21395d2a73485096ca061252314e78";
 
 const httpHeaders = {
   'Accept': 'application/json, text/plain, */*',
