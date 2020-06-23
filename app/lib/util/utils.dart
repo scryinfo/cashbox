@@ -84,14 +84,14 @@ class Utils {
   }
 
   // 返回应用文档路径对应File
-  static Future<File> get _localFile async {
+  static Future<File> _localFile(String filePath) async {
     final appPath = await _localPath;
     var directory = new Directory('$appPath');
     var isDirectoryExists = await directory.exists();
     if (!isDirectoryExists) {
       await directory.create();
     }
-    final file = new File('$appPath' + "/" + GlobalConfig.diamondCaFileName);
+    final file = new File('$appPath' + "/" + filePath);
     var isFileExists = await file.exists();
     if (!isFileExists) {
       await file.create();
@@ -100,9 +100,9 @@ class Utils {
   }
 
   //读取文件中的数据
-  static Future<String> readFile() async {
+  static Future<String> readFile(String path) async {
     try {
-      final file = await _localFile;
+      final file = await _localFile(path);
       String data = await file.readAsString();
       print(data);
       return data;
@@ -112,8 +112,8 @@ class Utils {
   }
 
   //将数据存储到文件中
-  static Future<File> writeFile(String data) async {
-    final file = await _localFile;
+  static Future<File> writeFile(String filePath, String data) async {
+    final file = await _localFile(filePath);
     return file.writeAsString(data);
   }
 }

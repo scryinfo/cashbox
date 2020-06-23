@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:app/generated/i18n.dart';
+import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
@@ -8,6 +9,7 @@ import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/qr_scan_util.dart';
+import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +41,7 @@ class _DappPageState extends State<DappPage> {
             //initialUrl: "http://192.168.1.3:8080/",
             javascriptMode: JavascriptMode.unrestricted,
             userAgent:
-                "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
+            "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
             //JS执行模式 是否允许JS执行
             onWebViewCreated: (WebViewController webViewController) {
               _controller = webViewController;
@@ -161,11 +163,13 @@ class _DappPageState extends State<DappPage> {
   }
 
   Future<String> loadDiamondCa() async {
-    var resultCA = await Utils.readFile();
-    return resultCA;
+    var spUtil = await SharedPreferenceUtil.instance;
+    var resultCa = spUtil.getString(GlobalConfig.dappCaKey1);
+    return resultCa;
   }
 
-  editDiamondCaToFile(String caInfo) {
-    Utils.writeFile(caInfo);
+  editDiamondCaToFile(String caInfo) async {
+    var spUtil = await SharedPreferenceUtil.instance;
+    spUtil.setString(GlobalConfig.dappCaKey1, caInfo);
   }
 }

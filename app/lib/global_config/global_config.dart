@@ -58,7 +58,7 @@ class GlobalConfig {
   }
 
   //保存dapp 合约地址信息
-  static String diamondCaFileName = "contract_address.txt";
+  static String dappCaKey1 = "dapp_ca_key_1";
 
   static double getMaxGasLimit(String digitName) {
     return maxGasLimitMap[digitName];
