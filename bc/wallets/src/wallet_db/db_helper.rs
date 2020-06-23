@@ -19,7 +19,16 @@ fn create_teble(table_name: &str, table_desc: &str) -> WalletResult<()> {
         fs::File::create(table_name)?;
     }
     let connect = Connection::open(table_name)?;
-    connect.execute(table_desc).map_err(|e| e.into())
+    //在执行数据库表创建过程中出现错误，需要将对应的文件删除掉
+    if let Err(e) =  connect.execute(table_desc){
+        if let Err(msg) = fs::remove_file(table_name){
+            log::error!("create table:{}",msg.to_string());
+        }
+        return Err(e.into())
+    }else {
+        Ok(())
+    }
+
 }
 
 pub struct DataServiceProvider {

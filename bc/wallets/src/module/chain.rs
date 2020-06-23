@@ -15,7 +15,7 @@ struct RawTx {
 }
 
 //后续修改名称为ScryX?
-pub struct EEE {}
+pub struct EEE;
 
 impl Chain for EEE{}
 
@@ -142,7 +142,7 @@ impl EEE {
     }
 }
 
-pub struct Ethereum {}
+pub struct Ethereum;
 impl Chain for Ethereum{}
 impl Ethereum {
     ///ETH交易签名
@@ -282,7 +282,7 @@ impl Ethereum {
     }
 }
 
-pub struct Bitcoin{}
+pub struct Bitcoin;
 impl Chain for Bitcoin{}
 impl Bitcoin{
     pub fn get_chain_data(&self) -> WalletResult<HashMap<String, Vec<BtcChain>>> {

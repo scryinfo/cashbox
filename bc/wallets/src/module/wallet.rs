@@ -1,13 +1,10 @@
 use super::*;
-
-use crate::{StatusCode, wallet_db};
-use model::{TbAddress, Address, Wallet, Mnemonic};
 use std::collections::HashMap;
-use uuid::Uuid;
-use model::wallet_store::TbWallet;
 
-use ethereum_types::H256;
+use uuid::Uuid;
+
 use substratetx::{Crypto, Keccak256};
+use model::{wallet_store::TbWallet, TbAddress, Address, Wallet, Mnemonic};
 
 impl Wallet {
     pub fn get_all(&self) -> WalletResult<Vec<Wallet>> {
@@ -165,7 +162,7 @@ impl Wallet {
             err
         })
     }
-    pub fn export_mnemonic(&self,wallet_id: &str, password: &[u8]) -> WalletResult<Mnemonic> {
+    pub fn export_mnemonic(&self, wallet_id: &str, password: &[u8]) -> WalletResult<Mnemonic> {
         let provider = wallet_db::DataServiceProvider::instance()?;
         //查询出对应id的助记词
         match provider.query_by_wallet_id(wallet_id) {
@@ -182,7 +179,7 @@ impl Wallet {
             }
         }
     }
-    fn mnemonic_psd_update(&self,wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> WalletResult<StatusCode> {
+    fn mnemonic_psd_update(&self, wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> WalletResult<StatusCode> {
         //获取原来的助记词
         let mnemonic = wallet.mnemonic.clone();
         let context = substratetx::Sr25519::get_mnemonic_context(mnemonic.as_str(), old_psd)?;
@@ -200,7 +197,7 @@ impl Wallet {
         instance.update_wallet(wallet_update).map(|_| StatusCode::OK).map_err(|err| err.into())
     }
 
-    fn generate_address(&self,wallet_id: &str, mn: &[u8], wallet_type: i64) -> WalletResult<Vec<TbAddress>> {
+    fn generate_address(&self, wallet_id: &str, mn: &[u8], wallet_type: i64) -> WalletResult<Vec<TbAddress>> {
         //获取当前钱包哪些链可用
         let instance = wallet_db::DataServiceProvider::instance()?;
         let chains = instance.get_available_chain()?;//错误处理demo
@@ -236,7 +233,7 @@ impl Wallet {
         Ok(address_vec)
     }
     //根据生成钱包的类型，需要创建对应的地址
-    fn address_from_mnemonic(&self,mn: &[u8], wallet_type: ChainType) -> WalletResult<Address> {
+    fn address_from_mnemonic(&self, mn: &[u8], wallet_type: ChainType) -> WalletResult<Address> {
         let phrase = String::from_utf8(mn.to_vec())?;
         match wallet_type {
             ChainType::EEE | ChainType::EeeTest => {
@@ -253,7 +250,7 @@ impl Wallet {
             }
             ChainType::ETH | ChainType::EthTest => {
                 let secret_byte = ethtx::pri_from_mnemonic(&phrase, None)?;
-                let (address,puk) = ethtx::generate_eth_address(&secret_byte)?;
+                let (address, puk) = ethtx::generate_eth_address(&secret_byte)?;
                 let address = Address {
                     chain_type: wallet_type,
                     pubkey: puk,

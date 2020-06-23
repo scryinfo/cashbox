@@ -11,10 +11,10 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-     //   System.out.println(NativeLib.initWalletBasicData());
+       System.out.println(NativeLib.initWalletBasicData());
        // updateDefaultDigitTest();
         walletGenerateTest();
-        walletExportTest();
+      //  walletExportTest();
        //  updateAuthListTest();
       //  addNonAuthDigitTest();
       //  getAuthDigitListTest();
@@ -85,7 +85,7 @@ public class NativeLibTest {
 
     public static void walletGenerateTest(){
         Random random = new Random(1);
-        while (NativeLib.loadAllWalletList().size()<4){
+        while (NativeLib.loadAllWalletList().size()<2){
             NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(12);
             System.out.println(mnemonic.mnId);
             int  r = random.nextInt(1000);
