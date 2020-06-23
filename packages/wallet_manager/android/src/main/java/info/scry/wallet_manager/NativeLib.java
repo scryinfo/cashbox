@@ -288,12 +288,6 @@ public class NativeLib {
      * @return
      */
     public static native WalletState addDigit(String walletId, int chainType, String digitId);
-    // 0515 meeting
-    // 1、addDigit区分处理
-    // 2、digit数据结构增加字段 是否是自定义
-    // 3、查询代币列表，分页
-    // 4、检查更新的口子（parker）
-    // 5、ip等配置文件，配置流程。（parker）
 
 
     /**
