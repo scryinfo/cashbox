@@ -20,9 +20,7 @@ class GlobalConfig {
 
   static String savedLocaleKey = "savedLocaleKey"; //默认语言中文；
   static String defaultLocaleValue = "zh"; //默认语言中文；
-  static String zhLocale = "zh"; //
-  static String enLocale = "en_US"; //
-  static Map<String, String> globalLanguageMap = {GlobalConfig.zhLocale: "中文", GlobalConfig.enLocale: "English"};
+  static Map<String, String> globalLanguageMap = {"zh": "中文", "en_US": "English"};
 
   //static String ipAddress = "ws://47.108.146.67:9933";
   static String ipAddress = "ws://40.73.75.224:9933";
@@ -45,17 +43,6 @@ class GlobalConfig {
   static String publicIpDefaultValue = "http://40.73.35.55:9010/web_app/pub";
   static String currencyKey = "currency_key"; //选择的法币 usd || cny等
   static String currencyDefaultValue = "USD";
-
-  static Locale loadLocale(String locale) {
-    switch (locale) {
-      case 'zh':
-        return Locale('zh', '');
-      case 'en':
-        return Locale('en', '');
-      default:
-        return Locale('zh', '');
-    }
-  }
 
   //保存dapp 合约地址信息
   static String dappCaKey1 = "dapp_ca_key_1";

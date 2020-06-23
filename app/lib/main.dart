@@ -29,7 +29,7 @@ void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   var delegate = await LocalizationDelegate.create(
-    fallbackLocale: GlobalConfig.enLocale,
+    fallbackLocale: GlobalConfig.defaultLocaleValue,
     supportedLocales: GlobalConfig.globalLanguageMap.keys.toList(),
   );
 
