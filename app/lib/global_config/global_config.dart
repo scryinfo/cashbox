@@ -2,10 +2,6 @@
 *     1 ETH = 1e9gwei (10的九次方) = 1e18 wei
 * */
 
-import 'dart:ui';
-
-import 'package:app/model/chain.dart';
-
 class GlobalConfig {
   static const EthGasLimitKey = "eth";
   static const Erc20GasLimitKey = "eth";

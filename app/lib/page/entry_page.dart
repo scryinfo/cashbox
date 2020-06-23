@@ -46,6 +46,8 @@ class _EntryPageState extends State<EntryPage> {
   void didChangeDependencies() async {
     super.didChangeDependencies();
     await initWalletBasicData(); //case : 删除钱包后，没钱包，回到entryPage，每次检查一下
+    var spUtil = await SharedPreferenceUtil.instance;
+    languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
     future = _checkIsContainWallet();
   }
 
@@ -62,10 +64,8 @@ class _EntryPageState extends State<EntryPage> {
     await Wallets.instance.initWalletBasicData();
   }
 
+  //检查是否已有 创建过钱包
   Future<bool> _checkIsContainWallet() async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    print("initData  _checkIsContainWallet GlobalConfig.savedLocaleKey===>" + spUtil.getString(GlobalConfig.savedLocaleKey));
-    languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
     isContainWallet = await Wallets.instance.isContainWallet();
     return isContainWallet;
   }
