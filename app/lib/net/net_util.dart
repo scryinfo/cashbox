@@ -28,7 +28,12 @@ Future requestWithDeviceId(String url, {formData}) async {
     }
   }
   if (appSignInfo == null || appSignInfo.trim() == "") {
-    appSignInfo = await AppInfoUtil.instance.getAppSignInfo();
+    try {
+      appSignInfo = await AppInfoUtil.instance.getAppSignInfo();
+    } catch (e) {
+      LogUtil.e("requestWithDeviceId request() error is", "${e}");
+      return;
+    }
   }
   var paramObj = {
     "deviceId": _deviceData["id"],
