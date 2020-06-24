@@ -1,17 +1,20 @@
 import 'dart:io';
 
+import 'package:app/util/app_info_util.dart';
 import 'package:app/util/log_util.dart';
 import 'package:dio/dio.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
 
 final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-Map<String, dynamic> _deviceData = <String, dynamic>{};
+Map<String, dynamic> _deviceData = <String, dynamic>{}; //设备信息
+String appSignInfo; //应用签名信息
 
+// 访问后台接口时，增加参数
+// 1、设备id        deviceId
+// 2、应用签名信息   appSignInfo
 Future requestWithDeviceId(String url, {formData}) async {
-  if (_deviceData != null && _deviceData.length > 0) {
-    ///有设备信息记录
-  } else {
+  if (_deviceData == null || _deviceData.length == 0 || _deviceData["id"] == null) {
     ///没有设备信息记录，去获取
     try {
       if (Platform.isAndroid) {
@@ -21,13 +24,20 @@ Future requestWithDeviceId(String url, {formData}) async {
       }
     } on PlatformException {
       _deviceData = <String, dynamic>{'Error:': 'Failed to get platform version.'};
+      return;
     }
   }
-  //todo 应用签名信息
-  ///
-  ///
+  if (appSignInfo == null || appSignInfo.trim() == "") {
+    appSignInfo = await AppInfoUtil.instance.getAppSignInfo();
+  }
+  var paramObj = {
+    "deviceId": _deviceData["id"],
+    "signInfo": appSignInfo,
+  };
+  request(url, formData: paramObj);
 }
 
+//访问网络请求，url + 参数对象
 Future request(String url, {formData}) async {
   try {
     print('开始获取数据...............' + url);
@@ -56,7 +66,7 @@ Future request(String url, {formData}) async {
 Future download(url, savePath) async {
   try {
     Response response;
-    Dio dio = new Dio();
+    //Dio dio = new Dio();
     //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
     response = await Dio().download(url, savePath);
     print("downloadHttp response==>" + response.toString());
@@ -68,6 +78,7 @@ Future download(url, savePath) async {
   }
 }
 
+//记录android设备信息
 Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
   return <String, dynamic>{
     'version.securityPatch': build.version.securityPatch,
@@ -100,6 +111,7 @@ Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
   };
 }
 
+//记录ios设备信息
 Map<String, dynamic> _readIosDeviceInfo(IosDeviceInfo data) {
   return <String, dynamic>{
     'name': data.name,

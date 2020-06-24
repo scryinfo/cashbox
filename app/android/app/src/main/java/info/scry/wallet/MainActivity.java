@@ -99,6 +99,7 @@ public class MainActivity extends FlutterActivity {
                             public void onMethodCall(MethodCall call, Result result) {
                                 if (call.method.toString().equals(APP_SIGNINFO_METHOD)) {
                                     try {
+                                        mFlutterChannelResult = result;
                                         String signInfo = Utils.md5(Utils.getSignature(MainActivity.this));
                                         mFlutterChannelResult.success(signInfo);
                                     } catch (Exception e) {
@@ -114,7 +115,7 @@ public class MainActivity extends FlutterActivity {
                                         ScryLog.e("checkApplicationVersion appear error", e.toString());
                                     }
                                 } else {
-                                    ScryLog.e("Unknown method ===>");
+                                    ScryLog.e("APP_INFO_CHANNEL===>", "Unknown method");
                                 }
                             }
                         }

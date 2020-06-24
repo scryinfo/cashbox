@@ -62,7 +62,9 @@ class AppInfoUtil {
     appInfoChannel.invokeMethod(UPGRADE_APP_METHOD, {'downloadurl': downloadUrl, 'serverVersion': serverVersion});
   }
 
-  Future<bool> getAppSignInfo() async {
-    appInfoChannel.invokeMethod(APP_SIGNINFO_METHOD);
+  //获取app 签名信息
+  Future<String> getAppSignInfo() async {
+    String appSignInfo = await appInfoChannel.invokeMethod(APP_SIGNINFO_METHOD);
+    return appSignInfo;
   }
 }
