@@ -18,6 +18,7 @@ Cashbox钱包技术选型上，上层ui部分用flutter来实现，底层用rust
 
 ### 项目运行
    - 以android为例： 将编译好的动态库。 放在对应目录packages/wallet_manager/android/src/main/jniLibs/arm64-v8a下。
+   - 命名开发者自己的applicationId，对应位置为：app/android/app/build.gradle 里面的applicationId参数值。
    - 进入到app目录下，先执行flutter pub get 同步依赖的工具包。
    - 电脑连接上android设备后， 执行flutter run    可运行起开发版的android应用。
    - flutter run --release 运行release版的应用（具体参数可根据开发需求来改变）
