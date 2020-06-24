@@ -122,7 +122,7 @@ impl EEE {
         let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
         let tx_encode_data = hex::decode(raw_tx)?;
         let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
-        let wallet = model::Wallet::default();
+        let wallet = module::wallet::WalletManager{};
         let mnemonic = wallet.export_mnemonic(wallet_id, psw)?;
         let mn = String::from_utf8(mnemonic.mn)?;
         let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//这个地方直接使用 tx.func_data 会引起错误，会把首字节的数据漏掉，
@@ -135,7 +135,7 @@ impl EEE {
     pub fn raw_sign(&self, raw_data: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
         let raw_data = raw_data.get(2..).unwrap();// remove `0x`
         let tx_encode_data = hex::decode(raw_data)?;
-        let wallet = model::Wallet::default();
+        let wallet = module::wallet::WalletManager{};
         let mnemonic = wallet.export_mnemonic(wallet_id, psw)?;
         let mn = String::from_utf8(mnemonic.mn)?;
         let sign_data = substratetx::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();

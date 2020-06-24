@@ -1,13 +1,12 @@
 use jni::JNIEnv;
 use jni::objects::{JClass, JString, JObject, JValue};
 use jni::sys::{jint, jobject, jbyteArray};
-use wallets::StatusCode;
-use wallets::model::Wallet;
+use wallets::{StatusCode,module,model::Wallet};
 use crate::chain;
 
 #[no_mangle]
 pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_mnemonicGenerate(env: JNIEnv, _: JClass, count: jint) -> jobject {
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
 
     let mnemonic = wallet.crate_mnemonic(count as u8);
     let mn_byte = env.byte_array_from_slice(mnemonic.mn.as_slice()).unwrap();
@@ -40,7 +39,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_isContainWalle
     //调用获取所有钱包，查看返回值的情况
     let state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("can't found NativeLib$WalletState class");
     let state_obj = env.alloc_object(state_class).expect("create state_obj instance ");
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
     match wallet.is_contain_wallet() {
         Ok(data) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
@@ -126,7 +125,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_loadAllWalletL
     let wallet_list_class = env.find_class("java/util/ArrayList").expect("find ArrayList type");
     let wallet_list_class_obj = env.alloc_object(wallet_list_class).expect("create chain_list_class instance ");
     env.call_method(wallet_list_class_obj, "<init>", "()V", &[]).expect("wallet_list_class_obj init ArrayList");
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
     match wallet.get_all() {
         Ok(wallet_list) => {
             for wallet in wallet_list {
@@ -148,7 +147,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveWallet(env
 
     let wallet_class = env.find_class("info/scry/wallet_manager/NativeLib$Wallet").expect("can't found NativeLib$Wallet class");
 
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
     let ret_obj = match wallet.create_wallet(wallet_name.as_str(), mnemonic.as_slice(), pwd.as_slice(), wallet_type as i64) {
         Ok(wallet) => {
             let obj = wallet_jni_obj_util(&env, wallet);
@@ -174,7 +173,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_resetPwd(env: 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
     let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$WalletState instance ");
 
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
     match wallet.reset_mnemonic_pwd(wallet_id.as_str(), old_pwd.as_slice(), new_pwd.as_slice()) {
         Ok(_code) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("resetPwd StatusCode ");
@@ -194,7 +193,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_resetPwd(env: 
 pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowWallet(env: JNIEnv, _: JClass) -> jobject {
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
     match wallet.get_current_wallet() {
         Ok(wallet) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
@@ -214,7 +213,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_setNowWallet(e
     let wallet_id: String = env.get_string(walletId).unwrap().into();
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
     match wallet.set_current_wallet(wallet_id.as_str()) {
         Ok(_exist) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
@@ -235,7 +234,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_deleteWallet(e
     let passwd = env.convert_byte_array(psd).unwrap();
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
     match wallet.del_wallet(wallet_id.as_str(), passwd.as_slice()) {
         Ok(_exist) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
@@ -256,7 +255,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_rename(env: JN
     let wallet_name: String = env.get_string(walletName).unwrap().into();
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
     match wallet.rename_wallet(wallet_id.as_str(), wallet_name.as_str()) {
         Ok(exist) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
@@ -279,7 +278,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_exportWallet(e
     let mn_class = env.find_class("info/scry/wallet_manager/NativeLib$Mnemonic").expect("exportWallet NativeLib$Mnemonic");
     let jobj = env.alloc_object(mn_class).unwrap();
 
-    let wallet = wallets::model::Wallet::default();
+    let wallet = module::wallet::WalletManager{};
     match wallet.export_mnemonic(wallet_id.as_str(), passwd.as_slice()) {
         Ok(mnemonic) => {
             let mn_byte = env.byte_array_from_slice(mnemonic.mn.as_slice()).unwrap();

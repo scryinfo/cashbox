@@ -6,7 +6,9 @@ use uuid::Uuid;
 use substratetx::{Crypto, Keccak256};
 use model::{wallet_store::TbWallet, TbAddress, Address, Wallet, Mnemonic};
 
-impl Wallet {
+pub struct WalletManager;
+
+impl WalletManager {
     pub fn get_all(&self) -> WalletResult<Vec<Wallet>> {
         let wallet_info_map = self.get_wallet_info();
         let eee_obj = chain::EEE {};
