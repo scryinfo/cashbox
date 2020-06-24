@@ -22,6 +22,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import info.scry.utils.ScryLog;
+import info.scry.utils.Utils;
 import info.scry.ui.BaseDialog;
 
 import android.app.Dialog;
@@ -52,8 +53,9 @@ public class MainActivity extends FlutterActivity {
     private final String FILE_SYSTEM_METHOD = "file_system_method";
     private final String CHARGING_CHANNEL = "samples.flutter.io/charging";
     private final String FLUTTER_LOG_CHANNEL = "android_log_channel";
-    private final String UPGRADE_APP_CHANNEL = "upgrade_app_channel";
+    private final String APP_INFO_CHANNEL = "app_info_channel";
     private final String UPGRADE_APP_METHOD = "upgrade_app_method";
+    private final String APP_SIGNINFO_METHOD = "app_signinfo_method";
     Context context;
 
     @Override
@@ -90,21 +92,29 @@ public class MainActivity extends FlutterActivity {
                 );
 
         //flutter处 通知版本升级
-        new MethodChannel(getFlutterView(), UPGRADE_APP_CHANNEL)
+        new MethodChannel(getFlutterView(), APP_INFO_CHANNEL)
                 .setMethodCallHandler(
                         new MethodCallHandler() {
                             @Override
                             public void onMethodCall(MethodCall call, Result result) {
-                                String downloadurl = call.argument("downloadurl");
-                                String serverVersion = call.argument("serverVersion");
-                                if (call.method.toString().equals(UPGRADE_APP_METHOD)) {
+                                if (call.method.toString().equals(APP_SIGNINFO_METHOD)) {
                                     try {
-                                        checkAndUpgradeVersion(downloadurl, serverVersion);  //todo 待验证，暂不放开
+                                        String signInfo = Utils.md5(Utils.getSignature(MainActivity.this));
+                                        mFlutterChannelResult.success(signInfo);
+                                    } catch (Exception e) {
+                                        ScryLog.e("APP_SIGNINFO_METHOD appear error", e.toString());
+                                        mFlutterChannelResult.success("");
+                                    }
+                                } else if (call.method.toString().equals(UPGRADE_APP_METHOD)) {
+                                    String downloadurl = call.argument("downloadurl");
+                                    String serverVersion = call.argument("serverVersion");
+                                    try {
+                                        checkAndUpgradeVersion(downloadurl, serverVersion);
                                     } catch (Exception e) {
                                         ScryLog.e("checkApplicationVersion appear error", e.toString());
                                     }
                                 } else {
-                                    ScryLog.e("call.method.toString() not equal===>", call.method.toString());
+                                    ScryLog.e("Unknown method ===>");
                                 }
                             }
                         }

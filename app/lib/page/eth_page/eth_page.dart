@@ -14,7 +14,7 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
-import 'package:app/util/upgrade_app_util.dart';
+import 'package:app/util/app_info_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -129,7 +129,7 @@ class _EthPageState extends State<EthPage> {
     loadDigitBalance();
     loadLegalCurrency();
     loadDigitRateInfo();
-    UpgradeAppUtil.instance.checkAppUpgrade();
+    AppInfoUtil.instance.checkAppUpgrade();
   }
 
   //todo 保存预置代币 version1.0写死，后续移除

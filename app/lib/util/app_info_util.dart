@@ -3,22 +3,24 @@ import 'package:app/net/net_util.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 
-class UpgradeAppUtil {
-  static const methodPlugin = const MethodChannel('upgrade_app_channel');
+class AppInfoUtil {
+  static const appInfoChannel = const MethodChannel('app_info_channel');
+  static const UPGRADE_APP_METHOD = "upgrade_app_method";
+  static const APP_SIGNINFO_METHOD = "app_signinfo_method";
 
   //工厂单例类实现
-  factory UpgradeAppUtil() => _getInstance();
+  factory AppInfoUtil() => _getInstance();
 
-  static UpgradeAppUtil get instance => _getInstance();
-  static UpgradeAppUtil _instance;
+  static AppInfoUtil get instance => _getInstance();
+  static AppInfoUtil _instance;
 
-  UpgradeAppUtil._internal() {
+  AppInfoUtil._internal() {
     //init data
   }
 
-  static UpgradeAppUtil _getInstance() {
+  static AppInfoUtil _getInstance() {
     if (_instance == null) {
-      _instance = new UpgradeAppUtil._internal();
+      _instance = new AppInfoUtil._internal();
     }
     return _instance;
   }
@@ -57,6 +59,10 @@ class UpgradeAppUtil {
 
   //通知到android/ios 原生部分，去升级
   _doUpgradeApp(String downloadUrl, String serverVersion) {
-    methodPlugin.invokeMethod('upgrade_app_method', {'downloadurl': downloadUrl, 'serverVersion': serverVersion});
+    appInfoChannel.invokeMethod(UPGRADE_APP_METHOD, {'downloadurl': downloadUrl, 'serverVersion': serverVersion});
+  }
+
+  Future<bool> getAppSignInfo() async {
+    appInfoChannel.invokeMethod(APP_SIGNINFO_METHOD);
   }
 }

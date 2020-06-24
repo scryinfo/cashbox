@@ -1,7 +1,7 @@
 import 'package:app/generated/i18n.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/upgrade_app_util.dart';
+import 'package:app/util/app_info_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/list_item.dart';
 import 'package:flutter/material.dart';
@@ -108,7 +108,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
           ),
           GestureDetector(
             onTap: () async {
-              bool isCanUpgrade = await UpgradeAppUtil.instance.checkAppUpgrade();
+              bool isCanUpgrade = await AppInfoUtil.instance.checkAppUpgrade();
               if (!isCanUpgrade) {
                 Fluttertoast.showToast(msg: translate('no_new_version_hint'));
               }
