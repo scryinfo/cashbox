@@ -1,7 +1,9 @@
 /*
-这个vendor 配置文件，用来扩展配置各个功能接口地址。可根据需要调整增加、删除
+  配置文件
+  开发者可根据自己需要，增、删各个功能的接口接口数据。
+  例如：可增加对应后端法币接口等
 **/
-class VendorGlobalConfig {
+class VendorConfig {
   static const RatePath = "";
   static const versionCheckIp = ""; //版本检查接口；
   static const latestVersionIp = ""; //最新版本app下载接口；

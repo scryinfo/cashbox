@@ -1,4 +1,4 @@
-import 'package:app/global_config/vendor_global_config.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/net/net_util.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
@@ -30,7 +30,7 @@ class UpgradeAppUtil {
     String buildNumber = packageInfo.buildNumber; //版本构建号
     print("packageInfo appVersion===>" + appVersion + "||buildNumber===>" + buildNumber);
     try {
-      var serveResult = await request(VendorGlobalConfig.versionCheckIp, formData: {"ApkVersion": appVersion});
+      var serveResult = await request(VendorConfig.versionCheckIp, formData: {"ApkVersion": appVersion});
       if ((serveResult != null) && (serveResult["code"] == 0)) {
         var resultObj = serveResult["data"];
         if (resultObj == null || resultObj["confirmLatest"] == null) {
@@ -41,7 +41,7 @@ class UpgradeAppUtil {
           print("confirmLatest=====>" + resultObj["confirmLatest"].toString());
           var latestVersion = resultObj["latestApk"]["apkVersion"].toString();
           if (latestVersion != null && latestVersion.isNotEmpty) {
-            _doUpgradeApp(VendorGlobalConfig.latestVersionIp, latestVersion);
+            _doUpgradeApp(VendorConfig.latestVersionIp, latestVersion);
             return true;
           }
         }

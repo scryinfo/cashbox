@@ -1,4 +1,4 @@
-import 'package:app/global_config/vendor_global_config.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';

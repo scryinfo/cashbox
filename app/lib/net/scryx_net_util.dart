@@ -1,11 +1,11 @@
-import 'package:app/global_config/vendor_global_config.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/util/sharedpreference_util.dart';
 import 'net_util.dart';
 
 class ScryXNetUtil {
   loadScryXStorage(address) async {
     var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorGlobalConfig.scryXIpKey);
+    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
     if (netUrl == null || netUrl.isEmpty) {
       return "";
     }
@@ -26,7 +26,7 @@ class ScryXNetUtil {
 
   loadScryXRuntimeVersion() async {
     var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorGlobalConfig.scryXIpKey);
+    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
     if (netUrl == null || netUrl.isEmpty) {
       return "";
     }
@@ -47,7 +47,7 @@ class ScryXNetUtil {
 
   loadScryXBlockHash() async {
     var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorGlobalConfig.scryXIpKey);
+    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
     if (netUrl == null || netUrl.isEmpty) {
       return "";
     }
@@ -68,7 +68,7 @@ class ScryXNetUtil {
 
   submitExtrinsic(txInfo) async {
     var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorGlobalConfig.scryXIpKey);
+    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
     if (netUrl == null || netUrl.isEmpty) {
       return "";
     }

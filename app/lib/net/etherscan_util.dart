@@ -1,5 +1,5 @@
 import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_global_config.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/model/wallets.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'net_util.dart';
 
-const etherscanApiKey = VendorGlobalConfig.ETHERSCAN_API_KEY; //todo change it 替换成你自己,在etherscan中申请的apikey
+const etherscanApiKey = VendorConfig.ETHERSCAN_API_KEY; //todo change it 替换成你自己,在etherscan中申请的apikey
 
 const Eth_Tx_Account = "http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
 const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=";

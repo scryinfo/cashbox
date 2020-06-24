@@ -1,5 +1,5 @@
 import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_global_config.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
