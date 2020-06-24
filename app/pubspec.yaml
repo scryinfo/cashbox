@@ -50,6 +50,9 @@ dependencies:
 
   webview_flutter: ^0.3.20+2
 
+  device_info: ^0.4.2+4
+  # 获取设备id
+  
   qr_flutter: ^3.0.1
   # 生成二维码         https://github.com/lukef/qr.flutter
 
