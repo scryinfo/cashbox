@@ -25,7 +25,7 @@ class AppInfoUtil {
     return _instance;
   }
 
-  //true:需要更新，   false： 不需要更新
+  //方法参数，根据后端来定。  true:需要更新，   false： 不需要更新
   Future<bool> checkAppUpgrade() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String appVersion = packageInfo.version;
@@ -35,12 +35,12 @@ class AppInfoUtil {
       var serveResult = await request(VendorConfig.versionCheckIp, formData: {"ApkVersion": appVersion});
       if ((serveResult != null) && (serveResult["code"] == 0)) {
         var resultObj = serveResult["data"];
-        if (resultObj == null || resultObj["confirmLatest"] == null) {
+        if (resultObj == null || resultObj["isLatest"] == null) {
           print("resultObj is wrong=====>");
           return false;
         }
-        if (!resultObj["confirmLatest"]) {
-          print("confirmLatest=====>" + resultObj["confirmLatest"].toString());
+        if (!resultObj["isLatest"]) {
+          print("isLatest=====>" + resultObj["isLatest"].toString());
           var latestVersion = resultObj["latestApk"]["apkVersion"].toString();
           if (latestVersion != null && latestVersion.isNotEmpty) {
             _doUpgradeApp(VendorConfig.latestVersionIp, latestVersion);
