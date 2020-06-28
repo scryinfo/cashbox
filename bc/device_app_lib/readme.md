@@ -26,6 +26,12 @@
 - 确保已经设置`ANDROID_NDK`环境变量，
 - rustup toolchain install x86_64-unknown-linux-gnu
 - rustup target add aarch64-linux-android armv7-linux-androideabi
+- 在`~/.cargo/config`中配置linker、ar路径，针对需要编译的平台分别进行配置。比如需要编译`aarch64-linux-android`平台对应的配置文件为
+```
+[target.aarch64-linux-android]
+linker="/home/jeremy/work/sw/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android28-clang"
+ar="/home/jeremy/work/sw/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar"
+```
 - 根据android目标平台架构，运行`script`目录下 `build_aarch64-linux-android.sh` 或 `build_armv7-linux-androideabi.sh`
 
 **说明**：当前钱包版本Android适配目标平台`targetSdkVersion 28`
