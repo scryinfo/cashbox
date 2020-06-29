@@ -5,7 +5,7 @@ import 'package:app/net/net_util.dart';
 //返回 价格对象Rate
 Future<Rate> loadRateInstance() async {
   try {
-    var res = await request(VendorConfig.RatePath); //todo change it 替换成你自己后端对应的法币接口地址
+    var res = await requestWithDeviceId(VendorConfig.rateDigitIpDefaultValue); //todo change it 替换成你自己后端对应的法币接口地址
     if (res != null && (res as Map).containsKey("data") && ((res["data"] as Map).containsKey("prices"))) {
       Rate resultRate = Rate.instance;
       Map priceMap = (res["data"]["prices"] as Map);

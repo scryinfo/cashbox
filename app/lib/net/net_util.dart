@@ -11,6 +11,7 @@ final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
 Map<String, dynamic> _deviceData = <String, dynamic>{}; //设备信息
 String appSignInfo; //应用签名信息
 String deviceId = ""; //设备唯一标识id
+
 // 访问后台接口时，增加参数
 // 1、设备id        deviceId
 // 2、应用签名信息   appSignInfo
@@ -43,11 +44,9 @@ Future requestWithDeviceId(String url, {formData}) async {
       return;
     }
   }
-  var paramObj = {
-    "deviceId": deviceId,
-    "signInfo": appSignInfo,
-  };
-  request(url, formData: paramObj);
+  formData["deviceId"] = deviceId;
+  formData["signature"] = appSignInfo;
+  return request(url, formData: formData);
 }
 
 //访问网络请求，url + 参数对象
