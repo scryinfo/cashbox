@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app/util/app_info_util.dart';
 import 'package:app/util/log_util.dart';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +10,7 @@ import 'package:flutter/services.dart';
 final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
 Map<String, dynamic> _deviceData = <String, dynamic>{}; //设备信息
 String appSignInfo; //应用签名信息
-
+String deviceId = ""; //设备唯一标识id
 // 访问后台接口时，增加参数
 // 1、设备id        deviceId
 // 2、应用签名信息   appSignInfo
@@ -19,11 +20,18 @@ Future requestWithDeviceId(String url, {formData}) async {
     try {
       if (Platform.isAndroid) {
         _deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+        if (_deviceData != null) {
+          deviceId = _deviceData["androidId"]; //目前各个android品台设备,唯一标识值，没有同意，暂取androidId这个值。
+        }
       } else if (Platform.isIOS) {
         _deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
       }
     } on PlatformException {
       _deviceData = <String, dynamic>{'Error:': 'Failed to get platform version.'};
+      LogUtil.e("requestWithDeviceId", "unknown target platform");
+      return;
+    } catch (e) {
+      LogUtil.e("requestWithDeviceId", "${e}");
       return;
     }
   }
@@ -36,7 +44,7 @@ Future requestWithDeviceId(String url, {formData}) async {
     }
   }
   var paramObj = {
-    "deviceId": _deviceData["id"],
+    "deviceId": deviceId,
     "signInfo": appSignInfo,
   };
   request(url, formData: paramObj);
