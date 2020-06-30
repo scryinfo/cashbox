@@ -45,6 +45,7 @@ Future requestWithDeviceId(String url, {formData}) async {
       return;
     }
   }
+  if (formData == null) formData = {};
   formData["deviceId"] = deviceId;
   formData["signature"] = appSignInfo;
   return request(url, formData: formData);
