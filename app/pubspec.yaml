@@ -115,9 +115,6 @@ flutter:
   assets:
 
     - assets/i18n/
-    
-    - assets/crt.pem
-    - assets/ca.crt
    
     - assets/images/
     - assets/images/2.0x/

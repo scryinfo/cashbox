@@ -57,12 +57,13 @@ Future request(String url, {formData}) async {
     Response response;
     Dio dio = new Dio();
     //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
-    String cerData = await rootBundle.loadString("assets/ca.crt");  ///加入 可信证书 （可自签）
+    //String cerData = await rootBundle.loadString("assets/crt.pem"); ///加入 可信证书 （可自签）
+
+    //不验证证书实现方式
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
-      SecurityContext sc = new SecurityContext();
-      sc.setTrustedCertificatesBytes(utf8.encode(cerData));
-      HttpClient httpClient = new HttpClient(context: sc);
-      return httpClient;
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+        return true;
+      };
     };
 
     if (formData == null) {
