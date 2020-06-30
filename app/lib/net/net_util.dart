@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app/util/app_info_util.dart';
@@ -56,6 +57,14 @@ Future request(String url, {formData}) async {
     Response response;
     Dio dio = new Dio();
     //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
+    String cerData = await rootBundle.loadString("assets/ca.crt");  ///加入 可信证书 （可自签）
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+      SecurityContext sc = new SecurityContext();
+      sc.setTrustedCertificatesBytes(utf8.encode(cerData));
+      HttpClient httpClient = new HttpClient(context: sc);
+      return httpClient;
+    };
+
     if (formData == null) {
       response = await dio.post(url);
     } else {
