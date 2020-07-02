@@ -26,3 +26,8 @@
      - widgets     通用widget组件
 
      pubspec.yaml   项目配置文件
+
+####
+    查看andriod apk签名信息
+    先安装jdk并配置好环境变量，然后运行->CMD->输入以下命令
+    keytool -list -printcert -jarfile D:......\target.apk
