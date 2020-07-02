@@ -101,6 +101,7 @@ pub fn hash160(public_key: &str) -> String {
 }
 
 #[no_mangle]
+#[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_creat_1master(env: JNIEnv, _: JClass, mnemonic_str: JString) -> jobject {
     let mnemonic_str = env.get_string(mnemonic_str).unwrap();
 

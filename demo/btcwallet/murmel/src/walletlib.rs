@@ -9,6 +9,7 @@ use bitcoin_hashes::sha256d;
 use bitcoin::hashes::hex::FromHex;
 use hex::decode as hex_decode;
 use bitcoin::consensus::serialize;
+use bitcoin::util::psbt::serialize::Serialize;
 
 const PASSPHRASE: &str = "";
 
@@ -26,22 +27,28 @@ pub fn create_master() -> Transaction {
     let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
     master.add_account(account);
 
-    let source = master.get_mut((0, 0)).unwrap().next_key().unwrap().address.clone();
-    let public_key = master.get_mut((0, 0)).unwrap().next_key().unwrap().public.clone();
+    let account = master.get_mut((0, 0)).unwrap();
+    let instance_key = account.next_key().unwrap();
+    let source = instance_key.address.clone();
+    let public_key = instance_key.public.clone();
+    let public_compressed = public_key.serialize();
+    let public_compressed = hex::encode(public_compressed);
     println!("source {:?}", &source);
-    println!("public_key {:?}", public_key);
-    println!("script_pubkey {:?}", source.script_pubkey());
+    println!("public_compressed {:?}", &public_compressed);
 
     let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 1, 10).unwrap();
     master.add_account(account);
-    // get next legacy receiver address
-    let target = master.get_mut((0, 1)).unwrap().next_key().unwrap().address.clone();
-    let target_pubkey = master.get_mut((0, 0)).unwrap().next_key().unwrap().public.clone();
-    println!("target address {:?}", target);
-    println!("target pub key {:?}", target_pubkey);
+    let account = master.get_mut((0, 1)).unwrap();
+    let instance_key = account.next_key().unwrap();
+    let target = instance_key.address.clone();
+    let public_key = instance_key.public.clone();
+    let public_compressed = public_key.serialize();
+    let public_compressed = hex::encode(public_compressed);
+    println!("target {:?}", &target);
+    println!("public_compressed {:?}", &public_compressed);
+
 
     const RBF: u32 = 0xffffffff - 2;
-
     //a transaction that spend spend spend source to target
     let mut spending_transaction = Transaction {
         input: vec![

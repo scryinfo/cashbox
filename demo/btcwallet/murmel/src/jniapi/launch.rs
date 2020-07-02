@@ -16,6 +16,7 @@ use constructor::Constructor;
 use db::SQLite;
 
 #[no_mangle]
+#[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_launch(env: JNIEnv,
 // This is the class that owns our static method. It's not going to be used,
 // but still must be present to match the expected signature of a static
