@@ -53,19 +53,6 @@ class _EthPageState extends State<EthPage> {
   void initState() {
     super.initState();
     initData();
-    print("initState =========================>");
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print("didChangeDependencies =========================>");
-  }
-
-  @override
-  void didUpdateWidget(EthPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    print("didUpdateWidget =========================>");
   }
 
   void initData() async {
@@ -90,7 +77,7 @@ class _EthPageState extends State<EthPage> {
       Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, 0, singleDigitCount);
       if (nativeAuthMap != null && nativeAuthMap["authDigit"] != null && nativeAuthMap["authDigit"].length != 0) {
         List<Digit> tempDigitsList = nativeAuthMap["authDigit"];
-        print("||tempDigitsList.length.toStrin===>" + tempDigitsList.length.toString());
+        print("tempDigitsList.length.toString===>" + tempDigitsList.length.toString());
         for (int i = 0; i < tempDigitsList.length; i++) {
           var element = tempDigitsList[i];
           if ((element.contractAddress.trim().toUpperCase() == DddMainNetContractAddress.toUpperCase()) ||
@@ -99,7 +86,6 @@ class _EthPageState extends State<EthPage> {
                 .addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, element.digitId);
             int status = addDigitMap["status"];
             if (status == null || status != 200) {
-              print("addDigitToChainModel failure==" + addDigitMap["message"]);
               LogUtil.e("addDigitToChainModel error is", addDigitMap["message"]);
             } else {
               print("addDigitToChainModel successful==");
@@ -122,7 +108,6 @@ class _EthPageState extends State<EthPage> {
     this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
     digitListFuture = loadDisplayDigitListData();
     chainIndex = Wallets.instance.nowWallet.chainList.indexOf(Wallets.instance.nowWallet.nowChain);
-    print("chainIndex=======>" + chainIndex.toString());
     setState(() {
       this.walletList = walletList;
     });
@@ -757,15 +742,6 @@ class _EthPageState extends State<EthPage> {
 
   //链卡片 地址address
   Widget _chainCardAddressWidget(index) {
-    print("nowChian===>" + Wallets.instance.nowWallet.nowChain.toString() + "||");
-    print("_chainCardAddressWidget index======>" +
-        index.toString() +
-        "||" +
-        Wallets.instance.nowWallet.chainList[index].chainType.toString() +
-        "||" +
-        Chain.chainTypeToValue(Wallets.instance.nowWallet.nowChain.chainType) +
-        "||" +
-        Wallets.instance.nowWallet.chainList[index].chainAddress.toString());
     return Container(
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.start,
