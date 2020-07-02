@@ -32,7 +32,7 @@ class AppInfoUtil {
     String buildNumber = packageInfo.buildNumber; //版本构建号
     print("packageInfo appVersion===>" + appVersion + "||buildNumber===>" + buildNumber);
     try {
-      var serveResult = await requestWithDeviceId(VendorConfig.versionCheckIp, formData: {"ApkVersion": appVersion});
+      var serveResult = await requestWithDeviceId(VendorConfig.versionCheckIp, formData: {"apkVersion": appVersion});
       if ((serveResult != null) && (serveResult["code"] == 0)) {
         var resultObj = serveResult["data"];
         if (resultObj == null || resultObj["isLatest"] == null) {
