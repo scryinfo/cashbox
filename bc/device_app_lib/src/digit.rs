@@ -224,7 +224,7 @@ pub mod android {
         let eth_token_class = env.find_class("info/scry/wallet_manager/NativeLib$EthToken").expect("find NativeLib$EthToken class");
         for datum in data.eth_tokens {
             let eth_token_class_obj = env.alloc_object(eth_token_class).expect("alloc eth_token_class object");
-            //设置digit 属性
+            //Set digit property
             env.set_field(eth_token_class_obj, "id", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(datum.id).unwrap()))).expect("eth_token_class_obj set id value");
             env.set_field(eth_token_class_obj, "symbol", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(datum.symbol).unwrap()))).expect("eth_token_class_obj set symbol value");
             env.set_field(eth_token_class_obj, "name", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(datum.name).unwrap()))).expect("eth_token_class_obj set name value");

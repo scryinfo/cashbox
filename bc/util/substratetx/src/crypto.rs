@@ -7,15 +7,15 @@ use tiny_keccak::Keccak;
 use crate::error::Error;
 
 pub const SCRYPT_LOG_N: u8 = 5;
-//调试 将迭代次数降低
+//Debug Reduce the number of iterations
 pub const SCRYPT_P: u32 = 1;
-//u32 的数据类型为使用scrypt这个库中定义
+//The data type of u32 is defined in the library using scrypt
 pub const SCRYPT_R: u32 = 8;
 pub const SCRYPT_DKLEN: usize = 32;
 pub const CIPHER_KEY_SIZE: &'static str = "aes-128-ctr";
 
 //type Result<T> = Result<T,Error>;
-//定义输入keystore文件格式，用于转换json格式文件
+//Define the input keystore file format, used to convert json format file
 #[derive(Serialize, Deserialize)]
 struct KeyStore {
     version: String,
@@ -28,7 +28,7 @@ struct KeyCrypto {
     cipher: String,
     cipherparams: CipherParams,
     kdf: String,
-    //使用的kdf算法 现在默认使用scrypt
+    //The kdf algorithm used now uses scrypt by default
     kdfparams: KdfParams,
     mac: String,
 }
@@ -150,7 +150,7 @@ pub trait Crypto {
         };
 
         let ciphertext = aes::encrypt(aes::EncryptMethod::Aes128Ctr, mn, &dk, &iv).unwrap();
-        //将导出密钥的16到32位数据，与加密后的内容拼接，计算出的摘要值
+        //The 16- to 32-bit data of the derived key is concatenated with the encrypted content to calculate the digest value
         let mut hex_mac = [0u8; 32];
         {
             let mut keccak = tiny_keccak::Keccak::new_keccak256();
@@ -180,7 +180,7 @@ pub trait Crypto {
         //  let store: Result<KeyStore, _> = serde_json::from_str(keystore);
         let store: KeyStore = serde_json::from_str(keystore)?;
 
-        //对称加密密钥
+        //Symmetric encryption key
         let mut key = vec![0u8; 32];
 
         //  let store = store.unwrap();
@@ -201,13 +201,13 @@ pub trait Crypto {
         scrypt(password, salt.as_slice(), &params, &mut key)
             .expect("32 bytes always satisfy output length requirements");
 
-        //开始构造对称解密所需要的参数
-        let hex_ciphertext: &str = &crypto.ciphertext;
+        //Start constructing the parameters needed for symmetric decryption
+         let hex_ciphertext: &str = &crypto.ciphertext;
 
         let ciphertext = hex::decode(hex_ciphertext)?;
 
-        //要校验输入的密钥导出的对称密钥是否正确，将导出密钥的16到32位数据，与加密后的内容拼接，计算出的摘要值与文本中保存的hash进行对比
-        //let mut account_msg = [0u8;16+ciphertext.len()];
+         //To verify that the symmetric key derived from the input key is correct, concatenate the 16 to 32-bit data of the derived key with the encrypted content, and compare the calculated digest value with the hash stored in the text
+         //let mut account_msg = [0u8;16+ciphertext.len()];
         /* let mut account_msg =Vec::new();
              account_msg.clone_from_slice(&key[16..]);
          //account_msg.clone_from_slice(&key[16..]);
@@ -233,7 +233,7 @@ pub trait Crypto {
         let cipher_method = match cipher.as_str() {
             "aes-128-ctr" => aes::EncryptMethod::Aes128Ctr,
             "aes-256-ctr" => aes::EncryptMethod::Aes256Ctr,
-            _ => aes::EncryptMethod::Aes256Ctr,//默认使用这种方式加密
+            _ => aes::EncryptMethod::Aes256Ctr,//Encrypted in this way by default
         };
         let mnemonic_content = aes::decrypt(cipher_method, ciphertext.as_slice(), key.as_slice(), iv.as_slice());
         match mnemonic_content {

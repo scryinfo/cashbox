@@ -1,10 +1,10 @@
-// 该模块用于定义module database 层级之间的交互对象的定义
+// This module is used to define the definition of interactive objects between module database levels
 use super::*;
 
-//用于定义与device_app_lib交互的数据格式
+//Used to define the data format interacting with device_app_lib
 mod wallet;
 
-//用于定义数据存储的结构
+//Used to define the structure of data storage
 pub mod wallet_store;
 
 pub use wallet::{Wallet, Mnemonic};
@@ -22,30 +22,30 @@ pub struct Address {
 }
 
 /// Description of a Digit
-/// 用于默认代币的导入
+/// Used for import of default tokens
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
 pub struct DefaultDigit {
-    pub id: Option<String>,
-    #[serde(rename = "contractAddress")]
-    pub contract_address: Option<String>,
-    #[serde(rename = "shortName")]
-    pub short_name: String,
-    #[serde(rename = "fullName")]
-    pub full_name: String,
-    pub group_name: Option<String>,
-    pub decimal: String,
-    #[serde(rename = "chainType")]
-    pub chain_type: String,
-    #[serde(rename = "urlImg")]
-    pub img_url: Option<String>,
-    pub is_basic: Option<bool>,
-    pub is_default: Option<bool>,
-    pub status: Option<i64>,
+     pub id: Option<String>,
+     #[serde(rename = "contractAddress")]
+     pub contract_address: Option<String>,
+     #[serde(rename = "shortName")]
+     pub short_name: String,
+     #[serde(rename = "fullName")]
+     pub full_name: String,
+     pub group_name: Option<String>,
+     pub decimal: String,
+     #[serde(rename = "chainType")]
+     pub chain_type: String,
+     #[serde(rename = "urlImg")]
+     pub img_url: Option<String>,
+     pub is_basic: Option<bool>,
+     pub is_default: Option<bool>,
+     pub status: Option<i64>,
 
 }
 
 /// Description of a Digit
-/// 用于认证代币的导入
+/// Import of authentication tokens
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
 pub struct EthToken {
     pub id: String,
@@ -57,10 +57,10 @@ pub struct EthToken {
     pub chain_type: String,
     #[serde(rename = "shortName")]
     pub symbol: String,
-    //简写名称
-    #[serde(rename = "fullName")]
-    pub name: String,
-    //完整的名称
+    //Abbreviated name
+     #[serde(rename = "fullName")]
+     pub name: String,
+     //Complete name
     pub publisher: Option<String>,
     pub project: Option<String>,
     #[serde(rename = "urlImg")]

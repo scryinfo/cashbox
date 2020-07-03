@@ -35,14 +35,14 @@ pub mod android {
             let chain_type = eee_chain.chain_type.unwrap();
             env.set_field(chain_class_obj, "chainType", "I", JValue::Int(chain_type as i32)).expect("get_eee_chain_obj chain_type");
         }
-        //每一条链下存在多个代币，需要使用List来存储
+        //There are multiple tokens under each chain, need to use List to store
         let digit_list_obj = env.alloc_object(eee_digit_list_class).expect("create digit_list_obj instance");
         env.call_method(digit_list_obj, "<init>", "()V", &[]).expect("chain chain obj init method is exec");
 
         for digit in eee_chain.digit_list {
-            //实例化 chain
+            //Instantiate chain
             let digit_class_obj = env.alloc_object(eee_digit_class).expect("create eee_digit_class instance");
-            //设置digit 属性
+            //Set the digit attribute
             env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("set status value");
 
             env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("set digitId value");
@@ -106,14 +106,14 @@ pub mod android {
             let chain_type = eth_chain.chain_type.unwrap();
             env.set_field(chain_class_obj, "chainType", "I", JValue::Int(chain_type as i32)).expect("get_eth_chain_obj chain_type ");
         }
-        //每一条链下存在多个代币，需要使用List来存储
-        let digit_list_obj = env.alloc_object(eth_digit_list_class).expect("get_eth_chain_obj eth_digit_list_class");
-        env.call_method(digit_list_obj, "<init>", "()V", &[]).expect("get_eth_chain_obj digit_list_obj");
+        //There are multiple tokens under each chain, you need to use List to store
+         let digit_list_obj = env.alloc_object(eth_digit_list_class).expect("get_eth_chain_obj eth_digit_list_class");
+         env.call_method(digit_list_obj, "<init>", "()V", &[]).expect("get_eth_chain_obj digit_list_obj");
 
-        for digit in eth_chain.digit_list {
-            //实例化 chain
-            let digit_class_obj = env.alloc_object(eth_digit_class).expect("eth_digit_class create chain instance");
-            //设置digit 属性
+         for digit in eth_chain.digit_list {
+             //Instantiate chain
+             let digit_class_obj = env.alloc_object(eth_digit_class).expect("eth_digit_class create chain instance");
+             //Set the digit attribute
             env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("get_eth_chain_obj set status value");
             env.set_field(digit_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.chain_id).unwrap()))).expect("get_eth_chain_obj set chainId value");
             env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("get_eth_chain_obj set digitId value");
@@ -175,18 +175,18 @@ pub mod android {
             let chain_type = btc_chain.chain_type.unwrap();
             env.set_field(chain_class_obj, "chainType", "I", JValue::Int(chain_type as i32)).expect("get_btc_chain_obj set chainType");
         }
-        //每一条链下存在多个代币，需要使用List来存储
-        let digit_list_obj = env.alloc_object(btc_digit_list_class).expect("btc_digit_list_class");
-        env.call_method(digit_list_obj, "<init>", "()V", &[]).expect("chain chain obj init method is exec");
+        //There are multiple tokens under each chain, you need to use List to store
+         let digit_list_obj = env.alloc_object(btc_digit_list_class).expect("btc_digit_list_class");
+         env.call_method(digit_list_obj, "<init>", "()V", &[]).expect("chain chain obj init method is exec");
 
-        for digit in btc_chain.digit_list {
-            //实例化 chain
-            let digit_class_obj = env.alloc_object(btc_digit_class).expect("btc_digit_class");
-            //设置digit 属性
-            env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("get_btc_chain_obj set status value");
+         for digit in btc_chain.digit_list {
+             //Instantiate chain
+             let digit_class_obj = env.alloc_object(btc_digit_class).expect("btc_digit_class");
+             //Set the digit attribute
+             env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("get_btc_chain_obj set status value");
 
-            env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("get_btc_chain_obj set digitId value");
-            //这个值可优化
+             env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("get_btc_chain_obj set digitId value");
+             //This value can be optimized
             // env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address.clone()).unwrap()))).expect("get_btc_chain_obj set address value");
 
             /*   if digit.contract_address.is_some() {
@@ -327,28 +327,28 @@ pub mod android {
         let wallet_message_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_message_class");
         let state_obj = env.alloc_object(wallet_message_class).expect("state_obj");
 
-        //发送方账户地址 通过wallet id 能够关联起来
-        let from_address: String = env.get_string(fromAddress).unwrap().into();
-        //接收方账户地址
-        let to_address: String = env.get_string(toAddress).unwrap().into();
+        //The sender account address can be linked by wallet id
+         let from_address: String = env.get_string(fromAddress).unwrap().into();
+         //Receiver account address
+         let to_address: String = env.get_string(toAddress).unwrap().into();
 
-        let to_address = {
-            if to_address.is_empty() {
-                None
-            } else {
-                let to = H160::from_slice(hex::decode(&to_address[2..]).unwrap().as_slice());
-                Some(to)
-            }
-        };
-        //调用合约地址
-        let contract_address: String = env.get_string(contractAddress).unwrap().into();
-        //转帐金额 这里都用这个参数来表示
-        let amount = {
-            let value_str: String = env.get_string(value).unwrap().into();
-            //不同的代币，会有不同的精度
-            wallets::convert_token(&value_str, decimal as usize).unwrap()
-        };
-        //附加参数
+         let to_address = {
+             if to_address.is_empty() {
+                 None
+             } else {
+                 let to = H160::from_slice(hex::decode(&to_address[2..]).unwrap().as_slice());
+                 Some(to)
+             }
+         };
+         //Call contract address
+         let contract_address: String = env.get_string(contractAddress).unwrap().into();
+         //The transfer amount is expressed here using this parameter
+         let amount = {
+             let value_str: String = env.get_string(value).unwrap().into();
+             //Different tokens will have different accuracy
+             wallets::convert_token(&value_str, decimal as usize).unwrap()
+         };
+         //Additional parameters
         let data: String = env.get_string(backup).unwrap().into();
         let data = if data.is_empty() {
             None
@@ -356,18 +356,18 @@ pub mod android {
             Some(data)
         };
 
-        //gas价格
+        //gas price
         let gas_price: U256 = {
             let price_str: String = env.get_string(gasPrice).unwrap().into();
-            //使用单位的是gwei,这是确定的
+            //The unit used is gwei, which is ok
             wallets::convert_token(&price_str, 9).unwrap()
         };
-        //允许最大消耗gas数量
+        //Allow maximum gas consumption
         let gas_limit: U256 = {
             let gas_limit_str: String = env.get_string(gasLimit).unwrap().into();
             U256::from_dec_str(&gas_limit_str).unwrap()
         };
-        //当前交易的nonce值
+        //Nonce value of the current transaction
         let nonce: U256 = {
             let nonce_str: String = env.get_string(nonce).unwrap().into();
             let nonce = if nonce_str.starts_with("0x") {
@@ -379,20 +379,20 @@ pub mod android {
             U256::from_dec_str(&nonce).unwrap()
         };
 
-        //当前钱包默认只使用 3、4来表示以太坊 主链和测试链，根据chain type转换为以太坊标准定义的chain_id,做如下转换 3->1,4->3,其余的保持不变
+        //The current wallet only uses 3 and 4 to represent the Ethereum main chain and test chain by default. According to the chain type, it is converted to the chain_id defined by the Ethereum standard, and the conversion is done as follows 3->1,4->3, the rest remain unchanged
         let chain_id = {
             if chainType == 3 {
                 1
             } else if chainType == 4 {
                 3
-            } else {//针对这种情况，是用于在开发过程中使用另外的链类型来测试
+            } else {//For this situation, it is used to test with another chain type during the development process
                 chainType
             }
         };
 
-        //使用私钥确认码
+        //Use the private key confirmation code
         let pwd = env.convert_byte_array(pwd).unwrap();
-        //合约地址为空，是普通ETH转账 或者部署合约
+        //The contract address is empty, it is an ordinary ETH transfer or deployment contract
         let ethereum = wallets::module::Ethereum {};
 
         let signed_ret = if contract_address.is_empty() {
@@ -470,10 +470,10 @@ pub mod android {
         let value: String = env.get_string(value).unwrap().into();
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("findNativeLib$Message");
         let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
-        //  使用钱包方式来构造交易，用户交易index不会达到强制转换造成溢出的问题这个交易量
-        let eee = wallets::module::EEE {};
-        match eee.generate_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, pwd.as_slice()) {
-            Ok(data) => {
+        //  Using the wallet method to construct transactions, the user transaction index will not reach the transaction volume caused by the forced conversion.
+         let eee = wallets::module::EEE {};
+         match eee.generate_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, pwd.as_slice()) {
+             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");
             }
@@ -592,12 +592,12 @@ pub mod android {
                 let account_record_class = env.find_class("info/scry/wallet_manager/NativeLib$AccountRecord").expect("find NativeLib$EthToken class");
                 for record in sync_records {
                     let account_record_class_obj = env.alloc_object(account_record_class).expect("alloc eth_token_class object");
-                    //设置digit 属性
+                    //Set digit property
                     env.set_field(account_record_class_obj, "account", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&record.account).unwrap()))).expect("account_record_class_obj set account value");
                     env.set_field(account_record_class_obj, "blockHash", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(record.block_hash).unwrap()))).expect("account_record_class_obj set block_hash value");
                     env.set_field(account_record_class_obj, "chainType", "I", JValue::Int(record.chain_type as i32)).expect("account_record_class_obj set chain_type value");
                     env.set_field(account_record_class_obj, "blockNum", "I", JValue::Int(record.block_num as i32)).expect("account_record_class_obj set block_num value");
-                    env.call_method(map_obj, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", &[JObject::from(env.new_string(record.account).unwrap()).into(), account_record_class_obj.into()]).expect("map_obj put");
+                    env.call_method(map_obj, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", &[JObject::from(env.new_string(record.account).unwrap ()).into(), account_record_class_obj.into()]).expect("map_obj put");
                 }
                 env.set_field(sync_status_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
                 env.set_field(sync_status_obj, "records", "Ljava/util/Map;", JValue::Object(map_obj)).expect("set records");

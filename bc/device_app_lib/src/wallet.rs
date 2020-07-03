@@ -33,9 +33,9 @@ pub mod android {
         match mn_class {
             Ok(class) => {
                 let jobj = env.alloc_object(class).unwrap();
-                env.set_field(jobj, "mnId", "Ljava/lang/String;", JValue::Object(mn_id_obj)).expect("find mnId type ");//返回字符串
-                env.set_field(jobj, "status", "I", JValue::Int(mnemonic.status as i32)).expect("find status type");//返回数字
-                env.set_field(jobj, "mn", "[B", JValue::Object(mn_object)).expect("find mn type");//返回数组
+                env.set_field(jobj, "mnId", "Ljava/lang/String;", JValue::Object(mn_id_obj)).expect("find mnId type ");//Return string
+                env.set_field(jobj, "status", "I", JValue::Int(mnemonic.status as i32)).expect("find status type");//Return the number
+                env.set_field(jobj, "mn", "[B", JValue::Object(mn_object)).expect("find mn type");//Return the array
                 *jobj
             }
             Err(_err) => {
@@ -48,7 +48,7 @@ pub mod android {
     #[no_mangle]
     #[allow(non_snake_case)]
     pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_isContainWallet(env: JNIEnv, _: JClass) -> jobject {
-        //调用获取所有钱包，查看返回值的情况
+        //Call to get all wallets and check the return value
         let wallet = module::wallet::WalletManager{};
         let wallet = wallet.is_contain_wallet();
 
@@ -290,15 +290,15 @@ pub mod android {
                 let mn_object = JObject::from(mn_byte);
                 let mnid = env.new_string(mnemonic.mnid).unwrap();
                 let mn_id_obj = JObject::from(mnid);
-                env.set_field(jobj, "mnId", "Ljava/lang/String;", JValue::Object(mn_id_obj)).expect("find mnId type ");//返回字符串
-                env.set_field(jobj, "status", "I", JValue::Int(mnemonic.status as i32)).expect("find status type ");//返回数字
-                env.set_field(jobj, "mn", "[B", JValue::Object(mn_object)).expect("find mn type ");//返回数组
+                env.set_field(jobj, "mnId", "Ljava/lang/String;", JValue::Object(mn_id_obj)).expect("find mnId type ");//Return string
+                env.set_field(jobj, "status", "I", JValue::Int(mnemonic.status as i32)).expect("find status type ");//Return the number
+                env.set_field(jobj, "mn", "[B", JValue::Object(mn_object)).expect("find mn type ");//Return the array
                 *jobj
             }
             Err(e) => {
                 let msg_obj = JObject::from(env.new_string(e.to_string()).unwrap());
-                env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type ");//返回数字
-                env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(msg_obj)).expect("find status type ");//返回数字
+                env.set_field(jobj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find status type ");//Return the number
+                env.set_field(jobj, "message", "Ljava/lang/String;", JValue::Object(msg_obj)).expect("find status type ");//Return the number
                 *jobj
             }
         }

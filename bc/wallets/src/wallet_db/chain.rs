@@ -6,21 +6,21 @@ use substratetx::TransferDetail;
 
 impl DataServiceProvider {
     pub fn get_available_chain(&self) -> WalletResult<Vec<i64>> {
-        //查询当前可用链类型，启用了哪些链
+        //Query the currently available chain types and which chains are enabled
         let sql = "select type from detail.chain where selected=1 and status=1;";
         let stat = self.db_hander.prepare(sql)?;
         let mut cursor = stat.cursor();
         let mut chain_type = Vec::new();
         while let Some(row) = cursor.next()? {
-            let type_id = row[0].as_integer().unwrap();//存储的值类型为 i64 是明确的
+            let type_id = row[0].as_integer().unwrap();//It is clear that the type of value stored is i64
             chain_type.push(type_id);
         }
         Ok(chain_type)
     }
     pub fn display_chain_detail(&self, chain_type: ChainType) -> WalletResult<Vec<WalletObj>> {
-        //这个sql语句关联表较多 关联逻辑： 查询出当前钱包有效钱包，这里是不区分主链或者测试链钱包 得到一个子表 e
-        // 查询出当前地址使用详情跟代币的关联情况，得到子表 d
-        // 最后和表f做自然连接，根据筛选条件找出符合要求的结果
+        //There are many association tables in this SQL statement. Association logic: Query the current wallet valid wallet, here is the main chain or test chain wallet is not distinguished to get a sub-table e
+        // Query the relationship between the current address usage details and tokens, and get the sub-table d
+        // Finally, make a natural connection with table f, find out the results that meet the requirements according to the filtering conditions
         let query_sql = match chain_type {
             ChainType::EthTest | ChainType::ETH => {
                 "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
@@ -53,7 +53,7 @@ impl DataServiceProvider {
             self.query_wallet_obj(query_sql)
         }
     }
-    //根据传递进来的sql 查询钱包关联数据
+    //Query wallet-related data based on the incoming SQL
     fn query_wallet_obj(&self, sql: &str) -> WalletResult<Vec<WalletObj>> {
         let stat = self.db_hander.prepare(sql)?;
         let mut cursor = stat.cursor();
@@ -117,17 +117,17 @@ impl DataServiceProvider {
     pub fn save_transfer_detail(&self, account: &str, blockhash: &str, tx_detail: &TransferDetail, timestamp: u64, is_successful: bool) -> WalletResult<bool> {
         let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,tx_index,tx_from,tx_to,amount,status,account,tx_timestamp)values(?,?,?,?,?,?,?,?,?,?);";
         let mut stat = self.db_hander.prepare(insert_sql)?;
-        stat.bind(1, tx_detail.hash.as_ref().unwrap().as_str())?;//交易hash
-        stat.bind(2, blockhash)?;//区块hash
-        stat.bind(3, 3 as i64)?;// 链id需要灵活调整
+        stat.bind(1, tx_detail.hash.as_ref().unwrap().as_str())?;//Transaction hash
+        stat.bind(2, blockhash)?;//block hash
+        stat.bind(3, 3 as i64)?;// The chain id needs to be flexibly adjusted
         stat.bind(4, tx_detail.index.unwrap() as i64)?;
-        stat.bind(5, tx_detail.from.as_ref().unwrap().as_str())?;//交易发起账户
-        stat.bind(6, tx_detail.to.as_ref().unwrap().as_str())?;//交易接收账户
-        //value 为u128类型，数据库不支持这种类型，转码为字符串来表示
+        stat.bind(5, tx_detail.from.as_ref().unwrap().as_str())?;//The transaction initiating account
+        stat.bind(6, tx_detail.to.as_ref().unwrap().as_str())?;//Transaction receiving account
+        //value is u128 type, the database does not support this type, transcoded as a string to represent
         stat.bind(7, format!("{}", tx_detail.value.unwrap()).as_str())?;
         stat.bind(8, is_successful as i64)?;
-        stat.bind(9, account)?;//同步账户
-        stat.bind(10, timestamp as i64)?;//交易上链时间
+        stat.bind(9, account)?;//Sync account
+        stat.bind(10, timestamp as i64)?;//Transaction time
         stat.next().map(|_| true).map_err(|err| err.into())
     }
 

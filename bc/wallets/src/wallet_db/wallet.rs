@@ -4,7 +4,7 @@ use sqlite::{State, Statement};
 use crate::model::wallet_store::{TbAddress, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
 
-//根据链id,转换为对应的链类型和分组名称
+//According to the chain id, convert to the corresponding chain type and group name
 fn chain_id_convert_group_name(chain_id: i16) -> Option<(i64, String)> {
     match chain_id {
         3 => Some((1, "ETH".to_string())),
@@ -70,27 +70,27 @@ impl DataServiceProvider {
     pub fn query_by_wallet_digest(&self, digest: &str, wallet_type: i64) -> Option<TbWallet> {
         let query_sql = "select * from Wallet where mn_digest = ? and wallet_type = ?";
         let mut statement = self.db_hander.prepare(query_sql).unwrap();
-        //定义的返回结果为Option,针对错误处理当前还不能使用 `？`方式返回
+        //The defined return result is Option, which cannot be used for error handling currently? `Way back
         statement.bind(1, digest).expect("query_by_mnemonic_id bind id");
         statement.bind(2, wallet_type).expect("query_by_mnemonic_id bind id");
         self.query_wallet(&mut statement).ok()
     }
 
     pub fn query_selected_wallet(&self) -> WalletResult<TbWallet> {
-        //选中钱包 只有一个
+        // Only one wallet is selected
         let sql = "select * from Wallet where selected=1;";
         let mut statement = self.db_hander.prepare(sql)?;
         self.query_wallet(&mut statement)
     }
-    //通过钱包地址
+    //Via wallet address
     pub fn get_wallet_by_address(&self, address: &str, chain_type: ChainType) -> WalletResult<TbWallet> {
-        let query_sql = "SELECT a.* from Wallet a,detail.Address b,detail.Chain c WHERE b.chain_id = c.id and b.wallet_id = a.wallet_id and b.address = ? and c.type=?;";
+        let query_sql = "SELECT a.* from Wallet a, detail.Address b, detail.Chain c WHERE b.chain_id = c.id and b.wallet_id = a.wallet_id and b.address =? and c.type=?; ";
         let mut statement = self.db_hander.prepare(query_sql)?;
         statement.bind(1, address).expect("get_wallet_by_address bind address");
         statement.bind(2, chain_type as i64).expect("get_wallet_by_address chain_type");
         self.query_wallet(&mut statement)
     }
-    //返回满足条件的钱包信息，该函数只返回一个元素
+    //Return wallet information that satisfies the condition, the function returns only one element
     fn query_wallet(&self, statement: &mut Statement) -> WalletResult<TbWallet> {
         let wallets = self.get_wallets_from_database(statement);
         if !wallets.is_empty() {
@@ -120,7 +120,7 @@ impl DataServiceProvider {
         wallets
     }
 
-    //当前该功能是返回所有的钱包
+    //Currently the function is to return all wallets
     pub fn get_wallets(&self) -> Vec<TbWallet> {
         let sql = "select * from Wallet WHERE status = 1 order by create_time desc;";
         let mut statement = self.db_hander.prepare(sql).unwrap();
@@ -128,7 +128,7 @@ impl DataServiceProvider {
     }
 
     pub fn set_selected_wallet(&self, wallet_id: &str) -> WalletResult<()> {
-        //需要先查询出那些助记词是被设置为当前选中，将其设置为取消选中，再将指定的id 设置为选中状态
+        //Need to find out whether the mnemonic word is set to the currently selected, set it to unchecked, and then set the specified id to the selected state
         let sql = "UPDATE Wallet set selected = 0 where wallet_id in (select wallet_id from Wallet WHERE selected=1);";
         self.db_hander.execute(sql)?;
         let set_select_sql = "update Wallet set selected = 1 where wallet_id =?;";
@@ -140,14 +140,14 @@ impl DataServiceProvider {
 
 
     pub fn del_mnemonic(&self, mn_id: &str) -> WalletResult<()> {
-        //删除钱包表中的对应记录
+        //Delete the corresponding record in the wallet table
         let sql = "delete from Wallet WHERE wallet_id = ?; ";
-        //删除代币相关记录 需要先删除记录详情
+        //Delete token related records, need to delete the record details first
         let delete_digit_detail = "delete from detail.DigitUseDetail where address_id in (select address_id from detail.Address where wallet_id =?) ;";
-        //删除地址中的记录
+        //Delete the record in the address
         let delete_address = "delete from detail.Address WHERE wallet_id =?;";
 
-        //检测是否删除到当前钱包
+        //Check if the current wallet is deleted
         let check_select_wallet = "select count(*) from wallet where selected=1;";
 
         let mut stat = self.db_hander.prepare(sql)?;

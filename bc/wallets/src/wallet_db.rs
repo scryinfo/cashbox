@@ -9,7 +9,7 @@ pub mod digit;
 
 pub use db_helper::DataServiceProvider;
 
-//创建数据库表。导入默认数据等操作
+//Create a database table. Import default data and other operations
 pub fn init_wallet_database() -> WalletResult<()> {
     wallet_db::DataServiceProvider::init()?;
     let helper = wallet_db::DataServiceProvider::instance()?;

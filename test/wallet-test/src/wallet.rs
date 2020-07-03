@@ -36,7 +36,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_mnemonicGenera
 #[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_isContainWallet(env: JNIEnv, _: JClass) -> jobject {
-    //调用获取所有钱包，查看返回值的情况
+  //Call to get all wallets and check the return value
     let state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("can't found NativeLib$WalletState class");
     let state_obj = env.alloc_object(state_class).expect("create state_obj instance ");
     let wallet = module::wallet::WalletManager{};

@@ -14,12 +14,12 @@ const TB_WALLET: &str = r#"cashbox_wallet.db"#;
 const TB_WALLET_DETAIL: &str = r#"cashbox_wallet_detail.db"#;
 
 fn create_teble(table_name: &str, table_desc: &str) -> WalletResult<()> {
-    //先创建对应的文件路径
+    //First create the corresponding file path
     if !path::Path::new(table_name).exists() {
-        fs::File::create(table_name)?;
-    }
+    fs::File::create(table_name)?;
+}
     let connect = Connection::open(table_name)?;
-    //在执行数据库表创建过程中出现错误，需要将对应的文件删除掉
+    // An error occurred during the execution of the database table creation process, the corresponding file needs to be deleted
     if let Err(e) = connect.execute(table_desc) {
         if let Err(msg) = fs::remove_file(table_name) {
             log::error!("create table:{}",msg.to_string());

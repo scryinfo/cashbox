@@ -1,4 +1,4 @@
-//对称加密算法进行封装，为上层业务使用
+//Symmetric encryption algorithm for encapsulation and use for upper-layer services
 pub mod aes {
     use crypto::buffer::{BufferResult, ReadBuffer, WriteBuffer};
     use crypto::symmetriccipher::{Decryptor, Encryptor};
@@ -10,7 +10,7 @@ pub mod aes {
         Aes256Ctr,
     }
 
-    //选用指定的加密方式，为传入的数据使用对称方式加密
+    //Use the specified encryption method to encrypt the incoming data symmetrically
     pub fn encrypt(medthod: EncryptMethod, data: &[u8], key: &[u8], iv: &[u8]) -> Result<Vec<u8>, String> {
         let mut encryptor = match medthod {
             EncryptMethod::Aes128Ctr => aes::ctr(aes::KeySize::KeySize128, &key[0..16], iv),
@@ -40,7 +40,7 @@ pub mod aes {
         Ok(final_result)
     }
 
-    // 对加密内容进行解密, 注意：在输入密码错误的情况下，此处的解密函数并不能检测出来，只能依靠加密前的hash值来进行判断
+    // Decrypt the encrypted content. Note: In the case of incorrect password, the decryption function here cannot be detected, and can only be judged by the hash value before encryption
     pub fn decrypt(medthod: EncryptMethod,
                    encrypted_data: &[u8],
                    key: &[u8],

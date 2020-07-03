@@ -14,7 +14,7 @@ mod error;
 
 pub use error::Error;
 
-// 从助记词恢复私钥
+// Recover private key from mnemonic
 pub fn pri_from_mnemonic(phrase: &str, psd: Option<Vec<u8>>) -> Result<Vec<u8>, error::Error> {
     let mnemonic = Mnemonic::from_phrase(phrase, Language::English)?;
     let psd = {
@@ -28,13 +28,13 @@ pub fn pri_from_mnemonic(phrase: &str, psd: Option<Vec<u8>>) -> Result<Vec<u8>, 
     Ok(ext_key.secret().to_vec())
 }
 
-//从非压缩公钥生成ETH地址
+//Generate ETH address from uncompressed public key
 pub fn generate_eth_address(secret_byte: &[u8]) -> Result<(String, String), error::Error> {
     let context = Secp256k1::new();
-    //todo 增加错误处理
+    //todo adds error handling
     let secret = SecretKey::from_slice(&secret_byte)?;
     let public_key = PublicKey::from_secret_key(&context, &secret);
-    //一个是非压缩公钥 用于地址生成
+    //the uncompressed public key used for address generation
     let puk_uncompressed = &public_key.serialize_uncompressed()[..];
     let public_key_hash = keccak(&puk_uncompressed[1..]);
     let address_str = hex::encode(&public_key_hash[12..]);
@@ -123,7 +123,7 @@ impl RawTransaction {
         keccak(stream.out().as_slice())
     }
 
-    //对RawTransaction 数据使用RLP编码
+    //Use RLP encoding for RawTransaction data
     fn encode(&self, rlp: &mut RlpStream) {
         rlp.append(&self.nonce);
         rlp.append(&self.gas_price);
@@ -163,23 +163,23 @@ fn ecdsa_sign(hash: &[u8], private_key: &[u8], chain_id: u64) -> EcdsaSig {
     }
 }
 
-//根据精度，将字符串输入的数量转换为最小进度来表示
+//According to the precision, convert the number of string input to the minimum progress to represent
 pub fn convert_token(value: &str, decimal: usize) -> Option<U256> {
-    //判断需要转化的数是否为浮点数
+    //Determine whether the number to be converted is a floating point number
     match value.find('.') {
         Some(index) => {
             let integer_part = value.get(0..index).unwrap();
             let integer_part_256 = U256::from_dec_str(integer_part).unwrap();
             let integer_part_wei = integer_part_256.checked_mul(U256::exp10(decimal)).unwrap();
-            //获取小数部分，只保留指定精度部分数据
-            let max_distace = if value.len() - index <= decimal {
+            //Get the fractional part, only retain the data with the specified precision
+            let max_distace = if value.len()-index <= decimal {
                 value.len()
             } else {
                 index + 1 + decimal
             };
             let decimal_part = value.get((index + 1)..max_distace).unwrap();
             let decimal_part_256 = U256::from_dec_str(decimal_part).unwrap();
-            //将小数点去掉后，还需要在末尾添加0的个数
+            //After removing the decimal point, you need to add 0 at the end
             let base = U256::exp10(decimal - decimal_part.len());
             let decimal_part_wei = decimal_part_256.checked_mul(base).unwrap();
             integer_part_wei.checked_add(decimal_part_wei)
@@ -212,16 +212,16 @@ struct ContractFunc {
     func_name: String,
     address: String,
     value: String,
-    addition: String,//附加信息
+    addition: String,//extra information
 }
 
-//将目前只解析erc20 transfer 方法
+//Currently only erc20 transfer method will be parsed
 pub fn decode_tranfer_data(input: &str) -> Result<String, error::Error> {
     if !input.starts_with("0x") {
         return Err(error::Error::Decoder("data format error".to_string()));
     }
-    //0xa9059cbb 为transfer前缀
-    //当前只解析附加数据
+    //0xa9059cbb is the transfer prefix
+    //Currently only parse additional data
     let addition = if input.starts_with("0xa9059cbb") {
         let start_len = 2 + 8;
         input.get(start_len + 64 * 2..).unwrap()
@@ -235,15 +235,15 @@ pub fn decode_tranfer_data(input: &str) -> Result<String, error::Error> {
           Err(err)=>Ok(err.to_string())
       }*/
 
-    //判断是否为普通data
+    //judge whether it is ordinary data
     /*    if input.starts_with("0xa9059cbb") {
-            //满足这种情况的，认为是合约参数
+            //If this condition is met, it is considered to be a contract parameter
             let start_len = 2+8;
             let addr = input.get((start_len+24)..start_len+64).unwrap();
             let value = {
                 let value_bytes= hex::decode(input.get(start_len+64..start_len+64*2).unwrap()).unwrap();
                 println!("value_bytes:{:?}",value_bytes);
-                //大端?
+                //Big endian encoding?
                 let value_u256 = U256::from_big_endian(&value_bytes);
                 format!("{}",value_u256)
             };
@@ -264,8 +264,8 @@ pub fn decode_tranfer_data(input: &str) -> Result<String, error::Error> {
 
 #[test]
 fn pri_from_mnemonic_test() {
-    let words = "pulp second side simple clinic step salad enact only mixed address paddle";
-    pri_from_mnemonic(words, None);
+    let words = "wheel permit dog party ceiling olympic clerk human equip adapt equal kangaroo";
+    println!("pri key:{}",hex::encode(pri_from_mnemonic(words, None).unwrap().as_slice()));
 }
 
 #[test]

@@ -1,6 +1,6 @@
 use super::*;
 
-//当前能够操作的代币，都是属于Ethereum相关的功能
+//The tokens that can be operated at present are all related functions of Ethereum
 impl Ethereum {
     pub fn add_wallet_digit(&self, wallet_id: &str, chain_id: i64, digit_id: &str) -> WalletResult<()> {
         let instance = wallet_db::DataServiceProvider::instance()?;
@@ -11,7 +11,7 @@ impl Ethereum {
                 if let Err(rollback_err) = instance.tx_rollback() {
                     log::error!("rollback error:{}",rollback_err.to_string());
                 }
-                //需要往上层返回错误信息，不处理tx_rollback返回的Error
+                //The error information needs to be returned to the upper layer, and the Error returned by tx_rollback is not processed
                 error
             })
     }
@@ -40,12 +40,12 @@ impl Ethereum {
         instance.query_digit(chain_type, name, contract_addr)
     }
 
-    //接收客户端传递过来的认证代币列表,将数据更新到认证代币列表中
-    //todo 根据传递进来的代币属于测试链还是主链分别处理
+    //Receive the authentication token list passed by the client, and update the data to the authentication token list
+    //todo processes each token based on whether the passed-in token belongs to the test chain or the main chain
     pub fn update_auth_digit(&self, digits: Vec<model::EthToken>, is_auth: bool, _chain_type: Option<String>) -> WalletResult<()> {
         let instance = wallet_db::DataServiceProvider::instance()?;
         instance.tx_begin()?;
-        //当前采用全量更新手段，直接删除存在的代币,更新新的代币
+        //At present, the full update method is used to directly delete the existing tokens and update the new tokens.
         match instance.update_digit_base(digits, is_auth) {
             Ok(()) => instance.tx_commint(),
             Err(e) => {
@@ -58,7 +58,7 @@ impl Ethereum {
     pub fn update_default_digit(&self, digits: Vec<model::DefaultDigit>) -> WalletResult<()> {
         let helper = wallet_db::DataServiceProvider::instance()?;
         helper.tx_begin()?;
-        //当前采用全量更新手段，直接删除存在的代币,更新新的代币
+        //At present, the full update method is used to directly delete the existing tokens and update the new tokens.
         match helper.update_default_digits(digits) {
             Ok(()) => helper.tx_commint(),
             Err(e) => {

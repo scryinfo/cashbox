@@ -28,7 +28,7 @@ impl WalletManager {
                 display_chain_id: wallet.display_chain_id,
                 selected: wallet.selected,
                 create_time: wallet.create_time,
-                eee_chain: eee_data.get(&wallet_id).map(|data| data[0].clone()),//当出现Some这种情况，表示肯定存在值且vec len 不为0
+                eee_chain: eee_data.get(&wallet_id).map(|data| data[0].clone()),//When Some happens, it means there must be a value and vec len is not 0
                 eth_chain: eth_data.get(&wallet_id).map(|data| data[0].clone()),
                 btc_chain: btc_data.get(&wallet_id).map(|data| data[0].clone()),
             };
@@ -48,7 +48,7 @@ impl WalletManager {
 
     pub fn reset_mnemonic_pwd(&self, wallet_id: &str, old_pwd: &[u8], new_pwd: &[u8]) -> WalletResult<StatusCode> {
         let provider = wallet_db::DataServiceProvider::instance()?;
-        //查询出对应id的助记词
+        //Query the mnemonic word corresponding to id
         if let Some(mn) = provider.query_by_wallet_id(wallet_id) {
             self.mnemonic_psd_update(&mn, old_pwd, new_pwd).map(|_| StatusCode::OK)
         } else {
@@ -91,7 +91,7 @@ impl WalletManager {
 
     pub fn del_wallet(&self, walletid: &str, psd: &[u8]) -> WalletResult<()> {
         let provider = wallet_db::DataServiceProvider::instance()?;
-        //查询出对应id的助记词
+        //Query the mnemonic word corresponding to id
         provider.query_by_wallet_id(walletid).ok_or_else(|| WalletError::NotExist)
             .and_then(|mn| substratetx::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), psd).map_err(|e| e.into()))
             .and_then(|_data| provider.tx_begin())
@@ -101,7 +101,7 @@ impl WalletManager {
             .and_then(|_| provider.tx_commint())
             .map_err(|err| {
                 let _ = provider.tx_rollback();
-                //返回以上任意一个链式调用发生的错误
+                //Returns the error of any of the above chained calls
                 err
             })
     }
@@ -111,7 +111,7 @@ impl WalletManager {
         instance.rename_mnemonic(walletid, wallet_name).map(|_| true)
     }
     pub fn create_wallet(&self, wallet_name: &str, mn: &[u8], password: &[u8], wallet_type: i64) -> WalletResult<Wallet> {
-        //指定默认链类型
+        //Specify the default chain type
         let default_chain_type = if wallet_type == 1 {
             ChainType::ETH
         } else {
@@ -123,7 +123,7 @@ impl WalletManager {
             let hash_first = mn.keccak256();
             hex::encode((&hash_first[..]).keccak256())
         };
-        //正式链，助记词只能导入一次,通过hash是否存在判断是否导入
+        //Official chain, mnemonic words can only be imported once, whether to import by hash exists
         if wallet_type == 1 && dbhelper.query_by_wallet_digest(hex_mn_digest.as_str(), wallet_type).is_some() {
             return Err(WalletError::Custom("this wallet is exist".to_string()));
         }
@@ -132,29 +132,29 @@ impl WalletManager {
         let wallet_id = Uuid::new_v4().to_string();
         let address: Vec<TbAddress> = self.generate_address(&wallet_id, mn, wallet_type)?;
 
-        //构造钱包保存结构
+        //Construct a wallet saving structure
         let wallet_save = model::wallet_store::TbWallet {
             wallet_id: wallet_id.clone(),
             mn_digest: hex_mn_digest,
             full_name: Some(wallet_name.to_string()),
             mnemonic: keystore,
-            display_chain_id: default_chain_type.clone() as i64,//设置默认显示链类型
+            display_chain_id: default_chain_type.clone() as i64,//Set the default display chain type
             wallet_type,
             ..Default::default()
         };
 
-        // 开启事务
+        // Start transaction
         dbhelper.tx_begin()?;
-        //保存钱包信息到数据库
+        //Save wallet information to database
         dbhelper.save_wallet_address(wallet_save, address)
-            .map(|_| dbhelper.tx_commint()) //提交事务
+            .map(|_| dbhelper.tx_commint()) //Commit transaction
             .map(|_| {
                 Wallet {
                     status: StatusCode::OK,
                     wallet_id,
                     wallet_type,
                     wallet_name: Some(wallet_name.to_string()),
-                    display_chain_id: default_chain_type as i64,//设置默认显示链类型
+                    display_chain_id: default_chain_type as i64,//Set the default display chain type
                     ..Default::default()
                 }
             }).map_err(|err| {
@@ -164,7 +164,7 @@ impl WalletManager {
     }
     pub fn export_mnemonic(&self, wallet_id: &str, password: &[u8]) -> WalletResult<Mnemonic> {
         let provider = wallet_db::DataServiceProvider::instance()?;
-        //查询出对应id的助记词
+        //Query the mnemonic word corresponding to id
         match provider.query_by_wallet_id(wallet_id) {
             Some(mn) => {
                 substratetx::Sr25519::get_mnemonic_context(mn.mnemonic.as_str(), password).map(|mnemonic| Mnemonic {
@@ -180,12 +180,12 @@ impl WalletManager {
         }
     }
     fn mnemonic_psd_update(&self, wallet: &TbWallet, old_psd: &[u8], new_psd: &[u8]) -> WalletResult<StatusCode> {
-        //获取原来的助记词
+        //Get the original mnemonic
         let mnemonic = wallet.mnemonic.clone();
         let context = substratetx::Sr25519::get_mnemonic_context(mnemonic.as_str(), old_psd)?;
-        //使用新的密码进行加密
+        //Encrypt with new password
         let new_encrypt_mn = substratetx::Sr25519::encrypt_mnemonic(&context[..], new_psd);
-        //构造需要升级的助记词对象，先只修改指定的字段，后续再根据需求完善
+        //Construct the mnemonic object that needs to be upgraded, first only modify the specified field, and then perfect it according to the needs
         let wallet_update = TbWallet {
             wallet_id: wallet.wallet_id.clone(),
             full_name: wallet.full_name.clone(),
@@ -197,9 +197,9 @@ impl WalletManager {
     }
 
     fn generate_address(&self, wallet_id: &str, mn: &[u8], wallet_type: i64) -> WalletResult<Vec<TbAddress>> {
-        //获取当前钱包哪些链可用
+        //Get which chains of the current wallet are available
         let instance = wallet_db::DataServiceProvider::instance()?;
-        let chains = instance.get_available_chain()?;//错误处理demo
+        let chains = instance.get_available_chain()?;//Error handling demo
         let mut address_vec = vec![];
         for chain in chains {
             let chian_type = ChainType::from(chain);
@@ -231,11 +231,11 @@ impl WalletManager {
         }
         Ok(address_vec)
     }
-    //根据生成钱包的类型，需要创建对应的地址
+    //According to the type of wallet generated, the corresponding address needs to be created
     fn address_from_mnemonic(&self, mn: &[u8], wallet_type: ChainType) -> WalletResult<Address> {
         let phrase = String::from_utf8(mn.to_vec())?;
         match wallet_type {
-            //当前版本不支持功能
+            //The current version does not support features
             ChainType::EEE | ChainType::EeeTest => {
                 let seed = substratetx::Sr25519::seed_from_phrase(&phrase, None).unwrap();
                 let pair = substratetx::Sr25519::pair_from_seed(&seed);
@@ -262,10 +262,10 @@ impl WalletManager {
         }
     }
 
-    // Wallet 结构说明：
-    //  一个助记词 对应的是一个钱包，在cashbox钱包软件中 可以同时管理多个钱包；
-    // 一个助记词 可以同时应用于多条链；
-    //  一条链，在基于链的应用上，存在多个合约地址的可能
+    // Wallet structure description:
+    // A mnemonic corresponds to a wallet, and multiple wallets can be managed simultaneously in the cashbox wallet software;
+    // A mnemonic can be applied to multiple chains at the same time;
+    // A chain, in chain-based applications, there may be multiple contract addresses
     fn get_wallet_info(&self) -> HashMap<String, Wallet> {
         let instance = wallet_db::DataServiceProvider::instance().unwrap();
         let mn = instance.get_wallets();

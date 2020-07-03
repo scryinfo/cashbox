@@ -15,19 +15,19 @@ pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
 #[derive(PartialEq, Clone)]
 pub enum StatusCode {
-    DylibError = -1,//由于外部输入参数造成的错误
-    FailToGenerateMnemonic = 100,//生成助记词失败
-    OK = 200,//正常
-    PwdIsWrong,//密码错误
+    DylibError = -1,//Errors caused by external input parameters
+    FailToGenerateMnemonic = 100,//Failed to generate mnemonic
+    OK = 200, // normal
+    PwdIsWrong,//Wrong password
 }
 
 impl Default for StatusCode {
-    fn default() -> Self { StatusCode::OK }
+    fn default() -> Self {StatusCode::OK}
 }
 
 #[derive(PartialEq, Clone)]
 pub enum EthChainId {
-    //以太坊链类型编号，用于签名过程
+    //Ethernet chain type number, used in the signing process
     MAIN = 1,
     ROPSTEN = 3,
     RINKEBY = 4,
@@ -35,7 +35,7 @@ pub enum EthChainId {
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum ChainType {
-    //用于区别钱包支持的链类型
+    //Used to distinguish the chain types supported by the wallet
     BTC = 1,
     BtcTest = 2,
     ETH = 3,
@@ -67,21 +67,21 @@ mod tests {
 
     #[test]
     fn mnemonic_create_test() {
-        //助记词创建测试、签名测试
-        let mnemonic = substratetx::Sr25519::generate_phrase(18);
-        let data = "substrate sign method test";
-        let s = String::new();
-        match substratetx::Ed25519::sign(&mnemonic, data.as_bytes()) {
-            Ok(signed_data) => println!("{}", hex::encode(&signed_data[..])),
-            Err(e) => println!("{}", e.to_string()),
-        }
-    }
+        //Mnemonic word creation test, signature test
+         let mnemonic = substratetx::Sr25519::generate_phrase(18);
+         let data = "substrate sign method test";
+         let s = String::new();
+         match substratetx::Ed25519::sign(&mnemonic, data.as_bytes()) {
+             Ok(signed_data) => println!("{}", hex::encode(&signed_data[..])),
+             Err(e) => println!("{}", e.to_string()),
+         }
+     }
 
-    #[test]
-    fn func_sign_test() {
-        //初始化数据库
-        wallet_db::init_wallet_database();
-        //创建钱包实例
+     #[test]
+     fn func_sign_test() {
+         //Initialize the database
+         wallet_db::init_wallet_database();
+         //Create a wallet instance
         let wallet_instance = model::Wallet::default();
         let mnemonic = wallet_instance.crate_mnemonic(15);
         let rawtx = "0xac040600ff0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea300b0040e59c301200000000979d3bb306ed9fbd5d6ae1eade033b81ae12a5c5d5aa32781153579d7f6d5504ed000000";
@@ -104,7 +104,7 @@ mod tests {
         let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap()).unwrap();
         let mut genesis_h256 = [0u8; 32];
         genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
-        // 涉及到数据库访问 需要进行一系列数据准备才能正常测试
+        // Involving database access requires a series of data preparations for normal testing
         let eee = module::EEE{};
         match eee.generate_transfer(from, to, value, genesis_hash, index, runtime_version, "123456".as_bytes()) {
             Ok(sign_str) => {

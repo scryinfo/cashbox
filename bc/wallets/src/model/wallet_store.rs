@@ -43,7 +43,7 @@ struct TbChain {
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct WalletObj {
     pub wallet_id: Option<String>,
-    //助记词id
+    //Mnemonic id
     pub wallet_name: Option<String>,
     pub selected: Option<bool>,
     pub chain_id: Option<i64>,

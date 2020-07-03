@@ -1,7 +1,7 @@
 use super::*;
 use std::fmt;
 
-///定义与App端交互的钱包数据结构
+///Define the wallet data structure that interacts with the App
 ///
 #[repr(C)]
 pub struct Mnemonic {
@@ -16,7 +16,7 @@ pub struct Wallet {
     pub status: StatusCode,
     pub wallet_id: String,
     pub wallet_type: i64,
-    //这个值不会存在Null 的情况
+    //This value does not exist in the case of Null
     pub wallet_name: Option<String>,
     pub display_chain_id: i64,
     pub selected: bool,

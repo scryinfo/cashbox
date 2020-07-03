@@ -25,27 +25,27 @@ impl<T> Keccak256<[u8; 32]> for T where T: AsRef<[u8]> {
     }
 }
 
-/// 用于传递账户信息解码后的结果，这里使用默认的单位？
+/// Used to transfer the decoded result of account information, use the default unit here?
 #[derive(Clone, Debug, Default)]
 pub struct EeeAccountInfo {
-    pub nonce: u32,
-    pub refcount: u32,
-    pub free: String,
-    //为避免java不支持u128类型格式，全部转换为String格式
-    pub reserved: String,
-    pub misc_frozen: String,
-    pub fee_frozen: String,
+     pub nonce: u32,
+     pub refcount: u32,
+     pub free: String,
+     //To avoid java does not support u128 type format, all converted to String format
+     pub reserved: String,
+     pub misc_frozen: String,
+     pub fee_frozen: String,
 }
 
-//设计成option，当交易为设置区块时间的交易，就不存在签名
+//Designed as an option, when the transaction is a transaction that sets the block time, there is no signature
 #[derive(Default, Debug)]
 pub struct TransferDetail {
-    pub index: Option<u32>,
-    //签名账户对应的交易nonce
-    pub from: Option<String>,
-    //签名账户 从哪个账户转出balance
-    pub to: Option<String>,
-    //目的账户，接收balance的账户
+     pub index: Option<u32>,
+     //The transaction nonce corresponding to the signed account
+     pub from: Option<String>,
+     //Signature account from which account is transferred out of balance
+     pub to: Option<String>,
+     //Destination account, balance account
     pub value: Option<u128>,
     pub hash: Option<String>,
     pub timestamp: Option<u64>,
@@ -67,7 +67,7 @@ pub fn decode_account_info(_info: &str) -> Result<EeeAccountInfo, error::Error> 
     unimplemented!()
 }
 
-// 通知事件数据 使用hex 方式编码的字符串,将通知事件的结果与交易关联起来
+// Notification event data Use hex-encoded strings to associate the results of notification events with transactions
 pub fn event_decode(_event_data: &str, _blockhash: &str, _account: &str) -> HashMap<u32, bool> {
     unimplemented!()
 }

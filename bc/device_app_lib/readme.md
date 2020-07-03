@@ -1,37 +1,47 @@
+# Build
 
-# build
+## Compile in windows
 
-## 在windows中编译
-- `Android`平台的动态库的编译，编译过程都需要依赖[NDK](https://developer.android.com/ndk)提供的适配库支持，
-为后续编译脚本能够正常使用需要提前设置 `ANDROID_NDK`环境变量，这里我们使用的是[NDK21](https://dl.google.com/android/repository/android-ndk-r21-windows-x86_64.zip)
-添加rust target:`rustup target add aarch64-linux-android armv7-linux-androideabi`
-- `IOS`平台的编译，内容待完善；
-由于在windows中可以使用 `x86_64-pc-windows-gnu`、`x86_64-pc-windows-msvc`两种编译链，对应的操作有些区别； 
-### 使用 x86_64-pc-windows-gnu 编译工具链
-若是使用`x86_64-pc-windows-gnu`，需要进行如下操作
+- The compilation of the dynamic library on the `Android` platform, the compilation process needs to rely on the support of the adaptation library provided by [NDK](https://developer.android.com/ndk),
+In order to use the subsequent compilation scripts normally, you need to set the `ANDROID_NDK` environment variable in advance. Here we use [NDK21](https://dl.google.com/android/repository/android-ndk-r21-windows-x86_64.zip )
+Add rust target: `rustup target add aarch64-linux-android armv7-linux-androideabi`
+- `IOS` platform compile, content to be improved;
+
+Since `x86_64-pc-windows-gnu` and `x86_64-pc-windows-msvc` can be used in Windows, the corresponding operations are somewhat different;
+
+### x86_64-pc-windows-gnu compile toolchain
+
+If you use `x86_64-pc-windows-gnu`, you need to do the following
+
 - rustup toolchain install x86_64-pc-windows-gnu
 - rustup default gnu
-- 根据android目标平台架构，运行`script`目录下 `build_aarch64-linux-android.bat` 或 `build_armv7-linux-androideabi.bat`
-### 使用x86_64-pc-windows-msvc 编译工具链
+- According to the Android target platform architecture, run `build_aarch64-linux-android.bat` or `build_armv7-linux-androideabi.bat` in the `script` directory
+
+### x86_64-pc-windows-msvc to compile the toolchain
+
 - `rustup toolchain install x86_64-pc-windows-msvc`
 - `rustup default msvc`
-- 首先安装vcpkg包(下面是安装后要做的)，
+- First install the vcpkg package (the following is what to do after installation),
 - `vcpkg integrate install`
 - `vcpkg install sqlite3:x64-windows-static`
 - `vcpkg install sqlite3:x64-windows`
-- 根据android目标平台架构，运行`script`目录下 `build_aarch64-linux-android.bat` 或 `build_armv7-linux-androideabi.bat`
+- According to the Android target platform architecture, run `build_aarch64-linux-android.bat` or `build_armv7-linux-androideabi.bat` in the `script` directory
 
-**注意**：安装`sqlite3`是因为项目里面使用了sqlite数据库
-## 在Linux中编译
-- 确保已经设置`ANDROID_NDK`环境变量，
+**Note**: The installation of `sqlite3` is because the sqlite database is used in the project
+
+## Compile in Linux
+
+- Make sure that the `ANDROID_NDK` environment variable has been set,
 - rustup toolchain install x86_64-unknown-linux-gnu
 - rustup target add aarch64-linux-android armv7-linux-androideabi
-- 在`~/.cargo/config`中配置linker、ar路径，针对需要编译的平台分别进行配置。比如需要编译`aarch64-linux-android`平台对应的配置文件为
+- Configure linker and ar paths in `~/.cargo/config`, and configure them separately for the platform to be compiled. For example, the configuration file corresponding to the `aarch64-linux-android` platform needs to be compiled as
+
 ```
 [target.aarch64-linux-android]
 linker="/home/jeremy/work/sw/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android28-clang"
 ar="/home/jeremy/work/sw/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar"
 ```
-- 根据android目标平台架构，运行`script`目录下 `build_aarch64-linux-android.sh` 或 `build_armv7-linux-androideabi.sh`
 
-**说明**：当前钱包版本Android适配目标平台`targetSdkVersion 28`
+- Run `build_aarch64-linux-android.sh` or `build_armv7-linux-androideabi.sh` under `script` directory according to the Android target platform architecture
+
+**Description**: The current wallet version Android adapts to the target platform `targetSdkVersion 28`

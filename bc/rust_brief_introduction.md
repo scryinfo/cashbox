@@ -1,34 +1,50 @@
-# Rust 特性介绍
-Rust是一门具有安全性、高性能、安全并发，现代化特点的系统级编程语言。
+# Rust Features Introduction
 
-## 高性能
-Rust 具有高性能的通过静态编译成机器码直接运行，与常见的热门语言比较存在显著的优势
+Rust is a system-level programming language with security, high performance, safe concurrency, and modern features.
+
+## High Performance
+
+Rust has high performance and runs directly through static compilation into machine code, which has significant advantages compared to common popular languages.
+
 ### Python
-更快，较低的内存消耗
+
+Faster, lower memory consumption
+
 ### Java
-没有JVM消耗，GC停顿，较低的内存消耗，
+
+No JVM consumption, GC pauses, lower memory consumption,
+
 ### C/C++
-不存在段错误，空指针、缓冲区溢出、数据竞争问题、不统一的编译方式
+
+There are no segfaults, null pointers, buffer overflows, data competition issues, and inconsistent compilation methods.
+
 ### Go
-没有GC中断、 具有较低的内存使用、没有空指针问题，具有更好的错误处理、线程安全，零成本的抽象，依赖管理
 
-## 安全性
-### 类型系统
-Rust是一门强类型且类型安全的静态语言，在Rust中一切皆为表达式，表达式都有值，值都有类型，所以在Rust中一切皆为类型；类型包括
-- 基本的原始类型 `u8、u32、i32、usize、bool`
-- 复合类型,比如自定义的 struct
-- 生命周期作用域标记
-- Option<T>、Result<T、E>
-- never,指根本无法返回值的情况，比如线程奔溃、break、continue等行为    
+No GC interrupts, low memory usage, no null pointer problems, better error handling, thread safety, zero-cost abstraction, and dependency management.
 
-在类型系统里面，使用模式匹配，可以高效的进行数据逻辑处理
+## Safety
+
+### Type System
+
+Rust is a strongly typed and type-safe static language. Everything in Rust is an expression, expressions have values, and values ​​have types, so everything in Rust is a type; types include
+
+- Basic primitive types `u8, u32, i32, usize, bool`
+- Compound types, such as custom struct
+- Life cycle scope tags
+- Option<T>, Result<T, E>
+- never, refers to the situation where the value cannot be returned at all, such as thread crash, break, continue, etc.
+
+In the type system, the use of pattern matching can efficiently perform data logic processing
+
 ```rust
-// Option<T> is an enum that is either Some(T) or None 
+// Option<T> is an enum that is either Some(T) or None
 if let Some(f)=my_vec.find(|t|t>=42){
     /*found*/
 }
 ```
-针对Option<T>、Result<T、E> 类型的操作，常使用的方法有:
+
+For the operations of Option<T>, Result<T, E>, the commonly used methods are:
+
 ```rust
 //To inner type
 
@@ -44,10 +60,13 @@ map ((T) -> U) -> Option<U>
 map_or (U, (T) -> U) -> U
 map_or_else (() -> U, (T) -> U) -> U
 ```
-更多方法，可以查询标准库文档，直接在命令行中输入`Cargo doc`即可查看到本地下载的文档
-### 所有权管理
-每个变量都有一个所有者，所有者负责该变量对应内容的释放和读写权限，并且在一个时间点上只有一个拥有者，当变量所在的作用域结束的时候，变量以及它他代表的值都将消失。
-在Rust中通过是否实现Copy trait 来区分数据类型的是否发生复制或者所有权转移。 
+
+For more methods, you can query the standard library documentation, and enter `Cargo doc` directly on the command line to view the locally downloaded documentation
+
+### Ownership Management
+
+Each variable has an owner. The owner is responsible for the release and read and write permissions of the corresponding content of the variable, and there is only one owner at a time. When the scope of the variable ends, the variable and other representatives The values ​​will disappear.
+In Rust, whether to copy or transfer ownership is distinguished by whether to implement the Copy trait.
 
 ```rust
 let x = Vec::new();
@@ -55,16 +74,19 @@ let y = x;
 drop(x); //illegal, y is now owner
 
 ```
-**注意：** 针对赋值的情况，当等号右边的类型为实现了 `Copy` Trait时，会自动调用copy方法，不会发生所有权转移的问题；若该类型没有实现copy方法，则会发生所有权转移的情况。
-针对基本类型，标准库里面已经自动实现了Copy trait；针对上述代码，要是代码能够正常编译，可以调用clone方法，对x进行深拷贝。
+**Note:** For the case of assignment, when the type on the right of the equal sign is to implement `Copy` Trait, the copy method will be automatically called, and the problem of ownership transfer will not occur; if the type does not implement the copy method, it will Occurrence of ownership transfer.
+For the basic types, the Copy trait has been automatically implemented in the standard library. For the above code, if the code can be compiled normally, you can call the clone method to make a deep copy of x.
+
 ```rust
 
     let mut x = vec![1,2,3];
     let first = &x[0];
-    let y =x; 
-    println!("{}",*first);//illegal  first become invalid when x was moved.
+    let y = x;
+    println!("{}",*first);//illegal first become invalid when x was moved.
 ```
-在rust 变量声明中，默认情况下，变量对应的值是不可变的。当变量存在变动的可能时，需要在声明是 添加 `mut`标记
+
+In the rust variable declaration, by default, the value corresponding to the variable is immutable. When there is a possibility of variable changes, you need to add the `mut` tag in the declaration
+
 ```rust
 let v = Vec::new();
 //this compile just fine
@@ -72,18 +94,25 @@ println("len:{}",v.len());
 //this will not compile;would need mutable access
 v.push(42);
 ```
-**引用**是Rust提供的一种指针语义，是基于指针的实现。它与指针的区别是指针保存的是指向内存的地址，而引用可以看作某块内存的别名
-使用引用也需要满足编译器的各种安全检查规则，引用分为不可变引用和可变引用，使用& 符号表示不可变引用，使用&mut 表示可变引用。
 
-在实际使用时遵循 "共享不可变，可变不共享"的原则，就可以避免数据造成不安全的事件发生。
-### 安全并发
-Rust实现避免数据竞争是通过Send和Sync这两个trait来实现。
-- 如果类型T实现了`Send` Trait,那说明这个类型的变量在不同的线程中传递所有权是安全的；
-- 如果类型T实现了`Sync` Trait,那说明这个类型的变量在不同的线程中使用`&T`访问同一个变量是安全的；
+**Reference** is a pointer semantic provided by Rust and is based on pointer implementation. The difference between it and the pointer is that the pointer saves the address pointing to the memory, and the reference can be regarded as an alias of a certain memory
+The use of references also needs to meet various safety inspection rules of the compiler. References are divided into immutable references and variable references. The & symbol is used to indicate immutable references, and the &mut is used to indicate variable references.
 
-(更多内容待完善)
-### 错误处理
-通过使用Option、Result这两个枚举类型进行错误处理，他们的定义如下：
+Following the principle of "sharing is immutable and mutable and not sharing" when in actual use, you can avoid unsafe events caused by data.
+
+### Safe Concurrency
+
+The Rust implementation avoids data competition through the two traits Send and Sync.
+
+- If type T implements `Send` Trait, it means that it is safe to pass ownership of variables of this type in different threads;
+- If the type T implements `Sync` Trait, it means that it is safe for variables of this type to access the same variable using `&T` in different threads;
+
+(More content to be improved)
+
+### Error Handling
+
+By using the two enumeration types Option and Result for error handling, their definitions are as follows:
+
 ```rust
 enum Option<T>{
     Some(T),
@@ -93,19 +122,23 @@ enum Result<T,E>{
     Ok(T),
     Err(E),
 }
-// v is Option<&T>, not &T -- cannot use without checking for None
+// v is Option<&T>, not &T - cannot use without checking for None
 let v = my_vec.find(|t| t>=42);
-// n is Result<i32,ParseIntError> -- cannot use without checking for Err
+// n is Result<i32,ParseIntError> - cannot use without checking for Err
 let n ="42".parse::<i32>();
-//？ suffix is "return Err if Err,otherwise unwrap Ok"
+//? suffix is ​​"return Err if Err,otherwise unwrap Ok"
 let n = "42".parse::<i32>()?;
 ```
-若针对语句执行的结果存在没有处理的情况，在编译阶段编译都会检查出来，提示你进行完善。
-## 现代化
-### 构件工具
-- rust官方提供了成熟的构建工具Cargo，相比较go通过go path、go mod,java 使用Maven、Gradle，C/C++使用Makefile、Cmake、Automake,
-Cargo在依赖管理、编译的使用体验要好很多。
-- 提供了丰富的扩展工具只要在代码中以`///`开始的内容，通过命令cargo-doc能够自动将代码中文档输出形成文档，所在文档中包含完整的代码，那这部分代码在生成的时候也会通过编译；
+If there is no processing for the result of the statement execution, the compilation will be checked during the compilation stage, prompting you to improve.
+
+## Modernization
+
+### Construct Tool
+
+- rust official provides mature build tool Cargo, compared to go using go, go mod, java using Maven, Gradle, C/C++ using Makefile, Cmake, Automake,
+Cargo's experience in dependency management and compilation is much better.
+- Provides a wealth of extension tools as long as the content starting with `///` in the code, through the command cargo-doc can automatically output the document in the code to form a document, where the document contains the complete code, then this part of the code is being generated Will also be compiled when
+
 ```rust
 /// Return one more than its argument
 ///
@@ -116,21 +149,27 @@ fn one_more(n:i32)->i32{
     n+1
 }
 ```
-- cargo fmt提供了代码格式工具；
-- cargo clippy能够针对代码给出优化建议；
-### 单元测试
-在代码中的任何地方都可以编写单元测试，在编写的单元测试上使用`#[test]`就能在当使用`Cargo test`命令时进行自动检测；
+
+- cargo fmt provides code formatting tools;
+- cargo clippy can give optimization suggestions for the code;
+
+### unit test
+
+You can write unit tests anywhere in the code. Using `#[test]` on the written unit tests will automatically detect when you use the `Cargo test` command;
+
 ```rust
 #[test]
 fn it_works(){
     assert_eq!(1+1,2)
 }
 ```
-### 发展方向
-完全靠社区驱动的开源编程语言，所有的决议都是通过在[github](https://github.com/rust-lang)进行公开讨论，稳定的更新周期；
-## 缺点
-- 与java、go相比较，当前rust编译程序比较耗时；
-- 没有预编译，所有引用的crate在最终编译的时候都要编译一次，没有像C、C++那样直接链接动态库等功能；
-- 过于严格的生命周期、所有权检查。在某些场景下不会引发生命周期安全问题的代码，只要不满足当前的生命周期检查规则，都不能通过编译。
- 
 
+### Direction of development
+
+Open source programming language fully driven by the community. All decisions are made through open discussions at [github](https://github.com/rust-lang) and a stable update cycle;
+
+## Disadvantages
+
+- Compared with java and go, the current rust compiler is more time-consuming;
+- There is no pre-compilation, and all referenced crates must be compiled once at the time of final compilation. There is no direct link to dynamic libraries and other functions like C and C++;
+- Too strict life cycle and ownership inspection. In some scenarios, code that does not cause life cycle security issues will fail to compile as long as it does not meet the current life cycle inspection rules.

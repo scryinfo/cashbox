@@ -9,16 +9,16 @@ pub use chain::{Chain,Ethereum,EEE,Bitcoin};
 
 #[test]
 fn create_wallet_test() {
-    let mnemonic = "swarm grace knock race flip unveil pyramid reveal shoot vehicle renew axis";
+    let mnemonic = "wheel permit dog party ceiling olympic clerk human equip adapt equal kangaroo";
     wallet_db::init_wallet_database();
-    let wallet = model::Wallet::default();
+    let wallet = wallet::WalletManager{};
     let wallet = wallet.create_wallet("wallet test", mnemonic.as_bytes(), "123456".as_bytes(), 1);
     println!("{:?}", wallet);
 }
 
 #[test]
 fn load_wallet_test(){
-    let wallet = model::Wallet::default();
+    let wallet = wallet::WalletManager{};
     let wallets =wallet.get_all();
     println!("load wallet:{:?}", wallets);
 }

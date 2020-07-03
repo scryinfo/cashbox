@@ -27,7 +27,7 @@ impl DataServiceProvider {
         update_sql_state.bind(3, address)?;
         update_sql_state.next().map(|_| true).map_err(|e| e.into())
     }
-    //添加代币
+    //Add tokens
     fn add_default_digits(&self, digits: Vec<model::DefaultDigit>) -> WalletResult<()> {
         let insert_sql = "insert into detail.DefaultDigitBase(id,contract_address,chain_type,group_name,short_name,full_name,url_img,decimals,is_basic,is_default,status)values(?,?,?,?,?,?,?,?,?,?,?);";
         let mut insert_basic_statement = self.db_hander.prepare(insert_sql)?;
@@ -38,16 +38,16 @@ impl DataServiceProvider {
                 insert_basic_statement.bind(1, uuid::Uuid::new_v4().to_string().as_str())?;
             }
             insert_basic_statement.bind(2, digit.contract_address.unwrap_or_else(|| "".to_string()).as_str())?;
-            //代币类型 是正式连还是测试链
+            //Whether the token type is officially connected or a test chain
             insert_basic_statement.bind(3, self.is_main_chain(&digit.chain_type))?;
             insert_basic_statement.bind(4, digit.group_name.unwrap_or_else(|| "ETH".to_string()).as_str())?;
             insert_basic_statement.bind(5, digit.short_name.as_str())?;
             insert_basic_statement.bind(6, digit.full_name.as_str())?;
             insert_basic_statement.bind(7, digit.img_url.unwrap_or_else(|| "".to_string()).as_str())?;
             insert_basic_statement.bind(8, digit.decimal.as_str().parse::<i64>().unwrap_or(18))?;
-            insert_basic_statement.bind(9, digit.is_basic.unwrap_or(false) as i64)?;//最基础的代币（链上代币）
-            insert_basic_statement.bind(10, digit.is_default.unwrap_or(true) as i64)?;//设置增加的代币 是否为默认代币
-            insert_basic_statement.bind(11, digit.status.unwrap_or(1))?;//是否显示等状态
+            insert_basic_statement.bind(9, digit.is_basic.unwrap_or(false) as i64)?;//The most basic token (chain token)
+            insert_basic_statement.bind(10, digit.is_default.unwrap_or(true) as i64)?;//Set whether the added token is the default token
+            insert_basic_statement.bind(11, digit.status.unwrap_or(1))?;//Whether to display the status
             insert_basic_statement.next()?;
             insert_basic_statement.reset()?;
         }
@@ -60,23 +60,23 @@ impl DataServiceProvider {
         self.add_default_digits(digits)
     }
 
-    /// 更新默认代币逻辑
-    /// 将原添加的默认代币状态更新为非默认代币的状态，开始更新代币  这个接口用于批量的从外部导入数据
+    /// Update default token logic
+    /// Update the status of the original added default token to the status of the non-default token, and start to update the token. This interface is used to import data from outside in batches
     pub fn update_default_digits(&self, digits: Vec<model::DefaultDigit>) -> WalletResult<()> {
-        //todo 精细化处理默认代币的情况，当前先使用简单粗暴的方式将已经添加的默认代币直接删除，再将新的代币插入数据库表
-        let delete_sql = "delete from  detail.DefaultDigitBase where is_basic = 0 and is_default =1;";
+        //todo finely handles the case of default tokens. At present, the default tokens that have been added are directly deleted in a simple and crude way, and then the new tokens are inserted into the database table
+        let delete_sql = "delete from detail.DefaultDigitBase where is_basic = 0 and is_default =1;";
         self.db_hander.execute(delete_sql)?;
         self.add_default_digits(digits)
     }
 
 
     pub fn update_digit_base(&self, digits: Vec<model::EthToken>, is_auth: bool) -> WalletResult<()> {
-        //当更新的为认证代币时。需要删除原来已经存在的代币
+        //When the update is an authentication token. Need to delete the original token
         if is_auth {
             let delete_sql = format!("delete from detail.DigitBase where is_auth = {};", is_auth as u16);
             self.db_hander.execute(delete_sql)?;
         } else {
-            //添加自定义代币，需要检查该代币是否已经存在
+            //Add custom token, need to check whether the token already exists
             let select_sql = "select count(*) from detail.DigitBase where contract = ?;";
             let mut select_sql_statement = self.db_hander.prepare(select_sql)?;
             for digit in digits.clone() {
@@ -102,7 +102,7 @@ impl DataServiceProvider {
             update_digit_statement.bind(7, digit.publisher.unwrap_or_else(|| "".to_string()).as_str())?;
             update_digit_statement.bind(8, digit.project.unwrap_or_else(|| "".to_string()).as_str())?;
             update_digit_statement.bind(9, digit.logo_url.as_str())?;
-            update_digit_statement.bind(10, digit.logo_bytes.unwrap_or_else(|| "".to_string()).as_str())?;//需要前端传过来的为bytes格式
+            update_digit_statement.bind(10, digit.logo_bytes.unwrap_or_else(|| "".to_string()).as_str())?;//Need to be transmitted in bytes format from the front end
             update_digit_statement.bind(11, digit.decimal.as_str().parse::<i64>().unwrap_or(18))?;
             update_digit_statement.bind(12, digit.gas_limit.unwrap_or(0))?;
             update_digit_statement.bind(13, is_auth as i64)?;
@@ -113,10 +113,10 @@ impl DataServiceProvider {
         Ok(())
     }
 
-    //从代币库中取信息，更新默认代币
-    pub fn add_digit_from_base(&self, wallet_id: &str, chain_id: i64, digit_id: &str) -> WalletResult<()> {
-        //todo 判断需要添加的代币对应的链类型是否与传递进来的链类型一致
-        // 查看代币是否存在,这里规定新增的代币合约地址不会重复
+    //Get information from the token library and update the default token
+     pub fn add_digit_from_base(&self, wallet_id: &str, chain_id: i64, digit_id: &str) -> WalletResult<()> {
+        //todo judge whether the chain type corresponding to the token to be added is consistent with the chain type passed in
+        // Check if the token exists, here it is stipulated that the new token contract address will not be repeated
         let digit_detail_sql = "select contract,chain_type,symbol,name,logo_url,decimal from detail.DigitBase where id = ?;";
         let mut count_statement = self.db_hander.prepare(digit_detail_sql)?;
         count_statement.bind(1, digit_id)?;
@@ -136,25 +136,25 @@ impl DataServiceProvider {
                 is_default: Some(false),
                 status: None,
             };
-            //新增一条默认代币
+            //Add a default token
             self.add_default_digits(vec![new_default_digit])?;
         }
 
-        //获取钱包对应的地址id,目前只支持以太坊代币
-        let address_id = "select address_id from detail.Address a where a.wallet_id = ? and a.chain_id = ?;";
+        //Get the address id corresponding to the wallet, currently only supports Ethereum tokens
+        let address_id = "select address_id from detail.Address a where a.wallet_id =? and a.chain_id = ?;";
         let mut statement = self.db_hander.prepare(address_id)?;
         statement.bind(1, wallet_id)?;
         statement.bind(2, chain_id)?;
         let mut cursor = statement.cursor();
         let value = cursor.next().unwrap().ok_or(WalletError::NotExist)?;
         let address_id = value[0].as_string().unwrap();
-        //添加代币
+        //Add tokens
         let sql = format!("INSERT INTO detail.DigitUseDetail(digit_id,address_id) values('{}','{}');", digit_id, address_id);
         self.db_hander.execute(sql).map_err(|e| e.into())
     }
-    //参数照理说定义成无符号数更合理,但后续中会涉及到多次强制类型转换
+    //Parameters are logically defined as unsigned numbers, but many subsequent mandatory type conversions will be involved
     pub fn get_digit_by_page(&self, chain_type: i64, is_auth: bool, start_item: i64, page_size: i64) -> WalletResult<model::DigitList> {
-        //当前假设存放的所有代币都能够有机会返回,计算总共有多少条
+        //Currently assume that all tokens deposited can have a chance to return, and calculate how many tokens there are in total
         let count_digit_item = "select count(*) from detail.DigitBase where chain_type = ? and is_auth =?;";
         let mut state = self.db_hander.prepare(count_digit_item)?;
 
@@ -163,7 +163,7 @@ impl DataServiceProvider {
         state.next().unwrap();
         let count = state.read::<i64>(0).unwrap();
         let offset = if count < (start_item + page_size) { count - start_item } else { page_size };
-        //返回指定条数的代币
+        //Returns the specified number of tokens
         let select_digit = "select * from detail.DigitBase where chain_type = ? and is_auth =? limit ? offset ?;";
         let mut state = self.db_hander.prepare(select_digit)?;
         state.bind(1, chain_type)?;
@@ -177,7 +177,7 @@ impl DataServiceProvider {
             eth_tokens: digits,
         })
     }
-    // 这个条件查询和分页查询可以合并，当前在输入条件限制下不会出现需要分页的情况
+    // This conditional query and paging query can be merged, and there is currently no need for paging under the input conditions.
     pub fn query_digit(&self, chain_type: i64, name: Option<String>, contract_addr: Option<String>) -> WalletResult<model::DigitList> {
         let mut select_digit = "select * from detail.DigitBase where chain_type =? ".to_string();
         if contract_addr.is_some() {
@@ -232,7 +232,7 @@ impl DataServiceProvider {
         auth_digits
     }
 
-    //转换链类型,是正式链还是测试链
+    //Conversion chain type, is it a formal chain or a test chain
     fn is_main_chain(&self, chain_type: &str) -> i64 {
         match chain_type {
             "ETH" => 1,

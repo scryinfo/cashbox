@@ -1,4 +1,4 @@
-// 用于实现对各个模块的封装，实现ios、android jni接口的封装
+// It is used to realize the packaging of each module and the packaging of ios and android jni interfaces
 use wallets::StatusCode;
 use jni::JNIEnv;
 
