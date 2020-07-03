@@ -6,7 +6,7 @@ class GlobalConfig {
   ///应用语言配置
   static const savedLocaleKey = "savedLocaleKey"; //默认语言中文；
   static const defaultLocaleValue = "zh"; //默认语言中文；
-  static Map<String, String> globalLanguageMap = {"zh": "中文", "en_US": "English"};
+  static Map<String, String> globalLanguageMap = {"zh": "中文", "en": "English"};
 
   ///下面配置信息，以key-value形式，用本地文件，做信息持久保存
   static const isInitAppConfig = "is_init_app_config_key"; //是否初始化了app配置信息
