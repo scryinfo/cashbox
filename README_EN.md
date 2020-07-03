@@ -7,13 +7,13 @@ In the selection of the Cashbox wallet technology, the upper ui part is implemen
 ### Environment and configuration
 #### Pre-configuration information (features are optional, and configurations can be added, deleted, or modified according to the needs of developers. The function implementation is mainly related to VendorConfig)
 - In the global_config directory, create a vendor_config.dart file. In the whole project, search for the place where VendorConfig is used, and replace it with the developer's own function ip as needed.
-- Apply for test coins, and register [etherscan] (https://etherscan.io/) to develop APIs. Configure your apikey in etherscan_util file
+- Apply for test coins, and register [etherscan](https://etherscan.io/) to develop APIs. Configure your apikey in etherscan_util file
 - Change the interface to get the price of the corresponding fiat currency. The location is app/lib/net/rate_util.dart.
 - Add some required default configuration information, such as the backend ip of the price corresponding to the fiat currency, other public interface ip, etc. Location: app/lib/util/sharedpreference_util.dart
 
 #### Environment installation
-- Install development tools [AndroidStudio] (https://developer.android.com/studio/index.html)
-- Install [flutter SDK] (https://flutterchina.club/get-started/install/)
+- Install development tools [AndroidStudio](https://developer.android.com/studio/index.html)
+- Install [flutter SDK](https://flutterchina.club/get-started/install/)
 - Compile the dynamic library, specifically in [bc](https://github.com/scryinfo/cashbox/blob/master/bc/README.md) (written by rust language), there are detailed descriptions of the dynamic library generation process under the directory .
 
 ### Project running
