@@ -32,6 +32,7 @@ Cashbox钱包技术选型上，上层ui部分用flutter来实现，底层用rust
 - 3、packages --- 功能插件，帮助扩展app处的功能，如提供钱包管理功能，webview功能。
 
 具体各功能模块，可进入对应模块查看说明文档
-- [app部分说明](https://github.com/scryinfo/cashbox/blob/master/app/README.md)
+- [app部分说明 中文](https://github.com/scryinfo/cashbox/blob/master/app/README_CN.md)
+- [app部分说明 英文](https://github.com/scryinfo/cashbox/blob/master/app/README_EN.md)
 - [bc部分说明](https://github.com/scryinfo/cashbox/blob/master/bc/README.md)
 
