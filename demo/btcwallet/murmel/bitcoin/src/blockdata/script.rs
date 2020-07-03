@@ -1089,7 +1089,7 @@ mod test {
 
     #[test]
     fn build_script_test() {
-        // 测试自己的脚本  dfaxxx为hash160计算结果
+        // Test your own script "dfaxxx" calculates the result for hash160
         let script = Builder::new().push_opcode(opcodes::all::OP_DUP)
                                    .push_opcode(opcodes::all::OP_HASH160)
                                    .push_slice(&hex_decode("dfa0d6f68ada97595dac908c2d9821650e385a10").unwrap())

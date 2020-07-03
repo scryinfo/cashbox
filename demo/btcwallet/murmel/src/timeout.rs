@@ -38,8 +38,8 @@ pub enum ExpectedReply {
     FilterHeader,
     FilterCheckpoints,
     Filter,
-    //新添加类型 发送消息之后抓包得到的
-    //MerkleBlock 是先发送FilterLoad消息之后在发送getdata消息得到的结果
+    //Newly added type. After you send a message, you get the packet
+    //MerkleBlock is the result obtained by sending the getdata message after sending the FilterLoad message first
     MerkleBlock,
     Tx,
     INV,

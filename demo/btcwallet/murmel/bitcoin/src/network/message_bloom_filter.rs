@@ -103,7 +103,7 @@ impl FilterLoadMessage {
         //019f5b01d4195ecbc9398fbf3c3b1fa9bb3183301d7a1fb3bd174fcfa40a2b65"
         //652b0aa4cf4f17bdb31f7a1d308331bba91f3b3cbf8f39c9cb5e19d4015b9f01 正
         let mut data_to_hash = hex_decode(elements).expect("parse hex error");
-        //大小端序的问题，翻转一下
+        //For big and little endian order, flip it
         data_to_hash.reverse();
 
         for i in 0..n_hash_functions {

@@ -12,7 +12,7 @@ use bitcoin::Transaction;
 use walletlib;
 
 pub struct Broadcast {
-    //发送消息的
+    //used for Send message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
 }
@@ -26,10 +26,10 @@ impl Broadcast {
         PeerMessageSender::new(sender)
     }
 
-    //循环处理消息
+    //Loop through messages
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
         loop {
-            //这个方法是消息接收端，也就是channel的一个出口，Message的一个消耗端
+            //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
@@ -58,7 +58,7 @@ impl Broadcast {
         }
     }
 
-    //也许不需要这个
+    // don't need this in future
     fn is_serving_blocks(&self, peer: PeerId) -> bool {
         if let Some(peer_version) = self.p2p.peer_version(peer) {
             return peer_version.services & SERVICE_BLOCKS != 0;
@@ -67,7 +67,7 @@ impl Broadcast {
     }
 
 
-    /// 广播节点
+    // broadcast tx to bitcoin network
     fn broadcast_tx(&mut self, peer: PeerId) -> Result<(), Error> {
         info!("Broadcast tx message");
         let tx = walletlib::create_master();

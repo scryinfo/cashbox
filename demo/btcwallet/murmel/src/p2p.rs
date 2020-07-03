@@ -436,7 +436,7 @@ impl<Message: Version + Send + Sync + Clone,
         let peers = Arc::new(RwLock::new(PeerMap::new()));
 
         let p2p = Arc::new(P2P {
-            //发送端 从constructor传递过来
+            //The sender passes it from the constructor
             dispatcher,
             config,
             peers: peers.clone(),
@@ -449,7 +449,7 @@ impl<Message: Version + Send + Sync + Clone,
 
         let p2p2 = p2p.clone();
 
-        //被控制端
+        //Controlled end
         thread::Builder::new().name("p2pcntrl".to_string()).spawn(move || p2p2.control_loop(control_receiver)).unwrap();
 
         (p2p, P2PControlSender::new(control_sender, peers, back_pressure))
@@ -884,7 +884,7 @@ impl<Message: Version + Send + Sync + Clone,
                     }
                     // process queued incoming messages outside lock
                     // as process could call back to P2P
-                    // 处理消息的控制端
+                    // Controlling the message
                     for msg in incoming {
                         trace!("processing {} for peer={}", msg.command(), pid);
                         if let Ok(m) = self.config.unwrap(msg) {

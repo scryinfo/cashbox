@@ -66,8 +66,8 @@ pub fn main() {
     } else {
         simple_logger::init_with_level(Level::Debug).unwrap();
     }
-    // 这里切换地址 现在先调整成测试链
-    // 这里的network 和 下方match _ 都改过
+    // Switch the address here. Now adjust it to the test chain
+    // The network here and match_ below have been changed
     println!("Use Network::Testnet for test");
     let mut network = Network::Testnet;
     if let Some(net) = find_arg("network") {

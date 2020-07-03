@@ -100,7 +100,7 @@ impl Constructor {
             height: AtomicUsize::new(0),
             server: !listen.is_empty(),
         };
-        //p2p模块的控制端 控制P2P Constructor --> P2P
+        //control P2P Constructor --> P2P
         let (p2p, p2p_control) =
             P2P::new(p2pconfig, PeerMessageSender::new(to_dispatcher), BACK_PRESSURE);
 

@@ -134,8 +134,8 @@ pub enum NetworkMessage {
     Alert(Vec<u8>),
     /// `reject`
     Reject(message_network::Reject),
-    /// 'filterload'
-    /// 新添加类型
+    /// 'filterload' 
+    /// New type added
     FilterLoad(message_bloom_filter::FilterLoadMessage),
     /// `merkleblock`
     MerkleBlock(message_bloom_filter::MerkleBlockMessage),
@@ -454,7 +454,7 @@ mod test {
                         , 0xe4, 0x07, 0xfb, 0xad, 0x73, 0x31, 0xc6, 0xe8, 0xf9, 0xee, 0xf2, 0x31, 0xb7, 0x00, 0x00, 0x00
                         , 0x00, 0x00, 0x00];
 
-        //添加getdata InvType == FilteredBlock
+        //add getdata InvType == FilteredBlock
         let inventory = Inventory {
             inv_type: InvType::FilteredBlock,
             hash: sha256d::Hash::from_hex("000000000000b731f2eef9e8c63173adfb07e41bd53eb0ef0a6b720d6cb6dea4").expect("parse hex"),
@@ -466,15 +466,15 @@ mod test {
             payload: NetworkMessage::GetData(vec![inventory]),
         };
         let des: Result<RawNetworkMessage, _> = deserialize(&data);
-        //序列化raw_getdata
+        //Serialize raw_getdata
         let ser: Vec<u8> = serialize(&raw_getdata);
         println!("ser {:02x?}", &ser);
 
         assert!(des.is_ok());
         let msg = des.unwrap();
-        //注意这里打印出来是反的(和wireshark解析是反的，但是hexdump是正常的) 可以以正常序列传hash 进去 换言之 py示例中的block header hash是反的
-        //出现问题请查询这个序列的正反
-        //保证他们在wireshark中是一样的就行
+       	//Note that the printout here is reversed (and wireshark parsing is reversed, but hexdump is normal). You can pass the hash in the normal sequence. In other words, the block header hash in the py example is reversed.
+        //If there is a problem, please check the pros and cons of this sequence
+        //Just make sure they are the same in wireshark
         println!("{:#?}", &msg);
         if let NetworkMessage::GetData(data) = msg.payload {
             println!("{:#?}", &data[0]);

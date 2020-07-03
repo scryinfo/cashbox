@@ -48,10 +48,10 @@ pub fn add_account(master: &mut MasterAccount, path: (u32, u32)) {
 //     1 bitcoin == 100 million satoshi  100 000 000
 //target： is the target address string ,means the address you wanna to spend for the transaction
 pub fn create_translation(value: u64, target: &str, master: &mut MasterAccount, path: (u32, u32)) -> Transaction {
-    //  对比utxo 和 value的差值
-    //  如果不够,考虑报错
-    //  构建话费的交易信息 第一段硬编码的txid代表 utxo
-    //  本次交易不带签名
+    //  Compare the difference between utxo and value
+    //  If not enough, consider reporting an error
+    //  Construct the transaction information of the call fee The first hard-coded txid stands for utxo
+    //  This transaction does not carry a signature
     let mut unlocker = Unlocker::new_for_master(&master, PASSPHRASE).unwrap();
     let source = master.get_mut((0, 0)).unwrap().next_key().unwrap().address.clone();
     let target = Address::from_str(target).unwrap();
@@ -79,7 +79,7 @@ pub fn create_translation(value: u64, target: &str, master: &mut MasterAccount, 
         version: 2,
     };
 
-    // 需要拼装输入的script_sig
+    // The script_sig input needs to be assembled
     master.sign(&mut spending_transaction, SigHashType::All,
                 &(|_| Some(
                     TxOut {
@@ -92,7 +92,7 @@ pub fn create_translation(value: u64, target: &str, master: &mut MasterAccount, 
     spending_transaction
 }
 
-///计算hash160
+///Calculation hash160
 pub fn hash160(public_key: &str) -> String {
     let decode: Vec<u8> = FromHex::from_hex(public_key).expect("Invalid public key");
     let hash = hash160::Hash::hash(&decode[..]);

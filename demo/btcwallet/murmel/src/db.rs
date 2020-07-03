@@ -40,7 +40,7 @@ impl SQLite {
         }
     }
 
-    /// 查询上次初始化进度
+    // Query the last initialization progress
     pub fn init(&self) -> (String, String) {
         let (block_hash, timestamp) = self.query_newest_header(NEWEST_KEY);
         if block_hash.is_none() {
@@ -58,7 +58,7 @@ impl SQLite {
         (block_hash, timestamp)
     }
 
-    //存储区块头
+    // Storage block header
     pub fn insert_block(&self, block_hash: String, timestamp: String) {
         let mut statement = self.connection.prepare(
             "INSERT INTO block_hash VALUES(?, ?, ?)"
@@ -69,7 +69,7 @@ impl SQLite {
         statement.next().expect("insert block error");
     }
 
-    //查询未扫描区块头 返回相应数据 以时间戳为依据
+    // Query unscanned block header and return corresponding data based on timestamp
     pub fn query_header(&self, timestamp: String, add: bool) -> Vec<String> {
         let mut statement = self.connection.prepare(
             "SELECT * FROM block_hash WHERE timestamp >= ? AND  scanned <= 5 LIMIT 1000"
@@ -95,7 +95,7 @@ impl SQLite {
         block_hashes
     }
 
-    //查询最新进度s
+    //query new
     pub fn query_newest_header(&self, key: &str) -> (Option<String>, Option<String>) {
         let mut statement = self.connection.prepare(
             "SELECT * FROM newest_hash WHERE key = ?"
@@ -109,7 +109,7 @@ impl SQLite {
         (None, None)
     }
 
-    //插入最新进度
+    //insert new header
     pub fn insert_newest_header(&self, block_hash: String, timestamp: String) {
         let mut statement = self.connection.prepare(
             "INSERT INTO newest_hash VALUES(?, ?, ?)"
@@ -120,7 +120,7 @@ impl SQLite {
         statement.next().expect("insert newest_header error");
     }
 
-    //更新最新进度
+    //update the newest header
     pub fn update_newest_header(&self, block_hash: String, timestamp: String) {
         let mut statement = self.connection.prepare(
             "UPDATE newest_hash SET block_hash = ?, timestamp = ? WHERE key = ?"
@@ -131,7 +131,7 @@ impl SQLite {
         statement.next().expect("insert newest_header error");
     }
 
-    //存储 txin
+    //insert txin
     pub fn insert_txin(&self, tx: String, sig_script: String, prev_tx: String, prev_vout: String, sequence: String) {
         let mut statement = self.connection.prepare(
             "INSERT OR IGNORE INTO tx_input VALUES(?,?,?,?,?)"
@@ -144,7 +144,7 @@ impl SQLite {
         statement.next().expect("insert utxos error");
     }
 
-    //存储 txout
+    //insert txout
     pub fn insert_txout(&self, tx: String, script: String, value: String, vout: i64) {
         let mut statement = self.connection.prepare(
             "INSERT OR IGNORE INTO tx_output VALUES(?,?,?,?)"

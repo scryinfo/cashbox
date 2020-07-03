@@ -128,7 +128,7 @@ impl Encodable for Inventory {
             InvType::Block => 2,
             InvType::WitnessBlock => 0x40000002,
             InvType::WitnessTransaction => 0x40000001,
-            //新添加类型 对应数字为3
+            //The newly added type corresponds to the number 3
             InvType::FilteredBlock => 3,
         }.consensus_encode(&mut s)?;
         Ok(inv_len + self.hash.consensus_encode(&mut s)?)
@@ -144,7 +144,7 @@ impl Decodable for Inventory {
                 0 => InvType::Error,
                 1 => InvType::Transaction,
                 2 => InvType::Block,
-                // 新添加类型 filterblock, 来源于bitcoin network protocol
+                // new type filterblock, comes form bitcoin network protocol
                 3 => InvType::FilteredBlock,
                 // TODO do not fail here
                 _ => { panic!("bad inventory type field") }

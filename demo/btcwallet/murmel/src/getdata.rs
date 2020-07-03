@@ -26,7 +26,7 @@ const PUBLIC_KEY: &str = "0291ee52a0e0c22db9772f237f4271ea6f9330d92b242fb3c62192
 
 pub struct GetData {
     chaindb: SharedChainDB,
-    //发送消息
+    //send a message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     sqlite: SharedSQLite,
@@ -44,18 +44,18 @@ impl GetData {
         PeerMessageSender::new(sender)
     }
 
-    //循环处理消息
+    //Loop through messages
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
         let hash160 = self.hash160("");
         let mut merkle_vec = vec![];
         loop {
-            //这个方法是消息接收端，也就是channel的一个出口，Message的一个消耗端
+            //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {
                             trace!("serving blocks peer={}", pid);
-                            //发起请求 GetData
+                            //Make a request GetData
                             self.get_data(pid, false)
                         } else {
                             Ok(())
@@ -119,7 +119,7 @@ impl GetData {
         false
     }
 
-    // 获取数据
+    // retrieve data
     fn get_data(&mut self, peer: PeerId, add: bool) -> Result<(), Error> {
         if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::MerkleBlock) {
             return Ok(());
@@ -147,7 +147,7 @@ impl GetData {
         Ok(())
     }
 
-    ///处理tx返回值
+    // Handle tx return value
     fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
         let sqlite = self.sqlite.lock().expect("open connection error!");
         println!("Tx {:#?}", tx.clone());
@@ -201,7 +201,7 @@ impl GetData {
         Ok(())
     }
 
-    ///计算hash160
+    ///Calculation hash160
     fn hash160(&self, public_key: &str) -> String {
         let decode: Vec<u8> = FromHex::from_hex(PUBLIC_KEY).expect("Invalid public key");
         let hash = hash160::Hash::hash(&decode[..]);
