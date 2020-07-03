@@ -28,6 +28,9 @@
      pubspec.yaml   项目配置文件
 
 ####
+    生成签名文件
+    keytool -genkey -v -keystore 秘钥文件目录/名称.jks -keyalg RSA -keysize 2048 -validity 有效天数 -alias 昵称
+
     查看andriod apk签名信息
     先安装jdk并配置好环境变量，然后运行->CMD->输入以下命令
     keytool -list -printcert -jarfile D:......\target.apk
