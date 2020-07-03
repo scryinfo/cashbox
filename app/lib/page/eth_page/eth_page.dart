@@ -30,7 +30,7 @@ import '../../res/resources.dart';
 class EthPage extends StatefulWidget {
   const EthPage({Key key, this.isForceLoadFromJni}) : super(key: key);
 
-  final bool isForceLoadFromJni; //是否强制重新加载钱包信息
+  final bool isForceLoadFromJni; //Whether to force reload of wallet information
 
   @override
   _EthPageState createState() => _EthPageState();
@@ -38,15 +38,15 @@ class EthPage extends StatefulWidget {
 
 class _EthPageState extends State<EthPage> {
   List<Wallet> walletList = [];
-  static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
+  static int singleDigitCount = 20; //Display 20 items of data on a single page, update and update 20 items at a time
   String moneyUnitStr = "";
-  num nowWalletAmount = 0.00; //当前钱包内代币总市价
+  num nowWalletAmount = 0.00; //The current total market price of tokens in the wallet
   List<String> moneyUnitList = [];
   String walletName = "";
   Future digitListFuture;
-  List<Digit> allVisibleDigitsList = []; //当前链所有可见代币列表
-  List<Digit> displayDigitsList = []; //当前分页展示的固定代币数量信息
-  num chainIndex = 0; //当前链的下标
+  List<Digit> allVisibleDigitsList = []; //List of all visible tokens in the current chain
+  List<Digit> displayDigitsList = []; //Information about the number of fixed tokens displayed on the current page
+  num chainIndex = 0; //Subscript of current chain
   Rate rateInstance;
 
   @override
@@ -70,7 +70,7 @@ class _EthPageState extends State<EthPage> {
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;
     this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     {
-      //todo 1.0 写死，预置DDD代币，正式链 和 测试链,后续移除
+      //todo 1.0 write dead, preset DDD tokens, official chain and test chain, subsequent removal
       var digitParam =
           '[{"contractAddress":"0x9F5F3CFD7a32700C93F971637407ff17b91c7342","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"},{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"4","decimal":"","chainType":"ETH_TEST"}]';
       await updateNativeAuthDigitList(digitParam);
@@ -102,7 +102,7 @@ class _EthPageState extends State<EthPage> {
       print("isNowWallet===>" + wallet.isNowWallet.toString() + wallet.walletId.toString() + "walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
         this.walletName = Wallets.instance.nowWallet.walletName;
-        break; //找到，终止循环
+        break; //Find, terminate the loop
       }
     }
     this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
@@ -117,7 +117,7 @@ class _EthPageState extends State<EthPage> {
     AppInfoUtil.instance.checkAppUpgrade();
   }
 
-  //todo 保存预置代币 version1.0写死，后续移除
+  //todo saves the preset token version1.0 to death, and removes it later
   updateNativeAuthDigitList(String param) async {
     if (param == null || param.isEmpty || (param.trim() == "")) {
       print("param is empty======>" + param);
@@ -128,7 +128,7 @@ class _EthPageState extends State<EthPage> {
     print("updateMap[isUpdateAuthDigit]=====>" + updateMap["status"].toString() + updateMap["isUpdateAuthDigit"].toString());
   }
 
-  //处理显示法币 usd、cny等
+  //Processing display fiat currency usd, cny, etc.
   loadLegalCurrency() async {
     Rate rate = await loadRateInstance();
     if (rate == null) {
@@ -140,7 +140,7 @@ class _EthPageState extends State<EthPage> {
     });
   }
 
-  //市场价格信息 （每小时的变化等）
+  //Market price information (hourly changes, etc.)
   loadDigitRateInfo() async {
     if (displayDigitsList.length == 0) {
       return;
@@ -168,7 +168,7 @@ class _EthPageState extends State<EthPage> {
     }
   }
 
-  //代币余额
+  //Token balance
   loadDigitBalance() async {
     print("loadDigitBalance is enter ===>" + displayDigitsList.length.toString());
     if (displayDigitsList == null || displayDigitsList.length == 0) {
@@ -195,11 +195,11 @@ class _EthPageState extends State<EthPage> {
           this.displayDigitsList[i].balance = balance ?? "0";
         });
       }
-      loadDigitMoney(); //有余额了再去计算money值
+      loadDigitMoney(); //If you have a balance, go to calculate the money value
     }
   }
 
-  //代币数量对应的，市场法币的值
+  //Corresponding to the number of tokens, the value of the market fiat currency
   loadDigitMoney() {
     for (var i = 0; i < displayDigitsList.length; i++) {
       var index = i;
@@ -214,31 +214,31 @@ class _EthPageState extends State<EthPage> {
     }
   }
 
-  //展示代币列表
+  //Display token list
   Future<List<Digit>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
-      //没有展示数据
+      //No display data
       if (allVisibleDigitsList.length < singleDigitCount) {
-        //加载到的不够一页，全展示
+        //Not enough pages loaded, full display
         addDigitToDisplayList(allVisibleDigitsList.length);
       } else {
-        //超一页，展示singleDigitCount个。
+        //Super page, showing singleDigitCount.
         addDigitToDisplayList(singleDigitCount);
       }
     } else {
-      //有展示数据，继续往里添加
+      //There are display data, continue to add
       if (allVisibleDigitsList.length - displayDigitsList.length > singleDigitCount) {
-        //剩余的超过一页
+        //More than one page left
         addDigitToDisplayList(singleDigitCount);
       } else {
-        //剩余的不够一页，全给加入进去。
+        //If there is not enough one page left, all will be added.
         addDigitToDisplayList(allVisibleDigitsList.length - displayDigitsList.length);
       }
     }
     return displayDigitsList;
   }
 
-  //将 allVisibleDigitsList 分页展示在displayDigitsList里面。即：往displayDigitsList里面加数据
+  //Display allVisibleDigitsList in displayDigitsList. That is: add data to displayDigitsList
   List<Digit> addDigitToDisplayList(int targetCount) {
     for (var i = displayDigitsList.length; i < targetCount; i++) {
       var digitRate = DigitRate();
@@ -272,7 +272,7 @@ class _EthPageState extends State<EthPage> {
           style: TextStyle(fontSize: 20),
         ),
       ),
-      drawer: LeftDrawerCard(), //左侧抽屉栏
+      drawer: LeftDrawerCard(), //Left drawer
       body: Container(
         width: ScreenUtil.instance.setWidth(90),
         height: ScreenUtil.instance.setHeight(160),
@@ -284,13 +284,13 @@ class _EthPageState extends State<EthPage> {
           children: <Widget>[
             new Column(
               children: <Widget>[
-                _buildChainCard(), //链卡片swipe
-                _buildMiddleFuncCard(), //功能位置
-                _buildDigitListCard(), //代币列表
+                _buildChainCard(), //Chain card swipe
+                _buildMiddleFuncCard(), //Functional location
+                _buildDigitListCard(), //Token list
                 //DigitListCard(),
               ],
             ),
-            /* todo 1.0 不设置增加代币入口
+            /* todo 1.0 does not set to increase the token entrance
             Positioned(
               bottom: ScreenUtil.instance.setHeight(5),
               child: _buildAddDigitButton(),
@@ -331,7 +331,7 @@ class _EthPageState extends State<EthPage> {
     );
   }
 
-  //代币列表展示卡片
+  //Token list display card
   Widget _buildDigitListCard() {
     return Container(
       height: ScreenUtil().setHeight(78),
@@ -368,7 +368,7 @@ class _EthPageState extends State<EthPage> {
     );
   }
 
-  //代币列表layout
+  //Token list layout
   Widget _digitListWidgets(snapshot) {
     return EasyRefresh.custom(
       footer: BallPulseFooter(),
@@ -385,14 +385,14 @@ class _EthPageState extends State<EthPage> {
         ),
       ],
       onLoad: () async {
-        //代币列表栏，下拉 刷新||加载 数据。
+        //Token list bar, pull down to refresh||load data.
         await Future.delayed(
           Duration(seconds: 2),
           () {
             setState(() {
               if (displayDigitsList.length < allVisibleDigitsList.length) {
-                // allVisibleDigitsList还有没显示完的
-                // 下拉刷新的时候，加载新digit到displayDigitsList
+                // allVisibleDigitsList is still not displayed
+                // When pulling down to refresh, load the new digit to displayDigitsList
                 loadDisplayDigitListData();
               } else {
                 Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
@@ -405,7 +405,7 @@ class _EthPageState extends State<EthPage> {
     );
   }
 
-  //每个代币的layout
+  //Layout of each token
   Widget _makeDigitListItem(index) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -497,7 +497,7 @@ class _EthPageState extends State<EthPage> {
                                         " " +
                                         (rateInstance == null
                                             ? ""
-                                            : rateInstance.getPrice(displayDigitsList[index]).toStringAsFixed(5) ?? "0"), //市场单价
+                                            : rateInstance.getPrice(displayDigitsList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: ScreenUtil.instance.setSp(2.5),
@@ -506,7 +506,7 @@ class _EthPageState extends State<EthPage> {
                                   Padding(
                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                     child: Text(
-                                      displayDigitsList[index].digitRate.getChangeDaily ?? "0%", //市场价格波动
+                                      displayDigitsList[index].digitRate.getChangeDaily ?? "0%", //Market price fluctuations
                                       style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
                                     ),
                                   )
@@ -517,7 +517,7 @@ class _EthPageState extends State<EthPage> {
                                   child: Opacity(
                                     opacity: 0,
                                     child: Text(
-                                      "0", //最近一笔交易记录
+                                      "0", //Last transaction
                                       style: TextStyle(fontSize: ScreenUtil.instance.setSp(2.5), color: Colors.greenAccent),
                                     ),
                                   )),
@@ -547,7 +547,7 @@ class _EthPageState extends State<EthPage> {
     );
   }
 
-  //转账&&地址 功能卡片
+  //Transfer && Address Function Card
   Widget _buildMiddleFuncCard() {
     return Container(
       height: ScreenUtil().setHeight(15),
@@ -608,7 +608,7 @@ class _EthPageState extends State<EthPage> {
     );
   }
 
-  //链卡片
+  //Chain card
   Widget _buildChainCard() {
     return Container(
       width: ScreenUtil().setWidth(77.5),
@@ -666,7 +666,7 @@ class _EthPageState extends State<EthPage> {
                 itemCount: Wallets.instance.nowWallet.chainList.length,
                 pagination: new SwiperPagination(
                   builder: SwiperPagination(
-                    builder: SwiperPagination.rect, //切页面图标
+                    builder: SwiperPagination.rect, //Cut page icon
                   ),
                 ),
                 autoplay: false,
@@ -677,7 +677,7 @@ class _EthPageState extends State<EthPage> {
     );
   }
 
-  //链卡片money
+  //Chain card money
   Widget _chainCardMoneyWidget() {
     return Container(
       height: ScreenUtil().setHeight(7),
@@ -740,7 +740,7 @@ class _EthPageState extends State<EthPage> {
     return popMenuList;
   }
 
-  //链卡片 地址address
+  //Chain card address
   Widget _chainCardAddressWidget(index) {
     return Container(
       child: new Row(
@@ -803,7 +803,7 @@ class _EthPageState extends State<EthPage> {
 
   void _navigatorToQrInfoPage(String title, String hintInfo, String content) {
     print("_navigatorToQrInfoPage=>" + "target info is" + "addresspage?title=" + title + "&hintInfo=" + hintInfo + "&content=" + content);
-    //暂用 数据状态管理 处理， 路由功能fluro中文传值会有问题。
+    //Temporary use of data status management processing, routing function fluro Chinese pass value will have problems.
     Provider.of<QrInfoProvide>(context).setTitle(title);
     Provider.of<QrInfoProvide>(context).setHintInfo(hintInfo);
     Provider.of<QrInfoProvide>(context).setContent(content);

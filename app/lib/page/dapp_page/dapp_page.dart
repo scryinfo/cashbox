@@ -42,10 +42,10 @@ class _DappPageState extends State<DappPage> {
             javascriptMode: JavascriptMode.unrestricted,
             userAgent:
             "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
-            //JS执行模式 是否允许JS执行
+            //JS execution mode Whether to allow JS execution
             onWebViewCreated: (WebViewController webViewController) {
               _controller = webViewController;
-              //_loadHtmlFromAssets(_controller); //载入本地html文件
+              //_loadHtmlFromAssets(_controller); //Load local html file
             },
             javascriptChannels: makeJsChannelsSet(),
             navigationDelegate: (NavigationRequest request) {
@@ -58,7 +58,7 @@ class _DappPageState extends State<DappPage> {
               Chain chainEEE = nowWallet.getChainByChainType(ChainType.EEE);
               if (chainEEE != null && chainEEE.chainAddress != null && chainEEE.chainAddress.trim() != "") {
                 String chainEEEAddress = chainEEE.chainAddress;
-                _controller?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')?.then((result) {}); //传钱包EEE链地址给DApp记录保存
+                _controller?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                 print('Page finished loading================================>: $url');
               } else {
                 print('Page finished loading================================>:address is null');
@@ -84,7 +84,7 @@ class _DappPageState extends State<DappPage> {
         }));
 
     jsChannelList.add(JavascriptChannel(
-        name: "NativeQrScanAndPwdAndSignToQR", //备注。在此执行scan,在sign_tx_page执行pwdAndSign，后toQR
+        name: "NativeQrScanAndPwdAndSignToQR", //Remarks. Execute scan here, execute pwdAndSign on sign_tx_page, then toQR
         onMessageReceived: (JavascriptMessage message) {
           Future<String> qrResult = QrScanUtil.instance.qrscan();
           qrResult.then((qrInfo) {
@@ -94,7 +94,7 @@ class _DappPageState extends State<DappPage> {
               NavigatorUtils.goBack(context);
               return;
             }
-            var waitToSignInfo = "dtt=" + paramsMap["dtt"] + ";" + "v=" + paramsMap["v"]; //待签名交易信息
+            var waitToSignInfo = "dtt=" + paramsMap["dtt"] + ";" + "v=" + paramsMap["v"]; //Transaction information to be signed
             Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
             NavigatorUtils.push(context, Routes.signTxPage);
           }).catchError((e) {
@@ -127,7 +127,7 @@ class _DappPageState extends State<DappPage> {
                       var signResult = map["signedInfo"];
                       Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
                       _controller?.evaluateJavascript('nativeSignMsgToJsResult("$signResult")')?.then((result) {
-                        NavigatorUtils.goBack(context); //签名完成，关了密码弹框
+                        NavigatorUtils.goBack(context); //The signature is completed, the password box is closed
                       });
                     }
                   } else {

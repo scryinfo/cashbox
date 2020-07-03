@@ -28,7 +28,7 @@ import '../../res/resources.dart';
 class EeePage extends StatefulWidget {
   const EeePage({Key key, this.isForceLoadFromJni}) : super(key: key);
 
-  final bool isForceLoadFromJni; //是否强制重新加载钱包信息
+  final bool isForceLoadFromJni; //Whether to force reload of wallet information
 
   @override
   _EeePageState createState() => _EeePageState();
@@ -37,17 +37,17 @@ class EeePage extends StatefulWidget {
 class _EeePageState extends State<EeePage> {
   List<Wallet> walletList = [];
   Wallet nowWallet = Wallet();
-  static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
+  static int singleDigitCount = 20; //Display 20 items of data on a single page, update and update 20 items at a time
   String moneyUnitStr = "USD";
-  num nowWalletAmount = 0.00; //当前钱包内代币总市价
+  num nowWalletAmount = 0.00; //The current total market price of tokens in the wallet
   List<String> moneyUnitList = [];
   List<String> chainTypeList = []; //"BTC", "ETH",
   Chain nowChain;
   String nowChainAddress = "";
   String walletName = "";
   Future future;
-  List<Digit> nowChainDigitsList = []; //链上获取到的所有代币数据
-  List<Digit> displayDigitsList = []; //当前分页展示的固定代币数量信息
+  List<Digit> nowChainDigitsList = []; //All token data obtained on the chain
+  List<Digit> displayDigitsList = []; //Information about the number of fixed tokens displayed on the current page
 
   @override
   void initState() {
@@ -79,7 +79,7 @@ class _EeePageState extends State<EeePage> {
         Wallets.instance.nowWallet.setNowChainType(nowChain);
         this.nowChainAddress = nowChain.chainAddress;
         this.nowChainDigitsList = nowChain.digitsList;
-        break; //找到，终止循环
+        break; //Find, terminate the loop
       }
     }
     setState(() {
@@ -91,21 +91,21 @@ class _EeePageState extends State<EeePage> {
 
   Future<List<Digit>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
-      //没有展示数据
+      //No display data
       if (nowChainDigitsList.length < singleDigitCount) {
-        //加载到的不够一页，全展示
+        //Not enough pages loaded, full display
         addDigitToDisplayList(nowChainDigitsList.length);
       } else {
-        //超一页，展示singleDigitCount个。
+        //Super page, showing singleDigitCount.
         addDigitToDisplayList(singleDigitCount);
       }
     } else {
-      //有展示数据，继续往里添加
+      //There are display data, continue to add
       if (nowChainDigitsList.length - displayDigitsList.length > singleDigitCount) {
-        //剩余的超过一页
+        //More than one page left
         addDigitToDisplayList(singleDigitCount);
       } else {
-        //剩余的不够一页，全给加入进去。
+        //If there is not enough one page left, all will be added.
         addDigitToDisplayList(nowChainDigitsList.length - displayDigitsList.length);
       }
     }
@@ -145,7 +145,7 @@ class _EeePageState extends State<EeePage> {
           style: TextStyle(fontSize: 20),
         ),
       ),
-      drawer: LeftDrawerCard(), //左侧抽屉栏
+      drawer: LeftDrawerCard(), //Left drawer
       body: Container(
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(
@@ -155,10 +155,10 @@ class _EeePageState extends State<EeePage> {
           children: <Widget>[
             new Column(
               children: <Widget>[
-                _buildChainCard(), //链卡片swipe
-                //_buildMiddleFuncCard(), //功能位置
+                _buildChainCard(), //Chain card swipe
+                //_buildMiddleFuncCard(), //Functional location
                 Gaps.scaleVGap(5),
-                _buildDigitListCard(), //代币列表
+                _buildDigitListCard(), //Token list
                 //DigitListCard(),
               ],
             ),
@@ -168,7 +168,7 @@ class _EeePageState extends State<EeePage> {
     );
   }
 
-  //代币列表展示卡片
+  //Token list display card
   Widget _buildDigitListCard() {
     return Container(
       height: ScreenUtil().setHeight(78),
@@ -205,7 +205,7 @@ class _EeePageState extends State<EeePage> {
     );
   }
 
-  //代币列表layout
+  //Token list layout
   Widget _digitListWidgets(snapshot) {
     return EasyRefresh.custom(
       footer: BallPulseFooter(),
@@ -222,15 +222,15 @@ class _EeePageState extends State<EeePage> {
         ),
       ],
       onLoad: () async {
-        //代币列表栏，下拉 刷新||加载 数据。
+        //Token list bar, pull down Refresh || Load data.
         await Future.delayed(
           Duration(seconds: 2),
           () {
             setState(() {
               if (displayDigitsList.length < nowChainDigitsList.length) {
-                // 从JNI加载的数据(nowChain.digitList),还有没显示完的，继续将nowChainDigitsList剩余数据，
-                // 添加到 displayDigitsList里面做展示
-                loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
+                // The data loaded from JNI (nowChain.digitList), there are still not displayed, continue to the remaining data of nowChainDigitsList,
+                // Add to displayDigitsList for display
+                loadDisplayDigitListData(); //When pull down to refresh, load new digit to displayDigitsList
               } else {
                 Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
                 return;
@@ -242,7 +242,7 @@ class _EeePageState extends State<EeePage> {
     );
   }
 
-  //每个代币的layout
+  //Layout of each token
   Widget _makeDigitListItem(index) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -330,8 +330,8 @@ class _EeePageState extends State<EeePage> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    moneyUnitStr + " 0.00 ", //市场单价
-                                    //moneyUnitStr + " " + (displayDigitsList[index].digitRate.getPrice(moneyUnitStr).toStringAsFixed(5) ?? "0"), //市场单价
+                                    moneyUnitStr + " 0.00 ", //Market price
+                                    //moneyUnitStr + " " + (displayDigitsList[index].digitRate.getPrice(moneyUnitStr).toStringAsFixed(5) ?? "0"), //Market price
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: ScreenUtil.instance.setSp(2.5),
@@ -342,7 +342,7 @@ class _EeePageState extends State<EeePage> {
                                     child: Padding(
                                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                       child: Text(
-                                        displayDigitsList[index].digitRate.getChangeDaily ?? "0%", //市场价格波动
+                                        displayDigitsList[index].digitRate.getChangeDaily ?? "0%", //Market price fluctuations
                                         style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
                                       ),
                                     ),
@@ -354,7 +354,7 @@ class _EeePageState extends State<EeePage> {
                                   child: Opacity(
                                     opacity: 0,
                                     child: Text(
-                                      "0", //最近一笔交易记录
+                                      "0", //Last transaction
                                       style: TextStyle(fontSize: ScreenUtil.instance.setSp(2.5), color: Colors.greenAccent),
                                     ),
                                   )),
@@ -384,7 +384,7 @@ class _EeePageState extends State<EeePage> {
     );
   }
 
-  //转账&&地址 功能卡片
+  //Transfer && Address Function Card
   Widget _buildMiddleFuncCard() {
     return Container(
       height: ScreenUtil().setHeight(15),
@@ -445,7 +445,7 @@ class _EeePageState extends State<EeePage> {
     );
   }
 
-  //链卡片
+  //Chain card
   Widget _buildChainCard() {
     if (chainTypeList.isEmpty) {
       return Container(
@@ -480,7 +480,7 @@ class _EeePageState extends State<EeePage> {
         itemCount: chainTypeList.isNotEmpty ? chainTypeList.length : 0,
         pagination: new SwiperPagination(
           builder: SwiperPagination(
-            builder: SwiperPagination.rect, //切页面图标
+            builder: SwiperPagination.rect, //Cut page icon
           ),
         ),
         autoplay: false,
@@ -488,7 +488,7 @@ class _EeePageState extends State<EeePage> {
     );
   }
 
-  //链卡片money
+  //Chain card money
   Widget _chainCardMoneyWidget() {
     return Container(
       height: ScreenUtil().setHeight(7),
@@ -548,7 +548,7 @@ class _EeePageState extends State<EeePage> {
     return popMenuList;
   }
 
-  //链卡片 地址address
+  //Chain card address
   Widget _chainCardAddressWidget(index) {
     return Container(
       child: new Row(
@@ -607,7 +607,7 @@ class _EeePageState extends State<EeePage> {
 
   void _navigatorToQrInfoPage(String title, String hintInfo, String content) {
     print("_navigatorToQrInfoPage=>" + "target info is" + "addresspage?title=" + title + "&hintInfo=" + hintInfo + "&content=" + content);
-    //暂用 数据状态管理 处理， 路由功能fluro中文传值会有问题。
+    //Temporary use of data state management processing, routing function fluro Chinese pass value will have problems.
     Provider.of<QrInfoProvide>(context).setTitle(title);
     Provider.of<QrInfoProvide>(context).setHintInfo(hintInfo);
     Provider.of<QrInfoProvide>(context).setContent(content);

@@ -32,8 +32,8 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _pwdController.addListener(_listenWalletName); //监听密码 输入框
-    _confirmPwdController.addListener(_listenPwd); //监听确认密码 输入框
+    _pwdController.addListener(_listenWalletName); //Monitor password input box
+    _confirmPwdController.addListener(_listenPwd); //Monitor and confirm password input box
   }
 
   @override
@@ -314,7 +314,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
   }
 
   bool _verifyToCreateWallet() {
-    //验证：数据不为空
+    //Verification: data is not empty
     if (_nameController.text.isEmpty ||
         _nameController.text.length < 1 ||
         _pwdController.text.isEmpty ||
@@ -324,12 +324,12 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       Fluttertoast.showToast(msg: translate('some_info_is_null'));
       return false;
     }
-    //验证：两次密码一致
+    //Verification: the two passwords are consistent
     if (_confirmPwdController.text != _pwdController.text) {
       Fluttertoast.showToast(msg: translate('pwd_is_not_same'));
       return false;
     }
-    //验证：勾选 链
+    //Verification: check the chain
     if (!_ethChainChoose) {
       Fluttertoast.showToast(msg: translate('pls_ensure_eth_chain'));
       return false;

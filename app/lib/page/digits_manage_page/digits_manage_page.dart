@@ -28,12 +28,12 @@ class DigitsManagePage extends StatefulWidget {
 }
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
-  List<Digit> displayDigitsList = []; //页面展示的代币=nowWallet.nowChain.digitsList(本链已有，visible显示在前面) + nativeAuthDigitsList(分页认证代币)
+  List<Digit> displayDigitsList = []; //Tokens displayed on the page = nowWallet.nowChain.digitsList (this chain already exists, visible is displayed in front) + nativeAuthDigitsList (paged authentication tokens)
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
   int nativeDigitIndex = 0;
-  int onePageOffSet = 50; //单页面显示20条数据，一次下拉刷新更新20条
-  int maxAuthTokenCount = 0; //本地authToken总个数
+  int onePageOffSet = 50; //Display 20 items of data on a single page, update and update 20 items at a time
+  int maxAuthTokenCount = 0; //Total number of local authToken
   bool isLoadAuthDigitFinish = false;
 
   @override
@@ -43,51 +43,51 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   initData() async {
-    addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1、可见代币显示在前面 isVisible = true;
-    addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2、本地已有代币列表
+    addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1. The visible token is displayed in front isVisible = true;
+    addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2. List of existing local tokens
     print("initData() displayDigitsList.length====>" + displayDigitsList.length.toString());
     {
-      /*   todo 1.0 暂时不做，写死预置代币数据
+      /*   todo 1.0 will not do it for the time being
       var spUtil = await SharedPreferenceUtil.instance;
       var localDigitsVersion = spUtil.getString(GlobalConfig.authDigitsVersionKey);
       var serverDigitsVersion = Provider.of<ServerConfigProvide>(context).authDigitListVersion;
       var serverDigitsIp = Provider.of<ServerConfigProvide>(context).authDigitListIp;
       var localDigitListIP = spUtil.getString(GlobalConfig.authDigitsIpKey);
       if (localDigitsVersion == null || localDigitsVersion == "") {
-        //本地没有认证代币版本号，没加载过
+        //There is no certified token version number locally and it has not been loaded
         if (serverDigitsIp != null && serverDigitsIp != "") {
           var param = await loadServerDigitsData(serverDigitsIp);
-          await updateNativeAuthDigitList(param); //保存代币：服务器可信任代币列表ip
+          await updateNativeAuthDigitList(param); //Save tokens: server trusted token list ip
         } else {
           var param = await loadServerDigitsData(localDigitListIP);
-          await updateNativeAuthDigitList(param); //保存代币：本地初始记录的代币列表ip
+          await updateNativeAuthDigitList(param); //Save tokens: local initial recorded token list ip
         }
-        spUtil.setString(GlobalConfig.authDigitsVersionKey, serverDigitsVersion); //保存server端，拿到的版本号Version
+        spUtil.setString(GlobalConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number Version
       } else {
-        //本地有版本号，检查更新,且有服务端版本号信息
+        //Local version number, check for updates, and server version number information
         if (serverDigitsVersion != null && serverDigitsVersion != "") {
           if (double.parse(localDigitsVersion) < double.parse(serverDigitsVersion)) {
-            //server端有新版本出现
-            //todo 随机策略, 检查服务器端 可信代币列表 版本，更新本地代币列表
-            //todo 替换 ======> 2、本地已有代币列表
+            //A new version appears on the server side
+            //todo random strategy, check the server-side trusted token list version, update the local token list
+            //todo replacement ======> 2. List of existing local tokens
             if (serverDigitsIp != null && serverDigitsIp != "") {
-              //有服务端代币ip地址
+              //There is a server token IP address
               var param = await loadServerDigitsData(serverDigitsIp);
-              await updateNativeAuthDigitList(param); //保存代币：服务器可信任代币列表ip
-              spUtil.setString(GlobalConfig.authDigitsVersionKey, serverDigitsVersion); //保存server端，拿到的版本号
+              await updateNativeAuthDigitList(param); //Save tokens: server trusted token list ip
+              spUtil.setString(GlobalConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number
             }
           }
         }
       }*/
       {
-        //todo 1.0 写死，预置代币
+        //todo 1.0 write dead, preset token
         var digitParam =
             '[{"contractAddress":"0x9F5F3CFD7a32700C93F971637407ff17b91c7342","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
         await updateNativeAuthDigitList(digitParam);
         var addDigitMap = await Wallets.instance.addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, "3");
         int status = addDigitMap["status"];
         if (status == null || status != 200) {
-          Fluttertoast.showToast(msg: "执行状态保存，出问题了,请重新尝试");
+          Fluttertoast.showToast(msg: "Execution status save, something went wrong, please try again");
           print("addDigitToChainModel failure==" + addDigitMap["message"]);
         } else {
           print("addDigitToChainModel successful==");
@@ -165,7 +165,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     );
   }
 
-  //代币列表layout
+  //Token list layout
   Widget _digitListWidgets() {
     return EasyRefresh.custom(
       footer: BallPulseFooter(),
@@ -182,7 +182,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         ),
       ],
       onLoad: () async {
-        //代币列表栏，下拉 刷新||加载 数据。
+        //Token list bar, pull down to refresh||load data.
         await Future.delayed(
           Duration(seconds: 2),
           () async {
@@ -202,7 +202,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     );
   }
 
-  //每个代币的layout
+  //Layout of each token
   Widget _makeDigitListItem(index) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -220,7 +220,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                 if (displayDigitsList[index].isVisible) {
                   isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.hideDigit(displayDigitsList[index]);
                 } else {
-                  //不可见，执行可见show操作
+                  //Invisible, perform visible show operation
                   bool isDigitExist = false;
                   Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
                     if (element.digitId == displayDigitsList[index].digitId) {
@@ -230,8 +230,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   if (isDigitExist) {
                     isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
                   } else {
-                    // todo 保存 或者 更改显示状态 接口功能待验证
-                    // 保存到本地Chain下的digit中 （底层 + model）
+                    // todo save or change the display state interface function to be verified
+                    // Save to digit under the local Chain (bottom + model)
                     var addDigitMap = await Wallets.instance.addDigitToChainModel(
                         Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
                     int status = addDigitMap["status"];
@@ -244,7 +244,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   }
                 }
                 if (isExecutorSuccess) {
-                  //底层执行成功，上层刷新 显示数据
+                  //The bottom layer is successfully executed, the upper layer refreshes to display data
                   Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
                     if (element.shortName == displayDigitsList[index].shortName) {
                       element.isVisible = displayDigitsList[index].isVisible;
@@ -318,7 +318,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       if (result["code"] != null && result["code"] == 0) {
         print("loadServerDigitsData result.code=>" + convert.jsonEncode(result["data"]));
         //return convert.jsonEncode(result["data"]).toString();
-        //TODO 测试用
+        //TODO test
         return '[{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
         //return "";
       }
@@ -339,7 +339,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     print("updateMap[isUpdateAuthDigit]=====>" + updateMap["status"].toString() + updateMap["isUpdateAuthDigit"].toString());
   }
 
-  //加入到展示列表displayDigitsList中
+  //Add to displayDigitsList
   addToDisplayDigitsList(List<Digit> newDigitList) {
     if (newDigitList == null || newDigitList.length == 0) {
       print("addToDisplayDigitsList newDigitList is null");

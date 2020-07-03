@@ -10,7 +10,7 @@ typedef AssembleTx = ffi.Pointer<Utf8> Function(
 class WalletFFI {
   static WalletFFI _instance;
 
-  //工厂单例类实现
+  //Factory singleton class implementation
   factory WalletFFI() => _getInstance();
 
   static WalletFFI get instance => _getInstance();
@@ -32,7 +32,7 @@ class WalletFFI {
     path = "./libwallet.so";
   }
 
-  String assembleEthTx(String walletId, String value, String fromAddress, String toAddress, String backupMsg) { //todo eth nonce获取位置 待定
+  String assembleEthTx(String walletId, String value, String fromAddress, String toAddress, String backupMsg) { //todo eth nonce get location to be determined
     try {
       final dylib = ffi.DynamicLibrary.open(path);
       final AssembleTx assembleTx = dylib.lookup<ffi.NativeFunction<assemble_tx_func>>(assembleEthTxFunctionName).asFunction();

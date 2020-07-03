@@ -377,7 +377,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     ));
   }
 
-  //验证 助记词 不能为空
+  //Verification mnemonic cannot be empty
   void _listenMnemonic() {
     String mnemonic = _mneController.text;
     if (mnemonic.isEmpty || mnemonic.length < 1) {
@@ -386,7 +386,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     }
   }
 
-  //验证 钱包名 不能为空
+  //Verify that the wallet name cannot be empty
   void _listenWalletName() {
     String name = _walletNameController.text;
     if (name.isEmpty || name.length < 1) {
@@ -395,7 +395,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     }
   }
 
-  //验证 钱包名 不能为空
+  //Verify that the wallet name cannot be empty
   void _listenPwd() {
     String pwd = _pwdController.text;
     if (pwd.isEmpty || pwd.length < 1) {
@@ -432,7 +432,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       var isSuccess = await Wallets.instance.saveWallet(_walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
           Uint8List.fromList(_mneController.text.codeUnits), WalletType.WALLET);
       if (isSuccess) {
-        NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
+        NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
       } else {
         Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'));
       }

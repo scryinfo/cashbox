@@ -5,7 +5,7 @@ class SignInfoProvide with ChangeNotifier {
 
   get waitToSignInfo => _waitToSignInfo;
 
-  /*检查每次调用完毕，清理数据记录*/
+  /*Check the completion of each call, clean up the data record*/
   void emptyData() {
     this._waitToSignInfo = null;
   }

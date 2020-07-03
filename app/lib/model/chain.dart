@@ -4,18 +4,18 @@ import 'package:wallet_manager/wallet_manager.dart';
 
 import 'digit.dart';
 
-enum ChainType { UNKNOWN, BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST } /*标记：定义需要与JNI处保持一致*/
+enum ChainType { UNKNOWN, BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST } /*Mark: Definition needs to be consistent with JNI*/
 
 abstract class Chain {
-  String chainId; //链Id
-  String walletId; //钱包Id
-  String chainAddress; //链地址
+  String chainId; //Chain Id
+  String walletId; //Wallet Id
+  String chainAddress; //Chain address
   List<Digit> digitsList = [];
   List<Digit> _visibleDigitsList = [];
-  bool isVisible = true; //默认链可见
+  bool isVisible = true; //The default chain is visible
   ChainType chainType;
 
-  //可见代币列表：digit.isVisible = true类型
+  //List of visible tokens: digit.isVisible = true type
   List<Digit> getVisibleDigitList() {
     if (_visibleDigitsList != null && _visibleDigitsList.length != 0) {
       return _visibleDigitsList;
@@ -50,7 +50,7 @@ abstract class Chain {
     }
   }
 
-  //跟jni接口处，定义一致  NativeLib.ChainType
+  //At the jni interface, the definition is the same NativeLib.Chain Type
   static int chainTypeToInt(ChainType chainType) {
     switch (chainType) {
       case ChainType.BTC:
@@ -73,7 +73,7 @@ abstract class Chain {
   static ChainType intToChainType(int chainTypeInt) {
     ChainType chainType;
     switch (chainTypeInt) {
-      /*标记：定义需要与JNI处保持一致*/
+      /*Mark: Definition needs to be consistent with JNI*/
       case 1:
         chainType = ChainType.BTC;
         break;
@@ -98,7 +98,7 @@ abstract class Chain {
     return chainType;
   }
 
-  // 显示代币
+  // Show tokens
   // apiNo:WM14
   Future<bool> showDigit(Digit digit) async {
     print("showDigit    walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
@@ -107,15 +107,15 @@ abstract class Chain {
     bool isShowDigit = showDigitMap["isShowDigit"];
     if (status == 200) {
       if (isShowDigit) {
-        //执行成功
+        //execution succeed
         digit.isVisible = true;
         return isShowDigit;
       }
     }
-    return false; //执行失败
+    return false; //Execution failed
   }
 
-  // 隐藏代币
+  // Hidden tokens
   // apiNo:WM15
   Future<bool> hideDigit(Digit digit) async {
     print("hideDigit        walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
@@ -125,7 +125,7 @@ abstract class Chain {
     if (status == 200) {
       if (isHideDigit == true) {
         digit.isVisible = false;
-        return isHideDigit; //执行成功
+        return isHideDigit; //execution succeed
       }
     }
     return false;

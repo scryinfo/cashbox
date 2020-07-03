@@ -5,25 +5,25 @@ import 'package:wallet_manager/wallet_manager.dart';
 
 import 'chain.dart';
 
-enum WalletType { TEST_WALLET, WALLET } //0,1  /*标记：定义需要与JNI处保持一致*/
+enum WalletType { TEST_WALLET, WALLET } //0,1  /*Mark: Definition needs to be consistent with JNI*/
 
 class Wallet {
-  int status; //接口数据，返回状态码
-  String walletId; //钱包Id
-  String walletName; //钱包名
-  String accountMoney; // 当前钱包 当前链 代币总余额
-  Uint8List mnemonic; //助记词,                  /* 参数传递，及时释放*/
-  Uint8List secretKey; //私钥                    /* 参数传递，及时释放*/
-  String jsonFilePath; //私钥加密文件jsonFile路径
-  String creationTime; //钱包创建时间
-  List<Chain> chainList = []; //钱包内包含链列表
-  String nowChainId; //钱包内，当前链chainId
+  int status; //Interface data, return status code
+  String walletId; //Wallet Id
+  String walletName; //Wallet name
+  String accountMoney; // Current wallet Current chain Total token balance
+  Uint8List mnemonic; //Mnemonic                 /* Parameter transfer, timely release*/
+  Uint8List secretKey; //Private key             /* Parameter transfer, timely release*/
+  String jsonFilePath; //Private key encrypted file jsonFile path
+  String creationTime; //Wallet creation time
+  List<Chain> chainList = []; //The wallet contains a list of chains
+  String nowChainId; //In the wallet, the current chain chainId
   Chain nowChain;
   WalletType walletType;
-  bool isNowWallet; //是否是当前钱包
+  bool isNowWallet; //Whether it is the current wallet
   //todo load chain
 
-  // 重置钱包密码
+  // Reset wallet password
   // apiNo:WM08
   Future<Map> resetPwd(Uint8List newPwd, Uint8List oldPwd) async {
     Map resetPwdMap = await WalletManager.resetPwd(walletId, newPwd, oldPwd);
@@ -41,7 +41,7 @@ class Wallet {
     return resetPwdMap;
   }
 
-  // 重置钱包名
+  // Reset wallet name
   // apiNo:WM09
   Future<bool> rename(String walletName) async {
     Map walletRenameMap = await WalletManager.rename(walletId, walletName);
@@ -52,7 +52,7 @@ class Wallet {
       return false;
     }
     if (status == 200) {
-      this.walletName = walletName; //jni操作完成，更改model
+      this.walletName = walletName; //The jni operation is complete, change the model
       return walletRenameMap["isRename"];
     } else {
       LogUtil.e("isContainWallet=>", "error status is=>" + walletRenameMap["status"].toString() + "||message is=>" + message.toString());
@@ -60,7 +60,7 @@ class Wallet {
     }
   }
 
-  // 显示链
+  // Display chain
   // apiNo:WM10
   Future<bool> showChain(int chainType) async {
     Map showChainMap = await WalletManager.showChain(walletId, chainType);
@@ -73,24 +73,24 @@ class Wallet {
     print("showChain  isShowChain=>" + isShowChain.toString());
 
     //if (isSuccess) {
-    //todo 数据格式
+    //todo Data Format
     //chainList.remove(chain);
     //}
     return null;
   }
 
-  // 隐藏链
+  // Hidden chain
   // apiNo:WM11
   Future<bool> hideChain(int chainType) async {
     var isSuccess = await WalletManager.hideChain(walletId, chainType);
     if (isSuccess) {
-      //todo 数据格式
+      //todo Data Format
       //chainList.remove(chain);
     }
     return null;
   }
 
-  // 获取当前链
+  // Get the current chain
   // apiNo:WM12
   Future<ChainType> getNowChainType() async {
     Map getNowChainMap = await WalletManager.getNowChain(walletId);
@@ -101,7 +101,7 @@ class Wallet {
       return ChainType.UNKNOWN; //0===UNKNOWN
     }
     if (status == 200) {
-      this.walletName = walletName; //jni操作完成，更改model
+      this.walletName = walletName; //The jni operation is complete, change the model
       ChainType chainType = Chain.intToChainType(getNowChainMap["getNowChainType"]);
       return chainType;
     } else {
@@ -110,7 +110,7 @@ class Wallet {
     }
   }
 
-  // 设置当前链
+  // Set current chain
   // apiNo:WM13
   Future<bool> setNowChainType(Chain chain) async {
     int chainTypeInt = Chain.chainTypeToInt(chain.chainType);

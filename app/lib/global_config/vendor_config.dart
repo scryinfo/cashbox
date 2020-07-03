@@ -1,26 +1,26 @@
 /*
-  配置文件
-  开发者可根据自己需要，增、删各个功能的接口接口数据。
-  例如：可增加对应后端法币接口等
+  Configuration file
+  Developers can add or delete interface data for each function according to their needs.
+  For example: the corresponding back-end legal currency interface can be added
 **/
 class VendorConfig {
-  static const RatePath = "";
-  static const versionCheckIp = ""; //版本检查接口；
-  static const latestVersionIp = ""; //最新版本app下载接口；
 
-  static const rateDigitIpKey = ""; //代币对应的法币key
-  static const rateDigitIpDefaultValue = ""; //代币对应的法币接口ip；
+  static const versionCheckIp = ""; //Version check interface；
+  static const latestVersionIp = ""; //The latest version app download interface；
 
-  static const authDigitsVersionKey = ""; //可信任代币的版本号key
-  static const authDigitsVersionValue = ""; //可信任代币的版本号value
+  static const rateDigitIpKey = ""; //The fiat currency key corresponding to the token
+  static const rateDigitIpDefaultValue = ""; //The legal currency interface ip corresponding to the token；
 
-  static const authDigitsIpKey = ""; //可信erc代币列表key
-  static const authDigitsIpDefaultValue = ""; //可信erc代币列表；
+  static const authDigitsVersionKey = ""; //Trusted token version number key
+  static const authDigitsVersionValue = ""; //Trusted token version number value
 
-  static const defaultDigitsKey = ""; //默认代币ip对应key；
-  static const defaultDigitsDefaultValue = ""; //默认代币ip对应的值；
+  static const authDigitsIpKey = ""; //List of trusted erc tokens
+  static const authDigitsIpDefaultValue = ""; //List of trusted erc tokens；
 
-  static const scryXIpKey = ""; //默认语言中文；
+  static const defaultDigitsKey = ""; //The default token ip corresponds to the key；
+  static const defaultDigitsDefaultValue = ""; //The value corresponding to the default token ip；
+
+  static const scryXIpKey = ""; //Default language Chinese；
   static const scryXIpDefaultValue = "";
 
   static const cashboxDownloadIpKey = ""; //

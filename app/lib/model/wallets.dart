@@ -11,12 +11,12 @@ import 'chain.dart';
 import 'digit.dart';
 import 'ffi/wallet_ffi.dart';
 
-//钱包管理
+//Wallet management
 class Wallets {
   List<Wallet> allWalletList = List();
   Wallet nowWallet;
 
-  //工厂单例类实现
+  //Factory singleton class implementation
   factory Wallets() => _getInstance();
 
   static Wallets get instance => _getInstance();
@@ -37,12 +37,12 @@ class Wallets {
     var spUtil = await SharedPreferenceUtil.instance;
     var isFinishInit = spUtil.getBool(GlobalConfig.isInitAppConfig);
     if (isFinishInit == null || !isFinishInit) {
-      SharedPreferenceUtil.initVersion(); //初始化 接口ip、版本信息等 到本地文件保存
+      SharedPreferenceUtil.initVersion(); //Initialize interface ip, version information, etc. to local file
     }
-    WalletManager.initWalletBasicData(); //初始化数据库部分数据
+    WalletManager.initWalletBasicData(); //Initialize some database data
   }
 
-  // 创建助记词，待验证正确通过，由底层创建钱包完成，应用层做保存
+  // Create mnemonic words, to be verified correctly, the wallet is created by the bottom layer, and the application layer is saved
   // apiNo:MM00
   Future<Uint8List> createMnemonic(int count) async {
     Map resultMap = await WalletManager.mnemonicGenerate(count);
@@ -59,7 +59,7 @@ class Wallets {
     }
   }
 
-  // 是否已有钱包
+  // Whether you already have a wallet
   // apiNo:WM01
   Future<bool> isContainWallet() async {
     Map containWalletMap = await WalletManager.isContainWallet();
@@ -77,10 +77,10 @@ class Wallets {
     }
   }
 
-  // 导出所有钱包
+  // Export all wallets
   // apiNo:WM02
   Future<List<Wallet>> loadAllWalletList({bool isForceLoadFromJni = false}) async {
-    ///判是否需要重新从JNI再获取一次，加载过就是有缓存的。
+    ///Judge whether you need to get it from JNI again, it will be cached after loading.
     if (!isForceLoadFromJni) {
       return allWalletList;
     }
@@ -96,7 +96,7 @@ class Wallets {
       int walletStatus = jniList[walletIndex]["status"];
       if (walletStatus == null || walletStatus != 200) {
         LogUtil.e("loadAllWalletList=>", "error status code is" + walletStatus.toString() + "||message is=>" + jniList[walletIndex]["message"]);
-        continue; //这个钱包数据有问题，跳过取下个wallet
+        continue; //There is a problem with this wallet data, skip it, take down a wallet
       }
       int walletType = jniList[walletIndex]["walletType"];
       if (walletType == 0) {
@@ -110,7 +110,7 @@ class Wallets {
         ..nowChainId = jniList[walletIndex]["nowChainId"].toString()
         ..creationTime = jniList[walletIndex]["creationTime"].toString()
         ..isNowWallet = jniList[walletIndex]["isNowWallet"];
-      //  todo version1.0不加scryx链的展示
+      //  todo version1.0 without scryx chain display
       /*{
         var eeeChain = jniList[walletIndex]["eeeChain"];
         Chain chainEeeM = ChainEEE();
@@ -137,7 +137,7 @@ class Wallets {
             ..urlImg = digitInfoMap["urlImg"];
           chainEeeM.digitsList.add(digitM);
         }
-        walletM.chainList.add(chainEeeM); ////将chain 添加到chainList里面
+        walletM.chainList.add(chainEeeM); ////Add chain to chainList
       }*/
       {
         //ETH
@@ -168,7 +168,7 @@ class Wallets {
         }
         walletM.chainList.add(chainEthM);
       }
-      //todo    BTC 链信息还没有加入
+      //todo BTC chain information has not been added
       {
         //BTC
       }
@@ -176,13 +176,13 @@ class Wallets {
         this.nowWallet = walletM;
         this.nowWallet.nowChain = this.nowWallet.getChainByChainId(this.nowWallet.nowChainId);
       }
-      allWalletList.add(walletM); ////将wallet 添加到walletList里面
+      allWalletList.add(walletM); ////Add wallet to WalletList
     }
     return allWalletList;
   }
 
-  // 保存钱包,钱包导入。  通过助记词创建钱包流程
-  // apiNo:WM03           //todo 2.0 优化saveWallet接口，返回值类型
+  // Save the wallet and import the wallet. Create a wallet process with mnemonic words
+  // apiNo:WM03           //todo 2.0 optimize saveWallet interface, return value type
   Future<bool> saveWallet(String walletName, Uint8List pwd, Uint8List mnemonic, WalletType walletType) async {
     int walletTypeToInt = 0;
     switch (walletType) {
@@ -208,14 +208,14 @@ class Wallets {
     return false;
   }
 
-  // 钱包导出。 恢复钱包   /* 此处有助记词生成。注意及时释放*/
+  // Wallet export. Restore wallet.   /* There is mnemonic word generation here. Pay attention to release in time*/
   // apiNo:WM04
   Future<Map> exportWallet(String walletId, Uint8List pwd) async {
     Map mnemonicMap = await WalletManager.exportWallet(walletId, pwd);
     return mnemonicMap;
   }
 
-  //获取当前钱包
+  //Get current wallet
   // apiNo:WM05
   Future<String> getNowWalletId() async {
     var walletId = await WalletManager.getNowWalletId();
@@ -228,13 +228,13 @@ class Wallets {
       int index = i;
       if (allWalletList[index].walletId == walletId) {
         chooseWallet = allWalletList[index];
-        break; //找到，终止循环
+        break; //Find, terminate the loop
       }
     }
     return chooseWallet;
   }
 
-  //设置当前钱包 bool是否成功
+  //Set whether the current wallet bool is successful
   //  apiNo:WM06
   Future<bool> setNowWallet(String walletId) async {
     Map setNowWalletMap = await WalletManager.setNowWallet(walletId);
@@ -244,7 +244,7 @@ class Wallets {
       return false;
     }
     if (status == 200) {
-      //改model层数据
+      //Change the model layer data
       this.allWalletList.forEach((w) {
         if (w.walletId.toLowerCase() == walletId.toLowerCase()) {
           w.isNowWallet = true;
@@ -260,7 +260,7 @@ class Wallets {
     }
   }
 
-  //删除钱包。 钱包设置可删除，链设置隐藏。
+  //Delete the wallet. The wallet settings can be deleted, and the chain settings are hidden.
   // apiNo:WM07.
   Future<Map> deleteWallet(String walletId, Uint8List pwd) async {
     Map deleteWalletMap = await WalletManager.deleteWallet(walletId, pwd);
@@ -271,7 +271,7 @@ class Wallets {
       return null;
     }
     if (status == 200 && isSuccess) {
-      // 数据模型层移除
+      // Data model layer removal
       allWalletList.remove(getWalletByWalletId(walletId));
       return deleteWalletMap;
     } else {
@@ -323,7 +323,7 @@ class Wallets {
     return decodeMap;
   }
 
-  //数据库 更新余额信息
+  //Database update balance information
   Future<Map> updateDigitBalance(String address, String digitId, String balance) async {
     if (!Utils.checkByEthAddressFormat(address)) {
       return null;
@@ -360,7 +360,7 @@ class Wallets {
     return eeeAccountMap;
   }
 
-  //在 当前钱包、当前链下，增加新代币的数据模型
+  //Add a new token data model to the current wallet and current chain
   addDigitToChainModel(String walletId, Chain chain, String digitId) async {
     Map addDigitModelMap =
         await WalletManager.addDigitToChainModel(walletId, Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), digitId);
@@ -368,7 +368,7 @@ class Wallets {
     if (status == null || status != 200) {
       LogUtil.e("addDigitModelMap=>", "error status code is" + status.toString() + "||message is=>" + addDigitModelMap["message"].toString());
     } else {
-      await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //在digitList增加这个代币model,重新加载
+      await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //Add this token model to digitList and reload
     }
     return addDigitModelMap;
   }
@@ -418,7 +418,7 @@ class Wallets {
           ethDigit.decimal = decimal;
           ethDigit.contractAddress = contract;
           ethDigit.digitId = digitId;
-          ethDigit.isVisible = false; //从代币列表加载的，先设置不可见，跟本地chain下对比后，再判是否visible
+          ethDigit.isVisible = false; //Loaded from the token list, set the invisible first, and compare it with the local chain before determining whether it is visible
           resultAuthDigitList.add(ethDigit);
           break;
         case ChainType.BTC:

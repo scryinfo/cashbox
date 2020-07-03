@@ -190,7 +190,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   Gaps.scaleHGap(45),
                   Container(
                     child: Opacity(
-                      opacity: 0, //todo 通过时间筛选交易，暂不显示
+                      opacity: 0, //todo filters transactions by time, not shown for now
                       child: Text(
                         "2018.07",
                         style: TextStyle(
@@ -284,7 +284,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         await Future.delayed(Duration(seconds: 2), () async {
           print("refresh onLoad======>");
           if (this.ethTxListModel.length < displayTxOffset) {
-            //展示的，比上次请求加载到的少，说明没了
+            //Shown, less loaded than the last request, indicating that it is gone
             Fluttertoast.showToast(msg: translate('finish_load_tx_history').toString());
             return;
           }
@@ -420,7 +420,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   }
 
   Future<List<EthTransactionModel>> getTxListData() async {
-    displayTxOffset = displayTxOffset + refreshAddCount; //每次增加refreshAddCount个
+    displayTxOffset = displayTxOffset + refreshAddCount; //Increment refreshAddCount each time
     try {
       if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress.trim() != "")) {
         ethTxListModel = await loadEthTxHistory(context, fromAddress, chainType, offset: displayTxOffset.toString());

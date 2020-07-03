@@ -14,7 +14,7 @@ import 'log_util.dart';
 class QrScanUtil {
   static const methodPlugin = const MethodChannel('qr_scan_channel');
 
-  //工厂单例类实现
+  //Factory singleton class implementation
   factory QrScanUtil() => _getInstance();
 
   static QrScanUtil get instance => _getInstance();
@@ -44,10 +44,10 @@ class QrScanUtil {
       Fluttertoast.showToast(msg: translate('qr_info_is_null'));
       return null;
     }
-    //--------------------------拼装url里面的参数-----------------------
+    //--------------------------Assemble the parameters in the url-----------------------
     var paramIndex = qrInfo.indexOf("?");
     if (paramIndex <= 0 || paramIndex == qrInfo.length - 1) {
-      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //信息里面没? 或者就一个?
+      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //Not in the message? Or just one?
       return null;
     }
     List paramsList = qrInfo.substring(paramIndex + 1).split("&");
@@ -64,43 +64,43 @@ class QrScanUtil {
       }
     });
     if (paramsMap.isEmpty) {
-      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //信息里面没? 或者就一个?
+      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //Not in the message? Or just one?
       return null;
     }
-    //--------------------------检查参数-----------------------
+    //--------------------------Check parameters-----------------------
     print("paramsMap======>" + paramsMap.toString());
     print("begin verify timestamp======>");
     if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
       Fluttertoast.showToast(msg: translate('qr_info_is_out_of_date'));
-      return null; //有效期有问题
+      return null; //There is a problem with the validity period
     }
     print("begin verify chainType======>");
     if (!paramsMap.containsKey("ct") || paramsMap["ct"] != "60") {
       Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
-      return null; //不知道是哪条链
+      return null; //Don't know which chain
     }
     print("begin verify ot======>");
     if (!paramsMap.containsKey("ot") || paramsMap["ot"] != "t") {
       Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
-      return null; //不知道要做什么操作
+      return null; //Don't know what to do
     }
 
     print("begin verify contract address======>");
     if (!paramsMap.containsKey("ca") || paramsMap["ca"].toLowerCase() != DddTestNetContractAddress.toLowerCase()) {
       Fluttertoast.showToast(msg: "合约地址不匹配");
-      return null; //不知道要做什么操作
+      return null; //Don't know what to do
     }
 
     print("begin verify To Address======>");
     if (!paramsMap.containsKey("ta")) {
       Fluttertoast.showToast(msg: "缺少转账目的地址");
-      return null; //不知道要做什么操作
+      return null; //Don't know what to do
     }
 
     print("begin verify values======>");
     if (!paramsMap.containsKey("v") || double.parse(paramsMap["v"]) < 0) {
       Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
-      return null; //不清楚 转账多少
+      return null; //Not sure how much to transfer
     }
 
     var toAddress = paramsMap["ta"];
@@ -122,10 +122,10 @@ class QrScanUtil {
       Fluttertoast.showToast(msg: translate('qr_info_is_null'));
       return null;
     }
-    //------------拼装url里面的参数------------
+    //------------Assemble the parameters in the url------------
     var paramIndex = qrInfo.indexOf("?");
     if (paramIndex <= 0 || paramIndex == qrInfo.length - 1) {
-      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //信息里面没? 或者就一个?
+      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //Not in the message? Or just one?
       return null;
     }
     List paramsList = qrInfo.substring(paramIndex + 1).split("&");
@@ -143,39 +143,39 @@ class QrScanUtil {
     });
 
     if (paramsMap.isEmpty) {
-      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //信息里面没? 或者就一个?
+      Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //Not in the message? Or just one?
       return null;
     }
-    //------------检查参数------------
+    //------------Check parameters------------
     print("begin verify timestamp======>");
     if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
       Fluttertoast.showToast(msg: translate('qr_info_is_out_of_date'));
-      return null; //有效期有问题
+      return null; //There is a problem with the validity period
     }
     print("begin verify chainType======>");
     if (!paramsMap.containsKey("ct")) {
       Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
-      return null; //不知道是哪条链
+      return null; //Don't know which chain
     }
     print("begin verify v======>");
     if (!paramsMap.containsKey("v")) {
       //Fluttertoast.showToast(msg: translate('not_sure_operation_type);
-      return null; //不知道内容是什么
+      return null; //Don't know what the content is
     }
     print("begin verify ot======>");
     if (!paramsMap.containsKey("ot")) {
       Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
-      return null; //不知道要做什么操作
+      return null; //Don't know what to do
     }
     var operationType = paramsMap["ot"];
     if (operationType == "ds" && paramsMap.containsKey("dtt") && paramsMap.containsKey("v")) {
-      //确认是签名类型，且信息足够
+      //Confirm that it is a signature type and the information is sufficient
       return paramsMap;
     }
     return null;
   }
 
-  //签名  abandon （重新设计，让给你单一，扫描功能类就只负责扫码）
+  //Signature abandon (redesigned to give you a single, scanning function class is only responsible for scanning code)
   doSignTx(Map paramsMap, BuildContext context) {
     var chainType = paramsMap["ct"];
     switch (chainType) {
@@ -183,21 +183,21 @@ class QrScanUtil {
         break;
       case "60": //ETH
         break;
-      case "66": //substrate链
+      case "66": //substrate chain
         if (paramsMap.containsKey("dt") && paramsMap["dt"] == "0") {
-          //0代表diamond项目
-          var dtt = paramsMap["dtt"]; //签名操作类型 标识  01：授权原始地址  02：授权业务员
-          var value = paramsMap["v"]; //待签名交易信息
-          var waitToSignInfo = dtt + value; //待签名交易信息
+          //0 represents the diamond project
+          var dtt = paramsMap["dtt"]; //Signature operation type ID 01: authorized original address 02: authorized salesperson
+          var value = paramsMap["v"]; //Transaction information to be signed
+          var waitToSignInfo = dtt + value; //Transaction information to be signed
           Fluttertoast.showToast(msg: "waitToSignInfo is ===>" + waitToSignInfo);
           print("wait to sign info is=======>" + waitToSignInfo);
           Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
         } else {
-          var waitSignTx = paramsMap["v"]; //待签名交易信息
+          var waitSignTx = paramsMap["v"]; //Transaction information to be signed
           Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitSignTx);
         }
         NavigatorUtils.push(context, Routes.signTxPage);
-        paramsMap = null; //置空扫描数据
+        paramsMap = null; //Blank scan data
         break;
       default:
         Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
@@ -208,13 +208,13 @@ class QrScanUtil {
 
   bool verifyTimeStamp(String qrTimeStamp) {
     if (qrTimeStamp.isEmpty) {
-      return false; //时间戳有问题，
+      return false; //There is a problem with the time stamp，
     }
-    int nowTimeStamp = DateTime.now().millisecondsSinceEpoch; //当前时间戳
+    int nowTimeStamp = DateTime.now().millisecondsSinceEpoch; //Current timestamp
     int qrTime = int.parse(qrTimeStamp);
     print("qrTimeStamp===>" + qrTimeStamp + " || nowTimeStamp===>" + nowTimeStamp.toString());
     if (qrTime * 1000 > nowTimeStamp) {
-      return true; //数据正常，且还在有效期内
+      return true; //The data is normal and still within the validity period
     }
     return false;
   }

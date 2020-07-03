@@ -47,7 +47,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
       walletName = Provider.of<CreateWalletProcessProvide>(context).walletName;
     });
     Provider.of<CreateWalletProcessProvide>(context).setMnemonic(mnemonic);
-    mnemonic = null; /*助记词，用完就释放*/
+    mnemonic = null; /*Mnemonic words, free when used up*/
   }
 
   @override
@@ -219,7 +219,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
   }
 
   _showAddressInQR(BuildContext context, String walletName, String qrHintInfo, String mnemonicString) {
-    //暂用 数据状态管理 处理， 路由功能fluro中文传值会有问题。
+    //Temporary use of data state management processing, routing function fluro Chinese pass value will have problems.
     Provider.of<QrInfoProvide>(context).setTitle(walletName);
     Provider.of<QrInfoProvide>(context).setHintInfo(qrHintInfo);
     Provider.of<QrInfoProvide>(context).setContent(mnemonicString);

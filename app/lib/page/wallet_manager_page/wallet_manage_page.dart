@@ -300,7 +300,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
             int status = mnemonicMap["status"];
             if (status == 200) {
               Provider.of<CreateWalletProcessProvide>(context).setMnemonic(mnemonicMap["mn"]);
-              mnemonicMap = null; //跟助记词相关,用完置空
+              mnemonicMap = null; //Related to mnemonic words, empty after use
               NavigatorUtils.push(context, Routes.recoverWalletPage);
             } else {
               LogUtil.e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);

@@ -37,7 +37,7 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
   }
 
   void initData() async {
-    walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //改钱包属性后，需要重新刷新同步数据，如改钱包名。
+    walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //After changing the wallet attributes, you need to refresh the synchronization data again, such as changing the wallet name.
     setState(() {
       this.walletList = walletList;
     });

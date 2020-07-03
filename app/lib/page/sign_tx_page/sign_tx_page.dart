@@ -129,7 +129,7 @@ class _SignTxPageState extends State<SignTxPage> {
                 String walletId = await Wallets.instance.getNowWalletId();
                 Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
                 String chainEEEAddress = wallet.getChainByChainType(ChainType.EEE).chainAddress;
-                var content = _waitToSignInfo.replaceFirst(waitToSignInfo, map["signedInfo"]) + ";addr=" + chainEEEAddress; //**// 签名结果数据
+                var content = _waitToSignInfo.replaceFirst(waitToSignInfo, map["signedInfo"]) + ";addr=" + chainEEEAddress; //**// Signature result data
                 Provider.of<QrInfoProvide>(context).setContent(content);
                 NavigatorUtils.goBack(context);
                 NavigatorUtils.push(context, Routes.qrInfoPage);

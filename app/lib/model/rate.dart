@@ -13,7 +13,7 @@ class Rate {
   }
 
   Rate._internal() {
-    // 可初始化参数
+    // Initializable parameters
   }
 
   Map<String, DigitRate> digitRateMap = Map<String, DigitRate>();
@@ -66,7 +66,7 @@ class Rate {
   }
 
   double getPrice(Digit digit) {
-    //法币对应单价
+    //Unit price corresponding to fiat currency
     if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
@@ -98,7 +98,7 @@ class Rate {
   }
 }
 
-//api返回model格式一致
+//API returns the model format is consistent
 class DigitRate {
   String name = "";
   String symbol = "";

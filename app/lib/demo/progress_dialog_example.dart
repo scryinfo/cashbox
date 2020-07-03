@@ -9,20 +9,20 @@ void showProgressDialog(context) {
   try {
     showTransparentDialog(
         context: context,
-        barrierDismissible: false, //点击周围，要不要取消dialog显示。进度条的选 false
+        barrierDismissible: false, //Click around, whether to cancel the dialog display. Select false for the progress bar
         builder: (_) {
           return WillPopScope(
             onWillPop: () async {
-              // 拦截到返回键，证明dialog被手动关闭
+              // Intercept to return key, prove dialog is closed manually
               return Future.value(true);
             },
-            child: ProgressDialog(hintText: "正在加载..."),
+            child: ProgressDialog(hintText: "loading..."),
           );
         });
     /*
     const timeout = Duration(seconds: 5);
     Timer(timeout, () {
-      Navigator.pop(context); ///通过取消dialog显示
+      Navigator.pop(context); ///By canceling the dialog display
     });
     */
   } catch (e) {

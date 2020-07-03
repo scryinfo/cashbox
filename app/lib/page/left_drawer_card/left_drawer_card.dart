@@ -32,7 +32,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
 
   void initData() async {
     walletList = [];
-    walletList = await Wallets.instance.loadAllWalletList(); //在首页加载后，已经掉过接口了,拿缓存就行
+    walletList = await Wallets.instance.loadAllWalletList(); //After the homepage is loaded, the interface has been dropped, just take the cache
     setState(() {
       this.walletList = walletList;
     });

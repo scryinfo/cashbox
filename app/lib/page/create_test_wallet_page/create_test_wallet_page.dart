@@ -406,7 +406,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   }
 
   bool _verifyPwdAndMnemonic() {
-    //助记词密码不为空
+    //Mnemonic password is not empty
     if (_pwdController.text.isEmpty || _pwdController.text.length <= 0 || _mnemonicController.text.isEmpty || _mnemonicController.text.length <= 0) {
       return false;
     } else {

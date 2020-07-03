@@ -9,21 +9,20 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
 
 final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-Map<String, dynamic> _deviceData = <String, dynamic>{}; //设备信息
-String appSignInfo; //应用签名信息
-String deviceId = ""; //设备唯一标识id
-
-// 访问后台接口时，增加参数
-// 1、设备id        deviceId
-// 2、应用签名信息   appSignInfo
+Map<String, dynamic> _deviceData = <String, dynamic>{}; //Device Information
+String appSignInfo; //Application signature information
+String deviceId = ""; //Device unique ID
+// Add parameters when accessing the background interface
+// 1, device id deviceId
+// 2, application signature information appSignInfo
 Future requestWithDeviceId(String url, {formData}) async {
   if (_deviceData == null || _deviceData.length == 0 || _deviceData["id"] == null) {
-    ///没有设备信息记录，去获取
+    ///No device information record, go to get
     try {
       if (Platform.isAndroid) {
         _deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
         if (_deviceData != null) {
-          deviceId = _deviceData["androidId"]; //目前各个android品台设备,唯一标识值，没有同意，暂取androidId这个值。
+          deviceId = _deviceData["androidId"]; //At present, each Android product device has a unique identification value. If you do not agree, temporarily take the value of androidId.
         }
       } else if (Platform.isIOS) {
         _deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
@@ -51,7 +50,7 @@ Future requestWithDeviceId(String url, {formData}) async {
   return request(url, formData: formData);
 }
 
-//访问网络请求，url + 参数对象
+//Access network request, url + parameter object
 Future request(String url, {formData}) async {
   try {
     print('开始获取数据...............' + url);
@@ -101,7 +100,7 @@ Future download(url, savePath) async {
   }
 }
 
-//记录android设备信息
+//Record android device information
 Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
   return <String, dynamic>{
     'version.securityPatch': build.version.securityPatch,
@@ -134,7 +133,7 @@ Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
   };
 }
 
-//记录ios设备信息
+//Record ios device information
 Map<String, dynamic> _readIosDeviceInfo(IosDeviceInfo data) {
   return <String, dynamic>{
     'name': data.name,

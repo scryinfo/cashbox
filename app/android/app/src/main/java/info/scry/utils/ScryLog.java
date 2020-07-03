@@ -18,28 +18,28 @@ import java.util.Date;
 
 public class ScryLog {
 
-    private static Boolean MYLOG_SWITCH = true; // 日志文件总开关
-    private static Boolean MYLOG_WRITE_TO_FILE = true;// 日志写入文件开关
-    private static char MYLOG_TYPE = 'v';// 输入日志类型，w代表只输出告警信息等，v代表输出所有信息
-    private static String MYLOG_PATH_SDCARD_DIR = "/sdcard/cashbox/log";// 日志文件在sdcard中的路径
-    private static int SDCARD_LOG_FILE_SAVE_DAYS = 0;// sd卡中日志文件的最多保存天数
-    private static String MYLOGFILEName = "Log.txt";// 本类输出的日志文件名称
+    private static Boolean MYLOG_SWITCH = true; // Log file master switch
+    private static Boolean MYLOG_WRITE_TO_FILE = true;// Log write file switch
+    private static char MYLOG_TYPE = 'v';// Enter the log type, w means to output only alarm information, etc., v means to output all information
+    private static String MYLOG_PATH_SDCARD_DIR = "/sdcard/cashbox/log";// The path of the log file in the sdcard
+    private static int SDCARD_LOG_FILE_SAVE_DAYS = 0;// Maximum number of days to save log files in sd card
+    private static String MYLOGFILEName = "Log.txt";// The name of the log file output by this class
     @SuppressLint("NewApi")
     private static SimpleDateFormat myLogSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//
-    // 日志的输出格式
+    // Log output format
     @SuppressLint("NewApi")
-    private static SimpleDateFormat logfile = new SimpleDateFormat("yyyy-MM-dd");// 日志文件格式
+    private static SimpleDateFormat logfile = new SimpleDateFormat("yyyy-MM-dd");// Log file format
     public Context context;
 
-    public static void w(String tag, Object msg) { // 警告信息
+    public static void w(String tag, Object msg) { // Warning message
         log(tag, msg.toString(), 'w');
     }
 
-    public static void e(String tag, Object msg) { // 错误信息
+    public static void e(String tag, Object msg) { // Error message
         log(tag, msg.toString(), 'e');
     }
 
-    public static void d(String tag, Object msg) {// 调试信息
+    public static void d(String tag, Object msg) {// Debug information
         log(tag, msg.toString(), 'd');
     }
 
@@ -72,7 +72,7 @@ public class ScryLog {
     }
 
     /**
-     * 根据tag, msg和等级，输出日志
+     * According to tag, msg and level, output log
      *
      * @param tag
      * @param msg
@@ -80,8 +80,8 @@ public class ScryLog {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     private static void log(String tag, String msg, char level) {
-        if (MYLOG_SWITCH) {//日志文件总开关
-            if ('e' == level && ('e' == MYLOG_TYPE || 'v' == MYLOG_TYPE)) { // 输出错误信息
+        if (MYLOG_SWITCH) {//Log file master switch
+            if ('e' == level && ('e' == MYLOG_TYPE || 'v' == MYLOG_TYPE)) { // Output error message
                 Log.e(tag, msg);
             } else if ('w' == level && ('w' == MYLOG_TYPE || 'v' == MYLOG_TYPE)) {
                 Log.w(tag, msg);
@@ -92,20 +92,20 @@ public class ScryLog {
             } else {
                 Log.v(tag, msg);
             }
-            if (MYLOG_WRITE_TO_FILE)//日志写入文件开关
+            if (MYLOG_WRITE_TO_FILE)//Log write file switch
                 writeLogtoFile(String.valueOf(level), tag, msg);
         }
     }
 
     /**
-     * 打开日志文件并写入日志
+     * Open the log file and write to the log
      *
      * @param mylogtype
      * @param tag
      * @param text
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private static void writeLogtoFile(String mylogtype, String tag, String text) {// 新建或打开日志文件
+    private static void writeLogtoFile(String mylogtype, String tag, String text) {// Create or open a log file
         Date nowtime = new Date();
         String needWriteFiel = logfile.format(nowtime);
         String needWriteMessage = myLogSdf.format(nowtime) + "    " + mylogtype + "    " + tag +
@@ -116,20 +116,20 @@ public class ScryLog {
         if (!dirsFile.exists()) {
             dirsFile.mkdirs();
         }
-        //Log.i("创建文件","创建文件");
+        //Log.i("Create a file","Create a file");
         File file = new File(dirsFile.toString(), needWriteFiel + MYLOGFILEName);//
         Log.d("ScryLog================>", file.getAbsolutePath());
         // MYLOG_PATH_SDCARD_DIR
         if (!file.exists()) {
             try {
-                //在指定的文件夹中创建文件
+                //Create a file in the specified folder
                 file.createNewFile();
             } catch (Exception e) {
             }
         }
 
         try {
-            FileWriter filerWriter = new FileWriter(file, true);// 后面这个参数代表是不是要接上文件中原来的数据，不进行覆盖
+            FileWriter filerWriter = new FileWriter(file, true);// The latter parameter represents whether you want to connect to the original data in the file, without overwriting
             BufferedWriter bufWriter = new BufferedWriter(filerWriter);
             bufWriter.write(needWriteMessage);
             bufWriter.newLine();
@@ -141,10 +141,10 @@ public class ScryLog {
     }
 
     /**
-     * 删除制定的日志文件
+     * Delete the specified log file
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public static void delFile() {// 删除日志文件
+    public static void delFile() {// Delete log files
         String needDelFiel = logfile.format(getDateBefore());
         File dirPath = Environment.getExternalStorageDirectory();
         File file = new File(dirPath, needDelFiel + MYLOGFILEName);// MYLOG_PATH_SDCARD_DIR
@@ -154,7 +154,7 @@ public class ScryLog {
     }
 
     /**
-     * 得到现在时间前的几天日期，用来得到需要删除的日志文件名
+     * Get the date a few days before the current time, used to get the log file name that needs to be deleted
      */
     private static Date getDateBefore() {
         Date nowtime = new Date();

@@ -3,7 +3,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'application.dart';
 
-/// fluro的路由跳转工具类
+/// Fluro routing jump tool class
 class NavigatorUtils {
   static push(BuildContext context, String path,
       {bool replace = false, bool clearStack = false}) {
@@ -22,7 +22,7 @@ class NavigatorUtils {
             clearStack: clearStack,
             transition: TransitionType.native)
         .then((result) {
-      // 页面返回result为null
+      // The page returns result is null
       if (result == null) {
         return;
       }
@@ -33,19 +33,19 @@ class NavigatorUtils {
     });
   }
 
-  /// 返回
+  /// return
   static void goBack(BuildContext context) {
     Navigator.pop(context);
   }
 
-  /// 带参数返回
+  /// Return with parameters
   static void goBackWithParams(BuildContext context, result) {
     Navigator.pop(context, result);
   }
 
-  /// todo 跳到WebView页
+  /// todo Jump to WebView page
   static goWebViewPage(BuildContext context, String title, String url) {
-    //fluro 不支持传中文,需转换
+    //fluro does not support Chinese transmission, conversion is required
     //push(context, '${Routes.webViewPage}?title=${Uri.encodeComponent(title)}&url=${Uri.encodeComponent(url)}');
   }
 }

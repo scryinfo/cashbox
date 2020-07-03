@@ -27,7 +27,7 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
           //initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
           javascriptMode: JavascriptMode.unrestricted,
 
-          //JS执行模式 是否允许JS执行
+          //JS execution mode Whether to allow JS execution
           onWebViewCreated: (WebViewController webViewController) {
             _controller = webViewController;
           },
@@ -45,11 +45,11 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
                       "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
                       hintInput: "请输入钱包密码",
                       onPressed: (value) {
-                        //method 1 方法回调ok
+                        //method 1 method callback ok
                         _controller
                             ?.evaluateJavascript('callJs("$value")')
                             ?.then((result) {});
-                        //method 2 字段回调ok
+                        //method 2 field callback ok
                         //_controller?.evaluateJavascript('window.qrresult=" $value "')?.then((result) {});
                       },
                     );

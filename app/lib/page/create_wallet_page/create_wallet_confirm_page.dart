@@ -37,7 +37,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   initData() {
     setState(() {
       mnemonicList = String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic).split(" ");
-      mnemonicList.sort((left, right) => left.length.compareTo(right.length)); //乱序显示 助记词
+      mnemonicList.sort((left, right) => left.length.compareTo(right.length)); //Out of order display Mnemonic
     });
   }
 
@@ -118,8 +118,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                 onPressed: () async {
                   var isSuccess = await _verifyMnemonicSame();
                   if (isSuccess) {
-                    Provider.of<CreateWalletProcessProvide>(context).emptyData(); /**创建钱包完成，清楚内存关于助记词的记录信息*/
-                    NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //重新加载walletList
+                    Provider.of<CreateWalletProcessProvide>(context).emptyData(); /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
+                    NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
                     //NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                   } else {
                     Fluttertoast.showToast(msg: translate('mnemonic_order_wrong'));
@@ -239,6 +239,6 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   @override
   void dispose() {
     super.dispose();
-    Provider.of<CreateWalletProcessProvide>(context).emptyData(); /**创建钱包完成，清楚内存关于助记词的记录信息*/
+    Provider.of<CreateWalletProcessProvide>(context).emptyData(); /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
   }
 }

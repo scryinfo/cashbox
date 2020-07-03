@@ -46,8 +46,7 @@ class _PublicPageState extends State<PublicPage> {
       height: ScreenUtil().setHeight(160),
       child: WebView(
         initialUrl: VendorConfig.publicIpDefaultValue,
-        //initialUrl: "http://192.168.1.59:9689/pub.html",
-        javascriptMode: JavascriptMode.unrestricted, //JS执行模式 是否允许JS执行
+        javascriptMode: JavascriptMode.unrestricted, //JS execution mode Whether to allow JS execution
         onWebViewCreated: (controller) {
           _controller = controller;
         },

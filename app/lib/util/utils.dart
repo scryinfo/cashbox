@@ -9,17 +9,17 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Utils {
-  ///复制信息
+  ///Copy information
   static copyMsg(String msg) {
     Clipboard.setData(ClipboardData(text: msg));
   }
 
-  ///粘贴信息
+  ///Paste information
   static Future<ClipboardData> getCopyMsg() async {
     return Clipboard.getData(Clipboard.kTextPlain);
   }
 
-  //记录方法执行耗时
+  //Time-consuming execution of the recording method
   static int recordExecuteTime(Function f) {
     var start = DateTime.now();
     f();
@@ -28,10 +28,10 @@ class Utils {
     return duration.inSeconds;
   }
 
-  //double类型的值，取后面几位小数。  默认进度:8
+  //Double type value, take the next few decimal places. Default progress: 8
   static double formatDouble(double num, {int precision = 8}) {
     if ((num.toString().length - num.toString().lastIndexOf(".") - 1) < precision) {
-      //小数点后有几位小数
+      //There are a few decimal places after the decimal point
       return double.parse(num.toStringAsFixed(precision).substring(0, num.toString().lastIndexOf(".") + precision + 1));
     } else {
       return double.parse(num.toString().substring(0, num.toString().lastIndexOf(".") + precision + 1));
@@ -58,7 +58,7 @@ class Utils {
     return val;
   }
 
-  //指数方法math.pow(x,y)
+  //Exponential method math.pow(x,y)
   static BigInt mathPow(int x, int y) {
     BigInt result = BigInt.from(1);
     while (y != 0) {
@@ -68,22 +68,22 @@ class Utils {
     return result;
   }
 
-  //以以太坊地址格式，检查字符串格式是否符合. 长度42  0x开头
+  //In Ethereum address format, check whether the string format conforms. Length starts with 42 0x
   static bool checkByEthAddressFormat(String address) {
-    const ethStandardAddressLength = 42; //以太坊标准地址42位
+    const ethStandardAddressLength = 42; //Ethereum standard address 42 bits
     if (address.isNotEmpty && (address.length == ethStandardAddressLength) && (address.toLowerCase().startsWith("0x"))) {
       return true;
     }
     return false;
   }
 
-  // 获取应用文档 对应路径
+  // Obtain application documentation Corresponding path
   static Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
     return directory.path;
   }
 
-  // 返回应用文档路径对应File
+  // Returns the file path corresponding to the application file
   static Future<File> _localFile(String filePath) async {
     final appPath = await _localPath;
     var directory = new Directory('$appPath');
@@ -99,7 +99,7 @@ class Utils {
     return file;
   }
 
-  //读取文件中的数据
+  //Read the data in the file
   static Future<String> readFile(String path) async {
     try {
       final file = await _localFile(path);
@@ -111,14 +111,14 @@ class Utils {
     }
   }
 
-  //将数据存储到文件中
+  //Store data in a file
   static Future<File> writeFile(String filePath, String data) async {
     final file = await _localFile(filePath);
     return file.writeAsString(data);
   }
 }
 
-/// 默认dialog背景色为半透明黑色，这里修改源码改为透明
+/// The default dialog background color is translucent black. Here, the source code is changed to transparent
 Future<T> showTransparentDialog<T>({
   @required BuildContext context,
   bool barrierDismissible = true,
@@ -158,11 +158,11 @@ void showProgressDialog(context, message, {bool outsideDismiss: false, bool back
   try {
     showTransparentDialog(
         context: context,
-        barrierDismissible: outsideDismiss, //点击周围，要不要取消dialog显示。进度条的选 false
+        barrierDismissible: outsideDismiss, //Click around, whether to cancel the dialog display. Select false for the progress bar
         builder: (_) {
           return WillPopScope(
             onWillPop: () async {
-              // 拦截到返回键，证明dialog被手动关闭
+              // Intercept to return key, prove dialog is closed manually
               return Future.value(backKeyPop);
             },
             child: ProgressDialog(hintText: message),

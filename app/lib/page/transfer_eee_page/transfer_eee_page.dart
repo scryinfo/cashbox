@@ -223,7 +223,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
               ),
               controller: _txValueController,
               inputFormatters: [
-                WhitelistingTextInputFormatter(RegExp("[0-9.]")), //只能输入 数字 或 小数点.
+                WhitelistingTextInputFormatter(RegExp("[0-9.]")), //Only numbers or decimal points can be entered.
               ],
             ),
           ),
@@ -268,7 +268,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
             String walletId = await Wallets.instance.getNowWalletId();
-            //todo 待测试
+            //todo to be tested
             var eeeAccountMap = await Wallets.instance.eeeAccountInfoKey(chainAddress);
             int status = eeeAccountMap["status"];
             if (status == null || status != 200) {
@@ -278,7 +278,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
             var accountKeyInfo = eeeAccountMap["accountKeyInfo"];
             ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
             var storageData = await scryXNetUtil.loadScryXStorage(accountKeyInfo);
-            //todo 判断scryX链上返回的状态
+            //todo determines the status returned on the scryX chain
             Wallets.instance.decodeAccountInfo(storageData);
           },
         );

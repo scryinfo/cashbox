@@ -19,7 +19,7 @@ class _FlutterWebViewPluginDemo extends State<FlutterWebViewPluginDemo> {
   }
 
   void initListen() {
-    //  监听url地址改变事件
+    //  Listen to url address change event
     flutterWebviewPlugin.onUrlChanged.listen((String url) {
       print("flutterWebviewPlugin url =========>" + url);
     });
@@ -33,7 +33,7 @@ class _FlutterWebViewPluginDemo extends State<FlutterWebViewPluginDemo> {
         width: ScreenUtil.instance.setWidth(90),
         height: ScreenUtil.instance.setHeight(160),
         color: Colors.blueAccent,
-        child: WebviewScaffold(   //说明：WebViewScaffold 没法跟js交互
+        child: WebviewScaffold(   //Description: WebViewScaffold cannot interact with js
           //url: "file:///android_asset/flutter_assets/assets/dist/index.html",
           url: "http://192.168.1.4:8080/",
           appBar: AppBar(

@@ -1,7 +1,7 @@
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:flutter/material.dart';
-//配置链接地址  ws://echo.websocket.org
+//Configure link address  ws://echo.websocket.org
 
 class DemoSocketWidget extends StatefulWidget {
   final String title;
@@ -28,14 +28,14 @@ class _DemoSocketWidgetState extends State<DemoSocketWidget> {
   void initState() {
     super.initState();
     socketChannel =
-        IOWebSocketChannel.connect('ws://echo.websocket.org'); //与服务器 建立连接
+        IOWebSocketChannel.connect('ws://echo.websocket.org'); //Establish a connection with the server
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: new StreamBuilder(
-          stream: widget.socketChannel.stream, //监听来自服务器的信息  Stream
+          stream: widget.socketChannel.stream, //Listen for information from the server Stream
           builder: (context, snapshot) {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
@@ -47,12 +47,12 @@ class _DemoSocketWidgetState extends State<DemoSocketWidget> {
   }
 
   void _sendMessage() {
-    widget.socketChannel.sink.add("发消息给服务器"); //发消息给服务器
+    widget.socketChannel.sink.add("发消息给服务器"); //Send a message to the server
   }
 
   @override
   void dispose() {
-    //记得把socket关了
+    //Remember to close the socket
     widget.socketChannel.sink.close();
     super.dispose();
   }

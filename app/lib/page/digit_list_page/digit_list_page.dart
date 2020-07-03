@@ -27,7 +27,7 @@ class DigitListPage extends StatefulWidget {
 }
 
 class _DigitListPageState extends State<DigitListPage> {
-  static int singleDigitCount = 20; //单页面显示20条数据，一次下拉刷新更新20条
+  static int singleDigitCount = 20; //Display 20 items of data on a single page, update and update 20 items at a time
   Wallet nowWalletM;
   Chain nowChain;
   String nowChainAddress = "";
@@ -80,7 +80,7 @@ class _DigitListPageState extends State<DigitListPage> {
         ));
   }
 
-  //代币列表layout
+  //Token list layout
   Widget _digitListWidgets() {
     return EasyRefresh.custom(
       footer: BallPulseFooter(),
@@ -97,18 +97,18 @@ class _DigitListPageState extends State<DigitListPage> {
         ),
       ],
       onLoad: () async {
-        //代币列表栏，下拉 刷新||加载 数据。
+        //Token list bar, pull down Refresh||Load data.
         await Future.delayed(
           Duration(seconds: 2),
           () {
             setState(() {
               if (displayDigitsList.length < nowChainDigitsList.length) {
-                // 从JNI加载的数据(nowChain.digitList),还有没显示完的，继续将nowChainDigitsList剩余数据，
-                // 添加到 displayDigitsList里面做展示
-                loadDisplayDigitListData(); //下拉刷新的时候，加载新digit到displayDigitsList
+                // The data loaded from JNI (nowChain.digitList), there are still not displayed, continue to the remaining data of nowChainDigitsList,
+                // Add to displayDigitsList for display
+                loadDisplayDigitListData(); //When pull down to refresh, load new digit to displayDigitsList
               } else {
-                // todo 2.0。 功能：加载代币列表，可选择添加erc20代币。 代币列表下拉刷新。
-                // 继续调jni获取，或者提示已经没数据了。 根据是否jni分页处理来决定。
+                // todo 2.0. Function: load token list, optionally add erc20 tokens. The token list is refreshed by drop-down.
+                // Continue to adjust jni to obtain, or suggest that there is no data. Decide according to whether or not jni paging processing.
                 Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
                 return;
               }
@@ -119,7 +119,7 @@ class _DigitListPageState extends State<DigitListPage> {
     );
   }
 
-  //每个代币的layout
+  //Layout of each token
   Widget _makeDigitListItem(index) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -189,21 +189,21 @@ class _DigitListPageState extends State<DigitListPage> {
 
   Future<List<Digit>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
-      //没有展示数据
+      //No display data
       if (nowChainDigitsList.length < singleDigitCount) {
-        //加载到的不够一页，全展示
+        //Not enough pages loaded, full display
         addDigitToDisplayList(nowChainDigitsList.length);
       } else {
-        //超一页，展示singleDigitCount个。
+        //Super page, showing singleDigitCount.
         addDigitToDisplayList(singleDigitCount);
       }
     } else {
-      //有展示数据，继续往里添加
+      //There are display data, continue to add
       if (nowChainDigitsList.length - displayDigitsList.length > singleDigitCount) {
-        //剩余的超过一页
+        //More than one page left
         addDigitToDisplayList(singleDigitCount);
       } else {
-        //剩余的不够一页，全给加入进去。
+        //If there is not enough one page left, all will be added.
         addDigitToDisplayList(nowChainDigitsList.length - displayDigitsList.length);
       }
     }

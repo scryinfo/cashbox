@@ -36,7 +36,7 @@ class _EntryPageState extends State<EntryPage> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    await initWalletBasicData(); //case : 删除钱包后，没钱包，回到entryPage，每次检查一下
+    await initWalletBasicData(); //case: After deleting the wallet, there is no wallet, return to entryPage, check every time
     var spUtil = await SharedPreferenceUtil.instance;
     languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
     future = _checkIsContainWallet();
@@ -47,15 +47,15 @@ class _EntryPageState extends State<EntryPage> {
     languagesKeyList = GlobalConfig.globalLanguageMap.keys.toList();
     languageMap = {};
     languageMap.addAll(GlobalConfig.globalLanguageMap);
-    /*  初始化 到 本地文件
-        1、接口ip、版本信息等 到本地文件保存
-        2、数据库信息等
-        3、应用语言类型（中、英文）
+    /*  Initialize to local file
+        1. Interface ip, version information, etc. Save to local file
+        2. Database information, etc.
+        3. Application language type (Chinese and English)
         */
     await Wallets.instance.initWalletBasicData();
   }
 
-  //检查是否已有 创建过钱包
+  //Check if a wallet has been created
   Future<bool> _checkIsContainWallet() async {
     isContainWallet = await Wallets.instance.isContainWallet();
     return isContainWallet;
@@ -63,7 +63,7 @@ class _EntryPageState extends State<EntryPage> {
 
   @override
   Widget build(BuildContext context) {
-    ///初始化屏幕 宽高比 ，以 cashbox切图中，标注XXXHDPI@4x 为准
+    ///Initialize the screen aspect ratio, based on the cashbox cut-out, marked with XXXHDPI@4x
     ScreenUtil.instance = ScreenUtil(width: 90, height: 160)..init(context);
 
     return Container(

@@ -8,7 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'net_util.dart';
 
-const etherscanApiKey = VendorConfig.ETHERSCAN_API_KEY; //todo change it 替换成你自己,在etherscan中申请的apikey
+const etherscanApiKey = VendorConfig.ETHERSCAN_API_KEY; //todo change it Replace yourself with the apikey applied in etherscan
 
 const Eth_Tx_Account = "http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
 const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=";
@@ -21,12 +21,12 @@ String assembleTxAccount(String address, ChainType chainType, {String apiKey = e
   }
 }
 
-//nonce === txAccount目前接口 用的是 infura||etherscan
+//nonce === txAccount currently uses infura||etherscan
 Future<String> loadTxAccount(String address, ChainType chainType) async {
   try {
     var res = await request(assembleTxAccount(address, chainType));
     if (res != null && (res as Map).containsKey("result")) {
-      //说明由于 infura||etherscan 目前接口返回的是 如:0x085f这种格式。需处理掉开头0x。 后转十六进制 成 十进制
+      //Note that due to infura||etherscan, the interface currently returns a format like 0x085f. Need to deal with the beginning 0x. Back to Hexadecimal to Decimal
       if (res["result"] != null && (res["result"].toString().startsWith("0x") || res["result"].toString().startsWith("0X"))) {
         return Utils.hexToInt(res["result"].toString().substring("0x".length)).toString();
       } else {
@@ -51,8 +51,8 @@ String assembleEthBalanceUrl(String address, {ChainType chainType = ChainType.ET
   }
 }
 
-//返回根据 1、Eth_Unit数量级，转换后的格式
-//        2、balance只保留小数点后4位
+//According to return  1. Eth_Unit magnitude, converted format
+//                     2. balance only keeps 4 decimal places
 Future<String> loadEthBalance(String address, ChainType chainType) async {
   try {
     var res = await request(assembleEthBalanceUrl(address, chainType: chainType));
@@ -76,8 +76,8 @@ String assembleErc20BalanceUrl(String address, String contractAddress, ChainType
   }
 }
 
-//返回根据 1、Utils.mathPow(10, decimal)数量级，转换后的格式
-//        2、balance只保留小数点后 4位
+//According to return 1. Utils.mathPow(10, decimal) order of magnitude, converted format
+//                    2. balance only keeps 4 decimal places
 Future<String> loadErc20Balance(String ethAddress, String contractAddress, ChainType chainType, {int decimal = 18}) async {
   try {
     var res = await request(assembleErc20BalanceUrl(ethAddress, contractAddress, chainType));

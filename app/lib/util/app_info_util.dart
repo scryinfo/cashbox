@@ -8,7 +8,7 @@ class AppInfoUtil {
   static const UPGRADE_APP_METHOD = "upgrade_app_method";
   static const APP_SIGNINFO_METHOD = "app_signinfo_method";
 
-  //工厂单例类实现
+  //Factory singleton class implementation
   factory AppInfoUtil() => _getInstance();
 
   static AppInfoUtil get instance => _getInstance();
@@ -25,11 +25,11 @@ class AppInfoUtil {
     return _instance;
   }
 
-  //方法参数，根据后端来定。  true:需要更新，   false： 不需要更新
+  //Method parameters are determined according to the backend. true: update required, false: no update required
   Future<bool> checkAppUpgrade() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String appVersion = packageInfo.version;
-    String buildNumber = packageInfo.buildNumber; //版本构建号
+    String buildNumber = packageInfo.buildNumber; //Version build number
     print("packageInfo appVersion===>" + appVersion + "||buildNumber===>" + buildNumber);
     try {
       var serveResult = await requestWithDeviceId(VendorConfig.versionCheckIp, formData: {"apkVersion": appVersion});
@@ -58,12 +58,12 @@ class AppInfoUtil {
     return false;
   }
 
-  //通知到android/ios 原生部分，去升级
+  //Notification to the native part of android/ios, to upgrade
   _doUpgradeApp(String downloadUrl, String serverVersion) {
     appInfoChannel.invokeMethod(UPGRADE_APP_METHOD, {'downloadurl': downloadUrl, 'serverVersion': serverVersion});
   }
 
-  //获取app 签名信息
+  //Get app signature information
   Future<String> getAppSignInfo() async {
     String appSignInfo = await appInfoChannel.invokeMethod(APP_SIGNINFO_METHOD);
     return appSignInfo;

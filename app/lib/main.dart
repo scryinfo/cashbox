@@ -22,10 +22,10 @@ import 'routers/application.dart';
 import 'package:flutter/rendering.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); //确保WidgetsFlutterBinding被初始化 把widget跟flutter绑定在一起。
-  //  debugPaintLayerBordersEnabled=true; //测试样式边界用
+  WidgetsFlutterBinding.ensureInitialized(); //Make sure that WidgetsFlutterBinding is initialized. Bind the widget with flutter.
+  //  debugPaintLayerBordersEnabled=true; //For testing style boundaries
   //  debugPaintBaselinesEnabled=true;
-  ///强制竖屏
+  ///Force portrait
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   var delegate = await LocalizationDelegate.create(
@@ -36,8 +36,8 @@ void main() async {
   runApp(LocalizedApp(delegate, MyApp()));
 
   if (Platform.isAndroid) {
-    /*以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，是为了在渲染后进行set赋值，
-    覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。*/
+    /*The following two lines set the android status bar to transparent immersion. It is written after the component is rendered, in order to perform set assignment after rendering,
+     Override the status bar. The MaterialApp component overwrites this value before rendering.*/
     SystemUiOverlayStyle systemUiOverlayStyle = SystemUiOverlayStyle(statusBarColor: Colors.transparent);
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
   }
@@ -69,7 +69,7 @@ class _MyApp extends State<MyApp> {
       spUtil.setString(GlobalConfig.savedLocaleKey, savedLocale);
     }
     print("initData  savedLocale-===>" + savedLocale);
-    changeLocale(context, savedLocale); //更改应用语言 english chinese
+    changeLocale(context, savedLocale); //Change application language english chinese
   }
 
   @override
@@ -78,7 +78,7 @@ class _MyApp extends State<MyApp> {
 
     return MultiProvider(
       providers: [
-        /// 注册数据状态管理，类似vuex实现
+        /// Registration data status management, similar to vuex implementation
         ChangeNotifierProvider(
           builder: (_) => CreateWalletProcessProvide(),
         ),
@@ -112,7 +112,7 @@ class _MyApp extends State<MyApp> {
             supportedLocales: localizationDelegate.supportedLocales,
             locale: localizationDelegate.currentLocale,
 
-            ///页面入口
+            ///Page entry
             home: EntryPage(),
             onGenerateRoute: Application.router.generator,
           ),

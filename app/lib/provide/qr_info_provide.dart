@@ -15,7 +15,7 @@ class QrInfoProvide with ChangeNotifier {
 
   get btnContent => _btnContent;
 
-  /*检查每次调用完毕，清理数据记录*/
+  /*Check the completion of each call, clean up the data record*/
   void emptyData() {
     this._title = null;
     this._hintInfo = null;

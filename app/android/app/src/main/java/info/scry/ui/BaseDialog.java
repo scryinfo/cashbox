@@ -9,7 +9,7 @@ public class BaseDialog extends Dialog {
 
     public BaseDialog(Context context, int theme, int res) {
         super(context, theme);
-        // TODO 自动生成的构造函数存根
+        // TODO automatically generated constructor stub
         setContentView(res);
         this.res = res;
         setCanceledOnTouchOutside(false);

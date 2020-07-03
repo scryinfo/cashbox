@@ -92,9 +92,9 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
   Widget buildSearchInputWidget() {
     return Container(
       width: ScreenUtil.instance.setWidth(60),
-      //修饰黑色背景与圆角
+      //Retouched black background with rounded corners
       decoration: new BoxDecoration(
-        border: Border.all(color: Colors.grey, width: ScreenUtil.instance.setWidth(1)), //灰色的一层边框
+        border: Border.all(color: Colors.grey, width: ScreenUtil.instance.setWidth(1)), //Gray layer border
         color: Colors.grey,
         borderRadius: new BorderRadius.all(new Radius.circular(ScreenUtil.instance.setWidth(3))),
       ),
@@ -108,7 +108,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
     return Container(
         child: TextField(
       cursorColor: Colors.white,
-      //设置光标
+      //Set cursor
       decoration: InputDecoration(
         contentPadding: new EdgeInsets.only(bottom: ScreenUtil.instance.setHeight(2.5)),
         border: InputBorder.none,
@@ -128,7 +128,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
         _searchDigit(value);
       },
       controller: _searchContentController,
-      //文本对齐方式(即光标初始位置)
+      //Text alignment (i.e. initial cursor position)
       textAlign: TextAlign.start,
       style: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
     ));
@@ -144,7 +144,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
         ));
   }
 
-  //代币列表layout
+  //Token list layout
   Widget _digitListWidgets() {
     return EasyRefresh.custom(
       footer: BallPulseFooter(),
@@ -161,7 +161,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
         ),
       ],
       onLoad: () async {
-        //代币列表栏，下拉 刷新||加载 数据。
+        //Token list bar, pull down Refresh||Load data.
         await Future.delayed(
           Duration(seconds: 2),
           () {
@@ -174,7 +174,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
     );
   }
 
-  //每个代币的layout
+  //Layout of each token
   Widget _makeDigitListItem(index) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -189,7 +189,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
           child: GestureDetector(
             onTap: () async {
               try {
-                // todo 保存 或者 更改显示状态 接口功能待验证
+                // todo save or change the display state interface function to be verified
                 var addDigitMap = await Wallets.instance
                     .addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
                 int status = addDigitMap["status"];
@@ -247,7 +247,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
   }
 
   _searchDigit(String param) async {
-    // todo 执行查找接口
+    // todo execute lookup interface
     Map queryMap = await Wallets.instance.queryDigit(Wallets.instance.nowWallet.nowChain, param);
     var status = queryMap["status"];
     if (status != null && status == 200) {

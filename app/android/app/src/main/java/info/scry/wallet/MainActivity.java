@@ -61,7 +61,7 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {//API>21,设置状态栏颜色透明
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {//API>21, Set the status bar color transparent
             getWindow().setStatusBarColor(0);
         }
         GeneratedPluginRegistrant.registerWith(this);
@@ -80,7 +80,7 @@ public class MainActivity extends FlutterActivity {
                             }
                         }
                 );
-        //flutter处 log日志保存
+        //Log storage at flutter
         new MethodChannel(getFlutterView(), FLUTTER_LOG_CHANNEL)
                 .setMethodCallHandler(
                         new MethodCallHandler() {
@@ -91,7 +91,7 @@ public class MainActivity extends FlutterActivity {
                         }
                 );
 
-        //flutter处 通知版本升级
+        //Notification of version upgrade at flutter
         new MethodChannel(getFlutterView(), APP_INFO_CHANNEL)
                 .setMethodCallHandler(
                         new MethodCallHandler() {
@@ -122,7 +122,7 @@ public class MainActivity extends FlutterActivity {
                 );
 
         //  EventChannel test code
-        //  native端，主动通知到 flutter
+        //  native end, proactive notification to flutter
         new EventChannel(getFlutterView(), CHARGING_CHANNEL).setStreamHandler(
                 new EventChannel.StreamHandler() {
                     @Override
@@ -130,7 +130,7 @@ public class MainActivity extends FlutterActivity {
                         //todo something
                         eventSink.success(o);
                         eventSink.error("error", "something is error", o);
-                        // errors参数：
+                        // Error parameters:
                         // this.code,
                         // this.message,
                         // this.details
@@ -182,7 +182,7 @@ public class MainActivity extends FlutterActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // 扫描二维码/条码回传
+        // Scan QR code/Barcode return
         if (requestCode == REQUEST_CODE_QR_SCAN) {
             if (data != null && resultCode == RESULT_OK) {
                 String scanResultString = data.getStringExtra(Constant.CODED_CONTENT);

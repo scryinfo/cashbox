@@ -1,23 +1,23 @@
 /*
-*     1 ETH = 1e9gwei (10的九次方) = 1e18 wei
+*     1 ETH = 1e9gwei (10 to the ninth power) = 1e18 wei
 * */
 
 class GlobalConfig {
-  ///应用语言配置
-  static const savedLocaleKey = "savedLocaleKey"; //默认语言中文；
-  static const defaultLocaleValue = "zh"; //默认语言中文；
-  static Map<String, String> globalLanguageMap = {"zh": "中文", "en": "English"};
+  ///Application language configuration
+  static const savedLocaleKey = "savedLocaleKey"; //Default language Chinese；
+  static const defaultLocaleValue = "zh"; //Default language Chinese；
+  static Map<String, String> globalLanguageMap = {"zh": "Chinese", "en_US": "English"};
 
-  ///下面配置信息，以key-value形式，用本地文件，做信息持久保存
-  static const isInitAppConfig = "is_init_app_config_key"; //是否初始化了app配置信息
+  ///The following configuration information, in the form of key-value, uses a local file to do persistent storage of information
+  static const isInitAppConfig = "is_init_app_config_key"; //Whether the app configuration information is initialized
 
-  static const currencyKey = "currency_key"; //选择的法币 usd || cny等
+  static const currencyKey = "currency_key"; //Selected fiat currency usd || cny etc.
   static String currencyDefaultValue = "USD";
 
-  ///dapp 保存合约地址信息
+  ///dapp saves contract address information
   static const dappCaKey1 = "dapp_ca_key_1";
 
-  ///eth相关gas费配置
+  ///eth related gas fee configuration
   static const EthGasLimitKey = "eth";
   static const Erc20GasLimitKey = "eth";
   static const EthGasPriceKey = "eth";
@@ -54,7 +54,7 @@ class GlobalConfig {
   }
 }
 
-const Eth_Unit = 1000000000000000000; // 18位
+const Eth_Unit = 1000000000000000000; // 18 digits
 
 const httpHeaders = {
   'Accept': 'application/json, text/plain, */*',

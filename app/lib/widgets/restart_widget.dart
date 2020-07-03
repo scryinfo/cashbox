@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-//根据key变化，用来重启应用或者 widget的组件
+//According to the key change, the component used to restart the application or widget
 class RestartWidget extends StatefulWidget {
   final Widget childWidget;
 

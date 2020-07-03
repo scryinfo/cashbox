@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 class WalletManagerProvide with ChangeNotifier {
   String _walletName;
   String _walletId;
-  String _locale = ''; //应用语言 选择
+  String _locale = ''; //Application language selection
 
   get walletName => _walletName;
 
@@ -11,7 +11,7 @@ class WalletManagerProvide with ChangeNotifier {
 
   get locale => _locale;
 
-  /*检查每次调用完毕，清理数据记录*/
+  /*Check the completion of each call, clean up the data record*/
   void emptyData() {
     this._walletName = null;
     this._walletId = null;

@@ -34,8 +34,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
   TextEditingController _backupMsgController = TextEditingController();
   ChainType chainType;
   bool isShowExactGas = false;
-  int precision = 8; //小数位精度
-  int eth2gasUnit = 1000 * 1000 * 1000; // 1 ETH = 1e9 gwei (10的九次方) = 1e18 wei
+  int precision = 8; //Decimal precision
+  int eth2gasUnit = 1000 * 1000 * 1000; // 1 ETH = 1e9 gwei (10 to the ninth power) = 1e18 wei
   String Gwei = "Gwei";
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
@@ -224,7 +224,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                       });
                     },
                     divisions: 100,
-                    //不想出现刻度和气泡,删除这个属性就可以了，自己实验
+                    //Don’t want to show scales and bubbles, just delete this attribute, experiment by yourself
                     label: '$mGasFeeValue',
                     value: mGasFeeValue,
                   )),
@@ -355,7 +355,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                     });
                                   },
                                   divisions: 100,
-                                  //不想出现刻度和气泡,删除这个属性就可以了，自己实验
+                                  //Don’t want to show scales and bubbles, just delete this attribute, experiment by yourself
                                   label: '$mGasPriceValue',
                                   value: mGasPriceValue,
                                 )),
@@ -441,7 +441,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                     });
                                   },
                                   divisions: 100,
-                                  //不想出现刻度和气泡,删除这个属性就可以了，自己实验
+                                  //Don’t want to show scales and bubbles, just delete this attribute, experiment by yourself
                                   label: '$mGasLimitValue',
                                   value: mGasLimitValue,
                                 )),
@@ -648,7 +648,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               ),
               controller: _txValueController,
               inputFormatters: [
-                WhitelistingTextInputFormatter(RegExp("[0-9.]")), //只能输入 数字 或 小数点.
+                WhitelistingTextInputFormatter(RegExp("[0-9.]")), //Enter only numbers or decimal point.
               ],
             ),
           ),
@@ -742,7 +742,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
     {
       const timeout = Duration(seconds: 5);
       Timer(timeout, () {
-        Navigator.pop(context); //让showProgressDialog弹框，至少显示两秒
+        Navigator.pop(context); //Let the showProgressDialog popup box display for at least two seconds
         NavigatorUtils.goBack(context);
       });
     }
@@ -774,7 +774,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), timeInSecForIos: 3);
       return false;
     }
-    //判断余额 是否大于转账额度
+    //Determine if the balance is greater than the transfer amount
     List displayDigitsList = Wallets.instance.nowWallet.nowChain.digitsList;
     for (var i = 0; i < displayDigitsList.length; i++) {
       if (digitBalance == null &&

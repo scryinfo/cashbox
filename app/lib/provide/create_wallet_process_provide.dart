@@ -14,7 +14,7 @@ class CreateWalletProcessProvide with ChangeNotifier {
 
   get mnemonic => _mnemonic;
 
-  /*检查每次调用完毕，清理数据记录*/
+  /*Check the completion of each call, clean up the data record*/
   void emptyData() {
     this._walletName = null;
     this._pwd = null;
