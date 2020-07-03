@@ -146,7 +146,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                       ],
                     ),
                   ),
-                  Gaps.scaleHGap(22),
+                  Gaps.scaleHGap(20),
                   Container(
                     child: GestureDetector(
                         onTap: () {
