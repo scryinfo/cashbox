@@ -369,148 +369,153 @@ public class NativeLib {
         public String inputInfo;            //extra information
         public String accountKeyInfo;       //Account storage key
         public AccountInfo accountInfo;     //account information 
-
-        //Define EEE chain account information
-        public static class AccountInfo {
-            public int nonce;                // The number of transactions this account has sent.
-            public int refcount;             //The number of other modules that currently depend on this account's existence.
-            public String free;              //Discretionary balance
-            public String reserved;          //Remaining balance, the balance here means participation in required activities, and the related business has not yet been designed on the chain
-            public String misc_frozen;      // The amount that `free` may not drop below when withdrawing for *anything except transaction fee payment*.
-            public String fee_frozen;       //The amount that `free` may not drop below when withdrawing specifically for transaction fee payment.
-        }
-
-        public static class SyncStatus {
-            public int status;                  //Communication message Status Code StatusCode 200 succeeded
-            public String message;              //Detailed error information
-            public Map<String, AccountRecord> records;
-        }
-
-        public static class AccountRecord {
-            public String account;
-            public int chainType;
-            public int blockNum;
-            public String blockHash;
-        }
-
-        //Get the assembled original transaction, distinguish the chain type
-        //Return: Unsigned transaction String, the format is json format
-        //The first parameter is the return value of eeeOpen
-        //  Add a new interface that will not affect the use of old versions of
-        // About eee related data acquisition, transaction extraction, all are operated by the client, the bottom layer does not operate the network;
-        // The bottom layer directly constructs a signed transfer transaction, and returns the information that can be directly submitted to the chain through the signedInfo attribute in the Message field.
-        // Note: vaule uses the default unit in the transfer: unit, the precision is 10^12, that is, 1 unit =1000_000_000_000
-        public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version, byte[] pwd);
-
-        //msg: transaction
-        //TODO The use of this interface also needs to be re-planned
-        public static native Message eeeEnergyTransfer(String from, byte[] pwd, String to, String value, String extendMsg);
-
-        // The signature result is: transaction type
-        public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
-
-        // Only do information signature, tool function
-        public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
-
-        //Broadcast transaction, distinguish the chain type
-        //msg: Transaction ID
-        public static native Message eeeTxBroadcast(long handle, String signedTx);
-
-        //msg: balance
-        public static native Message eeeBalance(long handle, String addr);
-
-        //msg: energy balance
-        public static native Message eeeEnergyBalance(long handle, String addr);
-
-        //For the key corresponding to the EEE account information, enter the address to be queried, for example: 5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4,
-        //  return the encoded key
-        // :0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
-        //Construct jsonrpc request data format {"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
-        public static native Message eeeAccountInfoKey(String addr);
-
-        /**
-         * Decode account information queried back from the chain
-         *
-         * @param encodeData Enter data in hexadecimal format  ‘0x’
-         * @return If the format is correct, return status 200, the accountInfo field in the Message contains details, if the format is incorrect, the msg field contains error information
-         */
-        public static native Message decodeAccountInfo(String encodeData);
-
-        /**
-         * Transaction details saved on the specified block (currently only focused on transfer transactions)
-         *
-         * @param accountId   The account of the transaction (the target account)
-         * @param eventDetail
-         * @param blockHash
-         * @param extrinsics  Transaction details included in the block
-         * @return
-         */
-
-        public static native Message saveExtrinsicDetail(String accountId, String eventDetail, String blockHash, String extrinsics);
-
-        /**
-         * Record the currently synchronized block number, used for the starting position when the update is triggered next time
-         *
-         * @param account    Synchronized account
-         * @param chain_type
-         * @param block_num
-         * @param block_hash
-         * @return
-         */
-        public static native Message updateEeeSyncRecord(String account, int chain_type, int block_num, String block_hash);
-
-        /**
-         * Get the current synchronization status
-         *
-         * @return
-         */
-        public static native SyncStatus getEeeSyncRecord();
-
-        /*------------------------------------------Transaction related------------------------------------------*/
-
-        // Eth transaction signature. The signature result is: transaction type
-        // Explanation: gasPrice unit: gwei gaslimit unit: gwei (1 ETH = 1e9 gwei (10 to the ninth power))
-        //      When gasPrice and gasLimit pass values, pass integer type strings. For example: "1000", not "100.0"
-        //     Chain type int: 3: formal chain 4: test chain (Ropsten), currently only these two test chains are used
-        public static native Message ethTxSign(String mnId, int chainType, String fromAddress, String toAddress, String contractAddress, String value,
-                                               String backup, byte[] pwd, String gasPrice, String gasLimit, String nonce, int decimal);
-
-        //ETH transaction assembly. Returns: Unsigned transaction String.
-        //
-        public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String toAddress, String value,
-                                                      String backupMsg, String gasLimit, String gasPrice);
-
-        //ERC20 transaction assembly. Returns: unsigned transaction String
-        //
-        public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String contractAddress, String toAddress,
-                                                        String value, String backupMsg, String gasLimit, String gasPrice);
-
-        //Handling suggestions are given priority, and the repository that implements spv does it. It is more convenient to get utxo, as well as change address selection, change amount.
-        public static native byte[] btcTxMakeBTCRawTx(String[] from, String[] to, String value);
-
-        public static native byte[] btcTxSignTx(String rawTx, byte[] encodeMne, byte[] pwd);
-
-        //Broadcast transaction, distinguish the chain type
-        //Return: broadcast success 1, broadcast failure 0
-        public static native boolean ethTxBroascastTx(byte[] signedTx);
-
-        public static native boolean btcTxBroascastTx(byte[] signedTx);
-
-        /**
-         * Update the balance of the token corresponding to the address
-         *
-         * @param address chain address
-         * @param digitId token id
-         * @param balance Number of tokens  How to determine the token unit passed in?
-         * @return Update wallet token results, use isUpdateDigitBalance to identify operation results
-         */
-        public static native WalletState updateDigitBalance(String address, String digitId, String balance);
-
-        //Decode additional transaction information
-        public static native Message decodeAdditionData(String input);
-
-
     }
+
+    //Define EEE chain account information
+    public static class AccountInfo {
+        public int nonce;                // The number of transactions this account has sent.
+        public int refcount;             //The number of other modules that currently depend on this account's existence.
+        public String free;              //Discretionary balance
+        public String reserved;          //Remaining balance, the balance here means participation in required activities, and the related business has not
+        // yet been designed on the chain
+        public String misc_frozen;      // The amount that `free` may not drop below when withdrawing for *anything except transaction fee payment*.
+        public String fee_frozen;       //The amount that `free` may not drop below when withdrawing specifically for transaction fee payment.
+    }
+
+    public static class SyncStatus {
+        public int status;                  //Communication message Status Code StatusCode 200 succeeded
+        public String message;              //Detailed error information
+        public Map<String, AccountRecord> records;
+    }
+
+    public static class AccountRecord {
+        public String account;
+        public int chainType;
+        public int blockNum;
+        public String blockHash;
+    }
+
+    //Get the assembled original transaction, distinguish the chain type
+    //Return: Unsigned transaction String, the format is json format
+    //The first parameter is the return value of eeeOpen
+    //  Add a new interface that will not affect the use of old versions of
+    // About eee related data acquisition, transaction extraction, all are operated by the client, the bottom layer does not operate the network;
+    // The bottom layer directly constructs a signed transfer transaction, and returns the information that can be directly submitted to the chain through
+    // the signedInfo attribute in the Message field.
+    // Note: vaule uses the default unit in the transfer: unit, the precision is 10^12, that is, 1 unit =1000_000_000_000
+    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version, byte[] pwd);
+
+    //msg: transaction
+    //TODO The use of this interface also needs to be re-planned
+    public static native Message eeeEnergyTransfer(String from, byte[] pwd, String to, String value, String extendMsg);
+
+    // The signature result is: transaction type
+    public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
+
+    // Only do information signature, tool function
+    public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
+
+    //Broadcast transaction, distinguish the chain type
+    //msg: Transaction ID
+    public static native Message eeeTxBroadcast(long handle, String signedTx);
+
+    //msg: balance
+    public static native Message eeeBalance(long handle, String addr);
+
+    //msg: energy balance
+    public static native Message eeeEnergyBalance(long handle, String addr);
+
+    //For the key corresponding to the EEE account information, enter the address to be queried, for example: 5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4,
+    //  return the encoded key
+    // :0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
+    //Construct jsonrpc request data format {"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
+    public static native Message eeeAccountInfoKey(String addr);
+
+    /**
+     * Decode account information queried back from the chain
+     *
+     * @param encodeData Enter data in hexadecimal format  ‘0x’
+     * @return If the format is correct, return status 200, the accountInfo field in the Message contains details, if the format is incorrect, the msg
+     * field contains error information
+     */
+    public static native Message decodeAccountInfo(String encodeData);
+
+    /**
+     * Transaction details saved on the specified block (currently only focused on transfer transactions)
+     *
+     * @param accountId   The account of the transaction (the target account)
+     * @param eventDetail
+     * @param blockHash
+     * @param extrinsics  Transaction details included in the block
+     * @return
+     */
+
+    public static native Message saveExtrinsicDetail(String accountId, String eventDetail, String blockHash, String extrinsics);
+
+    /**
+     * Record the currently synchronized block number, used for the starting position when the update is triggered next time
+     *
+     * @param account    Synchronized account
+     * @param chain_type
+     * @param block_num
+     * @param block_hash
+     * @return
+     */
+    public static native Message updateEeeSyncRecord(String account, int chain_type, int block_num, String block_hash);
+
+    /**
+     * Get the current synchronization status
+     *
+     * @return
+     */
+    public static native SyncStatus getEeeSyncRecord();
+
+    /*------------------------------------------Transaction related------------------------------------------*/
+
+    // Eth transaction signature. The signature result is: transaction type
+    // Explanation: gasPrice unit: gwei gaslimit unit: gwei (1 ETH = 1e9 gwei (10 to the ninth power))
+    //      When gasPrice and gasLimit pass values, pass integer type strings. For example: "1000", not "100.0"
+    //     Chain type int: 3: formal chain 4: test chain (Ropsten), currently only these two test chains are used
+    public static native Message ethTxSign(String mnId, int chainType, String fromAddress, String toAddress, String contractAddress, String value,
+                                           String backup, byte[] pwd, String gasPrice, String gasLimit, String nonce, int decimal);
+
+    //ETH transaction assembly. Returns: Unsigned transaction String.
+    //
+    public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String toAddress, String value,
+                                                  String backupMsg, String gasLimit, String gasPrice);
+
+    //ERC20 transaction assembly. Returns: unsigned transaction String
+    //
+    public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String contractAddress, String toAddress,
+                                                    String value, String backupMsg, String gasLimit, String gasPrice);
+
+    //Handling suggestions are given priority, and the repository that implements spv does it. It is more convenient to get utxo, as well as change address
+    // selection, change amount.
+    public static native byte[] btcTxMakeBTCRawTx(String[] from, String[] to, String value);
+
+    public static native byte[] btcTxSignTx(String rawTx, byte[] encodeMne, byte[] pwd);
+
+    //Broadcast transaction, distinguish the chain type
+    //Return: broadcast success 1, broadcast failure 0
+    public static native boolean ethTxBroascastTx(byte[] signedTx);
+
+    public static native boolean btcTxBroascastTx(byte[] signedTx);
+
+    /**
+     * Update the balance of the token corresponding to the address
+     *
+     * @param address chain address
+     * @param digitId token id
+     * @param balance Number of tokens  How to determine the token unit passed in?
+     * @return Update wallet token results, use isUpdateDigitBalance to identify operation results
+     */
+    public static native WalletState updateDigitBalance(String address, String digitId, String balance);
+
+    //Decode additional transaction information
+    public static native Message decodeAdditionData(String input);
+
+
+}
 
 /*
     fixd Mnemonic words are managed independently, one auxiliary word can generate multiple chain addresses（eth,btc,eee）
@@ -526,7 +531,8 @@ public class NativeLib {
 
            Source of wallet list loading?
 
-             Local database: save local transaction records + wallet list (add, delete, wallet name, set current wallet, wallet chain address, chain token information)
+             Local database: save local transaction records + wallet list (add, delete, wallet name, set current wallet, wallet chain address, chain token
+             information)
             Save it in flutter and process
 */
 //add
