@@ -6,7 +6,7 @@ class GlobalConfig {
   ///Application language configuration
   static const savedLocaleKey = "savedLocaleKey"; //Default language Chinese；
   static const defaultLocaleValue = "zh"; //Default language Chinese；
-  static Map<String, String> globalLanguageMap = {"zh": "Chinese", "en_US": "English"};
+  static Map<String, String> globalLanguageMap = {"zh": "Chinese", "en": "English"};
 
   ///The following configuration information, in the form of key-value, uses a local file to do persistent storage of information
   static const isInitAppConfig = "is_init_app_config_key"; //Whether the app configuration information is initialized
