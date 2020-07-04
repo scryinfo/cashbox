@@ -45,17 +45,26 @@ class _PublicPageState extends State<PublicPage> {
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(160),
       child: WebView(
-        initialUrl: VendorConfig.publicIpDefaultValue,
-        javascriptMode: JavascriptMode.unrestricted, //JS execution mode Whether to allow JS execution
-        onWebViewCreated: (controller) {
-          _controller = controller;
-        },
-        javascriptChannels: <JavascriptChannel>[].toSet(),
-        onPageFinished: (String url) async {
+          initialUrl: VendorConfig.publicIpDefaultValue,
+          javascriptMode: JavascriptMode.unrestricted,
+          //JS execution mode Whether to allow JS execution
+          onWebViewCreated: (controller) {
+            _controller = controller;
+          },
+          javascriptChannels: makeJsChannelsSet(),
+          onPageFinished: (String url) {}),
+    );
+  }
+
+  Set<JavascriptChannel> makeJsChannelsSet() {
+    List<JavascriptChannel> jsChannelList = [];
+    jsChannelList.add(JavascriptChannel(
+        name: "NativeLocaleValue",
+        onMessageReceived: (JavascriptMessage message) async {
           var spUtil = await SharedPreferenceUtil.instance;
           var savedLocale = spUtil.getString(GlobalConfig.savedLocaleKey);
-          _controller?.evaluateJavascript('nativeLocale("$savedLocale")')?.then((result) {}); //传钱包EEE链地址给DApp记录保存
-        }),
-    );
+          _controller?.evaluateJavascript('nativeLocale("$savedLocale")')?.then((result) {});
+        }));
+    return jsChannelList.toSet();
   }
 }
