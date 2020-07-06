@@ -1,3 +1,5 @@
+[README_CN](https://github.com/scryinfo/cashbox/blob/master/README_CN.md)
+
 # project instruction
 This project is an open source wallet Cashbox, mainly to realize the development of mobile platform (android, ios) functions.
 

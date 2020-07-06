@@ -1,4 +1,4 @@
-[README_CN](https://github.com/scryinfo/cashbox/blob/master/README_CN.md)
+[README_CN](https://github.com/scryinfo/cashbox/blob/master/app/README_CN.md)
 
 ## Technical selection instructions
 Regarding flutter technology, here are a few reference links that can help you get started with flutter
