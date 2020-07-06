@@ -32,5 +32,5 @@ In the selection of the Cashbox wallet technology, the upper ui part is implemen
 - 3.packages --- functional plug-in, help to expand the functions of the app, such as providing wallet management function, webview function.
 
 Specific functional modules, you can enter the corresponding module to view the documentation
-- [app part description ENGLISH](https://github.com/scryinfo/cashbox/blob/master/app/README_EN.md)
+- [app part description ENGLISH](https://github.com/scryinfo/cashbox/blob/master/app/README.md)
 - [section description of bc](https://github.com/scryinfo/cashbox/blob/master/bc/README.md)
