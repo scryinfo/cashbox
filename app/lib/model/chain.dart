@@ -108,6 +108,13 @@ abstract class Chain {
     if (status == 200) {
       if (isShowDigit) {
         //execution succeed
+        for (int i = 0; i < digitsList.length; i++) {
+          var element = digitsList[i];
+          if (element.digitId == digit.digitId) {
+            digitsList[i].isVisible = true;
+            break;
+          }
+        }
         digit.isVisible = true;
         return isShowDigit;
       }

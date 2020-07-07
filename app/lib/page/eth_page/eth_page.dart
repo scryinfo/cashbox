@@ -287,7 +287,6 @@ class _EthPageState extends State<EthPage> {
                 _buildChainCard(), //Chain card swipe
                 _buildMiddleFuncCard(), //Functional location
                 _buildDigitListCard(), //Token list
-                //DigitListCard(),
               ],
             ),
             /* todo 1.0 does not set to increase the token entrance

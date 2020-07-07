@@ -1,5 +1,4 @@
-import 'package:app/generated/i18n.dart';
-import 'package:app/global_config/global_config.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/wallets.dart';
@@ -8,9 +7,9 @@ import 'package:app/provide/server_config_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
-import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
@@ -28,11 +27,14 @@ class DigitsManagePage extends StatefulWidget {
 }
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
-  List<Digit> displayDigitsList = []; //Tokens displayed on the page = nowWallet.nowChain.digitsList (this chain already exists, visible is displayed in front) + nativeAuthDigitsList (paged authentication tokens)
+  List<Digit> allDigitsList = [];
+  List<Digit> displayDigitsList = [];
+
+  //Tokens displayed on the page = nowWallet.nowChain.digitsList (this chain already exists, visible is displayed in front) + nativeAuthDigitsList (paged authentication tokens)
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
   int nativeDigitIndex = 0;
-  int onePageOffSet = 50; //Display 20 items of data on a single page, update and update 20 items at a time
+  int onePageOffSet = 20; //Display 20 items of data on a single page, update and update 20 items at a time
   int maxAuthTokenCount = 0; //Total number of local authToken
   bool isLoadAuthDigitFinish = false;
 
@@ -43,43 +45,52 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   initData() async {
-    addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.getVisibleDigitList()); //1. The visible token is displayed in front isVisible = true;
-    addToDisplayDigitsList(Wallets.instance.nowWallet.nowChain.digitsList); //2. List of existing local tokens
-    print("initData() displayDigitsList.length====>" + displayDigitsList.length.toString());
+    var allNativeDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
+    allNativeDigitList.sort((left, right) {
+      if (left.isVisible ^ right.isVisible) {
+        //类型不同，结果为 1
+        return left.isVisible ? 1 : -1;
+      }
+      return 0;
+    });
+    addToAllDigitsList(allNativeDigitList);
+    pushToDisplayDigitList();
     {
-      /*   todo 1.0 will not do it for the time being
       var spUtil = await SharedPreferenceUtil.instance;
-      var localDigitsVersion = spUtil.getString(GlobalConfig.authDigitsVersionKey);
+      var localDigitsVersion = spUtil.getString(VendorConfig.authDigitsVersionKey);
       var serverDigitsVersion = Provider.of<ServerConfigProvide>(context).authDigitListVersion;
       var serverDigitsIp = Provider.of<ServerConfigProvide>(context).authDigitListIp;
-      var localDigitListIP = spUtil.getString(GlobalConfig.authDigitsIpKey);
+      var localDigitListIP = spUtil.getString(VendorConfig.authDigitsIpKey);
+
       if (localDigitsVersion == null || localDigitsVersion == "") {
         //There is no certified token version number locally and it has not been loaded
         if (serverDigitsIp != null && serverDigitsIp != "") {
           var param = await loadServerDigitsData(serverDigitsIp);
           await updateNativeAuthDigitList(param); //Save tokens: server trusted token list ip
+          spUtil.setString(VendorConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number Version
         } else {
-          var param = await loadServerDigitsData(localDigitListIP);
-          await updateNativeAuthDigitList(param); //Save tokens: local initial recorded token list ip
+          if (localDigitListIP != null && localDigitListIP.isNotEmpty) {
+            var param = await loadServerDigitsData(localDigitListIP);
+            await updateNativeAuthDigitList(param); //Save tokens: local initial recorded token list ip
+          }
         }
-        spUtil.setString(GlobalConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number Version
       } else {
-        //Local version number, check for updates, and server version number information
-        if (serverDigitsVersion != null && serverDigitsVersion != "") {
-          if (double.parse(localDigitsVersion) < double.parse(serverDigitsVersion)) {
+        try {
+          //Local version number, check for updates, and server version number information
+          if (serverDigitsVersion != null && serverDigitsVersion != "" && (double.parse(localDigitsVersion) < double.parse(serverDigitsVersion))) {
             //A new version appears on the server side
-            //todo random strategy, check the server-side trusted token list version, update the local token list
-            //todo replacement ======> 2. List of existing local tokens
             if (serverDigitsIp != null && serverDigitsIp != "") {
               //There is a server token IP address
               var param = await loadServerDigitsData(serverDigitsIp);
               await updateNativeAuthDigitList(param); //Save tokens: server trusted token list ip
-              spUtil.setString(GlobalConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number
+              spUtil.setString(VendorConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number
             }
           }
+        } catch (e) {
+          LogUtil.e("DigitsManagePage error is=>", e);
         }
-      }*/
-      {
+      }
+      /*{
         //todo 1.0 write dead, preset token
         var digitParam =
             '[{"contractAddress":"0x9F5F3CFD7a32700C93F971637407ff17b91c7342","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
@@ -92,9 +103,12 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         } else {
           print("addDigitToChainModel successful==");
         }
+      }*/
+      if (displayDigitsList.length < onePageOffSet) {
+        var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
+        addToAllDigitsList(tempNativeAuthDigitsList);
+        pushToDisplayDigitList();
       }
-      var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
-      addToDisplayDigitsList(tempNativeAuthDigitsList);
     }
     setState(() {
       this.displayDigitsList = displayDigitsList;
@@ -195,7 +209,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
               return;
             }
-            addToDisplayDigitsList(tempList);
+            addToAllDigitsList(tempList);
+            pushToDisplayDigitList();
           },
         );
       },
@@ -222,11 +237,14 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                 } else {
                   //Invisible, perform visible show operation
                   bool isDigitExist = false;
-                  Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
+                  var tempDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
+                  for (int i = 0; i < tempDigitList.length; i++) {
+                    var element = tempDigitList[i];
                     if (element.digitId == displayDigitsList[index].digitId) {
                       isDigitExist = true;
+                      break;
                     }
-                  });
+                  }
                   if (isDigitExist) {
                     isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
                   } else {
@@ -236,21 +254,15 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                         Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
                     int status = addDigitMap["status"];
                     if (status == null || status != 200) {
-                      Fluttertoast.showToast(msg: "执行状态保存，出问题了,请重新尝试");
+                      Fluttertoast.showToast(msg: "执行状态保存，出问题了,请退出重新尝试");
                       print("addDigitToChainModel failure==" + addDigitMap["message"]);
                     } else {
                       isExecutorSuccess = true;
                     }
+                    isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
                   }
                 }
                 if (isExecutorSuccess) {
-                  //The bottom layer is successfully executed, the upper layer refreshes to display data
-                  Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
-                    if (element.shortName == displayDigitsList[index].shortName) {
-                      element.isVisible = displayDigitsList[index].isVisible;
-                    }
-                    print("digit_manage_page digit.shortname===>" + element.shortName + "||element.isVisible===>" + element.isVisible.toString());
-                  });
                   setState(() {
                     displayDigitsList[index].isVisible = displayDigitsList[index].isVisible;
                   });
@@ -339,10 +351,26 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     print("updateMap[isUpdateAuthDigit]=====>" + updateMap["status"].toString() + updateMap["isUpdateAuthDigit"].toString());
   }
 
+  pushToDisplayDigitList() {
+    int targetLength = 0;
+    if (onePageOffSet < (allDigitsList.length - displayDigitsList.length)) {
+      targetLength = onePageOffSet;
+    } else {
+      targetLength = allDigitsList.length - displayDigitsList.length;
+    }
+    for (int i = 0; i < targetLength; i++) {
+      var index = i;
+      displayDigitsList.add(allDigitsList[displayDigitsList.length + index]);
+    }
+    setState(() {
+      this.displayDigitsList = displayDigitsList;
+    });
+  }
+
   //Add to displayDigitsList
-  addToDisplayDigitsList(List<Digit> newDigitList) {
+  addToAllDigitsList(List<Digit> newDigitList) {
     if (newDigitList == null || newDigitList.length == 0) {
-      print("addToDisplayDigitsList newDigitList is null");
+      print("addToAllDigitsList newDigitList is null");
       return;
     }
     for (num i = 0; i < newDigitList.length; i++) {
@@ -350,8 +378,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       if (element.contractAddress != null && element.contractAddress.isNotEmpty) {
         //erc20
         bool isExistErc20 = false;
-        for (num index = 0; index < displayDigitsList.length; index++) {
-          var digit = displayDigitsList[index];
+        for (num index = 0; index < allDigitsList.length; index++) {
+          var digit = allDigitsList[index];
           if ((digit.contractAddress != null) && (element.contractAddress != null) && (digit.contractAddress == element.contractAddress)) {
             print("digit.contractAddress=>" + digit.contractAddress + "||element.contractAddress===>" + element.contractAddress);
             isExistErc20 = true;
@@ -360,12 +388,12 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         }
         print("isExistErc20 ===>" + isExistErc20.toString());
         if (!isExistErc20) {
-          displayDigitsList.add(element);
+          allDigitsList.add(element);
         }
       } else {
         bool isExistDigit = false;
-        for (num index = 0; index < displayDigitsList.length; index++) {
-          var digit = displayDigitsList[index];
+        for (num index = 0; index < allDigitsList.length; index++) {
+          var digit = allDigitsList[index];
           if ((digit.shortName != null) && (element.shortName != null) && (digit.shortName == element.shortName)) {
             print("digit.shortName=>" + digit.shortName + "||element.shortName===>" + element.shortName);
             isExistDigit = true;
@@ -374,7 +402,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         }
         print("isExistDigit ===>" + isExistDigit.toString());
         if (!isExistDigit) {
-          displayDigitsList.add(element);
+          allDigitsList.add(element);
         }
       }
     }
