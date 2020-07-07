@@ -493,7 +493,42 @@ public class NativeLib {
     // selection, change amount.
     public static native byte[] btcTxMakeBTCRawTx(String[] from, String[] to, String value);
 
-    public static native byte[] btcTxSignTx(String rawTx, byte[] encodeMne, byte[] pwd);
+    // BTC api_01
+    // sign transaction
+    // result type: byte[]
+    public static native byte[] btcTxSign(String from, String to, String value);
+
+    // BTC api_02
+    // sign transaction and broadcast
+    // result type: boolean
+    public static native boolean btcTxSignAndBroadcast(String from, String to, String value);
+
+    // BTC api_03
+    // load BTC balance
+    // result type: String
+    public static native String btcLoadBalance(String address);
+
+    // BTC api_04
+    // max_block_number
+    // result type: String
+    public static native String btcLoadMaxBlockNumber();
+
+    // BTC api_05
+    // now_block_number
+    // result type: String
+    public static native String btcLoadNowBlockNumber();
+
+    // BTC api_06
+    // is sync data ok
+    // result type: boolean
+    public static native boolean btcIsSyncDataOk();
+
+    // BTC api_07
+    // transaction history
+    // param: startIndex：the start index of history list,   offset：the number of wanted tx history
+    // result type:        todo
+    public static native boolean btcLoadTxHistory(String address, int startIndex, String offset);
+
 
     //Broadcast transaction, distinguish the chain type
     //Return: broadcast success 1, broadcast failure 0
