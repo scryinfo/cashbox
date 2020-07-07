@@ -323,7 +323,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       return "";
     }
     try {
-      var result = await request(authUrl);
+      var result = await requestWithDeviceId(authUrl);
       if (result["code"] != null && result["code"] == 0) {
         print("loadServerDigitsData result.code=>" + convert.jsonEncode(result["data"]));
         //return convert.jsonEncode(result["data"]).toString();
@@ -333,7 +333,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       }
     } catch (e) {
       print("loadServerDigitsData error is ===>" + e.toString());
-      return null;
+      return "";
     }
     return "";
   }
@@ -355,10 +355,12 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     } else {
       targetLength = allDigitsList.length - displayDigitsList.length;
     }
+    List<Digit> tempList = new List();
     for (int i = 0; i < targetLength; i++) {
       var index = i;
-      displayDigitsList.add(allDigitsList[displayDigitsList.length + index]);
+      tempList.add(allDigitsList[displayDigitsList.length + index]);
     }
+    this.displayDigitsList.addAll(tempList);
     setState(() {
       this.displayDigitsList = displayDigitsList;
     });
@@ -377,8 +379,10 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         bool isExistErc20 = false;
         for (num index = 0; index < allDigitsList.length; index++) {
           var digit = allDigitsList[index];
-          if ((digit.contractAddress != null) && (element.contractAddress != null) && (digit.contractAddress == element.contractAddress)) {
-            print("digit.contractAddress=>" + digit.contractAddress + "||element.contractAddress===>" + element.contractAddress);
+          print("digit.contractAddress=>" + digit.contractAddress + "|| element.contractAddress===>" + element.contractAddress);
+          if ((digit.contractAddress != null) &&
+              (element.contractAddress != null) &&
+              (digit.contractAddress.trim().toLowerCase() == element.contractAddress.trim().toLowerCase())) {
             isExistErc20 = true;
             break;
           }
@@ -426,6 +430,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       print("认证列表的代币，加载完了 下标===》" + nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;
     }
+    print("认证列表的代币，tempDigitsList===》" + tempDigitsList.toString());
     return tempDigitsList;
   }
 }
