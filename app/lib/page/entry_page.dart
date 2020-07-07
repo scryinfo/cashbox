@@ -36,13 +36,13 @@ class _EntryPageState extends State<EntryPage> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    await initWalletBasicData(); //case: After deleting the wallet, there is no wallet, return to entryPage, check every time
+    await initAppConfigInfo(); //case: After deleting the wallet, there is no wallet, return to entryPage, check every time
     var spUtil = await SharedPreferenceUtil.instance;
     languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
     future = _checkIsContainWallet();
   }
 
-  void initWalletBasicData() async {
+  initAppConfigInfo() async {
     languagesKeyList = [];
     languagesKeyList = GlobalConfig.globalLanguageMap.keys.toList();
     languageMap = {};
@@ -52,7 +52,7 @@ class _EntryPageState extends State<EntryPage> {
         2. Database information, etc.
         3. Application language type (Chinese and English)
         */
-    await Wallets.instance.initWalletBasicData();
+    await Wallets.instance.initAppConfig();
   }
 
   //Check if a wallet has been created

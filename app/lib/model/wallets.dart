@@ -33,12 +33,20 @@ class Wallets {
     return _instance;
   }
 
-  initWalletBasicData() async {
+  initAppConfig() async {
+    initIpConfig(); //init IP config info to local file
+    initWalletBasicData(); //init wallet Database Info
+  }
+
+  initIpConfig() async {
     var spUtil = await SharedPreferenceUtil.instance;
     var isFinishInit = spUtil.getBool(GlobalConfig.isInitAppConfig);
     if (isFinishInit == null || !isFinishInit) {
       SharedPreferenceUtil.initVersion(); //Initialize interface ip, version information, etc. to local file
     }
+  }
+
+  initWalletBasicData() async {
     WalletManager.initWalletBasicData(); //Initialize some database data
   }
 
@@ -418,7 +426,8 @@ class Wallets {
           ethDigit.decimal = decimal;
           ethDigit.contractAddress = contract;
           ethDigit.digitId = digitId;
-          ethDigit.isVisible = false; //Loaded from the token list, set the invisible first, and compare it with the local chain before determining whether it is visible
+          ethDigit.isVisible =
+              false; //Loaded from the token list, set the invisible first, and compare it with the local chain before determining whether it is visible
           resultAuthDigitList.add(ethDigit);
           break;
         case ChainType.BTC:
