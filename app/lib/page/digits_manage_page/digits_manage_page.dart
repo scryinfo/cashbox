@@ -110,9 +110,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         pushToDisplayDigitList();
       }
     }
-    setState(() {
-      this.displayDigitsList = displayDigitsList;
-    });
   }
 
   @override

@@ -21,12 +21,10 @@ abstract class Chain {
       return _visibleDigitsList;
     }
     _visibleDigitsList = [];
-    var tempList = this.digitsList.map((e) => e).toList();
-    tempList.retainWhere((element) {
+    digitsList.forEach((element) {
       if (element.isVisible) {
         _visibleDigitsList.add(element);
       }
-      return element.isVisible;
     });
     return _visibleDigitsList;
   }
@@ -131,6 +129,13 @@ abstract class Chain {
     bool isHideDigit = hideDigitMap["isHideDigit"];
     if (status == 200) {
       if (isHideDigit == true) {
+        for (int i = 0; i < digitsList.length; i++) {
+          var element = digitsList[i];
+          if (element.digitId == digit.digitId) {
+            digitsList[i].isVisible = false;
+            break;
+          }
+        }
         digit.isVisible = false;
         return isHideDigit; //execution succeed
       }
