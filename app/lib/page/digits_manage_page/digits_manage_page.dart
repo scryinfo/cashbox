@@ -167,7 +167,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
 
   Widget _digitListAreaWidgets() {
     return Container(
-      height: ScreenUtil().setHeight(78),
+      height: ScreenUtil().setHeight(138),
       width: ScreenUtil().setWidth(90),
       child: Container(
         padding: EdgeInsets.only(left: ScreenUtil().setWidth(3), right: ScreenUtil().setWidth(3)),
@@ -326,10 +326,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       var result = await requestWithDeviceId(authUrl);
       if (result["code"] != null && result["code"] == 0) {
         print("loadServerDigitsData result.code=>" + convert.jsonEncode(result["data"]));
-        //return convert.jsonEncode(result["data"]).toString();
-        //TODO test
-        return '[{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
-        //return "";
+        return convert.jsonEncode(result["data"]).toString();
       }
     } catch (e) {
       print("loadServerDigitsData error is ===>" + e.toString());
@@ -379,7 +376,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         bool isExistErc20 = false;
         for (num index = 0; index < allDigitsList.length; index++) {
           var digit = allDigitsList[index];
-          print("digit.contractAddress=>" + digit.contractAddress + "|| element.contractAddress===>" + element.contractAddress);
           if ((digit.contractAddress != null) &&
               (element.contractAddress != null) &&
               (digit.contractAddress.trim().toLowerCase() == element.contractAddress.trim().toLowerCase())) {
@@ -396,7 +392,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         for (num index = 0; index < allDigitsList.length; index++) {
           var digit = allDigitsList[index];
           if ((digit.shortName != null) && (element.shortName != null) && (digit.shortName == element.shortName)) {
-            print("digit.shortName=>" + digit.shortName + "||element.shortName===>" + element.shortName);
+            //print("digit.shortName=>" + digit.shortName + "||element.shortName===>" + element.shortName);
             isExistDigit = true;
             break;
           }
@@ -409,7 +405,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     }
   }
 
-  Future<List<Digit>> getAuthDigitList(Chain chain, int nativeDigitIndex, int onePageOffSet) async {
+  Future<List<Digit>> getAuthDigitList(Chain chain, int tempDigitIndex, int onePageOffSet) async {
     Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
     if (nativeAuthMap == null) {
       print("加载本地认证列表失败===》");
@@ -418,16 +414,16 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     maxAuthTokenCount = nativeAuthMap["count"];
     List<Digit> tempDigitsList = nativeAuthMap["authDigit"];
     if (tempDigitsList == null || tempDigitsList.length == 0) {
-      print("认证列表的代币，加载完了 下标===》" + nativeDigitIndex.toString());
+      print("认证列表的代币，加载完了 下标===》" + this.nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;
       return [];
     }
     if (onePageOffSet == tempDigitsList.length) {
-      nativeDigitIndex = nativeDigitIndex + onePageOffSet;
+      this.nativeDigitIndex = tempDigitIndex + onePageOffSet;
       print("还有未加载完的认证代币，分页是下标是：===》" + nativeDigitIndex.toString());
     } else {
-      nativeDigitIndex = nativeDigitIndex + tempDigitsList.length;
-      print("认证列表的代币，加载完了 下标===》" + nativeDigitIndex.toString());
+      this.nativeDigitIndex = tempDigitIndex + tempDigitsList.length;
+      print("认证列表的代币，加载完了 下标===》" + this.nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;
     }
     print("认证列表的代币，tempDigitsList===》" + tempDigitsList.toString());
