@@ -177,9 +177,34 @@ class Wallets {
         walletM.chainList.add(chainEthM);
       }
       //todo BTC chain information has not been added
-      {
+      /*{
         //BTC
-      }
+        ChainBTC chainBtcM = ChainBTC();
+        var btcChain = jniList[walletIndex]["btcChain"];
+        chainBtcM
+          ..chainId = btcChain["chainId"]
+          ..chainAddress = btcChain["chainAddress"]
+          ..chainType = Chain.intToChainType(btcChain["chainType"])
+          ..isVisible = true
+          ..walletId = jniList[walletIndex]["walletId"];
+        List btcChainDigitList = btcChain["btcChainDigitList"];
+        for (int j = 0; j < btcChainDigitList.length; j++) {
+          Map digitInfoMap = btcChainDigitList[j];
+          Digit digitM = BtcDigit();
+          digitM
+            ..digitId = digitInfoMap["digitId"]
+            ..chainId = digitInfoMap["chainId"]
+            ..address = digitInfoMap["address"]
+            ..shortName = digitInfoMap["shortName"]
+            ..fullName = digitInfoMap["fullName"]
+            ..balance = digitInfoMap["balance"]
+            ..isVisible = digitInfoMap["isVisible"]
+            ..decimal = digitInfoMap["decimal"]
+            ..urlImg = digitInfoMap["urlImg"];
+          chainBtcM.digitsList.add(digitM);
+        }
+        walletM.chainList.add(chainBtcM);
+      }*/
       if (walletM.isNowWallet) {
         this.nowWallet = walletM;
         this.nowWallet.nowChain = this.nowWallet.getChainByChainId(this.nowWallet.nowChainId);

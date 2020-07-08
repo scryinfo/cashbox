@@ -146,15 +146,7 @@ abstract class Chain {
 
 class ChainETH extends Chain {}
 
-class ChainBTC extends Chain {
-  ChainBTC(chainId, walletId) {
-    this.chainId = chainId;
-    this.walletId = walletId;
-  }
-
-  @override
-  ChainType get chainType => ChainType.BTC;
-}
+class ChainBTC extends Chain {}
 
 class ChainEEE extends Chain {
   Future<Map<dynamic, dynamic>> eeeEnergyTransfer(String from, Uint8List pwd, String to, String value, String extendMsg) async {
