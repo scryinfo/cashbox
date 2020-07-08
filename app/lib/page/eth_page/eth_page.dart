@@ -289,11 +289,10 @@ class _EthPageState extends State<EthPage> {
                 _buildDigitListCard(), //Token list
               ],
             ),
-            /* todo 1.0 does not set to increase the token entrance
             Positioned(
               bottom: ScreenUtil.instance.setHeight(5),
               child: _buildAddDigitButton(),
-            )*/
+            )
           ],
         ),
       ),

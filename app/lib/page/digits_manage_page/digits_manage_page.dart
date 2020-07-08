@@ -49,7 +49,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     allNativeDigitList.sort((left, right) {
       if (left.isVisible ^ right.isVisible) {
         //类型不同，结果为 1
-        return left.isVisible ? 1 : -1;
+        return left.isVisible ? -1 : 1;
       }
       return 0;
     });
