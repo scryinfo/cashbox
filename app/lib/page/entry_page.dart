@@ -1,4 +1,6 @@
 import 'package:app/global_config/global_config.dart';
+import 'package:app/global_config/vendor_config.dart';
+import 'package:app/net/net_util.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -22,9 +24,9 @@ class EntryPage extends StatefulWidget {
 class _EntryPageState extends State<EntryPage> {
   var allWalletList = List();
   bool _agreeServiceProtocol = true;
-  bool isContainWallet = false;
+  bool _isContainWallet = false;
   Future future;
-  String languageTextValue = "";
+  String _languageTextValue = "";
   List<String> languagesKeyList = [];
   Map<String, String> languageMap = {};
 
@@ -38,8 +40,9 @@ class _EntryPageState extends State<EntryPage> {
     super.didChangeDependencies();
     await initAppConfigInfo(); //case: After deleting the wallet, there is no wallet, return to entryPage, check every time
     var spUtil = await SharedPreferenceUtil.instance;
-    languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
+    _languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
     future = _checkIsContainWallet();
+    //_checkUpdateAppConfig();
   }
 
   initAppConfigInfo() async {
@@ -55,10 +58,21 @@ class _EntryPageState extends State<EntryPage> {
     await Wallets.instance.initAppConfig();
   }
 
+  _checkUpdateAppConfig() async {
+    try {
+      var result = await requestWithDeviceId(VendorConfig.appServerConfigKey);
+      print("_checkServerAppConfig result.code=>" + result.toString());
+      // todo 举例：检查默认代币列表，更新默认代币列表，后续创建钱包是后，会默认创建
+      // 保存各个配置接口的最新地址，到本地。
+    } catch (e) {
+      print("_checkServerAppConfig error is ===>" + e.toString());
+    }
+  }
+
   //Check if a wallet has been created
   Future<bool> _checkIsContainWallet() async {
-    isContainWallet = await Wallets.instance.isContainWallet();
-    return isContainWallet;
+    _isContainWallet = await Wallets.instance.isContainWallet();
+    return _isContainWallet;
   }
 
   @override
@@ -135,7 +149,7 @@ class _EntryPageState extends State<EntryPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           Text(
-            languageTextValue ?? "",
+            this._languageTextValue ?? "",
             style: TextStyle(color: Colors.lightBlue),
           ),
           PopupMenuButton<String>(
@@ -144,7 +158,7 @@ class _EntryPageState extends State<EntryPage> {
             itemBuilder: (BuildContext context) => _makePopMenuList(),
             onSelected: (String value) async {
               setState(() {
-                this.languageTextValue = languageMap[value];
+                this._languageTextValue = languageMap[value];
               });
               print("changeLocale===>" + value);
               {

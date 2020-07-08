@@ -202,12 +202,33 @@ public class WalletManagerPlugin implements MethodCallHandler {
 
                     /*-------------------------组装BTC链上数据 start-------------------------*/
                     List<Map<String, Object>> resultBtcChain = new ArrayList<>();
+                    /*resultBtcChain.put("chainAddress", walletList.get(walletIndex).btcChain.address);
+                    resultBtcChain.put("chainId", walletList.get(walletIndex).btcChain.chainId);
+                    resultBtcChain.put("chainType", walletList.get(walletIndex).btcChain.chainType);
+                    resultBtcChain.put("isVisible", walletList.get(walletIndex).btcChain.isVisible);
+                    resultBtcChain.put("status", walletList.get(walletIndex).btcChain.status);
+                    resultBtcChain.put("walletId", walletList.get(walletIndex).btcChain.walletId);*/
                     if (walletList.get(walletIndex).btcChain != null) {
                         List<BtcDigit> btcDigitList =
                                 walletList.get(walletIndex).btcChain.digitList;
+                        /*List<Map<String, Object>> btcChainDigitList = new ArrayList<>();
                         for (int j = 0; j < btcDigitList.size(); j++) {
-                            //todo
+                            int digitIndex = j;
+                            Map<String, Object> digitMap = new HashMap<String, Object>();
+                            digitMap.put("status", btcDigitList.get(digitIndex).status);
+                            digitMap.put("digitId", btcDigitList.get(digitIndex).digitId);
+                            digitMap.put("chainId", btcDigitList.get(digitIndex).chainId);
+                            digitMap.put("shortName", btcDigitList.get(digitIndex).shortName);
+                            digitMap.put("fullName", btcDigitList.get(digitIndex).fullName);
+                            digitMap.put("balance", btcDigitList.get(digitIndex).balance);
+                            digitMap.put("isVisible", btcDigitList.get(digitIndex).isVisible);
+                            digitMap.put("decimal", btcDigitList.get(digitIndex).decimal);
+                            digitMap.put("imgUrl", btcDigitList.get(digitIndex).imgUrl);
+                            btcChainDigitList.add(digitMap);
                         }
+                        ScryWalletLog.d("nativeLib=>",
+                                "Btc链 btcChainDigitList.toString() ===>" + btcChainDigitList.toString());
+                        resultEthChain.put("btcChainDigitList", btcChainDigitList);*/
                     }
                     /*-------------------------组装BTC链上数据 end -------------------------*/
 
