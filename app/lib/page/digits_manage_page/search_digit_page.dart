@@ -249,6 +249,9 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
   _searchDigit(String param) async {
     // todo execute lookup interface
     Map queryMap = await Wallets.instance.queryDigit(Wallets.instance.nowWallet.nowChain, param);
+    if (queryMap == null) {
+      return;
+    }
     var status = queryMap["status"];
     if (status != null && status == 200) {
       print("_searchDigit  status===>" + queryMap["status"].toString());

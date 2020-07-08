@@ -485,6 +485,7 @@ class Wallets {
     }
     int status = updateMap["status"];
     print("queryDigit status==>" + status.toString());
+    resultMap["status"] = status;
     if (status == null || status != 200) {
       LogUtil.e("queryDigit=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
 

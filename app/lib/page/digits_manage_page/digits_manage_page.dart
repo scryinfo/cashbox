@@ -66,11 +66,17 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         //There is no certified token version number locally and it has not been loaded
         if (serverDigitsIp != null && serverDigitsIp != "") {
           var param = await loadServerDigitsData(serverDigitsIp);
+          if (param == null || param.trim() == "") {
+            return;
+          }
           await updateNativeAuthDigitList(param); //Save tokens: server trusted token list ip
           spUtil.setString(VendorConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number Version
         } else {
           if (localDigitListIP != null && localDigitListIP.isNotEmpty) {
             var param = await loadServerDigitsData(localDigitListIP);
+            if (param == null || param.trim() == "") {
+              return;
+            }
             await updateNativeAuthDigitList(param); //Save tokens: local initial recorded token list ip
           }
         }
@@ -82,6 +88,9 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             if (serverDigitsIp != null && serverDigitsIp != "") {
               //There is a server token IP address
               var param = await loadServerDigitsData(serverDigitsIp);
+              if (param == null || param.trim() == "") {
+                return;
+              }
               await updateNativeAuthDigitList(param); //Save tokens: server trusted token list ip
               spUtil.setString(VendorConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number
             }
@@ -90,20 +99,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           LogUtil.e("DigitsManagePage error is=>", e);
         }
       }
-      /*{
-        //todo 1.0 write dead, preset token
-        var digitParam =
-            '[{"contractAddress":"0x9F5F3CFD7a32700C93F971637407ff17b91c7342","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"}]';
-        await updateNativeAuthDigitList(digitParam);
-        var addDigitMap = await Wallets.instance.addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, "3");
-        int status = addDigitMap["status"];
-        if (status == null || status != 200) {
-          Fluttertoast.showToast(msg: "Execution status save, something went wrong, please try again");
-          print("addDigitToChainModel failure==" + addDigitMap["message"]);
-        } else {
-          print("addDigitToChainModel successful==");
-        }
-      }*/
       if (displayDigitsList.length < onePageOffSet) {
         var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
         addToAllDigitsList(tempNativeAuthDigitsList);
@@ -123,7 +118,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           appBar: AppBar(
             leading: GestureDetector(
                 onTap: () {
-                  NavigatorUtils.goBack(context);
+                  NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true);
                 },
                 child: Image.asset("assets/images/ic_back.png")),
             backgroundColor: Colors.transparent,
@@ -160,7 +155,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         ),
       ),
       onWillPop: () {
-        NavigatorUtils.goBack(context);
+        NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true);
+        return Future(() => false);
       },
     );
   }

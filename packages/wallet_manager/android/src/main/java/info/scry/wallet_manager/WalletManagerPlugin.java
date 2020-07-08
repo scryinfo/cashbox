@@ -856,6 +856,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     List<EthToken> authDigitList = authList.ethTokens;
                     if (authDigitList.isEmpty() || authDigitList.size() == 0) {
                         result.success(resultMap); ///empty wallet
+                        return;
                     }
                     resultMap.put("count", authList.count);
                     resultMap.put("startItem", authList.startItem);
