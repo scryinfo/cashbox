@@ -1,9 +1,11 @@
-import 'package:app/generated/i18n.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
+import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +15,8 @@ import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class SearchDigitPage extends StatefulWidget {
   @override
@@ -24,6 +28,8 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
   Wallet nowWalletM;
   Chain nowChain;
   TextEditingController _searchContentController = TextEditingController();
+  Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
+  Widget addWidget = Image.asset("assets/images/ic_plus.png");
 
   @override
   void initState() {
@@ -33,30 +39,36 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: ScreenUtil().setWidth(90),
-      height: ScreenUtil().setHeight(120),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-            title: buildSearchInputWidget(),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            brightness: Brightness.light,
-            actions: <Widget>[
-              buildCancelWidget(),
-            ]),
-        body: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
-            ),
-            child: Column(
-              children: <Widget>[
-                Gaps.scaleVGap(5),
-                buildDigitListAreaWidgets(),
-              ],
-            )),
+    return WillPopScope(
+      child: Container(
+        width: ScreenUtil().setWidth(90),
+        height: ScreenUtil().setHeight(120),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+              title: buildSearchInputWidget(),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              brightness: Brightness.light,
+              actions: <Widget>[
+                buildCancelWidget(),
+              ]),
+          body: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+              ),
+              child: Column(
+                children: <Widget>[
+                  Gaps.scaleVGap(5),
+                  buildDigitListAreaWidgets(),
+                ],
+              )),
+        ),
       ),
+      onWillPop: () {
+        NavigatorUtils.push(context, '${Routes.digitManagePage}?isReloadDigitList=true', clearStack: false);
+        return Future(() => false);
+      },
     );
   }
 
@@ -121,7 +133,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
             onPressed: () {
               _searchDigit(_searchContentController.text);
             }),
-        hintText: "请输入代币名称或合约地址",
+        hintText: translate("input_ca_or_name"),
         hintStyle: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
       ),
       onSubmitted: (value) {
@@ -187,49 +199,93 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
             right: ScreenUtil().setWidth(3),
           ),
           child: GestureDetector(
-            onTap: () async {
-              try {
-                // todo save or change the display state interface function to be verified
-                var addDigitMap = await Wallets.instance
-                    .addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
-                int status = addDigitMap["status"];
-                if (status != null && status == 200) {
-                  setState(() {
-                    displayDigitsList[index].isVisible = true;
-                  });
-                } else {
-                  print("addDigitToChainModel appear error:" + addDigitMap["message"]);
-                  return;
+              onTap: () async {
+                try {
+                  var isExecutorSuccess = false;
+                  if (displayDigitsList[index].isVisible) {
+                    // router to eth tx history
+                    {
+                      Provider.of<TransactionProvide>(context)
+                        ..setDigitName(displayDigitsList[index].shortName)
+                        ..setBalance(displayDigitsList[index].balance)
+                        ..setMoney(displayDigitsList[index].money)
+                        ..setDecimal(displayDigitsList[index].decimal)
+                        ..setFromAddress(Wallets.instance.nowWallet.nowChain.chainAddress)
+                        ..setChainType(Wallets.instance.nowWallet.nowChain.chainType)
+                        ..setContractAddress(displayDigitsList[index].contractAddress);
+                    }
+                    NavigatorUtils.push(context, Routes.transactionHistoryPage);
+                    return;
+                  } else {
+                    bool isDigitExist = false;
+                    var tempDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
+                    for (int i = 0; i < tempDigitList.length; i++) {
+                      var element = tempDigitList[i];
+                      if (element.digitId == displayDigitsList[index].digitId) {
+                        isDigitExist = true;
+                        break;
+                      }
+                    }
+                    if (isDigitExist) {
+                      isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
+                    } else {
+                      // Save to digit under the local Chain (bottom + model)
+                      var addDigitMap = await Wallets.instance.addDigitToChainModel(
+                          Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
+                      int status = addDigitMap["status"];
+                      if (status == null || status != 200) {
+                        Fluttertoast.showToast(msg: translate('save_digit_model_failure').toString());
+                        print("addDigitToChainModel failure==" + addDigitMap["message"]);
+                      } else {
+                        isExecutorSuccess = true;
+                      }
+                      isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
+                    }
+                  }
+                  if (isExecutorSuccess) {
+                    setState(() {
+                      displayDigitsList[index].isVisible = displayDigitsList[index].isVisible;
+                    });
+                  } else {
+                    Fluttertoast.showToast(msg: translate('save_digit_model_failure').toString());
+                  }
+                } catch (e) {
+                  print("digit_list_page error is===>" + e.toString());
+                  LogUtil.e("digit_list_page", e.toString());
                 }
-              } catch (e) {
-                print("digit_list_page点击传值出现位置错误===>" + e.toString());
-                LogUtil.e("digit_list_page", e.toString());
-              }
-            },
-            child: Row(
-              children: <Widget>[
-                Container(
-                  child: Image.asset("assets/images/ic_eth.png"),
-                ),
-                Container(
-                  color: Colors.transparent,
-                  padding: EdgeInsets.only(
-                    top: ScreenUtil().setHeight(3),
-                    left: ScreenUtil().setHeight(3),
-                  ),
-                  width: ScreenUtil().setWidth(30),
-                  height: ScreenUtil().setHeight(10),
-                  child: Text(
-                    displayDigitsList[index].shortName ?? "",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil.instance.setSp(3.5),
+              },
+              child: Container(
+                width: ScreenUtil().setWidth(80),
+                color: Colors.transparent,
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: ScreenUtil().setWidth(10),
+                      height: ScreenUtil().setWidth(10),
+                      child: displayDigitsList[index].isVisible ? checkedWidget : addWidget,
                     ),
-                  ),
+                    Container(
+                      child: Image.asset("assets/images/ic_eth.png"),
+                    ),
+                    Container(
+                      color: Colors.transparent,
+                      padding: EdgeInsets.only(
+                        top: ScreenUtil().setHeight(3),
+                        left: ScreenUtil().setHeight(3),
+                      ),
+                      width: ScreenUtil().setWidth(30),
+                      height: ScreenUtil().setHeight(10),
+                      child: Text(
+                        displayDigitsList[index].shortName ?? "",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil.instance.setSp(3.5),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              )),
         ),
         Container(
           alignment: Alignment.topLeft,
@@ -248,24 +304,37 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
 
   _searchDigit(String param) async {
     // todo execute lookup interface
+    List<Digit> tempList = [];
+    Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
+      if (element.shortName.toLowerCase() == param.toLowerCase() ||
+          element.fullName.toLowerCase() == param.toLowerCase() ||
+          element.contractAddress.toLowerCase() == param.toLowerCase()) {
+        tempList.add(element);
+      }
+    });
+    if (tempList.length > 0) {
+      setState(() {
+        this.displayDigitsList = tempList;
+      });
+      return;
+    }
+
     Map queryMap = await Wallets.instance.queryDigit(Wallets.instance.nowWallet.nowChain, param);
     if (queryMap == null) {
       return;
     }
     var status = queryMap["status"];
     if (status != null && status == 200) {
-      print("_searchDigit  status===>" + queryMap["status"].toString());
-      print("_searchDigit  count===>" + queryMap["count"].toString());
-      List tempList = queryMap["authDigit"];
+      List<Digit> tempList = List.from(queryMap["authDigit"]);
       if (tempList != null && tempList.length > 0) {
         setState(() {
           this.displayDigitsList = tempList;
         });
       } else {
-        print("搜索结果为空===>");
+        print("search result is empty===>");
       }
     } else {
-      print("搜索出现问题了===>" + status.toString());
+      print("search appear some error===>" + status.toString());
     }
   }
 }

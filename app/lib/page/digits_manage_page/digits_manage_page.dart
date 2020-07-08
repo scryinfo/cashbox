@@ -22,6 +22,10 @@ import 'dart:convert' as convert;
 import 'package:provider/provider.dart';
 
 class DigitsManagePage extends StatefulWidget {
+  const DigitsManagePage({Key key, this.isReloadDigitList}) : super(key: key);
+
+  final bool isReloadDigitList; //Whether to force reload of wallet digitList
+
   @override
   _DigitsManagePageState createState() => _DigitsManagePageState();
 }
@@ -45,16 +49,20 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   initData() async {
-    var allNativeDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
-    allNativeDigitList.sort((left, right) {
-      if (left.isVisible ^ right.isVisible) {
-        //类型不同，结果为 1
-        return left.isVisible ? -1 : 1;
-      }
-      return 0;
-    });
-    addToAllDigitsList(allNativeDigitList);
-    pushToDisplayDigitList();
+    bool isReloadDigitList = widget.isReloadDigitList;
+    if (isReloadDigitList == null) isReloadDigitList = true;
+    if (isReloadDigitList) {
+      var allNativeDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
+      allNativeDigitList.sort((left, right) {
+        if (left.isVisible ^ right.isVisible) {
+          //different state of  visible
+          return left.isVisible ? -1 : 1;
+        }
+        return 0;
+      });
+      addToAllDigitsList(allNativeDigitList);
+      pushToDisplayDigitList();
+    }
     {
       var spUtil = await SharedPreferenceUtil.instance;
       var localDigitsVersion = spUtil.getString(VendorConfig.authDigitsVersionKey);
@@ -241,13 +249,12 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   if (isDigitExist) {
                     isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
                   } else {
-                    // todo save or change the display state interface function to be verified
                     // Save to digit under the local Chain (bottom + model)
                     var addDigitMap = await Wallets.instance.addDigitToChainModel(
                         Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
                     int status = addDigitMap["status"];
                     if (status == null || status != 200) {
-                      Fluttertoast.showToast(msg: "执行状态保存，出问题了,请退出重新尝试");
+                      Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
                       print("addDigitToChainModel failure==" + addDigitMap["message"]);
                     } else {
                       isExecutorSuccess = true;
@@ -260,7 +267,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                     displayDigitsList[index].isVisible = displayDigitsList[index].isVisible;
                   });
                 } else {
-                  Fluttertoast.showToast(msg: "执行状态保存，出问题了");
+                  Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
                 }
               },
               child: Container(
@@ -404,25 +411,25 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   Future<List<Digit>> getAuthDigitList(Chain chain, int tempDigitIndex, int onePageOffSet) async {
     Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
     if (nativeAuthMap == null) {
-      print("加载本地认证列表失败===》");
+      print("getAuthDigitList() native digit list failure===》");
       return [];
     }
     maxAuthTokenCount = nativeAuthMap["count"];
     List<Digit> tempDigitsList = nativeAuthMap["authDigit"];
     if (tempDigitsList == null || tempDigitsList.length == 0) {
-      print("认证列表的代币，加载完了 下标===》" + this.nativeDigitIndex.toString());
+      print("getAuthDigitList() is empty, nativeDigitIndex===》" + this.nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;
       return [];
     }
     if (onePageOffSet == tempDigitsList.length) {
       this.nativeDigitIndex = tempDigitIndex + onePageOffSet;
-      print("还有未加载完的认证代币，分页是下标是：===》" + nativeDigitIndex.toString());
+      print("getAuthDigitList() continue, nativeDigitIndex===》" + this.nativeDigitIndex.toString());
     } else {
       this.nativeDigitIndex = tempDigitIndex + tempDigitsList.length;
-      print("认证列表的代币，加载完了 下标===》" + this.nativeDigitIndex.toString());
+      print("getAuthDigitList() finish, nativeDigitIndex===》" + this.nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;
     }
-    print("认证列表的代币，tempDigitsList===》" + tempDigitsList.toString());
+    print("getAuthDigitList() result，tempDigitsList===》" + tempDigitsList.toString());
     return tempDigitsList;
   }
 }

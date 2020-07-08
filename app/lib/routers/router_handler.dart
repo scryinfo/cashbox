@@ -59,7 +59,6 @@ Handler dappPageHandler = Handler(handlerFunc: (BuildContext context, Map<String
   return DappPage();
 });
 
-
 Handler createWalletPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return CreateWalletNamePage();
 });
@@ -69,7 +68,13 @@ Handler digitListPageHandler = Handler(handlerFunc: (BuildContext context, Map<S
 });
 
 Handler digitManageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return DigitsManagePage();
+  bool isReloadDigitList = false;
+  if (params['isReloadDigitList'] == null || params['isReloadDigitList'].first == null) {
+    isReloadDigitList = false;
+  } else {
+    isReloadDigitList = params['isReloadDigitList'].first == 'true';
+  }
+  return DigitsManagePage(isReloadDigitList: isReloadDigitList);
 });
 
 Handler searchDigitPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

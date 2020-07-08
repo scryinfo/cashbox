@@ -320,7 +320,7 @@ class _EthPageState extends State<EthPage> {
                 ),
               ),
               onPressed: () {
-                NavigatorUtils.push(context, Routes.digitManagePage);
+                NavigatorUtils.push(context, '${Routes.digitManagePage}?isReloadDigitList=true', clearStack: false);
               },
             ),
           )
