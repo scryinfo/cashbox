@@ -429,7 +429,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
         Uint8List.fromList(_mnemonicController.text.codeUnits), WalletType.TEST_WALLET);
     if (isSuccess) {
       Fluttertoast.showToast(msg: translate('success_create_test_wallet'));
-      NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
+      NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true);
     } else {
       Fluttertoast.showToast(msg: translate('failure_create_test_wallet'));
     }

@@ -67,6 +67,7 @@ class _EthPageState extends State<EthPage> {
 
     bool isForceLoadFromJni = widget.isForceLoadFromJni;
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;
+    this.walletList = [];
     this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: isForceLoadFromJni);
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
