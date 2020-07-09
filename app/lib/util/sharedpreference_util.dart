@@ -18,16 +18,23 @@ class SharedPreferenceUtil {
     var spUtil = await SharedPreferenceUtil.instance;
     {
       //Configure application version upgrade information
-      spUtil.setString(VendorConfig.cashboxDownloadIpKey, VendorConfig.cashboxDownloadIpDefaultValue);
+      spUtil.setString(VendorConfig.downloadLatestVersionIpKey, VendorConfig.downloadLatestVersionIpValue);
     }
     {
       //Configure token corresponding fiat currency information, trusted token list address, and default token address
       /// You can add or delete the initial configuration here according to your needs.
       spUtil.setString(VendorConfig.rateDigitIpKey, VendorConfig.rateDigitIpDefaultValue);
+      spUtil.setString(VendorConfig.authDigitsVersionKey, VendorConfig.authDigitsVersionValue);
       spUtil.setString(VendorConfig.authDigitsIpKey, VendorConfig.authDigitsIpDefaultValue);
-      spUtil.setString(VendorConfig.defaultDigitsKey, VendorConfig.defaultDigitsDefaultValue);
+      spUtil.setString(VendorConfig.defaultDigitsVersionKey, VendorConfig.defaultDigitsVersionValue);
+      spUtil.setString(VendorConfig.defaultDigitsIpKey, VendorConfig.defaultDigitsIpDefaultValue);
+      spUtil.setString(VendorConfig.defaultDigitsContentKey, VendorConfig.defaultDigitsContentDefaultValue);
       spUtil.setString(VendorConfig.scryXIpKey, VendorConfig.scryXIpDefaultValue);
       spUtil.setString(VendorConfig.publicIpKey, VendorConfig.publicIpDefaultValue);
+      spUtil.setString(VendorConfig.appServerConfigKey, VendorConfig.appServerConfigValue);
+      spUtil.setString(VendorConfig.appServerConfigVersionKey, VendorConfig.appServerConfigVersionValue);
+      spUtil.setString(VendorConfig.lastTimeCheckConfigKey, VendorConfig.lastTimeCheckConfigValue);
+      spUtil.setBool(VendorConfig.initDatabaseStateKey, false);
     }
     {
       //The selected fiat currency is: (usd cny jpy)

@@ -1,4 +1,5 @@
 import 'package:app/global_config/global_config.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
@@ -47,7 +48,22 @@ class Wallets {
   }
 
   initWalletBasicData() async {
-    WalletManager.initWalletBasicData(); //Initialize some database data
+    var spUtil = await SharedPreferenceUtil.instance;
+    var state = spUtil.getBool(VendorConfig.initDatabaseStateKey);
+    if (state != null && state) {
+      // database init have already finished
+      print("initWalletBasicData(), ===> finished");
+      return;
+    }
+    Map resultMap = await WalletManager.initWalletBasicData(); //Initialize some database data
+    int status = resultMap["status"];
+    if (status == null) {
+      LogUtil.e("initWalletBasicData error=>", "not find status code");
+      return;
+    }
+    if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
+      spUtil.setBool(VendorConfig.initDatabaseStateKey, resultMap["isInitWalletBasicData"]);
+    }
   }
 
   // Create mnemonic words, to be verified correctly, the wallet is created by the bottom layer, and the application layer is saved

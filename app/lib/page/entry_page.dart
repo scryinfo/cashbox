@@ -42,7 +42,7 @@ class _EntryPageState extends State<EntryPage> {
     var spUtil = await SharedPreferenceUtil.instance;
     _languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
     future = _checkIsContainWallet();
-    //_checkUpdateAppConfig();
+    //_checkAndUpdateAppConfig();
   }
 
   initAppConfigInfo() async {
@@ -58,14 +58,20 @@ class _EntryPageState extends State<EntryPage> {
     await Wallets.instance.initAppConfig();
   }
 
-  _checkUpdateAppConfig() async {
+  _checkAndUpdateAppConfig() async {
+    var spUtil = await SharedPreferenceUtil.instance;
+    String lastCheckTime = spUtil.getString(VendorConfig.lastTimeCheckConfigKey);
+    int nowTimeStamp = DateTime.now().millisecondsSinceEpoch;
     try {
-      var result = await requestWithDeviceId(VendorConfig.appServerConfigKey);
-      print("_checkServerAppConfig result.code=>" + result.toString());
-      // todo 举例：检查默认代币列表，更新默认代币列表，后续创建钱包是后，会默认创建
-      // 保存各个配置接口的最新地址，到本地。
+      if (lastCheckTime != null && ((nowTimeStamp - int.parse(lastCheckTime)) - 60 * 10 > 0)) {
+        String serverConfigIp = spUtil.getString(VendorConfig.appServerConfigKey) ?? VendorConfig.appServerConfigValue;
+        var result = await requestWithDeviceId(serverConfigIp);
+        print("_checkServerAppConfig result.code=>" + result.toString());
+        // todo 举例：检查默认代币列表，更新默认代币列表，后续创建钱包是后，会默认创建
+        // 保存各个配置接口的最新地址，到本地。
+      }
     } catch (e) {
-      print("_checkServerAppConfig error is ===>" + e.toString());
+      print("_checkServerAppConfig(), error is ===>" + e.toString());
     }
   }
 

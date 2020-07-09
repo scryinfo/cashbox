@@ -102,6 +102,11 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               await updateNativeAuthDigitList(param); //Save tokens: server trusted token list ip
               spUtil.setString(VendorConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number
             }
+          } else {
+            if (localDigitListIP != null && localDigitListIP.trim() != "") {
+              var param = await loadServerDigitsData(localDigitListIP);
+              await updateNativeAuthDigitList(param);
+            }
           }
         } catch (e) {
           LogUtil.e("DigitsManagePage error is=>", e);

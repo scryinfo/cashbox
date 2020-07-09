@@ -1,5 +1,6 @@
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/net/net_util.dart';
+import 'package:app/util/sharedpreference_util.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 
@@ -32,7 +33,9 @@ class AppInfoUtil {
     String buildNumber = packageInfo.buildNumber; //Version build number
     print("packageInfo appVersion===>" + appVersion + "||buildNumber===>" + buildNumber);
     try {
-      var serveResult = await requestWithDeviceId(VendorConfig.versionCheckIp, formData: {"apkVersion": appVersion});
+      var spUtil = await SharedPreferenceUtil.instance;
+      String versionIpValue = spUtil.getString(VendorConfig.versionCheckIpKey) ?? VendorConfig.versionCheckIpValue;
+      var serveResult = await requestWithDeviceId(versionIpValue, formData: {"apkVersion": appVersion});
       if ((serveResult != null) && (serveResult["code"] == 0)) {
         var resultObj = serveResult["data"];
         if (resultObj == null || resultObj["isLatest"] == null) {
@@ -43,7 +46,9 @@ class AppInfoUtil {
           print("isLatest=====>" + resultObj["isLatest"].toString());
           var latestVersion = resultObj["latestApk"]["apkVersion"].toString();
           if (latestVersion != null && latestVersion.isNotEmpty) {
-            _doUpgradeApp(VendorConfig.latestVersionIp, latestVersion);
+            var spUtil = await SharedPreferenceUtil.instance;
+            String downloadIpValue = spUtil.getString(VendorConfig.downloadLatestVersionIpKey) ?? VendorConfig.downloadLatestVersionIpValue;
+            _doUpgradeApp(downloadIpValue, latestVersion);
             return true;
           }
         }
