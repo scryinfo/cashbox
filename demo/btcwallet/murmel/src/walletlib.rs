@@ -88,7 +88,7 @@ pub fn create_master() -> Transaction {
                 )),
                 &mut unlocker).expect("can not sign");
 
-    println!("tx {:?}", &spending_transaction);
+    println!("tx {:#?}", &spending_transaction);
     spending_transaction
 }
 
