@@ -118,32 +118,35 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
 
   Widget buildSearchTextFieldWidget() {
     return Container(
-        child: TextField(
-      cursorColor: Colors.white,
-      //Set cursor
-      decoration: InputDecoration(
-        contentPadding: new EdgeInsets.only(bottom: ScreenUtil.instance.setHeight(2.5)),
-        border: InputBorder.none,
-        icon: IconButton(
-            icon: ImageIcon(
-              AssetImage(
-                "assets/images/ic_search.png",
-              ),
+      child: TextField(
+        cursorColor: Colors.white,
+        autofocus: true,
+        //Set cursor
+        decoration: InputDecoration(
+          contentPadding: new EdgeInsets.only(bottom: ScreenUtil.instance.setHeight(2.5), left: ScreenUtil.instance.setWidth(0)),
+          border: InputBorder.none,
+          icon: Container(
+            width: ScreenUtil.instance.setWidth(7),
+            child: IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                _searchDigit(_searchContentController.text);
+              },
             ),
-            onPressed: () {
-              _searchDigit(_searchContentController.text);
-            }),
-        hintText: translate("input_ca_or_name"),
-        hintStyle: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
+          ),
+          hintText: translate("input_ca_or_name"),
+          hintStyle: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white30),
+          labelStyle: TextStyle(),
+        ),
+        onSubmitted: (value) {
+          _searchDigit(value);
+        },
+        controller: _searchContentController,
+        //Text alignment (i.e. initial cursor position)
+        textAlign: TextAlign.start,
+        style: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
       ),
-      onSubmitted: (value) {
-        _searchDigit(value);
-      },
-      controller: _searchContentController,
-      //Text alignment (i.e. initial cursor position)
-      textAlign: TextAlign.start,
-      style: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
-    ));
+    );
   }
 
   Widget buildDigitListAreaWidgets() {
@@ -303,7 +306,9 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
   }
 
   _searchDigit(String param) async {
-    // todo execute lookup interface
+    if (param == null || param.trim() == "") {
+      return;
+    }
     List<Digit> tempList = [];
     Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
       if (element.shortName.toLowerCase() == param.toLowerCase() ||
