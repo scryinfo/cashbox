@@ -177,27 +177,27 @@ class Wallets {
           ..isVisible = true
           ..walletId = jniList[walletIndex]["walletId"];
         List ethChainDigitList = ethChain["ethChainDigitList"];
-        for (int j = 0; j < ethChainDigitList.length; j++) {
-          Map digitInfoMap = ethChainDigitList[j];
-          Digit digitM = EthDigit();
-          digitM
-            ..digitId = digitInfoMap["digitId"]
-            ..chainId = digitInfoMap["chainId"]
-            ..contractAddress = digitInfoMap["contractAddress"]
-            ..address = digitInfoMap["address"]
-            ..shortName = digitInfoMap["shortName"]
-            ..fullName = digitInfoMap["fullName"]
-            ..balance = digitInfoMap["balance"]
-            ..isVisible = digitInfoMap["isVisible"]
-            ..decimal = digitInfoMap["decimal"]
-            ..urlImg = digitInfoMap["urlImg"];
-          chainEthM.digitsList.add(digitM);
+        if (ethChainDigitList != null && ethChainDigitList.length > 0) {
+          for (int j = 0; j < ethChainDigitList.length; j++) {
+            Map digitInfoMap = ethChainDigitList[j];
+            Digit digitM = EthDigit();
+            digitM
+              ..digitId = digitInfoMap["digitId"]
+              ..chainId = digitInfoMap["chainId"]
+              ..contractAddress = digitInfoMap["contractAddress"]
+              ..address = digitInfoMap["address"]
+              ..shortName = digitInfoMap["shortName"]
+              ..fullName = digitInfoMap["fullName"]
+              ..balance = digitInfoMap["balance"]
+              ..isVisible = digitInfoMap["isVisible"]
+              ..decimal = digitInfoMap["decimal"]
+              ..urlImg = digitInfoMap["urlImg"];
+            chainEthM.digitsList.add(digitM);
+          }
+          walletM.chainList.add(chainEthM);
         }
-        walletM.chainList.add(chainEthM);
       }
-
-      //todo BTC chain information has not been added
-      /*{
+      {
         //BTC
         ChainBTC chainBtcM = ChainBTC();
         var btcChain = jniList[walletIndex]["btcChain"];
@@ -208,23 +208,25 @@ class Wallets {
           ..isVisible = true
           ..walletId = jniList[walletIndex]["walletId"];
         List btcChainDigitList = btcChain["btcChainDigitList"];
-        for (int j = 0; j < btcChainDigitList.length; j++) {
-          Map digitInfoMap = btcChainDigitList[j];
-          Digit digitM = BtcDigit();
-          digitM
-            ..digitId = digitInfoMap["digitId"]
-            ..chainId = digitInfoMap["chainId"]
-            ..address = digitInfoMap["address"]
-            ..shortName = digitInfoMap["shortName"]
-            ..fullName = digitInfoMap["fullName"]
-            ..balance = digitInfoMap["balance"]
-            ..isVisible = digitInfoMap["isVisible"]
-            ..decimal = digitInfoMap["decimal"]
-            ..urlImg = digitInfoMap["urlImg"];
-          chainBtcM.digitsList.add(digitM);
+        if (btcChainDigitList != null && btcChainDigitList.length > 0) {
+          for (int j = 0; j < btcChainDigitList.length; j++) {
+            Map digitInfoMap = btcChainDigitList[j];
+            Digit digitM = BtcDigit();
+            digitM
+              ..digitId = digitInfoMap["digitId"]
+              ..chainId = digitInfoMap["chainId"]
+              ..address = digitInfoMap["address"]
+              ..shortName = digitInfoMap["shortName"]
+              ..fullName = digitInfoMap["fullName"]
+              ..balance = digitInfoMap["balance"]
+              ..isVisible = digitInfoMap["isVisible"]
+              ..decimal = digitInfoMap["decimal"]
+              ..urlImg = digitInfoMap["urlImg"];
+            chainBtcM.digitsList.add(digitM);
+          }
+          walletM.chainList.add(chainBtcM);
         }
-        walletM.chainList.add(chainBtcM);
-      }*/
+      }
       walletM.nowChain = walletM.getChainByChainId(walletM.nowChainId);
       if (walletM.isNowWallet) {
         this.nowWallet = walletM;

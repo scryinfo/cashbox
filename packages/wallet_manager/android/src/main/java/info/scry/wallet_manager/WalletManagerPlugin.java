@@ -201,17 +201,17 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     /*-------------------------组装ETH链上数据 end---------------------------*/
 
                     /*-------------------------组装BTC链上数据 start-------------------------*/
-                    List<Map<String, Object>> resultBtcChain = new ArrayList<>();
-                    /*resultBtcChain.put("chainAddress", walletList.get(walletIndex).btcChain.address);
+                    Map<String, Object> resultBtcChain = new HashMap<>();
+                    resultBtcChain.put("chainAddress", walletList.get(walletIndex).btcChain.address);
                     resultBtcChain.put("chainId", walletList.get(walletIndex).btcChain.chainId);
                     resultBtcChain.put("chainType", walletList.get(walletIndex).btcChain.chainType);
                     resultBtcChain.put("isVisible", walletList.get(walletIndex).btcChain.isVisible);
                     resultBtcChain.put("status", walletList.get(walletIndex).btcChain.status);
-                    resultBtcChain.put("walletId", walletList.get(walletIndex).btcChain.walletId);*/
+                    resultBtcChain.put("walletId", walletList.get(walletIndex).btcChain.walletId);
                     if (walletList.get(walletIndex).btcChain != null) {
-                        List<BtcDigit> btcDigitList =
-                                walletList.get(walletIndex).btcChain.digitList;
-                        /*List<Map<String, Object>> btcChainDigitList = new ArrayList<>();
+                        List<BtcDigit> btcDigitList = walletList.get(walletIndex).btcChain.digitList;
+                        ScryWalletLog.d("nativeLib=>", "btcDigitList.size().toString() ===>" + btcDigitList.size());
+                        List<Map<String, Object>> btcChainDigitList = new ArrayList<>();
                         for (int j = 0; j < btcDigitList.size(); j++) {
                             int digitIndex = j;
                             Map<String, Object> digitMap = new HashMap<String, Object>();
@@ -226,9 +226,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                             digitMap.put("imgUrl", btcDigitList.get(digitIndex).imgUrl);
                             btcChainDigitList.add(digitMap);
                         }
-                        ScryWalletLog.d("nativeLib=>",
-                                "Btc链 btcChainDigitList.toString() ===>" + btcChainDigitList.toString());
-                        resultEthChain.put("btcChainDigitList", btcChainDigitList);*/
+                        ScryWalletLog.d("nativeLib=>", "Btc链 btcChainDigitList.toString() ===>" + btcChainDigitList.toString());
+                        resultBtcChain.put("btcChainDigitList", btcChainDigitList);
                     }
                     /*-------------------------组装BTC链上数据 end -------------------------*/
 
