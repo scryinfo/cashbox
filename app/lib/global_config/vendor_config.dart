@@ -43,8 +43,20 @@ class VendorConfig {
   static const publicIpDefaultValue = "";
 
   /// app server config ip
-  static const appServerConfigKey = "";
-  static const appServerConfigValue = " ";
+  static const appServerConfigIpKey = "";
+  static const appServerConfigIpValue = " ";
+
+  /// app server config version
+  static const appServerConfigVersionKey = "";
+  static const appServerConfigVersionValue = " ";
+
+  /// last change time of check config
+  static const checkConfigLastTimeKey = "";
+  static const checkConfigLastTimeValue = " ";
+
+  /// init database statement
+  static const initDatabaseStateKey = "";
+  static const initDatabaseStateValue = false;
 
   static const ETHERSCAN_API_KEY = "";
 }
