@@ -63,6 +63,9 @@ class Wallets {
     }
     if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
       spUtil.setBool(VendorConfig.initDatabaseStateKey, resultMap["isInitWalletBasicData"]);
+      var digitParam = spUtil.getString(VendorConfig.defaultDigitsContentKey) ?? VendorConfig.defaultDigitsContentDefaultValue;
+      var updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
+      print("updateMap[isUpdateDefaultDigit](),=====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
     }
   }
 
@@ -420,6 +423,15 @@ class Wallets {
       await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //Add this token model to digitList and reload
     }
     return addDigitModelMap;
+  }
+
+  updateDefaultDigitList(String digitData) async {
+    Map updateMap = await WalletManager.updateDefaultDigitList(digitData);
+    int status = updateMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("updateDefaultDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+    }
+    return updateMap;
   }
 
   updateAuthDigitList(String digitData) async {

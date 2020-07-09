@@ -1,5 +1,4 @@
 import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
@@ -68,34 +67,7 @@ class _EthPageState extends State<EthPage> {
 
     bool isForceLoadFromJni = widget.isForceLoadFromJni;
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;
-    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
-    {
-      //todo 1.0 write dead, preset DDD tokens, official chain and test chain, subsequent removal
-      var digitParam =
-          '[{"contractAddress":"0x9F5F3CFD7a32700C93F971637407ff17b91c7342","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"3","decimal":"","chainType":"ETH"},{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"4","decimal":"","chainType":"ETH_TEST"}]';
-      await updateNativeAuthDigitList(digitParam);
-      Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, 0, singleDigitCount);
-      if (nativeAuthMap != null && nativeAuthMap["authDigit"] != null && nativeAuthMap["authDigit"].length != 0) {
-        List<Digit> tempDigitsList = nativeAuthMap["authDigit"];
-        print("tempDigitsList.length.toString===>" + tempDigitsList.length.toString());
-        for (int i = 0; i < tempDigitsList.length; i++) {
-          var element = tempDigitsList[i];
-          if ((element.contractAddress.trim().toUpperCase() == DddMainNetContractAddress.toUpperCase()) ||
-              (element.contractAddress.trim().toUpperCase() == DddTestNetContractAddress.toUpperCase())) {
-            var addDigitMap = await Wallets.instance
-                .addDigitToChainModel(Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, element.digitId);
-            int status = addDigitMap["status"];
-            if (status == null || status != 200) {
-              LogUtil.e("addDigitToChainModel error is", addDigitMap["message"]);
-            } else {
-              print("addDigitToChainModel successful==");
-            }
-          }
-        }
-      }
-    }
-    this.walletList = [];
-    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
+    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: isForceLoadFromJni);
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
       Wallet wallet = walletList[index];
@@ -115,17 +87,6 @@ class _EthPageState extends State<EthPage> {
     loadLegalCurrency();
     loadDigitRateInfo();
     AppInfoUtil.instance.checkAppUpgrade();
-  }
-
-  //todo saves the preset token version1.0 to death, and removes it later
-  updateNativeAuthDigitList(String param) async {
-    if (param == null || param.isEmpty || (param.trim() == "")) {
-      print("param is empty======>" + param);
-      return;
-    }
-    print("updateNativeAuthDigitList  param=====>" + param.toString());
-    var updateMap = await Wallets.instance.updateAuthDigitList(param);
-    print("updateMap[isUpdateAuthDigit]=====>" + updateMap["status"].toString() + updateMap["isUpdateAuthDigit"].toString());
   }
 
   //Processing display fiat currency usd, cny, etc.

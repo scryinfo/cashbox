@@ -759,6 +759,29 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
+            case "updateDefaultDigitList": {
+                ScryWalletLog.d("nativeLib=>", "updateDefaultDigitList is enter =>" + call.argument("digitData").toString());
+                WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.updateDefaultDigitList((String) (call.argument("digitData")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "updateAuthDigitList exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                if (walletState.status == 200) {
+                    resultMap.put("isUpdateDefaultDigit", walletState.isUpdateDefaultDigit);
+                    ScryWalletLog.d("nativeLib=>",
+                            "message.isUpdateDefaultDigit is " + walletState.isUpdateDefaultDigit);
+                } else {
+                    resultMap.put("message", walletState.message);
+                    ScryWalletLog.d("nativeLib=>",
+                            "walletState.message is " + walletState.message.toString());
+                }
+                result.success(resultMap);
+                break;
+            }
             case "updateAuthDigitList": {
                 ScryWalletLog.d("nativeLib=>", "updateAuthDigitList is enter =>" + call.argument("digitData").toString());
                 WalletState walletState = new WalletState();

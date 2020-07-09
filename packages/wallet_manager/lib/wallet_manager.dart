@@ -215,7 +215,13 @@ class WalletManager {
     return decodeMap;
   }
 
-  //更新 本地存储的 认证代币列表（全量更新）
+  //更新本地存储的 默认代币 列表（全量更新）
+  static updateDefaultDigitList(String digitData) async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateDefaultDigitList", {"digitData": digitData});
+    return updateMap;
+  }
+
+  //更新本地存储的 认证代币 列表（全量更新）
   static updateAuthDigitList(String digitData) async {
     Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateAuthDigitList", {"digitData": digitData});
     return updateMap;
