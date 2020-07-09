@@ -75,7 +75,7 @@ class Rate {
   }
 
   double getMoney(Digit digit) {
-    if (digit.balance == null) {
+    if (digit.balance == null || digit.balance.trim() == "") {
       return 0.0;
     }
     return getPrice(digit) * double.parse(digit.balance);

@@ -81,9 +81,11 @@ class _EthPageState extends State<EthPage> {
     this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
     digitListFuture = loadDisplayDigitListData();
     chainIndex = Wallets.instance.nowWallet.chainList.indexOf(Wallets.instance.nowWallet.nowChain);
-    setState(() {
-      this.walletList = walletList;
-    });
+    if (mounted) {
+      setState(() {
+        this.walletList = walletList;
+      });
+    }
     loadDigitBalance();
     loadLegalCurrency();
     loadDigitRateInfo();
@@ -116,12 +118,14 @@ class _EthPageState extends State<EthPage> {
         int index = i;
         if ((this.displayDigitsList[index].shortName.toUpperCase() != null) &&
             (rateKeys.contains(this.displayDigitsList[index].shortName.toUpperCase().trim().toString()))) {
-          setState(() {
-            this.displayDigitsList[index].digitRate
-              ..symbol = rateInstance.getSymbol(this.displayDigitsList[index])
-              ..price = rateInstance.getPrice(this.displayDigitsList[index])
-              ..changeDaily = rateInstance.getChangeDaily(this.displayDigitsList[index]);
-          });
+          if (mounted) {
+            setState(() {
+              this.displayDigitsList[index].digitRate
+                ..symbol = rateInstance.getSymbol(this.displayDigitsList[index])
+                ..price = rateInstance.getPrice(this.displayDigitsList[index])
+                ..changeDaily = rateInstance.getChangeDaily(this.displayDigitsList[index]);
+            });
+          }
         } else {
           print("digitName is not exist===>" + this.displayDigitsList[index].shortName);
           LogUtil.w("digitName is not exist===>", this.displayDigitsList[index].shortName);
@@ -153,9 +157,11 @@ class _EthPageState extends State<EthPage> {
           Wallets.instance.updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[i].digitId, balance ?? "");
         } else {}
         allVisibleDigitsList[i].balance = balance ?? "0";
-        setState(() {
-          this.displayDigitsList[i].balance = balance ?? "0";
-        });
+        if (mounted) {
+          setState(() {
+            this.displayDigitsList[i].balance = balance ?? "0";
+          });
+        }
       }
       loadDigitMoney(); //If you have a balance, go to calculate the money value
     }
@@ -168,11 +174,13 @@ class _EthPageState extends State<EthPage> {
       nowWalletAmount = 0;
       var money = Rate.instance.getMoney(displayDigitsList[index]).toStringAsFixed(3);
       allVisibleDigitsList[i].money = money;
-      setState(() {
-        nowWalletAmount = nowWalletAmount + Rate.instance.getMoney(displayDigitsList[index]);
-        Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
-        displayDigitsList[index].money = money;
-      });
+      if (mounted) {
+        setState(() {
+          nowWalletAmount = nowWalletAmount + Rate.instance.getMoney(displayDigitsList[index]);
+          Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
+          displayDigitsList[index].money = money;
+        });
+      }
     }
   }
 
@@ -349,16 +357,18 @@ class _EthPageState extends State<EthPage> {
         await Future.delayed(
           Duration(seconds: 2),
           () {
-            setState(() {
-              if (displayDigitsList.length < allVisibleDigitsList.length) {
-                // allVisibleDigitsList is still not displayed
-                // When pulling down to refresh, load the new digit to displayDigitsList
-                loadDisplayDigitListData();
-              } else {
-                Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
-                return;
-              }
-            });
+            if (mounted) {
+              setState(() {
+                if (displayDigitsList.length < allVisibleDigitsList.length) {
+                  // allVisibleDigitsList is still not displayed
+                  // When pulling down to refresh, load the new digit to displayDigitsList
+                  loadDisplayDigitListData();
+                } else {
+                  Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
+                  return;
+                }
+              });
+            }
           },
         );
       },
@@ -612,13 +622,15 @@ class _EthPageState extends State<EthPage> {
                   print("isSetNowChain===>" + isSetNowChain.toString());
                   print("Wallets.instance.nowWallet.nowChain.chainType===>" + Wallets.instance.nowWallet.nowChain.chainType.toString());
                   if (isSetNowChain) {
-                    setState(() {
-                      this.chainIndex = index;
-                      Wallets.instance.nowWallet.nowChain.chainAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
-                      this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
-                      this.displayDigitsList = [];
-                      loadDisplayDigitListData();
-                    });
+                    if (mounted) {
+                      setState(() {
+                        this.chainIndex = index;
+                        Wallets.instance.nowWallet.nowChain.chainAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
+                        this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
+                        this.displayDigitsList = [];
+                        loadDisplayDigitListData();
+                      });
+                    }
                   }
                   loadDigitBalance();
                   loadDigitRateInfo();
@@ -673,9 +685,11 @@ class _EthPageState extends State<EthPage> {
                 itemBuilder: (BuildContext context) => _makePopMenuList(),
                 onSelected: (String value) async {
                   Rate.instance.setNowLegalCurrency(value);
-                  setState(() {
-                    moneyUnitStr = value;
-                  });
+                  if (mounted) {
+                    setState(() {
+                      moneyUnitStr = value;
+                    });
+                  }
                   this.loadDigitMoney();
                   var spUtil = await SharedPreferenceUtil.instance;
                   spUtil.setString(GlobalConfig.currencyKey, value);
