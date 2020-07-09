@@ -6,6 +6,7 @@ import 'package:app/page/digits_manage_page/search_digit_page.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/language_choose_page/language_choose_page.dart';
 import 'package:app/page/sign_tx_page/sign_tx_page.dart';
+import 'package:app/page/transfer_btc_page/transfer_btc_page.dart';
 import 'package:app/page/transfer_eee_page/transfer_eee_page.dart';
 import 'package:app/page/user_protocol/privacy_statements_page.dart';
 import 'package:app/page/user_protocol/qa_info_page.dart';
@@ -103,6 +104,9 @@ Handler transferEthPageHandler = Handler(handlerFunc: (BuildContext context, Map
 
 Handler transferEeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return TransferEeePage();
+});
+Handler transferBtcPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return TransferBtcPage();
 });
 
 Handler minePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

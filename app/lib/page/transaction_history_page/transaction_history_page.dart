@@ -147,6 +147,10 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   case ChainType.EEE_TEST:
                     NavigatorUtils.push(context, Routes.transferEeePage);
                     break;
+                  case ChainType.BTC_TEST:
+                  case ChainType.BTC:
+                    NavigatorUtils.push(context, Routes.transferBtcPage);
+                    break;
                   default:
                     NavigatorUtils.push(context, Routes.transferEthPage);
                     break;
