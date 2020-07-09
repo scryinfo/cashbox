@@ -4,30 +4,47 @@
   For example: the corresponding back-end legal currency interface can be added
 **/
 class VendorConfig {
+  ///Version check interface；
+  static const versionCheckIpKey = "";
+  static const versionCheckIpValue = "";
 
-  static const versionCheckIp = ""; //Version check interface；
-  static const latestVersionIp = ""; //The latest version app download interface；
+  ///The latest version app download interface；
+  static const downloadLatestVersionIpKey = "";
+  static const downloadLatestVersionIpValue = "";
 
-  static const rateDigitIpKey = ""; //The fiat currency key corresponding to the token
+  ///The fiat currency key corresponding to the token
+  static const rateDigitIpKey = "";
   static const rateDigitIpDefaultValue = ""; //The legal currency interface ip corresponding to the token；
 
+  ///Trusted token version number
   static const authDigitsVersionKey = ""; //Trusted token version number key
   static const authDigitsVersionValue = ""; //Trusted token version number value
 
+  ///List of trusted erc tokens
   static const authDigitsIpKey = ""; //List of trusted erc tokens
   static const authDigitsIpDefaultValue = ""; //List of trusted erc tokens；
 
-  static const defaultDigitsKey = ""; //The default token ip corresponds to the key；
-  static const defaultDigitsDefaultValue = ""; //The value corresponding to the default token ip；
+  /// default token version
+  static const defaultDigitsVersionKey = "";
+  static const defaultDigitsVersionValue = "";
 
-  static const scryXIpKey = ""; //Default language Chinese；
+  ///The default token ip
+  static const defaultDigitsIpKey = "";
+  static const defaultDigitsIpDefaultValue = "";
+
+  /// default token content
+  static const defaultDigitsContentKey = "";
+  static const defaultDigitsContentDefaultValue = '';
+
+  static const scryXIpKey = "";
   static const scryXIpDefaultValue = "";
-
-  static const cashboxDownloadIpKey = ""; //
-  static const cashboxDownloadIpDefaultValue = ""; //
 
   static const publicIpKey = "";
   static const publicIpDefaultValue = "";
+
+  /// app server config ip
+  static const appServerConfigKey = "";
+  static const appServerConfigValue = " ";
 
   static const ETHERSCAN_API_KEY = "";
 }
