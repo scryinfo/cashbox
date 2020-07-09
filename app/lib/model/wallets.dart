@@ -195,6 +195,7 @@ class Wallets {
         }
         walletM.chainList.add(chainEthM);
       }
+
       //todo BTC chain information has not been added
       /*{
         //BTC
@@ -224,9 +225,9 @@ class Wallets {
         }
         walletM.chainList.add(chainBtcM);
       }*/
+      walletM.nowChain = walletM.getChainByChainId(walletM.nowChainId);
       if (walletM.isNowWallet) {
         this.nowWallet = walletM;
-        this.nowWallet.nowChain = this.nowWallet.getChainByChainId(this.nowWallet.nowChainId);
       }
       allWalletList.add(walletM); ////Add wallet to WalletList
     }
