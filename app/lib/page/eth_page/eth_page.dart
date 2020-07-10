@@ -581,7 +581,7 @@ class _EthPageState extends State<EthPage> {
   //Chain card
   Widget _buildChainCard() {
     return Container(
-      width: ScreenUtil().setWidth(77.5),
+      width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(42.75),
       child: FutureBuilder(
           future: digitListFuture,
@@ -598,7 +598,7 @@ class _EthPageState extends State<EthPage> {
                   return SingleChildScrollView(
                     child: Container(
                       alignment: Alignment.centerLeft,
-                      width: ScreenUtil().setWidth(40),
+                      width: ScreenUtil().setWidth(90),
                       height: ScreenUtil().setHeight(42.75),
                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(8.5), top: ScreenUtil().setHeight(11)),
                       decoration: BoxDecoration(
@@ -636,6 +636,8 @@ class _EthPageState extends State<EthPage> {
                   loadDigitRateInfo();
                 },
                 itemCount: Wallets.instance.nowWallet.chainList.length,
+                viewportFraction: 0.8,
+                scale: 0.9,
                 pagination: new SwiperPagination(
                   builder: SwiperPagination(
                     builder: SwiperPagination.rect, //Cut page icon
@@ -753,21 +755,18 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
           ),
-          Gaps.scaleHGap(4.5),
+          Gaps.scaleHGap(4),
           Container(
-            color: Colors.transparent,
-            child: Container(
-              width: ScreenUtil.instance.setWidth(28),
-              child: Text(
-                Chain.chainTypeToValue(Wallets.instance.nowWallet.nowChain.chainType),
-                style: TextStyle(
-                  fontSize: 45,
-                  color: Color.fromRGBO(255, 255, 255, 0.1),
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.clip,
+            width: ScreenUtil.instance.setWidth(26),
+            child: Text(
+              Chain.chainTypeToValue(Wallets.instance.nowWallet.nowChain.chainType),
+              style: TextStyle(
+                fontSize: 45,
+                color: Color.fromRGBO(255, 255, 255, 0.1),
+                fontWeight: FontWeight.bold,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.clip,
             ),
           ),
         ],
