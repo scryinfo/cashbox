@@ -468,17 +468,18 @@ class Wallets {
     }
     print("count=====>" + count.toString() + "startItem=====>" + startItem.toString() + "length=====>" + authDigitList.length.toString());
     authDigitList.forEach((element) {
-      var name = element["name"];
+      var fullName = element["name"];
       var decimal = element["decimal"];
       var contract = element["contract"];
       var symbol = element["symbol"];
       var digitId = element["id"];
-      print("name=====>" + name + "decimal=====>" + decimal.toString() + "contract=====>" + contract + "symbol=====>" + symbol);
+      print("fullName=====>" + fullName + "decimal=====>" + decimal.toString() + "contract=====>" + contract + "symbol=====>" + symbol);
       switch (chain.chainType) {
         case ChainType.ETH:
         case ChainType.ETH_TEST:
           Digit ethDigit = new EthDigit();
-          ethDigit.shortName = name;
+          ethDigit.shortName = symbol;
+          ethDigit.fullName = fullName;
           ethDigit.decimal = decimal;
           ethDigit.contractAddress = contract;
           ethDigit.digitId = digitId;
@@ -534,16 +535,17 @@ class Wallets {
       return resultMap;
     }
     authDigitList.forEach((element) {
-      var name = element["name"];
+      var fullName = element["name"];
       var decimal = element["decimal"];
       var contract = element["contract"];
       var symbol = element["symbol"];
-      print("name=====>" + name + "decimal=====>" + decimal.toString() + "contract=====>" + contract + "symbol=====>" + symbol);
+      print("fullName=====>" + fullName + "decimal=====>" + decimal.toString() + "contract=====>" + contract + "symbol=====>" + symbol);
       switch (chain.chainType) {
         case ChainType.ETH:
         case ChainType.ETH_TEST:
           Digit ethDigit = new EthDigit();
-          ethDigit.shortName = name;
+          ethDigit.shortName = symbol;
+          ethDigit.fullName = fullName;
           ethDigit.decimal = decimal;
           ethDigit.contractAddress = contract;
           resultAuthDigitList.add(ethDigit);
