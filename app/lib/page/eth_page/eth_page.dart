@@ -615,7 +615,6 @@ class _EthPageState extends State<EthPage> {
                     ),
                   );
                 },
-                index: chainIndex,
                 onIndexChanged: (index) async {
                   print("onIndexChanged index======>" + index.toString() + "||" + Wallets.instance.nowWallet.chainList[index].chainType.toString());
                   bool isSetNowChain = await Wallets.instance.nowWallet.setNowChainType(Wallets.instance.nowWallet.chainList[index]);
@@ -635,6 +634,7 @@ class _EthPageState extends State<EthPage> {
                   loadDigitBalance();
                   loadDigitRateInfo();
                 },
+                index: chainIndex,
                 itemCount: Wallets.instance.nowWallet.chainList.length,
                 viewportFraction: 0.8,
                 scale: 0.9,
@@ -643,6 +643,7 @@ class _EthPageState extends State<EthPage> {
                     builder: SwiperPagination.rect, //Cut page icon
                   ),
                 ),
+                loop: false,
                 autoplay: false,
               );
             }
