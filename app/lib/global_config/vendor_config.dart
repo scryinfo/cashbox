@@ -51,8 +51,8 @@ class VendorConfig {
   static const appServerConfigVersionValue = " ";
 
   /// last change time of check config
-  static const checkConfigLastTimeKey = "";
-  static const checkConfigLastTimeValue = " ";
+  static const lastTimeCheckConfigKey = "";
+  static const lastTimeCheckConfigValue = "";
 
   /// init database statement
   static const initDatabaseStateKey = "";

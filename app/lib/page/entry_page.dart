@@ -64,7 +64,7 @@ class _EntryPageState extends State<EntryPage> {
     int nowTimeStamp = DateTime.now().millisecondsSinceEpoch;
     try {
       if (lastCheckTime != null && ((nowTimeStamp - int.parse(lastCheckTime)) - 60 * 10 > 0)) {
-        String serverConfigIp = spUtil.getString(VendorConfig.appServerConfigKey) ?? VendorConfig.appServerConfigValue;
+        String serverConfigIp = spUtil.getString(VendorConfig.appServerConfigIpKey) ?? VendorConfig.appServerConfigIpValue;
         var result = await requestWithDeviceId(serverConfigIp);
         print("_checkServerAppConfig result.code=>" + result.toString());
         // todo 举例：检查默认代币列表，更新默认代币列表，后续创建钱包是后，会默认创建

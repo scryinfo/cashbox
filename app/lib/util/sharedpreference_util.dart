@@ -31,7 +31,7 @@ class SharedPreferenceUtil {
       spUtil.setString(VendorConfig.defaultDigitsContentKey, VendorConfig.defaultDigitsContentDefaultValue);
       spUtil.setString(VendorConfig.scryXIpKey, VendorConfig.scryXIpDefaultValue);
       spUtil.setString(VendorConfig.publicIpKey, VendorConfig.publicIpDefaultValue);
-      spUtil.setString(VendorConfig.appServerConfigKey, VendorConfig.appServerConfigValue);
+      spUtil.setString(VendorConfig.appServerConfigIpKey, VendorConfig.appServerConfigIpValue);
       spUtil.setString(VendorConfig.appServerConfigVersionKey, VendorConfig.appServerConfigVersionValue);
       spUtil.setString(VendorConfig.lastTimeCheckConfigKey, VendorConfig.lastTimeCheckConfigValue);
       spUtil.setBool(VendorConfig.initDatabaseStateKey, false);
