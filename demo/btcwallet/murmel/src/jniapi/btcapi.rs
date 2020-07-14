@@ -2,7 +2,7 @@
 //! java native methood def in  packages/wallet_manager/android/src/main/java/info/scry/wallet_manager/NativeLib.java
 
 use jni::JNIEnv;
-use jni::objects::{JClass, JString};
+use jni::objects::{JClass, JString, JObject, JValue};
 use jni::sys::{jbyteArray, jint, jlong, jstring, jboolean};
 use bitcoin_wallet::mnemonic::Mnemonic;
 use bitcoin_wallet::account::{MasterAccount, Unlocker, Account, AccountAddressType};
@@ -12,6 +12,13 @@ use std::str::FromStr;
 use bitcoin::consensus::serialize;
 use bitcoin_hashes::sha256d;
 use bitcoin_hashes::hex::FromHex;
+use std::net::{SocketAddr, SocketAddrV4, Ipv4Addr};
+use std::time::SystemTime;
+use constructor::Constructor;
+use std::path::Path;
+use db::SQLite;
+use std::sync::{Arc, Mutex};
+use log::Level;
 
 
 const PASSPHRASE: &str = "";
@@ -61,7 +68,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
 
     //TODO
     // must use sqlite and modify database table UTXO
-    // just hard code  UTXO. must fix it in master
+    // just hard code  UTXO. must fix it in feature
     let mut spending = Transaction {
         input: vec![
             TxIn {
@@ -98,7 +105,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
     println!("btcapi btc_sign_tx {:#?}", &spending);
 
     let byte_array = serialize(&spending);
-    println!("btcapi byte_vec {:0x?}", &byte_array);
+    println!("btcapi byte_vec {:0?}", &byte_array);
     let byte_array = env.byte_array_from_slice(byte_array.as_slice()).unwrap();
     byte_array
 }
@@ -164,6 +171,56 @@ pub extern "system" fn Java_JniApi_btcLoadTxHistory(
 ) -> jboolean {
     unimplemented!()
 }
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub extern "system" fn Java_JniApi_btcStart(
+    env: JNIEnv,
+    class: JClass,
+    network: JString,
+) -> jboolean {
+    // TODO
+    // use testnet for test and default
+    // must change it in future
+    // should def it by network parameter
+    // connections = 1,
+    // peers birth listen all default value
+    // open db and sqlite in default name
+    simple_logger::init_with_level(Level::Debug).unwrap();
+    let network_str = env.get_string(network).unwrap();
+    let network_str = network_str.to_str().unwrap();
+    let mut network = Network::Testnet;
+
+    match network_str {
+        "Testnet" => {
+            network = Network::Testnet;
+            println!("Use testnet")
+        }
+        "Bitcoin" => {
+            network = Network::Bitcoin;
+            println!("Use Bitcoin")
+        }
+        _ => {
+            network = Network::Testnet;
+            println!("Use testnet")
+        }
+    }
+
+    let mut peers: Vec<SocketAddr> = Vec::new();
+    peers.push(SocketAddr::from(SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 8333)));
+
+    let connections = 1;
+    let listen: Vec<SocketAddr> = Vec::new();
+    let birth: u64 = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs();
+    let chaindb = Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap();
+    let sqlite = SQLite::open_db(network);
+    let shared_sqlite = Arc::new(Mutex::new(sqlite));
+    let mut spv = Constructor::new(network, listen, chaindb, shared_sqlite).unwrap();
+    spv.run(network, peers, connections).expect("can not start node");
+    1
+}
+
+
 
 
 
