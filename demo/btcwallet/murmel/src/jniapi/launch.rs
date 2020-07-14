@@ -68,6 +68,7 @@ pub extern "system" fn Java_JniApi_launch(env: JNIEnv,
     if peers.is_empty() {
         peers.push(SocketAddr::from(SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 8333)));
     }
+    // only collect 1 p2p node in p2p net work
     let mut connections = 1;
     if let Some(numstring) = find_arg("connections") {
         connections = numstring.parse().unwrap();
@@ -79,6 +80,7 @@ pub extern "system" fn Java_JniApi_launch(env: JNIEnv,
         SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs()
     };
 
+    // init chain db (hammersbald)
     let chaindb =
         if let Some(path) = find_arg("db") {
             Constructor::open_db(Some(&Path::new(path.as_str())), network, birth).unwrap()
@@ -86,8 +88,10 @@ pub extern "system" fn Java_JniApi_launch(env: JNIEnv,
             Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap()
         };
 
+    // init sqlite
     let sqlite = SQLite::open_db(network);
     let shared_sqlite = Arc::new(Mutex::new(sqlite));
+
     let mut spv = Constructor::new(network, listen, chaindb, shared_sqlite).unwrap();
     spv.run(network, peers, connections).expect("can not start node");
 }
