@@ -25,8 +25,12 @@
 #![deny(unused_mut)]
 #![deny(unused_must_use)]
 #![forbid(unsafe_code)]
-#[allow(deprecated)]
-#[allow(bare_trait_objects)]
+
+// allow &error
+#![allow(bare_trait_objects)]
+//allow range_inclusive_range_patterns
+#![allow(ellipsis_inclusive_range_patterns)]
+#![allow(deprecated)]
 
 extern crate bitcoin;
 extern crate bitcoin_hashes;

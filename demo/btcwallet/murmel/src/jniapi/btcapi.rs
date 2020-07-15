@@ -1,5 +1,5 @@
 //! mod for btcapi
-//! java native methood def in  packages/wallet_manager/android/src/main/java/info/scry/wallet_manager/NativeLib.java
+//! java native method def in  packages/wallet_manager/android/src/main/java/info/scry/wallet_manager/NativeLib.java
 
 use jni::JNIEnv;
 use jni::objects::{JClass, JString, JObject, JValue};
@@ -27,7 +27,7 @@ const PASSPHRASE: &str = "";
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcTxSign(
     env: JNIEnv,
-    class: JClass,
+    _class: JClass,
     from_address: JString,
     wallet_id: JString,
     to_address: JString,
@@ -114,7 +114,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcTxSignAndBroadcast(
     env: JNIEnv,
-    class: JClass,
+    _class: JClass,
     from_address: JString,
     wallet_id: JString,
     to: JString,
@@ -127,7 +127,7 @@ pub extern "system" fn Java_JniApi_btcTxSignAndBroadcast(
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcLoadBalance(
     env: JNIEnv,
-    class: JClass,
+    _class: JClass,
     address: JString,
 ) -> jstring {
     unimplemented!()
@@ -137,7 +137,7 @@ pub extern "system" fn Java_JniApi_btcLoadBalance(
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(
     env: JNIEnv,
-    class: JClass,
+    _class: JClass,
 ) {
     unimplemented!()
 }
@@ -155,7 +155,7 @@ pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcIsSyncDataOk(
     env: JNIEnv,
-    class: JClass,
+    _class: JClass,
 ) -> jboolean {
     unimplemented!()
 }
@@ -164,7 +164,7 @@ pub extern "system" fn Java_JniApi_btcIsSyncDataOk(
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcLoadTxHistory(
     env: JNIEnv,
-    class: JClass,
+    _class: JClass,
     address: JString,
     startIndex: jint,
     offset: JString,
@@ -176,16 +176,17 @@ pub extern "system" fn Java_JniApi_btcLoadTxHistory(
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcStart(
     env: JNIEnv,
-    class: JClass,
+    _class: JClass,
     network: JString,
-) -> jboolean {
+) {
     // TODO
     // use testnet for test and default
     // must change it in future
-    // should def it by network parameter
+    // should def it by network parameter，maybe you should give a wallet id
     // connections = 1,
     // peers birth listen all default value
     // open db and sqlite in default name
+    // use simple_logger in Debug Level
     simple_logger::init_with_level(Level::Debug).unwrap();
     let network_str = env.get_string(network).unwrap();
     let network_str = network_str.to_str().unwrap();
@@ -194,15 +195,15 @@ pub extern "system" fn Java_JniApi_btcStart(
     match network_str {
         "Testnet" => {
             network = Network::Testnet;
-            println!("Use testnet")
+            println!("Start with testnet")
         }
         "Bitcoin" => {
             network = Network::Bitcoin;
-            println!("Use Bitcoin")
+            println!("Start with Bitcoin")
         }
         _ => {
             network = Network::Testnet;
-            println!("Use testnet")
+            println!("Start with testnet")
         }
     }
 
@@ -217,7 +218,7 @@ pub extern "system" fn Java_JniApi_btcStart(
     let shared_sqlite = Arc::new(Mutex::new(sqlite));
     let mut spv = Constructor::new(network, listen, chaindb, shared_sqlite).unwrap();
     spv.run(network, peers, connections).expect("can not start node");
-    1
+
 }
 
 
