@@ -64,85 +64,109 @@ class _EntryPageState extends State<EntryPage> {
     String lastCheckTime = spUtil.getString(VendorConfig.lastTimeCheckConfigKey);
     int nowTimeStamp = DateTime.now().millisecondsSinceEpoch;
     try {
-      if (lastCheckTime == null || ((nowTimeStamp - int.parse(lastCheckTime)) - 60 * 10 * 1000 > 0)) {
-        spUtil.setString(VendorConfig.lastTimeCheckConfigKey, nowTimeStamp.toString());
-        String serverConfigIp = spUtil.getString(VendorConfig.appServerConfigIpKey) ?? VendorConfig.appServerConfigIpValue;
-        var result = await requestWithConfigCheckParam(serverConfigIp);
-        var resultCode = result["code"];
-        var resultData = result["data"];
-        if (result != null && resultCode != null && resultCode == 0) {
-          var isLatestConfig = resultData["isLatestConfig"];
-          var isLatestApk = resultData["isLatestApk"];
+      //if (lastCheckTime == null || ((nowTimeStamp - int.parse(lastCheckTime)) - 60 * 10 * 1000 > 0)) {
+      spUtil.setString(VendorConfig.lastTimeCheckConfigKey, nowTimeStamp.toString());
+      String serverConfigIp = spUtil.getString(VendorConfig.appServerConfigIpKey) ?? VendorConfig.appServerConfigIpValue;
+      var result = await requestWithConfigCheckParam(serverConfigIp);
+      var resultCode = result["code"];
+      var resultData = result["data"];
+      if (result != null && resultCode != null && resultCode == 0) {
+        var isLatestConfig = resultData["isLatestConfig"];
+        var isLatestApk = resultData["isLatestApk"];
 
-          ///update config information
-          if (isLatestConfig == null || !isLatestConfig) {
-            var latestConfigObj = resultData["latestConfig"];
-            print("_checkServerAppConfig latestConfigObj======>" + latestConfigObj.toString());
-            var isLatestAuthToken = resultData["isLatestAuthToken"];
-            print("_checkServerAppConfig isLatestAuthToken======>" + isLatestAuthToken.toString());
+        ///update config information
+        if (isLatestConfig == null || !isLatestConfig) {
+          var latestConfigObj = resultData["latestConfig"];
+          print("_checkServerAppConfig latestConfigObj======>" + latestConfigObj.toString());
+          var isLatestAuthToken = resultData["isLatestAuthToken"];
+          print("_checkServerAppConfig isLatestAuthToken======>" + isLatestAuthToken.toString());
 
-            ///update auth digit list
-            if (!isLatestAuthToken) {
-              List authTokenUrl = latestConfigObj["authTokenUrl"];
-              print("_checkServerAppConfig authTokenUrl======>" + authTokenUrl.toString());
-              print("_checkServerAppConfig authTokenUrl[0].toString()======>" + authTokenUrl[0].toString());
-              if (authTokenUrl != null && authTokenUrl.length > 0 && authTokenUrl[0].toString().isNotEmpty) {
-                spUtil.setString(VendorConfig.authDigitsIpKey, authTokenUrl[0].toString());
-              }
-            }
-            var isLatestDefaultToken = resultData["isLatestDefaultToken"];
-
-            ///upate default digit list
-            if (!isLatestDefaultToken) {
-              List defaultTokenUrl = latestConfigObj["defaultTokenUrl"];
-              print("_checkServerAppConfig defaultTokenUrl======>" + defaultTokenUrl.toString());
-              print("_checkServerAppConfig defaultTokenUrl[0].toString()======>" + defaultTokenUrl[0].toString());
-              if (defaultTokenUrl != null && defaultTokenUrl.length > 0 && defaultTokenUrl[0].toString().isNotEmpty) {
-                spUtil.setString(VendorConfig.defaultDigitsIpKey, defaultTokenUrl[0].toString());
-                //update defaultDigitList to native
-                String defaultDigitParam = await requestWithDeviceId(defaultTokenUrl[0].toString());
-                var updateMap = await Wallets.instance.updateDefaultDigitList(defaultDigitParam);
-                print("updateMap[isUpdateDefaultDigit](),=====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
-              }
-            }
-
-            ///update scryX
-            var scryXChainUrl = latestConfigObj["scryXChainUrl"];
-            print("_checkServerAppConfig scryXChainUrl======>" + scryXChainUrl.toString());
-            if (scryXChainUrl != null && scryXChainUrl.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.scryXIpKey, scryXChainUrl);
-            }
-
-            ///update announcementUrl
-            var announcementUrl = latestConfigObj["announcementUrl"];
-            print("_checkServerAppConfig announcementUrl======>" + announcementUrl.toString());
-            if (announcementUrl != null && announcementUrl.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.publicIpKey, announcementUrl);
-            }
-
-            ///update appConfigVersion
-            var appConfigVersion = latestConfigObj["appConfigVersion"];
-            print("_checkServerAppConfig appConfigVersion======>" + appConfigVersion.toString());
-            if (appConfigVersion != null && appConfigVersion.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.appConfigVersionKey, appConfigVersion);
+          ///update auth digit list
+          if (!isLatestAuthToken) {
+            List authTokenUrl = latestConfigObj["authTokenUrl"];
+            print("_checkServerAppConfig authTokenUrl======>" + authTokenUrl.toString());
+            print("_checkServerAppConfig authTokenUrl[0].toString()======>" + authTokenUrl[0].toString());
+            if (authTokenUrl != null && authTokenUrl.length > 0 && authTokenUrl[0].toString().isNotEmpty) {
+              spUtil.setString(VendorConfig.authDigitsIpKey, authTokenUrl[0].toString());
             }
           }
-          print("_checkServerAppConfig isLatestApk======>" + isLatestApk.toString());
-          if (isLatestApk == null || !isLatestApk) {
-            var latestApkObj = resultData["latestApk"];
-            print("_checkServerAppConfig latestApkObj======>" + latestApkObj.toString());
-            String apkVersion = latestApkObj["apkVersion"].toString();
-            print("_checkServerAppConfig apkVersion======>" + apkVersion.toString());
-            if (apkVersion != null && apkVersion.isNotEmpty) {
-              spUtil.setString(VendorConfig.serverApkVersionKey, apkVersion);
+          var isLatestDefaultToken = resultData["isLatestDefaultToken"];
+
+          ///upate default digit list
+          if (!isLatestDefaultToken) {
+            List defaultTokenUrl = latestConfigObj["defaultTokenUrl"];
+            print("_checkServerAppConfig defaultTokenUrl======>" + defaultTokenUrl.toString());
+            print("_checkServerAppConfig defaultTokenUrl[0].toString()======>" + defaultTokenUrl[0].toString());
+            if (defaultTokenUrl != null && (defaultTokenUrl.length > 0) && defaultTokenUrl[0].toString().isNotEmpty) {
+              spUtil.setString(VendorConfig.defaultDigitsIpKey, defaultTokenUrl[0].toString());
+              //update defaultDigitList to native
+              try {
+                var defaultDigitParam = await requestWithDeviceId(defaultTokenUrl[0].toString());
+                if (defaultDigitParam["code"] != null && defaultDigitParam["code"] == 0) {
+                  String paramString = convert.jsonEncode(defaultDigitParam["data"]);
+                  print("loadServerDigitsData paramString======>" + paramString.toString());
+                  var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
+                  print("updateMap[isUpdateDefaultDigit](),=====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
+                }
+              } catch (e) {
+                print("updateDefaultDigitList,error is ===>" + e.toString());
+              }
             }
           }
-        } else {
-          print("_checkAndUpdateAppConfig() requestWithVersionParam,result status is not ok");
+
+          ///update digit Rate
+          var tokenToLegalTenderExchangeRateIp = latestConfigObj["tokenToLegalTenderExchangeRateIp"];
+          print("_checkServerAppConfig tokenToLegalTenderExchangeRateIp======>" + tokenToLegalTenderExchangeRateIp.toString());
+          if (tokenToLegalTenderExchangeRateIp != null && tokenToLegalTenderExchangeRateIp.toString().isNotEmpty) {
+            spUtil.setString(VendorConfig.rateDigitIpKey, tokenToLegalTenderExchangeRateIp);
+          }
+
+          ///update scryX
+          var scryXChainUrl = latestConfigObj["scryXChainUrl"];
+          print("_checkServerAppConfig scryXChainUrl======>" + scryXChainUrl.toString());
+          if (scryXChainUrl != null && scryXChainUrl.toString().isNotEmpty) {
+            spUtil.setString(VendorConfig.scryXIpKey, scryXChainUrl);
+          }
+
+          ///update announcementUrl
+          var announcementUrl = latestConfigObj["announcementUrl"];
+          print("_checkServerAppConfig announcementUrl======>" + announcementUrl.toString());
+          if (announcementUrl != null && announcementUrl.toString().isNotEmpty) {
+            spUtil.setString(VendorConfig.publicIpKey, announcementUrl);
+          }
+
+          ///update downloadUrl
+          var apkDownloadLink = latestConfigObj["apkDownloadLink"];
+          print("_checkServerAppConfig apkDownloadLink======>" + apkDownloadLink.toString());
+          if (apkDownloadLink != null && apkDownloadLink.toString().isNotEmpty) {
+            spUtil.setString(VendorConfig.publicIpKey, apkDownloadLink);
+          }
+
+          ///update appConfigVersion
+          var appConfigVersion = latestConfigObj["appConfigVersion"];
+          print("_checkServerAppConfig appConfigVersion======>" + appConfigVersion.toString());
+          if (appConfigVersion != null && appConfigVersion.toString().isNotEmpty) {
+            spUtil.setString(VendorConfig.appConfigVersionKey, appConfigVersion);
+          }
+        }
+        print("_checkServerAppConfig isLatestApk======>" + isLatestApk.toString());
+        if (isLatestApk == null || !isLatestApk) {
+          var latestApkObj = resultData["latestApk"];
+          print("_checkServerAppConfig latestApkObj======>" + latestApkObj.toString());
+          String apkVersion = latestApkObj["apkVersion"].toString();
+          print("_checkServerAppConfig apkVersion======>" + apkVersion.toString());
+          if (apkVersion != null && apkVersion.isNotEmpty) {
+            spUtil.setString(VendorConfig.serverApkVersionKey, apkVersion);
+          }
         }
       } else {
-        print("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" + nowTimeStamp.toString() + "||lastChangeTime=>" + lastCheckTime.toString());
+        print("_checkAndUpdateAppConfig() requestWithVersionParam,result status is not ok");
       }
+      //} else {
+      //  print(
+      //      "_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" + nowTimeStamp.toString() + "||lastChangeTime=>" + lastCheckTime.toString());
+      //  print("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" + (nowTimeStamp - int.parse(lastCheckTime)).toString());
+      //}
     } catch (e) {
       print("_checkServerAppConfig(), error is =======>" + e.toString());
     }

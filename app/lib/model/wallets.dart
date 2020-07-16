@@ -429,6 +429,9 @@ class Wallets {
   }
 
   updateDefaultDigitList(String digitData) async {
+    if (digitData == null || digitData.isEmpty) {
+      return Map();
+    }
     Map updateMap = await WalletManager.updateDefaultDigitList(digitData);
     int status = updateMap["status"];
     if (status == null || status != 200) {
@@ -438,6 +441,9 @@ class Wallets {
   }
 
   updateAuthDigitList(String digitData) async {
+    if (digitData == null || digitData.isEmpty) {
+      return Map();
+    }
     Map updateMap = await WalletManager.updateAuthDigitList(digitData);
     int status = updateMap["status"];
     if (status == null || status != 200) {
