@@ -21,6 +21,7 @@ class SharedPreferenceUtil {
       spUtil.setString(VendorConfig.downloadLatestVersionIpKey, VendorConfig.downloadLatestVersionIpValue);
     }
     {
+      spUtil.setString(VendorConfig.appConfigVersionKey, VendorConfig.appConfigVersionValue);
       //Configure token corresponding fiat currency information, trusted token list address, and default token address
       /// You can add or delete the initial configuration here according to your needs.
       spUtil.setString(VendorConfig.rateDigitIpKey, VendorConfig.rateDigitIpDefaultValue);
@@ -32,7 +33,6 @@ class SharedPreferenceUtil {
       spUtil.setString(VendorConfig.scryXIpKey, VendorConfig.scryXIpDefaultValue);
       spUtil.setString(VendorConfig.publicIpKey, VendorConfig.publicIpDefaultValue);
       spUtil.setString(VendorConfig.appServerConfigIpKey, VendorConfig.appServerConfigIpValue);
-      spUtil.setString(VendorConfig.appServerConfigVersionKey, VendorConfig.appServerConfigVersionValue);
       spUtil.setString(VendorConfig.lastTimeCheckConfigKey, VendorConfig.lastTimeCheckConfigValue);
       spUtil.setBool(VendorConfig.initDatabaseStateKey, false);
     }
