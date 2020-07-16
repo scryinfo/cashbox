@@ -14,6 +14,27 @@ class PublicPage extends StatefulWidget {
 
 class _PublicPageState extends State<PublicPage> {
   WebViewController _controller;
+  String targetUrl = "";
+  Future targetUrlFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+
+  initData() async {
+    super.didChangeDependencies();
+    targetUrlFuture = loadTargetUrl();
+  }
+
+  loadTargetUrl() async {
+    var spUtil = await SharedPreferenceUtil.instance;
+    var publicValue = spUtil.getString(VendorConfig.publicIpKey);
+    targetUrl = publicValue ?? VendorConfig.publicIpDefaultValue;
+    print("targetUrl===>" + targetUrl);
+    return targetUrl;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,19 +62,29 @@ class _PublicPageState extends State<PublicPage> {
 
   Widget _buildWebViewWidget() {
     return Container(
-      color: Colors.transparent,
-      width: ScreenUtil().setWidth(90),
-      height: ScreenUtil().setHeight(160),
-      child: WebView(
-          initialUrl: VendorConfig.publicIpDefaultValue,
-          javascriptMode: JavascriptMode.unrestricted,
-          //JS execution mode Whether to allow JS execution
-          onWebViewCreated: (controller) {
-            _controller = controller;
-          },
-          javascriptChannels: makeJsChannelsSet(),
-          onPageFinished: (String url) {}),
-    );
+        color: Colors.transparent,
+        width: ScreenUtil().setWidth(90),
+        height: ScreenUtil().setHeight(160),
+        child: FutureBuilder(
+            future: targetUrlFuture,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text("sorry,some error happen!");
+              }
+              if (snapshot.hasData) {
+                return WebView(
+                  initialUrl: targetUrl,
+                  javascriptMode: JavascriptMode.unrestricted,
+                  //JS execution mode Whether to allow JS execution
+                  onWebViewCreated: (controller) {
+                    _controller = controller;
+                  },
+                  javascriptChannels: makeJsChannelsSet(),
+                  onPageFinished: (String url) {},
+                );
+              }
+              return Text("");
+            }));
   }
 
   Set<JavascriptChannel> makeJsChannelsSet() {
