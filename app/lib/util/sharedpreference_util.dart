@@ -14,7 +14,7 @@ class SharedPreferenceUtil {
     return _instance;
   }
 
-  static initVersion() async {
+  static initIpConfig() async {
     var spUtil = await SharedPreferenceUtil.instance;
     {
       //Configure application version upgrade information

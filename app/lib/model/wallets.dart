@@ -36,18 +36,18 @@ class Wallets {
 
   initAppConfig() async {
     initIpConfig(); //init IP config info to local file
-    initWalletBasicData(); //init wallet Database Info
+    initDatabaseAndDefaultDigits(); //init wallet Database Info
   }
 
   initIpConfig() async {
     var spUtil = await SharedPreferenceUtil.instance;
     var isFinishInit = spUtil.getBool(GlobalConfig.isInitAppConfig);
     if (isFinishInit == null || !isFinishInit) {
-      SharedPreferenceUtil.initVersion(); //Initialize interface ip, version information, etc. to local file
+      SharedPreferenceUtil.initIpConfig(); //Initialize interface ip, version information, etc. to local file
     }
   }
 
-  initWalletBasicData() async {
+  initDatabaseAndDefaultDigits() async {
     var spUtil = await SharedPreferenceUtil.instance;
     var state = spUtil.getBool(VendorConfig.initDatabaseStateKey);
     if (state != null && state) {
@@ -55,12 +55,16 @@ class Wallets {
       print("initWalletBasicData(), ===> finished");
       return;
     }
+    //传参数 当前上层记录的db版本号，下层判断如过小于，db升级；如果一致，不升级。  返回值：底层操作后的db版本号。
     Map resultMap = await WalletManager.initWalletBasicData(); //Initialize some database data
     int status = resultMap["status"];
     if (status == null) {
       LogUtil.e("initWalletBasicData error=>", "not find status code");
       return;
     }
+    //todo save the database version
+    //spUtil.setString(VendorConfig.nowDatabaseVersionKey, );
+
     if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
       spUtil.setBool(VendorConfig.initDatabaseStateKey, resultMap["isInitWalletBasicData"]);
       var digitParam = spUtil.getString(VendorConfig.defaultDigitsContentKey) ?? VendorConfig.defaultDigitsContentDefaultValue;
