@@ -54,7 +54,6 @@ Future requestWithDeviceId(String url, {formData}) async {
   return request(url, formData: formData);
 }
 
-
 Future requestWithConfigCheckParam(String url, {formData}) async {
   var spUtil = await SharedPreferenceUtil.instance;
 
@@ -72,7 +71,7 @@ Future requestWithConfigCheckParam(String url, {formData}) async {
   var appConfigVersion = spUtil.getString(VendorConfig.appConfigVersionKey) ?? VendorConfig.appConfigVersionValue;
   formData["appConfigVersion"] = appConfigVersion;
 
-  return request(url, formData: formData);
+  return requestWithDeviceId(url, formData: formData);
 }
 
 //Access network request, url + parameter object
@@ -90,7 +89,7 @@ Future request(String url, {formData}) async {
         return true;
       };
     };
-
+    //print("formData ======>"+formData.toString());
     if (formData == null) {
       response = await dio.post(url);
     } else {
