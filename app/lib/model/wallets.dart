@@ -142,14 +142,14 @@ class Wallets {
         ..creationTime = jniList[walletIndex]["creationTime"].toString()
         ..isNowWallet = jniList[walletIndex]["isNowWallet"];
       //  todo version1.0 without scryx chain display
-      /*{
+      {
         var eeeChain = jniList[walletIndex]["eeeChain"];
         Chain chainEeeM = ChainEEE();
         chainEeeM
           ..chainId = eeeChain["chainId"]
           ..chainAddress = eeeChain["chainAddress"]
           ..chainType = Chain.intToChainType(eeeChain["chainType"])
-          ..isVisible = eeeChain["isVisible"]
+          ..isVisible = false //todo change Visible state
           ..walletId = eeeChain["walletId"];
         List eeeChainDigitList = eeeChain["eeeChainDigitList"];
         for (int j = 0; j < eeeChainDigitList.length; j++) {
@@ -169,7 +169,7 @@ class Wallets {
           chainEeeM.digitsList.add(digitM);
         }
         walletM.chainList.add(chainEeeM); ////Add chain to chainList
-      }*/
+      }
       {
         //ETH
         ChainETH chainEthM = ChainETH();
@@ -209,7 +209,7 @@ class Wallets {
           ..chainId = btcChain["chainId"]
           ..chainAddress = btcChain["chainAddress"]
           ..chainType = Chain.intToChainType(btcChain["chainType"])
-          ..isVisible = true
+          ..isVisible = false //todo change Visible state
           ..walletId = jniList[walletIndex]["walletId"];
         List btcChainDigitList = btcChain["btcChainDigitList"];
         if (btcChainDigitList != null && btcChainDigitList.length > 0) {

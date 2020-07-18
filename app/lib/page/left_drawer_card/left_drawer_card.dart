@@ -280,8 +280,10 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
   }
 
   List<Widget> _buildChainListCard(Wallet wallet) {
-    List<Widget> chainsList = List.generate(wallet.chainList.length, (index) {
-      Chain nowChain = wallet.chainList[index];
+    List visibleChains = [];
+    visibleChains = wallet.getVisibleChainList();
+    List<Widget> chainsList = List.generate(visibleChains.length, (index) {
+      Chain nowChain = visibleChains[index];
       return Container(
         alignment: Alignment.centerLeft,
         height: ScreenUtil().setHeight(7.5),

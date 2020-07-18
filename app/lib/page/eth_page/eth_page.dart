@@ -45,6 +45,7 @@ class _EthPageState extends State<EthPage> {
   Future digitListFuture;
   List<Digit> allVisibleDigitsList = []; //List of all visible tokens in the current chain
   List<Digit> displayDigitsList = []; //Information about the number of fixed tokens displayed on the current page
+  List<Chain> allVisibleChainsList = [];
   num chainIndex = 0; //Subscript of current chain
   Rate rateInstance;
 
@@ -79,8 +80,10 @@ class _EthPageState extends State<EthPage> {
       }
     }
     this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
+    this.allVisibleChainsList = [];
+    this.allVisibleChainsList = Wallets.instance.nowWallet.getVisibleChainList(isForceLoad: true);
     digitListFuture = loadDisplayDigitListData();
-    chainIndex = Wallets.instance.nowWallet.chainList.indexOf(Wallets.instance.nowWallet.nowChain);
+    chainIndex = this.allVisibleChainsList.indexOf(Wallets.instance.nowWallet.nowChain);
     if (mounted) {
       setState(() {
         this.walletList = walletList;
@@ -594,7 +597,7 @@ class _EthPageState extends State<EthPage> {
               return Swiper(
                 itemBuilder: (BuildContext context, int index) {
                   print("itemBuilder length====>" + Wallets.instance.nowWallet.chainList.length.toString());
-                  print("itemBuilder index====>" + index.toString() + "||" + Wallets.instance.nowWallet.chainList[index].chainType.toString());
+                  print("itemBuilder index====>" + index.toString() + "||" + allVisibleChainsList[index].chainType.toString());
                   return SingleChildScrollView(
                     child: Container(
                       alignment: Alignment.centerLeft,
@@ -635,7 +638,7 @@ class _EthPageState extends State<EthPage> {
                   loadDigitRateInfo();
                 },
                 index: chainIndex,
-                itemCount: Wallets.instance.nowWallet.chainList.length,
+                itemCount: this.allVisibleChainsList.length,
                 viewportFraction: 0.8,
                 scale: 0.9,
                 pagination: new SwiperPagination(
