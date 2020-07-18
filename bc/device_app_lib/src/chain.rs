@@ -159,7 +159,7 @@ pub mod android {
         env.set_field(chain_class_obj, "status", "I", JValue::Int(btc_chain.status as i32)).expect("get_eth_chain_obj set status value");
 
         let chain_id_str = format!("{}", btc_chain.chain_id);
-        env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("get_btc_chain_obj set chainId value");
+        env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str.clone()).unwrap()))).expect("get_btc_chain_obj set chainId value");
         env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.wallet_id).unwrap()))).expect("get_btc_chain_obj set walletId value");
         env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address.clone()).unwrap()))).expect("get_btc_chain_obj set address value");
 
@@ -184,7 +184,7 @@ pub mod android {
              let digit_class_obj = env.alloc_object(btc_digit_class).expect("btc_digit_class");
              //Set the digit attribute
              env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("get_btc_chain_obj set status value");
-
+             env.set_field(digit_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str.clone()).unwrap()))).expect("get_btc_chain_obj set chainId value");
              env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("get_btc_chain_obj set digitId value");
              //This value can be optimized
             // env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address.clone()).unwrap()))).expect("get_btc_chain_obj set address value");
