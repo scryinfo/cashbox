@@ -3,12 +3,25 @@ extern crate serde_derive;
 
 use tiny_keccak::Keccak;
 
+use sp_core::{
+    H256,ecdsa, ed25519, sr25519,
+    crypto::{Pair, Ss58Codec},
+    hexdisplay::HexDisplay
+};
+use codec::{Encode,Decode};
+use node_runtime::{AccountId, Balance,Event, Index, Signature,Call, Runtime,BalancesCall::{self,transfer as transfercall}};
+use system::Phase;
+use node_runtime::TimestampCall::set;
+
 mod crypto;
+mod transaction;
 pub mod error;
 
 pub use crypto::{Sr25519, Ed25519, Crypto};
+pub use transaction::{tx_sign,transfer,decode_account_info,account_info_key};
 
 use std::collections::HashMap;
+
 
 pub trait Keccak256<T> {
     fn keccak256(&self) -> T
@@ -50,7 +63,7 @@ pub struct TransferDetail {
     pub hash: Option<String>,
     pub timestamp: Option<u64>,
 }
-
+/*
 pub fn transfer(_mnemonic: &str, _to: &str, _amount: &str, _genesis_hash: &[u8], _index: u32, _runtime_version: u32) -> Result<String, error::Error> {
     unimplemented!()
 }
@@ -58,7 +71,8 @@ pub fn transfer(_mnemonic: &str, _to: &str, _amount: &str, _genesis_hash: &[u8],
 pub fn tx_sign(_mnemonic: &str, _genesis_hash: &[u8], _index: u32, _func_data: &[u8], _version: u32) -> Result<String, error::Error> {
     unimplemented!()
 }
-
+*/
+/*
 pub fn account_info_key(_account_id: &str) -> Result<String, error::Error> {
     unimplemented!()
 }
@@ -66,14 +80,69 @@ pub fn account_info_key(_account_id: &str) -> Result<String, error::Error> {
 pub fn decode_account_info(_info: &str) -> Result<EeeAccountInfo, error::Error> {
     unimplemented!()
 }
-
-// Notification event data Use hex-encoded strings to associate the results of notification events with transactions
-pub fn event_decode(_event_data: &str, _blockhash: &str, _account: &str) -> HashMap<u32, bool> {
-    unimplemented!()
+*/
+// 通知事件数据 使用hex 方式编码的字符串,将通知事件的结果与交易关联起来
+pub fn event_decode(event_data:&str,_blockhash:&str,_account:&str)->HashMap<u32,bool> {
+    let enents_bytes = hex::decode(event_data.get(2..).unwrap()).unwrap();
+    let events = Vec::<system::EventRecord<Event, H256>>::decode(&mut &enents_bytes[..]);
+    let mut tx_result = HashMap::with_capacity(8);
+    for record in events {
+        for event in record {
+            //todo 将索引与区块交易中的索引关联起来，怎么来确定交易索引与交易结果之间的关系？
+            let index = if let  Phase::ApplyExtrinsic(index) = event.phase{index}else { 0 };
+            //todo 当交易失败，不会存在该通知记录
+            match event.event {
+                Event::system(se) => {
+                    match &se {
+                        system::RawEvent::ExtrinsicSuccess(_dispath) => {
+                            tx_result.insert(index,true);
+                        },
+                        system::RawEvent::ExtrinsicFailed(_err, _info) => {
+                            tx_result.insert(index,false);
+                        },
+                        _ => log::error!("ignoring unsupported  system event")
+                    }
+                },
+                _ => log::error!("ignoring unsupported event")
+            }
+        }
+    }
+    tx_result
 }
+pub fn decode_extrinsics(extrinsics_json:&str,target_account:&str)->Result<HashMap<u32,TransferDetail>,error::Error>{
+    let target_account = AccountId::from_ss58check(target_account)?;
+    let json_data:Vec<String>   = serde_json::from_str(extrinsics_json)?;
+    let mut map = HashMap::new();
+    for index in 0..json_data.len() {
+        let extrinsic_encode_bytes = hex::decode(json_data[index].get(2..).unwrap())?;
+        let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &extrinsic_encode_bytes[..])?;
+        let mut tx = TransferDetail::default();
+        match &extrinsic.function {
+            Call::Timestamp(set(date,))=> {
+                tx.timestamp = Some(*date);
+                map.insert(index as u32,tx);
+            }
+            Call::Balances(transfercall(to,vaule))=>{//需要将交易发送者的信息关联出来
+                if let Some((account,_,(_,_,_,nonce,_,_,_))) = &extrinsic.signature{
+                    if !target_account.ge(to)&&!target_account.ge(&account){
+                        continue
+                    }
+                    tx.value = Some(*vaule);
+                    tx.to = Some(to.to_ss58check());
+                    tx.from = Some(account.to_ss58check());
+                    tx.index = Some(nonce.get_value());
+                }
 
-pub fn decode_extrinsics(_extrinsics_json: &str, _target_account: &str) -> Result<HashMap<u32, TransferDetail>, error::Error> {
-    unimplemented!()
+                let extrinsic_func_byte =   extrinsic.encode();
+                let blake2_result =blake2_rfc::blake2b::blake2b(32, &[], &extrinsic_func_byte);
+                let hash = blake2_result.as_bytes();
+                tx.hash = Some(format!("0x{}",hex::encode(hash)));
+               map.insert(index as u32,tx);
+            },
+            _=> println!(" extrinsic.function")
+        }
+    }
+    Ok(map)
 }
 
 #[test]
