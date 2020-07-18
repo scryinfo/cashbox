@@ -17,6 +17,7 @@ impl DataServiceProvider {
         }
         Ok(chain_type)
     }
+
     pub fn display_chain_detail(&self, chain_type: ChainType) -> WalletResult<Vec<WalletObj>> {
         //There are many association tables in this SQL statement. Association logic: Query the current wallet valid wallet, here is the main chain or test chain wallet is not distinguished to get a sub-table e
         // Query the relationship between the current address usage details and tokens, and get the sub-table d

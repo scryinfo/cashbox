@@ -12,16 +12,16 @@ public class NativeLibTest {
 
         System.out.println("********************start jni func test***************************************");
         System.out.println(NativeLib.initWalletBasicData());
-        // updateDefaultDigitTest();
-        walletGenerateTest();
+       //  updateDefaultDigitTest();
+
         //  walletExportTest();
-        //  updateAuthListTest();
-        //  addNonAuthDigitTest();
+          //updateAuthListTest();
+         // addNonAuthDigitTest();
+          walletGenerateTest();
         //  getAuthDigitListTest();
-        //  queryDigitTest();
+       //  queryDigitTest();
         //  addDigitTest();
         //delWalletTest();
-
 
         //  walletSaveTest();
         //  updateBalance();
@@ -62,7 +62,7 @@ public class NativeLibTest {
     }
 
     public static void queryDigitTest() {
-        NativeLib.DigitList list = NativeLib.queryDigit(3, "sc", "0x5a895efacf987");
+        NativeLib.DigitList list = NativeLib.queryDigit(3, "DD", "");
         System.out.println(list);
     }
 
@@ -88,7 +88,7 @@ public class NativeLibTest {
             NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(12);
             System.out.println(mnemonic.mnId);
             int r = random.nextInt(1000);
-            NativeLib.Wallet wallet = NativeLib.saveWallet("wallet_hello" + r, "123456".getBytes(), mnemonic.mn, 0);
+            NativeLib.Wallet wallet = NativeLib.saveWallet("wallet_hello" + r, "123456".getBytes(), mnemonic.mn, 1);
             System.out.println(wallet.toString());
         }
     }

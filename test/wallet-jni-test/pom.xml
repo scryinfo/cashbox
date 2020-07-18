@@ -27,8 +27,8 @@
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.9</maven.compiler.source>
-        <maven.compiler.target>1.9</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <build>
         <plugins>
@@ -39,7 +39,7 @@
                 <configuration>
                     <executable>java</executable> <!-- executable指的是要执行什么样的命令 -->
                     <arguments>
-                        <argument>-Djava.library.path=/home/ming/work/prj/cashbox/test/wallet-test/target/release/</argument> <!-- 这是一个系统属性参数 -->
+                        <argument>-Djava.library.path=../wallet-test/target/release/</argument> <!-- 这是一个系统属性参数 -->
                         <!--automatically creates the classpath using all project dependencies,
                             also adding the project build directory -->
                         <argument>-classpath</argument> <!-- 这是classpath属性，其值就是下面的<classpath/> -->

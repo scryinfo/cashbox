@@ -199,22 +199,22 @@ impl WalletManager {
     fn generate_address(&self, wallet_id: &str, mn: &[u8], wallet_type: i64) -> WalletResult<Vec<TbAddress>> {
         //Get which chains of the current wallet are available
         let instance = wallet_db::DataServiceProvider::instance()?;
-        let chains = instance.get_available_chain()?;//Error handling demo
+        let chains = instance.get_available_chain()?;//Error handling
         let mut address_vec = vec![];
         for chain in chains {
-            let chian_type = ChainType::from(chain);
-            let address = match chian_type {
-                ChainType::ETH | ChainType::EEE => {
+            let chain_type = ChainType::from(chain);
+            let address = match chain_type {
+                ChainType::ETH | ChainType::EEE |ChainType::BTC => {
                     if wallet_type == 0 {
                         continue;
                     }
-                    self.address_from_mnemonic(mn, chian_type)?
+                    self.address_from_mnemonic(mn, chain_type)?
                 }
-                ChainType::EthTest | ChainType::EeeTest => {
+                ChainType::EthTest | ChainType::EeeTest |ChainType::BtcTest => {
                     if wallet_type == 1 {
                         continue;
                     }
-                    self.address_from_mnemonic(mn, chian_type)?
+                    self.address_from_mnemonic(mn, chain_type)?
                 }
                 _ => unimplemented!()
             };
@@ -249,6 +249,16 @@ impl WalletManager {
                 Ok(address)
             }
             ChainType::ETH | ChainType::EthTest => {
+                let secret_byte = ethtx::pri_from_mnemonic(&phrase, None)?;
+                let (address, puk) = ethtx::generate_eth_address(&secret_byte)?;
+                let address = Address {
+                    chain_type: wallet_type,
+                    pubkey: puk,
+                    addr: address,
+                };
+                Ok(address)
+            }
+            ChainType::BTC | ChainType::BtcTest => {
                 let secret_byte = ethtx::pri_from_mnemonic(&phrase, None)?;
                 let (address, puk) = ethtx::generate_eth_address(&secret_byte)?;
                 let address = Address {
