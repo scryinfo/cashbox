@@ -29,7 +29,7 @@ class Wallet {
       return [];
     }
     //visibleChainList have cache data
-    if (!isForceLoad && visibleChainList != null && visibleChainList.length > 0) {
+    if (!isForceLoad && (visibleChainList != null) && (visibleChainList.length > 0)) {
       return visibleChainList;
     }
     visibleChainList = [];
