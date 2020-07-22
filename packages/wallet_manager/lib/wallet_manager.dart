@@ -28,6 +28,12 @@ class WalletManager {
     return containMap;
   }
 
+
+  static Future<Map<dynamic, dynamic>> updateWalletDbData() async {
+    Map<dynamic, dynamic> containMap = await _channel.invokeMethod('updateWalletDbData');
+    return containMap;
+  }
+
   //从数据库 加载出 所有钱包数据
   //导出所有钱包
   // apiNo:WM02

@@ -21,20 +21,29 @@ class SharedPreferenceUtil {
       spUtil.setString(VendorConfig.downloadLatestVersionIpKey, VendorConfig.downloadLatestVersionIpValue);
     }
     {
-      spUtil.setString(VendorConfig.appConfigVersionKey, VendorConfig.appConfigVersionValue);
-      //Configure token corresponding fiat currency information, trusted token list address, and default token address
       /// You can add or delete the initial configuration here according to your needs.
+      spUtil.setString(VendorConfig.appServerConfigIpKey, VendorConfig.appServerConfigIpValue);
+      spUtil.setString(VendorConfig.appConfigVersionKey, VendorConfig.appConfigVersionValue);
+      spUtil.setString(VendorConfig.serverApkVersionKey, VendorConfig.serverApkVersionValue);
+      //Configure token corresponding fiat currency information, trusted token list address, and default token address
       spUtil.setString(VendorConfig.rateDigitIpKey, VendorConfig.rateDigitIpDefaultValue);
+      // record digit ip and version
       spUtil.setString(VendorConfig.authDigitsVersionKey, VendorConfig.authDigitsVersionValue);
       spUtil.setString(VendorConfig.authDigitsIpKey, VendorConfig.authDigitsIpDefaultValue);
       spUtil.setString(VendorConfig.defaultDigitsVersionKey, VendorConfig.defaultDigitsVersionValue);
       spUtil.setString(VendorConfig.defaultDigitsIpKey, VendorConfig.defaultDigitsIpDefaultValue);
       spUtil.setString(VendorConfig.defaultDigitsContentKey, VendorConfig.defaultDigitsContentDefaultValue);
       spUtil.setString(VendorConfig.scryXIpKey, VendorConfig.scryXIpDefaultValue);
+
+      /// public web
       spUtil.setString(VendorConfig.publicIpKey, VendorConfig.publicIpDefaultValue);
-      spUtil.setString(VendorConfig.appServerConfigIpKey, VendorConfig.appServerConfigIpValue);
+
+      /// control visit time
       spUtil.setString(VendorConfig.lastTimeCheckConfigKey, VendorConfig.lastTimeCheckConfigValue);
+      //init db info config
       spUtil.setBool(VendorConfig.initDatabaseStateKey, false);
+      spUtil.setString(VendorConfig.newDbVersionKey, VendorConfig.newDbVersionValue);
+      spUtil.setString(VendorConfig.oldDbVersionKey, VendorConfig.oldDbVersionValue);
     }
     {
       //The selected fiat currency is: (usd cny jpy)

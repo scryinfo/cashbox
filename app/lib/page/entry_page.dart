@@ -30,7 +30,7 @@ class _EntryPageState extends State<EntryPage> {
   String _languageTextValue = "";
   List<String> languagesKeyList = [];
   Map<String, String> languageMap = {};
-  int checkConfigInterval = 1 * 1000 * 60; //every 1 minute allow to check config Ip
+  int checkConfigInterval = 1000 * 20; //every 20 seconds allow to check config Ip
 
   @override
   void initState() {
@@ -44,7 +44,7 @@ class _EntryPageState extends State<EntryPage> {
     var spUtil = await SharedPreferenceUtil.instance;
     _languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
     future = _checkIsContainWallet();
-    //_checkAndUpdateAppConfig();
+    _checkAndUpdateAppConfig();
   }
 
   initAppConfigInfo() async {
@@ -63,6 +63,26 @@ class _EntryPageState extends State<EntryPage> {
 
   _checkAndUpdateAppConfig() async {
     var spUtil = await SharedPreferenceUtil.instance;
+    //check and update DB
+    if (true) {
+      //push Vendor data to sharedpreference file
+      spUtil.setString(VendorConfig.oldDbVersionKey, VendorConfig.oldDbVersionValue);
+      spUtil.setString(VendorConfig.newDbVersionKey, VendorConfig.newDbVersionValue);
+      //compare different versions
+      var oldDbVersion = spUtil.getString(VendorConfig.oldDbVersionKey);
+      var newDbVersion = spUtil.getString(VendorConfig.newDbVersionKey);
+      if (newDbVersion == null) {
+        LogUtil.e("_checkAndUpdateAppConfig:", "newDbVersion  is null");
+      } else if (oldDbVersion == null || (oldDbVersion != newDbVersion)) {
+        Map resultMap = Map(); //todo update dbVersion implement
+        //Map resultMap = await Wallets.instance.updateWalletDbData(oldDbVersion, newDbVersion);
+        if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
+          print("_checkAndUpdateAppConfig===>update database successful===>" + newDbVersion);
+          spUtil.setString(VendorConfig.oldDbVersionKey, newDbVersion); // update oldDbVersion record
+        }
+      }
+    }
+
     String lastCheckTime = spUtil.getString(VendorConfig.lastTimeCheckConfigKey);
     int nowTimeStamp = DateTime.now().millisecondsSinceEpoch;
     try {

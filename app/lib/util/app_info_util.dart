@@ -34,33 +34,17 @@ class AppInfoUtil {
     print("packageInfo appVersion===>" + appVersion + "||buildNumber===>" + buildNumber);
     try {
       var spUtil = await SharedPreferenceUtil.instance;
-      String versionIpValue = spUtil.getString(VendorConfig.versionCheckIpKey) ?? VendorConfig.versionCheckIpValue;
-      var serveResult = await requestWithDeviceId(versionIpValue, formData: {"apkVersion": appVersion});
-      if ((serveResult != null) && (serveResult["code"] == 0)) {
-        var resultObj = serveResult["data"];
-        if (resultObj == null || resultObj["isLatest"] == null) {
-          print("resultObj is wrong=====>");
-          return false;
-        }
-        if (!resultObj["isLatest"]) {
-          print("isLatest=====>" + resultObj["isLatest"].toString());
-          var latestVersion = resultObj["latestApk"]["apkVersion"].toString();
-          if (latestVersion != null && latestVersion.isNotEmpty) {
-            var spUtil = await SharedPreferenceUtil.instance;
-            String downloadIpValue = spUtil.getString(VendorConfig.downloadLatestVersionIpKey) ?? VendorConfig.downloadLatestVersionIpValue;
-            _doUpgradeApp(downloadIpValue, latestVersion);
-            return true;
-          }
-        }
-      } else {
-        print("checkAppUpgrade serve check failure ====>");
-        return false;
+      String serverVersion = spUtil.getString(VendorConfig.serverApkVersionKey);
+      if (serverVersion != null && appVersion != null && (serverVersion.toLowerCase() != appVersion.toLowerCase())) {
+        String downloadIpValue = spUtil.getString(VendorConfig.downloadLatestVersionIpKey) ?? VendorConfig.downloadLatestVersionIpValue;
+        _doUpgradeApp(downloadIpValue, serverVersion);
+        return true;
       }
+      return false;
     } catch (e) {
       print("checkAppUpgrade error is ===>" + e.toString());
       return false;
     }
-    return false;
   }
 
   //Notification to the native part of android/ios, to upgrade
