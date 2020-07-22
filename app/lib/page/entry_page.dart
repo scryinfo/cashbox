@@ -67,10 +67,10 @@ class _EntryPageState extends State<EntryPage> {
     if (true) {
       //push Vendor data to sharedpreference file
       spUtil.setString(VendorConfig.oldDbVersionKey, VendorConfig.oldDbVersionValue);
-      spUtil.setString(VendorConfig.newDbVersionKey, VendorConfig.newDbVersionValue);
+      spUtil.setString(VendorConfig.nowDbVersionKey, VendorConfig.nowDbVersionValue);
       //compare different versions
       var oldDbVersion = spUtil.getString(VendorConfig.oldDbVersionKey);
-      var newDbVersion = spUtil.getString(VendorConfig.newDbVersionKey);
+      var newDbVersion = spUtil.getString(VendorConfig.nowDbVersionKey);
       if (newDbVersion == null) {
         LogUtil.e("_checkAndUpdateAppConfig:", "newDbVersion  is null");
       } else if (oldDbVersion == null || (oldDbVersion != newDbVersion)) {

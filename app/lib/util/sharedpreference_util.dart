@@ -42,7 +42,7 @@ class SharedPreferenceUtil {
       spUtil.setString(VendorConfig.lastTimeCheckConfigKey, VendorConfig.lastTimeCheckConfigValue);
       //init db info config
       spUtil.setBool(VendorConfig.initDatabaseStateKey, false);
-      spUtil.setString(VendorConfig.newDbVersionKey, VendorConfig.newDbVersionValue);
+      spUtil.setString(VendorConfig.nowDbVersionKey, VendorConfig.nowDbVersionValue);
       spUtil.setString(VendorConfig.oldDbVersionKey, VendorConfig.oldDbVersionValue);
     }
     {

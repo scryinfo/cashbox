@@ -164,7 +164,7 @@ class Wallets {
           ..chainId = eeeChain["chainId"]
           ..chainAddress = eeeChain["chainAddress"]
           ..chainType = Chain.intToChainType(eeeChain["chainType"])
-          ..isVisible = true //todo change Visible state
+          ..isVisible = false //todo change Visible state
           ..walletId = eeeChain["walletId"];
         List eeeChainDigitList = eeeChain["eeeChainDigitList"];
         for (int j = 0; j < eeeChainDigitList.length; j++) {
