@@ -197,7 +197,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     /*-------------------------组装ETH链上数据 end---------------------------*/
 
                     /*-------------------------组装BTC链上数据 start-------------------------*/
-                    Map<String, Object> resultBtcChain = new HashMap<>();
+                    /*Map<String, Object> resultBtcChain = new HashMap<>();
                     resultBtcChain.put("chainAddress", walletList.get(walletIndex).btcChain.address);
                     resultBtcChain.put("chainId", walletList.get(walletIndex).btcChain.chainId);
                     resultBtcChain.put("chainType", walletList.get(walletIndex).btcChain.chainType);
@@ -224,13 +224,13 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         }
                         //ScryWalletLog.d("nativeLib=>", "Btc链 btcChainDigitList.toString() ===>" + btcChainDigitList.toString());
                         resultBtcChain.put("btcChainDigitList", btcChainDigitList);
-                    }
+                    }*/
                     /*-------------------------组装BTC链上数据 end -------------------------*/
 
                     ///每个钱包再加入组装好的各条链的信息
                     walletMap.put("eeeChain", resultEeeChain);
                     walletMap.put("ethChain", resultEthChain);
-                    walletMap.put("btcChain", resultBtcChain);
+                    //walletMap.put("btcChain", resultBtcChain);
 
                     ///钱包列表，加入拼装好的钱包
                     resultWalletList.add(walletMap);

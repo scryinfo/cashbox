@@ -216,7 +216,7 @@ class Wallets {
           walletM.chainList.add(chainEthM);
         }
       }
-      {
+      /*{
         //BTC
         ChainBTC chainBtcM = ChainBTC();
         var btcChain = jniList[walletIndex]["btcChain"];
@@ -245,7 +245,7 @@ class Wallets {
           }
           walletM.chainList.add(chainBtcM);
         }
-      }
+      }*/
       walletM.nowChain = walletM.getChainByChainId(walletM.nowChainId);
       if (walletM.isNowWallet) {
         this.nowWallet = walletM;
