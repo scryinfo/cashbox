@@ -4,9 +4,9 @@ use std::{fs, path};
 use sqlite::Connection;
 
 #[cfg(target_os = "android")]
-const TB_WALLET: &str = r#"/data/data/cashbox.scry.info/files/cashbox_wallet.db"#;
+const TB_WALLET: &str = r#"/data/data/wallet.cashbox.scry.info/files/cashbox_wallet.db"#;
 #[cfg(target_os = "android")]
-const TB_WALLET_DETAIL: &str = r#"/data/data/cashbox.scry.info/files/cashbox_wallet_detail.db"#;
+const TB_WALLET_DETAIL: &str = r#"/data/data/wallet.cashbox.scry.info/files/cashbox_wallet_detail.db"#;
 
 #[cfg(any(target_os = "linux", target_os = "windows"))]
 const TB_WALLET: &str = r#"cashbox_wallet.db"#;
