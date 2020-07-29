@@ -24,7 +24,7 @@ blake2-rfc="0.2.18"
 scrypt = { version = "0.2", default-features = true }
 codec = { package = "parity-scale-codec", version = "1.2.0" }
 
-primitive-types = { version = "0.6.2", default-features = false, features = ["codec"] }
+primitive-types = { version = "0.7.2", default-features = false, features = ["codec"] }
 
 scry-crypto = {version = "0.1.0",path="../crypto"}
 
@@ -32,43 +32,28 @@ scry-crypto = {version = "0.1.0",path="../crypto"}
 path = "../../../../eee/demo/substrate/primitives/core/"
 
 [dependencies.node-runtime]
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 package = "node-template-runtime"
 path="../../../../eee/demo/substrate/bin/node-template/runtime/"
 
 [dependencies.sp-runtime]
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../../eee/demo/substrate/primitives/runtime/"
 
 [dependencies.system]
 package = "frame-system"
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../../eee/demo/substrate/frame/system/"
 
 [dependencies.balances]
 package = "pallet-balances"
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../../eee/demo/substrate/frame/balances/"
 
 
 [dependencies.pallet-contracts]
 package = "pallet-contracts"
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../../eee/demo/substrate/frame/contracts/"
 
 [dependencies.transaction-payment]
 package = "pallet-transaction-payment"
-#git = 'https://github.com/paritytech/substrate.git'
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../../eee/demo/substrate/frame/transaction-payment/"
 
 [dependencies.frame-support]
-#git = "https://github.com/paritytech/substrate.git"
-package = "frame-support"
-#rev = "b443ddad65f2ffed68db4973b7b78231c6fc3674"
 path = "../../../../eee/demo/substrate/frame/support/"

@@ -1,6 +1,4 @@
 use super::*;
-
-
 pub use sp_runtime::{
     generic::{Era, SignedPayload, UncheckedExtrinsic},
     traits::{IdentifyAccount, Verify},
@@ -44,39 +42,39 @@ impl PublicT for ecdsa::Public { fn into_runtime(self) -> AccountPublic { self.i
 
 /// 签名验证过程中需要满足的条件
 type SignedExtra = (
-    system::CheckVersion<Runtime>,
+    system::CheckSpecVersion<Runtime>,
+    system::CheckTxVersion<Runtime>,
     system::CheckGenesis<Runtime>,
     system::CheckEra<Runtime>,
     system::CheckNonce<Runtime>,
     system::CheckWeight<Runtime>,
-    transaction_payment::ChargeTransactionPayment<Runtime>,
-    pallet_contracts::CheckBlockGasLimit<Runtime>,//检查合约执行消耗的gas是否超过区块gas限制
+    transaction_payment::ChargeTransactionPayment<Runtime>
 );
 
 
 /// 将Call方法使用调用者的密钥进行签名
 ///
-fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C::Pair, genesis_hash: H256, version: u32) -> UncheckedExtrinsicV4 where PublicOf<C>: PublicT, SignatureOf<C>: SignatureT,
+fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C::Pair, genesis_hash: H256, spec_version: u32,transaction_version:u32) -> UncheckedExtrinsicV4 where PublicOf<C>: PublicT, SignatureOf<C>: SignatureT,
 {
     let extra = |i: Index, f: Balance| {
         (
-            system::CheckVersion::<Runtime>::new(),
+            system::CheckSpecVersion::<Runtime>::new(),
+            system::CheckTxVersion::<Runtime>::new(),
             system::CheckGenesis::<Runtime>::new(),
             system::CheckEra::<Runtime>::from(Era::Immortal),
             system::CheckNonce::<Runtime>::from(i),
             system::CheckWeight::<Runtime>::new(),
             transaction_payment::ChargeTransactionPayment::<Runtime>::from(f),
-            Default::default(),
         )
     };
     let raw_payload = SignedPayload::from_raw(
         function,
         extra(index, 0),
         (
-            version,
+            spec_version,
+            transaction_version,
             genesis_hash,
             genesis_hash,
-            (),
             (),
             (),
             (),
@@ -94,7 +92,7 @@ fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C:
     )
 }
 
-pub fn transfer(mnemonic: &str, to: &str, amount: &str, genesis_hash: &[u8], index: u32, runtime_version: u32) -> Result<String, error::Error> {
+pub fn transfer(mnemonic: &str, to: &str, amount: &str, genesis_hash: &[u8], index: u32, runtime_version: u32,tx_version:u32) -> Result<String, error::Error> {
     //todo 考虑将交易的生成与交易的签名分成两个步骤，在交易生成环节可以计算出当前交易所需要的手续费，提示用户针对这次转账共需要消耗多少balance?
     let to_account_id = AccountId::from_ss58check(to)?;
     let amount = balance_unit_convert(amount, 12).unwrap();
@@ -104,15 +102,15 @@ pub fn transfer(mnemonic: &str, to: &str, amount: &str, genesis_hash: &[u8], ind
     let mut prefix = calculate_prefix(function.len());
     prefix.extend_from_slice(&function);
 
-    let result = tx_sign(mnemonic, genesis_hash, index as u32, &prefix, runtime_version)?;
+    let result = tx_sign(mnemonic, genesis_hash, index as u32, &prefix, runtime_version,tx_version)?;
     Ok(result)
 }
 
-pub fn tx_sign(mnemonic: &str, genesis_hash: &[u8], index: u32, func_data: &[u8], version: u32) -> Result<String, error::Error> {
+pub fn tx_sign(mnemonic: &str, genesis_hash: &[u8], index: u32, func_data: &[u8], spec_version: u32,tx_version:u32) -> Result<String, error::Error> {
     let signer = crypto::Sr25519::pair_from_phrase(mnemonic, None)?;
     let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &func_data[..])?;
-  
-    let extrinsic = generate_signed_extrinsic::<crypto::Sr25519>(extrinsic.function, index, signer,H256::from_slice(genesis_hash), version);
+
+    let extrinsic = generate_signed_extrinsic::<crypto::Sr25519>(extrinsic.function, index, signer,H256::from_slice(genesis_hash), spec_version,tx_version);
     let result = format!("0x{}", hex::encode(&extrinsic.encode()));
     Ok(result)
 }

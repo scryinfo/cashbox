@@ -11,13 +11,14 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-        System.out.println(NativeLib.initWalletBasicData());
+        //System.out.println(NativeLib.initWalletBasicData());
        //  updateDefaultDigitTest();
-
-        //  walletExportTest();
+        //walletGenerateTest();
+         //walletExportTest();
+        eeeTransferTest();
           //updateAuthListTest();
          // addNonAuthDigitTest();
-          walletGenerateTest();
+
         //  getAuthDigitListTest();
        //  queryDigitTest();
         //  addDigitTest();
@@ -26,12 +27,12 @@ public class NativeLibTest {
         //  walletSaveTest();
         //  updateBalance();
         // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
-        List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
+      //  List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
         //  contract_test(wallets);
-        for (NativeLib.Wallet wallet : wallets) {
+       /* for (NativeLib.Wallet wallet : wallets) {
             System.out.println("***********************");
             System.out.println(wallet.toString());
-        }
+        }*/
     }
 
 
@@ -126,13 +127,13 @@ public class NativeLibTest {
     }
 
     public static void eeeTransferTest() {
-        String from = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
+        String from = "5CATEAifKo78WrEPMwuxuEtGVZK632HKePjQ3632yVQptzp1";
         String to = "5GGzGJR54YNjMKhaYt6hHV3o99FZ6JKYEDCrzUg1HCz1tWPa";
         String value = "200000000000000";
-        String genesisHash = "0xabb0f2e62dfab481623438e14b5e1d4114a6e9a2f0d3f5e83f9192276e50cf34";
-        int index = 3;
+        String genesisHash = "0xd8b208f376046294d25ba5e759e72f5345d6bbe9da77322bcb2c330b254df268";
+        int index = 0;
         int runtimeVersion = 1;
-        NativeLib.Message msg = NativeLib.eeeTransfer(from, to, value, genesisHash, index, runtimeVersion, "123456".getBytes());
+        NativeLib.Message msg = NativeLib.eeeTransfer(from, to, value, genesisHash, index, runtimeVersion,1, "123456".getBytes());
         System.out.println(msg);
     }
 

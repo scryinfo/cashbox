@@ -589,7 +589,7 @@ public class NativeLib {
     // About eee related data acquisition, transaction extraction, all are operated by the client, the bottom layer does not operate the network;
     // The bottom layer directly constructs a signed transfer transaction, and returns the information that can be directly submitted to the chain through the signedInfo attribute in the Message field.
     // Note: vaule uses the default unit in the transfer: unit, the precision is 10^12, that is, 1 unit =1000_000_000_000
-    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version, byte[] pwd);
+    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version,int tx_version, byte[] pwd);
 
     //msg: transaction
     //TODO The use of this interface also needs to be re-planned

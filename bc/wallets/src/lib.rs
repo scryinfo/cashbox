@@ -101,6 +101,7 @@ mod tests {
         let genesis_hash = "0xabb0f2e62dfab481623438e14b5e1d4114a6e9a2f0d3f5e83f9192276e50cf34";
         let index = 0;
         let runtime_version = 1;
+        let tx_version =1 ;
         let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap()).unwrap();
         let mut genesis_h256 = [0u8; 32];
         genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
