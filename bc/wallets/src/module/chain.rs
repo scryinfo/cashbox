@@ -216,6 +216,7 @@ impl Ethereum {
         } else {
             ChainType::EthTest
         };
+
         let keystore = find_keystore_wallet_from_address(from_address, chain_type)?;
         //Password validation
         let mnemonic = substratetx::Sr25519::get_mnemonic_context(&keystore, psw)?;
