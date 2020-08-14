@@ -17,11 +17,29 @@ class Wallet {
   String jsonFilePath; //Private key encrypted file jsonFile path
   String creationTime; //Wallet creation time
   List<Chain> chainList = []; //The wallet contains a list of chains
+  List<Chain> visibleChainList = []; //List of visible chains
   String nowChainId; //In the wallet, the current chain chainId
   Chain nowChain;
   WalletType walletType;
   bool isNowWallet; //Whether it is the current wallet
   //todo load chain
+
+  List<Chain> getVisibleChainList({bool isForceLoad = false}) {
+    if (chainList == null || chainList.length == 0) {
+      return [];
+    }
+    //visibleChainList have cache data
+    if (!isForceLoad && (visibleChainList != null) && (visibleChainList.length > 0)) {
+      return visibleChainList;
+    }
+    visibleChainList = [];
+    chainList.forEach((element) {
+      if (element.isVisible) {
+        visibleChainList.add(element);
+      }
+    });
+    return visibleChainList;
+  }
 
   // Reset wallet password
   // apiNo:WM08

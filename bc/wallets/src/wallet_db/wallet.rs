@@ -7,6 +7,8 @@ use crate::wallet_db::db_helper::DataServiceProvider;
 //According to the chain id, convert to the corresponding chain type and group name
 fn chain_id_convert_group_name(chain_id: i16) -> Option<(i64, String)> {
     match chain_id {
+        1 => Some((1, "BTC".to_string())),
+        2 => Some((0, "BTC".to_string())),
         3 => Some((1, "ETH".to_string())),
         4 => Some((0, "ETH".to_string())),
         5 => Some((1, "EEE".to_string())),

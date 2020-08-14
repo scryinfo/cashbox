@@ -176,6 +176,7 @@ public class NativeLib {
         public boolean isAddDigit;            //Add tokens, is it successful       apiNo:WM16   Execution status: 1 success 0 failure
         public boolean isUpdateDigitBalance;  //Is it a success to update the number of tokens owned   Execution status: 1 success 0 failure
         public boolean isInitWalletBasicData;  //Is it successful to initialize the basic data of the data  Execution status: 1 success 0 failure
+        public boolean isUpdateDbData;         //Is it successful to update data.  Execution status: 1 success 0 failure
         public boolean isUpdateAuthDigit;     //Update the authentication token, is it successful   Execution status: 1 success 0 failure
         public boolean isUpdateDefaultDigit;  //Was it successful to update the default token   Execution status: 1 success 0 failure
         public boolean isAddNonAuthDigit;     //Add custom tokens, whether it's useful  Execution status: 1 success 0 failure
@@ -217,6 +218,13 @@ public class NativeLib {
      * @return// Whether you already have a wallet
      */
     public static native WalletState initWalletBasicData();
+
+    /**
+     * Update wallet data file
+     *
+     * @return// Whether update successful
+     */
+    public static native WalletState updateWalletDbData(String oldVersion,String newVersion); // init Version 1.0
 
     // apiNo:WM01 fixed - fixed
     public static native WalletState isContainWallet();

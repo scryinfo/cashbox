@@ -4,9 +4,17 @@
   For example: the corresponding back-end legal currency interface can be added
 **/
 class VendorConfig {
-  ///Version check interface；
-  static const versionCheckIpKey = "";
-  static const versionCheckIpValue = "";
+  ///server config IP
+  static const appServerConfigIpKey = ""; //
+  static const appServerConfigIpValue = ""; //
+
+  ///
+  static const appConfigVersionKey = "";
+  static const appConfigVersionValue = "";
+
+  ///
+  static const serverApkVersionKey = "";
+  static const serverApkVersionValue = "";
 
   ///The latest version app download interface；
   static const downloadLatestVersionIpKey = "";
@@ -42,21 +50,19 @@ class VendorConfig {
   static const publicIpKey = "";
   static const publicIpDefaultValue = "";
 
-  /// app server config ip
-  static const appServerConfigIpKey = "";
-  static const appServerConfigIpValue = " ";
-
-  /// app server config version
-  static const appServerConfigVersionKey = "";
-  static const appServerConfigVersionValue = " ";
-
   /// last change time of check config
-  static const checkConfigLastTimeKey = "";
-  static const checkConfigLastTimeValue = " ";
+  static const lastTimeCheckConfigKey = "";
+  static const lastTimeCheckConfigValue = "";
 
   /// init database statement
   static const initDatabaseStateKey = "";
   static const initDatabaseStateValue = false;
+
+  static const oldDbVersionKey = "old_db_version_key";
+  static const oldDbVersionValue = "1.0";
+
+  static const nowDbVersionKey = "new_db_version_key";
+  static const nowDbVersionValue = "1.0";
 
   static const ETHERSCAN_API_KEY = "";
 }

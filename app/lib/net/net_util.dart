@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/util/app_info_util.dart';
 import 'package:app/util/log_util.dart';
+import 'package:app/util/sharedpreference_util.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info/package_info.dart';
 
 final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
 Map<String, dynamic> _deviceData = <String, dynamic>{}; //Device Information
@@ -22,7 +25,8 @@ Future requestWithDeviceId(String url, {formData}) async {
       if (Platform.isAndroid) {
         _deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
         if (_deviceData != null) {
-          deviceId = _deviceData["androidId"]; //At present, each Android product device has a unique identification value. If you do not agree, temporarily take the value of androidId.
+          deviceId = _deviceData[
+              "androidId"]; //At present, each Android product device has a unique identification value. If you do not agree, temporarily take the value of androidId.
         }
       } else if (Platform.isIOS) {
         _deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
@@ -50,6 +54,26 @@ Future requestWithDeviceId(String url, {formData}) async {
   return request(url, formData: formData);
 }
 
+Future requestWithConfigCheckParam(String url, {formData}) async {
+  var spUtil = await SharedPreferenceUtil.instance;
+
+  if (formData == null) formData = {};
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  String apkVersion = packageInfo.version;
+  formData["apkVersion"] = apkVersion;
+
+  var authTokenListVersion = spUtil.getString(VendorConfig.authDigitsVersionKey) ?? VendorConfig.authDigitsVersionValue;
+  formData["authTokenListVersion"] = authTokenListVersion;
+
+  var defaultTokenListVersion = spUtil.getString(VendorConfig.defaultDigitsVersionKey) ?? VendorConfig.defaultDigitsVersionValue;
+  formData["defaultTokenListVersion"] = defaultTokenListVersion;
+
+  var appConfigVersion = spUtil.getString(VendorConfig.appConfigVersionKey) ?? VendorConfig.appConfigVersionValue;
+  formData["appConfigVersion"] = appConfigVersion;
+
+  return requestWithDeviceId(url, formData: formData);
+}
+
 //Access network request, url + parameter object
 Future request(String url, {formData}) async {
   try {
@@ -65,7 +89,7 @@ Future request(String url, {formData}) async {
         return true;
       };
     };
-
+    //print("formData ======>"+formData.toString());
     if (formData == null) {
       response = await dio.post(url);
     } else {

@@ -114,8 +114,8 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
         update DigitUseDetail set UPDATED_TIME = strftime('%s','now') where digit_id = new.digit_id and address_id = new.address_id ;
       end;
 
-    insert into Chain(id,short_name,full_name,type,domain,selected) Values(1,'BTC',"bitcoin",1,"",0);
-    insert into Chain(id,short_name,full_name,type,domain,selected) Values(2,'BTC TEST',"bitcoin test",2,"",0);
+    insert into Chain(id,short_name,full_name,type,domain,selected) Values(1,'BTC',"bitcoin",1,"",1);
+    insert into Chain(id,short_name,full_name,type,domain,selected) Values(2,'BTC TEST',"bitcoin test",2,"",1);
     insert into Chain(id,short_name,full_name,type,domain) Values(3,'ETH',"ethereum",3,"");
     insert into Chain(id,short_name,full_name,type,domain) Values(4,'ETH TEST',"ethereum test",4,"");
     insert into Chain(id,short_name,full_name,type,domain) Values(5,'EEE',"eee",5,"");

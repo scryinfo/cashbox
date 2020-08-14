@@ -36,18 +36,18 @@ class Wallets {
 
   initAppConfig() async {
     initIpConfig(); //init IP config info to local file
-    initWalletBasicData(); //init wallet Database Info
+    initDatabaseAndDefaultDigits(); //init wallet Database Info
   }
 
   initIpConfig() async {
     var spUtil = await SharedPreferenceUtil.instance;
     var isFinishInit = spUtil.getBool(GlobalConfig.isInitAppConfig);
     if (isFinishInit == null || !isFinishInit) {
-      SharedPreferenceUtil.initVersion(); //Initialize interface ip, version information, etc. to local file
+      SharedPreferenceUtil.initIpConfig(); //Initialize interface ip, version information, etc. to local file
     }
   }
 
-  initWalletBasicData() async {
+  initDatabaseAndDefaultDigits() async {
     var spUtil = await SharedPreferenceUtil.instance;
     var state = spUtil.getBool(VendorConfig.initDatabaseStateKey);
     if (state != null && state) {
@@ -55,17 +55,36 @@ class Wallets {
       print("initWalletBasicData(), ===> finished");
       return;
     }
+    //传参数 当前上层记录的db版本号，下层判断如过小于，db升级；如果一致，不升级。  返回值：底层操作后的db版本号。
     Map resultMap = await WalletManager.initWalletBasicData(); //Initialize some database data
     int status = resultMap["status"];
     if (status == null) {
       LogUtil.e("initWalletBasicData error=>", "not find status code");
       return;
     }
+    //todo save the database version
+    //spUtil.setString(VendorConfig.nowDatabaseVersionKey, );
+
     if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
       spUtil.setBool(VendorConfig.initDatabaseStateKey, resultMap["isInitWalletBasicData"]);
       var digitParam = spUtil.getString(VendorConfig.defaultDigitsContentKey) ?? VendorConfig.defaultDigitsContentDefaultValue;
       var updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
       print("updateMap[isUpdateDefaultDigit](),=====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
+    }
+  }
+
+  Future<Map> updateWalletDbData(String oldVersion, String newVersion) async {
+    Map resultMap = await WalletManager.updateWalletDbData(); //Initialize some database data
+    int status = resultMap["status"];
+    if (status == null) {
+      LogUtil.e("initWalletBasicData error=>", "not find status code");
+      return null;
+    }
+    if (status == 200) {
+      return resultMap;
+    } else {
+      LogUtil.e("initWalletBasicData=>", "error status is=>" + resultMap["status"].toString() + "||message is=>" + resultMap["message"].toString());
+      return null;
     }
   }
 
@@ -138,14 +157,14 @@ class Wallets {
         ..creationTime = jniList[walletIndex]["creationTime"].toString()
         ..isNowWallet = jniList[walletIndex]["isNowWallet"];
       //  todo version1.0 without scryx chain display
-      /*{
+      {
         var eeeChain = jniList[walletIndex]["eeeChain"];
         Chain chainEeeM = ChainEEE();
         chainEeeM
           ..chainId = eeeChain["chainId"]
           ..chainAddress = eeeChain["chainAddress"]
           ..chainType = Chain.intToChainType(eeeChain["chainType"])
-          ..isVisible = eeeChain["isVisible"]
+          ..isVisible = false //todo change Visible state
           ..walletId = eeeChain["walletId"];
         List eeeChainDigitList = eeeChain["eeeChainDigitList"];
         for (int j = 0; j < eeeChainDigitList.length; j++) {
@@ -165,7 +184,7 @@ class Wallets {
           chainEeeM.digitsList.add(digitM);
         }
         walletM.chainList.add(chainEeeM); ////Add chain to chainList
-      }*/
+      }
       {
         //ETH
         ChainETH chainEthM = ChainETH();
@@ -197,7 +216,7 @@ class Wallets {
           walletM.chainList.add(chainEthM);
         }
       }
-      {
+      /*{
         //BTC
         ChainBTC chainBtcM = ChainBTC();
         var btcChain = jniList[walletIndex]["btcChain"];
@@ -205,7 +224,7 @@ class Wallets {
           ..chainId = btcChain["chainId"]
           ..chainAddress = btcChain["chainAddress"]
           ..chainType = Chain.intToChainType(btcChain["chainType"])
-          ..isVisible = true
+          ..isVisible = false //todo change Visible state
           ..walletId = jniList[walletIndex]["walletId"];
         List btcChainDigitList = btcChain["btcChainDigitList"];
         if (btcChainDigitList != null && btcChainDigitList.length > 0) {
@@ -226,7 +245,7 @@ class Wallets {
           }
           walletM.chainList.add(chainBtcM);
         }
-      }
+      }*/
       walletM.nowChain = walletM.getChainByChainId(walletM.nowChainId);
       if (walletM.isNowWallet) {
         this.nowWallet = walletM;
@@ -429,6 +448,9 @@ class Wallets {
   }
 
   updateDefaultDigitList(String digitData) async {
+    if (digitData == null || digitData.isEmpty) {
+      return Map();
+    }
     Map updateMap = await WalletManager.updateDefaultDigitList(digitData);
     int status = updateMap["status"];
     if (status == null || status != 200) {
@@ -438,6 +460,9 @@ class Wallets {
   }
 
   updateAuthDigitList(String digitData) async {
+    if (digitData == null || digitData.isEmpty) {
+      return Map();
+    }
     Map updateMap = await WalletManager.updateAuthDigitList(digitData);
     int status = updateMap["status"];
     if (status == null || status != 200) {

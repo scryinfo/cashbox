@@ -717,10 +717,10 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 decimal: decimal);
             print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"].toString());
             if (result["status"] != null && result["status"] == 200) {
-              Fluttertoast.showToast(msg: "签名成功！ 交易发送上链中", timeInSecForIos: 5);
+              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), timeInSecForIos: 5);
               sendRawTx2Chain(result["ethSignedInfo"].toString());
             } else {
-              Fluttertoast.showToast(msg: "交易签名失败,请检查你输入的密码!", timeInSecForIos: 6);
+              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), timeInSecForIos: 6);
               NavigatorUtils.goBack(context);
             }
           },
@@ -731,13 +731,13 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   void sendRawTx2Chain(String rawTx) async {
     NavigatorUtils.goBack(context);
-    showProgressDialog(context, "交易发送上链中");
+    showProgressDialog(context, translate("tx_sending"));
     String txHash = await sendRawTx(Wallets.instance.nowWallet.nowChain.chainType, rawTx);
     print("after broadcast txHash is===>" + txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
-      Fluttertoast.showToast(msg: "交易上链 成功", timeInSecForIos: 8);
+      Fluttertoast.showToast(msg: translate("tx_upload_success"), timeInSecForIos: 8);
     } else {
-      Fluttertoast.showToast(msg: "交易上链 失败", timeInSecForIos: 8);
+      Fluttertoast.showToast(msg: translate("tx_upload_failure"), timeInSecForIos: 8);
     }
     {
       const timeout = Duration(seconds: 5);
@@ -752,7 +752,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
     nonce = await loadTxAccount(fromAddress, chainType);
     if (nonce == null || nonce.trim() == "") {
       print("取的nonce值有问题");
-      Fluttertoast.showToast(msg: "本次交易的nonce值有问题，请检查网络重新尝试", timeInSecForIos: 8);
+      Fluttertoast.showToast(msg: translate("nonce_is_wrong"), timeInSecForIos: 8);
       NavigatorUtils.goBack(context);
       return false;
     }
@@ -766,7 +766,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
     }
 
     if (!Utils.checkByEthAddressFormat(_toAddressController.text)) {
-      Fluttertoast.showToast(msg: "对方地址格式 有问题", timeInSecForIos: 5);
+      Fluttertoast.showToast(msg: translate("to_address_format_wrong"), timeInSecForIos: 5);
       return false;
     }
 
@@ -803,15 +803,15 @@ class _TransferEthPageState extends State<TransferEthPage> {
     if (ethBalance.isNotEmpty) {
       try {
         if (double.parse(ethBalance) <= 0) {
-          Fluttertoast.showToast(msg: "账户以太坊余额，不足支付gas费");
+          Fluttertoast.showToast(msg: translate("not_enough_for_gas"));
           return false;
         }
       } catch (e) {
-        Fluttertoast.showToast(msg: "账户以太坊余额出现错误:" + e.toString());
+        Fluttertoast.showToast(msg: translate("eth_balance_error") + e.toString());
         return false;
       }
     } else {
-      Fluttertoast.showToast(msg: "检查支付gas费失败，请重新打开尝试.");
+      Fluttertoast.showToast(msg: translate("check_gas_state_failure"));
       return false;
     }
     return true;

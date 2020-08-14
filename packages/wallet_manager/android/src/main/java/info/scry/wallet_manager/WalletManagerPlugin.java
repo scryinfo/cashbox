@@ -156,16 +156,14 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         eeeChainDigitList.add(digitMap);
                     }
                     resultEeeChain.put("eeeChainDigitList", eeeChainDigitList);
-                    ScryWalletLog.d("nativeLib=>",
-                            "组装完EEE链 result resultEeeChain is ===>" + resultEeeChain.toString());
+                    //ScryWalletLog.d("nativeLib=>","组装完EEE链 result resultEeeChain is ===>" + resultEeeChain.toString());
                     /*-------------------------组装eee链上数据 end---------------------------*/
 
                     /*-------------------------组装ETH链上数据 start-------------------------*/
                     Map<String, Object> resultEthChain = new HashMap<>();
                     resultEthChain.put("chainAddress",
                             walletList.get(walletIndex).ethChain.address);
-                    ScryWalletLog.d("nativeLib=>",
-                            "Eth链 chainAddresss ===>" + walletList.get(walletIndex).ethChain.address.toString());
+                    //ScryWalletLog.d("nativeLib=>","Eth链 chainAddresss ===>" + walletList.get(walletIndex).ethChain.address.toString());
                     resultEthChain.put("chainId", walletList.get(walletIndex).ethChain.chainId);
                     resultEthChain.put("chainType", walletList.get(walletIndex).ethChain.chainType);
                     resultEthChain.put("isVisible", walletList.get(walletIndex).ethChain.isVisible);
@@ -192,16 +190,14 @@ public class WalletManagerPlugin implements MethodCallHandler {
                             digitMap.put("imgUrl", ethDigitList.get(digitIndex).imgUrl);
                             ethChainDigitList.add(digitMap);
                         }
-                        ScryWalletLog.d("nativeLib=>",
-                                "Eth链 ethChainDigitList.toString() ===>" + ethChainDigitList.toString());
+                        //ScryWalletLog.d("nativeLib=>","Eth链 ethChainDigitList.toString() ===>" + ethChainDigitList.toString());
                         resultEthChain.put("ethChainDigitList", ethChainDigitList);
                     }
-                    ScryWalletLog.d("nativeLib=>",
-                            "组装完ETh链 result resultEthChain is ===>" + resultEthChain.toString());
+                    //ScryWalletLog.d("nativeLib=>","组装完ETh链 result resultEthChain is ===>" + resultEthChain.toString());
                     /*-------------------------组装ETH链上数据 end---------------------------*/
 
                     /*-------------------------组装BTC链上数据 start-------------------------*/
-                    Map<String, Object> resultBtcChain = new HashMap<>();
+                    /*Map<String, Object> resultBtcChain = new HashMap<>();
                     resultBtcChain.put("chainAddress", walletList.get(walletIndex).btcChain.address);
                     resultBtcChain.put("chainId", walletList.get(walletIndex).btcChain.chainId);
                     resultBtcChain.put("chainType", walletList.get(walletIndex).btcChain.chainType);
@@ -226,15 +222,15 @@ public class WalletManagerPlugin implements MethodCallHandler {
                             digitMap.put("imgUrl", btcDigitList.get(digitIndex).imgUrl);
                             btcChainDigitList.add(digitMap);
                         }
-                        ScryWalletLog.d("nativeLib=>", "Btc链 btcChainDigitList.toString() ===>" + btcChainDigitList.toString());
+                        //ScryWalletLog.d("nativeLib=>", "Btc链 btcChainDigitList.toString() ===>" + btcChainDigitList.toString());
                         resultBtcChain.put("btcChainDigitList", btcChainDigitList);
-                    }
+                    }*/
                     /*-------------------------组装BTC链上数据 end -------------------------*/
 
                     ///每个钱包再加入组装好的各条链的信息
                     walletMap.put("eeeChain", resultEeeChain);
                     walletMap.put("ethChain", resultEthChain);
-                    walletMap.put("btcChain", resultBtcChain);
+                    //walletMap.put("btcChain", resultBtcChain);
 
                     ///钱包列表，加入拼装好的钱包
                     resultWalletList.add(walletMap);
@@ -754,6 +750,29 @@ public class WalletManagerPlugin implements MethodCallHandler {
                     resultMap.put("message", walletState.message);
                     ScryWalletLog.d("nativeLib=>",
                             "initWalletBasicData walletState.message is " + walletState.message.toString());
+                }
+                result.success(resultMap);
+                break;
+            }
+            case "updateWalletDbData": {
+                ScryWalletLog.d("nativeLib=>", "updateWalletDbData is enter =>");
+                WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.updateWalletDbData((String) (call.argument("oldVersion")), (String) (call.argument("newVersion")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "updateWalletDbData exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", walletState.status);
+                if (walletState.status == 200) {
+                    resultMap.put("isUpdateDbData", walletState.isUpdateDbData);
+                    ScryWalletLog.d("nativeLib=>",
+                            "walletState.isUpdateDbData is " + walletState.isUpdateDbData);
+                } else {
+                    resultMap.put("message", walletState.message);
+                    ScryWalletLog.d("nativeLib=>",
+                            "isUpdateDbData walletState.message is " + walletState.message.toString());
                 }
                 result.success(resultMap);
                 break;
