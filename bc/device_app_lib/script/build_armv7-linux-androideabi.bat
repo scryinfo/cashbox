@@ -10,5 +10,5 @@ set CC=%TOOLCHAIN%/bin/armv7a-linux-androideabi28-clang.cmd
 set CXX=%TOOLCHAIN%/bin/armv7a-linux-androideabi24-clang++.cmd
 rustup default stable-gnu
 cd %batPath%/..
-cargo build --target %HOST_TAG%
-cd %cuPath%
+cargo build --target %HOST_TAG% --release
+cd %batPath%

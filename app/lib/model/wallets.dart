@@ -376,6 +376,15 @@ class Wallets {
     return ethTxSignMap;
   }
 
+  Future<Map> ethRawTxSign(String rawTx, int chainType, String fromAddress, Uint8List pwd) async {
+    Map ethRawTxSignMap = await WalletManager.ethRawTxSign(rawTx,chainType,fromAddress,pwd);
+    int status = ethRawTxSignMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("ethRawTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethRawTxSignMap["message"]);
+    }
+    return ethRawTxSignMap;
+  }
+
   Future<Map> eeeSign(String walletId, Uint8List pwd, String rawTx) async {
     Map eeeTxSignMap = await WalletManager.eeeSign(walletId, pwd, rawTx);
     int status = eeeTxSignMap["status"];

@@ -66,8 +66,9 @@ class _DappPageState extends State<DappPage> {
         child: Container(
           margin: EdgeInsets.only(top: ScreenUtil.instance.setHeight(4.5)),
           child: WebView(
-            initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
-            //initialUrl: "http://192.168.1.3:8080/",
+//            initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
+//            initialUrl: "http://192.168.1.3:8080/",
+            initialUrl:"http://192.168.1.5:9690/home.html",
             javascriptMode: JavascriptMode.unrestricted,
             userAgent:
             "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
@@ -194,15 +195,75 @@ class _DappPageState extends State<DappPage> {
         Future<String> qrResult = QrScanUtil.instance.qrscan();
         qrResult.then((t) {
           msg.data = t;
-          var json = msg.toJson().toString();
-          _controller?.evaluateJavascript(msg.callFun+'("$json")')?.then((result) {});
+          String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
+          print("cashboxScan json：" + call);
+          _controller?.evaluateJavascript(call)?.then((result) {
+            print(result);
+          });
         }).catchError((e) {
           msg.data = e.toString();
-          var json = msg.toJson().toString();
-          _controller?.evaluateJavascript(msg.callFun+'("$json")')?.then((result) {});
+          String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
+          _controller?.evaluateJavascript(call)?.then((result) {});
         });
       }
     ));
+
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxEthRawTxSign",
+        onMessageReceived: (JavascriptMessage message) {
+          print("cashboxEthRawTxSign 从Webview传回来的参数======>： ${message.message}");
+          var msg = Message.fromJson(jsonDecode(message.message));
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return PwdDialog(
+                title: translate('wallet_pwd').toString(),
+                hintContent: translate('dapp_sign_hint_content') + nowWallet.walletName ?? "",
+                hintInput: translate('input_pwd_hint').toString(),
+                onPressed: (pwd) async {
+                  var pwdFormat = pwd.codeUnits;
+                  Wallet wallet = await Wallets.instance.getWalletByWalletId( await Wallets.instance.getNowWalletId());
+                  ChainType chainType = ChainType.ETH;
+                  if (wallet.walletType == WalletType.TEST_WALLET) {
+                    chainType = ChainType.ETH_TEST;
+                  }
+                  Map map = await Wallets.instance.ethRawTxSign(msg.data, Chain.chainTypeToInt(chainType), wallet.getChainByChainType(chainType).chainAddress, Uint8List.fromList(pwdFormat));
+                  //todo change name from tx_sign_failure to raw_tx_sign_failure
+                  if (map.containsKey("status")) {
+                    int status = map["status"];
+                    if (status == null || status != 200) {
+                      msg.err = map["message"];
+                      msg.data = "";
+                      String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
+                      Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
+                      _controller?.evaluateJavascript(call)?.then((result) {
+                        NavigatorUtils.goBack(context);
+                      });
+                    } else {
+                      var signResult = map["signedInfo"];
+                      msg.err = "";
+                      msg.data = signResult;
+                      String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
+                      Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
+                      _controller?.evaluateJavascript(call)?.then((result) {
+                        NavigatorUtils.goBack(context);
+                      });
+                    }
+                  } else {
+                    msg.err = map["message"];
+                    msg.data = "";
+                    var json = msg.toJson().toString();
+                    String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
+                    Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
+                    _controller?.evaluateJavascript(call)?.then((result) {
+                      NavigatorUtils.goBack(context);
+                    });
+                  }
+                },
+              );
+            },
+          );
+        }));
 
     return jsChannelList.toSet();
   }

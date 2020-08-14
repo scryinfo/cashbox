@@ -7,6 +7,6 @@ set batPath=%~dp0
 #set VCPKG_ROOT=D:/tools/vcpkg
 rustup default stable-msvc
 cd %batPath%/..
-cargo build --target %HOST_TAG%
-cd %cuPath%
+cargo build --target %HOST_TAG% --release
+cd %batPath%
 

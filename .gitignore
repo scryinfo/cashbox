@@ -32,3 +32,7 @@ demo/btcwallet/murmel/bitcoin/target
 
 
 
+/app/android/key.properties
+/packages/wallet_manager/android/src/main/jniLibs/arm64-v8a/libwallet.so
+/packages/scry_webview/.dart_tool/
+/packages/wallet_manager/android/src/main/java/info/scry/wallet_manager/*.class

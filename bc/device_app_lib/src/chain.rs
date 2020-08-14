@@ -7,7 +7,7 @@ pub mod android {
     use jni::objects::{JObject, JValue, JClass, JString};
     use wallets::model::{EeeChain, BtcChain, EthChain};
     use jni::sys::{jint, jobject, jbyteArray};
-    use wallets::{StatusCode, RawTransaction};
+    use wallets::{StatusCode};
     use wallets::module::Chain;
 
     pub fn get_eee_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, eee_chain: EeeChain) -> JObject<'a> {
@@ -409,6 +409,38 @@ pub mod android {
             Err(msg) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set status");
                 env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
+            }
+        }
+        *state_obj
+    }
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethRawTxSign(env: JNIEnv, _: JClass, rawTx: JString, chainType: jint, fromAddress: JString,pwd: jbyteArray) -> jobject {
+        let pwd = env.convert_byte_array(pwd).unwrap();
+        let raw_tx: String = env.get_string(rawTx).unwrap().into();
+        let from_address: String = env.get_string(fromAddress).unwrap().into();
+        //The current wallet only uses 3 and 4 to represent the Ethereum main chain and test chain by default. According to the chain type, it is converted to the chain_id defined by the Ethereum standard, and the conversion is done as follows 3->1,4->3, the rest remain unchanged
+        let chain_id = {
+            if chainType == 3 {
+                1
+            } else if chainType == 4 {
+                3
+            } else {//For this situation, it is used to test with another chain type during the development process
+                chainType
+            }
+        };
+
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
+        let eth = wallets::module::Ethereum {};
+        match eth.raw_tx_sign(&raw_tx, chain_id as u64, &from_address, pwd.as_slice()) {
+            Ok(data) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode ");
+                env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set signedInfo");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set StatusCode ");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message ");
             }
         }
         *state_obj
