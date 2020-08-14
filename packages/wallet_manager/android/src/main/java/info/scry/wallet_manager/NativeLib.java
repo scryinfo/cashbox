@@ -479,6 +479,9 @@ public class NativeLib {
     public static native Message ethTxSign(String mnId, int chainType, String fromAddress, String toAddress, String contractAddress, String value,
                                            String backup, byte[] pwd, String gasPrice, String gasLimit, String nonce, int decimal);
 
+    // The signature result is: transaction type
+    public static native Message ethRawTxSign(String rawTx, int chainType, String fromAddress, byte[] pwd);
+
     //ETH transaction assembly. Returns: Unsigned transaction String.
     //
     public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String toAddress, String value,

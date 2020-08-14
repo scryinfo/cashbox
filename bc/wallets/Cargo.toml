@@ -8,18 +8,19 @@ edition = "2018"
 [dependencies]
 log = "0.4.8"
 tiny-keccak = "1.5.0"
-hex="0.3.2"
-sqlite="0.25.0"
+hex = "0.3.2"
+sqlite = "0.25.0"
 serde_derive = "1.0.98"
-serde="1.0"
+serde = "1.0"
 serde_json = "1.0"
-failure="0.1.3"
+failure = "0.1.3"
 ethereum-types = "0.8.0"
 
 uuid = { version = "0.7", features = ["serde", "v4"] }
-secp256k1 = {version = "0.16", features = ["recovery"] }
+secp256k1 = { version = "0.16", features = ["recovery"] }
 codec = { package = "parity-scale-codec", version = "1.2.0" }
+rlp = "0.4"
 
-scry-crypto = {version = "0.1.0",path="../util/crypto"}
-substratetx = {version = "0.1.0",path="../util/substratetx"}
-ethtx = {version = "0.1.0",path="../util/ethtx"}
+scry-crypto = { version = "0.1.0", path = "../util/crypto" }
+substratetx = { version = "0.1.0", path = "../util/substratetx" }
+ethtx = { version = "0.1.0", path = "../util/ethtx" }

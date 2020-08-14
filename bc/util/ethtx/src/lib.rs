@@ -3,7 +3,7 @@ extern crate serde_derive;
 
 use ethabi::Contract;
 use ethereum_types::{U256, H160};
-use rlp::RlpStream;
+use rlp::{RlpStream, DecoderError};
 use secp256k1::{Message, Secp256k1, key::{PublicKey, SecretKey}};
 use bip39::{Mnemonic, Language, Seed};
 use tiny_hderive::bip32::ExtendedPrivKey;
@@ -136,6 +136,21 @@ impl RawTransaction {
         rlp.append(&self.value);
         rlp.append(&self.data);
     }
+
+    pub fn decode(&mut self, data: &[u8]) -> Result<(), DecoderError> {
+        let rlp = rlp::Rlp::new(data);
+        let count = rlp.item_count()?;
+        if count != 6 && count != 9 {
+            return Err(DecoderError::RlpIncorrectListLen);
+        }
+        self.nonce = rlp.val_at(0)?;
+        self.gas_price = rlp.val_at(1)?;
+        self.gas = rlp.val_at(2)?;
+        self.to = Some(rlp.val_at(3)?);
+        self.value = rlp.val_at(4)?;
+        self.data = rlp.val_at(5)?;
+        Ok(())
+    }
 }
 
 fn keccak(s: &[u8]) -> [u8; 32] {
@@ -172,7 +187,7 @@ pub fn convert_token(value: &str, decimal: usize) -> Option<U256> {
             let integer_part_256 = U256::from_dec_str(integer_part).unwrap();
             let integer_part_wei = integer_part_256.checked_mul(U256::exp10(decimal)).unwrap();
             //Get the fractional part, only retain the data with the specified precision
-            let max_distace = if value.len()-index <= decimal {
+            let max_distace = if value.len() - index <= decimal {
                 value.len()
             } else {
                 index + 1 + decimal
@@ -265,7 +280,7 @@ pub fn decode_tranfer_data(input: &str) -> Result<String, error::Error> {
 #[test]
 fn pri_from_mnemonic_test() {
     let words = "wheel permit dog party ceiling olympic clerk human equip adapt equal kangaroo";
-    println!("pri key:{}",hex::encode(pri_from_mnemonic(words, None).unwrap().as_slice()));
+    println!("pri key:{}", hex::encode(pri_from_mnemonic(words, None).unwrap().as_slice()));
 }
 
 #[test]

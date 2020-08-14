@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:app/generated/i18n.dart';
@@ -12,6 +13,7 @@ import 'package:app/util/qr_scan_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/pwd_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -22,6 +24,33 @@ import 'package:scry_webview/scry_webview.dart';
 class DappPage extends StatefulWidget {
   @override
   _DappPageState createState() => _DappPageState();
+}
+
+class Message {
+  // message id
+  String id;
+  // message data, 自定义格式
+  String data;
+  // message 消息完成后调用的函数，此函数直接在window下面
+  String callFun;
+  // 出错误信息，没有出错时为零长度字符串
+  String err;
+
+  Message.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    data = json['data'];
+    callFun = json['callFun'];
+    err = json['err'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['data'] = this.data;
+    data['callFun'] = this.callFun;
+    data['err'] = this.err;
+    return data;
+  }
 }
 
 class _DappPageState extends State<DappPage> {
@@ -158,6 +187,22 @@ class _DappPageState extends State<DappPage> {
             editDiamondCaToFile(message.message);
           }
         }));
+    jsChannelList.add(JavascriptChannel(
+      name: "cashboxScan",
+      onMessageReceived: (JavascriptMessage message) async {
+        var msg = Message.fromJson(jsonDecode(message.message));
+        Future<String> qrResult = QrScanUtil.instance.qrscan();
+        qrResult.then((t) {
+          msg.data = t;
+          var json = msg.toJson().toString();
+          _controller?.evaluateJavascript(msg.callFun+'("$json")')?.then((result) {});
+        }).catchError((e) {
+          msg.data = e.toString();
+          var json = msg.toJson().toString();
+          _controller?.evaluateJavascript(msg.callFun+'("$json")')?.then((result) {});
+        });
+      }
+    ));
 
     return jsChannelList.toSet();
   }

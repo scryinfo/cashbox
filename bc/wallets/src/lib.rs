@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate serde_derive;
+
 mod error;
 
 pub mod model;
@@ -8,21 +9,24 @@ pub mod wallet_db;
 
 pub use error::WalletError;
 
-pub use ethtx::{RawTransaction,convert_token, address_legal as eth_address_legal};
+pub use ethtx::{RawTransaction, convert_token, address_legal as eth_address_legal};
 pub use substratetx::{account_info_key, decode_account_info, event_decode};
 
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
 #[derive(PartialEq, Clone)]
 pub enum StatusCode {
-    DylibError = -1,//Errors caused by external input parameters
-    FailToGenerateMnemonic = 100,//Failed to generate mnemonic
-    OK = 200, // normal
+    DylibError = -1,
+    //Errors caused by external input parameters
+    FailToGenerateMnemonic = 100,
+    //Failed to generate mnemonic
+    OK = 200,
+    // normal
     PwdIsWrong,//Wrong password
 }
 
 impl Default for StatusCode {
-    fn default() -> Self {StatusCode::OK}
+    fn default() -> Self { StatusCode::OK }
 }
 
 #[derive(PartialEq, Clone)]
@@ -68,27 +72,73 @@ mod tests {
     #[test]
     fn mnemonic_create_test() {
         //Mnemonic word creation test, signature test
-         let mnemonic = substratetx::Sr25519::generate_phrase(18);
-         let data = "substrate sign method test";
-         let s = String::new();
-         match substratetx::Ed25519::sign(&mnemonic, data.as_bytes()) {
-             Ok(signed_data) => println!("{}", hex::encode(&signed_data[..])),
-             Err(e) => println!("{}", e.to_string()),
-         }
-     }
+        let mnemonic = substratetx::Sr25519::generate_phrase(18);
+        let data = "substrate sign method test";
+        let s = String::new();
+        match substratetx::Ed25519::sign(&mnemonic, data.as_bytes()) {
+            Ok(signed_data) => println!("{}", hex::encode(&signed_data[..])),
+            Err(e) => println!("{}", e.to_string()),
+        }
+    }
 
-     #[test]
-     fn func_sign_test() {
-         //Initialize the database
-         wallet_db::init_wallet_database();
-         //Create a wallet instance
+    #[test]
+    fn func_sign_test() {
+        //Initialize the database
+        wallet_db::init_wallet_database();
+        //Create a wallet instance
         let wallet_instance = model::Wallet::default();
-        let mnemonic = wallet_instance.crate_mnemonic(15);
+        // let mnemonic = wallet_instance.crate_mnemonic(15);
         let rawtx = "0xac040600ff0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea300b0040e59c301200000000979d3bb306ed9fbd5d6ae1eade033b81ae12a5c5d5aa32781153579d7f6d5504ed000000";
-        let eee = module::EEE{};
+        let eee = module::EEE {};
         match eee.raw_tx_sign(rawtx, "9328ebd6-c205-439d-a016-ebe6ab1e5408", "123456".as_bytes()) {
             Ok(signed_data) => println!("tx sign result {}", signed_data),
             Err(e) => println!("{}", e.to_string()),
+        }
+    }
+
+    #[test]
+    fn sign_test() {
+        //Initialize the database
+        wallet_db::init_wallet_database();
+        //Create a wallet instance
+        let wallet_instance = model::Wallet::default();
+        // let mnemonic = wallet_instance.crate_mnemonic(15);
+        let rawtx = "0xac040600ff0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea300b0040e59c301200000000979d3bb306ed9fbd5d6ae1eade033b81ae12a5c5d5aa32781153579d7f6d5504ed000000";
+        let eee = module::EEE {};
+        match eee.raw_tx_sign(rawtx, "9328ebd6-c205-439d-a016-ebe6ab1e5408", "123456".as_bytes()) {
+            Ok(signed_data) => println!("tx sign result {}", signed_data),
+            Err(e) => println!("{}", e.to_string()),
+        }
+    }
+
+    #[test]
+    fn eth_raw_tx_sign_test() {
+        let address = {
+            //Initialize the database
+            wallet_db::init_wallet_database();
+            //Create a wallet instance
+            let wallet_instance = model::Wallet::default();
+            let manager = module::wallet::WalletManager {};
+            let mnemonic = manager.crate_mnemonic(15);
+            let mut wallet = manager.create_wallet("eth_raw_tx_sign_test", &mnemonic.mn, "123456".as_bytes(), 1).unwrap();
+            for it in manager.get_all().unwrap() {
+                if it.wallet_id == wallet.wallet_id {
+                    wallet = it;
+                    break;
+                }
+            }
+            wallet.eth_chain.unwrap().address
+        };
+        let rawtx = "0xf86b018301000082010094dac17f958d2ee523a2206206994597c13d831ec780b848565c93e30000000000000000000000001d8f02556aeccd9d311b649016f8091d8c687e84000000000000000000000000000000000000000000000000000000000000003874657374808080";
+        //tx sign result 0xf8ab018301000082010094dac17f958d2ee523a2206206994597c13d831ec780b848565c93e30000000000000000000000001d8f02556aeccd9d311b649016f8091d8c687e8400000000000000000000000000000000000000000000000000000000000000387465737426a088245d72fd4bd07a7d22fe46a40def8b6bdb0694e26aad10fab5baf19e757bc3a078034925d18562be11701f7e20d3cb503e961457626251b8d7d70db9de9b0b09
+        let ethereum = module::Ethereum {};
+        match ethereum.raw_tx_sign(rawtx, 1, address.as_str(), "123456".as_bytes()) {
+            Ok(signed_data) => {
+                println!("tx sign result {}", signed_data)
+            }
+            Err(e) => {
+                assert_eq!("", e.to_string())
+            }
         }
     }
 
@@ -105,7 +155,7 @@ mod tests {
         let mut genesis_h256 = [0u8; 32];
         genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
         // Involving database access requires a series of data preparations for normal testing
-        let eee = module::EEE{};
+        let eee = module::EEE {};
         match eee.generate_transfer(from, to, value, genesis_hash, index, runtime_version, "123456".as_bytes()) {
             Ok(sign_str) => {
                 println!("{}", sign_str);

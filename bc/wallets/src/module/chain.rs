@@ -122,7 +122,7 @@ impl EEE {
         let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
         let tx_encode_data = hex::decode(raw_tx)?;
         let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
-        let wallet = module::wallet::WalletManager{};
+        let wallet = module::wallet::WalletManager {};
         let mnemonic = wallet.export_mnemonic(wallet_id, psw)?;
         let mn = String::from_utf8(mnemonic.mn)?;
         let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//Direct use of tx.func_data in this place will cause an error, and the first byte of data will be missed.
@@ -135,7 +135,7 @@ impl EEE {
     pub fn raw_sign(&self, raw_data: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
         let raw_data = raw_data.get(2..).unwrap();// remove `0x`
         let tx_encode_data = hex::decode(raw_data)?;
-        let wallet = module::wallet::WalletManager{};
+        let wallet = module::wallet::WalletManager {};
         let mnemonic = wallet.export_mnemonic(wallet_id, psw)?;
         let mn = String::from_utf8(mnemonic.mn)?;
         let sign_data = substratetx::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();
@@ -208,6 +208,15 @@ impl Ethereum {
         };
         self.tx_sign(from_address, psw, rawtx, eth_chain_id)
     }
+
+    pub fn raw_tx_sign(&self, raw_tx: &str, chain_id: u64, from_address: &str, psw: &[u8]) -> WalletResult<String> {
+        let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
+        let tx_encode_data = hex::decode(raw_tx)?;
+        let mut rawtx = ethtx::RawTransaction::default();
+        rawtx.decode(&tx_encode_data)?;
+        self.tx_sign(from_address, psw, rawtx, chain_id)
+    }
+
     fn tx_sign(&self, from_address: &str, psw: &[u8], raw_transaction: ethtx::RawTransaction, eth_chain_id: u64) -> WalletResult<String> {
         //Since the development chain will be used for testing during the development process, the current wallet does not generate a chain address in development mode, and the test mode is used by default
         let chain_type = if eth_chain_id == 1 {
