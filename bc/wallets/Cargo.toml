@@ -24,3 +24,6 @@ rlp = "0.4"
 scry-crypto = { version = "0.1.0", path = "../util/crypto" }
 substratetx = { version = "0.1.0", path = "../util/substratetx" }
 ethtx = { version = "0.1.0", path = "../util/ethtx" }
+
+[target.'cfg(target_os="android")'.dependencies]
+android_logger = "0.9.0"

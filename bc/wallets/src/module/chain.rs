@@ -213,6 +213,7 @@ impl Ethereum {
         let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
         let tx_encode_data = hex::decode(raw_tx)?;
         let mut rawtx = ethtx::RawTransaction::default();
+        log::debug!("raw_tx_sign before decode");
         rawtx.decode(&tx_encode_data)?;
         self.tx_sign(from_address, psw, rawtx, chain_id)
     }
@@ -224,11 +225,14 @@ impl Ethereum {
         } else {
             ChainType::EthTest
         };
+
         let keystore = find_keystore_wallet_from_address(from_address, chain_type)?;
+        log::debug!("tx_sign before get_mnemonic_context");
         //Password validation
         let mnemonic = substratetx::Sr25519::get_mnemonic_context(&keystore, psw)?;
         //Return the private key used for signature
         let pri_key = ethtx::pri_from_mnemonic(&String::from_utf8(mnemonic)?, None)?;
+        log::debug!("raw_tx_sign before raw_transaction.sign");
         let tx_signed = raw_transaction.sign(&pri_key, Some(eth_chain_id));
         Ok(format!("0x{}", hex::encode(tx_signed)))
     }

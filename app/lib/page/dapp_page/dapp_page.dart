@@ -6,6 +6,7 @@ import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -29,10 +30,13 @@ class DappPage extends StatefulWidget {
 class Message {
   // message id
   String id;
+
   // message data, 自定义格式
   String data;
+
   // message 消息完成后调用的函数，此函数直接在window下面
   String callFun;
+
   // 出错误信息，没有出错时为零长度字符串
   String err;
 
@@ -68,10 +72,9 @@ class _DappPageState extends State<DappPage> {
           child: WebView(
 //            initialUrl: "file:///android_asset/flutter_assets/assets/dist/index.html",
 //            initialUrl: "http://192.168.1.3:8080/",
-            initialUrl:"http://192.168.1.5:9690/home.html",
+            initialUrl: "http://192.168.1.5:9690/home.html",
             javascriptMode: JavascriptMode.unrestricted,
-            userAgent:
-            "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
+            userAgent: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
             //JS execution mode Whether to allow JS execution
             onWebViewCreated: (WebViewController webViewController) {
               _controller = webViewController;
@@ -88,7 +91,9 @@ class _DappPageState extends State<DappPage> {
               Chain chainEEE = nowWallet.getChainByChainType(ChainType.EEE);
               if (chainEEE != null && chainEEE.chainAddress != null && chainEEE.chainAddress.trim() != "") {
                 String chainEEEAddress = chainEEE.chainAddress;
-                _controller?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                _controller
+                    ?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')
+                    ?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                 print('Page finished loading================================>: $url');
               } else {
                 print('Page finished loading================================>:address is null');
@@ -114,7 +119,8 @@ class _DappPageState extends State<DappPage> {
         }));
 
     jsChannelList.add(JavascriptChannel(
-        name: "NativeQrScanAndPwdAndSignToQR", //Remarks. Execute scan here, execute pwdAndSign on sign_tx_page, then toQR
+        name: "NativeQrScanAndPwdAndSignToQR",
+        //Remarks. Execute scan here, execute pwdAndSign on sign_tx_page, then toQR
         onMessageReceived: (JavascriptMessage message) {
           Future<String> qrResult = QrScanUtil.instance.qrscan();
           qrResult.then((qrInfo) {
@@ -189,24 +195,38 @@ class _DappPageState extends State<DappPage> {
           }
         }));
     jsChannelList.add(JavascriptChannel(
-      name: "cashboxScan",
-      onMessageReceived: (JavascriptMessage message) async {
-        var msg = Message.fromJson(jsonDecode(message.message));
-        Future<String> qrResult = QrScanUtil.instance.qrscan();
-        qrResult.then((t) {
-          msg.data = t;
-          String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
-          print("cashboxScan json：" + call);
-          _controller?.evaluateJavascript(call)?.then((result) {
-            print(result);
+        name: "cashboxScan",
+        onMessageReceived: (JavascriptMessage message) async {
+          var msg = Message.fromJson(jsonDecode(message.message));
+          QrScanUtil.instance.qrscan().then((t) {
+            msg.data = t;
+            this.callPromise(msg);
+          }).catchError((e) {
+            msg.err = "inner error";
+            this.callPromise(msg);
           });
-        }).catchError((e) {
-          msg.data = e.toString();
-          String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
-          _controller?.evaluateJavascript(call)?.then((result) {});
-        });
-      }
-    ));
+        }));
+
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxEthNonce",
+        onMessageReceived: (JavascriptMessage message) async {
+          var msg = Message.fromJson(jsonDecode(message.message));
+          try {
+            Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
+            ChainType chainType = ChainType.ETH;
+            if (wallet.walletType == WalletType.TEST_WALLET) {
+              chainType = ChainType.ETH_TEST;
+            }
+            loadTxAccount(wallet.getChainByChainType(chainType).chainAddress, chainType).then((nonce) {
+              msg.data = nonce;
+              this.callPromise(msg);
+            });
+          } catch (e) {
+            msg.err = "inner error";
+            print("cashboxEthNonce: " + e.toString());
+            this.callPromise(msg);
+          }
+        }));
 
     jsChannelList.add(JavascriptChannel(
         name: "cashboxEthRawTxSign",
@@ -221,41 +241,39 @@ class _DappPageState extends State<DappPage> {
                 hintContent: translate('dapp_sign_hint_content') + nowWallet.walletName ?? "",
                 hintInput: translate('input_pwd_hint').toString(),
                 onPressed: (pwd) async {
-                  var pwdFormat = pwd.codeUnits;
-                  Wallet wallet = await Wallets.instance.getWalletByWalletId( await Wallets.instance.getNowWalletId());
-                  ChainType chainType = ChainType.ETH;
-                  if (wallet.walletType == WalletType.TEST_WALLET) {
-                    chainType = ChainType.ETH_TEST;
-                  }
-                  Map map = await Wallets.instance.ethRawTxSign(msg.data, Chain.chainTypeToInt(chainType), wallet.getChainByChainType(chainType).chainAddress, Uint8List.fromList(pwdFormat));
-                  //todo change name from tx_sign_failure to raw_tx_sign_failure
-                  if (map.containsKey("status")) {
-                    int status = map["status"];
-                    if (status == null || status != 200) {
-                      msg.err = map["message"];
-                      msg.data = "";
-                      String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
-                      Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
-                      _controller?.evaluateJavascript(call)?.then((result) {
-                        NavigatorUtils.goBack(context);
-                      });
-                    } else {
-                      var signResult = map["signedInfo"];
-                      msg.err = "";
-                      msg.data = signResult;
-                      String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
-                      Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
-                      _controller?.evaluateJavascript(call)?.then((result) {
-                        NavigatorUtils.goBack(context);
-                      });
+                  try {
+                    var pwdFormat = pwd.codeUnits;
+                    Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
+                    ChainType chainType = ChainType.ETH;
+                    if (wallet.walletType == WalletType.TEST_WALLET) {
+                      chainType = ChainType.ETH_TEST;
                     }
-                  } else {
-                    msg.err = map["message"];
-                    msg.data = "";
-                    var json = msg.toJson().toString();
-                    String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
-                    Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
-                    _controller?.evaluateJavascript(call)?.then((result) {
+                    Wallets.instance
+                        .ethRawTxSign(
+                            msg.data, Chain.chainTypeToInt(chainType), wallet.getChainByChainType(chainType).chainAddress, Uint8List.fromList(pwdFormat))
+                        .then((map) {
+                      int status = map["status"];
+                      if (status == null || status != 200) {
+                        msg.err = map["message"];
+                        if (msg.err == null || msg.err.length < 1) {
+                          msg.err = "result nothing ";
+                        }
+                        msg.data = "";
+                        Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
+                      } else {
+                        var signResult = map["signedInfo"];
+                        msg.err = "";
+                        msg.data = signResult;
+                        Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
+                      }
+                      this.callPromise(msg).then((value) {
+                        NavigatorUtils.goBack(context);
+                      });
+                    });
+                  } catch (e) {
+                    print("cashboxEthRawTxSign: " + e.toString());
+                    msg.err = "inner error";
+                    this.callPromise(msg).whenComplete(() {
                       NavigatorUtils.goBack(context);
                     });
                   }
@@ -265,7 +283,33 @@ class _DappPageState extends State<DappPage> {
           );
         }));
 
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxEthSendSignedTx",
+        onMessageReceived: (JavascriptMessage message) async {
+          var msg = Message.fromJson(jsonDecode(message.message));
+          try {
+            Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
+            ChainType chainType = ChainType.ETH;
+            if (wallet.walletType == WalletType.TEST_WALLET) {
+              chainType = ChainType.ETH_TEST;
+            }
+            sendRawTx(chainType, msg.data).then((str) {
+              msg.data = str;
+              this.callPromise(msg);
+            });
+          }catch(e){
+            print("" + e.toString());
+            msg.err = "inner error";
+            this.callPromise(msg);
+          }
+        }));
+
     return jsChannelList.toSet();
+  }
+
+  Future<String> callPromise(Message msg) {
+    String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
+    return _controller?.evaluateJavascript(call);
   }
 
   Future<String> loadDiamondCa() async {

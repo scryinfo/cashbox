@@ -11,6 +11,8 @@ pub use db_helper::DataServiceProvider;
 
 //Create a database table. Import default data and other operations
 pub fn init_wallet_database() -> WalletResult<()> {
+    #[cfg(target_os="android")]crate::init_logger_once();
+
     wallet_db::DataServiceProvider::init()?;
     let helper = wallet_db::DataServiceProvider::instance()?;
     helper.tx_begin()?;

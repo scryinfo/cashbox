@@ -580,10 +580,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-//            "rawTx": rawTx,
-//                    "chainType": chainType,
-//                    "fromAddress": fromAddress,
-//                    "pwd": pwd,
+
             case "ethRawTxSign": {
                 ScryWalletLog.d("nativeLib=>", "ethRawTxSign is enter =>");
                 Message message = new Message();

@@ -58,6 +58,8 @@ impl WalletManager {
     }
 
     pub fn is_contain_wallet(&self) -> Result<Vec<TbWallet>, String> {
+        #[cfg(target_os="android")]crate::init_logger_once();
+
         match wallet_db::DataServiceProvider::instance() {
             Ok(provider) => {
                 Ok(provider.get_wallets())
