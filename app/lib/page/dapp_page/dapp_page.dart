@@ -304,6 +304,27 @@ class _DappPageState extends State<DappPage> {
           }
         }));
 
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxEthCall",
+        onMessageReceived: (JavascriptMessage message) async {
+          var msg = Message.fromJson(jsonDecode(message.message));
+          try {
+            List<String> data = msg.data.split(",");
+
+            Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
+            ChainType chainType = ChainType.ETH;
+            if (wallet.walletType == WalletType.TEST_WALLET) {
+              chainType = ChainType.ETH_TEST;
+            }
+            msg.data = await ethCall(chainType, data[0], data[1]);
+            this.callPromise(msg);
+          }catch(e){
+            print("" + e.toString());
+            msg.err = "inner error";
+            this.callPromise(msg);
+          }
+        }));
+
     return jsChannelList.toSet();
   }
 

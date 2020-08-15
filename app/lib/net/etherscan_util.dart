@@ -280,3 +280,23 @@ Future<String> sendRawTx(ChainType chainType, String rawTx) async {
     return "";
   }
 }
+
+const Eth_Call = "https://api-cn.etherscan.com/api?module=proxy&action=eth_call";
+const Eth_TestNet_Call = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_call";
+Future<String> ethCall(ChainType chainType, String to, String data, {String apiKey = etherscanApiKey}) async {
+  try {
+    String url = "";
+    if (chainType == ChainType.ETH_TEST) {
+      url = "${Eth_TestNet_Call}&to=${to}&data=${data}&tag=latest&apikey=${apiKey.toString()}";
+    }else{
+      url = "$Eth_Call&to=$to&data=$data&tag=latest&apikey=${apiKey.toString()}";
+    }
+    var res = await request(url);
+    if (res != null && (res as Map).containsKey("result")) {
+      return res["result"];
+    }
+    return "";
+  } catch (e) {
+    return "";
+  }
+}
