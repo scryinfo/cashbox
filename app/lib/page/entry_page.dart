@@ -107,7 +107,6 @@ class _EntryPageState extends State<EntryPage> {
             if (!isLatestAuthToken) {
               List authTokenUrl = latestConfigObj["authTokenUrl"];
               print("_checkServerAppConfig authTokenUrl======>" + authTokenUrl.toString());
-              print("_checkServerAppConfig authTokenUrl[0].toString()======>" + authTokenUrl[0].toString());
               if (authTokenUrl != null && authTokenUrl.length > 0 && authTokenUrl[0].toString().isNotEmpty) {
                 spUtil.setString(VendorConfig.authDigitsIpKey, authTokenUrl[0].toString());
               }
@@ -118,7 +117,6 @@ class _EntryPageState extends State<EntryPage> {
             if (!isLatestDefaultToken) {
               List defaultTokenUrl = latestConfigObj["defaultTokenUrl"];
               print("_checkServerAppConfig defaultTokenUrl======>" + defaultTokenUrl.toString());
-              print("_checkServerAppConfig defaultTokenUrl[0].toString()======>" + defaultTokenUrl[0].toString());
               if (defaultTokenUrl != null && (defaultTokenUrl.length > 0) && defaultTokenUrl[0].toString().isNotEmpty) {
                 spUtil.setString(VendorConfig.defaultDigitsIpKey, defaultTokenUrl[0].toString());
                 //update defaultDigitList to native

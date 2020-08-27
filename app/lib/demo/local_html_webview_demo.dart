@@ -67,7 +67,7 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
                         ?.evaluateJavascript('nativeScanResult("$t")')
                         ?.then((result) {});
                   }).catchError((e) {
-                    Fluttertoast.showToast(msg: "扫描发生未知失败，请重新尝试");
+                    Fluttertoast.showToast(msg: "扫描已取消，或出现未知失败");
                   });
                 }),
           ].toSet(),

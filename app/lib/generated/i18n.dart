@@ -218,7 +218,7 @@ class $zh extends S {
   @override
   String get currency_manage => "货币管理";
   @override
-  String get qr_scan_unknown_error => "扫描发生未知失败，请重新尝试";
+  String get qr_scan_unknown_error => "扫描已取消，或出现未知失败";
   @override
   String get pls_input_transaction_amount => "请输入转账数额";
   @override
@@ -452,7 +452,7 @@ class $zh extends S {
   @override
   String get pls_input_receive_address => "请输入收款地址";
   @override
-  String get scan_qr_unknown_error => "扫描发生未知失败，请重新尝试";
+  String get scan_qr_unknown_error => "扫描已取消，或出现未知失败";
   @override
   String get pwd_verify => "密码验证";
   @override
@@ -522,7 +522,7 @@ class $zh extends S {
   @override
   String get eee_token_name => "EEE";
   @override
-  String get unknown_error_in_scan_qr_code => "扫描发生未知失败，请重新尝试";
+  String get unknown_error_in_scan_qr_code => "扫描已取消，或出现未知失败";
   @override
   String get write_down_mnemonic => "抄下你的钱包助记词!";
 }
