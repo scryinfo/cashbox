@@ -65,6 +65,8 @@ class VendorConfig {
   static const nowDbVersionValue = "1.0";
 
   static const ETHERSCAN_API_KEY = "";
+  static const DDD2EEE_ETH_ADDRESS = "";
+  static const DDD2EEE_CONTRACT_ADDRESS = "";
 }
 
 const DddMainNetContractAddress = "";
