@@ -21,7 +21,7 @@ class TransactionProvide with ChangeNotifier {
   String _money;
   ChainType _chainType;
 
-  void emptyPartialRecord() {
+  void emptyDataRecord() {
     _toAddress = "";
     _txValue = "";
     _backup = "";

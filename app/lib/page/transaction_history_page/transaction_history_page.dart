@@ -311,7 +311,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         onTap: () {
           print("click tap intex is ===>" + index.toString());
           Provider.of<TransactionProvide>(context)
-            ..emptyPartialRecord()
+            ..emptyDataRecord()
             ..setFromAddress(ethTxListModel[index].from)
             ..setToAddress(ethTxListModel[index].to)
             ..setValue(ethTxListModel[index].value)
@@ -450,6 +450,6 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   @override
   void deactivate() {
     super.deactivate();
-    Provider.of<TransactionProvide>(context).emptyPartialRecord();
+    Provider.of<TransactionProvide>(context).emptyDataRecord();
   }
 }

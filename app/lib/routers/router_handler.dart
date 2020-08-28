@@ -1,5 +1,6 @@
 import 'package:app/demo/flutter_webview_plugin_demo.dart';
 import 'package:app/demo/local_html_webview_demo.dart';
+import 'package:app/page/ddd2eee_page/ddd2eee_confirm_page.dart';
 import 'package:app/page/ddd2eee_page/ddd2eee_page.dart';
 import 'package:app/page/digit_list_page/digit_list_page.dart';
 import 'package:app/page/digits_manage_page/digits_manage_page.dart';
@@ -116,6 +117,10 @@ Handler minePageHandler = Handler(handlerFunc: (BuildContext context, Map<String
 
 Handler ddd2eeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return Ddd2EeePage();
+});
+
+Handler ddd2eeeConfirmPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return Ddd2EeeConfirmPage();
 });
 
 Handler walletManagerListPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

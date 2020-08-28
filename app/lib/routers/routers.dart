@@ -24,6 +24,7 @@ class Routes {
 
   static String minePage = '/minepage';
   static String ddd2eeePage = '/ddd2eeepage';
+  static String ddd2eeeConfirmPage = '/ddd2eeeconfirmpage';
   static String walletManagerListPage = '/walletmanagerlistpage';
   static String languageChoosePage = '/languagechoosepage';
   static String walletManagerPage = '/walletmanagerpage';
@@ -64,6 +65,7 @@ class Routes {
     router.define(transferBtcPage, handler: transferBtcPageHandler);
     router.define(minePage, handler: minePageHandler);
     router.define(ddd2eeePage, handler: ddd2eeePageHandler);
+    router.define(ddd2eeeConfirmPage, handler: ddd2eeeConfirmPageHandler);
     router.define(walletManagerListPage, handler: walletManagerListPageHandler);
     router.define(languageChoosePage, handler: languageChoosePageHandler);
     router.define(walletManagerPage, handler: walletManagerPageHandler);
