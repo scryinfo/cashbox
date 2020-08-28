@@ -151,12 +151,25 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
           Gaps.scaleVGap(2),
           Container(
             alignment: Alignment.topLeft,
-            child: Text(
-              translate('exchange_instruction_content'),
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.8),
-                fontSize: ScreenUtil.instance.setSp(3.5),
-              ),
+            child: RichText(
+              text: TextSpan(children: <TextSpan>[
+                TextSpan(
+                    text: translate('exchange_instruction_content_hint1'),
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Colors.white70,
+                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontStyle: FontStyle.normal,
+                    )),
+                TextSpan(
+                    text: translate('exchange_instruction_content_hint2'),
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Colors.white70,
+                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontStyle: FontStyle.normal,
+                    )),
+              ]),
             ),
           ),
         ],
@@ -330,7 +343,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               children: <Widget>[
                 Container(
                   alignment: Alignment.center,
-                  height: ScreenUtil().setHeight(12),
+                  height: ScreenUtil().setHeight(13),
                   child: TextField(
                     textAlign: TextAlign.start,
                     style: TextStyle(
@@ -345,7 +358,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                         left: ScreenUtil().setHeight(3),
                         right: ScreenUtil().setWidth(10),
                         top: ScreenUtil().setHeight(5),
-                        bottom: ScreenUtil().setHeight(5),
+                        bottom: ScreenUtil().setHeight(0),
                       ),
                       labelStyle: TextStyle(
                         color: Colors.white,

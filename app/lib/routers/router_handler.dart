@@ -151,10 +151,6 @@ Handler serviceAgreementHandler = Handler(handlerFunc: (BuildContext context, Ma
   return ServiceAgreementPage();
 });
 
-Handler qaInfoHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return QaInfoPage();
-});
-
 Handler transactionHistoryHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return TransactionHistoryPage();
 });
