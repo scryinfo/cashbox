@@ -10,7 +10,7 @@ import 'net_util.dart';
 
 const etherscanApiKey = VendorConfig.ETHERSCAN_API_KEY; //todo change it Replace yourself with the apikey applied in etherscan
 
-const Eth_Tx_Account = "http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
+const Eth_Tx_Account = "https://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
 const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=";
 
 String assembleTxAccount(String address, ChainType chainType, {String apiKey = etherscanApiKey}) {

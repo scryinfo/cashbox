@@ -96,41 +96,11 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
             Gaps.scaleVGap(5),
             _buildGasLimitWidget(),
             Gaps.scaleVGap(5),
-            _buildInstructionWidget(),
+            _buildFinalConfirmWidget(),
             Gaps.scaleVGap(15),
             _buildExchangeBtnWidget(),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildInstructionWidget() {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.topLeft,
-            child: Text(
-              translate('exchange_confirm_instruction'),
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
-              ),
-            ),
-          ),
-          Gaps.scaleVGap(2),
-          Container(
-            alignment: Alignment.topLeft,
-            child: Text(
-              translate('exchange_confirm_instruction_content'),
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.3),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -338,6 +308,49 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: ScreenUtil.instance.setSp(3.3),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinalConfirmWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              translate('exchange_confirm_instruction'),
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(2),
+          Container(
+            alignment: Alignment.topLeft,
+            child: RichText(
+              text: TextSpan(children: <TextSpan>[
+                TextSpan(
+                    text: translate('exchange_confirm_instruction_content_hint1'),
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Colors.redAccent,
+                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontStyle: FontStyle.normal,
+                    )),
+                TextSpan(
+                    text: translate('exchange_confirm_instruction_content_hint2'),
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Colors.redAccent,
+                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontStyle: FontStyle.normal,
+                    )),
+              ]),
             ),
           ),
         ],

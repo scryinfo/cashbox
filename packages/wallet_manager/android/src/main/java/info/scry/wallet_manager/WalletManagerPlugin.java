@@ -553,6 +553,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         "ethTxSign is enter =>" + (call.argument("gasPrice")).toString());
                 ScryWalletLog.d("nativeLib=>",
                         "ethTxSign is enter =>" + (call.argument("gasLimit")).toString());
+                ScryWalletLog.d("nativeLib=>",
+                        "ethTxSign is enter =>" + (call.argument("nonce")).toString());
                 ScryWalletLog.d("nativeLib=>", "ethTxSign is enter =>" + ((int) (call.argument(
                         "decimal"))));
                 message = NativeLib.ethTxSign((String) (call.argument("mnId")),
