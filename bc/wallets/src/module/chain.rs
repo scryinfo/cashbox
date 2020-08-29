@@ -11,7 +11,8 @@ struct RawTx {
     func_data: Vec<u8>,
     index: u32,
     genesis_hash: H256,
-    version: u32,
+    spec_version: u32,
+    tx_version:u32,
 }
 
 //Subsequent modification of the name to ScryX?, the current open source version does not yet support the function call of the module
@@ -20,7 +21,7 @@ pub struct EEE;
 impl Chain for EEE {}
 
 impl EEE {
-    pub fn generate_transfer(&self, from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, psw: &[u8]) -> WalletResult<String> {
+    pub fn generate_transfer(&self, from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, tx_version:u32,psw: &[u8]) -> WalletResult<String> {
         let keystore = find_keystore_wallet_from_address(from, ChainType::EEE)?;
         let mnemonic = substratetx::Sr25519::get_mnemonic_context(&keystore, psw)?;
         //Passed password verification
@@ -29,7 +30,7 @@ impl EEE {
         let mut genesis_h256 = [0u8; 32];
         genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
         //let signed_data = substratetx::transfer(&mn, to, amount, H256(genesis_h256), index, runtime_version)?;
-        let signed_data = substratetx::transfer(&mn, to, amount, &genesis_h256[..], index, runtime_version)?;
+        let signed_data = substratetx::transfer(&mn, to, amount, &genesis_h256[..], index, runtime_version,tx_version)?;
         log::debug!("signed data is: {}", signed_data);
         Ok(signed_data)
     }
@@ -127,7 +128,7 @@ impl EEE {
         let mn = String::from_utf8(mnemonic.mn)?;
         let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//Direct use of tx.func_data in this place will cause an error, and the first byte of data will be missed.
         // let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, mut_data, tx.version)?;
-        let sign_data = substratetx::tx_sign(&mn, &tx.genesis_hash[..], tx.index, mut_data, tx.version)?;
+        let sign_data = substratetx::tx_sign(&mn, &tx.genesis_hash[..], tx.index, mut_data, tx.spec_version,tx.tx_version)?;
         Ok(sign_data)
     }
 

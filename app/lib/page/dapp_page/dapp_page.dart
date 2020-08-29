@@ -27,6 +27,12 @@ class DappPage extends StatefulWidget {
   _DappPageState createState() => _DappPageState();
 }
 
+const CashboxName = '__cashbox';
+const CashboxEeeName = '__cashbox_eee';
+const CashboxEthName = '__cashbox_eth';
+const CashboxBtcName = '__cashbox_btc';
+const setAddress = 'setAddress';
+
 class Message {
   // message id
   String id;
@@ -88,16 +94,62 @@ class _DappPageState extends State<DappPage> {
             onPageFinished: (String url) async {
               await Wallets.instance.loadAllWalletList(isForceLoadFromJni: false);
               nowWallet = Wallets.instance.nowWallet;
-              Chain chainEEE = nowWallet.getChainByChainType(ChainType.EEE);
-              if (chainEEE != null && chainEEE.chainAddress != null && chainEEE.chainAddress.trim() != "") {
-                String chainEEEAddress = chainEEE.chainAddress;
-                _controller
-                    ?.evaluateJavascript('nativeChainAddressToJsResult("$chainEEEAddress")')
-                    ?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
-                print('Page finished loading================================>: $url');
-              } else {
-                print('Page finished loading================================>:address is null');
+              {//eee
+                String address = '';
+                {
+                  Chain chain = nowWallet.getChainByChainType(ChainType.EEE);
+                  address = chain.chainAddress;
+                  if (address == null || address.isEmpty) {
+                    chain = nowWallet.getChainByChainType(ChainType.EEE_TEST);
+                    address = chain.chainAddress;
+                  }
+                }
+                if (address.isNotEmpty) {
+                  _controller?.evaluateJavascript('nativeChainAddressToJsResult("$address")')?.then((
+                      result) {}); //Pass the wallet EEE chain address to DApp record storage, this will be remove
+                  String script = 'if($CashboxEeeName){$CashboxEeeName.$setAddress("$address")}';
+                  _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                } else {
+                  print('Page finished loading================================>:address is null');
+                }
               }
+
+              {//eth
+                String address = '';
+                {
+                  Chain chain = nowWallet.getChainByChainType(ChainType.ETH);
+                  address = chain.chainAddress;
+                  if (address == null || address.isEmpty) {
+                    chain = nowWallet.getChainByChainType(ChainType.ETH_TEST);
+                    address = chain.chainAddress;
+                  }
+                }
+                if (address.isNotEmpty) {
+                  String script = 'if($CashboxEthName){$CashboxEthName.$setAddress("$address")}';
+                  _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                } else {
+                  print('Page finished loading================================>:address is null');
+                }
+              }
+
+              {//btc
+                String address = '';
+                {
+                  Chain chain = nowWallet.getChainByChainType(ChainType.BTC);
+                  address = chain.chainAddress;
+                  if (address == null || address.isEmpty) {
+                    chain = nowWallet.getChainByChainType(ChainType.BTC_TEST);
+                    address = chain.chainAddress;
+                  }
+                }
+                if (address.isNotEmpty) {
+                  String script = 'if($CashboxBtcName){$CashboxBtcName.$setAddress("$address")}';
+                  _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                } else {
+                  print('Page finished loading================================>:address is null');
+                }
+              }
+              print('Page finished loading================================>: $url');
             },
           ),
         ),

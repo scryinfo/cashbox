@@ -7,7 +7,7 @@ pub mod android {
     use jni::objects::{JObject, JValue, JClass, JString};
     use wallets::model::{EeeChain, BtcChain, EthChain};
     use jni::sys::{jint, jobject, jbyteArray};
-    use wallets::{StatusCode};
+    use wallets::{StatusCode, RawTransaction};
     use wallets::module::Chain;
 
     use log::{info};
@@ -162,7 +162,7 @@ pub mod android {
         env.set_field(chain_class_obj, "status", "I", JValue::Int(btc_chain.status as i32)).expect("get_eth_chain_obj set status value");
 
         let chain_id_str = format!("{}", btc_chain.chain_id);
-        env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("get_btc_chain_obj set chainId value");
+        env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str.clone()).unwrap()))).expect("get_btc_chain_obj set chainId value");
         env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.wallet_id).unwrap()))).expect("get_btc_chain_obj set walletId value");
         env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address.clone()).unwrap()))).expect("get_btc_chain_obj set address value");
 
@@ -187,7 +187,7 @@ pub mod android {
              let digit_class_obj = env.alloc_object(btc_digit_class).expect("btc_digit_class");
              //Set the digit attribute
              env.set_field(digit_class_obj, "status", "I", JValue::Int(digit.status as i32)).expect("get_btc_chain_obj set status value");
-
+             env.set_field(digit_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str.clone()).unwrap()))).expect("get_btc_chain_obj set chainId value");
              env.set_field(digit_class_obj, "digitId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(digit.digit_id).unwrap()))).expect("get_btc_chain_obj set digitId value");
              //This value can be optimized
             // env.set_field(digit_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address.clone()).unwrap()))).expect("get_btc_chain_obj set address value");
@@ -501,7 +501,7 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIEnv, _class: JClass, from: JString, to: JString, value: JString, genesisHash: JString, index: jint, runtime_version: jint, pwd: jbyteArray) -> jobject {
+    pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIEnv, _class: JClass, from: JString, to: JString, value: JString, genesisHash: JString, index: jint, runtime_version: jint,tx_version: jint, pwd: jbyteArray) -> jobject {
         let pwd = env.convert_byte_array(pwd).unwrap();
         let from: String = env.get_string(from).unwrap().into();
         let genesis_hash: String = env.get_string(genesisHash).unwrap().into();
@@ -511,7 +511,7 @@ pub mod android {
         let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
         //  Using the wallet method to construct transactions, the user transaction index will not reach the transaction volume caused by the forced conversion.
          let eee = wallets::module::EEE {};
-         match eee.generate_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, pwd.as_slice()) {
+         match eee.generate_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, tx_version as u32, pwd.as_slice()) {
              Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");

@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate serde_derive;
 
-use ethabi::Contract;
+use ethabi::{Contract,Bytes};
 use ethereum_types::{U256, H160};
 use rlp::{RlpStream, DecoderError};
 use secp256k1::{Message, Secp256k1, key::{PublicKey, SecretKey}};
@@ -61,12 +61,26 @@ impl EthTxHelper {
         })?;
         Ok(data)
     }
+    fn encode_contract_deploy<P>(&self, contract_code:Bytes,params: P) -> Result<Vec<u8>,error::Error> where P: contract::tokens::Tokenize {
+        let mut data = vec![];
+        if let Some(constructor) = &self.abi.constructor{
+            data = constructor.encode_input(contract_code,&params.into_tokens())?;
+        }
+        Ok(data)
+    }
 }
 
 pub fn get_erc20_transfer_data(address: H160, value: U256) -> Result<Vec<u8>, error::Error> {
     let bytecode = include_bytes!("build/Erc20.abi");
     let helper = EthTxHelper::load(&bytecode[..]);
     helper.encode_contract_input("transfer", (address, value))
+}
+
+pub fn get_tokenx_depoly_data(address1:H160,address2:H160,address3:H160)-> Result<Vec<u8>, error::Error> {
+    let bytecode = include_bytes!("build/tokenx.abi");
+    let helper = EthTxHelper::load(&bytecode[..]);
+    let code_byte = include_bytes!("build/tokenx_code");
+    helper.encode_contract_deploy(Vec::from(&code_byte[..]),(address1,address2,address3))
 }
 
 /// Description of a Transaction, pending or in the chain.
@@ -296,9 +310,43 @@ fn erc20_transfer_data_test() {
 }
 
 #[test]
+fn deploy_data_encode(){
+    let origin_addr1 = "0xd095de8fb4e2da680d113284bcc4e0222bbaa6a2";
+    let origin_addr2 = "0xaf6420548a1b9c4bad5897e408f79f1240059832";
+    let origin_addr3 = "0x15d60a6057e16dffdc0bb473a051ec379ae8f43a";
+
+    let origin_addr_byte1 = H160::from_slice(hex::decode(&origin_addr1[2..]).unwrap().as_slice());
+    let origin_addr_byte2 = H160::from_slice(hex::decode(&origin_addr2[2..]).unwrap().as_slice());
+    let origin_addr_byte3 = H160::from_slice(hex::decode(&origin_addr3[2..]).unwrap().as_slice());
+
+    let contract_byte = get_tokenx_depoly_data(origin_addr_byte1,origin_addr_byte2,origin_addr_byte3).unwrap();
+    let json = r#" {
+            "nonce": "0x09",
+            "gasPrice": "0x4a817c800",
+            "gas": "0x7a1200",
+            "to": "0x1c9baedc94600b2d1c8a6d2bad1744e6182f300e",
+            "value": "0xde0b6b3a7640000",
+            "data": []
+        }"#;
+    let chain_id = Some(17);
+    let mut rawtx: RawTransaction = serde_json::from_str(json).expect("tx format");
+    let addition = "tx test";
+    //rawtx.data = addition.as_bytes().to_vec();
+     rawtx.data = contract_byte;
+     rawtx.to = None;
+    let words = "airport powder pilot derive tail chair dynamic remember wide text seat noodle";
+    let pri_from_mn = pri_from_mnemonic(words, None).unwrap();
+    assert_eq!("c6e2fcde7a2713e20cb92f23e11f6d7ac5601124d38ba0eea3bf538a030c9365".to_string(), hex::encode(pri_from_mn));
+    let pri = "4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
+    let signed_data = rawtx.sign(&hex::decode(pri).unwrap(), chain_id);
+    println!("sign contract data is:{}",hex::encode(signed_data));
+}
+
+#[test]
 fn decode_tranfer_data_test() {
     let ret = decode_tranfer_data("0xa9059cbb000000000000000000000000c0c4824527ffb27a51034cea1e37840ed69a5f1e00000000000000000000000000000000000000000000000000000000000a2d77646464");
     assert_eq!(Ok("ddd".to_string()), ret);
+
 }
 
 #[test]

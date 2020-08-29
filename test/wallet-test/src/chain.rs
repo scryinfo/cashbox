@@ -455,7 +455,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeSign(env: JNIEnv, 
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIEnv, _class: JClass, from: JString, to: JString, value: JString, genesisHash: JString, index: jint, runtime_version: jint, pwd: jbyteArray) -> jobject {
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIEnv, _class: JClass, from: JString, to: JString, value: JString, genesisHash: JString, index: jint, runtime_version: jint,tx_version: jint, pwd: jbyteArray) -> jobject {
     let pwd = env.convert_byte_array(pwd).unwrap();
         let from: String = env.get_string(from).unwrap().into();
         let genesis_hash: String = env.get_string(genesisHash).unwrap().into();
@@ -465,7 +465,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIE
         let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
         //  Using the wallet method to construct transactions, the user transaction index will not reach the transaction volume caused by the forced conversion.
          let eee = wallets::module::EEE {};
-         match eee.generate_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, pwd.as_slice()) {
+         match eee.generate_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, tx_version as u32, pwd.as_slice()) {
              Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");
