@@ -10,7 +10,7 @@ import 'net_util.dart';
 
 const etherscanApiKey = VendorConfig.ETHERSCAN_API_KEY; //todo change it Replace yourself with the apikey applied in etherscan
 
-const Eth_Tx_Account = "http://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
+const Eth_Tx_Account = "https://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
 const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=";
 
 String assembleTxAccount(String address, ChainType chainType, {String apiKey = etherscanApiKey}) {
@@ -57,9 +57,10 @@ Future<String> loadEthBalance(String address, ChainType chainType) async {
   try {
     var res = await request(assembleEthBalanceUrl(address, chainType: chainType));
     if (res != null && (res as Map).containsKey("result")) {
-      return (int.parse(res["result"]) / Eth_Unit).toStringAsFixed(4);
+      return (BigInt.from(num.parse(res["result"])) / BigInt.from(Eth_Unit)).toStringAsFixed(4);
     }
   } catch (e) {
+    print(" error is " + e.toString());
     return null;
   }
   return null;
@@ -283,12 +284,13 @@ Future<String> sendRawTx(ChainType chainType, String rawTx) async {
 
 const Eth_Call = "https://api-cn.etherscan.com/api?module=proxy&action=eth_call";
 const Eth_TestNet_Call = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_call";
+
 Future<String> ethCall(ChainType chainType, String to, String data, {String apiKey = etherscanApiKey}) async {
   try {
     String url = "";
     if (chainType == ChainType.ETH_TEST) {
       url = "${Eth_TestNet_Call}&to=${to}&data=${data}&tag=latest&apikey=${apiKey.toString()}";
-    }else{
+    } else {
       url = "$Eth_Call&to=$to&data=$data&tag=latest&apikey=${apiKey.toString()}";
     }
     var res = await request(url);

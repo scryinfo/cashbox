@@ -6,8 +6,10 @@ import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
+import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/util/utils.dart';
@@ -18,6 +20,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class Ddd2EeePage extends StatefulWidget {
   @override
@@ -68,11 +71,11 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
 
   void initDataConfig() async {
     fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress;
-    ethBalance = await loadEthBalance(Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress, ChainType.ETH);
+    ethBalance = await loadEthBalance(fromAddress, ChainType.ETH);
     dddBalance =
         await loadErc20Balance(Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress, DddMainNetContractAddress, ChainType.ETH);
     if (dddBalance != null) {
-      dddBalance = _dddAmountController.text.toString();
+      _dddAmountController.text = dddBalance;
     }
   }
 
@@ -107,8 +110,12 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            Gaps.scaleVGap(5),
+            Gaps.scaleVGap(4),
             _buildInstructionWidget(),
+            Gaps.scaleVGap(5),
+            _buildFromAddressWidget(),
+            Gaps.scaleVGap(5),
+            _buildToAddressWidget(),
             Gaps.scaleVGap(5),
             _buildContractAddressWidget(),
             Gaps.scaleVGap(5),
@@ -119,8 +126,8 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
             _buildGasFeeWidget(),
             Gaps.scaleVGap(3),
             _buildHideDetailWidget(),
-            Gaps.scaleVGap(15),
-            _buildExchangeBtcWidget(),
+            Gaps.scaleVGap(3),
+            _buildExchangeBtnWidget(),
           ],
         ),
       ),
@@ -144,11 +151,84 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
           Gaps.scaleVGap(2),
           Container(
             alignment: Alignment.topLeft,
+            child: RichText(
+              text: TextSpan(children: <TextSpan>[
+                TextSpan(
+                    text: translate('exchange_instruction_content_hint1'),
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Colors.white70,
+                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontStyle: FontStyle.normal,
+                    )),
+                TextSpan(
+                    text: translate('exchange_instruction_content_hint2'),
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Colors.white70,
+                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontStyle: FontStyle.normal,
+                    )),
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFromAddressWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
             child: Text(
-              translate('exchange_instruction_content'),
+              translate('exchange_from_address'),
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(2),
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              fromAddress ?? "",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.3),
+                fontSize: ScreenUtil.instance.setSp(3.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToAddressWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              translate('exchange_to_address'),
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(2),
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              VendorConfig.DDD2EEE_ETH_ADDRESS ?? "",
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.6),
+                fontSize: ScreenUtil.instance.setSp(3.5),
               ),
             ),
           ),
@@ -164,7 +244,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              translate('exchange_eee_ca'),
+              translate('exchange_to_contract_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil.instance.setSp(3),
@@ -263,7 +343,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               children: <Widget>[
                 Container(
                   alignment: Alignment.center,
-                  height: ScreenUtil().setHeight(12),
+                  height: ScreenUtil().setHeight(13),
                   child: TextField(
                     textAlign: TextAlign.start,
                     style: TextStyle(
@@ -278,7 +358,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                         left: ScreenUtil().setHeight(3),
                         right: ScreenUtil().setWidth(10),
                         top: ScreenUtil().setHeight(5),
-                        bottom: ScreenUtil().setHeight(5),
+                        bottom: ScreenUtil().setHeight(0),
                       ),
                       labelStyle: TextStyle(
                         color: Colors.white,
@@ -468,35 +548,36 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                   Column(
                     children: <Widget>[
                       Container(
-                          alignment: Alignment.topLeft,
-                          child: Container(
-                            child: Row(
-                              children: <Widget>[
-                                Container(
-                                  width: ScreenUtil.instance.setWidth(40),
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    translate('gas_price').toString(),
-                                    style: TextStyle(
-                                      color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
-                                    ),
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                width: ScreenUtil.instance.setWidth(40),
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  translate('gas_price').toString(),
+                                  style: TextStyle(
+                                    color: Color.fromRGBO(255, 255, 255, 0.5),
+                                    fontSize: ScreenUtil.instance.setSp(2.5),
                                   ),
                                 ),
-                                Container(
-                                  alignment: Alignment.topRight,
-                                  width: ScreenUtil.instance.setWidth(40),
-                                  child: Text(
-                                    Utils.formatDouble(mGasPriceValue, precision: precision).toString() + " wei",
-                                    style: TextStyle(
-                                      color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
-                                    ),
+                              ),
+                              Container(
+                                alignment: Alignment.topRight,
+                                width: ScreenUtil.instance.setWidth(40),
+                                child: Text(
+                                  Utils.formatDouble(mGasPriceValue, precision: precision).toString() + " wei",
+                                  style: TextStyle(
+                                    color: Color.fromRGBO(255, 255, 255, 0.5),
+                                    fontSize: ScreenUtil.instance.setSp(2.5),
                                   ),
-                                )
-                              ],
-                            ),
-                          )),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
                       Container(
                         child: SliderTheme(
                           data: SliderTheme.of(context).copyWith(
@@ -644,20 +725,25 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         : Gaps.scaleHGap(1);
   }
 
-  Widget _buildExchangeBtcWidget() {
+  Widget _buildExchangeBtnWidget() {
     return GestureDetector(
       onTap: () async {
         showProgressDialog(context, translate("check_data_format"));
         var verifyTxInfoResult = await _verifyTransferInfo();
+        NavigatorUtils.goBack(context);
         if (!verifyTxInfoResult) {
-          NavigatorUtils.goBack(context);
           return;
         }
-        var verifyNonceResult = await _verifyNonce();
-        NavigatorUtils.goBack(context);
-        if (verifyNonceResult) {
-          _showPwdDialog(context);
-        }
+        Provider.of<TransactionProvide>(context)
+          ..emptyDataRecord()
+          ..setFromAddress(fromAddress)
+          ..setToAddress(VendorConfig.DDD2EEE_ETH_ADDRESS)
+          ..setContractAddress(VendorConfig.DDD2EEE_CONTRACT_ADDRESS)
+          ..setBackup(_eeeAddressController.text)
+          ..setBalance(dddBalance)
+          ..setGasPrice(mGasPriceValue.toString())
+          ..setGas(mGasLimitValue.toString());
+        NavigatorUtils.push(context, Routes.ddd2eeeConfirmPage);
       },
       child: Container(
         alignment: Alignment.bottomCenter,
@@ -676,74 +762,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         ),
       ),
     );
-  }
-
-  void _showPwdDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return PwdDialog(
-          title: translate('wallet_pwd').toString(),
-          hintContent: translate('input_pwd_hint_detail').toString(),
-          hintInput: translate('input_pwd_hint').toString(),
-          onPressed: (String pwd) async {
-            print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _dddAmountController.text);
-            String walletId = await Wallets.instance.getNowWalletId();
-            Map result = await Wallets.instance.ethTxSign(
-                walletId,
-                Chain.chainTypeToInt(chainType),
-                fromAddress,
-                VendorConfig.DDD2EEE_ETH_ADDRESS,
-                VendorConfig.DDD2EEE_CONTRACT_ADDRESS ?? "",
-                _dddAmountController.text,
-                _eeeAddressController.text,
-                Uint8List.fromList(pwd.codeUnits),
-                mGasPriceValue.toInt().toString(),
-                mGasLimitValue.toInt().toString(),
-                nonce,
-                decimal: decimal);
-            print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"].toString());
-            if (result["status"] != null && result["status"] == 200) {
-              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), timeInSecForIos: 5);
-              sendRawTx2Chain(result["ethSignedInfo"].toString());
-            } else {
-              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), timeInSecForIos: 6);
-              NavigatorUtils.goBack(context);
-            }
-          },
-        );
-      },
-    );
-  }
-
-  void sendRawTx2Chain(String rawTx) async {
-    NavigatorUtils.goBack(context);
-    showProgressDialog(context, translate("tx_sending"));
-    String txHash = await sendRawTx(Wallets.instance.nowWallet.nowChain.chainType, rawTx);
-    print("after broadcast txHash is===>" + txHash);
-    if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
-      Fluttertoast.showToast(msg: translate("tx_upload_success"), timeInSecForIos: 8);
-    } else {
-      Fluttertoast.showToast(msg: translate("tx_upload_failure"), timeInSecForIos: 8);
-    }
-    {
-      const timeout = Duration(seconds: 5);
-      Timer(timeout, () {
-        Navigator.pop(context); //Let the showProgressDialog popup box display for at least two seconds
-        NavigatorUtils.goBack(context);
-      });
-    }
-  }
-
-  Future<bool> _verifyNonce() async {
-    nonce = await loadTxAccount(fromAddress, chainType);
-    if (nonce == null || nonce.trim() == "") {
-      print("取的nonce值有问题");
-      Fluttertoast.showToast(msg: translate("nonce_is_wrong"), timeInSecForIos: 8);
-      NavigatorUtils.goBack(context);
-      return false;
-    }
-    return true;
   }
 
   Future<bool> _verifyTransferInfo() async {
@@ -789,21 +807,20 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;
       }
-      print("ethBalance===>" + ethBalance.toString() + "|| dddBalance===>" + dddBalance.toString());
-      if (ethBalance.isNotEmpty) {
-        try {
-          if (double.parse(ethBalance) <= 0) {
-            Fluttertoast.showToast(msg: translate("not_enough_for_gas"));
-            return false;
-          }
-        } catch (e) {
-          Fluttertoast.showToast(msg: translate("eth_balance_error") + e.toString());
+    }
+    if (ethBalance != null && ethBalance.isNotEmpty) {
+      try {
+        if (double.parse(ethBalance) <= 0) {
+          Fluttertoast.showToast(msg: translate("not_enough_for_gas"));
           return false;
         }
-      } else {
-        Fluttertoast.showToast(msg: translate("check_gas_state_failure"));
+      } catch (e) {
+        Fluttertoast.showToast(msg: translate("eth_balance_error") + e.toString());
         return false;
       }
+    } else {
+      Fluttertoast.showToast(msg: translate("check_gas_state_failure"));
+      return false;
     }
     return true;
   }

@@ -1,5 +1,6 @@
 import 'package:app/demo/flutter_webview_plugin_demo.dart';
 import 'package:app/demo/local_html_webview_demo.dart';
+import 'package:app/page/ddd2eee_page/ddd2eee_confirm_page.dart';
 import 'package:app/page/ddd2eee_page/ddd2eee_page.dart';
 import 'package:app/page/digit_list_page/digit_list_page.dart';
 import 'package:app/page/digits_manage_page/digits_manage_page.dart';
@@ -10,7 +11,6 @@ import 'package:app/page/sign_tx_page/sign_tx_page.dart';
 import 'package:app/page/transfer_btc_page/transfer_btc_page.dart';
 import 'package:app/page/transfer_eee_page/transfer_eee_page.dart';
 import 'package:app/page/user_protocol/privacy_statements_page.dart';
-import 'package:app/page/user_protocol/qa_info_page.dart';
 import 'package:app/page/user_protocol/service_agreement_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
@@ -118,6 +118,10 @@ Handler ddd2eeePageHandler = Handler(handlerFunc: (BuildContext context, Map<Str
   return Ddd2EeePage();
 });
 
+Handler ddd2eeeConfirmPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return Ddd2EeeConfirmPage();
+});
+
 Handler walletManagerListPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return WalletManagerListPage();
 });
@@ -144,10 +148,6 @@ Handler privacyStatementHandler = Handler(handlerFunc: (BuildContext context, Ma
 
 Handler serviceAgreementHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return ServiceAgreementPage();
-});
-
-Handler qaInfoHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return QaInfoPage();
 });
 
 Handler transactionHistoryHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

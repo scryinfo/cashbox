@@ -24,6 +24,7 @@ class Routes {
 
   static String minePage = '/minepage';
   static String ddd2eeePage = '/ddd2eeepage';
+  static String ddd2eeeConfirmPage = '/ddd2eeeconfirmpage';
   static String walletManagerListPage = '/walletmanagerlistpage';
   static String languageChoosePage = '/languagechoosepage';
   static String walletManagerPage = '/walletmanagerpage';
@@ -31,7 +32,6 @@ class Routes {
   static String recoverWalletPage = '/recoverwalletpage';
   static String privacyStatementPage = '/privacystatementpage';
   static String serviceAgreementPage = '/serviceagreementpage';
-  static String qaInfoPage = '/qainfopage';
   static String transactionHistoryPage = '/transactionhistorypage';
   static String transactionEeeDetailPage = '/transactioneeedetailpage';
   static String aboutUsPage = '/aboutuspage';
@@ -64,6 +64,7 @@ class Routes {
     router.define(transferBtcPage, handler: transferBtcPageHandler);
     router.define(minePage, handler: minePageHandler);
     router.define(ddd2eeePage, handler: ddd2eeePageHandler);
+    router.define(ddd2eeeConfirmPage, handler: ddd2eeeConfirmPageHandler);
     router.define(walletManagerListPage, handler: walletManagerListPageHandler);
     router.define(languageChoosePage, handler: languageChoosePageHandler);
     router.define(walletManagerPage, handler: walletManagerPageHandler);
@@ -71,7 +72,6 @@ class Routes {
     router.define(recoverWalletPage, handler: recoverWalletPageHandler);
     router.define(privacyStatementPage, handler: privacyStatementHandler);
     router.define(serviceAgreementPage, handler: serviceAgreementHandler);
-    router.define(qaInfoPage, handler: qaInfoHandler);
     router.define(transactionHistoryPage, handler: transactionHistoryHandler);
     router.define(transactionEeeDetailPage, handler: transactionEeeDetailHandler);
     router.define(createTestWalletPage, handler: createTestWalletHandler);
