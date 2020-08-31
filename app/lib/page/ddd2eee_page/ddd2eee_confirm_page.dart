@@ -43,7 +43,6 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   void initDataConfig() {
     fromExchangeAddress = Provider.of<TransactionProvide>(context).fromAddress;
     toExchangeAddress = Provider.of<TransactionProvide>(context).toAddress ?? VendorConfig.DDD2EEE_ETH_ADDRESS;
-    contractAddress = Provider.of<TransactionProvide>(context).contractAddress ?? VendorConfig.DDD2EEE_CONTRACT_ADDRESS;
     eeeAddress = Provider.of<TransactionProvide>(context).backup;
     dddAmount = Provider.of<TransactionProvide>(context).balance ?? "0.0";
     gasPrice = Provider.of<TransactionProvide>(context).gasPrice;
@@ -85,8 +84,6 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
             _buildFromEthAddressWidget(),
             Gaps.scaleVGap(5),
             _buildToEthAddressWidget(),
-            Gaps.scaleVGap(5),
-            _buildToEthContractAddressWidget(),
             Gaps.scaleVGap(3),
             _buildEeeTargetAddressWidget(),
             Gaps.scaleVGap(5),
@@ -154,36 +151,6 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
             alignment: Alignment.topLeft,
             child: Text(
               toExchangeAddress,
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.3),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToEthContractAddressWidget() {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.topLeft,
-            child: Text(
-              translate('exchange_to_contract_address'),
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
-              ),
-            ),
-          ),
-          Gaps.scaleVGap(2),
-          Container(
-            alignment: Alignment.topLeft,
-            child: Text(
-              contractAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: ScreenUtil.instance.setSp(3.3),

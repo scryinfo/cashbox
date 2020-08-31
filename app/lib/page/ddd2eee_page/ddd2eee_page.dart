@@ -71,9 +71,9 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
 
   void initDataConfig() async {
     fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress;
+    //fromAddress = "0x0d0707963952f2fba59dd06f2b425ace40b492fe";
     ethBalance = await loadEthBalance(fromAddress, ChainType.ETH);
-    dddBalance =
-        await loadErc20Balance(Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress, DddMainNetContractAddress, ChainType.ETH);
+    dddBalance = await loadErc20Balance(fromAddress, DddMainNetContractAddress, ChainType.ETH);
     if (dddBalance != null) {
       _dddAmountController.text = dddBalance;
     }
@@ -116,8 +116,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
             _buildFromAddressWidget(),
             Gaps.scaleVGap(5),
             _buildToAddressWidget(),
-            Gaps.scaleVGap(5),
-            _buildContractAddressWidget(),
             Gaps.scaleVGap(5),
             _buildDddAmountWidget(),
             Gaps.scaleVGap(3),
@@ -226,36 +224,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
             alignment: Alignment.topLeft,
             child: Text(
               VendorConfig.DDD2EEE_ETH_ADDRESS ?? "",
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.5),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContractAddressWidget() {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.topLeft,
-            child: Text(
-              translate('exchange_to_contract_address'),
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
-              ),
-            ),
-          ),
-          Gaps.scaleVGap(2),
-          Container(
-            alignment: Alignment.topLeft,
-            child: Text(
-              VendorConfig.DDD2EEE_CONTRACT_ADDRESS ?? "",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: ScreenUtil.instance.setSp(3.5),

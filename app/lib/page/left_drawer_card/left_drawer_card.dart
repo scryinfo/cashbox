@@ -68,7 +68,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
 
   Widget _drawerAction() {
     return Container(
-      height: ScreenUtil().setHeight(56.75),
+      height: ScreenUtil().setHeight(66.75),
       child: Column(
         children: <Widget>[
           Container(
@@ -164,6 +164,25 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                 ),
                 onTap: () {
                   NavigatorUtils.push(context, Routes.importWalletPage);
+                }),
+          ),
+          Container(
+            alignment: Alignment.center,
+            height: ScreenUtil().setHeight(11),
+            child: new ListTile(
+                leading: new Image.asset(
+                  "assets/images/ic_exchange.png",
+                  width: ScreenUtil().setWidth(6),
+                  height: ScreenUtil().setWidth(6),
+                ),
+                title: new Text(
+                  translate("token_exchange"),
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+                onTap: () {
+                  NavigatorUtils.push(context, Routes.ddd2eeePage);
                 }),
           ),
           /*Container(
