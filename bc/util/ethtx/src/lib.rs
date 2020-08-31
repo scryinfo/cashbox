@@ -83,6 +83,12 @@ pub fn get_tokenx_depoly_data(address1:H160,address2:H160,address3:H160)-> Resul
     helper.encode_contract_deploy(Vec::from(&code_byte[..]),(address1,address2,address3))
 }
 
+pub fn get_tokenx_method_data<P>(metod_name:&str,params: P)-> Result<Vec<u8>,error::Error> where P: contract::tokens::Tokenize {
+    let bytecode = include_bytes!("build/tokenx.abi");
+    let helper = EthTxHelper::load(&bytecode[..]);
+    helper.encode_contract_input(metod_name, params)
+}
+
 /// Description of a Transaction, pending or in the chain.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
 pub struct RawTransaction {
@@ -276,11 +282,7 @@ pub fn decode_tranfer_data(input: &str) -> Result<String, error::Error> {
 }
 
 
-#[test]
-fn pri_from_mnemonic_test() {
-    let words = "wheel permit dog party ceiling olympic clerk human equip adapt equal kangaroo";
-    println!("pri key:{}",hex::encode(pri_from_mnemonic(words, None).unwrap().as_slice()));
-}
+
 
 #[test]
 fn erc20_transfer_data_test() {
@@ -306,7 +308,7 @@ fn deploy_data_encode(){
 
     let contract_byte = get_tokenx_depoly_data(origin_addr_byte1,origin_addr_byte2,origin_addr_byte3).unwrap();
     let json = r#" {
-            "nonce": "0x09",
+            "nonce": "0x05",
             "gasPrice": "0x4a817c800",
             "gas": "0x7a1200",
             "to": "0x1c9baedc94600b2d1c8a6d2bad1744e6182f300e",
@@ -315,16 +317,111 @@ fn deploy_data_encode(){
         }"#;
     let chain_id = Some(17);
     let mut rawtx: RawTransaction = serde_json::from_str(json).expect("tx format");
-    let addition = "tx test";
-    //rawtx.data = addition.as_bytes().to_vec();
      rawtx.data = contract_byte;
      rawtx.to = None;
-    let words = "airport powder pilot derive tail chair dynamic remember wide text seat noodle";
-    let pri_from_mn = pri_from_mnemonic(words, None).unwrap();
-    assert_eq!("c6e2fcde7a2713e20cb92f23e11f6d7ac5601124d38ba0eea3bf538a030c9365".to_string(), hex::encode(pri_from_mn));
     let pri = "4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
     let signed_data = rawtx.sign(&hex::decode(pri).unwrap(), chain_id);
-    println!("sign contract data is:{}",hex::encode(signed_data));
+    println!("sign contract data is:0x{}",hex::encode(signed_data));
+}
+
+#[test]
+fn erc20_transfer_test(){
+    let token_buyer_addr = "0xb75269d7e3ad09d4bebf1217cdd801952cfb317b";
+    let token_buyer_byte = H160::from_slice(hex::decode(&token_buyer_addr[2..]).unwrap().as_slice());
+    let value = U256::from_dec_str("10").unwrap();
+    let mut data = get_tokenx_method_data("transfer",(token_buyer_byte,value)).unwrap();
+
+    let json = r#" {
+            "nonce": "0x01",
+            "gasPrice": "0x4a817c800",
+            "gas": "0x7a1200",
+            "to": "0x3f85d0b6119b38b7e6b119f7550290fec4be0e3c",
+            "value": "0x0",
+            "data": []
+        }"#;
+    let chain_id = Some(17);
+    let mut rawtx: RawTransaction = serde_json::from_str(json).expect("tx format");
+    let addition = "kim diamond token".as_bytes();
+    data.extend_from_slice(addition);
+    rawtx.data = data;
+    let pri = "c79ae72d807cbc1d053e25e945712668f49c3f4fd59d43f4b5ab38219410a6a1";
+    let signed_data = rawtx.sign(&hex::decode(pri).unwrap(), chain_id);
+    println!("sign contract data is:0x{}",hex::encode(signed_data));
+}
+
+#[test]
+fn authorize_tokenx_method_data_test(){
+    let business_man_addr = "0x3cbbd74db7b7fe68374dae7285e947a5dbe12aec";
+    let business_man__byte = H160::from_slice(hex::decode(&business_man_addr[2..]).unwrap().as_slice());
+    let value = U256::from_dec_str("100").unwrap();
+    let mut data = get_tokenx_method_data("authorizeTokenx",(business_man__byte,value)).unwrap();
+
+    let json = r#" {
+            "nonce": "0x00",
+            "gasPrice": "0x4a817c800",
+            "gas": "0x7a1200",
+            "to": "0x3f85d0b6119b38b7e6b119f7550290fec4be0e3c",
+            "value": "0x0",
+            "data": []
+        }"#;
+    let chain_id = Some(17);
+    let mut rawtx: RawTransaction = serde_json::from_str(json).expect("tx format");
+    let addition = "func test".as_bytes();
+    data.extend_from_slice(addition);
+    rawtx.data = data;
+    let pri = "1e742e12b1602fb8278890ebf567132ef338c0213a1d34812a29e028b3ac72b2";
+    let signed_data = rawtx.sign(&hex::decode(pri).unwrap(), chain_id);
+    println!("sign contract data is:0x{}",hex::encode(signed_data));
+}
+
+#[test]
+fn get_mint_method_data_test(){
+    let custom_addr1 = "0xbb95e564e7051cfc6c3936978839c5a722bdbd66";
+    let custom_addr1_byte1 = H160::from_slice(hex::decode(&custom_addr1[2..]).unwrap().as_slice());
+    let value = U256::from_dec_str("20").unwrap();
+    let mut data = get_tokenx_method_data("mintTokenx",(custom_addr1_byte1,value)).unwrap();
+
+    let json = r#" {
+            "nonce": "0x2",
+            "gasPrice": "0x4a817c800",
+            "gas": "0x7a1200",
+            "to": "0x3f85d0b6119b38b7e6b119f7550290fec4be0e3c",
+            "value": "0x0",
+            "data": []
+        }"#;
+    let chain_id = Some(17);
+    let mut rawtx: RawTransaction = serde_json::from_str(json).expect("tx format");
+    let addition = "20200814-08504a817c815".as_bytes();
+    data.extend_from_slice(addition);
+    rawtx.data = data;
+    let pri = "31839b400c87eb68f31c80ca0e7bc478fe0be89ea57136a5a2f9d175d6f40227";
+    let signed_data = rawtx.sign(&hex::decode(pri).unwrap(), chain_id);
+    println!("sign contract data is:0x{}",hex::encode(signed_data));
+}
+
+#[test]
+fn burn_tokenx_data_test(){
+    let custom_addr1 = "0xbb95e564e7051cfc6c3936978839c5a722bdbd66";
+    let custom_addr1_byte1 = H160::from_slice(hex::decode(&custom_addr1[2..]).unwrap().as_slice());
+    let value = U256::from_dec_str("50").unwrap();
+    let mut data = get_tokenx_method_data("burnTokenx",(value)).unwrap();
+
+    let json = r#" {
+            "nonce": "0x3",
+            "gasPrice": "0x4a817c800",
+            "gas": "0x7a1200",
+            "to": "0x3f85d0b6119b38b7e6b119f7550290fec4be0e3c",
+            "value": "0x0",
+            "data": []
+        }"#;
+    let chain_id = Some(17);
+    let mut rawtx: RawTransaction = serde_json::from_str(json).expect("tx format");
+    let addition = "20200814-08504a817c815".as_bytes();
+    data.extend_from_slice(addition);
+    rawtx.data = data;
+    let pri = "31839b400c87eb68f31c80ca0e7bc478fe0be89ea57136a5a2f9d175d6f40227";
+    let signed_data = rawtx.sign(&hex::decode(pri).unwrap(), chain_id);
+    println!("sign contract data is:0x{}",hex::encode(signed_data));
 }
 
 #[test]
@@ -376,4 +473,21 @@ fn address_format_legal_test() {
     assert_eq!(true, address_legal("0x7+f901b5b5f3c5d599bfcdda667b5b4716e3c46c"));
 }
 
+#[test]
+fn generate_eth_address_test(){
+    let pri = "4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
+    let pri_data = hex::decode(pri).unwrap();
+    println!("{:?}",generate_eth_address(pri_data.as_slice()));
+}
+
+#[test]
+fn pri_from_mnemonic_test() {
+    let words = "control camera congress prosper boy you blanket pilot series void affair bridge";
+    println!("pri key:{}",hex::encode(pri_from_mnemonic(words, None).unwrap().as_slice()));
+}
+
+#[test]
+fn encode_method_name_test(){
+
+}
 

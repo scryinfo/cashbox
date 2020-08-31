@@ -374,7 +374,7 @@
           "type": "uint256"
         }
       ],
-      "name": "generateTokenx",
+      "name": "mintTokenx",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -413,7 +413,7 @@
     },
     {
       "inputs": [],
-      "name": "listAuthAddr",
+      "name": "listOriginAddr",
       "outputs": [
         {
           "internalType": "address[]",
@@ -426,7 +426,7 @@
     },
     {
       "inputs": [],
-      "name": "listOriginAddr",
+      "name": "listAuthAddr",
       "outputs": [
         {
           "internalType": "address[]",
