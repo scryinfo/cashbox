@@ -159,7 +159,7 @@ class _EntryPageState extends State<EntryPage> {
             var apkDownloadLink = latestConfigObj["apkDownloadLink"];
             print("_checkServerAppConfig apkDownloadLink======>" + apkDownloadLink.toString());
             if (apkDownloadLink != null && apkDownloadLink.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.publicIpKey, apkDownloadLink);
+              spUtil.setString(VendorConfig.downloadLatestVersionIpKey, apkDownloadLink);
             }
 
             ///update appConfigVersion
