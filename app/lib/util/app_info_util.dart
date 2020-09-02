@@ -35,7 +35,18 @@ class AppInfoUtil {
     try {
       var spUtil = await SharedPreferenceUtil.instance;
       String serverVersion = spUtil.getString(VendorConfig.serverApkVersionKey);
-      if (serverVersion != null && appVersion != null && (serverVersion.toLowerCase() != appVersion.toLowerCase())) {
+      var serverVersionArray = serverVersion.split(".");
+      var nativeVersionArray = appVersion.split(".");
+      bool isExistNewVersion = false;
+      if (serverVersionArray.length == nativeVersionArray.length) {
+        for (int i = 0; i < serverVersionArray.length; i++) {
+          if (double.parse(serverVersionArray[i]) > double.parse(nativeVersionArray[i])) {
+            isExistNewVersion = true;
+            break;
+          }
+        }
+      }
+      if (serverVersion != null && appVersion != null && isExistNewVersion) {
         String downloadIpValue = spUtil.getString(VendorConfig.downloadLatestVersionIpKey) ?? VendorConfig.downloadLatestVersionIpValue;
         _doUpgradeApp(downloadIpValue, serverVersion);
         return true;
