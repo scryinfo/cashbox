@@ -99,9 +99,9 @@ class _EntryPageState extends State<EntryPage> {
           ///update config information
           if (isLatestConfig == null || !isLatestConfig) {
             var latestConfigObj = resultData["latestConfig"];
-            print("_checkServerAppConfig latestConfigObj======>" + latestConfigObj.toString());
+            LogUtil.i("_checkServerAppConfig latestConfigObj======>", latestConfigObj.toString());
             var isLatestAuthToken = resultData["isLatestAuthToken"];
-            print("_checkServerAppConfig isLatestAuthToken======>" + isLatestAuthToken.toString());
+            LogUtil.i("_checkServerAppConfig isLatestAuthToken======>", isLatestAuthToken.toString());
 
             ///update auth digit list
             if (!isLatestAuthToken) {
@@ -172,15 +172,15 @@ class _EntryPageState extends State<EntryPage> {
           print("_checkServerAppConfig isLatestApk======>" + isLatestApk.toString());
           if (isLatestApk == null || !isLatestApk) {
             var latestApkObj = resultData["latestApk"];
-            print("_checkServerAppConfig latestApkObj======>" + latestApkObj.toString());
+            LogUtil.i("_checkServerAppConfig latestApkObj======>", latestApkObj.toString());
             String apkVersion = latestApkObj["apkVersion"].toString();
-            print("_checkServerAppConfig apkVersion======>" + apkVersion.toString());
+            LogUtil.i("_checkServerAppConfig apkVersion======>", apkVersion.toString());
             if (apkVersion != null && apkVersion.isNotEmpty) {
               spUtil.setString(VendorConfig.serverApkVersionKey, apkVersion);
             }
           }
         } else {
-          print("_checkAndUpdateAppConfig() requestWithVersionParam,result status is not ok");
+          LogUtil.i("_checkAndUpdateAppConfig() requestWithVersionParam", "result status is not ok");
         }
       } else {
         print(
@@ -188,7 +188,7 @@ class _EntryPageState extends State<EntryPage> {
         print("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" + (nowTimeStamp - int.parse(lastCheckTime)).toString());
       }
     } catch (e) {
-      print("_checkServerAppConfig(), error is =======>" + e.toString());
+      LogUtil.i("_checkServerAppConfig(), error is =======>", e.toString());
     }
   }
 

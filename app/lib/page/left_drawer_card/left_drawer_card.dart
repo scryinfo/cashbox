@@ -235,7 +235,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                       Gaps.scaleVGap(1),
                       Container(
                         width: ScreenUtil().setWidth(60),
-                        height: ScreenUtil().setWidth(13),
+                        height: ScreenUtil().setWidth(14),
                         alignment: Alignment.centerLeft,
                         color: Colors.transparent,
                         child: Column(
