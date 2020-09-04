@@ -371,7 +371,7 @@ class Wallets {
         decimal: decimal);
     int status = ethTxSignMap["status"];
     if (status == null || status != 200) {
-      LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethTxSignMap["message"]);
+      LogUtil.e("ethTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethTxSignMap["message"]);
     }
     return ethTxSignMap;
   }
@@ -387,6 +387,16 @@ class Wallets {
 
   Future<Map> eeeSign(String walletId, Uint8List pwd, String rawTx) async {
     Map eeeTxSignMap = await WalletManager.eeeSign(walletId, pwd, rawTx);
+    int status = eeeTxSignMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
+    }
+    return eeeTxSignMap;
+  }
+
+  Future<Map> eeeTransfer(
+      String from, String to, String value, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
+    Map eeeTxSignMap = await WalletManager.eeeTransfer(from, to, value, genesisHash, index, runtimeVersion, txVersion, pwd);
     int status = eeeTxSignMap["status"];
     if (status == null || status != 200) {
       LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);

@@ -582,7 +582,34 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-
+            case "eeeTransfer": {
+                ScryWalletLog.d("nativeLib=>", "eeeTransfer is enter =>");
+                Message message = new Message();
+                ScryWalletLog.d("nativeLib=>",
+                        "eeeTransfer is enter =>" + (call.argument("from")).toString());
+                message = NativeLib.eeeTransfer(
+                        (String) (call.argument("from")),
+                        (String) (call.argument("to")),
+                        (String) (call.argument("value")),
+                        (String) (call.argument("genesisHash")),
+                        (int) (call.argument("index")),
+                        (int) (call.argument("runtime_version")),
+                        (int) (call.argument("tx_version")),
+                        (byte[]) (call.argument("pwd")));
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                ScryWalletLog.d("nativeLib=>", "message is " + message.toString());
+                if (message.status == 200) {
+                    resultMap.put("signedInfo", message.signedInfo);
+                    ScryWalletLog.d("nativeLib=>",
+                            "message.signedInfo is " + message.signedInfo.toString());
+                } else {
+                    resultMap.put("message", message.message);
+                    ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
+                }
+                result.success(resultMap);
+                break;
+            }
             case "ethRawTxSign": {
                 ScryWalletLog.d("nativeLib=>", "ethRawTxSign is enter =>");
                 Message message = new Message();

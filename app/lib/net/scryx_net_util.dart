@@ -43,32 +43,29 @@ class ScryXNetUtil {
     }
   }
 
-  loadScryXRuntimeVersion() async {
+  Future<Map> loadScryXRuntimeVersion() async {
+    Map resultMap = new Map();
     var spUtil = await SharedPreferenceUtil.instance;
     var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
     if (netUrl == null || netUrl.isEmpty) {
-      return "";
+      return null;
     }
-    var paramObj = {
-      "method": "state_getRuntimeVersion",
-      "params": [0],
-      "id": 1,
-      "jsonrpc": "2.0"
-    };
+    var paramObj = {"method": "state_getRuntimeVersion", "params": [], "id": 1, "jsonrpc": "2.0"};
     try {
-      var resultInfo = await request(netUrl, formData: paramObj);
-      return resultInfo;
+      resultMap = await request(netUrl, formData: paramObj);
+      return resultMap;
     } catch (e) {
       print("loadScryXRuntimeVersion error is ===>" + e.toString());
       return null;
     }
   }
 
-  loadScryXBlockHash() async {
+  Future<Map> loadScryXBlockHash() async {
+    Map resultMap = new Map();
     var spUtil = await SharedPreferenceUtil.instance;
     var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
     if (netUrl == null || netUrl.isEmpty) {
-      return "";
+      return null;
     }
     var paramObj = {
       "method": "chain_getBlockHash",
@@ -77,19 +74,20 @@ class ScryXNetUtil {
       "jsonrpc": "2.0"
     };
     try {
-      var resultInfo = await request(netUrl, formData: paramObj);
-      return resultInfo;
+      resultMap = await request(netUrl, formData: paramObj);
+      return resultMap;
     } catch (e) {
       print("loadScryXBlockHash error is ===>" + e.toString());
       return null;
     }
   }
 
-  submitExtrinsic(txInfo) async {
+  Future<Map> submitExtrinsic(txInfo) async {
+    Map resultMap = new Map();
     var spUtil = await SharedPreferenceUtil.instance;
     var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
     if (netUrl == null || netUrl.isEmpty) {
-      return "";
+      return null;
     }
     var paramObj = {
       "method": "author_submitExtrinsic", // author_submitExtrinsic
@@ -98,8 +96,8 @@ class ScryXNetUtil {
       "jsonrpc": "2.0"
     };
     try {
-      var resultInfo = await request(netUrl, formData: paramObj);
-      return resultInfo;
+      resultMap = await request(netUrl, formData: paramObj);
+      return resultMap;
     } catch (e) {
       print("submitExtrinsic error is ===>" + e.toString());
       return null;

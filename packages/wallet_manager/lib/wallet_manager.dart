@@ -28,7 +28,6 @@ class WalletManager {
     return containMap;
   }
 
-
   static Future<Map<dynamic, dynamic>> updateWalletDbData() async {
     Map<dynamic, dynamic> containMap = await _channel.invokeMethod('updateWalletDbData');
     return containMap;
@@ -203,6 +202,21 @@ class WalletManager {
 
   static Future<Map<dynamic, dynamic>> eeeSign(String walletId, Uint8List pwd, String rawTx) async {
     Map<dynamic, dynamic> eeeTxSignMap = await _channel.invokeMethod("eeeSign", {"rawTx": rawTx, "mnId": walletId, "pwd": pwd});
+    return eeeTxSignMap;
+  }
+
+  static Future<Map<dynamic, dynamic>> eeeTransfer(
+      String from, String to, String value, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
+    Map<dynamic, dynamic> eeeTxSignMap = await _channel.invokeMethod("eeeTransfer", {
+      "from": from,
+      "to": to,
+      "value": value,
+      "genesisHash": genesisHash,
+      "index": index,
+      "runtime_version": runtimeVersion,
+      "tx_version": txVersion,
+      "pwd": pwd
+    });
     return eeeTxSignMap;
   }
 

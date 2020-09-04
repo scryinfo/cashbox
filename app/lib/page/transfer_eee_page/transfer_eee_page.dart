@@ -1,9 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/util/utils.dart';
@@ -27,6 +30,11 @@ class _TransferEeePageState extends State<TransferEeePage> {
   TextEditingController _txValueController = TextEditingController();
   TextEditingController _backupMsgController = TextEditingController();
   var chainAddress = "";
+  int runtimeVersion;
+  int txVersion;
+  String eeeBalance;
+  int nonce;
+  String genesisHash;
 
   @override
   void initState() {
@@ -34,9 +42,34 @@ class _TransferEeePageState extends State<TransferEeePage> {
     initData();
   }
 
-  initData() {
+  initData() async {
     print("initData=======>");
-    // _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress ?? "";
+    ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+    Map eeeBalanceMap = await scryXNetUtil.loadEeeAccountInfo(Wallets.instance.nowWallet.nowChain.chainType);
+    if (eeeBalanceMap != null && eeeBalanceMap.containsKey("status")) {
+      if (eeeBalanceMap["status"] != null && eeeBalanceMap["status"] == 200) {
+        eeeBalance = eeeBalanceMap["free"];
+        nonce = eeeBalanceMap["nonce"];
+      }
+    }
+    Map blockHashMap = await scryXNetUtil.loadScryXBlockHash();
+    if (blockHashMap == null || !blockHashMap.containsKey("result")) {
+      return;
+    }
+    genesisHash = blockHashMap["result"];
+    print("genesisHash.toString is ===> " + genesisHash.toString());
+
+    Map runtimeMap = await scryXNetUtil.loadScryXRuntimeVersion();
+    print("runtimeMap.toString is ===> " + runtimeMap.toString());
+    if (runtimeMap == null || !runtimeMap.containsKey("result")) {
+      return;
+    }
+    var resultMap = runtimeMap["result"];
+    if (resultMap == null || !resultMap.containsKey("specVersion") || !resultMap.containsKey("transactionVersion")) {
+      return;
+    }
+    runtimeVersion = resultMap["specVersion"];
+    txVersion = resultMap["transactionVersion"];
   }
 
   @override
@@ -237,6 +270,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
       onTap: () async {
         showProgressDialog(context, translate("check_data_format"));
         NavigatorUtils.goBack(context);
+        _showPwdDialog(context);
       },
       child: Container(
         alignment: Alignment.bottomCenter,
@@ -267,19 +301,32 @@ class _TransferEeePageState extends State<TransferEeePage> {
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
-            String walletId = await Wallets.instance.getNowWalletId();
-            //todo to be tested
-            var eeeAccountMap = await Wallets.instance.eeeAccountInfoKey(chainAddress);
-            int status = eeeAccountMap["status"];
-            if (status == null || status != 200) {
-              print("net 获取eee参数失败 status" + eeeAccountMap["message"]);
+            Map eeeTransferMap = await Wallets.instance.eeeTransfer(
+                Wallets.instance.nowWallet.nowChain.chainAddress,
+                _toAddressController.text.toString(),
+                _txValueController.text.toString(),
+                genesisHash,
+                nonce,
+                runtimeVersion,
+                txVersion,
+                Uint8List.fromList(pwd.codeUnits));
+            if (eeeTransferMap == null || !eeeTransferMap.containsKey("status") || eeeTransferMap["status"] != 200) {
+              print("error, eeeTransferMap appear error===~");
+              NavigatorUtils.goBack(context);
               return;
             }
-            var accountKeyInfo = eeeAccountMap["accountKeyInfo"];
-            //ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-            //var storageData = await scryXNetUtil.loadScryXStorage(accountKeyInfo);
-            //todo determines the status returned on the scryX chain
-            //Wallets.instance.decodeEeeAccountInfo(storageData);
+            String signInfo = eeeTransferMap["signedInfo"];
+            print("eeeTransferMap, signInfo is ======>" + signInfo);
+            ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+            Map submitMap = await scryXNetUtil.submitExtrinsic(signInfo);
+            if (submitMap == null || !submitMap.containsKey("result")) {
+              print("error, submitMap appear error===~");
+              NavigatorUtils.goBack(context);
+              return;
+            }
+            String txHash = submitMap["result"];
+            print("txHash is " + txHash.toString());
+            NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
           },
         );
       },
