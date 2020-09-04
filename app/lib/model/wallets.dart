@@ -377,7 +377,7 @@ class Wallets {
   }
 
   Future<Map> ethRawTxSign(String rawTx, int chainType, String fromAddress, Uint8List pwd) async {
-    Map ethRawTxSignMap = await WalletManager.ethRawTxSign(rawTx,chainType,fromAddress,pwd);
+    Map ethRawTxSignMap = await WalletManager.ethRawTxSign(rawTx, chainType, fromAddress, pwd);
     int status = ethRawTxSignMap["status"];
     if (status == null || status != 200) {
       LogUtil.e("ethRawTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethRawTxSignMap["message"]);
@@ -433,14 +433,23 @@ class Wallets {
 
   //
   eeeAccountInfoKey(String address) async {
-    Map eeeAccountMap = await WalletManager.eeeAccountInfoKey(address);
-    return eeeAccountMap;
+    Map<dynamic, dynamic> eeeAccountInfoMap = await WalletManager.eeeAccountInfoKey(address);
+    int status = eeeAccountInfoMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("decodeAccountInfo=>", "error status code is" + status.toString() + "||message is=>" + eeeAccountInfoMap["message"].toString());
+    }
+    return eeeAccountInfoMap;
   }
 
   //
-  decodeAccountInfo(String encodeData) async {
-    Map eeeAccountMap = await WalletManager.decodeAccountInfo(encodeData);
-    return eeeAccountMap;
+  Future<Map> decodeEeeAccountInfo(String encodeData) async {
+    Map<dynamic, dynamic> decodeEeeAccountInfoMap = await WalletManager.decodeAccountInfo(encodeData);
+    int status = decodeEeeAccountInfoMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e(
+          "decodeEeeAccountInfo=>", "error status code is" + status.toString() + "||message is=>" + decodeEeeAccountInfoMap["message"].toString());
+    }
+    return decodeEeeAccountInfoMap;
   }
 
   //Add a new token data model to the current wallet and current chain

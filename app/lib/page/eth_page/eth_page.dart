@@ -6,6 +6,7 @@ import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
+import 'package:app/net/scryx_net_util.dart';
 import 'package:app/page/left_drawer_card/left_drawer_card.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -142,31 +143,52 @@ class _EthPageState extends State<EthPage> {
     print("loadDigitBalance is enter ===>" + displayDigitsList.length.toString());
     if (displayDigitsList == null || displayDigitsList.length == 0) {
       return;
-    } else {
-      for (var i = 0; i < displayDigitsList.length; i++) {
-        print("loadDigitBalance  contractAddress===>" +
-            this.displayDigitsList[i].contractAddress.toString() +
-            "|| address====>" +
-            this.displayDigitsList[i].address.toString());
-        String balance;
-        if (this.displayDigitsList[i].contractAddress != null && this.displayDigitsList[i].contractAddress.trim() != "") {
-          balance = await loadErc20Balance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[i].contractAddress,
-              Wallets.instance.nowWallet.nowChain.chainType);
-          print("erc20 balance==>" + balance.toString());
-          Wallets.instance.updateDigitBalance(this.displayDigitsList[i].contractAddress, this.displayDigitsList[i].digitId, balance ?? "");
-        } else if (Wallets.instance.nowWallet.nowChain.chainAddress != null && Wallets.instance.nowWallet.nowChain.chainAddress.trim() != "") {
-          balance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
-          print("eth balance==>" + balance.toString());
-          Wallets.instance.updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[i].digitId, balance ?? "");
-        } else {}
-        allVisibleDigitsList[i].balance = balance ?? "0";
-        if (mounted) {
-          setState(() {
-            this.displayDigitsList[i].balance = balance ?? "0";
-          });
+    }
+    switch (Wallets.instance.nowWallet.nowChain.chainType) {
+      case ChainType.ETH:
+      case ChainType.ETH_TEST:
+        {
+          for (var i = 0; i < displayDigitsList.length; i++) {
+            print("loadDigitBalance  contractAddress===>" +
+                this.displayDigitsList[i].contractAddress.toString() +
+                "|| address====>" +
+                this.displayDigitsList[i].address.toString());
+            int index = i;
+            String balance = "0";
+            if (this.displayDigitsList[index].contractAddress != null && this.displayDigitsList[index].contractAddress.trim() != "") {
+              balance = await loadErc20Balance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[index].contractAddress,
+                  Wallets.instance.nowWallet.nowChain.chainType);
+              Wallets.instance
+                  .updateDigitBalance(this.displayDigitsList[index].contractAddress, this.displayDigitsList[index].digitId, balance ?? "");
+            } else if (Wallets.instance.nowWallet.nowChain.chainAddress != null && Wallets.instance.nowWallet.nowChain.chainAddress.trim() != "") {
+              balance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
+              Wallets.instance
+                  .updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[index].digitId, balance ?? "");
+            } else {}
+            print("digit.balance ===>" + balance.toString());
+            allVisibleDigitsList[index].balance = balance ?? "0";
+            if (mounted) {
+              setState(() {
+                this.displayDigitsList[index].balance = balance ?? "0";
+              });
+            }
+          }
+          loadDigitMoney(); //If you have a balance, go to calculate the money value
         }
-      }
-      loadDigitMoney(); //If you have a balance, go to calculate the money value
+        break;
+      case ChainType.EEE:
+      case ChainType.EEE_TEST:
+        ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+        Map eeeBalanceMap = await scryXNetUtil.loadEeeAccountInfo(Wallets.instance.nowWallet.nowChain.chainType);
+        if (eeeBalanceMap != null && eeeBalanceMap.containsKey("status")) {
+          if (eeeBalanceMap["status"] != null && eeeBalanceMap["status"] == 200) {
+            Wallets.instance.nowWallet.nowChain.digitsList[0].balance = eeeBalanceMap["free"];
+            this.displayDigitsList[0].balance = eeeBalanceMap["free"] ?? "0.0";
+          }
+        }
+        break;
+      default:
+        break;
     }
   }
 
@@ -596,8 +618,7 @@ class _EthPageState extends State<EthPage> {
               print("Wallets.instance.nowWallet.chainList.length snapshot.hasData===>" + Wallets.instance.nowWallet.chainList.length.toString());
               return Swiper(
                 itemBuilder: (BuildContext context, int index) {
-                  print("itemBuilder length====>" + Wallets.instance.nowWallet.chainList.length.toString());
-                  print("itemBuilder index====>" + index.toString() + "||" + allVisibleChainsList[index].chainType.toString());
+                  print("itemBuilder length====>" + index.toString() + "||" + Wallets.instance.nowWallet.chainList.length.toString());
                   return SingleChildScrollView(
                     child: Container(
                       alignment: Alignment.centerLeft,

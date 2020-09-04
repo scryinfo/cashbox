@@ -749,10 +749,15 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
+                ScryWalletLog.d("nativeLib=>", "decodeAccountInfo message.status is " + message.status);
+                ScryWalletLog.d("nativeLib=>", "decodeAccountInfo message.accountInfo is " + message.accountInfo);
                 if (message.status == 200) {
-                    resultMap.put("accountKeyInfo", message.accountKeyInfo);
-                    ScryWalletLog.d("nativeLib=>",
-                            "message.accountKeyInfo is " + message.accountKeyInfo.toString());
+                    resultMap.put("nonce", message.accountInfo.nonce);
+                    resultMap.put("refcount", message.accountInfo.refcount);
+                    resultMap.put("free", message.accountInfo.free);
+                    resultMap.put("reserved", message.accountInfo.reserved);
+                    resultMap.put("misc_frozen", message.accountInfo.misc_frozen);
+                    resultMap.put("fee_frozen", message.accountInfo.fee_frozen);
                 } else {
                     resultMap.put("message", message.message);
                     ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());

@@ -1,23 +1,42 @@
 import 'package:app/global_config/vendor_config.dart';
+import 'package:app/model/chain.dart';
+import 'package:app/model/wallets.dart';
 import 'package:app/util/sharedpreference_util.dart';
 import 'net_util.dart';
 
 class ScryXNetUtil {
-  loadScryXStorage(address) async {
+  Future<Map> loadEeeAccountInfo(ChainType eeeChainType) async {
+    Map eeeResultMap;
+    Map<dynamic, dynamic> eeeAccountKeyMap =
+        await Wallets.instance.eeeAccountInfoKey(Wallets.instance.nowWallet.getChainByChainType(eeeChainType).chainAddress);
+    if (eeeAccountKeyMap != null && eeeAccountKeyMap.containsKey("status")) {
+      if (eeeAccountKeyMap["status"] != null && eeeAccountKeyMap["status"] == 200) {
+        String formattedKeyInfo = eeeAccountKeyMap["accountKeyInfo"];
+        Map netFormatMap = await _loadScryXStorage(formattedKeyInfo);
+        if (netFormatMap != null && netFormatMap.containsKey("result")) {
+          eeeResultMap = await Wallets.instance.decodeEeeAccountInfo(netFormatMap["result"]);
+        }
+      }
+    }
+    return eeeResultMap;
+  }
+
+  Future<Map> _loadScryXStorage(formattedAddress) async {
     var spUtil = await SharedPreferenceUtil.instance;
     var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    Map resultMap = new Map();
     if (netUrl == null || netUrl.isEmpty) {
-      return "";
+      return null;
     }
     var paramObj = {
       "method": "state_getStorage",
-      "params": [address],
+      "params": [formattedAddress],
       "id": 1,
       "jsonrpc": "2.0"
     };
     try {
-      var resultInfo = await request(netUrl, formData: paramObj);
-      return resultInfo;
+      resultMap = await request(netUrl, formData: paramObj);
+      return resultMap;
     } catch (e) {
       print("loadScryXStorage error is ===>" + e.toString());
       return null;

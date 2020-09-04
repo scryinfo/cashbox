@@ -276,10 +276,10 @@ class _TransferEeePageState extends State<TransferEeePage> {
               return;
             }
             var accountKeyInfo = eeeAccountMap["accountKeyInfo"];
-            ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-            var storageData = await scryXNetUtil.loadScryXStorage(accountKeyInfo);
+            //ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+            //var storageData = await scryXNetUtil.loadScryXStorage(accountKeyInfo);
             //todo determines the status returned on the scryX chain
-            Wallets.instance.decodeAccountInfo(storageData);
+            //Wallets.instance.decodeEeeAccountInfo(storageData);
           },
         );
       },
