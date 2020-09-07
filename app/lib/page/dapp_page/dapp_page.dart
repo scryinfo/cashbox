@@ -98,16 +98,18 @@ class _DappPageState extends State<DappPage> {
                 String address = '';
                 {
                   Chain chain = nowWallet.getChainByChainType(ChainType.EEE);
-                  address = chain.chainAddress;
-                  if (address == null || address.isEmpty) {
-                    chain = nowWallet.getChainByChainType(ChainType.EEE_TEST);
+                  if (chain != null) {
                     address = chain.chainAddress;
+                    if (address == null || address.isEmpty) {
+                      chain = nowWallet.getChainByChainType(ChainType.EEE_TEST);
+                      address = chain.chainAddress;
+                    }
                   }
                 }
                 if (address.isNotEmpty) {
                   _controller?.evaluateJavascript('nativeChainAddressToJsResult("$address")')?.then((
                       result) {}); //Pass the wallet EEE chain address to DApp record storage, this will be remove
-                  String script = 'if($CashboxEeeName){$CashboxEeeName.$setAddress("$address")}';
+                  String script = 'if(window.$CashboxEeeName){$CashboxEeeName.$setAddress("$address")}';
                   _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                 } else {
                   print('Page finished loading================================>:address is null');
@@ -118,14 +120,16 @@ class _DappPageState extends State<DappPage> {
                 String address = '';
                 {
                   Chain chain = nowWallet.getChainByChainType(ChainType.ETH);
-                  address = chain.chainAddress;
-                  if (address == null || address.isEmpty) {
-                    chain = nowWallet.getChainByChainType(ChainType.ETH_TEST);
+                  if(chain != null) {
                     address = chain.chainAddress;
+                    if (address == null || address.isEmpty) {
+                      chain = nowWallet.getChainByChainType(ChainType.ETH_TEST);
+                      address = chain.chainAddress;
+                    }
                   }
                 }
                 if (address.isNotEmpty) {
-                  String script = 'if($CashboxEthName){$CashboxEthName.$setAddress("$address")}';
+                  String script = 'if(window.$CashboxEthName){$CashboxEthName.$setAddress("$address")}';
                   _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                 } else {
                   print('Page finished loading================================>:address is null');
@@ -136,14 +140,16 @@ class _DappPageState extends State<DappPage> {
                 String address = '';
                 {
                   Chain chain = nowWallet.getChainByChainType(ChainType.BTC);
-                  address = chain.chainAddress;
-                  if (address == null || address.isEmpty) {
-                    chain = nowWallet.getChainByChainType(ChainType.BTC_TEST);
+                  if(chain != null) {
                     address = chain.chainAddress;
+                    if (address == null || address.isEmpty) {
+                      chain = nowWallet.getChainByChainType(ChainType.BTC_TEST);
+                      address = chain.chainAddress;
+                    }
                   }
                 }
                 if (address.isNotEmpty) {
-                  String script = 'if($CashboxBtcName){$CashboxBtcName.$setAddress("$address")}';
+                  String script = 'if(window.$CashboxBtcName){$CashboxBtcName.$setAddress("$address")}';
                   _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                 } else {
                   print('Page finished loading================================>:address is null');
@@ -376,6 +382,63 @@ class _DappPageState extends State<DappPage> {
             this.callPromise(msg);
           }
         }));
+    
+    //eee start
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxEeeRawTxSign",
+        onMessageReceived: (JavascriptMessage message) {
+          print("cashboxEeeRawTxSign 从Webview传回来的参数======>： ${message.message}");
+          var msg = Message.fromJson(jsonDecode(message.message));
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return PwdDialog(
+                title: translate('wallet_pwd').toString(),
+                hintContent: translate('dapp_sign_hint_content') + nowWallet.walletName ?? "",
+                hintInput: translate('input_pwd_hint').toString(),
+                onPressed: (pwd) async {
+                  try {
+                    var pwdFormat = pwd.codeUnits;
+                    Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
+                    ChainType chainType = ChainType.EEE;
+                    if (wallet.walletType == WalletType.TEST_WALLET) {
+                      chainType = ChainType.EEE_TEST;
+                    }
+                    Wallets.instance.eeeTxSign(wallet.walletId, Uint8List.fromList(pwdFormat), msg.data)
+                        .then((map) {
+                      int status = map["status"];
+                      if (status == null || status != 200) {
+                        msg.err = map["message"];
+                        if (msg.err == null || msg.err.length < 1) {
+                          msg.err = "result nothing ";
+                        }else{
+                          print("eeeTxSign: " + msg.err);
+                        }
+                        msg.data = "";
+                        Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
+                      } else {
+                        var signResult = map["signedInfo"];
+                        msg.err = "";
+                        msg.data = signResult;
+                        Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
+                      }
+                      this.callPromise(msg).then((value) {
+                        NavigatorUtils.goBack(context);
+                      });
+                    });
+                  } catch (e) {
+                    print("cashboxEeeRawTxSign: " + e.toString());
+                    msg.err = "inner error";
+                    this.callPromise(msg).whenComplete(() {
+                      NavigatorUtils.goBack(context);
+                    });
+                  }
+                },
+              );
+            },
+          );
+        }));
+    //eee end
 
     return jsChannelList.toSet();
   }
