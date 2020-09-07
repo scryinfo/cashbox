@@ -82,6 +82,24 @@ class ScryXNetUtil {
     }
   }
 
+  loadTxHistory() async {
+    Map resultMap = new Map();
+    var spUtil = await SharedPreferenceUtil.instance;
+    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    if (netUrl == null || netUrl.isEmpty) {
+      return null;
+    }
+    var paramObj = {"method": "chain_getHeader", "params": [], "id": 1, "jsonrpc": "2.0"};
+    try {
+      resultMap = await request(netUrl, formData: paramObj);
+      print("loadTxHistory resultMap is ===>" + resultMap.toString());
+      return resultMap;
+    } catch (e) {
+      print("loadScryXRuntimeVersion error is ===>" + e.toString());
+      return null;
+    }
+  }
+
   Future<Map> submitExtrinsic(txInfo) async {
     Map resultMap = new Map();
     var spUtil = await SharedPreferenceUtil.instance;

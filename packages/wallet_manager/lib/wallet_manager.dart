@@ -240,6 +240,11 @@ class WalletManager {
     return decodeMap;
   }
 
+  static getEeeSyncRecord() async{
+    Map<dynamic, dynamic> syncRecordMap = await _channel.invokeMethod("getEeeSyncRecord");
+    return syncRecordMap;
+  }
+
   //在 当前钱包、当前链下，增加新代币的数据模型
   static addDigitToChainModel(String walletId, int chainType, String digitId) async {
     Map<dynamic, dynamic> decodeMap = await _channel.invokeMethod("addDigit", {"walletId": walletId, "chainType": chainType, "digitId": digitId});

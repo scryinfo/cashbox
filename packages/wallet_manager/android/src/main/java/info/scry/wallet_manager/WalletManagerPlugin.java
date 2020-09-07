@@ -792,6 +792,44 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
+            case "getEeeSyncRecord": {
+                ScryWalletLog.d("nativeLib=>", "getEeeSyncRecord is enter =>");
+                SyncStatus syncStatus = new SyncStatus();
+                try {
+                    syncStatus = NativeLib.getEeeSyncRecord();
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "getEeeSyncRecord exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "syncStatus.status is " + syncStatus.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", syncStatus.status);
+                if (syncStatus.status == 200) {
+                    Map<String, AccountRecord> recordsMap = syncStatus.records;
+                    ScryWalletLog.d("nativeLib=>", "recordsMap is " + recordsMap);
+                    if (recordsMap == null || recordsMap.size() == 0) {
+                        resultMap.put("records", null);
+                    } else {
+                        Map accountMap = new HashMap();
+                        for (Map.Entry<String, AccountRecord> entry : recordsMap.entrySet()) {
+                            System.out.println("key = " + entry.getKey() + ", value = " + entry.getValue());
+                            Map accountDetailMap = new HashMap();
+                            accountDetailMap.put("accountkey", entry.getKey());
+                            accountDetailMap.put("account", entry.getValue().account);
+                            accountDetailMap.put("chainType", entry.getValue().chainType);
+                            accountDetailMap.put("blockNum", entry.getValue().blockNum);
+                            accountDetailMap.put("blockHash", entry.getValue().blockHash);
+                            accountMap.put(entry.getKey(), accountDetailMap);
+                        }
+                        resultMap.put("records", accountMap);
+                    }
+                } else {
+                    resultMap.put("message", syncStatus.message);
+                    ScryWalletLog.d("nativeLib=>", "getEeeSyncRecord syncStatus.message is " + syncStatus.message.toString());
+                }
+                result.success(resultMap);
+                break;
+            }
+
             case "initWalletBasicData": {
                 ScryWalletLog.d("nativeLib=>", "initWalletBasicData is enter =>");
                 WalletState walletState = new WalletState();

@@ -462,6 +462,15 @@ class Wallets {
     return decodeEeeAccountInfoMap;
   }
 
+  getEeeSyncRecord() async {
+    Map<dynamic, dynamic> getEeeSyncRecordMap = await WalletManager.getEeeSyncRecord();
+    int status = getEeeSyncRecordMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("getEeeSyncRecordMap=>", "error status code is" + status.toString() + "||message is=>" + getEeeSyncRecordMap["message"].toString());
+    }
+    return getEeeSyncRecordMap;
+  }
+
   //Add a new token data model to the current wallet and current chain
   addDigitToChainModel(String walletId, Chain chain, String digitId) async {
     Map addDigitModelMap =

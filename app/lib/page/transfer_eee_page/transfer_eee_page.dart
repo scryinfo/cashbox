@@ -43,7 +43,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
   }
 
   initData() async {
-    print("initData=======>");
     ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
     Map eeeBalanceMap = await scryXNetUtil.loadEeeAccountInfo(Wallets.instance.nowWallet.nowChain.chainType);
     if (eeeBalanceMap != null && eeeBalanceMap.containsKey("status")) {
@@ -70,6 +69,17 @@ class _TransferEeePageState extends State<TransferEeePage> {
     }
     runtimeVersion = resultMap["specVersion"];
     txVersion = resultMap["transactionVersion"];
+
+    Map txHistoryMap = await scryXNetUtil.loadTxHistory();
+    var number = txHistoryMap["result"]["number"].toString().substring(2);
+    print("block number is ===>" + number);
+    Map eeeSyncMap = await Wallets.instance.getEeeSyncRecord();
+    Map records = eeeSyncMap["records"];
+    if (records == null || records.length == 0) {
+      print("records length is ===>" + records.length.toString());
+    }else{
+
+    }
   }
 
   @override
