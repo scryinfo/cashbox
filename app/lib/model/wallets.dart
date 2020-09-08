@@ -471,6 +471,26 @@ class Wallets {
     return getEeeSyncRecordMap;
   }
 
+  updateEeeSyncRecord(String account, int chainType, int blockNum, String blockHash) async {
+    Map<dynamic, dynamic> updateEeeSyncRecordMap = await WalletManager.updateEeeSyncRecord(account, chainType, blockNum, blockHash);
+    int status = updateEeeSyncRecordMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e(
+          "updateEeeSyncRecord=>", "error status code is" + status.toString() + "||message is=>" + updateEeeSyncRecordMap["message"].toString());
+    }
+    return updateEeeSyncRecordMap;
+  }
+
+  Future<Map> saveEeeExtrinsicDetail(String account, String eventDetail, String blockHash, String extrinsic) async {
+    Map<dynamic, dynamic> saveEeeExtrinsicDetailMap = await WalletManager.saveEeeExtrinsicDetail(account, eventDetail, blockHash, extrinsic);
+    int status = saveEeeExtrinsicDetailMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("saveEeeExtrinsicDetail=>",
+          "error status code is" + status.toString() + "||message is=>" + saveEeeExtrinsicDetailMap["message"].toString());
+    }
+    return saveEeeExtrinsicDetailMap;
+  }
+
   //Add a new token data model to the current wallet and current chain
   addDigitToChainModel(String walletId, Chain chain, String digitId) async {
     Map addDigitModelMap =

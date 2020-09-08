@@ -240,9 +240,21 @@ class WalletManager {
     return decodeMap;
   }
 
-  static getEeeSyncRecord() async{
+  static getEeeSyncRecord() async {
     Map<dynamic, dynamic> syncRecordMap = await _channel.invokeMethod("getEeeSyncRecord");
     return syncRecordMap;
+  }
+
+  static updateEeeSyncRecord(String account, int chainType, int blockNum, String blockHash) async {
+    Map<dynamic, dynamic> updateRecordMap = await _channel
+        .invokeMethod("updateEeeSyncRecord", {"account": account, "chain_type": chainType, "block_num": blockNum, "block_hash": blockHash});
+    return updateRecordMap;
+  }
+
+  static saveEeeExtrinsicDetail(String account, String eventDetail, String blockHash, String extrinsics) async {
+    Map<dynamic, dynamic> updateRecordMap = await _channel
+        .invokeMethod("saveExtrinsicDetail", {"accountId": account, "eventDetail": eventDetail, "blockHash": blockHash, "extrinsics": extrinsics});
+    return updateRecordMap;
   }
 
   //在 当前钱包、当前链下，增加新代币的数据模型
