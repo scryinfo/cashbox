@@ -4,12 +4,12 @@ extern crate serde_derive;
 use tiny_keccak::Keccak;
 
 use sp_core::{
-    H256,ecdsa, ed25519, sr25519,
+    H256, ecdsa, ed25519, sr25519,
     crypto::{Pair, Ss58Codec},
-    hexdisplay::HexDisplay
+    hexdisplay::HexDisplay,
 };
-use codec::{Encode,Decode};
-use node_runtime::{AccountId, Balance,Event, Index, Signature,Call, Runtime,TokenXCall,BalancesCall::{self,transfer as transfercall,transfer_keep_alive}};
+use codec::{Encode, Decode};
+use node_runtime::{AccountId, Balance, Event, Index, Signature, Call, Runtime, TokenXCall, BalancesCall::{self, transfer as transfercall, transfer_keep_alive}};
 use node_runtime::TimestampCall::set;
 
 use system::Phase;
@@ -20,7 +20,7 @@ mod transaction;
 pub mod error;
 
 pub use crypto::{Sr25519, Ed25519, Crypto};
-pub use transaction::{tx_sign,transfer,decode_account_info,account_info_key};
+pub use transaction::{tx_sign, tokenx_transfer,transfer, decode_account_info, account_info_key};
 
 use std::collections::HashMap;
 
@@ -43,110 +43,111 @@ impl<T> Keccak256<[u8; 32]> for T where T: AsRef<[u8]> {
 /// Used to transfer the decoded result of account information, use the default unit here?
 #[derive(Clone, Debug, Default)]
 pub struct EeeAccountInfo {
-     pub nonce: u32,
-     pub refcount: u32,
-     pub free: String,
-     //To avoid java does not support u128 type format, all converted to String format
-     pub reserved: String,
-     pub misc_frozen: String,
-     pub fee_frozen: String,
+    pub nonce: u32,
+    pub refcount: u32,
+    pub free: String,
+    //To avoid java does not support u128 type format, all converted to String format
+    pub reserved: String,
+    pub misc_frozen: String,
+    pub fee_frozen: String,
 }
 
 //Designed as an option, when the transaction is a transaction that sets the block time, there is no signature
 #[derive(Default, Debug)]
 pub struct TransferDetail {
-     pub index: Option<u32>,
-     //The transaction nonce corresponding to the signed account
-     pub from: Option<String>,
-     //Signature account from which account is transferred out of balance
-     pub to: Option<String>,
-     //Destination account, balance account
+    pub index: Option<u32>,
+    //The transaction nonce corresponding to the signed account
+    pub from: Option<String>,
+    //Signature account from which account is transferred out of balance
+    pub to: Option<String>,
+    //Destination account, balance account
     pub value: Option<u128>,
     pub hash: Option<String>,
     pub timestamp: Option<u64>,
-    pub ext_data:Option<String>,
+    pub token_name: String,
+    pub ext_data: Option<String>,
 }
 
 // Notification event data Use hex-encoded strings to associate the results of notification events with transactions
-pub fn event_decode(event_data:&str,_blockhash:&str,_account:&str)->HashMap<u32,bool> {
+pub fn event_decode(event_data: &str, _blockhash: &str, _account: &str) -> HashMap<u32, bool> {
     let enents_bytes = hex::decode(event_data.get(2..).unwrap()).unwrap();
     let events = Vec::<system::EventRecord<Event, H256>>::decode(&mut &enents_bytes[..]);
     let mut tx_result = HashMap::with_capacity(8);
     for record in events {
         for event in record {
             //todo 将索引与区块交易中的索引关联起来，怎么来确定交易索引与交易结果之间的关系？
-            let index = if let  Phase::ApplyExtrinsic(index) = event.phase{index}else { 0 };
+            let index = if let Phase::ApplyExtrinsic(index) = event.phase { index } else { 0 };
             //todo 当交易失败，不会存在该通知记录
-            println!("event detail is:{:?}",event.event);
+            println!("event detail is:{:?}", event.event);
             match event.event {
-                 Event::frame_system(se) => { //todo
-                     match &se {
-                         system::RawEvent::ExtrinsicSuccess(_dispath) => {
-                             tx_result.insert(index,true);
-                         },
-                         system::RawEvent::ExtrinsicFailed(_err, _info) => {
-                             tx_result.insert(index,false);
-                         },
-                         _ => log::error!("ignoring unsupported  system event")
+                Event::frame_system(se) => { //todo
+                    match &se {
+                        system::RawEvent::ExtrinsicSuccess(_dispath) => {
+                            tx_result.insert(index, true);
+                        }
+                        system::RawEvent::ExtrinsicFailed(_err, _info) => {
+                            tx_result.insert(index, false);
+                        }
+                        _ => log::error!("ignoring unsupported  system event")
                     }
-                 },
+                }
                 _ => log::error!("ignoring unsupported event")
             }
         }
     }
     tx_result
 }
-pub fn decode_extrinsics(extrinsics_json:&str,target_account:&str)->Result<HashMap<u32,TransferDetail>,error::Error>{
+
+pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<HashMap<u32, TransferDetail>, error::Error> {
     let target_account = AccountId::from_ss58check(target_account)?;
-    let json_data:Vec<String>   = serde_json::from_str(extrinsics_json)?;
+    let json_data: Vec<String> = serde_json::from_str(extrinsics_json)?;
 
     let mut map = HashMap::new();
     for index in 0..json_data.len() {
         let extrinsic_encode_bytes = hex::decode(json_data[index].get(2..).unwrap())?;
         let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &extrinsic_encode_bytes[..])?;
+
+        let extrinsic_func_byte = extrinsic.encode();
+        let blake2_result = blake2_rfc::blake2b::blake2b(32, &[], &extrinsic_func_byte);
+        let hash = blake2_result.as_bytes();
+
         let mut tx = TransferDetail::default();
-        println!("tx detail is:{:?}",extrinsic.function);
+        tx.hash = Some(format!("0x{}", hex::encode(hash)));
+        println!("tx detail is:{:?}", extrinsic.function);
         match &extrinsic.function {
-            Call::Timestamp(set(date,))=> {
+            Call::Timestamp(set(date, )) => {
                 tx.timestamp = Some(*date);
-                map.insert(index as u32,tx);
-            },
-            Call::Balances(transfercall(to,vaule))| Call::Balances(transfer_keep_alive(to,vaule))=>{//需要将交易发送者的信息关联出来
-                if let Some((account,_,(_,_,_,_,nonce,_,_))) = &extrinsic.signature{
-                    if !target_account.ge(to)&&!target_account.ge(&account){
-                        continue
+            }
+            Call::Balances(transfercall(to, vaule)) | Call::Balances(transfer_keep_alive(to, vaule)) => {//需要将交易发送者的信息关联出来
+                if let Some((account, _, (_, _, _, _, nonce, _, _))) = &extrinsic.signature {
+                    if !target_account.ge(to) && !target_account.ge(&account) {
+                        continue;
                     }
                     tx.value = Some(*vaule);
                     tx.to = Some(to.to_ss58check());
                     tx.from = Some(account.to_ss58check());
                     tx.index = Some(0);//todo
+                    tx.token_name = "EEE".to_string();
                 }
-
-                let extrinsic_func_byte =   extrinsic.encode();
-                let blake2_result =blake2_rfc::blake2b::blake2b(32, &[], &extrinsic_func_byte);
-                let hash = blake2_result.as_bytes();
-                tx.hash = Some(format!("0x{}",hex::encode(hash)));
-               map.insert(index as u32,tx);
-            },
-            Call::TokenX(TokenXCall::transfer(to,value,ext))=>{
+            }
+            Call::TokenX(TokenXCall::transfer(to, value, ext)) => {
                 println!("TokenXCall::transfer");
-            },
-            Call::TokenX(TokenXCall::transfer_from(from,to,value,ext))=>{
+            }
+            Call::TokenX(TokenXCall::transfer_from(from, to, value, ext)) => {
                 println!("TokenXCall::transfer_from");
-            },
-            Call::TokenX(TokenXCall::approve(to,value,ext)) => {//需要将交易发送者的信息关联出来
+            }
+            Call::TokenX(TokenXCall::approve(to, value, ext)) => {//需要将交易发送者的信息关联出来
                 println!("TokenXCall approve");
             }
-            _=> println!(" extrinsic.function")
+            _ => println!(" extrinsic.function")
         }
+        map.insert(index as u32, tx);
     }
     Ok(map)
 }
 
 #[test]
 fn decode_extrinsics_test() {
-
-
     let data = r#"["0x280402000b8039476b7401","0x4d02840a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea3001bc043eee72b7eaeca391242bfe86bcfe35fa496e4f484c056da73f6cb101427685e2763aece95fa5211578e5b2e3a998b762e7984606535cbd264bc0e5ba8e85c6030c000602e6f5e1f00a994b5157049b3092c662f08b170013f77003321214d683316c18571300008a5d784563010400"]"#;
     match decode_extrinsics(data, "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H") {
         Ok(res) => {

@@ -170,7 +170,7 @@ mod tests {
         genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
         // Involving database access requires a series of data preparations for normal testing
         let eee = module::EEE {};
-        match eee.generate_transfer(from, to, value, genesis_hash, index, runtime_version, tx_version,"123456".as_bytes()) {
+        match eee.generate_eee_transfer(from, to, value, genesis_hash, index, runtime_version, tx_version, "123456".as_bytes()) {
             Ok(sign_str) => {
                 println!("{}", sign_str);
             }

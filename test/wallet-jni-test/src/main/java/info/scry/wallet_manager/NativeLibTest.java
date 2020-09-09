@@ -12,7 +12,7 @@ public class NativeLibTest {
 
         System.out.println("********************start jni func test***************************************");
        System.out.println(NativeLib.initWalletBasicData());
-      // updateDefaultDigitTest();
+       updateDefaultDigitTest();
        walletGenerateTest();
        //  walletExportTest();
       //  eeeTransferTest();

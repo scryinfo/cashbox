@@ -14,6 +14,8 @@ type SignatureOf<C> = <<C as Crypto>::Pair as Pair>::Signature;
 type PublicOf<C> = <<C as Crypto>::Pair as Pair>::Public;
 pub type UncheckedExtrinsicV4 = sp_runtime::generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
 
+pub const DECIMAL: usize = 15;
+
 trait SignatureT: AsRef<[u8]> + AsMut<[u8]> + Default {
     /// Converts the signature into a runtime account signature, if possible. If not possible, bombs out.
     fn into_runtime(self) -> Signature {
@@ -54,7 +56,7 @@ type SignedExtra = (
 
 /// 将Call方法使用调用者的密钥进行签名
 ///
-fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C::Pair, genesis_hash: H256, spec_version: u32,transaction_version:u32) -> UncheckedExtrinsicV4 where PublicOf<C>: PublicT, SignatureOf<C>: SignatureT,
+fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C::Pair, genesis_hash: H256, spec_version: u32, transaction_version: u32) -> UncheckedExtrinsicV4 where PublicOf<C>: PublicT, SignatureOf<C>: SignatureT,
 {
     let extra = |i: Index, f: Balance| {
         (
@@ -92,25 +94,39 @@ fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C:
     )
 }
 
-pub fn transfer(mnemonic: &str, to: &str, amount: &str, genesis_hash: &[u8], index: u32, runtime_version: u32,tx_version:u32) -> Result<String, error::Error> {
+pub fn transfer(mnemonic: &str, to: &str, amount: &str, genesis_hash: &[u8], index: u32, runtime_version: u32, tx_version: u32) -> Result<String, error::Error> {
     //todo 考虑将交易的生成与交易的签名分成两个步骤，在交易生成环节可以计算出当前交易所需要的手续费，提示用户针对这次转账共需要消耗多少balance?
     let to_account_id = AccountId::from_ss58check(to)?;
-    let amount = balance_unit_convert(amount, 12).unwrap();
+    let amount = balance_unit_convert(amount, DECIMAL).unwrap();
     //构造转账 call function
     let function = Call::Balances(BalancesCall::transfer(to_account_id, amount)).encode();
     //为了能够在签名时将数据解码出来，需要为function 计算对应的前缀
     let mut prefix = calculate_prefix(function.len());
     prefix.extend_from_slice(&function);
 
-    let result = tx_sign(mnemonic, genesis_hash, index as u32, &prefix, runtime_version,tx_version)?;
+    let result = tx_sign(mnemonic, genesis_hash, index as u32, &prefix, runtime_version, tx_version)?;
     Ok(result)
 }
 
-pub fn tx_sign(mnemonic: &str, genesis_hash: &[u8], index: u32, func_data: &[u8], spec_version: u32,tx_version:u32) -> Result<String, error::Error> {
+pub fn tokenx_transfer(mnemonic: &str, to: &str, amount: &str, ext:&[u8],genesis_hash: &[u8], index: u32, runtime_version: u32, tx_version: u32) -> Result<String, error::Error> {
+    let to_account_id = AccountId::from_ss58check(to)?;
+    let amount = balance_unit_convert(amount, DECIMAL).unwrap();
+  //  let ext_byte = hex::decode(ext.get(2..).unwrap())
+    //构造转账 call function
+    let function =  Call::TokenX(TokenXCall::transfer(to_account_id, amount,ext.to_vec())).encode();
+    //为了能够在签名时将数据解码出来，需要为function 计算对应的前缀
+    let mut prefix = calculate_prefix(function.len());
+    prefix.extend_from_slice(&function);
+
+    let result = tx_sign(mnemonic, genesis_hash, index as u32, &prefix, runtime_version, tx_version)?;
+    Ok(result)
+}
+
+pub fn tx_sign(mnemonic: &str, genesis_hash: &[u8], index: u32, func_data: &[u8], spec_version: u32, tx_version: u32) -> Result<String, error::Error> {
     let signer = crypto::Sr25519::pair_from_phrase(mnemonic, None)?;
     let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &func_data[..])?;
 
-    let extrinsic = generate_signed_extrinsic::<crypto::Sr25519>(extrinsic.function, index, signer,H256::from_slice(genesis_hash), spec_version,tx_version);
+    let extrinsic = generate_signed_extrinsic::<crypto::Sr25519>(extrinsic.function, index, signer, H256::from_slice(genesis_hash), spec_version, tx_version);
     let result = format!("0x{}", hex::encode(&extrinsic.encode()));
     Ok(result)
 }
