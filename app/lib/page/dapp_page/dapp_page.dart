@@ -412,6 +412,7 @@ class _DappPageState extends State<DappPage> {
                         if (msg.err == null || msg.err.length < 1) {
                           msg.err = "result nothing ";
                         }else{
+                          msg.err = 'tx_sign_failure';
                           print("eeeTxSign: " + msg.err);
                         }
                         msg.data = "";
