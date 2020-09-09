@@ -830,6 +830,44 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 break;
             }
 
+            case "updateEeeSyncRecord": {
+                ScryWalletLog.d("nativeLib=>", "updateEeeSyncRecord is enter =>");
+                Message message = new Message();
+                ScryWalletLog.d("nativeLib=>", "updateEeeSyncRecord is enter =>");
+                ScryWalletLog.d("nativeLib account   =>", (String) (call.argument("account")));
+                ScryWalletLog.d("nativeLib chain_type=>", (int) (call.argument("chain_type")));
+                ScryWalletLog.d("nativeLib block_num =>", (int) (call.argument("block_num")));
+                ScryWalletLog.d("nativeLib block_hash=>", (String) (call.argument("block_hash")));
+                try {
+                    message = NativeLib.updateEeeSyncRecord((String) (call.argument("account")),
+                            (int) (call.argument("chain_type")), (int) (call.argument("block_num")),
+                            (String) (call.argument("block_hash")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "updateEeeSyncRecord exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                resultMap.put("message", message.message);
+                result.success(resultMap);
+                break;
+            }
+            case "saveExtrinsicDetail":{
+                ScryWalletLog.d("nativeLib=>", "saveExtrinsicDetail is enter =>");
+                Message message = new Message();
+                try {
+                    message = NativeLib.saveExtrinsicDetail((String) (call.argument("accountId")),(String) (call.argument("eventDetail")),
+                            (String) (call.argument("blockHash")),(String) (call.argument("extrinsics")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "saveExtrinsicDetail exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                resultMap.put("message", message.message);
+                result.success(resultMap);
+                break;
+            }
             case "initWalletBasicData": {
                 ScryWalletLog.d("nativeLib=>", "initWalletBasicData is enter =>");
                 WalletState walletState = new WalletState();
