@@ -109,6 +109,7 @@ public class NativeLib {
         public String chainId;
         public String walletId;
         public String address;      //Chain address
+        public String pubkey;      // address public key
         public String domain;       //Node domain IP
         public boolean isVisible;   //Whether the chain is displayed
         public List<EeeDigit> digitList;
@@ -121,6 +122,7 @@ public class NativeLib {
                     ", chainId='" + chainId + '\'' +
                     ", walletId='" + walletId + '\'' +
                     ", address='" + address + '\'' +
+                    ", pubkey='" + pubkey + '\'' +
                     ", domain='" + domain + '\'' +
                     ", isVisible=" + isVisible +
                     ", digitList=" + digitList +
@@ -163,6 +165,7 @@ public class NativeLib {
         public String chainId;
         public String walletId;
         public String address;      //Chain address
+        public String pubkey;      // address public key
         public String domain;       //Node domain IP
         public boolean isVisible;
         public List<EthDigit> digitList;
@@ -175,6 +178,7 @@ public class NativeLib {
                     ", chainId='" + chainId + '\'' +
                     ", walletId='" + walletId + '\'' +
                     ", address='" + address + '\'' +
+                    ", pubkey='" + pubkey + '\'' +
                     ", domain='" + domain + '\'' +
                     ", isVisible=" + isVisible +
                     ", digitList=" + digitList +
@@ -217,6 +221,7 @@ public class NativeLib {
         public String chainId;
         public String walletId;
         public String address;      //chain address
+        public String pubkey;      // address public key
         public String domain;       //Node domain IP
         public boolean isVisible;
         public List<BtcDigit> digitList;
@@ -229,6 +234,7 @@ public class NativeLib {
                     ", chainId='" + chainId + '\'' +
                     ", walletId='" + walletId + '\'' +
                     ", address='" + address + '\'' +
+                    ", pubkey='" + pubkey + '\'' +
                     ", domain='" + domain + '\'' +
                     ", isVisible=" + isVisible +
                     ", digitList=" + digitList +

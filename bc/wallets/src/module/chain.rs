@@ -78,6 +78,7 @@ impl EEE {
                             chain_id: chain_id.clone(),
                             wallet_id: wallet_id.clone(),
                             address: tbwallet.address.unwrap(),
+                            pub_key:tbwallet.pub_key.unwrap(),
                             domain: tbwallet.domain,
                             is_visible: {
                                 tbwallet.chain_is_visible
@@ -262,6 +263,7 @@ impl Ethereum {
                             chain_id: chain_id.clone(),
                             wallet_id: wallet_id.clone(),
                             address: tbwallet.address.unwrap(),
+                            pub_key:tbwallet.pub_key.unwrap(),
                             domain: tbwallet.domain,
                             is_visible: tbwallet.chain_is_visible,
                             chain_type: {
@@ -323,6 +325,7 @@ impl Bitcoin {
                             chain_id: chain_id.clone(),
                             wallet_id: wallet_id.clone(),
                             address: tbwallet.address.unwrap(),
+                            pub_key: tbwallet.pub_key.unwrap(),
                             domain: tbwallet.domain,
                             is_visible: tbwallet.chain_is_visible,
                             chain_type: {

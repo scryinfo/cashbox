@@ -17,6 +17,7 @@ pub fn get_eee_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, eee_chain: EeeChain) -> JO
     env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("set chainId value");
     env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.wallet_id).unwrap()))).expect("walletId");
     env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.address.clone()).unwrap()))).expect("address");
+    env.set_field(chain_class_obj, "pubkey", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.pub_key.clone()).unwrap()))).expect("pub_key");
 
     if eee_chain.domain.is_some() {
         env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.domain.unwrap()).unwrap()))).expect("set domain value");
@@ -90,6 +91,7 @@ pub fn get_eth_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, eth_chain: EthChain) -> JO
     env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.chain_id).unwrap()))).expect("get_eth_chain_obj set chainId value");
     env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.wallet_id).unwrap()))).expect("get_eth_chain_obj set walletId value");
     env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.address).unwrap()))).expect("get_eth_chain_obj set address value");
+    env.set_field(chain_class_obj, "pubkey", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.pub_key).unwrap()))).expect("get_eth_chain_obj set pub_key value");
 
     if eth_chain.domain.is_some() {
         env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.domain.unwrap()).unwrap()))).expect("get_eth_chain_obj set domain value");
@@ -159,6 +161,7 @@ pub fn get_btc_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, btc_chain: BtcChain) -> JO
     env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str.clone()).unwrap()))).expect("get_btc_chain_obj set chainId value");
     env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.wallet_id).unwrap()))).expect("get_btc_chain_obj set walletId value");
     env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address.clone()).unwrap()))).expect("get_btc_chain_obj set address value");
+    env.set_field(chain_class_obj, "pubkey", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.pub_key.clone()).unwrap()))).expect("get_btc_chain_obj set pub_key value");
 
     if btc_chain.domain.is_some() {
         env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.domain.unwrap()).unwrap()))).expect("get_btc_chain_obj set domain value");

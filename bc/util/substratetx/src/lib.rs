@@ -9,7 +9,7 @@ use sp_core::{
     hexdisplay::HexDisplay
 };
 use codec::{Encode,Decode};
-use node_runtime::{AccountId, Balance,Event, Index, Signature,Call, Runtime,BalancesCall::{self,transfer as transfercall}};
+use node_runtime::{AccountId, Balance,Event, Index, Signature,Call, Runtime,TokenXCall,BalancesCall::{self,transfer as transfercall,transfer_keep_alive}};
 use node_runtime::TimestampCall::set;
 
 use system::Phase;
@@ -64,6 +64,7 @@ pub struct TransferDetail {
     pub value: Option<u128>,
     pub hash: Option<String>,
     pub timestamp: Option<u64>,
+    pub ext_data:Option<String>,
 }
 
 // Notification event data Use hex-encoded strings to associate the results of notification events with transactions
@@ -76,18 +77,19 @@ pub fn event_decode(event_data:&str,_blockhash:&str,_account:&str)->HashMap<u32,
             //todo 将索引与区块交易中的索引关联起来，怎么来确定交易索引与交易结果之间的关系？
             let index = if let  Phase::ApplyExtrinsic(index) = event.phase{index}else { 0 };
             //todo 当交易失败，不会存在该通知记录
+            println!("event detail is:{:?}",event.event);
             match event.event {
-                // Event::system(se) => { //todo
-                //     match &se {
-                //         system::RawEvent::ExtrinsicSuccess(_dispath) => {
-                //             tx_result.insert(index,true);
-                //         },
-                //         system::RawEvent::ExtrinsicFailed(_err, _info) => {
-                //             tx_result.insert(index,false);
-                //         },
-                //         _ => log::error!("ignoring unsupported  system event")
-                //     }
-                // },
+                 Event::frame_system(se) => { //todo
+                     match &se {
+                         system::RawEvent::ExtrinsicSuccess(_dispath) => {
+                             tx_result.insert(index,true);
+                         },
+                         system::RawEvent::ExtrinsicFailed(_err, _info) => {
+                             tx_result.insert(index,false);
+                         },
+                         _ => log::error!("ignoring unsupported  system event")
+                    }
+                 },
                 _ => log::error!("ignoring unsupported event")
             }
         }
@@ -97,17 +99,19 @@ pub fn event_decode(event_data:&str,_blockhash:&str,_account:&str)->HashMap<u32,
 pub fn decode_extrinsics(extrinsics_json:&str,target_account:&str)->Result<HashMap<u32,TransferDetail>,error::Error>{
     let target_account = AccountId::from_ss58check(target_account)?;
     let json_data:Vec<String>   = serde_json::from_str(extrinsics_json)?;
+
     let mut map = HashMap::new();
     for index in 0..json_data.len() {
         let extrinsic_encode_bytes = hex::decode(json_data[index].get(2..).unwrap())?;
         let extrinsic = node_runtime::UncheckedExtrinsic::decode(&mut &extrinsic_encode_bytes[..])?;
         let mut tx = TransferDetail::default();
+        println!("tx detail is:{:?}",extrinsic.function);
         match &extrinsic.function {
             Call::Timestamp(set(date,))=> {
                 tx.timestamp = Some(*date);
                 map.insert(index as u32,tx);
-            }
-            Call::Balances(transfercall(to,vaule))=>{//需要将交易发送者的信息关联出来
+            },
+            Call::Balances(transfercall(to,vaule))| Call::Balances(transfer_keep_alive(to,vaule))=>{//需要将交易发送者的信息关联出来
                 if let Some((account,_,(_,_,_,_,nonce,_,_))) = &extrinsic.signature{
                     if !target_account.ge(to)&&!target_account.ge(&account){
                         continue
@@ -124,6 +128,15 @@ pub fn decode_extrinsics(extrinsics_json:&str,target_account:&str)->Result<HashM
                 tx.hash = Some(format!("0x{}",hex::encode(hash)));
                map.insert(index as u32,tx);
             },
+            Call::TokenX(TokenXCall::transfer(to,value,ext))=>{
+                println!("TokenXCall::transfer");
+            },
+            Call::TokenX(TokenXCall::transfer_from(from,to,value,ext))=>{
+                println!("TokenXCall::transfer_from");
+            },
+            Call::TokenX(TokenXCall::approve(to,value,ext)) => {//需要将交易发送者的信息关联出来
+                println!("TokenXCall approve");
+            }
             _=> println!(" extrinsic.function")
         }
     }
@@ -132,8 +145,10 @@ pub fn decode_extrinsics(extrinsics_json:&str,target_account:&str)->Result<HashM
 
 #[test]
 fn decode_extrinsics_test() {
-    let data = r#"["0x280402000b00adc5647201","0x3d0284d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d0154c32d047e9629b33ad92c12920b60e722ab60aa9138e94a1f98ddd8c4e81f742eb8769f0177a011bcec4d6febf2290121b94ced49642abcbd38aa170f13c48fb60218000400306721211d5404bd9da88e0204360a1a9ab8b87c66c1bc2fcdd37f3c2222cc200b0060b7986c88"]"#;
-    match decode_extrinsics(data, "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy") {
+
+
+    let data = r#"["0x280402000b8039476b7401","0x4d02840a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea3001bc043eee72b7eaeca391242bfe86bcfe35fa496e4f484c056da73f6cb101427685e2763aece95fa5211578e5b2e3a998b762e7984606535cbd264bc0e5ba8e85c6030c000602e6f5e1f00a994b5157049b3092c662f08b170013f77003321214d683316c18571300008a5d784563010400"]"#;
+    match decode_extrinsics(data, "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H") {
         Ok(res) => {
             for (index, hash) in &res {
                 println!("index:{},tx hash is:{:?}", index, hash);

@@ -11,9 +11,9 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-      //  System.out.println(NativeLib.initWalletBasicData());
-       //  updateDefaultDigitTest();
-      //   walletGenerateTest();
+       System.out.println(NativeLib.initWalletBasicData());
+      // updateDefaultDigitTest();
+       walletGenerateTest();
        //  walletExportTest();
       //  eeeTransferTest();
           //updateAuthListTest();
@@ -23,16 +23,18 @@ public class NativeLibTest {
        //  queryDigitTest();
         //  addDigitTest();
         //delWalletTest();
-        contract_deploy_test();
+       // storage_query_test();
+        //contract_deploy_test();
         //  walletSaveTest();
         //  updateBalance();
         // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
-     //   List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
-       // contract_test(wallets);
-     /*  for (NativeLib.Wallet wallet : wallets) {
+        List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
+        System.out.println("wallet length is:"+wallets.size());
+        // contract_test(wallets);
+      for (NativeLib.Wallet wallet : wallets) {
             System.out.println("***********************");
             System.out.println(wallet);
-        }*/
+        }
     }
 
 
@@ -162,11 +164,11 @@ public class NativeLibTest {
         //Notification Event Coding Constant
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
-        String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        String account_1 = "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://127.0.0.1:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
 
         Header current_header = client.invoke("chain_getHeader", new Object[]{}, Header.class);
         //Get the current block number
@@ -735,7 +737,7 @@ public class NativeLibTest {
         public String toString() {
             return "StorageChange{" +
                     "block='" + block + '\'' +
-                    ", changes=" + changes +
+                    ", changes=" + changes.toString() +
                     '}';
         }
 

@@ -25,14 +25,14 @@ impl DataServiceProvider {
         let query_sql = match chain_type {
             ChainType::EthTest | ChainType::ETH => {
                 "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
-			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
+			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,e.puk_key
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and a.status=1 and b.status =1 and b.chain_id in (3,4)) e,
 	 ( select * from detail.DigitUseDetail a,detail.DefaultDigitBase b where a.digit_id = b.id  and b.status = 1 and group_name !='EEE' and group_name !='BTC') as d,detail.Chain f
          where e.address_id = d.address_id and e.chain_id = f.id and f.status = 1;"
             }
             ChainType::EeeTest | ChainType::EEE => {
                 "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
-			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
+			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,e.puk_key
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (5,6)) e,
 	 ( select * from detail.DigitUseDetail,detail.DefaultDigitBase
          where digit_id = id and group_name !='ETH' and group_name !='BTC'
@@ -40,7 +40,7 @@ impl DataServiceProvider {
             }
             ChainType::BtcTest | ChainType::BTC => {
                 "select  e.wallet_id,e.fullname as wallet_name,e.chain_id,e.address,e.selected,e.is_visible as chain_is_visible,f.domain,f.type as chain_type,
-			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img
+			d.digit_id,d.contract_address,d.short_name,d.full_name,d.balance,d.is_visible as digit_is_visible,d.decimals,d.url_img,e.puk_key
 	 from (select * from Wallet a ,detail.Address b where a.wallet_id=b.wallet_id and b.chain_id in (1,2)) e,
 	 ( select * from detail.DigitUseDetail,detail.DefaultDigitBase
          where digit_id = id and group_name !='EEE' and group_name !='ETH'
@@ -78,6 +78,7 @@ impl DataServiceProvider {
                 digit_is_visible: row[13].as_string().map(|value| Self::get_bool_value(value)),
                 decimals: row[14].as_integer(),
                 url_img: row[15].as_string().map(String::from),
+                pub_key: row[16].as_string().map(String::from),
             };
             tbwallets.push(tbwallet);
         }
