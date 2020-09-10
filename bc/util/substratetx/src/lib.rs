@@ -236,7 +236,7 @@ fn data_decode_test() {
 
 #[test]
 fn encode_account_storage_key_test(){
-    let res = encode_account_storage_key("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
+    let res = encode_account_storage_key("System","Account","0x0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea30");
    println!("key storage:{}",res.unwrap());
   //  assert_eq!(res.is_ok(),true)
 }

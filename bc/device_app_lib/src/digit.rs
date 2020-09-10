@@ -104,8 +104,6 @@ pub mod android {
         let digit_data: String = env.get_string(digit_data).unwrap().into();
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class ");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-
-
         let digits = serde_json::from_slice::<Vec<wallets::model::DefaultDigit>>(digit_data.as_bytes());
         if let Ok(digits) = digits {
             let eth = wallets::module::Ethereum {};

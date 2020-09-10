@@ -11,14 +11,13 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-       //System.out.println(NativeLib.initWalletBasicData());
-      // updateDefaultDigitTest();
-      // walletGenerateTest();
+      // System.out.println(NativeLib.initWalletBasicData());
+       updateDefaultDigitTest();
+       //walletGenerateTest();
        //  walletExportTest();
       //  eeeTransferTest();
           //updateAuthListTest();
          // addNonAuthDigitTest();
-
         //  getAuthDigitListTest();
        //  queryDigitTest();
         //  addDigitTest();
@@ -28,7 +27,7 @@ public class NativeLibTest {
         //  walletSaveTest();
         //  updateBalance();
         // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
-        eeeAccountInfoKeyTest();
+        //eeeAccountInfoKeyTest();
         List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
         System.out.println("wallet length is:"+wallets.size());
         // contract_test(wallets);
@@ -40,10 +39,7 @@ public class NativeLibTest {
 
 
     public static void updateDefaultDigitTest() {
-        String json = "[\n" +
-                "{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},\n" +
-                "{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"}\n" +
-                "]";
+        String json = "[{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342 \",\"shortName\":\"DDD \",\"fullName\":\"DDD \",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg \":\"locale: //ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"},{\"contractAddress\":\"\",\"shortName\":\"TokenX\",\"fullName\":\"TokenX\",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"kim-TokenX\",\"decimal\":\"15\",\"chainType\":\"EEE\"}]";
         NativeLib.WalletState state = NativeLib.updateDefaultDigitList(json);
         System.out.println(state);
     }
@@ -66,7 +62,7 @@ public class NativeLibTest {
     }
 
     public static void queryDigitTest() {
-        NativeLib.DigitList list = NativeLib.queryDigit(3, "DD", "");
+        NativeLib.DigitList list = NativeLib.queryDigit(3, "", "");
         System.out.println(list);
     }
 
@@ -88,11 +84,11 @@ public class NativeLibTest {
 
     public static void walletGenerateTest() {
         Random random = new Random(1);
-        while (NativeLib.loadAllWalletList().size() < 6) {
+        while (NativeLib.loadAllWalletList().size() < 2) {
             NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(12);
             System.out.println(mnemonic.mnId);
             int r = random.nextInt(1000);
-            NativeLib.Wallet wallet = NativeLib.saveWallet("wallet_hello" + r, "123456".getBytes(), mnemonic.mn, 0);
+            NativeLib.Wallet wallet = NativeLib.saveWallet("wallet_hello" + r, "123456".getBytes(), mnemonic.mn, 1);
             System.out.println(wallet.toString());
         }
     }

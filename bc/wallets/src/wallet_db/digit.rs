@@ -29,6 +29,7 @@ impl DataServiceProvider {
     }
     //Add tokens
     fn add_default_digits(&self, digits: Vec<model::DefaultDigit>) -> WalletResult<()> {
+        println!("digits len is:{}",digits.len());
         let insert_sql = "insert into detail.DefaultDigitBase(id,contract_address,chain_type,group_name,short_name,full_name,url_img,decimals,is_basic,is_default,status)values(?,?,?,?,?,?,?,?,?,?,?);";
         let mut insert_basic_statement = self.db_hander.prepare(insert_sql)?;
         for digit in digits {
@@ -40,7 +41,8 @@ impl DataServiceProvider {
             insert_basic_statement.bind(2, digit.contract_address.unwrap_or_else(|| "".to_string()).as_str())?;
             //Whether the token type is officially connected or a test chain
             insert_basic_statement.bind(3, self.is_main_chain(&digit.chain_type))?;
-            insert_basic_statement.bind(4, digit.group_name.unwrap_or_else(|| "ETH".to_string()).as_str())?;
+            let group_name = self.get_chain_group_from_chain_type(&digit.chain_type);
+            insert_basic_statement.bind(4, digit.group_name.unwrap_or_else(|| group_name).as_str())?;
             insert_basic_statement.bind(5, digit.short_name.as_str())?;
             insert_basic_statement.bind(6, digit.full_name.as_str())?;
             insert_basic_statement.bind(7, digit.img_url.unwrap_or_else(|| "".to_string()).as_str())?;
@@ -66,7 +68,33 @@ impl DataServiceProvider {
         //todo finely handles the case of default tokens. At present, the default tokens that have been added are directly deleted in a simple and crude way, and then the new tokens are inserted into the database table
         let delete_sql = "delete from detail.DefaultDigitBase where is_basic = 0 and is_default =1;";
         self.db_hander.execute(delete_sql)?;
-        self.add_default_digits(digits)
+        //delete default token which is not basic token,eg: DDD
+        let delete_digit_use_detail = "delete from detail.DigitUseDetail where digit_id = ?";
+        let mut delete_digit_detail_statement = self.db_hander.prepare(delete_digit_use_detail)?;
+        for digit in digits.clone() {
+            if let Some(id) = digit.id{
+                delete_digit_detail_statement.bind(1, id.as_str())?;
+                delete_digit_detail_statement.next()?;
+                delete_digit_detail_statement.reset()?;
+            }
+        }
+        // update DefaultDigitBase record
+        self.add_default_digits(digits.clone())?;
+
+     //  update DigitUseDetail
+        let update_detail =  "INSERT INTO detail.DigitUseDetail(digit_id,address_id) SELECT ?,detail.Address.address_id FROM detail.Address WHERE chain_id =?;";
+        let mut update_detail_statement = self.db_hander.prepare(update_detail)?;
+        for digit in digits.clone() {
+            if let Some(id) = digit.id{
+                let chain_number = self.chain_name_to_chain_number(&digit.chain_type);
+                println!("chain number:{}",chain_number);
+                update_detail_statement.bind(1, id.as_str())?;
+                update_detail_statement.bind(2, chain_number)?;
+                update_detail_statement.next()?;
+                update_detail_statement.reset()?;
+            }
+        }
+        Ok(())
     }
 
 
@@ -235,10 +263,8 @@ impl DataServiceProvider {
     //Conversion chain type, is it a formal chain or a test chain
     fn is_main_chain(&self, chain_type: &str) -> i64 {
         match chain_type {
-            "ETH" => 1,
-            "default" => 1,
-            "ETH_TEST" => 0,
-            "test" => 0,
+           "EEE"|"ETH"|"default" => 1,
+            "EEE_TEST"|"ETH_TEST"|"test" => 0,
             _ => 1,
         }
     }
@@ -246,8 +272,9 @@ impl DataServiceProvider {
 
     fn chain_name_to_chain_number(&self, chain_type: &str) -> i64 {
         match chain_type {
-            "ETH" => 3,
-            "default" => 3,
+            "BTC" => 1,
+            "BTC_TEST" =>2,
+            "ETH"|"default" => 3,
             "ETH_TEST" => 4,
             "test" => 4,
             "EEE" => 5,
@@ -255,10 +282,23 @@ impl DataServiceProvider {
             _ => 3,
         }
     }
+
+    fn get_chain_group_from_chain_type(&self, chain_type: &str) -> String{
+        match chain_type {
+            "BTC"|"BTC_TEST" => "BTC".into(),
+            "ETH"|"ETH_TEST" => "ETH".into(),
+            "EEE"|"EEE_TEST" => "EEE".into(),
+            _ => "ETH".into(),
+        }
+    }
     fn convert_chain_type(&self, chain_type: i64) -> String {
         match chain_type {
+            1 => "BTC".into(),
+            2 => "BTC_TEST".into(),
             3 => "ETH".into(),
             4 => "ETH_TEST".into(),
+            5 => "EEE".into(),
+            6 => "EEE_TEST".into(),
             _ => "ETH".into(),
         }
     }

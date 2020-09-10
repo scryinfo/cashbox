@@ -423,13 +423,6 @@ public class NativeLib {
     public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
 
 
-
-    //For the key corresponding to the EEE account information, enter the address to be queried, for example: 5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4,
-    //  return the encoded key
-    // 0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
-    //Construct jsonrpc request data format {"id":37,"jsonrpc":"2.0","method":"state_getStorage","params":["key"]]}
-    public static native Message eeeAccountInfoKey(String addr);
-
     /**
      * get
      * @param module

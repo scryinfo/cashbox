@@ -25,10 +25,7 @@ fn load_wallet_test(){
 
 #[test]
 fn update_default_digit_test() {
-    let default = r#"[
-{"contractAddress":"0x9f5f3cfd7a32700c93f971637407ff17b91c7342","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"eth_token_pre_id_DDD","decimal":18,"chainType":"ETH"},
-{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg":"locale://ic_ddd.png","id":"eth_test_token_pre_id_DDD","decimal":18,"chainType":"ETH_TEST"}
-]"#;
+    let default = r#"[{"contractAddress":"0x9f5f3cfd7a32700c93f971637407ff17b91c7342 ","shortName":"DDD ","fullName":"DDD ","urlImg":"locale: //ic_ddd.png","id":"eth_token_pre_id_DDD","decimal":"18","chainType":"ETH"},{"contractAddress":"0xaa638fca332190b63be1605baefde1df0b3b031e","shortName":"DDD","fullName":"DDD","urlImg ":"locale: //ic_ddd.png","id":"eth_test_token_pre_id_DDD","decimal":"18","chainType":"ETH_TEST"},{"contractAddress":"","shortName":"TokenX","fullName":"TokenX","urlImg":"locale: //ic_ddd.png","id":"kim-TokenX","decimal":"15","chainType":"EEE"}]"#;
 
     let digits =  serde_json::from_slice::<Vec<model::DefaultDigit>>(default.as_bytes()).unwrap();
     let helper = wallet_db::DataServiceProvider::instance().unwrap();
