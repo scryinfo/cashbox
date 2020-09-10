@@ -12,17 +12,18 @@ use codec::{Encode, Decode};
 use node_runtime::{AccountId, Balance, Event, Index, Signature, Call, Runtime, TokenXCall, BalancesCall::{self, transfer as transfercall, transfer_keep_alive}};
 use node_runtime::TimestampCall::set;
 
-use system::Phase;
-
+use system::{Phase, CheckNonce};
+use byteorder::{ByteOrder, LittleEndian};
 
 mod crypto;
 mod transaction;
 pub mod error;
 
 pub use crypto::{Sr25519, Ed25519, Crypto};
-pub use transaction::{tx_sign, tokenx_transfer,transfer, decode_account_info, account_info_key};
+pub use transaction::{tx_sign, tokenx_transfer, transfer, decode_account_info, account_info_key};
 
 use std::collections::HashMap;
+use std::hash::Hasher;
 
 
 pub trait Keccak256<T> {
@@ -66,6 +67,40 @@ pub struct TransferDetail {
     pub timestamp: Option<u64>,
     pub token_name: String,
     pub ext_data: Option<String>,
+}
+
+/// Do a XX 128-bit hash and place result in `dest`.
+ fn twox_128_into(data: &[u8], dest: &mut [u8; 16]) {
+    let mut h0 = twox_hash::XxHash::with_seed(0);
+    let mut h1 = twox_hash::XxHash::with_seed(1);
+    h0.write(data);
+    h1.write(data);
+    let r0 = h0.finish();
+    let r1 = h1.finish();
+
+    LittleEndian::write_u64(&mut dest[0..8], r0);
+    LittleEndian::write_u64(&mut dest[8..16], r1);
+}
+
+/// Do a XX 128-bit hash and return result.
+pub fn twox_128(data: &[u8]) -> [u8; 16] {
+    let mut r: [u8; 16] = [0; 16];
+    twox_128_into(data, &mut r);
+    r
+}
+
+pub fn encode_account_storage_key(module: &str, storage: &str, puk: &str) -> Result<String, error::Error> {
+    let module_byte = twox_128(module.as_bytes());
+    let storage_byte = twox_128(storage.as_bytes());
+    let pub_key_without_0x = puk.get(2..).unwrap();
+    let pub_vec = hex::decode(pub_key_without_0x)?;
+    let blake2_result = blake2_rfc::blake2b::blake2b(16, &[], &pub_vec);
+    let puk_hash = hex::encode(blake2_result.as_bytes());
+    let mut final_key = Vec::from(&module_byte[..]);
+    final_key.extend_from_slice(&storage_byte[..]);
+    let key_start = hex::encode(&final_key);
+    Ok(format!("0x{}{}{}",key_start,puk_hash,pub_key_without_0x))
+
 }
 
 // Notification event data Use hex-encoded strings to associate the results of notification events with transactions
@@ -118,12 +153,13 @@ pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<
             Call::Timestamp(set(date, )) => {
                 tx.timestamp = Some(*date);
             }
-            Call::Balances(transfercall(to, vaule)) | Call::Balances(transfer_keep_alive(to, vaule)) => {//需要将交易发送者的信息关联出来
+            Call::Balances(transfercall(to, value)) | Call::Balances(transfer_keep_alive(to, value)) => {//需要将交易发送者的信息关联出来
                 if let Some((account, _, (_, _, _, _, nonce, _, _))) = &extrinsic.signature {
                     if !target_account.ge(to) && !target_account.ge(&account) {
                         continue;
                     }
-                    tx.value = Some(*vaule);
+
+                    tx.value = Some(*value);
                     tx.to = Some(to.to_ss58check());
                     tx.from = Some(account.to_ss58check());
                     tx.index = Some(0);//todo
@@ -131,10 +167,41 @@ pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<
                 }
             }
             Call::TokenX(TokenXCall::transfer(to, value, ext)) => {
+                if let Some((account, _, (_, _, _, _, nonce, _, _))) = &extrinsic.signature {
+                    if !target_account.ge(to) && !target_account.ge(&account) {
+                        continue;
+                    }
+
+                    tx.value = Some(*value);
+                    tx.to = Some(to.to_ss58check());
+                    tx.from = Some(account.to_ss58check());
+                    tx.index = Some(0);//todo
+                    tx.token_name = "EEE".to_string();
+                }
                 println!("TokenXCall::transfer");
             }
             Call::TokenX(TokenXCall::transfer_from(from, to, value, ext)) => {
                 println!("TokenXCall::transfer_from");
+            }
+            Call::TokenX(TokenXCall::authorize_tokenx(target, quantity, ext)) => {
+                if let Some((account, _, (_, _, _, _, nonce, _, _))) = &extrinsic.signature {
+                    if !target_account.ge(target) && !target_account.ge(&account) {
+                        continue;
+                    }
+
+                    /* if let CheckNonce{0:test} = nonce{
+                         println!("temp:{:?}",test);
+                     }*/
+                    println!("nonce:{:?}", nonce);
+                    println!("nonce:{:?}", nonce.encode());
+
+                    tx.to = Some(target.to_ss58check());
+                    tx.from = Some(account.to_ss58check());
+                    tx.index = Some(0);//todo
+                    tx.token_name = "TokenX".to_string();
+                }
+
+                println!("TokenXCall::authorize_tokenx");
             }
             Call::TokenX(TokenXCall::approve(to, value, ext)) => {//需要将交易发送者的信息关联出来
                 println!("TokenXCall approve");
@@ -165,6 +232,13 @@ fn data_decode_test() {
     // let encode_event = r#"0x140000000000000010270000010100000100000000038e50224acdcc7591c0e9a28ab7d91c099574f8d47f3a35a542dbaebf1ec5f30c00000100000002008e50224acdcc7591c0e9a28ab7d91c099574f8d47f3a35a542dbaebf1ec5f30c00c06e31d910010000000000000000000000010000000202ea990fcb7e9600adcf735a69d7bbcbaa62e52d2eb26125381379a91558fe083b8e50224acdcc7591c0e9a28ab7d91c099574f8d47f3a35a542dbaebf1ec5f30c00c06e31d91001000000000000000000000001000000000040420f00000100"#;
     let res = event_decode(encode_event, "", "");
     println!("res detail:{:?}", res);
+}
+
+#[test]
+fn encode_account_storage_key_test(){
+    let res = encode_account_storage_key("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
+   println!("key storage:{}",res.unwrap());
+  //  assert_eq!(res.is_ok(),true)
 }
 
 

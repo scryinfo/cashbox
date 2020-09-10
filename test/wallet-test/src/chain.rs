@@ -509,14 +509,16 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_tokenXTransfer(env: J
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeAccountInfoKey(env: JNIEnv, _class: JClass, address: JString) -> jobject {
-    let account: String = env.get_string(address).unwrap().into();
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeStorageKey(env: JNIEnv, _class: JClass, module: JString,storageItem: JString,pub_key: JString) -> jobject {
+    let module: String = env.get_string(module).unwrap().into();
+    let storage_item: String = env.get_string(storageItem).unwrap().into();
+    let pub_key: String = env.get_string(pub_key).unwrap().into();
     let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
     let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
-    match wallets::account_info_key(&account) {
+    match wallets::encode_account_storage_key(&module,&storage_item,&pub_key) {
         Ok(key) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
-            env.set_field(state_obj, "accountKeyInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(key).unwrap()))).expect("set accountKeyInfo value");
+            env.set_field(state_obj, "storageKeyInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(key).unwrap()))).expect("set accountKeyInfo value");
         }
         Err(msg) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set StatusCode value");
@@ -525,7 +527,6 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeAccountInfoKey(env
     }
     *state_obj
 }
-
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAccountInfo(env: JNIEnv, _class: JClass, _encode_info: JString) -> jobject {

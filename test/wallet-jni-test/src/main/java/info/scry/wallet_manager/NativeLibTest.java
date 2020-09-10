@@ -11,9 +11,9 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-       System.out.println(NativeLib.initWalletBasicData());
-       updateDefaultDigitTest();
-       walletGenerateTest();
+       //System.out.println(NativeLib.initWalletBasicData());
+      // updateDefaultDigitTest();
+      // walletGenerateTest();
        //  walletExportTest();
       //  eeeTransferTest();
           //updateAuthListTest();
@@ -28,6 +28,7 @@ public class NativeLibTest {
         //  walletSaveTest();
         //  updateBalance();
         // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
+        eeeAccountInfoKeyTest();
         List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
         System.out.println("wallet length is:"+wallets.size());
         // contract_test(wallets);
@@ -119,7 +120,7 @@ public class NativeLibTest {
 
     public static void eeeAccountInfoKeyTest() {
         // NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
-        NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
+        NativeLib.Message msg = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
         System.out.println(msg);
     }
 
@@ -180,8 +181,8 @@ public class NativeLibTest {
 
         int startBlockNumber = accountRecord == null ? 0 : accountRecord.blockNum;
 
-        NativeLib.Message key1 = NativeLib.eeeAccountInfoKey(account_1);
-        NativeLib.Message key2 = NativeLib.eeeAccountInfoKey(account_2);
+        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
+        NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
         // System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
         //每Query block interval
         int queryNumberInterval = 3000;
@@ -203,7 +204,7 @@ public class NativeLibTest {
             //Get the block hash of the current query storage status
             endBlockHash = client.invoke("chain_getBlockHash", new Object[]{endBlockNumber}, String.class);
             //Query the history of account status changes within the changed block
-            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.accountKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
+            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
             System.out.println("*********************StorageChange start**************");
             System.out.println(storage.toString());
             System.out.println("*********************StorageChange end**************");
