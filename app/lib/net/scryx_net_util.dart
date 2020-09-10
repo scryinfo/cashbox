@@ -5,6 +5,7 @@ import 'package:app/util/sharedpreference_util.dart';
 import 'net_util.dart';
 
 class ScryXNetUtil {
+  //todo deprecated
   Future<Map> loadEeeAccountInfo(ChainType eeeChainType) async {
     Map eeeResultMap;
     Map<dynamic, dynamic> eeeAccountKeyMap =
@@ -12,9 +13,45 @@ class ScryXNetUtil {
     if (eeeAccountKeyMap != null && eeeAccountKeyMap.containsKey("status")) {
       if (eeeAccountKeyMap["status"] != null && eeeAccountKeyMap["status"] == 200) {
         String formattedKeyInfo = eeeAccountKeyMap["accountKeyInfo"];
-        print("eeeAccountKeyMap is ===>"+eeeAccountKeyMap.toString());
-        print("formattedKeyInfo is ===>"+formattedKeyInfo);
+        print("eeeAccountKeyMap is ===>" + eeeAccountKeyMap.toString());
+        print("formattedKeyInfo is ===>" + formattedKeyInfo);
         Map netFormatMap = await _loadScryXStorage(formattedKeyInfo);
+        if (netFormatMap != null && netFormatMap.containsKey("result")) {
+          eeeResultMap = await Wallets.instance.decodeEeeAccountInfo(netFormatMap["result"]);
+        }
+      }
+    }
+    return eeeResultMap;
+  }
+
+  Future<int> loadEeeChainNonce(String module, String storageItem, String pubKey) async {
+    int eeeNonce = 0;
+    Map eeeResultMap = await loadEeeStorageKey(module, storageItem, pubKey);
+    if (eeeResultMap != null && eeeResultMap.containsKey("nonce")) {
+      return eeeResultMap["nonce"];
+    }
+    return eeeNonce;
+  }
+
+  Future<String> loadEeeBalance(String module, String storageItem, String pubKey) async {
+    String eeeBalance = "0";
+    Map eeeResultMap = await loadEeeStorageKey(module, storageItem, pubKey);
+    if (eeeResultMap != null && eeeResultMap.containsKey("free")) {
+      return eeeResultMap["free"];
+    }
+    return eeeBalance;
+  }
+
+  Future<Map> loadEeeStorageKey(String module, String storageItem, String pubKey) async {
+    Map eeeResultMap;
+    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(module, storageItem, pubKey);
+    if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
+      if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200) {
+        String storageKeyInfo = eeeStorageKeyMap["storageKeyInfo"];
+        print("eeeAccountKeyMap is ===>" + eeeStorageKeyMap.toString());
+        print("storageKeyInfo is ===>" + storageKeyInfo);
+        Map netFormatMap = await _loadScryXStorage(storageKeyInfo);
+        print("netFormatMap is ===>" + netFormatMap.toString());
         if (netFormatMap != null && netFormatMap.containsKey("result")) {
           eeeResultMap = await Wallets.instance.decodeEeeAccountInfo(netFormatMap["result"]);
         }
