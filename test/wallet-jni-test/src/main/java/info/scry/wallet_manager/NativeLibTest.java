@@ -2,17 +2,17 @@ package info.scry.wallet_manager;
 
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.*;
+
 
 public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-      // System.out.println(NativeLib.initWalletBasicData());
-       updateDefaultDigitTest();
+       System.out.println(NativeLib.initWalletBasicData());
+       //updateDefaultDigitTest();
        //walletGenerateTest();
        //  walletExportTest();
       //  eeeTransferTest();
@@ -22,21 +22,20 @@ public class NativeLibTest {
        //  queryDigitTest();
         //  addDigitTest();
         //delWalletTest();
-       // storage_query_test();
+        storage_query_test();
         //contract_deploy_test();
         //  walletSaveTest();
         //  updateBalance();
         // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
         //eeeAccountInfoKeyTest();
-        List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
+      /*  List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
         System.out.println("wallet length is:"+wallets.size());
         // contract_test(wallets);
       for (NativeLib.Wallet wallet : wallets) {
             System.out.println("***********************");
             System.out.println(wallet);
-        }
+        }*/
     }
-
 
     public static void updateDefaultDigitTest() {
         String json = "[{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342 \",\"shortName\":\"DDD \",\"fullName\":\"DDD \",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg \":\"locale: //ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"},{\"contractAddress\":\"\",\"shortName\":\"TokenX\",\"fullName\":\"TokenX\",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"kim-TokenX\",\"decimal\":\"15\",\"chainType\":\"EEE\"}]";
@@ -161,7 +160,8 @@ public class NativeLibTest {
         //Notification Event Coding Constant
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
-        String account_1 = "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H";
+      //  String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        String account_1 = "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type", "application/json");
@@ -177,7 +177,7 @@ public class NativeLibTest {
 
         int startBlockNumber = accountRecord == null ? 0 : accountRecord.blockNum;
 
-        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
+        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0x306721211d5404bd9da88e0204360a1a9ab8b87c66c1bc2fcdd37f3c2222cc20");
         NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
         // System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
         //每Query block interval
@@ -216,8 +216,10 @@ public class NativeLibTest {
                 }
                 String extrinsicsDetail = new JSONArray(tx_list).toString();
                 System.out.println("block_detal:" + extrinsicsDetail);
+
                 //JSONArray
                 String event_detal = client.invoke("state_getStorage", new Object[]{eventKeyPrefix, item.block}, String.class);
+
                 //Decode the obtained notification details and decode them. If there is a transfer transaction, store the transaction details in the database
                 NativeLib.Message msg = NativeLib.saveExtrinsicDetail(account_1, event_detal, item.block, extrinsicsDetail);
                 if (msg.status != 200) {

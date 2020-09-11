@@ -87,7 +87,6 @@ impl DataServiceProvider {
         for digit in digits.clone() {
             if let Some(id) = digit.id{
                 let chain_number = self.chain_name_to_chain_number(&digit.chain_type);
-                println!("chain number:{}",chain_number);
                 update_detail_statement.bind(1, id.as_str())?;
                 update_detail_statement.bind(2, chain_number)?;
                 update_detail_statement.next()?;

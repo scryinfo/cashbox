@@ -117,19 +117,36 @@ impl DataServiceProvider {
         stat.next().map(|_| true).map_err(|err| err.into())
     }
     pub fn save_transfer_detail(&self, account: &str, blockhash: &str, tx_detail: &TransferDetail, timestamp: u64, is_successful: bool) -> WalletResult<bool> {
-        let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,tx_index,tx_from,tx_to,amount,status,account,tx_timestamp)values(?,?,?,?,?,?,?,?,?,?);";
+        let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp,wallet_account) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         let mut stat = self.db_hander.prepare(insert_sql)?;
+        //tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp
         stat.bind(1, tx_detail.hash.as_ref().unwrap().as_str())?;//Transaction hash
         stat.bind(2, blockhash)?;//block hash
-        stat.bind(3, 3 as i64)?;// The chain id needs to be flexibly adjusted
-        stat.bind(4, tx_detail.index.unwrap() as i64)?;
-        stat.bind(5, tx_detail.from.as_ref().unwrap().as_str())?;//The transaction initiating account
-        stat.bind(6, tx_detail.to.as_ref().unwrap().as_str())?;//Transaction receiving account
+        stat.bind(3, 5 as i64)?;// The chain id needs to be flexibly adjusted
+        stat.bind(4, tx_detail.token_name.as_str())?;// The chain id needs to be flexibly adjusted
+        stat.bind(5, tx_detail.method_name.as_str())?;// The chain id needs to be flexibly adjusted
+        stat.bind(6, tx_detail.signer.as_ref().unwrap().as_str())?;// The chain id needs to be flexibly adjusted
+        stat.bind(7, tx_detail.index.unwrap() as i64)?;
+        stat.bind(8, if let Some(from )= &tx_detail.from{
+            from
+        }else{
+           ""
+        })?;//The transaction initiating account
+        stat.bind(9, if let Some(to) = &tx_detail.to{
+            to
+        }else {
+            ""
+        })?;//Transaction receiving account
         //value is u128 type, the database does not support this type, transcoded as a string to represent
-        stat.bind(7, format!("{}", tx_detail.value.unwrap()).as_str())?;
-        stat.bind(8, is_successful as i64)?;
-        stat.bind(9, account)?;//Sync account
-        stat.bind(10, timestamp as i64)?;//Transaction time
+        stat.bind(10, format!("{}", tx_detail.value.unwrap()).as_str())?;
+        stat.bind(11, if let Some(ext_data) = &tx_detail.ext_data{
+            ext_data
+        }else{
+            ""
+        })?;
+        stat.bind(12, is_successful as i64)?;
+        stat.bind(13, timestamp as i64)?;//Transaction time
+        stat.bind(14, account)?;//Transaction time
         stat.next().map(|_| true).map_err(|err| err.into())
     }
 
