@@ -175,4 +175,30 @@ impl DataServiceProvider {
         }
         Ok(status_vec)
     }
+
+    pub fn get_eee_tx_record(&self, account:&str,token_name:&str,start_index:u32,limit:u32) -> WalletResult<Vec<model::EeeTxRecord>> {
+        let select_sql = "select tx_hash,block_hash,signer,tx_from,tx_to,amount,fees,ext_data,status from detail.TransferRecord a where a.token_name = ? and a.wallet_account = ? and method_name = ? limit ? offset ?;;";
+        let mut select_stat = self.db_hander.prepare(select_sql)?;
+        select_stat.bind(1, token_name)?;
+        select_stat.bind(2, account)?;
+        select_stat.bind(3, "transfer")?;
+        select_stat.bind(4, limit as i64)?;
+        select_stat.bind(5, start_index as i64)?;
+        let mut records = Vec::new();
+        while let State::Row = select_stat.next().unwrap() {
+            let status = model::EeeTxRecord {
+                tx_hash: select_stat.read::<String>(0).unwrap(),
+                block_hash: select_stat.read::<String>(1).unwrap(),
+                signer: select_stat.read::<String>(2).unwrap(),
+                from: select_stat.read::<String>(3).ok(),
+                to: select_stat.read::<String>(4).ok(),
+                value: select_stat.read::<String>(5).ok(),
+                fees: select_stat.read::<String>(6).ok(),
+                ext_data: select_stat.read::<String>(7).ok(),
+                is_success: select_stat.read::<i64>(8).unwrap() != 0,
+            };
+            records.push(status);
+        }
+        Ok(records)
+    }
 }

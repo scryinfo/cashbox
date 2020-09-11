@@ -379,6 +379,46 @@ public class NativeLib {
                     '}';
         }
     }
+    public static class EeeChainTxListHistory {
+        public int status;//Dynamic library call result
+        public String message;      //Error message, detailed description
+        public List<EeeChainTxDetail> eeeChainTxDetail;
+
+        @Override
+        public String toString() {
+            return "EeeChainTxListHistory{" +
+                    "status=" + status +
+                    ", message='" + message + '\'' +
+                    ", eeeChainTxDetail=" + eeeChainTxDetail +
+                    '}';
+        }
+    }
+
+    public static class EeeChainTxDetail{
+        public String blockHash;
+        public String from;
+        public String to;
+        public String value;
+        public String inputMsg;
+        public String gasFee;
+        public String signer;
+        public boolean isSuccess;
+
+        @Override
+        public String toString() {
+            return "EeeChainTxDetail{" +
+                    "blockHash='" + blockHash + '\'' +
+                    ", from='" + from + '\'' +
+                    ", to='" + to + '\'' +
+                    ", value='" + value + '\'' +
+                    ", inputMsg='" + inputMsg + '\'' +
+                    ", gasFee='" + gasFee + '\'' +
+                    ", signer='" + signer + '\'' +
+                    ", isSuccess=" + isSuccess +
+                    '}';
+        }
+    }
+
 
     /**
      * Initialize wallet data file, load basic data
@@ -632,6 +672,9 @@ public class NativeLib {
     public static native Message updateEeeSyncRecord(String account,int chain_type,int block_num,String block_hash);
     //Get the currently synchronized block number
     public static native SyncStatus getEeeSyncRecord();
+
+
+    public static native EeeChainTxListHistory loadEeeChainTxListHistory(String account,String tokenName,int startIndex,int offset);
 
 
     /**
