@@ -10,6 +10,7 @@ abstract class Chain {
   String chainId; //Chain Id
   String walletId; //Wallet Id
   String chainAddress; //Chain address
+  String pubKey; //Chain address
   List<Digit> digitsList = [];
   List<Digit> _visibleDigitsList = [];
   bool isVisible = true; //The default chain is visible

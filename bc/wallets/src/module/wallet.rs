@@ -245,7 +245,7 @@ impl WalletManager {
                 let puk_key = substratetx::Sr25519::public_from_pair(&pair);
                 let address = Address {
                     chain_type: wallet_type,
-                    pubkey: hex::encode(puk_key),
+                    pubkey: format!("0x{}",hex::encode(puk_key)),
                     addr: address,
                 };
                 Ok(address)

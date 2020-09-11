@@ -11,36 +11,35 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-      //  System.out.println(NativeLib.initWalletBasicData());
-       //  updateDefaultDigitTest();
-      //   walletGenerateTest();
+      // System.out.println(NativeLib.initWalletBasicData());
+       updateDefaultDigitTest();
+       //walletGenerateTest();
        //  walletExportTest();
       //  eeeTransferTest();
           //updateAuthListTest();
          // addNonAuthDigitTest();
-
         //  getAuthDigitListTest();
        //  queryDigitTest();
         //  addDigitTest();
         //delWalletTest();
-        contract_deploy_test();
+       // storage_query_test();
+        //contract_deploy_test();
         //  walletSaveTest();
         //  updateBalance();
         // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
-     //   List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
-       // contract_test(wallets);
-     /*  for (NativeLib.Wallet wallet : wallets) {
+        //eeeAccountInfoKeyTest();
+        List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
+        System.out.println("wallet length is:"+wallets.size());
+        // contract_test(wallets);
+      for (NativeLib.Wallet wallet : wallets) {
             System.out.println("***********************");
             System.out.println(wallet);
-        }*/
+        }
     }
 
 
     public static void updateDefaultDigitTest() {
-        String json = "[\n" +
-                "{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},\n" +
-                "{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"}\n" +
-                "]";
+        String json = "[{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342 \",\"shortName\":\"DDD \",\"fullName\":\"DDD \",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg \":\"locale: //ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"},{\"contractAddress\":\"\",\"shortName\":\"TokenX\",\"fullName\":\"TokenX\",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"kim-TokenX\",\"decimal\":\"15\",\"chainType\":\"EEE\"}]";
         NativeLib.WalletState state = NativeLib.updateDefaultDigitList(json);
         System.out.println(state);
     }
@@ -63,7 +62,7 @@ public class NativeLibTest {
     }
 
     public static void queryDigitTest() {
-        NativeLib.DigitList list = NativeLib.queryDigit(3, "DD", "");
+        NativeLib.DigitList list = NativeLib.queryDigit(3, "", "");
         System.out.println(list);
     }
 
@@ -85,11 +84,11 @@ public class NativeLibTest {
 
     public static void walletGenerateTest() {
         Random random = new Random(1);
-        while (NativeLib.loadAllWalletList().size() < 6) {
+        while (NativeLib.loadAllWalletList().size() < 2) {
             NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(12);
             System.out.println(mnemonic.mnId);
             int r = random.nextInt(1000);
-            NativeLib.Wallet wallet = NativeLib.saveWallet("wallet_hello" + r, "123456".getBytes(), mnemonic.mn, 0);
+            NativeLib.Wallet wallet = NativeLib.saveWallet("wallet_hello" + r, "123456".getBytes(), mnemonic.mn, 1);
             System.out.println(wallet.toString());
         }
     }
@@ -117,7 +116,7 @@ public class NativeLibTest {
 
     public static void eeeAccountInfoKeyTest() {
         // NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
-        NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
+        NativeLib.Message msg = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
         System.out.println(msg);
     }
 
@@ -162,11 +161,11 @@ public class NativeLibTest {
         //Notification Event Coding Constant
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
-        String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        String account_1 = "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://127.0.0.1:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
 
         Header current_header = client.invoke("chain_getHeader", new Object[]{}, Header.class);
         //Get the current block number
@@ -178,8 +177,8 @@ public class NativeLibTest {
 
         int startBlockNumber = accountRecord == null ? 0 : accountRecord.blockNum;
 
-        NativeLib.Message key1 = NativeLib.eeeAccountInfoKey(account_1);
-        NativeLib.Message key2 = NativeLib.eeeAccountInfoKey(account_2);
+        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
+        NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
         // System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
         //每Query block interval
         int queryNumberInterval = 3000;
@@ -201,7 +200,7 @@ public class NativeLibTest {
             //Get the block hash of the current query storage status
             endBlockHash = client.invoke("chain_getBlockHash", new Object[]{endBlockNumber}, String.class);
             //Query the history of account status changes within the changed block
-            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.accountKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
+            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
             System.out.println("*********************StorageChange start**************");
             System.out.println(storage.toString());
             System.out.println("*********************StorageChange end**************");
@@ -735,7 +734,7 @@ public class NativeLibTest {
         public String toString() {
             return "StorageChange{" +
                     "block='" + block + '\'' +
-                    ", changes=" + changes +
+                    ", changes=" + changes.toString() +
                     '}';
         }
 

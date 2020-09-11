@@ -109,6 +109,7 @@ public class NativeLib {
         public String chainId;
         public String walletId;
         public String address;      //Chain address
+        public String pubkey;      // address public key
         public String domain;       //Node domain IP
         public boolean isVisible;   //Whether the chain is displayed
         public List<EeeDigit> digitList;
@@ -121,6 +122,7 @@ public class NativeLib {
                     ", chainId='" + chainId + '\'' +
                     ", walletId='" + walletId + '\'' +
                     ", address='" + address + '\'' +
+                    ", pubkey='" + pubkey + '\'' +
                     ", domain='" + domain + '\'' +
                     ", isVisible=" + isVisible +
                     ", digitList=" + digitList +
@@ -163,6 +165,7 @@ public class NativeLib {
         public String chainId;
         public String walletId;
         public String address;      //Chain address
+        public String pubkey;      // address public key
         public String domain;       //Node domain IP
         public boolean isVisible;
         public List<EthDigit> digitList;
@@ -175,6 +178,7 @@ public class NativeLib {
                     ", chainId='" + chainId + '\'' +
                     ", walletId='" + walletId + '\'' +
                     ", address='" + address + '\'' +
+                    ", pubkey='" + pubkey + '\'' +
                     ", domain='" + domain + '\'' +
                     ", isVisible=" + isVisible +
                     ", digitList=" + digitList +
@@ -217,6 +221,7 @@ public class NativeLib {
         public String chainId;
         public String walletId;
         public String address;      //chain address
+        public String pubkey;      // address public key
         public String domain;       //Node domain IP
         public boolean isVisible;
         public List<BtcDigit> digitList;
@@ -229,6 +234,7 @@ public class NativeLib {
                     ", chainId='" + chainId + '\'' +
                     ", walletId='" + walletId + '\'' +
                     ", address='" + address + '\'' +
+                    ", pubkey='" + pubkey + '\'' +
                     ", domain='" + domain + '\'' +
                     ", isVisible=" + isVisible +
                     ", digitList=" + digitList +
@@ -281,6 +287,7 @@ public class NativeLib {
         public boolean isAddDigit;            //Add tokens, is it successful       apiNo:WM16   Execution status: 1 success 0 failure
         public boolean isUpdateDigitBalance;  //Is it a success to update the number of tokens owned   Execution status: 1 success 0 failure
         public boolean isInitWalletBasicData;  //Is it successful to initialize the basic data of the data  Execution status: 1 success 0 failure
+        public boolean isUpdateDbData;         //Is it successful to update data.  Execution status: 1 success 0 failure
         public boolean isUpdateAuthDigit;     //Update the authentication token, is it successful   Execution status: 1 success 0 failure
         public boolean isUpdateDefaultDigit;  //Was it successful to update the default token   Execution status: 1 success 0 failure
         public boolean isAddNonAuthDigit;     //Add custom tokens, whether it's useful  Execution status: 1 success 0 failure
@@ -463,13 +470,18 @@ public class NativeLib {
      */
     public static native WalletState updateAuthDigitList(String digitData);
 
+
+
     /**
      * Query the list of certified tokens
-     * @param startItem Start number
-     * @param pageSize  How many items are currently taken
+     *
+     * @param chain_type Use the number defined in ChainType
+     * @param isAuth
+     * @param startItem  Start number
+     * @param pageSize   How many items are currently taken
      * @return
      */
-    public static native DigitList getDigitList(int chainType,boolean isAuth,int startItem,int pageSize);
+    public static native DigitList getDigitList(int chain_type,boolean isAuth,int startItem,int pageSize);
 
     /**
      * View token information
@@ -508,7 +520,7 @@ public class NativeLib {
         public String energyTransferInfo;   //Turn energy result hash
         public String ethSignedInfo;        //Sign eth transaction information
         public String inputInfo;            //extra information
-        public String accountKeyInfo;       //Account storage key
+        public String storageKeyInfo;       //Account storage key
         public AccountInfo accountInfo;     //account information 
 
         @Override
@@ -520,7 +532,7 @@ public class NativeLib {
                     ", energyTransferInfo='" + energyTransferInfo + '\'' +
                     ", ethSignedInfo='" + ethSignedInfo + '\'' +
                     ", inputInfo='" + inputInfo + '\'' +
-                    ", accountKeyInfo='" + accountKeyInfo + '\'' +
+                    ", storageKeyInfo='" + storageKeyInfo + '\'' +
                     ", accountInfo=" + accountInfo +
                     '}';
         }
@@ -591,9 +603,7 @@ public class NativeLib {
     // Note: vaule uses the default unit in the transfer: unit, the precision is 10^12, that is, 1 unit =1000_000_000_000
     public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version,int tx_version, byte[] pwd);
 
-    //msg: transaction
-    //TODO The use of this interface also needs to be re-planned
-    public static native Message eeeEnergyTransfer(String from, byte[] pwd, String to, String value, String extendMsg);
+    public static native Message tokenXTransfer(String from, String to, String value, String extData, String genesisHash, int index, int runtime_version,int tx_version, byte[] pwd);
 
     // The signature result is: transaction type
     public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
@@ -615,7 +625,7 @@ public class NativeLib {
     //  return the encoded key
     // :0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
     //Construct jsonrpc request data format {"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
-    public static native Message eeeAccountInfoKey(String addr);
+    public static native Message eeeStorageKey(String module,String storageItem,String pubKey);
 
     public static native Message saveExtrinsicDetail(String accountId,String eventDetail,String blockHash,String extrinsics);
     //Used to record the currently synchronized block number

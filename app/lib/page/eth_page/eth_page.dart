@@ -1,4 +1,5 @@
 import 'package:app/global_config/global_config.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
@@ -15,6 +16,7 @@ import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/util/app_info_util.dart';
+import 'package:app/util/utils.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -179,13 +181,40 @@ class _EthPageState extends State<EthPage> {
       case ChainType.EEE:
       case ChainType.EEE_TEST:
         ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-        Map eeeBalanceMap = await scryXNetUtil.loadEeeAccountInfo(Wallets.instance.nowWallet.nowChain.chainType);
-        if (eeeBalanceMap != null && eeeBalanceMap.containsKey("status")) {
-          if (eeeBalanceMap["status"] != null && eeeBalanceMap["status"] == 200) {
-            Wallets.instance.nowWallet.nowChain.digitsList[0].balance = eeeBalanceMap["free"];
-            this.displayDigitsList[0].balance = eeeBalanceMap["free"] ?? "0.0";
+
+        for (var i = 0; i < displayDigitsList.length; i++) {
+          print("loadDigitBalance  contractAddress===>" +
+              this.displayDigitsList[i].contractAddress.toString() +
+              "|| address====>" +
+              this.displayDigitsList[i].address.toString());
+          int index = i;
+          if (this.displayDigitsList[index].shortName.toLowerCase() == "eee") {
+            Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageKey(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
+            if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
+              //Wallets.instance.nowWallet.nowChain.digitsList[index].balance = eeeStorageKeyMap["free"];
+              this.displayDigitsList[index].balance = eeeStorageKeyMap["free"] ?? "0.0";
+            }
+          } else if (this.displayDigitsList[index].shortName.toLowerCase() == "tokenx") {
+            //print("Utils.hexToInt is ===>" + Utils.hexToInt("0xe8030000000000000000000000000000").toString());
+            BigInt.parse("e8030000000000000000000000000000", radix: 16);
+            print("this.displayDigitsList[index].balance==========>" + BigInt.parse("0xe8030000000000000000000000000000").toRadixString(10));
+            print("this.displayDigitsList[index].balance==========>" + BigInt.parse("0xe8030000000000000000000000000000").toString());
+            print("this.displayDigitsList[index].balance==========>" + BigInt.parse("e8030000000000000000000000000000",radix: 16).toString());
+            print("this.displayDigitsList[index].balance==========>" + BigInt.parse("e8030000000000000000000000000000",radix: 16).toRadixString(10));
+            this.displayDigitsList[index].balance = BigInt.parse("0xe8030000000000000000000000000000").toRadixString(10);
+            print("this.displayDigitsList[index].balance==========>" + this.displayDigitsList[index].balance);
+            // Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageKey(EeeTokenX, EeeBalances, Wallets.instance.nowWallet.nowChain.pubKey);
+            // if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
+            //   //Wallets.instance.nowWallet.nowChain.digitsList[index].balance = eeeStorageKeyMap["free"];
+            //   this.displayDigitsList[index].balance = BigInt.parse("0xe8030000000000000000000000000000",radix: 16).toString();
+            //   print("this.displayDigitsList[index].balance==========>"+this.displayDigitsList[index].balance);
+            //   //this.displayDigitsList[index].balance = eeeStorageKeyMap["free"] ?? "0.0";
+            // }else{
+            //   print("this.displayDigitsList[index].balance=2=========>"+this.displayDigitsList[index].balance);
+            // }
           }
         }
+
         break;
       default:
         break;

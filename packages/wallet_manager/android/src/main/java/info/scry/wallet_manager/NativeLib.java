@@ -93,6 +93,7 @@ public class NativeLib {
         public String chainId;
         public String walletId;
         public String address;      //Chain address
+        public String pubkey;      // address public key
         public String domain;       //Node domain IP
         public boolean isVisible;   //Whether the chain is displayed
         public List<EeeDigit> digitList;
@@ -117,6 +118,7 @@ public class NativeLib {
         public String chainId;
         public String walletId;
         public String address;      //Chain address
+        public String pubkey;      // address public key
         public String domain;       //Node domain IP
         public boolean isVisible;
         public List<EthDigit> digitList;
@@ -141,6 +143,7 @@ public class NativeLib {
         public String chainId;
         public String walletId;
         public String address;      //chain address
+        public String pubkey;      // address public key
         public String domain;       //Node domain IP
         public boolean isVisible;
         public List<BtcDigit> digitList;
@@ -375,7 +378,7 @@ public class NativeLib {
         public String energyTransferInfo;   //Turn energy result hash
         public String ethSignedInfo;        //Sign eth transaction information
         public String inputInfo;            //extra information
-        public String accountKeyInfo;       //Account storage key
+        public String storageKeyInfo;       //Account storage key
         public AccountInfo accountInfo;     //account information 
     }
 
@@ -413,31 +416,21 @@ public class NativeLib {
     // Note: vaule uses the default unit in the transfer: unit, the precision is 10^12, that is, 1 unit =1000_000_000_000
     public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version,int tx_version, byte[] pwd);
 
-    //msg: transaction
-    //TODO The use of this interface also needs to be re-planned
-    public static native Message eeeEnergyTransfer(String from, byte[] pwd, String to, String value, String extendMsg);
+    public static native Message tokenXTransfer(String from, String to, String value, String extData, String genesisHash, int index, int runtime_version,int tx_version, byte[] pwd);
 
-    // The signature result is: transaction type
-    public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
 
     // Only do information signature, tool function
     public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
 
-    //Broadcast transaction, distinguish the chain type
-    //msg: Transaction ID
-    public static native Message eeeTxBroadcast(long handle, String signedTx);
 
-    //msg: balance
-    public static native Message eeeBalance(long handle, String addr);
-
-    //msg: energy balance
-    public static native Message eeeEnergyBalance(long handle, String addr);
-
-    //For the key corresponding to the EEE account information, enter the address to be queried, for example: 5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4,
-    //  return the encoded key
-    // :0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
-    //Construct jsonrpc request data format {"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
-    public static native Message eeeAccountInfoKey(String addr);
+    /**
+     * get
+     * @param module
+     * @param storage_item
+     * @param pub_key
+     * @return
+     */
+    public static native Message eeeStorageKey(String module,String storageItem,String pubKey);
 
     /**
      * Decode account information queried back from the chain
@@ -489,16 +482,6 @@ public class NativeLib {
 
     // The signature result is: transaction type
     public static native Message ethRawTxSign(String rawTx, int chainType, String fromAddress, byte[] pwd);
-
-    //ETH transaction assembly. Returns: Unsigned transaction String.
-    //
-    public static native byte[] ethTxMakeETHRawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String toAddress, String value,
-                                                  String backupMsg, String gasLimit, String gasPrice);
-
-    //ERC20 transaction assembly. Returns: unsigned transaction String
-    //
-    public static native byte[] ethTxMakeERC20RawTx(byte[] encodeMneByte, byte[] pwd, String fromAddress, String contractAddress, String toAddress,
-                                                    String value, String backupMsg, String gasLimit, String gasPrice);
 
     //Handling suggestions are given priority, and the repository that implements spv does it. It is more convenient to get utxo, as well as change address
     // selection, change amount.

@@ -17,6 +17,7 @@ pub fn get_eee_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, eee_chain: EeeChain) -> JO
     env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str).unwrap()))).expect("set chainId value");
     env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.wallet_id).unwrap()))).expect("walletId");
     env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.address.clone()).unwrap()))).expect("address");
+    env.set_field(chain_class_obj, "pubkey", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.pub_key.clone()).unwrap()))).expect("pub_key");
 
     if eee_chain.domain.is_some() {
         env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eee_chain.domain.unwrap()).unwrap()))).expect("set domain value");
@@ -90,6 +91,7 @@ pub fn get_eth_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, eth_chain: EthChain) -> JO
     env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.chain_id).unwrap()))).expect("get_eth_chain_obj set chainId value");
     env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.wallet_id).unwrap()))).expect("get_eth_chain_obj set walletId value");
     env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.address).unwrap()))).expect("get_eth_chain_obj set address value");
+    env.set_field(chain_class_obj, "pubkey", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.pub_key).unwrap()))).expect("get_eth_chain_obj set pub_key value");
 
     if eth_chain.domain.is_some() {
         env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(eth_chain.domain.unwrap()).unwrap()))).expect("get_eth_chain_obj set domain value");
@@ -159,6 +161,7 @@ pub fn get_btc_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, btc_chain: BtcChain) -> JO
     env.set_field(chain_class_obj, "chainId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(chain_id_str.clone()).unwrap()))).expect("get_btc_chain_obj set chainId value");
     env.set_field(chain_class_obj, "walletId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.wallet_id).unwrap()))).expect("get_btc_chain_obj set walletId value");
     env.set_field(chain_class_obj, "address", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.address.clone()).unwrap()))).expect("get_btc_chain_obj set address value");
+    env.set_field(chain_class_obj, "pubkey", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.pub_key.clone()).unwrap()))).expect("get_btc_chain_obj set pub_key value");
 
     if btc_chain.domain.is_some() {
         env.set_field(chain_class_obj, "domain", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(btc_chain.domain.unwrap()).unwrap()))).expect("get_btc_chain_obj set domain value");
@@ -465,7 +468,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIE
         let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
         //  Using the wallet method to construct transactions, the user transaction index will not reach the transaction volume caused by the forced conversion.
          let eee = wallets::module::EEE {};
-         match eee.generate_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, tx_version as u32, pwd.as_slice()) {
+         match eee.generate_eee_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, tx_version as u32, pwd.as_slice()) {
              Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");
@@ -480,14 +483,42 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIE
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeAccountInfoKey(env: JNIEnv, _class: JClass, address: JString) -> jobject {
-    let account: String = env.get_string(address).unwrap().into();
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_tokenXTransfer(env: JNIEnv, _class: JClass, from: JString, to: JString, value: JString, extData:JString,genesisHash: JString, index: jint, runtime_version: jint,tx_version: jint, pwd: jbyteArray) -> jobject {
+    let pwd = env.convert_byte_array(pwd).unwrap();
+    let from: String = env.get_string(from).unwrap().into();
+    let genesis_hash: String = env.get_string(genesisHash).unwrap().into();
+    let to: String = env.get_string(to).unwrap().into();
+    let ext_data: String = env.get_string(extData).unwrap().into();
+    let value: String = env.get_string(value).unwrap().into();
+    let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("findNativeLib$Message");
+    let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
+    //  Using the wallet method to construct transactions, the user transaction index will not reach the transaction volume caused by the forced conversion.
+    let eee = wallets::module::EEE {};
+    match eee.generate_tokenx_transfer(&from, &to, &value, &ext_data,&genesis_hash, index as u32, runtime_version as u32, tx_version as u32, pwd.as_slice()) {
+        Ok(data) => {
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
+            env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");
+        }
+        Err(msg) => {
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("eeeTransfer set StatusCode value ");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("eeeTransfer set message value");
+        }
+    }
+    *state_obj
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeStorageKey(env: JNIEnv, _class: JClass, module: JString,storageItem: JString,pub_key: JString) -> jobject {
+    let module: String = env.get_string(module).unwrap().into();
+    let storage_item: String = env.get_string(storageItem).unwrap().into();
+    let pub_key: String = env.get_string(pub_key).unwrap().into();
     let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
     let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
-    match wallets::account_info_key(&account) {
+    match wallets::encode_account_storage_key(&module,&storage_item,&pub_key) {
         Ok(key) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
-            env.set_field(state_obj, "accountKeyInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(key).unwrap()))).expect("set accountKeyInfo value");
+            env.set_field(state_obj, "storageKeyInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(key).unwrap()))).expect("set accountKeyInfo value");
         }
         Err(msg) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set StatusCode value");
@@ -496,7 +527,6 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeAccountInfoKey(env
     }
     *state_obj
 }
-
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAccountInfo(env: JNIEnv, _class: JClass, _encode_info: JString) -> jobject {

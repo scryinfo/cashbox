@@ -165,6 +165,7 @@ class Wallets {
           ..chainAddress = eeeChain["chainAddress"]
           ..chainType = Chain.intToChainType(eeeChain["chainType"])
           ..isVisible = true
+          ..pubKey = eeeChain["pubkey"]
           ..walletId = eeeChain["walletId"];
         List eeeChainDigitList = eeeChain["eeeChainDigitList"];
         for (int j = 0; j < eeeChainDigitList.length; j++) {
@@ -194,6 +195,7 @@ class Wallets {
           ..chainAddress = ethChain["chainAddress"]
           ..chainType = Chain.intToChainType(ethChain["chainType"])
           ..isVisible = true
+          ..pubKey = ethChain["pubkey"]
           ..walletId = jniList[walletIndex]["walletId"];
         List ethChainDigitList = ethChain["ethChainDigitList"];
         if (ethChainDigitList != null && ethChainDigitList.length > 0) {
@@ -225,6 +227,7 @@ class Wallets {
           ..chainAddress = btcChain["chainAddress"]
           ..chainType = Chain.intToChainType(btcChain["chainType"])
           ..isVisible = false //todo change Visible state
+          ..pubKey = btcChain["pubkey"]
           ..walletId = jniList[walletIndex]["walletId"];
         List btcChainDigitList = btcChain["btcChainDigitList"];
         if (btcChainDigitList != null && btcChainDigitList.length > 0) {
@@ -442,6 +445,15 @@ class Wallets {
   }
 
   //
+  eeeStorageKey(String module, String storageItem, String pubKey) async {
+    Map<dynamic, dynamic> eeeStorageMap = await WalletManager.eeeStorageKey(module, storageItem, pubKey);
+    int status = eeeStorageMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("eeeStorageMap=>", "error status code is" + status.toString() + "||message is=>" + eeeStorageMap["message"].toString());
+    }
+    return eeeStorageMap;
+  }
+
   eeeAccountInfoKey(String address) async {
     Map<dynamic, dynamic> eeeAccountInfoMap = await WalletManager.eeeAccountInfoKey(address);
     int status = eeeAccountInfoMap["status"];

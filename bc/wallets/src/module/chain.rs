@@ -21,16 +21,37 @@ pub struct EEE;
 impl Chain for EEE {}
 
 impl EEE {
-    pub fn generate_transfer(&self, from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, tx_version:u32,psw: &[u8]) -> WalletResult<String> {
-        let keystore = find_keystore_wallet_from_address(from, ChainType::EEE)?;
+
+    fn decode_mnemonic_by_address(&self,address: &str,psw: &[u8])-> WalletResult<String>{
+        let keystore = find_keystore_wallet_from_address(address, ChainType::EEE)?;
         let mnemonic = substratetx::Sr25519::get_mnemonic_context(&keystore, psw)?;
         //Passed password verification
         let mn = String::from_utf8(mnemonic)?;
-        let genesis_hash_bytes = hex::decode(genesis_hash.get(2..).unwrap())?;
-        let mut genesis_h256 = [0u8; 32];
-        genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
-        //let signed_data = substratetx::transfer(&mn, to, amount, H256(genesis_h256), index, runtime_version)?;
-        let signed_data = substratetx::transfer(&mn, to, amount, &genesis_h256[..], index, runtime_version,tx_version)?;
+        Ok(mn)
+    }
+
+    fn convert_hash_to_byte(&self,hash: &str)-> WalletResult<[u8;32]>{
+        let hash_vec = hex::decode(hash.get(2..).unwrap())?;
+        let mut h256 = [0u8; 32];
+        h256.clone_from_slice(hash_vec.as_slice());
+        Ok(h256)
+    }
+
+    pub fn generate_eee_transfer(&self, from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, tx_version:u32, psw: &[u8]) -> WalletResult<String> {
+
+        let mn = self.decode_mnemonic_by_address(from,psw)?;
+        let h256 = self.convert_hash_to_byte(genesis_hash)?;
+        let signed_data = substratetx::transfer(&mn, to, amount, &h256[..], index, runtime_version,tx_version)?;
+        log::debug!("signed data is: {}", signed_data);
+        Ok(signed_data)
+    }
+
+    pub fn generate_tokenx_transfer(&self, from: &str, to: &str, amount: &str, ext_data:&str,genesis_hash: &str, index: u32, runtime_version: u32, tx_version:u32, psw: &[u8]) -> WalletResult<String> {
+
+        let mn = self.decode_mnemonic_by_address(from,psw)?;
+        let h256 = self.convert_hash_to_byte(genesis_hash)?;
+        let ext_vec = hex::decode(ext_data.get(2..).unwrap())?;
+        let signed_data = substratetx::tokenx_transfer(&mn, to, amount, &ext_vec[..],&h256[..], index, runtime_version,tx_version)?;
         log::debug!("signed data is: {}", signed_data);
         Ok(signed_data)
     }
@@ -78,6 +99,7 @@ impl EEE {
                             chain_id: chain_id.clone(),
                             wallet_id: wallet_id.clone(),
                             address: tbwallet.address.unwrap(),
+                            pub_key:tbwallet.pub_key.unwrap(),
                             domain: tbwallet.domain,
                             is_visible: {
                                 tbwallet.chain_is_visible
@@ -262,6 +284,7 @@ impl Ethereum {
                             chain_id: chain_id.clone(),
                             wallet_id: wallet_id.clone(),
                             address: tbwallet.address.unwrap(),
+                            pub_key:tbwallet.pub_key.unwrap(),
                             domain: tbwallet.domain,
                             is_visible: tbwallet.chain_is_visible,
                             chain_type: {
@@ -323,6 +346,7 @@ impl Bitcoin {
                             chain_id: chain_id.clone(),
                             wallet_id: wallet_id.clone(),
                             address: tbwallet.address.unwrap(),
+                            pub_key: tbwallet.pub_key.unwrap(),
                             domain: tbwallet.domain,
                             is_visible: tbwallet.chain_is_visible,
                             chain_type: {

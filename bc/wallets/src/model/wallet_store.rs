@@ -48,6 +48,7 @@ pub struct WalletObj {
     pub selected: Option<bool>,
     pub chain_id: Option<i64>,
     pub address: Option<String>,
+    pub pub_key: Option<String>,
     pub digit_id: Option<String>,
     pub chain_type: Option<i64>,
     pub domain: Option<String>,

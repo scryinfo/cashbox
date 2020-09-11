@@ -10,7 +10,7 @@ pub mod wallet_db;
 pub use error::WalletError;
 
 pub use ethtx::{RawTransaction, convert_token, address_legal as eth_address_legal};
-pub use substratetx::{account_info_key, decode_account_info, event_decode};
+pub use substratetx::{encode_account_storage_key, decode_account_info, event_decode};
 
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
@@ -140,10 +140,7 @@ mod tests {
             }
             wallet.eth_chain.unwrap().address
         };
-        // let rawtx = "0xf86b018301000082010094dac17f958d2ee523a2206206994597c13d831ec780b848565c93e30000000000000000000000001d8f02556aeccd9d311b649016f8091d8c687e84000000000000000000000000000000000000000000000000000000000000003874657374808080";
-        //tx sign result 0xf8ab018301000082010094dac17f958d2ee523a2206206994597c13d831ec780b848565c93e30000000000000000000000001d8f02556aeccd9d311b649016f8091d8c687e8400000000000000000000000000000000000000000000000000000000000000387465737426a088245d72fd4bd07a7d22fe46a40def8b6bdb0694e26aad10fab5baf19e757bc3a078034925d18562be11701f7e20d3cb503e961457626251b8d7d70db9de9b0b09
         let rawtx = "0xf86a808301000082010094dac17f958d2ee523a2206206994597c13d831ec780b847565c93e3000000000000000000000000d132abb434b7fe9aca4b24e3f0ef6fdeeeaf87920000000000000000000000000000000000000000000000000000000000000064636268808080";
-        //tx sign result 0xf8aa808301000082010094dac17f958d2ee523a2206206994597c13d831ec780b847565c93e3000000000000000000000000d132abb434b7fe9aca4b24e3f0ef6fdeeeaf8792000000000000000000000000000000000000000000000000000000000000006463626825a0b8f2fca96255d36d6e7aeb34e592ad7a695e0231da37da08db33fe3760dcf4eda0292c1a69cb113826c5fd1c347d07338092069b17a804650a99f8511b5b02764f
         let ethereum = module::Ethereum {};
         match ethereum.raw_tx_sign(rawtx, 1, address.as_str(), "123456".as_bytes()) {
             Ok(signed_data) => {
@@ -170,11 +167,19 @@ mod tests {
         genesis_h256.clone_from_slice(genesis_hash_bytes.as_slice());
         // Involving database access requires a series of data preparations for normal testing
         let eee = module::EEE {};
-        match eee.generate_transfer(from, to, value, genesis_hash, index, runtime_version, "123456".as_bytes()) {
+        match eee.generate_eee_transfer(from, to, value, genesis_hash, index, runtime_version, tx_version, "123456".as_bytes()) {
             Ok(sign_str) => {
                 println!("{}", sign_str);
             }
             Err(err) => println!("{}", err)
         }
+    }
+
+    #[test]
+    fn get_all_test(){
+        let manager = module::wallet::WalletManager {};
+        let res = manager.get_all();
+        println!("res:{:?}",res);
+        assert_eq!(res.is_ok(),true);
     }
 }
