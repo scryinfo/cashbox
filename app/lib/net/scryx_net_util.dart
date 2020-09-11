@@ -60,6 +60,21 @@ class ScryXNetUtil {
     return eeeResultMap;
   }
 
+  Future<Map> loadTokenXbalance(String tokenx, String balances, String pubKey) async {
+    Map tokenXResultMap;
+    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(tokenx, balances, pubKey);
+    if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
+      if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
+        String storageKeyInfo = eeeStorageKeyMap["storageKeyInfo"];
+        Map netFormatMap = await _loadScryXStorage(storageKeyInfo);
+        if (netFormatMap != null && netFormatMap.containsKey("result")) {
+          return netFormatMap;
+        }
+      }
+    }
+    return tokenXResultMap;
+  }
+
   Future<Map> _loadScryXStorage(formattedAddress) async {
     var spUtil = await SharedPreferenceUtil.instance;
     var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
