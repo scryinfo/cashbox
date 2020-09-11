@@ -498,8 +498,8 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Message message = new Message();
                 try {
                     message = NativeLib.tokenXTransfer((String) (call.argument("from")),
-                             (String) (call.argument("to")), (String) (call.argument("value")), (String) (call.argument("extData")),
-                            (String) (call.argument("genesisHash")),(int) (call.argument("index")), (int) (call.argument("runtime_version")),
+                            (String) (call.argument("to")), (String) (call.argument("value")), (String) (call.argument("extData")),
+                            (String) (call.argument("genesisHash")), (int) (call.argument("index")), (int) (call.argument("runtime_version")),
                             (int) (call.argument("tx_version")), (byte[]) (call.argument("pwd")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "eeeEnergyTransfer exception is " + exception);
@@ -510,6 +510,45 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 resultMap.put("signedInfo", message.signedInfo);
+                result.success(resultMap);
+                break;
+            }
+            case "loadEeeChainTxListHistory": {
+                ScryWalletLog.d("nativeLib=>", "loadEeeChainTxListHistory =>");
+                EeeChainTxListHistory eeeChainTxListHistory = new EeeChainTxListHistory();
+                try {
+                    eeeChainTxListHistory = NativeLib.loadEeeChainTxListHistory((String) (call.argument("walletId")),
+                            (String) (call.argument("tokenName")), (int) (call.argument("startIndex")), (int) (call.argument("offset")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "loadEeeChainTxListHistory exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "loadEeeChainTxListHistory.status is " + eeeChainTxListHistory.status);
+                Map resultMap = new HashMap();
+                resultMap.put("status", eeeChainTxListHistory.status);
+                List<Map<String, Object>> resultEeeChainTxList = new ArrayList<>();  ///返回数据，拼装List<Map>
+                if (eeeChainTxListHistory.status == 200) {
+                    for (int i = 0; i < eeeChainTxListHistory.eeeChainTxDetail.size(); i++) {
+                        Map<String, Object> detailMap = new HashMap<>();
+                        String from = eeeChainTxListHistory.eeeChainTxDetail.get(i).from;
+                        detailMap.put("from", from);
+                        String to = eeeChainTxListHistory.eeeChainTxDetail.get(i).to;
+                        detailMap.put("to", to);
+                        String value = eeeChainTxListHistory.eeeChainTxDetail.get(i).value;
+                        detailMap.put("value", value);
+                        String inputMsg = eeeChainTxListHistory.eeeChainTxDetail.get(i).inputMsg;
+                        detailMap.put("inputMsg", inputMsg);
+                        String gasFee = eeeChainTxListHistory.eeeChainTxDetail.get(i).gasFee;
+                        detailMap.put("gasFee", gasFee);
+                        String signer = eeeChainTxListHistory.eeeChainTxDetail.get(i).signer;
+                        detailMap.put("signer", signer);
+                        resultEeeChainTxList.add(detailMap);
+                    }
+                    resultMap.put("eeeChainTxDetail", resultEeeChainTxList);
+                } else {
+                    resultMap.put("message", eeeChainTxListHistory.message);
+                    ScryWalletLog.d("nativeLib=>", "eeeChainTxListHistory.status is " + eeeChainTxListHistory.status +
+                            "||eeeChainTxListHistory.message is " + eeeChainTxListHistory.message.toString());
+                }
                 result.success(resultMap);
                 break;
             }

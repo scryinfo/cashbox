@@ -240,8 +240,9 @@ class WalletManager {
     return decodeMap;
   }
 
-  static eeeStorageKey(String module,String storageItem,String pubKey) async {
-    Map<dynamic, dynamic> eeeStorageMap = await _channel.invokeMethod("eeeStorageKey", {"module": module,"storageItem": storageItem,"pubKey": pubKey});
+  static eeeStorageKey(String module, String storageItem, String pubKey) async {
+    Map<dynamic, dynamic> eeeStorageMap =
+        await _channel.invokeMethod("eeeStorageKey", {"module": module, "storageItem": storageItem, "pubKey": pubKey});
     return eeeStorageMap;
   }
 
@@ -265,6 +266,12 @@ class WalletManager {
   //在 当前钱包、当前链下，增加新代币的数据模型
   static addDigitToChainModel(String walletId, int chainType, String digitId) async {
     Map<dynamic, dynamic> decodeMap = await _channel.invokeMethod("addDigit", {"walletId": walletId, "chainType": chainType, "digitId": digitId});
+    return decodeMap;
+  }
+
+  static loadEeeChainTxHistory(String walletId, String tokenName, int startIndex, int offset) async {
+    Map<dynamic, dynamic> decodeMap = await _channel
+        .invokeMethod("loadEeeChainTxListHistory", {"walletId": walletId, "tokenName": tokenName, "startIndex": startIndex, "offset": offset});
     return decodeMap;
   }
 
