@@ -418,6 +418,7 @@ public class NativeLib {
 
     public static native Message tokenXTransfer(String from, String to, String value, String extData, String genesisHash, int index, int runtime_version,int tx_version, byte[] pwd);
 
+    public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
 
     // Only do information signature, tool function
     public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
