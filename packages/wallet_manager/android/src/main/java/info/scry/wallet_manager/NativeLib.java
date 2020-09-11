@@ -215,6 +215,21 @@ public class NativeLib {
         public List<EthToken> ethTokens;
     }
 
+    public static class EeeChainTxListHistory {
+        public int status;//Dynamic library call result
+        public String message;      //Error message, detailed description
+        public List<EeeChainTxDetail> eeeChainTxDetail;
+    }
+
+    public static class EeeChainTxDetail{
+        public String from;
+        public String to;
+        public String value;
+        public String inputMsg;
+        public String gasFee;
+        public String signer;
+    }
+
     /**
      * Initialize wallet data file, load basic data
      *
@@ -471,6 +486,8 @@ public class NativeLib {
      * @return
      */
     public static native SyncStatus getEeeSyncRecord();
+
+    public static native EeeChainTxListHistory loadEeeChainTxListHistory(String walletId,String tokenName,int startIndex,int offset);
 
     /*------------------------------------------Transaction related------------------------------------------*/
 
