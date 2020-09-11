@@ -93,3 +93,15 @@ pub struct SyncStatus {
     pub chain_type: i64,
 }
 
+#[derive(Debug, Default, Clone)]
+pub struct EeeTxRecord{
+    pub tx_hash:String,
+    pub block_hash:String,
+    pub from:Option<String>,
+    pub to:Option<String>,
+    pub value:Option<String>,
+    pub ext_data:Option<String>,
+    pub fees:Option<String>,
+    pub signer:String,
+    pub is_success:bool,
+}

@@ -82,6 +82,11 @@ impl EEE {
         instance.get_sync_status()
     }
 
+    pub fn query_tx_record(&self,account:&str,token_name:&str,start_index:u32,offset:u32)->WalletResult<Vec<EeeTxRecord>>{
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        instance.get_eee_tx_record(account,token_name,start_index,offset)
+    }
+
     pub fn get_chain_data(&self) -> WalletResult<HashMap<String, Vec<EeeChain>>> {
         let instance = wallet_db::DataServiceProvider::instance()?;
         //The test chain and official chain of the data obtained here

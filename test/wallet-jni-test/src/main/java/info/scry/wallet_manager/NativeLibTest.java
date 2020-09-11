@@ -11,7 +11,7 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-       System.out.println(NativeLib.initWalletBasicData());
+      // System.out.println(NativeLib.initWalletBasicData());
        //updateDefaultDigitTest();
        //walletGenerateTest();
        //  walletExportTest();
@@ -22,7 +22,8 @@ public class NativeLibTest {
        //  queryDigitTest();
         //  addDigitTest();
         //delWalletTest();
-        storage_query_test();
+       // storage_query_test();
+        getEeeTxRecordTest();
         //contract_deploy_test();
         //  walletSaveTest();
         //  updateBalance();
@@ -155,6 +156,9 @@ public class NativeLibTest {
         System.out.println(NativeLib.getEeeSyncRecord());
     }
 
+    public static void getEeeTxRecordTest(){
+        System.out.println(NativeLib.loadEeeChainTxListHistory("5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy","TokenX",0,30));
+    }
     public static void storage_query_test() throws Throwable {
         Map header = new HashMap<String, String>();
         //Notification Event Coding Constant

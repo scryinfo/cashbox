@@ -222,12 +222,14 @@ public class NativeLib {
     }
 
     public static class EeeChainTxDetail{
+        public String blockHash;
         public String from;
         public String to;
         public String value;
         public String inputMsg;
         public String gasFee;
         public String signer;
+        public boolean isSuccess;
     }
 
     /**
@@ -487,7 +489,7 @@ public class NativeLib {
      */
     public static native SyncStatus getEeeSyncRecord();
 
-    public static native EeeChainTxListHistory loadEeeChainTxListHistory(String walletId,String tokenName,int startIndex,int offset);
+    public static native EeeChainTxListHistory loadEeeChainTxListHistory(String account,String tokenName,int startIndex,int offset);
 
     /*------------------------------------------Transaction related------------------------------------------*/
 
