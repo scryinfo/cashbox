@@ -748,7 +748,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-            case "eeeAccountInfoKey": {
+            /*case "eeeAccountInfoKey": {
                 ScryWalletLog.d("nativeLib=>", "eeeAccountInfoKey is enter =>");
                 Message message = new Message();
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("address")));
@@ -759,17 +759,17 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
-                /*if (message.status == 200) {
+                *//*if (message.status == 200) {
                     resultMap.put("accountKeyInfo", message.accountKeyInfo);
                     ScryWalletLog.d("nativeLib=>",
                             "message.accountKeyInfo is " + message.accountKeyInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
                     ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
-                }*/
+                }*//*
                 result.success(resultMap);
                 break;
-            }
+            }*/
             case "decodeAccountInfo": {
                 ScryWalletLog.d("nativeLib=>", "decodeAccountInfo is enter =>");
                 Message message = new Message();
