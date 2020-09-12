@@ -104,4 +104,5 @@ pub struct EeeTxRecord{
     pub fees:Option<String>,
     pub signer:String,
     pub is_success:bool,
+    pub timestamp:String,
 }

@@ -230,6 +230,7 @@ public class NativeLib {
         public String gasFee;
         public String signer;
         public boolean isSuccess;
+        public String timestamp;
     }
 
     /**

@@ -714,6 +714,7 @@ pub mod android {
                     env.set_field(tx_record_class_obj, "gasFee", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(fees).unwrap()))).expect("tx_record_class_obj set gasFee value");
                     env.set_field(tx_record_class_obj, "signer", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(record.signer).unwrap()))).expect("tx_record_class_obj set signer value");
                     env.set_field(tx_record_class_obj, "isSuccess", "Z", JValue::Bool(record.is_success as u8)).expect("set isSuccess value");
+                    env.set_field(tx_record_class_obj, "timestamp", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(record.timestamp).unwrap()))).expect("tx_record_class_obj set timestamp value");
                     env.call_method(array_list_obj, "add", "(Ljava/lang/Object;)Z", &[tx_record_class_obj.into()]).expect("array_list_obj add tx record instance");
                 }
                 env.set_field(history_class_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("history_class_obj set status value");

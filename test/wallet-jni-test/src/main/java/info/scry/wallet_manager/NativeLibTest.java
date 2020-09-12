@@ -157,7 +157,7 @@ public class NativeLibTest {
     }
 
     public static void getEeeTxRecordTest(){
-        System.out.println(NativeLib.loadEeeChainTxListHistory("5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy","TokenX",0,30));
+        System.out.println(NativeLib.loadEeeChainTxListHistory("5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC","EEE",0,30));
     }
     public static void storage_query_test() throws Throwable {
         Map header = new HashMap<String, String>();
@@ -165,7 +165,7 @@ public class NativeLibTest {
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
       //  String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
-        String account_1 = "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy";
+        String account_1 = "5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type", "application/json");
@@ -181,8 +181,9 @@ public class NativeLibTest {
 
         int startBlockNumber = accountRecord == null ? 0 : accountRecord.blockNum;
 
-        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0x306721211d5404bd9da88e0204360a1a9ab8b87c66c1bc2fcdd37f3c2222cc20");
-        NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
+        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0x766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d");
+        NativeLib.Message key2 = NativeLib.eeeStorageKey("Tokenx","Balances","0x766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d");
+        //NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
         // System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
         //每Query block interval
         int queryNumberInterval = 3000;
@@ -204,7 +205,7 @@ public class NativeLibTest {
             //Get the block hash of the current query storage status
             endBlockHash = client.invoke("chain_getBlockHash", new Object[]{endBlockNumber}, String.class);
             //Query the history of account status changes within the changed block
-            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
+            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo,key2.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
             System.out.println("*********************StorageChange start**************");
             System.out.println(storage.toString());
             System.out.println("*********************StorageChange end**************");
@@ -230,6 +231,7 @@ public class NativeLibTest {
                     System.out.println(msg.message);
                 }
             }
+
             System.out.println("start update sync record,endBlockNumber is:" + endBlockNumber + ",endBlockHash is" + endBlockHash);
             //Update the number of currently queried blocks
             NativeLib.Message update_result = NativeLib.updateEeeSyncRecord(account_1, 5, endBlockNumber, endBlockHash);

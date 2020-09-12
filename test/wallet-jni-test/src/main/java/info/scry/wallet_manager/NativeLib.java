@@ -403,6 +403,7 @@ public class NativeLib {
         public String gasFee;
         public String signer;
         public boolean isSuccess;
+        public String timestamp;
 
         @Override
         public String toString() {
@@ -415,6 +416,7 @@ public class NativeLib {
                     ", gasFee='" + gasFee + '\'' +
                     ", signer='" + signer + '\'' +
                     ", isSuccess=" + isSuccess +
+                    ", timestamp='" + timestamp + '\'' +
                     '}';
         }
     }

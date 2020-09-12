@@ -117,6 +117,7 @@ impl DataServiceProvider {
         stat.next().map(|_| true).map_err(|err| err.into())
     }
     pub fn save_transfer_detail(&self, account: &str, blockhash: &str, tx_detail: &TransferDetail, timestamp: u64, is_successful: bool) -> WalletResult<bool> {
+        log::info!("save_transfer_detail account:{},blockhash:{}",account,blockhash);
         let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp,wallet_account) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         let mut stat = self.db_hander.prepare(insert_sql)?;
         //tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp
@@ -177,7 +178,8 @@ impl DataServiceProvider {
     }
 
     pub fn get_eee_tx_record(&self, account:&str,token_name:&str,start_index:u32,limit:u32) -> WalletResult<Vec<model::EeeTxRecord>> {
-        let select_sql = "select tx_hash,block_hash,signer,tx_from,tx_to,amount,fees,ext_data,status from detail.TransferRecord a where a.token_name = ? and a.wallet_account = ? and method_name = ? limit ? offset ?;;";
+        log::info!("account:{},token name:{}",account,token_name);
+        let select_sql = "select tx_hash,block_hash,signer,tx_from,tx_to,amount,fees,ext_data,status,tx_timestamp from detail.TransferRecord a where a.token_name = ? and a.wallet_account = ? and method_name = ? order by tx_timestamp desc limit ? offset ? ;";
         let mut select_stat = self.db_hander.prepare(select_sql)?;
         select_stat.bind(1, token_name)?;
         select_stat.bind(2, account)?;
@@ -196,7 +198,9 @@ impl DataServiceProvider {
                 fees: select_stat.read::<String>(6).ok(),
                 ext_data: select_stat.read::<String>(7).ok(),
                 is_success: select_stat.read::<i64>(8).unwrap() != 0,
+                timestamp: select_stat.read::<String>(9).unwrap(),
             };
+            log::info!("account:{},token name:{},signer:{}",account,token_name,status.signer);
             records.push(status);
         }
         Ok(records)

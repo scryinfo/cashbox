@@ -195,8 +195,6 @@ pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<
                     tx.token_name = "TokenX".to_string();
                     tx.method_name = "transfer".to_string();
 
-                    //nonce_byte.len()
-
                     let ext_str = {
                         let ext_data_len = ext.len();
                         let temp_array = vec![0u8;ext_data_len];
@@ -252,8 +250,8 @@ pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<
 
 #[test]
 fn decode_extrinsics_test() {
-    let data = r#"["0x280402000b208b95717401","0x310284306721211d5404bd9da88e0204360a1a9ab8b87c66c1bc2fcdd37f3c2222cc200194a7aa651e1cda6cbd562e135b6c0c484566a2e3db5b017a927cf8d62c937e001c68627b990895d8d68d961fc861df5eb03eb1355356a42d2eedcb22cf381e89260200000605e659a7a1628cdd93febc04a4e0646ea20e9f5f0ce097d9a05290d4a9e054df4e91010400"]"#;
-    match decode_extrinsics(data, "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY") {
+    let data = r#"["0x280402000b208b95717401","0x2d0284306721211d5404bd9da88e0204360a1a9ab8b87c66c1bc2fcdd37f3c2222cc200118cc282a465f5de1c99dc5e346296dcdce0751bf484be239129de0fcb52c682b8767451a4ad6257754f83a055d20eab1e6814680b811d09ae07be3e2122fcd82060608000605766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d040400"]"#;
+    match decode_extrinsics(data, "5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC") {
         Ok(res) => {
             for (index, hash) in &res {
                 println!("index:{},tx hash is:{:?}", index, hash);
@@ -273,7 +271,7 @@ fn data_decode_test() {
 
 #[test]
 fn encode_account_storage_key_test(){
-    let res = encode_account_storage_key("System","Account","0x0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea30");
+    let res = encode_account_storage_key("TokenX","Balances","0x766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d");
    println!("key storage:{}",res.unwrap());
   //  assert_eq!(res.is_ok(),true)
 }
