@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:app/generated/i18n.dart';
-import 'package:app/model/chain.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -19,8 +18,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
-import 'dart:convert' as convert;
 
 class TransferEeePage extends StatefulWidget {
   @override
@@ -42,16 +39,23 @@ class _TransferEeePageState extends State<TransferEeePage> {
   void initState() {
     super.initState();
     initData();
+    //initDataInfo();
+  }
+
+  initDataInfo() {
+    // String digitName = Provider.of<TransactionProvide>(context).digitName;
+    // print("digitName is ===>" + digitName);
   }
 
   initData() async {
     ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-    Map eeeBalanceMap = await scryXNetUtil.loadEeeAccountInfo(Wallets.instance.nowWallet.nowChain.chainType);
-    if (!_isMapStatusOk(eeeBalanceMap)) {
+    Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
+    if (!_isMapStatusOk(eeeStorageKeyMap)) {
       return;
     }
-    eeeBalance = eeeBalanceMap["free"];
-    nonce = eeeBalanceMap["nonce"];
+    eeeBalance = eeeStorageKeyMap["free"] ?? "";
+    nonce = eeeStorageKeyMap["nonce"];
+
     Map blockHashMap = await scryXNetUtil.loadScryXBlockHash();
     if (blockHashMap == null || !blockHashMap.containsKey("result")) {
       return;
@@ -70,124 +74,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
     }
     runtimeVersion = resultMap["specVersion"];
     txVersion = resultMap["transactionVersion"];
-
-    Map txHistoryMap = await scryXNetUtil.loadChainHeader();
-    if (txHistoryMap == null || !txHistoryMap.containsKey("result")) {
-      return;
-    }
-
-    Map accountKeyMap = await Wallets.instance.eeeAccountInfoKey(Wallets.instance.nowWallet.nowChain.chainAddress);
-    if (!_isMapStatusOk(accountKeyMap) || !accountKeyMap.containsKey("accountKeyInfo")) {
-      return;
-    }
-
-    int latestBlockHeight = Utils.hexToInt(txHistoryMap["result"]["number"].toString().substring(2));
-    print("latestBlockHeight is ===>" + latestBlockHeight.toString());
-
-    Map eeeSyncMap = await Wallets.instance.getEeeSyncRecord();
-    if (!_isMapStatusOk(eeeSyncMap) || !eeeSyncMap.containsKey("records")) {
-      return;
-    }
-    Map records = eeeSyncMap["records"];
-
-    String formattedKey = accountKeyMap["accountKeyInfo"];
-    const onceCount = 3000;
-    int startBlockHeight = 0;
-    int queryCount = 0;
-    if (records == null || records.length == 0) {
-      print("records  is ===>" + records.toString());
-      startBlockHeight = 0;
-      queryCount = (latestBlockHeight - 0) ~/ onceCount + 1; //divide down to fetch int
-    } else {
-      print("eeeSyncMap is ===>" + eeeSyncMap.toString());
-      if (eeeSyncMap == null || !eeeSyncMap.containsKey("status") || eeeSyncMap["status"] != 200) {
-        return;
-      }
-      Map<dynamic, dynamic> recordsMap = eeeSyncMap["records"];
-      recordsMap.forEach((key, value) {
-        print("recordsMap key is =======>" + key);
-        Map<dynamic, dynamic> accountDetailMap = value;
-        if (accountDetailMap != null &&
-            accountDetailMap.containsKey("account") &&
-            accountDetailMap["account"].toString().toLowerCase().trim() == Wallets.instance.nowWallet.nowChain.chainAddress.toLowerCase()) {
-          startBlockHeight = accountDetailMap["blockNum"];
-          return;
-        }
-      });
-      queryCount = (latestBlockHeight - startBlockHeight) ~/ onceCount + 1; //divide down to fetch int
-    }
-
-    for (int i = 0; i < queryCount; i++) {
-      int queryIndex = i;
-      int currentStartBlockNum = startBlockHeight + queryIndex * onceCount + 1;
-      Map currentMap = await scryXNetUtil.loadChainBlockHash(currentStartBlockNum);
-      if (currentMap == null || !currentMap.containsKey("result")) {
-        return;
-      }
-      String currentBlockHash = currentMap["result"].toString();
-      int endBlockHeight = queryIndex == (queryCount - 1) ? latestBlockHeight : ((queryIndex + 1) * onceCount + startBlockHeight);
-      Map endBlockMap = await scryXNetUtil.loadChainBlockHash(endBlockHeight);
-      if (endBlockMap == null || !endBlockMap.containsKey("result")) {
-        return;
-      }
-      String endBlockHash = endBlockMap["result"].toString();
-      Map queryStorageMap = await scryXNetUtil.loadQueryStorage(formattedKey, currentBlockHash, endBlockHash);
-      if (queryStorageMap == null || !endBlockMap.containsKey("result")) {
-        return;
-      }
-      List storageChanges = queryStorageMap["result"];
-      print("storageChanges is ===>" + storageChanges.toString());
-      if (storageChanges == null || storageChanges.length < 1) {
-        return;
-      }
-      storageChanges.forEach((element) async {
-        if (element == null || !element.containsKey("block")) {
-          return;
-        }
-        String blockHash = element["block"];
-        Map loadBlockMap = await scryXNetUtil.loadBlock(blockHash);
-        if (loadBlockMap == null || !loadBlockMap.containsKey("result")) {
-          return;
-        }
-        Map blockResultMap = loadBlockMap["result"];
-        if (blockResultMap == null || !blockResultMap.containsKey("block")) {
-          return;
-        }
-        Map extrinsicResultMap = blockResultMap["extrinsics"];
-        if (extrinsicResultMap == null || !extrinsicResultMap.containsKey("extrinsics")) {
-          return;
-        }
-        List extrinsicList = extrinsicResultMap["extrinsics"];
-        if (extrinsicList == null || extrinsicList.length <= 1) {
-          return;
-        }
-        String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
-        Map loadStorageMap = await scryXNetUtil.loadStateStorage(eventKeyPrefix, element["block"]);
-        if (loadStorageMap == null || !loadStorageMap.containsKey("result")) {
-          return; //todo 停止整个同步记录流程
-        }
-        String extrinsicJson = convert.jsonEncode(extrinsicList);
-        Map saveEeeMap = await Wallets.instance
-            .saveEeeExtrinsicDetail(Wallets.instance.nowWallet.nowChain.chainAddress, loadStorageMap["result"], element["block"], extrinsicJson);
-        print("saveEeeMap is ===>" + saveEeeMap.toString());
-        if (!_isMapStatusOk(saveEeeMap)) {
-          //todo 停止整个同步记录流程
-        }
-      });
-      Map updateEeeMap = await Wallets.instance.updateEeeSyncRecord(Wallets.instance.nowWallet.nowChain.chainAddress,
-          Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), endBlockHeight, endBlockHash);
-      print("updateEeeMap is ===>" + updateEeeMap.toString());
-      if (!_isMapStatusOk(updateEeeMap)) {
-        //todo 停止整个同步记录流程
-      }
-    }
-  }
-
-  bool _isMapStatusOk(Map returnMap) {
-    if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      return false;
-    }
-    return true;
   }
 
   @override
@@ -449,5 +335,12 @@ class _TransferEeePageState extends State<TransferEeePage> {
         );
       },
     );
+  }
+
+  bool _isMapStatusOk(Map returnMap) {
+    if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
+      return false;
+    }
+    return true;
   }
 }

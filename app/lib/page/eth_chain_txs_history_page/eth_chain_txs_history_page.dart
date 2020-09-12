@@ -3,13 +3,17 @@ import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
+import 'package:app/model/tx_model/base_tx_model.dart';
+import 'package:app/model/tx_model/eee_transaction_model.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
+import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/gestures.dart';
@@ -22,13 +26,14 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
+import 'dart:convert' as convert;
 
-class TransactionHistoryPage extends StatefulWidget {
+class EthChainTxsHistoryPage extends StatefulWidget {
   @override
-  _TransactionHistoryPageState createState() => _TransactionHistoryPageState();
+  _EthChainTxsHistoryPageState createState() => _EthChainTxsHistoryPageState();
 }
 
-class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
+class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
   Future txListFuture;
   List<Digit> walletDataList = [];
   List<Digit> showDataList = [];
@@ -45,18 +50,6 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   @override
   void initState() {
     super.initState();
-    //initTest();
-  }
-
-  initTest() async {
-    var paramString = VendorConfig.defaultDigitsContentDefaultValue;
-    var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
-    print("updateMap[isUpdateDefaultDigit](),=====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
-    Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, 0, 100);
-    if (nativeAuthMap == null) {
-      print("getAuthDigitList() native digit list failure===》");
-      return [];
-    }
   }
 
   @override
@@ -438,46 +431,25 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
   }
 
   Future<List<EthTransactionModel>> getTxListData() async {
-    switch (Wallets.instance.nowWallet.nowChain.chainType) {
-      case ChainType.ETH_TEST:
-      case ChainType.ETH:
-        {
-          displayTxOffset = displayTxOffset + refreshAddCount; //Increment refreshAddCount each time
-          try {
-            if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress.trim() != "")) {
-              ethTxListModel = await loadEthTxHistory(context, fromAddress, chainType, offset: displayTxOffset.toString());
-            } else if (fromAddress.trim() != "") {
-              ethTxListModel = await loadErc20TxHistory(context, fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
-            } else {
-              Fluttertoast.showToast(msg: translate('address_empty').toString());
-            }
-            print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
-          } catch (onError) {
-            print("onError===>" + "$onError");
-          }
-          if (ethTxListModel == null || ethTxListModel.length == 0) {
-            ethTxListModel = [];
-          }
-          print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
-          setState(() {
-            this.ethTxListModel = ethTxListModel;
-          });
-          return ethTxListModel;
-        }
-        break;
-      case ChainType.BTC_TEST:
-      case ChainType.BTC:
-        break;
-      case ChainType.EEE_TEST:
-      case ChainType.EEE:
-        {
-          // todo
-          List eeeChainTxList = await Wallets.instance.loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, "tokenName", 0, 100);
-        }
-        break;
-      default:
-        break;
+    displayTxOffset = displayTxOffset + refreshAddCount; //Increment refreshAddCount each time
+    try {
+      if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress.trim() != "")) {
+        ethTxListModel = await loadEthTxHistory(context, fromAddress, chainType, offset: displayTxOffset.toString());
+      } else if (fromAddress.trim() != "") {
+        ethTxListModel = await loadErc20TxHistory(context, fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
+      } else {
+        Fluttertoast.showToast(msg: translate('address_empty').toString());
+      }
+    } catch (onError) {
+      print("onError===>" + "$onError");
     }
+    if (ethTxListModel == null || ethTxListModel.length == 0) {
+      ethTxListModel = [];
+    }
+    setState(() {
+      this.ethTxListModel = ethTxListModel;
+    });
+    return ethTxListModel;
   }
 
   @override

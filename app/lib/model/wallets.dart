@@ -505,7 +505,7 @@ class Wallets {
   }
 
   Future<List> loadEeeChainTxHistory(String account, String tokenName, int startIndex, int offset) async {
-    List resultList = new List();
+    List<EeeTransactionModel> resultList = new List();
     Map loadEeeChainTxMap = await WalletManager.loadEeeChainTxHistory(account, tokenName, startIndex, offset);
     int status = loadEeeChainTxMap["status"];
     if (status == null || status != 200) {
@@ -514,13 +514,21 @@ class Wallets {
       List eeeChainTxList = loadEeeChainTxMap["eeeChainTxDetail"];
       for (int i = 0; i < eeeChainTxList.length; i++) {
         EeeTransactionModel eeeTransactionModel = new EeeTransactionModel();
-        eeeTransactionModel
-          ..from = eeeChainTxList[i]["from"]
-          ..to = eeeChainTxList[i]["to"]
-          ..value = eeeChainTxList[i]["value"]
-          ..inputMsg = eeeChainTxList[i]["inputMsg"]
-          ..gasFee = eeeChainTxList[i]["gasFee"]
-          ..signer = eeeChainTxList[i]["signer"];
+        try {
+          eeeTransactionModel
+            ..blockHash = eeeChainTxList[i]["blockHash"]
+            ..from = eeeChainTxList[i]["from"]
+            ..to = eeeChainTxList[i]["to"]
+            ..value = eeeChainTxList[i]["value"]
+            ..inputMsg = eeeChainTxList[i]["inputMsg"]
+            ..gasFee = eeeChainTxList[i]["gasFee"]
+            ..signer = eeeChainTxList[i]["signer"]
+            ..isSuccess = eeeChainTxList[i]["isSuccess"];
+          eeeTransactionModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(eeeChainTxList[i]["timestamp"])).toString();
+        } catch (e) {
+          print("convert format error is ====>" + e);
+          return resultList;
+        }
         resultList.add(eeeTransactionModel);
       }
     }

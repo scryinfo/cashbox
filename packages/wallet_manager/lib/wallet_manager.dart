@@ -269,9 +269,9 @@ class WalletManager {
     return decodeMap;
   }
 
-  static loadEeeChainTxHistory(String walletId, String tokenName, int startIndex, int offset) async {
+  static loadEeeChainTxHistory(String account, String tokenName, int startIndex, int offset) async {
     Map<dynamic, dynamic> decodeMap = await _channel
-        .invokeMethod("loadEeeChainTxListHistory", {"walletId": walletId, "tokenName": tokenName, "startIndex": startIndex, "offset": offset});
+        .invokeMethod("loadEeeChainTxListHistory", {"account": account, "tokenName": tokenName, "startIndex": startIndex, "offset": offset});
     return decodeMap;
   }
 
