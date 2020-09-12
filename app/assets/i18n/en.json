@@ -159,6 +159,7 @@
   "wallet_manager": "Wallet management",
   "compile_wallet_name": "Edit",
   "tx_hash": "Transaction hash",
+  "block_hash": "Block hash",
   "digit_manage": "Token management",
   "check_data_format": "Checking tx data format,please wait a moment",
   "save_digit_model_failure": "save to local failure，please quit and retry it",

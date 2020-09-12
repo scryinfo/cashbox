@@ -329,7 +329,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
             ..setGasUsed(ethTxListModel[index].gasUsed)
             ..setTimeStamp(ethTxListModel[index].timeStamp)
             ..setNonce(ethTxListModel[index].nonce);
-          NavigatorUtils.push(context, Routes.transactionEeeDetailPage);
+          NavigatorUtils.push(context, Routes.eeeTransactionDetailPage);
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

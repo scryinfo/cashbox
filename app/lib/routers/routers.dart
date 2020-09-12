@@ -34,7 +34,8 @@ class Routes {
   static String serviceAgreementPage = '/serviceagreementpage';
   static String ethChainTxHistoryPage = '/ethchaintxhistorypage';
   static String eeeChainTxHistoryPage = '/eeechaintxhistorypage';
-  static String transactionEeeDetailPage = '/transactioneeedetailpage';
+  static String eeeTransactionDetailPage = '/transactioneeedetailpage';
+  static String ethTransactionDetailPage = '/transactionethdetailpage';
   static String aboutUsPage = '/aboutuspage';
   static String createTestWalletPage = '/createtestwalletpage';
   static String signTxPage = '/signtxpage';
@@ -75,7 +76,8 @@ class Routes {
     router.define(serviceAgreementPage, handler: serviceAgreementHandler);
     router.define(ethChainTxHistoryPage, handler: ethChainTxHistoryHandler);
     router.define(eeeChainTxHistoryPage, handler: eeeChainTxHistoryHandler);
-    router.define(transactionEeeDetailPage, handler: transactionEeeDetailHandler);
+    router.define(eeeTransactionDetailPage, handler: eeeTransactionDetailHandler);
+    router.define(ethTransactionDetailPage, handler: ethTransactionDetailHandler);
     router.define(createTestWalletPage, handler: createTestWalletHandler);
     router.define(signTxPage, handler: signTxPageHandler);
     router.define(webViewPluginPage, handler: flutterWebViewPluginHandler);

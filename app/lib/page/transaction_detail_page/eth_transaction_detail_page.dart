@@ -8,12 +8,12 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 
-class EeeTransactionDetailPage extends StatefulWidget {
+class EthTransactionDetailPage extends StatefulWidget {
   @override
-  _EeeTransactionDetailPageState createState() => _EeeTransactionDetailPageState();
+  _EthTransactionDetailPageState createState() => _EthTransactionDetailPageState();
 }
 
-class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
+class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Container(

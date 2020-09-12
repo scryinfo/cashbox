@@ -247,7 +247,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
               future: txListFuture,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  print("snapshot.hasError is ===>"+snapshot.hasError.toString());
+                  print("snapshot.hasError is ===>" + snapshot.hasError.toString());
                   return Text(translate('fail_to_load_data_hint'));
                 }
                 if (snapshot.hasData) {
@@ -324,10 +324,12 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
           print("click tap intex is ===>" + index.toString());
           Provider.of<TransactionProvide>(context)
             ..emptyDataRecord()
-            ..setFromAddress(eeeTxListModel[index].from)
+            ..setFromAddress(eeeTxListModel[index].from ?? eeeTxListModel[index].signer ?? "")
             ..setToAddress(eeeTxListModel[index].to)
+            ..setHash(eeeTxListModel[index].blockHash)
+            ..setTimeStamp(eeeTxListModel[index].timeStamp)
             ..setValue(eeeTxListModel[index].value);
-          NavigatorUtils.push(context, Routes.transactionEeeDetailPage);
+          NavigatorUtils.push(context, Routes.eeeTransactionDetailPage);
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
