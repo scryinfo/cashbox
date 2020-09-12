@@ -184,7 +184,7 @@ class _EthPageState extends State<EthPage> {
         for (var i = 0; i < displayDigitsList.length; i++) {
           int index = i;
           if (this.displayDigitsList[index].shortName.toLowerCase() == "eee") {
-            Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageKey(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
+            Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
             if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
               Wallets.instance.nowWallet.nowChain.digitsList[index].balance = eeeStorageKeyMap["free"] ?? "";
               this.displayDigitsList[index].balance = eeeStorageKeyMap["free"] ?? "0.0";
@@ -437,7 +437,20 @@ class _EthPageState extends State<EthPage> {
                   ..setChainType(Wallets.instance.nowWallet.nowChain.chainType)
                   ..setContractAddress(displayDigitsList[index].contractAddress);
               }
-              NavigatorUtils.push(context, Routes.transactionHistoryPage);
+              switch (Wallets.instance.nowWallet.nowChain.chainType) {
+                case ChainType.EEE:
+                case ChainType.EEE_TEST:
+                  NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
+                  break;
+                case ChainType.ETH_TEST:
+                case ChainType.ETH:
+                  NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);
+                  break;
+                default:
+                  //todo 加提示，不知道哪个链
+                  print("不知道哪个链");
+                  break;
+              }
             },
             child: Row(
               children: <Widget>[
