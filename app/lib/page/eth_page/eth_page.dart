@@ -58,6 +58,12 @@ class _EthPageState extends State<EthPage> {
     initData();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Provider.of<TransactionProvide>(context).emptyDataRecord();
+  }
+
   void initData() async {
     {
       var spUtil = await SharedPreferenceUtil.instance;

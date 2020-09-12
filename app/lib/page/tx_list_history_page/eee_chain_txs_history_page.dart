@@ -42,8 +42,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   String moneyInfo = "0.00";
   String digitName = "";
   String fromAddress = "";
-  String contractAddress = "";
-  ChainType chainType = ChainType.UNKNOWN;
   int displayTxOffset = 0;
   int refreshAddCount = 20;
 
@@ -69,12 +67,12 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     super.didChangeDependencies();
     {
       fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-      contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+
       digitName = Provider.of<TransactionProvide>(context).digitName;
       balanceInfo = Provider.of<TransactionProvide>(context).balance;
       moneyInfo = Provider.of<TransactionProvide>(context).money;
-      chainType = Provider.of<TransactionProvide>(context).chainType;
     }
+    print("fromAddress===>" + fromAddress + "||digitName===>" + digitName + "||balanceInfo===>" + balanceInfo + "||moneyInfo===>" + moneyInfo);
     txListFuture = getTxListData();
   }
 
@@ -160,6 +158,10 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                 switch (Wallets.instance.nowWallet.nowChain.chainType) {
                   case ChainType.EEE:
                   case ChainType.EEE_TEST:
+                    Provider.of<TransactionProvide>(context)
+                      ..emptyDataRecord()
+                      ..setDigitName(digitName)
+                      ..setBalance(balanceInfo);
                     NavigatorUtils.push(context, Routes.transferEeePage);
                     break;
                   default:
@@ -321,7 +323,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       alignment: Alignment.center,
       child: GestureDetector(
         onTap: () {
-          print("click tap intex is ===>" + index.toString());
           Provider.of<TransactionProvide>(context)
             ..emptyDataRecord()
             ..setFromAddress(eeeTxListModel[index].from ?? eeeTxListModel[index].signer ?? "")
@@ -568,6 +569,5 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   @override
   void deactivate() {
     super.deactivate();
-    Provider.of<TransactionProvide>(context).emptyDataRecord();
   }
 }

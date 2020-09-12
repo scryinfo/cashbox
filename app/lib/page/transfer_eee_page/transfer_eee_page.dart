@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class TransferEeePage extends StatefulWidget {
   @override
@@ -39,12 +40,16 @@ class _TransferEeePageState extends State<TransferEeePage> {
   void initState() {
     super.initState();
     initData();
-    //initDataInfo();
   }
 
-  initDataInfo() {
-    // String digitName = Provider.of<TransactionProvide>(context).digitName;
-    // print("digitName is ===>" + digitName);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    String digitName = Provider.of<TransactionProvide>(context).digitName;
+    print("digitName is ===>" + digitName);
+    String balance = Provider.of<TransactionProvide>(context).balance;
+    print("balance is ===>" + balance);
   }
 
   initData() async {
@@ -74,11 +79,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
     }
     runtimeVersion = resultMap["specVersion"];
     txVersion = resultMap["transactionVersion"];
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
   }
 
   @override
