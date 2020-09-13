@@ -632,3 +632,51 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getEeeSyncRecord(env:
         }
         *sync_status_obj
 }
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_loadEeeChainTxListHistory(env: JNIEnv, _class: JClass,account: JString, tokenName: JString, startIndex: jint, offset: jint) -> jobject {
+    let history_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeChainTxListHistory").expect("find NativeLib$EeeChainTxListHistory");
+    let history_class_obj = env.alloc_object(history_class).expect("create NativeLib$Message instance");
+    let account: String = env.get_string(account).unwrap().into();
+    let tokenName: String = env.get_string(tokenName).unwrap().into();
+
+    let array_list_class = env.find_class("java/util/ArrayList").expect("ArrayList");
+    let array_list_obj = env.alloc_object(array_list_class).expect("array_list_class");
+    env.call_method(array_list_obj, "<init>", "()V", &[]).expect("array_list_obj init method is exec");
+
+    let eee = wallets::module::EEE {};
+    match eee.query_tx_record(&account, &tokenName, startIndex as u32, offset as u32) {
+        Ok(tx_records) => {
+            let tx_record_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeChainTxDetail").expect("find NativeLib$EeeChainTxListHistory class");
+            for record in tx_records {
+                let tx_record_class_obj = env.alloc_object(tx_record_class).expect("alloc eth_token_class object");
+                //Set record property
+                println!("blockhash is:{}",record.block_hash);
+                env.set_field(tx_record_class_obj, "blockHash", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(record.block_hash).unwrap()))).expect("tx_record_class_obj set blockHash value");
+                let from = if let Some(from) = record.from{from}else { "".to_string() };
+                env.set_field(tx_record_class_obj, "from", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(from).unwrap()))).expect("tx_record_class_obj set from value");
+                let to = if let Some(to) = record.to{to}else { "".to_string() };
+                env.set_field(tx_record_class_obj, "to", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(to).unwrap()))).expect("tx_record_class_obj set to value");
+                let value = if let Some(value) = record.value{value}else { "".to_string() };
+                env.set_field(tx_record_class_obj, "value", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(value).unwrap()))).expect("tx_record_class_obj set value value");
+                let ext_data = if let Some(ext_data) = record.ext_data{ext_data}else { "".to_string() };
+                env.set_field(tx_record_class_obj, "inputMsg", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(ext_data).unwrap()))).expect("tx_record_class_obj set inputMsg value");
+                let fees = if let Some(fees) = record.fees{fees}else { "".to_string() };
+                env.set_field(tx_record_class_obj, "gasFee", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(fees).unwrap()))).expect("tx_record_class_obj set gasFee value");
+                env.set_field(tx_record_class_obj, "signer", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(record.signer).unwrap()))).expect("tx_record_class_obj set signer value");
+                env.set_field(tx_record_class_obj, "timestamp", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(record.timestamp).unwrap()))).expect("tx_record_class_obj set timestamp value");
+                env.set_field(tx_record_class_obj, "isSuccess", "Z", JValue::Bool(record.is_success as u8)).expect("set isSuccess value");
+                env.call_method(array_list_obj, "add", "(Ljava/lang/Object;)Z", &[tx_record_class_obj.into()]).expect("array_list_obj add tx record instance");
+            }
+            env.set_field(history_class_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("history_class_obj set status value");
+            env.set_field(history_class_obj, "eeeChainTxDetail", "Ljava/util/List;", JValue::Object(array_list_obj)).expect("history_class_obj set eeeChainTxDetail");
+        },
+        Err(msg) => {
+            env.set_field(history_class_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status value ");
+            env.set_field(history_class_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value ");
+        }
+    }
+    *history_class_obj
+}
+

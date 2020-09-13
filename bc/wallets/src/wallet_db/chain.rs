@@ -117,19 +117,37 @@ impl DataServiceProvider {
         stat.next().map(|_| true).map_err(|err| err.into())
     }
     pub fn save_transfer_detail(&self, account: &str, blockhash: &str, tx_detail: &TransferDetail, timestamp: u64, is_successful: bool) -> WalletResult<bool> {
-        let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,tx_index,tx_from,tx_to,amount,status,account,tx_timestamp)values(?,?,?,?,?,?,?,?,?,?);";
+        log::info!("save_transfer_detail account:{},blockhash:{}",account,blockhash);
+        let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp,wallet_account) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         let mut stat = self.db_hander.prepare(insert_sql)?;
+        //tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp
         stat.bind(1, tx_detail.hash.as_ref().unwrap().as_str())?;//Transaction hash
         stat.bind(2, blockhash)?;//block hash
-        stat.bind(3, 3 as i64)?;// The chain id needs to be flexibly adjusted
-        stat.bind(4, tx_detail.index.unwrap() as i64)?;
-        stat.bind(5, tx_detail.from.as_ref().unwrap().as_str())?;//The transaction initiating account
-        stat.bind(6, tx_detail.to.as_ref().unwrap().as_str())?;//Transaction receiving account
+        stat.bind(3, 5 as i64)?;// The chain id needs to be flexibly adjusted
+        stat.bind(4, tx_detail.token_name.as_str())?;// The chain id needs to be flexibly adjusted
+        stat.bind(5, tx_detail.method_name.as_str())?;// The chain id needs to be flexibly adjusted
+        stat.bind(6, tx_detail.signer.as_ref().unwrap().as_str())?;// The chain id needs to be flexibly adjusted
+        stat.bind(7, tx_detail.index.unwrap() as i64)?;
+        stat.bind(8, if let Some(from )= &tx_detail.from{
+            from
+        }else{
+           ""
+        })?;//The transaction initiating account
+        stat.bind(9, if let Some(to) = &tx_detail.to{
+            to
+        }else {
+            ""
+        })?;//Transaction receiving account
         //value is u128 type, the database does not support this type, transcoded as a string to represent
-        stat.bind(7, format!("{}", tx_detail.value.unwrap()).as_str())?;
-        stat.bind(8, is_successful as i64)?;
-        stat.bind(9, account)?;//Sync account
-        stat.bind(10, timestamp as i64)?;//Transaction time
+        stat.bind(10, format!("{}", tx_detail.value.unwrap()).as_str())?;
+        stat.bind(11, if let Some(ext_data) = &tx_detail.ext_data{
+            ext_data
+        }else{
+            ""
+        })?;
+        stat.bind(12, is_successful as i64)?;
+        stat.bind(13, timestamp as i64)?;//Transaction time
+        stat.bind(14, account)?;//Transaction time
         stat.next().map(|_| true).map_err(|err| err.into())
     }
 
@@ -157,5 +175,34 @@ impl DataServiceProvider {
             status_vec.push(status);
         }
         Ok(status_vec)
+    }
+
+    pub fn get_eee_tx_record(&self, account:&str,token_name:&str,start_index:u32,limit:u32) -> WalletResult<Vec<model::EeeTxRecord>> {
+        log::info!("account:{},token name:{}",account,token_name);
+        let select_sql = "select tx_hash,block_hash,signer,tx_from,tx_to,amount,fees,ext_data,status,tx_timestamp from detail.TransferRecord a where a.token_name = ? and a.wallet_account = ? and method_name = ? order by tx_timestamp desc limit ? offset ? ;";
+        let mut select_stat = self.db_hander.prepare(select_sql)?;
+        select_stat.bind(1, token_name)?;
+        select_stat.bind(2, account)?;
+        select_stat.bind(3, "transfer")?;
+        select_stat.bind(4, limit as i64)?;
+        select_stat.bind(5, start_index as i64)?;
+        let mut records = Vec::new();
+        while let State::Row = select_stat.next().unwrap() {
+            let status = model::EeeTxRecord {
+                tx_hash: select_stat.read::<String>(0).unwrap(),
+                block_hash: select_stat.read::<String>(1).unwrap(),
+                signer: select_stat.read::<String>(2).unwrap(),
+                from: select_stat.read::<String>(3).ok(),
+                to: select_stat.read::<String>(4).ok(),
+                value: select_stat.read::<String>(5).ok(),
+                fees: select_stat.read::<String>(6).ok(),
+                ext_data: select_stat.read::<String>(7).ok(),
+                is_success: select_stat.read::<i64>(8).unwrap() != 0,
+                timestamp: select_stat.read::<String>(9).unwrap(),
+            };
+            log::info!("account:{},token name:{},signer:{}",account,token_name,status.signer);
+            records.push(status);
+        }
+        Ok(records)
     }
 }

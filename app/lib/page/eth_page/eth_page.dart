@@ -58,6 +58,12 @@ class _EthPageState extends State<EthPage> {
     initData();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Provider.of<TransactionProvide>(context).emptyDataRecord();
+  }
+
   void initData() async {
     {
       var spUtil = await SharedPreferenceUtil.instance;
@@ -181,40 +187,24 @@ class _EthPageState extends State<EthPage> {
       case ChainType.EEE:
       case ChainType.EEE_TEST:
         ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-
         for (var i = 0; i < displayDigitsList.length; i++) {
-          print("loadDigitBalance  contractAddress===>" +
-              this.displayDigitsList[i].contractAddress.toString() +
-              "|| address====>" +
-              this.displayDigitsList[i].address.toString());
           int index = i;
           if (this.displayDigitsList[index].shortName.toLowerCase() == "eee") {
-            Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageKey(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
+            Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
             if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
-              //Wallets.instance.nowWallet.nowChain.digitsList[index].balance = eeeStorageKeyMap["free"];
+              Wallets.instance.nowWallet.nowChain.digitsList[index].balance = eeeStorageKeyMap["free"] ?? "";
               this.displayDigitsList[index].balance = eeeStorageKeyMap["free"] ?? "0.0";
             }
           } else if (this.displayDigitsList[index].shortName.toLowerCase() == "tokenx") {
-            //print("Utils.hexToInt is ===>" + Utils.hexToInt("0xe8030000000000000000000000000000").toString());
-            BigInt.parse("e8030000000000000000000000000000", radix: 16);
-            print("this.displayDigitsList[index].balance==========>" + BigInt.parse("0xe8030000000000000000000000000000").toRadixString(10));
-            print("this.displayDigitsList[index].balance==========>" + BigInt.parse("0xe8030000000000000000000000000000").toString());
-            print("this.displayDigitsList[index].balance==========>" + BigInt.parse("e8030000000000000000000000000000",radix: 16).toString());
-            print("this.displayDigitsList[index].balance==========>" + BigInt.parse("e8030000000000000000000000000000",radix: 16).toRadixString(10));
-            this.displayDigitsList[index].balance = BigInt.parse("0xe8030000000000000000000000000000").toRadixString(10);
-            print("this.displayDigitsList[index].balance==========>" + this.displayDigitsList[index].balance);
-            // Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageKey(EeeTokenX, EeeBalances, Wallets.instance.nowWallet.nowChain.pubKey);
-            // if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
-            //   //Wallets.instance.nowWallet.nowChain.digitsList[index].balance = eeeStorageKeyMap["free"];
-            //   this.displayDigitsList[index].balance = BigInt.parse("0xe8030000000000000000000000000000",radix: 16).toString();
-            //   print("this.displayDigitsList[index].balance==========>"+this.displayDigitsList[index].balance);
-            //   //this.displayDigitsList[index].balance = eeeStorageKeyMap["free"] ?? "0.0";
-            // }else{
-            //   print("this.displayDigitsList[index].balance=2=========>"+this.displayDigitsList[index].balance);
-            // }
+            Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(EeeTokenX, EeeBalances, Wallets.instance.nowWallet.nowChain.pubKey);
+            if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
+              this.displayDigitsList[index].balance =
+                  BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
+              Wallets.instance.nowWallet.nowChain.digitsList[index].balance =
+                  BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
+            }
           }
         }
-
         break;
       default:
         break;
@@ -453,7 +443,20 @@ class _EthPageState extends State<EthPage> {
                   ..setChainType(Wallets.instance.nowWallet.nowChain.chainType)
                   ..setContractAddress(displayDigitsList[index].contractAddress);
               }
-              NavigatorUtils.push(context, Routes.transactionHistoryPage);
+              switch (Wallets.instance.nowWallet.nowChain.chainType) {
+                case ChainType.EEE:
+                case ChainType.EEE_TEST:
+                  NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
+                  break;
+                case ChainType.ETH_TEST:
+                case ChainType.ETH:
+                  NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);
+                  break;
+                default:
+                  //todo 加提示，不知道哪个链
+                  print("不知道哪个链");
+                  break;
+              }
             },
             child: Row(
               children: <Widget>[

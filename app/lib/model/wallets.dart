@@ -1,5 +1,6 @@
 import 'package:app/global_config/global_config.dart';
 import 'package:app/global_config/vendor_config.dart';
+import 'package:app/model/tx_model/eee_transaction_model.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
@@ -501,6 +502,37 @@ class Wallets {
           "error status code is" + status.toString() + "||message is=>" + saveEeeExtrinsicDetailMap["message"].toString());
     }
     return saveEeeExtrinsicDetailMap;
+  }
+
+  Future<List> loadEeeChainTxHistory(String account, String tokenName, int startIndex, int offset) async {
+    List<EeeTransactionModel> resultList = new List();
+    Map loadEeeChainTxMap = await WalletManager.loadEeeChainTxHistory(account, tokenName, startIndex, offset);
+    int status = loadEeeChainTxMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("loadEeeChainTxHistory=>", "error status code is" + status.toString() + "||message is=>" + loadEeeChainTxMap["message"].toString());
+    } else {
+      List eeeChainTxList = loadEeeChainTxMap["eeeChainTxDetail"];
+      for (int i = 0; i < eeeChainTxList.length; i++) {
+        EeeTransactionModel eeeTransactionModel = new EeeTransactionModel();
+        try {
+          eeeTransactionModel
+            ..blockHash = eeeChainTxList[i]["blockHash"]
+            ..from = eeeChainTxList[i]["from"]
+            ..to = eeeChainTxList[i]["to"]
+            ..value = eeeChainTxList[i]["value"]
+            ..inputMsg = eeeChainTxList[i]["inputMsg"]
+            ..gasFee = eeeChainTxList[i]["gasFee"]
+            ..signer = eeeChainTxList[i]["signer"]
+            ..isSuccess = eeeChainTxList[i]["isSuccess"];
+          eeeTransactionModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(eeeChainTxList[i]["timestamp"])).toString();
+        } catch (e) {
+          print("convert format error is ====>" + e);
+          return resultList;
+        }
+        resultList.add(eeeTransactionModel);
+      }
+    }
+    return resultList;
   }
 
   //Add a new token data model to the current wallet and current chain

@@ -1,13 +1,19 @@
 import 'package:app/generated/i18n.dart';
+import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
+import 'package:app/model/tx_model/base_tx_model.dart';
+import 'package:app/model/tx_model/eee_transaction_model.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
+import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
+import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/gestures.dart';
@@ -20,29 +26,40 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
+import 'dart:convert' as convert;
 
-class TransactionHistoryPage extends StatefulWidget {
+class EeeChainTxsHistoryPage extends StatefulWidget {
   @override
-  _TransactionHistoryPageState createState() => _TransactionHistoryPageState();
+  _EeeChainTxsHistoryPageState createState() => _EeeChainTxsHistoryPageState();
 }
 
-class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
+class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   Future txListFuture;
   List<Digit> walletDataList = [];
   List<Digit> showDataList = [];
-  List<EthTransactionModel> ethTxListModel = [];
+  List<EeeTransactionModel> eeeTxListModel = [];
   String balanceInfo = "0.00";
   String moneyInfo = "0.00";
   String digitName = "";
   String fromAddress = "";
-  String contractAddress = "";
-  ChainType chainType = ChainType.UNKNOWN;
   int displayTxOffset = 0;
   int refreshAddCount = 20;
 
   @override
   void initState() {
     super.initState();
+    //initTest();
+  }
+
+  initTest() async {
+    var paramString = VendorConfig.defaultDigitsContentDefaultValue;
+    var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
+    print("updateMap[isUpdateDefaultDigit]() =====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
+    Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, 0, 100);
+    if (nativeAuthMap == null) {
+      print("getAuthDigitList() native digit list failure===》");
+      return [];
+    }
   }
 
   @override
@@ -50,12 +67,12 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     super.didChangeDependencies();
     {
       fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-      contractAddress = Provider.of<TransactionProvide>(context).contractAddress;
+
       digitName = Provider.of<TransactionProvide>(context).digitName;
       balanceInfo = Provider.of<TransactionProvide>(context).balance;
       moneyInfo = Provider.of<TransactionProvide>(context).money;
-      chainType = Provider.of<TransactionProvide>(context).chainType;
     }
+    print("fromAddress===>" + fromAddress + "||digitName===>" + digitName + "||balanceInfo===>" + balanceInfo + "||moneyInfo===>" + moneyInfo);
     txListFuture = getTxListData();
   }
 
@@ -139,20 +156,16 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               color: Color.fromRGBO(26, 141, 198, 0.2),
               onPressed: () {
                 switch (Wallets.instance.nowWallet.nowChain.chainType) {
-                  case ChainType.ETH:
-                  case ChainType.ETH_TEST:
-                    NavigatorUtils.push(context, Routes.transferEthPage);
-                    break;
                   case ChainType.EEE:
                   case ChainType.EEE_TEST:
+                    Provider.of<TransactionProvide>(context)
+                      ..emptyDataRecord()
+                      ..setDigitName(digitName)
+                      ..setBalance(balanceInfo);
                     NavigatorUtils.push(context, Routes.transferEeePage);
                     break;
-                  case ChainType.BTC_TEST:
-                  case ChainType.BTC:
-                    NavigatorUtils.push(context, Routes.transferBtcPage);
-                    break;
                   default:
-                    NavigatorUtils.push(context, Routes.transferEthPage);
+                    NavigatorUtils.push(context, Routes.transferEeePage);
                     break;
                 }
               },
@@ -236,10 +249,11 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
               future: txListFuture,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
+                  print("snapshot.hasError is ===>" + snapshot.hasError.toString());
                   return Text(translate('fail_to_load_data_hint'));
                 }
                 if (snapshot.hasData) {
-                  if (ethTxListModel.length == 0) {
+                  if (eeeTxListModel.length == 0) {
                     return Container(
                       alignment: Alignment.topCenter,
                       child: Text(
@@ -280,22 +294,22 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                 child: _makeTxItemWidget(index),
               );
             },
-            childCount: ethTxListModel.length,
+            childCount: eeeTxListModel.length,
           ),
         ),
       ],
       onLoad: () async {
         await Future.delayed(Duration(seconds: 2), () async {
           print("refresh onLoad======>");
-          if (this.ethTxListModel.length < displayTxOffset) {
+          if (this.eeeTxListModel.length < displayTxOffset) {
             //Shown, less loaded than the last request, indicating that it is gone
             Fluttertoast.showToast(msg: translate('finish_load_tx_history').toString());
             return;
           }
-          var ethTxListModel = await getTxListData();
-          if (ethTxListModel != null && ethTxListModel.length > 0) {
+          var eeeTxListModel = await getTxListData();
+          if (eeeTxListModel != null && eeeTxListModel.length > 0) {
             setState(() {
-              this.ethTxListModel = ethTxListModel;
+              this.eeeTxListModel = eeeTxListModel;
             });
           }
         });
@@ -309,20 +323,14 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
       alignment: Alignment.center,
       child: GestureDetector(
         onTap: () {
-          print("click tap intex is ===>" + index.toString());
           Provider.of<TransactionProvide>(context)
             ..emptyDataRecord()
-            ..setFromAddress(ethTxListModel[index].from)
-            ..setToAddress(ethTxListModel[index].to)
-            ..setValue(ethTxListModel[index].value)
-            ..setHash(ethTxListModel[index].hash)
-            ..setBackup(ethTxListModel[index].input)
-            ..setGas(ethTxListModel[index].gas)
-            ..setGasPrice(ethTxListModel[index].gasPrice)
-            ..setGasUsed(ethTxListModel[index].gasUsed)
-            ..setTimeStamp(ethTxListModel[index].timeStamp)
-            ..setNonce(ethTxListModel[index].nonce);
-          NavigatorUtils.push(context, Routes.transactionEeeDetailPage);
+            ..setFromAddress(eeeTxListModel[index].from ?? eeeTxListModel[index].signer ?? "")
+            ..setToAddress(eeeTxListModel[index].to)
+            ..setHash(eeeTxListModel[index].blockHash)
+            ..setTimeStamp(eeeTxListModel[index].timeStamp)
+            ..setValue(eeeTxListModel[index].value);
+          NavigatorUtils.push(context, Routes.eeeTransactionDetailPage);
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -340,7 +348,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        ethTxListModel[index].value ?? "",
+                        eeeTxListModel[index].value ?? "",
                         style: TextStyle(
                           color: Colors.greenAccent,
                           fontSize: ScreenUtil.instance.setSp(3.5),
@@ -353,7 +361,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                     Container(
                       width: ScreenUtil().setWidth(30),
                       child: Text(
-                        ethTxListModel[index].hash,
+                        eeeTxListModel[index].blockHash, //hash
                         style: TextStyle(
                           color: Color.fromRGBO(255, 255, 255, 0.7),
                           fontSize: ScreenUtil.instance.setSp(3),
@@ -379,9 +387,9 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        ethTxListModel[index].isError ?? "",
+                        eeeTxListModel[index].isSuccess ? translate('tx_success') : translate('tx_failure'),
                         style: TextStyle(
-                          color: (ethTxListModel[index].isError == translate('tx_success')) ? Colors.white70 : Colors.redAccent,
+                          color: eeeTxListModel[index].isSuccess ? Colors.white70 : Colors.redAccent,
                           fontSize: ScreenUtil.instance.setSp(2.5),
                         ),
                         textAlign: TextAlign.start,
@@ -391,7 +399,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                     Container(
                       width: ScreenUtil().setWidth(30),
                       child: Text(
-                        ethTxListModel[index].timeStamp,
+                        eeeTxListModel[index].timeStamp,
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: ScreenUtil.instance.setSp(2.5),
@@ -423,33 +431,143 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
     );
   }
 
-  Future<List<EthTransactionModel>> getTxListData() async {
-    displayTxOffset = displayTxOffset + refreshAddCount; //Increment refreshAddCount each time
-    try {
-      if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress.trim() != "")) {
-        ethTxListModel = await loadEthTxHistory(context, fromAddress, chainType, offset: displayTxOffset.toString());
-      } else if (fromAddress.trim() != "") {
-        ethTxListModel = await loadErc20TxHistory(context, fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
-      } else {
-        Fluttertoast.showToast(msg: translate('address_empty').toString());
+  Future<List<EeeTransactionModel>> getTxListData() async {
+    //去加载本地DB已有的交易，进行显示
+    eeeTxListModel = await Wallets.instance.loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, 0, 100);
+    print("eeeChainTxList=========>" + eeeTxListModel.toString());
+    //再去同步 最新块的交易记录
+    loadEeeChainTxHistoryData();
+    return eeeTxListModel;
+  }
+
+  loadEeeChainTxHistoryData() async {
+    //再次同步最新数据
+    ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+    Map txHistoryMap = await scryXNetUtil.loadChainHeader();
+    if (txHistoryMap == null || !txHistoryMap.containsKey("result")) {
+      return;
+    }
+    String eeeStorageKey = await scryXNetUtil.loadEeeStorageKey(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
+    String tokenXStorageKey = await scryXNetUtil.loadEeeStorageKey(EeeTokenX, EeeBalances, Wallets.instance.nowWallet.nowChain.pubKey);
+    print("eeeStorageKey======>" + eeeStorageKey.toString());
+    if (eeeStorageKey == null || eeeStorageKey.trim() == "") {
+      return;
+    }
+    int latestBlockHeight = Utils.hexToInt(txHistoryMap["result"]["number"].toString().substring(2));
+    print("latestBlockHeight is ===>" + latestBlockHeight.toString());
+
+    Map eeeSyncMap = await Wallets.instance.getEeeSyncRecord();
+    if (!_isMapStatusOk(eeeSyncMap) || !eeeSyncMap.containsKey("records")) {
+      return;
+    }
+    Map records = eeeSyncMap["records"];
+    const onceCount = 3000;
+    int startBlockHeight = 0;
+    int queryCount = 0;
+    if (records == null || records.length < 1) {
+      print("records  is ======>" + records.toString());
+      startBlockHeight = 0;
+      queryCount = (latestBlockHeight - 0) ~/ onceCount + 1; //divide down to fetch int
+    } else {
+      print("records.length.toString()  is ======>" + records.length.toString());
+      print("records  is ======>" + records.toString());
+      print("eeeSyncMap is ===>" + eeeSyncMap.toString());
+      if (eeeSyncMap == null || !eeeSyncMap.containsKey("status") || eeeSyncMap["status"] != 200) {
+        return;
       }
-      print("ethTxListModel.length.===>" + ethTxListModel.length.toString());
-    } catch (onError) {
-      print("onError===>" + "$onError");
+      Map<dynamic, dynamic> recordsMap = eeeSyncMap["records"];
+      recordsMap.forEach((key, value) {
+        print("recordsMap key is =======>" + key);
+        Map<dynamic, dynamic> accountDetailMap = value;
+        if (accountDetailMap != null &&
+            accountDetailMap.containsKey("account") &&
+            accountDetailMap["account"].toString().toLowerCase().trim() == Wallets.instance.nowWallet.nowChain.chainAddress.toLowerCase()) {
+          startBlockHeight = accountDetailMap["blockNum"];
+          return;
+        }
+      });
+      queryCount = (latestBlockHeight - startBlockHeight) ~/ onceCount + 1; //divide down to fetch int
     }
-    if (ethTxListModel == null || ethTxListModel.length == 0) {
-      ethTxListModel = [];
+    if (true) {
+      for (int i = 0; i < queryCount; i++) {
+        int queryIndex = i;
+        int currentStartBlockNum = startBlockHeight + queryIndex * onceCount + 1;
+        Map currentMap = await scryXNetUtil.loadChainBlockHash(currentStartBlockNum);
+        if (currentMap == null || !currentMap.containsKey("result")) {
+          return;
+        }
+        String currentBlockHash = currentMap["result"].toString();
+        int endBlockHeight = queryIndex == (queryCount - 1) ? latestBlockHeight : ((queryIndex + 1) * onceCount + startBlockHeight);
+        Map endBlockMap = await scryXNetUtil.loadChainBlockHash(endBlockHeight);
+        if (endBlockMap == null || !endBlockMap.containsKey("result")) {
+          return;
+        }
+        String endBlockHash = endBlockMap["result"].toString();
+        Map queryStorageMap = await scryXNetUtil.loadQueryStorage([eeeStorageKey, tokenXStorageKey], currentBlockHash, endBlockHash);
+        if (queryStorageMap == null || !endBlockMap.containsKey("result")) {
+          return;
+        }
+        List storageChanges = queryStorageMap["result"];
+        print("storageChanges is ===>" + storageChanges.toString());
+        if (storageChanges == null || storageChanges.length < 1) {
+          return;
+        }
+        storageChanges.forEach((element) async {
+          if (element == null || !element.containsKey("block")) {
+            return;
+          }
+          String blockHash = element["block"];
+          Map loadBlockMap = await scryXNetUtil.loadBlock(blockHash);
+          if (loadBlockMap == null || !loadBlockMap.containsKey("result")) {
+            return;
+          }
+          print("scryXNetUtil loadBlockMap is ======>" + loadBlockMap.toString());
+          Map blockResultMap = loadBlockMap["result"];
+          if (blockResultMap == null || !blockResultMap.containsKey("block")) {
+            return;
+          }
+          Map extrinsicResultMap = blockResultMap["block"]; // check maybe be null
+          if (extrinsicResultMap == null || !extrinsicResultMap.containsKey("extrinsics")) {
+            return;
+          }
+          List extrinsicList = extrinsicResultMap["extrinsics"];
+          if (extrinsicList == null || extrinsicList.length <= 1) {
+            return;
+          }
+          String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
+          Map loadStorageMap = await scryXNetUtil.loadStateStorage(eventKeyPrefix, element["block"]);
+          if (loadStorageMap == null || !loadStorageMap.containsKey("result")) {
+            return; //todo 停止整个同步记录流程
+          }
+          String extrinsicJson = convert.jsonEncode(extrinsicList);
+          print("scryXNetUtil extrinsicJson is ======>" + extrinsicJson);
+          Map saveEeeMap = await Wallets.instance
+              .saveEeeExtrinsicDetail(Wallets.instance.nowWallet.nowChain.chainAddress, loadStorageMap["result"], element["block"], extrinsicJson);
+          print("saveEeeMap is ===>" + saveEeeMap.toString() + "|| block is ===>" + element["block"] + "||extrinsicJson===>" + extrinsicJson);
+          if (!_isMapStatusOk(saveEeeMap)) {
+            //todo 停止整个同步记录流程
+          }
+        });
+        print("updateEeeSyncRecord ===> endBlockHeight is ===>" + endBlockHeight.toString());
+        Map updateEeeMap = await Wallets.instance.updateEeeSyncRecord(Wallets.instance.nowWallet.nowChain.chainAddress,
+            Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), endBlockHeight, endBlockHash);
+        print("updateEeeMap is ===>" + updateEeeMap.toString() + "|| endBlockHeight.toString()" + endBlockHeight.toString());
+        if (!_isMapStatusOk(updateEeeMap)) {
+          //todo 停止整个同步记录流程
+        }
+      }
     }
-    print("getData() ethTxListModel=====================>" + ethTxListModel.length.toString());
-    setState(() {
-      this.ethTxListModel = ethTxListModel;
-    });
-    return ethTxListModel;
+  }
+
+  bool _isMapStatusOk(Map returnMap) {
+    if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
+      return false;
+    }
+    return true;
   }
 
   @override
   void deactivate() {
     super.deactivate();
-    Provider.of<TransactionProvide>(context).emptyDataRecord();
   }
 }

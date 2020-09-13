@@ -215,6 +215,24 @@ public class NativeLib {
         public List<EthToken> ethTokens;
     }
 
+    public static class EeeChainTxListHistory {
+        public int status;//Dynamic library call result
+        public String message;      //Error message, detailed description
+        public List<EeeChainTxDetail> eeeChainTxDetail;
+    }
+
+    public static class EeeChainTxDetail{
+        public String blockHash;
+        public String from;
+        public String to;
+        public String value;
+        public String inputMsg;
+        public String gasFee;
+        public String signer;
+        public boolean isSuccess;
+        public String timestamp;
+    }
+
     /**
      * Initialize wallet data file, load basic data
      *
@@ -418,6 +436,7 @@ public class NativeLib {
 
     public static native Message tokenXTransfer(String from, String to, String value, String extData, String genesisHash, int index, int runtime_version,int tx_version, byte[] pwd);
 
+    public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
 
     // Only do information signature, tool function
     public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
@@ -470,6 +489,8 @@ public class NativeLib {
      * @return
      */
     public static native SyncStatus getEeeSyncRecord();
+
+    public static native EeeChainTxListHistory loadEeeChainTxListHistory(String account,String tokenName,int startIndex,int offset);
 
     /*------------------------------------------Transaction related------------------------------------------*/
 

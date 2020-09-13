@@ -2,17 +2,17 @@ package info.scry.wallet_manager;
 
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.*;
+
 
 public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
       // System.out.println(NativeLib.initWalletBasicData());
-       updateDefaultDigitTest();
+       //updateDefaultDigitTest();
        //walletGenerateTest();
        //  walletExportTest();
       //  eeeTransferTest();
@@ -23,20 +23,20 @@ public class NativeLibTest {
         //  addDigitTest();
         //delWalletTest();
        // storage_query_test();
+        getEeeTxRecordTest();
         //contract_deploy_test();
         //  walletSaveTest();
         //  updateBalance();
         // System.out.println(NativeLib.deleteWallet("74e1bce2-721f-4e1e-b339-3f4adff2bb90","123456".getBytes()));
         //eeeAccountInfoKeyTest();
-        List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
+      /*  List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
         System.out.println("wallet length is:"+wallets.size());
         // contract_test(wallets);
       for (NativeLib.Wallet wallet : wallets) {
             System.out.println("***********************");
             System.out.println(wallet);
-        }
+        }*/
     }
-
 
     public static void updateDefaultDigitTest() {
         String json = "[{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342 \",\"shortName\":\"DDD \",\"fullName\":\"DDD \",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg \":\"locale: //ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"},{\"contractAddress\":\"\",\"shortName\":\"TokenX\",\"fullName\":\"TokenX\",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"kim-TokenX\",\"decimal\":\"15\",\"chainType\":\"EEE\"}]";
@@ -156,12 +156,16 @@ public class NativeLibTest {
         System.out.println(NativeLib.getEeeSyncRecord());
     }
 
+    public static void getEeeTxRecordTest(){
+        System.out.println(NativeLib.loadEeeChainTxListHistory("5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC","EEE",0,30));
+    }
     public static void storage_query_test() throws Throwable {
         Map header = new HashMap<String, String>();
         //Notification Event Coding Constant
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
-        String account_1 = "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H";
+      //  String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        String account_1 = "5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type", "application/json");
@@ -177,8 +181,9 @@ public class NativeLibTest {
 
         int startBlockNumber = accountRecord == null ? 0 : accountRecord.blockNum;
 
-        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
-        NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
+        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0x766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d");
+        NativeLib.Message key2 = NativeLib.eeeStorageKey("Tokenx","Balances","0x766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d");
+        //NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
         // System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
         //每Query block interval
         int queryNumberInterval = 3000;
@@ -200,7 +205,7 @@ public class NativeLibTest {
             //Get the block hash of the current query storage status
             endBlockHash = client.invoke("chain_getBlockHash", new Object[]{endBlockNumber}, String.class);
             //Query the history of account status changes within the changed block
-            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
+            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo,key2.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
             System.out.println("*********************StorageChange start**************");
             System.out.println(storage.toString());
             System.out.println("*********************StorageChange end**************");
@@ -216,14 +221,17 @@ public class NativeLibTest {
                 }
                 String extrinsicsDetail = new JSONArray(tx_list).toString();
                 System.out.println("block_detal:" + extrinsicsDetail);
+
                 //JSONArray
                 String event_detal = client.invoke("state_getStorage", new Object[]{eventKeyPrefix, item.block}, String.class);
+
                 //Decode the obtained notification details and decode them. If there is a transfer transaction, store the transaction details in the database
                 NativeLib.Message msg = NativeLib.saveExtrinsicDetail(account_1, event_detal, item.block, extrinsicsDetail);
                 if (msg.status != 200) {
                     System.out.println(msg.message);
                 }
             }
+
             System.out.println("start update sync record,endBlockNumber is:" + endBlockNumber + ",endBlockHash is" + endBlockHash);
             //Update the number of currently queried blocks
             NativeLib.Message update_result = NativeLib.updateEeeSyncRecord(account_1, 5, endBlockNumber, endBlockHash);

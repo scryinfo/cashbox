@@ -1,13 +1,11 @@
-class EthTransactionModel {
+import 'package:app/model/tx_model/base_tx_model.dart';
+
+class EthTransactionModel extends BaseTxModel {
   String _blockNumber;
-  String _timeStamp;
   String _hash;
   String _nonce;
   String _blockHash;
   String _transactionIndex;
-  String _from;
-  String _to;
-  String _value;
   String _gas;
   String _gasPrice;
   String _isError;
@@ -27,8 +25,6 @@ class EthTransactionModel {
   setBlockNumber(String value) {
     this.blockNumber = value;
   }
-
-  String get timeStamp => _timeStamp;
 
   String get confirmations => _confirmations;
 
@@ -84,24 +80,6 @@ class EthTransactionModel {
     _gas = value;
   }
 
-  String get value => _value;
-
-  set value(String value) {
-    _value = value;
-  }
-
-  String get to => _to;
-
-  set to(String value) {
-    _to = value;
-  }
-
-  String get from => _from;
-
-  set from(String value) {
-    _from = value;
-  }
-
   String get transactionIndex => _transactionIndex;
 
   set transactionIndex(String value) {
@@ -124,9 +102,5 @@ class EthTransactionModel {
 
   set hash(String value) {
     _hash = value;
-  }
-
-  set timeStamp(String value) {
-    _timeStamp = value;
   }
 }

@@ -145,7 +145,19 @@ class _DigitListPageState extends State<DigitListPage> {
                 print("digit_list_page点击传值出现位置错误===>" + e.toString());
                 LogUtil.e("digit_list_page", e.toString());
               }
-              NavigatorUtils.push(context, Routes.transactionHistoryPage);
+              switch (Wallets.instance.nowWallet.nowChain.chainType) {
+                case ChainType.ETH:
+                case ChainType.ETH_TEST:
+                  NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);
+                  break;
+                case ChainType.EEE:
+                case ChainType.EEE_TEST:
+                  NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
+                  break;
+                default:
+                  print("未知链类型");
+                  break;
+              }
             },
             child: Row(
               children: <Widget>[

@@ -8,8 +8,12 @@ import 'package:app/page/digits_manage_page/search_digit_page.dart';
 import 'package:app/page/eee_page/eee_page.dart';
 import 'package:app/page/language_choose_page/language_choose_page.dart';
 import 'package:app/page/sign_tx_page/sign_tx_page.dart';
+import 'package:app/page/transaction_detail_page/eee_transaction_detail_page.dart';
+import 'package:app/page/transaction_detail_page/eth_transaction_detail_page.dart';
 import 'package:app/page/transfer_btc_page/transfer_btc_page.dart';
 import 'package:app/page/transfer_eee_page/transfer_eee_page.dart';
+import 'package:app/page/tx_list_history_page/eee_chain_txs_history_page.dart';
+import 'package:app/page/tx_list_history_page/eth_chain_txs_history_page.dart';
 import 'package:app/page/user_protocol/privacy_statements_page.dart';
 import 'package:app/page/user_protocol/service_agreement_page.dart';
 import 'package:flutter/material.dart';
@@ -29,8 +33,6 @@ import '../page/wallet_manager_list_page/wallet_manager_list_page.dart';
 import '../page/wallet_manager_page/wallet_manage_page.dart';
 import '../page/reset_pwd_page/reset_pwd_page.dart';
 import '../page/recover_wallet_page/recover_wallet_page.dart';
-import '../page/transaction_history_page/transaction_history_page.dart';
-import 'package:app/page/transaction_detail_page/eth_transactin_detail_page.dart';
 import '../page/about_us_page/about_us_page.dart';
 import 'package:app/page/dapp_page/dapp_page.dart';
 import 'package:app/page/create_test_wallet_page/create_test_wallet_page.dart';
@@ -150,11 +152,19 @@ Handler serviceAgreementHandler = Handler(handlerFunc: (BuildContext context, Ma
   return ServiceAgreementPage();
 });
 
-Handler transactionHistoryHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return TransactionHistoryPage();
+Handler ethChainTxHistoryHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return EthChainTxsHistoryPage();
 });
 
-Handler transactionEeeDetailHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler eeeChainTxHistoryHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return EeeChainTxsHistoryPage();
+});
+
+Handler ethTransactionDetailHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return EthTransactionDetailPage();
+});
+
+Handler eeeTransactionDetailHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return EeeTransactionDetailPage();
 });
 

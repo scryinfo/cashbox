@@ -217,7 +217,19 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                         ..setChainType(Wallets.instance.nowWallet.nowChain.chainType)
                         ..setContractAddress(displayDigitsList[index].contractAddress);
                     }
-                    NavigatorUtils.push(context, Routes.transactionHistoryPage);
+                    switch (Wallets.instance.nowWallet.nowChain.chainType) {
+                      case ChainType.ETH:
+                      case ChainType.ETH_TEST:
+                        NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);
+                        break;
+                      case ChainType.EEE:
+                      case ChainType.EEE_TEST:
+                        NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
+                        break;
+                      default:
+                        print("未知链类型");
+                        break;
+                    }
                     return;
                   } else {
                     bool isDigitExist = false;

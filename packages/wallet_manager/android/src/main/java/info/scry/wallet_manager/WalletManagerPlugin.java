@@ -493,14 +493,14 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-            /*case "tokenXTransfer": { //todo change parameter
+            case "tokenXTransfer": { //todo change parameter
                 ScryWalletLog.d("nativeLib=>", "eeeEnergyTransfer =>");
                 Message message = new Message();
                 try {
                     message = NativeLib.tokenXTransfer((String) (call.argument("from")),
-                            (byte[]) (call.argument("pwd")), (String) (call.argument("to")),
-                            (String) (call.argument("value")), (String) (call.argument("extendMsg"))
-                    );
+                            (String) (call.argument("to")), (String) (call.argument("value")), (String) (call.argument("extData")),
+                            (String) (call.argument("genesisHash")), (int) (call.argument("index")), (int) (call.argument("runtime_version")),
+                            (int) (call.argument("tx_version")), (byte[]) (call.argument("pwd")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "eeeEnergyTransfer exception is " + exception);
                 }
@@ -512,8 +512,43 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 resultMap.put("signedInfo", message.signedInfo);
                 result.success(resultMap);
                 break;
-            }*/
-            /*case "eeeTxSign": {
+            }
+            case "loadEeeChainTxListHistory": {
+                ScryWalletLog.d("nativeLib=>", "loadEeeChainTxListHistory =>");
+                EeeChainTxListHistory eeeChainTxListHistory = new EeeChainTxListHistory();
+                try {
+                    eeeChainTxListHistory = NativeLib.loadEeeChainTxListHistory((String) (call.argument("account")),
+                            (String) (call.argument("tokenName")), (int) (call.argument("startIndex")), (int) (call.argument("offset")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "loadEeeChainTxListHistory exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", eeeChainTxListHistory.status);
+                List<Map<String, Object>> resultEeeChainTxList = new ArrayList<>();  ///返回数据，拼装List<Map>
+                if (eeeChainTxListHistory.status == 200) {
+                    for (int i = 0; i < eeeChainTxListHistory.eeeChainTxDetail.size(); i++) {
+                        Map<String, Object> detailMap = new HashMap<>();
+                        detailMap.put("blockHash", eeeChainTxListHistory.eeeChainTxDetail.get(i).blockHash);
+                        detailMap.put("from", eeeChainTxListHistory.eeeChainTxDetail.get(i).from);
+                        detailMap.put("to", eeeChainTxListHistory.eeeChainTxDetail.get(i).to);
+                        detailMap.put("value", eeeChainTxListHistory.eeeChainTxDetail.get(i).value);
+                        detailMap.put("inputMsg", eeeChainTxListHistory.eeeChainTxDetail.get(i).inputMsg);
+                        detailMap.put("gasFee", eeeChainTxListHistory.eeeChainTxDetail.get(i).gasFee);
+                        detailMap.put("signer", eeeChainTxListHistory.eeeChainTxDetail.get(i).signer);
+                        detailMap.put("isSuccess", eeeChainTxListHistory.eeeChainTxDetail.get(i).isSuccess);
+                        detailMap.put("timestamp", eeeChainTxListHistory.eeeChainTxDetail.get(i).timestamp);
+                        resultEeeChainTxList.add(detailMap);
+                    }
+                    resultMap.put("eeeChainTxDetail", resultEeeChainTxList);
+                } else {
+                    resultMap.put("message", eeeChainTxListHistory.message);
+                    ScryWalletLog.d("nativeLib=>", "eeeChainTxListHistory.status is " + eeeChainTxListHistory.status +
+                            "||eeeChainTxListHistory.message is " + eeeChainTxListHistory.message.toString());
+                }
+                result.success(resultMap);
+                break;
+            }
+            case "eeeTxSign": {
                 ScryWalletLog.d("nativeLib=>", "eeeTxSign is enter =>");
                 Message message = new Message();
                 ScryWalletLog.d("nativeLib=>",
@@ -538,7 +573,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 result.success(resultMap);
                 break;
-            }*/
+            }
             case "ethTxSign": {
                 ScryWalletLog.d("nativeLib=>", "ethTxSign is enter =>");
                 Message message = new Message();
@@ -748,7 +783,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-            case "eeeAccountInfoKey": {
+            /*case "eeeAccountInfoKey": {
                 ScryWalletLog.d("nativeLib=>", "eeeAccountInfoKey is enter =>");
                 Message message = new Message();
                 ScryWalletLog.d("nativeLib=>", (String) (call.argument("address")));
@@ -759,17 +794,17 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
-                /*if (message.status == 200) {
+                *//*if (message.status == 200) {
                     resultMap.put("accountKeyInfo", message.accountKeyInfo);
                     ScryWalletLog.d("nativeLib=>",
                             "message.accountKeyInfo is " + message.accountKeyInfo.toString());
                 } else {
                     resultMap.put("message", message.message);
                     ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
-                }*/
+                }*//*
                 result.success(resultMap);
                 break;
-            }
+            }*/
             case "decodeAccountInfo": {
                 ScryWalletLog.d("nativeLib=>", "decodeAccountInfo is enter =>");
                 Message message = new Message();
@@ -800,9 +835,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "eeeStorageKey": {
                 ScryWalletLog.d("nativeLib=>", "eeeStorageKey is enter =>");
                 Message message = new Message();
-                ScryWalletLog.d("nativeLib module =>", (String) (call.argument("module")));
-                ScryWalletLog.d("nativeLib storageItem =>", (String) (call.argument("storageItem")));
-                ScryWalletLog.d("nativeLib pubKey =>", (String) (call.argument("pubKey")));
+                //ScryWalletLog.d("nativeLib module =>", (String) (call.argument("module")));
+                //ScryWalletLog.d("nativeLib storageItem =>", (String) (call.argument("storageItem")));
+                //ScryWalletLog.d("nativeLib pubKey =>", (String) (call.argument("pubKey")));
                 try {
                     message = NativeLib.eeeStorageKey((String) (call.argument("module")), (String) (call.argument("storageItem")), (String) (call.argument("pubKey")));
                 } catch (Exception exception) {
@@ -827,12 +862,12 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "getEeeSyncRecord exception is " + exception);
                 }
-                ScryWalletLog.d("nativeLib=>", "syncStatus.status is " + syncStatus.status);
+                //ScryWalletLog.d("nativeLib=>", "syncStatus.status is " + syncStatus.status);
                 Map resultMap = new HashMap();
                 resultMap.put("status", syncStatus.status);
                 if (syncStatus.status == 200) {
                     Map<String, AccountRecord> recordsMap = syncStatus.records;
-                    ScryWalletLog.d("nativeLib=>", "recordsMap is " + recordsMap);
+                    //ScryWalletLog.d("nativeLib=>", "recordsMap is " + recordsMap);
                     if (recordsMap == null || recordsMap.size() == 0) {
                         resultMap.put("records", null);
                     } else {
@@ -857,39 +892,15 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 break;
             }
 
-            case "tokenXTransfer": {
-               /* ScryWalletLog.d("nativeLib=>", "tokenXTransfer is enter =>");
-                Message message = new Message();
-                ScryWalletLog.d("nativeLib from =>", (String) (call.argument("from")));
-                ScryWalletLog.d("nativeLib to =>", (String) (call.argument("to")));
-                ScryWalletLog.d("nativeLib value =>", (String) (call.argument("value")));
-                try {
-                    message = NativeLib.tokenXTransfer((String) (call.argument("from")), (String) (call.argument("to")), (String) (call.argument("value")), (String) (call.argument("extData")),
-                            (String) (call.argument("genesisHash")), (String) (call.argument("index")), (String) (call.argument("runtime_version")), (String) (call.argument("tx_version")),
-                            (byte[]) (call.argument("pwd")));
-                } catch (Exception exception) {
-                    ScryWalletLog.d("nativeLib=>", "tokenXTransfer exception is " + exception);
-                }
-                Map resultMap = new HashMap();
-                resultMap.put("status", message.status);
-                if (message.status == 200) {
-                    resultMap.put("storageKeyInfo", message.storageKeyInfo);
-                } else {
-                    resultMap.put("message", message.message);
-                    ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
-                }
-                result.success(resultMap);*/
-                break;
-            }
 
             case "updateEeeSyncRecord": {
-                ScryWalletLog.d("nativeLib=>", "updateEeeSyncRecord is enter =>");
+                //ScryWalletLog.d("nativeLib=>", "updateEeeSyncRecord is enter =>");
                 Message message = new Message();
-                ScryWalletLog.d("nativeLib=>", "updateEeeSyncRecord is enter =>");
-                ScryWalletLog.d("nativeLib account   =>", (String) (call.argument("account")));
-                ScryWalletLog.d("nativeLib chain_type=>", (int) (call.argument("chain_type")));
-                ScryWalletLog.d("nativeLib block_num =>", (int) (call.argument("block_num")));
-                ScryWalletLog.d("nativeLib block_hash=>", (String) (call.argument("block_hash")));
+                //ScryWalletLog.d("nativeLib=>", "updateEeeSyncRecord is enter =>");
+                //ScryWalletLog.d("nativeLib account   =>", (String) (call.argument("account")));
+                //ScryWalletLog.d("nativeLib chain_type=>", (int) (call.argument("chain_type")));
+                //ScryWalletLog.d("nativeLib block_num =>", (int) (call.argument("block_num")));
+                //ScryWalletLog.d("nativeLib block_hash=>", (String) (call.argument("block_hash")));
                 try {
                     message = NativeLib.updateEeeSyncRecord((String) (call.argument("account")),
                             (int) (call.argument("chain_type")), (int) (call.argument("block_num")),
@@ -897,7 +908,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "updateEeeSyncRecord exception is " + exception);
                 }
-                ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
+                //ScryWalletLog.d("nativeLib=>", "updateEeeSyncRecord message.status is " + message.status);
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 resultMap.put("message", message.message);

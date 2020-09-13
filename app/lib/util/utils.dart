@@ -58,6 +58,25 @@ class Utils {
     return val;
   }
 
+  static String reverseHexValue2SmallEnd(String originValue) {
+    String resultString = "0";
+    if (originValue == null || originValue.trim() == "") {
+      return resultString;
+    }
+    if (originValue.toLowerCase().startsWith("0x")) {
+      String formatString = originValue.substring(2);
+      String tempString = formatString;
+      for (int i = 0; i < formatString.length / 2; i = i + 2) {
+        String rightPartial = tempString.substring(tempString.length - i - 2, tempString.length - i);
+        String leftPartial = tempString.substring(i, i + 2);
+        tempString = tempString.replaceRange(i, i + 2, rightPartial);
+        tempString = tempString.replaceRange(tempString.length - i - 2, tempString.length - i, leftPartial);
+      }
+      resultString = tempString;
+    }
+    return resultString;
+  }
+
   //Exponential method math.pow(x,y)
   static BigInt mathPow(int x, int y) {
     BigInt result = BigInt.from(1);

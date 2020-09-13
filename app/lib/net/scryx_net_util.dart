@@ -5,28 +5,9 @@ import 'package:app/util/sharedpreference_util.dart';
 import 'net_util.dart';
 
 class ScryXNetUtil {
-  //todo deprecated
-  Future<Map> loadEeeAccountInfo(ChainType eeeChainType) async {
-    Map eeeResultMap;
-    Map<dynamic, dynamic> eeeAccountKeyMap =
-        await Wallets.instance.eeeAccountInfoKey(Wallets.instance.nowWallet.getChainByChainType(eeeChainType).chainAddress);
-    if (eeeAccountKeyMap != null && eeeAccountKeyMap.containsKey("status")) {
-      if (eeeAccountKeyMap["status"] != null && eeeAccountKeyMap["status"] == 200) {
-        String formattedKeyInfo = eeeAccountKeyMap["accountKeyInfo"];
-        print("eeeAccountKeyMap is ===>" + eeeAccountKeyMap.toString());
-        print("formattedKeyInfo is ===>" + formattedKeyInfo);
-        Map netFormatMap = await _loadScryXStorage(formattedKeyInfo);
-        if (netFormatMap != null && netFormatMap.containsKey("result")) {
-          eeeResultMap = await Wallets.instance.decodeEeeAccountInfo(netFormatMap["result"]);
-        }
-      }
-    }
-    return eeeResultMap;
-  }
-
   Future<int> loadEeeChainNonce(String module, String storageItem, String pubKey) async {
     int eeeNonce = 0;
-    Map eeeResultMap = await loadEeeStorageKey(module, storageItem, pubKey);
+    Map eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
     if (eeeResultMap != null && eeeResultMap.containsKey("nonce")) {
       return eeeResultMap["nonce"];
     }
@@ -35,29 +16,48 @@ class ScryXNetUtil {
 
   Future<String> loadEeeBalance(String module, String storageItem, String pubKey) async {
     String eeeBalance = "0";
-    Map eeeResultMap = await loadEeeStorageKey(module, storageItem, pubKey);
+    Map eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
     if (eeeResultMap != null && eeeResultMap.containsKey("free")) {
       return eeeResultMap["free"];
     }
     return eeeBalance;
   }
 
-  Future<Map> loadEeeStorageKey(String module, String storageItem, String pubKey) async {
+  Future<Map> loadEeeStorageMap(String module, String storageItem, String pubKey) async {
     Map eeeResultMap;
-    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(module, storageItem, pubKey);
-    if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
-      if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200) {
-        String storageKeyInfo = eeeStorageKeyMap["storageKeyInfo"];
-        print("eeeAccountKeyMap is ===>" + eeeStorageKeyMap.toString());
-        print("storageKeyInfo is ===>" + storageKeyInfo);
-        Map netFormatMap = await _loadScryXStorage(storageKeyInfo);
-        print("netFormatMap is ===>" + netFormatMap.toString());
-        if (netFormatMap != null && netFormatMap.containsKey("result")) {
-          eeeResultMap = await Wallets.instance.decodeEeeAccountInfo(netFormatMap["result"]);
-        }
+    String storageKey = await loadEeeStorageKey(module, storageItem, pubKey);
+    if (storageKey != null && storageKey.trim() != "") {
+      Map netFormatMap = await _loadScryXStorage(storageKey);
+      if (netFormatMap != null && netFormatMap.containsKey("result")) {
+        eeeResultMap = await Wallets.instance.decodeEeeAccountInfo(netFormatMap["result"]);
       }
     }
     return eeeResultMap;
+  }
+
+  Future<String> loadEeeStorageKey(String module, String storageItem, String pubKey) async {
+    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(module, storageItem, pubKey);
+    if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
+      if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
+        return eeeStorageKeyMap["storageKeyInfo"];
+      }
+    }
+    return null;
+  }
+
+  Future<Map> loadTokenXbalance(String tokenx, String balances, String pubKey) async {
+    Map tokenXResultMap;
+    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(tokenx, balances, pubKey);
+    if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
+      if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
+        String storageKeyInfo = eeeStorageKeyMap["storageKeyInfo"];
+        Map netFormatMap = await _loadScryXStorage(storageKeyInfo);
+        if (netFormatMap != null && netFormatMap.containsKey("result")) {
+          return netFormatMap;
+        }
+      }
+    }
+    return tokenXResultMap;
   }
 
   Future<Map> _loadScryXStorage(formattedAddress) async {
@@ -131,10 +131,8 @@ class ScryXNetUtil {
     var paramObj = {"method": "chain_getHeader", "params": [], "id": 1, "jsonrpc": "2.0"};
     try {
       resultMap = await request(netUrl, formData: paramObj);
-      print("loadChainHeader resultMap is ===>" + resultMap.toString());
       return resultMap;
     } catch (e) {
-      print("loadChainHeader error is ===>" + e.toString());
       return null;
     }
   }
@@ -154,15 +152,13 @@ class ScryXNetUtil {
     };
     try {
       resultMap = await request(netUrl, formData: paramObj);
-      print("loadBlockHash resultMap is ===>" + resultMap.toString());
       return resultMap;
     } catch (e) {
-      print("loadBlockHash error is ===>" + e.toString());
       return null;
     }
   }
 
-  Future<Map> loadQueryStorage(String accountKeyInfo, String startBlockHash, String endBlockHash) async {
+  Future<Map> loadQueryStorage(List<String> accountKeyInfo, String startBlockHash, String endBlockHash) async {
     Map resultMap = new Map();
     var spUtil = await SharedPreferenceUtil.instance;
     var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
@@ -171,20 +167,14 @@ class ScryXNetUtil {
     }
     var paramObj = {
       "method": "state_queryStorage",
-      "params": [
-        [accountKeyInfo],
-        startBlockHash,
-        endBlockHash
-      ],
+      "params": [accountKeyInfo, startBlockHash, endBlockHash],
       "id": 1,
       "jsonrpc": "2.0"
     };
     try {
       resultMap = await request(netUrl, formData: paramObj);
-      print("loadQueryStorage resultMap is ===>" + resultMap.toString());
       return resultMap;
     } catch (e) {
-      print("loadQueryStorage error is ===>" + e.toString());
       return null;
     }
   }
@@ -204,10 +194,8 @@ class ScryXNetUtil {
     };
     try {
       resultMap = await request(netUrl, formData: paramObj);
-      print("loadBlocks resultMap is ===>" + resultMap.toString());
       return resultMap;
     } catch (e) {
-      print("loadBlocks error is ===>" + e.toString());
       return null;
     }
   }
@@ -227,10 +215,8 @@ class ScryXNetUtil {
     };
     try {
       resultMap = await request(netUrl, formData: paramObj);
-      print("loadBlocks resultMap is ===>" + resultMap.toString());
       return resultMap;
     } catch (e) {
-      print("loadBlocks error is ===>" + e.toString());
       return null;
     }
   }
