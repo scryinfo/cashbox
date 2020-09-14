@@ -32,10 +32,11 @@ class _TransferEeePageState extends State<TransferEeePage> {
   var chainAddress = "";
   int runtimeVersion;
   int txVersion;
-  String digitBalance;
+  String digitBalance = "0";
   int nonce;
   String genesisHash;
   String digitName;
+  bool isShowTxInput = false;
 
   @override
   void initState() {
@@ -63,14 +64,29 @@ class _TransferEeePageState extends State<TransferEeePage> {
       return;
     }
     nonce = eeeStorageKeyMap["nonce"];
-    digitBalance = eeeStorageKeyMap["free"] ?? "";
-    print("digitName is ===>" + digitName + "|| eeeStorageKeyMap is ===>" + eeeStorageKeyMap.toString());
+    try {
+      String eeeFree = eeeStorageKeyMap["free"] ?? "0";
+      double eeeFreeBalance = BigInt.parse(eeeFree) / BigInt.from(Eee_Unit);
+      digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
+    } catch (e) {
+      digitBalance = "0";
+      print("error(),convert EEE balance error is ====>" + e);
+    }
     if (digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
+      isShowTxInput = true;
+      setState(() {
+        this.isShowTxInput = true;
+      });
       Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
-        digitBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
+        try {
+          double eeeFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / BigInt.from(Eee_Unit);
+          digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
+        } catch (e) {
+          digitBalance = "0";
+          print("error(),convert token balance error is ====>" + e);
+        }
       }
-      print("digitName is ===>" + digitName + "|| eeeStorageKeyMap is ===>" + eeeStorageKeyMap.toString());
     }
     Map blockHashMap = await scryXNetUtil.loadScryXBlockHash();
     if (blockHashMap == null || !blockHashMap.containsKey("result")) {
@@ -127,6 +143,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
             _buildToAddressWidget(),
             Gaps.scaleVGap(5),
             _buildValueWidget(),
+            Gaps.scaleVGap(5),
+            isShowTxInput ? _buildBackupMsgWidget() : Text(""),
             Gaps.scaleVGap(15),
             _buildTransferBtnWidget(),
           ],
@@ -280,10 +298,65 @@ class _TransferEeePageState extends State<TransferEeePage> {
     );
   }
 
+  Widget _buildBackupMsgWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              translate('extend_msg'),
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil.instance.setSp(3),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(2),
+          Container(
+            height: ScreenUtil().setHeight(13),
+            alignment: Alignment.center,
+            child: TextField(
+              textAlign: TextAlign.start,
+              style: TextStyle(color: Colors.white),
+              autofocus: false,
+              decoration: InputDecoration(
+                fillColor: Color.fromRGBO(101, 98, 98, 0.50),
+                filled: true,
+                contentPadding:
+                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil.instance.setHeight(3.5)),
+                labelStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: ScreenUtil.instance.setSp(3),
+                ),
+                hintText: translate('hint_extend_msg_option'),
+                hintStyle: TextStyle(
+                  color: Color.fromRGBO(255, 255, 255, 0.7),
+                  fontSize: ScreenUtil.instance.setSp(3),
+                ),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black87),
+                  borderRadius: BorderRadius.circular(
+                    ScreenUtil().setWidth(1.0),
+                  ),
+                ),
+              ),
+              controller: _backupMsgController,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTransferBtnWidget() {
     return GestureDetector(
       onTap: () async {
         showProgressDialog(context, translate("check_data_format"));
+        if (!_verifyDataFormat()) {
+          NavigatorUtils.goBack(context);
+          return;
+        }
         NavigatorUtils.goBack(context);
         _showPwdDialog(context);
       },
@@ -304,6 +377,27 @@ class _TransferEeePageState extends State<TransferEeePage> {
         ),
       ),
     );
+  }
+
+  bool _verifyDataFormat() {
+    if (_toAddressController.text.trim() == "") {
+      Fluttertoast.showToast(msg: translate('to_address_null').toString(), timeInSecForIos: 3);
+      return false;
+    }
+    if (_txValueController.text.trim() == "") {
+      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), timeInSecForIos: 3);
+      return false;
+    }
+    try {
+      if (digitBalance == null || double.parse(_txValueController.text) > double.parse(digitBalance)) {
+        Fluttertoast.showToast(msg: translate('balance_is_less'));
+        return false;
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: translate('balance_is_less'));
+      return false;
+    }
+    return true;
   }
 
   void _showPwdDialog(BuildContext context) {
@@ -332,7 +426,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                   Wallets.instance.nowWallet.nowChain.chainAddress,
                   _toAddressController.text.toString(),
                   _txValueController.text.toString(),
-                  "0x11236542", // todo remove test code
+                  Utils.uint8ListToHex(Uint8List.fromList(_txValueController.text.codeUnits)),
                   genesisHash,
                   nonce,
                   runtimeVersion,
