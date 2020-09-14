@@ -494,8 +494,15 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 break;
             }
             case "tokenXTransfer": { //todo change parameter
-                ScryWalletLog.d("nativeLib=>", "eeeEnergyTransfer =>");
+                ScryWalletLog.d("nativeLib=>", "tokenXTransfer =>");
                 Message message = new Message();
+                ScryWalletLog.d("nativeLib=>", "from==>" + (String) (call.argument("from")) + "||to" + (String) (call.argument("to")) + "||value" + call.argument("value"));
+                ScryWalletLog.d("nativeLib=>", "from==>" + "||extData" + call.argument("extData"));
+                ScryWalletLog.d("nativeLib=>", "from==>" + "||genesisHash=》" + call.argument("genesisHash"));
+                ScryWalletLog.d("nativeLib=>", "index==>" + (int) (call.argument("index")));
+                ScryWalletLog.d("nativeLib=>", "runtime_version==>" + (int) (call.argument("runtime_version")));
+                ScryWalletLog.d("nativeLib=>", "tx_version==>" + (int) (call.argument("tx_version")));
+
                 try {
                     message = NativeLib.tokenXTransfer((String) (call.argument("from")),
                             (String) (call.argument("to")), (String) (call.argument("value")), (String) (call.argument("extData")),
@@ -504,12 +511,16 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "eeeEnergyTransfer exception is " + exception);
                 }
-                ScryWalletLog.d("nativeLib=>", "message.status is " + message.status);
-                ScryWalletLog.d("nativeLib=>",
-                        "message.signedInfo is " + message.signedInfo.toString());
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
-                resultMap.put("signedInfo", message.signedInfo);
+                if (message.status == 200) {
+                    resultMap.put("signedInfo", message.signedInfo);
+                    ScryWalletLog.d("nativeLib=>",
+                            "message.signedInfo is " + message.signedInfo.toString());
+                } else {
+                    resultMap.put("message", message.message);
+                    ScryWalletLog.d("nativeLib=>", "message.status is " + message.status + "||message.message is " + message.message.toString());
+                }
                 result.success(resultMap);
                 break;
             }
@@ -783,28 +794,6 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-            /*case "eeeAccountInfoKey": {
-                ScryWalletLog.d("nativeLib=>", "eeeAccountInfoKey is enter =>");
-                Message message = new Message();
-                ScryWalletLog.d("nativeLib=>", (String) (call.argument("address")));
-                try {
-                    message = NativeLib.eeeAccountInfoKey((String) (call.argument("address")));
-                } catch (Exception exception) {
-                    ScryWalletLog.d("nativeLib=>", "eeeAccountInfoKey exception is " + exception);
-                }
-                Map resultMap = new HashMap();
-                resultMap.put("status", message.status);
-                *//*if (message.status == 200) {
-                    resultMap.put("accountKeyInfo", message.accountKeyInfo);
-                    ScryWalletLog.d("nativeLib=>",
-                            "message.accountKeyInfo is " + message.accountKeyInfo.toString());
-                } else {
-                    resultMap.put("message", message.message);
-                    ScryWalletLog.d("nativeLib=>", "message.message is " + message.message.toString());
-                }*//*
-                result.success(resultMap);
-                break;
-            }*/
             case "decodeAccountInfo": {
                 ScryWalletLog.d("nativeLib=>", "decodeAccountInfo is enter =>");
                 Message message = new Message();

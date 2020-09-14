@@ -221,7 +221,7 @@ public class NativeLib {
         public List<EeeChainTxDetail> eeeChainTxDetail;
     }
 
-    public static class EeeChainTxDetail{
+    public static class EeeChainTxDetail {
         public String blockHash;
         public String from;
         public String to;
@@ -245,7 +245,7 @@ public class NativeLib {
      *
      * @return// Whether update successful
      */
-    public static native WalletState updateWalletDbData(String oldVersion,String newVersion); // init Version 1.0
+    public static native WalletState updateWalletDbData(String oldVersion, String newVersion); // init Version 1.0
 
     // apiNo:WM01 fixed - fixed
     public static native WalletState isContainWallet();
@@ -392,7 +392,7 @@ public class NativeLib {
     public static class Message {
         public int status;                  //Communication message Status Code StatusCode 200 succeeded
         public String message;              //Detailed error information
-        public String signedInfo;           //Post-signature information
+        public String signedInfo;           //Post-signature information ||  use for---> tokenXTransfer()、eeeTransfer()
         public String energyTransferInfo;   //Turn energy result hash
         public String ethSignedInfo;        //Sign eth transaction information
         public String inputInfo;            //extra information
@@ -432,9 +432,10 @@ public class NativeLib {
     // The bottom layer directly constructs a signed transfer transaction, and returns the information that can be directly submitted to the chain through
     // the signedInfo attribute in the Message field.
     // Note: vaule uses the default unit in the transfer: unit, the precision is 10^12, that is, 1 unit =1000_000_000_000
-    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version,int tx_version, byte[] pwd);
+    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version, int tx_version, byte[] pwd);
 
-    public static native Message tokenXTransfer(String from, String to, String value, String extData, String genesisHash, int index, int runtime_version,int tx_version, byte[] pwd);
+    // extData: format-> hex string
+    public static native Message tokenXTransfer(String from, String to, String value, String extData, String genesisHash, int index, int runtime_version, int tx_version, byte[] pwd);
 
     public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
 
@@ -444,12 +445,13 @@ public class NativeLib {
 
     /**
      * get
+     *
      * @param module
      * @param storage_item
      * @param pub_key
      * @return
      */
-    public static native Message eeeStorageKey(String module,String storageItem,String pubKey);
+    public static native Message eeeStorageKey(String module, String storageItem, String pubKey);
 
     /**
      * Decode account information queried back from the chain
@@ -490,7 +492,7 @@ public class NativeLib {
      */
     public static native SyncStatus getEeeSyncRecord();
 
-    public static native EeeChainTxListHistory loadEeeChainTxListHistory(String account,String tokenName,int startIndex,int offset);
+    public static native EeeChainTxListHistory loadEeeChainTxListHistory(String account, String tokenName, int startIndex, int offset);
 
     /*------------------------------------------Transaction related------------------------------------------*/
 

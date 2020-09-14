@@ -48,7 +48,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   @override
   void initState() {
     super.initState();
-    //initTest();
+    //initTest();  // manual mock add tokenX
   }
 
   initTest() async {
@@ -447,9 +447,8 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     if (txHistoryMap == null || !txHistoryMap.containsKey("result")) {
       return;
     }
-    String eeeStorageKey = await scryXNetUtil.loadEeeStorageKey(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
-    String tokenXStorageKey = await scryXNetUtil.loadEeeStorageKey(EeeTokenX, EeeBalances, Wallets.instance.nowWallet.nowChain.pubKey);
-    print("eeeStorageKey======>" + eeeStorageKey.toString());
+    String eeeStorageKey = await scryXNetUtil.loadEeeStorageKey(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+    String tokenXStorageKey = await scryXNetUtil.loadEeeStorageKey(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
     if (eeeStorageKey == null || eeeStorageKey.trim() == "") {
       return;
     }

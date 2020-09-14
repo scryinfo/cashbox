@@ -189,20 +189,26 @@ class _EthPageState extends State<EthPage> {
         ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
         for (var i = 0; i < displayDigitsList.length; i++) {
           int index = i;
+          String balance = "0";
           if (this.displayDigitsList[index].shortName.toLowerCase() == "eee") {
-            Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
+            Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
             if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
-              Wallets.instance.nowWallet.nowChain.digitsList[index].balance = eeeStorageKeyMap["free"] ?? "";
-              this.displayDigitsList[index].balance = eeeStorageKeyMap["free"] ?? "0.0";
+              balance = eeeStorageKeyMap["free"] ?? "";
+              Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
+              this.displayDigitsList[index].balance = balance;
             }
           } else if (this.displayDigitsList[index].shortName.toLowerCase() == "tokenx") {
-            Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(EeeTokenX, EeeBalances, Wallets.instance.nowWallet.nowChain.pubKey);
+            Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
             if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
-              this.displayDigitsList[index].balance =
-                  BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
-              Wallets.instance.nowWallet.nowChain.digitsList[index].balance =
-                  BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
+              balance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
+              this.displayDigitsList[index].balance = balance ?? "";
+              Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
             }
+          }
+          if (mounted) {
+            setState(() {
+              this.displayDigitsList[index].balance = balance ?? "0";
+            });
           }
         }
         break;

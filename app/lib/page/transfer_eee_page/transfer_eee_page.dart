@@ -32,35 +32,46 @@ class _TransferEeePageState extends State<TransferEeePage> {
   var chainAddress = "";
   int runtimeVersion;
   int txVersion;
-  String eeeBalance;
+  String digitBalance;
   int nonce;
   String genesisHash;
+  String digitName;
 
   @override
   void initState() {
     super.initState();
-    initData();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    String digitName = Provider.of<TransactionProvide>(context).digitName;
+    digitName = Provider.of<TransactionProvide>(context).digitName;
     print("digitName is ===>" + digitName);
     String balance = Provider.of<TransactionProvide>(context).balance;
     print("balance is ===>" + balance);
+    initData();
   }
 
   initData() async {
     ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-    Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(EeeSystem, EeeAccount, Wallets.instance.nowWallet.nowChain.pubKey);
+    Map eeeStorageKeyMap;
+    if (digitName == null || digitName.trim() == "") {
+      return;
+    }
+    eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
     if (!_isMapStatusOk(eeeStorageKeyMap)) {
       return;
     }
-    eeeBalance = eeeStorageKeyMap["free"] ?? "";
     nonce = eeeStorageKeyMap["nonce"];
-
+    digitBalance = eeeStorageKeyMap["free"] ?? "";
+    print("digitName is ===>" + digitName + "|| eeeStorageKeyMap is ===>" + eeeStorageKeyMap.toString());
+    if (digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
+      Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+      if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
+        digitBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
+      }
+      print("digitName is ===>" + digitName + "|| eeeStorageKeyMap is ===>" + eeeStorageKeyMap.toString());
+    }
     Map blockHashMap = await scryXNetUtil.loadScryXBlockHash();
     if (blockHashMap == null || !blockHashMap.containsKey("result")) {
       return;
@@ -305,15 +316,29 @@ class _TransferEeePageState extends State<TransferEeePage> {
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
-            Map eeeTransferMap = await Wallets.instance.eeeTransfer(
-                Wallets.instance.nowWallet.nowChain.chainAddress,
-                _toAddressController.text.toString(),
-                _txValueController.text.toString(),
-                genesisHash,
-                nonce,
-                runtimeVersion,
-                txVersion,
-                Uint8List.fromList(pwd.codeUnits));
+            Map eeeTransferMap;
+            if (digitName != null && digitName.toLowerCase() == EeeSymbol.toLowerCase()) {
+              eeeTransferMap = await Wallets.instance.eeeTransfer(
+                  Wallets.instance.nowWallet.nowChain.chainAddress,
+                  _toAddressController.text.toString(),
+                  _txValueController.text.toString(),
+                  genesisHash,
+                  nonce,
+                  runtimeVersion,
+                  txVersion,
+                  Uint8List.fromList(pwd.codeUnits));
+            } else if (digitName != null && digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
+              eeeTransferMap = await Wallets.instance.tokenXTransfer(
+                  Wallets.instance.nowWallet.nowChain.chainAddress,
+                  _toAddressController.text.toString(),
+                  _txValueController.text.toString(),
+                  "0x11236542", // todo remove test code
+                  genesisHash,
+                  nonce,
+                  runtimeVersion,
+                  txVersion,
+                  Uint8List.fromList(pwd.codeUnits));
+            }
             if (eeeTransferMap == null || !eeeTransferMap.containsKey("status") || eeeTransferMap["status"] != 200) {
               print("error, eeeTransferMap appear error===~");
               NavigatorUtils.goBack(context);

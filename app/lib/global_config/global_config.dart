@@ -55,6 +55,7 @@ class GlobalConfig {
 }
 
 const Eth_Unit = 1000000000000000000; // 18 digits
+const Eee_Chain_Unit = 1000000000000000; // 15 digits
 
 const httpHeaders = {
   'Accept': 'application/json, text/plain, */*',

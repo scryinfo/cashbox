@@ -248,12 +248,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
             print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
             String walletId = await Wallets.instance.getNowWalletId();
             //todo to be tested
-            var eeeAccountMap = await Wallets.instance.eeeAccountInfoKey(chainAddress);
-            int status = eeeAccountMap["status"];
-            if (status == null || status != 200) {
-              print("net 获取eee参数失败 status" + eeeAccountMap["message"]);
-              return;
-            }
+
           },
         );
       },

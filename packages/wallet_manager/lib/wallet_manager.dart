@@ -220,6 +220,22 @@ class WalletManager {
     return eeeTxSignMap;
   }
 
+  static Future<Map<dynamic, dynamic>> tokenXTransfer(
+      String from, String to, String value, String extData, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
+    Map<dynamic, dynamic> tokenXTxSignMap = await _channel.invokeMethod("tokenXTransfer", {
+      "from": from,
+      "to": to,
+      "value": value,
+      "extData": extData,
+      "genesisHash": genesisHash,
+      "index": index,
+      "runtime_version": runtimeVersion,
+      "tx_version": txVersion,
+      "pwd": pwd
+    });
+    return tokenXTxSignMap;
+  }
+
   static decodeAdditionData(String input) async {
     Map<dynamic, dynamic> decodeMap = await _channel.invokeMethod("decodeAdditionData", {"input": input});
     return decodeMap;
@@ -227,11 +243,6 @@ class WalletManager {
 
   static updateDigitBalance(String address, String digitId, String balance) async {
     Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateDigitBalance", {"address": address, "digitId": digitId, "balance": balance});
-    return updateMap;
-  }
-
-  static eeeAccountInfoKey(String address) async {
-    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("eeeAccountInfoKey", {"address": address});
     return updateMap;
   }
 
