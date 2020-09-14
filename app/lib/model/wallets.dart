@@ -408,6 +408,16 @@ class Wallets {
     return eeeTxSignMap;
   }
 
+  Future<Map> tokenXTransfer(
+      String from, String to, String value, String extData, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
+    Map tokenXTxSignMap = await WalletManager.tokenXTransfer(from, to, value, extData, genesisHash, index, runtimeVersion, txVersion, pwd);
+    int status = tokenXTxSignMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + tokenXTxSignMap["message"]);
+    }
+    return tokenXTxSignMap;
+  }
+
   Future<Map> decodeAdditionData(String inputData) async {
     if (inputData == null || inputData.trim() == "") {
       return null;
@@ -453,15 +463,6 @@ class Wallets {
       LogUtil.e("eeeStorageMap=>", "error status code is" + status.toString() + "||message is=>" + eeeStorageMap["message"].toString());
     }
     return eeeStorageMap;
-  }
-
-  eeeAccountInfoKey(String address) async {
-    Map<dynamic, dynamic> eeeAccountInfoMap = await WalletManager.eeeAccountInfoKey(address);
-    int status = eeeAccountInfoMap["status"];
-    if (status == null || status != 200) {
-      LogUtil.e("decodeAccountInfo=>", "error status code is" + status.toString() + "||message is=>" + eeeAccountInfoMap["message"].toString());
-    }
-    return eeeAccountInfoMap;
   }
 
   //

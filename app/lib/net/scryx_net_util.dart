@@ -5,6 +5,29 @@ import 'package:app/util/sharedpreference_util.dart';
 import 'net_util.dart';
 
 class ScryXNetUtil {
+  //todo 待优化
+  Future<Map> loadEeeChainNonce_test(String fromAddress) async {
+    var spUtil = await SharedPreferenceUtil.instance;
+    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    Map resultMap = new Map();
+    if (netUrl == null || netUrl.isEmpty) {
+      return null;
+    }
+    var paramObj = {
+      "method": "system_accountNextIndex",
+      "params": [fromAddress],
+      "id": 21,
+      "jsonrpc": "2.0"
+    };
+    try {
+      resultMap = await request(netUrl, formData: paramObj);
+      return resultMap;
+    } catch (e) {
+      print("loadScryXStorage error is ===>" + e.toString());
+      return null;
+    }
+  }
+
   Future<int> loadEeeChainNonce(String module, String storageItem, String pubKey) async {
     int eeeNonce = 0;
     Map eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);

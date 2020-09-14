@@ -55,6 +55,15 @@ class GlobalConfig {
 }
 
 const Eth_Unit = 1000000000000000000; // 18 digits
+const Eee_Unit = 1000000000000000; // 15 digits
+
+const SystemSymbol = "System";
+const AccountSymbol = "Account";
+
+const TokenXSymbol = "Tokenx";
+const BalanceSymbol = "Balances";
+
+const EeeSymbol = "Eee";
 
 const httpHeaders = {
   'Accept': 'application/json, text/plain, */*',
