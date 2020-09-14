@@ -11,6 +11,7 @@ import 'package:app/page/sign_tx_page/sign_tx_page.dart';
 import 'package:app/page/transaction_detail_page/eee_transaction_detail_page.dart';
 import 'package:app/page/transaction_detail_page/eth_transaction_detail_page.dart';
 import 'package:app/page/transfer_btc_page/transfer_btc_page.dart';
+import 'package:app/page/transfer_confirm_page/eee_transfer_confirm_page.dart';
 import 'package:app/page/transfer_eee_page/transfer_eee_page.dart';
 import 'package:app/page/tx_list_history_page/eee_chain_txs_history_page.dart';
 import 'package:app/page/tx_list_history_page/eth_chain_txs_history_page.dart';
@@ -108,6 +109,14 @@ Handler transferEthPageHandler = Handler(handlerFunc: (BuildContext context, Map
 Handler transferEeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return TransferEeePage();
 });
+
+Handler transferEeeConfirmPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return EeeTransferConfirmPage();
+});
+
+
+
+
 Handler transferBtcPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return TransferBtcPage();
 });
