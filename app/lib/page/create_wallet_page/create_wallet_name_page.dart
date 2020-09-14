@@ -19,6 +19,7 @@ class CreateWalletNamePage extends StatefulWidget {
 
 class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
   bool _ethChainChoose = true;
+  bool _eeeChainChoose = true;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
@@ -291,6 +292,29 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 ),
               ],
             )),
+            Gaps.scaleHGap(5),
+            Container(
+                child: Row(
+                  children: <Widget>[
+                    Checkbox(
+                      value: _eeeChainChoose,
+                      onChanged: (newValue) {
+                        setState(
+                              () {
+                            _eeeChainChoose = newValue;
+                          },
+                        );
+                      },
+                    ),
+                    Text(
+                      translate('eee_token_name'),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                )),
           ],
         ),
       ],

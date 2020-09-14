@@ -25,6 +25,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   TextEditingController _pwdController = TextEditingController();
   TextEditingController _confirmPwdController = TextEditingController();
   bool _eeeChainChoose = true;
+  bool _ethChainChoose = true;
 
   @override
   void initState() {
@@ -353,6 +354,29 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                 child: Row(
               children: <Widget>[
                 Checkbox(
+                  value: _ethChainChoose,
+                  onChanged: (newValue) {
+                    setState(
+                      () {
+                        _ethChainChoose = newValue;
+                      },
+                    );
+                  },
+                ),
+                Text(
+                  translate('eth_token_name'),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            )),
+            Gaps.scaleHGap(5),
+            Container(
+                child: Row(
+              children: <Widget>[
+                Checkbox(
                   value: _eeeChainChoose,
                   onChanged: (newValue) {
                     setState(
@@ -363,7 +387,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   },
                 ),
                 Text(
-                  translate('eth_token_name'), //todo
+                  translate('eee_token_name'),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 13,
