@@ -223,6 +223,7 @@ public class NativeLib {
 
     public static class EeeChainTxDetail {
         public String blockHash;
+        public String txHash;
         public String from;
         public String to;
         public String value;
