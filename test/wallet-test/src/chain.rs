@@ -652,7 +652,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_loadEeeChainTxListHis
             for record in tx_records {
                 let tx_record_class_obj = env.alloc_object(tx_record_class).expect("alloc eth_token_class object");
                 //Set record property
-                println!("blockhash is:{}",record.block_hash);
+                env.set_field(tx_record_class_obj, "txHash", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(record.tx_hash).unwrap()))).expect("tx_record_class_obj set blockHash value");
                 env.set_field(tx_record_class_obj, "blockHash", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(record.block_hash).unwrap()))).expect("tx_record_class_obj set blockHash value");
                 let from = if let Some(from) = record.from{from}else { "".to_string() };
                 env.set_field(tx_record_class_obj, "from", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(from).unwrap()))).expect("tx_record_class_obj set from value");

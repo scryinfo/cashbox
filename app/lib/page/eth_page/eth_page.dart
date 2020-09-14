@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:app/global_config/global_config.dart';
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
@@ -51,8 +53,8 @@ class _EthPageState extends State<EthPage> {
   List<Chain> allVisibleChainsList = [];
   num chainIndex = 0; //Subscript of current chain
   Rate rateInstance;
-  bool isLoadingBalance = false; // is loading balance
-  bool isLoadingRate = false; // is loading rate
+  Timer _loadingBalanceTimerTask; // is loading balance
+  Timer _loadingRateTimerTask; // is loading balance
 
   @override
   void initState() {
@@ -120,120 +122,116 @@ class _EthPageState extends State<EthPage> {
 
   //Market price information (hourly changes, etc.)
   loadDigitRateInfo() async {
-    if (displayDigitsList.length == 0) {
+    if (displayDigitsList == null || displayDigitsList.length == 0) {
       return;
     }
-    if (!isLoadingRate) {
-      isLoadingBalance = true;
-      Future.delayed(Duration(seconds: 2), () async {
-        rateInstance = await loadRateInstance();
-        if (rateInstance == null) {
-          return;
-        }
-        if (true) {
-          List<String> rateKeys = rateInstance.digitRateMap.keys.toList();
-          for (var i = 0; i < displayDigitsList.length; i++) {
-            int index = i;
-            if ((this.displayDigitsList[index].shortName.toUpperCase() != null) &&
-                (rateKeys.contains(this.displayDigitsList[index].shortName.toUpperCase().trim().toString()))) {
-              if (mounted) {
-                setState(() {
-                  this.displayDigitsList[index].digitRate
-                    ..symbol = rateInstance.getSymbol(this.displayDigitsList[index])
-                    ..price = rateInstance.getPrice(this.displayDigitsList[index])
-                    ..changeDaily = rateInstance.getChangeDaily(this.displayDigitsList[index]);
-                });
-              }
-            } else {
-              print("digitName is not exist===>" + this.displayDigitsList[index].shortName);
-              LogUtil.w("digitName is not exist===>", this.displayDigitsList[index].shortName);
+    if (_loadingRateTimerTask != null) {
+      _loadingRateTimerTask.cancel();
+    }
+    _loadingRateTimerTask = Timer(const Duration(milliseconds: 1000), () async {
+      rateInstance = await loadRateInstance();
+      if (rateInstance == null) {
+        return;
+      }
+      if (true) {
+        List<String> rateKeys = rateInstance.digitRateMap.keys.toList();
+        for (var i = 0; i < displayDigitsList.length; i++) {
+          int index = i;
+          if ((this.displayDigitsList[index].shortName.toUpperCase() != null) &&
+              (rateKeys.contains(this.displayDigitsList[index].shortName.toUpperCase().trim().toString()))) {
+            if (mounted) {
+              setState(() {
+                this.displayDigitsList[index].digitRate
+                  ..symbol = rateInstance.getSymbol(this.displayDigitsList[index])
+                  ..price = rateInstance.getPrice(this.displayDigitsList[index])
+                  ..changeDaily = rateInstance.getChangeDaily(this.displayDigitsList[index]);
+              });
             }
+          } else {
+            print("digitName is not exist===>" + this.displayDigitsList[index].shortName);
+            LogUtil.w("digitName is not exist===>", this.displayDigitsList[index].shortName);
           }
         }
-        isLoadingBalance = false;
-      });
-    }
+      }
+    });
   }
 
   //Token balance
   loadDigitBalance() async {
-    print("loadDigitBalance is enter ===>" + displayDigitsList.length.toString());
     if (displayDigitsList == null || displayDigitsList.length == 0) {
       return;
     }
-    if (!isLoadingBalance) {
-      isLoadingBalance = true;
-      Future.delayed(Duration(seconds: 2), () async {
-        if (true) {
-          switch (Wallets.instance.nowWallet.nowChain.chainType) {
-            case ChainType.ETH:
-            case ChainType.ETH_TEST:
-              {
-                for (var i = 0; i < displayDigitsList.length; i++) {
-                  print("loadDigitBalance  contractAddress===>" +
-                      this.displayDigitsList[i].contractAddress.toString() +
-                      "|| address====>" +
-                      this.displayDigitsList[i].address.toString());
-                  int index = i;
-                  String balance = "0";
-                  if (this.displayDigitsList[index].contractAddress != null && this.displayDigitsList[index].contractAddress.trim() != "") {
-                    balance = await loadErc20Balance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[index].contractAddress,
-                        Wallets.instance.nowWallet.nowChain.chainType);
-                    Wallets.instance
-                        .updateDigitBalance(this.displayDigitsList[index].contractAddress, this.displayDigitsList[index].digitId, balance ?? "");
-                  } else if (Wallets.instance.nowWallet.nowChain.chainAddress != null &&
-                      Wallets.instance.nowWallet.nowChain.chainAddress.trim() != "") {
-                    balance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
-                    Wallets.instance
-                        .updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[index].digitId, balance ?? "");
-                  } else {}
-                  print("digit.balance ===>" + balance.toString());
-                  allVisibleDigitsList[index].balance = balance ?? "0";
-                  if (mounted) {
-                    setState(() {
-                      this.displayDigitsList[index].balance = balance ?? "0";
-                    });
-                  }
-                }
-                loadDigitMoney(); //If you have a balance, go to calculate the money value
-              }
-              break;
-            case ChainType.EEE:
-            case ChainType.EEE_TEST:
-              ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+    if (_loadingBalanceTimerTask != null) {
+      _loadingBalanceTimerTask.cancel();
+    }
+    _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
+      if (true) {
+        switch (Wallets.instance.nowWallet.nowChain.chainType) {
+          case ChainType.ETH:
+          case ChainType.ETH_TEST:
+            {
               for (var i = 0; i < displayDigitsList.length; i++) {
+                print("loadDigitBalance  contractAddress===>" +
+                    this.displayDigitsList[i].contractAddress.toString() +
+                    "|| address====>" +
+                    this.displayDigitsList[i].address.toString());
                 int index = i;
                 String balance = "0";
-                if (this.displayDigitsList[index].shortName.toLowerCase() == "eee") {
-                  Map eeeStorageKeyMap =
-                      await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
-                  if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
-                    balance = eeeStorageKeyMap["free"] ?? "";
-                    Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
-                    this.displayDigitsList[index].balance = balance;
-                  }
-                } else if (this.displayDigitsList[index].shortName.toLowerCase() == "tokenx") {
-                  Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
-                  if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
-                    balance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
-                    this.displayDigitsList[index].balance = balance ?? "";
-                    Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
-                  }
-                }
+                if (this.displayDigitsList[index].contractAddress != null && this.displayDigitsList[index].contractAddress.trim() != "") {
+                  balance = await loadErc20Balance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[index].contractAddress,
+                      Wallets.instance.nowWallet.nowChain.chainType);
+                  Wallets.instance
+                      .updateDigitBalance(this.displayDigitsList[index].contractAddress, this.displayDigitsList[index].digitId, balance ?? "");
+                } else if (Wallets.instance.nowWallet.nowChain.chainAddress != null &&
+                    Wallets.instance.nowWallet.nowChain.chainAddress.trim() != "") {
+                  balance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
+                  Wallets.instance
+                      .updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[index].digitId, balance ?? "");
+                } else {}
+                print("digit.balance ===>" + balance.toString());
+                allVisibleDigitsList[index].balance = balance ?? "0";
                 if (mounted) {
                   setState(() {
                     this.displayDigitsList[index].balance = balance ?? "0";
                   });
                 }
               }
-              break;
-            default:
-              break;
-          }
+              loadDigitMoney(); //If you have a balance, go to calculate the money value
+            }
+            break;
+          case ChainType.EEE:
+          case ChainType.EEE_TEST:
+            ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+            for (var i = 0; i < displayDigitsList.length; i++) {
+              int index = i;
+              String balance = "0";
+              if (this.displayDigitsList[index].shortName.toLowerCase() == "eee") {
+                Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+                if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
+                  balance = eeeStorageKeyMap["free"] ?? "";
+                  Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
+                  this.displayDigitsList[index].balance = balance;
+                }
+              } else if (this.displayDigitsList[index].shortName.toLowerCase() == "tokenx") {
+                Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+                if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
+                  balance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
+                  this.displayDigitsList[index].balance = balance ?? "";
+                  Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
+                }
+              }
+              if (mounted) {
+                setState(() {
+                  this.displayDigitsList[index].balance = balance ?? "0";
+                });
+              }
+            }
+            break;
+          default:
+            break;
         }
-        isLoadingBalance = false;
-      });
-    }
+      }
+    });
   }
 
   //Corresponding to the number of tokens, the value of the market fiat currency
@@ -328,9 +326,13 @@ class _EthPageState extends State<EthPage> {
                 _buildDigitListCard(), //Token list
               ],
             ),
-            Positioned(
-              bottom: ScreenUtil.instance.setHeight(5),
-              child: _buildAddDigitButton(),
+            Container(
+              child: _isShowAddDigitBtn()
+                  ? Positioned(
+                      bottom: ScreenUtil.instance.setHeight(5),
+                      child: _buildAddDigitButton(),
+                    )
+                  : Text(""),
             )
           ],
         ),
@@ -854,6 +856,16 @@ class _EthPageState extends State<EthPage> {
         ],
       ),
     );
+  }
+
+  bool _isShowAddDigitBtn() {
+    switch (Wallets.instance.nowWallet.nowChain.chainType) {
+      case ChainType.ETH:
+      case ChainType.ETH_TEST:
+        return true;
+      default:
+        return false;
+    }
   }
 
   void _navigatorToQrInfoPage(String title, String hintInfo, String content) {

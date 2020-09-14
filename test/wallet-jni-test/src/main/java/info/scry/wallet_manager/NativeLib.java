@@ -395,6 +395,7 @@ public class NativeLib {
     }
 
     public static class EeeChainTxDetail{
+        public String txHash;
         public String blockHash;
         public String from;
         public String to;
@@ -408,7 +409,8 @@ public class NativeLib {
         @Override
         public String toString() {
             return "EeeChainTxDetail{" +
-                    "blockHash='" + blockHash + '\'' +
+                    "txHash='" + txHash + '\'' +
+                    ", blockHash='" + blockHash + '\'' +
                     ", from='" + from + '\'' +
                     ", to='" + to + '\'' +
                     ", value='" + value + '\'' +
