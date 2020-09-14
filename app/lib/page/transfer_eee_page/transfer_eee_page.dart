@@ -64,7 +64,14 @@ class _TransferEeePageState extends State<TransferEeePage> {
       return;
     }
     nonce = eeeStorageKeyMap["nonce"];
-    digitBalance = eeeStorageKeyMap["free"] ?? "0";
+    try {
+      String eeeFree = eeeStorageKeyMap["free"] ?? "0";
+      double eeeFreeBalance = BigInt.parse(eeeFree) / BigInt.from(Eee_Unit);
+      digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
+    } catch (e) {
+      digitBalance = "0";
+      print("error(),convert EEE balance error is ====>" + e);
+    }
     if (digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
       isShowTxInput = true;
       setState(() {
@@ -72,7 +79,13 @@ class _TransferEeePageState extends State<TransferEeePage> {
       });
       Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
-        digitBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "0";
+        try {
+          double eeeFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / BigInt.from(Eee_Unit);
+          digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
+        } catch (e) {
+          digitBalance = "0";
+          print("error(),convert token balance error is ====>" + e);
+        }
       }
     }
     Map blockHashMap = await scryXNetUtil.loadScryXBlockHash();
