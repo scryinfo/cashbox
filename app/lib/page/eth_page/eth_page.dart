@@ -208,14 +208,26 @@ class _EthPageState extends State<EthPage> {
               if (this.displayDigitsList[index].shortName.toLowerCase() == "eee") {
                 Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
                 if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
-                  balance = eeeStorageKeyMap["free"] ?? "";
+                  try {
+                    double balanceDouble = double.parse(eeeStorageKeyMap["free"] ?? "") / Eee_Unit;
+                    balance = balanceDouble.toStringAsFixed(5);
+                  } catch (e) {
+                    print("error(), _loadingBalanceTimerTask error is load Eee balance===>" + e);
+                    LogUtil.e("_loadingBalanceTimerTask error is =>", e.toString());
+                  }
                   Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
                   this.displayDigitsList[index].balance = balance;
                 }
               } else if (this.displayDigitsList[index].shortName.toLowerCase() == "tokenx") {
                 Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
                 if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
-                  balance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toRadixString(10) ?? "";
+                  try {
+                    double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / BigInt.from(Eee_Unit);
+                    balance = tokenBalance.toStringAsFixed(5);
+                  } catch (e) {
+                    print("error(), error is load tokenX balance===>" + e);
+                    LogUtil.e("_loadingBalanceTimerTask error is =>", e.toString());
+                  }
                   this.displayDigitsList[index].balance = balance ?? "";
                   Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
                 }
