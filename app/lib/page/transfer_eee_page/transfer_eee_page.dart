@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:app/global_config/vendor_config.dart';
+import 'package:app/global_config/global_config.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
