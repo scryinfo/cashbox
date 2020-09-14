@@ -326,9 +326,13 @@ class _EthPageState extends State<EthPage> {
                 _buildDigitListCard(), //Token list
               ],
             ),
-            Positioned(
-              bottom: ScreenUtil.instance.setHeight(5),
-              child: _buildAddDigitButton(),
+            Container(
+              child: _isShowAddDigitBtn()
+                  ? Positioned(
+                      bottom: ScreenUtil.instance.setHeight(5),
+                      child: _buildAddDigitButton(),
+                    )
+                  : Text(""),
             )
           ],
         ),
@@ -852,6 +856,16 @@ class _EthPageState extends State<EthPage> {
         ],
       ),
     );
+  }
+
+  bool _isShowAddDigitBtn() {
+    switch (Wallets.instance.nowWallet.nowChain.chainType) {
+      case ChainType.ETH:
+      case ChainType.ETH_TEST:
+        return true;
+      default:
+        return false;
+    }
   }
 
   void _navigatorToQrInfoPage(String title, String hintInfo, String content) {
