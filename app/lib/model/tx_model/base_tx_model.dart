@@ -3,6 +3,7 @@ class BaseTxModel{
   String _to;
   String _value;
   String _timeStamp;
+  String txHash;
 
   String get timeStamp => _timeStamp;
 

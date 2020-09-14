@@ -4,20 +4,13 @@ import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
-import 'package:app/model/tx_model/base_tx_model.dart';
 import 'package:app/model/tx_model/eee_transaction_model.dart';
-import 'package:app/model/tx_model/eth_transaction_model.dart';
-import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
-import 'package:app/net/etherscan_util.dart';
-import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
@@ -28,6 +21,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
 import 'dart:convert' as convert;
+
+import 'eee_sync_txs.dart';
 
 class EeeChainTxsHistoryPage extends StatefulWidget {
   @override
@@ -45,6 +40,10 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   String fromAddress = "";
   int displayTxOffset = 0;
   int refreshAddCount = 20;
+
+
+  int pageSize = 2;
+  int currentPage = -1;//到达最后，重新计算当前的页号
 
   @override
   void initState() {
@@ -75,6 +74,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     }
     print("fromAddress===>" + fromAddress + "||digitName===>" + digitName + "||balanceInfo===>" + balanceInfo + "||moneyInfo===>" + moneyInfo);
     txListFuture = getTxListData();
+    EeeSyncTxs.startOnce(Wallets.instance.nowWallet.nowChain);
   }
 
   @override
@@ -107,7 +107,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
           Gaps.scaleVGap(4),
           _buildDigitTxHistoryWidget(),
         ],
-      ),
+    ),
     );
   }
 
@@ -434,136 +434,27 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
 
   Future<List<EeeTransactionModel>> getTxListData() async {
     //去加载本地DB已有的交易，进行显示
-    eeeTxListModel = await Wallets.instance.loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, 0, 100);
-    print("eeeChainTxList=========>" + eeeTxListModel.toString());
-    //再去同步 最新块的交易记录
-    loadEeeChainTxHistoryData();
-    return eeeTxListModel;
-  }
-
-  loadEeeChainTxHistoryData() async {
-    //再次同步最新数据
-    ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-    Map txHistoryMap = await scryXNetUtil.loadChainHeader();
-    if (txHistoryMap == null || !txHistoryMap.containsKey("result")) {
-      return;
-    }
-    String eeeStorageKey = await scryXNetUtil.loadEeeStorageKey(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
-    String tokenXStorageKey = await scryXNetUtil.loadEeeStorageKey(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
-    if (eeeStorageKey == null || eeeStorageKey.trim() == "") {
-      return;
-    }
-    int latestBlockHeight = Utils.hexToInt(txHistoryMap["result"]["number"].toString().substring(2));
-    print("latestBlockHeight is ===>" + latestBlockHeight.toString());
-
-    Map eeeSyncMap = await Wallets.instance.getEeeSyncRecord();
-    if (!_isMapStatusOk(eeeSyncMap) || !eeeSyncMap.containsKey("records")) {
-      return;
-    }
-    Map records = eeeSyncMap["records"];
-    const onceCount = 3000;
-    int startBlockHeight = 0;
-    int queryCount = 0;
-    if (records == null || records.length < 1) {
-      print("records  is ======>" + records.toString());
-      startBlockHeight = 0;
-      queryCount = (latestBlockHeight - 0) ~/ onceCount + 1; //divide down to fetch int
-    } else {
-      print("records.length.toString()  is ======>" + records.length.toString());
-      print("records  is ======>" + records.toString());
-      print("eeeSyncMap is ===>" + eeeSyncMap.toString());
-      if (eeeSyncMap == null || !eeeSyncMap.containsKey("status") || eeeSyncMap["status"] != 200) {
-        return;
+    for(;true;){
+      var newData = await Wallets.instance.loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, currentPage + 1, this.pageSize);
+      if(newData.isEmpty){
+        break;
       }
-      Map<dynamic, dynamic> recordsMap = eeeSyncMap["records"];
-      recordsMap.forEach((key, value) {
-        print("recordsMap key is =======>" + key);
-        Map<dynamic, dynamic> accountDetailMap = value;
-        if (accountDetailMap != null &&
-            accountDetailMap.containsKey("account") &&
-            accountDetailMap["account"].toString().toLowerCase().trim() == Wallets.instance.nowWallet.nowChain.chainAddress.toLowerCase()) {
-          startBlockHeight = accountDetailMap["blockNum"];
-          return;
+      var oldMap = eeeTxListModel.map((e) => e.txHash);
+      var newModel = <EeeTransactionModel>[];
+      newData.forEach((element) { //去掉相同的交易
+        if(!oldMap.contains(element.txHash)){
+          newModel.add(element);
         }
       });
-      queryCount = (latestBlockHeight - startBlockHeight) ~/ onceCount + 1; //divide down to fetch int
-    }
-    if (true) {
-      for (int i = 0; i < queryCount; i++) {
-        int queryIndex = i;
-        int currentStartBlockNum = startBlockHeight + queryIndex * onceCount + 1;
-        Map currentMap = await scryXNetUtil.loadChainBlockHash(currentStartBlockNum);
-        if (currentMap == null || !currentMap.containsKey("result")) {
-          return;
-        }
-        String currentBlockHash = currentMap["result"].toString();
-        int endBlockHeight = queryIndex == (queryCount - 1) ? latestBlockHeight : ((queryIndex + 1) * onceCount + startBlockHeight);
-        Map endBlockMap = await scryXNetUtil.loadChainBlockHash(endBlockHeight);
-        if (endBlockMap == null || !endBlockMap.containsKey("result")) {
-          return;
-        }
-        String endBlockHash = endBlockMap["result"].toString();
-        Map queryStorageMap = await scryXNetUtil.loadQueryStorage([eeeStorageKey, tokenXStorageKey], currentBlockHash, endBlockHash);
-        if (queryStorageMap == null || !endBlockMap.containsKey("result")) {
-          return;
-        }
-        List storageChanges = queryStorageMap["result"];
-        print("storageChanges is ===>" + storageChanges.toString());
-        if (storageChanges == null || storageChanges.length < 1) {
-          return;
-        }
-        storageChanges.forEach((element) async {
-          if (element == null || !element.containsKey("block")) {
-            return;
-          }
-          String blockHash = element["block"];
-          Map loadBlockMap = await scryXNetUtil.loadBlock(blockHash);
-          if (loadBlockMap == null || !loadBlockMap.containsKey("result")) {
-            return;
-          }
-          print("scryXNetUtil loadBlockMap is ======>" + loadBlockMap.toString());
-          Map blockResultMap = loadBlockMap["result"];
-          if (blockResultMap == null || !blockResultMap.containsKey("block")) {
-            return;
-          }
-          Map extrinsicResultMap = blockResultMap["block"]; // check maybe be null
-          if (extrinsicResultMap == null || !extrinsicResultMap.containsKey("extrinsics")) {
-            return;
-          }
-          List extrinsicList = extrinsicResultMap["extrinsics"];
-          if (extrinsicList == null || extrinsicList.length <= 1) {
-            return;
-          }
-          String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
-          Map loadStorageMap = await scryXNetUtil.loadStateStorage(eventKeyPrefix, element["block"]);
-          if (loadStorageMap == null || !loadStorageMap.containsKey("result")) {
-            return; //todo 停止整个同步记录流程
-          }
-          String extrinsicJson = convert.jsonEncode(extrinsicList);
-          print("scryXNetUtil extrinsicJson is ======>" + extrinsicJson);
-          Map saveEeeMap = await Wallets.instance
-              .saveEeeExtrinsicDetail(Wallets.instance.nowWallet.nowChain.chainAddress, loadStorageMap["result"], element["block"], extrinsicJson);
-          print("saveEeeMap is ===>" + saveEeeMap.toString() + "|| block is ===>" + element["block"] + "||extrinsicJson===>" + extrinsicJson);
-          if (!_isMapStatusOk(saveEeeMap)) {
-            //todo 停止整个同步记录流程
-          }
-        });
-        print("updateEeeSyncRecord ===> endBlockHeight is ===>" + endBlockHeight.toString());
-        Map updateEeeMap = await Wallets.instance.updateEeeSyncRecord(Wallets.instance.nowWallet.nowChain.chainAddress,
-            Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), endBlockHeight, endBlockHash);
-        print("updateEeeMap is ===>" + updateEeeMap.toString() + "|| endBlockHeight.toString()" + endBlockHeight.toString());
-        if (!_isMapStatusOk(updateEeeMap)) {
-          //todo 停止整个同步记录流程
-        }
+      if(newModel.isEmpty){
+        currentPage += 1;
+        continue;
       }
+      eeeTxListModel.addAll(newModel);
+      currentPage = (eeeTxListModel.length / pageSize).floor(); //重新计算当前页号
+      break;
     }
-  }
-
-  bool _isMapStatusOk(Map returnMap) {
-    if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      return false;
-    }
-    return true;
+    return eeeTxListModel;
   }
 
   @override

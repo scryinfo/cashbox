@@ -543,6 +543,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         detailMap.put("from", eeeChainTxListHistory.eeeChainTxDetail.get(i).from);
                         detailMap.put("to", eeeChainTxListHistory.eeeChainTxDetail.get(i).to);
                         detailMap.put("value", eeeChainTxListHistory.eeeChainTxDetail.get(i).value);
+                        detailMap.put("txHash", eeeChainTxListHistory.eeeChainTxDetail.get(i).txHash);
                         detailMap.put("inputMsg", eeeChainTxListHistory.eeeChainTxDetail.get(i).inputMsg);
                         detailMap.put("gasFee", eeeChainTxListHistory.eeeChainTxDetail.get(i).gasFee);
                         detailMap.put("signer", eeeChainTxListHistory.eeeChainTxDetail.get(i).signer);

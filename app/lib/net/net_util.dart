@@ -77,7 +77,7 @@ Future requestWithConfigCheckParam(String url, {formData}) async {
 //Access network request, url + parameter object
 Future request(String url, {formData}) async {
   try {
-    print('开始获取数据...............' + url);
+    // print('开始获取数据...............' + url);
     Response response;
     Dio dio = new Dio();
     //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
@@ -97,7 +97,7 @@ Future request(String url, {formData}) async {
     }
     // print("response===>" + response.toString());
     if (response.statusCode == 200) {
-      print("net 访问返回数据结果是：" + response.data.toString());
+      // print("net 访问返回数据结果是：" + response.data.toString());
       return response.data;
     } else {
       print("后端接口出现异常，请检测代码和服务器情况.........");

@@ -521,6 +521,7 @@ class Wallets {
             ..from = eeeChainTxList[i]["from"]
             ..to = eeeChainTxList[i]["to"]
             ..value = eeeChainTxList[i]["value"]
+            ..txHash = eeeChainTxList[i]["txHash"]
             ..inputMsg = eeeChainTxList[i]["inputMsg"]
             ..gasFee = eeeChainTxList[i]["gasFee"]
             ..signer = eeeChainTxList[i]["signer"]
