@@ -1,3 +1,4 @@
+import 'package:app/global_config/global_config.dart';
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
@@ -459,6 +460,16 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       eeeTxListModel.addAll(newModel);
       currentPage = (eeeTxListModel.length / pageSize).floor(); //重新计算当前页号
       break;
+    }
+    for (int i = 0; i < eeeTxListModel.length; i++) {
+      int index = i;
+      var element = eeeTxListModel[index];
+      try {
+        element.value = (BigInt.parse(element.value) / BigInt.from(Eee_Unit)).toStringAsFixed(5);
+      } catch (e) {
+        element.value = "0";
+      }
+      eeeTxListModel[index] = element;
     }
     return eeeTxListModel;
   }
