@@ -450,6 +450,11 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       var newModel = <EeeTransactionModel>[];
       newData.forEach((element) { //去掉相同的交易
         if(!oldSet.contains(element.txHash)){
+          try {
+            element.value = (BigInt.parse(element.value) / BigInt.from(Eee_Unit)).toStringAsFixed(5);
+          } catch (e) {
+            element.value = "0";
+          }
           newModel.add(element);
         }
       });
@@ -460,16 +465,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       eeeTxListModel.addAll(newModel);
       currentPage = (eeeTxListModel.length / pageSize).floor(); //重新计算当前页号
       break;
-    }
-    for (int i = 0; i < eeeTxListModel.length; i++) {
-      int index = i;
-      var element = eeeTxListModel[index];
-      try {
-        element.value = (BigInt.parse(element.value) / BigInt.from(Eee_Unit)).toStringAsFixed(5);
-      } catch (e) {
-        element.value = "0";
-      }
-      eeeTxListModel[index] = element;
     }
     return eeeTxListModel;
   }
