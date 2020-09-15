@@ -445,10 +445,10 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       if(newData.isEmpty){
         break;
       }
-      var oldMap = eeeTxListModel.map((e) => e.txHash);
+      var oldSet = eeeTxListModel.map((e) => e.txHash).toSet();
       var newModel = <EeeTransactionModel>[];
       newData.forEach((element) { //去掉相同的交易
-        if(!oldMap.contains(element.txHash)){
+        if(!oldSet.contains(element.txHash)){
           newModel.add(element);
         }
       });

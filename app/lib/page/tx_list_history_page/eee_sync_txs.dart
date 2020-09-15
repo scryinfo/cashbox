@@ -50,31 +50,32 @@ class EeeSyncTxs {
   final String _address;
   final String _pubKey;
   final ChainType _chainType;
-  Isolate isolate;
-  ReceivePort receivePort;
-  Timer timer;
+  Timer _timer;
   bool _timing = false;
+  String _eeeStorageKey = '';
+  String _tokenXStorageKey = '';
+
+  ScryXNetUtil _scryXNetUtil = new ScryXNetUtil();
 
   _start() async {
-    receivePort = ReceivePort();
     RunParams runParams = new RunParams(_address, _pubKey, _chainType);
-    // isolate =  await Isolate.spawn(_threadRun, runParams);
+    _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(SystemSymbol, AccountSymbol, runParams.pubKey);
+    _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(TokenXSymbol, BalanceSymbol, runParams.pubKey);
     _threadRun(runParams);
   }
 
+
+
+
   stop() {
-    if (timer != null) {
-      timer.cancel();
-      timer = null;
-    }
-    if (isolate != null) {
-      isolate.kill();
-      isolate = null;
+    if (_timer != null) {
+      _timer.cancel();
+      _timer = null;
     }
   }
 
   _threadRun(RunParams runParams) async {
-    timer = Timer.periodic(new Duration(seconds: 30), (Timer t) async {
+    _timer = Timer.periodic(new Duration(seconds: 30), (Timer t) async {
       if (_timing) {
         return;
       }
@@ -102,13 +103,11 @@ class EeeSyncTxs {
     // }
   }
 
-  static _loadEeeChainTxHistoryData(RunParams runParams) async {
+  _loadEeeChainTxHistoryData(RunParams runParams) async {
     print("_loadEeeChainTxHistoryData");
-    //再次同步最新数据
-    ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
     int latestBlockHeight = -1;
     {
-      Map txHistoryMap = await scryXNetUtil.loadChainHeader();
+      Map txHistoryMap = await _scryXNetUtil.loadChainHeader();
       if (txHistoryMap == null || !txHistoryMap.containsKey("result")) {
         return;
       }
@@ -117,11 +116,14 @@ class EeeSyncTxs {
       print("latestBlockHeight is ===>" + latestBlockHeight.toString());
     }
 
-    var tokenXStorageKey = '', eeeStorageKey = '';
     {
-      eeeStorageKey = await scryXNetUtil.loadEeeStorageKey(SystemSymbol, AccountSymbol, runParams.pubKey);
-      tokenXStorageKey = await scryXNetUtil.loadEeeStorageKey(TokenXSymbol, BalanceSymbol, runParams.pubKey);
-      if (eeeStorageKey == null || eeeStorageKey.isEmpty || eeeStorageKey.trim() == "") {
+      if(_eeeStorageKey == null || _eeeStorageKey.isEmpty){
+        _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(SystemSymbol, AccountSymbol, runParams.pubKey);
+      }
+      if(_tokenXStorageKey == null || _tokenXStorageKey.isEmpty){
+        _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(TokenXSymbol, BalanceSymbol, runParams.pubKey);
+      }
+      if (_eeeStorageKey == null || _eeeStorageKey.isEmpty || _eeeStorageKey.trim().isEmpty || _tokenXStorageKey == null || _tokenXStorageKey.isEmpty || _tokenXStorageKey.trim().isEmpty) {
         return;
       }
     }
@@ -133,16 +135,16 @@ class EeeSyncTxs {
       }
       Map records = eeeSyncMap["records"];
       if (records != null && records.isNotEmpty) {
-        Map<dynamic, dynamic> recordsMap = eeeSyncMap["records"];
-        recordsMap.forEach((key, value) {
-          Map<dynamic, dynamic> accountDetailMap = value;
+        Map<String, dynamic> recordsMap = eeeSyncMap["records"];
+        for(var v in recordsMap.values){
+          Map<String, dynamic> accountDetailMap = v;
           if (accountDetailMap != null &&
               accountDetailMap.containsKey("account") &&
               accountDetailMap["account"].toString().toLowerCase().trim() == runParams.address.toLowerCase()) {
             startBlockHeight = accountDetailMap["blockNum"];
-            return;
+            break;
           }
-        });
+        };
       }
     }
 
@@ -155,7 +157,7 @@ class EeeSyncTxs {
       String startBlockHash = '';
       {
         int currentStartBlockNum = startBlockHeight + i * onceCount + 1;
-        Map currentMap = await scryXNetUtil.loadChainBlockHash(currentStartBlockNum);
+        Map currentMap = await _scryXNetUtil.loadChainBlockHash(currentStartBlockNum);
         if (currentMap == null || !currentMap.containsKey("result")) {
           return;
         }
@@ -170,7 +172,7 @@ class EeeSyncTxs {
         if (endBlockHeight > latestBlockHeight) {
           endBlockHeight = latestBlockHeight;
         }
-        Map endBlockMap = await scryXNetUtil.loadChainBlockHash(endBlockHeight);
+        Map endBlockMap = await _scryXNetUtil.loadChainBlockHash(endBlockHeight);
         if (endBlockMap == null || !endBlockMap.containsKey("result")) {
           return;
         }
@@ -179,7 +181,7 @@ class EeeSyncTxs {
           return;
         }
       }
-      Map queryStorageMap = await scryXNetUtil.loadQueryStorage([eeeStorageKey, tokenXStorageKey], startBlockHash, endBlockHash);
+      Map queryStorageMap = await _scryXNetUtil.loadQueryStorage([_eeeStorageKey, _tokenXStorageKey], startBlockHash, endBlockHash);
       if (queryStorageMap == null || !queryStorageMap.containsKey("result")) {
         return;
       }
@@ -192,7 +194,7 @@ class EeeSyncTxs {
           continue;
         }
         String blockHash = element["block"];
-        Map loadBlockMap = await scryXNetUtil.loadBlock(blockHash);
+        Map loadBlockMap = await _scryXNetUtil.loadBlock(blockHash);
         if (loadBlockMap == null || !loadBlockMap.containsKey("result")) {
           return;
         }
@@ -210,7 +212,7 @@ class EeeSyncTxs {
           continue; //这里没有出错，是没有数据，所以不用返回
         }
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
-        Map loadStorageMap = await scryXNetUtil.loadStateStorage(eventKeyPrefix, element["block"]); //如何检测具体的交易是否成功
+        Map loadStorageMap = await _scryXNetUtil.loadStateStorage(eventKeyPrefix, element["block"]); //如何检测具体的交易是否成功
         if (loadStorageMap == null || !loadStorageMap.containsKey("result")) {
           return;
         }
