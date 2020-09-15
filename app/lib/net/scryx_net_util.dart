@@ -51,7 +51,7 @@ class ScryXNetUtil {
     String storageKey = await loadEeeStorageKey(module, storageItem, pubKey);
     if (storageKey != null && storageKey.trim() != "") {
       Map netFormatMap = await _loadScryXStorage(storageKey);
-      if (netFormatMap != null && netFormatMap.containsKey("result")) {
+      if (netFormatMap != null && netFormatMap.containsKey("result") && netFormatMap["result"]) {
         eeeResultMap = await Wallets.instance.decodeEeeAccountInfo(netFormatMap["result"]);
       }
     }
