@@ -47,20 +47,19 @@ class _TransferEeePageState extends State<TransferEeePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     digitName = Provider.of<TransactionProvide>(context).digitName;
-    print("digitName is ===>" + digitName);
-    String balance = Provider.of<TransactionProvide>(context).balance;
-    print("balance is ===>" + balance);
-    initData();
+    initEeeChainTxInfo();
   }
 
-  initData() async {
+  initEeeChainTxInfo() async {
     ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
     Map eeeStorageKeyMap;
-    if (digitName == null || digitName.trim() == "") {
+    if (digitName == null || digitName.isEmpty) {
+      Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
       return;
     }
     eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
     if (!_isMapStatusOk(eeeStorageKeyMap)) {
+      Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
       return;
     }
     nonce = eeeStorageKeyMap["nonce"];
@@ -70,13 +69,14 @@ class _TransferEeePageState extends State<TransferEeePage> {
       digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
     } catch (e) {
       digitBalance = "0";
-      print("error(),convert EEE balance error is ====>" + e);
     }
     if (digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
-      isShowTxInput = true;
-      setState(() {
-        this.isShowTxInput = true;
-      });
+      {
+        isShowTxInput = true;
+        setState(() {
+          this.isShowTxInput = true;
+        });
+      }
       Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
         try {
@@ -84,28 +84,32 @@ class _TransferEeePageState extends State<TransferEeePage> {
           digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
         } catch (e) {
           digitBalance = "0";
-          print("error(),convert token balance error is ====>" + e);
         }
       }
     }
-    Map blockHashMap = await scryXNetUtil.loadScryXBlockHash();
-    if (blockHashMap == null || !blockHashMap.containsKey("result")) {
-      return;
+    {
+      Map blockHashMap = await scryXNetUtil.loadScryXBlockHash();
+      if (blockHashMap == null || !blockHashMap.containsKey("result")) {
+        Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
+        return;
+      }
+      genesisHash = blockHashMap["result"];
     }
-    genesisHash = blockHashMap["result"];
-    print("genesisHash.toString is ===> " + genesisHash.toString());
 
-    Map runtimeMap = await scryXNetUtil.loadScryXRuntimeVersion();
-    print("runtimeMap.toString is ===> " + runtimeMap.toString());
-    if (runtimeMap == null || !runtimeMap.containsKey("result")) {
-      return;
+    {
+      Map runtimeMap = await scryXNetUtil.loadScryXRuntimeVersion();
+      if (runtimeMap == null || !runtimeMap.containsKey("result")) {
+        Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
+        return;
+      }
+      var resultMap = runtimeMap["result"];
+      if (resultMap == null || !resultMap.containsKey("specVersion") || !resultMap.containsKey("transactionVersion")) {
+        Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
+        return;
+      }
+      runtimeVersion = resultMap["specVersion"];
+      txVersion = resultMap["transactionVersion"];
     }
-    var resultMap = runtimeMap["result"];
-    if (resultMap == null || !resultMap.containsKey("specVersion") || !resultMap.containsKey("transactionVersion")) {
-      return;
-    }
-    runtimeVersion = resultMap["specVersion"];
-    txVersion = resultMap["transactionVersion"];
   }
 
   @override
@@ -224,12 +228,10 @@ class _TransferEeePageState extends State<TransferEeePage> {
                     onPressed: () async {
                       try {
                         String qrResult = await QrScanUtil.instance.qrscan();
-                        print("qrResult===>" + qrResult.toString());
                         setState(() {
                           _toAddressController.text = qrResult.toString();
                         });
                       } catch (e) {
-                        LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
                         Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
                       }
                     },
@@ -409,7 +411,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
             Map eeeTransferMap;
             if (digitName != null && digitName.toLowerCase() == EeeSymbol.toLowerCase()) {
               eeeTransferMap = await Wallets.instance.eeeTransfer(
@@ -432,16 +433,20 @@ class _TransferEeePageState extends State<TransferEeePage> {
                   runtimeVersion,
                   txVersion,
                   Uint8List.fromList(pwd.codeUnits));
+            } else {
+              Fluttertoast.showToast(msg: translate('eee_config_error').toString(), timeInSecForIos: 3);
+              NavigatorUtils.goBack(context);
+              return;
             }
-            if (eeeTransferMap == null || !eeeTransferMap.containsKey("status") || eeeTransferMap["status"] != 200) {
-              print("error, eeeTransferMap appear error===~");
+            if (_isMapStatusOk(eeeTransferMap)) {
+              Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), timeInSecForIos: 3);
               NavigatorUtils.goBack(context);
               return;
             }
             String signInfo = eeeTransferMap["signedInfo"];
-            print("eeeTransferMap, signInfo is ======>" + signInfo);
             if (signInfo == null || signInfo.isEmpty) {
-              //todo 提示交易签名出现问题
+              Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), timeInSecForIos: 3);
+              NavigatorUtils.goBack(context);
               return;
             }
             Provider.of<TransactionProvide>(context)

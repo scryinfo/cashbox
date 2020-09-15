@@ -176,6 +176,7 @@
   "not_enough_for_gas": "the balance of eth is not enough to pay gas fee!",
   "eth_balance_error": "there is something wrong with the balance of eth",
   "check_gas_state_failure": "failure to check the gas fee,please try to reopen app.",
+  "eee_config_error": "fail to load eee chain info,pls reopen app to try it again.",
   "exchange_instruction": "exchange instruction",
   "exchange_instruction_content_hint1": "此兑换功能是将您当前钱包的DDD代币，兑换到最新的EEE代币。",
   "exchange_instruction_content_hint2": "\n操作时，请务必查证输入正确的参数",

@@ -176,6 +176,7 @@
   "not_enough_for_gas": "账户以太坊余额，不足支付gas费",
   "eth_balance_error": "账户以太坊余额出现错误:",
   "check_gas_state_failure": "检查支付gas费失败，请重新打开尝试.",
+  "eee_config_error": "获取eee链信息失败，请重新打开应用尝试.",
   "exchange_instruction": "兑换说明",
   "exchange_instruction_content_hint1": "此兑换功能是将您当前钱包的DDD代币，兑换到最新的EEE代币。",
   "exchange_instruction_content_hint2": "\n操作时，请务必查证输入正确的参数",
