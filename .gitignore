@@ -45,3 +45,8 @@ demo/btcwallet/murmel/bitcoin/target
 /packages/scry_webview/.flutter-plugins
 /packages/scry_webview/.flutter-plugins-dependencies
 /packages/wallet_manager/example/ios/Flutter/flutter_export_environment.sh
+/packages/scry_webview/.packages
+/packages/scry_webview/pubspec.lock
+/packages/wallet_manager/example/pubspec.lock
+/packages/wallet_manager/pubspec.lock
+/app/ios/Flutter/flutter_export_environment.sh
