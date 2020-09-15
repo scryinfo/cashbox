@@ -161,6 +161,7 @@
   "wallet_manager": "钱包管理",
   "compile_wallet_name": "编辑",
   "tx_hash": "交易哈希值",
+  "tx_unit": "单位",
   "block_hash": "区块哈希值",
   "digit_manage": "代币管理",
   "check_data_format": "信息格式检查中，请稍等",

@@ -252,12 +252,22 @@ class _TransferEeePageState extends State<TransferEeePage> {
         children: <Widget>[
           Container(
             alignment: Alignment.topLeft,
-            child: Text(
-              translate('transaction_amount'),
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
-              ),
+            child: RichText(
+              text: TextSpan(children: <TextSpan>[
+                TextSpan(
+                  text: translate('transaction_amount'),
+                  style: TextStyle(
+                    decoration: TextDecoration.none,
+                    color: Color.fromRGBO(255, 255, 255, 0.5),
+                    fontSize: ScreenUtil.instance.setSp(3),
+                    fontStyle: FontStyle.normal,
+                  ),
+                ),
+                TextSpan(
+                  text: " (" + translate('tx_unit') + digitName + ")",
+                  style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.35), fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
+                ),
+              ]),
             ),
           ),
           Gaps.scaleVGap(2),
@@ -438,7 +448,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
               NavigatorUtils.goBack(context);
               return;
             }
-            if (_isMapStatusOk(eeeTransferMap)) {
+            if (!_isMapStatusOk(eeeTransferMap)) {
               Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), timeInSecForIos: 3);
               NavigatorUtils.goBack(context);
               return;
