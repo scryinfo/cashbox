@@ -462,4 +462,10 @@ class _TransferEeePageState extends State<TransferEeePage> {
     }
     return true;
   }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    Provider.of<TransactionProvide>(context).setSignInfo("");
+  }
 }
