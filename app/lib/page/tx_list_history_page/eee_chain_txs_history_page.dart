@@ -92,6 +92,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   Widget _buildTxHistoryLayout() {
     return Container(
       width: ScreenUtil().setWidth(90),
+
       child: Column(
         children: <Widget>[
           Gaps.scaleVGap(1),
@@ -248,15 +249,15 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                   return Text(translate('fail_to_load_data_hint'));
                 }
                 if (snapshot.hasData) {
-                  if (eeeTxListModel.length == 0) {
-                    return Container(
-                      alignment: Alignment.topCenter,
-                      child: Text(
-                        translate('not_exist_tx_history').toString(),
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    );
-                  }
+                  // if (eeeTxListModel.length == 0) {
+                  //   return Container(
+                  //     alignment: Alignment.topCenter,
+                  //     child: Text(
+                  //       translate('not_exist_tx_history').toString(),
+                  //       style: TextStyle(color: Colors.white70),
+                  //     ),
+                  //   );
+                  // }
                   return Container(
                     child: _makeRefreshWidgets(snapshot),
                   );
@@ -295,7 +296,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       ],
       onLoad: () async {
         await Future.delayed(Duration(seconds: 2), () async {
-          print("refresh onLoad======>");
           if (this.eeeTxListModel.length < displayTxOffset) {
             //Shown, less loaded than the last request, indicating that it is gone
             Fluttertoast.showToast(msg: translate('finish_load_tx_history').toString());
@@ -308,6 +308,18 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
             });
           }
         });
+      },
+      onRefresh: ()async{
+        this.currentPage = -1;
+        setState(() {
+          this.eeeTxListModel.clear();
+        });
+        var eeeTxListModel = await getTxListData();
+        if (eeeTxListModel != null && eeeTxListModel.length > 0) {
+          setState(() {
+            this.eeeTxListModel = eeeTxListModel;
+          });
+        }
       },
     );
   }
