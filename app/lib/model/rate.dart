@@ -112,7 +112,7 @@ class DigitRate {
   double changeDaily = 0.00;
 
   String get getChangeDaily {
-    if (changeDaily > 0) {
+    if (changeDaily >= 0) {
       return (changeDaily * 100.0).toStringAsFixed(5) + "%" + "↑";
     }
     return (changeDaily * 100.0).toStringAsFixed(5) + "%" + "↓";

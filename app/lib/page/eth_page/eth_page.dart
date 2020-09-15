@@ -61,6 +61,13 @@ class _EthPageState extends State<EthPage> {
   void initState() {
     super.initState();
     initData();
+    insertTokenXDigitTest();
+  }
+
+  insertTokenXDigitTest() async {
+    var paramString = VendorConfig.defaultDigitsContentDefaultValue;
+    var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
+    print("updateMap[isUpdateDefaultDigit]() =====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
   }
 
   @override
