@@ -123,9 +123,9 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                     autofocus: false,
                     enabled: isNameEditable,
                     textAlign: TextAlign.start,
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white70),
                     decoration: InputDecoration(
-                      fillColor: Color.fromRGBO(101, 98, 98, 0.50),
+                      fillColor: Color.fromRGBO(101, 98, 98, 0.4),
                       filled: true,
                       hintStyle: TextStyle(
                         color: Colors.white,
@@ -182,11 +182,11 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                       child: isNameEditable
                           ? Text(
                               translate('confirm'),
-                              style: TextStyle(color: Colors.white70, fontSize: 15),
+                              style: TextStyle(color: Colors.white70, fontSize: 14),
                             )
                           : Text(
                               translate('compile_wallet_name'),
-                              style: TextStyle(color: Colors.white70, fontSize: 15),
+                              style: TextStyle(color: Colors.white70, fontSize: 14),
                             ),
                     ),
                   ),
