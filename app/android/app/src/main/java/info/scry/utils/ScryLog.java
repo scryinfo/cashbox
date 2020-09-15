@@ -118,7 +118,7 @@ public class ScryLog {
         }
         //Log.i("Create a file","Create a file");
         File file = new File(dirsFile.toString(), needWriteFiel + MYLOGFILEName);//
-        Log.d("ScryLog================>", file.getAbsolutePath());
+        //Log.d("ScryLog================>", file.getAbsolutePath());
         // MYLOG_PATH_SDCARD_DIR
         if (!file.exists()) {
             try {

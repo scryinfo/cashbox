@@ -871,6 +871,9 @@ class _EthPageState extends State<EthPage> {
   }
 
   bool _isShowAddDigitBtn() {
+    if (Wallets.instance.nowWallet == null || Wallets.instance.nowWallet.nowChain == null) {
+      return false;
+    }
     switch (Wallets.instance.nowWallet.nowChain.chainType) {
       case ChainType.ETH:
       case ChainType.ETH_TEST:
