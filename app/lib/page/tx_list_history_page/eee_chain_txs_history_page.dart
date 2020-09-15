@@ -38,8 +38,8 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   int refreshAddCount = 20;
 
 
-  int pageSize = 50;
-  int currentPage = -1;//到达最后，重新计算当前的页号
+  int pageSize = 32;
+  int currentPage = 0;//到达最后，重新计算当前的页号
 
   @override
   void initState() {
@@ -310,7 +310,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
         });
       },
       onRefresh: ()async{
-        this.currentPage = -1;
+        this.currentPage = 0;
         setState(() {
           this.eeeTxListModel.clear();
         });
@@ -441,7 +441,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   Future<List<EeeTransactionModel>> getTxListData() async {
     //去加载本地DB已有的交易，进行显示
     for(;true;){
-      var newData = await Wallets.instance.loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, currentPage + 1, this.pageSize);
+      var newData = await Wallets.instance.loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, (currentPage* this.pageSize), this.pageSize);
       if(newData.isEmpty){
         break;
       }

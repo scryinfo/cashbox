@@ -82,7 +82,7 @@ class EeeSyncTxs {
       try {
         await _loadEeeChainTxHistoryData(runParams);
       } catch (e) {
-        print(e);
+        print("_loadEeeChainTxHistoryData: " + e.toString());
       }
       _timing = false;
     });
