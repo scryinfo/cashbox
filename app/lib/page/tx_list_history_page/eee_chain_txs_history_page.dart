@@ -1,5 +1,3 @@
-import 'package:app/generated/i18n.dart';
-import 'package:app/global_config/global_config.dart';
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
@@ -20,7 +18,6 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
-import 'dart:convert' as convert;
 
 import 'eee_sync_txs.dart';
 
@@ -30,7 +27,6 @@ class EeeChainTxsHistoryPage extends StatefulWidget {
 }
 
 class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
-  Future txListFuture;
   List<Digit> walletDataList = [];
   List<Digit> showDataList = [];
   List<EeeTransactionModel> eeeTxListModel = [];
@@ -42,7 +38,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   int refreshAddCount = 20;
 
 
-  int pageSize = 2;
+  int pageSize = 50;
   int currentPage = -1;//到达最后，重新计算当前的页号
 
   @override
@@ -72,8 +68,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       balanceInfo = Provider.of<TransactionProvide>(context).balance;
       moneyInfo = Provider.of<TransactionProvide>(context).money;
     }
-    print("fromAddress===>" + fromAddress + "||digitName===>" + digitName + "||balanceInfo===>" + balanceInfo + "||moneyInfo===>" + moneyInfo);
-    txListFuture = getTxListData();
     EeeSyncTxs.startOnce(Wallets.instance.nowWallet.nowChain);
   }
 
@@ -247,7 +241,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
             height: ScreenUtil().setHeight(100),
             padding: EdgeInsets.only(left: ScreenUtil().setWidth(5), right: ScreenUtil().setWidth(5)),
             child: FutureBuilder(
-              future: txListFuture,
+              future: getTxListData(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   print("snapshot.hasError is ===>" + snapshot.hasError.toString());
