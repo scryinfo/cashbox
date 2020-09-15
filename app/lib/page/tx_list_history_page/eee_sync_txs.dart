@@ -32,6 +32,14 @@ class EeeSyncTxs {
       _instance[chain.chainAddress] = newOne;
       newOne._start();
     }
+    for(var key in _instance.keys.toList()){
+      var it = _instance[key];
+      if(it._address != chain.chainAddress){
+        it.stop();
+        _instance.remove(key);
+      }
+    }
+
     return _instance[chain.chainAddress];
   }
 
@@ -62,20 +70,20 @@ class EeeSyncTxs {
     }
   }
 
-  static _threadRun(RunParams runParams) async {
+  _threadRun(RunParams runParams) async {
     var oneFinish = true;
-        Timer.periodic(new Duration(seconds: 60),  (Timer t) async {
-          if(!oneFinish){
-            return;
-          }
-          oneFinish = false;
-          try {
-                await _loadEeeChainTxHistoryData(runParams);
-            }catch(e){
-              print(e);
-            }
-          oneFinish = true;
-        });
+    timer = Timer.periodic(new Duration(seconds: 60),  (Timer t) async {
+      if(!oneFinish){
+        return;
+      }
+      oneFinish = false;
+      try {
+            await _loadEeeChainTxHistoryData(runParams);
+        }catch(e){
+          print(e);
+        }
+      oneFinish = true;
+    });
 
     // await SharedPreferenceUtil.initIpConfig();
     // WidgetsFlutterBinding.ensureInitialized();
