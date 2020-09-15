@@ -19,6 +19,7 @@ class TransactionProvide with ChangeNotifier {
   String _confirmations;
   String _balance;
   String _money;
+  String _signInfo;
   ChainType _chainType;
 
   void emptyDataRecord() {
@@ -32,6 +33,13 @@ class TransactionProvide with ChangeNotifier {
     _timeStamp = "";
     _nonce = "";
     _confirmations = "";
+    _signInfo = "";
+  }
+
+  String get signInfo => _signInfo;
+
+  setSignInfo(String value) {
+    _signInfo = value;
   }
 
   ChainType get chainType => _chainType;

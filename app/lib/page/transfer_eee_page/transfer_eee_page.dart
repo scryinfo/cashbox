@@ -440,16 +440,16 @@ class _TransferEeePageState extends State<TransferEeePage> {
             }
             String signInfo = eeeTransferMap["signedInfo"];
             print("eeeTransferMap, signInfo is ======>" + signInfo);
-            ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-            Map submitMap = await scryXNetUtil.submitExtrinsic(signInfo);
-            if (submitMap == null || !submitMap.containsKey("result")) {
-              print("error, submitMap appear error===~");
-              NavigatorUtils.goBack(context);
+            if (signInfo == null || signInfo.isEmpty) {
+              //todo 提示交易签名出现问题
               return;
             }
-            String txHash = submitMap["result"];
-            print("txHash is " + txHash.toString());
-            NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
+            Provider.of<TransactionProvide>(context)
+              ..setFromAddress(Wallets.instance.nowWallet.nowChain.chainAddress)
+              ..setValue(_txValueController.text)
+              ..setToAddress(_toAddressController.text)
+              ..setSignInfo(signInfo);
+            NavigatorUtils.push(context, Routes.transferEeeConfirmPage);
           },
         );
       },
