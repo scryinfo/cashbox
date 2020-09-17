@@ -13,6 +13,7 @@ import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
+import 'package:flutter_easyrefresh/ball_pulse_header.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -38,9 +39,8 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   int displayTxOffset = 0;
   int refreshAddCount = 20;
 
-
   int pageSize = 32;
-  int currentPage = 0;//到达最后，重新计算当前的页号
+  int currentPage = 0; //到达最后，重新计算当前的页号
 
   @override
   void initState() {
@@ -93,7 +93,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   Widget _buildTxHistoryLayout() {
     return Container(
       width: ScreenUtil().setWidth(90),
-
       child: Column(
         children: <Widget>[
           Gaps.scaleVGap(1),
@@ -103,7 +102,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
           Gaps.scaleVGap(4),
           _buildDigitTxHistoryWidget(),
         ],
-    ),
+      ),
     );
   }
 
@@ -281,7 +280,8 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
 
   Widget _makeRefreshWidgets(snapshot) {
     return EasyRefresh.custom(
-      footer: BallPulseFooter(),
+      header: ClassicalHeader(textColor: Color.fromRGBO(16, 162, 222, 0.7)),
+      footer: ClassicalFooter(textColor: Color.fromRGBO(16, 162, 222, 0.7)),
       slivers: <Widget>[
         SliverList(
           delegate: SliverChildBuilderDelegate(
@@ -310,7 +310,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
           }
         });
       },
-      onRefresh: ()async{
+      onRefresh: () async {
         this.currentPage = 0;
         setState(() {
           this.eeeTxListModel.clear();
@@ -441,15 +441,17 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
 
   Future<List<EeeTransactionModel>> getTxListData() async {
     //去加载本地DB已有的交易，进行显示
-    for(;true;){
-      var newData = await Wallets.instance.loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, (currentPage* this.pageSize), this.pageSize);
-      if(newData.isEmpty){
+    for (; true;) {
+      var newData = await Wallets.instance
+          .loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, (currentPage * this.pageSize), this.pageSize);
+      if (newData.isEmpty) {
         break;
       }
       var oldSet = eeeTxListModel.map((e) => e.txHash).toSet();
       var newModel = <EeeTransactionModel>[];
-      newData.forEach((element) { //去掉相同的交易
-        if(!oldSet.contains(element.txHash)){
+      newData.forEach((element) {
+        //去掉相同的交易
+        if (!oldSet.contains(element.txHash)) {
           try {
             element.value = (BigInt.parse(element.value) / BigInt.from(Eee_Unit)).toStringAsFixed(5);
           } catch (e) {
@@ -458,7 +460,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
           newModel.add(element);
         }
       });
-      if(newModel.isEmpty){
+      if (newModel.isEmpty) {
         currentPage += 1;
         continue;
       }
