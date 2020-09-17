@@ -168,6 +168,14 @@ class _EntryPageState extends State<EntryPage> {
             if (appConfigVersion != null && appConfigVersion.toString().isNotEmpty) {
               spUtil.setString(VendorConfig.appConfigVersionKey, appConfigVersion);
             }
+
+            ///update appConfigVersion
+            var dappOpenUrlValue = latestConfigObj[VendorConfig.dappOpenUrlKey];
+            print("_checkServerAppConfig dappOpenUrlValue======>" + dappOpenUrlValue.toString());
+            if (dappOpenUrlValue != null && dappOpenUrlValue.toString().isNotEmpty) {
+              spUtil.setString(VendorConfig.dappOpenUrlKey, dappOpenUrlValue);
+              VendorConfig.dappOpenUrValue = dappOpenUrlValue.toString();
+            }
           }
           print("_checkServerAppConfig isLatestApk======>" + isLatestApk.toString());
           if (isLatestApk == null || !isLatestApk) {

@@ -46,6 +46,10 @@ class Wallets {
     if (isFinishInit == null || !isFinishInit) {
       SharedPreferenceUtil.initIpConfig(); //Initialize interface ip, version information, etc. to local file
     }
+    var temp = spUtil.get(VendorConfig.dappOpenUrlKey);
+    if(temp != null && temp.isNotEmpty){
+      VendorConfig.dappOpenUrValue = temp.toString();
+    }
   }
 
   initDatabaseAndDefaultDigits() async {
