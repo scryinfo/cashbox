@@ -93,4 +93,8 @@ version = "=0.3.2"
 [dependencies.jni]
 version = "0.17.0"
 
+# for global sqlite reference
+[dependencies.lazy_static]
+version = "1.4.0"
+
 
