@@ -19,6 +19,7 @@ use std::path::Path;
 use db::SQLite;
 use std::sync::{Arc, Mutex};
 use log::Level;
+use db::SharedSQLite;
 
 
 const PASSPHRASE: &str = "";
@@ -36,6 +37,15 @@ pub extern "system" fn Java_JniApi_btcTxSign(
     // TODO
     // use wallet_id to create master and calc public_key and sign Transaction
     // now just use mnemonic_str to sign it
+    let from_address = env.get_string(from_address).unwrap();
+    let from_address = from_address.to_str().unwrap();
+    let wallet_id = env.get_string(wallet_id).unwrap();
+    let wallet_id = wallet_id.to_str().unwrap();
+    let to_address = env.get_string(to_address).unwrap();
+    let to_address = to_address.to_str().unwrap();
+    let value = env.get_string(value).unwrap();
+    let value = value.to_str().unwrap();
+    let value = value.parse::<u64>().unwrap();
 
     let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
     let mnemonic = Mnemonic::from_str(&words).expect("don't have right mnemonic");
@@ -66,7 +76,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
 
     const RBF: u32 = 0xffffffff - 2;
 
-    //TODO
+    // TODO
     // must use sqlite and modify database table UTXO
     // just hard code  UTXO. must fix it in feature
     let mut spending = Transaction {
@@ -92,7 +102,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
     };
 
     // The script_sig input needs to be assembled
-    // resolver -> OTXO output data
+    // resolver -> UTXO output data
     // compare example in rust-wallet
     master.sign(&mut spending, SigHashType::All,
                 &(|_| Some(
@@ -120,6 +130,16 @@ pub extern "system" fn Java_JniApi_btcTxSignAndBroadcast(
     to: JString,
     value: JString,
 ) -> jboolean {
+    // let from_address = env.get_string(from_address).unwrap();
+    // let from_address = from_address.to_str().unwrap();
+    // let wallet_id = env.get_string(wallet_id).unwrap();
+    // let wallet_id = wallet_id.to_str().unwrap();
+    // let to_address = env.get_string(to_address).unwrap();
+    // let to_address = to_address.to_str().unwrap();
+    // let value = env.get_string(value).unwrap();
+    // let value = value.to_str().unwrap();
+    // let value = value.parse::<u64>().unwrap();
+
     unimplemented!()
 }
 
@@ -172,6 +192,7 @@ pub extern "system" fn Java_JniApi_btcLoadTxHistory(
     unimplemented!()
 }
 
+// this function don't have any return value。because it will run spv node
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcStart(
@@ -216,11 +237,20 @@ pub extern "system" fn Java_JniApi_btcStart(
     let chaindb = Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap();
     let sqlite = SQLite::open_db(network);
     let shared_sqlite = Arc::new(Mutex::new(sqlite));
-    let mut spv = Constructor::new(network, listen, chaindb, shared_sqlite).unwrap();
-    spv.run(network, peers, connections).expect("can not start node");
+    // let mut spv = Constructor::new(network, listen, chaindb, shared_sqlite).unwrap();
+    let mut spv = Constructor::new(network, listen, chaindb, SHARED_SQLITE).unwrap();
 
+    spv.run(network, peers, connections).expect("can not start node");
 }
 
+
+lazy_static! {
+    static ref SHARED_SQLITE : SharedSQLite = {
+         // when you test you need Testnet otherwise you need Mainnet
+         let sqlite = SQLite::open_db(Network::Testnet);
+         Arc::new(Mutex::new(sqlite))
+    };
+}
 
 
 
