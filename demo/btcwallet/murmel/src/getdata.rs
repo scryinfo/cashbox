@@ -15,12 +15,12 @@ use bitcoin::network::message_bloom_filter::{FilterLoadMessage, MerkleBlockMessa
 use chaindb::SharedChainDB;
 use bitcoin::network::message::NetworkMessage::GetBlocks;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
-use db::SharedSQLite;
 use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::Hash;
 use hooks::HooksMessage;
+use jniapi::btcapi::SHARED_SQLITE;
 
 const PUBLIC_KEY: &str = "0291ee52a0e0c22db9772f237f4271ea6f9330d92b242fb3c621928774c560b699";
 
@@ -29,15 +29,14 @@ pub struct GetData {
     //send a message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-    sqlite: SharedSQLite,
     hook_receiver: mpsc::Receiver<HooksMessage>,
 }
 
 impl GetData {
-    pub fn new(sqlite: SharedSQLite, chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>, hook_receiver: mpsc::Receiver<HooksMessage>) -> PeerMessageSender<NetworkMessage> {
+    pub fn new( chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>, hook_receiver: mpsc::Receiver<HooksMessage>) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
-        let mut getdata = GetData { chaindb, p2p, timeout, sqlite, hook_receiver };
+        let mut getdata = GetData { chaindb, p2p, timeout, hook_receiver };
 
         thread::Builder::new().name("GetData".to_string()).spawn(move || { getdata.run(receiver) }).unwrap();
 
@@ -71,7 +70,7 @@ impl GetData {
                                     {
                                         let block_hash = merkleblock.prev_block.to_hex();
                                         let timestamp = merkleblock.timestamp;
-                                        let sqlite = self.sqlite.lock().expect("open connection error!");
+                                        let sqlite = SHARED_SQLITE.lock().expect("open connection error!");
                                         sqlite.update_newest_header(block_hash, timestamp.to_string());
                                     }
 
@@ -124,7 +123,7 @@ impl GetData {
         if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::MerkleBlock) {
             return Ok(());
         }
-        let sqlite = self.sqlite.lock().expect("sqlite open error");
+        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
         let (_block_hash, timestamp) = sqlite.init();
         let block_hashes = sqlite.query_header(timestamp, add);
         if block_hashes.len() == 0 { return Ok(()); }
@@ -149,7 +148,7 @@ impl GetData {
 
     // Handle tx return value
     fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
-        let sqlite = self.sqlite.lock().expect("open connection error!");
+        let sqlite = SHARED_SQLITE.lock().expect("open connection error!");
         println!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;

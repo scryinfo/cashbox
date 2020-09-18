@@ -92,7 +92,7 @@ pub extern "system" fn Java_JniApi_launch(env: JNIEnv,
     let sqlite = SQLite::open_db(network);
     let shared_sqlite = Arc::new(Mutex::new(sqlite));
 
-    let mut spv = Constructor::new(network, listen, chaindb, shared_sqlite).unwrap();
+    let mut spv = Constructor::new(network, listen, chaindb).unwrap();
     spv.run(network, peers, connections).expect("can not start node");
 }
 

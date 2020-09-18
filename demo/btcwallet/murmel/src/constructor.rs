@@ -57,7 +57,6 @@ use p2p::BitcoinP2PConfig;
 use std::time::Duration;
 use bloomfilter::BloomFilter;
 use getdata::GetData;
-use sqlite::Connection;
 use db::{SharedSQLite, SQLite};
 use broadcast::Broadcast;
 
@@ -85,7 +84,7 @@ impl Constructor {
     }
 
     /// Construct the stack
-    pub fn new(network: Network, listen: Vec<SocketAddr>, chaindb: SharedChainDB, shared_sqlite: SharedSQLite) -> Result<Constructor, Error> {
+    pub fn new(network: Network, listen: Vec<SocketAddr>, chaindb: SharedChainDB) -> Result<Constructor, Error> {
         const BACK_PRESSURE: usize = 10;
 
         let (to_dispatcher, from_p2p) = mpsc::sync_channel(BACK_PRESSURE);
@@ -111,14 +110,14 @@ impl Constructor {
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
 
-        dispatcher.add_listener(HeaderDownload::new(shared_sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone(), lightning.clone(), hook_sender));
+        dispatcher.add_listener(HeaderDownload::new( chaindb.clone(), p2p_control.clone(), timeout.clone(), lightning.clone(), hook_sender));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
         info!("send FilterLoad");
         dispatcher.add_listener(BloomFilter::new(p2p_control.clone(), timeout.clone()));
 
         info!("send GetData");
-        dispatcher.add_listener(GetData::new(shared_sqlite.clone(), chaindb.clone(), p2p_control.clone(), timeout.clone(), hook_receiver));
+        dispatcher.add_listener(GetData::new( chaindb.clone(), p2p_control.clone(), timeout.clone(), hook_receiver));
 
         info!("Broadcast TX");
         dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone()));

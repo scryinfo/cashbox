@@ -235,17 +235,14 @@ pub extern "system" fn Java_JniApi_btcStart(
     let listen: Vec<SocketAddr> = Vec::new();
     let birth: u64 = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs();
     let chaindb = Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap();
-    let sqlite = SQLite::open_db(network);
-    let shared_sqlite = Arc::new(Mutex::new(sqlite));
-    // let mut spv = Constructor::new(network, listen, chaindb, shared_sqlite).unwrap();
-    let mut spv = Constructor::new(network, listen, chaindb, SHARED_SQLITE).unwrap();
+    let mut spv = Constructor::new(network, listen, chaindb).unwrap();
 
     spv.run(network, peers, connections).expect("can not start node");
 }
 
 
 lazy_static! {
-    static ref SHARED_SQLITE : SharedSQLite = {
+    pub static ref SHARED_SQLITE : SharedSQLite = {
          // when you test you need Testnet otherwise you need Mainnet
          let sqlite = SQLite::open_db(Network::Testnet);
          Arc::new(Mutex::new(sqlite))

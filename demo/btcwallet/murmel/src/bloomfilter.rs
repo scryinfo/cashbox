@@ -10,7 +10,6 @@ use std::collections::VecDeque;
 use bitcoin::network::message_blockdata::{InvType, Inventory};
 use bitcoin::{BlockHeader, BitcoinHash};
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use db::SharedSQLite;
 
 
 pub struct BloomFilter {

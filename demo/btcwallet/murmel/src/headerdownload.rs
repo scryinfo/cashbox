@@ -32,24 +32,23 @@ use std::{
 };
 use timeout::{ExpectedReply, SharedTimeout};
 use downstream::SharedDownstream;
-use db::{SharedSQLite, SQLite};
 use bitcoin_hashes::hex::ToHex;
 use hooks::HooksMessage;
+use jniapi::btcapi::SHARED_SQLITE;
 
 pub struct HeaderDownload {
     p2p: P2PControlSender<NetworkMessage>,
     chaindb: SharedChainDB,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     downstream: SharedDownstream,
-    sqlite: SharedSQLite,
     hook_sender: mpsc::SyncSender<HooksMessage>,
 }
 
 impl HeaderDownload {
-    pub fn new(sqlite: SharedSQLite, chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>, downstream: SharedDownstream, hook_sender: mpsc::SyncSender<HooksMessage>) -> PeerMessageSender<NetworkMessage> {
+    pub fn new(chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>, downstream: SharedDownstream, hook_sender: mpsc::SyncSender<HooksMessage>) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
-        let mut headerdownload = HeaderDownload { chaindb, p2p, timeout, downstream, sqlite, hook_sender };
+        let mut headerdownload = HeaderDownload { chaindb, p2p, timeout, downstream, hook_sender };
 
         thread::Builder::new().name("header download".to_string()).spawn(move || { headerdownload.run(receiver) }).unwrap();
 
@@ -168,7 +167,7 @@ impl HeaderDownload {
                                 // POW is ok, stored top chaindb
                                 some_new = true;
                                 // save block hash into sqlite table "block_hash"
-                                let sqlite = self.sqlite.lock().unwrap();
+                                let sqlite = SHARED_SQLITE.lock().unwrap();
                                 let header_clone = header.clone();
                                 sqlite.insert_block(
                                     header_clone.bitcoin_hash().to_hex(),
