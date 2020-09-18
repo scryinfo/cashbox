@@ -191,7 +191,7 @@
   "tx_confirm_instruction_title": "兑换确认说明",
   "tx_confirm_instruction_content": "请最后确认交易信息。确认无误后，点击发送即可上链",
   "exchange_confirm_instruction": "兑换确认说明",
-  "exchange_confirm_instruction_content_hint1": "最后一次检查，请务必确认相关信息无误。",
+  "exchange_confirm_instruction_content_hint1": "最后一次检查，请务必确认地址、数额等相关信息无误。",
   "exchange_confirm_instruction_content_hint2": "\n确认信息无误后。请点击输入密码，验证完成后，即可自动上链，完成代币DDD兑换成EEE。",
   "exchange_from_address": "兑换转出地址",
   "exchange_to_address": "兑换转入地址",
