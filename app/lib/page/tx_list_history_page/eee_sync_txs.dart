@@ -83,7 +83,7 @@ class EeeSyncTxs {
       try {
         await _loadEeeChainTxHistoryData(runParams);
       } catch (e) {
-        print("_loadEeeChainTxHistoryData: " + e.toString());
+        print("_loadEeeChainTxHistoryData error is : " + e.toString());
       }
       _timing = false;
     });
@@ -135,16 +135,16 @@ class EeeSyncTxs {
       }
       Map records = eeeSyncMap["records"];
       if (records != null && records.isNotEmpty) {
-        Map<String, dynamic> recordsMap = eeeSyncMap["records"];
+        Map<dynamic, dynamic> recordsMap = eeeSyncMap["records"];
         for(var v in recordsMap.values){
-          Map<String, dynamic> accountDetailMap = v;
+          Map<dynamic, dynamic> accountDetailMap = v;
           if (accountDetailMap != null &&
               accountDetailMap.containsKey("account") &&
               accountDetailMap["account"].toString().toLowerCase().trim() == runParams.address.toLowerCase()) {
             startBlockHeight = accountDetailMap["blockNum"];
             break;
           }
-        };
+        }
       }
     }
 
