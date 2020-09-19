@@ -1,5 +1,6 @@
 use super::*;
 
+use uuid::Uuid;
 use model::{WalletObj, SyncStatus};
 use sqlite::State;
 use substratetx::TransferDetail;
@@ -117,10 +118,24 @@ impl DataServiceProvider {
         stat.next().map(|_| true).map_err(|err| err.into())
     }
     pub fn save_transfer_detail(&self, account: &str, blockhash: &str, tx_detail: &TransferDetail, timestamp: u64, is_successful: bool) -> WalletResult<bool> {
+
         log::info!("save_transfer_detail account:{},blockhash:{}",account,blockhash);
-        let insert_sql = "insert or replace into detail.TransferRecord(tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp,wallet_account) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+        //check tx  exist?
+
+        let count_sql = "SELECT count(*) from detail.TransferRecord WHERE tx_hash = ? and wallet_account = ?";
+        let mut stat = self.db_hander.prepare(count_sql)?;
+        stat.bind(1, tx_detail.hash.as_ref().unwrap().as_str())?;//Transaction hash
+        stat.bind(2, account)?;//Transaction time
+        while let Ok(State::Row) = stat.next() {
+            if let Ok(count) = stat.read::<i64>(0){
+                if count==1{
+                    return Ok(true)
+                }
+            }
+        }
+        // start insert tx
+        let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp,wallet_account,tx_id) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         let mut stat = self.db_hander.prepare(insert_sql)?;
-        //tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp
         stat.bind(1, tx_detail.hash.as_ref().unwrap().as_str())?;//Transaction hash
         stat.bind(2, blockhash)?;//block hash
         stat.bind(3, 5 as i64)?;// The chain id needs to be flexibly adjusted
@@ -148,6 +163,8 @@ impl DataServiceProvider {
         stat.bind(12, is_successful as i64)?;
         stat.bind(13, timestamp as i64)?;//Transaction time
         stat.bind(14, account)?;//Transaction time
+        let tx_id = Uuid::new_v4().to_string();
+        stat.bind(15, tx_id.as_str())?;//Transaction time
         stat.next().map(|_| true).map_err(|err| err.into())
     }
 

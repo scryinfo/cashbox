@@ -86,7 +86,8 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
 
     DROP TABLE IF EXISTS [main].[TransferRecord];
     CREATE TABLE [main].[TransferRecord](
-    [tx_hash]  VARCHAR(72) PRIMARY KEY NOT NULL,
+    [tx_id] VARCHAR(64) PRIMARY KEY NOT NULL,
+    [tx_hash]  VARCHAR(72) ,
     [block_hash] VARCHAR(72),
     [wallet_account]  VARCHAR(48),
     [chain_id] INT,
