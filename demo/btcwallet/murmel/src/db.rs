@@ -155,6 +155,20 @@ impl SQLite {
         statement.bind(4, vout).expect("bind statement error");
         statement.next().expect("insert utxos error");
     }
+
+    // query count
+    pub fn count(&mut self) -> u64{
+        let mut statement = self.connection.prepare(
+            "select count(*) from block_hash"
+        ).expect("count error");
+
+        let mut count:usize = 0;
+        while let State::Row = statement.next().unwrap() {
+            let c = statement.read::<usize>(0).unwrap();
+            count = c;
+        }
+        count as u64
+    }
 }
 
 const NEWEST_KEY: &str = "NEWEST_KEY";
