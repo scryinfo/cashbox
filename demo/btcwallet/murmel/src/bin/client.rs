@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 extern crate bitcoin;
-extern crate log;
+#[macro_use] extern crate log;
 extern crate murmel;
 extern crate rand;
 extern crate simple_logger;
@@ -66,7 +66,7 @@ pub fn main() {
     }
     // Switch the address here. Now adjust it to the test chain
     // The network here and match_ below have been changed
-    println!("Use Network::Testnet for test");
+    info!("Use Network::Testnet for test");
     let mut network = Network::Testnet;
     if let Some(net) = find_arg("network") {
         match net.as_str() {

@@ -240,6 +240,7 @@ pub extern "system" fn Java_JniApi_btcStart(
     spv.run(network, peers, connections).expect("can not start node");
 }
 
+// use sqlite as global
 lazy_static! {
     pub static ref SHARED_SQLITE : SharedSQLite = {
          // when you test you need Testnet otherwise you need Mainnet

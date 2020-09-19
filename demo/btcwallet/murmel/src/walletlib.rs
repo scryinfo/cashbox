@@ -33,8 +33,8 @@ pub fn create_master() -> Transaction {
     let public_key = instance_key.public.clone();
     let public_compressed = public_key.serialize();
     let public_compressed = hex::encode(public_compressed);
-    println!("source {:?}", &source);
-    println!("public_compressed {:?}", &public_compressed);
+    error!("source {}", &source);
+    error!("public_compressed {:#?}", &public_compressed);
 
     let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 1, 10).unwrap();
     master.add_account(account);
@@ -44,8 +44,8 @@ pub fn create_master() -> Transaction {
     let public_key = instance_key.public.clone();
     let public_compressed = public_key.serialize();
     let public_compressed = hex::encode(public_compressed);
-    println!("target {:?}", &target);
-    println!("public_compressed {:?}", &public_compressed);
+    error!("target {:?}", &target);
+    error!("public_compressed {:?}", &public_compressed);
 
 
     const RBF: u32 = 0xffffffff - 2;
@@ -88,7 +88,7 @@ pub fn create_master() -> Transaction {
                 )),
                 &mut unlocker).expect("can not sign");
 
-    println!("tx {:#?}", &spending_transaction);
+    error!("tx {:#?}", &spending_transaction);
     spending_transaction
 }
 
