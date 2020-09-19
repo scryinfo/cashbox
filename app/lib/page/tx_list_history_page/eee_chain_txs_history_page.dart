@@ -333,7 +333,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
         onTap: () {
           Provider.of<TransactionProvide>(context)
             ..emptyDataRecord()
-            ..setFromAddress(eeeTxListModel[index].from ?? eeeTxListModel[index].signer ?? "")
+            ..setFromAddress(eeeTxListModel[index].from == "" ? eeeTxListModel[index].signer : eeeTxListModel[index].from)
             ..setToAddress(eeeTxListModel[index].to)
             ..setHash(eeeTxListModel[index].blockHash)
             ..setTimeStamp(eeeTxListModel[index].timeStamp)
