@@ -118,7 +118,7 @@ impl DataServiceProvider {
     }
     pub fn save_transfer_detail(&self, account: &str, blockhash: &str, tx_detail: &TransferDetail, timestamp: u64, is_successful: bool) -> WalletResult<bool> {
         log::info!("save_transfer_detail account:{},blockhash:{}",account,blockhash);
-        let insert_sql = "insert into detail.TransferRecord(tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp,wallet_account) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+        let insert_sql = "insert or replace into detail.TransferRecord(tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp,wallet_account) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         let mut stat = self.db_hander.prepare(insert_sql)?;
         //tx_hash,block_hash,chain_id,token_name,method_name,signer,tx_index,tx_from,tx_to,amount,ext_data,status,tx_timestamp
         stat.bind(1, tx_detail.hash.as_ref().unwrap().as_str())?;//Transaction hash

@@ -410,16 +410,7 @@ public class NativeLib {
         public String toString() {
             return "EeeChainTxDetail{" +
                     "txHash='" + txHash + '\'' +
-                    ", blockHash='" + blockHash + '\'' +
-                    ", from='" + from + '\'' +
-                    ", to='" + to + '\'' +
-                    ", value='" + value + '\'' +
-                    ", inputMsg='" + inputMsg + '\'' +
-                    ", gasFee='" + gasFee + '\'' +
-                    ", signer='" + signer + '\'' +
-                    ", isSuccess=" + isSuccess +
-                    ", timestamp='" + timestamp + '\'' +
-                    '}';
+                    ", blockHash='" + blockHash;
         }
     }
 

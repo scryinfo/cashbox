@@ -11,9 +11,9 @@ public class NativeLibTest {
     public static void main(String[] args) throws Throwable {
 
         System.out.println("********************start jni func test***************************************");
-      // System.out.println(NativeLib.initWalletBasicData());
-       //updateDefaultDigitTest();
-       //walletGenerateTest();
+       System.out.println(NativeLib.initWalletBasicData());
+     //  updateDefaultDigitTest();
+     //  walletGenerateTest();
        //  walletExportTest();
       //  eeeTransferTest();
           //updateAuthListTest();
@@ -22,8 +22,8 @@ public class NativeLibTest {
        //  queryDigitTest();
         //  addDigitTest();
         //delWalletTest();
-       // storage_query_test();
-        getEeeTxRecordTest();
+        storage_query_test();
+       // getEeeTxRecordTest();
         //contract_deploy_test();
         //  walletSaveTest();
         //  updateBalance();
@@ -39,8 +39,11 @@ public class NativeLibTest {
     }
 
     public static void updateDefaultDigitTest() {
-        String json = "[{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342 \",\"shortName\":\"DDD \",\"fullName\":\"DDD \",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg \":\"locale: //ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"},{\"contractAddress\":\"\",\"shortName\":\"TokenX\",\"fullName\":\"TokenX\",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"kim-TokenX\",\"decimal\":\"15\",\"chainType\":\"EEE\"}]";
-        NativeLib.WalletState state = NativeLib.updateDefaultDigitList(json);
+       // String json = "[{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342 \",\"shortName\":\"DDD \",\"fullName\":\"DDD \",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg \":\"locale: //ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"},{\"contractAddress\":\"\",\"shortName\":\"TokenX\",\"fullName\":\"TokenX\",\"urlImg\":\"locale: //ic_ddd.png\",\"id\":\"kim-TokenX\",\"decimal\":\"15\",\"chainType\":\"EEE\"}]";
+
+        String json_v = "[{\"contractAddress\":\"0x9F5F3CFD7a32700C93F971637407ff17b91c7342\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"3\",\"decimal\":\"18\",\"chainType\":\"ETH\"},{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"4\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"},{\"contractAddress\":\" \",\"shortName\":\"TokenX\",\"fullName\":\"TokenX\",\"urlImg\":\"\",\"id\":\"5\",\"decimal\":\"15\",\"chainType\":\"EEE\"}]";
+
+        NativeLib.WalletState state = NativeLib.updateDefaultDigitList(json_v);
         System.out.println(state);
     }
 
@@ -126,12 +129,12 @@ public class NativeLibTest {
     }
 
     public static void eeeTransferTest() {
-        String from = "5CATEAifKo78WrEPMwuxuEtGVZK632HKePjQ3632yVQptzp1";
-        String to = "5GGzGJR54YNjMKhaYt6hHV3o99FZ6JKYEDCrzUg1HCz1tWPa";
-        String value = "200000000000000";
-        String genesisHash = "0xd396f9ef65373109b2f049f346996fc285056e382c7aab6b2ec4b1dab032a754";
-        int index = 0;
-        int runtimeVersion = 1;
+        String from = "5H8iXEyLrvgceXrFFUXSJTAoPywmxTjjS8JHvLTfQJdv3Ybr";
+        String to = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
+        String value = "1";
+        String genesisHash = "0x4fa8fc5bbe75fbffe3df5b2dc7a809ae07119ea67e587c15d5b7c8c8ddca3303";
+        int index = 1;
+        int runtimeVersion = 4;
         NativeLib.Message msg = NativeLib.eeeTransfer(from, to, value, genesisHash, index, runtimeVersion,1, "123456".getBytes());
         System.out.println(msg);
     }
@@ -157,7 +160,7 @@ public class NativeLibTest {
     }
 
     public static void getEeeTxRecordTest(){
-        System.out.println(NativeLib.loadEeeChainTxListHistory("5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC","EEE",0,30));
+        System.out.println(NativeLib.loadEeeChainTxListHistory("5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC","EEE",30,30));
     }
     public static void storage_query_test() throws Throwable {
         Map header = new HashMap<String, String>();
@@ -169,7 +172,7 @@ public class NativeLibTest {
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://118.178.197.108:9933"), header);
 
         Header current_header = client.invoke("chain_getHeader", new Object[]{}, Header.class);
         //Get the current block number
@@ -207,11 +210,11 @@ public class NativeLibTest {
             //Query the history of account status changes within the changed block
             StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo,key2.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
             System.out.println("*********************StorageChange start**************");
-            System.out.println(storage.toString());
+           // System.out.println(storage.toString());
             System.out.println("*********************StorageChange end**************");
             for (StorageChange item : storage) {
                 //Read details of status changes
-                System.out.println("block hash:" + item.block + ",changes:" + item.changes.toString());
+                System.out.println("block hash:" + item.block + "\nchanges:" + item.changes.toString());
                 Block block_detail = client.invoke("chain_getBlock", new Object[]{item.block}, Block.class);
                 List tx_list = Arrays.asList(block_detail.block.extrinsics);
                 //todo Why are there blocks with only timestamps retrieved?
@@ -798,8 +801,15 @@ public class NativeLibTest {
 
     public static class Block {
         private BlockDetail block;
-        private String justification;
+        private byte[] justification;
 
+        public byte[] getJustification() {
+            return justification;
+        }
+
+        public void setJustification(byte[] justification) {
+            this.justification = justification;
+        }
 
         public BlockDetail getBlock() {
             return block;
@@ -809,19 +819,11 @@ public class NativeLibTest {
             this.block = block;
         }
 
-        public String getJustification() {
-            return justification;
-        }
-
-        public void setJustification(String justification) {
-            this.justification = justification;
-        }
-
         @Override
         public String toString() {
             return "Block{" +
                     "block=" + block +
-                    ", justification='" + justification + '\'' +
+                    ", justification=" + Arrays.toString(justification) +
                     '}';
         }
     }

@@ -1,7 +1,7 @@
 use super::*;
 use super::model::*;
 
-use substratetx::Crypto;
+use substratetx::{Crypto, TransferDetail};
 use std::collections::HashMap;
 use codec::{Encode, Decode};
 use ethereum_types::{H160, U256, H256};
@@ -60,13 +60,18 @@ impl EEE {
         let event_res = substratetx::event_decode(event_data, blockhash, account);
         let extrinsics_map = substratetx::decode_extrinsics(extrinsics, account)?;
         //Block transaction events There must be a time stamp setting
+      //  let tx_time = extrinsics_map.get(&0).unwrap_or(&TransferDetail::default());//Get timestamp
         let tx_time = extrinsics_map.get(&0).unwrap();//Get timestamp
         let instance = wallet_db::DataServiceProvider::instance()?;
-        for index in 1..extrinsics_map.len() {
-            let index = index as u32;
-            let transfer_detail = extrinsics_map.get(&index).unwrap();
-            let is_successful = event_res.get(&index).unwrap();
-            instance.save_transfer_detail(account, blockhash, transfer_detail, tx_time.timestamp.unwrap(), *is_successful)?;
+        for (index,transfer_detail) in extrinsics_map.iter() {
+            if transfer_detail.signer.is_none(){
+                continue;
+            }
+            log::info!("tx index:{}",index);
+            if let  Some(is_successful) = event_res.get(index){
+                instance.save_transfer_detail(account, blockhash, transfer_detail, tx_time.timestamp.unwrap(), *is_successful)?;
+            }
+
         }
         Ok(())
     }

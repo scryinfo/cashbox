@@ -115,7 +115,7 @@ pub fn event_decode(event_data: &str, _blockhash: &str, _account: &str) -> HashM
             //todo 将索引与区块交易中的索引关联起来，怎么来确定交易索引与交易结果之间的关系？
             let index = if let Phase::ApplyExtrinsic(index) = event.phase { index } else { 0 };
             //todo 当交易失败，不会存在该通知记录
-            println!("event detail is:{:?}", event.event);
+            log::info!("event detail is:{:?}", event.event);
             match event.event {
                 Event::frame_system(se) => { //todo
                     match &se {
@@ -157,7 +157,7 @@ pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<
 
         let mut tx = TransferDetail::default();
         tx.hash = Some(format!("0x{}", hex::encode(hash)));
-        println!("tx detail is:{:?}", extrinsic.function);
+        log::info!("tx detail is:{:?}", extrinsic.function);
 
         match &extrinsic.function {
             Call::Timestamp(set(date, )) => {
@@ -250,7 +250,7 @@ pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<
 
 #[test]
 fn decode_extrinsics_test() {
-    let data = r#"["0x280402000b208b95717401","0x2d0284306721211d5404bd9da88e0204360a1a9ab8b87c66c1bc2fcdd37f3c2222cc200118cc282a465f5de1c99dc5e346296dcdce0751bf484be239129de0fcb52c682b8767451a4ad6257754f83a055d20eab1e6814680b811d09ae07be3e2122fcd82060608000605766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d040400"]"#;
+    let data = r#"["0x280402000bc0800ea47401","0x0503040c0004a96de34159ef72e752de67ee7a4708c91d8cd840ea02acf43b46cf60a2b5d38ac15d123db612b696cb5949c88a7aebd62547d2e389fb20a9624ca4e747735a3e6a60bf3988f1a0b320d14fba64bdb3f2da9a1e041d7fed749d574a0e7968f33bac5908064241424534020000000055dfd81700000000054241424501016a54699755fd8663f61244982b723f6db1f90d8a89c9eb2b9670dd5154251950e78888c26f1eaf8a570beb1965d0c1417df613380b0dc5674c5ac3efe9a9bf87"]"#;
     match decode_extrinsics(data, "5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC") {
         Ok(res) => {
             for (index, hash) in &res {
@@ -263,7 +263,7 @@ fn decode_extrinsics_test() {
 
 #[test]
 fn data_decode_test() {
-    let encode_event = r#"0x0800000000000000102700000101000001000000000103050340420f00000100"#;
+    let encode_event = r#"0x1000000000000000482d7c090000000002000000010000000000000000000000000002000000020000000202766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d1e52c89947429e8925126b4152bfe847754794b89adb823f526bf1125783a25100008d49fd1a07000000000000000000000002000000000088a6610b00000000000000"#;
     // let encode_event = r#"0x140000000000000010270000010100000100000000038e50224acdcc7591c0e9a28ab7d91c099574f8d47f3a35a542dbaebf1ec5f30c00000100000002008e50224acdcc7591c0e9a28ab7d91c099574f8d47f3a35a542dbaebf1ec5f30c00c06e31d910010000000000000000000000010000000202ea990fcb7e9600adcf735a69d7bbcbaa62e52d2eb26125381379a91558fe083b8e50224acdcc7591c0e9a28ab7d91c099574f8d47f3a35a542dbaebf1ec5f30c00c06e31d91001000000000000000000000001000000000040420f00000100"#;
     let res = event_decode(encode_event, "", "");
     println!("res detail:{:?}", res);
