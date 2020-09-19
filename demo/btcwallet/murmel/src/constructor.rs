@@ -57,7 +57,6 @@ use p2p::BitcoinP2PConfig;
 use std::time::Duration;
 use bloomfilter::BloomFilter;
 use getdata::GetData;
-use db::{SharedSQLite, SQLite};
 use broadcast::Broadcast;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;

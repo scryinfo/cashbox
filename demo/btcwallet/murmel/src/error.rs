@@ -26,7 +26,6 @@ use hammersbald;
 use std::convert;
 use std::fmt;
 use std::io;
-use db::SQLite;
 
 /// An error class to offer a unified error interface upstream
 pub enum Error {

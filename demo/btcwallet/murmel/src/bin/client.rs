@@ -32,8 +32,6 @@ use std::{
     str::FromStr,
     time::SystemTime,
 };
-use murmel::db::SQLite;
-use std::sync::{Arc, Mutex};
 
 pub fn main() {
     if find_opt("help") {
