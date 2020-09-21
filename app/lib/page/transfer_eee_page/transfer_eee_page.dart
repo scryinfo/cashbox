@@ -405,6 +405,9 @@ class _TransferEeePageState extends State<TransferEeePage> {
         Fluttertoast.showToast(msg: translate('balance_is_less'));
         return false;
       }
+      if (_txValueController.text.startsWith(".")) { // case： float value that start with . without 0.
+        _txValueController.text = double.parse(_txValueController.text).toString();
+      }
     } catch (e) {
       Fluttertoast.showToast(msg: translate('balance_is_less'));
       return false;
