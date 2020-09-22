@@ -150,7 +150,7 @@ class EeeSyncTxs {
 
     print("start BlockHeight is ===>" + startBlockHeight.toString());
 
-    const onceCount = 30000;
+    const onceCount = 3000;
     var queryCount = ((latestBlockHeight - startBlockHeight) / onceCount.toDouble()).ceil(); //divide down to fetch int
 
     for (int i = 0; i < queryCount; i++) {
@@ -224,7 +224,6 @@ class EeeSyncTxs {
       }
 
       Map updateEeeMap = await Wallets.instance.updateEeeSyncRecord(runParams.address, Chain.chainTypeToInt(runParams.chainType), endBlockHeight, endBlockHash);
-
       if (!_isMapStatusOk(updateEeeMap)) {
         return;
       }
@@ -233,7 +232,7 @@ class EeeSyncTxs {
 
   static bool _isMapStatusOk(Map returnMap) {
     if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      print(returnMap);
+      print("returnMap error is ===>"+returnMap.toString());
       return false;
     }
     return true;

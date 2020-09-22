@@ -132,6 +132,7 @@
   "data_loading": "Data loading...",
   "load_data_error": "Data loading error, please retry it",
   "not_exist_tx_history": "No transaction records now.",
+  "not_exist_tx_history_or_is_syncing": "No record or data is being synchronized...",
   "pls_ensure_confirm_pwd": "Please confirm consistency of your password",
   "eee_token_name": "EEE",
   "eth_token_name": "ETH",

@@ -249,15 +249,15 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                   return Text(translate('fail_to_load_data_hint'));
                 }
                 if (snapshot.hasData) {
-                  // if (eeeTxListModel.length == 0) {
-                  //   return Container(
-                  //     alignment: Alignment.topCenter,
-                  //     child: Text(
-                  //       translate('not_exist_tx_history').toString(),
-                  //       style: TextStyle(color: Colors.white70),
-                  //     ),
-                  //   );
-                  // }
+                  if (eeeTxListModel != null && eeeTxListModel.length == 0) {
+                    return Container(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        translate('not_exist_tx_history_or_is_syncing').toString(),
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    );
+                  }
                   return Container(
                     child: _makeRefreshWidgets(snapshot),
                   );
