@@ -6,4 +6,5 @@
     <string name="new_version_title">Upgrade new VersionHint</string>
     <string name="search_new_version">This is latest Version：</string>
     <string name="search_new_version_end">，please click confirm to upgrade your current app</string>
+    <string name="camera_and_file_permission_deny">camera and file access denied</string>
 </resources>

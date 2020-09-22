@@ -6,4 +6,5 @@
     <string name="new_version_title">新版本升级提示</string>
     <string name="search_new_version">检测到新版本：</string>
     <string name="search_new_version_end">，点击确认即可更新体验新版本特性</string>
+    <string name="camera_and_file_permission_deny">拍照和文件读写权限被拒绝</string>
 </resources>
