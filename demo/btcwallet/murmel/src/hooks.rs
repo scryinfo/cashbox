@@ -6,3 +6,9 @@ pub enum HooksMessage {
     ReceivedHeaders(PeerId),
     Others,
 }
+
+pub enum ApiMessage {
+    Api,
+    Db,
+    Other,
+}

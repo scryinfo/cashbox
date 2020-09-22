@@ -162,12 +162,12 @@ impl SQLite {
             "select count(*) from block_hash"
         ).expect("count error");
 
-        let mut count:usize = 0;
+        let mut count:u64 = 0;
         while let State::Row = statement.next().unwrap() {
-            let c = statement.read::<usize>(0).unwrap();
-            count = c;
+            let c = statement.read::<String>(0).unwrap();
+            count = c.parse::<u64>().unwrap();
         }
-        count as u64
+        count
     }
 }
 

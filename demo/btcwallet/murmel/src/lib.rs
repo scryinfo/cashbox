@@ -50,7 +50,7 @@ extern crate hex;
 extern crate sqlite;
 extern crate bitcoin_wallet;
 extern crate jni;
-#[macro_use] extern crate lazy_static;
+extern crate once_cell;
 
 #[cfg(feature="lightning")] mod lightning;
 mod headercache;

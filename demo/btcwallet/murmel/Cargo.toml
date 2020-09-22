@@ -94,7 +94,7 @@ version = "=0.3.2"
 version = "0.17.0"
 
 # for global sqlite reference
-[dependencies.lazy_static]
-version = "1.4.0"
+[dependencies.once_cell]
+version = "1.4.1"
 
 

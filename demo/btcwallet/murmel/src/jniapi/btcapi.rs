@@ -20,6 +20,9 @@ use db::SQLite;
 use std::sync::{Arc, Mutex};
 use log::Level;
 use db::SharedSQLite;
+use once_cell::sync::Lazy;
+use hooks::{HooksMessage, ApiMessage};
+use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
 
 
 const PASSPHRASE: &str = "";
@@ -241,13 +244,19 @@ pub extern "system" fn Java_JniApi_btcStart(
 }
 
 // use sqlite as global
-lazy_static! {
-    pub static ref SHARED_SQLITE : SharedSQLite = {
-         // when you test you need Testnet otherwise you need Mainnet
-         let sqlite = SQLite::open_db(Network::Testnet);
-         Arc::new(Mutex::new(sqlite))
-    };
-}
+pub static SHARED_SQLITE: Lazy<SharedSQLite> = Lazy::new(|| {
+    let sqlite = SQLite::open_db(Network::Testnet);
+    Arc::new(Mutex::new(sqlite))
+});
+
+pub type SharedChannel = Arc<Mutex<(SyncSender<ApiMessage>, Receiver<ApiMessage>)>>;
+
+pub static SHARED_CHANNEL: Lazy<SharedChannel> = Lazy::new(|| {
+    let channel = sync_channel::<ApiMessage>(10usize);
+    Arc::new(Mutex::new(channel))
+});
+
+
 
 
 
