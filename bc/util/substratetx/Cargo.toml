@@ -74,11 +74,16 @@ default-features = false
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'v2.0.0-rc6'
 
+[dependencies.sp-io]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'v2.0.0-rc6'
 
 [features]
 default = ['std']
 std = [
 #    'pallet-contracts/std',
+    'sp-io/std',
     'node-runtime/std',
     "twox-hash/std",
 ]
