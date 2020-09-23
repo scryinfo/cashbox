@@ -140,7 +140,20 @@ mod tests {
             }
             wallet.eth_chain.unwrap().address
         };
+        //to 地址存在
         let rawtx = "0xf86a808301000082010094dac17f958d2ee523a2206206994597c13d831ec780b847565c93e3000000000000000000000000d132abb434b7fe9aca4b24e3f0ef6fdeeeaf87920000000000000000000000000000000000000000000000000000000000000064636268808080";
+        let ethereum = module::Ethereum {};
+        match ethereum.raw_tx_sign(rawtx, 1, address.as_str(), "123456".as_bytes()) {
+            Ok(signed_data) => {
+                println!("tx sign result {}", signed_data)
+            }
+            Err(e) => {
+                assert_eq!("", e.to_string())
+            }
+        }
+
+        //to 地址不存在，是创建合约的
+        let rawtx = "0xf86d208477359400830186a08080b85c6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212202e5795391448b8f14e8374588b280f6dea0ff0fa3270bc1f143022facc12dd0864736f6c634300060c0033808080";
         let ethereum = module::Ethereum {};
         match ethereum.raw_tx_sign(rawtx, 1, address.as_str(), "123456".as_bytes()) {
             Ok(signed_data) => {

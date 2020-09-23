@@ -160,7 +160,12 @@ impl RawTransaction {
         self.nonce = rlp.val_at(0)?;
         self.gas_price = rlp.val_at(1)?;
         self.gas = rlp.val_at(2)?;
-        self.to = Some(rlp.val_at(3)?);
+        let t = rlp.val_at::<H160>(3);
+        if t.is_ok(){
+            self.to = t.ok();
+        }else{
+            self.to = None;
+        }
         self.value = rlp.val_at(4)?;
         self.data = rlp.val_at(5)?;
         Ok(())
