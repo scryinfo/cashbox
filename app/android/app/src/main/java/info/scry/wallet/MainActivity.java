@@ -19,6 +19,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 
 import com.allenliu.versionchecklib.v2.callback.CustomDownloadingDialogListener;
 
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
