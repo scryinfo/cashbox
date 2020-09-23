@@ -19,6 +19,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 
 import com.allenliu.versionchecklib.v2.callback.CustomDownloadingDialogListener;
 
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -37,6 +38,9 @@ import com.allenliu.versionchecklib.v2.AllenVersionChecker;
 import com.allenliu.versionchecklib.v2.builder.DownloadBuilder;
 import com.allenliu.versionchecklib.v2.builder.UIData;
 import com.allenliu.versionchecklib.v2.callback.RequestVersionListener;
+import com.huawei.hms.hmsscankit.ScanUtil;
+import com.huawei.hms.ml.scan.HmsScan;
+import com.huawei.hms.ml.scan.HmsScanAnalyzerOptions;
 import com.yzq.zxinglibrary.android.CaptureActivity;
 import com.yzq.zxinglibrary.common.Constant;
 
@@ -60,6 +64,7 @@ public class MainActivity extends FlutterActivity {
     private static final int REQUEST_CODE_QR_SCAN = 0;
     private static final int REQUEST_CODE_FILE_SYSTEM = 1;
     private static final int CAMERA_AND_FILE_PERMISSION_REQ_CODE = 2;
+    private static final int REQUEST_CODE_SCAN_ONE = 3;
     private Result mFlutterChannelResult = null;
     private final String QR_SCAN_METHOD = "qr_scan_method";
     private final String FILE_SYSTEM_METHOD = "file_system_method";
@@ -91,8 +96,11 @@ public class MainActivity extends FlutterActivity {
                                     } else {
                                         if (call.method.toString().equals(QR_SCAN_METHOD)) {
                                             mFlutterChannelResult = result;
-                                            Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-                                            startActivityForResult(intent, REQUEST_CODE_QR_SCAN);
+                                            HmsScanAnalyzerOptions options = new HmsScanAnalyzerOptions.Creator().setHmsScanTypes(HmsScan.QRCODE_SCAN_TYPE, HmsScan.DATAMATRIX_SCAN_TYPE).create();
+                                            ScanUtil.startScan(MainActivity.this, REQUEST_CODE_SCAN_ONE, options);
+                                            //mFlutterChannelResult = result;
+                                            //Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+                                            //startActivityForResult(intent, REQUEST_CODE_QR_SCAN);
                                         }
                                     }
                                 } else {
@@ -214,6 +222,16 @@ public class MainActivity extends FlutterActivity {
                 if (scanResultString == null) {
                     scanResultString = "";
                 }
+                mFlutterChannelResult.success(scanResultString);
+            } else {
+                mFlutterChannelResult.error("resultCode is ===>", "" + resultCode, "");
+            }
+        } else if (requestCode == REQUEST_CODE_SCAN_ONE) {
+            HmsScan obj = data.getParcelableExtra(ScanUtil.RESULT);
+            if (obj != null) {
+                //展示解码结果
+                String scanResultString = obj.getOriginalValue().toString();
+                Log.println(Log.WARN, "hw scan result is =========>", scanResultString);
                 mFlutterChannelResult.success(scanResultString);
             } else {
                 mFlutterChannelResult.error("resultCode is ===>", "" + resultCode, "");

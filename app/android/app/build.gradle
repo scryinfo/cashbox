@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 
 apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-// apply plugin: 'com.huawei.agconnect'
+apply plugin: 'com.huawei.agconnect'
 
 def keystorePropertiesFile = rootProject.file("key.properties")
 def keystoreProperties = new Properties()
@@ -39,7 +39,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "wallet.cashbox.scry.info"
-        minSdkVersion 17
+        minSdkVersion 19
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -115,8 +115,9 @@ dependencies {
     //实现版本升级 工具库
     implementation 'com.github.AlexLiuSheng:CheckVersionLib:2.2.3'
     implementation 'com.google.code.gson:gson:2.8.6'
-    //hw sdk
-    // implementation 'com.huawei.agconnect:agconnect-core:1.3.1.300'
+    // hw sdk
+    implementation 'com.huawei.agconnect:agconnect-core:1.3.1.300'
+    implementation 'com.huawei.hms:scan:1.1.3.301'
 
     compile 'com.android.support:support-v4:23.0.0'
     compile 'com.android.support:appcompat-v7:24.2.1'
