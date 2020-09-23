@@ -144,6 +144,8 @@ fn decode_nonce(input:&[u8])->Option<u32>{
 }
 pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<HashMap<u32, TransferDetail>, error::Error> {
     let target_account = AccountId::from_ss58check(target_account)?;
+
+  //  let target_account = account_version.0;
     let json_data: Vec<String> = serde_json::from_str(extrinsics_json)?;
 
     let mut map = HashMap::new();
@@ -250,8 +252,8 @@ pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<
 
 #[test]
 fn decode_extrinsics_test() {
-    let data = r#"["0x280402000bc0800ea47401","0x0503040c0004a96de34159ef72e752de67ee7a4708c91d8cd840ea02acf43b46cf60a2b5d38ac15d123db612b696cb5949c88a7aebd62547d2e389fb20a9624ca4e747735a3e6a60bf3988f1a0b320d14fba64bdb3f2da9a1e041d7fed749d574a0e7968f33bac5908064241424534020000000055dfd81700000000054241424501016a54699755fd8663f61244982b723f6db1f90d8a89c9eb2b9670dd5154251950e78888c26f1eaf8a570beb1965d0c1417df613380b0dc5674c5ac3efe9a9bf87"]"#;
-    match decode_extrinsics(data, "5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC") {
+    let data = r#"["0x280402000bc0d50f9e7401","0x0503040c0004c6780e8d843aa93c7c5c006cba32f3675ca3cd86135aeec5088828f8e96e097b81bb29b6865b7ee5f472d9882a9a1ba4d3bedb24f66c0353caad811c62843a785994d3feeaf00ce00e48b9cae2a03ddb1b45c55c3d7f791ac23851f0438d34cd6e94080642414245340201000000c5f6d8170000000005424142450101ec3782732453246a01b929d5ed7bd01916514f4e682ebe823b90132b61cc0d69ac40c325bbbb0e096e2bf56aedbc1a29ea9f690a9248fce162fed5bca41daf8d"]"#;
+    match decode_extrinsics(data, "7Qcj18D5Ukn98iBZRHQ2AkDK1iAZLyJpqpZi2WKAKdrYy9DK") {
         Ok(res) => {
             for (index, hash) in &res {
                 println!("index:{},tx hash is:{:?}", index, hash);

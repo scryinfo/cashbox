@@ -14,6 +14,8 @@ pub use substratetx::{encode_account_storage_key, decode_account_info, event_dec
 
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
+const DEFAULT_SS58_VERSION:u8 = 42;
+
 #[derive(PartialEq, Clone)]
 pub enum StatusCode {
     DylibError = -1,//Errors caused by external input parameters
@@ -83,14 +85,20 @@ mod tests {
     #[test]
     fn mnemonic_create_test() {
         //Mnemonic word creation test, signature test
+
         let mnemonic = substratetx::Sr25519::generate_phrase(18);
+        let seed = substratetx::Sr25519::seed_from_phrase(&mnemonic, None).unwrap();
+        let pair = substratetx::Sr25519::pair_from_seed(&seed);
+        let address = substratetx::Sr25519::ss58_from_pair(&pair,64);
+        println!("address:{}",address);
         let data = "substrate sign method test";
         let s = String::new();
         match substratetx::Ed25519::sign(&mnemonic, data.as_bytes()) {
-            Ok(signed_data) => println!("{}", hex::encode(&signed_data[..])),
+            Ok(signed_data) => println!("0x{}", hex::encode(&signed_data[..])),
             Err(e) => println!("{}", e.to_string()),
         }
     }
+
 
     #[test]
     fn func_sign_test() {
@@ -126,7 +134,7 @@ mod tests {
     fn eth_raw_tx_sign_test() {
         let address = {
             //Initialize the database
-            wallet_db::init_wallet_database();
+            wallet_db::init_wallet_database().expect("init database error");
             //Create a wallet instance
             let wallet_instance = model::Wallet::default();
             let manager = module::wallet::WalletManager {};

@@ -78,18 +78,18 @@ pub trait Crypto {
     fn pair_from_suri(suri: &str, password: Option<&str>) -> Result<Self::Pair, Error> {
         Ok(Self::Pair::from_string(suri, password)?)
     }
-    fn ss58_from_pair(pair: &Self::Pair) -> String;
+    fn ss58_from_pair(pair: &Self::Pair,ss58_version:u8) -> String;
     fn public_from_pair(pair: &Self::Pair) -> Vec<u8>;
     fn seed_from_pair(_pair: &Self::Pair) -> Option<&Self::Seed> { None }
-    fn print_from_seed(seed: &Self::Seed) {
+    fn print_from_seed(seed: &Self::Seed,ss58_version:u8) {
         let pair = Self::pair_from_seed(seed);
         println!("Seed 0x{} is account:\n  Public key (hex): 0x{}\n  Address (SS58): {}",
                  HexDisplay::from(&seed.as_ref()),
                  HexDisplay::from(&Self::public_from_pair(&pair)),
-                 Self::ss58_from_pair(&pair)
+                 Self::ss58_from_pair(&pair,ss58_version)
         );
     }
-    fn print_from_phrase(phrase: &str, password: Option<&str>) {
+    fn print_from_phrase(phrase: &str, password: Option<&str>,ss58_version:u8) {
         match Self::seed_from_phrase(phrase, password) {
             Ok(seed) => {
                 let pair = Self::pair_from_seed(&seed);
@@ -97,7 +97,7 @@ pub trait Crypto {
                          phrase,
                          HexDisplay::from(&seed.as_ref()),
                          HexDisplay::from(&Self::public_from_pair(&pair)),
-                         Self::ss58_from_pair(&pair)
+                         Self::ss58_from_pair(&pair,ss58_version)
                 );
             }
             Err(e) => {
@@ -105,7 +105,7 @@ pub trait Crypto {
             }
         }
     }
-    fn print_from_uri(uri: &str, password: Option<&str>) where <Self::Pair as Pair>::Public: Sized + Ss58Codec + AsRef<[u8]> {
+    fn print_from_uri(uri: &str, password: Option<&str>,ss58_version:u8) where <Self::Pair as Pair>::Public: Sized + Ss58Codec + AsRef<[u8]> {
         if let Ok(pair) = Self::Pair::from_string(uri, password) {
             let seed_text = Self::seed_from_pair(&pair)
                 .map_or_else(Default::default, |s| format!("\n  Seed: 0x{}", HexDisplay::from(&s.as_ref())));
@@ -113,7 +113,7 @@ pub trait Crypto {
                      uri,
                      seed_text,
                      HexDisplay::from(&Self::public_from_pair(&pair)),
-                     Self::ss58_from_pair(&pair)
+                     Self::ss58_from_pair(&pair,ss58_version)
             );
         }
         if let Ok(public) = <Self::Pair as Pair>::Public::from_string(uri) {

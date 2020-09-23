@@ -241,7 +241,7 @@ impl WalletManager {
             ChainType::EEE | ChainType::EeeTest => {
                 let seed = substratetx::Sr25519::seed_from_phrase(&phrase, None).unwrap();
                 let pair = substratetx::Sr25519::pair_from_seed(&seed);
-                let address = substratetx::Sr25519::ss58_from_pair(&pair);
+                let address = substratetx::Sr25519::ss58_from_pair(&pair,DEFAULT_SS58_VERSION);
                 let puk_key = substratetx::Sr25519::public_from_pair(&pair);
                 let address = Address {
                     chain_type: wallet_type,

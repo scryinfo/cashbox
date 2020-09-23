@@ -1,5 +1,5 @@
 use super::*;
-use sp_core::{ed25519, Pair, crypto::Ss58Codec, blake2_256};
+use sp_core::{ed25519, Pair, crypto::{Ss58Codec,Ss58AddressFormat}, blake2_256};
 
 
 pub struct Ed25519;
@@ -18,7 +18,7 @@ impl Crypto for Ed25519 {
         Ok(ed25519::Pair::from_legacy_string(suri, password_override))
     }
 
-    fn ss58_from_pair(pair: &Self::Pair) -> String { pair.public().to_ss58check() }
+    fn ss58_from_pair(pair: &Self::Pair,ss58_version:u8) -> String { pair.public().to_ss58check_with_version(Ss58AddressFormat::Custom(ss58_version)) }
     fn public_from_pair(pair: &Self::Pair) -> Vec<u8> { (&pair.public().0[..]).to_owned() }
     fn seed_from_pair(pair: &Self::Pair) -> Option<&Self::Seed> { Some(pair.seed()) }
     fn sign(phrase: &str,msg:&[u8])->Result<[u8;64],Error>{
