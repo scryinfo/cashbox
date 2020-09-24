@@ -486,6 +486,7 @@ class _EthPageState extends State<EthPage> {
             onTap: () {
               {
                 Provider.of<TransactionProvide>(context)
+                  ..emptyDataRecord()
                   ..setDigitName(displayDigitsList[index].shortName)
                   ..setBalance(displayDigitsList[index].balance)
                   ..setMoney(displayDigitsList[index].money)

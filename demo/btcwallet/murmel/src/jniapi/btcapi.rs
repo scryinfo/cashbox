@@ -161,8 +161,11 @@ pub extern "system" fn Java_JniApi_btcLoadBalance(
 pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(
     env: JNIEnv,
     _class: JClass,
-) {
-    unimplemented!()
+) -> jstring{
+    let sqlite = SHARED_SQLITE.lock().unwrap();
+    let max_block_number =sqlite.count();
+    let max_block_number = env.new_string(max_block_number.to_string()).expect("Could not create java string!");
+    max_block_number.into_inner()
 }
 
 #[no_mangle]

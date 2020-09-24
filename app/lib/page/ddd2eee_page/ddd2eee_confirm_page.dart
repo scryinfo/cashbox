@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
+import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -12,7 +13,6 @@ import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -42,9 +42,9 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
 
   void initDataConfig() {
     fromExchangeAddress = Provider.of<TransactionProvide>(context).fromAddress;
-    toExchangeAddress = Provider.of<TransactionProvide>(context).toAddress ?? VendorConfig.DDD2EEE_ETH_ADDRESS;
+    toExchangeAddress = VendorConfig.DDD2EEE_RECEIVE_ETH_ADDRESS;
     eeeAddress = Provider.of<TransactionProvide>(context).backup;
-    dddAmount = Provider.of<TransactionProvide>(context).balance ?? "0.0";
+    dddAmount = Provider.of<TransactionProvide>(context).txValue ?? "0.0";
     gasPrice = Provider.of<TransactionProvide>(context).gasPrice;
     gasLimit = Provider.of<TransactionProvide>(context).gas;
   }
@@ -373,13 +373,23 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            print("_showPwdDialog pwd is ===>" + pwd + "value===>" + dddAmount);
             String walletId = await Wallets.instance.getNowWalletId();
-            Map result = await Wallets.instance.ethTxSign(walletId, Chain.chainTypeToInt(ChainType.ETH), fromExchangeAddress, toExchangeAddress,
-                VendorConfig.DDD2EEE_CONTRACT_ADDRESS ?? "", dddAmount, eeeAddress, Uint8List.fromList(pwd.codeUnits), gasPrice, gasLimit, nonce,
-                decimal: decimal);
-            print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"].toString());
-            if (result["status"] != null && result["status"] == 200) {
+            Map result;
+            switch (Wallets.instance.nowWallet.walletType) {
+              case WalletType.WALLET:
+                result = await Wallets.instance.ethTxSign(walletId, Chain.chainTypeToInt(ChainType.ETH), fromExchangeAddress, toExchangeAddress,
+                    DddMainNetContractAddress, dddAmount, eeeAddress, Uint8List.fromList(pwd.codeUnits), gasPrice, gasLimit, nonce,
+                    decimal: decimal);
+                break;
+              case WalletType.TEST_WALLET:
+                result = await Wallets.instance.ethTxSign(walletId, Chain.chainTypeToInt(ChainType.ETH_TEST), fromExchangeAddress, toExchangeAddress,
+                    DddTestNetContractAddress, dddAmount, eeeAddress, Uint8List.fromList(pwd.codeUnits), gasPrice, gasLimit, nonce,
+                    decimal: decimal);
+                break;
+              default:
+                break;
+            }
+            if (result != null && result.containsKey("status") && result["status"] == 200) {
               Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), timeInSecForIos: 5);
               sendRawTx2Chain(result["ethSignedInfo"].toString());
             } else {

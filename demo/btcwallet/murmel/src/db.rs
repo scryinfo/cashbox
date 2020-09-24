@@ -157,12 +157,12 @@ impl SQLite {
     }
 
     // query count
-    pub fn count(&mut self) -> u64{
+    pub fn count(&self) -> u64 {
         let mut statement = self.connection.prepare(
             "select count(*) from block_hash"
         ).expect("count error");
 
-        let mut count:u64 = 0;
+        let mut count: u64 = 0;
         while let State::Row = statement.next().unwrap() {
             let c = statement.read::<String>(0).unwrap();
             count = c.parse::<u64>().unwrap();
