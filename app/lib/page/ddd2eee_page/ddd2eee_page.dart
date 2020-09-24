@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:app/global_config/global_config.dart';
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
+import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -70,10 +70,24 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   }
 
   void initDataConfig() async {
-    fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress;
-    //fromAddress = "0x0d0707963952f2fba59dd06f2b425ace40b492fe";
-    ethBalance = await loadEthBalance(fromAddress, ChainType.ETH);
-    dddBalance = await loadErc20Balance(fromAddress, DddMainNetContractAddress, ChainType.ETH);
+    if (Wallets.instance.nowWallet == null) {
+      await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
+    }
+    switch (Wallets.instance.nowWallet.walletType) {
+      case WalletType.WALLET:
+        fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress;
+        ethBalance = await loadEthBalance(fromAddress, ChainType.ETH);
+        dddBalance = await loadErc20Balance(fromAddress, DddMainNetContractAddress, ChainType.ETH);
+        break;
+      case WalletType.TEST_WALLET:
+        fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH_TEST).chainAddress;
+        ethBalance = await loadEthBalance(fromAddress, ChainType.ETH_TEST);
+        dddBalance = await loadErc20Balance(fromAddress, DddTestNetContractAddress, ChainType.ETH_TEST);
+        break;
+      default:
+        break;
+    }
+
     if (dddBalance != null) {
       _dddAmountController.text = dddBalance;
     }
@@ -223,7 +237,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              VendorConfig.DDD2EEE_ETH_ADDRESS ?? "",
+              VendorConfig.DDD2EEE_RECEIVE_ETH_ADDRESS,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -705,12 +719,11 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         Provider.of<TransactionProvide>(context)
           ..emptyDataRecord()
           ..setFromAddress(fromAddress)
-          ..setToAddress(VendorConfig.DDD2EEE_ETH_ADDRESS)
-          ..setContractAddress(VendorConfig.DDD2EEE_CONTRACT_ADDRESS)
+          ..setToAddress(VendorConfig.DDD2EEE_RECEIVE_ETH_ADDRESS)
           ..setBackup(_eeeAddressController.text)
-          ..setBalance(dddBalance)
-          ..setGasPrice(mGasPriceValue.toString())
-          ..setGas(mGasLimitValue.toString());
+          ..setValue(_dddAmountController.text)
+          ..setGasPrice(mGasPriceValue.toInt().toString())
+          ..setGas(mGasLimitValue.toInt().toString());
         NavigatorUtils.push(context, Routes.ddd2eeeConfirmPage);
       },
       child: Container(
