@@ -141,7 +141,7 @@ impl GetData {
         self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
         warn!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
-        println!("got 100 merkleblock {:#?}", merkleblock);
+        info!("got 100 merkleblock {:#?}", merkleblock);
         self.get_data(peer, true)?;
         Ok(())
     }
@@ -149,7 +149,7 @@ impl GetData {
     // Handle tx return value
     fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
         let sqlite = SHARED_SQLITE.lock().expect("open connection error!");
-        println!("Tx {:#?}", tx.clone());
+        info!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;
         let mut index = -1;
