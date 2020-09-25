@@ -11,6 +11,8 @@ use bitcoin::hashes::hex::ToHex;
 
 pub type SharedSQLite = Arc<Mutex<SQLite>>;
 
+const NEWEST_KEY: &str = "NEWEST_KEY";
+
 pub struct SQLite {
     connection: sqlite::Connection,
     network: Network,
@@ -22,17 +24,17 @@ impl SQLite {
         sqlite.set_busy_timeout(3000).unwrap();
         sqlite.execute(
             "
-            CREATE TABLE IF NOT EXISTS block_hash(block_hash TEXT,scanned TEXT,timestamp TEXT);
+            CREATE TABLE IF NOT EXISTS block_hash(ID INTEGER PRIMARY KEY AUTOINCREMENT,block_hash TEXT,scanned TEXT,timestamp TEXT);
             "
         ).expect("Create table block_hash error");
         sqlite.execute(
-            "create table if not exists newest_hash(key TEXT,block_hash TEXT,timestamp TEXT);"
+            "create table if not exists newest_hash(ID INTEGER PRIMARY KEY AUTOINCREMENT,key TEXT,block_hash TEXT,timestamp TEXT);"
         ).expect("Create newest_hash table error");
         sqlite.execute(
-            "create table if not exists tx_input(tx TEXT primary key not null ,sig_script TEXT, prev_tx TEXT, prev_vout INT, sequence INT);"
+            "create table if not exists tx_input(ID INTEGER PRIMARY KEY AUTOINCREMENT,tx TEXT not null ,sig_script TEXT, prev_tx TEXT, prev_vout INT, sequence INT);"
         ).expect("Create tx_input table error");
         sqlite.execute(
-            "create table if not exists tx_output(tx TEXT primary key not null ,script TEXT, value REAL, vin INT);"
+            "create table if not exists tx_output(ID INTEGER PRIMARY KEY AUTOINCREMENT,tx TEXT not null ,script TEXT, value REAL, vin INT);"
         ).expect("Create tx_output table error");
         Self {
             connection: sqlite,
@@ -61,11 +63,12 @@ impl SQLite {
     // Storage block header
     pub fn insert_block(&self, block_hash: String, timestamp: String) {
         let mut statement = self.connection.prepare(
-            "INSERT INTO block_hash VALUES(?, ?, ?)"
+            "INSERT INTO block_hash VALUES(?, ?, ?, ?)"
         ).expect("PREPARE ERR");
-        statement.bind(1, block_hash.as_str()).unwrap();
-        statement.bind(2, "0").unwrap();
-        statement.bind(3, timestamp.as_str()).unwrap();
+        statement.bind(1,&Value::Null).expect("BIND ID ERR");
+        statement.bind(2, block_hash.as_str()).unwrap();
+        statement.bind(3, "0").unwrap();
+        statement.bind(4, timestamp.as_str()).unwrap();
         statement.next().expect("insert block error");
     }
 
@@ -80,7 +83,7 @@ impl SQLite {
         ).expect("bind ERR");
         let mut block_hashes = vec![];
         while let State::Row = statement.next().unwrap() {
-            let block_hash = statement.read::<String>(0).unwrap();
+            let block_hash = statement.read::<String>(1).unwrap();
             block_hashes.push(block_hash);
         }
 
@@ -102,8 +105,8 @@ impl SQLite {
         ).expect("query_new error");
         statement.bind(1, key).expect("query newest error");
         while let State::Row = statement.next().unwrap() {
-            let block_hash = statement.read::<String>(1).expect("query block hash error");
-            let timestamp = statement.read::<String>(2).expect("query block hash error");
+            let block_hash = statement.read::<String>(2).expect("query block hash error");
+            let timestamp = statement.read::<String>(3).expect("query block hash error");
             return (Some(block_hash), Some(timestamp));
         }
         (None, None)
@@ -112,11 +115,12 @@ impl SQLite {
     //insert new header
     pub fn insert_newest_header(&self, block_hash: String, timestamp: String) {
         let mut statement = self.connection.prepare(
-            "INSERT INTO newest_hash VALUES(?, ?, ?)"
+            "INSERT INTO newest_hash VALUES(?,?,?,?)"
         ).expect("PREPARE ERR");
-        statement.bind(1, NEWEST_KEY).unwrap();
-        statement.bind(2, block_hash.as_str()).unwrap();
-        statement.bind(3, timestamp.as_str()).unwrap();
+        statement.bind(1, &Value::Null).expect("ID BIND ERR");
+        statement.bind(2, NEWEST_KEY).expect("KEY BIND ERR");
+        statement.bind(3, block_hash.as_str()).expect("BLOCK_HASH BIND ERR");
+        statement.bind(4, timestamp.as_str()).expect("TIMESTAMP BIND ERR");
         statement.next().expect("insert newest_header error");
     }
 
@@ -134,7 +138,7 @@ impl SQLite {
     //insert txin
     pub fn insert_txin(&self, tx: String, sig_script: String, prev_tx: String, prev_vout: String, sequence: String) {
         let mut statement = self.connection.prepare(
-            "INSERT OR IGNORE INTO tx_input VALUES(?,?,?,?,?)"
+            "INSERT OR IGNORE INTO tx_input VALUES(NULL,?,?,?,?,?)"
         ).expect("insert txin error");
         statement.bind(1, tx.as_str()).expect("bind statement error");
         statement.bind(2, sig_script.as_str()).expect("bind statement error");
@@ -147,7 +151,7 @@ impl SQLite {
     //insert txout
     pub fn insert_txout(&self, tx: String, script: String, value: String, vout: i64) {
         let mut statement = self.connection.prepare(
-            "INSERT OR IGNORE INTO tx_output VALUES(?,?,?,?)"
+            "INSERT OR IGNORE INTO tx_output VALUES(NULL,?,?,?,?)"
         ).expect("insert utxo error");
         statement.bind(1, tx.as_str()).expect("bind statement error");
         statement.bind(2, script.as_str()).expect("bind statement error");
@@ -171,5 +175,31 @@ impl SQLite {
     }
 }
 
-const NEWEST_KEY: &str = "NEWEST_KEY";
+mod test {
+    use jniapi::btcapi::SHARED_SQLITE;
+    use db::NEWEST_KEY;
+
+    #[test]
+    pub fn test_init() {
+        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
+        let (hash, timestamp) = sqlite.init();
+        println!("{},{}", hash, timestamp);
+    }
+
+    #[test]
+    pub fn test_query_newest_header() {
+        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
+        let (hash, timestamp) = sqlite.query_newest_header(NEWEST_KEY);
+        println!("{},{}", hash.unwrap(), timestamp.unwrap());
+    }
+
+    #[test]
+    pub fn test_query_header() {
+        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
+        let headers = sqlite.query_header("1296688602".to_string(), false);
+        for header in headers {
+            println!("{}", header);
+        }
+    }
+}
 
