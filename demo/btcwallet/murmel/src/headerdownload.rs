@@ -167,7 +167,7 @@ impl HeaderDownload {
                                 // POW is ok, stored top chaindb
                                 some_new = true;
                                 // save block hash into sqlite table "block_hash"
-                                let sqlite = SHARED_SQLITE.lock().unwrap();
+                                let sqlite = SHARED_SQLITE.lock().expect("Open db error");
                                 let header_clone = header.clone();
                                 sqlite.insert_block(
                                     header_clone.bitcoin_hash().to_hex(),
