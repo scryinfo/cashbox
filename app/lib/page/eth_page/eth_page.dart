@@ -190,6 +190,9 @@ class _EthPageState extends State<EthPage> {
                 Wallets.instance
                     .updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[index].digitId, balance ?? "");
               } else {}
+              if (balance == null || double.parse(balance) == double.parse("0")) {
+                continue;
+              }
               allVisibleDigitsList[index].balance = balance ?? "0";
               if (mounted) {
                 setState(() {
@@ -213,6 +216,9 @@ class _EthPageState extends State<EthPage> {
                   try {
                     String eeeFree = eeeStorageKeyMap["free"] ?? "0";
                     balance = (BigInt.parse(eeeFree) / BigInt.from(Eee_Unit)).toStringAsFixed(5) ?? "0";
+                    if (balance == null || double.parse(balance) == double.parse("0")) {
+                      continue;
+                    }
                   } catch (e) {
                     print("error(), _loadingBalanceTimerTask error is load Eee balance===>" + e);
                     LogUtil.e("_loadingBalanceTimerTask error is =>", e.toString());
@@ -226,6 +232,9 @@ class _EthPageState extends State<EthPage> {
                   try {
                     double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / BigInt.from(Eee_Unit);
                     balance = tokenBalance.toStringAsFixed(5);
+                    if (balance == null || double.parse(balance) == double.parse("0")) {
+                      continue;
+                    }
                   } catch (e) {
                     print("error(), error is load tokenX balance===>" + e);
                     LogUtil.e("_loadingBalanceTimerTask error is =>", e.toString());

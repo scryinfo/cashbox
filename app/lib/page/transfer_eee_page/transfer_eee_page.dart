@@ -444,7 +444,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                   Wallets.instance.nowWallet.nowChain.chainAddress,
                   _toAddressController.text.toString(),
                   _txValueController.text.toString(),
-                  Utils.uint8ListToHex(Uint8List.fromList(_backupMsgController.text.codeUnits)),
+                  Utils.uint8ListToHex(Uint8List.fromList((_backupMsgController.text == "" ? "00" : _backupMsgController.text).codeUnits)),
                   genesisHash,
                   nonce,
                   runtimeVersion,
