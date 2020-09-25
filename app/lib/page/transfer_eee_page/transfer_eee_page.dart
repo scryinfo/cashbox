@@ -57,6 +57,15 @@ class _TransferEeePageState extends State<TransferEeePage> {
       Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
       return;
     }
+    if (digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
+      //quick determine flag that relative to display widget
+      {
+        isShowTxInput = true;
+        setState(() {
+          this.isShowTxInput = true;
+        });
+      }
+    }
     eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
     if (!_isMapStatusOk(eeeStorageKeyMap)) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
@@ -71,12 +80,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
       digitBalance = "0";
     }
     if (digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
-      {
-        isShowTxInput = true;
-        setState(() {
-          this.isShowTxInput = true;
-        });
-      }
       Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
         try {
@@ -405,7 +408,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
         Fluttertoast.showToast(msg: translate('balance_is_less'));
         return false;
       }
-      if (_txValueController.text.startsWith(".")) { // case： float value that start with . without 0.
+      if (_txValueController.text.startsWith(".")) {
+        // case： float value that start with . without 0.
         _txValueController.text = double.parse(_txValueController.text).toString();
       }
     } catch (e) {
