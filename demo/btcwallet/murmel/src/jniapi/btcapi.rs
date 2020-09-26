@@ -176,7 +176,7 @@ pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(
 ) -> jstring {
     let sqlite = SHARED_SQLITE.lock().unwrap();
     let height = sqlite.query_scanned_height();
-    let max_block_number = env.new_string(max_block_number.to_string()).expect("Could not create java string!");
+    let max_block_number = env.new_string(height.to_string()).expect("Could not create java string!");
     max_block_number.into_inner()
 }
 
