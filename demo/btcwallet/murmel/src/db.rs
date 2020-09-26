@@ -65,7 +65,7 @@ impl SQLite {
         let mut statement = self.connection.prepare(
             "INSERT INTO block_hash VALUES(?, ?, ?, ?)"
         ).expect("PREPARE ERR");
-        statement.bind(1,&Value::Null).expect("BIND ID ERR");
+        statement.bind(1, &Value::Null).expect("BIND ID ERR");
         statement.bind(2, block_hash.as_str()).unwrap();
         statement.bind(3, "0").unwrap();
         statement.bind(4, timestamp.as_str()).unwrap();
@@ -173,6 +173,22 @@ impl SQLite {
         }
         count
     }
+
+    // query height that we scanned
+    pub fn query_scanned_height(&self) -> String {
+        let (block_hash, _timestamp) = self.query_newest_header(NEWEST_KEY);
+        let mut statement = self.connection.prepare(
+            "SELECT ID FROM block_hash WHERE block_hash = ?"
+        ).expect("select hash error");
+
+        if let Some(block_hash) = block_hash {
+            statement.bind(1, block_hash.as_str()).expect("bind error");
+            while let State::Row = statement.next().expect("select error") {
+                return statement.read::<String>(0).expect("read error");
+            }
+        }
+        String::from("0")
+    }
 }
 
 mod test {
@@ -200,6 +216,13 @@ mod test {
         for header in headers {
             println!("{}", header);
         }
+    }
+
+    #[test]
+    pub fn test_query_saanned_height(){
+        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
+        let height = sqlite.query_scanned_height();
+        println!("{}", height);
     }
 }
 

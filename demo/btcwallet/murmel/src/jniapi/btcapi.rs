@@ -174,7 +174,10 @@ pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(
     env: JNIEnv,
     class: JClass,
 ) -> jstring {
-    unimplemented!()
+    let sqlite = SHARED_SQLITE.lock().unwrap();
+    let height = sqlite.query_scanned_height();
+    let max_block_number = env.new_string(max_block_number.to_string()).expect("Could not create java string!");
+    max_block_number.into_inner()
 }
 
 #[no_mangle]
