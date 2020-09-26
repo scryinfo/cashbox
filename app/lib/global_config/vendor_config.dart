@@ -65,11 +65,11 @@ class VendorConfig {
   static const nowDbVersionValue = "1.0";
 
   static const ETHERSCAN_API_KEY = "";
-  static const DDD2EEE_ETH_ADDRESS = "";
-  static const DDD2EEE_CONTRACT_ADDRESS = "";
+  static const MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS = "";
+  static const TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS = "";
 
   static const dappOpenUrlKey = "dappOpenUrl";
-  static String dappOpenUrValue = ""; 
+  static String dappOpenUrValue = "";
 }
 
 const DddMainNetContractAddress = "";

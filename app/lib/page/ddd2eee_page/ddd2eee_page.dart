@@ -50,6 +50,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   String dddBalance = "";
   String ethBalance = "";
   String fromAddress = "";
+  String toExchangeAddress = "";
   String nonce = "";
   int decimal = 0;
 
@@ -78,11 +79,13 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress;
         ethBalance = await loadEthBalance(fromAddress, ChainType.ETH);
         dddBalance = await loadErc20Balance(fromAddress, DddMainNetContractAddress, ChainType.ETH);
+        toExchangeAddress = VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
         break;
       case WalletType.TEST_WALLET:
         fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH_TEST).chainAddress;
         ethBalance = await loadEthBalance(fromAddress, ChainType.ETH_TEST);
         dddBalance = await loadErc20Balance(fromAddress, DddTestNetContractAddress, ChainType.ETH_TEST);
+        toExchangeAddress = VendorConfig.TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
         break;
       default:
         break;
@@ -237,7 +240,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              VendorConfig.DDD2EEE_RECEIVE_ETH_ADDRESS,
+              toExchangeAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
                 fontSize: ScreenUtil.instance.setSp(3.5),
@@ -719,7 +722,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         Provider.of<TransactionProvide>(context)
           ..emptyDataRecord()
           ..setFromAddress(fromAddress)
-          ..setToAddress(VendorConfig.DDD2EEE_RECEIVE_ETH_ADDRESS)
           ..setBackup(_eeeAddressController.text)
           ..setValue(_dddAmountController.text)
           ..setGasPrice(mGasPriceValue.toInt().toString())

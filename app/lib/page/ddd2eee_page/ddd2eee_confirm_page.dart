@@ -41,12 +41,30 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   }
 
   void initDataConfig() {
-    fromExchangeAddress = Provider.of<TransactionProvide>(context).fromAddress;
-    toExchangeAddress = VendorConfig.DDD2EEE_RECEIVE_ETH_ADDRESS;
-    eeeAddress = Provider.of<TransactionProvide>(context).backup;
-    dddAmount = Provider.of<TransactionProvide>(context).txValue ?? "0.0";
-    gasPrice = Provider.of<TransactionProvide>(context).gasPrice;
-    gasLimit = Provider.of<TransactionProvide>(context).gas;
+    fromExchangeAddress = Provider
+        .of<TransactionProvide>(context)
+        .fromAddress;
+    switch (Wallets.instance.nowWallet.walletType) {
+      case WalletType.TEST_WALLET:
+        toExchangeAddress = VendorConfig.TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
+        break;
+      case WalletType.WALLET:
+        toExchangeAddress = VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
+        break;
+    }
+
+    eeeAddress = Provider
+        .of<TransactionProvide>(context)
+        .backup;
+    dddAmount = Provider
+        .of<TransactionProvide>(context)
+        .txValue ?? "0.0";
+    gasPrice = Provider
+        .of<TransactionProvide>(context)
+        .gasPrice;
+    gasLimit = Provider
+        .of<TransactionProvide>(context)
+        .gas;
   }
 
   @override
@@ -377,13 +395,33 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
             Map result;
             switch (Wallets.instance.nowWallet.walletType) {
               case WalletType.WALLET:
-                result = await Wallets.instance.ethTxSign(walletId, Chain.chainTypeToInt(ChainType.ETH), fromExchangeAddress, toExchangeAddress,
-                    DddMainNetContractAddress, dddAmount, eeeAddress, Uint8List.fromList(pwd.codeUnits), gasPrice, gasLimit, nonce,
+                result = await Wallets.instance.ethTxSign(
+                    walletId,
+                    Chain.chainTypeToInt(ChainType.ETH),
+                    fromExchangeAddress,
+                    toExchangeAddress,
+                    DddMainNetContractAddress,
+                    dddAmount,
+                    eeeAddress,
+                    Uint8List.fromList(pwd.codeUnits),
+                    gasPrice,
+                    gasLimit,
+                    nonce,
                     decimal: decimal);
                 break;
               case WalletType.TEST_WALLET:
-                result = await Wallets.instance.ethTxSign(walletId, Chain.chainTypeToInt(ChainType.ETH_TEST), fromExchangeAddress, toExchangeAddress,
-                    DddTestNetContractAddress, dddAmount, eeeAddress, Uint8List.fromList(pwd.codeUnits), gasPrice, gasLimit, nonce,
+                result = await Wallets.instance.ethTxSign(
+                    walletId,
+                    Chain.chainTypeToInt(ChainType.ETH_TEST),
+                    fromExchangeAddress,
+                    toExchangeAddress,
+                    DddTestNetContractAddress,
+                    dddAmount,
+                    eeeAddress,
+                    Uint8List.fromList(pwd.codeUnits),
+                    gasPrice,
+                    gasLimit,
+                    nonce,
                     decimal: decimal);
                 break;
               default:
