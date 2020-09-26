@@ -79,23 +79,20 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
     if (Wallets.instance.nowWallet == null) {
       await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     }
+    //case nowChain is not eth or eth_test
     switch (Wallets.instance.nowWallet.walletType) {
       case WalletType.WALLET:
-        fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress;
-        toExchangeAddress = VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
-        ethBalance = await loadEthBalance(fromAddress, ChainType.ETH);
-        dddBalance = await loadErc20Balance(fromAddress, DddMainNetContractAddress, ChainType.ETH);
+        chainType = ChainType.ETH;
         break;
       case WalletType.TEST_WALLET:
-        fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH_TEST).chainAddress;
-        toExchangeAddress = VendorConfig.TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
-        ethBalance = await loadEthBalance(fromAddress, ChainType.ETH_TEST);
-        dddBalance = await loadErc20Balance(fromAddress, DddTestNetContractAddress, ChainType.ETH_TEST);
-        break;
-      default:
+        chainType = ChainType.ETH_TEST;
         break;
     }
-
+    fromAddress = Wallets.instance.nowWallet.getChainByChainType(chainType).chainAddress;
+    toExchangeAddress =
+        chainType == ChainType.ETH ? VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS : VendorConfig.TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
+    ethBalance = await loadEthBalance(fromAddress, chainType);
+    dddBalance = await loadErc20Balance(fromAddress, chainType == ChainType.ETH ? DddMainNetContractAddress : DddTestNetContractAddress, chainType);
     setState(() {
       toExchangeAddress = toExchangeAddress;
       if (dddBalance != null) {
@@ -471,7 +468,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                     onChanged: (double value) {
                       setState(() {
                         mGasFeeValue = Utils.formatDouble(value, precision: precision);
-                        print("mGasFeeValue===>" + mGasFeeValue.toString());
                       });
                     },
                     divisions: 100,
@@ -773,8 +769,8 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
     }
     if (dddBalance == null || dddBalance == "" || double.parse(dddBalance) <= 0) {
       try {
-        dddBalance = await loadErc20Balance(
-            Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress, DddMainNetContractAddress, ChainType.ETH);
+        dddBalance = await loadErc20Balance(Wallets.instance.nowWallet.getChainByChainType(chainType).chainAddress,
+            chainType == ChainType.ETH ? DddMainNetContractAddress : DddTestNetContractAddress, chainType);
       } catch (e) {
         Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;
@@ -793,7 +789,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
     }
     if (ethBalance == null || ethBalance == "" || double.parse(ethBalance) <= 0) {
       try {
-        ethBalance = await loadEthBalance(Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress, ChainType.ETH);
+        ethBalance = await loadEthBalance(Wallets.instance.nowWallet.getChainByChainType(chainType).chainAddress, chainType);
       } catch (e) {
         Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;

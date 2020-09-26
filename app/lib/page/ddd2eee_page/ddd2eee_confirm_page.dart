@@ -9,6 +9,7 @@ import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
+import 'package:app/routers/routers.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/pwd_dialog.dart';
@@ -33,6 +34,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   String gasLimit = "";
   String nonce = "";
   int decimal = 18;
+  ChainType chainType;
 
   @override
   void didChangeDependencies() {
@@ -41,30 +43,23 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   }
 
   void initDataConfig() {
-    fromExchangeAddress = Provider
-        .of<TransactionProvide>(context)
-        .fromAddress;
+    fromExchangeAddress = Provider.of<TransactionProvide>(context).fromAddress;
     switch (Wallets.instance.nowWallet.walletType) {
+      //use walletType:in case :nowChain is not eth or eth_test
       case WalletType.TEST_WALLET:
         toExchangeAddress = VendorConfig.TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
+        chainType = ChainType.ETH_TEST;
         break;
       case WalletType.WALLET:
         toExchangeAddress = VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
+        chainType = ChainType.ETH;
         break;
     }
 
-    eeeAddress = Provider
-        .of<TransactionProvide>(context)
-        .backup;
-    dddAmount = Provider
-        .of<TransactionProvide>(context)
-        .txValue ?? "0.0";
-    gasPrice = Provider
-        .of<TransactionProvide>(context)
-        .gasPrice;
-    gasLimit = Provider
-        .of<TransactionProvide>(context)
-        .gas;
+    eeeAddress = Provider.of<TransactionProvide>(context).backup;
+    dddAmount = Provider.of<TransactionProvide>(context).txValue ?? "0.0";
+    gasPrice = Provider.of<TransactionProvide>(context).gasPrice;
+    gasLimit = Provider.of<TransactionProvide>(context).gas;
   }
 
   @override
@@ -373,7 +368,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   }
 
   Future<bool> _verifyNonce() async {
-    nonce = await loadTxAccount(fromExchangeAddress, ChainType.ETH);
+    nonce = await loadTxAccount(fromExchangeAddress, chainType);
     if (nonce == null || nonce.trim() == "") {
       print("取的nonce值有问题");
       Fluttertoast.showToast(msg: translate("nonce_is_wrong"), timeInSecForIos: 8);
@@ -392,41 +387,19 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             String walletId = await Wallets.instance.getNowWalletId();
-            Map result;
-            switch (Wallets.instance.nowWallet.walletType) {
-              case WalletType.WALLET:
-                result = await Wallets.instance.ethTxSign(
-                    walletId,
-                    Chain.chainTypeToInt(ChainType.ETH),
-                    fromExchangeAddress,
-                    toExchangeAddress,
-                    DddMainNetContractAddress,
-                    dddAmount,
-                    eeeAddress,
-                    Uint8List.fromList(pwd.codeUnits),
-                    gasPrice,
-                    gasLimit,
-                    nonce,
-                    decimal: decimal);
-                break;
-              case WalletType.TEST_WALLET:
-                result = await Wallets.instance.ethTxSign(
-                    walletId,
-                    Chain.chainTypeToInt(ChainType.ETH_TEST),
-                    fromExchangeAddress,
-                    toExchangeAddress,
-                    DddTestNetContractAddress,
-                    dddAmount,
-                    eeeAddress,
-                    Uint8List.fromList(pwd.codeUnits),
-                    gasPrice,
-                    gasLimit,
-                    nonce,
-                    decimal: decimal);
-                break;
-              default:
-                break;
-            }
+            Map result = await Wallets.instance.ethTxSign(
+                walletId,
+                Chain.chainTypeToInt(chainType),
+                fromExchangeAddress,
+                toExchangeAddress,
+                chainType == ChainType.ETH ? DddMainNetContractAddress : DddTestNetContractAddress,
+                dddAmount,
+                eeeAddress,
+                Uint8List.fromList(pwd.codeUnits),
+                gasPrice,
+                gasLimit,
+                nonce,
+                decimal: decimal);
             if (result != null && result.containsKey("status") && result["status"] == 200) {
               Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), timeInSecForIos: 5);
               sendRawTx2Chain(result["ethSignedInfo"].toString());
@@ -443,7 +416,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   void sendRawTx2Chain(String rawTx) async {
     NavigatorUtils.goBack(context);
     showProgressDialog(context, translate("tx_sending"));
-    String txHash = await sendRawTx(ChainType.ETH, rawTx);
+    String txHash = await sendRawTx(chainType, rawTx);
     print("after broadcast txHash is===>" + txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
       Fluttertoast.showToast(msg: translate("tx_upload_success"), timeInSecForIos: 8);
@@ -454,7 +427,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
       const timeout = Duration(seconds: 5);
       Timer(timeout, () {
         Navigator.pop(context); //Let the showProgressDialog popup box display for at least two seconds
-        NavigatorUtils.goBack(context);
+        NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
       });
     }
   }
