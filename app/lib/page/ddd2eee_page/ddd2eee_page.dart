@@ -50,14 +50,19 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   String dddBalance = "";
   String ethBalance = "";
   String fromAddress = "";
-  String toExchangeAddress = "";
+  String toExchangeAddress = VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS; //default MAIN_NET
   String nonce = "";
   int decimal = 0;
 
   @override
+  void initState() {
+    super.initState();
+    initDataConfig();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    initDataConfig();
     mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.EthGasPriceKey);
     mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.EthGasPriceKey);
     mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.EthGasLimitKey);
@@ -77,23 +82,26 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
     switch (Wallets.instance.nowWallet.walletType) {
       case WalletType.WALLET:
         fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH).chainAddress;
+        toExchangeAddress = VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
         ethBalance = await loadEthBalance(fromAddress, ChainType.ETH);
         dddBalance = await loadErc20Balance(fromAddress, DddMainNetContractAddress, ChainType.ETH);
-        toExchangeAddress = VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
         break;
       case WalletType.TEST_WALLET:
         fromAddress = Wallets.instance.nowWallet.getChainByChainType(ChainType.ETH_TEST).chainAddress;
+        toExchangeAddress = VendorConfig.TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
         ethBalance = await loadEthBalance(fromAddress, ChainType.ETH_TEST);
         dddBalance = await loadErc20Balance(fromAddress, DddTestNetContractAddress, ChainType.ETH_TEST);
-        toExchangeAddress = VendorConfig.TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
         break;
       default:
         break;
     }
 
-    if (dddBalance != null) {
-      _dddAmountController.text = dddBalance;
-    }
+    setState(() {
+      toExchangeAddress = toExchangeAddress;
+      if (dddBalance != null) {
+        _dddAmountController.text = dddBalance;
+      }
+    });
   }
 
   @override
