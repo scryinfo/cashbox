@@ -85,7 +85,6 @@ mod tests {
     #[test]
     fn mnemonic_create_test() {
         //Mnemonic word creation test, signature test
-
         let mnemonic = substratetx::Sr25519::generate_phrase(18);
         let seed = substratetx::Sr25519::seed_from_phrase(&mnemonic, None).unwrap();
         let pair = substratetx::Sr25519::pair_from_seed(&seed);
@@ -103,7 +102,7 @@ mod tests {
     #[test]
     fn func_sign_test() {
         //Initialize the database
-        wallet_db::init_wallet_database();
+        wallet_db::init_wallet_database().is_ok();
         //Create a wallet instance
         let wallet_instance = model::Wallet::default();
         // let mnemonic = wallet_instance.crate_mnemonic(15);

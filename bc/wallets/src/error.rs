@@ -118,5 +118,11 @@ impl From<substratetx::error::Error> for WalletError {
     }
 }
 
+impl From<semver::SemVerError> for WalletError{
+    fn from(err: semver::SemVerError) -> Self {
+        WalletError::Custom(format!("{:?}", err))
+    }
+}
+
 
 
