@@ -17,6 +17,7 @@ import 'package:app/util/utils.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -77,7 +78,7 @@ class _DappPageState extends State<DappPage> {
         child: Container(
           margin: EdgeInsets.only(top: ScreenUtil.instance.setHeight(4.5)),
           child: WebView(
-            // initialUrl: "https://cashbox.scry.info/web_app/dapp/dapp.html",
+            // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
             // initialUrl:"http://192.168.1.12:9010/web_app/dapp/dapp.html",
             //initialUrl:"http://192.168.1.5:9690/home.html",
             initialUrl: VendorConfig.dappOpenUrValue,
@@ -105,8 +106,8 @@ class _DappPageState extends State<DappPage> {
                   }
                 }
                 if (address != null && address.isNotEmpty) {
-                  _controller?.evaluateJavascript('nativeChainAddressToJsResult("$address")')?.then((
-                      result) {}); //Pass the wallet EEE chain address to DApp record storage, this will be remove
+                  // _controller?.evaluateJavascript('nativeChainAddressToJsResult("$address")')?.then((
+                  //     result) {}); //Pass the wallet EEE chain address to DApp record storage, this will be remove
                   String script = 'if(window.$CashboxEeeName){$CashboxEeeName.$setAddress("$address")}';
                   _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                 } else {
@@ -253,6 +254,19 @@ class _DappPageState extends State<DappPage> {
             msg.err = "inner error";
             this.callPromise(msg);
           });
+        }));
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxCopy",
+        onMessageReceived: (JavascriptMessage message) async {
+          var msg = Message.fromJson(jsonDecode(message.message));
+          try {
+            Clipboard.setData(ClipboardData(text: msg.data));
+            msg.data = '';
+            msg.err = '';
+          }catch(e) {
+            msg.err = 'Cashbox Copy error';
+          }
+          this.callPromise(msg);
         }));
 
     jsChannelList.add(JavascriptChannel(
