@@ -256,7 +256,7 @@ class _DappPageState extends State<DappPage> {
           });
         }));
     jsChannelList.add(JavascriptChannel(
-        name: "cashboxCopy",
+        name: "cashboxTextToClipboard",
         onMessageReceived: (JavascriptMessage message) async {
           var msg = Message.fromJson(jsonDecode(message.message));
           try {
@@ -264,11 +264,23 @@ class _DappPageState extends State<DappPage> {
             msg.data = '';
             msg.err = '';
           }catch(e) {
-            msg.err = 'Cashbox Copy error';
+            msg.err = 'cashboxTextToClipboard error';
           }
           this.callPromise(msg);
         }));
-
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxTextFromClipboard",
+        onMessageReceived: (JavascriptMessage message) async {
+          var msg = Message.fromJson(jsonDecode(message.message));
+          try {
+            var data = await Clipboard.getData(Clipboard.kTextPlain);
+            msg.data = data.text;
+            msg.err = '';
+          }catch(e) {
+            msg.err = 'cashboxTextFromClipboard error';
+          }
+          this.callPromise(msg);
+        }));
     jsChannelList.add(JavascriptChannel(
         name: "cashboxEthNonce",
         onMessageReceived: (JavascriptMessage message) async {
