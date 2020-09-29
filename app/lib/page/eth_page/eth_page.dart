@@ -61,13 +61,6 @@ class _EthPageState extends State<EthPage> {
   void initState() {
     super.initState();
     initData();
-    insertTokenXDigitTest();
-  }
-
-  insertTokenXDigitTest() async {
-    var paramString = VendorConfig.defaultDigitsContentDefaultValue;
-    var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
-    print("updateMap[isUpdateDefaultDigit]() =====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
   }
 
   @override
@@ -156,7 +149,6 @@ class _EthPageState extends State<EthPage> {
               });
             }
           } else {
-            print("digitName is not exist===>" + this.displayDigitsList[index].shortName);
             LogUtil.w("digitName is not exist===>", this.displayDigitsList[index].shortName);
           }
         }

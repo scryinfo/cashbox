@@ -2,6 +2,8 @@
 *     1 ETH = 1e9gwei (10 to the ninth power) = 1e18 wei
 * */
 
+import 'package:package_info/package_info.dart';
+
 class GlobalConfig {
   ///Application language configuration
   static const savedLocaleKey = "savedLocaleKey"; //Default language Chinese；
@@ -52,6 +54,18 @@ class GlobalConfig {
   static double getDefaultGasPrice(String digitName) {
     return defaultGasPriceMap[digitName];
   }
+
+  static String dbVersion1_0_0 = "1.0.0"; //db version 1.0.0
+  static String dbVersion1_1_0 = "1.1.0"; //db version 1.1.0
+
+  static Map<String, String> appVersion2DbVersionMap = {
+    "2.0.0": dbVersion1_0_0,
+    "2.1.0": dbVersion1_0_0,
+    "2.1.1": dbVersion1_0_0,
+    "2.2.0": dbVersion1_1_0,
+  };
+
+  static int versionValueNumberCount = 3; //eg : the count of efficient number
 }
 
 const Eth_Unit = 1000000000000000000; // 18 digits

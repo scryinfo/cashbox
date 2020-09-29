@@ -6,6 +6,7 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
+import 'package:app/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
@@ -65,22 +66,39 @@ class _EntryPageState extends State<EntryPage> {
     var spUtil = await SharedPreferenceUtil.instance;
     //check and update DB
     if (true) {
-      //push Vendor data to sharedpreference file
-      spUtil.setString(VendorConfig.oldDbVersionKey, VendorConfig.oldDbVersionValue);
-      spUtil.setString(VendorConfig.nowDbVersionKey, VendorConfig.nowDbVersionValue);
-      //compare different versions
-      var oldDbVersion = spUtil.getString(VendorConfig.oldDbVersionKey);
-      var newDbVersion = spUtil.getString(VendorConfig.nowDbVersionKey);
-      if (newDbVersion == null) {
-        LogUtil.e("_checkAndUpdateAppConfig:", "newDbVersion  is null");
-      } else if (oldDbVersion == null || (oldDbVersion != newDbVersion)) {
-        Map resultMap = Map(); //todo update dbVersion implement
-        //Map resultMap = await Wallets.instance.updateWalletDbData(oldDbVersion, newDbVersion);
-        if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
-          print("_checkAndUpdateAppConfig===>update database successful===>" + newDbVersion);
-          spUtil.setString(VendorConfig.oldDbVersionKey, newDbVersion); // update oldDbVersion record
-        }
+      // handle case : DB upgrade.   DB initial installation already finish in func -> initAppConfigInfo()->initDatabaseAndDefaultDigits()
+      String recordDbVersion = spUtil.getString(VendorConfig.nowDbVersionKey);
+      if (recordDbVersion == null || recordDbVersion.trim() == "" || (recordDbVersion.split(".").length != GlobalConfig.versionValueNumberCount)) {
+        recordDbVersion = "1.0.0"; //initial Db version record
       }
+      Map resultMap = await Wallets.instance.updateWalletDbData(recordDbVersion, GlobalConfig.dbVersion1_1_0);
+      if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
+        print("_checkAndUpdateAppConfig===>update database successful===>" + GlobalConfig.dbVersion1_1_0);
+        spUtil.setString(VendorConfig.nowDbVersionKey, GlobalConfig.dbVersion1_1_0); // !!! important,remember to update DbVersion record
+      }
+      // 0929 temporary hard code handle db version problem
+      // String matchedDbVersion = await Utils.getNowAppMatchedDbVersion();
+      // if (matchedDbVersion != null && matchedDbVersion.trim() != "" && matchedDbVersion.trim() != recordDbVersion.trim()) {
+      //   List recordDbVersionArray = recordDbVersion.split(".");
+      //   List suitableDbVersionArray = matchedDbVersion.split(".");
+      //   bool isExistMatchedDbVersion = false;
+      //   if (recordDbVersionArray.length == suitableDbVersionArray.length) {
+      //     for (int i = 0; i < suitableDbVersionArray.length; i++) {
+      //       if (double.parse(matchedDbVersion[i]) > double.parse(recordDbVersionArray[i])) {
+      //         isExistMatchedDbVersion = true;
+      //         break;
+      //       }
+      //     }
+      //   }
+      //   if (isExistMatchedDbVersion) {
+      //     // 存在待更新DB,执行更新DB操作
+      //     Map resultMap = await Wallets.instance.updateWalletDbData(recordDbVersion, matchedDbVersion);
+      //     if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
+      //       print("_checkAndUpdateAppConfig===>update database successful===>" + matchedDbVersion);
+      //       spUtil.setString(VendorConfig.nowDbVersionKey, matchedDbVersion); // !!! important,remember to update DbVersion record
+      //     }
+      //   }
+      // }
     }
 
     String lastCheckTime = spUtil.getString(VendorConfig.lastTimeCheckConfigKey);

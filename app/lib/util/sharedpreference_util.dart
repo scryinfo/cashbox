@@ -43,7 +43,6 @@ class SharedPreferenceUtil {
       //init db info config
       spUtil.setBool(VendorConfig.initDatabaseStateKey, false);
       spUtil.setString(VendorConfig.nowDbVersionKey, VendorConfig.nowDbVersionValue);
-      spUtil.setString(VendorConfig.oldDbVersionKey, VendorConfig.oldDbVersionValue);
     }
     {
       //The selected fiat currency is: (usd cny jpy)
