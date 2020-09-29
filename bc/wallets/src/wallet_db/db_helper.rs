@@ -76,6 +76,34 @@ impl DataServiceProvider {
         self.db_hander.execute("commit;").map(|_| ()).map_err(|err| err.into())
     }
 
+    pub fn exec_db_update(&self,pre_version:Version,latest_version:Version)->WalletResult<()>{
+        let mut current_version = Version {
+            major: 1,
+            minor: 0,
+            patch: 0,
+            pre: vec!(),
+            build: vec!(),
+        };
+
+        let mut try_minor = pre_version.minor;
+        //this place should save old data,
+        for major in pre_version.major..=latest_version.major{
+            current_version.major = major;
+            loop {
+                try_minor = try_minor+1;
+                current_version.minor = try_minor;
+                // minor num must continuous
+                if let Some(sql) = super::table_desc::get_update_table_sql(&current_version.to_string()){
+                    self.db_hander.execute(sql)?;
+                }else {
+                    break;
+                }
+            }
+            try_minor = 0;
+        }
+        Ok(())
+    }
+
     pub fn tx_rollback(&self) -> WalletResult<()> {
         self.db_hander.execute("rollback;").map(|_| ()).map_err(|err| err.into())
     }
