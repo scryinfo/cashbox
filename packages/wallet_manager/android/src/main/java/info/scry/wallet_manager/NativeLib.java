@@ -245,6 +245,8 @@ public class NativeLib {
      * Update wallet data file
      *
      * @return// Whether update successful
+     * param oldVersion : null string mean to never initial
+     * param newVersion : the newest version match to current AppVersion
      */
     public static native WalletState updateWalletDbData(String oldVersion, String newVersion); // init Version 1.0
 
