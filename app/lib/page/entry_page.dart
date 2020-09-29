@@ -107,6 +107,7 @@ class _EntryPageState extends State<EntryPage> {
       if (lastCheckTime == null || ((nowTimeStamp - int.parse(lastCheckTime)) - checkConfigInterval > 0)) {
         spUtil.setString(VendorConfig.lastTimeCheckConfigKey, nowTimeStamp.toString());
         String serverConfigIp = spUtil.getString(VendorConfig.appServerConfigIpKey) ?? VendorConfig.appServerConfigIpValue;
+        // print("serverConfigIp===============>" + serverConfigIp);
         var result = await requestWithConfigCheckParam(serverConfigIp);
         var resultCode = result["code"];
         var resultData = result["data"];

@@ -72,8 +72,8 @@ class Wallets {
 
     if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
       spUtil.setBool(VendorConfig.initDatabaseStateKey, resultMap["isInitWalletBasicData"]);
-      var digitParam = spUtil.getString(VendorConfig.defaultDigitsContentKey) ?? VendorConfig.defaultDigitsContentDefaultValue;
-      var updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
+      String digitParam = spUtil.getString(VendorConfig.defaultDigitsContentKey) ?? VendorConfig.defaultDigitsContentDefaultValue;
+      Map updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
       print("updateMap[isUpdateDefaultDigit](),=====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
     }
   }
