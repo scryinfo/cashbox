@@ -43,6 +43,9 @@ class AppInfoUtil {
           if (double.parse(serverVersionArray[i]) > double.parse(nativeVersionArray[i])) {
             isExistNewVersion = true;
             break;
+          } else if (double.parse(serverVersionArray[i]) < double.parse(nativeVersionArray[i])) {
+            //case: test eg, serverVersion:2.1.1  nativeVersion: 2.2.0
+            break;
           }
         }
       }

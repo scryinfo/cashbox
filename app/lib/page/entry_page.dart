@@ -31,7 +31,7 @@ class _EntryPageState extends State<EntryPage> {
   String _languageTextValue = "";
   List<String> languagesKeyList = [];
   Map<String, String> languageMap = {};
-  int checkConfigInterval = 1000 * 20; //every 20 seconds allow to check config Ip
+  int checkConfigInterval = 1000 * 5; //every 5 seconds allow to check config Ip
 
   @override
   void initState() {
