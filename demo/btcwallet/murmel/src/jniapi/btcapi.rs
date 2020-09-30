@@ -257,8 +257,9 @@ pub static SHARED_SQLITE: Lazy<SharedSQLite> = Lazy::new(|| {
 
 pub type SharedChannel = Arc<Mutex<(SyncSender<ApiMessage>, Receiver<ApiMessage>)>>;
 
+const BACK_PRESSURE: usize = 10;
 pub static SHARED_CHANNEL: Lazy<SharedChannel> = Lazy::new(|| {
-    let channel = sync_channel::<ApiMessage>(10usize);
+    let channel = sync_channel::<ApiMessage>(BACK_PRESSURE);
     Arc::new(Mutex::new(channel))
 });
 

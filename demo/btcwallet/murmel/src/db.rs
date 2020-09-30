@@ -5,7 +5,6 @@ use std::sync::{Arc, Mutex};
 use sqlite::{State, Value, Statement};
 use bitcoin::{Network, BitcoinHash};
 use bitcoin::blockdata::constants::genesis_block;
-use bitcoin::secp256k1::ecdh::SharedSecret;
 use error;
 use bitcoin::hashes::hex::ToHex;
 
@@ -219,7 +218,7 @@ mod test {
     }
 
     #[test]
-    pub fn test_query_saanned_height(){
+    pub fn test_query_scanned_height(){
         let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
         let height = sqlite.query_scanned_height();
         println!("{}", height);
