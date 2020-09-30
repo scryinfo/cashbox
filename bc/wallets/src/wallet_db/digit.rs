@@ -29,7 +29,6 @@ impl DataServiceProvider {
     }
     //Add tokens
     fn add_default_digits(&self, digits: Vec<model::DefaultDigit>) -> WalletResult<()> {
-        println!("digits len is:{}",digits.len());
         let insert_sql = "insert into detail.DefaultDigitBase(id,contract_address,chain_type,group_name,short_name,full_name,url_img,decimals,is_basic,is_default,status)values(?,?,?,?,?,?,?,?,?,?,?);";
         let mut insert_basic_statement = self.db_hander.prepare(insert_sql)?;
         for digit in digits {

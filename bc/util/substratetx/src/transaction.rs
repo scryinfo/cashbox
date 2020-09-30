@@ -155,8 +155,8 @@ fn balance_unit_convert(amount: &str, decimal: usize) -> Option<u128> {
     match amount.find(".") {
         Some(index) => {
             let integer_part = amount.get(0..index).unwrap();
-            //默认输入的数字在u128 表示的范围内
-            let integer_part_data = str::parse::<Balance>(integer_part).unwrap();
+            //The number input is within the range indicated by u128
+            let integer_part_data = str::parse::<Balance>(integer_part).unwrap_or(0);
             let integer_part_u128 = integer_part_data.checked_mul(10_u128.pow(decimal as u32)).unwrap();
             //获取小数部分，只保留指定精度部分数据
             //max_distace 用于截取小数部分的长度
@@ -166,9 +166,11 @@ fn balance_unit_convert(amount: &str, decimal: usize) -> Option<u128> {
                 index + 1 + decimal
             };
             let decimal_part = amount.get((index + 1)..max_distace).unwrap();
-            let decimal_part_data = str::parse::<Balance>(decimal_part).unwrap();
+
+            let decimal_part_data = str::parse::<Balance>(decimal_part).unwrap_or(0);
             //将小数点去掉后，还需要在末尾添加0的个数
             let add_zero = decimal - decimal_part.len();
+            println!("decimal_part {},add_zero:{}",decimal_part,add_zero);
             let base = 10_u128.pow(add_zero as u32);
             let decimal_part_u128 = decimal_part_data.checked_mul(base).unwrap();
             integer_part_u128.checked_add(decimal_part_u128)

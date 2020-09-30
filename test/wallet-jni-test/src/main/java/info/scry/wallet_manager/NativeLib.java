@@ -312,6 +312,7 @@ public class NativeLib {
                     ", isAddDigit=" + isAddDigit +
                     ", isUpdateDigitBalance=" + isUpdateDigitBalance +
                     ", isInitWalletBasicData=" + isInitWalletBasicData +
+                    ", isUpdateDbData=" + isUpdateDbData +
                     ", isUpdateAuthDigit=" + isUpdateAuthDigit +
                     ", isUpdateDefaultDigit=" + isUpdateDefaultDigit +
                     ", isAddNonAuthDigit=" + isAddNonAuthDigit +
@@ -421,8 +422,18 @@ public class NativeLib {
      * @return// Whether you already have a wallet
      */
     public static native WalletState initWalletBasicData();
-    
-     // apiNo:WM01 fixed - fixed
+
+    /**
+     * Update wallet data file
+     *
+     * @return// Whether update successful
+     * param oldVersion : null string mean to never initial
+     * param newVersion : the newest version match to current AppVersion
+     */
+    public static native WalletState updateWalletDbData(String oldVersion, String newVersion); // init Version 1.0
+
+
+    // apiNo:WM01 fixed - fixed
     public static native WalletState isContainWallet();
 
     // Export all wallets
