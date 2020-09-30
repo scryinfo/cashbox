@@ -92,8 +92,11 @@ impl DataServiceProvider {
             loop {
                 try_minor = try_minor+1;
                 current_version.minor = try_minor;
+                log::info!("update database version {}",current_version.to_string());
+                println!("update database version {}",current_version.to_string());
                 // minor num must continuous
                 if let Some(sql) = super::table_desc::get_update_table_sql(&current_version.to_string()){
+                    log::info!("update database sql {}",sql);
                     self.db_hander.execute(sql)?;
                 }else {
                     break;

@@ -26,6 +26,13 @@ impl DataServiceProvider {
         statement.next().map(|_| true).map_err(|err| err.into())
     }
 
+
+    pub fn clean_user_data(&self) -> WalletResult<()> {
+        let delete_sql = "delete from detail.AccountInfoSyncProg; delete from detail.TransferRecord;";
+        self.db_hander.execute(delete_sql)?;
+        Ok(())
+    }
+
     pub fn save_wallet_address(&mut self, mn: TbWallet, addrs: Vec<TbAddress>) -> WalletResult<()> {
         let update_selected = "update Wallet set selected = 0 where wallet_id = (select wallet_id from Wallet where selected==1 )";
         let wallet_sql = "insert into Wallet(wallet_id,mn_digest,fullname,mnemonic,wallet_type,display_chain_id,selected)values(?,?,?,?,?,?,?)";

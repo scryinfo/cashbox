@@ -531,25 +531,35 @@ pub mod android {
     #[no_mangle]
     #[allow(non_snake_case)]
     pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIEnv, _class: JClass, from: JString, to: JString, value: JString, genesisHash: JString, index: jint, runtime_version: jint, tx_version: jint, pwd: jbyteArray) -> jobject {
-        let pwd = env.convert_byte_array(pwd).unwrap();
-        let from: String = env.get_string(from).unwrap().into();
-        let genesis_hash: String = env.get_string(genesisHash).unwrap().into();
-        let to: String = env.get_string(to).unwrap().into();
-        let value: String = env.get_string(value).unwrap().into();
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("findNativeLib$Message");
         let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
-        //  Using the wallet method to construct transactions, the user transaction index will not reach the transaction volume caused by the forced conversion.
-        let eee = wallets::module::EEE {};
-        match eee.generate_eee_transfer(&from, &to, &value, &genesis_hash, index as u32, runtime_version as u32, tx_version as u32, pwd.as_slice()) {
-            Ok(data) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
-                env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");
-            }
-            Err(msg) => {
-                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("eeeTransfer set StatusCode value ");
-                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("eeeTransfer set message value");
+        let pwd = env.convert_byte_array(pwd);
+        let from = env.get_string(from);
+        let genesis_hash = env.get_string(genesisHash);
+        let to = env.get_string(to);
+        let amount = env.get_string(value);
+        if pwd.is_err()||from.is_err()||genesis_hash.is_err()||to.is_err()||amount.is_err() {
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("eeeTransfer set StatusCode value ");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter format not support".to_string()).unwrap()))).expect("eeeTransfer set message value");
+        }else {
+            let eee = wallets::module::EEE {};
+            let from:String = from.unwrap().into();
+            let to :String= to.unwrap().into();
+            let genesis_hash :String= genesis_hash.unwrap().into();
+            let amount:String = amount.unwrap().into();
+            //let pwd :Vec<u8>= amount.unwrap().into();
+            match eee.generate_eee_transfer(&from, &to, &amount, &genesis_hash, index as u32, runtime_version as u32, tx_version as u32, pwd.unwrap().as_slice()) {
+                Ok(data) => {
+                    env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
+                    env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");
+                }
+                Err(msg) => {
+                    env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("eeeTransfer set StatusCode value ");
+                    env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("eeeTransfer set message value");
+                }
             }
         }
+        //  Using the wallet method to construct transactions, the user transaction index will not reach the transaction volume caused by the forced conversion.
         *state_obj
     }
 

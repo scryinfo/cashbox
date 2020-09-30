@@ -59,7 +59,6 @@ impl WalletManager {
 
     pub fn is_contain_wallet(&self) -> Result<Vec<TbWallet>, String> {
         #[cfg(target_os="android")]crate::init_logger_once();
-
         match wallet_db::DataServiceProvider::instance() {
             Ok(provider) => {
                 Ok(provider.get_wallets())
@@ -67,6 +66,15 @@ impl WalletManager {
             Err(e) => Err(e.to_string())
         }
     }
+    //clear user download data
+/*    pub fn clean_account_data(&self, walletid: &str) -> Mnemonic {
+        match wallet_db::DataServiceProvider::instance() {
+            Ok(provider) => {
+                Ok(provider.get_wallets())
+            }
+            Err(e) => Err(e.to_string())
+        }
+    }*/
 
     pub fn get_current_wallet(&self) -> WalletResult<Wallet> {
         let instance = wallet_db::DataServiceProvider::instance()?;

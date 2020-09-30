@@ -159,6 +159,16 @@ pub fn get_cashbox_wallet_sql() -> &'static str {
 
 fn update_table_1_1_0()->Option<&'static str>{
     let sql = r#"
+    UPDATE detail.DefaultDigitBase set decimals = 15,group_name = 'EEE' WHERE short_name = 'TokenX';
+    UPDATE detail.DefaultDigitBase set decimals = 15 WHERE group_name = 'EEE';
+	UPDATE detail.DefaultDigitBase set decimals = 8 WHERE group_name = 'BTC';
+    UPDATE detail.Address set puk_key = '0x'||puk_key  WHERE puk_key not like '0x%';
+    Delete from detail.DigitUseDetail where digit_id in (SELECT  b.id from detail.DefaultDigitBase b WHERE b.group_name='ETH' and b.is_basic = 0);
+    Delete from detail.DigitUseDetail where digit_id in (SELECT  b.id from detail.DefaultDigitBase b WHERE b.group_name='EEE' and b.is_basic = 0);
+    INSERT INTO detail.DigitUseDetail(digit_id,address_id) SELECT * from (SELECT  b.id from detail.DefaultDigitBase b WHERE b.group_name='ETH' and b.is_basic = 0),(SELECT address_id from detail.Address a WHERE a.chain_id = 3);
+	INSERT INTO detail.DigitUseDetail(digit_id,address_id) SELECT * from (SELECT  b.id from detail.DefaultDigitBase b WHERE b.group_name='ETH' and b.is_basic = 0),(SELECT address_id from detail.Address a WHERE a.chain_id = 4);
+	INSERT INTO detail.DigitUseDetail(digit_id,address_id) SELECT * from (SELECT  b.id from detail.DefaultDigitBase b WHERE b.group_name='EEE' and b.is_basic = 0),(SELECT address_id from detail.Address a WHERE a.chain_id = 5);
+	INSERT INTO detail.DigitUseDetail(digit_id,address_id) SELECT * from (SELECT  b.id from detail.DefaultDigitBase b WHERE b.group_name='EEE' and b.is_basic = 0),(SELECT address_id from detail.Address a WHERE a.chain_id = 6);
     DROP TABLE IF EXISTS [detail].[TransferRecord];
     CREATE TABLE [detail].[TransferRecord](
     [tx_hash]  VARCHAR(72) PRIMARY KEY NOT NULL,

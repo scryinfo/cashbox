@@ -22,6 +22,7 @@ pub enum StatusCode {
     FailToGenerateMnemonic = 100,//Failed to generate mnemonic
     OK = 200, // normal
     PwdIsWrong,//Wrong password
+    ParameterFormatWrong,
 }
 
 impl Default for StatusCode {
@@ -147,20 +148,8 @@ mod tests {
             }
             wallet.eth_chain.unwrap().address
         };
-        //to 地址存在
-        let rawtx = "0xf86a808301000082010094dac17f958d2ee523a2206206994597c13d831ec780b847565c93e3000000000000000000000000d132abb434b7fe9aca4b24e3f0ef6fdeeeaf87920000000000000000000000000000000000000000000000000000000000000064636268808080";
-        let ethereum = module::Ethereum {};
-        match ethereum.raw_tx_sign(rawtx, 1, address.as_str(), "123456".as_bytes()) {
-            Ok(signed_data) => {
-                println!("tx sign result {}", signed_data)
-            }
-            Err(e) => {
-                assert_eq!("", e.to_string())
-            }
-        }
 
-        //to 地址不存在，是创建合约的
-        let rawtx = "0xf86d208477359400830186a08080b85c6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212202e5795391448b8f14e8374588b280f6dea0ff0fa3270bc1f143022facc12dd0864736f6c634300060c0033808080";
+        let rawtx = "0xf86a808301000082010094dac17f958d2ee523a2206206994597c13d831ec780b847565c93e3000000000000000000000000d132abb434b7fe9aca4b24e3f0ef6fdeeeaf87920000000000000000000000000000000000000000000000000000000000000064636268808080";
         let ethereum = module::Ethereum {};
         match ethereum.raw_tx_sign(rawtx, 1, address.as_str(), "123456".as_bytes()) {
             Ok(signed_data) => {
@@ -174,10 +163,10 @@ mod tests {
 
     #[test]
     fn transfer_test() {
-        let mnemonic = "settle essay unique empty neutral pistol essence monkey combine service gun burden";
-        let from = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
+       // let mnemonic = "settle essay unique empty neutral pistol essence monkey combine service gun burden";
+        let from = "5HmDfrMF62f1CDHXYcZ3G3vnKbu14HvzTkisnRU5oa7YZDff";
         let to = "5GGzGJR54YNjMKhaYt6hHV3o99FZ6JKYEDCrzUg1HCz1tWPa";
-        let value = "200000000000000";
+        let value = "5.";
         let genesis_hash = "0xabb0f2e62dfab481623438e14b5e1d4114a6e9a2f0d3f5e83f9192276e50cf34";
         let index = 0;
         let runtime_version = 1;
@@ -199,7 +188,6 @@ mod tests {
     fn get_all_test(){
         let manager = module::wallet::WalletManager {};
         let res = manager.get_all();
-        println!("res:{:?}",res);
         assert_eq!(res.is_ok(),true);
     }
 }
