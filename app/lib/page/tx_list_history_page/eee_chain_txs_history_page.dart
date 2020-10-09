@@ -304,9 +304,11 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
           }
           var eeeTxListModel = await getTxListData();
           if (eeeTxListModel != null && eeeTxListModel.length > 0) {
-            setState(() {
-              this.eeeTxListModel = eeeTxListModel;
-            });
+            if (mounted) {
+              setState(() {
+                this.eeeTxListModel = eeeTxListModel;
+              });
+            }
           }
         });
       },
