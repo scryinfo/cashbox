@@ -13,6 +13,12 @@ import java.util.Map;
 public class NativeLibTest {
 
     @Test
+   public void updateWalletDbDataTest(){
+        NativeLib.WalletState state = NativeLib.updateWalletDbData("1.0.0","1.1.0");
+        System.out.println(state);
+    }
+
+    @Test
     public void saveWalletTest() {
         System.out.println(NativeLib.initWalletBasicData());
         NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(15);
@@ -154,7 +160,7 @@ public class NativeLibTest {
     }
 
     @Test
-    public void storage_query_test() throws Throwable {
+    public void storageQueryTest() throws Throwable {
         Map header = new HashMap<String, String>();
         //Notification Event Coding Constant
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
@@ -164,7 +170,7 @@ public class NativeLibTest {
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://118.178.197.108:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
 
         Header current_header = client.invoke("chain_getHeader", new Object[]{}, Header.class);
         //Get the current block number
@@ -748,7 +754,7 @@ public class NativeLibTest {
 
     public static class Block {
         private BlockDetail block;
-        private String justification;
+        private  byte[] justification;
 
 
         public BlockDetail getBlock() {
@@ -759,11 +765,11 @@ public class NativeLibTest {
             this.block = block;
         }
 
-        public String getJustification() {
+        public byte[] getJustification() {
             return justification;
         }
 
-        public void setJustification(String justification) {
+        public void setJustification(byte[] justification) {
             this.justification = justification;
         }
 
@@ -771,7 +777,7 @@ public class NativeLibTest {
         public String toString() {
             return "Block{" +
                     "block=" + block +
-                    ", justification='" + justification + '\'' +
+                    ", justification=" + Arrays.toString(justification) +
                     '}';
         }
     }

@@ -87,7 +87,7 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     DROP TABLE IF EXISTS [main].[TransferRecord];
     CREATE TABLE [main].[TransferRecord](
     [tx_id] VARCHAR(64) PRIMARY KEY NOT NULL,
-    [tx_hash_]  VARCHAR(72) ,
+    [tx_hash]  VARCHAR(72) ,
     [block_hash] VARCHAR(72),
     [wallet_account]  VARCHAR(48),
     [chain_id] INT,
@@ -171,19 +171,24 @@ fn update_table_1_1_0()->Option<&'static str>{
 	INSERT INTO detail.DigitUseDetail(digit_id,address_id) SELECT * from (SELECT  b.id from detail.DefaultDigitBase b WHERE b.group_name='EEE' and b.is_basic = 0),(SELECT address_id from detail.Address a WHERE a.chain_id = 6);
     DROP TABLE IF EXISTS [detail].[TransferRecord];
     CREATE TABLE [detail].[TransferRecord](
-    [tx_hash]  VARCHAR(72) PRIMARY KEY NOT NULL,
+    [tx_id] VARCHAR(64) PRIMARY KEY NOT NULL,
+    [tx_hash]  VARCHAR(72) ,
     [block_hash] VARCHAR(72),
+    [wallet_account]  VARCHAR(48),
     [chain_id] INT,
-    [account] VARCHAR(48),
+    [token_name] VARCHAR(32),
+    [method_name] VARCHAR(32),
+    [signer] VARCHAR(48),
     [tx_index] INT,
     [tx_from] VARCHAR(48),
     [tx_to] VARCHAR(48),
     [amount] VARCHAR(32),
-    [unit] VARCHAR(32),
+    [fees] VARCHAR(32),
+    [ext_data] VARCHAR(2048),
     [status] int,
     [tx_timestamp] timestamp NOT NULL,
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now'))
-    );
+);
     "#;
     Some(sql)
 }
