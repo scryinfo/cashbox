@@ -45,18 +45,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   @override
   void initState() {
     super.initState();
-    //initTest();  // manual mock add tokenX
-  }
-
-  initTest() async {
-    var paramString = VendorConfig.defaultDigitsContentDefaultValue;
-    var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
-    print("updateMap[isUpdateDefaultDigit]() =====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
-    Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, 0, 100);
-    if (nativeAuthMap == null) {
-      print("getAuthDigitList() native digit list failure===》");
-      return [];
-    }
   }
 
   @override
