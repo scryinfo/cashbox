@@ -67,14 +67,10 @@ impl WalletManager {
         }
     }
     //clear user download data
-/*    pub fn clean_account_data(&self, walletid: &str) -> Mnemonic {
-        match wallet_db::DataServiceProvider::instance() {
-            Ok(provider) => {
-                Ok(provider.get_wallets())
-            }
-            Err(e) => Err(e.to_string())
-        }
-    }*/
+    pub fn clean_wallets_data(&self) -> WalletResult<()> {
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        instance.delete_user_data()
+    }
 
     pub fn get_current_wallet(&self) -> WalletResult<Wallet> {
         let instance = wallet_db::DataServiceProvider::instance()?;

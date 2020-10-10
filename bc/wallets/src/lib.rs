@@ -80,7 +80,7 @@ fn init_logger_once() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use substratetx::{Keccak256, Crypto};
+    use substratetx:: Crypto;
     use hex;
 
     #[test]
@@ -92,7 +92,6 @@ mod tests {
         let address = substratetx::Sr25519::ss58_from_pair(&pair,64);
         println!("address:{}",address);
         let data = "substrate sign method test";
-        let s = String::new();
         match substratetx::Ed25519::sign(&mnemonic, data.as_bytes()) {
             Ok(signed_data) => println!("0x{}", hex::encode(&signed_data[..])),
             Err(e) => println!("{}", e.to_string()),
@@ -103,9 +102,8 @@ mod tests {
     #[test]
     fn func_sign_test() {
         //Initialize the database
-        wallet_db::init_wallet_database().is_ok();
+        assert_eq!( wallet_db::init_wallet_database().is_ok(),true);
         //Create a wallet instance
-        let wallet_instance = model::Wallet::default();
         // let mnemonic = wallet_instance.crate_mnemonic(15);
         let rawtx = "0xac040600ff0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea300b0040e59c301200000000979d3bb306ed9fbd5d6ae1eade033b81ae12a5c5d5aa32781153579d7f6d5504ed000000";
         let eee = module::EEE {};
@@ -118,9 +116,8 @@ mod tests {
     #[test]
     fn sign_test() {
         //Initialize the database
-        wallet_db::init_wallet_database();
+        assert_eq!( wallet_db::init_wallet_database().is_ok(),true);
         //Create a wallet instance
-        let wallet_instance = model::Wallet::default();
         // let mnemonic = wallet_instance.crate_mnemonic(15);
         let rawtx = "0xac040600ff0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea300b0040e59c301200000000979d3bb306ed9fbd5d6ae1eade033b81ae12a5c5d5aa32781153579d7f6d5504ed000000";
         let eee = module::EEE {};
@@ -136,7 +133,6 @@ mod tests {
             //Initialize the database
             wallet_db::init_wallet_database().expect("init database error");
             //Create a wallet instance
-            let wallet_instance = model::Wallet::default();
             let manager = module::wallet::WalletManager {};
             let mnemonic = manager.crate_mnemonic(15);
             let mut wallet = manager.create_wallet("eth_raw_tx_sign_test", &mnemonic.mn, "123456".as_bytes(), 1).unwrap();

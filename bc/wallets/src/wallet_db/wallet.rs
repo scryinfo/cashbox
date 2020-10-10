@@ -27,7 +27,7 @@ impl DataServiceProvider {
     }
 
 
-    pub fn clean_user_data(&self) -> WalletResult<()> {
+    pub fn delete_user_data(&self) -> WalletResult<()> {
         let delete_sql = "delete from detail.AccountInfoSyncProg; delete from detail.TransferRecord;";
         self.db_hander.execute(delete_sql)?;
         Ok(())

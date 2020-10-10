@@ -189,6 +189,14 @@ fn update_table_1_1_0()->Option<&'static str>{
     [tx_timestamp] timestamp NOT NULL,
     [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now'))
 );
+   DROP TABLE IF EXISTS [detail].[LibHelperInfo];
+   CREATE TABLE [detail].[LibHelperInfo](
+    [name]  VARCHAR(72) PRIMARY KEY NOT NULL,
+    [value] VARCHAR(512),
+	[status] INT NOT NULL  DEFAULT 1);
+
+    INSERT INTO [detail].[LibHelperInfo](name,value) Values('current_db_version','1.0.0');
+
     "#;
     Some(sql)
 }

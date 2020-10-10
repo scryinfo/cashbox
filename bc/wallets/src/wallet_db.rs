@@ -28,23 +28,27 @@ pub fn init_wallet_database() -> WalletResult<()> {
     }
 }
 
-pub fn update_db_version(pre_version:&str,latest_version:&str)->WalletResult<()>{
-    let  pre = Version::parse(pre_version)?;
+pub fn update_db_version(latest_version:&str)->WalletResult<()>{
+
+    let helper = wallet_db::DataServiceProvider::instance()?;
+    let pre_version = helper.get_current_db_version()?;
+    log::info!("current database version is {}",pre_version);
+    let  pre = Version::parse(pre_version.as_str())?;
     let  latest = Version::parse(latest_version)?;
     if pre<latest {
-        let helper = wallet_db::DataServiceProvider::instance()?;
         helper.tx_begin()?;
         let ret = match helper.exec_db_update(pre,latest) {
             Ok(_) => helper.tx_commint(),
             Err(err) => {
                 helper.tx_rollback()?;
+                println!("{:?}",err);
                 log::error!("{:?}",err);
                 Err(err)
             }
         };
         ret
     }else if pre>latest{
-      Err(WalletError::Custom("pre_version is bigger than latest version".to_string()))
+      Err(WalletError::Custom("pre_version is bigger than latest version,please reinstall this application".to_string()))
     }else {
         Ok(())
     }
@@ -53,13 +57,13 @@ pub fn update_db_version(pre_version:&str,latest_version:&str)->WalletResult<()>
 
 #[test]
 fn init_database_test() {
-    let ret = init_wallet_database();
-    assert_eq!(ret.is_ok(),true);
+    assert_eq!(init_wallet_database().is_ok(),true);
 }
 
 #[test]
 fn update_db_version_test(){
-    let ret = update_db_version("1.2.0","1.1.0");
-
-    assert_eq!(ret.is_ok(),true);
+    match update_db_version("1.1.0") {
+        Ok(_)=>println!("database update successful"),
+        Err(e)=>println!("database update error:{}",e.to_string()),
+    }
 }

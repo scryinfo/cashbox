@@ -1,7 +1,7 @@
 use super::*;
 use super::model::*;
 
-use substratetx::{Crypto, TransferDetail};
+use substratetx::Crypto;
 use std::collections::HashMap;
 use codec::{Encode, Decode};
 use ethereum_types::{H160, U256, H256};

@@ -14,7 +14,13 @@ public class NativeLibTest {
 
     @Test
    public void updateWalletDbDataTest(){
-        NativeLib.WalletState state = NativeLib.updateWalletDbData("1.0.0","1.1.0");
+        NativeLib.WalletState state = NativeLib.updateWalletDbData("1.1.0");
+        System.out.println(state);
+    }
+
+    @Test
+    public void cleanWalletsDataTest(){
+        NativeLib.WalletState state = NativeLib.cleanWalletsDownloadData();
         System.out.println(state);
     }
 

@@ -324,27 +324,17 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateWalletDbData(env: JNIEnv, _: JClass,oldVersion: JString,newVersion: JString) -> jobject {
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateWalletDbData(env: JNIEnv, _: JClass,newVersion: JString) -> jobject {
         let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
         let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
-        let old_version:Option<String> = env.get_string(oldVersion).map(|value| value.into()).ok();
         let new_version:Option<String> = env.get_string(newVersion).map(|value| value.into()).ok();
 
-        if old_version.is_none()||new_version.is_none() {
-            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("find rename StatusCode");
+        if new_version.is_none() {
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("find  StatusCode");
             env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter format not support").unwrap()))).expect("set message value ");
         }else {
-            let old_version: String  = {
-                let data = old_version.unwrap();
-                if data.as_str().ge(""){
-                    "1.0.0".to_string()
-                }else{
-                    data.to_string()
-                }
-            };
             let new_version = new_version.unwrap();
-
-            match wallets::wallet_db::update_db_version(&old_version,&new_version) {
+            match wallets::wallet_db::update_db_version(&new_version) {
                 Ok(_) => {
                     env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
                     env.set_field(state_obj, "isUpdateDbData", "Z", JValue::Bool(1 as u8)).expect("set isUpdateDbData value ");
@@ -356,6 +346,24 @@ pub mod android {
             }
         }
         *state_obj
+    }
+
+    #[no_mangle]
+    #[allow(non_snake_case)]
+    pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_cleanWalletsDownloadData(env: JNIEnv, _: JClass){
+        let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
+        let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
+        let wallet = module::wallet::WalletManager {};
+        match wallet.clean_wallets_data() {
+            Ok(_) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type ");
+                env.set_field(state_obj, "isCleanWalletsData", "Z", JValue::Bool(1 as u8)).expect("set isCleanWalletsData value ");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("find rename StatusCode");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message value ");
+            }
+        }
     }
 
 
