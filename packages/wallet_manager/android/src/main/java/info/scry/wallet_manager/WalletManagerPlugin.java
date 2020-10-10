@@ -950,7 +950,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 ScryWalletLog.d("nativeLib=>", "updateWalletDbData is enter =>");
                 WalletState walletState = new WalletState();
                 try {
-                    walletState = NativeLib.updateWalletDbData((String) (call.argument("oldVersion")), (String) (call.argument("newVersion")));
+                    walletState = NativeLib.updateWalletDbData((String) (call.argument("newVersion")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "updateWalletDbData exception is " + exception);
                 }

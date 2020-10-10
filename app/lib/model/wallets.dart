@@ -78,8 +78,8 @@ class Wallets {
     }
   }
 
-  Future<Map> updateWalletDbData(String oldVersion, String newVersion) async {
-    Map resultMap = await WalletManager.updateWalletDbData(oldVersion, newVersion); //Initialize some database data
+  Future<Map> updateWalletDbData( String newVersion) async {
+    Map resultMap = await WalletManager.updateWalletDbData(newVersion); //Initialize some database data
     int status = resultMap["status"];
     if (status == null) {
       LogUtil.e("initWalletBasicData error=>", "not find status code");
