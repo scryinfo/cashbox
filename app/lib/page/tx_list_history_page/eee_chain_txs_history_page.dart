@@ -346,7 +346,9 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        eeeTxListModel[index].value ?? "",
+                        eeeTxListModel[index].from == fromAddress || eeeTxListModel[index].signer == fromAddress
+                            ? "-" + eeeTxListModel[index].value ?? ""
+                            : "+" + eeeTxListModel[index].value ?? "",
                         style: TextStyle(
                           color: Colors.greenAccent,
                           fontSize: ScreenUtil.instance.setSp(3.5),
