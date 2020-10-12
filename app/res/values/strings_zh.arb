@@ -79,6 +79,7 @@
   "currency_manage": "货币管理",
   "wallet_list": "钱包列表",
   "language_choose": "语言选择",
+  "clean_cache": "清除缓存",
   "version_update": "版本更新",
   "no_new_version_hint": "当前已是最新版本，暂无更新",
   "success_to_copy_info": "信息已经成功拷贝!~~~",
