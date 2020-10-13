@@ -155,8 +155,8 @@ class EeeSyncTxs {
 
     for (int i = 0; i < queryCount; i++) {
       String startBlockHash = '';
+      int currentStartBlockNum = startBlockHeight + i * onceCount + 1;
       {
-        int currentStartBlockNum = startBlockHeight + i * onceCount + 1;
         Map currentMap = await _scryXNetUtil.loadChainBlockHash(currentStartBlockNum);
         if (currentMap == null || !currentMap.containsKey("result")) {
           return;
@@ -167,7 +167,7 @@ class EeeSyncTxs {
         }
       }
       String endBlockHash = '';
-      int endBlockHeight = startBlockHeight + onceCount;
+      int endBlockHeight = currentStartBlockNum + onceCount;
       {
         if (endBlockHeight > latestBlockHeight) {
           endBlockHeight = latestBlockHeight;
