@@ -121,7 +121,6 @@ impl DataServiceProvider {
 
         log::info!("save_transfer_detail account:{},blockhash:{}",account,blockhash);
         //check tx  exist?
-
         let count_sql = "SELECT count(*) from detail.TransferRecord WHERE tx_hash = ? and wallet_account = ?";
         let mut stat = self.db_hander.prepare(count_sql)?;
         stat.bind(1, tx_detail.hash.as_ref().unwrap().as_str())?;//Transaction hash
@@ -143,16 +142,8 @@ impl DataServiceProvider {
         stat.bind(5, tx_detail.method_name.as_str())?;// The chain id needs to be flexibly adjusted
         stat.bind(6, tx_detail.signer.as_ref().unwrap().as_str())?;// The chain id needs to be flexibly adjusted
         stat.bind(7, tx_detail.index.unwrap() as i64)?;
-        stat.bind(8, if let Some(from )= &tx_detail.from{
-            from
-        }else{
-           ""
-        })?;//The transaction initiating account
-        stat.bind(9, if let Some(to) = &tx_detail.to{
-            to
-        }else {
-            ""
-        })?;//Transaction receiving account
+        stat.bind(8, if let Some(from )= &tx_detail.from{ from}else{ ""})?;//The transaction initiating account
+        stat.bind(9, if let Some(to) = &tx_detail.to{ to }else { "" })?;//Transaction receiving account
         //value is u128 type, the database does not support this type, transcoded as a string to represent
         stat.bind(10, format!("{}", tx_detail.value.unwrap()).as_str())?;
         stat.bind(11, if let Some(ext_data) = &tx_detail.ext_data{

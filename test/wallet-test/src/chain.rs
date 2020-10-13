@@ -216,17 +216,22 @@ pub fn get_btc_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, btc_chain: BtcChain) -> JO
 #[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_showChain(env: JNIEnv, _: JClass, walletId: JString, wallet_type: jint) -> jobject {
-    let wallet_id: String = env.get_string(walletId).unwrap().into();
+    let wallet_id: JniResult<String> = env.get_string(walletId).map(|value| value.into());
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find wallet_state_class is error");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
 
-    match wallets::module::EEE::show_chain(wallet_id.as_str(), wallet_type as i64) {
-        Ok(_) => {
+    if wallet_id.is_err() {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set showChain StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set showChain message");
+        return *state_obj;
+    }
+    match wallets::module::EEE::show_chain(&wallet_id.unwrap(), wallet_type as i64) {
+        Ok(ret) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
-            env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(1 as u8)).expect("set isShowChain value");
+            env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(ret as u8)).expect("set isShowChain value");
         }
         Err(msg) => {
-            env.set_field(state_obj, "isShowChain", "Z", JValue::Bool(0 as u8)).expect("set isShowChain value");
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set showChain value ");
             env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error msg value");
         }
     }
@@ -236,19 +241,24 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_showChain(env:
 #[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideChain(env: JNIEnv, _: JClass, walletId: JString, wallet_type: jint) -> jobject {
-    let wallet_id: String = env.get_string(walletId).unwrap().into();
+    let wallet_id: JniResult<String> = env.get_string(walletId).map(|value| value.into());
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
 
-    match wallets::module::EEE::hide_chain(wallet_id.as_str(), wallet_type as i64) {
-        Ok(_) => {
-            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
-            env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(1 as u8)).expect("set isHideChain value");
+    if let Ok(wallet_id) = wallet_id{
+        match wallets::module::EEE::hide_chain(&wallet_id, wallet_type as i64) {
+            Ok(ret) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
+                env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(ret as u8)).expect("set isHideChain value");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set isHideChain value ");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
+            }
         }
-        Err(msg) => {
-            env.set_field(state_obj, "isHideChain", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
-        }
+    }else {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set hideChain StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set hideChain message");
     }
     *state_obj
 }
@@ -257,12 +267,17 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_hideChain(env:
 #[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAdditionData(env: JNIEnv, _: JClass, input: JString) -> jobject {
-    let input: String = env.get_string(input).unwrap().into();
+    let input: JniResult<String> = env.get_string(input).map(|value| value.into());
 
     let message_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("decodeAdditionData NativeLib$Message");
     let state_obj = env.alloc_object(message_class).expect("decodeAdditionData create state_obj");
+    if input.is_err() {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set decodeAdditionData StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set decodeAdditionData message");
+        return *state_obj;
+    }
     let eth = wallets::module::Ethereum {};
-    match eth.decode_data(input.as_str()) {
+    match eth.decode_data(&input.unwrap()) {
         Ok(data) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");
             env.set_field(state_obj, "inputInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set inputInfo");
@@ -278,18 +293,23 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAddition
 #[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowChainType(env: JNIEnv, _: JClass, walletId: JString) -> jobject {
-    let wallet_id: String = env.get_string(walletId).unwrap().into();
+    let wallet_id: JniResult<String> = env.get_string(walletId).map(|value| value.into());
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("find NativeLib$WalletState");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance");
-    match wallets::module::EEE::get_now_chain_type(wallet_id.as_str()) {
-        Ok(code) => {
-            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
-            env.set_field(state_obj, "getNowChainType", "I", JValue::Int(code as i32)).expect("get nowChainType value");
+    if let Ok(wallet_id) = wallet_id{
+        match wallets::module::EEE::get_now_chain_type(&wallet_id) {
+            Ok(code) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("find status type");
+                env.set_field(state_obj, "getNowChainType", "I", JValue::Int(code as i32)).expect("get nowChainType value");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set status");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error message");
+            }
         }
-        Err(msg) => {
-            //env.set_field(state_obj, "status", "Z", JValue::Bool(0 as u8)).expect("set isHideChain value");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set error message");
-        }
+    }else {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set nowChainType StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set nowChainType message");
     }
     *state_obj
 }
@@ -297,37 +317,58 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getNowChainTyp
 #[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_setNowChainType(env: JNIEnv, _: JClass, walletId: JString, chain_type: jint) -> jobject {
-    let wallet_id: String = env.get_string(walletId).unwrap().into();
+    let wallet_id: JniResult<String> = env.get_string(walletId).map(|value| value.into());
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$WalletState").expect("setNowChainType wallet_state_class");
     let state_obj = env.alloc_object(wallet_state_class).expect("setNowChainType create state_obj");
-    match wallets::module::EEE::set_now_chain_type(wallet_id.as_str(), chain_type as i64) {
-        Ok(_) => {
-            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");
-            env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(1 as u8)).expect("setNowChainType isSetNowChain");
+    if let Ok(wallet_id) = wallet_id{
+        match wallets::module::EEE::set_now_chain_type(&wallet_id, chain_type as i64) {
+            Ok(_) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set status");
+                env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(1 as u8)).expect("setNowChainType isSetNowChain");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(0 as u8)).expect("isSetNowChain");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
+            }
         }
-        Err(msg) => {
-            env.set_field(state_obj, "isSetNowChain", "Z", JValue::Bool(0 as u8)).expect("isSetNowChain");
-            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message");
-        }
+    }else {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set setNowChainType StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set setNowChainType message");
     }
     *state_obj
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env: JNIEnv, _: JClass, walletId: JString, chainType: jint, fromAddress: JString,
+pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env: JNIEnv, _: JClass, _walletId: JString, chainType: jint, fromAddress: JString,
                                                                             toAddress: JString, contractAddress: JString, value: JString, backup: JString, pwd: jbyteArray,
                                                                             gasPrice: JString, gasLimit: JString, nonce: JString, decimal: jint) -> jobject {
     let wallet_message_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find wallet_message_class");
     let state_obj = env.alloc_object(wallet_message_class).expect("state_obj");
-
     //The sender account address can be linked by wallet id
-    let from_address: String = env.get_string(fromAddress).unwrap().into();
+    let from_address: JniResult<String> = env.get_string(fromAddress).map(|value| value.into());
     //Receiver account address
-    let to_address: String = env.get_string(toAddress).unwrap().into();
+    let to_address: JniResult<String> = env.get_string(toAddress).map(|value| value.into());
+    //Call contract address
+    let contract_address: JniResult<String> = env.get_string(contractAddress).map(|value| value.into());
 
+    let value: JniResult<String> = env.get_string(value).map(|value| value.into());
+    let nonce: JniResult<String> = env.get_string(nonce).map(|value| value.into());
+    let gas_limit: JniResult<String> = env.get_string(gasLimit).map(|value| value.into());
+
+    let price: JniResult<String> = env.get_string(gasPrice).map(|value| value.into());
+    //Additional parameters
+    let data: JniResult<String> = env.get_string(backup).map(|value| value.into());
+    let pwd = env.convert_byte_array(pwd);
+
+    if from_address.is_err()||to_address.is_err()||contract_address.is_err()||gas_limit.is_err()||price.is_err()||data.is_err()||pwd.is_err()||nonce.is_err(){
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set updateDigitBalance StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set updateDigitBalance message");
+        return *state_obj;
+    }
     let to_address = {
+        let to_address = to_address.unwrap();
         if to_address.is_empty() {
             None
         } else {
@@ -335,36 +376,25 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env:
             Some(to)
         }
     };
-    //Call contract address
-    let contract_address: String = env.get_string(contractAddress).unwrap().into();
     //The transfer amount is expressed here using this parameter
     let amount = {
-        let value_str: String = env.get_string(value).unwrap().into();
         //Different tokens will have different accuracy
-        wallets::convert_token(&value_str, decimal as usize).unwrap()
+        wallets::convert_token(&value.unwrap(), decimal as usize).unwrap()
     };
     //Additional parameters
-    let data: String = env.get_string(backup).unwrap().into();
+    let data = data.unwrap();
     let data = if data.is_empty() {
         None
     } else {
         Some(data)
     };
-
     //gas price
-    let gas_price: U256 = {
-        let price_str: String = env.get_string(gasPrice).unwrap().into();
-        //The unit used is gwei, which is ok
-        wallets::convert_token(&price_str, 9).unwrap()
-    };
+    let gas_price: U256 = wallets::convert_token(&price.unwrap(), 9).unwrap();
     //Allow maximum gas consumption
-    let gas_limit: U256 = {
-        let gas_limit_str: String = env.get_string(gasLimit).unwrap().into();
-        U256::from_dec_str(&gas_limit_str).unwrap()
-    };
+    let gas_limit: U256 = U256::from_dec_str(&gas_limit.unwrap()).unwrap();
     //Nonce value of the current transaction
     let nonce: U256 = {
-        let nonce_str: String = env.get_string(nonce).unwrap().into();
+        let nonce_str = nonce.unwrap();
         let nonce = if nonce_str.starts_with("0x") {
             let nonce_u64 = u64::from_str_radix(&nonce_str[2..], 16);
             format!("{}", nonce_u64.unwrap())
@@ -373,7 +403,6 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env:
         };
         U256::from_dec_str(&nonce).unwrap()
     };
-
     //The current wallet only uses 3 and 4 to represent the Ethereum main chain and test chain by default. According to the chain type, it is converted to the chain_id defined by the Ethereum standard, and the conversion is done as follows 3->1,4->3, the rest remain unchanged
     let chain_id = {
         if chainType == 3 {
@@ -384,17 +413,14 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env:
             chainType
         }
     };
-
-    //Use the private key confirmation code
-    let pwd = env.convert_byte_array(pwd).unwrap();
     //The contract address is empty, it is an ordinary ETH transfer or deployment contract
     let ethereum = wallets::module::Ethereum {};
-
+    let contract_address = contract_address.unwrap();
     let signed_ret = if contract_address.is_empty() {
-        ethereum.raw_transfer_sign(&from_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_id as u64)
+        ethereum.raw_transfer_sign(&from_address.unwrap(), to_address, amount, &pwd.unwrap(), nonce, gas_limit, gas_price, data, chain_id as u64)
     } else {
         let contract_address = H160::from_slice(hex::decode(&contract_address[2..]).unwrap().as_slice());
-        ethereum.raw_erc20_transfer_sign(&from_address, contract_address, to_address, amount, &pwd, nonce, gas_limit, gas_price, data, chain_id as u64)
+        ethereum.raw_erc20_transfer_sign(&from_address.unwrap(), contract_address, to_address, amount, &pwd.unwrap(), nonce, gas_limit, gas_price, data, chain_id as u64)
     };
     match signed_ret {
         Ok(data) => {
@@ -411,15 +437,62 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env:
 
 #[no_mangle]
 #[allow(non_snake_case)]
+pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethRawTxSign(env: JNIEnv, _: JClass, rawTx: JString, chainType: jint, fromAddress: JString, psd: jbyteArray) -> jobject {
+    let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
+    let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
+
+    let pwd = env.convert_byte_array(psd);
+    let raw_tx:JniResult<String> = env.get_string(rawTx).map(|value| value.into());
+    let from_address: JniResult<String> = env.get_string(fromAddress).map(|value| value.into());
+
+    if pwd.is_err()||raw_tx.is_err()||from_address.is_err() {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set ethRawTxSign StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set ethRawTxSign message");
+        return *state_obj;
+    }
+    //The current wallet only uses 3 and 4 to represent the Ethereum main chain and test chain by default. According to the chain type, it is converted to the chain_id defined by the Ethereum standard, and the conversion is done as follows 3->1,4->3, the rest remain unchanged
+    let chain_id = {
+        if chainType == 3 {
+            1
+        } else if chainType == 4 {
+            3
+        } else {//For this situation, it is used to test with another chain type during the development process
+            chainType
+        }
+    };
+
+    let eth = wallets::module::Ethereum {};
+    match eth.raw_tx_sign(&raw_tx.unwrap(), chain_id as u64, &from_address.unwrap(), &pwd.unwrap()) {
+        Ok(data) => {
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode ");
+            env.set_field(state_obj, "ethSignedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set signedInfo");
+        }
+        Err(msg) => {
+            env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::PwdIsWrong as i32)).expect("set StatusCode ");
+            env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message ");
+        }
+    }
+    *state_obj
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTxSign(env: JNIEnv, _class: JClass, rawTx: JString, walletId: JString, psd: jbyteArray) -> jobject {
-    let pwd = env.convert_byte_array(psd).unwrap();
-    let raw_tx: String = env.get_string(rawTx).unwrap().into();
-    let wallet_id: String = env.get_string(walletId).unwrap().into();
+    let pwd = env.convert_byte_array(psd);
+    let raw_tx: JniResult<String> = env.get_string(rawTx).map(|value| value.into());
+    let wallet_id: JniResult<String> = env.get_string(walletId).map(|value| value.into());
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
     let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
+
+    if pwd.is_err()||raw_tx.is_err()||wallet_id.is_err() {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set updateDigitBalance StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set updateDigitBalance message");
+        return *state_obj;
+    }
+
     let eee = wallets::module::EEE {};
-    match eee.raw_tx_sign(&raw_tx, &wallet_id, pwd.as_slice()) {
+    match eee.raw_tx_sign(&raw_tx.unwrap(), &wallet_id.unwrap(), &pwd.unwrap()) {
         Ok(data) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode ");
             env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set signedInfo");
@@ -435,14 +508,19 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTxSign(env: JNIEnv
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeSign(env: JNIEnv, _class: JClass, rawTx: JString, walletId: JString, psd: jbyteArray) -> jobject {
-    let pwd = env.convert_byte_array(psd).unwrap();
-    let raw_tx: String = env.get_string(rawTx).unwrap().into();
-    let wallet_id: String = env.get_string(walletId).unwrap().into();
+    let pwd = env.convert_byte_array(psd);
+    let raw_tx: JniResult<String> = env.get_string(rawTx).map(|value| value.into());
+    let wallet_id: JniResult<String> = env.get_string(walletId).map(|value| value.into());
 
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
     let state_obj = env.alloc_object(wallet_state_class).expect("create wallet_state_class instance ");
+    if pwd.is_err()||raw_tx.is_err()||wallet_id.is_err() {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set eeeSign StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set eeeSign message");
+        return *state_obj;
+    }
     let eee = wallets::module::EEE {};
-    match eee.raw_sign(&raw_tx, &wallet_id, pwd.as_slice()) {
+    match eee.raw_sign(&raw_tx.unwrap(), &wallet_id.unwrap(), &pwd.unwrap()) {
         Ok(data) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("eeeSign set StatusCode value");
             env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value ");
@@ -462,21 +540,16 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIE
     let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
 
     let pwd = env.convert_byte_array(pwd);
-    let from = env.get_string(from);
-    let genesis_hash = env.get_string(genesisHash);
-    let to = env.get_string(to);
-    let amount = env.get_string(value);
+    let from:JniResult<String> = env.get_string(from).map(|value| value.into());
+    let genesis_hash:JniResult<String> = env.get_string(genesisHash).map(|value| value.into());
+    let to :JniResult<String>= env.get_string(to).map(|value| value.into());
+    let amount:JniResult<String> = env.get_string(value).map(|value| value.into());
     if pwd.is_err()||from.is_err()||genesis_hash.is_err()||to.is_err()||amount.is_err() {
         env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("eeeTransfer set StatusCode value ");
         env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter format not support".to_string()).unwrap()))).expect("eeeTransfer set message value");
     }else {
         let eee = wallets::module::EEE {};
-        let from:String = from.unwrap().into();
-        let to :String= to.unwrap().into();
-        let genesis_hash :String= genesis_hash.unwrap().into();
-        let amount:String = amount.unwrap().into();
-        //let pwd :Vec<u8>= amount.unwrap().into();
-        match eee.generate_eee_transfer(&from, &to, &amount, &genesis_hash, index as u32, runtime_version as u32, tx_version as u32, pwd.unwrap().as_slice()) {
+        match eee.generate_eee_transfer(&from.unwrap(), &to.unwrap(), &amount.unwrap(), &genesis_hash.unwrap(), index as u32, runtime_version as u32, tx_version as u32, pwd.unwrap().as_slice()) {
             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");
@@ -487,24 +560,29 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeTransfer(env: JNIE
             }
         }
     }
-    //  Using the wallet method to construct transactions, the user transaction index will not reach the transaction volume caused by the forced conversion.
     *state_obj
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_tokenXTransfer(env: JNIEnv, _class: JClass, from: JString, to: JString, value: JString, extData: JString, genesisHash: JString, index: jint, runtime_version: jint, tx_version: jint, pwd: jbyteArray) -> jobject {
-    let pwd = env.convert_byte_array(pwd).unwrap();
-    let from: String = env.get_string(from).unwrap().into();
-    let genesis_hash: String = env.get_string(genesisHash).unwrap().into();
-    let to: String = env.get_string(to).unwrap().into();
-    let ext_data: String = env.get_string(extData).unwrap().into();
-    let value: String = env.get_string(value).unwrap().into();
+    let pwd = env.convert_byte_array(pwd);
+    let from: JniResult<String> = env.get_string(from).map(|value| value.into());
+    let genesis_hash: JniResult<String> = env.get_string(genesisHash).map(|value| value.into());
+    let to: JniResult<String> = env.get_string(to).map(|value| value.into());
+    let ext_data: JniResult<String> = env.get_string(extData).map(|value| value.into());
+    let value: JniResult<String> = env.get_string(value).map(|value| value.into());
+
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("findNativeLib$Message");
     let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
+    if value.is_err()||ext_data.is_err()||to.is_err()||genesis_hash.is_err()||from.is_err()||pwd.is_err() {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set updateDigitBalance StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set updateDigitBalance message");
+        return *state_obj;
+    }
     //  Using the wallet method to construct transactions, the user transaction index will not reach the transaction volume caused by the forced conversion.
     let eee = wallets::module::EEE {};
-    match eee.generate_tokenx_transfer(&from, &to, &value, &ext_data, &genesis_hash, index as u32, runtime_version as u32, tx_version as u32, pwd.as_slice()) {
+    match eee.generate_tokenx_transfer(&from.unwrap(), &to.unwrap(), &value.unwrap(), &ext_data.unwrap(), &genesis_hash.unwrap(), index as u32, runtime_version as u32, tx_version as u32, &pwd.unwrap()) {
         Ok(data) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
             env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("eeeTransfer set signedInfo value");
@@ -520,12 +598,20 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_tokenXTransfer(env: J
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeStorageKey(env: JNIEnv, _class: JClass, module: JString, storageItem: JString, pub_key: JString) -> jobject {
-    let module: String = env.get_string(module).unwrap().into();
-    let storage_item: String = env.get_string(storageItem).unwrap().into();
-    let pub_key: String = env.get_string(pub_key).unwrap().into();
+    let module: JniResult<String> = env.get_string(module).map(|value| value.into());
+    let storage_item: JniResult<String> = env.get_string(storageItem).map(|value| value.into());
+    let pub_key: JniResult<String> = env.get_string(pub_key).map(|value| value.into());
+
     let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
     let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
-    match wallets::encode_account_storage_key(&module, &storage_item, &pub_key) {
+
+    if module.is_err()||storage_item.is_err()||pub_key.is_err() {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set updateDigitBalance StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set updateDigitBalance message");
+        return *state_obj;
+    }
+
+    match wallets::encode_account_storage_key(&module.unwrap(), &storage_item.unwrap(), &pub_key.unwrap()) {
         Ok(key) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
             env.set_field(state_obj, "storageKeyInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(key).unwrap()))).expect("set accountKeyInfo value");
@@ -540,45 +626,57 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeStorageKey(env: JN
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAccountInfo(env: JNIEnv, _class: JClass, _encode_info: JString) -> jobject {
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAccountInfo(env: JNIEnv, _class: JClass, encode_info: JString) -> jobject {
     let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
-
     let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
-    /* let encode_info: String = env.get_string(encode_info).unwrap().into();
-     match wallets::decode_account_info(&encode_info) {
-         Ok(account_info) => {
-             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
-             let account_info_class = env.find_class("info/scry/wallet_manager/NativeLib$AccountInfo").expect("find NativeLib$AccountInfo");
-             let account_obj = env.alloc_object(account_info_class).expect("create NativeLib$AccountInfo instance");
-             //start set account info
-             env.set_field(account_obj, "nonce", "I", JValue::Int(account_info.nonce as i32)).expect("set StatusCode value");
-             env.set_field(account_obj, "refcount", "I", JValue::Int(account_info.refcount as i32)).expect("set StatusCode value");
-             env.set_field(account_obj, "free", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(account_info.free.to_string()).unwrap()))).expect("set message value");
-             env.set_field(account_obj, "reserved", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(account_info.reserved.to_string()).unwrap()))).expect("set message value");
-             env.set_field(account_obj, "misc_frozen", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(account_info.misc_frozen.to_string()).unwrap()))).expect("set message value");
-             env.set_field(account_obj, "fee_frozen", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(account_info.fee_frozen.to_string()).unwrap()))).expect("set message value");
-             //end set account info
-             env.set_field(state_obj, "accountInfo", "Linfo/scry/wallet_manager/NativeLib$AccountInfo;",account_obj.into() ).expect("set decodeAccountInfo value");
-         }
-         Err(msg) => {
-             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set StatusCode value");
-             env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message value");
-         }
-     }*/
+    let encode_info: JniResult<String> = env.get_string(encode_info).map(|value| value.into());
+    if let  Ok(info) = encode_info{
+        match wallets::decode_account_info(&info) {
+            Ok(account_info) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
+                let account_info_class = env.find_class("info/scry/wallet_manager/NativeLib$AccountInfo").expect("find NativeLib$AccountInfo");
+                let account_obj = env.alloc_object(account_info_class).expect("create NativeLib$AccountInfo instance");
+                //start set account info
+                env.set_field(account_obj, "nonce", "I", JValue::Int(account_info.nonce as i32)).expect("set StatusCode value");
+                env.set_field(account_obj, "refcount", "I", JValue::Int(account_info.refcount as i32)).expect("set StatusCode value");
+                env.set_field(account_obj, "free", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(account_info.free.to_string()).unwrap()))).expect("set message value");
+                env.set_field(account_obj, "reserved", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(account_info.reserved.to_string()).unwrap()))).expect("set message value");
+                env.set_field(account_obj, "misc_frozen", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(account_info.misc_frozen.to_string()).unwrap()))).expect("set message value");
+                env.set_field(account_obj, "fee_frozen", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(account_info.fee_frozen.to_string()).unwrap()))).expect("set message value");
+                //end set account info
+                env.set_field(state_obj, "accountInfo", "Linfo/scry/wallet_manager/NativeLib$AccountInfo;",account_obj.into() ).expect("set decodeAccountInfo value");
+            }
+            Err(msg) => {
+                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("set StatusCode value");
+                env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message value");
+            }
+        }
+    }else {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set decodeAccountInfo StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set decodeAccountInfo message");
+    }
     *state_obj
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveExtrinsicDetail(env: JNIEnv, _class: JClass, account_id: JString, event_detail: JString, block_hash: JString, extrinsics: JString) -> jobject {
-    let account_id: String = env.get_string(account_id).unwrap().into();
-    let encode_event_info: String = env.get_string(event_detail).unwrap().into();
-    let block_hash: String = env.get_string(block_hash).unwrap().into();
-    let block_extrinsics: String = env.get_string(extrinsics).unwrap().into();
+    let account_id: JniResult<String> = env.get_string(account_id).map(|value| value.into());
+    let encode_event_info: JniResult<String> = env.get_string(event_detail).map(|value| value.into());
+    let block_hash: JniResult<String> = env.get_string(block_hash).map(|value| value.into());
+    let block_extrinsics: JniResult<String> = env.get_string(extrinsics).map(|value| value.into());
+
     let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
     let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
+
+    if account_id.is_err()||encode_event_info.is_err()||block_hash.is_err()||block_extrinsics.is_err() {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set saveExtrinsicDetail StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set saveExtrinsicDetail message");
+        return *state_obj
+    }
+
     let eee = wallets::module::EEE {};
-    match eee.save_tx_record(&account_id, &block_hash, &encode_event_info, &block_extrinsics) {
+    match eee.save_tx_record(&account_id.unwrap(), &block_hash.unwrap(), &encode_event_info.unwrap(), &block_extrinsics.unwrap()) {
         Ok(_key) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
         }
@@ -593,14 +691,20 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveExtrinsicDetail(e
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateEeeSyncRecord(env: JNIEnv, _class: JClass, account: JString, chain_type: jint, block_num: jint, block_hash: JString) -> jobject {
-    let account: String = env.get_string(account).unwrap().into();  //String account,int chain_type,int block_num,String block_hash
-    let block_hash: String = env.get_string(block_hash).unwrap().into();
+    let account: JniResult<String> = env.get_string(account).map(|value| value.into());  //String account,int chain_type,int block_num,String block_hash
+    let block_hash: JniResult<String> = env.get_string(block_hash).map(|value| value.into());
 
     let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
     let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
-    let eee = wallets::module::EEE {};
 
-    match eee.update_sync_record(&account, chain_type, block_num as u32, &block_hash) {
+    if account.is_err()||block_hash.is_err() {
+        env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set updateEeeSyncRecord StatusCode ");
+        env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set updateEeeSyncRecord message");
+        return *state_obj
+    }
+
+    let eee = wallets::module::EEE {};
+    match eee.update_sync_record(&account.unwrap(), chain_type, block_num as u32, &block_hash.unwrap()) {
         Ok(_key) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
         }
@@ -649,15 +753,20 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getEeeSyncRecord(env:
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_loadEeeChainTxListHistory(env: JNIEnv, _class: JClass, account: JString, tokenName: JString, startIndex: jint, offset: jint) -> jobject {
     let history_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeChainTxListHistory").expect("find NativeLib$EeeChainTxListHistory");
     let history_class_obj = env.alloc_object(history_class).expect("create NativeLib$Message instance");
-    let account: String = env.get_string(account).unwrap().into();
-    let tokenName: String = env.get_string(tokenName).unwrap().into();
+    let account: JniResult<String> = env.get_string(account).map(|value| value.into());
+    let tokenName: JniResult<String> = env.get_string(tokenName).map(|value| value.into());
+
+    if account.is_err()||tokenName.is_err() {
+        env.set_field(history_class_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set loadEeeChainTxListHistory StatusCode ");
+        env.set_field(history_class_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set loadEeeChainTxListHistory message");
+        return *history_class_obj
+    }
 
     let array_list_class = env.find_class("java/util/ArrayList").expect("ArrayList");
     let array_list_obj = env.alloc_object(array_list_class).expect("array_list_class");
     env.call_method(array_list_obj, "<init>", "()V", &[]).expect("array_list_obj init method is exec");
-
     let eee = wallets::module::EEE {};
-    match eee.query_tx_record(&account, &tokenName, startIndex as u32, offset as u32) {
+    match eee.query_tx_record(&account.unwrap(), &tokenName.unwrap(), startIndex as u32, offset as u32) {
         Ok(tx_records) => {
             let tx_record_class = env.find_class("info/scry/wallet_manager/NativeLib$EeeChainTxDetail").expect("find NativeLib$EeeChainTxListHistory class");
             for record in tx_records {

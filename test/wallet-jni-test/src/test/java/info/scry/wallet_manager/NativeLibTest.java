@@ -33,6 +33,12 @@ public class NativeLibTest {
     }
 
     @Test
+    public void isContainWalletTest(){
+        NativeLib.WalletState state = NativeLib.isContainWallet();
+        System.out.println(state);
+    }
+
+    @Test
     public void loadAllWalletTest() {
         List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
         for (NativeLib.Wallet wallet : wallets) {
@@ -47,7 +53,7 @@ public class NativeLibTest {
                 "{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH\"},\n" +
                 "{\"contractAddress\":\"0xaa638fca332190b63be1605baefde1df0b3b031e\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"locale://ic_ddd.png\",\"id\":\"eth_test_token_pre_id_DDD\",\"decimal\":\"18\",\"chainType\":\"ETH_TEST\"}\n" +
                 "]";*/
-        String json = "[{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"symbol=DDD\",\"id\":\"4ce05105-3540-4ef4-8d4b-c805e3b534f5\",\"decimal\":\"\",\"chainType\":\"ETH\"},{\"contractAddress\":\"0x00\",\"shortName\":\"TokenX\",\"fullName\":\"\",\"urlImg\":\"symbol=TokenX\",\"id\":\"f28cbc2e-f01d-4122-8e85-c0a8ef494623\",\"decimal\":\"\",\"chainType\":\"EEE\"}]";
+        String json = "[{\"contractAddress\":\"0x9f5f3cfd7a32700c93f971637407ff17b91c7342\",\"shortName\":\"DDD\",\"fullName\":\"DDD\",\"urlImg\":\"symbol=DDD\",\"id\":\"4ce05105-3540-4ef4-8d4b-c805e3b534f5\",\"decimal\":\"\",\"chainType\":\"ETH\"},{\"contractAddress\":\"0x00\",\"shortName\":\"TokenX\",\"fullName\":\"\",\"urlImg\":\"symbol=TokenX\",\"id\":\"f28cbc2e-f01d-4122-8e85-c0a8ef494623\",\"decimal\":\"15\",\"chainType\":\"EEE\"}]";
         System.out.println(json);
         NativeLib.WalletState state = NativeLib.updateDefaultDigitList(json);
         System.out.println(state);
@@ -172,11 +178,11 @@ public class NativeLibTest {
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
         //  String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
-        String account_1 = "5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC";
+        String account_1 = "5E54p5Mf2sHsoemRqD7a2o2ThudbTtEXMhSgSNCi16DEsQ1Y";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://118.178.197.108:9933"), header);
 
         Header current_header = client.invoke("chain_getHeader", new Object[]{}, Header.class);
         //Get the current block number
@@ -188,8 +194,8 @@ public class NativeLibTest {
 
         int startBlockNumber = accountRecord == null ? 0 : accountRecord.blockNum;
 
-        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0x766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d");
-        NativeLib.Message key2 = NativeLib.eeeStorageKey("Tokenx","Balances","0x766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d");
+        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0x58bf023b83ab4fea776351b5901a4aeb94e625625d573eefd8dda5e925674a78");
+        NativeLib.Message key2 = NativeLib.eeeStorageKey("Tokenx","Balances","0x58bf023b83ab4fea776351b5901a4aeb94e625625d573eefd8dda5e925674a78");
         //NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
         // System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
         //每Query block interval
@@ -227,7 +233,7 @@ public class NativeLibTest {
                     continue;
                 }
                 String extrinsicsDetail = new JSONArray(tx_list).toString();
-                System.out.println("block_detal:" + extrinsicsDetail);
+                System.out.println("block_detail:" + extrinsicsDetail);
                 //JSONArray
                 String event_detal = client.invoke("state_getStorage", new Object[]{eventKeyPrefix, item.block}, String.class);
                 //Decode the obtained notification details and decode them. If there is a transfer transaction, store the transaction details in the database

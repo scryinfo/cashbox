@@ -57,14 +57,13 @@ impl WalletManager {
         }
     }
 
-    pub fn is_contain_wallet(&self) -> Result<Vec<TbWallet>, String> {
+    pub fn is_contain_wallet(&self) -> WalletResult<bool> {
         #[cfg(target_os="android")]crate::init_logger_once();
-        match wallet_db::DataServiceProvider::instance() {
-            Ok(provider) => {
-                Ok(provider.get_wallets())
-            }
-            Err(e) => Err(e.to_string())
-        }
+       wallet_db::DataServiceProvider::instance().map(|provider|{
+            if provider.get_wallets().len()>0{
+                true
+            }else { false }
+        })
     }
     //clear user download data
     pub fn clean_wallets_data(&self) -> WalletResult<()> {
@@ -84,15 +83,20 @@ impl WalletManager {
 
     pub fn set_current_wallet(&self, walletid: &str) -> WalletResult<()> {
         let instance = wallet_db::DataServiceProvider::instance()?;
-        instance.tx_begin()?;
-        instance.set_selected_wallet(walletid)
-            .and_then(|_| instance.tx_commint())
-            .map_err(|error| {
-                if let Err(rollback_err) = instance.tx_rollback() {
-                    log::error!("rollback error:{}",rollback_err.to_string());
-                }
-                error
-            })
+        //ensure wallet exist
+        if let Some(_) = instance.query_by_wallet_id(walletid){
+            instance.tx_begin()?;
+            instance.set_selected_wallet(walletid)
+                .and_then(|_| instance.tx_commint())
+                .map_err(|error| {
+                    if let Err(rollback_err) = instance.tx_rollback() {
+                        log::error!("rollback error:{}",rollback_err.to_string());
+                    }
+                    error
+                })
+        }else {
+           Err(WalletError::NotExist)
+        }
     }
 
     pub fn del_wallet(&self, walletid: &str, psd: &[u8]) -> WalletResult<()> {
@@ -114,7 +118,12 @@ impl WalletManager {
 
     pub fn rename_wallet(&self, walletid: &str, wallet_name: &str) -> WalletResult<bool> {
         let instance = wallet_db::DataServiceProvider::instance()?;
-        instance.rename_mnemonic(walletid, wallet_name).map(|_| true)
+        if let Some(_) = instance.query_by_wallet_id(walletid){
+            instance.rename_mnemonic(walletid, wallet_name).map(|_| true)
+        }else {
+            Err(WalletError::NotExist)
+        }
+
     }
     pub fn create_wallet(&self, wallet_name: &str, mn: &[u8], password: &[u8], wallet_type: i64) -> WalletResult<Wallet> {
         //Specify the default chain type
