@@ -1,6 +1,6 @@
 //！ hooks message for notices when should get data
 
-use p2p::PeerId;
+use crate::p2p::PeerId;
 
 pub enum HooksMessage {
     ReceivedHeaders(PeerId),

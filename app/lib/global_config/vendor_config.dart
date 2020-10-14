@@ -58,11 +58,8 @@ class VendorConfig {
   static const initDatabaseStateKey = "";
   static const initDatabaseStateValue = false;
 
-  static const oldDbVersionKey = "old_db_version_key";
-  static const oldDbVersionValue = "1.0";
-
   static const nowDbVersionKey = "new_db_version_key";
-  static const nowDbVersionValue = "1.0";
+  static const nowDbVersionValue = "1.1.0";
 
   static const ETHERSCAN_API_KEY = "";
   static const MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS = "";

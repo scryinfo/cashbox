@@ -1,26 +1,30 @@
 //! after send loadfilter message in bloomfilter mod we can get merkleblock in this mod and get
 //! loadfilter message do not get any response.
 //! we get response here
+use crate::chaindb::SharedChainDB;
+use crate::error::Error;
+use crate::hooks::HooksMessage;
+use crate::jniapi::btcapi::SHARED_SQLITE;
+use crate::p2p::{
+    P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
+    SERVICE_BLOCKS, SERVICE_BLOOM,
+};
+use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
-use p2p::{P2PControlSender, PeerMessageSender, PeerMessageReceiver, PeerMessage, PeerId, SERVICE_BLOCKS, P2PControl, SERVICE_BLOOM};
-use timeout::{ExpectedReply, SharedTimeout};
+use bitcoin::network::message::NetworkMessage::GetBlocks;
+use bitcoin::network::message_blockdata::{GetBlocksMessage, InvType, Inventory};
+use bitcoin::network::message_bloom_filter::{FilterLoadMessage, MerkleBlockMessage};
+use bitcoin::{BitcoinHash, BlockHeader, Transaction};
+use bitcoin_hashes::hash160;
+use bitcoin_hashes::hex::FromHex;
+use bitcoin_hashes::hex::ToHex;
+use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use bitcoin_hashes::Hash;
+use log::{error, info, trace, warn};
+use std::collections::VecDeque;
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
-use error::Error;
-use std::collections::VecDeque;
-use bitcoin::network::message_blockdata::{InvType, Inventory, GetBlocksMessage};
-use bitcoin::{BlockHeader, BitcoinHash, Transaction};
-use bitcoin::network::message_bloom_filter::{FilterLoadMessage, MerkleBlockMessage};
-use chaindb::SharedChainDB;
-use bitcoin::network::message::NetworkMessage::GetBlocks;
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
-use bitcoin_hashes::hex::FromHex;
-use bitcoin_hashes::hex::ToHex;
-use bitcoin_hashes::hash160;
-use bitcoin_hashes::Hash;
-use hooks::HooksMessage;
-use jniapi::btcapi::SHARED_SQLITE;
 
 const PUBLIC_KEY: &str = "0291ee52a0e0c22db9772f237f4271ea6f9330d92b242fb3c621928774c560b699";
 
@@ -33,12 +37,25 @@ pub struct GetData {
 }
 
 impl GetData {
-    pub fn new( chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>, hook_receiver: mpsc::Receiver<HooksMessage>) -> PeerMessageSender<NetworkMessage> {
+    pub fn new(
+        chaindb: SharedChainDB,
+        p2p: P2PControlSender<NetworkMessage>,
+        timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
+        hook_receiver: mpsc::Receiver<HooksMessage>,
+    ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
-        let mut getdata = GetData { chaindb, p2p, timeout, hook_receiver };
+        let mut getdata = GetData {
+            chaindb,
+            p2p,
+            timeout,
+            hook_receiver,
+        };
 
-        thread::Builder::new().name("GetData".to_string()).spawn(move || { getdata.run(receiver) }).unwrap();
+        thread::Builder::new()
+            .name("GetData".to_string())
+            .spawn(move || getdata.run(receiver))
+            .unwrap();
 
         PeerMessageSender::new(sender)
     }
@@ -60,37 +77,41 @@ impl GetData {
                             Ok(())
                         }
                     }
-                    PeerMessage::Disconnected(_, _) => {
-                        Ok(())
-                    }
-                    PeerMessage::Incoming(pid, msg) => {
-                        match msg {
-                            NetworkMessage::MerkleBlock(ref merkleblock) => {
-                                if self.is_serving_blocks(pid) {
-                                    {
-                                        let block_hash = merkleblock.prev_block.to_hex();
-                                        let timestamp = merkleblock.timestamp;
-                                        let sqlite = SHARED_SQLITE.lock().expect("open connection error!");
-                                        sqlite.update_newest_header(block_hash, timestamp.to_string());
-                                    }
-
-                                    if merkle_vec.len() <= 100 {
-                                        merkle_vec.push(merkleblock.clone());
-                                    } else {
-                                        self.merkleblock(&merkle_vec, pid).expect("merkle block vector failed");
-                                        merkle_vec.clear();
-                                    }
-                                    Ok(())
-                                } else {
-                                    Ok(())
+                    PeerMessage::Disconnected(_, _) => Ok(()),
+                    PeerMessage::Incoming(pid, msg) => match msg {
+                        NetworkMessage::MerkleBlock(ref merkleblock) => {
+                            if self.is_serving_blocks(pid) {
+                                {
+                                    let block_hash = merkleblock.prev_block.to_hex();
+                                    let timestamp = merkleblock.timestamp;
+                                    let sqlite =
+                                        SHARED_SQLITE.lock().expect("open connection error!");
+                                    sqlite.update_newest_header(block_hash, timestamp.to_string());
                                 }
+
+                                if merkle_vec.len() <= 100 {
+                                    merkle_vec.push(merkleblock.clone());
+                                } else {
+                                    self.merkleblock(&merkle_vec, pid)
+                                        .expect("merkle block vector failed");
+                                    merkle_vec.clear();
+                                }
+                                Ok(())
+                            } else {
+                                Ok(())
                             }
-                            NetworkMessage::Tx(ref tx) => if self.is_serving_blocks(pid) { self.tx(tx, pid, hash160.clone()) } else { Ok(()) },
-                            NetworkMessage::Ping(_) => { Ok(()) }
-                            _ => { Ok(()) }
                         }
-                    }
-                    _ => { Ok(()) }
+                        NetworkMessage::Tx(ref tx) => {
+                            if self.is_serving_blocks(pid) {
+                                self.tx(tx, pid, hash160.clone())
+                            } else {
+                                Ok(())
+                            }
+                        }
+                        NetworkMessage::Ping(_) => Ok(()),
+                        _ => Ok(()),
+                    },
+                    _ => Ok(()),
                 } {
                     error!("Error processing headers: {}", e);
                 }
@@ -102,12 +123,13 @@ impl GetData {
                         warn!("hooks for received headers");
                         self.get_data(pid, true).expect("GOT HOOKS error");
                     }
-                    HooksMessage::Others => {
-                        ()
-                    }
+                    HooksMessage::Others => (),
                 }
             }
-            self.timeout.lock().unwrap().check(vec!(ExpectedReply::MerkleBlock));
+            self.timeout
+                .lock()
+                .unwrap()
+                .check(vec![ExpectedReply::MerkleBlock]);
         }
     }
 
@@ -120,25 +142,40 @@ impl GetData {
 
     // retrieve data
     fn get_data(&mut self, peer: PeerId, add: bool) -> Result<(), Error> {
-        if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::MerkleBlock) {
+        if self
+            .timeout
+            .lock()
+            .unwrap()
+            .is_busy_with(peer, ExpectedReply::MerkleBlock)
+        {
             return Ok(());
         }
         let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
         let (_block_hash, timestamp) = sqlite.init();
         let block_hashes = sqlite.query_header(timestamp, add);
-        if block_hashes.len() == 0 { return Ok(()); }
+        if block_hashes.len() == 0 {
+            return Ok(());
+        }
 
         let mut inventory_vec = vec![];
         for block_hash in block_hashes {
             let inventory = Inventory::new(InvType::FilteredBlock, block_hash.as_str());
             inventory_vec.push(inventory);
         }
-        self.p2p.send_network(peer, NetworkMessage::GetData(inventory_vec));
+        self.p2p
+            .send_network(peer, NetworkMessage::GetData(inventory_vec));
         Ok(())
     }
 
-    fn merkleblock(&mut self, merkle_vec: &Vec<MerkleBlockMessage>, peer: PeerId) -> Result<(), Error> {
-        self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::MerkleBlock);
+    fn merkleblock(
+        &mut self,
+        merkle_vec: &Vec<MerkleBlockMessage>,
+        peer: PeerId,
+    ) -> Result<(), Error> {
+        self.timeout
+            .lock()
+            .unwrap()
+            .received(peer, 1, ExpectedReply::MerkleBlock);
         warn!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
         info!("got 100 merkleblock {:#?}", merkleblock);

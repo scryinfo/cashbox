@@ -46,6 +46,7 @@ class _MinePageState extends State<MinePage> {
         _buildWalletListWidget(),
         _buildTestWalletWidget(),
         _buildLanguageChooseWidget(),
+        //_buildClearCacheWidget(),
         _buildAboutUsWidget(),
       ]),
     );
@@ -124,7 +125,6 @@ class _MinePageState extends State<MinePage> {
     );
   }
 
-  //todo 2.0
   Widget _buildLanguageChooseWidget() {
     return GestureDetector(
       onTap: () {
@@ -133,6 +133,18 @@ class _MinePageState extends State<MinePage> {
       },
       child: ItemOfListWidget(
         leftText: translate('language_choose'),
+      ),
+    );
+  }
+
+  Widget _buildClearCacheWidget() {
+    return GestureDetector(
+      onTap: () {
+        print("click 清除缓存");
+        //todo 提示清除操作，执行清除操作
+      },
+      child: ItemOfListWidget(
+        leftText: translate('clean_cache'),
       ),
     );
   }

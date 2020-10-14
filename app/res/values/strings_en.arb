@@ -79,6 +79,7 @@
   "currency_manage": "Token management",
   "wallet_list": "Wallet list",
   "language_choose": "Language selection",
+  "clean_cache": "Clean cache",
   "version_update": "Version updates",
   "no_new_version_hint": "The current version is the latest version",
   "success_to_copy_info": "Information successfully copied",

@@ -160,7 +160,6 @@ pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<
         let mut tx = TransferDetail::default();
         tx.hash = Some(format!("0x{}", hex::encode(hash)));
         log::info!("tx detail is:{:?}", extrinsic.function);
-
         match &extrinsic.function {
             Call::Timestamp(set(date, )) => {
                 tx.timestamp = Some(*date);
@@ -168,11 +167,11 @@ pub fn decode_extrinsics(extrinsics_json: &str, target_account: &str) -> Result<
             }
             Call::Balances(transfercall(to, value)) | Call::Balances(transfer_keep_alive(to, value)) => {//需要将交易发送者的信息关联出来
                 if let Some((account, _, (_, _, _, _, nonce, _, _))) = &extrinsic.signature {
-                    if !target_account.ge(to) && !target_account.ge(&account) {
+                    if !target_account.eq(to) && !target_account.eq(&account) {
                         continue;
                     }
                     let nonce_byte=nonce.encode();
-                   let nonce =  decode_nonce(nonce_byte.as_slice());
+                    let nonce =  decode_nonce(nonce_byte.as_slice());
                     tx.value = Some(*value);
                     tx.to = Some(to.to_ss58check());
                     tx.signer = Some(account.to_ss58check());

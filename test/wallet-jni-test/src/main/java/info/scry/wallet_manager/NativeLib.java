@@ -288,6 +288,7 @@ public class NativeLib {
         public boolean isUpdateDigitBalance;  //Is it a success to update the number of tokens owned   Execution status: 1 success 0 failure
         public boolean isInitWalletBasicData;  //Is it successful to initialize the basic data of the data  Execution status: 1 success 0 failure
         public boolean isUpdateDbData;         //Is it successful to update data.  Execution status: 1 success 0 failure
+        public boolean isCleanWalletsData;         //Is it successful to clean all wallet data.  Execution status: 1 success 0 failure
         public boolean isUpdateAuthDigit;     //Update the authentication token, is it successful   Execution status: 1 success 0 failure
         public boolean isUpdateDefaultDigit;  //Was it successful to update the default token   Execution status: 1 success 0 failure
         public boolean isAddNonAuthDigit;     //Add custom tokens, whether it's useful  Execution status: 1 success 0 failure
@@ -312,6 +313,8 @@ public class NativeLib {
                     ", isAddDigit=" + isAddDigit +
                     ", isUpdateDigitBalance=" + isUpdateDigitBalance +
                     ", isInitWalletBasicData=" + isInitWalletBasicData +
+                    ", isUpdateDbData=" + isUpdateDbData +
+                    ", isCleanWalletsData=" + isCleanWalletsData +
                     ", isUpdateAuthDigit=" + isUpdateAuthDigit +
                     ", isUpdateDefaultDigit=" + isUpdateDefaultDigit +
                     ", isAddNonAuthDigit=" + isAddNonAuthDigit +
@@ -421,8 +424,21 @@ public class NativeLib {
      * @return// Whether you already have a wallet
      */
     public static native WalletState initWalletBasicData();
-    
-     // apiNo:WM01 fixed - fixed
+
+    /**
+     * Update wallet data file
+     *
+     * @return// Whether update successful
+     * param oldVersion : null string mean to never initial
+     * param newVersion : the newest version match to current AppVersion
+     */
+    public static native WalletState updateWalletDbData(String newVersion); // init Version 1.0
+
+    //clean all wallet data which downloaded from the Internet
+    public static native WalletState cleanWalletsDownloadData();
+
+
+    // apiNo:WM01 fixed - fixed
     public static native WalletState isContainWallet();
 
     // Export all wallets

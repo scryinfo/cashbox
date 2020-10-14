@@ -6,6 +6,7 @@ import 'package:app/util/log_util.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Utils {
@@ -36,6 +37,16 @@ class Utils {
     } else {
       return double.parse(num.toString().substring(0, num.toString().lastIndexOf(".") + precision + 1));
     }
+  }
+
+  //获取当前版本的app，可更新到的最新的db版本
+  static Future<String> getNowAppMatchedDbVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String appVersion = packageInfo.version;
+    if (GlobalConfig.appVersion2DbVersionMap.containsKey(appVersion)) {
+      return GlobalConfig.appVersion2DbVersionMap[appVersion];
+    }
+    return "";
   }
 
   static String uint8ListToHex(Uint8List bArr) {

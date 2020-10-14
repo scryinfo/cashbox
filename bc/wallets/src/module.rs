@@ -10,7 +10,7 @@ pub use chain::{Chain,Ethereum,EEE,Bitcoin};
 #[test]
 fn create_wallet_test() {
     let mnemonic = "wheel permit dog party ceiling olympic clerk human equip adapt equal kangaroo";
-    wallet_db::init_wallet_database();
+    assert_eq!(wallet_db::init_wallet_database().is_ok(),true);
     let wallet = wallet::WalletManager{};
     let wallet = wallet.create_wallet("wallet test", mnemonic.as_bytes(), "123456".as_bytes(), 1);
     println!("{:?}", wallet);
@@ -21,6 +21,12 @@ fn load_wallet_test(){
     let wallet = wallet::WalletManager{};
     let wallets =wallet.get_all();
     println!("load wallet:{:?}", wallets);
+}
+
+#[test]
+fn clean_wallet_data_test(){
+    let wallet = wallet::WalletManager{};
+    assert_eq!(wallet.clean_wallets_data().is_ok(),true);
 }
 
 #[test]

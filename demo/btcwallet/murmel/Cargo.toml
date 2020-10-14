@@ -21,6 +21,7 @@ readme = "README.md"
 keywords = ["bitcoin"]
 license = "Apache-2.0"
 repository = "https://github.com/rust-bitcoin/murmel/"
+edition = "2018"
 
 [lib]
 name = "murmel"

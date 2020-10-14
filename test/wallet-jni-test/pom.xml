@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>info.scry.wallet_manager</groupId>
-    <artifactId>wallet-test</artifactId>
+    <artifactId>wallet-jni-test</artifactId>
     <version>1.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
@@ -24,29 +24,42 @@
             <artifactId>json</artifactId>
             <version>20200518</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit-jupiter.version>5.5.2</junit-jupiter.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <configuration>
+                    <argLine>-Djava.library.path=../wallet-test/target/release/</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
-                <configuration>
-                    <executable>java</executable> <!-- executable指的是要执行什么样的命令 -->
-                    <arguments>
-                        <argument>-Djava.library.path=../wallet-test/target/release/</argument> <!-- 这是一个系统属性参数 -->
-                        <!--automatically creates the classpath using all project dependencies,
-                            also adding the project build directory -->
-                        <argument>-classpath</argument> <!-- 这是classpath属性，其值就是下面的<classpath/> -->
-                        <classpath/> <!-- 这是exec插件最有价值的地方，关于工程的classpath并不需要手动指定，它将由exec自动计算得出 -->
-                        <argument>info.scry.wallet_manager.NativeLibTest</argument> <!-- 程序入口，主类名称 -->
-                    </arguments>
-                </configuration>
             </plugin>
         </plugins>
     </build>

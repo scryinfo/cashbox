@@ -18,27 +18,19 @@
 //!
 
 use bitcoin::{
+    blockdata::{block::BlockHeader, constants::genesis_block},
+    network::constants::Network,
     BitcoinHash,
-    blockdata::{
-        block::{BlockHeader},
-        constants::genesis_block
-    },
-    network::constants::Network
 };
 
-use bitcoin_hashes::{sha256d};
-use error::Error;
-use hammersbald::{
-    BitcoinAdaptor, HammersbaldAPI, persistent,
-    transient,
-};
-use headercache::{CachedHeader, HeaderCache};
-use std::{
-    sync::{Arc, RwLock}
-};
-use std::{
-    path::Path
-};
+use crate::error::Error;
+use crate::headercache::{CachedHeader, HeaderCache};
+use bitcoin_hashes::sha256d;
+use hammersbald::{persistent, transient, BitcoinAdaptor, HammersbaldAPI};
+use log::{error, info};
+use serde_derive::{Deserialize, Serialize};
+use std::path::Path;
+use std::sync::{Arc, RwLock};
 
 /// Shared handle to a database storing the block chain
 /// protected by an RwLock
@@ -48,7 +40,7 @@ pub type SharedChainDB = Arc<RwLock<ChainDB>>;
 pub struct ChainDB {
     db: BitcoinAdaptor,
     headercache: HeaderCache,
-    network: Network
+    network: Network,
 }
 
 impl ChainDB {
@@ -57,7 +49,11 @@ impl ChainDB {
         info!("working with in memory chain db");
         let db = BitcoinAdaptor::new(transient(2)?);
         let headercache = HeaderCache::new(network);
-        Ok(ChainDB { db, network, headercache })
+        Ok(ChainDB {
+            db,
+            network,
+            headercache,
+        })
     }
 
     /// Create or open a persistent database instance identified by the path
@@ -65,7 +61,11 @@ impl ChainDB {
         let basename = path.to_str().unwrap().to_string();
         let db = BitcoinAdaptor::new(persistent((basename.clone()).as_str(), 100, 2)?);
         let headercache = HeaderCache::new(network);
-        Ok(ChainDB { db, network, headercache})
+        Ok(ChainDB {
+            db,
+            network,
+            headercache,
+        })
     }
 
     /// Initialize caches
@@ -94,8 +94,7 @@ impl ChainDB {
             }
             self.headercache.reverse_trunk();
             info!("read {} headers", self.headercache.len());
-        }
-        else {
+        } else {
             let genesis = genesis_block(self.network).header;
             if let Some((cached, _, _)) = self.headercache.add_header(&genesis)? {
                 info!("Initialized with genesis header {}", genesis.bitcoin_hash());
@@ -103,8 +102,7 @@ impl ChainDB {
                 self.db.batch()?;
                 self.store_header_tip(&cached.bitcoin_hash())?;
                 self.db.batch()?;
-            }
-            else {
+            } else {
                 error!("Failed to initialize with genesis header");
                 return Err(Error::NoTip);
             }
@@ -112,9 +110,18 @@ impl ChainDB {
         Ok(())
     }
 
-
     /// Store a header
-    pub fn add_header(&mut self, header: &BlockHeader) -> Result<Option<(StoredHeader, Option<Vec<sha256d::Hash>>, Option<Vec<sha256d::Hash>>)>, Error> {
+    pub fn add_header(
+        &mut self,
+        header: &BlockHeader,
+    ) -> Result<
+        Option<(
+            StoredHeader,
+            Option<Vec<sha256d::Hash>>,
+            Option<Vec<sha256d::Hash>>,
+        )>,
+        Error,
+    > {
         if let Some((cached, unwinds, forward)) = self.headercache.add_header(header)? {
             self.db.put_hash_keyed(&cached.stored)?;
             if let Some(forward) = forward.clone() {
@@ -133,12 +140,15 @@ impl ChainDB {
     }
 
     /// iterate trunk [from .. tip]
-    pub fn iter_trunk<'a> (&'a self, from: u32) -> impl Iterator<Item=&'a CachedHeader> +'a {
+    pub fn iter_trunk<'a>(&'a self, from: u32) -> impl Iterator<Item = &'a CachedHeader> + 'a {
         self.headercache.iter_trunk(from)
     }
 
     /// iterate trunk [genesis .. from] in reverse order from is the tip if not specified
-    pub fn iter_trunk_rev<'a> (&'a self, from: Option<u32>) -> impl Iterator<Item=&'a CachedHeader> +'a {
+    pub fn iter_trunk_rev<'a>(
+        &'a self,
+        from: Option<u32>,
+    ) -> impl Iterator<Item = &'a CachedHeader> + 'a {
         self.headercache.iter_trunk_rev(from)
     }
 
@@ -170,12 +180,18 @@ impl ChainDB {
 
     /// Find header id with most work
     pub fn fetch_header_tip(&self) -> Result<Option<sha256d::Hash>, Error> {
-        Ok(self.db.get_keyed_decodable::<sha256d::Hash>(HEADER_TIP_KEY)?.map(|(_, h)| h.clone()))
+        Ok(self
+            .db
+            .get_keyed_decodable::<sha256d::Hash>(HEADER_TIP_KEY)?
+            .map(|(_, h)| h.clone()))
     }
 
     /// Read header from the DB
     pub fn fetch_header(&self, id: &sha256d::Hash) -> Result<Option<StoredHeader>, Error> {
-        Ok(self.db.get_hash_keyed::<StoredHeader>(id)?.map(|(_, header)| header))
+        Ok(self
+            .db
+            .get_hash_keyed::<StoredHeader>(id)?
+            .map(|(_, header)| header))
     }
 }
 
@@ -187,7 +203,7 @@ pub struct StoredHeader {
     /// chain height
     pub height: u32,
     /// log2 of total work
-    pub log2work: f64
+    pub log2work: f64,
 }
 
 // need to implement if put_hash_keyed and get_hash_keyed should be used
@@ -198,5 +214,3 @@ impl BitcoinHash for StoredHeader {
 }
 
 const HEADER_TIP_KEY: &[u8] = &[0u8; 1];
-
-

@@ -16,25 +16,27 @@
 //!
 //! # Download headers
 //!
-use bitcoin::{BitcoinHash, network::{
-    message::NetworkMessage,
-    message_blockdata::{GetHeadersMessage, Inventory, InvType},
-}, BlockHeader};
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
-use chaindb::SharedChainDB;
-use error::Error;
-use p2p::{P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS};
-use std::{
-    collections::VecDeque,
-    sync::mpsc,
-    thread,
-    time::Duration,
+use crate::chaindb::SharedChainDB;
+use crate::downstream::SharedDownstream;
+use crate::error::Error;
+use crate::hooks::HooksMessage;
+use crate::jniapi::btcapi::SHARED_SQLITE;
+use crate::p2p::{
+    P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
+    SERVICE_BLOCKS,
 };
-use timeout::{ExpectedReply, SharedTimeout};
-use downstream::SharedDownstream;
+use crate::timeout::{ExpectedReply, SharedTimeout};
+use bitcoin::{
+    network::{
+        message::NetworkMessage,
+        message_blockdata::{GetHeadersMessage, InvType, Inventory},
+    },
+    BitcoinHash, BlockHeader,
+};
 use bitcoin_hashes::hex::ToHex;
-use hooks::HooksMessage;
-use jniapi::btcapi::SHARED_SQLITE;
+use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use log::{debug, error, info, trace};
+use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
 
 pub struct HeaderDownload {
     p2p: P2PControlSender<NetworkMessage>,
@@ -45,12 +47,27 @@ pub struct HeaderDownload {
 }
 
 impl HeaderDownload {
-    pub fn new(chaindb: SharedChainDB, p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>, downstream: SharedDownstream, hook_sender: mpsc::SyncSender<HooksMessage>) -> PeerMessageSender<NetworkMessage> {
+    pub fn new(
+        chaindb: SharedChainDB,
+        p2p: P2PControlSender<NetworkMessage>,
+        timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
+        downstream: SharedDownstream,
+        hook_sender: mpsc::SyncSender<HooksMessage>,
+    ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
-        let mut headerdownload = HeaderDownload { chaindb, p2p, timeout, downstream, hook_sender };
+        let mut headerdownload = HeaderDownload {
+            chaindb,
+            p2p,
+            timeout,
+            downstream,
+            hook_sender,
+        };
 
-        thread::Builder::new().name("header download".to_string()).spawn(move || { headerdownload.run(receiver) }).unwrap();
+        thread::Builder::new()
+            .name("header download".to_string())
+            .spawn(move || headerdownload.run(receiver))
+            .unwrap();
 
         PeerMessageSender::new(sender)
     }
@@ -67,23 +84,34 @@ impl HeaderDownload {
                             Ok(())
                         }
                     }
-                    PeerMessage::Disconnected(_, _) => {
-                        Ok(())
-                    }
-                    PeerMessage::Incoming(pid, msg) => {
-                        match msg {
-                            NetworkMessage::Headers(ref headers) => if self.is_serving_blocks(pid) { self.headers(headers, pid) } else { Ok(()) },
-                            NetworkMessage::Inv(ref inv) => if self.is_serving_blocks(pid) { self.inv(inv, pid) } else { Ok(()) },
-                            NetworkMessage::Ping(_) => { Ok(()) }
-                            _ => { Ok(()) }
+                    PeerMessage::Disconnected(_, _) => Ok(()),
+                    PeerMessage::Incoming(pid, msg) => match msg {
+                        NetworkMessage::Headers(ref headers) => {
+                            if self.is_serving_blocks(pid) {
+                                self.headers(headers, pid)
+                            } else {
+                                Ok(())
+                            }
                         }
-                    }
-                    _ => { Ok(()) }
+                        NetworkMessage::Inv(ref inv) => {
+                            if self.is_serving_blocks(pid) {
+                                self.inv(inv, pid)
+                            } else {
+                                Ok(())
+                            }
+                        }
+                        NetworkMessage::Ping(_) => Ok(()),
+                        _ => Ok(()),
+                    },
+                    _ => Ok(()),
                 } {
                     error!("Error processing headers: {}", e);
                 }
             }
-            self.timeout.lock().unwrap().check(vec!(ExpectedReply::Headers));
+            self.timeout
+                .lock()
+                .unwrap()
+                .check(vec![ExpectedReply::Headers]);
         }
     }
 
@@ -102,7 +130,10 @@ impl HeaderDownload {
             if inventory.inv_type == InvType::Block {
                 let chaindb = self.chaindb.read().unwrap();
                 if chaindb.get_header(&inventory.hash).is_none() {
-                    debug!("received inv for new block {} peer={}", inventory.hash, peer);
+                    debug!(
+                        "received inv for new block {} peer={}",
+                        inventory.hash, peer
+                    );
                     // ask for header(s) if observing a new block
                     ask_for_headers = true;
                 }
@@ -116,7 +147,12 @@ impl HeaderDownload {
 
     /// get headers this peer is ahead of us
     fn get_headers(&mut self, peer: PeerId) -> Result<(), Error> {
-        if self.timeout.lock().unwrap().is_busy_with(peer, ExpectedReply::Headers) {
+        if self
+            .timeout
+            .lock()
+            .unwrap()
+            .is_busy_with(peer, ExpectedReply::Headers)
+        {
             return Ok(());
         }
         let chaindb = self.chaindb.read().unwrap();
@@ -127,14 +163,23 @@ impl HeaderDownload {
             } else {
                 Sha256dHash::default()
             };
-            self.timeout.lock().unwrap().expect(peer, 1, ExpectedReply::Headers);
-            self.p2p.send_network(peer, NetworkMessage::GetHeaders(GetHeadersMessage::new(locator, first)));
+            self.timeout
+                .lock()
+                .unwrap()
+                .expect(peer, 1, ExpectedReply::Headers);
+            self.p2p.send_network(
+                peer,
+                NetworkMessage::GetHeaders(GetHeadersMessage::new(locator, first)),
+            );
         }
         Ok(())
     }
 
     fn headers(&mut self, headers: &Vec<BlockHeader>, peer: PeerId) -> Result<(), Error> {
-        self.timeout.lock().unwrap().received(peer, 1, ExpectedReply::Headers);
+        self.timeout
+            .lock()
+            .unwrap()
+            .received(peer, 1, ExpectedReply::Headers);
 
         if headers.len() > 0 {
             // current height
@@ -179,8 +224,11 @@ impl HeaderDownload {
                                 height = stored.height;
 
                                 if let Some(unwinds) = unwinds {
-                                    disconnected_headers.extend(unwinds.iter()
-                                                                       .map(|h| chaindb.get_header(h).unwrap().stored.header));
+                                    disconnected_headers.extend(
+                                        unwinds
+                                            .iter()
+                                            .map(|h| chaindb.get_header(h).unwrap().stored.header),
+                                    );
                                     break;
                                 }
                             }
@@ -214,12 +262,25 @@ impl HeaderDownload {
             }
 
             if let Some(new_tip) = moved_tip {
-                info!("received {} headers new tip={} from peer={}", headers.len(), new_tip, peer);
+                info!(
+                    "received {} headers new tip={} from peer={}",
+                    headers.len(),
+                    new_tip,
+                    peer
+                );
                 //hooks for new headers
-                self.hook_sender.send(HooksMessage::ReceivedHeaders(peer.clone())).expect("HOOKS ERROR");
+                self.hook_sender
+                    .send(HooksMessage::ReceivedHeaders(peer.clone()))
+                    .expect("HOOKS ERROR");
                 self.p2p.send(P2PControl::Height(height));
             } else {
-                debug!("received {} known or orphan headers [{} .. {}] from peer={}", headers.len(), headers[0].bitcoin_hash(), headers[headers.len() - 1].bitcoin_hash(), peer);
+                debug!(
+                    "received {} known or orphan headers [{} .. {}] from peer={}",
+                    headers.len(),
+                    headers[0].bitcoin_hash(),
+                    headers[headers.len() - 1].bitcoin_hash(),
+                    peer
+                );
             }
         }
         Ok(())

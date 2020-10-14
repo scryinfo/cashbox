@@ -28,8 +28,8 @@ class WalletManager {
     return containMap;
   }
 
-  static Future<Map<dynamic, dynamic>> updateWalletDbData() async {
-    Map<dynamic, dynamic> containMap = await _channel.invokeMethod('updateWalletDbData');
+  static Future<Map<dynamic, dynamic>> updateWalletDbData(String newVersion) async {
+    Map<dynamic, dynamic> containMap = await _channel.invokeMethod('updateWalletDbData', {"newVersion": newVersion});
     return containMap;
   }
 

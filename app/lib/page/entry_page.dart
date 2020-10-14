@@ -6,6 +6,7 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
+import 'package:app/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
@@ -30,7 +31,7 @@ class _EntryPageState extends State<EntryPage> {
   String _languageTextValue = "";
   List<String> languagesKeyList = [];
   Map<String, String> languageMap = {};
-  int checkConfigInterval = 1000 * 20; //every 20 seconds allow to check config Ip
+  int checkConfigInterval = 1000 * 5; //every 5 seconds allow to check config Ip
 
   @override
   void initState() {
@@ -65,20 +66,13 @@ class _EntryPageState extends State<EntryPage> {
     var spUtil = await SharedPreferenceUtil.instance;
     //check and update DB
     if (true) {
-      //push Vendor data to sharedpreference file
-      spUtil.setString(VendorConfig.oldDbVersionKey, VendorConfig.oldDbVersionValue);
-      spUtil.setString(VendorConfig.nowDbVersionKey, VendorConfig.nowDbVersionValue);
-      //compare different versions
-      var oldDbVersion = spUtil.getString(VendorConfig.oldDbVersionKey);
-      var newDbVersion = spUtil.getString(VendorConfig.nowDbVersionKey);
-      if (newDbVersion == null) {
-        LogUtil.e("_checkAndUpdateAppConfig:", "newDbVersion  is null");
-      } else if (oldDbVersion == null || (oldDbVersion != newDbVersion)) {
-        Map resultMap = Map(); //todo update dbVersion implement
-        //Map resultMap = await Wallets.instance.updateWalletDbData(oldDbVersion, newDbVersion);
+      // handle case : DB upgrade.   DB initial installation already finish in func -> initAppConfigInfo()->initDatabaseAndDefaultDigits()
+      String recordDbVersion = spUtil.getString(VendorConfig.nowDbVersionKey);
+      if (recordDbVersion != GlobalConfig.dbVersion1_1_0) {
+        Map resultMap = await Wallets.instance.updateWalletDbData(GlobalConfig.dbVersion1_1_0);
         if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
-          print("_checkAndUpdateAppConfig===>update database successful===>" + newDbVersion);
-          spUtil.setString(VendorConfig.oldDbVersionKey, newDbVersion); // update oldDbVersion record
+          print("_checkAndUpdateAppConfig===>update database successful===>" + GlobalConfig.dbVersion1_1_0);
+          spUtil.setString(VendorConfig.nowDbVersionKey, GlobalConfig.dbVersion1_1_0); // !!! important,remember to update DbVersion record
         }
       }
     }
@@ -89,6 +83,7 @@ class _EntryPageState extends State<EntryPage> {
       if (lastCheckTime == null || ((nowTimeStamp - int.parse(lastCheckTime)) - checkConfigInterval > 0)) {
         spUtil.setString(VendorConfig.lastTimeCheckConfigKey, nowTimeStamp.toString());
         String serverConfigIp = spUtil.getString(VendorConfig.appServerConfigIpKey) ?? VendorConfig.appServerConfigIpValue;
+        // print("serverConfigIp===============>" + serverConfigIp);
         var result = await requestWithConfigCheckParam(serverConfigIp);
         var resultCode = result["code"];
         var resultData = result["data"];

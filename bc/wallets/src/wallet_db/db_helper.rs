@@ -13,11 +13,13 @@ const TB_WALLET: &str = r#"cashbox_wallet.db"#;
 #[cfg(any(target_os = "linux", target_os = "windows"))]
 const TB_WALLET_DETAIL: &str = r#"cashbox_wallet_detail.db"#;
 
+const CURRENT_DATABASE_VERSION: &str = r#"current_db_version"#;
+
 fn create_teble(table_name: &str, table_desc: &str) -> WalletResult<()> {
     //First create the corresponding file path
     if !path::Path::new(table_name).exists() {
-    fs::File::create(table_name)?;
-}
+        fs::File::create(table_name)?;
+    }
     let connect = Connection::open(table_name)?;
     // An error occurred during the execution of the database table creation process, the corresponding file needs to be deleted
     if let Err(e) = connect.execute(table_desc) {
@@ -76,7 +78,7 @@ impl DataServiceProvider {
         self.db_hander.execute("commit;").map(|_| ()).map_err(|err| err.into())
     }
 
-    pub fn exec_db_update(&self,pre_version:Version,latest_version:Version)->WalletResult<()>{
+    pub fn exec_db_update(&self, pre_version: Version, latest_version: Version) -> WalletResult<()> {
         let mut current_version = Version {
             major: 1,
             minor: 0,
@@ -85,23 +87,43 @@ impl DataServiceProvider {
             build: vec!(),
         };
 
-        let mut try_minor = pre_version.minor;
+        let mut try_minor = pre_version.minor + 1;
         //this place should save old data,
-        for major in pre_version.major..=latest_version.major{
+        for major in pre_version.major..=latest_version.major {
             current_version.major = major;
             loop {
-                try_minor = try_minor+1;
                 current_version.minor = try_minor;
+                log::info!("update database version {}",current_version.to_string());
                 // minor num must continuous
-                if let Some(sql) = super::table_desc::get_update_table_sql(&current_version.to_string()){
+                if let Some(sql) = super::table_desc::get_update_table_sql(&current_version.to_string()) {
+                    log::info!("update database sql {}",sql);
                     self.db_hander.execute(sql)?;
-                }else {
+                    try_minor = try_minor + 1;
+                } else {
+                    try_minor = 0;
                     break;
                 }
             }
-            try_minor = 0;
         }
-        Ok(())
+        //update current database version
+        let update_db_version_sql = "update detail.LibHelperInfo set value = ? where name = ?;";
+        let mut statement = self.db_hander.prepare(update_db_version_sql)?;
+        statement.bind(1, latest_version.to_string().as_str())?;
+        statement.bind(2, CURRENT_DATABASE_VERSION)?;
+        statement.next().map(|_| ()).map_err(|err| err.into())
+
+    }
+
+    pub fn get_current_db_version(&self) -> WalletResult<String> {
+        let query_info_sql = "select value from detail.LibHelperInfo where name = ?;";
+        if let Ok(mut statement) = self.db_hander.prepare(query_info_sql) {
+            statement.bind(1, CURRENT_DATABASE_VERSION)?;
+            statement.next()?;
+            Ok(statement.read::<String>(0).unwrap())
+        } else {
+            log::info!("table LibHelperInfo not exist,will use default version value");
+            Ok("1.0.0".to_string())
+        }
     }
 
     pub fn tx_rollback(&self) -> WalletResult<()> {

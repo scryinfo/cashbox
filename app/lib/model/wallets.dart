@@ -47,7 +47,7 @@ class Wallets {
       SharedPreferenceUtil.initIpConfig(); //Initialize interface ip, version information, etc. to local file
     }
     var temp = spUtil.get(VendorConfig.dappOpenUrlKey);
-    if(temp != null && temp.isNotEmpty){
+    if (temp != null && temp.isNotEmpty) {
       VendorConfig.dappOpenUrValue = temp.toString();
     }
   }
@@ -72,14 +72,14 @@ class Wallets {
 
     if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
       spUtil.setBool(VendorConfig.initDatabaseStateKey, resultMap["isInitWalletBasicData"]);
-      var digitParam = spUtil.getString(VendorConfig.defaultDigitsContentKey) ?? VendorConfig.defaultDigitsContentDefaultValue;
-      var updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
+      String digitParam = spUtil.getString(VendorConfig.defaultDigitsContentKey) ?? VendorConfig.defaultDigitsContentDefaultValue;
+      Map updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
       print("updateMap[isUpdateDefaultDigit](),=====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
     }
   }
 
-  Future<Map> updateWalletDbData(String oldVersion, String newVersion) async {
-    Map resultMap = await WalletManager.updateWalletDbData(); //Initialize some database data
+  Future<Map> updateWalletDbData( String newVersion) async {
+    Map resultMap = await WalletManager.updateWalletDbData(newVersion); //Initialize some database data
     int status = resultMap["status"];
     if (status == null) {
       LogUtil.e("initWalletBasicData error=>", "not find status code");

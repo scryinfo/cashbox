@@ -17,31 +17,28 @@
 //! # Cache of headers and the chain with most work
 //!
 
+use crate::chaindb::StoredHeader;
+use crate::error::Error;
 use bitcoin::{
-    BitcoinHash,
-    blockdata::block::BlockHeader,
-    network::constants::Network,
-    util::{
-        uint::Uint256,
-    },
+    blockdata::block::BlockHeader, network::constants::Network, util::uint::Uint256, BitcoinHash,
 };
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use bitcoin_hashes::Hash;
-use chaindb::StoredHeader;
-use error::Error;
-use std::{
-    collections::HashMap
-};
+use log::trace;
+use std::collections::HashMap;
 
 #[derive(Clone)]
 pub struct CachedHeader {
-    pub stored : StoredHeader,
-    id: Sha256dHash
+    pub stored: StoredHeader,
+    id: Sha256dHash,
 }
 
 impl CachedHeader {
-    pub fn new (id: &Sha256dHash, header: StoredHeader) -> CachedHeader {
-        CachedHeader{ stored: header, id: id.clone() }
+    pub fn new(id: &Sha256dHash, header: StoredHeader) -> CachedHeader {
+        CachedHeader {
+            stored: header,
+            id: id.clone(),
+        }
     }
 
     /// Computes the target [0, T] that a blockhash must land in to be valid
@@ -53,9 +50,15 @@ impl CachedHeader {
         let (mant, expt) = {
             let unshifted_expt = self.stored.header.bits >> 24;
             if unshifted_expt <= 3 {
-                ((self.stored.header.bits & 0xFFFFFF) >> (8 * (3 - unshifted_expt)), 0)
+                (
+                    (self.stored.header.bits & 0xFFFFFF) >> (8 * (3 - unshifted_expt)),
+                    0,
+                )
             } else {
-                (self.stored.header.bits & 0xFFFFFF, 8 * ((self.stored.header.bits >> 24) - 3))
+                (
+                    self.stored.header.bits & 0xFFFFFF,
+                    8 * ((self.stored.header.bits >> 24) - 3),
+                )
             }
         };
 
@@ -81,7 +84,11 @@ impl CachedHeader {
         let mut ret = [0u64; 4];
         LittleEndian::read_u64_into(&data, &mut ret);
         let hash = &Uint256(ret);
-        if hash <= target { Ok(()) } else { Err(Error::SpvBadProofOfWork) }
+        if hash <= target {
+            Ok(())
+        } else {
+            Err(Error::SpvBadProofOfWork)
+        }
     }
 
     /// Returns the total work of the block
@@ -115,7 +122,11 @@ const EXPECTED_CHAIN_LENGTH: usize = 600000;
 
 impl HeaderCache {
     pub fn new(network: Network) -> HeaderCache {
-        HeaderCache { network, headers: HashMap::with_capacity(EXPECTED_CHAIN_LENGTH), trunk: Vec::with_capacity(EXPECTED_CHAIN_LENGTH) }
+        HeaderCache {
+            network,
+            headers: HashMap::with_capacity(EXPECTED_CHAIN_LENGTH),
+            trunk: Vec::with_capacity(EXPECTED_CHAIN_LENGTH),
+        }
     }
 
     pub fn add_header_unchecked(&mut self, id: &Sha256dHash, stored: &StoredHeader) {
@@ -128,12 +139,22 @@ impl HeaderCache {
         self.trunk.reverse()
     }
 
-    pub fn len (&self) -> usize {
+    pub fn len(&self) -> usize {
         self.trunk.len()
     }
 
     /// add a Bitcoin header
-    pub fn add_header(&mut self, header: &BlockHeader) -> Result<Option<(CachedHeader, Option<Vec<Sha256dHash>>, Option<Vec<Sha256dHash>>)>, Error> {
+    pub fn add_header(
+        &mut self,
+        header: &BlockHeader,
+    ) -> Result<
+        Option<(
+            CachedHeader,
+            Option<Vec<Sha256dHash>>,
+            Option<Vec<Sha256dHash>>,
+        )>,
+        Error,
+    > {
         if self.headers.get(&header.bitcoin_hash()).is_some() {
             // ignore already known header
             return Ok(None);
@@ -153,14 +174,17 @@ impl HeaderCache {
         } else {
             // insert genesis
             let new_tip = header.bitcoin_hash();
-            let stored = CachedHeader::new(&new_tip, StoredHeader {
-                header: header.clone(),
-                height: 0,
-                log2work: Self::log2(header.work())
-            });
+            let stored = CachedHeader::new(
+                &new_tip,
+                StoredHeader {
+                    header: header.clone(),
+                    height: 0,
+                    log2work: Self::log2(header.work()),
+                },
+            );
             self.trunk.push(new_tip.clone());
             self.headers.insert(new_tip.clone(), stored.clone());
-            return Ok(Some((stored, None, Some(vec!(new_tip)))));
+            return Ok(Some((stored, None, Some(vec![new_tip]))));
         }
     }
 
@@ -185,7 +209,18 @@ impl HeaderCache {
     }
 
     // add header to tree, return stored, optional list of unwinds, optional list of extensions
-    fn add_header_to_tree(&mut self, prev: &CachedHeader, next: &BlockHeader) -> Result<(CachedHeader, Option<Vec<Sha256dHash>>, Option<Vec<Sha256dHash>>), Error> {
+    fn add_header_to_tree(
+        &mut self,
+        prev: &CachedHeader,
+        next: &BlockHeader,
+    ) -> Result<
+        (
+            CachedHeader,
+            Option<Vec<Sha256dHash>>,
+            Option<Vec<Sha256dHash>>,
+        ),
+        Error,
+    > {
         const DIFFCHANGE_INTERVAL: u32 = 2016;
         const DIFFCHANGE_TIMESPAN: u32 = 14 * 24 * 3600;
         const TARGET_BLOCK_SPACING: u32 = 600;
@@ -252,11 +287,14 @@ impl HeaderCache {
                 prev.stored.header.target()
             };
 
-        let cached = CachedHeader::new(&next.bitcoin_hash(), StoredHeader {
-            header: next.clone(),
-            height: prev.stored.height + 1,
-            log2work: Self::log2(next.work() + Self::exp2(prev.stored.log2work))
-        });
+        let cached = CachedHeader::new(
+            &next.bitcoin_hash(),
+            StoredHeader {
+                header: next.clone(),
+                height: prev.stored.height + 1,
+                log2work: Self::log2(next.work() + Self::exp2(prev.stored.log2work)),
+            },
+        );
 
         // Check POW
         if cached.spv_validate(&required_work).is_err() {
@@ -279,32 +317,37 @@ impl HeaderCache {
                         forks_at = h.stored.header.prev_blockhash;
                         path_to_new_tip.push(forks_at);
                     } else {
-                        trace!("previous header not in cache (path to new tip) {}", &forks_at);
+                        trace!(
+                            "previous header not in cache (path to new tip) {}",
+                            &forks_at
+                        );
                         return Err(Error::UnconnectedHeader);
                     }
                 }
                 path_to_new_tip.reverse();
                 path_to_new_tip.push(next_hash);
 
-
                 // compute list of headers no longer on trunk
                 if forks_at != next.prev_blockhash {
                     let mut unwinds = Vec::new();
 
-                    if let Some(pos) = self.trunk.iter().rposition(|h| { *h == forks_at }) {
+                    if let Some(pos) = self.trunk.iter().rposition(|h| *h == forks_at) {
                         if pos < self.trunk.len() - 1 {
                             // store and cut headers that are no longer on trunk
                             unwinds.extend(self.trunk[pos + 1..].iter().rev().map(|h| *h));
                             self.trunk.truncate(pos + 1);
                         }
                     } else {
-                        trace!("previous header not in cache (header no longer on trunk) {}", &forks_at);
+                        trace!(
+                            "previous header not in cache (header no longer on trunk) {}",
+                            &forks_at
+                        );
                         return Err(Error::UnconnectedHeader);
                     }
-                    self.trunk.extend(path_to_new_tip.iter().map(|h| { *h }));
+                    self.trunk.extend(path_to_new_tip.iter().map(|h| *h));
                     return Ok((cached, Some(unwinds), Some(path_to_new_tip)));
                 } else {
-                    self.trunk.extend(path_to_new_tip.iter().map(|h| { *h }));
+                    self.trunk.extend(path_to_new_tip.iter().map(|h| *h));
                     return Ok((cached, None, Some(path_to_new_tip)));
                 }
             } else {
@@ -317,7 +360,11 @@ impl HeaderCache {
 
     /// position on trunk (chain with most work from genesis to tip)
     pub fn pos_on_trunk(&self, hash: &Sha256dHash) -> Option<u32> {
-        self.trunk.iter().rev().position(|e| { *e == *hash }).map(|p| (self.trunk.len() - p - 1) as u32)
+        self.trunk
+            .iter()
+            .rev()
+            .position(|e| *e == *hash)
+            .map(|p| (self.trunk.len() - p - 1) as u32)
     }
 
     /// retrieve the id of the block/header with most work
@@ -364,29 +411,46 @@ impl HeaderCache {
     pub fn get_header_for_height(&self, height: u32) -> Option<CachedHeader> {
         if height < self.trunk.len() as u32 {
             self.headers.get(&self.trunk[height as usize]).cloned()
-        }
-        else {
+        } else {
             None
         }
     }
 
-    pub fn iter_trunk<'a> (&'a self, from: u32) -> Box<dyn Iterator<Item=&'a CachedHeader> +'a> {
-        Box::new(self.trunk.iter().skip(from as usize).map(move |a| self.headers.get(&*a).unwrap()))
+    pub fn iter_trunk<'a>(&'a self, from: u32) -> Box<dyn Iterator<Item = &'a CachedHeader> + 'a> {
+        Box::new(
+            self.trunk
+                .iter()
+                .skip(from as usize)
+                .map(move |a| self.headers.get(&*a).unwrap()),
+        )
     }
 
-    pub fn iter_trunk_rev<'a> (&'a self, from: Option<u32>) -> Box<dyn Iterator<Item=&'a CachedHeader> +'a> {
+    pub fn iter_trunk_rev<'a>(
+        &'a self,
+        from: Option<u32>,
+    ) -> Box<dyn Iterator<Item = &'a CachedHeader> + 'a> {
         let len = self.trunk.len();
         if let Some(from) = from {
-            Box::new(self.trunk.iter().rev().skip(len - from as usize).map(move |a| self.headers.get(&*a).unwrap()))
-        }
-        else {
-            Box::new(self.trunk.iter().rev().map(move |a| self.headers.get(&*a).unwrap()))
+            Box::new(
+                self.trunk
+                    .iter()
+                    .rev()
+                    .skip(len - from as usize)
+                    .map(move |a| self.headers.get(&*a).unwrap()),
+            )
+        } else {
+            Box::new(
+                self.trunk
+                    .iter()
+                    .rev()
+                    .map(move |a| self.headers.get(&*a).unwrap()),
+            )
         }
     }
 
     // locator for getheaders message
     pub fn locator_hashes(&self) -> Vec<Sha256dHash> {
-        let mut locator = vec!();
+        let mut locator = vec![];
         let mut skip = 1;
         let mut count = 0;
         let mut s = 0;
