@@ -1,31 +1,44 @@
 //! mod for btcapi
 //! java native method def in  packages/wallet_manager/android/src/main/java/info/scry/wallet_manager/NativeLib.java
 
-use jni::JNIEnv;
-use jni::objects::{JClass, JString, JObject, JValue};
-use jni::sys::{jbyteArray, jint, jlong, jstring, jboolean};
-use bitcoin_wallet::mnemonic::Mnemonic;
-use bitcoin_wallet::account::{MasterAccount, Unlocker, Account, AccountAddressType};
-use bitcoin::{Network, Address, Transaction, TxIn, OutPoint, Script, TxOut, SigHashType};
-use bitcoin::util::psbt::serialize::Serialize;
-use std::str::FromStr;
 use bitcoin::consensus::serialize;
-use bitcoin_hashes::sha256d;
+use bitcoin::util::psbt::serialize::Serialize;
+use bitcoin::{Address, Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut};
 use bitcoin_hashes::hex::FromHex;
-use std::net::{SocketAddr, SocketAddrV4, Ipv4Addr};
-use std::time::SystemTime;
+use bitcoin_hashes::sha256d;
+use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
+use bitcoin_wallet::mnemonic::Mnemonic;
 use constructor::Constructor;
-use std::path::Path;
 use db::SQLite;
-use std::sync::{Arc, Mutex};
-use log::Level;
 use db::SharedSQLite;
+use hooks::{ApiMessage, HooksMessage};
+use jni::objects::{JClass, JObject, JString, JValue};
+use jni::sys::{jboolean, jbyteArray, jint, jlong, jstring};
+use jni::JNIEnv;
+use log::Level;
 use once_cell::sync::Lazy;
-use hooks::{HooksMessage, ApiMessage};
-use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
-
+use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
+use std::path::Path;
+use std::str::FromStr;
+use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
+use std::sync::{Arc, Mutex};
+use std::time::SystemTime;
 
 const PASSPHRASE: &str = "";
+
+// use sqlite as global
+pub static SHARED_SQLITE: Lazy<SharedSQLite> = Lazy::new(|| {
+    let sqlite = SQLite::open_db(Network::Testnet);
+    Arc::new(Mutex::new(sqlite))
+});
+
+pub type SharedChannel = Arc<Mutex<(SyncSender<ApiMessage>, Receiver<ApiMessage>)>>;
+
+const BACK_PRESSURE: usize = 10;
+pub static SHARED_CHANNEL: Lazy<SharedChannel> = Lazy::new(|| {
+    let channel = sync_channel::<ApiMessage>(BACK_PRESSURE);
+    Arc::new(Mutex::new(channel))
+});
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -52,13 +65,8 @@ pub extern "system" fn Java_JniApi_btcTxSign(
 
     let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
     let mnemonic = Mnemonic::from_str(&words).expect("don't have right mnemonic");
-    let mut master = MasterAccount::from_mnemonic(
-        &mnemonic,
-        0,
-        Network::Testnet,
-        PASSPHRASE,
-        None,
-    ).unwrap();
+    let mut master =
+        MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
     let mut unlocker = Unlocker::new_for_master(&master, "").expect("don't have right unlocker");
 
     // path 0,0 => source(from address)
@@ -74,7 +82,8 @@ pub extern "system" fn Java_JniApi_btcTxSign(
     println!("public_compressed {:?}", &public_compressed);
 
     // target(to address) must use to address
-    let address = Address::from_str("n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk").expect("don't have right address");
+    let address =
+        Address::from_str("n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk").expect("don't have right address");
     let script_pubkey = address.script_pubkey();
 
     const RBF: u32 = 0xffffffff - 2;
@@ -83,23 +92,22 @@ pub extern "system" fn Java_JniApi_btcTxSign(
     // must use sqlite and modify database table UTXO
     // just hard code  UTXO. must fix it in feature
     let mut spending = Transaction {
-        input: vec![
-            TxIn {
-                previous_output: OutPoint {
-                    txid: sha256d::Hash::from_hex("d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916").unwrap(),
-                    vout: 1,
-                },
-                sequence: RBF,
-                witness: Vec::new(),
-                script_sig: Script::new(),
-            }
-        ],
-        output: vec![
-            TxOut {
-                script_pubkey,
-                value: 21000,
+        input: vec![TxIn {
+            previous_output: OutPoint {
+                txid: sha256d::Hash::from_hex(
+                    "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
+                )
+                .unwrap(),
+                vout: 1,
             },
-        ],
+            sequence: RBF,
+            witness: Vec::new(),
+            script_sig: Script::new(),
+        }],
+        output: vec![TxOut {
+            script_pubkey,
+            value: 21000,
+        }],
         lock_time: 0,
         version: 2,
     };
@@ -107,14 +115,19 @@ pub extern "system" fn Java_JniApi_btcTxSign(
     // The script_sig input needs to be assembled
     // resolver -> UTXO output data
     // compare example in rust-wallet
-    master.sign(&mut spending, SigHashType::All,
-                &(|_| Some(
-                    TxOut {
-                        value: 22000,
-                        script_pubkey: source.script_pubkey(),
-                    }
-                )),
-                &mut unlocker).expect("can not sign");
+    master
+        .sign(
+            &mut spending,
+            SigHashType::All,
+            &(|_| {
+                Some(TxOut {
+                    value: 22000,
+                    script_pubkey: source.script_pubkey(),
+                })
+            }),
+            &mut unlocker,
+        )
+        .expect("can not sign");
     println!("btcapi btc_sign_tx {:#?}", &spending);
 
     let byte_array = serialize(&spending);
@@ -158,34 +171,29 @@ pub extern "system" fn Java_JniApi_btcLoadBalance(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(
-    env: JNIEnv,
-    _class: JClass,
-) -> jstring{
+pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv, _class: JClass) -> jstring {
     let sqlite = SHARED_SQLITE.lock().unwrap();
-    let max_block_number =sqlite.count();
-    let max_block_number = env.new_string(max_block_number.to_string()).expect("Could not create java string!");
+    let max_block_number = sqlite.count();
+    let max_block_number = env
+        .new_string(max_block_number.to_string())
+        .expect("Could not create java string!");
     max_block_number.into_inner()
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(
-    env: JNIEnv,
-    class: JClass,
-) -> jstring {
+pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv, class: JClass) -> jstring {
     let sqlite = SHARED_SQLITE.lock().unwrap();
     let height = sqlite.query_scanned_height();
-    let max_block_number = env.new_string(height.to_string()).expect("Could not create java string!");
+    let max_block_number = env
+        .new_string(height.to_string())
+        .expect("Could not create java string!");
     max_block_number.into_inner()
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcIsSyncDataOk(
-    env: JNIEnv,
-    _class: JClass,
-) -> jboolean {
+pub extern "system" fn Java_JniApi_btcIsSyncDataOk(env: JNIEnv, _class: JClass) -> jboolean {
     unimplemented!()
 }
 
@@ -204,11 +212,7 @@ pub extern "system" fn Java_JniApi_btcLoadTxHistory(
 // this function don't have any return value。because it will run spv node
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcStart(
-    env: JNIEnv,
-    _class: JClass,
-    network: JString,
-) {
+pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv, _class: JClass, network: JString) {
     // TODO
     // use testnet for test and default
     // must change it in future
@@ -238,33 +242,25 @@ pub extern "system" fn Java_JniApi_btcStart(
     }
 
     let mut peers: Vec<SocketAddr> = Vec::new();
-    peers.push(SocketAddr::from(SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 8333)));
+    peers.push(SocketAddr::from(SocketAddrV4::new(
+        Ipv4Addr::new(127, 0, 0, 1),
+        8333,
+    )));
 
     let connections = 1;
     let listen: Vec<SocketAddr> = Vec::new();
-    let birth: u64 = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs();
+    let birth: u64 = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
     let chaindb = Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap();
     let mut spv = Constructor::new(network, listen, chaindb).unwrap();
 
-    spv.run(network, peers, connections).expect("can not start node");
+    spv.run(network, peers, connections)
+        .expect("can not start node");
 }
 
-// use sqlite as global
-pub static SHARED_SQLITE: Lazy<SharedSQLite> = Lazy::new(|| {
-    let sqlite = SQLite::open_db(Network::Testnet);
-    Arc::new(Mutex::new(sqlite))
-});
-
-pub type SharedChannel = Arc<Mutex<(SyncSender<ApiMessage>, Receiver<ApiMessage>)>>;
-
-const BACK_PRESSURE: usize = 10;
-pub static SHARED_CHANNEL: Lazy<SharedChannel> = Lazy::new(|| {
-    let channel = sync_channel::<ApiMessage>(BACK_PRESSURE);
-    Arc::new(Mutex::new(channel))
-});
-
-
-
-
-
-
+// cala bloom filter
+fn calc_bloomfilter() {
+    //todo must use stored mnemonic
+}
