@@ -3,6 +3,8 @@ set VCPKGRS_DYNAMIC=1
 set cuPath=%cd
 set batPath=%~dp0
 
+set BUILD_DUMMY_WASM_BINARY=1
+
 #set RUSTFLAGS=-Ctarget-feature=+crt-static
 #set VCPKG_ROOT=D:/tools/vcpkg
 rustup default stable-msvc

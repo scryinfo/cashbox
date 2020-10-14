@@ -2,7 +2,7 @@ package info.scry.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.icu.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
