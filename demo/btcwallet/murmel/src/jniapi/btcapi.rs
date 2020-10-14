@@ -1,6 +1,10 @@
 //! mod for btcapi
 //! java native method def in  packages/wallet_manager/android/src/main/java/info/scry/wallet_manager/NativeLib.java
 
+use crate::constructor::Constructor;
+use crate::db::SQLite;
+use crate::db::SharedSQLite;
+use crate::hooks::{ApiMessage, HooksMessage};
 use bitcoin::consensus::serialize;
 use bitcoin::util::psbt::serialize::Serialize;
 use bitcoin::{Address, Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut};
@@ -8,10 +12,6 @@ use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::sha256d;
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
-use constructor::Constructor;
-use db::SQLite;
-use db::SharedSQLite;
-use hooks::{ApiMessage, HooksMessage};
 use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::{jboolean, jbyteArray, jint, jlong, jstring};
 use jni::JNIEnv;

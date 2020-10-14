@@ -1,15 +1,18 @@
 //! mod for broadcast TX
 
-use p2p::{P2PControlSender, PeerMessageSender, PeerMessageReceiver, PeerMessage, PeerId, SERVICE_BLOCKS};
-use timeout::{SharedTimeout, ExpectedReply};
+use crate::error::Error;
+use crate::p2p::{
+    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
+};
+use crate::timeout::{ExpectedReply, SharedTimeout};
+use crate::walletlib;
 use bitcoin::network::message::NetworkMessage;
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
+use bitcoin::Transaction;
+use log::{error, info, trace};
 use std::sync::mpsc;
 use std::thread;
-use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use std::time::Duration;
-use error::Error;
-use bitcoin::Transaction;
-use walletlib;
 
 pub struct Broadcast {
     //used for Send message
@@ -18,11 +21,17 @@ pub struct Broadcast {
 }
 
 impl Broadcast {
-    pub fn new(p2p: P2PControlSender<NetworkMessage>, timeout: SharedTimeout<NetworkMessage, ExpectedReply>) -> PeerMessageSender<NetworkMessage> {
+    pub fn new(
+        p2p: P2PControlSender<NetworkMessage>,
+        timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
+    ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
         let mut broadcast = Broadcast { p2p, timeout };
 
-        thread::Builder::new().name("Broadcast TX".to_string()).spawn(move || { broadcast.run(receiver) }).unwrap();
+        thread::Builder::new()
+            .name("Broadcast TX".to_string())
+            .spawn(move || broadcast.run(receiver))
+            .unwrap();
         PeerMessageSender::new(sender)
     }
 
@@ -40,21 +49,20 @@ impl Broadcast {
                             Ok(())
                         }
                     }
-                    PeerMessage::Disconnected(_, _) => {
-                        Ok(())
-                    }
-                    PeerMessage::Incoming(pid, msg) => {
-                        match msg {
-                            NetworkMessage::Ping(_) => { Ok(()) }
-                            _ => { Ok(()) }
-                        }
-                    }
-                    _ => { Ok(()) }
+                    PeerMessage::Disconnected(_, _) => Ok(()),
+                    PeerMessage::Incoming(pid, msg) => match msg {
+                        NetworkMessage::Ping(_) => Ok(()),
+                        _ => Ok(()),
+                    },
+                    _ => Ok(()),
                 } {
                     error!("Error processing headers: {}", e);
                 }
             }
-            self.timeout.lock().unwrap().check(vec!(ExpectedReply::Nonce));
+            self.timeout
+                .lock()
+                .unwrap()
+                .check(vec![ExpectedReply::Nonce]);
         }
     }
 
@@ -65,7 +73,6 @@ impl Broadcast {
         }
         false
     }
-
 
     // broadcast tx to bitcoin network
     fn broadcast_tx(&mut self, peer: PeerId) -> Result<(), Error> {

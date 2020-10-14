@@ -19,48 +19,44 @@
 //! Assembles modules of this library to a complete service
 //!
 
-use bitcoin::{
-    network::{
-        constants::Network
-    }
-};
-use chaindb::{ChainDB, SharedChainDB};
-use dispatcher::Dispatcher;
-use dns::dns_seed;
-use error::Error;
+use crate::bloomfilter::BloomFilter;
+use crate::broadcast::Broadcast;
+use crate::chaindb::{ChainDB, SharedChainDB};
+use crate::dispatcher::Dispatcher;
+use crate::dns::dns_seed;
+use crate::downstream::DownStreamDummy;
+use crate::downstream::SharedDownstream;
+use crate::error::Error;
+use crate::getdata::GetData;
+use crate::headerdownload::HeaderDownload;
+#[cfg(feature = "lightning")]
+use crate::lightning::LightningConnector;
+use crate::p2p::BitcoinP2PConfig;
+use crate::p2p::{P2PControl, PeerMessageSender, PeerSource, P2P};
+use crate::ping::Ping;
+use crate::timeout::Timeout;
+use bitcoin::network::constants::Network;
+use bitcoin::network::message::NetworkMessage;
+use bitcoin::network::message::RawNetworkMessage;
 use futures::{
     executor::{ThreadPool, ThreadPoolBuilder},
     future,
-    Poll as Async,
-    FutureExt, StreamExt,
-    task::{SpawnExt, Context},
-    Future,
+    task::{Context, SpawnExt},
+    Future, FutureExt, Poll as Async, StreamExt,
 };
-use std::pin::Pin;
 use futures_timer::Interval;
-use headerdownload::HeaderDownload;
-use p2p::{P2P, P2PControl, PeerMessageSender, PeerSource};
-use ping::Ping;
-use rand::{RngCore, thread_rng};
+use log::{error, info};
+use rand::{thread_rng, RngCore};
+use std::pin::Pin;
+use std::time::Duration;
 use std::{
     collections::HashSet,
     net::SocketAddr,
     path::Path,
-    sync::{Arc, mpsc, Mutex, RwLock, atomic::AtomicUsize},
+    sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
-use timeout::Timeout;
-use downstream::DownStreamDummy;
-use downstream::SharedDownstream;
-use bitcoin::network::message::NetworkMessage;
-use bitcoin::network::message::RawNetworkMessage;
-use p2p::BitcoinP2PConfig;
-use std::time::Duration;
-use bloomfilter::BloomFilter;
-use getdata::GetData;
-use broadcast::Broadcast;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
-
 
 /// The complete stack
 pub struct Constructor {
@@ -71,19 +67,26 @@ pub struct Constructor {
 
 impl Constructor {
     /// open DBs
-    pub fn open_db(path: Option<&Path>, network: Network, _birth: u64) -> Result<SharedChainDB, Error> {
-        let mut chaindb =
-            if let Some(path) = path {
-                ChainDB::new(path, network)?
-            } else {
-                ChainDB::mem(network)?
-            };
+    pub fn open_db(
+        path: Option<&Path>,
+        network: Network,
+        _birth: u64,
+    ) -> Result<SharedChainDB, Error> {
+        let mut chaindb = if let Some(path) = path {
+            ChainDB::new(path, network)?
+        } else {
+            ChainDB::mem(network)?
+        };
         chaindb.init()?;
         Ok(Arc::new(RwLock::new(chaindb)))
     }
 
     /// Construct the stack
-    pub fn new(network: Network, listen: Vec<SocketAddr>, chaindb: SharedChainDB) -> Result<Constructor, Error> {
+    pub fn new(
+        network: Network,
+        listen: Vec<SocketAddr>,
+        chaindb: SharedChainDB,
+    ) -> Result<Constructor, Error> {
         const BACK_PRESSURE: usize = 10;
 
         let (to_dispatcher, from_p2p) = mpsc::sync_channel(BACK_PRESSURE);
@@ -99,24 +102,42 @@ impl Constructor {
             server: !listen.is_empty(),
         };
         //control P2P Constructor --> P2P
-        let (p2p, p2p_control) =
-            P2P::new(p2pconfig, PeerMessageSender::new(to_dispatcher), BACK_PRESSURE);
+        let (p2p, p2p_control) = P2P::new(
+            p2pconfig,
+            PeerMessageSender::new(to_dispatcher),
+            BACK_PRESSURE,
+        );
 
-        #[cfg(feature = "lightning")] let lightning = Arc::new(Mutex::new(LightningConnector::new(network, p2p_control.clone())));
-        #[cfg(not(feature = "lightning"))] let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
-
+        #[cfg(feature = "lightning")]
+        let lightning = Arc::new(Mutex::new(LightningConnector::new(
+            network,
+            p2p_control.clone(),
+        )));
+        #[cfg(not(feature = "lightning"))]
+        let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
 
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
 
-        dispatcher.add_listener(HeaderDownload::new( chaindb.clone(), p2p_control.clone(), timeout.clone(), lightning.clone(), hook_sender));
+        dispatcher.add_listener(HeaderDownload::new(
+            chaindb.clone(),
+            p2p_control.clone(),
+            timeout.clone(),
+            lightning.clone(),
+            hook_sender,
+        ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
         info!("send FilterLoad");
         dispatcher.add_listener(BloomFilter::new(p2p_control.clone(), timeout.clone()));
 
         info!("send GetData");
-        dispatcher.add_listener(GetData::new( chaindb.clone(), p2p_control.clone(), timeout.clone(), hook_receiver));
+        dispatcher.add_listener(GetData::new(
+            chaindb.clone(),
+            p2p_control.clone(),
+            timeout.clone(),
+            hook_receiver,
+        ));
 
         info!("Broadcast TX");
         dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone()));
@@ -125,7 +146,10 @@ impl Constructor {
             p2p_control.send(P2PControl::Bind(addr.clone()));
         }
 
-        Ok(Constructor { p2p, downstream: lightning })
+        Ok(Constructor {
+            p2p,
+            downstream: lightning,
+        })
     }
 
     /// Run the stack. This should be called AFTER registering listener of the ChainWatchInterface,
@@ -133,12 +157,26 @@ impl Constructor {
     /// * peers - connect to these peers at startup (might be empty)
     /// * min_connections - keep connections with at least this number of peers. Peers will be randomly chosen
     /// from those discovered in earlier runs
-    pub fn run(&mut self, network: Network, peers: Vec<SocketAddr>, min_connections: usize) -> Result<(), Error> {
-        let mut executor = ThreadPoolBuilder::new().name_prefix("bitcoin-connect").pool_size(2).create().expect("can not start futures thread pool");
+    pub fn run(
+        &mut self,
+        network: Network,
+        peers: Vec<SocketAddr>,
+        min_connections: usize,
+    ) -> Result<(), Error> {
+        let mut executor = ThreadPoolBuilder::new()
+            .name_prefix("bitcoin-connect")
+            .pool_size(2)
+            .create()
+            .expect("can not start futures thread pool");
 
         let p2p = self.p2p.clone();
         for addr in &peers {
-            executor.spawn(p2p.add_peer("bitcoin", PeerSource::Outgoing(addr.clone())).map(|_| ())).expect("can not spawn task for peers");
+            executor
+                .spawn(
+                    p2p.add_peer("bitcoin", PeerSource::Outgoing(addr.clone()))
+                        .map(|_| ()),
+                )
+                .expect("can not spawn task for peers");
         }
 
         let keep_connected = KeepConnected {
@@ -148,7 +186,9 @@ impl Constructor {
             dns: dns_seed(network),
             cex: executor.clone(),
         };
-        executor.spawn(Interval::new(Duration::new(10, 0)).for_each(move |_| keep_connected.clone())).expect("can not keep connected");
+        executor
+            .spawn(Interval::new(Duration::new(10, 0)).for_each(move |_| keep_connected.clone()))
+            .expect("can not keep connected");
 
         let p2p = self.p2p.clone();
         let mut cex = executor.clone();
@@ -175,13 +215,23 @@ impl Future for KeepConnected {
 
     fn poll(mut self: Pin<&mut Self>, _: &mut Context<'_>) -> Async<Self::Output> {
         if self.p2p.n_connected_peers() < self.min_connections {
-            let eligible = self.dns.iter().cloned().filter(|a| !self.earlier.contains(a)).collect::<Vec<_>>();
+            let eligible = self
+                .dns
+                .iter()
+                .cloned()
+                .filter(|a| !self.earlier.contains(a))
+                .collect::<Vec<_>>();
             if eligible.len() > 0 {
                 let mut rng = thread_rng();
                 let choice = eligible[(rng.next_u32() as usize) % eligible.len()];
                 self.earlier.insert(choice.clone());
-                let add = self.p2p.add_peer("bitcoin", PeerSource::Outgoing(choice)).map(|_| ());
-                self.cex.spawn(add).expect("can not add peer for outgoing connection");
+                let add = self
+                    .p2p
+                    .add_peer("bitcoin", PeerSource::Outgoing(choice))
+                    .map(|_| ());
+                self.cex
+                    .spawn(add)
+                    .expect("can not add peer for outgoing connection");
             }
         }
         Async::Ready(())

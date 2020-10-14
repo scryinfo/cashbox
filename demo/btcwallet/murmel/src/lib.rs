@@ -25,53 +25,31 @@
 #![deny(unused_mut)]
 #![deny(unused_must_use)]
 #![forbid(unsafe_code)]
-
-// allow &error
 #![allow(bare_trait_objects)]
-//allow range_inclusive_range_patterns
 #![allow(ellipsis_inclusive_range_patterns)]
 #![allow(deprecated)]
 
-extern crate bitcoin;
-extern crate bitcoin_hashes;
-extern crate byteorder;
-extern crate futures;
-extern crate futures_timer;
-extern crate hammersbald;
-extern crate serde;
-#[macro_use] extern crate serde_derive;
-#[macro_use] extern crate log;
-extern crate lru_cache;
-extern crate mio;
-extern crate rand;
-extern crate hex;
-
-#[cfg(feature="lightning")] extern crate lightning;
-extern crate sqlite;
-extern crate bitcoin_wallet;
-extern crate jni;
-extern crate once_cell;
-
-#[cfg(feature="lightning")] mod lightning;
 mod headercache;
+#[cfg(feature = "lightning")]
+mod lightning;
 
-pub mod ping;
-pub mod dns;
-pub mod timeout;
-pub mod headerdownload;
-pub mod downstream;
-pub mod dispatcher;
-pub mod p2p;
-pub mod error;
+pub mod bloomfilter;
+pub mod broadcast;
 pub mod chaindb;
 pub mod constructor;
-pub mod bloomfilter;
-pub mod getdata;
 pub mod db;
+pub mod dispatcher;
+pub mod dns;
+pub mod downstream;
+pub mod error;
+pub mod getdata;
+pub mod headerdownload;
 pub mod hooks;
-pub mod walletlib;
-pub mod broadcast;
 pub mod jniapi;
+pub mod p2p;
+pub mod ping;
+pub mod timeout;
+pub mod walletlib;
 
 pub use error::Error;
 

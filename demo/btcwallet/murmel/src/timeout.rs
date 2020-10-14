@@ -17,18 +17,19 @@
 //! # Keep track of peer timeouts
 //!
 
-use p2p::{P2PControl, P2PControlSender, PeerId};
+use crate::p2p::{P2PControl, P2PControlSender, PeerId};
+use log::debug;
+use std::hash::Hash;
 use std::{
     cmp::min,
     collections::HashMap,
     sync::{Arc, Mutex},
-    time::{SystemTime, UNIX_EPOCH}
+    time::{SystemTime, UNIX_EPOCH},
 };
-use std::hash::Hash;
 
 pub type SharedTimeout<Message, Reply> = Arc<Mutex<Timeout<Message, Reply>>>;
 
-const TIMEOUT:u64 = 60;
+const TIMEOUT: u64 = 60;
 
 #[derive(Eq, PartialEq, Hash, Debug)]
 pub enum ExpectedReply {
@@ -43,31 +44,40 @@ pub enum ExpectedReply {
     MerkleBlock,
     Tx,
     INV,
-    Nonce
+    Nonce,
 }
 
-pub struct Timeout<Message: Send + Sync + Clone, Reply : Eq + Hash + std::fmt::Debug> {
+pub struct Timeout<Message: Send + Sync + Clone, Reply: Eq + Hash + std::fmt::Debug> {
     timeouts: HashMap<PeerId, u64>,
     expected: HashMap<PeerId, HashMap<Reply, usize>>,
-    p2p: P2PControlSender<Message>
+    p2p: P2PControlSender<Message>,
 }
 
 impl<Message: Send + Sync + Clone, Reply: Eq + Hash + std::fmt::Debug> Timeout<Message, Reply> {
-    pub fn new (p2p: P2PControlSender<Message>) -> Timeout<Message, Reply> {
-        Timeout{p2p, timeouts: HashMap::new(), expected: HashMap::new()}
+    pub fn new(p2p: P2PControlSender<Message>) -> Timeout<Message, Reply> {
+        Timeout {
+            p2p,
+            timeouts: HashMap::new(),
+            expected: HashMap::new(),
+        }
     }
 
-    pub fn forget (&mut self, peer: PeerId) {
+    pub fn forget(&mut self, peer: PeerId) {
         self.timeouts.remove(&peer);
         self.expected.remove(&peer);
     }
 
-    pub fn expect (&mut self, peer: PeerId, n: usize, what: Reply) {
+    pub fn expect(&mut self, peer: PeerId, n: usize, what: Reply) {
         self.timeouts.insert(peer, Self::now() + TIMEOUT);
-        *self.expected.entry(peer).or_insert(HashMap::new()).entry(what).or_insert(0) += n;
+        *self
+            .expected
+            .entry(peer)
+            .or_insert(HashMap::new())
+            .entry(what)
+            .or_insert(0) += n;
     }
 
-    pub fn received (&mut self, peer: PeerId, n: usize, what: Reply) {
+    pub fn received(&mut self, peer: PeerId, n: usize, what: Reply) {
         if let Some(expected) = self.expected.get(&peer) {
             if let Some(m) = expected.get(&what) {
                 if *m > 0 {
@@ -76,7 +86,12 @@ impl<Message: Send + Sync + Clone, Reply: Eq + Hash + std::fmt::Debug> Timeout<M
             }
         }
         {
-            let expected = self.expected.entry(peer).or_insert(HashMap::new()).entry(what).or_insert(n);
+            let expected = self
+                .expected
+                .entry(peer)
+                .or_insert(HashMap::new())
+                .entry(what)
+                .or_insert(n);
             *expected -= min(n, *expected);
         }
         if let Some(expected) = self.expected.get(&peer) {
@@ -86,11 +101,11 @@ impl<Message: Send + Sync + Clone, Reply: Eq + Hash + std::fmt::Debug> Timeout<M
         }
     }
 
-    pub fn is_busy (&self, peer: PeerId) -> bool {
+    pub fn is_busy(&self, peer: PeerId) -> bool {
         self.timeouts.contains_key(&peer)
     }
 
-    pub fn is_busy_with (&self, peer: PeerId, what: Reply) -> bool {
+    pub fn is_busy_with(&self, peer: PeerId, what: Reply) -> bool {
         if self.timeouts.contains_key(&peer) {
             if let Some(expected) = self.expected.get(&peer) {
                 if let Some(n) = expected.get(&what) {
@@ -101,12 +116,27 @@ impl<Message: Send + Sync + Clone, Reply: Eq + Hash + std::fmt::Debug> Timeout<M
         false
     }
 
-    pub fn check (&mut self, expected: Vec<Reply>) {
+    pub fn check(&mut self, expected: Vec<Reply>) {
         let mut banned = Vec::new();
         for (peer, timeout) in &self.timeouts {
-            if *timeout < Self::now () {
-                if expected.iter().any(|expected| if let Some(e) = self.expected.get(peer) { if let Some(n) = e.get(expected) { *n>0 } else { false } } else { false }) {
-                    debug!("too slow answering {:?} requests {:?}, disconnecting peer={}", expected, self.expected.get(peer), *peer);
+            if *timeout < Self::now() {
+                if expected.iter().any(|expected| {
+                    if let Some(e) = self.expected.get(peer) {
+                        if let Some(n) = e.get(expected) {
+                            *n > 0
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    }
+                }) {
+                    debug!(
+                        "too slow answering {:?} requests {:?}, disconnecting peer={}",
+                        expected,
+                        self.expected.get(peer),
+                        *peer
+                    );
                     self.p2p.send(P2PControl::Disconnect(*peer));
                     banned.push(*peer);
                 }
@@ -119,6 +149,9 @@ impl<Message: Send + Sync + Clone, Reply: Eq + Hash + std::fmt::Debug> Timeout<M
     }
 
     fn now() -> u64 {
-        SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
     }
 }

@@ -1,12 +1,12 @@
 //! mod for sqlite
 //!
 //!
-use std::sync::{Arc, Mutex};
-use sqlite::{State, Value, Statement};
-use bitcoin::{Network, BitcoinHash};
 use bitcoin::blockdata::constants::genesis_block;
-use error;
 use bitcoin::hashes::hex::ToHex;
+use bitcoin::{BitcoinHash, Network};
+use log::info;
+use sqlite::{State, Statement, Value};
+use std::sync::{Arc, Mutex};
 
 pub type SharedSQLite = Arc<Mutex<SQLite>>;
 
@@ -61,9 +61,10 @@ impl SQLite {
 
     // Storage block header
     pub fn insert_block(&self, block_hash: String, timestamp: String) {
-        let mut statement = self.connection.prepare(
-            "INSERT INTO block_hash VALUES(?, ?, ?, ?)"
-        ).expect("PREPARE ERR");
+        let mut statement = self
+            .connection
+            .prepare("INSERT INTO block_hash VALUES(?, ?, ?, ?)")
+            .expect("PREPARE ERR");
         statement.bind(1, &Value::Null).expect("BIND ID ERR");
         statement.bind(2, block_hash.as_str()).unwrap();
         statement.bind(3, "0").unwrap();
@@ -73,13 +74,11 @@ impl SQLite {
 
     // Query unscanned block header and return corresponding data based on timestamp
     pub fn query_header(&self, timestamp: String, add: bool) -> Vec<String> {
-        let mut statement = self.connection.prepare(
-            "SELECT * FROM block_hash WHERE timestamp >= ? AND  scanned <= 5 LIMIT 1000"
-        ).expect("query_header PREPARE ERR");
-        statement.bind(
-            1,
-            timestamp.as_str(),
-        ).expect("bind ERR");
+        let mut statement = self
+            .connection
+            .prepare("SELECT * FROM block_hash WHERE timestamp >= ? AND  scanned <= 5 LIMIT 1000")
+            .expect("query_header PREPARE ERR");
+        statement.bind(1, timestamp.as_str()).expect("bind ERR");
         let mut block_hashes = vec![];
         while let State::Row = statement.next().unwrap() {
             let block_hash = statement.read::<String>(1).unwrap();
@@ -99,9 +98,10 @@ impl SQLite {
 
     //query new
     pub fn query_newest_header(&self, key: &str) -> (Option<String>, Option<String>) {
-        let mut statement = self.connection.prepare(
-            "SELECT * FROM newest_hash WHERE key = ?"
-        ).expect("query_new error");
+        let mut statement = self
+            .connection
+            .prepare("SELECT * FROM newest_hash WHERE key = ?")
+            .expect("query_new error");
         statement.bind(1, key).expect("query newest error");
         while let State::Row = statement.next().unwrap() {
             let block_hash = statement.read::<String>(2).expect("query block hash error");
@@ -113,21 +113,27 @@ impl SQLite {
 
     //insert new header
     pub fn insert_newest_header(&self, block_hash: String, timestamp: String) {
-        let mut statement = self.connection.prepare(
-            "INSERT INTO newest_hash VALUES(?,?,?,?)"
-        ).expect("PREPARE ERR");
+        let mut statement = self
+            .connection
+            .prepare("INSERT INTO newest_hash VALUES(?,?,?,?)")
+            .expect("PREPARE ERR");
         statement.bind(1, &Value::Null).expect("ID BIND ERR");
         statement.bind(2, NEWEST_KEY).expect("KEY BIND ERR");
-        statement.bind(3, block_hash.as_str()).expect("BLOCK_HASH BIND ERR");
-        statement.bind(4, timestamp.as_str()).expect("TIMESTAMP BIND ERR");
+        statement
+            .bind(3, block_hash.as_str())
+            .expect("BLOCK_HASH BIND ERR");
+        statement
+            .bind(4, timestamp.as_str())
+            .expect("TIMESTAMP BIND ERR");
         statement.next().expect("insert newest_header error");
     }
 
     //update the newest header
     pub fn update_newest_header(&self, block_hash: String, timestamp: String) {
-        let mut statement = self.connection.prepare(
-            "UPDATE newest_hash SET block_hash = ?, timestamp = ? WHERE key = ?"
-        ).expect("PREPARE ERR");
+        let mut statement = self
+            .connection
+            .prepare("UPDATE newest_hash SET block_hash = ?, timestamp = ? WHERE key = ?")
+            .expect("PREPARE ERR");
         statement.bind(1, block_hash.as_str()).unwrap();
         statement.bind(2, timestamp.as_str()).unwrap();
         statement.bind(3, NEWEST_KEY).unwrap();
@@ -135,35 +141,61 @@ impl SQLite {
     }
 
     //insert txin
-    pub fn insert_txin(&self, tx: String, sig_script: String, prev_tx: String, prev_vout: String, sequence: String) {
-        let mut statement = self.connection.prepare(
-            "INSERT OR IGNORE INTO tx_input VALUES(NULL,?,?,?,?,?)"
-        ).expect("insert txin error");
-        statement.bind(1, tx.as_str()).expect("bind statement error");
-        statement.bind(2, sig_script.as_str()).expect("bind statement error");
-        statement.bind(3, prev_tx.as_str()).expect("bind statement error");
-        statement.bind(4, prev_vout.as_str()).expect("bind statement error");
-        statement.bind(5, sequence.as_str()).expect("bind statement error");
+    pub fn insert_txin(
+        &self,
+        tx: String,
+        sig_script: String,
+        prev_tx: String,
+        prev_vout: String,
+        sequence: String,
+    ) {
+        let mut statement = self
+            .connection
+            .prepare("INSERT OR IGNORE INTO tx_input VALUES(NULL,?,?,?,?,?)")
+            .expect("insert txin error");
+        statement
+            .bind(1, tx.as_str())
+            .expect("bind statement error");
+        statement
+            .bind(2, sig_script.as_str())
+            .expect("bind statement error");
+        statement
+            .bind(3, prev_tx.as_str())
+            .expect("bind statement error");
+        statement
+            .bind(4, prev_vout.as_str())
+            .expect("bind statement error");
+        statement
+            .bind(5, sequence.as_str())
+            .expect("bind statement error");
         statement.next().expect("insert utxos error");
     }
 
     //insert txout
     pub fn insert_txout(&self, tx: String, script: String, value: String, vout: i64) {
-        let mut statement = self.connection.prepare(
-            "INSERT OR IGNORE INTO tx_output VALUES(NULL,?,?,?,?)"
-        ).expect("insert utxo error");
-        statement.bind(1, tx.as_str()).expect("bind statement error");
-        statement.bind(2, script.as_str()).expect("bind statement error");
-        statement.bind(3, value.as_str()).expect("bind statement error");
+        let mut statement = self
+            .connection
+            .prepare("INSERT OR IGNORE INTO tx_output VALUES(NULL,?,?,?,?)")
+            .expect("insert utxo error");
+        statement
+            .bind(1, tx.as_str())
+            .expect("bind statement error");
+        statement
+            .bind(2, script.as_str())
+            .expect("bind statement error");
+        statement
+            .bind(3, value.as_str())
+            .expect("bind statement error");
         statement.bind(4, vout).expect("bind statement error");
         statement.next().expect("insert utxos error");
     }
 
     // query count
     pub fn count(&self) -> u64 {
-        let mut statement = self.connection.prepare(
-            "select count(*) from block_hash"
-        ).expect("count error");
+        let mut statement = self
+            .connection
+            .prepare("select count(*) from block_hash")
+            .expect("count error");
 
         let mut count: u64 = 0;
         while let State::Row = statement.next().unwrap() {
@@ -176,9 +208,10 @@ impl SQLite {
     // query height that we scanned
     pub fn query_scanned_height(&self) -> String {
         let (block_hash, _timestamp) = self.query_newest_header(NEWEST_KEY);
-        let mut statement = self.connection.prepare(
-            "SELECT ID FROM block_hash WHERE block_hash = ?"
-        ).expect("select hash error");
+        let mut statement = self
+            .connection
+            .prepare("SELECT ID FROM block_hash WHERE block_hash = ?")
+            .expect("select hash error");
 
         if let Some(block_hash) = block_hash {
             statement.bind(1, block_hash.as_str()).expect("bind error");
@@ -191,8 +224,8 @@ impl SQLite {
 }
 
 mod test {
-    use jniapi::btcapi::SHARED_SQLITE;
-    use db::NEWEST_KEY;
+    use crate::db::NEWEST_KEY;
+    use crate::jniapi::btcapi::SHARED_SQLITE;
 
     #[test]
     pub fn test_init() {
@@ -218,10 +251,9 @@ mod test {
     }
 
     #[test]
-    pub fn test_query_scanned_height(){
+    pub fn test_query_scanned_height() {
         let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
         let height = sqlite.query_scanned_height();
         println!("{}", height);
     }
 }
-
