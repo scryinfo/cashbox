@@ -1,5 +1,5 @@
 import 'package:app/util/log_util.dart';
-import 'package:fluro/fluro.dart';
+import 'package:fluro/fluro.dart' as fluro;
 import 'package:flutter/material.dart';
 import '../routers/router_handler.dart';
 
@@ -41,8 +41,8 @@ class Routes {
   static String createTestWalletPage = '/createtestwalletpage';
   static String signTxPage = '/signtxpage';
 
-  static void configureRoutes(Router router) {
-    router.notFoundHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  static void configureRoutes(fluro.Router router) {
+    router.notFoundHandler = fluro.Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       print('ERROR====>ROUTE WAS NOT FONUND!!!');
       LogUtil.e("Routers error is=>", "noFoundHandler");
     });
