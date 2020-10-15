@@ -261,6 +261,32 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv, _class: JClass, network
 }
 
 // cala bloom filter
-fn calc_bloomfilter() {
+pub fn calc_bloomfilter() {
     //todo must use stored mnemonic
+    let words = "announce damage viable ticket engage curious yellow ten clock finish burden orient faculty rigid smile host offer affair suffer slogan mercy another switch park";
+    let mnemonic = Mnemonic::from_str(words).unwrap();
+    let mut master =
+        MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
+    let mut unlocker = Unlocker::new_for_master(&master, "").expect("don't have right unlocker");
+
+    // path 0,0 => source(from address)
+    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
+    master.add_account(account);
+    let account = master.get_mut((0, 0)).unwrap();
+    let instance_key = account.next_key().unwrap();
+    let source = instance_key.address.clone();
+    let public_key = instance_key.public.clone();
+    let public_compressed = public_key.serialize();
+    let public_compressed = hex::encode(public_compressed);
+    println!("source {:?}", &source);
+    println!("public_compressed {:?}", &public_compressed.len());
+}
+
+mod test {
+    use crate::jniapi::btcapi::calc_bloomfilter;
+
+    #[test]
+    pub fn test_calc_bloomfilter() {
+        calc_bloomfilter()
+    }
 }
