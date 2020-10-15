@@ -6,6 +6,7 @@ use crate::db::SQLite;
 use crate::db::SharedSQLite;
 use crate::hooks::{ApiMessage, HooksMessage};
 use bitcoin::consensus::serialize;
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::util::psbt::serialize::Serialize;
 use bitcoin::{Address, Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut};
 use bitcoin_hashes::hex::FromHex;
@@ -15,6 +16,7 @@ use bitcoin_wallet::mnemonic::Mnemonic;
 use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::{jboolean, jbyteArray, jint, jlong, jstring};
 use jni::JNIEnv;
+use log::info;
 use log::Level;
 use once_cell::sync::Lazy;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
@@ -78,8 +80,8 @@ pub extern "system" fn Java_JniApi_btcTxSign(
     let public_key = instance_key.public.clone();
     let public_compressed = public_key.serialize();
     let public_compressed = hex::encode(public_compressed);
-    println!("source {:?}", &source);
-    println!("public_compressed {:?}", &public_compressed);
+    info!("source {:?}", &source);
+    info!("public_compressed {:?}", &public_compressed);
 
     // target(to address) must use to address
     let address =
@@ -280,6 +282,9 @@ pub fn calc_bloomfilter() {
     let public_compressed = hex::encode(public_compressed);
     println!("source {:?}", &source);
     println!("public_compressed {:?}", &public_compressed.len());
+
+    let bloom_filter = FilterLoadMessage::calculate_filter(public_compressed.as_ref());
+    println!("bloom_filter {:0x?}", &bloom_filter);
 }
 
 mod test {

@@ -35,6 +35,9 @@ impl SQLite {
         sqlite.execute(
             "create table if not exists tx_output(ID INTEGER PRIMARY KEY AUTOINCREMENT,tx TEXT not null ,script TEXT, value REAL, vin INT);"
         ).expect("Create tx_output table error");
+        sqlite.execute(
+            "create table if not exists compressed_pub(ID INTEGER PRIMARY KEY AUTOINCREMENT,address TEXT not null ,compressed_key TEXT);"
+        ).expect("Create compressed_pub table error");
         Self {
             connection: sqlite,
             network,
@@ -220,6 +223,21 @@ impl SQLite {
             }
         }
         String::from("0")
+    }
+
+    // insert address compressed_pub key and bloom filter
+    pub fn insert_compressed_pub_key(&self, address: String, pubkey: String) {
+        let mut statement = self
+            .connection
+            .prepare("INSERT INTO compressed_pub VALUES(NULL,?,?)")
+            .expect("prepare compressed pub key error");
+        statement
+            .bind(1, address.as_str())
+            .expect("bind statement error");
+        statement
+            .bind(2, pubkey.as_str())
+            .expect("bind statement error");
+        statement.next().expect("insert compressed error");
     }
 }
 
