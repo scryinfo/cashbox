@@ -239,6 +239,20 @@ impl SQLite {
             .expect("bind statement error");
         statement.next().expect("insert compressed error");
     }
+
+    // query public compressed key
+    pub fn query_compressed_pub_key(&self) -> Option<String> {
+        let mut statement = self
+            .connection
+            .prepare("SELECT * FROM compressed_pub")
+            .expect("query compressed key error");
+        statement.bind(1, key).expect("query newest error");
+        while let State::Row = statement.next().unwrap() {
+            let compressed_pub_key = statement.read::<String>(2).expect("query block hash error");
+            return Some(compressed_pub_key);
+        }
+        None
+    }
 }
 
 mod test {
@@ -273,5 +287,12 @@ mod test {
         let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
         let height = sqlite.query_scanned_height();
         println!("{}", height);
+    }
+
+    #[test]
+    pub fn test_query_compressed_pubkey() {
+        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
+        let pubkey = sqlite.query_compressed_pub_key();
+        println!("{}", pubkey.unwrap());
     }
 }
