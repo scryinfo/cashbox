@@ -113,19 +113,6 @@ mod tests {
         }
     }
 
-    #[test]
-    fn sign_test() {
-        //Initialize the database
-        assert_eq!( wallet_db::init_wallet_database().is_ok(),true);
-        //Create a wallet instance
-        // let mnemonic = wallet_instance.crate_mnemonic(15);
-        let rawtx = "0xac040600ff0a146e76bbdc381bd77bb55ec45c8bef5f52e2909114d632967683ec1eb4ea300b0040e59c301200000000979d3bb306ed9fbd5d6ae1eade033b81ae12a5c5d5aa32781153579d7f6d5504ed000000";
-        let eee = module::EEE {};
-        match eee.raw_tx_sign(rawtx, "9328ebd6-c205-439d-a016-ebe6ab1e5408", "123456".as_bytes()) {
-            Ok(signed_data) => println!("tx sign result {}", signed_data),
-            Err(e) => println!("{}", e.to_string()),
-        }
-    }
 
     #[test]
     fn eth_raw_tx_sign_test() {

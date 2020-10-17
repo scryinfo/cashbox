@@ -138,12 +138,12 @@ public class NativeLibTest {
 
     @Test
     public void eeeTransferTest() {
-        String from = "5H8iXEyLrvgceXrFFUXSJTAoPywmxTjjS8JHvLTfQJdv3Ybr";
+        String from = "5H1T7hU5zFNzCZMWXryQETyEXiAkYFYEPUo63PYHcQXwBJVF";
         String to = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
-        String value = "1";
-        String genesisHash = "0x4fa8fc5bbe75fbffe3df5b2dc7a809ae07119ea67e587c15d5b7c8c8ddca3303";
-        int index = 1;
-        int runtimeVersion = 4;
+        String value = "10";
+        String genesisHash = "0x7fa792d0aff5e5529e0125faf969f7adfd65894b962e24681f18eab116975a20";
+        int index = 0;
+        int runtimeVersion = 6;
         NativeLib.Message msg = NativeLib.eeeTransfer(from, to, value, genesisHash, index, runtimeVersion,1, "123456".getBytes());
         System.out.println(msg);
     }
