@@ -15,7 +15,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import 'global_config/global_config.dart';
 import 'page/entry_page.dart';
-import 'package:fluro/fluro.dart' as fluro;
+import 'package:fluro/fluro.dart';
 import 'provide/transaction_provide.dart';
 import 'routers/routers.dart';
 import 'routers/application.dart';
@@ -50,7 +50,7 @@ class MyApp extends StatefulWidget {
 
 class _MyApp extends State<MyApp> {
   _MyApp() {
-    final router = fluro.Router();
+    final router = FluroRouter();
     Routes.configureRoutes(router);
     Application.router = router;
   }

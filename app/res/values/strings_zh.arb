@@ -14,6 +14,7 @@
   "judge_the_difference_between_two_wallet": "注意：此测试钱包里面能使用的,都是测试链上的代币。      请区分与正式链的差别。",
   "qr_scan_unknown_error": "扫描已取消，或出现未知失败",
   "change_another_group": "换一组",
+  "camera_permission_deny": "拍照权限被拒绝。请允许打开应用的相机功能",
   "wallet_pwd": "钱包密码",
   "pls_set_wallet_pwd": "请设置钱包密码",
   "choose_multi_chain": "选择创建链",

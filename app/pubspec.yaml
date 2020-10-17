@@ -44,7 +44,7 @@ dependencies:
   oktoast: ^2.2.0
   # Toast插件 https://github.com/OpenFlutter/flutter_oktoast
 
-  fluro: "^1.6.3"
+  fluro: "^1.7.2"
   # 路由管理           https://github.com/theyakka/fluro
 
   flutter_webview_plugin: ^0.3.11
@@ -82,6 +82,9 @@ dependencies:
 
   package_info: ^0.4.0+18
   #yingyongbanben
+
+  permission_handler: ^5.0.1+1
+  # https://github.com/Baseflow/flutter-permission-handler
 
   json_rpc_2: ^2.1.1
   #         https://github.com/dart-lang/json_rpc_2

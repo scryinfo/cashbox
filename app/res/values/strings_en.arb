@@ -14,6 +14,7 @@
   "judge_the_difference_between_two_wallet": "Note: The tokens on the test chain can be used in this test wallet. Please distinguish the difference from the official chain.",
   "qr_scan_unknown_error": "Unknown error occured, please retry it",
   "change_another_group": "Change another group",
+  "camera_permission_deny": "Permission to take photos is denied. Please allow to turn on your camera function",
   "wallet_pwd": "Wallet password",
   "pls_set_wallet_pwd": "Please set wallet password",
   "choose_multi_chain": "Select to create chain type",
