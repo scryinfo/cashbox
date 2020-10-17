@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class TransferEeePage extends StatefulWidget {
@@ -229,13 +230,16 @@ class _TransferEeePageState extends State<TransferEeePage> {
                   ),
                   child: IconButton(
                     onPressed: () async {
-                      try {
-                        String qrResult = await QrScanUtil.instance.qrscan();
-                        setState(() {
-                          _toAddressController.text = qrResult.toString();
-                        });
-                      } catch (e) {
-                        Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
+                      var status = await Permission.camera.status;
+                      if (status.isGranted) {
+                        _scanQrContent();
+                      } else {
+                        Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+                        if (statuses[Permission.camera] == PermissionStatus.granted) {
+                          _scanQrContent();
+                        } else {
+                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                        }
                       }
                     },
                     icon: Image.asset("assets/images/ic_scan.png"),
@@ -247,6 +251,17 @@ class _TransferEeePageState extends State<TransferEeePage> {
         ],
       ),
     );
+  }
+
+  void _scanQrContent() async {
+    try {
+      String qrResult = await QrScanUtil.instance.qrscan();
+      setState(() {
+        _toAddressController.text = qrResult.toString();
+      });
+    } catch (e) {
+      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
+    }
   }
 
   Widget _buildValueWidget() {

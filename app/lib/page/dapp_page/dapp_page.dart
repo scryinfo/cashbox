@@ -21,6 +21,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:scry_webview/scry_webview.dart';
 
@@ -83,7 +84,8 @@ class _DappPageState extends State<DappPage> {
             //initialUrl:"http://192.168.1.5:9690/home.html",
             initialUrl: VendorConfig.dappOpenUrValue,
             javascriptMode: JavascriptMode.unrestricted,
-            userAgent: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
+            userAgent:
+                "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
             //JS execution mode Whether to allow JS execution
             onWebViewCreated: (WebViewController webViewController) {
               _controller = webViewController;
@@ -97,7 +99,8 @@ class _DappPageState extends State<DappPage> {
             onPageFinished: (String url) async {
               await Wallets.instance.loadAllWalletList(isForceLoadFromJni: false);
               nowWallet = Wallets.instance.nowWallet;
-              {//eee
+              {
+                //eee
                 String address = '';
                 {
                   address = nowWallet.getChainByChainType(ChainType.EEE)?.chainAddress;
@@ -115,7 +118,8 @@ class _DappPageState extends State<DappPage> {
                 }
               }
 
-              {//eth
+              {
+                //eth
                 String address = '';
                 {
                   address = nowWallet.getChainByChainType(ChainType.ETH)?.chainAddress;
@@ -131,7 +135,8 @@ class _DappPageState extends State<DappPage> {
                 }
               }
 
-              {//btc
+              {
+                //btc
                 String address = '';
                 {
                   address = nowWallet.getChainByChainType(ChainType.BTC)?.chainAddress;
@@ -154,37 +159,75 @@ class _DappPageState extends State<DappPage> {
     );
   }
 
+  void _scanNativeQrScanToJs() {
+    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    qrResult.then((t) {
+      _controller?.evaluateJavascript('nativeQrScanToJsResult("$t")')?.then((result) {});
+    }).catchError((e) {
+      // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
+    });
+  }
+
+  void _scanNativeQrSignToQR() {
+    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    qrResult.then((qrInfo) {
+      Map paramsMap = QrScanUtil.instance.checkQrInfoByDiamondSignAndQr(qrInfo, context);
+      if (paramsMap == null) {
+        Fluttertoast.showToast(msg: translate('not_follow_diamond_rule').toString());
+        NavigatorUtils.goBack(context);
+        return;
+      }
+      var waitToSignInfo = "dtt=" + paramsMap["dtt"] + ";" + "v=" + paramsMap["v"]; //Transaction information to be signed
+      Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
+      NavigatorUtils.push(context, Routes.signTxPage);
+    }).catchError((e) {
+      // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
+    });
+  }
+
+  void _scanCashboxScan(Message msg) {
+    QrScanUtil.instance.qrscan().then((t) {
+      msg.data = t;
+      this.callPromise(msg);
+    }).catchError((e) {
+      msg.err = "inner error";
+      this.callPromise(msg);
+    });
+  }
+
   Set<JavascriptChannel> makeJsChannelsSet() {
     List<JavascriptChannel> jsChannelList = [];
     jsChannelList.add(JavascriptChannel(
         name: "NativeQrScanToJs",
-        onMessageReceived: (JavascriptMessage message) {
-          Future<String> qrResult = QrScanUtil.instance.qrscan();
-          qrResult.then((t) {
-            _controller?.evaluateJavascript('nativeQrScanToJsResult("$t")')?.then((result) {});
-          }).catchError((e) {
-            // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
-          });
+        onMessageReceived: (JavascriptMessage message) async {
+          var status = await Permission.camera.status;
+          if (status.isGranted) {
+            _scanNativeQrScanToJs();
+          } else {
+            Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+            if (statuses[Permission.camera] == PermissionStatus.granted) {
+              _scanNativeQrScanToJs();
+            } else {
+              Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+            }
+          }
         }));
 
     jsChannelList.add(JavascriptChannel(
         name: "NativeQrScanAndPwdAndSignToQR",
         //Remarks. Execute scan here, execute pwdAndSign on sign_tx_page, then toQR
-        onMessageReceived: (JavascriptMessage message) {
-          Future<String> qrResult = QrScanUtil.instance.qrscan();
-          qrResult.then((qrInfo) {
-            Map paramsMap = QrScanUtil.instance.checkQrInfoByDiamondSignAndQr(qrInfo, context);
-            if (paramsMap == null) {
-              Fluttertoast.showToast(msg: translate('not_follow_diamond_rule').toString());
-              NavigatorUtils.goBack(context);
-              return;
+        onMessageReceived: (JavascriptMessage message) async {
+          var status = await Permission.camera.status;
+          if (status.isGranted) {
+            _scanNativeQrSignToQR();
+          } else {
+            Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+            if (statuses[Permission.camera] == PermissionStatus.granted) {
+              _scanNativeQrSignToQR();
+            } else {
+              Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
             }
-            var waitToSignInfo = "dtt=" + paramsMap["dtt"] + ";" + "v=" + paramsMap["v"]; //Transaction information to be signed
-            Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
-            NavigatorUtils.push(context, Routes.signTxPage);
-          }).catchError((e) {
-            // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
-          });
+          }
         }));
 
     jsChannelList.add(JavascriptChannel(
@@ -247,13 +290,17 @@ class _DappPageState extends State<DappPage> {
         name: "cashboxScan",
         onMessageReceived: (JavascriptMessage message) async {
           var msg = Message.fromJson(jsonDecode(message.message));
-          QrScanUtil.instance.qrscan().then((t) {
-            msg.data = t;
-            this.callPromise(msg);
-          }).catchError((e) {
-            msg.err = "inner error";
-            this.callPromise(msg);
-          });
+          var status = await Permission.camera.status;
+          if (status.isGranted) {
+            _scanCashboxScan(msg);
+          } else {
+            Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+            if (statuses[Permission.camera] == PermissionStatus.granted) {
+              _scanCashboxScan(msg);
+            } else {
+              Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+            }
+          }
         }));
     jsChannelList.add(JavascriptChannel(
         name: "cashboxTextToClipboard",
@@ -263,7 +310,7 @@ class _DappPageState extends State<DappPage> {
             Clipboard.setData(ClipboardData(text: msg.data));
             msg.data = '';
             msg.err = '';
-          }catch(e) {
+          } catch (e) {
             msg.err = 'cashboxTextToClipboard error';
           }
           this.callPromise(msg);
@@ -276,7 +323,7 @@ class _DappPageState extends State<DappPage> {
             var data = await Clipboard.getData(Clipboard.kTextPlain);
             msg.data = data.text;
             msg.err = '';
-          }catch(e) {
+          } catch (e) {
             msg.err = 'cashboxTextFromClipboard error';
           }
           this.callPromise(msg);
@@ -323,8 +370,8 @@ class _DappPageState extends State<DappPage> {
                       chainType = ChainType.ETH_TEST;
                     }
                     Wallets.instance
-                        .ethRawTxSign(
-                            msg.data, Chain.chainTypeToInt(chainType), wallet.getChainByChainType(chainType).chainAddress, Uint8List.fromList(pwdFormat))
+                        .ethRawTxSign(msg.data, Chain.chainTypeToInt(chainType), wallet.getChainByChainType(chainType).chainAddress,
+                            Uint8List.fromList(pwdFormat))
                         .then((map) {
                       int status = map["status"];
                       if (status == null || status != 200) {
@@ -371,7 +418,7 @@ class _DappPageState extends State<DappPage> {
               msg.data = str;
               this.callPromise(msg);
             });
-          }catch(e){
+          } catch (e) {
             print("" + e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
@@ -392,13 +439,13 @@ class _DappPageState extends State<DappPage> {
             }
             msg.data = await ethCall(chainType, data[0], data[1]);
             this.callPromise(msg);
-          }catch(e){
+          } catch (e) {
             print("" + e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
           }
         }));
-    
+
     //eee start
     jsChannelList.add(JavascriptChannel(
         name: "cashboxEeeRawTxSign",
@@ -420,14 +467,13 @@ class _DappPageState extends State<DappPage> {
                     if (wallet.walletType == WalletType.TEST_WALLET) {
                       chainType = ChainType.EEE_TEST;
                     }
-                    Wallets.instance.eeeTxSign(wallet.walletId, Uint8List.fromList(pwdFormat), msg.data)
-                        .then((map) {
+                    Wallets.instance.eeeTxSign(wallet.walletId, Uint8List.fromList(pwdFormat), msg.data).then((map) {
                       int status = map["status"];
                       if (status == null || status != 200) {
                         msg.err = map["message"];
                         if (msg.err == null || msg.err.length < 1) {
                           msg.err = "result nothing ";
-                        }else{
+                        } else {
                           msg.err = 'tx_sign_failure';
                           print("eeeTxSign: " + msg.err);
                         }

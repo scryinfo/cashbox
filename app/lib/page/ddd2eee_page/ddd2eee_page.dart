@@ -20,6 +20,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class Ddd2EeePage extends StatefulWidget {
@@ -381,15 +382,16 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                   ),
                   child: IconButton(
                     onPressed: () async {
-                      try {
-                        String qrResult = await QrScanUtil.instance.qrscan();
-                        print("qrResult===>" + qrResult.toString());
-                        setState(() {
-                          _eeeAddressController.text = qrResult.toString();
-                        });
-                      } catch (e) {
-                        LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
-                        Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
+                      var status = await Permission.camera.status;
+                      if (status.isGranted) {
+                        _scanQrContent();
+                      } else {
+                        Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+                        if (statuses[Permission.camera] == PermissionStatus.granted) {
+                          _scanQrContent();
+                        } else {
+                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                        }
                       }
                     },
                     icon: Image.asset("assets/images/ic_scan.png"),
@@ -401,6 +403,19 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         ],
       ),
     );
+  }
+
+  void _scanQrContent() async {
+    try {
+      String qrResult = await QrScanUtil.instance.qrscan();
+      print("qrResult===>" + qrResult.toString());
+      setState(() {
+        _eeeAddressController.text = qrResult.toString();
+      });
+    } catch (e) {
+      LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
+      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
+    }
   }
 
   Widget _buildGasFeeWidget() {

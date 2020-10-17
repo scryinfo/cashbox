@@ -85,23 +85,10 @@ public class MainActivity extends FlutterActivity {
                         new MethodCallHandler() {
                             @Override
                             public void onMethodCall(MethodCall call, Result result) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PERMISSION_GRANTED) {
-                                        //  ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED
-                                        ActivityCompat.requestPermissions(MainActivity.this, PERMISSION_LIST, CAMERA_AND_FILE_PERMISSION_REQ_CODE);
-                                    } else {
-                                        if (call.method.toString().equals(QR_SCAN_METHOD)) {
-                                            mFlutterChannelResult = result;
-                                            Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-                                            startActivityForResult(intent, REQUEST_CODE_QR_SCAN);
-                                        }
-                                    }
-                                } else {
-                                    if (call.method.toString().equals(QR_SCAN_METHOD)) {
-                                        mFlutterChannelResult = result;
-                                        Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-                                        startActivityForResult(intent, REQUEST_CODE_QR_SCAN);
-                                    }
+                                if (call.method.toString().equals(QR_SCAN_METHOD)) {
+                                    mFlutterChannelResult = result;
+                                    Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+                                    startActivityForResult(intent, REQUEST_CODE_QR_SCAN);
                                 }
                             }
                         }
@@ -221,16 +208,6 @@ public class MainActivity extends FlutterActivity {
             }
         } else {
             ScryLog.e("MainActivity", "unknown method result, requestCode is=========>" + requestCode);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        //判断“requestCode”是否为申请权限时设置请求码CAMERA_AND_FILE_PERMISSION_REQ_CODE，然后校验权限开启状态
-        if (requestCode == CAMERA_AND_FILE_PERMISSION_REQ_CODE && grantResults.length == PERMISSION_LIST.length && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-            //权限流程待优化，暂时只用到了相机
-        } else {
-            Toast.makeText(this, R.string.camera_and_file_permission_deny, Toast.LENGTH_LONG).show();
         }
     }
 }

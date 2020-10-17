@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,6 +14,7 @@ import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ImportWalletPage extends StatefulWidget {
   @override
@@ -171,14 +173,17 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   ),
                   child: GestureDetector(
                     onTap: () async {
-                      Future<String> qrResult = QrScanUtil.instance.qrscan();
-                      qrResult.then((t) {
-                        setState(() {
-                          _mneController.text = t.toString();
-                        });
-                      }).catchError((e) {
-                        Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'));
-                      });
+                      var status = await Permission.camera.status;
+                      if (status.isGranted) {
+                        _scanQrContent();
+                      } else {
+                        Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+                        if (statuses[Permission.camera] == PermissionStatus.granted) {
+                          _scanQrContent();
+                        } else {
+                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                        }
+                      }
                     },
                     child: Image.asset("assets/images/ic_scan.png"),
                   ),
@@ -189,6 +194,17 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
         ],
       ),
     );
+  }
+
+  void _scanQrContent() {
+    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    qrResult.then((t) {
+      setState(() {
+        _mneController.text = t.toString();
+      });
+    }).catchError((e) {
+      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'));
+    });
   }
 
   Widget _buildWalletNameWidget() {

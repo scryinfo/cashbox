@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../res/resources.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
@@ -145,14 +146,17 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
               alignment: Alignment.bottomRight,
               child: GestureDetector(
                 onTap: () async {
-                  Future<String> qrResult = QrScanUtil.instance.qrscan();
-                  qrResult.then((t) {
-                    setState(() {
-                      _mnemonicController.text = t.toString();
-                    });
-                  }).catchError((e) {
-                    Fluttertoast.showToast(msg: translate('qr_scan_unknown_error'));
-                  });
+                  var status = await Permission.camera.status;
+                  if (status.isGranted) {
+                    _scanQrContent();
+                  } else {
+                    Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+                    if (statuses[Permission.camera] == PermissionStatus.granted) {
+                      _scanQrContent();
+                    } else {
+                      Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                    }
+                  }
                 },
                 child: Image.asset("assets/images/ic_scan.png"),
               ),
@@ -161,6 +165,17 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
         ),
       ),
     );
+  }
+
+  void _scanQrContent() {
+    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    qrResult.then((t) {
+      setState(() {
+        _mnemonicController.text = t.toString();
+      });
+    }).catchError((e) {
+      Fluttertoast.showToast(msg: translate('qr_scan_unknown_error'));
+    });
   }
 
   Widget _buildChangeMnemonicWidget() {

@@ -4,6 +4,7 @@ import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -118,7 +119,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                 onPressed: () async {
                   var isSuccess = await _verifyMnemonicSame();
                   if (isSuccess) {
-                    Provider.of<CreateWalletProcessProvide>(context).emptyData(); /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
+                    Provider.of<CreateWalletProcessProvide>(context)
+                        .emptyData(); /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
                     NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
                     //NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                   } else {
@@ -174,14 +176,17 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
             alignment: Alignment.bottomRight,
             child: GestureDetector(
               onTap: () async {
-                Future<String> qrResult = QrScanUtil.instance.qrscan();
-                qrResult.then((t) {
-                  setState(() {
-                    this.verifyString = t.toString();
-                  });
-                }).catchError((e) {
-                  Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'));
-                });
+                var status = await Permission.camera.status;
+                if (status.isGranted) {
+                  _scanQrContent();
+                } else {
+                  Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+                  if (statuses[Permission.camera] == PermissionStatus.granted) {
+                    _scanQrContent();
+                  } else {
+                    Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                  }
+                }
               },
               child: Image.asset("assets/images/ic_scan.png"),
             ),
@@ -189,6 +194,17 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
         ],
       ),
     );
+  }
+
+  void _scanQrContent() {
+    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    qrResult.then((t) {
+      setState(() {
+        this.verifyString = t.toString();
+      });
+    }).catchError((e) {
+      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'));
+    });
   }
 
   List<Widget> _buildRandomMnemonicBtn() {
@@ -239,6 +255,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   @override
   void dispose() {
     super.dispose();
-    Provider.of<CreateWalletProcessProvide>(context).emptyData(); /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
+    Provider.of<CreateWalletProcessProvide>(context)
+        .emptyData(); /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
   }
 }
