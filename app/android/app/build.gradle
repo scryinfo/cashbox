@@ -82,6 +82,12 @@ android {
         }
     }
 
+    //test for ffi
+    // sourceSets{
+    //     // ...
+    //     main.jniLibs.srcDirs = ['libs']
+    // }
+
 }
 
 // 处理support版本和build tools版本的问题，如果运行没有问题则无需配置

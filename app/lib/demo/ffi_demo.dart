@@ -1,37 +1,34 @@
-/*import 'dart:ffi' as ffi;
+import 'dart:ffi';
 import 'dart:io' show Platform;
+/*
+* flutter直接引用so动态库，不需要管通过cmake等编译生成so的流程。
+*
+* 配置： 引入so库
+*     android平台：
+*         android/build.gradle文件
+*         sourceSets{
+            // ...
+            main.jniLibs.srcDirs = ['libs']
+          }
+      ios平台：
+          修改flutter_no_cpp_src.podspec文件
+          s.vendored_frameworks = 'some.framework'
+*  */
 
-typedef hello_world_func = ffi.Void Function();
+/*
+ preview：需要事先定义
 
-typedef HelloWorld = void Function();
+ 1、   C函数方法名 和 参数。
+ 即：  "native_add"     和     Int32,Int32
+ 文件位置？？
+*/
 
-class FfiDemoClass {
-  static void hello() {
-    var path = "./wallet.so";
-    if (Platform.isWindows) {
-      print("isWindows");
-      path = "./libwallet.so";
-    } else {
-      print("not isWindows:===>" + path);
-    }
-    //if (Platform.isMacOS) path = "hello_library\libhello.dll";
-    try {
-      final dylib = ffi.DynamicLibrary.open(path);
-      final HelloWorld helloExe = dylib.lookup<ffi.NativeFunction<hello_world_func>>('hello_world').asFunction();
-      helloExe();
-    } catch (e) {
-      print("e===>" + e);
-    }
-  }
+//用法
+final DynamicLibrary nativeAddLib = Platform.isAndroid
+    ? DynamicLibrary.open("libsome.so") //android目录下 so包名
+    : DynamicLibrary.open("some.framework/some");
+final int Function(int x, int y) nativeAdd = nativeAddLib.lookup<NativeFunction<Int32 Function(Int32, Int32)>>("native_add").asFunction();
 
-  static AssembleEthTx(String walletId, String value, String fromAddress, String toAddress) {
-
-  }
-}*/
-// WalletFFI walletFFI = new WalletFFI();
-// // todo ffi  assemble TX
-// var txResultString = walletFFI.assembleEthTx(walletId, value, fromAddress, toAddress, backup);
-// if (txResultString.isEmpty || txResultString.trim() == "") {
-//   LogUtil.e("ethTxSign=======>", "txResultString.isEmpty");
-//   return new Map();
-// }
+void testFunc(num a, num b) {
+  nativeAdd(a, b);
+}
