@@ -235,7 +235,7 @@ class _EthPageState extends State<EthPage> {
                   Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
                 }
               } else {
-                Fluttertoast.showToast(msg: translate('eee_config_error').toString(), timeInSecForIos: 3);
+                Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               }
               if (mounted) {
                 setState(() {

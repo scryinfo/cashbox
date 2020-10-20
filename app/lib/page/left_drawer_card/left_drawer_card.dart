@@ -226,7 +226,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                     if (isSuccess) {
                       NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=false', clearStack: true);
                     } else {
-                      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), timeInSecForIos: 8);
+                      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                     }
                   },
                   child: Column(

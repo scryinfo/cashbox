@@ -390,7 +390,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -414,7 +414,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
       });
     } catch (e) {
       LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
-      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
     }
   }
 
@@ -768,18 +768,18 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
 
   Future<bool> _verifyTransferInfo() async {
     if (_eeeAddressController.text.trim() == "") {
-      Fluttertoast.showToast(msg: translate('to_address_null').toString(), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('to_address_null').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
 
     //todo check eeeAddress by eee rule
     /* if (!Utils.checkByEthAddressFormat(_eeeAddressController.text)) {
-      Fluttertoast.showToast(msg: translate("to_address_format_wrong"), timeInSecForIos: 5);
+      Fluttertoast.showToast(msg: translate("to_address_format_wrong"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
       return false;
     }*/
 
     if (_dddAmountController.text.trim() == "" || double.parse(_dddAmountController.text.trim()) <= 0) {
-      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
     if (dddBalance == null || dddBalance == "" || double.parse(dddBalance) <= 0) {

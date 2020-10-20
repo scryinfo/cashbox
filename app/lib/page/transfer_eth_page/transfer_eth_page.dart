@@ -590,7 +590,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -614,7 +614,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       });
     } catch (e) {
       LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
-      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
     }
   }
 
@@ -732,10 +732,10 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 decimal: decimal);
             print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"].toString());
             if (result["status"] != null && result["status"] == 200) {
-              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), timeInSecForIos: 5);
+              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
               sendRawTx2Chain(result["ethSignedInfo"].toString());
             } else {
-              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), timeInSecForIos: 6);
+              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
             }
           },
@@ -750,9 +750,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
     String txHash = await sendRawTx(Wallets.instance.nowWallet.nowChain.chainType, rawTx);
     print("after broadcast txHash is===>" + txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
-      Fluttertoast.showToast(msg: translate("tx_upload_success"), timeInSecForIos: 8);
+      Fluttertoast.showToast(msg: translate("tx_upload_success"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
     } else {
-      Fluttertoast.showToast(msg: translate("tx_upload_failure"), timeInSecForIos: 8);
+      Fluttertoast.showToast(msg: translate("tx_upload_failure"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
     }
     {
       const timeout = Duration(seconds: 5);
@@ -767,7 +767,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
     nonce = await loadTxAccount(fromAddress, chainType);
     if (nonce == null || nonce.trim() == "") {
       print("取的nonce值有问题");
-      Fluttertoast.showToast(msg: translate("nonce_is_wrong"), timeInSecForIos: 8);
+      Fluttertoast.showToast(msg: translate("nonce_is_wrong"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
       NavigatorUtils.goBack(context);
       return false;
     }
@@ -776,17 +776,17 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   Future<bool> _verifyTransferInfo() async {
     if (_toAddressController.text.trim() == "") {
-      Fluttertoast.showToast(msg: translate('to_address_null').toString(), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('to_address_null').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
 
     if (!Utils.checkByEthAddressFormat(_toAddressController.text)) {
-      Fluttertoast.showToast(msg: translate("to_address_format_wrong"), timeInSecForIos: 5);
+      Fluttertoast.showToast(msg: translate("to_address_format_wrong"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
       return false;
     }
 
     if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
-      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
     //Determine if the balance is greater than the transfer amount

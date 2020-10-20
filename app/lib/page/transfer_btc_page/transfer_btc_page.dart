@@ -144,7 +144,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -167,7 +167,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
       });
     } catch (e) {
       LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
-      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 5);
+      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
     }
   }
 

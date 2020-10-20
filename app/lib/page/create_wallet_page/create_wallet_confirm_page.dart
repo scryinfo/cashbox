@@ -184,7 +184,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                   if (statuses[Permission.camera] == PermissionStatus.granted) {
                     _scanQrContent();
                   } else {
-                    Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                    Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                   }
                 }
               },

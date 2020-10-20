@@ -371,7 +371,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
     nonce = await loadTxAccount(fromExchangeAddress, chainType);
     if (nonce == null || nonce.trim() == "") {
       print("取的nonce值有问题");
-      Fluttertoast.showToast(msg: translate("nonce_is_wrong"), timeInSecForIos: 8);
+      Fluttertoast.showToast(msg: translate("nonce_is_wrong"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
       return false;
     }
     return true;
@@ -401,10 +401,10 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
                 nonce,
                 decimal: decimal);
             if (result != null && result.containsKey("status") && result["status"] == 200) {
-              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), timeInSecForIos: 5);
+              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
               sendRawTx2Chain(result["ethSignedInfo"].toString());
             } else {
-              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), timeInSecForIos: 6);
+              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
             }
           },
@@ -419,9 +419,9 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
     String txHash = await sendRawTx(chainType, rawTx);
     print("after broadcast txHash is===>" + txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
-      Fluttertoast.showToast(msg: translate("tx_upload_success"), timeInSecForIos: 8);
+      Fluttertoast.showToast(msg: translate("tx_upload_success"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
     } else {
-      Fluttertoast.showToast(msg: translate("tx_upload_failure"), timeInSecForIos: 8);
+      Fluttertoast.showToast(msg: translate("tx_upload_failure"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
     }
     {
       const timeout = Duration(seconds: 5);

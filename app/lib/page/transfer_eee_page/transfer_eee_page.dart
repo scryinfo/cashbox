@@ -55,7 +55,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
     ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
     Map eeeStorageKeyMap;
     if (digitName == null || digitName.isEmpty) {
-      Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return;
     }
     if (digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
@@ -69,7 +69,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
     }
     eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
     if (!_isMapStatusOk(eeeStorageKeyMap)) {
-      Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return;
     }
     nonce = eeeStorageKeyMap["nonce"];
@@ -94,7 +94,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
     {
       Map blockHashMap = await scryXNetUtil.loadScryXBlockHash();
       if (blockHashMap == null || !blockHashMap.containsKey("result")) {
-        Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
+        Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
         return;
       }
       genesisHash = blockHashMap["result"];
@@ -103,12 +103,12 @@ class _TransferEeePageState extends State<TransferEeePage> {
     {
       Map runtimeMap = await scryXNetUtil.loadScryXRuntimeVersion();
       if (runtimeMap == null || !runtimeMap.containsKey("result")) {
-        Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
+        Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
         return;
       }
       var resultMap = runtimeMap["result"];
       if (resultMap == null || !resultMap.containsKey("specVersion") || !resultMap.containsKey("transactionVersion")) {
-        Fluttertoast.showToast(msg: translate('eee_config_error'), timeInSecForIos: 3);
+        Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
         return;
       }
       runtimeVersion = resultMap["specVersion"];
@@ -238,7 +238,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -260,7 +260,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
         _toAddressController.text = qrResult.toString();
       });
     } catch (e) {
-      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
     }
   }
 
@@ -411,11 +411,11 @@ class _TransferEeePageState extends State<TransferEeePage> {
 
   bool _verifyDataFormat() {
     if (_toAddressController.text.trim() == "") {
-      Fluttertoast.showToast(msg: translate('to_address_null').toString(), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('to_address_null').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
     if (_txValueController.text.trim() == "") {
-      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), timeInSecForIos: 3);
+      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
     try {
@@ -466,18 +466,18 @@ class _TransferEeePageState extends State<TransferEeePage> {
                   txVersion,
                   Uint8List.fromList(pwd.codeUnits));
             } else {
-              Fluttertoast.showToast(msg: translate('eee_config_error').toString(), timeInSecForIos: 3);
+              Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
             }
             if (!_isMapStatusOk(eeeTransferMap)) {
-              Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), timeInSecForIos: 3);
+              Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
             }
             String signInfo = eeeTransferMap["signedInfo"];
             if (signInfo == null || signInfo.isEmpty) {
-              Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), timeInSecForIos: 3);
+              Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
             }

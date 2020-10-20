@@ -181,7 +181,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), timeInSecForIos: 8);
+                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -474,7 +474,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       if (isSuccess) {
         NavigatorUtils.push(context, '${Routes.ethPage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
       } else {
-        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'));
+        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
       }
     }
   }
