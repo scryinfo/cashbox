@@ -119,7 +119,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                     style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Colors.white,
-                      fontSize: ScreenUtil.instance.setSp(4.2),
+                      fontSize: ScreenUtil().setSp(4.2),
                       fontStyle: FontStyle.normal,
                     ),
                   ),
@@ -128,14 +128,14 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                   ),
                   TextSpan(
                     text: digitName ?? "*",
-                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3.5), fontStyle: FontStyle.normal),
+                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
                     text: " ",
                   ),
                   TextSpan(
                     text: "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
-                    style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil.instance.setSp(3.5), fontStyle: FontStyle.normal),
+                    style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
                   ),
                 ])),
               )),
@@ -167,7 +167,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                 translate('transfer'),
                 style: TextStyle(
                   color: Colors.lightBlue,
-                  fontSize: ScreenUtil.instance.setSp(3.5),
+                  fontSize: ScreenUtil().setSp(3.5),
                 ),
               ),
             ),
@@ -194,7 +194,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                       translate('transaction_history_record'),
                       style: TextStyle(
                         color: Colors.white70,
-                        fontSize: ScreenUtil.instance.setSp(3.5),
+                        fontSize: ScreenUtil().setSp(3.5),
                       ),
                     ),
                   ),
@@ -263,7 +263,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                     translate('data_loading').toString(),
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: ScreenUtil.instance.setSp(4),
+                      fontSize: ScreenUtil().setSp(4),
                     ),
                   );
                 }
@@ -350,7 +350,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                         ethTxListModel[index].value ?? "",
                         style: TextStyle(
                           color: Colors.greenAccent,
-                          fontSize: ScreenUtil.instance.setSp(3.5),
+                          fontSize: ScreenUtil().setSp(3.5),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -363,7 +363,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                         ethTxListModel[index].hash,
                         style: TextStyle(
                           color: Color.fromRGBO(255, 255, 255, 0.7),
-                          fontSize: ScreenUtil.instance.setSp(3),
+                          fontSize: ScreenUtil().setSp(3),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.clip,
@@ -389,7 +389,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                         ethTxListModel[index].isError ?? "",
                         style: TextStyle(
                           color: (ethTxListModel[index].isError == translate('tx_success')) ? Colors.white70 : Colors.redAccent,
-                          fontSize: ScreenUtil.instance.setSp(2.5),
+                          fontSize: ScreenUtil().setSp(2.5),
                         ),
                         textAlign: TextAlign.start,
                       ),
@@ -401,7 +401,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                         ethTxListModel[index].timeStamp,
                         style: TextStyle(
                           color: Colors.white70,
-                          fontSize: ScreenUtil.instance.setSp(2.5),
+                          fontSize: ScreenUtil().setSp(2.5),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

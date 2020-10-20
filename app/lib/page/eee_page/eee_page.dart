@@ -296,7 +296,7 @@ class _EeePageState extends State<EeePage> {
                                   (displayDigitsList[index].shortName ?? "") + " * " + (displayDigitsList[index].balance ?? "0.00"),
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: ScreenUtil.instance.setSp(3),
+                                    fontSize: ScreenUtil().setSp(3),
                                   ),
                                 ),
                               ),
@@ -304,13 +304,13 @@ class _EeePageState extends State<EeePage> {
                                 alignment: FractionalOffset.topRight,
                                 child: Container(
                                   padding: EdgeInsets.all(0.0),
-                                  width: ScreenUtil.instance.setWidth(30),
+                                  width: ScreenUtil().setWidth(30),
                                   child: Text(
                                     "≈" + moneyUnitStr + " " + displayDigitsList[index].money ?? "0.00",
                                     maxLines: 2,
                                     overflow: TextOverflow.visible,
                                     textAlign: TextAlign.right,
-                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
+                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3)),
                                   ),
                                 ),
                               ),
@@ -334,7 +334,7 @@ class _EeePageState extends State<EeePage> {
                                     //moneyUnitStr + " " + (displayDigitsList[index].digitRate.getPrice(moneyUnitStr).toStringAsFixed(5) ?? "0"), //Market price
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                      fontSize: ScreenUtil().setSp(2.5),
                                     ),
                                   ),
                                   Opacity(
@@ -343,7 +343,7 @@ class _EeePageState extends State<EeePage> {
                                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                       child: Text(
                                         displayDigitsList[index].digitRate.getChangeDaily ?? "0%", //Market price fluctuations
-                                        style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
+                                        style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil().setSp(2.5)),
                                       ),
                                     ),
                                   )
@@ -355,7 +355,7 @@ class _EeePageState extends State<EeePage> {
                                     opacity: 0,
                                     child: Text(
                                       "0", //Last transaction
-                                      style: TextStyle(fontSize: ScreenUtil.instance.setSp(2.5), color: Colors.greenAccent),
+                                      style: TextStyle(fontSize: ScreenUtil().setSp(2.5), color: Colors.greenAccent),
                                     ),
                                   )),
                             ],

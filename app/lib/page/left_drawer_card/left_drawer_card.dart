@@ -249,7 +249,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     walletList[index] != null ? walletList[index].walletName : "",
-                                    style: TextStyle(color: Colors.black87, fontSize: ScreenUtil.instance.setSp(3)),
+                                    style: TextStyle(color: Colors.black87, fontSize: ScreenUtil().setSp(3)),
                                     maxLines: 1,
                                   ),
                                 ),
@@ -258,7 +258,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
                                   margin: EdgeInsets.only(left: ScreenUtil().setWidth(3)),
                                   child: Text(
                                     walletList[index].accountMoney ?? "0",
-                                    style: TextStyle(color: Colors.grey, fontSize: ScreenUtil.instance.setSp(3)),
+                                    style: TextStyle(color: Colors.grey, fontSize: ScreenUtil().setSp(3)),
                                     maxLines: 1,
                                     textAlign: TextAlign.center,
                                     overflow: TextOverflow.ellipsis,
@@ -309,7 +309,7 @@ class _LeftDrawerCardState extends State<LeftDrawerCard> {
         width: ScreenUtil().setWidth(15),
         child: Text(
           Chain.chainTypeToValue(nowChain.chainType),
-          style: TextStyle(color: Colors.black54, fontSize: ScreenUtil.instance.setSp(3)),
+          style: TextStyle(color: Colors.black54, fontSize: ScreenUtil().setSp(3)),
         ),
       );
     });

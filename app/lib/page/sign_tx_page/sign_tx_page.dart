@@ -51,7 +51,7 @@ class _SignTxPageState extends State<SignTxPage> {
       decoration: BoxDecoration(
         image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
       ),
-      padding: EdgeInsets.only(left: ScreenUtil.instance.setWidth(5), right: ScreenUtil.instance.setWidth(5)),
+      padding: EdgeInsets.only(left: ScreenUtil().setWidth(5), right: ScreenUtil().setWidth(5)),
       child: Column(
         children: <Widget>[
           Gaps.scaleVGap(5),
@@ -59,13 +59,13 @@ class _SignTxPageState extends State<SignTxPage> {
             alignment: Alignment.centerLeft,
             child: Text(
               translate('wait_to_sign_info'),
-              style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
+              style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3)),
             ),
           ),
           Gaps.scaleVGap(2),
           Container(
             alignment: Alignment.center,
-            height: ScreenUtil.instance.setHeight(45),
+            height: ScreenUtil().setHeight(45),
             decoration: BoxDecoration(
               color: Color.fromRGBO(255, 255, 255, 0.06),
               border: Border.all(
@@ -74,7 +74,7 @@ class _SignTxPageState extends State<SignTxPage> {
               ),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Text(_waitToSignInfo ?? "", style: TextStyle(color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3))),
+            child: Text(_waitToSignInfo ?? "", style: TextStyle(color: Colors.white70, fontSize: ScreenUtil().setSp(3))),
           ),
           Gaps.scaleVGap(10),
           Container(
@@ -90,7 +90,7 @@ class _SignTxPageState extends State<SignTxPage> {
                 style: TextStyle(
                   color: Colors.blue,
                   letterSpacing: 0.03,
-                  fontSize: ScreenUtil.instance.setSp(3.5),
+                  fontSize: ScreenUtil().setSp(3.5),
                 ),
               ),
             ),

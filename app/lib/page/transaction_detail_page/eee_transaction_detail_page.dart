@@ -68,7 +68,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               translate('transfer_from_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.7),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -79,7 +79,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).fromAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -98,7 +98,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               translate('transfer_to_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -109,7 +109,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).toAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -128,7 +128,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               translate('transaction_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -139,7 +139,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).txValue,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -158,7 +158,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               translate('block_hash'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -169,7 +169,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).hash,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -188,7 +188,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               translate('transaction_timestamp'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -199,7 +199,7 @@ class _EeeTransactionDetailPageState extends State<EeeTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).timeStamp,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),

@@ -94,7 +94,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                   style: TextStyle(
                     color: Colors.blue,
                     letterSpacing: 0.03,
-                    fontSize: ScreenUtil.instance.setSp(3.5),
+                    fontSize: ScreenUtil().setSp(3.5),
                   ),
                 ),
               ),

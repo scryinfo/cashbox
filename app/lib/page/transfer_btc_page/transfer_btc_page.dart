@@ -77,7 +77,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
               translate('receive_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -93,7 +93,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.7),
-                      fontSize: ScreenUtil.instance.setSp(3.5),
+                      fontSize: ScreenUtil().setSp(3.5),
                     ),
                     maxLines: 1,
                     decoration: InputDecoration(
@@ -108,12 +108,12 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
                       labelStyle: TextStyle(
                         color: Colors.white,
                         height: ScreenUtil().setHeight(40),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                       hintText: translate('pls_input_receive_address'),
                       hintStyle: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.7),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black87),
@@ -181,7 +181,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
               translate('transaction_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -197,15 +197,15 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
                 contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil.instance.setHeight(3.5)),
+                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 hintText: translate('pls_input_transaction_amount'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black87),

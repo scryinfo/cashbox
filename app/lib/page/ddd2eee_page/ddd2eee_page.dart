@@ -165,7 +165,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               translate('exchange_instruction'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -179,7 +179,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                     style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Colors.white70,
-                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontSize: ScreenUtil().setSp(3),
                       fontStyle: FontStyle.normal,
                     )),
                 TextSpan(
@@ -187,7 +187,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                     style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Colors.white70,
-                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontSize: ScreenUtil().setSp(3),
                       fontStyle: FontStyle.normal,
                     )),
               ]),
@@ -208,7 +208,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               translate('exchange_from_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -219,7 +219,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               fromAddress ?? "",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -238,7 +238,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               translate('exchange_to_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -249,7 +249,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               toExchangeAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -268,7 +268,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               translate('exchange_ddd_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -284,15 +284,15 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
                 contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil.instance.setHeight(3.5)),
+                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 hintText: translate('pls_input_exchange_amount'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.6),
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black87),
@@ -322,7 +322,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               translate('to_eee_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -339,7 +339,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.6),
-                      fontSize: ScreenUtil.instance.setSp(3.5),
+                      fontSize: ScreenUtil().setSp(3.5),
                     ),
                     maxLines: 1,
                     decoration: InputDecoration(
@@ -354,12 +354,12 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                       labelStyle: TextStyle(
                         color: Colors.white,
                         height: ScreenUtil().setHeight(40),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                       hintText: translate('pls_input_eee_address'),
                       hintStyle: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.7),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black87),
@@ -428,24 +428,24 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               child: Row(
                 children: <Widget>[
                   Container(
-                    width: ScreenUtil.instance.setWidth(40),
+                    width: ScreenUtil().setWidth(40),
                     alignment: Alignment.centerLeft,
                     child: Text(
                       translate('mine_fee'),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                     ),
                   ),
                   Container(
                     alignment: Alignment.topRight,
-                    width: ScreenUtil.instance.setWidth(40),
+                    width: ScreenUtil().setWidth(40),
                     child: Text(
                       Utils.formatDouble(mGasFeeValue, precision: precision).toString(),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                     ),
                   )
@@ -464,7 +464,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               overlayColor: Colors.blueAccent,
             ),
             child: new Container(
-              margin: EdgeInsets.only(left: ScreenUtil.getInstance().setWidth(2)),
+              margin: EdgeInsets.only(left: ScreenUtil().setWidth(2)),
               child: new Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -473,7 +473,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                     mMinGasFee.toString(),
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.8),
-                      fontSize: ScreenUtil.instance.setSp(2.3),
+                      fontSize: ScreenUtil().setSp(2.3),
                     ),
                   ),
                   new Expanded(
@@ -494,7 +494,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                     mMaxGasFee.toString(),
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.8),
-                      fontSize: ScreenUtil.instance.setSp(2.3),
+                      fontSize: ScreenUtil().setSp(2.3),
                     ),
                   ),
                 ],
@@ -520,12 +520,12 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                 children: <Widget>[
                   Container(
                     alignment: Alignment.topRight,
-                    width: ScreenUtil.instance.setWidth(75),
+                    width: ScreenUtil().setWidth(75),
                     child: Text(
                       translate('high_setting').toString(),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.8),
-                        fontSize: ScreenUtil.instance.setSp(2.5),
+                        fontSize: ScreenUtil().setSp(2.5),
                       ),
                     ),
                   ),
@@ -557,24 +557,24 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                           child: Row(
                             children: <Widget>[
                               Container(
-                                width: ScreenUtil.instance.setWidth(40),
+                                width: ScreenUtil().setWidth(40),
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   translate('gas_price').toString(),
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.5),
-                                    fontSize: ScreenUtil.instance.setSp(2.5),
+                                    fontSize: ScreenUtil().setSp(2.5),
                                   ),
                                 ),
                               ),
                               Container(
                                 alignment: Alignment.topRight,
-                                width: ScreenUtil.instance.setWidth(40),
+                                width: ScreenUtil().setWidth(40),
                                 child: Text(
                                   Utils.formatDouble(mGasPriceValue, precision: precision).toString() + " wei",
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.5),
-                                    fontSize: ScreenUtil.instance.setSp(2.5),
+                                    fontSize: ScreenUtil().setSp(2.5),
                                   ),
                                 ),
                               )
@@ -603,7 +603,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                                   mMinGasPrice.toString() + Gwei,
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
-                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                    fontSize: ScreenUtil().setSp(2.3),
                                   ),
                                 ),
                                 new Expanded(
@@ -626,7 +626,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                                   mMaxGasPrice.toString() + Gwei,
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
-                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                    fontSize: ScreenUtil().setSp(2.3),
                                   ),
                                 ),
                               ],
@@ -644,24 +644,24 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                             child: Row(
                               children: <Widget>[
                                 Container(
-                                  width: ScreenUtil.instance.setWidth(40),
+                                  width: ScreenUtil().setWidth(40),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     translate('gas_limit').toString(),
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                      fontSize: ScreenUtil().setSp(2.5),
                                     ),
                                   ),
                                 ),
                                 Container(
                                   alignment: Alignment.topRight,
-                                  width: ScreenUtil.instance.setWidth(40),
+                                  width: ScreenUtil().setWidth(40),
                                   child: Text(
                                     mGasLimitValue.toString(),
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                      fontSize: ScreenUtil().setSp(2.5),
                                     ),
                                   ),
                                 )
@@ -689,7 +689,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                                   mMinGasLimit.toString(),
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
-                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                    fontSize: ScreenUtil().setSp(2.3),
                                   ),
                                 ),
                                 new Expanded(
@@ -712,7 +712,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                                   mMaxGasLimit.toString(),
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
-                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                    fontSize: ScreenUtil().setSp(2.3),
                                   ),
                                 ),
                               ],

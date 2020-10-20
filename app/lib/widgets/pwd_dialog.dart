@@ -29,7 +29,7 @@ class PwdDialog extends StatelessWidget {
       ),
       titleTextStyle: TextStyle(
         color: Colors.black,
-        fontSize: ScreenUtil.instance.setSp(4),
+        fontSize: ScreenUtil().setSp(4),
       ),
       content: Container(
         margin: EdgeInsets.only(left: 7, right: 6),
@@ -47,7 +47,7 @@ class PwdDialog extends StatelessWidget {
                   textAlign: TextAlign.start,
                   style: TextStyle(
                     color: Color.fromRGBO(0, 0, 0, 0.8),
-                    fontSize: ScreenUtil.instance.setSp(2.5),
+                    fontSize: ScreenUtil().setSp(2.5),
                   ),
                 ),
               ),
@@ -69,7 +69,7 @@ class PwdDialog extends StatelessWidget {
                     hintText: hintInput,
                     hintStyle: TextStyle(
                       color: Color.fromRGBO(0, 0, 0, 0.7),
-                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontSize: ScreenUtil().setSp(3),
                     ),
                     contentPadding: EdgeInsets.only(
                       left: ScreenUtil().setWidth(2),
@@ -88,7 +88,7 @@ class PwdDialog extends StatelessWidget {
       ),
       contentTextStyle: TextStyle(
         color: Colors.black45,
-        fontSize: ScreenUtil.instance.setSp(3),
+        fontSize: ScreenUtil().setSp(3),
       ),
       actions: <Widget>[
         new FlatButton(

@@ -72,7 +72,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
               translate('tx_confirm_instruction_title'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.7),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -86,7 +86,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
                     style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Colors.redAccent,
-                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontSize: ScreenUtil().setSp(3),
                       fontStyle: FontStyle.normal,
                     )),
               ]),
@@ -107,7 +107,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
               translate('transfer_from_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.7),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -118,7 +118,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
               Provider.of<TransactionProvide>(context).fromAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.8),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -137,7 +137,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
               translate('transfer_to_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -148,7 +148,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
               Provider.of<TransactionProvide>(context).toAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.8),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -167,7 +167,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
               translate('transaction_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -178,7 +178,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
               Provider.of<TransactionProvide>(context).txValue,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.8),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),

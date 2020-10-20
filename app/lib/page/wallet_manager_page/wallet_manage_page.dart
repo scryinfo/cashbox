@@ -108,7 +108,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               translate('wallet_name'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 1),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),

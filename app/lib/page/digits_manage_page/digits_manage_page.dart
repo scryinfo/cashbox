@@ -144,7 +144,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             ),
             actions: <Widget>[
               Container(
-                width: ScreenUtil.instance.setWidth(10),
+                width: ScreenUtil().setWidth(10),
                 child: Row(
                   children: <Widget>[
                     GestureDetector(
@@ -302,7 +302,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                         displayDigitsList[index].shortName ?? "",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: ScreenUtil.instance.setSp(3.5),
+                          fontSize: ScreenUtil().setSp(3.5),
                         ),
                       ),
                     ),

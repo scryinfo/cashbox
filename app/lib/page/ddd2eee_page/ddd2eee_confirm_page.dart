@@ -125,7 +125,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               translate('exchange_from_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -136,7 +136,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               fromExchangeAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.3),
+                fontSize: ScreenUtil().setSp(3.3),
               ),
             ),
           ),
@@ -155,7 +155,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               translate('exchange_to_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -166,7 +166,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               toExchangeAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.3),
+                fontSize: ScreenUtil().setSp(3.3),
               ),
             ),
           ),
@@ -185,7 +185,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               translate('eee_target_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -196,7 +196,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               eeeAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.3),
+                fontSize: ScreenUtil().setSp(3.3),
               ),
             ),
           ),
@@ -215,7 +215,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               translate('exchange_ddd_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -226,7 +226,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               dddAmount,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.3),
+                fontSize: ScreenUtil().setSp(3.3),
               ),
             ),
           ),
@@ -245,7 +245,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               translate('gas_price'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -256,7 +256,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               gasPrice,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.3),
+                fontSize: ScreenUtil().setSp(3.3),
               ),
             ),
           ),
@@ -275,7 +275,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               translate('gas_limit'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -286,7 +286,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               gasLimit,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.3),
+                fontSize: ScreenUtil().setSp(3.3),
               ),
             ),
           ),
@@ -305,7 +305,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               translate('exchange_confirm_instruction'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -319,7 +319,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
                     style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Colors.redAccent,
-                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontSize: ScreenUtil().setSp(3),
                       fontStyle: FontStyle.normal,
                     )),
                 TextSpan(
@@ -327,7 +327,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
                     style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Colors.redAccent,
-                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontSize: ScreenUtil().setSp(3),
                       fontStyle: FontStyle.normal,
                     )),
               ]),

@@ -103,7 +103,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
             style: TextStyle(
               color: Colors.blue,
               letterSpacing: 0.03,
-              fontSize: ScreenUtil.instance.setSp(3.5),
+              fontSize: ScreenUtil().setSp(3.5),
             ),
           ),
         ),
@@ -121,7 +121,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               translate('wallet_name'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(4),
+                fontSize: ScreenUtil().setSp(4),
               ),
             ),
           ),
@@ -168,7 +168,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               translate('wallet_pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -216,7 +216,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
               translate('pls_pwd_again'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -264,7 +264,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
             translate('choose_multi_chain'),
             style: TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.85),
-              fontSize: ScreenUtil.instance.setSp(3.5),
+              fontSize: ScreenUtil().setSp(3.5),
             ),
           ),
         ),

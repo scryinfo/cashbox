@@ -176,7 +176,7 @@ class _DigitListPageState extends State<DigitListPage> {
                     displayDigitsList[index].shortName ?? "",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: ScreenUtil.instance.setSp(3.5),
+                      fontSize: ScreenUtil().setSp(3.5),
                     ),
                   ),
                 ),

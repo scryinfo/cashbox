@@ -113,7 +113,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                     style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Colors.white,
-                      fontSize: ScreenUtil.instance.setSp(4.2),
+                      fontSize: ScreenUtil().setSp(4.2),
                       fontStyle: FontStyle.normal,
                     ),
                   ),
@@ -122,14 +122,14 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                   ),
                   TextSpan(
                     text: digitName ?? "*",
-                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3.5), fontStyle: FontStyle.normal),
+                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
                     text: " ",
                   ),
                   TextSpan(
                     text: "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
-                    style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil.instance.setSp(3.5), fontStyle: FontStyle.normal),
+                    style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
                   ),
                 ])),
               )),
@@ -157,7 +157,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                 translate('transfer'),
                 style: TextStyle(
                   color: Colors.lightBlue,
-                  fontSize: ScreenUtil.instance.setSp(3.5),
+                  fontSize: ScreenUtil().setSp(3.5),
                 ),
               ),
             ),
@@ -184,7 +184,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                       translate('transaction_history_record'),
                       style: TextStyle(
                         color: Colors.white70,
-                        fontSize: ScreenUtil.instance.setSp(3.5),
+                        fontSize: ScreenUtil().setSp(3.5),
                       ),
                     ),
                   ),
@@ -254,7 +254,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                     translate('data_loading').toString(),
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: ScreenUtil.instance.setSp(4),
+                      fontSize: ScreenUtil().setSp(4),
                     ),
                   );
                 }
@@ -351,7 +351,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                             : "+" + eeeTxListModel[index].value ?? "",
                         style: TextStyle(
                           color: Colors.greenAccent,
-                          fontSize: ScreenUtil.instance.setSp(3.5),
+                          fontSize: ScreenUtil().setSp(3.5),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -364,7 +364,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                         eeeTxListModel[index].blockHash, //hash
                         style: TextStyle(
                           color: Color.fromRGBO(255, 255, 255, 0.7),
-                          fontSize: ScreenUtil.instance.setSp(3),
+                          fontSize: ScreenUtil().setSp(3),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.clip,
@@ -390,7 +390,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                         eeeTxListModel[index].isSuccess ? translate('tx_success') : translate('tx_failure'),
                         style: TextStyle(
                           color: eeeTxListModel[index].isSuccess ? Colors.white70 : Colors.redAccent,
-                          fontSize: ScreenUtil.instance.setSp(2.5),
+                          fontSize: ScreenUtil().setSp(2.5),
                         ),
                         textAlign: TextAlign.start,
                       ),
@@ -402,7 +402,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                         eeeTxListModel[index].timeStamp,
                         style: TextStyle(
                           color: Colors.white70,
-                          fontSize: ScreenUtil.instance.setSp(2.5),
+                          fontSize: ScreenUtil().setSp(2.5),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

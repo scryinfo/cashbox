@@ -21,8 +21,8 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
     return Scaffold(
       appBar: AppBar(title: Text("html demo")),
       body: Container(
-        width: ScreenUtil.instance.setWidth(90),
-        height: ScreenUtil.instance.setHeight(160),
+        width: ScreenUtil().setWidth(90),
+        height: ScreenUtil().setHeight(160),
         color: Colors.blueAccent,
         child: WebView(
           initialUrl: "http://192.168.1.4:8080",

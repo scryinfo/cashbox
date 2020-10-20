@@ -204,7 +204,7 @@ class _EntryPageState extends State<EntryPage> {
   @override
   Widget build(BuildContext context) {
     ///Initialize the screen aspect ratio, based on the cashbox cut-out, marked with XXXHDPI@4x
-    ScreenUtil.instance = ScreenUtil(width: 90, height: 160)..init(context);
+    ScreenUtil.init(context, designSize: Size(90, 160), allowFontScaling: false);
 
     return Container(
       child: FutureBuilder(
@@ -268,8 +268,8 @@ class _EntryPageState extends State<EntryPage> {
 
   Widget _buildChangeLanguageWidget(context) {
     return Container(
-      margin: EdgeInsets.only(left: ScreenUtil.instance.setWidth(50)),
-      width: ScreenUtil.instance.setWidth(25),
+      margin: EdgeInsets.only(left: ScreenUtil().setWidth(50)),
+      width: ScreenUtil().setWidth(25),
       color: Color.fromRGBO(0, 0, 0, 0.05),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -343,7 +343,7 @@ class _EntryPageState extends State<EntryPage> {
             Text(
               translate('add_wallet'),
               style:
-                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
+                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -371,7 +371,7 @@ class _EntryPageState extends State<EntryPage> {
             Text(
               translate('import_wallet'),
               style:
-                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
+                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -404,14 +404,14 @@ class _EntryPageState extends State<EntryPage> {
                   TextSpan(
                     text: translate('agree_service_prefix'),
                     style: TextStyle(
-                        decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
+                        decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
                       text: translate('service_protocol_tag'),
                       style: TextStyle(
                           decoration: TextDecoration.underline,
                           color: Colors.white70,
-                          fontSize: ScreenUtil.instance.setSp(3),
+                          fontSize: ScreenUtil().setSp(3),
                           fontStyle: FontStyle.normal),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
@@ -420,14 +420,14 @@ class _EntryPageState extends State<EntryPage> {
                   TextSpan(
                     text: "、",
                     style: TextStyle(
-                        decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil.instance.setSp(3), fontStyle: FontStyle.normal),
+                        decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
                       text: translate('privacy_protocol_tag'),
                       style: TextStyle(
                           decoration: TextDecoration.underline,
                           color: Colors.white70,
-                          fontSize: ScreenUtil.instance.setSp(3),
+                          fontSize: ScreenUtil().setSp(3),
                           fontStyle: FontStyle.normal),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {

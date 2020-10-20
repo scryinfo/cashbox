@@ -74,10 +74,10 @@ class _DappPageState extends State<DappPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: ScreenUtil.instance.setWidth(90),
-        height: ScreenUtil.instance.setHeight(160),
+        width: ScreenUtil().setWidth(90),
+        height: ScreenUtil().setHeight(160),
         child: Container(
-          margin: EdgeInsets.only(top: ScreenUtil.instance.setHeight(4.5)),
+          margin: EdgeInsets.only(top: ScreenUtil().setHeight(4.5)),
           child: WebView(
             // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
             // initialUrl:"http://192.168.1.12:9010/web_app/dapp/dapp.html",

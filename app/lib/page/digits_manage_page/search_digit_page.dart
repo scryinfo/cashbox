@@ -74,7 +74,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
 
   Widget buildCancelWidget() {
     return Container(
-        width: ScreenUtil.instance.setWidth(10),
+        width: ScreenUtil().setWidth(10),
         child: Row(
           children: <Widget>[
             RichText(
@@ -84,7 +84,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                     style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Colors.white70,
-                      fontSize: ScreenUtil.instance.setSp(3),
+                      fontSize: ScreenUtil().setSp(3),
                       fontStyle: FontStyle.normal,
                     ),
                     recognizer: TapGestureRecognizer()
@@ -103,15 +103,15 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
 
   Widget buildSearchInputWidget() {
     return Container(
-      width: ScreenUtil.instance.setWidth(60),
+      width: ScreenUtil().setWidth(60),
       //Retouched black background with rounded corners
       decoration: new BoxDecoration(
-        border: Border.all(color: Colors.grey, width: ScreenUtil.instance.setWidth(1)), //Gray layer border
+        border: Border.all(color: Colors.grey, width: ScreenUtil().setWidth(1)), //Gray layer border
         color: Colors.grey,
-        borderRadius: new BorderRadius.all(new Radius.circular(ScreenUtil.instance.setWidth(3))),
+        borderRadius: new BorderRadius.all(new Radius.circular(ScreenUtil().setWidth(3))),
       ),
       alignment: Alignment.center,
-      height: ScreenUtil.instance.setHeight(8),
+      height: ScreenUtil().setHeight(8),
       child: buildSearchTextFieldWidget(),
     );
   }
@@ -123,10 +123,10 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
         autofocus: true,
         //Set cursor
         decoration: InputDecoration(
-          contentPadding: new EdgeInsets.only(bottom: ScreenUtil.instance.setHeight(2.5), left: ScreenUtil.instance.setWidth(0)),
+          contentPadding: new EdgeInsets.only(bottom: ScreenUtil().setHeight(2.5), left: ScreenUtil().setWidth(0)),
           border: InputBorder.none,
           icon: Container(
-            width: ScreenUtil.instance.setWidth(7),
+            width: ScreenUtil().setWidth(7),
             child: IconButton(
               icon: Icon(Icons.search),
               onPressed: () {
@@ -135,7 +135,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
             ),
           ),
           hintText: translate("input_ca_or_name"),
-          hintStyle: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white30),
+          hintStyle: new TextStyle(fontSize: ScreenUtil().setSp(3), color: Colors.white30),
           labelStyle: TextStyle(),
         ),
         onSubmitted: (value) {
@@ -144,7 +144,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
         controller: _searchContentController,
         //Text alignment (i.e. initial cursor position)
         textAlign: TextAlign.start,
-        style: new TextStyle(fontSize: ScreenUtil.instance.setSp(3), color: Colors.white),
+        style: new TextStyle(fontSize: ScreenUtil().setSp(3), color: Colors.white),
       ),
     );
   }
@@ -294,7 +294,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                         displayDigitsList[index].shortName ?? "",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: ScreenUtil.instance.setSp(3.5),
+                          fontSize: ScreenUtil().setSp(3.5),
                         ),
                       ),
                     ),

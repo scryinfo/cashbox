@@ -71,7 +71,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
             child: Text(
               appVersion,
               style:
-                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil.instance.setSp(4), fontStyle: FontStyle.normal),
+                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
             ),
           ),
           Gaps.scaleVGap(8),
@@ -84,7 +84,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
               translate("wallet_explanation"),
               style: TextStyle(
                 color: Colors.white,
-                fontSize: ScreenUtil.instance.setSp(3.2),
+                fontSize: ScreenUtil().setSp(3.2),
               ),
             ),
           ),

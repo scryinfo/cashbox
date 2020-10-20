@@ -215,7 +215,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
               translate('wallet_name'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(4),
+                fontSize: ScreenUtil().setSp(4),
               ),
             ),
           ),
@@ -262,7 +262,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
               translate('wallet_pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -283,7 +283,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                 hintText: translate('pls_set_wallet_pwd'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black87),
@@ -310,7 +310,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
               translate('choose_multi_chain'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -338,7 +338,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                             translate('eee_chain_test,
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: ScreenUtil.instance.setSp(3),
+                              fontSize: ScreenUtil().setSp(3),
                             ),
                           ),
                         ],
@@ -362,7 +362,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                             translate('eth_test_chain_name'), //eth_test_chain_name
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: ScreenUtil.instance.setSp(3),
+                              fontSize: ScreenUtil().setSp(3),
                             ),
                           ),
                         ],
@@ -394,7 +394,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           style: TextStyle(
             color: Colors.blue,
             letterSpacing: 0.03,
-            fontSize: ScreenUtil.instance.setSp(3.2),
+            fontSize: ScreenUtil().setSp(3.2),
           ),
         ),
       ),

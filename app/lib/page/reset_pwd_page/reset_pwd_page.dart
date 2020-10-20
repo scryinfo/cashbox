@@ -102,7 +102,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
               translate('old_pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -120,7 +120,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 hintText: translate('pls_input_old_pwd'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black87),
@@ -147,7 +147,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
               translate('new_pwd'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -168,7 +168,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 hintText: translate('new_pwd_format_hint'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black87),
@@ -195,7 +195,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
               translate('rewrite_new_pwd_format_hint'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -216,7 +216,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
                 hintText: translate('rewrite_new_pwd_format_hint'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black87),

@@ -30,8 +30,8 @@ class _FlutterWebViewPluginDemo extends State<FlutterWebViewPluginDemo> {
     return Scaffold(
       appBar: AppBar(title: Text("html demo")),
       body: Container(
-        width: ScreenUtil.instance.setWidth(90),
-        height: ScreenUtil.instance.setHeight(160),
+        width: ScreenUtil().setWidth(90),
+        height: ScreenUtil().setHeight(160),
         color: Colors.blueAccent,
         child: WebviewScaffold(   //Description: WebViewScaffold cannot interact with js
           //url: "file:///android_asset/flutter_assets/assets/dist/index.html",

@@ -153,7 +153,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                           _showAddressInQR(context, walletName, translate('mnemonic_qr_info'), mnemonicList.join(" ").toString());
                         },
                         child: Container(
-                          width: ScreenUtil.instance.setWidth(20),
+                          width: ScreenUtil().setWidth(20),
                           child: Text(
                             translate('qr_backup'),
                             maxLines: 2,

@@ -166,24 +166,24 @@ class _TransferEthPageState extends State<TransferEthPage> {
               child: Row(
                 children: <Widget>[
                   Container(
-                    width: ScreenUtil.instance.setWidth(40),
+                    width: ScreenUtil().setWidth(40),
                     alignment: Alignment.centerLeft,
                     child: Text(
                       translate('mine_fee'),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                     ),
                   ),
                   Container(
                     alignment: Alignment.topRight,
-                    width: ScreenUtil.instance.setWidth(40),
+                    width: ScreenUtil().setWidth(40),
                     child: Text(
                       Utils.formatDouble(mGasFeeValue, precision: precision).toString() + (digitName ?? ""),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                     ),
                   )
@@ -202,7 +202,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               overlayColor: Colors.blueAccent,
             ),
             child: new Container(
-              margin: EdgeInsets.only(left: ScreenUtil.getInstance().setWidth(2)),
+              margin: EdgeInsets.only(left: ScreenUtil().setWidth(2)),
               child: new Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -211,7 +211,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     mMinGasFee.toString(),
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.8),
-                      fontSize: ScreenUtil.instance.setSp(2.3),
+                      fontSize: ScreenUtil().setSp(2.3),
                     ),
                   ),
                   new Expanded(
@@ -233,7 +233,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     mMaxGasFee.toString(),
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.8),
-                      fontSize: ScreenUtil.instance.setSp(2.3),
+                      fontSize: ScreenUtil().setSp(2.3),
                     ),
                   ),
                 ],
@@ -259,12 +259,12 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 children: <Widget>[
                   Container(
                     alignment: Alignment.topRight,
-                    width: ScreenUtil.instance.setWidth(75),
+                    width: ScreenUtil().setWidth(75),
                     child: Text(
                       translate('high_setting').toString(),
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.8),
-                        fontSize: ScreenUtil.instance.setSp(2.5),
+                        fontSize: ScreenUtil().setSp(2.5),
                       ),
                     ),
                   ),
@@ -296,24 +296,24 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             child: Row(
                               children: <Widget>[
                                 Container(
-                                  width: ScreenUtil.instance.setWidth(40),
+                                  width: ScreenUtil().setWidth(40),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     translate('gas_price').toString(),
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                      fontSize: ScreenUtil().setSp(2.5),
                                     ),
                                   ),
                                 ),
                                 Container(
                                   alignment: Alignment.topRight,
-                                  width: ScreenUtil.instance.setWidth(40),
+                                  width: ScreenUtil().setWidth(40),
                                   child: Text(
                                     Utils.formatDouble(mGasPriceValue, precision: precision).toString() + " wei",
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                      fontSize: ScreenUtil().setSp(2.5),
                                     ),
                                   ),
                                 )
@@ -341,7 +341,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   mMinGasPrice.toString() + Gwei,
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
-                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                    fontSize: ScreenUtil().setSp(2.3),
                                   ),
                                 ),
                                 new Expanded(
@@ -364,7 +364,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   mMaxGasPrice.toString() + Gwei,
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
-                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                    fontSize: ScreenUtil().setSp(2.3),
                                   ),
                                 ),
                               ],
@@ -382,24 +382,24 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             child: Row(
                               children: <Widget>[
                                 Container(
-                                  width: ScreenUtil.instance.setWidth(40),
+                                  width: ScreenUtil().setWidth(40),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     translate('gas_limit').toString(),
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                      fontSize: ScreenUtil().setSp(2.5),
                                     ),
                                   ),
                                 ),
                                 Container(
                                   alignment: Alignment.topRight,
-                                  width: ScreenUtil.instance.setWidth(40),
+                                  width: ScreenUtil().setWidth(40),
                                   child: Text(
                                     mGasLimitValue.toString(),
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                      fontSize: ScreenUtil().setSp(2.5),
                                     ),
                                   ),
                                 )
@@ -427,7 +427,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   mMinGasLimit.toString(),
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
-                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                    fontSize: ScreenUtil().setSp(2.3),
                                   ),
                                 ),
                                 new Expanded(
@@ -450,7 +450,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   mMaxGasLimit.toString(),
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
-                                    fontSize: ScreenUtil.instance.setSp(2.3),
+                                    fontSize: ScreenUtil().setSp(2.3),
                                   ),
                                 ),
                               ],
@@ -469,7 +469,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                             translate('extend_msg'),
                             style: TextStyle(
                               color: Color.fromRGBO(255, 255, 255, 0.5),
-                              fontSize: ScreenUtil.instance.setSp(3),
+                              fontSize: ScreenUtil().setSp(3),
                             ),
                           ),
                         ),
@@ -491,7 +491,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                               hintText: translate('hint_extend_msg_option'),
                               hintStyle: TextStyle(
                                 color: Color.fromRGBO(255, 255, 255, 0.6),
-                                fontSize: ScreenUtil.instance.setSp(3),
+                                fontSize: ScreenUtil().setSp(3),
                               ),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black87),
@@ -523,7 +523,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               translate('receive_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -539,7 +539,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       color: Color.fromRGBO(255, 255, 255, 0.7),
-                      fontSize: ScreenUtil.instance.setSp(3.5),
+                      fontSize: ScreenUtil().setSp(3.5),
                     ),
                     maxLines: 1,
                     decoration: InputDecoration(
@@ -554,12 +554,12 @@ class _TransferEthPageState extends State<TransferEthPage> {
                       labelStyle: TextStyle(
                         color: Colors.white,
                         height: ScreenUtil().setHeight(40),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                       hintText: translate('pls_input_receive_address'),
                       hintStyle: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.7),
-                        fontSize: ScreenUtil.instance.setSp(3),
+                        fontSize: ScreenUtil().setSp(3),
                       ),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black87),
@@ -628,7 +628,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               translate('transaction_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3),
+                fontSize: ScreenUtil().setSp(3),
               ),
             ),
           ),
@@ -644,15 +644,15 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
                 contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil.instance.setHeight(3.5)),
+                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 hintText: translate('pls_input_transaction_amount'),
                 hintStyle: TextStyle(
                   color: Color.fromRGBO(255, 255, 255, 0.7),
-                  fontSize: ScreenUtil.instance.setSp(3),
+                  fontSize: ScreenUtil().setSp(3),
                 ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.black87),

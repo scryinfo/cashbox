@@ -73,7 +73,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
                           hintInfo ?? "",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: ScreenUtil.instance.setSp(3.5),
+                            fontSize: ScreenUtil().setSp(3.5),
                           ),
                         ),
                       ),
@@ -101,7 +101,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
                             content ?? "",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: ScreenUtil.instance.setSp(3),
+                              fontSize: ScreenUtil().setSp(3),
                             ),
                             maxLines: 3,
                           ),
@@ -128,7 +128,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
                     style: TextStyle(
                       color: Colors.blue,
                       letterSpacing: 0.03,
-                      fontSize: ScreenUtil.instance.setSp(3.5),
+                      fontSize: ScreenUtil().setSp(3.5),
                     ),
                   ),
                 ),

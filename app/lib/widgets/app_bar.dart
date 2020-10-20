@@ -44,7 +44,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                     width: double.infinity,
                     child: Text(title.isEmpty ? centerTitle : title,
                         style: TextStyle(
-                          fontSize: ScreenUtil.instance.setSp(4.5),
+                          fontSize: ScreenUtil().setSp(4.5),
                           color: _overlayStyle == SystemUiOverlayStyle.light ? Colors.white : Colours.text_dark,
                         )),
                     padding: const EdgeInsets.symmetric(horizontal: 48.0),

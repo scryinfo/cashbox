@@ -78,7 +78,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               translate('transfer_from_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.7),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -89,7 +89,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).fromAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -108,7 +108,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               translate('transfer_to_address'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -119,7 +119,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).toAddress,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -138,7 +138,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               translate('transaction_amount'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -149,7 +149,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).txValue,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -168,7 +168,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               translate('tx_hash'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -179,7 +179,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).hash,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -198,7 +198,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               translate('transaction_timestamp'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -209,7 +209,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).timeStamp,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -228,7 +228,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               translate('gas_used'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -239,7 +239,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).gasUsed,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -258,7 +258,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               translate('gas_price'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -269,7 +269,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).gasPrice,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -288,7 +288,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               translate('tx_backup'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -299,7 +299,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).backup ?? "",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -318,7 +318,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               translate('nonce_value'),
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),
@@ -329,7 +329,7 @@ class _EthTransactionDetailPageState extends State<EthTransactionDetailPage> {
               Provider.of<TransactionProvide>(context).nonce,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
-                fontSize: ScreenUtil.instance.setSp(3.5),
+                fontSize: ScreenUtil().setSp(3.5),
               ),
             ),
           ),

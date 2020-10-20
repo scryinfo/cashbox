@@ -336,8 +336,8 @@ class _EthPageState extends State<EthPage> {
       ),
       drawer: LeftDrawerCard(), //Left drawer
       body: Container(
-        width: ScreenUtil.instance.setWidth(90),
-        height: ScreenUtil.instance.setHeight(160),
+        width: ScreenUtil().setWidth(90),
+        height: ScreenUtil().setHeight(160),
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(
           image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
@@ -354,7 +354,7 @@ class _EthPageState extends State<EthPage> {
             Container(
               child: _isShowAddDigitBtn()
                   ? Positioned(
-                      bottom: ScreenUtil.instance.setHeight(5),
+                      bottom: ScreenUtil().setHeight(5),
                       child: _buildAddDigitButton(),
                     )
                   : Text(""),
@@ -367,8 +367,8 @@ class _EthPageState extends State<EthPage> {
 
   Widget _buildAddDigitButton() {
     return Container(
-      width: ScreenUtil.instance.setWidth(90),
-      height: ScreenUtil.instance.setHeight(9),
+      width: ScreenUtil().setWidth(90),
+      height: ScreenUtil().setHeight(9),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -382,7 +382,7 @@ class _EthPageState extends State<EthPage> {
                 style: TextStyle(
                   color: Colors.blue,
                   letterSpacing: 0.03,
-                  fontSize: ScreenUtil.instance.setSp(3.2),
+                  fontSize: ScreenUtil().setSp(3.2),
                 ),
               ),
               onPressed: () {
@@ -539,7 +539,7 @@ class _EthPageState extends State<EthPage> {
                                   (displayDigitsList[index].shortName ?? "") + " * " + (displayDigitsList[index].balance ?? "0.00"),
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: ScreenUtil.instance.setSp(3),
+                                    fontSize: ScreenUtil().setSp(3),
                                   ),
                                 ),
                               ),
@@ -547,13 +547,13 @@ class _EthPageState extends State<EthPage> {
                                 alignment: FractionalOffset.topRight,
                                 child: Container(
                                   padding: EdgeInsets.all(0.0),
-                                  width: ScreenUtil.instance.setWidth(30),
+                                  width: ScreenUtil().setWidth(30),
                                   child: Text(
                                     "≈" + moneyUnitStr + " " + displayDigitsList[index].money ?? "0.00",
                                     maxLines: 2,
                                     overflow: TextOverflow.visible,
                                     textAlign: TextAlign.right,
-                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil.instance.setSp(3)),
+                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3)),
                                   ),
                                 ),
                               ),
@@ -580,14 +580,14 @@ class _EthPageState extends State<EthPage> {
                                             : rateInstance.getPrice(displayDigitsList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
-                                      fontSize: ScreenUtil.instance.setSp(2.5),
+                                      fontSize: ScreenUtil().setSp(2.5),
                                     ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                     child: Text(
                                       displayDigitsList[index].digitRate.getChangeDaily ?? "0%", //Market price fluctuations
-                                      style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil.instance.setSp(2.5)),
+                                      style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil().setSp(2.5)),
                                     ),
                                   )
                                 ],
@@ -598,7 +598,7 @@ class _EthPageState extends State<EthPage> {
                                     opacity: 0,
                                     child: Text(
                                       "0", //Last transaction
-                                      style: TextStyle(fontSize: ScreenUtil.instance.setSp(2.5), color: Colors.greenAccent),
+                                      style: TextStyle(fontSize: ScreenUtil().setSp(2.5), color: Colors.greenAccent),
                                     ),
                                   )),
                             ],
@@ -867,7 +867,7 @@ class _EthPageState extends State<EthPage> {
           ),
           Gaps.scaleHGap(4),
           Container(
-            width: ScreenUtil.instance.setWidth(26),
+            width: ScreenUtil().setWidth(26),
             child: Text(
               Chain.chainTypeToValue(Wallets.instance.nowWallet.nowChain.chainType),
               style: TextStyle(
