@@ -5,6 +5,16 @@
 /bc/.idea
 /bc/Cargo.lock
 /bc/target
+/bc/murmel/.idea
+/bc/murmel/client.db.0.bc
+/bc/murmel/client.db.0.bl
+/bc/murmel/client.db.0.tb
+/bc/murmel/client.db.0.lg
+/bc/murmel/client_sqlite.sqlite
+/bc/murmel/NOTICE
+/bc/murmel/.DS_Store
+/bc/murmel/bitcoin/target
+
 *.db
 /test/wallet-jni-test/target/
 /packages/wallet/.idea

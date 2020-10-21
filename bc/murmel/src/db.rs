@@ -246,7 +246,6 @@ impl SQLite {
             .connection
             .prepare("SELECT * FROM compressed_pub")
             .expect("query compressed key error");
-        statement.bind(1, key).expect("query newest error");
         while let State::Row = statement.next().unwrap() {
             let compressed_pub_key = statement.read::<String>(2).expect("query block hash error");
             return Some(compressed_pub_key);
