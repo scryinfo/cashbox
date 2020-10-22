@@ -9,7 +9,6 @@ path = "lib.rs"
 crate-type = ["cdylib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-
 [workspace]
 members = [
     "wallets",
@@ -17,13 +16,12 @@ members = [
     "util/substratetx",
     "murmel",
 ]
-
-
+exclude = ["bitcoin"]
 
 [dependencies.bitcoin]
 version = "0.21"
 features = ["serde"]
 
 [patch.crates-io]
-bitcoin = { path = "./murmel/bitcoin" }
+bitcoin = { path = "bitcoin" }
 

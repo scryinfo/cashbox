@@ -33,7 +33,7 @@ version = "0.21"
 features = ["serde"]
 
 [patch.crates-io]
-bitcoin = { path = "../murmel/bitcoin" }
+bitcoin = { path = "../bitcoin" }
 
 [dependencies.bitcoin_hashes]
 version = "0.7"
