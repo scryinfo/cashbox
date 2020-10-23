@@ -263,7 +263,7 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv, _class: JClass, network
 }
 
 // cala bloom filter
-pub fn calc_bloomfilter() {
+pub fn calc_bloomfilter() -> FilterLoadMessage {
     //todo must use stored mnemonic
     let words = "announce damage viable ticket engage curious yellow ten clock finish burden orient faculty rigid smile host offer affair suffer slogan mercy another switch park";
     let mnemonic = Mnemonic::from_str(words).unwrap();
@@ -280,11 +280,8 @@ pub fn calc_bloomfilter() {
     let public_key = instance_key.public.clone();
     let public_compressed = public_key.serialize();
     let public_compressed = hex::encode(public_compressed);
-    println!("source {:?}", &source);
-    println!("public_compressed {:?}", &public_compressed.len());
-
     let bloom_filter = FilterLoadMessage::calculate_filter(public_compressed.as_ref());
-    println!("bloom_filter {:0x?}", &bloom_filter);
+    bloom_filter
 }
 
 // calc pubkey
@@ -311,8 +308,14 @@ mod test {
 
     #[test]
     pub fn test_calc_pubkey() {
-        let pubkey =  calc_pubkey();
-        println!("calc_pubkey {:?}",pubkey);
+        let pubkey = calc_pubkey();
+        println!("calc_pubkey {:?}", pubkey);
+    }
+
+    #[test]
+    pub fn test_calc_bloomfilter() {
+        let filter = calc_bloomfilter();
+        println!("calc_bloomfilter {:#0x?}", filter);
     }
 }
 
