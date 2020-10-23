@@ -262,10 +262,26 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv, _class: JClass, network
        .expect("can not start node");
 }
 
+// calc default address in path (0,0) maybe modfiy in future
+pub fn calc_default_address() -> Address {
+    let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
+    let mnemonic = Mnemonic::from_str(words).unwrap();
+    let mut master =
+        MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
+    let mut unlocker = Unlocker::new_for_master(&master, "").expect("don't have right unlocker");
+
+    // path 0,0 => source(from address)
+    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
+    master.add_account(account);
+    let account = master.get_mut((0, 0)).unwrap();
+    let instance_key = account.next_key().unwrap();
+    instance_key.address.clone()
+}
+
 // cala bloom filter
 pub fn calc_bloomfilter() -> FilterLoadMessage {
     //todo must use stored mnemonic
-    let words = "announce damage viable ticket engage curious yellow ten clock finish burden orient faculty rigid smile host offer affair suffer slogan mercy another switch park";
+    let words =  "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
     let mnemonic = Mnemonic::from_str(words).unwrap();
     let mut master =
         MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
@@ -286,7 +302,7 @@ pub fn calc_bloomfilter() -> FilterLoadMessage {
 
 // calc pubkey
 pub fn calc_pubkey() -> String {
-    let words = "announce damage viable ticket engage curious yellow ten clock finish burden orient faculty rigid smile host offer affair suffer slogan mercy another switch park";
+    let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
     let mnemonic = Mnemonic::from_str(words).unwrap();
     let mut master =
         MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
@@ -304,7 +320,7 @@ pub fn calc_pubkey() -> String {
 }
 
 mod test {
-    use crate::jniapi::btcapi::{calc_bloomfilter, calc_pubkey};
+    use crate::jniapi::btcapi::{calc_bloomfilter, calc_pubkey, calc_default_address};
 
     #[test]
     pub fn test_calc_pubkey() {
@@ -316,6 +332,12 @@ mod test {
     pub fn test_calc_bloomfilter() {
         let filter = calc_bloomfilter();
         println!("calc_bloomfilter {:#0x?}", filter);
+    }
+
+    #[test]
+    pub fn test_calc_defalut_address() {
+        let address = calc_default_address();
+        println!("address {:?}", address.to_string());
     }
 }
 

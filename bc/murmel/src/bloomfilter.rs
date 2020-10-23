@@ -98,6 +98,6 @@ impl BloomFilter {
 fn calculate_filter() -> FilterLoadMessage {
     // Public key 66（compressed）
     FilterLoadMessage::calculate_filter(
-        "0291EE52A0E0C22DB9772F237F4271EA6F9330D92B242FB3C621928774C560B699",
+        "02a485e265a661def2d9db1f5880fb07e96ffc0ffcec0f403d61a08aa21b1bdeb4",
     )
 }
