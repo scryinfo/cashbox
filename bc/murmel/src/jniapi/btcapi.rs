@@ -99,7 +99,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
                 txid: sha256d::Hash::from_hex(
                     "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
                 )
-                .unwrap(),
+                    .unwrap(),
                 vout: 1,
             },
             sequence: RBF,
@@ -259,7 +259,7 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv, _class: JClass, network
     let mut spv = Constructor::new(network, listen, chaindb).unwrap();
 
     spv.run(network, peers, connections)
-        .expect("can not start node");
+       .expect("can not start node");
 }
 
 // cala bloom filter
@@ -288,7 +288,7 @@ pub fn calc_bloomfilter() {
 }
 
 // calc pubkey
-pub fn calculate_pubkey() {
+pub fn calc_pubkey() -> String {
     let words = "announce damage viable ticket engage curious yellow ten clock finish burden orient faculty rigid smile host offer affair suffer slogan mercy another switch park";
     let mnemonic = Mnemonic::from_str(words).unwrap();
     let mut master =
@@ -303,16 +303,16 @@ pub fn calculate_pubkey() {
     let source = instance_key.address.clone();
     let public_key = instance_key.public.clone();
     let public_compressed = public_key.serialize();
-    let public_compressed = hex::encode(public_compressed);
-    println!("source {:?}", &source);
-    println!("public_compressed {:?}", &public_compressed.len());
+    hex::encode(public_compressed)
 }
 
 mod test {
-    use crate::jniapi::btcapi::calc_bloomfilter;
+    use crate::jniapi::btcapi::{calc_bloomfilter, calc_pubkey};
 
     #[test]
-    pub fn test_calc_bloomfilter() {
-        calc_bloomfilter()
+    pub fn test_calc_pubkey() {
+        let pubkey =  calc_pubkey();
+        println!("calc_pubkey {:?}",pubkey);
     }
 }
+
