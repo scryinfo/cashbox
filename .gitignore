@@ -61,3 +61,6 @@ demo/btcwallet/murmel/bitcoin/target
 /packages/wallet_manager/pubspec.lock
 /app/ios/Flutter/flutter_export_environment.sh
 /app/ios/Flutter/flutter_export_environment.sh
+/cashbox.code-workspace
+/bc/.vscode
+/packages/wallet_manager/android/src/main/jniLibs/x86_64/libwallet.so
