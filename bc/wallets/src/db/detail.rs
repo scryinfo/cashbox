@@ -1,37 +1,3 @@
-pub enum WalletType {
-    Normal,//钱包
-    Test,  //测试钱包，对应的链为测试链
-}
-
-pub enum ChainType {
-    Eth,
-    EthTest,
-    Eee,
-    EeeTest,
-    Btc,
-    BtcTest,
-}
-/// 用来切换钱包的网络时使用的
-///
-/// [WalletType.Test] 可以切换为 [NetType.Test]， [NetType.Test] ，[NetType.PrivateTest]
-///
-/// [WalletType.Normal] 只能为 [NetType.Main]
-///
-/// 测试钱包不能切换到主网，这样做是为了避免用户弄错了
-///
-/// [WalletType.Test]:WalletType::TEST
-/// [WalletType.Normal]:WalletType::Normal
-/// [NetType.Main]:NetType::Main
-/// [NetType.Test]:NetType::Test
-/// [NetType.Test]:NetType::Test
-/// [NetType.PrivateTest]:NetType::PrivateTest
-pub enum NetType {
-    Main,
-    Test,
-    Private,
-    PrivateTest,
-}
-
 #[derive(Default, Clone)]
 pub struct Wallet {
     //primary key
@@ -41,26 +7,28 @@ pub struct Wallet {
     pub full_name: String,
     pub mnemonic_digest: String,
     pub mnemonic: String,
-    /// [WalletType]
+    /// [crate::WalletType]
     pub wallet_type: String,
-    /// [NetType]
+    /// [crate::NetType]
     pub net_type: String,
+    /// 数据库中的创建时间
     pub create_time: i64,
+    /// 数据库中的更新时间
     pub update_time: i64,
 }
 
-//每一种链类型一条记录，与钱包没有关系
+//每一种链类型一条记录，
 #[derive(Default, Clone)]
-pub struct Chain {
+pub struct ChainTypeMeta {
     //primary key
     pub id: String,
-    //下一个显示顺序的 chain_id
-    pub next_id: i32,
-    /// [ChainType]
+    /// [crate::ChainType]
     pub chain_type: String,
     pub short_name: String,
     pub full_name: String,
+    /// 数据库中的创建时间
     pub create_time: i64,
+    /// 数据库中的更新时间
     pub update_time: i64,
 }
 
@@ -70,36 +38,44 @@ pub struct Address {
     pub id: String,
     /// [Wallet]
     pub wallet_id: String,
-    /// [Chain]
-    pub chain_id: String,
+    /// [crate::ChainType]
+    pub chain_type: String,
     pub address: String,
     pub public_key: String,
-    pub wallet_address: bool, //是否为钱包地址
+    /// 是否为钱包地址
+    pub wallet_address: bool,
 
+    /// 数据库中的创建时间
     pub create_time: i64,
+    /// 数据库中的更新时间
     pub update_time: i64,
 }
 
-//如名字图片等不变的信息
+/// 没有对应的数据库表
 #[derive(Default, Clone)]
-pub struct AuthToken {
-    //primary key
-    pub id: String,
-    pub next_id: String,
-    pub name: String,
-    /// [ChainType]
+pub struct TokenShared {
+    /// [crate::ChainType]
     pub chain_type: String,
+
+    pub name: String,
+    pub symbol: String,
+    pub logo_url: Option<String>,
+    /// base 64编码
+    pub logo_bytes: Option<String>,
+    pub project: Option<String>,
+
+    /// true为认证token
+    pub auth: bool,
+
+    /// 数据库中的创建时间
+    pub create_time: i64,
+    /// 数据库中的更新时间
+    pub update_time: i64,
 }
 
-/// DefaultDigit must be a [AuthDigit]
-#[derive(Default, Clone)]
-pub struct DefaultToken {
-    //primary key
-    pub id: String,
-    pub name: String,
-    /// [AuthDigit]
-    pub auth_token_id: String,
-}
+
+
+
 
 
 

@@ -6,6 +6,8 @@ mod error;
 pub mod model;
 pub mod module;
 pub mod wallet_db;
+pub mod db;
+pub mod cdl;
 
 pub use error::WalletError;
 
@@ -62,6 +64,46 @@ impl From<i64> for ChainType {
         }
     }
 }
+
+pub enum WalletType {
+    Normal,//钱包
+    Test,  //测试钱包，对应的链为测试链
+}
+
+/// 用来切换钱包的网络时使用的
+///
+/// [WalletType.Test] 可以切换为 [NetType.Test]， [NetType.Test] ，[NetType.PrivateTest]
+///
+/// [WalletType.Normal] 只能为 [NetType.Main]
+///
+/// 测试钱包不能切换到主网，这样做是为了避免用户弄错了
+///
+/// [WalletType.Test]:WalletType::TEST
+/// [WalletType.Normal]:WalletType::Normal
+/// [NetType.Main]:NetType::Main
+/// [NetType.Test]:NetType::Test
+/// [NetType.Test]:NetType::Test
+/// [NetType.PrivateTest]:NetType::PrivateTest
+pub enum NetType {
+    Main,
+    Test,
+    Private,
+    PrivateTest,
+}
+
+pub enum TxStatus {
+    /// 交易在链上确认成功
+    Success,
+    /// 交易在链上失败
+    Fail,
+    /// 新创建的交易
+    New,
+    /// 进入Pending中的交易
+    Pending,
+    /// 开始打包的交易
+    Packing,
+}
+
 
 #[cfg(target_os="android")]
 fn init_logger_once() {

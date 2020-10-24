@@ -1,29 +1,29 @@
+use crate::cdl::{ChainShared, TokenShared};
 
-// eee
+// eth
 #[repr(C)]
 #[derive(Clone, Default)]
-pub struct EeeChain {
+pub struct EthChain {
     pub chain_shared: ChainShared,
-    pub tokens: Vec<EeeToken>,
+    pub tokens: Vec<EthChainToken>,
 }
 
 #[repr(C)]
 #[derive(Clone, Default)]
-pub struct EeeToken {
-    pub token_shared: TokenShared,
+pub struct EthChainToken {
+    pub token_shared: Option<TokenShared>,
 }
 
 #[repr(C)]
 #[derive(Clone, Default)]
-pub struct EeeDefaultToken{
+pub struct EthChainTokenDefault {
     pub token_shared: TokenShared,
 
 }
 
 #[repr(C)]
 #[derive(Clone, Default)]
-pub struct EeeAuthToken {
+pub struct EthChainTokenAuth {
     pub token_shared: TokenShared,
 }
-
-// eee end
+// eth end

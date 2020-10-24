@@ -9,6 +9,6 @@ pub struct Mnemonic {
     pub mnemonic_digest: String,
     pub mnemonic: String,
     pub wallet_type: String,
-    pub create_time: String,
-    pub update_time: Option<String>,
+    pub create_time: i64,
+    pub update_time: i64,
 }
