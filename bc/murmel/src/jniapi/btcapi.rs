@@ -99,7 +99,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
                 txid: sha256d::Hash::from_hex(
                     "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
                 )
-                .unwrap(),
+                    .unwrap(),
                 vout: 1,
             },
             sequence: RBF,
@@ -259,13 +259,29 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv, _class: JClass, network
     let mut spv = Constructor::new(network, listen, chaindb).unwrap();
 
     spv.run(network, peers, connections)
-        .expect("can not start node");
+       .expect("can not start node");
+}
+
+// calc default address in path (0,0) maybe modfiy in future
+pub fn calc_default_address() -> Address {
+    let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
+    let mnemonic = Mnemonic::from_str(words).unwrap();
+    let mut master =
+        MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
+    let mut unlocker = Unlocker::new_for_master(&master, "").expect("don't have right unlocker");
+
+    // path 0,0 => source(from address)
+    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
+    master.add_account(account);
+    let account = master.get_mut((0, 0)).unwrap();
+    let instance_key = account.next_key().unwrap();
+    instance_key.address.clone()
 }
 
 // cala bloom filter
-pub fn calc_bloomfilter() {
+pub fn calc_bloomfilter() -> FilterLoadMessage {
     //todo must use stored mnemonic
-    let words = "announce damage viable ticket engage curious yellow ten clock finish burden orient faculty rigid smile host offer affair suffer slogan mercy another switch park";
+    let words =  "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
     let mnemonic = Mnemonic::from_str(words).unwrap();
     let mut master =
         MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
@@ -280,16 +296,13 @@ pub fn calc_bloomfilter() {
     let public_key = instance_key.public.clone();
     let public_compressed = public_key.serialize();
     let public_compressed = hex::encode(public_compressed);
-    println!("source {:?}", &source);
-    println!("public_compressed {:?}", &public_compressed.len());
-
     let bloom_filter = FilterLoadMessage::calculate_filter(public_compressed.as_ref());
-    println!("bloom_filter {:0x?}", &bloom_filter);
+    bloom_filter
 }
 
 // calc pubkey
-pub fn calculate_pubkey() {
-    let words = "announce damage viable ticket engage curious yellow ten clock finish burden orient faculty rigid smile host offer affair suffer slogan mercy another switch park";
+pub fn calc_pubkey() -> String {
+    let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
     let mnemonic = Mnemonic::from_str(words).unwrap();
     let mut master =
         MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
@@ -303,16 +316,28 @@ pub fn calculate_pubkey() {
     let source = instance_key.address.clone();
     let public_key = instance_key.public.clone();
     let public_compressed = public_key.serialize();
-    let public_compressed = hex::encode(public_compressed);
-    println!("source {:?}", &source);
-    println!("public_compressed {:?}", &public_compressed.len());
+    hex::encode(public_compressed)
 }
 
 mod test {
-    use crate::jniapi::btcapi::calc_bloomfilter;
+    use crate::jniapi::btcapi::{calc_bloomfilter, calc_pubkey, calc_default_address};
+
+    #[test]
+    pub fn test_calc_pubkey() {
+        let pubkey = calc_pubkey();
+        println!("calc_pubkey {:?}", pubkey);
+    }
 
     #[test]
     pub fn test_calc_bloomfilter() {
-        calc_bloomfilter()
+        let filter = calc_bloomfilter();
+        println!("calc_bloomfilter {:#0x?}", filter);
+    }
+
+    #[test]
+    pub fn test_calc_defalut_address() {
+        let address = calc_default_address();
+        println!("address {:?}", address.to_string());
     }
 }
+
