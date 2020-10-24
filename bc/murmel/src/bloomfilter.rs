@@ -95,6 +95,7 @@ impl BloomFilter {
     }
 }
 
+//todo fix
 fn calculate_filter() -> FilterLoadMessage {
     // Public key 66（compressed）
     FilterLoadMessage::calculate_filter(
