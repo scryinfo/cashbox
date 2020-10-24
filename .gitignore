@@ -13,7 +13,7 @@
 /bc/murmel/client_sqlite.sqlite
 /bc/murmel/NOTICE
 /bc/murmel/.DS_Store
-/bc/murmel/bitcoin/target
+/bc/bitcoin/target
 
 *.db
 /test/wallet-jni-test/target/

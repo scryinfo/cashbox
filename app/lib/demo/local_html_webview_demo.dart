@@ -5,7 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:scry_webview/scry_webview.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
 
 class LocalHtmlWebViewDemo extends StatefulWidget {
   @override

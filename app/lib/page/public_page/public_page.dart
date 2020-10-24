@@ -5,7 +5,7 @@ import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:scry_webview/scry_webview.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class PublicPage extends StatefulWidget {
   @override

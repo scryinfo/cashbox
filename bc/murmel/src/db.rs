@@ -38,6 +38,9 @@ impl SQLite {
         sqlite.execute(
             "create table if not exists compressed_pub(ID INTEGER PRIMARY KEY AUTOINCREMENT,address TEXT not null ,compressed_key TEXT);"
         ).expect("Create compressed_pub table error");
+        sqlite.execute(
+            "create table if not exists local_tx_log(ID INTEGER PRIMARY KEY AUTOINCREMENT,from_address TEXT not null ,to_address TEXT,value TEXT,status TEXT);"
+        ).expect("Create local_tx_log table error");
         Self {
             connection: sqlite,
             network,
