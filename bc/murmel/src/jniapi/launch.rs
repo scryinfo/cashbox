@@ -1,4 +1,7 @@
 //! mod for jniapi main function launch
+
+#![cfg(target_os="android")]
+#![allow(non_snake_case)]
 use bitcoin::network::constants::Network;
 use jni::objects::JClass;
 use jni::JNIEnv;

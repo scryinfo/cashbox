@@ -1,6 +1,8 @@
 //! mod for btcapi
 //! java native method def in  packages/wallet_manager/android/src/main/java/info/scry/wallet_manager/NativeLib.java
 
+#![cfg(target_os="android")]
+#![allow(non_snake_case)]
 use crate::constructor::Constructor;
 use crate::db::SQLite;
 use crate::db::SharedSQLite;
