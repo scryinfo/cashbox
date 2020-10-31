@@ -216,7 +216,7 @@ pub extern "system" fn Java_JniApi_btcLoadTxHistory(
 // this function don't have any return value。because it will run spv node
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv, _class: JClass, network: JString) {
+pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEnv, _class: JClass, network: JString) {
     // TODO
     // use testnet for test and default
     // must change it in future
