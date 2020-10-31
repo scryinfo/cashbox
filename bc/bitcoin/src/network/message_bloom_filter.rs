@@ -1,12 +1,12 @@
 //! mod for bloom filter message
 use bitvec::prelude::*;
 use consensus::Encodable;
-use fasthash::murmur3;
 use hashes::{sha256d, Hash};
 use hex::decode as hex_decode;
 use std::f64::consts::{E, LN_2};
 use std::num::Wrapping;
 use BitcoinHash;
+use std::io::{Cursor, Read};
 
 ///the message filterload
 /// n_flags
@@ -92,7 +92,8 @@ pub const MAGIC: u32 = 0xFBA4C795;
 /// Value used in murmur3 hash
 pub const FFF: u32 = 0xffffffff;
 /// a false positive rate
-/// p in [https://bitcoin.org/en/developer-examples#creating-a-bloom-filter] 0.0001
+/// p in [https://bitcoin.org/en/developer-examples#creating-a-bloom-filter] 0.0001 --> examples  moved to p2p_network
+/// p in [https://dashcore.readme.io/docs/core-examples-p2p-network-creating-a-bloom-filter]
 pub const P: f64 = 0.00001;
 
 /// calculate filter
@@ -122,7 +123,7 @@ impl FilterLoadMessage {
         data_to_hash.reverse();
 
         for i in 0..n_hash_functions {
-            let n_index = FilterLoadMessage::bloom_hash(i, &data_to_hash, n_filter_bytes);
+            let n_index = FilterLoadMessage::bloom_hash(i, &mut data_to_hash, n_filter_bytes);
             // Set the bit at nIndex to 1
             v_data.set(n_index as usize, true);
         }
@@ -137,9 +138,10 @@ impl FilterLoadMessage {
 
     /// calc bloom hash
     /// Protect calc from overflow for using Wrapping
-    fn bloom_hash(n_hash_num: u32, data: &Vec<u8>, n_filter_bytes: u32) -> u32 {
+    fn bloom_hash(n_hash_num: u32, data: &mut Vec<u8>, n_filter_bytes: u32) -> u32 {
         let seed = ((Wrapping(n_hash_num) * Wrapping(MAGIC) + Wrapping(N_TWEAK)) & Wrapping(FFF)).0;
-        murmur3::hash32_with_seed(data, seed) % (n_filter_bytes * 8)
+        // murmur3::hash32_with_seed(data, seed) % (n_filter_bytes * 8)
+        murmur3::murmur3_32(Cursor::new(data).by_ref(), seed).unwrap() % (n_filter_bytes * 8)
     }
 }
 
@@ -203,7 +205,7 @@ mod test {
     #[test]
     fn calculate_filter_test() {
         let filterload = FilterLoadMessage::calculate_filter(
-            "03BDBDB81926E8AFD621E7362352748FC500F81266A3F39F75450ACAE6FAA1A458",
+            "652b0aa4cf4f17bdb31f7a1d308331bba91f3b3cbf8f39c9cb5e19d4015b9f01",
         );
         println!("{:0x?}", filterload);
     }

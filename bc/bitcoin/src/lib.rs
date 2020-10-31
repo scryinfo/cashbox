@@ -66,7 +66,7 @@ extern crate hex;
 #[cfg(all(test, feature = "unstable"))] extern crate test;
 #[cfg(feature="bitcoinconsensus")] extern crate bitcoinconsensus;
 extern crate bitcoin_hashes;
-extern crate fasthash;
+extern crate murmur3;
 extern crate bitvec;
 
 #[cfg(target_pointer_width = "16")]

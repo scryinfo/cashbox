@@ -15,8 +15,9 @@ members = [
     "device_app_lib",
     "util/substratetx",
     "murmel",
+    "bitcoin"
 ]
-exclude = ["bitcoin"]
+
 
 [dependencies.bitcoin]
 version = "0.21"
