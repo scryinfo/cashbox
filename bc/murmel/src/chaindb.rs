@@ -16,6 +16,7 @@
 //!
 //! # Blockchain DB for a node
 //!
+//!
 
 use bitcoin::{
     blockdata::{block::BlockHeader, constants::genesis_block},

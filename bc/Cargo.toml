@@ -18,7 +18,6 @@ members = [
     "bitcoin"
 ]
 
-
 [dependencies.bitcoin]
 version = "0.21"
 features = ["serde"]

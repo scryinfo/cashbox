@@ -8,6 +8,12 @@ use log::info;
 use sqlite::{State, Statement, Value};
 use std::sync::{Arc, Mutex};
 
+#[cfg(target_os = "android")]
+const BTC_DETAIL_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_detail.sqlite"#;
+
+#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
+const BTC_DETAIL_PATH: &str = r#"btc_detail.sqlite"#;
+
 pub type SharedSQLite = Arc<Mutex<SQLite>>;
 
 const NEWEST_KEY: &str = "NEWEST_KEY";
@@ -19,7 +25,7 @@ pub struct SQLite {
 
 impl SQLite {
     pub fn open_db(network: Network) -> Self {
-        let mut sqlite = sqlite::open("client_sqlite.sqlite").expect("create sqlite error");
+        let mut sqlite = sqlite::open(BTC_CHAIN_PATH).expect("create sqlite error");
         sqlite.set_busy_timeout(3000).unwrap();
         sqlite.execute(
             "

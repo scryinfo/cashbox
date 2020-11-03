@@ -18,6 +18,12 @@ use std::{
     time::SystemTime,
 };
 
+#[cfg(target_os = "android")]
+const BTC_CHAIN_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_chain.db"#;
+
+#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
+const BTC_CHAIN_PATH: &str = r#"btc_chain.db"#;
+
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_launch(
@@ -97,7 +103,7 @@ pub extern "system" fn Java_JniApi_launch(
     let chaindb = if let Some(path) = find_arg("db") {
         Constructor::open_db(Some(&Path::new(path.as_str())), network, birth).unwrap()
     } else {
-        Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap()
+        Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap()
     };
 
     // init sqlite

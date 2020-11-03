@@ -30,6 +30,12 @@ use std::time::SystemTime;
 
 const PASSPHRASE: &str = "";
 
+#[cfg(target_os = "android")]
+const BTC_CHAIN_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_chain.db"#;
+
+#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
+const BTC_CHAIN_PATH: &str = r#"btc_chain.db"#;
+
 // use sqlite as global
 pub static SHARED_SQLITE: Lazy<SharedSQLite> = Lazy::new(|| {
     let sqlite = SQLite::open_db(Network::Testnet);
@@ -257,7 +263,7 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEn
         .duration_since(SystemTime::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    let chaindb = Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap();
+    let chaindb = Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap();
     let mut spv = Constructor::new(network, listen, chaindb).unwrap();
 
     spv.run(network, peers, connections)
