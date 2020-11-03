@@ -29,7 +29,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     lintOptions {
         disable 'InvalidPackage'
@@ -39,7 +39,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "wallet.cashbox.scry.info"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86_64'
@@ -64,10 +64,6 @@ android {
         }
 
         debug {
-            ndk {
-                //这里要加上，否则debug包会出问题,后面三个为可选，x86建议加上不然部分模拟器回报错
-                abiFilters "armeabi-v7a", "arm64-v8a", "x86_64", "x86"
-            }
             packagingOptions {
                 doNotStrip '**/*.so'
             }
@@ -125,5 +121,4 @@ dependencies {
     implementation 'com.github.yuzhiqiang1993:zxing:2.2.5'
     //实现版本升级 工具库
     implementation 'com.github.AlexLiuSheng:CheckVersionLib:2.2.3'
-    implementation 'com.google.code.gson:gson:2.8.6'
 }

@@ -15,7 +15,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import 'global_config/global_config.dart';
-import 'page/entry_page.dart';
+import 'pages/entry_page.dart';
 import 'package:fluro/fluro.dart';
 import 'provide/transaction_provide.dart';
 import 'routers/routers.dart';

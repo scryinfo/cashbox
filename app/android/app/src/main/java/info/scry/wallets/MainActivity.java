@@ -1,4 +1,4 @@
-package info.scry.wallet;
+package info.scry.wallets;
 
 import android.Manifest;
 import android.content.Context;

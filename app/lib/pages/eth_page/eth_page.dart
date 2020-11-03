@@ -10,7 +10,7 @@ import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
 import 'package:app/net/scryx_net_util.dart';
-import 'package:app/page/left_drawer_card/left_drawer_card.dart';
+import 'package:app/pages/left_drawer_card/left_drawer_card.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
