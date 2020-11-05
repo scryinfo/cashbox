@@ -1,9 +1,5 @@
-import 'package:app/util/qr_scan_util.dart';
-import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_translate/flutter_translate.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -42,7 +38,7 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return PwdDialog(
+                    /*return PwdDialog(
                       title: "钱包密码",
                       hintContent: "提示：请输入您的密码。     切记，应用不会保存你的助记词等隐私信息，请您自己务必保存好。",
                       hintInput: "请输入钱包密码",
@@ -52,7 +48,7 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
                         //method 2 field callback ok
                         //_controller?.evaluateJavascript('window.qrresult=" $value "')?.then((result) {});
                       },
-                    );
+                    );*/
                   },
                 );
               },
@@ -68,7 +64,7 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
                     if (statuses[Permission.camera] == PermissionStatus.granted) {
                       _scanQrContent();
                     } else {
-                      Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+                      // Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                     }
                   }
                 }),
@@ -87,12 +83,12 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
   }
 
   void _scanQrContent() {
-    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    /*Future<String> qrResult = QrScanUtil.instance.qrscan();
     qrResult.then((t) {
       Fluttertoast.showToast(msg: "扫描结果是======> $t");
       _controller?.evaluateJavascript('nativeScanResult("$t")')?.then((result) {});
     }).catchError((e) {
       Fluttertoast.showToast(msg: "扫描已取消，或出现未知失败");
-    });
+    });*/
   }
 }

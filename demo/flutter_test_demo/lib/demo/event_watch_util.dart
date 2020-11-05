@@ -1,4 +1,3 @@
-import 'package:app/util/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,7 +22,6 @@ class _EventWatchUtilState extends State<EventWatchUtil> {
 
   void _onError(Object object) {
     print("eventchannel  _onError is=>" + object);
-    LogUtil.e("eventWatch _onError is =>", object.toString());
   }
 
   @override

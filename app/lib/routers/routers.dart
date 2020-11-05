@@ -80,6 +80,5 @@ class Routes {
     router.define(ethTransactionDetailPage, handler: ethTransactionDetailHandler);
     router.define(createTestWalletPage, handler: createTestWalletHandler);
     router.define(signTxPage, handler: signTxPageHandler);
-    router.define(webViewPluginPage, handler: flutterWebViewPluginHandler);
   }
 }

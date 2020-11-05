@@ -7,8 +7,8 @@ class SQLiteDemo {
 
   void initDB() async {
     // open the database
-    var dbFilePath = ""; //todo
-    //
+    var dbFilePath = "/data/data/wallet.cashbox.scry.info/files/cashbox_wallet_detail.db"; //todo
+    //                /data/data/wallet.cashbox.scry.info/files/cashbox_wallet_detail.db
     database = await openDatabase(dbFilePath, version: 1, onCreate: (Database db, int version) async {
       // When creating the db, create the table
       // await db.execute('CREATE TABLE detail.DefaultDigitBase (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)');

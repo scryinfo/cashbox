@@ -1,4 +1,4 @@
-import 'package:app/demo/flutter_webview_plugin_demo.dart';
+import 'package:app/pages/about_us.dart';
 import 'package:app/pages/create_wallet/create_test_wallet/create_test_wallet.dart';
 import 'package:app/pages/create_wallet/create_wallet_confirm.dart';
 import 'package:app/pages/create_wallet/create_wallet_mnemonic.dart';
@@ -12,13 +12,12 @@ import 'package:app/pages/digitlist_manage/digits_manage.dart';
 import 'package:app/pages/digitlist_manage/search_digit.dart';
 import 'package:app/pages/entrance.dart';
 import 'package:app/pages/home.dart';
-import 'package:app/pages/mine/about_us.dart';
-import 'package:app/pages/mine/language_choose.dart';
-import 'package:app/pages/mine/mine.dart';
-import 'package:app/pages/mine/privacy_statements.dart';
-import 'package:app/pages/mine/service_agreement.dart';
+import 'package:app/pages/language_choose.dart';
+import 'package:app/pages/mine.dart';
+import 'package:app/pages/privacy_statements.dart';
 import 'package:app/pages/public_page.dart';
 import 'package:app/pages/qr_info.dart';
+import 'package:app/pages/service_agreement.dart';
 import 'package:app/pages/transfer_tx/eee_tx_detail.dart';
 import 'package:app/pages/transfer_tx/eee_transfer_confirm.dart';
 import 'package:app/pages/transfer_tx/eth_tx_detail.dart';
@@ -176,8 +175,4 @@ Handler createTestWalletHandler = Handler(handlerFunc: (BuildContext context, Ma
 });
 Handler signTxPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return SignTxPage();
-});
-
-Handler flutterWebViewPluginHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return FlutterWebViewPluginDemo();
 });
