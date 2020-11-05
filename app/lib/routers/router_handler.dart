@@ -1,59 +1,51 @@
-import 'package:app/demo/flutter_webview_plugin_demo.dart';
-import 'package:app/demo/local_html_webview_demo.dart';
-import 'package:app/page/ddd2eee_page/ddd2eee_confirm_page.dart';
-import 'package:app/page/ddd2eee_page/ddd2eee_page.dart';
-import 'package:app/page/digit_list_page/digit_list_page.dart';
-import 'package:app/page/digits_manage_page/digits_manage_page.dart';
-import 'package:app/page/digits_manage_page/search_digit_page.dart';
-import 'package:app/page/eee_page/eee_page.dart';
-import 'package:app/page/language_choose_page/language_choose_page.dart';
-import 'package:app/page/sign_tx_page/sign_tx_page.dart';
-import 'package:app/page/transaction_detail_page/eee_transaction_detail_page.dart';
-import 'package:app/page/transaction_detail_page/eth_transaction_detail_page.dart';
-import 'package:app/page/transfer_btc_page/transfer_btc_page.dart';
-import 'package:app/page/transfer_confirm_page/eee_transfer_confirm_page.dart';
-import 'package:app/page/transfer_eee_page/transfer_eee_page.dart';
-import 'package:app/page/tx_list_history_page/eee_chain_txs_history_page.dart';
-import 'package:app/page/tx_list_history_page/eth_chain_txs_history_page.dart';
-import 'package:app/page/user_protocol/privacy_statements_page.dart';
-import 'package:app/page/user_protocol/service_agreement_page.dart';
+import 'package:app/pages/about_us.dart';
+import 'package:app/pages/create_wallet/create_test_wallet/create_test_wallet.dart';
+import 'package:app/pages/create_wallet/create_wallet_confirm.dart';
+import 'package:app/pages/create_wallet/create_wallet_mnemonic.dart';
+import 'package:app/pages/create_wallet/create_wallet_name.dart';
+import 'package:app/pages/create_wallet/import_wallet.dart';
+import 'package:app/pages/dapp_page.dart';
+import 'package:app/pages/ddd2eee/ddd2eee.dart';
+import 'package:app/pages/ddd2eee/ddd2eee_confirm.dart';
+import 'package:app/pages/digitlist_manage/digit_list.dart';
+import 'package:app/pages/digitlist_manage/digits_manage.dart';
+import 'package:app/pages/digitlist_manage/search_digit.dart';
+import 'package:app/pages/entrance.dart';
+import 'package:app/pages/home.dart';
+import 'package:app/pages/language_choose.dart';
+import 'package:app/pages/mine.dart';
+import 'package:app/pages/privacy_statements.dart';
+import 'package:app/pages/public_page.dart';
+import 'package:app/pages/qr_info.dart';
+import 'package:app/pages/service_agreement.dart';
+import 'package:app/pages/transfer_tx/eee_tx_detail.dart';
+import 'package:app/pages/transfer_tx/eee_transfer_confirm.dart';
+import 'package:app/pages/transfer_tx/eth_tx_detail.dart';
+import 'package:app/pages/transfer_tx/sign_tx.dart';
+import 'package:app/pages/transfer_tx/transfer_btc.dart';
+import 'package:app/pages/transfer_tx/transfer_eee.dart';
+import 'package:app/pages/transfer_tx/transfer_eth.dart';
+import 'package:app/pages/tx_list_history/eee_chain_txs_history.dart';
+import 'package:app/pages/tx_list_history/eth_chain_txs_history.dart';
+import 'package:app/pages/wallet_manager/recover_wallet.dart';
+import 'package:app/pages/wallet_manager/reset_pwd.dart';
+import 'package:app/pages/wallet_manager/wallet_manage.dart';
+import 'package:app/pages/wallet_manager/wallet_manager_list.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
-import '../page/entry_page.dart';
-import 'package:app/page/eth_page/eth_page.dart';
-import '../page/public_page/public_page.dart';
-import '../page/create_wallet_page/create_wallet_name_page.dart';
-import '../page/create_wallet_page/create_wallet_mnemonic_page.dart';
-import '../page/create_wallet_page/create_wallet_confirm_page.dart';
-import '../page/qr_info_page/qr_info_page.dart';
-import '../page/import_wallet_page/import_wallet_page.dart';
-import '../page/transfer_eth_page/transfer_eth_page.dart';
-import '../page/mine_page/mine_page.dart';
-import '../page/wallet_manager_list_page/wallet_manager_list_page.dart';
-import '../page/wallet_manager_page/wallet_manage_page.dart';
-import '../page/reset_pwd_page/reset_pwd_page.dart';
-import '../page/recover_wallet_page/recover_wallet_page.dart';
-import '../page/about_us_page/about_us_page.dart';
-import 'package:app/page/dapp_page/dapp_page.dart';
-import 'package:app/page/create_test_wallet_page/create_test_wallet_page.dart';
-
-Handler entryPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return EntryPage();
+Handler entrancePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return EntrancePage();
 });
 
-Handler ethPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler homePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   bool isForceLoadFromJni = false;
   if (params['isForceLoadFromJni'] == null || params['isForceLoadFromJni'].first == null) {
     isForceLoadFromJni = false;
   } else {
     isForceLoadFromJni = params['isForceLoadFromJni'].first == 'true';
   }
-  return EthPage(isForceLoadFromJni: isForceLoadFromJni);
-});
-
-Handler eeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return EeePage();
+  return HomePage(isForceLoadFromJni: isForceLoadFromJni);
 });
 
 Handler publicPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -114,9 +106,6 @@ Handler transferEeeConfirmPageHandler = Handler(handlerFunc: (BuildContext conte
   return EeeTransferConfirmPage();
 });
 
-
-
-
 Handler transferBtcPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return TransferBtcPage();
 });
@@ -170,11 +159,11 @@ Handler eeeChainTxHistoryHandler = Handler(handlerFunc: (BuildContext context, M
 });
 
 Handler ethTransactionDetailHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return EthTransactionDetailPage();
+  return EthTxDetailPage();
 });
 
 Handler eeeTransactionDetailHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return EeeTransactionDetailPage();
+  return EeeTxDetailPage();
 });
 
 Handler aboutUsPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
@@ -186,8 +175,4 @@ Handler createTestWalletHandler = Handler(handlerFunc: (BuildContext context, Ma
 });
 Handler signTxPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return SignTxPage();
-});
-
-Handler flutterWebViewPluginHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return FlutterWebViewPluginDemo();
 });

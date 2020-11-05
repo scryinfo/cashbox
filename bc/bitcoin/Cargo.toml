@@ -67,6 +67,6 @@ use-serde = ["serde", "bitcoin_hashes/serde"]
 
 [dependencies]
 bitvec = "0.17"
-fasthash = "0.4.0"
+murmur3 = "0.5.1"
 
 

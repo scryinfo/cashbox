@@ -1,5 +1,7 @@
 // mod for creating transaction
 
+#![cfg(target_os="android")]
+#![allow(non_snake_case)]
 use bitcoin::blockdata::opcodes;
 use bitcoin::blockdata::script::Builder;
 use bitcoin::{

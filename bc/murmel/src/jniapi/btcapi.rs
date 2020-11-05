@@ -1,6 +1,8 @@
 //! mod for btcapi
 //! java native method def in  packages/wallet_manager/android/src/main/java/info/scry/wallet_manager/NativeLib.java
 
+#![cfg(target_os="android")]
+#![allow(non_snake_case)]
 use crate::constructor::Constructor;
 use crate::db::SQLite;
 use crate::db::SharedSQLite;
@@ -27,6 +29,12 @@ use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
 
 const PASSPHRASE: &str = "";
+
+#[cfg(target_os = "android")]
+const BTC_CHAIN_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_chain.db"#;
+
+#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
+const BTC_CHAIN_PATH: &str = r#"btc_chain.db"#;
 
 // use sqlite as global
 pub static SHARED_SQLITE: Lazy<SharedSQLite> = Lazy::new(|| {
@@ -214,7 +222,7 @@ pub extern "system" fn Java_JniApi_btcLoadTxHistory(
 // this function don't have any return value。because it will run spv node
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv, _class: JClass, network: JString) {
+pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEnv, _class: JClass, network: JString) {
     // TODO
     // use testnet for test and default
     // must change it in future
@@ -255,7 +263,7 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv, _class: JClass, network
         .duration_since(SystemTime::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    let chaindb = Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap();
+    let chaindb = Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap();
     let mut spv = Constructor::new(network, listen, chaindb).unwrap();
 
     spv.run(network, peers, connections)

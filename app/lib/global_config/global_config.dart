@@ -21,9 +21,9 @@ class GlobalConfig {
 
   ///eth related gas fee configuration
   static const EthGasLimitKey = "eth";
-  static const Erc20GasLimitKey = "eth";
+  static const Erc20GasLimitKey = "erc20";
   static const EthGasPriceKey = "eth";
-  static const Erc20GasPriceKey = "eth";
+  static const Erc20GasPriceKey = "erc20";
   static Map<String, double> maxGasLimitMap = {EthGasLimitKey: 30000, Erc20GasLimitKey: 300000}; //unit: gwei
   static Map<String, double> minGasLimitMap = {EthGasLimitKey: 21000, Erc20GasLimitKey: 35000};
   static Map<String, double> defaultGasLimitMap = {EthGasLimitKey: 21000, Erc20GasLimitKey: 70000};

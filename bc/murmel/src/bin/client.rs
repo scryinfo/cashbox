@@ -33,6 +33,12 @@ use std::{
     time::SystemTime,
 };
 
+#[cfg(target_os = "android")]
+const BTC_CHAIN_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_chain.db"#;
+
+#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
+const BTC_CHAIN_PATH: &str = r#"btc_chain.db"#;
+
 pub fn main() {
     if find_opt("help") {
         println!("Murmel Client");
@@ -95,7 +101,7 @@ pub fn main() {
         if let Some(path) = find_arg("db") {
             Constructor::open_db(Some(&Path::new(path.as_str())), network, birth).unwrap()
         } else {
-            Constructor::open_db(Some(&Path::new("client.db")), network, birth).unwrap()
+            Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap()
         };
 
     let mut spv = Constructor::new(network, listen, chaindb).unwrap();
