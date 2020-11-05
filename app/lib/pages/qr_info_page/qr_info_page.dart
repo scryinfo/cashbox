@@ -1,4 +1,4 @@
-import 'package:app/generated/i18n.dart';
+
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/util/utils.dart';

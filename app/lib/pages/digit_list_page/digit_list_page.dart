@@ -1,4 +1,4 @@
-import 'package:app/generated/i18n.dart';
+
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';

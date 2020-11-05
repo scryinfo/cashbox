@@ -1,4 +1,3 @@
-import 'package:app/generated/i18n.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/app_info_util.dart';

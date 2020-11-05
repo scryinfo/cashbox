@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:app/generated/i18n.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';

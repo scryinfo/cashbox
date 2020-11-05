@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:app/generated/i18n.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';

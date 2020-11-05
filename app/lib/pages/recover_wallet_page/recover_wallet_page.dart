@@ -1,6 +1,4 @@
-import 'dart:typed_data';
 
-import 'package:app/generated/i18n.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

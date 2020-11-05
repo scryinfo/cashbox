@@ -1,4 +1,3 @@
-import 'package:app/generated/i18n.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';

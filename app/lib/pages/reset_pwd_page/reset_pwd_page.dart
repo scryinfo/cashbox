@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:app/generated/i18n.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
