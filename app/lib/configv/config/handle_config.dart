@@ -76,7 +76,7 @@ class HandleConfig {
     File file = File(filePath);
     if (!await file.exists()) {
       String jsonStr = await rootBundle.loadString(defaultConfigFilePath);
-      file.writeAsString(jsonStr, flush: true);
+      file.writeAsString(jsonStr, flush: true); // creates the file for writing and truncates
     }
     return file;
   }

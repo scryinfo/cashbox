@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app/pages/entrance.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
@@ -14,7 +15,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import 'global_config/global_config.dart';
-import 'pages/entry_page.dart';
 import 'package:fluro/fluro.dart';
 import 'provide/transaction_provide.dart';
 import 'routers/routers.dart';
@@ -113,7 +113,7 @@ class _MyApp extends State<MyApp> {
             locale: localizationDelegate.currentLocale,
 
             ///Page entry
-            home: EntryPage(),
+            home: EntrancePage(),
             onGenerateRoute: Application.router.generator,
           ),
         ),
