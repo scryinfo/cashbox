@@ -51,6 +51,15 @@ pub struct Address {
     pub update_time: i64,
 }
 
+/// 动态库自己的配置，并不指app的配置
+/// todo app的配置是否要放到这里？
+#[derive(Default, Clone)]
+pub struct Setting {
+    pub id: String,
+    /// 由于value可能会是数据库的关键字，所以加上str
+    pub value_str: String,
+}
+
 /// 没有对应的数据库表
 #[derive(Default, Clone)]
 pub struct TokenShared {

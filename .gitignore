@@ -64,3 +64,6 @@ demo/btcwallet/murmel/bitcoin/target
 /cashbox.code-workspace
 /bc/.vscode
 /packages/wallet_manager/android/src/main/jniLibs/x86_64/libwallet.so
+/demo/ffi/cdl/Cargo.lock
+/demo/ffi/cdl/target
+/demo/ffi/flutter_app/pubspec.lock
