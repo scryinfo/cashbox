@@ -10,41 +10,136 @@ class NativeLibrary {
   /// The symbols are looked up in [dynamicLibrary].
   NativeLibrary(ffi.DynamicLibrary dynamicLibrary) : _dylib = dynamicLibrary;
 
-  void Cool_function(
-    int i,
-    int c,
-    ffi.Pointer<CoolStruct> cs,
+  int add(
+    int a,
+    int b,
   ) {
-    _Cool_function ??= _dylib
-        .lookupFunction<_c_Cool_function, _dart_Cool_function>('Cool_function');
-    return _Cool_function(
-      i,
-      c,
+    _add ??= _dylib.lookupFunction<_c_add, _dart_add>('add');
+    return _add(
+      a,
+      b,
+    );
+  }
+
+  _dart_add _add;
+
+  ffi.Pointer<ffi.Int8> addStr(
+    ffi.Pointer<ffi.Int8> cs,
+  ) {
+    _addStr ??= _dylib.lookupFunction<_c_addStr, _dart_addStr>('addStr');
+    return _addStr(
       cs,
     );
   }
 
-  _dart_Cool_function _Cool_function;
+  _dart_addStr _addStr;
+
+  void Str_free(
+    ffi.Pointer<ffi.Int8> cs,
+  ) {
+    _Str_free ??=
+        _dylib.lookupFunction<_c_Str_free, _dart_Str_free>('Str_free');
+    return _Str_free(
+      cs,
+    );
+  }
+
+  _dart_Str_free _Str_free;
+
+  ffi.Pointer<Data> Data_new() {
+    _Data_new ??=
+        _dylib.lookupFunction<_c_Data_new, _dart_Data_new>('Data_new');
+    return _Data_new();
+  }
+
+  _dart_Data_new _Data_new;
+
+  void Data_free(
+    ffi.Pointer<Data> cd,
+  ) {
+    _Data_free ??=
+        _dylib.lookupFunction<_c_Data_free, _dart_Data_free>('Data_free');
+    return _Data_free(
+      cd,
+    );
+  }
+
+  _dart_Data_free _Data_free;
+
+  ffi.Pointer<Data> Data_use(
+    ffi.Pointer<Data> cd,
+  ) {
+    _Data_use ??=
+        _dylib.lookupFunction<_c_Data_use, _dart_Data_use>('Data_use');
+    return _Data_use(
+      cd,
+    );
+  }
+
+  _dart_Data_use _Data_use;
 }
 
-class CoolStruct extends ffi.Struct {
+class Data extends ffi.Struct {
   @ffi.Int32()
-  int x;
+  int intType;
 
-  @ffi.Int32()
-  int y;
+  ffi.Pointer<ffi.Int8> charType;
 
   ffi.Pointer<ffi.Int32> arrayInt;
+
+  @ffi.Uint64()
+  int arrayIntLength;
+
+  ffi.Pointer<Data> arrayData;
+
+  @ffi.Uint64()
+  int arrayDataLength;
+
+  ffi.Pointer<Data> pointData;
 }
 
-typedef _c_Cool_function = ffi.Void Function(
-  ffi.Int32 i,
-  ffi.Int8 c,
-  ffi.Pointer<CoolStruct> cs,
+typedef _c_add = ffi.Int32 Function(
+  ffi.Int32 a,
+  ffi.Int32 b,
 );
 
-typedef _dart_Cool_function = void Function(
-  int i,
-  int c,
-  ffi.Pointer<CoolStruct> cs,
+typedef _dart_add = int Function(
+  int a,
+  int b,
+);
+
+typedef _c_addStr = ffi.Pointer<ffi.Int8> Function(
+  ffi.Pointer<ffi.Int8> cs,
+);
+
+typedef _dart_addStr = ffi.Pointer<ffi.Int8> Function(
+  ffi.Pointer<ffi.Int8> cs,
+);
+
+typedef _c_Str_free = ffi.Void Function(
+  ffi.Pointer<ffi.Int8> cs,
+);
+
+typedef _dart_Str_free = void Function(
+  ffi.Pointer<ffi.Int8> cs,
+);
+
+typedef _c_Data_new = ffi.Pointer<Data> Function();
+
+typedef _dart_Data_new = ffi.Pointer<Data> Function();
+
+typedef _c_Data_free = ffi.Void Function(
+  ffi.Pointer<Data> cd,
+);
+
+typedef _dart_Data_free = void Function(
+  ffi.Pointer<Data> cd,
+);
+
+typedef _c_Data_use = ffi.Pointer<Data> Function(
+  ffi.Pointer<Data> cd,
+);
+
+typedef _dart_Data_use = ffi.Pointer<Data> Function(
+  ffi.Pointer<Data> cd,
 );

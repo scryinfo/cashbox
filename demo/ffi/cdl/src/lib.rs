@@ -1,7 +1,7 @@
 use std::os::raw::{
-    c_char, c_int,c_ulonglong,
+    c_char, c_int, c_ulonglong,
 };
-use std::ffi::{CStr,CString};
+use std::ffi::{CStr, CString};
 
 mod wallets_c;
 
@@ -13,7 +13,7 @@ pub extern "C" fn add(a: c_int, b: c_int) -> c_int {
 
 //调用函数Str_free 释放内存返回的字符
 #[no_mangle]
-pub extern "C" fn str(cs: *mut c_char) -> *mut c_char {
+pub extern "C" fn addStr(cs: *mut c_char) -> *mut c_char {
     let s = to_str(cs);
     return to_c_char((s.to_owned() + " 测试").as_str());
 }
@@ -32,6 +32,7 @@ fn to_c_char(rs: &str) -> *mut c_char {
     let cstr = CString::new(rs).expect("Failed to create CString");
     return cstr.into_raw();
 }
+
 // do not free the cs's memory
 fn to_str(cs: *const c_char) -> &'static str {
     let cstr = unsafe {
@@ -61,7 +62,7 @@ pub extern "C" fn Data_new() -> *mut Data {
     new_d.charType = to_c_char("test 测试");
 
     {
-        let mut v = vec![1,2];
+        let mut v = vec![1, 2];
         new_d.arrayIntLength = v.len() as c_ulonglong;
         new_d.arrayInt = v.as_mut_ptr();
         std::mem::forget(v);
@@ -87,9 +88,9 @@ pub extern "C" fn Data_new() -> *mut Data {
 
 #[no_mangle]
 pub extern "C" fn Data_free(cd: *mut Data) {
-        if !cd.is_null() {
-            unsafe { Box::from_raw(cd); }// it will call the function "drop"
-        }
+    if !cd.is_null() {
+        unsafe { Box::from_raw(cd); }// it will call the function "drop"
+    }
 }
 
 #[no_mangle]
@@ -97,7 +98,7 @@ pub extern "C" fn Data_use(cd: *mut Data) -> *mut Data {
     let d = unsafe {
         Box::from_raw(cd)
     };
-    let mut ps = unsafe{
+    let mut ps = unsafe {
         Box::from_raw(d.pointData)
     };
     ps.intType = 1;
@@ -122,21 +123,21 @@ pub struct Data {
     pointData: *mut Data,
 }
 
-impl Default for Data{
+impl Default for Data {
     fn default() -> Self {
-        Data{
+        Data {
             intType: Default::default(),
             charType: std::ptr::null_mut(),
             arrayInt: std::ptr::null_mut(),
-            arrayIntLength:0,
+            arrayIntLength: 0,
             arrayData: std::ptr::null_mut(),
-            arrayDataLength:0,
+            arrayDataLength: 0,
             pointData: std::ptr::null_mut(),
         }
     }
 }
 
-impl Drop for Data{
+impl Drop for Data {
     fn drop(&mut self) {
         unsafe {
             Str_free(self.charType);
@@ -159,30 +160,32 @@ impl Drop for Data{
 
 #[cfg(test)]
 mod tests {
-    use crate::{add, str, to_c_char, to_str, Str_free, Data_new, Data_free};
+    use crate::{add, addStr, to_c_char, to_str, Str_free, Data_new, Data_free};
 
     #[test]
     fn test_add() {
-        assert_eq!(add(2,1), 3);
+        assert_eq!(add(2, 1), 3);
     }
+
     #[test]
     fn test_str() {
         let s = to_c_char("str");
-        let rs = str(s);
+        let rs = addStr(s);
         Str_free(s);// s alloc by to_c_char, so free memory
         let news = to_str(rs);
         assert_eq!("str 测试".to_string(), news.to_string());
         Str_free(rs);//rs alloc by str, so free memory
     }
+
     #[test]
-    fn test_struct(){
+    fn test_struct() {
         let s = unsafe { Box::from_raw(Data_new()) };
         assert_eq!(10, s.intType);
         assert_eq!("test 测试", to_str(s.charType));
         unsafe {
             let ints = std::slice::from_raw_parts_mut(s.arrayInt, s.arrayIntLength as usize);
             assert_eq!(ints.len(), s.arrayIntLength as usize);
-            assert_eq!(vec![1,2], ints);
+            assert_eq!(vec![1, 2], ints);
             std::mem::forget(ints);//不要释放内存
         }
         unsafe {
