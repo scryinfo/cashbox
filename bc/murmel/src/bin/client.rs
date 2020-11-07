@@ -21,9 +21,7 @@ extern crate simple_logger;
 
 use bitcoin::network::constants::Network;
 use log::Level;
-use murmel::{
-    constructor::Constructor
-};
+use murmel::constructor::Constructor;
 
 use std::{
     env::args,
@@ -52,10 +50,10 @@ pub fn main() {
         println!("--birth unixtime : blocks will be downloaded if matching filters after this time stamp");
         println!("defaults:");
         println!("--peer 127.0.0.1:8333");
-        println!("--db client.db");
+        println!("--db btc_chain.db");
         println!("--log debug");
         println!("--nodns");
-        println!("--network main");
+        println!("--network tetsnet");
         return;
     }
     if let Some(log) = find_arg("log") {
@@ -78,13 +76,21 @@ pub fn main() {
         match net.as_str() {
             "main" => network = Network::Bitcoin,
             "test" => network = Network::Testnet,
-            _ => network = Network::Testnet,
+            _ => network = Network::Bitcoin,
         }
     }
 
     let mut peers = get_peers();
     if peers.is_empty() {
-        peers.push(SocketAddr::from(SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 8333)));
+        let port = match network {
+            Network::Bitcoin => 8333,
+            Network::Testnet => 18333,
+            Network::Regtest => 18444,
+        };
+        peers.push(SocketAddr::from(SocketAddrV4::new(
+            Ipv4Addr::new(127, 0, 0, 1),
+            port,
+        )));
     }
     let mut connections = 1;
     if let Some(numstring) = find_arg("connections") {
@@ -94,11 +100,13 @@ pub fn main() {
     let birth = if let Some(timestamp) = find_arg("birth") {
         timestamp.parse::<u64>().unwrap()
     } else {
-        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs()
+        SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
     };
 
-    let chaindb =
-        if let Some(path) = find_arg("db") {
+    let chaindb = if let Some(path) = find_arg("db") {
             Constructor::open_db(Some(&Path::new(path.as_str())), network, birth).unwrap()
         } else {
             Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap()
@@ -109,29 +117,44 @@ pub fn main() {
 }
 
 fn get_peers() -> Vec<SocketAddr> {
-    find_args("peer").iter().map(|s| SocketAddr::from_str(s).unwrap()).collect()
+    find_args("peer")
+        .iter()
+        .map(|s| SocketAddr::from_str(s).unwrap())
+        .collect()
 }
 
 fn get_listeners() -> Vec<SocketAddr> {
-    find_args("listen").iter().map(|s| SocketAddr::from_str(s).unwrap()).collect()
+    find_args("listen")
+        .iter()
+        .map(|s| SocketAddr::from_str(s).unwrap())
+        .collect()
 }
 
 // Returns key-value zipped iterator.
-fn zipped_args() -> impl Iterator<Item=(String, String)> {
-    let key_args = args().filter(|arg| arg.starts_with("--")).map(|mut arg| arg.split_off(2));
+fn zipped_args() -> impl Iterator<Item = (String, String)> {
+    let key_args = args()
+        .filter(|arg| arg.starts_with("--"))
+        .map(|mut arg| arg.split_off(2));
     let val_args = args().skip(1).filter(|arg| !arg.starts_with("--"));
     key_args.zip(val_args)
 }
 
 fn find_opt(key: &str) -> bool {
-    let mut key_args = args().filter(|arg| arg.starts_with("--")).map(|mut arg| arg.split_off(2));
+    let mut key_args = args()
+        .filter(|arg| arg.starts_with("--"))
+        .map(|mut arg| arg.split_off(2));
     key_args.find(|ref k| k.as_str() == key).is_some()
 }
 
 fn find_arg(key: &str) -> Option<String> {
-    zipped_args().find(|&(ref k, _)| k.as_str() == key).map(|(_, v)| v)
+    zipped_args()
+        .find(|&(ref k, _)| k.as_str() == key)
+        .map(|(_, v)| v)
 }
 
 fn find_args(key: &str) -> Vec<String> {
-    zipped_args().filter(|&(ref k, _)| k.as_str() == key).map(|(_, v)| v).collect()
+    zipped_args()
+        .filter(|&(ref k, _)| k.as_str() == key)
+        .map(|(_, v)| v)
+        .collect()
 }

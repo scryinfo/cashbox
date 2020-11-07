@@ -93,7 +93,6 @@ pub fn create_master() -> Transaction {
 }
 
 mod test {
-    use crate::jniapi::create_translation::hash160;
     use crate::walletlib::create_master;
     use bitcoin::consensus::serialize;
     use bitcoin::Address;

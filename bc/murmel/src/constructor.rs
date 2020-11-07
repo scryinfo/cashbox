@@ -45,7 +45,7 @@ use futures::{
     Future, FutureExt, Poll as Async, StreamExt,
 };
 use futures_timer::Interval;
-use log::{error, info};
+use log::info;
 use rand::{thread_rng, RngCore};
 use std::pin::Pin;
 use std::time::Duration;
@@ -109,12 +109,12 @@ impl Constructor {
         );
 
         #[cfg(feature = "lightning")]
-        let lightning = Arc::new(Mutex::new(LightningConnector::new(
+            let lightning = Arc::new(Mutex::new(LightningConnector::new(
             network,
             p2p_control.clone(),
         )));
         #[cfg(not(feature = "lightning"))]
-        let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
+            let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
 
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
@@ -174,7 +174,7 @@ impl Constructor {
             executor
                 .spawn(
                     p2p.add_peer("bitcoin", PeerSource::Outgoing(addr.clone()))
-                        .map(|_| ()),
+                       .map(|_| ()),
                 )
                 .expect("can not spawn task for peers");
         }

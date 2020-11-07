@@ -1,12 +1,12 @@
-//! mod for btcapi
-//! java native method def in  packages/wallet_manager/android/src/main/java/info/scry/wallet_manager/NativeLib.java
-
-#![cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
+//！ Expose the JNI interface for android
+#![cfg(target_os="android")]
 #![allow(non_snake_case)]
-pub mod another {
-    use crate::jniapi::SHARED_SQLITE;
+pub mod android {
+
     use crate::constructor::Constructor;
+    use crate::db::SQLite;
     use crate::db::SharedSQLite;
+    use crate::hooks::{ApiMessage, HooksMessage};
     use bitcoin::consensus::serialize;
     use bitcoin::network::message_bloom_filter::FilterLoadMessage;
     use bitcoin::util::psbt::serialize::Serialize;
@@ -314,7 +314,7 @@ pub mod another {
     }
 
     mod test {
-        use crate::jniapi::btcapi::another::{calc_bloomfilter, calc_pubkey, calc_default_address};
+        use crate::jniapi::btcapi::{calc_bloomfilter, calc_pubkey, calc_default_address};
 
         #[test]
         pub fn test_calc_pubkey() {
