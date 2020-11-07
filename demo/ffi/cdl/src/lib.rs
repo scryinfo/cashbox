@@ -111,16 +111,16 @@ pub extern "C" fn Data_use(cd: *mut Data) -> *mut Data {
 #[repr(C)]
 #[derive(Clone)]
 pub struct Data {
-    intType: c_int,
-    charType: *mut c_char,
+    pub intType: c_int,
+    pub charType: *mut c_char,
 
-    arrayInt: *mut c_int,
-    arrayIntLength: c_ulonglong,
+    pub arrayInt: *mut c_int,
+    pub arrayIntLength: c_ulonglong,
 
-    arrayData: *mut Data,
-    arrayDataLength: c_ulonglong,
+    pub arrayData: *mut Data,
+    pub arrayDataLength: c_ulonglong,
 
-    pointData: *mut Data,
+    pub pointData: *mut Data,
 }
 
 impl Default for Data {
@@ -143,10 +143,12 @@ impl Drop for Data {
             Str_free(self.charType);
 
             if self.arrayIntLength > 0 && !self.arrayInt.is_null() {
-                std::slice::from_raw_parts_mut(self.arrayInt, self.arrayIntLength as usize);
+                let p = std::slice::from_raw_parts_mut(self.arrayInt, self.arrayIntLength as usize);
+                Box::from_raw(p.as_mut_ptr());//free memory
             }
             if self.arrayDataLength > 0 && !self.arrayData.is_null() {
-                std::slice::from_raw_parts_mut(self.arrayData, self.arrayDataLength as usize);
+                let p = std::slice::from_raw_parts_mut(self.arrayData, self.arrayDataLength as usize);
+                Box::from_raw(p.as_mut_ptr());
             }
             if !self.pointData.is_null() {
                 Box::from_raw(self.pointData);
