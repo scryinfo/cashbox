@@ -1,16 +1,13 @@
 //! This mod is about bloomfilter
 use crate::error::Error;
 use crate::p2p::{
-    P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
+     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
     SERVICE_BLOCKS,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
-use bitcoin::network::message_blockdata::{InvType, Inventory};
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use bitcoin::{BitcoinHash, BlockHeader};
 use log::{error, info, trace};
-use std::collections::VecDeque;
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;

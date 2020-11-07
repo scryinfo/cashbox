@@ -20,7 +20,7 @@ use crate::chaindb::SharedChainDB;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
 use crate::hooks::HooksMessage;
-use crate::jniapi::btcapi::SHARED_SQLITE;
+use crate::jniapi::SHARED_SQLITE;
 use crate::p2p::{
     P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
     SERVICE_BLOCKS,

@@ -7,8 +7,6 @@ use crate::p2p::{
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use crate::walletlib;
 use bitcoin::network::message::NetworkMessage;
-use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use bitcoin::Transaction;
 use log::{error, info, trace};
 use std::sync::mpsc;
 use std::thread;

@@ -48,7 +48,7 @@ const TEST_SEEDER: [&str; 4] = [
 pub fn dns_seed(network: Network) -> Vec<SocketAddr> {
     let mut seeds = Vec::new();
     if network == Network::Bitcoin {
-        info!("reaching out for DNS seed...");
+        info!("reaching out for Mainet DNS seed...");
         for seedhost in MAIN_SEEDER.iter() {
             if let Ok(lookup) = (*seedhost, 8333).to_socket_addrs() {
                 for host in lookup {
@@ -61,7 +61,7 @@ pub fn dns_seed(network: Network) -> Vec<SocketAddr> {
         info!("received {} DNS seeds", seeds.len());
     }
     if network == Network::Testnet {
-        info!("reaching out for DNS seed...");
+        info!("reaching out for Testnet DNS seed...");
         for seedhost in TEST_SEEDER.iter() {
             if let Ok(lookup) = (*seedhost, 18333).to_socket_addrs() {
                 for host in lookup {

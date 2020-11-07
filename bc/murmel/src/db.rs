@@ -25,7 +25,7 @@ pub struct SQLite {
 
 impl SQLite {
     pub fn open_db(network: Network) -> Self {
-        let mut sqlite = sqlite::open(BTC_CHAIN_PATH).expect("create sqlite error");
+        let mut sqlite = sqlite::open(BTC_DETAIL_PATH).expect("create sqlite error");
         sqlite.set_busy_timeout(3000).unwrap();
         sqlite.execute(
             "
@@ -264,8 +264,8 @@ impl SQLite {
 }
 
 mod test {
+    use crate::jniapi::SHARED_SQLITE;
     use crate::db::NEWEST_KEY;
-    use crate::jniapi::btcapi::SHARED_SQLITE;
 
     #[test]
     pub fn test_init() {

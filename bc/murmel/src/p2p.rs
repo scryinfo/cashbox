@@ -289,7 +289,7 @@ pub trait P2PConfig<
     fn magic(&self) -> u32;
     fn user_agent(&self) -> &str;
     fn get_height(&self) -> u32;
-    fn set_height(&self, _: u32);
+    fn set_height(&self, height: u32);
     fn max_protocol_version(&self) -> u32;
     fn min_protocol_version(&self) -> u32;
     fn verack(&self) -> Message;

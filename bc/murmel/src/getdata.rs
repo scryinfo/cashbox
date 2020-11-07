@@ -4,24 +4,22 @@
 use crate::chaindb::SharedChainDB;
 use crate::error::Error;
 use crate::hooks::HooksMessage;
-use crate::jniapi::btcapi::SHARED_SQLITE;
+use crate::jniapi::SHARED_SQLITE;
 use crate::p2p::{
-    P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
+     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
     SERVICE_BLOCKS, SERVICE_BLOOM,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
-use bitcoin::network::message::NetworkMessage::GetBlocks;
-use bitcoin::network::message_blockdata::{GetBlocksMessage, InvType, Inventory};
-use bitcoin::network::message_bloom_filter::{FilterLoadMessage, MerkleBlockMessage};
-use bitcoin::{BitcoinHash, BlockHeader, Transaction};
+use bitcoin::network::message_blockdata::{ InvType, Inventory};
+use bitcoin::network::message_bloom_filter::{ MerkleBlockMessage};
+use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use bitcoin_hashes::Hash;
 use log::{error, info, trace, warn};
-use std::collections::VecDeque;
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
