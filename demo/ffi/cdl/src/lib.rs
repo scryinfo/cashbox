@@ -188,19 +188,22 @@ mod tests {
             let ints = std::slice::from_raw_parts_mut(s.arrayInt, s.arrayIntLength as usize);
             assert_eq!(ints.len(), s.arrayIntLength as usize);
             assert_eq!(vec![1, 2], ints);
-            std::mem::forget(ints);//不要释放内存
+            //以下这行代码不需要，因为from_raw_parts_mut返回的对象不会释放内存
+            // std::mem::forget(ints);//不要释放内存
         }
         unsafe {
             let datas = std::slice::from_raw_parts_mut(s.arrayData, s.arrayDataLength as usize);
             assert_eq!(datas.len(), s.arrayDataLength as usize);
             assert_eq!(1, datas[0].intType);
             assert_eq!(2, datas[1].intType);
-            std::mem::forget(datas);//不要释放内存
+            //以下这行代码不需要，因为from_raw_parts_mut返回的对象不会释放内存
+            // std::mem::forget(datas);//不要释放内存
         }
         unsafe {
             let data = Box::from_raw(s.pointData);
             assert_eq!(3, data.intType);
             std::mem::forget(data);//不要释放内存
+            // Box::into_raw(data); 这个方法与上面的效果是一样的
         }
         Data_free(Box::into_raw(s));//这里已经执行 into_raw了，所以不需要再调用 下面的 forget
         // std::mem::forget(s);//内存由Data_new函数内分配，要使用Data_free释放内存
