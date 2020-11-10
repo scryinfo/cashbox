@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:app/global_config/vendor_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/util/app_info_util.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/sharedpreference_util.dart';
@@ -25,8 +25,8 @@ Future requestWithDeviceId(String url, {formData}) async {
       if (Platform.isAndroid) {
         _deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
         if (_deviceData != null) {
-          deviceId = _deviceData[
-              "androidId"]; //At present, each Android product device has a unique identification value. If you do not agree, temporarily take the value of androidId.
+          deviceId = _deviceData["androidId"];
+          //At present, each Android product device has a unique identification value. If you do not agree, temporarily take the value of androidId.
         }
       } else if (Platform.isIOS) {
         _deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
@@ -61,15 +61,11 @@ Future requestWithConfigCheckParam(String url, {formData}) async {
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   String apkVersion = packageInfo.version;
   formData["apkVersion"] = apkVersion;
-
-  var authTokenListVersion = spUtil.getString(VendorConfig.authDigitsVersionKey) ?? VendorConfig.authDigitsVersionValue;
-  formData["authTokenListVersion"] = authTokenListVersion;
-
-  var defaultTokenListVersion = spUtil.getString(VendorConfig.defaultDigitsVersionKey) ?? VendorConfig.defaultDigitsVersionValue;
-  formData["defaultTokenListVersion"] = defaultTokenListVersion;
-
-  var appConfigVersion = spUtil.getString(VendorConfig.appConfigVersionKey) ?? VendorConfig.appConfigVersionValue;
-  formData["appConfigVersion"] = appConfigVersion;
+  
+  Config config = await HandleConfig.instance.getConfig();
+  formData["authTokenListVersion"] = config.privateConfig.authDigitVersion;
+  formData["defaultTokenListVersion"] = config.privateConfig.defaultDigitVersion;
+  formData["appConfigVersion"] = config.privateConfig.configVersion;
 
   return requestWithDeviceId(url, formData: formData);
 }
@@ -77,7 +73,7 @@ Future requestWithConfigCheckParam(String url, {formData}) async {
 //Access network request, url + parameter object
 Future request(String url, {formData}) async {
   try {
-    // print('开始获取数据...............' + url);
+    // print('开始获取数据...............' + url + "||formData :" + formData.toString());
     Response response;
     Dio dio = new Dio();
     //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");

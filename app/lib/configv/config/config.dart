@@ -8,7 +8,7 @@ part 'config.g.dart';
 class Config extends Object {
   Config();
 
-  bool isInitializedDB;
+  bool isInitedConfig;
   int lastTimeConfigCheck;
   int intervalMilliseconds;
   String currency;
@@ -152,11 +152,10 @@ class PrivateConfig {
   String downloadLatestAppUrl;
   String rateUrl;
   String authDigitVersion;
-  String authDigitIp;
+  List<String> authDigitIpList;
   String defaultDigitVersion;
-  String defaultDigitIp;
+  List<String> defaultDigitIpList;
   List<Token> defaultTokens;
-  String defaultDigitContent;
   String scryXIp;
   String publicIp;
   String nowDbVersion;

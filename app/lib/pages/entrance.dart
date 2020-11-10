@@ -1,13 +1,10 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
 import 'package:app/net/net_util.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
-import 'package:app/util/sharedpreference_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
@@ -65,14 +62,12 @@ class _EntrancePageState extends State<EntrancePage> {
   }
 
   _checkAndUpdateAppConfig() async {
-
-
     // handle case : DB upgrade.   DB initial installation already finish in func -> initAppConfigInfo()->initDatabaseAndDefaultDigits()
     Config config = await HandleConfig.instance.getConfig();
 
     Map resultMap = await Wallets.instance.updateWalletDbData(config.dbVersion);
     if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
-      print("_checkAndUpdateAppConfig===>update database successful===>" + config.dbVersion);
+      LogUtil.i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
     }
     int lastTimeConfigCheck = config.lastTimeConfigCheck;
     int nowTimeStamp = DateTime.now().millisecondsSinceEpoch;
@@ -90,103 +85,95 @@ class _EntrancePageState extends State<EntrancePage> {
           ///update config information
           if (isLatestConfig == null || !isLatestConfig) {
             var latestConfigObj = resultData["latestConfig"];
-            LogUtil.i("_checkServerAppConfig latestConfigObj======>", latestConfigObj.toString());
             var isLatestAuthToken = resultData["isLatestAuthToken"];
-            LogUtil.i("_checkServerAppConfig isLatestAuthToken======>", isLatestAuthToken.toString());
 
             ///update auth digit list
             if (!isLatestAuthToken) {
-              List authTokenUrl = latestConfigObj["authTokenUrl"];
-              print("_checkServerAppConfig authTokenUrl======>" + authTokenUrl.toString());
-              if (authTokenUrl != null && authTokenUrl.length > 0 && authTokenUrl[0].toString().isNotEmpty) {
-                config.privateConfig.authDigitIp = authTokenUrl[0].toString(); // TODO youhua
+              List authTokenUrlList = latestConfigObj["authTokenUrl"];
+              if (authTokenUrlList != null && authTokenUrlList.length > 0) {
+                config.privateConfig.authDigitIpList = [];
+                authTokenUrlList.forEach((element) {
+                  config.privateConfig.authDigitIpList.add(element.toString());
+                });
               }
+              config.privateConfig.authDigitVersion = latestConfigObj["authTokenListVersion"];
             }
             var isLatestDefaultToken = resultData["isLatestDefaultToken"];
 
             ///update default digit list
             if (!isLatestDefaultToken) {
-              List defaultTokenUrl = latestConfigObj["defaultTokenUrl"];
-              print("_checkServerAppConfig defaultTokenUrl======>" + defaultTokenUrl.toString());
-              if (defaultTokenUrl != null && (defaultTokenUrl.length > 0) && defaultTokenUrl[0].toString().isNotEmpty) {
-                config.privateConfig.defaultDigitIp = defaultTokenUrl[0].toString(); //todo
+              List defaultTokenIpList = latestConfigObj["defaultTokenUrl"];
+              if (defaultTokenIpList != null && (defaultTokenIpList.length > 0)) {
+                config.privateConfig.defaultDigitIpList = [];
+                defaultTokenIpList.forEach((element) {
+                  config.privateConfig.defaultDigitIpList.add(element);
+                });
+                config.privateConfig.defaultDigitVersion = latestConfigObj["defaultTokenListVersion"];
                 //update defaultDigitList to native
                 try {
-                  var defaultDigitParam = await requestWithDeviceId(defaultTokenUrl[0].toString());
+                  var defaultDigitParam = await requestWithDeviceId(defaultTokenIpList[0].toString());
                   if (defaultDigitParam["code"] != null && defaultDigitParam["code"] == 0) {
                     String paramString = convert.jsonEncode(defaultDigitParam["data"]);
-                    print("loadServerDigitsData paramString======>" + paramString.toString());
                     var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
-                    print("updateMap[isUpdateDefaultDigit](),=====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
+                    LogUtil.i("updateDefaultDigitList=====>", updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
                   }
                 } catch (e) {
-                  print("updateDefaultDigitList,error is ===>" + e.toString());
+                  LogUtil.e("updateDefaultDigitList error =====>", e.toString());
                 }
               }
             }
 
             ///update digit Rate
             var tokenToLegalTenderExchangeRateIp = latestConfigObj["tokenToLegalTenderExchangeRateIp"];
-            print("_checkServerAppConfig tokenToLegalTenderExchangeRateIp======>" + tokenToLegalTenderExchangeRateIp.toString());
             if (tokenToLegalTenderExchangeRateIp != null && tokenToLegalTenderExchangeRateIp.toString().isNotEmpty) {
               config.privateConfig.rateUrl = tokenToLegalTenderExchangeRateIp;
             }
 
             ///update scryX
             var scryXChainUrl = latestConfigObj["scryXChainUrl"];
-            print("_checkServerAppConfig scryXChainUrl======>" + scryXChainUrl.toString());
             if (scryXChainUrl != null && scryXChainUrl.toString().isNotEmpty) {
               config.privateConfig.scryXIp = scryXChainUrl;
             }
 
             ///update announcementUrl
             var announcementUrl = latestConfigObj["announcementUrl"];
-            print("_checkServerAppConfig announcementUrl======>" + announcementUrl.toString());
             if (announcementUrl != null && announcementUrl.toString().isNotEmpty) {
               config.privateConfig.publicIp = announcementUrl;
             }
 
             ///update downloadUrl
             var apkDownloadLink = latestConfigObj["apkDownloadLink"];
-            print("_checkServerAppConfig apkDownloadLink======>" + apkDownloadLink.toString());
             if (apkDownloadLink != null && apkDownloadLink.toString().isNotEmpty) {
               config.privateConfig.downloadLatestAppUrl = apkDownloadLink;
             }
 
             ///update appConfigVersion
             var appConfigVersion = latestConfigObj["appConfigVersion"];
-            print("_checkServerAppConfig appConfigVersion======>" + appConfigVersion.toString());
             if (appConfigVersion != null && appConfigVersion.toString().isNotEmpty) {
               config.privateConfig.configVersion = appConfigVersion;
             }
 
             ///update appConfigVersion
-            var dappOpenUrlValue = latestConfigObj[VendorConfig.dappOpenUrlKey];
-            print("_checkServerAppConfig dappOpenUrlValue======>" + dappOpenUrlValue.toString());
+            var dappOpenUrlValue = latestConfigObj["dappOpenUrl"];
             if (dappOpenUrlValue != null && dappOpenUrlValue.toString().isNotEmpty) {
               config.privateConfig.dappOpenUrl = dappOpenUrlValue;
             }
           }
-          print("_checkServerAppConfig isLatestApk======>" + isLatestApk.toString());
           if (isLatestApk == null || !isLatestApk) {
             var latestApkObj = resultData["latestApk"];
             LogUtil.i("_checkServerAppConfig latestApkObj======>", latestApkObj.toString());
             String apkVersion = latestApkObj["apkVersion"].toString();
-            LogUtil.i("_checkServerAppConfig apkVersion======>", apkVersion.toString());
             if (apkVersion != null && apkVersion.isNotEmpty) {
               config.privateConfig.serverApkVersionKey = apkVersion;
             }
           }
+          // save changed config
+          HandleConfig.instance.saveConfig(config);
         } else {
-          LogUtil.i("_checkAndUpdateAppConfig() requestWithVersionParam", "result status is not ok");
+          LogUtil.i("_checkAndUpdateAppConfig() requestWithVersionParam ", "result status is not ok");
         }
-        HandleConfig.instance.saveConfig(config);
       } else {
-        print("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" +
-            nowTimeStamp.toString() +
-            "||lastChangeTime=>" +
-            lastTimeConfigCheck.toString());
-        print("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" + (nowTimeStamp - lastTimeConfigCheck).toString());
+        LogUtil.i("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>", (nowTimeStamp - lastTimeConfigCheck).toString());
       }
     } catch (e) {
       LogUtil.i("_checkServerAppConfig(), error is =======>", e.toString());

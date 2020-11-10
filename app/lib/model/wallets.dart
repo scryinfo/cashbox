@@ -1,14 +1,11 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/tx_model/eee_transaction_model.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/util/log_util.dart';
-import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:wallet_manager/wallet_manager.dart';
-
+import 'dart:convert' as convert;
 import 'dart:typed_data';
 
 import 'chain.dart';
@@ -37,45 +34,40 @@ class Wallets {
   }
 
   initAppConfig() async {
-    // initIpConfig(); //init IP config info to local file
     initDatabaseAndDefaultDigits(); //init wallet Database Info
-  }
-
-  initIpConfig() async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    var isFinishInit = spUtil.getBool(GlobalConfig.isInitAppConfig);
-    if (isFinishInit == null || !isFinishInit) {
-      SharedPreferenceUtil.initIpConfig(); //Initialize interface ip, version information, etc. to local file
-    }
-    var temp = spUtil.get(VendorConfig.dappOpenUrlKey);
-    if (temp != null && temp.isNotEmpty) {
-      VendorConfig.dappOpenUrValue = temp.toString();
-    }
   }
 
   initDatabaseAndDefaultDigits() async {
     Config config = await HandleConfig.instance.getConfig();
-    {
-      String digitParam = config.privateConfig.defaultDigitContent;
-      if (digitParam != null && digitParam != "") {
-        Map updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
-        int status = updateMap["status"];
-        if (status == null || status != 200) {
-          LogUtil.e("initWallet,updateDefaultDigitList error=>", "not find status code");
+    if (config.isInitedConfig == null || config.isInitedConfig == false) {
+      {
+        //init defaultDigit
+        config.privateConfig.defaultTokens.toString();
+        String digitParam = "[";
+        config.privateConfig.defaultTokens.forEach((element) {
+          digitParam = digitParam + convert.jsonEncode(element) + ",";
+        });
+        digitParam = digitParam.substring(0, digitParam.length - 1) + "]";
+        if (digitParam != null && digitParam != "") {
+          Map updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
+          int status = updateMap["status"];
+          if (status == null || status != 200) {
+            LogUtil.e("initWallet,updateDefaultDigitList error=>", updateMap["message"].toString());
+          }
         }
       }
-    }
-
-    if (config.isInitializedDB == null || config.isInitializedDB == false) {
-      Map resultMap = await WalletManager.initWalletBasicData(); //Initialize some database data
-      int status = resultMap["status"];
-      if (status == null || status != 200) {
-        LogUtil.e("initWalletBasicData error=>", "not find status code");
-        return;
-      }
-      if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
-        config.isInitializedDB = true;
-        HandleConfig.instance.saveConfig(config);
+      {
+        //init DB
+        Map resultMap = await WalletManager.initWalletBasicData(); //Initialize some database data
+        int status = resultMap["status"];
+        if (status == null || status != 200) {
+          LogUtil.e("initWalletBasicData error=>", "not find status code");
+          return;
+        }
+        if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
+          config.isInitedConfig = true;
+          HandleConfig.instance.saveConfig(config);
+        }
       }
     }
   }

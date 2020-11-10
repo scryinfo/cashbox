@@ -8,15 +8,11 @@ import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/provide/server_config_provide.dart';
-import 'package:app/util/sharedpreference_util.dart';
-import 'package:app/widgets/restart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
-import 'global_config/global_config.dart';
 import 'package:fluro/fluro.dart';
 import 'provide/transaction_provide.dart';
 import 'routers/routers.dart';
@@ -30,9 +26,15 @@ void main() async {
   ///Force portrait
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
+  Config config = await HandleConfig.instance.getConfig();
+  List<String> languagesKeyList = [];
+  config.languages.forEach((element) {
+    languagesKeyList.add(element.localeKey);
+  });
+
   var delegate = await LocalizationDelegate.create(
-    fallbackLocale: GlobalConfig.defaultLocaleValue,
-    supportedLocales: GlobalConfig.globalLanguageMap.keys.toList(),
+    fallbackLocale:  config.locale,
+    supportedLocales: languagesKeyList,
   );
 
   runApp(LocalizedApp(delegate, MyApp()));

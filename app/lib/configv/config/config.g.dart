@@ -8,7 +8,7 @@ part of 'config.dart';
 
 Config _$ConfigFromJson(Map<String, dynamic> json) {
   return Config()
-    ..isInitializedDB = json['isInitializedDB'] as bool
+    ..isInitedConfig = json['isInitedConfig'] as bool
     ..lastTimeConfigCheck = json['lastTimeConfigCheck'] as int
     ..intervalMilliseconds = json['intervalMilliseconds'] as int
     ..currency = json['currency'] as String
@@ -54,7 +54,7 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
-      'isInitializedDB': instance.isInitializedDB,
+      'isInitedConfig': instance.isInitedConfig,
       'lastTimeConfigCheck': instance.lastTimeConfigCheck,
       'intervalMilliseconds': instance.intervalMilliseconds,
       'currency': instance.currency,
@@ -191,14 +191,15 @@ PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
     ..downloadLatestAppUrl = json['downloadLatestAppUrl'] as String
     ..rateUrl = json['rateUrl'] as String
     ..authDigitVersion = json['authDigitVersion'] as String
-    ..authDigitIp = json['authDigitIp'] as String
+    ..authDigitIpList =
+        (json['authDigitIpList'] as List)?.map((e) => e as String)?.toList()
     ..defaultDigitVersion = json['defaultDigitVersion'] as String
-    ..defaultDigitIp = json['defaultDigitIp'] as String
+    ..defaultDigitIpList =
+        (json['defaultDigitIpList'] as List)?.map((e) => e as String)?.toList()
     ..defaultTokens = (json['defaultTokens'] as List)
         ?.map(
             (e) => e == null ? null : Token.fromJson(e as Map<String, dynamic>))
         ?.toList()
-    ..defaultDigitContent = json['defaultDigitContent'] as String
     ..scryXIp = json['scryXIp'] as String
     ..publicIp = json['publicIp'] as String
     ..nowDbVersion = json['nowDbVersion'] as String
@@ -217,11 +218,10 @@ Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
       'downloadLatestAppUrl': instance.downloadLatestAppUrl,
       'rateUrl': instance.rateUrl,
       'authDigitVersion': instance.authDigitVersion,
-      'authDigitIp': instance.authDigitIp,
+      'authDigitIpList': instance.authDigitIpList,
       'defaultDigitVersion': instance.defaultDigitVersion,
-      'defaultDigitIp': instance.defaultDigitIp,
+      'defaultDigitIpList': instance.defaultDigitIpList,
       'defaultTokens': instance.defaultTokens,
-      'defaultDigitContent': instance.defaultDigitContent,
       'scryXIp': instance.scryXIp,
       'publicIp': instance.publicIp,
       'nowDbVersion': instance.nowDbVersion,
