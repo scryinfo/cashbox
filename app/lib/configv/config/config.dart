@@ -6,11 +6,12 @@ part 'config.g.dart';
 
 @JsonSerializable()
 class Config extends Object {
-  Config(this.currency, this.locale, this.ethUnit, this.eeeUnit);
+  Config();
 
+  bool isInitializedDB;
   String currency;
   String locale;
-  List<Object> languages;
+  List<Language> languages;
   String serverAppVersion;
 
   MaxGasLimit maxGasLimit;
@@ -30,7 +31,7 @@ class Config extends Object {
   String balanceSymbol;
   String eeeSymbol;
 
-  VendorConfig vendorConfig;
+  PrivateConfig privateConfig;
 
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
@@ -38,8 +39,20 @@ class Config extends Object {
 }
 
 @JsonSerializable()
+class Language extends Object {
+  Language();
+
+  String localeKey;
+  String localeValue;
+
+  factory Language.fromJson(Map<String, dynamic> json) => _$LanguageFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LanguageToJson(this);
+}
+
+@JsonSerializable()
 class MaxGasLimit extends Object {
-  MaxGasLimit(this.ethGasLimit, this.erc20GasLimit);
+  MaxGasLimit();
 
   int ethGasLimit;
   int erc20GasLimit;
@@ -51,7 +64,7 @@ class MaxGasLimit extends Object {
 
 @JsonSerializable()
 class MinGasLimit extends Object {
-  MinGasLimit(this.ethGasLimit, this.erc20GasLimit);
+  MinGasLimit();
 
   int ethGasLimit;
   int erc20GasLimit;
@@ -63,7 +76,7 @@ class MinGasLimit extends Object {
 
 @JsonSerializable()
 class DefaultGasLimit extends Object {
-  DefaultGasLimit(this.ethGasLimit, this.erc20GasLimit);
+  DefaultGasLimit();
 
   int ethGasLimit;
   int erc20GasLimit;
@@ -75,7 +88,7 @@ class DefaultGasLimit extends Object {
 
 @JsonSerializable()
 class MaxGasPrice extends Object {
-  MaxGasPrice(this.ethGasPrice, this.erc20GasPrice);
+  MaxGasPrice();
 
   int ethGasPrice;
   int erc20GasPrice;
@@ -87,7 +100,7 @@ class MaxGasPrice extends Object {
 
 @JsonSerializable()
 class MinGasPrice extends Object {
-  MinGasPrice(this.ethGasPrice, this.erc20GasPrice);
+  MinGasPrice();
 
   int ethGasPrice;
   int erc20GasPrice;
@@ -99,7 +112,7 @@ class MinGasPrice extends Object {
 
 @JsonSerializable()
 class DefaultGasPrice extends Object {
-  DefaultGasPrice(this.ethGasPrice, this.erc20GasPrice);
+  DefaultGasPrice();
 
   int ethGasPrice;
   int erc20GasPrice;
@@ -110,8 +123,8 @@ class DefaultGasPrice extends Object {
 }
 
 @JsonSerializable()
-class VendorConfig {
-  VendorConfig();
+class PrivateConfig {
+  PrivateConfig();
 
   String serverConfigIp;
   String configVersion;
@@ -131,7 +144,7 @@ class VendorConfig {
   String dddTestNetCA;
   String dappOpenUrl;
 
-  factory VendorConfig.fromJson(Map<String, dynamic> json) => _$VendorConfigFromJson(json);
+  factory PrivateConfig.fromJson(Map<String, dynamic> json) => _$PrivateConfigFromJson(json);
 
-  Map<String, dynamic> toJson() => _$VendorConfigToJson(this);
+  Map<String, dynamic> toJson() => _$PrivateConfigToJson(this);
 }

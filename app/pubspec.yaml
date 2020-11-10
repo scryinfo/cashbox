@@ -131,6 +131,8 @@ flutter:
 
   assets:
 
+    - assets/config/config.json
+
     - assets/i18n/
 
     - assets/images/

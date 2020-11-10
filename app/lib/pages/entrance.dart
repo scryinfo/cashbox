@@ -1,3 +1,5 @@
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/net/net_util.dart';
@@ -26,7 +28,6 @@ class _EntrancePageState extends State<EntrancePage> {
   var allWalletList = List();
   bool _agreeServiceProtocol = true;
   bool _isContainWallet = false;
-  Future future;
   String _languageTextValue = "";
   List<String> languagesKeyList = [];
   Map<String, String> languageMap = {};
@@ -41,17 +42,19 @@ class _EntrancePageState extends State<EntrancePage> {
   void didChangeDependencies() async {
     super.didChangeDependencies();
     await initAppConfigInfo(); //case: After deleting the wallet, there is no wallet, return to EntrancePage, check every time
-    var spUtil = await SharedPreferenceUtil.instance;
-    _languageTextValue = languageMap[spUtil.getString(GlobalConfig.savedLocaleKey)];
-    future = _checkIsContainWallet();
+    Config config = await HandleConfig.instance.getConfig();
+    _languageTextValue = languageMap[config.locale];
     _checkAndUpdateAppConfig();
   }
 
   initAppConfigInfo() async {
     languagesKeyList = [];
-    languagesKeyList = GlobalConfig.globalLanguageMap.keys.toList();
     languageMap = {};
-    languageMap.addAll(GlobalConfig.globalLanguageMap);
+    Config config = await HandleConfig.instance.getConfig();
+    config.languages.forEach((element) {
+      languageMap[element.localeKey] = element.localeValue;
+      languagesKeyList.add(element.localeKey);
+    });
     /*  Initialize to local file
         1. Interface ip, version information, etc. Save to local file
         2. Database information, etc.
@@ -207,7 +210,7 @@ class _EntrancePageState extends State<EntrancePage> {
 
     return Container(
       child: FutureBuilder(
-          future: future,
+          future: _checkIsContainWallet(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               print("EntrancePage snapshot.error==>" + snapshot.error.toString());

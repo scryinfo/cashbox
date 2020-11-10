@@ -1,12 +1,15 @@
 {
+  "isInitializedDB": false,
   "currency": "USD",
   "locale": "zh",
   "languages": [
     {
-      "zh": "Chinese"
+      "localeKey": "zh",
+      "localeValue": "Chinese"
     },
     {
-      "en": "English"
+      "localeKey": "en",
+      "localeValue": "English"
     }
   ],
   "maxGasLimit": {
@@ -41,7 +44,7 @@
   "tokenXSymbol": "Tokenx",
   "balanceSymbol": "Balances",
   "eeeSymbol": "Eee",
-  "vendorConfig": {
+  "privateConfig": {
     "serverConfigIp": "111",
     "configVersion": "222",
     "downloadAppUrl": "333",

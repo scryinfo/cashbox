@@ -7,13 +7,14 @@ part of 'config.dart';
 // **************************************************************************
 
 Config _$ConfigFromJson(Map<String, dynamic> json) {
-  return Config(
-    json['currency'] as String,
-    json['locale'] as String,
-    json['ethUnit'] == null ? null : BigInt.parse(json['ethUnit'] as String),
-    json['eeeUnit'] == null ? null : BigInt.parse(json['eeeUnit'] as String),
-  )
-    ..languages = json['languages'] as List
+  return Config()
+    ..isInitializedDB = json['isInitializedDB'] as bool
+    ..currency = json['currency'] as String
+    ..locale = json['locale'] as String
+    ..languages = (json['languages'] as List)
+        ?.map((e) =>
+            e == null ? null : Language.fromJson(e as Map<String, dynamic>))
+        ?.toList()
     ..serverAppVersion = json['serverAppVersion'] as String
     ..maxGasLimit = json['maxGasLimit'] == null
         ? null
@@ -36,17 +37,22 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
         : DefaultGasPrice.fromJson(
             json['defaultGasPrice'] as Map<String, dynamic>)
     ..dbVersion = json['dbVersion'] as String
+    ..ethUnit =
+        json['ethUnit'] == null ? null : BigInt.parse(json['ethUnit'] as String)
+    ..eeeUnit =
+        json['eeeUnit'] == null ? null : BigInt.parse(json['eeeUnit'] as String)
     ..systemSymbol = json['systemSymbol'] as String
     ..accountSymbol = json['accountSymbol'] as String
     ..tokenXSymbol = json['tokenXSymbol'] as String
     ..balanceSymbol = json['balanceSymbol'] as String
     ..eeeSymbol = json['eeeSymbol'] as String
-    ..vendorConfig = json['vendorConfig'] == null
+    ..privateConfig = json['privateConfig'] == null
         ? null
-        : VendorConfig.fromJson(json['vendorConfig'] as Map<String, dynamic>);
+        : PrivateConfig.fromJson(json['privateConfig'] as Map<String, dynamic>);
 }
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
+      'isInitializedDB': instance.isInitializedDB,
       'currency': instance.currency,
       'locale': instance.locale,
       'languages': instance.languages,
@@ -65,14 +71,24 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'tokenXSymbol': instance.tokenXSymbol,
       'balanceSymbol': instance.balanceSymbol,
       'eeeSymbol': instance.eeeSymbol,
-      'vendorConfig': instance.vendorConfig,
+      'privateConfig': instance.privateConfig,
+    };
+
+Language _$LanguageFromJson(Map<String, dynamic> json) {
+  return Language()
+    ..localeKey = json['localeKey'] as String
+    ..localeValue = json['localeValue'] as String;
+}
+
+Map<String, dynamic> _$LanguageToJson(Language instance) => <String, dynamic>{
+      'localeKey': instance.localeKey,
+      'localeValue': instance.localeValue,
     };
 
 MaxGasLimit _$MaxGasLimitFromJson(Map<String, dynamic> json) {
-  return MaxGasLimit(
-    json['ethGasLimit'] as int,
-    json['erc20GasLimit'] as int,
-  );
+  return MaxGasLimit()
+    ..ethGasLimit = json['ethGasLimit'] as int
+    ..erc20GasLimit = json['erc20GasLimit'] as int;
 }
 
 Map<String, dynamic> _$MaxGasLimitToJson(MaxGasLimit instance) =>
@@ -82,10 +98,9 @@ Map<String, dynamic> _$MaxGasLimitToJson(MaxGasLimit instance) =>
     };
 
 MinGasLimit _$MinGasLimitFromJson(Map<String, dynamic> json) {
-  return MinGasLimit(
-    json['ethGasLimit'] as int,
-    json['erc20GasLimit'] as int,
-  );
+  return MinGasLimit()
+    ..ethGasLimit = json['ethGasLimit'] as int
+    ..erc20GasLimit = json['erc20GasLimit'] as int;
 }
 
 Map<String, dynamic> _$MinGasLimitToJson(MinGasLimit instance) =>
@@ -95,10 +110,9 @@ Map<String, dynamic> _$MinGasLimitToJson(MinGasLimit instance) =>
     };
 
 DefaultGasLimit _$DefaultGasLimitFromJson(Map<String, dynamic> json) {
-  return DefaultGasLimit(
-    json['ethGasLimit'] as int,
-    json['erc20GasLimit'] as int,
-  );
+  return DefaultGasLimit()
+    ..ethGasLimit = json['ethGasLimit'] as int
+    ..erc20GasLimit = json['erc20GasLimit'] as int;
 }
 
 Map<String, dynamic> _$DefaultGasLimitToJson(DefaultGasLimit instance) =>
@@ -108,10 +122,9 @@ Map<String, dynamic> _$DefaultGasLimitToJson(DefaultGasLimit instance) =>
     };
 
 MaxGasPrice _$MaxGasPriceFromJson(Map<String, dynamic> json) {
-  return MaxGasPrice(
-    json['ethGasPrice'] as int,
-    json['erc20GasPrice'] as int,
-  );
+  return MaxGasPrice()
+    ..ethGasPrice = json['ethGasPrice'] as int
+    ..erc20GasPrice = json['erc20GasPrice'] as int;
 }
 
 Map<String, dynamic> _$MaxGasPriceToJson(MaxGasPrice instance) =>
@@ -121,10 +134,9 @@ Map<String, dynamic> _$MaxGasPriceToJson(MaxGasPrice instance) =>
     };
 
 MinGasPrice _$MinGasPriceFromJson(Map<String, dynamic> json) {
-  return MinGasPrice(
-    json['ethGasPrice'] as int,
-    json['erc20GasPrice'] as int,
-  );
+  return MinGasPrice()
+    ..ethGasPrice = json['ethGasPrice'] as int
+    ..erc20GasPrice = json['erc20GasPrice'] as int;
 }
 
 Map<String, dynamic> _$MinGasPriceToJson(MinGasPrice instance) =>
@@ -134,10 +146,9 @@ Map<String, dynamic> _$MinGasPriceToJson(MinGasPrice instance) =>
     };
 
 DefaultGasPrice _$DefaultGasPriceFromJson(Map<String, dynamic> json) {
-  return DefaultGasPrice(
-    json['ethGasPrice'] as int,
-    json['erc20GasPrice'] as int,
-  );
+  return DefaultGasPrice()
+    ..ethGasPrice = json['ethGasPrice'] as int
+    ..erc20GasPrice = json['erc20GasPrice'] as int;
 }
 
 Map<String, dynamic> _$DefaultGasPriceToJson(DefaultGasPrice instance) =>
@@ -146,8 +157,8 @@ Map<String, dynamic> _$DefaultGasPriceToJson(DefaultGasPrice instance) =>
       'erc20GasPrice': instance.erc20GasPrice,
     };
 
-VendorConfig _$VendorConfigFromJson(Map<String, dynamic> json) {
-  return VendorConfig()
+PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
+  return PrivateConfig()
     ..serverConfigIp = json['serverConfigIp'] as String
     ..configVersion = json['configVersion'] as String
     ..downloadAppUrl = json['downloadAppUrl'] as String
@@ -167,7 +178,7 @@ VendorConfig _$VendorConfigFromJson(Map<String, dynamic> json) {
     ..dappOpenUrl = json['dappOpenUrl'] as String;
 }
 
-Map<String, dynamic> _$VendorConfigToJson(VendorConfig instance) =>
+Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
     <String, dynamic>{
       'serverConfigIp': instance.serverConfigIp,
       'configVersion': instance.configVersion,
