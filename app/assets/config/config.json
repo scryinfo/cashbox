@@ -1,6 +1,6 @@
 {
   "isInitializedDB": false,
-  "lastTimeCheckConfig": 0,
+  "lastTimeConfigCheck": 0,
   "intervalMilliseconds": 5,
   "currency": "USD",
   "locale": "zh",
@@ -47,22 +47,51 @@
   "balanceSymbol": "Balances",
   "eeeSymbol": "Eee",
   "privateConfig": {
-    "serverConfigIp": "111",
-    "configVersion": "222",
+    "serverConfigIp": "https://cash/check",
+    "serverApkVersionKey": "2.1.0",
+    "configVersion": "1.0.0",
     "downloadAppUrl": "333",
-    "downloadLatestAppUrl": "444",
-    "rateUrl": "555",
-    "authDigitVersion": "",
+    "downloadLatestAppUrl": "https://atest",
+    "rateUrl": "https://cascerate",
+    "authDigitVersion": "1.0",
     "authDigitIp": "",
-    "defaultDigitVersion": "",
-    "defaultDigitIp": "",
-    "defaultDigitContent": "",
-    "scryXIp": "",
-    "publicIp": "",
-    "nowDbVersion": "",
+    "defaultDigitVersion": "1.0",
+    "defaultDigitIp": "https://cfaultlist",
+    "defaultTokens": [
+      {
+        "contractAddress": "0x9F5F3CFD7a17b91c7342",
+        "shortName": "DDD",
+        "fullName": "DDD",
+        "urlImg": "locald.png",
+        "id": "3",
+        "decimal": "18",
+        "chainType": "ETH"
+      },
+      {
+        "contractAddress": "0xaa638f1df0b3b031e",
+        "shortName": "DDD",
+        "fullName": "DDD",
+        "urlImg": "locale://ic_ddd.png",
+        "id": "4",
+        "decimal": "18",
+        "chainType": "ETEST"
+      },
+      {
+        "contractAddress": "",
+        "shortName": "TonX",
+        "fullName": "ToX",
+        "urlImg": "",
+        "id": "5",
+        "decimal": "15",
+        "chainType": "EEE"
+      }
+    ],
+    "scryXIp": "ht3",
+    "publicIp": "https://cap/pub",
+    "nowDbVersion": "1.1.0",
     "etherscanKey": "",
     "dddMainNetCA": "",
     "dddTestNetCA": "",
-    "dappOpenUrl": ""
+    "dappOpenUrl": "https://cashtml"
   }
 }

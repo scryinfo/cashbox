@@ -9,7 +9,7 @@ part of 'config.dart';
 Config _$ConfigFromJson(Map<String, dynamic> json) {
   return Config()
     ..isInitializedDB = json['isInitializedDB'] as bool
-    ..lastTimeCheckConfig = json['lastTimeCheckConfig'] as int
+    ..lastTimeConfigCheck = json['lastTimeConfigCheck'] as int
     ..intervalMilliseconds = json['intervalMilliseconds'] as int
     ..currency = json['currency'] as String
     ..locale = json['locale'] as String
@@ -55,7 +55,7 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'isInitializedDB': instance.isInitializedDB,
-      'lastTimeCheckConfig': instance.lastTimeCheckConfig,
+      'lastTimeConfigCheck': instance.lastTimeConfigCheck,
       'intervalMilliseconds': instance.intervalMilliseconds,
       'currency': instance.currency,
       'locale': instance.locale,
@@ -91,8 +91,8 @@ Map<String, dynamic> _$LanguageToJson(Language instance) => <String, dynamic>{
 
 MaxGasLimit _$MaxGasLimitFromJson(Map<String, dynamic> json) {
   return MaxGasLimit()
-    ..ethGasLimit = json['ethGasLimit'] as int
-    ..erc20GasLimit = json['erc20GasLimit'] as int;
+    ..ethGasLimit = (json['ethGasLimit'] as num)?.toDouble()
+    ..erc20GasLimit = (json['erc20GasLimit'] as num)?.toDouble();
 }
 
 Map<String, dynamic> _$MaxGasLimitToJson(MaxGasLimit instance) =>
@@ -103,8 +103,8 @@ Map<String, dynamic> _$MaxGasLimitToJson(MaxGasLimit instance) =>
 
 MinGasLimit _$MinGasLimitFromJson(Map<String, dynamic> json) {
   return MinGasLimit()
-    ..ethGasLimit = json['ethGasLimit'] as int
-    ..erc20GasLimit = json['erc20GasLimit'] as int;
+    ..ethGasLimit = (json['ethGasLimit'] as num)?.toDouble()
+    ..erc20GasLimit = (json['erc20GasLimit'] as num)?.toDouble();
 }
 
 Map<String, dynamic> _$MinGasLimitToJson(MinGasLimit instance) =>
@@ -115,8 +115,8 @@ Map<String, dynamic> _$MinGasLimitToJson(MinGasLimit instance) =>
 
 DefaultGasLimit _$DefaultGasLimitFromJson(Map<String, dynamic> json) {
   return DefaultGasLimit()
-    ..ethGasLimit = json['ethGasLimit'] as int
-    ..erc20GasLimit = json['erc20GasLimit'] as int;
+    ..ethGasLimit = (json['ethGasLimit'] as num)?.toDouble()
+    ..erc20GasLimit = (json['erc20GasLimit'] as num)?.toDouble();
 }
 
 Map<String, dynamic> _$DefaultGasLimitToJson(DefaultGasLimit instance) =>
@@ -127,8 +127,8 @@ Map<String, dynamic> _$DefaultGasLimitToJson(DefaultGasLimit instance) =>
 
 MaxGasPrice _$MaxGasPriceFromJson(Map<String, dynamic> json) {
   return MaxGasPrice()
-    ..ethGasPrice = json['ethGasPrice'] as int
-    ..erc20GasPrice = json['erc20GasPrice'] as int;
+    ..ethGasPrice = (json['ethGasPrice'] as num)?.toDouble()
+    ..erc20GasPrice = (json['erc20GasPrice'] as num)?.toDouble();
 }
 
 Map<String, dynamic> _$MaxGasPriceToJson(MaxGasPrice instance) =>
@@ -139,8 +139,8 @@ Map<String, dynamic> _$MaxGasPriceToJson(MaxGasPrice instance) =>
 
 MinGasPrice _$MinGasPriceFromJson(Map<String, dynamic> json) {
   return MinGasPrice()
-    ..ethGasPrice = json['ethGasPrice'] as int
-    ..erc20GasPrice = json['erc20GasPrice'] as int;
+    ..ethGasPrice = (json['ethGasPrice'] as num)?.toDouble()
+    ..erc20GasPrice = (json['erc20GasPrice'] as num)?.toDouble();
 }
 
 Map<String, dynamic> _$MinGasPriceToJson(MinGasPrice instance) =>
@@ -151,8 +151,8 @@ Map<String, dynamic> _$MinGasPriceToJson(MinGasPrice instance) =>
 
 DefaultGasPrice _$DefaultGasPriceFromJson(Map<String, dynamic> json) {
   return DefaultGasPrice()
-    ..ethGasPrice = json['ethGasPrice'] as int
-    ..erc20GasPrice = json['erc20GasPrice'] as int;
+    ..ethGasPrice = (json['ethGasPrice'] as num)?.toDouble()
+    ..erc20GasPrice = (json['erc20GasPrice'] as num)?.toDouble();
 }
 
 Map<String, dynamic> _$DefaultGasPriceToJson(DefaultGasPrice instance) =>
@@ -161,9 +161,31 @@ Map<String, dynamic> _$DefaultGasPriceToJson(DefaultGasPrice instance) =>
       'erc20GasPrice': instance.erc20GasPrice,
     };
 
+Token _$TokenFromJson(Map<String, dynamic> json) {
+  return Token()
+    ..contractAddress = json['contractAddress'] as String
+    ..shortName = json['shortName'] as String
+    ..fullName = json['fullName'] as String
+    ..urlImg = json['urlImg'] as String
+    ..id = json['id'] as String
+    ..decimal = json['decimal'] as String
+    ..chainType = json['chainType'] as String;
+}
+
+Map<String, dynamic> _$TokenToJson(Token instance) => <String, dynamic>{
+      'contractAddress': instance.contractAddress,
+      'shortName': instance.shortName,
+      'fullName': instance.fullName,
+      'urlImg': instance.urlImg,
+      'id': instance.id,
+      'decimal': instance.decimal,
+      'chainType': instance.chainType,
+    };
+
 PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
   return PrivateConfig()
     ..serverConfigIp = json['serverConfigIp'] as String
+    ..serverApkVersionKey = json['serverApkVersionKey'] as String
     ..configVersion = json['configVersion'] as String
     ..downloadAppUrl = json['downloadAppUrl'] as String
     ..downloadLatestAppUrl = json['downloadLatestAppUrl'] as String
@@ -172,6 +194,10 @@ PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
     ..authDigitIp = json['authDigitIp'] as String
     ..defaultDigitVersion = json['defaultDigitVersion'] as String
     ..defaultDigitIp = json['defaultDigitIp'] as String
+    ..defaultTokens = (json['defaultTokens'] as List)
+        ?.map(
+            (e) => e == null ? null : Token.fromJson(e as Map<String, dynamic>))
+        ?.toList()
     ..defaultDigitContent = json['defaultDigitContent'] as String
     ..scryXIp = json['scryXIp'] as String
     ..publicIp = json['publicIp'] as String
@@ -185,6 +211,7 @@ PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
     <String, dynamic>{
       'serverConfigIp': instance.serverConfigIp,
+      'serverApkVersionKey': instance.serverApkVersionKey,
       'configVersion': instance.configVersion,
       'downloadAppUrl': instance.downloadAppUrl,
       'downloadLatestAppUrl': instance.downloadLatestAppUrl,
@@ -193,6 +220,7 @@ Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
       'authDigitIp': instance.authDigitIp,
       'defaultDigitVersion': instance.defaultDigitVersion,
       'defaultDigitIp': instance.defaultDigitIp,
+      'defaultTokens': instance.defaultTokens,
       'defaultDigitContent': instance.defaultDigitContent,
       'scryXIp': instance.scryXIp,
       'publicIp': instance.publicIp,

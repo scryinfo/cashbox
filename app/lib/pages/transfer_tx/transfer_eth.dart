@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:app/global_config/global_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
@@ -62,6 +63,12 @@ class _TransferEthPageState extends State<TransferEthPage> {
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    initDataConfig();
+  }
+
   void initDataConfig() async {
     {
       fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
@@ -82,26 +89,22 @@ class _TransferEthPageState extends State<TransferEthPage> {
     _txValueController.text = Provider.of<TransactionProvide>(context).txValue ?? "";
     _toAddressController.text = Provider.of<TransactionProvide>(context).toAddress ?? "";
     _backupMsgController.text = Provider.of<TransactionProvide>(context).backup ?? "";
-  }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    initDataConfig();
+    Config config = await HandleConfig.instance.getConfig();
     if (contractAddress != null && contractAddress.trim() != "") {
-      mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.Erc20GasPriceKey);
-      mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.Erc20GasPriceKey);
-      mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.Erc20GasLimitKey);
-      mMinGasLimit = GlobalConfig.getMinGasLimit(GlobalConfig.Erc20GasLimitKey);
-      mGasPriceValue = GlobalConfig.getDefaultGasPrice(GlobalConfig.Erc20GasPriceKey);
-      mGasLimitValue = GlobalConfig.getDefaultGasLimit(GlobalConfig.Erc20GasLimitKey);
+      mMaxGasPrice = config.maxGasLimit.erc20GasLimit;
+      mMinGasPrice = config.minGasPrice.erc20GasPrice;
+      mMaxGasLimit = config.maxGasLimit.erc20GasLimit;
+      mMinGasLimit = config.minGasLimit.erc20GasLimit;
+      mGasLimitValue = config.defaultGasLimit.erc20GasLimit;
+      mGasPriceValue = config.defaultGasPrice.erc20GasPrice;
     } else {
-      mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.EthGasPriceKey);
-      mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.EthGasPriceKey);
-      mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.EthGasLimitKey);
-      mMinGasLimit = GlobalConfig.getMinGasLimit(GlobalConfig.EthGasLimitKey);
-      mGasPriceValue = GlobalConfig.getDefaultGasPrice(GlobalConfig.EthGasPriceKey);
-      mGasLimitValue = GlobalConfig.getDefaultGasLimit(GlobalConfig.EthGasLimitKey);
+      mMaxGasPrice = config.maxGasLimit.ethGasLimit;
+      mMinGasPrice = config.minGasPrice.ethGasPrice;
+      mMaxGasLimit = config.maxGasLimit.ethGasLimit;
+      mMinGasLimit = config.minGasLimit.ethGasLimit;
+      mGasLimitValue = config.defaultGasLimit.ethGasLimit;
+      mGasPriceValue = config.defaultGasPrice.ethGasPrice;
     }
     mMaxGasFee = mMaxGasLimit * mMaxGasPrice / eth2gasUnit;
     mMinGasFee = mMinGasLimit * mMinGasPrice / eth2gasUnit;

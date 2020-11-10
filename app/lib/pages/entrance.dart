@@ -65,8 +65,7 @@ class _EntrancePageState extends State<EntrancePage> {
   }
 
   _checkAndUpdateAppConfig() async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    //check and update DB
+
 
     // handle case : DB upgrade.   DB initial installation already finish in func -> initAppConfigInfo()->initDatabaseAndDefaultDigits()
     Config config = await HandleConfig.instance.getConfig();
@@ -75,15 +74,13 @@ class _EntrancePageState extends State<EntrancePage> {
     if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
       print("_checkAndUpdateAppConfig===>update database successful===>" + config.dbVersion);
     }
-
-    String lastCheckTime = spUtil.getString(VendorConfig.lastTimeCheckConfigKey);
+    int lastTimeConfigCheck = config.lastTimeConfigCheck;
     int nowTimeStamp = DateTime.now().millisecondsSinceEpoch;
+
+    // handle case : Config upgrade.
     try {
-      if (lastCheckTime == null || ((nowTimeStamp - int.parse(lastCheckTime)) - checkConfigInterval > 0)) {
-        spUtil.setString(VendorConfig.lastTimeCheckConfigKey, nowTimeStamp.toString());
-        String serverConfigIp = spUtil.getString(VendorConfig.appServerConfigIpKey) ?? VendorConfig.appServerConfigIpValue;
-        // print("serverConfigIp===============>" + serverConfigIp);
-        var result = await requestWithConfigCheckParam(serverConfigIp);
+      if (lastTimeConfigCheck == null || ((nowTimeStamp - lastTimeConfigCheck) - config.intervalMilliseconds * 1000 > 0)) {
+        var result = await requestWithConfigCheckParam(config.privateConfig.serverConfigIp);
         var resultCode = result["code"];
         var resultData = result["data"];
         if (result != null && resultCode != null && resultCode == 0) {
@@ -102,7 +99,7 @@ class _EntrancePageState extends State<EntrancePage> {
               List authTokenUrl = latestConfigObj["authTokenUrl"];
               print("_checkServerAppConfig authTokenUrl======>" + authTokenUrl.toString());
               if (authTokenUrl != null && authTokenUrl.length > 0 && authTokenUrl[0].toString().isNotEmpty) {
-                spUtil.setString(VendorConfig.authDigitsIpKey, authTokenUrl[0].toString());
+                config.privateConfig.authDigitIp = authTokenUrl[0].toString(); // TODO youhua
               }
             }
             var isLatestDefaultToken = resultData["isLatestDefaultToken"];
@@ -112,7 +109,7 @@ class _EntrancePageState extends State<EntrancePage> {
               List defaultTokenUrl = latestConfigObj["defaultTokenUrl"];
               print("_checkServerAppConfig defaultTokenUrl======>" + defaultTokenUrl.toString());
               if (defaultTokenUrl != null && (defaultTokenUrl.length > 0) && defaultTokenUrl[0].toString().isNotEmpty) {
-                spUtil.setString(VendorConfig.defaultDigitsIpKey, defaultTokenUrl[0].toString());
+                config.privateConfig.defaultDigitIp = defaultTokenUrl[0].toString(); //todo
                 //update defaultDigitList to native
                 try {
                   var defaultDigitParam = await requestWithDeviceId(defaultTokenUrl[0].toString());
@@ -132,43 +129,42 @@ class _EntrancePageState extends State<EntrancePage> {
             var tokenToLegalTenderExchangeRateIp = latestConfigObj["tokenToLegalTenderExchangeRateIp"];
             print("_checkServerAppConfig tokenToLegalTenderExchangeRateIp======>" + tokenToLegalTenderExchangeRateIp.toString());
             if (tokenToLegalTenderExchangeRateIp != null && tokenToLegalTenderExchangeRateIp.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.rateDigitIpKey, tokenToLegalTenderExchangeRateIp);
+              config.privateConfig.rateUrl = tokenToLegalTenderExchangeRateIp;
             }
 
             ///update scryX
             var scryXChainUrl = latestConfigObj["scryXChainUrl"];
             print("_checkServerAppConfig scryXChainUrl======>" + scryXChainUrl.toString());
             if (scryXChainUrl != null && scryXChainUrl.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.scryXIpKey, scryXChainUrl);
+              config.privateConfig.scryXIp = scryXChainUrl;
             }
 
             ///update announcementUrl
             var announcementUrl = latestConfigObj["announcementUrl"];
             print("_checkServerAppConfig announcementUrl======>" + announcementUrl.toString());
             if (announcementUrl != null && announcementUrl.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.publicIpKey, announcementUrl);
+              config.privateConfig.publicIp = announcementUrl;
             }
 
             ///update downloadUrl
             var apkDownloadLink = latestConfigObj["apkDownloadLink"];
             print("_checkServerAppConfig apkDownloadLink======>" + apkDownloadLink.toString());
             if (apkDownloadLink != null && apkDownloadLink.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.downloadLatestVersionIpKey, apkDownloadLink);
+              config.privateConfig.downloadLatestAppUrl = apkDownloadLink;
             }
 
             ///update appConfigVersion
             var appConfigVersion = latestConfigObj["appConfigVersion"];
             print("_checkServerAppConfig appConfigVersion======>" + appConfigVersion.toString());
             if (appConfigVersion != null && appConfigVersion.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.appConfigVersionKey, appConfigVersion);
+              config.privateConfig.configVersion = appConfigVersion;
             }
 
             ///update appConfigVersion
             var dappOpenUrlValue = latestConfigObj[VendorConfig.dappOpenUrlKey];
             print("_checkServerAppConfig dappOpenUrlValue======>" + dappOpenUrlValue.toString());
             if (dappOpenUrlValue != null && dappOpenUrlValue.toString().isNotEmpty) {
-              spUtil.setString(VendorConfig.dappOpenUrlKey, dappOpenUrlValue);
-              VendorConfig.dappOpenUrValue = dappOpenUrlValue.toString();
+              config.privateConfig.dappOpenUrl = dappOpenUrlValue;
             }
           }
           print("_checkServerAppConfig isLatestApk======>" + isLatestApk.toString());
@@ -178,16 +174,19 @@ class _EntrancePageState extends State<EntrancePage> {
             String apkVersion = latestApkObj["apkVersion"].toString();
             LogUtil.i("_checkServerAppConfig apkVersion======>", apkVersion.toString());
             if (apkVersion != null && apkVersion.isNotEmpty) {
-              spUtil.setString(VendorConfig.serverApkVersionKey, apkVersion);
+              config.privateConfig.serverApkVersionKey = apkVersion;
             }
           }
         } else {
           LogUtil.i("_checkAndUpdateAppConfig() requestWithVersionParam", "result status is not ok");
         }
+        HandleConfig.instance.saveConfig(config);
       } else {
-        print(
-            "_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" + nowTimeStamp.toString() + "||lastChangeTime=>" + lastCheckTime.toString());
-        print("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" + (nowTimeStamp - int.parse(lastCheckTime)).toString());
+        print("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" +
+            nowTimeStamp.toString() +
+            "||lastChangeTime=>" +
+            lastTimeConfigCheck.toString());
+        print("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>" + (nowTimeStamp - lastTimeConfigCheck).toString());
       }
     } catch (e) {
       LogUtil.i("_checkServerAppConfig(), error is =======>", e.toString());

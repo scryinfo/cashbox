@@ -9,7 +9,7 @@ class Config extends Object {
   Config();
 
   bool isInitializedDB;
-  int lastTimeCheckConfig;
+  int lastTimeConfigCheck;
   int intervalMilliseconds;
   String currency;
   String locale;
@@ -56,8 +56,8 @@ class Language extends Object {
 class MaxGasLimit extends Object {
   MaxGasLimit();
 
-  int ethGasLimit;
-  int erc20GasLimit;
+  double ethGasLimit;
+  double erc20GasLimit;
 
   factory MaxGasLimit.fromJson(Map<String, dynamic> json) => _$MaxGasLimitFromJson(json);
 
@@ -68,8 +68,8 @@ class MaxGasLimit extends Object {
 class MinGasLimit extends Object {
   MinGasLimit();
 
-  int ethGasLimit;
-  int erc20GasLimit;
+  double ethGasLimit;
+  double erc20GasLimit;
 
   factory MinGasLimit.fromJson(Map<String, dynamic> json) => _$MinGasLimitFromJson(json);
 
@@ -80,8 +80,8 @@ class MinGasLimit extends Object {
 class DefaultGasLimit extends Object {
   DefaultGasLimit();
 
-  int ethGasLimit;
-  int erc20GasLimit;
+  double ethGasLimit;
+  double erc20GasLimit;
 
   factory DefaultGasLimit.fromJson(Map<String, dynamic> json) => _$DefaultGasLimitFromJson(json);
 
@@ -92,8 +92,8 @@ class DefaultGasLimit extends Object {
 class MaxGasPrice extends Object {
   MaxGasPrice();
 
-  int ethGasPrice;
-  int erc20GasPrice;
+  double ethGasPrice;
+  double erc20GasPrice;
 
   factory MaxGasPrice.fromJson(Map<String, dynamic> json) => _$MaxGasPriceFromJson(json);
 
@@ -104,8 +104,8 @@ class MaxGasPrice extends Object {
 class MinGasPrice extends Object {
   MinGasPrice();
 
-  int ethGasPrice;
-  int erc20GasPrice;
+  double ethGasPrice;
+  double erc20GasPrice;
 
   factory MinGasPrice.fromJson(Map<String, dynamic> json) => _$MinGasPriceFromJson(json);
 
@@ -116,8 +116,8 @@ class MinGasPrice extends Object {
 class DefaultGasPrice extends Object {
   DefaultGasPrice();
 
-  int ethGasPrice;
-  int erc20GasPrice;
+  double ethGasPrice;
+  double erc20GasPrice;
 
   factory DefaultGasPrice.fromJson(Map<String, dynamic> json) => _$DefaultGasPriceFromJson(json);
 
@@ -125,10 +125,28 @@ class DefaultGasPrice extends Object {
 }
 
 @JsonSerializable()
+class Token extends Object {
+  Token();
+
+  String contractAddress;
+  String shortName;
+  String fullName;
+  String urlImg;
+  String id;
+  String decimal;
+  String chainType;
+
+  factory Token.fromJson(Map<String, dynamic> json) => _$TokenFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TokenToJson(this);
+}
+
+@JsonSerializable()
 class PrivateConfig {
   PrivateConfig();
 
   String serverConfigIp;
+  String serverApkVersionKey;
   String configVersion;
   String downloadAppUrl;
   String downloadLatestAppUrl;
@@ -137,6 +155,7 @@ class PrivateConfig {
   String authDigitIp;
   String defaultDigitVersion;
   String defaultDigitIp;
+  List<Token> defaultTokens;
   String defaultDigitContent;
   String scryXIp;
   String publicIp;

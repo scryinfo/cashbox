@@ -1,6 +1,7 @@
 !.gitkeep
 *.idea
 /app/android/app/src/debug
+/app/assets/config/config.json
 /app/pubspec.lock
 /bc/.idea
 /bc/Cargo.lock
