@@ -15,7 +15,13 @@ members = [
     "device_app_lib",
     "util/substratetx",
     "murmel",
-    "bitcoin"
+    "bitcoin",
+    "wallets_cdl",
+    "wallets_types",
+    "mav",
+    "chain/eth",
+    "chain/eee",
+    "chain/btc"
 ]
 
 [dependencies.bitcoin]

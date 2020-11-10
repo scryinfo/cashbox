@@ -53,3 +53,4 @@ git
 /demo/ffi/cdl/Cargo.lock
 /demo/ffi/cdl/target
 /demo/ffi/flutter_app/pubspec.lock
+/packages/wallets/pubspec.lock

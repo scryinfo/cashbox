@@ -6,8 +6,7 @@ mod error;
 pub mod model;
 pub mod module;
 pub mod wallet_db;
-pub mod db;
-pub mod cdl;
+mod wallets;
 
 pub use error::WalletError;
 
@@ -15,6 +14,8 @@ pub use ethtx::{RawTransaction, convert_token, address_legal as eth_address_lega
 pub use substratetx::{encode_account_storage_key, decode_account_info, event_decode};
 
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
+
+pub use wallets::{Wallets};
 
 const DEFAULT_SS58_VERSION:u8 = 42;
 
