@@ -6,12 +6,16 @@ part 'config.g.dart';
 
 @JsonSerializable()
 class Config extends Object {
-  Config(this.currency, this.locale, this.ethUnit, this.eeeUnit);
+  Config();
 
+  bool isInitedConfig;
+  int lastTimeConfigCheck;
+  int intervalMilliseconds;
   String currency;
   String locale;
-  List<Object> languages;
+  List<Language> languages;
   String serverAppVersion;
+  String diamondCa; //diamond Dapp contractAddress
 
   MaxGasLimit maxGasLimit;
   MinGasLimit minGasLimit;
@@ -30,7 +34,7 @@ class Config extends Object {
   String balanceSymbol;
   String eeeSymbol;
 
-  VendorConfig vendorConfig;
+  PrivateConfig privateConfig;
 
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
@@ -38,11 +42,23 @@ class Config extends Object {
 }
 
 @JsonSerializable()
-class MaxGasLimit extends Object {
-  MaxGasLimit(this.ethGasLimit, this.erc20GasLimit);
+class Language extends Object {
+  Language();
 
-  int ethGasLimit;
-  int erc20GasLimit;
+  String localeKey;
+  String localeValue;
+
+  factory Language.fromJson(Map<String, dynamic> json) => _$LanguageFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LanguageToJson(this);
+}
+
+@JsonSerializable()
+class MaxGasLimit extends Object {
+  MaxGasLimit();
+
+  double ethGasLimit;
+  double erc20GasLimit;
 
   factory MaxGasLimit.fromJson(Map<String, dynamic> json) => _$MaxGasLimitFromJson(json);
 
@@ -51,10 +67,10 @@ class MaxGasLimit extends Object {
 
 @JsonSerializable()
 class MinGasLimit extends Object {
-  MinGasLimit(this.ethGasLimit, this.erc20GasLimit);
+  MinGasLimit();
 
-  int ethGasLimit;
-  int erc20GasLimit;
+  double ethGasLimit;
+  double erc20GasLimit;
 
   factory MinGasLimit.fromJson(Map<String, dynamic> json) => _$MinGasLimitFromJson(json);
 
@@ -63,10 +79,10 @@ class MinGasLimit extends Object {
 
 @JsonSerializable()
 class DefaultGasLimit extends Object {
-  DefaultGasLimit(this.ethGasLimit, this.erc20GasLimit);
+  DefaultGasLimit();
 
-  int ethGasLimit;
-  int erc20GasLimit;
+  double ethGasLimit;
+  double erc20GasLimit;
 
   factory DefaultGasLimit.fromJson(Map<String, dynamic> json) => _$DefaultGasLimitFromJson(json);
 
@@ -75,10 +91,10 @@ class DefaultGasLimit extends Object {
 
 @JsonSerializable()
 class MaxGasPrice extends Object {
-  MaxGasPrice(this.ethGasPrice, this.erc20GasPrice);
+  MaxGasPrice();
 
-  int ethGasPrice;
-  int erc20GasPrice;
+  double ethGasPrice;
+  double erc20GasPrice;
 
   factory MaxGasPrice.fromJson(Map<String, dynamic> json) => _$MaxGasPriceFromJson(json);
 
@@ -87,10 +103,10 @@ class MaxGasPrice extends Object {
 
 @JsonSerializable()
 class MinGasPrice extends Object {
-  MinGasPrice(this.ethGasPrice, this.erc20GasPrice);
+  MinGasPrice();
 
-  int ethGasPrice;
-  int erc20GasPrice;
+  double ethGasPrice;
+  double erc20GasPrice;
 
   factory MinGasPrice.fromJson(Map<String, dynamic> json) => _$MinGasPriceFromJson(json);
 
@@ -99,10 +115,10 @@ class MinGasPrice extends Object {
 
 @JsonSerializable()
 class DefaultGasPrice extends Object {
-  DefaultGasPrice(this.ethGasPrice, this.erc20GasPrice);
+  DefaultGasPrice();
 
-  int ethGasPrice;
-  int erc20GasPrice;
+  double ethGasPrice;
+  double erc20GasPrice;
 
   factory DefaultGasPrice.fromJson(Map<String, dynamic> json) => _$DefaultGasPriceFromJson(json);
 
@@ -110,19 +126,37 @@ class DefaultGasPrice extends Object {
 }
 
 @JsonSerializable()
-class VendorConfig {
-  VendorConfig();
+class Token extends Object {
+  Token();
+
+  String contractAddress;
+  String shortName;
+  String fullName;
+  String urlImg;
+  String id;
+  String decimal;
+  String chainType;
+
+  factory Token.fromJson(Map<String, dynamic> json) => _$TokenFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TokenToJson(this);
+}
+
+@JsonSerializable()
+class PrivateConfig {
+  PrivateConfig();
 
   String serverConfigIp;
+  String serverApkVersionKey;
   String configVersion;
   String downloadAppUrl;
   String downloadLatestAppUrl;
   String rateUrl;
   String authDigitVersion;
-  String authDigitIp;
+  List<String> authDigitIpList;
   String defaultDigitVersion;
-  String defaultDigitIp;
-  String defaultDigitContent;
+  List<String> defaultDigitIpList;
+  List<Token> defaultTokens;
   String scryXIp;
   String publicIp;
   String nowDbVersion;
@@ -131,7 +165,7 @@ class VendorConfig {
   String dddTestNetCA;
   String dappOpenUrl;
 
-  factory VendorConfig.fromJson(Map<String, dynamic> json) => _$VendorConfigFromJson(json);
+  factory PrivateConfig.fromJson(Map<String, dynamic> json) => _$PrivateConfigFromJson(json);
 
-  Map<String, dynamic> toJson() => _$VendorConfigToJson(this);
+  Map<String, dynamic> toJson() => _$PrivateConfigToJson(this);
 }

@@ -1,3 +1,5 @@
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/util/sharedpreference_util.dart';
@@ -92,9 +94,8 @@ class _PublicPageState extends State<PublicPage> {
     jsChannelList.add(JavascriptChannel(
         name: "NativeLocaleValue",
         onMessageReceived: (JavascriptMessage message) async {
-          var spUtil = await SharedPreferenceUtil.instance;
-          var savedLocale = spUtil.getString(GlobalConfig.savedLocaleKey);
-          _controller?.evaluateJavascript('nativeLocale("$savedLocale")')?.then((result) {});
+          Config config = await HandleConfig.instance.getConfig();
+          _controller?.evaluateJavascript('nativeLocale("$config.locale")')?.then((result) {});
         }));
     return jsChannelList.toSet();
   }

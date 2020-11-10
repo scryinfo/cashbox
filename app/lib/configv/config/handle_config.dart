@@ -55,13 +55,13 @@ class HandleConfig {
     }
     try {
       Config config = await this.getConfig();
-      var applyMap = config.vendorConfig.toJson();
-      VendorConfig.fromJson(json.decode(jsonString)).toJson().forEach((key, value) {
+      var applyMap = config.privateConfig.toJson();
+      PrivateConfig.fromJson(json.decode(jsonString)).toJson().forEach((key, value) {
         if (key.isNotEmpty && value != null && value != "") {
           applyMap[key] = value;
         }
       });
-      config.vendorConfig = VendorConfig.fromJson(applyMap);
+      config.privateConfig = PrivateConfig.fromJson(applyMap);
       this.saveConfig(config);
     } catch (e) {
       return false;

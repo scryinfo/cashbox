@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
@@ -23,7 +25,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
 
 class DappPage extends StatefulWidget {
   @override
@@ -279,11 +280,12 @@ class _DappPageState extends State<DappPage> {
         name: "NativeEditOrLoadCA",
         onMessageReceived: (JavascriptMessage message) async {
           print("NativeEditOrLoadCA 传回来的参数======>： ${message.message}");
+          Config config = await HandleConfig.instance.getConfig();
           if (message.message == null || message.message.trim() == "") {
-            String caInfo = await loadDiamondCa();
-            _controller?.evaluateJavascript('nativeCAInfo("$caInfo")')?.then((result) {});
+            _controller?.evaluateJavascript('nativeCAInfo("$config.diamondCa")')?.then((result) {});
           } else {
-            editDiamondCaToFile(message.message);
+            config.diamondCa = message.message;
+            HandleConfig.instance.saveConfig(config);
           }
         }));
     jsChannelList.add(JavascriptChannel(
@@ -509,16 +511,5 @@ class _DappPageState extends State<DappPage> {
   Future<String> callPromise(Message msg) {
     String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
     return _controller?.evaluateJavascript(call);
-  }
-
-  Future<String> loadDiamondCa() async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    var resultCa = spUtil.getString(GlobalConfig.dappCaKey1);
-    return resultCa;
-  }
-
-  editDiamondCaToFile(String caInfo) async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    spUtil.setString(GlobalConfig.dappCaKey1, caInfo);
   }
 }

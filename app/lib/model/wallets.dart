@@ -1,17 +1,15 @@
-import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/tx_model/eee_transaction_model.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/util/log_util.dart';
-import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:wallet_manager/wallet_manager.dart';
-
+import 'dart:convert' as convert;
 import 'dart:typed_data';
 
 import 'chain.dart';
 import 'digit.dart';
-import 'ffi/wallet_ffi.dart';
 
 //Wallet management
 class Wallets {
@@ -36,49 +34,45 @@ class Wallets {
   }
 
   initAppConfig() async {
-    initIpConfig(); //init IP config info to local file
     initDatabaseAndDefaultDigits(); //init wallet Database Info
   }
 
-  initIpConfig() async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    var isFinishInit = spUtil.getBool(GlobalConfig.isInitAppConfig);
-    if (isFinishInit == null || !isFinishInit) {
-      SharedPreferenceUtil.initIpConfig(); //Initialize interface ip, version information, etc. to local file
-    }
-    var temp = spUtil.get(VendorConfig.dappOpenUrlKey);
-    if (temp != null && temp.isNotEmpty) {
-      VendorConfig.dappOpenUrValue = temp.toString();
-    }
-  }
-
   initDatabaseAndDefaultDigits() async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    var state = spUtil.getBool(VendorConfig.initDatabaseStateKey);
-    if (state != null && state) {
-      // database init have already finished
-      print("initWalletBasicData(), ===> finished");
-      return;
-    }
-    //传参数 当前上层记录的db版本号，下层判断如过小于，db升级；如果一致，不升级。  返回值：底层操作后的db版本号。
-    Map resultMap = await WalletManager.initWalletBasicData(); //Initialize some database data
-    int status = resultMap["status"];
-    if (status == null) {
-      LogUtil.e("initWalletBasicData error=>", "not find status code");
-      return;
-    }
-    //todo save the database version
-    //spUtil.setString(VendorConfig.nowDatabaseVersionKey, );
-
-    if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
-      spUtil.setBool(VendorConfig.initDatabaseStateKey, resultMap["isInitWalletBasicData"]);
-      String digitParam = spUtil.getString(VendorConfig.defaultDigitsContentKey) ?? VendorConfig.defaultDigitsContentDefaultValue;
-      Map updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
-      print("updateMap[isUpdateDefaultDigit](),=====>" + updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
+    Config config = await HandleConfig.instance.getConfig();
+    if (config.isInitedConfig == null || config.isInitedConfig == false) {
+      {
+        //init defaultDigit
+        config.privateConfig.defaultTokens.toString();
+        String digitParam = "[";
+        config.privateConfig.defaultTokens.forEach((element) {
+          digitParam = digitParam + convert.jsonEncode(element) + ",";
+        });
+        digitParam = digitParam.substring(0, digitParam.length - 1) + "]";
+        if (digitParam != null && digitParam != "") {
+          Map updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
+          int status = updateMap["status"];
+          if (status == null || status != 200) {
+            LogUtil.e("initWallet,updateDefaultDigitList error=>", updateMap["message"].toString());
+          }
+        }
+      }
+      {
+        //init DB
+        Map resultMap = await WalletManager.initWalletBasicData(); //Initialize some database data
+        int status = resultMap["status"];
+        if (status == null || status != 200) {
+          LogUtil.e("initWalletBasicData error=>", "not find status code");
+          return;
+        }
+        if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
+          config.isInitedConfig = true;
+          HandleConfig.instance.saveConfig(config);
+        }
+      }
     }
   }
 
-  Future<Map> updateWalletDbData( String newVersion) async {
+  Future<Map> updateWalletDbData(String newVersion) async {
     Map resultMap = await WalletManager.updateWalletDbData(newVersion); //Initialize some database data
     int status = resultMap["status"];
     if (status == null) {
@@ -694,5 +688,9 @@ class Wallets {
     });
     resultMap["authDigit"] = resultAuthDigitList;
     return resultMap;
+  }
+
+  btcStart() async {
+    await WalletManager.btcStart();
   }
 }
