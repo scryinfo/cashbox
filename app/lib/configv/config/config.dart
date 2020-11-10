@@ -9,6 +9,8 @@ class Config extends Object {
   Config();
 
   bool isInitializedDB;
+  int lastTimeCheckConfig;
+  int intervalMilliseconds;
   String currency;
   String locale;
   List<Language> languages;

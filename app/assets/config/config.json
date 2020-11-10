@@ -1,5 +1,7 @@
 {
   "isInitializedDB": false,
+  "lastTimeCheckConfig": 0,
+  "intervalMilliseconds": 5,
   "currency": "USD",
   "locale": "zh",
   "languages": [

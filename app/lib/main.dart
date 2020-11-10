@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/pages/entrance.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
@@ -58,18 +60,12 @@ class _MyApp extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    initData();
+    initLocale();
   }
 
-  initData() async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    var savedLocale = spUtil.getString(GlobalConfig.savedLocaleKey);
-    if (savedLocale == null || savedLocale == "") {
-      savedLocale = GlobalConfig.defaultLocaleValue;
-      spUtil.setString(GlobalConfig.savedLocaleKey, savedLocale);
-    }
-    print("initData  savedLocale-===>" + savedLocale);
-    changeLocale(context, savedLocale); //Change application language english chinese
+  initLocale() async {
+    Config config = await HandleConfig.instance.getConfig();
+    changeLocale(context, config.locale);
   }
 
   @override

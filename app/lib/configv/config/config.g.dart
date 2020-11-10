@@ -9,6 +9,8 @@ part of 'config.dart';
 Config _$ConfigFromJson(Map<String, dynamic> json) {
   return Config()
     ..isInitializedDB = json['isInitializedDB'] as bool
+    ..lastTimeCheckConfig = json['lastTimeCheckConfig'] as int
+    ..intervalMilliseconds = json['intervalMilliseconds'] as int
     ..currency = json['currency'] as String
     ..locale = json['locale'] as String
     ..languages = (json['languages'] as List)
@@ -53,6 +55,8 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'isInitializedDB': instance.isInitializedDB,
+      'lastTimeCheckConfig': instance.lastTimeCheckConfig,
+      'intervalMilliseconds': instance.intervalMilliseconds,
       'currency': instance.currency,
       'locale': instance.locale,
       'languages': instance.languages,

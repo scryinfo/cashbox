@@ -67,16 +67,13 @@ class _EntrancePageState extends State<EntrancePage> {
   _checkAndUpdateAppConfig() async {
     var spUtil = await SharedPreferenceUtil.instance;
     //check and update DB
-    if (true) {
-      // handle case : DB upgrade.   DB initial installation already finish in func -> initAppConfigInfo()->initDatabaseAndDefaultDigits()
-      String recordDbVersion = spUtil.getString(VendorConfig.nowDbVersionKey);
-      if (recordDbVersion != GlobalConfig.dbVersion1_1_0) {
-        Map resultMap = await Wallets.instance.updateWalletDbData(GlobalConfig.dbVersion1_1_0);
-        if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
-          print("_checkAndUpdateAppConfig===>update database successful===>" + GlobalConfig.dbVersion1_1_0);
-          spUtil.setString(VendorConfig.nowDbVersionKey, GlobalConfig.dbVersion1_1_0); // !!! important,remember to update DbVersion record
-        }
-      }
+
+    // handle case : DB upgrade.   DB initial installation already finish in func -> initAppConfigInfo()->initDatabaseAndDefaultDigits()
+    Config config = await HandleConfig.instance.getConfig();
+
+    Map resultMap = await Wallets.instance.updateWalletDbData(config.dbVersion);
+    if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
+      print("_checkAndUpdateAppConfig===>update database successful===>" + config.dbVersion);
     }
 
     String lastCheckTime = spUtil.getString(VendorConfig.lastTimeCheckConfigKey);
@@ -291,8 +288,9 @@ class _EntrancePageState extends State<EntrancePage> {
               print("changeLocale===>" + value);
               {
                 changeLocale(context, value);
-                var spUtil = await SharedPreferenceUtil.instance;
-                spUtil.setString(GlobalConfig.savedLocaleKey, value);
+                Config config = await HandleConfig.instance.getConfig();
+                config.locale = value;
+                HandleConfig.instance.saveConfig(config);
               }
             },
           )
