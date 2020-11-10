@@ -15,6 +15,7 @@ class Config extends Object {
   String locale;
   List<Language> languages;
   String serverAppVersion;
+  String diamondCa; //diamond Dapp contractAddress
 
   MaxGasLimit maxGasLimit;
   MinGasLimit minGasLimit;

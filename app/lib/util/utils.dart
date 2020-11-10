@@ -39,16 +39,6 @@ class Utils {
     }
   }
 
-  //获取当前版本的app，可更新到的最新的db版本
-  static Future<String> getNowAppMatchedDbVersion() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String appVersion = packageInfo.version;
-    if (GlobalConfig.appVersion2DbVersionMap.containsKey(appVersion)) {
-      return GlobalConfig.appVersion2DbVersionMap[appVersion];
-    }
-    return "";
-  }
-
   static String uint8ListToHex(Uint8List bArr) {
     int length;
     if (bArr == null || (length = bArr.length) <= 0) {

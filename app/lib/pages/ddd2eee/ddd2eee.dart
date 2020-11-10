@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/global_config/global_config.dart';
 import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
@@ -62,14 +64,15 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies()async {
     super.didChangeDependencies();
-    mMaxGasPrice = GlobalConfig.getMaxGasPrice(GlobalConfig.EthGasPriceKey);
-    mMinGasPrice = GlobalConfig.getMinGasPrice(GlobalConfig.EthGasPriceKey);
-    mMaxGasLimit = GlobalConfig.getMaxGasLimit(GlobalConfig.EthGasLimitKey);
-    mMinGasLimit = GlobalConfig.getMinGasLimit(GlobalConfig.EthGasLimitKey);
-    mGasPriceValue = GlobalConfig.getDefaultGasPrice(GlobalConfig.EthGasPriceKey);
-    mGasLimitValue = GlobalConfig.getDefaultGasLimit(GlobalConfig.EthGasLimitKey);
+    Config config = await HandleConfig.instance.getConfig();
+    mMaxGasPrice = config.maxGasLimit.erc20GasLimit;
+    mMinGasPrice = config.minGasPrice.erc20GasPrice;
+    mMaxGasLimit = config.maxGasLimit.erc20GasLimit;
+    mMinGasLimit = config.minGasLimit.erc20GasLimit;
+    mGasLimitValue = config.defaultGasLimit.erc20GasLimit;
+    mGasPriceValue = config.defaultGasPrice.erc20GasPrice;
 
     mMaxGasFee = mMaxGasLimit * mMaxGasPrice / eth2gasUnit;
     mMinGasFee = mMinGasLimit * mMinGasPrice / eth2gasUnit;

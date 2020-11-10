@@ -18,6 +18,7 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
             e == null ? null : Language.fromJson(e as Map<String, dynamic>))
         ?.toList()
     ..serverAppVersion = json['serverAppVersion'] as String
+    ..diamondCa = json['diamondCa'] as String
     ..maxGasLimit = json['maxGasLimit'] == null
         ? null
         : MaxGasLimit.fromJson(json['maxGasLimit'] as Map<String, dynamic>)
@@ -61,6 +62,7 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'locale': instance.locale,
       'languages': instance.languages,
       'serverAppVersion': instance.serverAppVersion,
+      'diamondCa': instance.diamondCa,
       'maxGasLimit': instance.maxGasLimit,
       'minGasLimit': instance.minGasLimit,
       'defaultGasLimit': instance.defaultGasLimit,

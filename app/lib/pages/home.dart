@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
@@ -17,7 +18,6 @@ import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
-import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/util/app_info_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/my_separator_line.dart';
@@ -71,13 +71,8 @@ class _HomePageState extends State<HomePage> {
 
   void initData() async {
     {
-      var spUtil = await SharedPreferenceUtil.instance;
-      var currency = spUtil.getString(GlobalConfig.currencyKey);
-      if (currency == null || currency == "") {
-        moneyUnitStr = GlobalConfig.currencyDefaultValue;
-      } else {
-        moneyUnitStr = currency;
-      }
+      Config config = await HandleConfig.instance.getConfig();
+      moneyUnitStr = config.currency;
     }
 
     bool isForceLoadFromJni = widget.isForceLoadFromJni;
@@ -803,8 +798,10 @@ class _HomePageState extends State<HomePage> {
                     });
                   }
                   this.loadDigitMoney();
-                  var spUtil = await SharedPreferenceUtil.instance;
-                  spUtil.setString(GlobalConfig.currencyKey, value);
+
+                  Config config = await HandleConfig.instance.getConfig();
+                  config.currency = value;
+                  HandleConfig.instance.saveConfig(config);
                 },
               ),
             ),
