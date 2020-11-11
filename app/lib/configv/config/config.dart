@@ -163,6 +163,8 @@ class PrivateConfig {
   String etherscanKey;
   String dddMainNetCA;
   String dddTestNetCA;
+  String d2eMainNetEthAddress;
+  String d2eTestNetEthAddress;
   String dappOpenUrl;
 
   factory PrivateConfig.fromJson(Map<String, dynamic> json) => _$PrivateConfigFromJson(json);

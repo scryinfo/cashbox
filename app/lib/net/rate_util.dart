@@ -1,13 +1,13 @@
-import 'package:app/global_config/vendor_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/net/net_util.dart';
-import 'package:app/util/sharedpreference_util.dart';
 
 //Returns Price Object Rate
 Future<Rate> loadRateInstance() async {
+  Config config = await HandleConfig.instance.getConfig();
   try {
-    var spUtil = await SharedPreferenceUtil.instance;
-    String rateIpValue = spUtil.getString(VendorConfig.rateDigitIpKey) ?? VendorConfig.rateDigitIpDefaultValue;
+    String rateIpValue = config.privateConfig.rateUrl;
     var res = await requestWithDeviceId(rateIpValue);
     if (res != null && (res as Map).containsKey("data") && ((res["data"] as Map).containsKey("prices"))) {
       Rate resultRate = Rate.instance;

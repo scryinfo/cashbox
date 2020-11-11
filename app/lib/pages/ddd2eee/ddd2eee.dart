@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
@@ -16,7 +14,6 @@ import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
-import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -53,7 +50,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   String dddBalance = "";
   String ethBalance = "";
   String fromAddress = "";
-  String toExchangeAddress = VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS; //default MAIN_NET
+  String toExchangeAddress = ""; //default MAIN_NET
   String nonce = "";
   int decimal = 0;
 
@@ -64,7 +61,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   }
 
   @override
-  void didChangeDependencies()async {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
     Config config = await HandleConfig.instance.getConfig();
     mMaxGasPrice = config.maxGasLimit.erc20GasLimit;
@@ -93,10 +90,11 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         break;
     }
     fromAddress = Wallets.instance.nowWallet.getChainByChainType(chainType).chainAddress;
-    toExchangeAddress =
-        chainType == ChainType.ETH ? VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS : VendorConfig.TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
+    Config config = await HandleConfig.instance.getConfig();
+    toExchangeAddress = chainType == ChainType.ETH ? config.privateConfig.d2eMainNetEthAddress : config.privateConfig.d2eTestNetEthAddress;
     ethBalance = await loadEthBalance(fromAddress, chainType);
-    dddBalance = await loadErc20Balance(fromAddress, chainType == ChainType.ETH ? DddMainNetContractAddress : DddTestNetContractAddress, chainType);
+    dddBalance = await loadErc20Balance(
+        fromAddress, chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA, chainType);
     setState(() {
       toExchangeAddress = toExchangeAddress;
       if (dddBalance != null) {
@@ -787,8 +785,10 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
     }
     if (dddBalance == null || dddBalance == "" || double.parse(dddBalance) <= 0) {
       try {
+        Config config = await HandleConfig.instance.getConfig();
+
         dddBalance = await loadErc20Balance(Wallets.instance.nowWallet.getChainByChainType(chainType).chainAddress,
-            chainType == ChainType.ETH ? DddMainNetContractAddress : DddTestNetContractAddress, chainType);
+            chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA, chainType);
       } catch (e) {
         Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;

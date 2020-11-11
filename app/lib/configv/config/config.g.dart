@@ -208,6 +208,8 @@ PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
     ..etherscanKey = json['etherscanKey'] as String
     ..dddMainNetCA = json['dddMainNetCA'] as String
     ..dddTestNetCA = json['dddTestNetCA'] as String
+    ..d2eMainNetEthAddress = json['d2eMainNetEthAddress'] as String
+    ..d2eTestNetEthAddress = json['d2eTestNetEthAddress'] as String
     ..dappOpenUrl = json['dappOpenUrl'] as String;
 }
 
@@ -230,5 +232,7 @@ Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
       'etherscanKey': instance.etherscanKey,
       'dddMainNetCA': instance.dddMainNetCA,
       'dddTestNetCA': instance.dddTestNetCA,
+      'd2eMainNetEthAddress': instance.d2eMainNetEthAddress,
+      'd2eTestNetEthAddress': instance.d2eTestNetEthAddress,
       'dappOpenUrl': instance.dappOpenUrl,
     };

@@ -1,14 +1,17 @@
-import 'package:app/global_config/vendor_config.dart';
-import 'package:app/model/chain.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/wallets.dart';
-import 'package:app/util/sharedpreference_util.dart';
 import 'net_util.dart';
 
 class ScryXNetUtil {
   //todo 待优化
-  Future<Map> loadEeeChainNonce_test(String fromAddress) async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+  Future<String> _loadScryXIp() async {
+    Config config = await HandleConfig.instance.getConfig();
+    return config.privateConfig.scryXIp;
+  }
+
+  Future<Map> loadEeeChainNonceTest(String fromAddress) async {
+    String netUrl = await _loadScryXIp();
     Map resultMap = new Map();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
@@ -84,8 +87,7 @@ class ScryXNetUtil {
   }
 
   Future<Map> _loadScryXStorage(formattedAddress) async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    String netUrl = await _loadScryXIp();
     Map resultMap = new Map();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
@@ -107,8 +109,7 @@ class ScryXNetUtil {
 
   Future<Map> loadScryXRuntimeVersion() async {
     Map resultMap = new Map();
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
     }
@@ -124,8 +125,7 @@ class ScryXNetUtil {
 
   Future<Map> loadScryXBlockHash() async {
     Map resultMap = new Map();
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
     }
@@ -146,8 +146,7 @@ class ScryXNetUtil {
 
   Future<Map> loadChainHeader() async {
     Map resultMap = new Map();
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
     }
@@ -162,8 +161,7 @@ class ScryXNetUtil {
 
   Future<Map> loadChainBlockHash(int endBlockHeight) async {
     Map resultMap = new Map();
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
     }
@@ -183,8 +181,7 @@ class ScryXNetUtil {
 
   Future<Map> loadQueryStorage(List<String> accountKeyInfo, String startBlockHash, String endBlockHash) async {
     Map resultMap = new Map();
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
     }
@@ -204,8 +201,7 @@ class ScryXNetUtil {
 
   Future<Map> loadBlock(String blockHash) async {
     Map resultMap = new Map();
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
     }
@@ -225,8 +221,7 @@ class ScryXNetUtil {
 
   Future<Map> loadStateStorage(String eventKeyPrefix, String blockHash) async {
     Map resultMap = new Map();
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
     }
@@ -246,8 +241,7 @@ class ScryXNetUtil {
 
   Future<Map> submitExtrinsic(txInfo) async {
     Map resultMap = new Map();
-    var spUtil = await SharedPreferenceUtil.instance;
-    var netUrl = spUtil.getString(VendorConfig.scryXIpKey);
+    String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
       return null;
     }

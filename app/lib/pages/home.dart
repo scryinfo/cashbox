@@ -111,9 +111,11 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     this.moneyUnitList = rate.getAllSupportLegalCurrency();
-    setState(() {
-      this.moneyUnitList = this.moneyUnitList;
-    });
+    if (mounted) {
+      setState(() {
+        this.moneyUnitList = this.moneyUnitList;
+      });
+    }
   }
 
   //Market price information (hourly changes, etc.)
