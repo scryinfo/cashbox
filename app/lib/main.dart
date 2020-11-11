@@ -7,7 +7,6 @@ import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
-import 'package:app/provide/server_config_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -33,7 +32,7 @@ void main() async {
   });
 
   var delegate = await LocalizationDelegate.create(
-    fallbackLocale:  config.locale,
+    fallbackLocale: config.locale,
     supportedLocales: languagesKeyList,
   );
 
@@ -91,9 +90,6 @@ class _MyApp extends State<MyApp> {
         ),
         ChangeNotifierProvider(
           builder: (_) => TransactionProvide(),
-        ),
-        ChangeNotifierProvider(
-          builder: (_) => ServerConfigProvide(),
         ),
       ],
       child: Container(

@@ -147,7 +147,7 @@ class PrivateConfig {
   PrivateConfig();
 
   String serverConfigIp;
-  String serverApkVersionKey;
+  String serverApkVersion;
   String configVersion;
   String downloadAppUrl;
   String downloadLatestAppUrl;

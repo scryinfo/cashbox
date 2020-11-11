@@ -187,7 +187,7 @@ Map<String, dynamic> _$TokenToJson(Token instance) => <String, dynamic>{
 PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
   return PrivateConfig()
     ..serverConfigIp = json['serverConfigIp'] as String
-    ..serverApkVersionKey = json['serverApkVersionKey'] as String
+    ..serverApkVersion = json['serverApkVersion'] as String
     ..configVersion = json['configVersion'] as String
     ..downloadAppUrl = json['downloadAppUrl'] as String
     ..downloadLatestAppUrl = json['downloadLatestAppUrl'] as String
@@ -216,7 +216,7 @@ PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
     <String, dynamic>{
       'serverConfigIp': instance.serverConfigIp,
-      'serverApkVersionKey': instance.serverApkVersionKey,
+      'serverApkVersion': instance.serverApkVersion,
       'configVersion': instance.configVersion,
       'downloadAppUrl': instance.downloadAppUrl,
       'downloadLatestAppUrl': instance.downloadLatestAppUrl,

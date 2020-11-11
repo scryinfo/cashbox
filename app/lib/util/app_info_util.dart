@@ -1,6 +1,5 @@
-import 'package:app/global_config/vendor_config.dart';
-import 'package:app/net/net_util.dart';
-import 'package:app/util/sharedpreference_util.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 
@@ -31,10 +30,9 @@ class AppInfoUtil {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String appVersion = packageInfo.version;
     String buildNumber = packageInfo.buildNumber; //Version build number
-    print("packageInfo appVersion===>" + appVersion + "||buildNumber===>" + buildNumber);
+    Config config = await HandleConfig.instance.getConfig();
     try {
-      var spUtil = await SharedPreferenceUtil.instance;
-      String serverVersion = spUtil.getString(VendorConfig.serverApkVersionKey);
+      String serverVersion = config.privateConfig.serverApkVersion;
       var serverVersionArray = serverVersion.split(".");
       var nativeVersionArray = appVersion.split(".");
       bool isExistNewVersion = false;
@@ -50,7 +48,7 @@ class AppInfoUtil {
         }
       }
       if (serverVersion != null && appVersion != null && isExistNewVersion) {
-        String downloadIpValue = spUtil.getString(VendorConfig.downloadLatestVersionIpKey) ?? VendorConfig.downloadLatestVersionIpValue;
+        String downloadIpValue = config.privateConfig.downloadLatestAppUrl;
         _doUpgradeApp(downloadIpValue, serverVersion);
         return true;
       }

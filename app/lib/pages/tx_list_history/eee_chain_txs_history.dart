@@ -1,5 +1,5 @@
-import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
@@ -49,19 +49,11 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     {
-      fromAddress = Provider
-          .of<TransactionProvide>(context)
-          .fromAddress;
+      fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
 
-      digitName = Provider
-          .of<TransactionProvide>(context)
-          .digitName;
-      balanceInfo = Provider
-          .of<TransactionProvide>(context)
-          .balance;
-      moneyInfo = Provider
-          .of<TransactionProvide>(context)
-          .money;
+      digitName = Provider.of<TransactionProvide>(context).digitName;
+      balanceInfo = Provider.of<TransactionProvide>(context).balance;
+      moneyInfo = Provider.of<TransactionProvide>(context).money;
     }
     EeeSyncTxs.startOnce(Wallets.instance.nowWallet.nowChain);
   }
@@ -114,30 +106,30 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
               child: SingleChildScrollView(
                 child: RichText(
                     text: TextSpan(children: <TextSpan>[
-                      TextSpan(
-                        text: balanceInfo ?? "0.0000",
-                        style: TextStyle(
-                          decoration: TextDecoration.none,
-                          color: Colors.white,
-                          fontSize: ScreenUtil().setSp(4.2),
-                          fontStyle: FontStyle.normal,
-                        ),
-                      ),
-                      TextSpan(
-                        text: " ",
-                      ),
-                      TextSpan(
-                        text: digitName ?? "*",
-                        style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
-                      ),
-                      TextSpan(
-                        text: " ",
-                      ),
-                      TextSpan(
-                        text: "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
-                        style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
-                      ),
-                    ])),
+                  TextSpan(
+                    text: balanceInfo ?? "0.0000",
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Colors.white,
+                      fontSize: ScreenUtil().setSp(4.2),
+                      fontStyle: FontStyle.normal,
+                    ),
+                  ),
+                  TextSpan(
+                    text: " ",
+                  ),
+                  TextSpan(
+                    text: digitName ?? "*",
+                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
+                  ),
+                  TextSpan(
+                    text: " ",
+                  ),
+                  TextSpan(
+                    text: "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
+                    style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
+                  ),
+                ])),
               )),
           Gaps.scaleHGap(1),
           Container(
@@ -279,7 +271,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       slivers: <Widget>[
         SliverList(
           delegate: SliverChildBuilderDelegate(
-                (context, index) {
+            (context, index) {
               return Container(
                 height: ScreenUtil().setHeight(16),
                 child: _makeTxItemWidget(index),
@@ -439,6 +431,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
 
   Future<List<EeeTransactionModel>> getTxListData() async {
     //去加载本地DB已有的交易，进行显示
+    Config config = await HandleConfig.instance.getConfig();
     for (; true;) {
       var newData = await Wallets.instance
           .loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, (currentPage * this.pageSize), this.pageSize);
@@ -451,7 +444,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
         //去掉相同的交易
         if (!oldSet.contains(element.txHash)) {
           try {
-            element.value = (BigInt.parse(element.value) / BigInt.from(Eee_Unit)).toStringAsFixed(5);
+            element.value = (BigInt.parse(element.value) / config.eeeUnit).toStringAsFixed(5);
           } catch (e) {
             element.value = "0";
           }

@@ -164,7 +164,7 @@ class _EntrancePageState extends State<EntrancePage> {
             LogUtil.i("_checkServerAppConfig latestApkObj======>", latestApkObj.toString());
             String apkVersion = latestApkObj["apkVersion"].toString();
             if (apkVersion != null && apkVersion.isNotEmpty) {
-              config.privateConfig.serverApkVersionKey = apkVersion;
+              config.privateConfig.serverApkVersion = apkVersion;
             }
           }
           // save changed config

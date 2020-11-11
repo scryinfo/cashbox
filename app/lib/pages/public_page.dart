@@ -1,8 +1,5 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
-import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,7 +14,6 @@ class PublicPage extends StatefulWidget {
 class _PublicPageState extends State<PublicPage> {
   WebViewController _controller;
   String targetUrl = "";
-  Future targetUrlFuture;
 
   @override
   void initState() {
@@ -27,13 +23,11 @@ class _PublicPageState extends State<PublicPage> {
 
   initData() async {
     super.didChangeDependencies();
-    targetUrlFuture = loadTargetUrl();
   }
 
-  loadTargetUrl() async {
-    var spUtil = await SharedPreferenceUtil.instance;
-    var publicValue = spUtil.getString(VendorConfig.publicIpKey);
-    targetUrl = publicValue ?? VendorConfig.publicIpDefaultValue;
+  Future<String> loadTargetUrl() async {
+    Config config = await HandleConfig.instance.getConfig();
+    targetUrl = config.privateConfig.publicIp;
     print("targetUrl===>" + targetUrl);
     return targetUrl;
   }
@@ -68,7 +62,7 @@ class _PublicPageState extends State<PublicPage> {
         width: ScreenUtil().setWidth(90),
         height: ScreenUtil().setHeight(160),
         child: FutureBuilder(
-            future: targetUrlFuture,
+            future: loadTargetUrl(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Text("sorry,some error happen!");

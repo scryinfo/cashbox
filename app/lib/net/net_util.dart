@@ -4,7 +4,6 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/util/app_info_util.dart';
 import 'package:app/util/log_util.dart';
-import 'package:app/util/sharedpreference_util.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:device_info/device_info.dart';
@@ -55,13 +54,11 @@ Future requestWithDeviceId(String url, {formData}) async {
 }
 
 Future requestWithConfigCheckParam(String url, {formData}) async {
-  var spUtil = await SharedPreferenceUtil.instance;
-
   if (formData == null) formData = {};
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   String apkVersion = packageInfo.version;
   formData["apkVersion"] = apkVersion;
-  
+
   Config config = await HandleConfig.instance.getConfig();
   formData["authTokenListVersion"] = config.privateConfig.authDigitVersion;
   formData["defaultTokenListVersion"] = config.privateConfig.defaultDigitVersion;

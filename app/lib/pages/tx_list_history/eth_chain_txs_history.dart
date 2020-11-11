@@ -1,21 +1,14 @@
-import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
-import 'package:app/model/tx_model/base_tx_model.dart';
-import 'package:app/model/tx_model/eee_transaction_model.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
-import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
-import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
@@ -25,7 +18,6 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
-import 'dart:convert' as convert;
 
 class EthChainTxsHistoryPage extends StatefulWidget {
   @override
