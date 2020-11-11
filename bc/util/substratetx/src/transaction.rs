@@ -143,9 +143,10 @@ fn calculate_prefix(func_len: usize) -> Vec<u8> {
     }
     let mut prefix_vec = vec![];
     let num = func_base_num + add_num;
-    let prefix_le_bytes: [u8; 8] = num.to_le_bytes();
-    let zeros_num = (num.leading_zeros() / 8) as usize;
-    prefix_vec.extend_from_slice(&prefix_le_bytes[0..8 - zeros_num]);
+    const LEN_USIZE: usize = std::mem::size_of::<usize>();
+    let prefix_le_bytes: [u8; LEN_USIZE] = num.to_le_bytes();
+    let zeros_num = (num.leading_zeros() as usize / LEN_USIZE) as usize;
+    prefix_vec.extend_from_slice(&prefix_le_bytes[0..LEN_USIZE - zeros_num]);
     prefix_vec.push(4u8);
     prefix_vec
 }
