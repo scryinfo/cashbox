@@ -2,7 +2,7 @@
 
 use bitcoin::blockdata::opcodes;
 use bitcoin::blockdata::script::Builder;
-use bitcoin::consensus::serialize;
+
 use bitcoin::hashes::hex::FromHex;
 use bitcoin::util::psbt::serialize::Serialize;
 use bitcoin::{Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut};
@@ -93,10 +93,10 @@ pub fn create_master() -> Transaction {
 }
 
 mod test {
-    use crate::walletlib::create_master;
-    use bitcoin::consensus::serialize;
-    use bitcoin::Address;
-    use std::str::FromStr;
+    
+    
+    
+    
 
     #[test]
     pub fn fee_test() {

@@ -5,7 +5,7 @@ use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::{BitcoinHash, Network};
 use log::info;
-use sqlite::{State, Statement, Value};
+use sqlite::{State, Value};
 use std::sync::{Arc, Mutex};
 
 #[cfg(target_os = "android")]
@@ -264,8 +264,8 @@ impl SQLite {
 }
 
 mod test {
-    use crate::jniapi::SHARED_SQLITE;
-    use crate::db::NEWEST_KEY;
+    
+    
 
     #[test]
     pub fn test_init() {

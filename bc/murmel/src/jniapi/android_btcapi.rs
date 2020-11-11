@@ -27,6 +27,7 @@ pub mod android {
     use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
     use std::sync::{Arc, Mutex};
     use std::time::SystemTime;
+    use crate::jniapi::SHARED_SQLITE;
 
     const PASSPHRASE: &str = "";
 
@@ -314,7 +315,7 @@ pub mod android {
     }
 
     mod test {
-        use crate::jniapi::btcapi::{calc_bloomfilter, calc_pubkey, calc_default_address};
+        use crate::jniapi::android_btcapi::android::{calc_bloomfilter, calc_pubkey, calc_default_address};
 
         #[test]
         pub fn test_calc_pubkey() {
