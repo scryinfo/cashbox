@@ -6,7 +6,7 @@
 pub mod another {
     use crate::jniapi::SHARED_SQLITE;
     use crate::constructor::Constructor;
-    use crate::db::SharedSQLite;
+    
     use bitcoin::consensus::serialize;
     use bitcoin::network::message_bloom_filter::FilterLoadMessage;
     use bitcoin::util::psbt::serialize::Serialize;
@@ -16,16 +16,16 @@ pub mod another {
     use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
     use bitcoin_wallet::mnemonic::Mnemonic;
     use jni::objects::{JClass, JObject, JString, JValue};
-    use jni::sys::{jboolean, jbyteArray, jint, jlong, jstring};
+    use jni::sys::{jboolean, jbyteArray, jint, jstring};
     use jni::JNIEnv;
     use log::info;
     use log::Level;
-    use once_cell::sync::Lazy;
+    
     use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
     use std::path::Path;
     use std::str::FromStr;
-    use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
-    use std::sync::{Arc, Mutex};
+    
+    
     use std::time::SystemTime;
 
     const PASSPHRASE: &str = "";
@@ -39,25 +39,25 @@ pub mod another {
     #[no_mangle]
     #[allow(non_snake_case)]
     pub extern "system" fn Java_JniApi_btcTxSign(
-        env: JNIEnv,
-        _class: JClass,
-        from_address: JString,
-        wallet_id: JString,
-        to_address: JString,
-        value: JString,
+        env: JNIEnv<'_>,
+        _class: JClass<'_>,
+        from_address: JString<'_>,
+        wallet_id: JString<'_>,
+        to_address: JString<'_>,
+        value: JString<'_>,
     ) -> jbyteArray {
         // TODO
         // use wallet_id to create master and calc public_key and sign Transaction
         // now just use mnemonic_str to sign it
         let from_address = env.get_string(from_address).unwrap();
-        let from_address = from_address.to_str().unwrap();
+        let _from_address = from_address.to_str().unwrap();
         let wallet_id = env.get_string(wallet_id).unwrap();
-        let wallet_id = wallet_id.to_str().unwrap();
+        let _wallet_id = wallet_id.to_str().unwrap();
         let to_address = env.get_string(to_address).unwrap();
-        let to_address = to_address.to_str().unwrap();
+        let _to_address = to_address.to_str().unwrap();
         let value = env.get_string(value).unwrap();
         let value = value.to_str().unwrap();
-        let value = value.parse::<u64>().unwrap();
+        let _value = value.parse::<u64>().unwrap();
 
         let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
         let mnemonic = Mnemonic::from_str(&words).expect("don't have right mnemonic");
@@ -135,12 +135,12 @@ pub mod another {
     #[no_mangle]
     #[allow(non_snake_case)]
     pub extern "system" fn Java_JniApi_btcTxSignAndBroadcast(
-        env: JNIEnv,
-        _class: JClass,
-        from_address: JString,
-        wallet_id: JString,
-        to: JString,
-        value: JString,
+        _env: JNIEnv<'_>,
+        _class: JClass<'_>,
+        _from_address: JString<'_>,
+        _wallet_id: JString<'_>,
+        _to: JString<'_>,
+        _value: JString<'_>,
     ) -> jboolean {
         // let from_address = env.get_string(from_address).unwrap();
         // let from_address = from_address.to_str().unwrap();
@@ -158,16 +158,16 @@ pub mod another {
     #[no_mangle]
     #[allow(non_snake_case)]
     pub extern "system" fn Java_JniApi_btcLoadBalance(
-        env: JNIEnv,
-        _class: JClass,
-        address: JString,
+        _env: JNIEnv<'_>,
+        _class: JClass<'_>,
+        _address: JString<'_>,
     ) -> jstring {
         unimplemented!()
     }
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv, _class: JClass) -> jstring {
+    pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
         let sqlite = SHARED_SQLITE.lock().unwrap();
         let max_block_number = sqlite.count();
         let max_block_number = env
@@ -178,7 +178,7 @@ pub mod another {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv, class: JClass) -> jstring {
+    pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
         let sqlite = SHARED_SQLITE.lock().unwrap();
         let height = sqlite.query_scanned_height();
         let max_block_number = env
@@ -189,18 +189,18 @@ pub mod another {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcIsSyncDataOk(env: JNIEnv, _class: JClass) -> jboolean {
+    pub extern "system" fn Java_JniApi_btcIsSyncDataOk(_env: JNIEnv<'_>, _class: JClass<'_>) -> jboolean {
         unimplemented!()
     }
 
     #[no_mangle]
     #[allow(non_snake_case)]
     pub extern "system" fn Java_JniApi_btcLoadTxHistory(
-        env: JNIEnv,
-        _class: JClass,
-        address: JString,
-        startIndex: jint,
-        offset: JString,
+        _env: JNIEnv<'_>,
+        _class: JClass<'_>,
+        _address: JString<'_>,
+        _startIndex: jint,
+        _offset: JString<'_>,
     ) -> jboolean {
         unimplemented!()
     }
@@ -208,7 +208,7 @@ pub mod another {
     // this function don't have any return value。because it will run spv node
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEnv, _class: JClass, network: JString) {
+    pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEnv<'_>, _class: JClass<'_>, network: JString<'_>) {
         // TODO
         // use testnet for test and default
         // must change it in future
@@ -286,7 +286,7 @@ pub mod another {
         master.add_account(account);
         let account = master.get_mut((0, 0)).unwrap();
         let instance_key = account.next_key().unwrap();
-        let source = instance_key.address.clone();
+        let _source = instance_key.address.clone();
         let public_key = instance_key.public.clone();
         let public_compressed = public_key.serialize();
         let public_compressed = hex::encode(public_compressed);
@@ -307,14 +307,14 @@ pub mod another {
         master.add_account(account);
         let account = master.get_mut((0, 0)).unwrap();
         let instance_key = account.next_key().unwrap();
-        let source = instance_key.address.clone();
+        let _source = instance_key.address.clone();
         let public_key = instance_key.public.clone();
         let public_compressed = public_key.serialize();
         hex::encode(public_compressed)
     }
 
     mod test {
-        use crate::jniapi::btcapi::another::{calc_bloomfilter, calc_pubkey, calc_default_address};
+        
 
         #[test]
         pub fn test_calc_pubkey() {

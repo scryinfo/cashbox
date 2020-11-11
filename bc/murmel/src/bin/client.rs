@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-extern crate bitcoin;
+
 #[macro_use] extern crate log;
-extern crate murmel;
-extern crate rand;
-extern crate simple_logger;
+
+
+use simple_logger;
 
 use bitcoin::network::constants::Network;
 use log::Level;

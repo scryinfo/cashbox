@@ -51,7 +51,7 @@ impl BloomFilter {
                         }
                     }
                     PeerMessage::Disconnected(_, _) => Ok(()),
-                    PeerMessage::Incoming(pid, msg) => {
+                    PeerMessage::Incoming(_pid, msg) => {
                         match msg {
                             //  The processing methods related to the Bitcoin network protocol must be modified accordingly to send FilterLoad
                             //  There is a branch dealing with inv, this is not needed for the time being

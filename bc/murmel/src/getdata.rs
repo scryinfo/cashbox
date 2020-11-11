@@ -6,8 +6,7 @@ use crate::error::Error;
 use crate::hooks::HooksMessage;
 use crate::jniapi::SHARED_SQLITE;
 use crate::p2p::{
-     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
-    SERVICE_BLOCKS, SERVICE_BLOOM,
+     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOOM,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
@@ -17,7 +16,7 @@ use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+
 use bitcoin_hashes::Hash;
 use log::{error, info, trace, warn};
 use std::sync::mpsc;
@@ -236,7 +235,7 @@ impl GetData {
     }
 
     ///Calculation hash160
-    fn hash160(&self, public_key: &str) -> String {
+    fn hash160(&self, _public_key: &str) -> String {
         let decode: Vec<u8> = FromHex::from_hex(PUBLIC_KEY).expect("Invalid public key");
         let hash = hash160::Hash::hash(&decode[..]);
         warn!("HASH160 {:?}", hash.to_hex());
