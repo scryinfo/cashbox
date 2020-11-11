@@ -3,9 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wallets/wallets.dart';
 
 void main() {
-  test('adds one to input values', () {
-    // final calculator = Wallets();
-    // expect(calculator.addOne(0), 1);
-    // expect(() => calculator.addOne(null), throwsNoSuchMethodError);
+  test('Wallets lock', () {
+    var wallet = Wallets.instance();
+    var r = wallet.safeRead(() {
+      //...
+    });
+    expect(true, r);
+    r = wallet.safeWrite(() {
+      // ...
+    });
+    expect(true, r);
   });
 }

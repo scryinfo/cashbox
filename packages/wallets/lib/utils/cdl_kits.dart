@@ -14,9 +14,9 @@ String _platformPath(String name, {String path}) {
   } else {
     throw Exception("Platform not implemented");
   }
-  if (!(File(dlPath).existsSync())) {
-    dlPath = Platform.script.resolve(dlPath).path;
-  }
+  // if (!(File(dlPath).existsSync())) {
+  //   dlPath = Platform.script.resolve(dlPath).path;
+  // }
   return dlPath;
 }
 

@@ -55,3 +55,8 @@ git
 /demo/ffi/cdl/target
 /demo/ffi/flutter_app/pubspec.lock
 /packages/wallets/pubspec.lock
+/demo/ffi/flutter_app/android/app/src/main/jniLibs/arm64-v8a/libcdl.so
+/demo/ffi/flutter_app/cdl.dll
+/demo/ffi/flutter_app/dl/arm64-v8a/libcdl.so
+/demo/ffi/flutter_app/dl/arm64-v8a/libwallets_cdl.so
+/packages/wallets/wallets_cdl.dll

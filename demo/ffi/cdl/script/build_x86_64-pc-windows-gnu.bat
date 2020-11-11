@@ -1,3 +1,4 @@
+Setlocal
 set HOST_TAG=x86_64-pc-windows-gnu
 set VCPKGRS_DYNAMIC=1
 set cuPath=%cd
@@ -9,4 +10,4 @@ rustup default stable-gnu
 cd %batPath%/..
 cargo build --target %HOST_TAG%
 cd %batPath%
-
+EndLocal

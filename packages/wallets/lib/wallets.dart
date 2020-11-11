@@ -6,8 +6,8 @@ import 'wallets_c.dart';
 import 'utils/cdl_kits.dart';
 import 'error.dart';
 
-const _False = 1;
-const _True = 0;
+const _False = 0;
+const _True = 1;
 const _dlName = "wallets_cdl";
 
 class Wallets {
