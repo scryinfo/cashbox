@@ -3,6 +3,7 @@
 #![allow(non_snake_case)]
 pub mod android {
 
+    use crate::jniapi::BTC_CHAIN_PATH;
     use crate::constructor::Constructor;
     use crate::db::SQLite;
     use crate::db::SharedSQLite;
@@ -30,12 +31,6 @@ pub mod android {
     use crate::jniapi::SHARED_SQLITE;
 
     const PASSPHRASE: &str = "";
-
-    #[cfg(target_os = "android")]
-    const BTC_CHAIN_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_chain.db"#;
-
-    #[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
-    const BTC_CHAIN_PATH: &str = r#"btc_chain.db"#;
 
     #[no_mangle]
     #[allow(non_snake_case)]

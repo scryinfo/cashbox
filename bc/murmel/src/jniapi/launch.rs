@@ -7,6 +7,7 @@ use jni::objects::JClass;
 use jni::JNIEnv;
 use log::Level;
 
+use crate::jniapi::BTC_CHAIN_PATH;
 use crate::constructor::Constructor;
 use crate::db::SQLite;
 use std::sync::{Arc, Mutex};
@@ -17,12 +18,6 @@ use std::{
     str::FromStr,
     time::SystemTime,
 };
-
-#[cfg(target_os = "android")]
-const BTC_CHAIN_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_chain.db"#;
-
-#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
-const BTC_CHAIN_PATH: &str = r#"btc_chain.db"#;
 
 #[no_mangle]
 #[allow(non_snake_case)]

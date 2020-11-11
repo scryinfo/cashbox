@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#[macro_use] extern crate log;
-
+#[macro_use]
+extern crate log;
 
 use simple_logger;
 
@@ -30,12 +30,7 @@ use std::{
     str::FromStr,
     time::SystemTime,
 };
-
-#[cfg(target_os = "android")]
-const BTC_CHAIN_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_chain.db"#;
-
-#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
-const BTC_CHAIN_PATH: &str = r#"btc_chain.db"#;
+use murmel::jniapi::BTC_CHAIN_PATH;
 
 pub fn main() {
     if find_opt("help") {
@@ -107,10 +102,10 @@ pub fn main() {
     };
 
     let chaindb = if let Some(path) = find_arg("db") {
-            Constructor::open_db(Some(&Path::new(path.as_str())), network, birth).unwrap()
-        } else {
-            Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap()
-        };
+        Constructor::open_db(Some(&Path::new(path.as_str())), network, birth).unwrap()
+    } else {
+        Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap()
+    };
 
     let mut spv = Constructor::new(network, listen, chaindb).unwrap();
     spv.run(network, peers, connections).expect("can not start node");
@@ -131,7 +126,7 @@ fn get_listeners() -> Vec<SocketAddr> {
 }
 
 // Returns key-value zipped iterator.
-fn zipped_args() -> impl Iterator<Item = (String, String)> {
+fn zipped_args() -> impl Iterator<Item=(String, String)> {
     let key_args = args()
         .filter(|arg| arg.starts_with("--"))
         .map(|mut arg| arg.split_off(2));

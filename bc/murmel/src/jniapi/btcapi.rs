@@ -6,6 +6,7 @@
 pub mod another {
     use crate::jniapi::SHARED_SQLITE;
     use crate::constructor::Constructor;
+    use crate::jniapi::BTC_CHAIN_PATH;
     
     use bitcoin::consensus::serialize;
     use bitcoin::network::message_bloom_filter::FilterLoadMessage;
@@ -29,12 +30,6 @@ pub mod another {
     use std::time::SystemTime;
 
     const PASSPHRASE: &str = "";
-
-    #[cfg(target_os = "android")]
-    const BTC_CHAIN_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_chain.db"#;
-
-    #[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
-    const BTC_CHAIN_PATH: &str = r#"btc_chain.db"#;
 
     #[no_mangle]
     #[allow(non_snake_case)]
