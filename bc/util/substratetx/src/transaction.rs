@@ -56,7 +56,7 @@ type SignedExtra = (
 
 /// 将Call方法使用调用者的密钥进行签名
 ///
-fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C::Pair, genesis_hash: H256, spec_version: u32, transaction_version: u32) -> UncheckedExtrinsicV4 where PublicOf<C>: PublicT, SignatureOf<C>: SignatureT,
+/*fn generate_signed_extrinsic<C: Crypto>(function: Call, index: Index, signer: C::Pair, genesis_hash: H256, spec_version: u32, transaction_version: u32) -> UncheckedExtrinsicV4 where PublicOf<C>: PublicT, SignatureOf<C>: SignatureT,
 {
     let extra = |i: Index, f: Balance| {
         (
@@ -106,9 +106,9 @@ pub fn transfer(mnemonic: &str, to: &str, amount: &str, genesis_hash: &[u8], ind
 
     let result = tx_sign(mnemonic, genesis_hash, index as u32, &prefix, runtime_version, tx_version)?;
     Ok(result)
-}
+}*/
 
-pub fn tokenx_transfer(mnemonic: &str, to: &str, amount: &str, ext:&[u8],genesis_hash: &[u8], index: u32, runtime_version: u32, tx_version: u32) -> Result<String, error::Error> {
+/*pub fn tokenx_transfer(mnemonic: &str, to: &str, amount: &str, ext:&[u8],genesis_hash: &[u8], index: u32, runtime_version: u32, tx_version: u32) -> Result<String, error::Error> {
     let to_account_id = AccountId::from_ss58check(to)?;
     let amount = balance_unit_convert(amount, DECIMAL).unwrap();
   //  let ext_byte = hex::decode(ext.get(2..).unwrap())
@@ -129,7 +129,7 @@ pub fn tx_sign(mnemonic: &str, genesis_hash: &[u8], index: u32, func_data: &[u8]
     let extrinsic = generate_signed_extrinsic::<crypto::Sr25519>(extrinsic.function, index, signer, H256::from_slice(genesis_hash), spec_version, tx_version);
     let result = format!("0x{}", hex::encode(&extrinsic.encode()));
     Ok(result)
-}
+}*/
 
 //TODO do该计算方法是通过数字找出来的规律，这样构造出来的数据 能够在链上验证，背后的理论知识还需要再去源码中查找！
 fn calculate_prefix(func_len: usize) -> Vec<u8> {
@@ -151,7 +151,7 @@ fn calculate_prefix(func_len: usize) -> Vec<u8> {
 }
 
 //todo 处理转换失败的情况，将option 转换为result来表示
-fn balance_unit_convert(amount: &str, decimal: usize) -> Option<u128> {
+pub fn balance_unit_convert(amount: &str, decimal: usize) -> Option<u128> {
     match amount.find(".") {
         Some(index) => {
             let integer_part = amount.get(0..index).unwrap();
@@ -170,7 +170,7 @@ fn balance_unit_convert(amount: &str, decimal: usize) -> Option<u128> {
             let decimal_part_data = str::parse::<Balance>(decimal_part).unwrap_or(0);
             //将小数点去掉后，还需要在末尾添加0的个数
             let add_zero = decimal - decimal_part.len();
-            println!("decimal_part {},add_zero:{}",decimal_part,add_zero);
+            log::info!("decimal_part {},add_zero:{}",decimal_part,add_zero);
             let base = 10_u128.pow(add_zero as u32);
             let decimal_part_u128 = decimal_part_data.checked_mul(base).unwrap();
             integer_part_u128.checked_add(decimal_part_u128)
@@ -182,19 +182,17 @@ fn balance_unit_convert(amount: &str, decimal: usize) -> Option<u128> {
     }
 }
 
-pub fn account_info_key(account_id: &str) -> Result<String, error::Error> {
+/*pub fn account_info_key(account_id: &str) -> Result<String, error::Error> {
     let account_id = AccountId::from_ss58check(account_id)?;
     let final_key = <system::Account<Runtime>>::hashed_key_for(account_id);
     let key = format!("0x{:}", HexDisplay::from(&final_key));
     Ok(key)
 }
-
+*/
 pub fn decode_account_info(info: &str) -> Result<EeeAccountInfo, error::Error> {
-    if !info.starts_with("0x") {
-        return Err(error::Error::Custom("input data format error,please start with '0x'".to_string()));
-    }
-    let state_vec = hex::decode(info.get(2..).unwrap())?;
-    let state = system::AccountInfo::<Index, balances::AccountData<Balance>>::decode(&mut &state_vec.as_slice()[..])?;
+    let state_vec =  hexstr_to_vec(info)?;
+     EeeAccountInfo::decode(&mut &state_vec.as_slice()[..]).map_err(|err|err.into())
+  /*  let state = system::AccountInfo::<Index, balances::AccountData<Balance>>::decode(&mut &state_vec.as_slice()[..])?;
     Ok(EeeAccountInfo {
         nonce: state.nonce,
         refcount: state.refcount as u32,
@@ -202,23 +200,20 @@ pub fn decode_account_info(info: &str) -> Result<EeeAccountInfo, error::Error> {
         reserved: state.data.reserved.to_string(),
         misc_frozen: state.data.misc_frozen.to_string(),
         fee_frozen: state.data.fee_frozen.to_string(),
-    })
+    })*/
 }
+
+//convert hex metadata string to RuntimeMetadata obj
 
 #[test]
 fn balance_unit_convert_test() {
     println!("{:?}", balance_unit_convert("200.02", 12));
 }
 
-#[test]
-fn account_info_key_test() {
-    assert_eq!("0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e".to_string(), account_info_key("5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4").unwrap());
-}
 
 #[test]
 fn decode_test() {
     let nonce = "0x0b00000000002ed2523097f2d21d02000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-
     let blob = hex::decode(&nonce[2..10]).unwrap();
     let mut index_target = [0u8; 8];
     {
@@ -231,7 +226,8 @@ fn decode_test() {
 
 #[test]
 fn decode_account_info_test() {
-    let state_str = "0x0b00000000002ed2523097f2d21d02000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+    let state_str = "0x0500000000000000c7da0cd38532ab80960a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
     let info = decode_account_info(state_str);
     println!("account info:{:?}", info);
 }
+
