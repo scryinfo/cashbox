@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:isolate';
-
-import 'package:app/global_config/global_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
@@ -58,14 +57,12 @@ class EeeSyncTxs {
   ScryXNetUtil _scryXNetUtil = new ScryXNetUtil();
 
   _start() async {
+    Config config = await HandleConfig.instance.getConfig();
     RunParams runParams = new RunParams(_address, _pubKey, _chainType);
-    _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(SystemSymbol, AccountSymbol, runParams.pubKey);
-    _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(TokenXSymbol, BalanceSymbol, runParams.pubKey);
+    _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.pubKey);
+    _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.pubKey);
     _threadRun(runParams);
   }
-
-
-
 
   stop() {
     if (_timer != null) {
@@ -105,6 +102,7 @@ class EeeSyncTxs {
 
   _loadEeeChainTxHistoryData(RunParams runParams) async {
     print("_loadEeeChainTxHistoryData");
+    Config config = await HandleConfig.instance.getConfig();
     int latestBlockHeight = -1;
     {
       Map txHistoryMap = await _scryXNetUtil.loadChainHeader();
@@ -117,13 +115,18 @@ class EeeSyncTxs {
     }
 
     {
-      if(_eeeStorageKey == null || _eeeStorageKey.isEmpty){
-        _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(SystemSymbol, AccountSymbol, runParams.pubKey);
+      if (_eeeStorageKey == null || _eeeStorageKey.isEmpty) {
+        _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.pubKey);
       }
-      if(_tokenXStorageKey == null || _tokenXStorageKey.isEmpty){
-        _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(TokenXSymbol, BalanceSymbol, runParams.pubKey);
+      if (_tokenXStorageKey == null || _tokenXStorageKey.isEmpty) {
+        _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.pubKey);
       }
-      if (_eeeStorageKey == null || _eeeStorageKey.isEmpty || _eeeStorageKey.trim().isEmpty || _tokenXStorageKey == null || _tokenXStorageKey.isEmpty || _tokenXStorageKey.trim().isEmpty) {
+      if (_eeeStorageKey == null ||
+          _eeeStorageKey.isEmpty ||
+          _eeeStorageKey.trim().isEmpty ||
+          _tokenXStorageKey == null ||
+          _tokenXStorageKey.isEmpty ||
+          _tokenXStorageKey.trim().isEmpty) {
         return;
       }
     }
@@ -136,7 +139,7 @@ class EeeSyncTxs {
       Map records = eeeSyncMap["records"];
       if (records != null && records.isNotEmpty) {
         Map<dynamic, dynamic> recordsMap = eeeSyncMap["records"];
-        for(var v in recordsMap.values){
+        for (var v in recordsMap.values) {
           Map<dynamic, dynamic> accountDetailMap = v;
           if (accountDetailMap != null &&
               accountDetailMap.containsKey("account") &&
@@ -223,7 +226,8 @@ class EeeSyncTxs {
         }
       }
 
-      Map updateEeeMap = await Wallets.instance.updateEeeSyncRecord(runParams.address, Chain.chainTypeToInt(runParams.chainType), endBlockHeight, endBlockHash);
+      Map updateEeeMap =
+          await Wallets.instance.updateEeeSyncRecord(runParams.address, Chain.chainTypeToInt(runParams.chainType), endBlockHeight, endBlockHash);
       if (!_isMapStatusOk(updateEeeMap)) {
         return;
       }
@@ -232,7 +236,7 @@ class EeeSyncTxs {
 
   static bool _isMapStatusOk(Map returnMap) {
     if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      print("returnMap error is ===>"+returnMap.toString());
+      print("returnMap error is ===>" + returnMap.toString());
       return false;
     }
     return true;

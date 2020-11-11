@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/global_config/global_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
@@ -111,9 +110,11 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     this.moneyUnitList = rate.getAllSupportLegalCurrency();
-    setState(() {
-      this.moneyUnitList = this.moneyUnitList;
-    });
+    if (mounted) {
+      setState(() {
+        this.moneyUnitList = this.moneyUnitList;
+      });
+    }
   }
 
   //Market price information (hourly changes, etc.)
@@ -159,6 +160,7 @@ class _HomePageState extends State<HomePage> {
     if (_loadingBalanceTimerTask != null) {
       _loadingBalanceTimerTask.cancel();
     }
+    Config config = await HandleConfig.instance.getConfig();
     _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
       switch (Wallets.instance.nowWallet.nowChain.chainType) {
         case ChainType.ETH:
@@ -197,12 +199,14 @@ class _HomePageState extends State<HomePage> {
             for (var i = 0; i < displayDigitsList.length; i++) {
               int index = i;
               String balance = "0";
-              if (this.displayDigitsList[index].shortName.toLowerCase() == EeeSymbol.toLowerCase()) {
-                Map eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+
+              if (this.displayDigitsList[index].shortName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
+                Map eeeStorageKeyMap =
+                    await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
                 if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
                   try {
                     String eeeFree = eeeStorageKeyMap["free"] ?? "0";
-                    balance = (BigInt.parse(eeeFree) / BigInt.from(Eee_Unit)).toStringAsFixed(5) ?? "0";
+                    balance = (BigInt.parse(eeeFree) / config.eeeUnit).toStringAsFixed(5) ?? "0";
                     if (balance == null || double.parse(balance) == double.parse("0")) {
                       continue;
                     }
@@ -213,11 +217,12 @@ class _HomePageState extends State<HomePage> {
                   Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
                   this.displayDigitsList[index].balance = balance;
                 }
-              } else if (this.displayDigitsList[index].shortName.toLowerCase() == TokenXSymbol.toLowerCase()) {
-                Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+              } else if (this.displayDigitsList[index].shortName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
+                Map tokenBalanceMap =
+                    await scryXNetUtil.loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
                 if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
                   try {
-                    double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / BigInt.from(Eee_Unit);
+                    double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
                     balance = tokenBalance.toStringAsFixed(5);
                     if (balance == null || double.parse(balance) == double.parse("0")) {
                       continue;

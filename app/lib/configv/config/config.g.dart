@@ -187,7 +187,7 @@ Map<String, dynamic> _$TokenToJson(Token instance) => <String, dynamic>{
 PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
   return PrivateConfig()
     ..serverConfigIp = json['serverConfigIp'] as String
-    ..serverApkVersionKey = json['serverApkVersionKey'] as String
+    ..serverApkVersion = json['serverApkVersion'] as String
     ..configVersion = json['configVersion'] as String
     ..downloadAppUrl = json['downloadAppUrl'] as String
     ..downloadLatestAppUrl = json['downloadLatestAppUrl'] as String
@@ -208,13 +208,15 @@ PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
     ..etherscanKey = json['etherscanKey'] as String
     ..dddMainNetCA = json['dddMainNetCA'] as String
     ..dddTestNetCA = json['dddTestNetCA'] as String
+    ..d2eMainNetEthAddress = json['d2eMainNetEthAddress'] as String
+    ..d2eTestNetEthAddress = json['d2eTestNetEthAddress'] as String
     ..dappOpenUrl = json['dappOpenUrl'] as String;
 }
 
 Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
     <String, dynamic>{
       'serverConfigIp': instance.serverConfigIp,
-      'serverApkVersionKey': instance.serverApkVersionKey,
+      'serverApkVersion': instance.serverApkVersion,
       'configVersion': instance.configVersion,
       'downloadAppUrl': instance.downloadAppUrl,
       'downloadLatestAppUrl': instance.downloadLatestAppUrl,
@@ -230,5 +232,7 @@ Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
       'etherscanKey': instance.etherscanKey,
       'dddMainNetCA': instance.dddMainNetCA,
       'dddTestNetCA': instance.dddTestNetCA,
+      'd2eMainNetEthAddress': instance.d2eMainNetEthAddress,
+      'd2eTestNetEthAddress': instance.d2eTestNetEthAddress,
       'dappOpenUrl': instance.dappOpenUrl,
     };

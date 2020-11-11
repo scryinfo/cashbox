@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
-
-import 'package:app/global_config/vendor_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
@@ -42,16 +42,18 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
     initDataConfig();
   }
 
-  void initDataConfig() {
+  void initDataConfig() async {
     fromExchangeAddress = Provider.of<TransactionProvide>(context).fromAddress;
+    Config config = await HandleConfig.instance.getConfig();
+
     switch (Wallets.instance.nowWallet.walletType) {
       //use walletType:in case :nowChain is not eth or eth_test
       case WalletType.TEST_WALLET:
-        toExchangeAddress = VendorConfig.TEST_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
+        toExchangeAddress = config.privateConfig.d2eTestNetEthAddress;
         chainType = ChainType.ETH_TEST;
         break;
       case WalletType.WALLET:
-        toExchangeAddress = VendorConfig.MAIN_NET_DDD2EEE_RECEIVE_ETH_ADDRESS;
+        toExchangeAddress = config.privateConfig.d2eMainNetEthAddress;
         chainType = ChainType.ETH;
         break;
     }
@@ -387,12 +389,14 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             String walletId = await Wallets.instance.getNowWalletId();
+            Config config = await HandleConfig.instance.getConfig();
+
             Map result = await Wallets.instance.ethTxSign(
                 walletId,
                 Chain.chainTypeToInt(chainType),
                 fromExchangeAddress,
                 toExchangeAddress,
-                chainType == ChainType.ETH ? DddMainNetContractAddress : DddTestNetContractAddress,
+                chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA,
                 dddAmount,
                 eeeAddress,
                 Uint8List.fromList(pwd.codeUnits),

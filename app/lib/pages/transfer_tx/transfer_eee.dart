@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:app/global_config/global_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -53,11 +54,12 @@ class _TransferEeePageState extends State<TransferEeePage> {
   initEeeChainTxInfo() async {
     ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
     Map eeeStorageKeyMap;
+    Config config = await HandleConfig.instance.getConfig();
     if (digitName == null || digitName.isEmpty) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return;
     }
-    if (digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
+    if (digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
       //quick determine flag that relative to display widget
       {
         isShowTxInput = true;
@@ -66,7 +68,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
         });
       }
     }
-    eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(SystemSymbol, AccountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+    eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
     if (!_isMapStatusOk(eeeStorageKeyMap)) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return;
@@ -74,16 +76,17 @@ class _TransferEeePageState extends State<TransferEeePage> {
     nonce = eeeStorageKeyMap["nonce"];
     try {
       String eeeFree = eeeStorageKeyMap["free"] ?? "0";
-      double eeeFreeBalance = BigInt.parse(eeeFree) / BigInt.from(Eee_Unit);
+      double eeeFreeBalance = BigInt.parse(eeeFree) / config.eeeUnit;
       digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
     } catch (e) {
       digitBalance = "0";
     }
-    if (digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
-      Map tokenBalanceMap = await scryXNetUtil.loadTokenXbalance(TokenXSymbol, BalanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+    if (digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
+      Map tokenBalanceMap =
+          await scryXNetUtil.loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
         try {
-          double eeeFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / BigInt.from(Eee_Unit);
+          double eeeFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
           digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
         } catch (e) {
           digitBalance = "0";
@@ -443,7 +446,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             Map eeeTransferMap;
-            if (digitName != null && digitName.toLowerCase() == EeeSymbol.toLowerCase()) {
+            Config config = await HandleConfig.instance.getConfig();
+            if (digitName != null && digitName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
               eeeTransferMap = await Wallets.instance.eeeTransfer(
                   Wallets.instance.nowWallet.nowChain.chainAddress,
                   _toAddressController.text.toString(),
@@ -453,7 +457,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                   runtimeVersion,
                   txVersion,
                   Uint8List.fromList(pwd.codeUnits));
-            } else if (digitName != null && digitName.toLowerCase() == TokenXSymbol.toLowerCase()) {
+            } else if (digitName != null && digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
               eeeTransferMap = await Wallets.instance.tokenXTransfer(
                   Wallets.instance.nowWallet.nowChain.chainAddress,
                   _toAddressController.text.toString(),

@@ -3,8 +3,6 @@ import 'dart:typed_data';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
@@ -13,8 +11,6 @@ import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/qr_scan_util.dart';
-import 'package:app/util/sharedpreference_util.dart';
-import 'package:app/util/utils.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -71,92 +67,107 @@ class _DappPageState extends State<DappPage> {
   WebViewController _controller;
   Wallet nowWallet;
 
+  Future<String> _loadDappUrl() async {
+    Config config = await HandleConfig.instance.getConfig();
+    return config.privateConfig.dappOpenUrl;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: ScreenUtil().setWidth(90),
-        height: ScreenUtil().setHeight(160),
-        child: Container(
-          margin: EdgeInsets.only(top: ScreenUtil().setHeight(4.5)),
-          child: WebView(
-            // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
-            // initialUrl:"http://192.168.1.12:9010/web_app/dapp/dapp.html",
-            //initialUrl:"http://192.168.1.5:9690/home.html",
-            initialUrl: VendorConfig.dappOpenUrValue,
-            javascriptMode: JavascriptMode.unrestricted,
-            userAgent:
-                "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
-            //JS execution mode Whether to allow JS execution
-            onWebViewCreated: (WebViewController webViewController) {
-              _controller = webViewController;
-              //_loadHtmlFromAssets(_controller); //Load local html file
-            },
-            javascriptChannels: makeJsChannelsSet(),
-            navigationDelegate: (NavigationRequest request) {
-              print("navigationDelegate ===============================>:  $request");
-              return NavigationDecision.navigate;
-            },
-            onPageFinished: (String url) async {
-              await Wallets.instance.loadAllWalletList(isForceLoadFromJni: false);
-              nowWallet = Wallets.instance.nowWallet;
-              {
-                //eee
-                String address = '';
-                {
-                  address = nowWallet.getChainByChainType(ChainType.EEE)?.chainAddress;
-                  if (address == null || address.isEmpty) {
-                    address = nowWallet.getChainByChainType(ChainType.EEE_TEST)?.chainAddress;
-                  }
+          width: ScreenUtil().setWidth(90),
+          height: ScreenUtil().setHeight(160),
+          child: FutureBuilder(
+              future: _loadDappUrl(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text("sorry,some error happen!");
                 }
-                if (address != null && address.isNotEmpty) {
-                  // _controller?.evaluateJavascript('nativeChainAddressToJsResult("$address")')?.then((
-                  //     result) {}); //Pass the wallet EEE chain address to DApp record storage, this will be remove
-                  String script = 'if(window.$CashboxEeeName){$CashboxEeeName.$setAddress("$address")}';
-                  _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
-                } else {
-                  print('Page finished loading================================>:eee address is null');
-                }
-              }
+                if (snapshot.hasData) {
+                  return Container(
+                    margin: EdgeInsets.only(top: ScreenUtil().setHeight(4.5)),
+                    child: WebView(
+                      // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
+                      // initialUrl:"http://192.168.1.12:9010/web_app/dapp/dapp.html",
+                      //initialUrl:"http://192.168.1.5:9690/home.html",
+                      initialUrl: snapshot.data.toString(),
+                      javascriptMode: JavascriptMode.unrestricted,
+                      userAgent:
+                          "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
+                      //JS execution mode Whether to allow JS execution
+                      onWebViewCreated: (WebViewController webViewController) {
+                        _controller = webViewController;
+                        //_loadHtmlFromAssets(_controller); //Load local html file
+                      },
+                      javascriptChannels: makeJsChannelsSet(),
+                      navigationDelegate: (NavigationRequest request) {
+                        print("navigationDelegate ===============================>:  $request");
+                        return NavigationDecision.navigate;
+                      },
+                      onPageFinished: (String url) async {
+                        await Wallets.instance.loadAllWalletList(isForceLoadFromJni: false);
+                        nowWallet = Wallets.instance.nowWallet;
+                        {
+                          //eee
+                          String address = '';
+                          {
+                            address = nowWallet.getChainByChainType(ChainType.EEE)?.chainAddress;
+                            if (address == null || address.isEmpty) {
+                              address = nowWallet.getChainByChainType(ChainType.EEE_TEST)?.chainAddress;
+                            }
+                          }
+                          if (address != null && address.isNotEmpty) {
+                            // _controller?.evaluateJavascript('nativeChainAddressToJsResult("$address")')?.then((
+                            //     result) {}); //Pass the wallet EEE chain address to DApp record storage, this will be remove
+                            String script = 'if(window.$CashboxEeeName){$CashboxEeeName.$setAddress("$address")}';
+                            _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                          } else {
+                            print('Page finished loading================================>:eee address is null');
+                          }
+                        }
 
-              {
-                //eth
-                String address = '';
-                {
-                  address = nowWallet.getChainByChainType(ChainType.ETH)?.chainAddress;
-                  if (address == null || address.isEmpty) {
-                    address = nowWallet.getChainByChainType(ChainType.ETH_TEST)?.chainAddress;
-                  }
-                }
-                if (address != null && address.isNotEmpty) {
-                  String script = 'if(window.$CashboxEthName){$CashboxEthName.$setAddress("$address")}';
-                  _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
-                } else {
-                  print('Page finished loading================================>:eth address is null');
-                }
-              }
+                        {
+                          //eth
+                          String address = '';
+                          {
+                            address = nowWallet.getChainByChainType(ChainType.ETH)?.chainAddress;
+                            if (address == null || address.isEmpty) {
+                              address = nowWallet.getChainByChainType(ChainType.ETH_TEST)?.chainAddress;
+                            }
+                          }
+                          if (address != null && address.isNotEmpty) {
+                            String script = 'if(window.$CashboxEthName){$CashboxEthName.$setAddress("$address")}';
+                            _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                          } else {
+                            print('Page finished loading================================>:eth address is null');
+                          }
+                        }
 
-              {
-                //btc
-                String address = '';
-                {
-                  address = nowWallet.getChainByChainType(ChainType.BTC)?.chainAddress;
-                  if (address == null || address.isEmpty) {
-                    address = nowWallet.getChainByChainType(ChainType.BTC_TEST)?.chainAddress;
-                  }
-                }
-                if (address != null && address.isNotEmpty) {
-                  String script = 'if(window.$CashboxBtcName){$CashboxBtcName.$setAddress("$address")}';
-                  _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                        {
+                          //btc
+                          String address = '';
+                          {
+                            address = nowWallet.getChainByChainType(ChainType.BTC)?.chainAddress;
+                            if (address == null || address.isEmpty) {
+                              address = nowWallet.getChainByChainType(ChainType.BTC_TEST)?.chainAddress;
+                            }
+                          }
+                          if (address != null && address.isNotEmpty) {
+                            String script = 'if(window.$CashboxBtcName){$CashboxBtcName.$setAddress("$address")}';
+                            _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                          } else {
+                            print('Page finished loading================================>:btc address is null');
+                          }
+                        }
+                        print('Page finished loading================================>: $url');
+                      },
+                    ),
+                  );
                 } else {
-                  print('Page finished loading================================>:btc address is null');
+                  return Text("no data yet,please to refresh page");
                 }
-              }
-              print('Page finished loading================================>: $url');
-            },
-          ),
-        ),
-      ),
+              })),
     );
   }
 

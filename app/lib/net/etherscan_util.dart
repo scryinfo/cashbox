@@ -1,5 +1,5 @@
-import 'package:app/global_config/global_config.dart';
-import 'package:app/global_config/vendor_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/model/wallets.dart';
@@ -8,12 +8,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'net_util.dart';
 
-const etherscanApiKey = VendorConfig.ETHERSCAN_API_KEY; //todo change it Replace yourself with the apikey applied in etherscan
-
 const Eth_Tx_Account = "https://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
 const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=";
 
-String assembleTxAccount(String address, ChainType chainType, {String apiKey = etherscanApiKey}) {
+Future<String> loadEtherApiKey() async {
+  Config config = await HandleConfig.instance.getConfig();
+  return config.privateConfig.etherscanKey;
+}
+
+Future<String> assembleTxAccount(String address, ChainType chainType) async {
+  String apiKey = await loadEtherApiKey();
   if (chainType == ChainType.ETH) {
     return Eth_Tx_Account + address + "&tag=latest&apikey=" + apiKey;
   } else {
@@ -24,7 +28,7 @@ String assembleTxAccount(String address, ChainType chainType, {String apiKey = e
 //nonce === txAccount currently uses infura||etherscan
 Future<String> loadTxAccount(String address, ChainType chainType) async {
   try {
-    var res = await request(assembleTxAccount(address, chainType));
+    var res = await request(await assembleTxAccount(address, chainType));
     if (res != null && (res as Map).containsKey("result")) {
       //Note that due to infura||etherscan, the interface currently returns a format like 0x085f. Need to deal with the beginning 0x. Back to Hexadecimal to Decimal
       if (res["result"] != null && (res["result"].toString().startsWith("0x") || res["result"].toString().startsWith("0X"))) {
@@ -43,7 +47,8 @@ Future<String> loadTxAccount(String address, ChainType chainType) async {
 const Eth_MainNet_Balance = "https://api-cn.etherscan.com/api?module=account&action=balance&address=";
 const Eth_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account&action=balance&address=";
 
-String assembleEthBalanceUrl(String address, {ChainType chainType = ChainType.ETH, String apiKey = etherscanApiKey}) {
+Future<String> assembleEthBalanceUrl(String address, {ChainType chainType = ChainType.ETH}) async {
+  String apiKey = await loadEtherApiKey();
   if (chainType == ChainType.ETH_TEST) {
     return Eth_TestNet_Balance + address + "&tag=latest&apikey=" + apiKey;
   } else {
@@ -54,10 +59,11 @@ String assembleEthBalanceUrl(String address, {ChainType chainType = ChainType.ET
 //According to return  1. Eth_Unit magnitude, converted format
 //                     2. balance only keeps 4 decimal places
 Future<String> loadEthBalance(String address, ChainType chainType) async {
+  Config config = await HandleConfig.instance.getConfig();
   try {
-    var res = await request(assembleEthBalanceUrl(address, chainType: chainType));
+    var res = await request(await assembleEthBalanceUrl(address, chainType: chainType));
     if (res != null && (res as Map).containsKey("result")) {
-      return (BigInt.from(num.parse(res["result"])) / BigInt.from(Eth_Unit)).toStringAsFixed(4);
+      return (BigInt.from(num.parse(res["result"])) / config.ethUnit).toStringAsFixed(4);
     }
   } catch (e) {
     print(" error is " + e.toString());
@@ -69,7 +75,8 @@ Future<String> loadEthBalance(String address, ChainType chainType) async {
 const Erc20_Balance = "https://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=";
 const Erc20_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account&action=tokenbalance&contractaddress=";
 
-String assembleErc20BalanceUrl(String address, String contractAddress, ChainType chainType, {String apiKey = etherscanApiKey}) {
+Future<String> assembleErc20BalanceUrl(String address, String contractAddress, ChainType chainType) async {
+  String apiKey = await loadEtherApiKey();
   if (chainType == ChainType.ETH_TEST) {
     return Erc20_TestNet_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + apiKey;
   } else {
@@ -81,7 +88,7 @@ String assembleErc20BalanceUrl(String address, String contractAddress, ChainType
 //                    2. balance only keeps 4 decimal places
 Future<String> loadErc20Balance(String ethAddress, String contractAddress, ChainType chainType, {int decimal = 18}) async {
   try {
-    var res = await request(assembleErc20BalanceUrl(ethAddress, contractAddress, chainType));
+    var res = await request(await assembleErc20BalanceUrl(ethAddress, contractAddress, chainType));
     if (res != null && (res as Map).containsKey("result")) {
       String balance = ((BigInt.parse(res["result"])) / Utils.mathPow(10, decimal)).toStringAsFixed(4);
       return balance;
@@ -95,14 +102,14 @@ Future<String> loadErc20Balance(String ethAddress, String contractAddress, Chain
 const Eth_Tx_List = "https://api-cn.etherscan.com/api?module=account&action=txlist&address=";
 const Eth_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=";
 
-String assembleEthTxListUrl(String address,
+Future<String> assembleEthTxListUrl(String address,
     {String contractAddress,
     ChainType chainType = ChainType.ETH,
     String startBlock = "0",
     String endBlock = "99999999",
     String page = "1",
-    String offset = "20",
-    String apiKey = etherscanApiKey}) {
+    String offset = "20"}) async {
+  String apiKey = await loadEtherApiKey();
   if (chainType == ChainType.ETH_TEST) {
     return Eth_TestNet_Tx_List +
         address +
@@ -134,8 +141,9 @@ String assembleEthTxListUrl(String address,
 
 Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String address, ChainType chainType, {String offset}) async {
   List<EthTransactionModel> modelArray = [];
+  Config config = await HandleConfig.instance.getConfig();
   try {
-    var res = await request(assembleEthTxListUrl(address, offset: offset, chainType: chainType));
+    var res = await request(await assembleEthTxListUrl(address, offset: offset, chainType: chainType));
     print("loadEthTxHistory=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       for (var i = 0; i < res["result"].length; i++) {
@@ -167,9 +175,9 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
         }
         ethTxModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
         if (res["result"][i]["from"].trim().toLowerCase() == address.trim().toLowerCase()) {
-          ethTxModel.value = "-" + (int.parse(res["result"][i]["value"]) / Eth_Unit).toString();
+          ethTxModel.value = "-" + (double.parse(res["result"][i]["value"]) / config.ethUnit.toDouble()).toString();
         } else {
-          ethTxModel.value = "+" + (int.parse(res["result"][i]["value"]) / Eth_Unit).toString();
+          ethTxModel.value = "+" + (double.parse(res["result"][i]["value"]) / config.ethUnit.toDouble()).toString();
         }
         if (res["result"][i]["isError"] == "0") {
           ethTxModel.isError = translate('tx_success').toString();
@@ -191,8 +199,8 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
 const Erc20_Tx_List = "http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=";
 const Erc20_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=";
 
-String assembleErc20TxListUrl(String address,
-    {ChainType chainType, String contractAddress, String page = "1", String offset = "20", String apiKey = etherscanApiKey}) {
+Future<String> assembleErc20TxListUrl(String address, {ChainType chainType, String contractAddress, String page = "1", String offset = "20"}) async {
+  String apiKey = await loadEtherApiKey();
   if (chainType.toString() == ChainType.ETH_TEST.toString()) {
     return Erc20_TestNet_Tx_List +
         contractAddress +
@@ -221,8 +229,9 @@ String assembleErc20TxListUrl(String address,
 Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, String address, String contractAddress, ChainType chainType,
     {String offset}) async {
   List<EthTransactionModel> modelArray = [];
+  Config config = await HandleConfig.instance.getConfig();
   try {
-    var res = await request(assembleErc20TxListUrl(address, contractAddress: contractAddress, chainType: chainType, offset: offset));
+    var res = await request(await assembleErc20TxListUrl(address, contractAddress: contractAddress, chainType: chainType, offset: offset));
     if (res != null && (res as Map).containsKey("result")) {
       for (var i = 0; i < res["result"].length; i++) {
         var ethTxModel = new EthTransactionModel();
@@ -244,9 +253,9 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, Strin
           ..confirmations = res["result"][i]["confirmations"];
         ethTxModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
         if (res["result"][i]["from"].trim().toLowerCase() == address.trim().toLowerCase()) {
-          ethTxModel.value = "-" + (double.parse(res["result"][i]["value"]) / Eth_Unit).toString();
+          ethTxModel.value = "-" + (double.parse(res["result"][i]["value"]) / config.ethUnit.toDouble()).toString();
         } else {
-          ethTxModel.value = "+" + (double.parse(res["result"][i]["value"]) / Eth_Unit).toString();
+          ethTxModel.value = "+" + (double.parse(res["result"][i]["value"]) / config.ethUnit.toDouble()).toString();
         }
         ethTxModel.isError = translate('tx_success').toString();
         modelArray.add(ethTxModel);
@@ -262,7 +271,8 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, Strin
 const Eth_Send_RawTx = "https://api.etherscan.io/api?module=proxy&action=eth_sendRawTransaction&hex=";
 const Eth_TestNet_Send_RawTx = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_sendRawTransaction&hex=";
 
-String assembleSendRawTx(ChainType chainType, String hexRawTx, {String apiKey = etherscanApiKey}) {
+Future<String> assembleSendRawTx(ChainType chainType, String hexRawTx) async {
+  String apiKey = await loadEtherApiKey();
   if (chainType == ChainType.ETH_TEST) {
     return Eth_TestNet_Send_RawTx + hexRawTx + "&apikey=" + apiKey.toString();
   } else {
@@ -272,7 +282,7 @@ String assembleSendRawTx(ChainType chainType, String hexRawTx, {String apiKey = 
 
 Future<String> sendRawTx(ChainType chainType, String rawTx) async {
   try {
-    var res = await request(assembleSendRawTx(chainType, rawTx));
+    var res = await request(await assembleSendRawTx(chainType, rawTx));
     if (res != null && (res as Map).containsKey("result")) {
       return res["result"];
     }
@@ -285,7 +295,8 @@ Future<String> sendRawTx(ChainType chainType, String rawTx) async {
 const Eth_Call = "https://api-cn.etherscan.com/api?module=proxy&action=eth_call";
 const Eth_TestNet_Call = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_call";
 
-Future<String> ethCall(ChainType chainType, String to, String data, {String apiKey = etherscanApiKey}) async {
+Future<String> ethCall(ChainType chainType, String to, String data) async {
+  String apiKey = await loadEtherApiKey();
   try {
     String url = "";
     if (chainType == ChainType.ETH_TEST) {

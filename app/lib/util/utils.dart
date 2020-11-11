@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:app/global_config/global_config.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:flutter/material.dart';

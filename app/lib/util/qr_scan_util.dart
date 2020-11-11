@@ -1,4 +1,4 @@
-import 'package:app/global_config/vendor_config.dart';
+import 'package:app/configv/config/config.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -85,11 +85,11 @@ class QrScanUtil {
       return null; //Don't know what to do
     }
 
-    print("begin verify contract address======>");
-    if (!paramsMap.containsKey("ca") || paramsMap["ca"].toLowerCase() != DddTestNetContractAddress.toLowerCase()) {
-      Fluttertoast.showToast(msg: "合约地址不匹配");
-      return null; //Don't know what to do
-    }
+    // print("begin verify contract address======>");
+    // if (!paramsMap.containsKey("ca") || paramsMap["ca"].toLowerCase() != DddTestNetContractAddress.toLowerCase()) {
+    //   Fluttertoast.showToast(msg: "合约地址不匹配");
+    //   return null; //Don't know what to do
+    // }
 
     print("begin verify To Address======>");
     if (!paramsMap.containsKey("ta")) {

@@ -48,7 +48,7 @@ impl Broadcast {
                         }
                     }
                     PeerMessage::Disconnected(_, _) => Ok(()),
-                    PeerMessage::Incoming(pid, msg) => match msg {
+                    PeerMessage::Incoming(_pid, msg) => match msg {
                         NetworkMessage::Ping(_) => Ok(()),
                         _ => Ok(()),
                     },

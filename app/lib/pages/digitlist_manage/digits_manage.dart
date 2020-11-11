@@ -1,14 +1,13 @@
-import 'package:app/global_config/vendor_config.dart';
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/net_util.dart';
-import 'package:app/provide/server_config_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/log_util.dart';
-import 'package:app/util/sharedpreference_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +17,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert' as convert;
-
-import 'package:provider/provider.dart';
 
 class DigitsManagePage extends StatefulWidget {
   const DigitsManagePage({Key key, this.isReloadDigitList}) : super(key: key);
@@ -64,53 +61,20 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       pushToDisplayDigitList();
     }
     {
-      var spUtil = await SharedPreferenceUtil.instance;
-      var localDigitsVersion = spUtil.getString(VendorConfig.authDigitsVersionKey);
-      var serverDigitsVersion = Provider.of<ServerConfigProvide>(context).authDigitListVersion;
-      var serverDigitsIp = Provider.of<ServerConfigProvide>(context).authDigitListIp;
-      var localDigitListIP = spUtil.getString(VendorConfig.authDigitsIpKey);
-
-      if (localDigitsVersion == null || localDigitsVersion == "") {
-        //There is no certified token version number locally and it has not been loaded
-        if (serverDigitsIp != null && serverDigitsIp != "") {
-          var param = await loadServerDigitsData(serverDigitsIp);
-          if (param == null || param.trim() == "") {
-            return;
-          }
-          await updateNativeAuthDigitList(param); //Save tokens: server trusted token list ip
-          spUtil.setString(VendorConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number Version
-        } else {
-          if (localDigitListIP != null && localDigitListIP.isNotEmpty) {
-            var param = await loadServerDigitsData(localDigitListIP);
-            if (param == null || param.trim() == "") {
-              return;
-            }
-            await updateNativeAuthDigitList(param); //Save tokens: local initial recorded token list ip
-          }
+      try {
+        Config config = await HandleConfig.instance.getConfig();
+        String authDigitIp = "";
+        if (config.privateConfig.authDigitIpList != null && config.privateConfig.authDigitIpList.length > 0) {
+          authDigitIp = config.privateConfig.authDigitIpList[0];
         }
-      } else {
-        try {
-          //Local version number, check for updates, and server version number information
-          if (serverDigitsVersion != null && serverDigitsVersion != "" && (double.parse(localDigitsVersion) < double.parse(serverDigitsVersion))) {
-            //A new version appears on the server side
-            if (serverDigitsIp != null && serverDigitsIp != "") {
-              //There is a server token IP address
-              var param = await loadServerDigitsData(serverDigitsIp);
-              if (param == null || param.trim() == "") {
-                return;
-              }
-              await updateNativeAuthDigitList(param); //Save tokens: server trusted token list ip
-              spUtil.setString(VendorConfig.authDigitsVersionKey, serverDigitsVersion); //Save the server and get the version number
-            }
-          } else {
-            if (localDigitListIP != null && localDigitListIP.trim() != "") {
-              var param = await loadServerDigitsData(localDigitListIP);
-              await updateNativeAuthDigitList(param);
-            }
-          }
-        } catch (e) {
-          LogUtil.e("DigitsManagePage error is=>", e);
+        print("authDigitIp is ----->" + authDigitIp);
+        var param = await loadServerDigitsData(authDigitIp);
+        if (param == null || param.trim() == "") {
+          return;
         }
+        await updateNativeAuthDigitList(param);
+      } catch (e) {
+        LogUtil.e("DigitsManagePage error is=>", e);
       }
       if (displayDigitsList.length < onePageOffSet) {
         var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
@@ -384,6 +348,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         bool isExistErc20 = false;
         for (num index = 0; index < allDigitsList.length; index++) {
           var digit = allDigitsList[index];
+          print(" digit.fullName ===>" + digit.fullName.toString() + " ||digit--->" + digit.contractAddress.toString());
+          print(" element.fullName ===>" + element.fullName.toString() + " ||element--->" + element.contractAddress.toString());
           if ((digit.contractAddress != null) &&
               (element.contractAddress != null) &&
               (digit.contractAddress.trim().toLowerCase() == element.contractAddress.trim().toLowerCase())) {
@@ -391,7 +357,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             break;
           }
         }
-        print("isExistErc20 ===>" + isExistErc20.toString());
+        print("isExistErc20 ===>" + isExistErc20.toString() + " || element.contractAddress--->" + element.contractAddress.toString());
         if (!isExistErc20) {
           allDigitsList.add(element);
         }
