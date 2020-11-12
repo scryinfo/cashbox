@@ -205,7 +205,7 @@ class Wallets {
               ..digitId = digitInfoMap["digitId"]
               ..chainId = digitInfoMap["chainId"]
               ..contractAddress = digitInfoMap["contractAddress"]
-              ..address = digitInfoMap["address"]
+              ..address = ethChain["chainAddress"] // !attention this differ
               ..shortName = digitInfoMap["shortName"]
               ..fullName = digitInfoMap["fullName"]
               ..balance = digitInfoMap["balance"]
