@@ -1,0 +1,16 @@
+[package]
+name = "ffi"
+version = "0.1.0"
+authors = ["Peace <peacess@163.com>"]
+edition = "2018"
+
+[lib]
+path = "lib.rs"
+
+[workspace]
+members = [
+    "cdl",
+    "shared",
+#    "orm/vendor/openssl-sys"
+
+]

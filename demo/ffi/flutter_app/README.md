@@ -11,3 +11,6 @@
 1. 运行 demo/ffi/cdl/script/build_x86_64-pc-windows-gnu.bat
 2. 把 demo/ffi/cdl/target/x86_64-pc-windows-gnu/debug/cdl.dll 文件复制到 demo/ffi/flutter_app下面
 3. 运行ffi_test单元测试
+
+# flutter_app 编译说明
+1. 编译动态库 

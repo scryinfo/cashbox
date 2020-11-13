@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
-import 'ff.dart';
+import 'cdl.dart';
+import 'orm_rbatis.dart';
+import 'orm_rustorm.dart';
 
 void main() {
-  print(add(1, 2));
+  WidgetsFlutterBinding.ensureInitialized();
+  {
+    dTryRbatis();
+  }
+
+  {
+    dTryRustOrm();
+  }
+  {
+    print(add(1, 2));
+  }
   runApp(MyApp());
 }
 

@@ -60,3 +60,12 @@ git
 /demo/ffi/flutter_app/dl/arm64-v8a/libcdl.so
 /demo/ffi/flutter_app/dl/arm64-v8a/libwallets_cdl.so
 /packages/wallets/wallets_cdl.dll
+/demo/ffi/Cargo.lock
+/demo/ffi/orm_diesel/Cargo.lock
+/demo/ffi/orm_diesel/target
+/demo/ffi/orm_diesel/Cargo.lock
+/demo/ffi/orm_rbatis/target
+/demo/ffi/orm_rbatis/Cargo.lock
+/demo/ffi/orm_rustorm/Cargo.lock
+/demo/ffi/requests.log
+/demo/ffi/target

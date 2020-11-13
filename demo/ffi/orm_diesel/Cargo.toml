@@ -1,0 +1,19 @@
+[package]
+name = "orm_diesel"
+version = "0.1.0"
+authors = ["Peace <peacess@163.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+crate-type = ["cdylib", "lib"]
+path = "lib.rs"
+
+[dependencies]
+libc = "0.2.80"
+shared = {path= "../shared" }
+
+#diesel
+diesel = { version = "1.4.5", features = ["sqlite"] }
+
+[workspace]

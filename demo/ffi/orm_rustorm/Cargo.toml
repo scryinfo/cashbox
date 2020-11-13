@@ -1,0 +1,28 @@
+[package]
+name = "orm_rustorm"
+version = "0.1.0"
+authors = ["scry"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib","lib"]
+path = "lib.rs"
+
+
+[dependencies]
+libc = "0.2.80"
+log = "0.4"
+
+shared = {path="../shared"}
+
+rustorm = { version = "0.15.4", features = [ "with-sqlite" ] }
+chrono = "0.4.0"
+rusqlite = {version = "0.18", optional = true, features=["bundled"]}
+libsqlite3-sys = {version="*", features=["bundled"]}
+
+[target.'cfg(target_os="android")'.dependencies]
+android_logger = "0.9.0"
+
+[workspace]
