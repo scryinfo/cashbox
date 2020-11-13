@@ -100,7 +100,6 @@ abstract class Chain {
   // Show tokens
   // apiNo:WM14
   Future<bool> showDigit(Digit digit) async {
-    print("showDigit    walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
     Map showDigitMap = await WalletManager.showDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
     int status = showDigitMap["status"];
     bool isShowDigit = showDigitMap["isShowDigit"];
@@ -124,7 +123,6 @@ abstract class Chain {
   // Hidden tokens
   // apiNo:WM15
   Future<bool> hideDigit(Digit digit) async {
-    print("hideDigit        walletId===>" + walletId + "||chainId===>" + chainId + "||digit.digitId" + digit.digitId);
     Map hideDigitMap = await WalletManager.hideDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
     int status = hideDigitMap["status"];
     bool isHideDigit = hideDigitMap["isHideDigit"];
@@ -152,7 +150,6 @@ class ChainBTC extends Chain {}
 class ChainEEE extends Chain {
   Future<Map<dynamic, dynamic>> eeeEnergyTransfer(String from, Uint8List pwd, String to, String value, String extendMsg) async {
     Map map = await WalletManager.eeeEnergyTransfer(from, pwd, to, value, extendMsg);
-    print("map");
     return map;
   }
 }

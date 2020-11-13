@@ -141,9 +141,9 @@ class Utils {
     try {
       final file = await _localFile(path);
       String data = await file.readAsString();
-      print(data);
       return data;
     } catch (e) {
+      LogUtil.e("readFile error is ===>", e.toString());
       return "error";
     }
   }

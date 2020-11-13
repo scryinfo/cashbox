@@ -373,7 +373,6 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   Future<bool> _verifyNonce() async {
     nonce = await loadTxAccount(fromExchangeAddress, chainType);
     if (nonce == null || nonce.trim() == "") {
-      print("取的nonce值有问题");
       Fluttertoast.showToast(msg: translate("nonce_is_wrong"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
       return false;
     }
@@ -422,7 +421,6 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
     NavigatorUtils.goBack(context);
     ProgressDialog.showProgressDialog(context, translate("tx_sending"));
     String txHash = await sendRawTx(chainType, rawTx);
-    print("after broadcast txHash is===>" + txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
       Fluttertoast.showToast(msg: translate("tx_upload_success"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
     } else {

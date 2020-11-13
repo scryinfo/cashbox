@@ -82,18 +82,9 @@ class Wallet {
   // apiNo:WM10
   Future<bool> showChain(int chainType) async {
     Map showChainMap = await WalletManager.showChain(walletId, chainType);
-    print("showChain  showChainMap=>" + showChainMap.toString());
     int status = showChainMap["status"];
     String message = showChainMap["message"];
     bool isShowChain = showChainMap["message"];
-    print("showChain  status=>" + status.toString());
-    print("showChain  message=>" + message.toString());
-    print("showChain  isShowChain=>" + isShowChain.toString());
-
-    //if (isSuccess) {
-    //todo Data Format
-    //chainList.remove(chain);
-    //}
     return null;
   }
 
@@ -132,12 +123,9 @@ class Wallet {
   // apiNo:WM13
   Future<bool> setNowChainType(Chain chain) async {
     int chainTypeInt = Chain.chainTypeToInt(chain.chainType);
-    print("walletid===>" + walletId + "||chainTypeInt===>" + chainTypeInt.toString());
     Map setNowChainMap = await WalletManager.setNowChainType(walletId, chainTypeInt);
     int status = setNowChainMap["status"];
     bool isSetNowChain = setNowChainMap["isSetNowChain"];
-    print("status===>" + status.toString());
-    print("isSetNowChain===>" + setNowChainMap["isSetNowChain"].toString());
     nowChain = chain;
     if (status == null) {
       return false;
@@ -145,7 +133,7 @@ class Wallet {
     if (status == 200) {
       return isSetNowChain;
     } else {
-      print("status===>" + setNowChainMap["message"].toString());
+      LogUtil.e("setNowChainType message ===>", setNowChainMap["message"].toString());
       return false;
     }
   }

@@ -410,7 +410,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   void _scanQrContent() async {
     try {
       String qrResult = await QrScanUtil.instance.qrscan();
-      print("qrResult===>" + qrResult.toString());
       setState(() {
         _eeeAddressController.text = qrResult.toString();
       });
@@ -616,7 +615,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                                     setState(() {
                                       mGasPriceValue = value;
                                       mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
-                                      print("===>" + mGasPriceValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
                                   divisions: 100,
@@ -702,7 +700,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                                     setState(() {
                                       mGasLimitValue = value;
                                       mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
-                                      print("===>" + mGasLimitValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
                                   divisions: 100,

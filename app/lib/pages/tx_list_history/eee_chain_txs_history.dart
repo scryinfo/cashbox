@@ -231,7 +231,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
               future: getTxListData(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  print("snapshot.hasError is ===>" + snapshot.hasError.toString());
                   return Text(translate('fail_to_load_data_hint'));
                 }
                 if (snapshot.hasData) {

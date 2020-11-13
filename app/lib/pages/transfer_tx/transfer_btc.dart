@@ -260,7 +260,6 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
             String walletId = await Wallets.instance.getNowWalletId();
             //todo to be tested
           },

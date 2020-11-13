@@ -40,7 +40,6 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
       LogUtil.e("CreateWalletMnemonicPage=>", "mnemonic is null");
       return;
     }
-    print("mnemonic createWalletMnemonicPage===>" + String.fromCharCodes(mnemonic));
     setState(() {
       mnemonicList = String.fromCharCodes(mnemonic).split(" ");
       walletName = Provider.of<CreateWalletProcessProvide>(context).walletName;
@@ -175,8 +174,6 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
               color: Color.fromRGBO(26, 141, 198, 0.20),
               child: FlatButton(
                 onPressed: () {
-                  print("clicked the add wallet btn");
-
                   NavigatorUtils.push(context, Routes.createWalletConfirmPage);
                 },
                 child: Text(

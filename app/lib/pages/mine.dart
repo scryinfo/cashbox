@@ -53,7 +53,6 @@ class _MinePageState extends State<MinePage> {
   Widget _buildMoneyUnitWidget() {
     return GestureDetector(
       onTap: () {
-        print("click 货币管理");
       },
       child: Container(
         width: ScreenUtil().setWidth(90),
@@ -101,7 +100,6 @@ class _MinePageState extends State<MinePage> {
   Widget _buildTestWalletWidget() {
     return GestureDetector(
       onTap: () {
-        print("click 测试钱包");
         NavigatorUtils.push(context, Routes.createTestWalletPage);
       },
       child: ItemOfListWidget(
@@ -113,7 +111,6 @@ class _MinePageState extends State<MinePage> {
   Widget _buildWalletListWidget() {
     return GestureDetector(
       onTap: () {
-        print("click 钱包列表");
         NavigatorUtils.push(context, Routes.walletManagerListPage);
       },
       child: ItemOfListWidget(
@@ -125,7 +122,6 @@ class _MinePageState extends State<MinePage> {
   Widget _buildLanguageChooseWidget() {
     return GestureDetector(
       onTap: () {
-        print("click 语言选择");
         NavigatorUtils.push(context, Routes.languageChoosePage);
       },
       child: ItemOfListWidget(
@@ -137,7 +133,6 @@ class _MinePageState extends State<MinePage> {
   Widget _buildClearCacheWidget() {
     return GestureDetector(
       onTap: () {
-        print("click 清除缓存");
         //todo 提示清除操作，执行清除操作
       },
       child: ItemOfListWidget(

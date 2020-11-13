@@ -223,7 +223,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     onChanged: (double value) {
                       setState(() {
                         mGasFeeValue = Utils.formatDouble(value, precision: precision);
-                        print("mGasFeeValue===>" + mGasFeeValue.toString());
                       });
                     },
                     divisions: 100,
@@ -354,7 +353,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                     setState(() {
                                       mGasPriceValue = value;
                                       mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
-                                      print("===>" + mGasPriceValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
                                   divisions: 100,
@@ -440,7 +438,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                     setState(() {
                                       mGasLimitValue = value;
                                       mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
-                                      print("===>" + mGasLimitValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
                                   divisions: 100,
@@ -610,7 +607,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
   void _scanQrContent() async {
     try {
       String qrResult = await QrScanUtil.instance.qrscan();
-      print("qrResult===>" + qrResult.toString());
       setState(() {
         _toAddressController.text = qrResult.toString();
       });
@@ -717,7 +713,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            print("_showPwdDialog pwd is ===>" + pwd + "value===>" + _txValueController.text);
             String walletId = await Wallets.instance.getNowWalletId();
             Map result = await Wallets.instance.ethTxSign(
                 walletId,
@@ -732,9 +727,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 mGasLimitValue.toInt().toString(),
                 nonce,
                 decimal: decimal);
-            print("result====>" + result["status"].toString() + "||" + result["ethSignedInfo"].toString());
             if (result["status"] != null && result["status"] == 200) {
               Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+              NavigatorUtils.goBack(context);
               sendRawTx2Chain(result["ethSignedInfo"].toString());
             } else {
               Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
@@ -747,7 +742,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
   }
 
   void sendRawTx2Chain(String rawTx) async {
-    NavigatorUtils.goBack(context);
     ProgressDialog.showProgressDialog(context, translate("tx_sending"));
     String txHash = await sendRawTx(Wallets.instance.nowWallet.nowChain.chainType, rawTx);
     LogUtil.d("broadcast txHash is ===>", txHash);
@@ -768,7 +762,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
   Future<bool> _verifyNonce() async {
     nonce = await loadTxAccount(fromAddress, chainType);
     if (nonce == null || nonce.trim() == "") {
-      print("取的nonce值有问题");
       Fluttertoast.showToast(msg: translate("nonce_is_wrong"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
       NavigatorUtils.goBack(context);
       return false;
@@ -816,7 +809,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       }
     }
     ethBalance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
-    print("ethBalance===>" + ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
+    LogUtil.d("ethBalance is ===> ", ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
     if (ethBalance.isNotEmpty) {
       try {
         if (double.parse(ethBalance) <= 0) {

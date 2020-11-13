@@ -4,6 +4,7 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/utils.dart';
 import 'dart:convert' as convert;
 
@@ -80,7 +81,7 @@ class EeeSyncTxs {
       try {
         await _loadEeeChainTxHistoryData(runParams);
       } catch (e) {
-        print("_loadEeeChainTxHistoryData error is : " + e.toString());
+        LogUtil.e("_loadEeeChainTxHistoryData error is ",e.toString());
       }
       _timing = false;
     });
@@ -101,7 +102,6 @@ class EeeSyncTxs {
   }
 
   _loadEeeChainTxHistoryData(RunParams runParams) async {
-    print("_loadEeeChainTxHistoryData");
     Config config = await HandleConfig.instance.getConfig();
     int latestBlockHeight = -1;
     {
@@ -111,7 +111,6 @@ class EeeSyncTxs {
       }
 
       latestBlockHeight = Utils.hexToInt(txHistoryMap["result"]["number"].toString().substring(2));
-      print("latestBlockHeight is ===>" + latestBlockHeight.toString());
     }
 
     {
@@ -150,8 +149,6 @@ class EeeSyncTxs {
         }
       }
     }
-
-    print("start BlockHeight is ===>" + startBlockHeight.toString());
 
     const onceCount = 3000;
     var queryCount = ((latestBlockHeight - startBlockHeight) / onceCount.toDouble()).ceil(); //divide down to fetch int
@@ -201,7 +198,6 @@ class EeeSyncTxs {
         if (loadBlockMap == null || !loadBlockMap.containsKey("result")) {
           return;
         }
-        // print("scryXNetUtil loadBlockMap is ======>" + loadBlockMap.toString());
         Map blockResultMap = loadBlockMap["result"];
         if (blockResultMap == null || !blockResultMap.containsKey("block")) {
           return;
@@ -236,7 +232,7 @@ class EeeSyncTxs {
 
   static bool _isMapStatusOk(Map returnMap) {
     if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      print("returnMap error is ===>" + returnMap.toString());
+      LogUtil.e("returnMap error is ",returnMap.toString());
       return false;
     }
     return true;

@@ -196,7 +196,6 @@ class _EntrancePageState extends State<EntrancePage> {
           future: _checkIsContainWallet(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              print("EntrancePage snapshot.error==>" + snapshot.error.toString());
               LogUtil.e("EntrancePage future snapshot.hasError is +>", snapshot.error.toString());
               return Center(
                 child: Text(
@@ -271,7 +270,6 @@ class _EntrancePageState extends State<EntrancePage> {
               setState(() {
                 this._languageTextValue = languageMap[value];
               });
-              print("changeLocale===>" + value);
               {
                 changeLocale(context, value);
                 Config config = await HandleConfig.instance.getConfig();

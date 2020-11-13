@@ -227,7 +227,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                         NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
                         break;
                       default:
-                        print("未知链类型");
+                        LogUtil.e("unknown chainType error ", "unknown chainType");
                         break;
                     }
                     return;
@@ -250,7 +250,6 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                       int status = addDigitMap["status"];
                       if (status == null || status != 200) {
                         Fluttertoast.showToast(msg: translate('save_digit_model_failure').toString());
-                        print("addDigitToChainModel failure==" + addDigitMap["message"]);
                       } else {
                         isExecutorSuccess = true;
                       }
@@ -265,7 +264,6 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                     Fluttertoast.showToast(msg: translate('save_digit_model_failure').toString());
                   }
                 } catch (e) {
-                  print("digit_list_page error is===>" + e.toString());
                   LogUtil.e("digit_list_page", e.toString());
                 }
               },
@@ -348,10 +346,10 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
           this.displayDigitsList = tempList;
         });
       } else {
-        print("search result is empty===>");
+        LogUtil.d("search result ===>", "is empty");
       }
     } else {
-      print("search appear some error===>" + status.toString());
+      LogUtil.d("search appear some error ===>", status.toString());
     }
   }
 }
