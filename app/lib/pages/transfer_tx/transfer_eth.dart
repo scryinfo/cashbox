@@ -4,13 +4,13 @@ import 'dart:typed_data';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
-import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/utils.dart';
+import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -677,7 +677,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   Widget _buildTransferBtnWidget() {
     return GestureDetector(
       onTap: () async {
-        showProgressDialog(context, translate("check_data_format"));
+        ProgressDialog.showProgressDialog(context, translate("check_data_format"));
         var verifyTxInfoResult = await _verifyTransferInfo();
         if (!verifyTxInfoResult) {
           NavigatorUtils.goBack(context);
@@ -748,9 +748,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   void sendRawTx2Chain(String rawTx) async {
     NavigatorUtils.goBack(context);
-    showProgressDialog(context, translate("tx_sending"));
+    ProgressDialog.showProgressDialog(context, translate("tx_sending"));
     String txHash = await sendRawTx(Wallets.instance.nowWallet.nowChain.chainType, rawTx);
-    print("after broadcast txHash is===>" + txHash);
+    LogUtil.d("broadcast txHash is ===>", txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
       Fluttertoast.showToast(msg: translate("tx_upload_success"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
     } else {

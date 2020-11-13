@@ -5,6 +5,7 @@ import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
+import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -228,7 +229,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
   Widget _buildTransferBtnWidget() {
     return GestureDetector(
       onTap: () async {
-        showProgressDialog(context, translate("check_data_format"));
+        ProgressDialog.showProgressDialog(context, translate("check_data_format"));
         NavigatorUtils.goBack(context);
       },
       child: Container(
