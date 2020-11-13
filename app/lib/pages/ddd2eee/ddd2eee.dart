@@ -14,6 +14,7 @@ import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
+import 'package:app/widgets/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -409,7 +410,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   void _scanQrContent() async {
     try {
       String qrResult = await QrScanUtil.instance.qrscan();
-      print("qrResult===>" + qrResult.toString());
       setState(() {
         _eeeAddressController.text = qrResult.toString();
       });
@@ -615,7 +615,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                                     setState(() {
                                       mGasPriceValue = value;
                                       mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
-                                      print("===>" + mGasPriceValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
                                   divisions: 100,
@@ -701,7 +700,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                                     setState(() {
                                       mGasLimitValue = value;
                                       mGasFeeValue = mGasPriceValue * mGasLimitValue / eth2gasUnit;
-                                      print("===>" + mGasLimitValue.toString() + "||===>" + mGasFeeValue.toString());
                                     });
                                   },
                                   divisions: 100,
@@ -733,7 +731,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   Widget _buildExchangeBtnWidget() {
     return GestureDetector(
       onTap: () async {
-        showProgressDialog(context, translate("check_data_format"));
+        ProgressDialog.showProgressDialog(context, translate("check_data_format"));
         var verifyTxInfoResult = await _verifyTransferInfo();
         NavigatorUtils.goBack(context);
         if (!verifyTxInfoResult) {

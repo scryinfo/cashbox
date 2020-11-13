@@ -218,7 +218,6 @@ class _LeftDrawerState extends State<LeftDrawer> {
                 color: walletList[index].isNowWallet ? Color.fromRGBO(60, 72, 88, 0.5) : Colors.transparent,
                 child: GestureDetector(
                   onTap: () async {
-                    print("wallet index is===> " + walletList[index].walletId + "|| isNowWallet===>" + walletList[index].isNowWallet.toString());
                     bool isSuccess = await Wallets.instance.setNowWallet(walletList[index].walletId);
                     if (isSuccess) {
                       NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=false', clearStack: true);

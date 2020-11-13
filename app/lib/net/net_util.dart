@@ -94,6 +94,7 @@ Future request(String url, {formData}) async {
       return response.data;
     } else {
       print("后端接口出现异常，请检测代码和服务器情况.........");
+      LogUtil.e("后端接口出现异常，请检测代码和服务器情况 ", url.toString());
       throw Exception('后端接口出现异常，请检测代码和服务器情况.........');
     }
   } catch (e) {
@@ -108,12 +109,10 @@ Future download(url, savePath) async {
     //Dio dio = new Dio();
     //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
     response = await Dio().download(url, savePath);
-    print("downloadHttp response==>" + response.toString());
     LogUtil.d("net_util download() response is", "${response}");
     return response;
   } catch (e) {
     LogUtil.e("net_util download() error is", "${e}");
-    print("downloadHttp error is" + e);
   }
 }
 

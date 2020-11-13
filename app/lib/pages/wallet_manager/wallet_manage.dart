@@ -163,7 +163,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                         }
                         Wallet chooseWallet = await Wallets.instance.getWalletByWalletId(Provider.of<WalletManagerProvide>(context).walletId);
                         if (_walletNameController.text == null || _walletNameController.text.isEmpty) {
-                          print("钱包名为空");
+                          LogUtil.d("getWalletByWalletId error ===>", "wallet name is null");
                           return;
                         }
                         bool isRenameSuccess = await chooseWallet.rename(_walletNameController.text);
@@ -270,7 +270,6 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
             Map deleteMap = await Wallets.instance.deleteWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
-            print("to do verify pwd,delete wallet");
             int status = deleteMap["status"];
             bool isSuccess = deleteMap["isDeletWallet"];
             if (status == 200 && isSuccess) {

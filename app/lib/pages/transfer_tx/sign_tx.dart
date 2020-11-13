@@ -108,7 +108,6 @@ class _SignTxPageState extends State<SignTxPage> {
           hintContent: translate('info_sign_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-            print("_showPwdDialog   pwd is =========>" + value);
             String walletId = await Wallets.instance.getNowWalletId();
             var pwdFormat = value.codeUnits;
             var separateIndex = _waitToSignInfo.indexOf(";");

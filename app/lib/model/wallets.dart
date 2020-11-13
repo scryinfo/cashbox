@@ -134,7 +134,6 @@ class Wallets {
     if (jniList == null || jniList.isEmpty || jniList.length == 0) {
       return allWalletList;
     }
-    print("loadAllWalletList  => jniList is=====>" + jniList.toString());
     for (int i = 0; i < jniList.length; i++) {
       int walletIndex = i;
       Wallet walletM = Wallet();
@@ -205,7 +204,7 @@ class Wallets {
               ..digitId = digitInfoMap["digitId"]
               ..chainId = digitInfoMap["chainId"]
               ..contractAddress = digitInfoMap["contractAddress"]
-              ..address = digitInfoMap["address"]
+              ..address = ethChain["chainAddress"] // !attention this differ
               ..shortName = digitInfoMap["shortName"]
               ..fullName = digitInfoMap["fullName"]
               ..balance = digitInfoMap["balance"]
@@ -526,7 +525,7 @@ class Wallets {
             ..isSuccess = eeeChainTxList[i]["isSuccess"];
           eeeTransactionModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(eeeChainTxList[i]["timestamp"])).toString();
         } catch (e) {
-          print("convert format error is ====>" + e);
+          LogUtil.e("convert format error ", e.toString());
           return resultList;
         }
         resultList.add(eeeTransactionModel);
@@ -576,7 +575,6 @@ class Wallets {
     Map resultMap = Map();
     Map updateMap = await WalletManager.getNativeAuthDigitList(Chain.chainTypeToInt(chain.chainType), startIndex, pageSize);
     int status = updateMap["status"];
-    print("getAuthDigitList status==>" + status.toString());
     if (status == null || status != 200) {
       LogUtil.e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
       return resultMap;
@@ -589,17 +587,14 @@ class Wallets {
     List<Digit> resultAuthDigitList = [];
     if (authDigitList == null || authDigitList.length == 0) {
       resultMap["authDigit"] = resultAuthDigitList;
-      print("count=====>" + count.toString() + "startItem=====>" + startItem.toString());
       return resultMap;
     }
-    print("count=====>" + count.toString() + "startItem=====>" + startItem.toString() + "length=====>" + authDigitList.length.toString());
     authDigitList.forEach((element) {
       var fullName = element["name"];
       var decimal = element["decimal"];
       var contract = element["contract"];
       var symbol = element["symbol"];
       var digitId = element["id"];
-      print("fullName=====>" + fullName + "decimal=====>" + decimal.toString() + "contract=====>" + contract + "symbol=====>" + symbol);
       switch (chain.chainType) {
         case ChainType.ETH:
         case ChainType.ETH_TEST:
@@ -642,7 +637,6 @@ class Wallets {
       updateMap = await WalletManager.queryDigit(Chain.chainTypeToInt(chain.chainType), param, "");
     }
     int status = updateMap["status"];
-    print("queryDigit status==>" + status.toString());
     resultMap["status"] = status;
     if (status == null || status != 200) {
       LogUtil.e("queryDigit=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
@@ -652,7 +646,6 @@ class Wallets {
     int count = updateMap["count"];
     int startItem = updateMap["startItem"];
     List authDigitList = updateMap["authDigit"];
-    print("count=====>" + count.toString() + "startItem=====>" + startItem.toString());
 
     resultMap["count"] = count;
     resultMap["startItem"] = startItem;
@@ -665,7 +658,6 @@ class Wallets {
       var decimal = element["decimal"];
       var contract = element["contract"];
       var symbol = element["symbol"];
-      print("fullName=====>" + fullName + "decimal=====>" + decimal.toString() + "contract=====>" + contract + "symbol=====>" + symbol);
       switch (chain.chainType) {
         case ChainType.ETH:
         case ChainType.ETH_TEST:

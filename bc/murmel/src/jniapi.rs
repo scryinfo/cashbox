@@ -24,3 +24,9 @@ pub static SHARED_CHANNEL: Lazy<SharedChannel> = Lazy::new(|| {
     let channel = sync_channel::<ApiMessage>(BACK_PRESSURE);
     Arc::new(Mutex::new(channel))
 });
+
+#[cfg(target_os = "android")]
+pub const BTC_CHAIN_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_chain.db"#;
+
+#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
+pub const BTC_CHAIN_PATH: &str = r#"btc_chain.db"#;

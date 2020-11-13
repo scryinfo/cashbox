@@ -69,17 +69,14 @@ class QrScanUtil {
     }
     //--------------------------Check parameters-----------------------
     print("paramsMap======>" + paramsMap.toString());
-    print("begin verify timestamp======>");
     if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
       Fluttertoast.showToast(msg: translate('qr_info_is_out_of_date'));
       return null; //There is a problem with the validity period
     }
-    print("begin verify chainType======>");
     if (!paramsMap.containsKey("ct") || paramsMap["ct"] != "60") {
       Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
       return null; //Don't know which chain
     }
-    print("begin verify ot======>");
     if (!paramsMap.containsKey("ot") || paramsMap["ot"] != "t") {
       Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
       return null; //Don't know what to do
@@ -91,13 +88,11 @@ class QrScanUtil {
     //   return null; //Don't know what to do
     // }
 
-    print("begin verify To Address======>");
     if (!paramsMap.containsKey("ta")) {
       Fluttertoast.showToast(msg: "缺少转账目的地址");
       return null; //Don't know what to do
     }
 
-    print("begin verify values======>");
     if (!paramsMap.containsKey("v") || double.parse(paramsMap["v"]) < 0) {
       Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
       return null; //Not sure how much to transfer
@@ -147,22 +142,18 @@ class QrScanUtil {
       return null;
     }
     //------------Check parameters------------
-    print("begin verify timestamp======>");
     if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
       Fluttertoast.showToast(msg: translate('qr_info_is_out_of_date'));
       return null; //There is a problem with the validity period
     }
-    print("begin verify chainType======>");
     if (!paramsMap.containsKey("ct")) {
       Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
       return null; //Don't know which chain
     }
-    print("begin verify v======>");
     if (!paramsMap.containsKey("v")) {
       //Fluttertoast.showToast(msg: translate('not_sure_operation_type);
       return null; //Don't know what the content is
     }
-    print("begin verify ot======>");
     if (!paramsMap.containsKey("ot")) {
       Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
       return null; //Don't know what to do
@@ -190,7 +181,6 @@ class QrScanUtil {
           var value = paramsMap["v"]; //Transaction information to be signed
           var waitToSignInfo = dtt + value; //Transaction information to be signed
           Fluttertoast.showToast(msg: "waitToSignInfo is ===>" + waitToSignInfo);
-          print("wait to sign info is=======>" + waitToSignInfo);
           Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
         } else {
           var waitSignTx = paramsMap["v"]; //Transaction information to be signed
@@ -212,7 +202,6 @@ class QrScanUtil {
     }
     int nowTimeStamp = DateTime.now().millisecondsSinceEpoch; //Current timestamp
     int qrTime = int.parse(qrTimeStamp);
-    print("qrTimeStamp===>" + qrTimeStamp + " || nowTimeStamp===>" + nowTimeStamp.toString());
     if (qrTime * 1000 > nowTimeStamp) {
       return true; //The data is normal and still within the validity period
     }

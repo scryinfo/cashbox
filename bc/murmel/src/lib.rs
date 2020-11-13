@@ -25,7 +25,7 @@
 #![deny(unused_mut)]
 #![deny(unused_must_use)]
 #![forbid(unsafe_code)]
-// #![allow(bare_trait_objects)]
+#![allow(bare_trait_objects)]
 #![allow(ellipsis_inclusive_range_patterns)]
 #![allow(deprecated)]
 
@@ -52,5 +52,3 @@ pub mod timeout;
 pub mod walletlib;
 
 pub use error::Error;
-
-//*****************************for jni api

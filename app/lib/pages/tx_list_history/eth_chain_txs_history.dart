@@ -7,6 +7,7 @@ import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
@@ -284,7 +285,6 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
       ],
       onLoad: () async {
         await Future.delayed(Duration(seconds: 2), () async {
-          print("refresh onLoad======>");
           if (this.ethTxListModel.length < displayTxOffset) {
             //Shown, less loaded than the last request, indicating that it is gone
             Fluttertoast.showToast(msg: translate('finish_load_tx_history').toString());
@@ -307,7 +307,6 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
       alignment: Alignment.center,
       child: GestureDetector(
         onTap: () {
-          print("click tap intex is ===>" + index.toString());
           Provider.of<TransactionProvide>(context)
             ..emptyDataRecord()
             ..setFromAddress(ethTxListModel[index].from)
@@ -432,7 +431,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
         Fluttertoast.showToast(msg: translate('address_empty').toString());
       }
     } catch (onError) {
-      print("onError===>" + "$onError");
+      LogUtil.e("getTxListData error ===>", "$onError");
     }
     if (ethTxListModel == null || ethTxListModel.length == 0) {
       ethTxListModel = [];

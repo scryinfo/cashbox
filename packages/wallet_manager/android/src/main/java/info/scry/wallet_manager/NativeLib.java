@@ -186,7 +186,33 @@ public class NativeLib {
         public boolean isAddNonAuthDigit;     //Add custom tokens, whether it's useful  Execution status: 1 success 0 failure
         public String message;                //Error message, detailed description
 
-
+        @Override
+        public String toString() {
+            return "WalletState{" +
+                    "status=" + status +
+                    ", isContainWallet=" + isContainWallet +
+                    ", walletId='" + walletId + '\'' +
+                    ", isSetNowWallet=" + isSetNowWallet +
+                    ", isDeletWallet=" + isDeletWallet +
+                    ", isResetPwd=" + isResetPwd +
+                    ", isRename=" + isRename +
+                    ", isShowChain=" + isShowChain +
+                    ", isHideChain=" + isHideChain +
+                    ", getNowChainType=" + getNowChainType +
+                    ", isSetNowChain=" + isSetNowChain +
+                    ", isShowDigit=" + isShowDigit +
+                    ", isHideDigit=" + isHideDigit +
+                    ", isAddDigit=" + isAddDigit +
+                    ", isUpdateDigitBalance=" + isUpdateDigitBalance +
+                    ", isInitWalletBasicData=" + isInitWalletBasicData +
+                    ", isUpdateDbData=" + isUpdateDbData +
+                    ", isCleanWalletsData=" + isCleanWalletsData +
+                    ", isUpdateAuthDigit=" + isUpdateAuthDigit +
+                    ", isUpdateDefaultDigit=" + isUpdateDefaultDigit +
+                    ", isAddNonAuthDigit=" + isAddNonAuthDigit +
+                    ", message='" + message + '\'' +
+                    '}';
+        }
     }
 
     public static class EthToken {

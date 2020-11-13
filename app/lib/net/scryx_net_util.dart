@@ -1,6 +1,7 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/util/log_util.dart';
 import 'net_util.dart';
 
 class ScryXNetUtil {
@@ -26,7 +27,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("loadScryXStorage error is ===>" + e.toString());
+      LogUtil.e("loadEeeChainNonceTest error is  ", e.toString());
       return null;
     }
   }
@@ -102,7 +103,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("loadScryXStorage error is ===>" + e.toString());
+      LogUtil.e("loadScryXStorage error is  ", e.toString());
       return null;
     }
   }
@@ -118,7 +119,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("loadScryXRuntimeVersion error is ===>" + e.toString());
+      LogUtil.e("loadScryXRuntimeVersion error is  ", e.toString());
       return null;
     }
   }
@@ -139,7 +140,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("loadScryXBlockHash error is ===>" + e.toString());
+      LogUtil.e("loadScryXBlockHash error is  ", e.toString());
       return null;
     }
   }
@@ -155,6 +156,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
+      LogUtil.e("loadChainHeader error is  ", e.toString());
       return null;
     }
   }
@@ -255,7 +257,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("submitExtrinsic error is ===>" + e.toString());
+      LogUtil.e("submitExtrinsic error is  ", e.toString());
       return null;
     }
   }

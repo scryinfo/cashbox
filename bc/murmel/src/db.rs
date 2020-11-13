@@ -264,8 +264,8 @@ impl SQLite {
 }
 
 mod test {
-    
-    
+    use crate::jniapi::SHARED_SQLITE;
+    use crate::db::NEWEST_KEY;
 
     #[test]
     pub fn test_init() {
