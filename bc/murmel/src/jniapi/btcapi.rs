@@ -3,11 +3,12 @@
 
 #![cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
 #![allow(non_snake_case)]
+
 pub mod another {
     use crate::jniapi::SHARED_SQLITE;
     use crate::constructor::Constructor;
     use crate::jniapi::BTC_CHAIN_PATH;
-    
+
     use bitcoin::consensus::serialize;
     use bitcoin::network::message_bloom_filter::FilterLoadMessage;
     use bitcoin::util::psbt::serialize::Serialize;
@@ -21,12 +22,10 @@ pub mod another {
     use jni::JNIEnv;
     use log::info;
     use log::Level;
-    
+
     use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
     use std::path::Path;
     use std::str::FromStr;
-    
-    
     use std::time::SystemTime;
 
     const PASSPHRASE: &str = "";
@@ -270,7 +269,7 @@ pub mod another {
     // cala bloom filter
     pub fn calc_bloomfilter() -> FilterLoadMessage {
         //todo must use stored mnemonic
-        let words =  "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
+        let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
         let mnemonic = Mnemonic::from_str(words).unwrap();
         let mut master =
             MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
@@ -309,8 +308,6 @@ pub mod another {
     }
 
     mod test {
-        
-
         #[test]
         pub fn test_calc_pubkey() {
             let pubkey = calc_pubkey();
@@ -329,5 +326,4 @@ pub mod another {
             println!("address {:?}", address.to_string());
         }
     }
-
 }
