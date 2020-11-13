@@ -34,7 +34,7 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcTxSign(
+    pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcTxSign(
         env: JNIEnv,
         _class: JClass,
         from_address: JString,
@@ -130,7 +130,7 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcTxSignAndBroadcast(
+    pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcTxSignAndBroadcast(
         env: JNIEnv,
         _class: JClass,
         from_address: JString,
@@ -153,7 +153,7 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcLoadBalance(
+    pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadBalance(
         env: JNIEnv,
         _class: JClass,
         address: JString,
@@ -163,7 +163,7 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv, _class: JClass) -> jstring {
+    pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadMaxBlockNumber(env: JNIEnv, _class: JClass) -> jstring {
         let sqlite = SHARED_SQLITE.lock().unwrap();
         let max_block_number = sqlite.count();
         let max_block_number = env
@@ -174,7 +174,7 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv, class: JClass) -> jstring {
+    pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadNowBlockNumber(env: JNIEnv, class: JClass) -> jstring {
         let sqlite = SHARED_SQLITE.lock().unwrap();
         let height = sqlite.query_scanned_height();
         let max_block_number = env
@@ -185,13 +185,13 @@ pub mod android {
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcIsSyncDataOk(env: JNIEnv, _class: JClass) -> jboolean {
+    pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcIsSyncDataOk(env: JNIEnv, _class: JClass) -> jboolean {
         unimplemented!()
     }
 
     #[no_mangle]
     #[allow(non_snake_case)]
-    pub extern "system" fn Java_JniApi_btcLoadTxHistory(
+    pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadTxHistory(
         env: JNIEnv,
         _class: JClass,
         address: JString,
