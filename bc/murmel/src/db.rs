@@ -7,12 +7,7 @@ use bitcoin::{BitcoinHash, Network};
 use log::info;
 use sqlite::{State, Value};
 use std::sync::{Arc, Mutex};
-
-#[cfg(target_os = "android")]
-const BTC_DETAIL_PATH: &str = r#"/data/data/wallet.cashbox.scry.info/files/btc_detail.sqlite"#;
-
-#[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
-const BTC_DETAIL_PATH: &str = r#"btc_detail.sqlite"#;
+use crate::jniapi::BTC_DETAIL_PATH;
 
 pub type SharedSQLite = Arc<Mutex<SQLite>>;
 
