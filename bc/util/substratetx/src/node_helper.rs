@@ -31,9 +31,9 @@ impl ChainHelper {
         })
     }
     // transfer amount is the basic unit （smallest unit)
-    pub fn token_transfer_sign(&self, token_name: &str, mnemonic: &str, to: &str, amount: &str, index: u32) -> Result<String, error::Error> {
+    pub fn token_transfer_sign(&self, token_name: &str, mnemonic: &str, to: &str, amount: &str, index: u32,ext_data:Option<Vec<u8>>) -> Result<String, error::Error> {
         if let Some(token_func) = self.convert_token_name(token_name) {
-            self.transfer(token_func.0, token_func.1, mnemonic, to, amount, index)
+            self.transfer(token_func.0, token_func.1, mnemonic, to, amount, index,ext_data)
         } else {
             Err(error::Error::Custom("token not support".to_string()))
         }
@@ -73,18 +73,18 @@ impl ChainHelper {
         Ok(xt.hex_encode())
     }
 
-    pub fn get_storage_map_key<K: Encode, V: Decode + Clone>(&self, storage_prefix: &'static str, storage_key_name: &'static str, map_key: K) -> Result<String, error::Error> {
+    pub fn get_storage_map_key<K: Encode, V: Decode + Clone>(&self, storage_prefix: &str, storage_key_name: &str, map_key: K) -> Result<String, error::Error> {
         self.metadata.storage_map_key::<K, V>(storage_prefix, storage_key_name, map_key).map(|key| hex::encode(&key.0)).map_err(|err| err.into())
     }
 
-    pub fn decode_events(&self, event_str: &str, decoder: Option<EventsDecoder>) -> Result<HashMap<u32, bool>, error::Error> {
+    pub fn decode_events(&self, event_str: &str, decoder: Option<EventsDecoder>) -> Result<HashMap<usize, bool>, error::Error> {
         let unhex = hexstr_to_vec(event_str)?;
         let mut tx_result = HashMap::new();
         let event_decoder =
             decoder.unwrap_or_else(|| self.event_decode.clone());
         let events = event_decoder.decode_events(&mut &unhex[..])?;
         for (phase, event) in events {
-            let index = if let Phase::ApplyExtrinsic(index) = phase { index } else { 0 };
+            let index:usize = if let Phase::ApplyExtrinsic(index) = phase { index as usize } else { 0 };
             match event {
                 RuntimeEvent::System(sys) => {
                     match sys {
@@ -218,19 +218,25 @@ impl ChainHelper {
         }
         Ok(map)
     }
-    fn transfer(&self, module_name: &str, call_name: &str, mnemonic: &str, to: &str, amount: &str, index: u32) -> Result<String, error::Error> {
+    fn transfer(&self, module_name: &str, call_name: &str, mnemonic: &str, to: &str, amount: &str, index: u32,ext_data:Option<Vec<u8>>) -> Result<String, error::Error> {
         let to = AccountId::from_ss58check(to)?;
 
         if self.is_module_call_exist(module_name, call_name).is_none() {
             return Err(error::Error::Custom("module call is not exist".to_string()));
         }
+        let signer = crypto::Sr25519::pair_from_phrase(mnemonic, None)?;
         if let Ok(amount) = str::parse::<u128>(amount) {
-            let call = compose_call!(self.metadata,  module_name, call_name, to, Compact(amount ));
-            let signer = crypto::Sr25519::pair_from_phrase(mnemonic, None)?;
-            let xt: extrinsic::UncheckedExtrinsicV4<_> = compose_extrinsic_offline!(signer,call,index,Era::Immortal,self.genesis_hash,self.genesis_hash,self.runtime_version,self.tx_version);
-            println!("sp std len is:{},{},{}", sp_std::mem::size_of::<GenericAddress>(), sp_std::mem::size_of::<MultiSignature>(), sp_std::mem::size_of::<GenericExtra>());
-            println!("sp std AdditionalSigned len is:{},", sp_std::mem::size_of::<AdditionalSigned>());
-            Ok(xt.hex_encode())
+            let encode_str = if let Some(ext_data) = ext_data{
+                let call = compose_call!(self.metadata,  module_name, call_name, to, Compact(amount ),ext_data);
+                let xt: extrinsic::UncheckedExtrinsicV4<_> = compose_extrinsic_offline!(signer,call,index,Era::Immortal,self.genesis_hash,self.genesis_hash,self.runtime_version,self.tx_version);
+                xt.hex_encode()
+            }else{
+                //todo when balances pallet transfer function have ext data,the following code can be removed
+                let call = compose_call!(self.metadata,  module_name, call_name, to, Compact(amount ));
+                let xt: extrinsic::UncheckedExtrinsicV4<_> = compose_extrinsic_offline!(signer,call,index,Era::Immortal,self.genesis_hash,self.genesis_hash,self.runtime_version,self.tx_version);
+                xt.hex_encode()
+            };
+            Ok(encode_str)
         } else {
             Err(error::Error::Custom("amount format is not invalid".to_string()))
         }
@@ -270,7 +276,7 @@ impl ChainHelper {
         funcs
     }
 
-    pub fn get_chain_runtime_metadata(hex_str: &str) -> Result<Metadata, error::Error> {
+     fn get_chain_runtime_metadata(hex_str: &str) -> Result<Metadata, error::Error> {
         let runtime_vec = hexstr_to_vec(hex_str)?;
         let prefixed = RuntimeMetadataPrefixed::decode(&mut &runtime_vec[..])?;
         Metadata::try_from(prefixed).map_err(|err| err.into())

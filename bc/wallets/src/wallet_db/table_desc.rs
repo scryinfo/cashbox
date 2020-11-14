@@ -45,7 +45,7 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
 	[is_basic] VARCHAR(1) NOT NULL  DEFAULT 0,
 	[is_default] VARCHAR(1) NOT NULL  DEFAULT 0,
     [status] INT NOT NULL  DEFAULT 0,
-    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now'))
+    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now'))
     );
 
 
@@ -56,13 +56,14 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
 	[balance] VARCHAR(32) NOT NULL DEFAULT 0,
     [is_visible] VARCHAR(1)  NOT NULL DEFAULT 1,
     [status] INT NOT NULL DEFAULT 1,
-    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-    [UPDATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now')),
-	primary key(digit_id,address_id));
+    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
+    [update_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
+	primary key(digit_id,address_id)
+	);
 
     DROP TABLE IF EXISTS [main].[DigitBase];
      CREATE TABLE [main].[DigitBase] (
-        [id]  VARCHAR (40),
+        [id]  VARCHAR (40) PRIMARY KEY NOT NULL,
         [chain_type]    INT  NOT NULL,
         [contract]      VARCHAR (64),
         [accept_id]     VARCHAR (32),
@@ -78,11 +79,10 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
         [status]        INT NOT NULL DEFAULT 1,
         [is_auth]    VARCHAR (1) NOT NULL DEFAULT 0,
         [is_visible]    VARCHAR (1) NOT NULL DEFAULT 1,
-        [CREATED_TIME]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
-        [UPDATED_TIME]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
-        [version]       INT,
-        PRIMARY KEY(`id`)
-);
+        [create_time]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
+        [update_time]  timestamp NOT NULL DEFAULT (strftime('%s','now')),
+        [version]       INT
+     );
 
     DROP TABLE IF EXISTS [main].[TransferRecord];
     CREATE TABLE [main].[TransferRecord](
@@ -102,8 +102,8 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     [ext_data] VARCHAR(2048),
     [status] int,
     [tx_timestamp] timestamp NOT NULL,
-    [CREATED_TIME] timestamp NOT NULL DEFAULT (strftime('%s','now'))
-);
+    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now'))
+    );
 
     DROP TABLE IF EXISTS [main].[AccountInfoSyncProg];
     CREATE TABLE [main].[AccountInfoSyncProg](
@@ -113,6 +113,21 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
     [block_hash] VARCHAR(72),
     [update_time] timestamp NOT NULL DEFAULT (strftime('%s','now'))
 );
+
+ DROP TABLE IF EXISTS [main].[SubChainInfo];
+    CREATE TABLE [main].[SubChainInfo](
+    [genesis_hash] VARCHAR(64) PRIMARY KEY NOT NULL,
+    [metadata]  TEXT,
+    [runtime_version] INT,
+    [tx_version]  INT,
+    [ss58_format_prefix] INT,
+    [token_decimals] INT,
+    [token_symbol] VARCHAR(32),
+    [is_default] tinyint,
+    [status] INT NOT NULL DEFAULT 1,
+    [create_time] timestamp NOT NULL DEFAULT (strftime('%s','now')),
+	[update_time] timestamp NOT NULL DEFAULT (strftime('%s','now'))
+ );
 
      create trigger update_digit_detail_trigger after update on DigitUseDetail
       begin

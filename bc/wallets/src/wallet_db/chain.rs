@@ -4,6 +4,7 @@ use uuid::Uuid;
 use model::{WalletObj, SyncStatus};
 use sqlite::State;
 use substratetx::TransferDetail;
+use crate::model::SubChainBasicInfo;
 
 impl DataServiceProvider {
     pub fn get_available_chain(&self) -> WalletResult<Vec<i64>> {
@@ -213,4 +214,50 @@ impl DataServiceProvider {
         }
         Ok(records)
     }
+
+    pub fn get_sub_chain_info(&self,genesis_hash:Option<&str>)->WalletResult<Vec<SubChainBasicInfo>>{
+        let  start_sql = "select * from detail.SubChainInfo where status = 1";
+        let after_prefix = if genesis_hash.is_some(){
+            "and genesis_hash = ?;"
+        }else {
+            "and is_default = ?;"
+        };
+        let query_sql = format!("{} {}",start_sql,after_prefix);
+        let mut select_stat = self.db_hander.prepare(query_sql)?;
+        if let Some(hash) = genesis_hash{
+            select_stat.bind(1, hash)?;
+        }else{
+            select_stat.bind(1, 1)?;
+        }
+        let mut infos = Vec::new();
+        while let State::Row = select_stat.next().unwrap() {
+            let status = model::SubChainBasicInfo {
+                genesis_hash:select_stat.read::<String>(0).unwrap(),
+                metadata:select_stat.read::<String>(1).unwrap(),
+                runtime_version:select_stat.read::<i64>(2).map(|val| val as i32).unwrap(),
+                tx_version:select_stat.read::<i64>(3).map(|val|val as i32).unwrap(),
+                ss58_format:select_stat.read::<i64>(4).map(|val|val as i32).unwrap(),
+                token_decimals:select_stat.read::<i64>(5).map(|val|val as i32).unwrap(),
+                token_symbol:select_stat.read::<String>(6).unwrap(),
+            };
+            infos.push(status);
+        }
+       Ok(infos)
+    }
+
+    pub fn update_sub_chain_info(&self,basic_info:&SubChainBasicInfo,is_default:bool)->WalletResult<()>{
+
+        let insert_update_sql = "replace into detail.SubChainInfo(genesis_hash,metadata,runtime_version,tx_version,ss58_format_prefix,token_decimals,token_symbol,is_default) values(?,?,?,?,?,?,?,?)";
+        let mut stat = self.db_hander.prepare(insert_update_sql)?;
+        stat.bind(1, basic_info.genesis_hash.as_str())?;
+        stat.bind(2, basic_info.metadata.as_str())?;
+        stat.bind(3, basic_info.runtime_version as i64)?;
+        stat.bind(4, basic_info.tx_version as i64)?;
+        stat.bind(5, basic_info.ss58_format as i64)?;
+        stat.bind(6, basic_info.token_decimals as i64)?;
+        stat.bind(7, basic_info.token_symbol.as_str())?;
+        stat.bind(8, is_default as i64)?;
+        stat.next().map(|_| ()).map_err(|err| err.into())
+    }
+
 }

@@ -2,7 +2,7 @@
 extern crate serde_derive;
 use std::collections::HashMap;
 use tiny_keccak::Keccak;
-use sp_core::{
+pub use sp_core::{
     H256 as Hash,
     crypto::{Pair, Ss58Codec,AccountId32 as AccountId},
 };
@@ -13,10 +13,10 @@ use sp_runtime::{
 };
 use codec::{Encode, Decode, Compact};
 use system::Phase;
-pub use crypto::{Sr25519, Ed25519, Crypto};
-
 use events::{EventsDecoder, RuntimeEvent, SystemEvent};
 use extrinsic::xt_primitives::{GenericAddress, GenericExtra, AdditionalSigned};
+pub use node_helper::ChainHelper as SubChainHelper;
+pub use crypto::{Sr25519, Ed25519, Crypto};
 
 mod crypto;
 
@@ -114,6 +114,10 @@ pub fn twox_128(data: &[u8]) -> [u8; 16] {
 //     Ok(format!("0x{}{}{}", key_start, puk_hash, pub_key_without_0x))
 // }
 
+pub fn decode_account_info(info: &str) -> Result<EeeAccountInfo, error::Error> {
+    let state_vec = hexstr_to_vec(info)?;
+    EeeAccountInfo::decode(&mut &state_vec.as_slice()[..]).map_err(|err| err.into())
+}
 pub fn hexstr_to_vec(hexstr: &str) -> Result<Vec<u8>, error::Error> {
     let hexstr = hexstr
         .trim_matches('\"')

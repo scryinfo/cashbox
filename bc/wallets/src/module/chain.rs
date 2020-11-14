@@ -5,6 +5,7 @@ use substratetx::Crypto;
 use std::collections::HashMap;
 use codec::{Encode, Decode};
 use ethereum_types::{H160, U256, H256};
+use substratetx::Ss58Codec;
 
 #[derive(Encode, Decode, Debug)]
 struct RawTx {
@@ -37,41 +38,59 @@ impl EEE {
         Ok(h256)
     }
 
-    pub fn generate_eee_transfer(&self, from: &str, to: &str, amount: &str, genesis_hash: &str, index: u32, runtime_version: u32, tx_version:u32, psw: &[u8]) -> WalletResult<String> {
+    pub fn generate_eee_transfer(&self, from: &str, to: &str, amount: &str, index: u32, psw: &[u8]) -> WalletResult<String> {
 
         let mn = self.decode_mnemonic_by_address(from,psw)?;
-        let h256 = self.convert_hash_to_byte(genesis_hash)?;
-        let signed_data = substratetx::transfer(&mn, to, amount, &h256[..], index, runtime_version,tx_version)?;
-        log::debug!("signed data is: {}", signed_data);
-        Ok(signed_data)
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        let chain_info = instance.get_sub_chain_info(None)?;
+        if let Some(info) = chain_info.get(0){
+            let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
+            let helper = substratetx::SubChainHelper::init(&info.metadata,&genesis_hash[..],info.runtime_version as u32,info.tx_version as u32,None)?;
+            let signed_data = helper.token_transfer_sign("eee",&mn,to,amount,index,None)?;
+            log::debug!("signed data is: {}", signed_data);
+            Ok(signed_data)
+        }else {
+            Err(WalletError::NotExist)
+        }
     }
 
-    pub fn generate_tokenx_transfer(&self, from: &str, to: &str, amount: &str, ext_data:&str,genesis_hash: &str, index: u32, runtime_version: u32, tx_version:u32, psw: &[u8]) -> WalletResult<String> {
+    pub fn generate_tokenx_transfer(&self, from: &str, to: &str, amount: &str, ext_data:&str,index: u32, psw: &[u8]) -> WalletResult<String> {
 
         let mn = self.decode_mnemonic_by_address(from,psw)?;
-        let h256 = self.convert_hash_to_byte(genesis_hash)?;
         let ext_vec = hex::decode(ext_data.get(2..).unwrap())?;
-        let signed_data = substratetx::tokenx_transfer(&mn, to, amount, &ext_vec[..],&h256[..], index, runtime_version,tx_version)?;
-        log::debug!("signed data is: {}", signed_data);
-        Ok(signed_data)
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        let chain_info = instance.get_sub_chain_info(None)?;
+        if let Some(info) = chain_info.get(0){
+            let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
+            let helper = substratetx::SubChainHelper::init(&info.metadata,&genesis_hash[..],info.runtime_version as u32,info.tx_version as u32,None)?;
+            let signed_data = helper.token_transfer_sign("tokenx",&mn,to,amount,index,Some(ext_vec))?;
+            log::debug!("signed data is: {}", signed_data);
+            Ok(signed_data)
+        }else {
+            Err(WalletError::NotExist)
+        }
     }
 
     pub fn save_tx_record(&self, account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
-        let event_res = substratetx::event_decode(event_data, blockhash, account);
-        let extrinsics_map = substratetx::decode_extrinsics(extrinsics, account)?;
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        let chain_info = instance.get_sub_chain_info(None)?;
+        let info = chain_info.get(0).unwrap();
+        let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
+        let helper = substratetx::SubChainHelper::init(&info.metadata,&genesis_hash,info.runtime_version as u32,info.tx_version as u32,None)?;
+        let event_res =  helper.decode_events(event_data,None)?;
+        let extrinsics_map = helper.decode_extrinsics(extrinsics, account)?;
+
         //Block transaction events There must be a time stamp setting
         let tx_time = extrinsics_map.get(&0).unwrap();//Get timestamp
         let instance = wallet_db::DataServiceProvider::instance()?;
-        for (index,transfer_detail) in extrinsics_map.iter() {
+        for (index ,transfer_detail) in extrinsics_map.iter() {
             if transfer_detail.signer.is_none(){
                 continue;
             }
-            println!("tx index:{}",index);
             log::info!("tx index:{}",index);
             if let  Some(is_successful) = event_res.get(index){
                 instance.save_transfer_detail(account, blockhash, transfer_detail, tx_time.timestamp.unwrap(), *is_successful)?;
             }
-
         }
         Ok(())
     }
@@ -158,10 +177,16 @@ impl EEE {
         let wallet = module::wallet::WalletManager {};
         let mnemonic = wallet.export_mnemonic(wallet_id, psw)?;
         let mn = String::from_utf8(mnemonic.mn)?;
-        let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//Direct use of tx.func_data in this place will cause an error, and the first byte of data will be missed.
-        // let sign_data = substratetx::tx_sign(&mn, tx.genesis_hash, tx.index, mut_data, tx.version)?;
-        let sign_data = substratetx::tx_sign(&mn, &tx.genesis_hash[..], tx.index, mut_data, tx.spec_version,tx.tx_version)?;
-        Ok(sign_data)
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        let chain_infos= instance.get_sub_chain_info(Some(&hex::encode(tx.genesis_hash)))?;
+        if let Some(chain_info) =chain_infos.get(0) {
+            let chain_helper = substratetx::SubChainHelper::init(&chain_info.metadata,&tx.genesis_hash[..],chain_info.runtime_version as u32,chain_info.tx_version as u32,None)?;
+            let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//Direct use of tx.func_data in this place will cause an error, and the first byte of data will be missed.
+            let sign_data =   chain_helper.tx_sign(&mn,  tx.index, mut_data)?;
+            Ok(sign_data)
+        }else {
+             Err(error::WalletError::NotExist)
+        }
     }
 
     //Used for signing ordinary data, incoming data, hex format data
@@ -174,6 +199,37 @@ impl EEE {
         let sign_data = substratetx::Sr25519::sign(&mn, &tx_encode_data[..]).unwrap();
         let hex_data = format!("0x{}", hex::encode(&sign_data[..]));
         Ok(hex_data)
+    }
+    //update chain basic info,eg:metadata,genesis hash,runtime version tx version etc,which will be used to structure extrinsic encode or decode function
+    pub fn update_chain_basic_info(&self,info:SubChainBasicInfo,is_default:bool)->WalletResult<()> {
+        let instance = wallet_db::DataServiceProvider::instance()?;
+         instance.update_sub_chain_info(&info,is_default)
+    }
+
+    pub fn query_chain_basic_info(&self,genesis_hash:&str)->WalletResult<Vec<SubChainBasicInfo>>{
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        let genesis_hash = genesis_hash.trim();
+        let genesis_final = if genesis_hash.trim().is_empty() {
+            None
+        }else {
+            Some(genesis_hash)
+        };
+        instance.get_sub_chain_info(genesis_final)
+    }
+
+    pub fn encode_account_storage_key(&self,module: String, storage: String, account: &str)->WalletResult<String> {
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        let chain_infos = instance.get_sub_chain_info(None)?;
+        if let Some(chain_info) = chain_infos.get(0) {
+            let genesis_hash = substratetx::hexstr_to_vec(&chain_info.genesis_hash)?;
+            let account_id = substratetx::AccountId::from_ss58check(account).map_err(|err|WalletError::SubstrateTx(substratetx::error::Error::Public(err)))?;
+            let chain_helper = substratetx::SubChainHelper::init(&chain_info.metadata, &genesis_hash[..], chain_info.runtime_version as u32, chain_info.tx_version as u32, None)?;
+            chain_helper.get_storage_map_key::<substratetx::AccountId, u128>(&module, &storage, account_id)
+                .map(|key|format!("0x{}",key))
+                .map_err(|e| e.into())
+        } else {
+            Err(error::WalletError::NotExist)
+        }
     }
 }
 

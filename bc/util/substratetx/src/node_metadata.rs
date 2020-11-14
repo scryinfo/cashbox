@@ -39,7 +39,7 @@ pub enum MetadataError {
     #[error("Event not found")]
     EventNotFound(u8),
     #[error("Storage not found")]
-    StorageNotFound(&'static str),
+    StorageNotFound(String),
     #[error("Storage type error")]
     StorageTypeError,
     #[error("Map value type error")]
@@ -161,8 +161,8 @@ impl Metadata {
 
     pub fn storage_map_key<K: Encode, V: Decode + Clone>(
         &self,
-        storage_prefix: &'static str,
-        storage_key_name: &'static str,
+        storage_prefix: &str,
+        storage_key_name: &str,
         map_key: K,
     ) -> Result<StorageKey, MetadataError> {
         Ok(self
@@ -206,10 +206,10 @@ pub struct ModuleMetadata {
 }
 
 impl ModuleMetadata {
-    pub fn storage(&self, key: &'static str) -> Result<&StorageMetadata, MetadataError> {
+    pub fn storage(&self, key: &str) -> Result<&StorageMetadata, MetadataError> {
         self.storage
             .get(key)
-            .ok_or(MetadataError::StorageNotFound(key))
+            .ok_or(MetadataError::StorageNotFound(key.to_string()))
     }
 }
 

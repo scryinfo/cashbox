@@ -106,3 +106,14 @@ pub struct EeeTxRecord{
     pub is_success:bool,
     pub timestamp:String,
 }
+
+#[derive(Debug, Default, Clone)]
+pub struct SubChainBasicInfo {
+    pub genesis_hash: String,
+    pub metadata: String,
+    pub runtime_version: i32,
+    pub tx_version: i32,
+    pub ss58_format: i32,
+    pub token_decimals: i32,
+    pub token_symbol: String,
+}

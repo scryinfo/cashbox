@@ -189,9 +189,9 @@ pub fn balance_unit_convert(amount: &str, decimal: usize) -> Option<u128> {
     Ok(key)
 }
 */
-pub fn decode_account_info(info: &str) -> Result<EeeAccountInfo, error::Error> {
+/*pub fn decode_account_info(info: &str) -> Result<EeeAccountInfo, error::Error> {
     let state_vec =  hexstr_to_vec(info)?;
-     EeeAccountInfo::decode(&mut &state_vec.as_slice()[..]).map_err(|err|err.into())
+     EeeAccountInfo::decode(&mut &state_vec.as_slice()[..]).map_err(|err|err.into())*/
   /*  let state = system::AccountInfo::<Index, balances::AccountData<Balance>>::decode(&mut &state_vec.as_slice()[..])?;
     Ok(EeeAccountInfo {
         nonce: state.nonce,
@@ -201,7 +201,7 @@ pub fn decode_account_info(info: &str) -> Result<EeeAccountInfo, error::Error> {
         misc_frozen: state.data.misc_frozen.to_string(),
         fee_frozen: state.data.fee_frozen.to_string(),
     })*/
-}
+/*}*/
 
 //convert hex metadata string to RuntimeMetadata obj
 

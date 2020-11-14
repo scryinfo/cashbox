@@ -2,20 +2,17 @@
 extern crate serde_derive;
 
 mod error;
+mod wallets;
 
 pub mod model;
 pub mod module;
 pub mod wallet_db;
-mod wallets;
 
 pub use error::WalletError;
-
 pub use ethtx::{RawTransaction, convert_token, address_legal as eth_address_legal};
-pub use substratetx::{encode_account_storage_key, decode_account_info, event_decode};
-
+pub use wallets::Wallets;
+pub use substratetx::decode_account_info;
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
-
-pub use wallets::{Wallets};
 
 const DEFAULT_SS58_VERSION:u8 = 42;
 
