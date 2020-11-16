@@ -5,12 +5,15 @@
 extern "C" {
     pub fn add(a: ::std::os::raw::c_int, b: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
+
 extern "C" {
     pub fn addStr(cs: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
+
 extern "C" {
     pub fn Str_free(cs: *mut ::std::os::raw::c_char);
 }
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Data {
@@ -22,6 +25,7 @@ pub struct Data {
     pub arrayDataLength: ::std::os::raw::c_ulonglong,
     pub pointData: *mut Data,
 }
+
 #[test]
 fn bindgen_test_layout_Data() {
     assert_eq!(
@@ -38,79 +42,82 @@ fn bindgen_test_layout_Data() {
         unsafe { &(*(::std::ptr::null::<Data>())).intType as *const _ as usize },
         0usize,
         concat!(
-            "Offset of field: ",
-            stringify!(Data),
-            "::",
-            stringify!(intType)
+        "Offset of field: ",
+        stringify!(Data),
+        "::",
+        stringify!(intType)
         )
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<Data>())).charType as *const _ as usize },
         8usize,
         concat!(
-            "Offset of field: ",
-            stringify!(Data),
-            "::",
-            stringify!(charType)
+        "Offset of field: ",
+        stringify!(Data),
+        "::",
+        stringify!(charType)
         )
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<Data>())).arrayInt as *const _ as usize },
         16usize,
         concat!(
-            "Offset of field: ",
-            stringify!(Data),
-            "::",
-            stringify!(arrayInt)
+        "Offset of field: ",
+        stringify!(Data),
+        "::",
+        stringify!(arrayInt)
         )
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<Data>())).arrayIntLength as *const _ as usize },
         24usize,
         concat!(
-            "Offset of field: ",
-            stringify!(Data),
-            "::",
-            stringify!(arrayIntLength)
+        "Offset of field: ",
+        stringify!(Data),
+        "::",
+        stringify!(arrayIntLength)
         )
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<Data>())).arrayData as *const _ as usize },
         32usize,
         concat!(
-            "Offset of field: ",
-            stringify!(Data),
-            "::",
-            stringify!(arrayData)
+        "Offset of field: ",
+        stringify!(Data),
+        "::",
+        stringify!(arrayData)
         )
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<Data>())).arrayDataLength as *const _ as usize },
         40usize,
         concat!(
-            "Offset of field: ",
-            stringify!(Data),
-            "::",
-            stringify!(arrayDataLength)
+        "Offset of field: ",
+        stringify!(Data),
+        "::",
+        stringify!(arrayDataLength)
         )
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<Data>())).pointData as *const _ as usize },
         48usize,
         concat!(
-            "Offset of field: ",
-            stringify!(Data),
-            "::",
-            stringify!(pointData)
+        "Offset of field: ",
+        stringify!(Data),
+        "::",
+        stringify!(pointData)
         )
     );
 }
+
 extern "C" {
     pub fn Data_new() -> *mut Data;
 }
+
 extern "C" {
     pub fn Data_free(cd: *mut Data);
 }
+
 extern "C" {
     pub fn Data_use(cd: *mut Data) -> *mut Data;
 }

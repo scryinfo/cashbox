@@ -6,24 +6,24 @@ import 'package:path_provider/path_provider.dart';
 
 final DynamicLibrary _nativeAddLib = () {
   if (Platform.isAndroid) {
-    return DynamicLibrary.open("liborm_rustorm.so");
+    return DynamicLibrary.open("liborm_diesel.so");
   } else if (Platform.isWindows) {
-    return DynamicLibrary.open("orm_rustorm.dll");
+    return DynamicLibrary.open("orm_diesel.dll");
   } else if (Platform.isLinux) {
-    return DynamicLibrary.open("liborm_rustorm.so");
+    return DynamicLibrary.open("liborm_diesel.so");
   } else {
     return DynamicLibrary.process();
   }
 }();
 
-final void Function(Pointer<Int8>) tryRustOrm = _nativeAddLib
-    .lookup<NativeFunction<Void Function(Pointer<Int8>)>>("tryRustOrm")
+final void Function(Pointer<Int8>) tryDiesel = _nativeAddLib
+    .lookup<NativeFunction<Void Function(Pointer<Int8>)>>("tryDiesel")
     .asFunction();
 
-final void Function() dTryRustOrm = () async {
+final void Function() dTryDiesel = () async {
   var filepath = (await getApplicationDocumentsDirectory()).path;
-  filepath = pathLib.join(filepath, "orm_rustorm.db").substring(0);
+  filepath = pathLib.join(filepath, "orm_diesel.db").substring(0);
   Pointer<Int8> s = Utf8.toUtf8(filepath).cast();
-  tryRustOrm(s);
+  tryDiesel(s);
   free(s.cast<Pointer<Utf8>>());
 };

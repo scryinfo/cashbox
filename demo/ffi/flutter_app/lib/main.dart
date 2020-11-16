@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import 'cdl.dart';
+import 'orm_diesel.dart';
 import 'orm_rbatis.dart';
 import 'orm_rustorm.dart';
+
+import 'cdl.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   {
     dTryRbatis();
   }
-
   {
     dTryRustOrm();
+  }
+  {
+    dTryDiesel();
   }
   {
     print(add(1, 2));

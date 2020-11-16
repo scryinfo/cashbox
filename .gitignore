@@ -69,3 +69,5 @@ git
 /demo/ffi/orm_rustorm/Cargo.lock
 /demo/ffi/requests.log
 /demo/ffi/target
+/demo/ffi/flutter_app/dl/arm64-v8a/*.so
+/demo/ffi/orm_rustorm/target

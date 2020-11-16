@@ -1,4 +1,3 @@
-
 #[cfg(test)]
 mod tests {
     use cdl::{Data_new, Data_free};

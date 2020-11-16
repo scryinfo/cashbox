@@ -1,11 +1,10 @@
-
 use std::os::raw::c_char;
-use chrono::{
-    offset::Utc,
-    DateTime,
-    NaiveDate,
-};
-use rustorm::{DbError, FromDao, Pool, TableName, ToColumnNames, ToDao, ToTableName, rustorm_dao, Value};
+// use chrono::{
+//     offset::Utc,
+//     DateTime,
+//     NaiveDate,
+// };
+use rustorm::{DbError, FromDao, Pool, ToColumnNames, ToDao, ToTableName, rustorm_dao, Value};
 use std::ops::Add;
 
 #[no_mangle]
@@ -13,6 +12,7 @@ pub extern "C" fn tryRustOrm(name: *mut c_char) {
     #[cfg(target_os = "android")]shared::init_logger_once();
     mod for_insert {
         use super::*;
+
         #[derive(Debug, PartialEq, ToDao, ToColumnNames, ToTableName)]
         pub struct Actor {
             pub first_name: String,
@@ -45,11 +45,11 @@ pub extern "C" fn tryRustOrm(name: *mut c_char) {
     let db_url = db_url.as_str();
 
     let mut pool = Pool::new();
-    let mut em = pool.em(db_url).unwrap();
+    let em = pool.em(db_url).unwrap();
 
     {
         let sql = "drop table actor";
-        em.db().execute_sql_with_return(sql, &[]);
+        let _ = em.db().execute_sql_with_return(sql, &[]);
     }
     let create_sql = "CREATE TABLE actor(
                 actor_id integer PRIMARY KEY AUTOINCREMENT,
@@ -100,9 +100,8 @@ mod tests {
 
     #[test]
     fn try_rustorm_test() {
-        let url = shared::to_c_char("rustorm_db");
+        let url = shared::to_c_char("orm_rustorm.db");
         tryRustOrm(url);
         shared::Str_free(url);
-
     }
 }

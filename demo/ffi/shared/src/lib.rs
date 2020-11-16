@@ -16,8 +16,9 @@ pub fn to_str(cs: *mut c_char) -> &'static str {
     return cstr.to_str().expect("Failed to create str");
 }
 
-pub fn Str_free(cs:*mut c_char) {
-    unsafe{
+#[allow(non_snake_case)]
+pub fn Str_free(cs: *mut c_char) {
+    unsafe {
         if !cs.is_null() {
             Box::from_raw(cs);
         }

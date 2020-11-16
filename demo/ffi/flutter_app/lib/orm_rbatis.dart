@@ -22,7 +22,7 @@ final void Function(Pointer<Int8>) tryRbatis = _nativeAddLib
 
 final void Function() dTryRbatis = () async {
   var filepath = (await getApplicationDocumentsDirectory()).path;
-  filepath = pathLib.join(filepath,"orm_rbatis.db").substring(0);
+  filepath = pathLib.join(filepath, "orm_rbatis.db").substring(0);
   Pointer<Int8> s = Utf8.toUtf8(filepath).cast();
   tryRbatis(s);
   free(s.cast<Pointer<Utf8>>());
