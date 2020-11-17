@@ -49,7 +49,7 @@ class ProgressDialog extends Dialog {
             );
           });
     } catch (e) {
-      LogUtil.e("showProgressDialog error is =>", e);
+      LogUtil.instance.e("showProgressDialog error is =>", e);
     }
   }
 

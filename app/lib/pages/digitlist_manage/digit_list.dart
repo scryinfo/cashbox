@@ -142,7 +142,7 @@ class _DigitListPageState extends State<DigitListPage> {
                   ..setChainType(nowChain.chainType)
                   ..setContractAddress(displayDigitsList[index].contractAddress ?? "");
               } catch (e) {
-                LogUtil.e("digit_list_page", e.toString());
+                LogUtil.instance.e("digit_list_page", e.toString());
               }
               switch (Wallets.instance.nowWallet.nowChain.chainType) {
                 case ChainType.ETH:
@@ -154,7 +154,7 @@ class _DigitListPageState extends State<DigitListPage> {
                   NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
                   break;
                 default:
-                  LogUtil.e("unknown chain type error ","unknown chainType");
+                  LogUtil.instance.e("unknown chain type error ","unknown chainType");
                   break;
               }
             },

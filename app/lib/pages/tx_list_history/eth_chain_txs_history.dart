@@ -431,7 +431,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
         Fluttertoast.showToast(msg: translate('address_empty').toString());
       }
     } catch (onError) {
-      LogUtil.e("getTxListData error ===>", "$onError");
+      LogUtil.instance.e("getTxListData error ===>", "$onError");
     }
     if (ethTxListModel == null || ethTxListModel.length == 0) {
       ethTxListModel = [];

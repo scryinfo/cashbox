@@ -611,7 +611,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
         _toAddressController.text = qrResult.toString();
       });
     } catch (e) {
-      LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
+      LogUtil.instance.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
       Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
     }
   }
@@ -744,7 +744,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   void sendRawTx2Chain(String rawTx) async {
     ProgressDialog.showProgressDialog(context, translate("tx_sending"));
     String txHash = await sendRawTx(Wallets.instance.nowWallet.nowChain.chainType, rawTx);
-    LogUtil.d("broadcast txHash is ===>", txHash);
+    LogUtil.instance.d("broadcast txHash is ===>", txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
       Fluttertoast.showToast(msg: translate("tx_upload_success"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
     } else {
@@ -809,7 +809,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       }
     }
     ethBalance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
-    LogUtil.d("ethBalance is ===> ", ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
+    LogUtil.instance.d("ethBalance is ===> ", ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
     if (ethBalance.isNotEmpty) {
       try {
         if (double.parse(ethBalance) <= 0) {

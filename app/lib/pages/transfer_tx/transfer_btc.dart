@@ -167,7 +167,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
         _toAddressController.text = qrResult.toString();
       });
     } catch (e) {
-      LogUtil.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
+      LogUtil.instance.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
       Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
     }
   }

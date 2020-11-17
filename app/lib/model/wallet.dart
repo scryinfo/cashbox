@@ -47,14 +47,14 @@ class Wallet {
     Map resetPwdMap = await WalletManager.resetPwd(walletId, newPwd, oldPwd);
     int status = resetPwdMap["status"];
     if (status == null) {
-      LogUtil.e("resetPwd=>", "not find status code");
+      LogUtil.instance.e("resetPwd=>", "not find status code");
       return null;
     }
     if (status == 200) {
       return resetPwdMap;
     } else {
       String message = resetPwdMap["message"];
-      LogUtil.e("isContainWallet=>", "error status is=>" + status.toString() + "||message is=>" + message.toString());
+      LogUtil.instance.e("isContainWallet=>", "error status is=>" + status.toString() + "||message is=>" + message.toString());
     }
     return resetPwdMap;
   }
@@ -66,14 +66,14 @@ class Wallet {
     int status = walletRenameMap["status"];
     String message = walletRenameMap["message"];
     if (status == null) {
-      LogUtil.e("rename=>", "not find status code");
+      LogUtil.instance.e("rename=>", "not find status code");
       return false;
     }
     if (status == 200) {
       this.walletName = walletName; //The jni operation is complete, change the model
       return walletRenameMap["isRename"];
     } else {
-      LogUtil.e("isContainWallet=>", "error status is=>" + walletRenameMap["status"].toString() + "||message is=>" + message.toString());
+      LogUtil.instance.e("isContainWallet=>", "error status is=>" + walletRenameMap["status"].toString() + "||message is=>" + message.toString());
       return false;
     }
   }
@@ -106,7 +106,7 @@ class Wallet {
     int status = getNowChainMap["status"];
     String message = getNowChainMap["message"];
     if (status == null) {
-      LogUtil.e("getNowChain=>", "not find status code");
+      LogUtil.instance.e("getNowChain=>", "not find status code");
       return ChainType.UNKNOWN; //0===UNKNOWN
     }
     if (status == 200) {
@@ -114,7 +114,7 @@ class Wallet {
       ChainType chainType = Chain.intToChainType(getNowChainMap["getNowChainType"]);
       return chainType;
     } else {
-      LogUtil.e("getNowChain=>", "error status is=>" + getNowChainMap["status"].toString() + "||message is=>" + message.toString());
+      LogUtil.instance.e("getNowChain=>", "error status is=>" + getNowChainMap["status"].toString() + "||message is=>" + message.toString());
       return ChainType.UNKNOWN; //0===UNKNOWN
     }
   }
@@ -133,7 +133,7 @@ class Wallet {
     if (status == 200) {
       return isSetNowChain;
     } else {
-      LogUtil.e("setNowChainType message ===>", setNowChainMap["message"].toString());
+      LogUtil.instance.e("setNowChainType message ===>", setNowChainMap["message"].toString());
       return false;
     }
   }

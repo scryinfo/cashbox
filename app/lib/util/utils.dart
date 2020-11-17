@@ -143,7 +143,7 @@ class Utils {
       String data = await file.readAsString();
       return data;
     } catch (e) {
-      LogUtil.e("readFile error is ===>", e.toString());
+      LogUtil.instance.e("readFile error is ===>", e.toString());
       return "error";
     }
   }

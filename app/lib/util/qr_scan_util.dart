@@ -191,7 +191,7 @@ class QrScanUtil {
         break;
       default:
         Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
-        LogUtil.e("QrScanUtil", "unknown chainType ======>" + chainType);
+        LogUtil.instance.e("QrScanUtil", "unknown chainType ======>" + chainType);
         break;
     }
   }

@@ -67,7 +67,7 @@ Future<String> loadEthBalance(String address, ChainType chainType) async {
       return (BigInt.from(num.parse(res["result"])) / config.ethUnit).toStringAsFixed(4);
     }
   } catch (e) {
-    LogUtil.e("loadEthBalance  error ", e.toString());
+    LogUtil.instance.e("loadEthBalance  error ", e.toString());
     return null;
   }
   return null;
@@ -171,7 +171,7 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
           }
         } catch (e) {
           ethTxModel.input = "";
-          LogUtil.e("etherScanUtil  error ", e.toString());
+          LogUtil.instance.e("etherScanUtil  error ", e.toString());
         }
         ethTxModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
         if (res["result"][i]["from"].trim().toLowerCase() == address.trim().toLowerCase()) {
@@ -191,7 +191,7 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
       return [];
     }
   } catch (e) {
-    LogUtil.e("loadEthTxHistory===> ", e.toString());
+    LogUtil.instance.e("loadEthTxHistory===> ", e.toString());
     return [];
   }
 }
@@ -263,7 +263,7 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, Strin
     }
     return modelArray;
   } catch (e) {
-    LogUtil.e("loadErc20TxHistory===> ", e.toString());
+    LogUtil.instance.e("loadErc20TxHistory===> ", e.toString());
     return [];
   }
 }

@@ -433,7 +433,7 @@ class _DappPageState extends State<DappPage> {
               this.callPromise(msg);
             });
           } catch (e) {
-            LogUtil.d("cashboxEthSendSignedTx===>", e.toString());
+            LogUtil.instance.d("cashboxEthSendSignedTx===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
           }
@@ -454,7 +454,7 @@ class _DappPageState extends State<DappPage> {
             msg.data = await ethCall(chainType, data[0], data[1]);
             this.callPromise(msg);
           } catch (e) {
-            LogUtil.d("cashboxEthCall===>", e.toString());
+            LogUtil.instance.d("cashboxEthCall===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
           }
@@ -504,7 +504,7 @@ class _DappPageState extends State<DappPage> {
                       });
                     });
                   } catch (e) {
-                    LogUtil.d("cashboxEeeRawTxSign===>", e.toString());
+                    LogUtil.instance.d("cashboxEeeRawTxSign===>", e.toString());
                     msg.err = "inner error";
                     this.callPromise(msg).whenComplete(() {
                       NavigatorUtils.goBack(context);

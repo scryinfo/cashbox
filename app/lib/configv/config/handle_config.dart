@@ -92,7 +92,7 @@ class HandleConfig {
         await file.create();
       }
     } catch (e) {
-      LogUtil.e("_getDirectoryPath ", e.toString());
+      LogUtil.instance.e("_getDirectoryPath ", e.toString());
     }
     return file.path;
   }

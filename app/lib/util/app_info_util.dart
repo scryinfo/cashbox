@@ -56,7 +56,7 @@ class AppInfoUtil {
       }
       return false;
     } catch (e) {
-      LogUtil.e("checkAppUpgrade error is ",e.toString());
+      LogUtil.instance.e("checkAppUpgrade error is ",e.toString());
       return false;
     }
   }

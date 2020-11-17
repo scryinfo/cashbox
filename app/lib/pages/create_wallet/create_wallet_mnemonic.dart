@@ -37,7 +37,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
   _initMnemonicData() async {
     var mnemonic = await Wallets.instance.createMnemonic(12);
     if (mnemonic == null) {
-      LogUtil.e("CreateWalletMnemonicPage=>", "mnemonic is null");
+      LogUtil.instance.e("CreateWalletMnemonicPage=>", "mnemonic is null");
       return;
     }
     setState(() {
