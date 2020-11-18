@@ -43,7 +43,6 @@ impl ChainHelper {
     pub fn tx_sign(&self, mnemonic: &str, index: u32, func_data: &[u8]) -> Result<String, error::Error> {
         let signer = crypto::Sr25519::pair_from_phrase(mnemonic, None)?;
         let prefix_len = extrinsic::get_func_prefix_len(func_data);
-        println!("prefix len is:{}", prefix_len);
         let func_data = &func_data[prefix_len..];
         let playload = {
             let mut temp = vec![];
@@ -137,6 +136,7 @@ impl ChainHelper {
                 let ext_str = {
                     let ext_data_len = func_args.2.len();
                     let temp_array = vec![0u8; ext_data_len];
+                    println!("func args:{:?},temp_array:{:?}",func_args,temp_array);
                     if !temp_array.as_slice().eq(&func_args.2[..]) {
                         Some(format!("0x{}", hex::encode(func_args.2.as_slice())))
                     } else {

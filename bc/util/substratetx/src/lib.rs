@@ -81,38 +81,6 @@ pub struct TransferDetail {
     pub ext_data: Option<String>,
 }
 
-/*/// Do a XX 128-bit hash and place result in `dest`.
-fn twox_128_into(data: &[u8], dest: &mut [u8; 16]) {
-    let mut h0 = twox_hash::XxHash::with_seed(0);
-    let mut h1 = twox_hash::XxHash::with_seed(1);
-    h0.write(data);
-    h1.write(data);
-    let r0 = h0.finish();
-    let r1 = h1.finish();
-
-    LittleEndian::write_u64(&mut dest[0..8], r0);
-    LittleEndian::write_u64(&mut dest[8..16], r1);
-}
-
-/// Do a XX 128-bit hash and return result.
-pub fn twox_128(data: &[u8]) -> [u8; 16] {
-    let mut r: [u8; 16] = [0; 16];
-    twox_128_into(data, &mut r);
-    r
-}*/
-
-// pub fn encode_account_storage_key(module: &str, storage: &str, puk: &str) -> Result<String, error::Error> {
-//     let module_byte = twox_128(module.as_bytes());
-//     let storage_byte = twox_128(storage.as_bytes());
-//     let pub_key_without_0x = puk.get(2..).unwrap();
-//     let pub_vec = hex::decode(pub_key_without_0x)?;
-//     let blake2_result = blake2_rfc::blake2b::blake2b(16, &[], &pub_vec);
-//     let puk_hash = hex::encode(blake2_result.as_bytes());
-//     let mut final_key = Vec::from(&module_byte[..]);
-//     final_key.extend_from_slice(&storage_byte[..]);
-//     let key_start = hex::encode(&final_key);
-//     Ok(format!("0x{}{}{}", key_start, puk_hash, pub_key_without_0x))
-// }
 
 pub fn decode_account_info(info: &str) -> Result<EeeAccountInfo, error::Error> {
     let state_vec = hexstr_to_vec(info)?;
@@ -153,7 +121,7 @@ mod tests {
         }
     }
 
-    #[test]
+  /*  #[test]
     fn get_chain_runtime_metadata_test() {
         let data = get_request(URL, METADATA_REQ).unwrap();
         match node_helper::ChainHelper::get_chain_runtime_metadata(&data) {
@@ -166,11 +134,11 @@ mod tests {
                 println!("get metadata error:{:?}", err);
             }
         }
-    }
+    }*/
 
     #[test]
     fn decode_extrinsics_test() {
-        let input_tx = r#"["0x280402000bc01bb6ab7501","0x3d028454065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f010e85977b32d9b3ad26dc7ddc3c6a3d3b834cfbaaf2f44e5e323ec333046cb43eab08f603f1bf73abf921ef7dc90c68312316a3b45fed585f90b0e37522a87c8900040005034c37ff22d2e3537d83f19ac2f1adafb0b3f9563122232ac93b4bbb949852e72e0f00008d49fd1a07"]"#;
+        let input_tx = r#"["0x280402000b80d51cd07501","0x35028454065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f01a688989578914fa4bd2f2b75eaf0b498b27bba76d4f8a2077479aeb9af73db7cf3bd093a69ff6963b0b0082a960daf7873cfe7ded5b3309d9fd400fe3eacd488f602100008051cbd2d43530a44705ad088af313e18f80b53ef16b36177cd4b77b846f2a5f07c2103083030"]"#;
         let metadata_hex = get_request(URL, METADATA_REQ).unwrap();
         let genesis_byte = hexstr_to_vec(GENESIS_HASH).unwrap();
         let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15));
@@ -187,8 +155,9 @@ mod tests {
         let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15));
         assert!(helper.is_ok());
         let helper = helper.unwrap();
-        let event_str = r#"0x0c00000000000000482d7c090000000002000000010000000502d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d54065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f0000c16ff28623000000000000000000000001000000000068663b0a00000000000000"#;
+        let event_str = r#"0x0c00000000000000482d7c09000000000200000001000000080554065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f1cbd2d43530a44705ad088af313e18f80b53ef16b36177cd4b77b846f2a5f07cc80000000000000000000000000000000000010000000000801d2c0400000000000000"#;
         let decode_ret = helper.decode_events(event_str, None);
+        println!("decode event is:{:?}",decode_ret);
         assert!(decode_ret.is_ok());
 
         println!("event decode result:{:?}", decode_ret);
@@ -220,7 +189,7 @@ mod tests {
         let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15));
         assert!(helper.is_ok());
         let helper = helper.unwrap();
-        let sign_ret = helper.token_transfer_sign("eee", mnemonic, "5Dne8YVzkp7YKRJVMP8GYm9xTtNdW1crtZeeh6NavTPdLoUY", amount, 3);
+        let sign_ret = helper.token_transfer_sign("eee", mnemonic, "5Dne8YVzkp7YKRJVMP8GYm9xTtNdW1crtZeeh6NavTPdLoUY", amount, 3,None);
         assert!(sign_ret.is_ok());
         println!("signed tx result:{}", sign_ret.unwrap());
     }

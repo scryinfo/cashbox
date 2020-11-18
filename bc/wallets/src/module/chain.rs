@@ -12,8 +12,6 @@ struct RawTx {
     func_data: Vec<u8>,
     index: u32,
     genesis_hash: H256,
-    spec_version: u32,
-    tx_version:u32,
 }
 
 //Subsequent modification of the name to ScryX?, the current open source version does not yet support the function call of the module
@@ -32,7 +30,7 @@ impl EEE {
     }
 
     fn convert_hash_to_byte(&self,hash: &str)-> WalletResult<[u8;32]>{
-        let hash_vec = hex::decode(hash.get(2..).unwrap())?;
+        let hash_vec = substratetx::hexstr_to_vec(hash)?;
         let mut h256 = [0u8; 32];
         h256.clone_from_slice(hash_vec.as_slice());
         Ok(h256)
@@ -57,7 +55,7 @@ impl EEE {
     pub fn generate_tokenx_transfer(&self, from: &str, to: &str, amount: &str, ext_data:&str,index: u32, psw: &[u8]) -> WalletResult<String> {
 
         let mn = self.decode_mnemonic_by_address(from,psw)?;
-        let ext_vec = hex::decode(ext_data.get(2..).unwrap())?;
+        let ext_vec = substratetx::hexstr_to_vec(ext_data)?;
         let instance = wallet_db::DataServiceProvider::instance()?;
         let chain_info = instance.get_sub_chain_info(None)?;
         if let Some(info) = chain_info.get(0){
@@ -74,6 +72,7 @@ impl EEE {
     pub fn save_tx_record(&self, account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
         let instance = wallet_db::DataServiceProvider::instance()?;
         let chain_info = instance.get_sub_chain_info(None)?;
+        // default chain genesis hash  definitely exists
         let info = chain_info.get(0).unwrap();
         let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
         let helper = substratetx::SubChainHelper::init(&info.metadata,&genesis_hash,info.runtime_version as u32,info.tx_version as u32,None)?;
@@ -171,28 +170,40 @@ impl EEE {
     }
     // This function is used for externally stitched transactions, such as transactions constructed by js
     pub fn raw_tx_sign(&self, raw_tx: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
-        let raw_tx = raw_tx.get(2..).unwrap();// remove `0x`
-        let tx_encode_data = hex::decode(raw_tx)?;
+        let tx_encode_data = substratetx::hexstr_to_vec(raw_tx)?;
         let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
         let wallet = module::wallet::WalletManager {};
         let mnemonic = wallet.export_mnemonic(wallet_id, psw)?;
         let mn = String::from_utf8(mnemonic.mn)?;
         let instance = wallet_db::DataServiceProvider::instance()?;
-        let chain_infos= instance.get_sub_chain_info(Some(&hex::encode(tx.genesis_hash)))?;
+        let genesis_hash_str =format!("0x{}",hex::encode(tx.genesis_hash));
+        let chain_infos= instance.get_sub_chain_info(Some(&genesis_hash_str))?;
         if let Some(chain_info) =chain_infos.get(0) {
             let chain_helper = substratetx::SubChainHelper::init(&chain_info.metadata,&tx.genesis_hash[..],chain_info.runtime_version as u32,chain_info.tx_version as u32,None)?;
-            let mut_data = &mut &tx_encode_data[0..tx_encode_data.len() - 40];//Direct use of tx.func_data in this place will cause an error, and the first byte of data will be missed.
-            let sign_data =   chain_helper.tx_sign(&mn,  tx.index, mut_data)?;
+            let sign_data =   chain_helper.tx_sign(&mn,  tx.index, &self.restore_func_data(&tx.func_data))?;
             Ok(sign_data)
         }else {
              Err(error::WalletError::NotExist)
         }
     }
-
+    // when decode RawTx instance,the function data length info will be drop,this func is aim to restore the original structure
+    fn restore_func_data(&self, func_data:&[u8]) ->Vec<u8>{
+        let func_size = func_data.len();
+        let reserve = match func_size {
+            0..=0b0011_1111 => 1,
+            0b0100_0000..=0b0011_1111_1111_1111 => 2,
+            _ => 4,
+        };
+        let mut func_vec = vec![0u8;func_size+reserve];
+        {
+            let temp = &mut func_vec[2..];
+            temp.copy_from_slice(func_data);
+        }
+        func_vec
+    }
     //Used for signing ordinary data, incoming data, hex format data
     pub fn raw_sign(&self, raw_data: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
-        let raw_data = raw_data.get(2..).unwrap();// remove `0x`
-        let tx_encode_data = hex::decode(raw_data)?;
+        let tx_encode_data = substratetx::hexstr_to_vec(raw_data)?;
         let wallet = module::wallet::WalletManager {};
         let mnemonic = wallet.export_mnemonic(wallet_id, psw)?;
         let mn = String::from_utf8(mnemonic.mn)?;

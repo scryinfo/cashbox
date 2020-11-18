@@ -121,7 +121,7 @@ public class NativeLibTest {
     public void updateSubChainBasicInfoTest() throws Throwable{
         Map header = new HashMap<String, String>();
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://127.0.0.1:9933"), header);
         // Get the  genesis hash  {"id":1,"jsonrpc":"2.0","method":"chain_getBlockHash","params":[0]}
        String genesisHash = client.invoke("chain_getBlockHash", new Object[]{0}, String.class);
         System.out.println("genesis hash is:"+genesisHash);
@@ -134,13 +134,18 @@ public class NativeLibTest {
         // get metadata detail: {"id":7,"jsonrpc":"2.0","method":"state_getMetadata","params":[]}
         String metadata = client.invoke("state_getMetadata", new Object[]{}, String.class);
       //  System.out.println("metadata is:"+metadata);
-        NativeLib.SubChainBasicInfo info = new NativeLib.SubChainBasicInfo(genesisHash,metadata,6,1);
-        Integer ss58Prefix = (Integer) properties.get("ss58Format");
-        Integer decimals = (Integer) properties.get("tokenDecimals");
-        String symbol = (String) properties.get("tokenSymbol");
-        info.ss58Format = ss58Prefix;
-        info.tokenSymbol =symbol;
-        info.tokenDecimals = decimals;
+        Integer runtime_version = (Integer) version.get("specVersion");
+        Integer tx_version = (Integer) version.get("transactionVersion");
+        NativeLib.SubChainBasicInfo info = new NativeLib.SubChainBasicInfo(genesisHash,metadata,runtime_version,tx_version);
+        if (!properties.isEmpty()){
+            Integer ss58Prefix = (Integer) properties.get("ss58Format");
+            Integer decimals = (Integer) properties.get("tokenDecimals");
+            String symbol = (String) properties.get("tokenSymbol");
+            info.ss58Format = ss58Prefix;
+            info.tokenSymbol =symbol;
+            info.tokenDecimals = decimals;
+        }
+
         NativeLib.Message message = NativeLib.updateSubChainBasicInfo(info,true);
         System.out.println(message);
     }
@@ -164,6 +169,9 @@ public class NativeLibTest {
         // NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
         NativeLib.Message msg = NativeLib.eeeStorageKey("System","Account","5CRq2XF4BVaAWT72q7NaQdVZTajD12yDTu6YegyWAAxpDHah");
         System.out.println(msg);
+        String account_1 = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
+        NativeLib.Message key2 = NativeLib.eeeStorageKey("TokenX","Balances",account_1);
+        System.out.println(key2);
     }
 
     @Test
@@ -222,11 +230,12 @@ public class NativeLibTest {
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
         //  String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
-        String account_1 = "5E54p5Mf2sHsoemRqD7a2o2ThudbTtEXMhSgSNCi16DEsQ1Y";
+        String account_1 = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
+
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://118.178.197.108:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
 
         Header current_header = client.invoke("chain_getHeader", new Object[]{}, Header.class);
         //Get the current block number
@@ -238,10 +247,10 @@ public class NativeLibTest {
 
         int startBlockNumber = accountRecord == null ? 0 : accountRecord.blockNum;
 
-        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account","0x58bf023b83ab4fea776351b5901a4aeb94e625625d573eefd8dda5e925674a78");
-        NativeLib.Message key2 = NativeLib.eeeStorageKey("Tokenx","Balances","0x58bf023b83ab4fea776351b5901a4aeb94e625625d573eefd8dda5e925674a78");
-        //NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
-        // System.out.println("key1:"+key1.accountKeyInfo+",key2:"+key2.accountKeyInfo);
+        NativeLib.Message key1 = NativeLib.eeeStorageKey("System","Account",account_1);
+        NativeLib.Message key2 = NativeLib.eeeStorageKey("TokenX","Balances",account_1);
+        ////NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
+         System.out.println("key1:"+key1.storageKeyInfo+",key2:"+key2.storageKeyInfo);
         //Query block interval
         int queryNumberInterval = 3000;
         //The number of queries currently required, rounded up
@@ -286,7 +295,7 @@ public class NativeLibTest {
                     System.out.println(msg.message);
                 }
             }
-            System.out.println("start update sync record,endBlockNumber is:" + endBlockNumber + ",endBlockHash is" + endBlockHash);
+            System.out.println("start update sync record,endBlockNumber is:" + endBlockNumber + ",endBlockHash is:" + endBlockHash);
             //Update the number of currently queried blocks
             NativeLib.Message update_result = NativeLib.updateEeeSyncRecord(account_1, 5, endBlockNumber, endBlockHash);
             if (update_result.status != 200) {

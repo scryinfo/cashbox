@@ -4,10 +4,6 @@ use jni::objects::{JObject, JValue, JClass, JString};
 use wallets::model::{EeeChain, BtcChain, EthChain, SubChainBasicInfo};
 use jni::sys::{jint, jobject, jbyteArray, jboolean, jstring, jvalue};
 use wallets::module::Chain;
-use std::ops::Deref;
-use std::any::TypeId;
-use jni::strings::JavaStr;
-
 
 pub fn get_eee_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, eee_chain: EeeChain) -> JObject<'a> {
     let eee_digit_list_class = env.find_class("java/util/ArrayList").expect("find ArrayList");
@@ -536,8 +532,6 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeSign(env: JNIEnv, 
     *state_obj
 }
 
-
-
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateSubChainBasicInfo(env: JNIEnv, _class: JClass, chainInfo: JObject, isDefault: jboolean) -> jobject {
@@ -554,12 +548,12 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateSubChainBasicIn
     let tx_version = txVersion.i().unwrap();
 
     let ss58Format = env.get_field(chainInfo,"ss58Format","I").expect("get ss58 addr prefix number");
-    let ss58_prefix = ss58Format.i().unwrap();
+    let ss58_prefix = ss58Format.i().unwrap_or(42);
     let tokenDecimals = env.get_field(chainInfo,"tokenDecimals","I").expect("get token decimals");
-    let decimals = tokenDecimals.i().unwrap();
+    let decimals = tokenDecimals.i().unwrap_or(12);
 
     let symbol = env.get_field(chainInfo,"tokenSymbol","Ljava/lang/String;").expect("get token symbol");
-    let symbol_str =string_convert(&env,&symbol).expect("convert metadata hash");
+    let symbol_str =string_convert(&env,&symbol).unwrap_or("Unit".to_string());
 
     let chain_info_detail = SubChainBasicInfo {
         genesis_hash,
@@ -573,7 +567,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateSubChainBasicIn
 
     let eee = wallets::module::EEE {};
     match eee.update_chain_basic_info(chain_info_detail,isDefault !=0){
-        Ok(data) => {
+        Ok(_) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("eeeSign set StatusCode value");
         }
         Err(msg) => {
@@ -585,7 +579,6 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateSubChainBasicIn
 }
 
 fn string_convert(env: &JNIEnv,jvalue:&JValue)->Option<String>  {
-
     let value = JString::from(jvalue.l().unwrap());
     let result: Option<String>= env.get_string(value).map(|value| value.into()).ok();
     result

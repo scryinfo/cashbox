@@ -405,6 +405,7 @@ public class NativeLib {
         public String inputInfo;            //extra information
         public String storageKeyInfo;       //Account storage key
         public AccountInfo accountInfo;     //account information 
+　　　　　public SubChainBasicInfo chainInfo;
     }
 
     //Define EEE chain account information
@@ -412,8 +413,7 @@ public class NativeLib {
         public int nonce;                // The number of transactions this account has sent.
         public int refcount;             //The number of other modules that currently depend on this account's existence.
         public String free;              //Discretionary balance
-        public String reserved;          //Remaining balance, the balance here means participation in required activities, and the related business has not
-        // yet been designed on the chain
+        public String reserved;          //Remaining balance, the balance here means participation in required activities, and the related business has not　yet been designed on the chain
         public String misc_frozen;      // The amount that `free` may not drop below when withdrawing for *anything except transaction fee payment*.
         public String fee_frozen;       //The amount that `free` may not drop below when withdrawing specifically for transaction fee payment.
     }
@@ -430,6 +430,22 @@ public class NativeLib {
         public int blockNum;
         public String blockHash;
     }
+　　　public static class SubChainBasicInfo{
+        public String genesisHash;
+        public String metadata;
+        public int runtimeVersion;
+        public int txVersion;
+        public int ss58Format;
+        public int tokenDecimals;
+        public String tokenSymbol;
+
+        public SubChainBasicInfo(String genesisHash, String metadata, int runtimeVersion, int txVersion) {
+            this.genesisHash = genesisHash;
+            this.metadata = metadata;
+            this.runtimeVersion = runtimeVersion;
+            this.txVersion = txVersion;
+        }
+    }
 
     //Get the assembled original transaction, distinguish the chain type
     //Return: Unsigned transaction String, the format is json format
@@ -439,26 +455,35 @@ public class NativeLib {
     // The bottom layer directly constructs a signed transfer transaction, and returns the information that can be directly submitted to the chain through
     // the signedInfo attribute in the Message field.
     // Note: vaule uses the default unit in the transfer: unit, the precision is 10^12, that is, 1 unit =1000_000_000_000
-    public static native Message eeeTransfer(String from, String to, String value, String genesisHash, int index, int runtime_version, int tx_version, byte[] pwd);
+    public static native Message eeeTransfer(String from, String to, String value, int index,byte[] pwd);
 
-    // extData: format-> hex string
-    public static native Message tokenXTransfer(String from, String to, String value, String extData, String genesisHash, int index, int runtime_version, int tx_version, byte[] pwd);
+    public static native Message tokenXTransfer(String from, String to, String value, String extData, int index, byte[] pwd);
 
     public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
 
     // Only do information signature, tool function
     public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
 
+    // update chain basic info base on substrate framework
+   public static native Message updateSubChainBasicInfo(SubChainBasicInfo chainInfo,boolean isDefault);
+    /**
+     * get the substrate chain basic info
+     * @param genesisHash target chain genesis hash,which is a unique value for the chain,if input value is empty,will return default chain basic info;
+     *
+     * @return  if return Message `status` value is Ok and `chainInfo` field representative the basic info detail
+     */
+    public static native Message getSubChainBasicInfo(String genesisHash);
 
     /**
-     * get
+     * get the key corresponding to the EEE account information, enter the account to be queried, for example: 5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4,
      *
      * @param module
      * @param storage_item
-     * @param pub_key
-     * @return
-     */
-    public static native Message eeeStorageKey(String module, String storageItem, String pubKey);
+     * @param account_str
+     * @return return the encoded key like this:0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
+     *  Construct jsonrpc request data format {"id":37,"jsonrpc":"2.0","method":"state_getStorage","params":[["key"]]]}
+     * /
+    public static native Message eeeStorageKey(String module, String storageItem, String account_str);
 
     /**
      * Decode account information queried back from the chain

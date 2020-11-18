@@ -96,6 +96,8 @@ impl TryFrom<Metadata> for EventsDecoder {
         decoder.register_type_size::<u32>("AuthorityIndex")?;
         decoder.register_type_size::<u64>("AuthorityWeight")?;
         decoder.register_type_size::<u32>("MemberCount")?;
+        decoder.register_type_size::<u128>("TokenXQuantity")?;
+        decoder.register_type_size::<u32>("OriginalNonce")?;
         decoder.register_type_size::<crate::AccountId>("AccountId")?;
         decoder.register_type_size::<crate::BlockNumber>("BlockNumber")?;
         decoder.register_type_size::<crate::Moment>("Moment")?;

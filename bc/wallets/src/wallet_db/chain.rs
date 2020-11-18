@@ -215,16 +215,16 @@ impl DataServiceProvider {
         Ok(records)
     }
 
-    pub fn get_sub_chain_info(&self,genesis_hash:Option<&str>)->WalletResult<Vec<SubChainBasicInfo>>{
+    pub fn get_sub_chain_info(&self, genesis_hash_str:Option<&str>) ->WalletResult<Vec<SubChainBasicInfo>>{
         let  start_sql = "select * from detail.SubChainInfo where status = 1";
-        let after_prefix = if genesis_hash.is_some(){
+        let after_prefix = if genesis_hash_str.is_some(){
             "and genesis_hash = ?;"
         }else {
             "and is_default = ?;"
         };
         let query_sql = format!("{} {}",start_sql,after_prefix);
         let mut select_stat = self.db_hander.prepare(query_sql)?;
-        if let Some(hash) = genesis_hash{
+        if let Some(hash) = genesis_hash_str {
             select_stat.bind(1, hash)?;
         }else{
             select_stat.bind(1, 1)?;
