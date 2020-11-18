@@ -6,6 +6,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import info.scry.wallet_manager.NativeLib.*;
+// import info.scry.wallet_manager.BtcLib.*;
 import info.scry.wallet_manager.ScryWalletLog;
 
 import java.util.ArrayList;
@@ -691,8 +692,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "eeeSign": {
                 ScryWalletLog.d("nativeLib=>", "eeeSign is enter =>");
                 Message message = new Message();
-                ScryWalletLog.d("nativeLib=>",
-                        (String) (call.argument("rawTx")) + "||" + (String) (call.argument("mnId")) + "||" + call.argument("pwd"));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("rawTx")) + "||" + (String) (call.argument("mnId")) + "||" + call.argument("pwd"));
                 try {
                     message = NativeLib.eeeSign((String) (call.argument("rawTx")),
                             (String) (call.argument("mnId")),
@@ -974,16 +974,19 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.updateDefaultDigitList((String) (call.argument("digitData")));
+                    ScryWalletLog.d("nativeLib=>",
+                            "walletState is " + walletState.toString());
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "updateAuthDigitList exception is " + exception);
                 }
+
                 ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
                 if (walletState.status == 200) {
                     resultMap.put("isUpdateDefaultDigit", walletState.isUpdateDefaultDigit);
                     ScryWalletLog.d("nativeLib=>",
-                            "message.isUpdateDefaultDigit is " + walletState.isUpdateDefaultDigit);
+                            "message.isUpdateDefaultDigit is " + walletState.isUpdateDefaultDigit + "||walletState.message is -->" + walletState.message);
                 } else {
                     resultMap.put("message", walletState.message);
                     ScryWalletLog.d("nativeLib=>",
@@ -1073,7 +1076,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-            case "queryDigit":
+            case "queryDigit": {
                 ScryWalletLog.d("nativeLib=>", "queryDigit is enter ===>");
                 DigitList authList = new DigitList();
                 try {
@@ -1124,6 +1127,65 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 result.success(resultMap);
                 break;
+            }
+            /*case "btcStart": {
+                ScryWalletLog.d("BtcLib=>", "btcStart is enter ===>");
+                try {
+                    // BtcLib.btcStart((String) (call.argument("network")));
+                    BtcLib.btcStart("Testnet");
+                } catch (Exception exception) {
+                    ScryWalletLog.d("BtcLib=>", "btcStart exception is " + exception);
+                }
+                ScryWalletLog.d("BtcLib=>", "btcStart is end~~~ ===");
+                break;
+            }*/
+            case "getSubChainBasicInfo": {
+                ScryWalletLog.d("nativeLib=>", "getSubChainBasicInfo is enter ===>");
+                Message message = new Message();
+                try {
+                    message = NativeLib.getSubChainBasicInfo((String) (call.argument("genesisHash")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "getSubChainBasicInfo exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "message is  ===>"+message.toString());
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                int status = message.status;
+                if (status == 200) {
+                    resultMap.put("genesisHash", message.chainInfo.genesisHash);
+                    resultMap.put("metadata", message.chainInfo.metadata);
+                    resultMap.put("runtimeVersion", message.chainInfo.runtimeVersion);
+                    resultMap.put("txVersion", message.chainInfo.txVersion);
+                    resultMap.put("ss58Format", message.chainInfo.ss58Format);
+                    resultMap.put("tokenDecimals", message.chainInfo.tokenDecimals);
+                    resultMap.put("tokenSymbol", message.chainInfo.tokenSymbol);
+                } else {
+                    resultMap.put("message", message.message);
+                }
+                result.success(resultMap);
+                break;
+            }
+            case "updateSubChainBasicInfo": {
+                ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is enter ===>");
+                Message message = new Message();
+                SubChainBasicInfo chainInfo = new NativeLib.SubChainBasicInfo();
+                chainInfo.runtimeVersion = (int) (call.argument("runtimeVersion"));
+                chainInfo.txVersion = (int) (call.argument("txVersion"));
+                chainInfo.genesisHash = (String) (call.argument("genesisHash"));
+                chainInfo.metadata = (String) (call.argument("metadata"));
+                chainInfo.ss58Format = (int) (call.argument("ss58Format"));
+                chainInfo.tokenDecimals = (int) (call.argument("tokenDecimals"));
+                chainInfo.tokenSymbol = (String) (call.argument("tokenSymbol"));
+                try {
+                    message = NativeLib.updateSubChainBasicInfo(chainInfo, true);
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "updateSubChainBasic exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                result.success(resultMap);
+                break;
+            }
             default:
                 result.notImplemented();
                 break;

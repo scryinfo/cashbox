@@ -9,6 +9,7 @@ class ScryXNetUtil {
   Future<String> _loadScryXIp() async {
     Config config = await HandleConfig.instance.getConfig();
     return config.privateConfig.scryXIp;
+    // return "http://192.168.1.7:9933";
   }
 
   Future<Map> loadEeeChainNonceTest(String fromAddress) async {
@@ -260,5 +261,85 @@ class ScryXNetUtil {
       LogUtil.instance.e("submitExtrinsic error is  ", e.toString());
       return null;
     }
+  }
+
+  Future<Map> loadMetadata() async {
+    Map resultMap = new Map();
+    String netUrl = await _loadScryXIp();
+    if (netUrl == null || netUrl.isEmpty) {
+      return null;
+    }
+    var paramObj = {"method": "state_getMetadata", "params": [], "id": 1, "jsonrpc": "2.0"};
+    try {
+      resultMap = await request(netUrl, formData: paramObj);
+      return resultMap;
+    } catch (e) {
+      LogUtil.instance.e("getMetadata error is  ", e.toString());
+      return null;
+    }
+  }
+
+  Future<Map> loadSystemProperties() async {
+    Map resultMap = new Map();
+    String netUrl = await _loadScryXIp();
+    if (netUrl == null || netUrl.isEmpty) {
+      return null;
+    }
+    var paramObj = {"method": "system_properties", "params": [], "id": 1, "jsonrpc": "2.0"};
+    try {
+      resultMap = await request(netUrl, formData: paramObj);
+      return resultMap;
+    } catch (e) {
+      LogUtil.instance.e("loadSystemProperties error is  ", e.toString());
+      return null;
+    }
+  }
+
+  Future<Map> updateSubChainBasicInfo() async {
+    Map runtimeMap = await loadScryXRuntimeVersion();
+    if (runtimeMap == null || !runtimeMap.containsKey("result")) {
+      return null;
+    }
+    var runtimeResultMap = runtimeMap["result"];
+    if (runtimeResultMap == null || !runtimeResultMap.containsKey("specVersion") || !runtimeResultMap.containsKey("transactionVersion")) {
+      return null;
+    }
+    int runtimeVersion = runtimeResultMap["specVersion"];
+    int txVersion = runtimeResultMap["transactionVersion"];
+
+    Map blockHashMap = await loadScryXBlockHash();
+    if (blockHashMap == null || !blockHashMap.containsKey("result")) {
+      return null;
+    }
+    String genesisHash = blockHashMap["result"];
+
+    Map metaDataMap = await loadMetadata();
+    if (metaDataMap == null || !metaDataMap.containsKey("result")) {
+      return null;
+    }
+    String metadata = metaDataMap["result"];
+
+    Map systemPropertiesMap = await loadSystemProperties();
+    if (systemPropertiesMap == null || !systemPropertiesMap.containsKey("result")) {
+      return null;
+    }
+    Map resultMap = Map();
+    Map propertiesResultMap = systemPropertiesMap["result"];
+    int ss58Format = propertiesResultMap["ss58Format"];
+    int tokenDecimals = propertiesResultMap["tokenDecimals"];
+    String tokenSymbol = propertiesResultMap["tokenSymbol"];
+    if (runtimeVersion != null &&
+        txVersion != null &&
+        genesisHash != null &&
+        metadata != null &&
+        ss58Format != null &&
+        tokenDecimals != null &&
+        tokenSymbol != null) {
+      Map updateMap =
+          await Wallets.instance.updateSubChainBasicInfo(runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol);
+      return updateMap;
+    }
+
+    return resultMap;
   }
 }

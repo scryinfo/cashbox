@@ -318,4 +318,28 @@ class WalletManager {
         await _channel.invokeMethod("queryDigit", {"chainType": chainType, "name": name, "contract_addr": contract_addr});
     return updateMap;
   }
+
+  static btcStart() async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("btcStart");
+    return updateMap;
+  }
+
+  static getSubChainBasicInfo(String genesisHash) async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("getSubChainBasicInfo", {"genesisHash": genesisHash});
+    return updateMap;
+  }
+
+  static updateSubChainBasicInfo(
+      int runtimeVersion, int txVersion, String genesisHash, String metadata, int ss58Format, int tokenDecimals, String tokenSymbol) async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateSubChainBasicInfo", {
+      "runtimeVersion": runtimeVersion,
+      "txVersion": txVersion,
+      "genesisHash": genesisHash,
+      "metadata": metadata,
+      "ss58Format": ss58Format,
+      "tokenDecimals": tokenDecimals,
+      "tokenSymbol": tokenSymbol,
+    });
+    return updateMap;
+  }
 }

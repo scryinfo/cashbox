@@ -430,7 +430,8 @@ public class NativeLib {
         public String ethSignedInfo;        //Sign eth transaction information
         public String inputInfo;            //extra information
         public String storageKeyInfo;       //Account storage key
-        public AccountInfo accountInfo;     //account information 
+        public AccountInfo accountInfo;     //account information
+        public SubChainBasicInfo chainInfo;
     }
 
     //Define EEE chain account information
@@ -457,6 +458,15 @@ public class NativeLib {
         public String blockHash;
     }
 
+    public static class SubChainBasicInfo{
+        public String genesisHash;
+        public String metadata;
+        public int runtimeVersion;
+        public int txVersion;
+        public int ss58Format;
+        public int tokenDecimals;
+        public String tokenSymbol;
+    }
     //Get the assembled original transaction, distinguish the chain type
     //Return: Unsigned transaction String, the format is json format
     //The first parameter is the return value of eeeOpen
@@ -475,6 +485,8 @@ public class NativeLib {
     // Only do information signature, tool function
     public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
 
+    public static native Message getSubChainBasicInfo(String genesisHash);
+    public static native Message updateSubChainBasicInfo(SubChainBasicInfo chainInfo,boolean isDefault);
 
     /**
      * get
