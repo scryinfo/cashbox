@@ -2,8 +2,7 @@ library wallets;
 
 import 'dart:ffi';
 
-import 'wallets_c.dart';
-import 'utils/cdl_kits.dart';
+import 'wallets_c.dart' as _c;
 import 'error.dart';
 
 const _False = 0;
@@ -12,7 +11,7 @@ const _dlName = "wallets_cdl";
 
 class Wallets {
 
-  void _errorFree(Pointer<CError> error){
+  void _errorFree(Pointer<_c.CError> error){
     _c.CError_free(error);
   }
 
@@ -78,15 +77,7 @@ class Wallets {
     // 只能有一个实例
     if (_instance == null) {
       _instance = new Wallets._internal();
-      _instance._init(_dlName);
     }
     return _instance;
-  }
-
-  CWallets _c;
-
-  _init(String dlName) {
-    var dl = dlOpenPlatform(dlName);
-    _c = new CWallets(dl);
   }
 }

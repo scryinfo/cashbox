@@ -59,4 +59,4 @@ ffigen:
   output: 'lib/wallets_c.dart'
   headers:
     entry-points:
-      - '../../bc/wallets_cdl/h/all.h'
+      - '../../bc/wallets_cdl/src/wallets_c.h'

@@ -1,18 +1,15 @@
 
-mod types;
+pub mod types;
 mod types_eth;
 mod types_eee;
 mod types_btc;
 
-mod wallets;
-mod wallets_c;
+pub mod wallets;
 
 mod chain;
 mod chain_eth;
 mod chain_eee;
 mod chain_btc;
-
-pub use crate::wallets_c::{Wallet, Address, TokenShared, ChainShared,EthChain,EeeChain,BtcChain};
 
 #[cfg(test)]
 mod tests {

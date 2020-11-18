@@ -1,7 +1,7 @@
 Setlocal
 set HOST_TAG=aarch64-linux-android
 set NDK=%ANDROID_NDK%
-set cuPath=%cd
+set cuPath=%cd%
 set batPath=%~dp0
 
 set BUILD_DUMMY_WASM_BINARY=1
@@ -15,6 +15,6 @@ set CXX=%TOOLCHAIN%/bin/%HOST_TAG%28-clang++.cmd
 rustup default stable-gnu
 cd %batPath%/..
 cargo build --target %HOST_TAG% --release
-cd %batPath%
+cd %cuPath%
 EndLocal
 
