@@ -1,39 +1,67 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
-import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
+enum Level {
+  Debug,
+  Info,
+  Warn,
+  Error,
+}
+
 class LogUtil {
-  static const perform = const MethodChannel("android_log_channel");
+  Level _level;
+  String _logFileName = "cashbox.log";
 
-  // todo : wait plugin Logger merge code to fix FileOutput problem
-  // Future<Logger> getLogUtilInstance() async {
-  //   Directory directory = await getApplicationDocumentsDirectory();
-  //   String fullPath = directory.path + "/" + "some-log.txt";
-  //   final Logger fileLogger = Logger(output: FileOutput(file: File(fullPath)));
-  //   fileLogger.d();
-  //   fileLogger.v();
-  //   return fileLogger;
-  // }
+  factory LogUtil() => _getInstance();
 
-  static void v(String tag, String message) {
-    perform.invokeMethod('logV', {'tag': tag, 'msg': message});
+  static LogUtil get instance => _getInstance();
+  static LogUtil _instance;
+
+  LogUtil._internal() {
+    //init data
   }
 
-  static void d(String tag, String message) {
-    perform.invokeMethod('logD', {'tag': tag, 'msg': message});
+  static LogUtil _getInstance() {
+    if (_instance == null) {
+      _instance = LogUtil._internal();
+    }
+    return _instance;
   }
 
-  static void i(String tag, String message) {
-    perform.invokeMethod('logI', {'tag': tag, 'msg': message});
+  Future<File> get _logFile async {
+    Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
+    String fullPath = directory.path + "/" + _logFileName;
+    print("log fullPath is " + fullPath.toString());
+    if (!await File(fullPath).exists()) {
+      File(fullPath).create();
+    }
+    return File(fullPath);
   }
 
-  static void w(String tag, String message) {
-    perform.invokeMethod('logW', {'tag': tag, 'msg': message});
+  void d(String tag, String message) async {
+    _level = Level.Debug;
+    _printOut(tag, message);
   }
 
-  static void e(String tag, String message) {
-    perform.invokeMethod('logE', {'tag': tag, 'msg': message});
+  void i(String tag, String message) async {
+    _level = Level.Info;
+    _printOut(tag, message);
+  }
+
+  void w(String tag, String message) async {
+    _level = Level.Warn;
+    _printOut(tag, message);
+  }
+
+  e(String tag, String message) async {
+    _level = Level.Error;
+    _printOut(tag, message);
+  }
+
+  void _printOut(String tag, String message) async {
+    File file = await _logFile;
+    file.writeAsString(_level.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n", flush: true, mode: FileMode.append);
   }
 }

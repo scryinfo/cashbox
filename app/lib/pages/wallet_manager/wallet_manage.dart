@@ -163,7 +163,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                         }
                         Wallet chooseWallet = await Wallets.instance.getWalletByWalletId(Provider.of<WalletManagerProvide>(context).walletId);
                         if (_walletNameController.text == null || _walletNameController.text.isEmpty) {
-                          LogUtil.d("getWalletByWalletId error ===>", "wallet name is null");
+                          LogUtil.instance.d("getWalletByWalletId error ===>", "wallet name is null");
                           return;
                         }
                         bool isRenameSuccess = await chooseWallet.rename(_walletNameController.text);
@@ -276,7 +276,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               Fluttertoast.showToast(msg: translate('success_in_delete_wallet'));
               NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
             } else {
-              LogUtil.e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
+              LogUtil.instance.e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_delete_wallet'));
             }
           },
@@ -301,7 +301,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               mnemonicMap = null; //Related to mnemonic words, empty after use
               NavigatorUtils.push(context, Routes.recoverWalletPage);
             } else {
-              LogUtil.e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
+              LogUtil.instance.e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_recover_wallet_hint'));
             }
           },

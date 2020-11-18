@@ -81,7 +81,7 @@ class EeeSyncTxs {
       try {
         await _loadEeeChainTxHistoryData(runParams);
       } catch (e) {
-        LogUtil.e("_loadEeeChainTxHistoryData error is ",e.toString());
+        LogUtil.instance.e("_loadEeeChainTxHistoryData error is ",e.toString());
       }
       _timing = false;
     });
@@ -232,7 +232,7 @@ class EeeSyncTxs {
 
   static bool _isMapStatusOk(Map returnMap) {
     if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      LogUtil.e("returnMap error is ",returnMap.toString());
+      LogUtil.instance.e("returnMap error is ",returnMap.toString());
       return false;
     }
     return true;

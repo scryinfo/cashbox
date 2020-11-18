@@ -32,10 +32,10 @@ Future requestWithDeviceId(String url, {formData}) async {
       }
     } on PlatformException {
       _deviceData = <String, dynamic>{'Error:': 'Failed to get platform version.'};
-      LogUtil.e("requestWithDeviceId", "unknown target platform");
+      LogUtil.instance.e("requestWithDeviceId", "unknown target platform");
       return;
     } catch (e) {
-      LogUtil.e("requestWithDeviceId", "${e}");
+      LogUtil.instance.e("requestWithDeviceId", "${e}");
       return;
     }
   }
@@ -43,7 +43,7 @@ Future requestWithDeviceId(String url, {formData}) async {
     try {
       appSignInfo = await AppInfoUtil.instance.getAppSignInfo();
     } catch (e) {
-      LogUtil.e("requestWithDeviceId request() error is", "${e}");
+      LogUtil.instance.e("requestWithDeviceId request() error is", "${e}");
       return;
     }
   }
@@ -94,11 +94,11 @@ Future request(String url, {formData}) async {
       return response.data;
     } else {
       print("后端接口出现异常，请检测代码和服务器情况.........");
-      LogUtil.e("后端接口出现异常，请检测代码和服务器情况 ", url.toString());
+      LogUtil.instance.e("后端接口出现异常，请检测代码和服务器情况 ", url.toString());
       throw Exception('后端接口出现异常，请检测代码和服务器情况.........');
     }
   } catch (e) {
-    LogUtil.e("net_util request() error is", "${e}");
+    LogUtil.instance.e("net_util request() error is", "${e}");
     return print('ERROR:======>${e}');
   }
 }
@@ -109,10 +109,10 @@ Future download(url, savePath) async {
     //Dio dio = new Dio();
     //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
     response = await Dio().download(url, savePath);
-    LogUtil.d("net_util download() response is", "${response}");
+    LogUtil.instance.d("net_util download() response is", "${response}");
     return response;
   } catch (e) {
-    LogUtil.e("net_util download() error is", "${e}");
+    LogUtil.instance.e("net_util download() error is", "${e}");
   }
 }
 

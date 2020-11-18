@@ -73,7 +73,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         }
         await updateNativeAuthDigitList(param);
       } catch (e) {
-        LogUtil.e("DigitsManagePage error is=>", e);
+        LogUtil.instance.e("DigitsManagePage error is=>", e);
       }
       if (displayDigitsList.length < onePageOffSet) {
         var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
@@ -297,7 +297,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         return convert.jsonEncode(result["data"]).toString();
       }
     } catch (e) {
-      LogUtil.e("loadServerDigitsData error ", e.toString());
+      LogUtil.instance.e("loadServerDigitsData error ", e.toString());
       return "";
     }
     return "";

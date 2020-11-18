@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> {
               });
             }
           } else {
-            LogUtil.w("digitName is not exist===>", this.displayDigitsList[index].shortName);
+            LogUtil.instance.w("digitName is not exist===>", this.displayDigitsList[index].shortName);
           }
         }
       }
@@ -210,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                       continue;
                     }
                   } catch (e) {
-                    LogUtil.e("_loadingBalanceTimerTask error is =>", e.toString());
+                    LogUtil.instance.e("_loadingBalanceTimerTask error is =>", e.toString());
                   }
                   Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
                   this.displayDigitsList[index].balance = balance;
@@ -226,7 +226,7 @@ class _HomePageState extends State<HomePage> {
                       continue;
                     }
                   } catch (e) {
-                    LogUtil.e("_loadingBalanceTimerTask error is =>", e.toString());
+                    LogUtil.instance.e("_loadingBalanceTimerTask error is =>", e.toString());
                   }
                   this.displayDigitsList[index].balance = balance ?? "";
                   Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
@@ -401,7 +401,7 @@ class _HomePageState extends State<HomePage> {
         future: digitListFuture,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            LogUtil.e("digitList future snapshot.hasError is +>", snapshot.error.toString());
+            LogUtil.instance.e("digitList future snapshot.hasError is +>", snapshot.error.toString());
             return Center(
               child: Text(
                 translate('failure_to_load_data_pls_retry'),
@@ -502,7 +502,7 @@ class _HomePageState extends State<HomePage> {
                   NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);
                   break;
                 default:
-                  LogUtil.e("switch chainType error is --->", "unknown which chainType");
+                  LogUtil.instance.e("switch chainType error is --->", "unknown which chainType");
                   break;
               }
             },
