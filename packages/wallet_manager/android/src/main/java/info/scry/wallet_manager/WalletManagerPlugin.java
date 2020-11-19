@@ -827,7 +827,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 //ScryWalletLog.d("nativeLib storageItem =>", (String) (call.argument("storageItem")));
                 //ScryWalletLog.d("nativeLib pubKey =>", (String) (call.argument("pubKey")));
                 try {
-                    message = NativeLib.eeeStorageKey((String) (call.argument("module")), (String) (call.argument("storageItem")), (String) (call.argument("pubKey")));
+                    message = NativeLib.eeeStorageKey((String) (call.argument("module")), (String) (call.argument("storageItem")), (String) (call.argument("account_str")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "decodeAccountInfo exception is " + exception);
                 }

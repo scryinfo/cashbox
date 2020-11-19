@@ -51,9 +51,9 @@ class ScryXNetUtil {
     return eeeBalance;
   }
 
-  Future<Map> loadEeeStorageMap(String module, String storageItem, String pubKey) async {
+  Future<Map> loadEeeStorageMap(String module, String storageItem, String accountStr) async {
     Map eeeResultMap;
-    String storageKey = await loadEeeStorageKey(module, storageItem, pubKey);
+    String storageKey = await loadEeeStorageKey(module, storageItem, accountStr);
     if (storageKey != null && storageKey.trim() != "") {
       Map netFormatMap = await _loadScryXStorage(storageKey);
       if (netFormatMap != null && netFormatMap.containsKey("result") && netFormatMap["result"] != null) {
@@ -63,8 +63,8 @@ class ScryXNetUtil {
     return eeeResultMap;
   }
 
-  Future<String> loadEeeStorageKey(String module, String storageItem, String pubKey) async {
-    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(module, storageItem, pubKey);
+  Future<String> loadEeeStorageKey(String module, String storageItem, String accountStr) async {
+    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(module, storageItem, accountStr);
     if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
       if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
         return eeeStorageKeyMap["storageKeyInfo"];
@@ -73,9 +73,9 @@ class ScryXNetUtil {
     return null;
   }
 
-  Future<Map> loadTokenXbalance(String tokenx, String balances, String pubKey) async {
+  Future<Map> loadTokenXbalance(String tokenx, String balances, String accountStr) async {
     Map tokenXResultMap;
-    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(tokenx, balances, pubKey);
+    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(tokenx, balances, accountStr);
     if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
       if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
         String storageKeyInfo = eeeStorageKeyMap["storageKeyInfo"];

@@ -496,7 +496,7 @@ public class NativeLib {
      * @param pub_key
      * @return
      */
-    public static native Message eeeStorageKey(String module, String storageItem, String pubKey);
+    public static native Message eeeStorageKey(String module, String storageItem, String account_str);
 
     /**
      * Decode account information queried back from the chain

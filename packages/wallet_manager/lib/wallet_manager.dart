@@ -251,9 +251,9 @@ class WalletManager {
     return decodeMap;
   }
 
-  static eeeStorageKey(String module, String storageItem, String pubKey) async {
+  static eeeStorageKey(String module, String storageItem, String accountStr) async {
     Map<dynamic, dynamic> eeeStorageMap =
-        await _channel.invokeMethod("eeeStorageKey", {"module": module, "storageItem": storageItem, "pubKey": pubKey});
+        await _channel.invokeMethod("eeeStorageKey", {"module": module, "storageItem": storageItem, "account_str": accountStr});
     return eeeStorageMap;
   }
 

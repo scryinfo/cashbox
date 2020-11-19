@@ -176,7 +176,7 @@ class Wallets {
             ..digitId = digitInfoMap["digitId"]
             ..chainId = digitInfoMap["chainId"]
             ..contractAddress = digitInfoMap["contractAddress"]
-            ..address = digitInfoMap["address"]
+            ..address = eeeChain["chainAddress"]   // !attention this differ
             ..shortName = digitInfoMap["shortName"]
             ..fullName = digitInfoMap["fullName"]
             ..balance = digitInfoMap["balance"]
@@ -456,8 +456,8 @@ class Wallets {
   }
 
   //
-  eeeStorageKey(String module, String storageItem, String pubKey) async {
-    Map<dynamic, dynamic> eeeStorageMap = await WalletManager.eeeStorageKey(module, storageItem, pubKey);
+  eeeStorageKey(String module, String storageItem, String accountStr) async {
+    Map<dynamic, dynamic> eeeStorageMap = await WalletManager.eeeStorageKey(module, storageItem, accountStr);
     int status = eeeStorageMap["status"];
     if (status == null || status != 200) {
       LogUtil.instance.e("eeeStorageMap=>", "error status code is" + status.toString() + "||message is=>" + eeeStorageMap["message"].toString());
