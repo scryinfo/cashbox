@@ -33,7 +33,6 @@ class LogUtil {
   Future<File> get _logFile async {
     Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
     String fullPath = directory.path + "/" + _logFileName;
-    print("log fullPath is " + fullPath.toString());
     if (!await File(fullPath).exists()) {
       File(fullPath).create();
     }

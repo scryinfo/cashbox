@@ -201,7 +201,7 @@ class _HomePageState extends State<HomePage> {
 
               if (this.displayDigitsList[index].shortName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
                 Map eeeStorageKeyMap =
-                    await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+                    await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, this.displayDigitsList[index].address);
                 if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
                   try {
                     String eeeFree = eeeStorageKeyMap["free"] ?? "0";
@@ -217,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                 }
               } else if (this.displayDigitsList[index].shortName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
                 Map tokenBalanceMap =
-                    await scryXNetUtil.loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+                    await scryXNetUtil.loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, this.displayDigitsList[index].address);
                 if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
                   try {
                     double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
