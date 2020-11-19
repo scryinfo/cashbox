@@ -1,4 +1,3 @@
-
 pub mod types;
 mod types_eth;
 mod types_eee;
@@ -10,6 +9,9 @@ mod chain;
 mod chain_eth;
 mod chain_eee;
 mod chain_btc;
+
+mod kits;
+
 
 #[cfg(test)]
 mod tests {

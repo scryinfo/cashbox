@@ -22,8 +22,9 @@ pub extern "C" fn addStr(cs: *mut c_char) -> *mut c_char {
 #[no_mangle]
 pub extern "C" fn Str_free(cs: *mut c_char) {
     unsafe {
-        if cs.is_null() { return; }
-        CString::from_raw(cs);
+        if !cs.is_null() {
+            CString::from_raw(cs);
+        }
     };
 }
 

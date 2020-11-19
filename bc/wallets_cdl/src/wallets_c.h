@@ -31,6 +31,8 @@ typedef struct UnInitParameters {
 extern "C" {
 #endif // __cplusplus
 
+void CChar_free(char *cs);
+
 void CError_free(CError *error);
 
 CBool Wallets_lockRead(void);

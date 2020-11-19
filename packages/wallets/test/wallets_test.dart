@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wallets/wallets.dart';
 
 void main() {
-  test('Wallets lock', () {
+  test('Wallets', () {
     var wallet = Wallets.instance();
     var r = wallet.safeRead(() {
       //...

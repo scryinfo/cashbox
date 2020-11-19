@@ -8,8 +8,10 @@ edition = "2018"
 
 [lib]
 path = "src/lib.rs"
-crate-type = ["cdylib","lib"]
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
 libc = "0.2.80"
 wallets = { version = "0.1.0", path = "../wallets" }
+[dev-dependencies]
+pkg-config = "0.3.19"

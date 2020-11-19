@@ -1,4 +1,4 @@
-# 生成一个文件说明（改为使用cbindgen）
+# 生成一个文件说明（改用cbindgen）
 bindgen在生成时，会把头文件包含的内容一起生成，每个文件生成一次，会产生大量重复的定义，所以最后选择生成一个文件
 注：如果使用前置声明也不行，它会把前置声明的struct生成struct
 
@@ -9,3 +9,4 @@ bindgen在生成时，会把头文件包含的内容一起生成，每个文件�
         1. install [llvm](https://releases.llvm.org/)
         2. 设置环境变量： LIBCLANG_PATH = D:\lang\LLVM\bin
 3. cbindgen 
+注：运行脚本 bc/wallets_cdl/script/gen.bat 可以生成.h及.dart文件，并放入正确的位置

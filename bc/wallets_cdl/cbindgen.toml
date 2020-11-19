@@ -177,7 +177,7 @@ private:
 # c_char -> CChar, etc.
 rename_types = "PascalCase"
 # Whether the underscores from the mangled name should be omitted.
-remove_underscores = false
+remove_underscores = true
 
 [layout]
 # A string that should come before the name of any type which has been marked
@@ -494,7 +494,8 @@ clean = false
 # bindings for.
 #
 # default: []
-extra_bindings = ["my_awesome_dep"]
+#extra_bindings = ["my_awesome_dep"]
+extra_bindings = ["awesome_dep"]
 
 [parse.expand]
 # A list of crate names that should be run through `cargo expand` before

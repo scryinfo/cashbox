@@ -4,6 +4,9 @@ set NDK=%ANDROID_NDK%
 set cuPath=%cd%
 set batPath=%~dp0
 
+cd %batPath%/../../../app/dl
+set outPath=%cd%
+
 set BUILD_DUMMY_WASM_BINARY=1
 
 set TOOLCHAIN=%NDK%/toolchains/llvm/prebuilt/windows-x86_64
@@ -17,5 +20,9 @@ set CXX=%TOOLCHAIN%/bin/%HOST_TAG%28-clang++.cmd
 rustup default stable-gnu
 cd %batPath%/..
 cargo build --target %HOST_TAG%  --release
+
+cd %batPath%../../target/aarch64-linux-android/release
+copy /Y "libwallets_cdl.so" "%outPath%/x86"
+
 cd %cuPath%
 EndLocal
