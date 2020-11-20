@@ -57,11 +57,23 @@ impl CStruct for Wallet {
         self.nextId.free();
         self.ethChains.free();
         self.eeeChains.free();
-        self.eeeChains.free();
+        self.btcChains.free();
     }
 }
 
 drop_ctype!(Wallet);
+
+impl Default for Wallet {
+    fn default() -> Self {
+        Self{
+            id: null_mut(),
+            nextId: null_mut(),
+            ethChains: null_mut(),
+            eeeChains: null_mut(),
+            btcChains: null_mut(),
+        }
+    }
+}
 
 #[repr(C)]
 #[derive(Debug, Clone)]
@@ -140,7 +152,14 @@ impl CStruct for UnInitParameters {
     fn free(&mut self) {}
 }
 drop_ctype!(UnInitParameters);
-
+#[repr(C)]
+#[derive(Debug, Clone)]
+pub struct WalletsContext {
+}
+impl CStruct for WalletsContext {
+    fn free(&mut self) {}
+}
+drop_ctype!(WalletsContext);
 #[cfg(test)]
 mod tests {
     use crate::types::CError;

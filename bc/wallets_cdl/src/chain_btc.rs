@@ -2,7 +2,7 @@
 
 use crate::types::{TokenShared, ChainShared, CU64};
 use crate::drop_ctype;
-use crate::kits::CStruct;
+use crate::kits::{CStruct, CArray};
 
 #[repr(C)]
 #[derive(Debug, Clone)]
@@ -22,15 +22,13 @@ drop_ctype!(BtcChainToken);
 #[derive(Debug, Clone)]
 pub struct BtcChain {
     pub chainShared: *mut ChainShared,
-    pub tokens: *mut BtcChainToken,
-    pub tokensLength: CU64,
+    pub tokens: *mut CArray<BtcChainToken>,
 }
 
 impl CStruct for BtcChain {
     fn free(&mut self) {
         self.chainShared.free();
         self.tokens.free();
-        self.tokensLength = 0;
     }
 }
 

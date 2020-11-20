@@ -26,5 +26,7 @@ scry-crypto = { version = "0.1.0", path = "../util/crypto" }
 substratetx = { version = "0.1.0", path = "../util/substratetx" }
 ethtx = { version = "0.1.0", path = "../util/ethtx" }
 
+wallets_types = {vesion="0.1.0", path="../wallets_types"}
+
 [target.'cfg(target_os="android")'.dependencies]
 android_logger = "0.9.0"

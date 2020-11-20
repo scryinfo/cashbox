@@ -10,3 +10,4 @@ export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$LINKER
 cd $batPath/..
 cargo build --release --target  aarch64-linux-android
 cd $cuPath
+

@@ -2,7 +2,7 @@
 
 use crate::types::{TokenShared, ChainShared, Address, CU64};
 use crate::drop_ctype;
-use crate::kits::CStruct;
+use crate::kits::{CStruct, CArray};
 
 #[repr(C)]
 #[derive(Debug, Clone)]
@@ -22,8 +22,7 @@ drop_ctype!(EeeChainToken);
 pub struct EeeChain {
     pub chainShared: *mut ChainShared,
     pub address: *mut Address,
-    pub tokens: *mut EeeChainToken,
-    pub tokensLength: CU64,
+    pub tokens: *mut CArray<EeeChainToken>,
 }
 
 impl CStruct for EeeChain {
@@ -31,7 +30,6 @@ impl CStruct for EeeChain {
         self.chainShared.free();
         self.address.free();
         self.tokens.free();
-        self.tokensLength = 0;
     }
 }
 

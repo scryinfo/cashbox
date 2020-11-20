@@ -2,7 +2,7 @@
 
 use crate::types::{TokenShared, ChainShared, CU64};
 use crate::drop_ctype;
-use crate::kits::CStruct;
+use crate::kits::{CStruct, CArray};
 
 #[repr(C)]
 #[derive(Debug)]
@@ -41,15 +41,13 @@ drop_ctype!(EthChainTokenAuth);
 #[derive(Debug)]
 pub struct EthChain {
     pub chain_shared: *mut ChainShared,
-    pub tokens: *mut EthChainToken,
-    pub tokens_length: CU64,
+    pub tokens: *mut CArray<EthChainToken>,
 }
 
 impl CStruct for EthChain {
     fn free(&mut self) {
         self.chain_shared.free();
         self.tokens.free();
-        self.tokens_length = 0;
     }
 }
 
