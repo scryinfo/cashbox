@@ -129,22 +129,23 @@ pub mod another {
     #[no_mangle]
     #[allow(non_snake_case)]
     pub extern "system" fn Java_JniApi_btcTxSignAndBroadcast(
-        _env: JNIEnv<'_>,
+        env: JNIEnv<'_>,
         _class: JClass<'_>,
         _from_address: JString<'_>,
+        _to_address: JString<'_>,
         _wallet_id: JString<'_>,
         _to: JString<'_>,
         _value: JString<'_>,
     ) -> jboolean {
-        // let from_address = env.get_string(from_address).unwrap();
-        // let from_address = from_address.to_str().unwrap();
-        // let wallet_id = env.get_string(wallet_id).unwrap();
-        // let wallet_id = wallet_id.to_str().unwrap();
-        // let to_address = env.get_string(to_address).unwrap();
-        // let to_address = to_address.to_str().unwrap();
-        // let value = env.get_string(value).unwrap();
-        // let value = value.to_str().unwrap();
-        // let value = value.parse::<u64>().unwrap();
+        // let _from_address = env.get_string(_from_address).unwrap();
+        // let _from_address = _from_address.to_str().unwrap();
+        // let _wallet_id = env.get_string(_wallet_id).unwrap();
+        // let _wallet_id = _wallet_id.to_str().unwrap();
+        // let _to_address = env.get_string(_to_address).unwrap();
+        // let _to_address = _to_address.to_str().unwrap();
+        // let _value = env.get_string(_value).unwrap();
+        // let _value = _value.to_str().unwrap();
+        // let _value = _value.parse::<u64>().unwrap();
 
         unimplemented!()
     }
