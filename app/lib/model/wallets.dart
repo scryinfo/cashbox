@@ -176,7 +176,7 @@ class Wallets {
             ..digitId = digitInfoMap["digitId"]
             ..chainId = digitInfoMap["chainId"]
             ..contractAddress = digitInfoMap["contractAddress"]
-            ..address = eeeChain["chainAddress"]   // !attention this differ
+            ..address = eeeChain["chainAddress"] // !attention this differ
             ..shortName = digitInfoMap["shortName"]
             ..fullName = digitInfoMap["fullName"]
             ..balance = digitInfoMap["balance"]
@@ -398,9 +398,8 @@ class Wallets {
     return eeeTxSignMap;
   }
 
-  Future<Map> eeeTransfer(
-      String from, String to, String value, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
-    Map eeeTxSignMap = await WalletManager.eeeTransfer(from, to, value, genesisHash, index, runtimeVersion, txVersion, pwd);
+  Future<Map> eeeTransfer(String from, String to, String value, int index, Uint8List pwd) async {
+    Map eeeTxSignMap = await WalletManager.eeeTransfer(from, to, value, index, pwd);
     int status = eeeTxSignMap["status"];
     if (status == null || status != 200) {
       LogUtil.instance.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
@@ -408,9 +407,8 @@ class Wallets {
     return eeeTxSignMap;
   }
 
-  Future<Map> tokenXTransfer(
-      String from, String to, String value, String extData, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
-    Map tokenXTxSignMap = await WalletManager.tokenXTransfer(from, to, value, extData, genesisHash, index, runtimeVersion, txVersion, pwd);
+  Future<Map> tokenXTransfer(String from, String to, String value, String extData, int index, Uint8List pwd) async {
+    Map tokenXTxSignMap = await WalletManager.tokenXTransfer(from, to, value, extData, index, pwd);
     int status = tokenXTxSignMap["status"];
     if (status == null || status != 200) {
       LogUtil.instance.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + tokenXTxSignMap["message"]);

@@ -449,25 +449,15 @@ class _TransferEeePageState extends State<TransferEeePage> {
             Map eeeTransferMap;
             Config config = await HandleConfig.instance.getConfig();
             if (digitName != null && digitName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
-              eeeTransferMap = await Wallets.instance.eeeTransfer(
-                  Wallets.instance.nowWallet.nowChain.chainAddress,
-                  _toAddressController.text.toString(),
-                  _txValueController.text.toString(),
-                  genesisHash,
-                  nonce,
-                  runtimeVersion,
-                  txVersion,
-                  Uint8List.fromList(pwd.codeUnits));
+              eeeTransferMap = await Wallets.instance.eeeTransfer(Wallets.instance.nowWallet.nowChain.chainAddress,
+                  _toAddressController.text.toString(), _txValueController.text.toString(), nonce, Uint8List.fromList(pwd.codeUnits));
             } else if (digitName != null && digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
               eeeTransferMap = await Wallets.instance.tokenXTransfer(
                   Wallets.instance.nowWallet.nowChain.chainAddress,
                   _toAddressController.text.toString(),
                   _txValueController.text.toString(),
                   Utils.uint8ListToHex(Uint8List.fromList((_backupMsgController.text == "" ? "00" : _backupMsgController.text).codeUnits)),
-                  genesisHash,
                   nonce,
-                  runtimeVersion,
-                  txVersion,
                   Uint8List.fromList(pwd.codeUnits));
             } else {
               Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);

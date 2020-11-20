@@ -10,10 +10,9 @@ import 'dart:convert' as convert;
 
 class RunParams {
   final String address;
-  final String pubKey;
   final ChainType chainType;
 
-  RunParams(this.address, this.pubKey, this.chainType);
+  RunParams(this.address, this.chainType);
 }
 
 class EeeSyncTxs {
@@ -22,7 +21,6 @@ class EeeSyncTxs {
 
   EeeSyncTxs._internal(Chain chain)
       : _address = chain.chainAddress,
-        _pubKey = chain.pubKey,
         _chainType = chain.chainType {
     // 初始化
   }
@@ -48,7 +46,6 @@ class EeeSyncTxs {
   }
 
   final String _address;
-  final String _pubKey;
   final ChainType _chainType;
   Timer _timer;
   bool _timing = false;
@@ -59,9 +56,9 @@ class EeeSyncTxs {
 
   _start() async {
     Config config = await HandleConfig.instance.getConfig();
-    RunParams runParams = new RunParams(_address, _pubKey, _chainType);
-    _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.pubKey);
-    _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.pubKey);
+    RunParams runParams = new RunParams(_address, _chainType);
+    _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
+    _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
     _threadRun(runParams);
   }
 
@@ -81,7 +78,7 @@ class EeeSyncTxs {
       try {
         await _loadEeeChainTxHistoryData(runParams);
       } catch (e) {
-        LogUtil.instance.e("_loadEeeChainTxHistoryData error is ",e.toString());
+        LogUtil.instance.e("_loadEeeChainTxHistoryData error is ", e.toString());
       }
       _timing = false;
     });
@@ -115,10 +112,10 @@ class EeeSyncTxs {
 
     {
       if (_eeeStorageKey == null || _eeeStorageKey.isEmpty) {
-        _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.pubKey);
+        _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
       }
       if (_tokenXStorageKey == null || _tokenXStorageKey.isEmpty) {
-        _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.pubKey);
+        _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
       }
       if (_eeeStorageKey == null ||
           _eeeStorageKey.isEmpty ||
@@ -232,7 +229,7 @@ class EeeSyncTxs {
 
   static bool _isMapStatusOk(Map returnMap) {
     if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      LogUtil.instance.e("returnMap error is ",returnMap.toString());
+      LogUtil.instance.e("returnMap error is ", returnMap.toString());
       return false;
     }
     return true;

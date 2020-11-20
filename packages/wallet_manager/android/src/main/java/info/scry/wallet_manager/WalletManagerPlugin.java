@@ -507,8 +507,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 try {
                     message = NativeLib.tokenXTransfer((String) (call.argument("from")),
                             (String) (call.argument("to")), (String) (call.argument("value")), (String) (call.argument("extData")),
-                            (String) (call.argument("genesisHash")), (int) (call.argument("index")), (int) (call.argument("runtime_version")),
-                            (int) (call.argument("tx_version")), (byte[]) (call.argument("pwd")));
+                            (int) (call.argument("index")), (byte[]) (call.argument("pwd")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "eeeEnergyTransfer exception is " + exception);
                 }
@@ -644,10 +643,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                         (String) (call.argument("from")),
                         (String) (call.argument("to")),
                         (String) (call.argument("value")),
-                        (String) (call.argument("genesisHash")),
                         (int) (call.argument("index")),
-                        (int) (call.argument("runtime_version")),
-                        (int) (call.argument("tx_version")),
                         (byte[]) (call.argument("pwd")));
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
@@ -825,7 +821,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Message message = new Message();
                 //ScryWalletLog.d("nativeLib module =>", (String) (call.argument("module")));
                 //ScryWalletLog.d("nativeLib storageItem =>", (String) (call.argument("storageItem")));
-                //ScryWalletLog.d("nativeLib pubKey =>", (String) (call.argument("pubKey")));
+                //ScryWalletLog.d("nativeLib account_str =>", (String) (call.argument("account_str")));
                 try {
                     message = NativeLib.eeeStorageKey((String) (call.argument("module")), (String) (call.argument("storageItem")), (String) (call.argument("account_str")));
                 } catch (Exception exception) {
@@ -1147,7 +1143,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "getSubChainBasicInfo exception is " + exception);
                 }
-                ScryWalletLog.d("nativeLib=>", "message is  ===>"+message.toString());
+                ScryWalletLog.d("nativeLib=>", "message is  ===>" + message.toString());
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
                 int status = message.status;
