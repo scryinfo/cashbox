@@ -205,34 +205,15 @@ class WalletManager {
     return eeeTxSignMap;
   }
 
-  static Future<Map<dynamic, dynamic>> eeeTransfer(
-      String from, String to, String value, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
-    Map<dynamic, dynamic> eeeTxSignMap = await _channel.invokeMethod("eeeTransfer", {
-      "from": from,
-      "to": to,
-      "value": value,
-      "genesisHash": genesisHash,
-      "index": index,
-      "runtime_version": runtimeVersion,
-      "tx_version": txVersion,
-      "pwd": pwd
-    });
+  static Future<Map<dynamic, dynamic>> eeeTransfer(String from, String to, String value, int index, Uint8List pwd) async {
+    Map<dynamic, dynamic> eeeTxSignMap =
+        await _channel.invokeMethod("eeeTransfer", {"from": from, "to": to, "value": value, "index": index, "pwd": pwd});
     return eeeTxSignMap;
   }
 
-  static Future<Map<dynamic, dynamic>> tokenXTransfer(
-      String from, String to, String value, String extData, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
-    Map<dynamic, dynamic> tokenXTxSignMap = await _channel.invokeMethod("tokenXTransfer", {
-      "from": from,
-      "to": to,
-      "value": value,
-      "extData": extData,
-      "genesisHash": genesisHash,
-      "index": index,
-      "runtime_version": runtimeVersion,
-      "tx_version": txVersion,
-      "pwd": pwd
-    });
+  static Future<Map<dynamic, dynamic>> tokenXTransfer(String from, String to, String value, String extData, int index, Uint8List pwd) async {
+    Map<dynamic, dynamic> tokenXTxSignMap =
+        await _channel.invokeMethod("tokenXTransfer", {"from": from, "to": to, "value": value, "extData": extData, "index": index, "pwd": pwd});
     return tokenXTxSignMap;
   }
 
