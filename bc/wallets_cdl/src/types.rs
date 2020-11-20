@@ -1,20 +1,19 @@
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
 
-pub use crate::types_eth::{*};
-pub use crate::types_eee::{*};
-pub use crate::types_btc::{*};
-
-pub use crate::chain::{*};
-pub use crate::chain_eth::{*};
-pub use crate::chain_eee::{*};
-pub use crate::chain_btc::{*};
-pub use crate::kits::{CU64, CBool, CTrue, CFalse};
-
 use std::os::raw::c_char;
 use std::ptr::null_mut;
-use crate::kits::{CStruct};
+
+pub use crate::chain::{*};
+pub use crate::chain_btc::{*};
+pub use crate::chain_eee::{*};
+pub use crate::chain_eth::{*};
 use crate::drop_ctype;
+pub use crate::kits::{CBool, CFalse, CTrue, CU64};
+use crate::kits::{CArray, CStruct, free_c_char};
+pub use crate::types_btc::{*};
+pub use crate::types_eee::{*};
+pub use crate::types_eth::{*};
 
 #[repr(C)]
 #[derive(Debug, Clone)]
@@ -65,7 +64,7 @@ drop_ctype!(Wallet);
 
 impl Default for Wallet {
     fn default() -> Self {
-        Self{
+        Self {
             id: null_mut(),
             nextId: null_mut(),
             ethChains: null_mut(),
@@ -154,12 +153,46 @@ impl CStruct for UnInitParameters {
 drop_ctype!(UnInitParameters);
 #[repr(C)]
 #[derive(Debug, Clone)]
-pub struct WalletsContext {
-}
-impl CStruct for WalletsContext {
+pub struct Context {}
+
+impl CStruct for Context {
     fn free(&mut self) {}
 }
-drop_ctype!(WalletsContext);
+drop_ctype!(Context);
+
+#[no_mangle]
+pub extern "C" fn CStr_free(cs: *mut c_char) {
+    let mut t = cs;//由于 free_c_char 会把参数的值修改为空，所以这里要定义一个临时变量，
+    free_c_char(&mut t);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CError_free(error: *mut CError) {
+    if !error.is_null() {
+        Box::from_raw(error);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn Wallet_alloc() -> *mut Wallet {
+    Box::into_raw(Box::new(Wallet::default()))
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Wallet_free(ptr: *mut Wallet) {
+    Box::from_raw(ptr);
+}
+
+#[no_mangle]
+pub extern "C" fn CArrayWallet_alloc() -> *mut CArray<Wallet> {
+    Box::into_raw(Box::new(CArray::<Wallet>::default()))
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CArrayWallet_free(ptr: *mut CArray<Wallet>) {
+    Box::from_raw(ptr);
+}
+
 #[cfg(test)]
 mod tests {
     use crate::types::CError;

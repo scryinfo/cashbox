@@ -208,6 +208,20 @@ typedef _CError_free_Dart = void Function(
   Pointer<CError> error,
 );
 
+/// C function `CStr_free`.
+void CStr_free(
+  Pointer<ffi.Utf8> cs,
+) {
+  _CStr_free(cs);
+}
+final _CStr_free_Dart _CStr_free = _dl.lookupFunction<_CStr_free_C, _CStr_free_Dart>('CStr_free');
+typedef _CStr_free_C = Void Function(
+  Pointer<ffi.Utf8> cs,
+);
+typedef _CStr_free_Dart = void Function(
+  Pointer<ffi.Utf8> cs,
+);
+
 /// C struct `ChainShared`.
 class ChainShared extends Struct {
   
@@ -222,6 +236,20 @@ class ChainShared extends Struct {
 
   static ChainShared from(int ptr) {
     return Pointer<ChainShared>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C struct `Context`.
+class Context extends Struct {
+  
+  static Pointer<Context> allocate() {
+    return ffi.allocate<Context>();
+  }
+
+
+  static Context from(int ptr) {
+    return Pointer<Context>.fromAddress(ptr).ref;
   }
 
 }
@@ -358,34 +386,42 @@ class Wallet extends Struct {
 
 }
 
-/// C struct `WalletsContext`.
-class WalletsContext extends Struct {
-  
-  static Pointer<WalletsContext> allocate() {
-    return ffi.allocate<WalletsContext>();
-  }
-
-
-  static WalletsContext from(int ptr) {
-    return Pointer<WalletsContext>.fromAddress(ptr).ref;
-  }
-
+/// C function `Wallet_alloc`.
+Pointer<Wallet> Wallet_alloc() {
+  return _Wallet_alloc();
 }
+final _Wallet_alloc_Dart _Wallet_alloc = _dl.lookupFunction<_Wallet_alloc_C, _Wallet_alloc_Dart>('Wallet_alloc');
+typedef _Wallet_alloc_C = Pointer<Wallet> Function();
+typedef _Wallet_alloc_Dart = Pointer<Wallet> Function();
+
+/// C function `Wallet_free`.
+void Wallet_free(
+  Pointer<Wallet> ptr,
+) {
+  _Wallet_free(ptr);
+}
+final _Wallet_free_Dart _Wallet_free = _dl.lookupFunction<_Wallet_free_C, _Wallet_free_Dart>('Wallet_free');
+typedef _Wallet_free_C = Void Function(
+  Pointer<Wallet> ptr,
+);
+typedef _Wallet_free_Dart = void Function(
+  Pointer<Wallet> ptr,
+);
 
 /// C function `Wallets_all`.
 Pointer<CError> Wallets_all(
-  Pointer<WalletsContext> ctx,
+  Pointer<Context> ctx,
   Pointer<CArrayWallet> ptr,
 ) {
   return _Wallets_all(ctx, ptr);
 }
 final _Wallets_all_Dart _Wallets_all = _dl.lookupFunction<_Wallets_all_C, _Wallets_all_Dart>('Wallets_all');
 typedef _Wallets_all_C = Pointer<CError> Function(
-  Pointer<WalletsContext> ctx,
+  Pointer<Context> ctx,
   Pointer<CArrayWallet> ptr,
 );
 typedef _Wallets_all_Dart = Pointer<CError> Function(
-  Pointer<WalletsContext> ctx,
+  Pointer<Context> ctx,
   Pointer<CArrayWallet> ptr,
 );
 

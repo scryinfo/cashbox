@@ -11,20 +11,6 @@ typedef struct CError {
     char *message;
 } CError;
 
-typedef uint16_t CBool;
-
-typedef struct InitParameters {
-    uint64_t code;
-} InitParameters;
-
-typedef struct UnInitParameters {
-    uint64_t code;
-} UnInitParameters;
-
-typedef struct WalletsContext {
-
-} WalletsContext;
-
 typedef struct Address {
     char *id;
     char *walletId;
@@ -126,6 +112,20 @@ typedef struct CArrayWallet {
     CU64 cap;
 } CArrayWallet;
 
+typedef uint16_t CBool;
+
+typedef struct InitParameters {
+    uint64_t code;
+} InitParameters;
+
+typedef struct UnInitParameters {
+    uint64_t code;
+} UnInitParameters;
+
+typedef struct Context {
+
+} Context;
+
 #define CFalse 0
 
 #define CTrue 1
@@ -136,9 +136,19 @@ typedef struct CArrayWallet {
 extern "C" {
 #endif // __cplusplus
 
-void CChar_free(char *cs);
+void CStr_free(char *cs);
 
 void CError_free(CError *error);
+
+Wallet *Wallet_alloc(void);
+
+void Wallet_free(Wallet *ptr);
+
+CArrayWallet *CArrayWallet_alloc(void);
+
+void CArrayWallet_free(CArrayWallet *ptr);
+
+void CChar_free(char *cs);
 
 CBool Wallets_lockRead(void);
 
@@ -152,11 +162,7 @@ const CError *Wallets_init(InitParameters *params);
 
 const CError *Wallets_uninit(UnInitParameters *params);
 
-const CError *Wallets_all(WalletsContext *ctx, CArrayWallet *ptr);
-
-CArrayWallet *CArrayWallet_alloc(void);
-
-void CArrayWallet_free(CArrayWallet *ptr);
+const CError *Wallets_all(Context *ctx, CArrayWallet *ptr);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -1,8 +1,8 @@
 #![allow(non_snake_case)]
 
-use crate::types::{TokenShared, ChainShared, CU64};
 use crate::drop_ctype;
-use crate::kits::{CStruct, CArray};
+use crate::kits::{CArray, CStruct};
+use crate::types::{ChainShared, TokenShared};
 
 #[repr(C)]
 #[derive(Debug, Clone)]

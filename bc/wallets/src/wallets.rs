@@ -29,5 +29,10 @@ impl Wallets{
     pub fn all(&mut self, ctx: &mut WalletsContext, ws: &mut Vec::<Wallet>) -> Error {
         Error{}
     }
+}
 
+impl Default for Wallets{
+    fn default() -> Self {
+        Self{}
+    }
 }
