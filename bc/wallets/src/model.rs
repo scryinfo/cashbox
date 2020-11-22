@@ -109,6 +109,7 @@ pub struct EeeTxRecord{
 
 #[derive(Debug, Default, Clone)]
 pub struct SubChainBasicInfo {
+    pub info_id:String,
     pub genesis_hash: String,
     pub metadata: String,
     pub runtime_version: i32,

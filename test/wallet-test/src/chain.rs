@@ -538,6 +538,9 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateSubChainBasicIn
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("findNativeLib$Message");
     let state_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
 
+    let info_id_jvalue = env.get_field(chainInfo,"infoId","Ljava/lang/String;").expect("get infoId");
+    let info_id =string_convert(&env,&info_id_jvalue).unwrap_or("".to_string());
+
     let genesis_hash_jvalue = env.get_field(chainInfo,"genesisHash","Ljava/lang/String;").expect("get genesis hash");
     let genesis_hash =string_convert(&env,&genesis_hash_jvalue).expect("convert genesis hash");
     let metadata_value = env.get_field(chainInfo,"metadata","Ljava/lang/String;").expect("get genesis hash");
@@ -555,7 +558,8 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateSubChainBasicIn
     let symbol = env.get_field(chainInfo,"tokenSymbol","Ljava/lang/String;").expect("get token symbol");
     let symbol_str =string_convert(&env,&symbol).unwrap_or("Unit".to_string());
 
-    let chain_info_detail = SubChainBasicInfo {
+    let mut chain_info_detail = SubChainBasicInfo {
+        info_id,
         genesis_hash,
         metadata,
         runtime_version,
@@ -566,9 +570,12 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateSubChainBasicIn
     };
 
     let eee = wallets::module::EEE {};
-    match eee.update_chain_basic_info(chain_info_detail,isDefault !=0){
-        Ok(_) => {
+    match eee.update_chain_basic_info(&chain_info_detail,isDefault !=0){
+        Ok(info_id) => {
+            chain_info_detail.info_id = info_id;
+           let basic_info_obj =  get_basic_info_obj(&env,&chain_info_detail);
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("eeeSign set StatusCode value");
+            env.set_field(state_obj, "chainInfo", "Linfo/scry/wallet_manager/NativeLib$SubChainBasicInfo;", JValue::Object(JObject::from(basic_info_obj))).expect("getSubChainBasicInfo set chainInfo")
         }
         Err(msg) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("eeeSign set StatusCode value");
@@ -579,13 +586,33 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_updateSubChainBasicIn
 }
 
 fn string_convert(env: &JNIEnv,jvalue:&JValue)->Option<String>  {
-    let value = JString::from(jvalue.l().unwrap());
-    let result: Option<String>= env.get_string(value).map(|value| value.into()).ok();
-    result
+    if let Ok(value) = jvalue.l(){
+        let value = JString::from(value);
+        let result: Option<String>= env.get_string(value).map(|value| value.into()).ok();
+        result
+    }else{
+        None
+    }
+
 }
+
+fn get_basic_info_obj(env: &JNIEnv,info_dec:&SubChainBasicInfo)-> jobject{
+    let basic_info_class = env.find_class("info/scry/wallet_manager/NativeLib$SubChainBasicInfo").expect("findNativeLib$SubChainBasicInfo");
+    let basic_info_obj = env.alloc_object(basic_info_class).expect("create NativeLib$SubChainBasicInfo instance ");
+    env.set_field(basic_info_obj, "infoId", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info_dec.info_id).unwrap()))).expect("basic info obj set genesis_hash value ");
+    env.set_field(basic_info_obj, "genesisHash", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info_dec.genesis_hash).unwrap()))).expect("basic info obj set genesis_hash value ");
+    env.set_field(basic_info_obj, "metadata", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info_dec.metadata).unwrap()))).expect("basic info obj set metadata value ");
+    env.set_field(basic_info_obj, "runtimeVersion", "I", JValue::Int(info_dec.runtime_version)).expect("basic info  obj set runtime_version value ");
+    env.set_field(basic_info_obj, "txVersion", "I", JValue::Int(info_dec.tx_version)).expect("basic info obj set tx_version value ");
+    env.set_field(basic_info_obj, "ss58Format", "I", JValue::Int(info_dec.ss58_format)).expect("basic info obj set ss58_format value ");
+    env.set_field(basic_info_obj, "tokenDecimals", "I", JValue::Int(info_dec.token_decimals)).expect("basic info obj set StatusCode value ");
+    env.set_field(basic_info_obj, "tokenSymbol", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info_dec.token_symbol).unwrap()))).expect("basic info obj set token_symbol value ");
+    *basic_info_obj
+}
+
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getSubChainBasicInfo(env: JNIEnv, _class: JClass, genesisHash: JString) -> jobject {
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getSubChainBasicInfo(env: JNIEnv, _class: JClass, genesisHash: JString,spec_ver:jint,tx_version:jint) -> jobject {
     let wallet_state_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("findNativeLib$Message");
     let msg_obj = env.alloc_object(wallet_state_class).expect("create NativeLib$Message instance ");
     let genesis_hash: JniResult<String> = env.get_string(genesisHash).map(|value| value.into());
@@ -593,19 +620,12 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_getSubChainBasicInfo(
    match genesis_hash {
        Ok(hash) => {
            let eee = wallets::module::EEE {};
-           match eee.query_chain_basic_info(&hash) {
+           match eee.query_chain_basic_info(&hash,spec_ver as u32,tx_version as u32) {
                Ok(infos) => {
                    if let Some(info) = infos.get(0) {
-                       let basic_info_class = env.find_class("info/scry/wallet_manager/NativeLib$SubChainBasicInfo").expect("findNativeLib$SubChainBasicInfo");
-                       let basic_info_obj = env.alloc_object(basic_info_class).expect("create NativeLib$SubChainBasicInfo instance ");
-                       env.set_field(basic_info_obj, "genesisHash", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info.genesis_hash).unwrap()))).expect("basic info obj set genesis_hash value ");
-                       env.set_field(basic_info_obj, "metadata", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info.metadata).unwrap()))).expect("basic info obj set metadata value ");
-                       env.set_field(basic_info_obj, "runtimeVersion", "I", JValue::Int(info.runtime_version)).expect("basic info  obj set runtime_version value ");
-                       env.set_field(basic_info_obj, "txVersion", "I", JValue::Int(info.tx_version)).expect("basic info obj set tx_version value ");
-                       env.set_field(basic_info_obj, "ss58Format", "I", JValue::Int(info.ss58_format)).expect("basic info obj set ss58_format value ");
-                       env.set_field(basic_info_obj, "tokenDecimals", "I", JValue::Int(info.token_decimals)).expect("basic info obj set StatusCode value ");
-                       env.set_field(basic_info_obj, "tokenSymbol", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info.token_symbol).unwrap()))).expect("basic info obj set token_symbol value ");
-                       env.set_field(msg_obj, "chainInfo", "Linfo/scry/wallet_manager/NativeLib$SubChainBasicInfo;", JValue::Object(JObject::from(basic_info_obj))).expect("getSubChainBasicInfo set chainInfo")
+                      let basic_info_obj =  get_basic_info_obj(&env,info);
+                       env.set_field(msg_obj, "chainInfo", "Linfo/scry/wallet_manager/NativeLib$SubChainBasicInfo;", JValue::Object(JObject::from(basic_info_obj))).expect("getSubChainBasicInfo set chainInfo");
+                       env.set_field(msg_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("getSubChainBasicInfo set StatusCode value ");
                    } else {
                        env.set_field(msg_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("getSubChainBasicInfo set StatusCode value ");
                        env.set_field(msg_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("not target chain info".to_string()).unwrap()))).expect("getSubChainBasicInfo set message value");

@@ -519,11 +519,13 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
         }
         let meta = match metadata.1 {
             RuntimeMetadata::V12(meta) => meta,
+           // RuntimeMetadata::V11(meta)=>meta,
             _ => return Err(ConversionError::InvalidVersion.into()),
         };
         let mut modules = HashMap::new();
         let mut modules_with_calls = HashMap::new();
         let mut modules_with_events = HashMap::new();
+        let mut event_module_index = 0;
         for module in convert(meta.modules)?.into_iter() {
             let module_name = convert(module.name.clone())?;
 
@@ -570,11 +572,12 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                 modules_with_events.insert(
                     module_name.clone(),
                     ModuleWithEvents {
-                        index: module.index,
+                        index: event_module_index,
                         name: module_name.clone(),
                         events: event_map,
                     },
                 );
+               // event_module_index = event_module_index+1;
             }
         }
         Ok(Metadata {

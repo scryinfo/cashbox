@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with substrate-subxt.  If not, see <http://www.gnu.org/licenses/>.
 
+use super::*;
 use std::{
     collections::{HashMap, HashSet},
     convert::TryFrom,
@@ -35,6 +36,12 @@ pub enum SystemEvent {
     ExtrinsicSuccess(DispatchInfo),
     /// An extrinsic failed.
     ExtrinsicFailed(DispatchError, DispatchInfo),
+    /// `:code` was updated.
+    CodeUpdated,
+    /// A new \[account\] was created.
+    NewAccount(AccountId),
+    /// An \[account\] was reaped.
+    KilledAccount(AccountId),
 }
 
 /// Top level Event that can be produced by a substrate runtime
@@ -90,6 +97,7 @@ impl TryFrom<Metadata> for EventsDecoder {
         decoder.register_type_size::<u32>("u32")?;
         decoder.register_type_size::<u64>("u64")?;
         decoder.register_type_size::<u32>("AccountIndex")?;
+        decoder.register_type_size::<u32>("EraIndex")?;
         decoder.register_type_size::<u32>("SessionIndex")?;
         decoder.register_type_size::<u32>("PropIndex")?;
         decoder.register_type_size::<u32>("ProposalIndex")?;
@@ -199,13 +207,14 @@ impl EventsDecoder {
         let mut r = Vec::new();
         for _ in 0..len {
             // decode EventRecord
-            log::debug!("Decoding phase: {:?}", input);
+            //log::debug!("Decoding phase: {:?}", input);
+            println!("Decoding phase: {:?}", input);
             let phase = Phase::decode(input)?;
             let module_variant = input.read_byte()?;
 
             let module = self.metadata.module_with_events(module_variant)?;
             let event = if module.name() == "System" {
-                log::debug!("Decoding system event, intput: {:?}", input);
+                println!("Decoding system event, intput: {:?}", input);
                 let system_event = SystemEvent::decode(input)?;
                 log::debug!("Decoding successful, system_event: {:?}", system_event);
                 RuntimeEvent::System(system_event)

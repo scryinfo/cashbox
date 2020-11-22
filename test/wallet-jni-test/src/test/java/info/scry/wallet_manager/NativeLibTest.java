@@ -117,23 +117,27 @@ public class NativeLibTest {
         }
     }
 
-    @Test
-    public void updateSubChainBasicInfoTest() throws Throwable{
-        Map header = new HashMap<String, String>();
-        header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://127.0.0.1:9933"), header);
-        // Get the  genesis hash  {"id":1,"jsonrpc":"2.0","method":"chain_getBlockHash","params":[0]}
-       String genesisHash = client.invoke("chain_getBlockHash", new Object[]{0}, String.class);
+    NativeLib.Message saveSubChainBasicInfo(JsonRpcHttpClient client,String blackHash,boolean isDetault) throws Throwable{
+        if (client ==null){
+            return null;
+        }
+        String genesisHash = client.invoke("chain_getBlockHash", new Object[]{0}, String.class);
         System.out.println("genesis hash is:"+genesisHash);
-       // get version info {"id":2,"jsonrpc":"2.0","method":"state_getRuntimeVersion","params":[]}
-        Map version = client.invoke("state_getRuntimeVersion", new Object[]{}, HashMap.class);
+
+        String queryBlackHash = null;
+        if (blackHash!=null&&!blackHash.trim().isEmpty()){
+            queryBlackHash = blackHash;
+        }
+
+        // get version info {"id":2,"jsonrpc":"2.0","method":"state_getRuntimeVersion","params":[]}
+        Map version = client.invoke("state_getRuntimeVersion", queryBlackHash==null?new Object[]{}:new Object[]{queryBlackHash}, HashMap.class);
         System.out.println("version is:"+version);
         // get ss58Format,tokenSymbol,tokenDecimals  {"id":4,"jsonrpc":"2.0","method":"system_properties","params":[]}
-        Map properties = client.invoke("system_properties", new Object[]{}, HashMap.class);
+        Map properties = client.invoke("system_properties",  new Object[]{}, HashMap.class);
         System.out.println("properties is:"+properties);
         // get metadata detail: {"id":7,"jsonrpc":"2.0","method":"state_getMetadata","params":[]}
-        String metadata = client.invoke("state_getMetadata", new Object[]{}, String.class);
-      //  System.out.println("metadata is:"+metadata);
+        String metadata = client.invoke("state_getMetadata",  queryBlackHash==null?new Object[]{}:new Object[]{queryBlackHash}, String.class);
+        //  System.out.println("metadata is:"+metadata);
         Integer runtime_version = (Integer) version.get("specVersion");
         Integer tx_version = (Integer) version.get("transactionVersion");
         NativeLib.SubChainBasicInfo info = new NativeLib.SubChainBasicInfo(genesisHash,metadata,runtime_version,tx_version);
@@ -146,14 +150,22 @@ public class NativeLibTest {
             info.tokenDecimals = decimals;
         }
 
-        NativeLib.Message message = NativeLib.updateSubChainBasicInfo(info,true);
+        return NativeLib.updateSubChainBasicInfo(info,isDetault);
+    }
+
+    @Test
+    public void updateSubChainBasicInfoTest() throws Throwable{
+        Map header = new HashMap<String, String>();
+        header.put("Content-Type", "application/json");
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
+        NativeLib.Message message = saveSubChainBasicInfo(client,null,true);
         System.out.println(message);
     }
 
     @Test
     public void getSubChainBasicInfoTest(){
         //0x7fa792d0aff5e5529e0125faf969f7adfd65894b962e24681f18eab116975a20
-        NativeLib.Message msg= NativeLib.getSubChainBasicInfo("");
+        NativeLib.Message msg= NativeLib.getSubChainBasicInfo("",null,null);
         System.out.println(msg);
     }
 
@@ -167,7 +179,7 @@ public class NativeLibTest {
     @Test
     public void eeeAccountInfoKeyTest() {
         // NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
-        NativeLib.Message msg = NativeLib.eeeStorageKey("System","Account","5CRq2XF4BVaAWT72q7NaQdVZTajD12yDTu6YegyWAAxpDHah");
+        NativeLib.Message msg = NativeLib.eeeStorageKey("System","Account","5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX");
         System.out.println(msg);
         String account_1 = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
         NativeLib.Message key2 = NativeLib.eeeStorageKey("TokenX","Balances",account_1);
@@ -230,7 +242,7 @@ public class NativeLibTest {
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
         //  String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
-        String account_1 = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
+        String account_1 = "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
 
@@ -259,6 +271,7 @@ public class NativeLibTest {
 
         String endBlockHash = "";//Get the last blockhash
         int endBlockNumber = 0;
+        String genesisHash = client.invoke("chain_getBlockHash", new Object[]{0}, String.class);
         for (int i = 0; i < query_times; i++) {
             //1-3000 3001-6000
 
@@ -276,6 +289,19 @@ public class NativeLibTest {
             // System.out.println(storage.toString());
             System.out.println("*********************StorageChange end**************");
             for (StorageChange item : storage) {
+                //check chain basic info exist
+                Map version = client.invoke("state_getRuntimeVersion", new Object[]{item.block}, HashMap.class);
+
+                NativeLib.Message targetBasicInfo= NativeLib.getSubChainBasicInfo(genesisHash,(Integer)version.get("specVersion"),(Integer)version.get("transactionVersion"));
+                if (targetBasicInfo.status!=200){
+                    //this version chain basic info not exist,should save into database!
+                    NativeLib.Message save_ret = saveSubChainBasicInfo(client,item.block,false);
+                    if (save_ret.status!=200){
+                        return;
+                    }
+                    //
+                    targetBasicInfo = save_ret;
+                }
                 //Read details of status changes
                 System.out.println("block hash:" + item.block + ",changes:" + item.changes.toString());
                 Block block_detail = client.invoke("chain_getBlock", new Object[]{item.block}, Block.class);
@@ -288,11 +314,12 @@ public class NativeLibTest {
                 String extrinsicsDetail = new JSONArray(tx_list).toString();
                 System.out.println("block_detail:" + extrinsicsDetail);
                 //JSONArray
-                String event_detal = client.invoke("state_getStorage", new Object[]{eventKeyPrefix, item.block}, String.class);
+                String event_detail = client.invoke("state_getStorage", new Object[]{eventKeyPrefix, item.block}, String.class);
                 //Decode the obtained notification details and decode them. If there is a transfer transaction, store the transaction details in the database
-                NativeLib.Message msg = NativeLib.saveExtrinsicDetail(account_1, event_detal, item.block, extrinsicsDetail);
+                NativeLib.Message msg = NativeLib.saveExtrinsicDetail(targetBasicInfo.chainInfo.infoId,account_1, event_detail, item.block, extrinsicsDetail);
                 if (msg.status != 200) {
                     System.out.println(msg.message);
+                    return;
                 }
             }
             System.out.println("start update sync record,endBlockNumber is:" + endBlockNumber + ",endBlockHash is:" + endBlockHash);
@@ -301,7 +328,6 @@ public class NativeLibTest {
             if (update_result.status != 200) {
                 System.out.println("update message is:" + update_result.message);
             }
-
         }
 
     }

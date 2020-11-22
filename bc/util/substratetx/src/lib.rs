@@ -106,7 +106,7 @@ mod tests {
     const RUNTIME_VERSION: u32 = 6;
     const URL: &'static str = "ws://192.168.1.7:9944";
     const GENESIS_HASH: &'static str = "0x7fa792d0aff5e5529e0125faf969f7adfd65894b962e24681f18eab116975a20";
-    const METADATA_REQ: &'static str = r#"{"id":1,"jsonrpc":"2.0","method":"state_getMetadata","params":[]}"#;
+    const METADATA_REQ: &'static str = r#"{"id":1,"jsonrpc":"2.0","method":"state_getMetadata","params":["0x27eccde07c9d5f45d40a66993c6a3dee5d97e52578c2f0ab4d157871cbc10956"]}"#;
 
     pub mod rpc;
 
@@ -150,12 +150,13 @@ mod tests {
 
     #[test]
     fn decode_event_test() {
+        env_logger::init();
         let metadata_hex = get_request(URL, METADATA_REQ).unwrap();
         let genesis_byte = hexstr_to_vec(GENESIS_HASH).unwrap();
-        let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15));
-        assert!(helper.is_ok());
-        let helper = helper.unwrap();
-        let event_str = r#"0x0c00000000000000482d7c09000000000200000001000000080554065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f1cbd2d43530a44705ad088af313e18f80b53ef16b36177cd4b77b846f2a5f07cc80000000000000000000000000000000000010000000000801d2c0400000000000000"#;
+        let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15)).expect("get metadata");
+
+       // let event_str = r#"0x0400000000000000482d7c0900000000020000"#;
+        let event_str = r#"0x1400000000000000482d7c090000000002000000010000000003664a2a9fe87200d0b0f96a525c75f0b016d534995fa9b1be1c9419d2b075176f0000010000000500664a2a9fe87200d0b0f96a525c75f0b016d534995fa9b1be1c9419d2b075176f000082dfe40d470000000000000000000000010000000502d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d664a2a9fe87200d0b0f96a525c75f0b016d534995fa9b1be1c9419d2b075176f000082dfe40d47000000000000000000000001000000000068663b0a00000000000000"#;
         let decode_ret = helper.decode_events(event_str, None);
         println!("decode event is:{:?}",decode_ret);
         assert!(decode_ret.is_ok());

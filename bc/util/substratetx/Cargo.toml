@@ -40,6 +40,7 @@ balances = {version = '2.0.0', package = "pallet-balances",default-features = fa
 
 [dev-dependencies]
 ws = {version = "0.9.1", features = ["ssl"]}
+env_logger="0.8.2"
 
 [features]
 default = ['std']

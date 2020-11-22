@@ -12,6 +12,8 @@ struct RawTx {
     func_data: Vec<u8>,
     index: u32,
     genesis_hash: H256,
+    spec_version: u32,
+    tx_version:u32,
 }
 
 //Subsequent modification of the name to ScryX?, the current open source version does not yet support the function call of the module
@@ -40,7 +42,7 @@ impl EEE {
 
         let mn = self.decode_mnemonic_by_address(from,psw)?;
         let instance = wallet_db::DataServiceProvider::instance()?;
-        let chain_info = instance.get_sub_chain_info(None)?;
+        let chain_info = instance.get_sub_chain_info(None,0,0)?;
         if let Some(info) = chain_info.get(0){
             let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
             let helper = substratetx::SubChainHelper::init(&info.metadata,&genesis_hash[..],info.runtime_version as u32,info.tx_version as u32,None)?;
@@ -57,7 +59,8 @@ impl EEE {
         let mn = self.decode_mnemonic_by_address(from,psw)?;
         let ext_vec = substratetx::hexstr_to_vec(ext_data)?;
         let instance = wallet_db::DataServiceProvider::instance()?;
-        let chain_info = instance.get_sub_chain_info(None)?;
+        //use default chain basic info;
+        let chain_info = instance.get_sub_chain_info(None,0,0)?;
         if let Some(info) = chain_info.get(0){
             let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
             let helper = substratetx::SubChainHelper::init(&info.metadata,&genesis_hash[..],info.runtime_version as u32,info.tx_version as u32,None)?;
@@ -71,7 +74,7 @@ impl EEE {
 
     pub fn save_tx_record(&self, account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
         let instance = wallet_db::DataServiceProvider::instance()?;
-        let chain_info = instance.get_sub_chain_info(None)?;
+        let chain_info = instance.get_sub_chain_info(None,0,0)?;
         // default chain genesis hash  definitely exists
         let info = chain_info.get(0).unwrap();
         let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
@@ -177,7 +180,7 @@ impl EEE {
         let mn = String::from_utf8(mnemonic.mn)?;
         let instance = wallet_db::DataServiceProvider::instance()?;
         let genesis_hash_str =format!("0x{}",hex::encode(tx.genesis_hash));
-        let chain_infos= instance.get_sub_chain_info(Some(&genesis_hash_str))?;
+        let chain_infos= instance.get_sub_chain_info(Some(&genesis_hash_str),tx.spec_version,tx.tx_version)?;
         if let Some(chain_info) =chain_infos.get(0) {
             let chain_helper = substratetx::SubChainHelper::init(&chain_info.metadata,&tx.genesis_hash[..],chain_info.runtime_version as u32,chain_info.tx_version as u32,None)?;
             let sign_data =   chain_helper.tx_sign(&mn,  tx.index, &self.restore_func_data(&tx.func_data))?;
@@ -212,26 +215,27 @@ impl EEE {
         Ok(hex_data)
     }
     //update chain basic info,eg:metadata,genesis hash,runtime version tx version etc,which will be used to structure extrinsic encode or decode function
-    pub fn update_chain_basic_info(&self,info:SubChainBasicInfo,is_default:bool)->WalletResult<()> {
+    pub fn update_chain_basic_info(&self,info:&SubChainBasicInfo,is_default:bool)->WalletResult<String> {
         let instance = wallet_db::DataServiceProvider::instance()?;
-         instance.update_sub_chain_info(&info,is_default)
+       instance.update_sub_chain_info(info,is_default)
     }
 
-    pub fn query_chain_basic_info(&self,genesis_hash:&str)->WalletResult<Vec<SubChainBasicInfo>>{
+    pub fn query_chain_basic_info(&self,genesis_hash:&str,spec_vers:u32,tx_vers:u32)->WalletResult<Vec<SubChainBasicInfo>>{
         let instance = wallet_db::DataServiceProvider::instance()?;
+        log::info!("query genesis hash is{}",genesis_hash);
         let genesis_hash = genesis_hash.trim();
         let genesis_final = if genesis_hash.trim().is_empty() {
             None
         }else {
             Some(genesis_hash)
         };
-        instance.get_sub_chain_info(genesis_final)
+        instance.get_sub_chain_info(genesis_final,spec_vers,tx_vers)
     }
 
     pub fn encode_account_storage_key(&self,module: String, storage: String, account: &str)->WalletResult<String> {
         let instance = wallet_db::DataServiceProvider::instance()?;
-        let chain_infos = instance.get_sub_chain_info(None)?;
-        if let Some(chain_info) = chain_infos.get(0) {
+        let chain_infos = instance.get_sub_chain_info(None,0,0)?;
+        if let Some(chain_info) = chain_infos.get(0){
             let genesis_hash = substratetx::hexstr_to_vec(&chain_info.genesis_hash)?;
             let account_id = substratetx::AccountId::from_ss58check(account).map_err(|err|WalletError::SubstrateTx(substratetx::error::Error::Public(err)))?;
             let chain_helper = substratetx::SubChainHelper::init(&chain_info.metadata, &genesis_hash[..], chain_info.runtime_version as u32, chain_info.tx_version as u32, None)?;

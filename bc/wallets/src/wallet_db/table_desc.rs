@@ -116,7 +116,8 @@ pub fn get_cashbox_wallet_detail_sql() -> &'static str {
 
  DROP TABLE IF EXISTS [main].[SubChainInfo];
     CREATE TABLE [main].[SubChainInfo](
-    [genesis_hash] VARCHAR(64) PRIMARY KEY NOT NULL,
+    [info_id] VARCHAR(64) PRIMARY KEY NOT NULL,
+    [genesis_hash] VARCHAR(64),
     [metadata]  TEXT,
     [runtime_version] INT,
     [tx_version]  INT,

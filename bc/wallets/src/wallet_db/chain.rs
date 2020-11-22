@@ -215,49 +215,78 @@ impl DataServiceProvider {
         Ok(records)
     }
 
-    pub fn get_sub_chain_info(&self, genesis_hash_str:Option<&str>) ->WalletResult<Vec<SubChainBasicInfo>>{
-        let  start_sql = "select * from detail.SubChainInfo where status = 1";
+    pub fn get_sub_chain_info(&self, genesis_hash_str:Option<&str>,spec_vers :u32,tx_vers:u32) ->WalletResult<Vec<SubChainBasicInfo>>{
+
+        let  start_sql = "select info_id,genesis_hash,metadata,runtime_version,tx_version,ss58_format_prefix,token_decimals,token_symbol from detail.SubChainInfo where status = 1";
         let after_prefix = if genesis_hash_str.is_some(){
-            "and genesis_hash = ?;"
+            "and genesis_hash = ? and runtime_version = ? and tx_version =?;"
         }else {
             "and is_default = ?;"
         };
+
         let query_sql = format!("{} {}",start_sql,after_prefix);
+        log::info!("query sql is:{}",query_sql);
         let mut select_stat = self.db_hander.prepare(query_sql)?;
         if let Some(hash) = genesis_hash_str {
             select_stat.bind(1, hash)?;
+            select_stat.bind(2, spec_vers as i64)?;
+            select_stat.bind(3, tx_vers as i64)?;
         }else{
             select_stat.bind(1, 1)?;
         }
         let mut infos = Vec::new();
+
         while let State::Row = select_stat.next().unwrap() {
+            log::info!("start deal State::Row wrap SubChainBasicInfo class is over");
             let status = model::SubChainBasicInfo {
-                genesis_hash:select_stat.read::<String>(0).unwrap(),
-                metadata:select_stat.read::<String>(1).unwrap(),
-                runtime_version:select_stat.read::<i64>(2).map(|val| val as i32).unwrap(),
-                tx_version:select_stat.read::<i64>(3).map(|val|val as i32).unwrap(),
-                ss58_format:select_stat.read::<i64>(4).map(|val|val as i32).unwrap(),
-                token_decimals:select_stat.read::<i64>(5).map(|val|val as i32).unwrap(),
-                token_symbol:select_stat.read::<String>(6).unwrap(),
+                info_id:select_stat.read::<String>(0).expect("info id"),
+                genesis_hash:select_stat.read::<String>(1).expect("genesis_hash"),
+                metadata:select_stat.read::<String>(2).expect("metadata"),
+                runtime_version:select_stat.read::<i64>(3).map(|val| val as i32).expect("runtime_version"),
+                tx_version:select_stat.read::<i64>(4).map(|val|val as i32).expect("tx_version"),
+                ss58_format:select_stat.read::<i64>(5).map(|val|val as i32).expect("ss58_format"),
+                token_decimals:select_stat.read::<i64>(6).map(|val|val as i32).expect("token_decimals"),
+                token_symbol:select_stat.read::<String>(7).expect("token_symbol"),
             };
             infos.push(status);
         }
+        log::info!("query chain info length is:{}",infos.len());
        Ok(infos)
     }
 
-    pub fn update_sub_chain_info(&self,basic_info:&SubChainBasicInfo,is_default:bool)->WalletResult<()>{
+    pub fn update_sub_chain_info(&self,basic_info:&SubChainBasicInfo,is_default:bool)->WalletResult<String>{
+        //check chain basic info is exist?
+        let query_sql = "select info_id from detail.SubChainInfo a where a.runtime_version = ? and a.tx_version = ? and a. genesis_hash = ?;";
+        let mut query_stat = self.db_hander.prepare(query_sql)?;
+        query_stat.bind(1, basic_info.runtime_version as i64)?;
+        query_stat.bind(2, basic_info.tx_version as i64)?;
+        query_stat.bind(3, basic_info.genesis_hash.as_str())?;
+        if let State::Row = query_stat.next().unwrap() {
+            let info_id = query_stat.read::<String>(0).expect("info id");
+            Ok(info_id)
+        }else{
+            let info_id = Uuid::new_v4().to_string();
+            log::info!("insert chain basic info id is: {}",info_id);
+            let prefix_sql = "update detail.SubChainInfo set is_default = 0;";
+            if is_default{
+                log::info!("reset default basic chain info");
+                self.db_hander.execute(prefix_sql)?;
+            }
+            let insert_update_sql = "insert into detail.SubChainInfo(info_id,genesis_hash,metadata,runtime_version,tx_version,ss58_format_prefix,token_decimals,token_symbol,is_default) values(?,?,?,?,?,?,?,?,?);";
+            let mut stat = self.db_hander.prepare(insert_update_sql)?;
+            stat.bind(1, info_id.as_str())?;
+            stat.bind(2, basic_info.genesis_hash.as_str())?;
+            stat.bind(3, basic_info.metadata.as_str())?;
+            stat.bind(4, basic_info.runtime_version as i64)?;
+            stat.bind(5, basic_info.tx_version as i64)?;
+            stat.bind(6, basic_info.ss58_format as i64)?;
+            stat.bind(7, basic_info.token_decimals as i64)?;
+            stat.bind(8, basic_info.token_symbol.as_str())?;
+            stat.bind(9, is_default as i64)?;
 
-        let insert_update_sql = "replace into detail.SubChainInfo(genesis_hash,metadata,runtime_version,tx_version,ss58_format_prefix,token_decimals,token_symbol,is_default) values(?,?,?,?,?,?,?,?)";
-        let mut stat = self.db_hander.prepare(insert_update_sql)?;
-        stat.bind(1, basic_info.genesis_hash.as_str())?;
-        stat.bind(2, basic_info.metadata.as_str())?;
-        stat.bind(3, basic_info.runtime_version as i64)?;
-        stat.bind(4, basic_info.tx_version as i64)?;
-        stat.bind(5, basic_info.ss58_format as i64)?;
-        stat.bind(6, basic_info.token_decimals as i64)?;
-        stat.bind(7, basic_info.token_symbol.as_str())?;
-        stat.bind(8, is_default as i64)?;
-        stat.next().map(|_| ()).map_err(|err| err.into())
+            stat.next().map(|_| info_id).map_err(|err| err.into())
+        }
+
     }
 
 }

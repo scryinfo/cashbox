@@ -645,6 +645,7 @@ public class NativeLib {
     }
 
     public static class SubChainBasicInfo{
+        public String infoId;
         public String genesisHash;
         public String metadata;
         public int runtimeVersion;
@@ -663,7 +664,8 @@ public class NativeLib {
         @Override
         public String toString() {
             return "SubChainBasicInfo{" +
-                    "genesisHash='" + genesisHash + '\'' +
+                    "infoId='" + infoId + '\'' +
+                    ", genesisHash='" + genesisHash + '\'' +
                     ", metadata='" + metadata + '\'' +
                     ", runtimeVersion=" + runtimeVersion +
                     ", txVersion=" + txVersion +
@@ -703,14 +705,14 @@ public class NativeLib {
      *
      * @return  if return Message `status` value is Ok and `chainInfo` field representative the basic info detail
      */
-   public static native Message getSubChainBasicInfo(String genesisHash);
+   public static native Message getSubChainBasicInfo(String genesisHash,Integer specVersion,Integer txVersion);
     //For the key corresponding to the EEE account information, enter the address to be queried, for example: 5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4,
     //  return the encoded key
     // :0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9f2fb387cbda1c4133ab4fd78aadb38d89effc1668ca381c242885516ec9fa2b19c67b6684c02a8a3237b6862e5c8cd7e
     //Construct jsonrpc request data format {"id":37,"jsonrpc":"2.0","method":"state_subscribeStorage","params":[["key"]]]}
     public static native Message eeeStorageKey(String module,String storageItem,String addr);
 
-    public static native Message saveExtrinsicDetail(String accountId,String eventDetail,String blockHash,String extrinsics);
+    public static native Message saveExtrinsicDetail(String infoId,String accountId,String eventDetail,String blockHash,String extrinsics);
     //Used to record the currently synchronized block number
     public static native Message updateEeeSyncRecord(String account,int chain_type,int block_num,String block_hash);
     //Get the currently synchronized block number

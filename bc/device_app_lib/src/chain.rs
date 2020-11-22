@@ -863,14 +863,15 @@ pub mod android {
                         if let Some(info) = infos.get(0) {
                             let basic_info_class = env.find_class("info/scry/wallet_manager/NativeLib$SubChainBasicInfo").expect("findNativeLib$SubChainBasicInfo");
                             let basic_info_obj = env.alloc_object(basic_info_class).expect("create NativeLib$SubChainBasicInfo instance ");
-                            env.set_field(basic_info_obj, "genesisHash", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info.genesis_hash).unwrap()))).expect("basic info obj set genesis_hash value ");
-                            env.set_field(basic_info_obj, "metadata", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info.metadata).unwrap()))).expect("basic info obj set metadata value ");
+                            env.set_field(basic_info_obj, "genesisHash", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info.genesis_hash).expect("new genesis field")))).expect("basic info obj set genesis_hash value ");
+                            env.set_field(basic_info_obj, "metadata", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info.metadata).expect("new metadata field")))).expect("basic info obj set metadata value ");
                             env.set_field(basic_info_obj, "runtimeVersion", "I", JValue::Int(info.runtime_version)).expect("basic info  obj set runtime_version value ");
                             env.set_field(basic_info_obj, "txVersion", "I", JValue::Int(info.tx_version)).expect("basic info obj set tx_version value ");
                             env.set_field(basic_info_obj, "ss58Format", "I", JValue::Int(info.ss58_format)).expect("basic info obj set ss58_format value ");
                             env.set_field(basic_info_obj, "tokenDecimals", "I", JValue::Int(info.token_decimals)).expect("basic info obj set StatusCode value ");
-                            env.set_field(basic_info_obj, "tokenSymbol", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info.token_symbol).unwrap()))).expect("basic info obj set token_symbol value ");
-                            env.set_field(msg_obj, "chainInfo", "Linfo/scry/wallet_manager/NativeLib$SubChainBasicInfo;", JValue::Object(JObject::from(basic_info_obj))).expect("getSubChainBasicInfo set chainInfo")
+                            env.set_field(basic_info_obj, "tokenSymbol", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(&info.token_symbol).expect("new token_symbol field")))).expect("basic info obj set token_symbol value ");
+                            env.set_field(msg_obj, "chainInfo", "Linfo/scry/wallet_manager/NativeLib$SubChainBasicInfo;", JValue::Object(JObject::from(basic_info_obj))).expect("getSubChainBasicInfo set chainInfo");
+                            env.set_field(msg_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("getSubChainBasicInfo set StatusCode value ");
                         } else {
                             env.set_field(msg_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("getSubChainBasicInfo set StatusCode value ");
                             env.set_field(msg_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("not target chain info".to_string()).unwrap()))).expect("getSubChainBasicInfo set message value");

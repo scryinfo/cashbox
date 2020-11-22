@@ -94,6 +94,9 @@ impl ChainHelper {
                         SystemEvent::ExtrinsicFailed(_dispatch_error, _dispatch_info) => {
                             tx_result.insert(index, false);
                         }
+                        _ =>{
+                            log::info!("this event info is ignore")
+                        }
                     }
                 }
                 RuntimeEvent::Raw(raw)
