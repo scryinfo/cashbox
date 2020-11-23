@@ -1,4 +1,4 @@
-//! mod for jniapi main function launch
+// start in jniapi same as start function
 
 #![cfg(target_os="android")]
 #![allow(non_snake_case)]

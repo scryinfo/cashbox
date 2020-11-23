@@ -130,12 +130,12 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcTxSign(
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcTxSignAndBroadcast(
-    env: JNIEnv,
+    _env: JNIEnv,
     _class: JClass,
-    from_address: JString,
-    wallet_id: JString,
-    to: JString,
-    value: JString,
+    _from_address: JString,
+    _wallet_id: JString,
+    _to: JString,
+    _value: JString,
 ) -> jboolean {
     // let from_address = env.get_string(from_address).unwrap();
     // let from_address = from_address.to_str().unwrap();
