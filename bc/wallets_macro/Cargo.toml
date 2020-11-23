@@ -1,0 +1,14 @@
+[package]
+name = "wallets_macro"
+version = "0.1.0"
+authors = ["Peace <peacess@163.com>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1.0.50"
+quote = "1.0.7"
+proc-macro2 = "1.0.24"
+proc_macro_roids = "0.7.0"

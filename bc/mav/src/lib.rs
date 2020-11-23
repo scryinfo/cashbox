@@ -1,5 +1,8 @@
+#[macro_use]
+extern crate rbatis_macro_driver;
 
 mod ma;
+mod kits;
 
 #[cfg(test)]
 mod tests {
