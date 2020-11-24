@@ -5,6 +5,8 @@ use std::mem::ManuallyDrop;
 use std::os::raw::c_char;
 use std::ptr::null_mut;
 
+use wallets_macro::{DlStruct,DlDefault};
+
 pub type CBool = u16;
 
 pub const CFalse: CBool = 0;
@@ -90,7 +92,7 @@ macro_rules! drop_ctype {
 /// c的数组需要定义两个字段，所定义一个结构体进行统一管理
 /// 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
 #[repr(C)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone)] //,DlStruct,DlDefault
 pub struct CArray<T: CStruct> {
     ptr: *mut T,
     //数组指针，变量命名参考 rust Vec
@@ -157,7 +159,7 @@ mod tests {
     use std::ptr::null_mut;
 
     #[test]
-    fn test_Array() {
+    fn c_array() {
         struct Data {}
         impl CStruct for Data {
             fn free(&mut self) {}

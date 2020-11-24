@@ -1,17 +1,23 @@
+
+use rbatis::crud::CRUDEnable;
+use serde::Deserialize;
+use serde::Serialize;
+use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+
+use crate::kits;
+use crate::ma::db::{self, Shared};
 use crate::ma::TokenShared;
 
 //eth
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainTokenShared {
-    //primary key
-    pub id: String,
     pub token_shared: TokenShared,
 }
 
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainTokenAuth {
-    //primary key
-    pub id: String,
     /// [EthChainTokenShared]
     pub chain_token_shared_id: String,
     /// 显示位置，以此从小到大排列
@@ -19,10 +25,9 @@ pub struct EthChainTokenAuth {
 }
 
 /// DefaultToken must be a [EthChainTokenAuth]
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainTokenDefault {
-    //primary key
-    pub id: String,
     /// [crate::db::TokenShared]
     pub chain_token_shared_id: String,
 

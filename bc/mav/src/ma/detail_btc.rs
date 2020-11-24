@@ -1,17 +1,22 @@
+use rbatis::crud::CRUDEnable;
+use serde::Deserialize;
+use serde::Serialize;
+use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+
+use crate::kits;
+use crate::ma::db::{self, Shared};
 use crate::ma::TokenShared;
 
 //btc
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct BtcChainTokenShared {
-    //primary key
-    pub id: String,
     pub token_shared: TokenShared,
 }
 
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct BtcChainTokenAuth {
-    //primary key
-    pub id: String,
     /// [BtcChainTokenShared]
     pub chain_token_shared_id: String,
     /// 显示位置，以此从小到大排列
@@ -19,10 +24,9 @@ pub struct BtcChainTokenAuth {
 }
 
 /// DefaultToken must be a [BtcChainTokenAuth]
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct BtcChainTokenDefault {
-    //primary key
-    pub id: String,
     /// [BtcChainTokenShared]
     pub chain_token_shared_id: String,
 

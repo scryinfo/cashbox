@@ -1,10 +1,17 @@
-use crate::ma::{TxShared};
+
+use rbatis::crud::CRUDEnable;
+use serde::Deserialize;
+use serde::Serialize;
+use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+
+use crate::kits;
+use crate::ma::db::{self, Shared};
+use crate::ma::TxShared;
 
 //btc
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct BtcChainToken {
-    //primary key
-    pub id: String,
     pub next_id: String,
     /// 手动加入的token就没有token shared内容
     /// [crate::db::BtcChainTokenShared]
@@ -20,10 +27,10 @@ pub struct BtcChainToken {
     pub decimal: i32,
 }
 
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct BtcChainTx {
     pub tx_shared: TxShared,
-
     pub total_input: String,
     pub total_output: String,
     pub fees: String,
@@ -32,9 +39,9 @@ pub struct BtcChainTx {
     // ...
 }
 
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct BtcInputTx {
-    pub id: String,
     pub btc_chain_tx_id: String,
 
     pub index: i64,
@@ -45,9 +52,9 @@ pub struct BtcInputTx {
     // ...
 }
 
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct BtcOutputTx {
-    pub id: String,
     pub btc_chain_tx_id: String,
     pub index: i64,
     pub address: String,

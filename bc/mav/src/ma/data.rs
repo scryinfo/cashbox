@@ -1,8 +1,16 @@
+
+use rbatis::crud::CRUDEnable;
+use serde::Deserialize;
+use serde::Serialize;
+use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+
+use crate::kits;
+use crate::ma::db::{self, Shared};
+
 /// 地址与token对应的balance
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct TokenAddress {
-    //primary key
-    pub id: String,
     pub wallet_id: String,
     /// [crate::ChainType]
     pub chain_type: String,
@@ -10,27 +18,15 @@ pub struct TokenAddress {
     pub address_id: String,
 
     pub balance: String,
-
-    /// 数据库中的创建时间
-    pub create_time: i64,
-    /// 数据库中的更新时间
-    pub update_time: i64,
 }
 
 /// 没有对应的数据库表
-#[derive(Default, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct TxShared {
-    //primary key
-    pub id: String,
     pub tx_hash: String,
     pub block_hash: String,
     pub block_number: String,
     /// 交易的byte数据，不同链格式不一样
     pub tx_bytes: String,
-
-    /// 数据库中的创建时间
-    pub create_time: i64,
-    /// 数据库中的更新时间
-    pub update_time: i64,
 }
 

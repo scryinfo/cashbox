@@ -4,33 +4,18 @@ use crate::drop_ctype;
 use crate::kits::{CArray, CStruct};
 use crate::types::{Address, ChainShared, TokenShared};
 
+use wallets_macro::{DlStruct,DlDefault};
+
 #[repr(C)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone,DlStruct,DlDefault)]
 pub struct EeeChainToken {
     pub tokenShared: *mut TokenShared,
 }
 
-impl CStruct for EeeChainToken {
-    fn free(&mut self) {
-        self.tokenShared.free();
-    }
-}
-
-drop_ctype!(EeeChainToken);
 #[repr(C)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone,DlStruct,DlDefault)]
 pub struct EeeChain {
     pub chainShared: *mut ChainShared,
     pub address: *mut Address,
     pub tokens: *mut CArray<EeeChainToken>,
 }
-
-impl CStruct for EeeChain {
-    fn free(&mut self) {
-        self.chainShared.free();
-        self.address.free();
-        self.tokens.free();
-    }
-}
-
-drop_ctype!(EeeChain);

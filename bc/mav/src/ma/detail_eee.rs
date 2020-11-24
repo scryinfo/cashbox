@@ -1,17 +1,23 @@
+
+use rbatis::crud::CRUDEnable;
+use serde::Deserialize;
+use serde::Serialize;
+use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+
+use crate::kits;
+use crate::ma::db::{self, Shared};
 use crate::ma::TokenShared;
 
 // eee
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EeeChainTokenShared {
-    //primary key
-    pub id: String,
     pub token_shared: TokenShared,
 }
 
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EeeChainTokenAuth {
-    //primary key
-    pub id: String,
     /// [EeeChainTokenShared]
     pub chain_token_shared_id: String,
     /// 显示位置，以此从小到大排列
@@ -19,10 +25,9 @@ pub struct EeeChainTokenAuth {
 }
 
 /// DefaultToken must be a [EeeChainTokenAuth]
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EeeChainTokenDefault {
-    //primary key
-    pub id: String,
     /// [EeeChainTokenShared]
     pub chain_token_shared_id: String,
 

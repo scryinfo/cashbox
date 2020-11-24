@@ -1,7 +1,14 @@
-#[derive(Default, Clone)]
+use rbatis::crud::CRUDEnable;
+use serde::Deserialize;
+use serde::Serialize;
+use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+
+use crate::kits;
+use crate::ma::db::{self, Shared};
+
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct Wallet {
-    //primary key
-    pub id: String,
     //下一个显示顺序的 wallet_id
     pub next_id: String,
     pub full_name: String,
@@ -11,31 +18,21 @@ pub struct Wallet {
     pub wallet_type: String,
     /// [crate::NetType]
     pub net_type: String,
-    /// 数据库中的创建时间
-    pub create_time: i64,
-    /// 数据库中的更新时间
-    pub update_time: i64,
 }
 
 //每一种链类型一条记录，
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct ChainTypeMeta {
-    //primary key
-    pub id: String,
     /// [crate::ChainType]
     pub chain_type: String,
     pub short_name: String,
     pub full_name: String,
-    /// 数据库中的创建时间
-    pub create_time: i64,
-    /// 数据库中的更新时间
-    pub update_time: i64,
 }
 
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct Address {
-    //primary key
-    pub id: String,
     /// [Wallet]
     pub wallet_id: String,
     /// [crate::ChainType]
@@ -44,24 +41,19 @@ pub struct Address {
     pub public_key: String,
     /// 是否为钱包地址
     pub wallet_address: bool,
-
-    /// 数据库中的创建时间
-    pub create_time: i64,
-    /// 数据库中的更新时间
-    pub update_time: i64,
 }
 
 /// 动态库自己的配置，并不指app的配置
 /// todo app的配置是否要放到这里？
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct Setting {
-    pub id: String,
     /// 由于value可能会是数据库的关键字，所以加上str
     pub value_str: String,
 }
 
 /// 没有对应的数据库表
-#[derive(Default, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct TokenShared {
     /// [crate::ChainType]
     pub chain_type: String,

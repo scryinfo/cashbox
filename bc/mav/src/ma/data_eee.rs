@@ -1,10 +1,17 @@
-use crate::ma::{TxShared};
+
+use rbatis::crud::CRUDEnable;
+use serde::Deserialize;
+use serde::Serialize;
+use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+
+use crate::kits;
+use crate::ma::db::{self, Shared};
+use crate::ma::TxShared;
 
 //eee
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EeeChainToken {
-    //primary key
-    pub id: String,
     pub next_id: String,
     /// 手动加入的token就没有token shared内容
     /// [crate::db::EeeChainTokenShared]
@@ -21,7 +28,8 @@ pub struct EeeChainToken {
 }
 
 /// eee chain的交易
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EeeChainTx {
     pub tx_shared: TxShared,
 
@@ -39,7 +47,8 @@ pub struct EeeChainTx {
     pub extension: String,
 }
 
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EeeTokenxTx {
     pub tx_shared: TxShared,
 

@@ -1,13 +1,21 @@
+
+use rbatis::crud::CRUDEnable;
+use serde::Deserialize;
+use serde::Serialize;
+use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+
+use crate::kits;
+use crate::ma::db::{self, Shared};
 use std::fmt;
-use crate::ma::{TxShared};
+
+use crate::ma::TxShared;
 
 //eth
 
 /// eth链的token
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainToken {
-    //primary key
-    pub id: String,
     pub next_id: String,
     /// 手动加入的token就没有token shared内容
     /// [crate::db::BtcChainTokenShared]
@@ -29,10 +37,10 @@ pub struct EthChainToken {
 }
 
 /// eth chain的交易，包含eth，erc20等
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainTx {
     pub tx_shared: TxShared,
-
     /// [crate::TxStatus]
     pub status: String,
     /// 链上的时间戳
@@ -95,9 +103,9 @@ impl fmt::Display for EthErc20Face {
     }
 }
 
-#[derive(Default, Clone)]
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthErc20Tx {
-    pub id: String,
     pub eth_chain_tx_id: String,
     pub contract_address: String,
     /// [Erc20::transfer] 与 [Erc20::transferFrom]此地址有值，其余为""
