@@ -690,15 +690,15 @@ class Wallets {
     await WalletManager.btcStart();
   }
 
-  Future<Map> getSubChainBasicInfo(String genesisHash) async {
-    Map updateMap = await WalletManager.getSubChainBasicInfo(genesisHash);
+  Future<Map> getSubChainBasicInfo(String genesisHash, int specVersion, int txVersion) async {
+    Map updateMap = await WalletManager.getSubChainBasicInfo(genesisHash, specVersion, txVersion);
     return updateMap;
   }
 
-  Future<Map> updateSubChainBasicInfo(
-      int runtimeVersion, int txVersion, String genesisHash, String metadata, int ss58Format, int tokenDecimals, String tokenSymbol) async {
+  Future<Map> updateSubChainBasicInfo(String infoId, int runtimeVersion, int txVersion, String genesisHash, String metadata, int ss58Format,
+      int tokenDecimals, String tokenSymbol) async {
     Map updateMap =
-        await WalletManager.updateSubChainBasicInfo(runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol);
+        await WalletManager.updateSubChainBasicInfo(infoId, runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol);
     return updateMap;
   }
 }

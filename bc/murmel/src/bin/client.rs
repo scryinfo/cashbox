@@ -30,7 +30,8 @@ use std::{
     str::FromStr,
     time::SystemTime,
 };
-use murmel::jniapi::BTC_CHAIN_PATH;
+use murmel::jniapi::{BTC_CHAIN_PATH, SHARED_SQLITE};
+use murmel::jniapi::btcapi::{calc_default_address, calc_pubkey};
 
 pub fn main() {
     if find_opt("help") {
@@ -106,6 +107,18 @@ pub fn main() {
     } else {
         Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap()
     };
+
+    // todo
+    // use mnemonic generate publc address and store it in database
+    let sqlite = SHARED_SQLITE.lock().unwrap();
+    let pubkey = sqlite.query_compressed_pub_key();
+    if let None = pubkey {
+        info!("Did not have default pubkey in database yet");
+        let default_address = calc_default_address();
+        let address = default_address.to_string();
+        let default_pubkey = calc_pubkey();
+        sqlite.insert_compressed_pub_key(address, default_pubkey);
+    }
 
     let mut spv = Constructor::new(network, listen, chaindb).unwrap();
     spv.run(network, peers, connections).expect("can not start node");

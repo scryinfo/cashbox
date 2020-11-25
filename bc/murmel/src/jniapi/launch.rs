@@ -7,7 +7,7 @@ use jni::objects::JClass;
 use jni::JNIEnv;
 use log::Level;
 
-use crate::jniapi::BTC_CHAIN_PATH;
+use crate::jniapi::{BTC_CHAIN_PATH, SHARED_SQLITE};
 use crate::constructor::Constructor;
 use crate::db::SQLite;
 use std::sync::{Arc, Mutex};
@@ -18,6 +18,7 @@ use std::{
     str::FromStr,
     time::SystemTime,
 };
+use crate::jniapi::btcapi::{calc_default_address, calc_pubkey};
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -104,6 +105,18 @@ pub extern "system" fn Java_JniApi_launch(
     // init sqlite
     let sqlite = SQLite::open_db(network);
     let shared_sqlite = Arc::new(Mutex::new(sqlite));
+
+    // todo
+    // use mnemonic generate publc address and store it in database
+    let sqlite = SHARED_SQLITE.lock().unwrap();
+    let pubkey = sqlite.query_compressed_pub_key();
+    if let None = pubkey {
+        info!("Did not have default pubkey in database yet");
+        let default_address = calc_default_address();
+        let address = default_address.to_string();
+        let default_pubkey = calc_pubkey();
+        sqlite.insert_compressed_pub_key(address, default_pubkey);
+    }
 
     let mut spv = Constructor::new(network, listen, chaindb).unwrap();
     spv.run(network, peers, connections)

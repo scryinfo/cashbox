@@ -295,7 +295,7 @@ class ScryXNetUtil {
     }
   }
 
-  Future<Map> updateSubChainBasicInfo() async {
+  Future<Map> updateSubChainBasicInfo(String infoId) async {
     Map runtimeMap = await loadScryXRuntimeVersion();
     if (runtimeMap == null || !runtimeMap.containsKey("result")) {
       return null;
@@ -335,8 +335,8 @@ class ScryXNetUtil {
         ss58Format != null &&
         tokenDecimals != null &&
         tokenSymbol != null) {
-      Map updateMap =
-          await Wallets.instance.updateSubChainBasicInfo(runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol);
+      Map updateMap = await Wallets.instance
+          .updateSubChainBasicInfo(infoId, runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol);
       return updateMap;
     }
 
