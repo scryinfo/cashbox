@@ -305,14 +305,19 @@ class WalletManager {
     return updateMap;
   }
 
-  static getSubChainBasicInfo(String genesisHash) async {
-    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("getSubChainBasicInfo", {"genesisHash": genesisHash});
+  static getSubChainBasicInfo(String genesisHash, int specVersion, int txVersion) async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("getSubChainBasicInfo", {
+      "genesisHash": genesisHash,
+      "specVersion": specVersion,
+      "txVersion": txVersion,
+    });
     return updateMap;
   }
 
-  static updateSubChainBasicInfo(
-      int runtimeVersion, int txVersion, String genesisHash, String metadata, int ss58Format, int tokenDecimals, String tokenSymbol) async {
+  static updateSubChainBasicInfo(String infoId, int runtimeVersion, int txVersion, String genesisHash, String metadata, int ss58Format,
+      int tokenDecimals, String tokenSymbol) async {
     Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateSubChainBasicInfo", {
+      "infoId": infoId,
       "runtimeVersion": runtimeVersion,
       "txVersion": txVersion,
       "genesisHash": genesisHash,

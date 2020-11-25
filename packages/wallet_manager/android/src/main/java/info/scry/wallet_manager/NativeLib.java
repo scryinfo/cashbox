@@ -458,7 +458,8 @@ public class NativeLib {
         public String blockHash;
     }
 
-    public static class SubChainBasicInfo{
+    public static class SubChainBasicInfo {
+        public String infoId;
         public String genesisHash;
         public String metadata;
         public int runtimeVersion;
@@ -467,6 +468,7 @@ public class NativeLib {
         public int tokenDecimals;
         public String tokenSymbol;
     }
+
     //Get the assembled original transaction, distinguish the chain type
     //Return: Unsigned transaction String, the format is json format
     //The first parameter is the return value of eeeOpen
@@ -485,8 +487,9 @@ public class NativeLib {
     // Only do information signature, tool function
     public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
 
-    public static native Message getSubChainBasicInfo(String genesisHash);
-    public static native Message updateSubChainBasicInfo(SubChainBasicInfo chainInfo,boolean isDefault);
+    public static native Message getSubChainBasicInfo(String genesisHash, int specVersion, int txVersion);
+
+    public static native Message updateSubChainBasicInfo(SubChainBasicInfo chainInfo, boolean isDefault);
 
     /**
      * get

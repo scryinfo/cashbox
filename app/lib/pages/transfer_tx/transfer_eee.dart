@@ -69,7 +69,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
         });
       }
     }
-    eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+    eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.chainAddress);
     if (!_isMapStatusOk(eeeStorageKeyMap)) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return;

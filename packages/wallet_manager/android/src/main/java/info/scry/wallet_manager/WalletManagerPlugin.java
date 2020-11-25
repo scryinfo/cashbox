@@ -637,8 +637,10 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "eeeTransfer": {
                 ScryWalletLog.d("nativeLib=>", "eeeTransfer is enter =>");
                 Message message = new Message();
-                ScryWalletLog.d("nativeLib=>",
-                        "eeeTransfer is enter =>" + (call.argument("from")).toString());
+                // ScryWalletLog.d("nativeLib=>", "eeeTransfer is from =>" + (call.argument("from")).toString());
+                // ScryWalletLog.d("nativeLib=>", "eeeTransfer is to =>" + (call.argument("to")).toString());
+                // ScryWalletLog.d("nativeLib=>", "eeeTransfer is value =>" + (call.argument("value")).toString());
+                // ScryWalletLog.d("nativeLib=>", "index is index =>" + ((int) (call.argument("index"))));
                 message = NativeLib.eeeTransfer(
                         (String) (call.argument("from")),
                         (String) (call.argument("to")),
@@ -1138,8 +1140,11 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "getSubChainBasicInfo": {
                 ScryWalletLog.d("nativeLib=>", "getSubChainBasicInfo is enter ===>");
                 Message message = new Message();
+                // ScryWalletLog.d("nativeLib genesisHash   =>", (String) (call.argument("genesisHash")));
+                // ScryWalletLog.d("nativeLib=>", "specVersion==>" + (int) (call.argument("specVersion")));
+                // ScryWalletLog.d("nativeLib=>", "txVersion==>" + (int) (call.argument("txVersion")));
                 try {
-                    message = NativeLib.getSubChainBasicInfo((String) (call.argument("genesisHash")));
+                    message = NativeLib.getSubChainBasicInfo((String) (call.argument("genesisHash")), (int) (call.argument("specVersion")), (int) (call.argument("txVersion")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "getSubChainBasicInfo exception is " + exception);
                 }
@@ -1148,6 +1153,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 resultMap.put("status", message.status);
                 int status = message.status;
                 if (status == 200) {
+                    resultMap.put("infoId", message.chainInfo.infoId);
                     resultMap.put("genesisHash", message.chainInfo.genesisHash);
                     resultMap.put("metadata", message.chainInfo.metadata);
                     resultMap.put("runtimeVersion", message.chainInfo.runtimeVersion);
@@ -1165,6 +1171,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is enter ===>");
                 Message message = new Message();
                 SubChainBasicInfo chainInfo = new NativeLib.SubChainBasicInfo();
+                chainInfo.infoId = (String) (call.argument("infoId"));
                 chainInfo.runtimeVersion = (int) (call.argument("runtimeVersion"));
                 chainInfo.txVersion = (int) (call.argument("txVersion"));
                 chainInfo.genesisHash = (String) (call.argument("genesisHash"));
