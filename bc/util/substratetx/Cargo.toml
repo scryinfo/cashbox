@@ -72,10 +72,16 @@ default-features = false
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'v2.0.0'
 
+[dependencies.sp-arithmetic]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'v2.0.0'
+
 [features]
 default = ['std']
 std = [
     'sp-io/std',
     'node-runtime/std',
     "twox-hash/std",
+    "sp-arithmetic/std"
 ]

@@ -17,13 +17,18 @@ pub struct Mnemonic {
     pub mnemonic_digest: String,
     pub mnemonic: String,
     pub wallet_type: String,
+    pub temp: Option<String>,
+    pub temp2: Option<u64>,
 }
+
 
 #[cfg(test)]
 mod tests {
     use rbatis::crud::CRUDEnable;
 
-    use crate::ma::{DbBeforeSave, DbBeforeUpdate, DbShared, Mnemonic};
+    use crate::ma::db::{BeforeSave, BeforeUpdate, Shared, Mnemonic};
+    use rbatis::rbatis::Rbatis;
+    use std::ops::Add;
 
     #[test]
     fn test_mnemonic() {
@@ -43,5 +48,29 @@ mod tests {
         assert_eq!("", m.get_id());
         assert_eq!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
+
+        // let rb = block_on(init_rbatis("mnemonic"));
+
+
+
+    }
+
+    async fn init_rbatis(db_file_name: &str) -> Rbatis {
+        log::info!("init_rbatis");
+        if std::fs::metadata(db_file_name).is_err() {
+            let file = std::fs::File::create(db_file_name);
+            if file.is_err() {
+                log::info!("{:?}",file.err().unwrap());
+            }
+        }
+        let rb = Rbatis::new();
+        let url = "sqlite://".to_owned().add(db_file_name);
+        log::info!("{:?}",url);
+        let r = rb.link(url.as_str()).await;
+        if r.is_err() {
+            log::info!("{:?}",r.err().unwrap());
+        }
+
+        return rb;
     }
 }

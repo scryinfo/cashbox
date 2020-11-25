@@ -20,7 +20,10 @@ shared = { path = "../shared" }
 rustorm = { version = "0.15.4", features = ["with-sqlite"] }
 chrono = "0.4.0"
 rusqlite = { version = "0.18", optional = true, features = ["bundled"] }
-libsqlite3-sys = { version = "*", features = ["bundled"] }
+
+
+
+
 
 [target.'cfg(target_os="android")'.dependencies]
 android_logger = "0.9.0"

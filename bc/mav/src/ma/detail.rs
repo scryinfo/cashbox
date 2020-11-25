@@ -67,11 +67,6 @@ pub struct TokenShared {
 
     /// true为认证token
     pub auth: bool,
-
-    /// 数据库中的创建时间
-    pub create_time: i64,
-    /// 数据库中的更新时间
-    pub update_time: i64,
 }
 
 
