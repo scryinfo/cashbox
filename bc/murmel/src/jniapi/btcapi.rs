@@ -202,7 +202,7 @@ pub extern "system" fn Java_JniApi_btcLoadTxHistory(
 // this function don't have any return value。because it will run spv node
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEnv<'_>, _class: JClass<'_>, network: JString<'_>) {
+pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv<'_>, _class: JClass<'_>, network: JString<'_>) {
     // TODO
     // use testnet for test and default
     // must change it in future
@@ -219,15 +219,15 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEn
     match network_str {
         "Testnet" => {
             network = Network::Testnet;
-            println!("Start with testnet")
+            info!("Start with testnet")
         }
         "Bitcoin" => {
             network = Network::Bitcoin;
-            println!("Start with Bitcoin")
+            info!("Start with Bitcoin")
         }
         _ => {
             network = Network::Testnet;
-            println!("Start with testnet")
+            info!("Start with testnet")
         }
     }
 
@@ -244,8 +244,20 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEn
         .unwrap()
         .as_secs();
     let chaindb = Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap();
-    let mut spv = Constructor::new(network, listen, chaindb).unwrap();
 
+    // todo
+    // use mnemonic generate publc address and store it in database
+    let sqlite = SHARED_SQLITE.lock().unwrap();
+    let pubkey = sqlite.query_compressed_pub_key();
+    if let None = pubkey {
+        info!("Did not have default pubkey in database yet");
+        let default_address = calc_default_address();
+        let address = default_address.to_string();
+        let default_pubkey = calc_pubkey();
+        sqlite.insert_compressed_pub_key(address, default_pubkey);
+    }
+
+    let mut spv = Constructor::new(network, listen, chaindb).unwrap();
     spv.run(network, peers, connections)
        .expect("can not start node");
 }
