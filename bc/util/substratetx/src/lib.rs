@@ -22,6 +22,7 @@ mod crypto;
 
 pub mod error;
 pub mod node_metadata;
+//pub mod multiaddress;
 
 #[macro_use]
 pub mod extrinsic;
@@ -101,12 +102,16 @@ mod tests {
     use super::*;
     use sp_core::crypto::AccountId32 as AccountId;
     use std::sync::mpsc::channel;
+    use node_metadata::Metadata;
+    use frame_metadata::RuntimeMetadataPrefixed;
+    use std::convert::TryFrom;
 
     const TX_VERSION: u32 = 1;
     const RUNTIME_VERSION: u32 = 6;
-    const URL: &'static str = "ws://192.168.1.7:9944";
-    const GENESIS_HASH: &'static str = "0x7fa792d0aff5e5529e0125faf969f7adfd65894b962e24681f18eab116975a20";
-    const METADATA_REQ: &'static str = r#"{"id":1,"jsonrpc":"2.0","method":"state_getMetadata","params":["0x27eccde07c9d5f45d40a66993c6a3dee5d97e52578c2f0ab4d157871cbc10956"]}"#;
+    const URL: &'static str = "ws://192.168.1.7:9947";
+    //const GENESIS_HASH: &'static str = "0x85caf08522f79bae099d06348fe8b42f411159352fabd2dbd6a41f52afe8208c";
+    const GENESIS_HASH: &'static str =  "0x286a1642a861e1c5d83365167f04c0bfd756108c931eac9d55bca171c46c707f";
+    const METADATA_REQ: &'static str = r#"{"id":1,"jsonrpc":"2.0","method":"state_getMetadata","params":["0xdc7f2230c290ff11dbe94353058ed32ee939f734781307f051a0857d0e856c32"]}"#;
 
     pub mod rpc;
 
@@ -121,24 +126,20 @@ mod tests {
         }
     }
 
-  /*  #[test]
+    #[test]
     fn get_chain_runtime_metadata_test() {
-        let data = get_request(URL, METADATA_REQ).unwrap();
-        match node_helper::ChainHelper::get_chain_runtime_metadata(&data) {
-            Ok(meta) => {
-                meta.print_overview();
-                meta.print_modules_with_calls();
-                meta.print_modules_with_events();
-            }
-            Err(err) => {
-                println!("get metadata error:{:?}", err);
-            }
-        }
-    }*/
+        let hex_str = get_request(URL, METADATA_REQ).expect("get metadata json-rpc");
+        let runtime_vec = hexstr_to_vec(&hex_str).expect("vec format is wrong");
+        let prefixed = RuntimeMetadataPrefixed::decode(&mut &runtime_vec[..]).expect("runtime prefixed");
+        let metadata = Metadata::try_from(prefixed).expect("Metadata");
+        metadata.print_overview();
+        metadata.print_modules_with_calls();
+        metadata.print_modules_with_events();
+    }
 
     #[test]
     fn decode_extrinsics_test() {
-        let input_tx = r#"["0x280402000b80d51cd07501","0x35028454065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f01a688989578914fa4bd2f2b75eaf0b498b27bba76d4f8a2077479aeb9af73db7cf3bd093a69ff6963b0b0082a960daf7873cfe7ded5b3309d9fd400fe3eacd488f602100008051cbd2d43530a44705ad088af313e18f80b53ef16b36177cd4b77b846f2a5f07c2103083030"]"#;
+        let input_tx = r#"["0x490284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d01e6291e2731dbb933d9ac8b03fe06c96d8c284a2281b66f93800d7adb8d1e3845adafbf522e610797e1bfd54dbcd24b53146b8ef42168c95430884f320b153680e60000000603ff54065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f0f0000c16ff28623"]"#;
         let metadata_hex = get_request(URL, METADATA_REQ).unwrap();
         let genesis_byte = hexstr_to_vec(GENESIS_HASH).unwrap();
         let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15));
@@ -156,7 +157,7 @@ mod tests {
         let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15)).expect("get metadata");
 
        // let event_str = r#"0x0400000000000000482d7c0900000000020000"#;
-        let event_str = r#"0x1400000000000000482d7c090000000002000000010000000003664a2a9fe87200d0b0f96a525c75f0b016d534995fa9b1be1c9419d2b075176f0000010000000500664a2a9fe87200d0b0f96a525c75f0b016d534995fa9b1be1c9419d2b075176f000082dfe40d470000000000000000000000010000000502d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d664a2a9fe87200d0b0f96a525c75f0b016d534995fa9b1be1c9419d2b075176f000082dfe40d47000000000000000000000001000000000068663b0a00000000000000"#;
+        let event_str = r#"0x1c00000000000000482d7c09000000000200000001000000000000000000000000000200000002000000000354065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f000002000000030054065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f0000c16ff286230000000000000000000000020000000302d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d54065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f0000c16ff286230000000000000000000000020000000c06f0e60aba130100000000000000000000000002000000000068663b0a00000000000000"#;
         let decode_ret = helper.decode_events(event_str, None);
         println!("decode event is:{:?}",decode_ret);
         assert!(decode_ret.is_ok());

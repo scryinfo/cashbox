@@ -431,6 +431,7 @@ public class NativeLib {
         public String blockHash;
     }
 　　　public static class SubChainBasicInfo{
+        public String infoId;
         public String genesisHash;
         public String metadata;
         public int runtimeVersion;
@@ -472,7 +473,7 @@ public class NativeLib {
      *
      * @return  if return Message `status` value is Ok and `chainInfo` field representative the basic info detail
      */
-    public static native Message getSubChainBasicInfo(String genesisHash);
+   public static native Message getSubChainBasicInfo(String genesisHash,Integer specVersion,Integer txVersion);
 
     /**
      * get the key corresponding to the EEE account information, enter the account to be queried, for example: 5FfBQ3kwXrbdyoqLPvcXRp7ikWydXawpNs2Ceu3WwFdhZ8W4,
@@ -504,7 +505,7 @@ public class NativeLib {
      * @return
      */
 
-    public static native Message saveExtrinsicDetail(String accountId, String eventDetail, String blockHash, String extrinsics);
+    public static native Message saveExtrinsicDetail(String infoId,String accountId,String eventDetail,String blockHash,String extrinsics);
 
     /**
      * Record the currently synchronized block number, used for the starting position when the update is triggered next time

@@ -593,7 +593,6 @@ fn string_convert(env: &JNIEnv,jvalue:&JValue)->Option<String>  {
     }else{
         None
     }
-
 }
 
 fn get_basic_info_obj(env: &JNIEnv,info_dec:&SubChainBasicInfo)-> jobject{
@@ -773,7 +772,8 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAccountInfo(env
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveExtrinsicDetail(env: JNIEnv, _class: JClass, account_id: JString, event_detail: JString, block_hash: JString, extrinsics: JString) -> jobject {
+pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveExtrinsicDetail(env: JNIEnv, _class: JClass, info_id:JString,account_id: JString, event_detail: JString, block_hash: JString, extrinsics: JString) -> jobject {
+    let info_id: JniResult<String> = env.get_string(info_id).map(|value| value.into());
     let account_id: JniResult<String> = env.get_string(account_id).map(|value| value.into());
     let encode_event_info: JniResult<String> = env.get_string(event_detail).map(|value| value.into());
     let block_hash: JniResult<String> = env.get_string(block_hash).map(|value| value.into());
@@ -782,14 +782,14 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_saveExtrinsicDetail(e
     let wallet_msg_class = env.find_class("info/scry/wallet_manager/NativeLib$Message").expect("find NativeLib$Message");
     let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
 
-    if account_id.is_err() || encode_event_info.is_err() || block_hash.is_err() || block_extrinsics.is_err() {
+    if account_id.is_err() || encode_event_info.is_err() || block_hash.is_err() || block_extrinsics.is_err()||info_id.is_err() {
         env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::ParameterFormatWrong as i32)).expect("set saveExtrinsicDetail StatusCode ");
         env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string("input parameter incorrect").unwrap()))).expect("set saveExtrinsicDetail message");
         return *state_obj;
     }
 
     let eee = wallets::module::EEE {};
-    match eee.save_tx_record(&account_id.unwrap(), &block_hash.unwrap(), &encode_event_info.unwrap(), &block_extrinsics.unwrap()) {
+    match eee.save_tx_record(&info_id.unwrap(),&account_id.unwrap(), &block_hash.unwrap(), &encode_event_info.unwrap(), &block_extrinsics.unwrap()) {
         Ok(_key) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
         }

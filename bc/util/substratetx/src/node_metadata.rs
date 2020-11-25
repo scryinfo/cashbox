@@ -510,6 +510,24 @@ pub enum ConversionError {
     InvalidEventArg(String, &'static str),
 }
 
+/*fn add_modules_storage<B: 'static>(module_meta_data:B,modules:&mut HashMap<String,ModuleMetadata>){
+   // let mut modules = HashMap::new();
+    for module in module_meta_data.into_iter() {
+        let module_name = convert(module.name.clone())?;
+        let mut storage_map = HashMap::new();
+        if let Some(storage) = module.storage {
+            let storage = convert(storage)?;
+            let module_prefix = convert(storage.prefix)?;
+            for entry in convert(storage.entries)?.into_iter() {
+                let storage_prefix = convert(entry.name.clone())?;
+                let entry =
+                    convert_entry(module_prefix.clone(), storage_prefix.clone(), entry)?;
+                storage_map.insert(storage_prefix, entry);
+            }
+        }
+    }
+}*/
+
 impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
     type Error = MetadataError;
 
@@ -517,69 +535,135 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
         if metadata.0 != META_RESERVED {
             return Err(ConversionError::InvalidPrefix.into());
         }
-        let meta = match metadata.1 {
-            RuntimeMetadata::V12(meta) => meta,
-           // RuntimeMetadata::V11(meta)=>meta,
-            _ => return Err(ConversionError::InvalidVersion.into()),
-        };
+
         let mut modules = HashMap::new();
         let mut modules_with_calls = HashMap::new();
         let mut modules_with_events = HashMap::new();
-        let mut event_module_index = 0;
-        for module in convert(meta.modules)?.into_iter() {
-            let module_name = convert(module.name.clone())?;
 
-            let mut storage_map = HashMap::new();
-            if let Some(storage) = module.storage {
-                let storage = convert(storage)?;
-                let module_prefix = convert(storage.prefix)?;
-                for entry in convert(storage.entries)?.into_iter() {
-                    let storage_prefix = convert(entry.name.clone())?;
-                    let entry =
-                        convert_entry(module_prefix.clone(), storage_prefix.clone(), entry)?;
-                    storage_map.insert(storage_prefix, entry);
-                }
-            }
-            modules.insert(
-                module_name.clone(),
-                ModuleMetadata {
-                    index: module.index,
-                    name: module_name.clone(),
-                    storage: storage_map,
-                },
-            );
 
-            if let Some(calls) = module.calls {
-                let mut call_map = HashMap::new();
-                for (index, call) in convert(calls)?.into_iter().enumerate() {
-                    let name = convert(call.name)?;
-                    call_map.insert(name, index as u8);
+       match metadata.1 {
+            RuntimeMetadata::V12(meta) => {
+              /*  let modules_meta_data_vec = convert(meta.modules)?;
+                add_modules(modules_meta_data_vec,modules);*/
+                for module in convert(meta.modules)?.into_iter() {
+                    let module_name = convert(module.name.clone())?;
+
+                    let mut storage_map = HashMap::new();
+                    if let Some(storage) = module.storage {
+                        let storage = convert(storage)?;
+                        let module_prefix = convert(storage.prefix)?;
+                        for entry in convert(storage.entries)?.into_iter() {
+                            let storage_prefix = convert(entry.name.clone())?;
+                            let entry =
+                                convert_entry(module_prefix.clone(), storage_prefix.clone(), entry)?;
+                            storage_map.insert(storage_prefix, entry);
+                        }
+                    }
+                    modules.insert(
+                        module_name.clone(),
+                        ModuleMetadata {
+                            index: module.index,
+                            name: module_name.clone(),
+                            storage: storage_map,
+                        },
+                    );
+
+                    if let Some(calls) = module.calls {
+                        let mut call_map = HashMap::new();
+                        for (index, call) in convert(calls)?.into_iter().enumerate() {
+                            let name = convert(call.name)?;
+                            call_map.insert(name, index as u8);
+                        }
+                        modules_with_calls.insert(
+                            module_name.clone(),
+                            ModuleWithCalls {
+                                index: module.index,
+                                name: module_name.clone(),
+                                calls: call_map,
+                            },
+                        );
+                    }
+                    if let Some(events) = module.event {
+                        let mut event_map = HashMap::new();
+                        for (index, event) in convert(events)?.into_iter().enumerate() {
+                            event_map.insert(index as u8, convert_event(event)?);
+                        }
+                        modules_with_events.insert(
+                            module_name.clone(),
+                            ModuleWithEvents {
+                                index: module.index,
+                                name: module_name.clone(),
+                                events: event_map,
+                            },
+                        );
+                    }
                 }
-                modules_with_calls.insert(
-                    module_name.clone(),
-                    ModuleWithCalls {
-                        index: module.index,
-                        name: module_name.clone(),
-                        calls: call_map,
-                    },
-                );
-            }
-            if let Some(events) = module.event {
-                let mut event_map = HashMap::new();
-                for (index, event) in convert(events)?.into_iter().enumerate() {
-                    event_map.insert(index as u8, convert_event(event)?);
+            },
+            RuntimeMetadata::V11(metav11)=>{
+                let mut event_module_index = 0;
+                let mut call_module_index = 0;
+                let mut module_index = 0;
+                for module in convert(metav11.modules)?.into_iter() {
+                    let module_name = convert(module.name.clone())?;
+
+                    let mut storage_map = HashMap::new();
+                    if let Some(storage) = module.storage {
+                        let storage = convert(storage)?;
+                        let module_prefix = convert(storage.prefix)?;
+                        for entry in convert(storage.entries)?.into_iter() {
+                            let storage_prefix = convert(entry.name.clone())?;
+                            let entry =
+                                convert_entry(module_prefix.clone(), storage_prefix.clone(), entry)?;
+                            storage_map.insert(storage_prefix, entry);
+                        }
+                    }
+                    modules.insert(
+                        module_name.clone(),
+                        ModuleMetadata {
+                            index: module_index,
+                            name: module_name.clone(),
+                            storage: storage_map,
+                        },
+                    );
+                    module_index = module_index+1;
+
+                    if let Some(calls) = module.calls {
+                        let mut call_map = HashMap::new();
+                        for (index, call) in convert(calls)?.into_iter().enumerate() {
+                            let name = convert(call.name)?;
+                            call_map.insert(name, index as u8);
+                        }
+                        modules_with_calls.insert(
+                            module_name.clone(),
+                            ModuleWithCalls {
+                                index: call_module_index,
+                                name: module_name.clone(),
+                                calls: call_map,
+                            },
+                        );
+                        call_module_index = call_module_index+1;
+                    }
+                    if let Some(events) = module.event {
+                        let mut event_map = HashMap::new();
+                        for (index, event) in convert(events)?.into_iter().enumerate() {
+                            event_map.insert(index as u8, convert_event(event)?);
+                        }
+                        modules_with_events.insert(
+                            module_name.clone(),
+                            ModuleWithEvents {
+                                index: event_module_index,
+                                name: module_name.clone(),
+                                events: event_map,
+                            },
+                        );
+                         event_module_index = event_module_index+1;
+                    }
                 }
-                modules_with_events.insert(
-                    module_name.clone(),
-                    ModuleWithEvents {
-                        index: event_module_index,
-                        name: module_name.clone(),
-                        events: event_map,
-                    },
-                );
-               // event_module_index = event_module_index+1;
-            }
-        }
+            },
+            _ => return Err(ConversionError::InvalidVersion.into()),
+        };
+
+
         Ok(Metadata {
             modules,
             modules_with_calls,

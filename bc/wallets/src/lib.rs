@@ -150,7 +150,7 @@ mod tests {
         //Create a wallet instance
         let manager = module::wallet::WalletManager{};
         let wallet = manager.create_wallet("foo",MNEMONIC.as_bytes(),"123456".as_bytes(),0).expect("save wallet");
-        let rawtx = "0x6501040902a39a014e7bceb3c2ff84bb6aba8d9e46c635257a2b9aa41969e70b0a8dd07b6c00070088526a74b8cc91625b54065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f1443617273686400000001000000aefb7cabceff9471ab404331d44dae2215a80fe475ad0c831aef1e0a0afe95050200000001000000";
+        let rawtx = "0x6501040902a39a014e7bceb3c2ff84bb6aba8d9e46c635257a2b9aa41969e70b0a8dd07b6c00070088526a74b8cc91625b766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d146265616368e8030000080000002fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb9730200000001000000";
         let eee = module::EEE {};
         match eee.raw_tx_sign(rawtx, &wallet.wallet_id, "123456".as_bytes()) {
             Ok(signed_data) => println!("tx sign result {}", signed_data),

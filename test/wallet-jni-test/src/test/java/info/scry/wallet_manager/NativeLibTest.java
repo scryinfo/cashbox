@@ -157,7 +157,7 @@ public class NativeLibTest {
     public void updateSubChainBasicInfoTest() throws Throwable{
         Map header = new HashMap<String, String>();
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.57:9933"), header);
         NativeLib.Message message = saveSubChainBasicInfo(client,null,true);
         System.out.println(message);
     }
@@ -171,8 +171,8 @@ public class NativeLibTest {
 
     @Test
     public void eeeTxsign() {
-        String rawtx = "0xd00411030f00404c948b3203029435776b349a5506857e7aafbd735966b7171b7044664866f43b818b9eef14d3a866bd100222ff18030000003f4bea2466b9e7d477e58c9c6b79aa2fbb2010ccc03aae14c0e2075cc31a571304000000";
-        NativeLib.Message msg = NativeLib.eeeTxSign(rawtx, "72ae6480-ce42-4dff-abf6-6777f76d3203", "123456".getBytes());
+        String rawtx = "0x6501040902a39a014e7bceb3c2ff84bb6aba8d9e46c635257a2b9aa41969e70b0a8dd07b6c00070088526a74b8cc91625b766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d146265616368e8030000080000002fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb9730200000001000000";
+        NativeLib.Message msg = NativeLib.eeeTxSign(rawtx, "dd510030-52fb-433d-8736-19f643ef1acb", "123456".getBytes());
         System.out.println(msg.toString());
     }
 
@@ -194,8 +194,8 @@ public class NativeLibTest {
 
     @Test
     public void eeeTransferTest() {
-        String from = "5CRq2XF4BVaAWT72q7NaQdVZTajD12yDTu6YegyWAAxpDHah";
-        String to = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
+        String from = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";// 5GubjQedXVKqZ3TGigy4y3Ez1HPYnajJVxNhF9gjzuQ6onzd
+        String to = "5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC";
         String value = "100000000000";
         int index = 2;
         NativeLib.Message msg = NativeLib.eeeTransfer(from, to, value,index, "123456".getBytes());
@@ -242,12 +242,12 @@ public class NativeLibTest {
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
         //  String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
-        String account_1 = "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H";
+        String account_1 = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
 
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9937"), header);
 
         Header current_header = client.invoke("chain_getHeader", new Object[]{}, Header.class);
         //Get the current block number
@@ -283,8 +283,8 @@ public class NativeLibTest {
             endBlockNumber = i == (query_times - 1) ? number : (i + 1) * queryNumberInterval + startBlockNumber;
             //Get the block hash of the current query storage status
             endBlockHash = client.invoke("chain_getBlockHash", new Object[]{endBlockNumber}, String.class);
-            //Query the history of account status changes within the changed block
-            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo,key2.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
+            //Query the history of account status changes within the changed block ,key2.storageKeyInfo
+            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
             System.out.println("*********************StorageChange start**************");
             // System.out.println(storage.toString());
             System.out.println("*********************StorageChange end**************");

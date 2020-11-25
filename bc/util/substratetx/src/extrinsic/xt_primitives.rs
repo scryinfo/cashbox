@@ -8,7 +8,7 @@ use sp_core::{blake2_256,H256,};
 use sp_runtime::{generic::Era, MultiSignature,AccountId32 as AccountId};
 
 pub type AccountIndex = u64;
-pub type GenericAddress = AccountId; //Address<AccountId, AccountIndex>;
+pub type GenericAddress =AccountId; // crate::multiaddress::MultiAddress<AccountId, ()>
 
 /// Simple generic extra mirroring the SignedExtra currently used in extrinsics. Does not implement
 /// the SignedExtension trait. It simply encodes to the same bytes as the real SignedExtra. The

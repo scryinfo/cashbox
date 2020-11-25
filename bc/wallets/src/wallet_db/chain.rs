@@ -215,6 +215,27 @@ impl DataServiceProvider {
         Ok(records)
     }
 
+    pub fn query_chain_info(&self,basic_info_id:&str)->WalletResult<SubChainBasicInfo>{
+        let  query_sql = "select info_id,genesis_hash,metadata,runtime_version,tx_version,ss58_format_prefix,token_decimals,token_symbol from detail.SubChainInfo where info_id = ?";
+        let mut select_stat = self.db_hander.prepare(query_sql)?;
+        select_stat.bind(1, basic_info_id)?;
+        if let Ok(State::Row) = select_stat.next(){
+            let info_detail = model::SubChainBasicInfo {
+                info_id:select_stat.read::<String>(0).expect("info id"),
+                genesis_hash:select_stat.read::<String>(1).expect("genesis_hash"),
+                metadata:select_stat.read::<String>(2).expect("metadata"),
+                runtime_version:select_stat.read::<i64>(3).map(|val| val as i32).expect("runtime_version"),
+                tx_version:select_stat.read::<i64>(4).map(|val|val as i32).expect("tx_version"),
+                ss58_format:select_stat.read::<i64>(5).map(|val|val as i32).expect("ss58_format"),
+                token_decimals:select_stat.read::<i64>(6).map(|val|val as i32).expect("token_decimals"),
+                token_symbol:select_stat.read::<String>(7).expect("token_symbol"),
+            };
+            return Ok(info_detail)
+        }else {
+            Err(error::WalletError::NotExist)
+        }
+    }
+
     pub fn get_sub_chain_info(&self, genesis_hash_str:Option<&str>,spec_vers :u32,tx_vers:u32) ->WalletResult<Vec<SubChainBasicInfo>>{
 
         let  start_sql = "select info_id,genesis_hash,metadata,runtime_version,tx_version,ss58_format_prefix,token_decimals,token_symbol from detail.SubChainInfo where status = 1";

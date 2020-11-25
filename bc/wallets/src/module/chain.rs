@@ -72,11 +72,10 @@ impl EEE {
         }
     }
 
-    pub fn save_tx_record(&self, account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
+    pub fn save_tx_record(&self, info_id:&str,account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {
         let instance = wallet_db::DataServiceProvider::instance()?;
-        let chain_info = instance.get_sub_chain_info(None,0,0)?;
+        let info = instance.query_chain_info(info_id)?;
         // default chain genesis hash  definitely exists
-        let info = chain_info.get(0).unwrap();
         let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
         let helper = substratetx::SubChainHelper::init(&info.metadata,&genesis_hash,info.runtime_version as u32,info.tx_version as u32,None)?;
         let event_res =  helper.decode_events(event_data,None)?;
