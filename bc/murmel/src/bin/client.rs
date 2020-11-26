@@ -32,6 +32,7 @@ use std::{
 };
 use murmel::jniapi::{BTC_CHAIN_PATH, SHARED_SQLITE};
 use murmel::jniapi::{calc_default_address, calc_pubkey};
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 
 pub fn main() {
     if find_opt("help") {
@@ -112,17 +113,25 @@ pub fn main() {
     // use mnemonic generate publc address and store it in database
     let sqlite = SHARED_SQLITE.lock().unwrap();
     let pubkey = sqlite.query_compressed_pub_key();
-    if let None = pubkey {
+    let mut filter_message: Option<FilterLoadMessage> = None;
+
+    if let Some(pubkey) = pubkey {
+        info!("Calc bloomfilter via pubkey {:?}", &pubkey);
+        let filter_load_message = FilterLoadMessage::calculate_filter(pubkey.as_str());
+        filter_message = Some(filter_load_message)
+    } else {
         info!("Did not have default pubkey in database yet");
         let default_address = calc_default_address();
         let address = default_address.to_string();
         let default_pubkey = calc_pubkey();
-        sqlite.insert_compressed_pub_key(address, default_pubkey);
+        sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
+        let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
+        filter_message = Some(filter_load_message)
     }
 
-    let mut spv = Constructor::new(network, listen, chaindb).unwrap();
-    spv.run(network, peers, connections).expect("can not start node");
-}
+    let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
+    spv.run(network, peers, connections)
+       .expect("can not start node");}
 
 fn get_peers() -> Vec<SocketAddr> {
     find_args("peer")

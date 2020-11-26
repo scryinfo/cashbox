@@ -55,6 +55,7 @@ use std::{
     path::Path,
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -86,6 +87,7 @@ impl Constructor {
         network: Network,
         listen: Vec<SocketAddr>,
         chaindb: SharedChainDB,
+        filter_load_message: Option<FilterLoadMessage>
     ) -> Result<Constructor, Error> {
         const BACK_PRESSURE: usize = 10;
 
@@ -129,7 +131,7 @@ impl Constructor {
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
         info!("send FilterLoad");
-        dispatcher.add_listener(BloomFilter::new(p2p_control.clone(), timeout.clone()));
+        dispatcher.add_listener(BloomFilter::new(p2p_control.clone(), timeout.clone(), filter_load_message));
 
         info!("send GetData");
         dispatcher.add_listener(GetData::new(

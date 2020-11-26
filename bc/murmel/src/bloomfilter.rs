@@ -1,7 +1,7 @@
-//! This mod is about bloomfilter
+//! This mod is about bloomfilter sender
 use crate::error::Error;
 use crate::p2p::{
-     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
+    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
     SERVICE_BLOCKS,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
@@ -11,32 +11,34 @@ use log::{error, info, trace};
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
+use crate::jniapi::SHARED_SQLITE;
 
 pub struct BloomFilter {
     // send message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
+    filter_load_message: Option<FilterLoadMessage>,
 }
 
 impl BloomFilter {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
+        filter_load_message: Option<FilterLoadMessage>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
-        let filter = calculate_filter();
-        let mut bloomfilter = BloomFilter { p2p, timeout };
+        let mut bloomfilter = BloomFilter { p2p, timeout, filter_load_message };
 
         thread::Builder::new()
             .name("Bloom filter".to_string())
-            .spawn(move || bloomfilter.run(receiver, filter))
+            .spawn(move || bloomfilter.run(receiver))
             .unwrap();
 
         PeerMessageSender::new(sender)
     }
 
     //Loop through messages
-    fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>, filter: FilterLoadMessage) {
+    fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
@@ -45,7 +47,7 @@ impl BloomFilter {
                         if self.is_serving_blocks(pid) {
                             trace!("serving blocks peer={}", pid);
                             // Initiate request loadfilter
-                            self.send_filter(pid, &filter)
+                            self.send_filter(pid)
                         } else {
                             Ok(())
                         }
@@ -84,10 +86,13 @@ impl BloomFilter {
     }
 
     /// Each node needs to send a filter load message
-    fn send_filter(&mut self, peer: PeerId, filter: &FilterLoadMessage) -> Result<(), Error> {
-        info!("send filter loaded message");
-        self.p2p
-            .send_network(peer, NetworkMessage::FilterLoad(filter.to_owned()));
+    fn send_filter(&mut self, peer: PeerId) -> Result<(), Error> {
+        if let Some(filter_load_message)  = &self.filter_load_message {
+            info!("send filter loaded message");
+            self.p2p
+                .send_network(peer, NetworkMessage::FilterLoad(filter_load_message.to_owned()));
+        }
+        info!("did not find filter");
         Ok(())
     }
 }
