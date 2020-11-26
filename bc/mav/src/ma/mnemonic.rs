@@ -1,4 +1,5 @@
 use rbatis::crud::CRUDEnable;
+use rbatis_macro_driver::CRUDEnable;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -17,18 +18,17 @@ pub struct Mnemonic {
     pub mnemonic_digest: String,
     pub mnemonic: String,
     pub wallet_type: String,
-    pub temp: Option<String>,
-    pub temp2: Option<u64>,
 }
 
 
 #[cfg(test)]
 mod tests {
-    use rbatis::crud::CRUDEnable;
-
-    use crate::ma::db::{BeforeSave, BeforeUpdate, Shared, Mnemonic};
-    use rbatis::rbatis::Rbatis;
     use std::ops::Add;
+
+    use rbatis::crud::CRUDEnable;
+    use rbatis::rbatis::Rbatis;
+
+    use crate::ma::db::{BeforeSave, BeforeUpdate, Mnemonic, Shared};
 
     #[test]
     fn test_mnemonic() {
@@ -50,9 +50,6 @@ mod tests {
         assert_ne!(0, m.get_update_time());
 
         // let rb = block_on(init_rbatis("mnemonic"));
-
-
-
     }
 
     async fn init_rbatis(db_file_name: &str) -> Rbatis {
