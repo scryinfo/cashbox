@@ -17,9 +17,9 @@ members = [
     "murmel",
     "bitcoin",
     "wallets_cdl",
-    "wallets_macro",
+    #"wallets_macro",
     "wallets_types",
-    "mav",
+    #"mav",
     "chain/eth",
     "chain/eee",
     "chain/btc"
