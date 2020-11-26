@@ -18,7 +18,7 @@ use std::{
     str::FromStr,
     time::SystemTime,
 };
-use crate::jniapi::btcapi::{calc_default_address, calc_pubkey};
+use crate::jniapi::{calc_default_address, calc_pubkey};
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -111,7 +111,7 @@ pub extern "system" fn Java_JniApi_launch(
     let sqlite = SHARED_SQLITE.lock().unwrap();
     let pubkey = sqlite.query_compressed_pub_key();
     if let None = pubkey {
-        info!("Did not have default pubkey in database yet");
+        log::info!("Did not have default pubkey in database yet");
         let default_address = calc_default_address();
         let address = default_address.to_string();
         let default_pubkey = calc_pubkey();

@@ -31,7 +31,7 @@ use std::{
     time::SystemTime,
 };
 use murmel::jniapi::{BTC_CHAIN_PATH, SHARED_SQLITE};
-use murmel::jniapi::btcapi::{calc_default_address, calc_pubkey};
+use murmel::jniapi::{calc_default_address, calc_pubkey};
 
 pub fn main() {
     if find_opt("help") {
