@@ -2,7 +2,7 @@
 #![cfg(target_os = "android")]
 #![allow(non_snake_case)]
 
-use crate::jniapi::BTC_CHAIN_PATH;
+use super::*;
 use crate::constructor::Constructor;
 use crate::db::SQLite;
 use crate::db::SharedSQLite;
@@ -28,9 +28,7 @@ use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
 use crate::jniapi::SHARED_SQLITE;
-use crate::jniapi::btcapi::{calc_default_address, calc_pubkey};
-
-const PASSPHRASE: &str = "";
+use crate::jniapi::{calc_default_address, calc_pubkey};
 
 #[no_mangle]
 #[allow(non_snake_case)]

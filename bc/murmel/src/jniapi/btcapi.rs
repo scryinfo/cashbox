@@ -4,9 +4,8 @@
 #![cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
 #![allow(non_snake_case)]
 
-use crate::jniapi::SHARED_SQLITE;
 use crate::constructor::Constructor;
-use crate::jniapi::BTC_CHAIN_PATH;
+use super::*;
 
 use bitcoin::consensus::serialize;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
@@ -26,8 +25,6 @@ use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
 use std::time::SystemTime;
-
-const PASSPHRASE: &str = "";
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -262,65 +259,8 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv<'_>, _class: JClass<'_>,
        .expect("can not start node");
 }
 
-// calc default address in path (0,0) maybe modfiy in future
-pub fn calc_default_address() -> Address {
-    let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
-    let mnemonic = Mnemonic::from_str(words).unwrap();
-    let mut master =
-        MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
-    let mut unlocker = Unlocker::new_for_master(&master, "").expect("don't have right unlocker");
-
-    // path 0,0 => source(from address)
-    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
-    master.add_account(account);
-    let account = master.get_mut((0, 0)).unwrap();
-    let instance_key = account.next_key().unwrap();
-    instance_key.address.clone()
-}
-
-// cala bloom filter
-pub fn calc_bloomfilter() -> FilterLoadMessage {
-    //todo must use stored mnemonic
-    let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
-    let mnemonic = Mnemonic::from_str(words).unwrap();
-    let mut master =
-        MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
-    let mut unlocker = Unlocker::new_for_master(&master, "").expect("don't have right unlocker");
-
-    // path 0,0 => source(from address)
-    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
-    master.add_account(account);
-    let account = master.get_mut((0, 0)).unwrap();
-    let instance_key = account.next_key().unwrap();
-    let _source = instance_key.address.clone();
-    let public_key = instance_key.public.clone();
-    let public_compressed = public_key.serialize();
-    let public_compressed = hex::encode(public_compressed);
-    let bloom_filter = FilterLoadMessage::calculate_filter(public_compressed.as_ref());
-    bloom_filter
-}
-
-// calc pubkey
-pub fn calc_pubkey() -> String {
-    let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
-    let mnemonic = Mnemonic::from_str(words).unwrap();
-    let mut master =
-        MasterAccount::from_mnemonic(&mnemonic, 0, Network::Testnet, PASSPHRASE, None).unwrap();
-    let mut unlocker = Unlocker::new_for_master(&master, "").expect("don't have right unlocker");
-
-    // path 0,0 => source(from address)
-    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
-    master.add_account(account);
-    let account = master.get_mut((0, 0)).unwrap();
-    let instance_key = account.next_key().unwrap();
-    let _source = instance_key.address.clone();
-    let public_key = instance_key.public.clone();
-    let public_compressed = public_key.serialize();
-    hex::encode(public_compressed)
-}
-
 mod test {
-    use crate::jniapi::btcapi::{calc_pubkey, calc_bloomfilter, calc_default_address};
+    use crate::jniapi::{calc_pubkey, calc_bloomfilter, calc_default_address};
 
     #[test]
     pub fn test_calc_pubkey() {
