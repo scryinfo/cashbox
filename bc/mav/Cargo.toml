@@ -18,10 +18,10 @@ chrono = { version = "0.4", features = ["serde"] }
 bigdecimal = "0.2"
 rbatis-core = { version = "1.8.32", features = ["async-io-sqlite"] }
 rbatis = { version = "1.8.32", features = ["async-io-sqlite"] }
-rbatis-macro-driver = { version = "1.8.32" }
+rbatis-macro-driver = { version = "1.8.32", features = ["no_print"] }
 async-std = { version = "1.7" }
 
 async-trait = "0.1.31"
 
-wallets_macro = { path = "../wallets_macro", features=["db_meta"]}
+wallets_macro = { path = "../wallets_macro", features = ["db_meta"] }
 

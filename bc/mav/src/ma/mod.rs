@@ -1,4 +1,3 @@
-
 pub use crate::ma::data::{TokenAddress, TxShared};
 pub use crate::ma::data_eth::{EthChainToken, EthChainTx, EthErc20Face, EthErc20Tx};
 pub use crate::ma::detail::{TokenShared, Wallet};

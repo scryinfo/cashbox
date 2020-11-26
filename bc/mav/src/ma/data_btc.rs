@@ -1,7 +1,8 @@
-
 use rbatis::crud::CRUDEnable;
+use rbatis_macro_driver::CRUDEnable;
 use serde::Deserialize;
 use serde::Serialize;
+
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
@@ -44,7 +45,7 @@ pub struct BtcChainTx {
 pub struct BtcInputTx {
     pub btc_chain_tx_id: String,
 
-    pub index: i64,
+    pub tx_index: i64, //index is keyword
     pub address: String,
     pub pk_script: String,
     pub sig_script: String,
@@ -56,7 +57,7 @@ pub struct BtcInputTx {
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct BtcOutputTx {
     pub btc_chain_tx_id: String,
-    pub index: i64,
+    pub tx_index: i64, //index is keyword
     pub address: String,
     pub pk_script: String,
     pub value: String,

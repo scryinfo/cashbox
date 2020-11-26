@@ -1,6 +1,8 @@
 use rbatis::crud::CRUDEnable;
+use rbatis_macro_driver::CRUDEnable;
 use serde::Deserialize;
 use serde::Serialize;
+
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
