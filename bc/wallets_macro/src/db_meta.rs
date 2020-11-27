@@ -1,15 +1,49 @@
-use std::{fs,path};
+use std::{fs, path};
+use std::collections::{BTreeMap, HashMap};
 use std::io::Write;
 use std::sync::Mutex;
 
 use once_cell::sync::OnceCell;
 use proc_macro_roids::DeriveInputStructExt;
-use syn::{AngleBracketedGenericArguments, GenericArgument, PathArguments, PathSegment, Type, TypePath, Fields};
+use syn::{AngleBracketedGenericArguments, Fields, GenericArgument, PathArguments, PathSegment, Type, TypePath};
 
-#[derive(Default)]
+#[derive(Default, Debug)]
+pub struct TableMeta {
+    //type name
+    pub type_name: String,
+    //所有参数都准备好后，会生成sql语句，一但生成就不会再有变化
+    sql: String,
+    //带有参数的sql模板
+    pub template: String,
+    pub cols: String,
+    //key: sub struct name, value: {name}
+    //Sample: Eee: {Eee}
+    subs: HashMap<String, String>,
+    pub write_file: bool,
+    pub is_sub: bool,
+}
+
+impl TableMeta {
+    fn type_name_to_key(type_name: &str) -> String {
+        format!("{{{}}}", type_name)
+    }
+
+    //return {Eee}
+    fn set_sub(&mut self, type_name: &str) -> String {
+        let v = TableMeta::type_name_to_key(type_name);
+        self.subs.insert(type_name.to_owned(), v.clone());
+        return v;
+    }
+}
+
+#[derive(Default, Debug)]
 pub struct DbMeta {
     // pub metas: Vec<syn::DeriveInput>,
-    all_sql: String,
+    // key：table name, value: sql
+    table_metas: BTreeMap<String, TableMeta>,
+    // key: sub struct name, value: cols
+    sub_struct: HashMap<String, String>,
+    writed_first: bool,
 }
 
 impl DbMeta {
@@ -22,26 +56,95 @@ impl DbMeta {
         }
     }
 
-    pub fn push(&mut self, ast: syn::DeriveInput) {
-        let script = generate_table(&ast);
-        let all_file = path::Path::new(get_path().as_str()).join("all.sql");
-        let all_file = all_file.to_str().expect("push -- all_file.to_str()");
+    pub fn push(&mut self, ast: &syn::DeriveInput) {
+        let mut tm = self.generate_table_meta(&ast);
+        tm.is_sub = false;
+        self.table_metas.insert(tm.type_name.clone(), tm);
+        self.full_template();
+    }
 
-        if self.all_sql.is_empty() {
-            recreate_file(script.as_str(), all_file);
-        }else{
-            append_file(script.as_str(), all_file);
+    ///update or add
+    pub fn push_sub_struct(&mut self, ast: &syn::DeriveInput) {
+        let mut tm = self.generate_table_meta(&ast);
+        if !tm.subs.is_empty() {
+            panic!("do not support sub --> sub struct: {}", tm.type_name);
         }
-        self.all_sql.push_str(script.as_str());
+        tm.is_sub = true;
+        self.sub_struct.insert(tm.type_name.clone(), tm.cols.clone());
+        self.full_template();
+    }
+
+    ///处理 sub struct中的字段
+    fn full_template(&mut self) {
+        let mut dones = Vec::new();
+        for (table_name, tm) in &mut self.table_metas {
+            if tm.sql.is_empty() {
+                let mut all = true;
+                for (key, _) in &tm.subs {
+                    if !self.sub_struct.contains_key(key) {
+                        all = false;
+                        break;
+                    }
+                }
+                if all {
+                    let mut sql = tm.template.clone();
+                    for (key, value) in &tm.subs {
+                        let cols = self.sub_struct.get(key).expect("self.sub_struct.get");
+                        //检查是否是最后一个
+                        let mut ex_value = value.clone();
+                        ex_value.push(',');
+                        if let Some(_) = sql.find(ex_value.as_str()) {
+                            let index = cols.rfind("\n  ").expect("cols.rfind('\n')");
+                            let mut temp = cols.clone();
+                            temp.insert(index, ',');
+                            sql = sql.replace(ex_value.as_str(), temp.as_str());
+                        } else {
+                            sql = sql.replace(value, cols);
+                        }
+                    }
+                    tm.sql = sql;
+                    dones.push(table_name.clone());
+                }
+            } else {
+                dones.push(table_name.clone());
+            }
+        }
+        if !dones.is_empty() {
+            let mut all_sql = String::new();
+            for name in &dones {
+                let tm = self.table_metas.get_mut(name).unwrap();
+                if !tm.write_file {
+                    let table_name = gen_table_name(tm.type_name.as_str());
+                    let file = get_path((table_name + ".sql").as_str());
+                    recreate_file(tm.sql.as_str(), file.as_str());
+                    tm.write_file = true;
+                }
+                all_sql.push_str(tm.sql.as_str());
+            }
+
+            let all_file = get_path("all.sql");
+            if !self.writed_first {
+                recreate_file(all_sql.as_str(), all_file.as_str());
+                self.writed_first = true;
+            } else {
+                append_file(all_sql.as_str(), all_file.as_str());
+            }
+        }
+    }
+
+    fn generate_table_meta(&mut self, ast: &syn::DeriveInput) -> TableMeta {
+        let mut tm = generate_table_script(&ast.ident.to_string(), ast.fields());
+        tm.template.insert_str(0, format!("-- {}\n", ast.ident.to_string()).as_str());
+        tm
     }
 }
 
-fn gen_table_name(ast: &syn::Ident) -> String {
-    let mut table_name = ast.to_string();
-    let names: Vec<&str> = table_name.split("::").collect();
-    table_name = names.get(names.len() - 1).expect("gen_table_name -- names.get(names.len() - 1)").to_string();
-    table_name = to_snake_name(&table_name);
-    table_name
+fn gen_table_name(type_name: &str) -> String {
+    let mut type_name = type_name.to_owned();
+    let names: Vec<&str> = type_name.split("::").collect();
+    type_name = names.get(names.len() - 1).expect("gen_table_name -- names.get(names.len() - 1)").to_string();
+    type_name = to_snake_name(&type_name);
+    type_name
 }
 
 fn to_snake_name(name: &String) -> String {
@@ -63,18 +166,10 @@ fn to_snake_name(name: &String) -> String {
     return new_name;
 }
 
-fn generate_table(ast: &syn::DeriveInput) -> String {
-    let name = gen_table_name(&ast.ident);
-    let file_name = path::Path::new(get_path().as_str()).join(name.clone() + ".sql");
-    let mut script = generate_table_script(name.as_str(), ast.fields());
-    script.insert_str(0,format!("-- {}\n",ast.ident.to_string()).as_str());
-    recreate_file(script.as_str(), file_name.to_str().expect("Path::new(get_path().as_str()).join(name + \".sql\")"));
-    script
-}
-
-fn generate_table_script(name: &str, fields: &Fields) -> String {
-    let mut sql = String::new();
-    sql.push_str(format!("CREATE TABLE IF NOT EXISTS {} (  \n", name).as_str());
+fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
+    let mut tm = TableMeta::default();
+    tm.type_name = type_name.to_owned();
+    let mut cols = String::new();
     for field in fields {
         let col_name = field.ident.as_ref().expect("field.ident.as_ref()").to_string();
         let type_name = if let Type::Path(TypePath { path, .. }) = &field.ty {
@@ -85,20 +180,20 @@ fn generate_table_script(name: &str, fields: &Fields) -> String {
                         if let Some(GenericArgument::Type(Type::Path(TypePath { path, .. }))) = args.last() {
                             format!("{}<{}>", ident.to_string(), path.segments.last().expect("ident.to_string(),path.segments.last()").ident.to_string())
                         } else {
-                            panic!(format!("generate create table is not support type {} -- {} -- AngleBracketed args is None", name, col_name))
+                            panic!(format!("generate create table is not support type {} -- {} -- AngleBracketed args is None", type_name, col_name))
                         }
                     }
-                    PathArguments::Parenthesized(_) => panic!(format!("generate create table is not support type {} -- {} -- Parenthesized", name, col_name)),
+                    PathArguments::Parenthesized(_) => panic!(format!("generate create table is not support type {} -- {} -- Parenthesized", type_name, col_name)),
                 }
             } else {
-                panic!(format!("generate create table is not support type {} -- {} -- not TypePath", name, col_name))
+                panic!(format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
             }
         } else {
-            panic!(format!("generate create table is not support type {} -- {} -- not TypePath", name, col_name))
+            panic!(format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
         };
 
         let col = match type_name.as_str() {
-            "String" | "BigDecimal" => if col_name == "id" {format!("{} TEXT PRIMARY KEY,", col_name)} else{format!("{} TEXT NOT NULL,", col_name)},
+            "String" | "BigDecimal" => if col_name == "id" { format!("{} TEXT PRIMARY KEY,", col_name) } else { format!("{} TEXT NOT NULL,", col_name) },
             "Option<String>" | "Option<BigDecimal>" => format!("{} TEXT DEFAULT NULL,", col_name),
             "i64" | "u64" | "i32" | "u32" | "i16" | "u16" => format!("{} INTEGER NOT NULL,", col_name),
             "Option<i64>" | "Option<u64>" | "Option<i32>" | "Option<u32>" | "Option<i16>" | "Option<u16>" => format!("{} INTEGER DEFAULT NULL,", col_name),
@@ -106,25 +201,32 @@ fn generate_table_script(name: &str, fields: &Fields) -> String {
             "Option<f32>" | "Option<f64>" => format!("{} REAL DEFAULT NULL,", col_name),
             "bool" => format!("{} BOOLEAN NOT NULL,", col_name),
             "Option<bool>" => format!("{} BOOLEAN DEFAULT NULL,", col_name),
-            _ => format!("{} TEXT, -- is struct! ", col_name), //todo do not support sub struct
+            _ => {
+                format!("{},", tm.set_sub(type_name.as_str()))
+            }
             // _ => panic!( format!("generate create table is not support type {} -- {} -- {}", &ast.ident, col_name, type_name))
         };
-        sql.push_str("    ");
-        sql.push_str(col.as_str());
-        sql.push_str("\n");
-
-        // //test
-        // if name == "mnemonic" {
-        //     if let Type::Path(TypePath { path, .. }) = &field.ty {
-        //         println!("+++ {:?} -- {} ---- {} ",path.segments,  type_name, col_name);
-        //     }
-        // }
+        cols.push_str("    ");
+        cols.push_str(col.as_str());
+        cols.push_str("\n");
     }
 
-    sql.remove(sql.len() - 2);
-    sql.push_str(" );\n");
+    if let Some(index) = cols.rfind(',') {
+        cols.remove(index);
+    }
+    {
+        let mut temp = cols.clone();
+        temp.insert_str(0, format!("-- {} start\n", type_name).as_str());
+        temp.insert_str(temp.len(), format!("    -- {} end\n", type_name).as_str());
+        tm.cols = temp;
+    }
 
-    sql
+    let mut template = cols;
+    template.insert_str(0, format!("CREATE TABLE IF NOT EXISTS {} (  \n", gen_table_name(type_name)).as_str());
+    template.push_str(" );\n");
+    tm.template = template;
+
+    return tm;
 }
 
 fn recreate_file(script: &str, file_name: &str) {
@@ -155,18 +257,19 @@ fn append_file(script: &str, file_name: &str) {
     let _ = file.write_all(script.as_bytes());
 }
 
-fn get_path() -> String {
+fn get_path(short_name: &str) -> String {
     let cur = "generated_sql".to_owned();
     if fs::metadata(cur.as_str()).is_err() {
         let _ = fs::create_dir(cur.as_str());
     }
-    cur
+    let full = path::Path::new(cur.as_str()).join(short_name);
+    return full.to_str().expect("full.to_str().").to_owned();
 }
 
 #[cfg(test)]
 mod tests {
     // use proc_macro_roids::FieldExt;
-    use syn::{Fields, FieldsNamed, parse_quote, };
+    use syn::{Fields, FieldsNamed, parse_quote};
 
     #[test]
     fn generate_table_script() {
@@ -198,38 +301,45 @@ mod tests {
 
             pub o_f32: Option<f32>,
             pub o_f64: Option<f64>,
+
+            pub d_big: BigDecimal,
+            pub o_big: Option<BigDecimal>,
         }};
         let fields = Fields::from(fields_named);
-        let name = "test_generate";
-        let sql = crate::db_meta::generate_table_script(name,&fields);
+        let name = "TestGenerate";
+        let tm = crate::db_meta::generate_table_script(name, &fields);
+        let sql = tm.template;
 
-        assert_eq!(true,sql.contains("id TEXT PRIMARY KEY"));
+        assert_eq!(true, sql.contains("id TEXT PRIMARY KEY"));
 
-        assert_eq!(true,sql.contains("d_str TEXT NOT NULL"));
-        assert_eq!(true,sql.contains("o_str TEXT DEFAULT NULL"));
+        assert_eq!(true, sql.contains("d_str TEXT NOT NULL"));
+        assert_eq!(true, sql.contains("o_str TEXT DEFAULT NULL"));
 
-        assert_eq!(true,sql.contains("d_i16 INTEGER NOT NULL"));
-        assert_eq!(true,sql.contains("d_u16 INTEGER NOT NULL"));
-        assert_eq!(true,sql.contains("d_i32 INTEGER NOT NULL"));
-        assert_eq!(true,sql.contains("d_u32 INTEGER NOT NULL"));
-        assert_eq!(true,sql.contains("d_i64 INTEGER NOT NULL"));
-        assert_eq!(true,sql.contains("d_u64 INTEGER NOT NULL"));
+        assert_eq!(true, sql.contains("d_i16 INTEGER NOT NULL"));
+        assert_eq!(true, sql.contains("d_u16 INTEGER NOT NULL"));
+        assert_eq!(true, sql.contains("d_i32 INTEGER NOT NULL"));
+        assert_eq!(true, sql.contains("d_u32 INTEGER NOT NULL"));
+        assert_eq!(true, sql.contains("d_i64 INTEGER NOT NULL"));
+        assert_eq!(true, sql.contains("d_u64 INTEGER NOT NULL"));
 
-        assert_eq!(true,sql.contains("o_i16 INTEGER DEFAULT NULL"));
-        assert_eq!(true,sql.contains("o_u16 INTEGER DEFAULT NULL"));
-        assert_eq!(true,sql.contains("o_i32 INTEGER DEFAULT NULL"));
-        assert_eq!(true,sql.contains("o_u32 INTEGER DEFAULT NULL"));
-        assert_eq!(true,sql.contains("o_i64 INTEGER DEFAULT NULL"));
-        assert_eq!(true,sql.contains("o_u64 INTEGER DEFAULT NULL"));
+        assert_eq!(true, sql.contains("o_i16 INTEGER DEFAULT NULL"));
+        assert_eq!(true, sql.contains("o_u16 INTEGER DEFAULT NULL"));
+        assert_eq!(true, sql.contains("o_i32 INTEGER DEFAULT NULL"));
+        assert_eq!(true, sql.contains("o_u32 INTEGER DEFAULT NULL"));
+        assert_eq!(true, sql.contains("o_i64 INTEGER DEFAULT NULL"));
+        assert_eq!(true, sql.contains("o_u64 INTEGER DEFAULT NULL"));
 
-        assert_eq!(true,sql.contains("d_bool BOOLEAN NOT NULL"));
-        assert_eq!(true,sql.contains("o_bool BOOLEAN DEFAULT NULL"));
+        assert_eq!(true, sql.contains("d_bool BOOLEAN NOT NULL"));
+        assert_eq!(true, sql.contains("o_bool BOOLEAN DEFAULT NULL"));
 
-        assert_eq!(true,sql.contains("d_f32 REAL NOT NULL"));
-        assert_eq!(true,sql.contains("d_f64 REAL NOT NULL"));
-        assert_eq!(true,sql.contains("o_f32 REAL DEFAULT NULL"));
-        assert_eq!(true,sql.contains("o_f64 REAL DEFAULT NULL"));
+        assert_eq!(true, sql.contains("d_f32 REAL NOT NULL"));
+        assert_eq!(true, sql.contains("d_f64 REAL NOT NULL"));
+        assert_eq!(true, sql.contains("o_f32 REAL DEFAULT NULL"));
+        assert_eq!(true, sql.contains("o_f64 REAL DEFAULT NULL"));
 
-        println!("{}",sql);
+        assert_eq!(true, sql.contains("d_big String NOT NULL"));
+        assert_eq!(true, sql.contains("o_big String DEFAULT NULL"));
+
+        println!("{}", sql);
     }
 }

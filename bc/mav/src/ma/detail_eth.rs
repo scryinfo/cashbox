@@ -10,9 +10,10 @@ use crate::ma::db::{self, Shared};
 use crate::ma::TokenShared;
 
 //eth
-#[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[db_append_shared(CRUDEnable)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainTokenShared {
+    #[serde(flatten)]
     pub token_shared: TokenShared,
 }
 
@@ -20,8 +21,10 @@ pub struct EthChainTokenShared {
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainTokenAuth {
     /// [EthChainTokenShared]
+    #[serde(default)]
     pub chain_token_shared_id: String,
     /// 显示位置，以此从小到大排列
+    #[serde(default)]
     pub position: i64,
 }
 
@@ -30,9 +33,10 @@ pub struct EthChainTokenAuth {
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainTokenDefault {
     /// [crate::db::TokenShared]
+    #[serde(default)]
     pub chain_token_shared_id: String,
-
     /// 显示位置，以此从小到大排列
+    #[serde(default)]
     pub position: i64,
 }
 //eth end

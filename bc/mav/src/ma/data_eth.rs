@@ -8,7 +8,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::db::{self, Shared};
+use crate::ma::db::{self, bool_from_int, Shared};
 use crate::ma::TxShared;
 
 //eth
@@ -17,49 +17,68 @@ use crate::ma::TxShared;
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainToken {
+    #[serde(default)]
     pub next_id: String,
     /// 手动加入的token就没有token shared内容
     /// [crate::db::BtcChainTokenShared]
+    #[serde(default)]
     pub chain_token_shared_id: Option<String>,
     /// [crate::db::Wallet]
+    #[serde(default)]
     pub wallet_id: String,
     /// [crate::ChainType]
+    #[serde(default)]
     pub chain_type: String,
     /// 是否显示
+    #[serde(default, deserialize_with = "bool_from_int")]
     pub show: bool,
 
     /// 交易时默认的gas limit
+    #[serde(default)]
     pub gas_limit: i64,
     /// 交易时默认的gas price
+    #[serde(default)]
     pub gas_price: String,
     /// 糖度
+    #[serde(default)]
     pub decimal: i32,
 
 }
 
 /// eth chain的交易，包含eth，erc20等
-#[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[db_append_shared(CRUDEnable)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct EthChainTx {
+    #[serde(flatten)]
     pub tx_shared: TxShared,
     /// [crate::TxStatus]
+    #[serde(default)]
     pub status: String,
     /// 链上的时间戳
+    #[serde(default)]
     pub tx: i64,
     /// from是数据库的关键字，所以加上 address
     /// 这是签名地址
+    #[serde(default)]
     pub from_address: String,
     /// 接收到token的地址，如果为erc20时，此地址为空
+    #[serde(default)]
     pub to_address: String,
+    #[serde(default)]
     pub value: String,
+    #[serde(default)]
     pub fee: String,
+    #[serde(default)]
     pub gas_price: String,
+    #[serde(default)]
     pub gas_limit: i64,
+    #[serde(default)]
     pub nonce: String,
     /// 原始的input data
+    #[serde(default)]
     pub input_data: String,
-
     /// 解析过的扩展数据，这里eth与erc20的处理是不一样的
+    #[serde(default)]
     pub extension: String,
 }
 

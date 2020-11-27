@@ -1,7 +1,14 @@
-pub use crate::ma::data::{TokenAddress, TxShared};
-pub use crate::ma::data_eth::{EthChainToken, EthChainTx, EthErc20Face, EthErc20Tx};
-pub use crate::ma::detail::{TokenShared, Wallet};
-pub use crate::ma::detail_eth::{EthChainTokenAuth, EthChainTokenDefault};
+#[cfg(test)]
+pub use db::test as db_dest;
+
+pub use crate::ma::data::{*};
+pub use crate::ma::data_btc::{*};
+pub use crate::ma::data_eee::{*};
+pub use crate::ma::data_eth::{*};
+pub use crate::ma::detail::{*};
+pub use crate::ma::detail_btc::{*};
+pub use crate::ma::detail_eee::{*};
+pub use crate::ma::detail_eth::{*};
 pub use crate::ma::mnemonic::Mnemonic;
 
 mod mnemonic;
@@ -15,3 +22,4 @@ mod data_eee;
 mod data_btc;
 
 pub mod db;
+

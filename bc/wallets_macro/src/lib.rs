@@ -2,18 +2,22 @@ use proc_macro::TokenStream;
 
 use proc_macro_roids::{DeriveInputStructExt, FieldsNamedAppend};
 use quote::quote;
-use syn::{DeriveInput, FieldsNamed, parse_macro_input, parse_quote, Type};
+use syn::{AttributeArgs, DeriveInput, FieldsNamed, parse_macro_input, parse_quote, Type};
 
 mod db_meta;
 
 #[proc_macro_attribute]
-pub fn db_append_shared(_args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut ast = parse_macro_input!(input as DeriveInput);
+    let args = parse_macro_input!(args as AttributeArgs);
 
     // Append the fields.
     let fields_additional: FieldsNamed = parse_quote!({
+        #[serde(default)]
         pub id: String,
+        #[serde(default)]
         pub create_time: i64,
+        #[serde(default)]
         pub update_time: i64,
      });
     ast.append_named(fields_additional);
@@ -49,9 +53,20 @@ pub fn db_append_shared(_args: TokenStream, input: TokenStream) -> TokenStream {
             }
     };
 
+    let impl_crud = if args.is_empty() {
+        quote! {}
+    } else {
+        quote! {
+            impl CRUDEnable for #name {
+                type IdType = String;
+            }
+        }
+    };
+
     let gen = TokenStream::from(quote! {
             #ast
             #imp_base
+            #impl_crud
         });
     if cfg!(feature = "print_macro") {
         println!("\n............gen impl db_append_shared {}:\n {}", name, gen);
@@ -59,9 +74,27 @@ pub fn db_append_shared(_args: TokenStream, input: TokenStream) -> TokenStream {
 
     if cfg!(feature = "db_meta") {
         let mut meta = db_meta::DbMeta::get().lock().expect("db_meta::DbMeta::get().lock()");
-        (*meta).push(ast.clone());
+        (*meta).push(&ast);
     }
 
+    gen
+}
+
+#[proc_macro_attribute]
+pub fn db_sub_struct(_: TokenStream, input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput);
+    let gen = TokenStream::from(quote! {
+            #ast
+        });
+
+    if cfg!(feature = "print_macro") {
+        println!("\n////// gen impl db_sub_struct {}:\n {}", &ast.ident.to_string(), gen);
+    }
+
+    if cfg!(feature = "db_meta") {
+        let mut meta = db_meta::DbMeta::get().lock().expect("db_meta::DbMeta::get().lock()");
+        (*meta).push_sub_struct(&ast);
+    }
     gen
 }
 
@@ -137,7 +170,7 @@ pub fn dl_struct(input: TokenStream) -> TokenStream {
 
 #[cfg(test)]
 mod tests {
-    use syn::{Fields, FieldsNamed,  parse_quote, Type};
+    use syn::{Fields, FieldsNamed, parse_quote, Type};
 
     #[test]
     fn it_works() {

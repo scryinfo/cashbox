@@ -71,3 +71,5 @@ git
 /demo/ffi/target
 /demo/ffi/flutter_app/dl/arm64-v8a/*.so
 /demo/ffi/orm_rustorm/target
+/bc/generated_sql
+/bc/mav/generated_sql
