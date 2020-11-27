@@ -249,9 +249,9 @@ class WalletManager {
     return updateRecordMap;
   }
 
-  static saveEeeExtrinsicDetail(String account, String eventDetail, String blockHash, String extrinsics) async {
-    Map<dynamic, dynamic> updateRecordMap = await _channel
-        .invokeMethod("saveExtrinsicDetail", {"accountId": account, "eventDetail": eventDetail, "blockHash": blockHash, "extrinsics": extrinsics});
+  static saveEeeExtrinsicDetail(String infoId, String account, String eventDetail, String blockHash, String extrinsics) async {
+    Map<dynamic, dynamic> updateRecordMap = await _channel.invokeMethod("saveExtrinsicDetail",
+        {"infoId": infoId, "accountId": account, "eventDetail": eventDetail, "blockHash": blockHash, "extrinsics": extrinsics});
     return updateRecordMap;
   }
 

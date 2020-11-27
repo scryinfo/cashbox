@@ -494,8 +494,8 @@ class Wallets {
     return updateEeeSyncRecordMap;
   }
 
-  Future<Map> saveEeeExtrinsicDetail(String account, String eventDetail, String blockHash, String extrinsic) async {
-    Map<dynamic, dynamic> saveEeeExtrinsicDetailMap = await WalletManager.saveEeeExtrinsicDetail(account, eventDetail, blockHash, extrinsic);
+  Future<Map> saveEeeExtrinsicDetail(String infoId,String account, String eventDetail, String blockHash, String extrinsic) async {
+    Map<dynamic, dynamic> saveEeeExtrinsicDetailMap = await WalletManager.saveEeeExtrinsicDetail(infoId, account, eventDetail, blockHash, extrinsic);
     int status = saveEeeExtrinsicDetailMap["status"];
     if (status == null || status != 200) {
       LogUtil.instance.e("saveEeeExtrinsicDetail=>",
