@@ -2,7 +2,6 @@ package info.scry.wallet_manager;
 
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
@@ -157,7 +156,7 @@ public class NativeLibTest {
     public void updateSubChainBasicInfoTest() throws Throwable{
         Map header = new HashMap<String, String>();
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.57:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9937"), header);
         NativeLib.Message message = saveSubChainBasicInfo(client,null,true);
         System.out.println(message);
     }
@@ -232,6 +231,7 @@ public class NativeLibTest {
 
     @Test
     public void getEeeSyncRecordTest() {
+        System.out.println("java library path:"+System.getProperty("java.library.path"));
         System.out.println(NativeLib.getEeeSyncRecord());
     }
 
@@ -244,7 +244,6 @@ public class NativeLibTest {
         //  String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
         String account_1 = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
-
 
         header.put("Content-Type", "application/json");
         JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9937"), header);
@@ -284,7 +283,7 @@ public class NativeLibTest {
             //Get the block hash of the current query storage status
             endBlockHash = client.invoke("chain_getBlockHash", new Object[]{endBlockNumber}, String.class);
             //Query the history of account status changes within the changed block ,key2.storageKeyInfo
-            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
+            StorageChange[] storage = client.invoke("state_queryStorage", new Object[]{new String[]{key1.storageKeyInfo,key2.storageKeyInfo}, startBlockHash, endBlockHash}, StorageChange[].class);
             System.out.println("*********************StorageChange start**************");
             // System.out.println(storage.toString());
             System.out.println("*********************StorageChange end**************");
