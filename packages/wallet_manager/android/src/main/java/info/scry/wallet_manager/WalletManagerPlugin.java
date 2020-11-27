@@ -909,7 +909,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 // ScryWalletLog.d("nativeLib extrinsics   =>", (String) (call.argument("extrinsics")));
                 Message message = new Message();
                 try {
-                    message = NativeLib.saveExtrinsicDetail((String) (call.argument("accountId")), (String) (call.argument("eventDetail")),
+                    message = NativeLib.saveExtrinsicDetail((String) (call.argument("infoId")),(String) (call.argument("accountId")), (String) (call.argument("eventDetail")),
                             (String) (call.argument("blockHash")), (String) (call.argument("extrinsics")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "saveExtrinsicDetail exception is " + exception);

@@ -51,6 +51,7 @@ class EeeSyncTxs {
   bool _timing = false;
   String _eeeStorageKey = '';
   String _tokenXStorageKey = '';
+  String _infoId = '';
 
   ScryXNetUtil _scryXNetUtil = new ScryXNetUtil();
 
@@ -59,6 +60,10 @@ class EeeSyncTxs {
     RunParams runParams = new RunParams(_address, _chainType);
     _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
     _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
+    Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0);
+    if (getSubChainMap != null && getSubChainMap["status"] == 200) {
+      _infoId = getSubChainMap["infoId"];
+    }
     _threadRun(runParams);
   }
 
@@ -82,20 +87,6 @@ class EeeSyncTxs {
       }
       _timing = false;
     });
-
-    // await SharedPreferenceUtil.initIpConfig();
-    // WidgetsFlutterBinding.ensureInitialized();
-    // await SystemChrome.setEnabledSystemUIOverlays([]);
-    // await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    // await di.init(); //initialize the service locator
-    // for (;true;) {
-    //   try {
-    //     await _loadEeeChainTxHistoryData(runParams);
-    //   }catch(e){
-    //     print(e);
-    //   }
-    //   sleep(new Duration(seconds: 1));
-    // }
   }
 
   _loadEeeChainTxHistoryData(RunParams runParams) async {
@@ -213,7 +204,8 @@ class EeeSyncTxs {
           return;
         }
         String extrinsicJson = convert.jsonEncode(extrinsicList);
-        Map saveEeeMap = await Wallets.instance.saveEeeExtrinsicDetail(runParams.address, loadStorageMap["result"], element["block"], extrinsicJson);
+        Map saveEeeMap =
+            await Wallets.instance.saveEeeExtrinsicDetail(_infoId, runParams.address, loadStorageMap["result"], element["block"], extrinsicJson);
         if (!_isMapStatusOk(saveEeeMap)) {
           return;
         }

@@ -520,7 +520,7 @@ public class NativeLib {
      * @return
      */
 
-    public static native Message saveExtrinsicDetail(String accountId, String eventDetail, String blockHash, String extrinsics);
+    public static native Message saveExtrinsicDetail(String infoId, String accountId, String eventDetail, String blockHash, String extrinsics);
 
     /**
      * Record the currently synchronized block number, used for the starting position when the update is triggered next time
