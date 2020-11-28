@@ -543,8 +543,6 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
 
        match metadata.1 {
             RuntimeMetadata::V12(meta) => {
-              /*  let modules_meta_data_vec = convert(meta.modules)?;
-                add_modules(modules_meta_data_vec,modules);*/
                 for module in convert(meta.modules)?.into_iter() {
                     let module_name = convert(module.name.clone())?;
 

@@ -52,6 +52,14 @@ impl<T> Keccak256<[u8; 32]> for T where T: AsRef<[u8]> {
     }
 }
 
+//
+#[derive(Clone, Debug, Decode)]
+pub enum Token{
+    EEE,
+    TokenX
+}
+
+
 /// Used to transfer the decoded result of account information, use the default unit here?
 #[derive(Clone, Debug, Default, Decode)]
 pub struct EeeAccountInfo {
@@ -108,10 +116,10 @@ mod tests {
 
     const TX_VERSION: u32 = 1;
     const RUNTIME_VERSION: u32 = 6;
-    const URL: &'static str = "ws://192.168.1.7:9947";
+    const URL: &'static str = "ws://192.168.1.57:9944";
     //const GENESIS_HASH: &'static str = "0x85caf08522f79bae099d06348fe8b42f411159352fabd2dbd6a41f52afe8208c";
-    const GENESIS_HASH: &'static str =  "0x286a1642a861e1c5d83365167f04c0bfd756108c931eac9d55bca171c46c707f";
-    const METADATA_REQ: &'static str = r#"{"id":1,"jsonrpc":"2.0","method":"state_getMetadata","params":["0xdc7f2230c290ff11dbe94353058ed32ee939f734781307f051a0857d0e856c32"]}"#;
+    const GENESIS_HASH: &'static str =  "0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973";
+    const METADATA_REQ: &'static str = r#"{"id":1,"jsonrpc":"2.0","method":"state_getMetadata","params":[]}"#;
 
     pub mod rpc;
 
@@ -172,7 +180,7 @@ mod tests {
         let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15));
         assert!(helper.is_ok());
         let helper = helper.unwrap();
-        let account_id = AccountId::from_ss58check("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY").unwrap();
+        let account_id = AccountId::from_ss58check("5HguabiDW28a7pmPzVj6DHcAQoZ5DesD1KhXBWEAH4PXvDZ9").unwrap();
         // AccountInfo
         match helper.get_storage_map_key::<AccountId, u128>("System", "Account", account_id) {
             Ok(key) => {
@@ -191,7 +199,7 @@ mod tests {
         let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15));
         assert!(helper.is_ok());
         let helper = helper.unwrap();
-        let sign_ret = helper.token_transfer_sign("eee", mnemonic, "5Dne8YVzkp7YKRJVMP8GYm9xTtNdW1crtZeeh6NavTPdLoUY", amount, 3,None);
+        let sign_ret = helper.token_transfer_sign(Token::EEE, mnemonic, "5Dne8YVzkp7YKRJVMP8GYm9xTtNdW1crtZeeh6NavTPdLoUY", amount, 3,None);
         assert!(sign_ret.is_ok());
         println!("signed tx result:{}", sign_ret.unwrap());
     }

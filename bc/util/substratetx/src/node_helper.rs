@@ -31,7 +31,7 @@ impl ChainHelper {
         })
     }
     // transfer amount is the basic unit （smallest unit)
-    pub fn token_transfer_sign(&self, token_name: &str, mnemonic: &str, to: &str, amount: &str, index: u32,ext_data:Option<Vec<u8>>) -> Result<String, error::Error> {
+    pub fn token_transfer_sign(&self, token_name:Token, mnemonic: &str, to: &str, amount: &str, index: u32,ext_data:Option<Vec<u8>>) -> Result<String, error::Error> {
         if let Some(token_func) = self.convert_token_name(token_name) {
             self.transfer(token_func.0, token_func.1, mnemonic, to, amount, index,ext_data)
         } else {
@@ -254,9 +254,9 @@ impl ChainHelper {
             None
         }
     }
-    fn convert_token_name(&self, token_name: &str) -> Option<(&str, &str)> {
-        let funcs = match token_name.to_lowercase().as_str() {
-            "eee" => {
+    fn convert_token_name(&self, token_name: Token) -> Option<(&str, &str)> {
+        let funcs = match token_name {
+            Token::EEE => {
                 let moudule_name = "Balances";
                 let call_name = "transfer";
                 if self.is_module_call_exist(moudule_name, call_name).is_some() {
@@ -265,7 +265,7 @@ impl ChainHelper {
                     None
                 }
             }
-            "tokenx" => {
+            Token::TokenX => {
                 let moudule_name = "TokenX";
                 let call_name = "transfer";
                 if self.is_module_call_exist(moudule_name, call_name).is_some() {
@@ -274,7 +274,6 @@ impl ChainHelper {
                     None
                 }
             }
-            _ => None
         };
         funcs
     }
