@@ -73,3 +73,6 @@ git
 /demo/ffi/orm_rustorm/target
 /bc/generated_sql
 /bc/mav/generated_sql
+/bc/wallets_cdl/Cargo.lock
+/bc/wallets_cdl/target
+/demo/ffi/sql_sqlite/target

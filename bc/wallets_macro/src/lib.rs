@@ -168,6 +168,42 @@ pub fn dl_struct(input: TokenStream) -> TokenStream {
     gen
 }
 
+#[proc_macro_derive(DlDefault)]
+pub fn dl_default(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput);
+    let name = &ast.ident;
+    let mut drops = Vec::new();
+    for field in ast.fields().iter() {
+        if let Some(ident) = field.ident.as_ref() {
+            let fname = ident;
+            if let Type::Ptr(_) = &field.ty{
+                drops.push(quote! {
+                    #fname : std::ptr::null_mut()
+                });
+            }else{
+                drops.push(quote! {
+                    #fname : Default::default()
+                });
+            }
+        }
+    }
+
+    let gen = TokenStream::from(quote! {
+            impl Default for #name {
+                fn default() -> Self {
+                    #name {
+                        #(#drops,)*
+                    }
+                }
+            }
+        });
+    if !cfg!(feature = "print_macro") {
+        println!("............gen impl dl_default {}:\n {}", name, gen);
+        println!("\n............gen impl dl_struct {}:\n {}", name, gen);
+    }
+    gen
+}
+
 #[cfg(test)]
 mod tests {
     use syn::{Fields, FieldsNamed, parse_quote, Type};

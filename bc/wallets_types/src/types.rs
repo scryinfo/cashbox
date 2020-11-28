@@ -1,10 +1,13 @@
-
+#[derive(Default)]
 pub struct Error{}
+#[derive(Default)]
 pub struct InitParameters{}
-
+#[derive(Default)]
 pub struct UnInitParameters{}
-
+#[derive(Default)]
 pub struct WalletsContext{}
+
+#[derive(Default)]
 pub struct Wallet{}
 
 // pub struct Address([u8]);

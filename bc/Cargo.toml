@@ -16,10 +16,6 @@ members = [
     "util/substratetx",
     "murmel",
     "bitcoin",
-    "wallets_cdl",
-    "wallets_macro",
-    "wallets_types",
-    "mav",
     "chain/eth",
     "chain/eee",
     "chain/btc"
