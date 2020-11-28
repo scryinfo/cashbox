@@ -18,7 +18,10 @@ members = [
     "bitcoin",
     "chain/eth",
     "chain/eee",
-    "chain/btc"
+    "chain/btc",
+    "wallets_cdl",
+    "wallets_types",
+    "wallets_macro"
 ]
 
 [dependencies.bitcoin]

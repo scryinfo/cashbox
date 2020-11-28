@@ -20,9 +20,4 @@ wallets_macro = { path = "../wallets_macro" }
 [dev-dependencies]
 pkg-config = "0.3.19"
 
-[workspace]
-members=[
-#    "../wallets_macro",
-#    "../wallets_types",
-#    "../mav",
-]
+#[workspace]

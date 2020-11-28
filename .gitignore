@@ -76,3 +76,5 @@ git
 /bc/wallets_cdl/Cargo.lock
 /bc/wallets_cdl/target
 /demo/ffi/sql_sqlite/target
+/bc/mav/target
+/bc/mav/Cargo.lock
