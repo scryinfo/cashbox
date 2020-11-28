@@ -7,3 +7,4 @@ pub fn uuid() -> String {
 pub fn now_ts_seconds() -> i64 {
     chrono::offset::Utc::now().timestamp()
 }
+

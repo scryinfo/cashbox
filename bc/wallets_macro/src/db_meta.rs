@@ -202,9 +202,20 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
             "bool" => format!("{} BOOLEAN NOT NULL,", col_name),
             "Option<bool>" => format!("{} BOOLEAN DEFAULT NULL,", col_name),
             _ => {
-                format!("{},", tm.set_sub(type_name.as_str()))
+                //#[serde(flatten)]
+                let flatten = field.attrs.iter().any(|it| {
+                    if it.path.segments.iter().any(|p| p.ident.to_string() == "serde") {
+                        it.tokens.to_string().find("flatten").is_some()
+                    } else {
+                        false
+                    }
+                });
+                if flatten {
+                    format!("{},", tm.set_sub(type_name.as_str()))
+                }else{
+                    panic!( format!("generate create table is not support type {} -- {}", type_name, col_name))
+                }
             }
-            // _ => panic!( format!("generate create table is not support type {} -- {} -- {}", &ast.ident, col_name, type_name))
         };
         cols.push_str("    ");
         cols.push_str(col.as_str());
@@ -225,6 +236,11 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
     template.insert_str(0, format!("CREATE TABLE IF NOT EXISTS {} (  \n", gen_table_name(type_name)).as_str());
     template.push_str(" );\n");
     tm.template = template;
+
+    // //test
+    // if type_name == "EeeChainTx" {
+    //     println!(" =============== {:?}\n++++++++++++++++++\n", fields);
+    // }
 
     return tm;
 }
@@ -258,7 +274,13 @@ fn append_file(script: &str, file_name: &str) {
 }
 
 fn get_path(short_name: &str) -> String {
-    let cur = "generated_sql".to_owned();
+    const CARGO_MANIFEST_DIR: &str = "CARGO_MANIFEST_DIR";
+    let mut cur = "generated_sql".to_owned();
+    if let Ok(p) = std::env::var(CARGO_MANIFEST_DIR) {
+        let p = path::Path::new(p.as_str()).join(cur);
+        cur = p.to_str().expect("cur = p.to_str().expect").to_owned();
+    }
+
     if fs::metadata(cur.as_str()).is_err() {
         let _ = fs::create_dir(cur.as_str());
     }
@@ -341,5 +363,21 @@ mod tests {
         assert_eq!(true, sql.contains("o_big String DEFAULT NULL"));
 
         println!("{}", sql);
+    }
+
+    #[test]
+    fn sub_struct() {
+        // let flatten = "#[serde(flatten)]";
+        // let flatten = "flatten".to_string();
+
+        let fields_named: FieldsNamed = parse_quote! {
+            pub id: String,
+            //#[serde(flatten)]
+            pub d_str: String,
+        };
+        // let fields = Fields::from(fields_named);
+        // for f in &fields {
+        //     println!("{:?}", f);
+        // }
     }
 }
