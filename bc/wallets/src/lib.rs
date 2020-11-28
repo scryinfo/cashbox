@@ -102,7 +102,6 @@ pub enum TxStatus {
     Packing,
 }
 
-
 #[cfg(target_os="android")]
 fn init_logger_once() {
     android_logger::init_once(
@@ -139,7 +138,6 @@ mod tests {
             Err(e) => println!("{}", e.to_string()),
         }
     }
-
 
     #[test]
     fn func_sign_test() {

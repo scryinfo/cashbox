@@ -197,11 +197,45 @@ impl DataServiceProvider {
         state.bind(3, offset)?;
         state.bind(4, start_item)?;
 
-        let digits = self.fetch_tokens(state);
+        let digits = self.fetch_eth_tokens(state);
         Ok(model::DigitList {
             count: digits.len() as u32,
             eth_tokens: digits,
         })
+    }
+    //
+    pub fn query_default_digit(&self,chain_type: i64, name: Option<String>,)-> WalletResult<Vec<model::DefaultDigit>>{
+        let mut select_digit = "select id,contract_address,chain_type,short_name,full_name,url_img,group_name,decimals,is_basic,is_default,status from detail.DefaultDigitBase where chain_type =? ".to_string();
+        if name.is_some() {
+            select_digit.push_str("and short_name like ?")
+        }
+        select_digit.push_str(";");
+        let mut state = self.db_hander.prepare(select_digit)?;
+        state.bind(1, chain_type)?;
+
+        if let Some(name) = name {
+            let query_name = format!("%{}%", name);
+            state.bind(2, query_name.as_str())?;
+        }
+
+        let mut default_digits = Vec::new();
+        while let State::Row = state.next().unwrap() {
+            let row_data = model::DefaultDigit {
+                id: state.read::<String>(0).ok(),
+                contract_address: state.read::<String>(1).ok(),
+                chain_type: state.read::<i64>(2).map(|value|format!("{}",value))?,
+                short_name:  state.read::<String>(3).unwrap_or("".to_string()),
+                full_name: state.read::<String>(4).unwrap_or("".to_string()),
+                img_url: state.read::<String>(5).ok(),
+                group_name: state.read::<String>(6).ok(),
+                decimal: state.read::<String>(7)?,
+                is_basic: state.read::<i64>(8).map(|value| value !=0).ok(),
+                is_default: state.read::<i64>(9).map(|value| value !=0).ok(),
+                status: state.read::<i64>(10).ok(),
+            };
+            default_digits.push(row_data);
+        }
+        Ok(default_digits)
     }
     // This conditional query and paging query can be merged, and there is currently no need for paging under the input conditions.
     pub fn query_digit(&self, chain_type: i64, name: Option<String>, contract_addr: Option<String>) -> WalletResult<model::DigitList> {
@@ -225,14 +259,14 @@ impl DataServiceProvider {
                 state.bind(3, query_name.as_str())?;
             }
         }
-        let auth_digits = self.fetch_tokens(state);
+        let auth_digits = self.fetch_eth_tokens(state);
         Ok(model::DigitList {
             count: auth_digits.len() as u32,
             eth_tokens: auth_digits,
         })
     }
 
-    fn fetch_tokens(&self, mut state: Statement) -> Vec<model::EthToken> {
+    fn fetch_eth_tokens(&self, mut state: Statement) -> Vec<model::EthToken> {
         let mut auth_digits = Vec::with_capacity(32 as usize);
         while let State::Row = state.next().unwrap() {
             let row_data = model::EthToken {

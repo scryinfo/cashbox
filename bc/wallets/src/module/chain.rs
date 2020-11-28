@@ -1,7 +1,7 @@
 use super::*;
 use super::model::*;
 
-use substratetx::Crypto;
+use substratetx::{Crypto, Token};
 use std::collections::HashMap;
 use codec::{Encode, Decode};
 use ethereum_types::{H160, U256, H256};
@@ -45,8 +45,13 @@ impl EEE {
         let chain_info = instance.get_sub_chain_info(None,0,0)?;
         if let Some(info) = chain_info.get(0){
             let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
+         /*   let genesis_hash =genesis_hash?;*/
+            let decimal = if info.token_decimals == 0{15}else { info.token_decimals as usize};
+            let transfer_amount = general::token_unit_convert(amount,decimal).map(|amount| amount.to_string())
+                .ok_or_else(||WalletError::Custom("input amount is illegal".to_string()));
+            log::info!("transfer eee amount is:{:?}",transfer_amount);
             let helper = substratetx::SubChainHelper::init(&info.metadata,&genesis_hash[..],info.runtime_version as u32,info.tx_version as u32,None)?;
-            let signed_data = helper.token_transfer_sign("eee",&mn,to,amount,index,None)?;
+            let signed_data = helper.token_transfer_sign(Token::EEE,&mn,to,&transfer_amount?,index,None)?;
             log::debug!("signed data is: {}", signed_data);
             Ok(signed_data)
         }else {
@@ -60,16 +65,21 @@ impl EEE {
         let ext_vec = substratetx::hexstr_to_vec(ext_data)?;
         let instance = wallet_db::DataServiceProvider::instance()?;
         //use default chain basic info;
-        let chain_info = instance.get_sub_chain_info(None,0,0)?;
-        if let Some(info) = chain_info.get(0){
-            let genesis_hash = substratetx::hexstr_to_vec(&info.genesis_hash)?;
-            let helper = substratetx::SubChainHelper::init(&info.metadata,&genesis_hash[..],info.runtime_version as u32,info.tx_version as u32,None)?;
-            let signed_data = helper.token_transfer_sign("tokenx",&mn,to,amount,index,Some(ext_vec))?;
+        let chain_info = instance.get_sub_chain_info(None,0,0)
+            .and_then(|mut chains| chains.pop().ok_or(WalletError::Custom(" default chain basic info isn't exist".to_string())));
+        let decimal = instance.query_default_digit(1,Some("TokenX".to_string()))
+            .and_then(|mut digits|  digits.pop().ok_or(WalletError::Custom("digit TokenX isn't exist".to_string())))
+            .map(|digit| digit.decimal.clone())
+            .and_then(|d| d.parse::<usize>().map_err(|err|WalletError::from(err)));
+
+        let transfer_amount = general::token_unit_convert(amount,decimal?).map(|amount| amount.to_string())
+            .ok_or_else(||WalletError::Custom("input amount is illegal".to_string()));
+        let chain_basic_info = chain_info?;
+            let genesis_hash = substratetx::hexstr_to_vec(&chain_basic_info.genesis_hash)?;
+            let helper = substratetx::SubChainHelper::init(&chain_basic_info.metadata,&genesis_hash[..],chain_basic_info.runtime_version as u32,chain_basic_info.tx_version as u32,None)?;
+            let signed_data = helper.token_transfer_sign(Token::TokenX,&mn,to,&transfer_amount?,index,Some(ext_vec))?;
             log::debug!("signed data is: {}", signed_data);
             Ok(signed_data)
-        }else {
-            Err(WalletError::NotExist)
-        }
     }
 
     pub fn save_tx_record(&self, info_id:&str,account: &str, blockhash: &str, event_data: &str, extrinsics: &str) -> WalletResult<()> {

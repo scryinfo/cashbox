@@ -193,10 +193,10 @@ public class NativeLibTest {
 
     @Test
     public void eeeTransferTest() {
-        String from = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";// 5GubjQedXVKqZ3TGigy4y3Ez1HPYnajJVxNhF9gjzuQ6onzd
+        String from = "5DPYtLY4vrCfxvYHFbMUtdXBCtwWPAjftJJPx61LFmiySkc7";// 5GubjQedXVKqZ3TGigy4y3Ez1HPYnajJVxNhF9gjzuQ6onzd
         String to = "5EjvCP7DL9mS8wNyqVgef3oygW8KtbzsRFoRguixFQkSuFNC";
-        String value = "100000000000";
-        int index = 2;
+        String value = "10";
+        int index = 0;
         NativeLib.Message msg = NativeLib.eeeTransfer(from, to, value,index, "123456".getBytes());
         System.out.println(msg);
     }
