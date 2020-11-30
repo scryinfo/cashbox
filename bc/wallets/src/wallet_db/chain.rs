@@ -276,6 +276,7 @@ impl DataServiceProvider {
     }
 
     pub fn update_sub_chain_info(&self,basic_info:&SubChainBasicInfo,is_default:bool)->WalletResult<String>{
+
         //check chain basic info is exist?
         let query_sql = "select info_id from detail.SubChainInfo a where a.runtime_version = ? and a.tx_version = ? and a. genesis_hash = ?;";
         let mut query_stat = self.db_hander.prepare(query_sql)?;
@@ -284,12 +285,17 @@ impl DataServiceProvider {
         query_stat.bind(3, basic_info.genesis_hash.as_str())?;
         if let State::Row = query_stat.next().unwrap() {
             let info_id = query_stat.read::<String>(0).expect("info id");
+            //update this chain as default chain
+            if is_default{
+                let update_sql =format!("update detail.SubChainInfo set is_default = 0;update detail.SubChainInfo set is_default = 1 where info_id = {};",info_id);
+                self.db_hander.execute(update_sql)?;
+            }
             Ok(info_id)
         }else{
             let info_id = Uuid::new_v4().to_string();
             log::info!("insert chain basic info id is: {}",info_id);
-            let prefix_sql = "update detail.SubChainInfo set is_default = 0;";
             if is_default{
+                let prefix_sql = "update detail.SubChainInfo set is_default = 0;";
                 log::info!("reset default basic chain info");
                 self.db_hander.execute(prefix_sql)?;
             }

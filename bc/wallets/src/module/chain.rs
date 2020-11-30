@@ -226,7 +226,18 @@ impl EEE {
     //update chain basic info,eg:metadata,genesis hash,runtime version tx version etc,which will be used to structure extrinsic encode or decode function
     pub fn update_chain_basic_info(&self,info:&SubChainBasicInfo,is_default:bool)->WalletResult<String> {
         let instance = wallet_db::DataServiceProvider::instance()?;
-       instance.update_sub_chain_info(info,is_default)
+        instance.tx_begin()?;
+       let ret = instance.update_sub_chain_info(info,is_default)
+           .map(|id|{
+               let _ = instance.tx_commint();
+               id
+           })
+           .map_err(|err|{
+               log::error!("update chain basic info:{}",err.to_string());
+               let _ = instance.tx_rollback();
+               err
+           });
+        ret
     }
 
     pub fn query_chain_basic_info(&self,genesis_hash:&str,spec_vers:u32,tx_vers:u32)->WalletResult<Vec<SubChainBasicInfo>>{
