@@ -112,19 +112,28 @@ typedef struct CArrayWallet {
     CU64 cap;
 } CArrayWallet;
 
-typedef uint16_t CBool;
+typedef struct DbName {
+    char *cashboxWallets;
+    char *cashboxMnemonic;
+    char *walletMainnet;
+    char *walletPrivate;
+    char *walletTestnet;
+    char *walletTestnetPrivate;
+} DbName;
 
 typedef struct InitParameters {
-    uint64_t code;
+    DbName *dbName;
 } InitParameters;
 
+typedef struct Context {
+    char *id;
+} Context;
+
 typedef struct UnInitParameters {
-    uint64_t code;
+
 } UnInitParameters;
 
-typedef struct Context {
-
-} Context;
+typedef uint16_t CBool;
 
 #define CFalse 0
 
@@ -144,25 +153,32 @@ Wallet *Wallet_alloc(void);
 
 void Wallet_free(Wallet *ptr);
 
-CArrayWallet *CArrayWallet_alloc(void);
+CArrayWallet **CArrayWallet_dAlloc(void);
 
-void CArrayWallet_free(CArrayWallet *ptr);
+void CArrayWallet_dFree(CArrayWallet **dPtr);
 
 void CChar_free(char *cs);
 
-CBool Wallets_lockRead(void);
+/**
+ * dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存
+ */
+const CError *Wallets_init(InitParameters *parameter, Context **ctx);
 
-CBool Wallets_unlockRead(void);
+const CError *Wallets_uninit(Context *ctx, UnInitParameters *parameter);
 
-CBool Wallets_lockWrite(void);
+CBool Wallets_lockRead(Context *ctx);
 
-CBool Wallets_unlockWrite(void);
+CBool Wallets_unlockRead(Context *ctx);
 
-const CError *Wallets_init(InitParameters *params);
+CBool Wallets_lockWrite(Context *ctx);
 
-const CError *Wallets_uninit(UnInitParameters *params);
+CBool Wallets_unlockWrite(Context *ctx);
 
-const CError *Wallets_all(Context *ctx, CArrayWallet *ptr);
+const CError *Wallets_all(Context *ctx, CArrayWallet *arrayWallet);
+
+Context **Context_dAlloc(void);
+
+void Context_dFree(Context **dPtr);
 
 #ifdef __cplusplus
 } // extern "C"

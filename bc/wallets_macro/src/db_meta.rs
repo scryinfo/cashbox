@@ -212,8 +212,8 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
                 });
                 if flatten {
                     format!("{},", tm.set_sub(type_name.as_str()))
-                }else{
-                    panic!( format!("generate create table is not support type {} -- {}", type_name, col_name))
+                } else {
+                    panic!(format!("generate create table is not support type {} -- {}", type_name, col_name))
                 }
             }
         };

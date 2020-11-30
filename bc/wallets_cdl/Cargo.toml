@@ -14,7 +14,7 @@ crate-type = ["cdylib", "lib"]
 libc = "0.2.80"
 
 wallets = { version = "0.1.0", path = "../wallets" }
-wallets_types = {path="../wallets_types"}
+wallets_types = { path = "../wallets_types" }
 wallets_macro = { path = "../wallets_macro" }
 
 [dev-dependencies]

@@ -141,26 +141,26 @@ class CArrayWallet extends Struct {
 
 }
 
-/// C function `CArrayWallet_alloc`.
-Pointer<CArrayWallet> CArrayWallet_alloc() {
-  return _CArrayWallet_alloc();
+/// C function `CArrayWallet_dAlloc`.
+Pointer<Pointer<CArrayWallet>> CArrayWallet_dAlloc() {
+  return _CArrayWallet_dAlloc();
 }
-final _CArrayWallet_alloc_Dart _CArrayWallet_alloc = _dl.lookupFunction<_CArrayWallet_alloc_C, _CArrayWallet_alloc_Dart>('CArrayWallet_alloc');
-typedef _CArrayWallet_alloc_C = Pointer<CArrayWallet> Function();
-typedef _CArrayWallet_alloc_Dart = Pointer<CArrayWallet> Function();
+final _CArrayWallet_dAlloc_Dart _CArrayWallet_dAlloc = _dl.lookupFunction<_CArrayWallet_dAlloc_C, _CArrayWallet_dAlloc_Dart>('CArrayWallet_dAlloc');
+typedef _CArrayWallet_dAlloc_C = Pointer<Pointer<CArrayWallet>> Function();
+typedef _CArrayWallet_dAlloc_Dart = Pointer<Pointer<CArrayWallet>> Function();
 
-/// C function `CArrayWallet_free`.
-void CArrayWallet_free(
-  Pointer<CArrayWallet> ptr,
+/// C function `CArrayWallet_dFree`.
+void CArrayWallet_dFree(
+  Pointer<Pointer<CArrayWallet>> dPtr,
 ) {
-  _CArrayWallet_free(ptr);
+  _CArrayWallet_dFree(dPtr);
 }
-final _CArrayWallet_free_Dart _CArrayWallet_free = _dl.lookupFunction<_CArrayWallet_free_C, _CArrayWallet_free_Dart>('CArrayWallet_free');
-typedef _CArrayWallet_free_C = Void Function(
-  Pointer<CArrayWallet> ptr,
+final _CArrayWallet_dFree_Dart _CArrayWallet_dFree = _dl.lookupFunction<_CArrayWallet_dFree_C, _CArrayWallet_dFree_Dart>('CArrayWallet_dFree');
+typedef _CArrayWallet_dFree_C = Void Function(
+  Pointer<Pointer<CArrayWallet>> dPtr,
 );
-typedef _CArrayWallet_free_Dart = void Function(
-  Pointer<CArrayWallet> ptr,
+typedef _CArrayWallet_dFree_Dart = void Function(
+  Pointer<Pointer<CArrayWallet>> dPtr,
 );
 
 /// C function `CChar_free`.
@@ -243,6 +243,7 @@ class ChainShared extends Struct {
 /// C struct `Context`.
 class Context extends Struct {
   
+  Pointer<ffi.Utf8> id;
   static Pointer<Context> allocate() {
     return ffi.allocate<Context>();
   }
@@ -250,6 +251,48 @@ class Context extends Struct {
 
   static Context from(int ptr) {
     return Pointer<Context>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C function `Context_dAlloc`.
+Pointer<Pointer<Context>> Context_dAlloc() {
+  return _Context_dAlloc();
+}
+final _Context_dAlloc_Dart _Context_dAlloc = _dl.lookupFunction<_Context_dAlloc_C, _Context_dAlloc_Dart>('Context_dAlloc');
+typedef _Context_dAlloc_C = Pointer<Pointer<Context>> Function();
+typedef _Context_dAlloc_Dart = Pointer<Pointer<Context>> Function();
+
+/// C function `Context_dFree`.
+void Context_dFree(
+  Pointer<Pointer<Context>> dPtr,
+) {
+  _Context_dFree(dPtr);
+}
+final _Context_dFree_Dart _Context_dFree = _dl.lookupFunction<_Context_dFree_C, _Context_dFree_Dart>('Context_dFree');
+typedef _Context_dFree_C = Void Function(
+  Pointer<Pointer<Context>> dPtr,
+);
+typedef _Context_dFree_Dart = void Function(
+  Pointer<Pointer<Context>> dPtr,
+);
+
+/// C struct `DbName`.
+class DbName extends Struct {
+  
+  Pointer<ffi.Utf8> cashboxWallets;
+  Pointer<ffi.Utf8> cashboxMnemonic;
+  Pointer<ffi.Utf8> walletMainnet;
+  Pointer<ffi.Utf8> walletPrivate;
+  Pointer<ffi.Utf8> walletTestnet;
+  Pointer<ffi.Utf8> walletTestnetPrivate;
+  static Pointer<DbName> allocate() {
+    return ffi.allocate<DbName>();
+  }
+
+
+  static DbName from(int ptr) {
+    return Pointer<DbName>.fromAddress(ptr).ref;
   }
 
 }
@@ -320,8 +363,7 @@ class EthChainToken extends Struct {
 /// C struct `InitParameters`.
 class InitParameters extends Struct {
   
-  @Uint64()
-  int code;
+  Pointer<DbName> dbName;
   static Pointer<InitParameters> allocate() {
     return ffi.allocate<InitParameters>();
   }
@@ -354,8 +396,6 @@ class TokenShared extends Struct {
 /// C struct `UnInitParameters`.
 class UnInitParameters extends Struct {
   
-  @Uint64()
-  int code;
   static Pointer<UnInitParameters> allocate() {
     return ffi.allocate<UnInitParameters>();
   }
@@ -411,76 +451,106 @@ typedef _Wallet_free_Dart = void Function(
 /// C function `Wallets_all`.
 Pointer<CError> Wallets_all(
   Pointer<Context> ctx,
-  Pointer<CArrayWallet> ptr,
+  Pointer<CArrayWallet> arrayWallet,
 ) {
-  return _Wallets_all(ctx, ptr);
+  return _Wallets_all(ctx, arrayWallet);
 }
 final _Wallets_all_Dart _Wallets_all = _dl.lookupFunction<_Wallets_all_C, _Wallets_all_Dart>('Wallets_all');
 typedef _Wallets_all_C = Pointer<CError> Function(
   Pointer<Context> ctx,
-  Pointer<CArrayWallet> ptr,
+  Pointer<CArrayWallet> arrayWallet,
 );
 typedef _Wallets_all_Dart = Pointer<CError> Function(
   Pointer<Context> ctx,
-  Pointer<CArrayWallet> ptr,
+  Pointer<CArrayWallet> arrayWallet,
 );
 
-/// C function `Wallets_init`.
+/// <p class="para-brief"> dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存</p>
 Pointer<CError> Wallets_init(
-  Pointer<InitParameters> params,
+  Pointer<InitParameters> parameter,
+  Pointer<Pointer<Context>> ctx,
 ) {
-  return _Wallets_init(params);
+  return _Wallets_init(parameter, ctx);
 }
 final _Wallets_init_Dart _Wallets_init = _dl.lookupFunction<_Wallets_init_C, _Wallets_init_Dart>('Wallets_init');
 typedef _Wallets_init_C = Pointer<CError> Function(
-  Pointer<InitParameters> params,
+  Pointer<InitParameters> parameter,
+  Pointer<Pointer<Context>> ctx,
 );
 typedef _Wallets_init_Dart = Pointer<CError> Function(
-  Pointer<InitParameters> params,
+  Pointer<InitParameters> parameter,
+  Pointer<Pointer<Context>> ctx,
 );
 
 /// C function `Wallets_lockRead`.
-int Wallets_lockRead() {
-  return _Wallets_lockRead();
+int Wallets_lockRead(
+  Pointer<Context> ctx,
+) {
+  return _Wallets_lockRead(ctx);
 }
 final _Wallets_lockRead_Dart _Wallets_lockRead = _dl.lookupFunction<_Wallets_lockRead_C, _Wallets_lockRead_Dart>('Wallets_lockRead');
-typedef _Wallets_lockRead_C = Uint16 Function();
-typedef _Wallets_lockRead_Dart = int Function();
+typedef _Wallets_lockRead_C = Uint16 Function(
+  Pointer<Context> ctx,
+);
+typedef _Wallets_lockRead_Dart = int Function(
+  Pointer<Context> ctx,
+);
 
 /// C function `Wallets_lockWrite`.
-int Wallets_lockWrite() {
-  return _Wallets_lockWrite();
+int Wallets_lockWrite(
+  Pointer<Context> ctx,
+) {
+  return _Wallets_lockWrite(ctx);
 }
 final _Wallets_lockWrite_Dart _Wallets_lockWrite = _dl.lookupFunction<_Wallets_lockWrite_C, _Wallets_lockWrite_Dart>('Wallets_lockWrite');
-typedef _Wallets_lockWrite_C = Uint16 Function();
-typedef _Wallets_lockWrite_Dart = int Function();
+typedef _Wallets_lockWrite_C = Uint16 Function(
+  Pointer<Context> ctx,
+);
+typedef _Wallets_lockWrite_Dart = int Function(
+  Pointer<Context> ctx,
+);
 
 /// C function `Wallets_uninit`.
 Pointer<CError> Wallets_uninit(
-  Pointer<UnInitParameters> params,
+  Pointer<Context> ctx,
+  Pointer<UnInitParameters> parameter,
 ) {
-  return _Wallets_uninit(params);
+  return _Wallets_uninit(ctx, parameter);
 }
 final _Wallets_uninit_Dart _Wallets_uninit = _dl.lookupFunction<_Wallets_uninit_C, _Wallets_uninit_Dart>('Wallets_uninit');
 typedef _Wallets_uninit_C = Pointer<CError> Function(
-  Pointer<UnInitParameters> params,
+  Pointer<Context> ctx,
+  Pointer<UnInitParameters> parameter,
 );
 typedef _Wallets_uninit_Dart = Pointer<CError> Function(
-  Pointer<UnInitParameters> params,
+  Pointer<Context> ctx,
+  Pointer<UnInitParameters> parameter,
 );
 
 /// C function `Wallets_unlockRead`.
-int Wallets_unlockRead() {
-  return _Wallets_unlockRead();
+int Wallets_unlockRead(
+  Pointer<Context> ctx,
+) {
+  return _Wallets_unlockRead(ctx);
 }
 final _Wallets_unlockRead_Dart _Wallets_unlockRead = _dl.lookupFunction<_Wallets_unlockRead_C, _Wallets_unlockRead_Dart>('Wallets_unlockRead');
-typedef _Wallets_unlockRead_C = Uint16 Function();
-typedef _Wallets_unlockRead_Dart = int Function();
+typedef _Wallets_unlockRead_C = Uint16 Function(
+  Pointer<Context> ctx,
+);
+typedef _Wallets_unlockRead_Dart = int Function(
+  Pointer<Context> ctx,
+);
 
 /// C function `Wallets_unlockWrite`.
-int Wallets_unlockWrite() {
-  return _Wallets_unlockWrite();
+int Wallets_unlockWrite(
+  Pointer<Context> ctx,
+) {
+  return _Wallets_unlockWrite(ctx);
 }
 final _Wallets_unlockWrite_Dart _Wallets_unlockWrite = _dl.lookupFunction<_Wallets_unlockWrite_C, _Wallets_unlockWrite_Dart>('Wallets_unlockWrite');
-typedef _Wallets_unlockWrite_C = Uint16 Function();
-typedef _Wallets_unlockWrite_Dart = int Function();
+typedef _Wallets_unlockWrite_C = Uint16 Function(
+  Pointer<Context> ctx,
+);
+typedef _Wallets_unlockWrite_Dart = int Function(
+  Pointer<Context> ctx,
+);

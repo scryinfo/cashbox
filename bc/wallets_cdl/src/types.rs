@@ -3,21 +3,21 @@
 
 use std::os::raw::c_char;
 
+use wallets_macro::{DlDefault, DlStruct};
+
 pub use crate::chain::{*};
 pub use crate::chain_btc::{*};
 pub use crate::chain_eee::{*};
 pub use crate::chain_eth::{*};
 use crate::drop_ctype;
 pub use crate::kits::{CBool, CFalse, CTrue, CU64};
-use crate::kits::{CArray, CStruct, free_c_char};
+use crate::kits::{CArray, CStruct, free_c_char, pointer_alloc, pointer_free};
 pub use crate::types_btc::{*};
 pub use crate::types_eee::{*};
 pub use crate::types_eth::{*};
 
-use wallets_macro::{DlStruct,DlDefault};
-
 #[repr(C)]
-#[derive(Debug, Clone,DlStruct,DlDefault)]
+#[derive(Debug, Clone, DlStruct, DlDefault)]
 pub struct CError {
     //由于很多地方都有使用 error这个名字，加一个C减少重名
     pub code: CU64,
@@ -25,7 +25,7 @@ pub struct CError {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone,DlStruct,DlDefault)]
+#[derive(Debug, Clone, DlStruct, DlDefault)]
 pub struct Wallet {
     pub id: *mut c_char,
     pub nextId: *mut c_char,
@@ -34,8 +34,22 @@ pub struct Wallet {
     pub btcChains: *mut BtcChain,
 }
 
+impl Wallet {
+    pub fn to_c(wallet: &wallets_types::Wallet) -> *mut Wallet {
+        let temp = Box::new(Wallet::default());
+        //todo
+        Box::into_raw(temp)
+    }
+    pub fn to_rust(wallet: &Wallet) -> wallets_types::Wallet {
+        let w = wallets_types::Wallet::default();
+        //todo
+        w
+    }
+}
+
+
 #[repr(C)]
-#[derive(Debug, Clone,DlStruct,DlDefault)]
+#[derive(Debug, Clone, DlStruct, DlDefault)]
 pub struct Address {
     pub id: *mut c_char,
     pub walletId: *mut c_char,
@@ -45,7 +59,7 @@ pub struct Address {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone,DlStruct,DlDefault)]
+#[derive(Debug, Clone, DlStruct, DlDefault)]
 pub struct TokenShared {
     pub id: *mut c_char,
     pub nextId: *mut c_char,
@@ -54,7 +68,7 @@ pub struct TokenShared {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone,DlStruct,DlDefault)]
+#[derive(Debug, Clone, DlStruct, DlDefault)]
 pub struct ChainShared {
     pub id: *mut c_char,
     pub walletId: *mut c_char,
@@ -63,21 +77,6 @@ pub struct ChainShared {
     pub walletAddress: *mut Address,
 }
 
-#[repr(C)]
-#[derive(Debug, Clone,DlStruct,DlDefault)]
-pub struct InitParameters {
-    pub code: u64,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone,DlStruct,DlDefault)]
-pub struct UnInitParameters {
-    pub code: u64,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone,DlStruct,DlDefault)]
-pub struct Context {}
 
 #[no_mangle]
 pub extern "C" fn CStr_free(cs: *mut c_char) {
@@ -103,13 +102,13 @@ pub unsafe extern "C" fn Wallet_free(ptr: *mut Wallet) {
 }
 
 #[no_mangle]
-pub extern "C" fn CArrayWallet_alloc() -> *mut CArray<Wallet> {
-    Box::into_raw(Box::new(CArray::<Wallet>::default()))
+pub extern "C" fn CArrayWallet_dAlloc() -> *mut *mut CArray<Wallet> {
+    pointer_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CArrayWallet_free(ptr: *mut CArray<Wallet>) {
-    Box::from_raw(ptr);
+pub unsafe extern "C" fn CArrayWallet_dFree(dPtr: *mut *mut CArray<Wallet>) {
+    pointer_free(dPtr)
 }
 
 #[cfg(test)]

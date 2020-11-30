@@ -1,14 +1,41 @@
-#[derive(Default)]
-pub struct Error{}
-#[derive(Default)]
-pub struct InitParameters{}
-#[derive(Default)]
-pub struct UnInitParameters{}
-#[derive(Default)]
-pub struct WalletsContext{}
+use parking_lot::ReentrantMutex;
 
 #[derive(Default)]
-pub struct Wallet{}
+pub struct Error {}
+
+#[derive(Default)]
+pub struct DbName {
+    pub cashbox_wallets: String,
+    pub cashbox_mnemonic: String,
+    pub wallet_mainnet: String,
+    pub wallet_private: String,
+    pub wallet_testnet: String,
+    pub wallet_testnet_private: String,
+}
+
+#[derive(Default)]
+pub struct InitParameters {}
+
+
+#[derive(Default)]
+pub struct UnInitParameters {}
+
+pub struct Context {
+    pub id: String,
+    pub reentrant_mutex: ReentrantMutex<i32>,
+}
+
+impl Default for Context {
+    fn default() -> Self {
+        Self {
+            reentrant_mutex: ReentrantMutex::new(0),
+            id: uuid::Uuid::new_v4().to_string(),
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct Wallet {}
 
 // pub struct Address([u8]);
 //

@@ -5,8 +5,6 @@ use std::mem::ManuallyDrop;
 use std::os::raw::c_char;
 use std::ptr::null_mut;
 
-use wallets_macro::{DlStruct,DlDefault};
-
 pub type CBool = u16;
 
 pub const CFalse: CBool = 0;
@@ -152,11 +150,29 @@ pub unsafe fn from_raw<T: CStruct>(ptr: *mut T) -> Box<T> {
     Box::from_raw(ptr)
 }
 
+
+pub fn pointer_alloc<T>() -> *mut *mut T {
+    Box::into_raw(Box::new(null_mut()))
+}
+
+pub fn pointer_free<T>(mut d_ptr: *mut *mut T) {
+    unsafe {
+        let ptr = *d_ptr;
+        if !ptr.is_null() {
+            Box::from_raw(ptr);
+            *d_ptr = null_mut();
+        }
+        Box::from_raw(d_ptr);
+    };
+    d_ptr = null_mut();
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::kits::{CArray, CStruct, to_c_char, free_c_char};
-    use crate::types::CError;
     use std::ptr::null_mut;
+
+    use crate::kits::{CArray, CStruct, free_c_char, to_c_char};
+    use crate::types::CError;
 
     #[test]
     fn c_array() {
@@ -170,22 +186,22 @@ mod tests {
         {//正常释放 default对象
             let mut da = CArray::<Data>::default();
             assert_eq!(null_mut(), da.ptr);
-            assert_eq!(0,da.len);
-            assert_eq!(0,da.cap);
+            assert_eq!(0, da.len);
+            assert_eq!(0, da.cap);
             da.free();
             assert_eq!(null_mut(), da.ptr);
-            assert_eq!(0,da.len);
-            assert_eq!(0,da.cap);
+            assert_eq!(0, da.len);
+            assert_eq!(0, da.cap);
         }
         {
             let mut da = CArray::<Data>::default();
-            da.set(vec![Data{},Data{}]);
+            da.set(vec![Data {}, Data {}]);
             assert_ne!(null_mut(), da.ptr);
-            assert_eq!(2,da.len);
+            assert_eq!(2, da.len);
             da.free();
             assert_eq!(null_mut(), da.ptr);
-            assert_eq!(0,da.len);
-            assert_eq!(0,da.cap);
+            assert_eq!(0, da.len);
+            assert_eq!(0, da.cap);
         }
         {//验证在Array中的内存，会自动释放
             let mut ptr = null_mut();
@@ -194,7 +210,7 @@ mod tests {
                 let mut da2 = CArray::<Data>::default();
                 da2.set(vec![Data {}, Data {}]);
                 unsafe {
-                    pptr  = &mut da2.ptr as *mut _ as *mut *mut Data;
+                    pptr = &mut da2.ptr as *mut _ as *mut *mut Data;
                 }
             }
             unsafe {
@@ -204,10 +220,11 @@ mod tests {
             }
         }
     }
+
     #[test]
-    fn test_c_char(){
+    fn test_c_char() {
         let mut cs = to_c_char("test");
         free_c_char(&mut cs);
-        assert_eq!(null_mut(),cs);
+        assert_eq!(null_mut(), cs);
     }
 }

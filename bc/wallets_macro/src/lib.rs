@@ -176,11 +176,11 @@ pub fn dl_default(input: TokenStream) -> TokenStream {
     for field in ast.fields().iter() {
         if let Some(ident) = field.ident.as_ref() {
             let fname = ident;
-            if let Type::Ptr(_) = &field.ty{
+            if let Type::Ptr(_) = &field.ty {
                 drops.push(quote! {
                     #fname : std::ptr::null_mut()
                 });
-            }else{
+            } else {
                 drops.push(quote! {
                     #fname : Default::default()
                 });
@@ -197,9 +197,8 @@ pub fn dl_default(input: TokenStream) -> TokenStream {
                 }
             }
         });
-    if !cfg!(feature = "print_macro") {
+    if cfg!(feature = "print_macro") {
         println!("............gen impl dl_default {}:\n {}", name, gen);
-        println!("\n............gen impl dl_struct {}:\n {}", name, gen);
     }
     gen
 }

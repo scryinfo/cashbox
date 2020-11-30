@@ -15,7 +15,7 @@ pub use substratetx::{encode_account_storage_key, decode_account_info, event_dec
 
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
-pub use wallets::{Wallets};
+pub use wallets::{Wallets,WalletsInstances};
 
 const DEFAULT_SS58_VERSION:u8 = 42;
 
