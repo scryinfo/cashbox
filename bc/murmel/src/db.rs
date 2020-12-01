@@ -1,5 +1,7 @@
 //! mod for sqlite
-//!
+//! use two database
+//!     1. for btc chain database
+//!     2. for user data (utxo address ...)
 //!
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;

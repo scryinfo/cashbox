@@ -92,7 +92,6 @@ impl BloomFilter {
             self.p2p
                 .send_network(peer, NetworkMessage::FilterLoad(filter_load_message.to_owned()));
         }
-        info!("did not find filter");
         Ok(())
     }
 }
