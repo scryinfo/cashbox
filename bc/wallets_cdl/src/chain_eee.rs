@@ -1,21 +1,22 @@
 #![allow(non_snake_case)]
 
-use wallets_macro::{DlDefault, DlStruct};
+use wallets_macro::{DlCR, DlDefault, DlStruct};
+use wallets_types::{EeeChain, EeeChainToken};
 
 use crate::drop_ctype;
-use crate::kits::{CArray, CStruct};
-use crate::types::{Address, ChainShared, TokenShared};
+use crate::kits::{CArray, CR, CStruct};
+use crate::types::{CAddress, CChainShared, CTokenShared};
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault)]
-pub struct EeeChainToken {
-    pub tokenShared: *mut TokenShared,
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CEeeChainToken {
+    pub tokenShared: *mut CTokenShared,
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault)]
-pub struct EeeChain {
-    pub chainShared: *mut ChainShared,
-    pub address: *mut Address,
-    pub tokens: *mut CArray<EeeChainToken>,
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CEeeChain {
+    pub chainShared: *mut CChainShared,
+    pub address: *mut CAddress,
+    pub tokens: *mut CArray<CEeeChainToken>,
 }

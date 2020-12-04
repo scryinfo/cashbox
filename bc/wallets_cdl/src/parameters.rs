@@ -3,29 +3,21 @@
 
 use std::os::raw::c_char;
 
-use wallets_macro::{DlDefault, DlStruct};
+use wallets_macro::{DlCR, DlDefault, DlStruct};
+use wallets_types::{Context, DbName, InitParameters, UnInitParameters};
 
 use crate::drop_ctype;
-use crate::kits::{to_c_char, to_str};
-use crate::kits::{CStruct, pointer_alloc, pointer_free};
+use crate::kits::{CR, CStruct, pointer_alloc, pointer_free, to_c_char, to_str};
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault)]
-pub struct InitParameters {
-    pub dbName: *mut DbName,
-}
-
-impl InitParameters {
-    pub fn to_rust(c_parameters: *mut InitParameters) -> wallets_types::InitParameters {
-        let r_parameters = wallets_types::InitParameters::default();
-        //todo
-        r_parameters
-    }
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CInitParameters {
+    pub dbName: *mut CDbName,
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault)]
-pub struct DbName {
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CDbName {
     pub cashboxWallets: *mut c_char,
     pub cashboxMnemonic: *mut c_char,
     pub walletMainnet: *mut c_char,
@@ -34,33 +26,18 @@ pub struct DbName {
     pub walletTestnetPrivate: *mut c_char,
 }
 
-impl DbName {
-    pub fn to_rust(c_parameters: *mut DbName) -> wallets_types::DbName {
-        let r_parameters = wallets_types::DbName::default();
-        //todo
-        r_parameters
-    }
-}
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CUnInitParameters {}
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault)]
-pub struct UnInitParameters {}
-
-impl UnInitParameters {
-    pub fn to_rust(c_parameters: *mut UnInitParameters) -> wallets_types::UnInitParameters {
-        let r_paremeters = wallets_types::UnInitParameters::default();
-        r_paremeters
-    }
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault)]
-pub struct Context {
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CContext {
     pub id: *mut c_char, //上下文的唯一标识
 }
 
-impl Context {
-    pub fn get_id(ctx: *mut Context) -> String {
+impl CContext {
+    pub fn get_id(ctx: *mut CContext) -> String {
         if ctx.is_null() {
             panic!("ptr is null in get_id ");
         }
@@ -69,7 +46,7 @@ impl Context {
         Box::into_raw(c);
         id.to_owned()
     }
-    pub fn get_id_d(ctx: *mut *mut Context) -> String {
+    pub fn get_id_d(ctx: *mut *mut CContext) -> String {
         unsafe {
             if ctx.is_null() || !(*ctx).is_null() {
                 panic!("ptr is null in get_id_d ");
@@ -80,20 +57,15 @@ impl Context {
         Box::into_raw(c);
         id.to_owned()
     }
-    pub fn to_rust(ctx: &wallets_types::Context) -> *mut Context {
-        let mut temp = Box::new(Context::default());
-        temp.id = to_c_char(&ctx.id);
-        Box::into_raw(temp)
-    }
 }
 
 #[no_mangle]
-pub extern "C" fn Context_dAlloc() -> *mut *mut Context {
+pub extern "C" fn Context_dAlloc() -> *mut *mut CContext {
     pointer_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Context_dFree(dPtr: *mut *mut Context) {
+pub unsafe extern "C" fn Context_dFree(dPtr: *mut *mut CContext) {
     pointer_free(dPtr)
 }
 

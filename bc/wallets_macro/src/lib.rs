@@ -5,6 +5,7 @@ use quote::quote;
 use syn::{AttributeArgs, DeriveInput, FieldsNamed, parse_macro_input, parse_quote, Type};
 
 mod db_meta;
+mod cr;
 
 #[proc_macro_attribute]
 pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
@@ -201,6 +202,31 @@ pub fn dl_default(input: TokenStream) -> TokenStream {
         println!("............gen impl dl_default {}:\n {}", name, gen);
     }
     gen
+}
+
+#[proc_macro_derive(DlCR)]
+pub fn dl_cr(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput);
+    cr::dl_cr(&ast.ident.to_string(), &ast.fields())
+}
+
+pub(crate) fn to_snake_name(name: &String) -> String {
+    let chs = name.chars();
+    let mut new_name = String::new();
+    let mut index = 0;
+    let chs_len = name.len();
+    for x in chs {
+        if x.is_uppercase() {
+            if index != 0 && (index + 1) != chs_len {
+                new_name.push_str("_");
+            }
+            new_name.push_str(x.to_lowercase().to_string().as_str());
+        } else {
+            new_name.push(x);
+        }
+        index += 1;
+    }
+    return new_name;
 }
 
 #[cfg(test)]

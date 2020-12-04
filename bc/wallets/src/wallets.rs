@@ -25,17 +25,16 @@ impl Wallets {
     }
 
     pub fn init(&mut self, parameters: &InitParameters) -> Error {
-        let err = Error {};
-
+        let err = Error::default();
         err
     }
 
     pub fn uninit(&mut self, parameters: &UnInitParameters) -> Error {
-        Error {}
+        Error::default()
     }
 
     pub fn all(&mut self, array_wallet: &mut Vec::<Wallet>) -> Error {
-        Error {}
+        Error::default()
     }
 }
 

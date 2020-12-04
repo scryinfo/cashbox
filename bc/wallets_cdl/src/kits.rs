@@ -42,7 +42,6 @@ pub fn to_str(cs: *const c_char) -> &'static str {
     return s;
 }
 
-
 /// 释放c struct的内存， 这些内存需要手工管理
 pub trait CStruct {
     fn free(&mut self);
@@ -100,6 +99,15 @@ pub struct CArray<T: CStruct> {
 }
 
 impl<T: CStruct> CArray<T> {
+    pub fn new(ar: Vec<T>) -> Self {
+        //Vec::into_raw_parts 这个方法不是稳定方法，所以参考它手动实现
+        let mut t = ManuallyDrop::new(ar);
+        Self {
+            len: t.len() as CU64,
+            ptr: t.as_mut_ptr(),
+            cap: t.capacity() as CU64,
+        }
+    }
     pub fn set(&mut self, ar: Vec<T>) {
         self.free();//释放之前的内存
 
@@ -110,7 +118,13 @@ impl<T: CStruct> CArray<T> {
         self.cap = t.capacity() as CU64;
     }
 
-    pub fn get(&mut self) -> &mut [T] {
+    pub fn get_mut(&mut self) -> &mut [T] {
+        //from_raw_parts_mut 这个函数并不会获取所有权，所以它不会释放内存
+        let p = unsafe { std::slice::from_raw_parts_mut(self.ptr, self.len as usize) };
+        return p;
+    }
+
+    pub fn get(&self) -> &[T] {
         //from_raw_parts_mut 这个函数并不会获取所有权，所以它不会释放内存
         let p = unsafe { std::slice::from_raw_parts_mut(self.ptr, self.len as usize) };
         return p;
@@ -140,21 +154,46 @@ impl<T: CStruct> CStruct for CArray<T> {
     }
 }
 
+impl<T: CStruct + CR<T, R>, R: Default> CR<CArray<T>, Vec<R>> for CArray<T> {
+    fn to_c(r: &Vec<R>) -> CArray<T> {
+        let mut c = Self::default();
+        let temp = r.iter().map(|it| T::to_c(it)).collect();
+        c.set(temp);
+        c
+    }
+
+    fn to_c_ptr(r: &Vec<R>) -> *mut CArray<T> {
+        Box::into_raw(Box::new(Self::to_c(r)))
+    }
+
+    fn to_rust(c: &CArray<T>) -> Vec<R> {
+        let temp = c.get().iter().map(|it| T::to_rust(it)).collect();
+        temp
+    }
+
+    fn ptr_rust(c: *mut CArray<T>) -> Vec<R> {
+        Self::to_rust(unsafe { &*c })
+    }
+}
+
+
 drop_ctype!(CArray<T>);
 
-pub fn into_raw<T: CStruct>(obj: T) -> *mut T {
-    Box::into_raw(Box::new(obj))
-}
+pub trait CR<C: CStruct, R> {
+    fn to_c(r: &R) -> C;
 
-pub unsafe fn from_raw<T: CStruct>(ptr: *mut T) -> Box<T> {
-    Box::from_raw(ptr)
-}
+    fn to_c_ptr(r: &R) -> *mut C;
 
+    fn to_rust(c: &C) -> R;
+
+    fn ptr_rust(c: *mut C) -> R;
+}
 
 pub fn pointer_alloc<T>() -> *mut *mut T {
     Box::into_raw(Box::new(null_mut()))
 }
 
+#[allow(unused_assignments)]
 pub fn pointer_free<T>(mut d_ptr: *mut *mut T) {
     unsafe {
         let ptr = *d_ptr;
@@ -164,6 +203,7 @@ pub fn pointer_free<T>(mut d_ptr: *mut *mut T) {
         }
         Box::from_raw(d_ptr);
     };
+
     d_ptr = null_mut();
 }
 

@@ -3,7 +3,7 @@ mod types_eth;
 mod types_eee;
 mod types_btc;
 
-pub mod wallets;
+pub mod wallets_c;
 pub mod parameters;
 
 mod chain;
