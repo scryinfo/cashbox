@@ -116,8 +116,7 @@ mod tests {
 
     const TX_VERSION: u32 = 1;
     const RUNTIME_VERSION: u32 = 6;
-    const URL: &'static str = "ws://192.168.1.57:9944";
-    //const GENESIS_HASH: &'static str = "0x85caf08522f79bae099d06348fe8b42f411159352fabd2dbd6a41f52afe8208c";
+    const URL: &'static str = "ws://192.168.2.57:9944";
     const GENESIS_HASH: &'static str =  "0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973";
     const METADATA_REQ: &'static str = r#"{"id":1,"jsonrpc":"2.0","method":"state_getMetadata","params":[]}"#;
 

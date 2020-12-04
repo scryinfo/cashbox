@@ -5,10 +5,7 @@ import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NativeLibTest {
 
@@ -28,7 +25,7 @@ public class NativeLibTest {
     public void saveWalletTest() {
         System.out.println(NativeLib.initWalletBasicData());
         NativeLib.Mnemonic mnemonic = NativeLib.mnemonicGenerate(15);
-        NativeLib.Wallet wallet = NativeLib.saveWallet("wallet_hello", "123456".getBytes(), mnemonic.mn, 1);
+        NativeLib.Wallet wallet = NativeLib.saveWallet("wallet_hello3", "123456".getBytes(), mnemonic.mn, 0);
         System.out.println(wallet.toString());
     }
 
@@ -171,7 +168,7 @@ public class NativeLibTest {
     @Test
     public void eeeTxsign() {
         String rawtx = "0x6501040902a39a014e7bceb3c2ff84bb6aba8d9e46c635257a2b9aa41969e70b0a8dd07b6c00070088526a74b8cc91625b766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d146265616368e8030000080000002fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb9730200000001000000";
-        NativeLib.Message msg = NativeLib.eeeTxSign(rawtx, "dd510030-52fb-433d-8736-19f643ef1acb", "123456".getBytes());
+        NativeLib.Message msg = NativeLib.eeeTxSign(rawtx, "5a2571e5-90ff-4954-a6aa-c97c6a7aacdc", "123456".getBytes());
         System.out.println(msg.toString());
     }
 
@@ -341,11 +338,27 @@ public class NativeLibTest {
     }
 
     @Test
-    public void contract_test(List<NativeLib.Wallet> wallets) throws Throwable {
+    public void contract_test() throws Throwable {
+        List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
+        try {
+            List wallet_test = new ArrayList<NativeLib.Wallet>();
+            for (NativeLib.Wallet wallet:wallets){
+                if (wallet.walletType== NativeLib.WalletType.TEST_WALLET){
+                    System.out.println("wallet address:"+wallet.ethChain.address);
+                    wallet_test.add(wallet);
+                }
+            }
+            contract_exec(wallet_test);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void contract_exec(List<NativeLib.Wallet> wallets) throws Throwable {
         //Initializejsonrpc
         Map header = new HashMap<String, String>();
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://127.0.0.1:8545"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.2.7:8545"), header);
         //Initialize wallet
 
         //Get the balance of eth in the first wallet
@@ -377,7 +390,7 @@ public class NativeLibTest {
         tx.setValue("1.6543");
         tx.setContractAddress("");//0xee35211c4d9126d520bbfeaf3cfee5fe7b86f221
         tx.setGasPrice("6");
-        tx.setGasLimit("70000");
+        tx.setGasLimit("1560720");
         tx.setNonce(nonce);
         tx.setAdditional("hello");
         tx.setPsw("123456".getBytes());

@@ -4,6 +4,7 @@ use jni::objects::{JObject, JValue, JClass, JString};
 use wallets::model::{EeeChain, BtcChain, EthChain, SubChainBasicInfo};
 use jni::sys::{jint, jobject, jbyteArray, jboolean, jstring, jvalue};
 use wallets::module::Chain;
+use wallets::RawTransaction;
 
 pub fn get_eee_chain_obj<'a, 'b>(env: &'a JNIEnv<'b>, eee_chain: EeeChain) -> JObject<'a> {
     let eee_digit_list_class = env.find_class("java/util/ArrayList").expect("find ArrayList");
@@ -382,12 +383,8 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env:
     };
     //Additional parameters
 
-    let data = data.unwrap();
-    let data = if data.is_empty() {
-        None
-    } else {
-        Some(data)
-    };
+    //Additional parameters
+    let data = data.map(|val| val.as_bytes().to_vec()).ok();
     //gas price
     let gas_price: U256 = wallets::convert_token(&price.unwrap(), 9).unwrap();
     //Allow maximum gas consumption
@@ -417,10 +414,18 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env:
     let ethereum = wallets::module::Ethereum {};
     let contract_address = contract_address.unwrap();
     let signed_ret = if contract_address.is_empty() {
-        ethereum.raw_transfer_sign(&from_address.unwrap(), to_address, amount, &pwd.unwrap(), nonce, gas_limit, gas_price, data, chain_id as u64)
+        let raw_tx = RawTransaction{
+            nonce,
+            to: to_address,
+            value: amount,
+            gas_price: gas_price,
+            gas: gas_limit,
+            data:data.unwrap(),
+        };
+        ethereum.raw_transfer_sign(&from_address.unwrap(), &pwd.unwrap(),raw_tx,chain_id as u64)
     } else {
         let contract_address = H160::from_slice(hex::decode(&contract_address[2..]).unwrap().as_slice());
-        ethereum.raw_erc20_transfer_sign(&from_address.unwrap(), contract_address, to_address, amount, &pwd.unwrap(), nonce, gas_limit, gas_price, data, chain_id as u64)
+        ethereum.raw_erc20_transfer_sign(&from_address.unwrap(), contract_address, to_address, amount, &pwd.unwrap(), nonce, gas_limit, gas_price, data.unwrap(), chain_id as u64)
     };
     match signed_ret {
         Ok(data) => {
@@ -724,7 +729,7 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_eeeStorageKey(env: JN
     }
     let eee = wallets::module::EEE {};
 
-    match eee.encode_account_storage_key(module.unwrap(), storage_item.unwrap(), &account_str.unwrap()) {
+    match eee.encode_account_storage_key(&module.unwrap(), &storage_item.unwrap(), &account_str.unwrap()) {
         Ok(key) => {
             env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
             env.set_field(state_obj, "storageKeyInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(key).unwrap()))).expect("set accountKeyInfo value");
