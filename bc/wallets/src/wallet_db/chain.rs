@@ -230,7 +230,7 @@ impl DataServiceProvider {
                 token_decimals:select_stat.read::<i64>(6).map(|val|val as i32).expect("token_decimals"),
                 token_symbol:select_stat.read::<String>(7).expect("token_symbol"),
             };
-            return Ok(info_detail)
+            Ok(info_detail)
         }else {
             Err(error::WalletError::NotExist)
         }

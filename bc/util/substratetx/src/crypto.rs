@@ -12,7 +12,7 @@ pub const SCRYPT_P: u32 = 1;
 //The data type of u32 is defined in the library using scrypt
 pub const SCRYPT_R: u32 = 8;
 pub const SCRYPT_DKLEN: usize = 32;
-pub const CIPHER_KEY_SIZE: &'static str = "aes-128-ctr";
+pub const CIPHER_KEY_SIZE: &str = "aes-128-ctr";
 
 //type Result<T> = Result<T,Error>;
 //Define the input keystore file format, used to convert json format file

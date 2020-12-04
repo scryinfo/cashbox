@@ -98,7 +98,7 @@ impl DataServiceProvider {
                 if let Some(sql) = super::table_desc::get_update_table_sql(&current_version.to_string()) {
                     log::info!("update database sql {}",sql);
                     self.db_hander.execute(sql)?;
-                    try_minor = try_minor + 1;
+                    try_minor += 1;
                 } else {
                     try_minor = 0;
                     break;

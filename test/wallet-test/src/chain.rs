@@ -381,6 +381,7 @@ pub unsafe extern "C" fn Java_info_scry_wallet_1manager_NativeLib_ethTxSign(env:
         wallets::convert_token(&value.unwrap(), decimal as usize).unwrap()
     };
     //Additional parameters
+
     let data = data.unwrap();
     let data = if data.is_empty() {
         None

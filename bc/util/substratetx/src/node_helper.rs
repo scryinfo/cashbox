@@ -183,9 +183,9 @@ impl ChainHelper {
         let target_account = AccountId::from_ss58check(target_account)?;
         let json_data: Vec<String> = serde_json::from_str(extrinsics_json)?;
         let mut map = HashMap::new();
+        for  (index,tx_str)in json_data.iter().enumerate() {
 
-        for index in 0..json_data.len() {
-            let tx = hexstr_to_vec(&json_data[index])?;
+            let tx = hexstr_to_vec(tx_str)?;
             let checked_tx = extrinsic::CheckedExtrinsic::decode(&mut &tx[..])?;
 
             let tx_hash = sp_core::blake2_256(&tx[..]);
@@ -255,7 +255,7 @@ impl ChainHelper {
         }
     }
     fn convert_token_name(&self, token_name: Token) -> Option<(&str, &str)> {
-        let funcs = match token_name {
+        match token_name {
             Token::EEE => {
                 let moudule_name = "Balances";
                 let call_name = "transfer";
@@ -274,8 +274,7 @@ impl ChainHelper {
                     None
                 }
             }
-        };
-        funcs
+        }
     }
 
      fn get_chain_runtime_metadata(hex_str: &str) -> Result<Metadata, error::Error> {

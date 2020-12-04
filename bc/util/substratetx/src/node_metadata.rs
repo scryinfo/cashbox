@@ -209,7 +209,7 @@ impl ModuleMetadata {
     pub fn storage(&self, key: &str) -> Result<&StorageMetadata, MetadataError> {
         self.storage
             .get(key)
-            .ok_or(MetadataError::StorageNotFound(key.to_string()))
+            .ok_or_else(|| MetadataError::StorageNotFound(key.to_string()))
     }
 }
 
@@ -510,24 +510,6 @@ pub enum ConversionError {
     InvalidEventArg(String, &'static str),
 }
 
-/*fn add_modules_storage<B: 'static>(module_meta_data:B,modules:&mut HashMap<String,ModuleMetadata>){
-   // let mut modules = HashMap::new();
-    for module in module_meta_data.into_iter() {
-        let module_name = convert(module.name.clone())?;
-        let mut storage_map = HashMap::new();
-        if let Some(storage) = module.storage {
-            let storage = convert(storage)?;
-            let module_prefix = convert(storage.prefix)?;
-            for entry in convert(storage.entries)?.into_iter() {
-                let storage_prefix = convert(entry.name.clone())?;
-                let entry =
-                    convert_entry(module_prefix.clone(), storage_prefix.clone(), entry)?;
-                storage_map.insert(storage_prefix, entry);
-            }
-        }
-    }
-}*/
-
 impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
     type Error = MetadataError;
 
@@ -600,8 +582,9 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
             RuntimeMetadata::V11(metav11)=>{
                 let mut event_module_index = 0;
                 let mut call_module_index = 0;
-                let mut module_index = 0;
-                for module in convert(metav11.modules)?.into_iter() {
+                //let mut module_index = 0;
+                for (module_index, module) in convert(metav11.modules)?.into_iter().enumerate(){
+                // for module in convert(metav11.modules)?.into_iter() {
                     let module_name = convert(module.name.clone())?;
 
                     let mut storage_map = HashMap::new();
@@ -618,12 +601,12 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                     modules.insert(
                         module_name.clone(),
                         ModuleMetadata {
-                            index: module_index,
+                            index: module_index as u8,
                             name: module_name.clone(),
                             storage: storage_map,
                         },
                     );
-                    module_index = module_index+1;
+                   // module_index +=1;
 
                     if let Some(calls) = module.calls {
                         let mut call_map = HashMap::new();
@@ -639,7 +622,7 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                                 calls: call_map,
                             },
                         );
-                        call_module_index = call_module_index+1;
+                        call_module_index += 1;
                     }
                     if let Some(events) = module.event {
                         let mut event_map = HashMap::new();
@@ -654,7 +637,7 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                                 events: event_map,
                             },
                         );
-                         event_module_index = event_module_index+1;
+                         event_module_index +=1;
                     }
                 }
             },

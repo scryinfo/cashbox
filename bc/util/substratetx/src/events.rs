@@ -204,17 +204,17 @@ impl EventsDecoder {
         let compact_len = <Compact<u32>>::decode(input)?;
         let len = compact_len.0 as usize;
 
+        //let mut r = vec![(Phase,RuntimeEvent);len];
         let mut r = Vec::new();
         for _ in 0..len {
             // decode EventRecord
-            //log::debug!("Decoding phase: {:?}", input);
-            println!("Decoding phase: {:?}", input);
+            log::info!("Decoding phase: {:?}", input);
             let phase = Phase::decode(input)?;
             let module_variant = input.read_byte()?;
 
             let module = self.metadata.module_with_events(module_variant)?;
             let event = if module.name() == "System" {
-                println!("Decoding system event, intput: {:?}", input);
+                log::info!("Decoding system event, intput: {:?}", input);
                 let system_event = SystemEvent::decode(input)?;
                 log::debug!("Decoding successful, system_event: {:?}", system_event);
                 RuntimeEvent::System(system_event)
@@ -243,11 +243,8 @@ impl EventsDecoder {
                     data: event_data,
                 })
             };
-
             // topics come after the event data in EventRecord
             log::debug!("Phase {:?}, Event: {:?}", phase, event);
-
-            log::debug!("Decoding topics {:?}", input);
             let _topics = Vec::<crate::Hash>::decode(input)?;
             r.push((phase, event));
         }

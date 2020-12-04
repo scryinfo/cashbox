@@ -60,9 +60,7 @@ impl WalletManager {
     pub fn is_contain_wallet(&self) -> WalletResult<bool> {
         #[cfg(target_os="android")]crate::init_logger_once();
        wallet_db::DataServiceProvider::instance().map(|provider|{
-            if provider.get_wallets().len()>0{
-                true
-            }else { false }
+           !provider.get_wallets().is_empty()
         })
     }
     //clear user download data
@@ -84,7 +82,7 @@ impl WalletManager {
     pub fn set_current_wallet(&self, walletid: &str) -> WalletResult<()> {
         let instance = wallet_db::DataServiceProvider::instance()?;
         //ensure wallet exist
-        if let Some(_) = instance.query_by_wallet_id(walletid){
+        if instance.query_by_wallet_id(walletid).is_some(){
             instance.tx_begin()?;
             instance.set_selected_wallet(walletid)
                 .and_then(|_| instance.tx_commint())
@@ -118,7 +116,7 @@ impl WalletManager {
 
     pub fn rename_wallet(&self, walletid: &str, wallet_name: &str) -> WalletResult<bool> {
         let instance = wallet_db::DataServiceProvider::instance()?;
-        if let Some(_) = instance.query_by_wallet_id(walletid){
+        if instance.query_by_wallet_id(walletid).is_some(){
             instance.rename_mnemonic(walletid, wallet_name).map(|_| true)
         }else {
             Err(WalletError::NotExist)

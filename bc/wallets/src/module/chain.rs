@@ -31,12 +31,12 @@ impl EEE {
         Ok(mn)
     }
 
-    fn convert_hash_to_byte(&self,hash: &str)-> WalletResult<[u8;32]>{
-        let hash_vec = substratetx::hexstr_to_vec(hash)?;
-        let mut h256 = [0u8; 32];
-        h256.clone_from_slice(hash_vec.as_slice());
-        Ok(h256)
-    }
+    // fn convert_hash_to_byte(&self,hash: &str)-> WalletResult<[u8;32]>{
+    //     let hash_vec = substratetx::hexstr_to_vec(hash)?;
+    //     let mut h256 = [0u8; 32];
+    //     h256.clone_from_slice(hash_vec.as_slice());
+    //     Ok(h256)
+    // }
 
     pub fn generate_eee_transfer(&self, from: &str, to: &str, amount: &str, index: u32, psw: &[u8]) -> WalletResult<String> {
 
@@ -66,11 +66,11 @@ impl EEE {
         let instance = wallet_db::DataServiceProvider::instance()?;
         //use default chain basic info;
         let chain_info = instance.get_sub_chain_info(None,0,0)
-            .and_then(|mut chains| chains.pop().ok_or(WalletError::Custom(" default chain basic info isn't exist".to_string())));
+            .and_then(|mut chains| chains.pop().ok_or_else(|| WalletError::Custom(" default chain basic info isn't exist".to_string())));
         let decimal = instance.query_default_digit(1,Some("TokenX".to_string()))
-            .and_then(|mut digits|  digits.pop().ok_or(WalletError::Custom("digit TokenX isn't exist".to_string())))
-            .map(|digit| digit.decimal.clone())
-            .and_then(|d| d.parse::<usize>().map_err(|err|WalletError::from(err)));
+            .and_then(|mut digits|  digits.pop().ok_or_else(|| WalletError::Custom("digit TokenX isn't exist".to_string())))
+            .map(|digit| digit.decimal)
+            .and_then(|d| d.parse::<usize>().map_err(WalletError::from));
 
         let transfer_amount = general::token_unit_convert(amount,decimal?).map(|amount| amount.to_string())
             .ok_or_else(||WalletError::Custom("input amount is illegal".to_string()));
@@ -227,7 +227,7 @@ impl EEE {
     pub fn update_chain_basic_info(&self,info:&SubChainBasicInfo,is_default:bool)->WalletResult<String> {
         let instance = wallet_db::DataServiceProvider::instance()?;
         instance.tx_begin()?;
-       let ret = instance.update_sub_chain_info(info,is_default)
+        instance.update_sub_chain_info(info,is_default)
            .map(|id|{
                let _ = instance.tx_commint();
                id
@@ -236,8 +236,7 @@ impl EEE {
                log::error!("update chain basic info:{}",err.to_string());
                let _ = instance.tx_rollback();
                err
-           });
-        ret
+           })
     }
 
     pub fn query_chain_basic_info(&self,genesis_hash:&str,spec_vers:u32,tx_vers:u32)->WalletResult<Vec<SubChainBasicInfo>>{
@@ -252,7 +251,7 @@ impl EEE {
         instance.get_sub_chain_info(genesis_final,spec_vers,tx_vers)
     }
 
-    pub fn encode_account_storage_key(&self,module: String, storage: String, account: &str)->WalletResult<String> {
+    pub fn encode_account_storage_key(&self,module: &str, storage: &str, account: &str)->WalletResult<String> {
         let instance = wallet_db::DataServiceProvider::instance()?;
         let chain_infos = instance.get_sub_chain_info(None,0,0)?;
         if let Some(chain_info) = chain_infos.get(0){
@@ -283,22 +282,10 @@ impl Ethereum {
     /// gasPrice specifies the price of gas
     /// data Remarks message (can be viewed on the block after the transaction is confirmed)
     /// chain_id: ETH chain type
-    pub fn raw_transfer_sign(&self, from_address: &str, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> WalletResult<String> {
-        // pub fn raw_transfer_sign(&self, from_address: &str, raw_tx:RawTransaction, psw: &[u8], eth_chain_id: u64) -> WalletResult<String> {
-        let data = match data {
-            Some(data) => data.as_bytes().to_vec(),
-            None => vec![]
-        };
-        let rawtx = ethtx::RawTransaction {
-            nonce,
-            to: to_address,//For transfer operations, to cannot be empty.
-            value: amount,
-            gas_price,
-            gas: gas_limit,
-            data,
-        };
+    //pub fn raw_transfer_sign(&self, from_address: &str, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> WalletResult<String> {
+    pub fn raw_transfer_sign(&self, from_address: &str,  psw: &[u8],raw_tx:RawTransaction, eth_chain_id: u64) -> WalletResult<String> {
 
-        self.tx_sign(from_address, psw, rawtx, eth_chain_id)
+        self.tx_sign(from_address, psw, raw_tx, eth_chain_id)
     }
     ///ETH ERC20 transfer transaction signature The current wallet only provides the transfer function for ERC20
     /// from_account: transfer out of account
@@ -310,18 +297,17 @@ impl Ethereum {
     /// gasLimit the maximum gas consumption allowed for this transaction
     /// gasPrice specifies the price of gas
     /// data Remarks message (you need to confirm again, is this field still valid when transferring erc20 token?)
-    pub fn raw_erc20_transfer_sign(&self, from_address: &str, contract_address: H160, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> WalletResult<String> {
+    //pub fn raw_erc20_transfer_sign(&self, from_address: &str, contract_address: H160, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Option<String>, eth_chain_id: u64) -> WalletResult<String> {
+    pub fn raw_erc20_transfer_sign(&self, from_address: &str, contract_address: H160, to_address: Option<H160>, amount: U256, psw: &[u8], nonce: U256, gas_limit: U256, gas_price: U256, data: Vec<u8>, eth_chain_id: u64) -> WalletResult<String> {
         //Call erc20 contract to_account cannot be empty
         if to_address.is_none() {
-            return Err(WalletError::Custom("to account is not allown empty".to_string()));
+            return Err(WalletError::Custom("to account is not allowed empty".to_string()));
         }
         //Does the calling contract allow the transfer destination address to be empty?
         let mut encode_data = ethtx::get_erc20_transfer_data(to_address.unwrap(), amount)?;
         //Add contract transaction remark information
-        if let Some(addition_str) = data {
-            let mut addition = addition_str.as_bytes().to_vec();
-            encode_data.append(&mut addition);
-        }
+        encode_data.extend_from_slice(&data);
+
         let rawtx = ethtx::RawTransaction {
             nonce,
             to: Some(contract_address),//For calling contract, to cannot be empty

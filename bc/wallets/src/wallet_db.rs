@@ -10,6 +10,7 @@ pub mod chain;
 pub mod digit;
 
 pub use db_helper::DataServiceProvider;
+use std::cmp::Ordering;
 
 //Create a database table. Import default data and other operations
 pub fn init_wallet_database() -> WalletResult<()> {
@@ -35,9 +36,25 @@ pub fn update_db_version(latest_version:&str)->WalletResult<()>{
     log::info!("current database version is {}",pre_version);
     let  pre = Version::parse(pre_version.as_str())?;
     let  latest = Version::parse(latest_version)?;
-    if pre<latest {
+    match pre.cmp(&latest) {
+        Ordering::Greater =>  Err(WalletError::Custom("pre_version is bigger than latest version,please reinstall this application".to_string())),
+        Ordering::Less => {
+            helper.tx_begin()?;
+            match helper.exec_db_update(pre,latest) {
+                Ok(_) => helper.tx_commint(),
+                Err(err) => {
+                    helper.tx_rollback()?;
+                    println!("{:?}",err);
+                    log::error!("{:?}",err);
+                    Err(err)
+                }
+            }
+        },
+        Ordering::Equal =>   Ok(())
+    }
+  /*  if pre<latest {
         helper.tx_begin()?;
-        let ret = match helper.exec_db_update(pre,latest) {
+       match helper.exec_db_update(pre,latest) {
             Ok(_) => helper.tx_commint(),
             Err(err) => {
                 helper.tx_rollback()?;
@@ -45,13 +62,12 @@ pub fn update_db_version(latest_version:&str)->WalletResult<()>{
                 log::error!("{:?}",err);
                 Err(err)
             }
-        };
-        ret
+        }
     }else if pre>latest{
       Err(WalletError::Custom("pre_version is bigger than latest version,please reinstall this application".to_string()))
     }else {
         Ok(())
-    }
+    }*/
 
 }
 

@@ -14,7 +14,7 @@ use sp_runtime::{
 use codec::{Encode, Decode, Compact};
 use system::Phase;
 use events::{EventsDecoder, RuntimeEvent, SystemEvent};
-use extrinsic::xt_primitives::{GenericAddress, GenericExtra, AdditionalSigned};
+use extrinsic::xt_primitives::{GenericAddress, GenericExtra};//AdditionalSigned
 pub use node_helper::ChainHelper as SubChainHelper;
 pub use crypto::{Sr25519, Ed25519, Crypto};
 
