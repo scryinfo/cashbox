@@ -153,7 +153,7 @@ mod tests {
     use crate::cr::dl_cr;
 
     #[test]
-    fn test_dl_cr() {
+    fn dl_cr_test() {
         let fields_named: FieldsNamed = parse_quote! {{
             pub id: *mut c_char,
             pub data: *mut CArray<T>,

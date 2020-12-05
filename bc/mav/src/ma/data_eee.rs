@@ -6,7 +6,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::db::{self, bool_from_int, Shared};
+use crate::ma::dao::{self, bool_from_int, Shared};
 use crate::ma::TxShared;
 
 //eee
@@ -91,7 +91,7 @@ mod tests {
     use rbatis::rbatis::Rbatis;
 
     use crate::ma::data_eee::EeeChainTx;
-    use crate::ma::db::{BeforeSave, BeforeUpdate, Dao, Shared};
+    use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
     use crate::ma::db_dest;
 
     const TABLE: &str = "

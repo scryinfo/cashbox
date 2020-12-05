@@ -6,7 +6,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, db_sub_struct, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::db::{self, bool_from_int, Shared};
+use crate::ma::dao::{self, bool_from_int, Shared};
 
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]

@@ -12,7 +12,6 @@ crate-type = ["cdylib"]
 [workspace]
 members = [
     "wallets",
-    "device_app_lib",
     "util/substratetx",
     "murmel",
     "chain/btc/bitcoin",

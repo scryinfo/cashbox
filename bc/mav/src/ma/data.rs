@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use wallets_macro::{db_append_shared, db_sub_struct, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::db::{self, Shared};
+use crate::ma::dao::{self, Shared};
 
 /// 地址与token对应的balance
 #[db_append_shared]
@@ -44,7 +44,7 @@ mod tests {
     use rbatis::rbatis::Rbatis;
 
     use crate::ma::{db_dest, TokenAddress};
-    use crate::ma::db::{BeforeSave, BeforeUpdate, Dao, Shared};
+    use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
 
     const TABLE: &str = "
 -- TokenAddress

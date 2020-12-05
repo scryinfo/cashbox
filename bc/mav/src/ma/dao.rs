@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use rbatis::core::db_adapter::DBExecResult;
 use rbatis::core::Result;
 use rbatis::crud::{CRUD, CRUDEnable};
 use rbatis::plugin::page::{IPageRequest, Page};
@@ -13,6 +12,7 @@ pub use crate::ma::data_eth::{EthChainToken, EthChainTx, EthErc20Face, EthErc20T
 pub use crate::ma::detail::{TokenShared, Wallet};
 pub use crate::ma::detail_eth::{EthChainTokenAuth, EthChainTokenDefault};
 pub use crate::ma::mnemonic::Mnemonic;
+use rbatis::core::db::DBExecResult;
 
 pub trait Shared {
     fn get_id(&self) -> String;

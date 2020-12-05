@@ -1,5 +1,6 @@
-mod ma;
-mod kits;
+pub mod ma;
+pub mod kits;
+pub mod db;
 
 #[cfg(test)]
 mod tests {
