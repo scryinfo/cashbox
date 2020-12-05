@@ -14,7 +14,9 @@
 /bc/murmel/btc_detail.sqlite
 /bc/murmel/NOTICE
 /bc/murmel/.DS_Store
-/bc/bitcoin/target
+/bc/chain/btc/bitcoin/target
+/bc/chain/btc/bitcoin/Cargo.lock
+/bc/chain/btc/bitcoin/.cargo_vcs_info.json
 
 *.db
 /test/wallet-jni-test/target/

@@ -14,7 +14,7 @@ members = [
     "wallets",
     "util/substratetx",
     "murmel",
-    "bitcoin",
+    "chain/btc/bitcoin",
     "chain/eth",
     "chain/eee",
     "chain/btc",
@@ -28,5 +28,5 @@ version = "0.21"
 features = ["serde"]
 
 [patch.crates-io]
-bitcoin = { path = "bitcoin" }
+bitcoin = { path = "chain/btc/bitcoin" }
 
