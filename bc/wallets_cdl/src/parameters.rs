@@ -6,7 +6,6 @@ use std::os::raw::c_char;
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{Context, DbName, InitParameters, UnInitParameters};
 
-use crate::drop_ctype;
 use crate::kits::{CR, CStruct, pointer_alloc, pointer_free, to_c_char, to_str};
 
 #[repr(C)]

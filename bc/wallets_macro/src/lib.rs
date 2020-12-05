@@ -7,6 +7,50 @@ use syn::{AttributeArgs, DeriveInput, FieldsNamed, parse_macro_input, parse_quot
 mod db_meta;
 mod cr;
 
+/// 生成数据库通用部分，包括如下：
+/// # 三个字段， id: String, create_time: i64,update_time: i64
+/// # impl Shared
+/// # 选项，如果有“CRUDEnable”参数，那么使用 rbatis的json方式实现 CRUDEnable接口。 如果struct中带有sub struct只能使用这种方式实现
+/// # 在目录 “generated_sql”下面生成创建数据表的sql语言，现只支持sqlite，详细说明如下：
+/// * 数据库表需要 "#[db_append_shared]" attribute
+/// * 每一个字段都需要 "#[serde(default)]" 在使用serde_json时，提供默认值，如果不给 model <==> db时会出错
+/// * sub struct上需要使用 "#[serde(flatten)]" 在序列化时它会把sub struct中的字段直接放入parent struct中
+/// * 在有sub struct时不能使用"#[derive(CRUDEnable)]"，只能使用[db_append_shared(CRUDEnable)]
+/// * 如果没有sub struct 可以使用#[derive(CRUDEnable)]，它是在编译时生成的代码，没有运行开销。
+/// * 所有字段不能重名，包含sub struct中的
+/// ## 支持类型
+/// i16,u16,i32,u32,i64,u64,
+/// String,
+/// bool, //#[serde(default, deserialize_with = "bool_from_int")]
+/// f32,f64
+/// bigdecimal::BigDecimal
+/// #Sample include sub struct
+/// ````
+/// #[db_append_shared(CRUDEnable)]
+/// #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
+/// struct Big{
+///  #[serde(default)]
+///  pub name: String,
+///  #[serde(flatten)]
+///  pub sub: Sub,
+/// }
+/// #[db_sub_struct]
+/// #[derive(Serialize, Deserialize, Clone, Debug, Default)]
+/// struct Sub {
+///  #[serde(default)]
+///  pub count: u64,
+/// }
+/// ````
+/// # Sample no sub struct
+/// ````
+/// #[db_append_shared]
+/// #[derive(Serialize, Deserialize, Clone, Debug, Default,CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+/// struct Big{
+///  #[serde(default)]
+///  pub name: String,
+/// // other fields
+/// }
+/// ````
 #[proc_macro_attribute]
 pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut ast = parse_macro_input!(input as DeriveInput);
@@ -81,6 +125,7 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
     gen
 }
 
+/// 标记为 sub struct。只有标记为sub struct的才能被用到表的struct中
 #[proc_macro_attribute]
 pub fn db_sub_struct(_: TokenStream, input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
@@ -99,6 +144,7 @@ pub fn db_sub_struct(_: TokenStream, input: TokenStream) -> TokenStream {
     gen
 }
 
+/// impl BeforeSave
 #[proc_macro_derive(DbBeforeSave)]
 pub fn db_before_save(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
@@ -122,6 +168,7 @@ pub fn db_before_save(input: TokenStream) -> TokenStream {
     gen.into()
 }
 
+/// impl BeforeUpdate
 #[proc_macro_derive(DbBeforeUpdate)]
 pub fn db_before_update(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
@@ -139,6 +186,7 @@ pub fn db_before_update(input: TokenStream) -> TokenStream {
     gen.into()
 }
 
+/// impl CStruct + Drop
 #[proc_macro_derive(DlStruct)]
 pub fn dl_struct(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
@@ -161,7 +209,11 @@ pub fn dl_struct(input: TokenStream) -> TokenStream {
                     #(#drops)*
                 }
             }
-            drop_ctype!(#name);
+            impl Drop for #name {
+                fn drop(&mut self) {
+                    self.free();
+                }
+            }
         });
     if cfg!(feature = "print_macro") {
         println!("\n............gen impl dl_struct {}:\n {}", name, gen);
@@ -169,6 +221,7 @@ pub fn dl_struct(input: TokenStream) -> TokenStream {
     gen
 }
 
+/// impl Default
 #[proc_macro_derive(DlDefault)]
 pub fn dl_default(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
@@ -204,12 +257,16 @@ pub fn dl_default(input: TokenStream) -> TokenStream {
     gen
 }
 
+/// impl CR
 #[proc_macro_derive(DlCR)]
 pub fn dl_cr(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     cr::dl_cr(&ast.ident.to_string(), &ast.fields())
 }
 
+/// camel to snake
+/// Sample
+/// camelName to camel_name
 pub(crate) fn to_snake_name(name: &String) -> String {
     let chs = name.chars();
     let mut new_name = String::new();

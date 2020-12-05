@@ -10,7 +10,6 @@ pub use crate::chain::{*};
 pub use crate::chain_btc::{*};
 pub use crate::chain_eee::{*};
 pub use crate::chain_eth::{*};
-use crate::drop_ctype;
 pub use crate::kits::{CBool, CFalse, CR, CTrue, CU64};
 use crate::kits::{CArray, CStruct, free_c_char, pointer_alloc, pointer_free, to_c_char, to_str};
 pub use crate::types_btc::{*};

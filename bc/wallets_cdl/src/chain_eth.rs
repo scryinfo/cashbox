@@ -3,7 +3,6 @@
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{EthChain, EthChainToken, EthChainTokenAuth, EthChainTokenDefault};
 
-use crate::drop_ctype;
 use crate::kits::{CArray, CR, CStruct};
 use crate::types::{CChainShared, CTokenShared};
 

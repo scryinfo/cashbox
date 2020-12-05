@@ -49,6 +49,7 @@ pub struct DbMeta {
 }
 
 impl DbMeta {
+    ///使用 static 变量，生成一个线程安全的共享对象
     pub fn get() -> &'static Mutex<DbMeta> {
         static mut INSTANCE: OnceCell<Mutex<DbMeta>> = OnceCell::new();
         unsafe {
@@ -58,6 +59,7 @@ impl DbMeta {
         }
     }
 
+    /// 加入表
     pub fn push(&mut self, ast: &syn::DeriveInput) {
         let mut tm = self.generate_table_meta(&ast);
         tm.is_sub = false;
@@ -65,7 +67,7 @@ impl DbMeta {
         self.full_template();
     }
 
-    ///update or add
+    /// 加入sub struct
     pub fn push_sub_struct(&mut self, ast: &syn::DeriveInput) {
         let mut tm = self.generate_table_meta(&ast);
         if !tm.subs.is_empty() {
@@ -76,7 +78,7 @@ impl DbMeta {
         self.full_template();
     }
 
-    ///处理 sub struct中的字段
+    ///处理 struct中的字段
     fn full_template(&mut self) {
         let mut dones = Vec::new();
         for (table_name, tm) in &mut self.table_metas {
@@ -134,6 +136,7 @@ impl DbMeta {
         }
     }
 
+    /// 生成创建表的语句
     fn generate_table_meta(&mut self, ast: &syn::DeriveInput) -> TableMeta {
         let mut tm = generate_table_script(&ast.ident.to_string(), ast.fields());
         tm.template.insert_str(0, format!("-- {}\n", ast.ident.to_string()).as_str());
@@ -141,6 +144,7 @@ impl DbMeta {
     }
 }
 
+///通过 struct name生成表名
 fn gen_table_name(type_name: &str) -> String {
     let mut type_name = type_name.to_owned();
     let names: Vec<&str> = type_name.split("::").collect();
@@ -148,7 +152,7 @@ fn gen_table_name(type_name: &str) -> String {
     type_name = to_snake_name(&type_name);
     type_name
 }
-
+/// 生成创建表的sql script
 fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
     let mut tm = TableMeta::default();
     tm.type_name = type_name.to_owned();
