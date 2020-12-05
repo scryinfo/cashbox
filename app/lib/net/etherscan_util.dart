@@ -3,6 +3,7 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -66,7 +67,7 @@ Future<String> loadEthBalance(String address, ChainType chainType) async {
       return (BigInt.from(num.parse(res["result"])) / config.ethUnit).toStringAsFixed(4);
     }
   } catch (e) {
-    print(" error is " + e.toString());
+    LogUtil.instance.e("loadEthBalance  error ", e.toString());
     return null;
   }
   return null;
@@ -144,7 +145,6 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
   Config config = await HandleConfig.instance.getConfig();
   try {
     var res = await request(await assembleEthTxListUrl(address, offset: offset, chainType: chainType));
-    print("loadEthTxHistory=====================>" + res.toString());
     if (res != null && (res as Map).containsKey("result")) {
       for (var i = 0; i < res["result"].length; i++) {
         var ethTxModel = new EthTransactionModel();
@@ -171,7 +171,7 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
           }
         } catch (e) {
           ethTxModel.input = "";
-          print("etherScanUtil happen error===>" + e.toString());
+          LogUtil.instance.e("etherScanUtil  error ", e.toString());
         }
         ethTxModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
         if (res["result"][i]["from"].trim().toLowerCase() == address.trim().toLowerCase()) {
@@ -191,7 +191,7 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
       return [];
     }
   } catch (e) {
-    print("error is ====>" + e);
+    LogUtil.instance.e("loadEthTxHistory===> ", e.toString());
     return [];
   }
 }
@@ -263,7 +263,7 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, Strin
     }
     return modelArray;
   } catch (e) {
-    print("error is ====>" + e);
+    LogUtil.instance.e("loadErc20TxHistory===> ", e.toString());
     return [];
   }
 }

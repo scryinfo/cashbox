@@ -29,7 +29,6 @@ public class MainActivity extends FlutterActivity {
     private static final int REQUEST_CODE_QR_SCAN = 0;
     private MethodChannel.Result mFlutterChannelResult = null;
     private final String QR_SCAN_METHOD = "qr_scan_method";
-    private final String FLUTTER_LOG_CHANNEL = "android_log_channel";
     private final String APP_INFO_CHANNEL = "app_info_channel";
     private final String UPGRADE_APP_METHOD = "upgrade_app_method";
     private final String APP_SIGNINFO_METHOD = "app_signinfo_method";
@@ -58,12 +57,6 @@ public class MainActivity extends FlutterActivity {
                         }
                 );
 
-        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), FLUTTER_LOG_CHANNEL)
-                .setMethodCallHandler(
-                        (call, result) -> {
-                            logPrint(call);
-                        }
-                );
 
         //Notification of version upgrade at flutter
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), APP_INFO_CHANNEL)
@@ -105,29 +98,6 @@ public class MainActivity extends FlutterActivity {
                         UIData.create().setTitle(getString(R.string.new_version_title)).setContent(getString(R.string.search_new_version) + serverVersion + getString(R.string.search_new_version_end)).setDownloadUrl(loadUrl)
                 )
                 .executeMission(MainActivity.this);
-    }
-
-
-    private void logPrint(MethodCall call) {
-        String tag = call.argument("tag");
-        String message = call.argument("msg");
-        switch (call.method) {
-            case "logV":
-                ScryLog.v(tag, message);
-                break;
-            case "logD":
-                ScryLog.d(tag, message);
-                break;
-            case "logI":
-                ScryLog.i(tag, message);
-                break;
-            case "logW":
-                ScryLog.w(tag, message);
-                break;
-            case "logE":
-                ScryLog.e(tag, message);
-                break;
-        }
     }
 
     @Override

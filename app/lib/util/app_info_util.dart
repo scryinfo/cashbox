@@ -3,6 +3,8 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 
+import 'log_util.dart';
+
 class AppInfoUtil {
   static const appInfoChannel = const MethodChannel('app_info_channel');
   static const UPGRADE_APP_METHOD = "upgrade_app_method";
@@ -54,7 +56,7 @@ class AppInfoUtil {
       }
       return false;
     } catch (e) {
-      print("checkAppUpgrade error is ===>" + e.toString());
+      LogUtil.instance.e("checkAppUpgrade error is ",e.toString());
       return false;
     }
   }

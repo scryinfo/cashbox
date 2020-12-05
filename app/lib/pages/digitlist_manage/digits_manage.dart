@@ -67,14 +67,13 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         if (config.privateConfig.authDigitIpList != null && config.privateConfig.authDigitIpList.length > 0) {
           authDigitIp = config.privateConfig.authDigitIpList[0];
         }
-        print("authDigitIp is ----->" + authDigitIp);
         var param = await loadServerDigitsData(authDigitIp);
         if (param == null || param.trim() == "") {
           return;
         }
         await updateNativeAuthDigitList(param);
       } catch (e) {
-        LogUtil.e("DigitsManagePage error is=>", e);
+        LogUtil.instance.e("DigitsManagePage error is=>", e);
       }
       if (displayDigitsList.length < onePageOffSet) {
         var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
@@ -224,7 +223,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                     int status = addDigitMap["status"];
                     if (status == null || status != 200) {
                       Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
-                      print("addDigitToChainModel failure==" + addDigitMap["message"]);
                     } else {
                       isExecutorSuccess = true;
                     }
@@ -291,17 +289,15 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
 
   Future<String> loadServerDigitsData(String authUrl) async {
     if (authUrl == null || authUrl.isEmpty) {
-      print("loadServerDigitsData authUrl is null===>");
       return "";
     }
     try {
       var result = await requestWithDeviceId(authUrl);
       if (result["code"] != null && result["code"] == 0) {
-        print("loadServerDigitsData result.code=>" + convert.jsonEncode(result["data"]));
         return convert.jsonEncode(result["data"]).toString();
       }
     } catch (e) {
-      print("loadServerDigitsData error is ===>" + e.toString());
+      LogUtil.instance.e("loadServerDigitsData error ", e.toString());
       return "";
     }
     return "";
@@ -309,10 +305,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
 
   updateNativeAuthDigitList(String param) async {
     if (param == null || param.isEmpty || (param.trim() == "")) {
-      print("param is empty======>" + param);
       return;
     }
-    print("updateNativeAuthDigitList  param=====>" + param.toString());
     var updateMap = await Wallets.instance.updateAuthDigitList(param);
     print("updateMap[isUpdateAuthDigit]=====>" + updateMap["status"].toString() + updateMap["isUpdateAuthDigit"].toString());
   }
@@ -338,7 +332,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   //Add to displayDigitsList
   addToAllDigitsList(List<Digit> newDigitList) {
     if (newDigitList == null || newDigitList.length == 0) {
-      print("addToAllDigitsList newDigitList is null");
       return;
     }
     for (num i = 0; i < newDigitList.length; i++) {
@@ -348,8 +341,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         bool isExistErc20 = false;
         for (num index = 0; index < allDigitsList.length; index++) {
           var digit = allDigitsList[index];
-          print(" digit.fullName ===>" + digit.fullName.toString() + " ||digit--->" + digit.contractAddress.toString());
-          print(" element.fullName ===>" + element.fullName.toString() + " ||element--->" + element.contractAddress.toString());
           if ((digit.contractAddress != null) &&
               (element.contractAddress != null) &&
               (digit.contractAddress.trim().toLowerCase() == element.contractAddress.trim().toLowerCase())) {
@@ -357,7 +348,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             break;
           }
         }
-        print("isExistErc20 ===>" + isExistErc20.toString() + " || element.contractAddress--->" + element.contractAddress.toString());
         if (!isExistErc20) {
           allDigitsList.add(element);
         }
@@ -366,12 +356,10 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         for (num index = 0; index < allDigitsList.length; index++) {
           var digit = allDigitsList[index];
           if ((digit.shortName != null) && (element.shortName != null) && (digit.shortName == element.shortName)) {
-            //print("digit.shortName=>" + digit.shortName + "||element.shortName===>" + element.shortName);
             isExistDigit = true;
             break;
           }
         }
-        print("isExistDigit ===>" + isExistDigit.toString());
         if (!isExistDigit) {
           allDigitsList.add(element);
         }
@@ -382,25 +370,20 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   Future<List<Digit>> getAuthDigitList(Chain chain, int tempDigitIndex, int onePageOffSet) async {
     Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
     if (nativeAuthMap == null) {
-      print("getAuthDigitList() native digit list failure===》");
       return [];
     }
     maxAuthTokenCount = nativeAuthMap["count"];
     List<Digit> tempDigitsList = nativeAuthMap["authDigit"];
     if (tempDigitsList == null || tempDigitsList.length == 0) {
-      print("getAuthDigitList() is empty, nativeDigitIndex===》" + this.nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;
       return [];
     }
     if (onePageOffSet == tempDigitsList.length) {
       this.nativeDigitIndex = tempDigitIndex + onePageOffSet;
-      print("getAuthDigitList() continue, nativeDigitIndex===》" + this.nativeDigitIndex.toString());
     } else {
       this.nativeDigitIndex = tempDigitIndex + tempDigitsList.length;
-      print("getAuthDigitList() finish, nativeDigitIndex===》" + this.nativeDigitIndex.toString());
       isLoadAuthDigitFinish = true;
     }
-    print("getAuthDigitList() result，tempDigitsList===》" + tempDigitsList.toString());
     return tempDigitsList;
   }
 }

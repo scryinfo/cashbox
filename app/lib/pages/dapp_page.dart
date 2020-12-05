@@ -10,6 +10,7 @@ import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -171,15 +172,6 @@ class _DappPageState extends State<DappPage> {
     );
   }
 
-  void _scanNativeQrScanToJs() {
-    Future<String> qrResult = QrScanUtil.instance.qrscan();
-    qrResult.then((t) {
-      _controller?.evaluateJavascript('nativeQrScanToJsResult("$t")')?.then((result) {});
-    }).catchError((e) {
-      // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
-    });
-  }
-
   void _scanNativeQrSignToQR() {
     Future<String> qrResult = QrScanUtil.instance.qrscan();
     qrResult.then((qrInfo) {
@@ -213,12 +205,25 @@ class _DappPageState extends State<DappPage> {
         name: "NativeQrScanToJs",
         onMessageReceived: (JavascriptMessage message) async {
           var status = await Permission.camera.status;
+          var msg = Message.fromJson(jsonDecode(message.message));
           if (status.isGranted) {
-            _scanNativeQrScanToJs();
+            Future<String> qrResult = QrScanUtil.instance.qrscan();
+            qrResult.then((t) {
+              msg.data = t;
+              this.callPromise(msg);
+            }).catchError((e) {
+              // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
+            });
           } else {
             Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
             if (statuses[Permission.camera] == PermissionStatus.granted) {
-              _scanNativeQrScanToJs();
+              Future<String> qrResult = QrScanUtil.instance.qrscan();
+              qrResult.then((t) {
+                msg.data = t;
+                this.callPromise(msg);
+              }).catchError((e) {
+                // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
+              });
             } else {
               Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
             }
@@ -256,7 +261,8 @@ class _DappPageState extends State<DappPage> {
                 onPressed: (pwd) async {
                   var pwdFormat = pwd.codeUnits;
                   String walletId = await Wallets.instance.getNowWalletId();
-                  Map map = await Wallets.instance.eeeTxSign(walletId, Uint8List.fromList(pwdFormat), message.message);
+                  var msg = Message.fromJson(jsonDecode(message.message));
+                  Map map = await Wallets.instance.eeeTxSign(walletId, Uint8List.fromList(pwdFormat), msg.data);
                   if (map.containsKey("status")) {
                     int status = map["status"];
                     if (status == null || status != 200) {
@@ -265,10 +271,10 @@ class _DappPageState extends State<DappPage> {
                       return null;
                     } else {
                       var signResult = map["signedInfo"];
+                      msg.data = signResult;
                       Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
-                      _controller?.evaluateJavascript('nativeSignMsgToJsResult("$signResult")')?.then((result) {
-                        NavigatorUtils.goBack(context); //The signature is completed, the password box is closed
-                      });
+                      this.callPromise(msg);
+                      NavigatorUtils.goBack(context);
                     }
                   } else {
                     Fluttertoast.showToast(msg: translate('tx_sign_failure').toString());
@@ -286,16 +292,35 @@ class _DappPageState extends State<DappPage> {
           print("NativeSignMsg 从NativeGoBack传回来的参数======>： ${message.message}");
           NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=false', clearStack: true);
         }));
+    jsChannelList.add(JavascriptChannel(
+        name: "NativeSaveDappChainInfo",
+        onMessageReceived: (JavascriptMessage message) async {
+          print("NativeSignMsg 从NativeSaveDappChainInfo传回来的参数======>： ${message.message}");
+          var subChainInfo = SubChainInfo.fromJson(jsonDecode(message.message));
+          print("subChainInfo--->" + subChainInfo.toString());
+          Map updateMap = await Wallets.instance.updateSubChainBasicInfo(
+              "",
+              subChainInfo.specVersion ?? 0,
+              subChainInfo.txVersion ?? 0,
+              subChainInfo.genesisHash ?? "",
+              subChainInfo.metadata ?? "",
+              subChainInfo.ss58Format ?? 0,
+              subChainInfo.tokenDecimals ?? 0,
+              subChainInfo.tokenSymbol ?? "",
+              isDefault: false);
+        }));
 
     jsChannelList.add(JavascriptChannel(
         name: "NativeEditOrLoadCA",
         onMessageReceived: (JavascriptMessage message) async {
           print("NativeEditOrLoadCA 传回来的参数======>： ${message.message}");
           Config config = await HandleConfig.instance.getConfig();
-          if (message.message == null || message.message.trim() == "") {
-            _controller?.evaluateJavascript('nativeCAInfo("$config.diamondCa")')?.then((result) {});
+          var msg = Message.fromJson(jsonDecode(message.message));
+          if (msg.data == null || msg.data.trim() == "") {
+            msg.data = config.diamondCa;
+            this.callPromise(msg);
           } else {
-            config.diamondCa = message.message;
+            config.diamondCa = msg.data;
             HandleConfig.instance.saveConfig(config);
           }
         }));
@@ -432,7 +457,7 @@ class _DappPageState extends State<DappPage> {
               this.callPromise(msg);
             });
           } catch (e) {
-            print("" + e.toString());
+            LogUtil.instance.d("cashboxEthSendSignedTx===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
           }
@@ -453,7 +478,7 @@ class _DappPageState extends State<DappPage> {
             msg.data = await ethCall(chainType, data[0], data[1]);
             this.callPromise(msg);
           } catch (e) {
-            print("" + e.toString());
+            LogUtil.instance.d("cashboxEthCall===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
           }
@@ -503,7 +528,7 @@ class _DappPageState extends State<DappPage> {
                       });
                     });
                   } catch (e) {
-                    print("cashboxEeeRawTxSign: " + e.toString());
+                    LogUtil.instance.d("cashboxEeeRawTxSign===>", e.toString());
                     msg.err = "inner error";
                     this.callPromise(msg).whenComplete(() {
                       NavigatorUtils.goBack(context);
@@ -522,5 +547,38 @@ class _DappPageState extends State<DappPage> {
   Future<String> callPromise(Message msg) {
     String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
     return _controller?.evaluateJavascript(call);
+  }
+}
+
+// 注意与js处代码，格式定义一致
+class SubChainInfo {
+  int specVersion = 0;
+  int txVersion = 0;
+  String genesisHash = '';
+  String metadata = '';
+  int ss58Format = 0;
+  int tokenDecimals = 0;
+  String tokenSymbol = '';
+
+  SubChainInfo.fromJson(Map<String, dynamic> json) {
+    specVersion = json['specVersion'];
+    txVersion = json['txVersion'];
+    genesisHash = json['genesisHash'];
+    metadata = json['metadata'];
+    ss58Format = json['ss58Format'];
+    tokenDecimals = json['tokenDecimals'];
+    tokenSymbol = json['tokenSymbol'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['specVersion'] = this.specVersion;
+    data['txVersion'] = this.txVersion;
+    data['genesisHash'] = this.genesisHash;
+    data['metadata'] = this.metadata;
+    data['ss58Format'] = this.ss58Format;
+    data['tokenDecimals'] = this.tokenDecimals;
+    data['tokenSymbol'] = this.tokenSymbol;
+    return data;
   }
 }

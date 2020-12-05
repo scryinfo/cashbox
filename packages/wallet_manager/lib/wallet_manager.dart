@@ -205,34 +205,15 @@ class WalletManager {
     return eeeTxSignMap;
   }
 
-  static Future<Map<dynamic, dynamic>> eeeTransfer(
-      String from, String to, String value, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
-    Map<dynamic, dynamic> eeeTxSignMap = await _channel.invokeMethod("eeeTransfer", {
-      "from": from,
-      "to": to,
-      "value": value,
-      "genesisHash": genesisHash,
-      "index": index,
-      "runtime_version": runtimeVersion,
-      "tx_version": txVersion,
-      "pwd": pwd
-    });
+  static Future<Map<dynamic, dynamic>> eeeTransfer(String from, String to, String value, int index, Uint8List pwd) async {
+    Map<dynamic, dynamic> eeeTxSignMap =
+        await _channel.invokeMethod("eeeTransfer", {"from": from, "to": to, "value": value, "index": index, "pwd": pwd});
     return eeeTxSignMap;
   }
 
-  static Future<Map<dynamic, dynamic>> tokenXTransfer(
-      String from, String to, String value, String extData, String genesisHash, int index, int runtimeVersion, int txVersion, Uint8List pwd) async {
-    Map<dynamic, dynamic> tokenXTxSignMap = await _channel.invokeMethod("tokenXTransfer", {
-      "from": from,
-      "to": to,
-      "value": value,
-      "extData": extData,
-      "genesisHash": genesisHash,
-      "index": index,
-      "runtime_version": runtimeVersion,
-      "tx_version": txVersion,
-      "pwd": pwd
-    });
+  static Future<Map<dynamic, dynamic>> tokenXTransfer(String from, String to, String value, String extData, int index, Uint8List pwd) async {
+    Map<dynamic, dynamic> tokenXTxSignMap =
+        await _channel.invokeMethod("tokenXTransfer", {"from": from, "to": to, "value": value, "extData": extData, "index": index, "pwd": pwd});
     return tokenXTxSignMap;
   }
 
@@ -251,9 +232,9 @@ class WalletManager {
     return decodeMap;
   }
 
-  static eeeStorageKey(String module, String storageItem, String pubKey) async {
+  static eeeStorageKey(String module, String storageItem, String accountStr) async {
     Map<dynamic, dynamic> eeeStorageMap =
-        await _channel.invokeMethod("eeeStorageKey", {"module": module, "storageItem": storageItem, "pubKey": pubKey});
+        await _channel.invokeMethod("eeeStorageKey", {"module": module, "storageItem": storageItem, "account_str": accountStr});
     return eeeStorageMap;
   }
 
@@ -268,9 +249,9 @@ class WalletManager {
     return updateRecordMap;
   }
 
-  static saveEeeExtrinsicDetail(String account, String eventDetail, String blockHash, String extrinsics) async {
-    Map<dynamic, dynamic> updateRecordMap = await _channel
-        .invokeMethod("saveExtrinsicDetail", {"accountId": account, "eventDetail": eventDetail, "blockHash": blockHash, "extrinsics": extrinsics});
+  static saveEeeExtrinsicDetail(String infoId, String account, String eventDetail, String blockHash, String extrinsics) async {
+    Map<dynamic, dynamic> updateRecordMap = await _channel.invokeMethod("saveExtrinsicDetail",
+        {"infoId": infoId, "accountId": account, "eventDetail": eventDetail, "blockHash": blockHash, "extrinsics": extrinsics});
     return updateRecordMap;
   }
 
@@ -316,6 +297,36 @@ class WalletManager {
   static queryDigit(int chainType, String name, String contract_addr) async {
     Map<dynamic, dynamic> updateMap =
         await _channel.invokeMethod("queryDigit", {"chainType": chainType, "name": name, "contract_addr": contract_addr});
+    return updateMap;
+  }
+
+  static btcStart() async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("btcStart");
+    return updateMap;
+  }
+
+  static getSubChainBasicInfo(String genesisHash, int specVersion, int txVersion) async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("getSubChainBasicInfo", {
+      "genesisHash": genesisHash,
+      "specVersion": specVersion,
+      "txVersion": txVersion,
+    });
+    return updateMap;
+  }
+
+  static updateSubChainBasicInfo(String infoId, int runtimeVersion, int txVersion, String genesisHash, String metadata, int ss58Format,
+      int tokenDecimals, String tokenSymbol, bool isDefault) async {
+    Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateSubChainBasicInfo", {
+      "infoId": infoId,
+      "runtimeVersion": runtimeVersion,
+      "txVersion": txVersion,
+      "genesisHash": genesisHash,
+      "metadata": metadata,
+      "ss58Format": ss58Format,
+      "tokenDecimals": tokenDecimals,
+      "tokenSymbol": tokenSymbol,
+      "isDefault": isDefault,
+    });
     return updateMap;
   }
 }

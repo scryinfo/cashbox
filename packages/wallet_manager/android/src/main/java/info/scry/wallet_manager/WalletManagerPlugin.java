@@ -506,8 +506,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 try {
                     message = NativeLib.tokenXTransfer((String) (call.argument("from")),
                             (String) (call.argument("to")), (String) (call.argument("value")), (String) (call.argument("extData")),
-                            (String) (call.argument("genesisHash")), (int) (call.argument("index")), (int) (call.argument("runtime_version")),
-                            (int) (call.argument("tx_version")), (byte[]) (call.argument("pwd")));
+                            (int) (call.argument("index")), (byte[]) (call.argument("pwd")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "eeeEnergyTransfer exception is " + exception);
                 }
@@ -637,16 +636,15 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "eeeTransfer": {
                 ScryWalletLog.d("nativeLib=>", "eeeTransfer is enter =>");
                 Message message = new Message();
-                ScryWalletLog.d("nativeLib=>",
-                        "eeeTransfer is enter =>" + (call.argument("from")).toString());
+                // ScryWalletLog.d("nativeLib=>", "eeeTransfer is from =>" + (call.argument("from")).toString());
+                // ScryWalletLog.d("nativeLib=>", "eeeTransfer is to =>" + (call.argument("to")).toString());
+                // ScryWalletLog.d("nativeLib=>", "eeeTransfer is value =>" + (call.argument("value")).toString());
+                // ScryWalletLog.d("nativeLib=>", "index is index =>" + ((int) (call.argument("index"))));
                 message = NativeLib.eeeTransfer(
                         (String) (call.argument("from")),
                         (String) (call.argument("to")),
                         (String) (call.argument("value")),
-                        (String) (call.argument("genesisHash")),
                         (int) (call.argument("index")),
-                        (int) (call.argument("runtime_version")),
-                        (int) (call.argument("tx_version")),
                         (byte[]) (call.argument("pwd")));
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
@@ -691,8 +689,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
             case "eeeSign": {
                 ScryWalletLog.d("nativeLib=>", "eeeSign is enter =>");
                 Message message = new Message();
-                ScryWalletLog.d("nativeLib=>",
-                        (String) (call.argument("rawTx")) + "||" + (String) (call.argument("mnId")) + "||" + call.argument("pwd"));
+                ScryWalletLog.d("nativeLib=>", (String) (call.argument("rawTx")) + "||" + (String) (call.argument("mnId")) + "||" + call.argument("pwd"));
                 try {
                     message = NativeLib.eeeSign((String) (call.argument("rawTx")),
                             (String) (call.argument("mnId")),
@@ -825,9 +822,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 Message message = new Message();
                 //ScryWalletLog.d("nativeLib module =>", (String) (call.argument("module")));
                 //ScryWalletLog.d("nativeLib storageItem =>", (String) (call.argument("storageItem")));
-                //ScryWalletLog.d("nativeLib pubKey =>", (String) (call.argument("pubKey")));
+                //ScryWalletLog.d("nativeLib account_str =>", (String) (call.argument("account_str")));
                 try {
-                    message = NativeLib.eeeStorageKey((String) (call.argument("module")), (String) (call.argument("storageItem")), (String) (call.argument("pubKey")));
+                    message = NativeLib.eeeStorageKey((String) (call.argument("module")), (String) (call.argument("storageItem")), (String) (call.argument("account_str")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "decodeAccountInfo exception is " + exception);
                 }
@@ -911,7 +908,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 // ScryWalletLog.d("nativeLib extrinsics   =>", (String) (call.argument("extrinsics")));
                 Message message = new Message();
                 try {
-                    message = NativeLib.saveExtrinsicDetail((String) (call.argument("accountId")), (String) (call.argument("eventDetail")),
+                    message = NativeLib.saveExtrinsicDetail((String) (call.argument("infoId")),(String) (call.argument("accountId")), (String) (call.argument("eventDetail")),
                             (String) (call.argument("blockHash")), (String) (call.argument("extrinsics")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "saveExtrinsicDetail exception is " + exception);
@@ -974,16 +971,19 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 WalletState walletState = new WalletState();
                 try {
                     walletState = NativeLib.updateDefaultDigitList((String) (call.argument("digitData")));
+                    ScryWalletLog.d("nativeLib=>",
+                            "walletState is " + walletState.toString());
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "updateAuthDigitList exception is " + exception);
                 }
+
                 ScryWalletLog.d("nativeLib=>", "walletState.status is " + walletState.status);
                 Map resultMap = new HashMap();
                 resultMap.put("status", walletState.status);
                 if (walletState.status == 200) {
                     resultMap.put("isUpdateDefaultDigit", walletState.isUpdateDefaultDigit);
                     ScryWalletLog.d("nativeLib=>",
-                            "message.isUpdateDefaultDigit is " + walletState.isUpdateDefaultDigit);
+                            "message.isUpdateDefaultDigit is " + walletState.isUpdateDefaultDigit + "||walletState.message is -->" + walletState.message);
                 } else {
                     resultMap.put("message", walletState.message);
                     ScryWalletLog.d("nativeLib=>",
@@ -1073,7 +1073,7 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 result.success(resultMap);
                 break;
             }
-            case "queryDigit":
+            case "queryDigit": {
                 ScryWalletLog.d("nativeLib=>", "queryDigit is enter ===>");
                 DigitList authList = new DigitList();
                 try {
@@ -1124,6 +1124,73 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 }
                 result.success(resultMap);
                 break;
+            }
+            /*case "btcStart": {
+                ScryWalletLog.d("BtcLib=>", "btcStart is enter ===>");
+                try {
+                    // BtcLib.btcStart((String) (call.argument("network")));
+                    BtcLib.btcStart("Testnet");
+                } catch (Exception exception) {
+                    ScryWalletLog.d("BtcLib=>", "btcStart exception is " + exception);
+                }
+                ScryWalletLog.d("BtcLib=>", "btcStart is end~~~ ===");
+                break;
+            }*/
+            case "getSubChainBasicInfo": {
+                ScryWalletLog.d("nativeLib=>", "getSubChainBasicInfo is enter ===>");
+                Message message = new Message();
+                // ScryWalletLog.d("nativeLib genesisHash   =>", (String) (call.argument("genesisHash")));
+                // ScryWalletLog.d("nativeLib=>", "specVersion==>" + (int) (call.argument("specVersion")));
+                // ScryWalletLog.d("nativeLib=>", "txVersion==>" + (int) (call.argument("txVersion")));
+                try {
+                    message = NativeLib.getSubChainBasicInfo((String) (call.argument("genesisHash")), (int) (call.argument("specVersion")), (int) (call.argument("txVersion")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "getSubChainBasicInfo exception is " + exception);
+                }
+                ScryWalletLog.d("nativeLib=>", "message is  ===>" + message.toString());
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                int status = message.status;
+                if (status == 200) {
+                    resultMap.put("infoId", message.chainInfo.infoId);
+                    resultMap.put("genesisHash", message.chainInfo.genesisHash);
+                    resultMap.put("metadata", message.chainInfo.metadata);
+                    resultMap.put("runtimeVersion", message.chainInfo.runtimeVersion);
+                    resultMap.put("txVersion", message.chainInfo.txVersion);
+                    resultMap.put("ss58Format", message.chainInfo.ss58Format);
+                    resultMap.put("tokenDecimals", message.chainInfo.tokenDecimals);
+                    resultMap.put("tokenSymbol", message.chainInfo.tokenSymbol);
+                } else {
+                    resultMap.put("message", message.message);
+                }
+                result.success(resultMap);
+                break;
+            }
+            case "updateSubChainBasicInfo": {
+                ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is enter ===>");
+                ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is infoId ===>"+(String) (call.argument("infoId")));
+                ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is genesisHash ===>"+(String) (call.argument("genesisHash")));
+                ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is isDefault ===>"+(call.argument("isDefault")));
+                Message message = new Message();
+                SubChainBasicInfo chainInfo = new NativeLib.SubChainBasicInfo();
+                chainInfo.infoId = (String) (call.argument("infoId"));
+                chainInfo.runtimeVersion = (int) (call.argument("runtimeVersion"));
+                chainInfo.txVersion = (int) (call.argument("txVersion"));
+                chainInfo.genesisHash = (String) (call.argument("genesisHash"));
+                chainInfo.metadata = (String) (call.argument("metadata"));
+                chainInfo.ss58Format = (int) (call.argument("ss58Format"));
+                chainInfo.tokenDecimals = (int) (call.argument("tokenDecimals"));
+                chainInfo.tokenSymbol = (String) (call.argument("tokenSymbol"));
+                try {
+                    message = NativeLib.updateSubChainBasicInfo(chainInfo,  (boolean) (call.argument("isDefault")));
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "updateSubChainBasic exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                resultMap.put("status", message.status);
+                result.success(resultMap);
+                break;
+            }
             default:
                 result.notImplemented();
                 break;

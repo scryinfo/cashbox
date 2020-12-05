@@ -81,7 +81,6 @@ class _HomePageState extends State<HomePage> {
     for (int i = 0; i < walletList.length; i++) {
       int index = i;
       Wallet wallet = walletList[index];
-      print("isNowWallet===>" + wallet.isNowWallet.toString() + wallet.walletId.toString() + "walletName===>" + wallet.walletName.toString());
       if (wallet.isNowWallet == true) {
         this.walletName = Wallets.instance.nowWallet.walletName;
         break; //Find, terminate the loop
@@ -145,7 +144,7 @@ class _HomePageState extends State<HomePage> {
               });
             }
           } else {
-            LogUtil.w("digitName is not exist===>", this.displayDigitsList[index].shortName);
+            LogUtil.instance.w("digitName is not exist===>", this.displayDigitsList[index].shortName);
           }
         }
       }
@@ -202,7 +201,7 @@ class _HomePageState extends State<HomePage> {
 
               if (this.displayDigitsList[index].shortName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
                 Map eeeStorageKeyMap =
-                    await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+                    await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, this.displayDigitsList[index].address);
                 if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
                   try {
                     String eeeFree = eeeStorageKeyMap["free"] ?? "0";
@@ -211,15 +210,14 @@ class _HomePageState extends State<HomePage> {
                       continue;
                     }
                   } catch (e) {
-                    print("error(), _loadingBalanceTimerTask error is load Eee balance===>" + e);
-                    LogUtil.e("_loadingBalanceTimerTask error is =>", e.toString());
+                    LogUtil.instance.e("_loadingBalanceTimerTask error is =>", e.toString());
                   }
                   Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
                   this.displayDigitsList[index].balance = balance;
                 }
               } else if (this.displayDigitsList[index].shortName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
                 Map tokenBalanceMap =
-                    await scryXNetUtil.loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+                    await scryXNetUtil.loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, this.displayDigitsList[index].address);
                 if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
                   try {
                     double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
@@ -228,8 +226,7 @@ class _HomePageState extends State<HomePage> {
                       continue;
                     }
                   } catch (e) {
-                    print("error(), error is load tokenX balance===>" + e);
-                    LogUtil.e("_loadingBalanceTimerTask error is =>", e.toString());
+                    LogUtil.instance.e("_loadingBalanceTimerTask error is =>", e.toString());
                   }
                   this.displayDigitsList[index].balance = balance ?? "";
                   Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
@@ -404,8 +401,7 @@ class _HomePageState extends State<HomePage> {
         future: digitListFuture,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            print("snapshot.error==>" + snapshot.error.toString());
-            LogUtil.e("digitList future snapshot.hasError is +>", snapshot.error.toString());
+            LogUtil.instance.e("digitList future snapshot.hasError is +>", snapshot.error.toString());
             return Center(
               child: Text(
                 translate('failure_to_load_data_pls_retry'),
@@ -506,8 +502,7 @@ class _HomePageState extends State<HomePage> {
                   NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);
                   break;
                 default:
-                  //todo 加提示，不知道哪个链
-                  print("不知道哪个链");
+                  LogUtil.instance.e("switch chainType error is --->", "unknown which chainType");
                   break;
               }
             },
@@ -700,10 +695,8 @@ class _HomePageState extends State<HomePage> {
               return Text(translate('load_data_error'));
             }
             if (snapshot.hasData) {
-              print("Wallets.instance.nowWallet.chainList.length snapshot.hasData===>" + Wallets.instance.nowWallet.chainList.length.toString());
               return Swiper(
                 itemBuilder: (BuildContext context, int index) {
-                  print("itemBuilder length====>" + index.toString() + "||" + Wallets.instance.nowWallet.chainList.length.toString());
                   return SingleChildScrollView(
                     child: Container(
                       alignment: Alignment.centerLeft,
@@ -725,10 +718,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 onIndexChanged: (index) async {
-                  print("onIndexChanged index======>" + index.toString() + "||" + Wallets.instance.nowWallet.chainList[index].chainType.toString());
                   bool isSetNowChain = await Wallets.instance.nowWallet.setNowChainType(Wallets.instance.nowWallet.chainList[index]);
-                  print("isSetNowChain===>" + isSetNowChain.toString());
-                  print("Wallets.instance.nowWallet.nowChain.chainType===>" + Wallets.instance.nowWallet.nowChain.chainType.toString());
                   if (isSetNowChain) {
                     if (mounted) {
                       setState(() {
@@ -767,7 +757,6 @@ class _HomePageState extends State<HomePage> {
       height: ScreenUtil().setHeight(7),
       child: GestureDetector(
         onTap: () {
-          print("money unit is click~~~");
         },
         child: Container(
           height: ScreenUtil().setHeight(7),

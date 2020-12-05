@@ -27,7 +27,6 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    print("执行了一次_WalletManagerListPageState didChange()");
     initData();
   }
 

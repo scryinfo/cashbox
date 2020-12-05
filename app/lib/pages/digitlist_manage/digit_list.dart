@@ -142,8 +142,7 @@ class _DigitListPageState extends State<DigitListPage> {
                   ..setChainType(nowChain.chainType)
                   ..setContractAddress(displayDigitsList[index].contractAddress ?? "");
               } catch (e) {
-                print("digit_list_page点击传值出现位置错误===>" + e.toString());
-                LogUtil.e("digit_list_page", e.toString());
+                LogUtil.instance.e("digit_list_page", e.toString());
               }
               switch (Wallets.instance.nowWallet.nowChain.chainType) {
                 case ChainType.ETH:
@@ -155,7 +154,7 @@ class _DigitListPageState extends State<DigitListPage> {
                   NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
                   break;
                 default:
-                  print("未知链类型");
+                  LogUtil.instance.e("unknown chain type error ","unknown chainType");
                   break;
               }
             },
@@ -226,7 +225,6 @@ class _DigitListPageState extends State<DigitListPage> {
     for (var i = displayDigitsList.length; i < targetCount; i++) {
       var digitRate = DigitRate();
       Digit digit = EthDigit();
-      print("addDigitToDisplayList nowChainDigitsList[i].balance===>" + nowChainDigitsList[i].balance.toString());
       digit
         ..chainId = nowChainDigitsList[i].chainId
         ..decimal = nowChainDigitsList[i].decimal

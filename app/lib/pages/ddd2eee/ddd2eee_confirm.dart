@@ -12,6 +12,7 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
+import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -343,7 +344,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   Widget _buildExchangeBtnWidget() {
     return GestureDetector(
       onTap: () async {
-        showProgressDialog(context, translate("check_data_format"));
+        ProgressDialog.showProgressDialog(context, translate("check_data_format"));
         var verifyNonceResult = await _verifyNonce();
         NavigatorUtils.goBack(context);
         if (verifyNonceResult) {
@@ -372,7 +373,6 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   Future<bool> _verifyNonce() async {
     nonce = await loadTxAccount(fromExchangeAddress, chainType);
     if (nonce == null || nonce.trim() == "") {
-      print("取的nonce值有问题");
       Fluttertoast.showToast(msg: translate("nonce_is_wrong"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
       return false;
     }
@@ -419,9 +419,8 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
 
   void sendRawTx2Chain(String rawTx) async {
     NavigatorUtils.goBack(context);
-    showProgressDialog(context, translate("tx_sending"));
+    ProgressDialog.showProgressDialog(context, translate("tx_sending"));
     String txHash = await sendRawTx(chainType, rawTx);
-    print("after broadcast txHash is===>" + txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
       Fluttertoast.showToast(msg: translate("tx_upload_success"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
     } else {

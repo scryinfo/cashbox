@@ -28,7 +28,7 @@ class NavigatorUtils {
       }
       function(result);
     }).catchError((error) {
-      LogUtil.e("FluroNavigator error is=>", "$error");
+      LogUtil.instance.e("FluroNavigator error is ===>", "$error");
       print("$error");
     });
   }

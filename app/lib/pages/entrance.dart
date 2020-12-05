@@ -67,7 +67,7 @@ class _EntrancePageState extends State<EntrancePage> {
 
     Map resultMap = await Wallets.instance.updateWalletDbData(config.dbVersion);
     if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
-      LogUtil.i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
+      LogUtil.instance.i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
     }
     int lastTimeConfigCheck = config.lastTimeConfigCheck;
     int nowTimeStamp = DateTime.now().millisecondsSinceEpoch;
@@ -115,10 +115,10 @@ class _EntrancePageState extends State<EntrancePage> {
                   if (defaultDigitParam["code"] != null && defaultDigitParam["code"] == 0) {
                     String paramString = convert.jsonEncode(defaultDigitParam["data"]);
                     var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
-                    LogUtil.i("updateDefaultDigitList=====>", updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
+                    LogUtil.instance.i("updateDefaultDigitList=====>", updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
                   }
                 } catch (e) {
-                  LogUtil.e("updateDefaultDigitList error =====>", e.toString());
+                  LogUtil.instance.e("updateDefaultDigitList error =====>", e.toString());
                 }
               }
             }
@@ -161,7 +161,7 @@ class _EntrancePageState extends State<EntrancePage> {
           }
           if (isLatestApk == null || !isLatestApk) {
             var latestApkObj = resultData["latestApk"];
-            LogUtil.i("_checkServerAppConfig latestApkObj======>", latestApkObj.toString());
+            LogUtil.instance.i("_checkServerAppConfig latestApkObj======>", latestApkObj.toString());
             String apkVersion = latestApkObj["apkVersion"].toString();
             if (apkVersion != null && apkVersion.isNotEmpty) {
               config.privateConfig.serverApkVersion = apkVersion;
@@ -170,13 +170,13 @@ class _EntrancePageState extends State<EntrancePage> {
           // save changed config
           HandleConfig.instance.saveConfig(config);
         } else {
-          LogUtil.i("_checkAndUpdateAppConfig() requestWithVersionParam ", "result status is not ok");
+          LogUtil.instance.i("_checkAndUpdateAppConfig() requestWithVersionParam ", "result status is not ok");
         }
       } else {
-        LogUtil.i("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>", (nowTimeStamp - lastTimeConfigCheck).toString());
+        LogUtil.instance.i("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>", (nowTimeStamp - lastTimeConfigCheck).toString());
       }
     } catch (e) {
-      LogUtil.i("_checkServerAppConfig(), error is =======>", e.toString());
+      LogUtil.instance.i("_checkServerAppConfig(), error is =======>", e.toString());
     }
   }
 
@@ -196,8 +196,7 @@ class _EntrancePageState extends State<EntrancePage> {
           future: _checkIsContainWallet(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              print("EntrancePage snapshot.error==>" + snapshot.error.toString());
-              LogUtil.e("EntrancePage future snapshot.hasError is +>", snapshot.error.toString());
+              LogUtil.instance.e("EntrancePage future snapshot.hasError is +>", snapshot.error.toString());
               return Center(
                 child: Text(
                   translate('wallet_load_error'),
@@ -271,7 +270,6 @@ class _EntrancePageState extends State<EntrancePage> {
               setState(() {
                 this._languageTextValue = languageMap[value];
               });
-              print("changeLocale===>" + value);
               {
                 changeLocale(context, value);
                 Config config = await HandleConfig.instance.getConfig();

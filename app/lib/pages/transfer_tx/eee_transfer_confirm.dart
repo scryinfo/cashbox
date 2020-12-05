@@ -198,7 +198,6 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
           return;
         }
         String txHash = submitMap["result"];
-        print("txHash is " + txHash.toString());
         Fluttertoast.showToast(msg: translate("tx_upload_success"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
         NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=false', clearStack: true);
       },

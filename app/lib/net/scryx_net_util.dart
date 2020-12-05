@@ -1,6 +1,7 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/util/log_util.dart';
 import 'net_util.dart';
 
 class ScryXNetUtil {
@@ -26,7 +27,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("loadScryXStorage error is ===>" + e.toString());
+      LogUtil.instance.e("loadEeeChainNonceTest error is  ", e.toString());
       return null;
     }
   }
@@ -49,9 +50,9 @@ class ScryXNetUtil {
     return eeeBalance;
   }
 
-  Future<Map> loadEeeStorageMap(String module, String storageItem, String pubKey) async {
+  Future<Map> loadEeeStorageMap(String module, String storageItem, String accountStr) async {
     Map eeeResultMap;
-    String storageKey = await loadEeeStorageKey(module, storageItem, pubKey);
+    String storageKey = await loadEeeStorageKey(module, storageItem, accountStr);
     if (storageKey != null && storageKey.trim() != "") {
       Map netFormatMap = await _loadScryXStorage(storageKey);
       if (netFormatMap != null && netFormatMap.containsKey("result") && netFormatMap["result"] != null) {
@@ -61,8 +62,8 @@ class ScryXNetUtil {
     return eeeResultMap;
   }
 
-  Future<String> loadEeeStorageKey(String module, String storageItem, String pubKey) async {
-    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(module, storageItem, pubKey);
+  Future<String> loadEeeStorageKey(String module, String storageItem, String accountStr) async {
+    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(module, storageItem, accountStr);
     if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
       if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
         return eeeStorageKeyMap["storageKeyInfo"];
@@ -71,9 +72,9 @@ class ScryXNetUtil {
     return null;
   }
 
-  Future<Map> loadTokenXbalance(String tokenx, String balances, String pubKey) async {
+  Future<Map> loadTokenXbalance(String tokenx, String balances, String accountStr) async {
     Map tokenXResultMap;
-    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(tokenx, balances, pubKey);
+    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(tokenx, balances, accountStr);
     if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
       if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
         String storageKeyInfo = eeeStorageKeyMap["storageKeyInfo"];
@@ -102,7 +103,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("loadScryXStorage error is ===>" + e.toString());
+      LogUtil.instance.e("loadScryXStorage error is  ", e.toString());
       return null;
     }
   }
@@ -118,7 +119,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("loadScryXRuntimeVersion error is ===>" + e.toString());
+      LogUtil.instance.e("loadScryXRuntimeVersion error is  ", e.toString());
       return null;
     }
   }
@@ -139,7 +140,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("loadScryXBlockHash error is ===>" + e.toString());
+      LogUtil.instance.e("loadScryXBlockHash error is  ", e.toString());
       return null;
     }
   }
@@ -155,6 +156,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
+      LogUtil.instance.e("loadChainHeader error is  ", e.toString());
       return null;
     }
   }
@@ -255,8 +257,88 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      print("submitExtrinsic error is ===>" + e.toString());
+      LogUtil.instance.e("submitExtrinsic error is  ", e.toString());
       return null;
     }
+  }
+
+  Future<Map> loadMetadata() async {
+    Map resultMap = new Map();
+    String netUrl = await _loadScryXIp();
+    if (netUrl == null || netUrl.isEmpty) {
+      return null;
+    }
+    var paramObj = {"method": "state_getMetadata", "params": [], "id": 1, "jsonrpc": "2.0"};
+    try {
+      resultMap = await request(netUrl, formData: paramObj);
+      return resultMap;
+    } catch (e) {
+      LogUtil.instance.e("getMetadata error is  ", e.toString());
+      return null;
+    }
+  }
+
+  Future<Map> loadSystemProperties() async {
+    Map resultMap = new Map();
+    String netUrl = await _loadScryXIp();
+    if (netUrl == null || netUrl.isEmpty) {
+      return null;
+    }
+    var paramObj = {"method": "system_properties", "params": [], "id": 1, "jsonrpc": "2.0"};
+    try {
+      resultMap = await request(netUrl, formData: paramObj);
+      return resultMap;
+    } catch (e) {
+      LogUtil.instance.e("loadSystemProperties error is  ", e.toString());
+      return null;
+    }
+  }
+
+  Future<Map> updateSubChainBasicInfo(String infoId) async {
+    Map runtimeMap = await loadScryXRuntimeVersion();
+    if (runtimeMap == null || !runtimeMap.containsKey("result")) {
+      return null;
+    }
+    var runtimeResultMap = runtimeMap["result"];
+    if (runtimeResultMap == null || !runtimeResultMap.containsKey("specVersion") || !runtimeResultMap.containsKey("transactionVersion")) {
+      return null;
+    }
+    int runtimeVersion = runtimeResultMap["specVersion"];
+    int txVersion = runtimeResultMap["transactionVersion"];
+
+    Map blockHashMap = await loadScryXBlockHash();
+    if (blockHashMap == null || !blockHashMap.containsKey("result")) {
+      return null;
+    }
+    String genesisHash = blockHashMap["result"];
+
+    Map metaDataMap = await loadMetadata();
+    if (metaDataMap == null || !metaDataMap.containsKey("result")) {
+      return null;
+    }
+    String metadata = metaDataMap["result"];
+
+    Map systemPropertiesMap = await loadSystemProperties();
+    if (systemPropertiesMap == null || !systemPropertiesMap.containsKey("result")) {
+      return null;
+    }
+    Map resultMap = Map();
+    Map propertiesResultMap = systemPropertiesMap["result"];
+    int ss58Format = propertiesResultMap["ss58Format"];
+    int tokenDecimals = propertiesResultMap["tokenDecimals"];
+    String tokenSymbol = propertiesResultMap["tokenSymbol"];
+    if (runtimeVersion != null &&
+        txVersion != null &&
+        genesisHash != null &&
+        metadata != null &&
+        ss58Format != null &&
+        tokenDecimals != null &&
+        tokenSymbol != null) {
+      Map updateMap = await Wallets.instance
+          .updateSubChainBasicInfo(infoId, runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol);
+      return updateMap;
+    }
+
+    return resultMap;
   }
 }

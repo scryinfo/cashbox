@@ -28,7 +28,6 @@ class _PublicPageState extends State<PublicPage> {
   Future<String> loadTargetUrl() async {
     Config config = await HandleConfig.instance.getConfig();
     targetUrl = config.privateConfig.publicIp;
-    print("targetUrl===>" + targetUrl);
     return targetUrl;
   }
 

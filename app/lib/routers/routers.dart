@@ -43,7 +43,7 @@ class Routes {
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       print('ERROR====>ROUTE WAS NOT FONUND!!!');
-      LogUtil.e("Routers error is=>", "noFoundHandler");
+      LogUtil.instance.e("Routers error is=>", "noFoundHandler");
     });
 
     router.define(homePage, handler: homePageHandler);

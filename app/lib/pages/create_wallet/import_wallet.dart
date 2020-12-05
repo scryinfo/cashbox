@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/net/scryx_net_util.dart';
 import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,25 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     _walletNameController.addListener(_listenMnemonic);
     _pwdController.addListener(_listenWalletName);
     _confirmPwdController.addListener(_listenPwd);
+  }
+
+  @override
+  void didChangeDependencies() async {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    // Wallets.instance.btcStart();
+    // LogUtil.instance.d("didChangeDependencies ", "test third!~");
+    // LogUtil.instance.e("error ", "test error!~");
+    // LogUtil.instance.i("info ", "info!~");
+    // Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0);
+    // ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+    // if (getSubChainMap != null && getSubChainMap["status"] == 200) {
+    //   Map map = await scryXNetUtil.updateSubChainBasicInfo(getSubChainMap["infoId"]);
+    //   LogUtil.instance.i("info ", "info!~");
+    // }else{
+    //   Map map = await scryXNetUtil.updateSubChainBasicInfo("");
+    //   LogUtil.instance.i("info ", "info!~");
+    // }
   }
 
   @override

@@ -4,15 +4,15 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/util/utils.dart';
 import 'dart:convert' as convert;
 
 class RunParams {
   final String address;
-  final String pubKey;
   final ChainType chainType;
 
-  RunParams(this.address, this.pubKey, this.chainType);
+  RunParams(this.address, this.chainType);
 }
 
 class EeeSyncTxs {
@@ -21,7 +21,6 @@ class EeeSyncTxs {
 
   EeeSyncTxs._internal(Chain chain)
       : _address = chain.chainAddress,
-        _pubKey = chain.pubKey,
         _chainType = chain.chainType {
     // 初始化
   }
@@ -47,20 +46,24 @@ class EeeSyncTxs {
   }
 
   final String _address;
-  final String _pubKey;
   final ChainType _chainType;
   Timer _timer;
   bool _timing = false;
   String _eeeStorageKey = '';
   String _tokenXStorageKey = '';
+  String _infoId = '';
 
   ScryXNetUtil _scryXNetUtil = new ScryXNetUtil();
 
   _start() async {
     Config config = await HandleConfig.instance.getConfig();
-    RunParams runParams = new RunParams(_address, _pubKey, _chainType);
-    _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.pubKey);
-    _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.pubKey);
+    RunParams runParams = new RunParams(_address, _chainType);
+    _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
+    _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
+    Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0);
+    if (getSubChainMap != null && getSubChainMap["status"] == 200) {
+      _infoId = getSubChainMap["infoId"];
+    }
     _threadRun(runParams);
   }
 
@@ -80,28 +83,13 @@ class EeeSyncTxs {
       try {
         await _loadEeeChainTxHistoryData(runParams);
       } catch (e) {
-        print("_loadEeeChainTxHistoryData error is : " + e.toString());
+        LogUtil.instance.e("_loadEeeChainTxHistoryData error is ", e.toString());
       }
       _timing = false;
     });
-
-    // await SharedPreferenceUtil.initIpConfig();
-    // WidgetsFlutterBinding.ensureInitialized();
-    // await SystemChrome.setEnabledSystemUIOverlays([]);
-    // await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    // await di.init(); //initialize the service locator
-    // for (;true;) {
-    //   try {
-    //     await _loadEeeChainTxHistoryData(runParams);
-    //   }catch(e){
-    //     print(e);
-    //   }
-    //   sleep(new Duration(seconds: 1));
-    // }
   }
 
   _loadEeeChainTxHistoryData(RunParams runParams) async {
-    print("_loadEeeChainTxHistoryData");
     Config config = await HandleConfig.instance.getConfig();
     int latestBlockHeight = -1;
     {
@@ -111,15 +99,14 @@ class EeeSyncTxs {
       }
 
       latestBlockHeight = Utils.hexToInt(txHistoryMap["result"]["number"].toString().substring(2));
-      print("latestBlockHeight is ===>" + latestBlockHeight.toString());
     }
 
     {
       if (_eeeStorageKey == null || _eeeStorageKey.isEmpty) {
-        _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.pubKey);
+        _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
       }
       if (_tokenXStorageKey == null || _tokenXStorageKey.isEmpty) {
-        _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.pubKey);
+        _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
       }
       if (_eeeStorageKey == null ||
           _eeeStorageKey.isEmpty ||
@@ -150,8 +137,6 @@ class EeeSyncTxs {
         }
       }
     }
-
-    print("start BlockHeight is ===>" + startBlockHeight.toString());
 
     const onceCount = 3000;
     var queryCount = ((latestBlockHeight - startBlockHeight) / onceCount.toDouble()).ceil(); //divide down to fetch int
@@ -201,7 +186,6 @@ class EeeSyncTxs {
         if (loadBlockMap == null || !loadBlockMap.containsKey("result")) {
           return;
         }
-        // print("scryXNetUtil loadBlockMap is ======>" + loadBlockMap.toString());
         Map blockResultMap = loadBlockMap["result"];
         if (blockResultMap == null || !blockResultMap.containsKey("block")) {
           return;
@@ -220,7 +204,8 @@ class EeeSyncTxs {
           return;
         }
         String extrinsicJson = convert.jsonEncode(extrinsicList);
-        Map saveEeeMap = await Wallets.instance.saveEeeExtrinsicDetail(runParams.address, loadStorageMap["result"], element["block"], extrinsicJson);
+        Map saveEeeMap =
+            await Wallets.instance.saveEeeExtrinsicDetail(_infoId, runParams.address, loadStorageMap["result"], element["block"], extrinsicJson);
         if (!_isMapStatusOk(saveEeeMap)) {
           return;
         }
@@ -236,7 +221,7 @@ class EeeSyncTxs {
 
   static bool _isMapStatusOk(Map returnMap) {
     if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      print("returnMap error is ===>" + returnMap.toString());
+      LogUtil.instance.e("returnMap error is ", returnMap.toString());
       return false;
     }
     return true;

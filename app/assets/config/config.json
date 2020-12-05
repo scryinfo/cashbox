@@ -48,7 +48,7 @@
   "balanceSymbol": "Balances",
   "eeeSymbol": "Eee",
   "privateConfig": {
-    "serverConfigIp": "https://casg/check",
+    "serverConfigIp": "https://cashbox.scry.info",
     "serverApkVersionKey": "2.1.0",
     "configVersion": "1.0.0",
     "downloadAppUrl": "333",

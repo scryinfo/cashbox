@@ -402,7 +402,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   void changeMnemonic() async {
     var mnemonic = await Wallets.instance.createMnemonic(12);
     if (mnemonic == null) {
-      LogUtil.e("CreateWalletMnemonicPage=>", "mnemonic is null");
+      // LogUtil.e("CreateWalletMnemonicPage=>", "mnemonic is null");
       return;
     }
     setState(() {

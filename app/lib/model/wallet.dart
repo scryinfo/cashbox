@@ -47,14 +47,14 @@ class Wallet {
     Map resetPwdMap = await WalletManager.resetPwd(walletId, newPwd, oldPwd);
     int status = resetPwdMap["status"];
     if (status == null) {
-      LogUtil.e("resetPwd=>", "not find status code");
+      LogUtil.instance.e("resetPwd=>", "not find status code");
       return null;
     }
     if (status == 200) {
       return resetPwdMap;
     } else {
       String message = resetPwdMap["message"];
-      LogUtil.e("isContainWallet=>", "error status is=>" + status.toString() + "||message is=>" + message.toString());
+      LogUtil.instance.e("isContainWallet=>", "error status is=>" + status.toString() + "||message is=>" + message.toString());
     }
     return resetPwdMap;
   }
@@ -66,14 +66,14 @@ class Wallet {
     int status = walletRenameMap["status"];
     String message = walletRenameMap["message"];
     if (status == null) {
-      LogUtil.e("rename=>", "not find status code");
+      LogUtil.instance.e("rename=>", "not find status code");
       return false;
     }
     if (status == 200) {
       this.walletName = walletName; //The jni operation is complete, change the model
       return walletRenameMap["isRename"];
     } else {
-      LogUtil.e("isContainWallet=>", "error status is=>" + walletRenameMap["status"].toString() + "||message is=>" + message.toString());
+      LogUtil.instance.e("isContainWallet=>", "error status is=>" + walletRenameMap["status"].toString() + "||message is=>" + message.toString());
       return false;
     }
   }
@@ -82,18 +82,9 @@ class Wallet {
   // apiNo:WM10
   Future<bool> showChain(int chainType) async {
     Map showChainMap = await WalletManager.showChain(walletId, chainType);
-    print("showChain  showChainMap=>" + showChainMap.toString());
     int status = showChainMap["status"];
     String message = showChainMap["message"];
     bool isShowChain = showChainMap["message"];
-    print("showChain  status=>" + status.toString());
-    print("showChain  message=>" + message.toString());
-    print("showChain  isShowChain=>" + isShowChain.toString());
-
-    //if (isSuccess) {
-    //todo Data Format
-    //chainList.remove(chain);
-    //}
     return null;
   }
 
@@ -115,7 +106,7 @@ class Wallet {
     int status = getNowChainMap["status"];
     String message = getNowChainMap["message"];
     if (status == null) {
-      LogUtil.e("getNowChain=>", "not find status code");
+      LogUtil.instance.e("getNowChain=>", "not find status code");
       return ChainType.UNKNOWN; //0===UNKNOWN
     }
     if (status == 200) {
@@ -123,7 +114,7 @@ class Wallet {
       ChainType chainType = Chain.intToChainType(getNowChainMap["getNowChainType"]);
       return chainType;
     } else {
-      LogUtil.e("getNowChain=>", "error status is=>" + getNowChainMap["status"].toString() + "||message is=>" + message.toString());
+      LogUtil.instance.e("getNowChain=>", "error status is=>" + getNowChainMap["status"].toString() + "||message is=>" + message.toString());
       return ChainType.UNKNOWN; //0===UNKNOWN
     }
   }
@@ -132,12 +123,9 @@ class Wallet {
   // apiNo:WM13
   Future<bool> setNowChainType(Chain chain) async {
     int chainTypeInt = Chain.chainTypeToInt(chain.chainType);
-    print("walletid===>" + walletId + "||chainTypeInt===>" + chainTypeInt.toString());
     Map setNowChainMap = await WalletManager.setNowChainType(walletId, chainTypeInt);
     int status = setNowChainMap["status"];
     bool isSetNowChain = setNowChainMap["isSetNowChain"];
-    print("status===>" + status.toString());
-    print("isSetNowChain===>" + setNowChainMap["isSetNowChain"].toString());
     nowChain = chain;
     if (status == null) {
       return false;
@@ -145,7 +133,7 @@ class Wallet {
     if (status == 200) {
       return isSetNowChain;
     } else {
-      print("status===>" + setNowChainMap["message"].toString());
+      LogUtil.instance.e("setNowChainType message ===>", setNowChainMap["message"].toString());
       return false;
     }
   }
