@@ -1,5 +1,5 @@
 #[cfg(test)]
-pub use db::test as db_dest;
+pub use dao::test as db_dest;
 
 pub use crate::ma::data::{*};
 pub use crate::ma::data_btc::{*};
@@ -21,5 +21,5 @@ mod data_eth;
 mod data_eee;
 mod data_btc;
 
-pub mod db;
+pub mod dao;
 

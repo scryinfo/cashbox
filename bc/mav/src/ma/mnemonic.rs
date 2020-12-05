@@ -6,7 +6,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::db::{self, Shared};
+use crate::ma::dao::{self, Shared};
 
 //导入/创建钱包时生成
 //修改密码时修改
@@ -31,7 +31,7 @@ mod tests {
 
     use wallets_macro::db_append_shared;
 
-    use crate::ma::db::{BeforeSave, BeforeUpdate, Dao, Mnemonic, Shared};
+    use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Mnemonic, Shared};
     use crate::ma::db_dest;
 
     const TABLE: &str = "

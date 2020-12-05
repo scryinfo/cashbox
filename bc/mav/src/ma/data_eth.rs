@@ -8,7 +8,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::db::{self, bool_from_int, Shared};
+use crate::ma::dao::{self, bool_from_int, Shared};
 use crate::ma::TxShared;
 
 //eth

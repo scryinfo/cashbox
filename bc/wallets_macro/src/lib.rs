@@ -150,7 +150,7 @@ pub fn db_before_save(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
     let gen = quote! {
-        impl db::BeforeSave for #name {
+        impl dao::BeforeSave for #name {
             fn before_save(&mut self){
                 if self.get_id().is_empty() {
                     self.set_id(kits::uuid());
@@ -174,7 +174,7 @@ pub fn db_before_update(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let name = &ast.ident;
     let gen = quote! {
-        impl db::BeforeUpdate for #name {
+        impl dao::BeforeUpdate for #name {
             fn before_update(&mut self){
                 self.set_update_time(kits::now_ts_seconds());
             }

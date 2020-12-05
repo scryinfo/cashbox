@@ -2,30 +2,54 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 
 use once_cell::sync::OnceCell;
+use parking_lot::{RawMutex,RawThreadId};
+use parking_lot::lock_api::RawReentrantMutex;
 
 use wallets_types::{Context, Error, InitParameters, UnInitParameters, Wallet};
+use mav::db::Db;
 
-#[derive(Default)]
 pub struct Wallets {
+    raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
     pub ctx: Context,
+    db: Db,
+}
+
+impl Default for Wallets {
+    fn default() -> Self {
+        Self{
+            ctx: Default::default(),
+            db: Default::default(),
+            raw_reentrant: RawReentrantMutex::INIT,
+        }
+    }
 }
 
 impl Wallets {
     pub fn lock_read(&mut self) -> bool {
+        self.raw_reentrant.lock();
         return true;
     }
     pub fn unlock_read(&mut self) -> bool {
+        unsafe {
+            self.raw_reentrant.unlock();
+        }
         return true;
     }
     pub fn lock_write(&mut self) -> bool {
+        self.raw_reentrant.lock();
         return true;
     }
     pub fn unlock_write(&mut self) -> bool {
+        unsafe {
+            self.raw_reentrant.unlock();
+        }
         return true;
     }
 
     pub fn init(&mut self, parameters: &InitParameters) -> Error {
         let err = Error::default();
+        let r = self.db.init(&parameters.db_name);
+
         err
     }
 

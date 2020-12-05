@@ -6,7 +6,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::db::{self, bool_from_int, Shared};
+use crate::ma::dao::{self, bool_from_int, Shared};
 use crate::ma::TxShared;
 
 //btc
@@ -93,7 +93,7 @@ mod tests {
     use rbatis::rbatis::Rbatis;
 
     use crate::ma::{BtcChainToken, db_dest};
-    use crate::ma::db::{BeforeSave, BeforeUpdate, Dao, Shared};
+    use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
 
     const TABLE_BTC_CHAIN_TOKEN: &str = "
 -- BtcChainToken
