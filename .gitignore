@@ -14,7 +14,7 @@
 /bc/murmel/btc_detail.sqlite
 /bc/murmel/NOTICE
 /bc/murmel/.DS_Store
-/bc/bitcoin/target
+/bc/chain/btc/bitcoin/target
 
 *.db
 /test/wallet-jni-test/target/

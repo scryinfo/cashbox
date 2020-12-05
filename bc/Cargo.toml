@@ -15,7 +15,7 @@ members = [
     "device_app_lib",
     "util/substratetx",
     "murmel",
-    "bitcoin",
+    "chain/btc/bitcoin",
     "wallets_cdl",
     #"wallets_macro",
     "wallets_types",
@@ -30,5 +30,5 @@ version = "0.21"
 features = ["serde"]
 
 [patch.crates-io]
-bitcoin = { path = "bitcoin" }
+bitcoin = { path = "chain/btc/bitcoin" }
 
