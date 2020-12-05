@@ -4,8 +4,7 @@
 
 use super::*;
 use crate::constructor::Constructor;
-use crate::db::SQLite;
-use crate::db::SharedSQLite;
+use crate::db::{SQLite, lazy_db_default};
 use crate::hooks::{ApiMessage, HooksMessage};
 use bitcoin::consensus::serialize;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
@@ -27,8 +26,8 @@ use std::str::FromStr;
 use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
-use crate::jniapi::SHARED_SQLITE;
 use crate::jniapi::{calc_default_address, calc_pubkey};
+use crate::config::BTC_CHAIN_PATH;
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -162,7 +161,7 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadBalance(
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadMaxBlockNumber(env: JNIEnv, _class: JClass) -> jstring {
-    let sqlite = SHARED_SQLITE.lock().unwrap();
+    let sqlite = lazy_db_default().lock().unwrap();
     let max_block_number = sqlite.count();
     let max_block_number = env
         .new_string(max_block_number.to_string())
@@ -173,7 +172,7 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadMaxBlockNumb
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadNowBlockNumber(env: JNIEnv, class: JClass) -> jstring {
-    let sqlite = SHARED_SQLITE.lock().unwrap();
+    let sqlite = lazy_db_default().lock().unwrap();
     let height = sqlite.query_scanned_height();
     let max_block_number = env
         .new_string(height.to_string())
@@ -247,22 +246,23 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEn
 
     // todo
     // use mnemonic generate publc address and store it in database
-    let sqlite = SHARED_SQLITE.lock().unwrap();
-    let pubkey = sqlite.query_compressed_pub_key();
     let mut filter_message: Option<FilterLoadMessage> = None;
-
-    if let Some(pubkey) = pubkey {
-        info!("Calc bloomfilter via pubkey {:?}", &pubkey);
-        let filter_load_message = FilterLoadMessage::calculate_filter(pubkey.as_str());
-        filter_message = Some(filter_load_message)
-    } else {
-        info!("Did not have default pubkey in database yet");
-        let default_address = calc_default_address();
-        let address = default_address.to_string();
-        let default_pubkey = calc_pubkey();
-        sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
-        let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
-        filter_message = Some(filter_load_message)
+    {
+        let sqlite = lazy_db_default().lock().unwrap();
+        let pubkey = sqlite.query_compressed_pub_key();
+        if let Some(pubkey) = pubkey {
+            info!("Calc bloomfilter via pubkey {:?}", &pubkey);
+            let filter_load_message = FilterLoadMessage::calculate_filter(pubkey.as_str());
+            filter_message = Some(filter_load_message)
+        } else {
+            info!("Did not have default pubkey in database yet");
+            let default_address = calc_default_address();
+            let address = default_address.to_string();
+            let default_pubkey = calc_pubkey();
+            sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
+            let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
+            filter_message = Some(filter_load_message)
+        }
     }
 
     let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();

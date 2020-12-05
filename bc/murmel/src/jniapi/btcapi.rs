@@ -250,7 +250,6 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv<'_>, _class: JClass<'_>,
     {
         let sqlite = lazy_db_default().lock().unwrap();
         let pubkey = sqlite.query_compressed_pub_key();
-
         if let Some(pubkey) = pubkey {
             info!("Calc bloomfilter via pubkey {:?}", &pubkey);
             let filter_load_message = FilterLoadMessage::calculate_filter(pubkey.as_str());
