@@ -25,6 +25,8 @@ use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
 use std::time::SystemTime;
+use crate::db::lazy_db_default;
+use crate::config::{BTC_DETAIL_PATH, BTC_CHAIN_PATH};
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -159,7 +161,7 @@ pub extern "system" fn Java_JniApi_btcLoadBalance(
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
-    let sqlite = SHARED_SQLITE.lock().unwrap();
+    let sqlite = lazy_db_default().lock().unwrap();
     let max_block_number = sqlite.count();
     let max_block_number = env
         .new_string(max_block_number.to_string())
@@ -170,7 +172,7 @@ pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv<'_>, _class
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
-    let sqlite = SHARED_SQLITE.lock().unwrap();
+    let sqlite = lazy_db_default().lock().unwrap();
     let height = sqlite.query_scanned_height();
     let max_block_number = env
         .new_string(height.to_string())
@@ -244,22 +246,24 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv<'_>, _class: JClass<'_>,
 
     // todo
     // use mnemonic generate publc address and store it in database
-    let sqlite = SHARED_SQLITE.lock().unwrap();
-    let pubkey = sqlite.query_compressed_pub_key();
     let mut filter_message: Option<FilterLoadMessage> = None;
+    {
+        let sqlite = lazy_db_default().lock().unwrap();
+        let pubkey = sqlite.query_compressed_pub_key();
 
-    if let Some(pubkey) = pubkey {
-        info!("Calc bloomfilter via pubkey {:?}", &pubkey);
-        let filter_load_message = FilterLoadMessage::calculate_filter(pubkey.as_str());
-        filter_message = Some(filter_load_message)
-    } else {
-        info!("Did not have default pubkey in database yet");
-        let default_address = calc_default_address();
-        let address = default_address.to_string();
-        let default_pubkey = calc_pubkey();
-        sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
-        let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
-        filter_message = Some(filter_load_message)
+        if let Some(pubkey) = pubkey {
+            info!("Calc bloomfilter via pubkey {:?}", &pubkey);
+            let filter_load_message = FilterLoadMessage::calculate_filter(pubkey.as_str());
+            filter_message = Some(filter_load_message)
+        } else {
+            info!("Did not have default pubkey in database yet");
+            let default_address = calc_default_address();
+            let address = default_address.to_string();
+            let default_pubkey = calc_pubkey();
+            sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
+            let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
+            filter_message = Some(filter_load_message)
+        }
     }
 
     let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();

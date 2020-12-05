@@ -4,14 +4,13 @@
 use crate::chaindb::SharedChainDB;
 use crate::error::Error;
 use crate::hooks::HooksMessage;
-use crate::jniapi::SHARED_SQLITE;
 use crate::p2p::{
-     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOOM,
+    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOOM,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
-use bitcoin::network::message_blockdata::{ InvType, Inventory};
-use bitcoin::network::message_bloom_filter::{ MerkleBlockMessage};
+use bitcoin::network::message_blockdata::{InvType, Inventory};
+use bitcoin::network::message_bloom_filter::{MerkleBlockMessage};
 use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::hex::FromHex;
@@ -22,6 +21,7 @@ use log::{error, info, trace, warn};
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
+use crate::db::lazy_db_default;
 
 const PUBLIC_KEY: &str = "0291ee52a0e0c22db9772f237f4271ea6f9330d92b242fb3c621928774c560b699";
 
@@ -81,9 +81,11 @@ impl GetData {
                                 {
                                     let block_hash = merkleblock.prev_block.to_hex();
                                     let timestamp = merkleblock.timestamp;
-                                    let sqlite =
-                                        SHARED_SQLITE.lock().expect("open connection error!");
-                                    sqlite.update_newest_header(block_hash, timestamp.to_string());
+                                    {
+                                        let sqlite =
+                                            lazy_db_default().lock().expect("open connection error!");
+                                        sqlite.update_newest_header(block_hash, timestamp.to_string());
+                                    }
                                 }
 
                                 if merkle_vec.len() <= 100 {
@@ -147,9 +149,14 @@ impl GetData {
         {
             return Ok(());
         }
-        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
-        let (_block_hash, timestamp) = sqlite.init();
-        let block_hashes = sqlite.query_header(timestamp, add);
+
+        let mut block_hashes: Vec<String> = Vec::new();
+        {
+            let sqlite = lazy_db_default().lock().expect("sqlite open error");
+            let (_block_hash, timestamp) = sqlite.init();
+            block_hashes = sqlite.query_header(timestamp, add);
+        }
+
         if block_hashes.len() == 0 {
             return Ok(());
         }
@@ -182,7 +189,6 @@ impl GetData {
 
     // Handle tx return value
     fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
-        let sqlite = SHARED_SQLITE.lock().expect("open connection error!");
         info!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;
@@ -198,6 +204,7 @@ impl GetData {
                 iter.next();
                 let current_hash = iter.next().unwrap_or(" ");
                 if current_hash.eq(hash160.as_str()) {
+                    let sqlite = lazy_db_default().lock().expect("open db error");
                     sqlite.insert_txout(
                         tx_hash.to_hex(),
                         asm.clone(),
@@ -222,6 +229,7 @@ impl GetData {
             iter.next();
             let iter3 = iter.next().unwrap_or(" ");
             if iter3.eq(PUBLIC_KEY) {
+                let sqlite = lazy_db_default().lock().expect("open db error");
                 sqlite.insert_txin(
                     tx_hash.to_hex(),
                     sig_script.clone(),

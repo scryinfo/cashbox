@@ -11,7 +11,6 @@ use log::{error, info, trace};
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
-use crate::jniapi::SHARED_SQLITE;
 
 pub struct BloomFilter {
     // send message

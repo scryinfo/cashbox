@@ -50,5 +50,6 @@ pub mod p2p;
 pub mod ping;
 pub mod timeout;
 pub mod walletlib;
+pub mod config;
 
 pub use error::Error;

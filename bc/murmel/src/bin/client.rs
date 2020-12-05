@@ -30,9 +30,10 @@ use std::{
     str::FromStr,
     time::SystemTime,
 };
-use murmel::jniapi::{BTC_CHAIN_PATH, SHARED_SQLITE};
+use murmel::config::BTC_CHAIN_PATH;
 use murmel::jniapi::{calc_default_address, calc_pubkey};
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
+use murmel::db::lazy_db_default;
 
 pub fn main() {
     if find_opt("help") {
@@ -111,9 +112,12 @@ pub fn main() {
 
     // todo
     // use mnemonic generate publc address and store it in database
-    let sqlite = SHARED_SQLITE.lock().unwrap();
-    let pubkey = sqlite.query_compressed_pub_key();
     let mut filter_message: Option<FilterLoadMessage> = None;
+    let mut pubkey: Option<String> = None;
+    {
+        let sqlite = lazy_db_default().lock().expect("open db error");
+        pubkey = sqlite.query_compressed_pub_key();
+    }
 
     if let Some(pubkey) = pubkey {
         info!("Calc bloomfilter via pubkey {:?}", &pubkey);
@@ -124,14 +128,18 @@ pub fn main() {
         let default_address = calc_default_address();
         let address = default_address.to_string();
         let default_pubkey = calc_pubkey();
-        sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
+        {
+            let sqlite = lazy_db_default().lock().expect("open db error");
+            sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
+        }
         let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
         filter_message = Some(filter_load_message)
     }
 
     let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
     spv.run(network, peers, connections)
-       .expect("can not start node");}
+       .expect("can not start node");
+}
 
 fn get_peers() -> Vec<SocketAddr> {
     find_args("peer")

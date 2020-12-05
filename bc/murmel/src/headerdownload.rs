@@ -20,7 +20,6 @@ use crate::chaindb::SharedChainDB;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
 use crate::hooks::HooksMessage;
-use crate::jniapi::SHARED_SQLITE;
 use crate::p2p::{
     P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
     SERVICE_BLOCKS,
@@ -37,6 +36,7 @@ use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use log::{debug, error, info, trace};
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
+use crate::db::lazy_db_default;
 
 pub struct HeaderDownload {
     p2p: P2PControlSender<NetworkMessage>,
@@ -211,13 +211,17 @@ impl HeaderDownload {
                                 connected_headers.push((stored.header.clone(), stored.height));
                                 // POW is ok, stored top chaindb
                                 some_new = true;
+
                                 // save block hash into sqlite table "block_hash"
-                                let sqlite = SHARED_SQLITE.lock().expect("Open db error");
-                                let header_clone = header.clone();
-                                sqlite.insert_block(
-                                    header_clone.bitcoin_hash().to_hex(),
-                                    header_clone.time.to_string(),
-                                );
+                                {
+                                    let sqlite = lazy_db_default().lock().expect("Open db error");
+                                    let header_clone = header.clone();
+                                    sqlite.insert_block(
+                                        header_clone.bitcoin_hash().to_hex(),
+                                        header_clone.time.to_string(),
+                                    );
+                                }
+
                                 if let Some(forwards) = forwards {
                                     moved_tip = Some(forwards.last().unwrap().clone());
                                 }

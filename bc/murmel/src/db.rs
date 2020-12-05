@@ -8,10 +8,9 @@ use bitcoin::hashes::hex::ToHex;
 use bitcoin::{BitcoinHash, Network};
 use log::info;
 use sqlite::{State, Value};
-use std::sync::{Arc, Mutex};
-use crate::jniapi::BTC_DETAIL_PATH;
-
-pub type SharedSQLite = Arc<Mutex<SQLite>>;
+use std::sync::Mutex;
+use once_cell::sync::OnceCell;
+use crate::config::BTC_DETAIL_PATH;
 
 const NEWEST_KEY: &str = "NEWEST_KEY";
 
@@ -21,8 +20,9 @@ pub struct SQLite {
 }
 
 impl SQLite {
-    pub fn open_db(network: Network) -> Self {
-        let mut sqlite = sqlite::open(BTC_DETAIL_PATH).expect("create sqlite error");
+    // create database
+    pub fn create_db(network: Network, path: &str) -> Self {
+        let mut sqlite = sqlite::open(path).expect("create sqlite error");
         sqlite.set_busy_timeout(3000).unwrap();
         sqlite.execute(
             "
@@ -260,8 +260,27 @@ impl SQLite {
     }
 }
 
+pub fn lazy_db(network: Network, path: &str) -> &'static Mutex<SQLite> {
+    static INSTANCE: OnceCell<Mutex<SQLite>> = OnceCell::new();
+    INSTANCE.get_or_init(|| {
+        let sqlite = SQLite::create_db(network, path);
+        Mutex::new(sqlite)
+    })
+}
+
+pub fn lazy_db_main() -> &'static Mutex<SQLite> {
+    lazy_db(Network::Bitcoin, BTC_DETAIL_PATH)
+}
+
+pub fn lazy_db_test() -> &'static Mutex<SQLite> {
+    lazy_db(Network::Testnet, BTC_DETAIL_PATH)
+}
+
+pub fn lazy_db_default() -> &'static Mutex<SQLite> {
+    lazy_db_test()
+}
+
 mod test {
-    use crate::jniapi::SHARED_SQLITE;
     use crate::db::NEWEST_KEY;
 
     #[test]
