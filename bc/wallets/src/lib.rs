@@ -1,8 +1,7 @@
-#[macro_use]
-extern crate serde_derive;
+// #[macro_use]
+// extern crate serde_derive;
 
+pub use wallets::{Wallets, WalletsInstances};
 
 mod wallets;
-
-pub use wallets::{Wallets,WalletsInstances};
 

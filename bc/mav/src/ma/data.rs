@@ -1,4 +1,3 @@
-use rbatis::crud::CRUDEnable;
 use rbatis_macro_driver::CRUDEnable;
 use serde::{Deserialize, Serialize};
 

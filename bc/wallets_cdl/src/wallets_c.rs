@@ -28,11 +28,9 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, ctx: *mut
         //todo
     }
     let mut parameter = CInitParameters::ptr_rust(parameter);
-    let mut lock = WalletsInstances::instances().lock().expect("let &mut ws = WalletsInstances::instances().lock().");
-    let ws = lock.new().expect("let mut ws = lock.new().");
-    ws.init(&mut parameter);
-    *ctx = CContext::to_c_ptr(&ws.ctx);
-
+    let ws = WalletsInstances::instances().lock().borrow_mut().new().expect("WalletsInstances::instances().lock().borrow_mut().new()").clone();
+    ws.borrow_mut().init(&mut parameter);
+    *ctx = CContext::to_c_ptr(&ws.borrow().ctx);
     Box::into_raw(cerr)
 }
 
@@ -44,9 +42,9 @@ pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext, parameter: *mut CUnI
     }
     let mut rp = UnInitParameters {};
 
-    let mut lock = WalletsInstances::instances().lock().expect("let &mut ws = WalletsInstances::instances().lock().");
-    let ws = lock.get(&CContext::get_id(ctx)).expect("let mut ws = lock.new().");
-    ws.uninit(&mut rp); //todo handle error
+    let lock = WalletsInstances::instances().lock();
+    let ws = lock.borrow().get(&CContext::get_id(ctx)).expect("lock.borrow().get(&CContext::get_id(ctx))").clone();
+    ws.borrow_mut().uninit(&mut rp); //todo handle error
     Box::into_raw(cerr)
 }
 
@@ -55,9 +53,9 @@ pub unsafe extern "C" fn Wallets_lockRead(ctx: *mut CContext) -> CBool {
     if ctx.is_null() {
         return CFalse;
     }
-    let mut lock = WalletsInstances::instances().lock().expect("let &mut ws = WalletsInstances::instances().lock().");
-    let ws = lock.get(&CContext::get_id(ctx)).expect("let mut ws = lock.new().");
-    if ws.lock_read() {
+    let lock = WalletsInstances::instances().lock();
+    let ws = lock.borrow().get(&CContext::get_id(ctx)).expect("lock.borrow().get(&CContext::get_id(ctx))").clone();
+    if ws.borrow_mut().lock_read() {
         CTrue
     } else {
         CFalse
@@ -69,9 +67,9 @@ pub unsafe extern "C" fn Wallets_unlockRead(ctx: *mut CContext) -> CBool {
     if ctx.is_null() {
         return CFalse;
     }
-    let mut lock = WalletsInstances::instances().lock().expect("let &mut ws = WalletsInstances::instances().lock().");
-    let ws = lock.get(&CContext::get_id(ctx)).expect("let mut ws = lock.new().");
-    if ws.unlock_read() {
+    let lock = WalletsInstances::instances().lock();
+    let ws = lock.borrow().get(&CContext::get_id(ctx)).expect("lock.borrow_mut().get(&CContext::get_id(ctx))").clone();
+    if ws.borrow_mut().unlock_read() {
         CTrue
     } else {
         CFalse
@@ -83,9 +81,9 @@ pub unsafe extern "C" fn Wallets_lockWrite(ctx: *mut CContext) -> CBool {
     if ctx.is_null() {
         return CFalse;
     }
-    let mut lock = WalletsInstances::instances().lock().expect("let &mut ws = WalletsInstances::instances().lock().");
-    let ws = lock.get(&CContext::get_id(ctx)).expect("let mut ws = lock.new().");
-    if ws.lock_write() {
+    let lock = WalletsInstances::instances().lock();
+    let ws = lock.borrow().get(&CContext::get_id(ctx)).expect("lock.borrow().get(&CContext::get_id(ctx))").clone();
+    if ws.borrow_mut().lock_write() {
         CTrue
     } else {
         CFalse
@@ -97,9 +95,9 @@ pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> CBool {
     if ctx.is_null() {
         return CFalse;
     }
-    let mut lock = WalletsInstances::instances().lock().expect("let &mut ws = WalletsInstances::instances().lock().");
-    let ws = lock.get(&CContext::get_id(ctx)).expect("let mut ws = lock.new().");
-    if ws.unlock_read() {
+    let lock = WalletsInstances::instances().lock();
+    let ws = lock.borrow_mut().get(&CContext::get_id(ctx)).expect("lock.borrow_mut().get(&CContext::get_id(ctx))").clone();
+    if ws.borrow_mut().unlock_read() {
         CTrue
     } else {
         CFalse
@@ -119,11 +117,11 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
         *arrayWallet = null_mut();
     }
 
-    let mut lock = WalletsInstances::instances().lock().expect("let &mut ws = WalletsInstances::instances().lock().");
-    let ws = lock.get(&CContext::get_id(ctx)).expect("let mut ws = lock.new().");
+    let lock = WalletsInstances::instances().lock();
+    let ws = lock.borrow_mut().get(&CContext::get_id(ctx)).expect("lock.borrow_mut().get(&CContext::get_id(ctx))").clone();
 
     let mut all = vec![];
-    let _ = ws.all(&mut all);
+    let _ = ws.borrow_mut().all(&mut all);
     let cws = all.iter().map(|rw| CWallet::to_c(&rw)).collect();
     *arrayWallet = Box::into_raw(Box::new(CArray::<CWallet>::new(cws)));
     Box::into_raw(cerr)
