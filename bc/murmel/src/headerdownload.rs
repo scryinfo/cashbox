@@ -214,7 +214,7 @@ impl HeaderDownload {
 
                                 // save block hash into sqlite table "block_hash"
                                 {
-                                    let sqlite = lazy_db_default().lock().expect("Open db error");
+                                    let sqlite = lazy_db_default().lock();
                                     let header_clone = header.clone();
                                     sqlite.insert_block(
                                         header_clone.bitcoin_hash().to_hex(),

@@ -8,7 +8,7 @@ use bitcoin::hashes::hex::ToHex;
 use bitcoin::{BitcoinHash, Network};
 use log::info;
 use sqlite::{State, Value};
-use std::sync::Mutex;
+use parking_lot::ReentrantMutex;
 use once_cell::sync::OnceCell;
 use crate::config::BTC_DETAIL_PATH;
 
@@ -260,23 +260,23 @@ impl SQLite {
     }
 }
 
-pub fn lazy_db(network: Network, path: &str) -> &'static Mutex<SQLite> {
-    static INSTANCE: OnceCell<Mutex<SQLite>> = OnceCell::new();
+pub fn lazy_db(network: Network, path: &str) -> &'static ReentrantMutex<SQLite> {
+    static INSTANCE: OnceCell<ReentrantMutex<SQLite>> = OnceCell::new();
     INSTANCE.get_or_init(|| {
         let sqlite = SQLite::create_db(network, path);
-        Mutex::new(sqlite)
+        ReentrantMutex::new(sqlite)
     })
 }
 
-pub fn lazy_db_main() -> &'static Mutex<SQLite> {
+pub fn lazy_db_main() -> &'static ReentrantMutex<SQLite> {
     lazy_db(Network::Bitcoin, BTC_DETAIL_PATH)
 }
 
-pub fn lazy_db_test() -> &'static Mutex<SQLite> {
+pub fn lazy_db_test() -> &'static ReentrantMutex<SQLite> {
     lazy_db(Network::Testnet, BTC_DETAIL_PATH)
 }
 
-pub fn lazy_db_default() -> &'static Mutex<SQLite> {
+pub fn lazy_db_default() -> &'static ReentrantMutex<SQLite> {
     lazy_db_test()
 }
 

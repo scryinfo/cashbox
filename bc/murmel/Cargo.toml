@@ -98,4 +98,5 @@ version = "0.17.0"
 [dependencies.once_cell]
 version = "1.4.1"
 
-
+[dependencies.parking_lot]
+version = "0.11"

@@ -115,7 +115,7 @@ pub fn main() {
     let mut filter_message: Option<FilterLoadMessage> = None;
     let mut pubkey: Option<String> = None;
     {
-        let sqlite = lazy_db_default().lock().expect("open db error");
+        let sqlite = lazy_db_default().lock();
         pubkey = sqlite.query_compressed_pub_key();
     }
 
@@ -129,7 +129,7 @@ pub fn main() {
         let address = default_address.to_string();
         let default_pubkey = calc_pubkey();
         {
-            let sqlite = lazy_db_default().lock().expect("open db error");
+            let sqlite = lazy_db_default().lock();
             sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
         }
         let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());

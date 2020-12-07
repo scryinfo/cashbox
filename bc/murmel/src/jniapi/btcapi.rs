@@ -161,8 +161,8 @@ pub extern "system" fn Java_JniApi_btcLoadBalance(
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
-    let sqlite = lazy_db_default().lock().unwrap();
-    let max_block_number = sqlite.count();
+    let sqlite = lazy_db_default();
+    let max_block_number = (*sqlite).lock().count();
     let max_block_number = env
         .new_string(max_block_number.to_string())
         .expect("Could not create java string!");
@@ -172,7 +172,7 @@ pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv<'_>, _class
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
-    let sqlite = lazy_db_default().lock().unwrap();
+    let sqlite = lazy_db_default().lock();
     let height = sqlite.query_scanned_height();
     let max_block_number = env
         .new_string(height.to_string())
@@ -248,7 +248,7 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv<'_>, _class: JClass<'_>,
     // use mnemonic generate publc address and store it in database
     let mut filter_message: Option<FilterLoadMessage> = None;
     {
-        let sqlite = lazy_db_default().lock().unwrap();
+        let sqlite = lazy_db_default().lock();
         let pubkey = sqlite.query_compressed_pub_key();
         if let Some(pubkey) = pubkey {
             info!("Calc bloomfilter via pubkey {:?}", &pubkey);

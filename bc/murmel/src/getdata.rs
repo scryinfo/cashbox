@@ -83,7 +83,7 @@ impl GetData {
                                     let timestamp = merkleblock.timestamp;
                                     {
                                         let sqlite =
-                                            lazy_db_default().lock().expect("open connection error!");
+                                            lazy_db_default().lock();
                                         sqlite.update_newest_header(block_hash, timestamp.to_string());
                                     }
                                 }
@@ -152,7 +152,7 @@ impl GetData {
 
         let mut block_hashes: Vec<String> = Vec::new();
         {
-            let sqlite = lazy_db_default().lock().expect("sqlite open error");
+            let sqlite = lazy_db_default().lock();
             let (_block_hash, timestamp) = sqlite.init();
             block_hashes = sqlite.query_header(timestamp, add);
         }
@@ -204,7 +204,7 @@ impl GetData {
                 iter.next();
                 let current_hash = iter.next().unwrap_or(" ");
                 if current_hash.eq(hash160.as_str()) {
-                    let sqlite = lazy_db_default().lock().expect("open db error");
+                    let sqlite = lazy_db_default().lock();
                     sqlite.insert_txout(
                         tx_hash.to_hex(),
                         asm.clone(),
@@ -229,7 +229,7 @@ impl GetData {
             iter.next();
             let iter3 = iter.next().unwrap_or(" ");
             if iter3.eq(PUBLIC_KEY) {
-                let sqlite = lazy_db_default().lock().expect("open db error");
+                let sqlite = lazy_db_default().lock();
                 sqlite.insert_txin(
                     tx_hash.to_hex(),
                     sig_script.clone(),
