@@ -1,9 +1,9 @@
-#[derive(Debug, Default,Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct InitParameters {
     pub db_name: DbName,
 }
 
-#[derive(Debug, Default,Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct DbName {
     pub cashbox_wallets: String,
     pub cashbox_mnemonic: String,

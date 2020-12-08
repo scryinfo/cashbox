@@ -1,10 +1,9 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use once_cell::sync::OnceCell;
 use parking_lot::{RawMutex, RawThreadId, ReentrantMutex};
-use parking_lot::lock_api::RawReentrantMutex;
+use parking_lot::lock_api::{RawReentrantMutex};
 
 use mav::db::Db;
 use wallets_types::{Context, Error, InitParameters, UnInitParameters, Wallet};
@@ -47,51 +46,51 @@ impl Wallets {
         return true;
     }
 
-    pub fn init(&mut self, parameters: &InitParameters) -> Error {
-        let err = Error::default();
+    pub fn init(&mut self, parameters: &InitParameters) -> Result<(),Error> {
         let r = self.db.init(&parameters.db_name);
-
-        err
+        //todo
+        Ok(())
     }
 
-    pub fn uninit(&mut self, parameters: &UnInitParameters) -> Error {
-        Error::default()
+    pub fn uninit(&mut self, parameters: &UnInitParameters) -> Result<(),Error> {
+        //todo
+        Ok(())
     }
 
-    pub fn all(&mut self, array_wallet: &mut Vec::<Wallet>) -> Error {
-        Error::default()
+    pub fn all(&mut self, array_wallet: &mut Vec::<Wallet>) -> Result<(),Error> {
+        //todo
+        Ok(())
     }
 }
 
 ///处理所有的wallets实例，
 #[derive(Default)]
-pub struct WalletsInstances {
-    w_map: HashMap<String, Rc<RefCell<Wallets>>>,
+pub struct WalletsCollection {
+    w_map: HashMap<String, Wallets>,
 }
 
-impl WalletsInstances {
-    pub fn instances() -> &'static ReentrantMutex<RefCell<WalletsInstances>> {
-        static mut INSTANCE: OnceCell<ReentrantMutex<RefCell<WalletsInstances>>> = OnceCell::new();
+impl WalletsCollection {
+    pub fn collection() -> &'static ReentrantMutex<RefCell<WalletsCollection>> {
+        static mut INSTANCE: OnceCell<ReentrantMutex<RefCell<WalletsCollection>>> = OnceCell::new();
         // let mut t = unsafe { INSTANCE .get().unwrap().lock()};
         // t.borrow_mut().get("");
         unsafe {
             INSTANCE.get_or_init(|| {
-                ReentrantMutex::new(RefCell::new(WalletsInstances::default()))
+                #[cfg(target_os="android")]crate::init_logger_once();
+                ReentrantMutex::new(RefCell::new(WalletsCollection::default()))
             })
         }
     }
 
-    pub fn get(&self, key: &str) -> Option<&Rc<RefCell<Wallets>>> {
-        self.w_map.get(key)
+    pub fn get_mut(&mut self, key: &str) -> Option<&mut Wallets> {
+        self.w_map.get_mut(key)
     }
 
-    pub fn new(&mut self) -> Option<&Rc<RefCell<Wallets>>> {
-        let ws = Rc::new(RefCell::new(Wallets::default()));
-        let id = ws.borrow().ctx.id.clone();
-        self.w_map.insert(id.clone(), ws.clone());
-        self.w_map.get(&id)
-        // self.w_map[&id] = ws;
-        // Some(ws.clone())
+    pub fn new(&mut self) -> Option<&mut Wallets> {
+        let ws = Wallets::default();
+        let id = ws.ctx.id.clone();
+        self.w_map.insert(id.clone(), ws);
+        self.w_map.get_mut(&id)
     }
 }
 
@@ -103,27 +102,29 @@ mod tests {
     use once_cell::sync::OnceCell;
     use parking_lot::ReentrantMutex;
 
-    use crate::WalletsInstances;
+    use crate::WalletsCollection;
 
     #[test]
     fn one_cell_try() {
-        // let f = ||{
-        //     static mut INSTANCE: OnceCell<ReentrantMutex<RefCell<WalletsInstances>>> = OnceCell::new();
-        //     // let mut t = unsafe { INSTANCE .get().unwrap().lock()};
-        //     // t.borrow_mut().get("");
-        //     unsafe {
-        //         INSTANCE.get_or_init(|| {
-        //             ReentrantMutex::new(RefCell::new(WalletsInstances::default()))
-        //         })
-        //     }
-        // };
-        //
-        // let t = f();
-        // let wallet = t.lock().borrow_mut().new().unwrap();
-        let ins = WalletsInstances::instances();
+        {
+            let f = ||{
+                static mut T_INS: OnceCell<ReentrantMutex<RefCell<WalletsCollection>>> = OnceCell::new();
+                // let mut t = unsafe { INSTANCE .get().unwrap().lock()};
+                // t.borrow_mut().get("");
+                unsafe {
+                    T_INS.get_or_init(|| {
+                        ReentrantMutex::new(RefCell::new(WalletsCollection::default()))
+                    })
+                }
+            };
+            let lock = f().lock();
+            let mut ins =lock.borrow_mut();
+            let ws = ins.new().unwrap();
+            ws.ctx.id = "".to_owned();
+        }
 
-        let ws = ins.lock().borrow_mut().new().unwrap().clone();
-        ws.borrow_mut().ctx.id = "".to_owned();
-        // ws.ctx.id = "".to_owned();
+        let lock = WalletsCollection::collection().lock();
+        let mut ins = lock.borrow_mut();
+        let ws = ins.new().unwrap();
     }
 }

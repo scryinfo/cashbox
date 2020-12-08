@@ -15,90 +15,101 @@ const _dlName = "wallets_cdl";
 //todo 多线程，怎么处理实现
 class Wallets {
 
-  Pointer<clib.Context> _context;
-  Pointer<clib.Context> get context => _context;
-
-  Pointer<Pointer<clib.Context>> _dDontext;
-
-  void _errorFree(Pointer<clib.CError> error){
-    clib.CError_free(error);
+  Pointer<clib.CContext> _context;
+  Pointer<clib.CContext> get context => _context;
+  Pointer<Pointer<clib.CContext>> get dContext => _dDontext;
+  set dContext(Pointer<Pointer<clib.CContext>> ctx) {
+    _dDontext = ctx;
+    _context = _dDontext.value;
   }
 
-  bool lockRead() {
-    var r = clib.Wallets_lockRead(_context);
-    return (r == _True);
+  Pointer<Pointer<clib.CContext>> _dDontext;
+
+  Error lockRead() {
+    var cerr = clib.Wallets_lockRead(_context);
+    var err = Error.fromC(cerr);
+    clib.CError_free(cerr);
+    return err;
   }
 
-  bool unlockRead() {
-    var r = clib.Wallets_unlockRead(_context);
-    return (r == _True);
+  Error unlockRead() {
+    var cerr = clib.Wallets_unlockRead(_context);
+    var err = Error.fromC(cerr);
+    clib.CError_free(cerr);
+    return err;
   }
 
-  bool lockWrite() {
-    var r = clib.Wallets_lockWrite(_context);
-    return (r == _True);
+  Error lockWrite() {
+    var cerr = clib.Wallets_lockWrite(_context);
+    var err = Error.fromC(cerr);
+    clib.CError_free(cerr);
+    return err;
   }
 
-  bool unlockWrite() {
-    var r = clib.Wallets_unlockWrite(_context);
-    return (r == _True);
+  Error unlockWrite() {
+    var cerr = clib.Wallets_unlockWrite(_context);
+    var err = Error.fromC(cerr);
+    clib.CError_free(cerr);
+    return err;
   }
 
-  bool safeRead(void doRead()) {
-    bool r = false;
+  Error safeRead(void doRead()) {
+    Error err;
     try {
-      r = lockRead();
-      if (r) {
+      err = lockRead();
+      if (err.isSuccess()) {
         doRead();
       }
     } finally {
-      if (r) {
+      if (err.isSuccess()) {
         unlockRead();
       }
     }
-    return r;
+    return err;
   }
 
-  bool safeWrite(void doWrite()) {
-    bool r = false;
+  Error safeWrite(void doWrite()) {
+    Error err;
     try {
-      r = lockWrite();
-      if (r) {
+      err = lockWrite();
+      if (err.isSuccess()) {
         doWrite();
       }
     } finally {
-      if (r) {
+      if (err.isSuccess()) {
         unlockWrite();
       }
     }
-    return r;
+    return err;
   }
 
   Error init(InitParameters parameters) {
 
-    var ptr = InitParameters.toC(parameters);
-    var dp = clib.Context_dAlloc();
-    var err = clib.Wallets_init(ptr, dp);
-    InitParameters.free(ptr);
-    ptr = nullptr;
-    //todo error
-    _dDontext = dp;
-    _context = _dDontext.value;
-    return new Error();
+    var ptrParameters = parameters.toC();
+    var dptrContext = clib.CContext_dAlloc();
+    var cerr = clib.Wallets_init(ptrParameters, dptrContext);
+    var err = Error.fromC(cerr);
+    clib.CError_free(cerr);
+    InitParameters.free(ptrParameters);
+    ptrParameters = nullptr;
+    dContext = dptrContext;
+    return err;
   }
 
-  Error uninit() {
-    var parameters = clib.UnInitParameters.allocate();
-    var err = clib.Wallets_uninit(_context, parameters); //todo error
-    free(parameters);
-    parameters = nullptr;
+  Error uninit(UnInitParameters parameters) {
+    var ptrParameters = parameters.toC();
+    var cerr = clib.Wallets_uninit(_context, ptrParameters); //todo error
+    var err = Error.fromC(cerr);
+    clib.CError_free(cerr);
+    cerr = nullptr;
+    UnInitParameters.free(ptrParameters);
+    ptrParameters = nullptr;
+
     _context = nullptr;
     var temp = _dDontext;
     _dDontext = nullptr;
-    clib.Context_dFree(temp);
-
-
-    return new Error();
+    clib.CContext_dFree(temp);
+    return err;
   }
 
   static Wallets _instance;

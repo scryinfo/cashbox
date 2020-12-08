@@ -80,3 +80,7 @@ git
 /demo/ffi/sql_sqlite/target
 /bc/mav/target
 /bc/mav/Cargo.lock
+/packages/wallets/*.db-shm
+/packages/wallets/*.db-wal
+/demo/ffi/orm_rbatis/*.db-shm
+/demo/ffi/orm_rbatis/*.db-wal

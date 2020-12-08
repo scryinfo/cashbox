@@ -59,12 +59,12 @@ impl CContext {
 }
 
 #[no_mangle]
-pub extern "C" fn Context_dAlloc() -> *mut *mut CContext {
+pub extern "C" fn CContext_dAlloc() -> *mut *mut CContext {
     pointer_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Context_dFree(dPtr: *mut *mut CContext) {
+pub unsafe extern "C" fn CContext_dFree(dPtr: *mut *mut CContext) {
     pointer_free(dPtr)
 }
 

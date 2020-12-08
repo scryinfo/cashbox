@@ -4,12 +4,12 @@
 use std::os::raw::c_char;
 use std::ptr::null_mut;
 
-use wallets::WalletsInstances;
-use wallets_types::UnInitParameters;
+use wallets::WalletsCollection;
+use wallets_types::{Error, UnInitParameters};
 
 use crate::kits::{CArray, CR};
 use crate::parameters::{CContext, CInitParameters, CUnInitParameters};
-use crate::types::{CBool, CError, CFalse, CTrue, CWallet};
+use crate::types::{CError, CWallet};
 
 #[no_mangle]
 pub extern "C" fn CChar_free(cs: *mut c_char) {
@@ -23,93 +23,144 @@ pub extern "C" fn CChar_free(cs: *mut c_char) {
 /// dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, ctx: *mut *mut CContext) -> *const CError {
-    let cerr = Box::new(CError::default());
-    if parameter.is_null() || ctx.is_null() {
-        //todo
+    if ctx.is_null() || parameter.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or parameter is null");
+        return CError::to_c_ptr(&err);
     }
     let mut parameter = CInitParameters::ptr_rust(parameter);
-    let ws = WalletsInstances::instances().lock().borrow_mut().new().expect("WalletsInstances::instances().lock().borrow_mut().new()").clone();
-    ws.borrow_mut().init(&mut parameter);
-    *ctx = CContext::to_c_ptr(&ws.borrow().ctx);
-    Box::into_raw(cerr)
+    let lock = WalletsCollection::collection().lock();
+    let mut ins = lock.borrow_mut();
+
+    let err = {
+        if let Some(ws) = ins.new() {
+            if let Err(e) = ws.init(&mut parameter) {
+                e
+            } else {
+                *ctx = CContext::to_c_ptr(&ws.ctx);
+                Error::SUCCESS()
+            }
+        } else {
+            Error::NONE().append_message(": can not find the context")
+        }
+    };
+    CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext, parameter: *mut CUnInitParameters) -> *const CError {
-    let cerr = Box::new(CError::default());
-    if parameter.is_null() || ctx.is_null() {
-        //todo
+    if ctx.is_null() || parameter.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or parameter is null");
+        return CError::to_c_ptr(&err);
     }
     let mut rp = UnInitParameters {};
 
-    let lock = WalletsInstances::instances().lock();
-    let ws = lock.borrow().get(&CContext::get_id(ctx)).expect("lock.borrow().get(&CContext::get_id(ctx))").clone();
-    ws.borrow_mut().uninit(&mut rp); //todo handle error
-    Box::into_raw(cerr)
+    let lock = WalletsCollection::collection().lock();
+    let mut ins = lock.borrow_mut();
+    let err = {
+        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+            if let Err(e) = ws.uninit(&mut rp) {
+                e
+            } else {
+                Error::SUCCESS()
+            }
+        } else {
+            Error::NONE().append_message(": can not find the context")
+        }
+    };
+    CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_lockRead(ctx: *mut CContext) -> CBool {
+pub unsafe extern "C" fn Wallets_lockRead(ctx: *mut CContext) -> *const CError {
     if ctx.is_null() {
-        return CFalse;
+        let err = Error::PARAMETER().append_message(" : ctx is null");
+        return CError::to_c_ptr(&err);
     }
-    let lock = WalletsInstances::instances().lock();
-    let ws = lock.borrow().get(&CContext::get_id(ctx)).expect("lock.borrow().get(&CContext::get_id(ctx))").clone();
-    if ws.borrow_mut().lock_read() {
-        CTrue
+    let lock = WalletsCollection::collection().lock();
+    let mut ins = lock.borrow_mut();
+    let err = if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+        if ws.lock_read() {
+            Error::SUCCESS()
+        } else {
+            Error::FAIL()
+        }
     } else {
-        CFalse
-    }
+        Error::NONE().append_message(": can not find the context")
+    };
+    CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_unlockRead(ctx: *mut CContext) -> CBool {
+pub unsafe extern "C" fn Wallets_unlockRead(ctx: *mut CContext) -> *const CError {
     if ctx.is_null() {
-        return CFalse;
+        let err = Error::PARAMETER().append_message(" : ctx is null");
+        return CError::to_c_ptr(&err);
     }
-    let lock = WalletsInstances::instances().lock();
-    let ws = lock.borrow().get(&CContext::get_id(ctx)).expect("lock.borrow_mut().get(&CContext::get_id(ctx))").clone();
-    if ws.borrow_mut().unlock_read() {
-        CTrue
-    } else {
-        CFalse
-    }
+    let lock = WalletsCollection::collection().lock();
+    let mut ins = lock.borrow_mut();
+    let err = {
+        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+            if ws.unlock_read() {
+                Error::SUCCESS()
+            } else {
+                Error::FAIL()
+            }
+        } else {
+            Error::NONE().append_message(": can not find the context")
+        }
+    };
+    CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_lockWrite(ctx: *mut CContext) -> CBool {
+pub unsafe extern "C" fn Wallets_lockWrite(ctx: *mut CContext) -> *const CError {
     if ctx.is_null() {
-        return CFalse;
+        let err = Error::PARAMETER().append_message(" : ctx is null");
+        return CError::to_c_ptr(&err);
     }
-    let lock = WalletsInstances::instances().lock();
-    let ws = lock.borrow().get(&CContext::get_id(ctx)).expect("lock.borrow().get(&CContext::get_id(ctx))").clone();
-    if ws.borrow_mut().lock_write() {
-        CTrue
-    } else {
-        CFalse
-    }
+    let lock = WalletsCollection::collection().lock();
+    let mut ins = lock.borrow_mut();
+    let err = {
+        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+            if ws.lock_write() {
+                Error::SUCCESS()
+            } else {
+                Error::FAIL()
+            }
+        } else {
+            Error::NONE().append_message(": can not find the context")
+        }
+    };
+    CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> CBool {
+pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CError {
     if ctx.is_null() {
-        return CFalse;
+        let err = Error::PARAMETER().append_message(" : ctx is null");
+        return CError::to_c_ptr(&err);
     }
-    let lock = WalletsInstances::instances().lock();
-    let ws = lock.borrow_mut().get(&CContext::get_id(ctx)).expect("lock.borrow_mut().get(&CContext::get_id(ctx))").clone();
-    if ws.borrow_mut().unlock_read() {
-        CTrue
-    } else {
-        CFalse
-    }
+    let lock = WalletsCollection::collection().lock();
+    let mut ins = lock.borrow_mut();
+    let err = {
+        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+            if ws.unlock_write() {
+                Error::SUCCESS()
+            } else {
+                Error::FAIL()
+            }
+        } else {
+            Error::NONE().append_message(": can not find the context")
+        }
+    };
+    CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut CArray<CWallet>) -> *const CError {
-    let cerr = Box::new(CError::default());
-
-    if arrayWallet.is_null() {//todo 参数不正确
-        return Box::into_raw(cerr);
+    if ctx.is_null() || arrayWallet.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or arrayWallet is null");
+        return CError::to_c_ptr(&err);
     }
 
     if !(*arrayWallet).is_null() { //如果数组的内存已经分配，释放它
@@ -117,14 +168,15 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
         *arrayWallet = null_mut();
     }
 
-    let lock = WalletsInstances::instances().lock();
-    let ws = lock.borrow_mut().get(&CContext::get_id(ctx)).expect("lock.borrow_mut().get(&CContext::get_id(ctx))").clone();
+    let lock = WalletsCollection::collection().lock();
+    let mut ins = lock.borrow_mut();
+    let ws = ins.get_mut(&CContext::get_id(ctx)).expect("let ws = ins.get_mut(&CContext::get_id(ctx))");
 
     let mut all = vec![];
-    let _ = ws.borrow_mut().all(&mut all);
+    let _ = ws.all(&mut all);
     let cws = all.iter().map(|rw| CWallet::to_c(&rw)).collect();
     *arrayWallet = Box::into_raw(Box::new(CArray::<CWallet>::new(cws)));
-    Box::into_raw(cerr)
+    CError::to_c_ptr(&Error::SUCCESS())
 }
 
 

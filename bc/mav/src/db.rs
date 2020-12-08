@@ -1,7 +1,7 @@
-use wallets_types::{DbName,WalletError};
-
-use rbatis::rbatis::Rbatis;
 use async_std::task::block_on;
+use rbatis::rbatis::Rbatis;
+
+use wallets_types::{DbName, WalletError};
 
 use crate::kits;
 

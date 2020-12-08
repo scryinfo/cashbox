@@ -11,135 +11,127 @@ typedef struct CError {
     char *message;
 } CError;
 
-typedef struct Address {
+typedef struct CAddress {
     char *id;
     char *walletId;
     char *chainType;
     char *address;
     char *publicKey;
-} Address;
+} CAddress;
 
-typedef struct ChainShared {
+typedef struct CChainShared {
     char *id;
     char *walletId;
     char *chainType;
     /**
      * 钱包地址
      */
-    Address *walletAddress;
-} ChainShared;
+    CAddress *walletAddress;
+} CChainShared;
 
-typedef struct TokenShared {
+typedef struct CTokenShared {
     char *id;
     char *nextId;
     char *name;
     char *symbol;
-} TokenShared;
+} CTokenShared;
 
-typedef struct EthChainToken {
-    TokenShared *tokenShared;
-} EthChainToken;
-
-/**
- * c的数组需要定义两个字段，所定义一个结构体进行统一管理
- * 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
- */
-typedef struct CArrayEthChainToken {
-    EthChainToken *ptr;
-    CU64 len;
-    CU64 cap;
-} CArrayEthChainToken;
-
-typedef struct EthChain {
-    ChainShared *chain_shared;
-    CArrayEthChainToken *tokens;
-} EthChain;
-
-typedef struct EeeChainToken {
-    TokenShared *tokenShared;
-} EeeChainToken;
+typedef struct CEthChainToken {
+    CTokenShared *tokenShared;
+} CEthChainToken;
 
 /**
  * c的数组需要定义两个字段，所定义一个结构体进行统一管理
  * 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
  */
-typedef struct CArrayEeeChainToken {
-    EeeChainToken *ptr;
+typedef struct CArrayCEthChainToken {
+    CEthChainToken *ptr;
     CU64 len;
     CU64 cap;
-} CArrayEeeChainToken;
+} CArrayCEthChainToken;
 
-typedef struct EeeChain {
-    ChainShared *chainShared;
-    Address *address;
-    CArrayEeeChainToken *tokens;
-} EeeChain;
+typedef struct CEthChain {
+    CChainShared *chainShared;
+    CArrayCEthChainToken *tokens;
+} CEthChain;
 
-typedef struct BtcChainToken {
-    TokenShared *tokenShared;
-} BtcChainToken;
+typedef struct CEeeChainToken {
+    CTokenShared *tokenShared;
+} CEeeChainToken;
 
 /**
  * c的数组需要定义两个字段，所定义一个结构体进行统一管理
  * 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
  */
-typedef struct CArrayBtcChainToken {
-    BtcChainToken *ptr;
+typedef struct CArrayCEeeChainToken {
+    CEeeChainToken *ptr;
     CU64 len;
     CU64 cap;
-} CArrayBtcChainToken;
+} CArrayCEeeChainToken;
 
-typedef struct BtcChain {
-    ChainShared *chainShared;
-    CArrayBtcChainToken *tokens;
-} BtcChain;
+typedef struct CEeeChain {
+    CChainShared *chainShared;
+    CAddress *address;
+    CArrayCEeeChainToken *tokens;
+} CEeeChain;
 
-typedef struct Wallet {
+typedef struct CBtcChainToken {
+    CTokenShared *tokenShared;
+} CBtcChainToken;
+
+/**
+ * c的数组需要定义两个字段，所定义一个结构体进行统一管理
+ * 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
+ */
+typedef struct CArrayCBtcChainToken {
+    CBtcChainToken *ptr;
+    CU64 len;
+    CU64 cap;
+} CArrayCBtcChainToken;
+
+typedef struct CBtcChain {
+    CChainShared *chainShared;
+    CArrayCBtcChainToken *tokens;
+} CBtcChain;
+
+typedef struct CWallet {
     char *id;
     char *nextId;
-    EthChain *ethChains;
-    EeeChain *eeeChains;
-    BtcChain *btcChains;
-} Wallet;
+    CEthChain *ethChain;
+    CEeeChain *eeeChain;
+    CBtcChain *btcChain;
+} CWallet;
 
 /**
  * c的数组需要定义两个字段，所定义一个结构体进行统一管理
  * 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
  */
-typedef struct CArrayWallet {
-    Wallet *ptr;
+typedef struct CArrayCWallet {
+    CWallet *ptr;
     CU64 len;
     CU64 cap;
-} CArrayWallet;
+} CArrayCWallet;
 
-typedef struct DbName {
+typedef struct CDbName {
     char *cashboxWallets;
     char *cashboxMnemonic;
     char *walletMainnet;
     char *walletPrivate;
     char *walletTestnet;
     char *walletTestnetPrivate;
-} DbName;
+} CDbName;
 
-typedef struct InitParameters {
-    DbName *dbName;
-} InitParameters;
+typedef struct CInitParameters {
+    CDbName *dbName;
+} CInitParameters;
 
-typedef struct Context {
+typedef struct CContext {
     char *id;
-} Context;
+} CContext;
 
-typedef struct UnInitParameters {
+typedef struct CUnInitParameters {
 
-} UnInitParameters;
-
-typedef uint16_t CBool;
-
-#define CFalse 0
-
-#define CTrue 1
-
-#define Success 0
+} CUnInitParameters;
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,36 +141,36 @@ void CStr_free(char *cs);
 
 void CError_free(CError *error);
 
-Wallet *Wallet_alloc(void);
+CWallet *CWallet_alloc(void);
 
-void Wallet_free(Wallet *ptr);
+void CWallet_free(CWallet *ptr);
 
-CArrayWallet **CArrayWallet_dAlloc(void);
+CArrayCWallet **CArrayCWallet_dAlloc(void);
 
-void CArrayWallet_dFree(CArrayWallet **dPtr);
+void CArrayCWallet_dFree(CArrayCWallet **dPtr);
 
 void CChar_free(char *cs);
 
 /**
  * dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存
  */
-const CError *Wallets_init(InitParameters *parameter, Context **ctx);
+const CError *Wallets_init(CInitParameters *parameter, CContext **ctx);
 
-const CError *Wallets_uninit(Context *ctx, UnInitParameters *parameter);
+const CError *Wallets_uninit(CContext *ctx, CUnInitParameters *parameter);
 
-CBool Wallets_lockRead(Context *ctx);
+const CError *Wallets_lockRead(CContext *ctx);
 
-CBool Wallets_unlockRead(Context *ctx);
+const CError *Wallets_unlockRead(CContext *ctx);
 
-CBool Wallets_lockWrite(Context *ctx);
+const CError *Wallets_lockWrite(CContext *ctx);
 
-CBool Wallets_unlockWrite(Context *ctx);
+const CError *Wallets_unlockWrite(CContext *ctx);
 
-const CError *Wallets_all(Context *ctx, CArrayWallet *arrayWallet);
+const CError *Wallets_all(CContext *ctx, CArrayCWallet **arrayWallet);
 
-Context **Context_dAlloc(void);
+CContext **CContext_dAlloc(void);
 
-void Context_dFree(Context **dPtr);
+void CContext_dFree(CContext **dPtr);
 
 #ifdef __cplusplus
 } // extern "C"

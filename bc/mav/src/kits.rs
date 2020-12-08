@@ -1,7 +1,8 @@
-use uuid::Uuid;
-use rbatis::rbatis::Rbatis;
 use std::{fs, path};
 use std::ops::Add;
+
+use rbatis::rbatis::Rbatis;
+use uuid::Uuid;
 
 use wallets_types::WalletError;
 
@@ -15,7 +16,7 @@ pub fn now_ts_seconds() -> i64 {
 
 /// 如果数据库文件不存在，则创建它
 /// 如果连接出错直接panic
-pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis,WalletError> {
+pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis, WalletError> {
     if fs::metadata(db_file_name).is_err() {
         let file = path::Path::new(db_file_name);
         let dir = file.parent();

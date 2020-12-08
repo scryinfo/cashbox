@@ -2,9 +2,9 @@ pub use chain::*;
 pub use chain_btc::*;
 pub use chain_eee::*;
 pub use chain_eth::*;
+pub use error::*;
 pub use parameters::*;
 pub use types::*;
-pub use error::*;
 
 mod types;
 mod parameters;

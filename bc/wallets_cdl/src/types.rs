@@ -10,7 +10,7 @@ pub use crate::chain::{*};
 pub use crate::chain_btc::{*};
 pub use crate::chain_eee::{*};
 pub use crate::chain_eth::{*};
-pub use crate::kits::{CBool, CFalse, CR, CTrue, CU64};
+pub use crate::kits::{CR, CU64};
 use crate::kits::{CArray, CStruct, free_c_char, pointer_alloc, pointer_free, to_c_char, to_str};
 pub use crate::types_btc::{*};
 pub use crate::types_eee::{*};
@@ -23,6 +23,7 @@ pub struct CError {
     pub code: CU64,
     pub message: *mut c_char,
 }
+
 
 #[repr(C)] //
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
@@ -77,22 +78,22 @@ pub unsafe extern "C" fn CError_free(error: *mut CError) {
 }
 
 #[no_mangle]
-pub extern "C" fn Wallet_alloc() -> *mut CWallet {
+pub extern "C" fn CWallet_alloc() -> *mut CWallet {
     Box::into_raw(Box::new(CWallet::default()))
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallet_free(ptr: *mut CWallet) {
+pub unsafe extern "C" fn CWallet_free(ptr: *mut CWallet) {
     Box::from_raw(ptr);
 }
 
 #[no_mangle]
-pub extern "C" fn CArrayWallet_dAlloc() -> *mut *mut CArray<CWallet> {
+pub extern "C" fn CArrayCWallet_dAlloc() -> *mut *mut CArray<CWallet> {
     pointer_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CArrayWallet_dFree(dPtr: *mut *mut CArray<CWallet>) {
+pub unsafe extern "C" fn CArrayCWallet_dFree(dPtr: *mut *mut CArray<CWallet>) {
     pointer_free(dPtr)
 }
 

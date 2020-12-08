@@ -2,26 +2,30 @@ import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart' as ffi;
+import 'package:wallets/kits.dart';
 
 import 'wallets_c.dart' as clib;
 
-class InitParameters{
+class InitParameters extends DC{
   DbName dbName;
 
-  static Pointer<clib.InitParameters> toC(InitParameters parameters) {
-    var p = clib.InitParameters.allocate();
-    p.ref.dbName = clib.DbName.allocate();
+  Pointer<clib.CInitParameters> toC() {
+    var p = clib.CInitParameters.allocate();
+    p.ref.dbName = dbName.toC();
     return p;
   }
 
-  static free(Pointer<clib.InitParameters> ptr) {
+  static free(Pointer<clib.CInitParameters> ptr) {
     DbName.free(ptr.ref.dbName);
     ptr.ref.dbName = nullptr;
     ffi.free(ptr);
   }
+  InitParameters(){
+    dbName = new DbName();
+  }
 }
 
-class DbName {
+class DbName extends DC{
   String cashboxWallets;
   String cashboxMnemonic;
   String walletMainnet;
@@ -29,18 +33,19 @@ class DbName {
   String walletTestnet;
   String walletTestnetPrivate;
 
-  static Pointer<clib.DbName> toC(DbName dbName) {
-    var p = clib.DbName.allocate();
-    p.ref.cashboxWallets = ffi.Utf8.toUtf8(dbName.cashboxWallets);
-    p.ref.cashboxMnemonic = ffi.Utf8.toUtf8(dbName.cashboxMnemonic);
-    p.ref.walletMainnet = ffi.Utf8.toUtf8(dbName.walletMainnet);
-    p.ref.walletPrivate = ffi.Utf8.toUtf8(dbName.walletPrivate);
-    p.ref.walletTestnet = ffi.Utf8.toUtf8(dbName.walletTestnet);
-    p.ref.walletTestnetPrivate = ffi.Utf8.toUtf8(dbName.walletTestnetPrivate);
+  @override
+  Pointer<clib.CDbName> toC() {
+    var p = clib.CDbName.allocate();
+    p.ref.cashboxWallets = ffi.Utf8.toUtf8(cashboxWallets);
+    p.ref.cashboxMnemonic = ffi.Utf8.toUtf8(cashboxMnemonic);
+    p.ref.walletMainnet = ffi.Utf8.toUtf8(walletMainnet);
+    p.ref.walletPrivate = ffi.Utf8.toUtf8(walletPrivate);
+    p.ref.walletTestnet = ffi.Utf8.toUtf8(walletTestnet);
+    p.ref.walletTestnetPrivate = ffi.Utf8.toUtf8(walletTestnetPrivate);
     return p;
   }
 
-  static free(Pointer<clib.DbName> ptr) {
+  static free(Pointer<clib.CDbName> ptr) {
     ffi.free(ptr.ref.cashboxWallets);
     ptr.ref.cashboxWallets = nullptr;
     ffi.free(ptr.ref.cashboxMnemonic);
@@ -58,13 +63,16 @@ class DbName {
   }
 }
 
-class UnInitParameters{
-  static Pointer<clib.UnInitParameters> toC(UnInitParameters parameters) {
-    var p = clib.UnInitParameters.allocate();
-    return p;
-  }
+class UnInitParameters extends DC{
 
-  static free(Pointer<clib.UnInitParameters> ptr) {
+  static free(Pointer<clib.CUnInitParameters> ptr) {
     ffi.free(ptr);
   }
+
+  @override
+  Pointer<clib.CUnInitParameters> toC() {
+      var p = clib.CUnInitParameters.allocate();
+      return p;
+  }
+
 }

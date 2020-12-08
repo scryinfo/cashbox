@@ -1,11 +1,13 @@
-use std::io;
-use std::fmt;
 use std::error::Error;
+use std::fmt;
+use std::io;
 
 #[derive(Debug)]
 pub enum WalletError {
+    Success(String),
+    Fail(String),
     Io(io::Error),
-    // Sqlite(sqlite::Error),
+    Parameters(String),
     Custom(String),
     Decode(String),
     // EthTx(ethtx::Error),
@@ -21,7 +23,10 @@ pub enum WalletError {
 impl fmt::Display for WalletError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            WalletError::Success(str) => write!(f, "Parameters error: {}", str),
+            WalletError::Fail(str) => write!(f, "Parameters error: {}", str),
             WalletError::Io(ref err) => err.fmt(f),
+            WalletError::Parameters(ref err) => write!(f, "Parameters error: {}", err),
             // WalletError::Sqlite(ref err) => err.fmt(f),
             // WalletError::EthTx(ref err) => err.fmt(f),
             // WalletError::SubstrateTx(ref err) => err.fmt(f),
@@ -121,7 +126,7 @@ impl From<rlp::DecoderError> for WalletError {
 //     }
 // }
 
-impl From<semver::SemVerError> for WalletError{
+impl From<semver::SemVerError> for WalletError {
     fn from(err: semver::SemVerError) -> Self {
         WalletError::Custom(format!("{:?}", err))
     }
@@ -133,7 +138,7 @@ impl From<semver::SemVerError> for WalletError{
 //     }
 // }
 
-impl From<rbatis_core::Error> for WalletError{
+impl From<rbatis_core::Error> for WalletError {
     fn from(err: rbatis_core::Error) -> Self {
         WalletError::RbatisError(err)
     }

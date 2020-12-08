@@ -5,14 +5,7 @@ use std::mem::ManuallyDrop;
 use std::os::raw::c_char;
 use std::ptr::null_mut;
 
-pub type CBool = u16;
-
-pub const CFalse: CBool = 0;
-pub const CTrue: CBool = 1;
-
 pub type CU64 = u64;
-
-pub const Success: CU64 = 0;
 
 /// call free_c_char to free memory
 pub fn to_c_char(s: &str) -> *mut c_char {

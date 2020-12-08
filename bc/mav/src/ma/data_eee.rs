@@ -90,8 +90,8 @@ mod tests {
     use async_std::task::block_on;
     use rbatis::rbatis::Rbatis;
 
-    use crate::ma::data_eee::EeeChainTx;
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
+    use crate::ma::data_eee::EeeChainTx;
     use crate::ma::db_dest;
 
     const TABLE: &str = "
