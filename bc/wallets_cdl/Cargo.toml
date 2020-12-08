@@ -12,6 +12,8 @@ crate-type = ["cdylib", "lib"]
 
 [dependencies]
 libc = "0.2.80"
+log = "0.4.8"
+async-std = { version = "1.7" }
 
 wallets = { version = "0.1.0", path = "../wallets" }
 wallets_types = { path = "../wallets_types" }

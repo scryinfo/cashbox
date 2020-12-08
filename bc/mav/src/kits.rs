@@ -3,8 +3,8 @@ use std::ops::Add;
 
 use rbatis::rbatis::Rbatis;
 use uuid::Uuid;
+use crate::db::Error;
 
-use wallets_types::WalletError;
 
 pub fn uuid() -> String {
     Uuid::new_v4().to_string()
@@ -16,12 +16,12 @@ pub fn now_ts_seconds() -> i64 {
 
 /// 如果数据库文件不存在，则创建它
 /// 如果连接出错直接panic
-pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis, WalletError> {
+pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis, Error> {
     if fs::metadata(db_file_name).is_err() {
         let file = path::Path::new(db_file_name);
         let dir = file.parent();
         if dir.is_none() {
-            return Err(WalletError::NoneError(db_file_name.to_owned()));
+            return Err(Error::from(db_file_name));
         }
         let dir = dir.unwrap();
         fs::create_dir_all(dir)?;

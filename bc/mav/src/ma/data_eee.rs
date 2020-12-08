@@ -12,7 +12,7 @@ use crate::ma::TxShared;
 //eee
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct EeeChainToken {
+pub struct MEeeChainToken {
     #[serde(default)]
     pub next_id: String,
     /// 手动加入的token就没有token shared内容
@@ -36,7 +36,7 @@ pub struct EeeChainToken {
 /// eee chain的交易
 #[db_append_shared(CRUDEnable)]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
-pub struct EeeChainTx {
+pub struct MEeeChainTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
     //from是数据库的关键字，所以加上 address
@@ -60,7 +60,7 @@ pub struct EeeChainTx {
 
 #[db_append_shared(CRUDEnable)]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
-pub struct EeeTokenxTx {
+pub struct MEeeTokenxTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
     //from是数据库的关键字，所以加上 address
@@ -91,7 +91,7 @@ mod tests {
     use rbatis::rbatis::Rbatis;
 
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
-    use crate::ma::data_eee::EeeChainTx;
+    use crate::ma::data_eee::MEeeChainTx;
     use crate::ma::db_dest;
 
     const TABLE: &str = "
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS eee_chain_tx (
     #[allow(non_snake_case)]
     fn test_EeeChainTx() {
         // let colx = EeeChainTx::table_columns();
-        let mut m = EeeChainTx::default();
+        let mut m = MEeeChainTx::default();
         assert_eq!("", m.get_id());
         assert_eq!(0, m.get_create_time());
         assert_eq!(0, m.get_update_time());
@@ -139,14 +139,14 @@ CREATE TABLE IF NOT EXISTS eee_chain_tx (
         assert_ne!(0, m.get_update_time());
         assert_eq!(m.get_create_time(), m.get_update_time());
 
-        let mut m = EeeChainTx::default();
+        let mut m = MEeeChainTx::default();
         m.before_update();
         assert_eq!("", m.get_id());
         assert_eq!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
 
         let rb = block_on(init_memory());
-        let mut m = EeeChainTx::default();
+        let mut m = MEeeChainTx::default();
         m.from_address = "test".to_owned();
         m.extension = "eee".to_owned();
         m.status = String::new();
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS eee_chain_tx (
             assert!(e.to_string().is_empty());
         }
 
-        let re = block_on(EeeChainTx::fetch_by_id(&rb, "", &m.id));
+        let re = block_on(MEeeChainTx::fetch_by_id(&rb, "", &m.id));
         if let Err(e) = &re {
             println!("{}", e);
         }
@@ -176,12 +176,12 @@ CREATE TABLE IF NOT EXISTS eee_chain_tx (
         assert_eq!(m.tx_shared.tx_hash, m2.tx_shared.tx_hash);
 
 
-        let mut m3 = EeeChainTx::default();
+        let mut m3 = MEeeChainTx::default();
         m3.tx_shared.tx_hash = "m3".to_owned();
         let re = block_on(m3.save(&rb, ""));
 
         assert_eq!(false, re.is_err(), "{:?}", re);
-        let re = block_on(EeeChainTx::list(&rb, ""));
+        let re = block_on(MEeeChainTx::list(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);
         let list = re.unwrap();
         assert_eq!(2, list.len());

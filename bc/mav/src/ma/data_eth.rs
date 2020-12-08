@@ -16,7 +16,7 @@ use crate::ma::TxShared;
 /// eth链的token
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct EthChainToken {
+pub struct MEthChainToken {
     #[serde(default)]
     pub next_id: String,
     /// 手动加入的token就没有token shared内容
@@ -48,7 +48,7 @@ pub struct EthChainToken {
 /// eth chain的交易，包含eth，erc20等
 #[db_append_shared(CRUDEnable)]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
-pub struct EthChainTx {
+pub struct MEthChainTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
     /// [crate::TxStatus]
@@ -125,7 +125,7 @@ impl fmt::Display for EthErc20Face {
 
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct EthErc20Tx {
+pub struct MEthErc20Tx {
     pub eth_chain_tx_id: String,
     pub contract_address: String,
     /// [Erc20::transfer] 与 [Erc20::transferFrom]此地址有值，其余为""

@@ -152,6 +152,7 @@ fn gen_table_name(type_name: &str) -> String {
     type_name = to_snake_name(&type_name);
     type_name
 }
+
 /// 生成创建表的sql script
 fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
     let mut tm = TableMeta::default();

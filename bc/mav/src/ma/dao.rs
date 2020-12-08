@@ -8,10 +8,10 @@ use rbatis::wrapper::Wrapper;
 use serde::{de, Deserialize, Deserializer};
 use serde::de::Unexpected;
 
-pub use crate::ma::data::{TokenAddress, TxShared};
-pub use crate::ma::data_eth::{EthChainToken, EthChainTx, EthErc20Face, EthErc20Tx};
-pub use crate::ma::detail::{TokenShared, Wallet};
-pub use crate::ma::detail_eth::{EthChainTokenAuth, EthChainTokenDefault};
+pub use crate::ma::data::{MTokenAddress, TxShared};
+pub use crate::ma::data_eth::{MEthChainToken, MEthChainTx, EthErc20Face, MEthErc20Tx};
+pub use crate::ma::detail::{MTokenShared, MWallet};
+pub use crate::ma::detail_eth::{MEthChainTokenAuth, MEthChainTokenDefault};
 pub use crate::ma::mnemonic::Mnemonic;
 
 pub trait Shared {

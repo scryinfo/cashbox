@@ -48,16 +48,18 @@ pub struct CAddress {
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CTokenShared {
-    pub id: *mut c_char,
-    pub nextId: *mut c_char,
+    pub chainType: *mut c_char,
     pub name: *mut c_char,
     pub symbol: *mut c_char,
+    pub logoUrl: *mut c_char,
+    pub logoBytes: *mut c_char,
+    pub project: *mut c_char,
+    pub auth: bool,
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CChainShared {
-    pub id: *mut c_char,
     pub walletId: *mut c_char,
     pub chainType: *mut c_char,
     /// 钱包地址

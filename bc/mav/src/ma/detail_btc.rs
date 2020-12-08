@@ -7,19 +7,19 @@ use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
-use crate::ma::TokenShared;
+use crate::ma::MTokenShared;
 
 //btc
 #[db_append_shared(CRUDEnable)]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
-pub struct BtcChainTokenShared {
+pub struct MBtcChainTokenShared {
     #[serde(flatten)]
-    pub token_shared: TokenShared,
+    pub token_shared: MTokenShared,
 }
 
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct BtcChainTokenAuth {
+pub struct MBtcChainTokenAuth {
     /// [BtcChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
@@ -31,7 +31,7 @@ pub struct BtcChainTokenAuth {
 /// DefaultToken must be a [BtcChainTokenAuth]
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct BtcChainTokenDefault {
+pub struct MBtcChainTokenDefault {
     /// [BtcChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,

@@ -23,8 +23,10 @@ pub extern "C" fn CChar_free(cs: *mut c_char) {
 /// dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, ctx: *mut *mut CContext) -> *const CError {
+    log::debug!("enter Wallets_init");
     if ctx.is_null() || parameter.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or parameter is null");
+        log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
     let mut parameter = CInitParameters::ptr_rust(parameter);
@@ -43,13 +45,16 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, ctx: *mut
             Error::NONE().append_message(": can not find the context")
         }
     };
+    log::info!("{}",err);
     CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext, parameter: *mut CUnInitParameters) -> *const CError {
+    log::debug!("enter Wallets_uninit");
     if ctx.is_null() || parameter.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or parameter is null");
+        log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
     let mut rp = UnInitParameters {};
@@ -67,13 +72,16 @@ pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext, parameter: *mut CUnI
             Error::NONE().append_message(": can not find the context")
         }
     };
+    log::info!("{}",err);
     CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_lockRead(ctx: *mut CContext) -> *const CError {
+    log::debug!("enter Wallets_lockRead");
     if ctx.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx is null");
+        log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
     let lock = WalletsCollection::collection().lock();
@@ -87,13 +95,16 @@ pub unsafe extern "C" fn Wallets_lockRead(ctx: *mut CContext) -> *const CError {
     } else {
         Error::NONE().append_message(": can not find the context")
     };
+    log::info!("{}",err);
     CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_unlockRead(ctx: *mut CContext) -> *const CError {
+    log::debug!("enter Wallets_unlockRead");
     if ctx.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx is null");
+        log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
     let lock = WalletsCollection::collection().lock();
@@ -109,13 +120,16 @@ pub unsafe extern "C" fn Wallets_unlockRead(ctx: *mut CContext) -> *const CError
             Error::NONE().append_message(": can not find the context")
         }
     };
+    log::info!("{}",err);
     CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_lockWrite(ctx: *mut CContext) -> *const CError {
+    log::debug!("enter Wallets_lockWrite");
     if ctx.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx is null");
+        log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
     let lock = WalletsCollection::collection().lock();
@@ -131,13 +145,16 @@ pub unsafe extern "C" fn Wallets_lockWrite(ctx: *mut CContext) -> *const CError 
             Error::NONE().append_message(": can not find the context")
         }
     };
+    log::info!("{}",err);
     CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CError {
+    log::debug!("enter Wallets_unlockWrite");
     if ctx.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx is null");
+        log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
     let lock = WalletsCollection::collection().lock();
@@ -153,13 +170,16 @@ pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CErro
             Error::NONE().append_message(": can not find the context")
         }
     };
+    log::info!("{}",err);
     CError::to_c_ptr(&err)
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut CArray<CWallet>) -> *const CError {
+    log::debug!("enter Wallets_all");
     if ctx.is_null() || arrayWallet.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or arrayWallet is null");
+        log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
 
@@ -173,10 +193,12 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
     let ws = ins.get_mut(&CContext::get_id(ctx)).expect("let ws = ins.get_mut(&CContext::get_id(ctx))");
 
     let mut all = vec![];
-    let _ = ws.all(&mut all);
-    let cws = all.iter().map(|rw| CWallet::to_c(&rw)).collect();
+    let _ = async_std::task::block_on(ws.all(&mut all));
+    let cws = all.iter().map(|rw| CWallet::to_c(&rw)).rev().collect();
     *arrayWallet = Box::into_raw(Box::new(CArray::<CWallet>::new(cws)));
-    CError::to_c_ptr(&Error::SUCCESS())
+    let err = Error::SUCCESS();
+    log::info!("{}",err);
+    CError::to_c_ptr(&err)
 }
 
 

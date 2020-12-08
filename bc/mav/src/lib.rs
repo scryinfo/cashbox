@@ -1,6 +1,7 @@
 pub mod ma;
 pub mod kits;
 pub mod db;
+pub use db::Error;
 
 #[cfg(test)]
 mod tests {

@@ -9,7 +9,7 @@ use crate::ma::dao::{self, bool_from_int, Shared};
 
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct Wallet {
+pub struct MWallet {
     //下一个显示顺序的 wallet_id
     #[serde(default)]
     pub next_id: String,
@@ -30,7 +30,7 @@ pub struct Wallet {
 //每一种链类型一条记录，
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct ChainTypeMeta {
+pub struct MChainTypeMeta {
     /// [crate::ChainType]
     #[serde(default)]
     pub chain_type: String,
@@ -42,7 +42,7 @@ pub struct ChainTypeMeta {
 
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct Address {
+pub struct MAddress {
     /// [Wallet]
     #[serde(default)]
     pub wallet_id: String,
@@ -61,7 +61,7 @@ pub struct Address {
 /// 动态库自己的配置，并不指app的配置
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct Setting {
+pub struct MSetting {
     #[serde(default)]
     pub key_str: String,
     /// 由于value可能会是数据库的关键字，所以加上str
@@ -71,7 +71,7 @@ pub struct Setting {
 
 #[db_sub_struct]
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
-pub struct TokenShared {
+pub struct MTokenShared {
     /// [crate::ChainType]
     #[serde(default)]
     pub chain_type: String,
@@ -80,15 +80,24 @@ pub struct TokenShared {
     #[serde(default)]
     pub symbol: String,
     #[serde(default)]
-    pub logo_url: Option<String>,
+    pub logo_url: String,
     /// base 64编码
     #[serde(default)]
-    pub logo_bytes: Option<String>,
+    pub logo_bytes: String,
     #[serde(default)]
-    pub project: Option<String>,
+    pub project: String,
     /// true为认证token
     #[serde(default, deserialize_with = "bool_from_int")]
     pub auth: bool,
+}
+
+#[db_sub_struct]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+pub struct MChainShared {
+    pub wallet_id: String,
+    pub chain_type: String,
+    /// 钱包地址
+    pub address_id: String,
 }
 
 

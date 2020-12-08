@@ -1,31 +1,29 @@
-use async_std::task::block_on;
-use rbatis::rbatis::Rbatis;
+use std::{fmt, io};
 
-use wallets_types::{DbName, WalletError};
-
-use crate::kits;
-
-#[derive(Default)]
-pub struct Db {
-    cashbox_wallets: Rbatis,
-    cashbox_mnemonic: Rbatis,
-    wallet_mainnet: Rbatis,
-    wallet_private: Rbatis,
-    wallet_testnet: Rbatis,
-    wallet_testnet_private: Rbatis,
-    db_name: DbName,
+pub struct Error {
+    pub err: String,
 }
 
-impl Db {
-    pub fn init(&mut self, name: &DbName) -> Result<(), WalletError> {
-        self.db_name = name.clone();
-        self.cashbox_wallets = block_on(kits::make_rbatis(&self.db_name.cashbox_wallets))?;
-        self.cashbox_mnemonic = block_on(kits::make_rbatis(&self.db_name.cashbox_mnemonic))?;
-        self.wallet_mainnet = block_on(kits::make_rbatis(&self.db_name.wallet_mainnet))?;
-        self.wallet_private = block_on(kits::make_rbatis(&self.db_name.wallet_private))?;
-        self.wallet_testnet = block_on(kits::make_rbatis(&self.db_name.wallet_testnet))?;
-        self.wallet_testnet_private = block_on(kits::make_rbatis(&self.db_name.wallet_testnet_private))?;
-
-        Ok(())
+impl fmt::Debug for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.err, f)
     }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Db Error: {}", self.err)
+    }
+}
+
+impl From<rbatis_core::Error> for Error {
+    fn from(e: rbatis_core::Error) -> Self { Error::from(e.to_string().as_str()) }
+}
+
+impl From<&str> for Error {
+    fn from(e: &str) -> Self { Self{err: e.to_owned()} }
+}
+
+impl From<io::Error> for Error {
+    fn from(err: io::Error) -> Self{ Error::from(err.to_string().as_str())}
 }

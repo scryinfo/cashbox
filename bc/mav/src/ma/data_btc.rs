@@ -12,7 +12,7 @@ use crate::ma::TxShared;
 //btc
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct BtcChainToken {
+pub struct MBtcChainToken {
     #[serde(default)]
     pub next_id: String,
     /// 手动加入的token就没有token shared内容
@@ -35,7 +35,7 @@ pub struct BtcChainToken {
 
 #[db_append_shared(CRUDEnable)]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
-pub struct BtcChainTx {
+pub struct MBtcChainTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
     #[serde(default)]
@@ -52,7 +52,7 @@ pub struct BtcChainTx {
 
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct BtcInputTx {
+pub struct MBtcInputTx {
     #[serde(default)]
     pub btc_chain_tx_id: String,
     #[serde(default)]
@@ -70,7 +70,7 @@ pub struct BtcInputTx {
 
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct BtcOutputTx {
+pub struct MBtcOutputTx {
     #[serde(default)]
     pub btc_chain_tx_id: String,
     #[serde(default)]
@@ -92,7 +92,7 @@ mod tests {
     use async_std::task::block_on;
     use rbatis::rbatis::Rbatis;
 
-    use crate::ma::{BtcChainToken, db_dest};
+    use crate::ma::{MBtcChainToken, db_dest};
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
 
     const TABLE_BTC_CHAIN_TOKEN: &str = "
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS btc_chain_token (
     #[test]
     #[allow(non_snake_case)]
     fn test_TokenAddress() {
-        let mut m = BtcChainToken::default();
+        let mut m = MBtcChainToken::default();
         assert_eq!("", m.get_id());
         assert_eq!(0, m.get_create_time());
         assert_eq!(0, m.get_update_time());
@@ -123,19 +123,19 @@ CREATE TABLE IF NOT EXISTS btc_chain_token (
         assert_ne!(0, m.get_update_time());
         assert_eq!(m.get_create_time(), m.get_update_time());
 
-        let mut m = BtcChainToken::default();
+        let mut m = MBtcChainToken::default();
         m.before_update();
         assert_eq!("", m.get_id());
         assert_eq!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
 
         let rb = block_on(init_memory());
-        let mut m = BtcChainToken::default();
+        let mut m = MBtcChainToken::default();
         m.wallet_id = "test".to_owned();
         m.show = false;
         let result = block_on(m.save(&rb, ""));
         assert_eq!(false, result.is_err(), "{:?}", result);
-        let result = block_on(BtcChainToken::fetch_by_id(&rb, "", &m.id));
+        let result = block_on(MBtcChainToken::fetch_by_id(&rb, "", &m.id));
         assert_eq!(false, result.is_err(), "{:?}", result);
         let m2 = result.unwrap();
         assert_eq!(m.id, m2.id);
@@ -152,13 +152,13 @@ CREATE TABLE IF NOT EXISTS btc_chain_token (
         m.show = true;
         let result = block_on(m.update_by_id(&rb, ""));
         assert_eq!(false, result.is_err(), "{:?}", result);
-        let result = block_on(BtcChainToken::fetch_by_id(&rb, "", &m.id));
+        let result = block_on(MBtcChainToken::fetch_by_id(&rb, "", &m.id));
         assert_eq!(false, result.is_err(), "{:?}", result);
         let m2 = result.unwrap();
         assert_eq!(m.id, m2.id);
         assert_eq!(m.show, m2.show);
 
-        let result = block_on(BtcChainToken::list(&rb, ""));
+        let result = block_on(MBtcChainToken::list(&rb, ""));
         assert_eq!(false, result.is_err(), "{:?}", result);
         let list = result.unwrap();
         assert_eq!(1, list.len());

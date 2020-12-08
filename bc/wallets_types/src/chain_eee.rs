@@ -1,11 +1,14 @@
-use crate::{Address, ChainShared, TokenShared};
+use mav::ma::MEeeChainToken;
+
+use crate::{Address, ChainShared, deref_type, TokenShared};
 
 #[derive(Debug, Default)]
 pub struct EeeChainToken {
+    pub m: MEeeChainToken,
     pub token_shared: TokenShared,
 }
+deref_type!(EeeChainToken,MEeeChainToken);
 
-#[repr(C)]
 #[derive(Debug, Default)]
 pub struct EeeChain {
     pub chain_shared: ChainShared,

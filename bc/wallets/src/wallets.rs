@@ -5,8 +5,8 @@ use once_cell::sync::OnceCell;
 use parking_lot::{RawMutex, RawThreadId, ReentrantMutex};
 use parking_lot::lock_api::{RawReentrantMutex};
 
-use mav::db::Db;
 use wallets_types::{Context, Error, InitParameters, UnInitParameters, Wallet};
+use crate::db::Db;
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
@@ -57,8 +57,10 @@ impl Wallets {
         Ok(())
     }
 
-    pub fn all(&mut self, array_wallet: &mut Vec::<Wallet>) -> Result<(),Error> {
-        //todo
+    pub async fn all(&mut self, array_wallet: &mut Vec::<Wallet>) -> Result<(),Error> {
+        let mut ws = Wallet::all(&self.db.cashbox_wallets).await?;
+        array_wallet.clear();
+        array_wallet.append (&mut ws);
         Ok(())
     }
 }
@@ -72,8 +74,6 @@ pub struct WalletsCollection {
 impl WalletsCollection {
     pub fn collection() -> &'static ReentrantMutex<RefCell<WalletsCollection>> {
         static mut INSTANCE: OnceCell<ReentrantMutex<RefCell<WalletsCollection>>> = OnceCell::new();
-        // let mut t = unsafe { INSTANCE .get().unwrap().lock()};
-        // t.borrow_mut().get("");
         unsafe {
             INSTANCE.get_or_init(|| {
                 #[cfg(target_os="android")]crate::init_logger_once();

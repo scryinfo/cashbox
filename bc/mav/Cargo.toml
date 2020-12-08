@@ -24,4 +24,3 @@ async-std = { version = "1.7" }
 async-trait = "0.1.31"
 
 wallets_macro = { path = "../wallets_macro", features = ["db_meta"] }
-wallets_types = { path = "../wallets_types" }

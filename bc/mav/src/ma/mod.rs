@@ -11,6 +11,8 @@ pub use crate::ma::detail_eee::{*};
 pub use crate::ma::detail_eth::{*};
 pub use crate::ma::mnemonic::Mnemonic;
 
+pub use crate::ma::dao::*;
+
 mod mnemonic;
 mod detail;
 mod detail_eth;
@@ -21,5 +23,5 @@ mod data_eth;
 mod data_eee;
 mod data_btc;
 
-pub mod dao;
+mod dao;
 

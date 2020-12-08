@@ -7,19 +7,19 @@ use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
-use crate::ma::TokenShared;
+use crate::ma::MTokenShared;
 
 // eee
 #[db_append_shared(CRUDEnable)]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
-pub struct EeeChainTokenShared {
+pub struct MEeeChainTokenShared {
     #[serde(flatten)]
-    pub token_shared: TokenShared,
+    pub token_shared: MTokenShared,
 }
 
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct EeeChainTokenAuth {
+pub struct MEeeChainTokenAuth {
     /// [EeeChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
@@ -31,7 +31,7 @@ pub struct EeeChainTokenAuth {
 /// DefaultToken must be a [EeeChainTokenAuth]
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct EeeChainTokenDefault {
+pub struct MEeeChainTokenDefault {
     /// [EeeChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,

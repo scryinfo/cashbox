@@ -9,7 +9,7 @@ use crate::ma::dao::{self, Shared};
 /// 地址与token对应的balance
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct TokenAddress {
+pub struct MTokenAddress {
     #[serde(default)]
     pub wallet_id: String,
     /// [crate::ChainType]
@@ -42,7 +42,7 @@ mod tests {
     use async_std::task::block_on;
     use rbatis::rbatis::Rbatis;
 
-    use crate::ma::{db_dest, TokenAddress};
+    use crate::ma::{db_dest, MTokenAddress};
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
 
     const TABLE: &str = "
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS token_address (
     #[test]
     #[allow(non_snake_case)]
     fn test_TokenAddress() {
-        let mut m = TokenAddress::default();
+        let mut m = MTokenAddress::default();
         assert_eq!("", m.get_id());
         assert_eq!(0, m.get_create_time());
         assert_eq!(0, m.get_update_time());
@@ -72,19 +72,19 @@ CREATE TABLE IF NOT EXISTS token_address (
         assert_ne!(0, m.get_update_time());
         assert_eq!(m.get_create_time(), m.get_update_time());
 
-        let mut m = TokenAddress::default();
+        let mut m = MTokenAddress::default();
         m.before_update();
         assert_eq!("", m.get_id());
         assert_eq!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
 
         let rb = block_on(init_memory());
-        let mut m = TokenAddress::default();
+        let mut m = MTokenAddress::default();
         m.wallet_id = "test".to_owned();
         m.token_id = "eee".to_owned();
         let result = block_on(m.save(&rb, ""));
         assert_eq!(false, result.is_err(), "{:?}", result);
-        let result = block_on(TokenAddress::fetch_by_id(&rb, "", &m.id));
+        let result = block_on(MTokenAddress::fetch_by_id(&rb, "", &m.id));
         assert_eq!(false, result.is_err(), "{:?}", result);
         let m2 = result.unwrap();
         assert_eq!(m.id, m2.id);
@@ -96,11 +96,11 @@ CREATE TABLE IF NOT EXISTS token_address (
         assert_eq!(m.balance, m2.balance);
         assert_eq!(m.chain_type, m2.chain_type);
 
-        let mut m3 = TokenAddress::default();
+        let mut m3 = MTokenAddress::default();
         m3.token_id = "m3".to_owned();
         let re = block_on(m3.save(&rb, ""));
         assert_eq!(false, re.is_err());
-        let re = block_on(TokenAddress::list(&rb, ""));
+        let re = block_on(MTokenAddress::list(&rb, ""));
         assert_eq!(false, re.is_err());
         let list = re.unwrap();
         assert_eq!(2, list.len());
