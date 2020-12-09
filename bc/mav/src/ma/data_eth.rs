@@ -22,7 +22,7 @@ pub struct MEthChainToken {
     /// 手动加入的token就没有token shared内容
     /// [crate::db::BtcChainTokenShared]
     #[serde(default)]
-    pub chain_token_shared_id: Option<String>,
+    pub chain_token_shared_id: String,
     /// [crate::db::Wallet]
     #[serde(default)]
     pub wallet_id: String,

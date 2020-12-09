@@ -1,17 +1,28 @@
-use rbatis::rbatis::Rbatis;
 use async_trait::async_trait;
+use rbatis::rbatis::Rbatis;
 
 use mav::{ChainType, WalletType};
-use mav::ma::{MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MWallet, Dao};
+use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MWallet};
 
-use crate::{Chain2WalletType, ChainShared, deref_type, TokenShared, Load, WalletError};
+use crate::{Chain2WalletType, ChainShared, deref_type, Load, TokenShared, WalletError};
 
 #[derive(Debug, Default)]
 pub struct EthChainToken {
     pub m: MEthChainToken,
-    pub token_shared: EthChainTokenShared,
+    pub eth_chain_token_shared: EthChainTokenShared,
 }
 deref_type!(EthChainToken,MEthChainToken);
+
+#[async_trait]
+impl Load for EthChainToken {
+    type MType = MEthChainToken;
+    async fn load(&mut self, rb: &Rbatis, m: Self::MType) -> Result<(), WalletError> {
+        self.m = m;
+        let token_shared = MEthChainTokenShared::fetch_by_id(rb, "", &self.m.chain_token_shared_id).await?;
+        self.eth_chain_token_shared.load(rb, token_shared).await?;
+        Ok(())
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct EthChainTokenShared {
@@ -20,17 +31,27 @@ pub struct EthChainTokenShared {
 }
 deref_type!(EthChainTokenShared,MEthChainTokenShared);
 
+#[async_trait]
+impl Load for EthChainTokenShared {
+    type MType = MEthChainTokenShared;
+    async fn load(&mut self, _: &Rbatis, m: Self::MType) -> Result<(), WalletError> {
+        self.m = m;
+        self.token_shared.m = self.m.token_shared.clone();
+        Ok(())
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct EthChainTokenDefault {
     pub m: MEthChainTokenDefault,
-    pub token_shared: EthChainTokenShared,
+    pub eth_chain_token_shared: EthChainTokenShared,
 }
 deref_type!(EthChainTokenDefault,MEthChainTokenDefault);
 
 #[derive(Debug, Default)]
 pub struct EthChainTokenAuth {
     pub m: MEthChainTokenAuth,
-    pub token_shared: EthChainTokenShared,
+    pub eth_chain_token_shared: EthChainTokenShared,
 }
 deref_type!(EthChainTokenAuth,MEthChainTokenAuth);
 
@@ -57,24 +78,22 @@ impl Chain2WalletType for EthChain {
 impl Load for EthChain {
     type MType = MWallet;
 
-    async fn load(&mut self, rb: &Rbatis, mw: &Self::MType) -> Result<(), WalletError> {
-        self.chain_shared.set_m(mw);
+    async fn load(&mut self, rb: &Rbatis, mw: Self::MType) -> Result<(), WalletError> {
+        self.chain_shared.set_m(&mw);
         let wallet_type = WalletType::from(mw.wallet_type.as_str());
         self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
 
         {//load token
             let mut wrapper = rb.new_wrapper();
             wrapper.eq(MEthChainToken::wallet_id, mw.id.clone()).eq(MEthChainToken::chain_type, self.chain_shared.chain_type.clone());
-            let ms = MEthChainToken::list_by_wrapper(&rb,"", &wrapper).await?;
+            let ms = MEthChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
             for it in ms {
                 let mut token = EthChainToken::default();
-                token.m = it;
+                token.load(rb, it).await?;
                 self.tokens.push(token);
             }
         }
-
-        //todo
 
         Ok(())
     }

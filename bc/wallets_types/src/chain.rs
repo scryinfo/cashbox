@@ -1,6 +1,4 @@
-
 use mav::{ChainType, WalletType};
-use mav::ma::MWallet;
 
 pub trait Chain2WalletType {
     fn chain_type(wallet_type: &WalletType) -> ChainType;

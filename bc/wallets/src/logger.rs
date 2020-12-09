@@ -1,6 +1,4 @@
-
-
-#[cfg(target_os="android")]
+#[cfg(target_os = "android")]
 pub fn init_logger_once() {
     android_logger::init_once(
         android_logger::Config::default()

@@ -62,7 +62,7 @@ pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext, parameter: *mut CUnI
     let lock = WalletsCollection::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
-        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+        if let Some(mut ws) = ins.remove(&CContext::get_id(ctx)) {
             if let Err(e) = ws.uninit(&mut rp) {
                 e
             } else {

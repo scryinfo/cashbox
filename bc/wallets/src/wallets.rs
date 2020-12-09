@@ -3,9 +3,10 @@ use std::collections::HashMap;
 
 use once_cell::sync::OnceCell;
 use parking_lot::{RawMutex, RawThreadId, ReentrantMutex};
-use parking_lot::lock_api::{RawReentrantMutex};
+use parking_lot::lock_api::RawReentrantMutex;
 
 use wallets_types::{Context, Error, InitParameters, UnInitParameters, Wallet};
+
 use crate::db::Db;
 
 pub struct Wallets {
@@ -46,21 +47,21 @@ impl Wallets {
         return true;
     }
 
-    pub fn init(&mut self, parameters: &InitParameters) -> Result<(),Error> {
+    pub fn init(&mut self, parameters: &InitParameters) -> Result<(), Error> {
         let r = self.db.init(&parameters.db_name);
         //todo
         Ok(())
     }
 
-    pub fn uninit(&mut self, parameters: &UnInitParameters) -> Result<(),Error> {
+    pub fn uninit(&mut self, parameters: &UnInitParameters) -> Result<(), Error> {
         //todo
         Ok(())
     }
 
-    pub async fn all(&mut self, array_wallet: &mut Vec::<Wallet>) -> Result<(),Error> {
+    pub async fn all(&mut self, array_wallet: &mut Vec::<Wallet>) -> Result<(), Error> {
         let mut ws = Wallet::all(&self.db.cashbox_wallets).await?;
         array_wallet.clear();
-        array_wallet.append (&mut ws);
+        array_wallet.append(&mut ws);
         Ok(())
     }
 }
@@ -76,7 +77,7 @@ impl WalletsCollection {
         static mut INSTANCE: OnceCell<ReentrantMutex<RefCell<WalletsCollection>>> = OnceCell::new();
         unsafe {
             INSTANCE.get_or_init(|| {
-                #[cfg(target_os="android")]crate::init_logger_once();
+                #[cfg(target_os = "android")]crate::init_logger_once();
                 ReentrantMutex::new(RefCell::new(WalletsCollection::default()))
             })
         }
@@ -84,6 +85,10 @@ impl WalletsCollection {
 
     pub fn get_mut(&mut self, key: &str) -> Option<&mut Wallets> {
         self.w_map.get_mut(key)
+    }
+
+    pub fn remove(&mut self, key: &str) -> Option<Wallets> {
+        self.w_map.remove(key)
     }
 
     pub fn new(&mut self) -> Option<&mut Wallets> {
@@ -107,7 +112,7 @@ mod tests {
     #[test]
     fn one_cell_try() {
         {
-            let f = ||{
+            let f = || {
                 static mut T_INS: OnceCell<ReentrantMutex<RefCell<WalletsCollection>>> = OnceCell::new();
                 // let mut t = unsafe { INSTANCE .get().unwrap().lock()};
                 // t.borrow_mut().get("");
@@ -118,7 +123,7 @@ mod tests {
                 }
             };
             let lock = f().lock();
-            let mut ins =lock.borrow_mut();
+            let mut ins = lock.borrow_mut();
             let ws = ins.new().unwrap();
             ws.ctx.id = "".to_owned();
         }

@@ -9,7 +9,7 @@ use crate::types::{CChainShared, CTokenShared};
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthChainToken {
-    pub tokenShared: *mut CEthChainTokenShared,
+    pub ethChainTokenShared: *mut CEthChainTokenShared,
 }
 
 #[repr(C)]
@@ -21,13 +21,13 @@ pub struct CEthChainTokenShared {
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthChainTokenDefault {
-    pub tokenShared: *mut CEthChainTokenShared,
+    pub ethChainTokenShared: *mut CEthChainTokenShared,
 }
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthChainTokenAuth {
-    pub tokenShared: *mut CEthChainTokenShared,
+    pub ethChainTokenShared: *mut CEthChainTokenShared,
 }
 
 #[repr(C)]

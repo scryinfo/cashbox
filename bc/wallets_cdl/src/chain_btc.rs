@@ -9,7 +9,7 @@ use crate::types::{CChainShared, CTokenShared};
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CBtcChainToken {
-    pub tokenShared: *mut CBtcChainTokenShared,
+    pub btcChainTokenShared: *mut CBtcChainTokenShared,
 }
 
 #[repr(C)]
