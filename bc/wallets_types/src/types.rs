@@ -2,7 +2,7 @@ use rbatis::rbatis::Rbatis;
 
 use mav::ma::{Dao, MAddress, MChainShared, MTokenShared, MWallet};
 
-use crate::{BtcChain, EeeChain, EthChain, WalletError};
+use crate::{BtcChain, Chain, EeeChain, EthChain, WalletError};
 use crate::deref_type;
 
 #[derive(Debug, Default)]
@@ -26,7 +26,19 @@ impl Wallet {
         Ok(ws)
     }
     pub fn load(&mut self, rb: &Rbatis) {
-        //todo 
+        //todo
+        {
+            self.eth_chain.load(rb, &self.m);
+            //todo wallet address
+        }
+        {
+            self.eee_chain.load(rb, &self.m);
+            //todo wallet address
+        }
+        {
+            self.btc_chain.load(rb, &self.m);
+            //todo wallet address
+        }
     }
 }
 
@@ -49,6 +61,13 @@ pub struct ChainShared {
     /// 钱包地址
     pub wallet_address: Address,
 }
+
+impl ChainShared {
+    pub fn set_m(&mut self, mw: &MWallet) {
+        self.m.wallet_id = mw.id.clone();
+    }
+}
+
 deref_type!(ChainShared,MChainShared);
 // pub struct Address([u8]);
 //

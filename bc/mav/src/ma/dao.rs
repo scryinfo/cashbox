@@ -9,10 +9,10 @@ use serde::{de, Deserialize, Deserializer};
 use serde::de::Unexpected;
 
 pub use crate::ma::data::{MTokenAddress, TxShared};
-pub use crate::ma::data_eth::{MEthChainToken, MEthChainTx, EthErc20Face, MEthErc20Tx};
+pub use crate::ma::data_eth::{EthErc20Face, MEthChainToken, MEthChainTx, MEthErc20Tx};
 pub use crate::ma::detail::{MTokenShared, MWallet};
 pub use crate::ma::detail_eth::{MEthChainTokenAuth, MEthChainTokenDefault};
-pub use crate::ma::mnemonic::Mnemonic;
+pub use crate::ma::mnemonic::MMnemonic;
 
 pub trait Shared {
     fn get_id(&self) -> String;

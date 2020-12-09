@@ -1,6 +1,7 @@
 #[cfg(test)]
 pub use dao::test as db_dest;
 
+pub use crate::ma::dao::*;
 pub use crate::ma::data::{*};
 pub use crate::ma::data_btc::{*};
 pub use crate::ma::data_eee::{*};
@@ -9,9 +10,7 @@ pub use crate::ma::detail::{*};
 pub use crate::ma::detail_btc::{*};
 pub use crate::ma::detail_eee::{*};
 pub use crate::ma::detail_eth::{*};
-pub use crate::ma::mnemonic::Mnemonic;
-
-pub use crate::ma::dao::*;
+pub use crate::ma::mnemonic::MMnemonic;
 
 mod mnemonic;
 mod detail;

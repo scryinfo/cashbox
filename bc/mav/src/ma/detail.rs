@@ -15,8 +15,10 @@ pub struct MWallet {
     pub next_id: String,
     #[serde(default)]
     pub full_name: String,
+    //由助记词生成的唯一摘要，用于检测是否有重复的助记词
     #[serde(default)]
     pub mnemonic_digest: String,
+    //加密后的助记词
     #[serde(default)]
     pub mnemonic: String,
     /// [crate::WalletType]
@@ -27,7 +29,7 @@ pub struct MWallet {
     pub net_type: String,
 }
 
-//每一种链类型一条记录，
+//每一种链类型一条记录，实现时可以不写入数据库
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MChainTypeMeta {

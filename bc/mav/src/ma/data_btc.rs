@@ -92,7 +92,7 @@ mod tests {
     use async_std::task::block_on;
     use rbatis::rbatis::Rbatis;
 
-    use crate::ma::{MBtcChainToken, db_dest};
+    use crate::ma::{db_dest, MBtcChainToken};
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
 
     const TABLE_BTC_CHAIN_TOKEN: &str = "

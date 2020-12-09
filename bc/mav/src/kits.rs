@@ -3,8 +3,8 @@ use std::ops::Add;
 
 use rbatis::rbatis::Rbatis;
 use uuid::Uuid;
-use crate::db::Error;
 
+use crate::db::Error;
 
 pub fn uuid() -> String {
     Uuid::new_v4().to_string()

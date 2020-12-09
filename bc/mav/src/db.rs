@@ -21,9 +21,9 @@ impl From<rbatis_core::Error> for Error {
 }
 
 impl From<&str> for Error {
-    fn from(e: &str) -> Self { Self{err: e.to_owned()} }
+    fn from(e: &str) -> Self { Self { err: e.to_owned() } }
 }
 
 impl From<io::Error> for Error {
-    fn from(err: io::Error) -> Self{ Error::from(err.to_string().as_str())}
+    fn from(err: io::Error) -> Self { Error::from(err.to_string().as_str()) }
 }
