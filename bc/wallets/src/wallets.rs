@@ -47,8 +47,8 @@ impl Wallets {
         return true;
     }
 
-    pub fn init(&mut self, parameters: &InitParameters) -> Result<(), Error> {
-        let r = self.db.init(&parameters.db_name);
+    pub async fn init(&mut self, parameters: &InitParameters) -> Result<(), Error> {
+        self.db.init(&parameters.db_name).await?;
         //todo
         Ok(())
     }

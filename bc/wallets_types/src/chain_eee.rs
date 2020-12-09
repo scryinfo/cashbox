@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use rbatis::rbatis::Rbatis;
 
 use mav::{ChainType, WalletType};
-use mav::ma::{MEeeChainToken, MEeeChainTokenShared, MWallet};
+use mav::ma::{Dao, MEeeChainToken, MEeeChainTokenShared, MWallet};
 
 use crate::{Address, Chain2WalletType, ChainShared, deref_type, Load, TokenShared, WalletError};
 
@@ -13,12 +13,33 @@ pub struct EeeChainToken {
 }
 deref_type!(EeeChainToken,MEeeChainToken);
 
+#[async_trait]
+impl Load for EeeChainToken {
+    type MType = MEeeChainToken;
+    async fn load(&mut self, rb: &Rbatis, m: Self::MType) -> Result<(), WalletError> {
+        self.m = m;
+        let token_shared = MEeeChainTokenShared::fetch_by_id(rb, "", &self.m.chain_token_shared_id).await?;
+        self.eee_chain_token_shared.load(rb, token_shared).await?;
+        Ok(())
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct EeeChainTokenShared {
     pub m: MEeeChainTokenShared,
     pub token_shared: TokenShared,
 }
 deref_type!(EeeChainTokenShared,MEeeChainTokenShared);
+
+#[async_trait]
+impl Load for EeeChainTokenShared {
+    type MType = MEeeChainTokenShared;
+    async fn load(&mut self, _: &Rbatis, m: Self::MType) -> Result<(), WalletError> {
+        self.m = m;
+        self.token_shared.m = self.m.token_shared.clone();
+        Ok(())
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct EeeChain {
@@ -47,8 +68,18 @@ impl Load for EeeChain {
         self.chain_shared.set_m(&mw);
         let wallet_type = WalletType::from(&mw.wallet_type);
         self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
-        //todo
 
+        {//load token
+            let mut wrapper = rb.new_wrapper();
+            wrapper.eq(MEeeChainToken::wallet_id, mw.id.clone()).eq(MEeeChainToken::chain_type, self.chain_shared.chain_type.clone());
+            let ms = MEeeChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
+            self.tokens.clear();
+            for it in ms {
+                let mut token = EeeChainToken::default();
+                token.load(rb, it).await?;
+                self.tokens.push(token);
+            }
+        }
         Ok(())
     }
 }

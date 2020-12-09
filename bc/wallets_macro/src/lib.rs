@@ -1,8 +1,8 @@
 use proc_macro::TokenStream;
 
 use proc_macro_roids::{DeriveInputStructExt, FieldsNamedAppend};
-use quote::{quote};
-use syn::{AttributeArgs, DeriveInput, FieldsNamed, parse_macro_input, parse_quote, Type, Fields};
+use quote::quote;
+use syn::{AttributeArgs, DeriveInput, Fields, FieldsNamed, parse_macro_input, parse_quote, Type};
 use syn::export::TokenStream2;
 
 mod db_meta;

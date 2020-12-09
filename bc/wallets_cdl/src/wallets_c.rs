@@ -3,6 +3,7 @@
 
 use std::os::raw::c_char;
 use std::ptr::null_mut;
+use async_std::task::block_on;
 
 use wallets::WalletsCollection;
 use wallets_types::{Error, UnInitParameters};
@@ -35,7 +36,7 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, ctx: *mut
 
     let err = {
         if let Some(ws) = ins.new() {
-            if let Err(e) = ws.init(&mut parameter) {
+            if let Err(e) = block_on(ws.init(&mut parameter)) {
                 e
             } else {
                 *ctx = CContext::to_c_ptr(&ws.ctx);
