@@ -11,7 +11,7 @@ pub use crate::chain_btc::{*};
 pub use crate::chain_eee::{*};
 pub use crate::chain_eth::{*};
 pub use crate::kits::{CR, CU64};
-use crate::kits::{CArray, CStruct, free_c_char, pointer_alloc, pointer_free, to_c_char, to_str};
+use crate::kits::{CStruct, to_c_char, to_str};
 pub use crate::types_btc::{*};
 pub use crate::types_eee::{*};
 pub use crate::types_eth::{*};
@@ -65,38 +65,6 @@ pub struct CChainShared {
     pub walletAddress: *mut CAddress,
 }
 
-#[no_mangle]
-pub extern "C" fn CStr_free(cs: *mut c_char) {
-    let mut t = cs;//由于 free_c_char 会把参数的值修改为空，所以这里要定义一个临时变量，
-    free_c_char(&mut t);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn CError_free(error: *mut CError) {
-    if !error.is_null() {
-        Box::from_raw(error);
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn CWallet_alloc() -> *mut CWallet {
-    Box::into_raw(Box::new(CWallet::default()))
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn CWallet_free(ptr: *mut CWallet) {
-    Box::from_raw(ptr);
-}
-
-#[no_mangle]
-pub extern "C" fn CArrayCWallet_dAlloc() -> *mut *mut CArray<CWallet> {
-    pointer_alloc()
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn CArrayCWallet_dFree(dPtr: *mut *mut CArray<CWallet>) {
-    pointer_free(dPtr)
-}
 
 #[cfg(test)]
 mod tests {

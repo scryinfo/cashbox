@@ -4,9 +4,9 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{Context, DbName, InitParameters, UnInitParameters};
+use wallets_types::{Context, CreateWalletParameters, DbName, InitParameters, UnInitParameters};
 
-use crate::kits::{CR, CStruct, pointer_alloc, pointer_free, to_c_char, to_str};
+use crate::kits::{CR, CStruct, to_c_char, to_str};
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
@@ -28,6 +28,14 @@ pub struct CDbName {
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CUnInitParameters {}
+
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CCreateWalletParameters {
+    pub name: *mut c_char,
+    pub password: *mut c_char,
+    pub mnemonic: *mut c_char,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
@@ -56,16 +64,6 @@ impl CContext {
         Box::into_raw(c);
         id.to_owned()
     }
-}
-
-#[no_mangle]
-pub extern "C" fn CContext_dAlloc() -> *mut *mut CContext {
-    pointer_alloc()
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn CContext_dFree(dPtr: *mut *mut CContext) {
-    pointer_free(dPtr)
 }
 
 

@@ -53,7 +53,7 @@ impl Wallets {
         Ok(())
     }
 
-    pub fn uninit(&mut self, parameters: &UnInitParameters) -> Result<(), Error> {
+    pub async fn uninit(&mut self, _: &UnInitParameters) -> Result<(), Error> {
         //todo
         Ok(())
     }
