@@ -1,8 +1,9 @@
 use proc_macro::TokenStream;
 
 use proc_macro_roids::{DeriveInputStructExt, FieldsNamedAppend};
-use quote::quote;
-use syn::{AttributeArgs, DeriveInput, FieldsNamed, parse_macro_input, parse_quote, Type};
+use quote::{quote};
+use syn::{AttributeArgs, DeriveInput, FieldsNamed, parse_macro_input, parse_quote, Type, Fields};
+use syn::export::TokenStream2;
 
 mod db_meta;
 mod cr;
@@ -108,8 +109,10 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
         }
     };
 
+    let fields_stream = db_field_name(&ast.ident, &ast.fields());
     let gen = TokenStream::from(quote! {
             #ast
+            #fields_stream
             #imp_base
             #impl_crud
         });
@@ -121,7 +124,6 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
         let mut meta = db_meta::DbMeta::get().lock().expect("db_meta::DbMeta::get().lock()");
         (*meta).push(&ast);
     }
-
     gen
 }
 
@@ -129,8 +131,10 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn db_sub_struct(_: TokenStream, input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
+    let fields_stream = db_field_name(&ast.ident, &ast.fields());
     let gen = TokenStream::from(quote! {
             #ast
+            #fields_stream
         });
 
     if cfg!(feature = "print_macro") {
@@ -142,6 +146,30 @@ pub fn db_sub_struct(_: TokenStream, input: TokenStream) -> TokenStream {
         (*meta).push_sub_struct(&ast);
     }
     gen
+}
+
+fn db_field_name(name: &syn::Ident, fields: &Fields) -> TokenStream2 {
+    let fields_stream = {
+        let mut fields_vec = Vec::new();
+        for f in fields {
+            let field_ident = &f.ident;
+            if let Some(id) = &f.ident {
+                let field_name = id.to_string();
+                fields_vec.push(quote! {pub const #field_ident : &'a str = #field_name; });
+            }
+        }
+        if fields_vec.is_empty() {
+            quote! {}
+        } else {
+            quote! {
+                #[allow(non_upper_case_globals)]
+                impl<'a> #name {
+                    #(#fields_vec)*
+                }
+            }
+        }
+    };
+    fields_stream
 }
 
 /// impl BeforeSave
@@ -203,7 +231,6 @@ pub fn dl_struct(input: TokenStream) -> TokenStream {
 
     let gen = TokenStream::from(quote! {
             // #ast
-
             impl CStruct for #name {
                 fn free(&mut self) {
                     #(#drops)*

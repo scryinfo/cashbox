@@ -1,9 +1,15 @@
 use rbatis::rbatis::Rbatis;
-
+use async_trait::async_trait;
 use mav::ma::{Dao, MAddress, MChainShared, MTokenShared, MWallet};
 
-use crate::{BtcChain, Chain, EeeChain, EthChain, WalletError};
+use crate::{BtcChain, EeeChain, EthChain, WalletError};
 use crate::deref_type;
+
+#[async_trait]
+pub trait Load {
+    type MType;
+    async fn load(&mut self, rb: &Rbatis, mw: &Self::MType) -> Result<(),WalletError>;
+}
 
 #[derive(Debug, Default)]
 pub struct Wallet {
@@ -16,29 +22,36 @@ deref_type!(Wallet,MWallet);
 
 impl Wallet {
     pub async fn all(rb: &Rbatis) -> Result<Vec<Wallet>, WalletError> {
-        let ws = Vec::new();
+        let mut ws = Vec::new();
         let dws = MWallet::list(rb, "").await?;
-        for dw in dws {
+        for dw in &dws {
             let mut w = Wallet::default();
-            w.m = dw;
-            w.load(rb);
+            w.load(rb,dw);
+            ws.push(w);
         }
         Ok(ws)
     }
-    pub fn load(&mut self, rb: &Rbatis) {
-        //todo
+}
+
+#[async_trait]
+impl Load for Wallet {
+    type MType = MWallet;
+    async fn load(&mut self, rb: &Rbatis, mw: &MWallet) -> Result<(), WalletError> {
+        self.m = mw.clone();
         {
-            self.eth_chain.load(rb, &self.m);
+            self.eth_chain.load(rb, &self.m).await?;
             //todo wallet address
         }
         {
-            self.eee_chain.load(rb, &self.m);
+            self.eee_chain.load(rb, &self.m).await?;
             //todo wallet address
         }
         {
-            self.btc_chain.load(rb, &self.m);
+            self.btc_chain.load(rb, &self.m).await?;
             //todo wallet address
         }
+
+        Ok(())
     }
 }
 

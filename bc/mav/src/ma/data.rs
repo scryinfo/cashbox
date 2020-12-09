@@ -7,6 +7,7 @@ use crate::kits;
 use crate::ma::dao::{self, Shared};
 
 /// 地址与token对应的balance
+#[allow(non_upper_case_globals)]
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MTokenAddress {
@@ -22,6 +23,11 @@ pub struct MTokenAddress {
     #[serde(default)]
     pub balance: String,
 }
+
+
+// impl MTokenAddress {
+//     pub const t_name: &str = "sdf";
+// }
 
 #[db_sub_struct]
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]

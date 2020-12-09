@@ -1,9 +1,9 @@
 use rbatis::rbatis::Rbatis;
-
+use async_trait::async_trait;
 use mav::{ChainType, WalletType};
 use mav::ma::{MBtcChainToken, MBtcChainTokenShared, MWallet};
 
-use crate::{Chain, Chain2WalletType, ChainShared, deref_type, TokenShared};
+use crate::{Chain2WalletType, ChainShared, deref_type, TokenShared, Load, WalletError};
 
 #[derive(Debug, Default)]
 pub struct BtcChainToken {
@@ -36,13 +36,15 @@ impl Chain2WalletType for BtcChain {
         BtcChain::chain_type(wallet_type)
     }
 }
-
-impl Chain for BtcChain {
-    fn load(&mut self, rb: &Rbatis, mw: &MWallet) {
+#[async_trait]
+impl Load for BtcChain {
+    type MType = MWallet;
+    async fn load(&mut self, rb: &Rbatis, mw: &MWallet) -> Result<(), WalletError> {
         self.chain_shared.set_m(mw);
         let wallet_type = WalletType::from(&mw.wallet_type);
         self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
         //todo
+        Ok(())
     }
 }
 

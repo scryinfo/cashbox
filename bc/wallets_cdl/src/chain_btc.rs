@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{BtcChain, BtcChainToken,BtcChainTokenShared};
+use wallets_types::{BtcChain, BtcChainToken, BtcChainTokenShared};
 
 use crate::kits::{CArray, CR, CStruct};
 use crate::types::{CChainShared, CTokenShared};
@@ -17,6 +17,7 @@ pub struct CBtcChainToken {
 pub struct CBtcChainTokenShared {
     pub tokenShared: *mut CTokenShared,
 }
+
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CBtcChain {

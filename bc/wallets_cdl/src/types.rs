@@ -24,7 +24,6 @@ pub struct CError {
     pub message: *mut c_char,
 }
 
-
 #[repr(C)] //
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CWallet {

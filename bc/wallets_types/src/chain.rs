@@ -1,4 +1,3 @@
-use rbatis::rbatis::Rbatis;
 
 use mav::{ChainType, WalletType};
 use mav::ma::MWallet;
@@ -15,8 +14,4 @@ pub trait Chain2WalletType {
             ChainType::OTHER => WalletType::Test,
         }
     }
-}
-
-pub trait Chain {
-    fn load(&mut self, rb: &Rbatis, mw: &MWallet);
 }
