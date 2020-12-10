@@ -18,9 +18,9 @@ pub fn free_c_char(cs: &mut *mut c_char) {
     unsafe {
         if !cs.is_null() {
             CString::from_raw(*cs);
+            *cs = null_mut();//sure null
         }
     };
-    *cs = null_mut();//sure null
 }
 
 // do not free the cs's memory
@@ -35,28 +35,44 @@ pub fn to_str(cs: *const c_char) -> &'static str {
     return s;
 }
 
+/// 标记为c 类型
+pub trait CMark {}
+
 /// 释放c struct的内存， 这些内存需要手工管理
 pub trait CStruct {
     fn free(&mut self);
 }
 
-/// 为类型 “*mut T”实现 trait CType, T要实现 trait CType， T 与 *mut T是两种不同的类型，所以要再实现一次
-impl<T: CStruct> CStruct for *mut T {
+/// 为类型 “*mut T”实现 trait CStruct, T要实现 trait CStruct， T 与 *mut T是两种不同的类型，所以要再实现一次
+/// 注：如果T为“*mut”类型，实际类型为“*mut *mut”，这时调用free方法只把第一层的内存释放了。所以增加一个CMark trait来解决这个问题
+impl<T: CMark> CStruct for *mut T {
     fn free(&mut self) {
         if !self.is_null() {
             unsafe {
                 Box::from_raw(*self);
             }
+            *self = null_mut();
         }
-        *self = null_mut();
     }
 }
+
+// /// 为类型 “*mut T”实现 trait CType, T要实现 trait CType， T 与 *mut T是两种不同的类型，所以要再实现一次
+// impl<T: CStruct> CStruct for *mut *mut T {
+//     fn free(&mut self) {
+//         if !self.is_null() {
+//             *self.free();
+//             unsafe {
+//                 Box::from_raw(*self);
+//             }
+//             *self = null_mut();
+//         }
+//     }
+// }
 
 /// 为类型 “*mut c_char”实现 trait CType
 impl CStruct for *mut c_char {
     fn free(&mut self) {
         free_c_char(self);
-        *self = null_mut();
     }
 }
 
@@ -134,6 +150,8 @@ impl<T: CStruct> Default for CArray<T> {
     }
 }
 
+impl<T: CStruct> CMark for CArray<T> {}
+
 impl<T: CStruct> CStruct for CArray<T> {
     fn free(&mut self) {
         unsafe {
@@ -182,30 +200,44 @@ pub trait CR<C: CStruct, R> {
     fn ptr_rust(c: *mut C) -> R;
 }
 
-pub fn pointer_alloc<T>() -> *mut *mut T {
+pub fn d_ptr_alloc<T>() -> *mut *mut T {
     Box::into_raw(Box::new(null_mut()))
 }
 
-#[allow(unused_assignments)]
-pub fn pointer_free<T>(mut d_ptr: *mut *mut T) {
+pub fn d_ptr_free<T: CMark>(d_ptr: &mut *mut *mut T) {
     unsafe {
-        let ptr = *d_ptr;
-        if !ptr.is_null() {
-            Box::from_raw(ptr);
+        if !d_ptr.is_null() {
+            (**d_ptr).free();
+            Box::from_raw(*d_ptr);
             *d_ptr = null_mut();
+            // d_ptr.free(); //下面两种调用效果都是相同的，感觉rust会自动给对象使用 &mut操作,如果需要的话
+            //(&mut *d_ptr).free();
+            //(*d_ptr).free();
         }
-        Box::from_raw(d_ptr);
-    };
+    }
+}
 
-    d_ptr = null_mut();
+#[allow(unused_assignments)]
+pub fn d_str_free(d_ptr: &mut *mut *mut c_char) {
+    unsafe {
+        if !d_ptr.is_null() {
+            if !(*d_ptr).is_null() {
+                (**d_ptr).free();
+            }
+            Box::from_raw(d_ptr);
+            *d_ptr = null_mut();
+            // d_ptr.free();
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use std::ptr::null_mut;
 
-    use crate::kits::{CArray, CStruct, free_c_char, to_c_char};
-    use crate::types::CError;
+    use wallets_macro::{DlDefault, DlStruct};
+
+    use crate::kits::{CArray, CMark, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
 
     #[test]
     fn c_array() {
@@ -257,7 +289,35 @@ mod tests {
     #[test]
     fn test_c_char() {
         let mut cs = to_c_char("test");
-        free_c_char(&mut cs);
+        cs.free();
         assert_eq!(null_mut(), cs);
+    }
+
+    #[test]
+    fn d_ptr_free_test() {
+        #[derive(Debug, Clone, DlStruct, DlDefault)]
+        struct Data {
+            pub name: String,
+        }
+
+        let mut dptr: *mut *mut Data = null_mut();
+        d_ptr_free(&mut dptr);
+        assert_eq!(null_mut(), dptr);
+
+        let mut dptr: *mut *mut Data = d_ptr_alloc();
+        d_ptr_free(&mut dptr);
+        assert_eq!(null_mut(), dptr);
+
+        let mut dptr: *mut *mut Data = d_ptr_alloc();
+        unsafe { *dptr = Box::into_raw(Box::new(Data { name: "name".to_owned() })); }
+        let dpstr3 = dptr.clone();
+        let dpstr2 = (unsafe { *dptr }).clone();
+        d_ptr_free(&mut dptr);
+        assert_eq!(null_mut(), dptr);
+        // unsafe {
+        //     //pptr 使用已释放的内存，是非法操作，但是由于刚释放，正常情况下那个内存不会被再次分配，所以可以拿来检查
+        //     let ptr = dpstr2;
+        //     // assert_eq!(null_mut(), ptr);
+        // }
     }
 }

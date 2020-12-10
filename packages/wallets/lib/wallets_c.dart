@@ -151,7 +151,7 @@ class CBtcChain extends Struct {
 /// C struct `CBtcChainToken`.
 class CBtcChainToken extends Struct {
   
-  Pointer<CTokenShared> tokenShared;
+  Pointer<CBtcChainTokenShared> btcChainTokenShared;
   static Pointer<CBtcChainToken> allocate() {
     return ffi.allocate<CBtcChainToken>();
   }
@@ -163,10 +163,24 @@ class CBtcChainToken extends Struct {
 
 }
 
+/// C struct `CBtcChainTokenShared`.
+class CBtcChainTokenShared extends Struct {
+  
+  Pointer<CTokenShared> tokenShared;
+  static Pointer<CBtcChainTokenShared> allocate() {
+    return ffi.allocate<CBtcChainTokenShared>();
+  }
+
+
+  static CBtcChainTokenShared from(int ptr) {
+    return Pointer<CBtcChainTokenShared>.fromAddress(ptr).ref;
+  }
+
+}
+
 /// C struct `CChainShared`.
 class CChainShared extends Struct {
   
-  Pointer<ffi.Utf8> id;
   Pointer<ffi.Utf8> walletId;
   Pointer<ffi.Utf8> chainType;
   Pointer<CAddress> walletAddress;
@@ -232,6 +246,23 @@ typedef _CContext_dFree_Dart = void Function(
   Pointer<Pointer<CContext>> dPtr,
 );
 
+/// C struct `CCreateWalletParameters`.
+class CCreateWalletParameters extends Struct {
+  
+  Pointer<ffi.Utf8> name;
+  Pointer<ffi.Utf8> password;
+  Pointer<ffi.Utf8> mnemonic;
+  static Pointer<CCreateWalletParameters> allocate() {
+    return ffi.allocate<CCreateWalletParameters>();
+  }
+
+
+  static CCreateWalletParameters from(int ptr) {
+    return Pointer<CCreateWalletParameters>.fromAddress(ptr).ref;
+  }
+
+}
+
 /// C struct `CDbName`.
 class CDbName extends Struct {
   
@@ -272,7 +303,7 @@ class CEeeChain extends Struct {
 /// C struct `CEeeChainToken`.
 class CEeeChainToken extends Struct {
   
-  Pointer<CTokenShared> tokenShared;
+  Pointer<CEeeChainTokenShared> eeeChainTokenShared;
   static Pointer<CEeeChainToken> allocate() {
     return ffi.allocate<CEeeChainToken>();
   }
@@ -280,6 +311,21 @@ class CEeeChainToken extends Struct {
 
   static CEeeChainToken from(int ptr) {
     return Pointer<CEeeChainToken>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C struct `CEeeChainTokenShared`.
+class CEeeChainTokenShared extends Struct {
+  
+  Pointer<CTokenShared> tokenShared;
+  static Pointer<CEeeChainTokenShared> allocate() {
+    return ffi.allocate<CEeeChainTokenShared>();
+  }
+
+
+  static CEeeChainTokenShared from(int ptr) {
+    return Pointer<CEeeChainTokenShared>.fromAddress(ptr).ref;
   }
 
 }
@@ -334,7 +380,7 @@ class CEthChain extends Struct {
 /// C struct `CEthChainToken`.
 class CEthChainToken extends Struct {
   
-  Pointer<CTokenShared> tokenShared;
+  Pointer<CEthChainTokenShared> ethChainTokenShared;
   static Pointer<CEthChainToken> allocate() {
     return ffi.allocate<CEthChainToken>();
   }
@@ -342,6 +388,21 @@ class CEthChainToken extends Struct {
 
   static CEthChainToken from(int ptr) {
     return Pointer<CEthChainToken>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C struct `CEthChainTokenShared`.
+class CEthChainTokenShared extends Struct {
+  
+  Pointer<CTokenShared> tokenShared;
+  static Pointer<CEthChainTokenShared> allocate() {
+    return ffi.allocate<CEthChainTokenShared>();
+  }
+
+
+  static CEthChainTokenShared from(int ptr) {
+    return Pointer<CEthChainTokenShared>.fromAddress(ptr).ref;
   }
 
 }
@@ -361,6 +422,28 @@ class CInitParameters extends Struct {
 
 }
 
+/// C function `CStr_dAlloc`.
+Pointer<Pointer<ffi.Utf8>> CStr_dAlloc() {
+  return _CStr_dAlloc();
+}
+final _CStr_dAlloc_Dart _CStr_dAlloc = _dl.lookupFunction<_CStr_dAlloc_C, _CStr_dAlloc_Dart>('CStr_dAlloc');
+typedef _CStr_dAlloc_C = Pointer<Pointer<ffi.Utf8>> Function();
+typedef _CStr_dAlloc_Dart = Pointer<Pointer<ffi.Utf8>> Function();
+
+/// C function `CStr_dFree`.
+void CStr_dFree(
+  Pointer<Pointer<ffi.Utf8>> dcs,
+) {
+  _CStr_dFree(dcs);
+}
+final _CStr_dFree_Dart _CStr_dFree = _dl.lookupFunction<_CStr_dFree_C, _CStr_dFree_Dart>('CStr_dFree');
+typedef _CStr_dFree_C = Void Function(
+  Pointer<Pointer<ffi.Utf8>> dcs,
+);
+typedef _CStr_dFree_Dart = void Function(
+  Pointer<Pointer<ffi.Utf8>> dcs,
+);
+
 /// C function `CStr_free`.
 void CStr_free(
   Pointer<ffi.Utf8> cs,
@@ -378,10 +461,14 @@ typedef _CStr_free_Dart = void Function(
 /// C struct `CTokenShared`.
 class CTokenShared extends Struct {
   
-  Pointer<ffi.Utf8> id;
-  Pointer<ffi.Utf8> nextId;
+  Pointer<ffi.Utf8> chainType;
   Pointer<ffi.Utf8> name;
   Pointer<ffi.Utf8> symbol;
+  Pointer<ffi.Utf8> logoUrl;
+  Pointer<ffi.Utf8> logoBytes;
+  Pointer<ffi.Utf8> project;
+  @Int32()
+  int auth;
   static Pointer<CTokenShared> allocate() {
     return ffi.allocate<CTokenShared>();
   }
@@ -400,9 +487,11 @@ class CUnInitParameters extends Struct {
     return ffi.allocate<CUnInitParameters>();
   }
 
+
   static CUnInitParameters from(int ptr) {
     return Pointer<CUnInitParameters>.fromAddress(ptr).ref;
   }
+
 }
 
 /// C struct `CWallet`.
@@ -461,6 +550,111 @@ typedef _Wallets_all_C = Pointer<CError> Function(
 typedef _Wallets_all_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<Pointer<CArrayCWallet>> arrayWallet,
+);
+
+/// C function `Wallets_createWallet`.
+Pointer<CError> Wallets_createWallet(
+  Pointer<CContext> ctx,
+  Pointer<CCreateWalletParameters> parameters,
+  Pointer<Pointer<ffi.Utf8>> walletId,
+) {
+  return _Wallets_createWallet(ctx, parameters, walletId);
+}
+final _Wallets_createWallet_Dart _Wallets_createWallet = _dl.lookupFunction<_Wallets_createWallet_C, _Wallets_createWallet_Dart>('Wallets_createWallet');
+typedef _Wallets_createWallet_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CCreateWalletParameters> parameters,
+  Pointer<Pointer<ffi.Utf8>> walletId,
+);
+typedef _Wallets_createWallet_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CCreateWalletParameters> parameters,
+  Pointer<Pointer<ffi.Utf8>> walletId,
+);
+
+/// C function `Wallets_deleteWallet`.
+Pointer<CError> Wallets_deleteWallet(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+) {
+  return _Wallets_deleteWallet(ctx, walletId);
+}
+final _Wallets_deleteWallet_Dart _Wallets_deleteWallet = _dl.lookupFunction<_Wallets_deleteWallet_C, _Wallets_deleteWallet_Dart>('Wallets_deleteWallet');
+typedef _Wallets_deleteWallet_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+);
+typedef _Wallets_deleteWallet_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+);
+
+/// C function `Wallets_findById`.
+Pointer<CError> Wallets_findById(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+  Pointer<Pointer<CWallet>> wallet,
+) {
+  return _Wallets_findById(ctx, walletId, wallet);
+}
+final _Wallets_findById_Dart _Wallets_findById = _dl.lookupFunction<_Wallets_findById_C, _Wallets_findById_Dart>('Wallets_findById');
+typedef _Wallets_findById_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+  Pointer<Pointer<CWallet>> wallet,
+);
+typedef _Wallets_findById_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+  Pointer<Pointer<CWallet>> wallet,
+);
+
+/// C function `Wallets_findByName`.
+Pointer<CError> Wallets_findByName(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> name,
+  Pointer<Pointer<CArrayCWallet>> arrayWallet,
+) {
+  return _Wallets_findByName(ctx, name, arrayWallet);
+}
+final _Wallets_findByName_Dart _Wallets_findByName = _dl.lookupFunction<_Wallets_findByName_C, _Wallets_findByName_Dart>('Wallets_findByName');
+typedef _Wallets_findByName_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> name,
+  Pointer<Pointer<CArrayCWallet>> arrayWallet,
+);
+typedef _Wallets_findByName_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> name,
+  Pointer<Pointer<CArrayCWallet>> arrayWallet,
+);
+
+/// C function `Wallets_generateMnemonic`.
+Pointer<CError> Wallets_generateMnemonic(
+  Pointer<Pointer<ffi.Utf8>> mnemonic,
+) {
+  return _Wallets_generateMnemonic(mnemonic);
+}
+final _Wallets_generateMnemonic_Dart _Wallets_generateMnemonic = _dl.lookupFunction<_Wallets_generateMnemonic_C, _Wallets_generateMnemonic_Dart>('Wallets_generateMnemonic');
+typedef _Wallets_generateMnemonic_C = Pointer<CError> Function(
+  Pointer<Pointer<ffi.Utf8>> mnemonic,
+);
+typedef _Wallets_generateMnemonic_Dart = Pointer<CError> Function(
+  Pointer<Pointer<ffi.Utf8>> mnemonic,
+);
+
+/// <p class="para-brief"> Success: true; Fail: false</p>
+Pointer<CError> Wallets_hasOne(
+  Pointer<CContext> ctx,
+) {
+  return _Wallets_hasOne(ctx);
+}
+final _Wallets_hasOne_Dart _Wallets_hasOne = _dl.lookupFunction<_Wallets_hasOne_C, _Wallets_hasOne_Dart>('Wallets_hasOne');
+typedef _Wallets_hasOne_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+);
+typedef _Wallets_hasOne_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
 );
 
 /// <p class="para-brief"> dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存</p>

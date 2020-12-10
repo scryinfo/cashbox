@@ -3,7 +3,7 @@
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{EeeChain, EeeChainToken, EeeChainTokenShared};
 
-use crate::kits::{CArray, CR, CStruct};
+use crate::kits::{CArray, CMark, CR, CStruct};
 use crate::types::{CAddress, CChainShared, CTokenShared};
 
 #[repr(C)]

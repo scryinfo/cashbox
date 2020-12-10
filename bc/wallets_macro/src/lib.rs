@@ -231,6 +231,8 @@ pub fn dl_struct(input: TokenStream) -> TokenStream {
 
     let gen = TokenStream::from(quote! {
             // #ast
+            impl CMark for #name {
+            }
             impl CStruct for #name {
                 fn free(&mut self) {
                     #(#drops)*

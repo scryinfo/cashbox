@@ -6,7 +6,7 @@ use std::os::raw::c_char;
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{Context, CreateWalletParameters, DbName, InitParameters, UnInitParameters};
 
-use crate::kits::{CR, CStruct, to_c_char, to_str};
+use crate::kits::{CMark, CR, CStruct, to_c_char, to_str};
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]

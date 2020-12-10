@@ -11,7 +11,7 @@ pub use crate::chain_btc::{*};
 pub use crate::chain_eee::{*};
 pub use crate::chain_eth::{*};
 pub use crate::kits::{CR, CU64};
-use crate::kits::{CStruct, to_c_char, to_str};
+use crate::kits::{CMark, CStruct, to_c_char, to_str};
 pub use crate::types_btc::{*};
 pub use crate::types_eee::{*};
 pub use crate::types_eth::{*};

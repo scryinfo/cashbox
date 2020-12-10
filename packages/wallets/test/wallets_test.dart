@@ -13,23 +13,27 @@ import 'package:ffi/ffi.dart' as ffi;
 void main() {
   test('Wallets', () async {
     var wallet = Wallets.instance();
-    var initP = new InitParameters();
+
     {
+      var initP = new InitParameters();
       initP.dbName.cashboxWallets = "cashboxWallets.db";
       initP.dbName.cashboxMnemonic = "cashboxMnemonic.db";
       initP.dbName.walletMainnet = "walletMainnet.db";
       initP.dbName.walletPrivate = "walletPrivate.db";
       initP.dbName.walletTestnet = "walletTestnet.db";
       initP.dbName.walletTestnetPrivate = "walletTestnetPrivate.db";
-    }
-    {
       wallet.init(initP);
 
       expect(true, wallet.context != null);
       var id = ffi.Utf8.fromUtf8(wallet.context.ref.id);
       expect(true, id.isNotEmpty);
-
+    }
+    {
       var err = wallet.safeRead(() {
+        //...
+      });
+      expect(true, err.isSuccess());
+      err = wallet.safeRead(() {
         //...
       });
       expect(true, err.isSuccess());
@@ -41,6 +45,11 @@ void main() {
 
     {
       var err = await compute(computeFun, wallet.dContext.address);
+      expect(true, err.isSuccess());
+    }
+    {
+      var mnemonic = clib.CStr_dAlloc();
+      var err = clib.Wallets_generateMnemonic(mnemonic);
       expect(true, err.isSuccess());
     }
     var uninitP = new UnInitParameters();

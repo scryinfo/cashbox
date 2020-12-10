@@ -17,7 +17,7 @@ pub struct DbName {
 pub struct UnInitParameters {}
 
 #[derive(Debug, Default)]
-pub struct CreateWalletParameters{
+pub struct CreateWalletParameters {
     pub name: String,
     pub password: String,
     pub mnemonic: String,

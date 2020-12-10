@@ -11,6 +11,27 @@ typedef struct CError {
     char *message;
 } CError;
 
+typedef struct CDbName {
+    char *cashboxWallets;
+    char *cashboxMnemonic;
+    char *walletMainnet;
+    char *walletPrivate;
+    char *walletTestnet;
+    char *walletTestnetPrivate;
+} CDbName;
+
+typedef struct CInitParameters {
+    CDbName *dbName;
+} CInitParameters;
+
+typedef struct CContext {
+    char *id;
+} CContext;
+
+typedef struct CUnInitParameters {
+
+} CUnInitParameters;
+
 typedef struct CAddress {
     char *id;
     char *walletId;
@@ -20,7 +41,6 @@ typedef struct CAddress {
 } CAddress;
 
 typedef struct CChainShared {
-    char *id;
     char *walletId;
     char *chainType;
     /**
@@ -30,14 +50,21 @@ typedef struct CChainShared {
 } CChainShared;
 
 typedef struct CTokenShared {
-    char *id;
-    char *nextId;
+    char *chainType;
     char *name;
     char *symbol;
+    char *logoUrl;
+    char *logoBytes;
+    char *project;
+    bool auth;
 } CTokenShared;
 
-typedef struct CEthChainToken {
+typedef struct CEthChainTokenShared {
     CTokenShared *tokenShared;
+} CEthChainTokenShared;
+
+typedef struct CEthChainToken {
+    CEthChainTokenShared *ethChainTokenShared;
 } CEthChainToken;
 
 /**
@@ -55,8 +82,12 @@ typedef struct CEthChain {
     CArrayCEthChainToken *tokens;
 } CEthChain;
 
-typedef struct CEeeChainToken {
+typedef struct CEeeChainTokenShared {
     CTokenShared *tokenShared;
+} CEeeChainTokenShared;
+
+typedef struct CEeeChainToken {
+    CEeeChainTokenShared *eeeChainTokenShared;
 } CEeeChainToken;
 
 /**
@@ -75,8 +106,12 @@ typedef struct CEeeChain {
     CArrayCEeeChainToken *tokens;
 } CEeeChain;
 
-typedef struct CBtcChainToken {
+typedef struct CBtcChainTokenShared {
     CTokenShared *tokenShared;
+} CBtcChainTokenShared;
+
+typedef struct CBtcChainToken {
+    CBtcChainTokenShared *btcChainTokenShared;
 } CBtcChainToken;
 
 /**
@@ -112,42 +147,15 @@ typedef struct CArrayCWallet {
     CU64 cap;
 } CArrayCWallet;
 
-typedef struct CDbName {
-    char *cashboxWallets;
-    char *cashboxMnemonic;
-    char *walletMainnet;
-    char *walletPrivate;
-    char *walletTestnet;
-    char *walletTestnetPrivate;
-} CDbName;
-
-typedef struct CInitParameters {
-    CDbName *dbName;
-} CInitParameters;
-
-typedef struct CContext {
-    char *id;
-} CContext;
-
-typedef struct CUnInitParameters {
-
-} CUnInitParameters;
+typedef struct CCreateWalletParameters {
+    char *name;
+    char *password;
+    char *mnemonic;
+} CCreateWalletParameters;
 
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-
-void CStr_free(char *cs);
-
-void CError_free(CError *error);
-
-CWallet *CWallet_alloc(void);
-
-void CWallet_free(CWallet *ptr);
-
-CArrayCWallet **CArrayCWallet_dAlloc(void);
-
-void CArrayCWallet_dFree(CArrayCWallet **dPtr);
 
 void CChar_free(char *cs);
 
@@ -168,9 +176,40 @@ const CError *Wallets_unlockWrite(CContext *ctx);
 
 const CError *Wallets_all(CContext *ctx, CArrayCWallet **arrayWallet);
 
+const CError *Wallets_generateMnemonic(char **mnemonic);
+
+const CError *Wallets_createWallet(CContext *ctx, CCreateWalletParameters *parameters, char **walletId);
+
+const CError *Wallets_deleteWallet(CContext *ctx, char *walletId);
+
+/**
+ * Success: true; Fail: false
+ */
+const CError *Wallets_hasOne(CContext *ctx);
+
+const CError *Wallets_findById(CContext *ctx, char *walletId, CWallet **wallet);
+
+const CError *Wallets_findByName(CContext *ctx, char *name, CArrayCWallet **arrayWallet);
+
 CContext **CContext_dAlloc(void);
 
 void CContext_dFree(CContext **dPtr);
+
+void CStr_free(char *cs);
+
+void CStr_dFree(char **dcs);
+
+char **CStr_dAlloc(void);
+
+void CError_free(CError *error);
+
+CWallet *CWallet_alloc(void);
+
+void CWallet_free(CWallet *ptr);
+
+CArrayCWallet **CArrayCWallet_dAlloc(void);
+
+void CArrayCWallet_dFree(CArrayCWallet **dPtr);
 
 #ifdef __cplusplus
 } // extern "C"

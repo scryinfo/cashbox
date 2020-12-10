@@ -9,16 +9,9 @@ use async_std::task::block_on;
 use wallets::WalletsCollection;
 use wallets_types::{Error, UnInitParameters};
 
-use crate::kits::{CArray, CR, CStruct, free_c_char, pointer_alloc, pointer_free};
+use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, d_ptr_free, d_str_free};
 use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters, CUnInitParameters};
 use crate::types::{CError, CWallet};
-
-#[no_mangle]
-pub unsafe extern "C" fn CChar_free(cs: *mut c_char) {
-    if !cs.is_null() {
-        Box::from_raw(cs);
-    }
-}
 
 /// dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存
 #[no_mangle]
@@ -346,60 +339,52 @@ pub unsafe extern "C" fn Wallets_findByName(ctx: *mut CContext, name: *mut c_cha
 // alloc free start
 #[no_mangle]
 pub extern "C" fn CContext_dAlloc() -> *mut *mut CContext {
-    pointer_alloc()
+    d_ptr_alloc()
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn CContext_dFree(dPtr: *mut *mut CContext) {
-    pointer_free(dPtr)
-}
-
-
-#[no_mangle]
-pub unsafe extern "C" fn CStr_free(cs: *mut c_char) {
-    let mut t = cs;//由于 free_c_char 会把参数的值修改为空，所以这里要定义一个临时变量，
-    free_c_char(&mut t);
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn CStr_dFree(dcs: *mut *mut c_char) {
-    if !(*dcs).is_null() {
-        CStr_free(*dcs);
-        *dcs = null_mut();
-    }
-    pointer_free(dcs);
+    let mut dcs = dcs;
+    d_str_free(&mut dcs);
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn CStr_dAlloc() -> *mut *mut c_char {
-    pointer_alloc()
+    return d_ptr_alloc();
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn CError_free(error: *mut CError) {
-    if !error.is_null() {
-        Box::from_raw(error);
-    }
+    let mut error = error;
+    error.free();
 }
 
 #[no_mangle]
-pub extern "C" fn CWallet_alloc() -> *mut CWallet {
-    Box::into_raw(Box::new(CWallet::default()))
+pub extern "C" fn CWallet_dAlloc() -> *mut *mut CWallet {
+    d_ptr_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CWallet_free(ptr: *mut CWallet) {
-    Box::from_raw(ptr);
+pub unsafe extern "C" fn CWallet_dFree(dPtr: *mut *mut CWallet) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
 }
 
 #[no_mangle]
 pub extern "C" fn CArrayCWallet_dAlloc() -> *mut *mut CArray<CWallet> {
-    pointer_alloc()
+    d_ptr_alloc()
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn CArrayCWallet_dFree(dPtr: *mut *mut CArray<CWallet>) {
-    pointer_free(dPtr)
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
 }
 
 // alloc free end
