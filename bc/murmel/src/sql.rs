@@ -1,5 +1,5 @@
 pub fn create_chain_sql() -> &'static str {
-    "CREATE TABLE IF NOT EXISTS block_header(id INTEGER PRIMARY KEY AUTOINCREMENT,block_header TEXT,scanned TEXT,timestamp TEXT);"
+    "CREATE TABLE IF NOT EXISTS block_header(id INTEGER PRIMARY KEY AUTOINCREMENT,header TEXT,scanned TEXT,timestamp TEXT);"
 }
 
 pub fn create_progress_sql() -> &'static str {

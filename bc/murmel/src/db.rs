@@ -12,6 +12,8 @@ use once_cell::sync::OnceCell;
 use crate::config::BTC_DETAIL_PATH;
 use rbatis::rbatis::Rbatis;
 use std::ops::Add;
+use crate::sql::create_chain_sql;
+use async_std::task::block_on;
 
 const NEWEST_KEY: &str = "NEWEST_KEY";
 
@@ -261,17 +263,39 @@ impl ClientSqlite {
     }
 }
 
-pub struct ChainSqlite {
-    connection: Rbatis,
+pub struct ChainSqlite<'a> {
+    rb: Rbatis,
     network: Network,
+    url: String,
 }
 
 impl ChainSqlite {
-    pub fn init_chain_db(network: Network, path: &str) -> Self {
+    pub fn init(network: Network, path: &str) -> Self {
         let rb = Rbatis::new();
         let url = "sqlite://".to_owned().add(path);
         info!("init chain database in {:?}", url);
         let r = rb.link(url.as_str());
+        if r.is_err() {
+            log::error!("{:?}", r.err().unwrap());
+        }
+        Self {
+            rb,
+            network,
+            url,
+        }
+    }
+
+    pub fn create_chain_db(&self) {
+        let sql = create_chain_sql();
+        let r = block_on(self.rb.exec("create chain db", sql));
+        match r {
+            Ok(a) => {
+                log::info!("{:?}",a);
+            }
+            Err(e) => {
+                log::info!("{:?}",e);
+            }
+        }
     }
 }
 
