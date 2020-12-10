@@ -180,7 +180,7 @@ impl GetData {
             .lock()
             .unwrap()
             .received(peer, 1, ExpectedReply::MerkleBlock);
-        warn!("got a vec of 100 merkleblock");
+        info!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
         info!("got 100 merkleblock {:#?}", merkleblock);
         self.get_data(peer, true)?;

@@ -7,21 +7,22 @@ use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::{BitcoinHash, Network};
 use log::info;
-use sqlite::{State, Value};
 use parking_lot::ReentrantMutex;
 use once_cell::sync::OnceCell;
 use crate::config::BTC_DETAIL_PATH;
+use rbatis::rbatis::Rbatis;
+use std::ops::Add;
 
 const NEWEST_KEY: &str = "NEWEST_KEY";
 
-pub struct SQLite {
+pub struct ClientSqlite {
     connection: sqlite::Connection,
     network: Network,
 }
 
-impl SQLite {
+impl ClientSqlite {
     // create database
-    pub fn create_db(network: Network, path: &str) -> Self {
+    pub fn create_cient_db(network: Network, path: &str) -> Self {
         let mut sqlite = sqlite::open(path).expect("create sqlite error");
         sqlite.set_busy_timeout(3000).unwrap();
         sqlite.execute(
@@ -260,6 +261,20 @@ impl SQLite {
     }
 }
 
+pub struct ChainSqlite {
+    connection: Rbatis,
+    network: Network,
+}
+
+impl ChainSqlite {
+    pub fn init_chain_db(network: Network, path: &str) -> Self {
+        let rb = Rbatis::new();
+        let url = "sqlite://".to_owned().add(path);
+        info!("init chain database in {:?}", url);
+        let r = rb.link(url.as_str());
+    }
+}
+
 pub fn lazy_db(network: Network, path: &str) -> &'static ReentrantMutex<SQLite> {
     static INSTANCE: OnceCell<ReentrantMutex<SQLite>> = OnceCell::new();
     INSTANCE.get_or_init(|| {
@@ -280,43 +295,4 @@ pub fn lazy_db_default() -> &'static ReentrantMutex<SQLite> {
     lazy_db_test()
 }
 
-mod test {
-    use crate::db::NEWEST_KEY;
 
-    #[test]
-    pub fn test_init() {
-        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
-        let (hash, timestamp) = sqlite.init();
-        println!("{},{}", hash, timestamp);
-    }
-
-    #[test]
-    pub fn test_query_newest_header() {
-        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
-        let (hash, timestamp) = sqlite.query_newest_header(NEWEST_KEY);
-        println!("{},{}", hash.unwrap(), timestamp.unwrap());
-    }
-
-    #[test]
-    pub fn test_query_header() {
-        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
-        let headers = sqlite.query_header("1296688602".to_string(), false);
-        for header in headers {
-            println!("{}", header);
-        }
-    }
-
-    #[test]
-    pub fn test_query_scanned_height() {
-        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
-        let height = sqlite.query_scanned_height();
-        println!("{}", height);
-    }
-
-    #[test]
-    pub fn test_query_compressed_pubkey() {
-        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
-        let pubkey = sqlite.query_compressed_pub_key();
-        println!("{}", pubkey.unwrap());
-    }
-}

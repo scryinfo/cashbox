@@ -29,6 +29,8 @@
 #![allow(ellipsis_inclusive_range_patterns)]
 #![allow(deprecated)]
 
+extern crate rbatis_macro_driver;
+
 mod headercache;
 #[cfg(feature = "lightning")]
 mod lightning;
@@ -51,5 +53,7 @@ pub mod ping;
 pub mod timeout;
 pub mod walletlib;
 pub mod config;
+pub mod moudle;
+mod sql;
 
 pub use error::Error;
