@@ -208,7 +208,7 @@ impl EEE {
         };
         let mut func_vec = vec![0u8;func_size+reserve];
         {
-            let temp = &mut func_vec[2..];
+            let temp = &mut func_vec[reserve..];
             temp.copy_from_slice(func_data);
         }
         func_vec

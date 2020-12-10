@@ -153,7 +153,7 @@ public class NativeLibTest {
     public void updateSubChainBasicInfoTest() throws Throwable{
         Map header = new HashMap<String, String>();
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9937"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.2.7:9933"), header);
         NativeLib.Message message = saveSubChainBasicInfo(client,null,true);
         System.out.println(message);
     }
