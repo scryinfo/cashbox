@@ -12,8 +12,9 @@ use once_cell::sync::OnceCell;
 use crate::config::BTC_DETAIL_PATH;
 use rbatis::rbatis::Rbatis;
 use std::ops::Add;
-use crate::sql::create_chain_sql;
+use crate::sql::{create_chain_sql, create_user_address_sql, create_tx_input_sql, create_tx_output_sql, create_local_tx_sql, create_progress_sql};
 use async_std::task::block_on;
+use crate::moudle::chain::MBlockHeader;
 
 const NEWEST_KEY: &str = "NEWEST_KEY";
 
@@ -266,37 +267,149 @@ impl ClientSqlite {
 pub struct ChainSqlite<'a> {
     rb: Rbatis,
     network: Network,
-    url: String,
 }
 
 impl ChainSqlite {
-    pub fn init(network: Network, path: &str) -> Self {
-        let rb = Rbatis::new();
-        let url = "sqlite://".to_owned().add(path);
-        info!("init chain database in {:?}", url);
-        let r = rb.link(url.as_str());
-        if r.is_err() {
-            log::error!("{:?}", r.err().unwrap());
+    pub fn init_chain_db(network: Network, db_file_name: &str) -> Self {
+        let sql = create_chain_sql();
+        let rb = block_on(init_rbatis(db_file_name));
+        let r = block_on(rb.exec("create chain db", sql));
+        match r {
+            Ok(a) => {
+                info!("{:?}", a);
+            }
+            Err(e) => {
+                info!("{:?}", e);
+            }
         }
         Self {
             rb,
             network,
-            url,
         }
     }
 
-    pub fn create_chain_db(&self) {
-        let sql = create_chain_sql();
-        let r = block_on(self.rb.exec("create chain db", sql));
+    pub fn save_header(&self, header: String, timestamp: String) {
+        let block_header = MBlockHeader {
+            id: None,
+            header,
+            scanned: "0".to_string(),
+            timestamp,
+        };
+
+        let r = block_on(self.rb.save("", &block_header));
         match r {
             Ok(a) => {
-                log::info!("{:?}",a);
+                println!("{:?}", a);
             }
             Err(e) => {
-                log::info!("{:?}",e);
+                println!("{:?}", e);
             }
         }
     }
+}
+
+pub struct DetailSqlite {
+    rb: Rbatis,
+    network: Network,
+}
+
+impl DetailSqlite {
+    pub fn init_detail_db(network: Network, db_file_name: &str) -> Self {
+        let rb = block_on(init_rbatis(db_file_name));
+        DetailSqlite::create_progress(&rb);
+        DetailSqlite::create_user_address(&rb);
+        DetailSqlite::create_tx_input(&rb);
+        DetailSqlite::create_tx_output(&rb);
+        DetailSqlite::create_local_tx(&rb);
+        Self {
+            rb,
+            network,
+        }
+    }
+
+    fn create_user_address(rb: &Rbatis) {
+        let sql = create_user_address_sql();
+        let r = block_on(rb.exec("", sql));
+        match r {
+            Ok(a) => {
+                info!("create_user_address {:?}", a);
+            }
+            Err(e) => {
+                info!("create_user_address {:?}", e);
+            }
+        }
+    }
+
+    fn create_tx_input(rb: &Rbatis) {
+        let sql = create_tx_input_sql();
+        let r = block_on(rb.exec("", sql));
+        match r {
+            Ok(a) => {
+                info!("create_tx_input {:?}", a);
+            }
+            Err(e) => {
+                info!("create_tx_input {:?}", e);
+            }
+        }
+    }
+
+    fn create_tx_output(rb: &Rbatis) {
+        let sql = create_tx_output_sql();
+        let r = block_on(rb.exec("", sql));
+        match r {
+            Ok(a) => {
+                info!("create_tx_output {:?}", a);
+            }
+            Err(e) => {
+                info!("create_tx_output {:?}", e);
+            }
+        }
+    }
+
+    fn create_progress(rb: &Rbatis) {
+        let sql = create_progress_sql()_sql();
+        let r = block_on(rb.exec("", sql));
+        match r {
+            Ok(a) => {
+                info!("create_progress {:?}", a);
+            }
+            Err(e) => {
+                info!("create_progress {:?}", e);
+            }
+        }
+    }
+
+    fn create_local_tx(rb: &Rbatis) {
+        let sql = create_local_tx_sql();
+        let r = block_on(rb.exec("", sql));
+        match r {
+            Ok(a) => {
+                info!("create_local_tx {:?}", a);
+            }
+            Err(e) => {
+                info!("create_local_tx {:?}", e);
+            }
+        }
+    }
+
+}
+
+async fn init_rbatis(db_file_name: &str) -> Rbatis {
+    print!("init_rbatis");
+    if std::fs::metadata(db_file_name).is_err() {
+        let file = std::fs::File::create(db_file_name);
+        if file.is_err() {
+            info!("init file {:?}", file.err().unwrap());
+        }
+    }
+    let rb = Rbatis::new();
+    let url = "sqlite://".to_owned().add(db_file_name);
+    info!("file url: {:?}", url);
+    let r = rb.link(url.as_str()).await;
+    if r.is_err() {
+        info!("{:?}", r.err().unwrap());
+    }
+    rb
 }
 
 pub fn lazy_db(network: Network, path: &str) -> &'static ReentrantMutex<SQLite> {
