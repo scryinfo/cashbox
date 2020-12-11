@@ -749,7 +749,8 @@ pub extern "C" fn Java_info_scry_wallet_1manager_NativeLib_decodeAccountInfo(env
     let state_obj = env.alloc_object(wallet_msg_class).expect("create NativeLib$Message instance");
     let encode_info: JniResult<String> = env.get_string(encode_info).map(|value| value.into());
      if let Ok(info) = encode_info {
-     match wallets::decode_account_info(&info) {
+         let eee = wallets::module::EEE {};
+     match eee.decode_account_info(&info) {
            Ok(account_info) => {
                env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode value");
                let account_info_class = env.find_class("info/scry/wallet_manager/NativeLib$AccountInfo").expect("find NativeLib$AccountInfo");

@@ -22,7 +22,6 @@ mod crypto;
 
 pub mod error;
 pub mod node_metadata;
-//pub mod multiaddress;
 
 #[macro_use]
 pub mod extrinsic;
@@ -52,19 +51,28 @@ impl<T> Keccak256<[u8; 32]> for T where T: AsRef<[u8]> {
     }
 }
 
-//
 #[derive(Clone, Debug, Decode)]
 pub enum Token{
     EEE,
     TokenX
 }
 
-
 /// Used to transfer the decoded result of account information, use the default unit here?
 #[derive(Clone, Debug, Default, Decode)]
 pub struct EeeAccountInfo {
     pub nonce: u32,
     pub refcount: u32,
+    pub free: u128,
+    //To avoid java does not support u128 type format, all converted to String format
+    pub reserved: u128,
+    pub misc_frozen: u128,
+    pub fee_frozen: u128,
+}
+
+#[derive(Clone, Debug, Default, Decode)]
+pub struct EeeAccountInfoRefU8 {
+    pub nonce: u32,
+    pub refcount: u8,
     pub free: u128,
     //To avoid java does not support u128 type format, all converted to String format
     pub reserved: u128,
@@ -90,10 +98,30 @@ pub struct TransferDetail {
     pub ext_data: Option<String>,
 }
 
-
-pub fn decode_account_info(info: &str) -> Result<EeeAccountInfo, error::Error> {
+pub fn decode_account_info<T>(info: &str) -> Result<EeeAccountInfo, error::Error> {
     let state_vec = hexstr_to_vec(info)?;
-    EeeAccountInfo::decode(&mut &state_vec.as_slice()[..]).map_err(|err| err.into())
+    let type_name = std::any::type_name::<T>();
+    match type_name {
+        "substratetx::EeeAccountInfoRefU8"=>{
+            EeeAccountInfoRefU8::decode(&mut &state_vec.as_slice()[..]).map(|account|{
+                EeeAccountInfo{
+                    nonce: account.nonce,
+                    refcount: account.refcount as u32,
+                    free: account.free,
+                    reserved: account.reserved,
+                    misc_frozen: account.misc_frozen,
+                    fee_frozen: account.fee_frozen
+                }
+            }).map_err(|err| err.into())
+        },
+        "substratetx::EeeAccountInfo"=>{
+            EeeAccountInfo::decode(&mut &state_vec.as_slice()[..]).map_err(|err| err.into())
+        }
+        _ =>{
+            Err(error::Error::Custom(format!("decode type {} not support!",type_name)))
+        }
+    }
+
 }
 pub fn hexstr_to_vec(hexstr: &str) -> Result<Vec<u8>, error::Error> {
     let hexstr = hexstr
@@ -116,8 +144,8 @@ mod tests {
 
     const TX_VERSION: u32 = 1;
     const RUNTIME_VERSION: u32 = 6;
-    const URL: &'static str = "ws://192.168.2.57:9944";
-    const GENESIS_HASH: &'static str =  "0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973";
+    const URL: &'static str = "ws://127.0.0.1:9955";
+    const GENESIS_HASH: &'static str =  "0x4fa8fc5bbe75fbffe3df5b2dc7a809ae07119ea67e587c15d5b7c8c8ddca3303";//0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973
     const METADATA_REQ: &'static str = r#"{"id":1,"jsonrpc":"2.0","method":"state_getMetadata","params":[]}"#;
 
     pub mod rpc;
@@ -142,6 +170,16 @@ mod tests {
         metadata.print_overview();
         metadata.print_modules_with_calls();
         metadata.print_modules_with_events();
+    }
+    #[test]
+    fn ref_count_key_test(){
+        let metadata_hex = get_request(URL, METADATA_REQ).unwrap();
+        let genesis_byte = hexstr_to_vec(GENESIS_HASH).unwrap();
+        let helper = node_helper::ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15));
+        assert!(helper.is_ok());
+        let helper = helper.unwrap();
+        let storage_key = helper.get_storage_value_key("System","UpgradedToU32RefCount");
+        println!("{:?}", storage_key);
     }
 
     #[test]

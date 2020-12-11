@@ -175,7 +175,7 @@ public class NativeLibTest {
     @Test
     public void eeeAccountInfoKeyTest() {
         // NativeLib.Message msg = NativeLib.eeeAccountInfoKey("5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV");
-        NativeLib.Message msg = NativeLib.eeeStorageKey("System","Account","5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX");
+        NativeLib.Message msg = NativeLib.eeeStorageKey("System","Account","5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
         System.out.println(msg);
         String account_1 = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
         NativeLib.Message key2 = NativeLib.eeeStorageKey("TokenX","Balances",account_1);
@@ -184,7 +184,7 @@ public class NativeLibTest {
 
     @Test
     public void decodeAccountInfoTest() {
-        NativeLib.Message msg = NativeLib.decodeAccountInfo("0x0400000000000000c3898cd73c8ac6020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+        NativeLib.Message msg = NativeLib.decodeAccountInfo("0x06000000000000001d60416e9fcdf580960a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
         System.out.println(msg);
     }
 

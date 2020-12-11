@@ -11,7 +11,6 @@ pub mod wallet_db;
 pub use error::WalletError;
 pub use ethtx::{RawTransaction, convert_token, address_legal as eth_address_legal};
 pub use wallets::Wallets;
-pub use substratetx::decode_account_info;
 pub type WalletResult<T> = std::result::Result<T, WalletError>;
 
 const DEFAULT_SS58_VERSION:u8 = 42;

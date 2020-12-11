@@ -1,7 +1,7 @@
 use super::*;
 use super::model::*;
 
-use substratetx::{Crypto, Token};
+use substratetx::{Crypto, Token, EeeAccountInfo, EeeAccountInfoRefU8};
 use std::collections::HashMap;
 use codec::{Encode, Decode};
 use ethereum_types::{H160, U256, H256};
@@ -261,6 +261,22 @@ impl EEE {
             chain_helper.get_storage_map_key::<substratetx::AccountId, u128>(&module, &storage, account_id)
                 .map(|key|format!("0x{}",key))
                 .map_err(|e| e.into())
+        } else {
+            Err(error::WalletError::NotExist)
+        }
+    }
+    pub fn decode_account_info(&self,encode_info:&str)->WalletResult<EeeAccountInfo> {
+        let instance = wallet_db::DataServiceProvider::instance()?;
+        let chain_infos = instance.get_sub_chain_info(None,0,0)?;
+        if let Some(chain_info) = chain_infos.get(0){
+            let genesis_hash = substratetx::hexstr_to_vec(&chain_info.genesis_hash)?;
+            let chain_helper = substratetx::SubChainHelper::init(&chain_info.metadata, &genesis_hash[..], chain_info.runtime_version as u32, chain_info.tx_version as u32, None)?;
+           match chain_helper.get_storage_value_key("System","UpgradedToU32RefCount"){
+               Ok(_)=>{substratetx::decode_account_info::<EeeAccountInfo>(encode_info).map_err(|error|error.into())}
+               Err(_)=>{
+                   substratetx::decode_account_info::<EeeAccountInfoRefU8>(encode_info).map_err(|error|error.into())
+               }
+           }
         } else {
             Err(error::WalletError::NotExist)
         }

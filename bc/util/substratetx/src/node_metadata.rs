@@ -149,8 +149,8 @@ impl Metadata {
 
     pub fn storage_value_key(
         &self,
-        storage_prefix: &'static str,
-        storage_key_name: &'static str,
+        storage_prefix: & str,
+        storage_key_name: &str,
     ) -> Result<StorageKey, MetadataError> {
         Ok(self
             .module(storage_prefix)?

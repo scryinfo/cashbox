@@ -76,6 +76,10 @@ impl ChainHelper {
         self.metadata.storage_map_key::<K, V>(storage_prefix, storage_key_name, map_key).map(|key| hex::encode(&key.0)).map_err(|err| err.into())
     }
 
+    pub fn get_storage_value_key(&self,  storage_prefix: &str, storage_key_name: &str) -> Result<String, error::Error> {
+        self.metadata.storage_value_key(storage_prefix, storage_key_name).map(|key| hex::encode(&key.0)).map_err(|err| err.into())
+    }
+
     pub fn decode_events(&self, event_str: &str, decoder: Option<EventsDecoder>) -> Result<HashMap<usize, bool>, error::Error> {
         let unhex = hexstr_to_vec(event_str)?;
         let mut tx_result = HashMap::new();
