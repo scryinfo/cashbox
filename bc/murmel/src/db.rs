@@ -15,6 +15,8 @@ use std::ops::Add;
 use crate::sql::{create_chain_sql, create_user_address_sql, create_tx_input_sql, create_tx_output_sql, create_local_tx_sql, create_progress_sql};
 use async_std::task::block_on;
 use crate::moudle::chain::MBlockHeader;
+use rbatis::crud::CRUD;
+use crate::moudle::detail::MProgress;
 
 const NEWEST_KEY: &str = "NEWEST_KEY";
 
@@ -264,7 +266,7 @@ impl ClientSqlite {
     }
 }
 
-pub struct ChainSqlite<'a> {
+pub struct ChainSqlite {
     rb: Rbatis,
     network: Network,
 }
@@ -332,10 +334,10 @@ impl DetailSqlite {
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
-                info!("create_user_address {:?}", a);
+                debug!("create_user_address {:?}", a);
             }
             Err(e) => {
-                info!("create_user_address {:?}", e);
+                debug!("create_user_address {:?}", e);
             }
         }
     }
@@ -345,10 +347,10 @@ impl DetailSqlite {
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
-                info!("create_tx_input {:?}", a);
+                debug!("create_tx_input {:?}", a);
             }
             Err(e) => {
-                info!("create_tx_input {:?}", e);
+                debug!("create_tx_input {:?}", e);
             }
         }
     }
@@ -358,23 +360,24 @@ impl DetailSqlite {
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
-                info!("create_tx_output {:?}", a);
+                debug!("create_tx_output {:?}", a);
             }
             Err(e) => {
-                info!("create_tx_output {:?}", e);
+                debug!("create_tx_output {:?}", e);
             }
         }
     }
 
     fn create_progress(rb: &Rbatis) {
-        let sql = create_progress_sql()_sql();
+        let sql = create_progress_sql();
+        _sql();
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
-                info!("create_progress {:?}", a);
+                debug!("create_progress {:?}", a);
             }
             Err(e) => {
-                info!("create_progress {:?}", e);
+                debug!("create_progress {:?}", e);
             }
         }
     }
@@ -384,18 +387,81 @@ impl DetailSqlite {
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
-                info!("create_local_tx {:?}", a);
+                debug!("create_local_tx {:?}", a);
             }
             Err(e) => {
-                info!("create_local_tx {:?}", e);
+                debug!("create_local_tx {:?}", e);
             }
         }
     }
 
+    fn save_progress(&self, header: String, timestamp: String) {
+        let progress = MProgress {
+            id: None,
+            header,
+            timestamp,
+        };
+        let r = block_on(self.rb.save("", &progress));
+        match r {
+            Ok(a) => {
+                debug!("save_progress {:?}", a);
+            }
+            Err(e) => {
+                debug!("save_progress {:?}", e);
+            }
+        }
+    }
+
+    fn fetch_progress(&self) -> Option<MProgress> {
+        let r: Result<MProgress, _> = block_on(self.rb.fetch_by_id("", &1u64));
+        match r {
+            Ok(progress) => Some(progress),
+            Err(_) => None
+        }
+    }
+
+    pub fn update_progress(&self, header: String, timestamp: String) {
+        let progress = MProgress {
+            id: None,
+            header,
+            timestamp,
+        };
+        let w = self.rb.new_wrapper().eq("id", 1).check().unwrap();
+        let r = block_on(self.rb.update_by_wrapper("", &progress, &w));
+        match r {
+            Ok(a) => {
+                debug!("update_progress {:?}", a);
+            }
+            Err(e) => {
+                debug!("update_progress {:?}", e);
+            }
+        }
+    }
+
+    pub fn progress(&self) -> MProgress {
+        let progress = self.fetch_progress();
+        match progress {
+            None => {
+                let genesis = genesis_block(self.network).header;
+                let header = genesis.bitcoin_hash().to_hex();
+                let timestamp = genesis.time.to_string();
+                info!("scanned newest block from genesis {:?}", &genesis);
+                self.save_progress(header.clone(), timestamp.clone());
+                return MProgress {
+                    id: None,
+                    header,
+                    timestamp,
+                };
+            }
+            Some(progress) => {
+                progress
+            }
+        }
+    }
 }
 
 async fn init_rbatis(db_file_name: &str) -> Rbatis {
-    print!("init_rbatis");
+    info!("init_rbatis");
     if std::fs::metadata(db_file_name).is_err() {
         let file = std::fs::File::create(db_file_name);
         if file.is_err() {

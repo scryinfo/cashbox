@@ -6,7 +6,6 @@ use std::sync::{Arc, Mutex};
 use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
 use crate::hooks::ApiMessage;
 use once_cell::sync::Lazy;
-use crate::db::SQLite;
 use bitcoin::{Network, Address};
 use bitcoin_wallet::mnemonic::Mnemonic;
 use bitcoin_wallet::account::{MasterAccount, Unlocker, AccountAddressType, Account};

@@ -87,7 +87,6 @@ version = "=0.3.2"
 [dependencies.jni]
 version = "0.17.0"
 
-# for global sqlite reference
 [dependencies.once_cell]
 version = "1.4.1"
 
@@ -104,7 +103,7 @@ chrono = { version = "0.4", features = ["serde"] }
 bigdecimal = "0.2"
 rbatis-core = { version = "1.8.36", features = ["async-io-sqlite"] }
 rbatis = { version = "1.8.36", features=["async-io-sqlite"] }
-rbatis-macro-driver = { version = "1.8.36" }
+rbatis-macro-driver = { version = "1.8.36", features = ["no_print"]}
 async-std = { version = "1.7" }
 # rbatis end
 

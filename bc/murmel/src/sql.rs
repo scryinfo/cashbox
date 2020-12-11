@@ -3,7 +3,7 @@ pub fn create_chain_sql() -> &'static str {
 }
 
 pub fn create_progress_sql() -> &'static str {
-    "CREATE TABLE IF NOT EXISTS progress(id INTEGER PRIMARY KEY AUTOINCREMENT,key TEXT,header TEXT,timestamp TEXT);"
+    "CREATE TABLE IF NOT EXISTS progress(id INTEGER PRIMARY KEY AUTOINCREMENT,header TEXT,timestamp TEXT);"
 }
 
 pub fn create_user_address_sql() -> &'static str {
