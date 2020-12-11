@@ -7,13 +7,13 @@ use std::ptr::null_mut;
 use async_std::task::block_on;
 
 use wallets::WalletsCollection;
-use wallets_types::{Error, UnInitParameters};
+use wallets_types::{Context, Error, UnInitParameters};
 
 use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, d_ptr_free, d_str_free};
 use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters, CUnInitParameters};
 use crate::types::{CError, CWallet};
 
-/// dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存
+/// dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, ctx: *mut *mut CContext) -> *const CError {
     log::debug!("enter Wallets_init");
@@ -32,7 +32,9 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, ctx: *mut
     let mut ins = lock.borrow_mut();
 
     let err = {
-        if let Some(ws) = ins.new() {
+        let mut new_ctx = Context::default();
+        new_ctx.context_note = parameter.context_note.clone();
+        if let Some(ws) = ins.new(new_ctx) {
             if let Err(e) = block_on(ws.init(&mut parameter)) {
                 e
             } else {
@@ -69,6 +71,76 @@ pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext, parameter: *mut CUnI
         } else {
             Error::NONE().append_message(": can not find the context")
         }
+    };
+    log::debug!("{}",err);
+    CError::to_c_ptr(&err)
+}
+
+/// 返回所有的Context,如果没有返回空，且Error::SUCCESS()
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_Contexts(contexts: *mut *mut CArray<CContext>) -> *const CError {
+    log::debug!("enter Wallets_Contexts");
+    if contexts.is_null() {
+        let err = Error::PARAMETER().append_message(" : contexts is null");
+        log::info!("{}",err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = WalletsCollection::collection().lock();
+    let ins = lock.borrow();
+    let err = {
+        if let Some(cxts) = ins.contexts() {
+            let cxts = cxts.iter().map(|c| CContext::to_c(&c)).rev().collect();
+            *contexts = Box::into_raw(Box::new(CArray::new(cxts)));
+        } else {
+            *contexts = null_mut();
+        }
+        Error::SUCCESS()
+    };
+    log::debug!("{}",err);
+    CError::to_c_ptr(&err)
+}
+
+/// 返回最后的Context,如果没有返回空，且Error::SUCCESS()
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_lastContext(context: *mut *mut CContext) -> *const CError {
+    log::debug!("enter Wallets_lastContext");
+    if context.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx is null");
+        log::info!("{}",err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = WalletsCollection::collection().lock();
+    let ins = lock.borrow();
+    let err = {
+        if let Some(ctx) = ins.last_context() {
+            *context = CContext::to_c_ptr(&ctx);
+        } else {
+            *context = null_mut();
+        }
+        Error::SUCCESS()
+    };
+    log::debug!("{}",err);
+    CError::to_c_ptr(&err)
+}
+
+/// 返回最后的Context,如果没有返回空，且Error::SUCCESS()
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_firstContext(context: *mut *mut CContext, parameter: *mut CUnInitParameters) -> *const CError {
+    log::debug!("enter Wallets_firstContext");
+    if context.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx is null");
+        log::info!("{}",err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = WalletsCollection::collection().lock();
+    let ins = lock.borrow();
+    let err = {
+        if let Some(ctx) = ins.first_context() {
+            *context = CContext::to_c_ptr(&ctx);
+        } else {
+            *context = null_mut();
+        }
+        Error::SUCCESS()
     };
     log::debug!("{}",err);
     CError::to_c_ptr(&err)
@@ -195,7 +267,7 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
                 e
             } else {
                 let cws = all.iter().map(|rw| CWallet::to_c(&rw)).rev().collect();
-                *arrayWallet = Box::into_raw(Box::new(CArray::<CWallet>::new(cws)));
+                *arrayWallet = Box::into_raw(Box::new(CArray::new(cws)));
                 Error::SUCCESS()
             }
         } else {
@@ -344,6 +416,17 @@ pub extern "C" fn CContext_dAlloc() -> *mut *mut CContext {
 
 #[no_mangle]
 pub unsafe extern "C" fn CContext_dFree(dPtr: *mut *mut CContext) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
+
+#[no_mangle]
+pub extern "C" fn CArrayCContext_dAlloc() -> *mut *mut CArray<CContext> {
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CArrayCContext_dFree(dPtr: *mut *mut CArray<CContext>) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
 }

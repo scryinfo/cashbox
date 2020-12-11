@@ -48,6 +48,7 @@ impl Wallets {
     }
 
     pub async fn init(&mut self, parameters: &InitParameters) -> Result<(), Error> {
+        self.ctx.context_note = parameters.context_note.clone();
         self.db.init(&parameters.db_name).await?;
         //todo
         Ok(())
@@ -70,6 +71,8 @@ impl Wallets {
 #[derive(Default)]
 pub struct WalletsCollection {
     w_map: HashMap<String, Wallets>,
+    last_context: Option<Context>,
+    first_context: Option<Context>,
 }
 
 impl WalletsCollection {
@@ -91,11 +94,29 @@ impl WalletsCollection {
         self.w_map.remove(key)
     }
 
-    pub fn new(&mut self) -> Option<&mut Wallets> {
-        let ws = Wallets::default();
+    pub fn new(&mut self, ctx: Context) -> Option<&mut Wallets> {
+        let mut ws = Wallets::default();
+        ws.ctx = ctx;
+        if self.first_context.is_none() {
+            self.first_context = Some(ws.ctx.clone());
+        }
+        self.last_context = Some(ws.ctx.clone());
         let id = ws.ctx.id.clone();
         self.w_map.insert(id.clone(), ws);
         self.w_map.get_mut(&id)
+    }
+
+    pub fn contexts(&self) -> Option<Vec<Context>> {
+        let cts = self.w_map.values().into_iter().map(|w| w.ctx.clone()).collect();
+        Some(cts)
+    }
+
+    pub fn first_context(&self) -> Option<Context> {
+        self.first_context.clone()
+    }
+
+    pub fn last_context(&self) -> Option<Context> {
+        self.last_context.clone()
     }
 }
 

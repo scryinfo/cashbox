@@ -12,6 +12,7 @@ use crate::kits::{CMark, CR, CStruct, to_c_char, to_str};
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CInitParameters {
     pub dbName: *mut CDbName,
+    pub contextNote: *mut c_char,
 }
 
 #[repr(C)]
@@ -40,7 +41,9 @@ pub struct CCreateWalletParameters {
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CContext {
-    pub id: *mut c_char, //上下文的唯一标识
+    pub id: *mut c_char,
+    //上下文的唯一标识
+    pub contextNote: *mut c_char,
 }
 
 impl CContext {

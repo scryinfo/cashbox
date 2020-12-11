@@ -274,9 +274,7 @@ mod tests {
             {
                 let mut da2 = CArray::<Data>::default();
                 da2.set(vec![Data {}, Data {}]);
-                unsafe {
-                    pptr = &mut da2.ptr as *mut _ as *mut *mut Data;
-                }
+                pptr = &mut da2.ptr as *mut _ as *mut *mut Data;
             }
             unsafe {
                 //pptr 使用已释放的内存，是非法操作，但是由于刚释放，正常情况下那个内存不会被再次分配，所以可以拿来检查
@@ -310,8 +308,8 @@ mod tests {
 
         let mut dptr: *mut *mut Data = d_ptr_alloc();
         unsafe { *dptr = Box::into_raw(Box::new(Data { name: "name".to_owned() })); }
-        let dpstr3 = dptr.clone();
-        let dpstr2 = (unsafe { *dptr }).clone();
+        // let dpstr3 = dptr.clone();
+        // let dpstr2 = (unsafe { *dptr }).clone();
         d_ptr_free(&mut dptr);
         assert_eq!(null_mut(), dptr);
         // unsafe {

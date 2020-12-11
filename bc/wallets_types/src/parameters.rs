@@ -1,6 +1,7 @@
 #[derive(Debug, Default, Clone)]
 pub struct InitParameters {
     pub db_name: DbName,
+    pub context_note: String,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -23,14 +24,17 @@ pub struct CreateWalletParameters {
     pub mnemonic: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct Context {
     pub id: String,
+    pub context_note: String,
 }
 
 impl Default for Context {
     fn default() -> Self {
         Self {
             id: uuid::Uuid::new_v4().to_string(),
+            context_note: "".to_owned(),
         }
     }
 }
