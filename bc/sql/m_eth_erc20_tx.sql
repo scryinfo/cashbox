@@ -1,5 +1,5 @@
--- EthErc20Tx
-CREATE TABLE IF NOT EXISTS eth_erc20_tx (  
+-- MEthErc20Tx
+CREATE TABLE IF NOT EXISTS m_eth_erc20_tx (  
     eth_chain_tx_id TEXT NOT NULL,
     contract_address TEXT NOT NULL,
     to_address TEXT NOT NULL,

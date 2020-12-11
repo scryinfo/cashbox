@@ -36,6 +36,7 @@ pub struct CCreateWalletParameters {
     pub name: *mut c_char,
     pub password: *mut c_char,
     pub mnemonic: *mut c_char,
+    pub walletType: *mut c_char,
 }
 
 #[repr(C)]

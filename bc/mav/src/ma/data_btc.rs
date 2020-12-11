@@ -33,6 +33,12 @@ pub struct MBtcChainToken {
     pub decimal: i32,
 }
 
+impl MBtcChainToken {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_btc_chain_token.sql")
+    }
+}
+
 #[db_append_shared(CRUDEnable)]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTx {
@@ -48,6 +54,12 @@ pub struct MBtcChainTx {
     #[serde(default)]
     pub op_return: Option<String>,
     // ...
+}
+
+impl MBtcChainTx {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_btc_chain_tx.sql")
+    }
 }
 
 #[db_append_shared]
@@ -68,6 +80,12 @@ pub struct MBtcInputTx {
     // ...
 }
 
+impl MBtcInputTx {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_btc_input_tx.sql")
+    }
+}
+
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcOutputTx {
@@ -84,31 +102,26 @@ pub struct MBtcOutputTx {
     // ...
 }
 
+impl MBtcOutputTx {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_btc_output_tx.sql")
+    }
+}
 //btc end
 
 
 #[cfg(test)]
 mod tests {
     use async_std::task::block_on;
+    use once_cell::sync::Lazy;
+    use rbatis::crud::CRUDEnable;
     use rbatis::rbatis::Rbatis;
 
     use crate::ma::{db_dest, MBtcChainToken};
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
 
-    const TABLE_BTC_CHAIN_TOKEN: &str = "
--- BtcChainToken
-CREATE TABLE IF NOT EXISTS btc_chain_token (
-    next_id TEXT NOT NULL,
-    chain_token_shared_id TEXT DEFAULT NULL,
-    wallet_id TEXT NOT NULL,
-    chain_type TEXT NOT NULL,
-    show BOOLEAN NOT NULL,
-    decimal INTEGER NOT NULL,
-    id TEXT PRIMARY KEY,
-    create_time INTEGER NOT NULL,
-    update_time INTEGER NOT NULL
- );";
-    const TABLE_NAME_BTC_CHAIN_TOKEN: &str = "btc_chain_token";
+    const TABLE_BTC_CHAIN_TOKEN: &str = MBtcChainToken::create_table_script();
+    static TABLE_NAME_BTC_CHAIN_TOKEN: Lazy<String> = Lazy::new(|| MBtcChainToken::table_name());
 
     #[test]
     #[allow(non_snake_case)]
@@ -166,7 +179,7 @@ CREATE TABLE IF NOT EXISTS btc_chain_token (
 
     async fn init_memory() -> Rbatis {
         let rb = db_dest::init_memory(None).await;
-        let _ = rb.exec("", format!("drop table {}", TABLE_NAME_BTC_CHAIN_TOKEN).as_str()).await;
+        let _ = rb.exec("", format!("drop table {}", TABLE_NAME_BTC_CHAIN_TOKEN.as_str()).as_str()).await;
         let r = rb.exec("", TABLE_BTC_CHAIN_TOKEN).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         rb

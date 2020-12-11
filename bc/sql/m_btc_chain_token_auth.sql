@@ -1,5 +1,5 @@
--- BtcChainTokenAuth
-CREATE TABLE IF NOT EXISTS btc_chain_token_auth (  
+-- MBtcChainTokenAuth
+CREATE TABLE IF NOT EXISTS m_btc_chain_token_auth (  
     chain_token_shared_id TEXT NOT NULL,
     position INTEGER NOT NULL,
     id TEXT PRIMARY KEY,

@@ -12,6 +12,7 @@ mod chain_eee;
 mod chain_btc;
 
 mod kits;
+mod wallets_c_test;
 
 
 #[cfg(test)]

@@ -22,15 +22,27 @@ typedef struct CDbName {
 
 typedef struct CInitParameters {
     CDbName *dbName;
+    char *contextNote;
 } CInitParameters;
 
 typedef struct CContext {
     char *id;
+    char *contextNote;
 } CContext;
 
 typedef struct CUnInitParameters {
 
 } CUnInitParameters;
+
+/**
+ * c的数组需要定义两个字段，所定义一个结构体进行统一管理
+ * 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
+ */
+typedef struct CArrayCContext {
+    CContext *ptr;
+    CU64 len;
+    CU64 cap;
+} CArrayCContext;
 
 typedef struct CAddress {
     char *id;
@@ -151,20 +163,34 @@ typedef struct CCreateWalletParameters {
     char *name;
     char *password;
     char *mnemonic;
+    char *walletType;
 } CCreateWalletParameters;
 
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
-void CChar_free(char *cs);
-
 /**
- * dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存
+ * dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它
  */
-const CError *Wallets_init(CInitParameters *parameter, CContext **ctx);
+const CError *Wallets_init(CInitParameters *parameter, CContext **context);
 
 const CError *Wallets_uninit(CContext *ctx, CUnInitParameters *parameter);
+
+/**
+ * 返回所有的Context,如果没有返回空，且Error::SUCCESS()
+ */
+const CError *Wallets_Contexts(CArrayCContext **contexts);
+
+/**
+ * 返回最后的Context,如果没有返回空，且Error::SUCCESS()
+ */
+const CError *Wallets_lastContext(CContext **context);
+
+/**
+ * 返回最后的Context,如果没有返回空，且Error::SUCCESS()
+ */
+const CError *Wallets_firstContext(CContext **context);
 
 const CError *Wallets_lockRead(CContext *ctx);
 
@@ -178,7 +204,7 @@ const CError *Wallets_all(CContext *ctx, CArrayCWallet **arrayWallet);
 
 const CError *Wallets_generateMnemonic(char **mnemonic);
 
-const CError *Wallets_createWallet(CContext *ctx, CCreateWalletParameters *parameters, char **walletId);
+const CError *Wallets_createWallet(CContext *ctx, CCreateWalletParameters *parameters, CWallet **wallet);
 
 const CError *Wallets_deleteWallet(CContext *ctx, char *walletId);
 
@@ -195,7 +221,9 @@ CContext **CContext_dAlloc(void);
 
 void CContext_dFree(CContext **dPtr);
 
-void CStr_free(char *cs);
+CArrayCContext **CArrayCContext_dAlloc(void);
+
+void CArrayCContext_dFree(CArrayCContext **dPtr);
 
 void CStr_dFree(char **dcs);
 
@@ -203,9 +231,9 @@ char **CStr_dAlloc(void);
 
 void CError_free(CError *error);
 
-CWallet *CWallet_alloc(void);
+CWallet **CWallet_dAlloc(void);
 
-void CWallet_free(CWallet *ptr);
+void CWallet_dFree(CWallet **dPtr);
 
 CArrayCWallet **CArrayCWallet_dAlloc(void);
 

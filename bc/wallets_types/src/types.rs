@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use rbatis::rbatis::Rbatis;
 
 use mav::ma::{Dao, MAddress, MChainShared, MTokenShared, MWallet};
+use mav::WalletType;
 
 use crate::{BtcChain, EeeChain, EthChain, WalletError};
 use crate::deref_type;
@@ -32,6 +33,25 @@ impl Wallet {
         }
         Ok(ws)
     }
+
+    pub async fn mnemonic_digest(rb: &Rbatis, digest: &str) -> Result<Vec<MWallet>, WalletError> {
+        let mut wrapper = rb.new_wrapper();
+        wrapper.eq(MWallet::mnemonic_digest, digest);
+        let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
+        Ok(ms)
+    }
+
+    pub async fn wallet_type_mnemonic_digest(rb: &Rbatis, digest: &str, wallet_type: &WalletType) -> Result<Vec<MWallet>, WalletError> {
+        let mut wrapper = rb.new_wrapper();
+        wrapper.eq(MWallet::mnemonic_digest, digest.to_owned());
+        wrapper.eq(MWallet::wallet_type, wallet_type.to_string());
+        let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
+        Ok(ms)
+    }
+
+    // pub async fn save(&mut self, rb: &Rbatis,tx_id: &str) ->Result<(), WalletError> {
+    //     self.m.save(rb, tx_id).await?;
+    // }
 }
 
 #[async_trait]

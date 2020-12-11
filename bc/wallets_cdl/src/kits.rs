@@ -221,10 +221,8 @@ pub fn d_ptr_free<T: CMark>(d_ptr: &mut *mut *mut T) {
 pub fn d_str_free(d_ptr: &mut *mut *mut c_char) {
     unsafe {
         if !d_ptr.is_null() {
-            if !(*d_ptr).is_null() {
-                (**d_ptr).free();
-            }
-            Box::from_raw(d_ptr);
+            (**d_ptr).free();
+            Box::from_raw(*d_ptr);
             *d_ptr = null_mut();
             // d_ptr.free();
         }

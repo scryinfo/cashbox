@@ -1,7 +1,7 @@
--- EeeChainToken
-CREATE TABLE IF NOT EXISTS eee_chain_token (  
+-- MEeeChainToken
+CREATE TABLE IF NOT EXISTS m_eee_chain_token (  
     next_id TEXT NOT NULL,
-    chain_token_shared_id TEXT DEFAULT NULL,
+    chain_token_shared_id TEXT NOT NULL,
     wallet_id TEXT NOT NULL,
     chain_type TEXT NOT NULL,
     show BOOLEAN NOT NULL,

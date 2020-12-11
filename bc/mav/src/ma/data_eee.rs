@@ -33,6 +33,12 @@ pub struct MEeeChainToken {
     pub decimal: i32,
 }
 
+impl MEeeChainToken {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eee_chain_token.sql")
+    }
+}
+
 /// eee chain的交易
 #[db_append_shared(CRUDEnable)]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
@@ -56,6 +62,12 @@ pub struct MEeeChainTx {
     /// 扩展数据
     #[serde(default)]
     pub extension: String,
+}
+
+impl MEeeChainTx {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eee_chain_tx.sql")
+    }
 }
 
 #[db_append_shared(CRUDEnable)]
@@ -82,38 +94,27 @@ pub struct MEeeTokenxTx {
     pub extension: String,
 }
 
+impl MEeeTokenxTx {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eee_tokenx_tx.sql")
+    }
+}
 //eee end
 
 
 #[cfg(test)]
 mod tests {
     use async_std::task::block_on;
+    use once_cell::sync::Lazy;
+    use rbatis::crud::CRUDEnable;
     use rbatis::rbatis::Rbatis;
 
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
     use crate::ma::data_eee::MEeeChainTx;
     use crate::ma::db_dest;
 
-    const TABLE: &str = "
--- EeeChainTx
-CREATE TABLE IF NOT EXISTS eee_chain_tx (
-    -- TxShared start
-    tx_hash TEXT NOT NULL,
-    block_hash TEXT NOT NULL,
-    block_number TEXT NOT NULL,
-    tx_bytes TEXT NOT NULL,
-    -- TxShared end
-
-    from_address TEXT NOT NULL,
-    to_address TEXT NOT NULL,
-    value TEXT NOT NULL,
-    status TEXT NOT NULL,
-    extension TEXT NOT NULL,
-    id TEXT PRIMARY KEY,
-    create_time INTEGER NOT NULL,
-    update_time INTEGER NOT NULL
- );";
-    const TABLE_NAME: &str = "eee_chain_tx";
+    const TABLE: &str = MEeeChainTx::create_table_script();
+    static TABLE_NAME: Lazy<String> = Lazy::new(|| MEeeChainTx::table_name());
 
     #[test]
     #[allow(non_snake_case)]
@@ -189,7 +190,7 @@ CREATE TABLE IF NOT EXISTS eee_chain_tx (
 
     async fn init_memory() -> Rbatis {
         let rb = db_dest::init_memory(None).await;
-        let _ = rb.exec("", format!("drop table {}", TABLE_NAME).as_str()).await;
+        let _ = rb.exec("", format!("drop table {}", TABLE_NAME.as_str()).as_str()).await;
         let r = rb.exec("", TABLE).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         rb

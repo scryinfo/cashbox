@@ -2,30 +2,26 @@
 #![allow(non_upper_case_globals)]
 
 use std::os::raw::c_char;
-use std::ptr::null_mut;
 
 use async_std::task::block_on;
 
-use wallets::WalletsCollection;
+use wallets::{Wallets, WalletsCollection};
 use wallets_types::{Context, Error, UnInitParameters};
 
-use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, d_ptr_free, d_str_free};
+use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, d_ptr_free, d_str_free, to_c_char};
 use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters, CUnInitParameters};
 use crate::types::{CError, CWallet};
 
 /// dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, ctx: *mut *mut CContext) -> *const CError {
+pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, context: *mut *mut CContext) -> *const CError {
     log::debug!("enter Wallets_init");
-    if ctx.is_null() || parameter.is_null() {
+    if context.is_null() || parameter.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or parameter is null");
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-    if !(*ctx).is_null() {
-        (*ctx).free();
-        *ctx = null_mut();
-    }
+    (*context).free();
 
     let mut parameter = CInitParameters::ptr_rust(parameter);
     let lock = WalletsCollection::collection().lock();
@@ -38,7 +34,7 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, ctx: *mut
             if let Err(e) = block_on(ws.init(&mut parameter)) {
                 e
             } else {
-                *ctx = CContext::to_c_ptr(&ws.ctx);
+                *context = CContext::to_c_ptr(&ws.ctx);
                 Error::SUCCESS()
             }
         } else {
@@ -57,13 +53,13 @@ pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext, parameter: *mut CUnI
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-    let mut rp = UnInitParameters {};
+    let rp = UnInitParameters {};
 
     let lock = WalletsCollection::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
         if let Some(mut ws) = ins.remove(&CContext::get_id(ctx)) {
-            if let Err(e) = block_on(ws.uninit(&mut rp)) {
+            if let Err(e) = block_on(ws.uninit(&rp)) {
                 e
             } else {
                 Error::SUCCESS()
@@ -85,14 +81,13 @@ pub unsafe extern "C" fn Wallets_Contexts(contexts: *mut *mut CArray<CContext>) 
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
+    (*contexts).free();
     let lock = WalletsCollection::collection().lock();
     let ins = lock.borrow();
     let err = {
-        if let Some(cxts) = ins.contexts() {
-            let cxts = cxts.iter().map(|c| CContext::to_c(&c)).rev().collect();
-            *contexts = Box::into_raw(Box::new(CArray::new(cxts)));
-        } else {
-            *contexts = null_mut();
+        if let Some(ctxs) = ins.contexts() {
+            let ctxs = ctxs.iter().map(|c| CContext::to_c(&c)).rev().collect();
+            *contexts = Box::into_raw(Box::new(CArray::new(ctxs)));
         }
         Error::SUCCESS()
     };
@@ -109,13 +104,12 @@ pub unsafe extern "C" fn Wallets_lastContext(context: *mut *mut CContext) -> *co
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
+    (*context).free();
     let lock = WalletsCollection::collection().lock();
     let ins = lock.borrow();
     let err = {
         if let Some(ctx) = ins.last_context() {
             *context = CContext::to_c_ptr(&ctx);
-        } else {
-            *context = null_mut();
         }
         Error::SUCCESS()
     };
@@ -125,20 +119,19 @@ pub unsafe extern "C" fn Wallets_lastContext(context: *mut *mut CContext) -> *co
 
 /// 返回最后的Context,如果没有返回空，且Error::SUCCESS()
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_firstContext(context: *mut *mut CContext, parameter: *mut CUnInitParameters) -> *const CError {
+pub unsafe extern "C" fn Wallets_firstContext(context: *mut *mut CContext) -> *const CError {
     log::debug!("enter Wallets_firstContext");
     if context.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx is null");
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
+    (*context).free();
     let lock = WalletsCollection::collection().lock();
     let ins = lock.borrow();
     let err = {
         if let Some(ctx) = ins.first_context() {
             *context = CContext::to_c_ptr(&ctx);
-        } else {
-            *context = null_mut();
         }
         Error::SUCCESS()
     };
@@ -252,11 +245,7 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-
-    if !(*arrayWallet).is_null() { //如果数组的内存已经分配，释放它
-        (*arrayWallet).free();
-        *arrayWallet = null_mut();
-    }
+    (*arrayWallet).free();//如果数组的内存已经分配，释放它
 
     let lock = WalletsCollection::collection().lock();
     let mut ins = lock.borrow_mut();
@@ -275,7 +264,7 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
         }
     };
 
-    log::info!("{}",err);
+    log::debug!("{}",err);
     CError::to_c_ptr(&err)
 }
 
@@ -287,14 +276,11 @@ pub unsafe extern "C" fn Wallets_generateMnemonic(mnemonic: *mut *mut c_char) ->
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-
-    if !(*mnemonic).is_null() { //如果内存已存在，释放它
-        (*mnemonic).free();
-        *mnemonic = null_mut();
-    }
+    (*mnemonic).free();//如果内存已存在，释放它
 
     let err = {
-        //todo
+        let mn = Wallets::generate_mnemonic();
+        *mnemonic = to_c_char(&mn);
         Error::SUCCESS()
     };
 
@@ -303,22 +289,30 @@ pub unsafe extern "C" fn Wallets_generateMnemonic(mnemonic: *mut *mut c_char) ->
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_createWallet(ctx: *mut CContext, parameters: *mut CCreateWalletParameters, walletId: *mut *mut c_char) -> *const CError {
+pub unsafe extern "C" fn Wallets_createWallet(ctx: *mut CContext, parameters: *mut CCreateWalletParameters, wallet: *mut *mut CWallet) -> *const CError {
     log::debug!("enter Wallets_createWallet");
-    if ctx.is_null() || parameters.is_null() || walletId.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx or parameters or walletId is null");
+    if ctx.is_null() || parameters.is_null() || wallet.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or parameters or wallet is null");
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
+    (*wallet).free();//如果内存已存在，释放它
 
-    if !(*walletId).is_null() { //如果内存已存在，释放它
-        (*walletId).free();
-        *walletId = null_mut();
-    }
-
+    let lock = WalletsCollection::collection().lock();
+    let mut ins = lock.borrow_mut();
     let err = {
-        //todo
-        Error::SUCCESS()
+        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+            let parameters = CCreateWalletParameters::ptr_rust(parameters);
+            match async_std::task::block_on(ws.create_wallet(parameters)) {
+                Err(e) => Error::from(e),
+                Ok(w) => {
+                    *wallet = CWallet::to_c_ptr(&w);
+                    Error::SUCCESS()
+                }
+            }
+        } else {
+            Error::NONE().append_message(": can not find the context")
+        }
     };
 
     log::debug!("{}",err);
@@ -370,11 +364,7 @@ pub unsafe extern "C" fn Wallets_findById(ctx: *mut CContext, walletId: *mut c_c
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-
-    if !(*wallet).is_null() { //如果内存已存在，释放它
-        (*wallet).free();
-        *wallet = null_mut();
-    }
+    (*wallet).free();//如果内存已存在，释放它
 
     let err = {
         //todo
@@ -393,11 +383,7 @@ pub unsafe extern "C" fn Wallets_findByName(ctx: *mut CContext, name: *mut c_cha
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-
-    if !(*arrayWallet).is_null() { //如果内存已存在，释放它
-        (*arrayWallet).free();
-        *arrayWallet = null_mut();
-    }
+    (*arrayWallet).free();//如果内存已存在，释放它
 
     let err = {
         //todo

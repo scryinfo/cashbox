@@ -1,5 +1,5 @@
--- EeeTokenxTx
-CREATE TABLE IF NOT EXISTS eee_tokenx_tx (  
+-- MEeeChainTx
+CREATE TABLE IF NOT EXISTS m_eee_chain_tx (  
     -- TxShared start
     tx_hash TEXT NOT NULL,
     block_hash TEXT NOT NULL,

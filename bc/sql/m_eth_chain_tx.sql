@@ -1,5 +1,5 @@
--- EthChainTx
-CREATE TABLE IF NOT EXISTS eth_chain_tx (  
+-- MEthChainTx
+CREATE TABLE IF NOT EXISTS m_eth_chain_tx (  
     -- TxShared start
     tx_hash TEXT NOT NULL,
     block_hash TEXT NOT NULL,

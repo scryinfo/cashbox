@@ -14,7 +14,7 @@ pub struct MWallet {
     #[serde(default)]
     pub next_id: String,
     #[serde(default)]
-    pub full_name: String,
+    pub name: String,
     //由助记词生成的唯一摘要，用于检测是否有重复的助记词
     #[serde(default)]
     pub mnemonic_digest: String,
@@ -29,6 +29,12 @@ pub struct MWallet {
     pub net_type: String,
 }
 
+impl MWallet {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_wallet.sql")
+    }
+}
+
 //每一种链类型一条记录，实现时可以不写入数据库
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
@@ -40,6 +46,12 @@ pub struct MChainTypeMeta {
     pub short_name: String,
     #[serde(default)]
     pub full_name: String,
+}
+
+impl MChainTypeMeta {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_chain_type_meta.sql")
+    }
 }
 
 #[db_append_shared]
@@ -60,6 +72,12 @@ pub struct MAddress {
     pub wallet_address: bool,
 }
 
+impl MAddress {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_address.sql")
+    }
+}
+
 /// 动态库自己的配置，并不指app的配置
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
@@ -69,6 +87,12 @@ pub struct MSetting {
     /// 由于value可能会是数据库的关键字，所以加上str
     #[serde(default)]
     pub value_str: String,
+}
+
+impl MSetting {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_setting.sql")
+    }
 }
 
 #[db_sub_struct]

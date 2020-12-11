@@ -42,7 +42,12 @@ pub struct MEthChainToken {
     /// 糖度
     #[serde(default)]
     pub decimal: i32,
+}
 
+impl MEthChainToken {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eth_chain_token.sql")
+    }
 }
 
 /// eth chain的交易，包含eth，erc20等
@@ -80,6 +85,12 @@ pub struct MEthChainTx {
     /// 解析过的扩展数据，这里eth与erc20的处理是不一样的
     #[serde(default)]
     pub extension: String,
+}
+
+impl MEthChainTx {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eth_chain_tx.sql")
+    }
 }
 
 /// 类型以[ERC-20](https://eips.ethereum.org/EIPS/eip-20)规范中的命名，所以要保持定义的值，不能作命名转换

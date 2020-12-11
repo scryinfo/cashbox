@@ -28,7 +28,7 @@ pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis, Error> {
         fs::File::create(db_file_name)?;
     }
     let rb = Rbatis::new();
-    let url = "sqlite://".to_owned().add(db_file_name);
+    let url = "sqlite://".to_owned().add(db_file_name.clone());
     rb.link(url.as_str()).await?;
     return Ok(rb);
 }

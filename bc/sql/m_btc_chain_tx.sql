@@ -1,5 +1,5 @@
--- BtcChainTx
-CREATE TABLE IF NOT EXISTS btc_chain_tx (  
+-- MBtcChainTx
+CREATE TABLE IF NOT EXISTS m_btc_chain_tx (  
     -- TxShared start
     tx_hash TEXT NOT NULL,
     block_hash TEXT NOT NULL,

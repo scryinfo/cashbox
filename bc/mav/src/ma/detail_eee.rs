@@ -17,6 +17,12 @@ pub struct MEeeChainTokenShared {
     pub token_shared: MTokenShared,
 }
 
+impl MEeeChainTokenShared {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eee_chain_token_shared.sql")
+    }
+}
+
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenAuth {
@@ -26,6 +32,12 @@ pub struct MEeeChainTokenAuth {
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
+}
+
+impl MEeeChainTokenAuth {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eee_chain_token_auth.sql")
+    }
 }
 
 /// DefaultToken must be a [EeeChainTokenAuth]
@@ -38,5 +50,11 @@ pub struct MEeeChainTokenDefault {
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
+}
+
+impl MEeeChainTokenDefault {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eee_chain_token_default.sql")
+    }
 }
 // eee end

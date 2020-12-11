@@ -1,11 +1,15 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::ops::Not;
 
 use once_cell::sync::OnceCell;
 use parking_lot::{RawMutex, RawThreadId, ReentrantMutex};
 use parking_lot::lock_api::RawReentrantMutex;
 
-use wallets_types::{Context, Error, InitParameters, UnInitParameters, Wallet};
+use mav::ma::{Dao, MMnemonic, MWallet};
+use mav::WalletType;
+use substratetx::{Crypto, Keccak256};
+use wallets_types::{Context, CreateWalletParameters, Error, InitParameters, Load, UnInitParameters, Wallet, WalletError};
 
 use crate::db::Db;
 
@@ -64,6 +68,51 @@ impl Wallets {
         array_wallet.clear();
         array_wallet.append(&mut ws);
         Ok(())
+    }
+
+    pub fn generate_mnemonic() -> String {
+        let mnemonic = substratetx::Sr25519::generate_phrase(15);
+        mnemonic
+    }
+
+    pub async fn create_wallet(&self, parameters: CreateWalletParameters) -> Result<Wallet, WalletError> {
+        let rb = &self.db.cashbox_wallets;
+        let hex_mn_digest = {
+            let hash_first = parameters.mnemonic.as_bytes().keccak256();
+            hex::encode((&hash_first[..]).keccak256())
+        };
+        //Official chain, mnemonic words can only be imported once, whether to import by hash exists
+        let wallet_type = WalletType::from(&parameters.wallet_type);
+        if wallet_type == WalletType::Normal {
+            let ms = Wallet::wallet_type_mnemonic_digest(rb, &hex_mn_digest, &wallet_type).await?;
+            if ms.is_empty().not() {
+                return Err(WalletError::Custom("this wallet is exist".to_owned()));
+            }
+        }
+
+        let keystore = substratetx::Sr25519::encrypt_mnemonic(&parameters.mnemonic.as_bytes().to_vec(), &parameters.password.as_bytes().to_vec());
+        //todo address
+
+        let mut mw = MWallet::default();
+        {
+            mw.mnemonic_digest = hex_mn_digest;
+            mw.mnemonic = keystore;
+            mw.wallet_type = wallet_type.to_string();
+            mw.name = parameters.name.clone();
+            let mut tx_guard = rb.begin_tx_defer(false).await?;
+            mw.save(rb, &tx_guard.tx_id).await?;
+
+            let mut mm = MMnemonic::default();
+            mm.from(&mw);
+            // 现在只出现了2个数据库，所以第二个可以不使用事务，整个事务也是正确的，
+            // 但如果有三个数据库，这时事务就会有问题（需要做特别处理才能正常，如二阶段提交等）
+            mm.save(&self.db.cashbox_mnemonic, "").await?;
+            tx_guard.is_drop_commit = true; //all success, set true to commit the tx
+        }
+        let mut w = Wallet::default();
+        w.load(rb, mw).await?;
+
+        return Ok(w);
     }
 }
 

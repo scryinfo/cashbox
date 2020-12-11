@@ -16,12 +16,12 @@ void main() {
 
     {
       var initP = new InitParameters();
-      initP.dbName.cashboxWallets = "cashboxWallets.db";
-      initP.dbName.cashboxMnemonic = "cashboxMnemonic.db";
-      initP.dbName.walletMainnet = "walletMainnet.db";
-      initP.dbName.walletPrivate = "walletPrivate.db";
-      initP.dbName.walletTestnet = "walletTestnet.db";
-      initP.dbName.walletTestnetPrivate = "walletTestnetPrivate.db";
+      initP.dbName.cashboxWallets = "cashbox_wallets.db";
+      initP.dbName.cashboxMnemonic = "cashbox_mnemonic.db";
+      initP.dbName.walletMainnet = "wallet_mainnet.db";
+      initP.dbName.walletPrivate = "wallet_private.db";
+      initP.dbName.walletTestnet = "wallet_testnet.db";
+      initP.dbName.walletTestnetPrivate = "wallet_testnet_private.db";
       wallet.init(initP);
 
       expect(true, wallet.context != null);
@@ -49,7 +49,8 @@ void main() {
     }
     {
       var mnemonic = clib.CStr_dAlloc();
-      var err = clib.Wallets_generateMnemonic(mnemonic);
+      var cerr = clib.Wallets_generateMnemonic(mnemonic);
+      var err = Error.fromC(cerr);
       expect(true, err.isSuccess());
     }
     var uninitP = new UnInitParameters();

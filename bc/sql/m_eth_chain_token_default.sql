@@ -1,5 +1,5 @@
--- BtcChainTokenDefault
-CREATE TABLE IF NOT EXISTS btc_chain_token_default (  
+-- MEthChainTokenDefault
+CREATE TABLE IF NOT EXISTS m_eth_chain_token_default (  
     chain_token_shared_id TEXT NOT NULL,
     position INTEGER NOT NULL,
     id TEXT PRIMARY KEY,

@@ -24,10 +24,11 @@ pub struct MTokenAddress {
     pub balance: String,
 }
 
-
-// impl MTokenAddress {
-//     pub const t_name: &str = "sdf";
-// }
+impl MTokenAddress {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_token_address.sql")
+    }
+}
 
 #[db_sub_struct]
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
@@ -46,24 +47,15 @@ pub struct TxShared {
 #[cfg(test)]
 mod tests {
     use async_std::task::block_on;
+    use once_cell::sync::Lazy;
+    use rbatis::crud::CRUDEnable;
     use rbatis::rbatis::Rbatis;
 
     use crate::ma::{db_dest, MTokenAddress};
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
 
-    const TABLE: &str = "
--- TokenAddress
-CREATE TABLE IF NOT EXISTS token_address (
-    wallet_id TEXT NOT NULL,
-    chain_type TEXT NOT NULL,
-    token_id TEXT NOT NULL,
-    address_id TEXT NOT NULL,
-    balance TEXT NOT NULL,
-    id TEXT PRIMARY KEY,
-    create_time INTEGER NOT NULL,
-    update_time INTEGER NOT NULL
- );";
-    const TABLE_NAME: &str = "token_address";
+    const TABLE: &str = MTokenAddress::create_table_script();
+    static TABLE_NAME: Lazy<String> = Lazy::new(|| MTokenAddress::table_name());
 
     #[test]
     #[allow(non_snake_case)]
@@ -114,7 +106,7 @@ CREATE TABLE IF NOT EXISTS token_address (
 
     async fn init_memory() -> Rbatis {
         let rb = db_dest::init_memory(None).await;
-        let _ = rb.exec("", format!("drop table {}", TABLE_NAME).as_str()).await;
+        let _ = rb.exec("", format!("drop table {}", TABLE_NAME.as_str()).as_str()).await;
         let r = rb.exec("", TABLE).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         rb

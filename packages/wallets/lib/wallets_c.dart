@@ -54,6 +54,47 @@ class CArrayCBtcChainToken extends Struct {
 }
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
+class CArrayCContext extends Struct {
+  
+  Pointer<CContext> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
+  static Pointer<CArrayCContext> allocate() {
+    return ffi.allocate<CArrayCContext>();
+  }
+
+
+  static CArrayCContext from(int ptr) {
+    return Pointer<CArrayCContext>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C function `CArrayCContext_dAlloc`.
+Pointer<Pointer<CArrayCContext>> CArrayCContext_dAlloc() {
+  return _CArrayCContext_dAlloc();
+}
+final _CArrayCContext_dAlloc_Dart _CArrayCContext_dAlloc = _dl.lookupFunction<_CArrayCContext_dAlloc_C, _CArrayCContext_dAlloc_Dart>('CArrayCContext_dAlloc');
+typedef _CArrayCContext_dAlloc_C = Pointer<Pointer<CArrayCContext>> Function();
+typedef _CArrayCContext_dAlloc_Dart = Pointer<Pointer<CArrayCContext>> Function();
+
+/// C function `CArrayCContext_dFree`.
+void CArrayCContext_dFree(
+  Pointer<Pointer<CArrayCContext>> dPtr,
+) {
+  _CArrayCContext_dFree(dPtr);
+}
+final _CArrayCContext_dFree_Dart _CArrayCContext_dFree = _dl.lookupFunction<_CArrayCContext_dFree_C, _CArrayCContext_dFree_Dart>('CArrayCContext_dFree');
+typedef _CArrayCContext_dFree_C = Void Function(
+  Pointer<Pointer<CArrayCContext>> dPtr,
+);
+typedef _CArrayCContext_dFree_Dart = void Function(
+  Pointer<Pointer<CArrayCContext>> dPtr,
+);
+
+/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCEeeChainToken extends Struct {
   
   Pointer<CEeeChainToken> ptr;
@@ -195,24 +236,11 @@ class CChainShared extends Struct {
 
 }
 
-/// C function `CChar_free`.
-void CChar_free(
-  Pointer<ffi.Utf8> cs,
-) {
-  _CChar_free(cs);
-}
-final _CChar_free_Dart _CChar_free = _dl.lookupFunction<_CChar_free_C, _CChar_free_Dart>('CChar_free');
-typedef _CChar_free_C = Void Function(
-  Pointer<ffi.Utf8> cs,
-);
-typedef _CChar_free_Dart = void Function(
-  Pointer<ffi.Utf8> cs,
-);
-
 /// C struct `CContext`.
 class CContext extends Struct {
   
   Pointer<ffi.Utf8> id;
+  Pointer<ffi.Utf8> contextNote;
   static Pointer<CContext> allocate() {
     return ffi.allocate<CContext>();
   }
@@ -252,6 +280,7 @@ class CCreateWalletParameters extends Struct {
   Pointer<ffi.Utf8> name;
   Pointer<ffi.Utf8> password;
   Pointer<ffi.Utf8> mnemonic;
+  Pointer<ffi.Utf8> walletType;
   static Pointer<CCreateWalletParameters> allocate() {
     return ffi.allocate<CCreateWalletParameters>();
   }
@@ -411,6 +440,7 @@ class CEthChainTokenShared extends Struct {
 class CInitParameters extends Struct {
   
   Pointer<CDbName> dbName;
+  Pointer<ffi.Utf8> contextNote;
   static Pointer<CInitParameters> allocate() {
     return ffi.allocate<CInitParameters>();
   }
@@ -442,20 +472,6 @@ typedef _CStr_dFree_C = Void Function(
 );
 typedef _CStr_dFree_Dart = void Function(
   Pointer<Pointer<ffi.Utf8>> dcs,
-);
-
-/// C function `CStr_free`.
-void CStr_free(
-  Pointer<ffi.Utf8> cs,
-) {
-  _CStr_free(cs);
-}
-final _CStr_free_Dart _CStr_free = _dl.lookupFunction<_CStr_free_C, _CStr_free_Dart>('CStr_free');
-typedef _CStr_free_C = Void Function(
-  Pointer<ffi.Utf8> cs,
-);
-typedef _CStr_free_Dart = void Function(
-  Pointer<ffi.Utf8> cs,
 );
 
 /// C struct `CTokenShared`.
@@ -513,26 +529,40 @@ class CWallet extends Struct {
 
 }
 
-/// C function `CWallet_alloc`.
-Pointer<CWallet> CWallet_alloc() {
-  return _CWallet_alloc();
+/// C function `CWallet_dAlloc`.
+Pointer<Pointer<CWallet>> CWallet_dAlloc() {
+  return _CWallet_dAlloc();
 }
-final _CWallet_alloc_Dart _CWallet_alloc = _dl.lookupFunction<_CWallet_alloc_C, _CWallet_alloc_Dart>('CWallet_alloc');
-typedef _CWallet_alloc_C = Pointer<CWallet> Function();
-typedef _CWallet_alloc_Dart = Pointer<CWallet> Function();
+final _CWallet_dAlloc_Dart _CWallet_dAlloc = _dl.lookupFunction<_CWallet_dAlloc_C, _CWallet_dAlloc_Dart>('CWallet_dAlloc');
+typedef _CWallet_dAlloc_C = Pointer<Pointer<CWallet>> Function();
+typedef _CWallet_dAlloc_Dart = Pointer<Pointer<CWallet>> Function();
 
-/// C function `CWallet_free`.
-void CWallet_free(
-  Pointer<CWallet> ptr,
+/// C function `CWallet_dFree`.
+void CWallet_dFree(
+  Pointer<Pointer<CWallet>> dPtr,
 ) {
-  _CWallet_free(ptr);
+  _CWallet_dFree(dPtr);
 }
-final _CWallet_free_Dart _CWallet_free = _dl.lookupFunction<_CWallet_free_C, _CWallet_free_Dart>('CWallet_free');
-typedef _CWallet_free_C = Void Function(
-  Pointer<CWallet> ptr,
+final _CWallet_dFree_Dart _CWallet_dFree = _dl.lookupFunction<_CWallet_dFree_C, _CWallet_dFree_Dart>('CWallet_dFree');
+typedef _CWallet_dFree_C = Void Function(
+  Pointer<Pointer<CWallet>> dPtr,
 );
-typedef _CWallet_free_Dart = void Function(
-  Pointer<CWallet> ptr,
+typedef _CWallet_dFree_Dart = void Function(
+  Pointer<Pointer<CWallet>> dPtr,
+);
+
+/// <p class="para-brief"> 返回所有的Context,如果没有返回空，且Error::SUCCESS()</p>
+Pointer<CError> Wallets_Contexts(
+  Pointer<Pointer<CArrayCContext>> contexts,
+) {
+  return _Wallets_Contexts(contexts);
+}
+final _Wallets_Contexts_Dart _Wallets_Contexts = _dl.lookupFunction<_Wallets_Contexts_C, _Wallets_Contexts_Dart>('Wallets_Contexts');
+typedef _Wallets_Contexts_C = Pointer<CError> Function(
+  Pointer<Pointer<CArrayCContext>> contexts,
+);
+typedef _Wallets_Contexts_Dart = Pointer<CError> Function(
+  Pointer<Pointer<CArrayCContext>> contexts,
 );
 
 /// C function `Wallets_all`.
@@ -556,20 +586,20 @@ typedef _Wallets_all_Dart = Pointer<CError> Function(
 Pointer<CError> Wallets_createWallet(
   Pointer<CContext> ctx,
   Pointer<CCreateWalletParameters> parameters,
-  Pointer<Pointer<ffi.Utf8>> walletId,
+  Pointer<Pointer<CWallet>> wallet,
 ) {
-  return _Wallets_createWallet(ctx, parameters, walletId);
+  return _Wallets_createWallet(ctx, parameters, wallet);
 }
 final _Wallets_createWallet_Dart _Wallets_createWallet = _dl.lookupFunction<_Wallets_createWallet_C, _Wallets_createWallet_Dart>('Wallets_createWallet');
 typedef _Wallets_createWallet_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<CCreateWalletParameters> parameters,
-  Pointer<Pointer<ffi.Utf8>> walletId,
+  Pointer<Pointer<CWallet>> wallet,
 );
 typedef _Wallets_createWallet_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<CCreateWalletParameters> parameters,
-  Pointer<Pointer<ffi.Utf8>> walletId,
+  Pointer<Pointer<CWallet>> wallet,
 );
 
 /// C function `Wallets_deleteWallet`.
@@ -629,6 +659,20 @@ typedef _Wallets_findByName_Dart = Pointer<CError> Function(
   Pointer<Pointer<CArrayCWallet>> arrayWallet,
 );
 
+/// <p class="para-brief"> 返回最后的Context,如果没有返回空，且Error::SUCCESS()</p>
+Pointer<CError> Wallets_firstContext(
+  Pointer<Pointer<CContext>> context,
+) {
+  return _Wallets_firstContext(context);
+}
+final _Wallets_firstContext_Dart _Wallets_firstContext = _dl.lookupFunction<_Wallets_firstContext_C, _Wallets_firstContext_Dart>('Wallets_firstContext');
+typedef _Wallets_firstContext_C = Pointer<CError> Function(
+  Pointer<Pointer<CContext>> context,
+);
+typedef _Wallets_firstContext_Dart = Pointer<CError> Function(
+  Pointer<Pointer<CContext>> context,
+);
+
 /// C function `Wallets_generateMnemonic`.
 Pointer<CError> Wallets_generateMnemonic(
   Pointer<Pointer<ffi.Utf8>> mnemonic,
@@ -657,21 +701,35 @@ typedef _Wallets_hasOne_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
 );
 
-/// <p class="para-brief"> dart中不要复制Context的内存，会在调用 [Wallets_uninit] 释放内存</p>
+/// <p class="para-brief"> dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它</p>
 Pointer<CError> Wallets_init(
   Pointer<CInitParameters> parameter,
-  Pointer<Pointer<CContext>> ctx,
+  Pointer<Pointer<CContext>> context,
 ) {
-  return _Wallets_init(parameter, ctx);
+  return _Wallets_init(parameter, context);
 }
 final _Wallets_init_Dart _Wallets_init = _dl.lookupFunction<_Wallets_init_C, _Wallets_init_Dart>('Wallets_init');
 typedef _Wallets_init_C = Pointer<CError> Function(
   Pointer<CInitParameters> parameter,
-  Pointer<Pointer<CContext>> ctx,
+  Pointer<Pointer<CContext>> context,
 );
 typedef _Wallets_init_Dart = Pointer<CError> Function(
   Pointer<CInitParameters> parameter,
-  Pointer<Pointer<CContext>> ctx,
+  Pointer<Pointer<CContext>> context,
+);
+
+/// <p class="para-brief"> 返回最后的Context,如果没有返回空，且Error::SUCCESS()</p>
+Pointer<CError> Wallets_lastContext(
+  Pointer<Pointer<CContext>> context,
+) {
+  return _Wallets_lastContext(context);
+}
+final _Wallets_lastContext_Dart _Wallets_lastContext = _dl.lookupFunction<_Wallets_lastContext_C, _Wallets_lastContext_Dart>('Wallets_lastContext');
+typedef _Wallets_lastContext_C = Pointer<CError> Function(
+  Pointer<Pointer<CContext>> context,
+);
+typedef _Wallets_lastContext_Dart = Pointer<CError> Function(
+  Pointer<Pointer<CContext>> context,
 );
 
 /// C function `Wallets_lockRead`.

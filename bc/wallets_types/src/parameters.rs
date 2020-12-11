@@ -22,6 +22,7 @@ pub struct CreateWalletParameters {
     pub name: String,
     pub password: String,
     pub mnemonic: String,
+    pub wallet_type: String,
 }
 
 #[derive(Debug, Clone)]
