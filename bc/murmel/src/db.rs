@@ -6,7 +6,7 @@
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::{BitcoinHash, Network};
-use log::info;
+use log::{info, debug};
 use parking_lot::ReentrantMutex;
 use once_cell::sync::OnceCell;
 use crate::config::BTC_DETAIL_PATH;
@@ -17,6 +17,8 @@ use async_std::task::block_on;
 use crate::moudle::chain::MBlockHeader;
 use rbatis::crud::CRUD;
 use crate::moudle::detail::MProgress;
+use rbatis::plugin::page::{PageRequest, Page, IPage};
+use serde_json::json;
 
 const NEWEST_KEY: &str = "NEWEST_KEY";
 
@@ -301,12 +303,58 @@ impl ChainSqlite {
         let r = block_on(self.rb.save("", &block_header));
         match r {
             Ok(a) => {
-                println!("{:?}", a);
+                debug!("{:?}", a);
             }
             Err(e) => {
-                println!("{:?}", e);
+                debug!("{:?}", e);
             }
         }
+    }
+
+    /// fetch header which needed scan
+    /// scan_flag = false scan_flag does not need +1
+    /// scan_flag = true scan_flag need +1
+    pub fn fetch_scan_header(&self, timestamp: String, scan_flag: bool) -> Vec<String> {
+        let w = self.rb.new_wrapper()
+                    .gt("timestamp", &timestamp)
+                    .and()
+                    .lt("scanned", 6)
+                    .check().unwrap();
+        let req = PageRequest::new(1, 1000);
+        let r: Result<Page<MBlockHeader>, _> = block_on(self.rb.fetch_page_by_wrapper("", &w, &req));
+        let mut block_headers: Vec<MBlockHeader> = vec![];
+        match r {
+            Ok(page) => {
+                let header_vec = page.get_records();
+                block_headers = header_vec.to_vec();
+            }
+            Err(e) => debug!("{:?}", e)
+        }
+        let mut headers: Vec<String> = vec![];
+        for header_block in block_headers {
+            headers.push(header_block.header);
+        }
+
+        if scan_flag {
+            let py = r#"
+            UPDATE block_header
+            SET scanned = scanned + 1
+            WHERE timestamp >= #{ timestamp }
+            AND scanned <= 5
+            LIMIT 1000
+            "#;
+            let r = block_on(self.rb.py_exec("", py, &json!({ "timestamp": &timestamp })));
+            match r {
+                Ok(a) => {
+                    debug!("{:?}", a);
+                }
+                Err(e) => {
+                    debug!("{:?}", e);
+                }
+            }
+        }
+
+        headers
     }
 }
 
@@ -413,9 +461,9 @@ impl DetailSqlite {
     }
 
     fn fetch_progress(&self) -> Option<MProgress> {
-        let r: Result<MProgress, _> = block_on(self.rb.fetch_by_id("", &1u64));
+        let r: Result<Option<MProgress>, _> = block_on(self.rb.fetch_by_id("", &1u64));
         match r {
-            Ok(progress) => Some(progress),
+            Ok(p) => p,
             Err(_) => None
         }
     }
@@ -427,7 +475,7 @@ impl DetailSqlite {
             timestamp,
         };
         let w = self.rb.new_wrapper().eq("id", 1).check().unwrap();
-        let r = block_on(self.rb.update_by_wrapper("", &progress, &w));
+        let r = block_on(self.rb.update_by_wrapper("", &progress, &w, false));
         match r {
             Ok(a) => {
                 debug!("update_progress {:?}", a);
