@@ -48,10 +48,30 @@ pub enum DbCreateType {
     Drop,
 }
 
-pub struct Db {}
+
+#[derive(Default)]
+pub struct Db {
+    pub cashbox_wallets: Rbatis,
+    pub cashbox_mnemonic: Rbatis,
+    pub wallet_mainnet: Rbatis,
+    pub wallet_private: Rbatis,
+    pub wallet_testnet: Rbatis,
+    pub wallet_testnet_private: Rbatis,
+    pub db_name: DbName,
+}
 
 impl Db {
-    pub async fn init_db(db_name: &DbName, create_type: &DbCreateType) -> Result<(), Error> {
+    pub async fn init(&mut self, name: &DbName) -> Result<(), Error> {
+        self.db_name = name.clone();
+        self.cashbox_wallets = kits::make_rbatis(&self.db_name.cashbox_wallets).await?;
+        self.cashbox_mnemonic = kits::make_rbatis(&self.db_name.cashbox_mnemonic).await?;
+        self.wallet_mainnet = kits::make_rbatis(&self.db_name.wallet_mainnet).await?;
+        self.wallet_private = kits::make_rbatis(&self.db_name.wallet_private).await?;
+        self.wallet_testnet = kits::make_rbatis(&self.db_name.wallet_testnet).await?;
+        self.wallet_testnet_private = kits::make_rbatis(&self.db_name.wallet_testnet_private).await?;
+        Ok(())
+    }
+    pub async fn init_tables(db_name: &DbName, create_type: &DbCreateType) -> Result<(), Error> {
         let rb = &kits::make_rbatis(&db_name.cashbox_mnemonic).await?;
         Db::create_table_mnemonic(rb, create_type).await?;
         let rb = &kits::make_rbatis(&db_name.cashbox_wallets).await?;

@@ -3,11 +3,17 @@ set HOST_TAG=x86_64-pc-windows-gnu
 set VCPKGRS_DYNAMIC=1
 set cuPath=%cd%
 set batPath=%~dp0
+cd %batPath%/../../../packages/wallets
+set outPath=%cd%
 
 set BUILD_DUMMY_WASM_BINARY=1
 
 rustup default stable-gnu
 cd %batPath%/..
 cargo build --target %HOST_TAG%
+
+cd %batPath%../../target/x86_64-pc-windows-gnu/debug
+copy /Y "wallets_cdl.dll" "%outPath%/"
+
 cd %cuPath%
 EndLocal

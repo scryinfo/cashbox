@@ -58,7 +58,7 @@ mod tests {
                 let c_err = Wallets_init(CInitParameters::to_c_ptr(&parameters), ctx) as *mut CError;
                 assert_eq!(0 as CU64, (*c_err).code);
                 CError_free(c_err);
-                let t = block_on(mav::ma::Db::init_db(&parameters.db_name, &DbCreateType::Drop));
+                let t = block_on(mav::ma::Db::init_tables(&parameters.db_name, &DbCreateType::Drop));
                 if let Err(e) = &t {
                     panic!(e.to_string());
                 }

@@ -6,12 +6,10 @@ use once_cell::sync::OnceCell;
 use parking_lot::{RawMutex, RawThreadId, ReentrantMutex};
 use parking_lot::lock_api::RawReentrantMutex;
 
-use mav::ma::{Dao, MMnemonic, MWallet};
+use mav::ma::{Dao, MMnemonic, MWallet, Db};
 use mav::WalletType;
 use substratetx::{Crypto, Keccak256};
 use wallets_types::{Context, CreateWalletParameters, Error, InitParameters, Load, UnInitParameters, Wallet, WalletError};
-
-use crate::db::Db;
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,

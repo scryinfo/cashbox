@@ -207,6 +207,12 @@ impl From<WalletError> for Error {
     }
 }
 
+impl From<mav::Error> for Error {
+    fn from(err: mav::Error) -> Self {
+        Self::DB().set_message(&err.to_string())
+    }
+}
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "error code: {}, message: {}", self.code, self.message)
