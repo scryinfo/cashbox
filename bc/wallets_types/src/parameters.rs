@@ -1,21 +1,30 @@
+use failure::_core::ops::{Deref, DerefMut};
+
 #[derive(Debug, Default, Clone)]
 pub struct InitParameters {
     pub db_name: DbName,
     pub context_note: String,
 }
 
-#[derive(Debug, Default, Clone)]
-pub struct DbName {
-    pub cashbox_wallets: String,
-    pub cashbox_mnemonic: String,
-    pub wallet_mainnet: String,
-    pub wallet_private: String,
-    pub wallet_testnet: String,
-    pub wallet_testnet_private: String,
-}
-
 #[derive(Debug, Default)]
 pub struct UnInitParameters {}
+
+#[derive(Debug, Default, Clone)]
+pub struct DbName(pub mav::ma::DbName);
+
+impl Deref for DbName {
+    type Target = mav::ma::DbName;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for DbName {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct CreateWalletParameters {

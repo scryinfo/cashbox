@@ -16,7 +16,7 @@ use crate::db::Db;
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
     pub ctx: Context,
-    db: Db,
+    pub db: Db, //for test, make it pub
 }
 
 impl Default for Wallets {

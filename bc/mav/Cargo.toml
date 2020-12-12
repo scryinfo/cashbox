@@ -16,9 +16,9 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 chrono = { version = "0.4", features = ["serde"] }
 bigdecimal = "0.2"
-rbatis-core = { version = "1.8.41", features = ["async-io-sqlite"] }
-rbatis = { version = "1.8.41", features = ["async-io-sqlite"] }
-rbatis-macro-driver = { version = "1.8.41", features = ["no_print"] }
+rbatis-core = { version = "1.8.43", features = ["async-io-sqlite"] }
+rbatis = { version = "1.8.43", features = ["async-io-sqlite"] }
+rbatis-macro-driver = { version = "1.8.43", features = ["no_print"] }
 async-std = { version = "1.7" }
 
 async-trait = "0.1.31"

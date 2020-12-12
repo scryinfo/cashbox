@@ -2,7 +2,10 @@
 mod tests {
     use std::ptr::null_mut;
 
-    use mav::WalletType;
+    use async_std::task::block_on;
+
+    use mav::{kits, WalletType};
+    use mav::ma::DbCreateType;
     use wallets_types::{CreateWalletParameters, InitParameters};
 
     use crate::kits::{CR, CU64, to_str};
@@ -55,6 +58,10 @@ mod tests {
                 let c_err = Wallets_init(CInitParameters::to_c_ptr(&parameters), ctx) as *mut CError;
                 assert_eq!(0 as CU64, (*c_err).code);
                 CError_free(c_err);
+                let t = block_on(mav::ma::Db::init_db(&parameters.db_name, &DbCreateType::Drop));
+                if let Err(e) = &t {
+                    panic!(e.to_string());
+                }
                 ctx
             };
             let mn = {
@@ -87,13 +94,8 @@ mod tests {
 
     fn init_parameters() -> InitParameters {
         let mut p = InitParameters::default();
-        p.db_name.cashbox_wallets = "cashbox_wallets.db".to_owned();
-        p.db_name.cashbox_mnemonic = "cashbox_mnemonic.db".to_owned();
-        p.db_name.wallet_mainnet = "wallet_mainnet.db".to_owned();
-        p.db_name.wallet_private = "wallet_private.db".to_owned();
-        p.db_name.wallet_testnet = "wallet_testnet.db".to_owned();
-        p.db_name.wallet_testnet_private = "wallet_testnet_private.db".to_owned();
-        p.context_note = "context_test".to_owned();
+        p.db_name.0 = mav::ma::DbName::new("test_", "");
+        p.context_note = format!("test_{}", kits::uuid());
         p
     }
 }

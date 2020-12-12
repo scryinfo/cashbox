@@ -113,15 +113,11 @@ impl MBtcOutputTx {
 #[cfg(test)]
 mod tests {
     use async_std::task::block_on;
-    use once_cell::sync::Lazy;
     use rbatis::crud::CRUDEnable;
     use rbatis::rbatis::Rbatis;
 
-    use crate::ma::{db_dest, MBtcChainToken};
+    use crate::ma::{Db, db_dest, DbCreateType, MBtcChainToken};
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
-
-    const TABLE_BTC_CHAIN_TOKEN: &str = MBtcChainToken::create_table_script();
-    static TABLE_NAME_BTC_CHAIN_TOKEN: Lazy<String> = Lazy::new(|| MBtcChainToken::table_name());
 
     #[test]
     #[allow(non_snake_case)]
@@ -179,8 +175,7 @@ mod tests {
 
     async fn init_memory() -> Rbatis {
         let rb = db_dest::init_memory(None).await;
-        let _ = rb.exec("", format!("drop table {}", TABLE_NAME_BTC_CHAIN_TOKEN.as_str()).as_str()).await;
-        let r = rb.exec("", TABLE_BTC_CHAIN_TOKEN).await;
+        let r = Db::create_table(&rb, MBtcChainToken::create_table_script(), &MBtcChainToken::table_name(), &DbCreateType::Drop).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         rb
     }

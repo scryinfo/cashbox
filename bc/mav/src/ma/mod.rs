@@ -6,6 +6,7 @@ pub use crate::ma::data::{*};
 pub use crate::ma::data_btc::{*};
 pub use crate::ma::data_eee::{*};
 pub use crate::ma::data_eth::{*};
+pub use crate::ma::db::*;
 pub use crate::ma::detail::{*};
 pub use crate::ma::detail_btc::{*};
 pub use crate::ma::detail_eee::{*};
@@ -23,4 +24,5 @@ mod data_eee;
 mod data_btc;
 
 mod dao;
+mod db;
 

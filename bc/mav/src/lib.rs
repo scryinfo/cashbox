@@ -1,8 +1,7 @@
-pub use db::Error;
+pub use kits::Error;
 
 pub mod ma;
 pub mod kits;
-pub mod db;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum ChainType {

@@ -1,7 +1,8 @@
 use rbatis::rbatis::Rbatis;
 
 use mav::kits;
-use wallets_types::{DbName, WalletError};
+use mav::ma::DbName;
+use wallets_types::WalletError;
 
 #[derive(Default)]
 pub struct Db {
