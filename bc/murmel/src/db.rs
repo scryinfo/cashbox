@@ -16,7 +16,7 @@ use crate::sql::{create_chain_sql, create_user_address_sql, create_tx_input_sql,
 use async_std::task::block_on;
 use crate::moudle::chain::MBlockHeader;
 use rbatis::crud::CRUD;
-use crate::moudle::detail::MProgress;
+use crate::moudle::detail::{MProgress, MTxInput, MTxOutput};
 use rbatis::plugin::page::{PageRequest, Page, IPage};
 use serde_json::json;
 
@@ -524,6 +524,54 @@ impl DetailSqlite {
             }
             Some(progress) => {
                 progress
+            }
+        }
+    }
+
+    pub fn save_tx_input(&self,
+                         tx: String,
+                         sig_script: String,
+                         prev_tx: String,
+                         prev_vout: String,
+                         sequence: i64) {
+        let tx_input = MTxInput {
+            id: None,
+            tx,
+            sig_script,
+            prev_tx,
+            prev_vout,
+            sequence,
+        };
+        let r = block_on(self.rb.save("", &tx_input));
+        match r {
+            Ok(a) => {
+                debug!("save_tx_input {:?}", a);
+            }
+            Err(e) => {
+                debug!("save_tx_input {:?}", e);
+            }
+        }
+    }
+
+    pub fn save_txout(&self,
+                      tx: String,
+                      script: String,
+                      value: String,
+                      vin: String) {
+        let tx_output = MTxOutput{
+            id: None,
+            tx,
+            script,
+            value,
+            vin,
+        };
+        let r = block_on(self.rb.save("", &tx_output));
+        match r {
+            Ok(a) => {
+                debug!("save_tx_input {:?}", a);
+            }
+            Err(e) => {
+                debug!("save_tx_input {:?}", e);
             }
         }
     }
