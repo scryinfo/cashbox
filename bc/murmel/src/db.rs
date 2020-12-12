@@ -336,14 +336,19 @@ impl ChainSqlite {
         }
 
         if scan_flag {
-            let py = r#"
-            UPDATE block_header
-            SET scanned = scanned + 1
-            WHERE timestamp >= #{ timestamp }
-            AND scanned <= 5
-            LIMIT 1000
-            "#;
-            let r = block_on(self.rb.py_exec("", py, &json!({ "timestamp": &timestamp })));
+            let sql = format!(r#"
+            UPDATE block_header SET scanned = scanned+1
+                WHERE id IN (
+                    SELECT id FROM (
+                        SELECT id FROM block_header
+                        WHERE timestamp >= {}
+                        AND scanned <= 5
+                        ORDER BY id ASC
+                        LIMIT 0, 1000
+                    ) tmp
+                )
+            "#, timestamp);
+            let r = block_on(self.rb.exec("", &sql));
             match r {
                 Ok(a) => {
                     debug!("{:?}", a);
