@@ -361,6 +361,22 @@ impl ChainSqlite {
 
         headers
     }
+
+    // how may headers save in block_header table
+    pub fn fetch_height(&self) -> u64 {
+        let py = r#"
+        SELECT * FROM block_header
+        Order By id DESC
+        LIMIT 1;
+        "#;
+        let r: Result<MBlockHeader, _> = block_on(self.rb.py_fetch("", py, &""));
+        if let Ok(r) = r {
+            match r.id {
+                Some(id) => id,
+                _ => 0
+            }
+        } else { return 0; }
+    }
 }
 
 pub struct DetailSqlite {

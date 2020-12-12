@@ -171,6 +171,22 @@ impl ChainSqlite {
 
         headers
     }
+
+    // how may headers save in block_header table
+    pub fn fetch_height(&self) -> u64 {
+        let py = r#"
+        SELECT * FROM block_header
+        Order By id DESC
+        LIMIT 1;
+        "#;
+        let r: Result<MBlockHeader, _> = block_on(self.rb.py_fetch("", py, &""));
+        if let Ok(r) = r {
+            match r.id {
+                Some(id) => id,
+                _ => 0
+            }
+        } else { return 0; }
+    }
 }
 
 
@@ -322,17 +338,19 @@ impl DetailSqlite {
 
 fn main() {
     let btc_chain = ChainSqlite::init_chain_db(r#"btc_chain.db"#);
-
-    // let btc_detail = DetailSqlite::init_detail_db(r#"btc_detail.db"#);
+    //let btc_detail = DetailSqlite::init_detail_db(r#"btc_detail.db"#);
     // let p = btc_detail.progress();
     // println!("{:?}",p);
 
-    for _ in 0..2000{
-        btc_chain.save_chain()
-    }
-    let r = btc_chain.fetch_scan_header("0".to_string(),false);
-    println!("{:?}",r);
+    // for _ in 0..2000{
+    //     btc_chain.save_chain()
+    // }
+    // let r = btc_chain.fetch_scan_header("0".to_string(),false);
+    // println!("{:?}",r);
 
     // let r = btc_chain.fetch_scan_header("10".to_string(), true);
     // println!("{:?}", r.len())
+
+    let height = btc_chain.fetch_height();
+    print!("{}", height);
 }
