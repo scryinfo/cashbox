@@ -1,13 +1,12 @@
-
 use std::ops::Not;
 
 use parking_lot::{RawMutex, RawThreadId};
 use parking_lot::lock_api::RawReentrantMutex;
 
-use mav::ma::{Dao, MMnemonic, MWallet, Db};
+use mav::ma::{Dao, Db, MMnemonic, MWallet};
 use mav::WalletType;
 use substratetx::{Crypto, Keccak256};
-use wallets_types::{Context, CreateWalletParameters, InitParameters, Load, UnInitParameters, Wallet, WalletError};
+use wallets_types::{Context, CreateWalletParameters, InitParameters, Load, Wallet, WalletError};
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
@@ -54,7 +53,7 @@ impl Wallets {
         Ok(())
     }
 
-    pub async fn uninit(&mut self, _: &UnInitParameters) -> Result<(), WalletError> {
+    pub async fn uninit(&mut self) -> Result<(), WalletError> {
         //todo
         Ok(())
     }

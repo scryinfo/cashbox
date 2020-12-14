@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{Context, CreateWalletParameters, DbName, InitParameters, UnInitParameters};
+use wallets_types::{Context, CreateWalletParameters, DbName, InitParameters};
 
 use crate::kits::{CMark, CR, CStruct, to_c_char, to_str};
 
@@ -26,9 +26,9 @@ pub struct CDbName {
     pub walletTestnetPrivate: *mut c_char,
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
-pub struct CUnInitParameters {}
+// #[repr(C)]
+// #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+// pub struct CUnInitParameters {}
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]

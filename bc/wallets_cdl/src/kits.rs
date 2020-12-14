@@ -49,7 +49,8 @@ pub trait CStruct {
 }
 
 /// 为类型 “*mut T”实现 trait CStruct, T要实现 trait CStruct， T 与 *mut T是两种不同的类型，所以要再实现一次
-/// 注：如果T为“*mut”类型，实际类型为“*mut *mut”，这时调用free方法只把第一层的内存释放了。所以增加一个CMark trait来解决这个问题
+/// 注1：如果T为“*mut”类型，实际类型为“*mut *mut”，这时调用free方法时，要递归调用
+/// 注2：如果rust支持泛型特化后，就可以不使用TypeId了，而使用下面注释的实现方式，高效且结构明确
 impl<T: CStruct + Any> CStruct for *mut T {
     fn free(&mut self) {
         if !self.is_null() {
@@ -58,8 +59,7 @@ impl<T: CStruct + Any> CStruct for *mut T {
                     (**self).free();
                 }
                 if std::any::TypeId::of::<c_char>() == std::any::TypeId::of::<T>() {
-                    let mut cptr = *self as *mut c_char;
-                    free_c_char(&mut cptr);
+                    free_c_char(&mut (*self as *mut c_char));
                 } else {
                     Box::from_raw(*self);
                 }
@@ -72,20 +72,7 @@ impl<T: CStruct + Any> CStruct for *mut T {
     }
 }
 
-// /// 为类型 “*mut T”实现 trait CType, T要实现 trait CType， T 与 *mut T是两种不同的类型，所以要再实现一次
-// impl<T: CStruct> CStruct for *mut *mut T {
-//     fn free(&mut self) {
-//         if !self.is_null() {
-//             *self.free();
-//             unsafe {
-//                 Box::from_raw(*self);
-//             }
-//             *self = null_mut();
-//         }
-//     }
-// }
-
-// /// 为类型 “*mut c_char”实现 trait CType
+// /// 为类型 “*mut c_char”实现 trait CStruct，因为现在rust还不支持泛型特化，所不支持
 // impl CStruct for *mut c_char {
 //     fn free(&mut self) {
 //         free_c_char(self);
@@ -95,25 +82,21 @@ impl<T: CStruct + Any> CStruct for *mut T {
 //     }
 // }
 
-impl CStruct for c_char {
-    fn free(&mut self) {}
+//为所有需要 c <==> rust的原始类型实现 CStruct
+macro_rules! promise_c_struct {
+    ($t:ident) => {
+        impl CStruct for $t {
+            fn free(&mut self) {}
+        }
+    };
+    ($t:ident,$($t2:ident),+) => {
+        impl CStruct for $t {
+            fn free(&mut self) {}
+        }
+        promise_c_struct!($($t2), +);
+    };
 }
-
-impl CStruct for i32 {
-    fn free(&mut self) {}
-}
-
-impl CStruct for i64 {
-    fn free(&mut self) {}
-}
-
-impl CStruct for u32 {
-    fn free(&mut self) {}
-}
-
-impl CStruct for u64 {
-    fn free(&mut self) {}
-}
+promise_c_struct!(c_char,i32,i64,u32,u64,f32, f64);
 /// 实现drop, 要求实现 trait CStruct
 #[macro_export]
 macro_rules! drop_ctype {
@@ -309,50 +292,136 @@ mod tests {
 
     #[test]
     fn d_ptr_free_test() {
-        let mut ptr: *mut c_char = null_mut();
-        ptr.free();
-        assert_eq!(null_mut(), ptr);
-        let mut ptr = to_c_char("test c char");
-        ptr.free();
-        assert_eq!(null_mut(), ptr);
-
-        let mut ptr: *mut i32 = null_mut();
-        ptr.free();
-        assert_eq!(null_mut(), ptr);
-
-        let mut dptr: *mut *mut c_char = d_ptr_alloc();
-        d_ptr_free(&mut dptr);
-        assert_eq!(null_mut(), dptr);
-
-        let mut dptr: *mut *mut c_char = d_ptr_alloc();
-        unsafe { *dptr = to_c_char("test2 c char"); }
-        d_ptr_free(&mut dptr);
-        assert_eq!(null_mut(), dptr);
-
-        #[derive(Debug, Clone, DlStruct, DlDefault)]
-        struct Data {
-            pub name: String,
+        {//c_char
+            let mut ptr: *mut c_char = null_mut();
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut ptr = to_c_char("test c char");
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut dptr: *mut *mut c_char = d_ptr_alloc();
+            unsafe { *dptr = to_c_char("test2 c char"); }
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
         }
 
-        let mut dptr: *mut *mut Data = null_mut();
-        d_ptr_free(&mut dptr);
-        assert_eq!(null_mut(), dptr);
+        {//i32
+            let mut ptr: *mut i32 = null_mut();
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut ptr = Box::into_raw(Box::new(10i32));
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut dptr: *mut *mut i32 = d_ptr_alloc();
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+            let mut dptr: *mut *mut i32 = d_ptr_alloc();
+            unsafe { *dptr = Box::into_raw(Box::new(12i32)); }
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+        }
+        {//i64
+            let mut ptr: *mut i64 = null_mut();
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut ptr = Box::into_raw(Box::new(10i64));
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut dptr: *mut *mut i64 = d_ptr_alloc();
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+            let mut dptr: *mut *mut i64 = d_ptr_alloc();
+            unsafe { *dptr = Box::into_raw(Box::new(12i64)); }
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+        }
+        {//u32
+            let mut ptr: *mut u32 = null_mut();
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut ptr = Box::into_raw(Box::new(10u32));
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut dptr: *mut *mut u32 = d_ptr_alloc();
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+            let mut dptr: *mut *mut u32 = d_ptr_alloc();
+            unsafe { *dptr = Box::into_raw(Box::new(12u32)); }
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+        }
+        {//u64
+            let mut ptr: *mut u64 = null_mut();
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut ptr = Box::into_raw(Box::new(10u64));
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut dptr: *mut *mut u64 = d_ptr_alloc();
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+            let mut dptr: *mut *mut u64 = d_ptr_alloc();
+            unsafe { *dptr = Box::into_raw(Box::new(12u64)); }
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+        }
+        {//f32
+            let mut ptr: *mut f32 = null_mut();
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut ptr = Box::into_raw(Box::new(10f32));
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut dptr: *mut *mut f32 = d_ptr_alloc();
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+            let mut dptr: *mut *mut f32 = d_ptr_alloc();
+            unsafe { *dptr = Box::into_raw(Box::new(12f32)); }
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+        }
+        {//f64
+            let mut ptr: *mut f64 = null_mut();
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut ptr = Box::into_raw(Box::new(10f64));
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut dptr: *mut *mut f64 = d_ptr_alloc();
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+            let mut dptr: *mut *mut f64 = d_ptr_alloc();
+            unsafe { *dptr = Box::into_raw(Box::new(12f64)); }
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+        }
+        {
+            // struct
+            #[derive(Debug, Clone, DlStruct, DlDefault)]
+            struct Data {
+                pub name: String,
+            }
+            let mut ptr: *mut Data = null_mut();
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
+            let mut ptr = Box::into_raw(Box::new(Data { name: "struct name".to_owned() }));
+            ptr.free();
+            assert_eq!(null_mut(), ptr);
 
-        let mut dptr: *mut *mut Data = d_ptr_alloc();
-        d_ptr_free(&mut dptr);
-        assert_eq!(null_mut(), dptr);
+            let mut dptr: *mut *mut Data = null_mut();
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
 
-        let mut dptr: *mut *mut Data = d_ptr_alloc();
-        unsafe { *dptr = Box::into_raw(Box::new(Data { name: "name".to_owned() })); }
-        // let dpstr3 = dptr.clone();
-        // let dpstr2 = (unsafe { *dptr }).clone();
-        d_ptr_free(&mut dptr);
-        assert_eq!(null_mut(), dptr);
+            let mut dptr: *mut *mut Data = d_ptr_alloc();
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
 
-        // unsafe {
-        //     //pptr 使用已释放的内存，是非法操作，但是由于刚释放，正常情况下那个内存不会被再次分配，所以可以拿来检查
-        //     let ptr = dpstr2;
-        //     // assert_eq!(null_mut(), ptr);
-        // }
+            let mut dptr: *mut *mut Data = d_ptr_alloc();
+            unsafe { *dptr = Box::into_raw(Box::new(Data { name: "name".to_owned() })); }
+            // let dpstr3 = dptr.clone();
+            // let dpstr2 = (unsafe { *dptr }).clone();
+            d_ptr_free(&mut dptr);
+            assert_eq!(null_mut(), dptr);
+        }
     }
 }

@@ -6,12 +6,13 @@ mod tests {
 
     use mav::{kits, WalletType};
     use mav::ma::DbCreateType;
-    use wallets_types::{CreateWalletParameters, InitParameters};
+    use wallets::WalletsCollection;
+    use wallets_types::{CreateWalletParameters, InitParameters, WalletError};
 
-    use crate::kits::{CR, CU64, to_str};
+    use crate::kits::{CR, CStruct, CU64, to_str};
     use crate::parameters::{CCreateWalletParameters, CInitParameters};
     use crate::types::{CError, CWallet};
-    use crate::wallets_c::{CContext_dAlloc, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc, Wallets_createWallet, Wallets_generateMnemonic, Wallets_init};
+    use crate::wallets_c::{CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc, CWallet_dFree, Wallets_createWallet, Wallets_generateMnemonic, Wallets_init, Wallets_uninit};
 
     #[test]
     fn memory_test() {
@@ -28,6 +29,7 @@ mod tests {
             assert_eq!(0 as CU64, err.code);
             let words: Vec<&str> = to_str(*ptr).split(" ").collect();
             CStr_dFree(ptr);
+            CError_free(c_err);
             assert_eq!(15, words.len());
         }
     }
@@ -38,14 +40,26 @@ mod tests {
             let ctx = CContext_dAlloc();
             assert_ne!(null_mut(), ctx);
             let parameters = init_parameters();
-            let c_err = Wallets_init(CInitParameters::to_c_ptr(&parameters), ctx) as *mut CError;
+            let mut ptr = CInitParameters::to_c_ptr(&parameters);
+            let c_err = Wallets_init(ptr, ctx) as *mut CError;
             assert_ne!(null_mut(), c_err);
             let err = &*c_err;
             assert_eq!(0 as CU64, err.code);
             CError_free(c_err);
+            ptr.free();
+
             assert_ne!(null_mut(), *ctx);
             assert_eq!(parameters.context_note.as_str(), to_str((**ctx).contextNote));
             assert_ne!(0, to_str((**ctx).id).len());
+
+            {//only release memory
+                let c_err = Wallets_uninit(*ctx) as *mut CError;
+                assert_ne!(null_mut(), c_err);
+                CError_free(c_err);
+                CContext_dFree(ctx);
+
+                // let _ = free_wallets();
+            }
         }
     }
 
@@ -55,9 +69,11 @@ mod tests {
             let context = {
                 let ctx = CContext_dAlloc();
                 let parameters = init_parameters();
-                let c_err = Wallets_init(CInitParameters::to_c_ptr(&parameters), ctx) as *mut CError;
+                let mut ptr = CInitParameters::to_c_ptr(&parameters);
+                let c_err = Wallets_init(ptr, ctx) as *mut CError;
                 assert_eq!(0 as CU64, (*c_err).code);
                 CError_free(c_err);
+                ptr.free();
                 let t = block_on(mav::ma::Db::init_tables(&parameters.db_name, &DbCreateType::Drop));
                 if let Err(e) = &t {
                     panic!(e.to_string());
@@ -81,14 +97,18 @@ mod tests {
                     mnemonic: mn,
                     wallet_type: WalletType::Normal.to_string(),
                 };
-                let parameters = CCreateWalletParameters::to_c_ptr(&parameters);
+                let mut parameters = CCreateWalletParameters::to_c_ptr(&parameters);
                 let c_err = Wallets_createWallet(*context, parameters, cw) as *mut CError;
-                assert_eq!(0 as CU64, (*c_err).code);
+                parameters.free();
+                assert_eq!(0 as CU64, (*c_err).code, "{}", to_str((*c_err).message));
                 CError_free(c_err);
                 assert_ne!(null_mut(), *cw);
                 let w = CWallet::to_rust(&**cw);
+                CWallet_dFree(cw);
                 w
             };
+            let _ = free_wallets();
+            CContext_dFree(context);
         }
     }
 
@@ -97,5 +117,12 @@ mod tests {
         p.db_name.0 = mav::ma::DbName::new("test_", "");
         p.context_note = format!("test_{}", kits::uuid());
         p
+    }
+
+    fn free_wallets() -> Result<(), WalletError> {
+        let lock = WalletsCollection::collection().lock();
+        let mut ins = lock.borrow_mut();
+        let _ = ins.clean()?;
+        Ok(())
     }
 }

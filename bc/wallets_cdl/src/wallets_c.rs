@@ -6,10 +6,10 @@ use std::os::raw::c_char;
 use async_std::task::block_on;
 
 use wallets::{Wallets, WalletsCollection};
-use wallets_types::{Context, Error, UnInitParameters};
+use wallets_types::{Context, Error};
 
 use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
-use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters, CUnInitParameters};
+use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters};
 use crate::types::{CError, CWallet};
 
 /// dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它
@@ -45,20 +45,19 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, context: 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext, parameter: *mut CUnInitParameters) -> *const CError {
+pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext) -> *const CError {
     log::debug!("enter Wallets_uninit");
-    if ctx.is_null() || parameter.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx or parameter is null");
+    if ctx.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx is null");
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-    let rp = UnInitParameters {};
 
     let lock = WalletsCollection::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
         if let Some(mut ws) = ins.remove(&CContext::get_id(ctx)) {
-            if let Err(e) = block_on(ws.uninit(&rp)) {
+            if let Err(e) = block_on(ws.uninit()) {
                 Error::from(e)
             } else {
                 Error::SUCCESS()

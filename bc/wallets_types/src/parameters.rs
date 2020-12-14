@@ -6,8 +6,8 @@ pub struct InitParameters {
     pub context_note: String,
 }
 
-#[derive(Debug, Default)]
-pub struct UnInitParameters {}
+// #[derive(Debug, Default)]
+// pub struct UnInitParameters {}
 
 #[derive(Debug, Default, Clone)]
 pub struct DbName(pub mav::ma::DbName);

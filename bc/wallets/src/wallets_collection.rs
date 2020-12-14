@@ -2,12 +2,11 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 
 use once_cell::sync::OnceCell;
-use parking_lot::{ReentrantMutex};
+use parking_lot::ReentrantMutex;
 
-use wallets_types::{Context};
+use wallets_types::{Context, WalletError};
 
 use crate::Wallets;
-
 
 ///处理所有的wallets实例，
 #[derive(Default)]
@@ -34,6 +33,17 @@ impl WalletsCollection {
 
     pub fn remove(&mut self, key: &str) -> Option<Wallets> {
         self.w_map.remove(key)
+    }
+
+    pub fn clean(&mut self) -> Result<(), WalletError> {
+        self.last_context = None;
+        self.first_context = None;
+        for (_, it) in self.w_map.iter_mut() {
+            let _ = async_std::task::block_on(it.uninit())?;
+        }
+        self.w_map.clear();
+
+        Ok(())
     }
 
     pub fn new(&mut self, ctx: Context) -> Option<&mut Wallets> {
@@ -70,8 +80,9 @@ mod tests {
     use once_cell::sync::OnceCell;
     use parking_lot::ReentrantMutex;
 
-    use crate::WalletsCollection;
     use wallets_types::Context;
+
+    use crate::WalletsCollection;
 
     #[test]
     fn one_cell_try() {
