@@ -18,7 +18,7 @@ use crate::moudle::chain::MBlockHeader;
 use rbatis::crud::CRUD;
 use crate::moudle::detail::{MProgress, MTxInput, MTxOutput};
 use rbatis::plugin::page::{PageRequest, Page, IPage};
-use serde_json::json;
+use async_trait::async_trait;
 
 const NEWEST_KEY: &str = "NEWEST_KEY";
 
@@ -276,7 +276,7 @@ pub struct ChainSqlite {
 impl ChainSqlite {
     pub fn init_chain_db(network: Network, db_file_name: &str) -> Self {
         let sql = create_chain_sql();
-        let rb = block_on(init_rbatis(db_file_name));
+        let rb = block_on(ChainSqlite::init_rbatis(db_file_name));
         let r = block_on(rb.exec("create chain db", sql));
         match r {
             Ok(a) => {
@@ -386,7 +386,7 @@ pub struct DetailSqlite {
 
 impl DetailSqlite {
     pub fn init_detail_db(network: Network, db_file_name: &str) -> Self {
-        let rb = block_on(init_rbatis(db_file_name));
+        let rb = block_on(DetailSqlite::init_rbatis(db_file_name));
         DetailSqlite::create_progress(&rb);
         DetailSqlite::create_user_address(&rb);
         DetailSqlite::create_tx_input(&rb);
@@ -558,7 +558,7 @@ impl DetailSqlite {
                       script: String,
                       value: String,
                       vin: String) {
-        let tx_output = MTxOutput{
+        let tx_output = MTxOutput {
             id: None,
             tx,
             script,
@@ -577,23 +577,33 @@ impl DetailSqlite {
     }
 }
 
-async fn init_rbatis(db_file_name: &str) -> Rbatis {
-    info!("init_rbatis");
-    if std::fs::metadata(db_file_name).is_err() {
-        let file = std::fs::File::create(db_file_name);
-        if file.is_err() {
-            info!("init file {:?}", file.err().unwrap());
+#[async_trait]
+trait RInit {
+    async fn init_rbatis(db_file_name: &str) -> Rbatis {
+        info!("init_rbatis");
+        if std::fs::metadata(db_file_name).is_err() {
+            let file = std::fs::File::create(db_file_name);
+            if file.is_err() {
+                info!("init file {:?}", file.err().unwrap());
+            }
         }
+        let rb = Rbatis::new();
+        let url = "sqlite://".to_owned().add(db_file_name);
+        info!("file url: {:?}", url);
+        let r = rb.link(url.as_str()).await;
+        if r.is_err() {
+            info!("{:?}", r.err().unwrap());
+        }
+        rb
     }
-    let rb = Rbatis::new();
-    let url = "sqlite://".to_owned().add(db_file_name);
-    info!("file url: {:?}", url);
-    let r = rb.link(url.as_str()).await;
-    if r.is_err() {
-        info!("{:?}", r.err().unwrap());
-    }
-    rb
 }
+
+#[async_trait]
+impl RInit for ChainSqlite {}
+
+#[async_trait]
+impl RInit for DetailSqlite {}
+
 
 pub fn lazy_db(network: Network, path: &str) -> &'static ReentrantMutex<SQLite> {
     static INSTANCE: OnceCell<ReentrantMutex<SQLite>> = OnceCell::new();

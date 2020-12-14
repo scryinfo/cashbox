@@ -107,3 +107,5 @@ rbatis-macro-driver = { version = "1.8.36", features = ["no_print"]}
 async-std = { version = "1.7" }
 # rbatis end
 
+async-trait = "0.1.42"
+
