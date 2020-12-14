@@ -8,7 +8,7 @@ use async_std::task::block_on;
 use wallets::{Wallets, WalletsCollection};
 use wallets_types::{Context, Error, UnInitParameters};
 
-use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, d_ptr_free, d_str_free, to_c_char};
+use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
 use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters, CUnInitParameters};
 use crate::types::{CError, CWallet};
 
@@ -28,11 +28,10 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, context: 
     let mut ins = lock.borrow_mut();
 
     let err = {
-        let mut new_ctx = Context::default();
-        new_ctx.context_note = parameter.context_note.clone();
+        let new_ctx = Context::new(&parameter.context_note);
         if let Some(ws) = ins.new(new_ctx) {
             if let Err(e) = block_on(ws.init(&mut parameter)) {
-                e
+                Error::from(e)
             } else {
                 *context = CContext::to_c_ptr(&ws.ctx);
                 Error::SUCCESS()
@@ -60,7 +59,7 @@ pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext, parameter: *mut CUnI
     let err = {
         if let Some(mut ws) = ins.remove(&CContext::get_id(ctx)) {
             if let Err(e) = block_on(ws.uninit(&rp)) {
-                e
+                Error::from(e)
             } else {
                 Error::SUCCESS()
             }
@@ -253,7 +252,7 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
         if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
             let mut all = vec![];
             if let Err(e) = async_std::task::block_on(ws.all(&mut all)) {
-                e
+                Error::from(e)
             } else {
                 let cws = all.iter().map(|rw| CWallet::to_c(&rw)).rev().collect();
                 *arrayWallet = Box::into_raw(Box::new(CArray::new(cws)));
@@ -420,7 +419,7 @@ pub unsafe extern "C" fn CArrayCContext_dFree(dPtr: *mut *mut CArray<CContext>) 
 #[no_mangle]
 pub unsafe extern "C" fn CStr_dFree(dcs: *mut *mut c_char) {
     let mut dcs = dcs;
-    d_str_free(&mut dcs);
+    d_ptr_free(&mut dcs);
 }
 
 #[no_mangle]

@@ -40,6 +40,15 @@ pub struct Context {
     pub context_note: String,
 }
 
+impl Context {
+    pub fn new(context_note: &str) -> Self {
+        Self {
+            id: uuid::Uuid::new_v4().to_string(),
+            context_note: context_note.to_owned(),
+        }
+    }
+}
+
 impl Default for Context {
     fn default() -> Self {
         Self {

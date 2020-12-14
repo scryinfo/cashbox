@@ -1,5 +1,6 @@
 #![allow(non_upper_case_globals)]
 
+use std::any::Any;
 use std::ffi::{CStr, CString};
 use std::mem::ManuallyDrop;
 use std::os::raw::c_char;
@@ -41,18 +42,33 @@ pub trait CMark {}
 /// 释放c struct的内存， 这些内存需要手工管理
 pub trait CStruct {
     fn free(&mut self);
+    ///返回当前是否为struct，用于解决多层raw指针时的内存释放问题
+    fn is_struct(&self) -> bool {
+        true
+    }
 }
 
 /// 为类型 “*mut T”实现 trait CStruct, T要实现 trait CStruct， T 与 *mut T是两种不同的类型，所以要再实现一次
 /// 注：如果T为“*mut”类型，实际类型为“*mut *mut”，这时调用free方法只把第一层的内存释放了。所以增加一个CMark trait来解决这个问题
-impl<T: CMark> CStruct for *mut T {
+impl<T: CStruct + Any> CStruct for *mut T {
     fn free(&mut self) {
         if !self.is_null() {
             unsafe {
-                Box::from_raw(*self);
+                if !((**self).is_struct()) {
+                    (**self).free();
+                }
+                if std::any::TypeId::of::<c_char>() == std::any::TypeId::of::<T>() {
+                    let mut cptr = *self as *mut c_char;
+                    free_c_char(&mut cptr);
+                } else {
+                    Box::from_raw(*self);
+                }
             }
             *self = null_mut();
         }
+    }
+    fn is_struct(&self) -> bool {
+        false
     }
 }
 
@@ -69,13 +85,35 @@ impl<T: CMark> CStruct for *mut T {
 //     }
 // }
 
-/// 为类型 “*mut c_char”实现 trait CType
-impl CStruct for *mut c_char {
-    fn free(&mut self) {
-        free_c_char(self);
-    }
+// /// 为类型 “*mut c_char”实现 trait CType
+// impl CStruct for *mut c_char {
+//     fn free(&mut self) {
+//         free_c_char(self);
+//     }
+//     fn is_struct(&self) -> bool {
+//         false
+//     }
+// }
+
+impl CStruct for c_char {
+    fn free(&mut self) {}
 }
 
+impl CStruct for i32 {
+    fn free(&mut self) {}
+}
+
+impl CStruct for i64 {
+    fn free(&mut self) {}
+}
+
+impl CStruct for u32 {
+    fn free(&mut self) {}
+}
+
+impl CStruct for u64 {
+    fn free(&mut self) {}
+}
 /// 实现drop, 要求实现 trait CStruct
 #[macro_export]
 macro_rules! drop_ctype {
@@ -204,33 +242,13 @@ pub fn d_ptr_alloc<T>() -> *mut *mut T {
     Box::into_raw(Box::new(null_mut()))
 }
 
-pub fn d_ptr_free<T: CMark>(d_ptr: &mut *mut *mut T) {
-    unsafe {
-        if !d_ptr.is_null() {
-            (**d_ptr).free();
-            Box::from_raw(*d_ptr);
-            *d_ptr = null_mut();
-            // d_ptr.free(); //下面两种调用效果都是相同的，感觉rust会自动给对象使用 &mut操作,如果需要的话
-            //(&mut *d_ptr).free();
-            //(*d_ptr).free();
-        }
-    }
-}
-
-#[allow(unused_assignments)]
-pub fn d_str_free(d_ptr: &mut *mut *mut c_char) {
-    unsafe {
-        if !d_ptr.is_null() {
-            (**d_ptr).free();
-            Box::from_raw(*d_ptr);
-            *d_ptr = null_mut();
-            // d_ptr.free();
-        }
-    }
+pub fn d_ptr_free<T: CStruct + Any>(d_ptr: &mut *mut *mut T) {
+    (*d_ptr).free();
 }
 
 #[cfg(test)]
 mod tests {
+    use std::os::raw::c_char;
     use std::ptr::null_mut;
 
     use wallets_macro::{DlDefault, DlStruct};
@@ -291,6 +309,26 @@ mod tests {
 
     #[test]
     fn d_ptr_free_test() {
+        let mut ptr: *mut c_char = null_mut();
+        ptr.free();
+        assert_eq!(null_mut(), ptr);
+        let mut ptr = to_c_char("test c char");
+        ptr.free();
+        assert_eq!(null_mut(), ptr);
+
+        let mut ptr: *mut i32 = null_mut();
+        ptr.free();
+        assert_eq!(null_mut(), ptr);
+
+        let mut dptr: *mut *mut c_char = d_ptr_alloc();
+        d_ptr_free(&mut dptr);
+        assert_eq!(null_mut(), dptr);
+
+        let mut dptr: *mut *mut c_char = d_ptr_alloc();
+        unsafe { *dptr = to_c_char("test2 c char"); }
+        d_ptr_free(&mut dptr);
+        assert_eq!(null_mut(), dptr);
+
         #[derive(Debug, Clone, DlStruct, DlDefault)]
         struct Data {
             pub name: String,
@@ -310,6 +348,7 @@ mod tests {
         // let dpstr2 = (unsafe { *dptr }).clone();
         d_ptr_free(&mut dptr);
         assert_eq!(null_mut(), dptr);
+
         // unsafe {
         //     //pptr 使用已释放的内存，是非法操作，但是由于刚释放，正常情况下那个内存不会被再次分配，所以可以拿来检查
         //     let ptr = dpstr2;
