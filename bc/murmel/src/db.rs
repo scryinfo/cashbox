@@ -12,7 +12,6 @@ use once_cell::sync::OnceCell;
 use crate::config::BTC_DETAIL_PATH;
 use rbatis::rbatis::Rbatis;
 use std::ops::Add;
-use crate::sql::{create_chain_sql, create_user_address_sql, create_tx_input_sql, create_tx_output_sql, create_local_tx_sql, create_progress_sql};
 use async_std::task::block_on;
 use crate::moudle::chain::MBlockHeader;
 use rbatis::crud::CRUD;
@@ -275,7 +274,7 @@ pub struct ChainSqlite {
 
 impl ChainSqlite {
     pub fn init_chain_db(network: Network, db_file_name: &str) -> Self {
-        let sql = create_chain_sql();
+        let sql = include_str!("sql/create_chain.sql");
         let rb = block_on(ChainSqlite::init_rbatis(db_file_name));
         let r = block_on(rb.exec("create chain db", sql));
         match r {
@@ -399,7 +398,7 @@ impl DetailSqlite {
     }
 
     fn create_user_address(rb: &Rbatis) {
-        let sql = create_user_address_sql();
+        let sql = include_str!("sql/create_user_address.sql");
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
@@ -412,7 +411,7 @@ impl DetailSqlite {
     }
 
     fn create_tx_input(rb: &Rbatis) {
-        let sql = create_tx_input_sql();
+        let sql = include!("sql/create_tx_input.sql");
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
@@ -425,7 +424,7 @@ impl DetailSqlite {
     }
 
     fn create_tx_output(rb: &Rbatis) {
-        let sql = create_tx_output_sql();
+        let sql = include!("sql/create_tx_output.sql");
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
@@ -438,8 +437,7 @@ impl DetailSqlite {
     }
 
     fn create_progress(rb: &Rbatis) {
-        let sql = create_progress_sql();
-        _sql();
+        let sql = include_str!("sql/create_progress.sql");
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
@@ -452,7 +450,7 @@ impl DetailSqlite {
     }
 
     fn create_local_tx(rb: &Rbatis) {
-        let sql = create_local_tx_sql();
+        let sql = include!("sql/create_local_tx.sql");
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {

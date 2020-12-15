@@ -52,6 +52,5 @@ pub mod timeout;
 pub mod walletlib;
 pub mod config;
 pub mod moudle;
-mod sql;
 
 pub use error::Error;
