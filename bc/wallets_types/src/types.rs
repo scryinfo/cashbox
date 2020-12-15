@@ -4,14 +4,8 @@ use rbatis::rbatis::Rbatis;
 use mav::ma::{Dao, MAddress, MChainShared, MTokenShared, MWallet};
 use mav::WalletType;
 
-use crate::{BtcChain, EeeChain, EthChain, WalletError};
+use crate::{BtcChain, ContextTrait, EeeChain, EthChain, Load, WalletError};
 use crate::deref_type;
-
-#[async_trait]
-pub trait Load {
-    type MType;
-    async fn load(&mut self, rb: &Rbatis, m: Self::MType) -> Result<(), WalletError>;
-}
 
 #[derive(Debug, Default)]
 pub struct Wallet {
@@ -23,12 +17,12 @@ pub struct Wallet {
 deref_type!(Wallet,MWallet);
 
 impl Wallet {
-    pub async fn all(rb: &Rbatis) -> Result<Vec<Wallet>, WalletError> {
+    pub async fn all(context: &dyn ContextTrait) -> Result<Vec<Wallet>, WalletError> {
         let mut ws = Vec::new();
-        let dws = MWallet::list(rb, "").await?;
+        let dws = MWallet::list(context.db().wallets_db(), "").await?;
         for dw in &dws {
             let mut w = Wallet::default();
-            w.load(rb, dw.clone()).await?;
+            w.load(context, dw.clone()).await?;
             ws.push(w);
         }
         Ok(ws)
@@ -48,27 +42,23 @@ impl Wallet {
         let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(ms)
     }
-
-    // pub async fn save(&mut self, rb: &Rbatis,tx_id: &str) ->Result<(), WalletError> {
-    //     self.m.save(rb, tx_id).await?;
-    // }
 }
 
 #[async_trait]
 impl Load for Wallet {
     type MType = MWallet;
-    async fn load(&mut self, rb: &Rbatis, mw: MWallet) -> Result<(), WalletError> {
+    async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet) -> Result<(), WalletError> {
         self.m = mw;
         {
-            self.eth_chain.load(rb, self.m.clone()).await?;
+            self.eth_chain.load(context, self.m.clone()).await?;
             //todo wallet address
         }
         {
-            self.eee_chain.load(rb, self.m.clone()).await?;
+            self.eee_chain.load(context, self.m.clone()).await?;
             //todo wallet address
         }
         {
-            self.btc_chain.load(rb, self.m.clone()).await?;
+            self.btc_chain.load(context, self.m.clone()).await?;
             //todo wallet address
         }
 

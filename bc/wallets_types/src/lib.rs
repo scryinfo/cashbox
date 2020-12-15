@@ -4,6 +4,7 @@ pub use chain_eee::*;
 pub use chain_eth::*;
 pub use error::*;
 pub use parameters::*;
+pub use traits::*;
 pub use types::*;
 
 mod types;
@@ -13,6 +14,7 @@ mod chain_eth;
 mod chain_eee;
 mod chain_btc;
 mod error;
+mod traits;
 
 /// Sample code: deref_type!(Wallet,MWallet)
 /// ````

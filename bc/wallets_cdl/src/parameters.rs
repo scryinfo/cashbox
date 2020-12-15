@@ -18,12 +18,14 @@ pub struct CInitParameters {
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CDbName {
-    pub cashboxWallets: *mut c_char,
-    pub cashboxMnemonic: *mut c_char,
-    pub walletMainnet: *mut c_char,
-    pub walletPrivate: *mut c_char,
-    pub walletTestnet: *mut c_char,
-    pub walletTestnetPrivate: *mut c_char,
+    pub path: *mut c_char,
+    pub prefix: *mut c_char,
+    pub cashbox_wallets: *mut c_char,
+    pub cashbox_mnemonic: *mut c_char,
+    pub wallet_mainnet: *mut c_char,
+    pub wallet_private: *mut c_char,
+    pub wallet_testnet: *mut c_char,
+    pub wallet_testnet_private: *mut c_char,
 }
 
 // #[repr(C)]

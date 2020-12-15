@@ -2,13 +2,16 @@ use std::ops::Add;
 
 use rbatis::crud::CRUDEnable;
 use rbatis::rbatis::Rbatis;
+use strum_macros::EnumIter;
 
-use crate::kits;
+use crate::{kits, NetType};
 use crate::kits::Error;
 use crate::ma::{MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MTokenAddress, MWallet};
 
 #[derive(Debug, Default, Clone)]
-pub struct DbName {
+pub struct DbNames {
+    pub path: String,
+    pub prefix: String,
     pub cashbox_wallets: String,
     pub cashbox_mnemonic: String,
     pub wallet_mainnet: String,
@@ -17,8 +20,8 @@ pub struct DbName {
     pub wallet_testnet_private: String,
 }
 
-impl DbName {
-    pub fn new(pre: &str, path: &str) -> DbName {
+impl DbNames {
+    pub fn new(pre: &str, path: &str) -> DbNames {
         let path = {
             if path.ends_with("/") {
                 path.to_owned()
@@ -30,13 +33,85 @@ impl DbName {
                 path.to_owned()
             }
         };
-        DbName {
-            cashbox_wallets: format!("{}{}{}", path, pre, "cashbox_wallets.db"),
-            cashbox_mnemonic: format!("{}{}{}", path, pre, "cashbox_mnemonic.db"),
-            wallet_mainnet: format!("{}{}{}", path, pre, "wallet_mainnet.db"),
-            wallet_private: format!("{}{}{}", path, pre, "wallet_private.db"),
-            wallet_testnet: format!("{}{}{}", path, pre, "wallet_testnet.db"),
-            wallet_testnet_private: format!("{}{}{}", path, pre, "wallet_testnet_private.db"),
+        DbNames {
+            path: path.to_owned(),
+            prefix: pre.to_owned(),
+            cashbox_wallets: format!("{}{}{}", path, pre, DbNameType::cashbox_wallets.to_string()),
+            cashbox_mnemonic: format!("{}{}{}", path, pre, DbNameType::cashbox_mnemonic.to_string()),
+            wallet_mainnet: format!("{}{}{}", path, pre, DbNameType::wallet_mainnet.to_string()),
+            wallet_private: format!("{}{}{}", path, pre, DbNameType::wallet_private.to_string()),
+            wallet_testnet: format!("{}{}{}", path, pre, DbNameType::wallet_testnet.to_string()),
+            wallet_testnet_private: format!("{}{}{}", path, pre, DbNameType::wallet_testnet_private.to_string()),
+        }
+    }
+
+    pub fn db_name(&self, db_type: &DbNameType) -> String {
+        let t = match db_type {
+            DbNameType::cashbox_wallets => &self.cashbox_wallets,
+            DbNameType::cashbox_mnemonic => &self.cashbox_mnemonic,
+            DbNameType::wallet_mainnet => &self.wallet_mainnet,
+            DbNameType::wallet_private => &self.wallet_private,
+            DbNameType::wallet_testnet => &self.wallet_testnet,
+            DbNameType::wallet_testnet_private => &self.wallet_testnet_private,
+        };
+        t.clone()
+    }
+    pub fn db_name_type(&self, db_name: &str) -> Option<DbNameType> {
+        match &db_name.to_owned() {
+            k if k == &self.cashbox_wallets => Some(DbNameType::cashbox_wallets),
+            k if k == &self.cashbox_mnemonic => Some(DbNameType::cashbox_mnemonic),
+            k if k == &self.wallet_mainnet => Some(DbNameType::wallet_mainnet),
+            k if k == &self.wallet_private => Some(DbNameType::wallet_private),
+            k if k == &self.wallet_testnet => Some(DbNameType::wallet_testnet),
+            k if k == &self.wallet_testnet_private => Some(DbNameType::wallet_testnet_private),
+            _ => None
+        }
+    }
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Debug, PartialEq, EnumIter)]
+pub enum DbNameType {
+    cashbox_wallets,
+    cashbox_mnemonic,
+    wallet_mainnet,
+    wallet_private,
+    wallet_testnet,
+    wallet_testnet_private,
+}
+
+impl From<&str> for DbNameType {
+    fn from(db_name: &str) -> Self {
+        match db_name {
+            "cashbox_wallets.db" => DbNameType::cashbox_wallets,
+            "cashbox_mnemonic.db" => DbNameType::cashbox_mnemonic,
+            "wallet_mainnet.db" => DbNameType::wallet_mainnet,
+            "wallet_private.db" => DbNameType::wallet_private,
+            "wallet_testnet.db" => DbNameType::wallet_testnet,
+            "wallet_testnet_private.db" => DbNameType::wallet_testnet_private,
+            _ => {
+                log::error!("the str:{} can not to DbName",db_name);
+                panic!("the str:{} can not to DbName", db_name);
+            }
+        }
+    }
+}
+
+impl From<&String> for DbNameType {
+    fn from(db_name: &String) -> Self {
+        DbNameType::from(db_name.as_str())
+    }
+}
+
+impl ToString for DbNameType {
+    fn to_string(&self) -> String {
+        match &self {
+            DbNameType::cashbox_wallets => "cashbox_wallets.db".to_owned(),
+            DbNameType::cashbox_mnemonic => "cashbox_mnemonic.db".to_owned(),
+            DbNameType::wallet_mainnet => "wallet_mainnet.db".to_owned(),
+            DbNameType::wallet_private => "wallet_private.db".to_owned(),
+            DbNameType::wallet_testnet => "wallet_testnet.db".to_owned(),
+            DbNameType::wallet_testnet_private => "wallet_testnet_private.db".to_owned(),
         }
     }
 }
@@ -57,11 +132,29 @@ pub struct Db {
     pub wallet_private: Rbatis,
     pub wallet_testnet: Rbatis,
     pub wallet_testnet_private: Rbatis,
-    pub db_name: DbName,
+    pub db_name: DbNames,
 }
 
 impl Db {
-    pub async fn init(&mut self, name: &DbName) -> Result<(), Error> {
+    ///链数据的数据据库
+    pub fn data_db(&self, net_type: &NetType) -> &Rbatis {
+        match net_type {
+            NetType::Main => &self.wallet_mainnet,
+            NetType::Test => &self.wallet_testnet,
+            NetType::Private => &self.wallet_private,
+            NetType::PrivateTest => &self.wallet_testnet_private,
+        }
+    }
+    ///钱包名等信息的数据库
+    pub fn wallets_db(&self) -> &Rbatis {
+        &self.cashbox_wallets
+    }
+    ///助记词的数据库
+    pub fn mnemonic_db(&self) -> &Rbatis {
+        &self.cashbox_mnemonic
+    }
+
+    pub async fn init(&mut self, name: &DbNames) -> Result<(), Error> {
         self.db_name = name.clone();
         self.cashbox_wallets = kits::make_rbatis(&self.db_name.cashbox_wallets).await?;
         self.cashbox_mnemonic = kits::make_rbatis(&self.db_name.cashbox_mnemonic).await?;
@@ -71,7 +164,7 @@ impl Db {
         self.wallet_testnet_private = kits::make_rbatis(&self.db_name.wallet_testnet_private).await?;
         Ok(())
     }
-    pub async fn init_tables(db_name: &DbName, create_type: &DbCreateType) -> Result<(), Error> {
+    pub async fn init_tables(db_name: &DbNames, create_type: &DbCreateType) -> Result<(), Error> {
         let rb = &kits::make_rbatis(&db_name.cashbox_mnemonic).await?;
         Db::create_table_mnemonic(rb, create_type).await?;
         let rb = &kits::make_rbatis(&db_name.cashbox_wallets).await?;
@@ -140,5 +233,91 @@ impl Db {
         Db::create_table(rb, MBtcInputTx::create_table_script(), &MBtcInputTx::table_name(), create_type).await?;
         Db::create_table(rb, MBtcOutputTx::create_table_script(), &MBtcOutputTx::table_name(), create_type).await?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use async_std::task::block_on;
+    use rbatis::rbatis::Rbatis;
+    use strum::IntoEnumIterator;
+
+    use crate::ma::{Db, DbNames, DbNameType};
+    use crate::NetType;
+
+    #[test]
+    fn db_name_type_test() {
+        for it in DbNameType::iter() {
+            assert_eq!(it, DbNameType::from(&it.to_string()));
+        }
+    }
+
+    #[test]
+    fn db_names_test() {
+        {
+            let pre = "";
+            let db = DbNames::new(pre, "");
+            for it in DbNameType::iter() {
+                let name = db.db_name(&it);
+                assert_eq!(name, pre.to_owned() + &it.to_string());
+                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                assert_eq!(db_type, it);
+            }
+        }
+        {
+            let pre = "test";
+            let db = DbNames::new(pre, "");
+            for it in DbNameType::iter() {
+                let name = db.db_name(&it);
+                assert_eq!(name, pre.to_owned() + &it.to_string());
+                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                assert_eq!(db_type, it);
+            }
+        }
+        {
+            let pre = "test";
+            let db = DbNames::new(pre, "/");
+            for it in DbNameType::iter() {
+                let name = db.db_name(&it);
+                assert_eq!(name, format!("/{}{}", pre, it.to_string()));
+                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                assert_eq!(db_type, it);
+            }
+        }
+        {
+            let pre = "test";
+            let db = DbNames::new(pre, "/user");
+            for it in DbNameType::iter() {
+                let name = db.db_name(&it);
+                assert_eq!(name, format!("/user/{}{}", pre, it.to_string()));
+                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                assert_eq!(db_type, it);
+            }
+        }
+        {
+            let pre = "test";
+            let db = DbNames::new(pre, "/user/");
+            for it in DbNameType::iter() {
+                let name = db.db_name(&it);
+                assert_eq!(name, format!("/user/{}{}", pre, it.to_string()));
+                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                assert_eq!(db_type, it);
+            }
+        }
+    }
+
+    #[test]
+    fn db_test() {
+        let db_names = DbNames::new("", "");
+        let mut db = Db::default();
+        let re = block_on(db.init(&db_names));
+        assert_eq!(Ok(()), re);
+
+        assert_eq!(&db.cashbox_wallets as *const Rbatis, db.wallets_db() as *const Rbatis);
+        assert_eq!(&db.cashbox_mnemonic as *const Rbatis, db.mnemonic_db() as *const Rbatis);
+        assert_eq!(&db.wallet_mainnet as *const Rbatis, db.data_db(&NetType::Main) as *const Rbatis);
+        assert_eq!(&db.wallet_testnet as *const Rbatis, db.data_db(&NetType::Test) as *const Rbatis);
+        assert_eq!(&db.wallet_private as *const Rbatis, db.data_db(&NetType::Private) as *const Rbatis);
+        assert_eq!(&db.wallet_testnet_private as *const Rbatis, db.data_db(&NetType::PrivateTest) as *const Rbatis);
     }
 }

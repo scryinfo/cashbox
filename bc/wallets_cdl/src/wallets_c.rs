@@ -5,7 +5,7 @@ use std::os::raw::c_char;
 
 use async_std::task::block_on;
 
-use wallets::{Wallets, WalletsCollection};
+use wallets::{Contexts, Wallets};
 use wallets_types::{Context, Error};
 
 use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
@@ -24,7 +24,7 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, context: 
     (*context).free();
 
     let mut parameter = CInitParameters::ptr_rust(parameter);
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
 
     let err = {
@@ -53,7 +53,7 @@ pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext) -> *const CError {
         return CError::to_c_ptr(&err);
     }
 
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
         if let Some(mut ws) = ins.remove(&CContext::get_id(ctx)) {
@@ -80,7 +80,7 @@ pub unsafe extern "C" fn Wallets_Contexts(contexts: *mut *mut CArray<CContext>) 
         return CError::to_c_ptr(&err);
     }
     (*contexts).free();
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let ins = lock.borrow();
     let err = {
         if let Some(ctxs) = ins.contexts() {
@@ -103,7 +103,7 @@ pub unsafe extern "C" fn Wallets_lastContext(context: *mut *mut CContext) -> *co
         return CError::to_c_ptr(&err);
     }
     (*context).free();
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let ins = lock.borrow();
     let err = {
         if let Some(ctx) = ins.last_context() {
@@ -125,7 +125,7 @@ pub unsafe extern "C" fn Wallets_firstContext(context: *mut *mut CContext) -> *c
         return CError::to_c_ptr(&err);
     }
     (*context).free();
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let ins = lock.borrow();
     let err = {
         if let Some(ctx) = ins.first_context() {
@@ -145,7 +145,7 @@ pub unsafe extern "C" fn Wallets_lockRead(ctx: *mut CContext) -> *const CError {
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
         if ws.lock_read() {
@@ -168,7 +168,7 @@ pub unsafe extern "C" fn Wallets_unlockRead(ctx: *mut CContext) -> *const CError
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
         if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
@@ -193,7 +193,7 @@ pub unsafe extern "C" fn Wallets_lockWrite(ctx: *mut CContext) -> *const CError 
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
         if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
@@ -218,7 +218,7 @@ pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CErro
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
         if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
@@ -245,7 +245,7 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
     }
     (*arrayWallet).free();//如果数组的内存已经分配，释放它
 
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
         if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
@@ -296,7 +296,7 @@ pub unsafe extern "C" fn Wallets_createWallet(ctx: *mut CContext, parameters: *m
     }
     (*wallet).free();//如果内存已存在，释放它
 
-    let lock = WalletsCollection::collection().lock();
+    let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
         if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {

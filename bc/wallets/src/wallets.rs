@@ -1,17 +1,21 @@
 use std::ops::Not;
+use std::sync::atomic::AtomicBool;
 
+use failure::_core::sync::atomic::Ordering;
 use parking_lot::{RawMutex, RawThreadId};
 use parking_lot::lock_api::RawReentrantMutex;
 
 use mav::ma::{Dao, Db, MMnemonic, MWallet};
 use mav::WalletType;
 use substratetx::{Crypto, Keccak256};
-use wallets_types::{Context, CreateWalletParameters, InitParameters, Load, Wallet, WalletError};
+use wallets_types::{Context, ContextTrait, CreateWalletParameters, InitParameters, Load, Wallet, WalletError};
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
     pub ctx: Context,
-    pub db: Db, //for test, make it pub
+    pub db: Db,
+    //for test, make it pub
+    stopped: AtomicBool,
 }
 
 impl Default for Wallets {
@@ -20,6 +24,7 @@ impl Default for Wallets {
             ctx: Default::default(),
             db: Default::default(),
             raw_reentrant: RawReentrantMutex::INIT,
+            stopped: AtomicBool::new(false),
         }
     }
 }
@@ -59,7 +64,7 @@ impl Wallets {
     }
 
     pub async fn all(&mut self, array_wallet: &mut Vec::<Wallet>) -> Result<(), WalletError> {
-        let mut ws = Wallet::all(&self.db.cashbox_wallets).await?;
+        let mut ws = Wallet::all(self).await?;
         array_wallet.clear();
         array_wallet.append(&mut ws);
         Ok(())
@@ -71,7 +76,7 @@ impl Wallets {
     }
 
     pub async fn create_wallet(&self, parameters: CreateWalletParameters) -> Result<Wallet, WalletError> {
-        let rb = &self.db.cashbox_wallets;
+        let rb = self.db.wallets_db();
         let hex_mn_digest = {
             let hash_first = parameters.mnemonic.as_bytes().keccak256();
             hex::encode((&hash_first[..]).keccak256())
@@ -105,9 +110,23 @@ impl Wallets {
             tx_guard.is_drop_commit = true; //all success, set true to commit the tx
         }
         let mut w = Wallet::default();
-        w.load(rb, mw).await?;
+        w.load(self, mw).await?;
 
         return Ok(w);
+    }
+}
+
+impl ContextTrait for Wallets {
+    fn db(&self) -> &Db {
+        &self.db
+    }
+
+    fn stopped(&self) -> bool {
+        self.stopped.load(Ordering::SeqCst) //todo
+    }
+
+    fn set_stopped(&mut self, s: bool) {
+        self.stopped.store(s, Ordering::SeqCst);//todo
     }
 }
 

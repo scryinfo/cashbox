@@ -6,7 +6,7 @@ mod tests {
 
     use mav::{kits, WalletType};
     use mav::ma::DbCreateType;
-    use wallets::WalletsCollection;
+    use wallets::Contexts;
     use wallets_types::{CreateWalletParameters, InitParameters, WalletError};
 
     use crate::kits::{CR, CStruct, CU64, to_str};
@@ -114,13 +114,13 @@ mod tests {
 
     fn init_parameters() -> InitParameters {
         let mut p = InitParameters::default();
-        p.db_name.0 = mav::ma::DbName::new("test_", "");
+        p.db_name.0 = mav::ma::DbNames::new("test_", "");
         p.context_note = format!("test_{}", kits::uuid());
         p
     }
 
     fn free_wallets() -> Result<(), WalletError> {
-        let lock = WalletsCollection::collection().lock();
+        let lock = Contexts::collection().lock();
         let mut ins = lock.borrow_mut();
         let _ = ins.clean()?;
         Ok(())

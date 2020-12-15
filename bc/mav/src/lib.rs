@@ -1,9 +1,11 @@
+use strum_macros::EnumIter;
+
 pub use kits::Error;
 
 pub mod ma;
 pub mod kits;
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum ChainType {
     //Used to distinguish the chain types supported by the wallet
     BTC = 1,
@@ -14,20 +16,6 @@ pub enum ChainType {
     EeeTest = 6,
     OTHER = 7,
 }
-
-// impl From<i64> for ChainType {
-//     fn from(chain_type: i64) -> Self {
-//         match chain_type {
-//             1 => ChainType::BTC,
-//             2 => ChainType::BtcTest,
-//             3 => ChainType::ETH,
-//             4 => ChainType::EthTest,
-//             5 => ChainType::EEE,
-//             6 => ChainType::EeeTest,
-//             _ => ChainType::OTHER,
-//         }
-//     }
-// }
 
 impl From<&str> for ChainType {
     fn from(chain_type: &str) -> Self {
@@ -63,7 +51,7 @@ impl ToString for ChainType {
     }
 }
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum WalletType {
     Normal,
     //钱包
@@ -112,7 +100,7 @@ impl ToString for WalletType {
 /// [NetType.Test]:NetType::Test
 /// [NetType.Test]:NetType::Test
 /// [NetType.PrivateTest]:NetType::PrivateTest
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum NetType {
     Main,
     Test,
@@ -154,8 +142,44 @@ impl ToString for NetType {
 
 #[cfg(test)]
 mod tests {
+    use strum::IntoEnumIterator;
+
+    use crate::{ChainType, NetType, WalletType};
+
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn net_type_test() {
+        for it in NetType::iter() {
+            match it {
+                NetType::Main => assert_eq!(it, NetType::from(&it.to_string())),
+                NetType::Test => assert_eq!(it, NetType::from(&it.to_string())),
+                NetType::Private => assert_eq!(it, NetType::from(&it.to_string())),
+                NetType::PrivateTest => assert_eq!(it, NetType::from(&it.to_string())),
+            }
+        }
+    }
+
+    #[test]
+    fn chain_type_test() {
+        for it in ChainType::iter() {
+            match it {
+                ChainType::BTC => assert_eq!(it, ChainType::from(&it.to_string())),
+                ChainType::BtcTest => assert_eq!(it, ChainType::from(&it.to_string())),
+                ChainType::ETH => assert_eq!(it, ChainType::from(&it.to_string())),
+                ChainType::EthTest => assert_eq!(it, ChainType::from(&it.to_string())),
+                ChainType::EEE => assert_eq!(it, ChainType::from(&it.to_string())),
+                ChainType::EeeTest => assert_eq!(it, ChainType::from(&it.to_string())),
+                ChainType::OTHER => assert_eq!(it, ChainType::from(&it.to_string())),
+            }
+        }
+    }
+
+    #[test]
+    fn wallet_type_test() {
+        for it in WalletType::iter() {
+            match it {
+                WalletType::Normal => assert_eq!(it, WalletType::from(&it.to_string())),
+                WalletType::Test => assert_eq!(it, WalletType::from(&it.to_string())),
+            }
+        }
     }
 }

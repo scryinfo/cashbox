@@ -295,12 +295,14 @@ class CCreateWalletParameters extends Struct {
 /// C struct `CDbName`.
 class CDbName extends Struct {
   
-  Pointer<ffi.Utf8> cashboxWallets;
-  Pointer<ffi.Utf8> cashboxMnemonic;
-  Pointer<ffi.Utf8> walletMainnet;
-  Pointer<ffi.Utf8> walletPrivate;
-  Pointer<ffi.Utf8> walletTestnet;
-  Pointer<ffi.Utf8> walletTestnetPrivate;
+  Pointer<ffi.Utf8> path;
+  Pointer<ffi.Utf8> prefix;
+  Pointer<ffi.Utf8> cashbox_wallets;
+  Pointer<ffi.Utf8> cashbox_mnemonic;
+  Pointer<ffi.Utf8> wallet_mainnet;
+  Pointer<ffi.Utf8> wallet_private;
+  Pointer<ffi.Utf8> wallet_testnet;
+  Pointer<ffi.Utf8> wallet_testnet_private;
   static Pointer<CDbName> allocate() {
     return ffi.allocate<CDbName>();
   }
@@ -492,20 +494,6 @@ class CTokenShared extends Struct {
 
   static CTokenShared from(int ptr) {
     return Pointer<CTokenShared>.fromAddress(ptr).ref;
-  }
-
-}
-
-/// C struct `CUnInitParameters`.
-class CUnInitParameters extends Struct {
-  
-  static Pointer<CUnInitParameters> allocate() {
-    return ffi.allocate<CUnInitParameters>();
-  }
-
-
-  static CUnInitParameters from(int ptr) {
-    return Pointer<CUnInitParameters>.fromAddress(ptr).ref;
   }
 
 }
@@ -763,18 +751,15 @@ typedef _Wallets_lockWrite_Dart = Pointer<CError> Function(
 /// C function `Wallets_uninit`.
 Pointer<CError> Wallets_uninit(
   Pointer<CContext> ctx,
-  Pointer<CUnInitParameters> parameter,
 ) {
-  return _Wallets_uninit(ctx, parameter);
+  return _Wallets_uninit(ctx);
 }
 final _Wallets_uninit_Dart _Wallets_uninit = _dl.lookupFunction<_Wallets_uninit_C, _Wallets_uninit_Dart>('Wallets_uninit');
 typedef _Wallets_uninit_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<CUnInitParameters> parameter,
 );
 typedef _Wallets_uninit_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<CUnInitParameters> parameter,
 );
 
 /// C function `Wallets_unlockRead`.

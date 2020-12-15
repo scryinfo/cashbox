@@ -10,19 +10,19 @@ use crate::Wallets;
 
 ///处理所有的wallets实例，
 #[derive(Default)]
-pub struct WalletsCollection {
+pub struct Contexts {
     w_map: HashMap<String, Wallets>,
     last_context: Option<Context>,
     first_context: Option<Context>,
 }
 
-impl WalletsCollection {
-    pub fn collection() -> &'static ReentrantMutex<RefCell<WalletsCollection>> {
-        static mut INSTANCE: OnceCell<ReentrantMutex<RefCell<WalletsCollection>>> = OnceCell::new();
+impl Contexts {
+    pub fn collection() -> &'static ReentrantMutex<RefCell<Contexts>> {
+        static mut INSTANCE: OnceCell<ReentrantMutex<RefCell<Contexts>>> = OnceCell::new();
         unsafe {
             INSTANCE.get_or_init(|| {
                 #[cfg(target_os = "android")]crate::init_logger_once();
-                ReentrantMutex::new(RefCell::new(WalletsCollection::default()))
+                ReentrantMutex::new(RefCell::new(Contexts::default()))
             })
         }
     }
@@ -82,18 +82,18 @@ mod tests {
 
     use wallets_types::Context;
 
-    use crate::WalletsCollection;
+    use crate::Contexts;
 
     #[test]
     fn one_cell_try() {
         {
             let f = || {
-                static mut T_INS: OnceCell<ReentrantMutex<RefCell<WalletsCollection>>> = OnceCell::new();
+                static mut T_INS: OnceCell<ReentrantMutex<RefCell<Contexts>>> = OnceCell::new();
                 // let mut t = unsafe { INSTANCE .get().unwrap().lock()};
                 // t.borrow_mut().get("");
                 unsafe {
                     T_INS.get_or_init(|| {
-                        ReentrantMutex::new(RefCell::new(WalletsCollection::default()))
+                        ReentrantMutex::new(RefCell::new(Contexts::default()))
                     })
                 }
             };
@@ -104,7 +104,7 @@ mod tests {
             ws.ctx.id = "".to_owned();
         }
 
-        let lock = WalletsCollection::collection().lock();
+        let lock = Contexts::collection().lock();
         let mut ins = lock.borrow_mut();
         let new_ctx = Context::new("test_ctx");
         let _ = ins.new(new_ctx).unwrap();

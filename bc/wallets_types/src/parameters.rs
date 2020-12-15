@@ -10,10 +10,10 @@ pub struct InitParameters {
 // pub struct UnInitParameters {}
 
 #[derive(Debug, Default, Clone)]
-pub struct DbName(pub mav::ma::DbName);
+pub struct DbName(pub mav::ma::DbNames);
 
 impl Deref for DbName {
-    type Target = mav::ma::DbName;
+    type Target = mav::ma::DbNames;
 
     fn deref(&self) -> &Self::Target {
         &self.0

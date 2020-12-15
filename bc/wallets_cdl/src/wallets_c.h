@@ -12,12 +12,14 @@ typedef struct CError {
 } CError;
 
 typedef struct CDbName {
-    char *cashboxWallets;
-    char *cashboxMnemonic;
-    char *walletMainnet;
-    char *walletPrivate;
-    char *walletTestnet;
-    char *walletTestnetPrivate;
+    char *path;
+    char *prefix;
+    char *cashbox_wallets;
+    char *cashbox_mnemonic;
+    char *wallet_mainnet;
+    char *wallet_private;
+    char *wallet_testnet;
+    char *wallet_testnet_private;
 } CDbName;
 
 typedef struct CInitParameters {
@@ -29,10 +31,6 @@ typedef struct CContext {
     char *id;
     char *contextNote;
 } CContext;
-
-typedef struct CUnInitParameters {
-
-} CUnInitParameters;
 
 /**
  * c的数组需要定义两个字段，所定义一个结构体进行统一管理
@@ -175,7 +173,7 @@ extern "C" {
  */
 const CError *Wallets_init(CInitParameters *parameter, CContext **context);
 
-const CError *Wallets_uninit(CContext *ctx, CUnInitParameters *parameter);
+const CError *Wallets_uninit(CContext *ctx);
 
 /**
  * 返回所有的Context,如果没有返回空，且Error::SUCCESS()

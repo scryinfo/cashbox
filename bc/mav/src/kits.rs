@@ -4,15 +4,11 @@ use std::ops::Add;
 use rbatis::rbatis::Rbatis;
 use uuid::Uuid;
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct Error {
     pub err: String,
 }
 
-impl fmt::Debug for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Debug::fmt(&self.err, f)
-    }
-}
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
