@@ -1,11 +1,17 @@
+import 'dart:typed_data';
+
+import 'package:app/model/wallets.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/log_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/list_item.dart';
+import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MinePage extends StatefulWidget {
   @override
@@ -43,7 +49,7 @@ class _MinePageState extends State<MinePage> {
         _buildWalletListWidget(),
         _buildTestWalletWidget(),
         _buildLanguageChooseWidget(),
-        //_buildClearCacheWidget(),
+        _buildClearCacheWidget(),
         _buildAboutUsWidget(),
       ]),
     );
@@ -133,7 +139,7 @@ class _MinePageState extends State<MinePage> {
   Widget _buildClearCacheWidget() {
     return GestureDetector(
       onTap: () {
-        //todo 提示清除操作，执行清除操作
+        _showClearHintDialog(context);
       },
       child: ItemOfListWidget(
         leftText: translate('clean_cache'),
@@ -149,6 +155,31 @@ class _MinePageState extends State<MinePage> {
       child: ItemOfListWidget(
         leftText: translate('about_us_title'),
       ),
+    );
+  }
+
+  void _showClearHintDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PwdDialog(
+          title: translate('clean_cache_data'),
+          hintContent: translate('clean_cache_data_hint'),
+          hintInput: translate('pls_input_wallet_pwd'),
+          onPressed: (value) async {
+            Map cleanMap = await Wallets.instance.cleanWalletsDownloadData();
+            int status = cleanMap["status"];
+            bool isCleanWalletsData = cleanMap["isCleanWalletsData"];
+            if (status == 200 && isCleanWalletsData) {
+              Fluttertoast.showToast(msg: translate('success_clear_data'));
+              NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
+            } else {
+              LogUtil.instance.e("_showClearHintDialog=>", "status is=>" + status.toString() + "message=>" + cleanMap["message"]);
+              Fluttertoast.showToast(msg: translate('fail_delete_data'));
+            }
+          },
+        );
+      },
     );
   }
 }

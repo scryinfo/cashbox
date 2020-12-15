@@ -494,7 +494,7 @@ class Wallets {
     return updateEeeSyncRecordMap;
   }
 
-  Future<Map> saveEeeExtrinsicDetail(String infoId,String account, String eventDetail, String blockHash, String extrinsic) async {
+  Future<Map> saveEeeExtrinsicDetail(String infoId, String account, String eventDetail, String blockHash, String extrinsic) async {
     Map<dynamic, dynamic> saveEeeExtrinsicDetailMap = await WalletManager.saveEeeExtrinsicDetail(infoId, account, eventDetail, blockHash, extrinsic);
     int status = saveEeeExtrinsicDetailMap["status"];
     if (status == null || status != 200) {
@@ -692,13 +692,37 @@ class Wallets {
 
   Future<Map> getSubChainBasicInfo(String genesisHash, int specVersion, int txVersion) async {
     Map updateMap = await WalletManager.getSubChainBasicInfo(genesisHash, specVersion, txVersion);
+    int status = updateMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.instance.e("getSubChainBasicInfo=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+      return updateMap;
+    }
     return updateMap;
   }
 
-  Future<Map> updateSubChainBasicInfo(String infoId, int runtimeVersion, int txVersion, String genesisHash, String metadata, int ss58Format,
-      int tokenDecimals, String tokenSymbol) async {
-    Map updateMap =
-        await WalletManager.updateSubChainBasicInfo(infoId, runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol);
+  //default change Eee ChainBasicInfo
+  Future<Map> updateSubChainBasicInfo(
+      String infoId, int runtimeVersion, int txVersion, String genesisHash, String metadata, int ss58Format, int tokenDecimals, String tokenSymbol,
+      {bool isDefault = true}) async {
+    Map updateMap = await WalletManager.updateSubChainBasicInfo(
+        infoId, runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol, isDefault);
+    int status = updateMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.instance
+          .e("updateSubChainBasicInfo=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+      return updateMap;
+    }
     return updateMap;
+  }
+
+  Future<Map> cleanWalletsDownloadData() async {
+    Map cleanMap = await WalletManager.cleanWalletsDownloadData();
+    int status = cleanMap["status"];
+    if (status == null || status != 200) {
+      LogUtil.instance
+          .e("cleanWalletsDownloadData=>", "error status code is" + status.toString() + "||message is=>" + cleanMap["message"].toString());
+      return cleanMap;
+    }
+    return cleanMap;
   }
 }

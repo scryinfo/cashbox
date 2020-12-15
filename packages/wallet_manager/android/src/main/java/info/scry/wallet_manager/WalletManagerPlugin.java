@@ -1169,6 +1169,9 @@ public class WalletManagerPlugin implements MethodCallHandler {
             }
             case "updateSubChainBasicInfo": {
                 ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is enter ===>");
+                // ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is infoId ===>"+(String) (call.argument("infoId")));
+                // ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is genesisHash ===>"+(String) (call.argument("genesisHash")));
+                // ScryWalletLog.d("nativeLib=>", "updateSubChainBasicInfo is isDefault ===>"+(call.argument("isDefault")));
                 Message message = new Message();
                 SubChainBasicInfo chainInfo = new NativeLib.SubChainBasicInfo();
                 chainInfo.infoId = (String) (call.argument("infoId"));
@@ -1180,12 +1183,31 @@ public class WalletManagerPlugin implements MethodCallHandler {
                 chainInfo.tokenDecimals = (int) (call.argument("tokenDecimals"));
                 chainInfo.tokenSymbol = (String) (call.argument("tokenSymbol"));
                 try {
-                    message = NativeLib.updateSubChainBasicInfo(chainInfo, true);
+                    message = NativeLib.updateSubChainBasicInfo(chainInfo,  (boolean) (call.argument("isDefault")));
                 } catch (Exception exception) {
                     ScryWalletLog.d("nativeLib=>", "updateSubChainBasic exception is " + exception);
                 }
                 Map resultMap = new HashMap();
                 resultMap.put("status", message.status);
+                result.success(resultMap);
+                break;
+            }
+            case "cleanWalletsDownloadData": {
+                ScryWalletLog.d("nativeLib=>", "cleanWalletsDownloadData is enter ===>");
+                WalletState walletState = new WalletState();
+                try {
+                    walletState = NativeLib.cleanWalletsDownloadData();
+                } catch (Exception exception) {
+                    ScryWalletLog.d("nativeLib=>", "cleanWalletsDownloadData exception is " + exception);
+                }
+                Map resultMap = new HashMap();
+                int status = walletState.status;
+                resultMap.put("status", status);
+                if (status == 200) {
+                    resultMap.put("isCleanWalletsData", walletState.isCleanWalletsData);
+                }else{
+                    resultMap.put("message", walletState.message);
+                }
                 result.success(resultMap);
                 break;
             }

@@ -44,12 +44,12 @@
   "eeeUnit": "1000000000000000",
   "systemSymbol": "System",
   "accountSymbol": "Account",
-  "tokenXSymbol": "Tokenx",
+  "tokenXSymbol": "TokenX",
   "balanceSymbol": "Balances",
   "eeeSymbol": "Eee",
   "privateConfig": {
-    "serverConfigIp": "https://casg/check",
-    "serverApkVersionKey": "2.1.0",
+    "serverConfigIp": "",
+    "serverApkVersion": "2.1.0",
     "configVersion": "1.0.0",
     "downloadAppUrl": "333",
     "downloadLatestAppUrl": "https://atest",
@@ -66,7 +66,7 @@
     ],
     "defaultTokens": [
       {
-        "contractAddress": "0x9F5F3CFD7a37b91c7342",
+        "contractAddress": "",
         "shortName": "DDD",
         "fullName": "DDD",
         "urlImg": "locale://ic_ddd.png",
@@ -75,7 +75,7 @@
         "chainType": "ETH"
       },
       {
-        "contractAddress": "0xaa1e",
+        "contractAddress": "",
         "shortName": "DDD",
         "fullName": "DDD",
         "urlImg": "locale://ic_ddd.png",
@@ -85,8 +85,8 @@
       },
       {
         "contractAddress": "",
-        "shortName": "",
-        "fullName": "",
+        "shortName": "TokenX",
+        "fullName": "TokenX",
         "urlImg": "",
         "id": "5",
         "decimal": "15",
@@ -99,6 +99,8 @@
     "etherscanKey": "",
     "dddMainNetCA": "",
     "dddTestNetCA": "",
+    "d2eMainNetEthAddress": "",
+    "d2eTestNetEthAddress": "",
     "dappOpenUrl": "https://cashtml"
   }
 }
