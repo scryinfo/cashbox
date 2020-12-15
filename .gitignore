@@ -74,3 +74,5 @@ git
 demo/rbatis_demo/target
 /demo/rbatis_demo/Cargo.lock
 *.sqlite
+*.db-shm
+*.db-wal

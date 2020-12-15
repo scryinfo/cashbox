@@ -338,7 +338,7 @@ impl DetailSqlite {
 
 fn main() {
     let btc_chain = ChainSqlite::init_chain_db(r#"btc_chain.db"#);
-    //let btc_detail = DetailSqlite::init_detail_db(r#"btc_detail.db"#);
+    let btc_detail = DetailSqlite::init_detail_db(r#"btc_detail.db"#);
     // let p = btc_detail.progress();
     // println!("{:?}",p);
 

@@ -15,7 +15,7 @@ use std::ops::Add;
 use async_std::task::block_on;
 use crate::moudle::chain::MBlockHeader;
 use rbatis::crud::CRUD;
-use crate::moudle::detail::{MProgress, MTxInput, MTxOutput};
+use crate::moudle::detail::{MProgress, MTxInput, MTxOutput, MUserAddress};
 use rbatis::plugin::page::{PageRequest, Page, IPage};
 use async_trait::async_trait;
 
@@ -571,6 +571,31 @@ impl DetailSqlite {
             Err(e) => {
                 debug!("save_tx_input {:?}", e);
             }
+        }
+    }
+
+    pub fn save_user_address(&self, address: String, compressed_pub_key: String){
+        let user_address = MUserAddress {
+            id: None,
+            address,
+            compressed_pub_key
+        };
+        let r = block_on(self.rb.save("", &user_address));
+        match r {
+            Ok(a) => {
+                debug!("save_tx_input {:?}", a);
+            }
+            Err(e) => {
+                debug!("save_tx_input {:?}", e);
+            }
+        }
+    }
+
+    pub fn fetch_user_address(&self) -> Option<MUserAddress>{
+        let r: Result<Option<MUserAddress>, _> = block_on(self.rb.fetch_by_id("", &1u64));
+        match r {
+            Ok(p) => p,
+            Err(_) => None
         }
     }
 }
