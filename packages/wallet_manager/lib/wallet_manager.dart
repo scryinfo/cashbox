@@ -315,7 +315,7 @@ class WalletManager {
   }
 
   static updateSubChainBasicInfo(String infoId, int runtimeVersion, int txVersion, String genesisHash, String metadata, int ss58Format,
-      int tokenDecimals, String tokenSymbol) async {
+      int tokenDecimals, String tokenSymbol, bool isDefault) async {
     Map<dynamic, dynamic> updateMap = await _channel.invokeMethod("updateSubChainBasicInfo", {
       "infoId": infoId,
       "runtimeVersion": runtimeVersion,
@@ -325,7 +325,13 @@ class WalletManager {
       "ss58Format": ss58Format,
       "tokenDecimals": tokenDecimals,
       "tokenSymbol": tokenSymbol,
+      "isDefault": isDefault,
     });
     return updateMap;
+  }
+
+  static cleanWalletsDownloadData() async {
+    Map<dynamic, dynamic> cleanMap = await _channel.invokeMethod("cleanWalletsDownloadData");
+    return cleanMap;
   }
 }
