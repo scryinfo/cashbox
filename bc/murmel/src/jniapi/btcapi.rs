@@ -4,8 +4,8 @@
 #![cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
 #![allow(non_snake_case)]
 
-use crate::constructor::Constructor;
 use super::*;
+use crate::constructor::Constructor;
 
 use bitcoin::consensus::serialize;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
@@ -21,12 +21,11 @@ use jni::JNIEnv;
 use log::info;
 use log::Level;
 
+use crate::config::{BTC_CHAIN_PATH};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
 use std::time::SystemTime;
-use crate::db::lazy_db_default;
-use crate::config::{BTC_DETAIL_PATH, BTC_CHAIN_PATH};
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -160,7 +159,10 @@ pub extern "system" fn Java_JniApi_btcLoadBalance(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
+pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(
+    env: JNIEnv<'_>,
+    _class: JClass<'_>,
+) -> jstring {
     let sqlite = lazy_db_default();
     let max_block_number = (*sqlite).lock().count();
     let max_block_number = env
@@ -171,7 +173,10 @@ pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv<'_>, _class
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
+pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(
+    env: JNIEnv<'_>,
+    _class: JClass<'_>,
+) -> jstring {
     let sqlite = lazy_db_default().lock();
     let height = sqlite.query_scanned_height();
     let max_block_number = env
@@ -182,7 +187,10 @@ pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv<'_>, _class
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcIsSyncDataOk(_env: JNIEnv<'_>, _class: JClass<'_>) -> jboolean {
+pub extern "system" fn Java_JniApi_btcIsSyncDataOk(
+    _env: JNIEnv<'_>,
+    _class: JClass<'_>,
+) -> jboolean {
     unimplemented!()
 }
 
@@ -201,7 +209,11 @@ pub extern "system" fn Java_JniApi_btcLoadTxHistory(
 // this function don't have any return value。because it will run spv node
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv<'_>, _class: JClass<'_>, network: JString<'_>) {
+pub extern "system" fn Java_JniApi_btcStart(
+    env: JNIEnv<'_>,
+    _class: JClass<'_>,
+    network: JString<'_>,
+) {
     // TODO
     // use testnet for test and default
     // must change it in future
@@ -271,7 +283,7 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv<'_>, _class: JClass<'_>,
 }
 
 mod test {
-    use crate::jniapi::{calc_pubkey, calc_bloomfilter, calc_default_address};
+    use crate::jniapi::{calc_bloomfilter, calc_default_address, calc_pubkey};
 
     #[test]
     pub fn test_calc_pubkey() {

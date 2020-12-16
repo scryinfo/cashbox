@@ -21,7 +21,6 @@ use log::{error, info, trace, warn};
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
-use crate::db::lazy_db_default;
 
 const PUBLIC_KEY: &str = "0291ee52a0e0c22db9772f237f4271ea6f9330d92b242fb3c621928774c560b699";
 

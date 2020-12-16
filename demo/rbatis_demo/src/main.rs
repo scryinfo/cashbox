@@ -73,7 +73,7 @@ async fn init_rbatis(db_file_name: &str) -> Rbatis {
 
 impl ChainSqlite {
     pub fn init_chain_db(db_file_name: &str) -> Self {
-        let sql = create_chain_sql();
+        let sql = include_str!("sql/create_chain.sql");
         let rb = block_on(init_rbatis(db_file_name));
         let r = block_on(rb.exec("create chain db", sql));
         match r {
@@ -221,7 +221,7 @@ impl DetailSqlite {
     }
 
     fn create_tx_input(rb: &Rbatis) {
-        let sql = create_tx_input_sql();
+        let sql = include_str!("sql/create_tx_input.sql");
         let r = block_on(rb.exec("create chain db", sql));
         match r {
             Ok(a) => {
@@ -351,6 +351,6 @@ fn main() {
     // let r = btc_chain.fetch_scan_header("10".to_string(), true);
     // println!("{:?}", r.len())
 
-    let height = btc_chain.fetch_height();
-    print!("{}", height);
+    //let height = btc_chain.fetch_height();
+    //print!("{}", height);
 }

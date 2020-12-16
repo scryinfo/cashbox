@@ -57,8 +57,6 @@ pub enum Error {
     Handshake,
     /// lost connection
     Lost(String),
-    /// SQLite error
-    SQLite(sqlite::Error),
 }
 
 impl std::error::Error for Error {
@@ -78,7 +76,6 @@ impl std::error::Error for Error {
             Error::Serialize(ref err) => err.description(),
             Error::Handshake => "handshake",
             Error::Lost(ref s) => s,
-            Error::SQLite(ref err) => err.description(),
         }
     }
 
@@ -98,7 +95,6 @@ impl std::error::Error for Error {
             Error::Serialize(ref err) => Some(err),
             Error::Handshake => None,
             Error::Lost(_) => None,
-            Error::SQLite(ref err) => Some(err),
         }
     }
 }
@@ -124,7 +120,6 @@ impl fmt::Display for Error {
             Error::Util(ref err) => write!(f, "Util error: {}", err),
             Error::Hammersbald(ref err) => write!(f, "Hammersbald error: {}", err),
             Error::Serialize(ref err) => write!(f, "Serialize error: {}", err),
-            Error::SQLite(ref err) => write!(f, "SQLite error: {}", err),
         }
     }
 }

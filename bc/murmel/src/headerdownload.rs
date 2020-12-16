@@ -36,7 +36,6 @@ use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use log::{debug, error, info, trace};
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
-use crate::db::lazy_db_default;
 
 pub struct HeaderDownload {
     p2p: P2PControlSender<NetworkMessage>,
