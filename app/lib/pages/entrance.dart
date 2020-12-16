@@ -15,6 +15,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert' as convert;
 import 'home.dart';
+import 'package:app/net/scryx_net_util.dart';
 
 class EntrancePage extends StatefulWidget {
   @override
@@ -86,6 +87,26 @@ class _EntrancePageState extends State<EntrancePage> {
           if (isLatestConfig == null || !isLatestConfig) {
             var latestConfigObj = resultData["latestConfig"];
             var isLatestAuthToken = resultData["isLatestAuthToken"];
+
+            ///check and update  EeeChain txVersion and runtimeVersion
+            try {
+              ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+              Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0); // get local default Eee chain info
+              if (getSubChainMap == null || !getSubChainMap.containsKey("status") || getSubChainMap["status"] != 200) {
+                Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
+                LogUtil.instance.i("updateSubChainBasicInfo  ", "empty case!");
+              } else if (latestConfigObj["runtimeVersion"] == null ||
+                  getSubChainMap["runtimeVersion"] == null ||
+                  latestConfigObj["txVersion"] == null ||
+                  getSubChainMap["txVersion"] == null ||
+                  latestConfigObj["runtimeVersion"].toString() != getSubChainMap["runtimeVersion"].toString() ||
+                  latestConfigObj["txVersion"].toString() != getSubChainMap["txVersion"].toString()) {
+                Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
+                LogUtil.instance.i("updateSubChainBasicInfo  ", " finish do updateSubChainBasicInfo");
+              }
+            } catch (e) {
+              LogUtil.instance.e("updateSubChainBasicInfo error is ---> ", e.toString());
+            }
 
             ///update auth digit list
             if (!isLatestAuthToken) {
