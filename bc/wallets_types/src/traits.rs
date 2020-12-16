@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 
-use mav::ma::Db;
+use mav::WalletType;
+use mav::ma::{Db, MAddress};
 
 use crate::WalletError;
 
@@ -16,4 +17,12 @@ pub trait ContextTrait: Send + Sync {
     fn stopped(&self) -> bool;
 
     fn set_stopped(&mut self, s: bool);
+}
+
+pub trait ChainTrait: Send + Sync {
+    fn generate_address(&self, mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError>;
+}
+
+pub trait WalletTrait: Send + Sync {
+    fn chains(&self) -> &Vec<Box<dyn ChainTrait>>;
 }

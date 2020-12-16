@@ -8,6 +8,5 @@ export CC=$TOOLCHAIN/bin/aarch64-linux-android28-clang
 export LINKER=$TOOLCHAIN/bin/%HOST_TAG%28-clang.cmd
 export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$LINKER
 cd $batPath/..
-cargo build --release --target  aarch64-linux-android
+cargo build --release --target aarch64-linux-android
 cd $cuPath
-

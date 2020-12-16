@@ -1,0 +1,23 @@
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+BUILD_DUMMY_WASM_BINARY=1
+
+[tasks.clippy]
+description = "Lint with Clippy"
+install_crate = { rustup_component_name = "clippy", binary = "cargo-clippy", test_arg = "--help" }
+command = "cargo"
+args = ["clippy", "--all-features", "--", "--deny", "warnings", "--deny", "clippy::pedantic", "--deny", "clippy::nursery"]
+
+[tasks.fmt]
+description = "Format with rustfmt"
+command = "cargo"
+args = ["fmt"]
+
+[tasks.build_test]
+description = "build test"
+command = "cargo"
+args = ["test --no-run"]
+
+[tasks.before]
+dependencies=["clippy","fmt"]
+run_task=[{name="build_test"}]

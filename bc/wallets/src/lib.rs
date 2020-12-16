@@ -8,6 +8,7 @@ pub use wallets::Wallets;
 
 mod wallets;
 mod contexts;
+mod chain;
 
 #[cfg(target_os = "android")]
 mod logger;

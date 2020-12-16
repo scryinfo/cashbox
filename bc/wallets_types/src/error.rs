@@ -11,8 +11,8 @@ pub enum WalletError {
     Parameters(String),
     Custom(String),
     Decode(String),
-    // EthTx(ethtx::Error),
-    // SubstrateTx(substratetx::error::Error),
+    EthTx(ethtx::Error),
+    SubstrateTx(substratetx::error::Error),
     Serde(serde_json::Error),
     ScaleCodec(codec::Error),
     Secp256k1(secp256k1::Error),
@@ -30,8 +30,8 @@ impl fmt::Display for WalletError {
             WalletError::Db(ref err) => err.fmt(f),
             WalletError::Parameters(ref err) => write!(f, "Parameters error: {}", err),
             // WalletError::Sqlite(ref err) => err.fmt(f),
-            // WalletError::EthTx(ref err) => err.fmt(f),
-            // WalletError::SubstrateTx(ref err) => err.fmt(f),
+            WalletError::EthTx(ref err) => err.fmt(f),
+            WalletError::SubstrateTx(ref err) => err.fmt(f),
             WalletError::Serde(ref err) => err.fmt(f),
             WalletError::ScaleCodec(ref err) => err.fmt(f),
             WalletError::Secp256k1(ref err) => err.fmt(f),
@@ -49,8 +49,8 @@ impl std::error::Error for WalletError {
         match self {
             WalletError::Io(ref err) => Some(err),
             WalletError::Serde(error) => Some(error),
-            // WalletError::EthTx(error) => Some(error),
-            // WalletError::SubstrateTx(error) => Some(error),
+            WalletError::EthTx(error) => Some(error),
+            WalletError::SubstrateTx(error) => Some(error),
             _ => None,
         }
     }
@@ -68,11 +68,11 @@ impl From<serde_json::error::Error> for WalletError {
     }
 }
 
-// impl From<ethtx::Error> for WalletError {
-//     fn from(err: ethtx::Error) -> WalletError {
-//         WalletError::EthTx(err)
-//     }
-// }
+impl From<ethtx::Error> for WalletError {
+    fn from(err: ethtx::Error) -> WalletError {
+        WalletError::EthTx(err)
+    }
+}
 
 impl From<io::Error> for WalletError {
     fn from(err: io::Error) -> WalletError {
@@ -122,11 +122,11 @@ impl From<rlp::DecoderError> for WalletError {
     }
 }
 
-// impl From<substratetx::error::Error> for WalletError {
-//     fn from(err: substratetx::error::Error) -> Self {
-//         WalletError::SubstrateTx(err)
-//     }
-// }
+impl From<substratetx::error::Error> for WalletError {
+    fn from(err: substratetx::error::Error) -> Self {
+        WalletError::SubstrateTx(err)
+    }
+}
 
 impl From<semver::SemVerError> for WalletError {
     fn from(err: semver::SemVerError) -> Self {
@@ -167,6 +167,8 @@ impl Error {
     pub fn IO() -> Error { Error { code: 100, message: "IO error".to_owned() } }
     pub fn DB() -> Error { Error { code: 500, message: "DB error".to_owned() } }
     pub fn PARAMETER() -> Error { Error { code: 110, message: "Parameter error ".to_owned() } }
+    pub fn ETHTX() -> Error { Error { code: 300, message: "EthTx error ".to_owned() } }
+    pub fn SUBSTRATETX() -> Error { Error { code: 310, message: "SubstrateTx error ".to_owned() } }
     pub fn CUSTOM() -> Error { Error { code: 120, message: "CUSTOM error".to_owned() } }
     pub fn DECODE() -> Error { Error { code: 130, message: "DECODE error".to_owned() } }
     pub fn SERDE() -> Error { Error { code: 140, message: "SERDE error".to_owned() } }
@@ -195,6 +197,8 @@ impl From<WalletError> for Error {
             WalletError::Io(err) => Self::IO().set_message(&err.to_string()),
             WalletError::Db(err) => Self::DB().set_message(&err.to_string()),
             WalletError::Parameters(err) => Self::PARAMETER().set_message(&err),
+            WalletError::EthTx(err) => Self::ETHTX().set_message(&err.to_string()),
+            WalletError::SubstrateTx(err) => Self::SUBSTRATETX().set_message(&err.to_string()),
             WalletError::Custom(str) => Self::CUSTOM().set_message(str),
             WalletError::Decode(str) => Self::DECODE().set_message(str),
             WalletError::Serde(err) => Self::SERDE().set_message(&err.to_string()),

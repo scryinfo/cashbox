@@ -25,6 +25,7 @@ rlp = "0.4"
 rbatis = { version = "1.8.43", features = ["async-io-sqlite"] }
 async-std = { version = "1.7" }
 
+ethtx = { path = "../util/ethtx" }
 substratetx = { path = "../util/substratetx" }
 wallets_types = { path = "../wallets_types" }
 mav = { path = "../mav" }

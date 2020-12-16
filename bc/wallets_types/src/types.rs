@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use rbatis::rbatis::Rbatis;
 
 use mav::ma::{Dao, MAddress, MChainShared, MTokenShared, MWallet};
 use mav::WalletType;
@@ -28,14 +27,16 @@ impl Wallet {
         Ok(ws)
     }
 
-    pub async fn mnemonic_digest(rb: &Rbatis, digest: &str) -> Result<Vec<MWallet>, WalletError> {
+    pub async fn mnemonic_digest(context: &dyn ContextTrait, digest: &str) -> Result<Vec<MWallet>, WalletError> {
+        let rb = context.db().wallets_db();
         let mut wrapper = rb.new_wrapper();
         wrapper.eq(MWallet::mnemonic_digest, digest);
         let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(ms)
     }
 
-    pub async fn wallet_type_mnemonic_digest(rb: &Rbatis, digest: &str, wallet_type: &WalletType) -> Result<Vec<MWallet>, WalletError> {
+    pub async fn wallet_type_mnemonic_digest(context: &dyn ContextTrait, digest: &str, wallet_type: &WalletType) -> Result<Vec<MWallet>, WalletError> {
+        let rb = context.db().wallets_db();
         let mut wrapper = rb.new_wrapper();
         wrapper.eq(MWallet::mnemonic_digest, digest.to_owned());
         wrapper.eq(MWallet::wallet_type, wallet_type.to_string());

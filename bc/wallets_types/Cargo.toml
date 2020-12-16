@@ -23,5 +23,8 @@ rbatis-core = { version = "1.8.43", features = ["async-io-sqlite"] }
 
 async-trait = "0.1.31"
 
+ethtx = { path = "../util/ethtx" }
+substratetx = { path = "../util/substratetx" }
 mav = { path = "../mav" }
+
 

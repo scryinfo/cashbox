@@ -126,12 +126,12 @@ pub enum DbCreateType {
 
 #[derive(Default)]
 pub struct Db {
-    pub cashbox_wallets: Rbatis,
-    pub cashbox_mnemonic: Rbatis,
-    pub wallet_mainnet: Rbatis,
-    pub wallet_private: Rbatis,
-    pub wallet_testnet: Rbatis,
-    pub wallet_testnet_private: Rbatis,
+    cashbox_wallets: Rbatis,
+    cashbox_mnemonic: Rbatis,
+    wallet_mainnet: Rbatis,
+    wallet_private: Rbatis,
+    wallet_testnet: Rbatis,
+    wallet_testnet_private: Rbatis,
     pub db_name: DbNames,
 }
 
