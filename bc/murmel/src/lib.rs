@@ -27,7 +27,6 @@
 #![forbid(unsafe_code)]
 #![allow(bare_trait_objects)]
 #![allow(ellipsis_inclusive_range_patterns)]
-#![allow(deprecated)]
 #![allow(incomplete_include)]
 
 mod headercache;

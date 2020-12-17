@@ -12,7 +12,7 @@ use std::ops::Add;
 use async_std::task::block_on;
 use crate::moudle::chain::MBlockHeader;
 use rbatis::crud::CRUD;
-use crate::moudle::detail::{MProgress, MTxInput, MTxOutput, MUserAddress};
+use crate::moudle::detail::{MProgress, MTxInput, MTxOutput, MUserAddress, MLocalTx};
 use rbatis::plugin::page::{PageRequest, Page, IPage};
 use async_trait::async_trait;
 
@@ -23,7 +23,7 @@ pub struct ChainSqlite {
 
 impl ChainSqlite {
     pub fn init_chain_db(network: Network, db_file_name: &str) -> Self {
-        let sql = include_str!("../sql/create_chain.sql");
+        let sql = MBlockHeader::SQL;
         let rb = block_on(ChainSqlite::init_rbatis(db_file_name));
         let r = block_on(rb.exec("create chain db", sql));
         match r {
@@ -147,7 +147,7 @@ impl DetailSqlite {
     }
 
     fn create_user_address(rb: &Rbatis) {
-        let sql = include_str!("../sql/create_user_address.sql");
+        let sql = MUserAddress::SQL;
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
@@ -160,7 +160,7 @@ impl DetailSqlite {
     }
 
     fn create_tx_input(rb: &Rbatis) {
-        let sql = include!("../sql/create_tx_input.sql");
+        let sql = MTxInput::SQL;
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
@@ -173,7 +173,7 @@ impl DetailSqlite {
     }
 
     fn create_tx_output(rb: &Rbatis) {
-        let sql = include!("../sql/create_tx_output.sql");
+        let sql = MTxOutput::SQL;
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
@@ -186,7 +186,7 @@ impl DetailSqlite {
     }
 
     fn create_progress(rb: &Rbatis) {
-        let sql = include_str!("../sql/create_progress.sql");
+        let sql = MProgress::SQL;
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
@@ -199,7 +199,7 @@ impl DetailSqlite {
     }
 
     fn create_local_tx(rb: &Rbatis) {
-        let sql = include!("../sql/create_local_tx.sql");
+        let sql = MLocalTx::SQL;
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {

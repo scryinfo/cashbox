@@ -8,6 +8,10 @@ pub struct MUserAddress {
     pub compressed_pub_key: String,
 }
 
+impl MUserAddress {
+    pub(crate) const SQL: &'static str = std::include_str!("../../sql/create_user_address.sql");
+}
+
 #[crud_enable(table_name: tx_input)]
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MTxInput {
@@ -17,6 +21,10 @@ pub struct MTxInput {
     pub prev_tx: String,
     pub prev_vout: String,
     pub sequence: i64,
+}
+
+impl MTxInput {
+    pub(crate) const SQL: &'static str = std::include_str!("../../sql/create_tx_input.sql");
 }
 
 #[crud_enable(table_name: tx_output)]
@@ -29,12 +37,20 @@ pub struct MTxOutput {
     pub vin: String,
 }
 
+impl MTxOutput {
+    pub(crate) const SQL: &'static str = std::include_str!("../../sql/create_tx_output.sql");
+}
+
 #[crud_enable(table_name: progress)]
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MProgress {
     pub id: Option<u64>,
     pub header: String,
     pub timestamp: String,
+}
+
+impl MProgress {
+    pub(crate) const SQL: &'static str = std::include_str!("../../sql/create_progress.sql");
 }
 
 #[crud_enable(table_name: local_tx)]
@@ -47,3 +63,6 @@ pub struct MLocalTx {
     pub status: String,
 }
 
+impl MLocalTx {
+    pub(crate) const SQL: &'static str = std::include_str!("../../sql/create_local_tx.sql");
+}
