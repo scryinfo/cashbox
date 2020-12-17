@@ -2,6 +2,7 @@ use super::*;
 use std::convert::TryFrom;
 use frame_metadata::RuntimeMetadataPrefixed;
 use node_metadata::Metadata;
+use hex::ToHex;
 
 pub struct ChainHelper {
     metadata: Metadata,
@@ -40,7 +41,8 @@ impl ChainHelper {
     }
 
     //todo add sign preview func
-    pub fn tx_sign(&self, mnemonic: &str, index: u32, func_data: &[u8]) -> Result<String, error::Error> {
+    pub fn tx_sign(&self, mnemonic: &str, index: u32, func_data: &[u8],is_submittable:bool) -> Result<String, error::Error> {
+       // let signer = crypto::Sr25519::pair_from_phrase(mnemonic, None)?;
         let signer = crypto::Sr25519::pair_from_phrase(mnemonic, None)?;
         let prefix_len = extrinsic::get_func_prefix_len(func_data);
         let func_data = &func_data[prefix_len..];
@@ -63,13 +65,17 @@ impl ChainHelper {
             }
         };
         let signature = signer.sign(&sign_data);
-        let xt = extrinsic::UncheckedExtrinsicFromOuter::new_signed(
-            func_data.to_vec(),
-            GenericAddress::from(signer.public().0),
-            MultiSignature::from(signature),
-            GenericExtra::new(Era::Immortal, index),
-        );
-        Ok(xt.hex_encode())
+        if !is_submittable{
+            Ok(format!("0x01{}",hex::encode(&signature.0[..])))
+        }else {
+            let xt = extrinsic::UncheckedExtrinsicFromOuter::new_signed(
+                func_data.to_vec(),
+                GenericAddress::from(signer.public().0),
+                MultiSignature::from(signature),
+                GenericExtra::new(Era::Immortal, index),
+            );
+             Ok(xt.hex_encode())
+        }
     }
 
     pub fn get_storage_map_key<K: Encode, V: Decode + Clone>(&self, storage_prefix: &str, storage_key_name: &str, map_key: K) -> Result<String, error::Error> {

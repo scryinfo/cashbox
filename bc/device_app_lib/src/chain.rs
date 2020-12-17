@@ -490,7 +490,7 @@ pub mod android {
         }
 
         let eee = wallets::module::EEE {};
-        match eee.raw_tx_sign(&raw_tx.unwrap(), &wallet_id.unwrap(), &pwd.unwrap()) {
+        match eee.raw_tx_sign(&raw_tx.unwrap(), &wallet_id.unwrap(), &pwd.unwrap(),true) {
             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("set StatusCode ");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set signedInfo");
@@ -518,7 +518,7 @@ pub mod android {
             return *state_obj;
         }
         let eee = wallets::module::EEE {};
-        match eee.raw_sign(&raw_tx.unwrap(), &wallet_id.unwrap(), &pwd.unwrap()) {
+        match  eee.raw_tx_sign(&raw_tx.unwrap(), &wallet_id.unwrap(), &pwd.unwrap(),false) {
             Ok(data) => {
                 env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("eeeSign set StatusCode value");
                 env.set_field(state_obj, "signedInfo", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(data).unwrap()))).expect("set error msg value ");
@@ -844,11 +844,11 @@ pub mod android {
                 Ok(info_id) => {
                     chain_info_detail.info_id = info_id;
                    let basic_info_obj =  get_basic_info_obj(&env,&chain_info_detail);
-                    env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("eeeSign set StatusCode value");
+                    env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::OK as i32)).expect("updateSubChainBasicInfo set StatusCode value");
                     env.set_field(state_obj, "chainInfo", "Linfo/scry/wallet_manager/NativeLib$SubChainBasicInfo;", JValue::Object(JObject::from(basic_info_obj))).expect("getSubChainBasicInfo set chainInfo")
                 }
                 Err(msg) => {
-                    env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("eeeSign set StatusCode value");
+                    env.set_field(state_obj, "status", "I", JValue::Int(StatusCode::DylibError as i32)).expect("updateSubChainBasicInfo set StatusCode value");
                     env.set_field(state_obj, "message", "Ljava/lang/String;", JValue::Object(JObject::from(env.new_string(msg.to_string()).unwrap()))).expect("set message ");
                 }
             }

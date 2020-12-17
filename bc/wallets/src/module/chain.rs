@@ -181,7 +181,7 @@ impl EEE {
         }
     }
     // This function is used for externally stitched transactions, such as transactions constructed by js
-    pub fn raw_tx_sign(&self, raw_tx: &str, wallet_id: &str, psw: &[u8]) -> WalletResult<String> {
+    pub fn raw_tx_sign(&self, raw_tx: &str, wallet_id: &str, psw: &[u8],is_submittable:bool) -> WalletResult<String> {
         let tx_encode_data = substratetx::hexstr_to_vec(raw_tx)?;
         let tx = RawTx::decode(&mut &tx_encode_data[..]).expect("tx format");
         let wallet = module::wallet::WalletManager {};
@@ -192,10 +192,11 @@ impl EEE {
         let chain_infos= instance.get_sub_chain_info(Some(&genesis_hash_str),tx.spec_version,tx.tx_version)?;
         if let Some(chain_info) =chain_infos.get(0) {
             let chain_helper = substratetx::SubChainHelper::init(&chain_info.metadata,&tx.genesis_hash[..],chain_info.runtime_version as u32,chain_info.tx_version as u32,None)?;
-            let sign_data =   chain_helper.tx_sign(&mn,  tx.index, &self.restore_func_data(&tx.func_data))?;
+            let sign_data =   chain_helper.tx_sign(&mn,  tx.index, &self.restore_func_data(&tx.func_data),is_submittable)?;
             Ok(sign_data)
         }else {
-             Err(error::WalletError::NotExist)
+
+             Err(error::WalletError::Custom( format!("chain info {} is not exist!",genesis_hash_str)))
         }
     }
     // when decode RawTx instance,the function data length info will be drop,this func is aim to restore the original structure

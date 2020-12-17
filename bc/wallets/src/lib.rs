@@ -121,7 +121,7 @@ mod tests {
     use substratetx:: Crypto;
     use hex;
 
-    const MNEMONIC :&'static str = "alarm lottery circle settle account member deliver buffalo reason sunny size tongue";
+    const MNEMONIC :&'static str = "machine obscure caution wool edge box output deer ranch stereo position glimpse remove mutual settle";
 
     #[test]
     fn mnemonic_create_test() {
@@ -147,7 +147,7 @@ mod tests {
         //Create a wallet instance
         let manager = module::wallet::WalletManager{};
         let wallet = manager.create_wallet("foo",MNEMONIC.as_bytes(),"123456".as_bytes(),0).expect("save wallet");
-        let rawtx = "0xc804080254065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f0f0000c16ff2862318e68993e8bda6000000006cec71473c1b8d2295541cb5c21edc4fdb1926375413bb28f78793978229cf480600000001000000";
+        let rawtx = "0xa8040500a05de342fa2a9aed2f2899c97cdb25ba1ec6d1bedfb39b87afcefa981bb4956c0b0040e59c301200000000c68cadef9d04fd235d7deb94db1332767f3da2a1bf5462c75dba3a2047f8c15d0600000001000000";
         let eee = module::EEE {};
         match eee.raw_tx_sign(rawtx, &wallet.wallet_id, "123456".as_bytes()) {
             Ok(signed_data) => println!("tx sign result {}", signed_data),

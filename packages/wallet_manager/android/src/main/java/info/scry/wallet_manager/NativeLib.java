@@ -481,10 +481,10 @@ public class NativeLib {
 
     // extData: format-> hex string
     public static native Message tokenXTransfer(String from, String to, String value, String extData, int index, byte[] pwd);
-
+    //Sign the raw transaction and construct a transaction that can be submitted directly using jsonrpc.The algorithm used for signature is sr25519
     public static native Message eeeTxSign(String rawTx, String mnId, byte[] pwd);
 
-    // Only do information signature, tool function
+    // Sign the raw transaction,The signed result cannot be submitted directly using jsonrpc．
     public static native Message eeeSign(String rawTx, String mnId, byte[] pwd);
 
     public static native Message getSubChainBasicInfo(String genesisHash, int specVersion, int txVersion);

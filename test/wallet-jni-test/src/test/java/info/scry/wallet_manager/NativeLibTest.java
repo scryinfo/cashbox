@@ -108,7 +108,7 @@ public class NativeLibTest {
         for (NativeLib.Wallet wallet : wallets) {
             System.out.println("wallet detail " + wallet.toString());
             NativeLib.Mnemonic mnemonic1 = NativeLib.exportWallet(wallet.walletId, "123456".getBytes());
-            System.out.println("wallet id:" + wallet.walletId + "mnemonic:" + new String(mnemonic1.mn) + ",eth address:" + wallet.ethChain.address + "");
+            System.out.println("wallet id:" + wallet.walletId + ",mnemonic:" + new String(mnemonic1.mn) + ",eth address:" + wallet.ethChain.address + "");
             System.out.println("\n");
         }
     }
@@ -133,7 +133,7 @@ public class NativeLibTest {
         System.out.println("properties is:"+properties);
         // get metadata detail: {"id":7,"jsonrpc":"2.0","method":"state_getMetadata","params":[]}
         String metadata = client.invoke("state_getMetadata",  queryBlackHash==null?new Object[]{}:new Object[]{queryBlackHash}, String.class);
-        //  System.out.println("metadata is:"+metadata);
+       //   System.out.println("metadata is:"+metadata);
         Integer runtime_version = (Integer) version.get("specVersion");
         Integer tx_version = (Integer) version.get("transactionVersion");
         NativeLib.SubChainBasicInfo info = new NativeLib.SubChainBasicInfo(genesisHash,metadata,runtime_version,tx_version);
@@ -153,9 +153,9 @@ public class NativeLibTest {
     public void updateSubChainBasicInfoTest() throws Throwable{
         Map header = new HashMap<String, String>();
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.2.7:9933"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://127.0.0.1:9933"), header);
         NativeLib.Message message = saveSubChainBasicInfo(client,null,true);
-        System.out.println(message);
+        System.out.println("status:"+message.status+",message:"+message.message);
     }
 
     @Test
@@ -167,8 +167,27 @@ public class NativeLibTest {
 
     @Test
     public void eeeTxsign() {
-        String rawtx = "0x6501040902a39a014e7bceb3c2ff84bb6aba8d9e46c635257a2b9aa41969e70b0a8dd07b6c00070088526a74b8cc91625b766093d22a1f2be22b983cfcc89eb28cf89c8c849dc9a4688905d9ae300b465d146265616368e8030000080000002fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb9730200000001000000";
-        NativeLib.Message msg = NativeLib.eeeTxSign(rawtx, "5a2571e5-90ff-4954-a6aa-c97c6a7aacdc", "123456".getBytes());
+        List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
+        for (NativeLib.Wallet wallet : wallets) {
+            NativeLib.Mnemonic mnemonic1 = NativeLib.exportWallet(wallet.walletId, "123456".getBytes());
+            System.out.println("wallet id:" + wallet.walletId + ",mnemonic:" + new String(mnemonic1.mn));
+            System.out.println("\n");
+        }
+        String rawtx = "0xa8040500a05de342fa2a9aed2f2899c97cdb25ba1ec6d1bedfb39b87afcefa981bb4956c0b0040e59c301201000000c68cadef9d04fd235d7deb94db1332767f3da2a1bf5462c75dba3a2047f8c15d0600000001000000";
+        NativeLib.Message msg = NativeLib.eeeTxSign(rawtx, "986db8f7-fd30-413e-847c-f74ebe034f00", "123456".getBytes());
+        System.out.println(msg.toString());
+    }
+
+    @Test
+    public void eeesign() {
+        List<NativeLib.Wallet> wallets = NativeLib.loadAllWalletList();
+        for (NativeLib.Wallet wallet : wallets) {
+            NativeLib.Mnemonic mnemonic1 = NativeLib.exportWallet(wallet.walletId, "123456".getBytes());
+            System.out.println("wallet id:" + wallet.walletId + ",mnemonic:" + new String(mnemonic1.mn));
+            System.out.println("\n");
+        }
+        String rawtx = "0xa8040500a05de342fa2a9aed2f2899c97cdb25ba1ec6d1bedfb39b87afcefa981bb4956c0b0040e59c301201000000c68cadef9d04fd235d7deb94db1332767f3da2a1bf5462c75dba3a2047f8c15d0600000001000000";
+        NativeLib.Message msg = NativeLib.eeeSign(rawtx, "986db8f7-fd30-413e-847c-f74ebe034f00", "123456".getBytes());
         System.out.println(msg.toString());
     }
 
