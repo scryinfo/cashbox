@@ -78,23 +78,6 @@ impl MAddress {
     }
 }
 
-/// 动态库自己的配置，并不指app的配置
-#[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct MSetting {
-    #[serde(default)]
-    pub key_str: String,
-    /// 由于value可能会是数据库的关键字，所以加上str
-    #[serde(default)]
-    pub value_str: String,
-}
-
-impl MSetting {
-    pub const fn create_table_script() -> &'static str {
-        std::include_str!("../../../sql/m_setting.sql")
-    }
-}
-
 #[db_sub_struct]
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct MTokenShared {

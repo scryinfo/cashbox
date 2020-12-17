@@ -89,7 +89,7 @@ mod tests {
                 CStr_dFree(p_mn);
                 mn
             };
-            let w = {
+            let _ = {
                 let cw = CWallet_dAlloc();
                 let parameters = CreateWalletParameters {
                     name: "test".to_owned(),
@@ -100,14 +100,13 @@ mod tests {
                 let mut parameters = CCreateWalletParameters::to_c_ptr(&parameters);
                 let c_err = Wallets_createWallet(*context, parameters, cw) as *mut CError;
                 parameters.free();
-                assert_eq!(0 as CU64, (*c_err).code, "{}", to_str((*c_err).message));
+                assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
                 assert_ne!(null_mut(), *cw);
                 let w = CWallet::to_rust(&**cw);
                 CWallet_dFree(cw);
                 w
             };
-            let _ = free_wallets();
             CContext_dFree(context);
         }
     }

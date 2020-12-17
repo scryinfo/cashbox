@@ -8,7 +8,7 @@ use parking_lot::lock_api::RawReentrantMutex;
 use mav::ma::{BeforeSave, Dao, Db, MAddress, MMnemonic, MWallet};
 use mav::WalletType;
 use substratetx::{Crypto, Keccak256};
-use wallets_types::{Context, ContextTrait, CreateWalletParameters, InitParameters, Load, Wallet, WalletError, WalletTrait};
+use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait};
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
@@ -80,7 +80,8 @@ impl Wallets {
 
     /// 如果是正式钱包，一个助记词只能创建一个钱包（test类型的钱包允许有重复的）
     pub async fn create_wallet(&self, parameters: CreateWalletParameters) -> Result<Wallet, WalletError> {
-        let rb = self.db.wallets_db();
+        let context = self;
+        let rb = context.db.wallets_db();
         let hex_mn_digest = {
             let hash_first = parameters.mnemonic.as_bytes().keccak256();
             hex::encode((&hash_first[..]).keccak256())
@@ -88,7 +89,7 @@ impl Wallets {
 
         let wallet_type = WalletType::from(&parameters.wallet_type);
         if wallet_type == WalletType::Normal {
-            let ms = Wallet::wallet_type_mnemonic_digest(self, &hex_mn_digest, &wallet_type).await?;
+            let ms = Wallet::wallet_type_mnemonic_digest(context, &hex_mn_digest, &wallet_type).await?;
             if ms.is_empty().not() {
                 return Err(WalletError::Custom("this wallet is exist".to_owned()));
             }
@@ -117,6 +118,13 @@ impl Wallets {
                 m_mnemonic.save(self.db.mnemonic_db(), "").await?;
             }
             tx_wallets.is_drop_commit = true; //todo 怎么处理事务提交失败
+        }
+        {//是否为current wallet
+            if Wallet::count(context).await? == 1 {
+                let wallet_type = WalletType::from(&m_wallet.wallet_type);
+                //创建的第一个钱包，的默认链是 eee
+                Setting::save_current_wallet_chain(context, &m_wallet.id, &EeeChain::chain_type(&wallet_type)).await?;
+            }
         }
         let mut wallet = Wallet::default();
         wallet.load(self, m_wallet).await?;

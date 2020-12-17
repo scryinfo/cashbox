@@ -8,6 +8,7 @@ pub enum WalletError {
     Fail(String),
     Io(io::Error),
     Db(mav::Error),
+    NoRecord(String),
     Parameters(String),
     Custom(String),
     Decode(String),
@@ -28,6 +29,7 @@ impl fmt::Display for WalletError {
             WalletError::Fail(str) => write!(f, "Parameters error: {}", str),
             WalletError::Io(ref err) => err.fmt(f),
             WalletError::Db(ref err) => err.fmt(f),
+            WalletError::NoRecord(str) => write!(f, "No Record error: {}", str),
             WalletError::Parameters(ref err) => write!(f, "Parameters error: {}", err),
             // WalletError::Sqlite(ref err) => err.fmt(f),
             WalletError::EthTx(ref err) => err.fmt(f),
@@ -166,6 +168,7 @@ impl Error {
     pub fn FAIL() -> Error { Error { code: 1, message: "FAIL error ".to_owned() } }
     pub fn IO() -> Error { Error { code: 100, message: "IO error".to_owned() } }
     pub fn DB() -> Error { Error { code: 500, message: "DB error".to_owned() } }
+    pub fn NoRecord() -> Error { Error { code: 501, message: "No Record error".to_owned() } }
     pub fn PARAMETER() -> Error { Error { code: 110, message: "Parameter error ".to_owned() } }
     pub fn ETHTX() -> Error { Error { code: 300, message: "EthTx error ".to_owned() } }
     pub fn SUBSTRATETX() -> Error { Error { code: 310, message: "SubstrateTx error ".to_owned() } }
@@ -196,6 +199,7 @@ impl From<WalletError> for Error {
             WalletError::Fail(str) => Self::FAIL().set_message(str),
             WalletError::Io(err) => Self::IO().set_message(&err.to_string()),
             WalletError::Db(err) => Self::DB().set_message(&err.to_string()),
+            WalletError::NoRecord(str) => Self::NoRecord().set_message(str),
             WalletError::Parameters(err) => Self::PARAMETER().set_message(&err),
             WalletError::EthTx(err) => Self::ETHTX().set_message(&err.to_string()),
             WalletError::SubstrateTx(err) => Self::SUBSTRATETX().set_message(&err.to_string()),

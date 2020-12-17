@@ -238,6 +238,7 @@ mod tests {
 
     use crate::kits::{CArray, CMark, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
 
+    #[allow(unused_assignments)]
     #[test]
     fn c_array() {
         struct Data {}

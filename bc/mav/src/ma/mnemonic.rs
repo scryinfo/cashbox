@@ -71,6 +71,30 @@ mod tests {
         assert_ne!(0, m.get_update_time());
 
         let rb = block_on(init_memory());
+        {//exist
+            let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &rb.new_wrapper()));
+            assert_eq!(false, b.is_err(), "{:?}", b);
+            assert_eq!(false, b.unwrap());
+
+            let mut wrapper = rb.new_wrapper();
+            wrapper.eq(MMnemonic::id, "any");
+            let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
+            assert_eq!(false, b.is_err(), "{:?}", b);
+            assert_eq!(false, b.unwrap());
+
+            let mut wrapper = rb.new_wrapper();
+            wrapper.eq("1", 1);
+            let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
+            assert_eq!(false, b.is_err(), "{:?}", b);
+            assert_eq!(false, b.unwrap());
+
+            let mut wrapper = rb.new_wrapper();
+            wrapper.eq("1", 1);
+            wrapper.eq(MMnemonic::id, "any");
+            let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
+            assert_eq!(false, b.is_err(), "{:?}", b);
+            assert_eq!(false, b.unwrap());
+        }
         let mut m = MMnemonic::default();
         m.mnemonic = "test".to_owned();
         m.wallet_type = "eee".to_owned();
@@ -96,6 +120,30 @@ mod tests {
         assert_eq!(false, re.is_err());
         let list = re.unwrap();
         assert_eq!(2, list.len());
+        {//exist
+            let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &rb.new_wrapper()));
+            assert_eq!(false, b.is_err(), "{:?}", b);
+            assert_eq!(true, b.unwrap());
+
+            let mut wrapper = rb.new_wrapper();
+            wrapper.eq(MMnemonic::id, "any");
+            let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
+            assert_eq!(false, b.is_err(), "{:?}", b);
+            assert_eq!(false, b.unwrap());
+
+            let mut wrapper = rb.new_wrapper();
+            wrapper.eq("1", 1);
+            let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
+            assert_eq!(false, b.is_err(), "{:?}", b);
+            assert_eq!(true, b.unwrap());
+
+            let mut wrapper = rb.new_wrapper();
+            wrapper.eq("1", 1);
+            wrapper.eq(MMnemonic::id, "any");
+            let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
+            assert_eq!(false, b.is_err(), "{:?}", b);
+            assert_eq!(false, b.unwrap());
+        }
     }
 
     async fn init_memory() -> Rbatis {

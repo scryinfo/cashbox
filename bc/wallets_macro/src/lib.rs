@@ -27,6 +27,9 @@ mod cr;
 /// bigdecimal::BigDecimal
 /// #Sample include sub struct
 /// ````
+/// use serde::{Deserialize, Serialize};
+/// use wallets_macro::{db_append_shared,db_sub_struct};
+///
 /// #[db_append_shared(CRUDEnable)]
 /// #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 /// struct Big{
@@ -44,6 +47,11 @@ mod cr;
 /// ````
 /// # Sample no sub struct
 /// ````
+/// use serde::{Deserialize, Serialize};
+/// use rbatis_macro_driver::CRUDEnable;
+///
+/// use wallets_macro::db_append_shared;
+///
 /// #[db_append_shared]
 /// #[derive(Serialize, Deserialize, Clone, Debug, Default,CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 /// struct Big{
@@ -71,32 +79,24 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
     let name = &ast.ident;
 
     let imp_base = quote! {
-            impl Shared for #name {
-                fn get_id(&self) -> String {
-                    self.id.clone()
-                }
-
-                fn set_id(&mut self, id: String) {
-                    self.id = id;
-                }
-
-                fn get_create_time(&self) -> i64    {
-                    self.create_time
-                }
-
-                fn set_create_time(&mut self, create_time: i64) {
-                    self.create_time = create_time;
-                }
-
-                fn get_update_time(&self) -> i64 {
-                    self.update_time
-                }
-
-                fn set_update_time(&mut self, update_time: i64) {
-                    self.update_time = update_time;
-                }
-
+        impl Shared for #name {
+            fn get_id(&self) -> String { self.id.clone() }
+            fn set_id(&mut self, id: String) {
+                self.id = id;
             }
+            fn get_create_time(&self) -> i64    {
+                self.create_time
+            }
+            fn set_create_time(&mut self, create_time: i64) {
+                self.create_time = create_time;
+            }
+            fn get_update_time(&self) -> i64 {
+                self.update_time
+            }
+            fn set_update_time(&mut self, update_time: i64) {
+                self.update_time = update_time;
+            }
+        }
     };
 
     let impl_crud = if args.is_empty() {
@@ -119,6 +119,9 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
     if cfg!(feature = "print_macro") {
         println!("\n............gen impl db_append_shared {}:\n {}", name, gen);
     }
+    // if name.to_string() == "MMnemonic"{
+    //     println!("\n............gen impl db_append_shared {}:\n {}", name, gen);
+    // }
 
     if cfg!(feature = "db_meta") {
         let mut meta = db_meta::DbMeta::get().lock().expect("db_meta::DbMeta::get().lock()");

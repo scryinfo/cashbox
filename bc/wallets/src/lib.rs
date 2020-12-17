@@ -1,10 +1,8 @@
-// #[macro_use]
-// extern crate serde_derive;
-
-pub use contexts::Contexts;
 #[cfg(target_os = "android")]
 pub use logger::init_logger_once;
-pub use wallets::Wallets;
+
+pub use crate::contexts::Contexts;
+pub use crate::wallets::Wallets;
 
 mod wallets;
 mod contexts;

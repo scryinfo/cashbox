@@ -22,7 +22,7 @@ uuid = { version = "0.7", features = ["serde", "v4"] }
 secp256k1 = { version = "0.15", features = ["recovery"] }
 codec = { package = "parity-scale-codec", version = "1.2.0" }
 rlp = "0.4"
-rbatis = { version = "1.8.43", features = ["async-io-sqlite"] }
+rbatis = { version = "1.8.52", features = ["async-io-sqlite"] }
 async-std = { version = "1.7" }
 
 ethtx = { path = "../util/ethtx" }

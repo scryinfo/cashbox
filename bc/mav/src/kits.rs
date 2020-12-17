@@ -54,3 +54,10 @@ pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis, Error> {
     rb.link(url.as_str()).await?;
     return Ok(rb);
 }
+
+pub async fn make_memory_rbatis() -> Result<Rbatis, Error> {
+    let rb = Rbatis::new();
+    let url = "sqlite://:memory:".to_owned();
+    rb.link(&url).await?;
+    return Ok(rb);
+}

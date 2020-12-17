@@ -14,7 +14,6 @@ pub enum ChainType {
     EthTest = 4,
     EEE = 5,
     EeeTest = 6,
-    OTHER = 7,
 }
 
 impl From<&str> for ChainType {
@@ -26,7 +25,11 @@ impl From<&str> for ChainType {
             "EthTest" => ChainType::EthTest,
             "EEE" => ChainType::EEE,
             "EeeTest" => ChainType::EeeTest,
-            _ => ChainType::OTHER,
+            _ => {
+                let err = format!("the str:{} can not to ChainType", chain_type);
+                log::error!("{}",err);
+                panic!(err);
+            }
         }
     }
 }
@@ -46,7 +49,6 @@ impl ToString for ChainType {
             ChainType::EthTest => "EthTest".to_owned(),
             ChainType::EEE => "EEE".to_owned(),
             ChainType::EeeTest => "EeeTest".to_owned(),
-            ChainType::OTHER => "OTHER".to_owned(),
         }
     }
 }
@@ -149,37 +151,21 @@ mod tests {
     #[test]
     fn net_type_test() {
         for it in NetType::iter() {
-            match it {
-                NetType::Main => assert_eq!(it, NetType::from(&it.to_string())),
-                NetType::Test => assert_eq!(it, NetType::from(&it.to_string())),
-                NetType::Private => assert_eq!(it, NetType::from(&it.to_string())),
-                NetType::PrivateTest => assert_eq!(it, NetType::from(&it.to_string())),
-            }
+            assert_eq!(it, NetType::from(&it.to_string()));
         }
     }
 
     #[test]
     fn chain_type_test() {
         for it in ChainType::iter() {
-            match it {
-                ChainType::BTC => assert_eq!(it, ChainType::from(&it.to_string())),
-                ChainType::BtcTest => assert_eq!(it, ChainType::from(&it.to_string())),
-                ChainType::ETH => assert_eq!(it, ChainType::from(&it.to_string())),
-                ChainType::EthTest => assert_eq!(it, ChainType::from(&it.to_string())),
-                ChainType::EEE => assert_eq!(it, ChainType::from(&it.to_string())),
-                ChainType::EeeTest => assert_eq!(it, ChainType::from(&it.to_string())),
-                ChainType::OTHER => assert_eq!(it, ChainType::from(&it.to_string())),
-            }
+            assert_eq!(it, ChainType::from(&it.to_string()));
         }
     }
 
     #[test]
     fn wallet_type_test() {
         for it in WalletType::iter() {
-            match it {
-                WalletType::Normal => assert_eq!(it, WalletType::from(&it.to_string())),
-                WalletType::Test => assert_eq!(it, WalletType::from(&it.to_string())),
-            }
+            assert_eq!(it, WalletType::from(&it.to_string()));
         }
     }
 }

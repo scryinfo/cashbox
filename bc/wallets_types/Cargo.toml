@@ -8,6 +8,7 @@ edition = "2018"
 
 
 [dependencies]
+log = "0.4.8"
 uuid = { version = "0.7", features = ["serde", "v4"] }
 
 hex = "0.4.2"
@@ -18,10 +19,11 @@ semver = "0.11.0"
 codec = { package = "parity-scale-codec", version = "1.2.0" }
 rlp = "0.4"
 secp256k1 = { version = "0.15", features = ["recovery"] }
-rbatis = { version = "1.8.43", features = ["async-io-sqlite"] }
-rbatis-core = { version = "1.8.43", features = ["async-io-sqlite"] }
+rbatis = { version = "1.8.52", features = ["async-io-sqlite"] }
+rbatis-core = { version = "1.8.52", features = ["async-io-sqlite"] }
 
 async-trait = "0.1.31"
+async-std = { version = "1.7" }
 
 ethtx = { path = "../util/ethtx" }
 substratetx = { path = "../util/substratetx" }

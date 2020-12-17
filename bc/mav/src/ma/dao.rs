@@ -33,18 +33,28 @@ pub trait BeforeUpdate {
 
 #[async_trait]
 pub trait Dao<T: CRUDEnable + Shared> {
+    /// 调用 before_save 然后 insert 到数据 database,
     async fn save(&mut self, rb: &rbatis::rbatis::Rbatis, tx_id: &str) -> Result<DBExecResult>;
+    /// 调用 before_save 然后 insert 到数据 database,
     async fn save_batch(rb: &rbatis::rbatis::Rbatis, tx_id: &str, ms: &mut [T]) -> Result<DBExecResult>;
+    /// 如果id为空，调用save，
+    /// 如果id不为空，调用update_by_id, 且 last_insert_id为none
+    async fn save_update(&mut self, rb: &rbatis::rbatis::Rbatis, tx_id: &str) -> Result<DBExecResult>;
 
     async fn remove_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<u64> where T: 'async_trait;
     async fn remove_by_id(rb: &rbatis::rbatis::Rbatis, tx_id: &str, id: &T::IdType) -> Result<u64> where T: 'async_trait;
     async fn remove_batch_by_id(rb: &rbatis::rbatis::Rbatis, tx_id: &str, ids: &[T::IdType]) -> Result<u64> where T: 'async_trait;
 
+    /// 调用 before_update 然后 update 到数据 database,
     async fn update_by_wrapper(&mut self, rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper, update_null_value: bool) -> Result<u64>;
+    /// 调用 before_update 然后 update 到数据 database,
     async fn update_by_id(&mut self, rb: &rbatis::rbatis::Rbatis, tx_id: &str) -> Result<u64>;
+    /// 调用 before_update 然后 update 到数据 database,
     async fn update_batch_by_id(rb: &rbatis::rbatis::Rbatis, tx_id: &str, ids: &mut [T]) -> Result<u64>;
 
+    /// 查询唯一的一条记录，如果记录大于1条或没有，都会报错
     async fn fetch_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<T> where T: 'async_trait;
+    /// 查询唯一的一条记录，如果记录大于1条或没有，都会报错
     async fn fetch_by_id(rb: &rbatis::rbatis::Rbatis, tx_id: &str, id: &T::IdType) -> Result<T> where T: 'async_trait;
     async fn fetch_page_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper, page: &dyn IPageRequest) -> Result<Page<T>> where T: 'async_trait;
 
@@ -52,6 +62,11 @@ pub trait Dao<T: CRUDEnable + Shared> {
     async fn list(rb: &rbatis::rbatis::Rbatis, tx_id: &str) -> Result<Vec<T>> where T: 'async_trait;
     async fn list_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<Vec<T>> where T: 'async_trait;
     async fn list_by_ids(rb: &rbatis::rbatis::Rbatis, tx_id: &str, ids: &[T::IdType]) -> Result<Vec<T>> where T: 'async_trait;
+
+    ///使用 exist检查是否有数据
+    async fn exist_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<bool> where T: 'async_trait;
+    ///使用count计算数据的条数
+    async fn count_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<i64> where T: 'async_trait;
 }
 
 #[async_trait]
@@ -68,6 +83,18 @@ impl<T> Dao<T> for T where
             it.before_save();
         }
         rb.save_batch(tx_id, ms).await
+    }
+
+    async fn save_update(&mut self, rb: &rbatis::rbatis::Rbatis, tx_id: &str) -> Result<DBExecResult> {
+        if self.get_id().is_empty() {
+            self.save(rb, tx_id).await
+        } else {
+            let r = self.update_by_id(rb, tx_id).await?;
+            Ok(DBExecResult {
+                rows_affected: r,
+                last_insert_id: None,
+            })
+        }
     }
 
     async fn remove_by_wrapper(rb: &Rbatis, tx_id: &str, w: &Wrapper) -> Result<u64> where T: 'async_trait {
@@ -122,6 +149,31 @@ impl<T> Dao<T> for T where
 
     async fn list_by_ids(rb: &Rbatis, tx_id: &str, ids: &[T::IdType]) -> Result<Vec<T>> where T: 'async_trait {
         rb.list_by_ids(tx_id, ids).await
+    }
+
+    async fn exist_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<bool> where T: 'async_trait {
+        let w = w.clone().check()?;
+        let sql = {
+            if w.sql.is_empty() {
+                format!("SELECT EXISTS ( SELECT 1 FROM {} )", T::table_name())
+            } else {
+                format!("SELECT EXISTS ( SELECT 1 FROM {} WHERE {} )", T::table_name(), w.sql)
+            }
+        };
+        let re: i32 = rb.fetch_prepare(tx_id, &sql, &w.args).await?;
+        Ok(re != 0)
+    }
+    async fn count_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<i64> where T: 'async_trait {
+        let w = w.clone().check()?;
+        let sql = {
+            if w.sql.is_empty() {
+                format!("SELECT COUNT(*) FROM {} ", T::table_name())
+            } else {
+                format!("SELECT COUNT(*) FROM {} WHERE {} ", T::table_name(), w.sql)
+            }
+        };
+        let re: i64 = rb.fetch_prepare(tx_id, &sql, &w.args).await?;
+        Ok(re)
     }
 }
 

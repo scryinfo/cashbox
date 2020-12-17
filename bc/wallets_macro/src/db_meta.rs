@@ -347,8 +347,8 @@ mod tests {
         assert_eq!(true, sql.contains("o_f32 REAL DEFAULT NULL"));
         assert_eq!(true, sql.contains("o_f64 REAL DEFAULT NULL"));
 
-        assert_eq!(true, sql.contains("d_big String NOT NULL"));
-        assert_eq!(true, sql.contains("o_big String DEFAULT NULL"));
+        assert_eq!(true, sql.contains("d_big TEXT NOT NULL"));
+        assert_eq!(true, sql.contains("o_big TEXT DEFAULT NULL"));
 
         println!("{}", sql);
     }
@@ -358,11 +358,11 @@ mod tests {
         // let flatten = "#[serde(flatten)]";
         // let flatten = "flatten".to_string();
 
-        let fields_named: FieldsNamed = parse_quote! {
-            pub id: String,
-            //#[serde(flatten)]
-            pub d_str: String,
-        };
+        // let fields_named: FieldsNamed = parse_quote! {
+        //     pub id: String,
+        //     //#[serde(flatten)]
+        //     pub d_str: String,
+        // };
         // let fields = Fields::from(fields_named);
         // for f in &fields {
         //     println!("{:?}", f);

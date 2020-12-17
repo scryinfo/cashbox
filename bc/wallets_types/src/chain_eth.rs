@@ -117,8 +117,5 @@ mod tests {
         assert_eq!(WalletType::Normal, t);
         let t = EthChain::wallet_type(&ChainType::EthTest);
         assert_eq!(WalletType::Test, t);
-
-        let t = EthChain::wallet_type(&ChainType::OTHER);
-        assert_eq!(WalletType::Test, t);
     }
 }

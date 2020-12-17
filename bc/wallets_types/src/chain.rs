@@ -9,7 +9,6 @@ pub trait Chain2WalletType {
         match chain_type {
             ChainType::ETH | ChainType::BTC | ChainType::EEE => WalletType::Normal,
             ChainType::EthTest | ChainType::BtcTest | ChainType::EeeTest => WalletType::Test,
-            ChainType::OTHER => WalletType::Test,
         }
     }
 }

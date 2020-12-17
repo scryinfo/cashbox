@@ -146,23 +146,8 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
 
 #[cfg(test)]
 mod tests {
-    use proc_macro_roids::DeriveInputStructExt;
-    // use proc_macro_roids::FieldExt;
-    use syn::{Fields, FieldsNamed, parse_quote, Variant};
-
-    use crate::cr::dl_cr;
-
     #[test]
     fn dl_cr_test() {
-        let fields_named: FieldsNamed = parse_quote! {{
-            pub id: *mut c_char,
-            pub data: *mut CArray<T>,
-        }};
-        let name = "Test";
-        let fields = Fields::from(fields_named);
-        // let tm = dl_cr(&name, &fields);
-        // let code = tm.to_string();
-        // // assert_eq!(true, code.contains("id TEXT PRIMARY KEY"));
-        // println!("{}", code);
+        //can not test the fn
     }
 }

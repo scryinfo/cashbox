@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
-use mav::WalletType;
 use mav::ma::{Db, MAddress};
+use mav::WalletType;
 
 use crate::WalletError;
 

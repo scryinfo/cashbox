@@ -50,7 +50,7 @@ impl ChainTrait for EeeChain {
 }
 
 impl ChainTrait for BtcChain {
-    fn generate_address(&self, mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError> {
+    fn generate_address(&self, _mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError> {
         let mut addr = MAddress::default();
         addr.chain_type = wallets_types::BtcChain::chain_type(wallet_type).to_string();
         //todo

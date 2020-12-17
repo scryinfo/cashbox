@@ -164,6 +164,16 @@ impl Db {
         self.wallet_testnet_private = kits::make_rbatis(&self.db_name.wallet_testnet_private).await?;
         Ok(())
     }
+    pub async fn init_memory_sql(&mut self, name: &DbNames) -> Result<(), Error> {
+        self.db_name = name.clone();
+        self.cashbox_wallets = kits::make_memory_rbatis().await?;
+        self.cashbox_mnemonic = kits::make_memory_rbatis().await?;
+        self.wallet_mainnet = kits::make_memory_rbatis().await?;
+        self.wallet_private = kits::make_memory_rbatis().await?;
+        self.wallet_testnet = kits::make_memory_rbatis().await?;
+        self.wallet_testnet_private = kits::make_memory_rbatis().await?;
+        Ok(())
+    }
     pub async fn init_tables(db_name: &DbNames, create_type: &DbCreateType) -> Result<(), Error> {
         let rb = &kits::make_rbatis(&db_name.cashbox_mnemonic).await?;
         Db::create_table_mnemonic(rb, create_type).await?;

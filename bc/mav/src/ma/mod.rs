@@ -12,6 +12,7 @@ pub use crate::ma::detail_btc::{*};
 pub use crate::ma::detail_eee::{*};
 pub use crate::ma::detail_eth::{*};
 pub use crate::ma::mnemonic::MMnemonic;
+pub use crate::ma::setting::*;
 
 mod mnemonic;
 mod detail;
@@ -22,6 +23,7 @@ mod data;
 mod data_eth;
 mod data_eee;
 mod data_btc;
+mod setting;
 
 mod dao;
 mod db;
