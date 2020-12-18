@@ -90,12 +90,22 @@ pub mod tests {
         }
     }
 
-    pub fn mock_context() -> Box<dyn ContextTrait> {
+    pub fn mock_memory_context() -> Box<dyn ContextTrait> {
         let mut t = WalletsMock {
             db: Db::default(),
             stopped: Default::default(),
         };
         let re = block_on(t.db.init_memory_sql(&DbNames::new("", "")));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        Box::new(t)
+    }
+
+    pub fn mock_files_context() -> Box<dyn ContextTrait> {
+        let mut t = WalletsMock {
+            db: Db::default(),
+            stopped: Default::default(),
+        };
+        let re = block_on(t.db.init(&DbNames::new("", "")));
         assert_eq!(false, re.is_err(), "{:?}", re);
         Box::new(t)
     }

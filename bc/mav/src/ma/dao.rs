@@ -53,9 +53,9 @@ pub trait Dao<T: CRUDEnable + Shared> {
     async fn update_batch_by_id(rb: &rbatis::rbatis::Rbatis, tx_id: &str, ids: &mut [T]) -> Result<u64>;
 
     /// 查询唯一的一条记录，如果记录大于1条或没有，都会报错
-    async fn fetch_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<T> where T: 'async_trait;
+    async fn fetch_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<Option<T>> where T: 'async_trait;
     /// 查询唯一的一条记录，如果记录大于1条或没有，都会报错
-    async fn fetch_by_id(rb: &rbatis::rbatis::Rbatis, tx_id: &str, id: &T::IdType) -> Result<T> where T: 'async_trait;
+    async fn fetch_by_id(rb: &rbatis::rbatis::Rbatis, tx_id: &str, id: &T::IdType) -> Result<Option<T>> where T: 'async_trait;
     async fn fetch_page_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper, page: &dyn IPageRequest) -> Result<Page<T>> where T: 'async_trait;
 
     ///fetch all record
@@ -127,11 +127,11 @@ impl<T> Dao<T> for T where
         rb.update_batch_by_id(tx_id, ids).await
     }
 
-    async fn fetch_by_wrapper(rb: &Rbatis, tx_id: &str, w: &Wrapper) -> Result<T> where T: 'async_trait {
+    async fn fetch_by_wrapper(rb: &Rbatis, tx_id: &str, w: &Wrapper) -> Result<Option<T>> where T: 'async_trait {
         rb.fetch_by_wrapper(tx_id, w).await
     }
 
-    async fn fetch_by_id(rb: &Rbatis, tx_id: &str, id: &T::IdType) -> Result<T> where T: 'async_trait {
+    async fn fetch_by_id(rb: &Rbatis, tx_id: &str, id: &T::IdType) -> Result<Option<T>> where T: 'async_trait {
         rb.fetch_by_id(tx_id, id).await
     }
 
@@ -191,44 +191,81 @@ pub fn bool_from_int<'de, D>(deserializer: D) -> std::result::Result<bool, D::Er
     }
 }
 
+/// 同步事务，只能commit or rollback 一次
+/// 在完成生命周期后，检查如果 [has_done] 为 false，同步调用[finish()]方法
+/// 注：因为 [rbatis::tx::TxGuard]是异步的，提交后只能在当前线程可以看到数据，而其它线程看不到，所以增加一个同步的实现
+pub struct SyncTxGuard<'a> {
+    has_done: bool,
+    success: bool,
+    ///为了与Rbatis中的实现一至，把tx_id改为pub
+    pub tx_id: String,
+    rb: &'a Rbatis,
+}
+
+impl SyncTxGuard<'_> {
+    pub async fn new(rb: &Rbatis) -> Result<SyncTxGuard<'_>> {
+        let tx = rb.begin_tx().await?;
+        Ok(SyncTxGuard {
+            has_done: false,
+            success: false,
+            tx_id: tx,
+            rb: rb,
+        })
+    }
+
+    pub fn tx_id(&self) -> &String {
+        &self.tx_id
+    }
+
+    pub fn set_success(&mut self, b: bool) {
+        self.success = b;
+    }
+
+    pub async fn finish(&mut self) -> Result<()> {
+        if !self.has_done {
+            self.has_done = true;
+            if self.success {
+                self.rb.commit(&self.tx_id).await?;
+            } else {
+                self.rb.rollback(&self.tx_id).await?;
+            }
+        }
+        Ok(())
+    }
+    pub async fn commit(&mut self) -> Result<()> {
+        if !self.has_done {
+            self.has_done = true;
+            self.rb.commit(&self.tx_id).await?;
+        }
+        Ok(())
+    }
+    pub async fn rollback(&mut self) -> Result<()> {
+        if !self.has_done {
+            self.has_done = true;
+            self.rb.rollback(&self.tx_id).await?;
+        }
+        Ok(())
+    }
+}
+
+impl Drop for SyncTxGuard<'_> {
+    fn drop(&mut self) {
+        if !self.has_done {
+            async_std::task::block_on(self.finish());
+        }
+    }
+}
+
 #[cfg(test)]
 pub mod test {
-    use std::fs;
-    use std::ops::Add;
-
     use rbatis::rbatis::Rbatis;
 
     #[allow(dead_code)]
-    pub async fn init_memory(sql: Option<&str>) -> Rbatis {
+    pub async fn init_memory() -> Rbatis {
         let rb = Rbatis::new();
         let url = "sqlite://:memory:";
         let r = rb.link(url).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
-        if sql.is_some() {
-            let r = rb.exec("", sql.unwrap()).await;
-            assert_eq!(false, r.is_err(), "{:?}", r);
-        }
-        return rb;
-    }
-
-    #[allow(dead_code)]
-    pub async fn init_rbatis(db_file_name: Option<&str>, sql: Option<&str>) -> Rbatis {
-        let db_file_name = db_file_name.unwrap_or("wallets_ma.db");
-        if fs::metadata(db_file_name).is_err() {
-            let file = std::fs::File::create(db_file_name);
-            if file.is_err() {
-                log::info!("{:?}", file.err().unwrap());
-            }
-        }
-        let rb = Rbatis::new();
-        let url = "sqlite://".to_owned().add(db_file_name);
-        let r = rb.link(url.as_str()).await;
-        assert_eq!(false, r.is_err());
-
-        if sql.is_some() {
-            let r = rb.exec("", sql.unwrap()).await;
-            assert_eq!(false, r.is_err());
-        }
         return rb;
     }
 }

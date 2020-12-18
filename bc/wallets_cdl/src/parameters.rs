@@ -49,27 +49,4 @@ pub struct CContext {
     pub contextNote: *mut c_char,
 }
 
-impl CContext {
-    pub fn get_id(ctx: *mut CContext) -> String {
-        if ctx.is_null() {
-            panic!("ptr is null in get_id ");
-        }
-        let c = unsafe { Box::from_raw(ctx) };
-        let id = to_str(c.id);
-        Box::into_raw(c);
-        id.to_owned()
-    }
-    pub fn get_id_d(ctx: *mut *mut CContext) -> String {
-        unsafe {
-            if ctx.is_null() || !(*ctx).is_null() {
-                panic!("ptr is null in get_id_d ");
-            }
-        }
-        let c = unsafe { Box::from_raw(*ctx) };
-        let id = to_str(c.id);
-        Box::into_raw(c);
-        id.to_owned()
-    }
-}
-
 

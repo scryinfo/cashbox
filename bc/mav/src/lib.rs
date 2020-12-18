@@ -16,27 +16,21 @@ pub enum ChainType {
     EeeTest = 6,
 }
 
-impl From<&str> for ChainType {
-    fn from(chain_type: &str) -> Self {
+impl ChainType {
+    pub fn from(chain_type: &str) -> Result<Self, Error> {
         match chain_type {
-            "BTC" => ChainType::BTC,
-            "BtcTest" => ChainType::BtcTest,
-            "ETH" => ChainType::ETH,
-            "EthTest" => ChainType::EthTest,
-            "EEE" => ChainType::EEE,
-            "EeeTest" => ChainType::EeeTest,
+            "BTC" => Ok(ChainType::BTC),
+            "BtcTest" => Ok(ChainType::BtcTest),
+            "ETH" => Ok(ChainType::ETH),
+            "EthTest" => Ok(ChainType::EthTest),
+            "EEE" => Ok(ChainType::EEE),
+            "EeeTest" => Ok(ChainType::EeeTest),
             _ => {
-                let err = format!("the str:{} can not to ChainType", chain_type);
+                let err = format!("the str:{} can not be ChainType", chain_type);
                 log::error!("{}",err);
-                panic!(err);
+                Err(Error::from(err.as_str()))
             }
         }
-    }
-}
-
-impl From<&String> for ChainType {
-    fn from(chain_type: &String) -> Self {
-        ChainType::from(chain_type.as_str())
     }
 }
 
@@ -66,7 +60,7 @@ impl From<&str> for WalletType {
             "Normal" => WalletType::Normal,
             "Test" => WalletType::Test,
             _ => {
-                log::error!("the str:{} can not to WalletType",wallet_type);
+                log::error!("the str:{} can not be WalletType",wallet_type);
                 WalletType::Test
             }
         }
@@ -118,7 +112,7 @@ impl From<&str> for NetType {
             "Private" => NetType::Private,
             "PrivateTest" => NetType::PrivateTest,
             _ => {
-                log::error!("the str:{} can not to NetType",net_type);
+                log::error!("the str:{} can not be NetType",net_type);
                 NetType::Test
             }
         }
@@ -158,7 +152,7 @@ mod tests {
     #[test]
     fn chain_type_test() {
         for it in ChainType::iter() {
-            assert_eq!(it, ChainType::from(&it.to_string()));
+            assert_eq!(it, ChainType::from(&it.to_string()).unwrap());
         }
     }
 

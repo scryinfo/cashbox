@@ -80,26 +80,21 @@ pub enum DbNameType {
     wallet_testnet_private,
 }
 
-impl From<&str> for DbNameType {
-    fn from(db_name: &str) -> Self {
+impl DbNameType {
+    pub fn from(db_name: &str) -> Result<Self, Error> {
         match db_name {
-            "cashbox_wallets.db" => DbNameType::cashbox_wallets,
-            "cashbox_mnemonic.db" => DbNameType::cashbox_mnemonic,
-            "wallet_mainnet.db" => DbNameType::wallet_mainnet,
-            "wallet_private.db" => DbNameType::wallet_private,
-            "wallet_testnet.db" => DbNameType::wallet_testnet,
-            "wallet_testnet_private.db" => DbNameType::wallet_testnet_private,
+            "cashbox_wallets.db" => Ok(DbNameType::cashbox_wallets),
+            "cashbox_mnemonic.db" => Ok(DbNameType::cashbox_mnemonic),
+            "wallet_mainnet.db" => Ok(DbNameType::wallet_mainnet),
+            "wallet_private.db" => Ok(DbNameType::wallet_private),
+            "wallet_testnet.db" => Ok(DbNameType::wallet_testnet),
+            "wallet_testnet_private.db" => Ok(DbNameType::wallet_testnet_private),
             _ => {
-                log::error!("the str:{} can not to DbName",db_name);
-                panic!("the str:{} can not to DbName", db_name);
+                let err = format!("the str:{} can not to DbName", db_name);
+                log::error!("{}",err);
+                Err(Error::from(err.as_str()))
             }
         }
-    }
-}
-
-impl From<&String> for DbNameType {
-    fn from(db_name: &String) -> Self {
-        DbNameType::from(db_name.as_str())
     }
 }
 
@@ -258,7 +253,7 @@ mod tests {
     #[test]
     fn db_name_type_test() {
         for it in DbNameType::iter() {
-            assert_eq!(it, DbNameType::from(&it.to_string()));
+            assert_eq!(it, DbNameType::from(&it.to_string()).unwrap());
         }
     }
 

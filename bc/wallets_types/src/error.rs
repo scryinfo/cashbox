@@ -138,7 +138,7 @@ impl From<semver::SemVerError> for WalletError {
 
 // impl From<failure::NoneError> for WalletError{
 //     fn from(err: failure::NoneError) -> Self {
-//         WalletError::NoneError(err)
+//         WalletError::NoneError(err.to_string())
 //     }
 // }
 

@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use rbatis::crud::CRUDEnable;
 
 use mav::{ChainType, WalletType};
 use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MWallet};
@@ -19,6 +20,8 @@ impl Load for EthChainToken {
         self.m = m;
         let rb = context.db().wallets_db();
         let token_shared = MEthChainTokenShared::fetch_by_id(rb, "", &self.m.chain_token_shared_id).await?;
+        let token_shared = token_shared.ok_or_else(||
+            WalletError::NoneError(format!("do not find id:{}, in {}", &self.chain_token_shared_id, MEthChainTokenShared::table_name())))?;
         self.eth_chain_token_shared.load(context, token_shared).await?;
         Ok(())
     }

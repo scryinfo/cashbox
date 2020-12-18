@@ -99,11 +99,11 @@ mod tests {
         m.mnemonic = "test".to_owned();
         m.wallet_type = "eee".to_owned();
         m.mnemonic_digest = String::new();
-        let err = block_on(m.save(&rb, ""));
-        assert_eq!(false, err.is_err());
+        let re = block_on(m.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
         let re = block_on(MMnemonic::fetch_by_id(&rb, "", &m.id));
-        assert_eq!(false, re.is_err());
-        let m2 = re.unwrap();
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let m2 = re.unwrap().unwrap();
         assert_eq!(m.id, m2.id);
         assert_eq!(m.update_time, m2.update_time);
         assert_eq!(m.create_time, m2.create_time);
@@ -115,9 +115,9 @@ mod tests {
         let mut m3 = MMnemonic::default();
         m3.mnemonic = "m3".to_owned();
         let re = block_on(m3.save(&rb, ""));
-        assert_eq!(false, re.is_err());
+        assert_eq!(false, re.is_err(), "{:?}", re);
         let re = block_on(MMnemonic::list(&rb, ""));
-        assert_eq!(false, re.is_err());
+        assert_eq!(false, re.is_err(), "{:?}", re);
         let list = re.unwrap();
         assert_eq!(2, list.len());
         {//exist
@@ -147,7 +147,7 @@ mod tests {
     }
 
     async fn init_memory() -> Rbatis {
-        let rb = db_dest::init_memory(None).await;
+        let rb = db_dest::init_memory().await;
         let r = Db::create_table(&rb, MMnemonic::create_table_script(), &MMnemonic::table_name(), &DbCreateType::Drop).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         rb

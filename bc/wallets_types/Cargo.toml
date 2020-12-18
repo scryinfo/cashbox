@@ -8,7 +8,7 @@ edition = "2018"
 
 
 [dependencies]
-log = "0.4.8"
+log = "0.4.11"
 uuid = { version = "0.7", features = ["serde", "v4"] }
 
 hex = "0.4.2"
@@ -23,7 +23,7 @@ rbatis = { version = "1.8.52", features = ["async-io-sqlite"] }
 rbatis-core = { version = "1.8.52", features = ["async-io-sqlite"] }
 
 async-trait = "0.1.31"
-async-std = { version = "1.7" }
+async-std = "1.8.0"
 
 ethtx = { path = "../util/ethtx" }
 substratetx = { path = "../util/substratetx" }

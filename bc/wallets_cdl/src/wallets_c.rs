@@ -5,10 +5,11 @@ use std::os::raw::c_char;
 
 use async_std::task::block_on;
 
+use mav::ChainType;
 use wallets::{Contexts, Wallets};
 use wallets_types::{Context, Error};
 
-use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
+use crate::kits::{CArray, CBool, CFalse, CR, CStruct, CTrue, d_ptr_alloc, d_ptr_free, to_c_char, to_str};
 use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters};
 use crate::types::{CError, CWallet};
 
@@ -56,7 +57,8 @@ pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext) -> *const CError {
     let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
-        if let Some(mut ws) = ins.remove(&CContext::get_id(ctx)) {
+        let ctx = CContext::ptr_rust(ctx);
+        if let Some(mut ws) = ins.remove(&ctx.id) {
             if let Err(e) = block_on(ws.uninit()) {
                 Error::from(e)
             } else {
@@ -147,7 +149,8 @@ pub unsafe extern "C" fn Wallets_lockRead(ctx: *mut CContext) -> *const CError {
     }
     let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
-    let err = if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+    let ctx = CContext::ptr_rust(ctx);
+    let err = if let Some(ws) = ins.get_mut(&ctx.id) {
         if ws.lock_read() {
             Error::SUCCESS()
         } else {
@@ -171,7 +174,8 @@ pub unsafe extern "C" fn Wallets_unlockRead(ctx: *mut CContext) -> *const CError
     let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
-        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+        let ctx = CContext::ptr_rust(ctx);
+        if let Some(ws) = ins.get_mut(&ctx.id) {
             if ws.unlock_read() {
                 Error::SUCCESS()
             } else {
@@ -196,7 +200,8 @@ pub unsafe extern "C" fn Wallets_lockWrite(ctx: *mut CContext) -> *const CError 
     let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
-        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+        let ctx = CContext::ptr_rust(ctx);
+        if let Some(ws) = ins.get_mut(&ctx.id) {
             if ws.lock_write() {
                 Error::SUCCESS()
             } else {
@@ -221,7 +226,8 @@ pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CErro
     let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
-        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+        let ctx = CContext::ptr_rust(ctx);
+        if let Some(ws) = ins.get_mut(&ctx.id) {
             if ws.unlock_write() {
                 Error::SUCCESS()
             } else {
@@ -248,7 +254,8 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
     let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
-        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+        let ctx = CContext::ptr_rust(ctx);
+        if let Some(ws) = ins.get_mut(&ctx.id) {
             let mut all = vec![];
             if let Err(e) = async_std::task::block_on(ws.all(&mut all)) {
                 Error::from(e)
@@ -299,7 +306,8 @@ pub unsafe extern "C" fn Wallets_createWallet(ctx: *mut CContext, parameters: *m
     let lock = Contexts::collection().lock();
     let mut ins = lock.borrow_mut();
     let err = {
-        if let Some(ws) = ins.get_mut(&CContext::get_id(ctx)) {
+        let ctx = CContext::ptr_rust(ctx);
+        if let Some(ws) = ins.get_mut(&ctx.id) {
             let parameters = CCreateWalletParameters::ptr_rust(parameters);
             match async_std::task::block_on(ws.create_wallet(parameters)) {
                 Err(e) => Error::from(e),
@@ -337,17 +345,112 @@ pub unsafe extern "C" fn Wallets_deleteWallet(ctx: *mut CContext, walletId: *mut
 
 /// Success: true; Fail: false
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_hasOne(ctx: *mut CContext) -> *const CError {
-    log::debug!("enter Wallets_hasOne");
-    if ctx.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx is null");
+pub unsafe extern "C" fn Wallets_hasAny(ctx: *mut CContext, hasAny: *mut CBool) -> *const CError {
+    log::debug!("enter Wallets_hasAny");
+    if ctx.is_null() || hasAny.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or hasAny is null");
         log::info!("{}",err);
         return CError::to_c_ptr(&err);
     }
 
+    let lock = Contexts::collection().lock();
+    let mut ins = lock.borrow_mut();
     let err = {
-        //todo
-        Error::SUCCESS()
+        let ctx = CContext::ptr_rust(ctx);
+        if let Some(ws) = ins.get(&ctx.id) {
+            match async_std::task::block_on(ws.has_any()) {
+                Err(err) => Error::from(err),
+                Ok(b) => {
+                    if b {
+                        *hasAny = CTrue;
+                    } else {
+                        *hasAny = CFalse;
+                    }
+                    Error::NOT_EXIST()
+                }
+            }
+        } else {
+            Error::NONE().append_message(": can not find the context")
+        }
+    };
+
+    log::debug!("{}",err);
+    CError::to_c_ptr(&err)
+}
+
+/// Success: true; Fail: false
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_currentWalletChain(ctx: *mut CContext, walletId: *mut *mut c_char, chainType: *mut *mut c_char) -> *const CError {
+    log::debug!("enter Wallets_hasOne");
+    if ctx.is_null() || walletId.is_null() || chainType.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or walletId or chainType is null");
+        log::info!("{}",err);
+        return CError::to_c_ptr(&err);
+    }
+    (*walletId).free();
+    (*chainType).free();
+
+    let lock = Contexts::collection().lock();
+    let mut ins = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        if let Some(ws) = ins.get_mut(&ctx.id) {
+            match async_std::task::block_on(ws.current_wallet_chain()) {
+                Err(err) => Error::from(err),
+                Ok(Some((w, c))) => {
+                    *walletId = to_c_char(w.as_str());
+                    *chainType = to_c_char(&c.to_string());
+                    Error::SUCCESS()
+                }
+                Ok(None) => {
+                    Error::NOT_EXIST()
+                }
+            }
+        } else {
+            Error::NONE().append_message(": can not find the context")
+        }
+    };
+
+    log::debug!("{}",err);
+    CError::to_c_ptr(&err)
+}
+
+/// Success: true; Fail: false
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_saveCurrentWalletChain(ctx: *mut CContext, walletId: *mut c_char, chainType: *mut c_char) -> *const CError {
+    log::debug!("enter Wallets_hasOne");
+    if ctx.is_null() || walletId.is_null() || chainType.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or walletId or chainType is null");
+        log::info!("{}",err);
+        return CError::to_c_ptr(&err);
+    }
+    let chain_type = match ChainType::from(to_str(chainType)) {
+        Err(err) => {
+            let err = Error::PARAMETER().append_message(err.to_string().as_str());
+            log::info!("{}",err);
+            return CError::to_c_ptr(&err);
+        }
+        Ok(chain_type) => chain_type,
+    };
+
+    let wallet_id = {
+        to_str(walletId)
+    };
+
+    let lock = Contexts::collection().lock();
+    let mut ins = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        if let Some(ws) = ins.get_mut(&ctx.id) {
+            match async_std::task::block_on(ws.save_current_wallet_chain(wallet_id, &chain_type)) {
+                Err(err) => Error::from(err),
+                Ok(_) => {
+                    Error::SUCCESS()
+                }
+            }
+        } else {
+            Error::NONE().append_message(": can not find the context")
+        }
     };
 
     log::debug!("{}",err);
@@ -425,6 +528,18 @@ pub unsafe extern "C" fn CStr_dFree(dcs: *mut *mut c_char) {
 pub unsafe extern "C" fn CStr_dAlloc() -> *mut *mut c_char {
     return d_ptr_alloc();
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn CBool_dFree(dcs: *mut *mut CBool) {
+    let mut dcs = dcs;
+    d_ptr_free(&mut dcs);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CBool_dAlloc() -> *mut *mut CBool {
+    return d_ptr_alloc();
+}
+
 
 #[no_mangle]
 pub unsafe extern "C" fn CError_free(error: *mut CError) {

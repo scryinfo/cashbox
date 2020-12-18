@@ -160,8 +160,8 @@ mod tests {
             println!("{}", e);
         }
 
-        assert_eq!(false, re.is_err());
-        let m2 = re.unwrap();
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let m2 = re.unwrap().unwrap();
         assert_eq!(m.id, m2.id);
         assert_eq!(m.update_time, m2.update_time);
         assert_eq!(m.create_time, m2.create_time);
@@ -185,7 +185,7 @@ mod tests {
     }
 
     async fn init_memory() -> Rbatis {
-        let rb = db_dest::init_memory(None).await;
+        let rb = db_dest::init_memory().await;
         let r = Db::create_table(&rb, MEeeChainTx::create_table_script(), &MEeeChainTx::table_name(), &DbCreateType::Drop).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         rb

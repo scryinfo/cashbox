@@ -5,8 +5,8 @@ use failure::_core::sync::atomic::Ordering;
 use parking_lot::{RawMutex, RawThreadId};
 use parking_lot::lock_api::RawReentrantMutex;
 
+use mav::{ChainType, WalletType};
 use mav::ma::{BeforeSave, Dao, Db, MAddress, MMnemonic, MWallet};
-use mav::WalletType;
 use substratetx::{Crypto, Keccak256};
 use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait};
 
@@ -73,6 +73,21 @@ impl Wallets {
         Ok(())
     }
 
+    pub async fn has_any(&self) -> Result<bool, WalletError> {
+        let context = self;
+        let re = Wallet::has_any(context).await?;
+        Ok(re)
+    }
+    pub async fn save_current_wallet_chain(&mut self, wallet_id: &str, chain_type: &ChainType) -> Result<(), WalletError> {
+        let context = self;
+        let re = Setting::save_current_wallet_chain(context, wallet_id, chain_type).await?;
+        Ok(re)
+    }
+    pub async fn current_wallet_chain(&mut self) -> Result<Option<(String, ChainType)>, WalletError> {
+        let context = self;
+        let re = Setting::current_wallet_chain(context).await?;
+        Ok(re)
+    }
     pub fn generate_mnemonic() -> String {
         let mnemonic = substratetx::Sr25519::generate_phrase(15);
         mnemonic
@@ -107,17 +122,19 @@ impl Wallets {
         //todo default token
 
         {//save to database
-            let mut tx_wallets = rb.begin_tx_defer(false).await?;
+            //tx 只处理异常情况下，事务的rollback，所以会在事务提交成功后，调用 tx.manager = None; 阻止 [rbatis::tx::TxGuard]再管理事务
+            let mut tx = rb.begin_tx_defer(false).await?;
             {
-                m_wallet.save(rb, &tx_wallets.tx_id).await?;
-                MAddress::save_batch(rb, &tx_wallets.tx_id, &mut m_addresses).await?;
+                m_wallet.save(rb, &tx.tx_id).await?;
+                MAddress::save_batch(rb, &tx.tx_id, &mut m_addresses).await?;
 
                 let mut m_mnemonic = MMnemonic::default();
                 m_mnemonic.from(&m_wallet);
                 // 现在只出现了2个数据库，所以第二个可以不使用事务，最坏的情况出现助记词保存成功，而cashbox_wallet没有成功的情况，这时不会对程序
                 m_mnemonic.save(self.db.mnemonic_db(), "").await?;
             }
-            tx_wallets.is_drop_commit = true; //todo 怎么处理事务提交失败
+            rb.commit(&tx.tx_id).await?;
+            tx.manager = None;
         }
         {//是否为current wallet
             if Wallet::count(context).await? == 1 {

@@ -1,7 +1,7 @@
 use mav::ma::MAddress;
 use mav::WalletType;
 use substratetx::Crypto;
-use wallets_types::{Chain2WalletType, ChainTrait, WalletError, WalletTrait};
+use wallets_types::{Chain2WalletType, ChainTrait, ContextTrait, WalletError, WalletTrait};
 
 #[derive(Default)]
 struct EthChain();
@@ -28,6 +28,11 @@ impl ChainTrait for EthChain {
         m_address.public_key = puk;
         Ok(m_address)
     }
+
+    fn generate_default_token(&self, context: &dyn ContextTrait, wallet_id: &str, wallet_type: &WalletType) -> Result<(), WalletError> {
+        //todo
+        unimplemented!()
+    }
 }
 
 const DEFAULT_SS58_VERSION: u8 = 42;
@@ -47,6 +52,11 @@ impl ChainTrait for EeeChain {
         }
         Ok(addr)
     }
+
+    fn generate_default_token(&self, context: &dyn ContextTrait, wallet_id: &str, wallet_type: &WalletType) -> Result<(), WalletError> {
+        //todo
+        unimplemented!()
+    }
 }
 
 impl ChainTrait for BtcChain {
@@ -55,6 +65,11 @@ impl ChainTrait for BtcChain {
         addr.chain_type = wallets_types::BtcChain::chain_type(wallet_type).to_string();
         //todo
         Ok(addr)
+    }
+
+    fn generate_default_token(&self, context: &dyn ContextTrait, wallet_id: &str, wallet_type: &WalletType) -> Result<(), WalletError> {
+        //todo
+        unimplemented!()
     }
 }
 

@@ -80,7 +80,7 @@ mod tests {
         assert_eq!(false, result.is_err(), "{:?}", result);
         let result = block_on(MTokenAddress::fetch_by_id(&rb, "", &m.id));
         assert_eq!(false, result.is_err(), "{:?}", result);
-        let m2 = result.unwrap();
+        let m2 = result.unwrap().unwrap();
         assert_eq!(m.id, m2.id);
         assert_eq!(m.update_time, m2.update_time);
         assert_eq!(m.create_time, m2.create_time);
@@ -93,15 +93,15 @@ mod tests {
         let mut m3 = MTokenAddress::default();
         m3.token_id = "m3".to_owned();
         let re = block_on(m3.save(&rb, ""));
-        assert_eq!(false, re.is_err());
+        assert_eq!(false, re.is_err(), "{:?}", re);
         let re = block_on(MTokenAddress::list(&rb, ""));
-        assert_eq!(false, re.is_err());
+        assert_eq!(false, re.is_err(), "{:?}", re);
         let list = re.unwrap();
         assert_eq!(2, list.len());
     }
 
     async fn init_memory() -> Rbatis {
-        let rb = db_dest::init_memory(None).await;
+        let rb = db_dest::init_memory().await;
         let r = Db::create_table(&rb, MTokenAddress::create_table_script(), &MTokenAddress::table_name(), &DbCreateType::Drop).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         rb

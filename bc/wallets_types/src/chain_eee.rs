@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use rbatis::crud::CRUDEnable;
 
 use mav::{ChainType, WalletType};
 use mav::ma::{Dao, MEeeChainToken, MEeeChainTokenShared, MWallet};
@@ -18,7 +19,9 @@ impl Load for EeeChainToken {
     async fn load(&mut self, context: &dyn ContextTrait, m: Self::MType) -> Result<(), WalletError> {
         self.m = m;
         let rb = context.db().wallets_db();
-        let token_shared = MEeeChainTokenShared::fetch_by_id(rb, "", &self.m.chain_token_shared_id).await?;
+        let token_shared = MEeeChainTokenShared::fetch_by_id(rb, "", &self.chain_token_shared_id).await?;
+        let token_shared = token_shared.ok_or_else(||
+            WalletError::NoneError(format!("do not find id:{}, in {}", &self.chain_token_shared_id, MEeeChainTokenShared::table_name())))?;
         self.eee_chain_token_shared.load(context, token_shared).await?;
         Ok(())
     }

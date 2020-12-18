@@ -31,6 +31,9 @@ impl Contexts {
         self.w_map.get_mut(key)
     }
 
+    pub fn get(&mut self, key: &str) -> Option<&Wallets> {
+        self.w_map.get(key)
+    }
     pub fn remove(&mut self, key: &str) -> Option<Wallets> {
         self.w_map.remove(key)
     }

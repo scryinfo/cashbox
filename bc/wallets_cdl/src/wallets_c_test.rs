@@ -74,10 +74,8 @@ mod tests {
                 assert_eq!(0 as CU64, (*c_err).code);
                 CError_free(c_err);
                 ptr.free();
-                let t = block_on(mav::ma::Db::init_tables(&parameters.db_name, &DbCreateType::Drop));
-                if let Err(e) = &t {
-                    panic!(e.to_string());
-                }
+                let re = block_on(mav::ma::Db::init_tables(&parameters.db_name, &DbCreateType::Drop));
+                assert_eq!(false, re.is_err(), "{:?}", re);
                 ctx
             };
             let mn = {

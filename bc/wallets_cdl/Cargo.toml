@@ -12,12 +12,13 @@ crate-type = ["cdylib", "lib"]
 
 [dependencies]
 libc = "0.2.80"
-log = "0.4.8"
-async-std = { version = "1.7" }
+log = "0.4.11"
+async-std = "1.8.0"
 
 wallets = { version = "0.1.0", path = "../wallets" }
 wallets_types = { path = "../wallets_types" }
 wallets_macro = { path = "../wallets_macro" }
+mav = { path = "../mav" }
 
 [dev-dependencies]
 pkg-config = "0.3.19"
