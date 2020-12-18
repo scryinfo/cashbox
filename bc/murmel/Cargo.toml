@@ -32,9 +32,6 @@ crate_type = ["cdylib", "rlib"]
 version = "0.21"
 features = ["serde"]
 
-[patch.crates-io]
-bitcoin = { path = "../chain/btc/bitcoin" }
-
 [dependencies.bitcoin_hashes]
 version = "0.7"
 

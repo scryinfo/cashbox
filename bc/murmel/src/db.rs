@@ -3,7 +3,7 @@
 //!     1. for btc chain database
 //!     2. for user data (utxo address ...)
 //!
-use crate::config::BTC_CHAIN_PATH;
+use crate::config::{BTC_CHAIN_PATH, BTC_DETAIL_PATH};
 use crate::moudle::chain::MBlockHeader;
 use crate::moudle::detail::{MLocalTx, MProgress, MTxInput, MTxOutput, MUserAddress};
 use async_std::task::block_on;
@@ -24,10 +24,10 @@ pub struct ChainSqlite {
 }
 
 impl ChainSqlite {
-    pub fn init_chain_db(network: Network, db_file_name: &str) -> Self {
+    pub fn new(network: Network, db_file_name: &str) -> Self {
         let sql = MBlockHeader::SQL;
         let rb = block_on(ChainSqlite::init_rbatis(db_file_name));
-        let r = block_on(rb.exec("create chain db", sql));
+        let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
                 info!("{:?}", a);
@@ -141,7 +141,7 @@ pub struct DetailSqlite {
 }
 
 impl DetailSqlite {
-    pub fn init_detail_db(network: Network, db_file_name: &str) -> Self {
+    pub fn new(network: Network, db_file_name: &str) -> Self {
         let rb = block_on(DetailSqlite::init_rbatis(db_file_name));
         DetailSqlite::create_progress(&rb);
         DetailSqlite::create_user_address(&rb);
@@ -377,6 +377,8 @@ impl RInit for ChainSqlite {}
 #[async_trait]
 impl RInit for DetailSqlite {}
 
-pub static RB_CHAIN: Lazy<ChainSqlite> = Lazy::new(ChainSqlite::init_rbatis(BTC_CHAIN_PATH));
+pub static RB_CHAIN: Lazy<ChainSqlite> =
+    Lazy::new(|| ChainSqlite::new(Network::Testnet, BTC_CHAIN_PATH));
 
-pub static RB_DETAIL: Lazy<DetailSqlite> = Lazy::new(DetailSqlite::init_rbatis(BTC_CHAIN_PATH));
+pub static RB_DETAIL: Lazy<DetailSqlite> =
+    Lazy::new(|| DetailSqlite::new(Network::Testnet, BTC_DETAIL_PATH));
