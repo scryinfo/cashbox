@@ -3,9 +3,11 @@
 #![allow(non_snake_case)]
 
 use super::*;
+use crate::config::BTC_HAMMER_PATH;
 use crate::constructor::Constructor;
-use crate::db::{SQLite, lazy_db_default};
+use crate::db::{lazy_db_default, SQLite};
 use crate::hooks::{ApiMessage, HooksMessage};
+use crate::jniapi::{calc_default_address, calc_pubkey};
 use bitcoin::consensus::serialize;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::util::psbt::serialize::Serialize;
@@ -26,8 +28,6 @@ use std::str::FromStr;
 use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
-use crate::jniapi::{calc_default_address, calc_pubkey};
-use crate::config::BTC_CHAIN_PATH;
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -86,7 +86,7 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcTxSign(
                 txid: sha256d::Hash::from_hex(
                     "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
                 )
-                    .unwrap(),
+                .unwrap(),
                 vout: 1,
             },
             sequence: RBF,
@@ -160,7 +160,10 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadBalance(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadMaxBlockNumber(env: JNIEnv, _class: JClass) -> jstring {
+pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadMaxBlockNumber(
+    env: JNIEnv,
+    _class: JClass,
+) -> jstring {
     let sqlite = lazy_db_default().lock().unwrap();
     let max_block_number = sqlite.count();
     let max_block_number = env
@@ -171,7 +174,10 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadMaxBlockNumb
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadNowBlockNumber(env: JNIEnv, class: JClass) -> jstring {
+pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadNowBlockNumber(
+    env: JNIEnv,
+    class: JClass,
+) -> jstring {
     let sqlite = lazy_db_default().lock().unwrap();
     let height = sqlite.query_scanned_height();
     let max_block_number = env
@@ -182,7 +188,10 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadNowBlockNumb
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcIsSyncDataOk(env: JNIEnv, _class: JClass) -> jboolean {
+pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcIsSyncDataOk(
+    env: JNIEnv,
+    _class: JClass,
+) -> jboolean {
     unimplemented!()
 }
 
@@ -201,7 +210,11 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadTxHistory(
 // this function don't have any return value。because it will run spv node
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEnv, _class: JClass, network: JString) {
+pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(
+    env: JNIEnv,
+    _class: JClass,
+    network: JString,
+) {
     // TODO
     // use testnet for test and default
     // must change it in future
@@ -242,7 +255,7 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEn
         .duration_since(SystemTime::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    let chaindb = Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap();
+    let chaindb = Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap();
 
     // todo
     // use mnemonic generate publc address and store it in database
@@ -267,5 +280,5 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(env: JNIEn
 
     let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
     spv.run(network, peers, connections)
-       .expect("can not start node");
+        .expect("can not start node");
 }

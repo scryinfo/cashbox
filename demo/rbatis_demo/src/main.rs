@@ -247,7 +247,7 @@ impl DetailSqlite {
     }
 
     fn create_progress(rb: &Rbatis) {
-        let sql = create_progress_sql();
+        let sql = include_str!("sql/create_progress.sql");
         let r = block_on(rb.exec("create chain db", sql));
         match r {
             Ok(a) => {

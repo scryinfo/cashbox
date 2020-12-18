@@ -23,6 +23,10 @@ use bitcoin::network::constants::Network;
 use log::Level;
 use murmel::constructor::Constructor;
 
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
+use murmel::config::BTC_HAMMER_PATH;
+use murmel::db::lazy_db_default;
+use murmel::jniapi::{calc_default_address, calc_pubkey};
 use std::{
     env::args,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
@@ -30,10 +34,6 @@ use std::{
     str::FromStr,
     time::SystemTime,
 };
-use murmel::config::BTC_CHAIN_PATH;
-use murmel::jniapi::{calc_default_address, calc_pubkey};
-use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use murmel::db::lazy_db_default;
 
 pub fn main() {
     if find_opt("help") {
@@ -42,7 +42,9 @@ pub fn main() {
         println!("--log level: level is one of trace|debug|info|warn|error");
         println!("--connections n: maintain at least n connections");
         println!("--peer ip_address: connect to the given peer at start. You may use more than one --peer option.");
-        println!("--db file: store data in the given sqlite database file. Created if does not exist.");
+        println!(
+            "--db file: store data in the given sqlite database file. Created if does not exist."
+        );
         println!("--network net: net is one of main|test for corresponding Bitcoin networks");
         println!("--nodns : do not use dns seed");
         println!("--birth unixtime : blocks will be downloaded if matching filters after this time stamp");
@@ -61,7 +63,7 @@ pub fn main() {
             "info" => simple_logger::init_with_level(Level::Info).unwrap(),
             "debug" => simple_logger::init_with_level(Level::Debug).unwrap(),
             "trace" => simple_logger::init_with_level(Level::Trace).unwrap(),
-            _ => simple_logger::init_with_level(Level::Info).unwrap()
+            _ => simple_logger::init_with_level(Level::Info).unwrap(),
         }
     } else {
         simple_logger::init_with_level(Level::Debug).unwrap();
@@ -107,7 +109,7 @@ pub fn main() {
     let chaindb = if let Some(path) = find_arg("db") {
         Constructor::open_db(Some(&Path::new(path.as_str())), network, birth).unwrap()
     } else {
-        Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap()
+        Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap()
     };
 
     // todo
@@ -138,7 +140,7 @@ pub fn main() {
 
     let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
     spv.run(network, peers, connections)
-       .expect("can not start node");
+        .expect("can not start node");
 }
 
 fn get_peers() -> Vec<SocketAddr> {
@@ -156,7 +158,7 @@ fn get_listeners() -> Vec<SocketAddr> {
 }
 
 // Returns key-value zipped iterator.
-fn zipped_args() -> impl Iterator<Item=(String, String)> {
+fn zipped_args() -> impl Iterator<Item = (String, String)> {
     let key_args = args()
         .filter(|arg| arg.starts_with("--"))
         .map(|mut arg| arg.split_off(2));

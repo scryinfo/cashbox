@@ -21,7 +21,7 @@ use jni::JNIEnv;
 use log::info;
 use log::Level;
 
-use crate::config::{BTC_CHAIN_PATH};
+use crate::config::BTC_HAMMER_PATH;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
@@ -84,7 +84,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
                 txid: sha256d::Hash::from_hex(
                     "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
                 )
-                    .unwrap(),
+                .unwrap(),
                 vout: 1,
             },
             sequence: RBF,
@@ -254,7 +254,7 @@ pub extern "system" fn Java_JniApi_btcStart(
         .duration_since(SystemTime::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    let chaindb = Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap();
+    let chaindb = Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap();
 
     // todo
     // use mnemonic generate publc address and store it in database
@@ -279,7 +279,7 @@ pub extern "system" fn Java_JniApi_btcStart(
 
     let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
     spv.run(network, peers, connections)
-       .expect("can not start node");
+        .expect("can not start node");
 }
 
 mod test {

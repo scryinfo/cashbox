@@ -3,18 +3,20 @@
 //!     1. for btc chain database
 //!     2. for user data (utxo address ...)
 //!
+use crate::config::BTC_CHAIN_PATH;
+use crate::moudle::chain::MBlockHeader;
+use crate::moudle::detail::{MLocalTx, MProgress, MTxInput, MTxOutput, MUserAddress};
+use async_std::task::block_on;
+use async_trait::async_trait;
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::{BitcoinHash, Network};
-use log::{info, debug};
+use log::{debug, info};
+use once_cell::sync::Lazy;
+use rbatis::crud::CRUD;
+use rbatis::plugin::page::{IPage, Page, PageRequest};
 use rbatis::rbatis::Rbatis;
 use std::ops::Add;
-use async_std::task::block_on;
-use crate::moudle::chain::MBlockHeader;
-use rbatis::crud::CRUD;
-use crate::moudle::detail::{MProgress, MTxInput, MTxOutput, MUserAddress, MLocalTx};
-use rbatis::plugin::page::{PageRequest, Page, IPage};
-use async_trait::async_trait;
 
 pub struct ChainSqlite {
     rb: Rbatis,
@@ -34,10 +36,7 @@ impl ChainSqlite {
                 info!("{:?}", e);
             }
         }
-        Self {
-            rb,
-            network,
-        }
+        Self { rb, network }
     }
 
     pub fn save_header(&self, header: String, timestamp: String) {
@@ -63,20 +62,24 @@ impl ChainSqlite {
     /// scan_flag = false scan_flag does not need +1
     /// scan_flag = true scan_flag need +1
     pub fn fetch_scan_header(&self, timestamp: String, scan_flag: bool) -> Vec<String> {
-        let w = self.rb.new_wrapper()
-                    .gt("timestamp", &timestamp)
-                    .and()
-                    .lt("scanned", 6)
-                    .check().unwrap();
+        let w = self
+            .rb
+            .new_wrapper()
+            .gt("timestamp", &timestamp)
+            .and()
+            .lt("scanned", 6)
+            .check()
+            .unwrap();
         let req = PageRequest::new(1, 1000);
-        let r: Result<Page<MBlockHeader>, _> = block_on(self.rb.fetch_page_by_wrapper("", &w, &req));
+        let r: Result<Page<MBlockHeader>, _> =
+            block_on(self.rb.fetch_page_by_wrapper("", &w, &req));
         let mut block_headers: Vec<MBlockHeader> = vec![];
         match r {
             Ok(page) => {
                 let header_vec = page.get_records();
                 block_headers = header_vec.to_vec();
             }
-            Err(e) => debug!("{:?}", e)
+            Err(e) => debug!("{:?}", e),
         }
         let mut headers: Vec<String> = vec![];
         for header_block in block_headers {
@@ -84,7 +87,8 @@ impl ChainSqlite {
         }
 
         if scan_flag {
-            let sql = format!(r#"
+            let sql = format!(
+                r#"
             UPDATE block_header SET scanned = scanned+1
                 WHERE id IN (
                     SELECT id FROM (
@@ -95,7 +99,9 @@ impl ChainSqlite {
                         LIMIT 0, 1000
                     ) tmp
                 )
-            "#, timestamp);
+            "#,
+                timestamp
+            );
             let r = block_on(self.rb.exec("", &sql));
             match r {
                 Ok(a) => {
@@ -121,9 +127,11 @@ impl ChainSqlite {
         if let Ok(r) = r {
             match r.id {
                 Some(id) => id,
-                _ => 0
+                _ => 0,
             }
-        } else { return 0; }
+        } else {
+            return 0;
+        }
     }
 }
 
@@ -140,10 +148,7 @@ impl DetailSqlite {
         DetailSqlite::create_tx_input(&rb);
         DetailSqlite::create_tx_output(&rb);
         DetailSqlite::create_local_tx(&rb);
-        Self {
-            rb,
-            network,
-        }
+        Self { rb, network }
     }
 
     fn create_user_address(rb: &Rbatis) {
@@ -232,7 +237,7 @@ impl DetailSqlite {
         let r: Result<Option<MProgress>, _> = block_on(self.rb.fetch_by_id("", &1u64));
         match r {
             Ok(p) => p,
-            Err(_) => None
+            Err(_) => None,
         }
     }
 
@@ -269,18 +274,18 @@ impl DetailSqlite {
                     timestamp,
                 };
             }
-            Some(progress) => {
-                progress
-            }
+            Some(progress) => progress,
         }
     }
 
-    pub fn save_tx_input(&self,
-                         tx: String,
-                         sig_script: String,
-                         prev_tx: String,
-                         prev_vout: String,
-                         sequence: i64) {
+    pub fn save_tx_input(
+        &self,
+        tx: String,
+        sig_script: String,
+        prev_tx: String,
+        prev_vout: String,
+        sequence: i64,
+    ) {
         let tx_input = MTxInput {
             id: None,
             tx,
@@ -300,11 +305,7 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_txout(&self,
-                      tx: String,
-                      script: String,
-                      value: String,
-                      vin: String) {
+    pub fn save_txout(&self, tx: String, script: String, value: String, vin: String) {
         let tx_output = MTxOutput {
             id: None,
             tx,
@@ -323,11 +324,11 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_user_address(&self, address: String, compressed_pub_key: String){
+    pub fn save_user_address(&self, address: String, compressed_pub_key: String) {
         let user_address = MUserAddress {
             id: None,
             address,
-            compressed_pub_key
+            compressed_pub_key,
         };
         let r = block_on(self.rb.save("", &user_address));
         match r {
@@ -340,11 +341,11 @@ impl DetailSqlite {
         }
     }
 
-    pub fn fetch_user_address(&self) -> Option<MUserAddress>{
+    pub fn fetch_user_address(&self) -> Option<MUserAddress> {
         let r: Result<Option<MUserAddress>, _> = block_on(self.rb.fetch_by_id("", &1u64));
         match r {
             Ok(p) => p,
-            Err(_) => None
+            Err(_) => None,
         }
     }
 }
@@ -376,5 +377,6 @@ impl RInit for ChainSqlite {}
 #[async_trait]
 impl RInit for DetailSqlite {}
 
+pub static RB_CHAIN: Lazy<ChainSqlite> = Lazy::new(ChainSqlite::init_rbatis(BTC_CHAIN_PATH));
 
-
+pub static RB_DETAIL: Lazy<DetailSqlite> = Lazy::new(DetailSqlite::init_rbatis(BTC_CHAIN_PATH));
