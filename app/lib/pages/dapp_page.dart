@@ -90,10 +90,11 @@ class _DappPageState extends State<DappPage> {
                     margin: EdgeInsets.only(top: ScreenUtil().setHeight(4.5)),
                     child: WebView(
                       // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
-                      // initialUrl:"http://192.168.1.12:9010/web_app/dapp/dapp.html",
-                      //initialUrl:"http://192.168.1.5:9690/home.html",
-                      // initialUrl: "http://192.168.1.52:8080",
-                      initialUrl: snapshot.data.toString(),
+                      // initialUrl:"http://192.168.2.12:9010/web_app/dapp/dapp.html",
+                      //initialUrl:"file:///android_asset/flutter_assets/assets/dist/index.html",
+                      // initialUrl: "http://192.168.2.97:8080",
+                      initialUrl: "http://192.168.2.57:9010/web_app/dapp/dapp.html",
+                      // initialUrl: snapshot.data.toString(),
                       javascriptMode: JavascriptMode.unrestricted,
                       userAgent:
                           "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
@@ -296,7 +297,7 @@ class _DappPageState extends State<DappPage> {
     jsChannelList.add(JavascriptChannel(
         name: "NativeSaveDappChainInfo",
         onMessageReceived: (JavascriptMessage message) async {
-          print("NativeSignMsg 从NativeGoBack传回来的参数======>： ${message.message}");
+          print("NativeSignMsg 从NativeSaveDappChainInfo传回来的参数======>： ${message.message}");
           var subChainInfo = SubChainInfo.fromJson(jsonDecode(message.message));
           print("subChainInfo--->" + subChainInfo.toString());
           Map updateMap = await Wallets.instance.updateSubChainBasicInfo(
@@ -307,7 +308,9 @@ class _DappPageState extends State<DappPage> {
               subChainInfo.metadata ?? "",
               subChainInfo.ss58Format ?? 0,
               subChainInfo.tokenDecimals ?? 0,
-              subChainInfo.tokenSymbol ?? "");
+              subChainInfo.tokenSymbol ?? "",
+              isDefault: false);
+          print("dapp page updateSubChainBasicInfo--->" + updateMap.toString());
         }));
 
     jsChannelList.add(JavascriptChannel(
@@ -540,7 +543,61 @@ class _DappPageState extends State<DappPage> {
           );
         }));
     //eee end
-
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxEeePubkey",
+        onMessageReceived: (JavascriptMessage message) {
+          var msg = Message.fromJson(jsonDecode(message.message));
+          msg.data = Wallets.instance.nowWallet.getChainByChainType(ChainType.EEE).pubKey.toString() ?? "";
+          print("cashboxEeePubkey--->" + msg.data);
+          this.callPromise(msg);
+        }));
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxEeeSign",
+        onMessageReceived: (JavascriptMessage message) {
+          var msg = Message.fromJson(jsonDecode(message.message));
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return PwdDialog(
+                title: translate('wallet_pwd').toString(),
+                hintContent: translate('dapp_sign_hint_content') + nowWallet.walletName ?? "",
+                hintInput: translate('input_pwd_hint').toString(),
+                onPressed: (pwd) async {
+                  try {
+                    var pwdFormat = pwd.codeUnits;
+                    var eeeSignMap = await Wallets.instance.eeeSign(Wallets.instance.nowWallet.walletId, Uint8List.fromList(pwdFormat), msg.data);
+                    int status = eeeSignMap["status"];
+                    if (status == null || status != 200) {
+                      msg.err = eeeSignMap["message"];
+                      if (msg.err == null || msg.err.length < 1) {
+                        msg.err = "result nothing ";
+                      } else {
+                        msg.err = 'tx_sign_failure';
+                        print("eeeTxSign: " + msg.err);
+                      }
+                      msg.data = "";
+                      Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + eeeSignMap["message"]);
+                    } else {
+                      var signResult = eeeSignMap["signedInfo"];
+                      msg.err = "";
+                      msg.data = signResult;
+                      Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
+                    }
+                    this.callPromise(msg).then((value) {
+                      NavigatorUtils.goBack(context);
+                    });
+                  } catch (e) {
+                    LogUtil.instance.d("cashboxEeeRawTxSign===>", e.toString());
+                    msg.err = "inner error";
+                    this.callPromise(msg).whenComplete(() {
+                      NavigatorUtils.goBack(context);
+                    });
+                  }
+                },
+              );
+            },
+          );
+        }));
     return jsChannelList.toSet();
   }
 
