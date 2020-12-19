@@ -37,6 +37,46 @@ impl Wallet {
         }
         Ok(ws)
     }
+    pub async fn m_wallet_all(context: &dyn ContextTrait) -> Result<Vec<MWallet>, WalletError> {
+        let dws = MWallet::list(context.db().wallets_db(), "").await?;
+        Ok(dws)
+    }
+    pub async fn find_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<Option<Wallet>, WalletError> {
+        let rb = context.db().wallets_db();
+        let m_wallet = MWallet::fetch_by_id(rb, "", &wallet_id.to_owned()).await?;
+        match m_wallet {
+            Some(m) => {
+                let mut wallet = Wallet::default();
+                wallet.load(context, m).await?;
+                Ok(Some(wallet))
+            }
+            None => Ok(None)
+        }
+    }
+    pub async fn m_wallet_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<Option<MWallet>, WalletError> {
+        let rb = context.db().wallets_db();
+        let m_wallet = MWallet::fetch_by_id(rb, "", &wallet_id.to_owned()).await?;
+        Ok(m_wallet)
+    }
+    pub async fn remove_by_id(context: &dyn ContextTrait, wallet_id: &str, tx_id: &str) -> Result<u64, WalletError> {
+        let rb = context.db().wallets_db();
+        let re = MWallet::remove_by_id(rb, tx_id, &wallet_id.to_owned()).await?;
+        Ok(re)
+    }
+
+    pub async fn update_by_id(context: &dyn ContextTrait, m_wallet: &mut MWallet, tx_id: &str) -> Result<u64, WalletError> {
+        let rb = context.db().wallets_db();
+        let re = m_wallet.update_by_id(rb, tx_id).await?;
+        Ok(re)
+    }
+
+    pub async fn m_wallet_by_name(context: &dyn ContextTrait, name: &str) -> Result<Vec<MWallet>, WalletError> {
+        let rb = context.db().wallets_db();
+        let mut wrapper = rb.new_wrapper();
+        wrapper.eq(&MWallet::name, name);
+        let dws = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
+        Ok(dws)
+    }
 
     pub async fn mnemonic_digest(context: &dyn ContextTrait, digest: &str) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();

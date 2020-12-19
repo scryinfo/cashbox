@@ -29,6 +29,7 @@ pub struct CError {
 pub struct CWallet {
     pub id: *mut c_char,
     pub nextId: *mut c_char,
+    pub name: *mut c_char,
     pub ethChain: *mut CEthChain,
     pub eeeChain: *mut CEeeChain,
     pub btcChain: *mut CBtcChain,

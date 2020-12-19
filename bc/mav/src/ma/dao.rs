@@ -251,7 +251,10 @@ impl SyncTxGuard<'_> {
 impl Drop for SyncTxGuard<'_> {
     fn drop(&mut self) {
         if !self.has_done {
-            async_std::task::block_on(self.finish());
+            let re = async_std::task::block_on(self.finish());
+            if let Err(re) = re {
+                log::error!("SyncTxGuard drop error: {}", re.to_string());
+            }
         }
     }
 }

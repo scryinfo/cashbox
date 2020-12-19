@@ -66,11 +66,9 @@ impl Wallets {
         Ok(())
     }
 
-    pub async fn all(&mut self, array_wallet: &mut Vec::<Wallet>) -> Result<(), WalletError> {
-        let mut ws = Wallet::all(self).await?;
-        array_wallet.clear();
-        array_wallet.append(&mut ws);
-        Ok(())
+    pub async fn all(&mut self) -> Result<Vec<Wallet>, WalletError> {
+        let ws = Wallet::all(self).await?;
+        Ok(ws)
     }
 
     pub async fn has_any(&self) -> Result<bool, WalletError> {
@@ -78,12 +76,46 @@ impl Wallets {
         let re = Wallet::has_any(context).await?;
         Ok(re)
     }
+
+    pub async fn find_by_id(&self, wallet_id: &str) -> Result<Option<Wallet>, WalletError> {
+        let context = self;
+        let re = Wallet::find_by_id(context,wallet_id).await?;
+        Ok(re)
+    }
+    ///注：只加载了wallet的id name等直接的基本数据，链数据没有加载
+    pub async fn find_wallet_base_by_name(&self, name: &str) -> Result<Vec<Wallet>, WalletError> {
+        let context = self;
+        let ms = Wallet::m_wallet_by_name(context,name).await?;
+        let re = Vec::new();
+        for m in ms {
+            let mut w = Wallet::default();
+            w.m = m;
+        }
+        Ok(re)
+    }
+    pub async fn remove_by_id(&mut self, wallet_id: &str, tx_id: &str) -> Result<u64, WalletError> {
+        let context = self;
+        let re = Wallet::remove_by_id(context,wallet_id, tx_id).await?;
+        Ok(re)
+    }
+
+    pub async fn re_name_wallet(&mut self, name: &str, wallet_id: &str, tx_id: &str) -> Result<u64, WalletError> {
+        let context = self;
+        match Wallet::m_wallet_by_id(context, wallet_id).await? {
+            None => Err(WalletError::NoRecord("".to_owned())),
+            Some(mut m_wallet) => {
+                m_wallet.name = name.to_owned();
+                let re = Wallet::update_by_id(context,&mut m_wallet, tx_id).await?;
+                Ok(re)
+            }
+        }
+    }
     pub async fn save_current_wallet_chain(&mut self, wallet_id: &str, chain_type: &ChainType) -> Result<(), WalletError> {
         let context = self;
         let re = Setting::save_current_wallet_chain(context, wallet_id, chain_type).await?;
         Ok(re)
     }
-    pub async fn current_wallet_chain(&mut self) -> Result<Option<(String, ChainType)>, WalletError> {
+    pub async fn current_wallet_chain(&self) -> Result<Option<(String, ChainType)>, WalletError> {
         let context = self;
         let re = Setting::current_wallet_chain(context).await?;
         Ok(re)
