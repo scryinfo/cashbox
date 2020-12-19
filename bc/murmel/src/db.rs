@@ -26,7 +26,7 @@ pub struct ChainSqlite {
 impl ChainSqlite {
     pub fn new(network: Network, db_file_name: &str) -> Self {
         let sql = MBlockHeader::SQL;
-        let rb = block_on(ChainSqlite::init_rbatis(db_file_name));
+        let rb = block_on(Self::init_rbatis(db_file_name));
         let r = block_on(rb.exec("", sql));
         match r {
             Ok(a) => {
@@ -142,7 +142,7 @@ pub struct DetailSqlite {
 
 impl DetailSqlite {
     pub fn new(network: Network, db_file_name: &str) -> Self {
-        let rb = block_on(DetailSqlite::init_rbatis(db_file_name));
+        let rb = block_on(Self::init_rbatis(db_file_name));
         DetailSqlite::create_progress(&rb);
         DetailSqlite::create_user_address(&rb);
         DetailSqlite::create_tx_input(&rb);
@@ -278,13 +278,13 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_tx_input(
+    pub fn save_txin(
         &self,
         tx: String,
         sig_script: String,
         prev_tx: String,
         prev_vout: String,
-        sequence: i64,
+        sequence: u32,
     ) {
         let tx_input = MTxInput {
             id: None,
@@ -353,11 +353,10 @@ impl DetailSqlite {
 #[async_trait]
 trait RInit {
     async fn init_rbatis(db_file_name: &str) -> Rbatis {
-        info!("init_rbatis");
         if std::fs::metadata(db_file_name).is_err() {
             let file = std::fs::File::create(db_file_name);
             if file.is_err() {
-                info!("init file {:?}", file.err().unwrap());
+                info!("error when init file {:?}", file.err().unwrap());
             }
         }
         let rb = Rbatis::new();

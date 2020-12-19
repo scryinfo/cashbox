@@ -22,6 +22,7 @@ use log::info;
 use log::Level;
 
 use crate::config::BTC_HAMMER_PATH;
+use crate::db::{RB_CHAIN, RB_DETAIL};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
@@ -163,12 +164,11 @@ pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(
     env: JNIEnv<'_>,
     _class: JClass<'_>,
 ) -> jstring {
-    let sqlite = lazy_db_default();
-    let max_block_number = (*sqlite).lock().count();
-    let max_block_number = env
-        .new_string(max_block_number.to_string())
+    let h = RB_CHAIN.fetch_height();
+    let h = env
+        .new_string(h.to_string())
         .expect("Could not create java string!");
-    max_block_number.into_inner()
+    h.into_inner()
 }
 
 #[no_mangle]
@@ -260,18 +260,18 @@ pub extern "system" fn Java_JniApi_btcStart(
     // use mnemonic generate publc address and store it in database
     let mut filter_message: Option<FilterLoadMessage> = None;
     {
-        let sqlite = lazy_db_default().lock();
-        let pubkey = sqlite.query_compressed_pub_key();
-        if let Some(pubkey) = pubkey {
-            info!("Calc bloomfilter via pubkey {:?}", &pubkey);
-            let filter_load_message = FilterLoadMessage::calculate_filter(pubkey.as_str());
+        let m_address = RB_DETAIL.fetch_user_address();
+        if let Some(m_address) = m_address {
+            info!("Calc bloomfilter via pubkey {:?}", &m_address);
+            let filter_load_message =
+                FilterLoadMessage::calculate_filter(m_address.compressed_pub_key.as_str());
             filter_message = Some(filter_load_message)
         } else {
             info!("Did not have default pubkey in database yet");
             let default_address = calc_default_address();
             let address = default_address.to_string();
             let default_pubkey = calc_pubkey();
-            sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
+            RB_DETAIL.save_user_address(address, default_pubkey.clone());
             let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
             filter_message = Some(filter_load_message)
         }

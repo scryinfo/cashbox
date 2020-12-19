@@ -10,12 +10,13 @@ use crate::p2p::{
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message_blockdata::{InvType, Inventory};
-use bitcoin::network::message_bloom_filter::{MerkleBlockMessage};
+use bitcoin::network::message_bloom_filter::MerkleBlockMessage;
 use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 
+use crate::db::{RB_CHAIN, RB_DETAIL};
 use bitcoin_hashes::Hash;
 use log::{error, info, trace, warn};
 use std::sync::mpsc;
@@ -81,9 +82,8 @@ impl GetData {
                                     let block_hash = merkleblock.prev_block.to_hex();
                                     let timestamp = merkleblock.timestamp;
                                     {
-                                        let sqlite =
-                                            lazy_db_default().lock();
-                                        sqlite.update_newest_header(block_hash, timestamp.to_string());
+                                        RB_DETAIL
+                                            .update_progress(block_hash, timestamp.to_string());
                                     }
                                 }
 
@@ -149,20 +149,19 @@ impl GetData {
             return Ok(());
         }
 
-        let mut block_hashes: Vec<String> = Vec::new();
+        let mut header_vec: Vec<String> = vec![];
         {
-            let sqlite = lazy_db_default().lock();
-            let (_block_hash, timestamp) = sqlite.init();
-            block_hashes = sqlite.query_header(timestamp, add);
+            let p = RB_DETAIL.progress();
+            header_vec = RB_CHAIN.fetch_scan_header(p.timestamp, add);
         }
 
-        if block_hashes.len() == 0 {
+        if header_vec.len() == 0 {
             return Ok(());
         }
 
         let mut inventory_vec = vec![];
-        for block_hash in block_hashes {
-            let inventory = Inventory::new(InvType::FilteredBlock, block_hash.as_str());
+        for header in header_vec {
+            let inventory = Inventory::new(InvType::FilteredBlock, header.as_str());
             inventory_vec.push(inventory);
         }
         self.p2p
@@ -203,12 +202,11 @@ impl GetData {
                 iter.next();
                 let current_hash = iter.next().unwrap_or(" ");
                 if current_hash.eq(hash160.as_str()) {
-                    let sqlite = lazy_db_default().lock();
-                    sqlite.insert_txout(
+                    RB_DETAIL.save_txout(
                         tx_hash.to_hex(),
                         asm.clone(),
                         vout.value.to_string(),
-                        index,
+                        index.to_string(),
                     );
                 }
             }
@@ -228,14 +226,13 @@ impl GetData {
             iter.next();
             let iter3 = iter.next().unwrap_or(" ");
             if iter3.eq(PUBLIC_KEY) {
-                let sqlite = lazy_db_default().lock();
-                sqlite.insert_txin(
+                RB_DETAIL.save_txin(
                     tx_hash.to_hex(),
                     sig_script.clone(),
                     prev_tx,
                     prev_vout.to_string(),
-                    sequence.to_string(),
-                )
+                    sequence,
+                );
             }
         }
         Ok(())
@@ -249,4 +246,3 @@ impl GetData {
         hash.to_hex()
     }
 }
-

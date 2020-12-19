@@ -17,6 +17,7 @@
 //! # Download headers
 //!
 use crate::chaindb::SharedChainDB;
+use crate::db::RB_CHAIN;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
 use crate::hooks::HooksMessage;
@@ -213,12 +214,11 @@ impl HeaderDownload {
 
                                 // save block hash into sqlite table "block_hash"
                                 {
-                                    let sqlite = lazy_db_default().lock();
-                                    let header_clone = header.clone();
-                                    sqlite.insert_block(
-                                        header_clone.bitcoin_hash().to_hex(),
-                                        header_clone.time.to_string(),
-                                    );
+                                    let header_c = header.clone();
+                                    RB_CHAIN.save_header(
+                                        header_c.bitcoin_hash().to_hex(),
+                                        header_c.time.to_string(),
+                                    )
                                 }
 
                                 if let Some(forwards) = forwards {

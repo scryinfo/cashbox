@@ -20,7 +20,7 @@ pub struct MTxInput {
     pub sig_script: String,
     pub prev_tx: String,
     pub prev_vout: String,
-    pub sequence: i64,
+    pub sequence: u32,
 }
 
 impl MTxInput {
