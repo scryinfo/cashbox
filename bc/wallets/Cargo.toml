@@ -26,7 +26,8 @@ rbatis = { version = "1.8.52", features = ["async-io-sqlite"] }
 async-std = "1.8.0"
 
 ethtx = { path = "../util/ethtx" }
-substratetx = { path = "../util/substratetx" }
+scry-crypto={ path = "../util/crypto"}
+eee = { path = "../chain/eee" }
 wallets_types = { path = "../wallets_types" }
 mav = { path = "../mav" }
 

@@ -13,7 +13,7 @@ pub enum WalletError {
     Custom(String),
     Decode(String),
     EthTx(ethtx::Error),
-    SubstrateTx(substratetx::error::Error),
+    SubstrateTx(eee::error::Error),
     Serde(serde_json::Error),
     ScaleCodec(codec::Error),
     Secp256k1(secp256k1::Error),
@@ -124,8 +124,8 @@ impl From<rlp::DecoderError> for WalletError {
     }
 }
 
-impl From<substratetx::error::Error> for WalletError {
-    fn from(err: substratetx::error::Error) -> Self {
+impl From<eee::error::Error> for WalletError {
+    fn from(err: eee::error::Error) -> Self {
         WalletError::SubstrateTx(err)
     }
 }

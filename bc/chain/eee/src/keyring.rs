@@ -12,7 +12,7 @@ pub const SCRYPT_P: u32 = 1;
 //The data type of u32 is defined in the library using scrypt
 pub const SCRYPT_R: u32 = 8;
 pub const SCRYPT_DKLEN: usize = 32;
-pub const CIPHER_KEY_SIZE: &'static str = "aes-128-ctr";
+pub const CIPHER_KEY_SIZE: &str = "aes-128-ctr";
 
 //type Result<T> = Result<T,Error>;
 //Define the input keystore file format, used to convert json format file
@@ -129,26 +129,12 @@ pub trait Crypto {
         let params = ScryptParams::new(SCRYPT_LOG_N, SCRYPT_R, SCRYPT_P).unwrap();
         let mut salt = [0u8; 32];
         let mut iv = [0u8; 16];
-
-        OsRng.fill_bytes(&mut salt);
-        OsRng.fill_bytes(&mut iv);
-
         let mut dk = [0u8; SCRYPT_DKLEN];
-        let str_salt = hex::encode(salt);
-        let str_iv = hex::encode(iv);
-        scrypt(password, &salt, &params, &mut dk).expect("32 bytes always satisfy output length requirements");
-
-        let kdf_params = KdfParams {
-            dklen: SCRYPT_DKLEN,
-            salt: str_salt,
-            n: SCRYPT_LOG_N,
-            r: SCRYPT_R,
-            p: SCRYPT_P,
-        };
-        let cipher_params = CipherParams {
-            iv: str_iv,
-        };
-
+        {
+            OsRng.fill_bytes(&mut salt);
+            OsRng.fill_bytes(&mut iv);
+            scrypt(password, &salt, &params, &mut dk).expect("32 bytes always satisfy output length requirements");
+        }
         let ciphertext = aes::encrypt(aes::EncryptMethod::Aes128Ctr, mn, &dk, &iv).unwrap();
         //The 16- to 32-bit data of the derived key is concatenated with the encrypted content to calculate the digest value
         let mut hex_mac = [0u8; 32];
@@ -159,14 +145,24 @@ pub trait Crypto {
             keccak.finalize(&mut hex_mac);
         }
 
-        let hex_enc_mn_data = hex::encode(ciphertext);
-        let key_crypt = KeyCrypto {
-            ciphertext: hex_enc_mn_data,
-            cipher: CIPHER_KEY_SIZE.to_string(),
-            cipherparams: cipher_params,
-            kdf: "scrypt".to_string(),
-            kdfparams: kdf_params,
-            mac: hex::encode(hex_mac),
+        let key_crypt = {
+            let kdf_params = KdfParams {
+                dklen: SCRYPT_DKLEN,
+                salt: hex::encode(salt),
+                n: SCRYPT_LOG_N,
+                r: SCRYPT_R,
+                p: SCRYPT_P,
+            };
+
+            let cipher_params = CipherParams { iv: hex::encode(iv), };
+            KeyCrypto {
+                ciphertext: hex::encode(ciphertext),
+                cipher: CIPHER_KEY_SIZE.to_string(),
+                cipherparams: cipher_params,
+                kdf: "scrypt".to_string(),
+                kdfparams: kdf_params,
+                mac: hex::encode(hex_mac),
+            }
         };
 
         let store_data = KeyStore {
@@ -177,71 +173,38 @@ pub trait Crypto {
     }
 
     fn get_mnemonic_context(keystore: &str, password: &[u8]) -> Result<Vec<u8>, Error> {
-        //  let store: Result<KeyStore, _> = serde_json::from_str(keystore);
         let store: KeyStore = serde_json::from_str(keystore)?;
-
+        let crypto = store.crypto;
         //Symmetric encryption key
         let mut key = vec![0u8; 32];
+        {
+            let kdfparams: KdfParams = crypto.kdfparams;
+            let params = ScryptParams::new(kdfparams.n, kdfparams.r, kdfparams.p).unwrap();
+            let salt = hex::decode(kdfparams.salt)?;
+            scrypt(password, salt.as_slice(), &params, &mut key).expect("32 bytes always satisfy output length requirements");
+        }
 
-        //  let store = store.unwrap();
-        let crypto = store.crypto;
-        let cipher = crypto.cipher;
-        let kdfparams: KdfParams = crypto.kdfparams;
-
-        // let log_n = kdfparams.n.log2() as u8;
-        let log_n = kdfparams.n;
-
-        let p = kdfparams.p;
-        let r = kdfparams.r;
-
-        let params = ScryptParams::new(log_n, r, p).unwrap();
-        let hex_salt = kdfparams.salt;
-
-        let salt = hex::decode(hex_salt)?;
-        scrypt(password, salt.as_slice(), &params, &mut key)
-            .expect("32 bytes always satisfy output length requirements");
-
-        //Start constructing the parameters needed for symmetric decryption
-         let hex_ciphertext: &str = &crypto.ciphertext;
-
-        let ciphertext = hex::decode(hex_ciphertext)?;
-
-         //To verify that the symmetric key derived from the input key is correct, concatenate the 16 to 32-bit data of the derived key with the encrypted content, and compare the calculated digest value with the hash stored in the text
-         //let mut account_msg = [0u8;16+ciphertext.len()];
-        /* let mut account_msg =Vec::new();
-             account_msg.clone_from_slice(&key[16..]);
-         //account_msg.clone_from_slice(&key[16..]);
-         account_msg.append(&ciphertext[..]);
-         let hex_mac_from_password =  account_msg.keccak256();*/
-
-        let mut keccak = Keccak::new_keccak256();
-        keccak.update(&key[16..]);
-        keccak.update(&ciphertext[..]);
         let mut hex_mac_from_password = [0u8; 32];
+        //Start constructing the parameters needed for symmetric decryption
+        let ciphertext = hex::decode(&crypto.ciphertext)?;
+        {
+            let mut keccak = Keccak::new_keccak256();
+            keccak.update(&key[16..]);
+            keccak.update(&ciphertext[..]);
+            keccak.finalize(&mut hex_mac_from_password);
+        }
 
-        keccak.finalize(&mut hex_mac_from_password);
-
-        let hex_mac = crypto.mac;
-        if !hex_mac.eq(&hex::encode(hex_mac_from_password)) {
+        if !crypto.mac.eq(&hex::encode(hex_mac_from_password)) {
             return Err(Error::Custom("input password is not correct!".to_owned()));
         }
 
-        let cipherparams = &crypto.cipherparams;
-        let hex_iv = &cipherparams.iv;
-        let iv = hex::decode(hex_iv)?;
-
-        let cipher_method = match cipher.as_str() {
+        let iv = hex::decode(&crypto.cipherparams.iv)?;
+        let cipher_method = match crypto.cipher.as_str() {
             "aes-128-ctr" => aes::EncryptMethod::Aes128Ctr,
             "aes-256-ctr" => aes::EncryptMethod::Aes256Ctr,
             _ => aes::EncryptMethod::Aes256Ctr,//Encrypted in this way by default
         };
-        let mnemonic_content = aes::decrypt(cipher_method, ciphertext.as_slice(), key.as_slice(), iv.as_slice());
-        match mnemonic_content {
-            Ok(mnemonic_content) => Ok(mnemonic_content),
-            Err(e) => {
-                Err(Error::Custom(e))
-            }
-        }
+        aes::decrypt(cipher_method, ciphertext.as_slice(), key.as_slice(), iv.as_slice()).map_err(|err|Error::Custom(err))
     }
     fn sign(phrase: &str, msg: &[u8]) -> Result<[u8; 64], Error>;
 }

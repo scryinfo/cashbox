@@ -26,7 +26,7 @@ async-trait = "0.1.31"
 async-std = "1.8.0"
 
 ethtx = { path = "../util/ethtx" }
-substratetx = { path = "../util/substratetx" }
+eee = { path = "../chain/eee" }
 mav = { path = "../mav" }
 
 

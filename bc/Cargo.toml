@@ -12,11 +12,11 @@ crate-type = ["cdylib"]
 [workspace]
 members = [
     "wallets",
-    "util/substratetx",
     "murmel",
     "chain/btc/bitcoin",
     "chain/eth",
     "chain/eee",
+    "chain/eee/frame-metadata",
     "chain/btc",
     "wallets_cdl",
     "wallets_types",
@@ -29,4 +29,5 @@ features = ["serde"]
 
 [patch.crates-io]
 bitcoin = { path = "chain/btc/bitcoin" }
+frame-metadata = { path = "chain/eee/frame-metadata" }
 
