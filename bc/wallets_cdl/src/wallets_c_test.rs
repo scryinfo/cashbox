@@ -9,9 +9,10 @@ mod tests {
     use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet};
 
     use crate::kits::{CR, CStruct, CU64, to_c_char, to_str};
+    use crate::mem_c::{CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc, CWallet_dFree};
     use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters};
     use crate::types::{CError, CWallet};
-    use crate::wallets_c::{CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc, CWallet_dFree, Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init, Wallets_uninit};
+    use crate::wallets_c::{Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init, Wallets_uninit};
 
     #[test]
     fn mnemonic_test() {

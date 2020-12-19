@@ -142,6 +142,7 @@ typedef struct CBtcChain {
 typedef struct CWallet {
     char *id;
     char *nextId;
+    char *name;
     CEthChain *ethChain;
     CEeeChain *eeeChain;
     CBtcChain *btcChain;
@@ -164,29 +165,42 @@ typedef struct CCreateWalletParameters {
     char *walletType;
 } CCreateWalletParameters;
 
+typedef uint32_t CBool;
+
+#define CFalse 1
+
+#define CTrue 0
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
 /**
  * dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它
+ * 如果成功返回 [wallets_types::Error::SUCCESS()]
  */
 const CError *Wallets_init(CInitParameters *parameter, CContext **context);
 
+/**
+ * 如果成功返回 [wallets_types::Error::SUCCESS()]
+ */
 const CError *Wallets_uninit(CContext *ctx);
 
 /**
- * 返回所有的Context,如果没有返回空，且Error::SUCCESS()
+ * 返回所有的Context, 有可能是0个
+ * 如果成功返回 [wallets_types::Error::SUCCESS()]
  */
 const CError *Wallets_Contexts(CArrayCContext **contexts);
 
 /**
- * 返回最后的Context,如果没有返回空，且Error::SUCCESS()
+ * 返回最后的Context, 有可能是空值
+ * 如果成功返回 [wallets_types::Error::SUCCESS()]
  */
 const CError *Wallets_lastContext(CContext **context);
 
 /**
- * 返回最后的Context,如果没有返回空，且Error::SUCCESS()
+ * 返回第一个Context, 有可能是空值
+ * 如果成功返回 [wallets_types::Error::SUCCESS()]
  */
 const CError *Wallets_firstContext(CContext **context);
 
@@ -204,16 +218,32 @@ const CError *Wallets_generateMnemonic(char **mnemonic);
 
 const CError *Wallets_createWallet(CContext *ctx, CCreateWalletParameters *parameters, CWallet **wallet);
 
-const CError *Wallets_deleteWallet(CContext *ctx, char *walletId);
+const CError *Wallets_removeWallet(CContext *ctx, char *walletId);
+
+const CError *Wallets_renameWallet(CContext *ctx, char *newName, char *walletId);
 
 /**
- * Success: true; Fail: false
+ * 只有到CError为 Error::SUCCESS()时返值才有意义
+ * 返回值 hasAny: true表示至少有一个; Fail: false，没有
  */
-const CError *Wallets_hasOne(CContext *ctx);
+const CError *Wallets_hasAny(CContext *ctx, CBool *hasAny);
 
 const CError *Wallets_findById(CContext *ctx, char *walletId, CWallet **wallet);
 
-const CError *Wallets_findByName(CContext *ctx, char *name, CArrayCWallet **arrayWallet);
+/**
+ *注：只加载了wallet的id name等直接的基本数据，子对象（如链）的数据没有加载
+ */
+const CError *Wallets_findWalletBaseByName(CContext *ctx, char *name, CArrayCWallet **walletArray);
+
+/**
+ * 查询当前wallet 与 chain
+ */
+const CError *Wallets_currentWalletChain(CContext *ctx, char **walletId, char **chainType);
+
+/**
+ *保存当前wallet 与 chain
+ */
+const CError *Wallets_saveCurrentWalletChain(CContext *ctx, char *walletId, char *chainType);
 
 CContext **CContext_dAlloc(void);
 
@@ -226,6 +256,10 @@ void CArrayCContext_dFree(CArrayCContext **dPtr);
 void CStr_dFree(char **dcs);
 
 char **CStr_dAlloc(void);
+
+void CBool_dFree(CBool **dcs);
+
+CBool **CBool_dAlloc(void);
 
 void CError_free(CError *error);
 

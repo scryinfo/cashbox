@@ -173,6 +173,28 @@ typedef _CArrayCWallet_dFree_Dart = void Function(
   Pointer<Pointer<CArrayCWallet>> dPtr,
 );
 
+/// C function `CBool_dAlloc`.
+Pointer<Pointer<Uint32>> CBool_dAlloc() {
+  return _CBool_dAlloc();
+}
+final _CBool_dAlloc_Dart _CBool_dAlloc = _dl.lookupFunction<_CBool_dAlloc_C, _CBool_dAlloc_Dart>('CBool_dAlloc');
+typedef _CBool_dAlloc_C = Pointer<Pointer<Uint32>> Function();
+typedef _CBool_dAlloc_Dart = Pointer<Pointer<Uint32>> Function();
+
+/// C function `CBool_dFree`.
+void CBool_dFree(
+  Pointer<Pointer<Uint32>> dcs,
+) {
+  _CBool_dFree(dcs);
+}
+final _CBool_dFree_Dart _CBool_dFree = _dl.lookupFunction<_CBool_dFree_C, _CBool_dFree_Dart>('CBool_dFree');
+typedef _CBool_dFree_C = Void Function(
+  Pointer<Pointer<Uint32>> dcs,
+);
+typedef _CBool_dFree_Dart = void Function(
+  Pointer<Pointer<Uint32>> dcs,
+);
+
 /// C struct `CBtcChain`.
 class CBtcChain extends Struct {
   
@@ -503,6 +525,7 @@ class CWallet extends Struct {
   
   Pointer<ffi.Utf8> id;
   Pointer<ffi.Utf8> nextId;
+  Pointer<ffi.Utf8> name;
   Pointer<CEthChain> ethChain;
   Pointer<CEeeChain> eeeChain;
   Pointer<CBtcChain> btcChain;
@@ -539,7 +562,7 @@ typedef _CWallet_dFree_Dart = void Function(
   Pointer<Pointer<CWallet>> dPtr,
 );
 
-/// <p class="para-brief"> 返回所有的Context,如果没有返回空，且Error::SUCCESS()</p>
+/// <p class="para-brief"> 返回所有的Context, 有可能是0个 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
 Pointer<CError> Wallets_Contexts(
   Pointer<Pointer<CArrayCContext>> contexts,
 ) {
@@ -590,21 +613,24 @@ typedef _Wallets_createWallet_Dart = Pointer<CError> Function(
   Pointer<Pointer<CWallet>> wallet,
 );
 
-/// C function `Wallets_deleteWallet`.
-Pointer<CError> Wallets_deleteWallet(
+/// <p class="para-brief"> 查询当前wallet 与 chain</p>
+Pointer<CError> Wallets_currentWalletChain(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> walletId,
+  Pointer<Pointer<ffi.Utf8>> walletId,
+  Pointer<Pointer<ffi.Utf8>> chainType,
 ) {
-  return _Wallets_deleteWallet(ctx, walletId);
+  return _Wallets_currentWalletChain(ctx, walletId, chainType);
 }
-final _Wallets_deleteWallet_Dart _Wallets_deleteWallet = _dl.lookupFunction<_Wallets_deleteWallet_C, _Wallets_deleteWallet_Dart>('Wallets_deleteWallet');
-typedef _Wallets_deleteWallet_C = Pointer<CError> Function(
+final _Wallets_currentWalletChain_Dart _Wallets_currentWalletChain = _dl.lookupFunction<_Wallets_currentWalletChain_C, _Wallets_currentWalletChain_Dart>('Wallets_currentWalletChain');
+typedef _Wallets_currentWalletChain_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> walletId,
+  Pointer<Pointer<ffi.Utf8>> walletId,
+  Pointer<Pointer<ffi.Utf8>> chainType,
 );
-typedef _Wallets_deleteWallet_Dart = Pointer<CError> Function(
+typedef _Wallets_currentWalletChain_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> walletId,
+  Pointer<Pointer<ffi.Utf8>> walletId,
+  Pointer<Pointer<ffi.Utf8>> chainType,
 );
 
 /// C function `Wallets_findById`.
@@ -627,27 +653,27 @@ typedef _Wallets_findById_Dart = Pointer<CError> Function(
   Pointer<Pointer<CWallet>> wallet,
 );
 
-/// C function `Wallets_findByName`.
-Pointer<CError> Wallets_findByName(
+/// <p class="para-brief">注：只加载了wallet的id name等直接的基本数据，子对象（如链）的数据没有加载</p>
+Pointer<CError> Wallets_findWalletBaseByName(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> name,
-  Pointer<Pointer<CArrayCWallet>> arrayWallet,
+  Pointer<Pointer<CArrayCWallet>> walletArray,
 ) {
-  return _Wallets_findByName(ctx, name, arrayWallet);
+  return _Wallets_findWalletBaseByName(ctx, name, walletArray);
 }
-final _Wallets_findByName_Dart _Wallets_findByName = _dl.lookupFunction<_Wallets_findByName_C, _Wallets_findByName_Dart>('Wallets_findByName');
-typedef _Wallets_findByName_C = Pointer<CError> Function(
+final _Wallets_findWalletBaseByName_Dart _Wallets_findWalletBaseByName = _dl.lookupFunction<_Wallets_findWalletBaseByName_C, _Wallets_findWalletBaseByName_Dart>('Wallets_findWalletBaseByName');
+typedef _Wallets_findWalletBaseByName_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> name,
-  Pointer<Pointer<CArrayCWallet>> arrayWallet,
+  Pointer<Pointer<CArrayCWallet>> walletArray,
 );
-typedef _Wallets_findByName_Dart = Pointer<CError> Function(
+typedef _Wallets_findWalletBaseByName_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> name,
-  Pointer<Pointer<CArrayCWallet>> arrayWallet,
+  Pointer<Pointer<CArrayCWallet>> walletArray,
 );
 
-/// <p class="para-brief"> 返回最后的Context,如果没有返回空，且Error::SUCCESS()</p>
+/// <p class="para-brief"> 返回第一个Context, 有可能是空值 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
 Pointer<CError> Wallets_firstContext(
   Pointer<Pointer<CContext>> context,
 ) {
@@ -675,21 +701,24 @@ typedef _Wallets_generateMnemonic_Dart = Pointer<CError> Function(
   Pointer<Pointer<ffi.Utf8>> mnemonic,
 );
 
-/// <p class="para-brief"> Success: true; Fail: false</p>
-Pointer<CError> Wallets_hasOne(
+/// <p class="para-brief"> 只有到CError为 Error::SUCCESS()时返值才有意义 返回值 hasAny: true表示至少有一个; Fail: false，没有</p>
+Pointer<CError> Wallets_hasAny(
   Pointer<CContext> ctx,
+  Pointer<Uint32> hasAny,
 ) {
-  return _Wallets_hasOne(ctx);
+  return _Wallets_hasAny(ctx, hasAny);
 }
-final _Wallets_hasOne_Dart _Wallets_hasOne = _dl.lookupFunction<_Wallets_hasOne_C, _Wallets_hasOne_Dart>('Wallets_hasOne');
-typedef _Wallets_hasOne_C = Pointer<CError> Function(
+final _Wallets_hasAny_Dart _Wallets_hasAny = _dl.lookupFunction<_Wallets_hasAny_C, _Wallets_hasAny_Dart>('Wallets_hasAny');
+typedef _Wallets_hasAny_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<Uint32> hasAny,
 );
-typedef _Wallets_hasOne_Dart = Pointer<CError> Function(
+typedef _Wallets_hasAny_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<Uint32> hasAny,
 );
 
-/// <p class="para-brief"> dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它</p>
+/// <p class="para-brief"> dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
 Pointer<CError> Wallets_init(
   Pointer<CInitParameters> parameter,
   Pointer<Pointer<CContext>> context,
@@ -706,7 +735,7 @@ typedef _Wallets_init_Dart = Pointer<CError> Function(
   Pointer<Pointer<CContext>> context,
 );
 
-/// <p class="para-brief"> 返回最后的Context,如果没有返回空，且Error::SUCCESS()</p>
+/// <p class="para-brief"> 返回最后的Context, 有可能是空值 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
 Pointer<CError> Wallets_lastContext(
   Pointer<Pointer<CContext>> context,
 ) {
@@ -748,7 +777,64 @@ typedef _Wallets_lockWrite_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
 );
 
-/// C function `Wallets_uninit`.
+/// C function `Wallets_removeWallet`.
+Pointer<CError> Wallets_removeWallet(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+) {
+  return _Wallets_removeWallet(ctx, walletId);
+}
+final _Wallets_removeWallet_Dart _Wallets_removeWallet = _dl.lookupFunction<_Wallets_removeWallet_C, _Wallets_removeWallet_Dart>('Wallets_removeWallet');
+typedef _Wallets_removeWallet_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+);
+typedef _Wallets_removeWallet_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+);
+
+/// C function `Wallets_renameWallet`.
+Pointer<CError> Wallets_renameWallet(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> newName,
+  Pointer<ffi.Utf8> walletId,
+) {
+  return _Wallets_renameWallet(ctx, newName, walletId);
+}
+final _Wallets_renameWallet_Dart _Wallets_renameWallet = _dl.lookupFunction<_Wallets_renameWallet_C, _Wallets_renameWallet_Dart>('Wallets_renameWallet');
+typedef _Wallets_renameWallet_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> newName,
+  Pointer<ffi.Utf8> walletId,
+);
+typedef _Wallets_renameWallet_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> newName,
+  Pointer<ffi.Utf8> walletId,
+);
+
+/// <p class="para-brief">保存当前wallet 与 chain</p>
+Pointer<CError> Wallets_saveCurrentWalletChain(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+  Pointer<ffi.Utf8> chainType,
+) {
+  return _Wallets_saveCurrentWalletChain(ctx, walletId, chainType);
+}
+final _Wallets_saveCurrentWalletChain_Dart _Wallets_saveCurrentWalletChain = _dl.lookupFunction<_Wallets_saveCurrentWalletChain_C, _Wallets_saveCurrentWalletChain_Dart>('Wallets_saveCurrentWalletChain');
+typedef _Wallets_saveCurrentWalletChain_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+  Pointer<ffi.Utf8> chainType,
+);
+typedef _Wallets_saveCurrentWalletChain_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> walletId,
+  Pointer<ffi.Utf8> chainType,
+);
+
+/// <p class="para-brief"> 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
 Pointer<CError> Wallets_uninit(
   Pointer<CContext> ctx,
 ) {

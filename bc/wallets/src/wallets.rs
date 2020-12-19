@@ -12,8 +12,8 @@ use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParamet
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
-    pub ctx: Context,
-    pub db: Db,
+    pub(crate) ctx: Context,
+    pub(crate) db: Db,
     //for test, make it pub
     stopped: AtomicBool,
 
@@ -54,11 +54,11 @@ impl Wallets {
         return true;
     }
 
-    pub async fn init(&mut self, parameters: &InitParameters) -> Result<(), WalletError> {
+    pub async fn init(&mut self, parameters: &InitParameters) -> Result<&Context, WalletError> {
         self.ctx.context_note = parameters.context_note.clone();
         self.db.init(&parameters.db_name).await?;
         //todo
-        Ok(())
+        Ok(&self.ctx)
     }
 
     pub async fn uninit(&mut self) -> Result<(), WalletError> {
@@ -66,7 +66,7 @@ impl Wallets {
         Ok(())
     }
 
-    pub async fn all(&mut self) -> Result<Vec<Wallet>, WalletError> {
+    pub async fn all(&self) -> Result<Vec<Wallet>, WalletError> {
         let ws = Wallet::all(self).await?;
         Ok(ws)
     }
@@ -93,13 +93,13 @@ impl Wallets {
         }
         Ok(re)
     }
-    pub async fn remove_by_id(&mut self, wallet_id: &str, tx_id: &str) -> Result<u64, WalletError> {
+    pub async fn remove_by_id(&mut self, wallet_id: &str) -> Result<u64, WalletError> {
         let context = self;
-        let re = Wallet::remove_by_id(context,wallet_id, tx_id).await?;
+        let re = Wallet::remove_by_id(context,wallet_id).await?;
         Ok(re)
     }
 
-    pub async fn re_name_wallet(&mut self, name: &str, wallet_id: &str, tx_id: &str) -> Result<u64, WalletError> {
+    pub async fn rename_wallet(&mut self, name: &str, wallet_id: &str, tx_id: &str) -> Result<u64, WalletError> {
         let context = self;
         match Wallet::m_wallet_by_id(context, wallet_id).await? {
             None => Err(WalletError::NoRecord("".to_owned())),

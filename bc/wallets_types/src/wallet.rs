@@ -58,15 +58,20 @@ impl Wallet {
         let m_wallet = MWallet::fetch_by_id(rb, "", &wallet_id.to_owned()).await?;
         Ok(m_wallet)
     }
-    pub async fn remove_by_id(context: &dyn ContextTrait, wallet_id: &str, tx_id: &str) -> Result<u64, WalletError> {
+    pub async fn remove_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<u64, WalletError> {
         let rb = context.db().wallets_db();
-        let re = MWallet::remove_by_id(rb, tx_id, &wallet_id.to_owned()).await?;
+        let mut tx = rb.begin_tx_defer(false).await?;
+        let re = MWallet::remove_by_id(rb, &tx.tx_id, &wallet_id.to_owned()).await?;
+        //todo 删除相关表
+        rb.commit(&tx.tx_id).await?;
+        tx.manager = None;
         Ok(re)
     }
 
     pub async fn update_by_id(context: &dyn ContextTrait, m_wallet: &mut MWallet, tx_id: &str) -> Result<u64, WalletError> {
         let rb = context.db().wallets_db();
         let re = m_wallet.update_by_id(rb, tx_id).await?;
+        //todo 其它字段怎么处理？
         Ok(re)
     }
 
