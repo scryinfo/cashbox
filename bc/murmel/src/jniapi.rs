@@ -1,17 +1,16 @@
-pub mod create_translation;
-pub mod btcapi;
 pub mod android_btcapi;
+pub mod btcapi;
+pub mod create_translation;
 
-use std::sync::{Arc, Mutex};
-use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
 use crate::hooks::ApiMessage;
-use once_cell::sync::Lazy;
-use bitcoin::{Network, Address};
-use bitcoin_wallet::mnemonic::Mnemonic;
-use bitcoin_wallet::account::{MasterAccount, Unlocker, AccountAddressType, Account};
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use bitcoin::consensus::serialize;
 use bitcoin::util::psbt::serialize::Serialize;
+use bitcoin::{Address, Network};
+use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
+use bitcoin_wallet::mnemonic::Mnemonic;
+use once_cell::sync::Lazy;
+use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
+use std::sync::{Arc, Mutex};
 
 pub type SharedChannel = Arc<Mutex<(SyncSender<ApiMessage>, Receiver<ApiMessage>)>>;
 
