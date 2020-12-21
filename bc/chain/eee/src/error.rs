@@ -1,3 +1,4 @@
+use super::*;
 use derive_more::Display;
 
 #[derive(Debug, Display)]
@@ -6,7 +7,7 @@ pub enum Error {
     Custom(String),
     #[display(fmt = "SecretString error: {:?}", _0)]
     SecretString(sp_core::crypto::SecretStringError),
-    #[display(fmt = "crypto Public error: {:?}", _0)]
+    #[display(fmt = "keyring Public error: {:?}", _0)]
     Public(sp_core::crypto::PublicError),
     #[display(fmt = "substrate_bip39 error: {:?}", _0)]
     Bip39(substrate_bip39::Error),
@@ -16,6 +17,10 @@ pub enum Error {
     Serde(serde_json::Error),
     #[display(fmt = "codec error: {:?}", _0)]
     ScaleCodec(codec::Error),
+    #[display(fmt = "chian metadata error: {:?}", _0)]
+    MetaDataError(node_metadata::MetadataError),
+    #[display(fmt = "decode event error: {:?}", _0)]
+    EventsError(events::EventsError),
 }
 
 impl std::error::Error for Error {
@@ -75,4 +80,14 @@ impl From<codec::Error> for Error {
     fn from(err: codec::Error) -> Self {
         Error::ScaleCodec(err)
     }
+}
+
+impl From<node_metadata::MetadataError> for Error {
+    fn from(err: node_metadata::MetadataError) -> Self {
+        Error::MetaDataError(err)
+    }
+}
+
+impl From<events::EventsError> for Error{
+    fn from(err:events::EventsError)->Self{Error::EventsError(err)}
 }

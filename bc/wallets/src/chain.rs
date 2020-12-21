@@ -1,7 +1,8 @@
 use mav::ma::MAddress;
 use mav::WalletType;
-use substratetx::Crypto;
+
 use wallets_types::{Chain2WalletType, ChainTrait, ContextTrait, WalletError, WalletTrait};
+use eee::Crypto;
 
 #[derive(Default)]
 struct EthChain();
@@ -43,11 +44,11 @@ impl ChainTrait for EeeChain {
         addr.chain_type = wallets_types::EeeChain::chain_type(wallet_type).to_string();
         {
             let phrase = String::from_utf8(mn.to_vec())?;
-            let seed = substratetx::Sr25519::seed_from_phrase(&phrase, None).unwrap();
-            let pair = substratetx::Sr25519::pair_from_seed(&seed);
-            let puk_key = substratetx::Sr25519::public_from_pair(&pair);
+            let seed = eee::Sr25519::seed_from_phrase(&phrase, None).unwrap();
+            let pair = eee::Sr25519::pair_from_seed(&seed);
+            let puk_key = eee::Sr25519::public_from_pair(&pair);
 
-            addr.address = substratetx::Sr25519::ss58_from_pair(&pair, DEFAULT_SS58_VERSION);
+            addr.address = eee::Sr25519::ss58_from_pair(&pair, DEFAULT_SS58_VERSION);
             addr.public_key = format!("0x{}", hex::encode(puk_key));
         }
         Ok(addr)

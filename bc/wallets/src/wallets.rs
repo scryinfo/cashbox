@@ -7,7 +7,10 @@ use parking_lot::lock_api::RawReentrantMutex;
 
 use mav::{ChainType, WalletType};
 use mav::ma::{BeforeSave, Dao, Db, MAddress, MMnemonic, MWallet};
-use substratetx::{Crypto, Keccak256};
+use mav::WalletType;
+use eee::{Crypto,Sr25519};
+use scry_crypto::Keccak256;
+
 use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait};
 
 pub struct Wallets {
@@ -121,7 +124,7 @@ impl Wallets {
         Ok(re)
     }
     pub fn generate_mnemonic() -> String {
-        let mnemonic = substratetx::Sr25519::generate_phrase(15);
+        let mnemonic = eee::Sr25519::generate_phrase(15);
         mnemonic
     }
 
@@ -146,7 +149,7 @@ impl Wallets {
         let mut m_wallet = MWallet::default();
         {
             m_wallet.mnemonic_digest = hex_mn_digest;
-            m_wallet.mnemonic = substratetx::Sr25519::encrypt_mnemonic(&parameters.mnemonic.as_bytes().to_vec(), &parameters.password.as_bytes().to_vec());
+            m_wallet.mnemonic = eee::Sr25519::encrypt_mnemonic(&parameters.mnemonic.as_bytes().to_vec(), &parameters.password.as_bytes().to_vec());
             m_wallet.wallet_type = wallet_type.to_string();
             m_wallet.name = parameters.name.clone();
         }
