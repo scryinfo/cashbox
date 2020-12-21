@@ -1,8 +1,9 @@
 #[cfg(test)]
 mod tests {
     use std::ptr::null_mut;
+    use std::time::Instant;
 
-    use async_std::task::block_on;
+    use futures::executor::block_on;
 
     use mav::{kits, WalletType};
     use mav::ma::DbCreateType;
@@ -13,6 +14,31 @@ mod tests {
     use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters};
     use crate::types::{CError, CWallet};
     use crate::wallets_c::{Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init, Wallets_uninit};
+
+    #[test]
+    fn block_on_test() {
+        let block_async_std = |k: u64| -> u64{
+            let start = Instant::now();
+            for _ in 0..k {
+                async_std::task::block_on(async { 1 });
+            }
+            start.elapsed().as_nanos() as u64
+        };
+        let block_futures = |k: u64| -> u64{
+            let start = Instant::now();
+            for _ in 0..k {
+                futures::executor::block_on(async { 1 });
+            }
+            start.elapsed().as_nanos() as u64
+        };
+        let k = 10000u64;
+        let span_futures = block_futures(k) / k;
+        let span_async = block_async_std(k) / k;
+
+        println!("async_std::task::block_on:   {}(nanoseconds) \n\
+                  futures::executor::block_on: {}(nanoseconds)", span_async, span_futures);
+        assert!(span_async > span_futures)
+    }
 
     #[test]
     fn mnemonic_test() {

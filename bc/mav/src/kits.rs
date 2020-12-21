@@ -4,7 +4,7 @@ use std::ops::Add;
 use rbatis::rbatis::Rbatis;
 use uuid::Uuid;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Default)]
 pub struct Error {
     pub err: String,
 }
@@ -60,4 +60,32 @@ pub async fn make_memory_rbatis() -> Result<Rbatis, Error> {
     let url = "sqlite://:memory:".to_owned();
     rb.link(&url).await?;
     return Ok(rb);
+}
+
+#[cfg(test)]
+pub mod test {
+    use futures::executor::block_on;
+    use rbatis::rbatis::Rbatis;
+
+    use crate::kits::make_memory_rbatis;
+    use crate::ma::{Db, DbNames};
+
+    pub fn mock_memory_db() -> Db {
+        let mut db = Db::default();
+        let re = block_on(db.init_memory_sql(&DbNames::new("", "")));
+        assert_eq!(false, re.is_err(), "{:?}", re.unwrap_err());
+        db
+    }
+
+    pub fn mock_files_db() -> Db {
+        let mut db = Db::default();
+        let re = block_on(db.init(&DbNames::new("", "")));
+        assert_eq!(false, re.is_err(), "{:?}", re.unwrap_err());
+        db
+    }
+
+    pub async fn make_memory_rbatis_test() -> Rbatis {
+        let re = make_memory_rbatis().await;
+        re.unwrap()
+    }
 }

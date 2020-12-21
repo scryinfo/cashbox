@@ -3,7 +3,7 @@
 
 use std::os::raw::c_char;
 
-use async_std::task::block_on;
+use futures::executor::block_on;
 
 use mav::ChainType;
 use wallets::{Contexts, Wallets};

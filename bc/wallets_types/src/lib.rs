@@ -64,9 +64,10 @@ macro_rules! deref_type {
 pub mod tests {
     use std::sync::atomic::Ordering;
 
-    use async_std::task::block_on;
     use failure::_core::sync::atomic::AtomicBool;
+    use futures::executor::block_on;
 
+    use mav::kits::test::{mock_files_db, mock_memory_db};
     use mav::ma::{Db, DbNames};
 
     use crate::ContextTrait;
@@ -92,21 +93,17 @@ pub mod tests {
 
     pub fn mock_memory_context() -> Box<dyn ContextTrait> {
         let mut t = WalletsMock {
-            db: Db::default(),
+            db: mock_memory_db(),
             stopped: Default::default(),
         };
-        let re = block_on(t.db.init_memory_sql(&DbNames::new("", "")));
-        assert_eq!(false, re.is_err(), "{:?}", re);
         Box::new(t)
     }
 
     pub fn mock_files_context() -> Box<dyn ContextTrait> {
         let mut t = WalletsMock {
-            db: Db::default(),
+            db: mock_files_db(),
             stopped: Default::default(),
         };
-        let re = block_on(t.db.init(&DbNames::new("", "")));
-        assert_eq!(false, re.is_err(), "{:?}", re);
         Box::new(t)
     }
 }

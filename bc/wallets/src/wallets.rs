@@ -79,13 +79,13 @@ impl Wallets {
 
     pub async fn find_by_id(&self, wallet_id: &str) -> Result<Option<Wallet>, WalletError> {
         let context = self;
-        let re = Wallet::find_by_id(context,wallet_id).await?;
+        let re = Wallet::find_by_id(context, wallet_id).await?;
         Ok(re)
     }
     ///注：只加载了wallet的id name等直接的基本数据，链数据没有加载
     pub async fn find_wallet_base_by_name(&self, name: &str) -> Result<Vec<Wallet>, WalletError> {
         let context = self;
-        let ms = Wallet::m_wallet_by_name(context,name).await?;
+        let ms = Wallet::m_wallet_by_name(context, name).await?;
         let re = Vec::new();
         for m in ms {
             let mut w = Wallet::default();
@@ -95,7 +95,7 @@ impl Wallets {
     }
     pub async fn remove_by_id(&mut self, wallet_id: &str) -> Result<u64, WalletError> {
         let context = self;
-        let re = Wallet::remove_by_id(context,wallet_id).await?;
+        let re = Wallet::remove_by_id(context, wallet_id).await?;
         Ok(re)
     }
 
@@ -105,7 +105,7 @@ impl Wallets {
             None => Err(WalletError::NoRecord("".to_owned())),
             Some(mut m_wallet) => {
                 m_wallet.name = name.to_owned();
-                let re = Wallet::update_by_id(context,&mut m_wallet, tx_id).await?;
+                let re = Wallet::update_by_id(context, &mut m_wallet, tx_id).await?;
                 Ok(re)
             }
         }

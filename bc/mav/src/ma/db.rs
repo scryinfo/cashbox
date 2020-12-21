@@ -243,7 +243,7 @@ impl Db {
 
 #[cfg(test)]
 mod tests {
-    use async_std::task::block_on;
+    use futures::executor::block_on;
     use rbatis::rbatis::Rbatis;
     use strum::IntoEnumIterator;
 
@@ -313,10 +313,9 @@ mod tests {
 
     #[test]
     fn db_test() {
-        let db_names = DbNames::new("", "");
         let mut db = Db::default();
-        let re = block_on(db.init(&db_names));
-        assert_eq!(Ok(()), re);
+        let re = block_on(db.init(&DbNames::new("", "")));
+        assert_eq!(false, re.is_err(), "{:?}", re.unwrap_err());
 
         assert_eq!(&db.cashbox_wallets as *const Rbatis, db.wallets_db() as *const Rbatis);
         assert_eq!(&db.cashbox_mnemonic as *const Rbatis, db.mnemonic_db() as *const Rbatis);

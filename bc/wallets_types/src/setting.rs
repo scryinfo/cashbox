@@ -57,14 +57,13 @@ impl Setting {
 
 #[cfg(test)]
 mod tests {
-    use async_std::task::block_on;
+    use futures::executor::block_on;
     use rbatis::crud::CRUDEnable;
 
     use mav::ChainType;
     use mav::ma::{Dao, Db, DbCreateType, MSetting, SettingType};
 
     use crate::{ContextTrait, Setting};
-    use crate::tests::{mock_files_context, mock_memory_context};
 
     #[test]
     fn setting_test() {
@@ -120,7 +119,7 @@ mod tests {
     }
 
     fn init_table() -> Box<dyn ContextTrait> {
-        let context = mock_files_context();
+        let context = crate::tests::mock_memory_context();
         let rb = context.db().wallets_db();
         let re = block_on(Db::create_table(rb, MSetting::create_table_script(), &MSetting::table_name(), &DbCreateType::Drop));
         assert_eq!(false, re.is_err(), "{:?}", re);

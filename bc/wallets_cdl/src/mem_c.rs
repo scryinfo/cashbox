@@ -7,18 +7,20 @@ use crate::kits::{CArray, CBool, CStruct, d_ptr_alloc, d_ptr_free};
 use crate::parameters::CContext;
 use crate::types::{CError, CWallet};
 
-// alloc free start
+/// alloc ** [parameters::CContext]
 #[no_mangle]
 pub extern "C" fn CContext_dAlloc() -> *mut *mut CContext {
     d_ptr_alloc()
 }
 
+/// free ** [parameters::CContext]
 #[no_mangle]
 pub unsafe extern "C" fn CContext_dFree(dPtr: *mut *mut CContext) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
 }
 
+/// alloc ** [CArray]
 #[no_mangle]
 pub extern "C" fn CArrayCContext_dAlloc() -> *mut *mut CArray<CContext> {
     d_ptr_alloc()

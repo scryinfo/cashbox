@@ -23,10 +23,10 @@ rbatis = { version = "1.8.52", features = ["async-io-sqlite"] }
 rbatis-core = { version = "1.8.52", features = ["async-io-sqlite"] }
 
 async-trait = "0.1.31"
-async-std = "1.8.0"
 
 ethtx = { path = "../util/ethtx" }
 substratetx = { path = "../util/substratetx" }
 mav = { path = "../mav" }
 
-
+[dev-dependencies]
+futures = "0.3.8"

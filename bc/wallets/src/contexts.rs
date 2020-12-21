@@ -42,7 +42,7 @@ impl Contexts {
         self.last_context = None;
         self.first_context = None;
         for (_, it) in self.w_map.iter_mut() {
-            let _ = async_std::task::block_on(it.uninit())?;
+            let _ = futures::executor::block_on(it.uninit())?;
         }
         self.w_map.clear();
 

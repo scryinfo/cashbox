@@ -13,7 +13,7 @@ crate-type = ["cdylib", "lib"]
 [dependencies]
 libc = "0.2.80"
 log = "0.4.11"
-async-std = "1.8.0"
+futures = "0.3.8"
 
 wallets = { version = "0.1.0", path = "../wallets" }
 wallets_types = { path = "../wallets_types" }
@@ -21,6 +21,9 @@ wallets_macro = { path = "../wallets_macro" }
 mav = { path = "../mav" }
 
 [dev-dependencies]
+async-std = "1.8.0"
+futures = "0.3.8"
+
 pkg-config = "0.3.19"
 mav = { path = "../mav" }
 rbatis = { version = "1.8.52", features = ["async-io-sqlite"] }

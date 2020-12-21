@@ -100,3 +100,4 @@ git
 /app/dl/armeabi-v7a/libwallets_cdl.so
 /app/dl/x86/libwallets_cdl.so
 /app/dl/x86_64/libwallets_cdl.so
+/bc/mav/cashbox_mnemonic.db

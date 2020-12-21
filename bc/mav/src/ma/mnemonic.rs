@@ -40,14 +40,15 @@ impl MMnemonic {
 
 #[cfg(test)]
 mod tests {
-    use async_std::task::block_on;
+    use futures::executor::block_on;
     use rbatis::crud::CRUDEnable;
     use rbatis::rbatis::Rbatis;
     use serde::{Deserialize, Serialize};
 
     use wallets_macro::db_append_shared;
 
-    use crate::ma::{Db, db_dest, DbCreateType};
+    use crate::kits::test::make_memory_rbatis_test;
+    use crate::ma::{Db, DbCreateType};
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, MMnemonic, Shared};
 
     #[test]
@@ -147,7 +148,7 @@ mod tests {
     }
 
     async fn init_memory() -> Rbatis {
-        let rb = db_dest::init_memory().await;
+        let rb = make_memory_rbatis_test().await;
         let r = Db::create_table(&rb, MMnemonic::create_table_script(), &MMnemonic::table_name(), &DbCreateType::Drop).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         rb

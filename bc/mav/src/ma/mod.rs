@@ -1,6 +1,3 @@
-#[cfg(test)]
-pub use dao::test as db_dest;
-
 pub use crate::ma::dao::*;
 pub use crate::ma::data::{*};
 pub use crate::ma::data_btc::{*};
