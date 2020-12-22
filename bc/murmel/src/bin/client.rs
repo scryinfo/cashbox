@@ -25,7 +25,6 @@ use murmel::constructor::Constructor;
 
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use murmel::config::BTC_HAMMER_PATH;
-use murmel::db::lazy_db_default;
 use murmel::jniapi::{calc_default_address, calc_pubkey};
 use std::{
     env::args,

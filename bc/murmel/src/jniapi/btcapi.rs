@@ -22,6 +22,7 @@ use log::info;
 use log::Level;
 
 use crate::config::BTC_HAMMER_PATH;
+use crate::db::fetch_scanned_height;
 use crate::db::{RB_CHAIN, RB_DETAIL};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
@@ -177,8 +178,7 @@ pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(
     env: JNIEnv<'_>,
     _class: JClass<'_>,
 ) -> jstring {
-    let sqlite = lazy_db_default().lock();
-    let height = sqlite.query_scanned_height();
+    let height = fetch_scanned_height();
     let max_block_number = env
         .new_string(height.to_string())
         .expect("Could not create java string!");

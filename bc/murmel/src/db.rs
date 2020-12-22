@@ -6,11 +6,11 @@
 use crate::config::{BTC_CHAIN_PATH, BTC_DETAIL_PATH};
 use crate::moudle::chain::MBlockHeader;
 use crate::moudle::detail::{MLocalTx, MProgress, MTxInput, MTxOutput, MUserAddress};
-use async_std::task::block_on;
 use async_trait::async_trait;
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::{BitcoinHash, Network};
+use futures::executor::block_on;
 use log::{debug, info};
 use once_cell::sync::Lazy;
 use rbatis::crud::CRUD;
@@ -132,6 +132,21 @@ impl ChainSqlite {
         } else {
             return 0;
         }
+    }
+
+    pub fn fetch_header_by_timestamp(&self, timestamp: String) -> Option<MBlockHeader> {
+        let w = self.rb.new_wrapper().eq("timestamp", timestamp).check();
+        let r = match w {
+            Ok(w) => {
+                let r: Result<MBlockHeader, _> = block_on(self.rb.fetch_by_wrapper("", &w));
+                match r {
+                    Ok(header) => Some(header),
+                    Err(_) => None,
+                }
+            }
+            Err(_) => None,
+        };
+        r
     }
 }
 
@@ -347,6 +362,18 @@ impl DetailSqlite {
             Ok(p) => p,
             Err(_) => None,
         }
+    }
+}
+
+pub fn fetch_scanned_height() -> u64 {
+    let mprogress = RB_DETAIL.progress();
+    let header = RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp);
+    match header {
+        None => 0,
+        Some(header) => match header.id {
+            None => 0,
+            Some(id) => id,
+        },
     }
 }
 
