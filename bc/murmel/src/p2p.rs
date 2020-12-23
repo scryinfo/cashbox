@@ -337,7 +337,7 @@ impl P2PConfig<NetworkMessage, RawNetworkMessage> for BitcoinP2PConfig {
         } else {
             SERVICE_BLOCKS + SERVICE_WITNESS +
                 // announce that this node is capable of serving BIP157 messages
-                SERVICE_FILTERS + SERVICE_BLOOM
+                SERVICE_FILTERS // + SERVICE_BLOOM
         };
 
         // build message

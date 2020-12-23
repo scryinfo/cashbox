@@ -1,7 +1,6 @@
 //! after send loadfilter message in bloomfilter mod we can get merkleblock in this mod and get
 //! loadfilter message do not get any response.
 //! we get response here
-use crate::chaindb::SharedChainDB;
 use crate::error::Error;
 use crate::hooks::HooksMessage;
 use crate::p2p::{

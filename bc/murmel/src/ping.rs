@@ -69,6 +69,9 @@ impl Ping {
                                     .received(pid, 1, ExpectedReply::Pong);
                             }
                         }
+                        NetworkMessage::Ping(nonce) => {
+                            self.p2p.send_network(pid, NetworkMessage::Pong(nonce));
+                        }
                         _ => {}
                     },
                     _ => {}

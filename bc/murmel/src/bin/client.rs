@@ -25,7 +25,9 @@ use murmel::constructor::Constructor;
 
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use murmel::config::BTC_HAMMER_PATH;
+use murmel::db::RB_DETAIL;
 use murmel::jniapi::{calc_default_address, calc_pubkey};
+use murmel::moudle::detail::MUserAddress;
 use std::{
     env::args,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
@@ -114,24 +116,23 @@ pub fn main() {
     // todo
     // use mnemonic generate publc address and store it in database
     let mut filter_message: Option<FilterLoadMessage> = None;
-    let mut pubkey: Option<String> = None;
+    let mut muser_address: Option<MUserAddress> = None;
     {
-        let sqlite = lazy_db_default().lock();
-        pubkey = sqlite.query_compressed_pub_key();
+        muser_address = RB_DETAIL.fetch_user_address();
     }
 
-    if let Some(pubkey) = pubkey {
-        info!("Calc bloomfilter via pubkey {:?}", &pubkey);
-        let filter_load_message = FilterLoadMessage::calculate_filter(pubkey.as_str());
+    if let Some(k) = muser_address {
+        info!("User Address {:?}", &k);
+        let filter_load_message =
+            FilterLoadMessage::calculate_filter(k.compressed_pub_key.as_str());
         filter_message = Some(filter_load_message)
     } else {
-        info!("Did not have default pubkey in database yet");
+        info!("Did not have pubkey in database yet, calc default address and pubkey");
         let default_address = calc_default_address();
         let address = default_address.to_string();
         let default_pubkey = calc_pubkey();
         {
-            let sqlite = lazy_db_default().lock();
-            sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
+            RB_DETAIL.save_user_address(address, default_pubkey.clone());
         }
         let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
         filter_message = Some(filter_load_message)
