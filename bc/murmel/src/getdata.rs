@@ -26,7 +26,6 @@ use std::time::Duration;
 const PUBLIC_KEY: &str = "0291ee52a0e0c22db9772f237f4271ea6f9330d92b242fb3c621928774c560b699";
 
 pub struct GetData {
-    chaindb: SharedChainDB,
     //send a message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
@@ -35,7 +34,6 @@ pub struct GetData {
 
 impl GetData {
     pub fn new(
-        chaindb: SharedChainDB,
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         hook_receiver: mpsc::Receiver<HooksMessage>,
@@ -43,7 +41,6 @@ impl GetData {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
         let mut getdata = GetData {
-            chaindb,
             p2p,
             timeout,
             hook_receiver,

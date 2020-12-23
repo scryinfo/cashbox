@@ -38,6 +38,7 @@ use crate::timeout::Timeout;
 use bitcoin::network::constants::Network;
 use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message::RawNetworkMessage;
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use futures::{
     executor::{ThreadPool, ThreadPoolBuilder},
     future,
@@ -55,7 +56,6 @@ use std::{
     path::Path,
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
-use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -87,7 +87,7 @@ impl Constructor {
         network: Network,
         listen: Vec<SocketAddr>,
         chaindb: SharedChainDB,
-        filter_load_message: Option<FilterLoadMessage>
+        filter_load_message: Option<FilterLoadMessage>,
     ) -> Result<Constructor, Error> {
         const BACK_PRESSURE: usize = 10;
 
@@ -111,12 +111,12 @@ impl Constructor {
         );
 
         #[cfg(feature = "lightning")]
-            let lightning = Arc::new(Mutex::new(LightningConnector::new(
+        let lightning = Arc::new(Mutex::new(LightningConnector::new(
             network,
             p2p_control.clone(),
         )));
         #[cfg(not(feature = "lightning"))]
-            let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
+        let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
 
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
@@ -131,11 +131,14 @@ impl Constructor {
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
         info!("send FilterLoad");
-        dispatcher.add_listener(BloomFilter::new(p2p_control.clone(), timeout.clone(), filter_load_message));
+        dispatcher.add_listener(BloomFilter::new(
+            p2p_control.clone(),
+            timeout.clone(),
+            filter_load_message,
+        ));
 
         info!("send GetData");
         dispatcher.add_listener(GetData::new(
-            chaindb.clone(),
             p2p_control.clone(),
             timeout.clone(),
             hook_receiver,
@@ -176,7 +179,7 @@ impl Constructor {
             executor
                 .spawn(
                     p2p.add_peer("bitcoin", PeerSource::Outgoing(addr.clone()))
-                       .map(|_| ()),
+                        .map(|_| ()),
                 )
                 .expect("can not spawn task for peers");
         }
