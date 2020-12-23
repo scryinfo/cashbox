@@ -2,7 +2,9 @@ package info.scry.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+
 import java.text.SimpleDateFormat;
+
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
@@ -31,44 +33,54 @@ public class ScryLog {
     private static SimpleDateFormat logfile = new SimpleDateFormat("yyyy-MM-dd");// Log file format
     public Context context;
 
-    public static void w(String tag, Object msg) { // Warning message
-        log(tag, msg.toString(), 'w');
+    @SuppressLint("NewApi")
+    public static void w(Context context, String tag, Object msg) { // Warning message
+        log(context, tag, msg.toString(), 'w');
     }
 
-    public static void e(String tag, Object msg) { // Error message
-        log(tag, msg.toString(), 'e');
+    @SuppressLint("NewApi")
+    public static void e(Context context, String tag, Object msg) { // Error message
+        log(context, tag, msg.toString(), 'e');
     }
 
-    public static void d(String tag, Object msg) {// Debug information
-        log(tag, msg.toString(), 'd');
+    @SuppressLint("NewApi")
+    public static void d(Context context, String tag, Object msg) {// Debug information
+        log(context, tag, msg.toString(), 'd');
     }
 
-    public static void i(String tag, Object msg) {//
-        log(tag, msg.toString(), 'i');
+    @SuppressLint("NewApi")
+    public static void i(Context context, String tag, Object msg) {//
+        log(context, tag, msg.toString(), 'i');
     }
 
-    public static void v(String tag, Object msg) {
-        log(tag, msg.toString(), 'v');
+    @SuppressLint("NewApi")
+    public static void v(Context context, String tag, Object msg) {
+        log(context, tag, msg.toString(), 'v');
     }
 
-    public static void w(String tag, String text) {
-        log(tag, text, 'w');
+    @SuppressLint("NewApi")
+    public static void w(Context context, String tag, String text) {
+        log(context, tag, text, 'w');
     }
 
-    public static void e(String tag, String text) {
-        log(tag, text, 'e');
+    @SuppressLint("NewApi")
+    public static void e(Context context, String tag, String text) {
+        log(context, tag, text, 'e');
     }
 
-    public static void d(String tag, String text) {
-        log(tag, text, 'd');
+    @SuppressLint("NewApi")
+    public static void d(Context context, String tag, String text) {
+        log(context, tag, text, 'd');
     }
 
-    public static void i(String tag, String text) {
-        log(tag, text, 'i');
+    @SuppressLint("NewApi")
+    public static void i(Context context, String tag, String text) {
+        log(context, tag, text, 'i');
     }
 
-    public static void v(String tag, String text) {
-        log(tag, text, 'v');
+    @SuppressLint("NewApi")
+    public static void v(Context context, String tag, String text) {
+        log(context, tag, text, 'v');
     }
 
     /**
@@ -79,7 +91,7 @@ public class ScryLog {
      * @param level
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private static void log(String tag, String msg, char level) {
+    private static void log(Context context, String tag, String msg, char level) {
         if (MYLOG_SWITCH) {//Log file master switch
             if ('e' == level && ('e' == MYLOG_TYPE || 'v' == MYLOG_TYPE)) { // Output error message
                 Log.e(tag, msg);
@@ -93,7 +105,7 @@ public class ScryLog {
                 Log.v(tag, msg);
             }
             if (MYLOG_WRITE_TO_FILE)//Log write file switch
-                writeLogtoFile(String.valueOf(level), tag, msg);
+                writeLogtoFile(context, String.valueOf(level), tag, msg);
         }
     }
 
@@ -105,26 +117,28 @@ public class ScryLog {
      * @param text
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private static void writeLogtoFile(String mylogtype, String tag, String text) {// Create or open a log file
+    private static void writeLogtoFile(Context context, String mylogtype, String tag, String text) {// Create or open a log file
         Date nowtime = new Date();
         String needWriteFiel = logfile.format(nowtime);
-        String needWriteMessage = myLogSdf.format(nowtime) + "    " + mylogtype + "    " + tag +
-                "    " + text;
-        File dirPath = Environment.getExternalStorageDirectory();
-
-        File dirsFile = new File(MYLOG_PATH_SDCARD_DIR);
-        if (!dirsFile.exists()) {
-            dirsFile.mkdirs();
+        String needWriteMessage = myLogSdf.format(nowtime) + "    " + mylogtype + "    " + tag + "    " + text;
+        File dirPath = context.getExternalCacheDir();
+        File dirsFile = new File(dirPath + MYLOG_PATH_SDCARD_DIR);
+        try {
+            if (!dirsFile.exists()) {
+                dirsFile.mkdirs();
+            }
+        } catch (Exception e) {
+            Log.e("ScryLog exception,failure to create dirsFile--->", dirsFile.getAbsolutePath() + "||" + e.toString());
+            return;
         }
-        //Log.i("Create a file","Create a file");
-        File file = new File(dirsFile.toString(), needWriteFiel + MYLOGFILEName);//
-        //Log.d("ScryLog================>", file.getAbsolutePath());
-        // MYLOG_PATH_SDCARD_DIR
+        File file = new File(dirsFile.toString() + "/" + needWriteFiel + MYLOGFILEName);
         if (!file.exists()) {
             try {
-                //Create a file in the specified folder
+                //在指定的文件夹中创建文件
                 file.createNewFile();
             } catch (Exception e) {
+                Log.e("ScryLog exception,failure to create--->", file.getAbsolutePath() + "||" + e.toString());
+                return;
             }
         }
 

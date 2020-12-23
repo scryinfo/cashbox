@@ -2,7 +2,9 @@ package info.scry.wallet_manager;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+
 import java.text.SimpleDateFormat;
+
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
@@ -31,44 +33,44 @@ public class ScryWalletLog {
     private static SimpleDateFormat logfile = new SimpleDateFormat("yyyy-MM-dd");// 日志文件格式
     public Context context;
 
-    public static void w(String tag, Object msg) { // 警告信息
-        log(tag, msg.toString(), 'w');
+    public static void w(Context context, String tag, Object msg) { // 警告信息
+        log(context, tag, msg.toString(), 'w');
     }
 
-    public static void e(String tag, Object msg) { // 错误信息
-        log(tag, msg.toString(), 'e');
+    public static void e(Context context, String tag, Object msg) { // 错误信息
+        log(context, tag, msg.toString(), 'e');
     }
 
-    public static void d(String tag, Object msg) {// 调试信息
-        log(tag, msg.toString(), 'd');
+    public static void d(Context context, String tag, Object msg) {// 调试信息
+        log(context, tag, msg.toString(), 'd');
     }
 
-    public static void i(String tag, Object msg) {//
-        log(tag, msg.toString(), 'i');
+    public static void i(Context context, String tag, Object msg) {//
+        log(context, tag, msg.toString(), 'i');
     }
 
-    public static void v(String tag, Object msg) {
-        log(tag, msg.toString(), 'v');
+    public static void v(Context context, String tag, Object msg) {
+        log(context, tag, msg.toString(), 'v');
     }
 
-    public static void w(String tag, String text) {
-        log(tag, text, 'w');
+    public static void w(Context context, String tag, String text) {
+        log(context, tag, text, 'w');
     }
 
-    public static void e(String tag, String text) {
-        log(tag, text, 'e');
+    public static void e(Context context, String tag, String text) {
+        log(context, tag, text, 'e');
     }
 
-    public static void d(String tag, String text) {
-        log(tag, text, 'd');
+    public static void d(Context context, String tag, String text) {
+        log(context, tag, text, 'd');
     }
 
-    public static void i(String tag, String text) {
-        log(tag, text, 'i');
+    public static void i(Context context, String tag, String text) {
+        log(context, tag, text, 'i');
     }
 
-    public static void v(String tag, String text) {
-        log(tag, text, 'v');
+    public static void v(Context context, String tag, String text) {
+        log(context, tag, text, 'v');
     }
 
     /**
@@ -79,7 +81,7 @@ public class ScryWalletLog {
      * @param level
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private static void log(String tag, String msg, char level) {
+    private static void log(Context context, String tag, String msg, char level) {
         if (MYLOG_SWITCH) {//日志文件总开关
             if ('e' == level && ('e' == MYLOG_TYPE || 'v' == MYLOG_TYPE)) { // 输出错误信息
                 Log.e(tag, msg);
@@ -93,7 +95,7 @@ public class ScryWalletLog {
                 Log.v(tag, msg);
             }
             if (MYLOG_WRITE_TO_FILE)//日志写入文件开关
-                writeLogtoFile(String.valueOf(level), tag, msg);
+                writeLogtoFile(context, String.valueOf(level), tag, msg);
         }
     }
 
@@ -105,26 +107,28 @@ public class ScryWalletLog {
      * @param text
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private static void writeLogtoFile(String mylogtype, String tag, String text) {// 新建或打开日志文件
+    private static void writeLogtoFile(Context context, String mylogtype, String tag, String text) {// 新建或打开日志文件
         Date nowtime = new Date();
         String needWriteFiel = logfile.format(nowtime);
-        String needWriteMessage = myLogSdf.format(nowtime) + "    " + mylogtype + "    " + tag +
-                "    " + text;
-        File dirPath = Environment.getExternalStorageDirectory();
-
-        File dirsFile = new File(MYLOG_PATH_SDCARD_DIR);
-        if (!dirsFile.exists()) {
-            dirsFile.mkdirs();
+        String needWriteMessage = myLogSdf.format(nowtime) + "    " + mylogtype + "    " + tag + "    " + text;
+        File dirPath = context.getExternalCacheDir();
+        File dirsFile = new File(dirPath.getAbsolutePath() + MYLOG_PATH_SDCARD_DIR);
+        try {
+            if (!dirsFile.exists()) {
+                dirsFile.mkdirs();
+            }
+        } catch (Exception e) {
+            Log.e("ScryLog exception,failure to create dirsFile--->", dirsFile.getAbsolutePath() + "||" + e.toString());
+            return;
         }
-        //Log.i("创建文件","创建文件");
-        File file = new File(dirsFile.toString(), needWriteFiel + MYLOGFILEName);//
-        // MYLOG_PATH_SDCARD_DIR
+        File file = new File(dirsFile.toString() + "/" + needWriteFiel + MYLOGFILEName);
         if (!file.exists()) {
             try {
                 //在指定的文件夹中创建文件
                 file.createNewFile();
-                Log.d("ScryLog not exist,begin to create================>", file.getAbsolutePath());
             } catch (Exception e) {
+                Log.e("ScryLog exception,failure to create--->", file.getAbsolutePath() + "||" + e.toString());
+                return;
             }
         }
 
@@ -137,6 +141,7 @@ public class ScryWalletLog {
             filerWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
     }
 

@@ -68,7 +68,7 @@ public class MainActivity extends FlutterActivity {
                                     String signInfo = Utils.md5(Utils.getSignature(MainActivity.this));
                                     mFlutterChannelResult.success(signInfo);
                                 } catch (Exception e) {
-                                    ScryLog.e("APP_SIGNINFO_METHOD appear error", e.toString());
+                                    ScryLog.e(this, "APP_SIGNINFO_METHOD appear error", e.toString());
                                     mFlutterChannelResult.success("");
                                 }
                             } else if (call.method.toString().equals(UPGRADE_APP_METHOD)) {
@@ -77,10 +77,10 @@ public class MainActivity extends FlutterActivity {
                                 try {
                                     checkAndUpgradeVersion(downloadurl, serverVersion);
                                 } catch (Exception e) {
-                                    ScryLog.e("checkApplicationVersion appear error", e.toString());
+                                    ScryLog.e(this, "checkApplicationVersion appear error", e.toString());
                                 }
                             } else {
-                                ScryLog.e("APP_INFO_CHANNEL===>", "Unknown method");
+                                ScryLog.e(this, "APP_INFO_CHANNEL===>", "Unknown method");
                             }
                         }
                 );
@@ -88,7 +88,7 @@ public class MainActivity extends FlutterActivity {
 
 
     private void checkAndUpgradeVersion(String loadUrl, String serverVersion) {
-        ScryLog.v("begin to checkAndUpgradeVersion================>", loadUrl);
+        ScryLog.v(this, "begin to checkAndUpgradeVersion================>", loadUrl);
         /*
             https://github.com/AlexLiuSheng/CheckVersionLib
             */
@@ -115,7 +115,7 @@ public class MainActivity extends FlutterActivity {
                 mFlutterChannelResult.error("resultCode is ===>", "" + resultCode, "");
             }
         } else {
-            ScryLog.e("MainActivity", "unknown method result, requestCode is=========>" + requestCode);
+            ScryLog.e(this, "MainActivity", "unknown method result, requestCode is=========>" + requestCode);
         }
     }
 }
