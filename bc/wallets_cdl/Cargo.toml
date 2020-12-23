@@ -23,6 +23,9 @@ mav = { path = "../mav" }
 [dev-dependencies]
 async-std = "1.8.0"
 futures = "0.3.8"
+tokio = { version = "0.3.6", features = ["rt"] }
+smol = "1.2.5"
+futures-lite = "1.11.3"
 
 pkg-config = "0.3.19"
 mav = { path = "../mav" }

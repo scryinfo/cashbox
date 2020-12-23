@@ -1,9 +1,10 @@
 #[cfg(test)]
 mod tests {
     use std::ptr::null_mut;
-    use std::time::Instant;
+    use std::time::{Duration, Instant};
 
     use futures::executor::block_on;
+    use futures::task::SpawnExt;
 
     use mav::{kits, WalletType};
     use mav::ma::DbCreateType;
@@ -14,6 +15,44 @@ mod tests {
     use crate::parameters::{CContext, CCreateWalletParameters, CInitParameters};
     use crate::types::{CError, CWallet};
     use crate::wallets_c::{Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init, Wallets_uninit};
+
+    #[test]
+    fn executor_test() {
+        let ex = {
+            let mut bu = futures::executor::ThreadPool::builder();
+            bu.pool_size(4);
+            bu.create().unwrap()
+        };
+        println!("test thread: {:?}", std::thread::current().id());
+        let _ = ex.spawn(async {
+            std::thread::sleep(Duration::from_secs(5));
+            println!("futures::executor::ThreadPool : {:?}", std::thread::current().id());
+            ()
+        });
+        println!("after futures::executor::ThreadPool ");
+        std::thread::sleep(Duration::from_secs(10));
+
+        std::env::set_var("ASYNC_STD_THREAD_COUNT", "4");
+        let j = async_std::task::spawn(async {
+            let a = async_std::task::spawn(async {
+                println!("async_std::task::spawn 1: {:?}", std::thread::current().id());
+                println!("1 s");
+                std::thread::sleep(Duration::from_secs(2));
+                println!("1 end");
+                1
+            });
+            let b = async_std::task::spawn(async {
+                println!("async_std::task::spawn 2: {:?}", std::thread::current().id());
+                println!("2");
+                2
+            });
+            //futures::join!( a,  b);
+            futures::future::join(a, b).await;
+            1
+        });
+        futures::executor::block_on(j);
+        println!("done block_on");
+    }
 
     #[test]
     fn block_on_test() {
@@ -31,13 +70,52 @@ mod tests {
             }
             start.elapsed().as_nanos() as u64
         };
-        let k = 10000u64;
-        let span_futures = block_futures(k) / k;
-        let span_async = block_async_std(k) / k;
+        let block_futures_lite = |k: u64| -> u64{
+            let start = Instant::now();
+            for _ in 0..k {
+                futures_lite::future::block_on(async { 1 });
+            }
+            start.elapsed().as_nanos() as u64
+        };
+        let block_tokio = |k: u64| -> u64{
+            let start = Instant::now();
+            let r = tokio::runtime::Builder::new_current_thread().build().unwrap();
+            for _ in 0..k {
+                r.block_on(async { 1 });
+            }
+            start.elapsed().as_nanos() as u64
+        };
 
-        println!("async_std::task::block_on:   {}(nanoseconds) \n\
-                  futures::executor::block_on: {}(nanoseconds)", span_async, span_futures);
-        assert!(span_async > span_futures)
+        let block_smol = |k: u64| -> u64{
+            let start = Instant::now();
+            for _ in 0..k {
+                smol::block_on(async { 1 });
+            }
+            start.elapsed().as_nanos() as u64
+        };
+
+        let k = 100u64;
+        let elapsed_futures = block_futures(k) / k;
+        let elapsed_futures_lite = block_futures_lite(k) / k;
+        let elapsed_async = block_async_std(k) / k;
+        let elapsed_tokio = block_tokio(k) / k;
+        let elapsed_smol = block_smol(k) / k;
+        println!("async_std::task::block_on:      {}(nanoseconds) \n\
+                  futures::executor::block_on:    {}(nanoseconds) \n\
+                  futures_lite::block_on:         {}(nanoseconds) \n\
+                  tokio::runtime::current_thread: {}(nanoseconds) \n\
+                  smol::block_on:                 {}(nanoseconds)",
+                 elapsed_async, elapsed_futures, elapsed_futures_lite, elapsed_tokio, elapsed_smol);
+        // sample out
+        // async_std::task::block_on:      42487(nanoseconds)
+        // futures::executor::block_on:    423(nanoseconds)
+        // futures_lite::block_on:         255(nanoseconds)
+        // tokio::runtime::current_thread: 3275(nanoseconds)
+        // smol::block_on:                 2154(nanoseconds)
+        // 1000次以上时futures_lite的速度最快，最后选择futures::executor::block_on是因为它的更有名，且经过反复的考验
+        // 单次起动 smol::block_on最快，单从性能上看smol的作者（futures_lite作者相同）作了很多优化工作，它的库可以作为参考
+
+        assert!(elapsed_async > elapsed_futures && elapsed_tokio > elapsed_futures)
     }
 
     #[test]

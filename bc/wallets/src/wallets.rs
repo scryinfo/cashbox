@@ -7,7 +7,7 @@ use parking_lot::lock_api::RawReentrantMutex;
 
 use mav::{ChainType, WalletType};
 use mav::ma::{BeforeSave, Dao, Db, MAddress, MMnemonic, MWallet};
-use eee::{Crypto,Sr25519};
+use eee::{Crypto};
 use scry_crypto::Keccak256;
 
 use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait};
