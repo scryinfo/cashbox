@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{Context, CreateWalletParameters, DbName, InitParameters};
+use wallets_types::{Context, CreateWalletParameters, DbName, InitParameters,RawTxParam,AccountInfo,TransferPayload};
 
 use crate::kits::{CMark, CR, CStruct, to_c_char, to_str};
 
@@ -47,6 +47,39 @@ pub struct CContext {
     pub id: *mut c_char,
     //上下文的唯一标识
     pub contextNote: *mut c_char,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CTransferPayload {
+    pub fromAccount: *mut c_char,
+    pub toAccount: *mut c_char,
+    pub value: *mut c_char,
+    pub genesisHash: *mut c_char,
+    pub index: u32,
+    pub runtime_version: u32,
+    pub tx_version: u32,
+    pub extData: *mut c_char,
+    pub password: *mut c_char,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CRawTxParam {
+    pub rawTx: *mut c_char,
+    pub walletId: *mut c_char,
+    pub password: *mut c_char,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CAccountInfo {
+    pub nonce: u32,
+    pub ref_count: u32,
+    pub free: *mut c_char,
+    pub reserved: *mut c_char,
+    pub misc_frozen: *mut c_char,
+    pub fee_frozen: *mut c_char,
 }
 
 

@@ -99,6 +99,47 @@ impl MEeeTokenxTx {
         std::include_str!("../../../sql/m_eee_tokenx_tx.sql")
     }
 }
+
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MSubChainBasicInfo{
+    #[serde(default)]
+    genesis_hash:String,
+    #[serde(default)]
+    metadata:String,
+    #[serde(default)]
+    runtime_version:i32,
+    #[serde(default)]
+    tx_version:i32,
+    #[serde(default)]
+    ss58_format_prefix:i32,
+    #[serde(default)]
+    token_decimals:i32,
+    #[serde(default)]
+    token_symbol:String,
+    #[serde(default)]
+    is_default:bool,
+    #[serde(default)]
+    status:i32,
+}
+impl MSubChainBasicInfo {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_sub_chain_basic_info.sql")
+    }
+}
+
+#[db_append_shared]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MAccountInfoSyncProg{
+    account:String,
+    block_no:String,
+    block_hash:String,
+}
+impl MAccountInfoSyncProg {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_account_info_sync_prog.sql")
+    }
+}
 //eee end
 
 

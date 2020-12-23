@@ -58,3 +58,35 @@ impl Default for Context {
     }
 }
 
+#[derive(Debug,Default, Clone)]
+pub struct RawTxParam {
+    pub raw_tx: String,
+    pub wallet_id: String,
+    pub password: String,
+}
+
+#[derive(Debug,Default, Clone)]
+pub struct TransferPayload {
+    pub from_account: String,
+    pub to_account: String,
+    pub value: String,
+    pub genesis_hash: String,
+    pub index: u32,
+    pub runtime_version: u32,
+    pub tx_version: u32,
+    pub ext_data: String,
+    pub password: String,
+}
+
+#[repr(C)]
+#[derive(Debug, Default,Clone)]
+pub struct AccountInfo {
+    pub nonce: u32,
+    pub ref_count: u32,
+    pub free: String,
+    pub reserved: String,
+    pub misc_frozen: String,
+    pub fee_frozen: String,
+}
+
+

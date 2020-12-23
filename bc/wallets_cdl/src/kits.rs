@@ -7,6 +7,7 @@ use std::os::raw::c_char;
 use std::ptr::null_mut;
 
 pub type CU64 = u64;
+pub type CU32 = u32;
 pub type CBool = u32;
 
 pub const CFalse: CBool = 1u32;

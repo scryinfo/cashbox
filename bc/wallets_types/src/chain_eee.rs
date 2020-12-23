@@ -87,3 +87,24 @@ impl Load for EeeChain {
         Ok(())
     }
 }
+
+#[derive(Debug,Default, Clone)]
+pub struct SyncRecordDetail {
+    pub account: String,
+    pub block_no: String,
+    pub block_hash: String,
+}
+
+#[derive(Debug,Default,Clone)]
+pub struct SubChainBasicInfo {
+    pub info_id: String,
+    pub genesis_hash: String,
+    pub metadata: String,
+    pub runtime_version: u32,
+    pub tx_version: u32,
+    pub ss58_format: u32,
+    pub token_decimals: u32,
+    pub token_symbol: String,
+}
+
+

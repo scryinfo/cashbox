@@ -5,6 +5,7 @@ mod types_btc;
 
 pub mod wallets_c;
 pub mod mem_c;
+pub mod chain_eee_c;
 pub mod parameters;
 
 mod chain;
