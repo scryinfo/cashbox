@@ -130,23 +130,22 @@ impl Constructor {
         ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
-        //test for just use  save_header
-        // info!("send FilterLoad");
-        // dispatcher.add_listener(BloomFilter::new(
-        //     p2p_control.clone(),
-        //     timeout.clone(),
-        //     filter_load_message,
-        // ));
-        //
-        // info!("send GetData");
-        // dispatcher.add_listener(GetData::new(
-        //     p2p_control.clone(),
-        //     timeout.clone(),
-        //     hook_receiver,
-        // ));
-        //
-        // info!("Broadcast TX");
-        // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone()));
+        info!("send FilterLoad");
+        dispatcher.add_listener(BloomFilter::new(
+            p2p_control.clone(),
+            timeout.clone(),
+            filter_load_message,
+        ));
+
+        info!("send GetData");
+        dispatcher.add_listener(GetData::new(
+            p2p_control.clone(),
+            timeout.clone(),
+            hook_receiver,
+        ));
+
+        info!("Broadcast TX");
+        dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone()));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));

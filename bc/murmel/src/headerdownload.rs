@@ -272,10 +272,9 @@ impl HeaderDownload {
                     peer
                 );
                 //hooks for new headers
-                // todo open in a while
-                // self.hook_sender
-                //     .send(HooksMessage::ReceivedHeaders(peer.clone()))
-                //     .expect("HOOKS ERROR");
+                self.hook_sender
+                    .send(HooksMessage::ReceivedHeaders(peer.clone()))
+                    .expect("HOOKS ERROR");
                 self.p2p.send(P2PControl::Height(height));
             } else {
                 debug!(

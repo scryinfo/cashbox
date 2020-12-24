@@ -12,3 +12,11 @@ pub enum ApiMessage {
     Db,
     Other,
 }
+
+// Conditions for use CondVar
+// handhsake -> header -> filter -> getdata
+// handhsake -> header -> tx
+pub struct Condition {
+    pub header_ready: bool,
+    pub fillter_ready: bool,
+}
