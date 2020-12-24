@@ -254,6 +254,13 @@ pub struct VersionCarrier {
 }
 
 impl Version for NetworkMessage {
+    fn is_verack(&self) -> bool {
+        match self {
+            NetworkMessage::Verack => true,
+            _ => false,
+        }
+    }
+
     fn is_version(&self) -> Option<VersionCarrier> {
         match self {
             NetworkMessage::Version(v) => Some(VersionCarrier {
@@ -268,13 +275,6 @@ impl Version for NetworkMessage {
                 relay: v.relay,
             }),
             _ => None,
-        }
-    }
-
-    fn is_verack(&self) -> bool {
-        match self {
-            NetworkMessage::Verack => true,
-            _ => false,
         }
     }
 }
@@ -337,7 +337,7 @@ impl P2PConfig<NetworkMessage, RawNetworkMessage> for BitcoinP2PConfig {
         } else {
             SERVICE_BLOCKS + SERVICE_WITNESS +
                 // announce that this node is capable of serving BIP157 messages
-                SERVICE_FILTERS // + SERVICE_BLOOM
+                SERVICE_FILTERS  + SERVICE_BLOOM
         };
 
         // build message
@@ -620,7 +620,7 @@ impl<
         source: PeerSource,
     ) -> impl Future<Output = Result<SocketAddr, Error>> + Send {
         let version = self.config.version(
-            &SocketAddr::from_str("127.0.0.1:8333").unwrap(), // TODO wrong address
+            &SocketAddr::from_str("127.0.0.1:18333").unwrap(), // TODO wrong address
             self.config.max_protocol_version(),
         );
         let peers = self.peers.clone();
