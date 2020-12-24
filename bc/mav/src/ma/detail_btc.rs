@@ -2,12 +2,38 @@ use rbatis::crud::CRUDEnable;
 use rbatis_macro_driver::CRUDEnable;
 use serde::Deserialize;
 use serde::Serialize;
+use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
 use crate::ma::MTokenShared;
+
+#[derive(PartialEq, Clone, Debug, EnumIter)]
+pub enum BtcTokenType {
+    Btc,
+}
+
+impl BtcTokenType {
+    fn from(token_type: &str) -> Option<Self> {
+        match token_type {
+            "Btc" => Some(BtcTokenType::Btc),
+            _ => {
+                log::error!("the str:{} can not be BtcTokenType",token_type);
+                None
+            }
+        }
+    }
+}
+
+impl ToString for BtcTokenType {
+    fn to_string(&self) -> String {
+        match &self {
+            BtcTokenType::Btc => "Btc".to_owned(),
+        }
+    }
+}
 
 //btc
 #[db_append_shared(CRUDEnable)]
@@ -47,9 +73,14 @@ pub struct MBtcChainTokenDefault {
     /// [BtcChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
+
+    pub net_type: String,
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
+
+    #[serde(skip)]
+    pub chain_token_shared: MBtcChainTokenShared,
 }
 
 impl MBtcChainTokenDefault {
@@ -58,3 +89,17 @@ impl MBtcChainTokenDefault {
     }
 }
 //btc end
+
+#[cfg(test)]
+mod tests {
+    use strum::IntoEnumIterator;
+
+    use crate::ma::BtcTokenType;
+
+    #[test]
+    fn btc_token_type_test() {
+        for it in BtcTokenType::iter() {
+            assert_eq!(it, BtcTokenType::from(&it.to_string()));
+        }
+    }
+}

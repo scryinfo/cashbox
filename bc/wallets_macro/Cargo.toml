@@ -14,6 +14,7 @@ proc-macro2 = "1.0.24"
 proc_macro_roids = "0.7.0"
 
 once_cell = "1.5.2"
+serde = { version = "1", features = ["derive"] }
 
 bigdecimal = { version = "0.2.0", package = "bigdecimal", features = ["serde"] }
 

@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS m_eth_chain_token_shared
     auth        BOOLEAN NOT NULL,
     -- MTokenShared end
 
+    token_type  TEXT    NOT NULL,
+    erc20       TEXT    NOT NULL,
     id          TEXT PRIMARY KEY,
     create_time INTEGER NOT NULL,
     update_time INTEGER NOT NULL

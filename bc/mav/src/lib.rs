@@ -104,6 +104,15 @@ pub enum NetType {
     PrivateTest,
 }
 
+impl NetType {
+    pub fn default_net_type(wallet_type: &WalletType) -> NetType {
+        match wallet_type {
+            WalletType::Normal => NetType::Main,
+            WalletType::Test => NetType::Test,
+        }
+    }
+}
+
 impl From<&str> for NetType {
     fn from(net_type: &str) -> Self {
         match net_type {

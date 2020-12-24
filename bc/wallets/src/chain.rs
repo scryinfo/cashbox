@@ -1,8 +1,10 @@
-use mav::ma::MAddress;
-use mav::WalletType;
+use async_trait::async_trait;
+use strum::IntoEnumIterator;
 
-use wallets_types::{Chain2WalletType, ChainTrait, ContextTrait, WalletError, WalletTrait};
 use eee::Crypto;
+use mav::{NetType, WalletType};
+use mav::ma::{Dao, MAddress, MBtcChainToken, MEeeChainToken, MEthChainToken, MWallet};
+use wallets_types::{BtcChainTokenDefault, Chain2WalletType, ChainTrait, ContextTrait, EeeChainTokenDefault, EthChainTokenDefault, WalletError, WalletTrait};
 
 #[derive(Default)]
 struct EthChain();
@@ -17,7 +19,7 @@ pub(crate) struct Wallet {
     chains: Vec<Box<dyn ChainTrait>>,
 }
 
-
+#[async_trait]
 impl ChainTrait for EthChain {
     fn generate_address(&self, mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError> {
         let mut m_address = MAddress::default();
@@ -30,14 +32,38 @@ impl ChainTrait for EthChain {
         Ok(m_address)
     }
 
-    fn generate_default_token(&self, context: &dyn ContextTrait, wallet_id: &str, wallet_type: &WalletType) -> Result<(), WalletError> {
-        //todo
-        unimplemented!()
+    async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress) -> Result<(), WalletError> {
+        let wallet_type = WalletType::from(&wallet.wallet_type);
+        //�������ʵ�ֲ��оͺ���
+        for net_type in NetType::iter() {
+            let token_rb = context.db().data_db(&net_type);
+            let mut tx = token_rb.begin_tx_defer(false).await?;
+            let default_tokens = EthChainTokenDefault::list_by_net_type(context, &net_type, &tx.tx_id).await?;
+            let mut tokens = Vec::new();
+            for it in default_tokens {
+                let mut token = MEthChainToken::default();
+                token.chain_token_shared_id = it.chain_token_shared_id.clone();
+                token.wallet_id = wallet.id.clone();
+                token.chain_type = wallets_types::EthChain::chain_type(&wallet_type).to_string();
+                token.show = true;
+                //todo how to
+                // gas_limit: 0,
+                // gas_price: "".to_string(),
+                // decimal: 0
+                tokens.push(token);
+            }
+            MEthChainToken::save_batch(token_rb, &tx.tx_id, &mut tokens).await?;
+
+            token_rb.commit(&tx.tx_id).await?;
+            tx.manager = None;
+        }
+        Ok(())
     }
 }
 
 const DEFAULT_SS58_VERSION: u8 = 42;
 
+#[async_trait]
 impl ChainTrait for EeeChain {
     fn generate_address(&self, mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError> {
         let mut addr = MAddress::default();
@@ -54,12 +80,34 @@ impl ChainTrait for EeeChain {
         Ok(addr)
     }
 
-    fn generate_default_token(&self, context: &dyn ContextTrait, wallet_id: &str, wallet_type: &WalletType) -> Result<(), WalletError> {
-        //todo
-        unimplemented!()
+    async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress) -> Result<(), WalletError> {
+        let wallet_type = WalletType::from(&wallet.wallet_type);
+        //�������ʵ�ֲ��оͺ���
+        for net_type in NetType::iter() {
+            let token_rb = context.db().data_db(&net_type);
+            let mut tx = token_rb.begin_tx_defer(false).await?;
+            let default_tokens = EeeChainTokenDefault::list_by_net_type(context, &net_type, &tx.tx_id).await?;
+            let mut tokens = Vec::new();
+            for it in default_tokens {
+                let mut token = MEeeChainToken::default();
+                token.chain_token_shared_id = it.chain_token_shared_id.clone();
+                token.wallet_id = wallet.id.clone();
+                token.chain_type = wallets_types::EeeChain::chain_type(&wallet_type).to_string();
+                token.show = true;
+                //todo how to
+                // decimal: 0
+                tokens.push(token);
+            }
+            MEeeChainToken::save_batch(token_rb, &tx.tx_id, &mut tokens).await?;
+
+            token_rb.commit(&tx.tx_id).await?;
+            tx.manager = None;
+        }
+        Ok(())
     }
 }
 
+#[async_trait]
 impl ChainTrait for BtcChain {
     fn generate_address(&self, _mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError> {
         let mut addr = MAddress::default();
@@ -68,9 +116,30 @@ impl ChainTrait for BtcChain {
         Ok(addr)
     }
 
-    fn generate_default_token(&self, context: &dyn ContextTrait, wallet_id: &str, wallet_type: &WalletType) -> Result<(), WalletError> {
-        //todo
-        unimplemented!()
+    async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress) -> Result<(), WalletError> {
+        let wallet_type = WalletType::from(&wallet.wallet_type);
+        //�������ʵ�ֲ��оͺ���
+        for net_type in NetType::iter() {
+            let token_rb = context.db().data_db(&net_type);
+            let mut tx = token_rb.begin_tx_defer(false).await?;
+            let default_tokens = BtcChainTokenDefault::list_by_net_type(context, &net_type, &tx.tx_id).await?;
+            let mut tokens = Vec::new();
+            for it in default_tokens {
+                let mut token = MBtcChainToken::default();
+                token.chain_token_shared_id = it.chain_token_shared_id.clone();
+                token.wallet_id = wallet.id.clone();
+                token.chain_type = wallets_types::EeeChain::chain_type(&wallet_type).to_string();
+                token.show = true;
+                //todo how to
+                // decimal: 0
+                tokens.push(token);
+            }
+            MBtcChainToken::save_batch(token_rb, &tx.tx_id, &mut tokens).await?;
+
+            token_rb.commit(&tx.tx_id).await?;
+            tx.manager = None;
+        }
+        Ok(())
     }
 }
 

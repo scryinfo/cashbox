@@ -5,12 +5,10 @@ use failure::_core::sync::atomic::Ordering;
 use parking_lot::{RawMutex, RawThreadId};
 use parking_lot::lock_api::RawReentrantMutex;
 
-use mav::{ChainType, WalletType};
+use mav::{ChainType, NetType, WalletType};
 use mav::ma::{BeforeSave, Dao, Db, MAddress, MMnemonic, MWallet};
-
-use eee::{Crypto,Sr25519};
+use eee::{Crypto};
 use scry_crypto::Keccak256;
-
 use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait};
 
 pub struct Wallets {
@@ -152,10 +150,9 @@ impl Wallets {
             m_wallet.mnemonic = eee::Sr25519::encrypt_mnemonic(&parameters.mnemonic.as_bytes().to_vec(), &parameters.password.as_bytes().to_vec());
             m_wallet.wallet_type = wallet_type.to_string();
             m_wallet.name = parameters.name.clone();
+            m_wallet.net_type = NetType::default_net_type(&wallet_type).to_string();
         }
-        let mut m_addresses = self.generate_address(&mut m_wallet, &parameters.mnemonic.as_bytes().to_vec())?;
-        //todo default token
-
+        let mut m_addresses = self.generate_address_token(&mut m_wallet, &parameters.mnemonic.as_bytes().to_vec()).await?;
         {//save to database
             //tx 只处理异常情况下，事务的rollback，所以会在事务提交成功后，调用 tx.manager = None; 阻止 [rbatis::tx::TxGuard]再管理事务
             let mut tx = rb.begin_tx_defer(false).await?;
@@ -171,21 +168,18 @@ impl Wallets {
             rb.commit(&tx.tx_id).await?;
             tx.manager = None;
         }
-        {//是否为current wallet
-            if Wallet::count(context).await? == 1 {
-                let wallet_type = WalletType::from(&m_wallet.wallet_type);
-                //创建的第一个钱包，的默认链是 eee
-                Setting::save_current_wallet_chain(context, &m_wallet.id, &EeeChain::chain_type(&wallet_type)).await?;
-            }
+        if Wallet::count(context).await? == 1 { //是第一个创建的wallet，把它设置为当前钱包
+            let wallet_type = WalletType::from(&m_wallet.wallet_type);
+            //创建的第一个钱包，的默认链是 eee
+            Setting::save_current_wallet_chain(context, &m_wallet.id, &EeeChain::chain_type(&wallet_type)).await?;
         }
         let mut wallet = Wallet::default();
         wallet.load(self, m_wallet).await?;
-
         return Ok(wallet);
     }
 
 
-    fn generate_address(&self, wallet: &mut MWallet, mn: &[u8]) -> Result<Vec<MAddress>, WalletError> {
+    async fn generate_address_token(&self, wallet: &mut MWallet, mn: &[u8]) -> Result<Vec<MAddress>, WalletError> {
         if wallet.id.is_empty() {//make sure the id is not empty
             wallet.before_save();
         }
@@ -195,8 +189,10 @@ impl Wallets {
         let wallet_type = WalletType::from(&wallet.wallet_type);
         for chain in chains {
             let mut addr = chain.generate_address(mn, &wallet_type)?;
+            addr.before_save();
             addr.wallet_id = wallet.id.clone();
             addr.wallet_address = true;
+            chain.generate_default_token(self, &wallet, &addr).await?;
             addrs.push(addr);
         }
         Ok(addrs)

@@ -2,12 +2,38 @@ use rbatis::crud::CRUDEnable;
 use rbatis_macro_driver::CRUDEnable;
 use serde::Deserialize;
 use serde::Serialize;
+use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
 use crate::ma::MTokenShared;
+
+#[derive(PartialEq, Clone, Debug, EnumIter)]
+pub enum EeeTokenType {
+    Eee,
+}
+
+impl EeeTokenType {
+    fn from(token_type: &str) -> Option<Self> {
+        match token_type {
+            "Eee" => Some(EeeTokenType::Eee),
+            _ => {
+                log::error!("the str:{} can not be EeeTokenType",token_type);
+                None
+            }
+        }
+    }
+}
+
+impl ToString for EeeTokenType {
+    fn to_string(&self) -> String {
+        match &self {
+            EeeTokenType::Eee => "Eee".to_owned(),
+        }
+    }
+}
 
 // eee
 #[db_append_shared(CRUDEnable)]
@@ -47,9 +73,14 @@ pub struct MEeeChainTokenDefault {
     /// [EeeChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
+
+    pub net_type: String,
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
+
+    #[serde(skip)]
+    pub chain_token_shared: MEeeChainTokenShared,
 }
 
 impl MEeeChainTokenDefault {
@@ -58,3 +89,17 @@ impl MEeeChainTokenDefault {
     }
 }
 // eee end
+
+#[cfg(test)]
+mod tests {
+    use strum::IntoEnumIterator;
+
+    use crate::ma::EeeTokenType;
+
+    #[test]
+    fn eee_token_type_test() {
+        for it in EeeTokenType::iter() {
+            assert_eq!(it, EeeTokenType::from(&it.to_string()));
+        }
+    }
+}

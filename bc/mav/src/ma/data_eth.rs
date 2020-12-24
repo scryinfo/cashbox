@@ -20,10 +20,10 @@ pub struct MEthChainToken {
     #[serde(default)]
     pub next_id: String,
     /// 手动加入的token就没有token shared内容
-    /// [crate::db::BtcChainTokenShared]
+    /// [crate::ma::MEthChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
-    /// [crate::db::Wallet]
+    /// [crate::ma::MWallet]
     #[serde(default)]
     pub wallet_id: String,
     /// [crate::ChainType]

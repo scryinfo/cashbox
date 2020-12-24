@@ -190,9 +190,22 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
             "bool" => format!("{} BOOLEAN NOT NULL,", col_name),
             "Option<bool>" => format!("{} BOOLEAN DEFAULT NULL,", col_name),
             _ => {
+                //#[serde(skip)]
+                let skip = field.attrs.iter().any(|it| {
+                    if it.path.segments.iter().any(|p| p.ident.to_string() == "serde") {
+                        //todo 找到具体的path,而不用整个生成字符串
+                        it.tokens.to_string().find("skip").is_some()
+                    } else {
+                        false
+                    }
+                });
+                if skip {
+                    continue
+                }
                 //#[serde(flatten)]
                 let flatten = field.attrs.iter().any(|it| {
                     if it.path.segments.iter().any(|p| p.ident.to_string() == "serde") {
+                        //todo 找到具体的path,而不用整个生成字符串
                         it.tokens.to_string().find("flatten").is_some()
                     } else {
                         false

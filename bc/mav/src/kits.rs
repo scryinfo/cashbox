@@ -89,3 +89,21 @@ pub mod test {
         re.unwrap()
     }
 }
+
+pub fn sql_left_join_get_b(a: &str, a_id: &str, b: &str, b_id: &str) -> String {
+    let sql = {
+        format!("select {}.* from {} left join {} on {}.{} = {}.{}",
+                b, a, b, a, a_id, b, b_id
+        )
+    };
+    sql
+}
+
+pub fn sql_left_join_get_a(a: &str, a_id: &str, b: &str, b_id: &str) -> String {
+    let sql = {
+        format!("select {}.* from {} left join {} on {}.{} = {}.{}",
+                a, a, b, a, a_id, b, b_id
+        )
+    };
+    sql
+}

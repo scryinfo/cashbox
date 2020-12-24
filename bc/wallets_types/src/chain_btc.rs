@@ -1,8 +1,9 @@
 use async_trait::async_trait;
 use rbatis::crud::CRUDEnable;
 
-use mav::{ChainType, WalletType};
-use mav::ma::{Dao, MBtcChainToken, MBtcChainTokenShared, MWallet};
+use mav::{ChainType, NetType, WalletType};
+use mav::kits::sql_left_join_get_b;
+use mav::ma::{Dao, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MWallet};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, TokenShared, WalletError};
 
@@ -41,6 +42,48 @@ impl Load for BtcChainTokenShared {
         self.m = m;
         self.token_shared.m = self.m.token_shared.clone();
         Ok(())
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct BtcChainTokenDefault {
+    pub m: MBtcChainTokenDefault,
+    pub btc_chain_token_shared: BtcChainTokenShared,
+}
+deref_type!(BtcChainTokenDefault,MBtcChainTokenDefault);
+
+impl BtcChainTokenDefault {
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, tx_id: &str) -> Result<Vec<MBtcChainTokenDefault>, WalletError> {
+        let wallets_db = context.db().wallets_db();
+        let tokens_shared: Vec<MBtcChainTokenShared> = {
+            let mut wrapper = wallets_db.new_wrapper();
+            let default_name = MBtcChainTokenDefault::table_name();
+            let shared_name = MBtcChainTokenShared::table_name();
+            wrapper.eq(format!("{}.{}", default_name, MBtcChainTokenDefault::net_type).as_str(), net_type.to_string());
+
+            let sql = {
+                wrapper = wrapper.check()?;
+                let t = sql_left_join_get_b(&default_name, &MBtcChainTokenDefault::chain_token_shared_id,
+                                            &shared_name, &MBtcChainTokenShared::id);
+                format!("{} where {}", t, &wrapper.sql)
+            };
+            wallets_db.fetch_prepare(tx_id, &sql, &wrapper.args).await?
+        };
+
+        let mut tokens_default = {
+            let mut wrapper = wallets_db.new_wrapper();
+            wrapper.eq(MBtcChainTokenDefault::net_type, net_type.to_string());
+            wrapper.order_by(true, &[MBtcChainTokenDefault::position]);
+            MBtcChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
+        };
+        for token_default in &mut tokens_default {
+            for token_shared in &tokens_shared {
+                if token_default.chain_token_shared_id == token_shared.id {
+                    token_default.chain_token_shared = token_shared.clone();
+                }
+            }
+        }
+        Ok(tokens_default)
     }
 }
 
