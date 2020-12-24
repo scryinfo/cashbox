@@ -62,17 +62,3 @@ class DbName extends DC{
     ffi.free(ptr);
   }
 }
-
-class UnInitParameters extends DC{
-
-  static free(Pointer<clib.CUnInitParameters> ptr) {
-    ffi.free(ptr);
-  }
-
-  @override
-  Pointer<clib.CUnInitParameters> toC() {
-      var p = clib.CUnInitParameters.allocate();
-      return p;
-  }
-
-}

@@ -2,16 +2,12 @@ use std::ops::Add;
 
 use rbatis::crud::CRUDEnable;
 use rbatis::rbatis::Rbatis;
+use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 use crate::{kits, NetType};
 use crate::kits::Error;
-use crate::ma::{MAccountInfoSyncProg,
-                MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx,
-                MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx,
-                MEthChainToken,
-                MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo,
-                MTokenAddress, MWallet};
+use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet};
 
 #[derive(Debug, Default, Clone)]
 pub struct DbNames {
@@ -174,20 +170,18 @@ impl Db {
         self.wallet_testnet_private = kits::make_memory_rbatis().await?;
         Ok(())
     }
-    pub async fn init_tables(db_name: &DbNames, create_type: &DbCreateType) -> Result<(), Error> {
-        let rb = &kits::make_rbatis(&db_name.cashbox_mnemonic).await?;
+    pub async fn init_tables(&self, create_type: &DbCreateType) -> Result<(), Error> {
+        let rb = self.mnemonic_db();
         Db::create_table_mnemonic(rb, create_type).await?;
-        let rb = &kits::make_rbatis(&db_name.cashbox_wallets).await?;
+        let rb = self.wallets_db();
         Db::create_table_wallets(rb, create_type).await?;
 
-        let rb = &kits::make_rbatis(&db_name.wallet_mainnet).await?;
-        Db::create_table_data(rb, create_type).await?;
-        let rb = &kits::make_rbatis(&db_name.wallet_private).await?;
-        Db::create_table_data(rb, create_type).await?;
-        let rb = &kits::make_rbatis(&db_name.wallet_testnet).await?;
-        Db::create_table_data(rb, create_type).await?;
-        let rb = &kits::make_rbatis(&db_name.wallet_testnet_private).await?;
-        Db::create_table_data(rb, create_type).await?;
+        for net_type in NetType::iter() {
+            let rb = self.data_db(&net_type);
+            Db::create_table_data(rb, create_type).await?;
+        }
+
+        Db::insert_chain_token(self).await?;
         Ok(())
     }
     pub async fn create_table(rb: &Rbatis, sql: &str, name: &str, create_type: &DbCreateType) -> Result<(), Error> {
@@ -212,6 +206,7 @@ impl Db {
         Ok(())
     }
 
+    ///total: 16
     pub async fn create_table_wallets(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
         Db::create_table(rb, MWallet::create_table_script(), &MWallet::table_name(), create_type).await?;
         Db::create_table(rb, MChainTypeMeta::create_table_script(), &MChainTypeMeta::table_name(), create_type).await?;
@@ -231,6 +226,7 @@ impl Db {
         Db::create_table(rb, MBtcChainTokenDefault::create_table_script(), &MBtcChainTokenDefault::table_name(), create_type).await?;
         Ok(())
     }
+    ///total: 12
     pub async fn create_table_data(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
         Db::create_table(rb, MTokenAddress::create_table_script(), &MTokenAddress::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainToken::create_table_script(), &MEthChainToken::table_name(), create_type).await?;
@@ -244,6 +240,145 @@ impl Db {
         Db::create_table(rb, MBtcOutputTx::create_table_script(), &MBtcOutputTx::table_name(), create_type).await?;
         Db::create_table(rb, MSubChainBasicInfo::create_table_script(), &MSubChainBasicInfo::table_name(), create_type).await?;
         Db::create_table(rb, MAccountInfoSyncProg::create_table_script(), &MAccountInfoSyncProg::table_name(), create_type).await?;
+        Ok(())
+    }
+    /// such as: eth,eee,btc
+    pub async fn insert_chain_token(db: &Db) -> Result<(), Error> {
+        {//eth
+            let rb = db.wallets_db();
+            let token_shared = {
+                let mut eth = MEthChainTokenShared::default();
+                eth.token_type = EthTokenType::Eth.to_string();
+                eth.contract_address = "".to_owned();
+                eth.decimal = 18;
+                eth.gas_limit = 0; //todo
+                eth.gas_price = "".to_owned(); //todo
+
+                eth.token_shared.name = "Ethereum".to_owned();
+                eth.token_shared.symbol = "ETH".to_owned();
+                eth.token_shared.logo_url = "".to_owned();//todo
+                eth.token_shared.logo_bytes = "".to_owned();
+                eth.token_shared.project_name = "ethereum".to_owned();
+                eth.token_shared.project_home = "https://ethereum.org/zh/".to_owned();
+                eth.token_shared.project_note = "Ethereum is a global, open-source platform for decentralized applications.".to_owned();
+
+                let old_eth = {
+                    let mut wrapper = rb.new_wrapper();
+                    wrapper.eq(MEthChainTokenShared::token_type, &eth.token_type);
+                    MEthChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
+                };
+                if let Some(t) = old_eth {
+                    eth = t;
+                } else {
+                    eth.save(rb, "").await?;
+                }
+                eth
+            };
+            {//token_default
+                for net_type in NetType::iter() {
+                    let mut wrapper = rb.new_wrapper();
+                    wrapper.eq(MEthChainTokenDefault::chain_token_shared_id, token_shared.id.clone());
+                    wrapper.eq(MEthChainTokenDefault::net_type, net_type.to_string());
+                    let old = MEthChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
+                    if !old {
+                        let mut token_default = MEthChainTokenDefault::default();
+                        token_default.net_type = net_type.to_string();
+                        token_default.chain_token_shared_id = token_shared.id.clone();
+                        token_default.position = 0;
+                        token_default.save(rb, "").await?;
+                    }
+                }
+            }
+        }
+        {//eee
+            let rb = db.wallets_db();
+            let token_shared = {
+                let mut eee = MEeeChainTokenShared::default();
+                eee.token_type = EeeTokenType::Eee.to_string();
+                eee.decimal = 15;
+                eee.gas = 0; //todo
+
+                eee.token_shared.name = "EEE".to_owned();
+                eee.token_shared.symbol = "EEE".to_owned();
+                eee.token_shared.logo_url = "".to_owned();//todo
+                eee.token_shared.logo_bytes = "".to_owned();
+                eee.token_shared.project_name = "EEE".to_owned();
+                eee.token_shared.project_home = "https://scry.info".to_owned();
+                eee.token_shared.project_note = "EEE is a global".to_owned();
+
+                let old_eth = {
+                    let mut wrapper = rb.new_wrapper();
+                    wrapper.eq(MEeeChainTokenShared::token_type, &eee.token_type);
+                    MEeeChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
+                };
+                if let Some(t) = old_eth {
+                    eee = t;
+                } else {
+                    eee.save(rb, "").await?;
+                }
+                eee
+            };
+            {//token_default
+                for net_type in NetType::iter() {
+                    let mut wrapper = rb.new_wrapper();
+                    wrapper.eq(MEeeChainTokenDefault::chain_token_shared_id, token_shared.id.clone());
+                    wrapper.eq(MEeeChainTokenDefault::net_type, net_type.to_string());
+                    let old = MEeeChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
+                    if !old {
+                        let mut token_default = MEeeChainTokenDefault::default();
+                        token_default.net_type = net_type.to_string();
+                        token_default.chain_token_shared_id = token_shared.id.clone();
+                        token_default.position = 0;
+                        token_default.save(rb, "").await?;
+                    }
+                }
+            }
+        }
+        {//btc
+            let rb = db.wallets_db();
+            let token_shared = {
+                let mut btc = MBtcChainTokenShared::default();
+                btc.token_type = BtcTokenType::Btc.to_string();
+                btc.decimal = 18;
+                btc.gas = 0; //todo
+
+                btc.token_shared.name = "Bitcoin".to_owned();
+                btc.token_shared.symbol = "BTC".to_owned();
+                btc.token_shared.logo_url = "".to_owned();//todo
+                btc.token_shared.logo_bytes = "".to_owned();
+                btc.token_shared.project_name = "Bitcoin".to_owned();
+                btc.token_shared.project_home = "https://bitcoin.org/en/".to_owned();
+                btc.token_shared.project_note = "Bitcoin is a global, open-source platform for decentralized applications.".to_owned();
+
+                let old_eth = {
+                    let mut wrapper = rb.new_wrapper();
+                    wrapper.eq(MBtcChainTokenShared::token_type, &btc.token_type);
+                    MBtcChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
+                };
+                if let Some(t) = old_eth {
+                    btc = t;
+                } else {
+                    btc.save(rb, "").await?;
+                }
+                btc
+            };
+            {//token_default
+                for net_type in NetType::iter() {
+                    let mut wrapper = rb.new_wrapper();
+                    wrapper.eq(MBtcChainTokenDefault::chain_token_shared_id, token_shared.id.clone());
+                    wrapper.eq(MBtcChainTokenDefault::net_type, net_type.to_string());
+                    let old = MBtcChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
+                    if !old {
+                        let mut token_default = MBtcChainTokenDefault::default();
+                        token_default.net_type = net_type.to_string();
+                        token_default.chain_token_shared_id = token_shared.id.clone();
+                        token_default.position = 0;
+                        token_default.save(rb, "").await?;
+                    }
+                }
+            }
+        }
+
         Ok(())
     }
 }

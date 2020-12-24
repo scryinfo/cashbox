@@ -133,14 +133,14 @@ impl Load for EeeChain {
     }
 }
 
-#[derive(Debug,Default, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct SyncRecordDetail {
     pub account: String,
     pub block_no: String,
     pub block_hash: String,
 }
 
-#[derive(Debug,Default,Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct SubChainBasicInfo {
     pub info_id: String,
     pub genesis_hash: String,

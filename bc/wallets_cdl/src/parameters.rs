@@ -9,23 +9,23 @@ use wallets_types::{AccountInfo, Context, CreateWalletParameters, DbName, InitPa
 use crate::kits::{CMark, CR, CStruct, to_c_char, to_str};
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CInitParameters {
     pub dbName: *mut CDbName,
     pub contextNote: *mut c_char,
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CDbName {
     pub path: *mut c_char,
     pub prefix: *mut c_char,
-    pub cashbox_wallets: *mut c_char,
-    pub cashbox_mnemonic: *mut c_char,
-    pub wallet_mainnet: *mut c_char,
-    pub wallet_private: *mut c_char,
-    pub wallet_testnet: *mut c_char,
-    pub wallet_testnet_private: *mut c_char,
+    pub cashboxWallets: *mut c_char,
+    pub cashboxMnemonic: *mut c_char,
+    pub walletMainnet: *mut c_char,
+    pub walletPrivate: *mut c_char,
+    pub walletTestnet: *mut c_char,
+    pub walletTestnetPrivate: *mut c_char,
 }
 
 // #[repr(C)]
@@ -33,7 +33,7 @@ pub struct CDbName {
 // pub struct CUnInitParameters {}
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CCreateWalletParameters {
     pub name: *mut c_char,
     pub password: *mut c_char,
@@ -42,7 +42,7 @@ pub struct CCreateWalletParameters {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CContext {
     pub id: *mut c_char,
     //上下文的唯一标识
@@ -64,7 +64,7 @@ pub struct CTransferPayload {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CRawTxParam {
     pub rawTx: *mut c_char,
     pub walletId: *mut c_char,
@@ -72,7 +72,7 @@ pub struct CRawTxParam {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CAccountInfo {
     pub nonce: u32,
     pub ref_count: u32,

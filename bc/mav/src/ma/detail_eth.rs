@@ -47,8 +47,18 @@ pub struct MEthChainTokenShared {
     pub token_shared: MTokenShared,
 
     pub token_type: String,
-    ///
-    pub erc20: String,
+    ///如果是eth，那么合约地址为零长度字符串
+    pub contract_address: String,
+
+    /// 交易时默认的gas limit
+    #[serde(default)]
+    pub gas_limit: i64,
+    /// 交易时默认的gas price
+    #[serde(default)]
+    pub gas_price: String,
+    /// 糖度
+    #[serde(default)]
+    pub decimal: i32,
 }
 
 impl MEthChainTokenShared {

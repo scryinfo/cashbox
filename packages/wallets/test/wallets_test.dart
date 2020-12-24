@@ -53,8 +53,7 @@ void main() {
       var err = Error.fromC(cerr);
       expect(true, err.isSuccess());
     }
-    var uninitP = new UnInitParameters();
-    wallet.uninit(uninitP);
+    wallet.uninit();
   });
 }
 Error computeFun(int ctx) {

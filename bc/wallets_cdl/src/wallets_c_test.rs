@@ -149,8 +149,6 @@ mod tests {
                     CError_free(c_err);
                 }
                 c_parameters.free();
-                let re = block_on(mav::ma::Db::init_tables(&parameters.db_name, &DbCreateType::Drop));
-                assert_eq!(false, re.is_err(), "{:?}", re);
                 c_ctx
             };
 

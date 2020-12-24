@@ -49,13 +49,13 @@ impl fmt::Display for WalletError {
 impl std::error::Error for WalletError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            WalletError::Io(err) =>  Some(err),
+            WalletError::Io(err) => Some(err),
             // WalletError::Db(err) =>  Some(err),
-            WalletError::EthTx(err) =>  Some(err),
-            WalletError::SubstrateTx(err) =>  Some(err),
-            WalletError::Serde(err) =>  Some(err),
-            WalletError::ScaleCodec(err) =>  Some(err),
-            WalletError::Secp256k1(err) =>  Some(err),
+            WalletError::EthTx(err) => Some(err),
+            WalletError::SubstrateTx(err) => Some(err),
+            WalletError::Serde(err) => Some(err),
+            WalletError::ScaleCodec(err) => Some(err),
+            WalletError::Secp256k1(err) => Some(err),
             WalletError::RbatisError(err) => Some(err),
             _ => None,
         }

@@ -2,6 +2,8 @@
 
 use std::any::Any;
 use std::ffi::{CStr, CString};
+use std::fmt;
+use std::fmt::Formatter;
 use std::mem::ManuallyDrop;
 use std::os::raw::c_char;
 use std::ptr::null_mut;
@@ -76,6 +78,12 @@ impl<T: CStruct + Any> CStruct for *mut T {
         false
     }
 }
+
+// impl fmt::Debug for *mut c_char{
+//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//         unimplemented!()
+//     }
+// }
 
 // /// 为类型 “*mut c_char”实现 trait CStruct，因为现在rust还不支持泛型特化，所不支持
 // impl CStruct for *mut c_char {

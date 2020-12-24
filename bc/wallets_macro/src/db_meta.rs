@@ -200,7 +200,7 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
                     }
                 });
                 if skip {
-                    continue
+                    continue;
                 }
                 //#[serde(flatten)]
                 let flatten = field.attrs.iter().any(|it| {

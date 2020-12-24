@@ -59,13 +59,13 @@ pub struct CAddress {
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CTokenShared {
-    pub chainType: *mut c_char,
     pub name: *mut c_char,
     pub symbol: *mut c_char,
     pub logoUrl: *mut c_char,
     pub logoBytes: *mut c_char,
-    pub project: *mut c_char,
-    pub auth: bool,
+    pub project_name: *mut c_char,
+    pub project_home: *mut c_char,
+    pub project_note: *mut c_char,
 }
 
 #[repr(C)]

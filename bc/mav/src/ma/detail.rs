@@ -81,9 +81,6 @@ impl MAddress {
 #[db_sub_struct]
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct MTokenShared {
-    /// [crate::ChainType]
-    #[serde(default)]
-    pub chain_type: String,
     #[serde(default)]
     pub name: String,
     #[serde(default)]
@@ -94,10 +91,11 @@ pub struct MTokenShared {
     #[serde(default)]
     pub logo_bytes: String,
     #[serde(default)]
-    pub project: String,
-    /// true为认证token
-    #[serde(default, deserialize_with = "bool_from_int")]
-    pub auth: bool,
+    pub project_name: String,
+    #[serde(default)]
+    pub project_home: String,
+    #[serde(default)]
+    pub project_note: String,
 }
 
 #[db_sub_struct]

@@ -32,16 +32,6 @@ pub struct MEthChainToken {
     /// 是否显示
     #[serde(default, deserialize_with = "bool_from_int")]
     pub show: bool,
-
-    /// 交易时默认的gas limit
-    #[serde(default)]
-    pub gas_limit: i64,
-    /// 交易时默认的gas price
-    #[serde(default)]
-    pub gas_price: String,
-    /// 糖度
-    #[serde(default)]
-    pub decimal: i32,
 }
 
 impl MEthChainToken {

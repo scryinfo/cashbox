@@ -42,6 +42,16 @@ impl ToString for BtcTokenType {
 pub struct MBtcChainTokenShared {
     #[serde(flatten)]
     pub token_shared: MTokenShared,
+
+    pub token_type: String,
+    //
+    // pub contract_address: String,
+
+    #[serde(default)]
+    pub gas: i64,
+    /// 精度
+    #[serde(default)]
+    pub decimal: i32,
 }
 
 impl MBtcChainTokenShared {

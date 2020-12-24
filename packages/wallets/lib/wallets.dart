@@ -96,14 +96,11 @@ class Wallets {
     return err;
   }
 
-  Error uninit(UnInitParameters parameters) {
-    var ptrParameters = parameters.toC();
-    var cerr = clib.Wallets_uninit(_context, ptrParameters); //todo error
+  Error uninit() {
+    var cerr = clib.Wallets_uninit(_context); //todo error
     var err = Error.fromC(cerr);
     clib.CError_free(cerr);
     cerr = nullptr;
-    UnInitParameters.free(ptrParameters);
-    ptrParameters = nullptr;
 
     _context = nullptr;
     var temp = _dDontext;

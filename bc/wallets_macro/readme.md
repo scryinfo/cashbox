@@ -10,6 +10,10 @@ struct Big{
  pub name_: String,
  #[serde(flatten)]
  pub one: One,
+
+ //这个字段不会持久化（不会存入数据库，也不会生成数据库的字段）
+ #[serde(skip)]
+ pub skip: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
