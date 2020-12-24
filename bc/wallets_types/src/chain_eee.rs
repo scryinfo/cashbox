@@ -53,7 +53,8 @@ pub struct EeeChainTokenDefault {
 deref_type!(EeeChainTokenDefault,MEeeChainTokenDefault);
 
 impl EeeChainTokenDefault {
-    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, tx_id: &str) -> Result<Vec<MEeeChainTokenDefault>, WalletError> {
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<MEeeChainTokenDefault>, WalletError> {
+        let tx_id = "";
         let wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MEeeChainTokenShared> = {
             let mut wrapper = wallets_db.new_wrapper();

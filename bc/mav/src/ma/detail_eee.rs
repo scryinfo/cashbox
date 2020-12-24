@@ -16,12 +16,13 @@ pub enum EeeTokenType {
 }
 
 impl EeeTokenType {
-    fn from(token_type: &str) -> Option<Self> {
+    fn from(token_type: &str) -> Result<Self, kits::Error> {
         match token_type {
-            "Eee" => Some(EeeTokenType::Eee),
+            "Eee" => Ok(EeeTokenType::Eee),
             _ => {
-                log::error!("the str:{} can not be EeeTokenType",token_type);
-                None
+                let err = format!("the str:{} can not be EeeTokenType", token_type);
+                log::error!("{}",err);
+                Err(kits::Error::from(err.as_str()))
             }
         }
     }
@@ -67,8 +68,8 @@ impl MEeeChainTokenAuth {
 }
 
 /// DefaultToken must be a [EeeChainTokenAuth]
-#[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[db_append_shared(CRUDEnable)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenDefault {
     /// [EeeChainTokenShared]
     #[serde(default)]
@@ -99,7 +100,7 @@ mod tests {
     #[test]
     fn eee_token_type_test() {
         for it in EeeTokenType::iter() {
-            assert_eq!(it, EeeTokenType::from(&it.to_string()));
+            assert_eq!(it, EeeTokenType::from(&it.to_string()).unwrap());
         }
     }
 }

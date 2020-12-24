@@ -114,8 +114,6 @@ mod tests {
         // smol::block_on:                 2154(nanoseconds)
         // 1000次以上时futures_lite的速度最快，最后选择futures::executor::block_on是因为它的更有名，且经过反复的考验
         // 单次起动 smol::block_on最快，单从性能上看smol的作者（futures_lite作者相同）作了很多优化工作，它的库可以作为参考
-
-        assert!(elapsed_async > elapsed_futures && elapsed_tokio > elapsed_futures)
     }
 
     #[test]

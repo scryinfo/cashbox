@@ -1,13 +1,12 @@
 #![allow(non_snake_case)]
 
-use std::os::raw::{c_char};
+use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{EeeChain, EeeChainToken, EeeChainTokenShared,SyncRecordDetail,SubChainBasicInfo};
+use wallets_types::{EeeChain, EeeChainToken, EeeChainTokenShared, SubChainBasicInfo, SyncRecordDetail};
 
-use crate::kits::{CArray, CMark, CR, CStruct,to_c_char,to_str};
+use crate::kits::{CArray, CMark, CR, CStruct, to_c_char, to_str};
 use crate::types::{CAddress, CChainShared, CTokenShared};
-
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]

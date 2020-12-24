@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{Context, CreateWalletParameters, DbName, InitParameters,RawTxParam,AccountInfo,TransferPayload};
+use wallets_types::{AccountInfo, Context, CreateWalletParameters, DbName, InitParameters, RawTxParam, TransferPayload};
 
 use crate::kits::{CMark, CR, CStruct, to_c_char, to_str};
 

@@ -6,7 +6,7 @@ use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
-use crate::kits;
+use crate::kits::{self};
 use crate::ma::dao::{self, Shared};
 use crate::ma::MTokenShared;
 
@@ -17,13 +17,14 @@ pub enum EthTokenType {
 }
 
 impl EthTokenType {
-    fn from(token_type: &str) -> Option<Self> {
+    fn from(token_type: &str) -> Result<Self, kits::Error> {
         match token_type {
-            "Eth" => Some(EthTokenType::Eth),
-            "Erc20" => Some(EthTokenType::Erc20),
+            "Eth" => Ok(EthTokenType::Eth),
+            "Erc20" => Ok(EthTokenType::Erc20),
             _ => {
-                log::error!("the str:{} can not be EthTokenType",token_type);
-                None
+                let err = format!("the str:{} can not be EthTokenType", token_type);
+                log::error!("{}",err);
+                Err(kits::Error::from(err.as_str()))
             }
         }
     }
@@ -76,8 +77,8 @@ impl MEthChainTokenAuth {
 }
 
 /// DefaultToken must be a [EthChainTokenAuth]
-#[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[db_append_shared(CRUDEnable)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTokenDefault {
     /// [crate::db::TokenShared]
     #[serde(default)]
@@ -102,14 +103,33 @@ impl MEthChainTokenDefault {
 
 #[cfg(test)]
 mod tests {
+    use futures::executor::block_on;
+    use rbatis::crud::CRUDEnable;
+    use rbatis::rbatis::Rbatis;
     use strum::IntoEnumIterator;
 
-    use crate::ma::EthTokenType;
+    use crate::kits::test::make_memory_rbatis_test;
+    use crate::ma::{Dao, Db, DbCreateType, EthTokenType, MEthChainTokenDefault};
 
     #[test]
     fn eth_token_type_test() {
         for it in EthTokenType::iter() {
-            assert_eq!(it, EthTokenType::from(&it.to_string()));
+            assert_eq!(it, EthTokenType::from(&it.to_string()).unwrap());
         }
     }
+
+    #[test]
+    fn skip_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MEthChainTokenDefault::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+    }
+
+    async fn init_memory() -> Rbatis {
+        let rb = make_memory_rbatis_test().await;
+        let r = Db::create_table(&rb, MEthChainTokenDefault::create_table_script(), &MEthChainTokenDefault::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        rb
+    }
 }
+

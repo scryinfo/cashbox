@@ -53,7 +53,8 @@ pub struct EthChainTokenDefault {
 deref_type!(EthChainTokenDefault,MEthChainTokenDefault);
 
 impl EthChainTokenDefault {
-    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, tx_id: &str) -> Result<Vec<MEthChainTokenDefault>, WalletError> {
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<MEthChainTokenDefault>, WalletError> {
+        let tx_id = "";
         let wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MEthChainTokenShared> = {
             let mut wrapper = wallets_db.new_wrapper();

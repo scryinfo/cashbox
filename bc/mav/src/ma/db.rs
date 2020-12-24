@@ -6,11 +6,11 @@ use strum_macros::EnumIter;
 
 use crate::{kits, NetType};
 use crate::kits::Error;
-use crate::ma::{MAddress,
-                MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx,MBtcOutputTx,
-                MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx,MSubChainBasicInfo,MAccountInfoSyncProg,
-                MEeeTokenxTx,
-                MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting,
+use crate::ma::{MAccountInfoSyncProg,
+                MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx,
+                MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx,
+                MEthChainToken,
+                MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo,
                 MTokenAddress, MWallet};
 
 #[derive(Debug, Default, Clone)]

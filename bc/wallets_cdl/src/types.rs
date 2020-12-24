@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
 
+use std::fmt;
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
@@ -17,15 +18,25 @@ pub use crate::types_eee::{*};
 pub use crate::types_eth::{*};
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(DlStruct, DlDefault, DlCR)]
 pub struct CError {
     //由于很多地方都有使用 error这个名字，加一个C减少重名
     pub code: CU64,
     pub message: *mut c_char,
 }
 
+impl fmt::Debug for CError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let message = to_str(self.message).to_owned();
+        f.debug_struct("CError")
+            .field("code", &self.code)
+            .field("message", &message)
+            .finish()
+    }
+}
+
 #[repr(C)] //
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CWallet {
     pub id: *mut c_char,
     pub nextId: *mut c_char,
@@ -36,7 +47,7 @@ pub struct CWallet {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CAddress {
     pub id: *mut c_char,
     pub walletId: *mut c_char,
@@ -46,7 +57,7 @@ pub struct CAddress {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CTokenShared {
     pub chainType: *mut c_char,
     pub name: *mut c_char,
@@ -58,7 +69,7 @@ pub struct CTokenShared {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CChainShared {
     pub walletId: *mut c_char,
     pub chainType: *mut c_char,

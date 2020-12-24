@@ -34,11 +34,11 @@ impl ChainTrait for EthChain {
 
     async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress) -> Result<(), WalletError> {
         let wallet_type = WalletType::from(&wallet.wallet_type);
-        //�������ʵ�ֲ��оͺ���
+        //这里如果实现并行就好了
         for net_type in NetType::iter() {
             let token_rb = context.db().data_db(&net_type);
             let mut tx = token_rb.begin_tx_defer(false).await?;
-            let default_tokens = EthChainTokenDefault::list_by_net_type(context, &net_type, &tx.tx_id).await?;
+            let default_tokens = EthChainTokenDefault::list_by_net_type(context, &net_type).await?;
             let mut tokens = Vec::new();
             for it in default_tokens {
                 let mut token = MEthChainToken::default();
@@ -82,11 +82,11 @@ impl ChainTrait for EeeChain {
 
     async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress) -> Result<(), WalletError> {
         let wallet_type = WalletType::from(&wallet.wallet_type);
-        //�������ʵ�ֲ��оͺ���
+        //这里如果实现并行就好了
         for net_type in NetType::iter() {
             let token_rb = context.db().data_db(&net_type);
             let mut tx = token_rb.begin_tx_defer(false).await?;
-            let default_tokens = EeeChainTokenDefault::list_by_net_type(context, &net_type, &tx.tx_id).await?;
+            let default_tokens = EeeChainTokenDefault::list_by_net_type(context, &net_type).await?;
             let mut tokens = Vec::new();
             for it in default_tokens {
                 let mut token = MEeeChainToken::default();
@@ -118,11 +118,11 @@ impl ChainTrait for BtcChain {
 
     async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress) -> Result<(), WalletError> {
         let wallet_type = WalletType::from(&wallet.wallet_type);
-        //�������ʵ�ֲ��оͺ���
+        //这里如果实现并行就好了
         for net_type in NetType::iter() {
             let token_rb = context.db().data_db(&net_type);
             let mut tx = token_rb.begin_tx_defer(false).await?;
-            let default_tokens = BtcChainTokenDefault::list_by_net_type(context, &net_type, &tx.tx_id).await?;
+            let default_tokens = BtcChainTokenDefault::list_by_net_type(context, &net_type).await?;
             let mut tokens = Vec::new();
             for it in default_tokens {
                 let mut token = MBtcChainToken::default();
