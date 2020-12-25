@@ -4,6 +4,7 @@ use rbatis::crud::CRUDEnable;
 use rbatis_macro_driver::CRUDEnable;
 use serde::Deserialize;
 use serde::Serialize;
+use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
@@ -15,7 +16,7 @@ use crate::ma::TxShared;
 
 /// eth链的token
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainToken {
     #[serde(default)]
     pub next_id: String,
@@ -42,7 +43,7 @@ impl MEthChainToken {
 
 /// eth chain的交易，包含eth，erc20等
 #[db_append_shared(CRUDEnable)]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
@@ -86,6 +87,7 @@ impl MEthChainTx {
 /// 类型以[ERC-20](https://eips.ethereum.org/EIPS/eip-20)规范中的命名，所以要保持定义的值，不能作命名转换
 ///
 /// 这只列出会产生交易的接口
+#[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum EthErc20Face {
     #[allow(non_camel_case_types)]transfer,
     #[allow(non_camel_case_types)]transferFrom,
@@ -125,7 +127,7 @@ impl fmt::Display for EthErc20Face {
 }
 
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthErc20Tx {
     #[serde(default)]
     pub eth_chain_tx_id: String,
@@ -141,4 +143,113 @@ pub struct MEthErc20Tx {
     pub erc20_face: String,
 }
 
+impl MEthErc20Tx {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eth_erc20_tx.sql")
+    }
+}
+
 //eth end
+
+#[cfg(test)]
+mod tests {
+    use futures::executor::block_on;
+    use rbatis::crud::CRUDEnable;
+    use rbatis::rbatis::Rbatis;
+    use strum::IntoEnumIterator;
+
+    use crate::ChainType;
+    use crate::kits::test::make_memory_rbatis_test;
+    use crate::ma::{Dao, Db, DbCreateType, EthErc20Face, MEthChainToken, MEthChainTx, MEthErc20Tx};
+
+    #[test]
+    fn eth_erc20_face_test() {
+        for it in EthErc20Face::iter() {
+            assert_eq!(it, EthErc20Face::from(&it.to_string()));
+        }
+    }
+
+    #[test]
+    fn m_eth_chain_token_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MEthChainToken::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut m = MEthChainToken::default();
+        m.chain_type = ChainType::EEE.to_string();
+        m.wallet_id = "wallet_id".to_owned();
+
+        let re = block_on(m.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MEthChainToken::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let ms = re.unwrap();
+        assert_eq!(1, ms.len(), "{:?}", ms);
+
+        let db_m = &ms.as_slice()[0];
+        assert_eq!(&m, db_m);
+
+        let re = block_on(MEthChainToken::fetch_by_id(&rb, "", &m.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_m = re.unwrap().unwrap();
+        assert_eq!(m, db_m);
+    }
+
+    #[test]
+    fn m_eth_chain_tx_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MEthChainTx::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut m = MEthChainTx::default();
+        m.value = "value".to_owned();
+
+        let re = block_on(m.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MEthChainTx::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let ms = re.unwrap();
+        assert_eq!(1, ms.len(), "{:?}", ms);
+
+        let db_m = &ms.as_slice()[0];
+        assert_eq!(&m, db_m);
+
+        let re = block_on(MEthChainTx::fetch_by_id(&rb, "", &m.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_m = re.unwrap().unwrap();
+        assert_eq!(m, db_m);
+    }
+
+    #[test]
+    fn m_eth_erc20_tx_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MEthErc20Tx::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut m = MEthErc20Tx::default();
+        m.token = "token".to_owned();
+
+        let re = block_on(m.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MEthErc20Tx::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let ms = re.unwrap();
+        assert_eq!(1, ms.len(), "{:?}", ms);
+
+        let db_m = &ms.as_slice()[0];
+        assert_eq!(&m, db_m);
+
+        let re = block_on(MEthErc20Tx::fetch_by_id(&rb, "", &m.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_m = re.unwrap().unwrap();
+        assert_eq!(m, db_m);
+    }
+
+    async fn init_memory() -> Rbatis {
+        let rb = make_memory_rbatis_test().await;
+        let r = Db::create_table(&rb, MEthChainToken::create_table_script(), &MEthChainToken::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        let r = Db::create_table(&rb, MEthChainTx::create_table_script(), &MEthChainTx::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        let r = Db::create_table(&rb, MEthErc20Tx::create_table_script(), &MEthErc20Tx::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        rb
+    }
+}

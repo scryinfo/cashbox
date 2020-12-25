@@ -8,7 +8,7 @@ use crate::kits;
 use crate::ma::dao::{self, bool_from_int, Shared};
 
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MWallet {
     //下一个显示顺序的 wallet_id
     #[serde(default)]
@@ -37,7 +37,7 @@ impl MWallet {
 
 //每一种链类型一条记录，实现时可以不写入数据库
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MChainTypeMeta {
     /// [crate::ChainType]
     #[serde(default)]
@@ -55,7 +55,7 @@ impl MChainTypeMeta {
 }
 
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MAddress {
     /// [Wallet]
     #[serde(default)]
@@ -110,6 +110,52 @@ pub struct MChainShared {
     pub address_id: String,
 }
 
+#[cfg(test)]
+mod tests {
+    use futures::executor::block_on;
+    use rbatis::crud::CRUDEnable;
+    use rbatis::rbatis::Rbatis;
+
+    use crate::ChainType;
+    use crate::kits::test::make_memory_rbatis_test;
+    use crate::ma::{Dao, Db, DbCreateType, MAddress};
+
+    #[test]
+    fn m_address_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MAddress::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut m = MAddress::default();
+        m.chain_type = ChainType::EEE.to_string();
+        m.wallet_id = "wallet_id".to_owned();
+        m.public_key = "public_key".to_owned();
+        m.address = "address".to_owned();
+        m.wallet_address = true;
+
+        let re = block_on(m.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MAddress::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let tokens = re.unwrap();
+        assert_eq!(1, tokens.len(), "{:?}", tokens);
+
+        let db_m = &tokens.as_slice()[0];
+        assert_eq!(&m, db_m);
+
+        let re = block_on(MAddress::fetch_by_id(&rb, "", &m.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_m = re.unwrap().unwrap();
+        assert_eq!(m, db_m);
+    }
+
+
+    async fn init_memory() -> Rbatis {
+        let rb = make_memory_rbatis_test().await;
+        let r = Db::create_table(&rb, MAddress::create_table_script(), &MAddress::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        rb
+    }
+}
 
 
 

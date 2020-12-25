@@ -159,4 +159,5 @@ impl WalletTrait for Wallet {
     fn chains(&self) -> &Vec<Box<dyn ChainTrait>> {
         &self.chains
     }
+
 }

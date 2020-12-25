@@ -26,6 +26,9 @@ pub trait ChainTrait: Send + Sync {
     async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress) -> Result<(), WalletError>;
 }
 
+
+
+
 pub trait WalletTrait: Send + Sync {
     fn chains(&self) -> &Vec<Box<dyn ChainTrait>>;
 }

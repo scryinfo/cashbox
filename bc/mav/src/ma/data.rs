@@ -9,7 +9,7 @@ use crate::ma::dao::{self, Shared};
 /// 地址与token对应的balance
 #[allow(non_upper_case_globals)]
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MTokenAddress {
     #[serde(default)]
     pub wallet_id: String,
@@ -31,7 +31,7 @@ impl MTokenAddress {
 }
 
 #[db_sub_struct]
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct TxShared {
     #[serde(default)]
     pub tx_hash: String,
@@ -56,7 +56,7 @@ mod tests {
 
     #[test]
     #[allow(non_snake_case)]
-    fn test_TokenAddress() {
+    fn m_token_address_test() {
         let mut m = MTokenAddress::default();
         assert_eq!("", m.get_id());
         assert_eq!(0, m.get_create_time());

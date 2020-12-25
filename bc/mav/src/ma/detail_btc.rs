@@ -160,8 +160,8 @@ mod tests {
         token.token_shared.project_note = "test".to_owned();
         token.token_shared.logo_bytes = "bytes".to_owned();
         token.token_shared.logo_url = "http://".to_owned();
-        token.token_shared.symbol = "ETH".to_owned();
-        token.token_shared.name = "ETH".to_owned();
+        token.token_shared.symbol = "BTC".to_owned();
+        token.token_shared.name = "BTC".to_owned();
 
         let re = block_on(token.save(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);
