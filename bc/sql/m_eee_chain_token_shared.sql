@@ -2,16 +2,19 @@
 CREATE TABLE IF NOT EXISTS m_eee_chain_token_shared
 (
     -- MTokenShared start
-    chain_type  TEXT    NOT NULL,
-    name        TEXT    NOT NULL,
-    symbol      TEXT    NOT NULL,
-    logo_url    TEXT    NOT NULL,
-    logo_bytes  TEXT    NOT NULL,
-    project     TEXT    NOT NULL,
-    auth        BOOLEAN NOT NULL,
+    name         TEXT    NOT NULL,
+    symbol       TEXT    NOT NULL,
+    logo_url     TEXT    NOT NULL,
+    logo_bytes   TEXT    NOT NULL,
+    project_name TEXT    NOT NULL,
+    project_home TEXT    NOT NULL,
+    project_note TEXT    NOT NULL,
     -- MTokenShared end
 
-    id          TEXT PRIMARY KEY,
-    create_time INTEGER NOT NULL,
-    update_time INTEGER NOT NULL
+    token_type   TEXT    NOT NULL,
+    gas          INTEGER NOT NULL,
+    decimal      INTEGER NOT NULL,
+    id           TEXT PRIMARY KEY,
+    create_time  INTEGER NOT NULL,
+    update_time  INTEGER NOT NULL
 );

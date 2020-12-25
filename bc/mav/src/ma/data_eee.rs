@@ -132,8 +132,11 @@ impl MSubChainBasicInfo {
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MAccountInfoSyncProg {
+    #[serde(default)]
     account: String,
+    #[serde(default)]
     block_no: String,
+    #[serde(default)]
     block_hash: String,
 }
 

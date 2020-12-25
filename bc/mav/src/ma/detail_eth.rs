@@ -45,9 +45,10 @@ impl ToString for EthTokenType {
 pub struct MEthChainTokenShared {
     #[serde(flatten)]
     pub token_shared: MTokenShared,
-
+    #[serde(default)]
     pub token_type: String,
     ///如果是eth，那么合约地址为零长度字符串
+    #[serde(default)]
     pub contract_address: String,
 
     /// 交易时默认的gas limit
@@ -73,7 +74,7 @@ pub struct MEthChainTokenAuth {
     /// [EthChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
-    ///
+    #[serde(default)]
     pub net_type: String,
     /// 显示位置，以此从小到大排列
     #[serde(default)]
@@ -93,7 +94,8 @@ pub struct MEthChainTokenDefault {
     /// [crate::db::TokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
-    ///
+
+    #[serde(default)]
     pub net_type: String,
     /// 显示位置，以此从小到大排列
     #[serde(default)]
@@ -130,6 +132,12 @@ mod tests {
 
     #[test]
     fn skip_test() {
+        let bean: serde_json::Result<MEthChainTokenDefault> = serde_json::from_str("{}");
+        if bean.is_err() {
+            let err = bean.err().unwrap();
+            println!("{}", err);
+        }
+
         let rb = block_on(init_memory());
         let re = block_on(MEthChainTokenDefault::list(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);

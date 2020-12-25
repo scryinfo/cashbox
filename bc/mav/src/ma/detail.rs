@@ -101,9 +101,12 @@ pub struct MTokenShared {
 #[db_sub_struct]
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct MChainShared {
+    #[serde(default)]
     pub wallet_id: String,
+    #[serde(default)]
     pub chain_type: String,
     /// 钱包地址
+    #[serde(default)]
     pub address_id: String,
 }
 

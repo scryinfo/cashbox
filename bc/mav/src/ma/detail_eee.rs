@@ -42,7 +42,7 @@ impl ToString for EeeTokenType {
 pub struct MEeeChainTokenShared {
     #[serde(flatten)]
     pub token_shared: MTokenShared,
-
+    #[serde(default)]
     pub token_type: String,
     //
     // pub contract_address: String,
@@ -84,7 +84,7 @@ pub struct MEeeChainTokenDefault {
     /// [EeeChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
-
+    #[serde(default)]
     pub net_type: String,
     /// 显示位置，以此从小到大排列
     #[serde(default)]

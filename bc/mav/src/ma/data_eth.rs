@@ -127,12 +127,17 @@ impl fmt::Display for EthErc20Face {
 #[db_append_shared]
 #[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthErc20Tx {
+    #[serde(default)]
     pub eth_chain_tx_id: String,
+    #[serde(default)]
     pub contract_address: String,
     /// [Erc20::transfer] 与 [Erc20::transferFrom]此地址有值，其余为""
+    #[serde(default)]
     pub to_address: String,
+    #[serde(default)]
     pub token: String,
     /// [Erc20]
+    #[serde(default)]
     pub erc20_face: String,
 }
 
