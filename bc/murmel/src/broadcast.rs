@@ -1,6 +1,6 @@
 //! mod for broadcast TX
 
-use crate::constructor::CondVarPair;
+use crate::constructor::CondvarPair;
 use crate::error::Error;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
@@ -17,16 +17,21 @@ pub struct Broadcast<T> {
     //used for Send message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-    condvar_pair: CondVarPair<T>,
+    condvar_pair: CondvarPair<T>,
 }
 
-impl<T> Broadcast<T> {
+impl<T: std::marker::Send + 'static> Broadcast<T> {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
+        condvar_pair: CondvarPair<T>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
-        let mut broadcast = Broadcast { p2p, timeout };
+        let mut broadcast = Broadcast {
+            p2p,
+            timeout,
+            condvar_pair,
+        };
 
         thread::Builder::new()
             .name("Broadcast TX".to_string())

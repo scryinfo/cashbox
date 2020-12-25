@@ -1,5 +1,5 @@
 //! This mod is about bloomfilter sender
-use crate::constructor::CondVarPair;
+use crate::constructor::CondvarPair;
 use crate::error::Error;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
@@ -17,20 +17,22 @@ pub struct BloomFilter<T> {
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     filter_load_message: Option<FilterLoadMessage>,
-    condvar_pair: CondVarPair<T>,
+    condvar_pair: CondvarPair<T>,
 }
 
-impl<T> BloomFilter<T> {
+impl<T: std::marker::Send + 'static> BloomFilter<T> {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         filter_load_message: Option<FilterLoadMessage>,
+        condvar_pair: CondvarPair<T>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
         let mut bloomfilter = BloomFilter {
             p2p,
             timeout,
             filter_load_message,
+            condvar_pair,
         };
 
         thread::Builder::new()

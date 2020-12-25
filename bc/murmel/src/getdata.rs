@@ -15,7 +15,7 @@ use bitcoin_hashes::hash160;
 use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 
-use crate::constructor::CondVarPair;
+use crate::constructor::CondvarPair;
 use crate::db::{RB_CHAIN, RB_DETAIL};
 use bitcoin_hashes::Hash;
 use log::{error, info, trace, warn};
@@ -30,14 +30,15 @@ pub struct GetData<T> {
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     hook_receiver: mpsc::Receiver<HooksMessage>,
-    condvar_pair: CondVarPair<T>,
+    condvar_pair: CondvarPair<T>,
 }
 
-impl<T> GetData<T> {
+impl<T: std::marker::Send + 'static> GetData<T> {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         hook_receiver: mpsc::Receiver<HooksMessage>,
+        condvar_pair: CondvarPair<T>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
@@ -45,6 +46,7 @@ impl<T> GetData<T> {
             p2p,
             timeout,
             hook_receiver,
+            condvar_pair,
         };
 
         thread::Builder::new()

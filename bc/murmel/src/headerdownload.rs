@@ -17,7 +17,7 @@
 //! # Download headers
 //!
 use crate::chaindb::SharedChainDB;
-use crate::constructor::CondVarPair;
+use crate::constructor::CondvarPair;
 use crate::db::RB_CHAIN;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
@@ -45,16 +45,17 @@ pub struct HeaderDownload<T> {
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     downstream: SharedDownstream,
     hook_sender: mpsc::SyncSender<HooksMessage>,
-    condvar_pair: CondVarPair<T>,
+    condvar_pair: CondvarPair<T>,
 }
 
-impl<T> HeaderDownload<T> {
+impl<T: std::marker::Send + 'static> HeaderDownload<T> {
     pub fn new(
         chaindb: SharedChainDB,
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         downstream: SharedDownstream,
         hook_sender: mpsc::SyncSender<HooksMessage>,
+        condvar_pair: CondvarPair<T>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
@@ -64,6 +65,7 @@ impl<T> HeaderDownload<T> {
             timeout,
             downstream,
             hook_sender,
+            condvar_pair,
         };
 
         thread::Builder::new()
