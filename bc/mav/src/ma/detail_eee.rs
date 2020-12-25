@@ -38,7 +38,7 @@ impl ToString for EeeTokenType {
 
 // eee
 #[db_append_shared(CRUDEnable)]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenShared {
     #[serde(flatten)]
     pub token_shared: MTokenShared,
@@ -61,11 +61,13 @@ impl MEeeChainTokenShared {
 }
 
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenAuth {
     /// [EeeChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
+    #[serde(default)]
+    pub net_type: String,
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
@@ -79,7 +81,7 @@ impl MEeeChainTokenAuth {
 
 /// DefaultToken must be a [EeeChainTokenAuth]
 #[db_append_shared(CRUDEnable)]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenDefault {
     /// [EeeChainTokenShared]
     #[serde(default)]
@@ -103,14 +105,114 @@ impl MEeeChainTokenDefault {
 
 #[cfg(test)]
 mod tests {
+    use futures::executor::block_on;
+    use rbatis::crud::CRUDEnable;
+    use rbatis::rbatis::Rbatis;
     use strum::IntoEnumIterator;
 
-    use crate::ma::EeeTokenType;
+    use crate::kits::test::make_memory_rbatis_test;
+    use crate::ma::{Dao, Db, DbCreateType, EeeTokenType, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared};
+    use crate::NetType;
 
     #[test]
     fn eee_token_type_test() {
         for it in EeeTokenType::iter() {
             assert_eq!(it, EeeTokenType::from(&it.to_string()).unwrap());
         }
+    }
+
+    #[test]
+    fn m_eee_chain_token_default_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MEeeChainTokenDefault::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut token = MEeeChainTokenDefault::default();
+        token.chain_token_shared_id = "chain_token_shared_id".to_owned();
+        token.net_type = NetType::Main.to_string();
+        token.position = 1;
+
+        let re = block_on(token.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MEeeChainTokenDefault::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let tokens = re.unwrap();
+        assert_eq!(1, tokens.len(), "{:?}", tokens);
+
+        let db_token = &tokens.as_slice()[0];
+        assert_eq!(&token, db_token);
+
+        let re = block_on(MEeeChainTokenDefault::fetch_by_id(&rb, "", &token.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_token = re.unwrap().unwrap();
+        assert_eq!(token, db_token);
+    }
+
+    #[test]
+    fn m_eee_chain_token_shared_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MEeeChainTokenShared::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut token = MEeeChainTokenShared::default();
+        token.token_type = EeeTokenType::Eee.to_string();
+        token.decimal = 18;
+        token.token_shared.project_name = "test".to_owned();
+        token.token_shared.project_home = "http://".to_owned();
+        token.token_shared.project_note = "test".to_owned();
+        token.token_shared.logo_bytes = "bytes".to_owned();
+        token.token_shared.logo_url = "http://".to_owned();
+        token.token_shared.symbol = "ETH".to_owned();
+        token.token_shared.name = "ETH".to_owned();
+
+        let re = block_on(token.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MEeeChainTokenShared::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let tokens = re.unwrap();
+        assert_eq!(1, tokens.len(), "{:?}", tokens);
+
+        let db_token = &tokens.as_slice()[0];
+        assert_eq!(&token, db_token);
+
+        let re = block_on(MEeeChainTokenShared::fetch_by_id(&rb, "", &token.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_token = re.unwrap().unwrap();
+        assert_eq!(token, db_token);
+    }
+
+    #[test]
+    fn m_eee_chain_token_auth_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MEeeChainTokenAuth::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut token = MEeeChainTokenAuth::default();
+        token.chain_token_shared_id = "chain_token_shared_id".to_owned();
+        token.net_type = NetType::Main.to_string();
+        token.position = 1;
+
+        let re = block_on(token.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MEeeChainTokenAuth::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let tokens = re.unwrap();
+        assert_eq!(1, tokens.len(), "{:?}", tokens);
+
+        let db_token = &tokens.as_slice()[0];
+        assert_eq!(&token, db_token);
+
+        let re = block_on(MEeeChainTokenAuth::fetch_by_id(&rb, "", &token.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_token = re.unwrap().unwrap();
+        assert_eq!(token, db_token);
+    }
+
+    async fn init_memory() -> Rbatis {
+        let rb = make_memory_rbatis_test().await;
+        let r = Db::create_table(&rb, MEeeChainTokenDefault::create_table_script(), &MEeeChainTokenDefault::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        let r = Db::create_table(&rb, MEeeChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        let r = Db::create_table(&rb, MEeeChainTokenAuth::create_table_script(), &MEeeChainTokenAuth::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        rb
     }
 }

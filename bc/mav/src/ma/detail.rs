@@ -79,7 +79,7 @@ impl MAddress {
 }
 
 #[db_sub_struct]
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default)]
 pub struct MTokenShared {
     #[serde(default)]
     pub name: String,
