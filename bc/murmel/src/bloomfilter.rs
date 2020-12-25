@@ -1,8 +1,8 @@
 //! This mod is about bloomfilter sender
+use crate::constructor::CondVarPair;
 use crate::error::Error;
 use crate::p2p::{
-    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
-    SERVICE_BLOCKS,
+    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
@@ -12,21 +12,26 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
 
-pub struct BloomFilter {
+pub struct BloomFilter<T> {
     // send message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     filter_load_message: Option<FilterLoadMessage>,
+    condvar_pair: CondVarPair<T>,
 }
 
-impl BloomFilter {
+impl<T> BloomFilter<T> {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         filter_load_message: Option<FilterLoadMessage>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
-        let mut bloomfilter = BloomFilter { p2p, timeout, filter_load_message };
+        let mut bloomfilter = BloomFilter {
+            p2p,
+            timeout,
+            filter_load_message,
+        };
 
         thread::Builder::new()
             .name("Bloom filter".to_string())
@@ -86,10 +91,12 @@ impl BloomFilter {
 
     /// Each node needs to send a filter load message
     fn send_filter(&mut self, peer: PeerId) -> Result<(), Error> {
-        if let Some(filter_load_message)  = &self.filter_load_message {
+        if let Some(filter_load_message) = &self.filter_load_message {
             info!("send filter loaded message");
-            self.p2p
-                .send_network(peer, NetworkMessage::FilterLoad(filter_load_message.to_owned()));
+            self.p2p.send_network(
+                peer,
+                NetworkMessage::FilterLoad(filter_load_message.to_owned()),
+            );
         }
         Ok(())
     }

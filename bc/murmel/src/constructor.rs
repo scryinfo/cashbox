@@ -29,6 +29,7 @@ use crate::downstream::SharedDownstream;
 use crate::error::Error;
 use crate::getdata::GetData;
 use crate::headerdownload::HeaderDownload;
+use crate::hooks::Condition;
 #[cfg(feature = "lightning")]
 use crate::lightning::LightningConnector;
 use crate::p2p::BitcoinP2PConfig;
@@ -46,7 +47,7 @@ use futures::{
     Future, FutureExt, Poll as Async, StreamExt,
 };
 use futures_timer::Interval;
-use log::info;
+use parking_lot::Condvar;
 use rand::{thread_rng, RngCore};
 use std::pin::Pin;
 use std::time::Duration;
@@ -58,6 +59,9 @@ use std::{
 };
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
+
+// CondVar use for sync thread
+pub type CondVarPair<T> = Arc<(parking_lot::Mutex<T>, Condvar)>;
 
 /// The complete stack
 pub struct Constructor {
@@ -121,6 +125,17 @@ impl Constructor {
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
 
+        let pair: CondVarPair<Condition> = Arc::new((
+            parking_lot::Mutex::new(Condition {
+                header_ready: false,
+                fillter_ready: false,
+            }),
+            Condvar::new(),
+        ));
+        let pair2 = Arc::clone(&pair);
+        let pair3 = Arc::clone(&pair);
+        let pair4 = Arc::clone(&pair);
+
         dispatcher.add_listener(HeaderDownload::new(
             chaindb.clone(),
             p2p_control.clone(),
@@ -130,21 +145,18 @@ impl Constructor {
         ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
-        info!("send FilterLoad");
         dispatcher.add_listener(BloomFilter::new(
             p2p_control.clone(),
             timeout.clone(),
             filter_load_message,
         ));
 
-        info!("send GetData");
         dispatcher.add_listener(GetData::new(
             p2p_control.clone(),
             timeout.clone(),
             hook_receiver,
         ));
 
-        info!("Broadcast TX");
         dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone()));
 
         for addr in &listen {

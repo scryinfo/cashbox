@@ -17,6 +17,7 @@
 //! # Download headers
 //!
 use crate::chaindb::SharedChainDB;
+use crate::constructor::CondVarPair;
 use crate::db::RB_CHAIN;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
@@ -38,15 +39,16 @@ use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use log::{debug, error, info, trace};
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
 
-pub struct HeaderDownload {
+pub struct HeaderDownload<T> {
     p2p: P2PControlSender<NetworkMessage>,
     chaindb: SharedChainDB,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     downstream: SharedDownstream,
     hook_sender: mpsc::SyncSender<HooksMessage>,
+    condvar_pair: CondVarPair<T>,
 }
 
-impl HeaderDownload {
+impl<T> HeaderDownload<T> {
     pub fn new(
         chaindb: SharedChainDB,
         p2p: P2PControlSender<NetworkMessage>,

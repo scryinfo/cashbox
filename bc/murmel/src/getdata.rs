@@ -15,6 +15,7 @@ use bitcoin_hashes::hash160;
 use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 
+use crate::constructor::CondVarPair;
 use crate::db::{RB_CHAIN, RB_DETAIL};
 use bitcoin_hashes::Hash;
 use log::{error, info, trace, warn};
@@ -24,14 +25,15 @@ use std::time::Duration;
 
 const PUBLIC_KEY: &str = "0291ee52a0e0c22db9772f237f4271ea6f9330d92b242fb3c621928774c560b699";
 
-pub struct GetData {
+pub struct GetData<T> {
     //send a message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     hook_receiver: mpsc::Receiver<HooksMessage>,
+    condvar_pair: CondVarPair<T>,
 }
 
-impl GetData {
+impl<T> GetData<T> {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
