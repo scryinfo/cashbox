@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{AccountInfo, Context, CreateWalletParameters, DbName, InitParameters, RawTxParam, TransferPayload};
+use wallets_types::{Context, CreateWalletParameters, DbName, InitParameters, RawTxParam, AccountInfo, TransferPayload, DecodeAccountInfoParameters, StorageKeyParameters};
 
 use crate::kits::{CMark, CR, CStruct, to_c_char, to_str};
 
@@ -81,5 +81,29 @@ pub struct CAccountInfo {
     pub misc_frozen: *mut c_char,
     pub fee_frozen: *mut c_char,
 }
+
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CDecodeAccountInfoParameters {
+    pub netType: *mut c_char,
+    pub encodeData: *mut c_char,
+    pub genesisHash: *mut c_char,
+    pub runtimeVersion: i32,
+    pub txVersion: i32,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CStorageKeyParameters {
+    pub netType: *mut c_char,
+    pub genesisHash: *mut c_char,
+    pub runtimeVersion: i32,
+    pub txVersion: i32,
+    pub module: *mut c_char,
+    pub storageItem: *mut c_char,
+    pub pubKey: *mut c_char,
+}
+
+
 
 

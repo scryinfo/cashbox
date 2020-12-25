@@ -104,23 +104,21 @@ impl MEeeTokenxTx {
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MSubChainBasicInfo {
     #[serde(default)]
-    genesis_hash: String,
+    pub genesis_hash: String,
     #[serde(default)]
-    metadata: String,
+    pub metadata: String,
     #[serde(default)]
-    runtime_version: i32,
+    pub runtime_version: i32,
     #[serde(default)]
-    tx_version: i32,
+    pub tx_version: i32,
     #[serde(default)]
-    ss58_format_prefix: i32,
+    pub ss58_format_prefix: i32,
     #[serde(default)]
-    token_decimals: i32,
+    pub token_decimals: i32,
     #[serde(default)]
-    token_symbol: String,
-    #[serde(default, deserialize_with = "bool_from_int")]
-    is_default: bool,
+    pub token_symbol: String,
     #[serde(default)]
-    status: i32,
+    pub is_default: u32,
 }
 
 impl MSubChainBasicInfo {
@@ -133,11 +131,11 @@ impl MSubChainBasicInfo {
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MAccountInfoSyncProg {
     #[serde(default)]
-    account: String,
+    pub account: String,
     #[serde(default)]
-    block_no: String,
+    pub block_no: String,
     #[serde(default)]
-    block_hash: String,
+    pub block_hash: String,
 }
 
 impl MAccountInfoSyncProg {
