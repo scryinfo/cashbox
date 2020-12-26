@@ -10,7 +10,7 @@ use crate::ma::dao::{self, Shared};
 
 /// 动态库自己的配置，并不指app的配置
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MSetting {
     #[serde(default)]
     pub key_str: String,

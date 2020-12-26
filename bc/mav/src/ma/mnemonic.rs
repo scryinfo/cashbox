@@ -13,7 +13,7 @@ use crate::ma::MWallet;
 //删除钱包时软件删除
 //功能是作为备份使用，如果Wallet表中的数据无法读取时，才起用此表 ,CRUDEnable
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MMnemonic {
     #[serde(default)]
     pub mnemonic_digest: String,
@@ -157,7 +157,7 @@ mod tests {
     #[test]
     fn test_flatten() {
         #[db_append_shared]
-        #[derive(Serialize, Deserialize, Clone, Debug, Default)]
+        #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default)]
         struct Big {
             #[serde(default)]
             pub name_: String,
@@ -165,7 +165,7 @@ mod tests {
             pub one: One,
         }
 
-        #[derive(Serialize, Deserialize, Clone, Debug, Default)]
+        #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default)]
         struct One {
             #[serde(default)]
             pub id_: String,

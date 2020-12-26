@@ -3,9 +3,10 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{EeeChain, EeeChainToken, EeeChainTokenShared, SubChainBasicInfo, SyncRecordDetail};
 
-use crate::kits::{CArray, CMark, CR, CStruct, to_c_char, to_str};
+use wallets_types::{EeeChain, EeeChainToken, EeeChainTokenShared, SubChainBasicInfo, AccountInfoSyncProg};
+use crate::kits::{CArray, CMark, CR, CStruct, to_c_char, to_str,CBool};
+
 use crate::types::{CAddress, CChainShared, CTokenShared};
 
 #[repr(C)]
@@ -31,7 +32,7 @@ pub struct CEeeChain {
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
-pub struct CSyncRecordDetail {
+pub struct CAccountInfoSyncProg {
     pub account: *mut c_char,
     pub blockNo: *mut c_char,
     pub blockHash: *mut c_char,
@@ -40,12 +41,12 @@ pub struct CSyncRecordDetail {
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CSubChainBasicInfo {
-    pub infoId: *mut c_char,
     pub genesisHash: *mut c_char,
     pub metadata: *mut c_char,
-    pub runtimeVersion: u32,
-    pub txVersion: u32,
-    pub ss58Format: u32,
-    pub tokenDecimals: u32,
+    pub runtimeVersion: i32,
+    pub txVersion: i32,
+    pub ss58FormatPrefix: i32,
+    pub tokenDecimals: i32,
     pub tokenSymbol: *mut c_char,
+    pub isDefault: CBool,
 }

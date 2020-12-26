@@ -11,7 +11,7 @@ use crate::ma::TxShared;
 
 //eee
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainToken {
     #[serde(default)]
     pub next_id: String,
@@ -41,7 +41,7 @@ impl MEeeChainToken {
 
 /// eee chain的交易
 #[db_append_shared(CRUDEnable)]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
@@ -71,7 +71,7 @@ impl MEeeChainTx {
 }
 
 #[db_append_shared(CRUDEnable)]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeTokenxTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
@@ -101,26 +101,24 @@ impl MEeeTokenxTx {
 }
 
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MSubChainBasicInfo {
     #[serde(default)]
-    genesis_hash: String,
+    pub genesis_hash: String,
     #[serde(default)]
-    metadata: String,
+    pub metadata: String,
     #[serde(default)]
-    runtime_version: i32,
+    pub runtime_version: i32,
     #[serde(default)]
-    tx_version: i32,
+    pub tx_version: i32,
     #[serde(default)]
-    ss58_format_prefix: i32,
+    pub ss58_format_prefix: i32,
     #[serde(default)]
-    token_decimals: i32,
+    pub token_decimals: i32,
     #[serde(default)]
-    token_symbol: String,
+    pub token_symbol: String,
     #[serde(default)]
-    is_default: bool,
-    #[serde(default)]
-    status: i32,
+    pub is_default: u32,
 }
 
 impl MSubChainBasicInfo {
@@ -130,11 +128,14 @@ impl MSubChainBasicInfo {
 }
 
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MAccountInfoSyncProg {
-    account: String,
-    block_no: String,
-    block_hash: String,
+    #[serde(default)]
+    pub account: String,
+    #[serde(default)]
+    pub block_no: String,
+    #[serde(default)]
+    pub block_hash: String,
 }
 
 impl MAccountInfoSyncProg {
@@ -151,14 +152,40 @@ mod tests {
     use rbatis::crud::CRUDEnable;
     use rbatis::rbatis::Rbatis;
 
+    use crate::ChainType;
     use crate::kits::test::make_memory_rbatis_test;
-    use crate::ma::{Db, DbCreateType};
+    use crate::ma::{Db, DbCreateType, MAccountInfoSyncProg, MEeeChainToken, MEeeTokenxTx, MSubChainBasicInfo};
     use crate::ma::dao::{BeforeSave, BeforeUpdate, Dao, Shared};
     use crate::ma::data_eee::MEeeChainTx;
 
     #[test]
+    fn m_eee_chain_token_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MEeeChainToken::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut m = MEeeChainToken::default();
+        m.chain_type = ChainType::EEE.to_string();
+        m.wallet_id = "wallet_id".to_owned();
+
+        let re = block_on(m.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MEeeChainToken::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let ms = re.unwrap();
+        assert_eq!(1, ms.len(), "{:?}", ms);
+
+        let db_m = &ms.as_slice()[0];
+        assert_eq!(&m, db_m);
+
+        let re = block_on(MEeeChainToken::fetch_by_id(&rb, "", &m.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_m = re.unwrap().unwrap();
+        assert_eq!(m, db_m);
+    }
+
+    #[test]
     #[allow(non_snake_case)]
-    fn test_EeeChainTx() {
+    fn m_eee_chain_tx_test() {
         // let colx = EeeChainTx::table_columns();
         let mut m = MEeeChainTx::default();
         assert_eq!("", m.get_id());
@@ -206,16 +233,7 @@ mod tests {
 
         assert_eq!(false, re.is_err(), "{:?}", re);
         let m2 = re.unwrap().unwrap();
-        assert_eq!(m.id, m2.id);
-        assert_eq!(m.update_time, m2.update_time);
-        assert_eq!(m.create_time, m2.create_time);
-
-        assert_eq!(m.from_address, m2.from_address);
-        assert_eq!(m.extension, m2.extension);
-        assert_eq!(m.status, m2.status);
-
-        assert_eq!(m.tx_shared.tx_hash, m2.tx_shared.tx_hash);
-
+        assert_eq!(m, m2);
 
         let mut m3 = MEeeChainTx::default();
         m3.tx_shared.tx_hash = "m3".to_owned();
@@ -228,9 +246,89 @@ mod tests {
         assert_eq!(2, list.len());
     }
 
+    #[test]
+    fn m_eee_tokenx_tx_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MEeeTokenxTx::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut m = MEeeTokenxTx::default();
+        m.value = "value".to_owned();
+
+        let re = block_on(m.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MEeeTokenxTx::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let ms = re.unwrap();
+        assert_eq!(1, ms.len(), "{:?}", ms);
+
+        let db_m = &ms.as_slice()[0];
+        assert_eq!(&m, db_m);
+
+        let re = block_on(MEeeTokenxTx::fetch_by_id(&rb, "", &m.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_m = re.unwrap().unwrap();
+        assert_eq!(m, db_m);
+    }
+
+    #[test]
+    fn m_sub_chain_basic_info_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MSubChainBasicInfo::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut m = MSubChainBasicInfo::default();
+        m.metadata = "metadata".to_owned();
+
+        let re = block_on(m.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MSubChainBasicInfo::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let ms = re.unwrap();
+        assert_eq!(1, ms.len(), "{:?}", ms);
+
+        let db_m = &ms.as_slice()[0];
+        assert_eq!(&m, db_m);
+
+        let re = block_on(MSubChainBasicInfo::fetch_by_id(&rb, "", &m.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_m = re.unwrap().unwrap();
+        assert_eq!(m, db_m);
+    }
+
+    #[test]
+    fn m_account_info_sync_prog_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MAccountInfoSyncProg::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut m = MAccountInfoSyncProg::default();
+        m.block_no = "block_no".to_owned();
+
+        let re = block_on(m.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MAccountInfoSyncProg::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let ms = re.unwrap();
+        assert_eq!(1, ms.len(), "{:?}", ms);
+
+        let db_m = &ms.as_slice()[0];
+        assert_eq!(&m, db_m);
+
+        let re = block_on(MAccountInfoSyncProg::fetch_by_id(&rb, "", &m.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_m = re.unwrap().unwrap();
+        assert_eq!(m, db_m);
+    }
+
     async fn init_memory() -> Rbatis {
         let rb = make_memory_rbatis_test().await;
+        let r = Db::create_table(&rb, MEeeChainToken::create_table_script(), &MEeeChainToken::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
         let r = Db::create_table(&rb, MEeeChainTx::create_table_script(), &MEeeChainTx::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        let r = Db::create_table(&rb, MEeeTokenxTx::create_table_script(), &MEeeTokenxTx::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        let r = Db::create_table(&rb, MSubChainBasicInfo::create_table_script(), &MSubChainBasicInfo::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        let r = Db::create_table(&rb, MAccountInfoSyncProg::create_table_script(), &MAccountInfoSyncProg::table_name(), &DbCreateType::Drop).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         rb
     }

@@ -120,14 +120,14 @@ mod tests {
     fn mnemonic_test() {
         unsafe {//invalid parameters
             let c_err = Wallets_generateMnemonic(null_mut()) as *mut CError;
-            assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+            assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
             CError_free(c_err);
         }
         unsafe {
             let ptr = CStr_dAlloc();
             let c_err = Wallets_generateMnemonic(ptr) as *mut CError;
             assert_ne!(null_mut(), c_err);
-            assert_eq!(0 as CU64, (*c_err).code, "{:?}", c_err);
+            assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
             let words: Vec<&str> = to_str(*ptr).split(" ").collect();
             CStr_dFree(ptr);
             CError_free(c_err);
@@ -145,7 +145,7 @@ mod tests {
                 let mut c_parameters = CInitParameters::to_c_ptr(&parameters);
                 {
                     let c_err = Wallets_init(c_parameters, c_ctx) as *mut CError;
-                    assert_eq!(0 as CU64, (*c_err).code, "{:?}", c_err);
+                    assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
                     CError_free(c_err);
                 }
                 c_parameters.free();
@@ -156,7 +156,7 @@ mod tests {
                 let p_mn = CStr_dAlloc();
                 {
                     let c_err = Wallets_generateMnemonic(p_mn) as *mut CError;
-                    assert_eq!(0 as CU64, (*c_err).code, "{:?}", c_err);
+                    assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
                     CError_free(c_err);
                 }
                 let mn = to_str(*p_mn).to_owned();
@@ -174,27 +174,27 @@ mod tests {
                     let mut c_wallet = CWallet_dAlloc();
                     {
                         let c_err = Wallets_createWallet(null_mut(), null_mut(), null_mut()) as *mut CError;
-                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                         CError_free(c_err);
 
                         let c_err = Wallets_createWallet(null_mut(), parameters, null_mut()) as *mut CError;
-                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                         CError_free(c_err);
 
                         let c_err = Wallets_createWallet(null_mut(), null_mut(), c_wallet) as *mut CError;
-                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                         CError_free(c_err);
 
                         let c_err = Wallets_createWallet(*c_ctx, null_mut(), null_mut()) as *mut CError;
-                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                         CError_free(c_err);
 
                         let c_err = Wallets_createWallet(*c_ctx, parameters, null_mut()) as *mut CError;
-                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                         CError_free(c_err);
 
                         let c_err = Wallets_createWallet(*c_ctx, null_mut(), c_wallet) as *mut CError;
-                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                        assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                         CError_free(c_err);
                     }
                     c_wallet.free();
@@ -231,20 +231,20 @@ mod tests {
     fn init_test() {
         unsafe { //参数不正确的测试
             let c_err = Wallets_init(null_mut(), null_mut()) as *mut CError;
-            assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+            assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
             CError_free(c_err);
 
             let mut parameters = CInitParameters::to_c_ptr(&init_parameters());
             {
                 let c_err = Wallets_init(parameters, null_mut()) as *mut CError;
-                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
 
                 let ctx = CContext_dAlloc();
                 {
                     assert_ne!(null_mut(), ctx);
                     let c_err = Wallets_init(null_mut(), ctx) as *mut CError;
-                    assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                    assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                     CError_free(c_err);
                 }
                 CContext_dFree(ctx);
@@ -258,7 +258,7 @@ mod tests {
             let mut c_parameters = CInitParameters::to_c_ptr(&parameters);
             let c_err = Wallets_init(c_parameters, ctx) as *mut CError;
             assert_ne!(null_mut(), c_err);
-            assert_eq!(0 as CU64, (*c_err).code, "{:?}", c_err);
+            assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
             CError_free(c_err);
             c_parameters.free();
 
@@ -282,23 +282,23 @@ mod tests {
             let mut c_wallet = CWallet_dAlloc();
             {
                 let c_err = Wallets_findById(null_mut(), null_mut(), null_mut()) as *mut CError;
-                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
                 let c_err = Wallets_findById(null_mut(), c_wallet_id, null_mut()) as *mut CError;
-                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
                 let c_err = Wallets_findById(null_mut(), null_mut(), c_wallet) as *mut CError;
-                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
 
                 let c_err = Wallets_findById(c_ctx, null_mut(), null_mut()) as *mut CError;
-                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
                 let c_err = Wallets_findById(c_ctx, c_wallet_id, null_mut()) as *mut CError;
-                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
                 let c_err = Wallets_findById(c_ctx, null_mut(), c_wallet) as *mut CError;
-                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", c_err);
+                assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
             }
             c_wallet.free();
@@ -312,12 +312,12 @@ mod tests {
                 {
                     let mut not_id = to_c_char(kits::uuid().as_str());
                     let c_err = Wallets_findById(c_ctx, not_id, c_wallet) as *mut CError;
-                    assert_eq!(Error::NoRecord().code, (*c_err).code, "{:?}", c_err);
+                    assert_eq!(Error::NoRecord().code, (*c_err).code, "{:?}", *c_err);
                     CError_free(c_err);
                     not_id.free();
 
                     let c_err = Wallets_findById(c_ctx, c_wallet_id, c_wallet) as *mut CError;
-                    assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", c_err);
+                    assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
                     CError_free(c_err);
                 }
                 let wallet = CWallet::to_rust(&**c_wallet);

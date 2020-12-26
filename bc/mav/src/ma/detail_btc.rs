@@ -38,11 +38,11 @@ impl ToString for BtcTokenType {
 
 //btc
 #[db_append_shared(CRUDEnable)]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTokenShared {
     #[serde(flatten)]
     pub token_shared: MTokenShared,
-
+    #[serde(default)]
     pub token_type: String,
     //
     // pub contract_address: String,
@@ -61,11 +61,13 @@ impl MBtcChainTokenShared {
 }
 
 #[db_append_shared]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTokenAuth {
     /// [BtcChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
+    #[serde(default)]
+    pub net_type: String,
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
@@ -79,12 +81,12 @@ impl MBtcChainTokenAuth {
 
 /// DefaultToken must be a [BtcChainTokenAuth]
 #[db_append_shared(CRUDEnable)]
-#[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTokenDefault {
     /// [BtcChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
-
+    #[serde(default)]
     pub net_type: String,
     /// 显示位置，以此从小到大排列
     #[serde(default)]
@@ -103,14 +105,114 @@ impl MBtcChainTokenDefault {
 
 #[cfg(test)]
 mod tests {
+    use futures::executor::block_on;
+    use rbatis::crud::CRUDEnable;
+    use rbatis::rbatis::Rbatis;
     use strum::IntoEnumIterator;
 
-    use crate::ma::BtcTokenType;
+    use crate::kits::test::make_memory_rbatis_test;
+    use crate::ma::{BtcTokenType, Dao, Db, DbCreateType, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared};
+    use crate::NetType;
 
     #[test]
     fn btc_token_type_test() {
         for it in BtcTokenType::iter() {
             assert_eq!(it, BtcTokenType::from(&it.to_string()).unwrap());
         }
+    }
+
+    #[test]
+    fn m_btc_chain_token_default_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MBtcChainTokenDefault::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut token = MBtcChainTokenDefault::default();
+        token.chain_token_shared_id = "chain_token_shared_id".to_owned();
+        token.net_type = NetType::Main.to_string();
+        token.position = 1;
+
+        let re = block_on(token.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MBtcChainTokenDefault::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let tokens = re.unwrap();
+        assert_eq!(1, tokens.len(), "{:?}", tokens);
+
+        let db_token = &tokens.as_slice()[0];
+        assert_eq!(&token, db_token);
+
+        let re = block_on(MBtcChainTokenDefault::fetch_by_id(&rb, "", &token.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_token = re.unwrap().unwrap();
+        assert_eq!(token, db_token);
+    }
+
+    #[test]
+    fn m_btc_chain_token_shared_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MBtcChainTokenShared::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut token = MBtcChainTokenShared::default();
+        token.token_type = BtcTokenType::Btc.to_string();
+        token.decimal = 18;
+        token.token_shared.project_name = "test".to_owned();
+        token.token_shared.project_home = "http://".to_owned();
+        token.token_shared.project_note = "test".to_owned();
+        token.token_shared.logo_bytes = "bytes".to_owned();
+        token.token_shared.logo_url = "http://".to_owned();
+        token.token_shared.symbol = "BTC".to_owned();
+        token.token_shared.name = "BTC".to_owned();
+
+        let re = block_on(token.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MBtcChainTokenShared::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let tokens = re.unwrap();
+        assert_eq!(1, tokens.len(), "{:?}", tokens);
+
+        let db_token = &tokens.as_slice()[0];
+        assert_eq!(&token, db_token);
+
+        let re = block_on(MBtcChainTokenShared::fetch_by_id(&rb, "", &token.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_token = re.unwrap().unwrap();
+        assert_eq!(token, db_token);
+    }
+
+    #[test]
+    fn m_btc_chain_token_auth_test() {
+        let rb = block_on(init_memory());
+        let re = block_on(MBtcChainTokenAuth::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let mut token = MBtcChainTokenAuth::default();
+        token.chain_token_shared_id = "chain_token_shared_id".to_owned();
+        token.net_type = NetType::Main.to_string();
+        token.position = 1;
+
+        let re = block_on(token.save(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let re = block_on(MBtcChainTokenAuth::list(&rb, ""));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let tokens = re.unwrap();
+        assert_eq!(1, tokens.len(), "{:?}", tokens);
+
+        let db_token = &tokens.as_slice()[0];
+        assert_eq!(&token, db_token);
+
+        let re = block_on(MBtcChainTokenAuth::fetch_by_id(&rb, "", &token.id));
+        assert_eq!(false, re.is_err(), "{:?}", re);
+        let db_token = re.unwrap().unwrap();
+        assert_eq!(token, db_token);
+    }
+
+    async fn init_memory() -> Rbatis {
+        let rb = make_memory_rbatis_test().await;
+        let r = Db::create_table(&rb, MBtcChainTokenDefault::create_table_script(), &MBtcChainTokenDefault::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        let r = Db::create_table(&rb, MBtcChainTokenShared::create_table_script(), &MBtcChainTokenShared::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        let r = Db::create_table(&rb, MBtcChainTokenAuth::create_table_script(), &MBtcChainTokenAuth::table_name(), &DbCreateType::Drop).await;
+        assert_eq!(false, r.is_err(), "{:?}", r);
+        rb
     }
 }

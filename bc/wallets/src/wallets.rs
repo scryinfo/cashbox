@@ -5,9 +5,9 @@ use failure::_core::sync::atomic::Ordering;
 use parking_lot::{RawMutex, RawThreadId};
 use parking_lot::lock_api::RawReentrantMutex;
 
+use eee::Crypto;
 use mav::{ChainType, NetType, WalletType};
-use mav::ma::{BeforeSave, Dao, Db, MAddress, MMnemonic, MWallet, DbCreateType};
-use eee::{Crypto};
+use mav::ma::{BeforeSave, Dao, Db, DbCreateType, MAddress, MMnemonic, MWallet};
 use scry_crypto::Keccak256;
 use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait};
 
@@ -58,7 +58,7 @@ impl Wallets {
     pub async fn init(&mut self, parameters: &InitParameters) -> Result<&Context, WalletError> {
         self.ctx.context_note = parameters.context_note.clone();
         self.db.init(&parameters.db_name).await?;
-        self.db.init_tables(&DbCreateType::NotExists);
+        self.db.init_tables(&DbCreateType::NotExists).await?;
         //todo
         Ok(&self.ctx)
     }

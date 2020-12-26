@@ -78,8 +78,7 @@ pub struct TransferPayload {
     pub password: String,
 }
 
-#[repr(C)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default,Clone)]
 pub struct AccountInfo {
     pub nonce: u32,
     pub ref_count: u32,
@@ -87,6 +86,27 @@ pub struct AccountInfo {
     pub reserved: String,
     pub misc_frozen: String,
     pub fee_frozen: String,
+}
+
+
+#[derive(Debug, Clone,Default)]
+pub struct DecodeAccountInfoParameters {
+    pub net_type:String,
+    pub encode_data:String,
+    pub genesis_hash: String,
+    pub runtime_version: i32,
+    pub tx_version: i32,
+}
+
+#[derive(Debug, Clone, Default,)]
+pub struct StorageKeyParameters {
+    pub net_type:String,
+    pub genesis_hash: String,
+    pub runtime_version: i32,
+    pub tx_version: i32,
+    pub module: String,
+    pub storage_item:String,
+    pub pub_key:String,
 }
 
 
