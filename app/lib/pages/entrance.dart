@@ -1,6 +1,7 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/net/net_util.dart';
+import 'package:app/model/server_config_model.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -76,128 +77,76 @@ class _EntrancePageState extends State<EntrancePage> {
     // handle case : Config upgrade.
     try {
       if (lastTimeConfigCheck == null || ((nowTimeStamp - lastTimeConfigCheck) - config.intervalMilliseconds * 1000 > 0)) {
-        var result = await requestWithConfigCheckParam(config.privateConfig.serverConfigIp);
-        var resultCode = result["code"];
-        var resultData = result["data"];
-        if (result != null && resultCode != null && resultCode == 0) {
-          var isLatestConfig = resultData["isLatestConfig"];
-          var isLatestApk = resultData["isLatestApk"];
+        var configVersionObj = await requestWithConfigVersion("http://192.168.2.12:8080/inner_api/config/info");
+        ServerConfigModel serverConfigModel = ServerConfigModel.fromJson(configVersionObj);
+        print("serverConfigModel--->" + serverConfigModel.toString());
+        if (serverConfigModel.code != 0) {
+          LogUtil.instance.i("_checkServerAppConfig(), serverConfigModel.code error is =======>", serverConfigModel.code.toString());
+          return;
+        }
 
-          ///update config information
-          if (isLatestConfig == null || !isLatestConfig) {
-            var latestConfigObj = resultData["latestConfig"];
-            var isLatestAuthToken = resultData["isLatestAuthToken"];
-
-            ///check and update  EeeChain txVersion and runtimeVersion
+        ///check and update  EeeChain txVersion and runtimeVersion
+        try {
+          ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+          Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0); // get local default Eee chain info
+          if (getSubChainMap == null || !getSubChainMap.containsKey("status") || getSubChainMap["status"] != 200) {
+            Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
+            LogUtil.instance.i("updateSubChainBasicInfo  ", "empty case!");
+          } else if (serverConfigModel.data.latestConfig.eeeRuntimeV == null ||
+              getSubChainMap["runtimeVersion"] == null ||
+              serverConfigModel.data.latestConfig.eeeTxV == null ||
+              getSubChainMap["txVersion"] == null ||
+              serverConfigModel.data.latestConfig.eeeRuntimeV.toString() != getSubChainMap["runtimeVersion"].toString() ||
+              serverConfigModel.data.latestConfig.eeeTxV != getSubChainMap["txVersion"].toString()) {
+            Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
+            LogUtil.instance.i("updateSubChainBasicInfo  ", " finish do updateSubChainBasicInfo");
+          }
+        } catch (e) {
+          LogUtil.instance.e("updateSubChainBasicInfo error is ---> ", e.toString());
+        }
+        {
+          config.lastTimeConfigCheck = nowTimeStamp;
+          config.serverAppVersion = serverConfigModel.data.latestConfig.appConfigVersion;
+          config.privateConfig.authDigitVersion = serverConfigModel.data.latestConfig.authTokenListVersion;
+          config.privateConfig.defaultDigitVersion = serverConfigModel.data.latestConfig.defaultTokenListVersion;
+          config.privateConfig.serverApkVersion = serverConfigModel.data.latestConfig.apkVersion;
+          config.privateConfig.rateUrl = serverConfigModel.data.latestConfig.tokenToLegalTenderExchangeRateIp;
+          config.privateConfig.scryXIp = serverConfigModel.data.latestConfig.scryXChainUrl;
+          config.privateConfig.downloadLatestAppUrl = serverConfigModel.data.latestConfig.apkDownloadLink;
+          config.privateConfig.publicIp = serverConfigModel.data.latestConfig.announcementUrl;
+          config.privateConfig.dappOpenUrl = serverConfigModel.data.latestConfig.dappOpenUrl;
+          if (serverConfigModel.data.latestConfig.authTokenUrl != null && serverConfigModel.data.latestConfig.authTokenUrl.length > 0) {
+            config.privateConfig.authDigitIpList = [];
+            serverConfigModel.data.latestConfig.authTokenUrl.forEach((element) {
+              config.privateConfig.authDigitIpList.add(element);
+            });
+          }
+          if (serverConfigModel.data.latestConfig.defaultTokenUrl != null && serverConfigModel.data.latestConfig.defaultTokenUrl.length > 0) {
+            config.privateConfig.defaultDigitIpList = [];
+            serverConfigModel.data.latestConfig.defaultTokenUrl.forEach((element) {
+              config.privateConfig.defaultDigitIpList.add(element);
+            });
+            //update defaultDigitList to native
             try {
-              ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-              Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0); // get local default Eee chain info
-              if (getSubChainMap == null || !getSubChainMap.containsKey("status") || getSubChainMap["status"] != 200) {
-                Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
-                LogUtil.instance.i("updateSubChainBasicInfo  ", "empty case!");
-              } else if (latestConfigObj["runtimeVersion"] == null ||
-                  getSubChainMap["runtimeVersion"] == null ||
-                  latestConfigObj["txVersion"] == null ||
-                  getSubChainMap["txVersion"] == null ||
-                  latestConfigObj["runtimeVersion"].toString() != getSubChainMap["runtimeVersion"].toString() ||
-                  latestConfigObj["txVersion"].toString() != getSubChainMap["txVersion"].toString()) {
-                Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
-                LogUtil.instance.i("updateSubChainBasicInfo  ", " finish do updateSubChainBasicInfo");
+              var defaultDigitParam = await requestWithDeviceId(config.privateConfig.defaultDigitIpList[0].toString());
+              if (defaultDigitParam["code"] != null && defaultDigitParam["code"] == 0) {
+                String paramString = convert.jsonEncode(defaultDigitParam["data"]);
+                var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
+                LogUtil.instance.i("updateDefaultDigitList=====>", updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
               }
             } catch (e) {
-              LogUtil.instance.e("updateSubChainBasicInfo error is ---> ", e.toString());
-            }
-
-            ///update auth digit list
-            if (!isLatestAuthToken) {
-              List authTokenUrlList = latestConfigObj["authTokenUrl"];
-              if (authTokenUrlList != null && authTokenUrlList.length > 0) {
-                config.privateConfig.authDigitIpList = [];
-                authTokenUrlList.forEach((element) {
-                  config.privateConfig.authDigitIpList.add(element.toString());
-                });
-              }
-              config.privateConfig.authDigitVersion = latestConfigObj["authTokenListVersion"];
-            }
-            var isLatestDefaultToken = resultData["isLatestDefaultToken"];
-
-            ///update default digit list
-            if (!isLatestDefaultToken) {
-              List defaultTokenIpList = latestConfigObj["defaultTokenUrl"];
-              if (defaultTokenIpList != null && (defaultTokenIpList.length > 0)) {
-                config.privateConfig.defaultDigitIpList = [];
-                defaultTokenIpList.forEach((element) {
-                  config.privateConfig.defaultDigitIpList.add(element);
-                });
-                config.privateConfig.defaultDigitVersion = latestConfigObj["defaultTokenListVersion"];
-                //update defaultDigitList to native
-                try {
-                  var defaultDigitParam = await requestWithDeviceId(defaultTokenIpList[0].toString());
-                  if (defaultDigitParam["code"] != null && defaultDigitParam["code"] == 0) {
-                    String paramString = convert.jsonEncode(defaultDigitParam["data"]);
-                    var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
-                    LogUtil.instance.i("updateDefaultDigitList=====>", updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
-                  }
-                } catch (e) {
-                  LogUtil.instance.e("updateDefaultDigitList error =====>", e.toString());
-                }
-              }
-            }
-
-            ///update digit Rate
-            var tokenToLegalTenderExchangeRateIp = latestConfigObj["tokenToLegalTenderExchangeRateIp"];
-            if (tokenToLegalTenderExchangeRateIp != null && tokenToLegalTenderExchangeRateIp.toString().isNotEmpty) {
-              config.privateConfig.rateUrl = tokenToLegalTenderExchangeRateIp;
-            }
-
-            ///update scryX
-            var scryXChainUrl = latestConfigObj["scryXChainUrl"];
-            if (scryXChainUrl != null && scryXChainUrl.toString().isNotEmpty) {
-              config.privateConfig.scryXIp = scryXChainUrl;
-            }
-
-            ///update announcementUrl
-            var announcementUrl = latestConfigObj["announcementUrl"];
-            if (announcementUrl != null && announcementUrl.toString().isNotEmpty) {
-              config.privateConfig.publicIp = announcementUrl;
-            }
-
-            ///update downloadUrl
-            var apkDownloadLink = latestConfigObj["apkDownloadLink"];
-            if (apkDownloadLink != null && apkDownloadLink.toString().isNotEmpty) {
-              config.privateConfig.downloadLatestAppUrl = apkDownloadLink;
-            }
-
-            ///update appConfigVersion
-            var appConfigVersion = latestConfigObj["appConfigVersion"];
-            if (appConfigVersion != null && appConfigVersion.toString().isNotEmpty) {
-              config.privateConfig.configVersion = appConfigVersion;
-            }
-
-            ///update appConfigVersion
-            var dappOpenUrlValue = latestConfigObj["dappOpenUrl"];
-            if (dappOpenUrlValue != null && dappOpenUrlValue.toString().isNotEmpty) {
-              config.privateConfig.dappOpenUrl = dappOpenUrlValue;
+              LogUtil.instance.e("updateDefaultDigitList error =====>", e.toString());
             }
           }
-          if (isLatestApk == null || !isLatestApk) {
-            var latestApkObj = resultData["latestApk"];
-            LogUtil.instance.i("_checkServerAppConfig latestApkObj======>", latestApkObj.toString());
-            String apkVersion = latestApkObj["apkVersion"].toString();
-            if (apkVersion != null && apkVersion.isNotEmpty) {
-              config.privateConfig.serverApkVersion = apkVersion;
-            }
-          }
-          // save changed config
-          HandleConfig.instance.saveConfig(config);
-        } else {
-          LogUtil.instance.i("_checkAndUpdateAppConfig() requestWithVersionParam ", "result status is not ok");
+          config.privateConfig.configVersion = serverConfigModel.data.latestConfig.appConfigVersion;
         }
+        // save changed config
+        HandleConfig.instance.saveConfig(config);
       } else {
         LogUtil.instance.i("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>", (nowTimeStamp - lastTimeConfigCheck).toString());
       }
     } catch (e) {
-      LogUtil.instance.i("_checkServerAppConfig(), error is =======>", e.toString());
+      LogUtil.instance.e("_checkServerAppConfig(), error is =======>", e.toString());
     }
   }
 

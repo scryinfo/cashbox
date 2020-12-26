@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.Intent;
+import android.os.Environment;
 
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodCall;
@@ -97,6 +98,7 @@ public class MainActivity extends FlutterActivity {
                 .downloadOnly(
                         UIData.create().setTitle(getString(R.string.new_version_title)).setContent(getString(R.string.search_new_version) + serverVersion + getString(R.string.search_new_version_end)).setDownloadUrl(loadUrl)
                 )
+                .setDownloadAPKPath(this.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath() + "/")
                 .executeMission(MainActivity.this);
     }
 

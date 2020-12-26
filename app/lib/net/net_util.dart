@@ -53,6 +53,17 @@ Future requestWithDeviceId(String url, {formData}) async {
   return request(url, formData: formData);
 }
 
+Future requestWithConfigVersion(String url, {formData}) async {
+  if (formData == null) formData = {};
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  String apkVersion = packageInfo.version;
+  formData["apkVersion"] = apkVersion;
+
+  Config config = await HandleConfig.instance.getConfig();
+  formData["appConfigVersion"] = config.privateConfig.configVersion;
+  return requestWithDeviceId(url, formData: formData);
+}
+
 Future requestWithConfigCheckParam(String url, {formData}) async {
   if (formData == null) formData = {};
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
