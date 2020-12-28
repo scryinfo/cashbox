@@ -4,20 +4,24 @@ import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
 import 'package:flutter/material.dart';
-import 'package:wallets/parameter.dart';
+import 'package:wallets/wallets_c.dart';
+import 'package:wallets/wallets_c.dc.dart';
 
+import 'kits.dart';
 import 'wallets_c.dart' as clib;
-import 'error.dart';
 
 const _False = 0;
 const _True = 1;
 const _dlName = "wallets_cdl";
+
 //todo 多线程，怎么处理实现
 class Wallets {
-
   Pointer<clib.CContext> _context;
+
   Pointer<clib.CContext> get context => _context;
+
   Pointer<Pointer<clib.CContext>> get dContext => _dDontext;
+
   set dContext(Pointer<Pointer<clib.CContext>> ctx) {
     _dDontext = ctx;
     _context = _dDontext.value;
@@ -57,11 +61,11 @@ class Wallets {
     Error err;
     try {
       err = lockRead();
-      if (err.isSuccess()) {
+      if (isSuccess(err)) {
         doRead();
       }
     } finally {
-      if (err.isSuccess()) {
+      if (isSuccess(err)) {
         unlockRead();
       }
     }
@@ -72,11 +76,11 @@ class Wallets {
     Error err;
     try {
       err = lockWrite();
-      if (err.isSuccess()) {
+      if (isSuccess(err)) {
         doWrite();
       }
     } finally {
-      if (err.isSuccess()) {
+      if (isSuccess(err)) {
         unlockWrite();
       }
     }
@@ -84,7 +88,6 @@ class Wallets {
   }
 
   Error init(InitParameters parameters) {
-
     var ptrParameters = parameters.toC();
     var dptrContext = clib.CContext_dAlloc();
     var cerr = clib.Wallets_init(ptrParameters, dptrContext);

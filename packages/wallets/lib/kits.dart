@@ -1,6 +1,12 @@
 import 'dart:ffi';
 
-abstract class DC<C extends NativeType>{
+import 'package:wallets/wallets_c.dc.dart';
+
+abstract class DC<C extends NativeType> {
   Pointer<C> toC();
-  // static free<C extends NativeType>(Pointer<C> c);
+
+  toDart(Pointer<C> c);
+// free(Pointer<C> c); //
 }
+
+bool isSuccess(Error err) => err.code == 0;

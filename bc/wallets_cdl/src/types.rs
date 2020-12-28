@@ -63,9 +63,9 @@ pub struct CTokenShared {
     pub symbol: *mut c_char,
     pub logoUrl: *mut c_char,
     pub logoBytes: *mut c_char,
-    pub project_name: *mut c_char,
-    pub project_home: *mut c_char,
-    pub project_note: *mut c_char,
+    pub projectName: *mut c_char,
+    pub projectHome: *mut c_char,
+    pub projectNote: *mut c_char,
 }
 
 #[repr(C)]

@@ -1,14 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path/path.dart';
-import 'package:wallets/error.dart';
-import 'package:wallets/parameter.dart';
+import 'package:wallets/kits.dart';
 
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dart' as clib;
 
 import 'dart:ffi';
 import 'package:ffi/ffi.dart' as ffi;
+import 'package:wallets/wallets_c.dc.dart';
 
 void main() {
   test('Wallets', () async {
@@ -32,30 +31,31 @@ void main() {
       var err = wallet.safeRead(() {
         //...
       });
-      expect(true, err.isSuccess());
+      expect(true, isSuccess(err));
       err = wallet.safeRead(() {
         //...
       });
-      expect(true, err.isSuccess());
+      expect(true, isSuccess(err));
       err = wallet.safeWrite(() {
         // ...
       });
-      expect(true, err.isSuccess());
+      expect(true, isSuccess(err));
     }
 
     {
       var err = await compute(computeFun, wallet.dContext.address);
-      expect(true, err.isSuccess());
+      expect(true, isSuccess(err));
     }
     {
       var mnemonic = clib.CStr_dAlloc();
       var cerr = clib.Wallets_generateMnemonic(mnemonic);
       var err = Error.fromC(cerr);
-      expect(true, err.isSuccess());
+      expect(true, isSuccess(err));
     }
     wallet.uninit();
   });
 }
+
 Error computeFun(int ctx) {
   var wallet = Wallets.instance();
   wallet.dContext = Pointer<Pointer<clib.CContext>>.fromAddress(ctx);
@@ -64,5 +64,3 @@ Error computeFun(int ctx) {
   });
   return err;
 }
-
-

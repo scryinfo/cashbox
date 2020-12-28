@@ -101,3 +101,5 @@ git
 /app/dl/x86/libwallets_cdl.so
 /app/dl/x86_64/libwallets_cdl.so
 /bc/mav/cashbox_mnemonic.db
+/packages/gen_dl/pubspec.lock
+/packages/gen_dl/.metadata

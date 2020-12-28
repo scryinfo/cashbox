@@ -1,0 +1,9 @@
+# Read about `build.yaml` at https://pub.dev/packages/build_config
+builders:
+  dc:
+    import: "package:gen_dl/builder.dart"
+    builder_factories: [ "dcBuilder" ]
+    build_extensions: { ".dart": [ ".dc.part" ] }
+    auto_apply: dependents
+    build_to: source
+#    applies_builders: ["source_gen|combining_builder"]

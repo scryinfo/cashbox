@@ -60,13 +60,13 @@ typedef struct CChainShared {
 } CChainShared;
 
 typedef struct CTokenShared {
-    char *chainType;
     char *name;
     char *symbol;
     char *logoUrl;
     char *logoBytes;
-    char *project;
-    bool auth;
+    char *projectName;
+    char *projectHome;
+    char *projectNote;
 } CTokenShared;
 
 typedef struct CEthChainTokenShared {
@@ -344,8 +344,7 @@ const CError *ChainEee_txSign(CContext *ctx, CRawTxParam *rawTx, char **signedRe
 
 const CError *ChainEee_updateBasicInfo(CContext *ctx, CSubChainBasicInfo *basicInfo, CBool *isDefault);
 
-const CError *ChainEee_getBasicInfo(CContext *ctx, char *genesisHash, CU32 *specVersion, CU32 *txVersion,
-                                    CSubChainBasicInfo **basicInfo);
+const CError *ChainEee_getBasicInfo(CContext *ctx, char *genesisHash, CU32 *specVersion, CU32 *txVersion, CSubChainBasicInfo **basicInfo);
 
 #ifdef __cplusplus
 } // extern "C"

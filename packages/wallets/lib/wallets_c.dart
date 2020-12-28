@@ -4,10 +4,14 @@ import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart' as ffi;
 
+import 'kits.dart';
+
 // ignore_for_file: unused_import, camel_case_types, non_constant_identifier_names
 final DynamicLibrary _dl = _open();
+
 /// Reference to the Dynamic Library, it should be only used for low-level access
 final DynamicLibrary dl = _dl;
+
 DynamicLibrary _open() {
   if (Platform.isWindows) return DynamicLibrary.open('wallets_cdl.dll');
   if (Platform.isLinux) return DynamicLibrary.open('libwallets_cdl.so');
@@ -17,90 +21,87 @@ DynamicLibrary _open() {
 
 /// C struct `CAccountInfo`.
 class CAccountInfo extends Struct {
-  
   @Uint32()
   int nonce;
   @Uint32()
   int ref_count;
-  Pointer<ffi.Utf8> free;
+  Pointer<ffi.Utf8> free_;
   Pointer<ffi.Utf8> reserved;
   Pointer<ffi.Utf8> misc_frozen;
   Pointer<ffi.Utf8> fee_frozen;
+
   static Pointer<CAccountInfo> allocate() {
     return ffi.allocate<CAccountInfo>();
   }
 
-
   static CAccountInfo from(int ptr) {
     return Pointer<CAccountInfo>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CAddress`.
 class CAddress extends Struct {
-  
   Pointer<ffi.Utf8> id;
   Pointer<ffi.Utf8> walletId;
   Pointer<ffi.Utf8> chainType;
   Pointer<ffi.Utf8> address;
   Pointer<ffi.Utf8> publicKey;
+
   static Pointer<CAddress> allocate() {
     return ffi.allocate<CAddress>();
   }
 
-
   static CAddress from(int ptr) {
     return Pointer<CAddress>.fromAddress(ptr).ref;
   }
-
 }
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCBtcChainToken extends Struct {
-  
   Pointer<CBtcChainToken> ptr;
   @Uint64()
   int len;
   @Uint64()
   int cap;
+
   static Pointer<CArrayCBtcChainToken> allocate() {
     return ffi.allocate<CArrayCBtcChainToken>();
   }
 
-
   static CArrayCBtcChainToken from(int ptr) {
     return Pointer<CArrayCBtcChainToken>.fromAddress(ptr).ref;
   }
-
 }
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCContext extends Struct {
-  
   Pointer<CContext> ptr;
   @Uint64()
   int len;
   @Uint64()
   int cap;
+
   static Pointer<CArrayCContext> allocate() {
     return ffi.allocate<CArrayCContext>();
   }
 
-
   static CArrayCContext from(int ptr) {
     return Pointer<CArrayCContext>.fromAddress(ptr).ref;
   }
-
 }
 
 /// <p class="para-brief"> alloc ** [CArray]</p>
 Pointer<Pointer<CArrayCContext>> CArrayCContext_dAlloc() {
   return _CArrayCContext_dAlloc();
 }
-final _CArrayCContext_dAlloc_Dart _CArrayCContext_dAlloc = _dl.lookupFunction<_CArrayCContext_dAlloc_C, _CArrayCContext_dAlloc_Dart>('CArrayCContext_dAlloc');
+
+final _CArrayCContext_dAlloc_Dart _CArrayCContext_dAlloc =
+    _dl.lookupFunction<_CArrayCContext_dAlloc_C, _CArrayCContext_dAlloc_Dart>(
+        'CArrayCContext_dAlloc');
+
 typedef _CArrayCContext_dAlloc_C = Pointer<Pointer<CArrayCContext>> Function();
-typedef _CArrayCContext_dAlloc_Dart = Pointer<Pointer<CArrayCContext>> Function();
+typedef _CArrayCContext_dAlloc_Dart = Pointer<Pointer<CArrayCContext>>
+    Function();
 
 /// C function `CArrayCContext_dFree`.
 void CArrayCContext_dFree(
@@ -108,7 +109,11 @@ void CArrayCContext_dFree(
 ) {
   _CArrayCContext_dFree(dPtr);
 }
-final _CArrayCContext_dFree_Dart _CArrayCContext_dFree = _dl.lookupFunction<_CArrayCContext_dFree_C, _CArrayCContext_dFree_Dart>('CArrayCContext_dFree');
+
+final _CArrayCContext_dFree_Dart _CArrayCContext_dFree =
+    _dl.lookupFunction<_CArrayCContext_dFree_C, _CArrayCContext_dFree_Dart>(
+        'CArrayCContext_dFree');
+
 typedef _CArrayCContext_dFree_C = Void Function(
   Pointer<Pointer<CArrayCContext>> dPtr,
 );
@@ -118,66 +123,64 @@ typedef _CArrayCContext_dFree_Dart = void Function(
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCEeeChainToken extends Struct {
-  
   Pointer<CEeeChainToken> ptr;
   @Uint64()
   int len;
   @Uint64()
   int cap;
+
   static Pointer<CArrayCEeeChainToken> allocate() {
     return ffi.allocate<CArrayCEeeChainToken>();
   }
 
-
   static CArrayCEeeChainToken from(int ptr) {
     return Pointer<CArrayCEeeChainToken>.fromAddress(ptr).ref;
   }
-
 }
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCEthChainToken extends Struct {
-  
   Pointer<CEthChainToken> ptr;
   @Uint64()
   int len;
   @Uint64()
   int cap;
+
   static Pointer<CArrayCEthChainToken> allocate() {
     return ffi.allocate<CArrayCEthChainToken>();
   }
 
-
   static CArrayCEthChainToken from(int ptr) {
     return Pointer<CArrayCEthChainToken>.fromAddress(ptr).ref;
   }
-
 }
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCWallet extends Struct {
-  
   Pointer<CWallet> ptr;
   @Uint64()
   int len;
   @Uint64()
   int cap;
+
   static Pointer<CArrayCWallet> allocate() {
     return ffi.allocate<CArrayCWallet>();
   }
 
-
   static CArrayCWallet from(int ptr) {
     return Pointer<CArrayCWallet>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C function `CArrayCWallet_dAlloc`.
 Pointer<Pointer<CArrayCWallet>> CArrayCWallet_dAlloc() {
   return _CArrayCWallet_dAlloc();
 }
-final _CArrayCWallet_dAlloc_Dart _CArrayCWallet_dAlloc = _dl.lookupFunction<_CArrayCWallet_dAlloc_C, _CArrayCWallet_dAlloc_Dart>('CArrayCWallet_dAlloc');
+
+final _CArrayCWallet_dAlloc_Dart _CArrayCWallet_dAlloc =
+    _dl.lookupFunction<_CArrayCWallet_dAlloc_C, _CArrayCWallet_dAlloc_Dart>(
+        'CArrayCWallet_dAlloc');
+
 typedef _CArrayCWallet_dAlloc_C = Pointer<Pointer<CArrayCWallet>> Function();
 typedef _CArrayCWallet_dAlloc_Dart = Pointer<Pointer<CArrayCWallet>> Function();
 
@@ -187,7 +190,11 @@ void CArrayCWallet_dFree(
 ) {
   _CArrayCWallet_dFree(dPtr);
 }
-final _CArrayCWallet_dFree_Dart _CArrayCWallet_dFree = _dl.lookupFunction<_CArrayCWallet_dFree_C, _CArrayCWallet_dFree_Dart>('CArrayCWallet_dFree');
+
+final _CArrayCWallet_dFree_Dart _CArrayCWallet_dFree =
+    _dl.lookupFunction<_CArrayCWallet_dFree_C, _CArrayCWallet_dFree_Dart>(
+        'CArrayCWallet_dFree');
+
 typedef _CArrayCWallet_dFree_C = Void Function(
   Pointer<Pointer<CArrayCWallet>> dPtr,
 );
@@ -199,7 +206,10 @@ typedef _CArrayCWallet_dFree_Dart = void Function(
 Pointer<Pointer<Uint32>> CBool_dAlloc() {
   return _CBool_dAlloc();
 }
-final _CBool_dAlloc_Dart _CBool_dAlloc = _dl.lookupFunction<_CBool_dAlloc_C, _CBool_dAlloc_Dart>('CBool_dAlloc');
+
+final _CBool_dAlloc_Dart _CBool_dAlloc =
+    _dl.lookupFunction<_CBool_dAlloc_C, _CBool_dAlloc_Dart>('CBool_dAlloc');
+
 typedef _CBool_dAlloc_C = Pointer<Pointer<Uint32>> Function();
 typedef _CBool_dAlloc_Dart = Pointer<Pointer<Uint32>> Function();
 
@@ -209,7 +219,10 @@ void CBool_dFree(
 ) {
   _CBool_dFree(dcs);
 }
-final _CBool_dFree_Dart _CBool_dFree = _dl.lookupFunction<_CBool_dFree_C, _CBool_dFree_Dart>('CBool_dFree');
+
+final _CBool_dFree_Dart _CBool_dFree =
+    _dl.lookupFunction<_CBool_dFree_C, _CBool_dFree_Dart>('CBool_dFree');
+
 typedef _CBool_dFree_C = Void Function(
   Pointer<Pointer<Uint32>> dcs,
 );
@@ -219,88 +232,82 @@ typedef _CBool_dFree_Dart = void Function(
 
 /// C struct `CBtcChain`.
 class CBtcChain extends Struct {
-  
   Pointer<CChainShared> chainShared;
   Pointer<CArrayCBtcChainToken> tokens;
+
   static Pointer<CBtcChain> allocate() {
     return ffi.allocate<CBtcChain>();
   }
 
-
   static CBtcChain from(int ptr) {
     return Pointer<CBtcChain>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CBtcChainToken`.
 class CBtcChainToken extends Struct {
-  
   Pointer<CBtcChainTokenShared> btcChainTokenShared;
+
   static Pointer<CBtcChainToken> allocate() {
     return ffi.allocate<CBtcChainToken>();
   }
 
-
   static CBtcChainToken from(int ptr) {
     return Pointer<CBtcChainToken>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CBtcChainTokenShared`.
 class CBtcChainTokenShared extends Struct {
-  
   Pointer<CTokenShared> tokenShared;
+
   static Pointer<CBtcChainTokenShared> allocate() {
     return ffi.allocate<CBtcChainTokenShared>();
   }
 
-
   static CBtcChainTokenShared from(int ptr) {
     return Pointer<CBtcChainTokenShared>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CChainShared`.
 class CChainShared extends Struct {
-  
   Pointer<ffi.Utf8> walletId;
   Pointer<ffi.Utf8> chainType;
   Pointer<CAddress> walletAddress;
+
   static Pointer<CChainShared> allocate() {
     return ffi.allocate<CChainShared>();
   }
 
-
   static CChainShared from(int ptr) {
     return Pointer<CChainShared>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CContext`.
 class CContext extends Struct {
-  
   Pointer<ffi.Utf8> id;
   Pointer<ffi.Utf8> contextNote;
+
   static Pointer<CContext> allocate() {
     return ffi.allocate<CContext>();
   }
 
-
   static CContext from(int ptr) {
     return Pointer<CContext>.fromAddress(ptr).ref;
   }
-
 }
 
 /// <p class="para-brief"> alloc ** [parameters::CContext]</p>
 Pointer<Pointer<CContext>> CContext_dAlloc() {
   return _CContext_dAlloc();
 }
-final _CContext_dAlloc_Dart _CContext_dAlloc = _dl.lookupFunction<_CContext_dAlloc_C, _CContext_dAlloc_Dart>('CContext_dAlloc');
+
+final _CContext_dAlloc_Dart _CContext_dAlloc =
+    _dl.lookupFunction<_CContext_dAlloc_C, _CContext_dAlloc_Dart>(
+        'CContext_dAlloc');
+
 typedef _CContext_dAlloc_C = Pointer<Pointer<CContext>> Function();
 typedef _CContext_dAlloc_Dart = Pointer<Pointer<CContext>> Function();
 
@@ -310,7 +317,10 @@ void CContext_dFree(
 ) {
   _CContext_dFree(dPtr);
 }
-final _CContext_dFree_Dart _CContext_dFree = _dl.lookupFunction<_CContext_dFree_C, _CContext_dFree_Dart>('CContext_dFree');
+
+final _CContext_dFree_Dart _CContext_dFree = _dl
+    .lookupFunction<_CContext_dFree_C, _CContext_dFree_Dart>('CContext_dFree');
+
 typedef _CContext_dFree_C = Void Function(
   Pointer<Pointer<CContext>> dPtr,
 );
@@ -320,25 +330,22 @@ typedef _CContext_dFree_Dart = void Function(
 
 /// C struct `CCreateWalletParameters`.
 class CCreateWalletParameters extends Struct {
-  
   Pointer<ffi.Utf8> name;
   Pointer<ffi.Utf8> password;
   Pointer<ffi.Utf8> mnemonic;
   Pointer<ffi.Utf8> walletType;
+
   static Pointer<CCreateWalletParameters> allocate() {
     return ffi.allocate<CCreateWalletParameters>();
   }
 
-
   static CCreateWalletParameters from(int ptr) {
     return Pointer<CCreateWalletParameters>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CDbName`.
 class CDbName extends Struct {
-  
   Pointer<ffi.Utf8> path;
   Pointer<ffi.Utf8> prefix;
   Pointer<ffi.Utf8> cashboxWallets;
@@ -347,79 +354,70 @@ class CDbName extends Struct {
   Pointer<ffi.Utf8> walletPrivate;
   Pointer<ffi.Utf8> walletTestnet;
   Pointer<ffi.Utf8> walletTestnetPrivate;
+
   static Pointer<CDbName> allocate() {
     return ffi.allocate<CDbName>();
   }
 
-
   static CDbName from(int ptr) {
     return Pointer<CDbName>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CEeeChain`.
 class CEeeChain extends Struct {
-  
   Pointer<CChainShared> chainShared;
   Pointer<CAddress> address;
   Pointer<CArrayCEeeChainToken> tokens;
+
   static Pointer<CEeeChain> allocate() {
     return ffi.allocate<CEeeChain>();
   }
 
-
   static CEeeChain from(int ptr) {
     return Pointer<CEeeChain>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CEeeChainToken`.
 class CEeeChainToken extends Struct {
-  
   Pointer<CEeeChainTokenShared> eeeChainTokenShared;
+
   static Pointer<CEeeChainToken> allocate() {
     return ffi.allocate<CEeeChainToken>();
   }
 
-
   static CEeeChainToken from(int ptr) {
     return Pointer<CEeeChainToken>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CEeeChainTokenShared`.
 class CEeeChainTokenShared extends Struct {
-  
   Pointer<CTokenShared> tokenShared;
+
   static Pointer<CEeeChainTokenShared> allocate() {
     return ffi.allocate<CEeeChainTokenShared>();
   }
 
-
   static CEeeChainTokenShared from(int ptr) {
     return Pointer<CEeeChainTokenShared>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CError`.
 class CError extends Struct {
-  
   @Uint64()
   int code;
   Pointer<ffi.Utf8> message;
+
   static Pointer<CError> allocate() {
     return ffi.allocate<CError>();
   }
 
-
   static CError from(int ptr) {
     return Pointer<CError>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C function `CError_free`.
@@ -428,7 +426,10 @@ void CError_free(
 ) {
   _CError_free(error);
 }
-final _CError_free_Dart _CError_free = _dl.lookupFunction<_CError_free_C, _CError_free_Dart>('CError_free');
+
+final _CError_free_Dart _CError_free =
+    _dl.lookupFunction<_CError_free_C, _CError_free_Dart>('CError_free');
+
 typedef _CError_free_C = Void Function(
   Pointer<CError> error,
 );
@@ -438,88 +439,81 @@ typedef _CError_free_Dart = void Function(
 
 /// C struct `CEthChain`.
 class CEthChain extends Struct {
-  
   Pointer<CChainShared> chainShared;
   Pointer<CArrayCEthChainToken> tokens;
+
   static Pointer<CEthChain> allocate() {
     return ffi.allocate<CEthChain>();
   }
 
-
   static CEthChain from(int ptr) {
     return Pointer<CEthChain>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CEthChainToken`.
 class CEthChainToken extends Struct {
-  
   Pointer<CEthChainTokenShared> ethChainTokenShared;
+
   static Pointer<CEthChainToken> allocate() {
     return ffi.allocate<CEthChainToken>();
   }
 
-
   static CEthChainToken from(int ptr) {
     return Pointer<CEthChainToken>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CEthChainTokenShared`.
 class CEthChainTokenShared extends Struct {
-  
   Pointer<CTokenShared> tokenShared;
+
   static Pointer<CEthChainTokenShared> allocate() {
     return ffi.allocate<CEthChainTokenShared>();
   }
 
-
   static CEthChainTokenShared from(int ptr) {
     return Pointer<CEthChainTokenShared>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CInitParameters`.
 class CInitParameters extends Struct {
-  
   Pointer<CDbName> dbName;
   Pointer<ffi.Utf8> contextNote;
+
   static Pointer<CInitParameters> allocate() {
     return ffi.allocate<CInitParameters>();
   }
 
-
   static CInitParameters from(int ptr) {
     return Pointer<CInitParameters>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CRawTxParam`.
 class CRawTxParam extends Struct {
-  
   Pointer<ffi.Utf8> rawTx;
   Pointer<ffi.Utf8> walletId;
   Pointer<ffi.Utf8> password;
+
   static Pointer<CRawTxParam> allocate() {
     return ffi.allocate<CRawTxParam>();
   }
 
-
   static CRawTxParam from(int ptr) {
     return Pointer<CRawTxParam>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C function `CStr_dAlloc`.
 Pointer<Pointer<ffi.Utf8>> CStr_dAlloc() {
   return _CStr_dAlloc();
 }
-final _CStr_dAlloc_Dart _CStr_dAlloc = _dl.lookupFunction<_CStr_dAlloc_C, _CStr_dAlloc_Dart>('CStr_dAlloc');
+
+final _CStr_dAlloc_Dart _CStr_dAlloc =
+    _dl.lookupFunction<_CStr_dAlloc_C, _CStr_dAlloc_Dart>('CStr_dAlloc');
+
 typedef _CStr_dAlloc_C = Pointer<Pointer<ffi.Utf8>> Function();
 typedef _CStr_dAlloc_Dart = Pointer<Pointer<ffi.Utf8>> Function();
 
@@ -529,7 +523,10 @@ void CStr_dFree(
 ) {
   _CStr_dFree(dcs);
 }
-final _CStr_dFree_Dart _CStr_dFree = _dl.lookupFunction<_CStr_dFree_C, _CStr_dFree_Dart>('CStr_dFree');
+
+final _CStr_dFree_Dart _CStr_dFree =
+    _dl.lookupFunction<_CStr_dFree_C, _CStr_dFree_Dart>('CStr_dFree');
+
 typedef _CStr_dFree_C = Void Function(
   Pointer<Pointer<ffi.Utf8>> dcs,
 );
@@ -539,7 +536,6 @@ typedef _CStr_dFree_Dart = void Function(
 
 /// C struct `CSubChainBasicInfo`.
 class CSubChainBasicInfo extends Struct {
-  
   Pointer<ffi.Utf8> infoId;
   Pointer<ffi.Utf8> genesisHash;
   Pointer<ffi.Utf8> metadata;
@@ -552,59 +548,52 @@ class CSubChainBasicInfo extends Struct {
   @Uint32()
   int tokenDecimals;
   Pointer<ffi.Utf8> tokenSymbol;
+
   static Pointer<CSubChainBasicInfo> allocate() {
     return ffi.allocate<CSubChainBasicInfo>();
   }
 
-
   static CSubChainBasicInfo from(int ptr) {
     return Pointer<CSubChainBasicInfo>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CSyncRecordDetail`.
 class CSyncRecordDetail extends Struct {
-  
   Pointer<ffi.Utf8> account;
   Pointer<ffi.Utf8> blockNo;
   Pointer<ffi.Utf8> blockHash;
+
   static Pointer<CSyncRecordDetail> allocate() {
     return ffi.allocate<CSyncRecordDetail>();
   }
 
-
   static CSyncRecordDetail from(int ptr) {
     return Pointer<CSyncRecordDetail>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CTokenShared`.
 class CTokenShared extends Struct {
-  
-  Pointer<ffi.Utf8> chainType;
   Pointer<ffi.Utf8> name;
   Pointer<ffi.Utf8> symbol;
   Pointer<ffi.Utf8> logoUrl;
   Pointer<ffi.Utf8> logoBytes;
-  Pointer<ffi.Utf8> project;
-  @Int32()
-  int auth;
+  Pointer<ffi.Utf8> projectName;
+  Pointer<ffi.Utf8> projectHome;
+  Pointer<ffi.Utf8> projectNote;
+
   static Pointer<CTokenShared> allocate() {
     return ffi.allocate<CTokenShared>();
   }
 
-
   static CTokenShared from(int ptr) {
     return Pointer<CTokenShared>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CTransferPayload`.
 class CTransferPayload extends Struct {
-  
   Pointer<ffi.Utf8> fromAccount;
   Pointer<ffi.Utf8> toAccount;
   Pointer<ffi.Utf8> value;
@@ -617,42 +606,42 @@ class CTransferPayload extends Struct {
   int tx_version;
   Pointer<ffi.Utf8> extData;
   Pointer<ffi.Utf8> password;
+
   static Pointer<CTransferPayload> allocate() {
     return ffi.allocate<CTransferPayload>();
   }
 
-
   static CTransferPayload from(int ptr) {
     return Pointer<CTransferPayload>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C struct `CWallet`.
 class CWallet extends Struct {
-  
   Pointer<ffi.Utf8> id;
   Pointer<ffi.Utf8> nextId;
   Pointer<ffi.Utf8> name;
   Pointer<CEthChain> ethChain;
   Pointer<CEeeChain> eeeChain;
   Pointer<CBtcChain> btcChain;
+
   static Pointer<CWallet> allocate() {
     return ffi.allocate<CWallet>();
   }
 
-
   static CWallet from(int ptr) {
     return Pointer<CWallet>.fromAddress(ptr).ref;
   }
-
 }
 
 /// C function `CWallet_dAlloc`.
 Pointer<Pointer<CWallet>> CWallet_dAlloc() {
   return _CWallet_dAlloc();
 }
-final _CWallet_dAlloc_Dart _CWallet_dAlloc = _dl.lookupFunction<_CWallet_dAlloc_C, _CWallet_dAlloc_Dart>('CWallet_dAlloc');
+
+final _CWallet_dAlloc_Dart _CWallet_dAlloc = _dl
+    .lookupFunction<_CWallet_dAlloc_C, _CWallet_dAlloc_Dart>('CWallet_dAlloc');
+
 typedef _CWallet_dAlloc_C = Pointer<Pointer<CWallet>> Function();
 typedef _CWallet_dAlloc_Dart = Pointer<Pointer<CWallet>> Function();
 
@@ -662,7 +651,10 @@ void CWallet_dFree(
 ) {
   _CWallet_dFree(dPtr);
 }
-final _CWallet_dFree_Dart _CWallet_dFree = _dl.lookupFunction<_CWallet_dFree_C, _CWallet_dFree_Dart>('CWallet_dFree');
+
+final _CWallet_dFree_Dart _CWallet_dFree =
+    _dl.lookupFunction<_CWallet_dFree_C, _CWallet_dFree_Dart>('CWallet_dFree');
+
 typedef _CWallet_dFree_C = Void Function(
   Pointer<Pointer<CWallet>> dPtr,
 );
@@ -678,7 +670,11 @@ Pointer<CError> ChainEee_decodeAccountInfo(
 ) {
   return _ChainEee_decodeAccountInfo(ctx, encodeData, accountInfo);
 }
-final _ChainEee_decodeAccountInfo_Dart _ChainEee_decodeAccountInfo = _dl.lookupFunction<_ChainEee_decodeAccountInfo_C, _ChainEee_decodeAccountInfo_Dart>('ChainEee_decodeAccountInfo');
+
+final _ChainEee_decodeAccountInfo_Dart _ChainEee_decodeAccountInfo =
+    _dl.lookupFunction<_ChainEee_decodeAccountInfo_C,
+        _ChainEee_decodeAccountInfo_Dart>('ChainEee_decodeAccountInfo');
+
 typedef _ChainEee_decodeAccountInfo_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> encodeData,
@@ -698,7 +694,11 @@ Pointer<CError> ChainEee_eeeTransfer(
 ) {
   return _ChainEee_eeeTransfer(ctx, transferPayload, signedResult);
 }
-final _ChainEee_eeeTransfer_Dart _ChainEee_eeeTransfer = _dl.lookupFunction<_ChainEee_eeeTransfer_C, _ChainEee_eeeTransfer_Dart>('ChainEee_eeeTransfer');
+
+final _ChainEee_eeeTransfer_Dart _ChainEee_eeeTransfer =
+    _dl.lookupFunction<_ChainEee_eeeTransfer_C, _ChainEee_eeeTransfer_Dart>(
+        'ChainEee_eeeTransfer');
+
 typedef _ChainEee_eeeTransfer_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<CTransferPayload> transferPayload,
@@ -718,9 +718,14 @@ Pointer<CError> ChainEee_getBasicInfo(
   Pointer<Uint32> txVersion,
   Pointer<Pointer<CSubChainBasicInfo>> basicInfo,
 ) {
-  return _ChainEee_getBasicInfo(ctx, genesisHash, specVersion, txVersion, basicInfo);
+  return _ChainEee_getBasicInfo(
+      ctx, genesisHash, specVersion, txVersion, basicInfo);
 }
-final _ChainEee_getBasicInfo_Dart _ChainEee_getBasicInfo = _dl.lookupFunction<_ChainEee_getBasicInfo_C, _ChainEee_getBasicInfo_Dart>('ChainEee_getBasicInfo');
+
+final _ChainEee_getBasicInfo_Dart _ChainEee_getBasicInfo =
+    _dl.lookupFunction<_ChainEee_getBasicInfo_C, _ChainEee_getBasicInfo_Dart>(
+        'ChainEee_getBasicInfo');
+
 typedef _ChainEee_getBasicInfo_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> genesisHash,
@@ -746,7 +751,11 @@ Pointer<CError> ChainEee_getStorageKey(
 ) {
   return _ChainEee_getStorageKey(ctx, module, storageItem, pubKey, accountInfo);
 }
-final _ChainEee_getStorageKey_Dart _ChainEee_getStorageKey = _dl.lookupFunction<_ChainEee_getStorageKey_C, _ChainEee_getStorageKey_Dart>('ChainEee_getStorageKey');
+
+final _ChainEee_getStorageKey_Dart _ChainEee_getStorageKey =
+    _dl.lookupFunction<_ChainEee_getStorageKey_C, _ChainEee_getStorageKey_Dart>(
+        'ChainEee_getStorageKey');
+
 typedef _ChainEee_getStorageKey_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> module,
@@ -769,7 +778,11 @@ Pointer<CError> ChainEee_getSyncRecord(
 ) {
   return _ChainEee_getSyncRecord(ctx, syncRecord);
 }
-final _ChainEee_getSyncRecord_Dart _ChainEee_getSyncRecord = _dl.lookupFunction<_ChainEee_getSyncRecord_C, _ChainEee_getSyncRecord_Dart>('ChainEee_getSyncRecord');
+
+final _ChainEee_getSyncRecord_Dart _ChainEee_getSyncRecord =
+    _dl.lookupFunction<_ChainEee_getSyncRecord_C, _ChainEee_getSyncRecord_Dart>(
+        'ChainEee_getSyncRecord');
+
 typedef _ChainEee_getSyncRecord_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<Pointer<CSyncRecordDetail>> syncRecord,
@@ -787,7 +800,11 @@ Pointer<CError> ChainEee_tokenXTransfer(
 ) {
   return _ChainEee_tokenXTransfer(ctx, transferPayload, signedResult);
 }
-final _ChainEee_tokenXTransfer_Dart _ChainEee_tokenXTransfer = _dl.lookupFunction<_ChainEee_tokenXTransfer_C, _ChainEee_tokenXTransfer_Dart>('ChainEee_tokenXTransfer');
+
+final _ChainEee_tokenXTransfer_Dart _ChainEee_tokenXTransfer = _dl
+    .lookupFunction<_ChainEee_tokenXTransfer_C, _ChainEee_tokenXTransfer_Dart>(
+        'ChainEee_tokenXTransfer');
+
 typedef _ChainEee_tokenXTransfer_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<CTransferPayload> transferPayload,
@@ -807,7 +824,11 @@ Pointer<CError> ChainEee_txSign(
 ) {
   return _ChainEee_txSign(ctx, rawTx, signedResult);
 }
-final _ChainEee_txSign_Dart _ChainEee_txSign = _dl.lookupFunction<_ChainEee_txSign_C, _ChainEee_txSign_Dart>('ChainEee_txSign');
+
+final _ChainEee_txSign_Dart _ChainEee_txSign =
+    _dl.lookupFunction<_ChainEee_txSign_C, _ChainEee_txSign_Dart>(
+        'ChainEee_txSign');
+
 typedef _ChainEee_txSign_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<CRawTxParam> rawTx,
@@ -827,7 +848,11 @@ Pointer<CError> ChainEee_txSubmittableSign(
 ) {
   return _ChainEee_txSubmittableSign(ctx, rawTx, signedResult);
 }
-final _ChainEee_txSubmittableSign_Dart _ChainEee_txSubmittableSign = _dl.lookupFunction<_ChainEee_txSubmittableSign_C, _ChainEee_txSubmittableSign_Dart>('ChainEee_txSubmittableSign');
+
+final _ChainEee_txSubmittableSign_Dart _ChainEee_txSubmittableSign =
+    _dl.lookupFunction<_ChainEee_txSubmittableSign_C,
+        _ChainEee_txSubmittableSign_Dart>('ChainEee_txSubmittableSign');
+
 typedef _ChainEee_txSubmittableSign_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<CRawTxParam> rawTx,
@@ -847,7 +872,11 @@ Pointer<CError> ChainEee_updateBasicInfo(
 ) {
   return _ChainEee_updateBasicInfo(ctx, basicInfo, isDefault);
 }
-final _ChainEee_updateBasicInfo_Dart _ChainEee_updateBasicInfo = _dl.lookupFunction<_ChainEee_updateBasicInfo_C, _ChainEee_updateBasicInfo_Dart>('ChainEee_updateBasicInfo');
+
+final _ChainEee_updateBasicInfo_Dart _ChainEee_updateBasicInfo =
+    _dl.lookupFunction<_ChainEee_updateBasicInfo_C,
+        _ChainEee_updateBasicInfo_Dart>('ChainEee_updateBasicInfo');
+
 typedef _ChainEee_updateBasicInfo_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<CSubChainBasicInfo> basicInfo,
@@ -866,7 +895,11 @@ Pointer<CError> ChainEee_updateSyncRecord(
 ) {
   return _ChainEee_updateSyncRecord(ctx, syncRecord);
 }
-final _ChainEee_updateSyncRecord_Dart _ChainEee_updateSyncRecord = _dl.lookupFunction<_ChainEee_updateSyncRecord_C, _ChainEee_updateSyncRecord_Dart>('ChainEee_updateSyncRecord');
+
+final _ChainEee_updateSyncRecord_Dart _ChainEee_updateSyncRecord =
+    _dl.lookupFunction<_ChainEee_updateSyncRecord_C,
+        _ChainEee_updateSyncRecord_Dart>('ChainEee_updateSyncRecord');
+
 typedef _ChainEee_updateSyncRecord_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<CSyncRecordDetail> syncRecord,
@@ -882,7 +915,11 @@ Pointer<CError> Wallets_Contexts(
 ) {
   return _Wallets_Contexts(contexts);
 }
-final _Wallets_Contexts_Dart _Wallets_Contexts = _dl.lookupFunction<_Wallets_Contexts_C, _Wallets_Contexts_Dart>('Wallets_Contexts');
+
+final _Wallets_Contexts_Dart _Wallets_Contexts =
+    _dl.lookupFunction<_Wallets_Contexts_C, _Wallets_Contexts_Dart>(
+        'Wallets_Contexts');
+
 typedef _Wallets_Contexts_C = Pointer<CError> Function(
   Pointer<Pointer<CArrayCContext>> contexts,
 );
@@ -897,7 +934,10 @@ Pointer<CError> Wallets_all(
 ) {
   return _Wallets_all(ctx, arrayWallet);
 }
-final _Wallets_all_Dart _Wallets_all = _dl.lookupFunction<_Wallets_all_C, _Wallets_all_Dart>('Wallets_all');
+
+final _Wallets_all_Dart _Wallets_all =
+    _dl.lookupFunction<_Wallets_all_C, _Wallets_all_Dart>('Wallets_all');
+
 typedef _Wallets_all_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<Pointer<CArrayCWallet>> arrayWallet,
@@ -915,7 +955,11 @@ Pointer<CError> Wallets_createWallet(
 ) {
   return _Wallets_createWallet(ctx, parameters, wallet);
 }
-final _Wallets_createWallet_Dart _Wallets_createWallet = _dl.lookupFunction<_Wallets_createWallet_C, _Wallets_createWallet_Dart>('Wallets_createWallet');
+
+final _Wallets_createWallet_Dart _Wallets_createWallet =
+    _dl.lookupFunction<_Wallets_createWallet_C, _Wallets_createWallet_Dart>(
+        'Wallets_createWallet');
+
 typedef _Wallets_createWallet_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<CCreateWalletParameters> parameters,
@@ -935,7 +979,11 @@ Pointer<CError> Wallets_currentWalletChain(
 ) {
   return _Wallets_currentWalletChain(ctx, walletId, chainType);
 }
-final _Wallets_currentWalletChain_Dart _Wallets_currentWalletChain = _dl.lookupFunction<_Wallets_currentWalletChain_C, _Wallets_currentWalletChain_Dart>('Wallets_currentWalletChain');
+
+final _Wallets_currentWalletChain_Dart _Wallets_currentWalletChain =
+    _dl.lookupFunction<_Wallets_currentWalletChain_C,
+        _Wallets_currentWalletChain_Dart>('Wallets_currentWalletChain');
+
 typedef _Wallets_currentWalletChain_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<Pointer<ffi.Utf8>> walletId,
@@ -955,7 +1003,11 @@ Pointer<CError> Wallets_findById(
 ) {
   return _Wallets_findById(ctx, walletId, wallet);
 }
-final _Wallets_findById_Dart _Wallets_findById = _dl.lookupFunction<_Wallets_findById_C, _Wallets_findById_Dart>('Wallets_findById');
+
+final _Wallets_findById_Dart _Wallets_findById =
+    _dl.lookupFunction<_Wallets_findById_C, _Wallets_findById_Dart>(
+        'Wallets_findById');
+
 typedef _Wallets_findById_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> walletId,
@@ -975,7 +1027,11 @@ Pointer<CError> Wallets_findWalletBaseByName(
 ) {
   return _Wallets_findWalletBaseByName(ctx, name, walletArray);
 }
-final _Wallets_findWalletBaseByName_Dart _Wallets_findWalletBaseByName = _dl.lookupFunction<_Wallets_findWalletBaseByName_C, _Wallets_findWalletBaseByName_Dart>('Wallets_findWalletBaseByName');
+
+final _Wallets_findWalletBaseByName_Dart _Wallets_findWalletBaseByName =
+    _dl.lookupFunction<_Wallets_findWalletBaseByName_C,
+        _Wallets_findWalletBaseByName_Dart>('Wallets_findWalletBaseByName');
+
 typedef _Wallets_findWalletBaseByName_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> name,
@@ -993,7 +1049,11 @@ Pointer<CError> Wallets_firstContext(
 ) {
   return _Wallets_firstContext(context);
 }
-final _Wallets_firstContext_Dart _Wallets_firstContext = _dl.lookupFunction<_Wallets_firstContext_C, _Wallets_firstContext_Dart>('Wallets_firstContext');
+
+final _Wallets_firstContext_Dart _Wallets_firstContext =
+    _dl.lookupFunction<_Wallets_firstContext_C, _Wallets_firstContext_Dart>(
+        'Wallets_firstContext');
+
 typedef _Wallets_firstContext_C = Pointer<CError> Function(
   Pointer<Pointer<CContext>> context,
 );
@@ -1007,7 +1067,11 @@ Pointer<CError> Wallets_generateMnemonic(
 ) {
   return _Wallets_generateMnemonic(mnemonic);
 }
-final _Wallets_generateMnemonic_Dart _Wallets_generateMnemonic = _dl.lookupFunction<_Wallets_generateMnemonic_C, _Wallets_generateMnemonic_Dart>('Wallets_generateMnemonic');
+
+final _Wallets_generateMnemonic_Dart _Wallets_generateMnemonic =
+    _dl.lookupFunction<_Wallets_generateMnemonic_C,
+        _Wallets_generateMnemonic_Dart>('Wallets_generateMnemonic');
+
 typedef _Wallets_generateMnemonic_C = Pointer<CError> Function(
   Pointer<Pointer<ffi.Utf8>> mnemonic,
 );
@@ -1022,7 +1086,10 @@ Pointer<CError> Wallets_hasAny(
 ) {
   return _Wallets_hasAny(ctx, hasAny);
 }
-final _Wallets_hasAny_Dart _Wallets_hasAny = _dl.lookupFunction<_Wallets_hasAny_C, _Wallets_hasAny_Dart>('Wallets_hasAny');
+
+final _Wallets_hasAny_Dart _Wallets_hasAny = _dl
+    .lookupFunction<_Wallets_hasAny_C, _Wallets_hasAny_Dart>('Wallets_hasAny');
+
 typedef _Wallets_hasAny_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<Uint32> hasAny,
@@ -1039,7 +1106,10 @@ Pointer<CError> Wallets_init(
 ) {
   return _Wallets_init(parameter, context);
 }
-final _Wallets_init_Dart _Wallets_init = _dl.lookupFunction<_Wallets_init_C, _Wallets_init_Dart>('Wallets_init');
+
+final _Wallets_init_Dart _Wallets_init =
+    _dl.lookupFunction<_Wallets_init_C, _Wallets_init_Dart>('Wallets_init');
+
 typedef _Wallets_init_C = Pointer<CError> Function(
   Pointer<CInitParameters> parameter,
   Pointer<Pointer<CContext>> context,
@@ -1055,7 +1125,11 @@ Pointer<CError> Wallets_lastContext(
 ) {
   return _Wallets_lastContext(context);
 }
-final _Wallets_lastContext_Dart _Wallets_lastContext = _dl.lookupFunction<_Wallets_lastContext_C, _Wallets_lastContext_Dart>('Wallets_lastContext');
+
+final _Wallets_lastContext_Dart _Wallets_lastContext =
+    _dl.lookupFunction<_Wallets_lastContext_C, _Wallets_lastContext_Dart>(
+        'Wallets_lastContext');
+
 typedef _Wallets_lastContext_C = Pointer<CError> Function(
   Pointer<Pointer<CContext>> context,
 );
@@ -1069,7 +1143,11 @@ Pointer<CError> Wallets_lockRead(
 ) {
   return _Wallets_lockRead(ctx);
 }
-final _Wallets_lockRead_Dart _Wallets_lockRead = _dl.lookupFunction<_Wallets_lockRead_C, _Wallets_lockRead_Dart>('Wallets_lockRead');
+
+final _Wallets_lockRead_Dart _Wallets_lockRead =
+    _dl.lookupFunction<_Wallets_lockRead_C, _Wallets_lockRead_Dart>(
+        'Wallets_lockRead');
+
 typedef _Wallets_lockRead_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
 );
@@ -1083,7 +1161,11 @@ Pointer<CError> Wallets_lockWrite(
 ) {
   return _Wallets_lockWrite(ctx);
 }
-final _Wallets_lockWrite_Dart _Wallets_lockWrite = _dl.lookupFunction<_Wallets_lockWrite_C, _Wallets_lockWrite_Dart>('Wallets_lockWrite');
+
+final _Wallets_lockWrite_Dart _Wallets_lockWrite =
+    _dl.lookupFunction<_Wallets_lockWrite_C, _Wallets_lockWrite_Dart>(
+        'Wallets_lockWrite');
+
 typedef _Wallets_lockWrite_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
 );
@@ -1098,7 +1180,11 @@ Pointer<CError> Wallets_removeWallet(
 ) {
   return _Wallets_removeWallet(ctx, walletId);
 }
-final _Wallets_removeWallet_Dart _Wallets_removeWallet = _dl.lookupFunction<_Wallets_removeWallet_C, _Wallets_removeWallet_Dart>('Wallets_removeWallet');
+
+final _Wallets_removeWallet_Dart _Wallets_removeWallet =
+    _dl.lookupFunction<_Wallets_removeWallet_C, _Wallets_removeWallet_Dart>(
+        'Wallets_removeWallet');
+
 typedef _Wallets_removeWallet_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> walletId,
@@ -1116,7 +1202,11 @@ Pointer<CError> Wallets_renameWallet(
 ) {
   return _Wallets_renameWallet(ctx, newName, walletId);
 }
-final _Wallets_renameWallet_Dart _Wallets_renameWallet = _dl.lookupFunction<_Wallets_renameWallet_C, _Wallets_renameWallet_Dart>('Wallets_renameWallet');
+
+final _Wallets_renameWallet_Dart _Wallets_renameWallet =
+    _dl.lookupFunction<_Wallets_renameWallet_C, _Wallets_renameWallet_Dart>(
+        'Wallets_renameWallet');
+
 typedef _Wallets_renameWallet_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> newName,
@@ -1136,7 +1226,11 @@ Pointer<CError> Wallets_saveCurrentWalletChain(
 ) {
   return _Wallets_saveCurrentWalletChain(ctx, walletId, chainType);
 }
-final _Wallets_saveCurrentWalletChain_Dart _Wallets_saveCurrentWalletChain = _dl.lookupFunction<_Wallets_saveCurrentWalletChain_C, _Wallets_saveCurrentWalletChain_Dart>('Wallets_saveCurrentWalletChain');
+
+final _Wallets_saveCurrentWalletChain_Dart _Wallets_saveCurrentWalletChain =
+    _dl.lookupFunction<_Wallets_saveCurrentWalletChain_C,
+        _Wallets_saveCurrentWalletChain_Dart>('Wallets_saveCurrentWalletChain');
+
 typedef _Wallets_saveCurrentWalletChain_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> walletId,
@@ -1154,7 +1248,10 @@ Pointer<CError> Wallets_uninit(
 ) {
   return _Wallets_uninit(ctx);
 }
-final _Wallets_uninit_Dart _Wallets_uninit = _dl.lookupFunction<_Wallets_uninit_C, _Wallets_uninit_Dart>('Wallets_uninit');
+
+final _Wallets_uninit_Dart _Wallets_uninit = _dl
+    .lookupFunction<_Wallets_uninit_C, _Wallets_uninit_Dart>('Wallets_uninit');
+
 typedef _Wallets_uninit_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
 );
@@ -1168,7 +1265,11 @@ Pointer<CError> Wallets_unlockRead(
 ) {
   return _Wallets_unlockRead(ctx);
 }
-final _Wallets_unlockRead_Dart _Wallets_unlockRead = _dl.lookupFunction<_Wallets_unlockRead_C, _Wallets_unlockRead_Dart>('Wallets_unlockRead');
+
+final _Wallets_unlockRead_Dart _Wallets_unlockRead =
+    _dl.lookupFunction<_Wallets_unlockRead_C, _Wallets_unlockRead_Dart>(
+        'Wallets_unlockRead');
+
 typedef _Wallets_unlockRead_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
 );
@@ -1182,7 +1283,11 @@ Pointer<CError> Wallets_unlockWrite(
 ) {
   return _Wallets_unlockWrite(ctx);
 }
-final _Wallets_unlockWrite_Dart _Wallets_unlockWrite = _dl.lookupFunction<_Wallets_unlockWrite_C, _Wallets_unlockWrite_Dart>('Wallets_unlockWrite');
+
+final _Wallets_unlockWrite_Dart _Wallets_unlockWrite =
+    _dl.lookupFunction<_Wallets_unlockWrite_C, _Wallets_unlockWrite_Dart>(
+        'Wallets_unlockWrite');
+
 typedef _Wallets_unlockWrite_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
 );

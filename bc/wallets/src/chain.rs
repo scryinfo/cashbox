@@ -17,6 +17,7 @@ struct BtcChain();
 
 pub(crate) struct Wallet {
     chains: Vec<Box<dyn ChainTrait>>,
+    eee: Box<dyn EE>,
 }
 
 #[async_trait]
@@ -148,6 +149,7 @@ impl Wallet {
         let mut w = Wallet {
             chains: Default::default(),
         };
+
         w.chains.push(Box::new(EthChain::default()));
         w.chains.push(Box::new(EeeChain::default()));
         w.chains.push(Box::new(BtcChain::default()));

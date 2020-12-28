@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS m_eth_chain_token_shared
     symbol           TEXT    NOT NULL,
     logo_url         TEXT    NOT NULL,
     logo_bytes       TEXT    NOT NULL,
-    project_name     TEXT    NOT NULL,
-    project_home     TEXT    NOT NULL,
+    projectName     TEXT    NOT NULL,
+    projectHome     TEXT    NOT NULL,
     project_note     TEXT    NOT NULL,
     -- MTokenShared end
 
