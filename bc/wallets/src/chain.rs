@@ -4,7 +4,8 @@ use strum::IntoEnumIterator;
 use eee::Crypto;
 use mav::{NetType, WalletType};
 use mav::ma::{Dao, MAddress, MBtcChainToken, MEeeChainToken, MEthChainToken, MWallet};
-use wallets_types::{BtcChainTokenDefault, Chain2WalletType, ChainTrait, ContextTrait, EeeChainTokenDefault, EthChainTokenDefault, WalletError, WalletTrait};
+use wallets_types::{BtcChainTokenDefault, Chain2WalletType, ChainTrait, ContextTrait, EeeChainTokenDefault, EthChainTokenDefault, WalletError, WalletTrait,SubChainBasicInfo};
+
 
 #[derive(Default)]
 struct EthChain();
@@ -162,4 +163,15 @@ impl WalletTrait for Wallet {
         &self.chains
     }
 
+}
+
+impl EeeChain{
+    pub async fn update_basic_info(&self, context: &dyn ContextTrait, net_type: &NetType,basic_info:&mut SubChainBasicInfo) -> Result<(), WalletError> {
+        let rb = context.db().data_db(net_type);
+        let  tx = rb.begin_tx_defer(false).await?;
+       // let mut test = basic_info;
+        basic_info.save(rb, &tx.tx_id).await?;
+        rb.commit(&tx.tx_id).await?;
+        Ok(())
+    }
 }

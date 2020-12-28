@@ -84,7 +84,7 @@ impl ToString for WalletType {
 
 /// 用来切换钱包的网络时使用的
 ///
-/// [WalletType.Test] 可以切换为 [NetType.Test]， [NetType.Test] ，[NetType.PrivateTest]
+/// [WalletType.Test] 可以切换为 [NetType.Test]， [NetType.Private] ，[NetType.PrivateTest]
 ///
 /// [WalletType.Normal] 只能为 [NetType.Main]
 ///

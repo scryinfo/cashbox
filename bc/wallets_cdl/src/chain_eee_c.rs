@@ -1,30 +1,35 @@
 #![allow(non_snake_case)]
 
 use std::os::raw::c_char;
+use futures::executor::block_on;
 
-use crate::kits::{CBool, CU32};
-
-use super::chain_eee::{CSubChainBasicInfo, CSyncRecordDetail};
-use super::parameters::{CAccountInfo, CContext, CRawTxParam, CTransferPayload};
+use super::chain_eee::{CSubChainBasicInfo, CAccountInfoSyncProg};
+use super::parameters::{CContext, CTransferPayload, CRawTxParam, CAccountInfo, CStorageKeyParameters, CDecodeAccountInfoParameters};
 use super::types::CError;
+use super::kits::{CBool, CU32, CR, to_c_char, to_str};
+
+use wallets_types::{Context, Error, ContextTrait};
+use wallets::{Contexts};
+use mav::NetType;
+use log::kv::Source;
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_updateSyncRecord(ctx: *mut CContext, syncRecord: *mut CSyncRecordDetail) -> *const CError {
+pub unsafe extern "C" fn ChainEee_updateSyncRecord(ctx: *mut CContext, walletId: *mut c_char, syncRecord: *mut CAccountInfoSyncProg) -> *const CError {
     unimplemented!()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_getSyncRecord(ctx: *mut CContext, syncRecord: *mut *mut CSyncRecordDetail) -> *const CError {
+pub unsafe extern "C" fn ChainEee_getSyncRecord(ctx: *mut CContext, walletId: *mut c_char, syncRecord: *mut *mut CAccountInfoSyncProg) -> *const CError {
     unimplemented!()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_decodeAccountInfo(ctx: *mut CContext, encodeData: *mut c_char, accountInfo: *mut *mut CAccountInfo) -> *const CError {
+pub unsafe extern "C" fn ChainEee_decodeAccountInfo(ctx: *mut CContext, parameters: *mut CDecodeAccountInfoParameters, accountInfo: *mut *mut CAccountInfo) -> *const CError {
     unimplemented!()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_getStorageKey(ctx: *mut CContext, module: *mut c_char, storageItem: *mut c_char, pubKey: *mut c_char, accountInfo: *mut *mut c_char) -> *const CError {
+pub unsafe extern "C" fn ChainEee_getStorageKey(ctx: *mut CContext, parameters: *mut CStorageKeyParameters, accountInfo: *mut *mut c_char) -> *const CError {
     unimplemented!()
 }
 
@@ -51,11 +56,11 @@ pub unsafe extern "C" fn ChainEee_txSign(ctx: *mut CContext, rawTx: *mut CRawTxP
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_updateBasicInfo(ctx: *mut CContext, basicInfo: *mut CSubChainBasicInfo, isDefault: *mut CBool) -> *const CError {
+pub unsafe extern "C" fn ChainEee_updateBasicInfo(ctx: *mut CContext, netType: *mut c_char, basicInfo: *mut CSubChainBasicInfo) -> *const CError {
     unimplemented!()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, genesisHash: *mut c_char, specVersion: *mut CU32, txVersion: *mut CU32, basicInfo: *mut *mut CSubChainBasicInfo) -> *const CError {
+pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut c_char, basicInfo: *mut *mut CSubChainBasicInfo) -> *const CError {
     unimplemented!()
 }

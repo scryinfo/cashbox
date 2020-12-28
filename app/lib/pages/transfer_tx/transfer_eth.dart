@@ -49,7 +49,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   double mGasLimitValue;
   double mMaxGasFee;
   double mMinGasFee;
-  double mGasFeeValue;
+  double mGasFeeValue = 0;
   String digitBalance = "";
   String ethBalance = "";
   String fromAddress = "";
@@ -106,9 +106,17 @@ class _TransferEthPageState extends State<TransferEthPage> {
       mGasLimitValue = config.defaultGasLimit.ethGasLimit;
       mGasPriceValue = config.defaultGasPrice.ethGasPrice;
     }
-    mMaxGasFee = mMaxGasLimit * mMaxGasPrice / eth2gasUnit;
-    mMinGasFee = mMinGasLimit * mMinGasPrice / eth2gasUnit;
-    mGasFeeValue = mGasLimitValue * mGasPriceValue / eth2gasUnit;
+    setState(() {
+      this.mMaxGasPrice = mMaxGasPrice;
+      this.mMinGasPrice = mMinGasPrice;
+      this.mMaxGasLimit = mMaxGasLimit;
+      this.mMinGasLimit = mMinGasLimit;
+      this.mGasLimitValue = mGasLimitValue;
+      this.mGasPriceValue = mGasPriceValue;
+      mMaxGasFee = mMaxGasLimit * mMaxGasPrice / eth2gasUnit;
+      mMinGasFee = mMinGasLimit * mMinGasPrice / eth2gasUnit;
+      mGasFeeValue = mGasLimitValue * mGasPriceValue / eth2gasUnit;
+    });
   }
 
   @override
@@ -218,8 +226,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
                   ),
                   new Expanded(
                       child: new Slider(
-                    min: mMinGasFee,
-                    max: mMaxGasFee,
+                    min: mMinGasFee ?? 0,
+                    max: mMaxGasFee ?? 0,
                     onChanged: (double value) {
                       setState(() {
                         mGasFeeValue = Utils.formatDouble(value, precision: precision);
@@ -347,8 +355,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                 ),
                                 new Expanded(
                                     child: new Slider(
-                                  min: mMinGasPrice,
-                                  max: mMaxGasPrice,
+                                  min: mMinGasPrice ?? 0,
+                                  max: mMaxGasPrice ?? 0,
                                   onChanged: (double value) {
                                     setState(() {
                                       mGasPriceValue = value;
@@ -432,8 +440,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                 ),
                                 new Expanded(
                                     child: new Slider(
-                                  min: mMinGasLimit,
-                                  max: mMaxGasLimit,
+                                  min: mMinGasLimit ?? 0,
+                                  max: mMaxGasLimit ?? 0,
                                   onChanged: (double value) {
                                     setState(() {
                                       mGasLimitValue = value;

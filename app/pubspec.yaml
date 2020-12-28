@@ -48,7 +48,7 @@ dependencies:
 
   webview_flutter: ^0.3.20+2
 
-  device_info: ^0.4.2+4
+  device_info: ^1.0.0
   # 获取设备id
 
   qr_flutter: ^3.0.1
@@ -75,7 +75,7 @@ dependencies:
   path_provider: ^1.3.0
   #路径信息获取        https://github.com/flutter/plugins
 
-  shared_preferences: ^0.5.7+1
+  shared_preferences: ^0.5.12+4
   #https://github.com/flutter/plugins
 
   package_info: ^0.4.0+18

@@ -3,7 +3,7 @@ use rbatis::crud::CRUDEnable;
 
 use mav::{ChainType, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MEeeChainToken, MEeeChainTokenDefault, MEeeChainTokenShared, MWallet};
+use mav::ma::{Dao, MEeeChainToken, MEeeChainTokenDefault, MEeeChainTokenShared, MWallet,MSubChainBasicInfo, MAccountInfoSyncProg};
 
 use crate::{Address, Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, TokenShared, WalletError};
 
@@ -133,23 +133,17 @@ impl Load for EeeChain {
     }
 }
 
-#[derive(Debug, Default, Clone)]
-pub struct SyncRecordDetail {
-    pub account: String,
-    pub block_no: String,
-    pub block_hash: String,
+
+#[derive(Debug,Default, Clone)]
+pub struct AccountInfoSyncProg {
+    m:MAccountInfoSyncProg
 }
+deref_type!(AccountInfoSyncProg,MAccountInfoSyncProg);
 
 #[derive(Debug, Default, Clone)]
 pub struct SubChainBasicInfo {
-    pub info_id: String,
-    pub genesis_hash: String,
-    pub metadata: String,
-    pub runtime_version: u32,
-    pub tx_version: u32,
-    pub ss58_format: u32,
-    pub token_decimals: u32,
-    pub token_symbol: String,
+    m:MSubChainBasicInfo
 }
+deref_type!(SubChainBasicInfo,MSubChainBasicInfo);
 
 
