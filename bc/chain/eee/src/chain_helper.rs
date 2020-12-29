@@ -182,6 +182,21 @@ impl ChainHelper {
             }
         }
     }
+    // when decode RawTx instance,the function data length info will be drop,this func is aim to restore the original structure
+   pub fn restore_func_data(func_data:&[u8]) ->Vec<u8>{
+        let func_size = func_data.len();
+        let reserve = match func_size {
+            0..=0b0011_1111 => 1,
+            0b0100_0000..=0b0011_1111_1111_1111 => 2,
+            _ => 4,
+        };
+        let mut func_vec = vec![0u8;func_size+reserve];
+        {
+            let temp = &mut func_vec[reserve..];
+            temp.copy_from_slice(func_data);
+        }
+        func_vec
+    }
 }
 impl ChainHelper{
     // decode etransfer extrinsic,check if the extrinsic is related to the target account

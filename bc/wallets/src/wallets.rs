@@ -2,14 +2,17 @@ use std::ops::Not;
 use std::sync::atomic::AtomicBool;
 
 use failure::_core::sync::atomic::Ordering;
-use parking_lot::{RawMutex, RawThreadId};
 use parking_lot::lock_api::RawReentrantMutex;
+use parking_lot::{RawMutex, RawThreadId};
 
 use eee::Crypto;
-use mav::{ChainType, NetType, WalletType};
 use mav::ma::{BeforeSave, Dao, Db, DbCreateType, MAddress, MMnemonic, MWallet};
+use mav::{ChainType, NetType, WalletType};
 use scry_crypto::Keccak256;
-use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait};
+use wallets_types::{
+    Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait,
+    InitParameters, Load, Setting, Wallet, WalletError, WalletTrait,
+};
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
@@ -53,6 +56,10 @@ impl Wallets {
             self.raw_reentrant.unlock();
         }
         return true;
+    }
+
+    pub fn eee_chain_instance(&self) -> &Box<dyn EeeChainTrait> {
+        self.wallet_trait.eee_chain()
     }
 
     pub async fn init(&mut self, parameters: &InitParameters) -> Result<&Context, WalletError> {
@@ -114,8 +121,8 @@ impl Wallets {
     }
     pub async fn save_current_wallet_chain(&mut self, wallet_id: &str, chain_type: &ChainType) -> Result<(), WalletError> {
         let context = self;
-        let re = Setting::save_current_wallet_chain(context, wallet_id, chain_type).await?;
-        Ok(re)
+        let _re = Setting::save_current_wallet_chain(context, wallet_id, chain_type).await?;
+        Ok(())
     }
     pub async fn current_wallet_chain(&self) -> Result<Option<(String, ChainType)>, WalletError> {
         let context = self;
@@ -123,8 +130,7 @@ impl Wallets {
         Ok(re)
     }
     pub fn generate_mnemonic() -> String {
-        let mnemonic = eee::Sr25519::generate_phrase(15);
-        mnemonic
+        eee::Sr25519::generate_phrase(15)
     }
 
     /// 如果是正式钱包，一个助记词只能创建一个钱包（test类型的钱包允许有重复的）
@@ -144,7 +150,6 @@ impl Wallets {
             }
         }
 
-
         let mut m_wallet = MWallet::default();
         {
             m_wallet.mnemonic_digest = hex_mn_digest;
@@ -154,7 +159,7 @@ impl Wallets {
             m_wallet.net_type = NetType::default_net_type(&wallet_type).to_string();
         }
         let mut m_addresses = self.generate_address_token(&mut m_wallet, &parameters.mnemonic.as_bytes().to_vec()).await?;
-        {//save to database
+        { //save to database
             //tx 只处理异常情况下，事务的rollback，所以会在事务提交成功后，调用 tx.manager = None; 阻止 [rbatis::tx::TxGuard]再管理事务
             let mut tx = rb.begin_tx_defer(false).await?;
             {
@@ -209,9 +214,6 @@ impl ContextTrait for Wallets {
     }
 
     fn set_stopped(&mut self, s: bool) {
-        self.stopped.store(s, Ordering::SeqCst);//todo
+        self.stopped.store(s, Ordering::SeqCst); //todo
     }
 }
-
-
-

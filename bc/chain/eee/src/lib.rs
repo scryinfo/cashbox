@@ -18,6 +18,7 @@ use events::{EventsDecoder, RuntimeEvent, SystemEvent};
 use extrinsic::xt_primitives::{GenericAddress, GenericExtra};//AdditionalSigned
 pub use chain_helper::ChainHelper as SubChainHelper;
 pub use keyring::{Sr25519, Ed25519, Crypto};
+use sp_core::H256;
 
 mod keyring;
 pub mod extrinsic;
@@ -37,6 +38,15 @@ pub type Balance = u128;
 pub enum Token{
     EEE,
     TokenX
+}
+
+#[derive(Encode, Decode, Debug)]
+pub struct RawTx {
+   pub func_data: Vec<u8>,
+   pub index: u32,
+   pub genesis_hash: H256,
+   pub spec_version: u32,
+   pub tx_version:u32,
 }
 
 /// Used to transfer the decoded result of account information, use the default unit here?

@@ -2,14 +2,11 @@
 
 use std::any::Any;
 use std::ffi::{CStr, CString};
-use std::fmt;
-use std::fmt::Formatter;
 use std::mem::ManuallyDrop;
 use std::os::raw::c_char;
 use std::ptr::null_mut;
 
 pub type CU64 = u64;
-pub type CU32 = u32;
 pub type CBool = u32;
 
 pub const CFalse: CBool = 1u32;

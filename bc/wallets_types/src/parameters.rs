@@ -70,10 +70,8 @@ pub struct TransferPayload {
     pub from_account: String,
     pub to_account: String,
     pub value: String,
-    pub genesis_hash: String,
     pub index: u32,
-    pub runtime_version: u32,
-    pub tx_version: u32,
+    pub chain_version:ChainVersion,
     pub ext_data: String,
     pub password: String,
 }
@@ -91,22 +89,23 @@ pub struct AccountInfo {
 
 #[derive(Debug, Clone,Default)]
 pub struct DecodeAccountInfoParameters {
-    pub net_type:String,
     pub encode_data:String,
-    pub genesis_hash: String,
-    pub runtime_version: i32,
-    pub tx_version: i32,
+    pub chain_version:ChainVersion,
 }
 
 #[derive(Debug, Clone, Default,)]
 pub struct StorageKeyParameters {
-    pub net_type:String,
-    pub genesis_hash: String,
-    pub runtime_version: i32,
-    pub tx_version: i32,
+    pub chain_version:ChainVersion,
     pub module: String,
     pub storage_item:String,
     pub pub_key:String,
+}
+
+#[derive(Debug, Clone, Default,)]
+pub struct ChainVersion{
+    pub genesis_hash: String,
+    pub runtime_version: i32,
+    pub tx_version: i32,
 }
 
 
