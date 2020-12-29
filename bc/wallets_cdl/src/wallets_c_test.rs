@@ -7,7 +7,6 @@ mod tests {
     use futures::task::SpawnExt;
 
     use mav::{kits, WalletType};
-    use mav::ma::DbCreateType;
     use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet};
 
     use crate::kits::{CR, CStruct, CU64, to_c_char, to_str};

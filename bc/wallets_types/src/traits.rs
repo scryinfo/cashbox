@@ -1,9 +1,9 @@
 use async_trait::async_trait;
 
 use mav::ma::{Db, MAddress, MWallet};
-use mav::WalletType;
+use mav::{WalletType, NetType};
 
-use crate::WalletError;
+use crate::{WalletError, SubChainBasicInfo, RawTxParam, AccountInfoSyncProg, DecodeAccountInfoParameters, AccountInfo, StorageKeyParameters, TransferPayload};
 
 #[async_trait]
 pub trait Load {
@@ -26,9 +26,22 @@ pub trait ChainTrait: Send + Sync {
     async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress) -> Result<(), WalletError>;
 }
 
-
-
-
 pub trait WalletTrait: Send + Sync {
     fn chains(&self) -> &Vec<Box<dyn ChainTrait>>;
+    fn eee_chain(&self) -> &Box<dyn EeeChainTrait>;
+}
+
+#[async_trait]
+pub trait EeeChainTrait: Send + Sync {
+    async fn update_basic_info(&self, context: &dyn ContextTrait, net_type: &NetType, basic_info: &mut SubChainBasicInfo) -> Result<(), WalletError>;
+    async fn get_basic_info(&self, context: &dyn ContextTrait, net_type: &NetType, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<SubChainBasicInfo, WalletError>;
+
+    async fn update_sync_record(&self, context: &dyn ContextTrait, net_type: &NetType, sync_record: &AccountInfoSyncProg) -> Result<(), WalletError>;
+    async fn get_sync_record(&self, context: &dyn ContextTrait, net_type: &NetType, account: &str) -> Result<AccountInfoSyncProg, WalletError>;
+
+    async fn decode_account_info(&self, context: &dyn ContextTrait, net_type: &NetType, parameters: DecodeAccountInfoParameters) -> Result<AccountInfo, WalletError>;
+    async fn get_storage_key(&self, context: &dyn ContextTrait, net_type: &NetType, parameters: StorageKeyParameters) -> Result<String, WalletError>;
+    async fn eee_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &TransferPayload) -> Result<String, WalletError>;
+    async fn tokenx_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &TransferPayload) -> Result<String, WalletError>;
+    async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, raw_tx: &RawTxParam, is_submittable: bool) -> Result<String, WalletError>;
 }
