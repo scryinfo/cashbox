@@ -27,7 +27,7 @@ impl ChainType {
             "EeeTest" => Ok(ChainType::EeeTest),
             _ => {
                 let err = format!("the str:{} can not be ChainType", chain_type);
-                log::error!("{}",err);
+                log::error!("{}", err);
                 Err(Error::from(err.as_str()))
             }
         }
@@ -60,7 +60,7 @@ impl From<&str> for WalletType {
             "Normal" => WalletType::Normal,
             "Test" => WalletType::Test,
             _ => {
-                log::error!("the str:{} can not be WalletType",wallet_type);
+                log::error!("the str:{} can not be WalletType", wallet_type);
                 WalletType::Test
             }
         }
@@ -121,7 +121,7 @@ impl From<&str> for NetType {
             "Private" => NetType::Private,
             "PrivateTest" => NetType::PrivateTest,
             _ => {
-                log::error!("the str:{} can not be NetType",net_type);
+                log::error!("the str:{} can not be NetType", net_type);
                 NetType::Test
             }
         }

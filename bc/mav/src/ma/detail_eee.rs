@@ -21,7 +21,7 @@ impl EeeTokenType {
             "Eee" => Ok(EeeTokenType::Eee),
             _ => {
                 let err = format!("the str:{} can not be EeeTokenType", token_type);
-                log::error!("{}",err);
+                log::error!("{}", err);
                 Err(kits::Error::from(err.as_str()))
             }
         }

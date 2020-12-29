@@ -92,7 +92,7 @@ impl DbNameType {
             "wallet_testnet_private.db" => Ok(DbNameType::wallet_testnet_private),
             _ => {
                 let err = format!("the str:{} can not to DbName", db_name);
-                log::error!("{}",err);
+                log::error!("{}", err);
                 Err(Error::from(err.as_str()))
             }
         }

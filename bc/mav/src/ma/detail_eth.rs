@@ -23,7 +23,7 @@ impl EthTokenType {
             "Erc20" => Ok(EthTokenType::Erc20),
             _ => {
                 let err = format!("the str:{} can not be EthTokenType", token_type);
-                log::error!("{}",err);
+                log::error!("{}", err);
                 Err(kits::Error::from(err.as_str()))
             }
         }

@@ -21,7 +21,7 @@ impl BtcTokenType {
             "Btc" => Ok(BtcTokenType::Btc),
             _ => {
                 let err = format!("the str:{} can not be BtcTokenType", token_type);
-                log::error!("{}",err);
+                log::error!("{}", err);
                 Err(kits::Error::from(err.as_str()))
             }
         }
