@@ -126,10 +126,7 @@ impl Constructor {
         let mut dispatcher = Dispatcher::new(from_p2p);
 
         let pair: CondvarPair<Condition> = Arc::new((
-            parking_lot::Mutex::new(Condition {
-                header_ready: false,
-                fillter_ready: false,
-            }),
+            parking_lot::Mutex::new(Condition::new(false, false)),
             Condvar::new(),
         ));
         let pair2 = Arc::clone(&pair);
@@ -160,7 +157,7 @@ impl Constructor {
             pair3,
         ));
 
-        dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
+        // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));

@@ -81,6 +81,7 @@ impl Ping {
                 .lock()
                 .unwrap()
                 .check(vec![ExpectedReply::Pong]);
+
             for peer in self.p2p.peers() {
                 if !self.timeout.lock().unwrap().is_busy(peer) {
                     let ask = thread_rng().next_u64();

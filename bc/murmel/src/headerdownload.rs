@@ -21,7 +21,7 @@ use crate::constructor::CondvarPair;
 use crate::db::RB_CHAIN;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
-use crate::hooks::HooksMessage;
+use crate::hooks::{HooksMessage, ShowCondition};
 use crate::p2p::{
     P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
     SERVICE_BLOCKS,
@@ -37,6 +37,8 @@ use bitcoin::{
 use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use log::{debug, error, info, trace};
+use std::ops::Deref;
+use std::sync::Arc;
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
 
 pub struct HeaderDownload<T> {
@@ -48,7 +50,7 @@ pub struct HeaderDownload<T> {
     condvar_pair: CondvarPair<T>,
 }
 
-impl<T: std::marker::Send + 'static> HeaderDownload<T> {
+impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
     pub fn new(
         chaindb: SharedChainDB,
         p2p: P2PControlSender<NetworkMessage>,
@@ -186,6 +188,14 @@ impl<T: std::marker::Send + 'static> HeaderDownload<T> {
             .received(peer, 1, ExpectedReply::Headers);
 
         if headers.len() > 0 {
+            {
+                let ref pair = self.condvar_pair;
+                let &(ref lock, ref cvar) = Arc::deref(pair);
+                let mut condition = lock.lock();
+                (*condition).set_header(true);
+                cvar.notify_all();
+            }
+
             // current height
             let mut height;
             // some received headers were not yet known
@@ -276,9 +286,10 @@ impl<T: std::marker::Send + 'static> HeaderDownload<T> {
                     peer
                 );
                 //hooks for new headers
-                self.hook_sender
-                    .send(HooksMessage::ReceivedHeaders(peer.clone()))
-                    .expect("HOOKS ERROR");
+                // self.hook_sender
+                //     .send(HooksMessage::ReceivedHeaders(peer.clone()))
+                //     .expect("HOOKS ERROR");
+
                 self.p2p.send(P2PControl::Height(height));
             } else {
                 debug!(

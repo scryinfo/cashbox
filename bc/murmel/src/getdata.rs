@@ -2,9 +2,10 @@
 //! loadfilter message do not get any response.
 //! we get response here
 use crate::error::Error;
-use crate::hooks::HooksMessage;
+use crate::hooks::{HooksMessage, ShowCondition};
 use crate::p2p::{
-    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOOM,
+    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
+    SERVICE_BLOOM,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
@@ -19,7 +20,8 @@ use crate::constructor::CondvarPair;
 use crate::db::{RB_CHAIN, RB_DETAIL};
 use bitcoin_hashes::Hash;
 use log::{error, info, trace, warn};
-use std::sync::mpsc;
+use std::ops::Deref;
+use std::sync::{mpsc, Arc};
 use std::thread;
 use std::time::Duration;
 
@@ -33,7 +35,7 @@ pub struct GetData<T> {
     condvar_pair: CondvarPair<T>,
 }
 
-impl<T: std::marker::Send + 'static> GetData<T> {
+impl<T: Send + 'static + ShowCondition> GetData<T> {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
@@ -63,7 +65,7 @@ impl<T: std::marker::Send + 'static> GetData<T> {
         let mut merkle_vec = vec![];
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(4000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {
@@ -115,25 +117,25 @@ impl<T: std::marker::Send + 'static> GetData<T> {
                 }
             }
 
-            while let Ok(msg) = self.hook_receiver.recv_timeout(Duration::from_millis(1000)) {
-                match msg {
-                    HooksMessage::ReceivedHeaders(pid) => {
-                        warn!("hooks for received headers");
-                        self.get_data(pid, true).expect("GOT HOOKS error");
-                    }
-                    HooksMessage::Others => (),
-                }
-            }
+            // while let Ok(msg) = self.hook_receiver.recv_timeout(Duration::from_millis(1000)) {
+            //     match msg {
+            //         HooksMessage::ReceivedHeaders(pid) => {
+            //             warn!("hooks for received headers");
+            //             self.get_data(pid, true).expect("GOT HOOKS error");
+            //         }
+            //         HooksMessage::Others => (),
+            //     }
+            // }
             self.timeout
                 .lock()
                 .unwrap()
-                .check(vec![ExpectedReply::MerkleBlock]);
+                .check(vec![ExpectedReply::MerkleBlock, ExpectedReply::Tx]);
         }
     }
 
     fn is_serving_blocks(&self, peer: PeerId) -> bool {
         if let Some(peer_version) = self.p2p.peer_version(peer) {
-            return peer_version.services & SERVICE_BLOOM != 0;
+            return peer_version.services & SERVICE_BLOCKS != 0;
         }
         false
     }
@@ -146,7 +148,32 @@ impl<T: std::marker::Send + 'static> GetData<T> {
             .unwrap()
             .is_busy_with(peer, ExpectedReply::MerkleBlock)
         {
+            error!("busy with merkleblock");
             return Ok(());
+        }
+
+        if self
+            .timeout
+            .lock()
+            .unwrap()
+            .is_busy_with(peer, ExpectedReply::Tx)
+        {
+            error!("busy with Tx");
+            return Ok(());
+        }
+
+        {
+            error!("开始等filter");
+            let ref pair = self.condvar_pair;
+            let &(ref lock, ref cvar) = Arc::deref(pair);
+            let mut condition = lock.lock();
+            while !(*condition).get_filter() {
+                let r = cvar.wait_for(&mut condition, Duration::from_secs(3));
+                if r.timed_out() {
+                    error!("不等filter");
+                    return Ok(());
+                }
+            }
         }
 
         let mut header_vec: Vec<String> = vec![];
@@ -186,7 +213,12 @@ impl<T: std::marker::Send + 'static> GetData<T> {
     }
 
     // Handle tx return value
-    fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
+    fn tx(&mut self, tx: &Transaction, peer: PeerId, hash160: String) -> Result<(), Error> {
+        self.timeout
+            .lock()
+            .unwrap()
+            .received(peer, 1, ExpectedReply::Tx);
+
         info!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;
