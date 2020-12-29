@@ -19,6 +19,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:package_info/package_info.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -90,10 +91,10 @@ class _DappPageState extends State<DappPage> {
                     margin: EdgeInsets.only(top: ScreenUtil().setHeight(4.5)),
                     child: WebView(
                       // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
-                      // initialUrl:"http://192.168.2.12:9010/web_app/dapp/dapp.html",
+                      initialUrl:"http://192.168.2.57:9010/web_app/dapp/dapp.html",
                       //initialUrl:"file:///android_asset/flutter_assets/assets/dist/index.html",
                       // initialUrl: "http://192.168.2.97:8080",
-                      initialUrl: "http://192.168.2.57:9010/web_app/dapp/dapp.html",
+                      // initialUrl: "http://59.110.231.223:9010/web_app/dapp/dapp.html#/",
                       // initialUrl: snapshot.data.toString(),
                       javascriptMode: JavascriptMode.unrestricted,
                       userAgent:
@@ -597,6 +598,15 @@ class _DappPageState extends State<DappPage> {
               );
             },
           );
+        }));
+    jsChannelList.add(JavascriptChannel(
+        name: "cashboxAppVersion",
+        onMessageReceived: (JavascriptMessage message) async {
+          var msg = Message.fromJson(jsonDecode(message.message));
+          PackageInfo packageInfo = await PackageInfo.fromPlatform();
+          String apkVersion = packageInfo.version;
+          msg.data = apkVersion;
+          this.callPromise(msg);
         }));
     return jsChannelList.toSet();
   }

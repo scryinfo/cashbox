@@ -6,6 +6,7 @@ use mav::kits::sql_left_join_get_b;
 use mav::ma::{Dao, MEeeChainToken, MEeeChainTokenDefault, MEeeChainTokenShared, MWallet,MSubChainBasicInfo, MAccountInfoSyncProg};
 
 use crate::{Address, Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, TokenShared, WalletError};
+use rbatis::rbatis::Rbatis;
 
 #[derive(Debug, Default)]
 pub struct EeeChainToken {
@@ -140,10 +141,50 @@ pub struct AccountInfoSyncProg {
 }
 deref_type!(AccountInfoSyncProg,MAccountInfoSyncProg);
 
+impl From<MAccountInfoSyncProg> for AccountInfoSyncProg{
+    fn from(m_sync_prog: MAccountInfoSyncProg) -> Self {
+        let mut info =  AccountInfoSyncProg{
+            m: Default::default()
+        };
+        info.m = m_sync_prog;
+        info
+    }
+}
+
+impl AccountInfoSyncProg{
+    pub async fn find_by_account(rb: &Rbatis, account: &str) -> Result<Option<MAccountInfoSyncProg>, WalletError> {
+        let mut wrapper = rb.new_wrapper();
+        wrapper.eq(MAccountInfoSyncProg::account, account.to_string());
+        let r = MAccountInfoSyncProg::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info|info.into());
+        Ok(r)
+    }
+}
+
 #[derive(Debug, Default, Clone)]
 pub struct SubChainBasicInfo {
     m:MSubChainBasicInfo
 }
 deref_type!(SubChainBasicInfo,MSubChainBasicInfo);
+
+impl From<MSubChainBasicInfo> for SubChainBasicInfo{
+    fn from(m_sub_info: MSubChainBasicInfo) -> Self {
+        let mut info =  SubChainBasicInfo{
+            m: Default::default()
+        };
+        info.m = m_sub_info;
+        info
+    }
+}
+
+impl SubChainBasicInfo{
+    pub async fn find_by_version(rb: &Rbatis, genesis_hash: &str,runtime_version:i32,tx_version:i32) -> Result<Option<SubChainBasicInfo>, WalletError> {
+        let mut wrapper = rb.new_wrapper();
+        wrapper.eq(MSubChainBasicInfo::genesis_hash, genesis_hash.to_string());
+        wrapper.eq(MSubChainBasicInfo::runtime_version, runtime_version);
+        wrapper.eq(MSubChainBasicInfo::tx_version, tx_version);
+        let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info|info.into());
+        Ok(r)
+    }
+}
 
 
