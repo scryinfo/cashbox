@@ -169,7 +169,7 @@ class _DigitListPageState extends State<DigitListPage> {
                     top: ScreenUtil().setHeight(3),
                     left: ScreenUtil().setHeight(3),
                   ),
-                  width: ScreenUtil().setWidth(30),
+                  width: ScreenUtil().setWidth(60),
                   height: ScreenUtil().setHeight(10),
                   child: Text(
                     displayDigitsList[index].shortName ?? "",
