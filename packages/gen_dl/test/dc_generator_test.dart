@@ -1,5 +1,4 @@
 @TestOn('vm')
-import 'dart:convert';
 
 import 'package:build_test/build_test.dart';
 import 'package:gen_dl/src/dc_generator.dart';
@@ -8,15 +7,14 @@ import 'package:test/test.dart';
 
 void main() {
   tearDown(() {
-    // Increment this after each test so the next test has it's own package
     _pkgCacheCount++;
   });
   test('Simple Generator test', () async {
-    await _generateTest(const DCGenerator(), _testGenPartContent);
+    await _generateTest(const DCGenerator(), _testGenCode);
   });
 }
 
-const _testGenPartContent = r'''// GENERATED CODE - DO NOT MODIFY BY HAND
+const _testGenCode = r'''// GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
 // DCGenerator
@@ -35,6 +33,12 @@ class Error extends DC<clib.CError> {
   static free(Pointer<clib.CError> ptr) {
     ffi.free(ptr.ref.message);
     ffi.free(ptr);
+  }
+
+  static Error fromC(Pointer<clib.CError> ptr) {
+    var d = new Error();
+    d.toDart(ptr);
+    return d;
   }
 
   @override
@@ -62,6 +66,12 @@ class Address extends DC<clib.CAddress> {
     ffi.free(ptr);
   }
 
+  static Address fromC(Pointer<clib.CAddress> ptr) {
+    var d = new Address();
+    d.toDart(ptr);
+    return d;
+  }
+
   @override
   Pointer<clib.CAddress> toC() {
     var c = clib.CAddress.allocate();
@@ -81,7 +91,7 @@ class Address extends DC<clib.CAddress> {
 
 String get _pkgName => 'pkg$_pkgCacheCount';
 int _pkgCacheCount = 1;
-const _testLibContent = r'''
+const _testLibCode = r'''
 library test_lib;
 import 'dart:ffi';
 import 'package:ffi/ffi.dart' as ffi;
@@ -105,8 +115,10 @@ class CAddress extends Struct {
 ''';
 
 Future _generateTest(DCGenerator gen, String expectedContent) async {
-  final srcs = _createPackageStub();
-  final builder = LibraryBuilder(gen, generatedExtension: '.foo.dart');
+  final srcs = {
+    '$_pkgName|lib/test_lib.dart': _testLibCode,
+  };
+  final builder = LibraryBuilder(gen, generatedExtension: '.dc.dart');
 
   await testBuilder(
     builder,
@@ -114,7 +126,7 @@ Future _generateTest(DCGenerator gen, String expectedContent) async {
     reader: await PackageAssetReader.currentIsolate(),
     generateFor: {'$_pkgName|lib/test_lib.dart'},
     outputs: {
-      '$_pkgName|lib/test_lib.foo.dart': decodedMatches(expectedContent),
+      '$_pkgName|lib/test_lib.dc.dart': decodedMatches(expectedContent),
     },
     onLog: (log) {
       if (log.message.contains(
@@ -124,13 +136,7 @@ Future _generateTest(DCGenerator gen, String expectedContent) async {
         // This may happen with pre-release SDKs. Not an error.
         return;
       }
-      // fail('Unexpected log message: ${log.message}');
+      fail('Unexpected log message: ${log.message}');
     },
   );
 }
-
-Map<String, String> _createPackageStub(
-        {String testLibContent, String testLibPartContent}) =>
-    {
-      '$_pkgName|lib/test_lib.dart': testLibContent ?? _testLibContent,
-    };
