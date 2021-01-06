@@ -93,6 +93,7 @@ import 'kits.dart';
     StringBuffer free = new StringBuffer();
     StringBuffer toC = new StringBuffer();
     StringBuffer toDart = new StringBuffer();
+    StringBuffer subStruct = new StringBuffer();
     for (var f in fieldMetas) {
       switch (f.fieldType) {
         case _FieldType.baseType:
@@ -111,10 +112,9 @@ import 'kits.dart';
 
             free.writeln('${_blankTwo}ffi.free(ptr.ref.${f.name});');
 
-            toC.writeln(
-                '${_blankTwo}c.ref.${f.name} = ffi.Utf8.toUtf8(${f.name});');
+            toC.writeln('${_blankTwo}c.ref.${f.name} = toUtf8Null(${f.name});');
             toDart.writeln(
-                '${_blankTwo}${f.name} = ffi.Utf8.fromUtf8(c.ref.${f.name});');
+                '${_blankTwo}${f.name} = fromUtf8Null(c.ref.${f.name});');
           }
           break;
         case _FieldType.struct:
@@ -127,8 +127,18 @@ import 'kits.dart';
             toC.writeln('${_blankTwo}c.ref.${f.name} = ${f.name}.toC();');
             toDart.writeln('${_blankTwo}${f.name} = new ${className}();');
             toDart.writeln('${_blankTwo}${f.name}.toDart(c.ref.${f.name});');
+
+            subStruct.writeln('${_blankTwo}${f.name} = new ${className}();');
           }
       }
+    }
+    //new
+    if (subStruct.isNotEmpty) {
+      classCode.writeln('''
+
+  ${toClassName(c.name)}() {
+${subStruct.toString()}$_blankOne}
+''');
     }
     //free
     classCode.writeln('''

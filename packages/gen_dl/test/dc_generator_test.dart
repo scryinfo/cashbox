@@ -1,5 +1,4 @@
 @TestOn('vm')
-
 import 'package:build_test/build_test.dart';
 import 'package:gen_dl/src/dc_generator.dart';
 import 'package:source_gen/source_gen.dart';
@@ -45,20 +44,24 @@ class Error extends DC<clib.CError> {
   Pointer<clib.CError> toC() {
     var c = clib.CError.allocate();
     c.ref.code = code;
-    c.ref.message = ffi.Utf8.toUtf8(message);
+    c.ref.message = toUtf8Null(message);
     return c;
   }
 
   @override
   toDart(Pointer<clib.CError> c) {
     code = c.ref.code;
-    message = ffi.Utf8.fromUtf8(c.ref.message);
+    message = fromUtf8Null(c.ref.message);
   }
 }
 
 class Address extends DC<clib.CAddress> {
   String name;
   Error err;
+
+  Address() {
+    err = new Error();
+  }
 
   static free(Pointer<clib.CAddress> ptr) {
     ffi.free(ptr.ref.name);
@@ -75,14 +78,14 @@ class Address extends DC<clib.CAddress> {
   @override
   Pointer<clib.CAddress> toC() {
     var c = clib.CAddress.allocate();
-    c.ref.name = ffi.Utf8.toUtf8(name);
+    c.ref.name = toUtf8Null(name);
     c.ref.err = err.toC();
     return c;
   }
 
   @override
   toDart(Pointer<clib.CAddress> c) {
-    name = ffi.Utf8.fromUtf8(c.ref.name);
+    name = fromUtf8Null(c.ref.name);
     err = new Error();
     err.toDart(c.ref.err);
   }

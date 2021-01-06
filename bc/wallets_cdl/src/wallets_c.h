@@ -167,11 +167,22 @@ typedef struct CCreateWalletParameters {
 
 typedef uint32_t CBool;
 
-typedef struct CSyncRecordDetail {
+typedef struct CAccountInfoSyncProg {
     char *account;
     char *blockNo;
     char *blockHash;
-} CSyncRecordDetail;
+} CAccountInfoSyncProg;
+
+typedef struct CChainVersion {
+    char *genesisHash;
+    int32_t runtimeVersion;
+    int32_t txVersion;
+} CChainVersion;
+
+typedef struct CDecodeAccountInfoParameters {
+    char *encodeData;
+    CChainVersion *chainVersion;
+} CDecodeAccountInfoParameters;
 
 typedef struct CAccountInfo {
     uint32_t nonce;
@@ -182,14 +193,19 @@ typedef struct CAccountInfo {
     char *fee_frozen;
 } CAccountInfo;
 
+typedef struct CStorageKeyParameters {
+    CChainVersion *chainVersion;
+    char *module;
+    char *storageItem;
+    char *pubKey;
+} CStorageKeyParameters;
+
 typedef struct CTransferPayload {
     char *fromAccount;
     char *toAccount;
     char *value;
-    char *genesisHash;
     uint32_t index;
-    uint32_t runtime_version;
-    uint32_t tx_version;
+    CChainVersion *chainVersion;
     char *extData;
     char *password;
 } CTransferPayload;
@@ -201,17 +217,15 @@ typedef struct CRawTxParam {
 } CRawTxParam;
 
 typedef struct CSubChainBasicInfo {
-    char *infoId;
     char *genesisHash;
     char *metadata;
-    uint32_t runtimeVersion;
-    uint32_t txVersion;
-    uint32_t ss58Format;
-    uint32_t tokenDecimals;
+    int32_t runtimeVersion;
+    int32_t txVersion;
+    int32_t ss58FormatPrefix;
+    int32_t tokenDecimals;
     char *tokenSymbol;
+    CBool isDefault;
 } CSubChainBasicInfo;
-
-typedef uint32_t CU32;
 
 #define CFalse 1
 
@@ -326,25 +340,25 @@ CArrayCWallet **CArrayCWallet_dAlloc(void);
 
 void CArrayCWallet_dFree(CArrayCWallet **dPtr);
 
-const CError *ChainEee_updateSyncRecord(CContext *ctx, CSyncRecordDetail *syncRecord);
+const CError *ChainEee_updateSyncRecord(CContext *ctx, char *netType, CAccountInfoSyncProg *syncRecord);
 
-const CError *ChainEee_getSyncRecord(CContext *ctx, CSyncRecordDetail **syncRecord);
+const CError *ChainEee_getSyncRecord(CContext *ctx, char *netType, char *account, CAccountInfoSyncProg **syncRecord);
 
-const CError *ChainEee_decodeAccountInfo(CContext *ctx, char *encodeData, CAccountInfo **accountInfo);
+const CError *ChainEee_decodeAccountInfo(CContext *ctx, char *netType, CDecodeAccountInfoParameters *parameters, CAccountInfo **accountInfo);
 
-const CError *ChainEee_getStorageKey(CContext *ctx, char *module, char *storageItem, char *pubKey, char **accountInfo);
+const CError *ChainEee_getStorageKey(CContext *ctx, char *netType, CStorageKeyParameters *parameters, char **key);
 
-const CError *ChainEee_eeeTransfer(CContext *ctx, CTransferPayload *transferPayload, char **signedResult);
+const CError *ChainEee_eeeTransfer(CContext *ctx, char *netType, CTransferPayload *transferPayload, char **signedResult);
 
-const CError *ChainEee_tokenXTransfer(CContext *ctx, CTransferPayload *transferPayload, char **signedResult);
+const CError *ChainEee_tokenXTransfer(CContext *ctx, char *netType, CTransferPayload *transferPayload, char **signedResult);
 
-const CError *ChainEee_txSubmittableSign(CContext *ctx, CRawTxParam *rawTx, char **signedResult);
+const CError *ChainEee_txSubmittableSign(CContext *ctx, char *netType, CRawTxParam *rawTx, char **signedResult);
 
-const CError *ChainEee_txSign(CContext *ctx, CRawTxParam *rawTx, char **signedResult);
+const CError *ChainEee_txSign(CContext *ctx, char *netType, CRawTxParam *rawTx, char **signedResult);
 
-const CError *ChainEee_updateBasicInfo(CContext *ctx, CSubChainBasicInfo *basicInfo, CBool *isDefault);
+const CError *ChainEee_updateBasicInfo(CContext *ctx, char *netType, CSubChainBasicInfo *basicInfo);
 
-const CError *ChainEee_getBasicInfo(CContext *ctx, char *genesisHash, CU32 *specVersion, CU32 *txVersion, CSubChainBasicInfo **basicInfo);
+const CError *ChainEee_getBasicInfo(CContext *ctx, char *netType, CChainVersion *chainVersion, CSubChainBasicInfo **basicInfo);
 
 #ifdef __cplusplus
 } // extern "C"

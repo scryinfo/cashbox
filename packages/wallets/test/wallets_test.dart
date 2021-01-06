@@ -11,7 +11,7 @@ import 'package:wallets/wallets_c.dc.dart';
 
 void main() {
   test('Wallets', () async {
-    var wallet = Wallets.instance();
+    var wallet = Wallets.mainIsolate();
 
     {
       var initP = new InitParameters();
@@ -23,8 +23,8 @@ void main() {
       initP.dbName.walletTestnetPrivate = "wallet_testnet_private.db";
       wallet.init(initP);
 
-      expect(true, wallet.context != null);
-      var id = ffi.Utf8.fromUtf8(wallet.context.ref.id);
+      expect(true, wallet.ptrContext != null);
+      var id = ffi.Utf8.fromUtf8(wallet.ptrContext.ref.id);
       expect(true, id.isNotEmpty);
     }
     {
@@ -43,7 +43,7 @@ void main() {
     }
 
     {
-      var err = await compute(computeFun, wallet.dContext.address);
+      var err = await compute(computeFun, wallet.context);
       expect(true, isSuccess(err));
     }
     {
@@ -56,9 +56,9 @@ void main() {
   });
 }
 
-Error computeFun(int ctx) {
-  var wallet = Wallets.instance();
-  wallet.dContext = Pointer<Pointer<clib.CContext>>.fromAddress(ctx);
+Error computeFun(Context ctx) {
+  var wallet = Wallets.mainIsolate();
+  wallet.context = ctx;
   var err = wallet.safeRead(() {
     //...
   });

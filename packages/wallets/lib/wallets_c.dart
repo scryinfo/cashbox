@@ -4,8 +4,6 @@ import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart' as ffi;
 
-import 'kits.dart';
-
 // ignore_for_file: unused_import, camel_case_types, non_constant_identifier_names
 final DynamicLibrary _dl = _open();
 
@@ -25,7 +23,7 @@ class CAccountInfo extends Struct {
   int nonce;
   @Uint32()
   int ref_count;
-  Pointer<ffi.Utf8> free_;
+  Pointer<ffi.Utf8> free;
   Pointer<ffi.Utf8> reserved;
   Pointer<ffi.Utf8> misc_frozen;
   Pointer<ffi.Utf8> fee_frozen;
@@ -36,6 +34,21 @@ class CAccountInfo extends Struct {
 
   static CAccountInfo from(int ptr) {
     return Pointer<CAccountInfo>.fromAddress(ptr).ref;
+  }
+}
+
+/// C struct `CAccountInfoSyncProg`.
+class CAccountInfoSyncProg extends Struct {
+  Pointer<ffi.Utf8> account;
+  Pointer<ffi.Utf8> blockNo;
+  Pointer<ffi.Utf8> blockHash;
+
+  static Pointer<CAccountInfoSyncProg> allocate() {
+    return ffi.allocate<CAccountInfoSyncProg>();
+  }
+
+  static CAccountInfoSyncProg from(int ptr) {
+    return Pointer<CAccountInfoSyncProg>.fromAddress(ptr).ref;
   }
 }
 
@@ -285,6 +298,23 @@ class CChainShared extends Struct {
   }
 }
 
+/// C struct `CChainVersion`.
+class CChainVersion extends Struct {
+  Pointer<ffi.Utf8> genesisHash;
+  @Int32()
+  int runtimeVersion;
+  @Int32()
+  int txVersion;
+
+  static Pointer<CChainVersion> allocate() {
+    return ffi.allocate<CChainVersion>();
+  }
+
+  static CChainVersion from(int ptr) {
+    return Pointer<CChainVersion>.fromAddress(ptr).ref;
+  }
+}
+
 /// C struct `CContext`.
 class CContext extends Struct {
   Pointer<ffi.Utf8> id;
@@ -361,6 +391,20 @@ class CDbName extends Struct {
 
   static CDbName from(int ptr) {
     return Pointer<CDbName>.fromAddress(ptr).ref;
+  }
+}
+
+/// C struct `CDecodeAccountInfoParameters`.
+class CDecodeAccountInfoParameters extends Struct {
+  Pointer<ffi.Utf8> encodeData;
+  Pointer<CChainVersion> chainVersion;
+
+  static Pointer<CDecodeAccountInfoParameters> allocate() {
+    return ffi.allocate<CDecodeAccountInfoParameters>();
+  }
+
+  static CDecodeAccountInfoParameters from(int ptr) {
+    return Pointer<CDecodeAccountInfoParameters>.fromAddress(ptr).ref;
   }
 }
 
@@ -506,6 +550,22 @@ class CRawTxParam extends Struct {
   }
 }
 
+/// C struct `CStorageKeyParameters`.
+class CStorageKeyParameters extends Struct {
+  Pointer<CChainVersion> chainVersion;
+  Pointer<ffi.Utf8> module;
+  Pointer<ffi.Utf8> storageItem;
+  Pointer<ffi.Utf8> pubKey;
+
+  static Pointer<CStorageKeyParameters> allocate() {
+    return ffi.allocate<CStorageKeyParameters>();
+  }
+
+  static CStorageKeyParameters from(int ptr) {
+    return Pointer<CStorageKeyParameters>.fromAddress(ptr).ref;
+  }
+}
+
 /// C function `CStr_dAlloc`.
 Pointer<Pointer<ffi.Utf8>> CStr_dAlloc() {
   return _CStr_dAlloc();
@@ -536,18 +596,19 @@ typedef _CStr_dFree_Dart = void Function(
 
 /// C struct `CSubChainBasicInfo`.
 class CSubChainBasicInfo extends Struct {
-  Pointer<ffi.Utf8> infoId;
   Pointer<ffi.Utf8> genesisHash;
   Pointer<ffi.Utf8> metadata;
-  @Uint32()
+  @Int32()
   int runtimeVersion;
-  @Uint32()
+  @Int32()
   int txVersion;
-  @Uint32()
-  int ss58Format;
-  @Uint32()
+  @Int32()
+  int ss58FormatPrefix;
+  @Int32()
   int tokenDecimals;
   Pointer<ffi.Utf8> tokenSymbol;
+  @Uint32()
+  int isDefault;
 
   static Pointer<CSubChainBasicInfo> allocate() {
     return ffi.allocate<CSubChainBasicInfo>();
@@ -555,21 +616,6 @@ class CSubChainBasicInfo extends Struct {
 
   static CSubChainBasicInfo from(int ptr) {
     return Pointer<CSubChainBasicInfo>.fromAddress(ptr).ref;
-  }
-}
-
-/// C struct `CSyncRecordDetail`.
-class CSyncRecordDetail extends Struct {
-  Pointer<ffi.Utf8> account;
-  Pointer<ffi.Utf8> blockNo;
-  Pointer<ffi.Utf8> blockHash;
-
-  static Pointer<CSyncRecordDetail> allocate() {
-    return ffi.allocate<CSyncRecordDetail>();
-  }
-
-  static CSyncRecordDetail from(int ptr) {
-    return Pointer<CSyncRecordDetail>.fromAddress(ptr).ref;
   }
 }
 
@@ -597,13 +643,9 @@ class CTransferPayload extends Struct {
   Pointer<ffi.Utf8> fromAccount;
   Pointer<ffi.Utf8> toAccount;
   Pointer<ffi.Utf8> value;
-  Pointer<ffi.Utf8> genesisHash;
   @Uint32()
   int index;
-  @Uint32()
-  int runtime_version;
-  @Uint32()
-  int tx_version;
+  Pointer<CChainVersion> chainVersion;
   Pointer<ffi.Utf8> extData;
   Pointer<ffi.Utf8> password;
 
@@ -665,10 +707,11 @@ typedef _CWallet_dFree_Dart = void Function(
 /// C function `ChainEee_decodeAccountInfo`.
 Pointer<CError> ChainEee_decodeAccountInfo(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> encodeData,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CDecodeAccountInfoParameters> parameters,
   Pointer<Pointer<CAccountInfo>> accountInfo,
 ) {
-  return _ChainEee_decodeAccountInfo(ctx, encodeData, accountInfo);
+  return _ChainEee_decodeAccountInfo(ctx, netType, parameters, accountInfo);
 }
 
 final _ChainEee_decodeAccountInfo_Dart _ChainEee_decodeAccountInfo =
@@ -677,22 +720,25 @@ final _ChainEee_decodeAccountInfo_Dart _ChainEee_decodeAccountInfo =
 
 typedef _ChainEee_decodeAccountInfo_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> encodeData,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CDecodeAccountInfoParameters> parameters,
   Pointer<Pointer<CAccountInfo>> accountInfo,
 );
 typedef _ChainEee_decodeAccountInfo_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> encodeData,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CDecodeAccountInfoParameters> parameters,
   Pointer<Pointer<CAccountInfo>> accountInfo,
 );
 
 /// C function `ChainEee_eeeTransfer`.
 Pointer<CError> ChainEee_eeeTransfer(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CTransferPayload> transferPayload,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 ) {
-  return _ChainEee_eeeTransfer(ctx, transferPayload, signedResult);
+  return _ChainEee_eeeTransfer(ctx, netType, transferPayload, signedResult);
 }
 
 final _ChainEee_eeeTransfer_Dart _ChainEee_eeeTransfer =
@@ -701,11 +747,13 @@ final _ChainEee_eeeTransfer_Dart _ChainEee_eeeTransfer =
 
 typedef _ChainEee_eeeTransfer_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CTransferPayload> transferPayload,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 );
 typedef _ChainEee_eeeTransfer_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CTransferPayload> transferPayload,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 );
@@ -713,13 +761,11 @@ typedef _ChainEee_eeeTransfer_Dart = Pointer<CError> Function(
 /// C function `ChainEee_getBasicInfo`.
 Pointer<CError> ChainEee_getBasicInfo(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> genesisHash,
-  Pointer<Uint32> specVersion,
-  Pointer<Uint32> txVersion,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CChainVersion> chainVersion,
   Pointer<Pointer<CSubChainBasicInfo>> basicInfo,
 ) {
-  return _ChainEee_getBasicInfo(
-      ctx, genesisHash, specVersion, txVersion, basicInfo);
+  return _ChainEee_getBasicInfo(ctx, netType, chainVersion, basicInfo);
 }
 
 final _ChainEee_getBasicInfo_Dart _ChainEee_getBasicInfo =
@@ -728,28 +774,25 @@ final _ChainEee_getBasicInfo_Dart _ChainEee_getBasicInfo =
 
 typedef _ChainEee_getBasicInfo_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> genesisHash,
-  Pointer<Uint32> specVersion,
-  Pointer<Uint32> txVersion,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CChainVersion> chainVersion,
   Pointer<Pointer<CSubChainBasicInfo>> basicInfo,
 );
 typedef _ChainEee_getBasicInfo_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> genesisHash,
-  Pointer<Uint32> specVersion,
-  Pointer<Uint32> txVersion,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CChainVersion> chainVersion,
   Pointer<Pointer<CSubChainBasicInfo>> basicInfo,
 );
 
 /// C function `ChainEee_getStorageKey`.
 Pointer<CError> ChainEee_getStorageKey(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> module,
-  Pointer<ffi.Utf8> storageItem,
-  Pointer<ffi.Utf8> pubKey,
-  Pointer<Pointer<ffi.Utf8>> accountInfo,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CStorageKeyParameters> parameters,
+  Pointer<Pointer<ffi.Utf8>> key,
 ) {
-  return _ChainEee_getStorageKey(ctx, module, storageItem, pubKey, accountInfo);
+  return _ChainEee_getStorageKey(ctx, netType, parameters, key);
 }
 
 final _ChainEee_getStorageKey_Dart _ChainEee_getStorageKey =
@@ -758,25 +801,25 @@ final _ChainEee_getStorageKey_Dart _ChainEee_getStorageKey =
 
 typedef _ChainEee_getStorageKey_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> module,
-  Pointer<ffi.Utf8> storageItem,
-  Pointer<ffi.Utf8> pubKey,
-  Pointer<Pointer<ffi.Utf8>> accountInfo,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CStorageKeyParameters> parameters,
+  Pointer<Pointer<ffi.Utf8>> key,
 );
 typedef _ChainEee_getStorageKey_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> module,
-  Pointer<ffi.Utf8> storageItem,
-  Pointer<ffi.Utf8> pubKey,
-  Pointer<Pointer<ffi.Utf8>> accountInfo,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CStorageKeyParameters> parameters,
+  Pointer<Pointer<ffi.Utf8>> key,
 );
 
 /// C function `ChainEee_getSyncRecord`.
 Pointer<CError> ChainEee_getSyncRecord(
   Pointer<CContext> ctx,
-  Pointer<Pointer<CSyncRecordDetail>> syncRecord,
+  Pointer<ffi.Utf8> netType,
+  Pointer<ffi.Utf8> account,
+  Pointer<Pointer<CAccountInfoSyncProg>> syncRecord,
 ) {
-  return _ChainEee_getSyncRecord(ctx, syncRecord);
+  return _ChainEee_getSyncRecord(ctx, netType, account, syncRecord);
 }
 
 final _ChainEee_getSyncRecord_Dart _ChainEee_getSyncRecord =
@@ -785,20 +828,25 @@ final _ChainEee_getSyncRecord_Dart _ChainEee_getSyncRecord =
 
 typedef _ChainEee_getSyncRecord_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<Pointer<CSyncRecordDetail>> syncRecord,
+  Pointer<ffi.Utf8> netType,
+  Pointer<ffi.Utf8> account,
+  Pointer<Pointer<CAccountInfoSyncProg>> syncRecord,
 );
 typedef _ChainEee_getSyncRecord_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<Pointer<CSyncRecordDetail>> syncRecord,
+  Pointer<ffi.Utf8> netType,
+  Pointer<ffi.Utf8> account,
+  Pointer<Pointer<CAccountInfoSyncProg>> syncRecord,
 );
 
 /// C function `ChainEee_tokenXTransfer`.
 Pointer<CError> ChainEee_tokenXTransfer(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CTransferPayload> transferPayload,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 ) {
-  return _ChainEee_tokenXTransfer(ctx, transferPayload, signedResult);
+  return _ChainEee_tokenXTransfer(ctx, netType, transferPayload, signedResult);
 }
 
 final _ChainEee_tokenXTransfer_Dart _ChainEee_tokenXTransfer = _dl
@@ -807,11 +855,13 @@ final _ChainEee_tokenXTransfer_Dart _ChainEee_tokenXTransfer = _dl
 
 typedef _ChainEee_tokenXTransfer_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CTransferPayload> transferPayload,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 );
 typedef _ChainEee_tokenXTransfer_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CTransferPayload> transferPayload,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 );
@@ -819,10 +869,11 @@ typedef _ChainEee_tokenXTransfer_Dart = Pointer<CError> Function(
 /// C function `ChainEee_txSign`.
 Pointer<CError> ChainEee_txSign(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CRawTxParam> rawTx,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 ) {
-  return _ChainEee_txSign(ctx, rawTx, signedResult);
+  return _ChainEee_txSign(ctx, netType, rawTx, signedResult);
 }
 
 final _ChainEee_txSign_Dart _ChainEee_txSign =
@@ -831,11 +882,13 @@ final _ChainEee_txSign_Dart _ChainEee_txSign =
 
 typedef _ChainEee_txSign_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CRawTxParam> rawTx,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 );
 typedef _ChainEee_txSign_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CRawTxParam> rawTx,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 );
@@ -843,10 +896,11 @@ typedef _ChainEee_txSign_Dart = Pointer<CError> Function(
 /// C function `ChainEee_txSubmittableSign`.
 Pointer<CError> ChainEee_txSubmittableSign(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CRawTxParam> rawTx,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 ) {
-  return _ChainEee_txSubmittableSign(ctx, rawTx, signedResult);
+  return _ChainEee_txSubmittableSign(ctx, netType, rawTx, signedResult);
 }
 
 final _ChainEee_txSubmittableSign_Dart _ChainEee_txSubmittableSign =
@@ -855,11 +909,13 @@ final _ChainEee_txSubmittableSign_Dart _ChainEee_txSubmittableSign =
 
 typedef _ChainEee_txSubmittableSign_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CRawTxParam> rawTx,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 );
 typedef _ChainEee_txSubmittableSign_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CRawTxParam> rawTx,
   Pointer<Pointer<ffi.Utf8>> signedResult,
 );
@@ -867,10 +923,10 @@ typedef _ChainEee_txSubmittableSign_Dart = Pointer<CError> Function(
 /// C function `ChainEee_updateBasicInfo`.
 Pointer<CError> ChainEee_updateBasicInfo(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CSubChainBasicInfo> basicInfo,
-  Pointer<Uint32> isDefault,
 ) {
-  return _ChainEee_updateBasicInfo(ctx, basicInfo, isDefault);
+  return _ChainEee_updateBasicInfo(ctx, netType, basicInfo);
 }
 
 final _ChainEee_updateBasicInfo_Dart _ChainEee_updateBasicInfo =
@@ -879,21 +935,22 @@ final _ChainEee_updateBasicInfo_Dart _ChainEee_updateBasicInfo =
 
 typedef _ChainEee_updateBasicInfo_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CSubChainBasicInfo> basicInfo,
-  Pointer<Uint32> isDefault,
 );
 typedef _ChainEee_updateBasicInfo_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
   Pointer<CSubChainBasicInfo> basicInfo,
-  Pointer<Uint32> isDefault,
 );
 
 /// C function `ChainEee_updateSyncRecord`.
 Pointer<CError> ChainEee_updateSyncRecord(
   Pointer<CContext> ctx,
-  Pointer<CSyncRecordDetail> syncRecord,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CAccountInfoSyncProg> syncRecord,
 ) {
-  return _ChainEee_updateSyncRecord(ctx, syncRecord);
+  return _ChainEee_updateSyncRecord(ctx, netType, syncRecord);
 }
 
 final _ChainEee_updateSyncRecord_Dart _ChainEee_updateSyncRecord =
@@ -902,11 +959,13 @@ final _ChainEee_updateSyncRecord_Dart _ChainEee_updateSyncRecord =
 
 typedef _ChainEee_updateSyncRecord_C = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<CSyncRecordDetail> syncRecord,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CAccountInfoSyncProg> syncRecord,
 );
 typedef _ChainEee_updateSyncRecord_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
-  Pointer<CSyncRecordDetail> syncRecord,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CAccountInfoSyncProg> syncRecord,
 );
 
 /// <p class="para-brief"> 返回所有的Context, 有可能是0个 如果成功返回 [wallets_types::Error::SUCCESS()]</p>

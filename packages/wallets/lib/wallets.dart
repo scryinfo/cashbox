@@ -16,42 +16,41 @@ const _dlName = "wallets_cdl";
 
 //todo 多线程，怎么处理实现
 class Wallets {
-  Pointer<clib.CContext> _context;
+  Pointer<clib.CContext> _ptrContext;
+  Context _context;
 
-  Pointer<clib.CContext> get context => _context;
+  Pointer<clib.CContext> get ptrContext => _ptrContext;
 
-  Pointer<Pointer<clib.CContext>> get dContext => _dDontext;
+  Context get context => _context;
 
-  set dContext(Pointer<Pointer<clib.CContext>> ctx) {
-    _dDontext = ctx;
-    _context = _dDontext.value;
+  set context(Context ctx) {
+    _context = ctx;
+    _ptrContext = ctx.toC();
   }
 
-  Pointer<Pointer<clib.CContext>> _dDontext;
-
   Error lockRead() {
-    var cerr = clib.Wallets_lockRead(_context);
+    var cerr = clib.Wallets_lockRead(_ptrContext);
     var err = Error.fromC(cerr);
     clib.CError_free(cerr);
     return err;
   }
 
   Error unlockRead() {
-    var cerr = clib.Wallets_unlockRead(_context);
+    var cerr = clib.Wallets_unlockRead(_ptrContext);
     var err = Error.fromC(cerr);
     clib.CError_free(cerr);
     return err;
   }
 
   Error lockWrite() {
-    var cerr = clib.Wallets_lockWrite(_context);
+    var cerr = clib.Wallets_lockWrite(_ptrContext);
     var err = Error.fromC(cerr);
     clib.CError_free(cerr);
     return err;
   }
 
   Error unlockWrite() {
-    var cerr = clib.Wallets_unlockWrite(_context);
+    var cerr = clib.Wallets_unlockWrite(_ptrContext);
     var err = Error.fromC(cerr);
     clib.CError_free(cerr);
     return err;
@@ -95,20 +94,20 @@ class Wallets {
     clib.CError_free(cerr);
     InitParameters.free(ptrParameters);
     ptrParameters = nullptr;
-    dContext = dptrContext;
+    var ctx = Context.fromC(dptrContext.value);
+    clib.CContext_dFree(dptrContext);
+    context = ctx;
     return err;
   }
 
   Error uninit() {
-    var cerr = clib.Wallets_uninit(_context); //todo error
+    var cerr = clib.Wallets_uninit(_ptrContext);
     var err = Error.fromC(cerr);
     clib.CError_free(cerr);
     cerr = nullptr;
 
-    _context = nullptr;
-    var temp = _dDontext;
-    _dDontext = nullptr;
-    clib.CContext_dFree(temp);
+    Context.free(_ptrContext);
+    _ptrContext = nullptr;
     return err;
   }
 
@@ -116,11 +115,21 @@ class Wallets {
 
   Wallets._internal();
 
-  factory Wallets.instance() {
+  ///此方法只能在主线程中调用
+  factory Wallets.mainIsolate() {
     // 只能有一个实例
     if (_instance == null) {
       _instance = new Wallets._internal();
     }
+    return _instance;
+  }
+
+  ///在子线程中调用时，需要上下文参数
+  factory Wallets.subIsolate(Context ctx) {
+    if (_instance == null) {
+      _instance = new Wallets._internal();
+    }
+    _instance.context = ctx;
     return _instance;
   }
 }
