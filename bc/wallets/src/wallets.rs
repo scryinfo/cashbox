@@ -6,7 +6,7 @@ use parking_lot::lock_api::RawReentrantMutex;
 use parking_lot::{RawMutex, RawThreadId};
 
 use eee::Crypto;
-use mav::ma::{BeforeSave, Dao, Db, DbCreateType, MAddress, MMnemonic, MWallet};
+use mav::ma::{BeforeSave, Dao, Db, DbCreateType, MAddress, MMnemonic, MWallet, DbName};
 use mav::{ChainType, NetType, WalletType};
 use scry_crypto::Keccak256;
 use wallets_types::{
@@ -60,6 +60,10 @@ impl Wallets {
 
     pub fn eee_chain_instance(&self) -> &Box<dyn EeeChainTrait> {
         self.wallet_trait.eee_chain()
+    }
+
+    pub fn db_name(name: &wallets_types::DbName) -> wallets_types::DbName {
+        wallets_types::DbName(DbName::new_from(&name))
     }
 
     pub async fn init(&mut self, parameters: &InitParameters) -> Result<&Context, WalletError> {

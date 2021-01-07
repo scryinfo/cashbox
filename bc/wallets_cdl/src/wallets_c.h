@@ -167,6 +167,16 @@ typedef struct CCreateWalletParameters {
 
 typedef uint32_t CBool;
 
+/**
+ * c的数组需要定义两个字段，所定义一个结构体进行统一管理
+ * 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
+ */
+typedef struct CArrayI64 {
+    int64_t *ptr;
+    CU64 len;
+    CU64 cap;
+} CArrayI64;
+
 typedef struct CAccountInfoSyncProg {
     char *account;
     char *blockNo;
@@ -187,7 +197,7 @@ typedef struct CDecodeAccountInfoParameters {
 typedef struct CAccountInfo {
     uint32_t nonce;
     uint32_t ref_count;
-    char *free;
+    char *free_;
     char *reserved;
     char *misc_frozen;
     char *fee_frozen;
@@ -236,7 +246,12 @@ extern "C" {
 #endif // __cplusplus
 
 /**
- * dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它
+ * 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名
+ * 如果成功返回 [wallets_types::Error::SUCCESS()]
+ */
+const CError *Wallets_dbName(CDbName *name, CDbName **outName);
+
+/**
  * 如果成功返回 [wallets_types::Error::SUCCESS()]
  */
 const CError *Wallets_init(CInitParameters *parameter, CContext **context);
@@ -339,6 +354,14 @@ void CWallet_dFree(CWallet **dPtr);
 CArrayCWallet **CArrayCWallet_dAlloc(void);
 
 void CArrayCWallet_dFree(CArrayCWallet **dPtr);
+
+CDbName **CDbName_dAlloc(void);
+
+void CDbName_dFree(CDbName **dPtr);
+
+CArrayI64 **CInt64_dAlloc(void);
+
+void CInt64_dFree(CArrayI64 **dPtr);
 
 const CError *ChainEee_updateSyncRecord(CContext *ctx, char *netType, CAccountInfoSyncProg *syncRecord);
 

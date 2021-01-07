@@ -10,10 +10,10 @@ pub struct InitParameters {
 // pub struct UnInitParameters {}
 
 #[derive(Debug, Default, Clone)]
-pub struct DbName(pub mav::ma::DbNames);
+pub struct DbName(pub mav::ma::DbName);
 
 impl Deref for DbName {
-    type Target = mav::ma::DbNames;
+    type Target = mav::ma::DbName;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -80,7 +80,7 @@ pub struct TransferPayload {
 pub struct AccountInfo {
     pub nonce: u32,
     pub ref_count: u32,
-    pub free: String,
+    pub free_: String,//todo rename
     pub reserved: String,
     pub misc_frozen: String,
     pub fee_frozen: String,

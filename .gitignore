@@ -103,3 +103,15 @@ git
 /bc/mav/cashbox_mnemonic.db
 /packages/gen_dl/pubspec.lock
 /packages/gen_dl/.metadata
+/bc/test_cashbox_mnemonic.db-shm
+/bc/test_cashbox_mnemonic.db-wal
+/bc/test_cashbox_wallets.db-shm
+/bc/test_cashbox_wallets.db-wal
+/bc/test_wallet_mainnet.db-shm
+/bc/test_wallet_mainnet.db-wal
+/bc/test_wallet_private.db-shm
+/bc/test_wallet_private.db-wal
+/bc/test_wallet_testnet.db-shm
+/bc/test_wallet_testnet.db-wal
+/bc/test_wallet_testnet_private.db-shm
+/bc/test_wallet_testnet_private.db-wal

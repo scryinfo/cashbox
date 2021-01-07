@@ -274,7 +274,7 @@ impl EeeChainTrait for EeeChain {
             account_info.map(|info| AccountInfo {
                 nonce: info.nonce,
                 ref_count: info.refcount,
-                free: info.free.to_string(),
+                free_: info.free.to_string(),
                 reserved: info.reserved.to_string(),
                 misc_frozen: info.misc_frozen.to_string(),
                 fee_frozen: info.fee_frozen.to_string(),

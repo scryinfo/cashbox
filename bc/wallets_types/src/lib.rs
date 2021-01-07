@@ -44,7 +44,7 @@ mod setting;
 /// ````
 #[macro_export]
 macro_rules! deref_type {
-    ($t:ident,$mt:ident) => {
+    ($t:path,$mt:path) => {
         impl std::ops::Deref for $t {
             type Target = $mt;
             fn deref(&self) -> &Self::Target {
@@ -68,7 +68,7 @@ pub mod tests {
     use futures::executor::block_on;
 
     use mav::kits::test::{mock_files_db, mock_memory_db};
-    use mav::ma::{Db, DbNames};
+    use mav::ma::{Db, DbName};
 
     use crate::ContextTrait;
 

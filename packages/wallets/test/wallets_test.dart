@@ -12,15 +12,13 @@ import 'package:wallets/wallets_c.dc.dart';
 void main() {
   test('Wallets', () async {
     var wallet = Wallets.mainIsolate();
-
     {
       var initP = new InitParameters();
-      initP.dbName.cashboxWallets = "cashbox_wallets.db";
-      initP.dbName.cashboxMnemonic = "cashbox_mnemonic.db";
-      initP.dbName.walletMainnet = "wallet_mainnet.db";
-      initP.dbName.walletPrivate = "wallet_private.db";
-      initP.dbName.walletTestnet = "wallet_testnet.db";
-      initP.dbName.walletTestnetPrivate = "wallet_testnet_private.db";
+      {
+        initP.dbName.path = "";
+        initP.dbName.prefix = "test";
+        initP.dbName = Wallets.dbName(initP.dbName);
+      }
       wallet.init(initP);
 
       expect(true, wallet.ptrContext != null);
@@ -31,34 +29,33 @@ void main() {
       var err = wallet.safeRead(() {
         //...
       });
-      expect(true, isSuccess(err));
+      expect(true, err.isSuccess());
       err = wallet.safeRead(() {
         //...
       });
-      expect(true, isSuccess(err));
+      expect(true, err.isSuccess());
       err = wallet.safeWrite(() {
         // ...
       });
-      expect(true, isSuccess(err));
+      expect(true, err.isSuccess());
     }
 
     {
       var err = await compute(computeFun, wallet.context);
-      expect(true, isSuccess(err));
+      expect(true, err.isSuccess());
     }
     {
       var mnemonic = clib.CStr_dAlloc();
       var cerr = clib.Wallets_generateMnemonic(mnemonic);
       var err = Error.fromC(cerr);
-      expect(true, isSuccess(err));
+      expect(true, err.isSuccess());
     }
     wallet.uninit();
   });
 }
 
 Error computeFun(Context ctx) {
-  var wallet = Wallets.mainIsolate();
-  wallet.context = ctx;
+  var wallet = Wallets.subIsolate(ctx);
   var err = wallet.safeRead(() {
     //...
   });

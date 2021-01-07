@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{Context, CreateWalletParameters, DbName, InitParameters, RawTxParam, AccountInfo, TransferPayload, DecodeAccountInfoParameters, StorageKeyParameters,ChainVersion};
+use wallets_types::{AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName, DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, TransferPayload};
 
 use crate::kits::{CMark, CR, CStruct, to_c_char, to_str};
 
@@ -56,7 +56,7 @@ pub struct CTransferPayload {
     pub toAccount: *mut c_char,
     pub value: *mut c_char,
     pub index: u32,
-    pub chainVersion:*mut CChainVersion,
+    pub chainVersion: *mut CChainVersion,
     pub extData: *mut c_char,
     pub password: *mut c_char,
 }
@@ -74,7 +74,8 @@ pub struct CRawTxParam {
 pub struct CAccountInfo {
     pub nonce: u32,
     pub ref_count: u32,
-    pub free: *mut c_char,
+    pub free_: *mut c_char,
+    //todo rename
     pub reserved: *mut c_char,
     pub misc_frozen: *mut c_char,
     pub fee_frozen: *mut c_char,
@@ -84,13 +85,13 @@ pub struct CAccountInfo {
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CDecodeAccountInfoParameters {
     pub encodeData: *mut c_char,
-    pub chainVersion:*mut CChainVersion,
+    pub chainVersion: *mut CChainVersion,
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CStorageKeyParameters {
-    pub chainVersion:*mut CChainVersion,
+    pub chainVersion: *mut CChainVersion,
     pub module: *mut c_char,
     pub storageItem: *mut c_char,
     pub pubKey: *mut c_char,
@@ -98,7 +99,7 @@ pub struct CStorageKeyParameters {
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
-pub struct CChainVersion{
+pub struct CChainVersion {
     pub genesisHash: *mut c_char,
     pub runtimeVersion: i32,
     pub txVersion: i32,

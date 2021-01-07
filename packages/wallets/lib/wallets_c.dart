@@ -23,7 +23,7 @@ class CAccountInfo extends Struct {
   int nonce;
   @Uint32()
   int ref_count;
-  Pointer<ffi.Utf8> free;
+  Pointer<ffi.Utf8> free_;
   Pointer<ffi.Utf8> reserved;
   Pointer<ffi.Utf8> misc_frozen;
   Pointer<ffi.Utf8> fee_frozen;
@@ -215,6 +215,23 @@ typedef _CArrayCWallet_dFree_Dart = void Function(
   Pointer<Pointer<CArrayCWallet>> dPtr,
 );
 
+/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
+class CArrayI64 extends Struct {
+  Pointer<Int64> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
+
+  static Pointer<CArrayI64> allocate() {
+    return ffi.allocate<CArrayI64>();
+  }
+
+  static CArrayI64 from(int ptr) {
+    return Pointer<CArrayI64>.fromAddress(ptr).ref;
+  }
+}
+
 /// C function `CBool_dAlloc`.
 Pointer<Pointer<Uint32>> CBool_dAlloc() {
   return _CBool_dAlloc();
@@ -394,6 +411,34 @@ class CDbName extends Struct {
   }
 }
 
+/// C function `CDbName_dAlloc`.
+Pointer<Pointer<CDbName>> CDbName_dAlloc() {
+  return _CDbName_dAlloc();
+}
+
+final _CDbName_dAlloc_Dart _CDbName_dAlloc = _dl
+    .lookupFunction<_CDbName_dAlloc_C, _CDbName_dAlloc_Dart>('CDbName_dAlloc');
+
+typedef _CDbName_dAlloc_C = Pointer<Pointer<CDbName>> Function();
+typedef _CDbName_dAlloc_Dart = Pointer<Pointer<CDbName>> Function();
+
+/// C function `CDbName_dFree`.
+void CDbName_dFree(
+  Pointer<Pointer<CDbName>> dPtr,
+) {
+  _CDbName_dFree(dPtr);
+}
+
+final _CDbName_dFree_Dart _CDbName_dFree =
+    _dl.lookupFunction<_CDbName_dFree_C, _CDbName_dFree_Dart>('CDbName_dFree');
+
+typedef _CDbName_dFree_C = Void Function(
+  Pointer<Pointer<CDbName>> dPtr,
+);
+typedef _CDbName_dFree_Dart = void Function(
+  Pointer<Pointer<CDbName>> dPtr,
+);
+
 /// C struct `CDecodeAccountInfoParameters`.
 class CDecodeAccountInfoParameters extends Struct {
   Pointer<ffi.Utf8> encodeData;
@@ -534,6 +579,34 @@ class CInitParameters extends Struct {
     return Pointer<CInitParameters>.fromAddress(ptr).ref;
   }
 }
+
+/// C function `CInt64_dAlloc`.
+Pointer<Pointer<CArrayI64>> CInt64_dAlloc() {
+  return _CInt64_dAlloc();
+}
+
+final _CInt64_dAlloc_Dart _CInt64_dAlloc =
+    _dl.lookupFunction<_CInt64_dAlloc_C, _CInt64_dAlloc_Dart>('CInt64_dAlloc');
+
+typedef _CInt64_dAlloc_C = Pointer<Pointer<CArrayI64>> Function();
+typedef _CInt64_dAlloc_Dart = Pointer<Pointer<CArrayI64>> Function();
+
+/// C function `CInt64_dFree`.
+void CInt64_dFree(
+  Pointer<Pointer<CArrayI64>> dPtr,
+) {
+  _CInt64_dFree(dPtr);
+}
+
+final _CInt64_dFree_Dart _CInt64_dFree =
+    _dl.lookupFunction<_CInt64_dFree_C, _CInt64_dFree_Dart>('CInt64_dFree');
+
+typedef _CInt64_dFree_C = Void Function(
+  Pointer<Pointer<CArrayI64>> dPtr,
+);
+typedef _CInt64_dFree_Dart = void Function(
+  Pointer<Pointer<CArrayI64>> dPtr,
+);
 
 /// C struct `CRawTxParam`.
 class CRawTxParam extends Struct {
@@ -1054,6 +1127,26 @@ typedef _Wallets_currentWalletChain_Dart = Pointer<CError> Function(
   Pointer<Pointer<ffi.Utf8>> chainType,
 );
 
+/// <p class="para-brief"> 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
+Pointer<CError> Wallets_dbName(
+  Pointer<CDbName> name,
+  Pointer<Pointer<CDbName>> outName,
+) {
+  return _Wallets_dbName(name, outName);
+}
+
+final _Wallets_dbName_Dart _Wallets_dbName = _dl
+    .lookupFunction<_Wallets_dbName_C, _Wallets_dbName_Dart>('Wallets_dbName');
+
+typedef _Wallets_dbName_C = Pointer<CError> Function(
+  Pointer<CDbName> name,
+  Pointer<Pointer<CDbName>> outName,
+);
+typedef _Wallets_dbName_Dart = Pointer<CError> Function(
+  Pointer<CDbName> name,
+  Pointer<Pointer<CDbName>> outName,
+);
+
 /// C function `Wallets_findById`.
 Pointer<CError> Wallets_findById(
   Pointer<CContext> ctx,
@@ -1158,7 +1251,7 @@ typedef _Wallets_hasAny_Dart = Pointer<CError> Function(
   Pointer<Uint32> hasAny,
 );
 
-/// <p class="para-brief"> dart中不要复制Context的内存，在调用 [Wallets_uninit] 后，调用Context的内存函数释放它 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
+/// <p class="para-brief"> 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
 Pointer<CError> Wallets_init(
   Pointer<CInitParameters> parameter,
   Pointer<Pointer<CContext>> context,

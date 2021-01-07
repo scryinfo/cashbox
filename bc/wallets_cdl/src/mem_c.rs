@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use crate::kits::{CArray, CBool, CStruct, d_ptr_alloc, d_ptr_free};
-use crate::parameters::CContext;
+use crate::parameters::{CContext, CDbName};
 use crate::types::{CError, CWallet};
 
 /// alloc ** [parameters::CContext]
@@ -83,4 +83,25 @@ pub unsafe extern "C" fn CArrayCWallet_dFree(dPtr: *mut *mut CArray<CWallet>) {
     d_ptr_free(&mut dPtr);
 }
 
+#[no_mangle]
+pub extern "C" fn CDbName_dAlloc() -> *mut *mut CDbName {
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CDbName_dFree(dPtr: *mut *mut CDbName) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
+
+#[no_mangle]
+pub extern "C" fn CArrayInt64_dAlloc() -> *mut *mut CArray<i64> {
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CArrayInt64_dFree(dPtr: *mut *mut CArray<i64>) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
 // alloc free end

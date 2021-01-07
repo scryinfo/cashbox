@@ -329,7 +329,7 @@ mod tests {
 
     fn init_parameters() -> InitParameters {
         let mut p = InitParameters::default();
-        p.db_name.0 = mav::ma::DbNames::new("test_", "");
+        p.db_name.0 = mav::ma::DbName::new("test_", "");
         p.context_note = format!("test_{}", kits::uuid());
         p
     }

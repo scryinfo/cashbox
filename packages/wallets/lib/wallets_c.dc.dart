@@ -19,7 +19,7 @@ class AccountInfo extends DC<clib.CAccountInfo> {
   String fee_frozen;
 
   static free(Pointer<clib.CAccountInfo> ptr) {
-    ffi.free(ptr.ref.free);
+    ffi.free(ptr.ref.free_);
     ffi.free(ptr.ref.reserved);
     ffi.free(ptr.ref.misc_frozen);
     ffi.free(ptr.ref.fee_frozen);
@@ -33,22 +33,27 @@ class AccountInfo extends DC<clib.CAccountInfo> {
   }
 
   @override
-  Pointer<clib.CAccountInfo> toC() {
-    var c = clib.CAccountInfo.allocate();
+  Pointer<clib.CAccountInfo> toCPtr() {
+    var ptr = clib.CAccountInfo.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CAccountInfo> c) {
     c.ref.nonce = nonce;
     c.ref.ref_count = ref_count;
-    c.ref.free = toUtf8Null(free_);
+    c.ref.free_ = toUtf8Null(free_);
     c.ref.reserved = toUtf8Null(reserved);
     c.ref.misc_frozen = toUtf8Null(misc_frozen);
     c.ref.fee_frozen = toUtf8Null(fee_frozen);
-    return c;
   }
 
   @override
   toDart(Pointer<clib.CAccountInfo> c) {
     nonce = c.ref.nonce;
     ref_count = c.ref.ref_count;
-    free_ = fromUtf8Null(c.ref.free);
+    free_ = fromUtf8Null(c.ref.free_);
     reserved = fromUtf8Null(c.ref.reserved);
     misc_frozen = fromUtf8Null(c.ref.misc_frozen);
     fee_frozen = fromUtf8Null(c.ref.fee_frozen);
@@ -74,12 +79,17 @@ class AccountInfoSyncProg extends DC<clib.CAccountInfoSyncProg> {
   }
 
   @override
-  Pointer<clib.CAccountInfoSyncProg> toC() {
-    var c = clib.CAccountInfoSyncProg.allocate();
+  Pointer<clib.CAccountInfoSyncProg> toCPtr() {
+    var ptr = clib.CAccountInfoSyncProg.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CAccountInfoSyncProg> c) {
     c.ref.account = toUtf8Null(account);
     c.ref.blockNo = toUtf8Null(blockNo);
     c.ref.blockHash = toUtf8Null(blockHash);
-    return c;
   }
 
   @override
@@ -113,14 +123,19 @@ class Address extends DC<clib.CAddress> {
   }
 
   @override
-  Pointer<clib.CAddress> toC() {
-    var c = clib.CAddress.allocate();
+  Pointer<clib.CAddress> toCPtr() {
+    var ptr = clib.CAddress.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CAddress> c) {
     c.ref.id = toUtf8Null(id);
     c.ref.walletId = toUtf8Null(walletId);
     c.ref.chainType = toUtf8Null(chainType);
     c.ref.address = toUtf8Null(address);
     c.ref.publicKey = toUtf8Null(publicKey);
-    return c;
   }
 
   @override
@@ -134,12 +149,10 @@ class Address extends DC<clib.CAddress> {
 }
 
 class ArrayCBtcChainToken extends DC<clib.CArrayCBtcChainToken> {
-  BtcChainToken ptr;
-  int len;
-  int cap;
+  List<BtcChainToken> data;
 
   ArrayCBtcChainToken() {
-    ptr = new BtcChainToken();
+    data = new List<BtcChainToken>();
   }
 
   static free(Pointer<clib.CArrayCBtcChainToken> ptr) {
@@ -154,30 +167,39 @@ class ArrayCBtcChainToken extends DC<clib.CArrayCBtcChainToken> {
   }
 
   @override
-  Pointer<clib.CArrayCBtcChainToken> toC() {
+  Pointer<clib.CArrayCBtcChainToken> toCPtr() {
     var c = clib.CArrayCBtcChainToken.allocate();
-    c.ref.ptr = ptr.toC();
-    c.ref.len = len;
-    c.ref.cap = cap;
+    toC(c);
     return c;
   }
 
   @override
+  toC(Pointer<clib.CArrayCBtcChainToken> c) {
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      BtcChainToken.free(c.ref.ptr);
+    }
+    c.ref.ptr = ffi.allocate<clib.CBtcChainToken>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
   toDart(Pointer<clib.CArrayCBtcChainToken> c) {
-    ptr = new BtcChainToken();
-    ptr.toDart(c.ref.ptr);
-    len = c.ref.len;
-    cap = c.ref.cap;
+    data = new List<BtcChainToken>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
   }
 }
 
 class ArrayCContext extends DC<clib.CArrayCContext> {
-  Context ptr;
-  int len;
-  int cap;
+  List<Context> data;
 
   ArrayCContext() {
-    ptr = new Context();
+    data = new List<Context>();
   }
 
   static free(Pointer<clib.CArrayCContext> ptr) {
@@ -192,30 +214,39 @@ class ArrayCContext extends DC<clib.CArrayCContext> {
   }
 
   @override
-  Pointer<clib.CArrayCContext> toC() {
+  Pointer<clib.CArrayCContext> toCPtr() {
     var c = clib.CArrayCContext.allocate();
-    c.ref.ptr = ptr.toC();
-    c.ref.len = len;
-    c.ref.cap = cap;
+    toC(c);
     return c;
   }
 
   @override
+  toC(Pointer<clib.CArrayCContext> c) {
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      Context.free(c.ref.ptr);
+    }
+    c.ref.ptr = ffi.allocate<clib.CContext>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
   toDart(Pointer<clib.CArrayCContext> c) {
-    ptr = new Context();
-    ptr.toDart(c.ref.ptr);
-    len = c.ref.len;
-    cap = c.ref.cap;
+    data = new List<Context>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
   }
 }
 
 class ArrayCEeeChainToken extends DC<clib.CArrayCEeeChainToken> {
-  EeeChainToken ptr;
-  int len;
-  int cap;
+  List<EeeChainToken> data;
 
   ArrayCEeeChainToken() {
-    ptr = new EeeChainToken();
+    data = new List<EeeChainToken>();
   }
 
   static free(Pointer<clib.CArrayCEeeChainToken> ptr) {
@@ -230,30 +261,39 @@ class ArrayCEeeChainToken extends DC<clib.CArrayCEeeChainToken> {
   }
 
   @override
-  Pointer<clib.CArrayCEeeChainToken> toC() {
+  Pointer<clib.CArrayCEeeChainToken> toCPtr() {
     var c = clib.CArrayCEeeChainToken.allocate();
-    c.ref.ptr = ptr.toC();
-    c.ref.len = len;
-    c.ref.cap = cap;
+    toC(c);
     return c;
   }
 
   @override
+  toC(Pointer<clib.CArrayCEeeChainToken> c) {
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      EeeChainToken.free(c.ref.ptr);
+    }
+    c.ref.ptr = ffi.allocate<clib.CEeeChainToken>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
   toDart(Pointer<clib.CArrayCEeeChainToken> c) {
-    ptr = new EeeChainToken();
-    ptr.toDart(c.ref.ptr);
-    len = c.ref.len;
-    cap = c.ref.cap;
+    data = new List<EeeChainToken>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
   }
 }
 
 class ArrayCEthChainToken extends DC<clib.CArrayCEthChainToken> {
-  EthChainToken ptr;
-  int len;
-  int cap;
+  List<EthChainToken> data;
 
   ArrayCEthChainToken() {
-    ptr = new EthChainToken();
+    data = new List<EthChainToken>();
   }
 
   static free(Pointer<clib.CArrayCEthChainToken> ptr) {
@@ -268,30 +308,39 @@ class ArrayCEthChainToken extends DC<clib.CArrayCEthChainToken> {
   }
 
   @override
-  Pointer<clib.CArrayCEthChainToken> toC() {
+  Pointer<clib.CArrayCEthChainToken> toCPtr() {
     var c = clib.CArrayCEthChainToken.allocate();
-    c.ref.ptr = ptr.toC();
-    c.ref.len = len;
-    c.ref.cap = cap;
+    toC(c);
     return c;
   }
 
   @override
+  toC(Pointer<clib.CArrayCEthChainToken> c) {
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      EthChainToken.free(c.ref.ptr);
+    }
+    c.ref.ptr = ffi.allocate<clib.CEthChainToken>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
   toDart(Pointer<clib.CArrayCEthChainToken> c) {
-    ptr = new EthChainToken();
-    ptr.toDart(c.ref.ptr);
-    len = c.ref.len;
-    cap = c.ref.cap;
+    data = new List<EthChainToken>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
   }
 }
 
 class ArrayCWallet extends DC<clib.CArrayCWallet> {
-  Wallet ptr;
-  int len;
-  int cap;
+  List<Wallet> data;
 
   ArrayCWallet() {
-    ptr = new Wallet();
+    data = new List<Wallet>();
   }
 
   static free(Pointer<clib.CArrayCWallet> ptr) {
@@ -306,20 +355,78 @@ class ArrayCWallet extends DC<clib.CArrayCWallet> {
   }
 
   @override
-  Pointer<clib.CArrayCWallet> toC() {
+  Pointer<clib.CArrayCWallet> toCPtr() {
     var c = clib.CArrayCWallet.allocate();
-    c.ref.ptr = ptr.toC();
-    c.ref.len = len;
-    c.ref.cap = cap;
+    toC(c);
     return c;
   }
 
   @override
+  toC(Pointer<clib.CArrayCWallet> c) {
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      Wallet.free(c.ref.ptr);
+    }
+    c.ref.ptr = ffi.allocate<clib.CWallet>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
   toDart(Pointer<clib.CArrayCWallet> c) {
-    ptr = new Wallet();
-    ptr.toDart(c.ref.ptr);
-    len = c.ref.len;
-    cap = c.ref.cap;
+    data = new List<Wallet>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
+class ArrayI64 extends DC<clib.CArrayI64> {
+  List<int> data;
+
+  ArrayI64() {
+    data = new List<int>();
+  }
+
+  static free(Pointer<clib.CArrayI64> ptr) {
+    ffi.free(ptr.ref.ptr);
+    ffi.free(ptr);
+  }
+
+  static ArrayI64 fromC(Pointer<clib.CArrayI64> ptr) {
+    var d = new ArrayI64();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayI64> toCPtr() {
+    var c = clib.CArrayI64.allocate();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayI64> c) {
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      ffi.free(c.ref.ptr);
+    }
+    c.ref.ptr = ffi.allocate<Int64>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      c.ref.ptr.elementAt(i).value = data[i];
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayI64> c) {
+    data = new List<int>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i] = c.ref.ptr.elementAt(i).value;
+    }
   }
 }
 
@@ -345,11 +452,16 @@ class BtcChain extends DC<clib.CBtcChain> {
   }
 
   @override
-  Pointer<clib.CBtcChain> toC() {
-    var c = clib.CBtcChain.allocate();
-    c.ref.chainShared = chainShared.toC();
-    c.ref.tokens = tokens.toC();
-    return c;
+  Pointer<clib.CBtcChain> toCPtr() {
+    var ptr = clib.CBtcChain.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CBtcChain> c) {
+    chainShared.toC(c.ref.chainShared);
+    tokens.toC(c.ref.tokens);
   }
 
   @override
@@ -380,10 +492,15 @@ class BtcChainToken extends DC<clib.CBtcChainToken> {
   }
 
   @override
-  Pointer<clib.CBtcChainToken> toC() {
-    var c = clib.CBtcChainToken.allocate();
-    c.ref.btcChainTokenShared = btcChainTokenShared.toC();
-    return c;
+  Pointer<clib.CBtcChainToken> toCPtr() {
+    var ptr = clib.CBtcChainToken.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CBtcChainToken> c) {
+    btcChainTokenShared.toC(c.ref.btcChainTokenShared);
   }
 
   @override
@@ -412,10 +529,15 @@ class BtcChainTokenShared extends DC<clib.CBtcChainTokenShared> {
   }
 
   @override
-  Pointer<clib.CBtcChainTokenShared> toC() {
-    var c = clib.CBtcChainTokenShared.allocate();
-    c.ref.tokenShared = tokenShared.toC();
-    return c;
+  Pointer<clib.CBtcChainTokenShared> toCPtr() {
+    var ptr = clib.CBtcChainTokenShared.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CBtcChainTokenShared> c) {
+    tokenShared.toC(c.ref.tokenShared);
   }
 
   @override
@@ -448,12 +570,17 @@ class ChainShared extends DC<clib.CChainShared> {
   }
 
   @override
-  Pointer<clib.CChainShared> toC() {
-    var c = clib.CChainShared.allocate();
+  Pointer<clib.CChainShared> toCPtr() {
+    var ptr = clib.CChainShared.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CChainShared> c) {
     c.ref.walletId = toUtf8Null(walletId);
     c.ref.chainType = toUtf8Null(chainType);
-    c.ref.walletAddress = walletAddress.toC();
-    return c;
+    walletAddress.toC(c.ref.walletAddress);
   }
 
   @override
@@ -482,12 +609,17 @@ class ChainVersion extends DC<clib.CChainVersion> {
   }
 
   @override
-  Pointer<clib.CChainVersion> toC() {
-    var c = clib.CChainVersion.allocate();
+  Pointer<clib.CChainVersion> toCPtr() {
+    var ptr = clib.CChainVersion.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CChainVersion> c) {
     c.ref.genesisHash = toUtf8Null(genesisHash);
     c.ref.runtimeVersion = runtimeVersion;
     c.ref.txVersion = txVersion;
-    return c;
   }
 
   @override
@@ -515,11 +647,16 @@ class Context extends DC<clib.CContext> {
   }
 
   @override
-  Pointer<clib.CContext> toC() {
-    var c = clib.CContext.allocate();
+  Pointer<clib.CContext> toCPtr() {
+    var ptr = clib.CContext.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CContext> c) {
     c.ref.id = toUtf8Null(id);
     c.ref.contextNote = toUtf8Null(contextNote);
-    return c;
   }
 
   @override
@@ -551,13 +688,18 @@ class CreateWalletParameters extends DC<clib.CCreateWalletParameters> {
   }
 
   @override
-  Pointer<clib.CCreateWalletParameters> toC() {
-    var c = clib.CCreateWalletParameters.allocate();
+  Pointer<clib.CCreateWalletParameters> toCPtr() {
+    var ptr = clib.CCreateWalletParameters.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CCreateWalletParameters> c) {
     c.ref.name = toUtf8Null(name);
     c.ref.password = toUtf8Null(password);
     c.ref.mnemonic = toUtf8Null(mnemonic);
     c.ref.walletType = toUtf8Null(walletType);
-    return c;
   }
 
   @override
@@ -598,8 +740,14 @@ class DbName extends DC<clib.CDbName> {
   }
 
   @override
-  Pointer<clib.CDbName> toC() {
-    var c = clib.CDbName.allocate();
+  Pointer<clib.CDbName> toCPtr() {
+    var ptr = clib.CDbName.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CDbName> c) {
     c.ref.path = toUtf8Null(path);
     c.ref.prefix = toUtf8Null(prefix);
     c.ref.cashboxWallets = toUtf8Null(cashboxWallets);
@@ -608,7 +756,6 @@ class DbName extends DC<clib.CDbName> {
     c.ref.walletPrivate = toUtf8Null(walletPrivate);
     c.ref.walletTestnet = toUtf8Null(walletTestnet);
     c.ref.walletTestnetPrivate = toUtf8Null(walletTestnetPrivate);
-    return c;
   }
 
   @override
@@ -647,11 +794,16 @@ class DecodeAccountInfoParameters
   }
 
   @override
-  Pointer<clib.CDecodeAccountInfoParameters> toC() {
-    var c = clib.CDecodeAccountInfoParameters.allocate();
+  Pointer<clib.CDecodeAccountInfoParameters> toCPtr() {
+    var ptr = clib.CDecodeAccountInfoParameters.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CDecodeAccountInfoParameters> c) {
     c.ref.encodeData = toUtf8Null(encodeData);
-    c.ref.chainVersion = chainVersion.toC();
-    return c;
+    chainVersion.toC(c.ref.chainVersion);
   }
 
   @override
@@ -687,12 +839,17 @@ class EeeChain extends DC<clib.CEeeChain> {
   }
 
   @override
-  Pointer<clib.CEeeChain> toC() {
-    var c = clib.CEeeChain.allocate();
-    c.ref.chainShared = chainShared.toC();
-    c.ref.address = address.toC();
-    c.ref.tokens = tokens.toC();
-    return c;
+  Pointer<clib.CEeeChain> toCPtr() {
+    var ptr = clib.CEeeChain.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEeeChain> c) {
+    chainShared.toC(c.ref.chainShared);
+    address.toC(c.ref.address);
+    tokens.toC(c.ref.tokens);
   }
 
   @override
@@ -725,10 +882,15 @@ class EeeChainToken extends DC<clib.CEeeChainToken> {
   }
 
   @override
-  Pointer<clib.CEeeChainToken> toC() {
-    var c = clib.CEeeChainToken.allocate();
-    c.ref.eeeChainTokenShared = eeeChainTokenShared.toC();
-    return c;
+  Pointer<clib.CEeeChainToken> toCPtr() {
+    var ptr = clib.CEeeChainToken.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEeeChainToken> c) {
+    eeeChainTokenShared.toC(c.ref.eeeChainTokenShared);
   }
 
   @override
@@ -757,10 +919,15 @@ class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
   }
 
   @override
-  Pointer<clib.CEeeChainTokenShared> toC() {
-    var c = clib.CEeeChainTokenShared.allocate();
-    c.ref.tokenShared = tokenShared.toC();
-    return c;
+  Pointer<clib.CEeeChainTokenShared> toCPtr() {
+    var ptr = clib.CEeeChainTokenShared.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEeeChainTokenShared> c) {
+    tokenShared.toC(c.ref.tokenShared);
   }
 
   @override
@@ -786,11 +953,16 @@ class Error extends DC<clib.CError> {
   }
 
   @override
-  Pointer<clib.CError> toC() {
-    var c = clib.CError.allocate();
+  Pointer<clib.CError> toCPtr() {
+    var ptr = clib.CError.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CError> c) {
     c.ref.code = code;
     c.ref.message = toUtf8Null(message);
-    return c;
   }
 
   @override
@@ -822,11 +994,16 @@ class EthChain extends DC<clib.CEthChain> {
   }
 
   @override
-  Pointer<clib.CEthChain> toC() {
-    var c = clib.CEthChain.allocate();
-    c.ref.chainShared = chainShared.toC();
-    c.ref.tokens = tokens.toC();
-    return c;
+  Pointer<clib.CEthChain> toCPtr() {
+    var ptr = clib.CEthChain.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEthChain> c) {
+    chainShared.toC(c.ref.chainShared);
+    tokens.toC(c.ref.tokens);
   }
 
   @override
@@ -857,10 +1034,15 @@ class EthChainToken extends DC<clib.CEthChainToken> {
   }
 
   @override
-  Pointer<clib.CEthChainToken> toC() {
-    var c = clib.CEthChainToken.allocate();
-    c.ref.ethChainTokenShared = ethChainTokenShared.toC();
-    return c;
+  Pointer<clib.CEthChainToken> toCPtr() {
+    var ptr = clib.CEthChainToken.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEthChainToken> c) {
+    ethChainTokenShared.toC(c.ref.ethChainTokenShared);
   }
 
   @override
@@ -889,10 +1071,15 @@ class EthChainTokenShared extends DC<clib.CEthChainTokenShared> {
   }
 
   @override
-  Pointer<clib.CEthChainTokenShared> toC() {
-    var c = clib.CEthChainTokenShared.allocate();
-    c.ref.tokenShared = tokenShared.toC();
-    return c;
+  Pointer<clib.CEthChainTokenShared> toCPtr() {
+    var ptr = clib.CEthChainTokenShared.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEthChainTokenShared> c) {
+    tokenShared.toC(c.ref.tokenShared);
   }
 
   @override
@@ -923,11 +1110,16 @@ class InitParameters extends DC<clib.CInitParameters> {
   }
 
   @override
-  Pointer<clib.CInitParameters> toC() {
-    var c = clib.CInitParameters.allocate();
-    c.ref.dbName = dbName.toC();
+  Pointer<clib.CInitParameters> toCPtr() {
+    var ptr = clib.CInitParameters.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CInitParameters> c) {
+    dbName.toC(c.ref.dbName);
     c.ref.contextNote = toUtf8Null(contextNote);
-    return c;
   }
 
   @override
@@ -957,12 +1149,17 @@ class RawTxParam extends DC<clib.CRawTxParam> {
   }
 
   @override
-  Pointer<clib.CRawTxParam> toC() {
-    var c = clib.CRawTxParam.allocate();
+  Pointer<clib.CRawTxParam> toCPtr() {
+    var ptr = clib.CRawTxParam.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CRawTxParam> c) {
     c.ref.rawTx = toUtf8Null(rawTx);
     c.ref.walletId = toUtf8Null(walletId);
     c.ref.password = toUtf8Null(password);
-    return c;
   }
 
   @override
@@ -998,13 +1195,18 @@ class StorageKeyParameters extends DC<clib.CStorageKeyParameters> {
   }
 
   @override
-  Pointer<clib.CStorageKeyParameters> toC() {
-    var c = clib.CStorageKeyParameters.allocate();
-    c.ref.chainVersion = chainVersion.toC();
+  Pointer<clib.CStorageKeyParameters> toCPtr() {
+    var ptr = clib.CStorageKeyParameters.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CStorageKeyParameters> c) {
+    chainVersion.toC(c.ref.chainVersion);
     c.ref.module = toUtf8Null(module);
     c.ref.storageItem = toUtf8Null(storageItem);
     c.ref.pubKey = toUtf8Null(pubKey);
-    return c;
   }
 
   @override
@@ -1041,8 +1243,14 @@ class SubChainBasicInfo extends DC<clib.CSubChainBasicInfo> {
   }
 
   @override
-  Pointer<clib.CSubChainBasicInfo> toC() {
-    var c = clib.CSubChainBasicInfo.allocate();
+  Pointer<clib.CSubChainBasicInfo> toCPtr() {
+    var ptr = clib.CSubChainBasicInfo.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CSubChainBasicInfo> c) {
     c.ref.genesisHash = toUtf8Null(genesisHash);
     c.ref.metadata = toUtf8Null(metadata);
     c.ref.runtimeVersion = runtimeVersion;
@@ -1051,7 +1259,6 @@ class SubChainBasicInfo extends DC<clib.CSubChainBasicInfo> {
     c.ref.tokenDecimals = tokenDecimals;
     c.ref.tokenSymbol = toUtf8Null(tokenSymbol);
     c.ref.isDefault = isDefault;
-    return c;
   }
 
   @override
@@ -1094,8 +1301,14 @@ class TokenShared extends DC<clib.CTokenShared> {
   }
 
   @override
-  Pointer<clib.CTokenShared> toC() {
-    var c = clib.CTokenShared.allocate();
+  Pointer<clib.CTokenShared> toCPtr() {
+    var ptr = clib.CTokenShared.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CTokenShared> c) {
     c.ref.name = toUtf8Null(name);
     c.ref.symbol = toUtf8Null(symbol);
     c.ref.logoUrl = toUtf8Null(logoUrl);
@@ -1103,7 +1316,6 @@ class TokenShared extends DC<clib.CTokenShared> {
     c.ref.projectName = toUtf8Null(projectName);
     c.ref.projectHome = toUtf8Null(projectHome);
     c.ref.projectNote = toUtf8Null(projectNote);
-    return c;
   }
 
   @override
@@ -1148,16 +1360,21 @@ class TransferPayload extends DC<clib.CTransferPayload> {
   }
 
   @override
-  Pointer<clib.CTransferPayload> toC() {
-    var c = clib.CTransferPayload.allocate();
+  Pointer<clib.CTransferPayload> toCPtr() {
+    var ptr = clib.CTransferPayload.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CTransferPayload> c) {
     c.ref.fromAccount = toUtf8Null(fromAccount);
     c.ref.toAccount = toUtf8Null(toAccount);
     c.ref.value = toUtf8Null(value);
     c.ref.index = index;
-    c.ref.chainVersion = chainVersion.toC();
+    chainVersion.toC(c.ref.chainVersion);
     c.ref.extData = toUtf8Null(extData);
     c.ref.password = toUtf8Null(password);
-    return c;
   }
 
   @override
@@ -1204,15 +1421,20 @@ class Wallet extends DC<clib.CWallet> {
   }
 
   @override
-  Pointer<clib.CWallet> toC() {
-    var c = clib.CWallet.allocate();
+  Pointer<clib.CWallet> toCPtr() {
+    var ptr = clib.CWallet.allocate();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CWallet> c) {
     c.ref.id = toUtf8Null(id);
     c.ref.nextId = toUtf8Null(nextId);
     c.ref.name = toUtf8Null(name);
-    c.ref.ethChain = ethChain.toC();
-    c.ref.eeeChain = eeeChain.toC();
-    c.ref.btcChain = btcChain.toC();
-    return c;
+    ethChain.toC(c.ref.ethChain);
+    eeeChain.toC(c.ref.eeeChain);
+    btcChain.toC(c.ref.btcChain);
   }
 
   @override

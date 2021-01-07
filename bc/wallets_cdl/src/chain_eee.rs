@@ -3,10 +3,9 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
+use wallets_types::{AccountInfoSyncProg, EeeChain, EeeChainToken, EeeChainTokenShared, SubChainBasicInfo};
 
-use wallets_types::{EeeChain, EeeChainToken, EeeChainTokenShared, SubChainBasicInfo, AccountInfoSyncProg};
-use crate::kits::{CArray, CMark, CR, CStruct, to_c_char, to_str,CBool};
-
+use crate::kits::{CArray, CBool, CMark, CR, CStruct, to_c_char, to_str};
 use crate::types::{CAddress, CChainShared, CTokenShared};
 
 #[repr(C)]

@@ -10,7 +10,7 @@ use crate::kits::Error;
 use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet};
 
 #[derive(Debug, Default, Clone)]
-pub struct DbNames {
+pub struct DbName {
     pub path: String,
     pub prefix: String,
     pub cashbox_wallets: String,
@@ -21,9 +21,17 @@ pub struct DbNames {
     pub wallet_testnet_private: String,
 }
 
-impl DbNames {
-    pub fn new(pre: &str, path: &str) -> DbNames {
+impl DbName {
+    pub fn new(pre: &str, path: &str) -> DbName {
+        let mut temp = DbName::default();
+        temp.path = path.to_owned();
+        temp.prefix = pre.to_owned();
+        DbName::new_from(&temp)
+    }
+
+    pub fn new_from(names: &DbName) -> DbName {
         let path = {
+            let mut path = names.path.clone();
             if path.ends_with("/") {
                 path.to_owned()
             } else if path.ends_with("\\") {
@@ -34,15 +42,28 @@ impl DbNames {
                 path.to_owned()
             }
         };
-        DbNames {
+        let pre = names.prefix.clone();
+        DbName {
             path: path.to_owned(),
             prefix: pre.to_owned(),
-            cashbox_wallets: format!("{}{}{}", path, pre, DbNameType::cashbox_wallets.to_string()),
-            cashbox_mnemonic: format!("{}{}{}", path, pre, DbNameType::cashbox_mnemonic.to_string()),
-            wallet_mainnet: format!("{}{}{}", path, pre, DbNameType::wallet_mainnet.to_string()),
-            wallet_private: format!("{}{}{}", path, pre, DbNameType::wallet_private.to_string()),
-            wallet_testnet: format!("{}{}{}", path, pre, DbNameType::wallet_testnet.to_string()),
-            wallet_testnet_private: format!("{}{}{}", path, pre, DbNameType::wallet_testnet_private.to_string()),
+            cashbox_wallets: if names.cashbox_wallets.is_empty() {
+                format!("{}{}{}", path, pre, DbNameType::cashbox_wallets.to_string())
+            } else { names.cashbox_wallets.clone() },
+            cashbox_mnemonic: if names.cashbox_mnemonic.is_empty() {
+                format!("{}{}{}", path, pre, DbNameType::cashbox_mnemonic.to_string())
+            }else{names.cashbox_mnemonic.clone()},
+            wallet_mainnet: if names.wallet_mainnet.is_empty(){
+                format!("{}{}{}", path, pre, DbNameType::wallet_mainnet.to_string())
+            }else{names.wallet_mainnet.clone()},
+            wallet_private: if names.wallet_private.is_empty(){
+                format!("{}{}{}", path, pre, DbNameType::wallet_private.to_string())
+            }else{names.wallet_private.clone()},
+            wallet_testnet: if names.wallet_testnet.is_empty(){
+                format!("{}{}{}", path, pre, DbNameType::wallet_testnet.to_string())
+            }else{names.wallet_testnet.clone()},
+            wallet_testnet_private: if names.wallet_testnet_private.is_empty(){
+                format!("{}{}{}", path, pre, DbNameType::wallet_testnet_private.to_string())
+            }else{names.wallet_testnet_private.clone()},
         }
     }
 
@@ -128,7 +149,7 @@ pub struct Db {
     wallet_private: Rbatis,
     wallet_testnet: Rbatis,
     wallet_testnet_private: Rbatis,
-    pub db_name: DbNames,
+    pub db_name: DbName,
 }
 
 impl Db {
@@ -150,7 +171,7 @@ impl Db {
         &self.cashbox_mnemonic
     }
 
-    pub async fn init(&mut self, name: &DbNames) -> Result<(), Error> {
+    pub async fn init(&mut self, name: &DbName) -> Result<(), Error> {
         self.db_name = name.clone();
         self.cashbox_wallets = kits::make_rbatis(&self.db_name.cashbox_wallets).await?;
         self.cashbox_mnemonic = kits::make_rbatis(&self.db_name.cashbox_mnemonic).await?;
@@ -160,7 +181,7 @@ impl Db {
         self.wallet_testnet_private = kits::make_rbatis(&self.db_name.wallet_testnet_private).await?;
         Ok(())
     }
-    pub async fn init_memory_sql(&mut self, name: &DbNames) -> Result<(), Error> {
+    pub async fn init_memory_sql(&mut self, name: &DbName) -> Result<(), Error> {
         self.db_name = name.clone();
         self.cashbox_wallets = kits::make_memory_rbatis().await?;
         self.cashbox_mnemonic = kits::make_memory_rbatis().await?;
@@ -389,7 +410,7 @@ mod tests {
     use rbatis::rbatis::Rbatis;
     use strum::IntoEnumIterator;
 
-    use crate::ma::{Db, DbNames, DbNameType};
+    use crate::ma::{Db, DbName, DbNameType};
     use crate::NetType;
 
     #[test]
@@ -403,7 +424,7 @@ mod tests {
     fn db_names_test() {
         {
             let pre = "";
-            let db = DbNames::new(pre, "");
+            let db = DbName::new(pre, "");
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, pre.to_owned() + &it.to_string());
@@ -413,7 +434,7 @@ mod tests {
         }
         {
             let pre = "test";
-            let db = DbNames::new(pre, "");
+            let db = DbName::new(pre, "");
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, pre.to_owned() + &it.to_string());
@@ -423,7 +444,7 @@ mod tests {
         }
         {
             let pre = "test";
-            let db = DbNames::new(pre, "/");
+            let db = DbName::new(pre, "/");
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, format!("/{}{}", pre, it.to_string()));
@@ -433,7 +454,7 @@ mod tests {
         }
         {
             let pre = "test";
-            let db = DbNames::new(pre, "/user");
+            let db = DbName::new(pre, "/user");
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, format!("/user/{}{}", pre, it.to_string()));
@@ -443,7 +464,7 @@ mod tests {
         }
         {
             let pre = "test";
-            let db = DbNames::new(pre, "/user/");
+            let db = DbName::new(pre, "/user/");
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, format!("/user/{}{}", pre, it.to_string()));
@@ -456,7 +477,7 @@ mod tests {
     #[test]
     fn db_test() {
         let mut db = Db::default();
-        let re = block_on(db.init(&DbNames::new("", "")));
+        let re = block_on(db.init(&DbName::new("", "")));
         assert_eq!(false, re.is_err(), "{:?}", re.unwrap_err());
 
         assert_eq!(&db.cashbox_wallets as *const Rbatis, db.wallets_db() as *const Rbatis);

@@ -68,18 +68,18 @@ pub mod test {
     use rbatis::rbatis::Rbatis;
 
     use crate::kits::make_memory_rbatis;
-    use crate::ma::{Db, DbNames};
+    use crate::ma::{Db, DbName};
 
     pub fn mock_memory_db() -> Db {
         let mut db = Db::default();
-        let re = block_on(db.init_memory_sql(&DbNames::new("", "")));
+        let re = block_on(db.init_memory_sql(&DbName::new("", "")));
         assert_eq!(false, re.is_err(), "{:?}", re.unwrap_err());
         db
     }
 
     pub fn mock_files_db() -> Db {
         let mut db = Db::default();
-        let re = block_on(db.init(&DbNames::new("", "")));
+        let re = block_on(db.init(&DbName::new("", "")));
         assert_eq!(false, re.is_err(), "{:?}", re.unwrap_err());
         db
     }
