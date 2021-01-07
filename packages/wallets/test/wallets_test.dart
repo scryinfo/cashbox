@@ -1,12 +1,11 @@
+import 'dart:ffi';
+
+import 'package:ffi/ffi.dart' as ffi;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wallets/kits.dart';
-
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dart' as clib;
-
-import 'dart:ffi';
-import 'package:ffi/ffi.dart' as ffi;
 import 'package:wallets/wallets_c.dc.dart';
 
 void main() {

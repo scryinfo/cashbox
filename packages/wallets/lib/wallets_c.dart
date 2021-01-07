@@ -1,7 +1,7 @@
 /// bindings for `wallets_cdl`
-
 import 'dart:ffi';
 import 'dart:io';
+
 import 'package:ffi/ffi.dart' as ffi;
 
 // ignore_for_file: unused_import, camel_case_types, non_constant_identifier_names
@@ -231,6 +231,36 @@ class CArrayI64 extends Struct {
     return Pointer<CArrayI64>.fromAddress(ptr).ref;
   }
 }
+
+/// C function `CArrayInt64_dAlloc`.
+Pointer<Pointer<CArrayI64>> CArrayInt64_dAlloc() {
+  return _CArrayInt64_dAlloc();
+}
+
+final _CArrayInt64_dAlloc_Dart _CArrayInt64_dAlloc =
+    _dl.lookupFunction<_CArrayInt64_dAlloc_C, _CArrayInt64_dAlloc_Dart>(
+        'CArrayInt64_dAlloc');
+
+typedef _CArrayInt64_dAlloc_C = Pointer<Pointer<CArrayI64>> Function();
+typedef _CArrayInt64_dAlloc_Dart = Pointer<Pointer<CArrayI64>> Function();
+
+/// C function `CArrayInt64_dFree`.
+void CArrayInt64_dFree(
+  Pointer<Pointer<CArrayI64>> dPtr,
+) {
+  _CArrayInt64_dFree(dPtr);
+}
+
+final _CArrayInt64_dFree_Dart _CArrayInt64_dFree =
+    _dl.lookupFunction<_CArrayInt64_dFree_C, _CArrayInt64_dFree_Dart>(
+        'CArrayInt64_dFree');
+
+typedef _CArrayInt64_dFree_C = Void Function(
+  Pointer<Pointer<CArrayI64>> dPtr,
+);
+typedef _CArrayInt64_dFree_Dart = void Function(
+  Pointer<Pointer<CArrayI64>> dPtr,
+);
 
 /// C function `CBool_dAlloc`.
 Pointer<Pointer<Uint32>> CBool_dAlloc() {
@@ -579,34 +609,6 @@ class CInitParameters extends Struct {
     return Pointer<CInitParameters>.fromAddress(ptr).ref;
   }
 }
-
-/// C function `CInt64_dAlloc`.
-Pointer<Pointer<CArrayI64>> CInt64_dAlloc() {
-  return _CInt64_dAlloc();
-}
-
-final _CInt64_dAlloc_Dart _CInt64_dAlloc =
-    _dl.lookupFunction<_CInt64_dAlloc_C, _CInt64_dAlloc_Dart>('CInt64_dAlloc');
-
-typedef _CInt64_dAlloc_C = Pointer<Pointer<CArrayI64>> Function();
-typedef _CInt64_dAlloc_Dart = Pointer<Pointer<CArrayI64>> Function();
-
-/// C function `CInt64_dFree`.
-void CInt64_dFree(
-  Pointer<Pointer<CArrayI64>> dPtr,
-) {
-  _CInt64_dFree(dPtr);
-}
-
-final _CInt64_dFree_Dart _CInt64_dFree =
-    _dl.lookupFunction<_CInt64_dFree_C, _CInt64_dFree_Dart>('CInt64_dFree');
-
-typedef _CInt64_dFree_C = Void Function(
-  Pointer<Pointer<CArrayI64>> dPtr,
-);
-typedef _CInt64_dFree_Dart = void Function(
-  Pointer<Pointer<CArrayI64>> dPtr,
-);
 
 /// C struct `CRawTxParam`.
 class CRawTxParam extends Struct {

@@ -61,9 +61,7 @@ import 'kits.dart';
     var typePointer = TypeChecker.fromRuntime(Pointer);
     var typeUtf8 = TypeChecker.fromRuntime(ffi.Utf8);
     var typeStruct = TypeChecker.fromRuntime(Struct);
-    if (c.name == "CInitParameters") {
-      var t = 0;
-    }
+
     classCode
         .writeln('class ${toClassName(c.name)} extends DC<clib.${c.name}>{');
 
@@ -115,8 +113,12 @@ import 'kits.dart';
           {
             classCode.writeln('${_blankOne}String ${f.name};');
 
-            free.writeln('${_blankTwo}ffi.free(ptr.ref.${f.name});');
+            free.writeln(
+                '${_blankTwo}if (ptr.ref.${f.name} != null && ptr.ref.${f.name} != nullptr) {ffi.free(ptr.ref.${f.name});}');
+            free.writeln('${_blankTwo}ptr.ref.${f.name} = nullptr;');
 
+            toC.writeln(
+                '''${_blankTwo}if(c.ref.${f.name} != null && c.ref.${f.name} != nullptr) { ffi.free(c.ref.${f.name});}''');
             toC.writeln('${_blankTwo}c.ref.${f.name} = toUtf8Null(${f.name});');
             toDart.writeln(
                 '${_blankTwo}${f.name} = fromUtf8Null(c.ref.${f.name});');
@@ -128,7 +130,10 @@ import 'kits.dart';
             classCode.writeln('${_blankOne}${className} ${f.name};');
 
             free.writeln('${_blankTwo}${className}.free(ptr.ref.${f.name});');
+            free.writeln('${_blankTwo}ptr.ref.${f.name} = nullptr;');
 
+            toC.writeln(
+                '${_blankTwo}if (c.ref.${f.name} == null || c.ref.${f.name} == nullptr) {c.ref.${f.name} = allocateZero<clib.${f.typeName}>();}');
             toC.writeln('${_blankTwo}${f.name}.toC(c.ref.${f.name});');
             toDart.writeln('${_blankTwo}${f.name} = new ${className}();');
             toDart.writeln('${_blankTwo}${f.name}.toDart(c.ref.${f.name});');
@@ -141,7 +146,9 @@ import 'kits.dart';
             var className = mapNativeType(f.typeName);
             classCode.writeln('${_blankOne}${className} ${f.name};');
 
-            free.writeln('${_blankTwo}ffi.free(ptr.ref.${f.name});');
+            free.writeln(
+                '${_blankTwo}if (ptr.ref.${f.name} != null && ptr.ref.${f.name} != nullptr) {ffi.free(ptr.ref.${f.name});}');
+            free.writeln('${_blankTwo}ptr.ref.${f.name} = nullptr;');
 
             toC.writeln('${_blankTwo}c.ref.${f.name}.value = ${f.name};');
             toDart.writeln('${_blankTwo}${f.name} = c.ref.${f.name}.value;');
@@ -163,6 +170,9 @@ ${subStruct.toString()}$_blankOne}
     classCode.writeln('''
 
   static free(Pointer<clib.${c.name}> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
 ${free.toString()}${_blankTwo}ffi.free(ptr);
   }
 ''');
@@ -171,6 +181,9 @@ ${free.toString()}${_blankTwo}ffi.free(ptr);
     classCode.writeln('''
 
   static ${toClassName(c.name)} fromC(Pointer<clib.${c.name}> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
 ${_blankTwo}var d = new ${toClassName(c.name)}();
 ${_blankTwo}d.toDart(ptr);
 ${_blankTwo}return d;
@@ -181,18 +194,24 @@ ${_blankTwo}return d;
     classCode.writeln('''
   @override
   Pointer<clib.${c.name}> toCPtr() {
-${_blankTwo}var ptr = clib.${c.name}.allocate();
+${_blankTwo}var ptr = allocateZero<clib.${c.name}>();
 ${_blankTwo}toC(ptr);
 ${_blankTwo}return ptr;
   }
 
   @override
   toC(Pointer<clib.${c.name}> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
 ${toC.toString()}
   }
 
   @override
   toDart(Pointer<clib.${c.name}> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
 ${toDart.toString()}  }''');
 
     classCode.writeln('}');
@@ -206,7 +225,6 @@ ${toDart.toString()}  }''');
     bool nativeType = false;
     {
       var typePointer = TypeChecker.fromRuntime(Pointer);
-      var typeUtf8 = TypeChecker.fromRuntime(ffi.Utf8);
       var typeStruct = TypeChecker.fromRuntime(Struct);
       for (var f in c.fields) {
         if (f.name == ArrayLen) {
@@ -247,11 +265,17 @@ ${toDart.toString()}  }''');
   }
   
   static free(Pointer<clib.${c.name}> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
     ${nativeType ? "ffi.free(ptr.ref.ptr)" : elName + ".free(ptr.ref.ptr)"};
     ffi.free(ptr);
   }
   
   static ${className} fromC(Pointer<clib.${c.name}> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
     var d = new ${className}();
     d.toDart(ptr);
     return d;
@@ -259,17 +283,20 @@ ${toDart.toString()}  }''');
 
   @override
   Pointer<clib.${c.name}> toCPtr() {
-    var c = clib.${c.name}.allocate();
+    var c = allocateZero<clib.${c.name}>();
     toC(c);
     return c;
   }
   
   @override
   toC(Pointer<clib.${c.name}> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
     if (c.ref.ptr != nullptr && c.ref.ptr != null) {
       ${nativeType ? "ffi.free(c.ref.ptr)" : elName + ".free(c.ref.ptr)"};
     }
-    c.ref.ptr = ffi.allocate<${nativeType ? "" : "clib."}${el.name}>(count : data.length);
+    c.ref.ptr = allocateZero<${nativeType ? "" : "clib."}${el.name}>(count : data.length);
     c.ref.len = data.length;
     c.ref.cap = data.length;
     for (var i = 0; i < data.length;i++) {
@@ -279,6 +306,9 @@ ${toDart.toString()}  }''');
 
   @override
   toDart(Pointer<clib.${c.name}> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
     data = new List<$elName>(c.ref.len);
     for (var i = 0; i < data.length;i++) {
       ${nativeType ? "data[i] = c.ref.ptr.elementAt(i).value;" : "data[i].toDart(c.ref.ptr.elementAt(i));"}
@@ -294,56 +324,34 @@ ${toDart.toString()}  }''');
     String t;
     switch (className) {
       case "Int8":
-        {
-          t = "int";
-        }
+        t = "int";
         break;
       case "Int16":
-        {
-          t = "int";
-        }
+        t = "int";
         break;
       case "Int32":
-        {
-          t = "int";
-        }
+        t = "int";
         break;
       case "Int64":
-        {
-          t = "int";
-        }
+        t = "int";
         break;
-
       case "Uint8":
-        {
-          t = "int";
-        }
+        t = "int";
         break;
       case "Uint16":
-        {
-          t = "int";
-        }
+        t = "int";
         break;
       case "Uint32":
-        {
-          t = "int";
-        }
+        t = "int";
         break;
       case "Uint64":
-        {
-          t = "int";
-        }
+        t = "int";
         break;
-
       case "Float":
-        {
-          t = "double";
-        }
+        t = "double";
         break;
       case "Double":
-        {
-          t = "double";
-        }
+        t = "double";
         break;
     }
     return t;

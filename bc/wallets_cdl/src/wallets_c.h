@@ -359,9 +359,9 @@ CDbName **CDbName_dAlloc(void);
 
 void CDbName_dFree(CDbName **dPtr);
 
-CArrayI64 **CInt64_dAlloc(void);
+CArrayI64 **CArrayInt64_dAlloc(void);
 
-void CInt64_dFree(CArrayI64 **dPtr);
+void CArrayInt64_dFree(CArrayI64 **dPtr);
 
 const CError *ChainEee_updateSyncRecord(CContext *ctx, char *netType, CAccountInfoSyncProg *syncRecord);
 

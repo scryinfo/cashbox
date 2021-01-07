@@ -3,6 +3,16 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart' as ffi;
 import 'package:wallets/wallets_c.dc.dart';
 
+Pointer<T> allocateZero<T extends NativeType>({int count = 1}) {
+  final int totalSize = count * sizeOf<T>();
+  var ptr = ffi.allocate<T>();
+  var temp = ptr.cast<Uint8>();
+  for (var i = 0; i < totalSize; i++) {
+    temp.elementAt(i).value = 0;
+  }
+  return ptr;
+}
+
 //dart 与 c struct之间相互转换
 abstract class DC<C extends NativeType> {
   //转换到c，记得调用释放内存
