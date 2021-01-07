@@ -176,29 +176,31 @@ impl WalletTrait for Wallet {
     }
 }
 
+
 #[async_trait]
 impl EeeChainTrait for EeeChain {
-    async fn update_basic_info(
-        &self,
-        context: &dyn ContextTrait,
-        net_type: &NetType,
-        basic_info: &mut SubChainBasicInfo,
-    ) -> Result<(), WalletError> {
+    async fn update_basic_info(&self, context: &dyn ContextTrait, net_type: &NetType, basic_info: &mut SubChainBasicInfo) -> Result<(), WalletError> {
         let rb = context.db().data_db(net_type);
-        basic_info.save(rb, "").await?;
+
+        let mut save_basic_info = {
+            if let Some(mut info) = SubChainBasicInfo::find_by_version(rb, &basic_info.genesis_hash, basic_info.runtime_version, basic_info.tx_version).await?
+            {
+                info.token_decimals = basic_info.token_decimals;
+                info.is_default = basic_info.is_default;
+                info.token_symbol = basic_info.token_symbol.clone();
+                info.ss58_format_prefix = basic_info.ss58_format_prefix;
+                info
+            } else {
+               let basic_info =&*basic_info;
+                basic_info.clone()
+            }
+        };
+        save_basic_info.save_update(rb, "").await?;
         Ok(())
     }
-    async fn get_basic_info(
-        &self,
-        context: &dyn ContextTrait,
-        net_type: &NetType,
-        genesis_hash: &str,
-        runtime_version: i32,
-        tx_version: i32,
-    ) -> Result<SubChainBasicInfo, WalletError> {
+    async fn get_basic_info(&self, context: &dyn ContextTrait, net_type: &NetType, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<SubChainBasicInfo, WalletError> {
         let rb = context.db().data_db(net_type);
-        if let Some(info) =
-        SubChainBasicInfo::find_by_version(rb, genesis_hash, runtime_version, tx_version).await?
+        if let Some(info) = SubChainBasicInfo::find_by_version(rb, genesis_hash, runtime_version, tx_version).await?
         {
             Ok(info)
         } else {
@@ -206,17 +208,16 @@ impl EeeChainTrait for EeeChain {
         }
     }
 
-    async fn update_sync_record(
-        &self,
-        context: &dyn ContextTrait,
-        net_type: &NetType,
-        sync_record: &AccountInfoSyncProg,
-    ) -> Result<(), WalletError> {
+    async fn update_sync_record(&self, context: &dyn ContextTrait, net_type: &NetType, sync_record: &AccountInfoSyncProg) -> Result<(), WalletError> {
         let rb = context.db().data_db(net_type);
         let mut record = {
             match AccountInfoSyncProg::find_by_account(rb, &sync_record.account).await? {
                 Some(record) => record,
-                None => MAccountInfoSyncProg::default(),
+                None => {
+                    let mut instance = MAccountInfoSyncProg::default();
+                    instance.account = sync_record.account.clone();
+                    instance
+                }
             }
         };
         record.block_hash = sync_record.block_hash.clone();
@@ -224,12 +225,7 @@ impl EeeChainTrait for EeeChain {
         record.save_update(rb, "").await?;
         Ok(())
     }
-    async fn get_sync_record(
-        &self,
-        context: &dyn ContextTrait,
-        net_type: &NetType,
-        account: &str,
-    ) -> Result<AccountInfoSyncProg, WalletError> {
+    async fn get_sync_record(&self, context: &dyn ContextTrait, net_type: &NetType, account: &str) -> Result<AccountInfoSyncProg, WalletError> {
         let rb = context.db().data_db(net_type);
         if let Some(info) = AccountInfoSyncProg::find_by_account(rb, account).await? {
             Ok(info.into())
@@ -237,12 +233,7 @@ impl EeeChainTrait for EeeChain {
             Err(WalletError::NotExist)
         }
     }
-    async fn decode_account_info(
-        &self,
-        context: &dyn ContextTrait,
-        net_type: &NetType,
-        parameters: DecodeAccountInfoParameters,
-    ) -> Result<AccountInfo, WalletError> {
+    async fn decode_account_info(&self, context: &dyn ContextTrait, net_type: &NetType, parameters: DecodeAccountInfoParameters) -> Result<AccountInfo, WalletError> {
         let rb = context.db().data_db(net_type);
         if let Some(chain_info) = SubChainBasicInfo::find_by_version(
             rb,
@@ -262,14 +253,8 @@ impl EeeChainTrait for EeeChain {
             )?;
             let account_info =
                 match chain_helper.get_storage_value_key("System", "UpgradedToU32RefCount") {
-                    Ok(_) => eee::SubChainHelper::decode_account_info::<EeeAccountInfo>(
-                        &parameters.encode_data,
-                    )
-                        .map_err(|error| error.into()),
-                    Err(_) => eee::SubChainHelper::decode_account_info::<EeeAccountInfoRefU8>(
-                        &parameters.encode_data,
-                    )
-                        .map_err(|error| error.into()),
+                    Ok(_) => eee::SubChainHelper::decode_account_info::<EeeAccountInfo>(&parameters.encode_data).map_err(|error| error.into()),
+                    Err(_) => eee::SubChainHelper::decode_account_info::<EeeAccountInfoRefU8>(&parameters.encode_data).map_err(|error| error.into()),
                 };
             account_info.map(|info| AccountInfo {
                 nonce: info.nonce,
@@ -283,17 +268,12 @@ impl EeeChainTrait for EeeChain {
             Err(WalletError::NotExist)
         }
     }
-    async fn get_storage_key(
-        &self,
-        context: &dyn ContextTrait,
-        net_type: &NetType,
-        parameters: StorageKeyParameters,
-    ) -> Result<String, WalletError> {
+    async fn get_storage_key(&self, context: &dyn ContextTrait, net_type: &NetType, parameters: StorageKeyParameters) -> Result<String, WalletError> {
         let rb = context.db().data_db(net_type);
         if let Some(chain_info) = SubChainBasicInfo::find_by_version(rb, &parameters.chain_version.genesis_hash, parameters.chain_version.runtime_version, parameters.chain_version.tx_version).await?
         {
             let genesis_hash = scry_crypto::hexstr_to_vec(&chain_info.genesis_hash)?;
-            let account_id = eee::AccountId::from_ss58check(&parameters.pub_key)
+            let account_id = eee::AccountId::from_ss58check(&parameters.account)
                 .map_err(|err| WalletError::SubstrateTx(eee::error::Error::Public(err)))?;
             let chain_helper = eee::SubChainHelper::init(
                 &chain_info.metadata,
@@ -310,15 +290,11 @@ impl EeeChainTrait for EeeChain {
             Err(WalletError::NotExist)
         }
     }
-    async fn eee_transfer(
-        &self,
-        context: &dyn ContextTrait,
-        net_type: &NetType,
-        transfer_payload: &TransferPayload,
-    ) -> Result<String, WalletError> {
+    async fn eee_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &TransferPayload) -> Result<String, WalletError> {
         let data_rb = context.db().data_db(net_type);
         //todo 调整通过wallet　id查询wallet的功能
         let wallet_db = context.db().wallets_db();
+
         // get token decimal by account address
         let m_address = {
             let mut addr_wrapper = wallet_db.new_wrapper();
@@ -327,18 +303,13 @@ impl EeeChainTrait for EeeChain {
         };
 
         if m_address.is_none() {
-            return Err(WalletError::Custom(format!(
-                "wallet address {} is not exist!",
-                &transfer_payload.from_account
-            )));
+            return Err(WalletError::Custom(format!("wallet address {} is not exist!", &transfer_payload.from_account)));
         }
         let address = m_address.unwrap();
+
         let m_wallet = MWallet::fetch_by_id(wallet_db, "", &address.wallet_id.to_owned()).await?;
         if m_wallet.is_none() {
-            return Err(WalletError::Custom(format!(
-                "wallet {} is not exist!",
-                &address.wallet_id
-            )));
+            return Err(WalletError::Custom(format!("wallet {} is not exist!", &address.wallet_id)));
         }
         let mnemonic = eee::Sr25519::get_mnemonic_context(
             &m_wallet.unwrap().mnemonic,
@@ -380,18 +351,10 @@ impl EeeChainTrait for EeeChain {
             )?;
             Ok(sign_data)
         } else {
-            Err(WalletError::Custom(format!(
-                "chain info {} is not exist!",
-                transfer_payload.chain_version.genesis_hash
-            )))
+            Err(WalletError::Custom(format!("chain info {} is not exist!",transfer_payload.chain_version.genesis_hash)))
         }
     }
-    async fn tokenx_transfer(
-        &self,
-        context: &dyn ContextTrait,
-        net_type: &NetType,
-        transfer_payload: &TransferPayload,
-    ) -> Result<String, WalletError> {
+    async fn tokenx_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &TransferPayload) -> Result<String, WalletError> {
         let data_rb = context.db().data_db(net_type);
         //todo 调整通过wallet　id查询wallet的功能
         let wallet_db = context.db().wallets_db();
@@ -474,25 +437,15 @@ impl EeeChainTrait for EeeChain {
         }
     }
 
-    async fn tx_sign(
-        &self,
-        context: &dyn ContextTrait,
-        net_type: &NetType,
-        raw_tx_param: &RawTxParam,
-        is_submittable: bool,
-    ) -> Result<String, WalletError> {
+    async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, raw_tx_param: &RawTxParam, is_submittable: bool) -> Result<String, WalletError> {
         let data_rb = context.db().data_db(net_type);
         let tx_encode_data = scry_crypto::hexstr_to_vec(&raw_tx_param.raw_tx)?;
         let tx = eee::RawTx::decode(&mut &tx_encode_data[..])?;
         //todo 调整通过wallet　id查询wallet的功能
         let wallet_db = context.db().wallets_db();
-        let m_wallet =
-            MWallet::fetch_by_id(wallet_db, "", &raw_tx_param.wallet_id.to_owned()).await?;
+        let m_wallet = MWallet::fetch_by_id(wallet_db, "", &raw_tx_param.wallet_id.to_owned()).await?;
         if m_wallet.is_none() {
-            return Err(WalletError::Custom(format!(
-                "wallet {} is not exist!",
-                &raw_tx_param.wallet_id
-            )));
+            return Err(WalletError::Custom(format!("wallet {} is not exist!", &raw_tx_param.wallet_id)));
         }
         let mnemonic = eee::Sr25519::get_mnemonic_context(
             &m_wallet.unwrap().mnemonic,

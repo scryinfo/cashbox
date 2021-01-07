@@ -10,6 +10,7 @@ pub fn hexstr_to_vec(hexstr: &str) -> Result<Vec<u8>, hex::FromHexError> {
         .trim_matches('\"')
         .to_string()
         .trim_start_matches("0x")
+        .trim()
         .to_string();
     hex::decode(&hexstr)
 }

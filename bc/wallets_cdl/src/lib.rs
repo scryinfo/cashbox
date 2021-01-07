@@ -14,7 +14,9 @@ mod chain_eee;
 mod chain_btc;
 
 mod kits;
-mod wallets_c_test;
+
+pub use kits::{CR, CStruct, CU64, to_c_char, to_str};
+
 
 #[cfg(test)]
 mod tests {

@@ -4,8 +4,10 @@
 use std::os::raw::c_char;
 
 use crate::kits::{CArray, CBool, CStruct, d_ptr_alloc, d_ptr_free};
-use crate::parameters::{CContext, CDbName};
-use crate::types::{CError, CWallet};
+
+use crate::parameters::{CContext, CDbName, CAccountInfo};
+use crate::types::{CError, CWallet, CAccountInfoSyncProg, CSubChainBasicInfo};
+
 
 /// alloc ** [parameters::CContext]
 #[no_mangle]
@@ -40,7 +42,7 @@ pub unsafe extern "C" fn CStr_dFree(dcs: *mut *mut c_char) {
 
 #[no_mangle]
 pub unsafe extern "C" fn CStr_dAlloc() -> *mut *mut c_char {
-    return d_ptr_alloc();
+    d_ptr_alloc()
 }
 
 #[no_mangle]
@@ -51,7 +53,7 @@ pub unsafe extern "C" fn CBool_dFree(dcs: *mut *mut CBool) {
 
 #[no_mangle]
 pub unsafe extern "C" fn CBool_dAlloc() -> *mut *mut CBool {
-    return d_ptr_alloc();
+    d_ptr_alloc()
 }
 
 
@@ -104,4 +106,37 @@ pub unsafe extern "C" fn CArrayInt64_dFree(dPtr: *mut *mut CArray<i64>) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
 }
+
+#[no_mangle]
+pub extern "C" fn CAccountInfoSyncProg_dAlloc() -> *mut *mut CAccountInfoSyncProg {
+    d_ptr_alloc()
+}
+
+pub unsafe extern "C" fn CAccountInfoSyncProg_dFree(dPtr: *mut *mut CAccountInfoSyncProg) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
+
+#[no_mangle]
+pub extern "C" fn CAccountInfo_dAlloc() -> *mut *mut CAccountInfo {
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CAccountInfo_dFree(dPtr: *mut *mut CAccountInfo) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
+
+#[no_mangle]
+pub extern "C" fn CSubChainBasicInfo_dAlloc() -> *mut *mut CSubChainBasicInfo {
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CSubChainBasicInfo_dFree(dPtr: *mut *mut CSubChainBasicInfo) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
+
 // alloc free end

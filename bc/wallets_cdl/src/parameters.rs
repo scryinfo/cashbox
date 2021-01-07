@@ -94,7 +94,7 @@ pub struct CStorageKeyParameters {
     pub chainVersion: *mut CChainVersion,
     pub module: *mut c_char,
     pub storageItem: *mut c_char,
-    pub pubKey: *mut c_char,
+    pub account: *mut c_char,
 }
 
 #[repr(C)]
