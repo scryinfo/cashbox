@@ -115,8 +115,9 @@ pub unsafe extern "C" fn ChainEee_decodeAccountInfo(ctx: *mut CContext, netType:
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_getStorageKey(ctx: *mut CContext, netType: *mut c_char, parameters: *mut CStorageKeyParameters, key: *mut *mut c_char) -> *const CError {
     log::debug!("enter ChainEee getStorageKey");
+
     if ctx.is_null() || netType.is_null() || parameters.is_null() || key.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx or getStorageKey is null");
+        let err = Error::PARAMETER().append_message(" : ctx or parameters is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
     }
@@ -282,8 +283,9 @@ pub unsafe extern "C" fn ChainEee_txSign(ctx: *mut CContext, netType: *mut c_cha
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_updateBasicInfo(ctx: *mut CContext, netType: *mut c_char, basicInfo: *mut CSubChainBasicInfo) -> *const CError {
     log::debug!("enter ChainEee updateBasicInfo");
+
     if ctx.is_null() || basicInfo.is_null() || netType.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx or arrayWallet is null");
+        let err = Error::PARAMETER().append_message(" : ctx,basicInfo or netType is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
     }
@@ -314,12 +316,13 @@ pub unsafe extern "C" fn ChainEee_updateBasicInfo(ctx: *mut CContext, netType: *
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut c_char, chainVersion: *mut CChainVersion, basicInfo: *mut *mut CSubChainBasicInfo) -> *const CError {
     log::debug!("enter ChainEee getBasicInfo");
+
     if ctx.is_null() || basicInfo.is_null() || netType.is_null() || chainVersion.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx or arrayWallet is null");
+        let err = Error::PARAMETER().append_message(" : ctx or chainVersion or netType is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
     }
-    (*chainVersion).free();
+    (*basicInfo).free();
     let lock = Contexts::collection().lock();
     let mut contexts = lock.borrow_mut();
     let err = {

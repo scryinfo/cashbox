@@ -98,7 +98,7 @@ pub struct StorageKeyParameters {
     pub chain_version:ChainVersion,
     pub module: String,
     pub storage_item:String,
-    pub pub_key:String,
+    pub account:String,
 }
 
 #[derive(Debug, Clone, Default,)]

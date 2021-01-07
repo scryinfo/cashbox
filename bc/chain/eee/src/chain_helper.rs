@@ -162,7 +162,7 @@ impl ChainHelper {
         let state_vec = scry_crypto::hexstr_to_vec(info)?;
         let type_name = std::any::type_name::<T>();
         match type_name {
-            "substratetx::EeeAccountInfoRefU8"=>{
+            "eee::EeeAccountInfoRefU8"=>{
                 EeeAccountInfoRefU8::decode(&mut &state_vec.as_slice()[..]).map(|account|{
                     EeeAccountInfo{
                         nonce: account.nonce,
@@ -174,7 +174,7 @@ impl ChainHelper {
                     }
                 }).map_err(|err| err.into())
             },
-            "substratetx::EeeAccountInfo"=>{
+            "eee::EeeAccountInfo"=>{
                 EeeAccountInfo::decode(&mut &state_vec.as_slice()[..]).map_err(|err| err.into())
             }
             _ =>{

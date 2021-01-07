@@ -30,4 +30,5 @@ futures-lite = "1.11.3"
 pkg-config = "0.3.19"
 mav = { path = "../mav" }
 rbatis = { version = "1.8.52", features = ["async-io-sqlite"] }
+scry-crypto = {version = "0.1.0",path="../util/crypto"}
 #[workspace]
