@@ -32,32 +32,146 @@ String fromUtf8Null(Pointer<ffi.Utf8> ptr) {
   return ffi.Utf8.fromUtf8(ptr);
 }
 
-class DlResult1<T1> {
-  Error err;
-  T1 data1;
-
-  DlResult1(this.data1, this.err);
-
-  bool isSuccess() => err.isSuccess();
+extension StringEx on String {
+  Pointer<ffi.Utf8> toCPtr() {
+    return toUtf8Null(this);
+  }
 }
 
-class DlResult2<T1, T2> {
-  Error err;
-  T1 data1;
-  T2 data2;
-
-  DlResult2(this.data1, this.data2, this.err);
-
-  bool isSuccess() => err.isSuccess();
+extension Utf8PtrEx on Pointer<ffi.Utf8> {
+  void free() {
+    ffi.free(this);
+  }
 }
 
-class DlResult3<T1, T2, T3> {
-  Error err;
-  T1 data1;
-  T2 data2;
-  T3 data3;
+extension Int8PtrEx on Pointer<Int8> {
+  void free() {
+    ffi.free(this);
+  }
+}
 
-  DlResult3(this.data1, this.data2, this.err);
+extension Int16PtrEx on Pointer<Int16> {
+  void free() {
+    ffi.free(this);
+  }
+}
 
-  bool isSuccess() => err.isSuccess();
+extension Int32PtrEx on Pointer<Int32> {
+  void free() {
+    ffi.free(this);
+  }
+}
+
+extension Int64PtrEx on Pointer<Int64> {
+  void free() {
+    ffi.free(this);
+  }
+}
+
+extension Uint8PtrEx on Pointer<Uint8> {
+  void free() {
+    ffi.free(this);
+  }
+}
+
+extension Uint16PtrEx on Pointer<Uint16> {
+  void free() {
+    ffi.free(this);
+  }
+}
+
+extension Uint32PtrEx on Pointer<Uint32> {
+  void free() {
+    ffi.free(this);
+  }
+}
+
+extension Uint64PtrEx on Pointer<Uint64> {
+  void free() {
+    ffi.free(this);
+  }
+}
+
+extension FloatPtrEx on Pointer<Float> {
+  void free() {
+    ffi.free(this);
+  }
+}
+
+extension DoublePtrEx on Pointer<Double> {
+  void free() {
+    ffi.free(this);
+  }
+}
+
+extension IntEx on int {
+  bool isTrue() => this == 0;
+
+  Pointer<Uint32> toBoolPtr() {
+    var ptr = ffi.allocate<Uint32>();
+    ptr.value = this;
+    return ptr;
+  }
+
+  Pointer<Int8> toInt8Ptr() {
+    var ptr = ffi.allocate<Int8>();
+    ptr.value = this;
+    return ptr;
+  }
+
+  Pointer<Int16> toInt16Ptr() {
+    var ptr = ffi.allocate<Int16>();
+    ptr.value = this;
+    return ptr;
+  }
+
+  Pointer<Int32> toInt32Ptr() {
+    var ptr = ffi.allocate<Int32>();
+    ptr.value = this;
+    return ptr;
+  }
+
+  Pointer<Int64> toInt64Ptr() {
+    var ptr = ffi.allocate<Int64>();
+    ptr.value = this;
+    return ptr;
+  }
+
+  Pointer<Uint8> toUint8Ptr() {
+    var ptr = ffi.allocate<Uint8>();
+    ptr.value = this;
+    return ptr;
+  }
+
+  Pointer<Uint16> toUint16Ptr() {
+    var ptr = ffi.allocate<Uint16>();
+    ptr.value = this;
+    return ptr;
+  }
+
+  Pointer<Uint32> toUint32Ptr() {
+    var ptr = ffi.allocate<Uint32>();
+    ptr.value = this;
+    return ptr;
+  }
+
+  Pointer<Uint64> toUint64Ptr() {
+    var ptr = ffi.allocate<Uint64>();
+    ptr.value = this;
+    return ptr;
+  }
+}
+
+extension DoubleEx on double {
+  Pointer<Float> toFloatPtr() {
+    var ptr = ffi.allocate<Float>();
+    ptr.value = this;
+    return ptr;
+  }
+
+  Pointer<Double> toDoublePtr() {
+    var ptr = ffi.allocate<Double>();
+    ptr.value = this;
+    return ptr;
+  }
 }
