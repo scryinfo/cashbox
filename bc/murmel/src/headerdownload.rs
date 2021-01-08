@@ -188,14 +188,6 @@ impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
             .received(peer, 1, ExpectedReply::Headers);
 
         if headers.len() > 0 {
-            {
-                let ref pair = self.condvar_pair;
-                let &(ref lock, ref cvar) = Arc::deref(pair);
-                let mut condition = lock.lock();
-                (*condition).set_header(true);
-                cvar.notify_all();
-            }
-
             // current height
             let mut height;
             // some received headers were not yet known

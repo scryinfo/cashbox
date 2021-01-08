@@ -116,16 +116,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                     error!("Error processing headers: {}", e);
                 }
             }
-
-            // while let Ok(msg) = self.hook_receiver.recv_timeout(Duration::from_millis(1000)) {
-            //     match msg {
-            //         HooksMessage::ReceivedHeaders(pid) => {
-            //             warn!("hooks for received headers");
-            //             self.get_data(pid, true).expect("GOT HOOKS error");
-            //         }
-            //         HooksMessage::Others => (),
-            //     }
-            // }
+            
             self.timeout
                 .lock()
                 .unwrap()
@@ -163,18 +154,19 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         }
 
         {
-            error!("开始等filter");
+            error!("wait_for filter condition");
             let ref pair = self.condvar_pair;
             let &(ref lock, ref cvar) = Arc::deref(pair);
             let mut condition = lock.lock();
-            while !(*condition).get_filter() {
-                let r = cvar.wait_for(&mut condition, Duration::from_secs(3));
+            while (*condition).get_filter() == false {
+                let r = cvar.wait_for(&mut condition, Duration::from_secs(5));
                 if r.timed_out() {
-                    error!("不等filter");
+                    error!("wait_for filter condition timeout");
                     return Ok(());
                 }
             }
         }
+        error!("get fillter_ready condition");
 
         let mut header_vec: Vec<String> = vec![];
         {

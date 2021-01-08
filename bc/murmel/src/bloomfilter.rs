@@ -4,7 +4,6 @@ use crate::error::Error;
 use crate::hooks::ShowCondition;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
-    SERVICE_BLOOM,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
@@ -13,7 +12,7 @@ use log::{error, info, trace};
 use std::ops::Deref;
 use std::sync::{mpsc, Arc};
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 pub struct BloomFilter<T> {
     // send message
@@ -50,40 +49,27 @@ impl<T: Send + 'static + ShowCondition> BloomFilter<T> {
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(4000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {
-                            trace!("serving bloom peer={}", pid);
+                            trace!("serving blocks peer={}", pid);
                             // Initiate request loadfilter
                             self.send_filter(pid)
                         } else {
                             Ok(())
                         }
                     }
-                    PeerMessage::Disconnected(_, _) => Ok(()),
-                    PeerMessage::Incoming(_pid, msg) => {
-                        match msg {
-                            //  The processing methods related to the Bitcoin network protocol must be modified accordingly to send FilterLoad
-                            //  There is a branch dealing with inv, this is not needed for the time being
-                            //  The processing in Ping also proves that I do not need to process information that is not relevant to me
-                            //  I should only deal with merkerblock should be ok
-                            //  May be processed twice
-                            //  NetworkMessage::Headers(ref headers) => if self.is_serving_blocks(pid) { self.headers(headers, pid) } else { Ok(()) },
-                            NetworkMessage::Ping(_) => Ok(()),
-                            _ => Ok(()),
-                        }
-                    }
+                    PeerMessage::Disconnected(_, _) => self.reset_filter_condition(),
+                    PeerMessage::Incoming(_pid, msg) => match msg {
+                        NetworkMessage::Ping(_) => Ok(()),
+                        _ => Ok(()),
+                    },
                     _ => Ok(()),
                 } {
                     error!("Error processing headers: {}", e);
                 }
             }
-
-            self.timeout
-                .lock()
-                .unwrap()
-                .check(vec![ExpectedReply::Headers]);
         }
     }
 
@@ -96,18 +82,6 @@ impl<T: Send + 'static + ShowCondition> BloomFilter<T> {
 
     /// Each node needs to send a filter load message
     fn send_filter(&mut self, peer: PeerId) -> Result<(), Error> {
-        {
-            let ref pair = self.condvar_pair;
-            let &(ref lock, ref cvar) = Arc::deref(pair);
-            let mut condition = lock.lock();
-            while !(*condition).get_header() {
-                let r = cvar.wait_for(&mut condition, Duration::from_secs(3));
-                if r.timed_out() {
-                    return Ok(());
-                }
-            }
-        }
-
         if let Some(filter_load_message) = &self.filter_load_message {
             info!("send filter loaded message");
             self.p2p.send_network(
@@ -115,14 +89,22 @@ impl<T: Send + 'static + ShowCondition> BloomFilter<T> {
                 NetworkMessage::FilterLoad(filter_load_message.to_owned()),
             );
         }
+
+        let ref pair = self.condvar_pair;
+        let &(ref lock, ref cvar) = Arc::deref(pair);
+        let mut condition = lock.lock();
+        (*condition).set_filter(true);
+        cvar.notify_all();
         Ok(())
     }
-}
 
-//todo fix
-fn calculate_filter() -> FilterLoadMessage {
-    // Public key 66（compressed）
-    FilterLoadMessage::calculate_filter(
-        "02a485e265a661def2d9db1f5880fb07e96ffc0ffcec0f403d61a08aa21b1bdeb4",
-    )
+    // when disconnect, reset condition variable （fillter_ready）
+    fn reset_filter_condition(&self) -> Result<(), Error> {
+        let ref pair = self.condvar_pair;
+        let &(ref lock, ref cvar) = Arc::deref(pair);
+        let mut condition = lock.lock();
+        (*condition).set_filter(false);
+        cvar.notify_all();
+        Ok(())
+    }
 }
