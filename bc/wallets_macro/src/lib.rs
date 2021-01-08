@@ -3,7 +3,6 @@ use proc_macro::TokenStream;
 use proc_macro_roids::{DeriveInputStructExt, FieldsNamedAppend};
 use quote::quote;
 use syn::{AttributeArgs, DeriveInput, Fields, FieldsNamed, parse_macro_input, parse_quote, Type};
-use syn::export::TokenStream2;
 
 mod db_meta;
 mod cr;
@@ -151,7 +150,7 @@ pub fn db_sub_struct(_: TokenStream, input: TokenStream) -> TokenStream {
     gen
 }
 
-fn db_field_name(name: &syn::Ident, fields: &Fields) -> TokenStream2 {
+fn db_field_name(name: &syn::Ident, fields: &Fields) -> proc_macro2::TokenStream {
     let fields_stream = {
         let mut fields_vec = Vec::new();
         for f in fields {

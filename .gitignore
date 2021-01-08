@@ -128,3 +128,5 @@ demo/rbatis_demo/target
 /bc/murmel/btc_hammer.db.0.bl
 /bc/murmel/btc_hammer.db.0.lg
 /bc/murmel/btc_hammer.db.0.tb
+/bc/mav/temp
+/bc/mav/generated_sql

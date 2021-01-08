@@ -477,8 +477,8 @@ mod tests {
     #[test]
     fn db_test() {
         let mut db = Db::default();
-        let re = block_on(db.init(&DbName::new("", "")));
-        assert_eq!(false, re.is_err(), "{:?}", re.unwrap_err());
+        let re = block_on(db.init(&DbName::new("test_", "./temp")));
+        assert_eq!(false, re.is_err(), "{:?}", re);
 
         assert_eq!(&db.cashbox_wallets as *const Rbatis, db.wallets_db() as *const Rbatis);
         assert_eq!(&db.cashbox_mnemonic as *const Rbatis, db.mnemonic_db() as *const Rbatis);

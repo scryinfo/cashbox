@@ -1,8 +1,7 @@
 use proc_macro::TokenStream;
 
-use quote::{format_ident, quote};
+use quote::{format_ident, quote, ToTokens};
 use syn::{AngleBracketedGenericArguments, Fields, GenericArgument, PathArguments, PathSegment, Type, TypePath};
-use syn::export::ToTokens;
 
 use crate::to_snake_name;
 
