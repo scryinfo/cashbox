@@ -23,6 +23,11 @@ use bitcoin::network::constants::Network;
 use log::Level;
 use murmel::constructor::Constructor;
 
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
+use murmel::config::BTC_HAMMER_PATH;
+use murmel::db::RB_DETAIL;
+use murmel::jniapi::{calc_default_address, calc_pubkey};
+use murmel::moudle::detail::MUserAddress;
 use std::{
     env::args,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
@@ -30,8 +35,6 @@ use std::{
     str::FromStr,
     time::SystemTime,
 };
-use murmel::jniapi::{BTC_CHAIN_PATH, SHARED_SQLITE};
-use murmel::jniapi::{calc_default_address, calc_pubkey};
 
 pub fn main() {
     if find_opt("help") {
@@ -40,7 +43,9 @@ pub fn main() {
         println!("--log level: level is one of trace|debug|info|warn|error");
         println!("--connections n: maintain at least n connections");
         println!("--peer ip_address: connect to the given peer at start. You may use more than one --peer option.");
-        println!("--db file: store data in the given sqlite database file. Created if does not exist.");
+        println!(
+            "--db file: store data in the given sqlite database file. Created if does not exist."
+        );
         println!("--network net: net is one of main|test for corresponding Bitcoin networks");
         println!("--nodns : do not use dns seed");
         println!("--birth unixtime : blocks will be downloaded if matching filters after this time stamp");
@@ -59,7 +64,7 @@ pub fn main() {
             "info" => simple_logger::init_with_level(Level::Info).unwrap(),
             "debug" => simple_logger::init_with_level(Level::Debug).unwrap(),
             "trace" => simple_logger::init_with_level(Level::Trace).unwrap(),
-            _ => simple_logger::init_with_level(Level::Info).unwrap()
+            _ => simple_logger::init_with_level(Level::Info).unwrap(),
         }
     } else {
         simple_logger::init_with_level(Level::Debug).unwrap();
@@ -105,23 +110,37 @@ pub fn main() {
     let chaindb = if let Some(path) = find_arg("db") {
         Constructor::open_db(Some(&Path::new(path.as_str())), network, birth).unwrap()
     } else {
-        Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap()
+        Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap()
     };
 
     // todo
     // use mnemonic generate publc address and store it in database
-    let sqlite = SHARED_SQLITE.lock().unwrap();
-    let pubkey = sqlite.query_compressed_pub_key();
-    if let None = pubkey {
-        info!("Did not have default pubkey in database yet");
+    let mut filter_message: Option<FilterLoadMessage> = None;
+    let mut muser_address: Option<MUserAddress> = None;
+    {
+        muser_address = RB_DETAIL.fetch_user_address();
+    }
+
+    if let Some(k) = muser_address {
+        info!("User Address {:?}", &k);
+        let filter_load_message =
+            FilterLoadMessage::calculate_filter(k.compressed_pub_key.as_str());
+        filter_message = Some(filter_load_message)
+    } else {
+        info!("Did not have pubkey in database yet, calc default address and pubkey");
         let default_address = calc_default_address();
         let address = default_address.to_string();
         let default_pubkey = calc_pubkey();
-        sqlite.insert_compressed_pub_key(address, default_pubkey);
+        {
+            RB_DETAIL.save_user_address(address, default_pubkey.clone());
+        }
+        let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
+        filter_message = Some(filter_load_message)
     }
 
-    let mut spv = Constructor::new(network, listen, chaindb).unwrap();
-    spv.run(network, peers, connections).expect("can not start node");
+    let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
+    spv.run(network, peers, connections)
+        .expect("can not start node");
 }
 
 fn get_peers() -> Vec<SocketAddr> {
@@ -139,7 +158,7 @@ fn get_listeners() -> Vec<SocketAddr> {
 }
 
 // Returns key-value zipped iterator.
-fn zipped_args() -> impl Iterator<Item=(String, String)> {
+fn zipped_args() -> impl Iterator<Item = (String, String)> {
     let key_args = args()
         .filter(|arg| arg.starts_with("--"))
         .map(|mut arg| arg.split_off(2));

@@ -1,0 +1,21 @@
+[package]
+name = "rbatis_demo"
+version = "0.1.0"
+authors = ["TigerInYourDream <zyzzz0928@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# rbatis
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+log = "0.4"
+bigdecimal = "0.2"
+rbatis-core = { version = "1.8.36", features = ["async-io-sqlite"] }
+rbatis = { version = "1.8.36", features=["async-io-sqlite"] }
+rbatis-macro-driver = { version = "1.8.36"} # features=["no_print"] }
+async-std = { version = "1.7" }
+
+# rbatis end

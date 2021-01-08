@@ -29,6 +29,7 @@ use crate::downstream::SharedDownstream;
 use crate::error::Error;
 use crate::getdata::GetData;
 use crate::headerdownload::HeaderDownload;
+use crate::hooks::Condition;
 #[cfg(feature = "lightning")]
 use crate::lightning::LightningConnector;
 use crate::p2p::BitcoinP2PConfig;
@@ -38,6 +39,7 @@ use crate::timeout::Timeout;
 use bitcoin::network::constants::Network;
 use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message::RawNetworkMessage;
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use futures::{
     executor::{ThreadPool, ThreadPoolBuilder},
     future,
@@ -45,7 +47,7 @@ use futures::{
     Future, FutureExt, Poll as Async, StreamExt,
 };
 use futures_timer::Interval;
-use log::info;
+use parking_lot::Condvar;
 use rand::{thread_rng, RngCore};
 use std::pin::Pin;
 use std::time::Duration;
@@ -57,6 +59,9 @@ use std::{
 };
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
+
+// CondVar use for sync thread
+pub type CondvarPair<T> = Arc<(parking_lot::Mutex<T>, Condvar)>;
 
 /// The complete stack
 pub struct Constructor {
@@ -86,6 +91,7 @@ impl Constructor {
         network: Network,
         listen: Vec<SocketAddr>,
         chaindb: SharedChainDB,
+        filter_load_message: Option<FilterLoadMessage>,
     ) -> Result<Constructor, Error> {
         const BACK_PRESSURE: usize = 10;
 
@@ -109,15 +115,23 @@ impl Constructor {
         );
 
         #[cfg(feature = "lightning")]
-            let lightning = Arc::new(Mutex::new(LightningConnector::new(
+        let lightning = Arc::new(Mutex::new(LightningConnector::new(
             network,
             p2p_control.clone(),
         )));
         #[cfg(not(feature = "lightning"))]
-            let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
+        let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
 
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
+
+        let pair: CondvarPair<Condition> = Arc::new((
+            parking_lot::Mutex::new(Condition::new(false, false)),
+            Condvar::new(),
+        ));
+        let pair2 = Arc::clone(&pair);
+        let pair3 = Arc::clone(&pair);
+        let pair4 = Arc::clone(&pair);
 
         dispatcher.add_listener(HeaderDownload::new(
             chaindb.clone(),
@@ -125,22 +139,25 @@ impl Constructor {
             timeout.clone(),
             lightning.clone(),
             hook_sender,
+            pair,
         ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
-        info!("send FilterLoad");
-        dispatcher.add_listener(BloomFilter::new(p2p_control.clone(), timeout.clone()));
+        dispatcher.add_listener(BloomFilter::new(
+            p2p_control.clone(),
+            timeout.clone(),
+            filter_load_message,
+            pair2,
+        ));
 
-        info!("send GetData");
         dispatcher.add_listener(GetData::new(
-            chaindb.clone(),
             p2p_control.clone(),
             timeout.clone(),
             hook_receiver,
+            pair3,
         ));
 
-        info!("Broadcast TX");
-        dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone()));
+        // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));
@@ -174,7 +191,7 @@ impl Constructor {
             executor
                 .spawn(
                     p2p.add_peer("bitcoin", PeerSource::Outgoing(addr.clone()))
-                       .map(|_| ()),
+                        .map(|_| ()),
                 )
                 .expect("can not spawn task for peers");
         }
