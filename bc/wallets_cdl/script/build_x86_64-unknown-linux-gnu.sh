@@ -1,11 +1,18 @@
 #！/bin/bash
 
+HOST_TAG=x86_64-unknown-linux-gnu
 cuPath=$(pwd)
 batPath=$(dirname $(readlink -f "$0"))
+cd $batPath/../../../packages/wallets
+outPath=$(pwd)
 
 export BUILD_DUMMY_WASM_BINARY=1
 
 rustup default stable-gnu
 cd $batPath/..
-cargo build --release --target x86_64-unknown-linux-gnu
+cargo build --target $HOST_TAG
+
+cd %batPath%../../target/$HOST_TAG/debug
+cp "wallets_cdl.so" "%outPath%/"
+
 cd $cuPath
