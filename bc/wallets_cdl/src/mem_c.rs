@@ -3,11 +3,9 @@
 
 use std::os::raw::c_char;
 
-use crate::kits::{CArray, CBool, CStruct, d_ptr_alloc, d_ptr_free};
-
-use crate::parameters::{CContext, CDbName, CAccountInfo};
-use crate::types::{CError, CWallet, CAccountInfoSyncProg, CSubChainBasicInfo};
-
+use crate::kits::{d_ptr_alloc, d_ptr_free, CArray, CBool, CStruct};
+use crate::parameters::{CAccountInfo, CContext, CDbName};
+use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet};
 
 /// alloc ** [parameters::CContext]
 #[no_mangle]
@@ -55,7 +53,6 @@ pub unsafe extern "C" fn CBool_dFree(dcs: *mut *mut CBool) {
 pub unsafe extern "C" fn CBool_dAlloc() -> *mut *mut CBool {
     d_ptr_alloc()
 }
-
 
 #[no_mangle]
 pub unsafe extern "C" fn CError_free(error: *mut CError) {

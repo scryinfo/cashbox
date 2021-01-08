@@ -4,9 +4,12 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName, DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, TransferPayload};
+use wallets_types::{
+    AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName,
+    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, TransferPayload,
+};
 
-use crate::kits::{CMark, CR, CStruct, to_c_char, to_str};
+use crate::kits::{to_c_char, to_str, CMark, CStruct, CR};
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
@@ -104,7 +107,3 @@ pub struct CChainVersion {
     pub runtimeVersion: i32,
     pub txVersion: i32,
 }
-
-
-
-

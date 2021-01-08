@@ -23,7 +23,7 @@ pub fn free_c_char(cs: &mut *mut c_char) {
     unsafe {
         if !cs.is_null() {
             CString::from_raw(*cs);
-            *cs = null_mut();//sure null
+            *cs = null_mut(); //sure null
         }
     };
 }
@@ -106,7 +106,7 @@ macro_rules! promise_c_struct {
         promise_c_struct!($($t2), +);
     };
 }
-promise_c_struct!(c_char,i32,i64,u32,u64,f32, f64);
+promise_c_struct!(c_char, i32, i64, u32, u64, f32, f64);
 /// 实现drop, 要求实现 trait CStruct
 #[macro_export]
 macro_rules! drop_ctype {
@@ -118,12 +118,12 @@ macro_rules! drop_ctype {
         }
     };
     ($t:ident<$tt:tt>) => {
-        impl<$tt:crate::kits::CStruct> Drop for $t<$tt> {
+        impl<$tt: crate::kits::CStruct> Drop for $t<$tt> {
             fn drop(&mut self) {
                 self.free();
             }
         }
-    }
+    };
 }
 
 /// c的数组需要定义两个字段，所定义一个结构体进行统一管理
@@ -149,7 +149,7 @@ impl<T: CStruct> CArray<T> {
         }
     }
     pub fn set(&mut self, ar: Vec<T>) {
-        self.free();//释放之前的内存
+        self.free(); //释放之前的内存
 
         //Vec::into_raw_parts 这个方法不是稳定方法，所以参考它手动实现
         let mut t = ManuallyDrop::new(ar);
@@ -218,7 +218,6 @@ impl<T: CStruct + CR<T, R>, R: Default> CR<CArray<T>, Vec<R>> for CArray<T> {
     }
 }
 
-
 drop_ctype!(CArray<T>);
 
 pub trait CR<C: CStruct, R> {
@@ -246,7 +245,7 @@ mod tests {
 
     use wallets_macro::{DlDefault, DlStruct};
 
-    use crate::kits::{CArray, CMark, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
+    use crate::kits::{d_ptr_alloc, d_ptr_free, to_c_char, CArray, CMark, CStruct};
 
     #[allow(unused_assignments)]
     #[test]
@@ -258,7 +257,8 @@ mod tests {
         drop_ctype!(Data);
         // Vec::new();
 
-        {//正常释放 default对象
+        {
+            //正常释放 default对象
             let mut da = CArray::<Data>::default();
             assert_eq!(null_mut(), da.ptr);
             assert_eq!(0, da.len);
@@ -278,7 +278,8 @@ mod tests {
             assert_eq!(0, da.len);
             assert_eq!(0, da.cap);
         }
-        {//验证在Array中的内存，会自动释放
+        {
+            //验证在Array中的内存，会自动释放
             let mut ptr = null_mut();
             let mut pptr = &mut ptr as *mut _ as *mut *mut Data;
             {
@@ -303,7 +304,8 @@ mod tests {
 
     #[test]
     fn d_ptr_free_test() {
-        {//c_char
+        {
+            //c_char
             let mut ptr: *mut c_char = null_mut();
             ptr.free();
             assert_eq!(null_mut(), ptr);
@@ -311,12 +313,15 @@ mod tests {
             ptr.free();
             assert_eq!(null_mut(), ptr);
             let mut dptr: *mut *mut c_char = d_ptr_alloc();
-            unsafe { *dptr = to_c_char("test2 c char"); }
+            unsafe {
+                *dptr = to_c_char("test2 c char");
+            }
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
         }
 
-        {//i32
+        {
+            //i32
             let mut ptr: *mut i32 = null_mut();
             ptr.free();
             assert_eq!(null_mut(), ptr);
@@ -327,11 +332,14 @@ mod tests {
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
             let mut dptr: *mut *mut i32 = d_ptr_alloc();
-            unsafe { *dptr = Box::into_raw(Box::new(12i32)); }
+            unsafe {
+                *dptr = Box::into_raw(Box::new(12i32));
+            }
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
         }
-        {//i64
+        {
+            //i64
             let mut ptr: *mut i64 = null_mut();
             ptr.free();
             assert_eq!(null_mut(), ptr);
@@ -342,11 +350,14 @@ mod tests {
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
             let mut dptr: *mut *mut i64 = d_ptr_alloc();
-            unsafe { *dptr = Box::into_raw(Box::new(12i64)); }
+            unsafe {
+                *dptr = Box::into_raw(Box::new(12i64));
+            }
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
         }
-        {//u32
+        {
+            //u32
             let mut ptr: *mut u32 = null_mut();
             ptr.free();
             assert_eq!(null_mut(), ptr);
@@ -357,11 +368,14 @@ mod tests {
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
             let mut dptr: *mut *mut u32 = d_ptr_alloc();
-            unsafe { *dptr = Box::into_raw(Box::new(12u32)); }
+            unsafe {
+                *dptr = Box::into_raw(Box::new(12u32));
+            }
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
         }
-        {//u64
+        {
+            //u64
             let mut ptr: *mut u64 = null_mut();
             ptr.free();
             assert_eq!(null_mut(), ptr);
@@ -372,11 +386,14 @@ mod tests {
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
             let mut dptr: *mut *mut u64 = d_ptr_alloc();
-            unsafe { *dptr = Box::into_raw(Box::new(12u64)); }
+            unsafe {
+                *dptr = Box::into_raw(Box::new(12u64));
+            }
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
         }
-        {//f32
+        {
+            //f32
             let mut ptr: *mut f32 = null_mut();
             ptr.free();
             assert_eq!(null_mut(), ptr);
@@ -387,11 +404,14 @@ mod tests {
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
             let mut dptr: *mut *mut f32 = d_ptr_alloc();
-            unsafe { *dptr = Box::into_raw(Box::new(12f32)); }
+            unsafe {
+                *dptr = Box::into_raw(Box::new(12f32));
+            }
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
         }
-        {//f64
+        {
+            //f64
             let mut ptr: *mut f64 = null_mut();
             ptr.free();
             assert_eq!(null_mut(), ptr);
@@ -402,7 +422,9 @@ mod tests {
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
             let mut dptr: *mut *mut f64 = d_ptr_alloc();
-            unsafe { *dptr = Box::into_raw(Box::new(12f64)); }
+            unsafe {
+                *dptr = Box::into_raw(Box::new(12f64));
+            }
             d_ptr_free(&mut dptr);
             assert_eq!(null_mut(), dptr);
         }
@@ -415,7 +437,9 @@ mod tests {
             let mut ptr: *mut Data = null_mut();
             ptr.free();
             assert_eq!(null_mut(), ptr);
-            let mut ptr = Box::into_raw(Box::new(Data { name: "struct name".to_owned() }));
+            let mut ptr = Box::into_raw(Box::new(Data {
+                name: "struct name".to_owned(),
+            }));
             ptr.free();
             assert_eq!(null_mut(), ptr);
 
@@ -428,7 +452,11 @@ mod tests {
             assert_eq!(null_mut(), dptr);
 
             let mut dptr: *mut *mut Data = d_ptr_alloc();
-            unsafe { *dptr = Box::into_raw(Box::new(Data { name: "name".to_owned() })); }
+            unsafe {
+                *dptr = Box::into_raw(Box::new(Data {
+                    name: "name".to_owned(),
+                }));
+            }
             // let dpstr3 = dptr.clone();
             // let dpstr2 = (unsafe { *dptr }).clone();
             d_ptr_free(&mut dptr);

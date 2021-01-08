@@ -5,15 +5,21 @@ use futures::executor::block_on;
 use futures::task::SpawnExt;
 
 use mav::{kits, WalletType};
+use wallets_cdl::{
+    mem_c::{
+        CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc,
+        CWallet_dFree,
+    },
+    parameters::{CContext, CCreateWalletParameters, CInitParameters},
+    types::{CError, CWallet, CR, CU64},
+    wallets_c::{
+        Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init,
+        Wallets_uninit,
+    },
+};
+use wallets_cdl::{to_c_char, to_str, CStruct};
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet};
 
-use wallets_cdl::{CStruct, to_c_char, to_str};
-use wallets_cdl::{
-    parameters::{CContext, CCreateWalletParameters, CInitParameters},
-    types::{CError, CU64, CWallet,CR},
-    mem_c::{CError_free, CStr_dAlloc, CStr_dFree, CContext_dAlloc, CWallet_dAlloc, CWallet_dFree, CContext_dFree},
-    wallets_c::{Wallets_generateMnemonic, Wallets_init, Wallets_createWallet, Wallets_findById, Wallets_uninit},
-};
 #[test]
 fn executor_test() {
     let ex = {
@@ -24,7 +30,10 @@ fn executor_test() {
     println!("test thread: {:?}", std::thread::current().id());
     let _ = ex.spawn(async {
         std::thread::sleep(Duration::from_secs(5));
-        println!("futures::executor::ThreadPool : {:?}", std::thread::current().id());
+        println!(
+            "futures::executor::ThreadPool : {:?}",
+            std::thread::current().id()
+        );
         ()
     });
     println!("after futures::executor::ThreadPool ");
@@ -33,14 +42,20 @@ fn executor_test() {
     std::env::set_var("ASYNC_STD_THREAD_COUNT", "4");
     let j = async_std::task::spawn(async {
         let a = async_std::task::spawn(async {
-            println!("async_std::task::spawn 1: {:?}", std::thread::current().id());
+            println!(
+                "async_std::task::spawn 1: {:?}",
+                std::thread::current().id()
+            );
             println!("1 s");
             std::thread::sleep(Duration::from_secs(2));
             println!("1 end");
             1
         });
         let b = async_std::task::spawn(async {
-            println!("async_std::task::spawn 2: {:?}", std::thread::current().id());
+            println!(
+                "async_std::task::spawn 2: {:?}",
+                std::thread::current().id()
+            );
             println!("2");
             2
         });
@@ -54,37 +69,39 @@ fn executor_test() {
 
 #[test]
 fn block_on_test() {
-    let block_async_std = |k: u64| -> u64{
+    let block_async_std = |k: u64| -> u64 {
         let start = Instant::now();
         for _ in 0..k {
             async_std::task::block_on(async { 1 });
         }
         start.elapsed().as_nanos() as u64
     };
-    let block_futures = |k: u64| -> u64{
+    let block_futures = |k: u64| -> u64 {
         let start = Instant::now();
         for _ in 0..k {
             futures::executor::block_on(async { 1 });
         }
         start.elapsed().as_nanos() as u64
     };
-    let block_futures_lite = |k: u64| -> u64{
+    let block_futures_lite = |k: u64| -> u64 {
         let start = Instant::now();
         for _ in 0..k {
             futures_lite::future::block_on(async { 1 });
         }
         start.elapsed().as_nanos() as u64
     };
-    let block_tokio = |k: u64| -> u64{
+    let block_tokio = |k: u64| -> u64 {
         let start = Instant::now();
-        let r = tokio::runtime::Builder::new_current_thread().build().unwrap();
+        let r = tokio::runtime::Builder::new_current_thread()
+            .build()
+            .unwrap();
         for _ in 0..k {
             r.block_on(async { 1 });
         }
         start.elapsed().as_nanos() as u64
     };
 
-    let block_smol = |k: u64| -> u64{
+    let block_smol = |k: u64| -> u64 {
         let start = Instant::now();
         for _ in 0..k {
             smol::block_on(async { 1 });
@@ -98,12 +115,14 @@ fn block_on_test() {
     let elapsed_async = block_async_std(k) / k;
     let elapsed_tokio = block_tokio(k) / k;
     let elapsed_smol = block_smol(k) / k;
-    println!("async_std::task::block_on:      {}(nanoseconds) \n\
+    println!(
+        "async_std::task::block_on:      {}(nanoseconds) \n\
                   futures::executor::block_on:    {}(nanoseconds) \n\
                   futures_lite::block_on:         {}(nanoseconds) \n\
                   tokio::runtime::current_thread: {}(nanoseconds) \n\
                   smol::block_on:                 {}(nanoseconds)",
-             elapsed_async, elapsed_futures, elapsed_futures_lite, elapsed_tokio, elapsed_smol);
+        elapsed_async, elapsed_futures, elapsed_futures_lite, elapsed_tokio, elapsed_smol
+    );
     // sample out
     // async_std::task::block_on:      42487(nanoseconds)
     // futures::executor::block_on:    423(nanoseconds)
@@ -116,7 +135,8 @@ fn block_on_test() {
 
 #[test]
 fn mnemonic_test() {
-    unsafe {//invalid parameters
+    unsafe {
+        //invalid parameters
         let c_err = Wallets_generateMnemonic(null_mut()) as *mut CError;
         assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
@@ -162,7 +182,8 @@ fn wallets_test() {
             mn
         };
         let wallet = {
-            {//invalid parameters
+            {
+                //invalid parameters
                 let mut parameters = CCreateWalletParameters::to_c_ptr(&CreateWalletParameters {
                     name: "test".to_owned(),
                     password: "1".to_string(),
@@ -171,15 +192,18 @@ fn wallets_test() {
                 });
                 let mut c_wallet = CWallet_dAlloc();
                 {
-                    let c_err = Wallets_createWallet(null_mut(), null_mut(), null_mut()) as *mut CError;
+                    let c_err =
+                        Wallets_createWallet(null_mut(), null_mut(), null_mut()) as *mut CError;
                     assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                     CError_free(c_err);
 
-                    let c_err = Wallets_createWallet(null_mut(), parameters, null_mut()) as *mut CError;
+                    let c_err =
+                        Wallets_createWallet(null_mut(), parameters, null_mut()) as *mut CError;
                     assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                     CError_free(c_err);
 
-                    let c_err = Wallets_createWallet(null_mut(), null_mut(), c_wallet) as *mut CError;
+                    let c_err =
+                        Wallets_createWallet(null_mut(), null_mut(), c_wallet) as *mut CError;
                     assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
                     CError_free(c_err);
 
@@ -227,7 +251,8 @@ fn wallets_test() {
 
 //单元测试是并行的，这里把它放入一个测试中进行测试，以减少并行给单元测试带来的问题
 fn init_test() {
-    unsafe { //参数不正确的测试
+    unsafe {
+        //参数不正确的测试
         let c_err = Wallets_init(null_mut(), null_mut()) as *mut CError;
         assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
@@ -261,10 +286,14 @@ fn init_test() {
         c_parameters.free();
 
         assert_ne!(null_mut(), *ctx);
-        assert_eq!(parameters.context_note.as_str(), to_str((**ctx).contextNote));
+        assert_eq!(
+            parameters.context_note.as_str(),
+            to_str((**ctx).contextNote)
+        );
         assert_ne!(0, to_str((**ctx).id).len());
 
-        {//only release memory
+        {
+            //only release memory
             let c_err = Wallets_uninit(*ctx) as *mut CError;
             assert_ne!(null_mut(), c_err);
             CError_free(c_err);
@@ -274,7 +303,8 @@ fn init_test() {
 }
 
 fn find_by_id_test(c_ctx: *mut CContext, wallet_id: &str) -> Wallet {
-    unsafe { //invalid parameters
+    unsafe {
+        //invalid parameters
 
         let mut c_wallet_id = to_c_char("t");
         let mut c_wallet = CWallet_dAlloc();
@@ -303,26 +333,25 @@ fn find_by_id_test(c_ctx: *mut CContext, wallet_id: &str) -> Wallet {
         c_wallet_id.free();
     }
 
-    let wallet =
-        unsafe {
-            let mut c_wallet_id = to_c_char(wallet_id);
-            let mut c_wallet = CWallet_dAlloc();
-            {
-                let mut not_id = to_c_char(kits::uuid().as_str());
-                let c_err = Wallets_findById(c_ctx, not_id, c_wallet) as *mut CError;
-                assert_eq!(Error::NoRecord().code, (*c_err).code, "{:?}", *c_err);
-                CError_free(c_err);
-                not_id.free();
+    let wallet = unsafe {
+        let mut c_wallet_id = to_c_char(wallet_id);
+        let mut c_wallet = CWallet_dAlloc();
+        {
+            let mut not_id = to_c_char(kits::uuid().as_str());
+            let c_err = Wallets_findById(c_ctx, not_id, c_wallet) as *mut CError;
+            assert_eq!(Error::NoRecord().code, (*c_err).code, "{:?}", *c_err);
+            CError_free(c_err);
+            not_id.free();
 
-                let c_err = Wallets_findById(c_ctx, c_wallet_id, c_wallet) as *mut CError;
-                assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
-                CError_free(c_err);
-            }
-            let wallet = CWallet::to_rust(&**c_wallet);
-            c_wallet.free();
-            c_wallet_id.free();
-            wallet
-        };
+            let c_err = Wallets_findById(c_ctx, c_wallet_id, c_wallet) as *mut CError;
+            assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+            CError_free(c_err);
+        }
+        let wallet = CWallet::to_rust(&**c_wallet);
+        c_wallet.free();
+        c_wallet_id.free();
+        wallet
+    };
     wallet
 }
 

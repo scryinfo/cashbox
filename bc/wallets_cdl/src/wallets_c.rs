@@ -9,14 +9,17 @@ use mav::ChainType;
 use wallets::{Contexts, Wallets};
 use wallets_types::{Context, Error};
 
-use crate::kits::{CArray, CBool, CFalse, CR, CStruct, CTrue, to_c_char, to_str};
+use crate::kits::{to_c_char, to_str, CArray, CBool, CFalse, CStruct, CTrue, CR};
 use crate::parameters::{CContext, CCreateWalletParameters, CDbName, CInitParameters};
 use crate::types::{CError, CWallet};
 
 /// 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名
 /// 如果成功返回 [wallets_types::Error::SUCCESS()]
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_dbName(name: *mut CDbName, outName: *mut *mut CDbName) -> *const CError {
+pub unsafe extern "C" fn Wallets_dbName(
+    name: *mut CDbName,
+    outName: *mut *mut CDbName,
+) -> *const CError {
     log::debug!("enter Wallets_init");
     if name.is_null() || outName.is_null() {
         let err = Error::PARAMETER().append_message(" : name or outName is null");
@@ -36,7 +39,10 @@ pub unsafe extern "C" fn Wallets_dbName(name: *mut CDbName, outName: *mut *mut C
 
 /// 如果成功返回 [wallets_types::Error::SUCCESS()]
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, context: *mut *mut CContext) -> *const CError {
+pub unsafe extern "C" fn Wallets_init(
+    parameter: *mut CInitParameters,
+    context: *mut *mut CContext,
+) -> *const CError {
     log::debug!("enter Wallets_init");
     if context.is_null() || parameter.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or parameter is null");
@@ -81,13 +87,11 @@ pub unsafe extern "C" fn Wallets_uninit(ctx: *mut CContext) -> *const CError {
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.remove(&ctx.id) {
-            Some(mut wallets) => {
-                match block_on(wallets.uninit()) {
-                    Err(err) => Error::from(err),
-                    Ok(_) => Error::SUCCESS()
-                }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+            Some(mut wallets) => match block_on(wallets.uninit()) {
+                Err(err) => Error::from(err),
+                Ok(_) => Error::SUCCESS(),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
     log::debug!("{}", err);
@@ -176,13 +180,11 @@ pub unsafe extern "C" fn Wallets_lockRead(ctx: *mut CContext) -> *const CError {
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get_mut(&ctx.id) {
-            Some(wallets) => {
-                match wallets.lock_read() {
-                    true => Error::SUCCESS(),
-                    false => Error::FAIL()
-                }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+            Some(wallets) => match wallets.lock_read() {
+                true => Error::SUCCESS(),
+                false => Error::FAIL(),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
     log::debug!("{}", err);
@@ -202,13 +204,11 @@ pub unsafe extern "C" fn Wallets_unlockRead(ctx: *mut CContext) -> *const CError
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get_mut(&ctx.id) {
-            Some(wallets) => {
-                match wallets.unlock_read() {
-                    true => Error::SUCCESS(),
-                    false => Error::FAIL()
-                }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+            Some(wallets) => match wallets.unlock_read() {
+                true => Error::SUCCESS(),
+                false => Error::FAIL(),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
     log::debug!("{}", err);
@@ -228,13 +228,11 @@ pub unsafe extern "C" fn Wallets_lockWrite(ctx: *mut CContext) -> *const CError 
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get_mut(&ctx.id) {
-            Some(wallets) => {
-                match wallets.lock_write() {
-                    true => Error::SUCCESS(),
-                    false => Error::FAIL()
-                }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+            Some(wallets) => match wallets.lock_write() {
+                true => Error::SUCCESS(),
+                false => Error::FAIL(),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
     log::debug!("{}", err);
@@ -254,13 +252,11 @@ pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CErro
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get_mut(&ctx.id) {
-            Some(wallets) => {
-                match wallets.unlock_write() {
-                    true => Error::SUCCESS(),
-                    false => Error::FAIL()
-                }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+            Some(wallets) => match wallets.unlock_write() {
+                true => Error::SUCCESS(),
+                false => Error::FAIL(),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
     log::debug!("{}", err);
@@ -268,30 +264,31 @@ pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CErro
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut CArray<CWallet>) -> *const CError {
+pub unsafe extern "C" fn Wallets_all(
+    ctx: *mut CContext,
+    arrayWallet: *mut *mut CArray<CWallet>,
+) -> *const CError {
     log::debug!("enter Wallets_all");
     if ctx.is_null() || arrayWallet.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or arrayWallet is null");
         log::info!("{}", err);
         return CError::to_c_ptr(&err);
     }
-    (*arrayWallet).free();//如果数组的内存已经分配，释放它
+    (*arrayWallet).free(); //如果数组的内存已经分配，释放它
 
     let lock = Contexts::collection().lock();
     let mut contexts = lock.borrow_mut();
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
-            Some(wallets) => {
-                match block_on(wallets.all()) {
-                    Ok(wallet_vec) => {
-                        *arrayWallet = CArray::to_c_ptr(&wallet_vec);
-                        Error::SUCCESS()
-                    }
-                    Err(err) => Error::from(err)
+            Some(wallets) => match block_on(wallets.all()) {
+                Ok(wallet_vec) => {
+                    *arrayWallet = CArray::to_c_ptr(&wallet_vec);
+                    Error::SUCCESS()
                 }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+                Err(err) => Error::from(err),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
@@ -307,7 +304,7 @@ pub unsafe extern "C" fn Wallets_generateMnemonic(mnemonic: *mut *mut c_char) ->
         log::info!("{}", err);
         return CError::to_c_ptr(&err);
     }
-    (*mnemonic).free();//如果内存已存在，释放它
+    (*mnemonic).free(); //如果内存已存在，释放它
 
     let err = {
         let mn = Wallets::generate_mnemonic();
@@ -320,14 +317,18 @@ pub unsafe extern "C" fn Wallets_generateMnemonic(mnemonic: *mut *mut c_char) ->
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_createWallet(ctx: *mut CContext, parameters: *mut CCreateWalletParameters, wallet: *mut *mut CWallet) -> *const CError {
+pub unsafe extern "C" fn Wallets_createWallet(
+    ctx: *mut CContext,
+    parameters: *mut CCreateWalletParameters,
+    wallet: *mut *mut CWallet,
+) -> *const CError {
     log::debug!("enter Wallets_createWallet");
     if ctx.is_null() || parameters.is_null() || wallet.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or parameters or wallet is null");
         log::info!("{}", err);
         return CError::to_c_ptr(&err);
     }
-    (*wallet).free();//如果内存已存在，释放它
+    (*wallet).free(); //如果内存已存在，释放它
 
     let lock = Contexts::collection().lock();
     let mut contexts = lock.borrow_mut();
@@ -335,7 +336,8 @@ pub unsafe extern "C" fn Wallets_createWallet(ctx: *mut CContext, parameters: *m
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get_mut(&ctx.id) {
             Some(wallets) => {
-                match block_on(wallets.create_wallet(CCreateWalletParameters::ptr_rust(parameters))) {
+                match block_on(wallets.create_wallet(CCreateWalletParameters::ptr_rust(parameters)))
+                {
                     Err(err) => Error::from(err),
                     Ok(w) => {
                         *wallet = CWallet::to_c_ptr(&w);
@@ -343,7 +345,7 @@ pub unsafe extern "C" fn Wallets_createWallet(ctx: *mut CContext, parameters: *m
                     }
                 }
             }
-            None => Error::NONE().append_message(": can not find the context")
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
@@ -352,7 +354,10 @@ pub unsafe extern "C" fn Wallets_createWallet(ctx: *mut CContext, parameters: *m
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_removeWallet(ctx: *mut CContext, walletId: *mut c_char) -> *const CError {
+pub unsafe extern "C" fn Wallets_removeWallet(
+    ctx: *mut CContext,
+    walletId: *mut c_char,
+) -> *const CError {
     log::debug!("enter Wallets_removeWallet");
     if ctx.is_null() || walletId.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or walletId is null");
@@ -365,13 +370,11 @@ pub unsafe extern "C" fn Wallets_removeWallet(ctx: *mut CContext, walletId: *mut
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get_mut(&ctx.id) {
-            Some(wallets) => {
-                match block_on(wallets.remove_by_id(to_str(walletId))) {
-                    Err(err) => Error::from(err),
-                    Ok(_) => Error::SUCCESS()
-                }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+            Some(wallets) => match block_on(wallets.remove_by_id(to_str(walletId))) {
+                Err(err) => Error::from(err),
+                Ok(_) => Error::SUCCESS(),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
@@ -380,7 +383,11 @@ pub unsafe extern "C" fn Wallets_removeWallet(ctx: *mut CContext, walletId: *mut
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_renameWallet(ctx: *mut CContext, newName: *mut c_char, walletId: *mut c_char) -> *const CError {
+pub unsafe extern "C" fn Wallets_renameWallet(
+    ctx: *mut CContext,
+    newName: *mut c_char,
+    walletId: *mut c_char,
+) -> *const CError {
     log::debug!("enter Wallets_renameWallet");
     if ctx.is_null() || newName.is_null() || walletId.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or newName or walletId is null");
@@ -396,10 +403,10 @@ pub unsafe extern "C" fn Wallets_renameWallet(ctx: *mut CContext, newName: *mut 
             Some(wallets) => {
                 match block_on(wallets.rename_wallet(to_str(newName), to_str(walletId), "")) {
                     Err(err) => Error::from(err),
-                    Ok(_) => Error::SUCCESS()
+                    Ok(_) => Error::SUCCESS(),
                 }
             }
-            None => Error::NONE().append_message(": can not find the context")
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
@@ -423,20 +430,18 @@ pub unsafe extern "C" fn Wallets_hasAny(ctx: *mut CContext, hasAny: *mut CBool) 
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
-            Some(wallets) => {
-                match block_on(wallets.has_any()) {
-                    Err(err) => Error::from(err),
-                    Ok(true) => {
-                        *hasAny = CTrue;
-                        Error::SUCCESS()
-                    }
-                    Ok(false) => {
-                        *hasAny = CFalse;
-                        Error::SUCCESS()
-                    }
+            Some(wallets) => match block_on(wallets.has_any()) {
+                Err(err) => Error::from(err),
+                Ok(true) => {
+                    *hasAny = CTrue;
+                    Error::SUCCESS()
                 }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+                Ok(false) => {
+                    *hasAny = CFalse;
+                    Error::SUCCESS()
+                }
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
@@ -445,7 +450,11 @@ pub unsafe extern "C" fn Wallets_hasAny(ctx: *mut CContext, hasAny: *mut CBool) 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_findById(ctx: *mut CContext, walletId: *mut c_char, wallet: *mut *mut CWallet) -> *const CError {
+pub unsafe extern "C" fn Wallets_findById(
+    ctx: *mut CContext,
+    walletId: *mut c_char,
+    wallet: *mut *mut CWallet,
+) -> *const CError {
     log::debug!("enter Wallets_findById");
     if ctx.is_null() || wallet.is_null() || walletId.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or wallet or walletId is null");
@@ -459,17 +468,15 @@ pub unsafe extern "C" fn Wallets_findById(ctx: *mut CContext, walletId: *mut c_c
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
-            Some(wallets) => {
-                match block_on(wallets.find_by_id(to_str(walletId))) {
-                    Err(err) => Error::from(err),
-                    Ok(Some(w)) => {
-                        *wallet = CWallet::to_c_ptr(&w);
-                        Error::SUCCESS()
-                    }
-                    Ok(None) => Error::NoRecord()
+            Some(wallets) => match block_on(wallets.find_by_id(to_str(walletId))) {
+                Err(err) => Error::from(err),
+                Ok(Some(w)) => {
+                    *wallet = CWallet::to_c_ptr(&w);
+                    Error::SUCCESS()
                 }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+                Ok(None) => Error::NoRecord(),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
@@ -479,30 +486,32 @@ pub unsafe extern "C" fn Wallets_findById(ctx: *mut CContext, walletId: *mut c_c
 
 ///注：只加载了wallet的id name等直接的基本数据，子对象（如链）的数据没有加载
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_findWalletBaseByName(ctx: *mut CContext, name: *mut c_char, walletArray: *mut *mut CArray<CWallet>) -> *const CError {
+pub unsafe extern "C" fn Wallets_findWalletBaseByName(
+    ctx: *mut CContext,
+    name: *mut c_char,
+    walletArray: *mut *mut CArray<CWallet>,
+) -> *const CError {
     log::debug!("enter Wallets_findWalletBaseByName");
     if ctx.is_null() || name.is_null() || walletArray.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or name or arrayWallet is null");
         log::info!("{}", err);
         return CError::to_c_ptr(&err);
     }
-    (*walletArray).free();//如果内存已存在，释放它
+    (*walletArray).free(); //如果内存已存在，释放它
 
     let lock = Contexts::collection().lock();
     let mut contexts = lock.borrow_mut();
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
-            Some(wallets) => {
-                match block_on(wallets.find_wallet_base_by_name(to_str(name))) {
-                    Ok(wallet_vec) => {
-                        *walletArray = CArray::to_c_ptr(&wallet_vec);
-                        Error::SUCCESS()
-                    }
-                    Err(err) => Error::from(err)
+            Some(wallets) => match block_on(wallets.find_wallet_base_by_name(to_str(name))) {
+                Ok(wallet_vec) => {
+                    *walletArray = CArray::to_c_ptr(&wallet_vec);
+                    Error::SUCCESS()
                 }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+                Err(err) => Error::from(err),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
@@ -512,7 +521,11 @@ pub unsafe extern "C" fn Wallets_findWalletBaseByName(ctx: *mut CContext, name: 
 
 /// 查询当前wallet 与 chain
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_currentWalletChain(ctx: *mut CContext, walletId: *mut *mut c_char, chainType: *mut *mut c_char) -> *const CError {
+pub unsafe extern "C" fn Wallets_currentWalletChain(
+    ctx: *mut CContext,
+    walletId: *mut *mut c_char,
+    chainType: *mut *mut c_char,
+) -> *const CError {
     log::debug!("enter Wallets_currentWalletChain");
     if ctx.is_null() || walletId.is_null() || chainType.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or walletId or chainType is null");
@@ -527,18 +540,16 @@ pub unsafe extern "C" fn Wallets_currentWalletChain(ctx: *mut CContext, walletId
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
-            Some(wallets) => {
-                match block_on(wallets.current_wallet_chain()) {
-                    Err(err) => Error::from(err),
-                    Ok(Some((wallet_id, chain_type))) => {
-                        *walletId = to_c_char(wallet_id.as_str());
-                        *chainType = to_c_char(&chain_type.to_string());
-                        Error::SUCCESS()
-                    }
-                    Ok(None) => Error::NOT_EXIST()
+            Some(wallets) => match block_on(wallets.current_wallet_chain()) {
+                Err(err) => Error::from(err),
+                Ok(Some((wallet_id, chain_type))) => {
+                    *walletId = to_c_char(wallet_id.as_str());
+                    *chainType = to_c_char(&chain_type.to_string());
+                    Error::SUCCESS()
                 }
-            }
-            None => Error::NONE().append_message(": can not find the context")
+                Ok(None) => Error::NOT_EXIST(),
+            },
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
@@ -548,7 +559,11 @@ pub unsafe extern "C" fn Wallets_currentWalletChain(ctx: *mut CContext, walletId
 
 ///保存当前wallet 与 chain
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_saveCurrentWalletChain(ctx: *mut CContext, walletId: *mut c_char, chainType: *mut c_char) -> *const CError {
+pub unsafe extern "C" fn Wallets_saveCurrentWalletChain(
+    ctx: *mut CContext,
+    walletId: *mut c_char,
+    chainType: *mut c_char,
+) -> *const CError {
     log::debug!("enter Wallets_saveCurrentWalletChain");
     if ctx.is_null() || walletId.is_null() || chainType.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or walletId or chainType is null");
@@ -572,17 +587,13 @@ pub unsafe extern "C" fn Wallets_saveCurrentWalletChain(ctx: *mut CContext, wall
             Some(ws) => {
                 match block_on(ws.save_current_wallet_chain(to_str(walletId), &chain_type)) {
                     Err(err) => Error::from(err),
-                    Ok(_) => {
-                        Error::SUCCESS()
-                    }
+                    Ok(_) => Error::SUCCESS(),
                 }
             }
-            None => Error::NONE().append_message(": can not find the context")
+            None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
-
-

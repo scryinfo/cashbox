@@ -1,22 +1,21 @@
-pub mod types;
-mod types_eth;
-mod types_eee;
-mod types_btc;
+pub use kits::{to_c_char, to_str, CStruct, CR, CU64};
 
-pub mod wallets_c;
-pub mod mem_c;
+pub mod types;
+mod types_btc;
+mod types_eee;
+mod types_eth;
+
 pub mod chain_eee_c;
+pub mod mem_c;
 pub mod parameters;
+pub mod wallets_c;
 
 mod chain;
-mod chain_eth;
-mod chain_eee;
 mod chain_btc;
+mod chain_eee;
+mod chain_eth;
 
 mod kits;
-
-pub use kits::{CR, CStruct, CU64, to_c_char, to_str};
-
 
 #[cfg(test)]
 mod tests {

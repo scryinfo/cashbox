@@ -14,8 +14,8 @@ void main() {
     {
       var initP = new InitParameters();
       {
-        initP.dbName.path = "";
-        initP.dbName.prefix = "test";
+        initP.dbName.path = "./temp";
+        initP.dbName.prefix = "test_";
         initP.dbName = Wallets.dbName(initP.dbName);
       }
       wallet.init(initP);

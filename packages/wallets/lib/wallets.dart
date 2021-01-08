@@ -381,6 +381,7 @@ class Wallets {
   }
 
   ///在子线程中调用时，需要上下文参数
+  ///不要在子线程中调用，uninit或init，这两个函数都由主线程调用
   factory Wallets.subIsolate(Context ctx) {
     if (_instance == null) {
       _instance = new Wallets._internal();

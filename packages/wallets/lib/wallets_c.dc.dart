@@ -1778,7 +1778,7 @@ class StorageKeyParameters extends DC<clib.CStorageKeyParameters> {
   ChainVersion chainVersion;
   String module;
   String storageItem;
-  String pubKey;
+  String account;
 
   StorageKeyParameters() {
     chainVersion = new ChainVersion();
@@ -1798,10 +1798,10 @@ class StorageKeyParameters extends DC<clib.CStorageKeyParameters> {
       ffi.free(ptr.ref.storageItem);
     }
     ptr.ref.storageItem = nullptr;
-    if (ptr.ref.pubKey != null && ptr.ref.pubKey != nullptr) {
-      ffi.free(ptr.ref.pubKey);
+    if (ptr.ref.account != null && ptr.ref.account != nullptr) {
+      ffi.free(ptr.ref.account);
     }
-    ptr.ref.pubKey = nullptr;
+    ptr.ref.account = nullptr;
     ffi.free(ptr);
   }
 
@@ -1838,10 +1838,10 @@ class StorageKeyParameters extends DC<clib.CStorageKeyParameters> {
       ffi.free(c.ref.storageItem);
     }
     c.ref.storageItem = toUtf8Null(storageItem);
-    if (c.ref.pubKey != null && c.ref.pubKey != nullptr) {
-      ffi.free(c.ref.pubKey);
+    if (c.ref.account != null && c.ref.account != nullptr) {
+      ffi.free(c.ref.account);
     }
-    c.ref.pubKey = toUtf8Null(pubKey);
+    c.ref.account = toUtf8Null(account);
   }
 
   @override
@@ -1853,7 +1853,7 @@ class StorageKeyParameters extends DC<clib.CStorageKeyParameters> {
     chainVersion.toDart(c.ref.chainVersion);
     module = fromUtf8Null(c.ref.module);
     storageItem = fromUtf8Null(c.ref.storageItem);
-    pubKey = fromUtf8Null(c.ref.pubKey);
+    account = fromUtf8Null(c.ref.account);
   }
 }
 

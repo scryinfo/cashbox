@@ -52,6 +52,50 @@ class CAccountInfoSyncProg extends Struct {
   }
 }
 
+/// C function `CAccountInfoSyncProg_dAlloc`.
+Pointer<Pointer<CAccountInfoSyncProg>> CAccountInfoSyncProg_dAlloc() {
+  return _CAccountInfoSyncProg_dAlloc();
+}
+
+final _CAccountInfoSyncProg_dAlloc_Dart _CAccountInfoSyncProg_dAlloc =
+    _dl.lookupFunction<_CAccountInfoSyncProg_dAlloc_C,
+        _CAccountInfoSyncProg_dAlloc_Dart>('CAccountInfoSyncProg_dAlloc');
+
+typedef _CAccountInfoSyncProg_dAlloc_C = Pointer<Pointer<CAccountInfoSyncProg>>
+    Function();
+typedef _CAccountInfoSyncProg_dAlloc_Dart
+    = Pointer<Pointer<CAccountInfoSyncProg>> Function();
+
+/// C function `CAccountInfo_dAlloc`.
+Pointer<Pointer<CAccountInfo>> CAccountInfo_dAlloc() {
+  return _CAccountInfo_dAlloc();
+}
+
+final _CAccountInfo_dAlloc_Dart _CAccountInfo_dAlloc =
+    _dl.lookupFunction<_CAccountInfo_dAlloc_C, _CAccountInfo_dAlloc_Dart>(
+        'CAccountInfo_dAlloc');
+
+typedef _CAccountInfo_dAlloc_C = Pointer<Pointer<CAccountInfo>> Function();
+typedef _CAccountInfo_dAlloc_Dart = Pointer<Pointer<CAccountInfo>> Function();
+
+/// C function `CAccountInfo_dFree`.
+void CAccountInfo_dFree(
+  Pointer<Pointer<CAccountInfo>> dPtr,
+) {
+  _CAccountInfo_dFree(dPtr);
+}
+
+final _CAccountInfo_dFree_Dart _CAccountInfo_dFree =
+    _dl.lookupFunction<_CAccountInfo_dFree_C, _CAccountInfo_dFree_Dart>(
+        'CAccountInfo_dFree');
+
+typedef _CAccountInfo_dFree_C = Void Function(
+  Pointer<Pointer<CAccountInfo>> dPtr,
+);
+typedef _CAccountInfo_dFree_Dart = void Function(
+  Pointer<Pointer<CAccountInfo>> dPtr,
+);
+
 /// C struct `CAddress`.
 class CAddress extends Struct {
   Pointer<ffi.Utf8> id;
@@ -630,7 +674,7 @@ class CStorageKeyParameters extends Struct {
   Pointer<CChainVersion> chainVersion;
   Pointer<ffi.Utf8> module;
   Pointer<ffi.Utf8> storageItem;
-  Pointer<ffi.Utf8> pubKey;
+  Pointer<ffi.Utf8> account;
 
   static Pointer<CStorageKeyParameters> allocate() {
     return ffi.allocate<CStorageKeyParameters>();
@@ -693,6 +737,38 @@ class CSubChainBasicInfo extends Struct {
     return Pointer<CSubChainBasicInfo>.fromAddress(ptr).ref;
   }
 }
+
+/// C function `CSubChainBasicInfo_dAlloc`.
+Pointer<Pointer<CSubChainBasicInfo>> CSubChainBasicInfo_dAlloc() {
+  return _CSubChainBasicInfo_dAlloc();
+}
+
+final _CSubChainBasicInfo_dAlloc_Dart _CSubChainBasicInfo_dAlloc =
+    _dl.lookupFunction<_CSubChainBasicInfo_dAlloc_C,
+        _CSubChainBasicInfo_dAlloc_Dart>('CSubChainBasicInfo_dAlloc');
+
+typedef _CSubChainBasicInfo_dAlloc_C = Pointer<Pointer<CSubChainBasicInfo>>
+    Function();
+typedef _CSubChainBasicInfo_dAlloc_Dart = Pointer<Pointer<CSubChainBasicInfo>>
+    Function();
+
+/// C function `CSubChainBasicInfo_dFree`.
+void CSubChainBasicInfo_dFree(
+  Pointer<Pointer<CSubChainBasicInfo>> dPtr,
+) {
+  _CSubChainBasicInfo_dFree(dPtr);
+}
+
+final _CSubChainBasicInfo_dFree_Dart _CSubChainBasicInfo_dFree =
+    _dl.lookupFunction<_CSubChainBasicInfo_dFree_C,
+        _CSubChainBasicInfo_dFree_Dart>('CSubChainBasicInfo_dFree');
+
+typedef _CSubChainBasicInfo_dFree_C = Void Function(
+  Pointer<Pointer<CSubChainBasicInfo>> dPtr,
+);
+typedef _CSubChainBasicInfo_dFree_Dart = void Function(
+  Pointer<Pointer<CSubChainBasicInfo>> dPtr,
+);
 
 /// C struct `CTokenShared`.
 class CTokenShared extends Struct {

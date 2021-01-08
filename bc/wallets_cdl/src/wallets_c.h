@@ -183,6 +183,26 @@ typedef struct CAccountInfoSyncProg {
     char *blockHash;
 } CAccountInfoSyncProg;
 
+typedef struct CAccountInfo {
+    uint32_t nonce;
+    uint32_t ref_count;
+    char *free_;
+    char *reserved;
+    char *misc_frozen;
+    char *fee_frozen;
+} CAccountInfo;
+
+typedef struct CSubChainBasicInfo {
+    char *genesisHash;
+    char *metadata;
+    int32_t runtimeVersion;
+    int32_t txVersion;
+    int32_t ss58FormatPrefix;
+    int32_t tokenDecimals;
+    char *tokenSymbol;
+    CBool isDefault;
+} CSubChainBasicInfo;
+
 typedef struct CChainVersion {
     char *genesisHash;
     int32_t runtimeVersion;
@@ -194,20 +214,11 @@ typedef struct CDecodeAccountInfoParameters {
     CChainVersion *chainVersion;
 } CDecodeAccountInfoParameters;
 
-typedef struct CAccountInfo {
-    uint32_t nonce;
-    uint32_t ref_count;
-    char *free_;
-    char *reserved;
-    char *misc_frozen;
-    char *fee_frozen;
-} CAccountInfo;
-
 typedef struct CStorageKeyParameters {
     CChainVersion *chainVersion;
     char *module;
     char *storageItem;
-    char *pubKey;
+    char *account;
 } CStorageKeyParameters;
 
 typedef struct CTransferPayload {
@@ -225,17 +236,6 @@ typedef struct CRawTxParam {
     char *walletId;
     char *password;
 } CRawTxParam;
-
-typedef struct CSubChainBasicInfo {
-    char *genesisHash;
-    char *metadata;
-    int32_t runtimeVersion;
-    int32_t txVersion;
-    int32_t ss58FormatPrefix;
-    int32_t tokenDecimals;
-    char *tokenSymbol;
-    CBool isDefault;
-} CSubChainBasicInfo;
 
 #define CFalse 1
 
@@ -362,6 +362,16 @@ void CDbName_dFree(CDbName **dPtr);
 CArrayI64 **CArrayInt64_dAlloc(void);
 
 void CArrayInt64_dFree(CArrayI64 **dPtr);
+
+CAccountInfoSyncProg **CAccountInfoSyncProg_dAlloc(void);
+
+CAccountInfo **CAccountInfo_dAlloc(void);
+
+void CAccountInfo_dFree(CAccountInfo **dPtr);
+
+CSubChainBasicInfo **CSubChainBasicInfo_dAlloc(void);
+
+void CSubChainBasicInfo_dFree(CSubChainBasicInfo **dPtr);
 
 const CError *ChainEee_updateSyncRecord(CContext *ctx, char *netType, CAccountInfoSyncProg *syncRecord);
 

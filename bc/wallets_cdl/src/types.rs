@@ -7,15 +7,15 @@ use std::os::raw::c_char;
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{Address, ChainShared, Error, TokenShared, Wallet};
 
-pub use crate::chain::{*};
-pub use crate::chain_btc::{*};
-pub use crate::chain_eee::{*};
-pub use crate::chain_eth::{*};
+pub use crate::chain::*;
+pub use crate::chain_btc::*;
+pub use crate::chain_eee::*;
+pub use crate::chain_eth::*;
+use crate::kits::{to_c_char, to_str, CMark, CStruct};
 pub use crate::kits::{CR, CU64};
-use crate::kits::{CMark, CStruct, to_c_char, to_str};
-pub use crate::types_btc::{*};
-pub use crate::types_eee::{*};
-pub use crate::types_eth::{*};
+pub use crate::types_btc::*;
+pub use crate::types_eee::*;
+pub use crate::types_eth::*;
 
 #[repr(C)]
 #[derive(DlStruct, DlDefault, DlCR)]
@@ -76,7 +76,6 @@ pub struct CChainShared {
     /// 钱包地址
     pub walletAddress: *mut CAddress,
 }
-
 
 #[cfg(test)]
 mod tests {

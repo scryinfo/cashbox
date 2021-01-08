@@ -31,7 +31,7 @@ impl DbName {
 
     pub fn new_from(names: &DbName) -> DbName {
         let path = {
-            let mut path = names.path.clone();
+            let path = names.path.clone();
             if path.ends_with("/") {
                 path.to_owned()
             } else if path.ends_with("\\") {
