@@ -65,7 +65,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         let mut merkle_vec = vec![];
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(4000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(9000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {
@@ -116,11 +116,6 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                     error!("Error processing headers: {}", e);
                 }
             }
-            
-            self.timeout
-                .lock()
-                .unwrap()
-                .check(vec![ExpectedReply::MerkleBlock, ExpectedReply::Tx]);
         }
     }
 
@@ -133,26 +128,6 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
 
     // retrieve data
     fn get_data(&mut self, peer: PeerId, add: bool) -> Result<(), Error> {
-        if self
-            .timeout
-            .lock()
-            .unwrap()
-            .is_busy_with(peer, ExpectedReply::MerkleBlock)
-        {
-            error!("busy with merkleblock");
-            return Ok(());
-        }
-
-        if self
-            .timeout
-            .lock()
-            .unwrap()
-            .is_busy_with(peer, ExpectedReply::Tx)
-        {
-            error!("busy with Tx");
-            return Ok(());
-        }
-
         {
             error!("wait_for filter condition");
             let ref pair = self.condvar_pair;
@@ -193,10 +168,6 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         merkle_vec: &Vec<MerkleBlockMessage>,
         peer: PeerId,
     ) -> Result<(), Error> {
-        self.timeout
-            .lock()
-            .unwrap()
-            .received(peer, 1, ExpectedReply::MerkleBlock);
         info!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
         info!("got 100 merkleblock {:#?}", merkleblock);
@@ -206,11 +177,6 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
 
     // Handle tx return value
     fn tx(&mut self, tx: &Transaction, peer: PeerId, hash160: String) -> Result<(), Error> {
-        self.timeout
-            .lock()
-            .unwrap()
-            .received(peer, 1, ExpectedReply::Tx);
-
         info!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;
