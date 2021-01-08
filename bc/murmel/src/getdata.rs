@@ -1,52 +1,54 @@
 //! after send loadfilter message in bloomfilter mod we can get merkleblock in this mod and get
 //! loadfilter message do not get any response.
 //! we get response here
-use crate::chaindb::SharedChainDB;
 use crate::error::Error;
-use crate::hooks::HooksMessage;
-use crate::jniapi::SHARED_SQLITE;
+use crate::hooks::{HooksMessage, ShowCondition};
 use crate::p2p::{
-     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOOM,
+    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
+    SERVICE_BLOOM,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
-use bitcoin::network::message_blockdata::{ InvType, Inventory};
-use bitcoin::network::message_bloom_filter::{ MerkleBlockMessage};
+use bitcoin::network::message_blockdata::{InvType, Inventory};
+use bitcoin::network::message_bloom_filter::MerkleBlockMessage;
 use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 
+use crate::constructor::CondvarPair;
+use crate::db::{RB_CHAIN, RB_DETAIL};
 use bitcoin_hashes::Hash;
 use log::{error, info, trace, warn};
-use std::sync::mpsc;
+use std::ops::Deref;
+use std::sync::{mpsc, Arc};
 use std::thread;
 use std::time::Duration;
 
 const PUBLIC_KEY: &str = "0291ee52a0e0c22db9772f237f4271ea6f9330d92b242fb3c621928774c560b699";
 
-pub struct GetData {
-    chaindb: SharedChainDB,
+pub struct GetData<T> {
     //send a message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     hook_receiver: mpsc::Receiver<HooksMessage>,
+    condvar_pair: CondvarPair<T>,
 }
 
-impl GetData {
+impl<T: Send + 'static + ShowCondition> GetData<T> {
     pub fn new(
-        chaindb: SharedChainDB,
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         hook_receiver: mpsc::Receiver<HooksMessage>,
+        condvar_pair: CondvarPair<T>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
         let mut getdata = GetData {
-            chaindb,
             p2p,
             timeout,
             hook_receiver,
+            condvar_pair,
         };
 
         thread::Builder::new()
@@ -63,7 +65,7 @@ impl GetData {
         let mut merkle_vec = vec![];
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(9000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {
@@ -81,9 +83,10 @@ impl GetData {
                                 {
                                     let block_hash = merkleblock.prev_block.to_hex();
                                     let timestamp = merkleblock.timestamp;
-                                    let sqlite =
-                                        SHARED_SQLITE.lock().expect("open connection error!");
-                                    sqlite.update_newest_header(block_hash, timestamp.to_string());
+                                    {
+                                        RB_DETAIL
+                                            .update_progress(block_hash, timestamp.to_string());
+                                    }
                                 }
 
                                 if merkle_vec.len() <= 100 {
@@ -113,50 +116,46 @@ impl GetData {
                     error!("Error processing headers: {}", e);
                 }
             }
-
-            while let Ok(msg) = self.hook_receiver.recv_timeout(Duration::from_millis(1000)) {
-                match msg {
-                    HooksMessage::ReceivedHeaders(pid) => {
-                        warn!("hooks for received headers");
-                        self.get_data(pid, true).expect("GOT HOOKS error");
-                    }
-                    HooksMessage::Others => (),
-                }
-            }
-            self.timeout
-                .lock()
-                .unwrap()
-                .check(vec![ExpectedReply::MerkleBlock]);
         }
     }
 
     fn is_serving_blocks(&self, peer: PeerId) -> bool {
         if let Some(peer_version) = self.p2p.peer_version(peer) {
-            return peer_version.services & SERVICE_BLOOM != 0;
+            return peer_version.services & SERVICE_BLOCKS != 0;
         }
         false
     }
 
     // retrieve data
     fn get_data(&mut self, peer: PeerId, add: bool) -> Result<(), Error> {
-        if self
-            .timeout
-            .lock()
-            .unwrap()
-            .is_busy_with(peer, ExpectedReply::MerkleBlock)
         {
-            return Ok(());
+            error!("wait_for filter condition");
+            let ref pair = self.condvar_pair;
+            let &(ref lock, ref cvar) = Arc::deref(pair);
+            let mut condition = lock.lock();
+            while (*condition).get_filter() == false {
+                let r = cvar.wait_for(&mut condition, Duration::from_secs(5));
+                if r.timed_out() {
+                    error!("wait_for filter condition timeout");
+                    return Ok(());
+                }
+            }
         }
-        let sqlite = SHARED_SQLITE.lock().expect("sqlite open error");
-        let (_block_hash, timestamp) = sqlite.init();
-        let block_hashes = sqlite.query_header(timestamp, add);
-        if block_hashes.len() == 0 {
+        error!("get fillter_ready condition");
+
+        let mut header_vec: Vec<String> = vec![];
+        {
+            let p = RB_DETAIL.progress();
+            header_vec = RB_CHAIN.fetch_scan_header(p.timestamp, add);
+        }
+
+        if header_vec.len() == 0 {
             return Ok(());
         }
 
         let mut inventory_vec = vec![];
-        for block_hash in block_hashes {
-            let inventory = Inventory::new(InvType::FilteredBlock, block_hash.as_str());
+        for header in header_vec {
+            let inventory = Inventory::new(InvType::FilteredBlock, header.as_str());
             inventory_vec.push(inventory);
         }
         self.p2p
@@ -169,11 +168,7 @@ impl GetData {
         merkle_vec: &Vec<MerkleBlockMessage>,
         peer: PeerId,
     ) -> Result<(), Error> {
-        self.timeout
-            .lock()
-            .unwrap()
-            .received(peer, 1, ExpectedReply::MerkleBlock);
-        warn!("got a vec of 100 merkleblock");
+        info!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
         info!("got 100 merkleblock {:#?}", merkleblock);
         self.get_data(peer, true)?;
@@ -181,8 +176,7 @@ impl GetData {
     }
 
     // Handle tx return value
-    fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
-        let sqlite = SHARED_SQLITE.lock().expect("open connection error!");
+    fn tx(&mut self, tx: &Transaction, peer: PeerId, hash160: String) -> Result<(), Error> {
         info!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;
@@ -198,11 +192,11 @@ impl GetData {
                 iter.next();
                 let current_hash = iter.next().unwrap_or(" ");
                 if current_hash.eq(hash160.as_str()) {
-                    sqlite.insert_txout(
+                    RB_DETAIL.save_txout(
                         tx_hash.to_hex(),
                         asm.clone(),
                         vout.value.to_string(),
-                        index,
+                        index.to_string(),
                     );
                 }
             }
@@ -222,13 +216,13 @@ impl GetData {
             iter.next();
             let iter3 = iter.next().unwrap_or(" ");
             if iter3.eq(PUBLIC_KEY) {
-                sqlite.insert_txin(
+                RB_DETAIL.save_txin(
                     tx_hash.to_hex(),
                     sig_script.clone(),
                     prev_tx,
                     prev_vout.to_string(),
-                    sequence.to_string(),
-                )
+                    sequence,
+                );
             }
         }
         Ok(())

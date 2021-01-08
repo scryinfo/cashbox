@@ -115,3 +115,16 @@ git
 /bc/test_wallet_testnet.db-wal
 /bc/test_wallet_testnet_private.db-shm
 /bc/test_wallet_testnet_private.db-wal
+demo/rbatis_demo/target
+/demo/rbatis_demo/Cargo.lock
+*.sqlite
+*.db-shm
+*.db-wal
+/bc/murmel/btc_chain.sqlite-shm
+/bc/murmel/btc_chain.sqlite-wal
+/bc/murmel/btc_detail.sqlite-shm
+/bc/murmel/btc_detail.sqlite-wal
+/bc/murmel/btc_hammer.db.0.bc
+/bc/murmel/btc_hammer.db.0.bl
+/bc/murmel/btc_hammer.db.0.lg
+/bc/murmel/btc_hammer.db.0.tb

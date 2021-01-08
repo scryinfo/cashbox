@@ -4,8 +4,8 @@
 #![cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
 #![allow(non_snake_case)]
 
-use crate::constructor::Constructor;
 use super::*;
+use crate::constructor::Constructor;
 
 use bitcoin::consensus::serialize;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
@@ -21,6 +21,9 @@ use jni::JNIEnv;
 use log::info;
 use log::Level;
 
+use crate::config::BTC_HAMMER_PATH;
+use crate::db::fetch_scanned_height;
+use crate::db::{RB_CHAIN, RB_DETAIL};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
@@ -83,7 +86,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
                 txid: sha256d::Hash::from_hex(
                     "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
                 )
-                    .unwrap(),
+                .unwrap(),
                 vout: 1,
             },
             sequence: RBF,
@@ -158,20 +161,24 @@ pub extern "system" fn Java_JniApi_btcLoadBalance(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
-    let sqlite = SHARED_SQLITE.lock().unwrap();
-    let max_block_number = sqlite.count();
-    let max_block_number = env
-        .new_string(max_block_number.to_string())
+pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(
+    env: JNIEnv<'_>,
+    _class: JClass<'_>,
+) -> jstring {
+    let h = RB_CHAIN.fetch_height();
+    let h = env
+        .new_string(h.to_string())
         .expect("Could not create java string!");
-    max_block_number.into_inner()
+    h.into_inner()
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv<'_>, _class: JClass<'_>) -> jstring {
-    let sqlite = SHARED_SQLITE.lock().unwrap();
-    let height = sqlite.query_scanned_height();
+pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(
+    env: JNIEnv<'_>,
+    _class: JClass<'_>,
+) -> jstring {
+    let height = fetch_scanned_height();
     let max_block_number = env
         .new_string(height.to_string())
         .expect("Could not create java string!");
@@ -180,7 +187,10 @@ pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(env: JNIEnv<'_>, _class
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcIsSyncDataOk(_env: JNIEnv<'_>, _class: JClass<'_>) -> jboolean {
+pub extern "system" fn Java_JniApi_btcIsSyncDataOk(
+    _env: JNIEnv<'_>,
+    _class: JClass<'_>,
+) -> jboolean {
     unimplemented!()
 }
 
@@ -199,7 +209,11 @@ pub extern "system" fn Java_JniApi_btcLoadTxHistory(
 // this function don't have any return value。because it will run spv node
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv<'_>, _class: JClass<'_>, network: JString<'_>) {
+pub extern "system" fn Java_JniApi_btcStart(
+    env: JNIEnv<'_>,
+    _class: JClass<'_>,
+    network: JString<'_>,
+) {
     // TODO
     // use testnet for test and default
     // must change it in future
@@ -240,27 +254,36 @@ pub extern "system" fn Java_JniApi_btcStart(env: JNIEnv<'_>, _class: JClass<'_>,
         .duration_since(SystemTime::UNIX_EPOCH)
         .unwrap()
         .as_secs();
-    let chaindb = Constructor::open_db(Some(&Path::new(BTC_CHAIN_PATH)), network, birth).unwrap();
+    let chaindb = Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap();
 
     // todo
     // use mnemonic generate publc address and store it in database
-    let sqlite = SHARED_SQLITE.lock().unwrap();
-    let pubkey = sqlite.query_compressed_pub_key();
-    if let None = pubkey {
-        info!("Did not have default pubkey in database yet");
-        let default_address = calc_default_address();
-        let address = default_address.to_string();
-        let default_pubkey = calc_pubkey();
-        sqlite.insert_compressed_pub_key(address, default_pubkey);
+    let mut filter_message: Option<FilterLoadMessage> = None;
+    {
+        let m_address = RB_DETAIL.fetch_user_address();
+        if let Some(m_address) = m_address {
+            info!("Calc bloomfilter via pubkey {:?}", &m_address);
+            let filter_load_message =
+                FilterLoadMessage::calculate_filter(m_address.compressed_pub_key.as_str());
+            filter_message = Some(filter_load_message)
+        } else {
+            info!("Did not have default pubkey in database yet");
+            let default_address = calc_default_address();
+            let address = default_address.to_string();
+            let default_pubkey = calc_pubkey();
+            RB_DETAIL.save_user_address(address, default_pubkey.clone());
+            let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
+            filter_message = Some(filter_load_message)
+        }
     }
 
-    let mut spv = Constructor::new(network, listen, chaindb).unwrap();
+    let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
     spv.run(network, peers, connections)
-       .expect("can not start node");
+        .expect("can not start node");
 }
 
 mod test {
-    use crate::jniapi::{calc_pubkey, calc_bloomfilter, calc_default_address};
+    use crate::jniapi::{calc_bloomfilter, calc_default_address, calc_pubkey};
 
     #[test]
     pub fn test_calc_pubkey() {

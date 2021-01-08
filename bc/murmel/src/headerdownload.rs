@@ -17,10 +17,11 @@
 //! # Download headers
 //!
 use crate::chaindb::SharedChainDB;
+use crate::constructor::CondvarPair;
+use crate::db::RB_CHAIN;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
-use crate::hooks::HooksMessage;
-use crate::jniapi::SHARED_SQLITE;
+use crate::hooks::{HooksMessage, ShowCondition};
 use crate::p2p::{
     P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
     SERVICE_BLOCKS,
@@ -36,23 +37,27 @@ use bitcoin::{
 use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use log::{debug, error, info, trace};
+use std::ops::Deref;
+use std::sync::Arc;
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
 
-pub struct HeaderDownload {
+pub struct HeaderDownload<T> {
     p2p: P2PControlSender<NetworkMessage>,
     chaindb: SharedChainDB,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     downstream: SharedDownstream,
     hook_sender: mpsc::SyncSender<HooksMessage>,
+    condvar_pair: CondvarPair<T>,
 }
 
-impl HeaderDownload {
+impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
     pub fn new(
         chaindb: SharedChainDB,
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         downstream: SharedDownstream,
         hook_sender: mpsc::SyncSender<HooksMessage>,
+        condvar_pair: CondvarPair<T>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
@@ -62,6 +67,7 @@ impl HeaderDownload {
             timeout,
             downstream,
             hook_sender,
+            condvar_pair,
         };
 
         thread::Builder::new()
@@ -211,13 +217,16 @@ impl HeaderDownload {
                                 connected_headers.push((stored.header.clone(), stored.height));
                                 // POW is ok, stored top chaindb
                                 some_new = true;
+
                                 // save block hash into sqlite table "block_hash"
-                                let sqlite = SHARED_SQLITE.lock().expect("Open db error");
-                                let header_clone = header.clone();
-                                sqlite.insert_block(
-                                    header_clone.bitcoin_hash().to_hex(),
-                                    header_clone.time.to_string(),
-                                );
+                                {
+                                    let header_c = header.clone();
+                                    RB_CHAIN.save_header(
+                                        header_c.bitcoin_hash().to_hex(),
+                                        header_c.time.to_string(),
+                                    )
+                                }
+
                                 if let Some(forwards) = forwards {
                                     moved_tip = Some(forwards.last().unwrap().clone());
                                 }
@@ -269,9 +278,10 @@ impl HeaderDownload {
                     peer
                 );
                 //hooks for new headers
-                self.hook_sender
-                    .send(HooksMessage::ReceivedHeaders(peer.clone()))
-                    .expect("HOOKS ERROR");
+                // self.hook_sender
+                //     .send(HooksMessage::ReceivedHeaders(peer.clone()))
+                //     .expect("HOOKS ERROR");
+
                 self.p2p.send(P2PControl::Height(height));
             } else {
                 debug!(
