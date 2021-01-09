@@ -13,7 +13,7 @@ use crate::parameters::CChainVersion;
 
 use super::chain_eee::{CAccountInfoSyncProg, CSubChainBasicInfo};
 use super::kits::{CR, to_c_char, to_str};
-use super::parameters::{CAccountInfo, CContext, CDecodeAccountInfoParameters, CRawTxParam, CStorageKeyParameters, CTransferPayload};
+use super::parameters::{CAccountInfo, CContext, CDecodeAccountInfoParameters, CRawTxParam, CStorageKeyParameters, CEeeTransferPayload};
 use super::types::CError;
 
 #[no_mangle]
@@ -147,7 +147,7 @@ pub unsafe extern "C" fn ChainEee_getStorageKey(ctx: *mut CContext, netType: *mu
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_eeeTransfer(ctx: *mut CContext, netType: *mut c_char, transferPayload: *mut CTransferPayload, signedResult: *mut *mut c_char) -> *const CError {
+pub unsafe extern "C" fn ChainEee_eeeTransfer(ctx: *mut CContext, netType: *mut c_char, transferPayload: *mut CEeeTransferPayload, signedResult: *mut *mut c_char) -> *const CError {
     log::debug!("enter ChainEee updateBasicInfo");
     if ctx.is_null() || netType.is_null() || signedResult.is_null() || transferPayload.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or eeeTransfer is null");
@@ -163,7 +163,7 @@ pub unsafe extern "C" fn ChainEee_eeeTransfer(ctx: *mut CContext, netType: *mut 
             Some(wallets) => {
                 let eee_chain = wallets.eee_chain_instance();
                 let net_type = NetType::from(to_str(netType));
-                let transferPayload = CTransferPayload::ptr_rust(transferPayload);
+                let transferPayload = CEeeTransferPayload::ptr_rust(transferPayload);
                 match block_on(eee_chain.eee_transfer(wallets, &net_type, &transferPayload)) {
                     Ok(res) => {
                         *signedResult = to_c_char(&res);
@@ -180,7 +180,7 @@ pub unsafe extern "C" fn ChainEee_eeeTransfer(ctx: *mut CContext, netType: *mut 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_tokenXTransfer(ctx: *mut CContext, netType: *mut c_char, transferPayload: *mut CTransferPayload, signedResult: *mut *mut c_char) -> *const CError {
+pub unsafe extern "C" fn ChainEee_tokenXTransfer(ctx: *mut CContext, netType: *mut c_char, transferPayload: *mut CEeeTransferPayload, signedResult: *mut *mut c_char) -> *const CError {
     log::debug!("enter ChainEee updateBasicInfo");
     if ctx.is_null() || netType.is_null() || signedResult.is_null() || transferPayload.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or transferPayload is null");
@@ -196,7 +196,7 @@ pub unsafe extern "C" fn ChainEee_tokenXTransfer(ctx: *mut CContext, netType: *m
             Some(wallets) => {
                 let eee_chain = wallets.eee_chain_instance();
                 let net_type = NetType::from(to_str(netType));
-                let transferPayload = CTransferPayload::ptr_rust(transferPayload);
+                let transferPayload = CEeeTransferPayload::ptr_rust(transferPayload);
                 match block_on(eee_chain.tokenx_transfer(wallets, &net_type, &transferPayload)) {
                     Ok(res) => {
                         *signedResult = to_c_char(&res);

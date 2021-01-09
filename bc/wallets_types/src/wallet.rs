@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use mav::ma::{Dao, MWallet};
+use mav::ma::{Dao, MWallet, MAddress};
 use mav::WalletType;
 
 use crate::{BtcChain, ContextTrait, EeeChain, EthChain, Load, WalletError};
@@ -52,6 +52,19 @@ impl Wallet {
             }
             None => Ok(None)
         }
+    }
+    pub async fn find_by_address(context: &dyn ContextTrait, address: &str) -> Result<Option<Wallet>, WalletError> {
+        let wallet_db = context.db().wallets_db();
+        let m_address = {
+            let mut addr_wrapper = wallet_db.new_wrapper();
+            addr_wrapper.eq(&MAddress::address, address);
+            MAddress::fetch_by_wrapper(wallet_db, "", &addr_wrapper).await?
+        };
+        if m_address.is_none() {
+            return Err(WalletError::Custom(format!("wallet address {} is not exist!", address)));
+        }
+        let address = m_address.unwrap();
+        Self::find_by_id(context,&address.wallet_id.to_owned()).await
     }
     pub async fn m_wallet_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<Option<MWallet>, WalletError> {
         let rb = context.db().wallets_db();

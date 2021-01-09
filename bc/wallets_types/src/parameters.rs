@@ -1,4 +1,5 @@
 use failure::_core::ops::{Deref, DerefMut};
+use super::error::WalletError;
 
 #[derive(Debug, Default, Clone)]
 pub struct InitParameters {
@@ -66,46 +67,115 @@ pub struct RawTxParam {
 }
 
 #[derive(Debug, Default, Clone)]
-pub struct TransferPayload {
+pub struct EeeTransferPayload {
     pub from_account: String,
     pub to_account: String,
     pub value: String,
     pub index: u32,
-    pub chain_version:ChainVersion,
+    pub chain_version: ChainVersion,
     pub ext_data: String,
     pub password: String,
 }
 
-#[derive(Debug, Default,Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct AccountInfo {
     pub nonce: u32,
     pub ref_count: u32,
-    pub free_: String,//todo rename
+    pub free_: String,
+    //todo rename
     pub reserved: String,
     pub misc_frozen: String,
     pub fee_frozen: String,
 }
 
 
-#[derive(Debug, Clone,Default)]
+#[derive(Debug, Clone, Default)]
 pub struct DecodeAccountInfoParameters {
-    pub encode_data:String,
-    pub chain_version:ChainVersion,
+    pub encode_data: String,
+    pub chain_version: ChainVersion,
 }
 
-#[derive(Debug, Clone, Default,)]
+#[derive(Debug, Clone, Default, )]
 pub struct StorageKeyParameters {
-    pub chain_version:ChainVersion,
+    pub chain_version: ChainVersion,
     pub module: String,
-    pub storage_item:String,
-    pub account:String,
+    pub storage_item: String,
+    pub account: String,
 }
 
-#[derive(Debug, Clone, Default,)]
-pub struct ChainVersion{
+#[derive(Debug, Clone, Default, )]
+pub struct ChainVersion {
     pub genesis_hash: String,
     pub runtime_version: i32,
     pub tx_version: i32,
 }
 
+#[derive(Debug, Clone, Default, )]
+pub struct EthTransferPayload {
+    pub from_address: String,
+    pub to_address: String,
+    pub contract_address: String,
+    pub value: String,//unit ETH
+    pub nonce: String,
+    pub gas_price: String,
+    pub gas_limit: String,
+    pub decimal: u32,
+    pub ext_data: String,
+    pub password: String,
+}
+
+impl EthTransferPayload {
+    pub fn decode(&self) -> Result<eth::RawTransaction, WalletError> {
+        if self.contract_address.is_empty() && self.to_address.is_empty() {
+            return Err(WalletError::Custom("raw tx dest address in empty".into()));
+        }
+        let decimal = self.decimal as usize;
+        let amount = eth::convert_token(&self.value, decimal).unwrap();
+        //Additional parameters
+        let data = self.ext_data.as_str().as_bytes().to_vec();
+        let (to_address, data) = {
+            if self.to_address.is_empty() {
+                (None, data)
+            } else if !self.contract_address.is_empty() {
+                let contract_address = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.contract_address)?.as_slice());
+                let to = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.to_address)?.as_slice());
+                let mut encode_data = eth::get_erc20_transfer_data(to, amount)?;
+                encode_data.extend_from_slice(&data);
+                (Some(contract_address), encode_data)
+            } else {
+                let to = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.to_address)?.as_slice());
+                (Some(to), data)
+            }
+        };
+        //gas price
+        let gas_price = eth::convert_token(&self.gas_price, decimal).unwrap();
+        //Allow maximum gas consumption
+        let gas_limit = ethereum_types::U256::from_dec_str(&self.gas_limit).unwrap();
+        //Nonce value of the current transaction
+        let nonce = {
+            let nonce = if self.nonce.starts_with("0x") {
+                let nonce_u64 = u64::from_str_radix(&self.nonce[2..], 16);
+                format!("{}", nonce_u64.unwrap())
+            } else {
+                self.nonce.clone()
+            };
+            ethereum_types::U256::from_dec_str(&nonce).unwrap()
+        };
+
+        Ok(eth::RawTransaction {
+            nonce,
+            to: to_address,
+            value: amount,
+            gas_price,
+            gas: gas_limit,
+            data,
+        })
+    }
+}
+
+#[derive(Debug, Clone, Default, )]
+pub struct EthRawTxPayload {
+    pub from_address: String,
+    pub raw_tx: String,
+}
 

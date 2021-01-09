@@ -9,10 +9,7 @@ use eee::Crypto;
 use mav::ma::{BeforeSave, Dao, Db, DbCreateType, MAddress, MMnemonic, MWallet, DbName};
 use mav::{ChainType, NetType, WalletType};
 use scry_crypto::Keccak256;
-use wallets_types::{
-    Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait,
-    InitParameters, Load, Setting, Wallet, WalletError, WalletTrait,
-};
+use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait, EthChainTrait};
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
@@ -60,6 +57,9 @@ impl Wallets {
 
     pub fn eee_chain_instance(&self) -> &Box<dyn EeeChainTrait> {
         self.wallet_trait.eee_chain()
+    }
+    pub fn eth_chain_instance(&self) -> &Box<dyn EthChainTrait> {
+        self.wallet_trait.eth_chain()
     }
 
     pub fn db_name(name: &wallets_types::DbName) -> wallets_types::DbName {
