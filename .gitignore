@@ -130,3 +130,13 @@ demo/rbatis_demo/target
 /bc/murmel/btc_hammer.db.0.tb
 /bc/mav/temp
 /bc/mav/generated_sql
+/demo/grpc_dart/client_dart/.dart_tool
+/demo/grpc_dart/client_dart/.packages
+/demo/grpc_dart/client_dart/pubspec.lock
+/demo/grpc_dart/server_go/before.log
+/demo/grpc_dart/server_go/go.sum
+/demo/grpc_dart/server_go/log.log
+/demo/grpc_dart/server_go/server_go/before.log
+/demo/grpc_dart/server_go/server_go/log.log
+/demo/grpc_dart/server_go/server_go/server_go.exe
+/packages/wallets/test/wallets_cdl.dll

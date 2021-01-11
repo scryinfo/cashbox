@@ -132,13 +132,16 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                 }
             }
         };
+
     if cfg!(feature = "print_macro") {
-        println!("............gen impl dl_cr {}:\n {}", c_name, gen);
+        println!("............gen impl dl_cr {}:", c_name);
+        let _ = rustfmt::run(rustfmt::Input::Text(gen.to_string()),&rustfmt::config::Config::default());
     }
 
     //test
     if type_name == NAME {
-        println!("............gen impl dl_cr {}:\n {}", c_name, gen);
+        println!("............gen impl dl_cr {}:", c_name);
+        let _ = rustfmt::run(rustfmt::Input::Text(gen.to_string()),&rustfmt::config::Config::default());
     }
     gen.into()
 }
