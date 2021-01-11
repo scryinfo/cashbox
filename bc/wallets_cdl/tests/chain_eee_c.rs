@@ -11,7 +11,8 @@ use mav::ma::{MSubChainBasicInfo, MAccountInfoSyncProg};
 use mav::kits;
 use std::ptr::null_mut;
 use wallets_cdl::types::CAccountInfoSyncProg;
-use wallets_cdl::parameters::{CContext, CTransferPayload};
+use wallets_cdl::parameters::{CContext, CEeeTransferPayload};
+
 
 
 const TX_VERSION: u32 = 1;
@@ -181,7 +182,7 @@ fn eee_transfer_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
-        let payload = wallets_types::TransferPayload {
+        let payload = wallets_types::EeeTransferPayload {
             from_account: "5GxGZWfdE5v7ZbEWyEfXZ1R6kaKsdne3FWMzgazEQwN4j2a4".to_string(),
             to_account: "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H".to_string(),
             value: "20000".to_string(),
@@ -190,7 +191,7 @@ fn eee_transfer_test() {
             ext_data: "".to_string(),
             password: "1".to_string(),
         };
-        let mut c_payload = wallets_cdl::parameters::CTransferPayload::to_c_ptr(&payload);
+        let mut c_payload = wallets_cdl::parameters::CEeeTransferPayload::to_c_ptr(&payload);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let c_err = chain_eee_c::ChainEee_eeeTransfer(*c_ctx, to_c_char("Test"), c_payload, sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
@@ -214,7 +215,7 @@ fn eee_tokenx_transfer_test() {
         let c_err = init_parameters(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-        let payload = wallets_types::TransferPayload {
+        let payload = wallets_types::EeeTransferPayload {
             from_account: "5GxGZWfdE5v7ZbEWyEfXZ1R6kaKsdne3FWMzgazEQwN4j2a4".to_string(),
             to_account: "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H".to_string(),
             value: "20000".to_string(),
@@ -223,7 +224,7 @@ fn eee_tokenx_transfer_test() {
             ext_data: "".to_string(),
             password: "123".to_string(),
         };
-        let mut c_payload = wallets_cdl::parameters::CTransferPayload::to_c_ptr(&payload);
+        let mut c_payload = wallets_cdl::parameters::CEeeTransferPayload::to_c_ptr(&payload);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let c_err = chain_eee_c::ChainEee_tokenXTransfer(*c_ctx, to_c_char("Test"), c_payload, sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);

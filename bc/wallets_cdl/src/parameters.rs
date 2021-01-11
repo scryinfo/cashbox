@@ -6,7 +6,7 @@ use std::os::raw::c_char;
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{
     AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName,
-    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, TransferPayload,
+    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload,
 };
 
 use crate::kits::{to_c_char, to_str, CMark, CStruct, CR};
@@ -54,7 +54,7 @@ pub struct CContext {
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
-pub struct CTransferPayload {
+pub struct CEeeTransferPayload {
     pub fromAccount: *mut c_char,
     pub toAccount: *mut c_char,
     pub value: *mut c_char,
@@ -106,4 +106,25 @@ pub struct CChainVersion {
     pub genesisHash: *mut c_char,
     pub runtimeVersion: i32,
     pub txVersion: i32,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CEthTransferPayload {
+    pub fromAddress: *mut c_char,
+    pub toAddress: *mut c_char,
+    pub contractAddress: *mut c_char,
+    pub value: *mut c_char,
+    pub nonce: *mut c_char,
+    pub gasPrice: *mut c_char,
+    pub gasLimit: *mut c_char,
+    pub decimal: u32,
+    pub extData: *mut c_char,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct CEthRawTxPayload {
+    pub fromAddress: *mut c_char,
+    pub rawTx: *mut c_char,
 }

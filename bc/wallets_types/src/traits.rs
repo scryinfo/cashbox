@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use mav::ma::{Db, MAddress, MWallet};
 use mav::{WalletType, NetType};
 
-use crate::{WalletError, SubChainBasicInfo, RawTxParam, AccountInfoSyncProg, DecodeAccountInfoParameters, AccountInfo, StorageKeyParameters, TransferPayload};
+use crate::{WalletError, SubChainBasicInfo, RawTxParam, AccountInfoSyncProg, DecodeAccountInfoParameters, AccountInfo, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload};
 
 #[async_trait]
 pub trait Load {
@@ -29,6 +29,7 @@ pub trait ChainTrait: Send + Sync {
 pub trait WalletTrait: Send + Sync {
     fn chains(&self) -> &Vec<Box<dyn ChainTrait>>;
     fn eee_chain(&self) -> &Box<dyn EeeChainTrait>;
+    fn eth_chain(&self)->&Box<dyn EthChainTrait>;
 }
 
 #[async_trait]
@@ -41,7 +42,14 @@ pub trait EeeChainTrait: Send + Sync {
 
     async fn decode_account_info(&self, context: &dyn ContextTrait, net_type: &NetType, parameters: DecodeAccountInfoParameters) -> Result<AccountInfo, WalletError>;
     async fn get_storage_key(&self, context: &dyn ContextTrait, net_type: &NetType, parameters: StorageKeyParameters) -> Result<String, WalletError>;
-    async fn eee_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &TransferPayload) -> Result<String, WalletError>;
-    async fn tokenx_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &TransferPayload) -> Result<String, WalletError>;
+    async fn eee_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &EeeTransferPayload) -> Result<String, WalletError>;
+    async fn tokenx_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &EeeTransferPayload) -> Result<String, WalletError>;
     async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, raw_tx: &RawTxParam, is_submittable: bool) -> Result<String, WalletError>;
+}
+
+#[async_trait]
+pub trait EthChainTrait: Send + Sync {
+    async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_tx: &EthTransferPayload, password: &str) -> Result<String, WalletError>;
+    async fn raw_tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, raw_tx: &EthRawTxPayload, password: &str) -> Result<String, WalletError>;
+    async fn decode_addition_data(&self,encode_data:&str) -> Result<String, WalletError>;
 }

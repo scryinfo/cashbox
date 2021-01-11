@@ -6,12 +6,7 @@ use mav::ma::{
     Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MEeeChainToken, MEthChainToken, MWallet,
 };
 use mav::{NetType, WalletType};
-use wallets_types::{
-    AccountInfo, AccountInfoSyncProg, BtcChainTokenDefault, Chain2WalletType, ChainTrait,
-    ContextTrait, DecodeAccountInfoParameters, EeeChainTokenDefault, EeeChainTrait,
-    EthChainTokenDefault, RawTxParam, StorageKeyParameters, SubChainBasicInfo, TransferPayload,
-    WalletError, WalletTrait,
-};
+use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenDefault, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenDefault, EeeChainTrait, EthChainTokenDefault, RawTxParam, StorageKeyParameters, SubChainBasicInfo, EeeTransferPayload, WalletError, WalletTrait, EthChainTrait, EthTransferPayload, EthRawTxPayload};
 
 use codec::Decode;
 
@@ -27,6 +22,7 @@ struct BtcChain();
 pub(crate) struct Wallet {
     chains: Vec<Box<dyn ChainTrait>>,
     eee: Box<dyn EeeChainTrait>,
+    eth: Box<dyn EthChainTrait>,
 }
 
 #[async_trait]
@@ -35,8 +31,8 @@ impl ChainTrait for EthChain {
         let mut m_address = MAddress::default();
         m_address.chain_type = wallets_types::EthChain::chain_type(wallet_type).to_string();
         let phrase = String::from_utf8(mn.to_vec())?;
-        let secret_byte = ethtx::pri_from_mnemonic(&phrase, None)?;
-        let (addr, puk) = ethtx::generate_eth_address(&secret_byte)?;
+        let secret_byte = eth::pri_from_mnemonic(&phrase, None)?;
+        let (addr, puk) = eth::generate_eth_address(&secret_byte)?;
         m_address.address = addr;
         m_address.public_key = puk;
         Ok(m_address)
@@ -158,6 +154,7 @@ impl Wallet {
         let mut w = Wallet {
             chains: Default::default(),
             eee: Box::new(EeeChain::default()),
+            eth: Box::new(EthChain::default()),
         };
 
         w.chains.push(Box::new(EthChain::default()));
@@ -174,6 +171,7 @@ impl WalletTrait for Wallet {
     fn eee_chain(&self) -> &Box<dyn EeeChainTrait> {
         &self.eee
     }
+    fn eth_chain(&self) -> &Box<dyn EthChainTrait> { &self.eth }
 }
 
 
@@ -191,7 +189,7 @@ impl EeeChainTrait for EeeChain {
                 info.ss58_format_prefix = basic_info.ss58_format_prefix;
                 info
             } else {
-               let basic_info =&*basic_info;
+                let basic_info = &*basic_info;
                 basic_info.clone()
             }
         };
@@ -290,12 +288,16 @@ impl EeeChainTrait for EeeChain {
             Err(WalletError::NotExist)
         }
     }
-    async fn eee_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &TransferPayload) -> Result<String, WalletError> {
+    async fn eee_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &EeeTransferPayload) -> Result<String, WalletError> {
         let data_rb = context.db().data_db(net_type);
         //todo 调整通过wallet　id查询wallet的功能
-        let wallet_db = context.db().wallets_db();
-
-        // get token decimal by account address
+        // let wallet_db = context.db().wallets_db();
+        // if let Some(wallet) = wallets_types::Wallet::find_by_address(context, &transfer_payload.from_account).await? {
+        //
+        // }else {
+        //
+        // }
+       /* // get token decimal by account address
         let m_address = {
             let mut addr_wrapper = wallet_db.new_wrapper();
             addr_wrapper.eq(&MAddress::address, &transfer_payload.from_account);
@@ -305,11 +307,11 @@ impl EeeChainTrait for EeeChain {
         if m_address.is_none() {
             return Err(WalletError::Custom(format!("wallet address {} is not exist!", &transfer_payload.from_account)));
         }
-        let address = m_address.unwrap();
+        let address = m_address.unwrap();*/
 
-        let m_wallet = MWallet::fetch_by_id(wallet_db, "", &address.wallet_id.to_owned()).await?;
+        let m_wallet =  wallets_types::Wallet::find_by_address(context, &transfer_payload.from_account).await?;
         if m_wallet.is_none() {
-            return Err(WalletError::Custom(format!("wallet {} is not exist!", &address.wallet_id)));
+            return Err(WalletError::Custom(format!(" address {} wallet is not exist!", &transfer_payload.from_account)));
         }
         let mnemonic = eee::Sr25519::get_mnemonic_context(
             &m_wallet.unwrap().mnemonic,
@@ -351,10 +353,10 @@ impl EeeChainTrait for EeeChain {
             )?;
             Ok(sign_data)
         } else {
-            Err(WalletError::Custom(format!("chain info {} is not exist!",transfer_payload.chain_version.genesis_hash)))
+            Err(WalletError::Custom(format!("chain info {} is not exist!", transfer_payload.chain_version.genesis_hash)))
         }
     }
-    async fn tokenx_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &TransferPayload) -> Result<String, WalletError> {
+    async fn tokenx_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &EeeTransferPayload) -> Result<String, WalletError> {
         let data_rb = context.db().data_db(net_type);
         //todo 调整通过wallet　id查询wallet的功能
         let wallet_db = context.db().wallets_db();
@@ -483,3 +485,51 @@ impl EeeChainTrait for EeeChain {
         }
     }
 }
+
+#[async_trait]
+impl EthChainTrait for EthChain {
+    async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, tx_payload: &EthTransferPayload, password: &str) -> Result<String, WalletError> {
+        let chain_id = match net_type {
+            NetType::Main => 1,
+            NetType::Test => 3,
+            _ => 17
+        };
+        let raw_tx = tx_payload.decode()?;
+        let pri_key = Self::get_private_key_from_address(context, &tx_payload.from_address, password).await?;
+        let tx_signed = raw_tx.sign(&pri_key, Some(chain_id));
+        Ok(format!("0x{}", hex::encode(tx_signed)))
+    }
+
+    async fn raw_tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, raw_tx_payload: &EthRawTxPayload, password: &str) -> Result<String, WalletError> {
+        let chain_id = match net_type {
+            NetType::Main => 1,
+            NetType::Test => 3,
+            _ => 17
+        };
+        let tx_encode_data = scry_crypto::hexstr_to_vec(&raw_tx_payload.raw_tx)?;
+        let mut raw_tx = eth::RawTransaction::default();
+        raw_tx.decode(&tx_encode_data)?;
+        let pri_key = Self::get_private_key_from_address(context, &raw_tx_payload.from_address, password).await?;
+        let tx_signed = raw_tx.sign(&pri_key, Some(chain_id));
+        Ok(format!("0x{}", hex::encode(tx_signed)))
+    }
+
+    async fn decode_addition_data(&self, encode_data: &str) -> Result<String, WalletError> {
+        if encode_data.is_empty() {
+            return Ok("".to_string());
+        }
+        eth::decode_tranfer_data(encode_data).map_err(|error| error.into())
+    }
+}
+
+impl EthChain {
+    async fn get_private_key_from_address(context: &dyn ContextTrait, address: &str, password: &str) -> Result<Vec<u8>, WalletError> {
+        if let Some(wallet) = wallets_types::Wallet::find_by_address(context, address).await? {
+            let mnemonic = eee::Sr25519::get_mnemonic_context(&wallet.mnemonic, password.as_bytes())?;
+            eth::pri_from_mnemonic(&String::from_utf8(mnemonic)?, None).map_err(|err| err.into())
+        } else {
+            Err(WalletError::Custom(format!("address {} wallet is not exist!", address)))
+        }
+    }
+}
+
