@@ -3,11 +3,11 @@
 #![allow(non_snake_case)]
 
 use super::*;
-use crate::path::BTC_HAMMER_PATH;
 use crate::constructor::Constructor;
 use crate::db::{lazy_db_default, SQLite};
 use crate::hooks::{ApiMessage, HooksMessage};
 use crate::jniapi::{calc_default_address, calc_pubkey};
+use crate::path::BTC_HAMMER_PATH;
 use bitcoin::consensus::serialize;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::util::psbt::serialize::Serialize;
