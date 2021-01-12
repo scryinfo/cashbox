@@ -14,17 +14,16 @@
 // limitations under the License.
 //
 
-#[macro_use]
-extern crate log;
 
 use simple_logger;
+use log::info;
 
 use bitcoin::network::constants::Network;
 use log::Level;
 use murmel::constructor::Constructor;
 
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use murmel::config::BTC_HAMMER_PATH;
+use murmel::path::BTC_HAMMER_PATH;
 use murmel::db::RB_DETAIL;
 use murmel::jniapi::{calc_default_address, calc_pubkey};
 use murmel::moudle::detail::MUserAddress;
