@@ -3,7 +3,7 @@
 //!     1. for btc chain database
 //!     2. for user data (utxo address ...)
 //!
-use crate::config::{BTC_CHAIN_PATH, BTC_DETAIL_PATH};
+use crate::path::{BTC_CHAIN_PATH, BTC_DETAIL_PATH};
 use crate::moudle::chain::MBlockHeader;
 use crate::moudle::detail::{MLocalTx, MProgress, MTxInput, MTxOutput, MUserAddress};
 use async_trait::async_trait;

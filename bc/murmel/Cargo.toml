@@ -97,6 +97,7 @@ async-std = { version = "1.8.0" }
 # rbatis end
 
 async-trait = "0.1.42"
+config = "0.10.1"
 
 [dev-dependencies]
 rustc-serialize = "0.3"

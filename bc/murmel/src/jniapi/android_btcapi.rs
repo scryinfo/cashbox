@@ -3,7 +3,7 @@
 #![allow(non_snake_case)]
 
 use super::*;
-use crate::config::BTC_HAMMER_PATH;
+use crate::path::BTC_HAMMER_PATH;
 use crate::constructor::Constructor;
 use crate::db::{lazy_db_default, SQLite};
 use crate::hooks::{ApiMessage, HooksMessage};

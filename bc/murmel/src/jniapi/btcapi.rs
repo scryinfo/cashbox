@@ -21,7 +21,7 @@ use jni::JNIEnv;
 use log::info;
 use log::Level;
 
-use crate::config::BTC_HAMMER_PATH;
+use crate::path::BTC_HAMMER_PATH;
 use crate::db::fetch_scanned_height;
 use crate::db::{RB_CHAIN, RB_DETAIL};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
