@@ -140,3 +140,6 @@ demo/rbatis_demo/target
 /demo/grpc_dart/server_go/server_go/log.log
 /demo/grpc_dart/server_go/server_go/server_go.exe
 /packages/wallets/test/wallets_cdl.dll
+/demo/grpc_dart/app/.metadata
+/demo/grpc_dart/app/pubspec.lock
+/packages/services/CHANGELOG.md
