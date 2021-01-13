@@ -14,19 +14,20 @@
 // limitations under the License.
 //
 
-
-use simple_logger;
 use log::info;
+use simple_logger;
 
 use bitcoin::network::constants::Network;
 use log::Level;
 use murmel::constructor::Constructor;
 
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use murmel::path::BTC_HAMMER_PATH;
+use config::{Config, ConfigError};
 use murmel::db::RB_DETAIL;
 use murmel::jniapi::{calc_default_address, calc_pubkey};
 use murmel::moudle::detail::MUserAddress;
+use murmel::path::BTC_HAMMER_PATH;
+use std::collections::HashMap;
 use std::{
     env::args,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
@@ -38,25 +39,21 @@ use std::{
 pub fn main() {
     if find_opt("help") {
         println!("Murmel Client");
-        println!("{} [--help] [--log trace|debug|info|warn|error] [--connections n] [--peer ip_address:port] [--db database_file] [--network main|test]", args().next().unwrap());
-        println!("--log level: level is one of trace|debug|info|warn|error");
-        println!("--connections n: maintain at least n connections");
-        println!("--peer ip_address: connect to the given peer at start. You may use more than one --peer option.");
-        println!(
-            "--db file: store data in the given sqlite database file. Created if does not exist."
-        );
-        println!("--network net: net is one of main|test for corresponding Bitcoin networks");
-        println!("--nodns : do not use dns seed");
-        println!("--birth unixtime : blocks will be downloaded if matching filters after this time stamp");
         println!("defaults:");
         println!("--peer 127.0.0.1:8333");
-        println!("--db btc_chain.db");
+        println!("--db btc_hammer.db");
         println!("--log debug");
         println!("--nodns");
         println!("--network tetsnet");
+        println!("defaults Setting defined in Setting.toml");
         return;
     }
-    if let Some(log) = find_arg("log") {
+
+    let mut settings = Config::default();
+    settings.merge(config::File::with_name("Setting")).unwrap();
+
+    let log_level = settings.get_str("loglevel");
+    if let Ok(log) = log_level {
         match log.as_str() {
             "error" => simple_logger::init_with_level(Level::Error).unwrap(),
             "warn" => simple_logger::init_with_level(Level::Warn).unwrap(),
@@ -68,11 +65,9 @@ pub fn main() {
     } else {
         simple_logger::init_with_level(Level::Debug).unwrap();
     }
-    // Switch the address here. Now adjust it to the test chain
-    // The network here and match_ below have been changed
-    info!("Use Network::Testnet for test");
+
     let mut network = Network::Testnet;
-    if let Some(net) = find_arg("network") {
+    if let Ok(net) = settings.get_str("network") {
         match net.as_str() {
             "main" => network = Network::Bitcoin,
             "test" => network = Network::Testnet,
