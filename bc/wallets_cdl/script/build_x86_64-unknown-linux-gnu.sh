@@ -8,7 +8,7 @@ outPath=$(pwd)
 
 export BUILD_DUMMY_WASM_BINARY=1
 
-rustup default stable-gnu
+rustup default 1.48.0
 cd $batPath/..
 cargo build --target $HOST_TAG
 

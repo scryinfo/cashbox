@@ -153,6 +153,7 @@ class ArrayCAddress extends DC<clib.CArrayCAddress> {
       return;
     }
     Address.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
     ffi.free(ptr);
   }
 
@@ -179,6 +180,7 @@ class ArrayCAddress extends DC<clib.CArrayCAddress> {
     }
     if (c.ref.ptr != nullptr && c.ref.ptr != null) {
       Address.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
     }
     c.ref.ptr = allocateZero<clib.CAddress>(count: data.length);
     c.ref.len = data.length;
@@ -211,7 +213,8 @@ class ArrayInt32 extends DC<clib.CArrayInt32> {
     if (ptr == null || ptr == nullptr) {
       return;
     }
-    ffi.free(ptr.ref.ptr);
+    ptr.ref.ptr.free();
+    ptr.ref.ptr = nullptr;
     ffi.free(ptr);
   }
 
@@ -237,7 +240,8 @@ class ArrayInt32 extends DC<clib.CArrayInt32> {
       return;
     }
     if (c.ref.ptr != nullptr && c.ref.ptr != null) {
-      ffi.free(c.ref.ptr);
+      c.ref.ptr.free();
+      c.ref.ptr = nullptr;
     }
     c.ref.ptr = allocateZero<Int32>(count: data.length);
     c.ref.len = data.length;
@@ -368,6 +372,67 @@ class NativeType extends DC<clib.CNativeType> {
     ptrDouble = c.ref.ptrDouble.value;
   }
 }
+
+class ArrayCChar extends DC<clib.CArrayCChar> {
+  List<String> data;
+
+  ArrayCChar() {
+    data = new List<String>();
+  }
+
+  static free(Pointer<clib.CArrayCChar> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    ptr.ref.ptr.free(ptr.ref.len);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCChar fromC(Pointer<clib.CArrayCChar> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCChar();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCChar> toCPtr() {
+    var c = allocateZero<clib.CArrayCChar>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCChar> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      c.ref.ptr.free(c.ref.len);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<Pointer<ffi.Utf8>>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      c.ref.ptr.elementAt(i).value = data[i].toCPtr();
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCChar> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<String>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i] = fromUtf8Null(c.ref.ptr.elementAt(i).value);
+    }
+  }
+}
 ''';
 
 String get _pkgName => 'pkg$_pkgCacheCount';
@@ -421,6 +486,14 @@ class CNativeType extends Struct {
   Pointer<Uint64> ptrUInt64;
   Pointer<Float> ptrFloat;
   Pointer<Double> ptrDouble;
+}
+/// array string
+class CArrayCChar extends Struct {
+  Pointer<Pointer<ffi.Utf8>> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
 }
 ''';
 

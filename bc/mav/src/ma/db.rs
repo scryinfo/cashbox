@@ -233,15 +233,15 @@ impl Db {
         Db::create_table(rb, MChainTypeMeta::create_table_script(), &MChainTypeMeta::table_name(), create_type).await?;
         Db::create_table(rb, MAddress::create_table_script(), &MAddress::table_name(), create_type).await?;
         Db::create_table(rb, MSetting::create_table_script(), &MSetting::table_name(), create_type).await?;
-        Db::create_table(rb, MEthChainToken::create_table_script(), &MEthChainToken::table_name(), create_type).await?;
+        // Db::create_table(rb, MEthChainToken::create_table_script(), &MEthChainToken::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainTokenShared::create_table_script(), &MEthChainTokenShared::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainTokenAuth::create_table_script(), &MEthChainTokenAuth::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainTokenDefault::create_table_script(), &MEthChainTokenDefault::table_name(), create_type).await?;
-        Db::create_table(rb, MEeeChainToken::create_table_script(), &MEeeChainToken::table_name(), create_type).await?;
+        // Db::create_table(rb, MEeeChainToken::create_table_script(), &MEeeChainToken::table_name(), create_type).await?;
         Db::create_table(rb, MEeeChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), create_type).await?;
         Db::create_table(rb, MEeeChainTokenAuth::create_table_script(), &MEeeChainTokenAuth::table_name(), create_type).await?;
         Db::create_table(rb, MEeeChainTokenDefault::create_table_script(), &MEeeChainTokenDefault::table_name(), create_type).await?;
-        Db::create_table(rb, MBtcChainToken::create_table_script(), &MBtcChainToken::table_name(), create_type).await?;
+        // Db::create_table(rb, MBtcChainToken::create_table_script(), &MBtcChainToken::table_name(), create_type).await?;
         Db::create_table(rb, MBtcChainTokenShared::create_table_script(), &MBtcChainTokenShared::table_name(), create_type).await?;
         Db::create_table(rb, MBtcChainTokenAuth::create_table_script(), &MBtcChainTokenAuth::table_name(), create_type).await?;
         Db::create_table(rb, MBtcChainTokenDefault::create_table_script(), &MBtcChainTokenDefault::table_name(), create_type).await?;
