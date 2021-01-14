@@ -101,6 +101,67 @@ impl MBtcChainTokenDefault {
         std::include_str!("../../../sql/m_btc_chain_token_default.sql")
     }
 }
+
+//murmel defined
+#[db_append_shared]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MUserAddress {
+    #[serde(default)]
+    pub address: String,
+    #[serde(default)]
+    pub compressed_pub_key: String,
+}
+
+#[db_append_shared]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MTxInput {
+    #[serde(default)]
+    pub tx: String,
+    #[serde(default)]
+    pub sig_script: String,
+    #[serde(default)]
+    pub prev_tx: String,
+    #[serde(default)]
+    pub prev_vout: String,
+    #[serde(default)]
+    pub sequence: u32,
+}
+
+#[db_append_shared]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MTxOutput {
+    #[serde(default)]
+    pub tx: String,
+    #[serde(default)]
+    pub script: String,
+    #[serde(default)]
+    pub value: String,
+    #[serde(default)]
+    pub vin: String,
+}
+
+#[db_append_shared]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MProgress {
+    #[serde(default)]
+    pub header: String,
+    #[serde(default)]
+    pub timestamp: String,
+}
+
+#[db_append_shared]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MLocalTxLog {
+    #[serde(default)]
+    pub address_from: String,
+    #[serde(default)]
+    pub address_to: String,
+    #[serde(default)]
+    pub value: String,
+    #[serde(default)]
+    pub status: String,
+}
+//murmel end
 //btc end
 
 #[cfg(test)]

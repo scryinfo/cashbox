@@ -107,6 +107,17 @@ impl MBtcOutputTx {
         std::include_str!("../../../sql/m_btc_output_tx.sql")
     }
 }
+
+#[db_append_shared]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MBlockHeader{
+    #[serde(default)]
+    pub header: String,
+    #[serde(default)]
+    pub scanned: String,
+    #[serde(default)]
+    pub timestamp: String,
+}
 //btc end
 
 
