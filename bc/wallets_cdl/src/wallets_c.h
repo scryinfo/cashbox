@@ -11,26 +11,72 @@ typedef struct CError {
     char *message;
 } CError;
 
-typedef struct CDbName {
-    char *path;
-    char *prefix;
-    char *cashboxWallets;
-    char *cashboxMnemonic;
-    char *walletMainnet;
-    char *walletPrivate;
-    char *walletTestnet;
-    char *walletTestnetPrivate;
-} CDbName;
-
-typedef struct CInitParameters {
-    CDbName *dbName;
-    char *contextNote;
-} CInitParameters;
-
 typedef struct CContext {
     char *id;
     char *contextNote;
 } CContext;
+
+typedef struct CAccountInfoSyncProg {
+    char *account;
+    char *blockNo;
+    char *blockHash;
+} CAccountInfoSyncProg;
+
+typedef struct CChainVersion {
+    char *genesisHash;
+    int32_t runtimeVersion;
+    int32_t txVersion;
+} CChainVersion;
+
+typedef struct CDecodeAccountInfoParameters {
+    char *encodeData;
+    CChainVersion *chainVersion;
+} CDecodeAccountInfoParameters;
+
+typedef struct CAccountInfo {
+    uint32_t nonce;
+    uint32_t ref_count;
+    char *free_;
+    char *reserved;
+    char *misc_frozen;
+    char *fee_frozen;
+} CAccountInfo;
+
+typedef struct CStorageKeyParameters {
+    CChainVersion *chainVersion;
+    char *module;
+    char *storageItem;
+    char *account;
+} CStorageKeyParameters;
+
+typedef struct CEeeTransferPayload {
+    char *fromAccount;
+    char *toAccount;
+    char *value;
+    uint32_t index;
+    CChainVersion *chainVersion;
+    char *extData;
+    char *password;
+} CEeeTransferPayload;
+
+typedef struct CRawTxParam {
+    char *rawTx;
+    char *walletId;
+    char *password;
+} CRawTxParam;
+
+typedef uint32_t CBool;
+
+typedef struct CSubChainBasicInfo {
+    char *genesisHash;
+    char *metadata;
+    int32_t runtimeVersion;
+    int32_t txVersion;
+    int32_t ss58FormatPrefix;
+    int32_t tokenDecimals;
+    char *tokenSymbol;
+    CBool isDefault;
+} CSubChainBasicInfo;
 
 /**
  * c的数组需要定义两个字段，所定义一个结构体进行统一管理
@@ -158,14 +204,16 @@ typedef struct CArrayCWallet {
     CU64 cap;
 } CArrayCWallet;
 
-typedef struct CCreateWalletParameters {
-    char *name;
-    char *password;
-    char *mnemonic;
-    char *walletType;
-} CCreateWalletParameters;
-
-typedef uint32_t CBool;
+typedef struct CDbName {
+    char *path;
+    char *prefix;
+    char *cashboxWallets;
+    char *cashboxMnemonic;
+    char *walletMainnet;
+    char *walletPrivate;
+    char *walletTestnet;
+    char *walletTestnetPrivate;
+} CDbName;
 
 /**
  * c的数组需要定义两个字段，所定义一个结构体进行统一管理
@@ -177,65 +225,44 @@ typedef struct CArrayI64 {
     CU64 cap;
 } CArrayI64;
 
-typedef struct CAccountInfoSyncProg {
-    char *account;
-    char *blockNo;
-    char *blockHash;
-} CAccountInfoSyncProg;
+/**
+ * c的数组需要定义两个字段，所定义一个结构体进行统一管理
+ * 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
+ */
+typedef struct CArrayCChar {
+    char **ptr;
+    CU64 len;
+    CU64 cap;
+} CArrayCChar;
 
-typedef struct CAccountInfo {
-    uint32_t nonce;
-    uint32_t ref_count;
-    char *free_;
-    char *reserved;
-    char *misc_frozen;
-    char *fee_frozen;
-} CAccountInfo;
-
-typedef struct CSubChainBasicInfo {
-    char *genesisHash;
-    char *metadata;
-    int32_t runtimeVersion;
-    int32_t txVersion;
-    int32_t ss58FormatPrefix;
-    int32_t tokenDecimals;
-    char *tokenSymbol;
-    CBool isDefault;
-} CSubChainBasicInfo;
-
-typedef struct CChainVersion {
-    char *genesisHash;
-    int32_t runtimeVersion;
-    int32_t txVersion;
-} CChainVersion;
-
-typedef struct CDecodeAccountInfoParameters {
-    char *encodeData;
-    CChainVersion *chainVersion;
-} CDecodeAccountInfoParameters;
-
-typedef struct CStorageKeyParameters {
-    CChainVersion *chainVersion;
-    char *module;
-    char *storageItem;
-    char *account;
-} CStorageKeyParameters;
-
-typedef struct CTransferPayload {
-    char *fromAccount;
-    char *toAccount;
+typedef struct CEthTransferPayload {
+    char *fromAddress;
+    char *toAddress;
+    char *contractAddress;
     char *value;
-    uint32_t index;
-    CChainVersion *chainVersion;
+    char *nonce;
+    char *gasPrice;
+    char *gasLimit;
+    uint32_t decimal;
     char *extData;
-    char *password;
-} CTransferPayload;
+} CEthTransferPayload;
 
-typedef struct CRawTxParam {
+typedef struct CEthRawTxPayload {
+    char *fromAddress;
     char *rawTx;
-    char *walletId;
+} CEthRawTxPayload;
+
+typedef struct CInitParameters {
+    CDbName *dbName;
+    char *contextNote;
+} CInitParameters;
+
+typedef struct CCreateWalletParameters {
+    char *name;
     char *password;
-} CRawTxParam;
+    char *mnemonic;
+    char *walletType;
+} CCreateWalletParameters;
 
 #define CFalse 1
 
@@ -244,6 +271,89 @@ typedef struct CRawTxParam {
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
+
+const CError *ChainEee_updateSyncRecord(CContext *ctx, char *netType, CAccountInfoSyncProg *syncRecord);
+
+const CError *ChainEee_getSyncRecord(CContext *ctx, char *netType, char *account, CAccountInfoSyncProg **syncRecord);
+
+const CError *ChainEee_decodeAccountInfo(CContext *ctx, char *netType, CDecodeAccountInfoParameters *parameters, CAccountInfo **accountInfo);
+
+const CError *ChainEee_getStorageKey(CContext *ctx, char *netType, CStorageKeyParameters *parameters, char **key);
+
+const CError *ChainEee_eeeTransfer(CContext *ctx, char *netType, CEeeTransferPayload *transferPayload, char **signedResult);
+
+const CError *ChainEee_tokenXTransfer(CContext *ctx, char *netType, CEeeTransferPayload *transferPayload, char **signedResult);
+
+const CError *ChainEee_txSubmittableSign(CContext *ctx, char *netType, CRawTxParam *rawTx, char **signedResult);
+
+const CError *ChainEee_txSign(CContext *ctx, char *netType, CRawTxParam *rawTx, char **signedResult);
+
+const CError *ChainEee_updateBasicInfo(CContext *ctx, char *netType, CSubChainBasicInfo *basicInfo);
+
+const CError *ChainEee_getBasicInfo(CContext *ctx, char *netType, CChainVersion *chainVersion, CSubChainBasicInfo **basicInfo);
+
+/**
+ * alloc ** [parameters::CContext]
+ */
+CContext **CContext_dAlloc(void);
+
+/**
+ * free ** [parameters::CContext]
+ */
+void CContext_dFree(CContext **dPtr);
+
+/**
+ * alloc ** [CArray]
+ */
+CArrayCContext **CArrayCContext_dAlloc(void);
+
+void CArrayCContext_dFree(CArrayCContext **dPtr);
+
+void CStr_dFree(char **dcs);
+
+char **CStr_dAlloc(void);
+
+void CBool_dFree(CBool **dcs);
+
+CBool **CBool_dAlloc(void);
+
+void CError_free(CError *error);
+
+CWallet **CWallet_dAlloc(void);
+
+void CWallet_dFree(CWallet **dPtr);
+
+CArrayCWallet **CArrayCWallet_dAlloc(void);
+
+void CArrayCWallet_dFree(CArrayCWallet **dPtr);
+
+CDbName **CDbName_dAlloc(void);
+
+void CDbName_dFree(CDbName **dPtr);
+
+CArrayI64 **CArrayInt64_dAlloc(void);
+
+void CArrayInt64_dFree(CArrayI64 **dPtr);
+
+CAccountInfoSyncProg **CAccountInfoSyncProg_dAlloc(void);
+
+CAccountInfo **CAccountInfo_dAlloc(void);
+
+void CAccountInfo_dFree(CAccountInfo **dPtr);
+
+CSubChainBasicInfo **CSubChainBasicInfo_dAlloc(void);
+
+void CSubChainBasicInfo_dFree(CSubChainBasicInfo **dPtr);
+
+CArrayCChar **CArrayStr_dAlloc(void);
+
+void CArrayStr_dFree(CArrayCChar **dPtr);
+
+const CError *ChainEth_decodeAdditionData(CContext *ctx, char *encodeData, char **additionData);
+
+const CError *ChainEth_txSign(CContext *ctx, char *netType, CEthTransferPayload *txPayload, char *password, char **signResult);
+
+const CError *ChainEth_rawTxSign(CContext *ctx, char *netType, CEthRawTxPayload *rawTxPayload, char *password, char **signResult);
 
 /**
  * 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名
@@ -319,79 +429,6 @@ const CError *Wallets_currentWalletChain(CContext *ctx, char **walletId, char **
  *保存当前wallet 与 chain
  */
 const CError *Wallets_saveCurrentWalletChain(CContext *ctx, char *walletId, char *chainType);
-
-/**
- * alloc ** [parameters::CContext]
- */
-CContext **CContext_dAlloc(void);
-
-/**
- * free ** [parameters::CContext]
- */
-void CContext_dFree(CContext **dPtr);
-
-/**
- * alloc ** [CArray]
- */
-CArrayCContext **CArrayCContext_dAlloc(void);
-
-void CArrayCContext_dFree(CArrayCContext **dPtr);
-
-void CStr_dFree(char **dcs);
-
-char **CStr_dAlloc(void);
-
-void CBool_dFree(CBool **dcs);
-
-CBool **CBool_dAlloc(void);
-
-void CError_free(CError *error);
-
-CWallet **CWallet_dAlloc(void);
-
-void CWallet_dFree(CWallet **dPtr);
-
-CArrayCWallet **CArrayCWallet_dAlloc(void);
-
-void CArrayCWallet_dFree(CArrayCWallet **dPtr);
-
-CDbName **CDbName_dAlloc(void);
-
-void CDbName_dFree(CDbName **dPtr);
-
-CArrayI64 **CArrayInt64_dAlloc(void);
-
-void CArrayInt64_dFree(CArrayI64 **dPtr);
-
-CAccountInfoSyncProg **CAccountInfoSyncProg_dAlloc(void);
-
-CAccountInfo **CAccountInfo_dAlloc(void);
-
-void CAccountInfo_dFree(CAccountInfo **dPtr);
-
-CSubChainBasicInfo **CSubChainBasicInfo_dAlloc(void);
-
-void CSubChainBasicInfo_dFree(CSubChainBasicInfo **dPtr);
-
-const CError *ChainEee_updateSyncRecord(CContext *ctx, char *netType, CAccountInfoSyncProg *syncRecord);
-
-const CError *ChainEee_getSyncRecord(CContext *ctx, char *netType, char *account, CAccountInfoSyncProg **syncRecord);
-
-const CError *ChainEee_decodeAccountInfo(CContext *ctx, char *netType, CDecodeAccountInfoParameters *parameters, CAccountInfo **accountInfo);
-
-const CError *ChainEee_getStorageKey(CContext *ctx, char *netType, CStorageKeyParameters *parameters, char **key);
-
-const CError *ChainEee_eeeTransfer(CContext *ctx, char *netType, CTransferPayload *transferPayload, char **signedResult);
-
-const CError *ChainEee_tokenXTransfer(CContext *ctx, char *netType, CTransferPayload *transferPayload, char **signedResult);
-
-const CError *ChainEee_txSubmittableSign(CContext *ctx, char *netType, CRawTxParam *rawTx, char **signedResult);
-
-const CError *ChainEee_txSign(CContext *ctx, char *netType, CRawTxParam *rawTx, char **signedResult);
-
-const CError *ChainEee_updateBasicInfo(CContext *ctx, char *netType, CSubChainBasicInfo *basicInfo);
-
-const CError *ChainEee_getBasicInfo(CContext *ctx, char *netType, CChainVersion *chainVersion, CSubChainBasicInfo **basicInfo);
 
 #ifdef __cplusplus
 } // extern "C"

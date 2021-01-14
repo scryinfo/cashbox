@@ -47,70 +47,101 @@ extension StringEx on String {
     return toUtf8Null(this);
   }
 }
-
+extension Utf8DoublePtrEx on Pointer<Pointer<ffi.Utf8>> {
+  void free(int len) {
+    for(var i = 0; i < len; i++){
+      Pointer<ffi.Utf8> el = this.elementAt(i).value;
+      el.free();
+      this.elementAt(i).value = nullptr;
+    }
+    ffi.free(this);
+  }
+}
 extension Utf8PtrEx on Pointer<ffi.Utf8> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension Int8PtrEx on Pointer<Int8> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension Int16PtrEx on Pointer<Int16> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension Int32PtrEx on Pointer<Int32> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension Int64PtrEx on Pointer<Int64> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension Uint8PtrEx on Pointer<Uint8> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension Uint16PtrEx on Pointer<Uint16> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension Uint32PtrEx on Pointer<Uint32> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension Uint64PtrEx on Pointer<Uint64> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension FloatPtrEx on Pointer<Float> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 
 extension DoublePtrEx on Pointer<Double> {
   void free() {
-    ffi.free(this);
+    if(this != null && this !=  nullptr && this.address != 0) {
+      ffi.free(this);
+    }
   }
 }
 

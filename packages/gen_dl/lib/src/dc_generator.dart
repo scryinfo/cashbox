@@ -68,11 +68,9 @@ import 'kits.dart';
     List<_FieldMeta> fieldMetas = [];
     for (var f in c.fields) {
       if (typePointer.isExactly(f.type.element)) {
-        var parameterized = f.type as ParameterizedType;
-        if (parameterized != null &&
-            parameterized.typeArguments != null &&
-            parameterized.typeArguments.isNotEmpty) {
-          var first = parameterized.typeArguments.first;
+        var parameterized = (f.type as ParameterizedType)?.typeArguments;
+        if (parameterized != null && parameterized.isNotEmpty) {
+          var first = parameterized.first;
           if (typeUtf8.isExactly(first.element)) {
             fieldMetas
                 .add(_FieldMeta(_FieldType.string, f.name, first.element.name));
@@ -223,9 +221,14 @@ ${toDart.toString()}  }''');
 
     ClassElement el;
     bool nativeType = false;
+    bool nativeTypeArray = false;
+    StringBuffer free = new StringBuffer();
+    StringBuffer toC = new StringBuffer();
+    StringBuffer toDart = new StringBuffer();
     {
       var typePointer = TypeChecker.fromRuntime(Pointer);
       var typeStruct = TypeChecker.fromRuntime(Struct);
+      var typeUtf8 = TypeChecker.fromRuntime(ffi.Utf8);
       for (var f in c.fields) {
         if (f.name == ArrayLen) {
           ;
@@ -233,14 +236,22 @@ ${toDart.toString()}  }''');
           ;
         } else if (f.name == ArrayPtr) {
           if (typePointer.isExactly(f.type.element)) {
-            var parameterized = f.type as ParameterizedType;
-            if (parameterized != null &&
-                parameterized.typeArguments != null &&
-                parameterized.typeArguments.isNotEmpty) {
-              var first = parameterized.typeArguments.first;
+            var parameterized = (f.type as ParameterizedType)?.typeArguments;
+            var first = parameterized != null && parameterized.isNotEmpty
+                ? parameterized.first
+                : null;
+            if (first != null) {
+              parameterized = (first as ParameterizedType)?.typeArguments;
+              var firstFirst = parameterized != null && parameterized.isNotEmpty
+                  ? parameterized.first
+                  : null;
               if (typeStruct.isExactly(
                   (first.element as ClassElement).supertype.element)) {
                 el = first.element as ClassElement;
+              } else if (typePointer.isExactly(first.element) &&
+                  typeUtf8.isExactly(firstFirst?.element)) {
+                el = first.element as ClassElement;
+                nativeTypeArray = true;
               } else {
                 nativeType = true;
                 el = first.element as ClassElement;
@@ -256,6 +267,13 @@ ${toDart.toString()}  }''');
     }
 
     var elName = !nativeType ? toClassName(el.name) : mapNativeType(el.name);
+    var elNameAllocate = el.name;
+    if (nativeTypeArray) {
+      elName = "String";
+      elNameAllocate = "Pointer<ffi.Utf8>";
+    } else if (!nativeType) {
+      elNameAllocate = "clib." + elNameAllocate;
+    }
     var className = toClassName(c.name);
     classCode.writeln('''class ${className} extends DC<clib.${c.name}>{
   List<$elName> data;
@@ -268,7 +286,8 @@ ${toDart.toString()}  }''');
     if (ptr == null || ptr == nullptr) {
       return;
     }
-    ${nativeType ? "ffi.free(ptr.ref.ptr)" : elName + ".free(ptr.ref.ptr)"};
+    ${nativeType ? "ptr.ref.ptr.free()" : (nativeTypeArray ? "ptr.ref.ptr.free(ptr.ref.len)" : elName + ".free(ptr.ref.ptr)")};
+    ptr.ref.ptr = nullptr;
     ffi.free(ptr);
   }
   
@@ -294,13 +313,14 @@ ${toDart.toString()}  }''');
       return;
     }
     if (c.ref.ptr != nullptr && c.ref.ptr != null) {
-      ${nativeType ? "ffi.free(c.ref.ptr)" : elName + ".free(c.ref.ptr)"};
+      ${nativeType ? "c.ref.ptr.free()" : (nativeTypeArray ? "c.ref.ptr.free(c.ref.len)" : elName + ".free(c.ref.ptr)")};
+      c.ref.ptr = nullptr;
     }
-    c.ref.ptr = allocateZero<${nativeType ? "" : "clib."}${el.name}>(count : data.length);
+    c.ref.ptr = allocateZero<${elNameAllocate}>(count : data.length);
     c.ref.len = data.length;
     c.ref.cap = data.length;
     for (var i = 0; i < data.length;i++) {
-      ${nativeType ? "c.ref.ptr.elementAt(i).value = data[i];" : "data[i].toC(c.ref.ptr.elementAt(i));"}
+      ${nativeType ? "c.ref.ptr.elementAt(i).value = data[i]" : (nativeTypeArray ? "c.ref.ptr.elementAt(i).value = data[i].toCPtr()" : "data[i].toC(c.ref.ptr.elementAt(i))")};
     }
   }
 
@@ -311,7 +331,7 @@ ${toDart.toString()}  }''');
     }
     data = new List<$elName>(c.ref.len);
     for (var i = 0; i < data.length;i++) {
-      ${nativeType ? "data[i] = c.ref.ptr.elementAt(i).value;" : "data[i].toDart(c.ref.ptr.elementAt(i));"}
+      ${nativeType ? "data[i] = c.ref.ptr.elementAt(i).value" : (nativeTypeArray ? "data[i] = fromUtf8Null(c.ref.ptr.elementAt(i).value)" : "data[i].toDart(c.ref.ptr.elementAt(i))")};
     }
   }
 }

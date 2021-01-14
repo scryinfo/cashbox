@@ -51,7 +51,7 @@ class ReFreshParameter {
   }
 }
 
-// see: grpc-2.8.0/lib/src/client/channel.dart
+// see: grpc-2.8.0/lib/src/client/channel.dart ClientChannelBase
 // 增加功能，当连接出错时，刷新服务地址
 class ClientTransportChannel  implements $channel.ClientChannel {
   // TODO(jakobr): Multiple connections, load balancing.
