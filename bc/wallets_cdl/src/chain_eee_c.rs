@@ -347,3 +347,8 @@ pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+#[no_mangle]
+pub unsafe extern "C" fn ChainEee_updateAuthDigitList(ctx: *mut CContext, netType: *mut c_char, basicInfo: *mut CSubChainBasicInfo) -> *const CError {
+
+    unimplemented!()
+}

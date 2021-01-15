@@ -40,7 +40,7 @@ impl Load for BtcChainTokenShared {
     type MType = MBtcChainTokenShared;
     async fn load(&mut self, _: &dyn ContextTrait, m: Self::MType) -> Result<(), WalletError> {
         self.m = m;
-        self.token_shared.m = self.m.token_shared.clone();
+       // self.token_shared.m = self.m.token_shared.clone();
         Ok(())
     }
 }
@@ -116,7 +116,7 @@ impl Load for BtcChain {
         self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
 
         {//load token
-            let rb = context.db().wallets_db();
+            let rb = context.db().data_db( &NetType::from(&mw.net_type));
             let mut wrapper = rb.new_wrapper();
             wrapper.eq(MBtcChainToken::wallet_id, mw.id.clone()).eq(MBtcChainToken::chain_type, self.chain_shared.chain_type.clone());
             let ms = MBtcChainToken::list_by_wrapper(&rb, "", &wrapper).await?;

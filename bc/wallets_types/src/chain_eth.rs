@@ -5,7 +5,7 @@ use mav::{ChainType, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
 use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MWallet};
 
-use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, TokenShared, WalletError};
+use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 
 #[derive(Debug, Default)]
 pub struct EthChainToken {
@@ -31,7 +31,7 @@ impl Load for EthChainToken {
 #[derive(Debug, Default)]
 pub struct EthChainTokenShared {
     pub m: MEthChainTokenShared,
-    pub token_shared: TokenShared,
+    //pub token_shared: TokenShared,
 }
 deref_type!(EthChainTokenShared,MEthChainTokenShared);
 
@@ -40,7 +40,7 @@ impl Load for EthChainTokenShared {
     type MType = MEthChainTokenShared;
     async fn load(&mut self, _: &dyn ContextTrait, m: Self::MType) -> Result<(), WalletError> {
         self.m = m;
-        self.token_shared.m = self.m.token_shared.clone();
+        //self.token_shared.m = self.m.token_shared.clone();
         Ok(())
     }
 }
@@ -125,7 +125,8 @@ impl Load for EthChain {
         self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
 
         {//load token
-            let rb = context.db().wallets_db();
+
+            let rb = context.db().data_db( &NetType::from(&mw.net_type));
             let mut wrapper = rb.new_wrapper();
             wrapper.eq(MEthChainToken::wallet_id, mw.id.clone()).eq(MEthChainToken::chain_type, self.chain_shared.chain_type.clone());
             let ms = MEthChainToken::list_by_wrapper(&rb, "", &wrapper).await?;

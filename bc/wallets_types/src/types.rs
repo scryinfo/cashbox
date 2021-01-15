@@ -8,11 +8,12 @@ pub struct Address {
 }
 deref_type!(Address,MAddress);
 
-#[derive(Debug, Clone, Default)]
-pub struct TokenShared {
-    pub m: MTokenShared
-}
-deref_type!(TokenShared,MTokenShared);
+pub type TokenShared = MTokenShared;
+// #[derive(Debug, Clone, Default)]
+// pub struct TokenShared {
+//     pub m: MTokenShared
+// }
+// deref_type!(TokenShared,MTokenShared);
 
 #[derive(Debug, Clone, Default)]
 pub struct ChainShared {

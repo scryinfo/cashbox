@@ -5,7 +5,7 @@ use std::os::raw::c_char;
 
 use crate::kits::{d_ptr_alloc, d_ptr_free, CArray, CBool, CStruct};
 use crate::parameters::{CAccountInfo, CContext, CDbName};
-use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet};
+use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet, CEthChainTokenDefault};
 
 /// alloc ** [parameters::CContext]
 #[no_mangle]
@@ -146,5 +146,14 @@ pub unsafe extern "C" fn CArrayCChar_dFree(dPtr: *mut *mut CArray<*mut c_char>) 
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
 }
+#[no_mangle]
+pub extern "C" fn CArrayCEthChainTokenDefault_dAlloc() -> *mut *mut CArray<CEthChainTokenDefault> {
+    d_ptr_alloc()
+}
 
+#[no_mangle]
+pub unsafe extern "C" fn CArrayCEthChainTokenDefault_dFree(dPtr: *mut *mut CArray<CEthChainTokenDefault>) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
 // alloc free end
