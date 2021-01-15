@@ -118,6 +118,12 @@ pub struct MBlockHeader{
     #[serde(default)]
     pub timestamp: String,
 }
+
+impl MBlockHeader {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_block_header.sql")
+    }
+}
 //btc end
 
 

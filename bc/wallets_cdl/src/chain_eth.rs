@@ -17,11 +17,19 @@ pub struct CEthChainToken {
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthChainTokenShared {
     pub tokenShared: *mut CTokenShared,
+    pub tokenType: *mut c_char,
 }
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthChainTokenDefault {
+    pub chainTokenSharedId: *mut c_char,
+    pub netType: *mut c_char,
+    pub position: i64,
+    pub contractAddress: *mut c_char,
+    pub gasLimit: i64,
+    pub gasPrice: *mut c_char,
+    pub decimal: i32,
     pub ethChainTokenShared: *mut CEthChainTokenShared,
 }
 

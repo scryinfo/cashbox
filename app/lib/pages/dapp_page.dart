@@ -68,6 +68,7 @@ class Message {
 class _DappPageState extends State<DappPage> {
   WebViewController _controller;
   Wallet nowWallet;
+  final cookieManager = new CookieManager();
 
   Future<String> _loadDappUrl() async {
     Config config = await HandleConfig.instance.getConfig();
@@ -91,11 +92,12 @@ class _DappPageState extends State<DappPage> {
                     margin: EdgeInsets.only(top: ScreenUtil().setHeight(4.5)),
                     child: WebView(
                       // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
-                      initialUrl:"http://192.168.2.57:9010/web_app/dapp/dapp.html",
+                      // initialUrl:"http://192.168.2.57:9010/web_app/dapp/dapp.html",
                       //initialUrl:"file:///android_asset/flutter_assets/assets/dist/index.html",
                       // initialUrl: "http://192.168.2.97:8080",
+                      // initialUrl: "http://192.168.2.12:9690/dapp.html#/",
                       // initialUrl: "http://59.110.231.223:9010/web_app/dapp/dapp.html#/",
-                      // initialUrl: snapshot.data.toString(),
+                      initialUrl: snapshot.data.toString(),
                       javascriptMode: JavascriptMode.unrestricted,
                       userAgent:
                           "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
@@ -614,6 +616,12 @@ class _DappPageState extends State<DappPage> {
   Future<String> callPromise(Message msg) {
     String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
     return _controller?.evaluateJavascript(call);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    cookieManager.clearCookies();
   }
 }
 

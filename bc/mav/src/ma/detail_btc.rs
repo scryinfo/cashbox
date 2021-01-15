@@ -112,6 +112,12 @@ pub struct MUserAddress {
     pub compressed_pub_key: String,
 }
 
+impl MUserAddress {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_user_address.sql")
+    }
+}
+
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MTxInput {
@@ -127,6 +133,12 @@ pub struct MTxInput {
     pub sequence: u32,
 }
 
+impl MTxInput {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_tx_input.sql")
+    }
+}
+
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MTxOutput {
@@ -140,6 +152,12 @@ pub struct MTxOutput {
     pub vin: String,
 }
 
+impl MTxOutput {
+    pub const fn create_table_script() -> &'static str{
+        std::include_str!("../../../sql/m_tx_output.sql")
+    }
+}
+
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MProgress {
@@ -147,6 +165,12 @@ pub struct MProgress {
     pub header: String,
     #[serde(default)]
     pub timestamp: String,
+}
+
+impl MProgress{
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_progress.sql")
+    }
 }
 
 #[db_append_shared]
@@ -160,6 +184,12 @@ pub struct MLocalTxLog {
     pub value: String,
     #[serde(default)]
     pub status: String,
+}
+
+impl MLocalTxLog {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_local_tx_log.sql")
+    }
 }
 //murmel end
 //btc end

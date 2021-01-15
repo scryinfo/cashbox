@@ -1,13 +1,15 @@
 use std::ptr::null_mut;
 use mav::kits;
-use wallets_types::{InitParameters, Error, EthRawTxPayload, EthTransferPayload};
+use wallets_types::{InitParameters, Error, EthRawTxPayload, EthTransferPayload, EthChainTokenDefault, EthChainTokenShared, TokenShared};
 
-use wallets_cdl::{CU64, chain_eth_c, to_c_char,CR,CStruct,
-                  parameters::{CContext, CInitParameters,CEthTransferPayload,CEthRawTxPayload},
+use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
+                  parameters::{CContext, CInitParameters, CEthTransferPayload, CEthRawTxPayload},
                   mem_c::{CContext_dAlloc, CError_free},
                   types::CError,
                   wallets_c::Wallets_init,
 };
+use wallets_cdl::mem_c::CArrayCContext_dFree;
+use mav::ma::{EthTokenType};
 
 #[test]
 fn eth_tx_sign_test() {
@@ -18,7 +20,7 @@ fn eth_tx_sign_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
-        let transfer_tx = EthTransferPayload{
+        let transfer_tx = EthTransferPayload {
             from_address: "0xfc7c721f7ca42c5b9b7485d8efffc453d725499e".to_string(),
             to_address: "0x00a329c0648769a73afac7f9381e08fb43dbea72".to_string(),
             contract_address: "".to_string(),
@@ -28,10 +30,10 @@ fn eth_tx_sign_test() {
             gas_limit: "21000".to_string(),
             decimal: 18,
             ext_data: "".to_string(),
-            password: "1".to_string()
+            password: "1".to_string(),
         };
         let mut c_transfer_tx = CEthTransferPayload::to_c_ptr(&transfer_tx);
-        let c_err = chain_eth_c::ChainEth_txSign(*c_ctx, to_c_char("Private"), c_transfer_tx, to_c_char("1"),sign_result) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_txSign(*c_ctx, to_c_char("Private"), c_transfer_tx, to_c_char("1"), sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_transfer_tx.free();
@@ -49,12 +51,12 @@ fn eth_raw_tx_sign_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
-        let raw_tx_payload = EthRawTxPayload{
+        let raw_tx_payload = EthRawTxPayload {
             from_address: "0xfc7c721f7ca42c5b9b7485d8efffc453d725499e".to_string(),
-            raw_tx: "".to_string()
+            raw_tx: "".to_string(),
         };
         let mut c_raw_tx_payload = CEthRawTxPayload::to_c_ptr(&raw_tx_payload);
-        let c_err = chain_eth_c::ChainEth_rawTxSign(*c_ctx,to_c_char("Private"),c_raw_tx_payload,to_c_char("1"),sign_result) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_rawTxSign(*c_ctx, to_c_char("Private"), c_raw_tx_payload, to_c_char("1"), sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_raw_tx_payload.free();
@@ -77,6 +79,62 @@ fn eth_decode_addition_data_test() {
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         wallets_cdl::mem_c::CStr_dFree(addition_data);
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+
+#[test]
+fn eth_update_default_token_list_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        //CEthChainTokenDefault
+        let mut default_tokens = Vec::new();
+        {
+            let mut eth = EthChainTokenDefault::default();
+            eth.net_type = "Private".to_string();
+            eth.eth_chain_token_shared.m.token_type = EthTokenType::Eth.to_string();
+            eth.m.contract_address = "".to_owned();
+            eth.m.decimal = 18;
+            eth.m.gas_limit = 0; //todo
+            eth.m.gas_price = "".to_owned(); //todo
+
+            eth.eth_chain_token_shared.m.token_shared.name = "Ethereum".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.symbol = "ETH".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.logo_url = "".to_owned();//todo
+            eth.eth_chain_token_shared.m.token_shared.logo_bytes = "".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.project_name = "ethereum".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.project_home = "https://ethereum.org/zh/".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.project_note = "Ethereum is a global, open-source platform for decentralized applications.".to_owned();
+            default_tokens.push(eth);
+        }
+        {
+            let mut ddd = EthChainTokenDefault::default();
+            ddd.net_type = "Main".to_string();
+            ddd.eth_chain_token_shared.m.token_type = EthTokenType::Erc20.to_string();
+            ddd.m.contract_address = "0xcc638fca332190b63be1605baefde1df0b3b026e".to_owned();
+            ddd.m.decimal = 18;
+            ddd.m.gas_limit = 0; //todo
+            ddd.m.gas_price = "".to_owned(); //todo
+
+            ddd.eth_chain_token_shared.m.token_shared.name = "DDD".to_owned();
+            ddd.eth_chain_token_shared.m.token_shared.symbol = "DDD".to_owned();
+            ddd.eth_chain_token_shared.m.token_shared.logo_url = "".to_owned();//todo
+            ddd.eth_chain_token_shared.m.token_shared.logo_bytes = "".to_owned();
+            ddd.eth_chain_token_shared.m.token_shared.project_name = "scryinfo".to_owned();
+            ddd.eth_chain_token_shared.m.token_shared.project_home = "https://scry.info/".to_owned();
+            ddd.eth_chain_token_shared.m.token_shared.project_note = "SCRY.INFO is an open source blockchain data protocol layer, oracle of the blockchain world, cornerstone of data smart contract applications.".to_owned();
+            default_tokens.push(ddd);
+        }
+
+        let mut c_tokens = CArray::to_c_ptr(&default_tokens);
+        let c_err = chain_eth_c::ChainEth_updateDefaultTokenList(*c_ctx, c_tokens) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        c_tokens.free();
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }

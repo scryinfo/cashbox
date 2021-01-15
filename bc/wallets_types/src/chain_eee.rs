@@ -41,7 +41,7 @@ impl Load for EeeChainTokenShared {
     type MType = MEeeChainTokenShared;
     async fn load(&mut self, _: &dyn ContextTrait, m: Self::MType) -> Result<(), WalletError> {
         self.m = m;
-        self.token_shared.m = self.m.token_shared.clone();
+        //self.token_shared.m = self.m.token_shared.clone();
         Ok(())
     }
 }
@@ -119,7 +119,7 @@ impl Load for EeeChain {
         self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
 
         {//load token
-            let rb = context.db().wallets_db();
+            let rb = context.db().data_db( &NetType::from(&mw.net_type));
             let mut wrapper = rb.new_wrapper();
             wrapper.eq(MEeeChainToken::wallet_id, mw.id.clone()).eq(MEeeChainToken::chain_type, self.chain_shared.chain_type.clone());
             let ms = MEeeChainToken::list_by_wrapper(&rb, "", &wrapper).await?;

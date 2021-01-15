@@ -51,19 +51,19 @@ impl DbName {
             } else { names.cashbox_wallets.clone() },
             cashbox_mnemonic: if names.cashbox_mnemonic.is_empty() {
                 format!("{}{}{}", path, pre, DbNameType::cashbox_mnemonic.to_string())
-            }else{names.cashbox_mnemonic.clone()},
-            wallet_mainnet: if names.wallet_mainnet.is_empty(){
+            } else { names.cashbox_mnemonic.clone() },
+            wallet_mainnet: if names.wallet_mainnet.is_empty() {
                 format!("{}{}{}", path, pre, DbNameType::wallet_mainnet.to_string())
-            }else{names.wallet_mainnet.clone()},
-            wallet_private: if names.wallet_private.is_empty(){
+            } else { names.wallet_mainnet.clone() },
+            wallet_private: if names.wallet_private.is_empty() {
                 format!("{}{}{}", path, pre, DbNameType::wallet_private.to_string())
-            }else{names.wallet_private.clone()},
-            wallet_testnet: if names.wallet_testnet.is_empty(){
+            } else { names.wallet_private.clone() },
+            wallet_testnet: if names.wallet_testnet.is_empty() {
                 format!("{}{}{}", path, pre, DbNameType::wallet_testnet.to_string())
-            }else{names.wallet_testnet.clone()},
-            wallet_testnet_private: if names.wallet_testnet_private.is_empty(){
+            } else { names.wallet_testnet.clone() },
+            wallet_testnet_private: if names.wallet_testnet_private.is_empty() {
                 format!("{}{}{}", path, pre, DbNameType::wallet_testnet_private.to_string())
-            }else{names.wallet_testnet_private.clone()},
+            } else { names.wallet_testnet_private.clone() },
         }
     }
 
@@ -233,15 +233,12 @@ impl Db {
         Db::create_table(rb, MChainTypeMeta::create_table_script(), &MChainTypeMeta::table_name(), create_type).await?;
         Db::create_table(rb, MAddress::create_table_script(), &MAddress::table_name(), create_type).await?;
         Db::create_table(rb, MSetting::create_table_script(), &MSetting::table_name(), create_type).await?;
-        // Db::create_table(rb, MEthChainToken::create_table_script(), &MEthChainToken::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainTokenShared::create_table_script(), &MEthChainTokenShared::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainTokenAuth::create_table_script(), &MEthChainTokenAuth::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainTokenDefault::create_table_script(), &MEthChainTokenDefault::table_name(), create_type).await?;
-        // Db::create_table(rb, MEeeChainToken::create_table_script(), &MEeeChainToken::table_name(), create_type).await?;
         Db::create_table(rb, MEeeChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), create_type).await?;
         Db::create_table(rb, MEeeChainTokenAuth::create_table_script(), &MEeeChainTokenAuth::table_name(), create_type).await?;
         Db::create_table(rb, MEeeChainTokenDefault::create_table_script(), &MEeeChainTokenDefault::table_name(), create_type).await?;
-        // Db::create_table(rb, MBtcChainToken::create_table_script(), &MBtcChainToken::table_name(), create_type).await?;
         Db::create_table(rb, MBtcChainTokenShared::create_table_script(), &MBtcChainTokenShared::table_name(), create_type).await?;
         Db::create_table(rb, MBtcChainTokenAuth::create_table_script(), &MBtcChainTokenAuth::table_name(), create_type).await?;
         Db::create_table(rb, MBtcChainTokenDefault::create_table_script(), &MBtcChainTokenDefault::table_name(), create_type).await?;
@@ -270,10 +267,6 @@ impl Db {
             let token_shared = {
                 let mut eth = MEthChainTokenShared::default();
                 eth.token_type = EthTokenType::Eth.to_string();
-                eth.contract_address = "".to_owned();
-                eth.decimal = 18;
-                eth.gas_limit = 0; //todo
-                eth.gas_price = "".to_owned(); //todo
 
                 eth.token_shared.name = "Ethereum".to_owned();
                 eth.token_shared.symbol = "ETH".to_owned();
@@ -306,6 +299,10 @@ impl Db {
                         token_default.net_type = net_type.to_string();
                         token_default.chain_token_shared_id = token_shared.id.clone();
                         token_default.position = 0;
+                        token_default.contract_address = "".to_owned();
+                        token_default.decimal = 18;
+                        token_default.gas_limit = 0; //todo
+                        token_default.gas_price = "".to_owned(); //todo
                         token_default.save(rb, "").await?;
                     }
                 }

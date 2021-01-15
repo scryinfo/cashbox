@@ -51,6 +51,5 @@ pub mod ping;
 pub mod timeout;
 pub mod walletlib;
 pub mod path;
-pub mod moudle;
 
 pub use error::Error;
