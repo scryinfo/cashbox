@@ -2,12 +2,10 @@ import 'package:services/services.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('A group of tests', () {
-    setUp(() {
+  group('ReFreshParameter', () {
+    setUp(() {});
 
-    });
-
-    test('First Test', () async {
+    test('ReFreshParameter - ReFreshParameter', () async {
       var refresh = ReFreshParameter(ConnectParameter("host", 100), (p) async {
         return ConnectParameter("new", 200);
       });
@@ -16,7 +14,7 @@ void main() {
       refresh.refreshParameter();
       var parameter = refresh.connectParameter;
       expect(true, parameter == null);
-      await ()async{};
+      await () async {};
       parameter = refresh.connectParameter;
       expect(true, parameter != null);
 
