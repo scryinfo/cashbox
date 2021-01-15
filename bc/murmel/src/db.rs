@@ -4,18 +4,19 @@
 //!     2. for user data (utxo address ...)
 //!
 use crate::path::{BTC_CHAIN_PATH, BTC_DETAIL_PATH};
-use crate::moudle::chain::MBlockHeader;
-use crate::moudle::detail::{MLocalTx, MProgress, MTxInput, MTxOutput, MUserAddress};
 use async_trait::async_trait;
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, info};
+use mav::ma::{Dao, MBlockHeader};
+use mav::ma::{MLocalTxLog, MProgress, MTxInput, MTxOutput, MUserAddress};
 use once_cell::sync::Lazy;
 use rbatis::crud::CRUD;
 use rbatis::plugin::page::{IPage, Page, PageRequest};
 use rbatis::rbatis::Rbatis;
+use rbatis_core::Error;
 use std::ops::Add;
 
 pub struct ChainSqlite {
@@ -25,9 +26,8 @@ pub struct ChainSqlite {
 
 impl ChainSqlite {
     pub fn new(network: Network, db_file_name: &str) -> Self {
-        let sql = MBlockHeader::SQL;
         let rb = block_on(Self::init_rbatis(db_file_name));
-        let r = block_on(rb.exec("", sql));
+        let r = block_on(rb.exec("", MBlockHeader::create_table_script()));
         match r {
             Ok(a) => {
                 info!("{:?}", a);
@@ -40,14 +40,12 @@ impl ChainSqlite {
     }
 
     pub fn save_header(&self, header: String, timestamp: String) {
-        let block_header = MBlockHeader {
-            id: None,
-            header,
-            scanned: "0".to_string(),
-            timestamp,
-        };
+        let mut block_header = MBlockHeader::default();
+        block_header.scanned = "0".to_owned();
+        block_header.header = header;
+        block_header.timestamp = timestamp;
 
-        let r = block_on(self.rb.save("", &block_header));
+        let r = block_on(block_header.save(&self.rb, ""));
         match r {
             Ok(a) => {
                 debug!("{:?}", a);
@@ -124,13 +122,9 @@ impl ChainSqlite {
         LIMIT 1;
         "#;
         let r: Result<MBlockHeader, _> = block_on(self.rb.py_fetch("", py, &""));
-        if let Ok(r) = r {
-            match r.id {
-                Some(id) => id,
-                _ => 0,
-            }
-        } else {
-            return 0;
+        match r {
+            Ok(r) => r.id.parse::<u64>().unwrap(),
+            Err(_) => 0,
         }
     }
 
@@ -167,8 +161,7 @@ impl DetailSqlite {
     }
 
     fn create_user_address(rb: &Rbatis) {
-        let sql = MUserAddress::SQL;
-        let r = block_on(rb.exec("", sql));
+        let r = block_on(rb.exec("", MUserAddress::create_table_script()));
         match r {
             Ok(a) => {
                 debug!("create_user_address {:?}", a);
@@ -180,8 +173,7 @@ impl DetailSqlite {
     }
 
     fn create_tx_input(rb: &Rbatis) {
-        let sql = MTxInput::SQL;
-        let r = block_on(rb.exec("", sql));
+        let r = block_on(rb.exec("", MTxInput::create_table_script()));
         match r {
             Ok(a) => {
                 debug!("create_tx_input {:?}", a);
@@ -193,8 +185,7 @@ impl DetailSqlite {
     }
 
     fn create_tx_output(rb: &Rbatis) {
-        let sql = MTxOutput::SQL;
-        let r = block_on(rb.exec("", sql));
+        let r = block_on(rb.exec("", MTxOutput::create_table_script()));
         match r {
             Ok(a) => {
                 debug!("create_tx_output {:?}", a);
@@ -206,8 +197,7 @@ impl DetailSqlite {
     }
 
     fn create_progress(rb: &Rbatis) {
-        let sql = MProgress::SQL;
-        let r = block_on(rb.exec("", sql));
+        let r = block_on(rb.exec("", MProgress::create_table_script()));
         match r {
             Ok(a) => {
                 debug!("create_progress {:?}", a);
@@ -219,8 +209,7 @@ impl DetailSqlite {
     }
 
     fn create_local_tx(rb: &Rbatis) {
-        let sql = MLocalTx::SQL;
-        let r = block_on(rb.exec("", sql));
+        let r = block_on(rb.exec("", MLocalTxLog::create_table_script()));
         match r {
             Ok(a) => {
                 debug!("create_local_tx {:?}", a);
@@ -232,12 +221,11 @@ impl DetailSqlite {
     }
 
     fn save_progress(&self, header: String, timestamp: String) {
-        let progress = MProgress {
-            id: None,
-            header,
-            timestamp,
-        };
-        let r = block_on(self.rb.save("", &progress));
+        let mut progress = MProgress::default();
+        progress.header = header;
+        progress.timestamp = timestamp;
+
+        let r = block_on(progress.save(&self.rb, ""));
         match r {
             Ok(a) => {
                 debug!("save_progress {:?}", a);
@@ -249,7 +237,7 @@ impl DetailSqlite {
     }
 
     fn fetch_progress(&self) -> Option<MProgress> {
-        let r: Result<Option<MProgress>, _> = block_on(self.rb.fetch_by_id("", &1u64));
+        let r: Result<Option<MProgress>, _> = block_on(self.rb.fetch_by_id("", &"1".to_owned()));
         match r {
             Ok(p) => p,
             Err(_) => None,
@@ -257,12 +245,11 @@ impl DetailSqlite {
     }
 
     pub fn update_progress(&self, header: String, timestamp: String) {
-        let progress = MProgress {
-            id: None,
-            header,
-            timestamp,
-        };
-        let w = self.rb.new_wrapper().eq("id", 1).check().unwrap();
+        let mut progress = MProgress::default();
+        progress.header = header;
+        progress.timestamp = timestamp;
+
+        let w = self.rb.new_wrapper().eq(MProgress::id, 1).check().unwrap();
         let r = block_on(self.rb.update_by_wrapper("", &progress, &w, false));
         match r {
             Ok(a) => {
@@ -283,11 +270,10 @@ impl DetailSqlite {
                 let timestamp = genesis.time.to_string();
                 info!("scanned newest block from genesis {:?}", &genesis);
                 self.save_progress(header.clone(), timestamp.clone());
-                return MProgress {
-                    id: None,
-                    header,
-                    timestamp,
-                };
+                let mut progress = MProgress::default();
+                progress.header = header;
+                progress.timestamp = timestamp;
+                return progress;
             }
             Some(progress) => progress,
         }
@@ -301,14 +287,13 @@ impl DetailSqlite {
         prev_vout: String,
         sequence: u32,
     ) {
-        let tx_input = MTxInput {
-            id: None,
-            tx,
-            sig_script,
-            prev_tx,
-            prev_vout,
-            sequence,
-        };
+        let mut tx_input = MTxInput::default();
+        tx_input.tx = tx;
+        tx_input.sig_script = sig_script;
+        tx_input.prev_tx = prev_tx;
+        tx_input.prev_vout = prev_vout;
+        tx_input.sequence = sequence;
+
         let r = block_on(self.rb.save("", &tx_input));
         match r {
             Ok(a) => {
@@ -321,13 +306,12 @@ impl DetailSqlite {
     }
 
     pub fn save_txout(&self, tx: String, script: String, value: String, vin: String) {
-        let tx_output = MTxOutput {
-            id: None,
-            tx,
-            script,
-            value,
-            vin,
-        };
+        let mut tx_output = MTxOutput::default();
+        tx_output.tx = tx;
+        tx_output.script = script;
+        tx_output.value = value;
+        tx_output.vin = vin;
+
         let r = block_on(self.rb.save("", &tx_output));
         match r {
             Ok(a) => {
@@ -340,11 +324,9 @@ impl DetailSqlite {
     }
 
     pub fn save_user_address(&self, address: String, compressed_pub_key: String) {
-        let user_address = MUserAddress {
-            id: None,
-            address,
-            compressed_pub_key,
-        };
+        let mut user_address = MUserAddress::default();
+        user_address.address = address;
+        user_address.compressed_pub_key = compressed_pub_key;
         let r = block_on(self.rb.save("", &user_address));
         match r {
             Ok(a) => {
@@ -357,7 +339,7 @@ impl DetailSqlite {
     }
 
     pub fn fetch_user_address(&self) -> Option<MUserAddress> {
-        let r: Result<Option<MUserAddress>, _> = block_on(self.rb.fetch_by_id("", &1u64));
+        let r: Result<Option<MUserAddress>, _> = block_on(self.rb.fetch_by_id("", &"1".to_owned()));
         match r {
             Ok(p) => p,
             Err(_) => None,
@@ -370,10 +352,7 @@ pub fn fetch_scanned_height() -> u64 {
     let header = RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp);
     match header {
         None => 0,
-        Some(header) => match header.id {
-            None => 0,
-            Some(id) => id,
-        },
+        Some(header) => header.id.parse::<u64>().unwrap(),
     }
 }
 
