@@ -14,19 +14,17 @@
 // limitations under the License.
 //
 
-use log::info;
-use simple_logger;
-
 use bitcoin::network::constants::Network;
-use log::Level;
-use murmel::constructor::Constructor;
-
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use config::{Config, ConfigError};
+use log::info;
+use log::Level;
+use murmel::constructor::Constructor;
 use murmel::db::RB_DETAIL;
 use murmel::jniapi::{calc_default_address, calc_pubkey};
 use murmel::moudle::detail::MUserAddress;
 use murmel::path::BTC_HAMMER_PATH;
+use simple_logger;
 use std::collections::HashMap;
 use std::{
     env::args,
