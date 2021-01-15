@@ -141,6 +141,28 @@ class CArrayCChar extends Struct {
 
 }
 
+/// C function `CArrayCChar_dAlloc`.
+Pointer<Pointer<CArrayCChar>> CArrayCChar_dAlloc() {
+  return _CArrayCChar_dAlloc();
+}
+final _CArrayCChar_dAlloc_Dart _CArrayCChar_dAlloc = _dl.lookupFunction<_CArrayCChar_dAlloc_C, _CArrayCChar_dAlloc_Dart>('CArrayCChar_dAlloc');
+typedef _CArrayCChar_dAlloc_C = Pointer<Pointer<CArrayCChar>> Function();
+typedef _CArrayCChar_dAlloc_Dart = Pointer<Pointer<CArrayCChar>> Function();
+
+/// C function `CArrayCChar_dFree`.
+void CArrayCChar_dFree(
+  Pointer<Pointer<CArrayCChar>> dPtr,
+) {
+  _CArrayCChar_dFree(dPtr);
+}
+final _CArrayCChar_dFree_Dart _CArrayCChar_dFree = _dl.lookupFunction<_CArrayCChar_dFree_C, _CArrayCChar_dFree_Dart>('CArrayCChar_dFree');
+typedef _CArrayCChar_dFree_C = Void Function(
+  Pointer<Pointer<CArrayCChar>> dPtr,
+);
+typedef _CArrayCChar_dFree_Dart = void Function(
+  Pointer<Pointer<CArrayCChar>> dPtr,
+);
+
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCContext extends Struct {
   
@@ -300,28 +322,6 @@ typedef _CArrayInt64_dFree_C = Void Function(
 );
 typedef _CArrayInt64_dFree_Dart = void Function(
   Pointer<Pointer<CArrayI64>> dPtr,
-);
-
-/// C function `CArrayStr_dAlloc`.
-Pointer<Pointer<CArrayCChar>> CArrayStr_dAlloc() {
-  return _CArrayStr_dAlloc();
-}
-final _CArrayStr_dAlloc_Dart _CArrayStr_dAlloc = _dl.lookupFunction<_CArrayStr_dAlloc_C, _CArrayStr_dAlloc_Dart>('CArrayStr_dAlloc');
-typedef _CArrayStr_dAlloc_C = Pointer<Pointer<CArrayCChar>> Function();
-typedef _CArrayStr_dAlloc_Dart = Pointer<Pointer<CArrayCChar>> Function();
-
-/// C function `CArrayStr_dFree`.
-void CArrayStr_dFree(
-  Pointer<Pointer<CArrayCChar>> dPtr,
-) {
-  _CArrayStr_dFree(dPtr);
-}
-final _CArrayStr_dFree_Dart _CArrayStr_dFree = _dl.lookupFunction<_CArrayStr_dFree_C, _CArrayStr_dFree_Dart>('CArrayStr_dFree');
-typedef _CArrayStr_dFree_C = Void Function(
-  Pointer<Pointer<CArrayCChar>> dPtr,
-);
-typedef _CArrayStr_dFree_Dart = void Function(
-  Pointer<Pointer<CArrayCChar>> dPtr,
 );
 
 /// C function `CBool_dAlloc`.

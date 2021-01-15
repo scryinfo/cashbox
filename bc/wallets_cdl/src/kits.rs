@@ -14,8 +14,13 @@ pub const CTrue: CBool = 0u32;
 
 /// call free_c_char to free memory
 pub fn to_c_char(s: &str) -> *mut c_char {
-    let cs = CString::new(s).expect("Failed to create CString");
-    return cs.into_raw();
+    match CString::new(s){
+        Err(e) => {
+            //todo log "Failed to create CString"
+            null_mut()
+        },
+        Ok(cs) => cs.into_raw()
+    }
 }
 
 /// free the memory that make by to_c_char or CString::into_raw
@@ -126,6 +131,16 @@ macro_rules! drop_ctype {
     };
 }
 
+pub trait CR<C: CStruct, R> {
+    fn to_c(r: &R) -> C;
+
+    fn to_c_ptr(r: &R) -> *mut C;
+
+    fn to_rust(c: &C) -> R;
+
+    fn ptr_rust(c: *mut C) -> R;
+}
+
 /// c的数组需要定义两个字段，所定义一个结构体进行统一管理
 /// 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
 #[repr(C)]
@@ -187,7 +202,14 @@ impl<T: CStruct> CStruct for CArray<T> {
     fn free(&mut self) {
         unsafe {
             if (self.len > 0 || self.cap > 0) && !self.ptr.is_null() {
-                Vec::from_raw_parts(self.ptr, self.len as usize, self.cap as usize);
+                let mut v = Vec::from_raw_parts(self.ptr, self.len as usize, self.cap as usize);
+                for it in v.iter_mut(){
+                    if !((*it).is_struct()){
+                        (*it).free();
+                    }else{
+                        break;
+                    }
+                }
             }
         }
         self.len = 0;
@@ -220,15 +242,27 @@ impl<T: CStruct + CR<T, R>, R: Default> CR<CArray<T>, Vec<R>> for CArray<T> {
 
 drop_ctype!(CArray<T>);
 
-pub trait CR<C: CStruct, R> {
-    fn to_c(r: &R) -> C;
 
-    fn to_c_ptr(r: &R) -> *mut C;
+impl CR<*mut c_char, String> for *mut c_char {
+    fn to_c(r: &String) -> *mut c_char {
+        to_c_char(r)
+    }
 
-    fn to_rust(c: &C) -> R;
+    fn to_c_ptr(r: &String) -> *mut *mut c_char {
+        let t = d_ptr_alloc();
+        unsafe { *t = to_c_char(r); }
+        t
+    }
 
-    fn ptr_rust(c: *mut C) -> R;
+    fn to_rust(c: &*mut c_char) -> String {
+        to_str(*c).to_owned()
+    }
+
+    fn ptr_rust(c: *mut *mut c_char) -> String {
+        to_str(unsafe { *c }).to_owned()
+    }
 }
+
 
 pub fn d_ptr_alloc<T>() -> *mut *mut T {
     Box::into_raw(Box::new(null_mut()))

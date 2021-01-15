@@ -16,7 +16,7 @@ mod chain_btc;
 mod chain_eee;
 mod chain_eth;
 
-mod kits;
+pub mod kits;
 
 #[cfg(test)]
 mod tests {

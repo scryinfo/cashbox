@@ -137,12 +137,12 @@ pub unsafe extern "C" fn CSubChainBasicInfo_dFree(dPtr: *mut *mut CSubChainBasic
 }
 
 #[no_mangle]
-pub extern "C" fn CArrayStr_dAlloc() -> *mut *mut CArray<*mut c_char> {
+pub extern "C" fn CArrayCChar_dAlloc() -> *mut *mut CArray<*mut c_char> {
     d_ptr_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CArrayStr_dFree(dPtr: *mut *mut CArray<*mut c_char>) {
+pub unsafe extern "C" fn CArrayCChar_dFree(dPtr: *mut *mut CArray<*mut c_char>) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
 }
