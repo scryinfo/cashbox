@@ -77,7 +77,7 @@ class _EntrancePageState extends State<EntrancePage> {
     // handle case : Config upgrade.
     try {
       if (lastTimeConfigCheck == null || ((nowTimeStamp - lastTimeConfigCheck) - config.intervalMilliseconds * 1000 > 0)) {
-        var configVersionObj = await requestWithConfigVersion("http://192.168.2.12:8080/inner_api/config/info");
+        var configVersionObj = await requestWithConfigVersion(config.privateConfig.serverConfigIp);
         ServerConfigModel serverConfigModel = ServerConfigModel.fromJson(configVersionObj);
         print("serverConfigModel--->" + serverConfigModel.toString());
         if (serverConfigModel.code != 0) {
