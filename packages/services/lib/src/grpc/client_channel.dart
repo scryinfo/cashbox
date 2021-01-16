@@ -3,8 +3,9 @@ import 'package:grpc/grpc_connection_interface.dart';
 import 'package:grpc/src/client/channel.dart' as $channel;
 import 'package:grpc/src/client/http2_connection.dart';
 import 'package:grpc/src/shared/profiler.dart';
+import 'package:meta/meta.dart';
 
-ClientTransportChannel createChannel(
+ClientTransportChannel createClientChannel(
     ConnectParameter parameter, ReFreshCall refreshCall) {
   var refreshParameter = ReFreshParameter(parameter, refreshCall);
   var channel = ClientTransportChannel(refreshParameter);
@@ -33,31 +34,27 @@ class ReFreshParameter {
 
   ReFreshParameter(this._refreshService, this._refreshCall);
 
-  bool _refreshing = false;
-
   ConnectParameter get connectParameter => _connectParameter;
 
   void resetConnectParameter() {
     _connectParameter = null;
   }
 
-  void refreshParameter() async {
-    if (_refreshing) {
-      return null;
+  Future<ConnectParameter> refreshParameter() async {
+    if (_connectParameter != null) {
+      return _connectParameter;
     }
-    _refreshing = true;
     if (_refreshCall != null) {
       _connectParameter = await _refreshCall(_refreshService);
     }
-    _refreshing = false;
-    return;
+    return _connectParameter;
   }
 }
 
 // see: grpc-2.8.0/lib/src/client/channel.dart ClientChannelBase
 // 增加功能，当连接出错时，刷新服务地址
 class ClientTransportChannel implements $channel.ClientChannel {
-  // TODO(jakobr): Multiple connections, load balancing.
+  // TODO: Multiple connections, load balancing.
   ClientConnection _connection;
 
   bool _isShutdown = false;
@@ -73,7 +70,7 @@ class ClientTransportChannel implements $channel.ClientChannel {
       parameter = _refreshParameter.connectParameter;
     }
     if (parameter == null) {
-      throw Exception("can not get parameter from RefindingParameter");
+      throw Exception("can not get parameter from RefreshParameter");
     }
 
     return Http2ClientConnection(
@@ -93,9 +90,6 @@ class ClientTransportChannel implements $channel.ClientChannel {
     if (_connection != null) await _connection.terminate();
   }
 
-  /// Returns a connection to this [Channel]'s RPC endpoint.
-  ///
-  /// The connection may be shared between multiple RPCs.
   Future<ClientConnection> getConnection() async {
     if (_isShutdown) throw GrpcError.unavailable('Channel shutting down.');
     return _connection ??= await createConnection();
@@ -104,9 +98,11 @@ class ClientTransportChannel implements $channel.ClientChannel {
   @override
   ClientCall<Q, R> createCall<Q, R>(
       ClientMethod<Q, R> method, Stream<Q> requests, CallOptions options) {
-    final call = ClientCallError(method, requests, options, (err) {
-      _onConnectionError(err);
-    },
+    final call = ClientCallError(
+        method,
+        requests,
+        options,
+        _onConnectionError,
         isTimelineLoggingEnabled
             ? timelineTaskFactory(filterKey: clientTimelineFilterKey)
             : null);
@@ -117,15 +113,18 @@ class ClientTransportChannel implements $channel.ClientChannel {
     return call;
   }
 
-  //连接出错时，[freshParameter]
+  void resetConnectParameter() {
+    _onConnectionError(new Error());
+  }
+
+  @visibleForTesting
+  ConnectParameter get connectParameter => _refreshParameter.connectParameter;
+
+  //连接出错时，reset ConnectParameter
   void _onConnectionError(error) {
-    //重新取服务地址，重置连接
     if (_connection != null) {
-      // try {
-      //   _connection.shutdown();
-      // }catch(e){
-      //   //todo log
-      // }
+      //不能调用 _connection.shutdown()
+      // var t = Future(_connection.shutdown);
       _connection = null;
       _refreshParameter.resetConnectParameter();
     }
@@ -136,29 +135,31 @@ typedef ErrorCall = void Function(dynamic);
 
 class ClientCallError<Q, R> extends ClientCall<Q, R> {
   ErrorCall _errCall;
+  Stream<R> _stream = null;
 
   ClientCallError(ClientMethod<Q, R> method, Stream<Q> requests,
       CallOptions options, ErrorCall this._errCall,
-      [TimelineTask])
-      : super(method, requests, options);
+      [timelineTask])
+      : super(method, requests, options, timelineTask);
 
-  // @Override
-  void onConnectionError(error) {
-    if (_errCall != null) {
-      _errCall(error);
-    }
-    super.onConnectionError(error);
-  }
+  // @override
+  // void onConnectionError(error) {
+  //   if (_errCall != null) {
+  //     _errCall(error);
+  //   }
+  //   super.onConnectionError(error);
+  // }
 
   @override
-  void onConnectionReady(ClientConnection connection) {
-    try {
-      super.onConnectionReady(connection);
-    } catch (e) {
-      if (_errCall != null) {
-        _errCall(e);
-      }
-      throw e;
+  Stream<R> get response {
+    if (_stream == null) {
+      var res = super.response;
+      _stream = res.handleError((err) {
+        if (_errCall != null) {
+          _errCall(err);
+        }
+      });
     }
+    return _stream;
   }
 }
