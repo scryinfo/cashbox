@@ -9,14 +9,13 @@ use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
-use log::{debug, info};
+use log::{debug, error, info};
 use mav::ma::{Dao, MBlockHeader};
 use mav::ma::{MLocalTxLog, MProgress, MTxInput, MTxOutput, MUserAddress};
 use once_cell::sync::Lazy;
 use rbatis::crud::CRUD;
 use rbatis::plugin::page::{IPage, Page, PageRequest};
 use rbatis::rbatis::Rbatis;
-use rbatis_core::Error;
 use std::ops::Add;
 
 pub struct ChainSqlite {
@@ -33,7 +32,7 @@ impl ChainSqlite {
                 info!("{:?}", a);
             }
             Err(e) => {
-                info!("{:?}", e);
+                error!("{:?}", e);
             }
         }
         Self { rb, network }
@@ -51,7 +50,7 @@ impl ChainSqlite {
                 debug!("{:?}", a);
             }
             Err(e) => {
-                debug!("{:?}", e);
+                error!("{:?}", e);
             }
         }
     }
@@ -88,12 +87,12 @@ impl ChainSqlite {
             let sql = format!(
                 r#"
             UPDATE block_header SET scanned = scanned+1
-                WHERE id IN (
-                    SELECT id FROM (
-                        SELECT id FROM block_header
+                WHERE rowid IN (
+                    SELECT rowid FROM (
+                        SELECT rowid FROM block_header
                         WHERE timestamp >= {}
                         AND scanned <= 5
-                        ORDER BY id ASC
+                        ORDER BY rowid ASC
                         LIMIT 0, 1000
                     ) tmp
                 )
@@ -115,15 +114,12 @@ impl ChainSqlite {
     }
 
     // how may headers save in block_header table
-    pub fn fetch_height(&self) -> u64 {
-        let py = r#"
-        SELECT * FROM block_header
-        Order By id DESC
-        LIMIT 1;
-        "#;
-        let r: Result<MBlockHeader, _> = block_on(self.rb.py_fetch("", py, &""));
+    pub fn fetch_height(&self) -> i64 {
+        let w = self.rb.new_wrapper();
+        let sql = format!("SELECT COUNT(*) FROM {} ", "m_block_header");
+        let r: Result<i64, _> = block_on(self.rb.fetch_prepare("", &sql, &w.args));
         match r {
-            Ok(r) => r.id.parse::<u64>().unwrap(),
+            Ok(r) => r,
             Err(_) => 0,
         }
     }
@@ -167,7 +163,7 @@ impl DetailSqlite {
                 debug!("create_user_address {:?}", a);
             }
             Err(e) => {
-                debug!("create_user_address {:?}", e);
+                error!("create_user_address {:?}", e);
             }
         }
     }
@@ -237,9 +233,15 @@ impl DetailSqlite {
     }
 
     fn fetch_progress(&self) -> Option<MProgress> {
-        let r: Result<Option<MProgress>, _> = block_on(self.rb.fetch_by_id("", &"1".to_owned()));
-        match r {
-            Ok(p) => p,
+        let w = self.rb.new_wrapper().eq("rowid", 1).check();
+        match w {
+            Ok(w) => {
+                let r: Result<MProgress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
+                return match r {
+                    Ok(r) => Some(r),
+                    Err(_) => None,
+                };
+            }
             Err(_) => None,
         }
     }
@@ -249,7 +251,7 @@ impl DetailSqlite {
         progress.header = header;
         progress.timestamp = timestamp;
 
-        let w = self.rb.new_wrapper().eq(MProgress::id, 1).check().unwrap();
+        let w = self.rb.new_wrapper().eq("rowid", 1).check().unwrap();
         let r = block_on(self.rb.update_by_wrapper("", &progress, &w, false));
         match r {
             Ok(a) => {
@@ -348,12 +350,14 @@ impl DetailSqlite {
 }
 
 pub fn fetch_scanned_height() -> u64 {
-    let mprogress = RB_DETAIL.progress();
-    let header = RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp);
-    match header {
-        None => 0,
-        Some(header) => header.id.parse::<u64>().unwrap(),
-    }
+    unimplemented!();
+    // let mprogress = RB_DETAIL.progress();
+    // println!("{:#?}", &mprogress);
+    // let header = RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp);
+    // match header {
+    //     None => 0,
+    //     Some(header) => header.rowid,
+    // }
 }
 
 #[async_trait]
@@ -387,3 +391,23 @@ pub static RB_CHAIN: Lazy<ChainSqlite> =
 
 pub static RB_DETAIL: Lazy<DetailSqlite> =
     Lazy::new(|| DetailSqlite::new(Network::Testnet, BTC_DETAIL_PATH));
+
+#[cfg(test)]
+mod test {
+    use crate::db::{fetch_scanned_height, RB_CHAIN};
+    use futures::executor::block_on;
+
+    #[test]
+    fn test_fetch_scanned_height() {
+        // let u = fetch_scanned_height();
+        // println!("scanned height{:?}", u);
+    }
+
+    #[test]
+    fn test_fetch_scanned_header_by_timestamp() {
+        let w = RB_CHAIN.rb.new_wrapper().check().unwrap();
+        let sql = format!("SELECT {} FROM {} WHERE timestamp = {}", "rowid" , "m_block_header" ,"1368475833");
+        let r:Result<i64,_> =  block_on(RB_CHAIN.rb.fetch_prepare("",&sql,&w.args));
+        println!("{:#?}",r);
+    }
+}
