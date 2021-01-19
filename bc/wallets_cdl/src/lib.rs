@@ -1,4 +1,4 @@
-pub use kits::{to_c_char, to_str, CStruct, CR, CU64};
+pub use kits::{to_c_char, to_str, CStruct, CR, CU64,CArray};
 
 pub mod types;
 mod types_btc;

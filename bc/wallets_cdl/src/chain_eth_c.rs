@@ -10,6 +10,8 @@ use super::kits::{CR, to_c_char, to_str};
 
 use crate::parameters::{CContext, CEthTransferPayload, CEthRawTxPayload};
 use crate::CStruct;
+use crate::kits::CArray;
+use crate::chain_eth::{CEthChainTokenAuth, CEthChainTokenDefault, CEthChainTokenShared};
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_decodeAdditionData(ctx: *mut CContext,encodeData: *mut c_char, additionData: *mut *mut c_char) -> *const CError {
@@ -108,4 +110,55 @@ pub unsafe extern "C" fn ChainEth_rawTxSign(ctx: *mut CContext,netType: *mut c_c
     };
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
+}
+#[no_mangle]
+pub unsafe extern "C" fn ChainEth_updateAuthTokenList(ctx: *mut CContext, netType: *mut c_char, authTokens: *mut CArray<CEthChainTokenShared>) -> *const CError {
+
+
+    unimplemented!()
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn ChainEth_updateDefaultTokenList(ctx: *mut CContext, defaultTokens: *mut CArray<CEthChainTokenDefault>) -> *const CError {
+    log::debug!("enter ChainEee ChainEth rawTxSign");
+
+    if ctx.is_null() || defaultTokens.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx,defaultTokens is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let eth_chain = wallets.eth_chain_instance();
+                let default_token_list = CArray::<CEthChainTokenDefault>::ptr_rust(defaultTokens); //wallets, &net_type, &transferPayload)) {
+                match block_on(eth_chain.update_default_tokens(wallets,default_token_list)) {
+                    Ok(_) => {
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+//support non auth digit?
+#[no_mangle]
+pub unsafe extern "C" fn ChainEth_addNonAuthDigit(_ctx: *mut CContext, _netType: *mut c_char, _tokens: *mut CEthChainTokenDefault) -> *const CError {
+
+    unimplemented!()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn ChainEth_updateDigitBalance(_ctx: *mut CContext, _netType: *mut c_char, _tokens: *mut CEthChainTokenDefault) -> *const CError {
+
+    unimplemented!()
 }

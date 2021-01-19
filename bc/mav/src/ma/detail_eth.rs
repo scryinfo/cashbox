@@ -47,19 +47,6 @@ pub struct MEthChainTokenShared {
     pub token_shared: MTokenShared,
     #[serde(default)]
     pub token_type: String,
-    ///如果是eth，那么合约地址为零长度字符串
-    #[serde(default)]
-    pub contract_address: String,
-
-    /// 交易时默认的gas limit
-    #[serde(default)]
-    pub gas_limit: i64,
-    /// 交易时默认的gas price
-    #[serde(default)]
-    pub gas_price: String,
-    /// 糖度
-    #[serde(default)]
-    pub decimal: i32,
 }
 
 impl MEthChainTokenShared {
@@ -100,6 +87,19 @@ pub struct MEthChainTokenDefault {
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
+    ///如果是eth，那么合约地址为零长度字符串
+    #[serde(default)]
+    pub contract_address: String,
+
+    /// 交易时默认的gas limit
+    #[serde(default)]
+    pub gas_limit: i64,
+    /// 交易时默认的gas price
+    #[serde(default)]
+    pub gas_price: String,
+    /// 精度
+    #[serde(default)]
+    pub decimal: i32,
 
     ///这个是为了使用方便，它不会生成数据库字段
     #[serde(skip)]

@@ -1,12 +1,13 @@
-
 import 'package:grpc/grpc.dart';
 import 'package:grpc/grpc_connection_interface.dart';
 import 'package:grpc/src/client/channel.dart' as $channel;
 import 'package:grpc/src/client/http2_connection.dart';
 import 'package:grpc/src/shared/profiler.dart';
+import 'package:meta/meta.dart';
 
-ClientTransportChannel createChannel(ConnectParameter parameter, ReFreshCall refreshCall) {
-  var refreshParameter = ReFreshParameter(parameter,refreshCall);
+ClientTransportChannel createClientChannel(
+    ConnectParameter parameter, ReFreshCall refreshCall) {
+  var refreshParameter = ReFreshParameter(parameter, refreshCall);
   var channel = ClientTransportChannel(refreshParameter);
   return channel;
 }
@@ -18,7 +19,9 @@ class ConnectParameter {
   int port;
   ChannelOptions options;
 
-  ConnectParameter(this.host, this.port, {this.options = const ChannelOptions()});
+  ConnectParameter(this.host, this.port,
+      {this.options =
+          const ChannelOptions(credentials: ChannelCredentials.insecure())});
 }
 
 typedef ReFreshCall = Future<ConnectParameter> Function(ConnectParameter);
@@ -28,33 +31,30 @@ class ReFreshParameter {
   ConnectParameter _connectParameter;
   final ConnectParameter _refreshService;
   final ReFreshCall _refreshCall;
+
   ReFreshParameter(this._refreshService, this._refreshCall);
 
-  bool _refreshing = false;
+  ConnectParameter get connectParameter => _connectParameter;
 
-  ConnectParameter get connectParameter  => _connectParameter;
-
-  void resetConnectParameter(){
+  void resetConnectParameter() {
     _connectParameter = null;
   }
 
-  void refreshParameter() async {
-    if (_refreshing) {
-      return null;
+  Future<ConnectParameter> refreshParameter() async {
+    if (_connectParameter != null) {
+      return _connectParameter;
     }
-    _refreshing = true;
-    if(_refreshCall != null) {
+    if (_refreshCall != null) {
       _connectParameter = await _refreshCall(_refreshService);
     }
-    _refreshing = false;
-    return;
+    return _connectParameter;
   }
 }
 
 // see: grpc-2.8.0/lib/src/client/channel.dart ClientChannelBase
 // 增加功能，当连接出错时，刷新服务地址
-class ClientTransportChannel  implements $channel.ClientChannel {
-  // TODO(jakobr): Multiple connections, load balancing.
+class ClientTransportChannel implements $channel.ClientChannel {
+  // TODO: Multiple connections, load balancing.
   ClientConnection _connection;
 
   bool _isShutdown = false;
@@ -65,15 +65,16 @@ class ClientTransportChannel  implements $channel.ClientChannel {
 
   Future<ClientConnection> createConnection() async {
     var parameter = _refreshParameter.connectParameter;
-    if(parameter == null) {
+    if (parameter == null) {
       await _refreshParameter.refreshParameter();
       parameter = _refreshParameter.connectParameter;
     }
-    if(parameter == null){
-      throw Exception("can not get parameter from RefindingParameter");
+    if (parameter == null) {
+      throw Exception("can not get parameter from RefreshParameter");
     }
 
-    return Http2ClientConnection(parameter.host, parameter.port, parameter.options);
+    return Http2ClientConnection(
+        parameter.host, parameter.port, parameter.options);
   }
 
   @override
@@ -89,9 +90,6 @@ class ClientTransportChannel  implements $channel.ClientChannel {
     if (_connection != null) await _connection.terminate();
   }
 
-  /// Returns a connection to this [Channel]'s RPC endpoint.
-  ///
-  /// The connection may be shared between multiple RPCs.
   Future<ClientConnection> getConnection() async {
     if (_isShutdown) throw GrpcError.unavailable('Channel shutting down.');
     return _connection ??= await createConnection();
@@ -100,35 +98,68 @@ class ClientTransportChannel  implements $channel.ClientChannel {
   @override
   ClientCall<Q, R> createCall<Q, R>(
       ClientMethod<Q, R> method, Stream<Q> requests, CallOptions options) {
-    final call = ClientCall(
+    final call = ClientCallError(
         method,
         requests,
         options,
+        _onConnectionError,
         isTimelineLoggingEnabled
             ? timelineTaskFactory(filterKey: clientTimelineFilterKey)
             : null);
     getConnection().then((connection) {
       if (call.isCancelled) return;
       connection.dispatchCall(call);
-    }, onError: (err){
-      _onConnectionError(err);
-      call.onConnectionError(err);
-    });
+    }).catchError(call.onConnectionError);
     return call;
   }
 
-  //连接出错时，[freshParameter]
-  void _onConnectionError(error) {
-    freshParameter();
+  void resetConnectParameter() {
+    _onConnectionError(new Error());
   }
 
-  //重新取服务地址，重置连接
-  void freshParameter(){
-    if(_connection != null){
-      _connection.shutdown();
+  @visibleForTesting
+  ConnectParameter get connectParameter => _refreshParameter.connectParameter;
+
+  //连接出错时，reset ConnectParameter
+  void _onConnectionError(error) {
+    if (_connection != null) {
+      //不能调用 _connection.shutdown()
+      // var t = Future(_connection.shutdown);
       _connection = null;
+      _refreshParameter.resetConnectParameter();
     }
-    _refreshParameter.resetConnectParameter();
-    _refreshParameter.refreshParameter();
+  }
+}
+
+typedef ErrorCall = void Function(dynamic);
+
+class ClientCallError<Q, R> extends ClientCall<Q, R> {
+  ErrorCall _errCall;
+  Stream<R> _stream = null;
+
+  ClientCallError(ClientMethod<Q, R> method, Stream<Q> requests,
+      CallOptions options, ErrorCall this._errCall,
+      [timelineTask])
+      : super(method, requests, options, timelineTask);
+
+  // @override
+  // void onConnectionError(error) {
+  //   if (_errCall != null) {
+  //     _errCall(error);
+  //   }
+  //   super.onConnectionError(error);
+  // }
+
+  @override
+  Stream<R> get response {
+    if (_stream == null) {
+      var res = super.response;
+      _stream = res.handleError((err) {
+        if (_errCall != null) {
+          _errCall(err);
+        }
+      });
+    }
+    return _stream;
   }
 }
