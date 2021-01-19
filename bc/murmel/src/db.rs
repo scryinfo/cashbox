@@ -13,6 +13,7 @@ use log::{debug, error, info};
 use mav::ma::{Dao, MBlockHeader};
 use mav::ma::{MLocalTxLog, MProgress, MTxInput, MTxOutput, MUserAddress};
 use once_cell::sync::Lazy;
+use rbatis::crud::CRUDEnable;
 use rbatis::crud::CRUD;
 use rbatis::plugin::page::{IPage, Page, PageRequest};
 use rbatis::rbatis::Rbatis;
@@ -76,7 +77,7 @@ impl ChainSqlite {
                 let header_vec = page.get_records();
                 block_headers = header_vec.to_vec();
             }
-            Err(e) => debug!("{:?}", e),
+            Err(e) => error!("{:?}", e),
         }
         let mut headers: Vec<String> = vec![];
         for header_block in block_headers {
@@ -86,10 +87,10 @@ impl ChainSqlite {
         if scan_flag {
             let sql = format!(
                 r#"
-            UPDATE block_header SET scanned = scanned+1
+            UPDATE {} SET scanned = scanned+1
                 WHERE rowid IN (
                     SELECT rowid FROM (
-                        SELECT rowid FROM block_header
+                        SELECT rowid FROM {}
                         WHERE timestamp >= {}
                         AND scanned <= 5
                         ORDER BY rowid ASC
@@ -97,15 +98,17 @@ impl ChainSqlite {
                     ) tmp
                 )
             "#,
+                &MBlockHeader::table_name(),
+                &MBlockHeader::table_name(),
                 timestamp
             );
             let r = block_on(self.rb.exec("", &sql));
             match r {
                 Ok(a) => {
-                    debug!("{:?}", a);
+                    println!("=== {:?} ===", a);
                 }
                 Err(e) => {
-                    debug!("{:?}", e);
+                    println!("=== {:?} ===", e);
                 }
             }
         }
@@ -116,7 +119,7 @@ impl ChainSqlite {
     // how may headers save in block_header table
     pub fn fetch_height(&self) -> i64 {
         let w = self.rb.new_wrapper();
-        let sql = format!("SELECT COUNT(*) FROM {} ", "m_block_header");
+        let sql = format!("SELECT COUNT(*) FROM {} ", &MBlockHeader::table_name());
         let r: Result<i64, _> = block_on(self.rb.fetch_prepare("", &sql, &w.args));
         match r {
             Ok(r) => r,
@@ -124,19 +127,22 @@ impl ChainSqlite {
         }
     }
 
-    pub fn fetch_header_by_timestamp(&self, timestamp: String) -> Option<MBlockHeader> {
-        let w = self.rb.new_wrapper().eq("timestamp", timestamp).check();
-        let r = match w {
-            Ok(w) => {
-                let r: Result<MBlockHeader, _> = block_on(self.rb.fetch_by_wrapper("", &w));
-                match r {
-                    Ok(header) => Some(header),
-                    Err(_) => None,
-                }
+    pub fn fetch_header_by_timestamp(&self, timestamp: String) -> i64 {
+        let w = self.rb.new_wrapper().check().unwrap();
+        let sql = format!(
+            "SELECT {} FROM {} WHERE timestamp = {}",
+            "rowid",
+            &MBlockHeader::table_name(),
+            &timestamp
+        );
+        let r: Result<i64, _> = block_on(self.rb.fetch_prepare("", &sql, &w.args));
+        match r {
+            Ok(r) => r,
+            Err(e) => {
+                info!("=== fetch_header_by_timestamp error {:?} ===", e);
+                0
             }
-            Err(_) => None,
-        };
-        r
+        }
     }
 }
 
@@ -349,15 +355,10 @@ impl DetailSqlite {
     }
 }
 
-pub fn fetch_scanned_height() -> u64 {
-    unimplemented!();
-    // let mprogress = RB_DETAIL.progress();
-    // println!("{:#?}", &mprogress);
-    // let header = RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp);
-    // match header {
-    //     None => 0,
-    //     Some(header) => header.rowid,
-    // }
+pub fn fetch_scanned_height() -> i64 {
+    let mprogress = RB_DETAIL.progress();
+    let h = RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp);
+    h
 }
 
 #[async_trait]
@@ -394,20 +395,19 @@ pub static RB_DETAIL: Lazy<DetailSqlite> =
 
 #[cfg(test)]
 mod test {
-    use crate::db::{fetch_scanned_height, RB_CHAIN};
-    use futures::executor::block_on;
+    use crate::db::RB_CHAIN;
 
     #[test]
-    fn test_fetch_scanned_height() {
-        // let u = fetch_scanned_height();
-        // println!("scanned height{:?}", u);
+    fn test_fetch_scann_header() {
+        let r = RB_CHAIN.fetch_scan_header("1296688928".to_owned(), false);
+        println!("{:?}" ,r);
+        let r = RB_CHAIN.fetch_scan_header("1296688928".to_owned(), true);
+        println!("{:?}" ,r);
     }
 
     #[test]
     fn test_fetch_scanned_header_by_timestamp() {
-        let w = RB_CHAIN.rb.new_wrapper().check().unwrap();
-        let sql = format!("SELECT {} FROM {} WHERE timestamp = {}", "rowid" , "m_block_header" ,"1368475833");
-        let r:Result<i64,_> =  block_on(RB_CHAIN.rb.fetch_prepare("",&sql,&w.args));
-        println!("{:#?}",r);
+        let h = RB_CHAIN.fetch_header_by_timestamp("1368475833".to_owned());
+        println!("{}", h)
     }
 }
