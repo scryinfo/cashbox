@@ -28,7 +28,7 @@ pub struct MBtcChainToken {
     /// 是否显示
     #[serde(default, deserialize_with = "bool_from_int")]
     pub show: bool,
-    /// 糖度
+    /// 精度
     #[serde(default)]
     pub decimal: i32,
 }

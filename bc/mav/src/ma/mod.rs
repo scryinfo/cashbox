@@ -6,7 +6,7 @@ pub use crate::ma::data_eth::{*};
 pub use crate::ma::db::*;
 pub use crate::ma::detail::{*};
 pub use crate::ma::detail_btc::{*};
-pub use crate::ma::detail_eee::{*};
+pub use crate::ma::detail_eee::{EeeTokenType,MEeeChainTokenShared,MEeeChainTokenAuth,MEeeChainTokenDefault};
 pub use crate::ma::detail_eth::{*};
 pub use crate::ma::mnemonic::MMnemonic;
 pub use crate::ma::setting::*;

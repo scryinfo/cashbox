@@ -7,7 +7,7 @@ use strum_macros::EnumIter;
 
 use crate::{kits, NetType};
 use crate::kits::Error;
-use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet};
+use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenShared,MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet};
 
 #[derive(Debug, Default, Clone)]
 pub struct DbName {
@@ -233,7 +233,7 @@ impl Db {
         Db::create_table(rb, MChainTypeMeta::create_table_script(), &MChainTypeMeta::table_name(), create_type).await?;
         Db::create_table(rb, MAddress::create_table_script(), &MAddress::table_name(), create_type).await?;
         Db::create_table(rb, MSetting::create_table_script(), &MSetting::table_name(), create_type).await?;
-        Db::create_table(rb, MEthChainTokenShared::create_table_script(), &MEthChainTokenShared::table_name(), create_type).await?;
+        Db::create_table(rb, MEthChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainTokenAuth::create_table_script(), &MEthChainTokenAuth::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainTokenDefault::create_table_script(), &MEthChainTokenDefault::table_name(), create_type).await?;
         Db::create_table(rb, MEeeChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), create_type).await?;
@@ -275,10 +275,12 @@ impl Db {
                 eth.token_shared.project_name = "ethereum".to_owned();
                 eth.token_shared.project_home = "https://ethereum.org/zh/".to_owned();
                 eth.token_shared.project_note = "Ethereum is a global, open-source platform for decentralized applications.".to_owned();
-
+                eth.decimal = 18;
+                eth.gas_limit = 0; //todo
+                eth.gas_price = "".to_owned(); //todo
                 let old_eth = {
                     let mut wrapper = rb.new_wrapper();
-                    wrapper.eq(MEthChainTokenShared::token_type, &eth.token_type);
+                    wrapper.eq(MEeeChainTokenShared::token_type, &eth.token_type);
                     MEthChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
                 if let Some(t) = old_eth {
@@ -299,10 +301,8 @@ impl Db {
                         token_default.net_type = net_type.to_string();
                         token_default.chain_token_shared_id = token_shared.id.clone();
                         token_default.position = 0;
-                        token_default.contract_address = "".to_owned();
-                        token_default.decimal = 18;
-                        token_default.gas_limit = 0; //todo
-                        token_default.gas_price = "".to_owned(); //todo
+                        token_default.contract_address = " ".to_owned();
+
                         token_default.save(rb, "").await?;
                     }
                 }
@@ -314,7 +314,7 @@ impl Db {
                 let mut eee = MEeeChainTokenShared::default();
                 eee.token_type = EeeTokenType::Eee.to_string();
                 eee.decimal = 15;
-                eee.gas = 0; //todo
+                eee.gas_price = "".to_owned(); //todo
 
                 eee.token_shared.name = "EEE".to_owned();
                 eee.token_shared.symbol = "EEE".to_owned();

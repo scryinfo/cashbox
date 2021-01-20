@@ -3,9 +3,9 @@ use rbatis::crud::CRUDEnable;
 
 use mav::{ChainType, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MWallet};
+use mav::ma::{Dao, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MWallet, MBtcChainTokenAuth};
 
-use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, TokenShared, WalletError};
+use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 
 #[derive(Debug, Default)]
 pub struct BtcChainToken {
@@ -31,7 +31,7 @@ impl Load for BtcChainToken {
 #[derive(Debug, Default)]
 pub struct BtcChainTokenShared {
     pub m: MBtcChainTokenShared,
-    pub token_shared: TokenShared,
+    //pub token_shared: TokenShared,
 }
 deref_type!(BtcChainTokenShared,MBtcChainTokenShared);
 
@@ -87,6 +87,12 @@ impl BtcChainTokenDefault {
         Ok(tokens_default)
     }
 }
+#[derive(Debug, Default)]
+pub struct BtcChainTokenAuth {
+    pub m: MBtcChainTokenAuth,
+    pub btc_chain_token_shared: BtcChainTokenShared,
+}
+deref_type!(BtcChainTokenAuth,MBtcChainTokenAuth);
 
 #[derive(Debug, Default)]
 pub struct BtcChain {

@@ -33,6 +33,9 @@ pub struct MEthChainToken {
     /// 是否显示
     #[serde(default, deserialize_with = "bool_from_int")]
     pub show: bool,
+    /// 精度
+    #[serde(default)]
+    pub decimal: i32,
 }
 
 impl MEthChainToken {

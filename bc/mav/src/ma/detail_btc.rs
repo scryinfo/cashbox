@@ -44,9 +44,6 @@ pub struct MBtcChainTokenShared {
     pub token_shared: MTokenShared,
     #[serde(default)]
     pub token_type: String,
-    //
-    // pub contract_address: String,
-
     #[serde(default)]
     pub gas: i64,
     /// 精度

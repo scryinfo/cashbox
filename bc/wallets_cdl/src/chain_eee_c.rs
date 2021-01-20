@@ -15,6 +15,8 @@ use super::chain_eee::{CAccountInfoSyncProg, CSubChainBasicInfo};
 use super::kits::{CR, to_c_char, to_str};
 use super::parameters::{CAccountInfo, CContext, CDecodeAccountInfoParameters, CRawTxParam, CStorageKeyParameters, CEeeTransferPayload};
 use super::types::CError;
+use crate::chain_eee::{CEeeChainTokenDefault, CEeeChainTokenAuth};
+use crate::CArray;
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_updateSyncRecord(ctx: *mut CContext, netType: *mut c_char, syncRecord: *mut CAccountInfoSyncProg) -> *const CError {
@@ -347,8 +349,65 @@ pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
-#[no_mangle]
-pub unsafe extern "C" fn ChainEee_updateAuthDigitList(ctx: *mut CContext, netType: *mut c_char, basicInfo: *mut CSubChainBasicInfo) -> *const CError {
 
-    unimplemented!()
+#[no_mangle]
+pub unsafe extern "C" fn ChainEee_updateAuthDigitList(ctx: *mut CContext,authTokens: *mut CArray<CEeeChainTokenAuth>) -> *const CError {
+    log::debug!("enter ChainEth updateDefaultTokenLis");
+
+    if ctx.is_null() || authTokens.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx,authTokens is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let eee_chain = wallets.eee_chain_instance();
+                let default_token_list = CArray::<CEeeChainTokenAuth>::ptr_rust(authTokens);
+                match block_on(eee_chain.update_auth_tokens(wallets, default_token_list)) {
+                    Ok(_) => {
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn ChainEee_updateDefaultTokenList(ctx: *mut CContext, defaultTokens: *mut CArray<CEeeChainTokenDefault>) -> *const CError {
+    log::debug!("enter ChainEth updateDefaultTokenLis");
+
+    if ctx.is_null() || defaultTokens.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx,defaultTokens is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let eee_chain = wallets.eee_chain_instance();
+                let default_token_list = CArray::<CEeeChainTokenDefault>::ptr_rust(defaultTokens);
+                match block_on(eee_chain.update_default_tokens(wallets, default_token_list)) {
+                    Ok(_) => {
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
 }

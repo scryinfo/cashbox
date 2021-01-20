@@ -1,6 +1,6 @@
 use std::ptr::null_mut;
 use mav::kits;
-use wallets_types::{InitParameters, Error, EthRawTxPayload, EthTransferPayload, EthChainTokenDefault, EthChainTokenShared, TokenShared};
+use wallets_types::{InitParameters, Error, EthRawTxPayload, EthTransferPayload, EthChainTokenDefault, EthChainTokenAuth};
 
 use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
                   parameters::{CContext, CInitParameters, CEthTransferPayload, CEthRawTxPayload},
@@ -8,7 +8,7 @@ use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
                   types::CError,
                   wallets_c::Wallets_init,
 };
-use wallets_cdl::mem_c::CArrayCContext_dFree;
+
 use mav::ma::{EthTokenType};
 
 #[test]
@@ -98,9 +98,9 @@ fn eth_update_default_token_list_test() {
             eth.net_type = "Private".to_string();
             eth.eth_chain_token_shared.m.token_type = EthTokenType::Eth.to_string();
             eth.m.contract_address = "".to_owned();
-            eth.m.decimal = 18;
-            eth.m.gas_limit = 0; //todo
-            eth.m.gas_price = "".to_owned(); //todo
+            eth.eth_chain_token_shared.m.decimal = 18;
+            eth.eth_chain_token_shared.m.gas_limit = 0; //todo
+            eth.eth_chain_token_shared.m.gas_price = "".to_owned(); //todo
 
             eth.eth_chain_token_shared.m.token_shared.name = "Ethereum".to_owned();
             eth.eth_chain_token_shared.m.token_shared.symbol = "ETH".to_owned();
@@ -116,9 +116,9 @@ fn eth_update_default_token_list_test() {
             ddd.net_type = "Main".to_string();
             ddd.eth_chain_token_shared.m.token_type = EthTokenType::Erc20.to_string();
             ddd.m.contract_address = "0xcc638fca332190b63be1605baefde1df0b3b026e".to_owned();
-            ddd.m.decimal = 18;
-            ddd.m.gas_limit = 0; //todo
-            ddd.m.gas_price = "".to_owned(); //todo
+            ddd.eth_chain_token_shared.m.decimal = 18;
+            ddd.eth_chain_token_shared.m.gas_limit = 0; //todo
+            ddd.eth_chain_token_shared.m.gas_price = "".to_owned(); //todo
 
             ddd.eth_chain_token_shared.m.token_shared.name = "DDD".to_owned();
             ddd.eth_chain_token_shared.m.token_shared.symbol = "DDD".to_owned();
@@ -132,6 +132,44 @@ fn eth_update_default_token_list_test() {
 
         let mut c_tokens = CArray::to_c_ptr(&default_tokens);
         let c_err = chain_eth_c::ChainEth_updateDefaultTokenList(*c_ctx, c_tokens) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        c_tokens.free();
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+
+#[test]
+fn eth_update_auth_token_list_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        //CEthChainTokenDefault
+        let mut auth_tokens = Vec::new();
+        {
+            let mut eth = EthChainTokenAuth::default();
+            eth.net_type = "Private".to_string();
+            eth.eth_chain_token_shared.m.token_type = EthTokenType::Erc20.to_string();
+            eth.m.contract_address = "0x6f259637dcd74c767781e37bc6133cd6a68aa161".to_owned();
+            eth.eth_chain_token_shared.decimal = 18;
+            eth.eth_chain_token_shared.gas_limit = 0; //todo
+            eth.eth_chain_token_shared.gas_price = "".to_owned(); //todo
+
+            eth.eth_chain_token_shared.m.token_shared.name = "HuobiToken".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.symbol = "HT".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.logo_url = "".to_owned();//todo
+            eth.eth_chain_token_shared.m.token_shared.logo_bytes = "".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.project_name = "HuobiToken".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.project_home = "https://www.huobipro.com/".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.project_note = "A Global Cryptocurrency Leader Since 2013.".to_owned();
+            auth_tokens.push(eth);
+        }
+
+        let mut c_tokens = CArray::to_c_ptr(&auth_tokens);
+        let c_err = chain_eth_c::ChainEth_updateAuthTokenList(*c_ctx, c_tokens) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_tokens.free();

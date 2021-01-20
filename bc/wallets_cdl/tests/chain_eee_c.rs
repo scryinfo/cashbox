@@ -1,13 +1,13 @@
-use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, SubChainBasicInfo, ChainVersion, AccountInfoSyncProg, StorageKeyParameters, DecodeAccountInfoParameters, RawTxParam};
+use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, SubChainBasicInfo, ChainVersion, AccountInfoSyncProg, StorageKeyParameters, DecodeAccountInfoParameters, RawTxParam, EeeChainTokenDefault};
 use wallets_cdl::{
-    CStruct, to_c_char, to_str, CR, CU64,
-    mem_c::{CError_free, CStr_dAlloc, CStr_dFree, CContext_dAlloc},
+    CStruct, to_c_char, CR, CU64,CArray,
+    mem_c::{CError_free,CContext_dAlloc},
     wallets_c::Wallets_init,
     chain_eee_c,
     types::{CSubChainBasicInfo, CError},
     parameters::{CChainVersion, CInitParameters},
 };
-use mav::ma::{MSubChainBasicInfo, MAccountInfoSyncProg};
+use mav::ma::{MSubChainBasicInfo, MAccountInfoSyncProg, EeeTokenType};
 use mav::kits;
 use std::ptr::null_mut;
 use wallets_cdl::types::CAccountInfoSyncProg;
@@ -281,6 +281,61 @@ fn eee_tx_sign_test() {
         CError_free(c_err);
         wallets_cdl::mem_c::CStr_dFree(sign_result);
         c_raw_tx.free();
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+
+#[test]
+fn eee_update_default_token_list_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        //CEthChainTokenDefault
+        let mut default_tokens = Vec::new();
+        {
+            let mut eee = EeeChainTokenDefault::default();
+            eee.net_type = "Private".to_string();
+            eee.eee_chain_token_shared.m.token_type = EeeTokenType::Eee.to_string();
+            eee.eee_chain_token_shared.m.decimal = 15;
+            eee.eee_chain_token_shared.m.gas_limit = 0; //todo
+            eee.eee_chain_token_shared.m.gas_price = "".to_owned(); //todo
+
+            eee.eee_chain_token_shared.m.token_shared.name = "EEE".to_owned();
+            eee.eee_chain_token_shared.m.token_shared.symbol = "EEE".to_owned();
+            eee.eee_chain_token_shared.m.token_shared.logo_url = "".to_owned();//todo
+            eee.eee_chain_token_shared.m.token_shared.logo_bytes = "".to_owned();
+            eee.eee_chain_token_shared.m.token_shared.project_name = "scryinfo".to_owned();
+            eee.eee_chain_token_shared.m.token_shared.project_home = "https://scry.info/".to_owned();
+            eee.eee_chain_token_shared.m.token_shared.project_note = "SCRY.INFO is an open source blockchain data protocol layer, oracle of the blockchain world, cornerstone of data smart contract applications.".to_owned();
+            default_tokens.push(eee);
+        }
+        {
+            let mut tokenx = EeeChainTokenDefault::default();
+            tokenx.net_type = "Private".to_string();
+            tokenx.eee_chain_token_shared.m.token_type = "Tokenx".to_string();
+
+            tokenx.eee_chain_token_shared.m.decimal = 15;
+            tokenx.eee_chain_token_shared.m.gas_limit = 0; //todo
+            tokenx.eee_chain_token_shared.m.gas_price = "".to_owned(); //todo
+
+            tokenx.eee_chain_token_shared.m.token_shared.name = "TOKENX".to_owned();
+            tokenx.eee_chain_token_shared.m.token_shared.symbol = "TOX".to_owned();
+            tokenx.eee_chain_token_shared.m.token_shared.logo_url = "".to_owned();//todo
+            tokenx.eee_chain_token_shared.m.token_shared.logo_bytes = "".to_owned();
+            tokenx.eee_chain_token_shared.m.token_shared.project_name = "scryinfo".to_owned();
+            tokenx.eee_chain_token_shared.m.token_shared.project_home = "https://scry.info/".to_owned();
+            tokenx.eee_chain_token_shared.m.token_shared.project_note = "SCRY.INFO is an open source blockchain data protocol layer, oracle of the blockchain world, cornerstone of data smart contract applications.".to_owned();
+            default_tokens.push(tokenx);
+        }
+
+        let mut c_tokens = CArray::to_c_ptr(&default_tokens);
+        let c_err = chain_eee_c::ChainEee_updateDefaultTokenList(*c_ctx, c_tokens) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        c_tokens.free();
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }

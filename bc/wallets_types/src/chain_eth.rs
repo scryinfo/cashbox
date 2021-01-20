@@ -3,7 +3,7 @@ use rbatis::crud::CRUDEnable;
 
 use mav::{ChainType, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MWallet};
+use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault,MEthChainTokenShared, MWallet};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 

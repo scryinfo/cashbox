@@ -3,9 +3,9 @@ use rbatis::crud::CRUDEnable;
 
 use mav::{ChainType, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MEeeChainToken, MEeeChainTokenDefault, MEeeChainTokenShared, MWallet,MSubChainBasicInfo, MAccountInfoSyncProg};
+use mav::ma::{Dao, MEeeChainToken, MEeeChainTokenDefault, MEeeChainTokenShared, MWallet, MSubChainBasicInfo, MAccountInfoSyncProg, MEeeChainTokenAuth};
 
-use crate::{Address, Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, TokenShared, WalletError};
+use crate::{Address, Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 use rbatis::rbatis::Rbatis;
 
 #[derive(Debug, Default)]
@@ -32,7 +32,7 @@ impl Load for EeeChainToken {
 #[derive(Debug, Default)]
 pub struct EeeChainTokenShared {
     pub m: MEeeChainTokenShared,
-    pub token_shared: TokenShared,
+    //pub token_shared: TokenShared,
 }
 deref_type!(EeeChainTokenShared,MEeeChainTokenShared);
 
@@ -52,6 +52,13 @@ pub struct EeeChainTokenDefault {
     pub eee_chain_token_shared: EeeChainTokenShared,
 }
 deref_type!(EeeChainTokenDefault,MEeeChainTokenDefault);
+
+#[derive(Debug, Default)]
+pub struct EeeChainTokenAuth {
+    pub m: MEeeChainTokenAuth,
+    pub eee_chain_token_shared: EeeChainTokenShared,
+}
+deref_type!(EeeChainTokenAuth,MEeeChainTokenAuth);
 
 impl EeeChainTokenDefault {
     pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<MEeeChainTokenDefault>, WalletError> {

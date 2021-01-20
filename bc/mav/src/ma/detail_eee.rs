@@ -44,11 +44,11 @@ pub struct MEeeChainTokenShared {
     pub token_shared: MTokenShared,
     #[serde(default)]
     pub token_type: String,
-    //
-    // pub contract_address: String,
-
     #[serde(default)]
-    pub gas: i64,
+    pub gas_price: String,
+    /// 交易时默认的gas limit
+    #[serde(default)]
+    pub gas_limit: i64,
     /// 精度
     #[serde(default)]
     pub decimal: i32,

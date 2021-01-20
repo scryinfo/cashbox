@@ -47,6 +47,12 @@ pub struct MEthChainTokenShared {
     pub token_shared: MTokenShared,
     #[serde(default)]
     pub token_type: String,
+    #[serde(default)]
+    pub gas_limit: i64,
+    #[serde(default)]
+    pub gas_price: String,
+    #[serde(default)]
+    pub decimal: i32,
 }
 
 impl MEthChainTokenShared {
@@ -63,6 +69,9 @@ pub struct MEthChainTokenAuth {
     pub chain_token_shared_id: String,
     #[serde(default)]
     pub net_type: String,
+    ///如果是eth，那么合约地址为零长度字符串
+    #[serde(default)]
+    pub contract_address: String,
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
@@ -90,17 +99,6 @@ pub struct MEthChainTokenDefault {
     ///如果是eth，那么合约地址为零长度字符串
     #[serde(default)]
     pub contract_address: String,
-
-    /// 交易时默认的gas limit
-    #[serde(default)]
-    pub gas_limit: i64,
-    /// 交易时默认的gas price
-    #[serde(default)]
-    pub gas_price: String,
-    /// 精度
-    #[serde(default)]
-    pub decimal: i32,
-
     ///这个是为了使用方便，它不会生成数据库字段
     #[serde(skip)]
     pub chain_token_shared: MEthChainTokenShared,
@@ -121,7 +119,7 @@ mod tests {
     use strum::IntoEnumIterator;
 
     use crate::kits::test::make_memory_rbatis_test;
-    use crate::ma::{Dao, Db, DbCreateType, EthTokenType, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared};
+    use crate::ma::{Dao, Db, DbCreateType, EthTokenType, MEthChainTokenAuth, MEthChainTokenDefault, MEeeChainTokenShared};
     use crate::NetType;
 
     #[test]
@@ -160,9 +158,9 @@ mod tests {
     #[test]
     fn m_eth_chain_token_shared_test() {
         let rb = block_on(init_memory());
-        let re = block_on(MEthChainTokenShared::list(&rb, ""));
+        let re = block_on(MEeeChainTokenShared::list(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);
-        let mut token = MEthChainTokenShared::default();
+        let mut token = MEeeChainTokenShared::default();
         token.token_type = EthTokenType::Eth.to_string();
         token.gas_price = "10".to_owned();
         token.gas_limit = 10;
@@ -178,7 +176,7 @@ mod tests {
 
         let re = block_on(token.save(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);
-        let re = block_on(MEthChainTokenShared::list(&rb, ""));
+        let re = block_on(MEeeChainTokenShared::list(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);
         let tokens = re.unwrap();
         assert_eq!(1, tokens.len(), "{:?}", tokens);
@@ -186,7 +184,7 @@ mod tests {
         let db_token = &tokens.as_slice()[0];
         assert_eq!(&token, db_token);
 
-        let re = block_on(MEthChainTokenShared::fetch_by_id(&rb, "", &token.id));
+        let re = block_on(MEeeChainTokenShared::fetch_by_id(&rb, "", &token.id));
         assert_eq!(false, re.is_err(), "{:?}", re);
         let db_token = re.unwrap().unwrap();
         assert_eq!(token, db_token);
@@ -222,7 +220,7 @@ mod tests {
         let rb = make_memory_rbatis_test().await;
         let r = Db::create_table(&rb, MEthChainTokenDefault::create_table_script(), &MEthChainTokenDefault::table_name(), &DbCreateType::Drop).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
-        let r = Db::create_table(&rb, MEthChainTokenShared::create_table_script(), &MEthChainTokenShared::table_name(), &DbCreateType::Drop).await;
+        let r = Db::create_table(&rb, MEeeChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), &DbCreateType::Drop).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
         let r = Db::create_table(&rb, MEthChainTokenAuth::create_table_script(), &MEthChainTokenAuth::table_name(), &DbCreateType::Drop).await;
         assert_eq!(false, r.is_err(), "{:?}", r);
