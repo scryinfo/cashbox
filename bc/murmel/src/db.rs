@@ -105,10 +105,10 @@ impl ChainSqlite {
             let r = block_on(self.rb.exec("", &sql));
             match r {
                 Ok(a) => {
-                    println!("=== {:?} ===", a);
+                    debug!("=== {:?} ===", a);
                 }
                 Err(e) => {
-                    println!("=== {:?} ===", e);
+                    error!("=== {:?} ===", e);
                 }
             }
         }
@@ -264,7 +264,7 @@ impl DetailSqlite {
                 debug!("update_progress {:?}", a);
             }
             Err(e) => {
-                debug!("update_progress {:?}", e);
+                error!("update_progress {:?}", e);
             }
         }
     }
@@ -276,7 +276,7 @@ impl DetailSqlite {
                 let genesis = genesis_block(self.network).header;
                 let header = genesis.bitcoin_hash().to_hex();
                 let timestamp = genesis.time.to_string();
-                info!("scanned newest block from genesis {:?}", &genesis);
+                info!("=== scanned newest block from genesis {:?} ===", &genesis);
                 self.save_progress(header.clone(), timestamp.clone());
                 let mut progress = MProgress::default();
                 progress.header = header;
@@ -302,7 +302,7 @@ impl DetailSqlite {
         tx_input.prev_vout = prev_vout;
         tx_input.sequence = sequence;
 
-        let r = block_on(self.rb.save("", &tx_input));
+        let r = block_on(tx_input.save(&self.rb, ""));
         match r {
             Ok(a) => {
                 debug!("save_tx_input {:?}", a);
@@ -320,7 +320,7 @@ impl DetailSqlite {
         tx_output.value = value;
         tx_output.vin = vin;
 
-        let r = block_on(self.rb.save("", &tx_output));
+        let r = block_on(tx_output.save(&self.rb, ""));
         match r {
             Ok(a) => {
                 debug!("save_tx_input {:?}", a);
@@ -335,7 +335,7 @@ impl DetailSqlite {
         let mut user_address = MUserAddress::default();
         user_address.address = address;
         user_address.compressed_pub_key = compressed_pub_key;
-        let r = block_on(self.rb.save("", &user_address));
+        let r = block_on(user_address.save(&self.rb, ""));
         match r {
             Ok(a) => {
                 debug!("save_tx_input {:?}", a);
@@ -347,9 +347,10 @@ impl DetailSqlite {
     }
 
     pub fn fetch_user_address(&self) -> Option<MUserAddress> {
-        let r: Result<Option<MUserAddress>, _> = block_on(self.rb.fetch_by_id("", &"1".to_owned()));
+        let w = self.rb.new_wrapper().eq("rowid", 1).check().unwrap();
+        let r: Result<MUserAddress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
         match r {
-            Ok(p) => p,
+            Ok(u) => Some(u),
             Err(_) => None,
         }
     }
@@ -395,19 +396,51 @@ pub static RB_DETAIL: Lazy<DetailSqlite> =
 
 #[cfg(test)]
 mod test {
-    use crate::db::RB_CHAIN;
+    use crate::db::{RB_CHAIN, RB_DETAIL};
 
     #[test]
     fn test_fetch_scann_header() {
         let r = RB_CHAIN.fetch_scan_header("1296688928".to_owned(), false);
-        println!("{:?}" ,r);
+        println!("{:?}", r);
         let r = RB_CHAIN.fetch_scan_header("1296688928".to_owned(), true);
-        println!("{:?}" ,r);
+        println!("{:?}", r);
+    }
+
+    #[test]
+    fn test_fetch_height() {
+        let h = RB_CHAIN.fetch_height();
+        println!("{}", h)
     }
 
     #[test]
     fn test_fetch_scanned_header_by_timestamp() {
         let h = RB_CHAIN.fetch_header_by_timestamp("1368475833".to_owned());
         println!("{}", h)
+    }
+
+    #[test]
+    fn test_fetch_process() {
+        let progress = RB_DETAIL.fetch_progress();
+        println!("{:?}", &progress);
+    }
+
+    #[test]
+    fn test_update_progress() {
+        RB_DETAIL.update_progress(
+            "00000000ea6690ba48686a4fa690eb186000d55b6c67f30bd8d4f0a7d7f1f98b".to_owned(),
+            "1337966145".to_owned(),
+        )
+    }
+
+    #[test]
+    fn test_progress() {
+        let progress = RB_DETAIL.progress();
+        println!("{:#?}", &progress);
+    }
+
+    #[test]
+    fn test_fetch_user_address() {
+        let u = RB_DETAIL.fetch_user_address();
+        println!("{:?}", &u);
     }
 }
