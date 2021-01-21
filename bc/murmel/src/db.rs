@@ -228,28 +228,24 @@ impl DetailSqlite {
         progress.timestamp = timestamp;
 
         let r = block_on(progress.save(&self.rb, ""));
-        match r {
-            Ok(a) => {
-                debug!("save_progress {:?}", a);
-            }
-            Err(e) => {
-                debug!("save_progress {:?}", e);
-            }
-        }
+        r.map_or_else(
+            |e| error!("save_progress {:?}", e),
+            |r| debug!("save_progress {:?}", r),
+        );
     }
 
     fn fetch_progress(&self) -> Option<MProgress> {
         let w = self.rb.new_wrapper().eq("rowid", 1).check();
-        match w {
-            Ok(w) => {
+        w.map_or_else(
+            |e| None,
+            |w| {
                 let r: Result<MProgress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
                 return match r {
                     Ok(r) => Some(r),
                     Err(_) => None,
                 };
-            }
-            Err(_) => None,
-        }
+            },
+        )
     }
 
     pub fn update_progress(&self, header: String, timestamp: String) {
@@ -257,16 +253,21 @@ impl DetailSqlite {
         progress.header = header;
         progress.timestamp = timestamp;
 
-        let w = self.rb.new_wrapper().eq("rowid", 1).check().unwrap();
-        let r = block_on(self.rb.update_by_wrapper("", &progress, &w, false));
-        match r {
-            Ok(a) => {
-                debug!("update_progress {:?}", a);
-            }
-            Err(e) => {
-                error!("update_progress {:?}", e);
-            }
-        }
+        let w = self.rb.new_wrapper().eq("rowid", 1).check();
+        w.map_or_else(
+            |e| error!("update_progress {:?}", e),
+            |w| {
+                let r = block_on(progress.update_by_wrapper(&self.rb, "", &w, true));
+                match r {
+                    Ok(a) => {
+                        debug!("update_progress {:?}", a);
+                    }
+                    Err(e) => {
+                        error!("update_progress {:?}", e);
+                    }
+                }
+            },
+        )
     }
 
     pub fn progress(&self) -> MProgress {
@@ -355,13 +356,19 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_local_tx(&self,address_from: String,address_to: String,value:String,status:String) {
+    pub fn save_local_tx(
+        &self,
+        address_from: String,
+        address_to: String,
+        value: String,
+        status: String,
+    ) {
         let mut local_tx = MLocalTxLog::default();
         local_tx.address_from = address_from;
         local_tx.address_to = address_to;
         local_tx.value = value;
         local_tx.status = status;
-        let r = block_on(local_tx.save(&self.rb,""));
+        let r = block_on(local_tx.save(&self.rb, ""));
         match r {
             Ok(a) => {
                 debug!("save_tx_input {:?}", a);
