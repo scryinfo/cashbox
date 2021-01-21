@@ -354,6 +354,23 @@ impl DetailSqlite {
             Err(_) => None,
         }
     }
+
+    pub fn save_local_tx(&self,address_from: String,address_to: String,value:String,status:String) {
+        let mut local_tx = MLocalTxLog::default();
+        local_tx.address_from = address_from;
+        local_tx.address_to = address_to;
+        local_tx.value = value;
+        local_tx.status = status;
+        let r = block_on(local_tx.save(&self.rb,""));
+        match r {
+            Ok(a) => {
+                debug!("save_tx_input {:?}", a);
+            }
+            Err(e) => {
+                debug!("save_tx_input {:?}", e);
+            }
+        }
+    }
 }
 
 pub fn fetch_scanned_height() -> i64 {
