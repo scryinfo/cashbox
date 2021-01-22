@@ -374,7 +374,7 @@ impl DetailSqlite {
                 debug!("save_tx_input {:?}", a);
             }
             Err(e) => {
-                debug!("save_tx_input {:?}", e);
+                error!("save_tx_input {:?}", e);
             }
         }
     }

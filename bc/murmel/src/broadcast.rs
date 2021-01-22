@@ -75,10 +75,6 @@ impl<T: Send + 'static + ShowCondition> Broadcast<T> {
                     error!("Error processing headers: {}", e);
                 }
             }
-            self.timeout
-                .lock()
-                .unwrap()
-                .check(vec![ExpectedReply::Nonce]);
         }
     }
 
