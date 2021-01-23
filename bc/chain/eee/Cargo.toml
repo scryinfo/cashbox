@@ -25,17 +25,17 @@ primitive-types = { version = "0.7.2", default-features = false, features = ["co
 
 hex = {version = "0.4", default-features = false}
 scry-crypto = {version = "0.1.0",path="../../util/crypto"}
-frame-metadata = { version = '12.0.0', default-features = false}
+frame-metadata = { version = '12.0.1', default-features = false}
 thiserror = "1.0"
 failure="0.1.3"
-sp-std = {version = '2.0.0', default-features = false}
-sp-runtime = {version = '2.0.0', default-features = false}
-sp-io = {version = '2.0.0',default-features = false}
+sp-std = {version = '2.0.1', default-features = false}
+sp-runtime = {version = '2.0.1', default-features = false}
+sp-io = {version = '2.0.1',default-features = false}
 
-support = {version = '2.0.0', package = "frame-support", default-features = false}
-sp-core = {version = '2.0.0', default-features = false,features = ["full_crypto"]}
-system = {version = '2.0.0', package = "frame-system",default-features = false}
-balances = {version = '2.0.0', package = "pallet-balances",default-features = false}
+support = {version = '2.0.1', package = "frame-support", default-features = false}
+sp-core = {version = '2.0.1', default-features = false,features = ["full_crypto"]}
+system = {version = '2.0.1', package = "frame-system",default-features = false}
+balances = {version = '2.0.1', package = "pallet-balances",default-features = false}
 
 [dev-dependencies]
 ws = {version = "0.9.1", features = ["ssl"]}

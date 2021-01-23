@@ -322,10 +322,7 @@ impl StorageMetadata {
                 let default = Decode::decode(&mut &self.default[..])
                     .map_err(|_| MetadataError::MapValueTypeError)?;
 
-                info!(
-                    "map for '{}' '{}' has hasher {:?}",
-                    self.module_prefix, self.storage_prefix, hasher
-                );
+                info!("map for '{}' '{}' has hasher {:?}", self.module_prefix, self.storage_prefix, hasher);
                 Ok(StorageMap {
                     _marker: PhantomData,
                     module_prefix,

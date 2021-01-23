@@ -335,7 +335,7 @@ fn deploy_data_encode(){
         }"#;
     let chain_id = Some(17);
     let mut rawtx: RawTransaction = serde_json::from_str(json).expect("tx format");
-    let addition = "tx test";
+    let _addition = "tx test";
     //rawtx.data = addition.as_bytes().to_vec();
     rawtx.data = contract_byte;
     rawtx.to = None;

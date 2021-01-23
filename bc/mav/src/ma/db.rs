@@ -7,7 +7,7 @@ use strum_macros::EnumIter;
 
 use crate::{kits, NetType};
 use crate::kits::Error;
-use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenShared,MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet};
+use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenShared, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet};
 
 #[derive(Debug, Default, Clone)]
 pub struct DbName {
@@ -279,8 +279,8 @@ impl Db {
                 eth.gas_limit = 0; //todo
                 eth.gas_price = "".to_owned(); //todo
                 let old_eth = {
-                    let mut wrapper = rb.new_wrapper();
-                    wrapper.eq(MEeeChainTokenShared::token_type, &eth.token_type);
+                    let wrapper = rb.new_wrapper()
+                        .eq(MEeeChainTokenShared::token_type, &eth.token_type).check()?;
                     MEthChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
                 if let Some(t) = old_eth {
@@ -292,9 +292,9 @@ impl Db {
             };
             {//token_default
                 for net_type in NetType::iter() {
-                    let mut wrapper = rb.new_wrapper();
-                    wrapper.eq(MEthChainTokenDefault::chain_token_shared_id, token_shared.id.clone());
-                    wrapper.eq(MEthChainTokenDefault::net_type, net_type.to_string());
+                    let  wrapper = rb.new_wrapper()
+                        .eq(MEthChainTokenDefault::chain_token_shared_id, token_shared.id.clone())
+                        .eq(MEthChainTokenDefault::net_type, net_type.to_string()).check()?;
                     let old = MEthChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
                         let mut token_default = MEthChainTokenDefault::default();
@@ -325,8 +325,8 @@ impl Db {
                 eee.token_shared.project_note = "EEE is a global".to_owned();
 
                 let old_eth = {
-                    let mut wrapper = rb.new_wrapper();
-                    wrapper.eq(MEeeChainTokenShared::token_type, &eee.token_type);
+                    let wrapper = rb.new_wrapper()
+                        .eq(MEeeChainTokenShared::token_type, &eee.token_type).check()?;
                     MEeeChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
                 if let Some(t) = old_eth {
@@ -338,9 +338,9 @@ impl Db {
             };
             {//token_default
                 for net_type in NetType::iter() {
-                    let mut wrapper = rb.new_wrapper();
-                    wrapper.eq(MEeeChainTokenDefault::chain_token_shared_id, token_shared.id.clone());
-                    wrapper.eq(MEeeChainTokenDefault::net_type, net_type.to_string());
+                    let  wrapper = rb.new_wrapper()
+                        .eq(MEeeChainTokenDefault::chain_token_shared_id, token_shared.id.clone())
+                        .eq(MEeeChainTokenDefault::net_type, net_type.to_string()).check()?;
                     let old = MEeeChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
                         let mut token_default = MEeeChainTokenDefault::default();
@@ -369,8 +369,8 @@ impl Db {
                 btc.token_shared.project_note = "Bitcoin is a global, open-source platform for decentralized applications.".to_owned();
 
                 let old_eth = {
-                    let mut wrapper = rb.new_wrapper();
-                    wrapper.eq(MBtcChainTokenShared::token_type, &btc.token_type);
+                    let  wrapper = rb.new_wrapper()
+                        .eq(MBtcChainTokenShared::token_type, &btc.token_type).check()?;
                     MBtcChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
                 if let Some(t) = old_eth {
@@ -382,9 +382,9 @@ impl Db {
             };
             {//token_default
                 for net_type in NetType::iter() {
-                    let mut wrapper = rb.new_wrapper();
-                    wrapper.eq(MBtcChainTokenDefault::chain_token_shared_id, token_shared.id.clone());
-                    wrapper.eq(MBtcChainTokenDefault::net_type, net_type.to_string());
+                    let  wrapper = rb.new_wrapper()
+                        .eq(MBtcChainTokenDefault::chain_token_shared_id, token_shared.id.clone())
+                        .eq(MBtcChainTokenDefault::net_type, net_type.to_string()).check()?;
                     let old = MBtcChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
                         let mut token_default = MBtcChainTokenDefault::default();

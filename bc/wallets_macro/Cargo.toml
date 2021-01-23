@@ -8,7 +8,7 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-syn = "=1.0.50"
+syn = "1.0.58"
 quote = "1.0.7"
 proc-macro2 = "1.0.24"
 proc_macro_roids = "0.7.0"
@@ -20,9 +20,9 @@ rustfmt = "0.10.0"
 bigdecimal = { version = "0.2.0", package = "bigdecimal", features = ["serde"] }
 
 [dev-dependencies]
-rbatis-core = { version = "1.8.58", features = ["async-io-sqlite"] }
-rbatis = { version = "1.8.58", features = ["async-io-sqlite"] }
-rbatis-macro-driver = { version = "1.8.58", features = ["no_print"] }
+rbatis-core = { version = "1.8.65", features = ["async-io-sqlite"] }
+rbatis = { version = "1.8.65", features = ["async-io-sqlite"] }
+rbatis-macro-driver = { version = "1.8.65"}
 serde = { version = "1", features = ["derive"] }
 
 [features]

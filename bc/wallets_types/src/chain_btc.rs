@@ -57,10 +57,10 @@ impl BtcChainTokenDefault {
         let tx_id = "";
         let wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MBtcChainTokenShared> = {
-            let mut wrapper = wallets_db.new_wrapper();
             let default_name = MBtcChainTokenDefault::table_name();
             let shared_name = MBtcChainTokenShared::table_name();
-            wrapper.eq(format!("{}.{}", default_name, MBtcChainTokenDefault::net_type).as_str(), net_type.to_string());
+            let mut wrapper = wallets_db.new_wrapper()
+                .eq(format!("{}.{}", default_name, MBtcChainTokenDefault::net_type).as_str(), net_type.to_string());
 
             let sql = {
                 wrapper = wrapper.check()?;
@@ -72,9 +72,10 @@ impl BtcChainTokenDefault {
         };
 
         let mut tokens_default = {
-            let mut wrapper = wallets_db.new_wrapper();
-            wrapper.eq(MBtcChainTokenDefault::net_type, net_type.to_string());
-            wrapper.order_by(true, &[MBtcChainTokenDefault::position]);
+            let wrapper = wallets_db.new_wrapper()
+                .eq(MBtcChainTokenDefault::net_type, net_type.to_string())
+                .check()?
+                .order_by(true, &[MBtcChainTokenDefault::position]);
             MBtcChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
         for token_default in &mut tokens_default {
@@ -123,8 +124,9 @@ impl Load for BtcChain {
 
         {//load token
             let rb = context.db().data_db( &NetType::from(&mw.net_type));
-            let mut wrapper = rb.new_wrapper();
-            wrapper.eq(MBtcChainToken::wallet_id, mw.id.clone()).eq(MBtcChainToken::chain_type, self.chain_shared.chain_type.clone());
+            let wrapper = rb.new_wrapper()
+                .eq(MBtcChainToken::wallet_id, mw.id.clone())
+                .eq(MBtcChainToken::chain_type, self.chain_shared.chain_type.clone()).check()?;
             let ms = MBtcChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
             for it in ms {

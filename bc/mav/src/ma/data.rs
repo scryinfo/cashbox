@@ -42,6 +42,8 @@ pub struct TxShared {
     /// 交易的byte数据，不同链格式不一样
     #[serde(default)]
     pub tx_bytes: String,
+    #[serde(default)]
+    pub tx_timestamp:i64
 }
 
 #[cfg(test)]

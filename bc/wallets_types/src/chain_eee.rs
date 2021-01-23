@@ -65,10 +65,9 @@ impl EeeChainTokenDefault {
         let tx_id = "";
         let wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MEeeChainTokenShared> = {
-            let mut wrapper = wallets_db.new_wrapper();
             let default_name = MEeeChainTokenDefault::table_name();
             let shared_name = MEeeChainTokenShared::table_name();
-            wrapper.eq(format!("{}.{}", default_name, MEeeChainTokenDefault::net_type).as_str(), net_type.to_string());
+            let mut wrapper =  wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEeeChainTokenDefault::net_type).as_str(), net_type.to_string());
 
             let sql = {
                 wrapper = wrapper.check()?;
@@ -80,9 +79,10 @@ impl EeeChainTokenDefault {
         };
 
         let mut tokens_default = {
-            let mut wrapper = wallets_db.new_wrapper();
-            wrapper.eq(MEeeChainTokenDefault::net_type, net_type.to_string());
-            wrapper.order_by(true, &[MEeeChainTokenDefault::position]);
+            let wrapper = wallets_db.new_wrapper()
+                .eq(MEeeChainTokenDefault::net_type, net_type.to_string())
+                .check()?
+                .order_by(true, &[MEeeChainTokenDefault::position]);
             MEeeChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
         for token_default in &mut tokens_default {
@@ -126,9 +126,11 @@ impl Load for EeeChain {
         self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
 
         {//load token
-            let rb = context.db().data_db( &NetType::from(&mw.net_type));
-            let mut wrapper = rb.new_wrapper();
-            wrapper.eq(MEeeChainToken::wallet_id, mw.id.clone()).eq(MEeeChainToken::chain_type, self.chain_shared.chain_type.clone());
+            let rb = context.db().data_db(&NetType::from(&mw.net_type));
+            let wrapper = rb.new_wrapper()
+                .eq(MEeeChainToken::wallet_id, mw.id.clone())
+                .check()?
+                .eq(MEeeChainToken::chain_type, self.chain_shared.chain_type.clone());
             let ms = MEeeChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
             for it in ms {
@@ -142,15 +144,15 @@ impl Load for EeeChain {
 }
 
 
-#[derive(Debug,Default, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct AccountInfoSyncProg {
-    m:MAccountInfoSyncProg
+    m: MAccountInfoSyncProg
 }
 deref_type!(AccountInfoSyncProg,MAccountInfoSyncProg);
 
-impl From<MAccountInfoSyncProg> for AccountInfoSyncProg{
+impl From<MAccountInfoSyncProg> for AccountInfoSyncProg {
     fn from(m_sync_prog: MAccountInfoSyncProg) -> Self {
-        let mut info =  AccountInfoSyncProg{
+        let mut info = AccountInfoSyncProg {
             m: Default::default()
         };
         info.m = m_sync_prog;
@@ -158,24 +160,24 @@ impl From<MAccountInfoSyncProg> for AccountInfoSyncProg{
     }
 }
 
-impl AccountInfoSyncProg{
+impl AccountInfoSyncProg {
     pub async fn find_by_account(rb: &Rbatis, account: &str) -> Result<Option<MAccountInfoSyncProg>, WalletError> {
-        let mut wrapper = rb.new_wrapper();
-        wrapper.eq(MAccountInfoSyncProg::account, account.to_string());
-        let r = MAccountInfoSyncProg::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info|info.into());
+        let wrapper = rb.new_wrapper()
+            .eq(MAccountInfoSyncProg::account, account.to_string());
+        let r = MAccountInfoSyncProg::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)
     }
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct SubChainBasicInfo {
-    m:MSubChainBasicInfo
+    m: MSubChainBasicInfo
 }
 deref_type!(SubChainBasicInfo,MSubChainBasicInfo);
 
-impl From<MSubChainBasicInfo> for SubChainBasicInfo{
+impl From<MSubChainBasicInfo> for SubChainBasicInfo {
     fn from(m_sub_info: MSubChainBasicInfo) -> Self {
-        let mut info =  SubChainBasicInfo{
+        let mut info = SubChainBasicInfo {
             m: Default::default()
         };
         info.m = m_sub_info;
@@ -183,13 +185,14 @@ impl From<MSubChainBasicInfo> for SubChainBasicInfo{
     }
 }
 
-impl SubChainBasicInfo{
-    pub async fn find_by_version(rb: &Rbatis, genesis_hash: &str,runtime_version:i32,tx_version:i32) -> Result<Option<SubChainBasicInfo>, WalletError> {
-        let mut wrapper = rb.new_wrapper();
-        wrapper.eq(MSubChainBasicInfo::genesis_hash, genesis_hash.to_string());
-        wrapper.eq(MSubChainBasicInfo::runtime_version, runtime_version);
-        wrapper.eq(MSubChainBasicInfo::tx_version, tx_version);
-        let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info|info.into());
+impl SubChainBasicInfo {
+    pub async fn find_by_version(rb: &Rbatis, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<Option<SubChainBasicInfo>, WalletError> {
+        let wrapper = rb.new_wrapper()
+            .eq(MSubChainBasicInfo::genesis_hash, genesis_hash.to_string())
+            .check()?
+            .eq(MSubChainBasicInfo::runtime_version, runtime_version)
+            .eq(MSubChainBasicInfo::tx_version, tx_version);
+        let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)
     }
 }

@@ -15,7 +15,7 @@ pub const CTrue: CBool = 0u32;
 /// call free_c_char to free memory
 pub fn to_c_char(s: &str) -> *mut c_char {
     match CString::new(s){
-        Err(e) => {
+        Err(_e) => {
             //todo log "Failed to create CString"
             null_mut()
         },

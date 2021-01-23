@@ -57,10 +57,9 @@ impl EthChainTokenDefault {
         let tx_id = "";
         let wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MEthChainTokenShared> = {
-            let mut wrapper = wallets_db.new_wrapper();
             let default_name = MEthChainTokenDefault::table_name();
             let shared_name = MEthChainTokenShared::table_name();
-            wrapper.eq(format!("{}.{}", default_name, MEthChainTokenDefault::net_type).as_str(), net_type.to_string());
+            let mut wrapper=  wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEthChainTokenDefault::net_type).as_str(), net_type.to_string());
 
             let sql = {
                 wrapper = wrapper.check()?;
@@ -71,9 +70,10 @@ impl EthChainTokenDefault {
             wallets_db.fetch_prepare(tx_id, &sql, &wrapper.args).await?
         };
         let mut tokens_default = {
-            let mut wrapper = wallets_db.new_wrapper();
-            wrapper.eq(MEthChainTokenDefault::net_type, net_type.to_string());
-            wrapper.order_by(true, &[MEthChainTokenDefault::position]);
+            let wrapper = wallets_db.new_wrapper()
+                .eq(MEthChainTokenDefault::net_type, net_type.to_string())
+                .check()?
+                .order_by(true, &[MEthChainTokenDefault::position]);
             MEthChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
         for token_default in &mut tokens_default {
@@ -127,8 +127,9 @@ impl Load for EthChain {
         {//load token
 
             let rb = context.db().data_db( &NetType::from(&mw.net_type));
-            let mut wrapper = rb.new_wrapper();
-            wrapper.eq(MEthChainToken::wallet_id, mw.id.clone()).eq(MEthChainToken::chain_type, self.chain_shared.chain_type.clone());
+            let wrapper = rb.new_wrapper()
+                .eq(MEthChainToken::wallet_id, mw.id.clone())
+                .eq(MEthChainToken::chain_type, self.chain_shared.chain_type.clone()).check()?;
             let ms = MEthChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
             for it in ms {

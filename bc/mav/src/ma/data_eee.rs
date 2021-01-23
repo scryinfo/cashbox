@@ -45,6 +45,8 @@ impl MEeeChainToken {
 pub struct MEeeChainTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
+    #[serde(default)]
+    pub signer: String,
     //from是数据库的关键字，所以加上 address
     #[serde(default)]
     pub from_address: String,
@@ -75,6 +77,8 @@ impl MEeeChainTx {
 pub struct MEeeTokenxTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
+    #[serde(default)]
+    pub signer: String,
     //from是数据库的关键字，所以加上 address
     #[serde(default)]
     pub from_address: String,

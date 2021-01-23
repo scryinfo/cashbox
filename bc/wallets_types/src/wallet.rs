@@ -56,8 +56,7 @@ impl Wallet {
     pub async fn find_by_address(context: &dyn ContextTrait, address: &str) -> Result<Option<Wallet>, WalletError> {
         let wallet_db = context.db().wallets_db();
         let m_address = {
-            let mut addr_wrapper = wallet_db.new_wrapper();
-            addr_wrapper.eq(&MAddress::address, address);
+            let addr_wrapper = wallet_db.new_wrapper().eq(&MAddress::address, address).check()?;
             MAddress::fetch_by_wrapper(wallet_db, "", &addr_wrapper).await?
         };
         if m_address.is_none() {
@@ -90,25 +89,23 @@ impl Wallet {
 
     pub async fn m_wallet_by_name(context: &dyn ContextTrait, name: &str) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
-        let mut wrapper = rb.new_wrapper();
-        wrapper.eq(&MWallet::name, name);
+        let  wrapper = rb.new_wrapper().eq(&MWallet::name, name).check()?;
         let dws = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(dws)
     }
 
     pub async fn mnemonic_digest(context: &dyn ContextTrait, digest: &str) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
-        let mut wrapper = rb.new_wrapper();
-        wrapper.eq(MWallet::mnemonic_digest, digest);
+        let  wrapper = rb.new_wrapper().eq(MWallet::mnemonic_digest, digest).check()?;
         let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(ms)
     }
 
     pub async fn wallet_type_mnemonic_digest(context: &dyn ContextTrait, digest: &str, wallet_type: &WalletType) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
-        let mut wrapper = rb.new_wrapper();
-        wrapper.eq(MWallet::mnemonic_digest, digest.to_owned());
-        wrapper.eq(MWallet::wallet_type, wallet_type.to_string());
+        let wrapper = rb.new_wrapper()
+        .eq(MWallet::mnemonic_digest, digest.to_owned())
+        .eq(MWallet::wallet_type, wallet_type.to_string()).check()?;
         let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(ms)
     }

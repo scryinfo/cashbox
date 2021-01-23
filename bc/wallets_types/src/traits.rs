@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use mav::ma::{Db, MAddress, MWallet};
 use mav::{WalletType, NetType};
 
-use crate::{WalletError, SubChainBasicInfo, RawTxParam, AccountInfoSyncProg, DecodeAccountInfoParameters, AccountInfo, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, EthChainTokenDefault, EthChainTokenAuth, EeeChainTokenDefault, EeeChainTokenAuth, BtcChainTokenDefault, BtcChainTokenAuth};
+use crate::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError};
 
 #[async_trait]
 pub trait Load {
@@ -46,6 +46,7 @@ pub trait EeeChainTrait: Send + Sync {
     async fn eee_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &EeeTransferPayload) -> Result<String, WalletError>;
     async fn tokenx_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &EeeTransferPayload) -> Result<String, WalletError>;
     async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, raw_tx: &RawTxParam, is_submittable: bool) -> Result<String, WalletError>;
+    async fn save_tx_record(&self, context: &dyn ContextTrait,net_type: &NetType, extrinsic_ctx:&ExtrinsicContext) -> Result<(), WalletError>;
     async fn update_default_tokens(&self, context: &dyn ContextTrait, tokens: Vec<EeeChainTokenDefault>) -> Result<(), WalletError>;
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, auth_tokens: Vec<EeeChainTokenAuth>) -> Result<(), WalletError>;
 }

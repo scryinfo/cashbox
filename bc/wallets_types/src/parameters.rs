@@ -76,6 +76,15 @@ pub struct EeeTransferPayload {
     pub ext_data: String,
     pub password: String,
 }
+#[derive(Debug, Default, Clone)]
+pub struct ExtrinsicContext {
+    pub chain_version: ChainVersion,
+    pub account: String,
+    pub block_hash: String,
+    pub block_number: String,
+    pub event: String,
+    pub extrinsics: String,
+}
 
 #[derive(Debug, Default, Clone)]
 pub struct AccountInfo {

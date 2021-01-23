@@ -48,8 +48,7 @@ impl Setting {
     ///如果没有找到返回 none
     pub async fn get_setting(context: &dyn ContextTrait, key: &SettingType) -> Result<Option<MSetting>, WalletError> {
         let rb = context.db().wallets_db();
-        let mut wrapper = rb.new_wrapper();
-        wrapper.eq(MSetting::key_str, key.to_string());
+        let  wrapper = rb.new_wrapper().eq(MSetting::key_str, key.to_string()).check()?;
         let r = MSetting::fetch_by_wrapper(rb, "", &wrapper).await?;
         Ok(r)
     }

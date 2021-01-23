@@ -8,7 +8,7 @@ use mav::NetType;
 use wallets::Contexts;
 use wallets_types::Error;
 
-use crate::kits::CStruct;
+use crate::{kits::CStruct, parameters::CExtrinsicContext};
 use crate::parameters::CChainVersion;
 
 use super::chain_eee::{CAccountInfoSyncProg, CSubChainBasicInfo};
@@ -349,6 +349,41 @@ pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn ChainEee_saveExtrinsicDetail(ctx: *mut CContext, netType: *mut c_char,extrinsicCtx: *mut CExtrinsicContext) -> *const CError {
+    log::debug!("enter ChainEee saveExtrinsicDetail");
+
+    if ctx.is_null() || extrinsicCtx.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx,extrinsicCtx is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let eee_chain = wallets.eee_chain_instance();
+                let net_type = NetType::from(to_str(netType));
+                let extrinsic_ctx = CExtrinsicContext::ptr_rust(extrinsicCtx);
+                match block_on(eee_chain.save_tx_record(wallets, &net_type,&extrinsic_ctx)) {
+                    Ok(_) => {
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+
+}
+
+
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_updateAuthDigitList(ctx: *mut CContext,authTokens: *mut CArray<CEeeChainTokenAuth>) -> *const CError {

@@ -1,7 +1,6 @@
 use std::ptr::null_mut;
 use std::time::{Duration, Instant};
 
-use futures::executor::block_on;
 use futures::task::SpawnExt;
 
 use mav::{kits, WalletType};
