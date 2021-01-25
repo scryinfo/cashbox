@@ -3,6 +3,7 @@ import 'package:wallets/wallets_c.dc.dart';
 import 'enums.dart';
 import 'kits.dart';
 
+//动态库一个返回值，由于dart函数不支持返回多个值，所以增加class来处理返回多个值的情况
 class DlResult1<T1> {
   Error err;
   T1 data1;
@@ -12,6 +13,7 @@ class DlResult1<T1> {
   bool isSuccess() => err.isSuccess();
 }
 
+//动态库两个返回值
 class DlResult2<T1, T2> {
   Error err;
   T1 data1;
@@ -22,6 +24,7 @@ class DlResult2<T1, T2> {
   bool isSuccess() => err.isSuccess();
 }
 
+//动态库三个返回值
 class DlResult3<T1, T2, T3> {
   Error err;
   T1 data1;
@@ -33,6 +36,7 @@ class DlResult3<T1, T2, T3> {
   bool isSuccess() => err.isSuccess();
 }
 
+//当前钱包
 class CurrentWallet {
   String walletId;
   ChainType chainType;

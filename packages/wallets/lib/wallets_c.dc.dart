@@ -317,6 +317,130 @@ class ArrayCBtcChainToken extends DC<clib.CArrayCBtcChainToken> {
   }
 }
 
+class ArrayCBtcChainTokenAuth extends DC<clib.CArrayCBtcChainTokenAuth> {
+  List<BtcChainTokenAuth> data;
+
+  ArrayCBtcChainTokenAuth() {
+    data = new List<BtcChainTokenAuth>();
+  }
+
+  static free(Pointer<clib.CArrayCBtcChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    BtcChainTokenAuth.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCBtcChainTokenAuth fromC(
+      Pointer<clib.CArrayCBtcChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCBtcChainTokenAuth();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCBtcChainTokenAuth> toCPtr() {
+    var c = allocateZero<clib.CArrayCBtcChainTokenAuth>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCBtcChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      BtcChainTokenAuth.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<clib.CBtcChainTokenAuth>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCBtcChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<BtcChainTokenAuth>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
+class ArrayCBtcChainTokenDefault extends DC<clib.CArrayCBtcChainTokenDefault> {
+  List<BtcChainTokenDefault> data;
+
+  ArrayCBtcChainTokenDefault() {
+    data = new List<BtcChainTokenDefault>();
+  }
+
+  static free(Pointer<clib.CArrayCBtcChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    BtcChainTokenDefault.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCBtcChainTokenDefault fromC(
+      Pointer<clib.CArrayCBtcChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCBtcChainTokenDefault();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCBtcChainTokenDefault> toCPtr() {
+    var c = allocateZero<clib.CArrayCBtcChainTokenDefault>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCBtcChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      BtcChainTokenDefault.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<clib.CBtcChainTokenDefault>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCBtcChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<BtcChainTokenDefault>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
 class ArrayCChar extends DC<clib.CArrayCChar> {
   List<String> data;
 
@@ -500,6 +624,130 @@ class ArrayCEeeChainToken extends DC<clib.CArrayCEeeChainToken> {
   }
 }
 
+class ArrayCEeeChainTokenAuth extends DC<clib.CArrayCEeeChainTokenAuth> {
+  List<EeeChainTokenAuth> data;
+
+  ArrayCEeeChainTokenAuth() {
+    data = new List<EeeChainTokenAuth>();
+  }
+
+  static free(Pointer<clib.CArrayCEeeChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    EeeChainTokenAuth.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCEeeChainTokenAuth fromC(
+      Pointer<clib.CArrayCEeeChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCEeeChainTokenAuth();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCEeeChainTokenAuth> toCPtr() {
+    var c = allocateZero<clib.CArrayCEeeChainTokenAuth>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCEeeChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      EeeChainTokenAuth.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<clib.CEeeChainTokenAuth>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCEeeChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<EeeChainTokenAuth>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
+class ArrayCEeeChainTokenDefault extends DC<clib.CArrayCEeeChainTokenDefault> {
+  List<EeeChainTokenDefault> data;
+
+  ArrayCEeeChainTokenDefault() {
+    data = new List<EeeChainTokenDefault>();
+  }
+
+  static free(Pointer<clib.CArrayCEeeChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    EeeChainTokenDefault.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCEeeChainTokenDefault fromC(
+      Pointer<clib.CArrayCEeeChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCEeeChainTokenDefault();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCEeeChainTokenDefault> toCPtr() {
+    var c = allocateZero<clib.CArrayCEeeChainTokenDefault>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCEeeChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      EeeChainTokenDefault.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<clib.CEeeChainTokenDefault>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCEeeChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<EeeChainTokenDefault>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
 class ArrayCEthChainToken extends DC<clib.CArrayCEthChainToken> {
   List<EthChainToken> data;
 
@@ -555,6 +803,130 @@ class ArrayCEthChainToken extends DC<clib.CArrayCEthChainToken> {
       return;
     }
     data = new List<EthChainToken>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
+class ArrayCEthChainTokenAuth extends DC<clib.CArrayCEthChainTokenAuth> {
+  List<EthChainTokenAuth> data;
+
+  ArrayCEthChainTokenAuth() {
+    data = new List<EthChainTokenAuth>();
+  }
+
+  static free(Pointer<clib.CArrayCEthChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    EthChainTokenAuth.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCEthChainTokenAuth fromC(
+      Pointer<clib.CArrayCEthChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCEthChainTokenAuth();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCEthChainTokenAuth> toCPtr() {
+    var c = allocateZero<clib.CArrayCEthChainTokenAuth>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCEthChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      EthChainTokenAuth.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<clib.CEthChainTokenAuth>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCEthChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<EthChainTokenAuth>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
+class ArrayCEthChainTokenDefault extends DC<clib.CArrayCEthChainTokenDefault> {
+  List<EthChainTokenDefault> data;
+
+  ArrayCEthChainTokenDefault() {
+    data = new List<EthChainTokenDefault>();
+  }
+
+  static free(Pointer<clib.CArrayCEthChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    EthChainTokenDefault.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCEthChainTokenDefault fromC(
+      Pointer<clib.CArrayCEthChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCEthChainTokenDefault();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCEthChainTokenDefault> toCPtr() {
+    var c = allocateZero<clib.CArrayCEthChainTokenDefault>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCEthChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      EthChainTokenDefault.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<clib.CEthChainTokenDefault>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCEthChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<EthChainTokenDefault>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
@@ -800,8 +1172,169 @@ class BtcChainToken extends DC<clib.CBtcChainToken> {
   }
 }
 
+class BtcChainTokenAuth extends DC<clib.CBtcChainTokenAuth> {
+  String chainTokenSharedId;
+  String netType;
+  int position;
+  BtcChainTokenShared btcChainTokenShared;
+
+  BtcChainTokenAuth() {
+    btcChainTokenShared = new BtcChainTokenShared();
+  }
+
+  static free(Pointer<clib.CBtcChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    if (ptr.ref.chainTokenSharedId != null &&
+        ptr.ref.chainTokenSharedId != nullptr) {
+      ffi.free(ptr.ref.chainTokenSharedId);
+    }
+    ptr.ref.chainTokenSharedId = nullptr;
+    if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
+      ffi.free(ptr.ref.netType);
+    }
+    ptr.ref.netType = nullptr;
+    BtcChainTokenShared.free(ptr.ref.btcChainTokenShared);
+    ptr.ref.btcChainTokenShared = nullptr;
+    ffi.free(ptr);
+  }
+
+  static BtcChainTokenAuth fromC(Pointer<clib.CBtcChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new BtcChainTokenAuth();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CBtcChainTokenAuth> toCPtr() {
+    var ptr = allocateZero<clib.CBtcChainTokenAuth>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CBtcChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.chainTokenSharedId != null &&
+        c.ref.chainTokenSharedId != nullptr) {
+      ffi.free(c.ref.chainTokenSharedId);
+    }
+    c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
+    if (c.ref.netType != null && c.ref.netType != nullptr) {
+      ffi.free(c.ref.netType);
+    }
+    c.ref.netType = toUtf8Null(netType);
+    c.ref.position = position;
+    if (c.ref.btcChainTokenShared == null ||
+        c.ref.btcChainTokenShared == nullptr) {
+      c.ref.btcChainTokenShared = allocateZero<clib.CBtcChainTokenShared>();
+    }
+    btcChainTokenShared.toC(c.ref.btcChainTokenShared);
+  }
+
+  @override
+  toDart(Pointer<clib.CBtcChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    chainTokenSharedId = fromUtf8Null(c.ref.chainTokenSharedId);
+    netType = fromUtf8Null(c.ref.netType);
+    position = c.ref.position;
+    btcChainTokenShared = new BtcChainTokenShared();
+    btcChainTokenShared.toDart(c.ref.btcChainTokenShared);
+  }
+}
+
+class BtcChainTokenDefault extends DC<clib.CBtcChainTokenDefault> {
+  String chainTokenSharedId;
+  String netType;
+  int position;
+  BtcChainTokenShared btcChainTokenShared;
+
+  BtcChainTokenDefault() {
+    btcChainTokenShared = new BtcChainTokenShared();
+  }
+
+  static free(Pointer<clib.CBtcChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    if (ptr.ref.chainTokenSharedId != null &&
+        ptr.ref.chainTokenSharedId != nullptr) {
+      ffi.free(ptr.ref.chainTokenSharedId);
+    }
+    ptr.ref.chainTokenSharedId = nullptr;
+    if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
+      ffi.free(ptr.ref.netType);
+    }
+    ptr.ref.netType = nullptr;
+    BtcChainTokenShared.free(ptr.ref.btcChainTokenShared);
+    ptr.ref.btcChainTokenShared = nullptr;
+    ffi.free(ptr);
+  }
+
+  static BtcChainTokenDefault fromC(Pointer<clib.CBtcChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new BtcChainTokenDefault();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CBtcChainTokenDefault> toCPtr() {
+    var ptr = allocateZero<clib.CBtcChainTokenDefault>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CBtcChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.chainTokenSharedId != null &&
+        c.ref.chainTokenSharedId != nullptr) {
+      ffi.free(c.ref.chainTokenSharedId);
+    }
+    c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
+    if (c.ref.netType != null && c.ref.netType != nullptr) {
+      ffi.free(c.ref.netType);
+    }
+    c.ref.netType = toUtf8Null(netType);
+    c.ref.position = position;
+    if (c.ref.btcChainTokenShared == null ||
+        c.ref.btcChainTokenShared == nullptr) {
+      c.ref.btcChainTokenShared = allocateZero<clib.CBtcChainTokenShared>();
+    }
+    btcChainTokenShared.toC(c.ref.btcChainTokenShared);
+  }
+
+  @override
+  toDart(Pointer<clib.CBtcChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    chainTokenSharedId = fromUtf8Null(c.ref.chainTokenSharedId);
+    netType = fromUtf8Null(c.ref.netType);
+    position = c.ref.position;
+    btcChainTokenShared = new BtcChainTokenShared();
+    btcChainTokenShared.toDart(c.ref.btcChainTokenShared);
+  }
+}
+
 class BtcChainTokenShared extends DC<clib.CBtcChainTokenShared> {
   TokenShared tokenShared;
+  String tokenType;
+  int gas;
+  int decimal;
 
   BtcChainTokenShared() {
     tokenShared = new TokenShared();
@@ -813,6 +1346,10 @@ class BtcChainTokenShared extends DC<clib.CBtcChainTokenShared> {
     }
     TokenShared.free(ptr.ref.tokenShared);
     ptr.ref.tokenShared = nullptr;
+    if (ptr.ref.tokenType != null && ptr.ref.tokenType != nullptr) {
+      ffi.free(ptr.ref.tokenType);
+    }
+    ptr.ref.tokenType = nullptr;
     ffi.free(ptr);
   }
 
@@ -841,6 +1378,12 @@ class BtcChainTokenShared extends DC<clib.CBtcChainTokenShared> {
       c.ref.tokenShared = allocateZero<clib.CTokenShared>();
     }
     tokenShared.toC(c.ref.tokenShared);
+    if (c.ref.tokenType != null && c.ref.tokenType != nullptr) {
+      ffi.free(c.ref.tokenType);
+    }
+    c.ref.tokenType = toUtf8Null(tokenType);
+    c.ref.gas = gas;
+    c.ref.decimal = decimal;
   }
 
   @override
@@ -850,6 +1393,9 @@ class BtcChainTokenShared extends DC<clib.CBtcChainTokenShared> {
     }
     tokenShared = new TokenShared();
     tokenShared.toDart(c.ref.tokenShared);
+    tokenType = fromUtf8Null(c.ref.tokenType);
+    gas = c.ref.gas;
+    decimal = c.ref.decimal;
   }
 }
 
@@ -1437,8 +1983,170 @@ class EeeChainToken extends DC<clib.CEeeChainToken> {
   }
 }
 
+class EeeChainTokenAuth extends DC<clib.CEeeChainTokenAuth> {
+  String chainTokenSharedId;
+  String netType;
+  int position;
+  EeeChainTokenShared eeeChainTokenShared;
+
+  EeeChainTokenAuth() {
+    eeeChainTokenShared = new EeeChainTokenShared();
+  }
+
+  static free(Pointer<clib.CEeeChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    if (ptr.ref.chainTokenSharedId != null &&
+        ptr.ref.chainTokenSharedId != nullptr) {
+      ffi.free(ptr.ref.chainTokenSharedId);
+    }
+    ptr.ref.chainTokenSharedId = nullptr;
+    if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
+      ffi.free(ptr.ref.netType);
+    }
+    ptr.ref.netType = nullptr;
+    EeeChainTokenShared.free(ptr.ref.eeeChainTokenShared);
+    ptr.ref.eeeChainTokenShared = nullptr;
+    ffi.free(ptr);
+  }
+
+  static EeeChainTokenAuth fromC(Pointer<clib.CEeeChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new EeeChainTokenAuth();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CEeeChainTokenAuth> toCPtr() {
+    var ptr = allocateZero<clib.CEeeChainTokenAuth>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEeeChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.chainTokenSharedId != null &&
+        c.ref.chainTokenSharedId != nullptr) {
+      ffi.free(c.ref.chainTokenSharedId);
+    }
+    c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
+    if (c.ref.netType != null && c.ref.netType != nullptr) {
+      ffi.free(c.ref.netType);
+    }
+    c.ref.netType = toUtf8Null(netType);
+    c.ref.position = position;
+    if (c.ref.eeeChainTokenShared == null ||
+        c.ref.eeeChainTokenShared == nullptr) {
+      c.ref.eeeChainTokenShared = allocateZero<clib.CEeeChainTokenShared>();
+    }
+    eeeChainTokenShared.toC(c.ref.eeeChainTokenShared);
+  }
+
+  @override
+  toDart(Pointer<clib.CEeeChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    chainTokenSharedId = fromUtf8Null(c.ref.chainTokenSharedId);
+    netType = fromUtf8Null(c.ref.netType);
+    position = c.ref.position;
+    eeeChainTokenShared = new EeeChainTokenShared();
+    eeeChainTokenShared.toDart(c.ref.eeeChainTokenShared);
+  }
+}
+
+class EeeChainTokenDefault extends DC<clib.CEeeChainTokenDefault> {
+  String chainTokenSharedId;
+  String netType;
+  int position;
+  EeeChainTokenShared eeeChainTokenShared;
+
+  EeeChainTokenDefault() {
+    eeeChainTokenShared = new EeeChainTokenShared();
+  }
+
+  static free(Pointer<clib.CEeeChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    if (ptr.ref.chainTokenSharedId != null &&
+        ptr.ref.chainTokenSharedId != nullptr) {
+      ffi.free(ptr.ref.chainTokenSharedId);
+    }
+    ptr.ref.chainTokenSharedId = nullptr;
+    if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
+      ffi.free(ptr.ref.netType);
+    }
+    ptr.ref.netType = nullptr;
+    EeeChainTokenShared.free(ptr.ref.eeeChainTokenShared);
+    ptr.ref.eeeChainTokenShared = nullptr;
+    ffi.free(ptr);
+  }
+
+  static EeeChainTokenDefault fromC(Pointer<clib.CEeeChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new EeeChainTokenDefault();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CEeeChainTokenDefault> toCPtr() {
+    var ptr = allocateZero<clib.CEeeChainTokenDefault>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEeeChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.chainTokenSharedId != null &&
+        c.ref.chainTokenSharedId != nullptr) {
+      ffi.free(c.ref.chainTokenSharedId);
+    }
+    c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
+    if (c.ref.netType != null && c.ref.netType != nullptr) {
+      ffi.free(c.ref.netType);
+    }
+    c.ref.netType = toUtf8Null(netType);
+    c.ref.position = position;
+    if (c.ref.eeeChainTokenShared == null ||
+        c.ref.eeeChainTokenShared == nullptr) {
+      c.ref.eeeChainTokenShared = allocateZero<clib.CEeeChainTokenShared>();
+    }
+    eeeChainTokenShared.toC(c.ref.eeeChainTokenShared);
+  }
+
+  @override
+  toDart(Pointer<clib.CEeeChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    chainTokenSharedId = fromUtf8Null(c.ref.chainTokenSharedId);
+    netType = fromUtf8Null(c.ref.netType);
+    position = c.ref.position;
+    eeeChainTokenShared = new EeeChainTokenShared();
+    eeeChainTokenShared.toDart(c.ref.eeeChainTokenShared);
+  }
+}
+
 class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
   TokenShared tokenShared;
+  String tokenType;
+  int gasLimit;
+  String gasPrice;
+  int decimal;
 
   EeeChainTokenShared() {
     tokenShared = new TokenShared();
@@ -1450,6 +2158,14 @@ class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
     }
     TokenShared.free(ptr.ref.tokenShared);
     ptr.ref.tokenShared = nullptr;
+    if (ptr.ref.tokenType != null && ptr.ref.tokenType != nullptr) {
+      ffi.free(ptr.ref.tokenType);
+    }
+    ptr.ref.tokenType = nullptr;
+    if (ptr.ref.gasPrice != null && ptr.ref.gasPrice != nullptr) {
+      ffi.free(ptr.ref.gasPrice);
+    }
+    ptr.ref.gasPrice = nullptr;
     ffi.free(ptr);
   }
 
@@ -1478,6 +2194,16 @@ class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
       c.ref.tokenShared = allocateZero<clib.CTokenShared>();
     }
     tokenShared.toC(c.ref.tokenShared);
+    if (c.ref.tokenType != null && c.ref.tokenType != nullptr) {
+      ffi.free(c.ref.tokenType);
+    }
+    c.ref.tokenType = toUtf8Null(tokenType);
+    c.ref.gasLimit = gasLimit;
+    if (c.ref.gasPrice != null && c.ref.gasPrice != nullptr) {
+      ffi.free(c.ref.gasPrice);
+    }
+    c.ref.gasPrice = toUtf8Null(gasPrice);
+    c.ref.decimal = decimal;
   }
 
   @override
@@ -1487,6 +2213,10 @@ class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
     }
     tokenShared = new TokenShared();
     tokenShared.toDart(c.ref.tokenShared);
+    tokenType = fromUtf8Null(c.ref.tokenType);
+    gasLimit = c.ref.gasLimit;
+    gasPrice = fromUtf8Null(c.ref.gasPrice);
+    decimal = c.ref.decimal;
   }
 }
 
@@ -1766,8 +2496,190 @@ class EthChainToken extends DC<clib.CEthChainToken> {
   }
 }
 
+class EthChainTokenAuth extends DC<clib.CEthChainTokenAuth> {
+  String chainTokenSharedId;
+  String netType;
+  int position;
+  String contractAddress;
+  EthChainTokenShared ethChainTokenShared;
+
+  EthChainTokenAuth() {
+    ethChainTokenShared = new EthChainTokenShared();
+  }
+
+  static free(Pointer<clib.CEthChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    if (ptr.ref.chainTokenSharedId != null &&
+        ptr.ref.chainTokenSharedId != nullptr) {
+      ffi.free(ptr.ref.chainTokenSharedId);
+    }
+    ptr.ref.chainTokenSharedId = nullptr;
+    if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
+      ffi.free(ptr.ref.netType);
+    }
+    ptr.ref.netType = nullptr;
+    if (ptr.ref.contractAddress != null && ptr.ref.contractAddress != nullptr) {
+      ffi.free(ptr.ref.contractAddress);
+    }
+    ptr.ref.contractAddress = nullptr;
+    EthChainTokenShared.free(ptr.ref.ethChainTokenShared);
+    ptr.ref.ethChainTokenShared = nullptr;
+    ffi.free(ptr);
+  }
+
+  static EthChainTokenAuth fromC(Pointer<clib.CEthChainTokenAuth> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new EthChainTokenAuth();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CEthChainTokenAuth> toCPtr() {
+    var ptr = allocateZero<clib.CEthChainTokenAuth>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEthChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.chainTokenSharedId != null &&
+        c.ref.chainTokenSharedId != nullptr) {
+      ffi.free(c.ref.chainTokenSharedId);
+    }
+    c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
+    if (c.ref.netType != null && c.ref.netType != nullptr) {
+      ffi.free(c.ref.netType);
+    }
+    c.ref.netType = toUtf8Null(netType);
+    c.ref.position = position;
+    if (c.ref.contractAddress != null && c.ref.contractAddress != nullptr) {
+      ffi.free(c.ref.contractAddress);
+    }
+    c.ref.contractAddress = toUtf8Null(contractAddress);
+    if (c.ref.ethChainTokenShared == null ||
+        c.ref.ethChainTokenShared == nullptr) {
+      c.ref.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>();
+    }
+    ethChainTokenShared.toC(c.ref.ethChainTokenShared);
+  }
+
+  @override
+  toDart(Pointer<clib.CEthChainTokenAuth> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    chainTokenSharedId = fromUtf8Null(c.ref.chainTokenSharedId);
+    netType = fromUtf8Null(c.ref.netType);
+    position = c.ref.position;
+    contractAddress = fromUtf8Null(c.ref.contractAddress);
+    ethChainTokenShared = new EthChainTokenShared();
+    ethChainTokenShared.toDart(c.ref.ethChainTokenShared);
+  }
+}
+
+class EthChainTokenDefault extends DC<clib.CEthChainTokenDefault> {
+  String chainTokenSharedId;
+  String netType;
+  int position;
+  String contractAddress;
+  EthChainTokenShared ethChainTokenShared;
+
+  EthChainTokenDefault() {
+    ethChainTokenShared = new EthChainTokenShared();
+  }
+
+  static free(Pointer<clib.CEthChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    if (ptr.ref.chainTokenSharedId != null &&
+        ptr.ref.chainTokenSharedId != nullptr) {
+      ffi.free(ptr.ref.chainTokenSharedId);
+    }
+    ptr.ref.chainTokenSharedId = nullptr;
+    if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
+      ffi.free(ptr.ref.netType);
+    }
+    ptr.ref.netType = nullptr;
+    if (ptr.ref.contractAddress != null && ptr.ref.contractAddress != nullptr) {
+      ffi.free(ptr.ref.contractAddress);
+    }
+    ptr.ref.contractAddress = nullptr;
+    EthChainTokenShared.free(ptr.ref.ethChainTokenShared);
+    ptr.ref.ethChainTokenShared = nullptr;
+    ffi.free(ptr);
+  }
+
+  static EthChainTokenDefault fromC(Pointer<clib.CEthChainTokenDefault> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new EthChainTokenDefault();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CEthChainTokenDefault> toCPtr() {
+    var ptr = allocateZero<clib.CEthChainTokenDefault>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEthChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.chainTokenSharedId != null &&
+        c.ref.chainTokenSharedId != nullptr) {
+      ffi.free(c.ref.chainTokenSharedId);
+    }
+    c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
+    if (c.ref.netType != null && c.ref.netType != nullptr) {
+      ffi.free(c.ref.netType);
+    }
+    c.ref.netType = toUtf8Null(netType);
+    c.ref.position = position;
+    if (c.ref.contractAddress != null && c.ref.contractAddress != nullptr) {
+      ffi.free(c.ref.contractAddress);
+    }
+    c.ref.contractAddress = toUtf8Null(contractAddress);
+    if (c.ref.ethChainTokenShared == null ||
+        c.ref.ethChainTokenShared == nullptr) {
+      c.ref.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>();
+    }
+    ethChainTokenShared.toC(c.ref.ethChainTokenShared);
+  }
+
+  @override
+  toDart(Pointer<clib.CEthChainTokenDefault> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    chainTokenSharedId = fromUtf8Null(c.ref.chainTokenSharedId);
+    netType = fromUtf8Null(c.ref.netType);
+    position = c.ref.position;
+    contractAddress = fromUtf8Null(c.ref.contractAddress);
+    ethChainTokenShared = new EthChainTokenShared();
+    ethChainTokenShared.toDart(c.ref.ethChainTokenShared);
+  }
+}
+
 class EthChainTokenShared extends DC<clib.CEthChainTokenShared> {
   TokenShared tokenShared;
+  String tokenType;
+  int gasLimit;
+  String gasPrice;
+  int decimal;
 
   EthChainTokenShared() {
     tokenShared = new TokenShared();
@@ -1779,6 +2691,14 @@ class EthChainTokenShared extends DC<clib.CEthChainTokenShared> {
     }
     TokenShared.free(ptr.ref.tokenShared);
     ptr.ref.tokenShared = nullptr;
+    if (ptr.ref.tokenType != null && ptr.ref.tokenType != nullptr) {
+      ffi.free(ptr.ref.tokenType);
+    }
+    ptr.ref.tokenType = nullptr;
+    if (ptr.ref.gasPrice != null && ptr.ref.gasPrice != nullptr) {
+      ffi.free(ptr.ref.gasPrice);
+    }
+    ptr.ref.gasPrice = nullptr;
     ffi.free(ptr);
   }
 
@@ -1807,6 +2727,16 @@ class EthChainTokenShared extends DC<clib.CEthChainTokenShared> {
       c.ref.tokenShared = allocateZero<clib.CTokenShared>();
     }
     tokenShared.toC(c.ref.tokenShared);
+    if (c.ref.tokenType != null && c.ref.tokenType != nullptr) {
+      ffi.free(c.ref.tokenType);
+    }
+    c.ref.tokenType = toUtf8Null(tokenType);
+    c.ref.gasLimit = gasLimit;
+    if (c.ref.gasPrice != null && c.ref.gasPrice != nullptr) {
+      ffi.free(c.ref.gasPrice);
+    }
+    c.ref.gasPrice = toUtf8Null(gasPrice);
+    c.ref.decimal = decimal;
   }
 
   @override
@@ -1816,6 +2746,10 @@ class EthChainTokenShared extends DC<clib.CEthChainTokenShared> {
     }
     tokenShared = new TokenShared();
     tokenShared.toDart(c.ref.tokenShared);
+    tokenType = fromUtf8Null(c.ref.tokenType);
+    gasLimit = c.ref.gasLimit;
+    gasPrice = fromUtf8Null(c.ref.gasPrice);
+    decimal = c.ref.decimal;
   }
 }
 
@@ -1999,6 +2933,109 @@ class EthTransferPayload extends DC<clib.CEthTransferPayload> {
     gasLimit = fromUtf8Null(c.ref.gasLimit);
     decimal = c.ref.decimal;
     extData = fromUtf8Null(c.ref.extData);
+  }
+}
+
+class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
+  ChainVersion chainVersion;
+  String account;
+  String blockHash;
+  String blockNumber;
+  String event;
+  String extrinsics;
+
+  ExtrinsicContext() {
+    chainVersion = new ChainVersion();
+  }
+
+  static free(Pointer<clib.CExtrinsicContext> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    ChainVersion.free(ptr.ref.chainVersion);
+    ptr.ref.chainVersion = nullptr;
+    if (ptr.ref.account != null && ptr.ref.account != nullptr) {
+      ffi.free(ptr.ref.account);
+    }
+    ptr.ref.account = nullptr;
+    if (ptr.ref.blockHash != null && ptr.ref.blockHash != nullptr) {
+      ffi.free(ptr.ref.blockHash);
+    }
+    ptr.ref.blockHash = nullptr;
+    if (ptr.ref.blockNumber != null && ptr.ref.blockNumber != nullptr) {
+      ffi.free(ptr.ref.blockNumber);
+    }
+    ptr.ref.blockNumber = nullptr;
+    if (ptr.ref.event != null && ptr.ref.event != nullptr) {
+      ffi.free(ptr.ref.event);
+    }
+    ptr.ref.event = nullptr;
+    if (ptr.ref.extrinsics != null && ptr.ref.extrinsics != nullptr) {
+      ffi.free(ptr.ref.extrinsics);
+    }
+    ptr.ref.extrinsics = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ExtrinsicContext fromC(Pointer<clib.CExtrinsicContext> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ExtrinsicContext();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CExtrinsicContext> toCPtr() {
+    var ptr = allocateZero<clib.CExtrinsicContext>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CExtrinsicContext> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.chainVersion == null || c.ref.chainVersion == nullptr) {
+      c.ref.chainVersion = allocateZero<clib.CChainVersion>();
+    }
+    chainVersion.toC(c.ref.chainVersion);
+    if (c.ref.account != null && c.ref.account != nullptr) {
+      ffi.free(c.ref.account);
+    }
+    c.ref.account = toUtf8Null(account);
+    if (c.ref.blockHash != null && c.ref.blockHash != nullptr) {
+      ffi.free(c.ref.blockHash);
+    }
+    c.ref.blockHash = toUtf8Null(blockHash);
+    if (c.ref.blockNumber != null && c.ref.blockNumber != nullptr) {
+      ffi.free(c.ref.blockNumber);
+    }
+    c.ref.blockNumber = toUtf8Null(blockNumber);
+    if (c.ref.event != null && c.ref.event != nullptr) {
+      ffi.free(c.ref.event);
+    }
+    c.ref.event = toUtf8Null(event);
+    if (c.ref.extrinsics != null && c.ref.extrinsics != nullptr) {
+      ffi.free(c.ref.extrinsics);
+    }
+    c.ref.extrinsics = toUtf8Null(extrinsics);
+  }
+
+  @override
+  toDart(Pointer<clib.CExtrinsicContext> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    chainVersion = new ChainVersion();
+    chainVersion.toDart(c.ref.chainVersion);
+    account = fromUtf8Null(c.ref.account);
+    blockHash = fromUtf8Null(c.ref.blockHash);
+    blockNumber = fromUtf8Null(c.ref.blockNumber);
+    event = fromUtf8Null(c.ref.event);
+    extrinsics = fromUtf8Null(c.ref.extrinsics);
   }
 }
 

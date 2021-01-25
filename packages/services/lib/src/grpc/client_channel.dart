@@ -142,6 +142,7 @@ class ClientCallError<Q, R> extends ClientCall<Q, R> {
       [timelineTask])
       : super(method, requests, options, timelineTask);
 
+  // onConnectionError 建立连接时出错的回调，当服务端主动断开时，不会回调。处理不完整
   // @override
   // void onConnectionError(error) {
   //   if (_errCall != null) {

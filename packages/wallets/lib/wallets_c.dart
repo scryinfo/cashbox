@@ -123,6 +123,44 @@ class CArrayCBtcChainToken extends Struct {
 }
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
+class CArrayCBtcChainTokenAuth extends Struct {
+  
+  Pointer<CBtcChainTokenAuth> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
+  static Pointer<CArrayCBtcChainTokenAuth> allocate() {
+    return ffi.allocate<CArrayCBtcChainTokenAuth>();
+  }
+
+
+  static CArrayCBtcChainTokenAuth from(int ptr) {
+    return Pointer<CArrayCBtcChainTokenAuth>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
+class CArrayCBtcChainTokenDefault extends Struct {
+  
+  Pointer<CBtcChainTokenDefault> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
+  static Pointer<CArrayCBtcChainTokenDefault> allocate() {
+    return ffi.allocate<CArrayCBtcChainTokenDefault>();
+  }
+
+
+  static CArrayCBtcChainTokenDefault from(int ptr) {
+    return Pointer<CArrayCBtcChainTokenDefault>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCChar extends Struct {
   
   Pointer<Pointer<ffi.Utf8>> ptr;
@@ -224,6 +262,44 @@ class CArrayCEeeChainToken extends Struct {
 }
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
+class CArrayCEeeChainTokenAuth extends Struct {
+  
+  Pointer<CEeeChainTokenAuth> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
+  static Pointer<CArrayCEeeChainTokenAuth> allocate() {
+    return ffi.allocate<CArrayCEeeChainTokenAuth>();
+  }
+
+
+  static CArrayCEeeChainTokenAuth from(int ptr) {
+    return Pointer<CArrayCEeeChainTokenAuth>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
+class CArrayCEeeChainTokenDefault extends Struct {
+  
+  Pointer<CEeeChainTokenDefault> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
+  static Pointer<CArrayCEeeChainTokenDefault> allocate() {
+    return ffi.allocate<CArrayCEeeChainTokenDefault>();
+  }
+
+
+  static CArrayCEeeChainTokenDefault from(int ptr) {
+    return Pointer<CArrayCEeeChainTokenDefault>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCEthChainToken extends Struct {
   
   Pointer<CEthChainToken> ptr;
@@ -241,6 +317,66 @@ class CArrayCEthChainToken extends Struct {
   }
 
 }
+
+/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
+class CArrayCEthChainTokenAuth extends Struct {
+  
+  Pointer<CEthChainTokenAuth> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
+  static Pointer<CArrayCEthChainTokenAuth> allocate() {
+    return ffi.allocate<CArrayCEthChainTokenAuth>();
+  }
+
+
+  static CArrayCEthChainTokenAuth from(int ptr) {
+    return Pointer<CArrayCEthChainTokenAuth>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
+class CArrayCEthChainTokenDefault extends Struct {
+  
+  Pointer<CEthChainTokenDefault> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
+  static Pointer<CArrayCEthChainTokenDefault> allocate() {
+    return ffi.allocate<CArrayCEthChainTokenDefault>();
+  }
+
+
+  static CArrayCEthChainTokenDefault from(int ptr) {
+    return Pointer<CArrayCEthChainTokenDefault>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C function `CArrayCEthChainTokenDefault_dAlloc`.
+Pointer<Pointer<CArrayCEthChainTokenDefault>> CArrayCEthChainTokenDefault_dAlloc() {
+  return _CArrayCEthChainTokenDefault_dAlloc();
+}
+final _CArrayCEthChainTokenDefault_dAlloc_Dart _CArrayCEthChainTokenDefault_dAlloc = _dl.lookupFunction<_CArrayCEthChainTokenDefault_dAlloc_C, _CArrayCEthChainTokenDefault_dAlloc_Dart>('CArrayCEthChainTokenDefault_dAlloc');
+typedef _CArrayCEthChainTokenDefault_dAlloc_C = Pointer<Pointer<CArrayCEthChainTokenDefault>> Function();
+typedef _CArrayCEthChainTokenDefault_dAlloc_Dart = Pointer<Pointer<CArrayCEthChainTokenDefault>> Function();
+
+/// C function `CArrayCEthChainTokenDefault_dFree`.
+void CArrayCEthChainTokenDefault_dFree(
+  Pointer<Pointer<CArrayCEthChainTokenDefault>> dPtr,
+) {
+  _CArrayCEthChainTokenDefault_dFree(dPtr);
+}
+final _CArrayCEthChainTokenDefault_dFree_Dart _CArrayCEthChainTokenDefault_dFree = _dl.lookupFunction<_CArrayCEthChainTokenDefault_dFree_C, _CArrayCEthChainTokenDefault_dFree_Dart>('CArrayCEthChainTokenDefault_dFree');
+typedef _CArrayCEthChainTokenDefault_dFree_C = Void Function(
+  Pointer<Pointer<CArrayCEthChainTokenDefault>> dPtr,
+);
+typedef _CArrayCEthChainTokenDefault_dFree_Dart = void Function(
+  Pointer<Pointer<CArrayCEthChainTokenDefault>> dPtr,
+);
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCWallet extends Struct {
@@ -377,10 +513,53 @@ class CBtcChainToken extends Struct {
 
 }
 
+/// C struct `CBtcChainTokenAuth`.
+class CBtcChainTokenAuth extends Struct {
+  
+  Pointer<ffi.Utf8> chainTokenSharedId;
+  Pointer<ffi.Utf8> netType;
+  @Int64()
+  int position;
+  Pointer<CBtcChainTokenShared> btcChainTokenShared;
+  static Pointer<CBtcChainTokenAuth> allocate() {
+    return ffi.allocate<CBtcChainTokenAuth>();
+  }
+
+
+  static CBtcChainTokenAuth from(int ptr) {
+    return Pointer<CBtcChainTokenAuth>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C struct `CBtcChainTokenDefault`.
+class CBtcChainTokenDefault extends Struct {
+  
+  Pointer<ffi.Utf8> chainTokenSharedId;
+  Pointer<ffi.Utf8> netType;
+  @Int64()
+  int position;
+  Pointer<CBtcChainTokenShared> btcChainTokenShared;
+  static Pointer<CBtcChainTokenDefault> allocate() {
+    return ffi.allocate<CBtcChainTokenDefault>();
+  }
+
+
+  static CBtcChainTokenDefault from(int ptr) {
+    return Pointer<CBtcChainTokenDefault>.fromAddress(ptr).ref;
+  }
+
+}
+
 /// C struct `CBtcChainTokenShared`.
 class CBtcChainTokenShared extends Struct {
   
   Pointer<CTokenShared> tokenShared;
+  Pointer<ffi.Utf8> tokenType;
+  @Int64()
+  int gas;
+  @Int32()
+  int decimal;
   static Pointer<CBtcChainTokenShared> allocate() {
     return ffi.allocate<CBtcChainTokenShared>();
   }
@@ -576,10 +755,54 @@ class CEeeChainToken extends Struct {
 
 }
 
+/// C struct `CEeeChainTokenAuth`.
+class CEeeChainTokenAuth extends Struct {
+  
+  Pointer<ffi.Utf8> chainTokenSharedId;
+  Pointer<ffi.Utf8> netType;
+  @Int64()
+  int position;
+  Pointer<CEeeChainTokenShared> eeeChainTokenShared;
+  static Pointer<CEeeChainTokenAuth> allocate() {
+    return ffi.allocate<CEeeChainTokenAuth>();
+  }
+
+
+  static CEeeChainTokenAuth from(int ptr) {
+    return Pointer<CEeeChainTokenAuth>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C struct `CEeeChainTokenDefault`.
+class CEeeChainTokenDefault extends Struct {
+  
+  Pointer<ffi.Utf8> chainTokenSharedId;
+  Pointer<ffi.Utf8> netType;
+  @Int64()
+  int position;
+  Pointer<CEeeChainTokenShared> eeeChainTokenShared;
+  static Pointer<CEeeChainTokenDefault> allocate() {
+    return ffi.allocate<CEeeChainTokenDefault>();
+  }
+
+
+  static CEeeChainTokenDefault from(int ptr) {
+    return Pointer<CEeeChainTokenDefault>.fromAddress(ptr).ref;
+  }
+
+}
+
 /// C struct `CEeeChainTokenShared`.
 class CEeeChainTokenShared extends Struct {
   
   Pointer<CTokenShared> tokenShared;
+  Pointer<ffi.Utf8> tokenType;
+  @Int64()
+  int gasLimit;
+  Pointer<ffi.Utf8> gasPrice;
+  @Int32()
+  int decimal;
   static Pointer<CEeeChainTokenShared> allocate() {
     return ffi.allocate<CEeeChainTokenShared>();
   }
@@ -675,10 +898,56 @@ class CEthChainToken extends Struct {
 
 }
 
+/// C struct `CEthChainTokenAuth`.
+class CEthChainTokenAuth extends Struct {
+  
+  Pointer<ffi.Utf8> chainTokenSharedId;
+  Pointer<ffi.Utf8> netType;
+  @Int64()
+  int position;
+  Pointer<ffi.Utf8> contractAddress;
+  Pointer<CEthChainTokenShared> ethChainTokenShared;
+  static Pointer<CEthChainTokenAuth> allocate() {
+    return ffi.allocate<CEthChainTokenAuth>();
+  }
+
+
+  static CEthChainTokenAuth from(int ptr) {
+    return Pointer<CEthChainTokenAuth>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C struct `CEthChainTokenDefault`.
+class CEthChainTokenDefault extends Struct {
+  
+  Pointer<ffi.Utf8> chainTokenSharedId;
+  Pointer<ffi.Utf8> netType;
+  @Int64()
+  int position;
+  Pointer<ffi.Utf8> contractAddress;
+  Pointer<CEthChainTokenShared> ethChainTokenShared;
+  static Pointer<CEthChainTokenDefault> allocate() {
+    return ffi.allocate<CEthChainTokenDefault>();
+  }
+
+
+  static CEthChainTokenDefault from(int ptr) {
+    return Pointer<CEthChainTokenDefault>.fromAddress(ptr).ref;
+  }
+
+}
+
 /// C struct `CEthChainTokenShared`.
 class CEthChainTokenShared extends Struct {
   
   Pointer<CTokenShared> tokenShared;
+  Pointer<ffi.Utf8> tokenType;
+  @Int64()
+  int gasLimit;
+  Pointer<ffi.Utf8> gasPrice;
+  @Int32()
+  int decimal;
   static Pointer<CEthChainTokenShared> allocate() {
     return ffi.allocate<CEthChainTokenShared>();
   }
@@ -726,6 +995,26 @@ class CEthTransferPayload extends Struct {
 
   static CEthTransferPayload from(int ptr) {
     return Pointer<CEthTransferPayload>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// C struct `CExtrinsicContext`.
+class CExtrinsicContext extends Struct {
+  
+  Pointer<CChainVersion> chainVersion;
+  Pointer<ffi.Utf8> account;
+  Pointer<ffi.Utf8> blockHash;
+  Pointer<ffi.Utf8> blockNumber;
+  Pointer<ffi.Utf8> event;
+  Pointer<ffi.Utf8> extrinsics;
+  static Pointer<CExtrinsicContext> allocate() {
+    return ffi.allocate<CExtrinsicContext>();
+  }
+
+
+  static CExtrinsicContext from(int ptr) {
+    return Pointer<CExtrinsicContext>.fromAddress(ptr).ref;
   }
 
 }
@@ -915,6 +1204,40 @@ typedef _CWallet_dFree_Dart = void Function(
   Pointer<Pointer<CWallet>> dPtr,
 );
 
+/// C function `ChainBtc_updateAuthDigitList`.
+Pointer<CError> ChainBtc_updateAuthDigitList(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCBtcChainTokenAuth> authTokens,
+) {
+  return _ChainBtc_updateAuthDigitList(ctx, authTokens);
+}
+final _ChainBtc_updateAuthDigitList_Dart _ChainBtc_updateAuthDigitList = _dl.lookupFunction<_ChainBtc_updateAuthDigitList_C, _ChainBtc_updateAuthDigitList_Dart>('ChainBtc_updateAuthDigitList');
+typedef _ChainBtc_updateAuthDigitList_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCBtcChainTokenAuth> authTokens,
+);
+typedef _ChainBtc_updateAuthDigitList_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCBtcChainTokenAuth> authTokens,
+);
+
+/// C function `ChainBtc_updateDefaultTokenList`.
+Pointer<CError> ChainBtc_updateDefaultTokenList(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCBtcChainTokenDefault> defaultTokens,
+) {
+  return _ChainBtc_updateDefaultTokenList(ctx, defaultTokens);
+}
+final _ChainBtc_updateDefaultTokenList_Dart _ChainBtc_updateDefaultTokenList = _dl.lookupFunction<_ChainBtc_updateDefaultTokenList_C, _ChainBtc_updateDefaultTokenList_Dart>('ChainBtc_updateDefaultTokenList');
+typedef _ChainBtc_updateDefaultTokenList_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCBtcChainTokenDefault> defaultTokens,
+);
+typedef _ChainBtc_updateDefaultTokenList_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCBtcChainTokenDefault> defaultTokens,
+);
+
 /// C function `ChainEee_decodeAccountInfo`.
 Pointer<CError> ChainEee_decodeAccountInfo(
   Pointer<CContext> ctx,
@@ -1030,6 +1353,26 @@ typedef _ChainEee_getSyncRecord_Dart = Pointer<CError> Function(
   Pointer<Pointer<CAccountInfoSyncProg>> syncRecord,
 );
 
+/// C function `ChainEee_saveExtrinsicDetail`.
+Pointer<CError> ChainEee_saveExtrinsicDetail(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CExtrinsicContext> extrinsicCtx,
+) {
+  return _ChainEee_saveExtrinsicDetail(ctx, netType, extrinsicCtx);
+}
+final _ChainEee_saveExtrinsicDetail_Dart _ChainEee_saveExtrinsicDetail = _dl.lookupFunction<_ChainEee_saveExtrinsicDetail_C, _ChainEee_saveExtrinsicDetail_Dart>('ChainEee_saveExtrinsicDetail');
+typedef _ChainEee_saveExtrinsicDetail_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CExtrinsicContext> extrinsicCtx,
+);
+typedef _ChainEee_saveExtrinsicDetail_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<ffi.Utf8> netType,
+  Pointer<CExtrinsicContext> extrinsicCtx,
+);
+
 /// C function `ChainEee_tokenXTransfer`.
 Pointer<CError> ChainEee_tokenXTransfer(
   Pointer<CContext> ctx,
@@ -1099,6 +1442,23 @@ typedef _ChainEee_txSubmittableSign_Dart = Pointer<CError> Function(
   Pointer<Pointer<ffi.Utf8>> signedResult,
 );
 
+/// C function `ChainEee_updateAuthDigitList`.
+Pointer<CError> ChainEee_updateAuthDigitList(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEeeChainTokenAuth> authTokens,
+) {
+  return _ChainEee_updateAuthDigitList(ctx, authTokens);
+}
+final _ChainEee_updateAuthDigitList_Dart _ChainEee_updateAuthDigitList = _dl.lookupFunction<_ChainEee_updateAuthDigitList_C, _ChainEee_updateAuthDigitList_Dart>('ChainEee_updateAuthDigitList');
+typedef _ChainEee_updateAuthDigitList_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEeeChainTokenAuth> authTokens,
+);
+typedef _ChainEee_updateAuthDigitList_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEeeChainTokenAuth> authTokens,
+);
+
 /// C function `ChainEee_updateBasicInfo`.
 Pointer<CError> ChainEee_updateBasicInfo(
   Pointer<CContext> ctx,
@@ -1119,6 +1479,23 @@ typedef _ChainEee_updateBasicInfo_Dart = Pointer<CError> Function(
   Pointer<CSubChainBasicInfo> basicInfo,
 );
 
+/// C function `ChainEee_updateDefaultTokenList`.
+Pointer<CError> ChainEee_updateDefaultTokenList(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEeeChainTokenDefault> defaultTokens,
+) {
+  return _ChainEee_updateDefaultTokenList(ctx, defaultTokens);
+}
+final _ChainEee_updateDefaultTokenList_Dart _ChainEee_updateDefaultTokenList = _dl.lookupFunction<_ChainEee_updateDefaultTokenList_C, _ChainEee_updateDefaultTokenList_Dart>('ChainEee_updateDefaultTokenList');
+typedef _ChainEee_updateDefaultTokenList_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEeeChainTokenDefault> defaultTokens,
+);
+typedef _ChainEee_updateDefaultTokenList_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEeeChainTokenDefault> defaultTokens,
+);
+
 /// C function `ChainEee_updateSyncRecord`.
 Pointer<CError> ChainEee_updateSyncRecord(
   Pointer<CContext> ctx,
@@ -1137,6 +1514,23 @@ typedef _ChainEee_updateSyncRecord_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> netType,
   Pointer<CAccountInfoSyncProg> syncRecord,
+);
+
+/// C function `ChainEth_addNonAuthDigit`.
+Pointer<CError> ChainEth_addNonAuthDigit(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEthChainTokenAuth> tokens,
+) {
+  return _ChainEth_addNonAuthDigit(ctx, tokens);
+}
+final _ChainEth_addNonAuthDigit_Dart _ChainEth_addNonAuthDigit = _dl.lookupFunction<_ChainEth_addNonAuthDigit_C, _ChainEth_addNonAuthDigit_Dart>('ChainEth_addNonAuthDigit');
+typedef _ChainEth_addNonAuthDigit_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEthChainTokenAuth> tokens,
+);
+typedef _ChainEth_addNonAuthDigit_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEthChainTokenAuth> tokens,
 );
 
 /// C function `ChainEth_decodeAdditionData`.
@@ -1209,6 +1603,60 @@ typedef _ChainEth_txSign_Dart = Pointer<CError> Function(
   Pointer<CEthTransferPayload> txPayload,
   Pointer<ffi.Utf8> password,
   Pointer<Pointer<ffi.Utf8>> signResult,
+);
+
+/// C function `ChainEth_updateAuthTokenList`.
+Pointer<CError> ChainEth_updateAuthTokenList(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEthChainTokenAuth> authTokens,
+) {
+  return _ChainEth_updateAuthTokenList(ctx, authTokens);
+}
+final _ChainEth_updateAuthTokenList_Dart _ChainEth_updateAuthTokenList = _dl.lookupFunction<_ChainEth_updateAuthTokenList_C, _ChainEth_updateAuthTokenList_Dart>('ChainEth_updateAuthTokenList');
+typedef _ChainEth_updateAuthTokenList_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEthChainTokenAuth> authTokens,
+);
+typedef _ChainEth_updateAuthTokenList_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEthChainTokenAuth> authTokens,
+);
+
+/// C function `ChainEth_updateDefaultTokenList`.
+Pointer<CError> ChainEth_updateDefaultTokenList(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEthChainTokenDefault> defaultTokens,
+) {
+  return _ChainEth_updateDefaultTokenList(ctx, defaultTokens);
+}
+final _ChainEth_updateDefaultTokenList_Dart _ChainEth_updateDefaultTokenList = _dl.lookupFunction<_ChainEth_updateDefaultTokenList_C, _ChainEth_updateDefaultTokenList_Dart>('ChainEth_updateDefaultTokenList');
+typedef _ChainEth_updateDefaultTokenList_C = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEthChainTokenDefault> defaultTokens,
+);
+typedef _ChainEth_updateDefaultTokenList_Dart = Pointer<CError> Function(
+  Pointer<CContext> ctx,
+  Pointer<CArrayCEthChainTokenDefault> defaultTokens,
+);
+
+/// C function `ChainEth_updateDigitBalance`.
+Pointer<CError> ChainEth_updateDigitBalance(
+  Pointer<CContext> _ctx,
+  Pointer<ffi.Utf8> _netType,
+  Pointer<CEthChainTokenDefault> _tokens,
+) {
+  return _ChainEth_updateDigitBalance(_ctx, _netType, _tokens);
+}
+final _ChainEth_updateDigitBalance_Dart _ChainEth_updateDigitBalance = _dl.lookupFunction<_ChainEth_updateDigitBalance_C, _ChainEth_updateDigitBalance_Dart>('ChainEth_updateDigitBalance');
+typedef _ChainEth_updateDigitBalance_C = Pointer<CError> Function(
+  Pointer<CContext> _ctx,
+  Pointer<ffi.Utf8> _netType,
+  Pointer<CEthChainTokenDefault> _tokens,
+);
+typedef _ChainEth_updateDigitBalance_Dart = Pointer<CError> Function(
+  Pointer<CContext> _ctx,
+  Pointer<ffi.Utf8> _netType,
+  Pointer<CEthChainTokenDefault> _tokens,
 );
 
 /// <p class="para-brief"> 返回所有的Context, 有可能是0个 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
