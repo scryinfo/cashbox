@@ -46,7 +46,7 @@ dependencies:
 
   flutter_webview_plugin: ^0.3.11
 
-  webview_flutter: ^0.3.20+2
+  webview_flutter: ^1.0.7
 
   device_info: ^1.0.0
   # 获取设备id
