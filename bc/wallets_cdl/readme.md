@@ -12,5 +12,6 @@ bindgen在生成时，会把头文件包含的内容一起生成，每个文件�
 3. 在packages/wallets下面运行 flutter pub run build_runner build，生成c to dart代码 
 
 注：运行脚本 bc/wallets_cdl/script/gen.bat 可以生成.h及.dart文件，并放入正确的位置
+
 注：c struct中不能使用如下单词定义字段
    free alloc allocate  fromC from toC toDart

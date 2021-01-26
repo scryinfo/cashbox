@@ -109,6 +109,7 @@ pub extern "C" fn CAccountInfoSyncProg_dAlloc() -> *mut *mut CAccountInfoSyncPro
     d_ptr_alloc()
 }
 
+#[no_mangle]
 pub unsafe extern "C" fn CAccountInfoSyncProg_dFree(dPtr: *mut *mut CAccountInfoSyncProg) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);

@@ -189,9 +189,8 @@ impl SubChainBasicInfo {
     pub async fn find_by_version(rb: &Rbatis, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<Option<SubChainBasicInfo>, WalletError> {
         let wrapper = rb.new_wrapper()
             .eq(MSubChainBasicInfo::genesis_hash, genesis_hash.to_string())
-            .check()?
             .eq(MSubChainBasicInfo::runtime_version, runtime_version)
-            .eq(MSubChainBasicInfo::tx_version, tx_version);
+            .eq(MSubChainBasicInfo::tx_version, tx_version).check()?;
         let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)
     }

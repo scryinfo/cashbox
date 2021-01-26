@@ -31,7 +31,6 @@ pub fn pri_from_mnemonic(phrase: &str, psd: Option<Vec<u8>>) -> Result<Vec<u8>, 
 //Generate ETH address from uncompressed public key
 pub fn generate_eth_address(secret_byte: &[u8]) -> Result<(String, String), error::Error> {
     let context = Secp256k1::new();
-    //todo adds error handling
     let secret = SecretKey::from_slice(&secret_byte)?;
     let public_key = PublicKey::from_secret_key(&context, &secret);
     //the uncompressed public key used for address generation
@@ -262,37 +261,16 @@ pub fn decode_tranfer_data(input: &str) -> Result<String, error::Error> {
     } else {
         input.get(2..).unwrap()
     };
-    let data = hex::decode(addition)?;
-    Ok(String::from_utf8(data)?)
-    /*  match hex::decode(addition){
-          Ok(data)=>String::from_utf8(data).map_err(|err| err.to_string()),
-          Err(err)=>Ok(err.to_string())
-      }*/
-
-    //judge whether it is ordinary data
-    /*    if input.starts_with("0xa9059cbb") {
-            //If this condition is met, it is considered to be a contract parameter
-            let start_len = 2+8;
-            let addr = input.get((start_len+24)..start_len+64).unwrap();
-            let value = {
-                let value_bytes= hex::decode(input.get(start_len+64..start_len+64*2).unwrap()).unwrap();
-                println!("value_bytes:{:?}",value_bytes);
-                //Big endian encoding?
-                let value_u256 = U256::from_big_endian(&value_bytes);
-                format!("{}",value_u256)
-            };
-            let func = ContractFunc{
-                func_name:"transfer".to_string(),
-                address:format!("0x{}",addr),
-                value,
-            };
-            Ok(serde_json::to_string(&func).unwrap())
-        }else {
-            match hex::decode(input){
-                Ok(data)=>String::from_utf8(data).map_err(|err| err.to_string()),
-                Err(data)=>Ok(input.to_string())
-            }
-        }*/
+    // if decode hex string fail,ret
+    match  hex::decode(addition){
+        Ok(data) =>{
+            Ok(String::from_utf8(data)?)
+        },
+        Err(err)=>{
+            log::error!("decode addition fail: {}",err);
+            Ok(input.to_string())
+        }
+    }
 }
 
 
