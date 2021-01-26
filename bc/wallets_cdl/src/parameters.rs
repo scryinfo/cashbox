@@ -76,12 +76,11 @@ pub struct CRawTxParam {
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CAccountInfo {
     pub nonce: u32,
-    pub ref_count: u32,
-    pub free_: *mut c_char,
-    //todo rename
+    pub refCount: u32,
+    pub freeBalance: *mut c_char,
     pub reserved: *mut c_char,
-    pub misc_frozen: *mut c_char,
-    pub fee_frozen: *mut c_char,
+    pub miscFrozen: *mut c_char,
+    pub feeFrozen: *mut c_char,
 }
 
 #[repr(C)]

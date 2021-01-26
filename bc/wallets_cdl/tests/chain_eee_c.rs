@@ -31,10 +31,10 @@ fn eee_basic_info_test() {
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         // query chain basic info
         let chain_info = get_chain_basic_info(c_ctx);
-        assert_eq!(chain_info.is_none(),true);
+        assert_eq!(chain_info.is_none(), true);
 
         let save_res = save_basic_info(c_ctx);
-        assert_eq!(save_res.is_ok(),true);
+        assert_eq!(save_res.is_ok(), true);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }
@@ -244,7 +244,7 @@ fn eee_tx_sign_test() {
         let wallet = create_wallet(c_ctx);
         //check chain basic info
         let chain_info = get_chain_basic_info(c_ctx);
-        assert_eq!(chain_info.is_some(),true);
+        assert_eq!(chain_info.is_some(), true);
         // sign tx
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let raw_tx_param = wallets_types::RawTxParam {
@@ -318,17 +318,15 @@ fn eee_update_default_token_list_test() {
     }
 }
 
-#[derive(Deserialize, Debug)]
-struct Header {
-    pub digest: Vec<String>,
-    pub extrinsics_root: String,
-    pub number: String,
-    pub parent_hash: String,
-    pub state_root: String,
-}
 
 #[test]
 fn eee_tx_explorer_test() {
+
+    //query node basic info
+
+    //query node best height
+
+    //query account tx
     unimplemented!()
 }
 
@@ -379,7 +377,7 @@ fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
             mnemonic: mnemonic.clone(),
             wallet_type: WalletType::Test.to_string(),
         });
-        let  c_wallet = CWallet_dAlloc();
+        let c_wallet = CWallet_dAlloc();
         let c_err = Wallets_createWallet(*c_ctx, c_parameters, c_wallet) as *mut CError;
         c_parameters.free();
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
@@ -391,17 +389,17 @@ fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
     }
 }
 
-fn save_basic_info(c_ctx: *mut *mut CContext)->Result<(),String>{
+fn save_basic_info(c_ctx: *mut *mut CContext) -> Result<(), String> {
     let m_chain_basic_info = init_basic_info_parameters();
     let chain_basic_info = SubChainBasicInfo::from(m_chain_basic_info);
     let mut c_basic_info = CSubChainBasicInfo::to_c_ptr(&chain_basic_info);
     unsafe {
-        let c_err =  chain_eee_c::ChainEee_updateBasicInfo(*c_ctx, to_c_char("Test"), c_basic_info) as *mut CError;
-        let res ={
+        let c_err = chain_eee_c::ChainEee_updateBasicInfo(*c_ctx, to_c_char("Test"), c_basic_info) as *mut CError;
+        let res = {
             if Error::SUCCESS().code == (*c_err).code {
                 Ok(())
-            }else {
-                Err(format!("{:?}",*c_err))
+            } else {
+                Err(format!("{:?}", *c_err))
             }
         };
         CError_free(c_err);

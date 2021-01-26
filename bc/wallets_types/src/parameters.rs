@@ -90,8 +90,7 @@ pub struct ExtrinsicContext {
 pub struct AccountInfo {
     pub nonce: u32,
     pub ref_count: u32,
-    pub free_: String,
-    //todo rename
+    pub free_balance: String,
     pub reserved: String,
     pub misc_frozen: String,
     pub fee_frozen: String,
