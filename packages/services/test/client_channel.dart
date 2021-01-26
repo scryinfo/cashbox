@@ -2,10 +2,13 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import 'package:grpc/grpc.dart';
 import 'package:services/services.dart';
+import 'package:services/src/rpc_client/client_channel.dart';
 import 'package:test/test.dart';
 
 import 'greeter/greeter.pbgrpc.dart';
+import 'greeter/refresh.dart';
 import 'greeter/server.dart';
 
 void _kill(dynamic s) async {
@@ -27,19 +30,24 @@ void main() {
   group('ClientTransportChannel', () {
     var server1;
     var server2;
+    Server serverRefresh;
+    var refresh = Refresh.get(new ConnectParameter("localhost",serverRefreshPort),"",AppPlatformType.any);
     bool odd = true;
-    final channel =
-        createClientChannel(ConnectParameter("localhost", 5000), (p) async {
+    var channel =
+        createClientChannel(() async {
       ConnectParameter re;
       if (odd) {
         odd = false;
-        re = ConnectParameter("localhost", server1Port);
+        refresh.version = "1";
+        re = await refresh.refreshCall();
       } else {
         odd = true;
-        re = ConnectParameter("localhost", server2Port);
+        refresh.version = "";
+        re = await refresh.refreshCall();
       }
       return re;
-    });
+    }) as ClientTransportChannel;
+    // channel = createClientChannel(refresh.refreshCall);
     final greeter = GreeterClient(channel);
     final name = 'scry';
     final message1 = 'port: $server1Port -- Hello $name!';
@@ -80,6 +88,7 @@ void main() {
 
     setUp(() async {
       odd = true;
+      serverRefresh = await runRefreshServer(serverRefreshPort);
       // server1 = await Isolate.spawn( runServer,server1Port);
       // server2 = await Isolate.spawn( runServer,server2Port);
       // server1 = await runServer(server1Port);
@@ -88,6 +97,10 @@ void main() {
     });
 
     tearDown(() async {
+      if(serverRefresh != null){
+        serverRefresh.shutdown();
+        serverRefresh = null;
+      }
       killServer1();
       killServer2();
     });

@@ -5,10 +5,8 @@ import 'package:grpc/src/client/http2_connection.dart';
 import 'package:grpc/src/shared/profiler.dart';
 import 'package:meta/meta.dart';
 
-ClientTransportChannel createClientChannel(
-    ConnectParameter parameter, ReFreshCall refreshCall) {
-  var refreshParameter = ReFreshParameter(parameter, refreshCall);
-  var channel = ClientTransportChannel(refreshParameter);
+$channel.ClientChannel createClientChannel(_ReFreshCall refreshCall) {
+  var channel = ClientTransportChannel(_ReFreshParameter(refreshCall));
   return channel;
 }
 
@@ -24,28 +22,27 @@ class ConnectParameter {
           const ChannelOptions(credentials: ChannelCredentials.insecure())});
 }
 
-typedef ReFreshCall = Future<ConnectParameter> Function(ConnectParameter);
+typedef _ReFreshCall = Future<ConnectParameter> Function();
 
 //刷新服务端连接参数
-class ReFreshParameter {
+class _ReFreshParameter extends Function {
   ConnectParameter _connectParameter;
-  final ConnectParameter _refreshService;
-  final ReFreshCall _refreshCall;
+  final _ReFreshCall _refreshCall;
 
-  ReFreshParameter(this._refreshService, this._refreshCall);
+  _ReFreshParameter(this._refreshCall);
 
   ConnectParameter get connectParameter => _connectParameter;
 
-  void resetConnectParameter() {
+  void _resetConnectParameter() {
     _connectParameter = null;
   }
 
-  Future<ConnectParameter> refreshParameter() async {
+  Future<ConnectParameter> _refreshParameter() async {
     if (_connectParameter != null) {
       return _connectParameter;
     }
     if (_refreshCall != null) {
-      _connectParameter = await _refreshCall(_refreshService);
+      _connectParameter = await _refreshCall();
     }
     return _connectParameter;
   }
@@ -53,20 +50,21 @@ class ReFreshParameter {
 
 // see: grpc-2.8.0/lib/src/client/channel.dart ClientChannelBase
 // 增加功能，当连接出错时，刷新服务地址
+@visibleForTesting
 class ClientTransportChannel implements $channel.ClientChannel {
   // TODO: Multiple connections, load balancing.
   ClientConnection _connection;
 
   bool _isShutdown = false;
 
-  final ReFreshParameter _refreshParameter;
+  final _ReFreshParameter _refreshParameter;
 
   ClientTransportChannel(this._refreshParameter);
 
   Future<ClientConnection> createConnection() async {
     var parameter = _refreshParameter.connectParameter;
     if (parameter == null) {
-      await _refreshParameter.refreshParameter();
+      await _refreshParameter._refreshParameter();
       parameter = _refreshParameter.connectParameter;
     }
     if (parameter == null) {
@@ -98,7 +96,7 @@ class ClientTransportChannel implements $channel.ClientChannel {
   @override
   ClientCall<Q, R> createCall<Q, R>(
       ClientMethod<Q, R> method, Stream<Q> requests, CallOptions options) {
-    final call = ClientCallError(
+    final call = _ClientCallError(
         method,
         requests,
         options,
@@ -113,10 +111,6 @@ class ClientTransportChannel implements $channel.ClientChannel {
     return call;
   }
 
-  void resetConnectParameter() {
-    _onConnectionError(new Error());
-  }
-
   @visibleForTesting
   ConnectParameter get connectParameter => _refreshParameter.connectParameter;
 
@@ -126,19 +120,19 @@ class ClientTransportChannel implements $channel.ClientChannel {
       //不能调用 _connection.shutdown()
       // var t = Future(_connection.shutdown);
       _connection = null;
-      _refreshParameter.resetConnectParameter();
+      _refreshParameter._resetConnectParameter();
     }
   }
 }
 
-typedef ErrorCall = void Function(dynamic);
+typedef _ErrorCall = void Function(dynamic);
 
-class ClientCallError<Q, R> extends ClientCall<Q, R> {
-  ErrorCall _errCall;
+class _ClientCallError<Q, R> extends ClientCall<Q, R> {
+  _ErrorCall _errCall;
   Stream<R> _stream = null;
 
-  ClientCallError(ClientMethod<Q, R> method, Stream<Q> requests,
-      CallOptions options, ErrorCall this._errCall,
+  _ClientCallError(ClientMethod<Q, R> method, Stream<Q> requests,
+      CallOptions options, _ErrorCall this._errCall,
       [timelineTask])
       : super(method, requests, options, timelineTask);
 
