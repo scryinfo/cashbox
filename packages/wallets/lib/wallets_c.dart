@@ -21,11 +21,11 @@ class CAccountInfo extends Struct {
   @Uint32()
   int nonce;
   @Uint32()
-  int ref_count;
-  Pointer<ffi.Utf8> free_;
+  int refCount;
+  Pointer<ffi.Utf8> freeBalance;
   Pointer<ffi.Utf8> reserved;
-  Pointer<ffi.Utf8> misc_frozen;
-  Pointer<ffi.Utf8> fee_frozen;
+  Pointer<ffi.Utf8> miscFrozen;
+  Pointer<ffi.Utf8> feeFrozen;
   static Pointer<CAccountInfo> allocate() {
     return ffi.allocate<CAccountInfo>();
   }
@@ -61,6 +61,20 @@ Pointer<Pointer<CAccountInfoSyncProg>> CAccountInfoSyncProg_dAlloc() {
 final _CAccountInfoSyncProg_dAlloc_Dart _CAccountInfoSyncProg_dAlloc = _dl.lookupFunction<_CAccountInfoSyncProg_dAlloc_C, _CAccountInfoSyncProg_dAlloc_Dart>('CAccountInfoSyncProg_dAlloc');
 typedef _CAccountInfoSyncProg_dAlloc_C = Pointer<Pointer<CAccountInfoSyncProg>> Function();
 typedef _CAccountInfoSyncProg_dAlloc_Dart = Pointer<Pointer<CAccountInfoSyncProg>> Function();
+
+/// C function `CAccountInfoSyncProg_dFree`.
+void CAccountInfoSyncProg_dFree(
+  Pointer<Pointer<CAccountInfoSyncProg>> dPtr,
+) {
+  _CAccountInfoSyncProg_dFree(dPtr);
+}
+final _CAccountInfoSyncProg_dFree_Dart _CAccountInfoSyncProg_dFree = _dl.lookupFunction<_CAccountInfoSyncProg_dFree_C, _CAccountInfoSyncProg_dFree_Dart>('CAccountInfoSyncProg_dFree');
+typedef _CAccountInfoSyncProg_dFree_C = Void Function(
+  Pointer<Pointer<CAccountInfoSyncProg>> dPtr,
+);
+typedef _CAccountInfoSyncProg_dFree_Dart = void Function(
+  Pointer<Pointer<CAccountInfoSyncProg>> dPtr,
+);
 
 /// C function `CAccountInfo_dAlloc`.
 Pointer<Pointer<CAccountInfo>> CAccountInfo_dAlloc() {
