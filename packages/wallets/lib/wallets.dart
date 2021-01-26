@@ -3,6 +3,9 @@ library wallets;
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart' as ffi;
+import 'package:wallets/chain_btc.dart';
+import 'package:wallets/chain_eee.dart';
+import 'package:wallets/chain_eth.dart';
 import 'package:wallets/wallets_c.dc.dart';
 
 import 'enums.dart';
@@ -11,18 +14,6 @@ import 'result.dart';
 import 'wallets_c.dart' as clib;
 
 class Wallets {
-  Pointer<clib.CContext> _ptrContext;
-  Context _context;
-
-  Pointer<clib.CContext> get ptrContext => _ptrContext;
-
-  Context get context => _context;
-
-  set context(Context ctx) {
-    _context = ctx;
-    _ptrContext = ctx.toCPtr();
-  }
-
   ///如果失败返回 null，失败的可能性非常小
   static DbName dbName(DbName name) {
     var ptrOutName = clib.CDbName_dAlloc();
@@ -366,11 +357,6 @@ class Wallets {
 
   //wrapper end
 
-  //
-  static Wallets _instance;
-
-  Wallets._internal();
-
   ///此方法只能在主线程中调用
   factory Wallets.mainIsolate() {
     // 只能有一个实例
@@ -388,5 +374,30 @@ class Wallets {
     }
     _instance.context = ctx;
     return _instance;
+  }
+  //
+  static Wallets _instance;
+  Wallets._internal();
+
+  Pointer<clib.CContext> _ptrContext;
+  Pointer<clib.CContext> get ptrContext => _ptrContext;
+
+  ChainEth _chainEth;
+  ChainEth get chainEth => _chainEth;
+
+  ChainEee _chainEee;
+  ChainEee get chainEee => _chainEee;
+
+  ChainBtc _chainBtc;
+  ChainBtc get chainBtc => _chainBtc;
+
+  Context _context;
+  Context get context => _context;
+  set context(Context ctx) {
+    _context = ctx;
+    _ptrContext = ctx.toCPtr();
+    _chainEth = new ChainEth(this);
+    _chainEee = new ChainEee(this);
+    _chainBtc = new ChainBtc(this);
   }
 }

@@ -12,7 +12,7 @@ import 'result.dart';
 import 'wallets_c.dart' as clib;
 
 class ChainEee {
-  
+
 
   Wallets _wallets;
   ChainEee(this._wallets);
