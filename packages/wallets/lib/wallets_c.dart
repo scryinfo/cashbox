@@ -21,11 +21,11 @@ class CAccountInfo extends Struct {
   @Uint32()
   int nonce;
   @Uint32()
-  int ref_count;
-  Pointer<ffi.Utf8> free_;
+  int refCount;
+  Pointer<ffi.Utf8> freeBalance;
   Pointer<ffi.Utf8> reserved;
-  Pointer<ffi.Utf8> misc_frozen;
-  Pointer<ffi.Utf8> fee_frozen;
+  Pointer<ffi.Utf8> miscFrozen;
+  Pointer<ffi.Utf8> feeFrozen;
   static Pointer<CAccountInfo> allocate() {
     return ffi.allocate<CAccountInfo>();
   }
@@ -61,6 +61,20 @@ Pointer<Pointer<CAccountInfoSyncProg>> CAccountInfoSyncProg_dAlloc() {
 final _CAccountInfoSyncProg_dAlloc_Dart _CAccountInfoSyncProg_dAlloc = _dl.lookupFunction<_CAccountInfoSyncProg_dAlloc_C, _CAccountInfoSyncProg_dAlloc_Dart>('CAccountInfoSyncProg_dAlloc');
 typedef _CAccountInfoSyncProg_dAlloc_C = Pointer<Pointer<CAccountInfoSyncProg>> Function();
 typedef _CAccountInfoSyncProg_dAlloc_Dart = Pointer<Pointer<CAccountInfoSyncProg>> Function();
+
+/// C function `CAccountInfoSyncProg_dFree`.
+void CAccountInfoSyncProg_dFree(
+  Pointer<Pointer<CAccountInfoSyncProg>> dPtr,
+) {
+  _CAccountInfoSyncProg_dFree(dPtr);
+}
+final _CAccountInfoSyncProg_dFree_Dart _CAccountInfoSyncProg_dFree = _dl.lookupFunction<_CAccountInfoSyncProg_dFree_C, _CAccountInfoSyncProg_dFree_Dart>('CAccountInfoSyncProg_dFree');
+typedef _CAccountInfoSyncProg_dFree_C = Void Function(
+  Pointer<Pointer<CAccountInfoSyncProg>> dPtr,
+);
+typedef _CAccountInfoSyncProg_dFree_Dart = void Function(
+  Pointer<Pointer<CAccountInfoSyncProg>> dPtr,
+);
 
 /// C function `CAccountInfo_dAlloc`.
 Pointer<Pointer<CAccountInfo>> CAccountInfo_dAlloc() {
@@ -1092,6 +1106,20 @@ typedef _CStr_dFree_Dart = void Function(
   Pointer<Pointer<ffi.Utf8>> dcs,
 );
 
+/// C function `CStr_free`.
+void CStr_free(
+  Pointer<ffi.Utf8> dcs,
+) {
+  _CStr_free(dcs);
+}
+final _CStr_free_Dart _CStr_free = _dl.lookupFunction<_CStr_free_C, _CStr_free_Dart>('CStr_free');
+typedef _CStr_free_C = Void Function(
+  Pointer<ffi.Utf8> dcs,
+);
+typedef _CStr_free_Dart = void Function(
+  Pointer<ffi.Utf8> dcs,
+);
+
 /// C struct `CSubChainBasicInfo`.
 class CSubChainBasicInfo extends Struct {
   
@@ -1689,6 +1717,14 @@ typedef _Wallets_all_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<Pointer<CArrayCWallet>> arrayWallet,
 );
+
+/// C function `Wallets_appPlatformType`.
+Pointer<ffi.Utf8> Wallets_appPlatformType() {
+  return _Wallets_appPlatformType();
+}
+final _Wallets_appPlatformType_Dart _Wallets_appPlatformType = _dl.lookupFunction<_Wallets_appPlatformType_C, _Wallets_appPlatformType_Dart>('Wallets_appPlatformType');
+typedef _Wallets_appPlatformType_C = Pointer<ffi.Utf8> Function();
+typedef _Wallets_appPlatformType_Dart = Pointer<ffi.Utf8> Function();
 
 /// C function `Wallets_createWallet`.
 Pointer<CError> Wallets_createWallet(

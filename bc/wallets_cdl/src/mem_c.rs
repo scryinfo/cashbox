@@ -33,6 +33,12 @@ pub unsafe extern "C" fn CArrayCContext_dFree(dPtr: *mut *mut CArray<CContext>) 
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn CStr_free(dcs: *mut c_char) {
+    let mut dcs = dcs;
+    dcs.free();
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn CStr_dFree(dcs: *mut *mut c_char) {
     let mut dcs = dcs;
     d_ptr_free(&mut dcs);

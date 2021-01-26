@@ -1,6 +1,6 @@
 [package]
 name = "wallets_cdl"
-version = "0.1.0"
+version = "2.3.0"
 authors = ["Peace <peacess@163.com>"]
 edition = "2018"
 
@@ -20,7 +20,6 @@ wallets_types = { path = "../wallets_types" }
 wallets_macro = { path = "../wallets_macro" }
 mav = { path = "../mav" }
 
-
 [dev-dependencies]
 async-std = "1.8.0"
 futures = "0.3.8"
@@ -39,5 +38,12 @@ serde_derive = "1.0.98"
 serde = { version = "1.0.120", features = ["derive"] }
 #
 
+[dependencies.build_const]
+optional = false
+version = "0.2.1"
+
+[build-dependencies.build_const]
+optional = false
+version = "0.2.1"
 
 #[workspace]

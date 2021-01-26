@@ -18,6 +18,9 @@ use wallets_cdl::{
 };
 use wallets_cdl::{to_c_char, to_str, CStruct};
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet};
+use wallets_cdl::wallets_c::Wallets_appPlatformType;
+use wallets_cdl::mem_c::CStr_free;
+use std::os::raw::c_char;
 
 #[test]
 fn executor_test() {
@@ -149,6 +152,15 @@ fn mnemonic_test() {
         CStr_dFree(ptr);
         CError_free(c_err);
         assert_eq!(15, words.len());
+    }
+}
+#[test]
+fn plat_type_test() {
+
+    unsafe {
+        let mut ptr = Wallets_appPlatformType() as *mut c_char;
+        assert_ne!(null_mut(), ptr);
+        CStr_free(ptr);
     }
 }
 

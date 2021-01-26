@@ -12,32 +12,32 @@ import 'kits.dart';
 
 class AccountInfo extends DC<clib.CAccountInfo> {
   int nonce;
-  int ref_count;
-  String free_;
+  int refCount;
+  String freeBalance;
   String reserved;
-  String misc_frozen;
-  String fee_frozen;
+  String miscFrozen;
+  String feeFrozen;
 
   static free(Pointer<clib.CAccountInfo> ptr) {
     if (ptr == null || ptr == nullptr) {
       return;
     }
-    if (ptr.ref.free_ != null && ptr.ref.free_ != nullptr) {
-      ffi.free(ptr.ref.free_);
+    if (ptr.ref.freeBalance != null && ptr.ref.freeBalance != nullptr) {
+      ffi.free(ptr.ref.freeBalance);
     }
-    ptr.ref.free_ = nullptr;
+    ptr.ref.freeBalance = nullptr;
     if (ptr.ref.reserved != null && ptr.ref.reserved != nullptr) {
       ffi.free(ptr.ref.reserved);
     }
     ptr.ref.reserved = nullptr;
-    if (ptr.ref.misc_frozen != null && ptr.ref.misc_frozen != nullptr) {
-      ffi.free(ptr.ref.misc_frozen);
+    if (ptr.ref.miscFrozen != null && ptr.ref.miscFrozen != nullptr) {
+      ffi.free(ptr.ref.miscFrozen);
     }
-    ptr.ref.misc_frozen = nullptr;
-    if (ptr.ref.fee_frozen != null && ptr.ref.fee_frozen != nullptr) {
-      ffi.free(ptr.ref.fee_frozen);
+    ptr.ref.miscFrozen = nullptr;
+    if (ptr.ref.feeFrozen != null && ptr.ref.feeFrozen != nullptr) {
+      ffi.free(ptr.ref.feeFrozen);
     }
-    ptr.ref.fee_frozen = nullptr;
+    ptr.ref.feeFrozen = nullptr;
     ffi.free(ptr);
   }
 
@@ -63,23 +63,23 @@ class AccountInfo extends DC<clib.CAccountInfo> {
       return;
     }
     c.ref.nonce = nonce;
-    c.ref.ref_count = ref_count;
-    if (c.ref.free_ != null && c.ref.free_ != nullptr) {
-      ffi.free(c.ref.free_);
+    c.ref.refCount = refCount;
+    if (c.ref.freeBalance != null && c.ref.freeBalance != nullptr) {
+      ffi.free(c.ref.freeBalance);
     }
-    c.ref.free_ = toUtf8Null(free_);
+    c.ref.freeBalance = toUtf8Null(freeBalance);
     if (c.ref.reserved != null && c.ref.reserved != nullptr) {
       ffi.free(c.ref.reserved);
     }
     c.ref.reserved = toUtf8Null(reserved);
-    if (c.ref.misc_frozen != null && c.ref.misc_frozen != nullptr) {
-      ffi.free(c.ref.misc_frozen);
+    if (c.ref.miscFrozen != null && c.ref.miscFrozen != nullptr) {
+      ffi.free(c.ref.miscFrozen);
     }
-    c.ref.misc_frozen = toUtf8Null(misc_frozen);
-    if (c.ref.fee_frozen != null && c.ref.fee_frozen != nullptr) {
-      ffi.free(c.ref.fee_frozen);
+    c.ref.miscFrozen = toUtf8Null(miscFrozen);
+    if (c.ref.feeFrozen != null && c.ref.feeFrozen != nullptr) {
+      ffi.free(c.ref.feeFrozen);
     }
-    c.ref.fee_frozen = toUtf8Null(fee_frozen);
+    c.ref.feeFrozen = toUtf8Null(feeFrozen);
   }
 
   @override
@@ -88,11 +88,11 @@ class AccountInfo extends DC<clib.CAccountInfo> {
       return;
     }
     nonce = c.ref.nonce;
-    ref_count = c.ref.ref_count;
-    free_ = fromUtf8Null(c.ref.free_);
+    refCount = c.ref.refCount;
+    freeBalance = fromUtf8Null(c.ref.freeBalance);
     reserved = fromUtf8Null(c.ref.reserved);
-    misc_frozen = fromUtf8Null(c.ref.misc_frozen);
-    fee_frozen = fromUtf8Null(c.ref.fee_frozen);
+    miscFrozen = fromUtf8Null(c.ref.miscFrozen);
+    feeFrozen = fromUtf8Null(c.ref.feeFrozen);
   }
 }
 

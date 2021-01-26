@@ -145,11 +145,55 @@ impl ToString for NetType {
     }
 }
 
+#[derive(PartialEq, Clone, Debug, EnumIter)]
+pub enum AppPlatformType {
+    any,
+    aarch64_linux_android,
+    armv7_linux_androideabi,
+    i686_linux_android,
+    x86_64_linux_android,
+    x86_64_pc_windows_gnu,
+    x86_64_unknown_linux_gnu
+}
+
+impl AppPlatformType {
+    pub fn from(plat_type: &str) -> Result<Self, Error> {
+        match plat_type {
+            "any" => Ok(AppPlatformType::any),
+            "aarch64_linux_android" => Ok(AppPlatformType::aarch64_linux_android),
+            "armv7_linux_androideabi" => Ok(AppPlatformType::armv7_linux_androideabi),
+            "i686_linux_android" => Ok(AppPlatformType::i686_linux_android),
+            "x86_64_linux_android" => Ok(AppPlatformType::x86_64_linux_android),
+            "x86_64_pc_windows_gnu" => Ok(AppPlatformType::x86_64_pc_windows_gnu),
+            "x86_64_unknown_linux_gnu" => Ok(AppPlatformType::x86_64_unknown_linux_gnu),
+            _ => {
+                let err = format!("the str:{} can not be AppPlatformType", plat_type);
+                log::error!("{}", err);
+                Err(Error::from(err.as_str()))
+            }
+        }
+    }
+}
+
+impl ToString for AppPlatformType {
+    fn to_string(&self) -> String {
+        match self {
+            AppPlatformType::any => "any".to_owned(),
+            AppPlatformType::aarch64_linux_android => "aarch64_linux_android".to_owned(),
+            AppPlatformType::armv7_linux_androideabi => "armv7_linux_androideabi".to_owned(),
+            AppPlatformType::i686_linux_android => "i686_linux_android".to_owned(),
+            AppPlatformType::x86_64_linux_android => "x86_64_linux_android".to_owned(),
+            AppPlatformType::x86_64_pc_windows_gnu => "x86_64_pc_windows_gnu".to_owned(),
+            AppPlatformType::x86_64_unknown_linux_gnu => "x86_64_unknown_linux_gnu".to_owned(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use strum::IntoEnumIterator;
 
-    use crate::{ChainType, NetType, WalletType};
+    use crate::{ChainType, NetType, WalletType, AppPlatformType};
 
     #[test]
     fn net_type_test() {
@@ -169,6 +213,13 @@ mod tests {
     fn wallet_type_test() {
         for it in WalletType::iter() {
             assert_eq!(it, WalletType::from(&it.to_string()));
+        }
+    }
+
+    #[test]
+    fn app_platform_type_test() {
+        for it in AppPlatformType::iter() {
+            assert_eq!(it, AppPlatformType::from(&it.to_string()));
         }
     }
 }

@@ -10,6 +10,12 @@ import 'package:wallets/wallets_c.dc.dart';
 
 void main() {
   test('Wallets', () async {
+    {
+      var plat = clib.Wallets_appPlatformType();
+      String platName = fromUtf8Null(plat);
+      print(platName);
+      clib.CStr_free(plat);
+    }
     var wallet = Wallets.mainIsolate();
     {
       var initP = new InitParameters();

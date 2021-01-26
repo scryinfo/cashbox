@@ -12,7 +12,7 @@ export BUILD_DUMMY_WASM_BINARY=1
 cd $batPath/..
 cargo build --target $HOST_TAG
 
-cd %batPath%../../target/$HOST_TAG/debug
-cp /Y "wallets_cdl.dll" "$outPath/"
+cd $batPath/../../target/$HOST_TAG/debug
+cp "wallets_cdl.dll" "$outPath/"
 
 cd $cuPath

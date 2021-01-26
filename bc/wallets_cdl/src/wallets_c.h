@@ -184,11 +184,11 @@ typedef struct CAccountInfoSyncProg {
 
 typedef struct CAccountInfo {
     uint32_t nonce;
-    uint32_t ref_count;
-    char *free_;
+    uint32_t refCount;
+    char *freeBalance;
     char *reserved;
-    char *misc_frozen;
-    char *fee_frozen;
+    char *miscFrozen;
+    char *feeFrozen;
 } CAccountInfo;
 
 typedef struct CSubChainBasicInfo {
@@ -413,6 +413,8 @@ CArrayCContext **CArrayCContext_dAlloc(void);
 
 void CArrayCContext_dFree(CArrayCContext **dPtr);
 
+void CStr_free(char *dcs);
+
 void CStr_dFree(char **dcs);
 
 char **CStr_dAlloc(void);
@@ -440,6 +442,8 @@ CArrayI64 **CArrayInt64_dAlloc(void);
 void CArrayInt64_dFree(CArrayI64 **dPtr);
 
 CAccountInfoSyncProg **CAccountInfoSyncProg_dAlloc(void);
+
+void CAccountInfoSyncProg_dFree(CAccountInfoSyncProg **dPtr);
 
 CAccountInfo **CAccountInfo_dAlloc(void);
 
@@ -531,6 +535,8 @@ const CError *Wallets_currentWalletChain(CContext *ctx, char **walletId, char **
  *保存当前wallet 与 chain
  */
 const CError *Wallets_saveCurrentWalletChain(CContext *ctx, char *walletId, char *chainType);
+
+const char *Wallets_appPlatformType(void);
 
 const CError *ChainEee_updateSyncRecord(CContext *ctx, char *netType, CAccountInfoSyncProg *syncRecord);
 
