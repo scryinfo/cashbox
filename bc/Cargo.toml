@@ -30,4 +30,4 @@ features = ["serde"]
 [patch.crates-io]
 bitcoin = { path = "chain/btc/bitcoin" }
 frame-metadata = { path = "chain/eee/frame-metadata" }
-
+hammersbald = {path = "chain/btc/hammersbald"}

@@ -4,7 +4,6 @@
 
 use super::*;
 use crate::constructor::Constructor;
-use crate::db::{lazy_db_default, SQLite};
 use crate::hooks::{ApiMessage, HooksMessage};
 use crate::jniapi::{calc_default_address, calc_pubkey};
 use crate::path::BTC_HAMMER_PATH;
