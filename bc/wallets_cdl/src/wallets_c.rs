@@ -601,9 +601,9 @@ build_const::build_const!("constants");
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_appPlatformType() -> *const c_char {
     log::debug!("enter Wallets_appPlatformType");
-    let plat = CARGO_BUILD_TARGET;
+    let plat = CARGO_BUILD_TARGET.replace("-","_");
     let platType = {
-        match AppPlatformType::from(plat) {
+        match AppPlatformType::from(&plat) {
             Ok(t) => t,
             Err(_) =>{
                 log::error!("AppPlatformType is not support");
