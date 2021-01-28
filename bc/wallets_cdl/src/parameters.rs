@@ -10,6 +10,7 @@ use wallets_types::{
 };
 
 use crate::kits::{to_c_char, to_str, CMark, CStruct, CR};
+use crate::CArray;
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
@@ -107,7 +108,8 @@ pub struct CExtrinsicContext {
     pub blockHash: *mut c_char,
     pub blockNumber: *mut c_char,
     pub event: *mut c_char,
-    pub extrinsics: *mut c_char,
+
+    pub extrinsics: *mut CArray<*mut c_char>
 }
 
 

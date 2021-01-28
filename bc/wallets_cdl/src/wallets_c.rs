@@ -10,8 +10,9 @@ use wallets::{Contexts, Wallets};
 use wallets_types::{Context, Error};
 
 use crate::kits::{to_c_char, to_str, CArray, CBool, CFalse, CStruct, CTrue, CR};
-use crate::parameters::{CContext, CCreateWalletParameters, CDbName, CInitParameters};
+use crate::parameters::{CContext, CCreateWalletParameters, CDbName, CInitParameters, CExtrinsicContext};
 use crate::types::{CError, CWallet};
+use std::ptr::null_mut;
 
 /// 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名
 /// 如果成功返回 [wallets_types::Error::SUCCESS()]
@@ -600,6 +601,12 @@ pub unsafe extern "C" fn Wallets_saveCurrentWalletChain(
 build_const::build_const!("constants");
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_appPlatformType() -> *const c_char {
+    {
+        // let ptr :*mut CExtrinsicContext = null_mut();
+        // let data = CExtrinsicContext::ptr_rust(ptr);
+        let ptr : *mut CArray<*mut c_char> = null_mut();
+        let data: *mut CArray<*mut c_char> = CArray::<*mut c_char>::to_c_ptr(&vec!["".to_owned()]);
+    }
     log::debug!("enter Wallets_appPlatformType");
     let plat = CARGO_BUILD_TARGET.replace("-","_");
     let platType = {

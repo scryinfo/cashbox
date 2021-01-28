@@ -525,20 +525,20 @@ impl EeeChainTrait for EeeChain {
         let helper = eee::chain_helper::ChainHelper::init(&basic_info.metadata, &genesis_byte, runtime_version as u32, tx_version as u32, None)?;
 
         let event_res = helper.decode_events(&extrinsic_ctx.event, None)?;
-        let extrinsics_map = helper.decode_extrinsics(&extrinsic_ctx.extrinsics, &extrinsic_ctx.account)?;
-
-        //Block transaction events There must be a time stamp setting
-        let tx_time = extrinsics_map.get(&0).unwrap();//Get timestamp
-
-        for (index, transfer_detail) in extrinsics_map.iter() {
-            if transfer_detail.signer.is_none() {
-                continue;
-            }
-            log::info!("tx index:{}", index);
-            if let Some(is_successful) = event_res.get(index) {
-                Self::save_transfer_detail(data_rb, extrinsic_ctx, transfer_detail, tx_time.timestamp.unwrap(), *is_successful).await?;
-            }
-        }
+        // let extrinsics_map = helper.decode_extrinsics(&extrinsic_ctx.extrinsics, &extrinsic_ctx.account)?;
+        //
+        // //Block transaction events There must be a time stamp setting
+        // let tx_time = extrinsics_map.get(&0).unwrap();//Get timestamp
+        //
+        // for (index, transfer_detail) in extrinsics_map.iter() {
+        //     if transfer_detail.signer.is_none() {
+        //         continue;
+        //     }
+        //     log::info!("tx index:{}", index);
+        //     if let Some(is_successful) = event_res.get(index) {
+        //         Self::save_transfer_detail(data_rb, extrinsic_ctx, transfer_detail, tx_time.timestamp.unwrap(), *is_successful).await?;
+        //     }
+        // }
         Ok(())
     }
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<EeeChainTokenDefault>) -> Result<(), WalletError> {

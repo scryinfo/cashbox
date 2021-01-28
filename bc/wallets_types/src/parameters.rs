@@ -83,7 +83,7 @@ pub struct ExtrinsicContext {
     pub block_hash: String,
     pub block_number: String,
     pub event: String,
-    pub extrinsics: String,
+    pub extrinsics: Vec<String>,
 }
 
 #[derive(Debug, Default, Clone)]

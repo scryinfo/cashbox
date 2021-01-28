@@ -143,3 +143,5 @@ demo/rbatis_demo/target
 /demo/grpc_dart/app/.metadata
 /demo/grpc_dart/app/pubspec.lock
 /packages/services/CHANGELOG.md
+/packages/services/test/greeter/greeter_go/go.sum
+/packages/services/test/greeter/greeter_go/greeter_go/greeter_go.exe
