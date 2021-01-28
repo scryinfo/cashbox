@@ -30,9 +30,14 @@ class HandleConfig {
   Future<Config> getConfig() async {
     File file = await _getConfigFile(configFileName);
     String fileContent = await file.readAsString();
-    Map configMap = jsonDecode(fileContent);
-    Config config = Config.fromJson(configMap);
-    return config;
+    Config config = Config();
+    try {
+      Map configMap = jsonDecode(fileContent);
+      config = Config.fromJson(configMap);
+      return config;
+    } catch (e) {
+      return config;
+    }
   }
 
   Future<bool> saveConfig(final Config config) async {
