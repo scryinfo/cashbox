@@ -10,13 +10,16 @@ const TypeName_CArray: &str = "CArray";
 const TypeName_c_char: &str = "c_char";
 
 pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
-    const NAME: &str = "";
+    const NAME: &str = "";//CExtrinsicContext
     let r_name = {
         let mut str = type_name.to_owned();
         str.remove(0);
         format_ident!("{}",str)
     };
-
+    //test
+    if type_name == NAME {
+        println!("===gen impl dl_cr start:  {}", type_name);
+    }
     let mut to_c_quote = Vec::new();
     let mut ptr_rust_quote = Vec::new();
     for field in fields.iter() {
@@ -25,40 +28,40 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
             let r_field_name = format_ident!("{}",to_snake_name(&c_field_name.to_string()));
             //test
             if type_name == NAME {
-                println!("===gen impl dl_cr field name:  {}:", c_field_name.to_string());
+                println!("field name:  {}:", c_field_name.to_string());
             }
             if let Type::Ptr(t) = &field.ty {
                 let type_stream = if let Type::Path(TypePath { path, .. }) = t.elem.as_ref() {
                     //test
                     if type_name == NAME {
-                        println!("===gen impl dl_cr {}:", t.elem.to_token_stream());
-                        println!("{}", path.to_token_stream().to_string());
+                        println!("ptr: {}:", t.elem.to_token_stream());
+                        println!("ptr -path: {}", path.to_token_stream().to_string());
                     }
 
                     if let Some(PathSegment { ident, arguments }) = path.segments.last() {
-                        if ident.to_string().as_str() == TypeName_CArray {
+                        // if ident.to_string().as_str() == TypeName_CArray {
                             Some(ident.to_token_stream())
-                        } else {
-                            match arguments {
-                                PathArguments::None => Some(ident.to_token_stream()),
-                                PathArguments::AngleBracketed(AngleBracketedGenericArguments { args, .. }) => {
-                                    if let Some(GenericArgument::Type(Type::Path(TypePath { path, .. }))) = args.last() {
-                                        if let Some(path_segment) = path.segments.last() {
-                                            let arg_type = &path_segment.ident;
-                                            let q = quote! { #ident::<#arg_type> };
-                                            Some(q)
-                                        } else {
-                                            println!("if let Some(path_segment) = path.segments.last()");
-                                            None
-                                        }
-                                    } else {
-                                        println!("let Some(GenericArgument::Type(Type::Path(TypePath ");
-                                        None
-                                    }
-                                }
-                                PathArguments::Parenthesized(_) => None,
-                            }
-                        }
+                        // } else {
+                        //     match arguments {
+                        //         PathArguments::None => Some(ident.to_token_stream()),
+                        //         PathArguments::AngleBracketed(AngleBracketedGenericArguments { args, .. }) => {
+                        //             if let Some(GenericArgument::Type(Type::Path(TypePath { path, .. }))) = args.last() {
+                        //                 if let Some(path_segment) = path.segments.last() {
+                        //                     let arg_type = &path_segment.ident;
+                        //                     let q = quote! { #ident::<#arg_type> };
+                        //                     Some(q)
+                        //                 } else {
+                        //                     println!("if let Some(path_segment) = path.segments.last()");
+                        //                     None
+                        //                 }
+                        //             } else {
+                        //                 println!("let Some(GenericArgument::Type(Type::Path(TypePath ");
+                        //                 None
+                        //             }
+                        //         }
+                        //         PathArguments::Parenthesized(_) => None,
+                        //     }
+                        // }
                     } else {
                         None
                     }
@@ -66,10 +69,10 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                     None
                 };
 
-                let type_stream = type_stream.expect(&format!("can not find the type of field {}::{}", type_name, c_field_name));
+                let type_stream = type_stream.expect(&format!("can not find the type of field {}::{}\nfield type: \n{:?}", type_name, c_field_name, field));
                 match type_stream.to_string().as_str() {
                     //*mut c_char类型
-                    "c_char" => {
+                    TypeName_c_char => {
                         to_c_quote.push(quote! {
                             c.#c_field_name =  to_c_char(&r.#r_field_name)
                         });
@@ -78,7 +81,7 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                         });
                     }
                     "" => {
-                        panic!("dl_cr can not find the type of field {} -- {} -- not TypePath", type_name, c_field_name)
+                        panic!("dl_cr can not find the type of field {} -- {} -- not TypePath,\nfield type: \n{:?}", type_name, c_field_name,field);
                     }
                     _ => {
                         let ctype = type_stream;
@@ -104,58 +107,44 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                 });
             }
         }
-        //test
-        if type_name == NAME {
-            println!("............gen impl dl_cr {}:", type_name);
-            for it in ptr_rust_quote.iter() {
-                println!("{}", it);
-            }
-            for it in to_c_quote.iter() {
-                println!("{}", it);
-            }
-        }
-    }
-
-    //test
-    if type_name == NAME {
-        println!("............gen impl dl_cr {}:", type_name);
-        println!("{}", r_name)
     }
 
     let c_name = format_ident!("{}",type_name);
     let gen = quote! {
-            impl CR<#c_name,#r_name> for #c_name {
-                fn to_c(r: &#r_name) -> #c_name {
-                    let mut c = #c_name::default();
-                    #(#to_c_quote;)*
-                    c
-                }
-
-                fn to_c_ptr(r: &#r_name) -> *mut #c_name {
-                    Box::into_raw(Box::new(#c_name::to_c(r)))
-                }
-
-                fn to_rust(c: &#c_name) -> #r_name {
-                    let mut r = #r_name::default();
-                    #(#ptr_rust_quote;)*
-                    r
-                }
-
-                fn ptr_rust(c: *mut #c_name) -> #r_name {
-                    #c_name::to_rust(unsafe { &*c })
-                }
+        impl CR<#c_name,#r_name> for #c_name {
+            fn to_c(r: &#r_name) -> #c_name {
+                let mut c = #c_name::default();
+                #(#to_c_quote;)*
+                c
             }
-        };
+
+            fn to_c_ptr(r: &#r_name) -> *mut #c_name {
+                Box::into_raw(Box::new(#c_name::to_c(r)))
+            }
+
+            fn to_rust(c: &#c_name) -> #r_name {
+                let mut r = #r_name::default();
+                #(#ptr_rust_quote;)*
+                r
+            }
+
+            fn ptr_rust(c: *mut #c_name) -> #r_name {
+                #c_name::to_rust(unsafe { &*c })
+            }
+        }
+    };
 
     if cfg!(feature = "print_macro") {
         println!("............gen impl dl_cr {}:", c_name);
-        let _ = rustfmt::run(rustfmt::Input::Text(gen.to_string()), &rustfmt::config::Config::default());
+        println!("{}", gen);
+        // let _ = rustfmt::run(rustfmt::Input::Text(gen.to_string()), &rustfmt::config::Config::default());
     }
 
     //test
     if type_name == NAME {
-        println!("............gen impl dl_cr {}:", c_name);
-        let _ = rustfmt::run(rustfmt::Input::Text(gen.to_string()), &rustfmt::config::Config::default());
+        println!("===gen impl dl_cr end:  {}, {}", type_name, r_name);
+        // let _ = rustfmt::run(rustfmt::Input::Text(gen.to_string()), &rustfmt::config::Config::default());
+        println!("{}", gen);
     }
     gen.into()
 }
