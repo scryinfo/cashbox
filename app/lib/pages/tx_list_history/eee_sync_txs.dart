@@ -4,7 +4,7 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:app/util/utils.dart';
 import 'dart:convert' as convert;
 
@@ -83,7 +83,7 @@ class EeeSyncTxs {
       try {
         await _loadEeeChainTxHistoryData(runParams);
       } catch (e) {
-        LogUtil.instance.e("_loadEeeChainTxHistoryData error is ", e.toString());
+        LogUtil.instance().e("_loadEeeChainTxHistoryData error is ", e.toString());
       }
       _timing = false;
     });
@@ -221,7 +221,7 @@ class EeeSyncTxs {
 
   static bool _isMapStatusOk(Map returnMap) {
     if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      LogUtil.instance.e("returnMap error is ", returnMap.toString());
+      LogUtil.instance().e("returnMap error is ", returnMap.toString());
       return false;
     }
     return true;

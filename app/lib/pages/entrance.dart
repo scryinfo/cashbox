@@ -5,7 +5,7 @@ import 'package:app/model/server_config_model.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
@@ -69,7 +69,7 @@ class _EntrancePageState extends State<EntrancePage> {
 
     Map resultMap = await Wallets.instance.updateWalletDbData(config.dbVersion);
     if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
-      LogUtil.instance.i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
+      LogUtil.instance().i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
     }
     int lastTimeConfigCheck = config.lastTimeConfigCheck;
     int nowTimeStamp = DateTime.now().millisecondsSinceEpoch;
@@ -81,7 +81,7 @@ class _EntrancePageState extends State<EntrancePage> {
         ServerConfigModel serverConfigModel = ServerConfigModel.fromJson(configVersionObj);
         print("serverConfigModel--->" + serverConfigModel.toString());
         if (serverConfigModel.code != 0) {
-          LogUtil.instance.i("_checkServerAppConfig(), serverConfigModel.code error is =======>", serverConfigModel.code.toString());
+          LogUtil.instance().i("_checkServerAppConfig(), serverConfigModel.code error is =======>", serverConfigModel.code.toString());
           return;
         }
 
@@ -91,7 +91,7 @@ class _EntrancePageState extends State<EntrancePage> {
           Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0); // get local default Eee chain info
           if (getSubChainMap == null || !getSubChainMap.containsKey("status") || getSubChainMap["status"] != 200) {
             Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
-            LogUtil.instance.i("updateSubChainBasicInfo  ", "empty case!");
+            LogUtil.instance().i("updateSubChainBasicInfo  ", "empty case!");
           } else if (serverConfigModel.data.latestConfig.eeeRuntimeV == null ||
               getSubChainMap["runtimeVersion"] == null ||
               serverConfigModel.data.latestConfig.eeeTxV == null ||
@@ -99,10 +99,10 @@ class _EntrancePageState extends State<EntrancePage> {
               serverConfigModel.data.latestConfig.eeeRuntimeV.toString() != getSubChainMap["runtimeVersion"].toString() ||
               serverConfigModel.data.latestConfig.eeeTxV != getSubChainMap["txVersion"].toString()) {
             Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
-            LogUtil.instance.i("updateSubChainBasicInfo  ", " finish do updateSubChainBasicInfo");
+            LogUtil.instance().i("updateSubChainBasicInfo  ", " finish do updateSubChainBasicInfo");
           }
         } catch (e) {
-          LogUtil.instance.e("updateSubChainBasicInfo error is ---> ", e.toString());
+          LogUtil.instance().e("updateSubChainBasicInfo error is ---> ", e.toString());
         }
         {
           config.lastTimeConfigCheck = nowTimeStamp;
@@ -132,10 +132,10 @@ class _EntrancePageState extends State<EntrancePage> {
               if (defaultDigitParam["code"] != null && defaultDigitParam["code"] == 0) {
                 String paramString = convert.jsonEncode(defaultDigitParam["data"]);
                 var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
-                LogUtil.instance.i("updateDefaultDigitList=====>", updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
+                LogUtil.instance().i("updateDefaultDigitList=====>", updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
               }
             } catch (e) {
-              LogUtil.instance.e("updateDefaultDigitList error =====>", e.toString());
+              LogUtil.instance().e("updateDefaultDigitList error =====>", e.toString());
             }
           }
           config.privateConfig.configVersion = serverConfigModel.data.latestConfig.appConfigVersion;
@@ -143,10 +143,10 @@ class _EntrancePageState extends State<EntrancePage> {
         // save changed config
         HandleConfig.instance.saveConfig(config);
       } else {
-        LogUtil.instance.i("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>", (nowTimeStamp - lastTimeConfigCheck).toString());
+        LogUtil.instance().i("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>", (nowTimeStamp - lastTimeConfigCheck).toString());
       }
     } catch (e) {
-      LogUtil.instance.e("_checkServerAppConfig(), error is =======>", e.toString());
+      LogUtil.instance().e("_checkServerAppConfig(), error is =======>", e.toString());
     }
   }
 
@@ -166,7 +166,7 @@ class _EntrancePageState extends State<EntrancePage> {
           future: _checkIsContainWallet(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              LogUtil.instance.e("EntrancePage future snapshot.hasError is +>", snapshot.error.toString());
+              LogUtil.instance().e("EntrancePage future snapshot.hasError is +>", snapshot.error.toString());
               return Center(
                 child: Text(
                   translate('wallet_load_error'),

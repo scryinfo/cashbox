@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class FlutterWebViewPluginDemo extends StatefulWidget {
   @override
@@ -10,6 +11,8 @@ class FlutterWebViewPluginDemo extends StatefulWidget {
 class _FlutterWebViewPluginDemo extends State<FlutterWebViewPluginDemo> {
   String localHtmlFilPath = "";
   final flutterWebviewPlugin = new FlutterWebviewPlugin();
+  final CookieManager cookieManager = CookieManager();
+
 
   @override
   void didChangeDependencies() {
@@ -22,6 +25,9 @@ class _FlutterWebViewPluginDemo extends State<FlutterWebViewPluginDemo> {
     flutterWebviewPlugin.onUrlChanged.listen((String url) {
       print("flutterWebviewPlugin url =========>" + url);
     });
+    flutterWebviewPlugin.clearCache();
+    flutterWebviewPlugin.cleanCookies();
+    cookieManager.clearCookies();
   }
 
   @override
@@ -41,6 +47,7 @@ class _FlutterWebViewPluginDemo extends State<FlutterWebViewPluginDemo> {
           withZoom: true,
           withLocalStorage: true,
           hidden: true,
+          clearCache: true,
           initialChild: Container(
             color: Colors.redAccent,
             child: const Center(

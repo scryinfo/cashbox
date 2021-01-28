@@ -6,7 +6,7 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -227,7 +227,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                         NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
                         break;
                       default:
-                        LogUtil.instance.e("unknown chainType error ", "unknown chainType");
+                        LogUtil.instance().e("unknown chainType error ", "unknown chainType");
                         break;
                     }
                     return;
@@ -264,7 +264,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                     Fluttertoast.showToast(msg: translate('save_digit_model_failure').toString());
                   }
                 } catch (e) {
-                  LogUtil.instance.e("digit_list_page", e.toString());
+                  LogUtil.instance().e("digit_list_page", e.toString());
                 }
               },
               child: Container(
@@ -346,10 +346,10 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
           this.displayDigitsList = tempList;
         });
       } else {
-        LogUtil.instance.d("search result ===>", "is empty");
+        LogUtil.instance().d("search result ===>", "is empty");
       }
     } else {
-      LogUtil.instance.d("search appear some error ===>", status.toString());
+      LogUtil.instance().d("search appear some error ===>", status.toString());
     }
   }
 }

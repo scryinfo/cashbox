@@ -4,7 +4,7 @@ import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/routers/application.dart';
 import 'package:app/routers/fluro_navigator.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -37,7 +37,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
   _initMnemonicData() async {
     var mnemonic = await Wallets.instance.createMnemonic(12);
     if (mnemonic == null) {
-      LogUtil.instance.e("CreateWalletMnemonicPage=>", "mnemonic is null");
+      LogUtil.instance().e("CreateWalletMnemonicPage=>", "mnemonic is null");
       return;
     }
     setState(() {

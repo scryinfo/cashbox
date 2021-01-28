@@ -4,7 +4,7 @@ import 'package:app/model/wallets.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/list_item.dart';
 import 'package:app/widgets/pwd_dialog.dart';
@@ -58,8 +58,7 @@ class _MinePageState extends State<MinePage> {
   //todo 2.0
   Widget _buildMoneyUnitWidget() {
     return GestureDetector(
-      onTap: () {
-      },
+      onTap: () {},
       child: Container(
         width: ScreenUtil().setWidth(90),
         height: ScreenUtil().setHeight(13.5),
@@ -174,7 +173,7 @@ class _MinePageState extends State<MinePage> {
               Fluttertoast.showToast(msg: translate('success_clear_data'));
               NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
             } else {
-              LogUtil.instance.e("_showClearHintDialog=>", "status is=>" + status.toString() + "message=>" + cleanMap["message"]);
+              LogUtil.instance().e("_showClearHintDialog=>", "status is=>" + status.toString() + "message=>" + cleanMap["message"]);
               Fluttertoast.showToast(msg: translate('fail_delete_data'));
             }
           },

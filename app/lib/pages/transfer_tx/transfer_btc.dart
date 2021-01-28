@@ -1,7 +1,7 @@
 import 'package:app/model/wallets.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
@@ -167,7 +167,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
         _toAddressController.text = qrResult.toString();
       });
     } catch (e) {
-      LogUtil.instance.e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
+      LogUtil.instance().e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
       Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
     }
   }
