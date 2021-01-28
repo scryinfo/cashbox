@@ -86,8 +86,8 @@ version = "0.11.1"
 bitcoin-wallet = "1.1.0"
 
 # rbatis
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde = { version = "1.0.123", features = ["derive"] }
+serde_json = "1.0.61"
 chrono = { version = "0.4", features = ["serde"] }
 bigdecimal = "0.2"
 rbatis-core = { version = "1.8.65", features = ["async-io-sqlite"] }
