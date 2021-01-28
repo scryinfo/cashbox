@@ -1,4 +1,4 @@
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import '../routers/router_handler.dart';
@@ -43,7 +43,7 @@ class Routes {
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       print('ERROR====>ROUTE WAS NOT FONUND!!!');
-      LogUtil.instance.e("Routers error is=>", "noFoundHandler");
+      LogUtil.instance().e("Routers error is=>", "noFoundHandler");
     });
 
     router.define(homePage, handler: homePageHandler);

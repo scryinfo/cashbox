@@ -2,7 +2,7 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/tx_model/eee_transaction_model.dart';
 import 'package:app/model/wallet.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 import 'dart:convert' as convert;
@@ -52,7 +52,7 @@ class Wallets {
           Map updateMap = await Wallets.instance.updateDefaultDigitList(digitParam);
           int status = updateMap["status"];
           if (status == null || status != 200) {
-            LogUtil.instance.e("initWallet,updateDefaultDigitList error=>", updateMap["message"].toString());
+            LogUtil.instance().e("initWallet,updateDefaultDigitList error=>", updateMap["message"].toString());
           }
         }
       }
@@ -61,7 +61,7 @@ class Wallets {
         Map resultMap = await WalletManager.initWalletBasicData(); //Initialize some database data
         int status = resultMap["status"];
         if (status == null || status != 200) {
-          LogUtil.instance.e("initWalletBasicData error=>", "not find status code");
+          LogUtil.instance().e("initWalletBasicData error=>", "not find status code");
           return;
         }
         if (status == 200 && resultMap["isInitWalletBasicData"] == true) {
@@ -76,13 +76,13 @@ class Wallets {
     Map resultMap = await WalletManager.updateWalletDbData(newVersion); //Initialize some database data
     int status = resultMap["status"];
     if (status == null) {
-      LogUtil.instance.e("initWalletBasicData error=>", "not find status code");
+      LogUtil.instance().e("initWalletBasicData error=>", "not find status code");
       return null;
     }
     if (status == 200) {
       return resultMap;
     } else {
-      LogUtil.instance
+      LogUtil.instance()
           .e("initWalletBasicData=>", "error status is=>" + resultMap["status"].toString() + "||message is=>" + resultMap["message"].toString());
       return null;
     }
@@ -94,13 +94,13 @@ class Wallets {
     Map resultMap = await WalletManager.mnemonicGenerate(count);
     int status = resultMap["status"];
     if (status == null) {
-      LogUtil.instance.e("createMnemonic=>", "not find status code");
+      LogUtil.instance().e("createMnemonic=>", "not find status code");
       return null;
     }
     if (resultMap["status"] == 200) {
       return resultMap["mn"];
     } else {
-      LogUtil.instance
+      LogUtil.instance()
           .e("createMnemonic=>", "error status is=>" + resultMap["status"].toString() + "||message is=>" + resultMap["message"].toString());
       return null;
     }
@@ -113,13 +113,13 @@ class Wallets {
     int status = containWalletMap["status"];
     String message = containWalletMap["message"];
     if (status == null) {
-      LogUtil.instance.e("isContainWallet=>", "not find status code");
+      LogUtil.instance().e("isContainWallet=>", "not find status code");
       return false;
     }
     if (status == 200) {
       return containWalletMap["isContainWallet"];
     } else {
-      LogUtil.instance.e("isContainWallet=>", "error status is=>" + containWalletMap["status"].toString() + "||message is=>" + message.toString());
+      LogUtil.instance().e("isContainWallet=>", "error status is=>" + containWalletMap["status"].toString() + "||message is=>" + message.toString());
       return false;
     }
   }
@@ -141,7 +141,7 @@ class Wallets {
       Wallet walletM = Wallet();
       int walletStatus = jniList[walletIndex]["status"];
       if (walletStatus == null || walletStatus != 200) {
-        LogUtil.instance
+        LogUtil.instance()
             .e("loadAllWalletList=>", "error status code is" + walletStatus.toString() + "||message is=>" + jniList[walletIndex]["message"]);
         continue; //There is a problem with this wallet data, skip it, take down a wallet
       }
@@ -277,7 +277,7 @@ class Wallets {
 
     Map saveWalletMap = await WalletManager.saveWallet(walletName, pwd, mnemonic, walletTypeToInt);
     if (saveWalletMap["status"] == null) {
-      LogUtil.instance.e("saveWallet=>", "not find status code");
+      LogUtil.instance().e("saveWallet=>", "not find status code");
       return false;
     }
     if (saveWalletMap["status"] == 200) {
@@ -318,7 +318,7 @@ class Wallets {
     Map setNowWalletMap = await WalletManager.setNowWallet(walletId);
     int status = setNowWalletMap["status"];
     if (status == null) {
-      LogUtil.instance.e("setNowWallet=>", "not find status code");
+      LogUtil.instance().e("setNowWallet=>", "not find status code");
       return false;
     }
     if (status == 200) {
@@ -333,7 +333,7 @@ class Wallets {
       });
       return setNowWalletMap["isSetNowWallet"];
     } else {
-      LogUtil.instance.e("setNowWallet=>", "error status code is" + status.toString() + "||message is=>" + setNowWalletMap["message"]);
+      LogUtil.instance().e("setNowWallet=>", "error status code is" + status.toString() + "||message is=>" + setNowWalletMap["message"]);
       return false;
     }
   }
@@ -345,7 +345,7 @@ class Wallets {
     int status = deleteWalletMap["status"];
     bool isSuccess = deleteWalletMap["isDeletWallet"];
     if (status == null) {
-      LogUtil.instance.e("deleteWallet=>", "not find status code");
+      LogUtil.instance().e("deleteWallet=>", "not find status code");
       return null;
     }
     if (status == 200 && isSuccess) {
@@ -353,7 +353,7 @@ class Wallets {
       allWalletList.remove(getWalletByWalletId(walletId));
       return deleteWalletMap;
     } else {
-      LogUtil.instance.e("deleteWallet=>", "error status code is" + status.toString() + "||message is=>" + deleteWalletMap["message"]);
+      LogUtil.instance().e("deleteWallet=>", "error status code is" + status.toString() + "||message is=>" + deleteWalletMap["message"]);
       return deleteWalletMap;
     }
   }
@@ -362,7 +362,7 @@ class Wallets {
     Map eeeTxSignMap = await WalletManager.eeeTxSign(walletId, pwd, rawTx);
     int status = eeeTxSignMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
+      LogUtil.instance().e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
     }
     return eeeTxSignMap;
   }
@@ -375,7 +375,7 @@ class Wallets {
         decimal: decimal);
     int status = ethTxSignMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("ethTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethTxSignMap["message"]);
+      LogUtil.instance().e("ethTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethTxSignMap["message"]);
     }
     return ethTxSignMap;
   }
@@ -384,7 +384,7 @@ class Wallets {
     Map ethRawTxSignMap = await WalletManager.ethRawTxSign(rawTx, chainType, fromAddress, pwd);
     int status = ethRawTxSignMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("ethRawTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethRawTxSignMap["message"]);
+      LogUtil.instance().e("ethRawTxSign=>", "error status code is" + status.toString() + "||message is=>" + ethRawTxSignMap["message"]);
     }
     return ethRawTxSignMap;
   }
@@ -393,7 +393,7 @@ class Wallets {
     Map eeeTxSignMap = await WalletManager.eeeSign(walletId, pwd, rawTx);
     int status = eeeTxSignMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
+      LogUtil.instance().e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
     }
     return eeeTxSignMap;
   }
@@ -402,7 +402,7 @@ class Wallets {
     Map eeeTxSignMap = await WalletManager.eeeTransfer(from, to, value, index, pwd);
     int status = eeeTxSignMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
+      LogUtil.instance().e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + eeeTxSignMap["message"]);
     }
     return eeeTxSignMap;
   }
@@ -411,7 +411,7 @@ class Wallets {
     Map tokenXTxSignMap = await WalletManager.tokenXTransfer(from, to, value, extData, index, pwd);
     int status = tokenXTxSignMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + tokenXTxSignMap["message"]);
+      LogUtil.instance().e("eeeTxSign=>", "error status code is" + status.toString() + "||message is=>" + tokenXTxSignMap["message"]);
     }
     return tokenXTxSignMap;
   }
@@ -423,7 +423,7 @@ class Wallets {
     Map decodeMap = await WalletManager.decodeAdditionData(inputData);
     int status = decodeMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("decodeAdditionData=>", "error status code is" + status.toString() + "||message is=>" + decodeMap["message"].toString());
+      LogUtil.instance().e("decodeAdditionData=>", "error status code is" + status.toString() + "||message is=>" + decodeMap["message"].toString());
     }
     return decodeMap;
   }
@@ -438,12 +438,12 @@ class Wallets {
         return null;
       }
     } catch (e) {
-      LogUtil.instance.e("updateDigitBalance=>", "error status code is" + e.toString());
+      LogUtil.instance().e("updateDigitBalance=>", "error status code is" + e.toString());
     }
     Map updateMap = await WalletManager.updateDigitBalance(address, digitId, balance);
     int status = updateMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("updateDigitBalance=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+      LogUtil.instance().e("updateDigitBalance=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
     } else {
       var index = this.nowWallet.nowChain.digitsList.indexWhere((element) => (element.digitId == digitId));
       if (index != -1) {
@@ -458,7 +458,7 @@ class Wallets {
     Map<dynamic, dynamic> eeeStorageMap = await WalletManager.eeeStorageKey(module, storageItem, accountStr);
     int status = eeeStorageMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("eeeStorageMap=>", "error status code is" + status.toString() + "||message is=>" + eeeStorageMap["message"].toString());
+      LogUtil.instance().e("eeeStorageMap=>", "error status code is" + status.toString() + "||message is=>" + eeeStorageMap["message"].toString());
     }
     return eeeStorageMap;
   }
@@ -468,7 +468,7 @@ class Wallets {
     Map<dynamic, dynamic> decodeEeeAccountInfoMap = await WalletManager.decodeAccountInfo(encodeData);
     int status = decodeEeeAccountInfoMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance
+      LogUtil.instance()
           .e("decodeEeeAccountInfo=>", "error status code is" + status.toString() + "||message is=>" + decodeEeeAccountInfoMap["message"].toString());
     }
     return decodeEeeAccountInfoMap;
@@ -478,7 +478,7 @@ class Wallets {
     Map<dynamic, dynamic> getEeeSyncRecordMap = await WalletManager.getEeeSyncRecord();
     int status = getEeeSyncRecordMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance
+      LogUtil.instance()
           .e("getEeeSyncRecordMap=>", "error status code is" + status.toString() + "||message is=>" + getEeeSyncRecordMap["message"].toString());
     }
     return getEeeSyncRecordMap;
@@ -488,7 +488,7 @@ class Wallets {
     Map<dynamic, dynamic> updateEeeSyncRecordMap = await WalletManager.updateEeeSyncRecord(account, chainType, blockNum, blockHash);
     int status = updateEeeSyncRecordMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance
+      LogUtil.instance()
           .e("updateEeeSyncRecord=>", "error status code is" + status.toString() + "||message is=>" + updateEeeSyncRecordMap["message"].toString());
     }
     return updateEeeSyncRecordMap;
@@ -498,7 +498,7 @@ class Wallets {
     Map<dynamic, dynamic> saveEeeExtrinsicDetailMap = await WalletManager.saveEeeExtrinsicDetail(infoId, account, eventDetail, blockHash, extrinsic);
     int status = saveEeeExtrinsicDetailMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("saveEeeExtrinsicDetail=>",
+      LogUtil.instance().e("saveEeeExtrinsicDetail=>",
           "error status code is" + status.toString() + "||message is=>" + saveEeeExtrinsicDetailMap["message"].toString());
     }
     return saveEeeExtrinsicDetailMap;
@@ -509,7 +509,7 @@ class Wallets {
     Map loadEeeChainTxMap = await WalletManager.loadEeeChainTxHistory(account, tokenName, startIndex, offset);
     int status = loadEeeChainTxMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance
+      LogUtil.instance()
           .e("loadEeeChainTxHistory=>", "error status code is" + status.toString() + "||message is=>" + loadEeeChainTxMap["message"].toString());
     } else {
       List eeeChainTxList = loadEeeChainTxMap["eeeChainTxDetail"];
@@ -528,7 +528,7 @@ class Wallets {
             ..isSuccess = eeeChainTxList[i]["isSuccess"];
           eeeTransactionModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(eeeChainTxList[i]["timestamp"])).toString();
         } catch (e) {
-          LogUtil.instance.e("convert format error ", e.toString());
+          LogUtil.instance().e("convert format error ", e.toString());
           return resultList;
         }
         resultList.add(eeeTransactionModel);
@@ -543,7 +543,7 @@ class Wallets {
         await WalletManager.addDigitToChainModel(walletId, Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), digitId);
     int status = addDigitModelMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance
+      LogUtil.instance()
           .e("addDigitModelMap=>", "error status code is" + status.toString() + "||message is=>" + addDigitModelMap["message"].toString());
     } else {
       await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //Add this token model to digitList and reload
@@ -558,7 +558,8 @@ class Wallets {
     Map updateMap = await WalletManager.updateDefaultDigitList(digitData);
     int status = updateMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("updateDefaultDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+      LogUtil.instance()
+          .e("updateDefaultDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
     }
     return updateMap;
   }
@@ -570,7 +571,7 @@ class Wallets {
     Map updateMap = await WalletManager.updateAuthDigitList(digitData);
     int status = updateMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+      LogUtil.instance().e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
     }
     return updateMap;
   }
@@ -580,7 +581,7 @@ class Wallets {
     Map updateMap = await WalletManager.getNativeAuthDigitList(Chain.chainTypeToInt(chain.chainType), startIndex, pageSize);
     int status = updateMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+      LogUtil.instance().e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
       return resultMap;
     }
     int count = updateMap["count"];
@@ -643,7 +644,7 @@ class Wallets {
     int status = updateMap["status"];
     resultMap["status"] = status;
     if (status == null || status != 200) {
-      LogUtil.instance.e("queryDigit=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+      LogUtil.instance().e("queryDigit=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
 
       return resultMap;
     }
@@ -694,7 +695,7 @@ class Wallets {
     Map updateMap = await WalletManager.getSubChainBasicInfo(genesisHash, specVersion, txVersion);
     int status = updateMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance.e("getSubChainBasicInfo=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
+      LogUtil.instance().e("getSubChainBasicInfo=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
       return updateMap;
     }
     return updateMap;
@@ -708,7 +709,7 @@ class Wallets {
         infoId, runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol, isDefault);
     int status = updateMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance
+      LogUtil.instance()
           .e("updateSubChainBasicInfo=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
       return updateMap;
     }
@@ -719,7 +720,7 @@ class Wallets {
     Map cleanMap = await WalletManager.cleanWalletsDownloadData();
     int status = cleanMap["status"];
     if (status == null || status != 200) {
-      LogUtil.instance
+      LogUtil.instance()
           .e("cleanWalletsDownloadData=>", "error status code is" + status.toString() + "||message is=>" + cleanMap["message"].toString());
       return cleanMap;
     }

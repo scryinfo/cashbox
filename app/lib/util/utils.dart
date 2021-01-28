@@ -1,11 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
-
-import 'package:app/util/log_util.dart';
-import 'package:app/widgets/progress_dialog.dart';
-import 'package:flutter/material.dart';
+import 'package:log_util/log_util.dart';
 import 'package:flutter/services.dart';
-import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Utils {
@@ -143,7 +139,7 @@ class Utils {
       String data = await file.readAsString();
       return data;
     } catch (e) {
-      LogUtil.instance.e("readFile error is ===>", e.toString());
+      LogUtil.instance().e("readFile error is ===>", e.toString());
       return "error";
     }
   }
