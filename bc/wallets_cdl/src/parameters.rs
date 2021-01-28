@@ -6,7 +6,7 @@ use std::os::raw::c_char;
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{
     AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName,
-    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload,ExtrinsicContext
+    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,
 };
 
 use crate::kits::{to_c_char, to_str, CMark, CStruct, CR};
@@ -31,10 +31,6 @@ pub struct CDbName {
     pub walletTestnet: *mut c_char,
     pub walletTestnetPrivate: *mut c_char,
 }
-
-// #[repr(C)]
-// #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
-// pub struct CUnInitParameters {}
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
@@ -108,8 +104,7 @@ pub struct CExtrinsicContext {
     pub blockHash: *mut c_char,
     pub blockNumber: *mut c_char,
     pub event: *mut c_char,
-
-    pub extrinsics: *mut CArray<*mut c_char>
+    pub extrinsics: *mut CArray<*mut c_char>,
 }
 
 

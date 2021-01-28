@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use crate::kits::{d_ptr_alloc, d_ptr_free, CArray, CBool, CStruct};
-use crate::parameters::{CAccountInfo, CContext, CDbName};
+use crate::parameters::{CAccountInfo, CContext, CDbName, CExtrinsicContext};
 use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet, CEthChainTokenDefault};
 
 /// alloc ** [parameters::CContext]
@@ -153,6 +153,7 @@ pub unsafe extern "C" fn CArrayCChar_dFree(dPtr: *mut *mut CArray<*mut c_char>) 
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
 }
+
 #[no_mangle]
 pub extern "C" fn CArrayCEthChainTokenDefault_dAlloc() -> *mut *mut CArray<CEthChainTokenDefault> {
     d_ptr_alloc()
@@ -163,4 +164,16 @@ pub unsafe extern "C" fn CArrayCEthChainTokenDefault_dFree(dPtr: *mut *mut CArra
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
 }
+
+#[no_mangle]
+pub extern "C" fn CExtrinsicContext_dAlloc() -> *mut *mut CArray<CExtrinsicContext> {
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CExtrinsicContext_dFree(dPtr: *mut *mut CArray<CExtrinsicContext>) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
+
 // alloc free end

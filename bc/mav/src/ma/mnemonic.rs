@@ -77,21 +77,17 @@ mod tests {
             assert_eq!(false, b.is_err(), "{:?}", b);
             assert_eq!(false, b.unwrap());
 
-            let mut wrapper = rb.new_wrapper();
-            wrapper.eq(MMnemonic::id, "any");
+            let wrapper = rb.new_wrapper().eq(MMnemonic::id, "any");
             let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
             assert_eq!(false, b.is_err(), "{:?}", b);
             assert_eq!(false, b.unwrap());
 
-            let mut wrapper = rb.new_wrapper();
-            wrapper.eq("1", 1);
+            let wrapper = rb.new_wrapper().eq("1", 1);
             let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
             assert_eq!(false, b.is_err(), "{:?}", b);
             assert_eq!(false, b.unwrap());
 
-            let mut wrapper = rb.new_wrapper();
-            wrapper.eq("1", 1);
-            wrapper.eq(MMnemonic::id, "any");
+            let wrapper = rb.new_wrapper().eq("1", 1).eq(MMnemonic::id, "any");
             let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
             assert_eq!(false, b.is_err(), "{:?}", b);
             assert_eq!(false, b.unwrap());
@@ -126,21 +122,17 @@ mod tests {
             assert_eq!(false, b.is_err(), "{:?}", b);
             assert_eq!(true, b.unwrap());
 
-            let mut wrapper = rb.new_wrapper();
-            wrapper.eq(MMnemonic::id, "any");
+            let wrapper = rb.new_wrapper().eq(MMnemonic::id, "any");
             let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
             assert_eq!(false, b.is_err(), "{:?}", b);
             assert_eq!(false, b.unwrap());
 
-            let mut wrapper = rb.new_wrapper();
-            wrapper.eq("1", 1);
+            let wrapper = rb.new_wrapper().eq("1", 1);
             let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
             assert_eq!(false, b.is_err(), "{:?}", b);
             assert_eq!(true, b.unwrap());
 
-            let mut wrapper = rb.new_wrapper();
-            wrapper.eq("1", 1);
-            wrapper.eq(MMnemonic::id, "any");
+            let wrapper = rb.new_wrapper().eq("1", 1).eq(MMnemonic::id, "any");
             let b = block_on(MMnemonic::exist_by_wrapper(&rb, "", &wrapper));
             assert_eq!(false, b.is_err(), "{:?}", b);
             assert_eq!(false, b.unwrap());

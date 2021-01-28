@@ -27,7 +27,7 @@ fn get_request(url: &str, jsonreq: &str) -> Option<String> {
 
 #[test]
 fn get_chain_runtime_metadata_test() {
-    let hex_str = get_request(URL, METADATA_REQ).expect("get metadata json-rpc");
+    let hex_str = get_request(URL, METADATA_REQ).expect("get metadata data");
     let runtime_vec = scry_crypto::hexstr_to_vec(&hex_str).expect("vec format is wrong");
     let prefixed = RuntimeMetadataPrefixed::decode(&mut &runtime_vec[..]).expect("runtime prefixed");
     let metadata = Metadata::try_from(prefixed).expect("Metadata");
@@ -49,13 +49,15 @@ fn ref_count_key_test() {
 
 #[test]
 fn decode_extrinsics_test() {
-    let input_tx = r#"["0x490284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d01e6291e2731dbb933d9ac8b03fe06c96d8c284a2281b66f93800d7adb8d1e3845adafbf522e610797e1bfd54dbcd24b53146b8ef42168c95430884f320b153680e60000000603ff54065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f0f0000c16ff28623"]"#;
+    let input_tx = r#"0x490284ffd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d01e6291e2731dbb933d9ac8b03fe06c96d8c284a2281b66f93800d7adb8d1e3845adafbf522e610797e1bfd54dbcd24b53146b8ef42168c95430884f320b153680e60000000603ff54065129457ea102a3d978e78c88c93e7e9298d06378874b7206e43cf4c6f67f0f0000c16ff28623"#;
     let metadata_hex = get_request(URL, METADATA_REQ).unwrap();
     let genesis_byte = scry_crypto::hexstr_to_vec(GENESIS_HASH).unwrap();
     let helper = ChainHelper::init(&metadata_hex, &genesis_byte[..], RUNTIME_VERSION, TX_VERSION, Some(15));
     assert!(helper.is_ok());
     let helper = helper.unwrap();
-    let decode_ret = helper.decode_extrinsics(input_tx, "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX");
+
+    let txs = vec![String::from(input_tx)];
+    let decode_ret = helper.decode_extrinsics(&txs, "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX");
     println!("{:?}", decode_ret);
 }
 

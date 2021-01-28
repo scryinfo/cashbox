@@ -126,7 +126,7 @@ fn eth_update_default_token_list_test() {
             ddd.eth_chain_token_shared.m.token_shared.logo_bytes = "".to_owned();
             ddd.eth_chain_token_shared.m.token_shared.project_name = "scryinfo".to_owned();
             ddd.eth_chain_token_shared.m.token_shared.project_home = "https://scry.info/".to_owned();
-            ddd.eth_chain_token_shared.m.token_shared.project_note = "SCRY.INFO is an open source blockchain data protocol layer, oracle of the blockchain world, cornerstone of data smart contract applications.".to_owned();
+            ddd.eth_chain_token_shared.m.token_shared.project_note = "SCRY.INFO is an open source blockchain kits protocol layer, oracle of the blockchain world, cornerstone of kits smart contract applications.".to_owned();
             default_tokens.push(ddd);
         }
 

@@ -118,12 +118,10 @@ impl ChainHelper {
         Ok(tx_result)
     }
 
-    pub fn decode_extrinsics(&self, extrinsics_json: &str, target_account: &str) -> Result<HashMap<usize, TransferDetail>, error::Error> {
+    pub fn decode_extrinsics(&self, extrinsics: &Vec<String>, target_account: &str) -> Result<HashMap<usize, TransferDetail>, error::Error> {
         let target_account = AccountId::from_ss58check(target_account)?;
-        let json_data: Vec<String> = serde_json::from_str(extrinsics_json)?;
         let mut map = HashMap::new();
-        for  (index,tx_str)in json_data.iter().enumerate() {
-
+        for (index, tx_str) in extrinsics.iter().enumerate() {
             let tx = scry_crypto::hexstr_to_vec(tx_str)?;
             let checked_tx = extrinsic::CheckedExtrinsic::decode(&mut &tx[..])?;
             let tx_hash = sp_core::blake2_256(&tx[..]);
@@ -152,7 +150,7 @@ impl ChainHelper {
                     }
                 }
             }
-            if tx_transfer_detail.timestamp.is_some()||tx_transfer_detail.signer.is_some(){
+            if tx_transfer_detail.timestamp.is_some() || tx_transfer_detail.signer.is_some() {
                 map.insert(index, tx_transfer_detail);
             }
         }
@@ -162,35 +160,35 @@ impl ChainHelper {
         let state_vec = scry_crypto::hexstr_to_vec(info)?;
         let type_name = std::any::type_name::<T>();
         match type_name {
-            "eee::EeeAccountInfoRefU8"=>{
-                EeeAccountInfoRefU8::decode(&mut &state_vec.as_slice()[..]).map(|account|{
-                    EeeAccountInfo{
+            "eee::EeeAccountInfoRefU8" => {
+                EeeAccountInfoRefU8::decode(&mut &state_vec.as_slice()[..]).map(|account| {
+                    EeeAccountInfo {
                         nonce: account.nonce,
                         refcount: account.refcount as u32,
                         free: account.free,
                         reserved: account.reserved,
                         misc_frozen: account.misc_frozen,
-                        fee_frozen: account.fee_frozen
+                        fee_frozen: account.fee_frozen,
                     }
                 }).map_err(|err| err.into())
-            },
-            "eee::EeeAccountInfo"=>{
+            }
+            "eee::EeeAccountInfo" => {
                 EeeAccountInfo::decode(&mut &state_vec.as_slice()[..]).map_err(|err| err.into())
             }
-            _ =>{
-                Err(error::Error::Custom(format!("decode type {} not support!",type_name)))
+            _ => {
+                Err(error::Error::Custom(format!("decode type {} not support!", type_name)))
             }
         }
     }
     // when decode RawTx instance,the function data length info will be drop,this func is aim to restore the original structure
-   pub fn restore_func_data(func_data:&[u8]) ->Vec<u8>{
+    pub fn restore_func_data(func_data: &[u8]) -> Vec<u8> {
         let func_size = func_data.len();
         let reserve = match func_size {
             0..=0b0011_1111 => 1,
             0b0100_0000..=0b0011_1111_1111_1111 => 2,
             _ => 4,
         };
-        let mut func_vec = vec![0u8;func_size+reserve];
+        let mut func_vec = vec![0u8; func_size + reserve];
         {
             let temp = &mut func_vec[reserve..];
             temp.copy_from_slice(func_data);
@@ -198,7 +196,8 @@ impl ChainHelper {
         func_vec
     }
 }
-impl ChainHelper{
+
+impl ChainHelper {
     // decode etransfer extrinsic,check if the extrinsic is related to the target account
     fn decode_balance_transfer_tx(&self, target_account: &AccountId, checked_extrinsic: &extrinsic::CheckedExtrinsic, detail: &mut TransferDetail) -> Result<(), error::Error> {
         let func_args: (AccountId, Compact<u128>) = Decode::decode(&mut &checked_extrinsic.function.args[..])?;
@@ -268,7 +267,7 @@ impl ChainHelper{
     }
 
 
-    fn transfer(&self, module_name: &str, call_name: &str, mnemonic: &str, to: &str, amount: &str, index: u32,ext_data:Option<Vec<u8>>) -> Result<String, error::Error> {
+    fn transfer(&self, module_name: &str, call_name: &str, mnemonic: &str, to: &str, amount: &str, index: u32, ext_data: Option<Vec<u8>>) -> Result<String, error::Error> {
         let to = AccountId::from_ss58check(to)?;
 
         if self.is_module_call_exist(module_name, call_name).is_none() {
@@ -276,11 +275,11 @@ impl ChainHelper{
         }
         let signer = keyring::Sr25519::pair_from_phrase(mnemonic, None)?;
         if let Ok(amount) = str::parse::<u128>(amount) {
-            let encode_str = if let Some(ext_data) = ext_data{
+            let encode_str = if let Some(ext_data) = ext_data {
                 let call = compose_call!(self.metadata,  module_name, call_name, to, Compact(amount ),ext_data);
                 let xt: extrinsic::UncheckedExtrinsicV4<_> = compose_extrinsic_offline!(signer,call,index,Era::Immortal,self.genesis_hash,self.genesis_hash,self.runtime_version,self.tx_version);
                 xt.hex_encode()
-            }else{
+            } else {
                 //todo when balances pallet transfer function have ext data,the following code can be removed
                 let call = compose_call!(self.metadata,  module_name, call_name, to, Compact(amount ));
                 let xt: extrinsic::UncheckedExtrinsicV4<_> = compose_extrinsic_offline!(signer,call,index,Era::Immortal,self.genesis_hash,self.genesis_hash,self.runtime_version,self.tx_version);
@@ -324,7 +323,7 @@ impl ChainHelper{
         }
     }
 
-     fn get_chain_runtime_metadata(hex_str: &str) -> Result<Metadata, error::Error> {
+    fn get_chain_runtime_metadata(hex_str: &str) -> Result<Metadata, error::Error> {
         let runtime_vec = scry_crypto::hexstr_to_vec(hex_str)?;
         let prefixed = RuntimeMetadataPrefixed::decode(&mut &runtime_vec[..])?;
         Metadata::try_from(prefixed).map_err(|err| err.into())
