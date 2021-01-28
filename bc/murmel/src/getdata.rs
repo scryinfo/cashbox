@@ -5,7 +5,6 @@ use crate::error::Error;
 use crate::hooks::{HooksMessage, ShowCondition};
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
-    SERVICE_BLOOM,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
@@ -108,7 +107,15 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                                 Ok(())
                             }
                         }
-                        NetworkMessage::Ping(_) => Ok(()),
+                        NetworkMessage::Ping(_) => {
+                            if self.is_serving_blocks(pid) {
+                                trace!("serving blocks peer={}", pid);
+                                //Make a request GetData
+                                self.get_data(pid, false)
+                            } else {
+                                Ok(())
+                            }
+                        },
                         _ => Ok(()),
                     },
                     _ => Ok(()),
@@ -160,6 +167,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         }
         self.p2p
             .send_network(peer, NetworkMessage::GetData(inventory_vec));
+        error!("get data");
         Ok(())
     }
 
@@ -176,7 +184,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
     }
 
     // Handle tx return value
-    fn tx(&mut self, tx: &Transaction, peer: PeerId, hash160: String) -> Result<(), Error> {
+    fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
         info!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;

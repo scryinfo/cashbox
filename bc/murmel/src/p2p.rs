@@ -54,7 +54,7 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-const IO_BUFFER_SIZE: usize = 1024 * 1024;
+const IO_BUFFER_SIZE: usize = 1024 * 1024 * 5;
 const EVENT_BUFFER_SIZE: usize = 1024;
 const CONNECT_TIMEOUT_SECONDS: u64 = 5;
 const BAN: u32 = 100;

@@ -37,8 +37,6 @@ use bitcoin::{
 use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use log::{debug, error, info, trace};
-use std::ops::Deref;
-use std::sync::Arc;
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
 
 pub struct HeaderDownload<T> {
