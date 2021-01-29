@@ -165,7 +165,7 @@ mod tests {
         token.gas_price = "10".to_owned();
         token.gas_limit = 10;
         token.decimal = 18;
-        token.contract_address = "contract".to_owned();
+        //token.contract_address = "contract".to_owned();
         token.token_shared.project_name = "test".to_owned();
         token.token_shared.project_home = "http://".to_owned();
         token.token_shared.project_note = "test".to_owned();

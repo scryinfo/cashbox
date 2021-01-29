@@ -351,7 +351,7 @@ pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_saveExtrinsicDetail(ctx: *mut CContext, netType: *mut c_char,extrinsicCtx: *mut CExtrinsicContext) -> *const CError {
+pub unsafe extern "C" fn ChainEee_saveExtrinsicDetail(ctx: *mut CContext, netType: *mut c_char, extrinsicCtx: *mut CExtrinsicContext) -> *const CError {
     log::debug!("enter ChainEee saveExtrinsicDetail");
 
     if ctx.is_null() || extrinsicCtx.is_null() {
@@ -368,7 +368,7 @@ pub unsafe extern "C" fn ChainEee_saveExtrinsicDetail(ctx: *mut CContext, netTyp
                 let eee_chain = wallets.eee_chain_instance();
                 let net_type = NetType::from(to_str(netType));
                 let extrinsic_ctx = CExtrinsicContext::ptr_rust(extrinsicCtx);
-                match block_on(eee_chain.save_tx_record(wallets, &net_type,&extrinsic_ctx)) {
+                match block_on(eee_chain.save_tx_record(wallets, &net_type, &extrinsic_ctx)) {
                     Ok(_) => {
                         Error::SUCCESS()
                     }
@@ -380,13 +380,11 @@ pub unsafe extern "C" fn ChainEee_saveExtrinsicDetail(ctx: *mut CContext, netTyp
     };
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
-
 }
 
 
-
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_updateAuthDigitList(ctx: *mut CContext,authTokens: *mut CArray<CEeeChainTokenAuth>) -> *const CError {
+pub unsafe extern "C" fn ChainEee_updateAuthDigitList(ctx: *mut CContext, authTokens: *mut CArray<CEeeChainTokenAuth>) -> *const CError {
     log::debug!("enter ChainEth updateDefaultTokenLis");
 
     if ctx.is_null() || authTokens.is_null() {

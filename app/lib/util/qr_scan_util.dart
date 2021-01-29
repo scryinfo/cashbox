@@ -1,4 +1,3 @@
-import 'package:app/configv/config/config.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -9,7 +8,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
-import 'log_util.dart';
+import 'package:log_util/log_util.dart';
 
 class QrScanUtil {
   static const methodPlugin = const MethodChannel('qr_scan_channel');
@@ -191,7 +190,7 @@ class QrScanUtil {
         break;
       default:
         Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
-        LogUtil.instance.e("QrScanUtil", "unknown chainType ======>" + chainType);
+        LogUtil.instance().e("QrScanUtil", "unknown chainType ======>" + chainType);
         break;
     }
   }

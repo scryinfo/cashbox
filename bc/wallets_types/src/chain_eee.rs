@@ -163,7 +163,7 @@ impl From<MAccountInfoSyncProg> for AccountInfoSyncProg {
 impl AccountInfoSyncProg {
     pub async fn find_by_account(rb: &Rbatis, account: &str) -> Result<Option<MAccountInfoSyncProg>, WalletError> {
         let wrapper = rb.new_wrapper()
-            .eq(MAccountInfoSyncProg::account, account.to_string());
+            .eq(MAccountInfoSyncProg::account, account.to_string()).check()?;
         let r = MAccountInfoSyncProg::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)
     }

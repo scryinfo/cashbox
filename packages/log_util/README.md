@@ -20,8 +20,11 @@ import 'package:log_util/log_util.dart';
 
 LogUtil logUtil = new LogUtil();
 // LogUtil logUtil = LogUtil(logFileName: "123test");
+// logUtil.d("tag999", " message999", isSave2File: false);
+// 配置isSave2File，true输出到控制台+文件，false只输出到控制台
 // LogUtil.instance().d("tag", "message");
 // LogUtil.instance(logFileName: "123test").d("tag", "message");
+
 ```
 
 -   使用log

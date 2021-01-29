@@ -10,7 +10,7 @@ import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -99,6 +99,7 @@ class _DappPageState extends State<DappPage> {
                       // initialUrl: "http://59.110.231.223:9010/web_app/dapp/dapp.html#/",
                       initialUrl: snapshot.data.toString(),
                       javascriptMode: JavascriptMode.unrestricted,
+                      debuggingEnabled: true,
                       userAgent:
                           "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36",
                       //JS execution mode Whether to allow JS execution
@@ -463,7 +464,7 @@ class _DappPageState extends State<DappPage> {
               this.callPromise(msg);
             });
           } catch (e) {
-            LogUtil.instance.d("cashboxEthSendSignedTx===>", e.toString());
+            LogUtil.instance().d("cashboxEthSendSignedTx===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
           }
@@ -484,7 +485,7 @@ class _DappPageState extends State<DappPage> {
             msg.data = await ethCall(chainType, data[0], data[1]);
             this.callPromise(msg);
           } catch (e) {
-            LogUtil.instance.d("cashboxEthCall===>", e.toString());
+            LogUtil.instance().d("cashboxEthCall===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
           }
@@ -534,7 +535,7 @@ class _DappPageState extends State<DappPage> {
                       });
                     });
                   } catch (e) {
-                    LogUtil.instance.d("cashboxEeeRawTxSign===>", e.toString());
+                    LogUtil.instance().d("cashboxEeeRawTxSign===>", e.toString());
                     msg.err = "inner error";
                     this.callPromise(msg).whenComplete(() {
                       NavigatorUtils.goBack(context);
@@ -590,7 +591,7 @@ class _DappPageState extends State<DappPage> {
                       NavigatorUtils.goBack(context);
                     });
                   } catch (e) {
-                    LogUtil.instance.d("cashboxEeeRawTxSign===>", e.toString());
+                    LogUtil.instance().d("cashboxEeeRawTxSign===>", e.toString());
                     msg.err = "inner error";
                     this.callPromise(msg).whenComplete(() {
                       NavigatorUtils.goBack(context);

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
-import 'package:app/util/log_util.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

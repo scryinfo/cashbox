@@ -1,7 +1,7 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/wallets.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'net_util.dart';
 
 class ScryXNetUtil {
@@ -9,7 +9,7 @@ class ScryXNetUtil {
   Future<String> _loadScryXIp() async {
     Config config = await HandleConfig.instance.getConfig();
     return config.privateConfig.scryXIp;
-    // return "http://192.168.1.7:9933";
+    // return "http://192.168.2.7:9933";
   }
 
   Future<Map> loadEeeChainNonceTest(String fromAddress) async {
@@ -28,7 +28,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      LogUtil.instance.e("loadEeeChainNonceTest error is  ", e.toString());
+      LogUtil.instance().e("loadEeeChainNonceTest error is  ", e.toString());
       return null;
     }
   }
@@ -104,7 +104,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      LogUtil.instance.e("loadScryXStorage error is  ", e.toString());
+      LogUtil.instance().e("loadScryXStorage error is  ", e.toString());
       return null;
     }
   }
@@ -120,7 +120,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      LogUtil.instance.e("loadScryXRuntimeVersion error is  ", e.toString());
+      LogUtil.instance().e("loadScryXRuntimeVersion error is  ", e.toString());
       return null;
     }
   }
@@ -141,7 +141,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      LogUtil.instance.e("loadScryXBlockHash error is  ", e.toString());
+      LogUtil.instance().e("loadScryXBlockHash error is  ", e.toString());
       return null;
     }
   }
@@ -157,7 +157,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      LogUtil.instance.e("loadChainHeader error is  ", e.toString());
+      LogUtil.instance().e("loadChainHeader error is  ", e.toString());
       return null;
     }
   }
@@ -258,7 +258,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      LogUtil.instance.e("submitExtrinsic error is  ", e.toString());
+      LogUtil.instance().e("submitExtrinsic error is  ", e.toString());
       return null;
     }
   }
@@ -274,7 +274,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      LogUtil.instance.e("getMetadata error is  ", e.toString());
+      LogUtil.instance().e("getMetadata error is  ", e.toString());
       return null;
     }
   }
@@ -290,7 +290,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      LogUtil.instance.e("loadSystemProperties error is  ", e.toString());
+      LogUtil.instance().e("loadSystemProperties error is  ", e.toString());
       return null;
     }
   }

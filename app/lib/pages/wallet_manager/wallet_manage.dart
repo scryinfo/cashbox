@@ -4,7 +4,7 @@ import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -163,7 +163,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                         }
                         Wallet chooseWallet = await Wallets.instance.getWalletByWalletId(Provider.of<WalletManagerProvide>(context).walletId);
                         if (_walletNameController.text == null || _walletNameController.text.isEmpty) {
-                          LogUtil.instance.d("getWalletByWalletId error ===>", "wallet name is null");
+                          LogUtil.instance().d("getWalletByWalletId error ===>", "wallet name is null");
                           return;
                         }
                         bool isRenameSuccess = await chooseWallet.rename(_walletNameController.text);
@@ -276,7 +276,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               Fluttertoast.showToast(msg: translate('success_in_delete_wallet'));
               NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
             } else {
-              LogUtil.instance.e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
+              LogUtil.instance().e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_delete_wallet'));
             }
           },
@@ -301,7 +301,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
               mnemonicMap = null; //Related to mnemonic words, empty after use
               NavigatorUtils.push(context, Routes.recoverWalletPage);
             } else {
-              LogUtil.instance.e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
+              LogUtil.instance().e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_recover_wallet_hint'));
             }
           },

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -30,9 +29,14 @@ class HandleConfig {
   Future<Config> getConfig() async {
     File file = await _getConfigFile(configFileName);
     String fileContent = await file.readAsString();
-    Map configMap = jsonDecode(fileContent);
-    Config config = Config.fromJson(configMap);
-    return config;
+    Config config = Config();
+    try {
+      Map configMap = jsonDecode(fileContent);
+      config = Config.fromJson(configMap);
+      return config;
+    } catch (e) {
+      return config;
+    }
   }
 
   Future<bool> saveConfig(final Config config) async {
@@ -92,7 +96,7 @@ class HandleConfig {
         await file.create();
       }
     } catch (e) {
-      LogUtil.instance.e("_getDirectoryPath ", e.toString());
+      LogUtil.instance().e("_getDirectoryPath ", e.toString());
     }
     return file.path;
   }

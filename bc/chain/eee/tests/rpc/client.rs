@@ -176,7 +176,7 @@ fn parse_status(msg: &str) -> (XtStatus, Option<String>) {
         Some(obj) => {
             let error_message = obj.get("message").unwrap().as_str().unwrap().to_owned();
             let code = obj.get("code").unwrap().as_i64().unwrap();
-            let details = match obj.get("data") {
+            let details = match obj.get("kits") {
                 Some(d) => d.as_str().unwrap().to_owned(),
                 None => "".to_string(),
             };
@@ -273,7 +273,7 @@ mod tests {
             )
         );
 
-        let msg = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":1010,\"message\":\"Invalid Transaction\",\"data\":\"Bad Signature\"},\"id\":\"4\"}";
+        let msg = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":1010,\"message\":\"Invalid Transaction\",\"kits\":\"Bad Signature\"},\"id\":\"4\"}";
         assert_eq!(
             parse_status(msg),
             (
@@ -291,7 +291,7 @@ mod tests {
             )
         );
 
-        let msg = r#"{"jsonrpc":"2.0","error":{"code":1002,"message":"Verification Error: Execution(Wasmi(Trap(Trap { kind: Unreachable })))","data":"RuntimeApi(\"Execution(Wasmi(Trap(Trap { kind: Unreachable })))\")"},"id":"3"}"#;
+        let msg = r#"{"jsonrpc":"2.0","error":{"code":1002,"message":"Verification Error: Execution(Wasmi(Trap(Trap { kind: Unreachable })))","kits":"RuntimeApi(\"Execution(Wasmi(Trap(Trap { kind: Unreachable })))\")"},"id":"3"}"#;
         assert_eq!(
             parse_status(msg),
             (

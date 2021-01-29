@@ -1,12 +1,12 @@
 #[macro_use]
 extern crate serde_derive;
 
-use wallets_types::{Error, InitParameters, SubChainBasicInfo, ChainVersion, AccountInfoSyncProg, StorageKeyParameters, DecodeAccountInfoParameters, EeeChainTokenDefault, CreateWalletParameters, Wallet};
+use wallets_types::{Error, InitParameters, SubChainBasicInfo, ChainVersion, AccountInfoSyncProg, StorageKeyParameters, DecodeAccountInfoParameters, EeeChainTokenDefault, CreateWalletParameters, Wallet, ExtrinsicContext};
 use wallets_cdl::{CStruct, to_c_char, CR, CU64, CArray, chain_eee_c, to_str,
                   wallets_c::Wallets_init,
                   mem_c::{CError_free, CContext_dAlloc},
                   types::{CSubChainBasicInfo, CError},
-                  parameters::{CChainVersion, CInitParameters, CCreateWalletParameters, CContext},
+                  parameters::{CChainVersion, CInitParameters, CCreateWalletParameters, CContext, CExtrinsicContext},
 };
 use mav::ma::{MSubChainBasicInfo, MAccountInfoSyncProg, EeeTokenType};
 use mav::{kits, WalletType};
@@ -15,26 +15,36 @@ use wallets_cdl::types::{CAccountInfoSyncProg, CWallet};
 use wallets_cdl::mem_c::{CStr_dAlloc, CStr_dFree, CWallet_dAlloc, CWallet_dFree};
 use wallets_cdl::wallets_c::{Wallets_generateMnemonic, Wallets_createWallet};
 
-
 const TX_VERSION: u32 = 1;
 const RUNTIME_VERSION: u32 = 6;
 
 const GENESIS_HASH: &'static str = "0x6cec71473c1b8d2295541cb5c21edc4fdb1926375413bb28f78793978229cf48";//0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973
 
+
+mod data;
+
+use crate::data::node_rpc::{Node, Header, StorageChange, NodeVersion, Block};
+
 #[test]
 fn eee_basic_info_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    let c_err = init_parameters(c_ctx);
+    assert_ne!(null_mut(), c_err);
+
     unsafe {
-        let c_ctx = CContext_dAlloc();
-        assert_ne!(null_mut(), c_ctx);
-        let c_err = init_parameters(c_ctx);
-        assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         // query chain basic info
-        let chain_info = get_chain_basic_info(c_ctx);
-        assert_eq!(chain_info.is_none(), true);
-
-        let save_res = save_basic_info(c_ctx);
-        assert_eq!(save_res.is_ok(), true);
+        let chain_version = ChainVersion {
+            genesis_hash: GENESIS_HASH.to_string(),
+            runtime_version: RUNTIME_VERSION as i32,
+            tx_version: TX_VERSION as i32,
+        };
+        if get_chain_basic_info(c_ctx, &chain_version).is_none() {
+            let chain_metadata = include_str!("chain_metadata.rs");
+            let save_res = save_basic_info(c_ctx, &chain_version, chain_metadata.to_string());
+            assert_eq!(save_res.is_ok(), true);
+        }
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }
@@ -243,7 +253,12 @@ fn eee_tx_sign_test() {
         //create test wallet
         let wallet = create_wallet(c_ctx);
         //check chain basic info
-        let chain_info = get_chain_basic_info(c_ctx);
+        let chain_version = ChainVersion {
+            genesis_hash: GENESIS_HASH.to_string(),
+            runtime_version: RUNTIME_VERSION as i32,
+            tx_version: TX_VERSION as i32,
+        };
+        let chain_info = get_chain_basic_info(c_ctx, &chain_version);
         assert_eq!(chain_info.is_some(), true);
         // sign tx
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
@@ -318,25 +333,184 @@ fn eee_update_default_token_list_test() {
     }
 }
 
+pub type TestError = jsonrpc_client::Error<reqwest::Error>;
 
-#[test]
-fn eee_tx_explorer_test() {
+#[tokio::test]
+async fn eee_tx_explorer_test() {
+    let query_number_interval = 3000;
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
 
-    //query node basic info
+    let event_key_prefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
+    let account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+    let account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
+    let client = data::node_rpc::Client::new("http://127.0.0.1:9933/".to_owned()).unwrap();
 
-    //query node best height
+    let current_num = {
+        let current_header_res: Result<Header, TestError> = client.chain_getHeader(None).await;
+        assert!(current_header_res.is_ok());
+        let current_header: Header = current_header_res.unwrap();
+        let current_num_str = current_header.number.get(2..).unwrap();
+        u64::from_str_radix(current_num_str, 16).unwrap()
+    };
 
-    //query account tx
-    unimplemented!()
+    let genesis_hash_str = {
+        let genesis_hash: Result<String, TestError> = client.chain_getBlockHash(0).await;
+        assert!(genesis_hash.is_ok());
+        genesis_hash.unwrap()
+    };
+    let genesis_hash_runtime_version: Result<NodeVersion, TestError> = client.state_getRuntimeVersion(&genesis_hash_str).await;
+    assert!(genesis_hash_runtime_version.is_ok());
+    let version = genesis_hash_runtime_version.unwrap();
+    let mut chain_version = ChainVersion {
+        genesis_hash: genesis_hash_str.clone(),
+        runtime_version: version.implVersion as i32,
+        tx_version: version.transactionVersion as i32,
+    };
+
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        //ensure chain basic info exist
+        {
+            if get_chain_basic_info(c_ctx, &chain_version).is_none() {
+                let metadata: Result<String, TestError> = client.state_getMetadata(Some(genesis_hash_str.clone())).await;
+                assert!(metadata.is_ok());
+                let save_res = save_basic_info(c_ctx, &chain_version, metadata.unwrap());
+                assert!(save_res.is_ok());
+            }
+        }
+
+        let start_block_number =
+            {
+                let c_sync_prog = wallets_cdl::mem_c::CAccountInfoSyncProg_dAlloc();
+                let c_err = chain_eee_c::ChainEee_getSyncRecord(*c_ctx, to_c_char("Test"), to_c_char(account_1), c_sync_prog) as *mut CError;
+
+                if Error::SUCCESS().code == (*c_err).code {
+                    let account_sync_prog: AccountInfoSyncProg = CAccountInfoSyncProg::to_rust(&**c_sync_prog);
+                    println!("account_sync_prog:{:?}", account_sync_prog);
+                    u64::from_str_radix(&account_sync_prog.block_no, 10).unwrap()
+                } else {
+                    0
+                }
+            };
+        println!("start block num is:{}", start_block_number);
+
+        let storage_key_str = {
+            let storage_system_account = StorageKeyParameters {
+                chain_version: chain_version.clone(),
+                module: "System".to_string(),
+                storage_item: "Account".to_string(),
+                account: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+            };
+            let mut c_storage_param = wallets_cdl::parameters::CStorageKeyParameters::to_c_ptr(&storage_system_account);
+            let storage_key = wallets_cdl::mem_c::CStr_dAlloc();
+            let c_err = chain_eee_c::ChainEee_getStorageKey(*c_ctx, to_c_char("Test"), c_storage_param, storage_key) as *mut CError;
+            assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+            c_storage_param.free();
+            CError_free(c_err);
+            to_str(*storage_key.clone()).to_owned()
+        };
+        println!("query key string:{:?}", storage_key_str);
+        let query_times = (current_num - start_block_number) / query_number_interval + 1;
+        let mut end_block_number = 0u64;
+        for query_time in 0..query_times {
+            let current_start_block_num = start_block_number + query_time * query_number_interval + 1;
+            let start_block_hash: Result<String, TestError> = client.chain_getBlockHash(current_start_block_num).await;
+            assert!(start_block_hash.is_ok());
+            let start_block_hash = start_block_hash.unwrap();
+            end_block_number = {
+                if query_time == (query_times - 1) {
+                    current_num
+                } else {
+                    (query_time + 1) * query_number_interval + current_start_block_num
+                }
+            };
+            println!("end block number is:{}", end_block_number);
+            let end_block_number_hash: Result<String, TestError> = client.chain_getBlockHash(end_block_number).await;
+            assert!(end_block_number_hash.is_ok());
+            let end_block_number_hash = end_block_number_hash.unwrap();
+            let storage: Result<Vec<StorageChange>, TestError> = client.state_queryStorage(vec![storage_key_str.clone()], &start_block_hash, &end_block_number_hash).await;
+            assert!(storage.is_ok());
+            // save
+            for item in storage.unwrap() {
+                //check current block metadata whether exist
+                {
+                    // query runtime version by rpc
+                    let runtime_version: Result<NodeVersion, TestError> = client.state_getRuntimeVersion(&item.block).await;
+                    assert!(runtime_version.is_ok());
+
+                    let version = runtime_version.unwrap();
+                    chain_version.tx_version = version.implVersion as i32;
+                    chain_version.runtime_version = version.transactionVersion as i32;
+
+                    let c_basicinfo = wallets_cdl::mem_c::CSubChainBasicInfo_dAlloc();
+                    let mut c_chain_version = CChainVersion::to_c_ptr(&chain_version);
+                    let c_err = chain_eee_c::ChainEee_getBasicInfo(*c_ctx, to_c_char("Test"), c_chain_version, c_basicinfo) as *mut CError;
+
+                    if Error::SUCCESS().code != (*c_err).code {
+                        // query chain metadata detail  by rpc
+                        let metadata: Result<String, TestError> = client.state_getMetadata(Some(item.block.to_string())).await;
+                        assert!(metadata.is_ok());
+                        let save_res = save_basic_info(c_ctx, &chain_version, metadata.unwrap());
+                        assert!(save_res.is_ok());
+                    }
+                    c_chain_version.free();
+                }
+                let block: Result<Block, TestError> = client.chain_getBlock(&item.block).await;
+                assert!(block.is_ok());
+                let block_content = block.unwrap();
+                // if block only have one extrinsic,There will be no other extrinsic in this block except the set time
+                if block_content.block.extrinsics.len() == 1 {
+                    continue;
+                }
+
+                let event_detail: Result<String, TestError> = client.state_getStorage(event_key_prefix, &item.block).await;
+                assert!(event_detail.is_ok());
+                {
+                    let extrinsic = ExtrinsicContext {
+                        chain_version: chain_version.clone(),
+                        account: account_1.to_string(),
+                        block_hash: item.block,
+                        block_number: block_content.block.header.number,
+                        event: event_detail.unwrap(),
+                        extrinsics: block_content.block.extrinsics,
+                    };
+                    let mut c_extrinsic_ctx = CExtrinsicContext::to_c_ptr(&extrinsic);
+                    let c_err = chain_eee_c::ChainEee_saveExtrinsicDetail(*c_ctx, to_c_char("Test"), c_extrinsic_ctx) as *mut CError;
+                    assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+                    c_extrinsic_ctx.free();
+                }
+            }
+
+            let m_sync_prog = MAccountInfoSyncProg {
+                account: account_1.to_string(),
+                block_no: end_block_number.to_string(),
+                block_hash: end_block_number_hash,
+                ..Default::default()
+            };
+
+            let sync_prog = AccountInfoSyncProg::from(m_sync_prog);
+            let mut c_sync_prog = CAccountInfoSyncProg::to_c_ptr(&sync_prog);
+            let c_err = chain_eee_c::ChainEee_updateSyncRecord(*c_ctx, to_c_char("Test"), c_sync_prog) as *mut CError;
+            assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+            //wallets_cdl::mem_c::CAccountInfoSyncProg_dFree(c_sync_prog);
+            c_sync_prog.free();
+        }
+
+
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
 }
 
-fn init_basic_info_parameters() -> MSubChainBasicInfo {
-    let chain_metadata = include_str!("chain_metadata.rs");
+
+fn init_basic_info_parameters(chain_version: &ChainVersion, metadata: String) -> MSubChainBasicInfo {
     MSubChainBasicInfo {
-        genesis_hash: GENESIS_HASH.to_string(),
-        metadata: chain_metadata.to_string(),
-        runtime_version: RUNTIME_VERSION as i32,
-        tx_version: TX_VERSION as i32,
+        genesis_hash: chain_version.genesis_hash.to_string(),
+        metadata,
+        runtime_version: chain_version.runtime_version as i32,
+        tx_version: chain_version.tx_version as i32,
         ss58_format_prefix: 42,
         token_decimals: 15,
         token_symbol: "EEE".to_string(),
@@ -389,8 +563,8 @@ fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
     }
 }
 
-fn save_basic_info(c_ctx: *mut *mut CContext) -> Result<(), String> {
-    let m_chain_basic_info = init_basic_info_parameters();
+fn save_basic_info(c_ctx: *mut *mut CContext, chain_version: &ChainVersion, metadata: String) -> Result<(), String> {
+    let m_chain_basic_info = init_basic_info_parameters(chain_version, metadata);
     let chain_basic_info = SubChainBasicInfo::from(m_chain_basic_info);
     let mut c_basic_info = CSubChainBasicInfo::to_c_ptr(&chain_basic_info);
     unsafe {
@@ -408,15 +582,10 @@ fn save_basic_info(c_ctx: *mut *mut CContext) -> Result<(), String> {
     }
 }
 
-fn get_chain_basic_info(c_ctx: *mut *mut CContext) -> Option<SubChainBasicInfo> {
-    let chain_version = ChainVersion {
-        genesis_hash: GENESIS_HASH.to_string(),
-        runtime_version: RUNTIME_VERSION as i32,
-        tx_version: TX_VERSION as i32,
-    };
+fn get_chain_basic_info(c_ctx: *mut *mut CContext, chain_version: &ChainVersion) -> Option<SubChainBasicInfo> {
     unsafe {
         let c_basicinfo = wallets_cdl::mem_c::CSubChainBasicInfo_dAlloc();
-        let mut c_chain_version = CChainVersion::to_c_ptr(&chain_version);
+        let mut c_chain_version = CChainVersion::to_c_ptr(chain_version);
         let c_err = chain_eee_c::ChainEee_getBasicInfo(*c_ctx, to_c_char("Test"), c_chain_version, c_basicinfo) as *mut CError;
         let res = {
             if Error::SUCCESS().code == (*c_err).code {

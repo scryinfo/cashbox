@@ -54,12 +54,7 @@ class LogUtil {
   Future<File> get _logFile async {
     // filename eg: 2020_01_02_cashbox.log
     Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
-    var datePrefix = DateTime.now().year.toString() +
-        "_" +
-        DateTime.now().month.toString() +
-        "_" +
-        DateTime.now().subtract(Duration(days: 15)).day.toString() +
-        "_";
+    var datePrefix = DateTime.now().year.toString() + "_" + DateTime.now().month.toString() + "_" + DateTime.now().day.toString() + "_";
     String fullPath = directory.path + "/" + datePrefix + _logFileName;
     if (!await File(fullPath).exists()) {
       File(fullPath).create();
@@ -67,30 +62,32 @@ class LogUtil {
     return File(fullPath);
   }
 
-  void d(String tag, String message) async {
+  void d(String tag, String message, {bool isSave2File = true}) {
     _level = Level.Debug;
-    _printOut(tag, message);
+    _printOut(tag, message, isSave2File);
   }
 
-  void i(String tag, String message) async {
+  void i(String tag, String message, {bool isSave2File = true}) {
     _level = Level.Info;
-    _printOut(tag, message);
+    _printOut(tag, message, isSave2File);
   }
 
-  void w(String tag, String message) async {
+  void w(String tag, String message, {bool isSave2File = true}) {
     _level = Level.Warn;
-    _printOut(tag, message);
+    _printOut(tag, message, isSave2File);
   }
 
-  e(String tag, String message) async {
+  e(String tag, String message, {bool isSave2File = true}) {
     _level = Level.Error;
-    _printOut(tag, message);
+    _printOut(tag, message, isSave2File);
   }
 
-  void _printOut(String tag, String message) async {
+  void _printOut(String tag, String message, bool isSave2File) async {
     print(_level.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n");
-
-    File file = await _logFile;
-    file.writeAsString(_level.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n", flush: true, mode: FileMode.append);
+    if (isSave2File) {
+      File file = await _logFile;
+      file.writeAsStringSync(_level.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n",
+          flush: true, mode: FileMode.append);
+    }
   }
 }

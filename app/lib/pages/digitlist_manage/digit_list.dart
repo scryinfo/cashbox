@@ -1,4 +1,3 @@
-
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
@@ -9,7 +8,7 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/log_util.dart';
+import 'package:log_util/log_util.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
@@ -142,7 +141,7 @@ class _DigitListPageState extends State<DigitListPage> {
                   ..setChainType(nowChain.chainType)
                   ..setContractAddress(displayDigitsList[index].contractAddress ?? "");
               } catch (e) {
-                LogUtil.instance.e("digit_list_page", e.toString());
+                LogUtil.instance().e("digit_list_page", e.toString());
               }
               switch (Wallets.instance.nowWallet.nowChain.chainType) {
                 case ChainType.ETH:
@@ -154,7 +153,7 @@ class _DigitListPageState extends State<DigitListPage> {
                   NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
                   break;
                 default:
-                  LogUtil.instance.e("unknown chain type error ","unknown chainType");
+                  LogUtil.instance().e("unknown chain type error ", "unknown chainType");
                   break;
               }
             },
