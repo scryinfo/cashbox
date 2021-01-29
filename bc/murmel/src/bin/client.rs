@@ -16,13 +16,13 @@
 
 use bitcoin::network::constants::Network;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use config::{Config, ConfigError};
+use config::Config;
 use log::info;
 use log::Level;
+use mav::ma::MUserAddress;
 use murmel::constructor::Constructor;
 use murmel::db::RB_DETAIL;
 use murmel::jniapi::{calc_default_address, calc_pubkey};
-use mav::ma::MUserAddress;
 use murmel::path::BTC_HAMMER_PATH;
 use simple_logger;
 use std::collections::HashMap;

@@ -78,44 +78,35 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                     PeerMessage::Disconnected(_, _) => Ok(()),
                     PeerMessage::Incoming(pid, msg) => match msg {
                         NetworkMessage::MerkleBlock(ref merkleblock) => {
-                            if self.is_serving_blocks(pid) {
+                            {
+                                let block_hash = merkleblock.prev_block.to_hex();
+                                let timestamp = merkleblock.timestamp;
                                 {
-                                    let block_hash = merkleblock.prev_block.to_hex();
-                                    let timestamp = merkleblock.timestamp;
-                                    {
-                                        RB_DETAIL
-                                            .update_progress(block_hash, timestamp.to_string());
-                                    }
+                                    RB_DETAIL.update_progress(block_hash, timestamp.to_string());
                                 }
+                            }
 
-                                if merkle_vec.len() <= 100 {
-                                    merkle_vec.push(merkleblock.clone());
-                                } else {
+                            if merkle_vec.len() <= 100 {
+                                merkle_vec.push(merkleblock.clone());
+                            } else {
+                                if self.is_serving_blocks(pid) {
                                     self.merkleblock(&merkle_vec, pid)
                                         .expect("merkle block vector failed");
-                                    merkle_vec.clear();
                                 }
-                                Ok(())
-                            } else {
-                                Ok(())
+                                merkle_vec.clear();
                             }
+                            Ok(())
                         }
-                        NetworkMessage::Tx(ref tx) => {
-                            if self.is_serving_blocks(pid) {
-                                self.tx(tx, pid, hash160.clone())
-                            } else {
-                                Ok(())
-                            }
-                        }
+                        NetworkMessage::Tx(ref tx) => self.tx(tx, pid, hash160.clone()),
                         NetworkMessage::Ping(_) => {
                             if self.is_serving_blocks(pid) {
                                 trace!("serving blocks peer={}", pid);
                                 //Make a request GetData
-                                self.get_data(pid, false)
+                                self.get_data(pid, true)
                             } else {
                                 Ok(())
                             }
-                        },
+                        }
                         _ => Ok(()),
                     },
                     _ => Ok(()),
@@ -143,12 +134,12 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
             while (*condition).get_filter() == false {
                 let r = cvar.wait_for(&mut condition, Duration::from_secs(5));
                 if r.timed_out() {
-                    error!("wait_for filter condition timeout");
+                    info!("wait_for filter condition timeout");
                     return Ok(());
                 }
             }
         }
-        error!("get fillter_ready condition");
+        info!("get fillter_ready condition");
 
         let mut header_vec: Vec<String> = vec![];
         {
@@ -165,9 +156,9 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
             let inventory = Inventory::new(InvType::FilteredBlock, header.as_str());
             inventory_vec.push(inventory);
         }
+        info!("send getdata message");
         self.p2p
             .send_network(peer, NetworkMessage::GetData(inventory_vec));
-        error!("get data");
         Ok(())
     }
 
