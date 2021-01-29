@@ -331,6 +331,9 @@ ${toDart.toString()}  }''');
     }
     data = new List<$elName>(c.ref.len);
     for (var i = 0; i < data.length;i++) {
+      if (data[i] == null) {
+        data[i] = new $elName();
+      }
       ${nativeType ? "data[i] = c.ref.ptr.elementAt(i).value" : (nativeTypeArray ? "data[i] = fromUtf8Null(c.ref.ptr.elementAt(i).value)" : "data[i].toDart(c.ref.ptr.elementAt(i))")};
     }
   }
