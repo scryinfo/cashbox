@@ -100,7 +100,7 @@ impl EeeChainTokenDefault {
 #[derive(Debug, Default)]
 pub struct EeeChain {
     pub chain_shared: ChainShared,
-    pub address: Address,
+  //  pub address: Address,
     pub tokens: Vec<EeeChainToken>,
 }
 
@@ -125,6 +125,17 @@ impl Load for EeeChain {
         let wallet_type = WalletType::from(&mw.wallet_type);
         self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
 
+        {//load address
+            let wallet_id = self.chain_shared.wallet_id.clone();
+            let chain_type = self.chain_shared.chain_type.clone();
+            self.chain_shared.set_addr(context,&wallet_id,&chain_type).await?;
+        }
+
+        {//load address
+            let mut addr = Address::default();
+            addr.load(context,&self.chain_shared.wallet_id,&self.chain_shared.chain_type).await?;
+            self.chain_shared.wallet_address= addr;
+        }
         {//load token
             let rb = context.db().data_db(&NetType::from(&mw.net_type));
             let wrapper = rb.new_wrapper()

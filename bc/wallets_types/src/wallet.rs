@@ -118,15 +118,12 @@ impl Load for Wallet {
         self.m = mw;
         {
             self.eth_chain.load(context, self.m.clone()).await?;
-            //todo wallet address
         }
         {
             self.eee_chain.load(context, self.m.clone()).await?;
-            //todo wallet address
         }
         {
             self.btc_chain.load(context, self.m.clone()).await?;
-            //todo wallet address
         }
 
         Ok(())

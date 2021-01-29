@@ -6,7 +6,7 @@ use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{AccountInfoSyncProg, EeeChain, EeeChainToken, EeeChainTokenShared,EeeChainTokenAuth,EeeChainTokenDefault, SubChainBasicInfo};
 
 use crate::kits::{CArray, CBool, CMark, CR, CStruct, to_c_char, to_str};
-use crate::types::{CAddress, CChainShared, CTokenShared};
+use crate::types::{CChainShared, CTokenShared};
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
@@ -45,7 +45,7 @@ pub struct CEeeChainTokenAuth {
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChain {
     pub chainShared: *mut CChainShared,
-    pub address: *mut CAddress,
+   // pub address: *mut CAddress,
     pub tokens: *mut CArray<CEeeChainToken>,
 }
 

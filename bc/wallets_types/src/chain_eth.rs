@@ -3,7 +3,7 @@ use rbatis::crud::CRUDEnable;
 
 use mav::{ChainType, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault,MEthChainTokenShared, MWallet};
+use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MWallet};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 
@@ -31,7 +31,7 @@ impl Load for EthChainToken {
 #[derive(Debug, Default)]
 pub struct EthChainTokenShared {
     pub m: MEthChainTokenShared,
-    //pub token_shared: TokenShared,
+  //  pub token_shared: TokenShared,
 }
 deref_type!(EthChainTokenShared,MEthChainTokenShared);
 
@@ -124,6 +124,11 @@ impl Load for EthChain {
         let wallet_type = WalletType::from(mw.wallet_type.as_str());
         self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
 
+        {//load address
+            let wallet_id = self.chain_shared.wallet_id.clone();
+            let chain_type = self.chain_shared.chain_type.clone();
+            self.chain_shared.set_addr(context,&wallet_id,&chain_type).await?;
+        }
         {//load token
 
             let rb = context.db().data_db( &NetType::from(&mw.net_type));
