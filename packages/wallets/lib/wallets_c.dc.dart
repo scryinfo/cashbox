@@ -312,6 +312,7 @@ class ArrayCBtcChainToken extends DC<clib.CArrayCBtcChainToken> {
     }
     data = new List<BtcChainToken>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new BtcChainToken();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -374,6 +375,7 @@ class ArrayCBtcChainTokenAuth extends DC<clib.CArrayCBtcChainTokenAuth> {
     }
     data = new List<BtcChainTokenAuth>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new BtcChainTokenAuth();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -436,6 +438,7 @@ class ArrayCBtcChainTokenDefault extends DC<clib.CArrayCBtcChainTokenDefault> {
     }
     data = new List<BtcChainTokenDefault>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new BtcChainTokenDefault();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -558,6 +561,7 @@ class ArrayCContext extends DC<clib.CArrayCContext> {
     }
     data = new List<Context>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new Context();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -619,6 +623,7 @@ class ArrayCEeeChainToken extends DC<clib.CArrayCEeeChainToken> {
     }
     data = new List<EeeChainToken>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new EeeChainToken();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -681,6 +686,7 @@ class ArrayCEeeChainTokenAuth extends DC<clib.CArrayCEeeChainTokenAuth> {
     }
     data = new List<EeeChainTokenAuth>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new EeeChainTokenAuth();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -743,6 +749,7 @@ class ArrayCEeeChainTokenDefault extends DC<clib.CArrayCEeeChainTokenDefault> {
     }
     data = new List<EeeChainTokenDefault>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new EeeChainTokenDefault();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -804,6 +811,7 @@ class ArrayCEthChainToken extends DC<clib.CArrayCEthChainToken> {
     }
     data = new List<EthChainToken>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new EthChainToken();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -866,6 +874,7 @@ class ArrayCEthChainTokenAuth extends DC<clib.CArrayCEthChainTokenAuth> {
     }
     data = new List<EthChainTokenAuth>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new EthChainTokenAuth();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -928,6 +937,70 @@ class ArrayCEthChainTokenDefault extends DC<clib.CArrayCEthChainTokenDefault> {
     }
     data = new List<EthChainTokenDefault>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new EthChainTokenDefault();
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
+class ArrayCExtrinsicContext extends DC<clib.CArrayCExtrinsicContext> {
+  List<ExtrinsicContext> data;
+
+  ArrayCExtrinsicContext() {
+    data = new List<ExtrinsicContext>();
+  }
+
+  static free(Pointer<clib.CArrayCExtrinsicContext> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    ExtrinsicContext.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCExtrinsicContext fromC(
+      Pointer<clib.CArrayCExtrinsicContext> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCExtrinsicContext();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCExtrinsicContext> toCPtr() {
+    var c = allocateZero<clib.CArrayCExtrinsicContext>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCExtrinsicContext> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      ExtrinsicContext.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<clib.CExtrinsicContext>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCExtrinsicContext> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<ExtrinsicContext>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i] = new ExtrinsicContext();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -989,6 +1062,7 @@ class ArrayCWallet extends DC<clib.CArrayCWallet> {
     }
     data = new List<Wallet>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
+      data[i] = new Wallet();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -1858,12 +1932,10 @@ class DecodeAccountInfoParameters
 
 class EeeChain extends DC<clib.CEeeChain> {
   ChainShared chainShared;
-  Address address;
   ArrayCEeeChainToken tokens;
 
   EeeChain() {
     chainShared = new ChainShared();
-    address = new Address();
     tokens = new ArrayCEeeChainToken();
   }
 
@@ -1873,8 +1945,6 @@ class EeeChain extends DC<clib.CEeeChain> {
     }
     ChainShared.free(ptr.ref.chainShared);
     ptr.ref.chainShared = nullptr;
-    Address.free(ptr.ref.address);
-    ptr.ref.address = nullptr;
     ArrayCEeeChainToken.free(ptr.ref.tokens);
     ptr.ref.tokens = nullptr;
     ffi.free(ptr);
@@ -1905,10 +1975,6 @@ class EeeChain extends DC<clib.CEeeChain> {
       c.ref.chainShared = allocateZero<clib.CChainShared>();
     }
     chainShared.toC(c.ref.chainShared);
-    if (c.ref.address == null || c.ref.address == nullptr) {
-      c.ref.address = allocateZero<clib.CAddress>();
-    }
-    address.toC(c.ref.address);
     if (c.ref.tokens == null || c.ref.tokens == nullptr) {
       c.ref.tokens = allocateZero<clib.CArrayCEeeChainToken>();
     }
@@ -1922,8 +1988,6 @@ class EeeChain extends DC<clib.CEeeChain> {
     }
     chainShared = new ChainShared();
     chainShared.toDart(c.ref.chainShared);
-    address = new Address();
-    address.toDart(c.ref.address);
     tokens = new ArrayCEeeChainToken();
     tokens.toDart(c.ref.tokens);
   }
@@ -2942,10 +3006,11 @@ class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
   String blockHash;
   String blockNumber;
   String event;
-  String extrinsics;
+  ArrayCChar extrinsics;
 
   ExtrinsicContext() {
     chainVersion = new ChainVersion();
+    extrinsics = new ArrayCChar();
   }
 
   static free(Pointer<clib.CExtrinsicContext> ptr) {
@@ -2970,9 +3035,7 @@ class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
       ffi.free(ptr.ref.event);
     }
     ptr.ref.event = nullptr;
-    if (ptr.ref.extrinsics != null && ptr.ref.extrinsics != nullptr) {
-      ffi.free(ptr.ref.extrinsics);
-    }
+    ArrayCChar.free(ptr.ref.extrinsics);
     ptr.ref.extrinsics = nullptr;
     ffi.free(ptr);
   }
@@ -3018,10 +3081,10 @@ class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
       ffi.free(c.ref.event);
     }
     c.ref.event = toUtf8Null(event);
-    if (c.ref.extrinsics != null && c.ref.extrinsics != nullptr) {
-      ffi.free(c.ref.extrinsics);
+    if (c.ref.extrinsics == null || c.ref.extrinsics == nullptr) {
+      c.ref.extrinsics = allocateZero<clib.CArrayCChar>();
     }
-    c.ref.extrinsics = toUtf8Null(extrinsics);
+    extrinsics.toC(c.ref.extrinsics);
   }
 
   @override
@@ -3035,7 +3098,8 @@ class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
     blockHash = fromUtf8Null(c.ref.blockHash);
     blockNumber = fromUtf8Null(c.ref.blockNumber);
     event = fromUtf8Null(c.ref.event);
-    extrinsics = fromUtf8Null(c.ref.extrinsics);
+    extrinsics = new ArrayCChar();
+    extrinsics.toDart(c.ref.extrinsics);
   }
 }
 
