@@ -191,6 +191,78 @@ extension NetTypeEx on NetType {
     return re;
   }
 }
+//由于与dart中的重名，所以增加一个s
+enum AppPlatformTypes {
+  any,
+  aarch64_linux_android,
+  armv7_linux_androideabi,
+  i686_linux_android,
+  x86_64_linux_android,
+  x86_64_pc_windows_gnu,
+  x86_64_unknown_linux_gnu
+}
+
+extension AppPlatformTypesEx on AppPlatformTypes {
+  static AppPlatformTypes from(String str) {
+    AppPlatformTypes re;
+    switch (str) {
+      case "any":
+        re = AppPlatformTypes.any;
+        break;
+      case "aarch64_linux_android":
+        re = AppPlatformTypes.aarch64_linux_android;
+        break;
+      case "armv7_linux_androideabi":
+        re = AppPlatformTypes.armv7_linux_androideabi;
+        break;
+      case "i686_linux_android":
+        re = AppPlatformTypes.i686_linux_android;
+        break;
+      case "x86_64_linux_android":
+        re = AppPlatformTypes.x86_64_linux_android;
+        break;
+      case "x86_64_pc_windows_gnu":
+        re = AppPlatformTypes.x86_64_pc_windows_gnu;
+        break;
+      case "x86_64_unknown_linux_gnu":
+        re = AppPlatformTypes.x86_64_unknown_linux_gnu;
+        break;
+      default:
+        re = AppPlatformTypes.any;
+        // var err = "the str:$plat_type can not be AppPlatformType";
+        //todo log
+    }
+    return re;
+  }
+
+  String toEnumString() {
+    String re = "";
+    switch (this) {
+      case AppPlatformTypes.any:
+        re = "any";
+        break;
+      case AppPlatformTypes.aarch64_linux_android:
+        re = "aarch64_linux_android";
+        break;
+      case AppPlatformTypes.armv7_linux_androideabi:
+        re = "armv7_linux_androideabi";
+        break;
+      case AppPlatformTypes.i686_linux_android:
+        re = "i686_linux_android";
+        break;
+      case AppPlatformTypes.x86_64_linux_android:
+        re = "x86_64_linux_android";
+        break;
+      case AppPlatformTypes.x86_64_pc_windows_gnu:
+        re = "x86_64_pc_windows_gnu";
+        break;
+      case AppPlatformTypes.x86_64_unknown_linux_gnu:
+        re = "x86_64_unknown_linux_gnu";
+        break;
+    }
+    return re;
+  }
+}
 
 extension StringEx on String {
   ChainType toChainType() {
@@ -203,5 +275,9 @@ extension StringEx on String {
 
   NetType toNetType() {
     return NetTypeEx.from(this);
+  }
+
+  AppPlatformTypes toAppPlatformTypes() {
+    return AppPlatformTypesEx.from(this);
   }
 }

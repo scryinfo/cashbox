@@ -324,6 +324,17 @@ class Wallets {
     return err;
   }
 
+  static AppPlatformTypes appPlatformType() {
+    AppPlatformTypes platformType;
+    {
+      var t = clib.Wallets_appPlatformType();
+      var platform = fromUtf8Null(t);
+      clib.CStr_free(t);
+      platformType = platform.toAppPlatformTypes();
+    }
+    return platformType;
+  }
+
   //wrapper start
   Error safeRead(void doRead()) {
     Error err;

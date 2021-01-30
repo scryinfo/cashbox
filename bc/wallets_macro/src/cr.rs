@@ -1,13 +1,13 @@
 use proc_macro::TokenStream;
 
 use quote::{format_ident, quote, ToTokens};
-use syn::{AngleBracketedGenericArguments, Fields, GenericArgument, PathArguments, PathSegment, Type, TypePath};
+use syn::{Fields, PathSegment, Type, TypePath};
 
 use crate::to_snake_name;
 
-#[allow(non_upper_case_globals)]
-const TypeName_CArray: &str = "CArray";
-const TypeName_c_char: &str = "c_char";
+// #[allow(non_upper_case_globals)]
+// const TypeName_CArray: &str = "CArray";
+const TYPE_NAME_C_CHAR: &str = "c_char";
 
 pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
     const NAME: &str = "";//CExtrinsicContext
@@ -38,7 +38,7 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                         println!("ptr -path: {}", path.to_token_stream().to_string());
                     }
 
-                    if let Some(PathSegment { ident, arguments }) = path.segments.last() {
+                    if let Some(PathSegment { ident, .. }) = path.segments.last() {
                         // if ident.to_string().as_str() == TypeName_CArray {
                             Some(ident.to_token_stream())
                         // } else {
@@ -72,7 +72,7 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                 let type_stream = type_stream.expect(&format!("can not find the type of field {}::{}\nfield type: \n{:?}", type_name, c_field_name, field));
                 match type_stream.to_string().as_str() {
                     //*mut c_char类型
-                    TypeName_c_char => {
+                    TYPE_NAME_C_CHAR => {
                         to_c_quote.push(quote! {
                             c.#c_field_name =  to_c_char(&r.#r_field_name)
                         });
@@ -84,16 +84,16 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                         panic!("dl_cr can not find the type of field {} -- {} -- not TypePath,\nfield type: \n{:?}", type_name, c_field_name,field);
                     }
                     _ => {
-                        let ctype = type_stream;
+                        let c_type = type_stream;
                         //test
                         if type_name == NAME {
-                            println!("field type : {}", ctype);
+                            println!("field type : {}", c_type);
                         }
                         to_c_quote.push(quote! {
-                            c.#c_field_name =  #ctype::to_c_ptr(&r.#r_field_name)
+                            c.#c_field_name =  #c_type::to_c_ptr(&r.#r_field_name)
                         });
                         ptr_rust_quote.push(quote! {
-                            r.#r_field_name = #ctype::ptr_rust(c.#c_field_name)
+                            r.#r_field_name = #c_type::ptr_rust(c.#c_field_name)
                         });
                     }
                 }

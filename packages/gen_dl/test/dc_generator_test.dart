@@ -496,6 +496,10 @@ class CArrayCChar extends Struct {
   @Uint64()
   int cap;
 }
+//field array string
+class CFieldCArrayCChar extends Struct {
+  Pointer<CArrayCChar> strs;
+}
 ''';
 
 Future _generateTest(DCGenerator gen, String expectedContent) async {

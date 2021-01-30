@@ -145,6 +145,7 @@ impl ToString for NetType {
     }
 }
 
+#[allow(non_camel_case_types)]
 #[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum AppPlatformType {
     any,

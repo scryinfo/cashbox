@@ -6,7 +6,7 @@ set cuPath=%cd%
 set batPath=%~dp0
 
 cd %batPath%/../../../app/
-mkdir dl/arm64-v8a
+mkdir dl\arm64-v8a
 cd dl/arm64-v8a
 set outPath=%cd%
 

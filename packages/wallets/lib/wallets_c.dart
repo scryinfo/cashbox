@@ -393,6 +393,25 @@ typedef _CArrayCEthChainTokenDefault_dFree_Dart = void Function(
 );
 
 /// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
+class CArrayCExtrinsicContext extends Struct {
+  
+  Pointer<CExtrinsicContext> ptr;
+  @Uint64()
+  int len;
+  @Uint64()
+  int cap;
+  static Pointer<CArrayCExtrinsicContext> allocate() {
+    return ffi.allocate<CArrayCExtrinsicContext>();
+  }
+
+
+  static CArrayCExtrinsicContext from(int ptr) {
+    return Pointer<CArrayCExtrinsicContext>.fromAddress(ptr).ref;
+  }
+
+}
+
+/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
 class CArrayCWallet extends Struct {
   
   Pointer<CWallet> ptr;
@@ -741,7 +760,6 @@ class CDecodeAccountInfoParameters extends Struct {
 class CEeeChain extends Struct {
   
   Pointer<CChainShared> chainShared;
-  Pointer<CAddress> address;
   Pointer<CArrayCEeeChainToken> tokens;
   static Pointer<CEeeChain> allocate() {
     return ffi.allocate<CEeeChain>();
@@ -1021,7 +1039,7 @@ class CExtrinsicContext extends Struct {
   Pointer<ffi.Utf8> blockHash;
   Pointer<ffi.Utf8> blockNumber;
   Pointer<ffi.Utf8> event;
-  Pointer<ffi.Utf8> extrinsics;
+  Pointer<CArrayCChar> extrinsics;
   static Pointer<CExtrinsicContext> allocate() {
     return ffi.allocate<CExtrinsicContext>();
   }
@@ -1032,6 +1050,28 @@ class CExtrinsicContext extends Struct {
   }
 
 }
+
+/// C function `CExtrinsicContext_dAlloc`.
+Pointer<Pointer<CArrayCExtrinsicContext>> CExtrinsicContext_dAlloc() {
+  return _CExtrinsicContext_dAlloc();
+}
+final _CExtrinsicContext_dAlloc_Dart _CExtrinsicContext_dAlloc = _dl.lookupFunction<_CExtrinsicContext_dAlloc_C, _CExtrinsicContext_dAlloc_Dart>('CExtrinsicContext_dAlloc');
+typedef _CExtrinsicContext_dAlloc_C = Pointer<Pointer<CArrayCExtrinsicContext>> Function();
+typedef _CExtrinsicContext_dAlloc_Dart = Pointer<Pointer<CArrayCExtrinsicContext>> Function();
+
+/// C function `CExtrinsicContext_dFree`.
+void CExtrinsicContext_dFree(
+  Pointer<Pointer<CArrayCExtrinsicContext>> dPtr,
+) {
+  _CExtrinsicContext_dFree(dPtr);
+}
+final _CExtrinsicContext_dFree_Dart _CExtrinsicContext_dFree = _dl.lookupFunction<_CExtrinsicContext_dFree_C, _CExtrinsicContext_dFree_Dart>('CExtrinsicContext_dFree');
+typedef _CExtrinsicContext_dFree_C = Void Function(
+  Pointer<Pointer<CArrayCExtrinsicContext>> dPtr,
+);
+typedef _CExtrinsicContext_dFree_Dart = void Function(
+  Pointer<Pointer<CArrayCExtrinsicContext>> dPtr,
+);
 
 /// C struct `CInitParameters`.
 class CInitParameters extends Struct {

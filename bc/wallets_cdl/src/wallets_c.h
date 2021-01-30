@@ -106,7 +106,6 @@ typedef struct CArrayCEeeChainToken {
 
 typedef struct CEeeChain {
     CChainShared *chainShared;
-    CAddress *address;
     CArrayCEeeChainToken *tokens;
 } CEeeChain;
 
@@ -230,6 +229,31 @@ typedef struct CArrayCEthChainTokenDefault {
     CU64 cap;
 } CArrayCEthChainTokenDefault;
 
+typedef struct CChainVersion {
+    char *genesisHash;
+    int32_t runtimeVersion;
+    int32_t txVersion;
+} CChainVersion;
+
+typedef struct CExtrinsicContext {
+    CChainVersion *chainVersion;
+    char *account;
+    char *blockHash;
+    char *blockNumber;
+    char *event;
+    CArrayCChar *extrinsics;
+} CExtrinsicContext;
+
+/**
+ * c的数组需要定义两个字段，所定义一个结构体进行统一管理
+ * 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
+ */
+typedef struct CArrayCExtrinsicContext {
+    CExtrinsicContext *ptr;
+    CU64 len;
+    CU64 cap;
+} CArrayCExtrinsicContext;
+
 typedef struct CInitParameters {
     CDbName *dbName;
     char *contextNote;
@@ -241,12 +265,6 @@ typedef struct CCreateWalletParameters {
     char *mnemonic;
     char *walletType;
 } CCreateWalletParameters;
-
-typedef struct CChainVersion {
-    char *genesisHash;
-    int32_t runtimeVersion;
-    int32_t txVersion;
-} CChainVersion;
 
 typedef struct CDecodeAccountInfoParameters {
     char *encodeData;
@@ -275,15 +293,6 @@ typedef struct CRawTxParam {
     char *walletId;
     char *password;
 } CRawTxParam;
-
-typedef struct CExtrinsicContext {
-    CChainVersion *chainVersion;
-    char *account;
-    char *blockHash;
-    char *blockNumber;
-    char *event;
-    char *extrinsics;
-} CExtrinsicContext;
 
 typedef struct CEeeChainTokenAuth {
     char *chainTokenSharedId;
@@ -460,6 +469,10 @@ void CArrayCChar_dFree(CArrayCChar **dPtr);
 CArrayCEthChainTokenDefault **CArrayCEthChainTokenDefault_dAlloc(void);
 
 void CArrayCEthChainTokenDefault_dFree(CArrayCEthChainTokenDefault **dPtr);
+
+CArrayCExtrinsicContext **CExtrinsicContext_dAlloc(void);
+
+void CExtrinsicContext_dFree(CArrayCExtrinsicContext **dPtr);
 
 /**
  * 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名

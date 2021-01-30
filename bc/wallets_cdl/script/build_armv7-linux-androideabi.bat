@@ -7,7 +7,7 @@ set cuPath=%cd%
 set batPath=%~dp0
 
 cd %batPath%/../../../app/
-mkdir dl/armeabi-v7a
+mkdir dl\armeabi-v7a
 cd dl/armeabi-v7a
 set outPath=%cd%
 

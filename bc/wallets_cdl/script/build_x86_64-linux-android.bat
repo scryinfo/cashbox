@@ -6,7 +6,7 @@ set cuPath=%cd%
 set batPath=%~dp0
 
 cd %batPath%/../../../app/
-mkdir dl/x86_64
+mkdir dl\x86_64
 cd dl/x86_64
 set outPath=%cd%
 

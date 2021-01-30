@@ -7,11 +7,10 @@ cd %batPath%/../../../packages/wallets
 set outPath=%cd%
 
 set BUILD_DUMMY_WASM_BINARY=1
-#set SKIP_WASM_BUILD=1
-#set WASM_BUILD_TOOLCHAIN='nightly-2020-10-05-x86_64-pc-windows-gnu'
+
 #rustup target add wasm32-unknown-unknown --toolchain nightly-2020-10-05-x86_64-pc-windows-gnu
 
-rustup default 1.48.0-x86_64-pc-windows-gnu
+#rustup default 1.48.0-x86_64-pc-windows-gnu
 cd %batPath%/..
 cargo build --target %HOST_TAG%
 

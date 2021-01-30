@@ -145,3 +145,4 @@ demo/rbatis_demo/target
 /packages/services/CHANGELOG.md
 /packages/services/test/greeter/greeter_go/go.sum
 /packages/services/test/greeter/greeter_go/greeter_go/greeter_go.exe
+/app/libwallets_cdl.so
