@@ -4,22 +4,17 @@ use std::time::{Duration, Instant};
 use futures::task::SpawnExt;
 
 use mav::{kits, WalletType};
-use wallets_cdl::{
-    mem_c::{
-        CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc,
-        CWallet_dFree,
-    },
-    parameters::{CContext, CCreateWalletParameters, CInitParameters},
-    types::{CError, CWallet, CR, CU64},
-    wallets_c::{
-        Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init,
-        Wallets_uninit,
-    },
-};
-use wallets_cdl::{to_c_char, to_str, CStruct};
-use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet};
-use wallets_cdl::wallets_c::Wallets_appPlatformType;
-use wallets_cdl::mem_c::CStr_free;
+use wallets_cdl::{mem_c::{
+    CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc,
+    CWallet_dFree,
+}, parameters::{CContext, CCreateWalletParameters, CInitParameters}, types::{CError, CWallet, CR, CU64}, wallets_c::{
+    Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init,
+    Wallets_uninit, Wallets_updateBalance, Wallets_queryBalance
+}, CArray};
+use wallets_cdl::{to_c_char, to_str, CStruct, types::CTokenAddress};
+use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, TokenAddress};
+use wallets_cdl::wallets_c::{Wallets_appPlatformType, Wallets_lockWrite};
+use wallets_cdl::mem_c::{CStr_free, CArrayCTokenAddress_dAlloc, CArrayCTokenAddress_dFree};
 use std::os::raw::c_char;
 
 #[test]
@@ -154,9 +149,9 @@ fn mnemonic_test() {
         assert_eq!(15, words.len());
     }
 }
+
 #[test]
 fn plat_type_test() {
-
     unsafe {
         let mut ptr = Wallets_appPlatformType() as *mut c_char;
         assert_ne!(null_mut(), ptr);
@@ -256,6 +251,76 @@ fn wallets_test() {
         assert_eq!(wallet.id, temp.id);
         assert_eq!(wallet.name, temp.name);
 
+        CContext_dFree(c_ctx);
+    }
+}
+
+#[test]
+fn wallets_address_balance_test() {
+    unsafe {
+        let c_ctx = {
+            let c_ctx = CContext_dAlloc();
+            let parameters = init_parameters();
+            let mut c_parameters = CInitParameters::to_c_ptr(&parameters);
+            {
+                let c_err = Wallets_init(c_parameters, c_ctx) as *mut CError;
+                assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+                CError_free(c_err);
+            }
+            c_parameters.free();
+            c_ctx
+        };
+        let mnemonic = {
+            let p_mn = CStr_dAlloc();
+            {
+                let c_err = Wallets_generateMnemonic(p_mn) as *mut CError;
+                assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+                CError_free(c_err);
+            }
+            let mn = to_str(*p_mn).to_owned();
+            CStr_dFree(p_mn);
+            mn
+        };
+
+        let mut c_parameters = CCreateWalletParameters::to_c_ptr(&CreateWalletParameters {
+            name: "test".to_owned(),
+            password: "1".to_string(),
+            mnemonic: mnemonic.clone(),
+            wallet_type: WalletType::Test.to_string(),
+        });
+        let c_wallet = CWallet_dAlloc();
+        let c_err = Wallets_createWallet(*c_ctx, c_parameters, c_wallet) as *mut CError;
+        c_parameters.free();
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        assert_ne!(null_mut(), *c_wallet);
+        let wallet: Wallet = CWallet::to_rust(&**c_wallet);
+        let mut token_address = TokenAddress::default();
+        token_address.chain_type = wallet.eth_chain.chain_shared.chain_type.clone();
+        token_address.wallet_id = wallet.id.clone();
+        token_address.balance = "30000".to_string();
+        token_address.token_id=wallet.eth_chain.tokens[0].eth_chain_token_shared.m.id.clone();
+        token_address.address_id = wallet.eth_chain.chain_shared.wallet_address.id.clone();
+        let mut c_token_address = CTokenAddress::to_c_ptr(&token_address);
+        //test insert
+        let c_err = Wallets_updateBalance(*c_ctx, to_c_char("Test"), c_token_address.clone()) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        //test update
+        let c_err = Wallets_updateBalance(*c_ctx, to_c_char("Test"), c_token_address.clone()) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        c_token_address.free();
+
+        let c_array_token_address = CArrayCTokenAddress_dAlloc();
+        let c_err = Wallets_queryBalance(*c_ctx,to_c_char("Test"),to_c_char(token_address.wallet_id.as_str()),c_array_token_address) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let token_address_vec: Vec<TokenAddress> = CArray::to_rust(&**c_array_token_address);
+        assert_eq!(token_address_vec.len(),1);
+        CArrayCTokenAddress_dFree(c_array_token_address);
+        assert_eq!(token_address_vec[0].balance.as_str(),"30000");
+        c_parameters.free();
         CContext_dFree(c_ctx);
     }
 }

@@ -16,6 +16,7 @@ pub struct CBtcChainToken {
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CBtcChainTokenShared {
+    pub id: *mut c_char,
     pub tokenShared: *mut CTokenShared,
     pub tokenType: *mut c_char,
     pub gas: i64,

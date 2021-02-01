@@ -1,4 +1,4 @@
-use mav::ma::{MAddress, MChainShared, MTokenShared, MWallet};
+use mav::ma::{MAddress, MChainShared, MTokenShared, MWallet, MTokenAddress};
 
 use crate::{deref_type, ContextTrait,WalletError};
 use mav::ma::Dao;
@@ -24,11 +24,6 @@ impl Address{
 }
 
 pub type TokenShared = MTokenShared;
-// #[derive(Debug, Clone, Default)]
-// pub struct TokenShared {
-//     pub m: MTokenShared
-// }
-// deref_type!(TokenShared,MTokenShared);
 
 #[derive(Debug, Clone, Default)]
 pub struct ChainShared {
@@ -59,3 +54,11 @@ impl ChainShared {
 }
 
 deref_type!(ChainShared,MChainShared);
+
+#[derive(Debug, Clone, Default)]
+pub struct TokenAddress{
+  pub  m:MTokenAddress,
+}
+deref_type!(TokenAddress,MTokenAddress);
+
+
