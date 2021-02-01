@@ -378,7 +378,7 @@ class Wallets {
   }
 
   ///在子线程中调用时，需要上下文参数
-  ///不要在子线程中调用，uninit或init，这两个函数都由主线程调用
+  ///要在子线程中调用，uninit或init，这两个函数都由主线程调用
   factory Wallets.subIsolate(Context ctx) {
     if (_instance == null) {
       _instance = new Wallets._internal();
@@ -386,24 +386,32 @@ class Wallets {
     _instance.context = ctx;
     return _instance;
   }
+
   //
   static Wallets _instance;
+
   Wallets._internal();
 
   Pointer<clib.CContext> _ptrContext;
+
   Pointer<clib.CContext> get ptrContext => _ptrContext;
 
   ChainEth _chainEth;
+
   ChainEth get chainEth => _chainEth;
 
   ChainEee _chainEee;
+
   ChainEee get chainEee => _chainEee;
 
   ChainBtc _chainBtc;
+
   ChainBtc get chainBtc => _chainBtc;
 
   Context _context;
+
   Context get context => _context;
+
   set context(Context ctx) {
     _context = ctx;
     _ptrContext = ctx.toCPtr();

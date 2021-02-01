@@ -1,6 +1,6 @@
 @Timeout(const Duration(minutes: 10))
 import 'dart:async';
-import 'dart:isolate';
+import 'dart:io';
 
 import 'package:grpc/grpc.dart';
 import 'package:services/services.dart';
@@ -11,33 +11,22 @@ import 'greeter/greeter.pbgrpc.dart';
 import 'greeter/refresh.dart';
 import 'greeter/server.dart';
 
-void _kill(dynamic s) async {
-  if (s == null) {
-    return;
-  }
-  try {
-    if (s is Isolate) {
-      s.kill();
-    } else {
-      await s.shutdown();
-    }
-  } catch (e) {
-    print(e);
-  }
-}
-
 void main() {
   group('ClientTransportChannel tls', () {
-    var serverTls1;
-    Server serverRefreshTls;
-    var refresh = Refresh.get(new ConnectParameter("localhost",serverRefreshPort),"",AppPlatformType.any);
-    bool odd = true;
-    var channel = createClientChannel(refresh.refreshCall) as ClientTransportChannel;
+    Process serverTls1;
+    var channel = createClientChannel(() async {
+      ConnectParameter re = new ConnectParameter("localhost", 50051);
+      re.options = ChannelOptions(
+          credentials: ChannelCredentials.secure(
+              onBadCertificate: (certificate, host) =>
+                  certificate.subject.endsWith('scry')));
+      return re;
+    }) as ClientTransportChannel;
     final greeter = GreeterClient(channel);
     final name = 'scry';
-    final message1 = 'port: $server1Port -- Hello $name!';
+    final message1 = 'replay $name';
     var killServer1 = () {
-      _kill(serverTls1);
+      Process.killPid(serverTls1.pid);
       serverTls1 = null;
     };
 
@@ -46,7 +35,6 @@ void main() {
       var response = await greeter.sayHello(HelloRequest()..name = name);
       print('Greeter client received: ${response.message}');
       expect(message1, response.message);
-      expect(server1Port, channel.connectParameter.port);
     };
 
     var callException = () async {
@@ -59,16 +47,11 @@ void main() {
     };
 
     tearDown(() async {
-      if(serverRefreshTls != null){
-        serverRefreshTls.shutdown();
-        serverRefreshTls = null;
-      }
       killServer1();
     });
 
-    test('started all', () async {
-      serverRefreshTls = await runRefreshServer(serverRefreshPort);
-      serverTls1 = await runServer(server1Port);
+    test('tls', () async {
+      serverTls1 = await runGoServer();
       await Future.delayed(Duration(seconds: 1)); //确保server启动完成
       await callOkServer1();
       //再次调用，由上次是成功的，所以依然是server1
@@ -79,9 +62,8 @@ void main() {
       await callException();
       await callException();
 
-      serverTls1 = await runServer(server1Port);
+      serverTls1 = await runGoServer();
       await callOkServer1();
     });
-
   });
 }
