@@ -13,15 +13,17 @@ class ChannelCredentialsEx extends ChannelCredentials {
 
   @override
   SecurityContext get securityContext {
-    // SecurityContext context = new SecurityContext(withTrustedRoots: true);
+    //dart不支持使用dot组件生成的证书及key,所以只能单向认证
+    SecurityContext context = createSecurityContext(true);
     // context.setAlpnProtocols(supportedAlpnProtocols, false);
-    //
-    // // context.setTrustedCertificatesBytes(certBytes);
+
+    // context.setTrustedCertificatesBytes(certBytes);
     // context.usePrivateKeyBytes(keyBytes);
     // context.useCertificateChainBytes(chainBytes);
+    // context.setClientAuthoritiesBytes(certBytes);
 
-    SecurityContext context = new SecurityContext(withTrustedRoots: true);
-    context.setTrustedCertificatesBytes(certBytes);
+    // SecurityContext context = new SecurityContext(withTrustedRoots: true);
+    // context.setTrustedCertificatesBytes(certBytes);
     return context;
   }
 }
