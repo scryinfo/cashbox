@@ -27,7 +27,13 @@ const RpcModelBase$json = const {
     const {'1': 'Id', '3': 1, '4': 1, '5': 9, '10': 'Id'},
     const {'1': 'UpdateTime', '3': 2, '4': 1, '5': 3, '10': 'UpdateTime'},
     const {'1': 'CreateTime', '3': 3, '4': 1, '5': 3, '10': 'CreateTime'},
-    const {'1': 'OptimisticLockVersion', '3': 4, '4': 1, '5': 3, '10': 'OptimisticLockVersion'},
+    const {
+      '1': 'OptimisticLockVersion',
+      '3': 4,
+      '4': 1,
+      '5': 3,
+      '10': 'OptimisticLockVersion'
+    },
   ],
 };
 
@@ -43,7 +49,14 @@ const Languages$json = const {
   '1': 'Languages',
   '2': const [
     const {'1': 'DefaultValue', '3': 1, '4': 1, '5': 9, '10': 'DefaultValue'},
-    const {'1': 'Values', '3': 2, '4': 3, '5': 11, '6': '.rpc_face.LanguageValue', '10': 'Values'},
+    const {
+      '1': 'Values',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.rpc_face.LanguageValue',
+      '10': 'Values'
+    },
   ],
 };
 
@@ -71,7 +84,14 @@ const Empty$json = const {
 const ErrRes$json = const {
   '1': 'ErrRes',
   '2': const [
-    const {'1': 'err', '3': 1, '4': 1, '5': 11, '6': '.rpc_face.Err', '10': 'err'},
+    const {
+      '1': 'err',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.rpc_face.Err',
+      '10': 'err'
+    },
   ],
 };
 
@@ -85,7 +105,14 @@ const DeleteReq$json = const {
 const DeleteRes$json = const {
   '1': 'DeleteRes',
   '2': const [
-    const {'1': 'err', '3': 1, '4': 1, '5': 11, '6': '.rpc_face.Err', '10': 'err'},
+    const {
+      '1': 'err',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.rpc_face.Err',
+      '10': 'err'
+    },
   ],
 };
 
@@ -100,14 +127,28 @@ const RecordStatusReq$json = const {
 const RecordStatusRes$json = const {
   '1': 'RecordStatusRes',
   '2': const [
-    const {'1': 'err', '3': 1, '4': 1, '5': 11, '6': '.rpc_face.Err', '10': 'err'},
+    const {
+      '1': 'err',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.rpc_face.Err',
+      '10': 'err'
+    },
   ],
 };
 
 const ListReq$json = const {
   '1': 'ListReq',
   '2': const [
-    const {'1': 'page', '3': 1, '4': 1, '5': 11, '6': '.rpc_face.PageReq', '10': 'page'},
+    const {
+      '1': 'page',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.rpc_face.PageReq',
+      '10': 'page'
+    },
   ],
 };
 
@@ -117,4 +158,3 @@ const GetByIdReq$json = const {
     const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
   ],
 };
-

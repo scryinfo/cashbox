@@ -29,8 +29,10 @@ Future<Server> runServer(int port) async {
   return server;
 }
 
-Future<Process> runGoServer() async{
-    var result = await Process.start("./test/greeter/greeter_go/greeter_go/greeter_go.exe",<String>[],mode: ProcessStartMode.detached);
-    print('run go server  ...');
-    return result;
+Future<Process> runGoServer() async {
+  var result = await Process.start(
+      "./test/greeter/greeter_go/greeter_go/greeter_go.exe", <String>[],
+      mode: ProcessStartMode.detached);
+  print('run go server  ...');
+  return result;
 }

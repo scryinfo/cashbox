@@ -18,7 +18,8 @@
             ],
             "tls": {
               "key": "server.key",
-              "pem": "server.pem"
+              "pem": "server.pem",
+              "__caPem": "ca.pem"
             }
           }
         }

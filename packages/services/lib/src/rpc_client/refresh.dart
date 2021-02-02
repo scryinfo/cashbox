@@ -1,4 +1,3 @@
-
 import 'package:grpc/grpc.dart';
 import 'package:meta/meta.dart';
 import 'package:services/services.dart';
@@ -9,17 +8,23 @@ class Refresh {
   RefreshFaceClient _client;
   Refresh_RefreshReq _req;
   static Refresh _instance;
+
   Refresh._internal();
-  factory Refresh.get(ConnectParameter parameter, String version, AppPlatformType platformType){
-    if(_instance == null) {
+
+  factory Refresh.get(ConnectParameter parameter, String version,
+      AppPlatformType platformType) {
+    if (_instance == null) {
       _instance = Refresh._internal();
       _instance._channel = new ClientChannel(
         parameter.host,
         port: parameter.port,
-        options: const ChannelOptions(credentials: ChannelCredentials.insecure(), connectionTimeout: Duration(minutes: 1)),
+        options: const ChannelOptions(
+            credentials: ChannelCredentials.insecure(),
+            connectionTimeout: Duration(minutes: 1)),
       );
       _instance._client = new RefreshFaceClient(_instance._channel);
-      _instance._req = Refresh_RefreshReq(version:version,appPlatformType: platformType.toEnumString());
+      _instance._req = Refresh_RefreshReq(
+          version: version, appPlatformType: platformType.toEnumString());
     }
     return _instance;
   }
@@ -29,10 +34,11 @@ class Refresh {
 
   Future<ConnectParameter> refreshCall() async {
     var res = await _client.refresh(_req);
-    if(res.hasErr()){
+    if (res.hasErr()) {
       return null;
     }
-    ConnectParameter parameter = new ConnectParameter(res.serviceMeta.host, res.serviceMeta.port.toInt());
+    ConnectParameter parameter = new ConnectParameter(
+        res.serviceMeta.host, res.serviceMeta.port.toInt());
     return parameter;
   }
 
@@ -42,4 +48,3 @@ class Refresh {
     _channel = null;
   }
 }
-
