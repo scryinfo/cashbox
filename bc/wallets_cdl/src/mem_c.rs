@@ -5,7 +5,9 @@ use std::os::raw::c_char;
 
 use crate::kits::{d_ptr_alloc, d_ptr_free, CArray, CBool, CStruct};
 use crate::parameters::{CAccountInfo, CContext, CDbName, CExtrinsicContext};
-use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet, CEthChainTokenDefault};
+
+use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet, CEthChainTokenDefault, CTokenAddress, CEthChainTokenAuth};
+
 
 /// alloc ** [parameters::CContext]
 #[no_mangle]
@@ -176,4 +178,25 @@ pub unsafe extern "C" fn CExtrinsicContext_dFree(dPtr: *mut *mut CArray<CExtrins
     d_ptr_free(&mut dPtr);
 }
 
+#[no_mangle]
+pub extern "C" fn CArrayCTokenAddress_dAlloc() -> *mut *mut CArray<CTokenAddress> {
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CArrayCTokenAddress_dFree(dPtr: *mut *mut CArray<CTokenAddress>) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
+
+#[no_mangle]
+pub extern "C" fn CArrayCEthChainTokenAuth_dAlloc() -> *mut *mut CArray<CEthChainTokenAuth> {
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CArrayCEthChainTokenAuth_dFree(dPtr: *mut *mut CArray<CEthChainTokenAuth>) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
 // alloc free end

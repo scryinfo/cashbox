@@ -718,6 +718,10 @@ impl EthChainTrait for EthChain {
         Ok(())
     }
 
+    async fn get_default_digits(&self, _context: &dyn ContextTrait, _start_item: u64, _page_size: u64) -> Result<Vec<EthChainTokenDefault>, WalletError> {
+        unimplemented!()
+    }
+
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, author_tokens: Vec<EthChainTokenAuth>) -> Result<(), WalletError> {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
@@ -743,6 +747,11 @@ impl EthChainTrait for EthChain {
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
         Ok(())
+    }
+
+    async fn get_auth_digits(&self, context: &dyn ContextTrait, net_type: &NetType,start_item: u64, page_size: u64) -> Result<Vec<EthChainTokenAuth>, WalletError> {
+        let m_eth_tokens = EthChainTokenAuth::list_by_net_type(context,net_type,start_item,page_size).await?;
+        Ok(m_eth_tokens)
     }
 }
 

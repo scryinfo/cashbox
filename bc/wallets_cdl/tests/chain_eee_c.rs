@@ -20,7 +20,6 @@ const RUNTIME_VERSION: u32 = 6;
 
 const GENESIS_HASH: &'static str = "0x6cec71473c1b8d2295541cb5c21edc4fdb1926375413bb28f78793978229cf48";//0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973
 
-
 mod data;
 
 use crate::data::node_rpc::{Node, Header, StorageChange, NodeVersion, Block};
@@ -41,7 +40,7 @@ fn eee_basic_info_test() {
             tx_version: TX_VERSION as i32,
         };
         if get_chain_basic_info(c_ctx, &chain_version).is_none() {
-            let chain_metadata = include_str!("chain_metadata.rs");
+            let chain_metadata = include_str!("data/chain_metadata.rs");
             let save_res = save_basic_info(c_ctx, &chain_version, chain_metadata.to_string());
             assert_eq!(save_res.is_ok(), true);
         }

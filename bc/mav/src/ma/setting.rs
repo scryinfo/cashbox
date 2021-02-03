@@ -29,6 +29,7 @@ impl MSetting {
 pub enum SettingType {
     CurrentWallet,
     CurrentChain,
+    CurrentDbVersion,
     Other(String),
 }
 
@@ -37,6 +38,7 @@ impl From<&str> for SettingType {
         match setting_type {
             "CurrentWallet" => SettingType::CurrentWallet,
             "CurrentChain" => SettingType::CurrentChain,
+            "CurrentDbVersion"=>SettingType::CurrentDbVersion,
             _ => {
                 SettingType::Other(setting_type.to_owned())
             }
@@ -55,6 +57,7 @@ impl ToString for SettingType {
         match &self {
             SettingType::CurrentWallet => "CurrentWallet".to_owned(),
             SettingType::CurrentChain => "CurrentChain".to_owned(),
+            SettingType::CurrentDbVersion => "CurrentDbVersion".to_owned(),
             SettingType::Other(key) => key.clone(),
         }
     }

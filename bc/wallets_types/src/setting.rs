@@ -45,6 +45,15 @@ impl Setting {
         Ok(())
     }
 
+    pub async fn save_current_database_version(context: &dyn ContextTrait, version_value: &str, )->Result<(),WalletError>{
+        let rb = context.db().wallets_db();
+        let mut wallet_setting = Setting::get_setting(context, &SettingType::CurrentDbVersion).await?.unwrap_or_default();
+        wallet_setting.key_str=SettingType::CurrentDbVersion.to_string();
+        wallet_setting.value_str=version_value.to_string();
+        wallet_setting.save_update(rb, "").await?;
+       Ok(())
+    }
+
     ///如果没有找到返回 none
     pub async fn get_setting(context: &dyn ContextTrait, key: &SettingType) -> Result<Option<MSetting>, WalletError> {
         let rb = context.db().wallets_db();

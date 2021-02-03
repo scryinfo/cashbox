@@ -615,3 +615,117 @@ pub unsafe extern "C" fn Wallets_appPlatformType() -> *const c_char {
     to_c_char(&platType.to_string())
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_queryBalance( ctx: *mut CContext,netType: *mut c_char,walletId: *mut c_char,tokenAddress:*mut *mut CArray<CTokenAddress>) -> *const CError {
+    if ctx.is_null() || tokenAddress.is_null() ||netType.is_null() || walletId.is_null(){
+        let err = Error::PARAMETER().append_message(" : ctx,updateBalance is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    (*tokenAddress).free();
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let net_type = NetType::from(to_str(netType));
+
+                match block_on( wallets.query_address_balance(&net_type,&to_str(walletId))) {
+                    Ok(tokens) => {
+                        *tokenAddress = CArray::to_c_ptr(&tokens);
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_updateBalance( ctx: *mut CContext,netType: *mut c_char,tokenAddress:*mut CTokenAddress) -> *const CError {
+    if ctx.is_null() || tokenAddress.is_null() ||netType.is_null()  {
+        let err = Error::PARAMETER().append_message(" : ctx,updateBalance is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let net_type = NetType::from(to_str(netType));
+                let token_address = CTokenAddress::ptr_rust(tokenAddress);
+                match block_on( wallets.update_address_balance(&net_type,&token_address)) {
+                    Ok(_res) => {
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_hideTokenAddress( ctx: *mut CContext,netType: *mut c_char,tokenAddress:*mut CTokenAddress) -> *const CError {
+    if ctx.is_null() || tokenAddress.is_null() ||netType.is_null()  {
+        let err = Error::PARAMETER().append_message(" : ctx,hideTokenAddress is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let net_type = NetType::from(to_str(netType));
+                let token_address = CTokenAddress::ptr_rust(tokenAddress);
+                match block_on( wallets.update_address_balance(&net_type,&token_address)) {
+                    Ok(_res) => {
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_setCurrentDbVersion( ctx: *mut CContext,versionValue: *mut c_char) -> *const CError {
+    if ctx.is_null() ||versionValue.is_null()  {
+        let err = Error::PARAMETER().append_message(" : ctx,versionValue is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                match block_on( wallets.update_current_database_version( to_str(versionValue))) {
+                    Ok(_res) => {
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
