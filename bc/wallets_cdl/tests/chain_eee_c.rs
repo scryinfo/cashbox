@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate serde_derive;
 
-use wallets_types::{Error, InitParameters, SubChainBasicInfo, ChainVersion, AccountInfoSyncProg, StorageKeyParameters, DecodeAccountInfoParameters, EeeChainTokenDefault, CreateWalletParameters, Wallet, ExtrinsicContext};
+use wallets_types::{Error, InitParameters, SubChainBasicInfo, ChainVersion, AccountInfoSyncProg, StorageKeyParameters, DecodeAccountInfoParameters, EeeChainTokenDefault, CreateWalletParameters, Wallet, ExtrinsicContext, EeeChainTokenAuth};
 use wallets_cdl::{CStruct, to_c_char, CR, CU64, CArray, chain_eee_c, to_str,
                   wallets_c::Wallets_init,
                   mem_c::{CError_free, CContext_dAlloc},
@@ -12,7 +12,7 @@ use mav::ma::{MSubChainBasicInfo, MAccountInfoSyncProg, EeeTokenType};
 use mav::{kits, WalletType};
 use std::ptr::null_mut;
 use wallets_cdl::types::{CAccountInfoSyncProg, CWallet};
-use wallets_cdl::mem_c::{CStr_dAlloc, CStr_dFree, CWallet_dAlloc, CWallet_dFree};
+use wallets_cdl::mem_c::{CStr_dAlloc, CStr_dFree, CWallet_dAlloc, CWallet_dFree, CArrayCEeeChainTokenAuth_dAlloc, CArrayCEeeChainTokenAuth_dFree, CArrayCEeeChainTokenDefault_dAlloc, CArrayCEeeChainTokenDefault_dFree};
 use wallets_cdl::wallets_c::{Wallets_generateMnemonic, Wallets_createWallet};
 
 const TX_VERSION: u32 = 1;
@@ -503,6 +503,41 @@ async fn eee_tx_explorer_test() {
     }
 }
 
+#[test]
+fn query_eee_auth_token_list_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let token_auth = CArrayCEeeChainTokenAuth_dAlloc();
+        let c_err =  chain_eee_c::ChainEee_getAuthTokenList(*c_ctx,to_c_char("Private"),0,10,token_auth) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let _eth_token_auth_vec: Vec<EeeChainTokenAuth> = CArray::to_rust(&**token_auth);
+        CArrayCEeeChainTokenAuth_dFree(token_auth);
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+
+#[test]
+fn query_eee_default_token_list_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let token_default = CArrayCEeeChainTokenDefault_dAlloc();
+        let c_err =  chain_eee_c::ChainEee_getDefaultTokenList(*c_ctx,to_c_char("Private"),token_default) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let _eth_token_default_vec: Vec<EeeChainTokenDefault> = CArray::to_rust(&**token_default);
+        CArrayCEeeChainTokenDefault_dFree(token_default);
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
 
 fn init_basic_info_parameters(chain_version: &ChainVersion, metadata: String) -> MSubChainBasicInfo {
     MSubChainBasicInfo {

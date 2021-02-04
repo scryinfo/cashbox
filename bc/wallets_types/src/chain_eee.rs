@@ -36,6 +36,14 @@ pub struct EeeChainTokenShared {
 }
 deref_type!(EeeChainTokenShared,MEeeChainTokenShared);
 
+impl From<MEeeChainTokenShared> for EeeChainTokenShared {
+    fn from(token_shared: MEeeChainTokenShared) -> Self {
+        Self {
+            m: token_shared,
+        }
+    }
+}
+
 #[async_trait]
 impl Load for EeeChainTokenShared {
     type MType = MEeeChainTokenShared;
@@ -53,24 +61,17 @@ pub struct EeeChainTokenDefault {
 }
 deref_type!(EeeChainTokenDefault,MEeeChainTokenDefault);
 
-#[derive(Debug, Default)]
-pub struct EeeChainTokenAuth {
-    pub m: MEeeChainTokenAuth,
-    pub eee_chain_token_shared: EeeChainTokenShared,
-}
-deref_type!(EeeChainTokenAuth,MEeeChainTokenAuth);
 
 impl EeeChainTokenDefault {
-    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<MEeeChainTokenDefault>, WalletError> {
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<EeeChainTokenDefault>, WalletError> {
         let tx_id = "";
         let wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MEeeChainTokenShared> = {
             let default_name = MEeeChainTokenDefault::table_name();
             let shared_name = MEeeChainTokenShared::table_name();
-            let mut wrapper =  wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEeeChainTokenDefault::net_type).as_str(), net_type.to_string());
+            let wrapper =  wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEeeChainTokenDefault::net_type).as_str(), net_type.to_string());
 
             let sql = {
-                wrapper = wrapper.check()?;
                 let t = sql_left_join_get_b(&default_name, &MEeeChainTokenDefault::chain_token_shared_id,
                                             &shared_name, &MEeeChainTokenShared::id);
                 format!("{} where {}", t, &wrapper.sql)
@@ -81,7 +82,6 @@ impl EeeChainTokenDefault {
         let mut tokens_default = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MEeeChainTokenDefault::net_type, net_type.to_string())
-                .check()?
                 .order_by(true, &[MEeeChainTokenDefault::position]);
             MEeeChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
@@ -92,9 +92,51 @@ impl EeeChainTokenDefault {
                 }
             }
         }
-        Ok(tokens_default)
+        let eee_tokens = tokens_default.iter().map(|token|EeeChainTokenDefault{
+            m: token.clone(),
+            eee_chain_token_shared: EeeChainTokenShared::from(token.chain_token_shared.clone()),
+        }).collect::<Vec<EeeChainTokenDefault>>();
+        Ok(eee_tokens)
     }
 }
+
+#[derive(Debug, Default)]
+pub struct EeeChainTokenAuth {
+    pub m: MEeeChainTokenAuth,
+    pub eee_chain_token_shared: EeeChainTokenShared,
+}
+deref_type!(EeeChainTokenAuth,MEeeChainTokenAuth);
+
+impl EeeChainTokenAuth{
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<EeeChainTokenAuth>, WalletError> {
+        let tx_id = "";
+        let wallets_db = context.db().wallets_db();
+        let page_query = format!(" limit {} offset {}", page_size, start_item);
+        let mut tokens_auth = {
+            let wrapper = wallets_db.new_wrapper()
+                .eq(MEeeChainTokenAuth::net_type, net_type.to_string())
+                .order_by(false, &[MEeeChainTokenAuth::create_time]).push_sql(&page_query);
+            MEeeChainTokenAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
+        };
+        let token_shared_id = format!("id in (SELECT {} FROM {} WHERE {}='{}' ORDER by {} desc {})",
+                                      MEeeChainTokenAuth::chain_token_shared_id, MEeeChainTokenAuth::table_name(), MEeeChainTokenAuth::net_type, net_type.to_string(), MEeeChainTokenAuth::create_time, page_query);
+        let token_shared_wrapper = wallets_db.new_wrapper().push_sql(&token_shared_id);
+        let tokens_shared = MEeeChainTokenShared::list_by_wrapper(wallets_db, tx_id, &token_shared_wrapper).await?;
+        let mut target_tokens = vec![];
+        for token_auth in &mut tokens_auth {
+            for token_shared in &tokens_shared {
+                let mut token = EeeChainTokenAuth::default();
+                if token_auth.chain_token_shared_id == token_shared.id {
+                    token.m = token_auth.clone();
+                    token.eee_chain_token_shared = EeeChainTokenShared::from(token_shared.clone());
+                    target_tokens.push(token)
+                }
+            }
+        }
+        Ok(target_tokens)
+    }
+}
+
 
 
 #[derive(Debug, Default)]
@@ -140,7 +182,6 @@ impl Load for EeeChain {
             let rb = context.db().data_db(&NetType::from(&mw.net_type));
             let wrapper = rb.new_wrapper()
                 .eq(MEeeChainToken::wallet_id, mw.id.clone())
-                .check()?
                 .eq(MEeeChainToken::chain_type, self.chain_shared.chain_type.clone());
             let ms = MEeeChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
@@ -174,7 +215,7 @@ impl From<MAccountInfoSyncProg> for AccountInfoSyncProg {
 impl AccountInfoSyncProg {
     pub async fn find_by_account(rb: &Rbatis, account: &str) -> Result<Option<MAccountInfoSyncProg>, WalletError> {
         let wrapper = rb.new_wrapper()
-            .eq(MAccountInfoSyncProg::account, account.to_string()).check()?;
+            .eq(MAccountInfoSyncProg::account, account.to_string());
         let r = MAccountInfoSyncProg::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)
     }
@@ -201,7 +242,7 @@ impl SubChainBasicInfo {
         let wrapper = rb.new_wrapper()
             .eq(MSubChainBasicInfo::genesis_hash, genesis_hash.to_string())
             .eq(MSubChainBasicInfo::runtime_version, runtime_version)
-            .eq(MSubChainBasicInfo::tx_version, tx_version).check()?;
+            .eq(MSubChainBasicInfo::tx_version, tx_version);
         let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)
     }

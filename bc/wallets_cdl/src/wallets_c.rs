@@ -5,13 +5,13 @@ use std::os::raw::c_char;
 
 use futures::executor::block_on;
 
-use mav::{ChainType, AppPlatformType};
+use mav::{ChainType, NetType,AppPlatformType};
 use wallets::{Contexts, Wallets};
 use wallets_types::{Context, Error};
 
 use crate::kits::{to_c_char, to_str, CArray, CBool, CFalse, CStruct, CTrue, CR};
 use crate::parameters::{CContext, CCreateWalletParameters, CDbName, CInitParameters};
-use crate::types::{CError, CWallet};
+use crate::types::{CError, CWallet, CTokenAddress};
 
 /// 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名
 /// 如果成功返回 [wallets_types::Error::SUCCESS()]

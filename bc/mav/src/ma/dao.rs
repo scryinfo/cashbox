@@ -152,7 +152,7 @@ impl<T> Dao<T> for T where
     }
 
     async fn exist_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<bool> where T: 'async_trait {
-        let w = w.clone().check()?;
+        let w = w.clone();
         let sql = {
             if w.sql.is_empty() {
                 format!("SELECT EXISTS ( SELECT 1 FROM {} )", T::table_name())
@@ -164,7 +164,7 @@ impl<T> Dao<T> for T where
         Ok(re != 0)
     }
     async fn count_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<i64> where T: 'async_trait {
-        let w = w.clone().check()?;
+        let w = w.clone();
         let sql = {
             if w.sql.is_empty() {
                 format!("SELECT COUNT(*) FROM {} ", T::table_name())

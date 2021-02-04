@@ -280,7 +280,7 @@ impl Db {
                 eth.gas_price = "".to_owned(); //todo
                 let old_eth = {
                     let wrapper = rb.new_wrapper()
-                        .eq(MEeeChainTokenShared::token_type, &eth.token_type).check()?;
+                        .eq(MEeeChainTokenShared::token_type, &eth.token_type);
                     MEthChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
                 if let Some(t) = old_eth {
@@ -294,7 +294,7 @@ impl Db {
                 for net_type in NetType::iter() {
                     let  wrapper = rb.new_wrapper()
                         .eq(MEthChainTokenDefault::chain_token_shared_id, token_shared.id.clone())
-                        .eq(MEthChainTokenDefault::net_type, net_type.to_string()).check()?;
+                        .eq(MEthChainTokenDefault::net_type, net_type.to_string());
                     let old = MEthChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
                         let mut token_default = MEthChainTokenDefault::default();
@@ -326,7 +326,7 @@ impl Db {
 
                 let old_eth = {
                     let wrapper = rb.new_wrapper()
-                        .eq(MEeeChainTokenShared::token_type, &eee.token_type).check()?;
+                        .eq(MEeeChainTokenShared::token_type, &eee.token_type);
                     MEeeChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
                 if let Some(t) = old_eth {
@@ -340,7 +340,7 @@ impl Db {
                 for net_type in NetType::iter() {
                     let  wrapper = rb.new_wrapper()
                         .eq(MEeeChainTokenDefault::chain_token_shared_id, token_shared.id.clone())
-                        .eq(MEeeChainTokenDefault::net_type, net_type.to_string()).check()?;
+                        .eq(MEeeChainTokenDefault::net_type, net_type.to_string());
                     let old = MEeeChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
                         let mut token_default = MEeeChainTokenDefault::default();
@@ -370,7 +370,7 @@ impl Db {
 
                 let old_eth = {
                     let  wrapper = rb.new_wrapper()
-                        .eq(MBtcChainTokenShared::token_type, &btc.token_type).check()?;
+                        .eq(MBtcChainTokenShared::token_type, &btc.token_type);
                     MBtcChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
                 if let Some(t) = old_eth {
@@ -384,7 +384,7 @@ impl Db {
                 for net_type in NetType::iter() {
                     let  wrapper = rb.new_wrapper()
                         .eq(MBtcChainTokenDefault::chain_token_shared_id, token_shared.id.clone())
-                        .eq(MBtcChainTokenDefault::net_type, net_type.to_string()).check()?;
+                        .eq(MBtcChainTokenDefault::net_type, net_type.to_string());
                     let old = MBtcChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
                         let mut token_default = MBtcChainTokenDefault::default();

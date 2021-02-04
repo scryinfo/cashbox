@@ -158,7 +158,7 @@ fn mnemonic_test() {
 fn plat_type_test() {
 
     unsafe {
-        let mut ptr = Wallets_appPlatformType() as *mut c_char;
+        let ptr = Wallets_appPlatformType() as *mut c_char;
         assert_ne!(null_mut(), ptr);
         CStr_free(ptr);
     }

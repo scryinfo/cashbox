@@ -9,7 +9,7 @@ use eee::Crypto;
 use mav::ma::{BeforeSave, Dao, Db, DbCreateType, MAddress, MMnemonic, MWallet, DbName, MTokenAddress};
 use mav::{ChainType, NetType, WalletType};
 use scry_crypto::Keccak256;
-use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait, EthChainTrait, BtcChainTrait};
+use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait, EthChainTrait, BtcChainTrait, TokenAddress};
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
@@ -211,7 +211,7 @@ impl Wallets {
             .eq(&MTokenAddress::wallet_id, &token_address.wallet_id)
             .eq(&MTokenAddress::chain_type, &token_address.chain_type)
             .eq(&MTokenAddress::token_id, &token_address.token_id)
-            .eq(&MTokenAddress::address_id, &token_address.address_id).check()?;
+            .eq(&MTokenAddress::address_id, &token_address.address_id);
         if let Some(mut target_address) = MTokenAddress::fetch_by_wrapper(data_rb, "", &token_address_wrapper).await? {
             target_address.balance = token_address.balance.clone();
             target_address.status = 1;
@@ -227,7 +227,7 @@ impl Wallets {
         let data_rb = self.db().data_db(net_type);
         let token_address_wrapper = data_rb.new_wrapper()
             .eq(&MTokenAddress::wallet_id, wallet_id)
-            .eq(&MTokenAddress::status, 1).check()?;
+            .eq(&MTokenAddress::status, 1);
         let m_address_balance = MTokenAddress::list_by_wrapper(data_rb, "", &token_address_wrapper).await?;
         let address_ret = m_address_balance.iter().map(|address| TokenAddress {
             m: address.clone()
@@ -241,7 +241,7 @@ impl Wallets {
             .eq(&MTokenAddress::wallet_id, &token_address.wallet_id)
             .eq(&MTokenAddress::chain_type, &token_address.chain_type)
             .eq(&MTokenAddress::token_id, &token_address.token_id)
-            .eq(&MTokenAddress::address_id, &token_address.address_id).check()?;
+            .eq(&MTokenAddress::address_id, &token_address.address_id);
         if let Some(mut target_address) = MTokenAddress::fetch_by_wrapper(data_rb, "", &token_address_wrapper).await? {
             target_address.status = 0;
             target_address.save_update(data_rb, "").await?;

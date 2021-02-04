@@ -35,6 +35,14 @@ pub struct BtcChainTokenShared {
 }
 deref_type!(BtcChainTokenShared,MBtcChainTokenShared);
 
+impl From<MBtcChainTokenShared> for BtcChainTokenShared {
+    fn from(token_shared: MBtcChainTokenShared) -> Self {
+        Self {
+            m: token_shared,
+        }
+    }
+}
+
 #[async_trait]
 impl Load for BtcChainTokenShared {
     type MType = MBtcChainTokenShared;
@@ -52,8 +60,10 @@ pub struct BtcChainTokenDefault {
 }
 deref_type!(BtcChainTokenDefault,MBtcChainTokenDefault);
 
+
+
 impl BtcChainTokenDefault {
-    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<MBtcChainTokenDefault>, WalletError> {
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<BtcChainTokenDefault>, WalletError> {
         let tx_id = "";
         let wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MBtcChainTokenShared> = {
@@ -63,7 +73,7 @@ impl BtcChainTokenDefault {
                 .eq(format!("{}.{}", default_name, MBtcChainTokenDefault::net_type).as_str(), net_type.to_string());
 
             let sql = {
-                wrapper = wrapper.check()?;
+                wrapper = wrapper;
                 let t = sql_left_join_get_b(&default_name, &MBtcChainTokenDefault::chain_token_shared_id,
                                             &shared_name, &MBtcChainTokenShared::id);
                 format!("{} where {}", t, &wrapper.sql)
@@ -74,7 +84,7 @@ impl BtcChainTokenDefault {
         let mut tokens_default = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MBtcChainTokenDefault::net_type, net_type.to_string())
-                .check()?
+                
                 .order_by(true, &[MBtcChainTokenDefault::position]);
             MBtcChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
@@ -85,7 +95,11 @@ impl BtcChainTokenDefault {
                 }
             }
         }
-        Ok(tokens_default)
+        let btc_tokens = tokens_default.iter().map(|token|BtcChainTokenDefault{
+            m: token.clone(),
+            btc_chain_token_shared: BtcChainTokenShared::from(token.chain_token_shared.clone()),
+        }).collect::<Vec<BtcChainTokenDefault>>();
+        Ok(btc_tokens)
     }
 }
 #[derive(Debug, Default)]
@@ -94,6 +108,37 @@ pub struct BtcChainTokenAuth {
     pub btc_chain_token_shared: BtcChainTokenShared,
 }
 deref_type!(BtcChainTokenAuth,MBtcChainTokenAuth);
+
+
+impl BtcChainTokenAuth{
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<BtcChainTokenAuth>, WalletError> {
+        let tx_id = "";
+        let wallets_db = context.db().wallets_db();
+        let page_query = format!(" limit {} offset {}", page_size, start_item);
+        let mut tokens_auth = {
+            let wrapper = wallets_db.new_wrapper()
+                .eq(MBtcChainTokenAuth::net_type, net_type.to_string())
+                .order_by(false, &[MBtcChainTokenAuth::create_time]).push_sql(&page_query);
+            MBtcChainTokenAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
+        };
+        let token_shared_id = format!("id in (SELECT {} FROM {} WHERE {}='{}' ORDER by {} desc {})",
+                                      MBtcChainTokenAuth::chain_token_shared_id, MBtcChainTokenAuth::table_name(), MBtcChainTokenAuth::net_type, net_type.to_string(), MBtcChainTokenAuth::create_time, page_query);
+        let token_shared_wrapper = wallets_db.new_wrapper().push_sql(&token_shared_id);
+        let tokens_shared = MBtcChainTokenShared::list_by_wrapper(wallets_db, tx_id, &token_shared_wrapper).await?;
+        let mut target_tokens = vec![];
+        for token_auth in &mut tokens_auth {
+            for token_shared in &tokens_shared {
+                let mut token = BtcChainTokenAuth::default();
+                if token_auth.chain_token_shared_id == token_shared.id {
+                    token.m = token_auth.clone();
+                    token.btc_chain_token_shared = BtcChainTokenShared::from(token_shared.clone());
+                    target_tokens.push(token)
+                }
+            }
+        }
+        Ok(target_tokens)
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct BtcChain {
@@ -137,7 +182,7 @@ impl Load for BtcChain {
             let rb = context.db().data_db( &NetType::from(&mw.net_type));
             let wrapper = rb.new_wrapper()
                 .eq(MBtcChainToken::wallet_id, mw.id.clone())
-                .eq(MBtcChainToken::chain_type, self.chain_shared.chain_type.clone()).check()?;
+                .eq(MBtcChainToken::chain_type, self.chain_shared.chain_type.clone());
             let ms = MBtcChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
             for it in ms {

@@ -38,7 +38,7 @@ deref_type!(EthChainTokenShared,MEthChainTokenShared);
 impl From<MEthChainTokenShared> for EthChainTokenShared {
     fn from(token_shared: MEthChainTokenShared) -> Self {
         Self {
-            m: token_shared.clone(),
+            m: token_shared,
         }
     }
 }
@@ -61,16 +61,15 @@ pub struct EthChainTokenDefault {
 deref_type!(EthChainTokenDefault,MEthChainTokenDefault);
 
 impl EthChainTokenDefault {
-    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<MEthChainTokenDefault>, WalletError> {
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<EthChainTokenDefault>, WalletError> {
         let tx_id = "";
         let wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MEthChainTokenShared> = {
             let default_name = MEthChainTokenDefault::table_name();
             let shared_name = MEthChainTokenShared::table_name();
-            let mut wrapper = wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEthChainTokenDefault::net_type).as_str(), net_type.to_string());
+            let wrapper = wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEthChainTokenDefault::net_type).as_str(), net_type.to_string());
 
             let sql = {
-                wrapper = wrapper.check()?;
                 let t = sql_left_join_get_b(&default_name, &MEthChainTokenDefault::chain_token_shared_id,
                                             &shared_name, &MEthChainTokenShared::id);
                 format!("{} where {}", t, &wrapper.sql)
@@ -80,7 +79,6 @@ impl EthChainTokenDefault {
         let mut tokens_default = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MEthChainTokenDefault::net_type, net_type.to_string())
-                .check()?
                 .order_by(true, &[MEthChainTokenDefault::position]);
             MEthChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
@@ -91,7 +89,11 @@ impl EthChainTokenDefault {
                 }
             }
         }
-        Ok(tokens_default)
+     let eth_tokens = tokens_default.iter().map(|token|EthChainTokenDefault{
+            m: token.clone(),
+            eth_chain_token_shared: EthChainTokenShared::from(token.chain_token_shared.clone())
+        }).collect::<Vec<EthChainTokenDefault>>();
+        Ok(eth_tokens)
     }
 }
 
@@ -112,7 +114,6 @@ impl EthChainTokenAuth {
         let mut tokens_auth = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MEthChainTokenAuth::net_type, net_type.to_string())
-                .check()?
                 .order_by(false, &[MEthChainTokenAuth::create_time]).push_sql(&page_query);
             MEthChainTokenAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
@@ -173,7 +174,7 @@ impl Load for EthChain {
             let rb = context.db().data_db(&NetType::from(&mw.net_type));
             let wrapper = rb.new_wrapper()
                 .eq(MEthChainToken::wallet_id, mw.id.clone())
-                .eq(MEthChainToken::chain_type, self.chain_shared.chain_type.clone()).check()?;
+                .eq(MEthChainToken::chain_type, self.chain_shared.chain_type.clone());
             let ms = MEthChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
             for it in ms {

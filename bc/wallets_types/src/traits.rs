@@ -47,8 +47,10 @@ pub trait EeeChainTrait: Send + Sync {
     async fn tokenx_transfer(&self, context: &dyn ContextTrait, net_type: &NetType, transfer_payload: &EeeTransferPayload) -> Result<String, WalletError>;
     async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, raw_tx: &RawTxParam, is_submittable: bool) -> Result<String, WalletError>;
     async fn save_tx_record(&self, context: &dyn ContextTrait,net_type: &NetType, extrinsic_ctx:&ExtrinsicContext) -> Result<(), WalletError>;
+    async fn get_default_tokens(&self,context: &dyn ContextTrait,net_type: &NetType)->Result<Vec<EeeChainTokenDefault>,WalletError>;
     async fn update_default_tokens(&self, context: &dyn ContextTrait, tokens: Vec<EeeChainTokenDefault>) -> Result<(), WalletError>;
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, auth_tokens: Vec<EeeChainTokenAuth>) -> Result<(), WalletError>;
+    async fn get_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType,start_item:u64,page_size:u64)->Result<Vec<EeeChainTokenAuth>,WalletError>;
 
 }
 
@@ -58,13 +60,15 @@ pub trait EthChainTrait: Send + Sync {
     async fn raw_tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, raw_tx: &EthRawTxPayload, password: &str) -> Result<String, WalletError>;
     async fn decode_addition_data(&self, encode_data: &str) -> Result<String, WalletError>;
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<EthChainTokenDefault>) -> Result<(), WalletError>;
-    async fn get_default_digits(&self,context: &dyn ContextTrait,start_item:u64,page_size:u64)->Result<Vec<EthChainTokenDefault>,WalletError>;
+    async fn get_default_tokens(&self,context: &dyn ContextTrait,net_type: &NetType)->Result<Vec<EthChainTokenDefault>,WalletError>;
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, auth_tokens: Vec<EthChainTokenAuth>) -> Result<(), WalletError>;
-    async fn get_auth_digits(&self,context: &dyn ContextTrait,net_type: &NetType,start_item:u64,page_size:u64)->Result<Vec<EthChainTokenAuth>,WalletError>;
+    async fn get_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType,start_item:u64,page_size:u64)->Result<Vec<EthChainTokenAuth>,WalletError>;
 }
 
 #[async_trait]
 pub trait BtcChainTrait: Send + Sync {
+    async fn get_default_tokens(&self,context: &dyn ContextTrait,net_type: &NetType)->Result<Vec<BtcChainTokenDefault>,WalletError>;
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<BtcChainTokenDefault>) -> Result<(), WalletError>;
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, auth_tokens: Vec<BtcChainTokenAuth>) -> Result<(), WalletError>;
+    async fn get_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType,start_item:u64,page_size:u64)->Result<Vec<BtcChainTokenAuth>,WalletError>;
 }

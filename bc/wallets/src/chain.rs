@@ -181,6 +181,11 @@ impl WalletTrait for Wallet {
 
 #[async_trait]
 impl BtcChainTrait for BtcChain {
+    async fn get_default_tokens(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<BtcChainTokenDefault>, WalletError> {
+        let btc_tokens = BtcChainTokenDefault::list_by_net_type(context,net_type).await?;
+        Ok(btc_tokens)
+    }
+
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<BtcChainTokenDefault>) -> Result<(), WalletError> {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
@@ -193,7 +198,7 @@ impl BtcChainTrait for BtcChain {
             let mut shared = token.btc_chain_token_shared.clone();
             {
                 let token_shared_wrapper = token_rb.new_wrapper()
-                    .eq(&MTokenShared::symbol, &token.btc_chain_token_shared.m.token_shared.symbol).check()?;
+                    .eq(&MTokenShared::symbol, &token.btc_chain_token_shared.m.token_shared.symbol);
                 if let Some(token_shared) = MBtcChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
@@ -221,7 +226,7 @@ impl BtcChainTrait for BtcChain {
             let mut shared = token.btc_chain_token_shared.clone();
             {
                 let  token_shared_wrapper = token_rb.new_wrapper()
-                    .eq(&MTokenShared::symbol, &token.btc_chain_token_shared.m.token_shared.symbol).check()?;
+                    .eq(&MTokenShared::symbol, &token.btc_chain_token_shared.m.token_shared.symbol);
                 if let Some(token_shared) = MBtcChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
@@ -234,6 +239,11 @@ impl BtcChainTrait for BtcChain {
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
         Ok(())
+    }
+
+    async fn get_auth_tokens(&self, context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<BtcChainTokenAuth>, WalletError> {
+        let btc_tokens = BtcChainTokenAuth::list_by_net_type(context,net_type,start_item,page_size).await?;
+        Ok(btc_tokens)
     }
 }
 
@@ -405,7 +415,7 @@ impl EeeChainTrait for EeeChain {
         // get token decimal by account address
         let m_address = {
             let addr_wrapper = wallet_db.new_wrapper()
-                .eq(&MAddress::address, &transfer_payload.from_account).check()?;
+                .eq(&MAddress::address, &transfer_payload.from_account);
             MAddress::fetch_by_wrapper(wallet_db, "", &addr_wrapper).await?
         };
 
@@ -416,7 +426,7 @@ impl EeeChainTrait for EeeChain {
         //query token decimal by address
         let chain_token = {
             let token_wrapper = wallet_db.new_wrapper()
-                .eq(&MEeeChainToken::wallet_id, &address.wallet_id.to_owned()).check()?;
+                .eq(&MEeeChainToken::wallet_id, &address.wallet_id.to_owned());
             MEeeChainToken::fetch_by_wrapper(wallet_db, "", &token_wrapper).await?
         };
 
@@ -541,6 +551,12 @@ impl EeeChainTrait for EeeChain {
         }
         Ok(())
     }
+
+    async fn get_default_tokens(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<EeeChainTokenDefault>, WalletError> {
+        let eee_tokens = EeeChainTokenDefault::list_by_net_type(context,net_type).await?;
+        Ok(eee_tokens)
+    }
+
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<EeeChainTokenDefault>) -> Result<(), WalletError> {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
@@ -554,7 +570,7 @@ impl EeeChainTrait for EeeChain {
             let mut shared = token.eee_chain_token_shared.clone();
             {
                 let token_shared_wrapper = token_rb.new_wrapper()
-                    .eq(&MTokenShared::symbol, &token.eee_chain_token_shared.m.token_shared.symbol).check()?;
+                    .eq(&MTokenShared::symbol, &token.eee_chain_token_shared.m.token_shared.symbol);
                 if let Some(token_shared) = MEeeChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
@@ -582,7 +598,7 @@ impl EeeChainTrait for EeeChain {
             let mut shared = token.eee_chain_token_shared.clone();
             {
                 let token_shared_wrapper = token_rb.new_wrapper()
-                    .eq(&MTokenShared::symbol, &token.eee_chain_token_shared.m.token_shared.symbol).check()?;
+                    .eq(&MTokenShared::symbol, &token.eee_chain_token_shared.m.token_shared.symbol);
                 if let Some(token_shared) = MEeeChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
@@ -595,6 +611,11 @@ impl EeeChainTrait for EeeChain {
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
         Ok(())
+    }
+
+    async fn get_auth_tokens(&self, context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<EeeChainTokenAuth>, WalletError> {
+        let eee_tokens = EeeChainTokenAuth::list_by_net_type(context,net_type,start_item,page_size).await?;
+        Ok(eee_tokens)
     }
 }
 
@@ -618,7 +639,7 @@ impl EeeChain {
     async fn save_eee_chain_tx(rb: &rbatis::rbatis::Rbatis, extrinsic_ctx: &ExtrinsicContext, tx_detail: &eee::TransferDetail, timestamp: u64, is_successful: bool) -> Result<(), WalletError> {
         let query_tx_wrapper = rb.new_wrapper()
             .eq(&mav::ma::TxShared::tx_hash, tx_detail.hash.clone().unwrap_or_default())
-            .eq(&mav::ma::MEeeChainTx::signer, tx_detail.signer.clone().unwrap_or_default()).check()?;
+            .eq(&mav::ma::MEeeChainTx::signer, tx_detail.signer.clone().unwrap_or_default());
         if let None = MEeeChainTx::fetch_by_wrapper(rb, "", &query_tx_wrapper).await? {
             let mut chain_tx = mav::ma::MEeeChainTx::default();
             chain_tx.from_address = tx_detail.from.clone().unwrap_or_default();
@@ -638,7 +659,7 @@ impl EeeChain {
     async fn save_eee_tokenx_tx(rb: &rbatis::rbatis::Rbatis, extrinsic_ctx: &ExtrinsicContext, tx_detail: &eee::TransferDetail, timestamp: u64, is_successful: bool) -> Result<(), WalletError> {
         let query_tx_wrapper = rb.new_wrapper()
             .eq(&mav::ma::TxShared::tx_hash, tx_detail.hash.clone().unwrap_or_default())
-            .eq(&mav::ma::MEeeTokenxTx::signer, tx_detail.signer.clone().unwrap_or_default()).check()?;
+            .eq(&mav::ma::MEeeTokenxTx::signer, tx_detail.signer.clone().unwrap_or_default());
         if let None = MEeeTokenxTx::fetch_by_wrapper(rb, "", &query_tx_wrapper).await? {
             let mut chain_tx = mav::ma::MEeeTokenxTx::default();
             chain_tx.from_address = tx_detail.from.clone().unwrap_or_default();
@@ -703,7 +724,7 @@ impl EthChainTrait for EthChain {
             let mut shared = token.eth_chain_token_shared.clone();
             {
                 let token_shared_wrapper = token_rb.new_wrapper()
-                    .eq(&MTokenShared::symbol, &token.eth_chain_token_shared.m.token_shared.symbol).check()?;
+                    .eq(&MTokenShared::symbol, &token.eth_chain_token_shared.m.token_shared.symbol);
                 if let Some(token_shared) = MEthChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
@@ -718,8 +739,9 @@ impl EthChainTrait for EthChain {
         Ok(())
     }
 
-    async fn get_default_digits(&self, _context: &dyn ContextTrait, _start_item: u64, _page_size: u64) -> Result<Vec<EthChainTokenDefault>, WalletError> {
-        unimplemented!()
+    async fn get_default_tokens(&self, context: &dyn ContextTrait,net_type: &NetType) -> Result<Vec<EthChainTokenDefault>, WalletError> {
+        let m_eth_tokens = EthChainTokenDefault::list_by_net_type(context,net_type).await?;
+        Ok(m_eth_tokens)
     }
 
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, author_tokens: Vec<EthChainTokenAuth>) -> Result<(), WalletError> {
@@ -734,7 +756,7 @@ impl EthChainTrait for EthChain {
             let mut shared = token.eth_chain_token_shared.clone();
             {
                 let token_shared_wrapper = token_rb.new_wrapper()
-                    .eq(&MTokenShared::symbol, &token.eth_chain_token_shared.m.token_shared.symbol).check()?;
+                    .eq(&MTokenShared::symbol, &token.eth_chain_token_shared.m.token_shared.symbol);
                 if let Some(token_shared) = MEthChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
@@ -749,7 +771,7 @@ impl EthChainTrait for EthChain {
         Ok(())
     }
 
-    async fn get_auth_digits(&self, context: &dyn ContextTrait, net_type: &NetType,start_item: u64, page_size: u64) -> Result<Vec<EthChainTokenAuth>, WalletError> {
+    async fn get_auth_tokens(&self, context: &dyn ContextTrait, net_type: &NetType,start_item: u64, page_size: u64) -> Result<Vec<EthChainTokenAuth>, WalletError> {
         let m_eth_tokens = EthChainTokenAuth::list_by_net_type(context,net_type,start_item,page_size).await?;
         Ok(m_eth_tokens)
     }
