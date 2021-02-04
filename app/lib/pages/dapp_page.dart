@@ -10,7 +10,7 @@ import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:log_util/log_util.dart';
+import 'package:logger/logger.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -464,7 +464,7 @@ class _DappPageState extends State<DappPage> {
               this.callPromise(msg);
             });
           } catch (e) {
-            LogUtil.instance().d("cashboxEthSendSignedTx===>", e.toString());
+            Logger().d("cashboxEthSendSignedTx===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
           }
@@ -485,7 +485,7 @@ class _DappPageState extends State<DappPage> {
             msg.data = await ethCall(chainType, data[0], data[1]);
             this.callPromise(msg);
           } catch (e) {
-            LogUtil.instance().d("cashboxEthCall===>", e.toString());
+            Logger().d("cashboxEthCall===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
           }
@@ -535,7 +535,7 @@ class _DappPageState extends State<DappPage> {
                       });
                     });
                   } catch (e) {
-                    LogUtil.instance().d("cashboxEeeRawTxSign===>", e.toString());
+                    Logger().d("cashboxEeeRawTxSign===>", e.toString());
                     msg.err = "inner error";
                     this.callPromise(msg).whenComplete(() {
                       NavigatorUtils.goBack(context);
@@ -591,7 +591,7 @@ class _DappPageState extends State<DappPage> {
                       NavigatorUtils.goBack(context);
                     });
                   } catch (e) {
-                    LogUtil.instance().d("cashboxEeeRawTxSign===>", e.toString());
+                    Logger().d("cashboxEeeRawTxSign===>", e.toString());
                     msg.err = "inner error";
                     this.callPromise(msg).whenComplete(() {
                       NavigatorUtils.goBack(context);

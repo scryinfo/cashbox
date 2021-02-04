@@ -21,8 +21,8 @@ dev_dependencies:
   build_runner: ^1.10.3
   gen_dl:
     path: ../gen_dl
-  log_util:
-    path: ../log_util
+  logger:
+    path: ../logger
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -7,7 +7,7 @@ import 'package:app/net/net_util.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:log_util/log_util.dart';
+import 'package:logger/logger.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +73,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         }
         await updateNativeAuthDigitList(param);
       } catch (e) {
-        LogUtil.instance().e("DigitsManagePage error is=>", e);
+        Logger().e("DigitsManagePage error is=>", e);
       }
       if (displayDigitsList.length < onePageOffSet) {
         var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
@@ -297,7 +297,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         return convert.jsonEncode(result["data"]).toString();
       }
     } catch (e) {
-      LogUtil.instance().e("loadServerDigitsData error ", e.toString());
+      Logger().e("loadServerDigitsData error ", e.toString());
       return "";
     }
     return "";

@@ -10,7 +10,7 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:log_util/log_util.dart';
+import 'package:logger/logger.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
@@ -414,7 +414,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         _eeeAddressController.text = qrResult.toString();
       });
     } catch (e) {
-      LogUtil.instance().e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
+      Logger().e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
       Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
     }
   }

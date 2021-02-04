@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:log_util/log_util.dart';
+import 'package:logger/logger.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -139,7 +139,7 @@ class Utils {
       String data = await file.readAsString();
       return data;
     } catch (e) {
-      LogUtil.instance().e("readFile error is ===>", e.toString());
+      Logger().e("readFile error is ===>", e.toString());
       return "error";
     }
   }

@@ -1,4 +1,4 @@
-import 'package:log_util/log_util.dart';
+import 'package:logger/logger.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'application.dart';
@@ -28,7 +28,7 @@ class NavigatorUtils {
       }
       function(result);
     }).catchError((error) {
-      LogUtil.instance().e("FluroNavigator error is ===>", "$error");
+      Logger().e("FluroNavigator error is ===>", "$error");
       print("$error");
     });
   }
