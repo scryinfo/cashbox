@@ -1,9 +1,9 @@
 #![allow(non_snake_case)]
 
-use std::os::raw::c_char;
+use std::os::raw::{c_char, c_uint};
 use futures::executor::block_on;
 use mav::NetType;
-use wallets_types::Error;
+use wallets_types::{Error};
 use wallets::Contexts;
 use super::types::CError;
 use super::kits::{CR, to_c_char, to_str};
@@ -144,6 +144,38 @@ pub unsafe extern "C" fn ChainEth_updateAuthTokenList(ctx: *mut CContext, authTo
     CError::to_c_ptr(&err)
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn ChainEth_getAuthTokenList(ctx: *mut CContext,netType: *mut c_char, startItem:c_uint,pageSize:c_uint, tokens: *mut *mut CArray<CEthChainTokenAuth>) -> *const CError {
+    log::debug!("enter ChainEth getDigitList");
+
+    if ctx.is_null() || tokens.is_null() ||netType.is_null(){
+        let err = Error::PARAMETER().append_message(" : ctx,tokens,netType is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    (*tokens).free();
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let eth_chain = wallets.eth_chain_instance();
+                let net_type = NetType::from(to_str(netType));
+                match block_on( eth_chain.get_auth_tokens(wallets,&net_type,startItem as u64,pageSize as u64)) {
+                    Ok(data) => {
+                        *tokens = CArray::to_c_ptr(&data);
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_updateDefaultTokenList(ctx: *mut CContext, defaultTokens: *mut CArray<CEthChainTokenDefault>) -> *const CError {
@@ -164,6 +196,40 @@ pub unsafe extern "C" fn ChainEth_updateDefaultTokenList(ctx: *mut CContext, def
                 let default_token_list = CArray::<CEthChainTokenDefault>::ptr_rust(defaultTokens);
                 match block_on(eth_chain.update_default_tokens(wallets, default_token_list)) {
                     Ok(_) => {
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn ChainEth_getDefaultTokenList(ctx: *mut CContext,netType: *mut c_char,tokens: *mut *mut CArray<CEthChainTokenDefault>) -> *const CError {
+    log::debug!("enter ChainEth getDigitList");
+
+    if ctx.is_null() || tokens.is_null() ||netType.is_null(){
+        let err = Error::PARAMETER().append_message(" : ctx,tokens,netType is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    (*tokens).free();
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let eth_chain = wallets.eth_chain_instance();
+                let net_type = NetType::from(to_str(netType));
+                match block_on( eth_chain.get_default_tokens(wallets,&net_type)) {
+                    Ok(data) => {
+                        *tokens = CArray::to_c_ptr(&data);
                         Error::SUCCESS()
                     }
                     Err(err) => Error::from(err)
@@ -208,7 +274,34 @@ pub unsafe extern "C" fn ChainEth_addNonAuthDigit(ctx: *mut CContext, tokens: *m
     CError::to_c_ptr(&err)
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn ChainEth_updateDigitBalance(_ctx: *mut CContext, _netType: *mut c_char, _tokens: *mut CEthChainTokenDefault) -> *const CError {
-    unimplemented!()
-}
+/*#[no_mangle]
+pub unsafe extern "C" fn ChainEth_getDigitList(ctx: *mut CContext, startItem:c_uint,pageSize:c_uint, tokens: *mut *mut CArray<CEthChainTokenShared>) -> *const CError {
+    log::debug!("enter ChainEth getDigitList");
+
+    if ctx.is_null() || tokens.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx,tokens is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    (*tokens).free();
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let eth_chain = wallets.eth_chain_instance();
+                match block_on(eth_chain.get_digits(wallets,startItem as u64,pageSize as u64)) {
+                    Ok(digits) => {
+                        *tokens = CArray::to_c_ptr(&digits);
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}*/

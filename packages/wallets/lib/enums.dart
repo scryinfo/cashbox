@@ -191,6 +191,7 @@ extension NetTypeEx on NetType {
     return re;
   }
 }
+
 //由于与dart中的重名，所以增加一个s
 enum AppPlatformTypes {
   any,
@@ -229,8 +230,8 @@ extension AppPlatformTypesEx on AppPlatformTypes {
         break;
       default:
         re = AppPlatformTypes.any;
-        // var err = "the str:$plat_type can not be AppPlatformType";
-        //todo log
+      // var err = "the str:$plat_type can not be AppPlatformType";
+      //todo log
     }
     return re;
   }

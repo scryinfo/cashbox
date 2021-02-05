@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart';
 import 'package:grpc/src/server/call.dart';
@@ -8,12 +7,12 @@ import 'server.dart';
 
 class RefreshService extends RefreshFaceServiceBase {
   @override
-  Future<Refresh_RefreshRes> refresh(ServiceCall call, Refresh_RefreshReq request) async {
-
+  Future<Refresh_RefreshRes> refresh(
+      ServiceCall call, Refresh_RefreshReq request) async {
     Refresh_RefreshRes re = new Refresh_RefreshRes();
     re.serviceMeta = new Refresh_ServiceMeta();
     bool odd = true;
-    if (request.version != "1"){
+    if (request.version != "1") {
       odd = false;
     }
     if (odd) {

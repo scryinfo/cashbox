@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/scryinfo/dot/dot"
 	"github.com/scryinfo/dot/dots/grpc/gserver"
-	"time"
 )
 
 const GreeterServerImpTypeID = "c7b58321-ad66-41e6-937d-31cf4c6c1767"
@@ -21,7 +20,7 @@ type GreeterServerImp struct {
 
 func (c *GreeterServerImp) SayHello(ctx context.Context, request *HelloRequest) (*HelloReply, error) {
 	re := & HelloReply{}
-	re.Message = fmt.Sprintf("replay %s : %d",request.Name,time.Now().UnixNano())
+	re.Message = fmt.Sprintf("replay %s",request.Name)
 	return re, nil
 }
 

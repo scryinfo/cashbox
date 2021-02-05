@@ -15,7 +15,12 @@
           "json": {
             "addrs": [
               "localhost:50051"
-            ]
+            ],
+            "tls": {
+              "key": "server.key",
+              "pem": "server.pem",
+              "__caPem": "ca.pem"
+            }
           }
         }
       ]

@@ -1,16 +1,11 @@
 ///
-//  Generated code. Do not modify.
-//  source: cache.proto
-//
-// @dart = 2.7
-// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
-
 import 'dart:async' as $async;
-
 import 'dart:core' as $core;
 
 import 'package:grpc/service_api.dart' as $grpc;
+
 import 'cache.pb.dart' as $2;
+
 export 'cache.pb.dart';
 
 class CacheFaceClient extends $grpc.Client {
@@ -166,14 +161,19 @@ abstract class CacheFaceServiceBase extends $grpc.Service {
 
   $async.Future<$2.UpdateCacheRes> updateApk(
       $grpc.ServiceCall call, $2.CacheKeyReq request);
+
   $async.Future<$2.UpdateCacheRes> updateAppConfig(
       $grpc.ServiceCall call, $2.CacheKeyReq request);
+
   $async.Future<$2.VerifySignatureRes> verifySignature(
       $grpc.ServiceCall call, $2.VerifySignatureReq request);
+
   $async.Future<$2.LatestApkRes> getLatestApk(
       $grpc.ServiceCall call, $2.CacheKeyReq request);
+
   $async.Future<$2.AllApkRes> getApkList(
       $grpc.ServiceCall call, $2.CacheKeyReq request);
+
   $async.Future<$2.AppConfigRes> getAppConfig(
       $grpc.ServiceCall call, $2.CacheKeyReq request);
 }

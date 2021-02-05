@@ -103,8 +103,11 @@ dependencies:
   wallet_manager:
     path: ../packages/wallet_manager/
 
-  log_util:
-    path: ../packages/log_util
+  wallets:
+    path: ../packages/wallets
+
+  logger:
+    path: ../packages/logger
 
   # fork   修改官方插件webview_flutter
   # 基于   ^0.3.13版本   https://github.com/flutter/plugins/tree/master/packages/webview_flutter

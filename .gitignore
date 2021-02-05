@@ -146,6 +146,8 @@ demo/rbatis_demo/target
 /packages/services/test/greeter/greeter_go/go.sum
 /packages/services/test/greeter/greeter_go/greeter_go/greeter_go.exe
 /app/libwallets_cdl.so
-/packages/wallets/lib/wallets_c.dart
+/packages/services/before.log
+/packages/services/log.log
 /bc/wallets_cdl/src/wallets_c.h
-
+/packages/services/test/greeter/greeter_go/greeter_go/before.log
+/packages/services/test/greeter/greeter_go/greeter_go/log.log

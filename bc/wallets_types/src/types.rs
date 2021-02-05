@@ -14,7 +14,7 @@ impl Address{
         let wallet_rb = context.db().wallets_db();
         let wrapper = wallet_rb.new_wrapper()
             .eq(MAddress::wallet_id, wallet_id)
-            .eq(MAddress::chain_type, chain_type).check()?;
+            .eq(MAddress::chain_type, chain_type);
         let address = MAddress::fetch_by_wrapper(&wallet_rb, "", &wrapper).await?;
         if let Some(address) = address{
             self.m=address;
@@ -41,7 +41,7 @@ impl ChainShared {
         let wallet_rb = context.db().wallets_db();
         let wrapper = wallet_rb.new_wrapper()
             .eq(MAddress::wallet_id, wallet_id)
-            .eq(MAddress::chain_type, chain_type).check()?;
+            .eq(MAddress::chain_type, chain_type);
         let address = MAddress::fetch_by_wrapper(&wallet_rb, "", &wrapper).await?;
 
         if let Some(address) = address{
@@ -57,8 +57,6 @@ deref_type!(ChainShared,MChainShared);
 
 #[derive(Debug, Clone, Default)]
 pub struct TokenAddress{
-  pub  m:MTokenAddress,
+    pub  m:MTokenAddress,
 }
 deref_type!(TokenAddress,MTokenAddress);
-
-

@@ -10,6 +10,7 @@ use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
 };
 
 use mav::ma::{EthTokenType};
+use wallets_cdl::mem_c::{CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenAuth_dFree, CArrayCEthChainTokenDefault_dFree};
 
 #[test]
 fn eth_tx_sign_test() {
@@ -173,6 +174,40 @@ fn eth_update_auth_token_list_test() {
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_tokens.free();
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+#[test]
+fn query_eth_auth_token_list_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let token_auth = CArrayCEthChainTokenAuth_dAlloc();
+        let c_err =  chain_eth_c::ChainEth_getAuthTokenList(*c_ctx,to_c_char("Private"),0,10,token_auth) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let _eth_token_auth_vec: Vec<EthChainTokenAuth> = CArray::to_rust(&**token_auth);
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+
+#[test]
+fn query_eth_default_token_list_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let token_default = CArrayCEthChainTokenDefault_dAlloc();
+        let c_err =  chain_eth_c::ChainEth_getDefaultTokenList(*c_ctx,to_c_char("Private"),token_default) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let _eth_token_default_vec: Vec<EthChainTokenDefault> = CArray::to_rust(&**token_default);
+        CArrayCEthChainTokenDefault_dFree(token_default);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }

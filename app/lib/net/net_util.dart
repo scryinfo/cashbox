@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/util/app_info_util.dart';
-import 'package:log_util/log_util.dart';
+import 'package:logger/logger.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:device_info/device_info.dart';
@@ -32,10 +32,10 @@ Future requestWithDeviceId(String url, {formData}) async {
       }
     } on PlatformException {
       _deviceData = <String, dynamic>{'Error:': 'Failed to get platform version.'};
-      LogUtil.instance().e("requestWithDeviceId", "unknown target platform");
+      Logger().e("requestWithDeviceId", "unknown target platform");
       return;
     } catch (e) {
-      LogUtil.instance().e("requestWithDeviceId", "${e}");
+      Logger().e("requestWithDeviceId", "${e}");
       return;
     }
   }
@@ -43,7 +43,7 @@ Future requestWithDeviceId(String url, {formData}) async {
     try {
       appSignInfo = await AppInfoUtil.instance.getAppSignInfo();
     } catch (e) {
-      LogUtil.instance().e("requestWithDeviceId request() error is", "${e}");
+      Logger().e("requestWithDeviceId request() error is", "${e}");
       return;
     }
   }
@@ -105,11 +105,11 @@ Future request(String url, {formData}) async {
       return response.data;
     } else {
       print("后端接口出现异常，请检测代码和服务器情况.........");
-      LogUtil.instance().e("后端接口出现异常，请检测代码和服务器情况 ", url.toString());
+      Logger().e("后端接口出现异常，请检测代码和服务器情况 ", url.toString());
       throw Exception('后端接口出现异常，请检测代码和服务器情况.........');
     }
   } catch (e) {
-    LogUtil.instance().e("net_util request() error is", "${e}");
+    Logger().e("net_util request() error is", "${e}");
     return print('ERROR:======>${e}');
   }
 }
@@ -120,10 +120,10 @@ Future download(url, savePath) async {
     //Dio dio = new Dio();
     //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
     response = await Dio().download(url, savePath);
-    LogUtil.instance().d("net_util download() response is", "${response}");
+    Logger().d("net_util download() response is", "${response}");
     return response;
   } catch (e) {
-    LogUtil.instance().e("net_util download() error is", "${e}");
+    Logger().e("net_util download() error is", "${e}");
   }
 }
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:grpc/grpc.dart';
 
 import 'greeter.pbgrpc.dart';
@@ -25,4 +27,12 @@ Future<Server> runServer(int port) async {
   print('Server listening on port ${server.port}...');
   // await Future.delayed(Duration(days: 1));
   return server;
+}
+
+Future<Process> runGoServer() async {
+  var result = await Process.start(
+      "./test/greeter/greeter_go/greeter_go/greeter_go.exe", <String>[],
+      mode: ProcessStartMode.detached);
+  print('run go server  ...');
+  return result;
 }

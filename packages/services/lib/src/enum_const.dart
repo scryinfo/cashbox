@@ -22,7 +22,6 @@ enum AppPlatformType {
 }
 
 extension AppPlatformTypeEx on AppPlatformType {
-
   static AppPlatformType from(String chainType) {
     AppPlatformType re;
     switch (chainType) {
@@ -62,7 +61,8 @@ extension AppPlatformTypeEx on AppPlatformType {
     String re;
     switch (this) {
       case AppPlatformType.any:
-        re = "any";break;
+        re = "any";
+        break;
       case AppPlatformType.aarch64_linux_android:
         re = "aarch64_linux_android";
         break;

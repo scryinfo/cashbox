@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package= ".;greeter_go";
+option go_package = ".;greeter_go";
 package greeter;
 
 // The greeting service definition.

@@ -17,7 +17,6 @@ pub struct CEeeChainToken {
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainTokenShared {
-    pub id: *mut c_char,
     pub tokenShared: *mut CTokenShared,
     pub tokenType: *mut c_char,
     pub gasLimit: i64,

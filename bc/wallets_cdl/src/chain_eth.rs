@@ -16,7 +16,6 @@ pub struct CEthChainToken {
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthChainTokenShared {
-    pub id: *mut c_char,
     pub tokenShared: *mut CTokenShared,
     pub tokenType: *mut c_char,
     pub gasLimit: i64,

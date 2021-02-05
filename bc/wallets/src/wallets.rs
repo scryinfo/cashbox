@@ -205,31 +205,57 @@ impl Wallets {
         }
         Ok(addrs)
     }
-    pub async fn update_address_balance(&self, context: &dyn ContextTrait, net_type: &NetType, token_address: &TokenAddress) -> Result<(), WalletError> {
-        let data_rb = context.db().data_db(net_type);
+    pub async fn update_address_balance(&self, net_type: &NetType, token_address: &TokenAddress) -> Result<(), WalletError> {
+        let data_rb = self.db().data_db(net_type);
         let token_address_wrapper = data_rb.new_wrapper()
             .eq(&MTokenAddress::wallet_id, &token_address.wallet_id)
-            .eq(&MTokenAddress::address_id, &token_address.address_id).check()?;
+            .eq(&MTokenAddress::chain_type, &token_address.chain_type)
+            .eq(&MTokenAddress::token_id, &token_address.token_id)
+            .eq(&MTokenAddress::address_id, &token_address.address_id);
         if let Some(mut target_address) = MTokenAddress::fetch_by_wrapper(data_rb, "", &token_address_wrapper).await? {
             target_address.balance = token_address.balance.clone();
+            target_address.status = 1;
             target_address.save_update(data_rb, "").await?;
         } else {
             let mut token_address_instance = token_address.clone();
+            token_address_instance.m.status = 1;
             token_address_instance.save(data_rb, "").await?;
         }
         Ok(())
     }
-    pub async fn query_address_balance(&self, context: &dyn ContextTrait, net_type: &NetType, walletId: &str) -> Result<Vec<TokenAddress>, WalletError> {
-        let data_rb = context.db().data_db(net_type);
+    pub async fn query_address_balance(&self, net_type: &NetType, wallet_id: &str) -> Result<Vec<TokenAddress>, WalletError> {
+        let data_rb = self.db().data_db(net_type);
         let token_address_wrapper = data_rb.new_wrapper()
-            .eq(&MTokenAddress::wallet_id, walletId).check()?;
+            .eq(&MTokenAddress::wallet_id, wallet_id)
+            .eq(&MTokenAddress::status, 1);
         let m_address_balance = MTokenAddress::list_by_wrapper(data_rb, "", &token_address_wrapper).await?;
-        let address_ret = m_address_balance.iter().map(|address|TokenAddress{
-            m:address.clone()
+        let address_ret = m_address_balance.iter().map(|address| TokenAddress {
+            m: address.clone()
         }).collect::<Vec<TokenAddress>>();
         Ok(address_ret)
     }
 
+    pub async fn hide_token_address(&self, net_type: &NetType, token_address: &TokenAddress) -> Result<(), WalletError> {
+        let data_rb = self.db().data_db(net_type);
+        let token_address_wrapper = data_rb.new_wrapper()
+            .eq(&MTokenAddress::wallet_id, &token_address.wallet_id)
+            .eq(&MTokenAddress::chain_type, &token_address.chain_type)
+            .eq(&MTokenAddress::token_id, &token_address.token_id)
+            .eq(&MTokenAddress::address_id, &token_address.address_id);
+        if let Some(mut target_address) = MTokenAddress::fetch_by_wrapper(data_rb, "", &token_address_wrapper).await? {
+            target_address.status = 0;
+            target_address.save_update(data_rb, "").await?;
+            Ok(())
+        }else {
+            let msg = format!("wallet {} will hide token {} not exist!",token_address.wallet_id,token_address.token_id);
+            Err(WalletError::Fail(msg))
+        }
+    }
+    pub async fn update_current_database_version(&self, database_version: &str) -> Result<(), WalletError> {
+        let context = self;
+        let _re = Setting::save_current_database_version(context,  database_version).await?;
+        Ok(())
+    }
 }
 
 impl ContextTrait for Wallets {

@@ -1,4 +1,4 @@
-import 'package:log_util/log_util.dart';
+import 'package:logger/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -49,7 +49,7 @@ class ProgressDialog extends Dialog {
             );
           });
     } catch (e) {
-      LogUtil.instance().e("showProgressDialog error is =>", e);
+      Logger().e("showProgressDialog error is =>", e);
     }
   }
 

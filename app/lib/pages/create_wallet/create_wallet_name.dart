@@ -1,8 +1,10 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -294,26 +296,26 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
             Gaps.scaleHGap(5),
             Container(
                 child: Row(
-                  children: <Widget>[
-                    Checkbox(
-                      value: _eeeChainChoose,
-                      onChanged: (newValue) {
-                        setState(
-                              () {
-                            _eeeChainChoose = newValue;
-                          },
-                        );
+              children: <Widget>[
+                Checkbox(
+                  value: _eeeChainChoose,
+                  onChanged: (newValue) {
+                    setState(
+                      () {
+                        _eeeChainChoose = newValue;
                       },
-                    ),
-                    Text(
-                      translate('eee_token_name'),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                )),
+                    );
+                  },
+                ),
+                Text(
+                  translate('eee_token_name'),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            )),
           ],
         ),
       ],

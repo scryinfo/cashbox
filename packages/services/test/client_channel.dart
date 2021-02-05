@@ -31,10 +31,12 @@ void main() {
     var server1;
     var server2;
     Server serverRefresh;
-    var refresh = Refresh.get(new ConnectParameter("localhost",serverRefreshPort),"",AppPlatformType.any);
+    var refresh = Refresh.get(
+        new ConnectParameter("localhost", serverRefreshPort),
+        "",
+        AppPlatformType.any);
     bool odd = true;
-    var channel =
-        createClientChannel(() async {
+    var channel = createClientChannel(() async {
       ConnectParameter re;
       if (odd) {
         odd = false;
@@ -97,7 +99,7 @@ void main() {
     });
 
     tearDown(() async {
-      if(serverRefresh != null){
+      if (serverRefresh != null) {
         serverRefresh.shutdown();
         serverRefresh = null;
       }

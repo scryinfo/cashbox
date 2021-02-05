@@ -31,9 +31,17 @@ impl Load for EthChainToken {
 #[derive(Debug, Default)]
 pub struct EthChainTokenShared {
     pub m: MEthChainTokenShared,
-  //  pub token_shared: TokenShared,
+    //  pub token_shared: TokenShared,
 }
 deref_type!(EthChainTokenShared,MEthChainTokenShared);
+
+impl From<MEthChainTokenShared> for EthChainTokenShared {
+    fn from(token_shared: MEthChainTokenShared) -> Self {
+        Self {
+            m: token_shared,
+        }
+    }
+}
 
 #[async_trait]
 impl Load for EthChainTokenShared {
@@ -53,16 +61,15 @@ pub struct EthChainTokenDefault {
 deref_type!(EthChainTokenDefault,MEthChainTokenDefault);
 
 impl EthChainTokenDefault {
-    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<MEthChainTokenDefault>, WalletError> {
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<EthChainTokenDefault>, WalletError> {
         let tx_id = "";
         let wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MEthChainTokenShared> = {
             let default_name = MEthChainTokenDefault::table_name();
             let shared_name = MEthChainTokenShared::table_name();
-            let mut wrapper=  wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEthChainTokenDefault::net_type).as_str(), net_type.to_string());
+            let wrapper = wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEthChainTokenDefault::net_type).as_str(), net_type.to_string());
 
             let sql = {
-                wrapper = wrapper.check()?;
                 let t = sql_left_join_get_b(&default_name, &MEthChainTokenDefault::chain_token_shared_id,
                                             &shared_name, &MEthChainTokenShared::id);
                 format!("{} where {}", t, &wrapper.sql)
@@ -72,7 +79,6 @@ impl EthChainTokenDefault {
         let mut tokens_default = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MEthChainTokenDefault::net_type, net_type.to_string())
-                .check()?
                 .order_by(true, &[MEthChainTokenDefault::position]);
             MEthChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
@@ -83,8 +89,11 @@ impl EthChainTokenDefault {
                 }
             }
         }
-
-        Ok(tokens_default)
+     let eth_tokens = tokens_default.iter().map(|token|EthChainTokenDefault{
+            m: token.clone(),
+            eth_chain_token_shared: EthChainTokenShared::from(token.chain_token_shared.clone())
+        }).collect::<Vec<EthChainTokenDefault>>();
+        Ok(eth_tokens)
     }
 }
 
@@ -95,6 +104,37 @@ pub struct EthChainTokenAuth {
     pub eth_chain_token_shared: EthChainTokenShared,
 }
 deref_type!(EthChainTokenAuth,MEthChainTokenAuth);
+
+
+impl EthChainTokenAuth {
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<EthChainTokenAuth>, WalletError> {
+        let tx_id = "";
+        let wallets_db = context.db().wallets_db();
+        let page_query = format!(" limit {} offset {}", page_size, start_item);
+        let mut tokens_auth = {
+            let wrapper = wallets_db.new_wrapper()
+                .eq(MEthChainTokenAuth::net_type, net_type.to_string())
+                .order_by(false, &[MEthChainTokenAuth::create_time]).push_sql(&page_query);
+            MEthChainTokenAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
+        };
+        let token_shared_id = format!("id in (SELECT {} FROM {} WHERE {}='{}' ORDER by {} desc {})",
+                                      MEthChainTokenAuth::chain_token_shared_id, MEthChainTokenAuth::table_name(), MEthChainTokenAuth::net_type, net_type.to_string(), MEthChainTokenAuth::create_time, page_query);
+        let token_shared_wrapper = wallets_db.new_wrapper().push_sql(&token_shared_id);
+        let tokens_shared = MEthChainTokenShared::list_by_wrapper(wallets_db, tx_id, &token_shared_wrapper).await?;
+        let mut target_tokens = vec![];
+        for token_auth in &mut tokens_auth {
+            for token_shared in &tokens_shared {
+                let mut token = EthChainTokenAuth::default();
+                if token_auth.chain_token_shared_id == token_shared.id {
+                    token.m = token_auth.clone();
+                    token.eth_chain_token_shared = EthChainTokenShared::from(token_shared.clone());
+                    target_tokens.push(token)
+                }
+            }
+        }
+        Ok(target_tokens)
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct EthChain {
@@ -127,14 +167,14 @@ impl Load for EthChain {
         {//load address
             let wallet_id = self.chain_shared.wallet_id.clone();
             let chain_type = self.chain_shared.chain_type.clone();
-            self.chain_shared.set_addr(context,&wallet_id,&chain_type).await?;
+            self.chain_shared.set_addr(context, &wallet_id, &chain_type).await?;
         }
         {//load token
 
-            let rb = context.db().data_db( &NetType::from(&mw.net_type));
+            let rb = context.db().data_db(&NetType::from(&mw.net_type));
             let wrapper = rb.new_wrapper()
                 .eq(MEthChainToken::wallet_id, mw.id.clone())
-                .eq(MEthChainToken::chain_type, self.chain_shared.chain_type.clone()).check()?;
+                .eq(MEthChainToken::chain_type, self.chain_shared.chain_type.clone());
             let ms = MEthChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
             for it in ms {

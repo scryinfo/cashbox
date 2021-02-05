@@ -22,6 +22,8 @@ pub struct MTokenAddress {
     pub address_id: String,
     #[serde(default)]
     pub balance: String,
+    #[serde(default)]
+    pub status:i64,//set this row whether visible, 0 hide,1 display
 }
 
 impl MTokenAddress {

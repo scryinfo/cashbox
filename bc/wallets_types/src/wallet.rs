@@ -56,7 +56,7 @@ impl Wallet {
     pub async fn find_by_address(context: &dyn ContextTrait, address: &str) -> Result<Option<Wallet>, WalletError> {
         let wallet_db = context.db().wallets_db();
         let m_address = {
-            let addr_wrapper = wallet_db.new_wrapper().eq(&MAddress::address, address).check()?;
+            let addr_wrapper = wallet_db.new_wrapper().eq(&MAddress::address, address);
             MAddress::fetch_by_wrapper(wallet_db, "", &addr_wrapper).await?
         };
         if m_address.is_none() {
@@ -89,14 +89,14 @@ impl Wallet {
 
     pub async fn m_wallet_by_name(context: &dyn ContextTrait, name: &str) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
-        let  wrapper = rb.new_wrapper().eq(&MWallet::name, name).check()?;
+        let  wrapper = rb.new_wrapper().eq(&MWallet::name, name);
         let dws = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(dws)
     }
 
     pub async fn mnemonic_digest(context: &dyn ContextTrait, digest: &str) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
-        let  wrapper = rb.new_wrapper().eq(MWallet::mnemonic_digest, digest).check()?;
+        let  wrapper = rb.new_wrapper().eq(MWallet::mnemonic_digest, digest);
         let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(ms)
     }
@@ -105,7 +105,7 @@ impl Wallet {
         let rb = context.db().wallets_db();
         let wrapper = rb.new_wrapper()
         .eq(MWallet::mnemonic_digest, digest.to_owned())
-        .eq(MWallet::wallet_type, wallet_type.to_string()).check()?;
+        .eq(MWallet::wallet_type, wallet_type.to_string());
         let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(ms)
     }

@@ -1,13 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-
-import '../lib/log_util.dart';
-
+import 'package:logger/logger.dart';
 
 void main() {
   test('adds one to input values', () {
-    LogUtil logUtil = LogUtil();
-    logUtil.clearObsoleteFiles();
-    // logUtil.e(tag, message);
+    Logger logUtil = Logger(logFileName: "testLog");
+    logUtil.e("tag", "message");
 
     // expect(calculator.addOne(2), 3);
   });
