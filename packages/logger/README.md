@@ -22,7 +22,7 @@ dev_dependencies:
 ```
 2. 在具体文件内使用：
 -   生成log文件
-    -   // 可选参数logFileName---log文件名.      默认值cashbox.log
+    -   可选参数logFileName---log文件名.      默认值cashbox.log
 
 初始化示例代码如下：
 ```
@@ -30,9 +30,15 @@ import 'package:logger/logger.dart';
 
 Logger logger = new Logger();
 Logger logger = new Logger(logFileName: "123test");
+logger.initConfig();           //***切记执行这行***
 logger.d("tag999", " message999", isSave2File: false);
-// logger().d("tag", "message");
+logger().d("tag", "message");
 ```
+-   initConfig()
+    -   ***必须执行 此方法***
+    -   通过config()方法注册一个唯一的新线程，其他在调用日志输出的方法，都会调用到这个唯一线程来操作。
+    -   通过唯一线程，来支持多线程使用logger实例。
+
 -   参数 logFileName
     -   实例化对象时，通过方法名logFileName，可自定义log的文件名
 
@@ -40,11 +46,11 @@ logger.d("tag999", " message999", isSave2File: false);
 ```
     logger.e("testTag", "TestMessage"); // param1 ： Tag名称， param2： 具体信息
     logger.d("testTag1", "TestMessage1");
-    输出内容能显示在控制台，和log文件中保存
+    输出内容，能显示在控制台，和在log文件中保存
 ```
 -   参数 isSave2File
     -   调用日志输出时，通过参数isSave2File的值。为true时，可输出到控制台+文件，false只输出到控制台。 默认值：true
 
 -   参数 日志等级 d/i/w/e
-    -   在flutter中使用时，所有print输出到控制台的，默认等级是info级别。
-    -   此处加入等级，是为了方便查看在日志文件中，区分日志等级来筛选使用的。
+    -   在flutter中使用时，所有print输出，都会显示在控制台，日志等级是info级别。
+    -   此处调用时，加入日志等级，是为了方便在查看日志文件时，根据日志等级来筛选使用的。
