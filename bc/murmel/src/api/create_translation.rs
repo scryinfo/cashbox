@@ -213,7 +213,7 @@ pub extern "system" fn Java_JniApi_creat_1transaction(
 }
 
 mod test {
-    use crate::jniapi::create_translation::{
+    use crate::api::create_translation::{
         add_account, create_master_by_mnemonic, create_translation, hash160,
     };
     use crate::walletlib::create_master;

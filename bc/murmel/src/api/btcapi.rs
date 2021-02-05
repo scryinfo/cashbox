@@ -283,7 +283,7 @@ pub extern "system" fn Java_JniApi_btcStart(
 }
 
 mod test {
-    use crate::jniapi::{calc_bloomfilter, calc_default_address, calc_pubkey};
+    use crate::api::{calc_bloomfilter, calc_default_address, calc_pubkey};
 
     #[test]
     pub fn test_calc_pubkey() {

@@ -45,7 +45,7 @@ pub mod error;
 pub mod getdata;
 pub mod headerdownload;
 pub mod hooks;
-pub mod jniapi;
+pub mod api;
 pub mod p2p;
 pub mod ping;
 pub mod timeout;

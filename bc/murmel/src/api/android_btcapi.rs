@@ -5,7 +5,7 @@
 use super::*;
 use crate::constructor::Constructor;
 use crate::hooks::{ApiMessage, HooksMessage};
-use crate::jniapi::{calc_default_address, calc_pubkey};
+use crate::api::{calc_default_address, calc_pubkey};
 use crate::path::BTC_HAMMER_PATH;
 use bitcoin::consensus::serialize;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;

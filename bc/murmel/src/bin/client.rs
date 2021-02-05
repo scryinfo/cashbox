@@ -22,7 +22,7 @@ use log::Level;
 use mav::ma::MUserAddress;
 use murmel::constructor::Constructor;
 use murmel::db::RB_DETAIL;
-use murmel::jniapi::{calc_default_address, calc_pubkey};
+use murmel::api::{calc_default_address, calc_pubkey};
 use murmel::path::BTC_HAMMER_PATH;
 use simple_logger;
 use std::collections::HashMap;
