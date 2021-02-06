@@ -235,3 +235,21 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         hash.to_hex()
     }
 }
+
+mod test{
+
+
+    #[test]
+    pub fn test_calc_sig(){
+        use bitcoin_hashes::hash160;
+        use bitcoin_hashes::hex::FromHex;
+        use bitcoin_hashes::hex::ToHex;
+        use bitcoin_hashes::Hash;
+
+        let compressed_pub_key:&str = "02a485e265a661def2d9db1f5880fb07e96ffc0ffcec0f403d61a08aa21b1bdeb4";
+        let decode: Vec<u8> = FromHex::from_hex(compressed_pub_key).expect("Invalid public key");
+        let hash = hash160::Hash::hash(&decode[..]);
+        let sig = hash.to_hex();
+        println!("{}",sig);
+    }
+}

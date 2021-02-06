@@ -65,9 +65,7 @@ impl ChainSqlite {
             .new_wrapper()
             .gt("timestamp", &timestamp)
             .and()
-            .lt("scanned", 6)
-            .check()
-            .unwrap();
+            .lt("scanned", 6);
         let req = PageRequest::new(1, 1000);
         let r: Result<Page<MBlockHeader>, _> =
             block_on(self.rb.fetch_page_by_wrapper("", &w, &req));
@@ -128,7 +126,7 @@ impl ChainSqlite {
     }
 
     pub fn fetch_header_by_timestamp(&self, timestamp: String) -> i64 {
-        let w = self.rb.new_wrapper().check().unwrap();
+        let w = self.rb.new_wrapper();
         let sql = format!(
             "SELECT {} FROM {} WHERE timestamp = {}",
             "rowid",
@@ -235,17 +233,12 @@ impl DetailSqlite {
     }
 
     fn fetch_progress(&self) -> Option<MProgress> {
-        let w = self.rb.new_wrapper().eq("rowid", 1).check();
-        w.map_or_else(
-            |e| None,
-            |w| {
-                let r: Result<MProgress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
-                return match r {
-                    Ok(r) => Some(r),
-                    Err(_) => None,
-                };
-            },
-        )
+        let w = self.rb.new_wrapper().eq("rowid", 1);
+        let r: Result<MProgress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
+        return match r {
+            Ok(r) => Some(r),
+            Err(_) => None,
+        };
     }
 
     pub fn update_progress(&self, header: String, timestamp: String) {
@@ -253,21 +246,16 @@ impl DetailSqlite {
         progress.header = header;
         progress.timestamp = timestamp;
 
-        let w = self.rb.new_wrapper().eq("rowid", 1).check();
-        w.map_or_else(
-            |e| error!("update_progress {:?}", e),
-            |w| {
-                let r = block_on(progress.update_by_wrapper(&self.rb, "", &w, true));
-                match r {
-                    Ok(a) => {
-                        debug!("update_progress {:?}", a);
-                    }
-                    Err(e) => {
-                        error!("update_progress {:?}", e);
-                    }
-                }
-            },
-        )
+        let w = self.rb.new_wrapper().eq("rowid", 1);
+        let r = block_on(progress.update_by_wrapper(&self.rb, "", &w, true));
+        match r {
+            Ok(a) => {
+                debug!("update_progress {:?}", a);
+            }
+            Err(e) => {
+                error!("update_progress {:?}", e);
+            }
+        }
     }
 
     pub fn progress(&self) -> MProgress {
@@ -348,7 +336,7 @@ impl DetailSqlite {
     }
 
     pub fn fetch_user_address(&self) -> Option<MUserAddress> {
-        let w = self.rb.new_wrapper().eq("rowid", 1).check().unwrap();
+        let w = self.rb.new_wrapper().eq("rowid", 1);
         let r: Result<MUserAddress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
         match r {
             Ok(u) => Some(u),
