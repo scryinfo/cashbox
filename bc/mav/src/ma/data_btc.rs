@@ -45,6 +45,8 @@ pub struct MBtcChainTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
     #[serde(default)]
+    pub wallet_account: String,
+    #[serde(default)]
     pub total_input: String,
     #[serde(default)]
     pub total_output: String,

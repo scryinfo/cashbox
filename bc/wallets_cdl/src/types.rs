@@ -73,7 +73,7 @@ pub struct CTokenShared {
 pub struct CChainShared {
     pub walletId: *mut c_char,
     pub chainType: *mut c_char,
-    /// 钱包地址
+    // 钱包地址
     pub walletAddress: *mut CAddress,
 }
 

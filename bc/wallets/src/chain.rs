@@ -4,11 +4,12 @@ use strum::IntoEnumIterator;
 //use rbatis::crud::CRUDEnable;
 
 use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
-use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx};
+use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType};
 use mav::{NetType, WalletType};
-use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait};
+use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx};
 
 use codec::Decode;
+use rbatis::plugin::page::PageRequest;
 
 #[derive(Default)]
 struct EthChain();
@@ -526,7 +527,6 @@ impl EeeChainTrait for EeeChain {
     }
     async fn save_tx_record(&self, context: &dyn ContextTrait, net_type: &NetType, extrinsic_ctx: &ExtrinsicContext) -> Result<(), WalletError> {
         let data_rb = context.db().data_db(net_type);
-        // let genesis_hash = ;
         let runtime_version = extrinsic_ctx.chain_version.runtime_version;
         let tx_version = extrinsic_ctx.chain_version.tx_version;
         let basic_info = self.get_basic_info(context, net_type, &extrinsic_ctx.chain_version.genesis_hash, runtime_version, tx_version).await?;
@@ -550,6 +550,32 @@ impl EeeChainTrait for EeeChain {
             }
         }
         Ok(())
+    }
+
+    async fn get_tx_record(&self, context: &dyn ContextTrait, net_type: &NetType, token_type: EeeTokenType,target_account:Option<String>, start_item: u64, page_size: u64) -> Result<Vec<EeeChainTx>, WalletError> {
+        let page_req = PageRequest::new(start_item, page_size);
+        let data_rb = context.db().data_db(&net_type);
+        let wrapper = {
+            if let Some(account) = target_account{
+                data_rb.new_wrapper().eq(MEeeChainTx::wallet_account,&account)
+            }else {
+                data_rb.new_wrapper()
+            }
+        };
+        let wrapper = wrapper.order_by(false,&[&mav::ma::TxShared::tx_timestamp]);
+
+        match token_type {
+            EeeTokenType::Eee => {
+              let eee_tx_record =  MEeeChainTx::fetch_page_by_wrapper(data_rb, "", &wrapper, &page_req).await?;
+                let res = eee_tx_record.records.iter().map(|record|EeeChainTx::from(record.clone())).collect::<Vec<EeeChainTx>>();
+                Ok(res)
+            }
+            EeeTokenType::TokenX  => {
+                let tokenx_record =  MEeeTokenxTx::fetch_page_by_wrapper(data_rb, "", &wrapper, &page_req).await?;
+                let res = tokenx_record.records.iter().map(|record|EeeChainTx::from(record.clone())).collect::<Vec<EeeChainTx>>();
+                Ok(res)
+            }
+        }
     }
 
     async fn get_default_tokens(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<EeeChainTokenDefault>, WalletError> {
@@ -639,15 +665,16 @@ impl EeeChain {
     async fn save_eee_chain_tx(rb: &rbatis::rbatis::Rbatis, extrinsic_ctx: &ExtrinsicContext, tx_detail: &eee::TransferDetail, timestamp: u64, is_successful: bool) -> Result<(), WalletError> {
         let query_tx_wrapper = rb.new_wrapper()
             .eq(&mav::ma::TxShared::tx_hash, tx_detail.hash.clone().unwrap_or_default())
-            .eq(&mav::ma::MEeeChainTx::signer, tx_detail.signer.clone().unwrap_or_default());
+            .eq(&mav::ma::TxShared::signer, tx_detail.signer.clone().unwrap_or_default());
         if let None = MEeeChainTx::fetch_by_wrapper(rb, "", &query_tx_wrapper).await? {
             let mut chain_tx = mav::ma::MEeeChainTx::default();
             chain_tx.from_address = tx_detail.from.clone().unwrap_or_default();
             chain_tx.to_address = tx_detail.to.clone().unwrap_or_default();
-            chain_tx.signer = tx_detail.signer.clone().unwrap_or_default();
+           chain_tx.wallet_account=extrinsic_ctx.account.clone();
             chain_tx.extension = tx_detail.ext_data.clone().unwrap_or_default();
             chain_tx.value = tx_detail.value.unwrap().to_string();
-            chain_tx.status = is_successful.to_string();
+            chain_tx.status = is_successful;
+            chain_tx.tx_shared.signer = tx_detail.signer.clone().unwrap_or_default();
             chain_tx.tx_shared.block_hash = extrinsic_ctx.block_hash.clone();
             chain_tx.tx_shared.block_number = extrinsic_ctx.block_number.clone();
             chain_tx.tx_shared.tx_hash = tx_detail.hash.clone().unwrap_or_default();
@@ -659,15 +686,16 @@ impl EeeChain {
     async fn save_eee_tokenx_tx(rb: &rbatis::rbatis::Rbatis, extrinsic_ctx: &ExtrinsicContext, tx_detail: &eee::TransferDetail, timestamp: u64, is_successful: bool) -> Result<(), WalletError> {
         let query_tx_wrapper = rb.new_wrapper()
             .eq(&mav::ma::TxShared::tx_hash, tx_detail.hash.clone().unwrap_or_default())
-            .eq(&mav::ma::MEeeTokenxTx::signer, tx_detail.signer.clone().unwrap_or_default());
+            .eq(&mav::ma::TxShared::signer, tx_detail.signer.clone().unwrap_or_default());
         if let None = MEeeTokenxTx::fetch_by_wrapper(rb, "", &query_tx_wrapper).await? {
             let mut chain_tx = mav::ma::MEeeTokenxTx::default();
             chain_tx.from_address = tx_detail.from.clone().unwrap_or_default();
             chain_tx.to_address = tx_detail.to.clone().unwrap_or_default();
-            chain_tx.signer = tx_detail.signer.clone().unwrap_or_default();
+            chain_tx.wallet_account=extrinsic_ctx.account.clone();
             chain_tx.extension = tx_detail.ext_data.clone().unwrap_or_default();
             chain_tx.value = tx_detail.value.unwrap().to_string();
-            chain_tx.status = is_successful.to_string();
+            chain_tx.status = is_successful;
+            chain_tx.tx_shared.signer  = tx_detail.signer.clone().unwrap_or_default();
             chain_tx.tx_shared.block_hash = extrinsic_ctx.block_hash.clone();
             chain_tx.tx_shared.block_number = extrinsic_ctx.block_number.clone();
             chain_tx.tx_shared.tx_hash = tx_detail.hash.clone().unwrap_or_default();

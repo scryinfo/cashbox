@@ -1,5 +1,6 @@
 use failure::_core::ops::{Deref, DerefMut};
 use super::error::WalletError;
+use mav::ma::{MEeeChainTx, MEeeTokenxTx};
 
 #[derive(Debug, Default, Clone)]
 pub struct InitParameters {
@@ -187,3 +188,56 @@ pub struct EthRawTxPayload {
     pub raw_tx: String,
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct  EeeChainTx{
+    pub tx_hash:String,
+    pub block_hash:String,
+    pub block_number:String,
+    pub signer:String,
+    pub wallet_account:String,
+    pub from_address:String,
+    pub to_address:String,
+    pub value:String,
+    pub extension:String,
+    pub status:bool,
+    pub tx_timestamp:i64,
+    pub tx_bytes:String,
+}
+
+impl From<MEeeChainTx> for EeeChainTx{
+    fn from(chain_tx: MEeeChainTx) -> Self {
+        Self{
+            tx_hash: chain_tx.tx_shared.tx_hash.clone(),
+            block_hash: chain_tx.tx_shared.block_hash.clone(),
+            block_number: chain_tx.tx_shared.block_number.clone(),
+            signer: chain_tx.tx_shared.signer.clone(),
+            wallet_account: chain_tx.wallet_account.clone(),
+            from_address: chain_tx.from_address.clone(),
+            to_address: chain_tx.to_address.clone(),
+            value: chain_tx.value.clone(),
+            extension: chain_tx.extension.clone(),
+            status: chain_tx.status,
+            tx_timestamp: chain_tx.tx_shared.tx_timestamp,
+            tx_bytes: chain_tx.tx_shared.tx_bytes.clone()
+        }
+    }
+}
+
+impl From<MEeeTokenxTx> for EeeChainTx{
+    fn from(chain_tx: MEeeTokenxTx) -> Self {
+        Self{
+            tx_hash: chain_tx.tx_shared.tx_hash.clone(),
+            block_hash: chain_tx.tx_shared.block_hash.clone(),
+            block_number: chain_tx.tx_shared.block_number.clone(),
+            signer: chain_tx.tx_shared.signer.clone(),
+            wallet_account: chain_tx.wallet_account.clone(),
+            from_address: chain_tx.from_address.clone(),
+            to_address: chain_tx.to_address.clone(),
+            value: chain_tx.value.clone(),
+            extension: chain_tx.extension.clone(),
+            status: chain_tx.status,
+            tx_timestamp: chain_tx.tx_shared.tx_timestamp,
+            tx_bytes: chain_tx.tx_shared.tx_bytes.clone()
+        }
+    }
+}

@@ -15,20 +15,19 @@ use crate::ma::TxShared;
 pub struct MEeeChainToken {
     #[serde(default)]
     pub next_id: String,
-    /// 手动加入的token就没有token shared内容
-    /// [crate::db::EeeChainTokenShared]
+    // 手动加入的token就没有token shared内容
+    // [crate::db::EeeChainTokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
-    /// [crate::db::Wallet]
+    // [crate::db::Wallet]
     #[serde(default)]
     pub wallet_id: String,
-    /// [crate::ChainType]
     #[serde(default)]
     pub chain_type: String,
-    /// 是否显示
+    //是否显示
     #[serde(default, deserialize_with = "bool_from_int")]
     pub show: bool,
-    /// 精度
+    // 精度
     #[serde(default)]
     pub decimal: i32,
 }
@@ -46,7 +45,7 @@ pub struct MEeeChainTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
     #[serde(default)]
-    pub signer: String,
+    pub wallet_account: String,
     //from是数据库的关键字，所以加上 address
     #[serde(default)]
     pub from_address: String,
@@ -54,14 +53,9 @@ pub struct MEeeChainTx {
     pub to_address: String,
     #[serde(default)]
     pub value: String,
-
-    // ....
-
-    /// [crate::TxStatus]
-    #[serde(default)]
-    pub status: String,
-
-    /// 扩展数据
+    #[serde(default, deserialize_with = "bool_from_int")]
+    pub status: bool,
+    // 扩展数据
     #[serde(default)]
     pub extension: String,
 }
@@ -78,7 +72,7 @@ pub struct MEeeTokenxTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
     #[serde(default)]
-    pub signer: String,
+    pub wallet_account: String,
     //from是数据库的关键字，所以加上 address
     #[serde(default)]
     pub from_address: String,
@@ -86,14 +80,9 @@ pub struct MEeeTokenxTx {
     pub to_address: String,
     #[serde(default)]
     pub value: String,
-
-    // ....
-
-    /// [crate::TxStatus]
-    #[serde(default)]
-    pub status: String,
-
-    /// 扩展数据
+    #[serde(default, deserialize_with = "bool_from_int")]
+    pub status: bool,
+    // 扩展数据
     #[serde(default)]
     pub extension: String,
 }

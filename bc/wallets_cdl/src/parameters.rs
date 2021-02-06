@@ -6,7 +6,7 @@ use std::os::raw::c_char;
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{
     AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName,
-    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,
+    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,EeeChainTx
 };
 
 use crate::kits::{to_c_char, to_str, CMark, CStruct, CR};
@@ -130,9 +130,26 @@ pub struct CEthTransferPayload {
     pub extData: *mut c_char,
 }
 
+
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CEthRawTxPayload {
     pub fromAddress: *mut c_char,
     pub rawTx: *mut c_char,
+}
+#[repr(C)]
+#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+pub struct  CEeeChainTx{
+    pub txHash:*mut c_char,
+    pub blockHash:*mut c_char,
+    pub blockNumber:*mut c_char,
+    pub signer:*mut c_char,
+    pub walletAccount:*mut  c_char,
+    pub fromAddress:*mut c_char,
+    pub toAddress:*mut c_char,
+    pub value:*mut c_char,
+    pub extension:*mut c_char,
+    pub status:bool,
+    pub txTimestamp:i64,
+    pub txBytes:*mut c_char,
 }

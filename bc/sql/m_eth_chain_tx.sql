@@ -4,9 +4,12 @@ CREATE TABLE IF NOT EXISTS m_eth_chain_tx (
     tx_hash TEXT NOT NULL,
     block_hash TEXT NOT NULL,
     block_number TEXT NOT NULL,
+    signer TEXT NOT NULL,
     tx_bytes TEXT NOT NULL,
+    tx_timestamp INTEGER NOT NULL,
     -- TxShared end
 
+    wallet_account TEXT NOT NULL,
     status TEXT NOT NULL,
     tx INTEGER NOT NULL,
     from_address TEXT NOT NULL,

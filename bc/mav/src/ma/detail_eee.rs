@@ -13,12 +13,14 @@ use crate::ma::MTokenShared;
 #[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum EeeTokenType {
     Eee,
+    TokenX,
 }
 
 impl EeeTokenType {
     fn from(token_type: &str) -> Result<Self, kits::Error> {
         match token_type {
             "Eee" => Ok(EeeTokenType::Eee),
+            "TokenX" => Ok(EeeTokenType::TokenX),
             _ => {
                 let err = format!("the str:{} can not be EeeTokenType", token_type);
                 log::error!("{}", err);
@@ -32,6 +34,7 @@ impl ToString for EeeTokenType {
     fn to_string(&self) -> String {
         match &self {
             EeeTokenType::Eee => "Eee".to_owned(),
+            EeeTokenType::TokenX => "TokenX".to_owned(),
         }
     }
 }
