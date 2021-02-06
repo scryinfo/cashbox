@@ -11,14 +11,11 @@ use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message_blockdata::{InvType, Inventory};
 use bitcoin::network::message_bloom_filter::MerkleBlockMessage;
 use bitcoin::{BitcoinHash, Transaction};
-use bitcoin_hashes::hash160;
-use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::hex::ToHex;
 
 use crate::constructor::CondvarPair;
 use crate::db::{RB_CHAIN, RB_DETAIL};
-use bitcoin_hashes::Hash;
-use log::{error, info, trace, warn};
+use log::{error, info, trace};
 use std::ops::Deref;
 use std::sync::{mpsc, Arc};
 use std::thread;
@@ -60,7 +57,6 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
 
     //Loop through messages
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
-        let hash160 = self.hash160("");
         let mut merkle_vec = vec![];
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
@@ -97,7 +93,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                             }
                             Ok(())
                         }
-                        NetworkMessage::Tx(ref tx) => self.tx(tx, pid, hash160.clone()),
+                        NetworkMessage::Tx(ref tx) => self.tx(tx, pid),
                         NetworkMessage::Ping(_) => {
                             if self.is_serving_blocks(pid) {
                                 trace!("serving blocks peer={}", pid);
@@ -175,7 +171,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
     }
 
     // Handle tx return value
-    fn tx(&mut self, tx: &Transaction, _peer: PeerId, hash160: String) -> Result<(), Error> {
+    fn tx(&mut self, tx: &Transaction, _peer: PeerId) -> Result<(), Error> {
         info!("Tx {:#?}", tx.clone());
         let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;
@@ -226,30 +222,22 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         }
         Ok(())
     }
-
-    ///Calculation hash160
-    fn hash160(&self, _public_key: &str) -> String {
-        let decode: Vec<u8> = FromHex::from_hex(PUBLIC_KEY).expect("Invalid public key");
-        let hash = hash160::Hash::hash(&decode[..]);
-        warn!("HASH160 {:?}", hash.to_hex());
-        hash.to_hex()
-    }
 }
 
-mod test{
-
+mod test {
 
     #[test]
-    pub fn test_calc_sig(){
+    pub fn test_calc_sig() {
         use bitcoin_hashes::hash160;
         use bitcoin_hashes::hex::FromHex;
         use bitcoin_hashes::hex::ToHex;
         use bitcoin_hashes::Hash;
 
-        let compressed_pub_key:&str = "02a485e265a661def2d9db1f5880fb07e96ffc0ffcec0f403d61a08aa21b1bdeb4";
+        let compressed_pub_key: &str =
+            "02a485e265a661def2d9db1f5880fb07e96ffc0ffcec0f403d61a08aa21b1bdeb4";
         let decode: Vec<u8> = FromHex::from_hex(compressed_pub_key).expect("Invalid public key");
         let hash = hash160::Hash::hash(&decode[..]);
         let sig = hash.to_hex();
-        println!("{}",sig);
+        println!("{}", sig);
     }
 }

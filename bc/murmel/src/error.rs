@@ -56,7 +56,9 @@ pub enum Error {
     /// Handshake failure
     Handshake,
     /// lost connection
-    Lost(String)
+    Lost(String),
+    /// bitcoin_hashes error
+    BitcoinHash(bitcoin_hashes::hex::Error)
 }
 
 impl std::error::Error for Error {
@@ -75,7 +77,8 @@ impl std::error::Error for Error {
             Error::Hammersbald(ref err) => Some(err),
             Error::Serialize(ref err) => Some(err),
             Error::Handshake => None,
-            Error::Lost(_) => None
+            Error::Lost(_) => None,
+            Error::BitcoinHash(ref err) => Some(err),
         }
     }
 
@@ -100,6 +103,7 @@ impl fmt::Display for Error {
             Error::Util(ref err) => write!(f, "Util error: {}", err),
             Error::Hammersbald(ref err) => write!(f, "Hammersbald error: {}", err),
             Error::Serialize(ref err) => write!(f, "Serialize error: {}", err),
+            Error::BitcoinHash(ref err) => write!(f, "bitcoin_hashes::hex::Error {}", err),
         }
     }
 }
@@ -110,7 +114,7 @@ impl fmt::Debug for Error {
     }
 }
 
-impl convert::From<Error> for io::Error {
+impl From<Error> for io::Error {
     fn from(err: Error) -> io::Error {
         match err {
             Error::IO(e) => e,
@@ -121,38 +125,38 @@ impl convert::From<Error> for io::Error {
     }
 }
 
-impl convert::From<io::Error> for Error {
+impl From<io::Error> for Error {
     fn from(err: io::Error) -> Error {
         Error::IO(err)
     }
 }
 
 
-impl convert::From<util::Error> for Error {
+impl From<util::Error> for Error {
     fn from(err: util::Error) -> Error {
         Error::Util(err)
     }
 }
 
-impl convert::From<hammersbald::Error> for Error {
+impl From<hammersbald::Error> for Error {
     fn from(err: hammersbald::Error) -> Error {
         Error::Hammersbald(err)
     }
 }
 
-impl convert::From<encode::Error> for Error {
+impl From<encode::Error> for Error {
     fn from(err: encode::Error) -> Error {
         Error::Serialize(err)
     }
 }
 
-impl convert::From<Box<dyn std::error::Error>> for Error {
+impl From<Box<dyn std::error::Error>> for Error {
     fn from(err: Box<dyn std::error::Error>) -> Self {
         Error::Downstream(err.to_string())
     }
 }
 
-impl convert::From<bip158::Error> for Error {
+impl From<bip158::Error> for Error {
     fn from(err: bip158::Error) -> Self {
         match err {
             bip158::Error::Io(io) => Error::IO(io),
@@ -161,3 +165,8 @@ impl convert::From<bip158::Error> for Error {
     }
 }
 
+impl From<bitcoin_hashes::hex::Error> for Error {
+    fn from(err: bitcoin_hashes::hex::Error) -> Self {
+        Error::BitcoinHash(err)
+    }
+}

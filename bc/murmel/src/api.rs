@@ -3,9 +3,14 @@ pub mod btcapi;
 pub mod create_translation;
 
 use crate::hooks::ApiMessage;
+use crate::Error;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::util::psbt::serialize::Serialize;
 use bitcoin::{Address, Network};
+use bitcoin_hashes::hash160;
+use bitcoin_hashes::hex::FromHex;
+use bitcoin_hashes::hex::ToHex;
+use bitcoin_hashes::Hash;
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
 use once_cell::sync::Lazy;
@@ -77,4 +82,11 @@ pub fn calc_pubkey() -> String {
     let public_key = instance_key.public.clone();
     let public_compressed = public_key.serialize();
     hex::encode(public_compressed)
+}
+
+// calc verify_sig form compressed_pub_key us hash160
+pub fn calc_hash160(str: &str) -> String {
+    let decode: Vec<u8> = FromHex::from_hex(str).expect("Invalid public key");
+    let hash = hash160::Hash::hash(&decode[..]);
+    hash.to_hex()
 }
