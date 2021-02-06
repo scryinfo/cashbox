@@ -8,8 +8,8 @@ pub use sp_core::{
 };
 
 use sp_runtime::{
-    generic::Era,
     MultiSignature,
+    generic::Era,
 };
 use codec::{Encode, Decode, Compact};
 use system::Phase;
