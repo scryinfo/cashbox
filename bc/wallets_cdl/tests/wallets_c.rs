@@ -18,7 +18,7 @@ use wallets_cdl::{
 };
 use wallets_cdl::{to_c_char, to_str, CStruct};
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet};
-use wallets_cdl::wallets_c::Wallets_appPlatformType;
+use wallets_cdl::wallets_c::{Wallets_appPlatformType, Wallets_removeWallet};
 use wallets_cdl::mem_c::CStr_free;
 use std::os::raw::c_char;
 
@@ -154,9 +154,9 @@ fn mnemonic_test() {
         assert_eq!(15, words.len());
     }
 }
+
 #[test]
 fn plat_type_test() {
-
     unsafe {
         let ptr = Wallets_appPlatformType() as *mut c_char;
         assert_ne!(null_mut(), ptr);
@@ -235,6 +235,7 @@ fn wallets_test() {
             }
 
             let c_wallet = CWallet_dAlloc();
+
             let parameters = CreateWalletParameters {
                 name: "test".to_owned(),
                 password: "1".to_string(),
@@ -246,6 +247,7 @@ fn wallets_test() {
             c_parameters.free();
             assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
             CError_free(c_err);
+
             assert_ne!(null_mut(), *c_wallet);
             let w = CWallet::to_rust(&**c_wallet);
             CWallet_dFree(c_wallet);
@@ -255,6 +257,9 @@ fn wallets_test() {
         let temp = find_by_id_test(*c_ctx, &wallet.id);
         assert_eq!(wallet.id, temp.id);
         assert_eq!(wallet.name, temp.name);
+        /*let c_err = Wallets_removeWallet(*c_ctx, to_c_char(&wallet.id), to_c_char("1")) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);*/
 
         CContext_dFree(c_ctx);
     }

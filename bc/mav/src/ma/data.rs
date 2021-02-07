@@ -41,6 +41,8 @@ pub struct TxShared {
     pub block_hash: String,
     #[serde(default)]
     pub block_number: String,
+    #[serde(default)]
+    pub signer: String,
     /// 交易的byte数据，不同链格式不一样
     #[serde(default)]
     pub tx_bytes: String,

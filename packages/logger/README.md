@@ -1,56 +1,57 @@
 # logger
 功能说明： 一个log日志组件。
+1. 支持dart中多处调用时，只有一个实例。
+2. 支持多线程调用，各个线程有一个自己线程的实例。
+3. 支持控制对输出日志级别的筛选。
+4. 日志写入操作，会在一个独立的唯一日志线程里执行。 各处调用时，会排队发送到日志线程，由日志线程来执行。
+5. 会生成两个日志文件。  cashbox.log和cashbox.log.backup两个文件
 
 ## Getting Started
 
-### 部分功能原理说明：
-
-#### log日志文件名生成规则：
-默认文件名cashbox.log，可在实例化对象的时候，传入参数，来自定义文件名
-
-#### log日志的写入和清理规则：
-1. 默认根据文件名，只使用2个日志文件。（假如给的文件名是cashbox.log。则只有cashbox.log和cashbox.log.backup文件）
-2. 默认先写入命名文件，如cashbox.log文件中，此次写入结束时，判断如果当前文件大小超过给定的限制大小。清空另一个文件（此时是清除cashbox.log.backup文件），开始往另一个文件里面写。
-同规则，当此场景下cashbox.log.backup文件也写满时，清空cashbox.log文件，下次开始往cashbox.log里面写入内容。 依次循环清空文件，写入。
-
-### 使用说明：
-1. 在其他package项目的pubspec.yaml配置文件中，在 dependencies下面, 加入logger引用，格式如下所示:
+### 使用说明
+1. 在其他package项目的pubspec.yaml配置文件中，在dependencies下面, 加入logger引用，格式如下所示:
 ```
 dev_dependencies:
   logger:
     path: ../logger
 ```
-2. 在具体文件内使用：
--   生成log文件
-    -   可选参数logFileName---log文件名.      默认值cashbox.log
-
+2. 在具体文件内使用
 初始化示例代码如下：
+-   使用方法1
+    -   param1 ： Tag名称， param2 ： 具体信息
 ```
 import 'package:logger/logger.dart';
 
 Logger logger = new Logger();
-Logger logger = new Logger(logFileName: "123test");
-logger.initConfig();           //***切记执行这行***
 logger.d("tag999", " message999", isSave2File: false);
 logger().d("tag", "message");
 ```
--   initConfig()
-    -   ***必须执行 此方法***
-    -   通过config()方法注册一个唯一的新线程，其他在调用日志输出的方法，都会调用到这个唯一线程来操作。
-    -   通过唯一线程，来支持多线程使用logger实例。
 
--   参数 logFileName
-    -   实例化对象时，通过方法名logFileName，可自定义log的文件名
+-   使用方法2
+```Logger.getInstance().setLogLevel(LogLevel.Debug); ```
 
-使用log
-```
-    logger.e("testTag", "TestMessage"); // param1 ： Tag名称， param2： 具体信息
-    logger.d("testTag1", "TestMessage1");
-    输出内容，能显示在控制台，和在log文件中保存
-```
+-   使用方法3
+```Logger.getInstance().setLogLevel(LogLevel.Debug).d("flutter test demo tag", " d | message------>" + index.toString()); ```
+
+-   方法 setLogLevel(filterLogLevel)
+    -   设置限制log输出的日志级别。如level为info的时候，比info级别低的debug级别，就不会输出出来。即>= filterLogLevel的日志可以输出
+    
 -   参数 isSave2File
     -   调用日志输出时，通过参数isSave2File的值。为true时，可输出到控制台+文件，false只输出到控制台。 默认值：true
 
--   参数 日志等级 d/i/w/e
+-   参数 日志等级 d/i/w/e/f
     -   在flutter中使用时，所有print输出，都会显示在控制台，日志等级是info级别。
     -   此处调用时，加入日志等级，是为了方便在查看日志文件时，根据日志等级来筛选使用的。
+
+### 部分功能原理说明：
+#### log日志文件名生成规则：
+固定生成的日志文件名是cashbox.log
+
+#### log日志的写入和清理规则：
+1. 根据文件名，会使用2个日志文件。（cashbox.log和cashbox.log.backup两个文件）
+2. 写入内容到cashbox.log文件中，本次写入结束时，判断cashbox.log文件大小，是否超过给定的限制大小。
+超过限制大小后，重命名cashbox.log为cashbox.log.backup, 生成新的（或者选取已经存在的）cashbox.log文件，清空cashbox.log文件里的数据，后续继续往cashbox.log里面写入。
+
+### 日志线程说明
+1. 在 多处调用 或 多线程调用 此日志库时，通过registerPortWithName方法，只会生成一个 唯一日志线程 来处理写日志功能。
+2. 通过 懒加载(lazy register)的方式，注册此唯一的日志线程。   即：在调者确认有输出日志需求的时候，才会去注册此唯一日志线程。

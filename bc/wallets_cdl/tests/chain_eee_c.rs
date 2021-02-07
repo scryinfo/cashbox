@@ -336,7 +336,7 @@ pub type TestError = jsonrpc_client::Error<reqwest::Error>;
 
 #[tokio::test]
 async fn eee_tx_explorer_test() {
-    let query_number_interval = 3000;
+    let query_number_interval = 1000;
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
 
@@ -441,7 +441,7 @@ async fn eee_tx_explorer_test() {
                     assert!(runtime_version.is_ok());
 
                     let version = runtime_version.unwrap();
-                    chain_version.tx_version = version.implVersion as i32;
+                    chain_version.tx_version = version.specVersion as i32;
                     chain_version.runtime_version = version.transactionVersion as i32;
 
                     let c_basicinfo = wallets_cdl::mem_c::CSubChainBasicInfo_dAlloc();

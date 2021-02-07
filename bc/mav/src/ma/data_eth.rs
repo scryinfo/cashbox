@@ -50,6 +50,8 @@ impl MEthChainToken {
 pub struct MEthChainTx {
     #[serde(flatten)]
     pub tx_shared: TxShared,
+    #[serde(default)]
+    pub wallet_account: String,
     /// [crate::TxStatus]
     #[serde(default)]
     pub status: String,

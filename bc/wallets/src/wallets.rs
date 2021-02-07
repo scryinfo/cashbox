@@ -1,12 +1,13 @@
 use std::ops::Not;
 use std::sync::atomic::AtomicBool;
+use strum::IntoEnumIterator;
 
 use failure::_core::sync::atomic::Ordering;
 use parking_lot::lock_api::RawReentrantMutex;
 use parking_lot::{RawMutex, RawThreadId};
 
 use eee::Crypto;
-use mav::ma::{BeforeSave, Dao, Db, DbCreateType, MAddress, MMnemonic, MWallet, DbName, MTokenAddress};
+use mav::ma::{BeforeSave, Dao, Db, DbCreateType, MAddress, MMnemonic, MWallet, DbName, MTokenAddress, SettingType, MEeeChainToken, MEthChainToken, MBtcChainToken};
 use mav::{ChainType, NetType, WalletType};
 use scry_crypto::Keccak256;
 use wallets_types::{Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, InitParameters, Load, Setting, Wallet, WalletError, WalletTrait, EthChainTrait, BtcChainTrait, TokenAddress};
@@ -105,12 +106,91 @@ impl Wallets {
         }
         Ok(re)
     }
-    pub async fn remove_by_id(&mut self, wallet_id: &str) -> Result<u64, WalletError> {
+    pub async fn remove_wallet(&self, wallet_id: &str, password: &str) -> Result<(), WalletError> {
         let context = self;
-        let re = Wallet::remove_by_id(context, wallet_id).await?;
-        Ok(re)
+        {
+            // check whether is current_wallet
+            if let Some(m_setting) = Setting::get_setting(context, &SettingType::CurrentWallet).await? {
+                if m_setting.value_str.eq(wallet_id) {
+                    return Err(WalletError::Custom("current wallet cannot be deleted".to_string()));
+                }
+            }
+        }
+        match Wallet::m_wallet_by_id(context, wallet_id).await? {
+            None => Err(WalletError::NoRecord("".to_owned())),
+            Some(m_wallet) => {
+                if let Err(err) = eee::Sr25519::get_mnemonic_context(&m_wallet.mnemonic, &password.as_bytes().to_vec()) {
+                    Err(err.into())
+                } else {
+                    // todo transaction
+                    //password is correct,start delete wallet_id related data
+                    let rb = context.db().wallets_db();
+                    let mut tx = rb.begin_tx_defer(false).await?;
+                    {
+                        //delete m_wallet table record
+                        let _del_count = MWallet::remove_by_id(rb, &tx.tx_id, &wallet_id.to_owned()).await?;
+                    }
+                    {
+                        //delete wallet id related address,
+                        let del_addr_wrapper = rb.new_wrapper().eq(MAddress::wallet_id, &wallet_id);
+                        let _del_count = MAddress::remove_by_wrapper(rb, &tx.tx_id, &del_addr_wrapper).await?;
+                    }
+                    rb.commit(&tx.tx_id).await?;
+                    tx.manager = None;
+                    {
+                        // delete data
+                        for net_type in NetType::iter() {
+                            let data_rb = context.db().data_db(&net_type);
+                            let wrapper = data_rb.new_wrapper()
+                                .eq(MTokenAddress::wallet_id, wallet_id.clone());
+                            let _del_eee_chain = MEeeChainToken::remove_by_wrapper(data_rb, "", &wrapper).await?;
+                            let _del_eth_chain = MEthChainToken::remove_by_wrapper(data_rb, "", &wrapper).await?;
+                            let _del_btc_chain = MBtcChainToken::remove_by_wrapper(data_rb, "", &wrapper).await?;
+                            let _del_count = MTokenAddress::remove_by_wrapper(data_rb, "", &wrapper).await?;
+                        }
+                    }
+                    Ok(())
+                }
+            }
+        }
+    }
+    pub async fn reset_wallet_password(&self, wallet_id: &str, old_password: &str, new_password: &str) -> Result<(), WalletError> {
+        // let context = self;
+        match Wallet::m_wallet_by_id(self, wallet_id).await? {
+            None => Err(WalletError::NoRecord(wallet_id.to_owned())),
+            Some(mut m_wallet) => {
+                match eee::Sr25519::get_mnemonic_context(&m_wallet.mnemonic, old_password.as_bytes()) {
+                    Ok(mn_data) => {
+                        let encrypt_str = eee::Sr25519::encrypt_mnemonic(mn_data.as_slice(), new_password.as_bytes());
+                        m_wallet.mnemonic = encrypt_str;
+                        let rb = self.db().wallets_db();
+                        m_wallet.save_update(rb, "").await?;
+                        Ok(())
+                    }
+                    Err(err) => {
+                        Err(err.into())
+                    }
+                }
+            }
+        }
     }
 
+    pub async fn export_wallet(&self, wallet_id: &str, password: &str) -> Result<String, WalletError> {
+        // let context = self;
+        match Wallet::m_wallet_by_id(self, wallet_id).await? {
+            None => Err(WalletError::NoRecord(wallet_id.to_owned())),
+            Some( m_wallet) => {
+                match eee::Sr25519::get_mnemonic_context(&m_wallet.mnemonic, password.as_bytes()) {
+                    Ok(mn_data) => {
+                        Ok(String::from_utf8(mn_data)?)
+                    }
+                    Err(err) => {
+                        Err(err.into())
+                    }
+                }
+            }
+        }
+    }
     pub async fn rename_wallet(&mut self, name: &str, wallet_id: &str, tx_id: &str) -> Result<u64, WalletError> {
         let context = self;
         match Wallet::m_wallet_by_id(context, wallet_id).await? {
@@ -246,14 +326,14 @@ impl Wallets {
             target_address.status = 0;
             target_address.save_update(data_rb, "").await?;
             Ok(())
-        }else {
-            let msg = format!("wallet {} will hide token {} not exist!",token_address.wallet_id,token_address.token_id);
+        } else {
+            let msg = format!("wallet {} will hide token {} not exist!", token_address.wallet_id, token_address.token_id);
             Err(WalletError::Fail(msg))
         }
     }
     pub async fn update_current_database_version(&self, database_version: &str) -> Result<(), WalletError> {
         let context = self;
-        let _re = Setting::save_current_database_version(context,  database_version).await?;
+        let _re = Setting::save_current_database_version(context, database_version).await?;
         Ok(())
     }
 }
