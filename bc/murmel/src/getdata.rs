@@ -14,14 +14,12 @@ use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hex::ToHex;
 
 use crate::constructor::CondvarPair;
-use crate::db::{RB_CHAIN, RB_DETAIL};
+use crate::db::{RB_CHAIN, RB_DETAIL, VERIFY};
 use log::{error, info, trace};
 use std::ops::Deref;
 use std::sync::{mpsc, Arc};
 use std::thread;
 use std::time::Duration;
-
-const PUBLIC_KEY: &str = "0291ee52a0e0c22db9772f237f4271ea6f9330d92b242fb3c621928774c560b699";
 
 pub struct GetData<T> {
     //send a message
@@ -186,7 +184,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                 iter.next();
                 iter.next();
                 let current_hash = iter.next().unwrap_or(" ");
-                if current_hash.eq(hash160.as_str()) {
+                if current_hash.eq(&*VERIFY.1) {
                     RB_DETAIL.save_txout(
                         tx_hash.to_hex(),
                         asm.clone(),
@@ -210,7 +208,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
             iter.next();
             iter.next();
             let iter3 = iter.next().unwrap_or(" ");
-            if iter3.eq(PUBLIC_KEY) {
+            if iter3.eq(&*VERIFY.1) {
                 RB_DETAIL.save_txin(
                     tx_hash.to_hex(),
                     sig_script.clone(),

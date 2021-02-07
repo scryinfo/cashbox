@@ -20,9 +20,9 @@ use config::Config;
 use log::info;
 use log::Level;
 use mav::ma::MUserAddress;
+use murmel::api::{calc_default_address, calc_hash160, calc_pubkey};
 use murmel::constructor::Constructor;
-use murmel::db::RB_DETAIL;
-use murmel::api::{calc_default_address, calc_pubkey};
+use murmel::db::{RB_DETAIL, VERIFY};
 use murmel::path::BTC_HAMMER_PATH;
 use simple_logger;
 use std::collections::HashMap;
@@ -105,32 +105,10 @@ pub fn main() {
         Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap()
     };
 
-    // todo
     // use mnemonic generate publc address and store it in database
-    let mut filter_message: Option<FilterLoadMessage> = None;
-    let mut muser_address: Option<MUserAddress> = None;
-    {
-        muser_address = RB_DETAIL.fetch_user_address();
-    }
+    let (ref filter, _) = *VERIFY;
 
-    if let Some(k) = muser_address {
-        info!("User Address {:?}", &k);
-        let filter_load_message =
-            FilterLoadMessage::calculate_filter(k.compressed_pub_key.as_str());
-        filter_message = Some(filter_load_message)
-    } else {
-        info!("Did not have pubkey in database yet, calc default address and pubkey");
-        let default_address = calc_default_address();
-        let address = default_address.to_string();
-        let default_pubkey = calc_pubkey();
-        {
-            RB_DETAIL.save_user_address(address, default_pubkey.clone());
-        }
-        let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
-        filter_message = Some(filter_load_message)
-    }
-
-    let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
+    let mut spv = Constructor::new(network, listen, chaindb, filter.to_owned()).unwrap();
     spv.run(network, peers, connections)
         .expect("can not start node");
 }

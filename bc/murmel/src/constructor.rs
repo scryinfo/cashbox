@@ -131,7 +131,6 @@ impl Constructor {
         ));
         let pair2 = Arc::clone(&pair);
         let pair3 = Arc::clone(&pair);
-        let pair4 = Arc::clone(&pair);
 
         dispatcher.add_listener(HeaderDownload::new(
             chaindb.clone(),
