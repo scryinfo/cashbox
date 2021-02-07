@@ -107,6 +107,8 @@ pub struct MUserAddress {
     pub address: String,
     #[serde(default)]
     pub compressed_pub_key: String,
+    #[serde(default)]
+    pub verify: String,
 }
 
 impl MUserAddress {

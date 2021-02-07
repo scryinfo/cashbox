@@ -21,9 +21,9 @@ use jni::JNIEnv;
 use log::info;
 use log::Level;
 
-use crate::path::BTC_HAMMER_PATH;
 use crate::db::fetch_scanned_height;
-use crate::db::{RB_CHAIN, RB_DETAIL};
+use crate::db::{RB_CHAIN, VERIFY};
+use crate::path::BTC_HAMMER_PATH;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
@@ -256,28 +256,8 @@ pub extern "system" fn Java_JniApi_btcStart(
         .as_secs();
     let chaindb = Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap();
 
-    // todo
     // use mnemonic generate publc address and store it in database
-    let mut filter_message: Option<FilterLoadMessage> = None;
-    {
-        let m_address = RB_DETAIL.fetch_user_address();
-        if let Some(m_address) = m_address {
-            info!("Calc bloomfilter via pubkey {:?}", &m_address);
-            let filter_load_message =
-                FilterLoadMessage::calculate_filter(m_address.compressed_pub_key.as_str());
-            filter_message = Some(filter_load_message)
-        } else {
-            info!("Did not have default pubkey in database yet");
-            let default_address = calc_default_address();
-            let address = default_address.to_string();
-            let default_pubkey = calc_pubkey();
-            RB_DETAIL.save_user_address(address, default_pubkey.clone());
-            let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
-            filter_message = Some(filter_load_message)
-        }
-    }
-
-    let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
+    let mut spv = Constructor::new(network, listen, chaindb, VERIFY.0.to_owned()).unwrap();
     spv.run(network, peers, connections)
         .expect("can not start node");
 }

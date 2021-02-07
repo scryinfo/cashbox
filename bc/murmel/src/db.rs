@@ -3,10 +3,12 @@
 //!     1. for btc chain database
 //!     2. for user data (utxo address ...)
 //!
+use crate::api::{calc_default_address, calc_hash160, calc_pubkey};
 use crate::path::{BTC_CHAIN_PATH, BTC_DETAIL_PATH};
 use async_trait::async_trait;
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
@@ -320,10 +322,11 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_user_address(&self, address: String, compressed_pub_key: String) {
+    pub fn save_user_address(&self, address: String, compressed_pub_key: String, verify: String) {
         let mut user_address = MUserAddress::default();
         user_address.address = address;
         user_address.compressed_pub_key = compressed_pub_key;
+        user_address.verify = verify;
         let r = block_on(user_address.save(&self.rb, ""));
         match r {
             Ok(a) => {
@@ -406,6 +409,30 @@ pub static RB_CHAIN: Lazy<ChainSqlite> =
 pub static RB_DETAIL: Lazy<DetailSqlite> =
     Lazy::new(|| DetailSqlite::new(Network::Testnet, BTC_DETAIL_PATH));
 
+pub static VERIFY: Lazy<(Option<FilterLoadMessage>, String)> = Lazy::new(|| {
+    let user_address = RB_DETAIL.fetch_user_address();
+    match user_address {
+        None => {
+            info!("Did not have pubkey in database yet, calc default address and pubkey");
+            let default_address = calc_default_address();
+            let address = default_address.to_string();
+            let default_pubkey = calc_pubkey();
+            let verify = calc_hash160(default_pubkey.as_str());
+            {
+                RB_DETAIL.save_user_address(address, default_pubkey.clone(), verify.clone());
+            }
+            let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
+            (Some(filter_load_message), verify)
+        }
+        Some(u) => {
+            info!("User Address {:?}", &u);
+            let filter_load_message =
+                FilterLoadMessage::calculate_filter(u.compressed_pub_key.as_str());
+            (Some(filter_load_message), u.verify)
+        }
+    }
+});
+
 #[cfg(test)]
 mod test {
     use crate::db::{RB_CHAIN, RB_DETAIL};
@@ -455,4 +482,5 @@ mod test {
         let u = RB_DETAIL.fetch_user_address();
         println!("{:?}", &u);
     }
+
 }
