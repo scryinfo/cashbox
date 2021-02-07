@@ -4,87 +4,119 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:path_provider/path_provider.dart';
 
-enum Level {
+enum LogLevel {
   Debug,
   Info,
   Warn,
   Error,
+  Fatal,
+}
+
+extension LogLevelEx on LogLevel {
+  static int getLevelValue(LogLevel curLevel) {
+    switch (curLevel) {
+      case LogLevel.Debug:
+        return 0;
+        break;
+      case LogLevel.Info:
+        return 1;
+        break;
+      case LogLevel.Warn:
+        return 2;
+        break;
+      case LogLevel.Error:
+        return 3;
+        break;
+      case LogLevel.Fatal:
+        return 4;
+        break;
+      default:
+        return 0;
+    }
+  }
 }
 
 class InfoModel {
-  String fileName;
   String message;
-  SendPort sendPort;
-  bool isSaveToFile;
 }
 
 class Logger {
-  static String _logFileName = "cashbox.log";
+  static final String _logFileName = "cashbox.log";
+  static LogLevel _filterLevel = LogLevel.Debug;
   final String _logThreadName = "LogThread";
-  final int _fileSizeLimit = 30 * 1024 * 1024;
+  final int _fileSizeLimit = 30 * 1024 * 1024; // 30 * 1024 * 1024  bytes = 30M
+  bool _isLogThreadStarted = false; // is already start log thread
   SendPort _sendPort;
 
-  factory Logger({String logFileName = "cashbox.log"}) => _getInstance(logFileName);
+  factory Logger() => _getInstance();
 
   static Logger _instance;
 
-  Logger._internal(logFileName) {
+  Logger._internal() {
     //init data
   }
 
-  initConfig() async {
+  static Logger getInstance() {
+    return _getInstance();
+  }
+
+  static Logger _getInstance() {
+    if (_instance == null) {
+      _instance = Logger._internal();
+    }
+    return _instance;
+  }
+
+  // return Logger in order to chain style call
+  // eg: Logger.setLogLevel(LogLevel.Error).d("tag","msg")
+  Logger setLogLevel(LogLevel filterLevel) {
+    _filterLevel = filterLevel;
+    return this;
+  }
+
+  LogLevel getLogLevel() {
+    return _filterLevel;
+  }
+
+  _registerAndListeningLogThread() async {
     final rPort = ReceivePort();
-    IsolateNameServer.registerPortWithName(rPort.sendPort, _logThreadName);
+    bool onceRegister = IsolateNameServer.registerPortWithName(rPort.sendPort, _logThreadName);
+    if (onceRegister) {
+      _isLogThreadStarted = true;
+    }
     rPort.listen((message) async {
       if (!(message is InfoModel)) {
         return;
       }
-      print(message.message); // show it on console terminal
-      if (!message.isSaveToFile) {
-        return;
-      }
       try {
-        File mainLogFile = await _logFile(message.fileName);
+        File mainLogFile = await _logFile(_logFileName);
         if (mainLogFile == null) {
           return;
         }
-        File backupLogFile = await _logFile(message.fileName + ".backup");
+        File backupLogFile = await _logFile(_logFileName + ".backup");
         if (backupLogFile == null) {
           return;
         }
-        int mainLogFileLength = await mainLogFile.length();
-        int backupLogFileLength = await backupLogFile.length();
-        if (mainLogFileLength < _fileSizeLimit) {
-          await mainLogFile.writeAsStringSync(message.message, flush: true, mode: FileMode.append);
-          if (mainLogFileLength >= _fileSizeLimit) {
-            await backupLogFile.writeAsString(""); // clear the file
-          }
-        } else if (backupLogFileLength < _fileSizeLimit) {
-          await backupLogFile.writeAsStringSync(message.message, flush: true, mode: FileMode.append);
-          if (backupLogFileLength >= _fileSizeLimit) {
-            await mainLogFile.writeAsString(""); // clear the file
-          }
+        if (mainLogFile.lengthSync() > _fileSizeLimit) {
+          // file name exchange with a temporary fileName.   such as: t=a,a=b,b=a;
+          File tempFile = mainLogFile.renameSync(mainLogFile.path + ".backup.temp");
+          mainLogFile = backupLogFile.renameSync(mainLogFile.path);
+          mainLogFile.writeAsStringSync(""); // clear the file
+          backupLogFile = tempFile.renameSync(mainLogFile.path + ".backup");
         }
+        mainLogFile.writeAsStringSync(message.message, flush: true, mode: FileMode.append);
       } catch (e) {
         print("printOut error is --->" + e.toString());
       }
     });
   }
 
-  static Logger _getInstance(String logFileName) {
-    if (_instance == null || logFileName != _logFileName) {
-      _logFileName = logFileName;
-      _instance = Logger._internal(_logFileName);
-    }
-    return _instance;
-  }
-
   Future<File> _logFile(String fileName) async {
     Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
     String filePath = directory.path + "/" + fileName;
     try {
-      if (!await File(filePath).exists()) {
-        File(filePath).create();
+      if (!File(filePath).existsSync()) {
+        File(filePath).createSync();
       }
       return File(filePath);
     } catch (e) {
@@ -93,31 +125,62 @@ class Logger {
     }
   }
 
+  _isMatchOutputLevel(LogLevel logLevel) {
+    if (LogLevelEx.getLevelValue(logLevel) >= LogLevelEx.getLevelValue(_filterLevel)) {
+      return true;
+    }
+    return false;
+  }
+
   void d(String tag, String message, {bool isSave2File = true}) async {
-    var recordInfo = Level.Debug.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n";
-    sendToLogThread(recordInfo, isSave2File);
+    var recordInfo = LogLevel.Debug.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n";
+    print(recordInfo);
+    if (_isMatchOutputLevel(LogLevel.Debug) && isSave2File) {
+      sendToLogThread(recordInfo);
+    }
   }
 
   void i(String tag, String message, {bool isSave2File = true}) {
-    var recordInfo = Level.Info.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n";
-    sendToLogThread(recordInfo, isSave2File);
+    var recordInfo = LogLevel.Info.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n";
+    print(recordInfo);
+    if (_isMatchOutputLevel(LogLevel.Info) && isSave2File) {
+      sendToLogThread(recordInfo);
+    }
   }
 
   void w(String tag, String message, {bool isSave2File = true}) {
-    var recordInfo = Level.Warn.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n";
-    sendToLogThread(recordInfo, isSave2File);
+    var recordInfo = LogLevel.Warn.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n";
+    print(recordInfo);
+    if (_isMatchOutputLevel(LogLevel.Warn) && isSave2File) {
+      sendToLogThread(recordInfo);
+    }
   }
 
   void e(String tag, String message, {bool isSave2File = true}) {
-    var recordInfo = Level.Error.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n";
-    sendToLogThread(recordInfo, isSave2File);
+    var recordInfo = LogLevel.Error.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n";
+    print(recordInfo); // show it on console terminal
+    if (_isMatchOutputLevel(LogLevel.Error) && isSave2File) {
+      sendToLogThread(recordInfo);
+    }
   }
 
-  void sendToLogThread(String recordInfo, bool isSave2File) {
-    _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);
-    _sendPort?.send(InfoModel()
-      ..message = recordInfo
-      ..isSaveToFile = isSave2File
-      ..fileName = _logFileName);
+  void f(String tag, String message, {bool isSave2File = true}) {
+    var recordInfo = LogLevel.Fatal.toString() + "|" + DateTime.now().toString() + "|" + tag + ":" + message + "\n";
+    print(recordInfo); // show it on console terminal
+    if (_isMatchOutputLevel(LogLevel.Fatal) && isSave2File) {
+      sendToLogThread(recordInfo);
+    }
+  }
+
+  void sendToLogThread(String recordInfo) {
+    if (!_isLogThreadStarted) {
+      // case:  need save recordInfo to file and not yet register the log thread,
+      //        here do register and listen the log thread
+      _registerAndListeningLogThread();
+    }
+    if (_sendPort == null) {
+      _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);
+    }
+    _sendPort?.send(InfoModel()..message = recordInfo);
   }
 }
