@@ -13,7 +13,7 @@
 [package]
 edition = "2018"
 name = "frame-metadata"
-version = "12.0.0"
+version = "12.0.1"
 authors = ["Parity Technologies <admin@parity.io>"]
 description = "Decodable variant of the RuntimeMetadata."
 homepage = "https://substrate.dev"

@@ -28,5 +28,5 @@ hex="0.4.2"
 vcpkg = "*"
 
 [patch.crates-io]
-frame-metadata = { path = "../../../frame-metadata-12.0.0" }
+frame-metadata = { path = "../../bc/frame-metadata-12.0.0" }
 

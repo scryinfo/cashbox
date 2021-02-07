@@ -252,17 +252,29 @@ public class NativeLibTest {
     }
 
     @Test
+    public void eventQueryTest() throws Throwable{
+        String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
+        String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+        String blockHash = "0xb6199c38b2ae20be3ed34e0d64cf2609589bbe783d8c13d5acc789e863e4fedd";
+        Map header = new HashMap<String, String>();
+        header.put("Content-Type", "application/json");
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://127.0.0.1:9933"), header);
+        String eventDetail = client.invoke("state_getStorage", new Object[]{eventKeyPrefix, blockHash}, String.class);
+        System.out.println(eventDetail);
+    }
+
+    @Test
     public void storageQueryTest() throws Throwable {
         Map header = new HashMap<String, String>();
         //Notification Event Coding Constant
         String eventKeyPrefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
         //Need to query the target account of the transaction
         //  String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
-        String account_1 = "5DxskoXeEEyTg3pqQVfkku43VcumqL3rfkQKAgvHmEh4c6tX";
+        String account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
         String account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
 
         header.put("Content-Type", "application/json");
-        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://192.168.1.7:9937"), header);
+        JsonRpcHttpClient client = new JsonRpcHttpClient(new URL("http://127.0.0.1:9933"), header);
 
         Header current_header = client.invoke("chain_getHeader", new Object[]{}, Header.class);
         //Get the current block number
@@ -279,7 +291,7 @@ public class NativeLibTest {
         ////NativeLib.Message key2 = NativeLib.eeeStorageKey("System","Account","0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d");
          System.out.println("key1:"+key1.storageKeyInfo+",key2:"+key2.storageKeyInfo);
         //Query block interval
-        int queryNumberInterval = 3000;
+        int queryNumberInterval = 2000;
         //The number of queries currently required, rounded up
         int query_times = (number - startBlockNumber) / queryNumberInterval + 1;
 

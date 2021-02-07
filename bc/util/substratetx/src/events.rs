@@ -228,7 +228,21 @@ impl EventsDecoder {
                 );
 
                 let mut event_data = Vec::<u8>::new();
-                self.decode_raw_bytes(&event_metadata.arguments(), input, &mut event_data)?;
+                if let Err(e) = self.decode_raw_bytes(&event_metadata.arguments(), input, &mut event_data){
+                    match e {
+                        EventsError::TypeSizeUnavailable(name)=>{
+                            // result 0 correct, 1  error
+                            if 1==input.read_byte()?{
+                                let mut err_detail = [0u8;2];
+                                let _ = Input::read(input,&mut err_detail[..]);
+                            }
+                            log::debug!("received event has type {} current not support decode", name);
+                        }
+                        _ =>{
+                            return Err(e.into());
+                        }
+                    }
+                }
 
                 log::debug!(
                     "received event '{}::{}', raw bytes: {}",
