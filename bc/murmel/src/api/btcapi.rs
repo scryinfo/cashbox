@@ -257,8 +257,7 @@ pub extern "system" fn Java_JniApi_btcStart(
     let chaindb = Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap();
 
     // use mnemonic generate publc address and store it in database
-    let (ref filter, ..) = *VERIFY;
-    let mut spv = Constructor::new(network, listen, chaindb, filter.to_owned()).unwrap();
+    let mut spv = Constructor::new(network, listen, chaindb, VERIFY.0.to_owned()).unwrap();
     spv.run(network, peers, connections)
         .expect("can not start node");
 }

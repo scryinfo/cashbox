@@ -106,9 +106,7 @@ pub fn main() {
     };
 
     // use mnemonic generate publc address and store it in database
-    let (ref filter, _) = *VERIFY;
-
-    let mut spv = Constructor::new(network, listen, chaindb, filter.to_owned()).unwrap();
+    let mut spv = Constructor::new(network, listen, chaindb, VERIFY.0.to_owned()).unwrap();
     spv.run(network, peers, connections)
         .expect("can not start node");
 }

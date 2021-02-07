@@ -411,7 +411,6 @@ pub static RB_DETAIL: Lazy<DetailSqlite> =
 
 pub static VERIFY: Lazy<(Option<FilterLoadMessage>, String)> = Lazy::new(|| {
     let user_address = RB_DETAIL.fetch_user_address();
-
     match user_address {
         None => {
             info!("Did not have pubkey in database yet, calc default address and pubkey");
@@ -483,4 +482,5 @@ mod test {
         let u = RB_DETAIL.fetch_user_address();
         println!("{:?}", &u);
     }
+
 }
