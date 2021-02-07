@@ -1,10 +1,13 @@
 # logger
 功能说明： 一个log日志组件。
-1. 支持dart中多处调用时，只有一个实例。
-2. 支持多线程调用，各个线程有一个自己线程的实例。
-3. 支持控制对输出日志级别的筛选。
-4. 日志写入操作，会在一个独立的唯一日志线程里执行。 各处调用时，会排队发送到日志线程，由日志线程来执行。
-5. 会生成两个日志文件。  cashbox.log和cashbox.log.backup两个文件
+1. 日志信息可打印到控制台（用于开发调试）。
+2. 日志信息可保存在文件里面（信息收集，可供用户反馈信息）。
+3. 支持单线程中，多处调用时，只有一个实例。
+4. 支持多线程调用时，一个线程中只有一个logger实例。
+5. 唯一日志线程：写日志的动作，全部由唯一的日志线程来操作。 各处logger调用时，都会排队写入到日志线程，由日志线程来执行具体的写入操作。
+6. 会生成两个日志文件。 cashbox.log和cashbox.log.backup文件。 最新的内容写入到cashbox.log里面，每次写完后判断文件大小超过30M后，交换cashbox.log和cashbox.log.backup文件名，清空cashbox.log内容，继续往cashbox.log里面写入内容。
+7. 可控制是否输出日志内容到日志文件。 同时实现，懒注册(lazy register)日志线程功能，只有在判断确实需要写日志文件时，才会注册开启唯一日志线程。
+8. 可设置日志级别，来控制日志输出内容。 如：设置info级别时，不会输出debug级别。
 
 ## Getting Started
 
@@ -28,9 +31,11 @@ logger().d("tag", "message");
 ```
 
 -   使用方法2
+
 ```Logger.getInstance().setLogLevel(LogLevel.Debug); ```
 
 -   使用方法3
+
 ```Logger.getInstance().setLogLevel(LogLevel.Debug).d("flutter test demo tag", " d | message------>" + index.toString()); ```
 
 -   方法 setLogLevel(filterLogLevel)
