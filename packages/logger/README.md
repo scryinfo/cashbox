@@ -27,7 +27,7 @@ import 'package:logger/logger.dart';
 
 Logger logger = new Logger();
 logger.d("tag999", " message999", isSave2File: false);
-logger().d("tag", "message");
+logger.d("tag", "message");
 ```
 
 -   使用方法2
@@ -36,13 +36,15 @@ logger().d("tag", "message");
 
 -   使用方法3
 
-```Logger.getInstance().setLogLevel(LogLevel.Debug).d("flutter test demo tag", " d | message------>" + index.toString()); ```
+```Logger.getInstance().setLogLevel(LogLevel.Debug).d("test  tag", " test message" ); ```
 
 -   方法 setLogLevel(filterLogLevel)
     -   设置限制log输出的日志级别。如level为info的时候，比info级别低的debug级别，就不会输出出来。即>= filterLogLevel的日志可以输出
     
 -   参数 isSave2File
     -   调用日志输出时，通过参数isSave2File的值。为true时，可输出到控制台+文件，false只输出到控制台。 默认值：true
+
+**备注：日志内容是否最终输出到文件，决定于是否filterLogLevel和isSave2File两个参数都符合条件**
 
 -   参数 日志等级 d/i/w/e/f
     -   在flutter中使用时，所有print输出，都会显示在控制台，日志等级是info级别。
@@ -54,9 +56,9 @@ logger().d("tag", "message");
 
 #### log日志的写入和清理规则：
 1. 根据文件名，会使用2个日志文件。（cashbox.log和cashbox.log.backup两个文件）
-2. 写入内容到cashbox.log文件中，本次写入结束时，判断cashbox.log文件大小，是否超过给定的限制大小。
+2. 日志内容写入到cashbox.log文件中，本次写入结束时，判断cashbox.log文件的大小，是否超过给定的限制大小。
 超过限制大小后，重命名cashbox.log为cashbox.log.backup, 生成新的（或者选取已经存在的）cashbox.log文件，清空cashbox.log文件里的数据，后续继续往cashbox.log里面写入。
 
 ### 日志线程说明
-1. 在 多处调用 或 多线程调用 此日志库时，通过registerPortWithName方法，只会生成一个 唯一日志线程 来处理写日志功能。
-2. 通过 懒加载(lazy register)的方式，注册此唯一的日志线程。   即：在调者确认有输出日志需求的时候，才会去注册此唯一日志线程。
+1. 在**多处调用**或**多线程调用** 此日志库时，通过registerPortWithName方法，只会生成一个**唯一日志线程**来处理写日志功能。
+2. 通过 懒加载(lazy register)的方式，注册此唯一的日志线程。   即：在确认是有符合输出日志条件(logLevel和isSave2File)的时候，才会去注册此唯一日志线程。
