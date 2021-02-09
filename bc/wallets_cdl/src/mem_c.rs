@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use crate::kits::{d_ptr_alloc, d_ptr_free, CArray, CBool, CStruct};
-use crate::parameters::{CAccountInfo, CContext, CDbName, CExtrinsicContext};
+use crate::parameters::{CAccountInfo, CContext, CDbName, CExtrinsicContext, CEeeChainTx};
 
 use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet,
                    CEthChainTokenDefault, CTokenAddress, CEthChainTokenAuth, CEeeChainTokenAuth, CBtcChainTokenAuth,
@@ -242,6 +242,17 @@ pub extern "C" fn CArrayCBtcChainTokenAuth_dAlloc() -> *mut *mut CArray<CBtcChai
 
 #[no_mangle]
 pub unsafe extern "C" fn CArrayCBtcChainTokenAuth_dFree(dPtr: *mut *mut CArray<CBtcChainTokenAuth>) {
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr);
+}
+
+#[no_mangle]
+pub extern "C" fn CArrayCEeeChainTx_dAlloc() -> *mut *mut CArray<CEeeChainTx> {
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CArrayCEeeChainTx_dFree(dPtr: *mut *mut CArray<CEeeChainTx>) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
 }

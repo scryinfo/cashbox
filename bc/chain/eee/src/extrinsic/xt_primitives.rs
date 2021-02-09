@@ -47,7 +47,6 @@ where
     Call: Encode,
 {
     pub fn from_raw(call: Call, extra: GenericExtra, additional_signed: AdditionalSigned) -> Self {
-        println!("UncheckedExtrinsicV4 from_raw len is:{},",sp_std::mem::size_of::<Self>());
         Self((call, extra, additional_signed))
     }
 
@@ -56,7 +55,6 @@ where
     /// Payloads longer than 256 bytes are going to be `blake2_256`-hashed.
     pub fn using_encoded<R, F: FnOnce(&[u8]) -> R>(&self, f: F) -> R {
         self.0.using_encoded(|payload| {
-            println!("payload:{:?}",payload);
             if payload.len() > 256 {
                 let hash = blake2_256(payload);
                 f(&hash[..])

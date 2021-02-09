@@ -1,12 +1,11 @@
 use std::ptr::null_mut;
 use mav::kits;
 use mav::ma::BtcTokenType;
-use wallets_types::{InitParameters, Error, TokenShared, BtcChainTokenDefault};
-use wallets_cdl::{CU64, to_c_char, CR, CStruct, CArray,types::CError, wallets_c::Wallets_init, chain_btc_c,
+use wallets_types::{InitParameters, Error, BtcChainTokenDefault};
+use wallets_cdl::{CU64, CR, CStruct, CArray,types::CError, wallets_c::Wallets_init, chain_btc_c,
                   parameters::{CContext, CInitParameters,},
-                  mem_c::{CContext_dAlloc, CError_free,CArrayCContext_dFree},
+                  mem_c::{CContext_dAlloc, CError_free},
 };
-
 
 #[test]
 fn btc_update_default_token_list_test() {

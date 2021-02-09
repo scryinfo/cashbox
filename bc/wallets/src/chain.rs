@@ -428,18 +428,18 @@ impl EeeChainTrait for EeeChain {
         let chain_token = {
             let token_wrapper = wallet_db.new_wrapper()
                 .eq(&MEeeChainToken::wallet_id, &address.wallet_id.to_owned());
-            MEeeChainToken::fetch_by_wrapper(wallet_db, "", &token_wrapper).await?
+            MEeeChainToken::fetch_by_wrapper(data_rb, "", &token_wrapper).await?
         };
 
         if chain_token.is_none() {
             return Err(WalletError::Custom(format!("wallet {} is not exist!", &address.wallet_id)));
         }
         let chain_token_shared_id = chain_token.unwrap().chain_token_shared_id;
-        let m_wallet = MEeeChainTokenShared::fetch_by_id(wallet_db, "", &chain_token_shared_id).await?;
-        if m_wallet.is_none() {
+        let token_shared = MEeeChainTokenShared::fetch_by_id(wallet_db, "", &chain_token_shared_id).await?;
+        if token_shared.is_none() {
             return Err(WalletError::Custom(format!("eee chain token shared id {} is not exist!", &address.wallet_id)));
         }
-        let decimal = m_wallet.unwrap().decimal;
+        let decimal = token_shared.unwrap().decimal;
         let m_wallet = MWallet::fetch_by_id(wallet_db, "", &address.wallet_id.to_owned()).await?;
         if m_wallet.is_none() {
             return Err(WalletError::Custom(format!("wallet {} is not exist!", &address.wallet_id)));
@@ -465,7 +465,7 @@ impl EeeChainTrait for EeeChain {
         {
             let chain_helper = eee::SubChainHelper::init(
                 &chain_info.metadata,
-                &chain_info.genesis_hash.as_bytes(),
+                &scry_crypto::hexstr_to_vec(&chain_info.genesis_hash)?,
                 chain_info.runtime_version as u32,
                 chain_info.tx_version as u32,
                 None,

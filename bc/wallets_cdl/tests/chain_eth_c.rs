@@ -10,7 +10,9 @@ use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
 };
 
 use mav::ma::{EthTokenType};
-use wallets_cdl::mem_c::{CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenAuth_dFree, CArrayCEthChainTokenDefault_dFree};
+use wallets_cdl::mem_c::{CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenDefault_dFree};
+
+mod data;
 
 #[test]
 fn eth_tx_sign_test() {
@@ -20,9 +22,10 @@ fn eth_tx_sign_test() {
         let c_err = init_parameters(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let wallet =   data::create_wallet(c_ctx);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let transfer_tx = EthTransferPayload {
-            from_address: "0xfc7c721f7ca42c5b9b7485d8efffc453d725499e".to_string(),
+            from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
             to_address: "0x00a329c0648769a73afac7f9381e08fb43dbea72".to_string(),
             contract_address: "".to_string(),
             value: "3".to_string(),
@@ -51,10 +54,12 @@ fn eth_raw_tx_sign_test() {
         let c_err = init_parameters(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let wallet =   data::create_wallet(c_ctx);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
+
         let raw_tx_payload = EthRawTxPayload {
-            from_address: "0xfc7c721f7ca42c5b9b7485d8efffc453d725499e".to_string(),
-            raw_tx: "".to_string(),
+            from_address:  wallet.eth_chain.chain_shared.wallet_address.address.clone(),
+            raw_tx: "0xf86d068504a817c800837a1200941c9baedc94600b2d1c8a6d2bad1744e6182f300e880de0b6b3a76400008046a07e2c71664464b95fab4b1706785c244d86cef96b5e5c186a314c63306cfe9c54a0637c605b6004bb244cbea9bc69e18b7bd18b491c3794e17e31a0c932592bb476".to_string(),
         };
         let mut c_raw_tx_payload = CEthRawTxPayload::to_c_ptr(&raw_tx_payload);
         let c_err = chain_eth_c::ChainEth_rawTxSign(*c_ctx, to_c_char("Private"), c_raw_tx_payload, to_c_char("1"), sign_result) as *mut CError;

@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate serde_derive;
 
-use wallets_types::{Error, InitParameters, SubChainBasicInfo, ChainVersion, AccountInfoSyncProg, StorageKeyParameters, DecodeAccountInfoParameters, EeeChainTokenDefault, CreateWalletParameters, Wallet, ExtrinsicContext, EeeChainTokenAuth};
+use wallets_types::{Error, InitParameters, SubChainBasicInfo, ChainVersion, AccountInfoSyncProg, StorageKeyParameters, DecodeAccountInfoParameters, EeeChainTokenDefault, CreateWalletParameters, Wallet, ExtrinsicContext, EeeChainTokenAuth, EeeChainTx};
 use wallets_cdl::{CStruct, to_c_char, CR, CU64, CArray, chain_eee_c, to_str,
                   wallets_c::Wallets_init,
                   mem_c::{CError_free, CContext_dAlloc},
@@ -12,17 +12,18 @@ use mav::ma::{MSubChainBasicInfo, MAccountInfoSyncProg, EeeTokenType};
 use mav::{kits, WalletType};
 use std::ptr::null_mut;
 use wallets_cdl::types::{CAccountInfoSyncProg, CWallet};
-use wallets_cdl::mem_c::{CStr_dAlloc, CStr_dFree, CWallet_dAlloc, CWallet_dFree, CArrayCEeeChainTokenAuth_dAlloc, CArrayCEeeChainTokenAuth_dFree, CArrayCEeeChainTokenDefault_dAlloc, CArrayCEeeChainTokenDefault_dFree};
+use wallets_cdl::mem_c::{CStr_dAlloc, CStr_dFree, CWallet_dAlloc, CWallet_dFree, CArrayCEeeChainTokenAuth_dAlloc, CArrayCEeeChainTokenAuth_dFree, CArrayCEeeChainTokenDefault_dAlloc, CArrayCEeeChainTokenDefault_dFree, CArrayCEeeChainTx_dAlloc, CArrayCEeeChainTx_dFree};
 use wallets_cdl::wallets_c::{Wallets_generateMnemonic, Wallets_createWallet};
 
-const TX_VERSION: u32 = 1;
-const RUNTIME_VERSION: u32 = 6;
-
-const GENESIS_HASH: &'static str = "0x6cec71473c1b8d2295541cb5c21edc4fdb1926375413bb28f78793978229cf48";//0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973
 
 mod data;
 
 use crate::data::node_rpc::{Node, Header, StorageChange, NodeVersion, Block};
+pub type TestError = jsonrpc_client::Error<reqwest::Error>;
+
+const TX_VERSION: u32 = 1;
+const RUNTIME_VERSION: u32 = 6;
+const GENESIS_HASH: &'static str = "0x6cec71473c1b8d2295541cb5c21edc4fdb1926375413bb28f78793978229cf48";//0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973
 
 #[test]
 fn eee_basic_info_test() {
@@ -51,7 +52,7 @@ fn eee_basic_info_test() {
 #[test]
 fn eee_update_sync_record_test() {
     let m_sync_prog = MAccountInfoSyncProg {
-        account: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY".to_string(),
+        account: "5DHob83qDK5KWgz9xeqXcyYpku7bnLWR2cuRzKQpkY4p7BzL".to_string(),
         block_no: "20002".to_string(),
         block_hash: "0x41f01470971c270415cff96b3b11e2c66a82ed298bef3e7cafa35d0de20234a9".to_string(),
         ..Default::default()
@@ -81,9 +82,11 @@ fn get_sync_record_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let c_sync_prog = wallets_cdl::mem_c::CAccountInfoSyncProg_dAlloc();
-        let c_err = chain_eee_c::ChainEee_getSyncRecord(*c_ctx, to_c_char("Test"), to_c_char("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"), c_sync_prog) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_getSyncRecord(*c_ctx, to_c_char("Test"), to_c_char("5DHob83qDK5KWgz9xeqXcyYpku7bnLWR2cuRzKQpkY4p7BzL"), c_sync_prog) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
+        let sync_prog:AccountInfoSyncProg = CAccountInfoSyncProg::to_rust(&**c_sync_prog);
+        assert_eq!(sync_prog.block_no,"20002".to_string());
         wallets_cdl::mem_c::CAccountInfoSyncProg_dFree(c_sync_prog);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
@@ -163,8 +166,9 @@ fn eee_transfer_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
+        let wallet = create_wallet(c_ctx);
         let payload = wallets_types::EeeTransferPayload {
-            from_account: "5GxGZWfdE5v7ZbEWyEfXZ1R6kaKsdne3FWMzgazEQwN4j2a4".to_string(),
+            from_account: wallet.eee_chain.chain_shared.wallet_address.address.clone(),
             to_account: "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H".to_string(),
             value: "20000".to_string(),
             index: 0,
@@ -196,14 +200,15 @@ fn eee_tokenx_transfer_test() {
         let c_err = init_parameters(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let wallet = create_wallet(c_ctx);
         let payload = wallets_types::EeeTransferPayload {
-            from_account: "5GxGZWfdE5v7ZbEWyEfXZ1R6kaKsdne3FWMzgazEQwN4j2a4".to_string(),
+            from_account: wallet.eee_chain.chain_shared.wallet_address.address.clone(),
             to_account: "5CHvQU81NU367NohiMBxuWsfLMaNucZ4Vw3kG1g5EvhjBc9H".to_string(),
             value: "20000".to_string(),
             index: 0,
             chain_version,
             ext_data: "".to_string(),
-            password: "123".to_string(),
+            password: "1".to_string(),
         };
         let mut c_payload = wallets_cdl::parameters::CEeeTransferPayload::to_c_ptr(&payload);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
@@ -224,10 +229,11 @@ fn eee_tx_submittable_sign_test() {
         let c_err = init_parameters(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let wallet = create_wallet(c_ctx);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let raw_tx_param = wallets_types::RawTxParam {
             raw_tx: "0xa8040500a05de342fa2a9aed2f2899c97cdb25ba1ec6d1bedfb39b87afcefa981bb4956c0b0040e59c3012000000006cec71473c1b8d2295541cb5c21edc4fdb1926375413bb28f78793978229cf480600000001000000".to_string(),
-            wallet_id: "3eaf89eb-3ce0-4e8e-b3bb-0689b1e98261".to_string(),
+            wallet_id: wallet.id.clone(),
             password: "1".to_string(),
         };
         //  wallets_cdl::parameters::CRawTxParam
@@ -266,7 +272,6 @@ fn eee_tx_sign_test() {
             wallet_id: wallet.id.clone(),
             password: "1".to_string(),
         };
-        //  wallets_cdl::parameters::CRawTxParam
         let mut c_raw_tx = wallets_cdl::parameters::CRawTxParam::to_c_ptr(&raw_tx_param);
         let c_err = chain_eee_c::ChainEee_txSign(*c_ctx, to_c_char("Test"), c_raw_tx, sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
@@ -332,9 +337,8 @@ fn eee_update_default_token_list_test() {
     }
 }
 
-pub type TestError = jsonrpc_client::Error<reqwest::Error>;
-
 #[tokio::test]
+#[ignore]
 async fn eee_tx_explorer_test() {
     let query_number_interval = 1000;
     let c_ctx = CContext_dAlloc();
@@ -342,7 +346,6 @@ async fn eee_tx_explorer_test() {
 
     let event_key_prefix = "0x26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7";
     let account_1 = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
-    let account_2 = "5HNJXkYm2GBaVuBkHSwptdCgvaTFiP8zxEoEYjFCgugfEXjV";
     let client = data::node_rpc::Client::new("http://127.0.0.1:9933/".to_owned()).unwrap();
 
     let current_num = {
@@ -413,7 +416,7 @@ async fn eee_tx_explorer_test() {
         };
         println!("query key string:{:?}", storage_key_str);
         let query_times = (current_num - start_block_number) / query_number_interval + 1;
-        let mut end_block_number = 0u64;
+        let mut end_block_number;
         for query_time in 0..query_times {
             let current_start_block_num = start_block_number + query_time * query_number_interval + 1;
             let start_block_hash: Result<String, TestError> = client.chain_getBlockHash(current_start_block_num).await;
@@ -464,7 +467,7 @@ async fn eee_tx_explorer_test() {
                 if block_content.block.extrinsics.len() == 1 {
                     continue;
                 }
-
+                println!("query block {}",&item.block);
                 let event_detail: Result<String, TestError> = client.state_getStorage(event_key_prefix, &item.block).await;
                 assert!(event_detail.is_ok());
                 {
@@ -497,8 +500,25 @@ async fn eee_tx_explorer_test() {
             //wallets_cdl::mem_c::CAccountInfoSyncProg_dFree(c_sync_prog);
             c_sync_prog.free();
         }
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
 
-
+#[test]
+#[ignore]
+fn query_eee_tx_record(){
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let chain_tx = CArrayCEeeChainTx_dAlloc();
+        let c_err =  chain_eee_c::ChainEee_queryChainTxRecord(*c_ctx,to_c_char("Test"),to_c_char("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"),0,10,chain_tx) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let _chain_tx_vec: Vec<EeeChainTx> = CArray::to_rust(&**chain_tx);
+        CArrayCEeeChainTx_dFree(chain_tx);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }
@@ -562,6 +582,16 @@ fn init_parameters(c_ctx: *mut *mut CContext) -> *mut CError {
     let c_err = unsafe {
         Wallets_init(c_parameters, c_ctx) as *mut CError
     };
+    let chain_version = ChainVersion {
+        genesis_hash: GENESIS_HASH.to_string(),
+        runtime_version: RUNTIME_VERSION as i32,
+        tx_version: TX_VERSION as i32,
+    };
+    if get_chain_basic_info(c_ctx, &chain_version).is_none() {
+        let chain_metadata = include_str!("data/chain_metadata.rs");
+        let save_res = save_basic_info(c_ctx, &chain_version, chain_metadata.to_string());
+        assert_eq!(save_res.is_ok(), true);
+    }
     c_err
 }
 
