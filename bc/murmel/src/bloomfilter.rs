@@ -80,7 +80,7 @@ impl<T: Send + 'static + ShowCondition> BloomFilter<T> {
         false
     }
 
-    /// Each node needs to send a filter load message
+    // Each node needs to send a filter load message
     fn send_filter(&mut self, peer: PeerId) -> Result<(), Error> {
         if let Some(filter_load_message) = &self.filter_load_message {
             info!("send filter loaded message");

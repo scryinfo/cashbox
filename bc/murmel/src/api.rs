@@ -3,7 +3,6 @@ pub mod btcapi;
 pub mod create_translation;
 
 use crate::hooks::ApiMessage;
-use crate::Error;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::util::psbt::serialize::Serialize;
 use bitcoin::{Address, Network};

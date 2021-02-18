@@ -24,7 +24,6 @@
 #![deny(non_snake_case)]
 #![deny(unused_mut)]
 #![deny(unused_must_use)]
-#![forbid(unsafe_code)]
 #![allow(bare_trait_objects)]
 #![allow(ellipsis_inclusive_range_patterns)]
 #![allow(incomplete_include)]
