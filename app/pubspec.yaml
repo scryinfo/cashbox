@@ -25,9 +25,6 @@ dependencies:
 
   flutter_translate: ^1.6.0
 
-  logger: ^0.9.4
-  # https://github.com/leisim/logger
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
@@ -105,6 +102,15 @@ dependencies:
 
   wallet_manager:
     path: ../packages/wallet_manager/
+
+  wallets:
+    path: ../packages/wallets
+
+  logger:
+    path: ../packages/logger
+
+  services:
+    path: ../packages/services
 
   # fork   修改官方插件webview_flutter
   # 基于   ^0.3.13版本   https://github.com/flutter/plugins/tree/master/packages/webview_flutter
