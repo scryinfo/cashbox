@@ -4,7 +4,7 @@ set HOST_TAG=i686-linux-android
 set NDK=%ANDROID_NDK%
 set cuPath=%cd%
 set batPath=%~dp0
-
+%~d0
 cd %batPath%/../../../app/
 mkdir dl\x86
 cd dl/x86

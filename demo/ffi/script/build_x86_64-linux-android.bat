@@ -14,6 +14,7 @@ set CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER=%LINKER%
 set CC=%TOOLCHAIN%/bin/%HOST_TAG%28-clang.cmd
 set CXX=%TOOLCHAIN%/bin/%HOST_TAG%28-clang++.cmd
 rustup default stable-gnu
+%~d0
 cd %batPath%/..
 cargo build --target %HOST_TAG%
 cd %batPath%

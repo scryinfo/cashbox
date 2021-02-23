@@ -5,7 +5,7 @@ set HOST_TAG_NDK=armv7a-linux-androideabi
 set NDK=%ANDROID_NDK%
 set cuPath=%cd%
 set batPath=%~dp0
-
+%~d0
 cd %batPath%/../../../app/
 mkdir dl\armeabi-v7a
 cd dl/armeabi-v7a

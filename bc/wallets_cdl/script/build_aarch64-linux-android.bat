@@ -4,7 +4,7 @@ set HOST_TAG=aarch64-linux-android
 set NDK=%ANDROID_NDK%
 set cuPath=%cd%
 set batPath=%~dp0
-
+%~d0
 cd %batPath%/../../../app/
 mkdir dl\arm64-v8a
 cd dl/arm64-v8a

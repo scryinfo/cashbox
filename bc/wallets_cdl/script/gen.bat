@@ -1,7 +1,7 @@
 Setlocal
 set cuPath=%cd%
 set batPath=%~dp0
-
+%~d0
 cd %batPath%/..
 
 cbindgen --config cbindgen.toml --crate wallets_cdl --output src/wallets_c.h

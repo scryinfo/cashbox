@@ -6,6 +6,7 @@ set batPath=%~dp0
 set outPath=%batPath%dl/arm64-v8a
 
 call %batPath%/../cdl/script/%buildFile%
+%~d0
 cd %batPath%../target/aarch64-linux-android/release
 copy /Y "libcdl.so" "%outPath%"
 
