@@ -40,11 +40,8 @@ logger.d("tag", "message");
 
 -   方法 setLogLevel(filterLogLevel)
     -   设置限制log输出的日志级别。如level为info的时候，比info级别低的debug级别，就不会输出出来。即>= filterLogLevel的日志可以输出
-    
--   参数 isSave2File
-    -   调用日志输出时，通过参数isSave2File的值。为true时，可输出到控制台+文件，false只输出到控制台。 默认值：true
 
-**备注：日志内容是否最终输出到文件，决定于是否filterLogLevel和isSave2File两个参数都符合条件**
+**备注：日志内容是否最终输出到文件，决定于输出日记级别，是否filterLogLevel参数的筛选条件**
 
 -   参数 日志等级 d/i/w/e/f
     -   在flutter中使用时，所有print输出，都会显示在控制台，日志等级是info级别。
