@@ -12,8 +12,8 @@ use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
-use mav::ma::{Dao, MBlockHeader};
-use mav::ma::{MLocalTxLog, MProgress, MTxInput, MTxOutput, MUserAddress};
+use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcOutputTx, MBtcInputTx};
+use mav::ma::{MLocalTxLog, MProgress, MUserAddress};
 use once_cell::sync::Lazy;
 use rbatis::crud::CRUDEnable;
 use rbatis::crud::CRUD;
@@ -156,8 +156,9 @@ impl DetailSqlite {
         let rb = block_on(Self::init_rbatis(db_file_name));
         DetailSqlite::create_progress(&rb);
         DetailSqlite::create_user_address(&rb);
-        DetailSqlite::create_tx_input(&rb);
-        DetailSqlite::create_tx_output(&rb);
+        DetailSqlite::create_btc_input_tx(&rb);
+        DetailSqlite::create_btc_output_tx(&rb);
+        DetailSqlite::create_btc_chain_tx(&rb);
         DetailSqlite::create_local_tx(&rb);
         Self { rb, network }
     }
@@ -174,8 +175,8 @@ impl DetailSqlite {
         }
     }
 
-    fn create_tx_input(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MTxInput::create_table_script()));
+    fn create_btc_input_tx(rb: &Rbatis) {
+        let r = block_on(rb.exec("", MBtcInputTx::create_table_script()));
         match r {
             Ok(a) => {
                 debug!("create_tx_input {:?}", a);
@@ -186,14 +187,26 @@ impl DetailSqlite {
         }
     }
 
-    fn create_tx_output(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MTxOutput::create_table_script()));
+    fn create_btc_output_tx(rb: &Rbatis) {
+        let r = block_on(rb.exec("", MBtcOutputTx::create_table_script()));
         match r {
             Ok(a) => {
                 debug!("create_tx_output {:?}", a);
             }
             Err(e) => {
-                debug!("create_tx_output {:?}", e);
+                error!("error create_tx_output {:?}", e);
+            }
+        }
+    }
+
+    fn create_btc_chain_tx(rb: &Rbatis) {
+        let r = block_on(rb.exec("", MBtcChainTx::create_table_script()));
+        match r {
+            Ok(a) => {
+                debug!("create_btc_chain_tx {:?}", a);
+            }
+            Err(e) => {
+                error!("error create_btc_chain_tx {:?}", e);
             }
         }
     }
@@ -286,14 +299,14 @@ impl DetailSqlite {
         prev_vout: String,
         sequence: u32,
     ) {
-        let mut tx_input = MTxInput::default();
+        let mut tx_input = MBtcInputTx::default();
         tx_input.tx = tx;
         tx_input.sig_script = sig_script;
         tx_input.prev_tx = prev_tx;
         tx_input.prev_vout = prev_vout;
         tx_input.sequence = sequence;
 
-        let r = block_on(tx_input.save(&self.rb, ""));
+        let r = block_on(tx_input.save_update(&self.rb, ""));
         match r {
             Ok(a) => {
                 debug!("save_tx_input {:?}", a);
@@ -305,13 +318,13 @@ impl DetailSqlite {
     }
 
     pub fn save_txout(&self, tx: String, script: String, value: String, vin: String) {
-        let mut tx_output = MTxOutput::default();
+        let mut tx_output = MBtcOutputTx::default();
         tx_output.tx = tx;
         tx_output.script = script;
         tx_output.value = value;
         tx_output.vin = vin;
 
-        let r = block_on(tx_output.save(&self.rb, ""));
+        let r = block_on(tx_output.save_update(&self.rb, ""));
         match r {
             Ok(a) => {
                 debug!("save_tx_input {:?}", a);

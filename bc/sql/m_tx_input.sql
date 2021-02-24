@@ -1,6 +1,6 @@
 -- MTxInput
 CREATE TABLE IF NOT EXISTS m_tx_input (  
-    tx TEXT NOT NULL,
+    tx TEXT NOT NULL UNIQUE,
     sig_script TEXT NOT NULL,
     prev_tx TEXT NOT NULL,
     prev_vout TEXT NOT NULL,

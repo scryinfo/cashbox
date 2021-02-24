@@ -119,46 +119,6 @@ impl MUserAddress {
 
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct MTxInput {
-    #[serde(default)]
-    pub tx: String,
-    #[serde(default)]
-    pub sig_script: String,
-    #[serde(default)]
-    pub prev_tx: String,
-    #[serde(default)]
-    pub prev_vout: String,
-    #[serde(default)]
-    pub sequence: u32,
-}
-
-impl MTxInput {
-    pub const fn create_table_script() -> &'static str {
-        std::include_str!("../../../sql/m_tx_input.sql")
-    }
-}
-
-#[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
-pub struct MTxOutput {
-    #[serde(default)]
-    pub tx: String,
-    #[serde(default)]
-    pub script: String,
-    #[serde(default)]
-    pub value: String,
-    #[serde(default)]
-    pub vin: String,
-}
-
-impl MTxOutput {
-    pub const fn create_table_script() -> &'static str{
-        std::include_str!("../../../sql/m_tx_output.sql")
-    }
-}
-
-#[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MProgress {
     #[serde(default)]
     pub header: String,
