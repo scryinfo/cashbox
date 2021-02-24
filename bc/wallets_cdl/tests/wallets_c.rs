@@ -4,22 +4,17 @@ use std::time::{Duration, Instant};
 use futures::task::SpawnExt;
 
 use mav::{kits, WalletType};
-use wallets_cdl::{
-    mem_c::{
-        CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc,
-        CWallet_dFree,
-    },
-    parameters::{CContext, CCreateWalletParameters, CInitParameters},
-    types::{CError, CWallet, CR, CU64},
-    wallets_c::{
-        Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init,
-        Wallets_uninit,
-    },
-};
+use wallets_cdl::{mem_c::{
+    CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc,
+    CWallet_dFree,
+}, parameters::{CContext, CCreateWalletParameters, CInitParameters}, types::{CError, CWallet, CR, CU64}, wallets_c::{
+    Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init,
+    Wallets_uninit,
+}, CArray};
 use wallets_cdl::{to_c_char, to_str, CStruct};
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet};
-use wallets_cdl::wallets_c::{Wallets_appPlatformType, Wallets_removeWallet};
-use wallets_cdl::mem_c::CStr_free;
+use wallets_cdl::wallets_c::{Wallets_appPlatformType, Wallets_removeWallet, Wallets_all};
+use wallets_cdl::mem_c::{CStr_free, CArrayCWallet_dAlloc, CArrayCWallet_dFree};
 use std::os::raw::c_char;
 
 #[test]
@@ -257,10 +252,12 @@ fn wallets_test() {
         let temp = find_by_id_test(*c_ctx, &wallet.id);
         assert_eq!(wallet.id, temp.id);
         assert_eq!(wallet.name, temp.name);
-        /*let c_err = Wallets_removeWallet(*c_ctx, to_c_char(&wallet.id), to_c_char("1")) as *mut CError;
+        let c_array_wallet = CArrayCWallet_dAlloc();
+        let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-        CError_free(c_err);*/
-
+        CError_free(c_err);
+        let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+        CArrayCWallet_dFree(c_array_wallet);
         CContext_dFree(c_ctx);
     }
 }

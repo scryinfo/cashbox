@@ -10,6 +10,7 @@ use std::os::raw::c_char;
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthChainToken {
+    pub show:bool,
     pub ethChainTokenShared: *mut CEthChainTokenShared,
 }
 
