@@ -291,7 +291,7 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_txin(
+    pub fn save_btc_input_tx(
         &self,
         tx: String,
         sig_script: String,
@@ -299,40 +299,40 @@ impl DetailSqlite {
         prev_vout: String,
         sequence: u32,
     ) {
-        let mut tx_input = MBtcInputTx::default();
-        tx_input.tx = tx;
-        tx_input.sig_script = sig_script;
-        tx_input.prev_tx = prev_tx;
-        tx_input.prev_vout = prev_vout;
-        tx_input.sequence = sequence;
-
-        let r = block_on(tx_input.save_update(&self.rb, ""));
-        match r {
-            Ok(a) => {
-                debug!("save_tx_input {:?}", a);
-            }
-            Err(e) => {
-                debug!("save_tx_input {:?}", e);
-            }
-        }
+        // let mut tx_input = MBtcInputTx::default();
+        // tx_input.tx = tx;
+        // tx_input.sig_script = sig_script;
+        // tx_input.prev_tx = prev_tx;
+        // tx_input.prev_vout = prev_vout;
+        // tx_input.sequence = sequence;
+        //
+        // let r = block_on(tx_input.save_update(&self.rb, ""));
+        // match r {
+        //     Ok(a) => {
+        //         debug!("save_tx_input {:?}", a);
+        //     }
+        //     Err(e) => {
+        //         debug!("save_tx_input {:?}", e);
+        //     }
+        // }
     }
 
-    pub fn save_txout(&self, tx: String, script: String, value: String, vin: String) {
-        let mut tx_output = MBtcOutputTx::default();
-        tx_output.tx = tx;
-        tx_output.script = script;
-        tx_output.value = value;
-        tx_output.vin = vin;
-
-        let r = block_on(tx_output.save_update(&self.rb, ""));
-        match r {
-            Ok(a) => {
-                debug!("save_tx_input {:?}", a);
-            }
-            Err(e) => {
-                debug!("save_tx_input {:?}", e);
-            }
-        }
+    pub fn save_btc_output_tx(&self, tx: String, script: String, value: String, vin: String) {
+        // let mut tx_output = MBtcOutputTx::default();
+        // tx_output.tx = tx;
+        // tx_output.script = script;
+        // tx_output.value = value;
+        // tx_output.vin = vin;
+        //
+        // let r = block_on(tx_output.save_update(&self.rb, ""));
+        // match r {
+        //     Ok(a) => {
+        //         debug!("save_tx_input {:?}", a);
+        //     }
+        //     Err(e) => {
+        //         debug!("save_tx_input {:?}", e);
+        //     }
+        // }
     }
 
     pub fn save_user_address(&self, address: String, compressed_pub_key: String, verify: String) {

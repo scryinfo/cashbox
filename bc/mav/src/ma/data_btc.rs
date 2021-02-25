@@ -68,17 +68,17 @@ impl MBtcChainTx {
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcInputTx {
     #[serde(default)]
-    pub btc_chain_tx_id: String,
+    pub btc_chain_tx_foreign: String,
     #[serde(default)]
-    pub tx_index: i64,
+    // utxo
+    pub tx_id: String,
     #[serde(default)]
-    pub address: String,
-    #[serde(default)]
-    pub pk_script: String,
+    // index
+    pub vout: u32,
     #[serde(default)]
     pub sig_script: String,
     #[serde(default)]
-    pub value: String,
+    pub sequence: u64
     // ...
 }
 
@@ -92,15 +92,11 @@ impl MBtcInputTx {
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcOutputTx {
     #[serde(default)]
-    pub btc_chain_tx_id: String,
-    #[serde(default)]
-    pub tx_index: i64,
-    #[serde(default)]
-    pub address: String,
-    #[serde(default)]
-    pub pk_script: String,
+    pub btc_chain_tx_foreign: String,
     #[serde(default)]
     pub value: String,
+    #[serde(default)]
+    pub pk_script :String,
     // ...
 }
 
@@ -215,7 +211,7 @@ mod tests {
         let re = block_on(MBtcInputTx::list(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);
         let mut m = MBtcInputTx::default();
-        m.address = "address".to_owned();
+        m.tx_id = "tx_id".to_owned();
 
         let re = block_on(m.save(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);
@@ -239,7 +235,7 @@ mod tests {
         let re = block_on(MBtcOutputTx::list(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);
         let mut m = MBtcOutputTx::default();
-        m.address = "address".to_owned();
+        m.pk_script = "pk_script".to_owned();
 
         let re = block_on(m.save(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);

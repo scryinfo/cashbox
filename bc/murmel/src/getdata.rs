@@ -185,7 +185,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                 iter.next();
                 let current_hash = iter.next().unwrap_or(" ");
                 if current_hash.eq(&*VERIFY.1) {
-                    RB_DETAIL.save_txout(
+                    RB_DETAIL.save_btc_output_tx(
                         tx_hash.to_hex(),
                         asm.clone(),
                         vout.value.to_string(),
@@ -209,7 +209,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
             iter.next();
             let iter3 = iter.next().unwrap_or(" ");
             if iter3.eq(&*VERIFY.1) {
-                RB_DETAIL.save_txin(
+                RB_DETAIL.save_btc_input_tx(
                     tx_hash.to_hex(),
                     sig_script.clone(),
                     prev_tx,
