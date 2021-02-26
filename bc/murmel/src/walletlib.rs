@@ -94,17 +94,21 @@ pub fn create_master() -> Transaction {
 
 mod test {
     use crate::walletlib::create_master;
-    use bitcoin::Address;
+    use bitcoin::{Address, BitcoinHash, Network, Transaction, TxIn, Script, TxOut, OutPoint, SigHashType};
     use bitcoin::consensus::serialize;
     use std::str::FromStr;
     use bitcoin_hashes::hex::ToHex;
     use bitcoin_hashes::Hash;
+    use bitcoin_wallet::mnemonic::Mnemonic;
+    use bitcoin_wallet::account::{MasterAccount, Unlocker, Account, AccountAddressType};
+    use bitcoin::hashes::sha256d;
 
     #[test]
     pub fn fee_test() {
         let tx = create_master();
         let ser = serialize(&tx);
         println!("{:?}", ser.len());
+        println!("{:#?}", tx.bitcoin_hash());
         println!("{:#?}", tx);
 
         let bytes: f32 = 1.0 * 148f32 + 34.0 * 1.0 + 10.0f32;
@@ -114,4 +118,5 @@ mod test {
         let target = Address::from_str("n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk").unwrap();
         println!("target {:?}", target);
     }
+
 }

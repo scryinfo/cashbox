@@ -73,12 +73,20 @@ pub struct MBtcInputTx {
     // utxo
     pub tx_id: String,
     #[serde(default)]
-    // index
+    //utxo index
     pub vout: u32,
     #[serde(default)]
     pub sig_script: String,
     #[serde(default)]
-    pub sequence: u64
+    pub sequence: u64,
+    // index
+    #[serde(default)]
+    pub index :u32,
+    // The tx hash value that include this Output
+    #[serde(default)]
+    pub btc_tx_hash:String,
+    #[serde(default)]
+    pub btc_tx_hexbytes:String,
     // ...
 }
 
@@ -97,6 +105,13 @@ pub struct MBtcOutputTx {
     pub value: String,
     #[serde(default)]
     pub pk_script :String,
+    #[serde(default)]
+    pub index: u32,
+    #[serde(default)]
+    // The tx hash value that include this Output
+    pub btc_tx_hash:String,
+    #[serde(default)]
+    pub btc_tx_hexbytes:String,
     // ...
 }
 

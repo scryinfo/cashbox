@@ -12,7 +12,7 @@ use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
-use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcOutputTx, MBtcInputTx};
+use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx};
 use mav::ma::{MLocalTxLog, MProgress, MUserAddress};
 use once_cell::sync::Lazy;
 use rbatis::crud::CRUDEnable;
@@ -293,46 +293,58 @@ impl DetailSqlite {
 
     pub fn save_btc_input_tx(
         &self,
-        tx: String,
+        tx_id: String,
+        vout: u32,
         sig_script: String,
-        prev_tx: String,
-        prev_vout: String,
-        sequence: u32,
+        sequence: u64,
+        index: u32,
+        btc_tx_hash:String,
+        btc_tx_hexbytes:String,
     ) {
-        // let mut tx_input = MBtcInputTx::default();
-        // tx_input.tx = tx;
-        // tx_input.sig_script = sig_script;
-        // tx_input.prev_tx = prev_tx;
-        // tx_input.prev_vout = prev_vout;
-        // tx_input.sequence = sequence;
-        //
-        // let r = block_on(tx_input.save_update(&self.rb, ""));
-        // match r {
-        //     Ok(a) => {
-        //         debug!("save_tx_input {:?}", a);
-        //     }
-        //     Err(e) => {
-        //         debug!("save_tx_input {:?}", e);
-        //     }
-        // }
+        let mut btc_input_tx = MBtcInputTx::default();
+        btc_input_tx.tx_id = tx_id;
+        btc_input_tx.vout = vout;
+        btc_input_tx.sig_script = sig_script;
+        btc_input_tx.sequence = sequence;
+        btc_input_tx.index = index;
+        btc_input_tx.btc_tx_hash = btc_tx_hash;
+        btc_input_tx.btc_tx_hexbytes = btc_tx_hexbytes;
+
+        let r = block_on(btc_input_tx.save_update(&self.rb, ""));
+        match r {
+            Ok(a) => {
+                debug!("save btc_input_tx {:?}", a);
+            }
+            Err(e) => {
+                debug!("error save btc_input_tx {:?}", e);
+            }
+        }
     }
 
-    pub fn save_btc_output_tx(&self, tx: String, script: String, value: String, vin: String) {
-        // let mut tx_output = MBtcOutputTx::default();
-        // tx_output.tx = tx;
-        // tx_output.script = script;
-        // tx_output.value = value;
-        // tx_output.vin = vin;
-        //
-        // let r = block_on(tx_output.save_update(&self.rb, ""));
-        // match r {
-        //     Ok(a) => {
-        //         debug!("save_tx_input {:?}", a);
-        //     }
-        //     Err(e) => {
-        //         debug!("save_tx_input {:?}", e);
-        //     }
-        // }
+    pub fn save_btc_output_tx(
+        &self,
+        value: String,
+        pk_script: String,
+        index: u32,
+        btc_tx_hash: String,
+        btc_tx_hexbytes: String,
+    ) {
+        let mut btc_output_tx = MBtcOutputTx::default();
+        btc_output_tx.value = value;
+        btc_output_tx.pk_script = pk_script;
+        btc_output_tx.index = index;
+        btc_output_tx.btc_tx_hash = btc_tx_hash;
+        btc_output_tx.btc_tx_hexbytes = btc_tx_hexbytes;
+
+        let r = block_on(btc_output_tx.save_update(&self.rb, ""));
+        match r {
+            Ok(a) => {
+                debug!("save btc_output_tx {:?}", a);
+            }
+            Err(e) => {
+                debug!("error save btc_output_tx {:?}", e);
+            }
+        }
     }
 
     pub fn save_user_address(&self, address: String, compressed_pub_key: String, verify: String) {
@@ -495,5 +507,4 @@ mod test {
         let u = RB_DETAIL.fetch_user_address();
         println!("{:?}", &u);
     }
-
 }
