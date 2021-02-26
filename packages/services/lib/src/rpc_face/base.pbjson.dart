@@ -189,9 +189,9 @@ const BasicClientReq$json = const {
     const {'1': 'cashboxType', '3': 3, '4': 1, '5': 9, '10': 'cashboxType'},
     const {'1': 'cashboxVersion', '3': 4, '4': 1, '5': 9, '10': 'cashboxVersion'},
     const {'1': 'platformType', '3': 5, '4': 1, '5': 9, '10': 'platformType'},
-    const {'1': 'requestTime', '3': 6, '4': 1, '5': 3, '10': 'requestTime'},
+    const {'1': 'timestamp', '3': 6, '4': 1, '5': 3, '10': 'timestamp'},
   ],
 };
 
 /// Descriptor for `BasicClientReq`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List basicClientReqDescriptor = $convert.base64Decode('Cg5CYXNpY0NsaWVudFJlcRIcCglzaWduYXR1cmUYASABKAlSCXNpZ25hdHVyZRIaCghkZXZpY2VJZBgCIAEoCVIIZGV2aWNlSWQSIAoLY2FzaGJveFR5cGUYAyABKAlSC2Nhc2hib3hUeXBlEiYKDmNhc2hib3hWZXJzaW9uGAQgASgJUg5jYXNoYm94VmVyc2lvbhIiCgxwbGF0Zm9ybVR5cGUYBSABKAlSDHBsYXRmb3JtVHlwZRIgCgtyZXF1ZXN0VGltZRgGIAEoA1ILcmVxdWVzdFRpbWU=');
+final $typed_data.Uint8List basicClientReqDescriptor = $convert.base64Decode('Cg5CYXNpY0NsaWVudFJlcRIcCglzaWduYXR1cmUYASABKAlSCXNpZ25hdHVyZRIaCghkZXZpY2VJZBgCIAEoCVIIZGV2aWNlSWQSIAoLY2FzaGJveFR5cGUYAyABKAlSC2Nhc2hib3hUeXBlEiYKDmNhc2hib3hWZXJzaW9uGAQgASgJUg5jYXNoYm94VmVyc2lvbhIiCgxwbGF0Zm9ybVR5cGUYBSABKAlSDHBsYXRmb3JtVHlwZRIcCgl0aW1lc3RhbXAYBiABKANSCXRpbWVzdGFtcA==');

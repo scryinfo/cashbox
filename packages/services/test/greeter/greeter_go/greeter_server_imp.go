@@ -14,13 +14,13 @@ type configGreeterServerImp struct {
 }
 type GreeterServerImp struct {
 	ServerNobl gserver.ServerNobl `dot:""`
-	conf configGreeterServerImp
+	conf       configGreeterServerImp
 	//todo add
 }
 
 func (c *GreeterServerImp) SayHello(ctx context.Context, request *HelloRequest) (*HelloReply, error) {
-	re := & HelloReply{}
-	re.Message = fmt.Sprintf("replay %s",request.Name)
+	re := &HelloReply{}
+	re.Message = fmt.Sprintf("replay %s", request.Name)
 	return re, nil
 }
 
@@ -87,7 +87,7 @@ func GreeterServerImpConfigTypeLive() *dot.ConfigTypeLive {
 	paths = append(paths, "")
 	return &dot.ConfigTypeLive{
 		TypeIDConfig: GreeterServerImpTypeID,
-		ConfigInfo:   &configGreeterServerImp{
+		ConfigInfo: &configGreeterServerImp{
 			//todo
 		},
 	}

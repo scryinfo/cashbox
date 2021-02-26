@@ -755,6 +755,68 @@ class ArrayCEeeChainTokenDefault extends DC<clib.CArrayCEeeChainTokenDefault> {
   }
 }
 
+class ArrayCEeeChainTx extends DC<clib.CArrayCEeeChainTx> {
+  List<EeeChainTx> data;
+
+  ArrayCEeeChainTx() {
+    data = new List<EeeChainTx>();
+  }
+
+  static free(Pointer<clib.CArrayCEeeChainTx> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    EeeChainTx.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCEeeChainTx fromC(Pointer<clib.CArrayCEeeChainTx> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCEeeChainTx();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCEeeChainTx> toCPtr() {
+    var c = allocateZero<clib.CArrayCEeeChainTx>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCEeeChainTx> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      EeeChainTx.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<clib.CEeeChainTx>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCEeeChainTx> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<EeeChainTx>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i] = new EeeChainTx();
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
 class ArrayCEthChainToken extends DC<clib.CArrayCEthChainToken> {
   List<EthChainToken> data;
 
@@ -1001,6 +1063,68 @@ class ArrayCExtrinsicContext extends DC<clib.CArrayCExtrinsicContext> {
     data = new List<ExtrinsicContext>(c.ref.len);
     for (var i = 0; i < data.length; i++) {
       data[i] = new ExtrinsicContext();
+      data[i].toDart(c.ref.ptr.elementAt(i));
+    }
+  }
+}
+
+class ArrayCTokenAddress extends DC<clib.CArrayCTokenAddress> {
+  List<TokenAddress> data;
+
+  ArrayCTokenAddress() {
+    data = new List<TokenAddress>();
+  }
+
+  static free(Pointer<clib.CArrayCTokenAddress> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    TokenAddress.free(ptr.ref.ptr);
+    ptr.ref.ptr = nullptr;
+    ffi.free(ptr);
+  }
+
+  static ArrayCTokenAddress fromC(Pointer<clib.CArrayCTokenAddress> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new ArrayCTokenAddress();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CArrayCTokenAddress> toCPtr() {
+    var c = allocateZero<clib.CArrayCTokenAddress>();
+    toC(c);
+    return c;
+  }
+
+  @override
+  toC(Pointer<clib.CArrayCTokenAddress> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
+      TokenAddress.free(c.ref.ptr);
+      c.ref.ptr = nullptr;
+    }
+    c.ref.ptr = allocateZero<clib.CTokenAddress>(count: data.length);
+    c.ref.len = data.length;
+    c.ref.cap = data.length;
+    for (var i = 0; i < data.length; i++) {
+      data[i].toC(c.ref.ptr.elementAt(i));
+    }
+  }
+
+  @override
+  toDart(Pointer<clib.CArrayCTokenAddress> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    data = new List<TokenAddress>(c.ref.len);
+    for (var i = 0; i < data.length; i++) {
+      data[i] = new TokenAddress();
       data[i].toDart(c.ref.ptr.elementAt(i));
     }
   }
@@ -2284,6 +2408,152 @@ class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
   }
 }
 
+class EeeChainTx extends DC<clib.CEeeChainTx> {
+  String txHash;
+  String blockHash;
+  String blockNumber;
+  String signer;
+  String walletAccount;
+  String fromAddress;
+  String toAddress;
+  String value;
+  String extension;
+  int status;
+  int txTimestamp;
+  String txBytes;
+
+  static free(Pointer<clib.CEeeChainTx> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    if (ptr.ref.txHash != null && ptr.ref.txHash != nullptr) {
+      ffi.free(ptr.ref.txHash);
+    }
+    ptr.ref.txHash = nullptr;
+    if (ptr.ref.blockHash != null && ptr.ref.blockHash != nullptr) {
+      ffi.free(ptr.ref.blockHash);
+    }
+    ptr.ref.blockHash = nullptr;
+    if (ptr.ref.blockNumber != null && ptr.ref.blockNumber != nullptr) {
+      ffi.free(ptr.ref.blockNumber);
+    }
+    ptr.ref.blockNumber = nullptr;
+    if (ptr.ref.signer != null && ptr.ref.signer != nullptr) {
+      ffi.free(ptr.ref.signer);
+    }
+    ptr.ref.signer = nullptr;
+    if (ptr.ref.walletAccount != null && ptr.ref.walletAccount != nullptr) {
+      ffi.free(ptr.ref.walletAccount);
+    }
+    ptr.ref.walletAccount = nullptr;
+    if (ptr.ref.fromAddress != null && ptr.ref.fromAddress != nullptr) {
+      ffi.free(ptr.ref.fromAddress);
+    }
+    ptr.ref.fromAddress = nullptr;
+    if (ptr.ref.toAddress != null && ptr.ref.toAddress != nullptr) {
+      ffi.free(ptr.ref.toAddress);
+    }
+    ptr.ref.toAddress = nullptr;
+    if (ptr.ref.value != null && ptr.ref.value != nullptr) {
+      ffi.free(ptr.ref.value);
+    }
+    ptr.ref.value = nullptr;
+    if (ptr.ref.extension != null && ptr.ref.extension != nullptr) {
+      ffi.free(ptr.ref.extension);
+    }
+    ptr.ref.extension = nullptr;
+    if (ptr.ref.txBytes != null && ptr.ref.txBytes != nullptr) {
+      ffi.free(ptr.ref.txBytes);
+    }
+    ptr.ref.txBytes = nullptr;
+    ffi.free(ptr);
+  }
+
+  static EeeChainTx fromC(Pointer<clib.CEeeChainTx> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new EeeChainTx();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CEeeChainTx> toCPtr() {
+    var ptr = allocateZero<clib.CEeeChainTx>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEeeChainTx> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.txHash != null && c.ref.txHash != nullptr) {
+      ffi.free(c.ref.txHash);
+    }
+    c.ref.txHash = toUtf8Null(txHash);
+    if (c.ref.blockHash != null && c.ref.blockHash != nullptr) {
+      ffi.free(c.ref.blockHash);
+    }
+    c.ref.blockHash = toUtf8Null(blockHash);
+    if (c.ref.blockNumber != null && c.ref.blockNumber != nullptr) {
+      ffi.free(c.ref.blockNumber);
+    }
+    c.ref.blockNumber = toUtf8Null(blockNumber);
+    if (c.ref.signer != null && c.ref.signer != nullptr) {
+      ffi.free(c.ref.signer);
+    }
+    c.ref.signer = toUtf8Null(signer);
+    if (c.ref.walletAccount != null && c.ref.walletAccount != nullptr) {
+      ffi.free(c.ref.walletAccount);
+    }
+    c.ref.walletAccount = toUtf8Null(walletAccount);
+    if (c.ref.fromAddress != null && c.ref.fromAddress != nullptr) {
+      ffi.free(c.ref.fromAddress);
+    }
+    c.ref.fromAddress = toUtf8Null(fromAddress);
+    if (c.ref.toAddress != null && c.ref.toAddress != nullptr) {
+      ffi.free(c.ref.toAddress);
+    }
+    c.ref.toAddress = toUtf8Null(toAddress);
+    if (c.ref.value != null && c.ref.value != nullptr) {
+      ffi.free(c.ref.value);
+    }
+    c.ref.value = toUtf8Null(value);
+    if (c.ref.extension != null && c.ref.extension != nullptr) {
+      ffi.free(c.ref.extension);
+    }
+    c.ref.extension = toUtf8Null(extension);
+    c.ref.status = status;
+    c.ref.txTimestamp = txTimestamp;
+    if (c.ref.txBytes != null && c.ref.txBytes != nullptr) {
+      ffi.free(c.ref.txBytes);
+    }
+    c.ref.txBytes = toUtf8Null(txBytes);
+  }
+
+  @override
+  toDart(Pointer<clib.CEeeChainTx> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    txHash = fromUtf8Null(c.ref.txHash);
+    blockHash = fromUtf8Null(c.ref.blockHash);
+    blockNumber = fromUtf8Null(c.ref.blockNumber);
+    signer = fromUtf8Null(c.ref.signer);
+    walletAccount = fromUtf8Null(c.ref.walletAccount);
+    fromAddress = fromUtf8Null(c.ref.fromAddress);
+    toAddress = fromUtf8Null(c.ref.toAddress);
+    value = fromUtf8Null(c.ref.value);
+    extension = fromUtf8Null(c.ref.extension);
+    status = c.ref.status;
+    txTimestamp = c.ref.txTimestamp;
+    txBytes = fromUtf8Null(c.ref.txBytes);
+  }
+}
+
 class EeeTransferPayload extends DC<clib.CEeeTransferPayload> {
   String fromAccount;
   String toAccount;
@@ -3401,6 +3671,96 @@ class SubChainBasicInfo extends DC<clib.CSubChainBasicInfo> {
     tokenDecimals = c.ref.tokenDecimals;
     tokenSymbol = fromUtf8Null(c.ref.tokenSymbol);
     isDefault = c.ref.isDefault;
+  }
+}
+
+class TokenAddress extends DC<clib.CTokenAddress> {
+  String walletId;
+  String chainType;
+  String tokenId;
+  String addressId;
+  String balance;
+
+  static free(Pointer<clib.CTokenAddress> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    if (ptr.ref.walletId != null && ptr.ref.walletId != nullptr) {
+      ffi.free(ptr.ref.walletId);
+    }
+    ptr.ref.walletId = nullptr;
+    if (ptr.ref.chainType != null && ptr.ref.chainType != nullptr) {
+      ffi.free(ptr.ref.chainType);
+    }
+    ptr.ref.chainType = nullptr;
+    if (ptr.ref.tokenId != null && ptr.ref.tokenId != nullptr) {
+      ffi.free(ptr.ref.tokenId);
+    }
+    ptr.ref.tokenId = nullptr;
+    if (ptr.ref.addressId != null && ptr.ref.addressId != nullptr) {
+      ffi.free(ptr.ref.addressId);
+    }
+    ptr.ref.addressId = nullptr;
+    if (ptr.ref.balance != null && ptr.ref.balance != nullptr) {
+      ffi.free(ptr.ref.balance);
+    }
+    ptr.ref.balance = nullptr;
+    ffi.free(ptr);
+  }
+
+  static TokenAddress fromC(Pointer<clib.CTokenAddress> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new TokenAddress();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CTokenAddress> toCPtr() {
+    var ptr = allocateZero<clib.CTokenAddress>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CTokenAddress> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    if (c.ref.walletId != null && c.ref.walletId != nullptr) {
+      ffi.free(c.ref.walletId);
+    }
+    c.ref.walletId = toUtf8Null(walletId);
+    if (c.ref.chainType != null && c.ref.chainType != nullptr) {
+      ffi.free(c.ref.chainType);
+    }
+    c.ref.chainType = toUtf8Null(chainType);
+    if (c.ref.tokenId != null && c.ref.tokenId != nullptr) {
+      ffi.free(c.ref.tokenId);
+    }
+    c.ref.tokenId = toUtf8Null(tokenId);
+    if (c.ref.addressId != null && c.ref.addressId != nullptr) {
+      ffi.free(c.ref.addressId);
+    }
+    c.ref.addressId = toUtf8Null(addressId);
+    if (c.ref.balance != null && c.ref.balance != nullptr) {
+      ffi.free(c.ref.balance);
+    }
+    c.ref.balance = toUtf8Null(balance);
+  }
+
+  @override
+  toDart(Pointer<clib.CTokenAddress> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    walletId = fromUtf8Null(c.ref.walletId);
+    chainType = fromUtf8Null(c.ref.chainType);
+    tokenId = fromUtf8Null(c.ref.tokenId);
+    addressId = fromUtf8Null(c.ref.addressId);
+    balance = fromUtf8Null(c.ref.balance);
   }
 }
 

@@ -951,7 +951,7 @@ class BasicClientReq extends $pb.GeneratedMessage {
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cashboxType', protoName: 'cashboxType')
     ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cashboxVersion', protoName: 'cashboxVersion')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'platformType', protoName: 'platformType')
-    ..aInt64(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'requestTime', protoName: 'requestTime')
+    ..aInt64(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'timestamp')
     ..hasRequiredFields = false
   ;
 
@@ -962,7 +962,7 @@ class BasicClientReq extends $pb.GeneratedMessage {
     $core.String cashboxType,
     $core.String cashboxVersion,
     $core.String platformType,
-    $fixnum.Int64 requestTime,
+    $fixnum.Int64 timestamp,
   }) {
     final _result = create();
     if (signature != null) {
@@ -980,8 +980,8 @@ class BasicClientReq extends $pb.GeneratedMessage {
     if (platformType != null) {
       _result.platformType = platformType;
     }
-    if (requestTime != null) {
-      _result.requestTime = requestTime;
+    if (timestamp != null) {
+      _result.timestamp = timestamp;
     }
     return _result;
   }
@@ -1052,12 +1052,12 @@ class BasicClientReq extends $pb.GeneratedMessage {
   void clearPlatformType() => clearField(5);
 
   @$pb.TagNumber(6)
-  $fixnum.Int64 get requestTime => $_getI64(5);
+  $fixnum.Int64 get timestamp => $_getI64(5);
   @$pb.TagNumber(6)
-  set requestTime($fixnum.Int64 v) { $_setInt64(5, v); }
+  set timestamp($fixnum.Int64 v) { $_setInt64(5, v); }
   @$pb.TagNumber(6)
-  $core.bool hasRequestTime() => $_has(5);
+  $core.bool hasTimestamp() => $_has(5);
   @$pb.TagNumber(6)
-  void clearRequestTime() => clearField(6);
+  void clearTimestamp() => clearField(6);
 }
 

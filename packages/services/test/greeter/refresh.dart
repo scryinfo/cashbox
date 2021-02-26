@@ -1,29 +1,30 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart';
 import 'package:grpc/src/server/call.dart';
-import 'package:services/src/rpc_face/refresh.pbgrpc.dart';
+import 'package:services/src/rpc_face/base.pb.dart';
+import 'package:services/src/rpc_face/refresh_open.pbgrpc.dart';
 
 import 'server.dart';
 
-class RefreshService extends RefreshFaceServiceBase {
+class RefreshService extends RefreshOpenFaceServiceBase {
   @override
-  Future<Refresh_RefreshRes> refresh(
-      ServiceCall call, Refresh_RefreshReq request) async {
-    Refresh_RefreshRes re = new Refresh_RefreshRes();
-    re.serviceMeta = new Refresh_ServiceMeta();
+  Future<RefreshOpen_ConnectParameterRes> connectParameter(
+      ServiceCall call, BasicClientReq request) async {
+    RefreshOpen_ConnectParameterRes re = new RefreshOpen_ConnectParameterRes();
     bool odd = true;
-    if (request.version != "1") {
+    if (request.cashboxVersion != "1") {
       odd = false;
     }
     if (odd) {
-      re.serviceMeta.host = "localhost";
-      re.serviceMeta.port = Int64(server1Port);
+      re.host = "localhost";
+      re.port = Int64(server1Port);
     } else {
-      re.serviceMeta.host = "localhost";
-      re.serviceMeta.port = Int64(server2Port);
+      re.host = "localhost";
+      re.port = Int64(server2Port);
     }
     return re;
   }
+
 }
 
 const serverRefreshPort = 50050;

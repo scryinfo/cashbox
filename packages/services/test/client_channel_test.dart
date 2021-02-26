@@ -31,10 +31,8 @@ void main() {
     var server1;
     var server2;
     Server serverRefresh;
-    var refresh = Refresh.get(
-        new ConnectParameter("localhost", serverRefreshPort),
-        "",
-        AppPlatformType.any);
+    var refresh = RefreshOpen.get(new ConnectParameter("localhost", serverRefreshPort),
+        "", AppPlatformType.any, "", "", "");
     bool odd = true;
     var channel = createClientChannel(() async {
       ConnectParameter re;
