@@ -151,3 +151,4 @@ demo/rbatis_demo/target
 /bc/wallets_cdl/src/wallets_c.h
 /packages/services/test/greeter/greeter_go/greeter_go/before.log
 /packages/services/test/greeter/greeter_go/greeter_go/log.log
+/packages/logger/pubspec.lock
