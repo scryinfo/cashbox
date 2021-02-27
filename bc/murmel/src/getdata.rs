@@ -15,6 +15,7 @@ use bitcoin_hashes::hex::ToHex;
 
 use crate::constructor::CondvarPair;
 use crate::db::{RB_CHAIN, RB_DETAIL, VERIFY};
+use bitcoin::consensus::serialize as bitcoin_ser;
 use log::{error, info, trace};
 use std::ops::Deref;
 use std::sync::{mpsc, Arc};
@@ -171,11 +172,9 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
     // Handle tx return value
     fn tx(&mut self, tx: &Transaction, _peer: PeerId) -> Result<(), Error> {
         info!("Tx {:#?}", tx.clone());
-        let tx_hash = &tx.bitcoin_hash();
         let vouts = tx.clone().output;
-        let mut index = -1;
-        for vout in vouts {
-            index += 1;
+        for (index, vout) in vouts.iter().enumerate() {
+            let vout = vout.to_owned();
             let script = vout.script_pubkey;
             if script.is_p2pkh() {
                 let asm = script.asm();
@@ -183,41 +182,45 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                 iter.next();
                 iter.next();
                 iter.next();
-                let current_hash = iter.next().unwrap_or(" ");
-                if current_hash.eq(&*VERIFY.1) {
+                let current_hash_160 = iter.next().unwrap_or(" ");
+                if current_hash_160.eq(&*VERIFY.1) {
+                    let value = vout.value;
+                    let btc_tx_hash = tx.bitcoin_hash().to_hex();
+                    // let btc_tx_hexbytes = bitcoin_ser(&tx).to_string();
                     RB_DETAIL.save_btc_output_tx(
-                        tx_hash.to_hex(),
-                        asm.clone(),
-                        vout.value.to_string(),
-                        index.to_string(),
+                        value,
+                        script.asm(),
+                        index as u32,
+                        btc_tx_hash,
+                        "".to_owned(),
                     );
                 }
             }
         }
 
-        let vines = tx.clone().input;
-        for vin in vines {
-            let script = vin.script_sig;
-            let prev_output = vin.previous_output;
-            let prev_tx = prev_output.txid.to_hex();
-            let prev_vout = prev_output.vout;
-            let sequence = vin.sequence;
-            let sig_script = script.asm();
-            let mut iter = sig_script.split_ascii_whitespace();
-            iter.next();
-            iter.next();
-            iter.next();
-            let iter3 = iter.next().unwrap_or(" ");
-            if iter3.eq(&*VERIFY.1) {
-                RB_DETAIL.save_btc_input_tx(
-                    tx_hash.to_hex(),
-                    sig_script.clone(),
-                    prev_tx,
-                    prev_vout.to_string(),
-                    sequence,
-                );
-            }
-        }
+        // let vines = tx.clone().input;
+        // for vin in vines {
+        //     let script = vin.script_sig;
+        //     let prev_output = vin.previous_output;
+        //     let prev_tx = prev_output.txid.to_hex();
+        //     let prev_vout = prev_output.vout;
+        //     let sequence = vin.sequence;
+        //     let sig_script = script.asm();
+        //     let mut iter = sig_script.split_ascii_whitespace();
+        //     iter.next();
+        //     iter.next();
+        //     iter.next();
+        //     let iter3 = iter.next().unwrap_or(" ");
+        //     if iter3.eq(&*VERIFY.1) {
+        //         RB_DETAIL.save_btc_input_tx(
+        //             tx_hash.to_hex(),
+        //             sig_script.clone(),
+        //             prev_tx,
+        //             prev_vout.to_string(),
+        //             sequence,
+        //         );
+        //     }
+        //}
         Ok(())
     }
 }

@@ -102,7 +102,7 @@ pub struct MBtcOutputTx {
     #[serde(default)]
     pub btc_chain_tx_foreign: String,
     #[serde(default)]
-    pub value: String,
+    pub value: u64,
     #[serde(default)]
     pub pk_script :String,
     #[serde(default)]

@@ -94,14 +94,18 @@ pub fn create_master() -> Transaction {
 
 mod test {
     use crate::walletlib::create_master;
-    use bitcoin::{Address, BitcoinHash, Network, Transaction, TxIn, Script, TxOut, OutPoint, SigHashType};
-    use bitcoin::consensus::serialize;
-    use std::str::FromStr;
+    use bitcoin::consensus::{deserialize, serialize};
+    use bitcoin::hashes::sha256d;
+    use bitcoin::util::misc::hex_bytes;
+    use bitcoin::{
+        Address, BitcoinHash, Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut,
+    };
     use bitcoin_hashes::hex::ToHex;
     use bitcoin_hashes::Hash;
+    use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
     use bitcoin_wallet::mnemonic::Mnemonic;
-    use bitcoin_wallet::account::{MasterAccount, Unlocker, Account, AccountAddressType};
-    use bitcoin::hashes::sha256d;
+    use std::fmt::Write;
+    use std::str::FromStr;
 
     #[test]
     pub fn fee_test() {
@@ -119,4 +123,25 @@ mod test {
         println!("target {:?}", target);
     }
 
+    #[test]
+    pub fn bitcoin_hash_test() {
+        let tx = create_master();
+        let ser = serialize(&tx);
+        let hash = tx.bitcoin_hash().to_hex();
+
+        println!("tx {:#?}", &tx);
+        println!("hash {:#?}", &hash);
+        println!("hex_bytes {:0x?}", &ser);
+        let hex_tx = hex_bytes(&vec2string(ser)).unwrap();
+        let tx_der: Result<Transaction, _> = deserialize(&hex_tx);
+        assert_eq!(tx, tx_der.unwrap());
+    }
+
+    fn vec2string(vec: Vec<u8>) -> String {
+        let mut r = String::new();
+        for v in vec {
+            write!(r, "{:02x}", v).expect("No write");
+        }
+        r
+    }
 }

@@ -298,8 +298,8 @@ impl DetailSqlite {
         sig_script: String,
         sequence: u64,
         index: u32,
-        btc_tx_hash:String,
-        btc_tx_hexbytes:String,
+        btc_tx_hash: String,
+        btc_tx_hexbytes: String,
     ) {
         let mut btc_input_tx = MBtcInputTx::default();
         btc_input_tx.tx_id = tx_id;
@@ -323,7 +323,7 @@ impl DetailSqlite {
 
     pub fn save_btc_output_tx(
         &self,
-        value: String,
+        value: u64,
         pk_script: String,
         index: u32,
         btc_tx_hash: String,
