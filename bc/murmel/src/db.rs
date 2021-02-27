@@ -347,6 +347,17 @@ impl DetailSqlite {
         }
     }
 
+    pub fn list_btc_output_tx(&self) -> Vec<MBtcOutputTx> {
+        let r = block_on(MBtcOutputTx::list(&self.rb, ""));
+        match r {
+            Err(e) => {
+                error!("{:?}", e);
+                vec![]
+            }
+            Some(r) => r,
+        }
+    }
+
     pub fn save_user_address(&self, address: String, compressed_pub_key: String, verify: String) {
         let mut user_address = MUserAddress::default();
         user_address.address = address;

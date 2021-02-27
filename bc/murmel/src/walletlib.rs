@@ -106,6 +106,7 @@ mod test {
     use bitcoin_wallet::mnemonic::Mnemonic;
     use std::fmt::Write;
     use std::str::FromStr;
+    use crate::kit::vec_to_string;
 
     #[test]
     pub fn fee_test() {
@@ -132,16 +133,9 @@ mod test {
         println!("tx {:#?}", &tx);
         println!("hash {:#?}", &hash);
         println!("hex_bytes {:0x?}", &ser);
-        let hex_tx = hex_bytes(&vec2string(ser)).unwrap();
-        let tx_der: Result<Transaction, _> = deserialize(&hex_tx);
-        assert_eq!(tx, tx_der.unwrap());
+        let hex_tx = hex_bytes(&vec_to_string(ser)).unwrap();
+        let tx_deser: Result<Transaction, _> = deserialize(&hex_tx);
+        assert_eq!(tx, tx_deser.unwrap());
     }
 
-    fn vec2string(vec: Vec<u8>) -> String {
-        let mut r = String::new();
-        for v in vec {
-            write!(r, "{:02x}", v).expect("No write");
-        }
-        r
-    }
 }

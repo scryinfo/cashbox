@@ -15,7 +15,8 @@ use bitcoin_hashes::hex::ToHex;
 
 use crate::constructor::CondvarPair;
 use crate::db::{RB_CHAIN, RB_DETAIL, VERIFY};
-use bitcoin::consensus::serialize as bitcoin_ser;
+use crate::kit::vec_to_string;
+use bitcoin::consensus::serialize as btc_serialize;
 use log::{error, info, trace};
 use std::ops::Deref;
 use std::sync::{mpsc, Arc};
@@ -186,41 +187,33 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                 if current_hash_160.eq(&*VERIFY.1) {
                     let value = vout.value;
                     let btc_tx_hash = tx.bitcoin_hash().to_hex();
-                    // let btc_tx_hexbytes = bitcoin_ser(&tx).to_string();
+                    let btc_tx_hexbytes = btc_serialize(&tx);
+                    let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
                     RB_DETAIL.save_btc_output_tx(
                         value,
                         script.asm(),
                         index as u32,
                         btc_tx_hash,
-                        "".to_owned(),
+                        btc_tx_hexbytes,
                     );
                 }
             }
         }
 
-        // let vines = tx.clone().input;
-        // for vin in vines {
-        //     let script = vin.script_sig;
-        //     let prev_output = vin.previous_output;
-        //     let prev_tx = prev_output.txid.to_hex();
-        //     let prev_vout = prev_output.vout;
-        //     let sequence = vin.sequence;
-        //     let sig_script = script.asm();
-        //     let mut iter = sig_script.split_ascii_whitespace();
-        //     iter.next();
-        //     iter.next();
-        //     iter.next();
-        //     let iter3 = iter.next().unwrap_or(" ");
-        //     if iter3.eq(&*VERIFY.1) {
-        //         RB_DETAIL.save_btc_input_tx(
-        //             tx_hash.to_hex(),
-        //             sig_script.clone(),
-        //             prev_tx,
-        //             prev_vout.to_string(),
-        //             sequence,
-        //         );
-        //     }
-        //}
+        let inputs = tx.clone().input;
+        for (index,txin) in inputs.iter().enumerate() {
+            let txin = txin.to_owned();
+            let outpoint = txin.previous_output;
+            let tx_id = outpoint.txid.to_hex();
+
+
+            let vout = outpoint.vout;
+            let sig_script = txin.script_sig.asm();
+            let btc_tx_hash = tx.bitcoin_hash().to_hex();
+            let btc_tx_hexbytes = btc_serialize(&tx);
+            let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
+
+        }
         Ok(())
     }
 }
