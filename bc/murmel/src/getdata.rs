@@ -187,7 +187,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                 if current_hash_160.eq(&*VERIFY.1) {
                     let value = vout.value;
                     let btc_tx_hash = tx.bitcoin_hash().to_hex();
-                    let btc_tx_hexbytes = btc_serialize(&tx);
+                    let btc_tx_hexbytes = btc_serialize(tx);
                     let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
                     RB_DETAIL.save_btc_output_tx(
                         value,
@@ -216,7 +216,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                 let sig_script = txin.script_sig.asm();
                 let sequence = txin.sequence;
                 let btc_tx_hash = tx.bitcoin_hash().to_hex();
-                let btc_tx_hexbytes = btc_serialize(&tx);
+                let btc_tx_hexbytes = btc_serialize(tx);
                 let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
                 RB_DETAIL.save_btc_input_tx(
                     tx_id,

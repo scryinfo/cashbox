@@ -354,7 +354,7 @@ impl DetailSqlite {
                 error!("{:?}", e);
                 vec![]
             }
-            Some(r) => r,
+            Ok(r) => r,
         }
     }
 
