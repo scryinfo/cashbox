@@ -26,6 +26,9 @@ void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   Config config = await HandleConfig.instance.getConfig();
+  if (config == null) {
+    exit(0);
+  }
   List<String> languagesKeyList = [];
   config.languages.forEach((element) {
     languagesKeyList.add(element.localeKey);

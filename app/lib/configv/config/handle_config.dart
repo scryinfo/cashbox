@@ -28,9 +28,9 @@ class HandleConfig {
 
   Future<Config> getConfig() async {
     File file = await _getConfigFile(configFileName);
-    String fileContent = await file.readAsString();
     Config config = Config();
     try {
+      String fileContent = file.readAsStringSync();
       Map configMap = jsonDecode(fileContent);
       config = Config.fromJson(configMap);
       return config;
@@ -79,9 +79,10 @@ class HandleConfig {
     String docPath = await _getDirectoryPath();
     final filePath = docPath + "/" + fileName;
     File file = File(filePath);
-    if (!await file.exists()) {
+    if (!file.existsSync() || file.lengthSync() <= 0) {
+      file.createSync();
       String jsonStr = await rootBundle.loadString(defaultConfigFilePath);
-      file.writeAsString(jsonStr, flush: true); // creates the file for writing and truncates
+      await file.writeAsStringSync(jsonStr, flush: true); // creates the file for writing and truncates
     }
     return file;
   }
@@ -91,9 +92,9 @@ class HandleConfig {
     final filepath = await getApplicationDocumentsDirectory();
     var file = Directory(filepath.path + configDocumentPath);
     try {
-      bool exists = await file.exists();
+      bool exists = file.existsSync();
       if (!exists) {
-        await file.create();
+        file.createSync();
       }
     } catch (e) {
       Logger().e("_getDirectoryPath ", e.toString());

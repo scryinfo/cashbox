@@ -16,7 +16,7 @@ set CXX=%TOOLCHAIN%/bin/%HOST_TAG%28-clang++.cmd
 
 rustup default stable-gnu
 %~d0
-cd %batPath%/..
+cd "%batPath%/.."
 cargo build --target %HOST_TAG%
-cd %batPath%
+cd "%batPath%"
 EndLocal

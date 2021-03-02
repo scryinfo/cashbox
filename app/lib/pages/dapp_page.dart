@@ -93,11 +93,11 @@ class _DappPageState extends State<DappPage> {
                     child: WebView(
                       // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
                       // initialUrl:"http://192.168.2.57:9010/web_app/dapp/dapp.html",
-                      //initialUrl:"file:///android_asset/flutter_assets/assets/dist/index.html",
+                      initialUrl:"file:///android_asset/flutter_assets/assets/dist/index.html",
                       // initialUrl: "http://192.168.2.97:8080",
                       // initialUrl: "http://192.168.2.12:9690/dapp.html#/",
                       // initialUrl: "http://59.110.231.223:9010/web_app/dapp/dapp.html#/",
-                      initialUrl: snapshot.data.toString(),
+                      // initialUrl: snapshot.data.toString(),
                       javascriptMode: JavascriptMode.unrestricted,
                       debuggingEnabled: true,
                       userAgent:
