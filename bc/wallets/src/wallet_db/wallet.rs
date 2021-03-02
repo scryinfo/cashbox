@@ -1,8 +1,8 @@
 use super::*;
 
-use sqlite::{State, Statement};
 use crate::model::wallet_store::{TbAddress, TbWallet};
 use crate::wallet_db::db_helper::DataServiceProvider;
+use sqlite::{State, Statement};
 
 //According to the chain id, convert to the corresponding chain type and group name
 fn chain_id_convert_group_name(chain_id: i16) -> Option<(i64, String)> {
@@ -13,7 +13,7 @@ fn chain_id_convert_group_name(chain_id: i16) -> Option<(i64, String)> {
         4 => Some((0, "ETH".to_string())),
         5 => Some((1, "EEE".to_string())),
         6 => Some((0, "EEE".to_string())),
-        _ => None
+        _ => None,
     }
 }
 
@@ -26,9 +26,9 @@ impl DataServiceProvider {
         statement.next().map(|_| true).map_err(|err| err.into())
     }
 
-
     pub fn delete_user_data(&self) -> WalletResult<()> {
-        let delete_sql = "delete from detail.AccountInfoSyncProg; delete from detail.TransferRecord;";
+        let delete_sql =
+            "delete from detail.AccountInfoSyncProg; delete from detail.TransferRecord;";
         self.db_hander.execute(delete_sql)?;
         Ok(())
     }
@@ -50,7 +50,7 @@ impl DataServiceProvider {
         stat.next()?;
 
         let mut address_stat = self.db_hander.prepare(address_sql)?;
-        log::info!("addr length is:{}",addrs.len());
+        log::info!("addr length is:{}", addrs.len());
         for addr in addrs {
             address_stat.bind(1, addr.address_id.as_str())?;
             address_stat.bind(2, addr.wallet_id.as_str())?;
@@ -60,9 +60,9 @@ impl DataServiceProvider {
             address_stat.bind(6, addr.status as i64)?;
             address_stat.next()?;
             address_stat.reset()?;
-            log::debug!("chain type id:{}",addr.chain_id);
+            log::debug!("chain type id:{}", addr.chain_id);
             let convert_ret = chain_id_convert_group_name(addr.chain_id).unwrap();
-            log::debug!("type:{},group name:{}",convert_ret.0,convert_ret.1);
+            log::debug!("type:{},group name:{}", convert_ret.0, convert_ret.1);
             let sql = format!("insert into detail.DigitUseDetail(digit_id,address_id) select id,'{}' from detail.DefaultDigitBase where status =1 and is_visible =1 and chain_type={} and group_name = '{}';", addr.address_id, convert_ret.0, convert_ret.1);
             self.db_hander.execute(&sql)?;
         }
@@ -80,8 +80,12 @@ impl DataServiceProvider {
         let query_sql = "select * from Wallet where mn_digest = ? and wallet_type = ?";
         let mut statement = self.db_hander.prepare(query_sql).unwrap();
         //The defined return result is Option, which cannot be used for error handling currently? `Way back
-        statement.bind(1, digest).expect("query_by_mnemonic_id bind id");
-        statement.bind(2, wallet_type).expect("query_by_mnemonic_id bind id");
+        statement
+            .bind(1, digest)
+            .expect("query_by_mnemonic_id bind id");
+        statement
+            .bind(2, wallet_type)
+            .expect("query_by_mnemonic_id bind id");
         self.query_wallet(&mut statement).ok()
     }
 
@@ -92,16 +96,24 @@ impl DataServiceProvider {
         self.query_wallet(&mut statement)
     }
     //Via wallet address
-    pub fn get_wallet_by_address(&self, address: &str, chain_type: ChainType) -> WalletResult<TbWallet> {
+    pub fn get_wallet_by_address(
+        &self,
+        address: &str,
+        chain_type: ChainType,
+    ) -> WalletResult<TbWallet> {
         let query_sql = "SELECT a.* from Wallet a, detail.Address b, detail.Chain c WHERE b.chain_id = c.id and b.wallet_id = a.wallet_id and b.address =? and c.type=?; ";
         let mut statement = self.db_hander.prepare(query_sql)?;
-        statement.bind(1, address).expect("get_wallet_by_address bind address");
-        statement.bind(2, chain_type as i64).expect("get_wallet_by_address chain_type");
+        statement
+            .bind(1, address)
+            .expect("get_wallet_by_address bind address");
+        statement
+            .bind(2, chain_type as i64)
+            .expect("get_wallet_by_address chain_type");
         self.query_wallet(&mut statement)
     }
     //Return wallet information that satisfies the condition, the function returns only one element
     fn query_wallet(&self, statement: &mut Statement) -> WalletResult<TbWallet> {
-        let wallets = self.get_wallets_from_database(statement);
+        let wallets = self.get_wallets_from_database(statement)?;
         if !wallets.is_empty() {
             Ok(wallets[0].clone())
         } else {
@@ -109,30 +121,30 @@ impl DataServiceProvider {
         }
     }
 
-    fn get_wallets_from_database(&self, statement: &mut Statement) -> Vec<TbWallet> {
+    fn get_wallets_from_database(&self, statement: &mut Statement) -> WalletResult<Vec<TbWallet>> {
         let mut wallets = Vec::new();
-        while let State::Row = statement.next().unwrap() {
+        while let State::Row = statement.next()? {
             let wallet = TbWallet {
-                wallet_id: statement.read::<String>(0).unwrap(),
-                mn_digest: statement.read::<String>(1).unwrap(),
+                wallet_id: statement.read::<String>(0)?,
+                mn_digest: statement.read::<String>(1)?,
                 full_name: statement.read::<String>(2).ok(),
-                mnemonic: statement.read::<String>(3).unwrap(),
-                wallet_type: statement.read::<i64>(4).unwrap(),
+                mnemonic: statement.read::<String>(3)?,
+                wallet_type: statement.read::<i64>(4)?,
                 selected: statement.read::<i64>(5).map(|value| value == 1).ok(),
-                status: statement.read::<i64>(6).unwrap(),
-                display_chain_id: statement.read::<i64>(7).unwrap(),
-                create_time: statement.read::<String>(8).unwrap(),
+                status: statement.read::<i64>(6)?,
+                display_chain_id: statement.read::<i64>(7)?,
+                create_time: statement.read::<String>(8)?,
                 update_time: statement.read::<String>(9).ok(),
             };
             wallets.push(wallet);
         }
-        wallets
+        Ok(wallets)
     }
 
     //Currently the function is to return all wallets
-    pub fn get_wallets(&self) -> Vec<TbWallet> {
+    pub fn get_wallets(&self) -> WalletResult<Vec<TbWallet>> {
         let sql = "select * from Wallet WHERE status = 1 order by create_time desc;";
-        let mut statement = self.db_hander.prepare(sql).unwrap();
+        let mut statement = self.db_hander.prepare(sql)?;
         self.get_wallets_from_database(&mut statement)
     }
 
@@ -146,7 +158,6 @@ impl DataServiceProvider {
         stat.next()?;
         Ok(())
     }
-
 
     pub fn del_mnemonic(&self, mn_id: &str) -> WalletResult<()> {
         //Delete the corresponding record in the wallet table
