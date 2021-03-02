@@ -2,7 +2,7 @@ Setlocal
 set cuPath=%cd%
 set batPath=%~dp0
 %~d0
-cd %batPath%/..
+cd "%batPath%/.."
 
 cbindgen --config cbindgen.toml --crate wallets_cdl --output src/wallets_c.h
 
@@ -12,5 +12,5 @@ cd ../../packages/wallets
 #flutter pub get
 flutter pub run build_runner build
 
-cd %cuPath%
+cd "%cuPath%"
 EndLocal

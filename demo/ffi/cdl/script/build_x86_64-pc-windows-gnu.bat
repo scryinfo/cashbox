@@ -8,7 +8,7 @@ set BUILD_DUMMY_WASM_BINARY=1
 
 rustup default stable-gnu
 %~d0
-cd %batPath%/..
+cd "%batPath%/.."
 cargo build --target %HOST_TAG%
-cd %batPath%
+cd "%batPath%"
 EndLocal

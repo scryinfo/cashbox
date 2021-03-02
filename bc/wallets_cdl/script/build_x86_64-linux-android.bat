@@ -5,7 +5,7 @@ set NDK=%ANDROID_NDK%
 set cuPath=%cd%
 set batPath=%~dp0
 %~d0
-cd %batPath%/../../../app/
+cd "%batPath%/../../../app/"
 mkdir dl\x86_64
 cd dl/x86_64
 set outPath=%cd%
@@ -19,12 +19,12 @@ set LINKER=%TOOLCHAIN%/bin/%HOST_TAG%28-clang.cmd
 set CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER=%LINKER%
 
 #rustup default stable-gnu
-cd %batPath%/..
+cd "%batPath%/.."
 cargo build --release --target %HOST_TAG%
 
-cd %batPath%../../target/%HOST_TAG%/release
+cd "%batPath%../../target/%HOST_TAG%/release"
 copy /Y "libwallets_cdl.so" "%outPath%/"
 
-cd %cuPath%
+cd "%cuPath%"
 
 EndLocal
