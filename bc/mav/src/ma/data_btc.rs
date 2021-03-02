@@ -78,7 +78,7 @@ pub struct MBtcInputTx {
     #[serde(default)]
     pub sig_script: String,
     #[serde(default)]
-    pub sequence: u64,
+    pub sequence: u32,
     // index
     #[serde(default)]
     pub index :u32,

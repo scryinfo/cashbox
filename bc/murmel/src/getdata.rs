@@ -201,18 +201,33 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         }
 
         let inputs = tx.clone().input;
-        for (index,txin) in inputs.iter().enumerate() {
+        for (index, txin) in inputs.iter().enumerate() {
             let txin = txin.to_owned();
             let outpoint = txin.previous_output;
             let tx_id = outpoint.txid.to_hex();
+            let vec = RB_DETAIL.list_btc_output_tx();
+            let mut hash_vec = vec![];
+            for output in vec {
+                hash_vec.push(output.btc_tx_hash);
+            }
 
-
-            let vout = outpoint.vout;
-            let sig_script = txin.script_sig.asm();
-            let btc_tx_hash = tx.bitcoin_hash().to_hex();
-            let btc_tx_hexbytes = btc_serialize(&tx);
-            let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
-
+            if hash_vec.contains(&tx_id) {
+                let vout = outpoint.vout;
+                let sig_script = txin.script_sig.asm();
+                let sequence = txin.sequence;
+                let btc_tx_hash = tx.bitcoin_hash().to_hex();
+                let btc_tx_hexbytes = btc_serialize(&tx);
+                let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
+                RB_DETAIL.save_btc_input_tx(
+                    tx_id,
+                    vout,
+                    sig_script,
+                    sequence,
+                    index as u32,
+                    btc_tx_hash,
+                    btc_tx_hexbytes,
+                );
+            }
         }
         Ok(())
     }

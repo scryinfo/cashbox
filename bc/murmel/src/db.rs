@@ -296,7 +296,7 @@ impl DetailSqlite {
         tx_id: String,
         vout: u32,
         sig_script: String,
-        sequence: u64,
+        sequence: u32,
         index: u32,
         btc_tx_hash: String,
         btc_tx_hexbytes: String,
