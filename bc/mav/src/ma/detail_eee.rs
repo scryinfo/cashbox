@@ -1,5 +1,5 @@
-use rbatis::crud::CRUDEnable;
-use rbatis_macro_driver::CRUDEnable;
+use rbatis::crud::CRUDTable;
+use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
@@ -17,6 +17,7 @@ pub enum EeeTokenType {
 }
 
 impl EeeTokenType {
+    #[allow(dead_code)]
     fn from(token_type: &str) -> Result<Self, kits::Error> {
         match token_type {
             "Eee" => Ok(EeeTokenType::Eee),
@@ -40,7 +41,7 @@ impl ToString for EeeTokenType {
 }
 
 // eee
-#[db_append_shared(CRUDEnable)]
+#[db_append_shared(CRUDTable)]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenShared {
     #[serde(flatten)]
@@ -64,7 +65,7 @@ impl MEeeChainTokenShared {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenAuth {
     /// [EeeChainTokenShared]
     #[serde(default)]
@@ -83,7 +84,7 @@ impl MEeeChainTokenAuth {
 }
 
 /// DefaultToken must be a [EeeChainTokenAuth]
-#[db_append_shared(CRUDEnable)]
+#[db_append_shared(CRUDTable)]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenDefault {
     /// [EeeChainTokenShared]
@@ -109,7 +110,7 @@ impl MEeeChainTokenDefault {
 #[cfg(test)]
 mod tests {
     use futures::executor::block_on;
-    use rbatis::crud::CRUDEnable;
+    use rbatis::crud::CRUDTable;
     use rbatis::rbatis::Rbatis;
     use strum::IntoEnumIterator;
 

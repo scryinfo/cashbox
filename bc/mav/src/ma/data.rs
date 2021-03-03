@@ -1,4 +1,4 @@
-use rbatis_macro_driver::CRUDEnable;
+use rbatis_macro_driver::CRUDTable;
 use serde::{Deserialize, Serialize};
 
 use wallets_macro::{db_append_shared, db_sub_struct, DbBeforeSave, DbBeforeUpdate};
@@ -9,7 +9,7 @@ use crate::ma::dao::{self, Shared};
 /// 地址与token对应的balance
 #[allow(non_upper_case_globals)]
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MTokenAddress {
     #[serde(default)]
     pub wallet_id: String,
@@ -53,7 +53,7 @@ pub struct TxShared {
 #[cfg(test)]
 mod tests {
     use futures::executor::block_on;
-    use rbatis::crud::CRUDEnable;
+    use rbatis::crud::CRUDTable;
     use rbatis::rbatis::Rbatis;
 
     use crate::kits::test::make_memory_rbatis_test;
@@ -64,18 +64,18 @@ mod tests {
     #[allow(non_snake_case)]
     fn m_token_address_test() {
         let mut m = MTokenAddress::default();
-        assert_eq!("", m.get_id());
+        assert_eq!("", Shared::get_id(&m));
         assert_eq!(0, m.get_create_time());
         assert_eq!(0, m.get_update_time());
         m.before_save();
-        assert_ne!("", m.get_id());
+        assert_ne!("", Shared::get_id(&m));
         assert_ne!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
         assert_eq!(m.get_create_time(), m.get_update_time());
 
         let mut m = MTokenAddress::default();
         m.before_update();
-        assert_eq!("", m.get_id());
+        assert_eq!("", Shared::get_id(&m));
         assert_eq!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
 

@@ -1,8 +1,10 @@
 use std::{fmt, fs, io, path};
 use std::ops::Add;
 
-use rbatis::rbatis::Rbatis;
+use rbatis::rbatis::{Rbatis, RbatisOption};
 use uuid::Uuid;
+use rbatis::plugin::log::{RbatisLogPlugin, LogPlugin};
+use std::sync::Arc;
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Error {
@@ -56,7 +58,15 @@ pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis, Error> {
 }
 
 pub async fn make_memory_rbatis() -> Result<Rbatis, Error> {
-    let rb = Rbatis::new();
+    let rb = {
+        let op = RbatisOption{
+            log_plugin: Arc::new(Box::new(RbatisLogPlugin{
+                level_filter: log::max_level(),
+            }) as Box<dyn LogPlugin>),
+            ..RbatisOption::default()
+        };
+        Rbatis::new_with_opt(op)
+    };
     let url = "sqlite://:memory:".to_owned();
     rb.link(&url).await?;
     return Ok(rb);
@@ -85,6 +95,21 @@ pub mod test {
     }
 
     pub async fn make_memory_rbatis_test() -> Rbatis {
+        struct SimpleLogger;
+
+        impl log::Log for SimpleLogger {
+            fn enabled(&self, _: &log::Metadata) -> bool {
+                true
+            }
+
+            fn log(&self, record: &log::Record) {
+                println!("{} - {}", record.level(), record.args());
+            }
+
+            fn flush(&self) {}
+        }
+        let _ = log::set_boxed_logger(Box::new(SimpleLogger));
+        log::set_max_level(log::LevelFilter::Info);
         let re = make_memory_rbatis().await;
         re.unwrap()
     }

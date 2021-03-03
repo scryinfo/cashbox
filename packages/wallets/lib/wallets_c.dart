@@ -726,6 +726,8 @@ class CBtcChain extends Struct {
 /// C struct `CBtcChainToken`.
 class CBtcChainToken extends Struct {
   
+  @Int32()
+  int show;
   Pointer<CBtcChainTokenShared> btcChainTokenShared;
   static Pointer<CBtcChainToken> allocate() {
     return ffi.allocate<CBtcChainToken>();
@@ -967,6 +969,8 @@ class CEeeChain extends Struct {
 /// C struct `CEeeChainToken`.
 class CEeeChainToken extends Struct {
   
+  @Int32()
+  int show;
   Pointer<CEeeChainTokenShared> eeeChainTokenShared;
   static Pointer<CEeeChainToken> allocate() {
     return ffi.allocate<CEeeChainToken>();
@@ -1138,6 +1142,8 @@ class CEthChain extends Struct {
 /// C struct `CEthChainToken`.
 class CEthChainToken extends Struct {
   
+  @Int32()
+  int show;
   Pointer<CEthChainTokenShared> ethChainTokenShared;
   static Pointer<CEthChainToken> allocate() {
     return ffi.allocate<CEthChainToken>();

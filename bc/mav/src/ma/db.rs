@@ -1,6 +1,6 @@
 use std::ops::Add;
 
-use rbatis::crud::CRUDEnable;
+use rbatis::crud::CRUDTable;
 use rbatis::rbatis::Rbatis;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;

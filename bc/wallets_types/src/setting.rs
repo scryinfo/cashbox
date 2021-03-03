@@ -66,7 +66,7 @@ impl Setting {
 #[cfg(test)]
 mod tests {
     use futures::executor::block_on;
-    use rbatis::crud::CRUDEnable;
+    use rbatis::crud::CRUDTable;
 
     use mav::ChainType;
     use mav::ma::{Dao, Db, DbCreateType, MSetting, SettingType};

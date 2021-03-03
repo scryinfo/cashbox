@@ -6,4 +6,4 @@ CREATE TABLE IF NOT EXISTS m_block_header (
     id TEXT PRIMARY KEY,
     create_time INTEGER NOT NULL,
     update_time INTEGER NOT NULL
-);
+ );

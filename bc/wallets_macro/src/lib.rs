@@ -10,13 +10,13 @@ mod cr;
 /// 生成数据库通用部分，包括如下：
 /// # 三个字段， id: String, create_time: i64,update_time: i64
 /// # impl Shared
-/// # 选项，如果有“CRUDEnable”参数，那么使用 rbatis的json方式实现 CRUDEnable接口。 如果struct中带有sub struct只能使用这种方式实现
+/// # 选项，如果有“CRUDTable”参数，那么使用 rbatis的json方式实现 CRUDTable接口。 如果struct中带有sub struct只能使用这种方式实现
 /// # 在目录 “generated_sql”下面生成创建数据表的sql语言，现只支持sqlite，详细说明如下：
 /// * 数据库表需要 "#[db_append_shared]" attribute
 /// * 每一个字段都需要 "#[serde(default)]" 在使用serde_json时，提供默认值，如果不给 model <==> db时会出错
 /// * sub struct上需要使用 "#[serde(flatten)]" 在序列化时它会把sub struct中的字段直接放入parent struct中
-/// * 在有sub struct时不能使用"#[derive(CRUDEnable)]"，只能使用[db_append_shared(CRUDEnable)]
-/// * 如果没有sub struct 可以使用#[derive(CRUDEnable)]，它是在编译时生成的代码，没有运行开销。
+/// * 在有sub struct时不能使用"#[derive(CRUDTable)]"，只能使用[db_append_shared(CRUDTable)]
+/// * 如果没有sub struct 可以使用#[derive(CRUDTable)]，它是在编译时生成的代码，没有运行开销。
 /// * 所有字段不能重名，包含sub struct中的
 /// ## 支持类型
 /// i16,u16,i32,u32,i64,u64,
@@ -29,7 +29,7 @@ mod cr;
 /// use serde::{Deserialize, Serialize};
 /// use wallets_macro::{db_append_shared,db_sub_struct};
 ///
-/// #[db_append_shared(CRUDEnable)]
+/// #[db_append_shared(CRUDTable)]
 /// #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 /// struct Big{
 ///  #[serde(default)]
@@ -47,12 +47,12 @@ mod cr;
 /// # Sample no sub struct
 /// ````
 /// use serde::{Deserialize, Serialize};
-/// use rbatis_macro_driver::CRUDEnable;
+/// use rbatis_macro_driver::CRUDTable;
 ///
 /// use wallets_macro::db_append_shared;
 ///
 /// #[db_append_shared]
-/// #[derive(Serialize, Deserialize, Clone, Debug, Default,CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+/// #[derive(Serialize, Deserialize, Clone, Debug, Default,CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 /// struct Big{
 ///  #[serde(default)]
 ///  pub name: String,
@@ -102,8 +102,11 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
         quote! {}
     } else {
         quote! {
-            impl CRUDEnable for #name {
+            impl CRUDTable for #name {
                 type IdType = String;
+                fn get_id(&self) ->  Option<&Self::IdType>{
+                    Some(&self.id)
+                }
             }
         }
     };
@@ -182,7 +185,7 @@ pub fn db_before_save(input: TokenStream) -> TokenStream {
     let gen = quote! {
         impl dao::BeforeSave for #name {
             fn before_save(&mut self){
-                if self.get_id().is_empty() {
+                if Shared::get_id(self).is_empty() {
                     self.set_id(kits::uuid());
                     self.set_update_time(kits::now_ts_seconds());
                     self.set_create_time(self.get_update_time());

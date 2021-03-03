@@ -20,9 +20,9 @@ rustfmt = "0.10.0"
 bigdecimal = { version = "0.2.0", package = "bigdecimal", features = ["serde"] }
 
 [dev-dependencies]
-rbatis-core = { version = "1.8.65", features = ["async-io-sqlite"] }
-rbatis = { version = "1.8.65", features = ["async-io-sqlite"] }
-rbatis-macro-driver = { version = "1.8.65"}
+rbatis-core = { version = "1.8.70", features = ["async-io-sqlite"] }
+rbatis = { version = "1.8.75", features = ["async-io-sqlite"] }
+rbatis-macro-driver = { version = "1.8.74"}
 serde = { version = "1", features = ["derive"] }
 
 [features]

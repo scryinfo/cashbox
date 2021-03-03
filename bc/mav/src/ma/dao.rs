@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use rbatis::core::db::DBExecResult;
 use rbatis::core::Result;
-use rbatis::crud::{CRUD, CRUDEnable};
+use rbatis::crud::{CRUD, CRUDTable};
 use rbatis::plugin::page::{IPageRequest, Page};
 use rbatis::rbatis::Rbatis;
 use rbatis::wrapper::Wrapper;
@@ -32,7 +32,7 @@ pub trait BeforeUpdate {
 }
 
 #[async_trait]
-pub trait Dao<T: CRUDEnable + Shared> {
+pub trait Dao<T: CRUDTable + Shared> {
     /// 调用 before_save 然后 insert 到数据 database,
     async fn save(&mut self, rb: &rbatis::rbatis::Rbatis, tx_id: &str) -> Result<DBExecResult>;
     /// 调用 before_save 然后 insert 到数据 database,
@@ -71,7 +71,7 @@ pub trait Dao<T: CRUDEnable + Shared> {
 
 #[async_trait]
 impl<T> Dao<T> for T where
-    T: CRUDEnable + Shared + BeforeSave + BeforeUpdate,
+    T: CRUDTable + Shared + BeforeSave + BeforeUpdate,
 {
     async fn save(&mut self, rb: &Rbatis, tx_id: &str) -> Result<DBExecResult> {
         self.before_save();
@@ -86,7 +86,7 @@ impl<T> Dao<T> for T where
     }
 
     async fn save_update(&mut self, rb: &rbatis::rbatis::Rbatis, tx_id: &str) -> Result<DBExecResult> {
-        if self.get_id().is_empty() {
+        if Shared::get_id(self).is_empty() {
             self.save(rb, tx_id).await
         } else {
             let r = self.update_by_id(rb, tx_id).await?;
@@ -140,15 +140,16 @@ impl<T> Dao<T> for T where
     }
 
     async fn list(rb: &Rbatis, tx_id: &str) -> Result<Vec<T>> where T: 'async_trait {
-        rb.list(tx_id).await
+        rb.fetch_list(tx_id).await
+        // rb.list(tx_id).await
     }
 
     async fn list_by_wrapper(rb: &Rbatis, tx_id: &str, w: &Wrapper) -> Result<Vec<T>> where T: 'async_trait {
-        rb.list_by_wrapper(tx_id, w).await
+        rb.fetch_list_by_wrapper(tx_id, w).await
     }
 
     async fn list_by_ids(rb: &Rbatis, tx_id: &str, ids: &[T::IdType]) -> Result<Vec<T>> where T: 'async_trait {
-        rb.list_by_ids(tx_id, ids).await
+        rb.fetch_list_by_ids(tx_id, ids).await
     }
 
     async fn exist_by_wrapper(rb: &rbatis::rbatis::Rbatis, tx_id: &str, w: &Wrapper) -> Result<bool> where T: 'async_trait {

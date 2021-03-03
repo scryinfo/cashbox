@@ -15,7 +15,7 @@ use log::{debug, error, info};
 use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx};
 use mav::ma::{MLocalTxLog, MProgress, MUserAddress};
 use once_cell::sync::Lazy;
-use rbatis::crud::CRUDEnable;
+use rbatis::crud::CRUDTable;
 use rbatis::crud::CRUD;
 use rbatis::plugin::page::{IPage, Page, PageRequest};
 use rbatis::rbatis::Rbatis;

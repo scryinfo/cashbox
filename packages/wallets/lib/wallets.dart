@@ -207,14 +207,16 @@ class Wallets {
     return DlResult1(wallet, err);
   }
 
-  Error removeWallet(String walletId) {
+  Error removeWallet(String walletId,String password) {
     Error err;
     {
-      var ptr = walletId.toCPtr();
-      var cerr = clib.Wallets_removeWallet(ptrContext, ptr);
+      var ptrWalletId = walletId.toCPtr();
+      var ptrPassword = password.toCPtr();
+      var cerr = clib.Wallets_removeWallet(ptrContext, ptrWalletId,ptrPassword);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
-      ptr.free();
+      ptrWalletId.free();
+      ptrPassword.free();
     }
 
     return err;

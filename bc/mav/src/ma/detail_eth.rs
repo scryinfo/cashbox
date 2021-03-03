@@ -1,5 +1,5 @@
-use rbatis::crud::CRUDEnable;
-use rbatis_macro_driver::CRUDEnable;
+use rbatis::crud::CRUDTable;
+use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
@@ -17,6 +17,7 @@ pub enum EthTokenType {
 }
 
 impl EthTokenType {
+    #[allow(dead_code)]
     fn from(token_type: &str) -> Result<Self, kits::Error> {
         match token_type {
             "Eth" => Ok(EthTokenType::Eth),
@@ -40,7 +41,7 @@ impl ToString for EthTokenType {
 }
 
 //eth
-#[db_append_shared(CRUDEnable)]
+#[db_append_shared(CRUDTable)] //
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTokenShared {
     #[serde(flatten)]
@@ -62,7 +63,7 @@ impl MEthChainTokenShared {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTokenAuth {
     /// [EthChainTokenShared]
     #[serde(default)]
@@ -87,7 +88,7 @@ impl MEthChainTokenAuth {
 }
 
 /// DefaultToken must be a [EthChainTokenAuth]
-#[db_append_shared(CRUDEnable)]
+#[db_append_shared(CRUDTable)]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTokenDefault {
     /// [crate::db::TokenShared]
@@ -117,7 +118,7 @@ impl MEthChainTokenDefault {
 #[cfg(test)]
 mod tests {
     use futures::executor::block_on;
-    use rbatis::crud::CRUDEnable;
+    use rbatis::crud::CRUDTable;
     use rbatis::rbatis::Rbatis;
     use strum::IntoEnumIterator;
 

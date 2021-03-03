@@ -1317,6 +1317,7 @@ class BtcChain extends DC<clib.CBtcChain> {
 }
 
 class BtcChainToken extends DC<clib.CBtcChainToken> {
+  int show;
   BtcChainTokenShared btcChainTokenShared;
 
   BtcChainToken() {
@@ -1353,6 +1354,7 @@ class BtcChainToken extends DC<clib.CBtcChainToken> {
     if (c == null || c == nullptr) {
       return;
     }
+    c.ref.show = show;
     if (c.ref.btcChainTokenShared == null ||
         c.ref.btcChainTokenShared == nullptr) {
       c.ref.btcChainTokenShared = allocateZero<clib.CBtcChainTokenShared>();
@@ -1365,6 +1367,7 @@ class BtcChainToken extends DC<clib.CBtcChainToken> {
     if (c == null || c == nullptr) {
       return;
     }
+    show = c.ref.show;
     btcChainTokenShared = new BtcChainTokenShared();
     btcChainTokenShared.toDart(c.ref.btcChainTokenShared);
   }
@@ -2118,6 +2121,7 @@ class EeeChain extends DC<clib.CEeeChain> {
 }
 
 class EeeChainToken extends DC<clib.CEeeChainToken> {
+  int show;
   EeeChainTokenShared eeeChainTokenShared;
 
   EeeChainToken() {
@@ -2154,6 +2158,7 @@ class EeeChainToken extends DC<clib.CEeeChainToken> {
     if (c == null || c == nullptr) {
       return;
     }
+    c.ref.show = show;
     if (c.ref.eeeChainTokenShared == null ||
         c.ref.eeeChainTokenShared == nullptr) {
       c.ref.eeeChainTokenShared = allocateZero<clib.CEeeChainTokenShared>();
@@ -2166,6 +2171,7 @@ class EeeChainToken extends DC<clib.CEeeChainToken> {
     if (c == null || c == nullptr) {
       return;
     }
+    show = c.ref.show;
     eeeChainTokenShared = new EeeChainTokenShared();
     eeeChainTokenShared.toDart(c.ref.eeeChainTokenShared);
   }
@@ -2777,6 +2783,7 @@ class EthChain extends DC<clib.CEthChain> {
 }
 
 class EthChainToken extends DC<clib.CEthChainToken> {
+  int show;
   EthChainTokenShared ethChainTokenShared;
 
   EthChainToken() {
@@ -2813,6 +2820,7 @@ class EthChainToken extends DC<clib.CEthChainToken> {
     if (c == null || c == nullptr) {
       return;
     }
+    c.ref.show = show;
     if (c.ref.ethChainTokenShared == null ||
         c.ref.ethChainTokenShared == nullptr) {
       c.ref.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>();
@@ -2825,6 +2833,7 @@ class EthChainToken extends DC<clib.CEthChainToken> {
     if (c == null || c == nullptr) {
       return;
     }
+    show = c.ref.show;
     ethChainTokenShared = new EthChainTokenShared();
     ethChainTokenShared.toDart(c.ref.ethChainTokenShared);
   }

@@ -1,4 +1,4 @@
-use rbatis_macro_driver::CRUDEnable;
+use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -11,9 +11,9 @@ use crate::ma::MWallet;
 //导入/创建钱包时生成
 //修改密码时修改
 //删除钱包时软件删除
-//功能是作为备份使用，如果Wallet表中的数据无法读取时，才起用此表 ,CRUDEnable
+//功能是作为备份使用，如果Wallet表中的数据无法读取时，才起用此表 ,CRUDTable
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MMnemonic {
     #[serde(default)]
     pub mnemonic_digest: String,
@@ -41,7 +41,7 @@ impl MMnemonic {
 #[cfg(test)]
 mod tests {
     use futures::executor::block_on;
-    use rbatis::crud::CRUDEnable;
+    use rbatis::crud::CRUDTable;
     use rbatis::rbatis::Rbatis;
     use serde::{Deserialize, Serialize};
 
@@ -56,18 +56,18 @@ mod tests {
     fn test_Mnemonic() {
         // let colx = Mnemonic::table_columns();
         let mut m = MMnemonic::default();
-        assert_eq!("", m.get_id());
+        assert_eq!("", Shared::get_id(&m));
         assert_eq!(0, m.get_create_time());
         assert_eq!(0, m.get_update_time());
         m.before_save();
-        assert_ne!("", m.get_id());
+        assert_ne!("", Shared::get_id(&m));
         assert_ne!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
         assert_eq!(m.get_create_time(), m.get_update_time());
 
         let mut m = MMnemonic::default();
         m.before_update();
-        assert_eq!("", m.get_id());
+        assert_eq!("", Shared::get_id(&m));
         assert_eq!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
 

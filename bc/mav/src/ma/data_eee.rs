@@ -1,5 +1,5 @@
-use rbatis::crud::CRUDEnable;
-use rbatis_macro_driver::CRUDEnable;
+use rbatis::crud::CRUDTable;
+use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -11,7 +11,7 @@ use crate::ma::TxShared;
 
 //eee
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainToken {
     #[serde(default)]
     pub next_id: String,
@@ -39,7 +39,7 @@ impl MEeeChainToken {
 }
 
 /// eee chain的交易
-#[db_append_shared(CRUDEnable)]
+#[db_append_shared(CRUDTable)]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTx {
     #[serde(flatten)]
@@ -66,7 +66,7 @@ impl MEeeChainTx {
     }
 }
 
-#[db_append_shared(CRUDEnable)]
+#[db_append_shared(CRUDTable)]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeTokenxTx {
     #[serde(flatten)]
@@ -94,7 +94,7 @@ impl MEeeTokenxTx {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MSubChainBasicInfo {
     #[serde(default)]
     pub genesis_hash: String,
@@ -121,7 +121,7 @@ impl MSubChainBasicInfo {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MAccountInfoSyncProg {
     #[serde(default)]
     pub account: String,
@@ -142,7 +142,7 @@ impl MAccountInfoSyncProg {
 #[cfg(test)]
 mod tests {
     use futures::executor::block_on;
-    use rbatis::crud::CRUDEnable;
+    use rbatis::crud::CRUDTable;
     use rbatis::rbatis::Rbatis;
 
     use crate::ChainType;
@@ -181,10 +181,10 @@ mod tests {
     fn m_eee_chain_tx_test() {
         // let colx = EeeChainTx::table_columns();
         let mut m = MEeeChainTx::default();
-        assert_eq!("", m.get_id());
+        assert_eq!("", Shared::get_id(&m));
         assert_eq!(0, m.get_create_time());
         assert_eq!(0, m.get_update_time());
-        assert_eq!("", m.status);
+        assert_eq!(false, m.status);
         assert_eq!("", m.extension);
         assert_eq!("", m.from_address);
         assert_eq!("", m.to_address);
@@ -195,14 +195,14 @@ mod tests {
         assert_eq!("", m.tx_shared.tx_hash);
 
         m.before_save();
-        assert_ne!("", m.get_id());
+        assert_ne!("", Shared::get_id(&m));
         assert_ne!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
         assert_eq!(m.get_create_time(), m.get_update_time());
 
         let mut m = MEeeChainTx::default();
         m.before_update();
-        assert_eq!("", m.get_id());
+        assert_eq!("", Shared::get_id(&m));
         assert_eq!(0, m.get_create_time());
         assert_ne!(0, m.get_update_time());
 
@@ -210,7 +210,7 @@ mod tests {
         let mut m = MEeeChainTx::default();
         m.from_address = "test".to_owned();
         m.extension = "eee".to_owned();
-        m.status = String::new();
+        m.status = false;
         m.tx_shared.tx_hash = "hash".to_owned();
         let err = block_on(m.save(&rb, ""));
         if let Err(e) = &err {

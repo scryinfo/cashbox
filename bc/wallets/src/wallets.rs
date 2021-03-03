@@ -67,6 +67,9 @@ impl Wallets {
     }
 
     pub async fn init(&mut self, parameters: &InitParameters) -> Result<&Context, WalletError> {
+        #[cfg(target_os = "android")]
+        crate::init_logger_once();
+
         self.ctx.context_note = parameters.context_note.clone();
         self.db.init(&parameters.db_name).await?;
         self.db.init_tables(&DbCreateType::NotExists).await?;

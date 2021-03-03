@@ -1,5 +1,5 @@
-use rbatis::crud::CRUDEnable;
-use rbatis_macro_driver::CRUDEnable;
+use rbatis::crud::CRUDTable;
+use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
@@ -16,6 +16,7 @@ pub enum BtcTokenType {
 }
 
 impl BtcTokenType {
+    #[allow(dead_code)]
     fn from(token_type: &str) -> Result<Self, kits::Error> {
         match token_type {
             "Btc" => Ok(BtcTokenType::Btc),
@@ -37,7 +38,7 @@ impl ToString for BtcTokenType {
 }
 
 //btc
-#[db_append_shared(CRUDEnable)]
+#[db_append_shared(CRUDTable)]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTokenShared {
     #[serde(flatten)]
@@ -58,7 +59,7 @@ impl MBtcChainTokenShared {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTokenAuth {
     /// [BtcChainTokenShared]
     #[serde(default)]
@@ -77,7 +78,7 @@ impl MBtcChainTokenAuth {
 }
 
 /// DefaultToken must be a [BtcChainTokenAuth]
-#[db_append_shared(CRUDEnable)]
+#[db_append_shared(CRUDTable)]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTokenDefault {
     /// [BtcChainTokenShared]
@@ -101,7 +102,7 @@ impl MBtcChainTokenDefault {
 
 //murmel defined
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MUserAddress {
     #[serde(default)]
     pub address: String,
@@ -118,7 +119,7 @@ impl MUserAddress {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MProgress {
     #[serde(default)]
     pub header: String,
@@ -133,7 +134,7 @@ impl MProgress{
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MLocalTxLog {
     #[serde(default)]
     pub address_from: String,
@@ -156,7 +157,7 @@ impl MLocalTxLog {
 #[cfg(test)]
 mod tests {
     use futures::executor::block_on;
-    use rbatis::crud::CRUDEnable;
+    use rbatis::crud::CRUDTable;
     use rbatis::rbatis::Rbatis;
     use strum::IntoEnumIterator;
 

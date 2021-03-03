@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use rbatis::crud::CRUDEnable;
+use rbatis::crud::CRUDTable;
 
 use mav::{ChainType, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;

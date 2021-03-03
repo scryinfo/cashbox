@@ -220,7 +220,7 @@ mod tests {
     #[test]
     fn app_platform_type_test() {
         for it in AppPlatformType::iter() {
-            assert_eq!(it, AppPlatformType::from(&it.to_string()));
+            assert_eq!(it, AppPlatformType::from(&it.to_string()).unwrap());
         }
     }
 }

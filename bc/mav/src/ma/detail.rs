@@ -1,4 +1,4 @@
-use rbatis_macro_driver::CRUDEnable;
+use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -8,7 +8,7 @@ use crate::kits;
 use crate::ma::dao::{self, bool_from_int, Shared};
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MWallet {
     //下一个显示顺序的 wallet_id
     #[serde(default)]
@@ -37,7 +37,7 @@ impl MWallet {
 
 //每一种链类型一条记录，实现时可以不写入数据库
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MChainTypeMeta {
     /// [crate::ChainType]
     #[serde(default)]
@@ -55,7 +55,7 @@ impl MChainTypeMeta {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDEnable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MAddress {
     /// [Wallet]
     #[serde(default)]
@@ -113,7 +113,7 @@ pub struct MChainShared {
 #[cfg(test)]
 mod tests {
     use futures::executor::block_on;
-    use rbatis::crud::CRUDEnable;
+    use rbatis::crud::CRUDTable;
     use rbatis::rbatis::Rbatis;
 
     use crate::ChainType;
