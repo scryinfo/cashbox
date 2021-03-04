@@ -40,7 +40,7 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
 
                     if let Some(PathSegment { ident, .. }) = path.segments.last() {
                         // if ident.to_string().as_str() == TypeName_CArray {
-                            Some(ident.to_token_stream())
+                        Some(ident.to_token_stream())
                         // } else {
                         //     match arguments {
                         //         PathArguments::None => Some(ident.to_token_stream()),
@@ -81,7 +81,7 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                         });
                     }
                     "" => {
-                        panic!("dl_cr can not find the type of field {} -- {} -- not TypePath,\nfield type: \n{:?}", type_name, c_field_name,field);
+                        panic!("dl_cr can not find the type of field {} -- {} -- not TypePath,\nfield type: \n{:?}", type_name, c_field_name, field);
                     }
                     _ => {
                         let c_type = type_stream;

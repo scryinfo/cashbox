@@ -76,9 +76,9 @@ pub struct MEthChainTokenAuth {
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
-  //  ///这个是为了使用方便，它不会生成数据库字段
-/*    #[serde(skip)]
-    pub chain_token_shared: MEthChainTokenShared,*/
+    //  ///这个是为了使用方便，它不会生成数据库字段
+    /*    #[serde(skip)]
+        pub chain_token_shared: MEthChainTokenShared,*/
 }
 
 impl MEthChainTokenAuth {

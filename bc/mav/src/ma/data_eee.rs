@@ -6,7 +6,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::dao::{self, bool_from_int, Shared};
+use crate::ma::dao::{self, bool_from_u32, bool_to_u32, Shared};
 use crate::ma::TxShared;
 
 //eee
@@ -25,7 +25,7 @@ pub struct MEeeChainToken {
     #[serde(default)]
     pub chain_type: String,
     //是否显示
-    #[serde(default, deserialize_with = "bool_from_int")]
+    #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
     pub show: bool,
     // 精度
     #[serde(default)]
@@ -53,7 +53,7 @@ pub struct MEeeChainTx {
     pub to_address: String,
     #[serde(default)]
     pub value: String,
-    #[serde(default, deserialize_with = "bool_from_int")]
+    #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
     pub status: bool,
     // 扩展数据
     #[serde(default)]
@@ -80,7 +80,7 @@ pub struct MEeeTokenxTx {
     pub to_address: String,
     #[serde(default)]
     pub value: String,
-    #[serde(default, deserialize_with = "bool_from_int")]
+    #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
     pub status: bool,
     // 扩展数据
     #[serde(default)]

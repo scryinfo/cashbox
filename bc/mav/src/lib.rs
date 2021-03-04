@@ -5,6 +5,11 @@ pub use kits::Error;
 pub mod ma;
 pub mod kits;
 
+#[allow(non_upper_case_globals)]
+pub const CFalse: u32 = 1u32;
+#[allow(non_upper_case_globals)]
+pub const CTrue: u32 = 0u32;
+
 #[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum ChainType {
     //Used to distinguish the chain types supported by the wallet
@@ -154,7 +159,7 @@ pub enum AppPlatformType {
     i686_linux_android,
     x86_64_linux_android,
     x86_64_pc_windows_gnu,
-    x86_64_unknown_linux_gnu
+    x86_64_unknown_linux_gnu,
 }
 
 impl AppPlatformType {

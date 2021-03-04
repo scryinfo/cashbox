@@ -21,7 +21,7 @@ mod cr;
 /// ## 支持类型
 /// i16,u16,i32,u32,i64,u64,
 /// String,
-/// bool, //#[serde(default, deserialize_with = "bool_from_int")]
+/// bool, //#[serde(default, deserialize_with = "bool_from_u32")]
 /// f32,f64
 /// bigdecimal::BigDecimal
 /// #Sample include sub struct
@@ -105,7 +105,11 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
             impl CRUDTable for #name {
                 type IdType = String;
                 fn get_id(&self) ->  Option<&Self::IdType>{
-                    Some(&self.id)
+                    if self.id.is_empty() {
+                        None
+                    }else{
+                        Some(&self.id)
+                    }
                 }
             }
         }

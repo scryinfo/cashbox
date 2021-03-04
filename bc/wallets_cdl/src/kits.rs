@@ -9,8 +9,8 @@ use std::ptr::null_mut;
 pub type CU64 = u64;
 pub type CBool = u32;
 
-pub const CFalse: CBool = 1u32;
-pub const CTrue: CBool = 0u32;
+pub const CFalse: CBool = mav::CFalse;
+pub const CTrue: CBool = mav::CTrue;
 
 /// call free_c_char to free memory
 pub fn to_c_char(s: &str) -> *mut c_char {

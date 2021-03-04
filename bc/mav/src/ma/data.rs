@@ -23,7 +23,7 @@ pub struct MTokenAddress {
     #[serde(default)]
     pub balance: String,
     #[serde(default)]
-    pub status:i64,//set this row whether visible, 0 hide,1 display
+    pub status: i64,//set this row whether visible, 0 hide,1 display
 }
 
 impl MTokenAddress {
@@ -47,7 +47,7 @@ pub struct TxShared {
     #[serde(default)]
     pub tx_bytes: String,
     #[serde(default)]
-    pub tx_timestamp:i64
+    pub tx_timestamp: i64,
 }
 
 #[cfg(test)]

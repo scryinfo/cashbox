@@ -45,7 +45,6 @@ pub struct DbMeta {
     table_metas: BTreeMap<String, TableMeta>,
     // key: sub struct name, value: cols
     sub_struct: HashMap<String, String>,
-    writed_first: bool,
 }
 
 impl DbMeta {
@@ -127,12 +126,7 @@ impl DbMeta {
             }
 
             let all_file = get_path("all.sql");
-            if !self.writed_first {
-                recreate_file(all_sql.as_str(), all_file.as_str());
-                self.writed_first = true;
-            } else {
-                append_file(all_sql.as_str(), all_file.as_str());
-            }
+            recreate_file(all_sql.as_str(), all_file.as_str());
         }
     }
 
@@ -256,21 +250,6 @@ fn recreate_file(script: &str, file_name: &str) {
     }
 
     let mut file = fs::File::create(file_name).expect("fs::File::create(file_name)");
-    let _ = file.write_all(script.as_bytes());
-}
-
-
-fn append_file(script: &str, file_name: &str) {
-    let mut file = {
-        if fs::metadata(file_name).is_err() {
-            let f = path::Path::new(file_name);
-            let dir = f.parent().expect("append_file -- f.parent()");
-            let _ = fs::create_dir_all(dir);
-            fs::File::create(file_name).expect("append_file -- fs::File::create(file_name)")
-        } else {
-            fs::OpenOptions::new().append(true).open(file_name).expect("append_file -- fs::File::open(file_name)")
-        }
-    };
     let _ = file.write_all(script.as_bytes());
 }
 

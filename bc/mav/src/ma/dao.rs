@@ -5,7 +5,7 @@ use rbatis::crud::{CRUD, CRUDTable};
 use rbatis::plugin::page::{IPageRequest, Page};
 use rbatis::rbatis::Rbatis;
 use rbatis::wrapper::Wrapper;
-use serde::{de, Deserialize, Deserializer};
+use serde::{de, Deserialize, Deserializer, Serializer};
 use serde::de::Unexpected;
 
 pub use crate::ma::data::{MTokenAddress, TxShared};
@@ -178,16 +178,30 @@ impl<T> Dao<T> for T where
     }
 }
 
-pub fn bool_from_int<'de, D>(deserializer: D) -> std::result::Result<bool, D::Error>
+pub fn bool_from_u32<'de, D>(deserializer: D) -> std::result::Result<bool, D::Error>
     where
         D: Deserializer<'de>,
 {
-    match i32::deserialize(deserializer)? {
-        0 => Ok(false),
-        1 => Ok(true),
+    match u32::deserialize(deserializer)? {
+        crate::CFalse => Ok(false),
+        crate::CTrue => Ok(true),
         other => Err(de::Error::invalid_value(
             Unexpected::Unsigned(other as u64),
             &"zero or one",
         )),
     }
+}
+
+pub fn bool_to_u32<S>(x: &bool, s: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+{
+    let b = {
+        if *x {
+            crate::CTrue
+        } else {
+            crate::CFalse
+        }
+    };
+    s.serialize_u32(b)
 }

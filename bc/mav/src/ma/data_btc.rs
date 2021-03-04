@@ -6,7 +6,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::dao::{self, bool_from_int, Shared};
+use crate::ma::dao::{self, bool_from_u32, bool_to_u32, Shared};
 use crate::ma::TxShared;
 
 //btc
@@ -26,8 +26,8 @@ pub struct MBtcChainToken {
     #[serde(default)]
     pub chain_type: String,
     /// 是否显示
-    #[serde(default, deserialize_with = "bool_from_int")]
-    pub show_: bool,
+    #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    pub show: bool,
     /// 精度
     #[serde(default)]
     pub decimal: i32,
@@ -81,12 +81,12 @@ pub struct MBtcInputTx {
     pub sequence: u32,
     // index
     #[serde(default)]
-    pub index_:u32,
+    pub index_: u32,
     // The tx hash value that include this Output
     #[serde(default)]
-    pub btc_tx_hash:String,
+    pub btc_tx_hash: String,
     #[serde(default)]
-    pub btc_tx_hexbytes:String,
+    pub btc_tx_hexbytes: String,
     // ...
 }
 
@@ -104,14 +104,14 @@ pub struct MBtcOutputTx {
     #[serde(default)]
     pub value: u64,
     #[serde(default)]
-    pub pk_script :String,
+    pub pk_script: String,
     #[serde(default)]
     pub index_: u32,
     #[serde(default)]
     // The tx hash value that include this Output
-    pub btc_tx_hash:String,
+    pub btc_tx_hash: String,
     #[serde(default)]
-    pub btc_tx_hexbytes:String,
+    pub btc_tx_hexbytes: String,
     // ...
 }
 
@@ -123,7 +123,7 @@ impl MBtcOutputTx {
 
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
-pub struct MBlockHeader{
+pub struct MBlockHeader {
     #[serde(default)]
     pub header: String,
     #[serde(default)]
@@ -172,7 +172,7 @@ mod tests {
         let rb = block_on(init_memory());
         let mut m = MBtcChainToken::default();
         m.wallet_id = "test".to_owned();
-        m.show_ = false;
+        m.show = false;
         let result = block_on(m.save(&rb, ""));
         assert_eq!(false, result.is_err(), "{:?}", result);
         let result = block_on(MBtcChainToken::fetch_by_id(&rb, "", &m.id));
@@ -181,14 +181,14 @@ mod tests {
         assert_eq!(m, m2);
 
         m.wallet_id = "m3".to_owned();
-        m.show_ = true;
+        m.show = true;
         let result = block_on(m.update_by_id(&rb, ""));
         assert_eq!(false, result.is_err(), "{:?}", result);
         let result = block_on(MBtcChainToken::fetch_by_id(&rb, "", &m.id));
         assert_eq!(false, result.is_err(), "{:?}", result);
         let m2 = result.unwrap().unwrap();
         assert_eq!(m.id, m2.id);
-        assert_eq!(m.show_, m2.show_);
+        assert_eq!(m.show, m2.show);
 
         let result = block_on(MBtcChainToken::list(&rb, ""));
         assert_eq!(false, result.is_err(), "{:?}", result);

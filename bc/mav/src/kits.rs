@@ -59,8 +59,8 @@ pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis, Error> {
 
 pub async fn make_memory_rbatis() -> Result<Rbatis, Error> {
     let rb = {
-        let op = RbatisOption{
-            log_plugin: Arc::new(Box::new(RbatisLogPlugin{
+        let op = RbatisOption {
+            log_plugin: Arc::new(Box::new(RbatisLogPlugin {
                 level_filter: log::max_level(),
             }) as Box<dyn LogPlugin>),
             ..RbatisOption::default()

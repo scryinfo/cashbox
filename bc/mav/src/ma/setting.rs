@@ -38,7 +38,7 @@ impl From<&str> for SettingType {
         match setting_type {
             "CurrentWallet" => SettingType::CurrentWallet,
             "CurrentChain" => SettingType::CurrentChain,
-            "CurrentDbVersion"=>SettingType::CurrentDbVersion,
+            "CurrentDbVersion" => SettingType::CurrentDbVersion,
             _ => {
                 SettingType::Other(setting_type.to_owned())
             }

@@ -127,7 +127,7 @@ pub struct MProgress {
     pub timestamp: String,
 }
 
-impl MProgress{
+impl MProgress {
     pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_progress.sql")
     }
