@@ -11,7 +11,6 @@ cd dl/armeabi-v7a
 outPath=$(pwd)
 
 TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64
-export BUILD_DUMMY_WASM_BINARY=1
 export AR=$TOOLCHAIN/bin/arm-linux-androideabi-ar
 export CC=$TOOLCHAIN/bin/${HOST_TAG_NDK}28-clang
 export CXX=$TOOLCHAIN/bin/${HOST_TAG}28-clang++

@@ -12,7 +12,6 @@ cd dl/armeabi-v7a
 set outPath=%cd%
 
 set TOOLCHAIN=%NDK%/toolchains/llvm/prebuilt/windows-x86_64
-set BUILD_DUMMY_WASM_BINARY=1
 set AR=%TOOLCHAIN%/bin/arm-linux-androideabi-ar.exe
 set CC=%TOOLCHAIN%/bin/%HOST_TAG_NDK%28-clang.cmd
 set CXX=%TOOLCHAIN%/bin/%HOST_TAG_NDK%28-clang++.cmd

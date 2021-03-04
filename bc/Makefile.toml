@@ -1,6 +1,5 @@
 [env]
 CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
-BUILD_DUMMY_WASM_BINARY=1
 
 [tasks.clippy]
 description = "Lint with Clippy"
