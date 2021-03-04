@@ -6,9 +6,9 @@ pub mod ma;
 pub mod kits;
 
 #[allow(non_upper_case_globals)]
-pub const CFalse: u32 = 1u32;
+pub const CFalse: u32 = 0u32;
 #[allow(non_upper_case_globals)]
-pub const CTrue: u32 = 0u32;
+pub const CTrue: u32 = 1u32;
 
 #[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum ChainType {
