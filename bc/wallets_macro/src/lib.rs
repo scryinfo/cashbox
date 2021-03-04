@@ -21,7 +21,7 @@ mod cr;
 /// ## 支持类型
 /// i16,u16,i32,u32,i64,u64,
 /// String,
-/// bool, //#[serde(default, deserialize_with = "bool_from_u32")]
+/// bool, //#[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
 /// f32,f64
 /// bigdecimal::BigDecimal
 /// #Sample include sub struct

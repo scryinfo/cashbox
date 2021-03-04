@@ -224,6 +224,10 @@ extension IntEx on int {
   }
 }
 
+extension BoolEx on bool{
+  int toInt() => this ? CTrue:CFalse;
+}
+
 //转换指针
 extension DoubleEx on double {
   Pointer<Float> toFloatPtr() {
