@@ -17,7 +17,7 @@ set CXX=%TOOLCHAIN%/bin/%HOST_TAG%28-clang++.cmd
 set LINKER=%TOOLCHAIN%/bin/%HOST_TAG%28-clang.cmd
 set CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=%LINKER%
 
-#rustup default stable-gnu
+::rustup default stable-gnu
 cd "%batPath%/.."
 cargo build --release --target %HOST_TAG%
 

@@ -66,7 +66,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                         if self.is_serving_blocks(pid) {
                             trace!("serving blocks peer={}", pid);
                             //Make a request GetData
-                            self.get_data(pid, false)
+                            self.get_data(pid, false, true)
                         } else {
                             Ok(())
                         }
@@ -98,7 +98,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                             if self.is_serving_blocks(pid) {
                                 trace!("serving blocks peer={}", pid);
                                 //Make a request GetData
-                                self.get_data(pid, true)
+                                self.get_data(pid, true, false)
                             } else {
                                 Ok(())
                             }
@@ -121,8 +121,12 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
     }
 
     // retrieve data
-    fn get_data(&mut self, peer: PeerId, add: bool) -> Result<(), Error> {
-        {
+    // wait -> wait for filter
+    //         use in Connected need wait
+    //         use in other condition don't need wait(ping and get 100 merkleblock)
+    fn get_data(&mut self, peer: PeerId, add: bool, wait: bool) -> Result<(), Error> {
+
+        if wait {
             error!("wait_for filter condition");
             let ref pair = self.condvar_pair;
             let &(ref lock, ref cvar) = Arc::deref(pair);
@@ -166,12 +170,12 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         info!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
         info!("got 100 merkleblock {:#?}", merkleblock);
-        self.get_data(peer, true)?;
+        self.get_data(peer, true, false)?;
         Ok(())
     }
 
     // Handle tx return value
-    fn tx(&mut self, tx: &Transaction, _peer: PeerId) -> Result<(), Error> {
+    fn tx(&mut self, tx: &Transa ction, _peer: PeerId) -> Result<(), Error> {
         info!("Tx {:#?}", tx.clone());
         let vouts = tx.clone().output;
         for (index, vout) in vouts.iter().enumerate() {
