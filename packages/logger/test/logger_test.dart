@@ -5,6 +5,24 @@ import 'package:logger/logger.dart';
 void main() {
   test('adds one to input values', () {
     Logger logger = Logger();
+
+    logger.d("logger.getLogLevel().index", logger.getLogLevel().index.toString());
+    logger.e("tag", "message");
+    logger.setLogLevel(LogLevel.Info);
+    logger.d("logger.getLogLevel().index", logger.getLogLevel().index.toString());
+
+    logger.setLogLevel(LogLevel.Fatal);
+    logger.d("logger.getLogLevel().index", logger.getLogLevel().index.toString());
+
+    logger.setLogLevel(LogLevel.Warn);
+    logger.d("logger.getLogLevel().index", logger.getLogLevel().index.toString());
+
+    logger.d("d tag", "d message");
+    logger.i("i tag", "i message");
+  });
+
+  test('adds one to input values', () {
+    Logger logger = Logger();
     logger.e("tag", "message");
 
     logger.setLogLevel(LogLevel.Info);
