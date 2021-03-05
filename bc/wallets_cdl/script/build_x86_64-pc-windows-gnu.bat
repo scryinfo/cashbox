@@ -7,9 +7,9 @@ set batPath=%~dp0
 cd "%batPath%/../../../packages/wallets"
 set outPath=%cd%
 
-#rustup target add wasm32-unknown-unknown --toolchain nightly-2020-10-05-x86_64-pc-windows-gnu
+::rustup target add wasm32-unknown-unknown --toolchain nightly-2020-10-05-x86_64-pc-windows-gnu
 
-#rustup default 1.48.0-x86_64-pc-windows-gnu
+::rustup default 1.48.0-x86_64-pc-windows-gnu
 cd "%batPath%/.."
 cargo build --target %HOST_TAG%
 
