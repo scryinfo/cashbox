@@ -175,7 +175,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
     }
 
     // Handle tx return value
-    fn tx(&mut self, tx: &Transa ction, _peer: PeerId) -> Result<(), Error> {
+    fn tx(&mut self, tx: &Transaction, _peer: PeerId) -> Result<(), Error> {
         info!("Tx {:#?}", tx.clone());
         let vouts = tx.clone().output;
         for (index, vout) in vouts.iter().enumerate() {
@@ -204,16 +204,18 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
             }
         }
 
+
+        let vec = RB_DETAIL.list_btc_output_tx();
+        let mut hash_vec = vec![];
+        for output in vec {
+            hash_vec.push(output.btc_tx_hash);
+        }
+
         let inputs = tx.clone().input;
         for (index, txin) in inputs.iter().enumerate() {
             let txin = txin.to_owned();
             let outpoint = txin.previous_output;
             let tx_id = outpoint.txid.to_hex();
-            let vec = RB_DETAIL.list_btc_output_tx();
-            let mut hash_vec = vec![];
-            for output in vec {
-                hash_vec.push(output.btc_tx_hash);
-            }
 
             if hash_vec.contains(&tx_id) {
                 let vout = outpoint.vout;
@@ -253,4 +255,5 @@ mod test {
         let sig = hash.to_hex();
         println!("{}", sig);
     }
+
 }
