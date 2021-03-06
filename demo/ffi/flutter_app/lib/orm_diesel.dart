@@ -23,7 +23,7 @@ final void Function(Pointer<Int8>) tryDiesel = _nativeAddLib
 final void Function() dTryDiesel = () async {
   var filepath = (await getApplicationDocumentsDirectory()).path;
   filepath = pathLib.join(filepath, "orm_diesel.db").substring(0);
-  Pointer<Int8> s = Utf8.toUtf8(filepath).cast();
+  Pointer<Int8> s = filepath.toNativeUtf8().cast();
   tryDiesel(s);
-  free(s.cast<Pointer<Utf8>>());
+  calloc.free(s.cast<Pointer<Utf8>>());
 };

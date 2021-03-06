@@ -41,9 +41,9 @@ Use the tools provided by rust to quickly build a cross-compilation environment 
 
 ```
 
-## 文件生成工具
+## Dart file generation tool
 
-当在`flutter`通过`FFI`方式直接调用动态库提供的Ｃ接口，需要生成对应的Dart定义文件，
+When `flutter` calls the C interface provided by the dynamic library through the `FFI` method, it needs to use the corresponding Dart file that defines the interface in Rust.
 
 - cargo install --force cbindgen  //[See](https://github.com/eqrion/cbindgen/)
 - cargo install --force dart-bindgen --features cli  //[See](https://github.com/sunshine-protocol/dart-bindgen)

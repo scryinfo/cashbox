@@ -6,11 +6,17 @@ final DynamicLibrary nativeAddLib = () {
     return DynamicLibrary.open("libcdl.so");
   } else if (Platform.isWindows) {
     //demo/ffi/cdl/target/x86_64-pc-windows-gnu/debug/cdl.dll
-    var path = Platform.script
-        .resolve("../cdl/target/x86_64-pc-windows-gnu/debug/cdl.dll")
-        .path;
-    return DynamicLibrary.open(
-        "D:/scryinfo/cashbox/demo/ffi/cdl/target/x86_64-pc-windows-gnu/debug/cdl.dll");
+    const dllName = "cdl.dll";
+    String path = "";
+    if(new File(dllName).existsSync()){
+      path = dllName;
+    }else if(new File("../target/debug/" + dllName).existsSync()){
+      path = "../target/debug/" + dllName;
+    }else if(new File("../target/x86_64-pc-windows-gnu/debug/" + dllName).existsSync()){
+      path = "../target/x86_64-pc-windows-gnu/debug/" + dllName;
+    }
+    path = Platform.script.resolve(path).path;
+    return DynamicLibrary.open(path);
   } else if (Platform.isLinux) {
     return DynamicLibrary.open("libcdl.so");
   } else {

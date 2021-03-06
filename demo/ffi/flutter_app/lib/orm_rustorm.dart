@@ -23,7 +23,7 @@ final void Function(Pointer<Int8>) tryRustOrm = _nativeAddLib
 final void Function() dTryRustOrm = () async {
   var filepath = (await getApplicationDocumentsDirectory()).path;
   filepath = pathLib.join(filepath, "orm_rustorm.db").substring(0);
-  Pointer<Int8> s = Utf8.toUtf8(filepath).cast();
+  Pointer<Int8> s = filepath.toNativeUtf8().cast();
   tryRustOrm(s);
-  free(s.cast<Pointer<Utf8>>());
+  calloc.free(s.cast<Pointer<Utf8>>());
 };
