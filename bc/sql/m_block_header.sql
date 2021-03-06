@@ -1,6 +1,6 @@
 -- MBlockHeader
 CREATE TABLE IF NOT EXISTS m_block_header (  
-    header TEXT NOT NULL,
+    header TEXT NOT NULL UNIQUE,
     scanned TEXT NOT NULL,
     timestamp TEXT NOT NULL,
     id TEXT PRIMARY KEY,

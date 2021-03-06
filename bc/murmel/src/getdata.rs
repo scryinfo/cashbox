@@ -18,6 +18,7 @@ use crate::db::{RB_CHAIN, RB_DETAIL, VERIFY};
 use crate::kit::vec_to_string;
 use bitcoin::consensus::serialize as btc_serialize;
 use log::{error, info, trace};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::{mpsc, Arc};
 use std::thread;
@@ -125,7 +126,6 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
     //         use in Connected need wait
     //         use in other condition don't need wait(ping and get 100 merkleblock)
     fn get_data(&mut self, peer: PeerId, add: bool, wait: bool) -> Result<(), Error> {
-
         if wait {
             error!("wait_for filter condition");
             let ref pair = self.condvar_pair;
@@ -204,11 +204,10 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
             }
         }
 
-
         let vec = RB_DETAIL.list_btc_output_tx();
-        let mut hash_vec = vec![];
+        let mut output_map = HashMap::new();
         for output in vec {
-            hash_vec.push(output.btc_tx_hash);
+            output_map.insert(output.btc_tx_hash, output.idx);
         }
 
         let inputs = tx.clone().input;
@@ -216,23 +215,26 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
             let txin = txin.to_owned();
             let outpoint = txin.previous_output;
             let tx_id = outpoint.txid.to_hex();
+            let vout = outpoint.vout;
 
-            if hash_vec.contains(&tx_id) {
-                let vout = outpoint.vout;
-                let sig_script = txin.script_sig.asm();
-                let sequence = txin.sequence;
-                let btc_tx_hash = tx.bitcoin_hash().to_hex();
-                let btc_tx_hexbytes = btc_serialize(tx);
-                let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
-                RB_DETAIL.save_btc_input_tx(
-                    tx_id,
-                    vout,
-                    sig_script,
-                    sequence,
-                    index as u32,
-                    btc_tx_hash,
-                    btc_tx_hexbytes,
-                );
+            match output_map.get(&tx_id) {
+                Some(idx) if idx.to_owned() == vout => {
+                    let sig_script = txin.script_sig.asm();
+                    let sequence = txin.sequence;
+                    let btc_tx_hash = tx.bitcoin_hash().to_hex();
+                    let btc_tx_hexbytes = btc_serialize(tx);
+                    let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
+                    RB_DETAIL.save_btc_input_tx(
+                        tx_id,
+                        vout,
+                        sig_script,
+                        sequence,
+                        index as u32,
+                        btc_tx_hash,
+                        btc_tx_hexbytes,
+                    );
+                }
+                _ => {}
             }
         }
         Ok(())
@@ -255,5 +257,4 @@ mod test {
         let sig = hash.to_hex();
         println!("{}", sig);
     }
-
 }

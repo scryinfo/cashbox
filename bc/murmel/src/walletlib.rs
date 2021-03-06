@@ -109,6 +109,7 @@ mod test {
     use crate::kit::vec_to_string;
     use crate::db::RB_DETAIL;
     use bitcoin::consensus::serialize as btc_serialize;
+    use std::collections::HashMap;
 
     #[test]
     pub fn fee_test() {
@@ -181,33 +182,36 @@ mod test {
         println!("{:#?}", tx);
 
         let vec = RB_DETAIL.list_btc_output_tx();
-        let mut hash_vec = vec![];
+        let mut output_map = HashMap::new();
         for output in vec {
-            hash_vec.push(output.btc_tx_hash);
+            output_map.insert(output.btc_tx_hash, output.idx);
         }
-        println!("hash_vec {:#?}", &hash_vec);
+        println!("output_map {:#?}", &output_map);
 
         let inputs = tx.clone().input;
         for (index, txin) in inputs.iter().enumerate() {
             let txin = txin.to_owned();
             let outpoint = txin.previous_output;
             let tx_id = outpoint.txid.to_hex();
+            let vout = outpoint.vout;
 
-            if hash_vec.contains(&tx_id) {
-                let vout = outpoint.vout;
-                let sig_script = txin.script_sig.asm();
-                let sequence = txin.sequence;
-                let btc_tx_hash = tx.bitcoin_hash().to_hex();
-                let btc_tx_hexbytes = btc_serialize(&tx);
-                let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
+            match output_map.get(&tx_id) {
+                Some(idx) if idx.to_owned() == vout => {
+                    let sig_script = txin.script_sig.asm();
+                    let sequence = txin.sequence;
+                    let btc_tx_hash = tx.bitcoin_hash().to_hex();
+                    let btc_tx_hexbytes = btc_serialize(&tx);
+                    let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
 
-                println!("txid {:#?}", tx_id);
-                println!("vout {:#?}", vout);
-                println!("sig_script {:#?}", sig_script);
-                println!("sequence {:#?}", sequence);
-                println!("btc_tx_hash {:#?}", btc_tx_hash);
-                println!("btc_tx_hexbytes {:#?}", btc_tx_hexbytes);
-                println!("idx {:#?}", index);
+                    println!("txid {:#?}", tx_id);
+                    println!("vout {:#?}", vout);
+                    println!("sig_script {:#?}", sig_script);
+                    println!("sequence {:#?}", sequence);
+                    println!("btc_tx_hash {:#?}", btc_tx_hash);
+                    println!("btc_tx_hexbytes {:#?}", btc_tx_hexbytes);
+                    println!("idx {:#?}", index);
+                }
+                _ => {}
             }
         }
     }
