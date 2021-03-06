@@ -297,7 +297,7 @@ impl DetailSqlite {
         vout: u32,
         sig_script: String,
         sequence: u32,
-        index: u32,
+        idx: u32,
         btc_tx_hash: String,
         btc_tx_hexbytes: String,
     ) {
@@ -306,7 +306,7 @@ impl DetailSqlite {
         btc_input_tx.vout = vout;
         btc_input_tx.sig_script = sig_script;
         btc_input_tx.sequence = sequence;
-        btc_input_tx.index = index;
+        btc_input_tx.idx = idx;
         btc_input_tx.btc_tx_hash = btc_tx_hash;
         btc_input_tx.btc_tx_hexbytes = btc_tx_hexbytes;
 
@@ -325,14 +325,14 @@ impl DetailSqlite {
         &self,
         value: u64,
         pk_script: String,
-        index: u32,
+        idx: u32,
         btc_tx_hash: String,
         btc_tx_hexbytes: String,
     ) {
         let mut btc_output_tx = MBtcOutputTx::default();
         btc_output_tx.value = value;
         btc_output_tx.pk_script = pk_script;
-        btc_output_tx.index = index;
+        btc_output_tx.idx = idx;
         btc_output_tx.btc_tx_hash = btc_tx_hash;
         btc_output_tx.btc_tx_hexbytes = btc_tx_hexbytes;
 

@@ -81,8 +81,8 @@ pub struct MBtcInputTx {
     pub sequence: u32,
     // index
     #[serde(default)]
-    pub index_: u32,
-    // The tx hash value that include this Output
+    pub idx:u32,
+    // The tx hash value that include this Output unique
     #[serde(default)]
     pub btc_tx_hash: String,
     #[serde(default)]
@@ -106,10 +106,10 @@ pub struct MBtcOutputTx {
     #[serde(default)]
     pub pk_script: String,
     #[serde(default)]
-    pub index_: u32,
-    #[serde(default)]
-    // The tx hash value that include this Output
+    // The tx hash value that include this Output unique
     pub btc_tx_hash: String,
+    #[serde(default)]
+    pub idx: u32,
     #[serde(default)]
     pub btc_tx_hexbytes: String,
     // ...
