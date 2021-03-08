@@ -31,7 +31,8 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
   }
 
   void initData() async {
-    walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //After changing the wallet attributes, you need to refresh the synchronization data again, such as changing the wallet name.
+    walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
+    //After changing the wallet attributes, you need to refresh the synchronization data again, such as changing the wallet name.
     setState(() {
       this.walletList = walletList;
     });
@@ -62,8 +63,9 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
       return Container(
         child: GestureDetector(
           onTap: () {
-            Provider.of<WalletManagerProvide>(context).setWalletName(walletList[index].walletName);
-            Provider.of<WalletManagerProvide>(context).setWalletId(walletList[index].walletId);
+            context.read<WalletManagerProvide>()
+              ..setWalletName(walletList[index].walletName)
+              ..setWalletId(walletList[index].walletId);
             NavigatorUtils.push(context, Routes.walletManagerPage);
           },
           child: Container(

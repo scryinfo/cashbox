@@ -133,7 +133,7 @@ class _DigitListPageState extends State<DigitListPage> {
           child: GestureDetector(
             onTap: () {
               try {
-                Provider.of<TransactionProvide>(context)
+                context.read<TransactionProvide>()
                   ..setDigitName(displayDigitsList[index].shortName)
                   ..setBalance(displayDigitsList[index].balance)
                   ..setDecimal(displayDigitsList[index].decimal)

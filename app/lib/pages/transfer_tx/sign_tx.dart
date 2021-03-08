@@ -122,13 +122,15 @@ class _SignTxPageState extends State<SignTxPage> {
                 NavigatorUtils.goBack(context);
                 return null;
               } else {
-                Provider.of<QrInfoProvide>(context).setTitle("签名结果");
-                Provider.of<QrInfoProvide>(context).setHintInfo("签名成功，如下是签名结果信息");
                 String walletId = await Wallets.instance.getNowWalletId();
                 Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
                 String chainEEEAddress = wallet.getChainByChainType(ChainType.EEE).chainAddress;
-                var content = _waitToSignInfo.replaceFirst(waitToSignInfo, map["signedInfo"]) + ";addr=" + chainEEEAddress; //**// Signature result data
-                Provider.of<QrInfoProvide>(context).setContent(content);
+                var content =
+                    _waitToSignInfo.replaceFirst(waitToSignInfo, map["signedInfo"]) + ";addr=" + chainEEEAddress; //**// Signature result data
+                context.read<QrInfoProvide>()
+                  ..setTitle("签名结果")
+                  ..setContent(content)
+                  ..setHintInfo("签名成功，如下是签名结果信息");
                 NavigatorUtils.goBack(context);
                 NavigatorUtils.push(context, Routes.qrInfoPage);
               }

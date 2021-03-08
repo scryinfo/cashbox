@@ -69,7 +69,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
         });
       }
     }
-    eeeStorageKeyMap = await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.chainAddress);
+    eeeStorageKeyMap =
+        await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.chainAddress);
     if (!_isMapStatusOk(eeeStorageKeyMap)) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return;
@@ -475,7 +476,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
               NavigatorUtils.goBack(context);
               return;
             }
-            Provider.of<TransactionProvide>(context)
+            context.read<TransactionProvide>()
               ..setFromAddress(Wallets.instance.nowWallet.nowChain.chainAddress)
               ..setValue(_txValueController.text)
               ..setToAddress(_toAddressController.text)
@@ -497,6 +498,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
   @override
   void deactivate() {
     super.deactivate();
-    Provider.of<TransactionProvide>(context).setSignInfo("");
+    context.read<TransactionProvide>().setSignInfo("");
   }
 }

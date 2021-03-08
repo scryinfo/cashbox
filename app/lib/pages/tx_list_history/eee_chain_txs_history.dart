@@ -140,7 +140,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                 switch (Wallets.instance.nowWallet.nowChain.chainType) {
                   case ChainType.EEE:
                   case ChainType.EEE_TEST:
-                    Provider.of<TransactionProvide>(context)
+                    context.read<TransactionProvide>()
                       ..emptyDataRecord()
                       ..setDigitName(digitName)
                       ..setBalance(balanceInfo);
@@ -318,7 +318,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       alignment: Alignment.center,
       child: GestureDetector(
         onTap: () {
-          Provider.of<TransactionProvide>(context)
+          context.read<TransactionProvide>()
             ..emptyDataRecord()
             ..setFromAddress(eeeTxListModel[index].from == "" ? eeeTxListModel[index].signer : eeeTxListModel[index].from)
             ..setToAddress(eeeTxListModel[index].to)

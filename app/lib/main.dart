@@ -80,19 +80,19 @@ class _MyApp extends State<MyApp> {
       providers: [
         /// Registration data status management, similar to vuex implementation
         ChangeNotifierProvider(
-          builder: (_) => CreateWalletProcessProvide(),
+          create: (_) => CreateWalletProcessProvide(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => WalletManagerProvide(),
+          create: (_) => WalletManagerProvide(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => QrInfoProvide(),
+          create: (_) => QrInfoProvide(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => SignInfoProvide(),
+          create: (_) => SignInfoProvide(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => TransactionProvide(),
+          create: (_) => TransactionProvide(),
         ),
       ],
       child: Container(

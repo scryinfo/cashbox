@@ -208,7 +208,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                   if (displayDigitsList[index].isVisible) {
                     // router to eth tx history
                     {
-                      Provider.of<TransactionProvide>(context)
+                      context.read<TransactionProvide>()
                         ..setDigitName(displayDigitsList[index].shortName)
                         ..setBalance(displayDigitsList[index].balance)
                         ..setMoney(displayDigitsList[index].money)

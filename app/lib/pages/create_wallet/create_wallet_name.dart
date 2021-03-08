@@ -91,8 +91,8 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       child: FlatButton(
         onPressed: () {
           if (_verifyToCreateWallet()) {
-            Provider.of<CreateWalletProcessProvide>(context).setWalletName(_nameController.text);
-            Provider.of<CreateWalletProcessProvide>(context).setPwd(Uint8List.fromList(_pwdController.text.codeUnits));
+            context.read<CreateWalletProcessProvide>().setWalletName(_nameController.text);
+            context.read<CreateWalletProcessProvide>().setPwd(Uint8List.fromList(_pwdController.text.codeUnits));
             NavigatorUtils.push(context, Routes.createWalletMnemonicPage);
           }
         },
