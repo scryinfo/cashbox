@@ -247,7 +247,7 @@ class Wallets {
       if (err.isSuccess()) {
         re = ptr.value.isTrue();
       }
-      ffi.free(ptr);
+      ffi.calloc.free(ptr);
     }
     return DlResult1(re, err);
   }

@@ -112,11 +112,11 @@ import 'kits.dart';
             classCode.writeln('${_blankOne}String ${f.name};');
 
             free.writeln(
-                '${_blankTwo}if (ptr.ref.${f.name} != null && ptr.ref.${f.name} != nullptr) {ffi.free(ptr.ref.${f.name});}');
+                '${_blankTwo}if (ptr.ref.${f.name} != null && ptr.ref.${f.name} != nullptr) {ffi.calloc.free(ptr.ref.${f.name});}');
             free.writeln('${_blankTwo}ptr.ref.${f.name} = nullptr;');
 
             toC.writeln(
-                '''${_blankTwo}if(c.ref.${f.name} != null && c.ref.${f.name} != nullptr) { ffi.free(c.ref.${f.name});}''');
+                '''${_blankTwo}if(c.ref.${f.name} != null && c.ref.${f.name} != nullptr) { ffi.calloc.free(c.ref.${f.name});}''');
             toC.writeln('${_blankTwo}c.ref.${f.name} = toUtf8Null(${f.name});');
             toDart.writeln(
                 '${_blankTwo}${f.name} = fromUtf8Null(c.ref.${f.name});');
@@ -145,7 +145,7 @@ import 'kits.dart';
             classCode.writeln('${_blankOne}${className} ${f.name};');
 
             free.writeln(
-                '${_blankTwo}if (ptr.ref.${f.name} != null && ptr.ref.${f.name} != nullptr) {ffi.free(ptr.ref.${f.name});}');
+                '${_blankTwo}if (ptr.ref.${f.name} != null && ptr.ref.${f.name} != nullptr) {ffi.calloc.free(ptr.ref.${f.name});}');
             free.writeln('${_blankTwo}ptr.ref.${f.name} = nullptr;');
 
             toC.writeln('${_blankTwo}c.ref.${f.name}.value = ${f.name};');
@@ -171,7 +171,7 @@ ${subStruct.toString()}$_blankOne}
     if (ptr == null || ptr == nullptr) {
       return;
     }
-${free.toString()}${_blankTwo}ffi.free(ptr);
+${free.toString()}${_blankTwo}ffi.calloc.free(ptr);
   }
 ''');
 
@@ -288,7 +288,7 @@ ${toDart.toString()}  }''');
     }
     ${nativeType ? "ptr.ref.ptr.free()" : (nativeTypeArray ? "ptr.ref.ptr.free(ptr.ref.len)" : elName + ".free(ptr.ref.ptr)")};
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
   
   static ${className} fromC(Pointer<clib.${c.name}> ptr) {

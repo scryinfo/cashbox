@@ -23,22 +23,22 @@ class AccountInfo extends DC<clib.CAccountInfo> {
       return;
     }
     if (ptr.ref.freeBalance != null && ptr.ref.freeBalance != nullptr) {
-      ffi.free(ptr.ref.freeBalance);
+      ffi.calloc.free(ptr.ref.freeBalance);
     }
     ptr.ref.freeBalance = nullptr;
     if (ptr.ref.reserved != null && ptr.ref.reserved != nullptr) {
-      ffi.free(ptr.ref.reserved);
+      ffi.calloc.free(ptr.ref.reserved);
     }
     ptr.ref.reserved = nullptr;
     if (ptr.ref.miscFrozen != null && ptr.ref.miscFrozen != nullptr) {
-      ffi.free(ptr.ref.miscFrozen);
+      ffi.calloc.free(ptr.ref.miscFrozen);
     }
     ptr.ref.miscFrozen = nullptr;
     if (ptr.ref.feeFrozen != null && ptr.ref.feeFrozen != nullptr) {
-      ffi.free(ptr.ref.feeFrozen);
+      ffi.calloc.free(ptr.ref.feeFrozen);
     }
     ptr.ref.feeFrozen = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static AccountInfo fromC(Pointer<clib.CAccountInfo> ptr) {
@@ -65,19 +65,19 @@ class AccountInfo extends DC<clib.CAccountInfo> {
     c.ref.nonce = nonce;
     c.ref.refCount = refCount;
     if (c.ref.freeBalance != null && c.ref.freeBalance != nullptr) {
-      ffi.free(c.ref.freeBalance);
+      ffi.calloc.free(c.ref.freeBalance);
     }
     c.ref.freeBalance = toUtf8Null(freeBalance);
     if (c.ref.reserved != null && c.ref.reserved != nullptr) {
-      ffi.free(c.ref.reserved);
+      ffi.calloc.free(c.ref.reserved);
     }
     c.ref.reserved = toUtf8Null(reserved);
     if (c.ref.miscFrozen != null && c.ref.miscFrozen != nullptr) {
-      ffi.free(c.ref.miscFrozen);
+      ffi.calloc.free(c.ref.miscFrozen);
     }
     c.ref.miscFrozen = toUtf8Null(miscFrozen);
     if (c.ref.feeFrozen != null && c.ref.feeFrozen != nullptr) {
-      ffi.free(c.ref.feeFrozen);
+      ffi.calloc.free(c.ref.feeFrozen);
     }
     c.ref.feeFrozen = toUtf8Null(feeFrozen);
   }
@@ -106,18 +106,18 @@ class AccountInfoSyncProg extends DC<clib.CAccountInfoSyncProg> {
       return;
     }
     if (ptr.ref.account != null && ptr.ref.account != nullptr) {
-      ffi.free(ptr.ref.account);
+      ffi.calloc.free(ptr.ref.account);
     }
     ptr.ref.account = nullptr;
     if (ptr.ref.blockNo != null && ptr.ref.blockNo != nullptr) {
-      ffi.free(ptr.ref.blockNo);
+      ffi.calloc.free(ptr.ref.blockNo);
     }
     ptr.ref.blockNo = nullptr;
     if (ptr.ref.blockHash != null && ptr.ref.blockHash != nullptr) {
-      ffi.free(ptr.ref.blockHash);
+      ffi.calloc.free(ptr.ref.blockHash);
     }
     ptr.ref.blockHash = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static AccountInfoSyncProg fromC(Pointer<clib.CAccountInfoSyncProg> ptr) {
@@ -142,15 +142,15 @@ class AccountInfoSyncProg extends DC<clib.CAccountInfoSyncProg> {
       return;
     }
     if (c.ref.account != null && c.ref.account != nullptr) {
-      ffi.free(c.ref.account);
+      ffi.calloc.free(c.ref.account);
     }
     c.ref.account = toUtf8Null(account);
     if (c.ref.blockNo != null && c.ref.blockNo != nullptr) {
-      ffi.free(c.ref.blockNo);
+      ffi.calloc.free(c.ref.blockNo);
     }
     c.ref.blockNo = toUtf8Null(blockNo);
     if (c.ref.blockHash != null && c.ref.blockHash != nullptr) {
-      ffi.free(c.ref.blockHash);
+      ffi.calloc.free(c.ref.blockHash);
     }
     c.ref.blockHash = toUtf8Null(blockHash);
   }
@@ -178,26 +178,26 @@ class Address extends DC<clib.CAddress> {
       return;
     }
     if (ptr.ref.id != null && ptr.ref.id != nullptr) {
-      ffi.free(ptr.ref.id);
+      ffi.calloc.free(ptr.ref.id);
     }
     ptr.ref.id = nullptr;
     if (ptr.ref.walletId != null && ptr.ref.walletId != nullptr) {
-      ffi.free(ptr.ref.walletId);
+      ffi.calloc.free(ptr.ref.walletId);
     }
     ptr.ref.walletId = nullptr;
     if (ptr.ref.chainType != null && ptr.ref.chainType != nullptr) {
-      ffi.free(ptr.ref.chainType);
+      ffi.calloc.free(ptr.ref.chainType);
     }
     ptr.ref.chainType = nullptr;
     if (ptr.ref.address != null && ptr.ref.address != nullptr) {
-      ffi.free(ptr.ref.address);
+      ffi.calloc.free(ptr.ref.address);
     }
     ptr.ref.address = nullptr;
     if (ptr.ref.publicKey != null && ptr.ref.publicKey != nullptr) {
-      ffi.free(ptr.ref.publicKey);
+      ffi.calloc.free(ptr.ref.publicKey);
     }
     ptr.ref.publicKey = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static Address fromC(Pointer<clib.CAddress> ptr) {
@@ -222,23 +222,23 @@ class Address extends DC<clib.CAddress> {
       return;
     }
     if (c.ref.id != null && c.ref.id != nullptr) {
-      ffi.free(c.ref.id);
+      ffi.calloc.free(c.ref.id);
     }
     c.ref.id = toUtf8Null(id);
     if (c.ref.walletId != null && c.ref.walletId != nullptr) {
-      ffi.free(c.ref.walletId);
+      ffi.calloc.free(c.ref.walletId);
     }
     c.ref.walletId = toUtf8Null(walletId);
     if (c.ref.chainType != null && c.ref.chainType != nullptr) {
-      ffi.free(c.ref.chainType);
+      ffi.calloc.free(c.ref.chainType);
     }
     c.ref.chainType = toUtf8Null(chainType);
     if (c.ref.address != null && c.ref.address != nullptr) {
-      ffi.free(c.ref.address);
+      ffi.calloc.free(c.ref.address);
     }
     c.ref.address = toUtf8Null(address);
     if (c.ref.publicKey != null && c.ref.publicKey != nullptr) {
-      ffi.free(c.ref.publicKey);
+      ffi.calloc.free(c.ref.publicKey);
     }
     c.ref.publicKey = toUtf8Null(publicKey);
   }
@@ -269,7 +269,7 @@ class ArrayCBtcChainToken extends DC<clib.CArrayCBtcChainToken> {
     }
     BtcChainToken.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCBtcChainToken fromC(Pointer<clib.CArrayCBtcChainToken> ptr) {
@@ -331,7 +331,7 @@ class ArrayCBtcChainTokenAuth extends DC<clib.CArrayCBtcChainTokenAuth> {
     }
     BtcChainTokenAuth.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCBtcChainTokenAuth fromC(
@@ -394,7 +394,7 @@ class ArrayCBtcChainTokenDefault extends DC<clib.CArrayCBtcChainTokenDefault> {
     }
     BtcChainTokenDefault.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCBtcChainTokenDefault fromC(
@@ -457,7 +457,7 @@ class ArrayCChar extends DC<clib.CArrayCChar> {
     }
     ptr.ref.ptr.free(ptr.ref.len);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCChar fromC(Pointer<clib.CArrayCChar> ptr) {
@@ -518,7 +518,7 @@ class ArrayCContext extends DC<clib.CArrayCContext> {
     }
     Context.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCContext fromC(Pointer<clib.CArrayCContext> ptr) {
@@ -580,7 +580,7 @@ class ArrayCEeeChainToken extends DC<clib.CArrayCEeeChainToken> {
     }
     EeeChainToken.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCEeeChainToken fromC(Pointer<clib.CArrayCEeeChainToken> ptr) {
@@ -642,7 +642,7 @@ class ArrayCEeeChainTokenAuth extends DC<clib.CArrayCEeeChainTokenAuth> {
     }
     EeeChainTokenAuth.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCEeeChainTokenAuth fromC(
@@ -705,7 +705,7 @@ class ArrayCEeeChainTokenDefault extends DC<clib.CArrayCEeeChainTokenDefault> {
     }
     EeeChainTokenDefault.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCEeeChainTokenDefault fromC(
@@ -768,7 +768,7 @@ class ArrayCEeeChainTx extends DC<clib.CArrayCEeeChainTx> {
     }
     EeeChainTx.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCEeeChainTx fromC(Pointer<clib.CArrayCEeeChainTx> ptr) {
@@ -830,7 +830,7 @@ class ArrayCEthChainToken extends DC<clib.CArrayCEthChainToken> {
     }
     EthChainToken.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCEthChainToken fromC(Pointer<clib.CArrayCEthChainToken> ptr) {
@@ -892,7 +892,7 @@ class ArrayCEthChainTokenAuth extends DC<clib.CArrayCEthChainTokenAuth> {
     }
     EthChainTokenAuth.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCEthChainTokenAuth fromC(
@@ -955,7 +955,7 @@ class ArrayCEthChainTokenDefault extends DC<clib.CArrayCEthChainTokenDefault> {
     }
     EthChainTokenDefault.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCEthChainTokenDefault fromC(
@@ -1018,7 +1018,7 @@ class ArrayCExtrinsicContext extends DC<clib.CArrayCExtrinsicContext> {
     }
     ExtrinsicContext.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCExtrinsicContext fromC(
@@ -1081,7 +1081,7 @@ class ArrayCTokenAddress extends DC<clib.CArrayCTokenAddress> {
     }
     TokenAddress.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCTokenAddress fromC(Pointer<clib.CArrayCTokenAddress> ptr) {
@@ -1143,7 +1143,7 @@ class ArrayCWallet extends DC<clib.CArrayCWallet> {
     }
     Wallet.free(ptr.ref.ptr);
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayCWallet fromC(Pointer<clib.CArrayCWallet> ptr) {
@@ -1205,7 +1205,7 @@ class ArrayI64 extends DC<clib.CArrayI64> {
     }
     ptr.ref.ptr.free();
     ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ArrayI64 fromC(Pointer<clib.CArrayI64> ptr) {
@@ -1270,7 +1270,7 @@ class BtcChain extends DC<clib.CBtcChain> {
     ptr.ref.chainShared = nullptr;
     ArrayCBtcChainToken.free(ptr.ref.tokens);
     ptr.ref.tokens = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static BtcChain fromC(Pointer<clib.CBtcChain> ptr) {
@@ -1330,7 +1330,7 @@ class BtcChainToken extends DC<clib.CBtcChainToken> {
     }
     BtcChainTokenShared.free(ptr.ref.btcChainTokenShared);
     ptr.ref.btcChainTokenShared = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static BtcChainToken fromC(Pointer<clib.CBtcChainToken> ptr) {
@@ -1389,16 +1389,16 @@ class BtcChainTokenAuth extends DC<clib.CBtcChainTokenAuth> {
     }
     if (ptr.ref.chainTokenSharedId != null &&
         ptr.ref.chainTokenSharedId != nullptr) {
-      ffi.free(ptr.ref.chainTokenSharedId);
+      ffi.calloc.free(ptr.ref.chainTokenSharedId);
     }
     ptr.ref.chainTokenSharedId = nullptr;
     if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
-      ffi.free(ptr.ref.netType);
+      ffi.calloc.free(ptr.ref.netType);
     }
     ptr.ref.netType = nullptr;
     BtcChainTokenShared.free(ptr.ref.btcChainTokenShared);
     ptr.ref.btcChainTokenShared = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static BtcChainTokenAuth fromC(Pointer<clib.CBtcChainTokenAuth> ptr) {
@@ -1424,11 +1424,11 @@ class BtcChainTokenAuth extends DC<clib.CBtcChainTokenAuth> {
     }
     if (c.ref.chainTokenSharedId != null &&
         c.ref.chainTokenSharedId != nullptr) {
-      ffi.free(c.ref.chainTokenSharedId);
+      ffi.calloc.free(c.ref.chainTokenSharedId);
     }
     c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
     if (c.ref.netType != null && c.ref.netType != nullptr) {
-      ffi.free(c.ref.netType);
+      ffi.calloc.free(c.ref.netType);
     }
     c.ref.netType = toUtf8Null(netType);
     c.ref.position = position;
@@ -1468,16 +1468,16 @@ class BtcChainTokenDefault extends DC<clib.CBtcChainTokenDefault> {
     }
     if (ptr.ref.chainTokenSharedId != null &&
         ptr.ref.chainTokenSharedId != nullptr) {
-      ffi.free(ptr.ref.chainTokenSharedId);
+      ffi.calloc.free(ptr.ref.chainTokenSharedId);
     }
     ptr.ref.chainTokenSharedId = nullptr;
     if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
-      ffi.free(ptr.ref.netType);
+      ffi.calloc.free(ptr.ref.netType);
     }
     ptr.ref.netType = nullptr;
     BtcChainTokenShared.free(ptr.ref.btcChainTokenShared);
     ptr.ref.btcChainTokenShared = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static BtcChainTokenDefault fromC(Pointer<clib.CBtcChainTokenDefault> ptr) {
@@ -1503,11 +1503,11 @@ class BtcChainTokenDefault extends DC<clib.CBtcChainTokenDefault> {
     }
     if (c.ref.chainTokenSharedId != null &&
         c.ref.chainTokenSharedId != nullptr) {
-      ffi.free(c.ref.chainTokenSharedId);
+      ffi.calloc.free(c.ref.chainTokenSharedId);
     }
     c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
     if (c.ref.netType != null && c.ref.netType != nullptr) {
-      ffi.free(c.ref.netType);
+      ffi.calloc.free(c.ref.netType);
     }
     c.ref.netType = toUtf8Null(netType);
     c.ref.position = position;
@@ -1548,10 +1548,10 @@ class BtcChainTokenShared extends DC<clib.CBtcChainTokenShared> {
     TokenShared.free(ptr.ref.tokenShared);
     ptr.ref.tokenShared = nullptr;
     if (ptr.ref.tokenType != null && ptr.ref.tokenType != nullptr) {
-      ffi.free(ptr.ref.tokenType);
+      ffi.calloc.free(ptr.ref.tokenType);
     }
     ptr.ref.tokenType = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static BtcChainTokenShared fromC(Pointer<clib.CBtcChainTokenShared> ptr) {
@@ -1580,7 +1580,7 @@ class BtcChainTokenShared extends DC<clib.CBtcChainTokenShared> {
     }
     tokenShared.toC(c.ref.tokenShared);
     if (c.ref.tokenType != null && c.ref.tokenType != nullptr) {
-      ffi.free(c.ref.tokenType);
+      ffi.calloc.free(c.ref.tokenType);
     }
     c.ref.tokenType = toUtf8Null(tokenType);
     c.ref.gas = gas;
@@ -1614,16 +1614,16 @@ class ChainShared extends DC<clib.CChainShared> {
       return;
     }
     if (ptr.ref.walletId != null && ptr.ref.walletId != nullptr) {
-      ffi.free(ptr.ref.walletId);
+      ffi.calloc.free(ptr.ref.walletId);
     }
     ptr.ref.walletId = nullptr;
     if (ptr.ref.chainType != null && ptr.ref.chainType != nullptr) {
-      ffi.free(ptr.ref.chainType);
+      ffi.calloc.free(ptr.ref.chainType);
     }
     ptr.ref.chainType = nullptr;
     Address.free(ptr.ref.walletAddress);
     ptr.ref.walletAddress = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ChainShared fromC(Pointer<clib.CChainShared> ptr) {
@@ -1648,11 +1648,11 @@ class ChainShared extends DC<clib.CChainShared> {
       return;
     }
     if (c.ref.walletId != null && c.ref.walletId != nullptr) {
-      ffi.free(c.ref.walletId);
+      ffi.calloc.free(c.ref.walletId);
     }
     c.ref.walletId = toUtf8Null(walletId);
     if (c.ref.chainType != null && c.ref.chainType != nullptr) {
-      ffi.free(c.ref.chainType);
+      ffi.calloc.free(c.ref.chainType);
     }
     c.ref.chainType = toUtf8Null(chainType);
     if (c.ref.walletAddress == null || c.ref.walletAddress == nullptr) {
@@ -1683,10 +1683,10 @@ class ChainVersion extends DC<clib.CChainVersion> {
       return;
     }
     if (ptr.ref.genesisHash != null && ptr.ref.genesisHash != nullptr) {
-      ffi.free(ptr.ref.genesisHash);
+      ffi.calloc.free(ptr.ref.genesisHash);
     }
     ptr.ref.genesisHash = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ChainVersion fromC(Pointer<clib.CChainVersion> ptr) {
@@ -1711,7 +1711,7 @@ class ChainVersion extends DC<clib.CChainVersion> {
       return;
     }
     if (c.ref.genesisHash != null && c.ref.genesisHash != nullptr) {
-      ffi.free(c.ref.genesisHash);
+      ffi.calloc.free(c.ref.genesisHash);
     }
     c.ref.genesisHash = toUtf8Null(genesisHash);
     c.ref.runtimeVersion = runtimeVersion;
@@ -1738,14 +1738,14 @@ class Context extends DC<clib.CContext> {
       return;
     }
     if (ptr.ref.id != null && ptr.ref.id != nullptr) {
-      ffi.free(ptr.ref.id);
+      ffi.calloc.free(ptr.ref.id);
     }
     ptr.ref.id = nullptr;
     if (ptr.ref.contextNote != null && ptr.ref.contextNote != nullptr) {
-      ffi.free(ptr.ref.contextNote);
+      ffi.calloc.free(ptr.ref.contextNote);
     }
     ptr.ref.contextNote = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static Context fromC(Pointer<clib.CContext> ptr) {
@@ -1770,11 +1770,11 @@ class Context extends DC<clib.CContext> {
       return;
     }
     if (c.ref.id != null && c.ref.id != nullptr) {
-      ffi.free(c.ref.id);
+      ffi.calloc.free(c.ref.id);
     }
     c.ref.id = toUtf8Null(id);
     if (c.ref.contextNote != null && c.ref.contextNote != nullptr) {
-      ffi.free(c.ref.contextNote);
+      ffi.calloc.free(c.ref.contextNote);
     }
     c.ref.contextNote = toUtf8Null(contextNote);
   }
@@ -1800,22 +1800,22 @@ class CreateWalletParameters extends DC<clib.CCreateWalletParameters> {
       return;
     }
     if (ptr.ref.name != null && ptr.ref.name != nullptr) {
-      ffi.free(ptr.ref.name);
+      ffi.calloc.free(ptr.ref.name);
     }
     ptr.ref.name = nullptr;
     if (ptr.ref.password != null && ptr.ref.password != nullptr) {
-      ffi.free(ptr.ref.password);
+      ffi.calloc.free(ptr.ref.password);
     }
     ptr.ref.password = nullptr;
     if (ptr.ref.mnemonic != null && ptr.ref.mnemonic != nullptr) {
-      ffi.free(ptr.ref.mnemonic);
+      ffi.calloc.free(ptr.ref.mnemonic);
     }
     ptr.ref.mnemonic = nullptr;
     if (ptr.ref.walletType != null && ptr.ref.walletType != nullptr) {
-      ffi.free(ptr.ref.walletType);
+      ffi.calloc.free(ptr.ref.walletType);
     }
     ptr.ref.walletType = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static CreateWalletParameters fromC(
@@ -1841,19 +1841,19 @@ class CreateWalletParameters extends DC<clib.CCreateWalletParameters> {
       return;
     }
     if (c.ref.name != null && c.ref.name != nullptr) {
-      ffi.free(c.ref.name);
+      ffi.calloc.free(c.ref.name);
     }
     c.ref.name = toUtf8Null(name);
     if (c.ref.password != null && c.ref.password != nullptr) {
-      ffi.free(c.ref.password);
+      ffi.calloc.free(c.ref.password);
     }
     c.ref.password = toUtf8Null(password);
     if (c.ref.mnemonic != null && c.ref.mnemonic != nullptr) {
-      ffi.free(c.ref.mnemonic);
+      ffi.calloc.free(c.ref.mnemonic);
     }
     c.ref.mnemonic = toUtf8Null(mnemonic);
     if (c.ref.walletType != null && c.ref.walletType != nullptr) {
-      ffi.free(c.ref.walletType);
+      ffi.calloc.free(c.ref.walletType);
     }
     c.ref.walletType = toUtf8Null(walletType);
   }
@@ -1885,39 +1885,39 @@ class DbName extends DC<clib.CDbName> {
       return;
     }
     if (ptr.ref.path != null && ptr.ref.path != nullptr) {
-      ffi.free(ptr.ref.path);
+      ffi.calloc.free(ptr.ref.path);
     }
     ptr.ref.path = nullptr;
     if (ptr.ref.prefix != null && ptr.ref.prefix != nullptr) {
-      ffi.free(ptr.ref.prefix);
+      ffi.calloc.free(ptr.ref.prefix);
     }
     ptr.ref.prefix = nullptr;
     if (ptr.ref.cashboxWallets != null && ptr.ref.cashboxWallets != nullptr) {
-      ffi.free(ptr.ref.cashboxWallets);
+      ffi.calloc.free(ptr.ref.cashboxWallets);
     }
     ptr.ref.cashboxWallets = nullptr;
     if (ptr.ref.cashboxMnemonic != null && ptr.ref.cashboxMnemonic != nullptr) {
-      ffi.free(ptr.ref.cashboxMnemonic);
+      ffi.calloc.free(ptr.ref.cashboxMnemonic);
     }
     ptr.ref.cashboxMnemonic = nullptr;
     if (ptr.ref.walletMainnet != null && ptr.ref.walletMainnet != nullptr) {
-      ffi.free(ptr.ref.walletMainnet);
+      ffi.calloc.free(ptr.ref.walletMainnet);
     }
     ptr.ref.walletMainnet = nullptr;
     if (ptr.ref.walletPrivate != null && ptr.ref.walletPrivate != nullptr) {
-      ffi.free(ptr.ref.walletPrivate);
+      ffi.calloc.free(ptr.ref.walletPrivate);
     }
     ptr.ref.walletPrivate = nullptr;
     if (ptr.ref.walletTestnet != null && ptr.ref.walletTestnet != nullptr) {
-      ffi.free(ptr.ref.walletTestnet);
+      ffi.calloc.free(ptr.ref.walletTestnet);
     }
     ptr.ref.walletTestnet = nullptr;
     if (ptr.ref.walletTestnetPrivate != null &&
         ptr.ref.walletTestnetPrivate != nullptr) {
-      ffi.free(ptr.ref.walletTestnetPrivate);
+      ffi.calloc.free(ptr.ref.walletTestnetPrivate);
     }
     ptr.ref.walletTestnetPrivate = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static DbName fromC(Pointer<clib.CDbName> ptr) {
@@ -1942,36 +1942,36 @@ class DbName extends DC<clib.CDbName> {
       return;
     }
     if (c.ref.path != null && c.ref.path != nullptr) {
-      ffi.free(c.ref.path);
+      ffi.calloc.free(c.ref.path);
     }
     c.ref.path = toUtf8Null(path);
     if (c.ref.prefix != null && c.ref.prefix != nullptr) {
-      ffi.free(c.ref.prefix);
+      ffi.calloc.free(c.ref.prefix);
     }
     c.ref.prefix = toUtf8Null(prefix);
     if (c.ref.cashboxWallets != null && c.ref.cashboxWallets != nullptr) {
-      ffi.free(c.ref.cashboxWallets);
+      ffi.calloc.free(c.ref.cashboxWallets);
     }
     c.ref.cashboxWallets = toUtf8Null(cashboxWallets);
     if (c.ref.cashboxMnemonic != null && c.ref.cashboxMnemonic != nullptr) {
-      ffi.free(c.ref.cashboxMnemonic);
+      ffi.calloc.free(c.ref.cashboxMnemonic);
     }
     c.ref.cashboxMnemonic = toUtf8Null(cashboxMnemonic);
     if (c.ref.walletMainnet != null && c.ref.walletMainnet != nullptr) {
-      ffi.free(c.ref.walletMainnet);
+      ffi.calloc.free(c.ref.walletMainnet);
     }
     c.ref.walletMainnet = toUtf8Null(walletMainnet);
     if (c.ref.walletPrivate != null && c.ref.walletPrivate != nullptr) {
-      ffi.free(c.ref.walletPrivate);
+      ffi.calloc.free(c.ref.walletPrivate);
     }
     c.ref.walletPrivate = toUtf8Null(walletPrivate);
     if (c.ref.walletTestnet != null && c.ref.walletTestnet != nullptr) {
-      ffi.free(c.ref.walletTestnet);
+      ffi.calloc.free(c.ref.walletTestnet);
     }
     c.ref.walletTestnet = toUtf8Null(walletTestnet);
     if (c.ref.walletTestnetPrivate != null &&
         c.ref.walletTestnetPrivate != nullptr) {
-      ffi.free(c.ref.walletTestnetPrivate);
+      ffi.calloc.free(c.ref.walletTestnetPrivate);
     }
     c.ref.walletTestnetPrivate = toUtf8Null(walletTestnetPrivate);
   }
@@ -2006,12 +2006,12 @@ class DecodeAccountInfoParameters
       return;
     }
     if (ptr.ref.encodeData != null && ptr.ref.encodeData != nullptr) {
-      ffi.free(ptr.ref.encodeData);
+      ffi.calloc.free(ptr.ref.encodeData);
     }
     ptr.ref.encodeData = nullptr;
     ChainVersion.free(ptr.ref.chainVersion);
     ptr.ref.chainVersion = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static DecodeAccountInfoParameters fromC(
@@ -2037,7 +2037,7 @@ class DecodeAccountInfoParameters
       return;
     }
     if (c.ref.encodeData != null && c.ref.encodeData != nullptr) {
-      ffi.free(c.ref.encodeData);
+      ffi.calloc.free(c.ref.encodeData);
     }
     c.ref.encodeData = toUtf8Null(encodeData);
     if (c.ref.chainVersion == null || c.ref.chainVersion == nullptr) {
@@ -2074,7 +2074,7 @@ class EeeChain extends DC<clib.CEeeChain> {
     ptr.ref.chainShared = nullptr;
     ArrayCEeeChainToken.free(ptr.ref.tokens);
     ptr.ref.tokens = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EeeChain fromC(Pointer<clib.CEeeChain> ptr) {
@@ -2134,7 +2134,7 @@ class EeeChainToken extends DC<clib.CEeeChainToken> {
     }
     EeeChainTokenShared.free(ptr.ref.eeeChainTokenShared);
     ptr.ref.eeeChainTokenShared = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EeeChainToken fromC(Pointer<clib.CEeeChainToken> ptr) {
@@ -2193,16 +2193,16 @@ class EeeChainTokenAuth extends DC<clib.CEeeChainTokenAuth> {
     }
     if (ptr.ref.chainTokenSharedId != null &&
         ptr.ref.chainTokenSharedId != nullptr) {
-      ffi.free(ptr.ref.chainTokenSharedId);
+      ffi.calloc.free(ptr.ref.chainTokenSharedId);
     }
     ptr.ref.chainTokenSharedId = nullptr;
     if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
-      ffi.free(ptr.ref.netType);
+      ffi.calloc.free(ptr.ref.netType);
     }
     ptr.ref.netType = nullptr;
     EeeChainTokenShared.free(ptr.ref.eeeChainTokenShared);
     ptr.ref.eeeChainTokenShared = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EeeChainTokenAuth fromC(Pointer<clib.CEeeChainTokenAuth> ptr) {
@@ -2228,11 +2228,11 @@ class EeeChainTokenAuth extends DC<clib.CEeeChainTokenAuth> {
     }
     if (c.ref.chainTokenSharedId != null &&
         c.ref.chainTokenSharedId != nullptr) {
-      ffi.free(c.ref.chainTokenSharedId);
+      ffi.calloc.free(c.ref.chainTokenSharedId);
     }
     c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
     if (c.ref.netType != null && c.ref.netType != nullptr) {
-      ffi.free(c.ref.netType);
+      ffi.calloc.free(c.ref.netType);
     }
     c.ref.netType = toUtf8Null(netType);
     c.ref.position = position;
@@ -2272,16 +2272,16 @@ class EeeChainTokenDefault extends DC<clib.CEeeChainTokenDefault> {
     }
     if (ptr.ref.chainTokenSharedId != null &&
         ptr.ref.chainTokenSharedId != nullptr) {
-      ffi.free(ptr.ref.chainTokenSharedId);
+      ffi.calloc.free(ptr.ref.chainTokenSharedId);
     }
     ptr.ref.chainTokenSharedId = nullptr;
     if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
-      ffi.free(ptr.ref.netType);
+      ffi.calloc.free(ptr.ref.netType);
     }
     ptr.ref.netType = nullptr;
     EeeChainTokenShared.free(ptr.ref.eeeChainTokenShared);
     ptr.ref.eeeChainTokenShared = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EeeChainTokenDefault fromC(Pointer<clib.CEeeChainTokenDefault> ptr) {
@@ -2307,11 +2307,11 @@ class EeeChainTokenDefault extends DC<clib.CEeeChainTokenDefault> {
     }
     if (c.ref.chainTokenSharedId != null &&
         c.ref.chainTokenSharedId != nullptr) {
-      ffi.free(c.ref.chainTokenSharedId);
+      ffi.calloc.free(c.ref.chainTokenSharedId);
     }
     c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
     if (c.ref.netType != null && c.ref.netType != nullptr) {
-      ffi.free(c.ref.netType);
+      ffi.calloc.free(c.ref.netType);
     }
     c.ref.netType = toUtf8Null(netType);
     c.ref.position = position;
@@ -2353,14 +2353,14 @@ class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
     TokenShared.free(ptr.ref.tokenShared);
     ptr.ref.tokenShared = nullptr;
     if (ptr.ref.tokenType != null && ptr.ref.tokenType != nullptr) {
-      ffi.free(ptr.ref.tokenType);
+      ffi.calloc.free(ptr.ref.tokenType);
     }
     ptr.ref.tokenType = nullptr;
     if (ptr.ref.gasPrice != null && ptr.ref.gasPrice != nullptr) {
-      ffi.free(ptr.ref.gasPrice);
+      ffi.calloc.free(ptr.ref.gasPrice);
     }
     ptr.ref.gasPrice = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EeeChainTokenShared fromC(Pointer<clib.CEeeChainTokenShared> ptr) {
@@ -2389,12 +2389,12 @@ class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
     }
     tokenShared.toC(c.ref.tokenShared);
     if (c.ref.tokenType != null && c.ref.tokenType != nullptr) {
-      ffi.free(c.ref.tokenType);
+      ffi.calloc.free(c.ref.tokenType);
     }
     c.ref.tokenType = toUtf8Null(tokenType);
     c.ref.gasLimit = gasLimit;
     if (c.ref.gasPrice != null && c.ref.gasPrice != nullptr) {
-      ffi.free(c.ref.gasPrice);
+      ffi.calloc.free(c.ref.gasPrice);
     }
     c.ref.gasPrice = toUtf8Null(gasPrice);
     c.ref.decimal = decimal;
@@ -2433,46 +2433,46 @@ class EeeChainTx extends DC<clib.CEeeChainTx> {
       return;
     }
     if (ptr.ref.txHash != null && ptr.ref.txHash != nullptr) {
-      ffi.free(ptr.ref.txHash);
+      ffi.calloc.free(ptr.ref.txHash);
     }
     ptr.ref.txHash = nullptr;
     if (ptr.ref.blockHash != null && ptr.ref.blockHash != nullptr) {
-      ffi.free(ptr.ref.blockHash);
+      ffi.calloc.free(ptr.ref.blockHash);
     }
     ptr.ref.blockHash = nullptr;
     if (ptr.ref.blockNumber != null && ptr.ref.blockNumber != nullptr) {
-      ffi.free(ptr.ref.blockNumber);
+      ffi.calloc.free(ptr.ref.blockNumber);
     }
     ptr.ref.blockNumber = nullptr;
     if (ptr.ref.signer != null && ptr.ref.signer != nullptr) {
-      ffi.free(ptr.ref.signer);
+      ffi.calloc.free(ptr.ref.signer);
     }
     ptr.ref.signer = nullptr;
     if (ptr.ref.walletAccount != null && ptr.ref.walletAccount != nullptr) {
-      ffi.free(ptr.ref.walletAccount);
+      ffi.calloc.free(ptr.ref.walletAccount);
     }
     ptr.ref.walletAccount = nullptr;
     if (ptr.ref.fromAddress != null && ptr.ref.fromAddress != nullptr) {
-      ffi.free(ptr.ref.fromAddress);
+      ffi.calloc.free(ptr.ref.fromAddress);
     }
     ptr.ref.fromAddress = nullptr;
     if (ptr.ref.toAddress != null && ptr.ref.toAddress != nullptr) {
-      ffi.free(ptr.ref.toAddress);
+      ffi.calloc.free(ptr.ref.toAddress);
     }
     ptr.ref.toAddress = nullptr;
     if (ptr.ref.value != null && ptr.ref.value != nullptr) {
-      ffi.free(ptr.ref.value);
+      ffi.calloc.free(ptr.ref.value);
     }
     ptr.ref.value = nullptr;
     if (ptr.ref.extension != null && ptr.ref.extension != nullptr) {
-      ffi.free(ptr.ref.extension);
+      ffi.calloc.free(ptr.ref.extension);
     }
     ptr.ref.extension = nullptr;
     if (ptr.ref.txBytes != null && ptr.ref.txBytes != nullptr) {
-      ffi.free(ptr.ref.txBytes);
+      ffi.calloc.free(ptr.ref.txBytes);
     }
     ptr.ref.txBytes = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EeeChainTx fromC(Pointer<clib.CEeeChainTx> ptr) {
@@ -2497,45 +2497,45 @@ class EeeChainTx extends DC<clib.CEeeChainTx> {
       return;
     }
     if (c.ref.txHash != null && c.ref.txHash != nullptr) {
-      ffi.free(c.ref.txHash);
+      ffi.calloc.free(c.ref.txHash);
     }
     c.ref.txHash = toUtf8Null(txHash);
     if (c.ref.blockHash != null && c.ref.blockHash != nullptr) {
-      ffi.free(c.ref.blockHash);
+      ffi.calloc.free(c.ref.blockHash);
     }
     c.ref.blockHash = toUtf8Null(blockHash);
     if (c.ref.blockNumber != null && c.ref.blockNumber != nullptr) {
-      ffi.free(c.ref.blockNumber);
+      ffi.calloc.free(c.ref.blockNumber);
     }
     c.ref.blockNumber = toUtf8Null(blockNumber);
     if (c.ref.signer != null && c.ref.signer != nullptr) {
-      ffi.free(c.ref.signer);
+      ffi.calloc.free(c.ref.signer);
     }
     c.ref.signer = toUtf8Null(signer);
     if (c.ref.walletAccount != null && c.ref.walletAccount != nullptr) {
-      ffi.free(c.ref.walletAccount);
+      ffi.calloc.free(c.ref.walletAccount);
     }
     c.ref.walletAccount = toUtf8Null(walletAccount);
     if (c.ref.fromAddress != null && c.ref.fromAddress != nullptr) {
-      ffi.free(c.ref.fromAddress);
+      ffi.calloc.free(c.ref.fromAddress);
     }
     c.ref.fromAddress = toUtf8Null(fromAddress);
     if (c.ref.toAddress != null && c.ref.toAddress != nullptr) {
-      ffi.free(c.ref.toAddress);
+      ffi.calloc.free(c.ref.toAddress);
     }
     c.ref.toAddress = toUtf8Null(toAddress);
     if (c.ref.value != null && c.ref.value != nullptr) {
-      ffi.free(c.ref.value);
+      ffi.calloc.free(c.ref.value);
     }
     c.ref.value = toUtf8Null(value);
     if (c.ref.extension != null && c.ref.extension != nullptr) {
-      ffi.free(c.ref.extension);
+      ffi.calloc.free(c.ref.extension);
     }
     c.ref.extension = toUtf8Null(extension);
     c.ref.status = status;
     c.ref.txTimestamp = txTimestamp;
     if (c.ref.txBytes != null && c.ref.txBytes != nullptr) {
-      ffi.free(c.ref.txBytes);
+      ffi.calloc.free(c.ref.txBytes);
     }
     c.ref.txBytes = toUtf8Null(txBytes);
   }
@@ -2578,28 +2578,28 @@ class EeeTransferPayload extends DC<clib.CEeeTransferPayload> {
       return;
     }
     if (ptr.ref.fromAccount != null && ptr.ref.fromAccount != nullptr) {
-      ffi.free(ptr.ref.fromAccount);
+      ffi.calloc.free(ptr.ref.fromAccount);
     }
     ptr.ref.fromAccount = nullptr;
     if (ptr.ref.toAccount != null && ptr.ref.toAccount != nullptr) {
-      ffi.free(ptr.ref.toAccount);
+      ffi.calloc.free(ptr.ref.toAccount);
     }
     ptr.ref.toAccount = nullptr;
     if (ptr.ref.value != null && ptr.ref.value != nullptr) {
-      ffi.free(ptr.ref.value);
+      ffi.calloc.free(ptr.ref.value);
     }
     ptr.ref.value = nullptr;
     ChainVersion.free(ptr.ref.chainVersion);
     ptr.ref.chainVersion = nullptr;
     if (ptr.ref.extData != null && ptr.ref.extData != nullptr) {
-      ffi.free(ptr.ref.extData);
+      ffi.calloc.free(ptr.ref.extData);
     }
     ptr.ref.extData = nullptr;
     if (ptr.ref.password != null && ptr.ref.password != nullptr) {
-      ffi.free(ptr.ref.password);
+      ffi.calloc.free(ptr.ref.password);
     }
     ptr.ref.password = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EeeTransferPayload fromC(Pointer<clib.CEeeTransferPayload> ptr) {
@@ -2624,15 +2624,15 @@ class EeeTransferPayload extends DC<clib.CEeeTransferPayload> {
       return;
     }
     if (c.ref.fromAccount != null && c.ref.fromAccount != nullptr) {
-      ffi.free(c.ref.fromAccount);
+      ffi.calloc.free(c.ref.fromAccount);
     }
     c.ref.fromAccount = toUtf8Null(fromAccount);
     if (c.ref.toAccount != null && c.ref.toAccount != nullptr) {
-      ffi.free(c.ref.toAccount);
+      ffi.calloc.free(c.ref.toAccount);
     }
     c.ref.toAccount = toUtf8Null(toAccount);
     if (c.ref.value != null && c.ref.value != nullptr) {
-      ffi.free(c.ref.value);
+      ffi.calloc.free(c.ref.value);
     }
     c.ref.value = toUtf8Null(value);
     c.ref.index = index;
@@ -2641,11 +2641,11 @@ class EeeTransferPayload extends DC<clib.CEeeTransferPayload> {
     }
     chainVersion.toC(c.ref.chainVersion);
     if (c.ref.extData != null && c.ref.extData != nullptr) {
-      ffi.free(c.ref.extData);
+      ffi.calloc.free(c.ref.extData);
     }
     c.ref.extData = toUtf8Null(extData);
     if (c.ref.password != null && c.ref.password != nullptr) {
-      ffi.free(c.ref.password);
+      ffi.calloc.free(c.ref.password);
     }
     c.ref.password = toUtf8Null(password);
   }
@@ -2675,10 +2675,10 @@ class Error extends DC<clib.CError> {
       return;
     }
     if (ptr.ref.message != null && ptr.ref.message != nullptr) {
-      ffi.free(ptr.ref.message);
+      ffi.calloc.free(ptr.ref.message);
     }
     ptr.ref.message = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static Error fromC(Pointer<clib.CError> ptr) {
@@ -2704,7 +2704,7 @@ class Error extends DC<clib.CError> {
     }
     c.ref.code = code;
     if (c.ref.message != null && c.ref.message != nullptr) {
-      ffi.free(c.ref.message);
+      ffi.calloc.free(c.ref.message);
     }
     c.ref.message = toUtf8Null(message);
   }
@@ -2736,7 +2736,7 @@ class EthChain extends DC<clib.CEthChain> {
     ptr.ref.chainShared = nullptr;
     ArrayCEthChainToken.free(ptr.ref.tokens);
     ptr.ref.tokens = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EthChain fromC(Pointer<clib.CEthChain> ptr) {
@@ -2796,7 +2796,7 @@ class EthChainToken extends DC<clib.CEthChainToken> {
     }
     EthChainTokenShared.free(ptr.ref.ethChainTokenShared);
     ptr.ref.ethChainTokenShared = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EthChainToken fromC(Pointer<clib.CEthChainToken> ptr) {
@@ -2856,20 +2856,20 @@ class EthChainTokenAuth extends DC<clib.CEthChainTokenAuth> {
     }
     if (ptr.ref.chainTokenSharedId != null &&
         ptr.ref.chainTokenSharedId != nullptr) {
-      ffi.free(ptr.ref.chainTokenSharedId);
+      ffi.calloc.free(ptr.ref.chainTokenSharedId);
     }
     ptr.ref.chainTokenSharedId = nullptr;
     if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
-      ffi.free(ptr.ref.netType);
+      ffi.calloc.free(ptr.ref.netType);
     }
     ptr.ref.netType = nullptr;
     if (ptr.ref.contractAddress != null && ptr.ref.contractAddress != nullptr) {
-      ffi.free(ptr.ref.contractAddress);
+      ffi.calloc.free(ptr.ref.contractAddress);
     }
     ptr.ref.contractAddress = nullptr;
     EthChainTokenShared.free(ptr.ref.ethChainTokenShared);
     ptr.ref.ethChainTokenShared = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EthChainTokenAuth fromC(Pointer<clib.CEthChainTokenAuth> ptr) {
@@ -2895,16 +2895,16 @@ class EthChainTokenAuth extends DC<clib.CEthChainTokenAuth> {
     }
     if (c.ref.chainTokenSharedId != null &&
         c.ref.chainTokenSharedId != nullptr) {
-      ffi.free(c.ref.chainTokenSharedId);
+      ffi.calloc.free(c.ref.chainTokenSharedId);
     }
     c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
     if (c.ref.netType != null && c.ref.netType != nullptr) {
-      ffi.free(c.ref.netType);
+      ffi.calloc.free(c.ref.netType);
     }
     c.ref.netType = toUtf8Null(netType);
     c.ref.position = position;
     if (c.ref.contractAddress != null && c.ref.contractAddress != nullptr) {
-      ffi.free(c.ref.contractAddress);
+      ffi.calloc.free(c.ref.contractAddress);
     }
     c.ref.contractAddress = toUtf8Null(contractAddress);
     if (c.ref.ethChainTokenShared == null ||
@@ -2945,20 +2945,20 @@ class EthChainTokenDefault extends DC<clib.CEthChainTokenDefault> {
     }
     if (ptr.ref.chainTokenSharedId != null &&
         ptr.ref.chainTokenSharedId != nullptr) {
-      ffi.free(ptr.ref.chainTokenSharedId);
+      ffi.calloc.free(ptr.ref.chainTokenSharedId);
     }
     ptr.ref.chainTokenSharedId = nullptr;
     if (ptr.ref.netType != null && ptr.ref.netType != nullptr) {
-      ffi.free(ptr.ref.netType);
+      ffi.calloc.free(ptr.ref.netType);
     }
     ptr.ref.netType = nullptr;
     if (ptr.ref.contractAddress != null && ptr.ref.contractAddress != nullptr) {
-      ffi.free(ptr.ref.contractAddress);
+      ffi.calloc.free(ptr.ref.contractAddress);
     }
     ptr.ref.contractAddress = nullptr;
     EthChainTokenShared.free(ptr.ref.ethChainTokenShared);
     ptr.ref.ethChainTokenShared = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EthChainTokenDefault fromC(Pointer<clib.CEthChainTokenDefault> ptr) {
@@ -2984,16 +2984,16 @@ class EthChainTokenDefault extends DC<clib.CEthChainTokenDefault> {
     }
     if (c.ref.chainTokenSharedId != null &&
         c.ref.chainTokenSharedId != nullptr) {
-      ffi.free(c.ref.chainTokenSharedId);
+      ffi.calloc.free(c.ref.chainTokenSharedId);
     }
     c.ref.chainTokenSharedId = toUtf8Null(chainTokenSharedId);
     if (c.ref.netType != null && c.ref.netType != nullptr) {
-      ffi.free(c.ref.netType);
+      ffi.calloc.free(c.ref.netType);
     }
     c.ref.netType = toUtf8Null(netType);
     c.ref.position = position;
     if (c.ref.contractAddress != null && c.ref.contractAddress != nullptr) {
-      ffi.free(c.ref.contractAddress);
+      ffi.calloc.free(c.ref.contractAddress);
     }
     c.ref.contractAddress = toUtf8Null(contractAddress);
     if (c.ref.ethChainTokenShared == null ||
@@ -3035,14 +3035,14 @@ class EthChainTokenShared extends DC<clib.CEthChainTokenShared> {
     TokenShared.free(ptr.ref.tokenShared);
     ptr.ref.tokenShared = nullptr;
     if (ptr.ref.tokenType != null && ptr.ref.tokenType != nullptr) {
-      ffi.free(ptr.ref.tokenType);
+      ffi.calloc.free(ptr.ref.tokenType);
     }
     ptr.ref.tokenType = nullptr;
     if (ptr.ref.gasPrice != null && ptr.ref.gasPrice != nullptr) {
-      ffi.free(ptr.ref.gasPrice);
+      ffi.calloc.free(ptr.ref.gasPrice);
     }
     ptr.ref.gasPrice = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EthChainTokenShared fromC(Pointer<clib.CEthChainTokenShared> ptr) {
@@ -3071,12 +3071,12 @@ class EthChainTokenShared extends DC<clib.CEthChainTokenShared> {
     }
     tokenShared.toC(c.ref.tokenShared);
     if (c.ref.tokenType != null && c.ref.tokenType != nullptr) {
-      ffi.free(c.ref.tokenType);
+      ffi.calloc.free(c.ref.tokenType);
     }
     c.ref.tokenType = toUtf8Null(tokenType);
     c.ref.gasLimit = gasLimit;
     if (c.ref.gasPrice != null && c.ref.gasPrice != nullptr) {
-      ffi.free(c.ref.gasPrice);
+      ffi.calloc.free(c.ref.gasPrice);
     }
     c.ref.gasPrice = toUtf8Null(gasPrice);
     c.ref.decimal = decimal;
@@ -3105,14 +3105,14 @@ class EthRawTxPayload extends DC<clib.CEthRawTxPayload> {
       return;
     }
     if (ptr.ref.fromAddress != null && ptr.ref.fromAddress != nullptr) {
-      ffi.free(ptr.ref.fromAddress);
+      ffi.calloc.free(ptr.ref.fromAddress);
     }
     ptr.ref.fromAddress = nullptr;
     if (ptr.ref.rawTx != null && ptr.ref.rawTx != nullptr) {
-      ffi.free(ptr.ref.rawTx);
+      ffi.calloc.free(ptr.ref.rawTx);
     }
     ptr.ref.rawTx = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EthRawTxPayload fromC(Pointer<clib.CEthRawTxPayload> ptr) {
@@ -3137,11 +3137,11 @@ class EthRawTxPayload extends DC<clib.CEthRawTxPayload> {
       return;
     }
     if (c.ref.fromAddress != null && c.ref.fromAddress != nullptr) {
-      ffi.free(c.ref.fromAddress);
+      ffi.calloc.free(c.ref.fromAddress);
     }
     c.ref.fromAddress = toUtf8Null(fromAddress);
     if (c.ref.rawTx != null && c.ref.rawTx != nullptr) {
-      ffi.free(c.ref.rawTx);
+      ffi.calloc.free(c.ref.rawTx);
     }
     c.ref.rawTx = toUtf8Null(rawTx);
   }
@@ -3172,38 +3172,38 @@ class EthTransferPayload extends DC<clib.CEthTransferPayload> {
       return;
     }
     if (ptr.ref.fromAddress != null && ptr.ref.fromAddress != nullptr) {
-      ffi.free(ptr.ref.fromAddress);
+      ffi.calloc.free(ptr.ref.fromAddress);
     }
     ptr.ref.fromAddress = nullptr;
     if (ptr.ref.toAddress != null && ptr.ref.toAddress != nullptr) {
-      ffi.free(ptr.ref.toAddress);
+      ffi.calloc.free(ptr.ref.toAddress);
     }
     ptr.ref.toAddress = nullptr;
     if (ptr.ref.contractAddress != null && ptr.ref.contractAddress != nullptr) {
-      ffi.free(ptr.ref.contractAddress);
+      ffi.calloc.free(ptr.ref.contractAddress);
     }
     ptr.ref.contractAddress = nullptr;
     if (ptr.ref.value != null && ptr.ref.value != nullptr) {
-      ffi.free(ptr.ref.value);
+      ffi.calloc.free(ptr.ref.value);
     }
     ptr.ref.value = nullptr;
     if (ptr.ref.nonce != null && ptr.ref.nonce != nullptr) {
-      ffi.free(ptr.ref.nonce);
+      ffi.calloc.free(ptr.ref.nonce);
     }
     ptr.ref.nonce = nullptr;
     if (ptr.ref.gasPrice != null && ptr.ref.gasPrice != nullptr) {
-      ffi.free(ptr.ref.gasPrice);
+      ffi.calloc.free(ptr.ref.gasPrice);
     }
     ptr.ref.gasPrice = nullptr;
     if (ptr.ref.gasLimit != null && ptr.ref.gasLimit != nullptr) {
-      ffi.free(ptr.ref.gasLimit);
+      ffi.calloc.free(ptr.ref.gasLimit);
     }
     ptr.ref.gasLimit = nullptr;
     if (ptr.ref.extData != null && ptr.ref.extData != nullptr) {
-      ffi.free(ptr.ref.extData);
+      ffi.calloc.free(ptr.ref.extData);
     }
     ptr.ref.extData = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static EthTransferPayload fromC(Pointer<clib.CEthTransferPayload> ptr) {
@@ -3228,36 +3228,36 @@ class EthTransferPayload extends DC<clib.CEthTransferPayload> {
       return;
     }
     if (c.ref.fromAddress != null && c.ref.fromAddress != nullptr) {
-      ffi.free(c.ref.fromAddress);
+      ffi.calloc.free(c.ref.fromAddress);
     }
     c.ref.fromAddress = toUtf8Null(fromAddress);
     if (c.ref.toAddress != null && c.ref.toAddress != nullptr) {
-      ffi.free(c.ref.toAddress);
+      ffi.calloc.free(c.ref.toAddress);
     }
     c.ref.toAddress = toUtf8Null(toAddress);
     if (c.ref.contractAddress != null && c.ref.contractAddress != nullptr) {
-      ffi.free(c.ref.contractAddress);
+      ffi.calloc.free(c.ref.contractAddress);
     }
     c.ref.contractAddress = toUtf8Null(contractAddress);
     if (c.ref.value != null && c.ref.value != nullptr) {
-      ffi.free(c.ref.value);
+      ffi.calloc.free(c.ref.value);
     }
     c.ref.value = toUtf8Null(value);
     if (c.ref.nonce != null && c.ref.nonce != nullptr) {
-      ffi.free(c.ref.nonce);
+      ffi.calloc.free(c.ref.nonce);
     }
     c.ref.nonce = toUtf8Null(nonce);
     if (c.ref.gasPrice != null && c.ref.gasPrice != nullptr) {
-      ffi.free(c.ref.gasPrice);
+      ffi.calloc.free(c.ref.gasPrice);
     }
     c.ref.gasPrice = toUtf8Null(gasPrice);
     if (c.ref.gasLimit != null && c.ref.gasLimit != nullptr) {
-      ffi.free(c.ref.gasLimit);
+      ffi.calloc.free(c.ref.gasLimit);
     }
     c.ref.gasLimit = toUtf8Null(gasLimit);
     c.ref.decimal = decimal;
     if (c.ref.extData != null && c.ref.extData != nullptr) {
-      ffi.free(c.ref.extData);
+      ffi.calloc.free(c.ref.extData);
     }
     c.ref.extData = toUtf8Null(extData);
   }
@@ -3299,24 +3299,24 @@ class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
     ChainVersion.free(ptr.ref.chainVersion);
     ptr.ref.chainVersion = nullptr;
     if (ptr.ref.account != null && ptr.ref.account != nullptr) {
-      ffi.free(ptr.ref.account);
+      ffi.calloc.free(ptr.ref.account);
     }
     ptr.ref.account = nullptr;
     if (ptr.ref.blockHash != null && ptr.ref.blockHash != nullptr) {
-      ffi.free(ptr.ref.blockHash);
+      ffi.calloc.free(ptr.ref.blockHash);
     }
     ptr.ref.blockHash = nullptr;
     if (ptr.ref.blockNumber != null && ptr.ref.blockNumber != nullptr) {
-      ffi.free(ptr.ref.blockNumber);
+      ffi.calloc.free(ptr.ref.blockNumber);
     }
     ptr.ref.blockNumber = nullptr;
     if (ptr.ref.event != null && ptr.ref.event != nullptr) {
-      ffi.free(ptr.ref.event);
+      ffi.calloc.free(ptr.ref.event);
     }
     ptr.ref.event = nullptr;
     ArrayCChar.free(ptr.ref.extrinsics);
     ptr.ref.extrinsics = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static ExtrinsicContext fromC(Pointer<clib.CExtrinsicContext> ptr) {
@@ -3345,19 +3345,19 @@ class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
     }
     chainVersion.toC(c.ref.chainVersion);
     if (c.ref.account != null && c.ref.account != nullptr) {
-      ffi.free(c.ref.account);
+      ffi.calloc.free(c.ref.account);
     }
     c.ref.account = toUtf8Null(account);
     if (c.ref.blockHash != null && c.ref.blockHash != nullptr) {
-      ffi.free(c.ref.blockHash);
+      ffi.calloc.free(c.ref.blockHash);
     }
     c.ref.blockHash = toUtf8Null(blockHash);
     if (c.ref.blockNumber != null && c.ref.blockNumber != nullptr) {
-      ffi.free(c.ref.blockNumber);
+      ffi.calloc.free(c.ref.blockNumber);
     }
     c.ref.blockNumber = toUtf8Null(blockNumber);
     if (c.ref.event != null && c.ref.event != nullptr) {
-      ffi.free(c.ref.event);
+      ffi.calloc.free(c.ref.event);
     }
     c.ref.event = toUtf8Null(event);
     if (c.ref.extrinsics == null || c.ref.extrinsics == nullptr) {
@@ -3397,10 +3397,10 @@ class InitParameters extends DC<clib.CInitParameters> {
     DbName.free(ptr.ref.dbName);
     ptr.ref.dbName = nullptr;
     if (ptr.ref.contextNote != null && ptr.ref.contextNote != nullptr) {
-      ffi.free(ptr.ref.contextNote);
+      ffi.calloc.free(ptr.ref.contextNote);
     }
     ptr.ref.contextNote = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static InitParameters fromC(Pointer<clib.CInitParameters> ptr) {
@@ -3429,7 +3429,7 @@ class InitParameters extends DC<clib.CInitParameters> {
     }
     dbName.toC(c.ref.dbName);
     if (c.ref.contextNote != null && c.ref.contextNote != nullptr) {
-      ffi.free(c.ref.contextNote);
+      ffi.calloc.free(c.ref.contextNote);
     }
     c.ref.contextNote = toUtf8Null(contextNote);
   }
@@ -3455,18 +3455,18 @@ class RawTxParam extends DC<clib.CRawTxParam> {
       return;
     }
     if (ptr.ref.rawTx != null && ptr.ref.rawTx != nullptr) {
-      ffi.free(ptr.ref.rawTx);
+      ffi.calloc.free(ptr.ref.rawTx);
     }
     ptr.ref.rawTx = nullptr;
     if (ptr.ref.walletId != null && ptr.ref.walletId != nullptr) {
-      ffi.free(ptr.ref.walletId);
+      ffi.calloc.free(ptr.ref.walletId);
     }
     ptr.ref.walletId = nullptr;
     if (ptr.ref.password != null && ptr.ref.password != nullptr) {
-      ffi.free(ptr.ref.password);
+      ffi.calloc.free(ptr.ref.password);
     }
     ptr.ref.password = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static RawTxParam fromC(Pointer<clib.CRawTxParam> ptr) {
@@ -3491,15 +3491,15 @@ class RawTxParam extends DC<clib.CRawTxParam> {
       return;
     }
     if (c.ref.rawTx != null && c.ref.rawTx != nullptr) {
-      ffi.free(c.ref.rawTx);
+      ffi.calloc.free(c.ref.rawTx);
     }
     c.ref.rawTx = toUtf8Null(rawTx);
     if (c.ref.walletId != null && c.ref.walletId != nullptr) {
-      ffi.free(c.ref.walletId);
+      ffi.calloc.free(c.ref.walletId);
     }
     c.ref.walletId = toUtf8Null(walletId);
     if (c.ref.password != null && c.ref.password != nullptr) {
-      ffi.free(c.ref.password);
+      ffi.calloc.free(c.ref.password);
     }
     c.ref.password = toUtf8Null(password);
   }
@@ -3532,18 +3532,18 @@ class StorageKeyParameters extends DC<clib.CStorageKeyParameters> {
     ChainVersion.free(ptr.ref.chainVersion);
     ptr.ref.chainVersion = nullptr;
     if (ptr.ref.module != null && ptr.ref.module != nullptr) {
-      ffi.free(ptr.ref.module);
+      ffi.calloc.free(ptr.ref.module);
     }
     ptr.ref.module = nullptr;
     if (ptr.ref.storageItem != null && ptr.ref.storageItem != nullptr) {
-      ffi.free(ptr.ref.storageItem);
+      ffi.calloc.free(ptr.ref.storageItem);
     }
     ptr.ref.storageItem = nullptr;
     if (ptr.ref.account != null && ptr.ref.account != nullptr) {
-      ffi.free(ptr.ref.account);
+      ffi.calloc.free(ptr.ref.account);
     }
     ptr.ref.account = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static StorageKeyParameters fromC(Pointer<clib.CStorageKeyParameters> ptr) {
@@ -3572,15 +3572,15 @@ class StorageKeyParameters extends DC<clib.CStorageKeyParameters> {
     }
     chainVersion.toC(c.ref.chainVersion);
     if (c.ref.module != null && c.ref.module != nullptr) {
-      ffi.free(c.ref.module);
+      ffi.calloc.free(c.ref.module);
     }
     c.ref.module = toUtf8Null(module);
     if (c.ref.storageItem != null && c.ref.storageItem != nullptr) {
-      ffi.free(c.ref.storageItem);
+      ffi.calloc.free(c.ref.storageItem);
     }
     c.ref.storageItem = toUtf8Null(storageItem);
     if (c.ref.account != null && c.ref.account != nullptr) {
-      ffi.free(c.ref.account);
+      ffi.calloc.free(c.ref.account);
     }
     c.ref.account = toUtf8Null(account);
   }
@@ -3613,18 +3613,18 @@ class SubChainBasicInfo extends DC<clib.CSubChainBasicInfo> {
       return;
     }
     if (ptr.ref.genesisHash != null && ptr.ref.genesisHash != nullptr) {
-      ffi.free(ptr.ref.genesisHash);
+      ffi.calloc.free(ptr.ref.genesisHash);
     }
     ptr.ref.genesisHash = nullptr;
     if (ptr.ref.metadata != null && ptr.ref.metadata != nullptr) {
-      ffi.free(ptr.ref.metadata);
+      ffi.calloc.free(ptr.ref.metadata);
     }
     ptr.ref.metadata = nullptr;
     if (ptr.ref.tokenSymbol != null && ptr.ref.tokenSymbol != nullptr) {
-      ffi.free(ptr.ref.tokenSymbol);
+      ffi.calloc.free(ptr.ref.tokenSymbol);
     }
     ptr.ref.tokenSymbol = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static SubChainBasicInfo fromC(Pointer<clib.CSubChainBasicInfo> ptr) {
@@ -3649,11 +3649,11 @@ class SubChainBasicInfo extends DC<clib.CSubChainBasicInfo> {
       return;
     }
     if (c.ref.genesisHash != null && c.ref.genesisHash != nullptr) {
-      ffi.free(c.ref.genesisHash);
+      ffi.calloc.free(c.ref.genesisHash);
     }
     c.ref.genesisHash = toUtf8Null(genesisHash);
     if (c.ref.metadata != null && c.ref.metadata != nullptr) {
-      ffi.free(c.ref.metadata);
+      ffi.calloc.free(c.ref.metadata);
     }
     c.ref.metadata = toUtf8Null(metadata);
     c.ref.runtimeVersion = runtimeVersion;
@@ -3661,7 +3661,7 @@ class SubChainBasicInfo extends DC<clib.CSubChainBasicInfo> {
     c.ref.ss58FormatPrefix = ss58FormatPrefix;
     c.ref.tokenDecimals = tokenDecimals;
     if (c.ref.tokenSymbol != null && c.ref.tokenSymbol != nullptr) {
-      ffi.free(c.ref.tokenSymbol);
+      ffi.calloc.free(c.ref.tokenSymbol);
     }
     c.ref.tokenSymbol = toUtf8Null(tokenSymbol);
     c.ref.isDefault = isDefault;
@@ -3695,26 +3695,26 @@ class TokenAddress extends DC<clib.CTokenAddress> {
       return;
     }
     if (ptr.ref.walletId != null && ptr.ref.walletId != nullptr) {
-      ffi.free(ptr.ref.walletId);
+      ffi.calloc.free(ptr.ref.walletId);
     }
     ptr.ref.walletId = nullptr;
     if (ptr.ref.chainType != null && ptr.ref.chainType != nullptr) {
-      ffi.free(ptr.ref.chainType);
+      ffi.calloc.free(ptr.ref.chainType);
     }
     ptr.ref.chainType = nullptr;
     if (ptr.ref.tokenId != null && ptr.ref.tokenId != nullptr) {
-      ffi.free(ptr.ref.tokenId);
+      ffi.calloc.free(ptr.ref.tokenId);
     }
     ptr.ref.tokenId = nullptr;
     if (ptr.ref.addressId != null && ptr.ref.addressId != nullptr) {
-      ffi.free(ptr.ref.addressId);
+      ffi.calloc.free(ptr.ref.addressId);
     }
     ptr.ref.addressId = nullptr;
     if (ptr.ref.balance != null && ptr.ref.balance != nullptr) {
-      ffi.free(ptr.ref.balance);
+      ffi.calloc.free(ptr.ref.balance);
     }
     ptr.ref.balance = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static TokenAddress fromC(Pointer<clib.CTokenAddress> ptr) {
@@ -3739,23 +3739,23 @@ class TokenAddress extends DC<clib.CTokenAddress> {
       return;
     }
     if (c.ref.walletId != null && c.ref.walletId != nullptr) {
-      ffi.free(c.ref.walletId);
+      ffi.calloc.free(c.ref.walletId);
     }
     c.ref.walletId = toUtf8Null(walletId);
     if (c.ref.chainType != null && c.ref.chainType != nullptr) {
-      ffi.free(c.ref.chainType);
+      ffi.calloc.free(c.ref.chainType);
     }
     c.ref.chainType = toUtf8Null(chainType);
     if (c.ref.tokenId != null && c.ref.tokenId != nullptr) {
-      ffi.free(c.ref.tokenId);
+      ffi.calloc.free(c.ref.tokenId);
     }
     c.ref.tokenId = toUtf8Null(tokenId);
     if (c.ref.addressId != null && c.ref.addressId != nullptr) {
-      ffi.free(c.ref.addressId);
+      ffi.calloc.free(c.ref.addressId);
     }
     c.ref.addressId = toUtf8Null(addressId);
     if (c.ref.balance != null && c.ref.balance != nullptr) {
-      ffi.free(c.ref.balance);
+      ffi.calloc.free(c.ref.balance);
     }
     c.ref.balance = toUtf8Null(balance);
   }
@@ -3787,34 +3787,34 @@ class TokenShared extends DC<clib.CTokenShared> {
       return;
     }
     if (ptr.ref.name != null && ptr.ref.name != nullptr) {
-      ffi.free(ptr.ref.name);
+      ffi.calloc.free(ptr.ref.name);
     }
     ptr.ref.name = nullptr;
     if (ptr.ref.symbol != null && ptr.ref.symbol != nullptr) {
-      ffi.free(ptr.ref.symbol);
+      ffi.calloc.free(ptr.ref.symbol);
     }
     ptr.ref.symbol = nullptr;
     if (ptr.ref.logoUrl != null && ptr.ref.logoUrl != nullptr) {
-      ffi.free(ptr.ref.logoUrl);
+      ffi.calloc.free(ptr.ref.logoUrl);
     }
     ptr.ref.logoUrl = nullptr;
     if (ptr.ref.logoBytes != null && ptr.ref.logoBytes != nullptr) {
-      ffi.free(ptr.ref.logoBytes);
+      ffi.calloc.free(ptr.ref.logoBytes);
     }
     ptr.ref.logoBytes = nullptr;
     if (ptr.ref.projectName != null && ptr.ref.projectName != nullptr) {
-      ffi.free(ptr.ref.projectName);
+      ffi.calloc.free(ptr.ref.projectName);
     }
     ptr.ref.projectName = nullptr;
     if (ptr.ref.projectHome != null && ptr.ref.projectHome != nullptr) {
-      ffi.free(ptr.ref.projectHome);
+      ffi.calloc.free(ptr.ref.projectHome);
     }
     ptr.ref.projectHome = nullptr;
     if (ptr.ref.projectNote != null && ptr.ref.projectNote != nullptr) {
-      ffi.free(ptr.ref.projectNote);
+      ffi.calloc.free(ptr.ref.projectNote);
     }
     ptr.ref.projectNote = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static TokenShared fromC(Pointer<clib.CTokenShared> ptr) {
@@ -3839,31 +3839,31 @@ class TokenShared extends DC<clib.CTokenShared> {
       return;
     }
     if (c.ref.name != null && c.ref.name != nullptr) {
-      ffi.free(c.ref.name);
+      ffi.calloc.free(c.ref.name);
     }
     c.ref.name = toUtf8Null(name);
     if (c.ref.symbol != null && c.ref.symbol != nullptr) {
-      ffi.free(c.ref.symbol);
+      ffi.calloc.free(c.ref.symbol);
     }
     c.ref.symbol = toUtf8Null(symbol);
     if (c.ref.logoUrl != null && c.ref.logoUrl != nullptr) {
-      ffi.free(c.ref.logoUrl);
+      ffi.calloc.free(c.ref.logoUrl);
     }
     c.ref.logoUrl = toUtf8Null(logoUrl);
     if (c.ref.logoBytes != null && c.ref.logoBytes != nullptr) {
-      ffi.free(c.ref.logoBytes);
+      ffi.calloc.free(c.ref.logoBytes);
     }
     c.ref.logoBytes = toUtf8Null(logoBytes);
     if (c.ref.projectName != null && c.ref.projectName != nullptr) {
-      ffi.free(c.ref.projectName);
+      ffi.calloc.free(c.ref.projectName);
     }
     c.ref.projectName = toUtf8Null(projectName);
     if (c.ref.projectHome != null && c.ref.projectHome != nullptr) {
-      ffi.free(c.ref.projectHome);
+      ffi.calloc.free(c.ref.projectHome);
     }
     c.ref.projectHome = toUtf8Null(projectHome);
     if (c.ref.projectNote != null && c.ref.projectNote != nullptr) {
-      ffi.free(c.ref.projectNote);
+      ffi.calloc.free(c.ref.projectNote);
     }
     c.ref.projectNote = toUtf8Null(projectNote);
   }
@@ -3902,15 +3902,15 @@ class Wallet extends DC<clib.CWallet> {
       return;
     }
     if (ptr.ref.id != null && ptr.ref.id != nullptr) {
-      ffi.free(ptr.ref.id);
+      ffi.calloc.free(ptr.ref.id);
     }
     ptr.ref.id = nullptr;
     if (ptr.ref.nextId != null && ptr.ref.nextId != nullptr) {
-      ffi.free(ptr.ref.nextId);
+      ffi.calloc.free(ptr.ref.nextId);
     }
     ptr.ref.nextId = nullptr;
     if (ptr.ref.name != null && ptr.ref.name != nullptr) {
-      ffi.free(ptr.ref.name);
+      ffi.calloc.free(ptr.ref.name);
     }
     ptr.ref.name = nullptr;
     EthChain.free(ptr.ref.ethChain);
@@ -3919,7 +3919,7 @@ class Wallet extends DC<clib.CWallet> {
     ptr.ref.eeeChain = nullptr;
     BtcChain.free(ptr.ref.btcChain);
     ptr.ref.btcChain = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
   }
 
   static Wallet fromC(Pointer<clib.CWallet> ptr) {
@@ -3944,15 +3944,15 @@ class Wallet extends DC<clib.CWallet> {
       return;
     }
     if (c.ref.id != null && c.ref.id != nullptr) {
-      ffi.free(c.ref.id);
+      ffi.calloc.free(c.ref.id);
     }
     c.ref.id = toUtf8Null(id);
     if (c.ref.nextId != null && c.ref.nextId != nullptr) {
-      ffi.free(c.ref.nextId);
+      ffi.calloc.free(c.ref.nextId);
     }
     c.ref.nextId = toUtf8Null(nextId);
     if (c.ref.name != null && c.ref.name != nullptr) {
-      ffi.free(c.ref.name);
+      ffi.calloc.free(c.ref.name);
     }
     c.ref.name = toUtf8Null(name);
     if (c.ref.ethChain == null || c.ref.ethChain == nullptr) {

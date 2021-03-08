@@ -8,15 +8,15 @@ void main() {
   test("free", () {
     Pointer<Int32> ptr = null;
     try {
-      ffi.free(ptr);
+      ffi.calloc.free(ptr);
       expect("", "throw exception");
     } catch (e) {}
 
     ptr = nullptr;
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
 
     ptr = 0.toInt32Ptr();
-    ffi.free(ptr);
+    ffi.calloc.free(ptr);
     expect(false, ptr == nullptr);
   });
 }

@@ -30,7 +30,7 @@ void main() {
       wallets.init(initP);
 
       expect(true, wallets.ptrContext != null);
-      var id = ffi.Utf8.fromUtf8(wallets.ptrContext.ref.id);
+      var id = wallets.ptrContext.ref.id.toDartString();
       expect(true, id.isNotEmpty);
       expect("dart_test", wallets.context.contextNote);
     }

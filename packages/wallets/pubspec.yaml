@@ -11,13 +11,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ffi: ^0.1.3
+  ffi: ^1.0.0
   path:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  ffigen:
+  ffigen: ^2.2.2
   build_runner: ^1.10.3
   gen_dl:
     path: ../gen_dl
@@ -66,3 +66,6 @@ ffigen:
   headers:
     entry-points:
       - '../../bc/wallets_cdl/src/wallets_c.h'
+  llvm-lib: 'd:/lang/LLVM/bin'
+#  typedef-map:
+#    'bool': 'Uint32'
