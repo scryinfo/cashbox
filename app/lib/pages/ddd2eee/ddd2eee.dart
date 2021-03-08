@@ -737,7 +737,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         if (!verifyTxInfoResult) {
           return;
         }
-        Provider.of<TransactionProvide>(context)
+        context.read<TransactionProvide>()
           ..emptyDataRecord()
           ..setFromAddress(fromAddress)
           ..setBackup(_eeeAddressController.text)

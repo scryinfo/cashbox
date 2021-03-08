@@ -297,7 +297,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
             Map mnemonicMap = await Wallets.instance.exportWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
             int status = mnemonicMap["status"];
             if (status == 200) {
-              Provider.of<CreateWalletProcessProvide>(context).setMnemonic(mnemonicMap["mn"]);
+              context.read<CreateWalletProcessProvide>().setMnemonic(mnemonicMap["mn"]);
               mnemonicMap = null; //Related to mnemonic words, empty after use
               NavigatorUtils.push(context, Routes.recoverWalletPage);
             } else {

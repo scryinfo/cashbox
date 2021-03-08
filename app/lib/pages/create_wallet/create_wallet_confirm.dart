@@ -36,7 +36,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
 
   initData() {
     setState(() {
-      mnemonicList = String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic).split(" ");
+      mnemonicList = String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).split(" ");
       mnemonicList.sort((left, right) => left.length.compareTo(right.length)); //Out of order display Mnemonic
     });
   }
@@ -118,8 +118,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                 onPressed: () async {
                   var isSuccess = await _verifyMnemonicSame();
                   if (isSuccess) {
-                    Provider.of<CreateWalletProcessProvide>(context)
-                        .emptyData(); /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
+                    context.read<CreateWalletProcessProvide>().emptyData();
+                    /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
                     NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
                     //NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                   } else {
@@ -234,10 +234,13 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   }
 
   Future<bool> _verifyMnemonicSame() async {
-    if (verifyString.isNotEmpty && Provider.of<CreateWalletProcessProvide>(context).mnemonic.length != 0) {
-      if (verifyString.trim() == String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic).trim()) {
-        var isSuccess = await Wallets.instance.saveWallet(Provider.of<CreateWalletProcessProvide>(context).walletName,
-            Provider.of<CreateWalletProcessProvide>(context).pwd, Provider.of<CreateWalletProcessProvide>(context).mnemonic, WalletType.WALLET);
+    if (verifyString.isNotEmpty && Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic.length != 0) {
+      if (verifyString.trim() == String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).trim()) {
+        var isSuccess = await Wallets.instance.saveWallet(
+            Provider.of<CreateWalletProcessProvide>(context, listen: false).walletName,
+            Provider.of<CreateWalletProcessProvide>(context, listen: false).pwd,
+            Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic,
+            WalletType.WALLET);
         if (isSuccess) {
           return true;
         } else {
@@ -253,8 +256,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
 
   @override
   void dispose() {
+    context.read<CreateWalletProcessProvide>().emptyData();
+    /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
     super.dispose();
-    Provider.of<CreateWalletProcessProvide>(context)
-        .emptyData(); /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
   }
 }

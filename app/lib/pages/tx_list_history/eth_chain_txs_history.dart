@@ -307,7 +307,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
       alignment: Alignment.center,
       child: GestureDetector(
         onTap: () {
-          Provider.of<TransactionProvide>(context)
+          context.read<TransactionProvide>()
             ..emptyDataRecord()
             ..setFromAddress(ethTxListModel[index].from)
             ..setToAddress(ethTxListModel[index].to)
@@ -445,6 +445,6 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
   @override
   void deactivate() {
     super.deactivate();
-    Provider.of<TransactionProvide>(context).emptyDataRecord();
+    context.read<TransactionProvide>().emptyDataRecord();
   }
 }

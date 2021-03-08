@@ -101,7 +101,7 @@ class QrScanUtil {
     var contractAddress = paramsMap["ca"];
     var backup = paramsMap["bu"];
     var value = paramsMap["v"];
-    Provider.of<TransactionProvide>(context)
+    context.read<TransactionProvide>()
       ..setContractAddress(contractAddress)
       ..setToAddress(toAddress)
       ..setValue(value)
@@ -180,10 +180,10 @@ class QrScanUtil {
           var value = paramsMap["v"]; //Transaction information to be signed
           var waitToSignInfo = dtt + value; //Transaction information to be signed
           Fluttertoast.showToast(msg: "waitToSignInfo is ===>" + waitToSignInfo);
-          Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitToSignInfo);
+          context.read<SignInfoProvide>().setWaitToSignInfo(waitToSignInfo);
         } else {
           var waitSignTx = paramsMap["v"]; //Transaction information to be signed
-          Provider.of<SignInfoProvide>(context).setWaitToSignInfo(waitSignTx);
+          context.read<SignInfoProvide>().setWaitToSignInfo(waitSignTx);
         }
         NavigatorUtils.push(context, Routes.signTxPage);
         paramsMap = null; //Blank scan data

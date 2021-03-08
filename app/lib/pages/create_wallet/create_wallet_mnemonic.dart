@@ -42,9 +42,9 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
     }
     setState(() {
       mnemonicList = String.fromCharCodes(mnemonic).split(" ");
-      walletName = Provider.of<CreateWalletProcessProvide>(context).walletName;
+      walletName = Provider.of<CreateWalletProcessProvide>(context, listen: false).walletName;
     });
-    Provider.of<CreateWalletProcessProvide>(context).setMnemonic(mnemonic);
+    context.read<CreateWalletProcessProvide>().setMnemonic(mnemonic);
     mnemonic = null; /*Mnemonic words, free when used up*/
   }
 
@@ -216,9 +216,9 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
 
   _showAddressInQR(BuildContext context, String walletName, String qrHintInfo, String mnemonicString) {
     //Temporary use of data state management processing, routing function fluro Chinese pass value will have problems.
-    Provider.of<QrInfoProvide>(context).setTitle(walletName);
-    Provider.of<QrInfoProvide>(context).setHintInfo(qrHintInfo);
-    Provider.of<QrInfoProvide>(context).setContent(mnemonicString);
+    context.read<QrInfoProvide>().setTitle(walletName);
+    context.read<QrInfoProvide>().setHintInfo(qrHintInfo);
+    context.read<QrInfoProvide>().setContent(mnemonicString);
     NavigatorUtils.push(context, Routes.qrInfoPage);
   }
 }

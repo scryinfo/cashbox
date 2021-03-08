@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Provider.of<TransactionProvide>(context).emptyDataRecord();
+    context.read<TransactionProvide>().emptyDataRecord();
   }
 
   void initData() async {
@@ -482,7 +482,7 @@ class _HomePageState extends State<HomePage> {
           child: GestureDetector(
             onTap: () {
               {
-                Provider.of<TransactionProvide>(context)
+                context.read<TransactionProvide>()
                   ..emptyDataRecord()
                   ..setDigitName(displayDigitsList[index].shortName)
                   ..setBalance(displayDigitsList[index].balance)
@@ -889,9 +889,9 @@ class _HomePageState extends State<HomePage> {
 
   void _navigatorToQrInfoPage(String title, String hintInfo, String content) {
     //Temporary use of data status management processing, routing function fluro Chinese pass value will have problems.
-    Provider.of<QrInfoProvide>(context).setTitle(title);
-    Provider.of<QrInfoProvide>(context).setHintInfo(hintInfo);
-    Provider.of<QrInfoProvide>(context).setContent(content);
+    context.read<QrInfoProvide>().setTitle(title);
+    context.read<QrInfoProvide>().setHintInfo(hintInfo);
+    context.read<QrInfoProvide>().setContent(content);
 
     NavigatorUtils.push(context, Routes.qrInfoPage);
   }
