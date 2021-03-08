@@ -25,9 +25,11 @@ class Logger {
 
   static Logger _instance;
 
+  Logger._internal();
+
   static Logger getInstance() {
     if (_instance == null) {
-      _instance = new Logger();
+      _instance = new Logger._internal();
     }
     return _instance;
   }
