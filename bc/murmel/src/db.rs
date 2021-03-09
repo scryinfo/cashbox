@@ -276,7 +276,13 @@ impl DetailSqlite {
         state3.seq = 3;
         state3.state = "locked".to_owned();
 
-        let r = block_on(rb.save_batch("", &[state0, state1, state2, state3]));
+        let mut tokens = vec![];
+        tokens.push(state0);
+        tokens.push(state1);
+        tokens.push(state2);
+        tokens.push(state3);
+
+        let r = block_on(MBtcTxState::save_batch(&rb, "",&mut tokens));
         r.map_or_else(
             |e| error!("init state error {:?}", e),
             |r| debug!("inint_state {:?}", r),
