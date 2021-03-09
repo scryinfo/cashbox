@@ -121,6 +121,28 @@ impl MBtcOutputTx {
     }
 }
 
+/// when you want to add a state for Btc transaction,You should insert this table
+/// for example INSERT INTO m_btc_state(seq, state) VALUES (0,'unknown');
+/// now we have for state
+///     0 unknown,
+///     1 spent,
+///     2 unspent,
+///     3 locked,(have signed but havn't find in btcchain yet )
+#[db_append_shared]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MBtcTxState{
+    #[serde(default)]
+    pub seq:u16,
+    #[serde(default)]
+    pub state:String,
+}
+
+impl MBtcTxState {
+    pub const fn create_table_script() -> &'static str{
+        std::include_str!("../../../sql/m_btc_tx_state.sql")
+    }
+}
+
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBlockHeader {

@@ -12,7 +12,7 @@ use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
-use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx};
+use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState};
 use mav::ma::{MLocalTxLog, MProgress, MUserAddress};
 use once_cell::sync::Lazy;
 use rbatis::crud::CRUDTable;
@@ -160,6 +160,8 @@ impl DetailSqlite {
         DetailSqlite::create_btc_output_tx(&rb);
         DetailSqlite::create_btc_chain_tx(&rb);
         DetailSqlite::create_local_tx(&rb);
+        DetailSqlite::create_btc_tx_state(&rb);
+        DetailSqlite::init_state(&rb);
         Self { rb, network }
     }
 
@@ -233,6 +235,52 @@ impl DetailSqlite {
                 debug!("create_local_tx {:?}", e);
             }
         }
+    }
+
+    fn create_btc_tx_state(rb: &Rbatis) {
+        let r = block_on(rb.exec("", MBtcTxState::create_table_script()));
+        match r {
+            Ok(a) => {
+                debug!("MBtcTxState {:?}", a);
+            }
+            Err(e) => {
+                error!("error MBtcTxState {:?}", e);
+            }
+        }
+    }
+
+    pub fn save_state(&self, seq: u16, state: String) {
+        let mut tx_state = MBtcTxState::default();
+        tx_state.seq = seq;
+        tx_state.state = state;
+        let r = block_on(tx_state.save(&self.rb, ""));
+        r.map_or_else(
+            |e| error!("error save_state {:?}", e),
+            |r| debug!("save_state {:?}", r),
+        );
+    }
+
+    // insert statse in m_btc_tx_state
+    fn init_state(rb: &Rbatis) {
+        let mut state0 = MBtcTxState::default();
+        let mut state1 = MBtcTxState::default();
+        let mut state2 = MBtcTxState::default();
+        let mut state3 = MBtcTxState::default();
+
+        state0.seq = 0;
+        state0.state = "unknown".to_owned();
+        state1.seq = 1;
+        state1.state = "spent".to_owned();
+        state2.seq = 2;
+        state2.state = "unspent".to_owned();
+        state3.seq = 3;
+        state3.state = "locked".to_owned();
+
+        let r = block_on(rb.save_batch("", &[state0, state1, state2, state3]));
+        r.map_or_else(
+            |e| error!("init state error {:?}", e),
+            |r| debug!("inint_state {:?}", r),
+        );
     }
 
     fn save_progress(&self, header: String, timestamp: String) {
@@ -405,6 +453,9 @@ impl DetailSqlite {
             }
         }
     }
+
+    // get utxo from m_btc_output_tx and m_btc_input_tx
+    pub fn utxo(&self) {}
 }
 
 pub fn fetch_scanned_height() -> i64 {
