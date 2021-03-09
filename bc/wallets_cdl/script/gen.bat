@@ -11,13 +11,15 @@ dart-bindgen -i src/wallets_c.h -o ../../packages/wallets/lib/wallets_c.dart --n
 ::modify the file, because the dart-bindgen is not support ffi 1.0.0
 cd ../../packages/wallets/lib
 @echo off
+chcp 65001
 set search=ffi.allocate
 set replace=ffi.calloc
 setlocal enabledelayedexpansion
 (
-::eol== delims=
-::"delims="
-    for /f "delims="""  %%i in ('type wallets_c.dart') do (
+::"eol== delims="
+::"delims="""
+::"tokens=*"
+    for /f "delims="""  %%i in (wallets_c.dart) do (
         set "line=%%i"
         set "line=!line:%search%=%replace%!"
         if "%%i" NEQ "  " (
@@ -25,14 +27,11 @@ setlocal enabledelayedexpansion
         )
     )
 ) > temp_.dart
-
-endlocal
-del wallets_c.dart
-ren temp_.dart wallets_c.dart
+move temp_.dart wallets_c.dart
 
 cd ../
-::flutter pub get
-::flutter pub run build_runner build
+flutter pub get
+flutter pub run build_runner build
 
 cd "%cuPath%"
 EndLocal
