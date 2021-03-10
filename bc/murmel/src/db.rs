@@ -15,10 +15,13 @@ use log::{debug, error, info};
 use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo};
 use mav::ma::{MLocalTxLog, MProgress, MUserAddress};
 use once_cell::sync::Lazy;
+use rbatis::core::db::DBExecResult;
 use rbatis::crud::CRUDTable;
 use rbatis::crud::CRUD;
 use rbatis::plugin::page::{IPage, Page, PageRequest};
 use rbatis::rbatis::Rbatis;
+use rbatis::wrapper::Wrapper;
+use rbatis_core::Error;
 use std::ops::Add;
 
 pub struct ChainSqlite {
@@ -153,113 +156,65 @@ pub struct DetailSqlite {
 
 impl DetailSqlite {
     pub fn new(network: Network, db_file_name: &str) -> Self {
-        let rb = block_on(Self::init_rbatis(db_file_name));
-        DetailSqlite::create_progress(&rb);
-        DetailSqlite::create_user_address(&rb);
-        DetailSqlite::create_btc_input_tx(&rb);
-        DetailSqlite::create_btc_output_tx(&rb);
-        DetailSqlite::create_btc_chain_tx(&rb);
-        DetailSqlite::create_local_tx(&rb);
-        DetailSqlite::create_btc_tx_state(&rb);
-        DetailSqlite::create_btc_utxo(&rb);
-        DetailSqlite::init_state(&rb);
+        let rb = block_on(async {
+            let rb = Self::init_rbatis(db_file_name).await;
+            let r = DetailSqlite::init_table(&rb).await;
+            match r {
+                Ok(_) => {
+                    info!("init detail sqlite table successfully {:?}", r)
+                }
+                Err(e) => {
+                    error!("init detail sqlite table failed with error{:?}", e)
+                }
+            }
+            rb
+        });
         Self { rb, network }
     }
 
-    fn create_user_address(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MUserAddress::create_table_script()));
-        match r {
-            Ok(a) => {
-                debug!("create_user_address {:?}", a);
-            }
-            Err(e) => {
-                error!("create_user_address {:?}", e);
-            }
-        }
+    async fn init_table(rb: &Rbatis) -> Result<(), Error> {
+        DetailSqlite::create_progress(rb).await?;
+        DetailSqlite::create_user_address(rb).await?;
+        DetailSqlite::create_btc_input_tx(rb).await?;
+        DetailSqlite::create_btc_output_tx(rb).await?;
+        DetailSqlite::create_btc_chain_tx(rb).await?;
+        DetailSqlite::create_local_tx(rb).await?;
+        DetailSqlite::create_btc_tx_state(rb).await?;
+        DetailSqlite::create_btc_utxo(rb).await?;
+        DetailSqlite::init_state(rb).await?;
+        Ok(())
     }
 
-    fn create_btc_input_tx(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MBtcInputTx::create_table_script()));
-        match r {
-            Ok(a) => {
-                debug!("create_tx_input {:?}", a);
-            }
-            Err(e) => {
-                debug!("create_tx_input {:?}", e);
-            }
-        }
+    async fn create_user_address(rb: &Rbatis) -> Result<DBExecResult, Error> {
+        rb.exec("", MUserAddress::create_table_script()).await
     }
 
-    fn create_btc_output_tx(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MBtcOutputTx::create_table_script()));
-        match r {
-            Ok(a) => {
-                debug!("create_tx_output {:?}", a);
-            }
-            Err(e) => {
-                error!("error create_tx_output {:?}", e);
-            }
-        }
+    async fn create_btc_input_tx(rb: &Rbatis) -> Result<DBExecResult, Error> {
+        rb.exec("", MBtcInputTx::create_table_script()).await
     }
 
-    fn create_btc_chain_tx(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MBtcChainTx::create_table_script()));
-        match r {
-            Ok(a) => {
-                debug!("create_btc_chain_tx {:?}", a);
-            }
-            Err(e) => {
-                error!("error create_btc_chain_tx {:?}", e);
-            }
-        }
+    async fn create_btc_output_tx(rb: &Rbatis) -> Result<DBExecResult, Error> {
+        rb.exec("", MBtcOutputTx::create_table_script()).await
     }
 
-    fn create_progress(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MProgress::create_table_script()));
-        match r {
-            Ok(a) => {
-                debug!("create_progress {:?}", a);
-            }
-            Err(e) => {
-                debug!("create_progress {:?}", e);
-            }
-        }
+    async fn create_btc_chain_tx(rb: &Rbatis) -> Result<DBExecResult, Error> {
+        rb.exec("", MBtcChainTx::create_table_script()).await
     }
 
-    fn create_local_tx(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MLocalTxLog::create_table_script()));
-        match r {
-            Ok(a) => {
-                debug!("create_local_tx {:?}", a);
-            }
-            Err(e) => {
-                debug!("create_local_tx {:?}", e);
-            }
-        }
+    async fn create_progress(rb: &Rbatis) -> Result<DBExecResult, Error> {
+        rb.exec("", MProgress::create_table_script()).await
     }
 
-    fn create_btc_tx_state(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MBtcTxState::create_table_script()));
-        match r {
-            Ok(a) => {
-                debug!("MBtcTxState {:?}", a);
-            }
-            Err(e) => {
-                error!("error MBtcTxState {:?}", e);
-            }
-        }
+    async fn create_local_tx(rb: &Rbatis) -> Result<DBExecResult, Error> {
+        rb.exec("", MLocalTxLog::create_table_script()).await
     }
 
-    fn create_btc_utxo(rb: &Rbatis) {
-        let r = block_on(rb.exec("", MBtcUtxo::create_table_script()));
-        match r {
-            Ok(a) => {
-                debug!("MBtcUtxo {:?}", a);
-            }
-            Err(e) => {
-                error!("error MBtcUtxo {:?}", e);
-            }
-        }
+    async fn create_btc_tx_state(rb: &Rbatis) -> Result<DBExecResult, Error> {
+        rb.exec("", MBtcTxState::create_table_script()).await
+    }
+
+    async fn create_btc_utxo(rb: &Rbatis) -> Result<DBExecResult, Error> {
+        rb.exec("", MBtcUtxo::create_table_script()).await
     }
 
     pub fn save_state(&self, seq: u16, state: String) {
@@ -274,7 +229,7 @@ impl DetailSqlite {
     }
 
     // insert statse in m_btc_tx_state
-    fn init_state(rb: &Rbatis) {
+    async fn init_state(rb: &Rbatis) -> Result<DBExecResult, Error> {
         let mut state0 = MBtcTxState::default();
         let mut state1 = MBtcTxState::default();
         let mut state2 = MBtcTxState::default();
@@ -295,11 +250,7 @@ impl DetailSqlite {
         tokens.push(state2);
         tokens.push(state3);
 
-        let r = block_on(MBtcTxState::save_batch(&rb, "",&mut tokens));
-        r.map_or_else(
-            |e| error!("init state error {:?}", e),
-            |r| debug!("inint_state {:?}", r),
-        );
+        MBtcTxState::save_batch(&rb, "init_state", &mut tokens).await
     }
 
     fn save_progress(&self, header: String, timestamp: String) {
@@ -474,7 +425,47 @@ impl DetailSqlite {
     }
 
     // get utxo from m_btc_output_tx and m_btc_input_tx
-    pub fn utxo(&self) {}
+    // 从txin的表格和txout的表中计算出utxo,utxo含有状态，如果需要计算地址对应的balance，也从utxo表格算出
+    /*
+     *                           +---------------------------------------+
+     *                           |       serach btc_output_tx find       |
+     *                           |           tx_hash and idx             |
+     *                           +------------------+--------------------+
+     *                                              |
+     *                                              |
+     *                                              |
+     *                                              |                                                            v
+     *                                              v
+     *                               +----------------------------------+
+     *                               |                                  |
+     *                               |serach in btc_input_tx by         |     No
+     *                     Yes       |    tx_hash and idx in tx_output  +-------------+
+     *                +--------------+ where tx_hash == tx_id in input  |             |
+     *                |              | and idx == vout in input table   |             |
+     *                |              |                                  |             |
+     *                |              +----------------------------------+             |
+     *                |                                                               |
+     *                v                                                               v
+     * +----------------------------------+                               +--------------------------------+
+     * | the output marked as spend then  |                               | the output marked as unspend   |
+     * | clac the total spend and tx fee  |                               | when you can sign a Tx you can |
+     * +----------------------------------+                               | use it                         |
+     *                                                                    +--------------------------------+
+     */
+    pub fn utxo(&self) {
+        let outputs = block_on(MBtcOutputTx::list(&self.rb, ""));
+        if let Ok(outputs) = outputs {
+            for output in outputs {}
+        }
+    }
+
+    pub fn fetch_btc_input_tx(&self, w: &Wrapper) -> Option<MBtcInputTx> {
+        let r: Result<Option<MBtcInputTx>, _> = block_on(self.rb.fetch_by_wrapper("", &w));
+        match r {
+            Ok(r) => r,
+            Err(_) => None,
+        }
+    }
 }
 
 pub fn fetch_scanned_height() -> i64 {
