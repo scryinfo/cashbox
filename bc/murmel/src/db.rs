@@ -12,7 +12,7 @@ use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
-use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState};
+use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo};
 use mav::ma::{MLocalTxLog, MProgress, MUserAddress};
 use once_cell::sync::Lazy;
 use rbatis::crud::CRUDTable;
@@ -161,6 +161,7 @@ impl DetailSqlite {
         DetailSqlite::create_btc_chain_tx(&rb);
         DetailSqlite::create_local_tx(&rb);
         DetailSqlite::create_btc_tx_state(&rb);
+        DetailSqlite::create_btc_utxo(&rb);
         DetailSqlite::init_state(&rb);
         Self { rb, network }
     }
@@ -245,6 +246,18 @@ impl DetailSqlite {
             }
             Err(e) => {
                 error!("error MBtcTxState {:?}", e);
+            }
+        }
+    }
+
+    fn create_btc_utxo(rb: &Rbatis) {
+        let r = block_on(rb.exec("", MBtcUtxo::create_table_script()));
+        match r {
+            Ok(a) => {
+                debug!("MBtcUtxo {:?}", a);
+            }
+            Err(e) => {
+                error!("error MBtcUtxo {:?}", e);
             }
         }
     }
