@@ -365,8 +365,8 @@ impl DetailSqlite {
         }
     }
 
-    pub fn list_btc_output_tx(&self) -> Vec<MBtcOutputTx> {
-        let r = block_on(MBtcOutputTx::list(&self.rb, ""));
+    pub async fn list_btc_output_tx(&self) -> Vec<MBtcOutputTx> {
+        let r = MBtcOutputTx::list(&self.rb, "").await;
         match r {
             Err(e) => {
                 error!("{:?}", e);
@@ -452,15 +452,25 @@ impl DetailSqlite {
      * +----------------------------------+                               | use it                         |
      *                                                                    +--------------------------------+
      */
-    pub fn utxo(&self) {
-        let outputs = block_on(MBtcOutputTx::list(&self.rb, ""));
+    pub async fn utxo(&self) {
+        let outputs = MBtcOutputTx::list(&self.rb, "").await;
         if let Ok(outputs) = outputs {
-            for output in outputs {}
+            for output in outputs {
+                let tx_hash = output.btc_tx_hash;
+                let idx = output.idx;
+                let w = self
+                    .rb
+                    .new_wrapper()
+                    .eq(MBtcInputTx::tx_id, tx_hash)
+                    .eq(MBtcInputTx::vout, idx);
+                let r = self.fetch_btc_input_tx(&w).await;
+                println!("{:?}", r);
+            }
         }
     }
 
-    pub fn fetch_btc_input_tx(&self, w: &Wrapper) -> Option<MBtcInputTx> {
-        let r: Result<Option<MBtcInputTx>, _> = block_on(self.rb.fetch_by_wrapper("", &w));
+    pub async fn fetch_btc_input_tx(&self, w: &Wrapper) -> Option<MBtcInputTx> {
+        let r = self.rb.fetch_by_wrapper("", &w).await;
         match r {
             Ok(r) => r,
             Err(_) => None,
@@ -533,6 +543,7 @@ pub static VERIFY: Lazy<(Option<FilterLoadMessage>, String)> = Lazy::new(|| {
 #[cfg(test)]
 mod test {
     use crate::db::{RB_CHAIN, RB_DETAIL};
+    use futures::executor::block_on;
 
     #[test]
     fn test_fetch_scann_header() {
@@ -578,5 +589,10 @@ mod test {
     fn test_fetch_user_address() {
         let u = RB_DETAIL.fetch_user_address();
         println!("{:?}", &u);
+    }
+
+    #[test]
+    fn test_utxo() {
+        block_on(RB_DETAIL.utxo());
     }
 }
