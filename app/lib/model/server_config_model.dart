@@ -32,16 +32,15 @@ class Data extends Object {
 class LatestConfig extends Object {
   LatestConfig();
 
-  String appConfigVersion;
+  String tokenToLegalTenderExchangeRateIp;
   String authTokenListVersion;
   String defaultTokenListVersion;
-  String apkVersion;
-  String tokenToLegalTenderExchangeRateIp;
   List<String> authTokenUrl;
   List<String> defaultTokenUrl;
-  String scryXChainUrl;
-  String apkDownloadLink;
   String announcementUrl;
+  String scryXChainUrl;
+  String apkVersion;
+  String apkDownloadLink;
   String dappOpenUrl;
   String eeeTxV;
   String eeeRuntimeV;

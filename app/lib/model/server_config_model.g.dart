@@ -37,19 +37,18 @@ Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
 
 LatestConfig _$LatestConfigFromJson(Map<String, dynamic> json) {
   return LatestConfig()
-    ..appConfigVersion = json['appConfigVersion'] as String
-    ..authTokenListVersion = json['authTokenListVersion'] as String
-    ..defaultTokenListVersion = json['defaultTokenListVersion'] as String
-    ..apkVersion = json['apkVersion'] as String
     ..tokenToLegalTenderExchangeRateIp =
         json['tokenToLegalTenderExchangeRateIp'] as String
+    ..authTokenListVersion = json['authTokenListVersion'] as String
+    ..defaultTokenListVersion = json['defaultTokenListVersion'] as String
     ..authTokenUrl =
         (json['authTokenUrl'] as List)?.map((e) => e as String)?.toList()
     ..defaultTokenUrl =
         (json['defaultTokenUrl'] as List)?.map((e) => e as String)?.toList()
-    ..scryXChainUrl = json['scryXChainUrl'] as String
-    ..apkDownloadLink = json['apkDownloadLink'] as String
     ..announcementUrl = json['announcementUrl'] as String
+    ..scryXChainUrl = json['scryXChainUrl'] as String
+    ..apkVersion = json['apkVersion'] as String
+    ..apkDownloadLink = json['apkDownloadLink'] as String
     ..dappOpenUrl = json['dappOpenUrl'] as String
     ..eeeTxV = json['eeeTxV'] as String
     ..eeeRuntimeV = json['eeeRuntimeV'] as String;
@@ -57,17 +56,16 @@ LatestConfig _$LatestConfigFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$LatestConfigToJson(LatestConfig instance) =>
     <String, dynamic>{
-      'appConfigVersion': instance.appConfigVersion,
-      'authTokenListVersion': instance.authTokenListVersion,
-      'defaultTokenListVersion': instance.defaultTokenListVersion,
-      'apkVersion': instance.apkVersion,
       'tokenToLegalTenderExchangeRateIp':
           instance.tokenToLegalTenderExchangeRateIp,
+      'authTokenListVersion': instance.authTokenListVersion,
+      'defaultTokenListVersion': instance.defaultTokenListVersion,
       'authTokenUrl': instance.authTokenUrl,
       'defaultTokenUrl': instance.defaultTokenUrl,
-      'scryXChainUrl': instance.scryXChainUrl,
-      'apkDownloadLink': instance.apkDownloadLink,
       'announcementUrl': instance.announcementUrl,
+      'scryXChainUrl': instance.scryXChainUrl,
+      'apkVersion': instance.apkVersion,
+      'apkDownloadLink': instance.apkDownloadLink,
       'dappOpenUrl': instance.dappOpenUrl,
       'eeeTxV': instance.eeeTxV,
       'eeeRuntimeV': instance.eeeRuntimeV,
