@@ -111,4 +111,13 @@ class WalletsControl {
     var err = Wallets.mainIsolate().saveCurrentWalletChain(walletId, chainType);
     Logger.getInstance().d("wallet_control ", "saveCurrentWalletChain err" + err.toString());
   }
+
+  List<TokenAddress> getTokenAddress(String walletId, ChainType chainType) {
+    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId, chainType);
+    if (!tokenAddressObj.isSuccess()) {
+      return null;
+    }
+    Logger.getInstance().d("wallet_control ", "getTokenAddress err" + tokenAddressObj.data1.toString());
+    return tokenAddressObj.data1;
+  }
 }
