@@ -1,13 +1,36 @@
 use std::os::raw::{
     c_char, c_int, c_ulonglong,
 };
-use std::ffi::{CStr, CString};
 
-mod wallets_c;
+use crate::kits::{CStruct, to_str, to_c_char};
+use std::ffi::CString;
+
+mod kits;
+
+pub type CBool = u32;
+#[allow(non_upper_case_globals)]
+pub const CFalse: CBool = 0u32;
+#[allow(non_upper_case_globals)]
+pub const CTrue: CBool = 1u32;
+pub fn is_true(b:CBool) ->bool{
+    b != CFalse
+}
 
 #[no_mangle]
 pub extern "C" fn add(a: c_int, b: c_int) -> c_int {
     return a + b;
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn multi_i32(v: *mut *mut i32) -> u32 {
+    if v.is_null() {
+        return CFalse;
+    }
+    (*v).free();
+    // 释放 *v 的内存
+    let re = Box::into_raw(Box::new(1));
+    *v = re;
+    CTrue
 }
 
 
@@ -28,20 +51,7 @@ pub extern "C" fn Str_free(cs: *mut c_char) {
     };
 }
 
-// call Str_free to free memory
-fn to_c_char(rs: &str) -> *mut c_char {
-    let cstr = CString::new(rs).expect("Failed to create CString");
-    return cstr.into_raw();
-}
 
-// do not free the cs's memory
-fn to_str(cs: *const c_char) -> &'static str {
-    let cstr = unsafe {
-        assert!(!cs.is_null()); //todo 别的方法处理
-        CStr::from_ptr(cs)
-    };
-    return cstr.to_str().expect("Failed to create str");
-}
 
 // struct
 
@@ -103,6 +113,8 @@ pub extern "C" fn Data_use(cd: *mut Data) -> *mut Data {
         Box::from_raw(d.pointData)
     };
     ps.intType = 1;
+    // d.bBool = true;
+    // d.pBool = Box::into_raw(Box::new(true));
     std::mem::forget(d);//不要释放 由外转入的指针
     std::mem::forget(ps);//不要释放 由外转入的指针
     return cd;
@@ -122,6 +134,11 @@ pub struct Data {
     pub arrayDataLength: c_ulonglong,
 
     pub pointData: *mut Data,
+
+    // pub bBool: bool,
+    // pub intType2: c_int,
+    // pub pBool: *mut bool,
+
 }
 
 impl Default for Data {
@@ -134,6 +151,9 @@ impl Default for Data {
             arrayData: std::ptr::null_mut(),
             arrayDataLength: 0,
             pointData: std::ptr::null_mut(),
+            // bBool:false,
+            // intType2:22,
+            // pBool: std::ptr::null_mut(),
         }
     }
 }
@@ -154,6 +174,10 @@ impl Drop for Data {
             if !self.pointData.is_null() {
                 Box::from_raw(self.pointData);
             }
+
+            // if !self.pBool.is_null() {
+            //     Box::from_raw(self.pBool);
+            // }
         }
     }
 }
@@ -163,7 +187,10 @@ impl Drop for Data {
 
 #[cfg(test)]
 mod tests {
-    use crate::{add, addStr, to_c_char, to_str, Str_free, Data_new, Data_free};
+    use crate::{add, addStr, to_c_char, to_str, Str_free, Data_new, Data_free, multi_i32};
+    use std::ptr::null;
+    use crate::kits::{d_ptr_alloc, CStruct};
+    use std::os::raw::c_char;
 
     #[test]
     fn test_add() {
@@ -209,4 +236,22 @@ mod tests {
         Data_free(Box::into_raw(s));//这里已经执行 into_raw了，所以不需要再调用 下面的 forget
         // std::mem::forget(s);//内存由Data_new函数内分配，要使用Data_free释放内存
     }
+
+    #[test]
+    fn test_multi_return() {
+        unsafe {
+            let re: *mut *mut i32 = d_ptr_alloc();
+            assert_eq!(null(), *re);
+            let _ = multi_i32(re);
+            assert_eq!(1, **re);
+
+            let mut pp: *mut *mut c_char = d_ptr_alloc();
+            pp.free();
+
+            let mut pp: *mut *mut c_char = d_ptr_alloc();
+            *pp = to_c_char("test");
+            pp.free();
+        }
+    }
+
 }
