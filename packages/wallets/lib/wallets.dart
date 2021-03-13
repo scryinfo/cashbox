@@ -207,12 +207,12 @@ class Wallets {
     return DlResult1(wallet, err);
   }
 
-  Error removeWallet(String walletId,String password) {
+  Error removeWallet(String walletId, String password) {
     Error err;
     {
       var ptrWalletId = walletId.toCPtr();
       var ptrPassword = password.toCPtr();
-      var cerr = clib.Wallets_removeWallet(ptrContext, ptrWalletId,ptrPassword);
+      var cerr = clib.Wallets_removeWallet(ptrContext, ptrWalletId, ptrPassword);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
       ptrWalletId.free();
@@ -276,8 +276,7 @@ class Wallets {
     {
       var ptrName = name.toCPtr();
       var ptrWallet = clib.CArrayCWallet_dAlloc();
-      var cerr =
-          clib.Wallets_findWalletBaseByName(ptrContext, ptrName, ptrWallet);
+      var cerr = clib.Wallets_findWalletBaseByName(ptrContext, ptrName, ptrWallet);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
       if (err.isSuccess()) {
@@ -295,14 +294,12 @@ class Wallets {
     {
       var ptrWalletId = clib.CStr_dAlloc();
       var ptrChainType = clib.CStr_dAlloc();
-      var cerr = clib.Wallets_currentWalletChain(
-          ptrContext, ptrWalletId, ptrChainType);
+      var cerr = clib.Wallets_currentWalletChain(ptrContext, ptrWalletId, ptrChainType);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
       if (err.isSuccess()) {
         String chainType = fromUtf8Null(ptrChainType.value);
-        wallet = CurrentWallet(
-            fromUtf8Null(ptrWalletId.value), chainType.toChainType());
+        wallet = CurrentWallet(fromUtf8Null(ptrWalletId.value), chainType.toChainType());
       }
       clib.CStr_dFree(ptrWalletId);
       clib.CStr_dFree(ptrChainType);
@@ -315,8 +312,7 @@ class Wallets {
     {
       var ptrWalletId = walletId.toCPtr();
       var ptrChainType = chainType.toEnumString().toCPtr();
-      var cerr = clib.Wallets_saveCurrentWalletChain(
-          ptrContext, ptrWalletId, ptrChainType);
+      var cerr = clib.Wallets_saveCurrentWalletChain(ptrContext, ptrWalletId, ptrChainType);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
 
@@ -324,6 +320,27 @@ class Wallets {
       ptrChainType.free();
     }
     return err;
+  }
+
+  DlResult1<List<TokenAddress>> getTokenAddress(String walletId, ChainType chainType) {
+    Error err;
+    List<TokenAddress> arrayCTokenAddress = [];
+    {
+      var ptrWalletId = walletId.toCPtr();
+      var ptrChainType = chainType.toEnumString().toCPtr();
+      var ptrArrayToken = clib.CArrayCTokenAddress_dAlloc();
+      var cerr = clib.Wallets_queryBalance(ptrContext, ptrChainType, ptrWalletId, ptrArrayToken);
+      err = Error.fromC(cerr);
+      clib.CError_free(cerr);
+
+      if (err.isSuccess()) {
+        arrayCTokenAddress = ArrayCTokenAddress.fromC(ptrArrayToken.value).data;
+      }
+      ptrWalletId.free();
+      ptrChainType.free();
+      clib.CArrayCTokenAddress_dFree(ptrArrayToken);
+    }
+    return DlResult1(arrayCTokenAddress, err);
   }
 
   static AppPlatformTypes appPlatformType() {

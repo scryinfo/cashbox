@@ -2,8 +2,9 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
-
+import 'package:device_info/device_info.dart';
 import 'package:logger/logger.dart';
+import 'dart:io';
 
 class AppInfoUtil {
   static const appInfoChannel = const MethodChannel('app_info_channel');
@@ -16,9 +17,7 @@ class AppInfoUtil {
   static AppInfoUtil get instance => _getInstance();
   static AppInfoUtil _instance;
 
-  AppInfoUtil._internal() {
-    //init data
-  }
+  AppInfoUtil._internal();
 
   static AppInfoUtil _getInstance() {
     if (_instance == null) {
@@ -70,5 +69,84 @@ class AppInfoUtil {
   Future<String> getAppSignInfo() async {
     String appSignInfo = await appInfoChannel.invokeMethod(APP_SIGNINFO_METHOD);
     return appSignInfo;
+  }
+
+  DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+  Map<String, dynamic> _deviceData = <String, dynamic>{};
+  String deviceId = "";
+
+  Future<Map<String, dynamic>> _readAndroidBuildData() async {
+    var build = await _deviceInfoPlugin.androidInfo;
+    return <String, dynamic>{
+      'version.securityPatch': build.version.securityPatch,
+      'version.sdkInt': build.version.sdkInt,
+      'version.release': build.version.release,
+      'version.previewSdkInt': build.version.previewSdkInt,
+      'version.incremental': build.version.incremental,
+      'version.codename': build.version.codename,
+      'version.baseOS': build.version.baseOS,
+      'board': build.board,
+      'bootloader': build.bootloader,
+      'brand': build.brand,
+      'device': build.device,
+      'display': build.display,
+      'fingerprint': build.fingerprint,
+      'hardware': build.hardware,
+      'host': build.host,
+      'id': build.id,
+      'manufacturer': build.manufacturer,
+      'model': build.model,
+      'product': build.product,
+      'supported32BitAbis': build.supported32BitAbis,
+      'supported64BitAbis': build.supported64BitAbis,
+      'supportedAbis': build.supportedAbis,
+      'tags': build.tags,
+      'type': build.type,
+      'isPhysicalDevice': build.isPhysicalDevice,
+      'androidId': build.androidId,
+      'systemFeatures': build.systemFeatures,
+    };
+  }
+
+//Record ios device information
+  Future<Map<String, dynamic>> _readIosDeviceInfo() async {
+    var data = await _deviceInfoPlugin.iosInfo;
+    return <String, dynamic>{
+      'name': data.name,
+      'systemName': data.systemName,
+      'systemVersion': data.systemVersion,
+      'model': data.model,
+      'localizedModel': data.localizedModel,
+      'identifierForVendor': data.identifierForVendor,
+      'isPhysicalDevice': data.isPhysicalDevice,
+      'utsname.sysname:': data.utsname.sysname,
+      'utsname.nodename:': data.utsname.nodename,
+      'utsname.release:': data.utsname.release,
+      'utsname.version:': data.utsname.version,
+      'utsname.machine:': data.utsname.machine,
+    };
+  }
+
+  Future<dynamic> getDeviceId() async {
+    try {
+      if (Platform.isAndroid) {
+        _deviceData = await _readAndroidBuildData();
+        if (_deviceData != null) {
+          deviceId = _deviceData["androidId"];
+          //At present, each Android product device has a unique identification value. If you do not agree, temporarily take the value of androidId.
+        }
+      } else if (Platform.isIOS) {
+        _deviceData = await _readIosDeviceInfo();
+        deviceId = _deviceData["utsname.machine"];
+      }
+      return deviceId;
+    } on PlatformException {
+      _deviceData = <String, dynamic>{'Error:': 'Failed to get platform version.'};
+      Logger().e("requestWithDeviceId", "unknown target platform");
+      return null;
+    } catch (e) {
+      Logger().e("requestWithDeviceId", "${e}");
+      return null;
+    }
   }
 }

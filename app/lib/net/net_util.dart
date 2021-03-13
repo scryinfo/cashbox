@@ -10,7 +10,6 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 
-final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
 Map<String, dynamic> _deviceData = <String, dynamic>{}; //Device Information
 String appSignInfo; //Application signature information
 String deviceId = ""; //Device unique ID
@@ -20,22 +19,8 @@ String deviceId = ""; //Device unique ID
 Future requestWithDeviceId(String url, {formData}) async {
   if (_deviceData == null || _deviceData.length == 0 || _deviceData["id"] == null) {
     ///No device information record, go to get
-    try {
-      if (Platform.isAndroid) {
-        _deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
-        if (_deviceData != null) {
-          deviceId = _deviceData["androidId"];
-          //At present, each Android product device has a unique identification value. If you do not agree, temporarily take the value of androidId.
-        }
-      } else if (Platform.isIOS) {
-        _deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
-      }
-    } on PlatformException {
-      _deviceData = <String, dynamic>{'Error:': 'Failed to get platform version.'};
-      Logger().e("requestWithDeviceId", "unknown target platform");
-      return;
-    } catch (e) {
-      Logger().e("requestWithDeviceId", "${e}");
+    var deviceId = await AppInfoUtil.instance.getDeviceId();
+    if (deviceId == null || deviceId == "") {
       return;
     }
   }
@@ -125,55 +110,4 @@ Future download(url, savePath) async {
   } catch (e) {
     Logger().e("net_util download() error is", "${e}");
   }
-}
-
-//Record android device information
-Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
-  return <String, dynamic>{
-    'version.securityPatch': build.version.securityPatch,
-    'version.sdkInt': build.version.sdkInt,
-    'version.release': build.version.release,
-    'version.previewSdkInt': build.version.previewSdkInt,
-    'version.incremental': build.version.incremental,
-    'version.codename': build.version.codename,
-    'version.baseOS': build.version.baseOS,
-    'board': build.board,
-    'bootloader': build.bootloader,
-    'brand': build.brand,
-    'device': build.device,
-    'display': build.display,
-    'fingerprint': build.fingerprint,
-    'hardware': build.hardware,
-    'host': build.host,
-    'id': build.id,
-    'manufacturer': build.manufacturer,
-    'model': build.model,
-    'product': build.product,
-    'supported32BitAbis': build.supported32BitAbis,
-    'supported64BitAbis': build.supported64BitAbis,
-    'supportedAbis': build.supportedAbis,
-    'tags': build.tags,
-    'type': build.type,
-    'isPhysicalDevice': build.isPhysicalDevice,
-    'androidId': build.androidId,
-    'systemFeatures': build.systemFeatures,
-  };
-}
-
-//Record ios device information
-Map<String, dynamic> _readIosDeviceInfo(IosDeviceInfo data) {
-  return <String, dynamic>{
-    'name': data.name,
-    'systemName': data.systemName,
-    'systemVersion': data.systemVersion,
-    'model': data.model,
-    'localizedModel': data.localizedModel,
-    'identifierForVendor': data.identifierForVendor,
-    'isPhysicalDevice': data.isPhysicalDevice,
-    'utsname.sysname:': data.utsname.sysname,
-    'utsname.nodename:': data.utsname.nodename,
-    'utsname.release:': data.utsname.release,
-    'utsname.version:': data.utsname.version,
-    'utsname.machine:': data.utsname.machine,
-  };
 }

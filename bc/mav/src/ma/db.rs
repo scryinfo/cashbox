@@ -4,10 +4,27 @@ use rbatis::crud::CRUDTable;
 use rbatis::rbatis::Rbatis;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use lazy_static::lazy_static;
 
-use crate::{kits, NetType};
 use crate::kits::Error;
-use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenShared, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet};
+use crate::ma::{
+    BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken,
+    MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx,
+    MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault,
+    MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth,
+    MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting,
+    MSubChainBasicInfo, MTokenAddress, MWallet,
+};
+use crate::{kits, NetType};
+
+/// Note that cashbox is currently on version 1. Version 2 is this version,
+/// when cashbox want to update version we must synchronize this database version value;
+pub const VERSION: i64 = 1;
+
+lazy_static!{
+    static ref SET_VERSION_SQL: String =
+        format!("PRAGMA user_version = {version}", version = VERSION);
+}
 
 #[derive(Debug, Default, Clone)]
 pub struct DbName {
@@ -31,13 +48,14 @@ impl DbName {
 
     pub fn new_from(names: &DbName) -> DbName {
         let path = {
+            //todo 需要优化　path 字段若为空，是否抛出错误？
             let path = names.path.clone();
             if path.ends_with("/") {
                 path.to_owned()
             } else if path.ends_with("\\") {
                 path.replace("\\", "/")
             } else if !path.is_empty() {
-                path.to_owned().add("/")
+                path.to_owned().add("/") //c
             } else {
                 path.to_owned()
             }
@@ -48,22 +66,44 @@ impl DbName {
             prefix: pre.to_owned(),
             cashbox_wallets: if names.cashbox_wallets.is_empty() {
                 format!("{}{}{}", path, pre, DbNameType::cashbox_wallets.to_string())
-            } else { names.cashbox_wallets.clone() },
+            } else {
+                names.cashbox_wallets.clone()
+            },
             cashbox_mnemonic: if names.cashbox_mnemonic.is_empty() {
-                format!("{}{}{}", path, pre, DbNameType::cashbox_mnemonic.to_string())
-            } else { names.cashbox_mnemonic.clone() },
+                format!(
+                    "{}{}{}",
+                    path,
+                    pre,
+                    DbNameType::cashbox_mnemonic.to_string()
+                )
+            } else {
+                names.cashbox_mnemonic.clone()
+            },
             wallet_mainnet: if names.wallet_mainnet.is_empty() {
                 format!("{}{}{}", path, pre, DbNameType::wallet_mainnet.to_string())
-            } else { names.wallet_mainnet.clone() },
+            } else {
+                names.wallet_mainnet.clone()
+            },
             wallet_private: if names.wallet_private.is_empty() {
                 format!("{}{}{}", path, pre, DbNameType::wallet_private.to_string())
-            } else { names.wallet_private.clone() },
+            } else {
+                names.wallet_private.clone()
+            },
             wallet_testnet: if names.wallet_testnet.is_empty() {
                 format!("{}{}{}", path, pre, DbNameType::wallet_testnet.to_string())
-            } else { names.wallet_testnet.clone() },
+            } else {
+                names.wallet_testnet.clone()
+            },
             wallet_testnet_private: if names.wallet_testnet_private.is_empty() {
-                format!("{}{}{}", path, pre, DbNameType::wallet_testnet_private.to_string())
-            } else { names.wallet_testnet_private.clone() },
+                format!(
+                    "{}{}{}",
+                    path,
+                    pre,
+                    DbNameType::wallet_testnet_private.to_string()
+                )
+            } else {
+                names.wallet_testnet_private.clone()
+            },
         }
     }
 
@@ -86,7 +126,7 @@ impl DbName {
             k if k == &self.wallet_private => Some(DbNameType::wallet_private),
             k if k == &self.wallet_testnet => Some(DbNameType::wallet_testnet),
             k if k == &self.wallet_testnet_private => Some(DbNameType::wallet_testnet_private),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -140,7 +180,6 @@ pub enum DbCreateType {
     Drop,
 }
 
-
 #[derive(Default)]
 pub struct Db {
     cashbox_wallets: Rbatis,
@@ -171,14 +210,15 @@ impl Db {
         &self.cashbox_mnemonic
     }
 
-    pub async fn init(&mut self, name: &DbName) -> Result<(), Error> {
+    pub async fn connect(&mut self, name: &DbName) -> Result<(), Error> {
         self.db_name = name.clone();
         self.cashbox_wallets = kits::make_rbatis(&self.db_name.cashbox_wallets).await?;
         self.cashbox_mnemonic = kits::make_rbatis(&self.db_name.cashbox_mnemonic).await?;
         self.wallet_mainnet = kits::make_rbatis(&self.db_name.wallet_mainnet).await?;
         self.wallet_private = kits::make_rbatis(&self.db_name.wallet_private).await?;
         self.wallet_testnet = kits::make_rbatis(&self.db_name.wallet_testnet).await?;
-        self.wallet_testnet_private = kits::make_rbatis(&self.db_name.wallet_testnet_private).await?;
+        self.wallet_testnet_private =
+            kits::make_rbatis(&self.db_name.wallet_testnet_private).await?;
         Ok(())
     }
     pub async fn init_memory_sql(&mut self, name: &DbName) -> Result<(), Error> {
@@ -192,20 +232,48 @@ impl Db {
         Ok(())
     }
     pub async fn init_tables(&self, create_type: &DbCreateType) -> Result<(), Error> {
-        let rb = self.mnemonic_db();
-        Db::create_table_mnemonic(rb, create_type).await?;
-        let rb = self.wallets_db();
-        Db::create_table_wallets(rb, create_type).await?;
-
-        for net_type in NetType::iter() {
-            let rb = self.data_db(&net_type);
-            Db::create_table_data(rb, create_type).await?;
+        let wallets_rb = self.wallets_db();
+        let user_version :i64 = wallets_rb.fetch("","PRAGMA user_version").await?;
+        if user_version==0{
+            wallets_rb.exec("",&SET_VERSION_SQL).await?;
+            self.create(create_type).await?;
+            Db::insert_chain_token(self).await?;
+           return Ok(());
         }
-
-        Db::insert_chain_token(self).await?;
+        if user_version!=VERSION{
+            if user_version<VERSION {
+                self.update(user_version).await?;
+            }else{
+                let error_msg = "Current application version is higher,please uninstall and reinstall";
+                log::error!("{}",error_msg);
+                return Err(Error{ err: error_msg.to_string() })
+            }
+        }
         Ok(())
     }
-    pub async fn create_table(rb: &Rbatis, sql: &str, name: &str, create_type: &DbCreateType) -> Result<(), Error> {
+    async fn create(&self,create_type: &DbCreateType)-> Result<(), Error>{
+        Db::create_table_wallets(self.wallets_db(), create_type).await?;
+        Db::create_table_mnemonic(self.mnemonic_db(), create_type).await?;
+        for net_type in NetType::iter() {
+            let data_rb = self.data_db(&net_type);
+            Db::create_table_data(data_rb, create_type).await?;
+        }
+        Ok(())
+    }
+    async fn update(&self,from:i64)->Result<(),Error>{
+        log::debug!("Upgrading schema from {} to {}", from, VERSION);
+        if from == VERSION {
+            return Ok(());
+        }
+        assert_ne!(
+            from, 0,
+            "Upgrading from user_version = 0 should already be handled (in `init`)"
+        );
+        //todo add database update logic
+
+        Ok(())
+    }
+    pub async fn create_table(rb: &Rbatis,sql: &str, name: &str, create_type: &DbCreateType, ) -> Result<(), Error> {
         match create_type {
             DbCreateType::NotExists => {
                 rb.exec("", sql).await?;
@@ -215,54 +283,218 @@ impl Db {
                 rb.exec("", &format!("delete from {};", name)).await?;
             }
             DbCreateType::Drop => {
-                rb.exec("", &format!("drop table if exists {};", name)).await?;
+                rb.exec("", &format!("drop table if exists {};", name))
+                    .await?;
                 rb.exec("", sql).await?;
             }
         }
         Ok(())
     }
 
-    pub async fn create_table_mnemonic(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
-        Db::create_table(rb, MMnemonic::create_table_script(), &MMnemonic::table_name(), create_type).await?;
+    pub async fn create_table_mnemonic(
+        rb: &Rbatis,
+        create_type: &DbCreateType,
+    ) -> Result<(), Error> {
+        Db::create_table(
+            rb,
+            MMnemonic::create_table_script(),
+            &MMnemonic::table_name(),
+            create_type,
+        )
+        .await?;
         Ok(())
     }
 
     ///total: 16
-    pub async fn create_table_wallets(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
-        Db::create_table(rb, MWallet::create_table_script(), &MWallet::table_name(), create_type).await?;
-        Db::create_table(rb, MChainTypeMeta::create_table_script(), &MChainTypeMeta::table_name(), create_type).await?;
-        Db::create_table(rb, MAddress::create_table_script(), &MAddress::table_name(), create_type).await?;
-        Db::create_table(rb, MSetting::create_table_script(), &MSetting::table_name(), create_type).await?;
-        Db::create_table(rb, MEthChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), create_type).await?;
-        Db::create_table(rb, MEthChainTokenAuth::create_table_script(), &MEthChainTokenAuth::table_name(), create_type).await?;
-        Db::create_table(rb, MEthChainTokenDefault::create_table_script(), &MEthChainTokenDefault::table_name(), create_type).await?;
-        Db::create_table(rb, MEeeChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), create_type).await?;
-        Db::create_table(rb, MEeeChainTokenAuth::create_table_script(), &MEeeChainTokenAuth::table_name(), create_type).await?;
-        Db::create_table(rb, MEeeChainTokenDefault::create_table_script(), &MEeeChainTokenDefault::table_name(), create_type).await?;
-        Db::create_table(rb, MBtcChainTokenShared::create_table_script(), &MBtcChainTokenShared::table_name(), create_type).await?;
-        Db::create_table(rb, MBtcChainTokenAuth::create_table_script(), &MBtcChainTokenAuth::table_name(), create_type).await?;
-        Db::create_table(rb, MBtcChainTokenDefault::create_table_script(), &MBtcChainTokenDefault::table_name(), create_type).await?;
+    pub async fn create_table_wallets(
+        rb: &Rbatis,
+        create_type: &DbCreateType,
+    ) -> Result<(), Error> {
+        Db::create_table(
+            rb,
+            MWallet::create_table_script(),
+            &MWallet::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MChainTypeMeta::create_table_script(),
+            &MChainTypeMeta::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MAddress::create_table_script(),
+            &MAddress::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MSetting::create_table_script(),
+            &MSetting::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEthChainTokenShared::create_table_script(),
+            &MEeeChainTokenShared::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEthChainTokenAuth::create_table_script(),
+            &MEthChainTokenAuth::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEthChainTokenDefault::create_table_script(),
+            &MEthChainTokenDefault::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEeeChainTokenShared::create_table_script(),
+            &MEeeChainTokenShared::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEeeChainTokenAuth::create_table_script(),
+            &MEeeChainTokenAuth::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEeeChainTokenDefault::create_table_script(),
+            &MEeeChainTokenDefault::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MBtcChainTokenShared::create_table_script(),
+            &MBtcChainTokenShared::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MBtcChainTokenAuth::create_table_script(),
+            &MBtcChainTokenAuth::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MBtcChainTokenDefault::create_table_script(),
+            &MBtcChainTokenDefault::table_name(),
+            create_type,
+        )
+        .await?;
         Ok(())
     }
     ///total: 12
     pub async fn create_table_data(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
-        Db::create_table(rb, MTokenAddress::create_table_script(), &MTokenAddress::table_name(), create_type).await?;
-        Db::create_table(rb, MEthChainToken::create_table_script(), &MEthChainToken::table_name(), create_type).await?;
-        Db::create_table(rb, MEthChainTx::create_table_script(), &MEthChainTx::table_name(), create_type).await?;
-        Db::create_table(rb, MEeeChainToken::create_table_script(), &MEeeChainToken::table_name(), create_type).await?;
-        Db::create_table(rb, MEeeChainTx::create_table_script(), &MEeeChainTx::table_name(), create_type).await?;
-        Db::create_table(rb, MEeeTokenxTx::create_table_script(), &MEeeTokenxTx::table_name(), create_type).await?;
-        Db::create_table(rb, MBtcChainToken::create_table_script(), &MBtcChainToken::table_name(), create_type).await?;
-        Db::create_table(rb, MBtcChainTx::create_table_script(), &MBtcChainTx::table_name(), create_type).await?;
-        Db::create_table(rb, MBtcInputTx::create_table_script(), &MBtcInputTx::table_name(), create_type).await?;
-        Db::create_table(rb, MBtcOutputTx::create_table_script(), &MBtcOutputTx::table_name(), create_type).await?;
-        Db::create_table(rb, MSubChainBasicInfo::create_table_script(), &MSubChainBasicInfo::table_name(), create_type).await?;
-        Db::create_table(rb, MAccountInfoSyncProg::create_table_script(), &MAccountInfoSyncProg::table_name(), create_type).await?;
+        Db::create_table(
+            rb,
+            MTokenAddress::create_table_script(),
+            &MTokenAddress::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEthChainToken::create_table_script(),
+            &MEthChainToken::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEthChainTx::create_table_script(),
+            &MEthChainTx::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEeeChainToken::create_table_script(),
+            &MEeeChainToken::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEeeChainTx::create_table_script(),
+            &MEeeChainTx::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MEeeTokenxTx::create_table_script(),
+            &MEeeTokenxTx::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MBtcChainToken::create_table_script(),
+            &MBtcChainToken::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MBtcChainTx::create_table_script(),
+            &MBtcChainTx::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MBtcInputTx::create_table_script(),
+            &MBtcInputTx::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MBtcOutputTx::create_table_script(),
+            &MBtcOutputTx::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MSubChainBasicInfo::create_table_script(),
+            &MSubChainBasicInfo::table_name(),
+            create_type,
+        )
+        .await?;
+        Db::create_table(
+            rb,
+            MAccountInfoSyncProg::create_table_script(),
+            &MAccountInfoSyncProg::table_name(),
+            create_type,
+        )
+        .await?;
         Ok(())
     }
     /// such as: eth,eee,btc
     pub async fn insert_chain_token(db: &Db) -> Result<(), Error> {
-        {//eth
+        {
+            //eth
             let rb = db.wallets_db();
             let token_shared = {
                 let mut eth = MEthChainTokenShared::default();
@@ -270,16 +502,19 @@ impl Db {
 
                 eth.token_shared.name = "Ethereum".to_owned();
                 eth.token_shared.symbol = "ETH".to_owned();
-                eth.token_shared.logo_url = "".to_owned();//todo
+                eth.token_shared.logo_url = "".to_owned(); //todo
                 eth.token_shared.logo_bytes = "".to_owned();
                 eth.token_shared.project_name = "ethereum".to_owned();
                 eth.token_shared.project_home = "https://ethereum.org/zh/".to_owned();
-                eth.token_shared.project_note = "Ethereum is a global, open-source platform for decentralized applications.".to_owned();
+                eth.token_shared.project_note =
+                    "Ethereum is a global, open-source platform for decentralized applications."
+                        .to_owned();
                 eth.decimal = 18;
                 eth.gas_limit = 0; //todo
                 eth.gas_price = "".to_owned(); //todo
                 let old_eth = {
-                    let wrapper = rb.new_wrapper()
+                    let wrapper = rb
+                        .new_wrapper()
                         .eq(MEeeChainTokenShared::token_type, &eth.token_type);
                     MEthChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
@@ -290,10 +525,15 @@ impl Db {
                 }
                 eth
             };
-            {//token_default
+            {
+                //token_default
                 for net_type in NetType::iter() {
-                    let wrapper = rb.new_wrapper()
-                        .eq(MEthChainTokenDefault::chain_token_shared_id, token_shared.id.clone())
+                    let wrapper = rb
+                        .new_wrapper()
+                        .eq(
+                            MEthChainTokenDefault::chain_token_shared_id,
+                            token_shared.id.clone(),
+                        )
                         .eq(MEthChainTokenDefault::net_type, net_type.to_string());
                     let old = MEthChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
@@ -308,7 +548,8 @@ impl Db {
                 }
             }
         }
-        {//eee
+        {
+            //eee
             let rb = db.wallets_db();
             let token_shared = {
                 let mut eee = MEeeChainTokenShared::default();
@@ -318,14 +559,15 @@ impl Db {
 
                 eee.token_shared.name = "EEE".to_owned();
                 eee.token_shared.symbol = "EEE".to_owned();
-                eee.token_shared.logo_url = "".to_owned();//todo
+                eee.token_shared.logo_url = "".to_owned(); //todo
                 eee.token_shared.logo_bytes = "".to_owned();
                 eee.token_shared.project_name = "EEE".to_owned();
                 eee.token_shared.project_home = "https://scry.info".to_owned();
                 eee.token_shared.project_note = "EEE is a global".to_owned();
 
                 let old_eth = {
-                    let wrapper = rb.new_wrapper()
+                    let wrapper = rb
+                        .new_wrapper()
                         .eq(MEeeChainTokenShared::token_type, &eee.token_type);
                     MEeeChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
@@ -336,10 +578,15 @@ impl Db {
                 }
                 eee
             };
-            {//token_default
+            {
+                //token_default
                 for net_type in NetType::iter() {
-                    let wrapper = rb.new_wrapper()
-                        .eq(MEeeChainTokenDefault::chain_token_shared_id, token_shared.id.clone())
+                    let wrapper = rb
+                        .new_wrapper()
+                        .eq(
+                            MEeeChainTokenDefault::chain_token_shared_id,
+                            token_shared.id.clone(),
+                        )
                         .eq(MEeeChainTokenDefault::net_type, net_type.to_string());
                     let old = MEeeChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
@@ -352,7 +599,8 @@ impl Db {
                 }
             }
         }
-        {//btc
+        {
+            //btc
             let rb = db.wallets_db();
             let token_shared = {
                 let mut btc = MBtcChainTokenShared::default();
@@ -362,14 +610,17 @@ impl Db {
 
                 btc.token_shared.name = "Bitcoin".to_owned();
                 btc.token_shared.symbol = "BTC".to_owned();
-                btc.token_shared.logo_url = "".to_owned();//todo
+                btc.token_shared.logo_url = "".to_owned(); //todo
                 btc.token_shared.logo_bytes = "".to_owned();
                 btc.token_shared.project_name = "Bitcoin".to_owned();
                 btc.token_shared.project_home = "https://bitcoin.org/en/".to_owned();
-                btc.token_shared.project_note = "Bitcoin is a global, open-source platform for decentralized applications.".to_owned();
+                btc.token_shared.project_note =
+                    "Bitcoin is a global, open-source platform for decentralized applications."
+                        .to_owned();
 
                 let old_eth = {
-                    let wrapper = rb.new_wrapper()
+                    let wrapper = rb
+                        .new_wrapper()
                         .eq(MBtcChainTokenShared::token_type, &btc.token_type);
                     MBtcChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
@@ -380,10 +631,15 @@ impl Db {
                 }
                 btc
             };
-            {//token_default
+            {
+                //token_default
                 for net_type in NetType::iter() {
-                    let wrapper = rb.new_wrapper()
-                        .eq(MBtcChainTokenDefault::chain_token_shared_id, token_shared.id.clone())
+                    let wrapper = rb
+                        .new_wrapper()
+                        .eq(
+                            MBtcChainTokenDefault::chain_token_shared_id,
+                            token_shared.id.clone(),
+                        )
                         .eq(MBtcChainTokenDefault::net_type, net_type.to_string());
                     let old = MBtcChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
@@ -425,7 +681,9 @@ mod tests {
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, pre.to_owned() + &it.to_string());
-                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                let db_type = db
+                    .db_name_type(&name)
+                    .expect(&format!("can not find name: {}", &name));
                 assert_eq!(db_type, it);
             }
         }
@@ -435,7 +693,9 @@ mod tests {
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, pre.to_owned() + &it.to_string());
-                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                let db_type = db
+                    .db_name_type(&name)
+                    .expect(&format!("can not find name: {}", &name));
                 assert_eq!(db_type, it);
             }
         }
@@ -445,7 +705,9 @@ mod tests {
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, format!("/{}{}", pre, it.to_string()));
-                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                let db_type = db
+                    .db_name_type(&name)
+                    .expect(&format!("can not find name: {}", &name));
                 assert_eq!(db_type, it);
             }
         }
@@ -455,7 +717,9 @@ mod tests {
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, format!("/user/{}{}", pre, it.to_string()));
-                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                let db_type = db
+                    .db_name_type(&name)
+                    .expect(&format!("can not find name: {}", &name));
                 assert_eq!(db_type, it);
             }
         }
@@ -465,7 +729,9 @@ mod tests {
             for it in DbNameType::iter() {
                 let name = db.db_name(&it);
                 assert_eq!(name, format!("/user/{}{}", pre, it.to_string()));
-                let db_type = db.db_name_type(&name).expect(&format!("can not find name: {}", &name));
+                let db_type = db
+                    .db_name_type(&name)
+                    .expect(&format!("can not find name: {}", &name));
                 assert_eq!(db_type, it);
             }
         }
@@ -474,14 +740,32 @@ mod tests {
     #[test]
     fn db_test() {
         let mut db = Db::default();
-        let re = block_on(db.init(&DbName::new("test_", "./temp")));
+        let re = block_on(db.connect(&DbName::new("test_", "./temp")));
         assert_eq!(false, re.is_err(), "{:?}", re);
 
-        assert_eq!(&db.cashbox_wallets as *const Rbatis, db.wallets_db() as *const Rbatis);
-        assert_eq!(&db.cashbox_mnemonic as *const Rbatis, db.mnemonic_db() as *const Rbatis);
-        assert_eq!(&db.wallet_mainnet as *const Rbatis, db.data_db(&NetType::Main) as *const Rbatis);
-        assert_eq!(&db.wallet_testnet as *const Rbatis, db.data_db(&NetType::Test) as *const Rbatis);
-        assert_eq!(&db.wallet_private as *const Rbatis, db.data_db(&NetType::Private) as *const Rbatis);
-        assert_eq!(&db.wallet_testnet_private as *const Rbatis, db.data_db(&NetType::PrivateTest) as *const Rbatis);
+        assert_eq!(
+            &db.cashbox_wallets as *const Rbatis,
+            db.wallets_db() as *const Rbatis
+        );
+        assert_eq!(
+            &db.cashbox_mnemonic as *const Rbatis,
+            db.mnemonic_db() as *const Rbatis
+        );
+        assert_eq!(
+            &db.wallet_mainnet as *const Rbatis,
+            db.data_db(&NetType::Main) as *const Rbatis
+        );
+        assert_eq!(
+            &db.wallet_testnet as *const Rbatis,
+            db.data_db(&NetType::Test) as *const Rbatis
+        );
+        assert_eq!(
+            &db.wallet_private as *const Rbatis,
+            db.data_db(&NetType::Private) as *const Rbatis
+        );
+        assert_eq!(
+            &db.wallet_testnet_private as *const Rbatis,
+            db.data_db(&NetType::PrivateTest) as *const Rbatis
+        );
     }
 }

@@ -23,6 +23,7 @@ use std::ops::Deref;
 use std::sync::{mpsc, Arc};
 use std::thread;
 use std::time::Duration;
+use futures::executor::block_on;
 
 pub struct GetData<T> {
     //send a message
@@ -204,7 +205,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
             }
         }
 
-        let vec = RB_DETAIL.list_btc_output_tx();
+        let vec = block_on(RB_DETAIL.list_btc_output_tx());
         let mut output_map = HashMap::new();
         for output in vec {
             output_map.insert(output.btc_tx_hash, output.idx);

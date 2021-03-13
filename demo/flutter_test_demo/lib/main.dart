@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test_demo/control/wallets_control.dart';
 import 'package:grpc/grpc.dart';
+import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
@@ -54,33 +55,47 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // testGrpc();
+    testGrpc();
   }
 
-  testGrpc() {
-    const serverRefreshPort = 50050;
-    var refresh = RefreshOpen.get(new ConnectParameter("localhost", serverRefreshPort), "", AppPlatformType.any, "", "", "");
-    var channel = createClientChannel(() async {
-      ConnectParameter re = await refresh.refreshCall();
-      return re;
-    }) as ClientTransportChannel;
+
+
+  testGrpc() async {
+    var refresh =
+    RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), "2.0.0", AppPlatformType.any, "82499105f009f80a1fe2f1db86efdec7", "", "");
+    var channel = createClientChannel(refresh.refreshCall);
     BasicClientReq basicClientReq = new BasicClientReq();
+    //String deviceId = await AppInfoUtil.instance.getDeviceId();
+    String deviceId = "ddd device";
+    //String signInfo = await AppInfoUtil.instance.getAppSignInfo();
+    String signInfo = "82499105f009f80a1fe2f1db86efdec7";
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String apkVersion = packageInfo.version;
     basicClientReq
-      ..cashboxType = ""
-      ..cashboxVersion = ""
-      ..deviceId = ""
-      ..platformType = ""
-      ..signature = "";
+      ..cashboxType = "GA"
+      ..cashboxVersion = apkVersion // 2.0.0
+      ..deviceId = deviceId ?? ""
+      ..platformType = "aarch64-linux-android"
+      ..signature = signInfo; // 82499105f009f80a1fe2f1db86efdec7
     final cashboxConfigOpenFaceClient = CashboxConfigOpenFaceClient(channel);
-    ResponseFuture<CashboxConfigOpen_LatestConfigRes> latestConfigRes = cashboxConfigOpenFaceClient.latestConfig(basicClientReq);
-    latestConfigRes.then((res) => {});
+    try {
+      CashboxConfigOpen_LatestConfigRes latestConfigRes = await cashboxConfigOpenFaceClient.latestConfig(basicClientReq);
+      latestConfigRes.cashboxVersion;
+      latestConfigRes.configVersion;
+      latestConfigRes.conf;
+      print("latestConfigRes  is ------>" + latestConfigRes.toString());
+    } catch (e) {
+      print("latestConfigRes  error is ------>" + e.toString());
+    }
+
+
   }
 
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
     logger.setLogLevel(LogLevel.Debug);
-    testWalletFunc();
+    // testWalletFunc();
   }
 
   testWalletFunc() async {

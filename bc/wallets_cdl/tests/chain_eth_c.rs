@@ -101,7 +101,7 @@ fn eth_update_default_token_list_test() {
         let mut default_tokens = Vec::new();
         {
             let mut eth = EthChainTokenDefault::default();
-            eth.net_type = "Private".to_string();
+            eth.net_type = "Main".to_string();
             eth.eth_chain_token_shared.m.token_type = EthTokenType::Eth.to_string();
             eth.m.contract_address = "".to_owned();
             eth.eth_chain_token_shared.m.decimal = 18;

@@ -145,6 +145,32 @@ impl MBtcTxState {
 
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MBtcUtxo{
+    #[serde(default)]
+    // satoshi
+    pub fee:u64,
+    #[serde(default)]
+    // reference to btc tx state
+    pub state:String,
+    #[serde(default)]
+    pub btc_tx_hash: String,
+    #[serde(default)]
+    pub idx: u32,
+    #[serde(default)]
+    pub btc_tx_hexbytes: String,
+    #[serde(default)]
+    // reference to address in m_user_address
+    pub address: String,
+}
+
+impl MBtcUtxo{
+    pub const fn create_table_script() -> &'static str{
+        std::include_str!("../../../sql/m_btc_utxo.sql")
+    }
+}
+
+#[db_append_shared]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBlockHeader {
     #[serde(default)]
     pub header: String,
