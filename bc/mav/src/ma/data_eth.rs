@@ -30,6 +30,8 @@ pub struct MEthChainToken {
     /// [crate::ChainType]
     #[serde(default)]
     pub chain_type: String,
+    #[serde(default)]
+    pub contract_address: String,
     /// 是否显示
     #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
     pub show: bool,

@@ -89,7 +89,7 @@ pub mod test {
 
     pub fn mock_files_db() -> Db {
         let mut db = Db::default();
-        let re = block_on(db.init(&DbName::new("test_", "./temp")));
+        let re = block_on(db.connect(&DbName::new("test_", "./temp")));
         assert_eq!(false, re.is_err(), "{:?}", re);
         db
     }
