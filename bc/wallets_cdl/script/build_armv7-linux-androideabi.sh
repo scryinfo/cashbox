@@ -6,7 +6,7 @@ cuPath=$(pwd)
 batPath=$(dirname $(readlink -f "$0"))
 
 cd $batPath/../../../app/
-mkdir dl/armeabi-v7a
+mkdir -p dl/armeabi-v7a
 cd dl/armeabi-v7a
 outPath=$(pwd)
 
