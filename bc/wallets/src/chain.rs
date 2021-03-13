@@ -48,12 +48,13 @@ impl ChainTrait for EthChain {
             let mut tx = token_rb.begin_tx_defer(false).await?;
             let default_tokens = EthChainTokenDefault::list_by_net_type(context, &net_type).await?;
             let mut tokens = Vec::new();
-            for it in default_tokens {
+            for default_token in default_tokens {
                 let mut token = MEthChainToken::default();
-                token.chain_token_shared_id = it.chain_token_shared_id.clone();
+                token.chain_token_shared_id = default_token.chain_token_shared_id.clone();
                 token.wallet_id = wallet.id.clone();
                 token.chain_type = wallets_types::EthChain::chain_type(&wallet_type).to_string();
                 token.show = true;
+                token.contract_address= default_token.contract_address.clone();
                 //todo how to
                 // gas_limit: 0,
                 // gas_price: "".to_string(),

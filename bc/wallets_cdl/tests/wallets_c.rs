@@ -4,18 +4,24 @@ use std::time::{Duration, Instant};
 use futures::task::SpawnExt;
 
 use mav::{kits, WalletType};
-use wallets_cdl::{mem_c::{
-    CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc,
-    CWallet_dFree,
-}, parameters::{CContext, CCreateWalletParameters, CInitParameters}, types::{CError, CWallet, CR, CU64}, wallets_c::{
-    Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init,
-    Wallets_uninit,
-}, CArray};
+use std::os::raw::c_char;
+use wallets_cdl::mem_c::{CArrayCWallet_dAlloc, CArrayCWallet_dFree, CStr_free};
+use wallets_cdl::wallets_c::{Wallets_all, Wallets_appPlatformType, Wallets_removeWallet};
+use wallets_cdl::{
+    mem_c::{
+        CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc,
+        CWallet_dFree,
+    },
+    parameters::{CContext, CCreateWalletParameters, CInitParameters},
+    types::{CError, CWallet, CR, CU64},
+    wallets_c::{
+        Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init,
+        Wallets_uninit,
+    },
+    CArray,
+};
 use wallets_cdl::{to_c_char, to_str, CStruct};
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet};
-use wallets_cdl::wallets_c::{Wallets_appPlatformType, Wallets_removeWallet, Wallets_all};
-use wallets_cdl::mem_c::{CStr_free, CArrayCWallet_dAlloc, CArrayCWallet_dFree};
-use std::os::raw::c_char;
 
 #[test]
 fn executor_test() {
@@ -134,13 +140,13 @@ fn block_on_test() {
 fn mnemonic_test() {
     unsafe {
         //invalid parameters
-        let c_err = Wallets_generateMnemonic(null_mut()) as *mut CError;
+        let c_err = Wallets_generateMnemonic(15,null_mut()) as *mut CError;
         assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
     }
     unsafe {
         let ptr = CStr_dAlloc();
-        let c_err = Wallets_generateMnemonic(ptr) as *mut CError;
+        let c_err = Wallets_generateMnemonic(15,ptr) as *mut CError;
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let words: Vec<&str> = to_str(*ptr).split(" ").collect();
@@ -179,7 +185,7 @@ fn wallets_test() {
         let mnemonic = {
             let p_mn = CStr_dAlloc();
             {
-                let c_err = Wallets_generateMnemonic(p_mn) as *mut CError;
+                let c_err = Wallets_generateMnemonic(15,p_mn) as *mut CError;
                 assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
             }

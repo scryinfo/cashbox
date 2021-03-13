@@ -21,7 +21,8 @@ impl Contexts {
         static mut INSTANCE: OnceCell<ReentrantMutex<RefCell<Contexts>>> = OnceCell::new();
         unsafe {
             INSTANCE.get_or_init(|| {
-                #[cfg(target_os = "android")]crate::init_logger_once();
+                #[cfg(target_os = "android")]
+                crate::init_logger_once();
                 ReentrantMutex::new(RefCell::new(Contexts::default()))
             })
         }
@@ -48,7 +49,7 @@ impl Contexts {
 
         Ok(())
     }
-
+    // todo 改写返回值类型
     pub fn new(&mut self, ctx: Context) -> Option<&mut Wallets> {
         let mut ws = Wallets::default();
         ws.ctx = ctx;
@@ -62,7 +63,12 @@ impl Contexts {
     }
 
     pub fn contexts(&self) -> Option<Vec<Context>> {
-        let cts = self.w_map.values().into_iter().map(|w| w.ctx.clone()).collect();
+        let cts = self
+            .w_map
+            .values()
+            .into_iter()
+            .map(|w| w.ctx.clone())
+            .collect();
         Some(cts)
     }
 
@@ -74,7 +80,6 @@ impl Contexts {
         self.last_context.clone()
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -95,9 +100,7 @@ mod tests {
                 // let mut t = unsafe { INSTANCE .get().unwrap().lock()};
                 // t.borrow_mut().get("");
                 unsafe {
-                    T_INS.get_or_init(|| {
-                        ReentrantMutex::new(RefCell::new(Contexts::default()))
-                    })
+                    T_INS.get_or_init(|| ReentrantMutex::new(RefCell::new(Contexts::default())))
                 }
             };
             let lock = f().lock();
