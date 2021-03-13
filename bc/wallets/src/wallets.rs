@@ -11,7 +11,7 @@ use mav::ma::{
     BeforeSave, Dao, Db, DbCreateType, DbName, MAddress, MBtcChainToken, MEeeChainToken,
     MEthChainToken, MMnemonic, MTokenAddress, MWallet, SettingType,
 };
-use mav::{ChainType, NetType, WalletType};
+use mav::{ChainType, NetType, WalletType, CTrue};
 use scry_crypto::Keccak256;
 use wallets_types::{
     BtcChainTrait, Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain,
@@ -341,7 +341,7 @@ impl Wallets {
             let mut addr = chain.generate_address(mn, &wallet_type)?;
             addr.before_save();
             addr.wallet_id = wallet.id.clone();
-            addr.wallet_address = true;
+            addr.wallet_address = CTrue;
             chain.generate_default_token(self, &wallet, &addr).await?;
             addrs.push(addr);
         }
@@ -364,13 +364,13 @@ impl Wallets {
         {
             target_address.balance = token_address.balance.clone();
             target_address.status = 1;
-            target_address.save_update(data_rb, "").await?;
+            target_address.save_update(data_rb, "").await.map(|_|()).map_err(|err|err.into())
         } else {
             let mut token_address_instance = token_address.clone();
             token_address_instance.m.status = 1;
-            token_address_instance.save(data_rb, "").await?;
+            token_address_instance.save(data_rb, "").await.map(|_|()).map_err(|err|err.into())
         }
-        Ok(())
+
     }
     pub async fn query_address_balance(
         &self,
@@ -422,8 +422,7 @@ impl Wallets {
         database_version: &str,
     ) -> Result<(), WalletError> {
         let context = self;
-        let _re = Setting::save_current_database_version(context, database_version).await?;
-        Ok(())
+        Setting::save_current_database_version(context, database_version).await
     }
 }
 

@@ -3,14 +3,14 @@
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{BtcChain, BtcChainToken, BtcChainTokenShared,BtcChainTokenAuth,BtcChainTokenDefault};
 
-use crate::kits::{CArray, CMark, CR, CStruct,to_str,to_c_char};
+use crate::kits::{CArray, CBool,CMark, CR, CStruct,to_str,to_c_char};
 use crate::types::{CChainShared, CTokenShared};
 use std::os::raw::c_char;
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CBtcChainToken {
-    pub show:bool,
+    pub show:CBool,
     pub btcChainTokenShared: *mut CBtcChainTokenShared,
 }
 

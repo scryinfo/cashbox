@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS m_eee_chain_tx (
     from_address TEXT NOT NULL,
     to_address TEXT NOT NULL,
     value TEXT NOT NULL,
-    status BOOLEAN NOT NULL,
+    status INTEGER NOT NULL,
     extension TEXT NOT NULL,
     id TEXT PRIMARY KEY,
     create_time INTEGER NOT NULL,

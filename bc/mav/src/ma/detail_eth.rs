@@ -6,7 +6,7 @@ use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
-use crate::kits::{self};
+use crate::kits;
 use crate::ma::dao::{self, Shared};
 use crate::ma::MTokenShared;
 

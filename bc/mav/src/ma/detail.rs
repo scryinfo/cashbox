@@ -5,7 +5,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, db_sub_struct, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::dao::{self, bool_from_u32, bool_to_u32, Shared};
+use crate::ma::dao::{self, Shared};
 
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
@@ -68,8 +68,8 @@ pub struct MAddress {
     #[serde(default)]
     pub public_key: String,
     /// 是否为钱包地址
-    #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
-    pub wallet_address: bool,
+    //#[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    pub wallet_address: u32,
 }
 
 impl MAddress {
