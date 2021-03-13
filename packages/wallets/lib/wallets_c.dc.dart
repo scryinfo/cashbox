@@ -2784,6 +2784,7 @@ class EthChain extends DC<clib.CEthChain> {
 
 class EthChainToken extends DC<clib.CEthChainToken> {
   int show;
+  String contractAddress;
   EthChainTokenShared ethChainTokenShared;
 
   EthChainToken() {
@@ -2794,6 +2795,10 @@ class EthChainToken extends DC<clib.CEthChainToken> {
     if (ptr == null || ptr == nullptr) {
       return;
     }
+    if (ptr.ref.contractAddress != null && ptr.ref.contractAddress != nullptr) {
+      ffi.calloc.free(ptr.ref.contractAddress);
+    }
+    ptr.ref.contractAddress = nullptr;
     EthChainTokenShared.free(ptr.ref.ethChainTokenShared);
     ptr.ref.ethChainTokenShared = nullptr;
     ffi.calloc.free(ptr);
@@ -2821,6 +2826,10 @@ class EthChainToken extends DC<clib.CEthChainToken> {
       return;
     }
     c.ref.show = show;
+    if (c.ref.contractAddress != null && c.ref.contractAddress != nullptr) {
+      ffi.calloc.free(c.ref.contractAddress);
+    }
+    c.ref.contractAddress = toUtf8Null(contractAddress);
     if (c.ref.ethChainTokenShared == null ||
         c.ref.ethChainTokenShared == nullptr) {
       c.ref.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>();
@@ -2834,6 +2843,7 @@ class EthChainToken extends DC<clib.CEthChainToken> {
       return;
     }
     show = c.ref.show;
+    contractAddress = fromUtf8Null(c.ref.contractAddress);
     ethChainTokenShared = new EthChainTokenShared();
     ethChainTokenShared.toDart(c.ref.ethChainTokenShared);
   }
@@ -3887,6 +3897,7 @@ class Wallet extends DC<clib.CWallet> {
   String id;
   String nextId;
   String name;
+  String walletType;
   EthChain ethChain;
   EeeChain eeeChain;
   BtcChain btcChain;
@@ -3913,6 +3924,10 @@ class Wallet extends DC<clib.CWallet> {
       ffi.calloc.free(ptr.ref.name);
     }
     ptr.ref.name = nullptr;
+    if (ptr.ref.walletType != null && ptr.ref.walletType != nullptr) {
+      ffi.calloc.free(ptr.ref.walletType);
+    }
+    ptr.ref.walletType = nullptr;
     EthChain.free(ptr.ref.ethChain);
     ptr.ref.ethChain = nullptr;
     EeeChain.free(ptr.ref.eeeChain);
@@ -3955,6 +3970,10 @@ class Wallet extends DC<clib.CWallet> {
       ffi.calloc.free(c.ref.name);
     }
     c.ref.name = toUtf8Null(name);
+    if (c.ref.walletType != null && c.ref.walletType != nullptr) {
+      ffi.calloc.free(c.ref.walletType);
+    }
+    c.ref.walletType = toUtf8Null(walletType);
     if (c.ref.ethChain == null || c.ref.ethChain == nullptr) {
       c.ref.ethChain = allocateZero<clib.CEthChain>();
     }
@@ -3977,6 +3996,7 @@ class Wallet extends DC<clib.CWallet> {
     id = fromUtf8Null(c.ref.id);
     nextId = fromUtf8Null(c.ref.nextId);
     name = fromUtf8Null(c.ref.name);
+    walletType = fromUtf8Null(c.ref.walletType);
     ethChain = new EthChain();
     ethChain.toDart(c.ref.ethChain);
     eeeChain = new EeeChain();

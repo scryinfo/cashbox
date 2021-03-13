@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_test_demo/control/eth_chain_control.dart';
 import 'package:flutter_test_demo/control/wallets_control.dart';
 import 'package:grpc/grpc.dart';
 import 'package:package_info/package_info.dart';
@@ -55,14 +56,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    testGrpc();
+    // testGrpc();
   }
-
-
 
   testGrpc() async {
     var refresh =
-    RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), "2.0.0", AppPlatformType.any, "82499105f009f80a1fe2f1db86efdec7", "", "");
+        RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), "2.0.0", AppPlatformType.any, "82499105f009f80a1fe2f1db86efdec7", "", "");
     var channel = createClientChannel(refresh.refreshCall);
     BasicClientReq basicClientReq = new BasicClientReq();
     //String deviceId = await AppInfoUtil.instance.getDeviceId();
@@ -87,15 +86,13 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       print("latestConfigRes  error is ------>" + e.toString());
     }
-
-
   }
 
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
     logger.setLogLevel(LogLevel.Debug);
-    // testWalletFunc();
+    testWalletFunc();
   }
 
   testWalletFunc() async {
@@ -108,15 +105,27 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!isHasAny) {
       logger.i("wallet test ", "isHasAny is " + isHasAny.toString());
     }
-    String mne = WalletsControl.getInstance().generateMnemonic();
+    String mne = WalletsControl.getInstance().generateMnemonic(12);
     logger.i("wallet test ", "mne is " + mne.toString());
-    Wallet wallet = WalletsControl.getInstance().createWallet(mne, WalletType.Normal, "ddd", Uint8List.fromList("q".toString().codeUnits));
+    Wallet wallet = WalletsControl.getInstance().createWallet(mne, WalletType.Normal, "fff", Uint8List.fromList("q".toString().codeUnits));
     logger.i("wallet test ", "wallet is " + wallet.toString());
 
     List<Wallet> walletList = WalletsControl.getInstance().walletsAll();
+    print("walletList info is --->" + walletList.toString());
     if (walletList == null) {
       logger.e("wallet test ", "walletList is null~");
+      return;
     }
+    walletList.forEach((element) {
+      print("wallet test each wallet is --------->" + element.toString());
+    });
+    var curWallet = WalletsControl.getInstance().currentWallet();
+    if(curWallet==null){
+      return;
+    }
+    var allTokenList = EthChainControl.getInstance().getAllTokenList(curWallet);
+    var visibleTokenList = EthChainControl.getInstance().getVisibleTokenList();
+    print("wallet test visibleTokenList is --------->" + visibleTokenList.toString());
   }
 
   void _incrementCounter() async {

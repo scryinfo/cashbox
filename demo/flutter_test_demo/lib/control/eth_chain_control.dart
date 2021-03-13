@@ -1,20 +1,62 @@
-import 'package:wallets/chain_eth.dart';
+import 'package:flutter_test_demo/control/balance_control.dart';
+import 'package:flutter_test_demo/model/token_rate.dart';
+import 'package:flutter_test_demo/model/token.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
 
 class EthChainControl {
-  ChainEth chainEth;
-  Wallet wallet;
+  factory EthChainControl() => getInstance();
 
-  getTokenList(Wallet nowWallet) {
+  static EthChainControl _instance;
+
+  EthChainControl._internal();
+
+  static EthChainControl getInstance() {
+    if (_instance == null) {
+      _instance = new EthChainControl._internal();
+    }
+    return _instance;
+  }
+
+  List<TokenM> _allTokenList = [];
+
+  getAllTokenList(Wallet nowWallet) {
+    if (nowWallet == null) {
+      return [];
+    }
     List<EthChainToken> ethTokens = nowWallet.ethChain.tokens.data;
-    // todo getTokenBalance(tokenName)
-    // todo getTokenRate()
-    // todo getTokenMoney()
-    // token ---> Digit  todo rename
-    // return tokenList;
+    TokenM newToken = TokenM();
+    // convert from ffiModel to uniform format
+    ethTokens.forEach((element) {
+      newToken = TokenM()
+        ..fullName = element.ethChainTokenShared.tokenShared.name ?? ""
+        ..shortName = element.ethChainTokenShared.tokenShared.symbol ?? ""
+        ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
+        ..address = element.contractAddress ?? ""
+        ..isVisible = element.show.isTrue()
+        // ..tokenId = element.ethChainTokenShared.tokenShared.id
+        ..decimal = element.ethChainTokenShared.decimal ?? 0;
+
+      _allTokenList.add(newToken);
+    });
+
+    _allTokenList.forEach((element) {
+      // todo getTokenBalance(tokenName)
+      // element.balance = BalanceControl.getInstance().getBalanceByTokenId(); // todo lack element.ethChainTokenShared.tokenShared
+      // todo .tokenId?
+      // todo getTokenRate()
+      element.money = TokenRate.instance.getPrice(element).toStringAsFixed(6);
+    });
+
+    return _allTokenList;
+  }
+
+  getVisibleTokenList() {
+    return _allTokenList.retainWhere((element) {
+      return element.isVisible;
+    });
   }
 
   String decodeAdditionData(String encodeData) {

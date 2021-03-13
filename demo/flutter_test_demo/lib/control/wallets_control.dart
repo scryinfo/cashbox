@@ -41,8 +41,8 @@ class WalletsControl {
     }
   }
 
-  String generateMnemonic() {
-    var mneObj = Wallets.mainIsolate().generateMnemonic();
+  String generateMnemonic(int count) {
+    var mneObj = Wallets.mainIsolate().generateMnemonic(count);
     if (!mneObj.isSuccess()) {
       Logger.getInstance().e("wallet_control ", "generateMnemonic error is false --->" + mneObj.err.toString());
       return null;
@@ -81,7 +81,7 @@ class WalletsControl {
     return hasAnyObj.data1;
   }
 
-  Wallet currentWallet(List<Wallet> walletList) {
+  Wallet currentWallet() {
     var curWalletIdObj = Wallets.mainIsolate().currentWalletChain();
     if (curWalletIdObj.isSuccess()) {
       var walletObj = Wallets.mainIsolate().findById(curWalletIdObj.data1.walletId);
