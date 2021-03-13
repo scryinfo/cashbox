@@ -105,7 +105,7 @@ class _EntrancePageState extends State<EntrancePage> {
         }
         {
           config.lastTimeConfigCheck = nowTimeStamp;
-          config.serverAppVersion = serverConfigModel.data.latestConfig.appConfigVersion;
+          // config.serverAppVersion = serverConfigModel.data.latestConfig.appConfigVersion;
           config.privateConfig.authDigitVersion = serverConfigModel.data.latestConfig.authTokenListVersion;
           config.privateConfig.defaultDigitVersion = serverConfigModel.data.latestConfig.defaultTokenListVersion;
           config.privateConfig.serverApkVersion = serverConfigModel.data.latestConfig.apkVersion;
@@ -137,7 +137,7 @@ class _EntrancePageState extends State<EntrancePage> {
               Logger().e("updateDefaultDigitList error =====>", e.toString());
             }
           }
-          config.privateConfig.configVersion = serverConfigModel.data.latestConfig.appConfigVersion;
+          // config.privateConfig.configVersion = serverConfigModel.data.latestConfig.appConfigVersion;
         }
         // save changed config
         HandleConfig.instance.saveConfig(config);
