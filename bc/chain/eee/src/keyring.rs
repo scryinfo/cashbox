@@ -1,10 +1,10 @@
-use sp_core::{hexdisplay::HexDisplay, Public, Pair, crypto::Ss58Codec};
-use bip39::{Mnemonic, MnemonicType, Language};
-use rand::{RngCore, rngs::OsRng};
-use scry_crypto::aes;
-use scrypt::{ScryptParams, scrypt};
-use tiny_keccak::Keccak;
 use crate::error::Error;
+use bip39::{Language, Mnemonic, MnemonicType};
+use rand::{rngs::OsRng, RngCore};
+use scry_crypto::aes;
+use scrypt::{scrypt, ScryptParams};
+use sp_core::{crypto::Ss58Codec, hexdisplay::HexDisplay, Pair, Public};
+use tiny_keccak::Keccak;
 
 pub const SCRYPT_LOG_N: u8 = 5;
 //Debug Reduce the number of iterations
@@ -49,10 +49,10 @@ struct KdfParams {
 
 pub trait Crypto {
     type Seed: AsRef<[u8]> + AsMut<[u8]> + Sized + Default;
-    type Pair: Pair<Public=Self::Public>;
+    type Pair: Pair<Public = Self::Public>;
     type Public: Public + Ss58Codec + AsRef<[u8]> + std::hash::Hash;
 
-    fn generate_phrase(num: u8) -> String {
+    fn generate_phrase(num: u32) -> String {
         let mn_type = match num {
             12 => MnemonicType::Words12,
             15 => MnemonicType::Words15,
@@ -61,7 +61,9 @@ pub trait Crypto {
             24 => MnemonicType::Words24,
             _ => MnemonicType::Words15,
         };
-        Mnemonic::new(mn_type, Language::English).phrase().to_owned()
+        Mnemonic::new(mn_type, Language::English)
+            .phrase()
+            .to_owned()
     }
     fn generate_seed() -> Self::Seed {
         let mut seed: Self::Seed = Default::default();
@@ -78,18 +80,21 @@ pub trait Crypto {
     fn pair_from_suri(suri: &str, password: Option<&str>) -> Result<Self::Pair, Error> {
         Ok(Self::Pair::from_string(suri, password)?)
     }
-    fn ss58_from_pair(pair: &Self::Pair,ss58_version:u8) -> String;
+    fn ss58_from_pair(pair: &Self::Pair, ss58_version: u8) -> String;
     fn public_from_pair(pair: &Self::Pair) -> Vec<u8>;
-    fn seed_from_pair(_pair: &Self::Pair) -> Option<&Self::Seed> { None }
-    fn print_from_seed(seed: &Self::Seed,ss58_version:u8) {
+    fn seed_from_pair(_pair: &Self::Pair) -> Option<&Self::Seed> {
+        None
+    }
+    fn print_from_seed(seed: &Self::Seed, ss58_version: u8) {
         let pair = Self::pair_from_seed(seed);
-        println!("Seed 0x{} is account:\n  Public key (hex): 0x{}\n  Address (SS58): {}",
-                 HexDisplay::from(&seed.as_ref()),
-                 HexDisplay::from(&Self::public_from_pair(&pair)),
-                 Self::ss58_from_pair(&pair,ss58_version)
+        println!(
+            "Seed 0x{} is account:\n  Public key (hex): 0x{}\n  Address (SS58): {}",
+            HexDisplay::from(&seed.as_ref()),
+            HexDisplay::from(&Self::public_from_pair(&pair)),
+            Self::ss58_from_pair(&pair, ss58_version)
         );
     }
-    fn print_from_phrase(phrase: &str, password: Option<&str>,ss58_version:u8) {
+    fn print_from_phrase(phrase: &str, password: Option<&str>, ss58_version: u8) {
         match Self::seed_from_phrase(phrase, password) {
             Ok(seed) => {
                 let pair = Self::pair_from_seed(&seed);
@@ -105,22 +110,28 @@ pub trait Crypto {
             }
         }
     }
-    fn print_from_uri(uri: &str, password: Option<&str>,ss58_version:u8) where <Self::Pair as Pair>::Public: Sized + Ss58Codec + AsRef<[u8]> {
+    fn print_from_uri(uri: &str, password: Option<&str>, ss58_version: u8)
+    where
+        <Self::Pair as Pair>::Public: Sized + Ss58Codec + AsRef<[u8]>,
+    {
         if let Ok(pair) = Self::Pair::from_string(uri, password) {
-            let seed_text = Self::seed_from_pair(&pair)
-                .map_or_else(Default::default, |s| format!("\n  Seed: 0x{}", HexDisplay::from(&s.as_ref())));
-            println!("Secret Key URI `{}` is account:{}\n  Public key (hex): 0x{}\n  Address (SS58): {}",
-                     uri,
-                     seed_text,
-                     HexDisplay::from(&Self::public_from_pair(&pair)),
-                     Self::ss58_from_pair(&pair,ss58_version)
+            let seed_text = Self::seed_from_pair(&pair).map_or_else(Default::default, |s| {
+                format!("\n  Seed: 0x{}", HexDisplay::from(&s.as_ref()))
+            });
+            println!(
+                "Secret Key URI `{}` is account:{}\n  Public key (hex): 0x{}\n  Address (SS58): {}",
+                uri,
+                seed_text,
+                HexDisplay::from(&Self::public_from_pair(&pair)),
+                Self::ss58_from_pair(&pair, ss58_version)
             );
         }
         if let Ok(public) = <Self::Pair as Pair>::Public::from_string(uri) {
-            println!("Public Key URI `{}` is account:\n  Public key (hex): 0x{}\n  Address (SS58): {}",
-                     uri,
-                     HexDisplay::from(&public.as_ref()),
-                     public.to_ss58check()
+            println!(
+                "Public Key URI `{}` is account:\n  Public key (hex): 0x{}\n  Address (SS58): {}",
+                uri,
+                HexDisplay::from(&public.as_ref()),
+                public.to_ss58check()
             );
         }
     }
@@ -133,7 +144,8 @@ pub trait Crypto {
         {
             OsRng.fill_bytes(&mut salt);
             OsRng.fill_bytes(&mut iv);
-            scrypt(password, &salt, &params, &mut dk).expect("32 bytes always satisfy output length requirements");
+            scrypt(password, &salt, &params, &mut dk)
+                .expect("32 bytes always satisfy output length requirements");
         }
         let ciphertext = aes::encrypt(aes::EncryptMethod::Aes128Ctr, mn, &dk, &iv).unwrap();
         //The 16- to 32-bit data of the derived key is concatenated with the encrypted content to calculate the digest value
@@ -154,7 +166,9 @@ pub trait Crypto {
                 p: SCRYPT_P,
             };
 
-            let cipher_params = CipherParams { iv: hex::encode(iv), };
+            let cipher_params = CipherParams {
+                iv: hex::encode(iv),
+            };
             KeyCrypto {
                 ciphertext: hex::encode(ciphertext),
                 cipher: CIPHER_KEY_SIZE.to_string(),
@@ -181,7 +195,8 @@ pub trait Crypto {
             let kdfparams: KdfParams = crypto.kdfparams;
             let params = ScryptParams::new(kdfparams.n, kdfparams.r, kdfparams.p).unwrap();
             let salt = hex::decode(kdfparams.salt)?;
-            scrypt(password, salt.as_slice(), &params, &mut key).expect("32 bytes always satisfy output length requirements");
+            scrypt(password, salt.as_slice(), &params, &mut key)
+                .expect("32 bytes always satisfy output length requirements");
         }
 
         let mut hex_mac_from_password = [0u8; 32];
@@ -202,9 +217,15 @@ pub trait Crypto {
         let cipher_method = match crypto.cipher.as_str() {
             "aes-128-ctr" => aes::EncryptMethod::Aes128Ctr,
             "aes-256-ctr" => aes::EncryptMethod::Aes256Ctr,
-            _ => aes::EncryptMethod::Aes256Ctr,//Encrypted in this way by default
+            _ => aes::EncryptMethod::Aes256Ctr, //Encrypted in this way by default
         };
-        aes::decrypt(cipher_method, ciphertext.as_slice(), key.as_slice(), iv.as_slice()).map_err(|err|Error::Custom(err))
+        aes::decrypt(
+            cipher_method,
+            ciphertext.as_slice(),
+            key.as_slice(),
+            iv.as_slice(),
+        )
+        .map_err(|err| Error::Custom(err))
     }
     fn sign(phrase: &str, msg: &[u8]) -> Result<[u8; 64], Error>;
 }
@@ -212,5 +233,5 @@ pub trait Crypto {
 mod ed25519;
 mod sr25519;
 
-pub use sr25519::Sr25519;
 pub use ed25519::Ed25519;
+pub use sr25519::Sr25519;
