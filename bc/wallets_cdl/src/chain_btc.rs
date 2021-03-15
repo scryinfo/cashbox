@@ -11,6 +11,7 @@ use std::os::raw::c_char;
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CBtcChainToken {
     pub show:CBool,
+    pub chainTokenSharedId:*mut c_char,
     pub btcChainTokenShared: *mut CBtcChainTokenShared,
 }
 

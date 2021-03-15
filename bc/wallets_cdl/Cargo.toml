@@ -15,7 +15,7 @@ libc = "0.2.80"
 log = "0.4.11"
 futures = "0.3.8"
 
-wallets = { version = "0.1.0", path = "../wallets" }
+wallets = { version = "2.3.0", path = "../wallets" }
 wallets_types = { path = "../wallets_types" }
 #wallets_macro = { path = "../wallets_macro",features = ["print_macro"] }
 wallets_macro = { path = "../wallets_macro"}

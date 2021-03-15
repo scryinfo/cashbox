@@ -6,6 +6,7 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
+use crate::CTrue;
 use crate::ma::dao::{self, Shared};
 use crate::ma::TxShared;
 
@@ -27,6 +28,7 @@ pub struct MBtcChainToken {
     pub chain_type: String,
     /// 是否显示
     // #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    #[serde(default)]
     pub show: u32,
     /// 精度
     #[serde(default)]

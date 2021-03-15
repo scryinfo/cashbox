@@ -26,6 +26,7 @@ pub struct MEeeChainToken {
     pub chain_type: String,
     //是否显示
     //#[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    #[serde(default)]
     pub show: u32,
     // 精度
     #[serde(default)]
@@ -54,6 +55,7 @@ pub struct MEeeChainTx {
     #[serde(default)]
     pub value: String,
     //#[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    #[serde(default)]
     pub status: u32,
     // 扩展数据
     #[serde(default)]
@@ -81,6 +83,7 @@ pub struct MEeeTokenxTx {
     #[serde(default)]
     pub value: String,
     // #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    #[serde(default)]
     pub status: u32,
     // 扩展数据
     #[serde(default)]

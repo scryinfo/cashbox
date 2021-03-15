@@ -1,6 +1,6 @@
 [package]
 name = "wallets"
-version = "0.1.0"
+version = "2.3.0"
 authors = ["jeremy <jm140915@hotmail.com>"]
 edition = "2018"
 

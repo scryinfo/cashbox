@@ -12,6 +12,7 @@ use crate::types::{CChainShared, CTokenShared};
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainToken {
     pub show:CBool,
+    pub chainTokenSharedId:*mut c_char,
     pub eeeChainTokenShared: *mut CEeeChainTokenShared,
 }
 

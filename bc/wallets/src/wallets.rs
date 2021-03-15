@@ -292,6 +292,7 @@ impl Wallets {
             );
             m_wallet.wallet_type = wallet_type.to_string();
             m_wallet.name = parameters.name.clone();
+            m_wallet.show=CTrue;
             m_wallet.net_type = NetType::default_net_type(&wallet_type).to_string();
         }
         let mut m_addresses = self
@@ -341,7 +342,8 @@ impl Wallets {
             let mut addr = chain.generate_address(mn, &wallet_type)?;
             addr.before_save();
             addr.wallet_id = wallet.id.clone();
-            addr.wallet_address = CTrue;
+            addr.is_wallet_address = CTrue;
+            addr.show = CTrue;
             chain.generate_default_token(self, &wallet, &addr).await?;
             addrs.push(addr);
         }

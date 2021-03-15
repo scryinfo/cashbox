@@ -53,7 +53,7 @@ impl ChainTrait for EthChain {
                 token.chain_token_shared_id = default_token.chain_token_shared_id.clone();
                 token.wallet_id = wallet.id.clone();
                 token.chain_type = wallets_types::EthChain::chain_type(&wallet_type).to_string();
-                token.show = true as u32;
+                token.show = CTrue;
                 token.contract_address= default_token.contract_address.clone();
                 tokens.push(token);
             }
@@ -135,7 +135,7 @@ impl ChainTrait for BtcChain {
                 token.chain_token_shared_id = it.chain_token_shared_id.clone();
                 token.wallet_id = wallet.id.clone();
                 token.chain_type = wallets_types::EeeChain::chain_type(&wallet_type).to_string();
-                token.show = 1;
+                token.show = CTrue;
                 token.decimal = it.chain_token_shared.decimal;
                 //todo how to
                 // decimal: 0
@@ -787,9 +787,9 @@ impl EthChainTrait for EthChain {
                 }
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
-            let mut token_default = token.m.clone();
-            token_default.chain_token_shared_id = shared.id;
-            token_default.save(token_rb, &tx.tx_id).await?;
+            let mut token_auth = token.m.clone();
+            token_auth.chain_token_shared_id = shared.id;
+            token_auth.save(token_rb, &tx.tx_id).await?;
         }
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
