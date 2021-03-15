@@ -31,40 +31,38 @@ pub struct ChainSqlite {
 
 impl ChainSqlite {
     pub fn new(network: Network, db_file_name: &str) -> Self {
-        let rb = block_on(Self::init_rbatis(db_file_name));
-        let r = block_on(rb.exec("", MBlockHeader::create_table_script()));
-        match r {
-            Ok(a) => {
-                info!("{:?}", a);
+        let rb = block_on(async {
+            let rb = Self::init_rbatis(db_file_name).await;
+            let r = rb.exec("", MBlockHeader::create_table_script()).await;
+            match r {
+                Ok(a) => {
+                    info!("{:?}", a);
+                }
+                Err(e) => {
+                    error!("{:?}", e);
+                }
             }
-            Err(e) => {
-                error!("{:?}", e);
-            }
-        }
+            rb
+        });
         Self { rb, network }
     }
 
-    pub fn save_header(&self, header: String, timestamp: String) {
+    pub async fn save_header(
+        &self,
+        header: String,
+        timestamp: String,
+    ) -> Result<DBExecResult, Error> {
         let mut block_header = MBlockHeader::default();
         block_header.scanned = "0".to_owned();
         block_header.header = header;
         block_header.timestamp = timestamp;
-
-        let r = block_on(block_header.save(&self.rb, ""));
-        match r {
-            Ok(a) => {
-                debug!("{:?}", a);
-            }
-            Err(e) => {
-                error!("{:?}", e);
-            }
-        }
+        block_header.save(&self.rb, "").await
     }
 
     /// fetch header which needed scan
     /// scan_flag = false scan_flag does not need +1
     /// scan_flag = true scan_flag need +1
-    pub fn fetch_scan_header(&self, timestamp: String, scan_flag: bool) -> Vec<String> {
+    pub async fn fetch_scan_header(&self, timestamp: String, scan_flag: bool) -> Vec<String> {
         let w = self
             .rb
             .new_wrapper()
@@ -72,16 +70,14 @@ impl ChainSqlite {
             .and()
             .lt("scanned", 6);
         let req = PageRequest::new(1, 1000);
-        let r: Result<Page<MBlockHeader>, _> =
-            block_on(self.rb.fetch_page_by_wrapper("", &w, &req));
-        let mut block_headers: Vec<MBlockHeader> = vec![];
-        match r {
+        let r: Result<Page<MBlockHeader>, _> = self.rb.fetch_page_by_wrapper("", &w, &req).await;
+        let block_headers: Vec<MBlockHeader> = match r {
             Ok(page) => {
                 let header_vec = page.get_records();
-                block_headers = header_vec.to_vec();
+                header_vec.to_vec()
             }
-            Err(e) => error!("{:?}", e),
-        }
+            Err(_) => vec![],
+        };
         let mut headers: Vec<String> = vec![];
         for header_block in block_headers {
             headers.push(header_block.header);
@@ -105,7 +101,7 @@ impl ChainSqlite {
                 &MBlockHeader::table_name(),
                 timestamp
             );
-            let r = block_on(self.rb.exec("", &sql));
+            let r = self.rb.exec("", &sql).await;
             match r {
                 Ok(a) => {
                     debug!("=== {:?} ===", a);
@@ -456,7 +452,7 @@ impl DetailSqlite {
         let outputs = MBtcOutputTx::list(&self.rb, "").await;
         if let Ok(outputs) = outputs {
             for output in outputs {
-                let tx_hash = output.btc_tx_hash;
+                let tx_hash = output.btc_tx_hash.clone();
                 let idx = output.idx;
                 let w = self
                     .rb
@@ -472,10 +468,6 @@ impl DetailSqlite {
                         utxo.idx = output.idx;
                         utxo.btc_tx_hexbytes = output.btc_tx_hexbytes;
                         utxo.value = output.value;
-
-
-
-
                     }
                     Some(input) => {}
                 }

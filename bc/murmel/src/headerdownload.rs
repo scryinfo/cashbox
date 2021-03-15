@@ -36,6 +36,7 @@ use bitcoin::{
 };
 use bitcoin_hashes::hex::ToHex;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use futures::executor::block_on;
 use log::{debug, error, info, trace};
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
 
@@ -219,10 +220,18 @@ impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
                                 // save block hash into sqlite table "block_hash"
                                 {
                                     let header_c = header.clone();
-                                    RB_CHAIN.save_header(
-                                        header_c.bitcoin_hash().to_hex(),
-                                        header_c.time.to_string(),
-                                    )
+                                    block_on(async {
+                                        let r = RB_CHAIN
+                                            .save_header(
+                                                header_c.bitcoin_hash().to_hex(),
+                                                header_c.time.to_string(),
+                                            )
+                                            .await;
+                                        r.map_or_else(
+                                            |e| error!("error save header {:?}", e),
+                                            |r| debug!("save_state {:?}", r),
+                                        );
+                                    })
                                 }
 
                                 if let Some(forwards) = forwards {

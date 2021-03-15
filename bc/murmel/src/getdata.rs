@@ -142,11 +142,11 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         }
         info!("get fillter_ready condition");
 
-        let mut header_vec: Vec<String> = vec![];
+        let header_vec: Vec<String> =
         {
             let p = RB_DETAIL.progress();
-            header_vec = RB_CHAIN.fetch_scan_header(p.timestamp, add);
-        }
+            block_on(RB_CHAIN.fetch_scan_header(p.timestamp, add))
+        };
 
         if header_vec.len() == 0 {
             return Ok(());
