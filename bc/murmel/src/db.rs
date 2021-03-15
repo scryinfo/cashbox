@@ -116,17 +116,17 @@ impl ChainSqlite {
     }
 
     // how may headers save in block_header table
-    pub fn fetch_height(&self) -> i64 {
+    pub async fn fetch_height(&self) -> i64 {
         let w = self.rb.new_wrapper();
         let sql = format!("SELECT COUNT(*) FROM {} ", &MBlockHeader::table_name());
-        let r: Result<i64, _> = block_on(self.rb.fetch_prepare("", &sql, &w.args));
+        let r: Result<i64, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
         match r {
             Ok(r) => r,
             Err(_) => 0,
         }
     }
 
-    pub fn fetch_header_by_timestamp(&self, timestamp: String) -> i64 {
+    pub async fn fetch_header_by_timestamp(&self, timestamp: String) -> i64 {
         let w = self.rb.new_wrapper();
         let sql = format!(
             "SELECT {} FROM {} WHERE timestamp = {}",
@@ -134,7 +134,7 @@ impl ChainSqlite {
             &MBlockHeader::table_name(),
             &timestamp
         );
-        let r: Result<i64, _> = block_on(self.rb.fetch_prepare("", &sql, &w.args));
+        let r: Result<i64, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
         match r {
             Ok(r) => r,
             Err(e) => {
@@ -486,7 +486,7 @@ impl DetailSqlite {
 
 pub fn fetch_scanned_height() -> i64 {
     let mprogress = RB_DETAIL.progress();
-    let h = RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp);
+    let h = block_on(RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp));
     h
 }
 
