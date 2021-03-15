@@ -249,21 +249,21 @@ impl DetailSqlite {
         MBtcTxState::save_batch(&rb, "init_state", &mut tokens).await
     }
 
-    fn save_progress(&self, header: String, timestamp: String) {
+    async fn save_progress(&self, header: String, timestamp: String) {
         let mut progress = MProgress::default();
         progress.header = header;
         progress.timestamp = timestamp;
 
-        let r = block_on(progress.save(&self.rb, ""));
+        let r = progress.save(&self.rb, "").await;
         r.map_or_else(
             |e| error!("save_progress {:?}", e),
             |r| debug!("save_progress {:?}", r),
         );
     }
 
-    fn fetch_progress(&self) -> Option<MProgress> {
+    async fn fetch_progress(&self) -> Option<MProgress> {
         let w = self.rb.new_wrapper().eq("rowid", 1);
-        let r: Result<MProgress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
+        let r: Result<MProgress, _> = self.rb.fetch_by_wrapper("", &w).await;
         return match r {
             Ok(r) => Some(r),
             Err(_) => None,
@@ -287,15 +287,15 @@ impl DetailSqlite {
         }
     }
 
-    pub fn progress(&self) -> MProgress {
-        let progress = self.fetch_progress();
+    pub async fn progress(&self) -> MProgress {
+        let progress = self.fetch_progress().await;
         match progress {
             None => {
                 let genesis = genesis_block(self.network).header;
                 let header = genesis.bitcoin_hash().to_hex();
                 let timestamp = genesis.time.to_string();
                 info!("=== scanned newest block from genesis {:?} ===", &genesis);
-                self.save_progress(header.clone(), timestamp.clone());
+                self.save_progress(header.clone(), timestamp.clone()).await;
                 let mut progress = MProgress::default();
                 progress.header = header;
                 progress.timestamp = timestamp;
@@ -485,7 +485,7 @@ impl DetailSqlite {
 }
 
 pub fn fetch_scanned_height() -> i64 {
-    let mprogress = RB_DETAIL.progress();
+    let mprogress = block_on(RB_DETAIL.progress());
     let h = block_on(RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp));
     h
 }
@@ -553,27 +553,27 @@ mod test {
 
     #[test]
     fn test_fetch_scann_header() {
-        let r = RB_CHAIN.fetch_scan_header("1296688928".to_owned(), false);
+        let r = block_on(RB_CHAIN.fetch_scan_header("1296688928".to_owned(), false));
         println!("{:?}", r);
-        let r = RB_CHAIN.fetch_scan_header("1296688928".to_owned(), true);
+        let r = block_on(RB_CHAIN.fetch_scan_header("1296688928".to_owned(), true));
         println!("{:?}", r);
     }
 
     #[test]
     fn test_fetch_height() {
-        let h = RB_CHAIN.fetch_height();
+        let h = block_on(RB_CHAIN.fetch_height());
         println!("{}", h)
     }
 
     #[test]
     fn test_fetch_scanned_header_by_timestamp() {
-        let h = RB_CHAIN.fetch_header_by_timestamp("1368475833".to_owned());
+        let h = block_on(RB_CHAIN.fetch_header_by_timestamp("1368475833".to_owned()));
         println!("{}", h)
     }
 
     #[test]
     fn test_fetch_process() {
-        let progress = RB_DETAIL.fetch_progress();
+        let progress = block_on(RB_DETAIL.fetch_progress());
         println!("{:?}", &progress);
     }
 
@@ -582,12 +582,12 @@ mod test {
         RB_DETAIL.update_progress(
             "00000000ea6690ba48686a4fa690eb186000d55b6c67f30bd8d4f0a7d7f1f98b".to_owned(),
             "1337966145".to_owned(),
-        )
+        );
     }
 
     #[test]
     fn test_progress() {
-        let progress = RB_DETAIL.progress();
+        let progress = block_on(RB_DETAIL.progress());
         println!("{:#?}", &progress);
     }
 

@@ -17,13 +17,13 @@ use crate::constructor::CondvarPair;
 use crate::db::{RB_CHAIN, RB_DETAIL, VERIFY};
 use crate::kit::vec_to_string;
 use bitcoin::consensus::serialize as btc_serialize;
+use futures::executor::block_on;
 use log::{error, info, trace};
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::{mpsc, Arc};
 use std::thread;
 use std::time::Duration;
-use futures::executor::block_on;
 
 pub struct GetData<T> {
     //send a message
@@ -142,9 +142,8 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         }
         info!("get fillter_ready condition");
 
-        let header_vec: Vec<String> =
-        {
-            let p = RB_DETAIL.progress();
+        let header_vec: Vec<String> = {
+            let p = block_on(RB_DETAIL.progress());
             block_on(RB_CHAIN.fetch_scan_header(p.timestamp, add))
         };
 
