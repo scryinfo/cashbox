@@ -19,6 +19,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart';
 import '../../res/resources.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
@@ -724,7 +725,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
             String walletId = await Wallets.instance.getNowWalletId();
             Map result = await Wallets.instance.ethTxSign(
                 walletId,
-                Chain.chainTypeToInt(chainType),
+                5,
+                // todo chainType
+                // Chain.chainTypeToInt(chainType),
                 fromAddress,
                 _toAddressController.text.toString(),
                 contractAddress ?? "",

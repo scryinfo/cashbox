@@ -19,6 +19,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart';
 
 class Ddd2EeeConfirmPage extends StatefulWidget {
   @override
@@ -46,18 +47,8 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   void initDataConfig() async {
     fromExchangeAddress = Provider.of<TransactionProvide>(context).fromAddress;
     Config config = await HandleConfig.instance.getConfig();
-
-    switch (Wallets.instance.nowWallet.walletType) {
-      //use walletType:in case :nowChain is not eth or eth_test
-      case WalletType.TEST_WALLET:
-        toExchangeAddress = config.privateConfig.d2eTestNetEthAddress;
-        chainType = ChainType.ETH_TEST;
-        break;
-      case WalletType.WALLET:
-        toExchangeAddress = config.privateConfig.d2eMainNetEthAddress;
-        chainType = ChainType.ETH;
-        break;
-    }
+    chainType = ChainType.ETH;
+    //  chainType = ChainType.ETHTest;
 
     eeeAddress = Provider.of<TransactionProvide>(context).backup;
     dddAmount = Provider.of<TransactionProvide>(context).txValue ?? "0.0";
@@ -393,7 +384,9 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
 
             Map result = await Wallets.instance.ethTxSign(
                 walletId,
-                Chain.chainTypeToInt(chainType),
+                5,
+                // todo
+                // Chain.chainTypeToInt(chainType),
                 fromExchangeAddress,
                 toExchangeAddress,
                 chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA,

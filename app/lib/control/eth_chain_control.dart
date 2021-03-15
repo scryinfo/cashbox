@@ -1,6 +1,6 @@
-import 'package:flutter_test_demo/control/balance_control.dart';
-import 'package:flutter_test_demo/model/token_rate.dart';
-import 'package:flutter_test_demo/model/token.dart';
+import 'package:app/control/balance_control.dart';
+import 'package:app/model/token_rate.dart';
+import 'package:app/model/token.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets.dart';
@@ -54,8 +54,8 @@ class EthChainControl {
     return _allTokenList;
   }
 
-  List<TokenM> getVisibleTokenList() {
-    var visibleList = _allTokenList;
+  List<TokenM> getVisibleTokenList(Wallet nowWallet) {
+    var visibleList = getAllTokenList(nowWallet);
     visibleList.retainWhere((element) {
       return element.isVisible;
     });

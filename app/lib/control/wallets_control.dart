@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter_test_demo/control/balance_control.dart';
-import 'package:flutter_test_demo/control/eth_chain_control.dart';
-import 'package:flutter_test_demo/model/token_rate.dart';
+import 'package:app/control/balance_control.dart';
+import 'package:app/control/eth_chain_control.dart';
+import 'package:app/model/token_rate.dart';
+import 'package:app/model/chain.dart';
+import 'package:app/model/wallet.dart' as WalletM;
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:wallets/enums.dart' as EnumKit;
 import 'package:wallets/enums.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
@@ -53,10 +56,10 @@ class WalletsControl {
     return mneObj.data1;
   }
 
-  Wallet createWallet(String mnemonic, WalletType walletType, String walletName, Uint8List pwd) {
+  Wallet createWallet(Uint8List mnemonic, EnumKit.WalletType walletType, String walletName, Uint8List pwd) {
     CreateWalletParameters createWalletParameters = CreateWalletParameters();
     createWalletParameters.walletType = walletType.toEnumString();
-    createWalletParameters.mnemonic = mnemonic;
+    createWalletParameters.mnemonic = String.fromCharCodes(mnemonic);
     createWalletParameters.name = walletName;
     createWalletParameters.password = String.fromCharCodes(pwd);
     var newWalletObj = Wallets.mainIsolate().createWallet(createWalletParameters);
@@ -67,19 +70,46 @@ class WalletsControl {
     return newWalletObj.data1;
   }
 
-  List<Wallet> walletsAll() {
+  List<WalletM.Wallet> walletsAll() {
     var allWalletObj = Wallets.mainIsolate().all();
     if (!allWalletObj.isSuccess()) {
       Logger.getInstance().d("wallet_control", "walletsAll error is ====> " + allWalletObj.err.toString());
       return null;
     }
-    return allWalletObj.data1;
+    List<WalletM.Wallet> walletMList = [];
+    allWalletObj.data1.forEach((element) {
+      WalletM.Wallet tempWallet = WalletM.Wallet();
+      tempWallet.walletName = element.name;
+      tempWallet.walletId = element.id;
+      tempWallet.accountMoney = getWalletMoney(element).toStringAsFixed(6);
+      // todo isShowChain tempWallet.chainList =
+      ChainETH chainETH = ChainETH()
+        ..isVisible = true
+        ..chainType = ChainType.ETH;
+      ChainBTC chainBTC = ChainBTC()
+        ..isVisible = true
+        ..chainType = ChainType.BTC;
+      ChainEEE chainEEE = ChainEEE()
+        ..isVisible = true
+        ..chainType = ChainType.EEE;
+      tempWallet.chainList..add(chainETH)..add(chainBTC)..add(chainEEE);
+      walletMList.add(tempWallet);
+    });
+    return walletMList;
+  }
+
+  // todo
+  bool isCurWallet(WalletM.Wallet wallet) {
+    if (currentWallet().id == wallet.walletId) {
+      return true;
+    }
+    return false;
   }
 
   double getWalletMoney(Wallet wallet) {
     // todo wallet's chain's tokens * price
     double allMoneyValue = 0.0;
-    EthChainControl.getInstance().getVisibleTokenList().forEach((element) {
+    EthChainControl.getInstance().getVisibleTokenList(wallet).forEach((element) {
       allMoneyValue = allMoneyValue + TokenRate.instance.getMoney(element);
     });
     // todo BtcChainControl
@@ -121,12 +151,12 @@ class WalletsControl {
     Logger.getInstance().d("wallet_control", "renameWallet err is --->" + err.toString());
   }
 
-  saveCurrentWalletChain(String walletId, ChainType chainType) {
+  saveCurrentWalletChain(String walletId, EnumKit.ChainType chainType) {
     var err = Wallets.mainIsolate().saveCurrentWalletChain(walletId, chainType);
     Logger.getInstance().d("wallet_control ", "saveCurrentWalletChain err" + err.toString());
   }
 
-  List<TokenAddress> getTokenAddress(String walletId, ChainType chainType) {
+  List<TokenAddress> getTokenAddress(String walletId, EnumKit.ChainType chainType) {
     var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId, chainType);
     if (!tokenAddressObj.isSuccess()) {
       return null;

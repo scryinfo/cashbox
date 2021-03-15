@@ -137,19 +137,11 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
             child: FlatButton(
               color: Color.fromRGBO(26, 141, 198, 0.2),
               onPressed: () {
-                switch (Wallets.instance.nowWallet.nowChain.chainType) {
-                  case ChainType.EEE:
-                  case ChainType.EEE_TEST:
-                    context.read<TransactionProvide>()
-                      ..emptyDataRecord()
-                      ..setDigitName(digitName)
-                      ..setBalance(balanceInfo);
-                    NavigatorUtils.push(context, Routes.transferEeePage);
-                    break;
-                  default:
-                    NavigatorUtils.push(context, Routes.transferEeePage);
-                    break;
-                }
+                context.read<TransactionProvide>()
+                  ..emptyDataRecord()
+                  ..setDigitName(digitName)
+                  ..setBalance(balanceInfo);
+                NavigatorUtils.push(context, Routes.transferEeePage);
               },
               child: Text(
                 translate('transfer'),

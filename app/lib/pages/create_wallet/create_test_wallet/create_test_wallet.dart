@@ -438,8 +438,9 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       Fluttertoast.showToast(msg: translate('mne_pwd_not_allow_is_null'));
       return;
     }
-    var isSuccess = await Wallets.instance.saveWallet(_nameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
-        Uint8List.fromList(_mnemonicController.text.codeUnits), WalletType.TEST_WALLET);
+    // todo walletType
+    var isSuccess = await Wallets.instance
+        .saveWallet(_nameController.text, Uint8List.fromList(_pwdController.text.codeUnits), Uint8List.fromList(_mnemonicController.text.codeUnits));
     if (isSuccess) {
       Fluttertoast.showToast(msg: translate('success_create_test_wallet'));
       NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=true', clearStack: true);

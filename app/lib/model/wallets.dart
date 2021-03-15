@@ -5,6 +5,7 @@ import 'package:app/model/wallet.dart';
 import 'package:logger/logger.dart';
 import 'package:app/util/utils.dart';
 import 'package:wallet_manager/wallet_manager.dart';
+import 'package:wallets/enums.dart';
 import 'dart:convert' as convert;
 import 'dart:typed_data';
 import 'chain.dart';
@@ -142,11 +143,11 @@ class Wallets {
         continue; //There is a problem with this wallet data, skip it, take down a wallet
       }
       int walletType = jniList[walletIndex]["walletType"];
-      if (walletType == 0) {
-        walletM.walletType = WalletType.TEST_WALLET;
-      } else {
-        walletM.walletType = WalletType.WALLET;
-      }
+      // if (walletType == 0) {
+      //   walletM.walletType = WalletType.TEST_WALLET;
+      // } else {
+      //   walletM.walletType = WalletType.WALLET;
+      // }
       walletM
         ..walletName = jniList[walletIndex]["walletName"].toString()
         ..walletId = jniList[walletIndex]["walletId"].toString()
@@ -160,7 +161,7 @@ class Wallets {
         chainEeeM
           ..chainId = eeeChain["chainId"]
           ..chainAddress = eeeChain["chainAddress"]
-          ..chainType = Chain.intToChainType(eeeChain["chainType"])
+          ..chainType = ChainType.EEE
           ..isVisible = true
           ..pubKey = eeeChain["pubkey"]
           ..walletId = eeeChain["walletId"];
@@ -190,7 +191,7 @@ class Wallets {
         chainEthM
           ..chainId = ethChain["chainId"]
           ..chainAddress = ethChain["chainAddress"]
-          ..chainType = Chain.intToChainType(ethChain["chainType"])
+          ..chainType = ChainType.ETH
           ..isVisible = true
           ..pubKey = ethChain["pubkey"]
           ..walletId = jniList[walletIndex]["walletId"];
@@ -257,19 +258,8 @@ class Wallets {
 
   // Save the wallet and import the wallet. Create a wallet process with mnemonic words
   // apiNo:WM03           //todo 2.0 optimize saveWallet interface, return value type
-  Future<bool> saveWallet(String walletName, Uint8List pwd, Uint8List mnemonic, WalletType walletType) async {
+  Future<bool> saveWallet(String walletName, Uint8List pwd, Uint8List mnemonic) async {
     int walletTypeToInt = 0;
-    switch (walletType) {
-      case WalletType.TEST_WALLET:
-        walletTypeToInt = 0;
-        break;
-      case WalletType.WALLET:
-        walletTypeToInt = 1;
-        break;
-      default:
-        walletTypeToInt = 1;
-        break;
-    }
 
     Map saveWalletMap = await WalletManager.saveWallet(walletName, pwd, mnemonic, walletTypeToInt);
     if (saveWalletMap["status"] == null) {
@@ -533,15 +523,14 @@ class Wallets {
 
   //Add a new token data model to the current wallet and current chain
   addDigitToChainModel(String walletId, Chain chain, String digitId) async {
-    Map addDigitModelMap =
-        await WalletManager.addDigitToChainModel(walletId, Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), digitId);
+    /*Map addDigitModelMap =await WalletManager.addDigitToChainModel(walletId, Chain.chainTypeToInt(Wallets.instance.nowWallet.nowChain.chainType), digitId);
     int status = addDigitModelMap["status"];
     if (status == null || status != 200) {
       Logger().e("addDigitModelMap=>", "error status code is" + status.toString() + "||message is=>" + addDigitModelMap["message"].toString());
     } else {
       await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true); //Add this token model to digitList and reload
     }
-    return addDigitModelMap;
+    return addDigitModelMap;*/
   }
 
   updateDefaultDigitList(String digitData) async {
@@ -570,7 +559,8 @@ class Wallets {
 
   Future<Map> getNativeAuthDigitList(Chain chain, int startIndex, int pageSize) async {
     Map resultMap = Map();
-    Map updateMap = await WalletManager.getNativeAuthDigitList(Chain.chainTypeToInt(chain.chainType), startIndex, pageSize);
+    //Map updateMap = await WalletManager.getNativeAuthDigitList(Chain.chainTypeToInt(chain.chainType), startIndex, pageSize);
+    Map updateMap = null; // todo
     int status = updateMap["status"];
     if (status == null || status != 200) {
       Logger().e("updateAuthDigitList=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
@@ -594,7 +584,7 @@ class Wallets {
       var digitId = element["id"];
       switch (chain.chainType) {
         case ChainType.ETH:
-        case ChainType.ETH_TEST:
+        case ChainType.EthTest:
           Digit ethDigit = new EthDigit();
           ethDigit.shortName = symbol;
           ethDigit.fullName = fullName;
@@ -606,10 +596,10 @@ class Wallets {
           resultAuthDigitList.add(ethDigit);
           break;
         case ChainType.BTC:
-        case ChainType.BTC_TEST:
+        case ChainType.BtcTest:
           break;
         case ChainType.EEE:
-        case ChainType.EEE_TEST:
+        case ChainType.EeeTest:
           break;
         default:
           break;
@@ -628,11 +618,12 @@ class Wallets {
     Map resultMap = Map();
     List resultAuthDigitList = [];
     Map updateMap = Map();
-    if (Utils.checkByEthAddressFormat(param)) {
-      updateMap = await WalletManager.queryDigit(Chain.chainTypeToInt(chain.chainType), "", param);
-    } else {
-      updateMap = await WalletManager.queryDigit(Chain.chainTypeToInt(chain.chainType), param, "");
-    }
+    // todo
+    // if (Utils.checkByEthAddressFormat(param)) {
+    //   updateMap = await WalletManager.queryDigit(Chain.chainTypeToInt(chain.chainType), "", param);
+    // } else {
+    //   updateMap = await WalletManager.queryDigit(Chain.chainTypeToInt(chain.chainType), param, "");
+    // }
     int status = updateMap["status"];
     resultMap["status"] = status;
     if (status == null || status != 200) {
@@ -657,7 +648,7 @@ class Wallets {
       var symbol = element["symbol"];
       switch (chain.chainType) {
         case ChainType.ETH:
-        case ChainType.ETH_TEST:
+        case ChainType.EthTest:
           Digit ethDigit = new EthDigit();
           ethDigit.shortName = symbol;
           ethDigit.fullName = fullName;
@@ -666,10 +657,10 @@ class Wallets {
           resultAuthDigitList.add(ethDigit);
           break;
         case ChainType.BTC:
-        case ChainType.BTC_TEST:
+        case ChainType.BtcTest:
           break;
         case ChainType.EEE:
-        case ChainType.EEE_TEST:
+        case ChainType.EeeTest:
           break;
         default:
           break;

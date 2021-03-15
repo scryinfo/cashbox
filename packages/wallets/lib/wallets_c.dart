@@ -88,6 +88,10 @@ class CAddress extends Struct {
   Pointer<ffi.Utf8> chainType;
   Pointer<ffi.Utf8> address;
   Pointer<ffi.Utf8> publicKey;
+  @Uint32()
+  int isWalletAddress;
+  @Uint32()
+  int show;
   static Pointer<CAddress> allocate() {
     return ffi.calloc<CAddress>();
   }
@@ -592,8 +596,9 @@ class CBtcChain extends Struct {
 }
 /// C struct `CBtcChainToken`.
 class CBtcChainToken extends Struct {
-  @Int32()
+  @Uint32()
   int show;
+  Pointer<ffi.Utf8> chainTokenSharedId;
   Pointer<CBtcChainTokenShared> btcChainTokenShared;
   static Pointer<CBtcChainToken> allocate() {
     return ffi.calloc<CBtcChainToken>();
@@ -776,8 +781,9 @@ class CEeeChain extends Struct {
 }
 /// C struct `CEeeChainToken`.
 class CEeeChainToken extends Struct {
-  @Int32()
+  @Uint32()
   int show;
+  Pointer<ffi.Utf8> chainTokenSharedId;
   Pointer<CEeeChainTokenShared> eeeChainTokenShared;
   static Pointer<CEeeChainToken> allocate() {
     return ffi.calloc<CEeeChainToken>();
@@ -841,7 +847,7 @@ class CEeeChainTx extends Struct {
   Pointer<ffi.Utf8> toAddress;
   Pointer<ffi.Utf8> value;
   Pointer<ffi.Utf8> extension;
-  @Int32()
+  @Uint32()
   int status;
   @Int64()
   int txTimestamp;
@@ -908,7 +914,8 @@ class CEthChain extends Struct {
 }
 /// C struct `CEthChainToken`.
 class CEthChainToken extends Struct {
-  @Int32()
+  Pointer<ffi.Utf8> chainTokenSharedId;
+  @Uint32()
   int show;
   Pointer<ffi.Utf8> contractAddress;
   Pointer<CEthChainTokenShared> ethChainTokenShared;

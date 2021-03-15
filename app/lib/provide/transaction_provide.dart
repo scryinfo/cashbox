@@ -1,5 +1,6 @@
 import 'package:app/model/chain.dart';
 import 'package:flutter/foundation.dart';
+import 'package:wallets/enums.dart';
 
 class TransactionProvide with ChangeNotifier {
   String _toAddress;

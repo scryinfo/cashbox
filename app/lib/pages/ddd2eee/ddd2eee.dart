@@ -22,6 +22,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart';
 
 class Ddd2EeePage extends StatefulWidget {
   @override
@@ -82,14 +83,9 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
       await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
     }
     //case nowChain is not eth or eth_test
-    switch (Wallets.instance.nowWallet.walletType) {
-      case WalletType.WALLET:
-        chainType = ChainType.ETH;
-        break;
-      case WalletType.TEST_WALLET:
-        chainType = ChainType.ETH_TEST;
-        break;
-    }
+    chainType = ChainType.ETH;
+    // todo   chainType = ChainType.EthTest;
+
     fromAddress = Wallets.instance.nowWallet.getChainByChainType(chainType).chainAddress;
     Config config = await HandleConfig.instance.getConfig();
     toExchangeAddress = chainType == ChainType.ETH ? config.privateConfig.d2eMainNetEthAddress : config.privateConfig.d2eTestNetEthAddress;

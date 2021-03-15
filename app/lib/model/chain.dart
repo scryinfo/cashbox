@@ -1,10 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:wallet_manager/wallet_manager.dart';
+import 'package:wallets/enums.dart';
 
 import 'digit.dart';
 
-enum ChainType { UNKNOWN, BTC, BTC_TEST, ETH, ETH_TEST, EEE, EEE_TEST } /*Mark: Definition needs to be consistent with JNI*/
+
 
 abstract class Chain {
   String chainId; //Chain Id
@@ -30,7 +31,7 @@ abstract class Chain {
     return _visibleDigitsList;
   }
 
-  static String chainTypeToValue(ChainType chainType) {
+  /*static String chainTypeToValue(ChainType chainType) {
     switch (chainType) {
       case ChainType.BTC:
         return "BTC";
@@ -72,7 +73,7 @@ abstract class Chain {
   static ChainType intToChainType(int chainTypeInt) {
     ChainType chainType;
     switch (chainTypeInt) {
-      /*Mark: Definition needs to be consistent with JNI*/
+      *//*Mark: Definition needs to be consistent with JNI*//*
       case 1:
         chainType = ChainType.BTC;
         break;
@@ -95,12 +96,12 @@ abstract class Chain {
         chainType = ChainType.UNKNOWN;
     }
     return chainType;
-  }
+  }*/
 
   // Show tokens
   // apiNo:WM14
   Future<bool> showDigit(Digit digit) async {
-    Map showDigitMap = await WalletManager.showDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
+    /*Map showDigitMap = await WalletManager.showDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
     int status = showDigitMap["status"];
     bool isShowDigit = showDigitMap["isShowDigit"];
     if (status == 200) {
@@ -116,14 +117,14 @@ abstract class Chain {
         digit.isVisible = true;
         return isShowDigit;
       }
-    }
+    }*/
     return false; //Execution failed
   }
 
   // Hidden tokens
   // apiNo:WM15
   Future<bool> hideDigit(Digit digit) async {
-    Map hideDigitMap = await WalletManager.hideDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
+    /*Map hideDigitMap = await WalletManager.hideDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
     int status = hideDigitMap["status"];
     bool isHideDigit = hideDigitMap["isHideDigit"];
     if (status == 200) {
@@ -138,7 +139,7 @@ abstract class Chain {
         digit.isVisible = false;
         return isHideDigit; //execution succeed
       }
-    }
+    }*/
     return false;
   }
 }

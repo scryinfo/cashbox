@@ -7,6 +7,7 @@ import 'package:logger/logger.dart';
 import 'package:app/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:wallets/enums.dart';
 import 'net_util.dart';
 
 const Eth_Tx_Account = "https://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
@@ -50,7 +51,7 @@ const Eth_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=account
 
 Future<String> assembleEthBalanceUrl(String address, {ChainType chainType = ChainType.ETH}) async {
   String apiKey = await loadEtherApiKey();
-  if (chainType == ChainType.ETH_TEST) {
+  if (chainType == ChainType.EthTest) {
     return Eth_TestNet_Balance + address + "&tag=latest&apikey=" + apiKey;
   } else {
     return Eth_MainNet_Balance + address + "&tag=latest&apikey=" + apiKey;
@@ -78,7 +79,7 @@ const Erc20_TestNet_Balance = "https://api-ropsten.etherscan.io/api?module=accou
 
 Future<String> assembleErc20BalanceUrl(String address, String contractAddress, ChainType chainType) async {
   String apiKey = await loadEtherApiKey();
-  if (chainType == ChainType.ETH_TEST) {
+  if (chainType == ChainType.EthTest) {
     return Erc20_TestNet_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + apiKey;
   } else {
     return Erc20_Balance + contractAddress + "&address=" + address + "&tag=latest&apikey=" + apiKey;
@@ -111,7 +112,7 @@ Future<String> assembleEthTxListUrl(String address,
     String page = "1",
     String offset = "20"}) async {
   String apiKey = await loadEtherApiKey();
-  if (chainType == ChainType.ETH_TEST) {
+  if (chainType == ChainType.EthTest) {
     return Eth_TestNet_Tx_List +
         address +
         "&startblock=" +
@@ -201,7 +202,7 @@ const Erc20_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=accou
 
 Future<String> assembleErc20TxListUrl(String address, {ChainType chainType, String contractAddress, String page = "1", String offset = "20"}) async {
   String apiKey = await loadEtherApiKey();
-  if (chainType.toString() == ChainType.ETH_TEST.toString()) {
+  if (chainType.toString() == ChainType.EthTest.toString()) {
     return Erc20_TestNet_Tx_List +
         contractAddress +
         "&address=" +
@@ -273,7 +274,7 @@ const Eth_TestNet_Send_RawTx = "https://api-ropsten.etherscan.io/api?module=prox
 
 Future<String> assembleSendRawTx(ChainType chainType, String hexRawTx) async {
   String apiKey = await loadEtherApiKey();
-  if (chainType == ChainType.ETH_TEST) {
+  if (chainType == ChainType.EthTest) {
     return Eth_TestNet_Send_RawTx + hexRawTx + "&apikey=" + apiKey.toString();
   } else {
     return Eth_Send_RawTx + hexRawTx + "&apikey=" + apiKey.toString();
@@ -299,7 +300,7 @@ Future<String> ethCall(ChainType chainType, String to, String data) async {
   String apiKey = await loadEtherApiKey();
   try {
     String url = "";
-    if (chainType == ChainType.ETH_TEST) {
+    if (chainType == ChainType.EthTest) {
       url = "${Eth_TestNet_Call}&to=${to}&data=${data}&tag=latest&apikey=${apiKey.toString()}";
     } else {
       url = "$Eth_Call&to=$to&data=$data&tag=latest&apikey=${apiKey.toString()}";

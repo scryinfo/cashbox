@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     String mne = WalletsControl.getInstance().generateMnemonic(12);
     logger.i("wallet test ", "mne is " + mne.toString());
-    Wallet wallet = WalletsControl.getInstance().createWallet(mne, WalletType.Normal, "fff", Uint8List.fromList("q".toString().codeUnits));
+    Wallet wallet = WalletsControl.getInstance().createWallet(mne, WalletType.Normal, "ggg", Uint8List.fromList("q".toString().codeUnits));
     logger.i("wallet test ", "wallet is " + wallet.toString());
 
     List<Wallet> walletList = WalletsControl.getInstance().walletsAll();
@@ -126,6 +126,8 @@ class _MyHomePageState extends State<MyHomePage> {
     var allTokenList = EthChainControl.getInstance().getAllTokenList(curWallet);
     var visibleTokenList = EthChainControl.getInstance().getVisibleTokenList();
     print("wallet test visibleTokenList is --------->" + visibleTokenList.toString());
+    var curWalletMoney = WalletsControl.getInstance().getWalletMoney(curWallet);
+    print("wallet test curWalletMoney is --------->" + curWalletMoney.toString());
   }
 
   void _incrementCounter() async {

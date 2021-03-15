@@ -11,7 +11,7 @@ import 'package:app/pages/digitlist_manage/digit_list.dart';
 import 'package:app/pages/digitlist_manage/digits_manage.dart';
 import 'package:app/pages/digitlist_manage/search_digit.dart';
 import 'package:app/pages/entrance.dart';
-import 'package:app/pages/home.dart';
+import 'package:app/pages/eth_page.dart';
 import 'package:app/pages/language_choose.dart';
 import 'package:app/pages/mine.dart';
 import 'package:app/pages/privacy_statements.dart';
@@ -45,7 +45,7 @@ Handler homePageHandler = Handler(handlerFunc: (BuildContext context, Map<String
   } else {
     isForceLoadFromJni = params['isForceLoadFromJni'].first == 'true';
   }
-  return HomePage(isForceLoadFromJni: isForceLoadFromJni);
+  return EthPage(isForceLoadFromJni: isForceLoadFromJni);
 });
 
 Handler publicPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
