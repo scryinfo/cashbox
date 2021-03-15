@@ -149,8 +149,8 @@ impl MBtcTxState {
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcUtxo {
     #[serde(default)]
-    // satoshi
-    pub fee: u64,
+    // satoshi 已花费的交易才有交易费
+    pub fee:Option<u64>,
     #[serde(default)]
     // reference to btc tx state
     pub state: String,
@@ -161,8 +161,11 @@ pub struct MBtcUtxo {
     #[serde(default)]
     pub btc_tx_hexbytes: String,
     #[serde(default)]
-    // reference to address in m_user_address
-    pub address: String,
+    // 和自己地址有关的那条output idx输出对应的value 计算交易的依据
+    pub value :u64,
+    #[serde(default)]
+    // 如果是花费的  对应一条花费的价值
+    pub spent_value :Option<u64>,
 }
 
 impl MBtcUtxo {
