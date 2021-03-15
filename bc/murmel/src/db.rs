@@ -9,7 +9,7 @@ use async_trait::async_trait;
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use bitcoin::{BitcoinHash, Network};
+use bitcoin::{BitcoinHash, Network, Transaction};
 use futures::executor::block_on;
 use log::{debug, error, info};
 use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo};
@@ -464,7 +464,21 @@ impl DetailSqlite {
                     .eq(MBtcInputTx::tx_id, tx_hash)
                     .eq(MBtcInputTx::vout, idx);
                 let r = self.fetch_btc_input_tx(&w).await;
-                println!("{:?}", r);
+                match r {
+                    None => {
+                        let mut utxo = MBtcUtxo::default();
+                        utxo.state = "unspend".to_owned();
+                        utxo.btc_tx_hash = output.btc_tx_hash.clone();
+                        utxo.idx = output.idx;
+                        utxo.btc_tx_hexbytes = output.btc_tx_hexbytes;
+                        utxo.value = output.value;
+
+
+
+
+                    }
+                    Some(input) => {}
+                }
             }
         }
     }
