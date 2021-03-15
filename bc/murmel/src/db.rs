@@ -213,11 +213,11 @@ impl DetailSqlite {
         rb.exec("", MBtcUtxo::create_table_script()).await
     }
 
-    pub fn save_state(&self, seq: u16, state: String) {
+    pub async fn save_state(&self, seq: u16, state: String) {
         let mut tx_state = MBtcTxState::default();
         tx_state.seq = seq;
         tx_state.state = state;
-        let r = block_on(tx_state.save(&self.rb, ""));
+        let r = tx_state.save(&self.rb, "").await;
         r.map_or_else(
             |e| error!("error save_state {:?}", e),
             |r| debug!("save_state {:?}", r),
@@ -270,13 +270,13 @@ impl DetailSqlite {
         };
     }
 
-    pub fn update_progress(&self, header: String, timestamp: String) {
+    pub async fn update_progress(&self, header: String, timestamp: String) {
         let mut progress = MProgress::default();
         progress.header = header;
         progress.timestamp = timestamp;
 
         let w = self.rb.new_wrapper().eq("rowid", 1);
-        let r = block_on(progress.update_by_wrapper(&self.rb, "", &w, true));
+        let r = progress.update_by_wrapper(&self.rb, "", &w, true).await;
         match r {
             Ok(a) => {
                 debug!("update_progress {:?}", a);
@@ -305,7 +305,7 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_btc_input_tx(
+    pub async fn save_btc_input_tx(
         &self,
         tx_id: String,
         vout: u32,
@@ -324,7 +324,7 @@ impl DetailSqlite {
         btc_input_tx.btc_tx_hash = btc_tx_hash;
         btc_input_tx.btc_tx_hexbytes = btc_tx_hexbytes;
 
-        let r = block_on(btc_input_tx.save_update(&self.rb, ""));
+        let r = btc_input_tx.save_update(&self.rb, "").await;
         match r {
             Ok(a) => {
                 debug!("save btc_input_tx {:?}", a);

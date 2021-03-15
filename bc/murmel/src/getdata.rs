@@ -80,7 +80,10 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                                 let block_hash = merkleblock.prev_block.to_hex();
                                 let timestamp = merkleblock.timestamp;
                                 {
-                                    RB_DETAIL.update_progress(block_hash, timestamp.to_string());
+                                    block_on(
+                                        RB_DETAIL
+                                            .update_progress(block_hash, timestamp.to_string()),
+                                    );
                                 }
                             }
 
@@ -224,7 +227,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                     let btc_tx_hash = tx.bitcoin_hash().to_hex();
                     let btc_tx_hexbytes = btc_serialize(tx);
                     let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
-                    RB_DETAIL.save_btc_input_tx(
+                    block_on(RB_DETAIL.save_btc_input_tx(
                         tx_id,
                         vout,
                         sig_script,
@@ -232,7 +235,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                         index as u32,
                         btc_tx_hash,
                         btc_tx_hexbytes,
-                    );
+                    ));
                 }
                 _ => {}
             }
