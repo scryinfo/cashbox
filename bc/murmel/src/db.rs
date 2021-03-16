@@ -9,7 +9,7 @@ use async_trait::async_trait;
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use bitcoin::{BitcoinHash, Network, Transaction};
+use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
 use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo};
@@ -382,7 +382,7 @@ impl DetailSqlite {
         user_address.address = address;
         user_address.compressed_pub_key = compressed_pub_key;
         user_address.verify = verify;
-        let r = block_on(user_address.save(&self.rb, ""));
+        let r = user_address.save(&self.rb, "").await;
         match r {
             Ok(a) => {
                 debug!("save_tx_input {:?}", a);
@@ -414,7 +414,7 @@ impl DetailSqlite {
         local_tx.address_to = address_to;
         local_tx.value = value;
         local_tx.status = status;
-        let r = block_on(local_tx.save(&self.rb, ""));
+        let r = local_tx.save(&self.rb, "").await;
         match r {
             Ok(a) => {
                 debug!("save_tx_input {:?}", a);
@@ -490,9 +490,10 @@ impl DetailSqlite {
 }
 
 pub fn fetch_scanned_height() -> i64 {
-    let mprogress = block_on(RB_DETAIL.progress());
-    let h = block_on(RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp));
-    h
+    block_on(async {
+        let mprogress = RB_DETAIL.progress().await;
+        RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp).await
+    })
 }
 
 #[async_trait]
