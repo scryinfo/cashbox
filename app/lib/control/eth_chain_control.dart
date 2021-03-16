@@ -94,6 +94,14 @@ class EthChainControl {
     return true;
   }
 
+  List<EthChainTokenAuth> getChainEthAuthTokenList(NetType netType, int startIndex, int endIndex) {
+    var dataObj = Wallets.mainIsolate().chainEth.getChainEthAuthTokenList(netType, startIndex, endIndex);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
   updateDefaultTokenList(ArrayCEthChainTokenDefault defaultTokens) {
     var dataObj = Wallets.mainIsolate().chainEth.updateDefaultTokenList(defaultTokens);
     if (!dataObj.isSuccess()) {

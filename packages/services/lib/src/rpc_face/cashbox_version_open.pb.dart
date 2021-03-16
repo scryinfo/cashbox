@@ -2,8 +2,8 @@
 //  Generated code. Do not modify.
 //  source: cashbox_version_open.proto
 //
-// @dart = 2.7
-// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
+// @dart = 2.3
+// ignore_for_file: camel_case_types,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type
 
 import 'dart:core' as $core;
 
@@ -12,43 +12,19 @@ import 'package:protobuf/protobuf.dart' as $pb;
 import 'base.pb.dart' as $0;
 
 class CashboxVersionOpen_UpgradeRes extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CashboxVersionOpen.UpgradeRes', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
-    ..aOM<$0.Err>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'err', subBuilder: $0.Err.create)
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'upgradeStatus', protoName: 'upgradeStatus')
-    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'upgradeVersion', protoName: 'upgradeVersion')
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('CashboxVersionOpen.UpgradeRes', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
+    ..aOM<$0.Err>(1, 'err', subBuilder: $0.Err.create)
+    ..aOS(2, 'upgradeStatus', protoName: 'upgradeStatus')
+    ..aOS(3, 'upgradeVersion', protoName: 'upgradeVersion')
     ..hasRequiredFields = false
   ;
 
   CashboxVersionOpen_UpgradeRes._() : super();
-  factory CashboxVersionOpen_UpgradeRes({
-    $0.Err err,
-    $core.String upgradeStatus,
-    $core.String upgradeVersion,
-  }) {
-    final _result = create();
-    if (err != null) {
-      _result.err = err;
-    }
-    if (upgradeStatus != null) {
-      _result.upgradeStatus = upgradeStatus;
-    }
-    if (upgradeVersion != null) {
-      _result.upgradeVersion = upgradeVersion;
-    }
-    return _result;
-  }
+  factory CashboxVersionOpen_UpgradeRes() => create();
   factory CashboxVersionOpen_UpgradeRes.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory CashboxVersionOpen_UpgradeRes.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   CashboxVersionOpen_UpgradeRes clone() => CashboxVersionOpen_UpgradeRes()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  CashboxVersionOpen_UpgradeRes copyWith(void Function(CashboxVersionOpen_UpgradeRes) updates) => super.copyWith((message) => updates(message as CashboxVersionOpen_UpgradeRes)) as CashboxVersionOpen_UpgradeRes; // ignore: deprecated_member_use
+  CashboxVersionOpen_UpgradeRes copyWith(void Function(CashboxVersionOpen_UpgradeRes) updates) => super.copyWith((message) => updates(message as CashboxVersionOpen_UpgradeRes));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static CashboxVersionOpen_UpgradeRes create() => CashboxVersionOpen_UpgradeRes._();
@@ -89,7 +65,7 @@ class CashboxVersionOpen_UpgradeRes extends $pb.GeneratedMessage {
 }
 
 class CashboxVersionOpen extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CashboxVersionOpen', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('CashboxVersionOpen', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
     ..hasRequiredFields = false
   ;
 
@@ -97,16 +73,8 @@ class CashboxVersionOpen extends $pb.GeneratedMessage {
   factory CashboxVersionOpen() => create();
   factory CashboxVersionOpen.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory CashboxVersionOpen.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   CashboxVersionOpen clone() => CashboxVersionOpen()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  CashboxVersionOpen copyWith(void Function(CashboxVersionOpen) updates) => super.copyWith((message) => updates(message as CashboxVersionOpen)) as CashboxVersionOpen; // ignore: deprecated_member_use
+  CashboxVersionOpen copyWith(void Function(CashboxVersionOpen) updates) => super.copyWith((message) => updates(message as CashboxVersionOpen));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static CashboxVersionOpen create() => CashboxVersionOpen._();

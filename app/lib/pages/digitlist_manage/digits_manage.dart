@@ -1,12 +1,16 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
+import 'package:app/model/token.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/net_util.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/app_info_util.dart';
 import 'package:logger/logger.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +20,14 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:package_info/package_info.dart';
 import 'dart:convert' as convert;
+import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
+import 'package:services/src/rpc_face/base.pb.dart';
+import 'package:services/services.dart';
+import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dc.dart';
+import 'package:wallets/kits.dart';
 
 class DigitsManagePage extends StatefulWidget {
   const DigitsManagePage({Key key, this.isReloadDigitList}) : super(key: key);
@@ -28,8 +39,8 @@ class DigitsManagePage extends StatefulWidget {
 }
 
 class _DigitsManagePageState extends State<DigitsManagePage> {
-  List<Digit> allDigitsList = [];
-  List<Digit> displayDigitsList = [];
+  List<TokenM> allDigitsList = [];
+  List<TokenM> displayDigitsList = [];
 
   //Tokens displayed on the page = nowWallet.nowChain.digitsList (this chain already exists, visible is displayed in front) + nativeAuthDigitsList (paged authentication tokens)
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
@@ -49,7 +60,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     bool isReloadDigitList = widget.isReloadDigitList;
     if (isReloadDigitList == null) isReloadDigitList = true;
     if (isReloadDigitList) {
-      var allNativeDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
+      List<TokenM> allNativeDigitList = loadNativeToken();
       allNativeDigitList.sort((left, right) {
         if (left.isVisible ^ right.isVisible) {
           //different state of  visible
@@ -60,27 +71,120 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       addToAllDigitsList(allNativeDigitList);
       pushToDisplayDigitList();
     }
+  }
+
+  List<TokenM> loadNativeToken() {
+    List<EthChainToken> ethChainTokens = WalletsControl.getInstance().currentWallet().ethChain.tokens.data;
+    List<TokenM> nativeTokenMList = [];
+    ethChainTokens.forEach((element) {
+      TokenM tokenM = TokenM()
+        ..shortName = element.ethChainTokenShared.tokenShared.name
+        ..contractAddress = element.contractAddress
+        ..decimal = element.ethChainTokenShared.decimal
+        ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
+        ..isVisible = element.show.isTrue();
+      nativeTokenMList.add(tokenM);
+    });
+    return nativeTokenMList;
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    List<EthTokenOpen_Token> serverTokenList = await loadServerTokenList();
+    if (serverTokenList == null) {
+      return;
+    }
+    saveToAuthToken(serverTokenList);
+    List<EthChainTokenAuth> ethChainTokenAuthList =
+        EthChainControl.getInstance().getChainEthAuthTokenList(NetType.Main, nativeDigitIndex, onePageOffSet);
     {
-      try {
-        Config config = await HandleConfig.instance.getConfig();
-        String authDigitIp = "";
-        if (config.privateConfig.authDigitIpList != null && config.privateConfig.authDigitIpList.length > 0) {
-          authDigitIp = config.privateConfig.authDigitIpList[0];
-        }
-        var param = await loadServerDigitsData(authDigitIp);
-        if (param == null || param.trim() == "") {
-          return;
-        }
-        await updateNativeAuthDigitList(param);
-      } catch (e) {
-        Logger().e("DigitsManagePage error is=>", e);
+      if (ethChainTokenAuthList == null || ethChainTokenAuthList.length == 0) {
+        isLoadAuthDigitFinish = true;
+        return;
       }
-      if (displayDigitsList.length < onePageOffSet) {
-        var tempNativeAuthDigitsList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
-        addToAllDigitsList(tempNativeAuthDigitsList);
-        pushToDisplayDigitList();
+      if (onePageOffSet == ethChainTokenAuthList.length) {
+        this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+      } else {
+        this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+        isLoadAuthDigitFinish = true;
       }
     }
+
+    var authTokenList = formatTokenMList(ethChainTokenAuthList);
+    addToAllDigitsList(authTokenList);
+    pushToDisplayDigitList();
+  }
+
+  Future<List<EthTokenOpen_Token>> loadServerTokenList() async {
+    final cashBoxType = "GA";
+    final signInfo = "82499105f009f80a1fe2f1db86efdec7";
+    final deviceId = "deviceIddddddd";
+    final apkVersion = "2.0.0";
+    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, "eeeddd", cashBoxType);
+    var channel = createClientChannel(refresh.refreshCall);
+    EthTokenOpen_QueryReq open_queryReq = new EthTokenOpen_QueryReq();
+
+    BasicClientReq basicClientReq = new BasicClientReq();
+    basicClientReq
+      ..cashboxType = cashBoxType
+      ..cashboxVersion = apkVersion
+      ..deviceId = deviceId
+      ..platformType = "aarch64-linux-android"
+      ..signature = signInfo;
+
+    PageReq pageReq = PageReq();
+    pageReq..page = 0;
+    open_queryReq
+      ..info = basicClientReq
+      ..page = pageReq
+      ..isDefault = false;
+    final ethTokenClient = EthTokenOpenFaceClient(channel);
+    EthTokenOpen_QueryRes ethTokenOpenQueryRes = await ethTokenClient.query(open_queryReq);
+    List<EthTokenOpen_Token> ethTokenList = ethTokenOpenQueryRes.tokens;
+    return ethTokenList;
+  }
+
+  List<TokenM> formatTokenMList(List<EthChainTokenAuth> ethTokenList) {
+    List<TokenM> nativeTokenMList = [];
+    try {
+      ethTokenList.forEach((element) {
+        TokenM tokenM = TokenM()
+          ..shortName = element.ethChainTokenShared.tokenShared.symbol
+          ..fullName = element.ethChainTokenShared.tokenShared.name
+          ..contractAddress = element.contractAddress
+          ..decimal = element.ethChainTokenShared.decimal
+          ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
+          ..isVisible = false;
+        nativeTokenMList.add(tokenM);
+      });
+      return nativeTokenMList;
+    } catch (e) {
+      print("EthTokenOpen_QueryReq  error is ------>" + e.toString());
+      return null;
+    }
+  }
+
+  saveToAuthToken(List<EthTokenOpen_Token> ethTokenList) async {
+    List<EthChainTokenAuth> ethChainTokenList = [];
+    ethTokenList.forEach((element) {
+      EthChainTokenAuth ethChainTokenAuth = EthChainTokenAuth();
+      ethChainTokenAuth
+        ..chainTokenSharedId = element.tokenShardId
+        ..position = element.position.toInt()
+        ..contractAddress = element.contract
+        ..netType = element.tokenShared.chainType
+        ..ethChainTokenShared.decimal = element.decimal
+        ..netType = element.tokenShared.netType
+        ..ethChainTokenShared.tokenShared.name = element.tokenShared.name
+        ..ethChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
+        ..ethChainTokenShared.gasLimit = element.gasLimit.toInt()
+        ..ethChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl;
+      ethChainTokenList.add(ethChainTokenAuth);
+    });
+    ArrayCEthChainTokenAuth arrayCEthChainTokenAuth = ArrayCEthChainTokenAuth();
+    arrayCEthChainTokenAuth.data = ethChainTokenList;
+    EthChainControl.getInstance().updateAuthTokenList(arrayCEthChainTokenAuth);
   }
 
   @override
@@ -171,14 +275,24 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           () async {
             if (isLoadAuthDigitFinish) {
               Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
-              return;
+              return [];
             }
-            List tempList = await getAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
-            if (tempList == null || tempList.length == 0) {
-              Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
-              return;
+            List<EthChainTokenAuth> ethChainTokenAuthList =
+                EthChainControl.getInstance().getChainEthAuthTokenList(NetType.Main, nativeDigitIndex, onePageOffSet);
+            {
+              if (ethChainTokenAuthList == null || ethChainTokenAuthList.length == 0) {
+                isLoadAuthDigitFinish = true;
+                return [];
+              }
+              if (onePageOffSet == ethChainTokenAuthList.length) {
+                this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+              } else {
+                this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+                isLoadAuthDigitFinish = true;
+              }
             }
-            addToAllDigitsList(tempList);
+            var authTokenList = formatTokenMList(ethChainTokenAuthList);
+            addToAllDigitsList(authTokenList);
             pushToDisplayDigitList();
           },
         );
@@ -200,7 +314,10 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           ),
           child: GestureDetector(
               onTap: () async {
-                var isExecutorSuccess = false;
+
+
+
+                /*var isExecutorSuccess = false;
                 if (displayDigitsList[index].isVisible) {
                   isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.hideDigit(displayDigitsList[index]);
                 } else {
@@ -235,7 +352,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   });
                 } else {
                   Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
-                }
+                }*/
               },
               child: Container(
                 width: ScreenUtil().setWidth(80),
@@ -287,30 +404,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     );
   }
 
-  Future<String> loadServerDigitsData(String authUrl) async {
-    if (authUrl == null || authUrl.isEmpty) {
-      return "";
-    }
-    try {
-      var result = await requestWithDeviceId(authUrl);
-      if (result["code"] != null && result["code"] == 0) {
-        return convert.jsonEncode(result["data"]).toString();
-      }
-    } catch (e) {
-      Logger().e("loadServerDigitsData error ", e.toString());
-      return "";
-    }
-    return "";
-  }
-
-  updateNativeAuthDigitList(String param) async {
-    if (param == null || param.isEmpty || (param.trim() == "")) {
-      return;
-    }
-    var updateMap = await Wallets.instance.updateAuthDigitList(param);
-    print("updateMap[isUpdateAuthDigit]=====>" + updateMap["status"].toString() + updateMap["isUpdateAuthDigit"].toString());
-  }
-
   pushToDisplayDigitList() {
     int targetLength = 0;
     if (onePageOffSet < (allDigitsList.length - displayDigitsList.length)) {
@@ -318,7 +411,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     } else {
       targetLength = allDigitsList.length - displayDigitsList.length;
     }
-    List<Digit> tempList = new List();
+    List<TokenM> tempList = [];
     for (int i = 0; i < targetLength; i++) {
       var index = i;
       tempList.add(allDigitsList[displayDigitsList.length + index]);
@@ -330,7 +423,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   //Add to displayDigitsList
-  addToAllDigitsList(List<Digit> newDigitList) {
+  addToAllDigitsList(List<TokenM> newDigitList) {
     if (newDigitList == null || newDigitList.length == 0) {
       return;
     }
@@ -365,25 +458,5 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         }
       }
     }
-  }
-
-  Future<List<Digit>> getAuthDigitList(Chain chain, int tempDigitIndex, int onePageOffSet) async {
-    Map nativeAuthMap = await Wallets.instance.getNativeAuthDigitList(Wallets.instance.nowWallet.nowChain, nativeDigitIndex, onePageOffSet);
-    if (nativeAuthMap == null) {
-      return [];
-    }
-    maxAuthTokenCount = nativeAuthMap["count"];
-    List<Digit> tempDigitsList = nativeAuthMap["authDigit"];
-    if (tempDigitsList == null || tempDigitsList.length == 0) {
-      isLoadAuthDigitFinish = true;
-      return [];
-    }
-    if (onePageOffSet == tempDigitsList.length) {
-      this.nativeDigitIndex = tempDigitIndex + onePageOffSet;
-    } else {
-      this.nativeDigitIndex = tempDigitIndex + tempDigitsList.length;
-      isLoadAuthDigitFinish = true;
-    }
-    return tempDigitsList;
   }
 }
