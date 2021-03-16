@@ -81,12 +81,6 @@ impl<T: CStruct + Any> CStruct for *mut T {
     }
 }
 
-// impl fmt::Debug for *mut c_char{
-//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         unimplemented!()
-//     }
-// }
-
 // /// 为类型 “*mut c_char”实现 trait CStruct，因为现在rust还不支持泛型特化，所不支持
 // impl CStruct for *mut c_char {
 //     fn free(&mut self) {
@@ -144,7 +138,7 @@ pub trait CR<C: CStruct, R> {
 /// c的数组需要定义两个字段，所定义一个结构体进行统一管理
 /// 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
 #[repr(C)]
-#[derive(Debug, Clone)] //,DlStruct,DlDefault
+#[derive(Debug)] //,DlStruct,DlDefault
 pub struct CArray<T: CStruct> {
     ptr: *mut T,
     //数组指针，变量命名参考 rust Vec
