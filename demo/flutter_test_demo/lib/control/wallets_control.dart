@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter_test_demo/control/balance_control.dart';
+import 'package:flutter_test_demo/control/eth_chain_control.dart';
+import 'package:flutter_test_demo/model/token_rate.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallets/enums.dart';
@@ -41,8 +44,8 @@ class WalletsControl {
     }
   }
 
-  String generateMnemonic() {
-    var mneObj = Wallets.mainIsolate().generateMnemonic();
+  String generateMnemonic(int count) {
+    var mneObj = Wallets.mainIsolate().generateMnemonic(count);
     if (!mneObj.isSuccess()) {
       Logger.getInstance().e("wallet_control ", "generateMnemonic error is false --->" + mneObj.err.toString());
       return null;
@@ -73,6 +76,17 @@ class WalletsControl {
     return allWalletObj.data1;
   }
 
+  double getWalletMoney(Wallet wallet) {
+    // todo wallet's chain's tokens * price
+    double allMoneyValue = 0.0;
+    EthChainControl.getInstance().getVisibleTokenList().forEach((element) {
+      allMoneyValue = allMoneyValue + TokenRate.instance.getMoney(element);
+    });
+    // todo BtcChainControl
+    // todo EeeChainControl
+    return allMoneyValue;
+  }
+
   bool hasAny() {
     var hasAnyObj = Wallets.mainIsolate().hasAny();
     if (!hasAnyObj.isSuccess()) {
@@ -81,7 +95,7 @@ class WalletsControl {
     return hasAnyObj.data1;
   }
 
-  Wallet currentWallet(List<Wallet> walletList) {
+  Wallet currentWallet() {
     var curWalletIdObj = Wallets.mainIsolate().currentWalletChain();
     if (curWalletIdObj.isSuccess()) {
       var walletObj = Wallets.mainIsolate().findById(curWalletIdObj.data1.walletId);

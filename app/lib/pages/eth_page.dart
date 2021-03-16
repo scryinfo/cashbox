@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
-import 'package:app/model/wallet.dart';
+import 'package:app/model/token.dart';
+import 'package:app/model/token_rate.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
@@ -29,27 +32,26 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key key, this.isForceLoadFromJni}) : super(key: key);
+class EthPage extends StatefulWidget {
+  const EthPage({Key key, this.isForceLoadFromJni}) : super(key: key);
 
   final bool isForceLoadFromJni; //Whether to force reload of wallet information
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _EthPageState createState() => _EthPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  List<Wallet> walletList = [];
-  static int singleDigitCount = 20; //Display 20 items of data on a single page, update and update 20 items at a time
+class _EthPageState extends State<EthPage> {
+  static int singlePageTokenCount = 20; //Display 20 items of data on a single page, update and update 20 items at a time
   String moneyUnitStr = "";
   num nowWalletAmount = 0.00; //The current total market price of tokens in the wallet
   List<String> moneyUnitList = [];
   String walletName = "";
-  Future digitListFuture;
-  List<Digit> allVisibleDigitsList = []; //List of all visible tokens in the current chain
-  List<Digit> displayDigitsList = []; //Information about the number of fixed tokens displayed on the current page
-  List<Chain> allVisibleChainsList = [];
+  Future tokenListFuture;
+  List<TokenM> allVisibleTokenMList = []; //List of all visible tokens in the current chain
+  List<TokenM> displayTokenMList = []; //Information about the number of fixed tokens displayed on the current page
   num chainIndex = 0; //Subscript of current chain
   Rate rateInstance;
   Timer _loadingBalanceTimerTask; // is loading balance
@@ -73,33 +75,18 @@ class _HomePageState extends State<HomePage> {
       Config config = await HandleConfig.instance.getConfig();
       moneyUnitStr = config.currency;
     }
-
     bool isForceLoadFromJni = widget.isForceLoadFromJni;
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;
-    this.walletList = [];
-    this.walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: isForceLoadFromJni);
-    for (int i = 0; i < walletList.length; i++) {
-      int index = i;
-      Wallet wallet = walletList[index];
-      if (wallet.isNowWallet == true) {
-        this.walletName = Wallets.instance.nowWallet.walletName;
-        break; //Find, terminate the loop
-      }
-    }
-    this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
-    this.allVisibleChainsList = [];
-    this.allVisibleChainsList = Wallets.instance.nowWallet.getVisibleChainList(isForceLoad: true);
-    digitListFuture = loadDisplayDigitListData();
-    chainIndex = this.allVisibleChainsList.indexOf(Wallets.instance.nowWallet.nowChain);
+    this.walletName = WalletsControl.getInstance().currentWallet().name;
+    this.allVisibleTokenMList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
+    tokenListFuture = loadDisplayTokenListData();
     if (mounted) {
-      setState(() {
-        this.walletList = walletList;
-      });
+      setState(() {});
     }
-    loadDigitBalance();
+    // loadDigitBalance();
     loadLegalCurrency();
-    loadDigitRateInfo();
-    AppInfoUtil.instance.checkAppUpgrade();
+    // loadDigitRateInfo();
+    // todo AppInfoUtil.instance.checkAppUpgrade();
   }
 
   //Processing display fiat currency usd, cny, etc.
@@ -118,7 +105,7 @@ class _HomePageState extends State<HomePage> {
 
   //Market price information (hourly changes, etc.)
   loadDigitRateInfo() async {
-    if (displayDigitsList == null || displayDigitsList.length == 0) {
+    if (displayTokenMList == null || displayTokenMList.length == 0) {
       return;
     }
     if (_loadingRateTimerTask != null) {
@@ -131,20 +118,20 @@ class _HomePageState extends State<HomePage> {
       }
       if (true) {
         List<String> rateKeys = rateInstance.digitRateMap.keys.toList();
-        for (var i = 0; i < displayDigitsList.length; i++) {
+        for (var i = 0; i < displayTokenMList.length; i++) {
           int index = i;
-          if ((this.displayDigitsList[index].shortName.toUpperCase() != null) &&
-              (rateKeys.contains(this.displayDigitsList[index].shortName.toUpperCase().trim().toString()))) {
+          if ((this.displayTokenMList[index].shortName.toUpperCase() != null) &&
+              (rateKeys.contains(this.displayTokenMList[index].shortName.toUpperCase().trim().toString()))) {
             if (mounted) {
               setState(() {
-                this.displayDigitsList[index].digitRate
-                  ..symbol = rateInstance.getSymbol(this.displayDigitsList[index])
-                  ..price = rateInstance.getPrice(this.displayDigitsList[index])
-                  ..changeDaily = rateInstance.getChangeDaily(this.displayDigitsList[index]);
+                this.displayTokenMList[index].tokenRate
+                  ..symbol = TokenRate.instance.getSymbol(this.displayTokenMList[index])
+                  ..price = TokenRate.instance.getPrice(this.displayTokenMList[index])
+                  ..changeDaily = TokenRate.instance.getChangeDaily(this.displayTokenMList[index]);
               });
             }
           } else {
-            Logger().w("digitName is not exist===>", this.displayDigitsList[index].shortName);
+            Logger().w("digitName is not exist===>", this.displayTokenMList[index].shortName);
           }
         }
       }
@@ -153,7 +140,7 @@ class _HomePageState extends State<HomePage> {
 
   //Token balance
   loadDigitBalance() async {
-    if (displayDigitsList == null || displayDigitsList.length == 0) {
+    if (displayTokenMList == null || displayTokenMList.length == 0) {
       return;
     }
     if (_loadingBalanceTimerTask != null) {
@@ -161,112 +148,50 @@ class _HomePageState extends State<HomePage> {
     }
     Config config = await HandleConfig.instance.getConfig();
     _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
-      switch (Wallets.instance.nowWallet.nowChain.chainType) {
-        case ChainType.ETH:
-        case ChainType.ETH_TEST:
-          {
-            for (var i = 0; i < displayDigitsList.length; i++) {
-              int index = i;
-              String balance = "0";
-              if (this.displayDigitsList[index].contractAddress != null && this.displayDigitsList[index].contractAddress.trim() != "") {
-                balance = await loadErc20Balance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[index].contractAddress,
-                    Wallets.instance.nowWallet.nowChain.chainType);
-                Wallets.instance
-                    .updateDigitBalance(this.displayDigitsList[index].contractAddress, this.displayDigitsList[index].digitId, balance ?? "");
-              } else if (Wallets.instance.nowWallet.nowChain.chainAddress != null && Wallets.instance.nowWallet.nowChain.chainAddress.trim() != "") {
-                balance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
-                Wallets.instance
-                    .updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayDigitsList[index].digitId, balance ?? "");
-              } else {}
-              if (balance == null || double.parse(balance) == double.parse("0")) {
-                continue;
-              }
-              allVisibleDigitsList[index].balance = balance ?? "0";
-              if (mounted) {
-                setState(() {
-                  this.displayDigitsList[index].balance = balance ?? "0";
-                });
-              }
-            }
-            loadDigitMoney(); //If you have a balance, go to calculate the money value
-          }
-          break;
-        case ChainType.EEE:
-        case ChainType.EEE_TEST:
-          {
-            ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-            for (var i = 0; i < displayDigitsList.length; i++) {
-              int index = i;
-              String balance = "0";
-
-              if (this.displayDigitsList[index].shortName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
-                Map eeeStorageKeyMap =
-                    await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, this.displayDigitsList[index].address);
-                if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
-                  try {
-                    String eeeFree = eeeStorageKeyMap["free"] ?? "0";
-                    balance = (BigInt.parse(eeeFree) / config.eeeUnit).toStringAsFixed(5) ?? "0";
-                    if (balance == null || double.parse(balance) == double.parse("0")) {
-                      continue;
-                    }
-                  } catch (e) {
-                    Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
-                  }
-                  Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
-                  this.displayDigitsList[index].balance = balance;
-                }
-              } else if (this.displayDigitsList[index].shortName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
-                Map tokenBalanceMap =
-                    await scryXNetUtil.loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, this.displayDigitsList[index].address);
-                if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
-                  try {
-                    double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
-                    balance = tokenBalance.toStringAsFixed(5);
-                    if (balance == null || double.parse(balance) == double.parse("0")) {
-                      continue;
-                    }
-                  } catch (e) {
-                    Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
-                  }
-                  this.displayDigitsList[index].balance = balance ?? "";
-                  Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
-                }
-              } else {
-                Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
-              }
-              if (mounted) {
-                setState(() {
-                  this.displayDigitsList[index].balance = balance ?? "0";
-                });
-              }
-            }
-          }
-          break;
-        default:
-          break;
+      for (var i = 0; i < displayTokenMList.length; i++) {
+        int index = i;
+        String balance = "0";
+        if (this.displayTokenMList[index].contractAddress != null && this.displayTokenMList[index].contractAddress.trim() != "") {
+          balance = await loadErc20Balance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayTokenMList[index].contractAddress,
+              Wallets.instance.nowWallet.nowChain.chainType);
+          Wallets.instance.updateDigitBalance(this.displayTokenMList[index].contractAddress, this.displayTokenMList[index].tokenId, balance ?? "");
+        } else if (Wallets.instance.nowWallet.nowChain.chainAddress != null && Wallets.instance.nowWallet.nowChain.chainAddress.trim() != "") {
+          balance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
+          Wallets.instance.updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayTokenMList[index].tokenId, balance ?? "");
+        } else {}
+        if (balance == null || double.parse(balance) == double.parse("0")) {
+          continue;
+        }
+        allVisibleTokenMList[index].balance = balance ?? "0";
+        if (mounted) {
+          setState(() {
+            this.displayTokenMList[index].balance = balance ?? "0";
+          });
+        }
       }
+      loadDigitMoney(); //If you have a balance, go to calculate the money value
     });
   }
 
   //Corresponding to the number of tokens, the value of the market fiat currency
   loadDigitMoney() {
-    if (displayDigitsList == null || displayDigitsList.length == 0) {
+    if (displayTokenMList == null || displayTokenMList.length == 0) {
       return;
     }
     if (_loadingDigitMoneyTask != null) {
       _loadingDigitMoneyTask.cancel();
     }
     _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
-      for (var i = 0; i < displayDigitsList.length; i++) {
+      for (var i = 0; i < displayTokenMList.length; i++) {
         var index = i;
         nowWalletAmount = 0;
-        var money = Rate.instance.getMoney(displayDigitsList[index]).toStringAsFixed(3);
-        allVisibleDigitsList[i].money = money;
+        var money = TokenRate.instance.getMoney(displayTokenMList[index]).toStringAsFixed(3);
+        allVisibleTokenMList[i].money = money;
         if (mounted) {
           setState(() {
-            nowWalletAmount = nowWalletAmount + Rate.instance.getMoney(displayDigitsList[index]);
+            nowWalletAmount = nowWalletAmount + TokenRate.instance.getMoney(displayTokenMList[index]);
             Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
-            displayDigitsList[index].money = money;
+            displayTokenMList[index].money = money;
           });
         }
       }
@@ -274,47 +199,47 @@ class _HomePageState extends State<HomePage> {
   }
 
   //Display token list
-  Future<List<Digit>> loadDisplayDigitListData() async {
-    if (displayDigitsList.length == 0) {
+  Future<List<TokenM>> loadDisplayTokenListData() async {
+    if (displayTokenMList.length == 0) {
       //No display data
-      if (allVisibleDigitsList.length < singleDigitCount) {
+      if (allVisibleTokenMList.length < singlePageTokenCount) {
         //Not enough pages loaded, full display
-        addDigitToDisplayList(allVisibleDigitsList.length);
+        addTokenToDisplayList(allVisibleTokenMList.length);
       } else {
-        //Super page, showing singleDigitCount.
-        addDigitToDisplayList(singleDigitCount);
+        //Super page, showing singlePageTokenCount.
+        //addDigitToDisplayList(singlePageTokenCount);
+        addTokenToDisplayList(singlePageTokenCount);
       }
     } else {
       //There are display data, continue to add
-      if (allVisibleDigitsList.length - displayDigitsList.length > singleDigitCount) {
+      if (allVisibleTokenMList.length - displayTokenMList.length > singlePageTokenCount) {
         //More than one page left
-        addDigitToDisplayList(singleDigitCount);
+        addTokenToDisplayList(singlePageTokenCount);
       } else {
         //If there is not enough one page left, all will be added.
-        addDigitToDisplayList(allVisibleDigitsList.length - displayDigitsList.length);
+        addTokenToDisplayList(allVisibleTokenMList.length - displayTokenMList.length);
       }
     }
-    return displayDigitsList;
+    return displayTokenMList;
   }
 
-  //Display allVisibleDigitsList in displayDigitsList. That is: add data to displayDigitsList
-  List<Digit> addDigitToDisplayList(int targetCount) {
-    for (var i = displayDigitsList.length; i < targetCount; i++) {
-      var digitRate = DigitRate();
-      Digit digit = EthDigit();
-      digit
-        ..digitId = allVisibleDigitsList[i].digitId
-        ..chainId = allVisibleDigitsList[i].chainId
-        ..decimal = allVisibleDigitsList[i].decimal
-        ..shortName = allVisibleDigitsList[i].shortName
-        ..fullName = allVisibleDigitsList[i].fullName
-        ..balance = allVisibleDigitsList[i].balance
-        ..contractAddress = allVisibleDigitsList[i].contractAddress
-        ..address = allVisibleDigitsList[i].address
-        ..digitRate = digitRate;
-      displayDigitsList.add(digit);
+  List<TokenM> addTokenToDisplayList(int targetCount) {
+    for (var i = displayTokenMList.length; i < targetCount; i++) {
+      TokenRate tokenRate = TokenRate.instance;
+      TokenM tokenM = TokenM();
+      tokenM
+        ..tokenId = allVisibleTokenMList[i].tokenId
+        ..chainId = allVisibleTokenMList[i].chainId
+        ..decimal = allVisibleTokenMList[i].decimal
+        ..shortName = allVisibleTokenMList[i].shortName
+        ..fullName = allVisibleTokenMList[i].fullName
+        ..balance = allVisibleTokenMList[i].balance
+        ..contractAddress = allVisibleTokenMList[i].contractAddress
+        ..address = allVisibleTokenMList[i].address
+        ..tokenRate = tokenRate;
+      displayTokenMList.add(tokenM);
     }
-    return displayDigitsList;
+    return displayTokenMList;
   }
 
   @override
@@ -348,13 +273,9 @@ class _HomePageState extends State<HomePage> {
                 _buildDigitListCard(), //Token list
               ],
             ),
-            Container(
-              child: _isShowAddDigitBtn()
-                  ? Positioned(
-                      bottom: ScreenUtil().setHeight(5),
-                      child: _buildAddDigitButton(),
-                    )
-                  : Text(""),
+            Positioned(
+              bottom: ScreenUtil().setHeight(5),
+              child: _buildAddDigitButton(),
             )
           ],
         ),
@@ -398,7 +319,7 @@ class _HomePageState extends State<HomePage> {
       height: ScreenUtil().setHeight(78),
       width: ScreenUtil().setWidth(90),
       child: FutureBuilder(
-        future: digitListFuture,
+        future: tokenListFuture,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             Logger().e("digitList future snapshot.hasError is +>", snapshot.error.toString());
@@ -409,7 +330,7 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           }
-          if (snapshot.hasData && this.displayDigitsList.length > 0) {
+          if (snapshot.hasData && this.displayTokenMList.length > 0) {
             return Container(
               padding: EdgeInsets.only(left: ScreenUtil().setWidth(3), right: ScreenUtil().setWidth(3)),
               child: _digitListWidgets(snapshot),
@@ -440,7 +361,7 @@ class _HomePageState extends State<HomePage> {
                 child: _makeDigitListItem(index),
               );
             },
-            childCount: displayDigitsList.length,
+            childCount: displayTokenMList.length,
           ),
         ),
       ],
@@ -451,10 +372,10 @@ class _HomePageState extends State<HomePage> {
           () {
             if (mounted) {
               setState(() {
-                if (displayDigitsList.length < allVisibleDigitsList.length) {
-                  // allVisibleDigitsList is still not displayed
-                  // When pulling down to refresh, load the new digit to displayDigitsList
-                  loadDisplayDigitListData();
+                if (displayTokenMList.length < allVisibleTokenMList.length) {
+                  // allVisibleTokenMList is still not displayed
+                  // When pulling down to refresh, load the new digit to displayTokenMList
+                  loadDisplayTokenListData();
                 } else {
                   Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
                   return;
@@ -484,27 +405,15 @@ class _HomePageState extends State<HomePage> {
               {
                 context.read<TransactionProvide>()
                   ..emptyDataRecord()
-                  ..setDigitName(displayDigitsList[index].shortName)
-                  ..setBalance(displayDigitsList[index].balance)
-                  ..setMoney(displayDigitsList[index].money)
-                  ..setDecimal(displayDigitsList[index].decimal)
-                  ..setFromAddress(Wallets.instance.nowWallet.nowChain.chainAddress)
-                  ..setChainType(Wallets.instance.nowWallet.nowChain.chainType)
-                  ..setContractAddress(displayDigitsList[index].contractAddress);
+                  ..setDigitName(displayTokenMList[index].shortName)
+                  ..setBalance(displayTokenMList[index].balance)
+                  ..setMoney(displayTokenMList[index].money)
+                  ..setDecimal(displayTokenMList[index].decimal)
+                  ..setFromAddress(displayTokenMList[index].address)
+                  ..setChainType(WalletsControl.getInstance().currentWallet().ethChain.chainShared.chainType.toChainType())
+                  ..setContractAddress(displayTokenMList[index].contractAddress);
               }
-              switch (Wallets.instance.nowWallet.nowChain.chainType) {
-                case ChainType.EEE:
-                case ChainType.EEE_TEST:
-                  NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
-                  break;
-                case ChainType.ETH_TEST:
-                case ChainType.ETH:
-                  NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);
-                  break;
-                default:
-                  Logger().e("switch chainType error is --->", "unknown which chainType");
-                  break;
-              }
+              NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);
             },
             child: Row(
               children: <Widget>[
@@ -531,7 +440,7 @@ class _HomePageState extends State<HomePage> {
                               Align(
                                 alignment: new FractionalOffset(0.0, 0.0),
                                 child: Text(
-                                  (displayDigitsList[index].shortName ?? "") + " * " + (displayDigitsList[index].balance ?? "0.00"),
+                                  (displayTokenMList[index].shortName ?? "") + " * " + (displayTokenMList[index].balance ?? "0.00"),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: ScreenUtil().setSp(3),
@@ -544,7 +453,7 @@ class _HomePageState extends State<HomePage> {
                                   padding: EdgeInsets.all(0.0),
                                   width: ScreenUtil().setWidth(30),
                                   child: Text(
-                                    "≈" + moneyUnitStr + " " + displayDigitsList[index].money ?? "0.00",
+                                    "≈" + moneyUnitStr + " " + displayTokenMList[index].money.toString() ?? "0.00",
                                     maxLines: 2,
                                     overflow: TextOverflow.visible,
                                     textAlign: TextAlign.right,
@@ -572,7 +481,7 @@ class _HomePageState extends State<HomePage> {
                                         " " +
                                         (rateInstance == null
                                             ? ""
-                                            : rateInstance.getPrice(displayDigitsList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
+                                            : TokenRate.instance.getPrice(displayTokenMList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: ScreenUtil().setSp(2.5),
@@ -581,7 +490,8 @@ class _HomePageState extends State<HomePage> {
                                   Padding(
                                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
                                     child: Text(
-                                      displayDigitsList[index].digitRate.getChangeDaily ?? "0%", //Market price fluctuations
+                                      "0%", //Market price fluctuations
+                                      // todo  displayTokenMList[index].tokenRate.getChangeDaily.toString() ?? "0%", //Market price fluctuations
                                       style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil().setSp(2.5)),
                                     ),
                                   )
@@ -689,7 +599,7 @@ class _HomePageState extends State<HomePage> {
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(42.75),
       child: FutureBuilder(
-          future: digitListFuture,
+          future: tokenListFuture,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text(translate('load_data_error'));
@@ -718,15 +628,16 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 onIndexChanged: (index) async {
+                  // todo 切换页面方式，leftDrawer搞定
                   bool isSetNowChain = await Wallets.instance.nowWallet.setNowChainType(Wallets.instance.nowWallet.chainList[index]);
                   if (isSetNowChain) {
                     if (mounted) {
                       setState(() {
                         this.chainIndex = index;
                         Wallets.instance.nowWallet.nowChain.chainAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
-                        this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
-                        this.displayDigitsList = [];
-                        loadDisplayDigitListData();
+                        // this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
+                        this.displayTokenMList = [];
+                        loadDisplayTokenListData();
                       });
                     }
                   }
@@ -734,7 +645,7 @@ class _HomePageState extends State<HomePage> {
                   loadDigitRateInfo();
                 },
                 index: chainIndex,
-                itemCount: this.allVisibleChainsList.length,
+                itemCount: 1,
                 viewportFraction: 0.8,
                 scale: 0.9,
                 pagination: new SwiperPagination(
@@ -825,10 +736,11 @@ class _HomePageState extends State<HomePage> {
           Container(
             child: GestureDetector(
               onTap: () {
-                if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
-                  return;
-                }
-                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), Wallets.instance.nowWallet.nowChain.chainAddress);
+                // if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
+                //   return;
+                // }
+                _navigatorToQrInfoPage(walletName, translate('chain_address_info'),
+                    WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
@@ -841,13 +753,14 @@ class _HomePageState extends State<HomePage> {
             ),
             child: GestureDetector(
               onTap: () {
-                if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
-                  return;
-                }
-                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), Wallets.instance.nowWallet.nowChain.chainAddress);
+                // if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
+                //   return;
+                // }
+                _navigatorToQrInfoPage(walletName, translate('chain_address_info'),
+                    WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
               },
               child: Text(
-                Wallets.instance.nowWallet.nowChain.chainAddress,
+                WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
                 textAlign: TextAlign.start,
                 style: TextStyle(color: Colors.lightBlueAccent),
                 maxLines: 1,
@@ -859,7 +772,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             width: ScreenUtil().setWidth(26),
             child: Text(
-              Chain.chainTypeToValue(Wallets.instance.nowWallet.nowChain.chainType),
+              ChainType.ETH.toEnumString(),
               style: TextStyle(
                 fontSize: 45,
                 color: Color.fromRGBO(255, 255, 255, 0.1),
@@ -872,19 +785,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-
-  bool _isShowAddDigitBtn() {
-    if (Wallets.instance.nowWallet == null || Wallets.instance.nowWallet.nowChain == null) {
-      return false;
-    }
-    switch (Wallets.instance.nowWallet.nowChain.chainType) {
-      case ChainType.ETH:
-      case ChainType.ETH_TEST:
-        return true;
-      default:
-        return false;
-    }
   }
 
   void _navigatorToQrInfoPage(String title, String hintInfo, String content) {

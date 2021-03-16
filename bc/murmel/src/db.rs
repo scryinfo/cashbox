@@ -9,7 +9,7 @@ use async_trait::async_trait;
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use bitcoin::{BitcoinHash, Network};
+use bitcoin::{BitcoinHash, Network, Transaction};
 use futures::executor::block_on;
 use log::{debug, error, info};
 use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo};
@@ -31,40 +31,38 @@ pub struct ChainSqlite {
 
 impl ChainSqlite {
     pub fn new(network: Network, db_file_name: &str) -> Self {
-        let rb = block_on(Self::init_rbatis(db_file_name));
-        let r = block_on(rb.exec("", MBlockHeader::create_table_script()));
-        match r {
-            Ok(a) => {
-                info!("{:?}", a);
+        let rb = block_on(async {
+            let rb = Self::init_rbatis(db_file_name).await;
+            let r = rb.exec("", MBlockHeader::create_table_script()).await;
+            match r {
+                Ok(a) => {
+                    info!("{:?}", a);
+                }
+                Err(e) => {
+                    error!("{:?}", e);
+                }
             }
-            Err(e) => {
-                error!("{:?}", e);
-            }
-        }
+            rb
+        });
         Self { rb, network }
     }
 
-    pub fn save_header(&self, header: String, timestamp: String) {
+    pub async fn save_header(
+        &self,
+        header: String,
+        timestamp: String,
+    ) -> Result<DBExecResult, Error> {
         let mut block_header = MBlockHeader::default();
         block_header.scanned = "0".to_owned();
         block_header.header = header;
         block_header.timestamp = timestamp;
-
-        let r = block_on(block_header.save(&self.rb, ""));
-        match r {
-            Ok(a) => {
-                debug!("{:?}", a);
-            }
-            Err(e) => {
-                error!("{:?}", e);
-            }
-        }
+        block_header.save(&self.rb, "").await
     }
 
     /// fetch header which needed scan
     /// scan_flag = false scan_flag does not need +1
     /// scan_flag = true scan_flag need +1
-    pub fn fetch_scan_header(&self, timestamp: String, scan_flag: bool) -> Vec<String> {
+    pub async fn fetch_scan_header(&self, timestamp: String, scan_flag: bool) -> Vec<String> {
         let w = self
             .rb
             .new_wrapper()
@@ -72,16 +70,14 @@ impl ChainSqlite {
             .and()
             .lt("scanned", 6);
         let req = PageRequest::new(1, 1000);
-        let r: Result<Page<MBlockHeader>, _> =
-            block_on(self.rb.fetch_page_by_wrapper("", &w, &req));
-        let mut block_headers: Vec<MBlockHeader> = vec![];
-        match r {
+        let r: Result<Page<MBlockHeader>, _> = self.rb.fetch_page_by_wrapper("", &w, &req).await;
+        let block_headers: Vec<MBlockHeader> = match r {
             Ok(page) => {
                 let header_vec = page.get_records();
-                block_headers = header_vec.to_vec();
+                header_vec.to_vec()
             }
-            Err(e) => error!("{:?}", e),
-        }
+            Err(_) => vec![],
+        };
         let mut headers: Vec<String> = vec![];
         for header_block in block_headers {
             headers.push(header_block.header);
@@ -105,7 +101,7 @@ impl ChainSqlite {
                 &MBlockHeader::table_name(),
                 timestamp
             );
-            let r = block_on(self.rb.exec("", &sql));
+            let r = self.rb.exec("", &sql).await;
             match r {
                 Ok(a) => {
                     debug!("=== {:?} ===", a);
@@ -120,17 +116,17 @@ impl ChainSqlite {
     }
 
     // how may headers save in block_header table
-    pub fn fetch_height(&self) -> i64 {
+    pub async fn fetch_height(&self) -> i64 {
         let w = self.rb.new_wrapper();
         let sql = format!("SELECT COUNT(*) FROM {} ", &MBlockHeader::table_name());
-        let r: Result<i64, _> = block_on(self.rb.fetch_prepare("", &sql, &w.args));
+        let r: Result<i64, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
         match r {
             Ok(r) => r,
             Err(_) => 0,
         }
     }
 
-    pub fn fetch_header_by_timestamp(&self, timestamp: String) -> i64 {
+    pub async fn fetch_header_by_timestamp(&self, timestamp: String) -> i64 {
         let w = self.rb.new_wrapper();
         let sql = format!(
             "SELECT {} FROM {} WHERE timestamp = {}",
@@ -138,7 +134,7 @@ impl ChainSqlite {
             &MBlockHeader::table_name(),
             &timestamp
         );
-        let r: Result<i64, _> = block_on(self.rb.fetch_prepare("", &sql, &w.args));
+        let r: Result<i64, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
         match r {
             Ok(r) => r,
             Err(e) => {
@@ -217,11 +213,11 @@ impl DetailSqlite {
         rb.exec("", MBtcUtxo::create_table_script()).await
     }
 
-    pub fn save_state(&self, seq: u16, state: String) {
+    pub async fn save_state(&self, seq: u16, state: String) {
         let mut tx_state = MBtcTxState::default();
         tx_state.seq = seq;
         tx_state.state = state;
-        let r = block_on(tx_state.save(&self.rb, ""));
+        let r = tx_state.save(&self.rb, "").await;
         r.map_or_else(
             |e| error!("error save_state {:?}", e),
             |r| debug!("save_state {:?}", r),
@@ -253,34 +249,34 @@ impl DetailSqlite {
         MBtcTxState::save_batch(&rb, "init_state", &mut tokens).await
     }
 
-    fn save_progress(&self, header: String, timestamp: String) {
+    async fn save_progress(&self, header: String, timestamp: String) {
         let mut progress = MProgress::default();
         progress.header = header;
         progress.timestamp = timestamp;
 
-        let r = block_on(progress.save(&self.rb, ""));
+        let r = progress.save(&self.rb, "").await;
         r.map_or_else(
             |e| error!("save_progress {:?}", e),
             |r| debug!("save_progress {:?}", r),
         );
     }
 
-    fn fetch_progress(&self) -> Option<MProgress> {
+    async fn fetch_progress(&self) -> Option<MProgress> {
         let w = self.rb.new_wrapper().eq("rowid", 1);
-        let r: Result<MProgress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
+        let r: Result<MProgress, _> = self.rb.fetch_by_wrapper("", &w).await;
         return match r {
             Ok(r) => Some(r),
             Err(_) => None,
         };
     }
 
-    pub fn update_progress(&self, header: String, timestamp: String) {
+    pub async fn update_progress(&self, header: String, timestamp: String) {
         let mut progress = MProgress::default();
         progress.header = header;
         progress.timestamp = timestamp;
 
         let w = self.rb.new_wrapper().eq("rowid", 1);
-        let r = block_on(progress.update_by_wrapper(&self.rb, "", &w, true));
+        let r = progress.update_by_wrapper(&self.rb, "", &w, true).await;
         match r {
             Ok(a) => {
                 debug!("update_progress {:?}", a);
@@ -291,15 +287,15 @@ impl DetailSqlite {
         }
     }
 
-    pub fn progress(&self) -> MProgress {
-        let progress = self.fetch_progress();
+    pub async fn progress(&self) -> MProgress {
+        let progress = self.fetch_progress().await;
         match progress {
             None => {
                 let genesis = genesis_block(self.network).header;
                 let header = genesis.bitcoin_hash().to_hex();
                 let timestamp = genesis.time.to_string();
                 info!("=== scanned newest block from genesis {:?} ===", &genesis);
-                self.save_progress(header.clone(), timestamp.clone());
+                self.save_progress(header.clone(), timestamp.clone()).await;
                 let mut progress = MProgress::default();
                 progress.header = header;
                 progress.timestamp = timestamp;
@@ -309,7 +305,7 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_btc_input_tx(
+    pub async fn save_btc_input_tx(
         &self,
         tx_id: String,
         vout: u32,
@@ -328,7 +324,7 @@ impl DetailSqlite {
         btc_input_tx.btc_tx_hash = btc_tx_hash;
         btc_input_tx.btc_tx_hexbytes = btc_tx_hexbytes;
 
-        let r = block_on(btc_input_tx.save_update(&self.rb, ""));
+        let r = btc_input_tx.save_update(&self.rb, "").await;
         match r {
             Ok(a) => {
                 debug!("save btc_input_tx {:?}", a);
@@ -339,7 +335,7 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_btc_output_tx(
+    pub async fn save_btc_output_tx(
         &self,
         value: u64,
         pk_script: String,
@@ -354,7 +350,7 @@ impl DetailSqlite {
         btc_output_tx.btc_tx_hash = btc_tx_hash;
         btc_output_tx.btc_tx_hexbytes = btc_tx_hexbytes;
 
-        let r = block_on(btc_output_tx.save_update(&self.rb, ""));
+        let r = btc_output_tx.save_update(&self.rb, "").await;
         match r {
             Ok(a) => {
                 debug!("save btc_output_tx {:?}", a);
@@ -376,7 +372,12 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_user_address(&self, address: String, compressed_pub_key: String, verify: String) {
+    pub async fn save_user_address(
+        &self,
+        address: String,
+        compressed_pub_key: String,
+        verify: String,
+    ) {
         let mut user_address = MUserAddress::default();
         user_address.address = address;
         user_address.compressed_pub_key = compressed_pub_key;
@@ -392,16 +393,16 @@ impl DetailSqlite {
         }
     }
 
-    pub fn fetch_user_address(&self) -> Option<MUserAddress> {
+    pub async fn fetch_user_address(&self) -> Option<MUserAddress> {
         let w = self.rb.new_wrapper().eq("rowid", 1);
-        let r: Result<MUserAddress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
+        let r: Result<MUserAddress, _> = self.rb.fetch_by_wrapper("", &w).await;
         match r {
             Ok(u) => Some(u),
             Err(_) => None,
         }
     }
 
-    pub fn save_local_tx(
+    pub async fn save_local_tx(
         &self,
         address_from: String,
         address_to: String,
@@ -456,7 +457,7 @@ impl DetailSqlite {
         let outputs = MBtcOutputTx::list(&self.rb, "").await;
         if let Ok(outputs) = outputs {
             for output in outputs {
-                let tx_hash = output.btc_tx_hash;
+                let tx_hash = output.btc_tx_hash.clone();
                 let idx = output.idx;
                 let w = self
                     .rb
@@ -464,7 +465,17 @@ impl DetailSqlite {
                     .eq(MBtcInputTx::tx_id, tx_hash)
                     .eq(MBtcInputTx::vout, idx);
                 let r = self.fetch_btc_input_tx(&w).await;
-                println!("{:?}", r);
+                match r {
+                    None => {
+                        let mut utxo = MBtcUtxo::default();
+                        utxo.state = "unspend".to_owned();
+                        utxo.btc_tx_hash = output.btc_tx_hash.clone();
+                        utxo.idx = output.idx;
+                        utxo.btc_tx_hexbytes = output.btc_tx_hexbytes;
+                        utxo.value = output.value;
+                    }
+                    Some(input) => {}
+                }
             }
         }
     }
@@ -479,8 +490,8 @@ impl DetailSqlite {
 }
 
 pub fn fetch_scanned_height() -> i64 {
-    let mprogress = RB_DETAIL.progress();
-    let h = RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp);
+    let mprogress = block_on(RB_DETAIL.progress());
+    let h = block_on(RB_CHAIN.fetch_header_by_timestamp(mprogress.timestamp));
     h
 }
 
@@ -517,7 +528,7 @@ pub static RB_DETAIL: Lazy<DetailSqlite> =
     Lazy::new(|| DetailSqlite::new(Network::Testnet, BTC_DETAIL_PATH));
 
 pub static VERIFY: Lazy<(Option<FilterLoadMessage>, String)> = Lazy::new(|| {
-    let user_address = RB_DETAIL.fetch_user_address();
+    let user_address = block_on(RB_DETAIL.fetch_user_address());
     match user_address {
         None => {
             info!("Did not have pubkey in database yet, calc default address and pubkey");
@@ -526,7 +537,11 @@ pub static VERIFY: Lazy<(Option<FilterLoadMessage>, String)> = Lazy::new(|| {
             let default_pubkey = calc_pubkey();
             let verify = calc_hash160(default_pubkey.as_str());
             {
-                RB_DETAIL.save_user_address(address, default_pubkey.clone(), verify.clone());
+                block_on(RB_DETAIL.save_user_address(
+                    address,
+                    default_pubkey.clone(),
+                    verify.clone(),
+                ));
             }
             let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
             (Some(filter_load_message), verify)
@@ -547,47 +562,47 @@ mod test {
 
     #[test]
     fn test_fetch_scann_header() {
-        let r = RB_CHAIN.fetch_scan_header("1296688928".to_owned(), false);
+        let r = block_on(RB_CHAIN.fetch_scan_header("1296688928".to_owned(), false));
         println!("{:?}", r);
-        let r = RB_CHAIN.fetch_scan_header("1296688928".to_owned(), true);
+        let r = block_on(RB_CHAIN.fetch_scan_header("1296688928".to_owned(), true));
         println!("{:?}", r);
     }
 
     #[test]
     fn test_fetch_height() {
-        let h = RB_CHAIN.fetch_height();
+        let h = block_on(RB_CHAIN.fetch_height());
         println!("{}", h)
     }
 
     #[test]
     fn test_fetch_scanned_header_by_timestamp() {
-        let h = RB_CHAIN.fetch_header_by_timestamp("1368475833".to_owned());
+        let h = block_on(RB_CHAIN.fetch_header_by_timestamp("1368475833".to_owned()));
         println!("{}", h)
     }
 
     #[test]
     fn test_fetch_process() {
-        let progress = RB_DETAIL.fetch_progress();
+        let progress = block_on(RB_DETAIL.fetch_progress());
         println!("{:?}", &progress);
     }
 
     #[test]
     fn test_update_progress() {
-        RB_DETAIL.update_progress(
+        block_on(RB_DETAIL.update_progress(
             "00000000ea6690ba48686a4fa690eb186000d55b6c67f30bd8d4f0a7d7f1f98b".to_owned(),
             "1337966145".to_owned(),
-        )
+        ));
     }
 
     #[test]
     fn test_progress() {
-        let progress = RB_DETAIL.progress();
+        let progress = block_on(RB_DETAIL.progress());
         println!("{:#?}", &progress);
     }
 
     #[test]
     fn test_fetch_user_address() {
-        let u = RB_DETAIL.fetch_user_address();
+        let u = block_on(RB_DETAIL.fetch_user_address());
         println!("{:?}", &u);
     }
 

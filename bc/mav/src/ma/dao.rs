@@ -179,8 +179,7 @@ impl<T> Dao<T> for T where
 }
 
 pub fn bool_from_u32<'de, D>(deserializer: D) -> std::result::Result<bool, D::Error>
-    where
-        D: Deserializer<'de>,
+    where  D: Deserializer<'de>,
 {
     match u32::deserialize(deserializer)? {
         crate::CFalse => Ok(false),
@@ -193,8 +192,7 @@ pub fn bool_from_u32<'de, D>(deserializer: D) -> std::result::Result<bool, D::Er
 }
 
 pub fn bool_to_u32<S>(x: &bool, s: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+    where S: Serializer,
 {
     let b = {
         if *x {

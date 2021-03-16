@@ -2,8 +2,8 @@
 //  Generated code. Do not modify.
 //  source: token_open.proto
 //
-// @dart = 2.7
-// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
+// @dart = 2.3
+// ignore_for_file: camel_case_types,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type
 
 import 'dart:core' as $core;
 
@@ -13,68 +13,26 @@ import 'package:protobuf/protobuf.dart' as $pb;
 import 'base.pb.dart' as $0;
 
 class TokenSharedOpen extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TokenSharedOpen', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Symbol', protoName: 'Symbol')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Name', protoName: 'Name')
-    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Publisher', protoName: 'Publisher')
-    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Project', protoName: 'Project')
-    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'LogoUrl', protoName: 'LogoUrl')
-    ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'LogoBytes', protoName: 'LogoBytes')
-    ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ChainType', protoName: 'ChainType')
-    ..aOS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Mark', protoName: 'Mark')
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('TokenSharedOpen', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
+    ..aOS(1, 'Symbol', protoName: 'Symbol')
+    ..aOS(2, 'Name', protoName: 'Name')
+    ..aOS(3, 'Publisher', protoName: 'Publisher')
+    ..aOS(4, 'Project', protoName: 'Project')
+    ..aOS(5, 'LogoUrl', protoName: 'LogoUrl')
+    ..aOS(6, 'LogoBytes', protoName: 'LogoBytes')
+    ..aOS(7, 'ChainType', protoName: 'ChainType')
+    ..aOS(8, 'Mark', protoName: 'Mark')
+    ..aOS(9, 'TokenId', protoName: 'TokenId')
+    ..aOS(10, 'NetType', protoName: 'NetType')
     ..hasRequiredFields = false
   ;
 
   TokenSharedOpen._() : super();
-  factory TokenSharedOpen({
-    $core.String symbol,
-    $core.String name,
-    $core.String publisher,
-    $core.String project,
-    $core.String logoUrl,
-    $core.String logoBytes,
-    $core.String chainType,
-    $core.String mark,
-  }) {
-    final _result = create();
-    if (symbol != null) {
-      _result.symbol = symbol;
-    }
-    if (name != null) {
-      _result.name = name;
-    }
-    if (publisher != null) {
-      _result.publisher = publisher;
-    }
-    if (project != null) {
-      _result.project = project;
-    }
-    if (logoUrl != null) {
-      _result.logoUrl = logoUrl;
-    }
-    if (logoBytes != null) {
-      _result.logoBytes = logoBytes;
-    }
-    if (chainType != null) {
-      _result.chainType = chainType;
-    }
-    if (mark != null) {
-      _result.mark = mark;
-    }
-    return _result;
-  }
+  factory TokenSharedOpen() => create();
   factory TokenSharedOpen.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory TokenSharedOpen.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   TokenSharedOpen clone() => TokenSharedOpen()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  TokenSharedOpen copyWith(void Function(TokenSharedOpen) updates) => super.copyWith((message) => updates(message as TokenSharedOpen)) as TokenSharedOpen; // ignore: deprecated_member_use
+  TokenSharedOpen copyWith(void Function(TokenSharedOpen) updates) => super.copyWith((message) => updates(message as TokenSharedOpen));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static TokenSharedOpen create() => TokenSharedOpen._();
@@ -155,156 +113,44 @@ class TokenSharedOpen extends $pb.GeneratedMessage {
   $core.bool hasMark() => $_has(7);
   @$pb.TagNumber(8)
   void clearMark() => clearField(8);
-}
 
-class EthereumTokenOpen extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'EthereumTokenOpen', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Id', protoName: 'Id')
-    ..aOM<TokenSharedOpen>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'TokenShared', protoName: 'TokenShared', subBuilder: TokenSharedOpen.create)
-    ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Decimal', $pb.PbFieldType.O3, protoName: 'Decimal')
-    ..aInt64(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'GasLimit', protoName: 'GasLimit')
-    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Contract', protoName: 'Contract')
-    ..hasRequiredFields = false
-  ;
+  @$pb.TagNumber(9)
+  $core.String get tokenId => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set tokenId($core.String v) { $_setString(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasTokenId() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearTokenId() => clearField(9);
 
-  EthereumTokenOpen._() : super();
-  factory EthereumTokenOpen({
-    $core.String id,
-    TokenSharedOpen tokenShared,
-    $core.int decimal,
-    $fixnum.Int64 gasLimit,
-    $core.String contract,
-  }) {
-    final _result = create();
-    if (id != null) {
-      _result.id = id;
-    }
-    if (tokenShared != null) {
-      _result.tokenShared = tokenShared;
-    }
-    if (decimal != null) {
-      _result.decimal = decimal;
-    }
-    if (gasLimit != null) {
-      _result.gasLimit = gasLimit;
-    }
-    if (contract != null) {
-      _result.contract = contract;
-    }
-    return _result;
-  }
-  factory EthereumTokenOpen.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory EthereumTokenOpen.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  EthereumTokenOpen clone() => EthereumTokenOpen()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  EthereumTokenOpen copyWith(void Function(EthereumTokenOpen) updates) => super.copyWith((message) => updates(message as EthereumTokenOpen)) as EthereumTokenOpen; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static EthereumTokenOpen create() => EthereumTokenOpen._();
-  EthereumTokenOpen createEmptyInstance() => create();
-  static $pb.PbList<EthereumTokenOpen> createRepeated() => $pb.PbList<EthereumTokenOpen>();
-  @$core.pragma('dart2js:noInline')
-  static EthereumTokenOpen getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<EthereumTokenOpen>(create);
-  static EthereumTokenOpen _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get id => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set id($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasId() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearId() => clearField(1);
-
-  @$pb.TagNumber(2)
-  TokenSharedOpen get tokenShared => $_getN(1);
-  @$pb.TagNumber(2)
-  set tokenShared(TokenSharedOpen v) { setField(2, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasTokenShared() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearTokenShared() => clearField(2);
-  @$pb.TagNumber(2)
-  TokenSharedOpen ensureTokenShared() => $_ensure(1);
-
-  @$pb.TagNumber(3)
-  $core.int get decimal => $_getIZ(2);
-  @$pb.TagNumber(3)
-  set decimal($core.int v) { $_setSignedInt32(2, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasDecimal() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearDecimal() => clearField(3);
-
-  @$pb.TagNumber(4)
-  $fixnum.Int64 get gasLimit => $_getI64(3);
-  @$pb.TagNumber(4)
-  set gasLimit($fixnum.Int64 v) { $_setInt64(3, v); }
-  @$pb.TagNumber(4)
-  $core.bool hasGasLimit() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearGasLimit() => clearField(4);
-
-  @$pb.TagNumber(5)
-  $core.String get contract => $_getSZ(4);
-  @$pb.TagNumber(5)
-  set contract($core.String v) { $_setString(4, v); }
-  @$pb.TagNumber(5)
-  $core.bool hasContract() => $_has(4);
-  @$pb.TagNumber(5)
-  void clearContract() => clearField(5);
+  @$pb.TagNumber(10)
+  $core.String get netType => $_getSZ(9);
+  @$pb.TagNumber(10)
+  set netType($core.String v) { $_setString(9, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasNetType() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearNetType() => clearField(10);
 }
 
 class EthTokenOpen_Token extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'EthTokenOpen.Token', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Id', protoName: 'Id')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'EthereumTokenId', protoName: 'EthereumTokenId')
-    ..aOM<EthereumTokenOpen>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'EthereumToken', protoName: 'EthereumToken', subBuilder: EthereumTokenOpen.create)
-    ..a<$core.double>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Position', $pb.PbFieldType.OD, protoName: 'Position')
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('EthTokenOpen.Token', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
+    ..aOS(1, 'Id', protoName: 'Id')
+    ..aOS(2, 'TokenShardId', protoName: 'TokenShardId')
+    ..aOM<TokenSharedOpen>(3, 'TokenShared', protoName: 'TokenShared', subBuilder: TokenSharedOpen.create)
+    ..a<$core.int>(4, 'Decimal', $pb.PbFieldType.O3, protoName: 'Decimal')
+    ..aInt64(5, 'GasLimit', protoName: 'GasLimit')
+    ..aOS(6, 'Contract', protoName: 'Contract')
+    ..a<$core.double>(7, 'Position', $pb.PbFieldType.OD, protoName: 'Position')
     ..hasRequiredFields = false
   ;
 
   EthTokenOpen_Token._() : super();
-  factory EthTokenOpen_Token({
-    $core.String id,
-    $core.String ethereumTokenId,
-    EthereumTokenOpen ethereumToken,
-    $core.double position,
-  }) {
-    final _result = create();
-    if (id != null) {
-      _result.id = id;
-    }
-    if (ethereumTokenId != null) {
-      _result.ethereumTokenId = ethereumTokenId;
-    }
-    if (ethereumToken != null) {
-      _result.ethereumToken = ethereumToken;
-    }
-    if (position != null) {
-      _result.position = position;
-    }
-    return _result;
-  }
+  factory EthTokenOpen_Token() => create();
   factory EthTokenOpen_Token.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory EthTokenOpen_Token.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   EthTokenOpen_Token clone() => EthTokenOpen_Token()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  EthTokenOpen_Token copyWith(void Function(EthTokenOpen_Token) updates) => super.copyWith((message) => updates(message as EthTokenOpen_Token)) as EthTokenOpen_Token; // ignore: deprecated_member_use
+  EthTokenOpen_Token copyWith(void Function(EthTokenOpen_Token) updates) => super.copyWith((message) => updates(message as EthTokenOpen_Token));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static EthTokenOpen_Token create() => EthTokenOpen_Token._();
@@ -324,73 +170,76 @@ class EthTokenOpen_Token extends $pb.GeneratedMessage {
   void clearId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get ethereumTokenId => $_getSZ(1);
+  $core.String get tokenShardId => $_getSZ(1);
   @$pb.TagNumber(2)
-  set ethereumTokenId($core.String v) { $_setString(1, v); }
+  set tokenShardId($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasEthereumTokenId() => $_has(1);
+  $core.bool hasTokenShardId() => $_has(1);
   @$pb.TagNumber(2)
-  void clearEthereumTokenId() => clearField(2);
+  void clearTokenShardId() => clearField(2);
 
   @$pb.TagNumber(3)
-  EthereumTokenOpen get ethereumToken => $_getN(2);
+  TokenSharedOpen get tokenShared => $_getN(2);
   @$pb.TagNumber(3)
-  set ethereumToken(EthereumTokenOpen v) { setField(3, v); }
+  set tokenShared(TokenSharedOpen v) { setField(3, v); }
   @$pb.TagNumber(3)
-  $core.bool hasEthereumToken() => $_has(2);
+  $core.bool hasTokenShared() => $_has(2);
   @$pb.TagNumber(3)
-  void clearEthereumToken() => clearField(3);
+  void clearTokenShared() => clearField(3);
   @$pb.TagNumber(3)
-  EthereumTokenOpen ensureEthereumToken() => $_ensure(2);
+  TokenSharedOpen ensureTokenShared() => $_ensure(2);
 
   @$pb.TagNumber(4)
-  $core.double get position => $_getN(3);
+  $core.int get decimal => $_getIZ(3);
   @$pb.TagNumber(4)
-  set position($core.double v) { $_setDouble(3, v); }
+  set decimal($core.int v) { $_setSignedInt32(3, v); }
   @$pb.TagNumber(4)
-  $core.bool hasPosition() => $_has(3);
+  $core.bool hasDecimal() => $_has(3);
   @$pb.TagNumber(4)
-  void clearPosition() => clearField(4);
+  void clearDecimal() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get gasLimit => $_getI64(4);
+  @$pb.TagNumber(5)
+  set gasLimit($fixnum.Int64 v) { $_setInt64(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasGasLimit() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearGasLimit() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get contract => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set contract($core.String v) { $_setString(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasContract() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearContract() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.double get position => $_getN(6);
+  @$pb.TagNumber(7)
+  set position($core.double v) { $_setDouble(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasPosition() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearPosition() => clearField(7);
 }
 
 class EthTokenOpen_QueryReq extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'EthTokenOpen.QueryReq', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
-    ..aOM<$0.BasicClientReq>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'info', subBuilder: $0.BasicClientReq.create)
-    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isDefault', protoName: 'isDefault')
-    ..aOM<$0.PageReq>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'page', subBuilder: $0.PageReq.create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('EthTokenOpen.QueryReq', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
+    ..aOM<$0.BasicClientReq>(1, 'info', subBuilder: $0.BasicClientReq.create)
+    ..aOB(2, 'isDefault', protoName: 'isDefault')
+    ..aOM<$0.PageReq>(3, 'page', subBuilder: $0.PageReq.create)
     ..hasRequiredFields = false
   ;
 
   EthTokenOpen_QueryReq._() : super();
-  factory EthTokenOpen_QueryReq({
-    $0.BasicClientReq info,
-    $core.bool isDefault,
-    $0.PageReq page,
-  }) {
-    final _result = create();
-    if (info != null) {
-      _result.info = info;
-    }
-    if (isDefault != null) {
-      _result.isDefault = isDefault;
-    }
-    if (page != null) {
-      _result.page = page;
-    }
-    return _result;
-  }
+  factory EthTokenOpen_QueryReq() => create();
   factory EthTokenOpen_QueryReq.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory EthTokenOpen_QueryReq.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   EthTokenOpen_QueryReq clone() => EthTokenOpen_QueryReq()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  EthTokenOpen_QueryReq copyWith(void Function(EthTokenOpen_QueryReq) updates) => super.copyWith((message) => updates(message as EthTokenOpen_QueryReq)) as EthTokenOpen_QueryReq; // ignore: deprecated_member_use
+  EthTokenOpen_QueryReq copyWith(void Function(EthTokenOpen_QueryReq) updates) => super.copyWith((message) => updates(message as EthTokenOpen_QueryReq));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static EthTokenOpen_QueryReq create() => EthTokenOpen_QueryReq._();
@@ -433,43 +282,19 @@ class EthTokenOpen_QueryReq extends $pb.GeneratedMessage {
 }
 
 class EthTokenOpen_QueryRes extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'EthTokenOpen.QueryRes', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
-    ..pc<EthTokenOpen_Token>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tokens', $pb.PbFieldType.PM, subBuilder: EthTokenOpen_Token.create)
-    ..aOM<$0.PageRes>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'page', subBuilder: $0.PageRes.create)
-    ..aOM<$0.Err>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'err', subBuilder: $0.Err.create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('EthTokenOpen.QueryRes', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
+    ..pc<EthTokenOpen_Token>(1, 'tokens', $pb.PbFieldType.PM, subBuilder: EthTokenOpen_Token.create)
+    ..aOM<$0.PageRes>(2, 'page', subBuilder: $0.PageRes.create)
+    ..aOM<$0.Err>(3, 'err', subBuilder: $0.Err.create)
     ..hasRequiredFields = false
   ;
 
   EthTokenOpen_QueryRes._() : super();
-  factory EthTokenOpen_QueryRes({
-    $core.Iterable<EthTokenOpen_Token> tokens,
-    $0.PageRes page,
-    $0.Err err,
-  }) {
-    final _result = create();
-    if (tokens != null) {
-      _result.tokens.addAll(tokens);
-    }
-    if (page != null) {
-      _result.page = page;
-    }
-    if (err != null) {
-      _result.err = err;
-    }
-    return _result;
-  }
+  factory EthTokenOpen_QueryRes() => create();
   factory EthTokenOpen_QueryRes.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory EthTokenOpen_QueryRes.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   EthTokenOpen_QueryRes clone() => EthTokenOpen_QueryRes()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  EthTokenOpen_QueryRes copyWith(void Function(EthTokenOpen_QueryRes) updates) => super.copyWith((message) => updates(message as EthTokenOpen_QueryRes)) as EthTokenOpen_QueryRes; // ignore: deprecated_member_use
+  EthTokenOpen_QueryRes copyWith(void Function(EthTokenOpen_QueryRes) updates) => super.copyWith((message) => updates(message as EthTokenOpen_QueryRes));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static EthTokenOpen_QueryRes create() => EthTokenOpen_QueryRes._();
@@ -506,7 +331,7 @@ class EthTokenOpen_QueryRes extends $pb.GeneratedMessage {
 }
 
 class EthTokenOpen extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'EthTokenOpen', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('EthTokenOpen', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
     ..hasRequiredFields = false
   ;
 
@@ -514,16 +339,8 @@ class EthTokenOpen extends $pb.GeneratedMessage {
   factory EthTokenOpen() => create();
   factory EthTokenOpen.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory EthTokenOpen.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   EthTokenOpen clone() => EthTokenOpen()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  EthTokenOpen copyWith(void Function(EthTokenOpen) updates) => super.copyWith((message) => updates(message as EthTokenOpen)) as EthTokenOpen; // ignore: deprecated_member_use
+  EthTokenOpen copyWith(void Function(EthTokenOpen) updates) => super.copyWith((message) => updates(message as EthTokenOpen));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static EthTokenOpen create() => EthTokenOpen._();
@@ -534,39 +351,202 @@ class EthTokenOpen extends $pb.GeneratedMessage {
   static EthTokenOpen _defaultInstance;
 }
 
+class TokenOpen_Price extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('TokenOpen.Price', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
+    ..aOS(1, 'id')
+    ..aOS(2, 'rank')
+    ..aOS(3, 'symbol')
+    ..aOS(4, 'name')
+    ..aOS(5, 'supply')
+    ..aOS(6, 'maxSupply', protoName: 'maxSupply')
+    ..aOS(7, 'marketCapUsd', protoName: 'marketCapUsd')
+    ..aOS(8, 'volumeUsd24Hr', protoName: 'volumeUsd24Hr')
+    ..aOS(9, 'priceUsd', protoName: 'priceUsd')
+    ..aOS(10, 'changePercent24Hr', protoName: 'changePercent24Hr')
+    ..aOS(11, 'vwap24Hr', protoName: 'vwap24Hr')
+    ..aOS(12, 'explorer')
+    ..hasRequiredFields = false
+  ;
+
+  TokenOpen_Price._() : super();
+  factory TokenOpen_Price() => create();
+  factory TokenOpen_Price.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TokenOpen_Price.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  TokenOpen_Price clone() => TokenOpen_Price()..mergeFromMessage(this);
+  TokenOpen_Price copyWith(void Function(TokenOpen_Price) updates) => super.copyWith((message) => updates(message as TokenOpen_Price));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static TokenOpen_Price create() => TokenOpen_Price._();
+  TokenOpen_Price createEmptyInstance() => create();
+  static $pb.PbList<TokenOpen_Price> createRepeated() => $pb.PbList<TokenOpen_Price>();
+  @$core.pragma('dart2js:noInline')
+  static TokenOpen_Price getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TokenOpen_Price>(create);
+  static TokenOpen_Price _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get rank => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set rank($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasRank() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRank() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get symbol => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set symbol($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasSymbol() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSymbol() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get name => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set name($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasName() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearName() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get supply => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set supply($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasSupply() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearSupply() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get maxSupply => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set maxSupply($core.String v) { $_setString(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasMaxSupply() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearMaxSupply() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get marketCapUsd => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set marketCapUsd($core.String v) { $_setString(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasMarketCapUsd() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearMarketCapUsd() => clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.String get volumeUsd24Hr => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set volumeUsd24Hr($core.String v) { $_setString(7, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasVolumeUsd24Hr() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearVolumeUsd24Hr() => clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.String get priceUsd => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set priceUsd($core.String v) { $_setString(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasPriceUsd() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearPriceUsd() => clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.String get changePercent24Hr => $_getSZ(9);
+  @$pb.TagNumber(10)
+  set changePercent24Hr($core.String v) { $_setString(9, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasChangePercent24Hr() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearChangePercent24Hr() => clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.String get vwap24Hr => $_getSZ(10);
+  @$pb.TagNumber(11)
+  set vwap24Hr($core.String v) { $_setString(10, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasVwap24Hr() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearVwap24Hr() => clearField(11);
+
+  @$pb.TagNumber(12)
+  $core.String get explorer => $_getSZ(11);
+  @$pb.TagNumber(12)
+  set explorer($core.String v) { $_setString(11, v); }
+  @$pb.TagNumber(12)
+  $core.bool hasExplorer() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearExplorer() => clearField(12);
+}
+
+class TokenOpen_Rate extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('TokenOpen.Rate', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
+    ..aOS(1, 'name')
+    ..a<$core.double>(2, 'value', $pb.PbFieldType.OD)
+    ..hasRequiredFields = false
+  ;
+
+  TokenOpen_Rate._() : super();
+  factory TokenOpen_Rate() => create();
+  factory TokenOpen_Rate.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TokenOpen_Rate.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  TokenOpen_Rate clone() => TokenOpen_Rate()..mergeFromMessage(this);
+  TokenOpen_Rate copyWith(void Function(TokenOpen_Rate) updates) => super.copyWith((message) => updates(message as TokenOpen_Rate));
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static TokenOpen_Rate create() => TokenOpen_Rate._();
+  TokenOpen_Rate createEmptyInstance() => create();
+  static $pb.PbList<TokenOpen_Rate> createRepeated() => $pb.PbList<TokenOpen_Rate>();
+  @$core.pragma('dart2js:noInline')
+  static TokenOpen_Rate getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TokenOpen_Rate>(create);
+  static TokenOpen_Rate _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get name => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set name($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.double get value => $_getN(1);
+  @$pb.TagNumber(2)
+  set value($core.double v) { $_setDouble(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasValue() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearValue() => clearField(2);
+}
+
 class TokenOpen_PriceRateRes extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TokenOpen.PriceRateRes', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
-    ..a<$core.List<$core.int>>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'data', $pb.PbFieldType.OY)
-    ..aOM<$0.Err>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'err', subBuilder: $0.Err.create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('TokenOpen.PriceRateRes', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
+    ..pc<TokenOpen_Price>(1, 'prices', $pb.PbFieldType.PM, subBuilder: TokenOpen_Price.create)
+    ..pc<TokenOpen_Rate>(2, 'rates', $pb.PbFieldType.PM, subBuilder: TokenOpen_Rate.create)
+    ..aOM<$0.Err>(3, 'err', subBuilder: $0.Err.create)
     ..hasRequiredFields = false
   ;
 
   TokenOpen_PriceRateRes._() : super();
-  factory TokenOpen_PriceRateRes({
-    $core.List<$core.int> data,
-    $0.Err err,
-  }) {
-    final _result = create();
-    if (data != null) {
-      _result.data = data;
-    }
-    if (err != null) {
-      _result.err = err;
-    }
-    return _result;
-  }
+  factory TokenOpen_PriceRateRes() => create();
   factory TokenOpen_PriceRateRes.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory TokenOpen_PriceRateRes.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   TokenOpen_PriceRateRes clone() => TokenOpen_PriceRateRes()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  TokenOpen_PriceRateRes copyWith(void Function(TokenOpen_PriceRateRes) updates) => super.copyWith((message) => updates(message as TokenOpen_PriceRateRes)) as TokenOpen_PriceRateRes; // ignore: deprecated_member_use
+  TokenOpen_PriceRateRes copyWith(void Function(TokenOpen_PriceRateRes) updates) => super.copyWith((message) => updates(message as TokenOpen_PriceRateRes));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static TokenOpen_PriceRateRes create() => TokenOpen_PriceRateRes._();
@@ -577,28 +557,25 @@ class TokenOpen_PriceRateRes extends $pb.GeneratedMessage {
   static TokenOpen_PriceRateRes _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$core.int> get data => $_getN(0);
-  @$pb.TagNumber(1)
-  set data($core.List<$core.int> v) { $_setBytes(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasData() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearData() => clearField(1);
+  $core.List<TokenOpen_Price> get prices => $_getList(0);
+
+  @$pb.TagNumber(2)
+  $core.List<TokenOpen_Rate> get rates => $_getList(1);
 
   @$pb.TagNumber(3)
-  $0.Err get err => $_getN(1);
+  $0.Err get err => $_getN(2);
   @$pb.TagNumber(3)
   set err($0.Err v) { setField(3, v); }
   @$pb.TagNumber(3)
-  $core.bool hasErr() => $_has(1);
+  $core.bool hasErr() => $_has(2);
   @$pb.TagNumber(3)
   void clearErr() => clearField(3);
   @$pb.TagNumber(3)
-  $0.Err ensureErr() => $_ensure(1);
+  $0.Err ensureErr() => $_ensure(2);
 }
 
 class TokenOpen extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TokenOpen', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('TokenOpen', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
     ..hasRequiredFields = false
   ;
 
@@ -606,16 +583,8 @@ class TokenOpen extends $pb.GeneratedMessage {
   factory TokenOpen() => create();
   factory TokenOpen.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory TokenOpen.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   TokenOpen clone() => TokenOpen()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  TokenOpen copyWith(void Function(TokenOpen) updates) => super.copyWith((message) => updates(message as TokenOpen)) as TokenOpen; // ignore: deprecated_member_use
+  TokenOpen copyWith(void Function(TokenOpen) updates) => super.copyWith((message) => updates(message as TokenOpen));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static TokenOpen create() => TokenOpen._();

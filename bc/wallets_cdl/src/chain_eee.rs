@@ -11,7 +11,8 @@ use crate::types::{CChainShared, CTokenShared};
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainToken {
-    pub show:bool,
+    pub show:CBool,
+    pub chainTokenSharedId:*mut c_char,
     pub eeeChainTokenShared: *mut CEeeChainTokenShared,
 }
 

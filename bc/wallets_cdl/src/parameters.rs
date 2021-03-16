@@ -9,7 +9,7 @@ use wallets_types::{
     DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,EeeChainTx
 };
 
-use crate::kits::{to_c_char, to_str, CMark, CStruct, CR};
+use crate::kits::{to_c_char, to_str, CMark, CStruct, CR, CBool};
 use crate::CArray;
 
 #[repr(C)]
@@ -149,7 +149,7 @@ pub struct  CEeeChainTx{
     pub toAddress:*mut c_char,
     pub value:*mut c_char,
     pub extension:*mut c_char,
-    pub status:bool,
+    pub status:CBool,
     pub txTimestamp:i64,
     pub txBytes:*mut c_char,
 }

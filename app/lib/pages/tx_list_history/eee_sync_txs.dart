@@ -8,6 +8,8 @@ import 'package:logger/logger.dart';
 import 'package:app/util/utils.dart';
 import 'dart:convert' as convert;
 
+import 'package:wallets/enums.dart';
+
 class RunParams {
   final String address;
   final ChainType chainType;
@@ -210,12 +212,12 @@ class EeeSyncTxs {
           return;
         }
       }
-
-      Map updateEeeMap =
-          await Wallets.instance.updateEeeSyncRecord(runParams.address, Chain.chainTypeToInt(runParams.chainType), endBlockHeight, endBlockHash);
+      // todo chainType
+      /*Map updateEeeMap = await Wallets.instance.updateEeeSyncRecord(runParams.address, Chain.chainTypeToInt(runParams.chainType), endBlockHeight,
+          endBlockHash);
       if (!_isMapStatusOk(updateEeeMap)) {
         return;
-      }
+      }*/
     }
   }
 

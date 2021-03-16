@@ -55,7 +55,7 @@ void main() {
       expect(ChainType.EEE, err.data1.chainType);
     }
     {
-      var result = wallets.generateMnemonic();
+      var result = wallets.generateMnemonic(12);
       expect(true, result.isSuccess());
       CreateWalletParameters parameters = new CreateWalletParameters();
       {

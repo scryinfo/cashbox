@@ -18,6 +18,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart';
 import '../../res/resources.dart';
 
 class EthChainTxsHistoryPage extends StatefulWidget {
@@ -35,7 +36,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
   String digitName = "";
   String fromAddress = "";
   String contractAddress = "";
-  ChainType chainType = ChainType.UNKNOWN;
+  ChainType chainType = ChainType.ETH;
   int displayTxOffset = 0;
   int refreshAddCount = 20;
 
@@ -137,23 +138,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
             child: FlatButton(
               color: Color.fromRGBO(26, 141, 198, 0.2),
               onPressed: () {
-                switch (Wallets.instance.nowWallet.nowChain.chainType) {
-                  case ChainType.ETH:
-                  case ChainType.ETH_TEST:
-                    NavigatorUtils.push(context, Routes.transferEthPage);
-                    break;
-                  case ChainType.EEE:
-                  case ChainType.EEE_TEST:
-                    NavigatorUtils.push(context, Routes.transferEeePage);
-                    break;
-                  case ChainType.BTC_TEST:
-                  case ChainType.BTC:
-                    NavigatorUtils.push(context, Routes.transferBtcPage);
-                    break;
-                  default:
-                    NavigatorUtils.push(context, Routes.transferEthPage);
-                    break;
-                }
+                NavigatorUtils.push(context, Routes.transferEthPage);
               },
               child: Text(
                 translate('transfer'),

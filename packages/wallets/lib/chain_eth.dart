@@ -1,4 +1,3 @@
-
 import 'package:wallets/result.dart';
 import 'package:wallets/wallets.dart';
 import 'dart:ffi';
@@ -11,8 +10,7 @@ import 'result.dart';
 import 'wallets_c.dart' as clib;
 
 class ChainEth {
-
-  DlResult1<String> decodeAdditionData(String encodeData){
+  DlResult1<String> decodeAdditionData(String encodeData) {
     Error err;
     String additionData;
     {
@@ -39,7 +37,7 @@ class ChainEth {
       var ptrNetType = netType.toEnumString().toCPtr();
       var ptrTxPayload = txPayload.toCPtr();
       var ptrPwd = password.toCPtr();
-      var cerr = clib.ChainEth_txSign(_ptrContext, ptrNetType,ptrTxPayload,ptrPwd, ptrSignResult);
+      var cerr = clib.ChainEth_txSign(_ptrContext, ptrNetType, ptrTxPayload, ptrPwd, ptrSignResult);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
       ptrNetType.free();
@@ -92,6 +90,24 @@ class ChainEth {
     return err;
   }
 
+  DlResult1<List<EthChainTokenAuth>> getChainEthAuthTokenList(NetType netType, int startItem, int pageSize) {
+    Error err;
+    List<EthChainTokenAuth> ect = [];
+    {
+      var ptrNetType = netType.toEnumString().toCPtr();
+      var arrayToken = clib.CArrayCEthChainTokenAuth_dAlloc();
+      var cerr = clib.ChainEth_getAuthTokenList(_ptrContext, ptrNetType, startItem, pageSize, arrayToken);
+      err = Error.fromC(cerr);
+      clib.CError_free(cerr);
+      if (err.isSuccess()) {
+        ect = ArrayCEthChainTokenAuth.fromC(arrayToken.value).data;
+      }
+      clib.CArrayCEthChainTokenAuth_dFree(arrayToken);
+    }
+
+    return DlResult1(ect, err);
+  }
+
   Error updateDefaultTokenList(ArrayCEthChainTokenDefault defaultTokens) {
     Error err;
     {
@@ -119,7 +135,8 @@ class ChainEth {
   }
 
   Wallets _wallets;
-  ChainEth(this._wallets);
-  Pointer<clib.CContext> get _ptrContext => _wallets.ptrContext;
 
+  ChainEth(this._wallets);
+
+  Pointer<clib.CContext> get _ptrContext => _wallets.ptrContext;
 }

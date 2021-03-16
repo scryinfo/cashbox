@@ -6,7 +6,8 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::dao::{self, bool_from_u32, bool_to_u32, Shared};
+use crate::CTrue;
+use crate::ma::dao::{self, Shared};
 use crate::ma::TxShared;
 
 //btc
@@ -26,8 +27,9 @@ pub struct MBtcChainToken {
     #[serde(default)]
     pub chain_type: String,
     /// 是否显示
-    #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
-    pub show: bool,
+    // #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    #[serde(default)]
+    pub show: u32,
     /// 精度
     #[serde(default)]
     pub decimal: i32,
@@ -81,7 +83,7 @@ pub struct MBtcInputTx {
     pub sequence: u32,
     // index
     #[serde(default)]
-    pub idx:u32,
+    pub idx: u32,
     // The tx hash value that include this Output unique
     #[serde(default)]
     pub btc_tx_hash: String,
@@ -130,28 +132,28 @@ impl MBtcOutputTx {
 ///     3 locked,(have signed but havn't find in btcchain yet )
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
-pub struct MBtcTxState{
+pub struct MBtcTxState {
     #[serde(default)]
-    pub seq:u16,
+    pub seq: u16,
     #[serde(default)]
-    pub state:String,
+    pub state: String,
 }
 
 impl MBtcTxState {
-    pub const fn create_table_script() -> &'static str{
+    pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_btc_tx_state.sql")
     }
 }
 
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
-pub struct MBtcUtxo{
+pub struct MBtcUtxo {
     #[serde(default)]
-    // satoshi
-    pub fee:u64,
+    // satoshi 已花费的交易才有交易费
+    pub fee:Option<u64>,
     #[serde(default)]
     // reference to btc tx state
-    pub state:String,
+    pub state: String,
     #[serde(default)]
     pub btc_tx_hash: String,
     #[serde(default)]
@@ -159,12 +161,15 @@ pub struct MBtcUtxo{
     #[serde(default)]
     pub btc_tx_hexbytes: String,
     #[serde(default)]
-    // reference to address in m_user_address
-    pub address: String,
+    // 和自己地址有关的那条output idx输出对应的value 计算交易的依据
+    pub value :u64,
+    #[serde(default)]
+    // 如果是花费的  对应一条花费的价值
+    pub spent_value :Option<u64>,
 }
 
-impl MBtcUtxo{
-    pub const fn create_table_script() -> &'static str{
+impl MBtcUtxo {
+    pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_btc_utxo.sql")
     }
 }

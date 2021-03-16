@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS m_wallet (
     mnemonic TEXT NOT NULL,
     wallet_type TEXT NOT NULL,
     net_type TEXT NOT NULL,
+    show INTEGER NOT NULL,
     id TEXT PRIMARY KEY,
     create_time INTEGER NOT NULL,
     update_time INTEGER NOT NULL

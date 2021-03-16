@@ -1,3 +1,7 @@
+import 'dart:typed_data';
+
+import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
@@ -11,7 +15,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart' as Enum;
 
 class LeftDrawer extends StatefulWidget {
   @override
@@ -29,7 +35,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   void initData() async {
     walletList = [];
-    walletList = await Wallets.instance.loadAllWalletList(); //After the homepage is loaded, the interface has been dropped, just take the cache
+    walletList = WalletsControl.getInstance().walletsAll() ?? [];
+    // walletList = await Wallets.instance.loadAllWalletList(); //After the homepage is loaded, the interface has been dropped, just take the cache
     setState(() {
       this.walletList = walletList;
     });
@@ -215,7 +222,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
-                color: walletList[index].isNowWallet ? Color.fromRGBO(60, 72, 88, 0.5) : Colors.transparent,
+                color: WalletsControl.getInstance().isCurWallet(walletList[index]) ? Color.fromRGBO(60, 72, 88, 0.5) : Colors.transparent,
                 child: GestureDetector(
                   onTap: () async {
                     bool isSuccess = await Wallets.instance.setNowWallet(walletList[index].walletId);
@@ -231,7 +238,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                       Gaps.scaleVGap(1),
                       Container(
                         width: ScreenUtil().setWidth(60),
-                        height: ScreenUtil().setWidth(14),
+                        height: ScreenUtil().setWidth(18),
                         alignment: Alignment.centerLeft,
                         color: Colors.transparent,
                         child: Column(
@@ -295,17 +302,23 @@ class _LeftDrawerState extends State<LeftDrawer> {
   }
 
   List<Widget> _buildChainListCard(Wallet wallet) {
-    List visibleChains = [];
-    visibleChains = wallet.getVisibleChainList();
+    List<Chain> visibleChains = wallet.chainList;
     List<Widget> chainsList = List.generate(visibleChains.length, (index) {
-      Chain nowChain = visibleChains[index];
-      return Container(
-        alignment: Alignment.centerLeft,
-        height: ScreenUtil().setHeight(7.5),
-        width: ScreenUtil().setWidth(15),
-        child: Text(
-          Chain.chainTypeToValue(nowChain.chainType),
-          style: TextStyle(color: Colors.black54, fontSize: ScreenUtil().setSp(3)),
+      return GestureDetector(
+        onTap: () {
+          Logger().e("check chainType ------->", visibleChains[index].chainType.toEnumString());
+          //  todo depend chainType
+          //  NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=false', clearStack: true);
+        },
+        child: Container(
+          alignment: Alignment.center,
+          height: ScreenUtil().setHeight(7.5),
+          width: ScreenUtil().setWidth(15),
+          color: index % 2 == 0 ? Colors.black12 : Colors.transparent,
+          child: Text(
+            visibleChains[index].chainType.toEnumString(),
+            style: TextStyle(color: Colors.black54, fontSize: ScreenUtil().setSp(3)),
+          ),
         ),
       );
     });

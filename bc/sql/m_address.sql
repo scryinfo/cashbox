@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS m_address (
     chain_type TEXT NOT NULL,
     address TEXT NOT NULL,
     public_key TEXT NOT NULL,
-    wallet_address BOOLEAN NOT NULL,
+    is_wallet_address INTEGER NOT NULL,
+    show INTEGER NOT NULL,
     id TEXT PRIMARY KEY,
     create_time INTEGER NOT NULL,
     update_time INTEGER NOT NULL

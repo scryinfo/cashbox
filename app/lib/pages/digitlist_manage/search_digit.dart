@@ -17,6 +17,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart';
 
 class SearchDigitPage extends StatefulWidget {
   @override
@@ -219,11 +220,11 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                     }
                     switch (Wallets.instance.nowWallet.nowChain.chainType) {
                       case ChainType.ETH:
-                      case ChainType.ETH_TEST:
+                      case ChainType.EthTest:
                         NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);
                         break;
                       case ChainType.EEE:
-                      case ChainType.EEE_TEST:
+                      case ChainType.EeeTest:
                         NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
                         break;
                       default:

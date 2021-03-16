@@ -2,8 +2,8 @@
 //  Generated code. Do not modify.
 //  source: refresh_open.proto
 //
-// @dart = 2.7
-// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
+// @dart = 2.3
+// ignore_for_file: camel_case_types,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type
 
 import 'dart:core' as $core;
 
@@ -13,88 +13,28 @@ import 'package:protobuf/protobuf.dart' as $pb;
 import 'base.pb.dart' as $0;
 
 class RefreshOpen_ConnectParameterRes extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RefreshOpen.ConnectParameterRes', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
-    ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'updateTime', protoName: 'updateTime')
-    ..aInt64(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'createTime', protoName: 'createTime')
-    ..aInt64(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'optimisticLockVersion', protoName: 'optimisticLockVersion')
-    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'host')
-    ..aInt64(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'port')
-    ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cAPem', protoName: 'cAPem')
-    ..aOS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'servicePem', protoName: 'servicePem')
-    ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cashboxKey', protoName: 'cashboxKey')
-    ..aOS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cashboxPem', protoName: 'cashboxPem')
-    ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'remark')
-    ..aOM<$0.Err>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'err', subBuilder: $0.Err.create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('RefreshOpen.ConnectParameterRes', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
+    ..aOS(1, 'id')
+    ..aInt64(2, 'updateTime', protoName: 'updateTime')
+    ..aInt64(3, 'createTime', protoName: 'createTime')
+    ..aInt64(4, 'optimisticLockVersion', protoName: 'optimisticLockVersion')
+    ..aOS(5, 'host')
+    ..aInt64(6, 'port')
+    ..aOS(7, 'cAPem', protoName: 'cAPem')
+    ..aOS(8, 'servicePem', protoName: 'servicePem')
+    ..aOS(9, 'cashboxKey', protoName: 'cashboxKey')
+    ..aOS(10, 'cashboxPem', protoName: 'cashboxPem')
+    ..aOS(11, 'remark')
+    ..aOM<$0.Err>(12, 'err', subBuilder: $0.Err.create)
     ..hasRequiredFields = false
   ;
 
   RefreshOpen_ConnectParameterRes._() : super();
-  factory RefreshOpen_ConnectParameterRes({
-    $core.String id,
-    $fixnum.Int64 updateTime,
-    $fixnum.Int64 createTime,
-    $fixnum.Int64 optimisticLockVersion,
-    $core.String host,
-    $fixnum.Int64 port,
-    $core.String cAPem,
-    $core.String servicePem,
-    $core.String cashboxKey,
-    $core.String cashboxPem,
-    $core.String remark,
-    $0.Err err,
-  }) {
-    final _result = create();
-    if (id != null) {
-      _result.id = id;
-    }
-    if (updateTime != null) {
-      _result.updateTime = updateTime;
-    }
-    if (createTime != null) {
-      _result.createTime = createTime;
-    }
-    if (optimisticLockVersion != null) {
-      _result.optimisticLockVersion = optimisticLockVersion;
-    }
-    if (host != null) {
-      _result.host = host;
-    }
-    if (port != null) {
-      _result.port = port;
-    }
-    if (cAPem != null) {
-      _result.cAPem = cAPem;
-    }
-    if (servicePem != null) {
-      _result.servicePem = servicePem;
-    }
-    if (cashboxKey != null) {
-      _result.cashboxKey = cashboxKey;
-    }
-    if (cashboxPem != null) {
-      _result.cashboxPem = cashboxPem;
-    }
-    if (remark != null) {
-      _result.remark = remark;
-    }
-    if (err != null) {
-      _result.err = err;
-    }
-    return _result;
-  }
+  factory RefreshOpen_ConnectParameterRes() => create();
   factory RefreshOpen_ConnectParameterRes.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory RefreshOpen_ConnectParameterRes.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   RefreshOpen_ConnectParameterRes clone() => RefreshOpen_ConnectParameterRes()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  RefreshOpen_ConnectParameterRes copyWith(void Function(RefreshOpen_ConnectParameterRes) updates) => super.copyWith((message) => updates(message as RefreshOpen_ConnectParameterRes)) as RefreshOpen_ConnectParameterRes; // ignore: deprecated_member_use
+  RefreshOpen_ConnectParameterRes copyWith(void Function(RefreshOpen_ConnectParameterRes) updates) => super.copyWith((message) => updates(message as RefreshOpen_ConnectParameterRes));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static RefreshOpen_ConnectParameterRes create() => RefreshOpen_ConnectParameterRes._();
@@ -216,7 +156,7 @@ class RefreshOpen_ConnectParameterRes extends $pb.GeneratedMessage {
 }
 
 class RefreshOpen extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RefreshOpen', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'rpc_face'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo('RefreshOpen', package: const $pb.PackageName('rpc_face'), createEmptyInstance: create)
     ..hasRequiredFields = false
   ;
 
@@ -224,16 +164,8 @@ class RefreshOpen extends $pb.GeneratedMessage {
   factory RefreshOpen() => create();
   factory RefreshOpen.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory RefreshOpen.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
   RefreshOpen clone() => RefreshOpen()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  RefreshOpen copyWith(void Function(RefreshOpen) updates) => super.copyWith((message) => updates(message as RefreshOpen)) as RefreshOpen; // ignore: deprecated_member_use
+  RefreshOpen copyWith(void Function(RefreshOpen) updates) => super.copyWith((message) => updates(message as RefreshOpen));
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static RefreshOpen create() => RefreshOpen._();

@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:logger/logger.dart';
 import 'package:wallet_manager/wallet_manager.dart';
+import 'package:wallets/enums.dart';
 
 import 'chain.dart';
 
@@ -102,12 +103,12 @@ class Wallet {
   // Get the current chain
   // apiNo:WM12
   Future<ChainType> getNowChainType() async {
-    Map getNowChainMap = await WalletManager.getNowChain(walletId);
+    /*Map getNowChainMap = await WalletManager.getNowChain(walletId);
     int status = getNowChainMap["status"];
     String message = getNowChainMap["message"];
     if (status == null) {
       Logger().e("getNowChain=>", "not find status code");
-      return ChainType.UNKNOWN; //0===UNKNOWN
+      return ChainType.ETH; //0===UNKNOWN
     }
     if (status == 200) {
       this.walletName = walletName; //The jni operation is complete, change the model
@@ -115,14 +116,16 @@ class Wallet {
       return chainType;
     } else {
       Logger().e("getNowChain=>", "error status is=>" + getNowChainMap["status"].toString() + "||message is=>" + message.toString());
-      return ChainType.UNKNOWN; //0===UNKNOWN
-    }
+      return ChainType.ETH; //0===UNKNOWN
+    }*/
+    return ChainType.ETH;
   }
 
   // Set current chain
   // apiNo:WM13
   Future<bool> setNowChainType(Chain chain) async {
-    int chainTypeInt = Chain.chainTypeToInt(chain.chainType);
+    // int chainTypeInt = Chain.chainTypeToInt(chain.chainType);
+    int chainTypeInt = 0;
     Map setNowChainMap = await WalletManager.setNowChainType(walletId, chainTypeInt);
     int status = setNowChainMap["status"];
     bool isSetNowChain = setNowChainMap["isSetNowChain"];

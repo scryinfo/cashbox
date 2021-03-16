@@ -88,6 +88,10 @@ class CAddress extends Struct {
   Pointer<ffi.Utf8> chainType;
   Pointer<ffi.Utf8> address;
   Pointer<ffi.Utf8> publicKey;
+  @Uint32()
+  int isWalletAddress;
+  @Uint32()
+  int show;
   static Pointer<CAddress> allocate() {
     return ffi.calloc<CAddress>();
   }
@@ -592,8 +596,9 @@ class CBtcChain extends Struct {
 }
 /// C struct `CBtcChainToken`.
 class CBtcChainToken extends Struct {
-  @Int32()
+  @Uint32()
   int show;
+  Pointer<ffi.Utf8> chainTokenSharedId;
   Pointer<CBtcChainTokenShared> btcChainTokenShared;
   static Pointer<CBtcChainToken> allocate() {
     return ffi.calloc<CBtcChainToken>();
@@ -776,8 +781,9 @@ class CEeeChain extends Struct {
 }
 /// C struct `CEeeChainToken`.
 class CEeeChainToken extends Struct {
-  @Int32()
+  @Uint32()
   int show;
+  Pointer<ffi.Utf8> chainTokenSharedId;
   Pointer<CEeeChainTokenShared> eeeChainTokenShared;
   static Pointer<CEeeChainToken> allocate() {
     return ffi.calloc<CEeeChainToken>();
@@ -841,7 +847,7 @@ class CEeeChainTx extends Struct {
   Pointer<ffi.Utf8> toAddress;
   Pointer<ffi.Utf8> value;
   Pointer<ffi.Utf8> extension;
-  @Int32()
+  @Uint32()
   int status;
   @Int64()
   int txTimestamp;
@@ -908,8 +914,10 @@ class CEthChain extends Struct {
 }
 /// C struct `CEthChainToken`.
 class CEthChainToken extends Struct {
-  @Int32()
+  Pointer<ffi.Utf8> chainTokenSharedId;
+  @Uint32()
   int show;
+  Pointer<ffi.Utf8> contractAddress;
   Pointer<CEthChainTokenShared> ethChainTokenShared;
   static Pointer<CEthChainToken> allocate() {
     return ffi.calloc<CEthChainToken>();
@@ -1175,6 +1183,7 @@ class CWallet extends Struct {
   Pointer<ffi.Utf8> id;
   Pointer<ffi.Utf8> nextId;
   Pointer<ffi.Utf8> name;
+  Pointer<ffi.Utf8> walletType;
   Pointer<CEthChain> ethChain;
   Pointer<CEeeChain> eeeChain;
   Pointer<CBtcChain> btcChain;
@@ -1972,15 +1981,18 @@ typedef _Wallets_firstContext_Dart = Pointer<CError> Function(
 );
 /// C function `Wallets_generateMnemonic`.
 Pointer<CError> Wallets_generateMnemonic(
+  int mnemonic_num,
   Pointer<Pointer<ffi.Utf8>> mnemonic,
 ) {
-  return _Wallets_generateMnemonic(mnemonic);
+  return _Wallets_generateMnemonic(mnemonic_num, mnemonic);
 }
 final _Wallets_generateMnemonic_Dart _Wallets_generateMnemonic = _dl.lookupFunction<_Wallets_generateMnemonic_C, _Wallets_generateMnemonic_Dart>('Wallets_generateMnemonic');
 typedef _Wallets_generateMnemonic_C = Pointer<CError> Function(
+  Uint32 mnemonic_num,
   Pointer<Pointer<ffi.Utf8>> mnemonic,
 );
 typedef _Wallets_generateMnemonic_Dart = Pointer<CError> Function(
+  int mnemonic_num,
   Pointer<Pointer<ffi.Utf8>> mnemonic,
 );
 /// <p class="para-brief"> 只有到CError为 Error::SUCCESS()时返值才有意义 返回值 hasAny: true表示至少有一个; Fail: false，没有</p>

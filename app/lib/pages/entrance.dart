@@ -1,5 +1,6 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/net/net_util.dart';
 import 'package:app/model/server_config_model.dart';
 import 'package:app/res/resources.dart';
@@ -15,7 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert' as convert;
-import 'home.dart';
+import 'eth_page.dart';
 import 'package:app/net/scryx_net_util.dart';
 
 class EntrancePage extends StatefulWidget {
@@ -151,7 +152,9 @@ class _EntrancePageState extends State<EntrancePage> {
 
   //Check if a wallet has been created
   Future<bool> _checkIsContainWallet() async {
-    _isContainWallet = await Wallets.instance.isContainWallet();
+    await WalletsControl.getInstance().initWallet();
+    //_isContainWallet = await Wallets.instance.isContainWallet();
+    _isContainWallet = WalletsControl.getInstance().hasAny();
     return _isContainWallet;
   }
 
@@ -176,7 +179,7 @@ class _EntrancePageState extends State<EntrancePage> {
             if (snapshot.hasData) {
               bool isContainWallet = snapshot.data;
               if (isContainWallet) {
-                return HomePage();
+                return EthPage();
               } else {
                 return _buildProtocolLayout(context);
               }

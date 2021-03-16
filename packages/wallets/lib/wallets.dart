@@ -172,12 +172,12 @@ class Wallets {
     return DlResult1(ws, err);
   }
 
-  DlResult1<String> generateMnemonic() {
+  DlResult1<String> generateMnemonic(int count) {
     Error err;
     String mn;
     {
       var ptr = clib.CStr_dAlloc();
-      var cerr = clib.Wallets_generateMnemonic(ptr);
+      var cerr = clib.Wallets_generateMnemonic(count, ptr);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
       if (err.isSuccess()) {

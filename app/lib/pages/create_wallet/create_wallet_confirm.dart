@@ -1,3 +1,4 @@
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
@@ -13,6 +14,7 @@ import '../../routers/routers.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import '../../util/qr_scan_util.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:wallets/enums.dart' as EnumKit;
 
 class CreateWalletConfirmPage extends StatefulWidget {
   @override
@@ -236,12 +238,14 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   Future<bool> _verifyMnemonicSame() async {
     if (verifyString.isNotEmpty && Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic.length != 0) {
       if (verifyString.trim() == String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).trim()) {
-        var isSuccess = await Wallets.instance.saveWallet(
+        var walletObj = WalletsControl.getInstance().createWallet(
+            Uint8List.fromList(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic),
+            EnumKit.WalletType.Normal,
             Provider.of<CreateWalletProcessProvide>(context, listen: false).walletName,
-            Provider.of<CreateWalletProcessProvide>(context, listen: false).pwd,
-            Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic,
-            WalletType.WALLET);
-        if (isSuccess) {
+            Uint8List.fromList(Provider.of<CreateWalletProcessProvide>(context, listen: false).pwd));
+        if (walletObj != null) {
+          context.read<CreateWalletProcessProvide>().setMnemonic(null);
+          context.read<CreateWalletProcessProvide>().setPwd(null);
           return true;
         } else {
           Fluttertoast.showToast(msg: translate('unknown_error_in_create_wallet'));

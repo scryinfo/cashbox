@@ -5,7 +5,8 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, db_sub_struct, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::dao::{self, bool_from_u32, bool_to_u32, Shared};
+use crate::ma::dao::{self, Shared};
+use crate::CTrue;
 
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
@@ -27,6 +28,8 @@ pub struct MWallet {
     /// [crate::NetType]
     #[serde(default)]
     pub net_type: String,
+    #[serde(default)]
+    pub show:u32,
 }
 
 impl MWallet {
@@ -68,8 +71,10 @@ pub struct MAddress {
     #[serde(default)]
     pub public_key: String,
     /// 是否为钱包地址
-    #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
-    pub wallet_address: bool,
+    #[serde(default)]
+    pub is_wallet_address: u32, //#[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    #[serde(default)]
+    pub show: u32,
 }
 
 impl MAddress {
@@ -116,7 +121,7 @@ mod tests {
     use rbatis::crud::CRUDTable;
     use rbatis::rbatis::Rbatis;
 
-    use crate::ChainType;
+    use crate::{ChainType, CTrue};
     use crate::kits::test::make_memory_rbatis_test;
     use crate::ma::{Dao, Db, DbCreateType, MAddress};
 
@@ -130,7 +135,7 @@ mod tests {
         m.wallet_id = "wallet_id".to_owned();
         m.public_key = "public_key".to_owned();
         m.address = "address".to_owned();
-        m.wallet_address = true;
+        m.wallet_address = CTrue;
 
         let re = block_on(m.save(&rb, ""));
         assert_eq!(false, re.is_err(), "{:?}", re);

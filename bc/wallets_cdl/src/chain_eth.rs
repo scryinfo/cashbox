@@ -3,14 +3,15 @@
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{EthChain, EthChainToken, EthChainTokenAuth, EthChainTokenDefault, EthChainTokenShared};
 
-use crate::kits::{CArray, CMark, CR, CStruct,to_str,to_c_char};
+use crate::kits::{CArray, CBool,CMark, CR, CStruct,to_str,to_c_char};
 use crate::types::{CChainShared, CTokenShared};
 use std::os::raw::c_char;
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthChainToken {
-    pub show:bool,
+    pub chainTokenSharedId:*mut c_char,
+    pub show:CBool,
     pub contractAddress:*mut c_char,
     pub ethChainTokenShared: *mut CEthChainTokenShared,
 }

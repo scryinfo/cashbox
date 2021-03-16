@@ -24,6 +24,7 @@ use log::Level;
 use crate::db::fetch_scanned_height;
 use crate::db::{RB_CHAIN, VERIFY};
 use crate::path::BTC_HAMMER_PATH;
+use futures::executor::block_on;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
@@ -165,7 +166,7 @@ pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(
     env: JNIEnv<'_>,
     _class: JClass<'_>,
 ) -> jstring {
-    let h = RB_CHAIN.fetch_height();
+    let h = block_on(RB_CHAIN.fetch_height());
     let h = env
         .new_string(h.to_string())
         .expect("Could not create java string!");

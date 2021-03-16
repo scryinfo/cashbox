@@ -199,7 +199,7 @@ pub struct  EeeChainTx{
     pub to_address:String,
     pub value:String,
     pub extension:String,
-    pub status:bool,
+    pub status:u32,
     pub tx_timestamp:i64,
     pub tx_bytes:String,
 }
@@ -216,7 +216,7 @@ impl From<MEeeChainTx> for EeeChainTx{
             to_address: chain_tx.to_address.clone(),
             value: chain_tx.value.clone(),
             extension: chain_tx.extension.clone(),
-            status: chain_tx.status,
+            status: chain_tx.status as u32,
             tx_timestamp: chain_tx.tx_shared.tx_timestamp,
             tx_bytes: chain_tx.tx_shared.tx_bytes.clone()
         }

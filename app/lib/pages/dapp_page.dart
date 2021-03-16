@@ -22,6 +22,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:package_info/package_info.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class DappPage extends StatefulWidget {
@@ -115,7 +116,8 @@ class _DappPageState extends State<DappPage> {
                       onPageFinished: (String url) async {
                         await Wallets.instance.loadAllWalletList(isForceLoadFromJni: false);
                         nowWallet = Wallets.instance.nowWallet;
-                        {
+                        // todo chainType
+                        /*{
                           //eee
                           String address = '';
                           {
@@ -132,9 +134,9 @@ class _DappPageState extends State<DappPage> {
                           } else {
                             print('Page finished loading================================>:eee address is null');
                           }
-                        }
+                        }*/
 
-                        {
+                        /*{
                           //eth
                           String address = '';
                           {
@@ -150,8 +152,8 @@ class _DappPageState extends State<DappPage> {
                             print('Page finished loading================================>:eth address is null');
                           }
                         }
-
-                        {
+*/
+                        /*{
                           //btc
                           String address = '';
                           {
@@ -166,7 +168,7 @@ class _DappPageState extends State<DappPage> {
                           } else {
                             print('Page finished loading================================>:btc address is null');
                           }
-                        }
+                        }*/
                         print('Page finished loading================================>: $url');
                       },
                     ),
@@ -380,9 +382,9 @@ class _DappPageState extends State<DappPage> {
           try {
             Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
             ChainType chainType = ChainType.ETH;
-            if (wallet.walletType == WalletType.TEST_WALLET) {
-              chainType = ChainType.ETH_TEST;
-            }
+            // if (wallet.walletType == WalletType.TEST_WALLET) {
+            //   chainType = ChainType.ETH_TEST;
+            // }
             loadTxAccount(wallet.getChainByChainType(chainType).chainAddress, chainType).then((nonce) {
               msg.data = nonce;
               this.callPromise(msg);
@@ -411,10 +413,11 @@ class _DappPageState extends State<DappPage> {
                     var pwdFormat = pwd.codeUnits;
                     Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
                     ChainType chainType = ChainType.ETH;
-                    if (wallet.walletType == WalletType.TEST_WALLET) {
-                      chainType = ChainType.ETH_TEST;
-                    }
-                    Wallets.instance
+                    // todo
+                    // if (wallet.walletType == WalletType.TEST_WALLET) {
+                    //   chainType = ChainType.ETH_TEST;
+                    // }
+                    /*Wallets.instance
                         .ethRawTxSign(msg.data, Chain.chainTypeToInt(chainType), wallet.getChainByChainType(chainType).chainAddress,
                             Uint8List.fromList(pwdFormat))
                         .then((map) {
@@ -435,7 +438,7 @@ class _DappPageState extends State<DappPage> {
                       this.callPromise(msg).then((value) {
                         NavigatorUtils.goBack(context);
                       });
-                    });
+                    });*/
                   } catch (e) {
                     print("cashboxEthRawTxSign: " + e.toString());
                     msg.err = "inner error";
@@ -453,7 +456,8 @@ class _DappPageState extends State<DappPage> {
         name: "cashboxEthSendSignedTx",
         onMessageReceived: (JavascriptMessage message) async {
           var msg = Message.fromJson(jsonDecode(message.message));
-          try {
+          // todo
+          /*try {
             Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
             ChainType chainType = ChainType.ETH;
             if (wallet.walletType == WalletType.TEST_WALLET) {
@@ -467,14 +471,15 @@ class _DappPageState extends State<DappPage> {
             Logger().d("cashboxEthSendSignedTx===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
-          }
+          }*/
         }));
 
     jsChannelList.add(JavascriptChannel(
         name: "cashboxEthCall",
         onMessageReceived: (JavascriptMessage message) async {
           var msg = Message.fromJson(jsonDecode(message.message));
-          try {
+          // todo
+          /*try {
             List<String> data = msg.data.split(",");
 
             Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
@@ -488,7 +493,7 @@ class _DappPageState extends State<DappPage> {
             Logger().d("cashboxEthCall===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
-          }
+          }*/
         }));
 
     //eee start
@@ -509,7 +514,8 @@ class _DappPageState extends State<DappPage> {
                     var pwdFormat = pwd.codeUnits;
                     Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
                     ChainType chainType = ChainType.EEE;
-                    if (wallet.walletType == WalletType.TEST_WALLET) {
+                    // todo
+                    /*if (wallet.walletType == WalletType.TEST_WALLET) {
                       chainType = ChainType.EEE_TEST;
                     }
                     Wallets.instance.eeeTxSign(wallet.walletId, Uint8List.fromList(pwdFormat), msg.data).then((map) {
@@ -533,7 +539,7 @@ class _DappPageState extends State<DappPage> {
                       this.callPromise(msg).then((value) {
                         NavigatorUtils.goBack(context);
                       });
-                    });
+                    });*/
                   } catch (e) {
                     Logger().d("cashboxEeeRawTxSign===>", e.toString());
                     msg.err = "inner error";

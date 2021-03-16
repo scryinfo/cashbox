@@ -9,7 +9,7 @@ use strum_macros::EnumIter;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::ma::dao::{self, bool_from_u32, bool_to_u32, Shared};
+use crate::ma::dao::{self, Shared};
 use crate::ma::TxShared;
 
 //eth
@@ -33,8 +33,9 @@ pub struct MEthChainToken {
     #[serde(default)]
     pub contract_address: String,
     /// 是否显示
-    #[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
-    pub show: bool,
+    //#[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    #[serde(default)]
+    pub show: u32,
     /// 精度
     #[serde(default)]
     pub decimal: i32,

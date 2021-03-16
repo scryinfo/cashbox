@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/util/qr_scan_util.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:wallets/enums.dart' as EnumKit;
 import '../../res/resources.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
@@ -467,9 +469,13 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
 
   Future _checkAndDoImportWallet() async {
     if (_verifyImportWallet()) {
-      var isSuccess = await Wallets.instance.saveWallet(_walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
-          Uint8List.fromList(_mneController.text.codeUnits), WalletType.WALLET);
-      if (isSuccess) {
+      var walletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mneController.text.codeUnits), EnumKit.WalletType.Normal,
+          _walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
+      // var isSuccess = await Wallets.instance.saveWallet(_walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
+      //     Uint8List.fromList(_mneController.text.codeUnits), WalletType.WALLET);
+      if (walletObj != null) {
+        _mneController.text = "";
+        _pwdController.text = "";
         NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
       } else {
         Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);

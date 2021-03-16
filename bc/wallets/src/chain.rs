@@ -5,7 +5,7 @@ use strum::IntoEnumIterator;
 
 use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
 use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType};
-use mav::{NetType, WalletType};
+use mav::{NetType, WalletType, CTrue};
 use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx};
 
 use codec::Decode;
@@ -53,12 +53,8 @@ impl ChainTrait for EthChain {
                 token.chain_token_shared_id = default_token.chain_token_shared_id.clone();
                 token.wallet_id = wallet.id.clone();
                 token.chain_type = wallets_types::EthChain::chain_type(&wallet_type).to_string();
-                token.show = true;
+                token.show = CTrue;
                 token.contract_address= default_token.contract_address.clone();
-                //todo how to
-                // gas_limit: 0,
-                // gas_price: "".to_string(),
-                // decimal: 0
                 tokens.push(token);
             }
             MEthChainToken::save_batch(token_rb, &tx.tx_id, &mut tokens).await?;
@@ -102,7 +98,7 @@ impl ChainTrait for EeeChain {
                 token.chain_token_shared_id = it.chain_token_shared_id.clone();
                 token.wallet_id = wallet.id.clone();
                 token.chain_type = wallets_types::EeeChain::chain_type(&wallet_type).to_string();
-                token.show = true;
+                token.show = CTrue;
                 token.decimal = it.chain_token_shared.decimal;
                 //todo how to
                 // decimal: 0
@@ -139,7 +135,7 @@ impl ChainTrait for BtcChain {
                 token.chain_token_shared_id = it.chain_token_shared_id.clone();
                 token.wallet_id = wallet.id.clone();
                 token.chain_type = wallets_types::EeeChain::chain_type(&wallet_type).to_string();
-                token.show = true;
+                token.show = CTrue;
                 token.decimal = it.chain_token_shared.decimal;
                 //todo how to
                 // decimal: 0
@@ -674,7 +670,7 @@ impl EeeChain {
            chain_tx.wallet_account=extrinsic_ctx.account.clone();
             chain_tx.extension = tx_detail.ext_data.clone().unwrap_or_default();
             chain_tx.value = tx_detail.value.unwrap().to_string();
-            chain_tx.status = is_successful;
+            chain_tx.status = is_successful as u32;
             chain_tx.tx_shared.signer = tx_detail.signer.clone().unwrap_or_default();
             chain_tx.tx_shared.block_hash = extrinsic_ctx.block_hash.clone();
             chain_tx.tx_shared.block_number = extrinsic_ctx.block_number.clone();
@@ -695,7 +691,7 @@ impl EeeChain {
             chain_tx.wallet_account=extrinsic_ctx.account.clone();
             chain_tx.extension = tx_detail.ext_data.clone().unwrap_or_default();
             chain_tx.value = tx_detail.value.unwrap().to_string();
-            chain_tx.status = is_successful;
+            chain_tx.status = is_successful as u32;
             chain_tx.tx_shared.signer  = tx_detail.signer.clone().unwrap_or_default();
             chain_tx.tx_shared.block_hash = extrinsic_ctx.block_hash.clone();
             chain_tx.tx_shared.block_number = extrinsic_ctx.block_number.clone();
@@ -791,9 +787,9 @@ impl EthChainTrait for EthChain {
                 }
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
-            let mut token_default = token.m.clone();
-            token_default.chain_token_shared_id = shared.id;
-            token_default.save(token_rb, &tx.tx_id).await?;
+            let mut token_auth = token.m.clone();
+            token_auth.chain_token_shared_id = shared.id;
+            token_auth.save(token_rb, &tx.tx_id).await?;
         }
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
