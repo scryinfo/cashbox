@@ -335,7 +335,7 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_btc_output_tx(
+    pub async fn save_btc_output_tx(
         &self,
         value: u64,
         pk_script: String,
@@ -350,7 +350,7 @@ impl DetailSqlite {
         btc_output_tx.btc_tx_hash = btc_tx_hash;
         btc_output_tx.btc_tx_hexbytes = btc_tx_hexbytes;
 
-        let r = block_on(btc_output_tx.save_update(&self.rb, ""));
+        let r = btc_output_tx.save_update(&self.rb, "").await;
         match r {
             Ok(a) => {
                 debug!("save btc_output_tx {:?}", a);
@@ -372,7 +372,12 @@ impl DetailSqlite {
         }
     }
 
-    pub fn save_user_address(&self, address: String, compressed_pub_key: String, verify: String) {
+    pub async fn save_user_address(
+        &self,
+        address: String,
+        compressed_pub_key: String,
+        verify: String,
+    ) {
         let mut user_address = MUserAddress::default();
         user_address.address = address;
         user_address.compressed_pub_key = compressed_pub_key;
@@ -388,16 +393,16 @@ impl DetailSqlite {
         }
     }
 
-    pub fn fetch_user_address(&self) -> Option<MUserAddress> {
+    pub async fn fetch_user_address(&self) -> Option<MUserAddress> {
         let w = self.rb.new_wrapper().eq("rowid", 1);
-        let r: Result<MUserAddress, _> = block_on(self.rb.fetch_by_wrapper("", &w));
+        let r: Result<MUserAddress, _> = self.rb.fetch_by_wrapper("", &w).await;
         match r {
             Ok(u) => Some(u),
             Err(_) => None,
         }
     }
 
-    pub fn save_local_tx(
+    pub async fn save_local_tx(
         &self,
         address_from: String,
         address_to: String,
@@ -523,7 +528,7 @@ pub static RB_DETAIL: Lazy<DetailSqlite> =
     Lazy::new(|| DetailSqlite::new(Network::Testnet, BTC_DETAIL_PATH));
 
 pub static VERIFY: Lazy<(Option<FilterLoadMessage>, String)> = Lazy::new(|| {
-    let user_address = RB_DETAIL.fetch_user_address();
+    let user_address = block_on(RB_DETAIL.fetch_user_address());
     match user_address {
         None => {
             info!("Did not have pubkey in database yet, calc default address and pubkey");
@@ -532,7 +537,11 @@ pub static VERIFY: Lazy<(Option<FilterLoadMessage>, String)> = Lazy::new(|| {
             let default_pubkey = calc_pubkey();
             let verify = calc_hash160(default_pubkey.as_str());
             {
-                RB_DETAIL.save_user_address(address, default_pubkey.clone(), verify.clone());
+                block_on(RB_DETAIL.save_user_address(
+                    address,
+                    default_pubkey.clone(),
+                    verify.clone(),
+                ));
             }
             let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
             (Some(filter_load_message), verify)
@@ -579,10 +588,10 @@ mod test {
 
     #[test]
     fn test_update_progress() {
-        RB_DETAIL.update_progress(
+        block_on(RB_DETAIL.update_progress(
             "00000000ea6690ba48686a4fa690eb186000d55b6c67f30bd8d4f0a7d7f1f98b".to_owned(),
             "1337966145".to_owned(),
-        );
+        ));
     }
 
     #[test]
@@ -593,7 +602,7 @@ mod test {
 
     #[test]
     fn test_fetch_user_address() {
-        let u = RB_DETAIL.fetch_user_address();
+        let u = block_on(RB_DETAIL.fetch_user_address());
         println!("{:?}", &u);
     }
 

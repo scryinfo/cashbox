@@ -196,13 +196,13 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                     let btc_tx_hash = tx.bitcoin_hash().to_hex();
                     let btc_tx_hexbytes = btc_serialize(tx);
                     let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
-                    RB_DETAIL.save_btc_output_tx(
+                    block_on(RB_DETAIL.save_btc_output_tx(
                         value,
                         script.asm(),
                         index as u32,
                         btc_tx_hash,
                         btc_tx_hexbytes,
-                    );
+                    ));
                 }
             }
         }
