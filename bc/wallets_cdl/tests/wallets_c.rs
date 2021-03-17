@@ -5,23 +5,24 @@ use futures::task::SpawnExt;
 
 use mav::{kits, WalletType};
 use std::os::raw::c_char;
-use wallets_cdl::mem_c::{CArrayCWallet_dAlloc, CArrayCWallet_dFree, CStr_free};
-use wallets_cdl::wallets_c::{Wallets_all, Wallets_appPlatformType, Wallets_removeWallet};
+
 use wallets_cdl::{
+    to_c_char, to_str, CStruct,
     mem_c::{
         CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc,
-        CWallet_dFree,
+        CWallet_dFree,CArrayCWallet_dAlloc, CArrayCWallet_dFree, CStr_free
     },
-    parameters::{CContext, CCreateWalletParameters, CInitParameters},
+    parameters::{CContext, CCreateWalletParameters, CInitParameters,CWalletTokenStatus},
     types::{CError, CWallet, CR, CU64},
     wallets_c::{
         Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init,
-        Wallets_uninit,
+        Wallets_uninit,Wallets_all, Wallets_appPlatformType, Wallets_removeWallet,Wallets_changeTokenShowState
     },
     CArray,
 };
-use wallets_cdl::{to_c_char, to_str, CStruct};
-use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet};
+
+use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, WalletTokenStatus};
+
 
 #[test]
 fn executor_test() {
@@ -168,19 +169,14 @@ fn plat_type_test() {
 #[test]
 fn wallets_test() {
     init_test();
+
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_ctx = {
-            let c_ctx = CContext_dAlloc();
-            let parameters = init_parameters();
-            let mut c_parameters = CInitParameters::to_c_ptr(&parameters);
-            {
-                let c_err = Wallets_init(c_parameters, c_ctx) as *mut CError;
-                assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-                CError_free(c_err);
-            }
-            c_parameters.free();
-            c_ctx
-        };
+
+        let c_err = init_ctx_parameters(c_ctx);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
 
         let mnemonic = {
             let p_mn = CStr_dAlloc();
@@ -262,11 +258,39 @@ fn wallets_test() {
         let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
-        let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+        let _wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
         CArrayCWallet_dFree(c_array_wallet);
         CContext_dFree(c_ctx);
     }
 }
+
+#[test]
+fn wallet_token_status_change_test() {
+    //Wallets_changeTokenShowState
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+
+    unsafe {
+        let c_err = init_ctx_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let tokens_status = WalletTokenStatus {
+            wallet_id: "aa9edc1c-92b3-44ad-93e6-fcf916f42f0d".to_string(),
+            chain_type: "ETH".to_string(),
+            token_id: "7eef16c3-c47f-4f47-b0e9-e3a39897c8d7".to_string(),
+            is_show: 0
+        };
+        let mut c_tokens_status = CWalletTokenStatus::to_c_ptr(&tokens_status);
+        let c_err = Wallets_changeTokenShowState(*c_ctx, to_c_char("Main"), c_tokens_status) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        c_tokens_status.free();
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+
+
+
 
 //单元测试是并行的，这里把它放入一个测试中进行测试，以减少并行给单元测试带来的问题
 fn init_test() {
@@ -379,4 +403,16 @@ fn init_parameters() -> InitParameters {
     p.db_name.0 = mav::ma::DbName::new("test_", "");
     p.context_note = format!("test_{}", kits::uuid());
     p
+}
+
+fn init_ctx_parameters(c_ctx: *mut *mut CContext) -> *mut CError {
+  /*  let mut p = InitParameters::default();
+    p.db_name.0 = mav::ma::DbName::new("test_", "");
+    p.context_note = format!("test_{}", kits::uuid());*/
+    let c_parameters = CInitParameters::to_c_ptr(&init_parameters());
+
+    let c_err = unsafe {
+        Wallets_init(c_parameters, c_ctx) as *mut CError
+    };
+    c_err
 }

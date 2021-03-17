@@ -6,7 +6,6 @@ use wallets_macro::{db_append_shared, db_sub_struct, DbBeforeSave, DbBeforeUpdat
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
-use crate::CTrue;
 
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]

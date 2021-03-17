@@ -98,6 +98,15 @@ pub struct AccountInfo {
 }
 
 
+#[repr(C)]
+#[derive(Debug, Default, Clone)]
+pub struct WalletTokenStatus{
+    pub wallet_id: String,
+    pub chain_type: String,
+    pub token_id: String,
+    pub is_show: u32,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct DecodeAccountInfoParameters {
     pub encode_data: String,

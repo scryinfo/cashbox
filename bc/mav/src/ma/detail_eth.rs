@@ -113,6 +113,29 @@ impl MEthChainTokenDefault {
         std::include_str!("../../../sql/m_eth_chain_token_default.sql")
     }
 }
+
+#[db_append_shared]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+pub struct MEthChainTokenNonAuth {
+    #[serde(default)]
+    pub chain_token_shared_id: String,
+    #[serde(default)]
+    pub net_type: String,
+    #[serde(default)]
+    pub contract_address: String,
+    /// 显示位置，以此从小到大排列
+    #[serde(default)]
+    pub position: i64,
+   /* #[serde(skip)]
+    pub chain_token_shared: MEthChainTokenShared,*/
+}
+
+impl MEthChainTokenNonAuth {
+    pub const fn create_table_script() -> &'static str {
+        std::include_str!("../../../sql/m_eth_chain_token_non_auth.sql")
+    }
+}
+
 //eth end
 
 #[cfg(test)]

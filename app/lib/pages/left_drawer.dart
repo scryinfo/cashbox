@@ -18,6 +18,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart' as Enum;
+import 'package:wallets/enums.dart';
 
 class LeftDrawer extends StatefulWidget {
   @override
@@ -35,8 +36,9 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   void initData() async {
     walletList = [];
-    walletList = WalletsControl.getInstance().walletsAll() ?? [];
-    // walletList = await Wallets.instance.loadAllWalletList(); //After the homepage is loaded, the interface has been dropped, just take the cache
+    walletList =
+        WalletsControl.getInstance().walletsAll() ?? []; //After the ethHomePage is loaded, the interface has been dropped, just take the cache
+
     setState(() {
       this.walletList = walletList;
     });
@@ -222,14 +224,15 @@ class _LeftDrawerState extends State<LeftDrawer> {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
-                color: WalletsControl.getInstance().isCurWallet(walletList[index]) ? Color.fromRGBO(60, 72, 88, 0.5) : Colors.transparent,
+                color: WalletsControl.getInstance().isCurWallet(walletList[index]) ? Color.fromRGBO(152, 245, 255, 0.5) : Colors.transparent,
                 child: GestureDetector(
                   onTap: () async {
-                    bool isSuccess = await Wallets.instance.setNowWallet(walletList[index].walletId);
-                    if (isSuccess) {
-                      NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=false', clearStack: true);
+                    // todo
+                    bool isSaveOk = WalletsControl.getInstance().saveCurrentWalletChain(walletList[index].walletId, ChainType.ETH);
+                    if (isSaveOk) {
+                      NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
                     } else {
-                      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+                      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
                     }
                   },
                   child: Column(
@@ -273,6 +276,9 @@ class _LeftDrawerState extends State<LeftDrawer> {
                                 ),
                               ],
                             ),
+                            Container(
+                              height: ScreenUtil().setHeight(2),
+                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: _buildChainListCard(walletList[index]),
@@ -302,22 +308,30 @@ class _LeftDrawerState extends State<LeftDrawer> {
   }
 
   List<Widget> _buildChainListCard(Wallet wallet) {
-    List<Chain> visibleChains = wallet.chainList;
+    List<Chain> visibleChains = wallet.getVisibleChainList();
     List<Widget> chainsList = List.generate(visibleChains.length, (index) {
       return GestureDetector(
         onTap: () {
           Logger().e("check chainType ------->", visibleChains[index].chainType.toEnumString());
-          //  todo depend chainType
-          //  NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=false', clearStack: true);
+          switch (visibleChains[index].chainType) {
+            case Enum.ChainType.ETH:
+              NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
+              break;
+            case Enum.ChainType.EEE:
+              NavigatorUtils.push(context, '${Routes.eeeHomePage}?isForceLoadFromJni=false', clearStack: true);
+              break;
+            default:
+              break;
+          }
         },
         child: Container(
-          alignment: Alignment.center,
+          alignment: Alignment.centerLeft,
           height: ScreenUtil().setHeight(7.5),
           width: ScreenUtil().setWidth(15),
-          color: index % 2 == 0 ? Colors.black12 : Colors.transparent,
+          color: Colors.transparent,
           child: Text(
             visibleChains[index].chainType.toEnumString(),
-            style: TextStyle(color: Colors.black54, fontSize: ScreenUtil().setSp(3)),
+            style: TextStyle(color: Color.fromRGBO(87, 205, 242, 1), fontSize: ScreenUtil().setSp(3)),
           ),
         ),
       );

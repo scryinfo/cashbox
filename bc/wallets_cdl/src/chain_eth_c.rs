@@ -11,7 +11,7 @@ use super::kits::{CR, to_c_char, to_str};
 use crate::parameters::{CContext, CEthTransferPayload, CEthRawTxPayload};
 use crate::CStruct;
 use crate::kits::CArray;
-use crate::chain_eth::{CEthChainTokenAuth, CEthChainTokenDefault};
+use crate::chain_eth::{CEthChainTokenAuth, CEthChainTokenDefault, CEthChainTokenNonAuth};
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_decodeAdditionData(ctx: *mut CContext, encodeData: *mut c_char, additionData: *mut *mut c_char) -> *const CError {
@@ -147,7 +147,6 @@ pub unsafe extern "C" fn ChainEth_updateAuthTokenList(ctx: *mut CContext, authTo
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_getAuthTokenList(ctx: *mut CContext,netType: *mut c_char, startItem:c_uint,pageSize:c_uint, tokens: *mut *mut CArray<CEthChainTokenAuth>) -> *const CError {
     log::debug!("enter ChainEth getDigitList");
-
     if ctx.is_null() || tokens.is_null() ||netType.is_null(){
         let err = Error::PARAMETER().append_message(" : ctx,tokens,netType is null");
         log::error!("{}", err);
@@ -208,11 +207,9 @@ pub unsafe extern "C" fn ChainEth_updateDefaultTokenList(ctx: *mut CContext, def
     CError::to_c_ptr(&err)
 }
 
-
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_getDefaultTokenList(ctx: *mut CContext,netType: *mut c_char,tokens: *mut *mut CArray<CEthChainTokenDefault>) -> *const CError {
     log::debug!("enter ChainEth getDigitList");
-
     if ctx.is_null() || tokens.is_null() ||netType.is_null(){
         let err = Error::PARAMETER().append_message(" : ctx,tokens,netType is null");
         log::error!("{}", err);
@@ -244,9 +241,8 @@ pub unsafe extern "C" fn ChainEth_getDefaultTokenList(ctx: *mut CContext,netType
 
 //support non auth digit?
 #[no_mangle]
-pub unsafe extern "C" fn ChainEth_addNonAuthDigit(ctx: *mut CContext, tokens: *mut CArray<CEthChainTokenAuth>) -> *const CError {
+pub unsafe extern "C" fn ChainEth_updateNonAuthTokenList(ctx: *mut CContext, tokens: *mut CArray<CEthChainTokenNonAuth>) -> *const CError {
     log::debug!("enter ChainEth addNonAuthDigit");
-
     if ctx.is_null() || tokens.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,tokens is null");
         log::error!("{}", err);
@@ -259,9 +255,43 @@ pub unsafe extern "C" fn ChainEth_addNonAuthDigit(ctx: *mut CContext, tokens: *m
         match contexts.get(&ctx.id) {
             Some(wallets) => {
                 let eth_chain = wallets.eth_chain_instance();
-                let auth_tokens = CArray::<CEthChainTokenAuth>::ptr_rust(tokens);
-                match block_on(eth_chain.update_auth_tokens(wallets, auth_tokens)) {
+                let non_auth_tokens = CArray::<CEthChainTokenNonAuth>::ptr_rust(tokens);
+                match block_on(eth_chain.update_non_auth_tokens(wallets, non_auth_tokens)) {
                     Ok(_) => {
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+
+#[no_mangle]
+pub unsafe extern "C" fn ChainEth_getNonAuthTokenList(ctx: *mut CContext,netType: *mut c_char,tokens: *mut *mut CArray<CEthChainTokenNonAuth>) -> *const CError {
+    log::debug!("enter ChainEth getNonAuthTokenList");
+
+    if ctx.is_null() || tokens.is_null() ||netType.is_null(){
+        let err = Error::PARAMETER().append_message(" : ctx,tokens,netType is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    (*tokens).free();
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let eth_chain = wallets.eth_chain_instance();
+                let net_type = NetType::from(to_str(netType));
+                match block_on( eth_chain.get_non_auth_tokens(wallets,&net_type)) {
+                    Ok(data) => {
+                        *tokens = CArray::to_c_ptr(&data);
                         Error::SUCCESS()
                     }
                     Err(err) => Error::from(err)

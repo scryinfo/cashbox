@@ -1,6 +1,6 @@
 use std::ptr::null_mut;
 use mav::kits;
-use wallets_types::{InitParameters, Error, EthRawTxPayload, EthTransferPayload, EthChainTokenDefault, EthChainTokenAuth};
+use wallets_types::{InitParameters, Error, EthRawTxPayload, EthTransferPayload, EthChainTokenDefault, EthChainTokenAuth, EthChainTokenNonAuth};
 
 use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
                   parameters::{CContext, CInitParameters, CEthTransferPayload, CEthRawTxPayload},
@@ -10,7 +10,7 @@ use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
 };
 
 use mav::ma::{EthTokenType};
-use wallets_cdl::mem_c::{CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenDefault_dFree};
+use wallets_cdl::mem_c::{CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenDefault_dFree, CArrayCEthChainTokenNonAuth_dAlloc, CArrayCEthChainTokenNonAuth_dFree};
 
 mod data;
 
@@ -213,6 +213,62 @@ fn query_eth_default_token_list_test() {
         CError_free(c_err);
         let _eth_token_default_vec: Vec<EthChainTokenDefault> = CArray::to_rust(&**token_default);
         CArrayCEthChainTokenDefault_dFree(token_default);
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+
+#[test]
+fn eth_update_non_auth_token_list_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        //CEthChainTokenDefault
+        let mut non_auth_tokens = Vec::new();
+        {
+            let mut eth = EthChainTokenNonAuth::default();
+            eth.net_type = "Private".to_string();
+            eth.eth_chain_token_shared.m.token_type = EthTokenType::Erc20.to_string();
+            eth.m.contract_address = "0x6f259637dcd74c767781e37bc6133cd6a68aa161".to_owned();
+            eth.eth_chain_token_shared.decimal = 18;
+            eth.eth_chain_token_shared.gas_limit = 0; //todo
+            eth.eth_chain_token_shared.gas_price = "".to_owned(); //todo
+
+            eth.eth_chain_token_shared.m.token_shared.name = "HuobiToken".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.symbol = "HT".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.logo_url = "".to_owned();//todo
+            eth.eth_chain_token_shared.m.token_shared.logo_bytes = "".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.project_name = "HuobiToken".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.project_home = "https://www.huobipro.com/".to_owned();
+            eth.eth_chain_token_shared.m.token_shared.project_note = "A Global Cryptocurrency Leader Since 2013.".to_owned();
+            non_auth_tokens.push(eth);
+        }
+
+        let mut c_tokens = CArray::to_c_ptr(&non_auth_tokens);
+        let c_err = chain_eth_c::ChainEth_updateNonAuthTokenList(*c_ctx, c_tokens) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        c_tokens.free();
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+
+#[test]
+fn query_eth_non_auth_token_list_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let token_default = CArrayCEthChainTokenNonAuth_dAlloc();
+        let c_err =  chain_eth_c::ChainEth_getNonAuthTokenList(*c_ctx,to_c_char("Private"),token_default) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let _eth_token_non_auth_vec: Vec<EthChainTokenNonAuth> = CArray::to_rust(&**token_default);
+        CArrayCEthChainTokenNonAuth_dFree(token_default);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }

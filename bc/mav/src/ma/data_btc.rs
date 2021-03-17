@@ -6,7 +6,6 @@ use serde::Serialize;
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
 use crate::kits;
-use crate::CTrue;
 use crate::ma::dao::{self, Shared};
 use crate::ma::TxShared;
 

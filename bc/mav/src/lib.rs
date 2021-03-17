@@ -31,7 +31,7 @@ impl ChainType {
             "EEE" => Ok(ChainType::EEE),
             "EeeTest" => Ok(ChainType::EeeTest),
             _ => {
-                let err = format!("the str:{} can not be ChainType", chain_type);
+                let err = format!("the chain type:{} currently not supported ", chain_type);
                 log::error!("{}", err);
                 Err(Error::from(err.as_str()))
             }

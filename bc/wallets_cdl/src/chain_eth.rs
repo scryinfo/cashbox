@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{EthChain, EthChainToken, EthChainTokenAuth, EthChainTokenDefault, EthChainTokenShared};
+use wallets_types::{EthChain, EthChainToken, EthChainTokenAuth, EthChainTokenDefault, EthChainTokenNonAuth,EthChainTokenShared};
 
 use crate::kits::{CArray, CBool,CMark, CR, CStruct,to_str,to_c_char};
 use crate::types::{CChainShared, CTokenShared};
@@ -39,6 +39,16 @@ pub struct CEthChainTokenDefault {
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthChainTokenAuth {
+    pub chainTokenSharedId: *mut c_char,
+    pub netType: *mut c_char,
+    pub position: i64,
+    pub contractAddress: *mut c_char,
+    pub ethChainTokenShared: *mut CEthChainTokenShared,
+}
+
+#[repr(C)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
+pub struct CEthChainTokenNonAuth {
     pub chainTokenSharedId: *mut c_char,
     pub netType: *mut c_char,
     pub position: i64,

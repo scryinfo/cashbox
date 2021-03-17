@@ -198,7 +198,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           appBar: AppBar(
             leading: GestureDetector(
                 onTap: () {
-                  NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=true', clearStack: true);
+                  NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
                 },
                 child: Image.asset("assets/images/ic_back.png")),
             backgroundColor: Colors.transparent,
@@ -235,7 +235,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         ),
       ),
       onWillPop: () {
-        NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=true', clearStack: true);
+        NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
         return Future(() => false);
       },
     );

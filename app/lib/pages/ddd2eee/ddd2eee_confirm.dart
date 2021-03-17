@@ -423,7 +423,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
       const timeout = Duration(seconds: 5);
       Timer(timeout, () {
         Navigator.pop(context); //Let the showProgressDialog popup box display for at least two seconds
-        NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=false', clearStack: true);
+        NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
       });
     }
   }

@@ -476,7 +476,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       if (walletObj != null) {
         _mneController.text = "";
         _pwdController.text = "";
-        NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
+        NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
       } else {
         Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
       }

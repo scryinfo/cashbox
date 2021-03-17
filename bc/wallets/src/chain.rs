@@ -4,9 +4,9 @@ use strum::IntoEnumIterator;
 //use rbatis::crud::CRUDTable;
 
 use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
-use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType};
+use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth};
 use mav::{NetType, WalletType, CTrue};
-use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx};
+use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth};
 
 use codec::Decode;
 use rbatis::plugin::page::PageRequest;
@@ -775,7 +775,7 @@ impl EthChainTrait for EthChain {
         //delete all exist authority tokens
         let token_auth_wrapper = token_rb.new_wrapper().push_sql("1==1;");
         let count = MEthChainTokenAuth::remove_by_wrapper(token_rb, &tx.tx_id, &token_auth_wrapper).await?;
-        log::debug!("delete MEthChainTokenDefault row {}", count);
+        log::debug!("delete MEthChainTokenAuth row {}", count);
         //insert new tokens shared
         for token in author_tokens {
             let mut shared = token.eth_chain_token_shared.clone();
@@ -796,9 +796,37 @@ impl EthChainTrait for EthChain {
         Ok(())
     }
 
+    async fn update_non_auth_tokens(&self, context: &dyn ContextTrait, author_tokens: Vec<EthChainTokenNonAuth>) -> Result<(), WalletError> {
+        let token_rb = context.db().wallets_db();
+        let mut tx = token_rb.begin_tx_defer(false).await?;
+        //delete all exist authority tokens
+        let token_auth_wrapper = token_rb.new_wrapper().push_sql("1==1;");
+        let count = MEthChainTokenNonAuth::remove_by_wrapper(token_rb, &tx.tx_id, &token_auth_wrapper).await?;
+        log::debug!("delete MEthChainTokenNonAuth row {}", count);
+        //insert new tokens shared
+        for token in author_tokens {
+            let mut shared = token.eth_chain_token_shared.clone();
+            {
+                let token_shared_wrapper = token_rb.new_wrapper()
+                    .eq(&MTokenShared::symbol, &token.eth_chain_token_shared.m.token_shared.symbol);
+                if let Some(token_shared) = MEthChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
+                    shared.id = token_shared.id;
+                }
+                shared.save_update(token_rb, &tx.tx_id).await?;
+            }
+            let mut token_non_auth = token.m.clone();
+            token_non_auth.chain_token_shared_id = shared.id;
+            token_non_auth.save(token_rb, &tx.tx_id).await?;
+        }
+        tx.manager = None;
+        token_rb.commit(&tx.tx_id).await?;
+        Ok(())
+    }
+    async fn get_non_auth_tokens(&self, context: &dyn ContextTrait,net_type: &NetType) -> Result<Vec<EthChainTokenNonAuth>, WalletError> {
+        EthChainTokenNonAuth::list_by_net_type(context,net_type).await
+    }
     async fn get_auth_tokens(&self, context: &dyn ContextTrait, net_type: &NetType,start_item: u64, page_size: u64) -> Result<Vec<EthChainTokenAuth>, WalletError> {
-        let m_eth_tokens = EthChainTokenAuth::list_by_net_type(context,net_type,start_item,page_size).await?;
-        Ok(m_eth_tokens)
+       EthChainTokenAuth::list_by_net_type(context,net_type,start_item,page_size).await
     }
 }
 

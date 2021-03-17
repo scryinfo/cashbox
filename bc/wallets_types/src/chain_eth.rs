@@ -3,7 +3,7 @@ use rbatis::crud::CRUDTable;
 
 use mav::{ChainType, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MWallet};
+use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MWallet, MEthChainTokenNonAuth};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 
@@ -89,9 +89,9 @@ impl EthChainTokenDefault {
                 }
             }
         }
-     let eth_tokens = tokens_default.iter().map(|token|EthChainTokenDefault{
+        let eth_tokens = tokens_default.iter().map(|token| EthChainTokenDefault {
             m: token.clone(),
-            eth_chain_token_shared: EthChainTokenShared::from(token.chain_token_shared.clone())
+            eth_chain_token_shared: EthChainTokenShared::from(token.chain_token_shared.clone()),
         }).collect::<Vec<EthChainTokenDefault>>();
         Ok(eth_tokens)
     }
@@ -135,6 +135,51 @@ impl EthChainTokenAuth {
         Ok(target_tokens)
     }
 }
+
+#[derive(Debug, Default)]
+pub struct EthChainTokenNonAuth {
+    pub m: MEthChainTokenNonAuth,
+    pub eth_chain_token_shared: EthChainTokenShared,
+}
+deref_type!(EthChainTokenNonAuth,MEthChainTokenNonAuth);
+
+impl EthChainTokenNonAuth {
+    pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<EthChainTokenNonAuth>, WalletError> {
+        let tx_id = "";
+        let wallets_db = context.db().wallets_db();
+        let tokens_shared: Vec<MEthChainTokenShared> = {
+            let non_auth_token_table_name = MEthChainTokenNonAuth::table_name();
+            let shared_name = MEthChainTokenShared::table_name();
+            let wrapper = wallets_db.new_wrapper().eq(format!("{}.{}", non_auth_token_table_name, MEthChainTokenNonAuth::net_type).as_str(), net_type.to_string());
+
+            let sql = {
+                let t = sql_left_join_get_b(&non_auth_token_table_name, &MEthChainTokenNonAuth::chain_token_shared_id,
+                                            &shared_name, &MEthChainTokenShared::id);
+                format!("{} where {}", t, &wrapper.sql)
+            };
+            wallets_db.fetch_prepare(tx_id, &sql, &wrapper.args).await?
+        };
+        let mut tokens_non_auth = {
+            let wrapper = wallets_db.new_wrapper()
+                .eq(MEthChainTokenNonAuth::net_type, net_type.to_string())
+                .order_by(true, &[MEthChainTokenNonAuth::position]);
+            MEthChainTokenNonAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
+        };
+        let mut target_tokens = vec![];
+        for token_non_auth in &mut tokens_non_auth {
+            for token_shared in &tokens_shared {
+                let mut token = EthChainTokenNonAuth::default();
+                if token_non_auth.chain_token_shared_id == token_shared.id {
+                    token.m = token_non_auth.clone();
+                    token.eth_chain_token_shared = EthChainTokenShared::from(token_shared.clone());
+                    target_tokens.push(token)
+                }
+            }
+        }
+        Ok(target_tokens)
+    }
+}
+
 
 #[derive(Debug, Default)]
 pub struct EthChain {

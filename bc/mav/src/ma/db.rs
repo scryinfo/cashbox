@@ -7,21 +7,14 @@ use strum_macros::EnumIter;
 use lazy_static::lazy_static;
 
 use crate::kits::Error;
-use crate::ma::{
-    BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken,
-    MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx,
-    MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault,
-    MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth,
-    MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting,
-    MSubChainBasicInfo, MTokenAddress, MWallet,
-};
+use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet, MEthChainTokenNonAuth};
 use crate::{kits, NetType};
 
 /// Note that cashbox is currently on version 1. Version 2 is this version,
 /// when cashbox want to update version we must synchronize this database version value;
 pub const VERSION: i64 = 1;
 
-lazy_static!{
+lazy_static! {
     static ref SET_VERSION_SQL: String =
         format!("PRAGMA user_version = {version}", version = VERSION);
 }
@@ -233,25 +226,25 @@ impl Db {
     }
     pub async fn init_tables(&self, create_type: &DbCreateType) -> Result<(), Error> {
         let wallets_rb = self.wallets_db();
-        let user_version :i64 = wallets_rb.fetch("","PRAGMA user_version").await?;
-        if user_version==0{
-            wallets_rb.exec("",&SET_VERSION_SQL).await?;
+        let user_version: i64 = wallets_rb.fetch("", "PRAGMA user_version").await?;
+        if user_version == 0 {
+            wallets_rb.exec("", &SET_VERSION_SQL).await?;
             self.create(create_type).await?;
             Db::insert_chain_token(self).await?;
-           return Ok(());
+            return Ok(());
         }
-        if user_version!=VERSION{
-            if user_version<VERSION {
+        if user_version != VERSION {
+            if user_version < VERSION {
                 self.update(user_version).await?;
-            }else{
+            } else {
                 let error_msg = "Current application version is higher,please uninstall and reinstall";
-                log::error!("{}",error_msg);
-                return Err(Error{ err: error_msg.to_string() })
+                log::error!("{}", error_msg);
+                return Err(Error { err: error_msg.to_string() });
             }
         }
         Ok(())
     }
-    async fn create(&self,create_type: &DbCreateType)-> Result<(), Error>{
+    async fn create(&self, create_type: &DbCreateType) -> Result<(), Error> {
         Db::create_table_wallets(self.wallets_db(), create_type).await?;
         Db::create_table_mnemonic(self.mnemonic_db(), create_type).await?;
         for net_type in NetType::iter() {
@@ -260,7 +253,7 @@ impl Db {
         }
         Ok(())
     }
-    async fn update(&self,from:i64)->Result<(),Error>{
+    async fn update(&self, from: i64) -> Result<(), Error> {
         log::debug!("Upgrading schema from {} to {}", from, VERSION);
         if from == VERSION {
             return Ok(());
@@ -273,7 +266,7 @@ impl Db {
 
         Ok(())
     }
-    pub async fn create_table(rb: &Rbatis,sql: &str, name: &str, create_type: &DbCreateType, ) -> Result<(), Error> {
+    pub async fn create_table(rb: &Rbatis, sql: &str, name: &str, create_type: &DbCreateType) -> Result<(), Error> {
         match create_type {
             DbCreateType::NotExists => {
                 rb.exec("", sql).await?;
@@ -291,204 +284,43 @@ impl Db {
         Ok(())
     }
 
-    pub async fn create_table_mnemonic(
-        rb: &Rbatis,
-        create_type: &DbCreateType,
-    ) -> Result<(), Error> {
-        Db::create_table(
-            rb,
-            MMnemonic::create_table_script(),
-            &MMnemonic::table_name(),
-            create_type,
-        )
-        .await?;
+    pub async fn create_table_mnemonic(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
+        Db::create_table(rb, MMnemonic::create_table_script(), &MMnemonic::table_name(), create_type).await?;
         Ok(())
     }
 
     ///total: 16
-    pub async fn create_table_wallets(
-        rb: &Rbatis,
-        create_type: &DbCreateType,
-    ) -> Result<(), Error> {
-        Db::create_table(
-            rb,
-            MWallet::create_table_script(),
-            &MWallet::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MChainTypeMeta::create_table_script(),
-            &MChainTypeMeta::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MAddress::create_table_script(),
-            &MAddress::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MSetting::create_table_script(),
-            &MSetting::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEthChainTokenShared::create_table_script(),
-            &MEeeChainTokenShared::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEthChainTokenAuth::create_table_script(),
-            &MEthChainTokenAuth::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEthChainTokenDefault::create_table_script(),
-            &MEthChainTokenDefault::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEeeChainTokenShared::create_table_script(),
-            &MEeeChainTokenShared::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEeeChainTokenAuth::create_table_script(),
-            &MEeeChainTokenAuth::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEeeChainTokenDefault::create_table_script(),
-            &MEeeChainTokenDefault::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MBtcChainTokenShared::create_table_script(),
-            &MBtcChainTokenShared::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MBtcChainTokenAuth::create_table_script(),
-            &MBtcChainTokenAuth::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MBtcChainTokenDefault::create_table_script(),
-            &MBtcChainTokenDefault::table_name(),
-            create_type,
-        )
-        .await?;
+    pub async fn create_table_wallets(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
+        Db::create_table(rb, MWallet::create_table_script(), &MWallet::table_name(), create_type).await?;
+        Db::create_table(rb, MChainTypeMeta::create_table_script(), &MChainTypeMeta::table_name(), create_type).await?;
+        Db::create_table(rb, MAddress::create_table_script(), &MAddress::table_name(), create_type).await?;
+        Db::create_table(rb, MSetting::create_table_script(), &MSetting::table_name(), create_type).await?;
+        Db::create_table(rb, MEthChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), create_type).await?;
+        Db::create_table(rb, MEthChainTokenAuth::create_table_script(), &MEthChainTokenAuth::table_name(), create_type).await?;
+        Db::create_table(rb, MEthChainTokenNonAuth::create_table_script(), &MEthChainTokenNonAuth::table_name(), create_type).await?;
+        Db::create_table(rb, MEthChainTokenDefault::create_table_script(), &MEthChainTokenDefault::table_name(), create_type).await?;
+        Db::create_table(rb, MEeeChainTokenShared::create_table_script(), &MEeeChainTokenShared::table_name(), create_type).await?;
+        Db::create_table(rb, MEeeChainTokenAuth::create_table_script(), &MEeeChainTokenAuth::table_name(), create_type).await?;
+        Db::create_table(rb, MEeeChainTokenDefault::create_table_script(), &MEeeChainTokenDefault::table_name(), create_type).await?;
+        Db::create_table(rb, MBtcChainTokenShared::create_table_script(), &MBtcChainTokenShared::table_name(), create_type).await?;
+        Db::create_table(rb, MBtcChainTokenAuth::create_table_script(), &MBtcChainTokenAuth::table_name(), create_type).await?;
+        Db::create_table(rb, MBtcChainTokenDefault::create_table_script(), &MBtcChainTokenDefault::table_name(), create_type).await?;
         Ok(())
     }
     ///total: 12
     pub async fn create_table_data(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
-        Db::create_table(
-            rb,
-            MTokenAddress::create_table_script(),
-            &MTokenAddress::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEthChainToken::create_table_script(),
-            &MEthChainToken::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEthChainTx::create_table_script(),
-            &MEthChainTx::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEeeChainToken::create_table_script(),
-            &MEeeChainToken::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEeeChainTx::create_table_script(),
-            &MEeeChainTx::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MEeeTokenxTx::create_table_script(),
-            &MEeeTokenxTx::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MBtcChainToken::create_table_script(),
-            &MBtcChainToken::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MBtcChainTx::create_table_script(),
-            &MBtcChainTx::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MBtcInputTx::create_table_script(),
-            &MBtcInputTx::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MBtcOutputTx::create_table_script(),
-            &MBtcOutputTx::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MSubChainBasicInfo::create_table_script(),
-            &MSubChainBasicInfo::table_name(),
-            create_type,
-        )
-        .await?;
-        Db::create_table(
-            rb,
-            MAccountInfoSyncProg::create_table_script(),
-            &MAccountInfoSyncProg::table_name(),
-            create_type,
-        )
-        .await?;
+        Db::create_table(rb, MTokenAddress::create_table_script(), &MTokenAddress::table_name(), create_type).await?;
+        Db::create_table(rb, MEthChainToken::create_table_script(), &MEthChainToken::table_name(), create_type).await?;
+        Db::create_table(rb, MEthChainTx::create_table_script(), &MEthChainTx::table_name(), create_type).await?;
+        Db::create_table(rb, MEeeChainToken::create_table_script(), &MEeeChainToken::table_name(), create_type).await?;
+        Db::create_table(rb, MEeeChainTx::create_table_script(), &MEeeChainTx::table_name(), create_type).await?;
+        Db::create_table(rb, MEeeTokenxTx::create_table_script(), &MEeeTokenxTx::table_name(), create_type).await?;
+        Db::create_table(rb, MBtcChainToken::create_table_script(), &MBtcChainToken::table_name(), create_type).await?;
+        Db::create_table(rb, MBtcChainTx::create_table_script(), &MBtcChainTx::table_name(), create_type).await?;
+        Db::create_table(rb, MBtcInputTx::create_table_script(), &MBtcInputTx::table_name(), create_type).await?;
+        Db::create_table(rb, MBtcOutputTx::create_table_script(), &MBtcOutputTx::table_name(), create_type).await?;
+        Db::create_table(rb, MSubChainBasicInfo::create_table_script(), &MSubChainBasicInfo::table_name(), create_type).await?;
+        Db::create_table(rb, MAccountInfoSyncProg::create_table_script(), &MAccountInfoSyncProg::table_name(), create_type).await?;
         Ok(())
     }
     /// such as: eth,eee,btc
