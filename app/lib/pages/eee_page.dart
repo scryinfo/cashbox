@@ -82,7 +82,7 @@ class _EeePageState extends State<EeePage> {
     if (mounted) {
       setState(() {});
     }
-    // loadDigitBalance();
+    loadDigitBalance();
     loadLegalCurrency();
     // loadDigitRateInfo();
     // todo AppInfoUtil.instance.checkAppUpgrade();
