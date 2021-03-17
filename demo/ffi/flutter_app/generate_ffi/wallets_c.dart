@@ -51,6 +51,13 @@ Pointer<Data> Data_new() {
 final _Data_new_Dart _Data_new = _dl.lookupFunction<_Data_new_C, _Data_new_Dart>('Data_new');
 typedef _Data_new_C = Pointer<Data> Function();
 typedef _Data_new_Dart = Pointer<Data> Function();
+/// C function `Data_noPtr`.
+Data Data_noPtr() {
+  return _Data_noPtr();
+}
+final _Data_noPtr_Dart _Data_noPtr = _dl.lookupFunction<_Data_noPtr_C, _Data_noPtr_Dart>('Data_noPtr');
+typedef _Data_noPtr_C = Data Function();
+typedef _Data_noPtr_Dart = Data Function();
 /// C function `Data_use`.
 Pointer<Data> Data_use(
   Pointer<Data> cd,
@@ -105,4 +112,17 @@ typedef _addStr_C = Pointer<ffi.Utf8> Function(
 );
 typedef _addStr_Dart = Pointer<ffi.Utf8> Function(
   Pointer<ffi.Utf8> cs,
+);
+/// C function `multi_i32`.
+int multi_i32(
+  Pointer<Pointer<Int32>> v,
+) {
+  return _multi_i32(v);
+}
+final _multi_i32_Dart _multi_i32 = _dl.lookupFunction<_multi_i32_C, _multi_i32_Dart>('multi_i32');
+typedef _multi_i32_C = Uint32 Function(
+  Pointer<Pointer<Int32>> v,
+);
+typedef _multi_i32_Dart = int Function(
+  Pointer<Pointer<Int32>> v,
 );
