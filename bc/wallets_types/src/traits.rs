@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use mav::ma::{Db, MAddress, MWallet, EeeTokenType};
 use mav::{WalletType, NetType};
 
-use crate::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, EeeChainTx};
+use crate::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, EeeChainTx, EthChainTokenNonAuth};
 
 #[async_trait]
 pub trait Load {
@@ -63,6 +63,8 @@ pub trait EthChainTrait: Send + Sync {
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<EthChainTokenDefault>) -> Result<(), WalletError>;
     async fn get_default_tokens(&self,context: &dyn ContextTrait,net_type: &NetType)->Result<Vec<EthChainTokenDefault>,WalletError>;
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, auth_tokens: Vec<EthChainTokenAuth>) -> Result<(), WalletError>;
+    async fn update_non_auth_tokens(&self, context: &dyn ContextTrait, non_auth_tokens: Vec<EthChainTokenNonAuth>) -> Result<(), WalletError>;
+    async fn get_non_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType)->Result<Vec<EthChainTokenNonAuth>,WalletError>;
     async fn get_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType,start_item:u64,page_size:u64)->Result<Vec<EthChainTokenAuth>,WalletError>;
 }
 
