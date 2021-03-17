@@ -443,7 +443,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
         .saveWallet(_nameController.text, Uint8List.fromList(_pwdController.text.codeUnits), Uint8List.fromList(_mnemonicController.text.codeUnits));
     if (isSuccess) {
       Fluttertoast.showToast(msg: translate('success_create_test_wallet'));
-      NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=true', clearStack: true);
+      NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
     } else {
       Fluttertoast.showToast(msg: translate('failure_create_test_wallet'));
     }

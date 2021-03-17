@@ -84,13 +84,13 @@ class WalletsControl {
       tempWallet.accountMoney = getWalletMoney(element).toStringAsFixed(6);
       // todo isShowChain tempWallet.chainList =
       ChainETH chainETH = ChainETH()
-        ..isVisible = true
+        ..isVisible = true // todo element.ethChain.chainShared.visible;
         ..chainType = ChainType.ETH;
       ChainBTC chainBTC = ChainBTC()
-        ..isVisible = true
+        ..isVisible = false // todo element.ethChain.chainShared.visible;
         ..chainType = ChainType.BTC;
       ChainEEE chainEEE = ChainEEE()
-        ..isVisible = true
+        ..isVisible = true // todo element.ethChain.chainShared.visible;
         ..chainType = ChainType.EEE;
       tempWallet.chainList..add(chainETH)..add(chainBTC)..add(chainEEE);
       walletMList.add(tempWallet);
@@ -151,9 +151,13 @@ class WalletsControl {
     Logger.getInstance().d("wallet_control", "renameWallet err is --->" + err.toString());
   }
 
-  saveCurrentWalletChain(String walletId, EnumKit.ChainType chainType) {
-    var err = Wallets.mainIsolate().saveCurrentWalletChain(walletId, chainType);
+  bool saveCurrentWalletChain(String walletId, EnumKit.ChainType chainType) {
+    Error err = Wallets.mainIsolate().saveCurrentWalletChain(walletId, chainType);
+    if (err.isSuccess()) {
+      return true;
+    }
     Logger.getInstance().d("wallet_control ", "saveCurrentWalletChain err" + err.toString());
+    return false;
   }
 
   List<TokenAddress> getTokenAddress(String walletId, EnumKit.ChainType chainType) {

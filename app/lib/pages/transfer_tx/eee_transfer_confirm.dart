@@ -199,7 +199,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
         }
         String txHash = submitMap["result"];
         Fluttertoast.showToast(msg: translate("tx_upload_success"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
-        NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=false', clearStack: true);
+        NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
       },
       child: Container(
         alignment: Alignment.bottomCenter,

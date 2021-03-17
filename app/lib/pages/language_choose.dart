@@ -78,7 +78,7 @@ class _LanguageChoosePageState extends State<LanguageChoosePage> {
               config.locale = languagesList[index].localeKey;
               HandleConfig.instance.saveConfig(config);
             }
-            NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=false', clearStack: true);
+            NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
           },
           child: Container(
             width: ScreenUtil().setWidth(90),

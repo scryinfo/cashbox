@@ -10,6 +10,7 @@ import 'package:app/pages/ddd2eee/ddd2eee_confirm.dart';
 import 'package:app/pages/digitlist_manage/digit_list.dart';
 import 'package:app/pages/digitlist_manage/digits_manage.dart';
 import 'package:app/pages/digitlist_manage/search_digit.dart';
+import 'package:app/pages/eee_page.dart';
 import 'package:app/pages/entrance.dart';
 import 'package:app/pages/eth_page.dart';
 import 'package:app/pages/language_choose.dart';
@@ -38,7 +39,7 @@ Handler entrancePageHandler = Handler(handlerFunc: (BuildContext context, Map<St
   return EntrancePage();
 });
 
-Handler homePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler ethHomePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   bool isForceLoadFromJni = false;
   if (params['isForceLoadFromJni'] == null || params['isForceLoadFromJni'].first == null) {
     isForceLoadFromJni = false;
@@ -46,6 +47,16 @@ Handler homePageHandler = Handler(handlerFunc: (BuildContext context, Map<String
     isForceLoadFromJni = params['isForceLoadFromJni'].first == 'true';
   }
   return EthPage(isForceLoadFromJni: isForceLoadFromJni);
+});
+
+Handler eeeHomePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  bool isForceLoadFromJni = false;
+  if (params['isForceLoadFromJni'] == null || params['isForceLoadFromJni'].first == null) {
+    isForceLoadFromJni = false;
+  } else {
+    isForceLoadFromJni = params['isForceLoadFromJni'].first == 'true';
+  }
+  return EeePage(isForceLoadFromJni: isForceLoadFromJni);
 });
 
 Handler publicPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

@@ -122,7 +122,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                   if (isSuccess) {
                     context.read<CreateWalletProcessProvide>().emptyData();
                     /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
-                    NavigatorUtils.push(context, '${Routes.homePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
+                    NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
                     //NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
                   } else {
                     Fluttertoast.showToast(msg: translate('mnemonic_order_wrong'));
