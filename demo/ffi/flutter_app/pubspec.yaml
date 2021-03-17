@@ -85,5 +85,5 @@ ffigen:
   output: 'generate_ffi/wallets_c.dart'
   headers:
     entry-points:
-      - 'generate_ffi/wallets_c.h'
+      - '../cdl/src/wallets_c.h'
   compiler-opts: '-I"d:/Program Files/LLVM/include" -L"d:/Program Files/LLVM/lib"'

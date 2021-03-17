@@ -9,7 +9,7 @@ use crate::kits::{CArray, CBool, CMark, CR, CStruct, to_c_char, to_str};
 use crate::types::{CChainShared, CTokenShared};
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainToken {
     pub show:CBool,
     pub chainTokenSharedId:*mut c_char,
@@ -17,7 +17,7 @@ pub struct CEeeChainToken {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainTokenShared {
     pub tokenShared: *mut CTokenShared,
     pub tokenType: *mut c_char,
@@ -26,7 +26,7 @@ pub struct CEeeChainTokenShared {
     pub decimal: i32,
 }
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainTokenDefault {
     pub chainTokenSharedId:  *mut c_char,
     pub netType:  *mut c_char,
@@ -35,7 +35,7 @@ pub struct CEeeChainTokenDefault {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainTokenAuth {
     pub chainTokenSharedId:  *mut c_char,
     pub netType:  *mut c_char,
@@ -44,7 +44,7 @@ pub struct CEeeChainTokenAuth {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChain {
     pub chainShared: *mut CChainShared,
    // pub address: *mut CAddress,
@@ -53,7 +53,7 @@ pub struct CEeeChain {
 
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CAccountInfoSyncProg {
     pub account: *mut c_char,
     pub blockNo: *mut c_char,
@@ -61,7 +61,7 @@ pub struct CAccountInfoSyncProg {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CSubChainBasicInfo {
     pub genesisHash: *mut c_char,
     pub metadata: *mut c_char,

@@ -1,13 +1,38 @@
+use std::ffi::CString;
 use std::os::raw::{
     c_char, c_int, c_ulonglong,
 };
-use std::ffi::{CStr, CString};
 
-mod wallets_c;
+use crate::kits::{CStruct, to_c_char, to_str};
+
+mod kits;
+
+pub type CBool = u32;
+
+#[allow(non_upper_case_globals)]
+pub const CFalse: CBool = 0u32;
+#[allow(non_upper_case_globals)]
+pub const CTrue: CBool = 1u32;
+
+pub fn is_true(b: CBool) -> bool {
+    b != CFalse
+}
 
 #[no_mangle]
 pub extern "C" fn add(a: c_int, b: c_int) -> c_int {
     return a + b;
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn multi_i32(v: *mut *mut i32) -> u32 {
+    if v.is_null() {
+        return CFalse;
+    }
+    (*v).free();
+    // 释放 *v 的内存
+    let re = Box::into_raw(Box::new(1));
+    *v = re;
+    CTrue
 }
 
 
@@ -28,20 +53,6 @@ pub extern "C" fn Str_free(cs: *mut c_char) {
     };
 }
 
-// call Str_free to free memory
-fn to_c_char(rs: &str) -> *mut c_char {
-    let cstr = CString::new(rs).expect("Failed to create CString");
-    return cstr.into_raw();
-}
-
-// do not free the cs's memory
-fn to_str(cs: *const c_char) -> &'static str {
-    let cstr = unsafe {
-        assert!(!cs.is_null()); //todo 别的方法处理
-        CStr::from_ptr(cs)
-    };
-    return cstr.to_str().expect("Failed to create str");
-}
 
 // struct
 
@@ -108,9 +119,17 @@ pub extern "C" fn Data_use(cd: *mut Data) -> *mut Data {
     return cd;
 }
 
+#[no_mangle]
+pub extern "C" fn Data_noPtr(cd: Data) -> Data {
+    let mut ps = unsafe {
+        Box::from_raw(cd.pointData)
+    };
+    ps.intType = 1;
+    return cd;
+}
+
 #[allow(non_snake_case)]
 #[repr(C)]
-#[derive(Clone)]
 pub struct Data {
     pub intType: c_int,
     pub charType: *mut c_char,
@@ -123,6 +142,16 @@ pub struct Data {
 
     pub pointData: *mut Data,
 }
+
+// impl Clone for Data{
+//     fn clone(&self) -> Self {
+//         unimplemented!()
+//     }
+//
+//     fn clone_from(&mut self, source: &Self) {
+//         unimplemented!()
+//     }
+// }
 
 impl Default for Data {
     fn default() -> Self {
@@ -163,7 +192,11 @@ impl Drop for Data {
 
 #[cfg(test)]
 mod tests {
-    use crate::{add, addStr, to_c_char, to_str, Str_free, Data_new, Data_free};
+    use std::os::raw::c_char;
+    use std::ptr::{null, null_mut};
+
+    use crate::{add, addStr, Data_free, Data_new, multi_i32, Str_free, to_c_char, to_str};
+    use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, ptr_alloc};
 
     #[test]
     fn test_add() {
@@ -208,5 +241,79 @@ mod tests {
         }
         Data_free(Box::into_raw(s));//这里已经执行 into_raw了，所以不需要再调用 下面的 forget
         // std::mem::forget(s);//内存由Data_new函数内分配，要使用Data_free释放内存
+
+        //test clone
+        unsafe {
+            let mut d = Data_new();
+            (*d).arrayInt = ptr_alloc();
+            *(*d).arrayInt = 10;
+            // let d2 = *d;
+            // assert_ne!((*d).arrayInt, d2.arrayInt);
+        }
+    }
+
+    #[test]
+    fn test_multi_return() {
+        unsafe {
+            let mut re: *mut *mut i32 = d_ptr_alloc();
+            assert_eq!(null(), *re);
+            let _ = multi_i32(re);
+            assert_eq!(1, **re);
+            // d_ptr_free(&mut re);
+            re.free();
+
+            let mut pp: *mut *mut c_char = d_ptr_alloc();
+            pp.free();
+
+            let mut pp: *mut *mut c_char = d_ptr_alloc();
+            *pp = to_c_char("test");
+            pp.free();
+            assert_eq!(null(), pp);
+        }
+    }
+
+    #[test]
+    fn test_sample() {
+        unsafe {
+            //*mut c_char
+            let mut p_str = to_c_char("pointer char");
+            p_str.free();
+            assert_eq!(null_mut(), p_str);
+
+            //*mut u32
+            let mut p_u32: *mut u32 = ptr_alloc();
+            p_u32.free();
+            assert_eq!(null_mut(), p_u32);
+
+            //*mut *mut c_char
+            let mut pp_str = d_ptr_alloc();
+            *pp_str = to_c_char("pointer pointer char");
+            pp_str.free();
+            assert_eq!(null_mut(), pp_str);
+
+            //struct
+            struct Sample {
+                len: u32,
+                name: *mut c_char,
+                list: CArray<*mut c_char>,
+            }
+            impl CStruct for Sample {
+                fn free(&mut self) {
+                    self.name.free();
+                }
+            }
+            crate::drop_ctype!(Sample);
+            let mut sample = Sample {
+                len: 0,
+                name: to_c_char("test"),
+                list: CArray::default(),
+            };
+            //sample会自动释放分配的内存，不需要手动调用来释放
+            let v = vec!["one".to_owned(), "two".to_owned()];
+            let v_ptr = v.clone().into_iter().map(|it| to_c_char(it.as_str())).collect();
+            sample.list.set(v_ptr);
+            let v2 = CArray::to_rust(&sample.list); //v2 is "Vec<String>"
+            assert_eq!(v, v2);
+        }
     }
 }
