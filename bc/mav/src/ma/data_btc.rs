@@ -163,7 +163,7 @@ pub struct MBtcUtxo {
     // 和自己地址有关的那条output idx输出对应的value 计算交易的依据
     pub value :u64,
     #[serde(default)]
-    // 如果是花费的  对应一条花费的价值
+    // 如果是花费的  这一笔交易所有的花销，等于所有output 中的value之和
     pub spent_value :Option<u64>,
 }
 

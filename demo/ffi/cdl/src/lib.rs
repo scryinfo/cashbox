@@ -4,6 +4,7 @@ use std::os::raw::{
 };
 
 use crate::kits::{CStruct, to_c_char, to_str};
+use std::ptr::null_mut;
 
 mod kits;
 
@@ -120,12 +121,31 @@ pub extern "C" fn Data_use(cd: *mut Data) -> *mut Data {
 }
 
 #[no_mangle]
-pub extern "C" fn Data_noPtr(cd: Data) -> Data {
-    let mut ps = unsafe {
-        Box::from_raw(cd.pointData)
-    };
-    ps.intType = 1;
-    return cd;
+pub extern "C" fn Data_noPtr() -> Data {
+    let mut data = Data::default();
+    data.intType = 10;
+    data.charType = to_c_char("test 测试");
+
+    {
+        let mut v = vec![1, 2];
+        data.arrayIntLength = v.len() as c_ulonglong;
+        data.arrayInt = v.as_mut_ptr();
+        std::mem::forget(v);
+    }
+    {
+        let mut v = vec![Data::default(), Data::default()];
+        v[0].intType = 1;
+        v[1].intType = 2;
+        data.arrayDataLength = v.len() as c_ulonglong;
+        data.arrayData = v.as_mut_ptr();
+        std::mem::forget(v);
+    }
+    {
+        let mut d = Box::new(Data::default());
+        d.intType = 3;
+        data.pointData = Box::into_raw(d);
+    }
+    return data;
 }
 
 #[allow(non_snake_case)]
@@ -171,18 +191,26 @@ impl Drop for Data {
     fn drop(&mut self) {
         unsafe {
             Str_free(self.charType);
+            self.charType = null_mut();
 
             if self.arrayIntLength > 0 && !self.arrayInt.is_null() {
                 let p = std::slice::from_raw_parts_mut(self.arrayInt, self.arrayIntLength as usize);
                 Box::from_raw(p.as_mut_ptr());//free memory
             }
+            self.arrayIntLength = 0;
+            self.arrayInt = null_mut();
+
             if self.arrayDataLength > 0 && !self.arrayData.is_null() {
                 let p = std::slice::from_raw_parts_mut(self.arrayData, self.arrayDataLength as usize);
                 Box::from_raw(p.as_mut_ptr());
             }
+            self.arrayDataLength = 0;
+            self.arrayData = null_mut();
+
             if !self.pointData.is_null() {
                 Box::from_raw(self.pointData);
             }
+            self.pointData = null_mut();
         }
     }
 }
@@ -195,7 +223,7 @@ mod tests {
     use std::os::raw::c_char;
     use std::ptr::{null, null_mut};
 
-    use crate::{add, addStr, Data_free, Data_new, multi_i32, Str_free, to_c_char, to_str};
+    use crate::{add, addStr, Data_free, Data_new, Data_noPtr, multi_i32, Str_free, to_c_char, to_str};
     use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, ptr_alloc};
 
     #[test]
@@ -215,40 +243,48 @@ mod tests {
 
     #[test]
     fn test_struct() {
-        let s = unsafe { Box::from_raw(Data_new()) };
-        assert_eq!(10, s.intType);
-        assert_eq!("test 测试", to_str(s.charType));
         unsafe {
-            let ints = std::slice::from_raw_parts_mut(s.arrayInt, s.arrayIntLength as usize);
-            assert_eq!(ints.len(), s.arrayIntLength as usize);
+            let data = unsafe { Box::from_raw(Data_new()) };
+            assert_eq!(10, data.intType);
+            assert_eq!("test 测试", to_str(data.charType));
+
+            let ints = std::slice::from_raw_parts_mut(data.arrayInt, data.arrayIntLength as usize);
+            assert_eq!(ints.len(), data.arrayIntLength as usize);
             assert_eq!(vec![1, 2], ints);
             //以下这行代码不需要，因为from_raw_parts_mut返回的对象不会释放内存
             // std::mem::forget(ints);//不要释放内存
-        }
-        unsafe {
-            let datas = std::slice::from_raw_parts_mut(s.arrayData, s.arrayDataLength as usize);
-            assert_eq!(datas.len(), s.arrayDataLength as usize);
+
+            let datas = std::slice::from_raw_parts_mut(data.arrayData, data.arrayDataLength as usize);
+            assert_eq!(datas.len(), data.arrayDataLength as usize);
             assert_eq!(1, datas[0].intType);
             assert_eq!(2, datas[1].intType);
             //以下这行代码不需要，因为from_raw_parts_mut返回的对象不会释放内存
             // std::mem::forget(datas);//不要释放内存
-        }
-        unsafe {
-            let data = Box::from_raw(s.pointData);
-            assert_eq!(3, data.intType);
-            std::mem::forget(data);//不要释放内存
-            // Box::into_raw(data); 这个方法与上面的效果是一样的
-        }
-        Data_free(Box::into_raw(s));//这里已经执行 into_raw了，所以不需要再调用 下面的 forget
-        // std::mem::forget(s);//内存由Data_new函数内分配，要使用Data_free释放内存
 
-        //test clone
-        unsafe {
-            let mut d = Data_new();
-            (*d).arrayInt = ptr_alloc();
-            *(*d).arrayInt = 10;
-            // let d2 = *d;
-            // assert_ne!((*d).arrayInt, d2.arrayInt);
+            assert_eq!(3, (*data.pointData).intType);
+
+            Data_free(Box::into_raw(data));//这里已经执行 into_raw了，所以不需要再调用 下面的 forget
+            // std::mem::forget(s);//内存由Data_new函数内分配，要使用Data_free释放内存
+        }
+        unsafe {//ffi 1.0.0
+            let data = Data_noPtr();
+            assert_eq!(10, data.intType);
+            assert_eq!("test 测试", to_str(data.charType));
+
+            let ints = std::slice::from_raw_parts_mut(data.arrayInt, data.arrayIntLength as usize);
+            assert_eq!(ints.len(), data.arrayIntLength as usize);
+            assert_eq!(vec![1, 2], ints);
+            //以下这行代码不需要，因为from_raw_parts_mut返回的对象不会释放内存
+            // std::mem::forget(ints);//不要释放内存
+
+            let datas = std::slice::from_raw_parts_mut(data.arrayData, data.arrayDataLength as usize);
+            assert_eq!(datas.len(), data.arrayDataLength as usize);
+            assert_eq!(1, datas[0].intType);
+            assert_eq!(2, datas[1].intType);
+            //以下这行代码不需要，因为from_raw_parts_mut返回的对象不会释放内存
+            // std::mem::forget(datas);//不要释放内存
+
+            assert_eq!(3, (*data.pointData).intType);
         }
     }
 
