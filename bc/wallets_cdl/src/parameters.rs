@@ -50,7 +50,7 @@ pub struct CContext {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeTransferPayload {
     pub fromAccount: *mut c_char,
     pub toAccount: *mut c_char,
@@ -81,14 +81,14 @@ pub struct CAccountInfo {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CDecodeAccountInfoParameters {
     pub encodeData: *mut c_char,
     pub chainVersion: *mut CChainVersion,
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CStorageKeyParameters {
     pub chainVersion: *mut CChainVersion,
     pub module: *mut c_char,
@@ -97,7 +97,7 @@ pub struct CStorageKeyParameters {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CExtrinsicContext {
     pub chainVersion: *mut CChainVersion,
     pub account: *mut c_char,
@@ -109,7 +109,7 @@ pub struct CExtrinsicContext {
 
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CChainVersion {
     pub genesisHash: *mut c_char,
     pub runtimeVersion: i32,
@@ -117,7 +117,7 @@ pub struct CChainVersion {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthTransferPayload {
     pub fromAddress: *mut c_char,
     pub toAddress: *mut c_char,
@@ -132,13 +132,13 @@ pub struct CEthTransferPayload {
 
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEthRawTxPayload {
     pub fromAddress: *mut c_char,
     pub rawTx: *mut c_char,
 }
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct  CEeeChainTx{
     pub txHash:*mut c_char,
     pub blockHash:*mut c_char,

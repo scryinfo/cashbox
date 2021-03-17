@@ -8,7 +8,7 @@ use crate::types::{CChainShared, CTokenShared};
 use std::os::raw::c_char;
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CBtcChainToken {
     pub show:CBool,
     pub chainTokenSharedId:*mut c_char,
@@ -16,7 +16,7 @@ pub struct CBtcChainToken {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CBtcChainTokenShared {
     pub tokenShared: *mut CTokenShared,
     pub tokenType: *mut c_char,
@@ -44,7 +44,7 @@ pub struct CBtcChainTokenAuth {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CBtcChain {
     pub chainShared: *mut CChainShared,
     pub tokens: *mut CArray<CBtcChainToken>,

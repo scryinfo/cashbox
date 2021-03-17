@@ -458,7 +458,7 @@ mod tests {
         }
         {
             // struct
-            #[derive(Debug, Clone, DlStruct, DlDefault)]
+            #[derive(Debug, DlStruct, DlDefault)]
             struct Data {
                 pub name: String,
             }

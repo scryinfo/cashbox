@@ -30,7 +30,7 @@ mod cr;
 /// use wallets_macro::{db_append_shared,db_sub_struct};
 ///
 /// #[db_append_shared(CRUDTable)]
-/// #[derive(Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
+/// #[derive(Serialize, Deserialize, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 /// struct Big{
 ///  #[serde(default)]
 ///  pub name: String,
@@ -38,7 +38,7 @@ mod cr;
 ///  pub sub: Sub,
 /// }
 /// #[db_sub_struct]
-/// #[derive(Serialize, Deserialize, Clone, Debug, Default)]
+/// #[derive(Serialize, Deserialize, Debug, Default)]
 /// struct Sub {
 ///  #[serde(default)]
 ///  pub count: u64,
@@ -52,7 +52,7 @@ mod cr;
 /// use wallets_macro::db_append_shared;
 ///
 /// #[db_append_shared]
-/// #[derive(Serialize, Deserialize, Clone, Debug, Default,CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+/// #[derive(Serialize, Deserialize, Debug, Default,CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 /// struct Big{
 ///  #[serde(default)]
 ///  pub name: String,
