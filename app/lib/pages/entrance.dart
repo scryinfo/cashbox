@@ -1,8 +1,10 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/net/net_util.dart';
 import 'package:app/model/server_config_model.dart';
+import 'package:app/pages/eee_page.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -15,6 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dc.dart';
 import 'dart:convert' as convert;
 import 'eth_page.dart';
 import 'package:app/net/scryx_net_util.dart';
@@ -179,7 +183,18 @@ class _EntrancePageState extends State<EntrancePage> {
             if (snapshot.hasData) {
               bool isContainWallet = snapshot.data;
               if (isContainWallet) {
-                return EthPage();
+                ChainType curChainType = WalletsControl.getInstance().currentChainType();
+                switch (curChainType) {
+                  case ChainType.ETH:
+                    return EthPage();
+                    break;
+                  case ChainType.EEE:
+                    return EeePage();
+                    break;
+                  default:
+                    return EthPage();
+                    break;
+                }
               } else {
                 return _buildProtocolLayout(context);
               }
