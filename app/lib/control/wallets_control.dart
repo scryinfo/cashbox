@@ -125,6 +125,16 @@ class WalletsControl {
     return hasAnyObj.data1;
   }
 
+  EnumKit.ChainType currentChainType() {
+    var curWalletIdObj = Wallets.mainIsolate().currentWalletChain();
+    if (curWalletIdObj.isSuccess()) {
+      return curWalletIdObj.data1.chainType;
+    } else {
+      Logger.getInstance().e("wallet_control", "currentWalletChain error is --->" + curWalletIdObj.err.toString());
+      return null;
+    }
+  }
+
   Wallet currentWallet() {
     var curWalletIdObj = Wallets.mainIsolate().currentWalletChain();
     if (curWalletIdObj.isSuccess()) {

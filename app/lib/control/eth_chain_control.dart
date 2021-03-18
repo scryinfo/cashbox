@@ -40,6 +40,9 @@ class EthChainControl {
         // ..tokenId = element.ethChainTokenShared.tokenShared.id
         ..decimal = element.ethChainTokenShared.decimal ?? 0;
 
+      if (element.ethChainTokenShared.tokenShared.symbol.toLowerCase() == ChainType.ETH.toEnumString().toLowerCase()) {
+        newToken.address = nowWallet.ethChain.chainShared.walletAddress.address;
+      }
       _allTokenList.add(newToken);
     });
 

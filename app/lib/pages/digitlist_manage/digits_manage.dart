@@ -156,6 +156,9 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           ..decimal = element.ethChainTokenShared.decimal
           ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
           ..isVisible = false;
+        if (element.ethChainTokenShared.tokenShared.symbol.toLowerCase() == ChainType.ETH.toEnumString().toLowerCase()) {
+          tokenM.address = WalletsControl().currentWallet().ethChain.chainShared.walletAddress.address;
+        }
         nativeTokenMList.add(tokenM);
       });
       return nativeTokenMList;
@@ -314,9 +317,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           ),
           child: GestureDetector(
               onTap: () async {
-
-
-
                 /*var isExecutorSuccess = false;
                 if (displayDigitsList[index].isVisible) {
                   isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.hideDigit(displayDigitsList[index]);

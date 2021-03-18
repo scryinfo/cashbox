@@ -408,7 +408,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
   Future<List<EthTransactionModel>> getTxListData() async {
     displayTxOffset = displayTxOffset + refreshAddCount; //Increment refreshAddCount each time
     try {
-      if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress.trim() != "")) {
+      if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress != null && fromAddress.trim() != "")) {
         ethTxListModel = await loadEthTxHistory(context, fromAddress, chainType, offset: displayTxOffset.toString());
       } else if (fromAddress.trim() != "") {
         ethTxListModel = await loadErc20TxHistory(context, fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
