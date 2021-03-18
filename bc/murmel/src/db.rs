@@ -475,7 +475,7 @@ impl DetailSqlite {
                         utxo.btc_tx_hexbytes = this_output.btc_tx_hexbytes;
                         utxo.value = this_output.value;
                         let r = utxo.save_update(&self.rb, "").await;
-                        r.map_or_else(|e| println!("{:?}", e), |d| println!("{:?}", d))
+                        r.map_or_else(|e| error!("{:?}", e), |d| debug!("{:?}", d))
                     }
                     Some(input) => {
                         let mut utxo = MBtcUtxo::default();
@@ -496,7 +496,7 @@ impl DetailSqlite {
 
                         utxo.spent_value = Some(spent_value);
                         let r = utxo.save_update(&self.rb, "").await;
-                        r.map_or_else(|e| println!("{:?}", e), |d| println!("{:?}", d))
+                        r.map_or_else(|e| error!("{:?}", e), |d| debug!("{:?}", d))
                     }
                 }
             }
