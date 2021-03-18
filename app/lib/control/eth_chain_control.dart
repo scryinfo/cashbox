@@ -73,7 +73,7 @@ class EthChainControl {
     return dataObj.data1;
   }
 
-  txSign(NetType netType, EthTransferPayload txPayload, NoCacheString password) {
+  String txSign(NetType netType, EthTransferPayload txPayload, NoCacheString password) {
     var dataObj = Wallets.mainIsolate().chainEth.txSign(netType, txPayload, password);
     if (!dataObj.isSuccess()) {
       return null;
