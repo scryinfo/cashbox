@@ -24,13 +24,26 @@ pub fn hex_to_tx(str: &str) -> Result<Transaction, Error> {
 
 ///
 /// static tx fee mybe not a good idea <br>
-/// Data from https://bitcoinfees.earn.com/ <br>
-/// {"fastestFee":102,"halfHourFee":102,"hourFee":88} <br>
+/// https://coinb.in/#fees <br>
 /// tx fee changes over time <br>
-/// size = inputsNum * 148 + outputsNum * 34 + 10 (+/-) 40
-/// tx fee related to inputs and outputs
+/// size = inputsNum * 148 + outputsNum * 34 + 10 (+/-) 40 <br>
+/// tx fee related to inputs and outputs <br>
+/// use low fee compaire with tx fee in Mainet <br>
+/// '19' comes from coinb.in (Satoshi per Byte: 19) </br>
 ///
-pub fn tx_fee(input_sum: f32, outputs_num: f32) -> f32 {
-    let size = input_sum * 148f32 + outputs_num * 34f32 + 10f32;
-    size * 88
+/// another website  https://bitcoinfees.earn.com/api/v1/fees/recommended
+///
+pub fn tx_fee(input_sum: u32, outputs_num: u32) -> u32 {
+    let size = input_sum * 148u32 + outputs_num * 34u32  + 10;
+    size * 19
+}
+
+mod test {
+    use crate::kit::tx_fee;
+
+    #[test]
+    pub fn tx_fee_test() {
+        let fee = tx_fee(1, 1);
+        println!("{:?}", fee);
+    }
 }
