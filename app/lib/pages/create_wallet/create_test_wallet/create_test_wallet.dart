@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:app/model/wallet.dart';
-import 'package:app/model/wallets.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -13,6 +12,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:wallets/enums.dart' as EnumKit;
 
 class CreateTestWalletPage extends StatefulWidget {
   @override
@@ -20,7 +20,6 @@ class CreateTestWalletPage extends StatefulWidget {
 }
 
 class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
-  bool _isChooseEeeChain = true;
   bool _isChooseEthChain = true;
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _mnemonicController = TextEditingController();
@@ -400,13 +399,14 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   }
 
   void changeMnemonic() async {
-    var mnemonic = await Wallets.instance.createMnemonic(12);
-    if (mnemonic == null) {
+    String mneStr = WalletsControl.getInstance().generateMnemonic(12);
+    if (mneStr == null) {
       Logger().e("CreateWalletMnemonicPage=>", "mnemonic is null");
       return;
     }
     setState(() {
-      _mnemonicController.text = String.fromCharCodes(mnemonic);
+      _mnemonicController.text = mneStr;
+      mneStr = null;
     });
   }
 
@@ -438,10 +438,11 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       Fluttertoast.showToast(msg: translate('mne_pwd_not_allow_is_null'));
       return;
     }
-    // todo walletType
-    var isSuccess = await Wallets.instance
-        .saveWallet(_nameController.text, Uint8List.fromList(_pwdController.text.codeUnits), Uint8List.fromList(_mnemonicController.text.codeUnits));
-    if (isSuccess) {
+
+    var newWalletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mnemonicController.text.codeUnits), EnumKit.WalletType.Test,
+        _nameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
+
+    if (newWalletObj != null) {
       Fluttertoast.showToast(msg: translate('success_create_test_wallet'));
       NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
     } else {
