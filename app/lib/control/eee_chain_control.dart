@@ -119,6 +119,14 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
+  List<EeeChainTx> getTxRecord(NetType netType, String account, int startItem, int pageSize) {
+    var dataObj = Wallets.mainIsolate().chainEee.getTxRecord(netType, account, startItem, pageSize);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
   AccountInfoSyncProg getSyncRecord(NetType netType, String account) {
     var dataObj = Wallets.mainIsolate().chainEee.getSyncRecord(netType, account);
     if (!dataObj.isSuccess()) {
