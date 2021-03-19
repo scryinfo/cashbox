@@ -24,7 +24,7 @@ use wallets_cdl::{
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, WalletTokenStatus, TokenAddress};
 use mav::ma::MTokenAddress;
 use wallets_cdl::wallets_c::{Wallets_updateBalance, Wallets_queryBalance, Wallets_currentWalletChain, Wallets_saveCurrentWalletChain, Wallets_hasAny, Wallets_findWalletBaseByName, Wallets_renameWallet, Wallets_resetWalletPassword, Wallets_exportWallet};
-use wallets_cdl::mem_c::{CArrayCTokenAddress_dAlloc, CArrayCTokenAddress_dFree, CBool_dAlloc, CBool_dFree};
+use wallets_cdl::mem_c::{CArrayCTokenAddress_dAlloc, CArrayCTokenAddress_dFree, CBool_alloc, CBool_free};
 use wallets_cdl::kits::CTrue;
 
 
@@ -265,12 +265,12 @@ fn wallets_test() {
             w
         };
         {
-            let c_bool = CBool_dAlloc();
+            let c_bool = CBool_alloc();
             let c_err = Wallets_hasAny(*c_ctx,c_bool) as *mut CError;
             assert_eq!(0 as CU64, (*c_err).code, "Wallets_hasAny {:?}", *c_err);
             CError_free(c_err);
             assert_eq!(*c_bool,CTrue);
-            CBool_dFree(c_bool);
+            CBool_free(c_bool);
         }
 
         let target_wallet = find_by_id_test(*c_ctx, &wallet.id);

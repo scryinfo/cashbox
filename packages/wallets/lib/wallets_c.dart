@@ -611,25 +611,25 @@ typedef _CArrayInt64_dFree_C = Void Function(
 typedef _CArrayInt64_dFree_Dart = void Function(
   Pointer<Pointer<CArrayI64>> dPtr,
 );
-/// C function `CBool_dAlloc`.
-Pointer<Pointer<Uint32>> CBool_dAlloc() {
-  return _CBool_dAlloc();
+/// C function `CBool_alloc`.
+Pointer<Uint32> CBool_alloc() {
+  return _CBool_alloc();
 }
-final _CBool_dAlloc_Dart _CBool_dAlloc = _dl.lookupFunction<_CBool_dAlloc_C, _CBool_dAlloc_Dart>('CBool_dAlloc');
-typedef _CBool_dAlloc_C = Pointer<Pointer<Uint32>> Function();
-typedef _CBool_dAlloc_Dart = Pointer<Pointer<Uint32>> Function();
-/// C function `CBool_dFree`.
-void CBool_dFree(
-  Pointer<Pointer<Uint32>> dcs,
+final _CBool_alloc_Dart _CBool_alloc = _dl.lookupFunction<_CBool_alloc_C, _CBool_alloc_Dart>('CBool_alloc');
+typedef _CBool_alloc_C = Pointer<Uint32> Function();
+typedef _CBool_alloc_Dart = Pointer<Uint32> Function();
+/// C function `CBool_free`.
+void CBool_free(
+  Pointer<Uint32> dcs,
 ) {
-  _CBool_dFree(dcs);
+  _CBool_free(dcs);
 }
-final _CBool_dFree_Dart _CBool_dFree = _dl.lookupFunction<_CBool_dFree_C, _CBool_dFree_Dart>('CBool_dFree');
-typedef _CBool_dFree_C = Void Function(
-  Pointer<Pointer<Uint32>> dcs,
+final _CBool_free_Dart _CBool_free = _dl.lookupFunction<_CBool_free_C, _CBool_free_Dart>('CBool_free');
+typedef _CBool_free_C = Void Function(
+  Pointer<Uint32> dcs,
 );
-typedef _CBool_dFree_Dart = void Function(
-  Pointer<Pointer<Uint32>> dcs,
+typedef _CBool_free_Dart = void Function(
+  Pointer<Uint32> dcs,
 );
 /// C struct `CBtcChain`.
 class CBtcChain extends Struct {
@@ -2301,22 +2301,6 @@ typedef _Wallets_saveCurrentWalletChain_Dart = Pointer<CError> Function(
   Pointer<CContext> ctx,
   Pointer<ffi.Utf8> walletId,
   Pointer<ffi.Utf8> chainType,
-);
-/// C function `Wallets_setCurrentDbVersion`.
-Pointer<CError> Wallets_setCurrentDbVersion(
-  Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> versionValue,
-) {
-  return _Wallets_setCurrentDbVersion(ctx, versionValue);
-}
-final _Wallets_setCurrentDbVersion_Dart _Wallets_setCurrentDbVersion = _dl.lookupFunction<_Wallets_setCurrentDbVersion_C, _Wallets_setCurrentDbVersion_Dart>('Wallets_setCurrentDbVersion');
-typedef _Wallets_setCurrentDbVersion_C = Pointer<CError> Function(
-  Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> versionValue,
-);
-typedef _Wallets_setCurrentDbVersion_Dart = Pointer<CError> Function(
-  Pointer<CContext> ctx,
-  Pointer<ffi.Utf8> versionValue,
 );
 /// <p class="para-brief"> 如果成功返回 [wallets_types::Error::SUCCESS()]</p>
 Pointer<CError> Wallets_uninit(

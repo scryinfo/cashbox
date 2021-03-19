@@ -27,11 +27,11 @@ setlocal enabledelayedexpansion
         )
     )
 ) > temp_.dart
+EndLocal
+@echo on
 move temp_.dart wallets_c.dart
-
 cd ../
-flutter pub get
+::flutter pub get
 flutter pub run build_runner build
-
 cd "%cuPath%"
 EndLocal

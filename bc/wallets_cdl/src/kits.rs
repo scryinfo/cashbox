@@ -315,11 +315,11 @@ impl CR<*mut c_char, String> for *mut c_char {
     }
 }
 
-
+/// d表示 指针的指针
 pub fn d_ptr_alloc<T>() -> *mut *mut T {
     Box::into_raw(Box::new(null_mut()))
 }
-
+/// d表示 指针的指针
 pub fn d_ptr_free<T: CStruct + Any>(d_ptr: &mut *mut *mut T) {
     (*d_ptr).free();
 }

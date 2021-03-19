@@ -55,12 +55,12 @@ pub unsafe extern "C" fn CStr_dAlloc() -> *mut *mut c_char {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CBool_dFree(dcs: *mut CBool) {
+pub unsafe extern "C" fn CBool_free(dcs: *mut CBool) {
     Box::from_raw(dcs);
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CBool_dAlloc() -> *mut CBool {
+pub unsafe extern "C" fn CBool_alloc() -> *mut CBool {
     let c_bool: *mut CBool = Box::into_raw(Box::new(0));
     c_bool
 }

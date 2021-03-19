@@ -120,19 +120,19 @@ class ChainEth {
 
     return err;
   }
-
-  Error addNonAuthDigit(ArrayCEthChainTokenAuth tokens) {
-    Error err;
-    {
-      var ptrTokens = tokens.toCPtr();
-      var cerr = clib.ChainEth_addNonAuthDigit(_ptrContext, ptrTokens);
-      err = Error.fromC(cerr);
-      clib.CError_free(cerr);
-      ArrayCEthChainTokenAuth.free(ptrTokens);
-    }
-
-    return err;
-  }
+  //
+  // Error addNonAuthDigit(ArrayCEthChainTokenAuth tokens) {
+  //   Error err;
+  //   {
+  //     var ptrTokens = tokens.toCPtr();
+  //     var cerr = clib.ChainEth_addNonAuthDigit(_ptrContext, ptrTokens);
+  //     err = Error.fromC(cerr);
+  //     clib.CError_free(cerr);
+  //     ArrayCEthChainTokenAuth.free(ptrTokens);
+  //   }
+  //
+  //   return err;
+  // }
 
   Wallets _wallets;
 
