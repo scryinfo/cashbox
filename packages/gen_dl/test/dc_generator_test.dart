@@ -29,15 +29,22 @@ class Error extends DC<clib.CError> {
   int code;
   String message;
 
+  static freeInstance(clib.CError instance) {
+    if (instance == null) {
+      return;
+    }
+    if (instance.message != null && instance.message != nullptr) {
+      ffi.calloc.free(instance.message);
+    }
+    instance.message = nullptr;
+  }
+
   static free(Pointer<clib.CError> ptr) {
     if (ptr == null || ptr == nullptr) {
       return;
     }
-    if (ptr.ref.message != null && ptr.ref.message != nullptr) {
-      ffi.free(ptr.ref.message);
-    }
-    ptr.ref.message = nullptr;
-    ffi.free(ptr);
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
   }
 
   static Error fromC(Pointer<clib.CError> ptr) {
@@ -61,11 +68,19 @@ class Error extends DC<clib.CError> {
     if (c == null || c == nullptr) {
       return;
     }
-    c.ref.code = code;
-    if (c.ref.message != null && c.ref.message != nullptr) {
-      ffi.free(c.ref.message);
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CError c) {
+    if (c == null) {
+      return;
     }
-    c.ref.message = toUtf8Null(message);
+    c.code = code;
+    if (c.message != null && c.message != nullptr) {
+      ffi.calloc.free(c.message);
+    }
+    c.message = toUtf8Null(message);
   }
 
   @override
@@ -73,30 +88,57 @@ class Error extends DC<clib.CError> {
     if (c == null || c == nullptr) {
       return;
     }
-    code = c.ref.code;
-    message = fromUtf8Null(c.ref.message);
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CError c) {
+    if (c == null) {
+      return;
+    }
+    code = c.code;
+    message = fromUtf8Null(c.message);
   }
 }
 
 class Address extends DC<clib.CAddress> {
   String name;
   Error err;
+  Error instance;
+  ArrayCAddress arrayCAddress;
 
   Address() {
     err = new Error();
+    instance = new Error();
+    arrayCAddress = new ArrayCAddress();
+  }
+
+  static freeInstance(clib.CAddress instance) {
+    if (instance == null) {
+      return;
+    }
+    if (instance.name != null && instance.name != nullptr) {
+      ffi.calloc.free(instance.name);
+    }
+    instance.name = nullptr;
+    Error.free(instance.err);
+    instance.err = nullptr;
+    if (instance.instance != null) {
+      Error.freeInstance(instance.instance);
+    }
+    instance.instance = null;
+    if (instance.arrayCAddress != null) {
+      ArrayCAddress.freeInstance(instance.arrayCAddress);
+    }
+    instance.arrayCAddress = null;
   }
 
   static free(Pointer<clib.CAddress> ptr) {
     if (ptr == null || ptr == nullptr) {
       return;
     }
-    if (ptr.ref.name != null && ptr.ref.name != nullptr) {
-      ffi.free(ptr.ref.name);
-    }
-    ptr.ref.name = nullptr;
-    Error.free(ptr.ref.err);
-    ptr.ref.err = nullptr;
-    ffi.free(ptr);
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
   }
 
   static Address fromC(Pointer<clib.CAddress> ptr) {
@@ -120,14 +162,24 @@ class Address extends DC<clib.CAddress> {
     if (c == null || c == nullptr) {
       return;
     }
-    if (c.ref.name != null && c.ref.name != nullptr) {
-      ffi.free(c.ref.name);
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CAddress c) {
+    if (c == null) {
+      return;
     }
-    c.ref.name = toUtf8Null(name);
-    if (c.ref.err == null || c.ref.err == nullptr) {
-      c.ref.err = allocateZero<clib.CError>();
+    if (c.name != null && c.name != nullptr) {
+      ffi.calloc.free(c.name);
     }
-    err.toC(c.ref.err);
+    c.name = toUtf8Null(name);
+    if (c.err == null || c.err == nullptr) {
+      c.err = allocateZero<clib.CError>();
+    }
+    err.toC(c.err);
+    instance.toCInstance(c.instance);
+    arrayCAddress.toCInstance(c.arrayCAddress);
   }
 
   @override
@@ -135,9 +187,21 @@ class Address extends DC<clib.CAddress> {
     if (c == null || c == nullptr) {
       return;
     }
-    name = fromUtf8Null(c.ref.name);
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CAddress c) {
+    if (c == null) {
+      return;
+    }
+    name = fromUtf8Null(c.name);
     err = new Error();
-    err.toDart(c.ref.err);
+    err.toDart(c.err);
+    instance = new Error();
+    instance.toDartInstance(c.instance);
+    arrayCAddress = new ArrayCAddress();
+    arrayCAddress.toDartInstance(c.arrayCAddress);
   }
 }
 
@@ -145,16 +209,23 @@ class ArrayCAddress extends DC<clib.CArrayCAddress> {
   List<Address> data;
 
   ArrayCAddress() {
-    data = new List<Address>();
+    data = <Address>[];
   }
 
   static free(Pointer<clib.CArrayCAddress> ptr) {
     if (ptr == null || ptr == nullptr) {
       return;
     }
-    Address.free(ptr.ref.ptr);
-    ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
+  }
+
+  static freeInstance(clib.CArrayCAddress instance) {
+    if (instance == null) {
+      return;
+    }
+    Address.free(instance.ptr);
+    instance.ptr = nullptr;
   }
 
   static ArrayCAddress fromC(Pointer<clib.CArrayCAddress> ptr) {
@@ -178,15 +249,23 @@ class ArrayCAddress extends DC<clib.CArrayCAddress> {
     if (c == null || c == nullptr) {
       return;
     }
-    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
-      Address.free(c.ref.ptr);
-      c.ref.ptr = nullptr;
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CArrayCAddress c) {
+    if (c == null) {
+      return;
     }
-    c.ref.ptr = allocateZero<clib.CAddress>(count: data.length);
-    c.ref.len = data.length;
-    c.ref.cap = data.length;
+    if (c.ptr != nullptr && c.ptr != null) {
+      Address.free(c.ptr);
+      c.ptr = nullptr;
+    }
+    c.ptr = allocateZero<clib.CAddress>(count: data.length);
+    c.len = data.length;
+    c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
-      data[i].toC(c.ref.ptr.elementAt(i));
+      data[i].toC(c.ptr.elementAt(i));
     }
   }
 
@@ -195,10 +274,18 @@ class ArrayCAddress extends DC<clib.CArrayCAddress> {
     if (c == null || c == nullptr) {
       return;
     }
-    data = new List<Address>(c.ref.len);
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CArrayCAddress c) {
+    if (c == null) {
+      return;
+    }
+    data = List.filled(c.len, null);
     for (var i = 0; i < data.length; i++) {
       data[i] = new Address();
-      data[i].toDart(c.ref.ptr.elementAt(i));
+      data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
@@ -207,16 +294,23 @@ class ArrayInt32 extends DC<clib.CArrayInt32> {
   List<int> data;
 
   ArrayInt32() {
-    data = new List<int>();
+    data = <int>[];
   }
 
   static free(Pointer<clib.CArrayInt32> ptr) {
     if (ptr == null || ptr == nullptr) {
       return;
     }
-    ptr.ref.ptr.free();
-    ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
+  }
+
+  static freeInstance(clib.CArrayInt32 instance) {
+    if (instance == null) {
+      return;
+    }
+    instance.ptr.free();
+    instance.ptr = nullptr;
   }
 
   static ArrayInt32 fromC(Pointer<clib.CArrayInt32> ptr) {
@@ -240,15 +334,23 @@ class ArrayInt32 extends DC<clib.CArrayInt32> {
     if (c == null || c == nullptr) {
       return;
     }
-    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
-      c.ref.ptr.free();
-      c.ref.ptr = nullptr;
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CArrayInt32 c) {
+    if (c == null) {
+      return;
     }
-    c.ref.ptr = allocateZero<Int32>(count: data.length);
-    c.ref.len = data.length;
-    c.ref.cap = data.length;
+    if (c.ptr != nullptr && c.ptr != null) {
+      c.ptr.free();
+      c.ptr = nullptr;
+    }
+    c.ptr = allocateZero<Int32>(count: data.length);
+    c.len = data.length;
+    c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
-      c.ref.ptr.elementAt(i).value = data[i];
+      c.ptr.elementAt(i).value = data[i];
     }
   }
 
@@ -257,9 +359,17 @@ class ArrayInt32 extends DC<clib.CArrayInt32> {
     if (c == null || c == nullptr) {
       return;
     }
-    data = new List<int>(c.ref.len);
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CArrayInt32 c) {
+    if (c == null) {
+      return;
+    }
+    data = List.filled(c.len, null);
     for (var i = 0; i < data.length; i++) {
-      data[i] = c.ref.ptr.elementAt(i).value;
+      data[i] = c.ptr.elementAt(i).value;
     }
   }
 }
@@ -276,51 +386,58 @@ class NativeType extends DC<clib.CNativeType> {
   double ptrFloat;
   double ptrDouble;
 
+  static freeInstance(clib.CNativeType instance) {
+    if (instance == null) {
+      return;
+    }
+    if (instance.ptrInt8 != null && instance.ptrInt8 != nullptr) {
+      ffi.calloc.free(instance.ptrInt8);
+    }
+    instance.ptrInt8 = nullptr;
+    if (instance.ptrInt16 != null && instance.ptrInt16 != nullptr) {
+      ffi.calloc.free(instance.ptrInt16);
+    }
+    instance.ptrInt16 = nullptr;
+    if (instance.ptrInt32 != null && instance.ptrInt32 != nullptr) {
+      ffi.calloc.free(instance.ptrInt32);
+    }
+    instance.ptrInt32 = nullptr;
+    if (instance.ptrInt64 != null && instance.ptrInt64 != nullptr) {
+      ffi.calloc.free(instance.ptrInt64);
+    }
+    instance.ptrInt64 = nullptr;
+    if (instance.ptrUInt8 != null && instance.ptrUInt8 != nullptr) {
+      ffi.calloc.free(instance.ptrUInt8);
+    }
+    instance.ptrUInt8 = nullptr;
+    if (instance.ptrUInt16 != null && instance.ptrUInt16 != nullptr) {
+      ffi.calloc.free(instance.ptrUInt16);
+    }
+    instance.ptrUInt16 = nullptr;
+    if (instance.ptrUInt32 != null && instance.ptrUInt32 != nullptr) {
+      ffi.calloc.free(instance.ptrUInt32);
+    }
+    instance.ptrUInt32 = nullptr;
+    if (instance.ptrUInt64 != null && instance.ptrUInt64 != nullptr) {
+      ffi.calloc.free(instance.ptrUInt64);
+    }
+    instance.ptrUInt64 = nullptr;
+    if (instance.ptrFloat != null && instance.ptrFloat != nullptr) {
+      ffi.calloc.free(instance.ptrFloat);
+    }
+    instance.ptrFloat = nullptr;
+    if (instance.ptrDouble != null && instance.ptrDouble != nullptr) {
+      ffi.calloc.free(instance.ptrDouble);
+    }
+    instance.ptrDouble = nullptr;
+  }
+
   static free(Pointer<clib.CNativeType> ptr) {
     if (ptr == null || ptr == nullptr) {
       return;
     }
-    if (ptr.ref.ptrInt8 != null && ptr.ref.ptrInt8 != nullptr) {
-      ffi.free(ptr.ref.ptrInt8);
-    }
-    ptr.ref.ptrInt8 = nullptr;
-    if (ptr.ref.ptrInt16 != null && ptr.ref.ptrInt16 != nullptr) {
-      ffi.free(ptr.ref.ptrInt16);
-    }
-    ptr.ref.ptrInt16 = nullptr;
-    if (ptr.ref.ptrInt32 != null && ptr.ref.ptrInt32 != nullptr) {
-      ffi.free(ptr.ref.ptrInt32);
-    }
-    ptr.ref.ptrInt32 = nullptr;
-    if (ptr.ref.ptrInt64 != null && ptr.ref.ptrInt64 != nullptr) {
-      ffi.free(ptr.ref.ptrInt64);
-    }
-    ptr.ref.ptrInt64 = nullptr;
-    if (ptr.ref.ptrUInt8 != null && ptr.ref.ptrUInt8 != nullptr) {
-      ffi.free(ptr.ref.ptrUInt8);
-    }
-    ptr.ref.ptrUInt8 = nullptr;
-    if (ptr.ref.ptrUInt16 != null && ptr.ref.ptrUInt16 != nullptr) {
-      ffi.free(ptr.ref.ptrUInt16);
-    }
-    ptr.ref.ptrUInt16 = nullptr;
-    if (ptr.ref.ptrUInt32 != null && ptr.ref.ptrUInt32 != nullptr) {
-      ffi.free(ptr.ref.ptrUInt32);
-    }
-    ptr.ref.ptrUInt32 = nullptr;
-    if (ptr.ref.ptrUInt64 != null && ptr.ref.ptrUInt64 != nullptr) {
-      ffi.free(ptr.ref.ptrUInt64);
-    }
-    ptr.ref.ptrUInt64 = nullptr;
-    if (ptr.ref.ptrFloat != null && ptr.ref.ptrFloat != nullptr) {
-      ffi.free(ptr.ref.ptrFloat);
-    }
-    ptr.ref.ptrFloat = nullptr;
-    if (ptr.ref.ptrDouble != null && ptr.ref.ptrDouble != nullptr) {
-      ffi.free(ptr.ref.ptrDouble);
-    }
-    ptr.ref.ptrDouble = nullptr;
-    ffi.free(ptr);
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
   }
 
   static NativeType fromC(Pointer<clib.CNativeType> ptr) {
@@ -344,16 +461,24 @@ class NativeType extends DC<clib.CNativeType> {
     if (c == null || c == nullptr) {
       return;
     }
-    c.ref.ptrInt8.value = ptrInt8;
-    c.ref.ptrInt16.value = ptrInt16;
-    c.ref.ptrInt32.value = ptrInt32;
-    c.ref.ptrInt64.value = ptrInt64;
-    c.ref.ptrUInt8.value = ptrUInt8;
-    c.ref.ptrUInt16.value = ptrUInt16;
-    c.ref.ptrUInt32.value = ptrUInt32;
-    c.ref.ptrUInt64.value = ptrUInt64;
-    c.ref.ptrFloat.value = ptrFloat;
-    c.ref.ptrDouble.value = ptrDouble;
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CNativeType c) {
+    if (c == null) {
+      return;
+    }
+    c.ptrInt8.value = ptrInt8;
+    c.ptrInt16.value = ptrInt16;
+    c.ptrInt32.value = ptrInt32;
+    c.ptrInt64.value = ptrInt64;
+    c.ptrUInt8.value = ptrUInt8;
+    c.ptrUInt16.value = ptrUInt16;
+    c.ptrUInt32.value = ptrUInt32;
+    c.ptrUInt64.value = ptrUInt64;
+    c.ptrFloat.value = ptrFloat;
+    c.ptrDouble.value = ptrDouble;
   }
 
   @override
@@ -361,16 +486,24 @@ class NativeType extends DC<clib.CNativeType> {
     if (c == null || c == nullptr) {
       return;
     }
-    ptrInt8 = c.ref.ptrInt8.value;
-    ptrInt16 = c.ref.ptrInt16.value;
-    ptrInt32 = c.ref.ptrInt32.value;
-    ptrInt64 = c.ref.ptrInt64.value;
-    ptrUInt8 = c.ref.ptrUInt8.value;
-    ptrUInt16 = c.ref.ptrUInt16.value;
-    ptrUInt32 = c.ref.ptrUInt32.value;
-    ptrUInt64 = c.ref.ptrUInt64.value;
-    ptrFloat = c.ref.ptrFloat.value;
-    ptrDouble = c.ref.ptrDouble.value;
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CNativeType c) {
+    if (c == null) {
+      return;
+    }
+    ptrInt8 = c.ptrInt8.value;
+    ptrInt16 = c.ptrInt16.value;
+    ptrInt32 = c.ptrInt32.value;
+    ptrInt64 = c.ptrInt64.value;
+    ptrUInt8 = c.ptrUInt8.value;
+    ptrUInt16 = c.ptrUInt16.value;
+    ptrUInt32 = c.ptrUInt32.value;
+    ptrUInt64 = c.ptrUInt64.value;
+    ptrFloat = c.ptrFloat.value;
+    ptrDouble = c.ptrDouble.value;
   }
 }
 
@@ -378,16 +511,23 @@ class ArrayCChar extends DC<clib.CArrayCChar> {
   List<String> data;
 
   ArrayCChar() {
-    data = new List<String>();
+    data = <String>[];
   }
 
   static free(Pointer<clib.CArrayCChar> ptr) {
     if (ptr == null || ptr == nullptr) {
       return;
     }
-    ptr.ref.ptr.free(ptr.ref.len);
-    ptr.ref.ptr = nullptr;
-    ffi.free(ptr);
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
+  }
+
+  static freeInstance(clib.CArrayCChar instance) {
+    if (instance == null) {
+      return;
+    }
+    instance.ptr.free(instance.len);
+    instance.ptr = nullptr;
   }
 
   static ArrayCChar fromC(Pointer<clib.CArrayCChar> ptr) {
@@ -411,15 +551,23 @@ class ArrayCChar extends DC<clib.CArrayCChar> {
     if (c == null || c == nullptr) {
       return;
     }
-    if (c.ref.ptr != nullptr && c.ref.ptr != null) {
-      c.ref.ptr.free(c.ref.len);
-      c.ref.ptr = nullptr;
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CArrayCChar c) {
+    if (c == null) {
+      return;
     }
-    c.ref.ptr = allocateZero<Pointer<ffi.Utf8>>(count: data.length);
-    c.ref.len = data.length;
-    c.ref.cap = data.length;
+    if (c.ptr != nullptr && c.ptr != null) {
+      c.ptr.free(c.len);
+      c.ptr = nullptr;
+    }
+    c.ptr = allocateZero<Pointer<ffi.Utf8>>(count: data.length);
+    c.len = data.length;
+    c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
-      c.ref.ptr.elementAt(i).value = data[i].toCPtr();
+      c.ptr.elementAt(i).value = data[i].toCPtr();
     }
   }
 
@@ -428,10 +576,94 @@ class ArrayCChar extends DC<clib.CArrayCChar> {
     if (c == null || c == nullptr) {
       return;
     }
-    data = new List<String>(c.ref.len);
-    for (var i = 0; i < data.length; i++) {
-      data[i] = fromUtf8Null(c.ref.ptr.elementAt(i).value);
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CArrayCChar c) {
+    if (c == null) {
+      return;
     }
+    data = List.filled(c.len, null);
+    for (var i = 0; i < data.length; i++) {
+      data[i] = fromUtf8Null(c.ptr.elementAt(i).value);
+    }
+  }
+}
+
+class FieldCArrayCChar extends DC<clib.CFieldCArrayCChar> {
+  ArrayCChar strs;
+
+  FieldCArrayCChar() {
+    strs = new ArrayCChar();
+  }
+
+  static freeInstance(clib.CFieldCArrayCChar instance) {
+    if (instance == null) {
+      return;
+    }
+    ArrayCChar.free(instance.strs);
+    instance.strs = nullptr;
+  }
+
+  static free(Pointer<clib.CFieldCArrayCChar> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return;
+    }
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
+  }
+
+  static FieldCArrayCChar fromC(Pointer<clib.CFieldCArrayCChar> ptr) {
+    if (ptr == null || ptr == nullptr) {
+      return null;
+    }
+    var d = new FieldCArrayCChar();
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CFieldCArrayCChar> toCPtr() {
+    var ptr = allocateZero<clib.CFieldCArrayCChar>();
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CFieldCArrayCChar> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CFieldCArrayCChar c) {
+    if (c == null) {
+      return;
+    }
+    if (c.strs == null || c.strs == nullptr) {
+      c.strs = allocateZero<clib.CArrayCChar>();
+    }
+    strs.toC(c.strs);
+  }
+
+  @override
+  toDart(Pointer<clib.CFieldCArrayCChar> c) {
+    if (c == null || c == nullptr) {
+      return;
+    }
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CFieldCArrayCChar c) {
+    if (c == null) {
+      return;
+    }
+    strs = new ArrayCChar();
+    strs.toDart(c.strs);
   }
 }
 ''';
@@ -458,6 +690,8 @@ class CError extends Struct {
 class CAddress extends Struct {
   Pointer<ffi.Utf8> name;
   Pointer<CError> err;
+  CError instance;
+  CArrayCAddress arrayCAddress;
 }
 /// C Array.
 class CArrayCAddress extends Struct {
