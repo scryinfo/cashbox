@@ -15,7 +15,7 @@ use crate::CArray;
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CInitParameters {
-    pub dbName: CDbName,
+    pub dbName: *mut CDbName,
     pub contextNote: *mut c_char,
 }
 

@@ -4773,10 +4773,8 @@ class InitParameters extends DC<clib.CInitParameters> {
     if (instance == null) {
       return;
     }
-    if (instance.dbName != null) {
-      DbName.freeInstance(instance.dbName);
-    }
-    instance.dbName = null;
+    DbName.free(instance.dbName);
+    instance.dbName = nullptr;
     if (instance.contextNote != null && instance.contextNote != nullptr) {
       ffi.calloc.free(instance.contextNote);
     }
@@ -4820,7 +4818,10 @@ class InitParameters extends DC<clib.CInitParameters> {
     if (c == null) {
       return;
     }
-    dbName.toCInstance(c.dbName);
+    if (c.dbName == null || c.dbName == nullptr) {
+      c.dbName = allocateZero<clib.CDbName>();
+    }
+    dbName.toC(c.dbName);
     if (c.contextNote != null && c.contextNote != nullptr) {
       ffi.calloc.free(c.contextNote);
     }
@@ -4841,7 +4842,7 @@ class InitParameters extends DC<clib.CInitParameters> {
       return;
     }
     dbName = new DbName();
-    dbName.toDartInstance(c.dbName);
+    dbName.toDart(c.dbName);
     contextNote = fromUtf8Null(c.contextNote);
   }
 }
