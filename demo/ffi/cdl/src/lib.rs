@@ -223,7 +223,7 @@ mod tests {
     use std::os::raw::c_char;
     use std::ptr::{null, null_mut};
 
-    use crate::{add, addStr, Data_free, Data_new, Data_noPtr, multi_i32, Str_free, to_c_char, to_str};
+    use crate::{add, addStr, Data_free, Data_new, Data_noPtr, multi_i32, Str_free, to_c_char, to_str, Data};
     use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, ptr_alloc};
 
     #[test]
@@ -244,6 +244,16 @@ mod tests {
     #[test]
     fn test_struct() {
         unsafe {
+            {//test Drop train in *mut T
+                let ptr = Box::into_raw(Box::new(Data::default()));
+                let tptr = ptr as i64;
+                {
+                    (*ptr).intType = 1;
+                    (*ptr).charType = to_c_char("t");
+                    Box::from_raw(ptr);
+                }
+                assert_eq!(null_mut(), (*ptr).charType);
+            }
             let data = unsafe { Box::from_raw(Data_new()) };
             assert_eq!(10, data.intType);
             assert_eq!("test 测试", to_str(data.charType));

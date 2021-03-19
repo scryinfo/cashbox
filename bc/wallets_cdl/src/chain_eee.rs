@@ -5,7 +5,7 @@ use std::os::raw::c_char;
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{AccountInfoSyncProg, EeeChain, EeeChainToken, EeeChainTokenShared,EeeChainTokenAuth,EeeChainTokenDefault, SubChainBasicInfo};
 
-use crate::kits::{CArray, CBool, CMark, CR, CStruct, to_c_char, to_str};
+use crate::kits::{CArray, CBool, CR, CStruct, to_c_char, to_str,Assignment};
 use crate::types::{CChainShared, CTokenShared};
 
 #[repr(C)]

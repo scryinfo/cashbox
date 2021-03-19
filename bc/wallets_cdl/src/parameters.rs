@@ -9,13 +9,13 @@ use wallets_types::{
     DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,EeeChainTx,WalletTokenStatus
 };
 
-use crate::kits::{to_c_char, to_str, CMark, CStruct, CR, CBool};
+use crate::kits::{to_c_char, to_str, CStruct, CR, CBool,Assignment};
 use crate::CArray;
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CInitParameters {
-    pub dbName: *mut CDbName,
+    pub dbName: CDbName,
     pub contextNote: *mut c_char,
 }
 
@@ -163,3 +163,4 @@ pub struct CWalletTokenStatus{
     pub tokenId: *mut c_char,
     pub isShow: CBool,
 }
+

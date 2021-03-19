@@ -10,7 +10,7 @@ use crate::to_snake_name;
 const TYPE_NAME_C_CHAR: &str = "c_char";
 
 pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
-    const NAME: &str = "";//CExtrinsicContext
+    const NAME: &str = "";//CExtrinsicContext,CInitParameters
     let r_name = {
         let mut str = type_name.to_owned();
         str.remove(0);
@@ -41,27 +41,6 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                     if let Some(PathSegment { ident, .. }) = path.segments.last() {
                         // if ident.to_string().as_str() == TypeName_CArray {
                         Some(ident.to_token_stream())
-                        // } else {
-                        //     match arguments {
-                        //         PathArguments::None => Some(ident.to_token_stream()),
-                        //         PathArguments::AngleBracketed(AngleBracketedGenericArguments { args, .. }) => {
-                        //             if let Some(GenericArgument::Type(Type::Path(TypePath { path, .. }))) = args.last() {
-                        //                 if let Some(path_segment) = path.segments.last() {
-                        //                     let arg_type = &path_segment.ident;
-                        //                     let q = quote! { #ident::<#arg_type> };
-                        //                     Some(q)
-                        //                 } else {
-                        //                     println!("if let Some(path_segment) = path.segments.last()");
-                        //                     None
-                        //                 }
-                        //             } else {
-                        //                 println!("let Some(GenericArgument::Type(Type::Path(TypePath ");
-                        //                 None
-                        //             }
-                        //         }
-                        //         PathArguments::Parenthesized(_) => None,
-                        //     }
-                        // }
                     } else {
                         None
                     }
@@ -99,11 +78,14 @@ pub fn dl_cr(type_name: &str, fields: &Fields) -> TokenStream {
                 }
             } else {
                 to_c_quote.push(quote! {
-                    c.#c_field_name =  r.#r_field_name
+                    //c.#c_field_name =  r.#r_field_name
+                    c.#c_field_name.assignment_c(&r.#r_field_name);
+
                 });
 
                 ptr_rust_quote.push(quote! {
-                    r.#r_field_name = c.#c_field_name
+                    // r.#r_field_name = c.#c_field_name
+                    c.#c_field_name.assignment_r(&mut r.#r_field_name);
                 });
             }
         }

@@ -138,6 +138,18 @@ fn block_on_test() {
 }
 
 #[test]
+fn init_parameters_test(){
+    unsafe {
+        let parameters = init_parameters();
+        let mut c_parameters = CInitParameters::to_c_ptr(&parameters);
+
+        assert_eq!(parameters.db_name.cashbox_wallets.as_str(), to_str((*c_parameters).dbName.cashboxWallets));
+        c_parameters.free();
+    }
+
+}
+
+#[test]
 fn mnemonic_test() {
     unsafe {
         //invalid parameters
@@ -288,7 +300,6 @@ fn wallet_token_status_change_test() {
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }
-
 
 
 

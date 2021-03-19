@@ -23,9 +23,12 @@ abstract class DC<C extends NativeType> {
 
   //把数据赋值给指针
   toC(Pointer<C> ptr);
+  //把数据赋值给指针
+  toCInstance(C instance);
 
   //转换到dart，
   toDart(Pointer<C> c);
+  toDartInstance(C instance);
 }
 
 extension ErrorEx on Error {

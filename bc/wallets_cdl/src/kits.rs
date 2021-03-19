@@ -14,11 +14,11 @@ pub const CTrue: CBool = mav::CTrue;
 
 /// call free_c_char to free memory
 pub fn to_c_char(s: &str) -> *mut c_char {
-    match CString::new(s){
+    match CString::new(s) {
         Err(_e) => {
             //todo log "Failed to create CString"
             null_mut()
-        },
+        }
         Ok(cs) => cs.into_raw()
     }
 }
@@ -44,9 +44,6 @@ pub fn to_str(cs: *const c_char) -> &'static str {
     };
     return s;
 }
-
-/// 标记为c 类型
-pub trait CMark {}
 
 /// 释放c struct的内存， 这些内存需要手工管理
 pub trait CStruct {
@@ -135,6 +132,62 @@ pub trait CR<C: CStruct, R> {
     fn ptr_rust(c: *mut C) -> R;
 }
 
+pub trait Assignment<T> {
+    //对C type赋值
+    fn assignment_c(&mut self, other: &T);
+    //对Rust type 赋值
+    fn assignment_r(&self, other: &mut T);
+}
+
+impl Assignment<u32> for u32 {
+    fn assignment_c(&mut self, other: &u32) {
+        *self = *other;
+    }
+
+    fn assignment_r(&self, other: &mut u32) {
+        *other = *self;
+    }
+}
+
+impl Assignment<u64> for u64 {
+    fn assignment_c(&mut self, other: &u64) {
+        *self = *other;
+    }
+
+    fn assignment_r(&self, other: &mut u64) {
+        *other = *self;
+    }
+}
+
+impl Assignment<i32> for i32 {
+    fn assignment_c(&mut self, other: &i32) {
+        *self = *other;
+    }
+
+    fn assignment_r(&self, other: &mut i32) {
+        *other = *self;
+    }
+}
+
+impl Assignment<i64> for i64 {
+    fn assignment_c(&mut self, other: &i64) {
+        *self = *other;
+    }
+
+    fn assignment_r(&self, other: &mut i64) {
+        *other = *self;
+    }
+}
+
+impl<C: CStruct + CR<C, R>, R> Assignment<R> for C {
+    fn assignment_c(&mut self, other: &R) {
+        *self = C::to_c(other);
+    }
+    fn assignment_r(&self, other: &mut R) {
+        *other = C::to_rust(self);
+    }
+}
+
 /// c的数组需要定义两个字段，所定义一个结构体进行统一管理
 /// 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替
 #[repr(C)]
@@ -190,17 +243,15 @@ impl<T: CStruct> Default for CArray<T> {
     }
 }
 
-impl<T: CStruct> CMark for CArray<T> {}
-
 impl<T: CStruct> CStruct for CArray<T> {
     fn free(&mut self) {
         unsafe {
             if (self.len > 0 || self.cap > 0) && !self.ptr.is_null() {
                 let mut v = Vec::from_raw_parts(self.ptr, self.len as usize, self.cap as usize);
-                for it in v.iter_mut(){
-                    if !((*it).is_struct()){
+                for it in v.iter_mut() {
+                    if !((*it).is_struct()) {
                         (*it).free();
-                    }else{
+                    } else {
                         break;
                     }
                 }
@@ -273,7 +324,7 @@ mod tests {
 
     use wallets_macro::{DlDefault, DlStruct};
 
-    use crate::kits::{d_ptr_alloc, d_ptr_free, to_c_char, CArray, CMark, CStruct};
+    use crate::kits::{CArray, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
 
     #[allow(unused_assignments)]
     #[test]
