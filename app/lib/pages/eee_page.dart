@@ -763,7 +763,7 @@ class _EeePageState extends State<EeePage> {
                   return;
                 }
                 _navigatorToQrInfoPage(WalletsControl.getInstance().currentWallet().name, translate('chain_address_info'),
-                    WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
+                    WalletsControl.getInstance().currentChainAddress()??"");
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),

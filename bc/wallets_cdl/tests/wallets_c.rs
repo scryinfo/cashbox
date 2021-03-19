@@ -10,18 +10,22 @@ use wallets_cdl::{
     to_c_char, to_str, CStruct,
     mem_c::{
         CContext_dAlloc, CContext_dFree, CError_free, CStr_dAlloc, CStr_dFree, CWallet_dAlloc,
-        CWallet_dFree,CArrayCWallet_dAlloc, CArrayCWallet_dFree, CStr_free
+        CWallet_dFree, CArrayCWallet_dAlloc, CArrayCWallet_dFree, CStr_free,
     },
-    parameters::{CContext, CCreateWalletParameters, CInitParameters,CWalletTokenStatus},
-    types::{CError, CWallet, CR, CU64},
+    parameters::{CContext, CCreateWalletParameters, CInitParameters, CWalletTokenStatus},
+    types::{CError, CWallet, CR, CU64,CTokenAddress},
     wallets_c::{
         Wallets_createWallet, Wallets_findById, Wallets_generateMnemonic, Wallets_init,
-        Wallets_uninit,Wallets_all, Wallets_appPlatformType, Wallets_removeWallet,Wallets_changeTokenShowState
+        Wallets_uninit, Wallets_all, Wallets_appPlatformType, Wallets_removeWallet, Wallets_changeTokenShowState,
     },
     CArray,
 };
 
-use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, WalletTokenStatus};
+use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, WalletTokenStatus, TokenAddress};
+use mav::ma::MTokenAddress;
+use wallets_cdl::wallets_c::{Wallets_updateBalance, Wallets_queryBalance, Wallets_currentWalletChain, Wallets_saveCurrentWalletChain, Wallets_hasAny, Wallets_findWalletBaseByName, Wallets_renameWallet, Wallets_resetWalletPassword, Wallets_exportWallet};
+use wallets_cdl::mem_c::{CArrayCTokenAddress_dAlloc, CArrayCTokenAddress_dFree, CBool_dAlloc, CBool_dFree};
+use wallets_cdl::kits::CTrue;
 
 
 #[test]
@@ -153,13 +157,13 @@ fn init_parameters_test(){
 fn mnemonic_test() {
     unsafe {
         //invalid parameters
-        let c_err = Wallets_generateMnemonic(15,null_mut()) as *mut CError;
+        let c_err = Wallets_generateMnemonic(15, null_mut()) as *mut CError;
         assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
     }
     unsafe {
         let ptr = CStr_dAlloc();
-        let c_err = Wallets_generateMnemonic(15,ptr) as *mut CError;
+        let c_err = Wallets_generateMnemonic(15, ptr) as *mut CError;
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let words: Vec<&str> = to_str(*ptr).split(" ").collect();
@@ -170,7 +174,7 @@ fn mnemonic_test() {
 }
 
 #[test]
-fn plat_type_test() {
+fn platform_type_test() {
     unsafe {
         let ptr = Wallets_appPlatformType() as *mut c_char;
         assert_ne!(null_mut(), ptr);
@@ -185,7 +189,6 @@ fn wallets_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-
         let c_err = init_ctx_parameters(c_ctx);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
@@ -193,7 +196,7 @@ fn wallets_test() {
         let mnemonic = {
             let p_mn = CStr_dAlloc();
             {
-                let c_err = Wallets_generateMnemonic(15,p_mn) as *mut CError;
+                let c_err = Wallets_generateMnemonic(15, p_mn) as *mut CError;
                 assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
             }
@@ -244,10 +247,9 @@ fn wallets_test() {
             }
 
             let c_wallet = CWallet_dAlloc();
-
             let parameters = CreateWalletParameters {
                 name: "test".to_owned(),
-                password: "1".to_string(),
+                password: "123456".to_string(),
                 mnemonic: mnemonic.clone(),
                 wallet_type: WalletType::Normal.to_string(),
             };
@@ -262,46 +264,176 @@ fn wallets_test() {
             CWallet_dFree(c_wallet);
             w
         };
+        {
+            let c_bool = CBool_dAlloc();
+            let c_err = Wallets_hasAny(*c_ctx,c_bool) as *mut CError;
+            assert_eq!(0 as CU64, (*c_err).code, "Wallets_hasAny {:?}", *c_err);
+            CError_free(c_err);
+            assert_eq!(*c_bool,CTrue);
+            CBool_dFree(c_bool);
+        }
 
-        let temp = find_by_id_test(*c_ctx, &wallet.id);
-        assert_eq!(wallet.id, temp.id);
-        assert_eq!(wallet.name, temp.name);
+        let target_wallet = find_by_id_test(*c_ctx, &wallet.id);
+        assert_eq!(wallet.id, target_wallet.id);
+        assert_eq!(wallet.name, target_wallet.name);
+        {
+            // wallet query test by wallet name
+            let c_array_wallet = CArrayCWallet_dAlloc();
+            let c_err = Wallets_findWalletBaseByName(*c_ctx,to_c_char("test"),c_array_wallet)  as *mut CError;
+            assert_eq!(0 as CU64, (*c_err).code, "Wallets_findWalletBaseByName {:?}", *c_err);
+            CError_free(c_err);
+            let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+            CArrayCWallet_dFree(c_array_wallet);
+            assert!(wallets.len()>0);
+        }
+
+        {
+            let c_err = Wallets_renameWallet(*c_ctx,to_c_char("alice_cashbox"),to_c_char(&wallet.id))  as *mut CError;
+            assert_eq!(0 as CU64, (*c_err).code, "Wallets_renameWallet {:?}", *c_err);
+            CError_free(c_err);
+        }
+
+        let defaut_chain = "ETH";
+        {
+            let c_err = Wallets_saveCurrentWalletChain(*c_ctx, to_c_char(&wallet.id), to_c_char(defaut_chain)) as *mut CError;
+            assert_eq!(0 as CU64, (*c_err).code, "saveCurrentWalletChain {:?}", *c_err);
+            CError_free(c_err);
+        }
+        {
+            let  current_wallet_id = CStr_dAlloc();
+            let  current_chain_type = CStr_dAlloc();
+
+            let c_err = Wallets_currentWalletChain(*c_ctx, current_wallet_id, current_chain_type) as *mut CError;
+            assert_eq!(0 as CU64, (*c_err).code, "saveCurrentWalletChain {:?}", *c_err);
+            CError_free(c_err);
+            assert_eq!(defaut_chain,to_str(*current_chain_type));
+            assert_eq!(wallet.id.as_str(),to_str(*current_wallet_id));
+
+            CStr_dFree(current_wallet_id);
+            CStr_dFree(current_chain_type);
+        }
+
+
         let c_array_wallet = CArrayCWallet_dAlloc();
         let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
-        let _wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+        let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
         CArrayCWallet_dFree(c_array_wallet);
+        {
+            let exported_mnemonic = CStr_dAlloc();
+            let c_err =  Wallets_exportWallet(*c_ctx, to_c_char(&wallets[0].id), to_c_char("123456"), exported_mnemonic ) as *mut CError;
+            assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+            println!("exported mnemonic detail:{}",to_str(*exported_mnemonic));
+            CError_free(c_err);
+        }
+        if wallets.len()>1{
+
+            let c_err =  Wallets_resetWalletPassword(*c_ctx, to_c_char(&wallets[0].id), to_c_char("123456"), to_c_char("12345678")) as *mut CError;
+            assert_eq!(0 as CU64, (*c_err).code, "Wallets_resetWalletPassword {:?}", *c_err);
+            CError_free(c_err);
+
+            let c_err = Wallets_removeWallet(*c_ctx,to_c_char(&wallets[0].id),to_c_char("12345678"))  as *mut CError;
+            assert_eq!(0 as CU64, (*c_err).code, "Wallets_renameWallet {:?}", *c_err);
+            CError_free(c_err);
+        }
+
         CContext_dFree(c_ctx);
     }
 }
 
 #[test]
-fn wallet_token_status_change_test() {
-    //Wallets_changeTokenShowState
+fn wallets_update_balance_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
-
     unsafe {
+        //query all wallet
         let c_err = init_ctx_parameters(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-        let tokens_status = WalletTokenStatus {
-            wallet_id: "aa9edc1c-92b3-44ad-93e6-fcf916f42f0d".to_string(),
-            chain_type: "ETH".to_string(),
-            token_id: "7eef16c3-c47f-4f47-b0e9-e3a39897c8d7".to_string(),
-            is_show: 0
-        };
-        let mut c_tokens_status = CWalletTokenStatus::to_c_ptr(&tokens_status);
-        let c_err = Wallets_changeTokenShowState(*c_ctx, to_c_char("Main"), c_tokens_status) as *mut CError;
-        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+
+        let c_array_wallet = CArrayCWallet_dAlloc();
+        let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
-        c_tokens_status.free();
+        let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+        for wallet in &wallets {
+            let m_token_address = MTokenAddress {
+                wallet_id: wallet.m.id.clone(),
+                chain_type: wallet.eth_chain.chain_shared.m.chain_type.clone(),
+                token_id: wallet.eth_chain.tokens[0].m.chain_token_shared_id.clone(),
+                address_id: wallet.eth_chain.chain_shared.wallet_address.m.id.clone(),
+                balance: "1000".to_string(),
+                status: 1,
+                ..Default::default()
+            };
+            let address = TokenAddress {
+                m: m_token_address,
+            };
+
+            let mut c_tokens_address = CTokenAddress::to_c_ptr(&address);
+            let c_err = Wallets_updateBalance(*c_ctx, to_c_char("Main"), c_tokens_address) as *mut CError;
+            assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+            CError_free(c_err);
+            c_tokens_address.free();
+        }
+
+        for wallet in &wallets {
+            let c_array_token_address = CArrayCTokenAddress_dAlloc();
+            let c_err = Wallets_queryBalance(*c_ctx, to_c_char("Main"), to_c_char(&wallet.m.id), c_array_token_address);
+            assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+            let token_address_balance: Vec<TokenAddress> = CArray::to_rust(&**c_array_token_address);
+            for address_balance in token_address_balance {
+                assert_eq!(address_balance.balance, "1000".to_string());
+            }
+            CArrayCTokenAddress_dFree(c_array_token_address);
+        }
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }
 
-
+#[test]
+fn wallet_token_status_change_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = init_ctx_parameters(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        //query all wallet
+        let c_array_wallet = CArrayCWallet_dAlloc();
+        let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+        // set all wallet token show statue is 0
+        for wallet in wallets {
+            let tokens_status = WalletTokenStatus {
+                wallet_id: wallet.m.id.clone(),
+                chain_type: wallet.eth_chain.chain_shared.m.chain_type,
+                token_id: wallet.eth_chain.tokens[0].m.chain_token_shared_id.clone(),
+                is_show: 0,
+            };
+            let mut c_tokens_status = CWalletTokenStatus::to_c_ptr(&tokens_status);
+            let c_err = Wallets_changeTokenShowState(*c_ctx, to_c_char("Main"), c_tokens_status) as *mut CError;
+            assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+            CError_free(c_err);
+            c_tokens_status.free();
+        }
+        CArrayCWallet_dFree(c_array_wallet);
+        let c_array_wallet = CArrayCWallet_dAlloc();
+        let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        //check change status whether successful
+        let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+        for wallet in wallets {
+            assert_eq!(wallet.eth_chain.tokens[0].m.show, 0);
+        }
+        CArrayCWallet_dFree(c_array_wallet);
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
 
 //单元测试是并行的，这里把它放入一个测试中进行测试，以减少并行给单元测试带来的问题
 fn init_test() {
@@ -417,11 +549,7 @@ fn init_parameters() -> InitParameters {
 }
 
 fn init_ctx_parameters(c_ctx: *mut *mut CContext) -> *mut CError {
-  /*  let mut p = InitParameters::default();
-    p.db_name.0 = mav::ma::DbName::new("test_", "");
-    p.context_note = format!("test_{}", kits::uuid());*/
     let c_parameters = CInitParameters::to_c_ptr(&init_parameters());
-
     let c_err = unsafe {
         Wallets_init(c_parameters, c_ctx) as *mut CError
     };

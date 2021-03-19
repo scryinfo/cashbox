@@ -90,31 +90,28 @@ impl Wallets {
     }
 
     pub async fn all(&self) -> Result<Vec<Wallet>, WalletError> {
-        let ws = Wallet::all(self).await?;
-        Ok(ws)
+        Wallet::all(self).await
     }
 
     pub async fn has_any(&self) -> Result<bool, WalletError> {
-        let context = self;
-        let re = Wallet::has_any(context).await?;
-        Ok(re)
+       Wallet::has_any(self).await
     }
 
     pub async fn find_by_id(&self, wallet_id: &str) -> Result<Option<Wallet>, WalletError> {
-        let context = self;
-        let re = Wallet::find_by_id(context, wallet_id).await?;
-        Ok(re)
+         Wallet::find_by_id(self, wallet_id).await
+
     }
     ///注：只加载了wallet的id name等直接的基本数据，链数据没有加载
     pub async fn find_wallet_base_by_name(&self, name: &str) -> Result<Vec<Wallet>, WalletError> {
         let context = self;
         let ms = Wallet::m_wallet_by_name(context, name).await?;
-        let re = Vec::new();
-        for m in ms {
-            let mut w = Wallet::default();
-            w.m = m;
+        let mut target_wallets = Vec::new();
+        for m_wallet in ms {
+            let mut wallet = Wallet::default();
+            wallet.m = m_wallet;
+            target_wallets.push(wallet);
         }
-        Ok(re)
+        Ok(target_wallets)
     }
     pub async fn remove_wallet(&self, wallet_id: &str, password: &str) -> Result<(), WalletError> {
         let context = self;
@@ -411,13 +408,10 @@ impl Wallets {
             Err(WalletError::Fail(msg))
         }*/
     }
-    pub async fn update_current_database_version(
-        &self,
-        database_version: &str,
-    ) -> Result<(), WalletError> {
+   /* pub async fn update_current_database_version(&self, database_version: &str, ) -> Result<(), WalletError> {
         let context = self;
         Setting::save_current_database_version(context, database_version).await
-    }
+    }*/
 }
 
 impl ContextTrait for Wallets {
