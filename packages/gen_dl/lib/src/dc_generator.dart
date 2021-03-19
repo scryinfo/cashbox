@@ -111,7 +111,7 @@ import 'kits.dart';
 
             //base type do not free
 
-            toC.writeln('${_blankTwo}c.${f.name} = ${f.name};');
+            toC.writeln('${_blankTwo}c.${f.name} = ${f.name}??0;');
             toDart.writeln('${_blankTwo}${f.name} = c.${f.name};');
           }
           break;
@@ -167,7 +167,7 @@ import 'kits.dart';
           classCode.writeln('${_blankOne}${className} ${f.name};');
           free.writeln(
               '${_blankTwo}if (instance.${f.name} != null ) {${className}.freeInstance(instance.${f.name});}');
-          free.writeln('${_blankTwo}instance.${f.name} = null;');
+          // free.writeln('${_blankTwo}instance.${f.name} = null;');
 
           toC.writeln('${_blankTwo}${f.name}.toCInstance(c.${f.name});');
           toDart.writeln('${_blankTwo}${f.name} = new ${className}();');
