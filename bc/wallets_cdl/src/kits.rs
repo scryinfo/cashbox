@@ -122,16 +122,19 @@ macro_rules! drop_ctype {
     };
 }
 
+/// c struct 与 rust struct之间的转换
 pub trait CR<C: CStruct, R> {
+    /// 从rust 到 c的转换
     fn to_c(r: &R) -> C;
-
+    /// 从rust 到 c 指针（*mut C）的转换
     fn to_c_ptr(r: &R) -> *mut C;
-
+    /// 从c到rust的转换
     fn to_rust(c: &C) -> R;
-
+    /// 从c指针(*mut C)到rust的转换
     fn ptr_rust(c: *mut C) -> R;
 }
 
+/// c struct与rust struct赋值（由于rust不支持重载“=”，所以定义一个trait来实现）
 pub trait Assignment<T> {
     //对C type赋值
     fn assignment_c(&mut self, other: &T);
@@ -139,6 +142,7 @@ pub trait Assignment<T> {
     fn assignment_r(&self, other: &mut T);
 }
 
+/// u32之间赋值
 impl Assignment<u32> for u32 {
     fn assignment_c(&mut self, other: &u32) {
         *self = *other;
@@ -149,6 +153,7 @@ impl Assignment<u32> for u32 {
     }
 }
 
+/// u64之间赋值
 impl Assignment<u64> for u64 {
     fn assignment_c(&mut self, other: &u64) {
         *self = *other;
@@ -159,6 +164,7 @@ impl Assignment<u64> for u64 {
     }
 }
 
+/// i32之间赋值
 impl Assignment<i32> for i32 {
     fn assignment_c(&mut self, other: &i32) {
         *self = *other;
@@ -169,6 +175,7 @@ impl Assignment<i32> for i32 {
     }
 }
 
+/// i64之间赋值
 impl Assignment<i64> for i64 {
     fn assignment_c(&mut self, other: &i64) {
         *self = *other;
@@ -179,6 +186,7 @@ impl Assignment<i64> for i64 {
     }
 }
 
+/// c struct与rust struct之间赋值
 impl<C: CStruct + CR<C, R>, R> Assignment<R> for C {
     fn assignment_c(&mut self, other: &R) {
         *self = C::to_c(other);
@@ -287,7 +295,6 @@ impl<T: CStruct + CR<T, R>, R: Default> CR<CArray<T>, Vec<R>> for CArray<T> {
 
 drop_ctype!(CArray<T>);
 
-
 impl CR<*mut c_char, String> for *mut c_char {
     fn to_c(r: &String) -> *mut c_char {
         to_c_char(r)
@@ -322,20 +329,19 @@ mod tests {
     use std::os::raw::c_char;
     use std::ptr::null_mut;
 
-    use wallets_macro::{DlDefault, DlStruct};
+    use wallets_macro::{DlDefault, DlStruct, DlDrop};
 
     use crate::kits::{CArray, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
 
     #[allow(unused_assignments)]
     #[test]
     fn c_array() {
+        #[derive(DlDrop)]
         struct Data {}
         impl CStruct for Data {
             fn free(&mut self) {}
         }
-        drop_ctype!(Data);
         // Vec::new();
-
         {
             //正常释放 default对象
             let mut da = CArray::<Data>::default();

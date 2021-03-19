@@ -299,6 +299,25 @@ pub fn dl_cr(input: TokenStream) -> TokenStream {
     cr::dl_cr(&ast.ident.to_string(), &ast.fields())
 }
 
+/// impl Drop
+#[proc_macro_derive(DlDrop)]
+pub fn dl_drop(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as DeriveInput);
+    let name = &ast.ident;
+
+    let gen = TokenStream::from(quote! {
+            impl Drop for #name {
+                fn drop(&mut self) {
+                    self.free();
+                }
+            }
+        });
+    if cfg!(feature = "print_macro") {
+        println!("............gen impl dl_drop {}:\n {}", name, gen);
+    }
+    gen
+}
+
 /// camel to snake
 /// Sample
 /// camelName to camel_name
