@@ -40,6 +40,9 @@ class EthChainControl {
         // ..tokenId = element.ethChainTokenShared.tokenShared.id
         ..decimal = element.ethChainTokenShared.decimal ?? 0;
 
+      if (element.ethChainTokenShared.tokenShared.symbol.toLowerCase() == ChainType.ETH.toEnumString().toLowerCase()) {
+        newToken.address = nowWallet.ethChain.chainShared.walletAddress.address;
+      }
       _allTokenList.add(newToken);
     });
 
@@ -70,7 +73,7 @@ class EthChainControl {
     return dataObj.data1;
   }
 
-  txSign(NetType netType, EthTransferPayload txPayload, NoCacheString password) {
+  String txSign(NetType netType, EthTransferPayload txPayload, NoCacheString password) {
     var dataObj = Wallets.mainIsolate().chainEth.txSign(netType, txPayload, password);
     if (!dataObj.isSuccess()) {
       return null;

@@ -151,7 +151,7 @@ pub struct MBtcUtxo {
     // satoshi 已花费的交易才有交易费
     pub fee:Option<u64>,
     #[serde(default)]
-    // reference to btc tx state
+    //forgien, reference to btc tx state
     pub state: String,
     #[serde(default)]
     pub btc_tx_hash: String,

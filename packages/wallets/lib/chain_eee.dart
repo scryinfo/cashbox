@@ -159,6 +159,27 @@ class ChainEee {
     return DlResult1(accountInfoSyncProg, err);
   }
 
+  DlResult1<List<EeeChainTx>> getTxRecord(NetType netType, String account, int startItem, int pageSize) {
+    Error err;
+    List<EeeChainTx> ect = [];
+    {
+      var ptrAccountInfoSyncProg = clib.CAccountInfoSyncProg_dAlloc();
+      var ptrNetType = netType.toEnumString().toCPtr();
+      var ptrAccount = account.toCPtr();
+      var ptrCArrayCEeeChainTx = clib.CArrayCEeeChainTx_dAlloc();
+      var cerr = clib.ChainEee_queryChainTxRecord(_ptrContext, ptrNetType, ptrAccount, startItem, pageSize, ptrCArrayCEeeChainTx);
+      err = Error.fromC(cerr);
+      clib.CError_free(cerr);
+      if (err.isSuccess()) {
+        ect = ArrayCEeeChainTx.fromC(ptrCArrayCEeeChainTx.value).data;
+      }
+      ptrNetType.free();
+      ptrAccount.free();
+      clib.CAccountInfoSyncProg_dFree(ptrAccountInfoSyncProg);
+    }
+    return DlResult1(ect, err);
+  }
+
   DlResult1<bool> saveExtrinsicDetail(NetType netType, ExtrinsicContext extrinsicContext) {
     Error err;
     {

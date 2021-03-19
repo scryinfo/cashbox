@@ -1,5 +1,7 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/eee_chain_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
@@ -17,6 +19,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dc.dart';
 import '../../res/resources.dart';
 
 import 'eee_sync_txs.dart';
@@ -55,7 +59,9 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       balanceInfo = Provider.of<TransactionProvide>(context).balance;
       moneyInfo = Provider.of<TransactionProvide>(context).money;
     }
-    EeeSyncTxs.startOnce(Wallets.instance.nowWallet.nowChain);
+
+    EeeSyncTxs.startOnce(WalletsControl.getInstance().currentWallet().eeeChain);
+    // EeeSyncTxs.startOnce(Wallets.instance.nowWallet.nowChain);
   }
 
   @override
@@ -424,6 +430,12 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     //去加载本地DB已有的交易，进行显示
     Config config = await HandleConfig.instance.getConfig();
     for (; true;) {
+      // todo differentiate tokenName
+      List<EeeChainTx> eeeChainTxList = EeeChainControl.getInstance().getTxRecord(NetType.Main,
+          WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address, (currentPage * this.pageSize), this.pageSize);
+      if (eeeChainTxList == null) {}
+      // todo
+
       var newData = await Wallets.instance
           .loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, (currentPage * this.pageSize), this.pageSize);
       if (newData.isEmpty) {

@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/model/chain.dart';
-import 'package:app/model/wallets.dart';
+import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -20,6 +19,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
+import 'package:wallets/kits.dart';
+import 'package:wallets/wallets_c.dc.dart';
 import '../../res/resources.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
@@ -79,10 +80,10 @@ class _TransferEthPageState extends State<TransferEthPage> {
       digitBalance = Provider.of<TransactionProvide>(context).balance;
     }
     if (fromAddress == null || fromAddress.trim() == "") {
-      fromAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
+      fromAddress = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
     }
     if (chainType == null) {
-      chainType = Wallets.instance.nowWallet.nowChain.chainType;
+      chainType = WalletsControl.getInstance().currentChainType();
     }
     if (decimal == null) {
       decimal = 18;
@@ -722,29 +723,33 @@ class _TransferEthPageState extends State<TransferEthPage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            String walletId = await Wallets.instance.getNowWalletId();
-            Map result = await Wallets.instance.ethTxSign(
-                walletId,
-                5,
-                // todo chainType
-                // Chain.chainTypeToInt(chainType),
-                fromAddress,
-                _toAddressController.text.toString(),
-                contractAddress ?? "",
-                _txValueController.text,
-                _backupMsgController.text,
-                Uint8List.fromList(pwd.codeUnits),
-                mGasPriceValue.toInt().toString(),
-                mGasLimitValue.toInt().toString(),
-                nonce,
-                decimal: decimal);
-            if (result["status"] != null && result["status"] == 200) {
-              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
-              NavigatorUtils.goBack(context);
-              sendRawTx2Chain(result["ethSignedInfo"].toString());
-            } else {
+            var netType = NetType.Main;
+            switch (chainType) {
+              case ChainType.EthTest:
+                netType = NetType.Test;
+                break;
+              default:
+                netType = NetType.Main;
+            }
+            EthTransferPayload ethTransferPayload = EthTransferPayload();
+            ethTransferPayload
+              ..fromAddress = fromAddress
+              ..toAddress = _toAddressController.text.toString()
+              ..contractAddress = contractAddress ?? ""
+              ..value = _txValueController.text
+              ..nonce = nonce
+              ..gasPrice = mGasPriceValue.toInt().toString()
+              ..gasLimit = mGasLimitValue.toInt().toString()
+              ..decimal = decimal;
+
+            String signResult = EthChainControl.getInstance().txSign(netType, ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
+            if (signResult == null) {
               Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
+            } else {
+              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+              NavigatorUtils.goBack(context);
+              sendRawTx2Chain(signResult);
             }
           },
         );
@@ -754,7 +759,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   void sendRawTx2Chain(String rawTx) async {
     ProgressDialog.showProgressDialog(context, translate("tx_sending"));
-    String txHash = await sendRawTx(Wallets.instance.nowWallet.nowChain.chainType, rawTx);
+    String txHash = await sendRawTx(WalletsControl.getInstance().currentChainType(), rawTx);
     Logger().d("broadcast txHash is ===>", txHash);
     if (txHash != null && txHash.trim() != "" && txHash.startsWith("0x")) {
       Fluttertoast.showToast(msg: translate("tx_upload_success"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
@@ -796,15 +801,15 @@ class _TransferEthPageState extends State<TransferEthPage> {
       return false;
     }
     //Determine if the balance is greater than the transfer amount
-    List displayDigitsList = Wallets.instance.nowWallet.nowChain.digitsList;
+    List displayDigitsList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
     for (var i = 0; i < displayDigitsList.length; i++) {
       if (digitBalance == null &&
           contractAddress != null &&
           contractAddress.trim() != "" &&
           displayDigitsList[i].contractAddress != null &&
           (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
-        digitBalance = await loadErc20Balance(
-            Wallets.instance.nowWallet.nowChain.chainAddress, displayDigitsList[i].contractAddress, Wallets.instance.nowWallet.nowChain.chainType);
+        digitBalance = await loadErc20Balance(WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
+            displayDigitsList[i].contractAddress, WalletsControl.getInstance().currentChainType());
         break;
       }
     }
@@ -815,19 +820,22 @@ class _TransferEthPageState extends State<TransferEthPage> {
           return false;
         }
       } catch (e) {
+        Logger().e("digitBalance parse error, error info is ===> ", e.toString());
         Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;
       }
     }
-    ethBalance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
-    Logger().d("ethBalance is ===> ", ethBalance.toString() + "|| digitBalance===>" + digitBalance.toString());
-    if (ethBalance.isNotEmpty) {
+    ethBalance = await loadEthBalance(
+        WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address, WalletsControl.getInstance().currentChainType());
+
+    if (ethBalance != null) {
       try {
         if (double.parse(ethBalance) <= 0) {
           Fluttertoast.showToast(msg: translate("not_enough_for_gas"));
           return false;
         }
       } catch (e) {
+        Logger().e("ethBalance error, error info is ===> ", e.toString());
         Fluttertoast.showToast(msg: translate("eth_balance_error") + e.toString());
         return false;
       }

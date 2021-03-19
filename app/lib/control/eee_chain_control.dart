@@ -1,10 +1,11 @@
 import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
+import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 
-class EeeChainControl{
+class EeeChainControl {
   factory EeeChainControl() => getInstance();
 
   static EeeChainControl _instance;
@@ -24,11 +25,11 @@ class EeeChainControl{
     if (nowWallet == null) {
       return [];
     }
-    List<EeeChainToken> ethTokens = nowWallet.eeeChain.tokens.data;
+    List<EeeChainToken> eeeTokens = nowWallet.eeeChain.tokens.data;
     TokenM newToken = TokenM();
     _allTokenList = [];
     // convert from ffiModel to uniform format
-    ethTokens.forEach((element) {
+    eeeTokens.forEach((element) {
       newToken = TokenM()
         ..fullName = element.eeeChainTokenShared.tokenShared.name ?? ""
         ..shortName = element.eeeChainTokenShared.tokenShared.symbol ?? ""
@@ -37,7 +38,9 @@ class EeeChainControl{
         ..isVisible = element.show.isTrue()
         // ..tokenId = element.ethChainTokenShared.tokenShared.id
         ..decimal = element.eeeChainTokenShared.decimal ?? 0;
-
+      if (element.eeeChainTokenShared.tokenShared.name.toLowerCase() == "eee") {
+        newToken.address = nowWallet.eeeChain.chainShared.walletAddress.address;
+      }
       _allTokenList.add(newToken);
     });
 
@@ -60,5 +63,124 @@ class EeeChainControl{
     return visibleList;
   }
 
+  AccountInfo decodeAdditionData(NetType netType, DecodeAccountInfoParameters decodeAccountInfoParameters) {
+    var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(netType, decodeAccountInfoParameters);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
 
+  String txSign(NetType netType, RawTxParam rawTx) {
+    var dataObj = Wallets.mainIsolate().chainEee.txSign(netType, rawTx);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  String eeeTransfer(NetType netType, EeeTransferPayload txPayload) {
+    var dataObj = Wallets.mainIsolate().chainEee.eeeTransfer(netType, txPayload);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  String tokenXTransfer(NetType netType, EeeTransferPayload txPayload) {
+    var dataObj = Wallets.mainIsolate().chainEee.tokenXTransfer(netType, txPayload);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  AccountInfo decodeAccountInfo(NetType netType, DecodeAccountInfoParameters decodeAccountInfoParameters) {
+    var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(netType, decodeAccountInfoParameters);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  SubChainBasicInfo getBasicInfo(NetType netType, ChainVersion chainVersion) {
+    var dataObj = Wallets.mainIsolate().chainEee.getBasicInfo(netType, chainVersion);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  String getStorageKey(NetType netType, StorageKeyParameters storageKeyParameters) {
+    var dataObj = Wallets.mainIsolate().chainEee.getStorageKey(netType, storageKeyParameters);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  List<EeeChainTx> getTxRecord(NetType netType, String account, int startItem, int pageSize) {
+    var dataObj = Wallets.mainIsolate().chainEee.getTxRecord(netType, account, startItem, pageSize);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  AccountInfoSyncProg getSyncRecord(NetType netType, String account) {
+    var dataObj = Wallets.mainIsolate().chainEee.getSyncRecord(netType, account);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  bool saveExtrinsicDetail(NetType netType, ExtrinsicContext extrinsicContext) {
+    var dataObj = Wallets.mainIsolate().chainEee.saveExtrinsicDetail(netType, extrinsicContext);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  String txSubmittableSign(NetType netType, RawTxParam rawTxParam) {
+    var dataObj = Wallets.mainIsolate().chainEee.txSubmittableSign(netType, rawTxParam);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  bool updateAuthDigitList(ArrayCEeeChainTokenAuth arrayCEeeChainTokenAuth) {
+    var dataObj = Wallets.mainIsolate().chainEee.updateAuthDigitList(arrayCEeeChainTokenAuth);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  bool updateBasicInfo(NetType netType, SubChainBasicInfo subChainBasicInfo) {
+    var dataObj = Wallets.mainIsolate().chainEee.updateBasicInfo(netType, subChainBasicInfo);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  bool updateDefaultTokenList(ArrayCEeeChainTokenDefault arrayCEeeChainTokenDefault) {
+    var dataObj = Wallets.mainIsolate().chainEee.updateDefaultTokenList(arrayCEeeChainTokenDefault);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  bool updateSyncRecord(NetType netType, AccountInfoSyncProg accountInfoSyncProg) {
+    var dataObj = Wallets.mainIsolate().chainEee.updateSyncRecord(netType, accountInfoSyncProg);
+
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
 }

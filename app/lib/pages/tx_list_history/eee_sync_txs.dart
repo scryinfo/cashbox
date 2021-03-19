@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/model/chain.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:logger/logger.dart';
@@ -9,6 +9,7 @@ import 'package:app/util/utils.dart';
 import 'dart:convert' as convert;
 
 import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dc.dart';
 
 class RunParams {
   final String address;
@@ -18,33 +19,33 @@ class RunParams {
 }
 
 class EeeSyncTxs {
-  static EeeSyncTxs startOnce(Chain chain) => _getInstance(chain); //此方法可以多次调用，但只运行一个线程
+  static EeeSyncTxs startOnce(EeeChain chain) => _getInstance(chain); //此方法可以多次调用，但只运行一个线程
   static Map<String, EeeSyncTxs> _instance;
 
-  EeeSyncTxs._internal(Chain chain)
-      : _address = chain.chainAddress,
-        _chainType = chain.chainType {
+  EeeSyncTxs._internal(EeeChain chain)
+      : _address = chain.chainShared.walletAddress.address,
+        _chainType = WalletsControl.getInstance().currentChainType() {
     // 初始化
   }
 
-  static EeeSyncTxs _getInstance(Chain chain) {
+  static EeeSyncTxs _getInstance(EeeChain chain) {
     if (_instance == null) {
       _instance = <String, EeeSyncTxs>{};
     }
-    if (!_instance.containsKey(chain.chainAddress)) {
+    if (!_instance.containsKey(chain.chainShared.walletAddress.address)) {
       var newOne = EeeSyncTxs._internal(chain);
-      _instance[chain.chainAddress] = newOne;
+      _instance[chain.chainShared.walletAddress.address] = newOne;
       newOne._start();
     }
     for (var key in _instance.keys.toList()) {
       var it = _instance[key];
-      if (it._address != chain.chainAddress) {
+      if (it._address != chain.chainShared.walletAddress.address) {
         it.stop();
         _instance.remove(key);
       }
     }
 
-    return _instance[chain.chainAddress];
+    return _instance[chain.chainShared.walletAddress.address];
   }
 
   final String _address;
@@ -60,6 +61,7 @@ class EeeSyncTxs {
   _start() async {
     Config config = await HandleConfig.instance.getConfig();
     RunParams runParams = new RunParams(_address, _chainType);
+    // todo replace with ffi impl
     _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
     _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
     Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0);
