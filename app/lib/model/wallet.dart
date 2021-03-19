@@ -6,7 +6,7 @@ import 'package:wallets/enums.dart';
 
 import 'chain.dart';
 
-enum WalletType { TEST_WALLET, WALLET } //0,1  /*Mark: Definition needs to be consistent with JNI*/
+// enum WalletType { TEST_WALLET, WALLET } //0,1  /*Mark: Definition needs to be consistent with JNI*/
 
 class Wallet {
   int status; //Interface data, return status code

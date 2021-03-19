@@ -80,7 +80,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       digitBalance = Provider.of<TransactionProvide>(context).balance;
     }
     if (fromAddress == null || fromAddress.trim() == "") {
-      fromAddress = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
+      fromAddress = WalletsControl.getInstance().currentChainAddress()??"";
     }
     if (chainType == null) {
       chainType = WalletsControl.getInstance().currentChainType();
@@ -808,7 +808,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
           contractAddress.trim() != "" &&
           displayDigitsList[i].contractAddress != null &&
           (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
-        digitBalance = await loadErc20Balance(WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
+        digitBalance = await loadErc20Balance(WalletsControl.getInstance().currentChainAddress()??"",
             displayDigitsList[i].contractAddress, WalletsControl.getInstance().currentChainType());
         break;
       }
@@ -826,7 +826,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       }
     }
     ethBalance = await loadEthBalance(
-        WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address, WalletsControl.getInstance().currentChainType());
+        WalletsControl.getInstance().currentChainAddress()??"", WalletsControl.getInstance().currentChainType());
 
     if (ethBalance != null) {
       try {

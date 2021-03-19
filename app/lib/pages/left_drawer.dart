@@ -314,9 +314,17 @@ class _LeftDrawerState extends State<LeftDrawer> {
         onTap: () {
           Logger().e("check chainType ------->", visibleChains[index].chainType.toEnumString());
           switch (visibleChains[index].chainType) {
+            case Enum.ChainType.EthTest:
+              WalletsControl.getInstance().saveCurrentWalletChain(wallet.walletId, Enum.ChainType.EthTest);
+              NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
+              break;
             case Enum.ChainType.ETH:
               WalletsControl.getInstance().saveCurrentWalletChain(wallet.walletId, Enum.ChainType.ETH);
               NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
+              break;
+            case Enum.ChainType.EeeTest:
+              WalletsControl.getInstance().saveCurrentWalletChain(wallet.walletId, Enum.ChainType.EeeTest);
+              NavigatorUtils.push(context, '${Routes.eeeHomePage}?isForceLoadFromJni=false', clearStack: true);
               break;
             case Enum.ChainType.EEE:
               WalletsControl.getInstance().saveCurrentWalletChain(wallet.walletId, Enum.ChainType.EEE);

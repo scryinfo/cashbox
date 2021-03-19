@@ -80,10 +80,7 @@ class _EthPageState extends State<EthPage> {
     this.walletName = WalletsControl.getInstance().currentWallet().name;
     this.allVisibleTokenMList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
     tokenListFuture = loadDisplayTokenListData();
-    if (mounted) {
-      setState(() {});
-    }
-    // loadDigitBalance();
+    loadDigitBalance();
     loadLegalCurrency();
     // loadDigitRateInfo();
     // todo AppInfoUtil.instance.checkAppUpgrade();
@@ -152,12 +149,10 @@ class _EthPageState extends State<EthPage> {
         int index = i;
         String balance = "0";
         if (this.displayTokenMList[index].contractAddress != null && this.displayTokenMList[index].contractAddress.trim() != "") {
-          balance = await loadErc20Balance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayTokenMList[index].contractAddress,
+          balance = await loadErc20Balance(WalletsControl.getInstance().currentChainAddress() ?? "", this.displayTokenMList[index].contractAddress,
               Wallets.instance.nowWallet.nowChain.chainType);
-          Wallets.instance.updateDigitBalance(this.displayTokenMList[index].contractAddress, this.displayTokenMList[index].tokenId, balance ?? "");
-        } else if (Wallets.instance.nowWallet.nowChain.chainAddress != null && Wallets.instance.nowWallet.nowChain.chainAddress.trim() != "") {
-          balance = await loadEthBalance(Wallets.instance.nowWallet.nowChain.chainAddress, Wallets.instance.nowWallet.nowChain.chainType);
-          Wallets.instance.updateDigitBalance(Wallets.instance.nowWallet.nowChain.chainAddress, this.displayTokenMList[index].tokenId, balance ?? "");
+        } else if (WalletsControl.getInstance().currentChainAddress() != null && WalletsControl.getInstance().currentChainAddress().trim() != "") {
+          balance = await loadEthBalance(WalletsControl.getInstance().currentChainAddress() ?? "", WalletsControl.getInstance().currentChainType());
         } else {}
         if (balance == null || double.parse(balance) == double.parse("0")) {
           continue;
@@ -190,7 +185,7 @@ class _EthPageState extends State<EthPage> {
         if (mounted) {
           setState(() {
             nowWalletAmount = nowWalletAmount + TokenRate.instance.getMoney(displayTokenMList[index]);
-            Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
+            // Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
             displayTokenMList[index].money = money;
           });
         }
@@ -739,8 +734,7 @@ class _EthPageState extends State<EthPage> {
                 // if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
                 //   return;
                 // }
-                _navigatorToQrInfoPage(walletName, translate('chain_address_info'),
-                    WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
+                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress() ?? "");
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
@@ -756,11 +750,10 @@ class _EthPageState extends State<EthPage> {
                 // if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
                 //   return;
                 // }
-                _navigatorToQrInfoPage(walletName, translate('chain_address_info'),
-                    WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
+                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress() ?? "");
               },
               child: Text(
-                WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
+                WalletsControl.getInstance().currentChainAddress() ?? "",
                 textAlign: TextAlign.start,
                 style: TextStyle(color: Colors.lightBlueAccent),
                 maxLines: 1,

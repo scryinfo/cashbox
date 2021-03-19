@@ -64,7 +64,7 @@ class WalletsControl {
     createWalletParameters.password = String.fromCharCodes(pwd);
     var newWalletObj = Wallets.mainIsolate().createWallet(createWalletParameters);
     if (!newWalletObj.isSuccess()) {
-      Logger.getInstance().d("wallet_control ", "createWallet error is  ====>" + newWalletObj.err.toString());
+      Logger.getInstance().e("wallet_control ", "createWallet error is  ====>" + newWalletObj.err.toString());
       return null;
     }
     return newWalletObj.data1;
@@ -73,7 +73,7 @@ class WalletsControl {
   List<WalletM.Wallet> walletsAll() {
     var allWalletObj = Wallets.mainIsolate().all();
     if (!allWalletObj.isSuccess()) {
-      Logger.getInstance().d("wallet_control", "walletsAll error is ====> " + allWalletObj.err.toString());
+      Logger.getInstance().e("wallet_control", "walletsAll error is ====> " + allWalletObj.err.toString());
       return null;
     }
     List<WalletM.Wallet> walletMList = [];
@@ -82,16 +82,23 @@ class WalletsControl {
       tempWallet.walletName = element.name;
       tempWallet.walletId = element.id;
       tempWallet.accountMoney = getWalletMoney(element).toStringAsFixed(6);
+
       // todo isShowChain tempWallet.chainList =
-      ChainETH chainETH = ChainETH()
-        ..isVisible = true // todo element.ethChain.chainShared.visible;
-        ..chainType = ChainType.ETH;
-      ChainBTC chainBTC = ChainBTC()
-        ..isVisible = false // todo element.ethChain.chainShared.visible;
-        ..chainType = ChainType.BTC;
-      ChainEEE chainEEE = ChainEEE()
-        ..isVisible = true // todo element.ethChain.chainShared.visible;
-        ..chainType = ChainType.EEE;
+      ChainETH chainETH = ChainETH()..isVisible = true; // todo element.ethChain.chainShared.visible;
+      ChainBTC chainBTC = ChainBTC()..isVisible = false; // todo element.ethChain.chainShared.visible;
+      ChainEEE chainEEE = ChainEEE()..isVisible = true; // todo element.ethChain.chainShared.visible;
+      switch (element.walletType.toWalletType()) {
+        case EnumKit.WalletType.Test:
+          chainETH..chainType = ChainType.EthTest;
+          chainBTC..chainType = ChainType.BtcTest;
+          chainEEE..chainType = ChainType.EeeTest;
+          break;
+        default:
+          chainETH..chainType = ChainType.ETH;
+          chainBTC..chainType = ChainType.BTC;
+          chainEEE..chainType = ChainType.EEE;
+          break;
+      }
       tempWallet.chainList..add(chainETH)..add(chainBTC)..add(chainEEE);
       walletMList.add(tempWallet);
     });
@@ -123,6 +130,16 @@ class WalletsControl {
       return false;
     }
     return hasAnyObj.data1;
+  }
+
+  String currentChainAddress() {
+    try {
+      String address = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
+      return address;
+    } catch (e) {
+      Logger.getInstance().e("wallet_control", "currentChainAddress error is --->" + e.toString());
+      return null;
+    }
   }
 
   EnumKit.ChainType currentChainType() {
