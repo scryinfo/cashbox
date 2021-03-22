@@ -114,10 +114,10 @@ class EthChainControl {
   }
 
   addNonAuthDigit(ArrayCEthChainTokenAuth tokens) {
-    var dataObj = Wallets.mainIsolate().chainEth.addNonAuthDigit(tokens);
-    if (!dataObj.isSuccess()) {
-      return false;
-    }
+    // var dataObj = Wallets.mainIsolate().chainEth.updateAuthTokenList(tokens);
+    // if (!dataObj.isSuccess()) {
+    //   return false;
+    // }
     return true;
   }
 }

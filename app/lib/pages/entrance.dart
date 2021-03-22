@@ -30,7 +30,6 @@ class EntrancePage extends StatefulWidget {
 
 class _EntrancePageState extends State<EntrancePage> {
   bool _agreeServiceProtocol = true;
-  bool _isContainWallet = false;
   String _languageTextValue = "";
   List<String> languagesKeyList = [];
   Map<String, String> languageMap = {};
@@ -157,9 +156,7 @@ class _EntrancePageState extends State<EntrancePage> {
   //Check if a wallet has been created
   Future<bool> _checkIsContainWallet() async {
     await WalletsControl.getInstance().initWallet();
-    //_isContainWallet = await Wallets.instance.isContainWallet();
-    _isContainWallet = WalletsControl.getInstance().hasAny();
-    return _isContainWallet;
+    return WalletsControl.getInstance().hasAny();
   }
 
   @override
@@ -172,7 +169,7 @@ class _EntrancePageState extends State<EntrancePage> {
           future: _checkIsContainWallet(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              Logger().e("EntrancePage future snapshot.hasError is +>", snapshot.error.toString());
+              Logger().e("EntrancePage future snapshot.hasError is --->", snapshot.error.toString());
               return Center(
                 child: Text(
                   translate('wallet_load_error'),
@@ -186,9 +183,11 @@ class _EntrancePageState extends State<EntrancePage> {
                 ChainType curChainType = WalletsControl.getInstance().currentChainType();
                 switch (curChainType) {
                   case ChainType.ETH:
+                  case ChainType.EthTest:
                     return EthPage();
                     break;
                   case ChainType.EEE:
+                  case ChainType.EeeTest:
                     return EeePage();
                     break;
                   default:

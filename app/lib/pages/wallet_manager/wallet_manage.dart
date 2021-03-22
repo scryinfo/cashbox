@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
@@ -245,6 +246,12 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
   Widget _buildDeleteWalletWidget(context) {
     return GestureDetector(
       onTap: () {
+        var curWallet = WalletsControl.getInstance().currentWallet();
+        if (curWallet.id == walletId) {
+          Fluttertoast.showToast(msg: translate('prefix_abandon_del_wallet') + curWallet.name + translate('suffix_abandon_del_wallet'));
+          return;
+        }
+
         _showDeleteDialog(context);
       },
       child: Column(
@@ -269,14 +276,11 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           hintContent: translate('delete_wallet_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-            Map deleteMap = await Wallets.instance.deleteWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
-            int status = deleteMap["status"];
-            bool isSuccess = deleteMap["isDeletWallet"];
-            if (status == 200 && isSuccess) {
+            bool isRemoved = WalletsControl.getInstance().removeWallet(walletId, value.toString());
+            if (isRemoved) {
               Fluttertoast.showToast(msg: translate('success_in_delete_wallet'));
               NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
             } else {
-              Logger().e("_buildDeleteWalletWidget=>", "status is=>" + status.toString() + "message=>" + deleteMap["message"]);
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_delete_wallet'));
             }
           },

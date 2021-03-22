@@ -170,7 +170,11 @@ class WalletsControl {
 
   removeWallet(String walletId, String pwd) {
     Error err = Wallets.mainIsolate().removeWallet(walletId, pwd);
-    Logger.getInstance().d("wallet_control ", "removeWallet err --->" + err.toString());
+    if (err.isSuccess()) {
+      return true;
+    }
+    Logger.getInstance().e("wallet_control ", "removeWallet err is --->" + err.code.toString() + "||" + err.message.toString());
+    return false;
   }
 
   renameWallet(String walletId, String newWalletName) {

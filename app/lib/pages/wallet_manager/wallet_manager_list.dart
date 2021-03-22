@@ -1,3 +1,4 @@
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
@@ -31,7 +32,7 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
   }
 
   void initData() async {
-    walletList = await Wallets.instance.loadAllWalletList(isForceLoadFromJni: true);
+    walletList = WalletsControl.getInstance().walletsAll();
     //After changing the wallet attributes, you need to refresh the synchronization data again, such as changing the wallet name.
     setState(() {
       this.walletList = walletList;
