@@ -92,10 +92,17 @@ pub fn create_master() -> Transaction {
     spending_transaction
 }
 
+// create mnemonic from bc/wallet
+// the function is generate_mnemonic
+pub fn generate_mnemonic() {
+    let mnemonic = wallets::Wallets::generate_mnemonic(12);
+    println!("{}", mnemonic);
+}
+
 mod test {
     use crate::db::RB_DETAIL;
     use crate::kit::vec_to_string;
-    use crate::walletlib::create_master;
+    use crate::walletlib::{create_master, generate_mnemonic};
     use bitcoin::consensus::serialize as btc_serialize;
     use bitcoin::consensus::{deserialize, serialize};
     use bitcoin::hashes::sha256d;
@@ -215,5 +222,10 @@ mod test {
                 _ => {}
             }
         }
+    }
+
+    #[test]
+    pub fn mnemonic_test() {
+        generate_mnemonic();
     }
 }

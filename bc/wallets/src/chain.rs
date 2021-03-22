@@ -840,4 +840,3 @@ impl EthChain {
         }
     }
 }
-
