@@ -146,8 +146,9 @@ fn init_parameters_test(){
     unsafe {
         let parameters = init_parameters();
         let mut c_parameters = CInitParameters::to_c_ptr(&parameters);
+        let dbName = (*c_parameters).dbName;
 
-        assert_eq!(parameters.db_name.cashbox_wallets.as_str(), to_str((*c_parameters).dbName.cashboxWallets));
+        assert_eq!(parameters.db_name.cashbox_wallets.as_str(), to_str((*dbName).cashboxWallets));
         c_parameters.free();
     }
 
