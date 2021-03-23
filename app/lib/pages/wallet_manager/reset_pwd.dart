@@ -1,13 +1,14 @@
 import 'dart:typed_data';
 
-import 'package:app/model/wallet.dart';
-import 'package:app/model/wallets.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart';
+import 'package:wallets/result.dart';
 import '../../res/resources.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
@@ -242,20 +243,22 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
 
   Future _checkAndResetPwd() async {
     if (_verifyPwdSame()) {
-      String walletId = Provider.of<WalletManagerProvide>(context).walletId;
-      Wallet wallet = await Wallets.instance.getWalletByWalletId(walletId);
-      Map resetPwdMap =
-          await wallet.resetPwd(Uint8List.fromList(_newPwdController.text.codeUnits), Uint8List.fromList(_oldPwdController.text.codeUnits));
-      if (resetPwdMap == null) {
-        Fluttertoast.showToast(msg: translate('unknown_error_in_reset_pwd'));
+      String walletId = Provider.of<WalletManagerProvide>(context, listen: false).walletId;
+      DlResult1<bool> isResetOkObj = WalletsControl.getInstance()
+          .resetPwd(walletId, Uint8List.fromList(_oldPwdController.text.codeUnits), Uint8List.fromList(_newPwdController.text.codeUnits));
+      if (!isResetOkObj.isSuccess()) {
+        Fluttertoast.showToast(msg: translate('failure_reset_pwd_hint') + isResetOkObj.err.message.toString());
         return;
-      } else {
-        if (resetPwdMap["status"] == 200 && resetPwdMap["isResetPwd"]) {
-          Fluttertoast.showToast(msg: translate('success_reset_pwd_hint'));
+      }
+      Fluttertoast.showToast(msg: translate('success_reset_pwd_hint'));
+      switch (WalletsControl.getInstance().currentChainType()) {
+        case ChainType.EEE:
+        case ChainType.EeeTest:
+          NavigatorUtils.push(context, '${Routes.eeeHomePage}?isForceLoadFromJni=false', clearStack: true);
+          break;
+        default:
           NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
-        } else {
-          Fluttertoast.showToast(msg: translate('failure_reset_pwd_hint') + resetPwdMap["message"]);
-        }
+          break;
       }
     }
   }

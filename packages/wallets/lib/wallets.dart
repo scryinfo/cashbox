@@ -1,6 +1,7 @@
 library wallets;
 
 import 'dart:ffi';
+import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart' as ffi;
 import 'package:wallets/chain_btc.dart';
@@ -207,11 +208,11 @@ class Wallets {
     return DlResult1(wallet, err);
   }
 
-  Error removeWallet(String walletId, String password) {
+  Error removeWallet(String walletId, Uint8List password) {
     Error err;
     {
       var ptrWalletId = walletId.toCPtr();
-      var ptrPassword = password.toCPtr();
+      var ptrPassword = String.fromCharCodes(password).toCPtr();
       var cerr = clib.Wallets_removeWallet(ptrContext, ptrWalletId, ptrPassword);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
@@ -234,6 +235,42 @@ class Wallets {
       ptrNewName.free();
     }
     return err;
+  }
+
+  Error resetPwdWallet(String walletId, Uint8List oldPwd, Uint8List newPwd) {
+    Error err;
+    {
+      var ptrWalletId = walletId.toCPtr();
+      var ptrOldPwd = String.fromCharCodes(oldPwd).toCPtr();
+      var ptrNewPwd = String.fromCharCodes(newPwd).toCPtr();
+      var cerr = clib.Wallets_resetWalletPassword(ptrContext, ptrWalletId, ptrOldPwd, ptrNewPwd);
+      err = Error.fromC(cerr);
+      clib.CError_free(cerr);
+      ptrWalletId.free();
+      ptrOldPwd.free();
+      ptrNewPwd.free();
+    }
+    return err;
+  }
+
+  DlResult1<String> exportWallet(String walletId, Uint8List pwd) {
+    Error err;
+    var mne;
+    {
+      var ptrWalletId = walletId.toCPtr();
+      var ptrPwd = String.fromCharCodes(pwd).toCPtr();
+      var ptr = clib.CStr_dAlloc();
+      var cerr = clib.Wallets_exportWallet(ptrContext, ptrWalletId, ptrPwd, ptr);
+      err = Error.fromC(cerr);
+      clib.CError_free(cerr);
+      if (err.isSuccess()) {
+        mne = fromUtf8Null(ptr.value);
+      }
+      ffi.calloc.free(ptr);
+      ptrWalletId.free();
+      ptrPwd.free();
+    }
+    return DlResult1(mne, err);
   }
 
   DlResult1<bool> hasAny() {

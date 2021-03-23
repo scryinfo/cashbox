@@ -276,7 +276,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           hintContent: translate('delete_wallet_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-            bool isRemoved = WalletsControl.getInstance().removeWallet(walletId, value.toString());
+            bool isRemoved = WalletsControl.getInstance().removeWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
             if (isRemoved) {
               Fluttertoast.showToast(msg: translate('success_in_delete_wallet'));
               NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);

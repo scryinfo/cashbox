@@ -10,6 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallets/enums.dart' as EnumKit;
 import 'package:wallets/enums.dart';
+import 'package:wallets/result.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import 'package:wallets/kits.dart';
@@ -154,21 +155,23 @@ class WalletsControl {
 
   Wallet currentWallet() {
     var curWalletIdObj = Wallets.mainIsolate().currentWalletChain();
-    if (curWalletIdObj.isSuccess()) {
-      var walletObj = Wallets.mainIsolate().findById(curWalletIdObj.data1.walletId);
-      if (walletObj.isSuccess()) {
-        return walletObj.data1;
-      } else {
-        Logger.getInstance().e("wallet_control", "findById error is --->" + walletObj.err.toString());
-      }
-    } else {
+    if (!curWalletIdObj.isSuccess()) {
       Logger.getInstance().e("wallet_control", "currentWalletChain error is --->" + curWalletIdObj.err.toString());
       return null;
     }
-    return null;
+    var walletObj = Wallets.mainIsolate().findById(curWalletIdObj.data1.walletId);
+    if (walletObj.isSuccess()) {
+      return walletObj.data1;
+    } else {
+      Logger.getInstance().e("wallet_control", "findById error is --->" + walletObj.err.toString());
+      return null;
+    }
   }
 
-  removeWallet(String walletId, String pwd) {
+  bool removeWallet(String walletId, Uint8List pwd) {
+    if (walletId == null || walletId == "" || pwd == null) {
+      return false;
+    }
     Error err = Wallets.mainIsolate().removeWallet(walletId, pwd);
     if (err.isSuccess()) {
       return true;
@@ -177,9 +180,34 @@ class WalletsControl {
     return false;
   }
 
-  renameWallet(String walletId, String newWalletName) {
+  bool renameWallet(String walletId, String newWalletName) {
+    if (walletId == null || walletId == "" || newWalletName == null) {
+      return false;
+    }
     var err = Wallets.mainIsolate().renameWallet(newWalletName, walletId);
-    Logger.getInstance().d("wallet_control", "renameWallet err is --->" + err.toString());
+    if (err.isSuccess()) {
+      return true;
+    }
+    Logger.getInstance().e("wallet_control ", "renameWallet err is --->" + err.code.toString() + "||" + err.message.toString());
+    return false;
+  }
+
+  DlResult1<bool> resetPwd(String walletId, Uint8List oldPwd, Uint8List newPwd) {
+    var err = Wallets.mainIsolate().resetPwdWallet(walletId, oldPwd, newPwd);
+    if (err.isSuccess()) {
+      return DlResult1(true, err);
+    }
+    Logger.getInstance().e("wallet_control ", "resetPwd err is --->" + err.code.toString() + "||" + err.message.toString());
+    return DlResult1(false, err);
+  }
+
+  String exportWallet(String walletId, Uint8List pwd) {
+    var resultObj = Wallets.mainIsolate().exportWallet(walletId, pwd);
+    if (resultObj.isSuccess()) {
+      return resultObj.data1;
+    }
+    Logger.getInstance().e("wallet_control", "exportWallet err is --->" + resultObj.err.message.toString());
+    return null;
   }
 
   bool saveCurrentWalletChain(String walletId, EnumKit.ChainType chainType) {
@@ -187,16 +215,16 @@ class WalletsControl {
     if (err.isSuccess()) {
       return true;
     }
-    Logger.getInstance().d("wallet_control ", "saveCurrentWalletChain err" + err.toString());
+    Logger.getInstance().e("wallet_control ", "saveCurrentWalletChain err is --->" + err.message.toString());
     return false;
   }
 
   List<TokenAddress> getTokenAddress(String walletId, EnumKit.ChainType chainType) {
     var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId, chainType);
-    if (!tokenAddressObj.isSuccess()) {
-      return null;
+    if (tokenAddressObj.isSuccess()) {
+      return tokenAddressObj.data1;
     }
-    Logger.getInstance().d("wallet_control ", "getTokenAddress err" + tokenAddressObj.data1.toString());
-    return tokenAddressObj.data1;
+    Logger.getInstance().e("wallet_control ", "getTokenAddress err is --->" + tokenAddressObj.err.message.toString());
+    return null;
   }
 }
