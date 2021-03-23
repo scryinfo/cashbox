@@ -135,7 +135,20 @@ class WalletsControl {
 
   String currentChainAddress() {
     try {
-      String address = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
+      String address = "";
+      switch (currentChainType()) {
+        case ChainType.EthTest:
+        case ChainType.ETH:
+          address = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
+          break;
+        case ChainType.EeeTest:
+        case ChainType.EEE:
+          address = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address;
+          break;
+        default:
+          address = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
+          break;
+      }
       return address;
     } catch (e) {
       Logger.getInstance().e("wallet_control", "currentChainAddress error is --->" + e.toString());

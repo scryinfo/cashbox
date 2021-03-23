@@ -10,7 +10,6 @@ import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
 import 'package:app/net/scryx_net_util.dart';
@@ -165,7 +164,7 @@ class _EeePageState extends State<EeePage> {
             } catch (e) {
               Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
             }
-            Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
+            // Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
             this.displayTokenMList[index].balance = balance;
           }
         } else if (this.displayTokenMList[index].shortName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
@@ -182,7 +181,7 @@ class _EeePageState extends State<EeePage> {
               Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
             }
             this.displayTokenMList[index].balance = balance ?? "";
-            Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
+            // Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
           }
         } else {
           Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
@@ -213,7 +212,7 @@ class _EeePageState extends State<EeePage> {
         if (mounted) {
           setState(() {
             nowWalletAmount = nowWalletAmount + TokenRate.instance.getMoney(displayTokenMList[index]);
-            Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
+            // Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
             displayTokenMList[index].money = money;
           });
         }
@@ -432,8 +431,8 @@ class _EeePageState extends State<EeePage> {
                   ..setBalance(displayTokenMList[index].balance)
                   ..setMoney(displayTokenMList[index].money)
                   ..setDecimal(displayTokenMList[index].decimal)
-                  ..setFromAddress(Wallets.instance.nowWallet.nowChain.chainAddress)
-                  ..setChainType(Wallets.instance.nowWallet.nowChain.chainType)
+                  ..setFromAddress(WalletsControl.getInstance().currentChainAddress())
+                  ..setChainType(WalletsControl.getInstance().currentChainType())
                   ..setContractAddress(displayTokenMList[index].contractAddress);
               }
               NavigatorUtils.push(context, Routes.eeeChainTxHistoryPage);
@@ -586,7 +585,6 @@ class _EeePageState extends State<EeePage> {
               ),
             ),
             onTap: () {
-              Provider.of<TransactionProvide>(context)..setChainType(Wallets.instance.nowWallet.nowChain.chainType);
               NavigatorUtils.push(context, Routes.digitListPage);
             },
           ),
@@ -609,7 +607,7 @@ class _EeePageState extends State<EeePage> {
             ),
             onTap: () {
               _navigatorToQrInfoPage(WalletsControl.getInstance().currentWallet().name, translate('chain_address_info'),
-                  Wallets.instance.nowWallet.nowChain.chainAddress);
+                  WalletsControl.getInstance().currentChainAddress());
             },
           )
         ],
@@ -652,18 +650,18 @@ class _EeePageState extends State<EeePage> {
                   );
                 },
                 onIndexChanged: (index) async {
-                  bool isSetNowChain = await Wallets.instance.nowWallet.setNowChainType(Wallets.instance.nowWallet.chainList[index]);
-                  if (isSetNowChain) {
-                    if (mounted) {
-                      setState(() {
-                        this.chainIndex = index;
-                        Wallets.instance.nowWallet.nowChain.chainAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
-                        // this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
-                        this.displayTokenMList = [];
-                        loadDisplayTokenListData();
-                      });
-                    }
-                  }
+                  // bool isSetNowChain = await Wallets.instance.nowWallet.setNowChainType(Wallets.instance.nowWallet.chainList[index]);
+                  // if (isSetNowChain) {
+                  //   if (mounted) {
+                  //     setState(() {
+                  //       this.chainIndex = index;
+                  //       // Wallets.instance.nowWallet.nowChain.chainAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
+                  //       // this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
+                  //       this.displayTokenMList = [];
+                  //       loadDisplayTokenListData();
+                  //     });
+                  //   }
+                  // }
                   // loadDigitBalance();
                   // loadDigitRateInfo();
                 },
@@ -763,7 +761,7 @@ class _EeePageState extends State<EeePage> {
                   return;
                 }
                 _navigatorToQrInfoPage(WalletsControl.getInstance().currentWallet().name, translate('chain_address_info'),
-                    WalletsControl.getInstance().currentChainAddress()??"");
+                    WalletsControl.getInstance().currentChainAddress() ?? "");
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
