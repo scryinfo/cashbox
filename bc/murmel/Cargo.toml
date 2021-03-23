@@ -65,6 +65,7 @@ mav = { path = "../mav" }
 
 # TODO should import murmel to wallets in future.
 wallets = { path = "../wallets" }
+wallets_types = { path = "../wallets_types" }
 
 [dev-dependencies]
 rustc-serialize = "0.3"
