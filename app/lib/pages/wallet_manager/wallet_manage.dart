@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/wallet.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:logger/logger.dart';
@@ -25,17 +23,14 @@ class WalletManagerPage extends StatefulWidget {
 }
 
 class _WalletManagerPageState extends State<WalletManagerPage> {
-  final List funcRouter = [Routes.resetPwdPage, Routes.recoverWalletPage];
-  final TextEditingController _walletNameController = TextEditingController();
-  final FocusNode _walletNameFocus = FocusNode();
-  String walletId;
+  TextEditingController _walletNameController = TextEditingController();
+  FocusNode _walletNameFocus = FocusNode();
   String walletName;
   bool isNameEditable = false;
 
   @override
   void initState() {
     super.initState();
-    _walletNameController.addListener(_listenWalletName);
   }
 
   @override
@@ -45,14 +40,8 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
   }
 
   void _initData(BuildContext context) {
-    walletId = Provider.of<WalletManagerProvide>(context).walletId;
     walletName = Provider.of<WalletManagerProvide>(context).walletName;
     _walletNameController.text = walletName;
-  }
-
-  void _listenWalletName() {
-    String newWalletName = _walletNameController.text;
-    print("_listenWalletName===>" + newWalletName + "||" + walletName);
   }
 
   @override
@@ -162,21 +151,21 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                           });
                           return;
                         }
-                        Wallet chooseWallet = await Wallets.instance.getWalletByWalletId(Provider.of<WalletManagerProvide>(context).walletId);
                         if (_walletNameController.text == null || _walletNameController.text.isEmpty) {
                           Logger().d("getWalletByWalletId error ===>", "wallet name is null");
                           return;
                         }
-                        bool isRenameSuccess = await chooseWallet.rename(_walletNameController.text);
-                        if (isRenameSuccess) {
-                          Fluttertoast.showToast(msg: translate('success_change_wallet_name').toString());
-                          setState(() {
-                            isNameEditable = false;
-                            walletName = _walletNameController.text;
-                          });
-                        } else {
+                        bool isRenameOk = WalletsControl.getInstance()
+                            .renameWallet(Provider.of<WalletManagerProvide>(context, listen: false).walletId, _walletNameController.text);
+                        if (!isRenameOk) {
                           Fluttertoast.showToast(msg: translate('failure_change_wallet_name').toString());
+                          return;
                         }
+                        Fluttertoast.showToast(msg: translate('success_change_wallet_name').toString());
+                        setState(() {
+                          isNameEditable = false;
+                          walletName = _walletNameController.text;
+                        });
                       },
                       color: Colors.white30,
                       child: isNameEditable
@@ -247,7 +236,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
     return GestureDetector(
       onTap: () {
         var curWallet = WalletsControl.getInstance().currentWallet();
-        if (curWallet.id == walletId) {
+        if (curWallet.id == Provider.of<WalletManagerProvide>(context, listen: false).walletId) {
           Fluttertoast.showToast(msg: translate('prefix_abandon_del_wallet') + curWallet.name + translate('suffix_abandon_del_wallet'));
           return;
         }
@@ -276,7 +265,8 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           hintContent: translate('delete_wallet_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-            bool isRemoved = WalletsControl.getInstance().removeWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
+            bool isRemoved = WalletsControl.getInstance()
+                .removeWallet(Provider.of<WalletManagerProvide>(context, listen: false).walletId, Uint8List.fromList(value.toString().codeUnits));
             if (isRemoved) {
               Fluttertoast.showToast(msg: translate('success_in_delete_wallet'));
               NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
@@ -298,7 +288,8 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           hintContent: translate('recover_wallet_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-            String mne = WalletsControl.getInstance().exportWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
+            String mne = WalletsControl.getInstance()
+                .exportWallet(Provider.of<WalletManagerProvide>(context, listen: false).walletId, Uint8List.fromList(value.toString().codeUnits));
             if (mne == null) {
               Logger.getInstance().e("_buildRecoverWalletWidget=>", "exportWallet is failure =>");
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_recover_wallet_hint'));
