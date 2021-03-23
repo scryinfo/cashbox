@@ -298,16 +298,14 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           hintContent: translate('recover_wallet_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-            Map mnemonicMap = await Wallets.instance.exportWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
-            int status = mnemonicMap["status"];
-            if (status == 200) {
-              context.read<CreateWalletProcessProvide>().setMnemonic(mnemonicMap["mn"]);
-              mnemonicMap = null; //Related to mnemonic words, empty after use
-              NavigatorUtils.push(context, Routes.recoverWalletPage);
-            } else {
-              Logger().e("_buildRecoverWalletWidget=>", "status is=>" + status.toString() + "message=>" + mnemonicMap["message"]);
+            String mne = WalletsControl.getInstance().exportWallet(walletId, Uint8List.fromList(value.toString().codeUnits));
+            if (mne == null) {
+              Logger.getInstance().e("_buildRecoverWalletWidget=>", "exportWallet is failure =>");
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_recover_wallet_hint'));
+              return;
             }
+            context.read<CreateWalletProcessProvide>().setMnemonic(Uint8List.fromList(mne.codeUnits));
+            NavigatorUtils.push(context, Routes.recoverWalletPage);
           },
         );
       },
