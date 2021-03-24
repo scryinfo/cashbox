@@ -16,7 +16,7 @@ fn array_char_test() {
         CArrayCChar_dFree(ptr);
 
         {
-            let a = CArray::<*mut c_char>::default();
+            let _a = CArray::<*mut c_char>::default();
         }
 
         {

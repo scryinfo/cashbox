@@ -8,8 +8,7 @@ use wallets_cdl::{
     parameters::CCreateWalletParameters,
     types::CWallet
 };
-use mav::{WalletType};
-
+use mav::{WalletType,kits::uuid,CTrue};
 pub mod node_rpc;
 
 pub fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
@@ -28,7 +27,7 @@ pub fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
         //invalid parameters
         let mut c_parameters = CCreateWalletParameters::to_c_ptr(&CreateWalletParameters {
             name: "test".to_owned(),
-            password: "1".to_string(),
+            password: "123456".to_string(),
             mnemonic: mnemonic.clone(),
             wallet_type: WalletType::Test.to_string(),
         });
@@ -44,3 +43,20 @@ pub fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
     }
 }
 
+pub fn init_wallets_context(c_ctx: *mut *mut CContext) -> *mut CError {
+    let p = init_parameters();
+    let c_parameters = CInitParameters::to_c_ptr(&p);
+    let c_err = unsafe {
+        Wallets_init(c_parameters, c_ctx) as *mut CError
+    };
+    c_err
+}
+
+pub fn init_parameters() -> InitParameters {
+    let mut p = InitParameters::default();
+    p.is_memory_db=CTrue;
+    let prefix = format!("{}_",uuid());
+    p.db_name.0 = mav::ma::DbName::new(&prefix, "");
+    p.context_note = format!("test_{}", prefix);
+    p
+}

@@ -6,7 +6,7 @@ use futures::executor::block_on;
 
 use mav::NetType;
 use wallets::Contexts;
-use wallets_types::Error;
+use wallets_types::{Error, WalletError, AccountInfoSyncProg};
 
 use crate::{kits::CStruct, parameters::CExtrinsicContext};
 use crate::parameters::{CChainVersion, CEeeChainTx};
@@ -70,6 +70,10 @@ pub unsafe extern "C" fn ChainEee_getSyncRecord(ctx: *mut CContext, netType: *mu
                 match block_on(eee_chain.get_sync_record(wallets, &net_type, &to_str(account))) {
                     Ok(res) => {
                         *syncRecord = CAccountInfoSyncProg::to_c_ptr(&res);
+                        Error::SUCCESS()
+                    },
+                    Err(WalletError::NotExist)=>{
+                        *syncRecord = CAccountInfoSyncProg::to_c_ptr(&AccountInfoSyncProg::default());
                         Error::SUCCESS()
                     }
                     Err(err) => Error::from(err)

@@ -15,8 +15,7 @@ use crate::{kits, NetType};
 pub const VERSION: i64 = 1;
 
 lazy_static! {
-    static ref SET_VERSION_SQL: String =
-        format!("PRAGMA user_version = {version}", version = VERSION);
+    static ref SET_VERSION_SQL: String = format!("PRAGMA user_version = {version}", version = VERSION);
 }
 
 #[derive(Debug, Default, Clone)]
@@ -63,12 +62,7 @@ impl DbName {
                 names.cashbox_wallets.clone()
             },
             cashbox_mnemonic: if names.cashbox_mnemonic.is_empty() {
-                format!(
-                    "{}{}{}",
-                    path,
-                    pre,
-                    DbNameType::cashbox_mnemonic.to_string()
-                )
+                format!("{}{}{}",path,pre,DbNameType::cashbox_mnemonic.to_string())
             } else {
                 names.cashbox_mnemonic.clone()
             },
@@ -88,12 +82,7 @@ impl DbName {
                 names.wallet_testnet.clone()
             },
             wallet_testnet_private: if names.wallet_testnet_private.is_empty() {
-                format!(
-                    "{}{}{}",
-                    path,
-                    pre,
-                    DbNameType::wallet_testnet_private.to_string()
-                )
+                format!("{}{}{}",path, pre,DbNameType::wallet_testnet_private.to_string())
             } else {
                 names.wallet_testnet_private.clone()
             },

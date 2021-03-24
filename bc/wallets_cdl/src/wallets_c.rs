@@ -39,10 +39,7 @@ pub unsafe extern "C" fn Wallets_dbName(
 
 /// 如果成功返回 [wallets_types::Error::SUCCESS()]
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_init(
-    parameter: *mut CInitParameters,
-    context: *mut *mut CContext,
-) -> *const CError {
+pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, context: *mut *mut CContext) -> *const CError {
     log::debug!("enter Wallets_init");
     if context.is_null() || parameter.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or parameter is null");

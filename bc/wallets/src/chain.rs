@@ -451,13 +451,13 @@ impl EeeChainTrait for EeeChain {
         let address = m_address.unwrap();
         //query token decimal by address
         let chain_token = {
-            let token_wrapper = wallet_db.new_wrapper()
+            let token_wrapper = data_rb.new_wrapper()
                 .eq(&MEeeChainToken::wallet_id, &address.wallet_id.to_owned());
             MEeeChainToken::fetch_by_wrapper(data_rb, "", &token_wrapper).await?
         };
 
         if chain_token.is_none() {
-            return Err(WalletError::Custom(format!("wallet {} is not exist!", &address.wallet_id)));
+            return Err(WalletError::Custom(format!("wallet {} chain token is not exist!", &address.wallet_id)));
         }
         let chain_token_shared_id = chain_token.unwrap().chain_token_shared_id;
         let token_shared = MEeeChainTokenShared::fetch_by_id(wallet_db, "", &chain_token_shared_id).await?;
@@ -620,11 +620,13 @@ impl EeeChainTrait for EeeChain {
         for token in default_tokens {
             let mut shared = token.eee_chain_token_shared.clone();
             {
+
                 let token_shared_wrapper = token_rb.new_wrapper()
                     .eq(&MTokenShared::symbol, &token.eee_chain_token_shared.m.token_shared.symbol);
-                if let Some(token_shared) = MEeeChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
+                if let Some(token_shared) = MEeeChainTokenShared::fetch_by_wrapper(token_rb, &tx.tx_id, &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
+
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
 

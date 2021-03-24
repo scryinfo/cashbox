@@ -34,10 +34,10 @@ fn eth_tx_sign_test() {
             gas_limit: "21000".to_string(),
             decimal: 18,
             ext_data: "".to_string(),
-            password: "1".to_string(),
+            password: "123456".to_string(),
         };
         let mut c_transfer_tx = CEthTransferPayload::to_c_ptr(&transfer_tx);
-        let c_err = chain_eth_c::ChainEth_txSign(*c_ctx, to_c_char("Private"), c_transfer_tx, to_c_char("1"), sign_result) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_txSign(*c_ctx, to_c_char("Private"), c_transfer_tx, to_c_char("123456"), sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_transfer_tx.free();
@@ -62,7 +62,7 @@ fn eth_raw_tx_sign_test() {
             raw_tx: "0xf86d068504a817c800837a1200941c9baedc94600b2d1c8a6d2bad1744e6182f300e880de0b6b3a76400008046a07e2c71664464b95fab4b1706785c244d86cef96b5e5c186a314c63306cfe9c54a0637c605b6004bb244cbea9bc69e18b7bd18b491c3794e17e31a0c932592bb476".to_string(),
         };
         let mut c_raw_tx_payload = CEthRawTxPayload::to_c_ptr(&raw_tx_payload);
-        let c_err = chain_eth_c::ChainEth_rawTxSign(*c_ctx, to_c_char("Private"), c_raw_tx_payload, to_c_char("1"), sign_result) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_rawTxSign(*c_ctx, to_c_char("Private"), c_raw_tx_payload, to_c_char("123456"), sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_raw_tx_payload.free();
