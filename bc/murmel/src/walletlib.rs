@@ -115,11 +115,12 @@ mod test {
     use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
     use bitcoin_wallet::mnemonic::Mnemonic;
     use futures::executor::block_on;
+    use mav::{kits, WalletType};
     use std::collections::HashMap;
     use std::fmt::Write;
     use std::str::FromStr;
     use wallets::Wallets;
-    use wallets_types::CreateWalletParameters;
+    use wallets_types::{CreateWalletParameters, InitParameters};
 
     #[test]
     pub fn fee_test() {
@@ -233,7 +234,7 @@ mod test {
 
     #[test]
     pub fn create_wallet_try() {
-        let wallet = Wallets::default();
+        let mut wallet = Wallets::default();
         let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
         let parameters = CreateWalletParameters {
             name: "murmel".to_string(),
@@ -241,9 +242,16 @@ mod test {
             mnemonic: words.to_string(),
             // 钱包类型 钱包分为正式钱包和测试钱包  链有多条链 现在钱包和链暂时不关联
             // wallet_type 依然有特定的字符串 Test 和 Normal
-            wallet_type: "Test".to_string(),
+            wallet_type: WalletType::Test.to_string(),
         };
-        let r = block_on(wallet.create_wallet(parameters));
+        let mut p = InitParameters::default();
+        p.db_name.0 = mav::ma::DbName::new("test_", "");
+        p.context_note = format!("test_{}", mav::kits::uuid());
+        let r = block_on(async {
+            let r = wallet.init(&p).await;
+            r.map_or_else(|e| println!("init error {}", e), |w| println!("init success {:?}", w));
+            wallet.create_wallet(parameters).await
+        });
         r.map_or_else(|e| println!("error {}", e), |w| println!("{:?}", w))
     }
 }
