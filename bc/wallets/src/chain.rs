@@ -10,6 +10,10 @@ use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChai
 
 use codec::Decode;
 use rbatis::plugin::page::PageRequest;
+use bitcoin_wallet::mnemonic::Mnemonic;
+use bitcoin_wallet::error::Error;
+use bitcoin_wallet::account::AccountAddressType;
+use bitcoin::util::psbt::serialize::Serialize;
 
 #[derive(Default)]
 struct EthChain();
@@ -115,10 +119,34 @@ impl ChainTrait for EeeChain {
 
 #[async_trait]
 impl ChainTrait for BtcChain {
-    fn generate_address(&self, _mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError> {
+    fn generate_address(&self, mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError> {
+        const PASSPHRASE: &str = "";
         let mut addr = MAddress::default();
-        addr.chain_type = wallets_types::BtcChain::chain_type(wallet_type).to_string();
-        //todo
+        {
+            addr.chain_type = wallets_types::BtcChain::chain_type(wallet_type).to_string();
+            let mn = String::from_utf8(mn.to_vec())?;
+            let mnemonic = bitcoin_wallet::mnemonic::Mnemonic::from_str(&mn).map_err(|e| WalletError::Custom(e.to_string()))?;
+            let network = match wallet_type {
+                WalletType::Normal => { bitcoin::network::constants::Network::Bitcoin }
+                WalletType::Test => { bitcoin::network::constants::Network::Testnet }
+            };
+            let mut master = bitcoin_wallet::account::MasterAccount::from_mnemonic(&mnemonic, 0, network, PASSPHRASE, None)
+                .map_err(|e| WalletError::Custom(e.to_string()))?;
+            let mut unlocker = bitcoin_wallet::account::Unlocker::new_for_master(&master, PASSPHRASE)
+                .map_err(|e| WalletError::Custom(e.to_string()))?;
+            // path(0,0)
+            let account = bitcoin_wallet::account::Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10)
+                .map_err(|e| WalletError::Custom(e.to_string()))?;
+            master.add_account(account);
+            let account = master.get_mut((0, 0)).unwrap();
+            let instance_key = account.next_key().unwrap();
+            let address = instance_key.address.clone().to_string();
+            let public_key = instance_key.public.clone();
+            let ser = public_key.serialize();
+            let public_key = hex::encode(ser);
+            addr.address = address;
+            addr.public_key = public_key;
+        }
         Ok(addr)
     }
 
