@@ -19,19 +19,17 @@ class Logger {
   final String _logThreadName = "LogThread";
 
   LogLevel _filterLevel = LogLevel.Debug;
-  SendPort _sendPort;
+  SendPort? _sendPort;
 
-  factory Logger() => getInstance();
+  static Logger? _instance;
 
-  static Logger _instance;
+  // factory Logger() => getInstance();
+  factory Logger() => _instance ??= Logger._logger();
 
-  Logger._internal();
+  Logger._logger();
 
   static Logger getInstance() {
-    if (_instance == null) {
-      _instance = new Logger._internal();
-    }
-    return _instance;
+    return _instance ??= Logger();
   }
 
   // return Logger in order to chain style call
@@ -61,12 +59,12 @@ class Logger {
 
     rPort.listen((message) async {
       try {
-        File mainLogFile = await _logFile(_logFileName);
+        File? mainLogFile = (await _logFile(_logFileName));
         if (mainLogFile == null) {
           return;
         }
         if (mainLogFile.lengthSync() > _fileSizeLimit) {
-          File backupLogFile = await _logFile(_logFileName + ".backup");
+          File? backupLogFile = await _logFile(_logFileName + ".backup");
           if (backupLogFile == null) {
             return;
           }
@@ -83,9 +81,9 @@ class Logger {
     });
   }
 
-  Future<File> _logFile(String fileName) async {
+  Future<File?> _logFile(String fileName) async {
     //todo 有大量的初始工作，放到一个地方统一初始化
-    Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
+    Directory directory = (await getExternalStorageDirectory())!; // path:  Android/data/
     String filePath = directory.path + "/" + fileName;
     try {
       if (!File(filePath).existsSync()) {

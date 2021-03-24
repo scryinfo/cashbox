@@ -7,21 +7,23 @@ void main() {
     Logger logger = Logger();
 
     logger.d("logger.getLogLevel().index", logger.getLogLevel().index.toString());
-    logger.e("tag", "message");
+    logger.e("tag", " level is error, message");
     logger.setLogLevel(LogLevel.Info);
     logger.d("logger.getLogLevel().index", logger.getLogLevel().index.toString());
 
     logger.setLogLevel(LogLevel.Fatal);
     logger.d("logger.getLogLevel().index", logger.getLogLevel().index.toString());
 
-    logger.setLogLevel(LogLevel.Warn);
-    logger.d("logger.getLogLevel().index", logger.getLogLevel().index.toString());
+    Logger.getInstance().setLogLevel(LogLevel.Info);
+    Logger.getInstance().d("Logger.getInstance().getLogLevel().index", Logger.getInstance().getLogLevel().index.toString());
 
-    logger.d("d tag", "d message");
-    logger.i("i tag", "i message");
+    Logger.getInstance().d("d tag", "d message");
+    Logger.getInstance().i("i tag", "level info is ok,message is msg!");
+    Logger.getInstance().w("w tag", "level is w,test w level is ok !");
+    Logger.getInstance().w("w tag", " --------------- ");
   });
 
-  test('adds one to input values', () {
+  test('info level test', () {
     Logger logger = Logger();
     logger.e("tag", "message");
 
