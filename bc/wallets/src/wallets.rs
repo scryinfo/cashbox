@@ -76,11 +76,14 @@ impl Wallets {
     pub async fn init(&mut self, parameters: &InitParameters) -> Result<&Context, WalletError> {
         #[cfg(target_os = "android")]
         crate::init_logger_once();
-
         self.ctx.context_note = parameters.context_note.clone();
-        self.db.connect(&parameters.db_name).await?;
+
+        if parameters.is_memory_db==CTrue{
+            self.db.init_memory_sql(&parameters.db_name).await?;
+        }else {
+            self.db.connect(&parameters.db_name).await?;
+        }
         self.db.init_tables(&DbCreateType::NotExists).await?;
-        //todo
         Ok(&self.ctx)
     }
 

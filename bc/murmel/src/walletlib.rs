@@ -249,9 +249,12 @@ mod test {
         p.context_note = format!("test_{}", mav::kits::uuid());
         let r = block_on(async {
             let r = wallet.init(&p).await;
-            r.map_or_else(|e| println!("init error {}", e), |w| println!("init success {:?}", w));
+            r.map_or_else(
+                |e| println!("init error {}", e),
+                |w| println!("init success {:?}", w),
+            );
             wallet.create_wallet(parameters).await
         });
-        r.map_or_else(|e| println!("error {}", e), |w| println!("{:?}", w))
+        r.map_or_else(|e| println!("error {}", e), |w| println!("{:#?}", w))
     }
 }

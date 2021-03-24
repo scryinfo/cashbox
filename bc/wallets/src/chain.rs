@@ -10,6 +10,10 @@ use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChai
 
 use codec::Decode;
 use rbatis::plugin::page::PageRequest;
+use bitcoin_wallet::mnemonic::Mnemonic;
+use bitcoin_wallet::error::Error;
+use bitcoin_wallet::account::AccountAddressType;
+use bitcoin::util::psbt::serialize::Serialize;
 
 #[derive(Default)]
 struct EthChain();
@@ -115,10 +119,34 @@ impl ChainTrait for EeeChain {
 
 #[async_trait]
 impl ChainTrait for BtcChain {
-    fn generate_address(&self, _mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError> {
+    fn generate_address(&self, mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError> {
+        const PASSPHRASE: &str = "";
         let mut addr = MAddress::default();
-        addr.chain_type = wallets_types::BtcChain::chain_type(wallet_type).to_string();
-        //todo
+        {
+            addr.chain_type = wallets_types::BtcChain::chain_type(wallet_type).to_string();
+            let mn = String::from_utf8(mn.to_vec())?;
+            let mnemonic = bitcoin_wallet::mnemonic::Mnemonic::from_str(&mn).map_err(|e| WalletError::Custom(e.to_string()))?;
+            let network = match wallet_type {
+                WalletType::Normal => { bitcoin::network::constants::Network::Bitcoin }
+                WalletType::Test => { bitcoin::network::constants::Network::Testnet }
+            };
+            let mut master = bitcoin_wallet::account::MasterAccount::from_mnemonic(&mnemonic, 0, network, PASSPHRASE, None)
+                .map_err(|e| WalletError::Custom(e.to_string()))?;
+            let mut unlocker = bitcoin_wallet::account::Unlocker::new_for_master(&master, PASSPHRASE)
+                .map_err(|e| WalletError::Custom(e.to_string()))?;
+            // path(0,0)
+            let account = bitcoin_wallet::account::Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10)
+                .map_err(|e| WalletError::Custom(e.to_string()))?;
+            master.add_account(account);
+            let account = master.get_mut((0, 0)).unwrap();
+            let instance_key = account.next_key().unwrap();
+            let address = instance_key.address.clone().to_string();
+            let public_key = instance_key.public.clone();
+            let ser = public_key.serialize();
+            let public_key = hex::encode(ser);
+            addr.address = address;
+            addr.public_key = public_key;
+        }
         Ok(addr)
     }
 
@@ -423,13 +451,13 @@ impl EeeChainTrait for EeeChain {
         let address = m_address.unwrap();
         //query token decimal by address
         let chain_token = {
-            let token_wrapper = wallet_db.new_wrapper()
+            let token_wrapper = data_rb.new_wrapper()
                 .eq(&MEeeChainToken::wallet_id, &address.wallet_id.to_owned());
             MEeeChainToken::fetch_by_wrapper(data_rb, "", &token_wrapper).await?
         };
 
         if chain_token.is_none() {
-            return Err(WalletError::Custom(format!("wallet {} is not exist!", &address.wallet_id)));
+            return Err(WalletError::Custom(format!("wallet {} chain token is not exist!", &address.wallet_id)));
         }
         let chain_token_shared_id = chain_token.unwrap().chain_token_shared_id;
         let token_shared = MEeeChainTokenShared::fetch_by_id(wallet_db, "", &chain_token_shared_id).await?;
@@ -592,11 +620,13 @@ impl EeeChainTrait for EeeChain {
         for token in default_tokens {
             let mut shared = token.eee_chain_token_shared.clone();
             {
+
                 let token_shared_wrapper = token_rb.new_wrapper()
                     .eq(&MTokenShared::symbol, &token.eee_chain_token_shared.m.token_shared.symbol);
-                if let Some(token_shared) = MEeeChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
+                if let Some(token_shared) = MEeeChainTokenShared::fetch_by_wrapper(token_rb, &tx.tx_id, &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
+
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
 

@@ -6,6 +6,8 @@ use futures::task::SpawnExt;
 use mav::{kits, WalletType};
 use std::os::raw::c_char;
 
+mod data;
+
 use wallets_cdl::{
     to_c_char, to_str, CStruct,
     mem_c::{
@@ -144,14 +146,13 @@ fn block_on_test() {
 #[test]
 fn init_parameters_test(){
     unsafe {
-        let parameters = init_parameters();
+        let parameters = data::init_parameters();
         let mut c_parameters = CInitParameters::to_c_ptr(&parameters);
-        let dbName = (*c_parameters).dbName;
 
-        assert_eq!(parameters.db_name.cashbox_wallets.as_str(), to_str((*dbName).cashboxWallets));
+        let db_name = (*c_parameters).dbName;
+        assert_eq!(parameters.db_name.cashbox_wallets.as_str(), to_str((*db_name).cashboxWallets));
         c_parameters.free();
     }
-
 }
 
 #[test]
@@ -184,13 +185,14 @@ fn platform_type_test() {
 }
 
 #[test]
+#[ignore]
 fn wallets_test() {
     init_test();
 
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_ctx_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
 
@@ -210,7 +212,7 @@ fn wallets_test() {
                 //invalid parameters
                 let mut parameters = CCreateWalletParameters::to_c_ptr(&CreateWalletParameters {
                     name: "test".to_owned(),
-                    password: "1".to_string(),
+                    password: "123456".to_string(),
                     mnemonic: mnemonic.clone(),
                     wallet_type: WalletType::Normal.to_string(),
                 });
@@ -349,10 +351,10 @@ fn wallets_update_balance_test() {
     assert_ne!(null_mut(), c_ctx);
     unsafe {
         //query all wallet
-        let c_err = init_ctx_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-
+        data::create_wallet(c_ctx);
         let c_array_wallet = CArrayCWallet_dAlloc();
         let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
@@ -373,7 +375,7 @@ fn wallets_update_balance_test() {
             };
 
             let mut c_tokens_address = CTokenAddress::to_c_ptr(&address);
-            let c_err = Wallets_updateBalance(*c_ctx, to_c_char("Main"), c_tokens_address) as *mut CError;
+            let c_err = Wallets_updateBalance(*c_ctx, to_c_char("Test"), c_tokens_address) as *mut CError;
             assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
             CError_free(c_err);
             c_tokens_address.free();
@@ -381,7 +383,7 @@ fn wallets_update_balance_test() {
 
         for wallet in &wallets {
             let c_array_token_address = CArrayCTokenAddress_dAlloc();
-            let c_err = Wallets_queryBalance(*c_ctx, to_c_char("Main"), to_c_char(&wallet.m.id), c_array_token_address);
+            let c_err = Wallets_queryBalance(*c_ctx, to_c_char("Test"), to_c_char(&wallet.m.id), c_array_token_address);
             assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
             let token_address_balance: Vec<TokenAddress> = CArray::to_rust(&**c_array_token_address);
             for address_balance in token_address_balance {
@@ -398,7 +400,7 @@ fn wallet_token_status_change_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_ctx_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         //query all wallet
@@ -407,6 +409,7 @@ fn wallet_token_status_change_test() {
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+        CArrayCWallet_dFree(c_array_wallet);
         // set all wallet token show statue is 0
         for wallet in wallets {
             let tokens_status = WalletTokenStatus {
@@ -416,12 +419,12 @@ fn wallet_token_status_change_test() {
                 is_show: 0,
             };
             let mut c_tokens_status = CWalletTokenStatus::to_c_ptr(&tokens_status);
-            let c_err = Wallets_changeTokenShowState(*c_ctx, to_c_char("Main"), c_tokens_status) as *mut CError;
+            let c_err = Wallets_changeTokenShowState(*c_ctx, to_c_char("Test"), c_tokens_status) as *mut CError;
             assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
             CError_free(c_err);
             c_tokens_status.free();
         }
-        CArrayCWallet_dFree(c_array_wallet);
+
         let c_array_wallet = CArrayCWallet_dAlloc();
         let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
@@ -429,7 +432,9 @@ fn wallet_token_status_change_test() {
         //check change status whether successful
         let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
         for wallet in wallets {
-            assert_eq!(wallet.eth_chain.tokens[0].m.show, 0);
+            if wallet.eth_chain.chain_shared.m.chain_type.eq("EthTest"){
+                assert_eq!(wallet.eth_chain.tokens[0].m.show, 0);
+            }
         }
         CArrayCWallet_dFree(c_array_wallet);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
@@ -444,7 +449,7 @@ fn init_test() {
         assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
 
-        let mut parameters = CInitParameters::to_c_ptr(&init_parameters());
+        let mut parameters = CInitParameters::to_c_ptr(&data::init_parameters());
         {
             let c_err = Wallets_init(parameters, null_mut()) as *mut CError;
             assert_eq!(Error::PARAMETER().code, (*c_err).code, "{:?}", *c_err);
@@ -464,7 +469,7 @@ fn init_test() {
     unsafe {
         let ctx = CContext_dAlloc();
         assert_ne!(null_mut(), ctx);
-        let parameters = init_parameters();
+        let parameters = data::init_parameters();
         let mut c_parameters = CInitParameters::to_c_ptr(&parameters);
         let c_err = Wallets_init(c_parameters, ctx) as *mut CError;
         assert_ne!(null_mut(), c_err);
@@ -540,19 +545,4 @@ fn find_by_id_test(c_ctx: *mut CContext, wallet_id: &str) -> Wallet {
         wallet
     };
     wallet
-}
-
-fn init_parameters() -> InitParameters {
-    let mut p = InitParameters::default();
-    p.db_name.0 = mav::ma::DbName::new("test_", "");
-    p.context_note = format!("test_{}", kits::uuid());
-    p
-}
-
-fn init_ctx_parameters(c_ctx: *mut *mut CContext) -> *mut CError {
-    let c_parameters = CInitParameters::to_c_ptr(&init_parameters());
-    let c_err = unsafe {
-        Wallets_init(c_parameters, c_ctx) as *mut CError
-    };
-    c_err
 }
