@@ -193,6 +193,15 @@ class WalletsControl {
     return false;
   }
 
+  bool updateBalance(ChainType chainType, TokenAddress tokenAddress) {
+    Error err = Wallets.mainIsolate().updateBalance(chainType, tokenAddress);
+    if (err.isSuccess()) {
+      return true;
+    }
+    Logger.getInstance().e("wallet_control ", "changeTokenStatus err is --->" + err.code.toString() + "||" + err.message.toString());
+    return false;
+  }
+
   bool removeWallet(String walletId, Uint8List pwd) {
     if (walletId == null || walletId == "" || pwd == null) {
       return false;
@@ -242,6 +251,14 @@ class WalletsControl {
     }
     Logger.getInstance().e("wallet_control ", "saveCurrentWalletChain err is --->" + err.message.toString());
     return false;
+  }
+
+  String getTokenAddressId(String walletId, ChainType chainType) {
+    List<TokenAddress> tokenAddressList = getTokenAddress(walletId, chainType);
+    if (tokenAddressList != null && tokenAddressList.length > 0) {
+      return tokenAddressList.first.addressId;
+    }
+    return null;
   }
 
   List<TokenAddress> getTokenAddress(String walletId, EnumKit.ChainType chainType) {

@@ -34,3 +34,7 @@
     查看andriod apk签名信息
     先安装jdk并配置好环境变量，然后运行->CMD->输入以下命令
     keytool -list -printcert -jarfile D:......\target.apk
+
+### 开源区块链钱包Cashbox技术编译教程
+-   [视频教程一](https://v.qq.com/x/page/y3126jrbjzz.html)
+-   [视频教程二](https://v.qq.com/x/page/v3129z5fsci.html)

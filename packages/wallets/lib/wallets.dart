@@ -395,6 +395,20 @@ class Wallets {
     return err;
   }
 
+  Error updateBalance(ChainType chainType, TokenAddress tokenAddress) {
+    Error err;
+    {
+      var ptrChainType = chainType.toEnumString().toCPtr();
+      var ptrTokenAddress = tokenAddress.toCPtr();
+      var cerr = clib.Wallets_updateBalance(ptrContext, ptrChainType, ptrTokenAddress);
+      err = Error.fromC(cerr);
+      clib.CError_free(cerr);
+      TokenAddress.free(ptrTokenAddress);
+      ptrChainType.free();
+    }
+    return err;
+  }
+
   static AppPlatformTypes appPlatformType() {
     AppPlatformTypes platformType;
     {

@@ -74,17 +74,25 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   List<TokenM> loadNativeToken() {
-    List<EthChainToken> ethChainTokens = WalletsControl.getInstance().currentWallet().ethChain.tokens.data;
     List<TokenM> nativeTokenMList = [];
-    ethChainTokens.forEach((element) {
-      TokenM tokenM = TokenM()
-        ..shortName = element.ethChainTokenShared.tokenShared.name
-        ..contractAddress = element.contractAddress
-        ..decimal = element.ethChainTokenShared.decimal
-        ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
-        ..isVisible = element.show.isTrue();
-      nativeTokenMList.add(tokenM);
-    });
+    switch (WalletsControl.getInstance().currentChainType()) {
+      case ChainType.EthTest:
+      case ChainType.ETH:
+        List<EthChainToken> ethChainTokens = WalletsControl.getInstance().currentWallet().ethChain.tokens.data;
+        ethChainTokens.forEach((element) {
+          TokenM tokenM = TokenM()
+            ..shortName = element.ethChainTokenShared.tokenShared.name
+            ..contractAddress = element.contractAddress
+            ..decimal = element.ethChainTokenShared.decimal
+            ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
+            ..isVisible = element.show.isTrue();
+          nativeTokenMList.add(tokenM);
+        });
+        break;
+      default:
+        break;
+    }
+
     return nativeTokenMList;
   }
 
@@ -140,9 +148,14 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       ..page = pageReq
       ..isDefault = false;
     final ethTokenClient = EthTokenOpenFaceClient(channel);
-    EthTokenOpen_QueryRes ethTokenOpenQueryRes = await ethTokenClient.query(open_queryReq);
-    List<EthTokenOpen_Token> ethTokenList = ethTokenOpenQueryRes.tokens;
-    return ethTokenList;
+    try {
+      EthTokenOpen_QueryRes ethTokenOpenQueryRes = await ethTokenClient.query(open_queryReq);
+      List<EthTokenOpen_Token> ethTokenList = ethTokenOpenQueryRes.tokens;
+      return ethTokenList;
+    } catch (e) {
+      Logger.getInstance().e("rpc query error", "e is --->" + e.toString());
+      return null;
+    }
   }
 
   List<TokenM> formatTokenMList(List<EthChainTokenAuth> ethTokenList) {
@@ -317,6 +330,53 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           ),
           child: GestureDetector(
               onTap: () async {
+                {
+                  // save token to local, make sure token exist
+                  TokenAddress tokenAddress = TokenAddress()
+                    ..tokenId = displayDigitsList[index].tokenId
+                    ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+                    ..walletId = WalletsControl.getInstance().currentWallet().id
+                    ..balance = 0.toString()
+                    ..addressId = WalletsControl.getInstance()
+                            .getTokenAddressId(WalletsControl.getInstance().currentWallet().id, WalletsControl.getInstance().currentChainType()) ??
+                        "";
+                  bool isUpsertOk = WalletsControl.getInstance().updateBalance(WalletsControl.getInstance().currentChainType(), tokenAddress);
+                  if (!isUpsertOk) {
+                    Logger.getInstance().e("updateBalance", "updateBalance failure");
+                    Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
+                    return;
+                  }
+                }
+
+                WalletTokenStatus walletTokenStatus = WalletTokenStatus()
+                  ..walletId = WalletsControl.getInstance().currentWallet().id
+                  ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+                  ..tokenId = displayDigitsList[index].tokenId;
+                if (displayDigitsList[index].isVisible) {
+                  // 本就可见
+                  walletTokenStatus.isShow = false.toInt();
+                  bool isChangeOk =
+                      WalletsControl.getInstance().changeTokenStatus(WalletsControl.getInstance().currentChainType(), walletTokenStatus);
+                  if (!isChangeOk) {
+                    Fluttertoast.showToast(msg: translate("save_digit_model_failure")); // todo change hint info
+                    return;
+                  }
+                  displayDigitsList[index].isVisible = false;
+                } else {
+                  // 代币未勾选，不可见状态,执行让显示token
+                  walletTokenStatus.isShow = true.toInt();
+                  bool isChangeOk =
+                      WalletsControl.getInstance().changeTokenStatus(WalletsControl.getInstance().currentChainType(), walletTokenStatus);
+                  if (!isChangeOk) {
+                    Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
+                    return;
+                  }
+                  displayDigitsList[index].isVisible = true;
+                }
+                setState(() {
+                  displayDigitsList[index].isVisible = displayDigitsList[index].isVisible;
+                });
+
                 /*var isExecutorSuccess = false;
                 if (displayDigitsList[index].isVisible) {
                   isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.hideDigit(displayDigitsList[index]);
