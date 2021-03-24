@@ -270,12 +270,12 @@ pub unsafe extern "C" fn CArrayCEeeChainTx_dFree(dPtr: *mut *mut CArray<CEeeChai
 }
 
 #[no_mangle]
-pub extern "C" fn CCWalletTokenStatus_dAlloc() -> *mut *mut CArray<CWalletTokenStatus> {
+pub extern "C" fn CWalletTokenStatus_dAlloc() -> *mut *mut CWalletTokenStatus{
     d_ptr_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CCWalletTokenStatus_dFree(dPtr: *mut *mut CArray<CWalletTokenStatus>) {
+pub unsafe extern "C" fn CWalletTokenStatus_dFree(dPtr: *mut *mut CWalletTokenStatus) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
 }
