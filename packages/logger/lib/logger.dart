@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as pathLib;
 
 enum LogLevel {
   Debug,
@@ -23,7 +24,6 @@ class Logger {
 
   static Logger? _instance;
 
-  // factory Logger() => getInstance();
   factory Logger() => _instance ??= Logger._logger();
 
   Logger._logger();
@@ -83,8 +83,14 @@ class Logger {
 
   Future<File?> _logFile(String fileName) async {
     //todo 有大量的初始工作，放到一个地方统一初始化
-    Directory directory = (await getExternalStorageDirectory())!; // path:  Android/data/
-    String filePath = directory.path + "/" + fileName;
+    String directoryPath = "";
+    if (Platform.isWindows) {
+      directoryPath = pathLib.current;
+    } else {
+      Directory directory = (await getExternalStorageDirectory())!; // path:  Android/data/
+      directoryPath = directory.path;
+    }
+    String filePath = directoryPath + "/" + fileName;
     try {
       if (!File(filePath).existsSync()) {
         File(filePath).createSync();

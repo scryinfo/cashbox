@@ -72,11 +72,8 @@ dependencies:
   #flutter_html: ^1.0.2
   #                    https://github.com/Sub6Resources/flutter_html
 
-  path_provider: ^1.3.0
+  path_provider: ^2.0.1
   #路径信息获取        https://github.com/flutter/plugins
-
-  shared_preferences: ^0.5.12+4
-  #https://github.com/flutter/plugins
 
   package_info: ^0.4.0+18
   #yingyongbanben
@@ -111,11 +108,6 @@ dependencies:
 
   services:
     path: ../packages/services
-
-  # fork   修改官方插件webview_flutter
-  # 基于   ^0.3.13版本   https://github.com/flutter/plugins/tree/master/packages/webview_flutter
-  # scry_webview:
-  #   path: ../packages/scry_webview/
 
 dev_dependencies:
   flutter_test:
