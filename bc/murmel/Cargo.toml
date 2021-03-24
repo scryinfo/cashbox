@@ -28,6 +28,11 @@ name = "murmel"
 path = "src/lib.rs"
 crate_type = ["cdylib", "rlib"]
 
+[[bin]]
+name = "client"
+path = "bin/client.rs"
+
+
 [dependencies]
 bitcoin = { version = "0.21.0", features = ["serde"] }
 bitcoin_hashes = "0.7"
