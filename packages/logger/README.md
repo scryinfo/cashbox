@@ -8,6 +8,7 @@
 6. 会生成两个日志文件。 cashbox.log和cashbox.log.backup文件。 最新的内容写入到cashbox.log里面，每次写完后判断文件大小超过30M后，交换cashbox.log和cashbox.log.backup文件名，清空cashbox.log内容，继续往cashbox.log里面写入内容。
 7. 可设置日志级别，来控制日志输出内容。 如：设置筛选级别info级别时，不会输出低于info界别的日志，如：debug级别。
 8. 懒注册(lazy register)日志线程功能，只有在判断确实需要写日志文件时，才会注册开启唯一日志线程。
+9. 日志输出平台支持android（已测）、windows（已测）、linux、ios。
 
 ## Getting Started
 
