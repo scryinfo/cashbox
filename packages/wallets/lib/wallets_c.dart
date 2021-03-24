@@ -543,20 +543,6 @@ class CArrayCWallet extends Struct {
     return Pointer<CArrayCWallet>.fromAddress(ptr).ref;
   }
 }
-/// <p class="para-brief"> c的数组需要定义两个字段，所定义一个结构体进行统一管理 注：c不支持范型，所以cbindgen工具会使用具体的类型来代替</p>
-class CArrayCWalletTokenStatus extends Struct {
-  Pointer<CWalletTokenStatus> ptr;
-  @Uint64()
-  int len;
-  @Uint64()
-  int cap;
-  static Pointer<CArrayCWalletTokenStatus> allocate() {
-    return ffi.calloc<CArrayCWalletTokenStatus>();
-  }
-  static CArrayCWalletTokenStatus from(int ptr) {
-    return Pointer<CArrayCWalletTokenStatus>.fromAddress(ptr).ref;
-  }
-}
 /// C function `CArrayCWallet_dAlloc`.
 Pointer<Pointer<CArrayCWallet>> CArrayCWallet_dAlloc() {
   return _CArrayCWallet_dAlloc();
@@ -698,26 +684,6 @@ class CBtcChainTokenShared extends Struct {
     return Pointer<CBtcChainTokenShared>.fromAddress(ptr).ref;
   }
 }
-/// C function `CCWalletTokenStatus_dAlloc`.
-Pointer<Pointer<CArrayCWalletTokenStatus>> CCWalletTokenStatus_dAlloc() {
-  return _CCWalletTokenStatus_dAlloc();
-}
-final _CCWalletTokenStatus_dAlloc_Dart _CCWalletTokenStatus_dAlloc = _dl.lookupFunction<_CCWalletTokenStatus_dAlloc_C, _CCWalletTokenStatus_dAlloc_Dart>('CCWalletTokenStatus_dAlloc');
-typedef _CCWalletTokenStatus_dAlloc_C = Pointer<Pointer<CArrayCWalletTokenStatus>> Function();
-typedef _CCWalletTokenStatus_dAlloc_Dart = Pointer<Pointer<CArrayCWalletTokenStatus>> Function();
-/// C function `CCWalletTokenStatus_dFree`.
-void CCWalletTokenStatus_dFree(
-  Pointer<Pointer<CArrayCWalletTokenStatus>> dPtr,
-) {
-  _CCWalletTokenStatus_dFree(dPtr);
-}
-final _CCWalletTokenStatus_dFree_Dart _CCWalletTokenStatus_dFree = _dl.lookupFunction<_CCWalletTokenStatus_dFree_C, _CCWalletTokenStatus_dFree_Dart>('CCWalletTokenStatus_dFree');
-typedef _CCWalletTokenStatus_dFree_C = Void Function(
-  Pointer<Pointer<CArrayCWalletTokenStatus>> dPtr,
-);
-typedef _CCWalletTokenStatus_dFree_Dart = void Function(
-  Pointer<Pointer<CArrayCWalletTokenStatus>> dPtr,
-);
 /// C struct `CChainShared`.
 class CChainShared extends Struct {
   Pointer<ffi.Utf8> walletId;
@@ -1291,6 +1257,26 @@ class CWalletTokenStatus extends Struct {
     return Pointer<CWalletTokenStatus>.fromAddress(ptr).ref;
   }
 }
+/// C function `CWalletTokenStatus_dAlloc`.
+Pointer<Pointer<CWalletTokenStatus>> CWalletTokenStatus_dAlloc() {
+  return _CWalletTokenStatus_dAlloc();
+}
+final _CWalletTokenStatus_dAlloc_Dart _CWalletTokenStatus_dAlloc = _dl.lookupFunction<_CWalletTokenStatus_dAlloc_C, _CWalletTokenStatus_dAlloc_Dart>('CWalletTokenStatus_dAlloc');
+typedef _CWalletTokenStatus_dAlloc_C = Pointer<Pointer<CWalletTokenStatus>> Function();
+typedef _CWalletTokenStatus_dAlloc_Dart = Pointer<Pointer<CWalletTokenStatus>> Function();
+/// C function `CWalletTokenStatus_dFree`.
+void CWalletTokenStatus_dFree(
+  Pointer<Pointer<CWalletTokenStatus>> dPtr,
+) {
+  _CWalletTokenStatus_dFree(dPtr);
+}
+final _CWalletTokenStatus_dFree_Dart _CWalletTokenStatus_dFree = _dl.lookupFunction<_CWalletTokenStatus_dFree_C, _CWalletTokenStatus_dFree_Dart>('CWalletTokenStatus_dFree');
+typedef _CWalletTokenStatus_dFree_C = Void Function(
+  Pointer<Pointer<CWalletTokenStatus>> dPtr,
+);
+typedef _CWalletTokenStatus_dFree_Dart = void Function(
+  Pointer<Pointer<CWalletTokenStatus>> dPtr,
+);
 /// C function `CWallet_dAlloc`.
 Pointer<Pointer<CWallet>> CWallet_dAlloc() {
   return _CWallet_dAlloc();

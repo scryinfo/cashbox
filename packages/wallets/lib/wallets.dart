@@ -199,6 +199,7 @@ class Wallets {
       var cerr = clib.Wallets_createWallet(ptrContext, ptrParameters, ptr);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
+      CreateWalletParameters.free(ptrParameters);
       if (err.isSuccess()) {
         wallet = Wallet.fromC(ptr.value);
       }
@@ -378,6 +379,20 @@ class Wallets {
       clib.CArrayCTokenAddress_dFree(ptrArrayToken);
     }
     return DlResult1(arrayCTokenAddress, err);
+  }
+
+  Error changeTokenStatus(ChainType chainType, WalletTokenStatus walletTokenStatus) {
+    Error err;
+    {
+      var ptrChainType = chainType.toEnumString().toCPtr();
+      var ptrWalletTokenStatus = walletTokenStatus.toCPtr();
+      var cerr = clib.Wallets_changeTokenShowState(ptrContext, ptrChainType, ptrWalletTokenStatus);
+      err = Error.fromC(cerr);
+      clib.CError_free(cerr);
+      WalletTokenStatus.free(ptrWalletTokenStatus);
+      ptrChainType.free();
+    }
+    return err;
   }
 
   static AppPlatformTypes appPlatformType() {

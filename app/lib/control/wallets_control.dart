@@ -181,6 +181,18 @@ class WalletsControl {
     }
   }
 
+  bool changeTokenStatus(ChainType chainType, WalletTokenStatus walletTokenStatus) {
+    if (walletTokenStatus == null) {
+      return false;
+    }
+    Error err = Wallets.mainIsolate().changeTokenStatus(chainType, walletTokenStatus);
+    if (err.isSuccess()) {
+      return true;
+    }
+    Logger.getInstance().e("wallet_control ", "changeTokenStatus err is --->" + err.code.toString() + "||" + err.message.toString());
+    return false;
+  }
+
   bool removeWallet(String walletId, Uint8List pwd) {
     if (walletId == null || walletId == "" || pwd == null) {
       return false;
