@@ -89,3 +89,15 @@ pub fn calc_hash160(str: &str) -> String {
     let hash = hash160::Hash::hash(&decode[..]);
     hash.to_hex()
 }
+
+mod test {
+    use bitcoin_wallet::mnemonic::Mnemonic;
+
+    #[test]
+    pub fn create_address_test() {
+        pub const PASSPHRASE: &str = "";
+        let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand trash travel treat";
+        let mnemonic = Mnemonic::from_str(words);
+        assert_eq!(mnemonic.is_ok(), false);
+    }
+}
