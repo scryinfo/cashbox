@@ -4677,6 +4677,7 @@ class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
 
 class InitParameters extends DC<clib.CInitParameters> {
   DbName dbName;
+  int isMemoryDb;
   String contextNote;
 
   InitParameters() {
@@ -4736,6 +4737,7 @@ class InitParameters extends DC<clib.CInitParameters> {
       c.dbName = allocateZero<clib.CDbName>();
     }
     dbName.toC(c.dbName);
+    c.isMemoryDb = isMemoryDb ?? 0;
     if (c.contextNote != null && c.contextNote != nullptr) {
       ffi.calloc.free(c.contextNote);
     }
@@ -4757,6 +4759,7 @@ class InitParameters extends DC<clib.CInitParameters> {
     }
     dbName = new DbName();
     dbName.toDart(c.dbName);
+    isMemoryDb = c.isMemoryDb;
     contextNote = fromUtf8Null(c.contextNote);
   }
 }

@@ -360,14 +360,14 @@ class Wallets {
     return err;
   }
 
-  DlResult1<List<TokenAddress>> getTokenAddress(String walletId, ChainType chainType) {
+  DlResult1<List<TokenAddress>> getTokenAddress(String walletId, NetType netType) {
     Error err;
     List<TokenAddress> arrayCTokenAddress = [];
     {
       var ptrWalletId = walletId.toCPtr();
-      var ptrChainType = chainType.toEnumString().toCPtr();
+      var ptrNetType = netType.toEnumString().toCPtr();
       var ptrArrayToken = clib.CArrayCTokenAddress_dAlloc();
-      var cerr = clib.Wallets_queryBalance(ptrContext, ptrChainType, ptrWalletId, ptrArrayToken);
+      var cerr = clib.Wallets_queryBalance(ptrContext, ptrNetType, ptrWalletId, ptrArrayToken);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
 
@@ -375,36 +375,36 @@ class Wallets {
         arrayCTokenAddress = ArrayCTokenAddress.fromC(ptrArrayToken.value).data;
       }
       ptrWalletId.free();
-      ptrChainType.free();
+      ptrNetType.free();
       clib.CArrayCTokenAddress_dFree(ptrArrayToken);
     }
     return DlResult1(arrayCTokenAddress, err);
   }
 
-  Error changeTokenStatus(ChainType chainType, WalletTokenStatus walletTokenStatus) {
+  Error changeTokenStatus(NetType netType, WalletTokenStatus walletTokenStatus) {
     Error err;
     {
-      var ptrChainType = chainType.toEnumString().toCPtr();
+      var ptrNetType = netType.toEnumString().toCPtr();
       var ptrWalletTokenStatus = walletTokenStatus.toCPtr();
-      var cerr = clib.Wallets_changeTokenShowState(ptrContext, ptrChainType, ptrWalletTokenStatus);
+      var cerr = clib.Wallets_changeTokenShowState(ptrContext, ptrNetType, ptrWalletTokenStatus);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
       WalletTokenStatus.free(ptrWalletTokenStatus);
-      ptrChainType.free();
+      ptrNetType.free();
     }
     return err;
   }
 
-  Error updateBalance(ChainType chainType, TokenAddress tokenAddress) {
+  Error updateBalance(NetType netType, TokenAddress tokenAddress) {
     Error err;
     {
-      var ptrChainType = chainType.toEnumString().toCPtr();
+      var ptrNetType = netType.toEnumString().toCPtr();
       var ptrTokenAddress = tokenAddress.toCPtr();
-      var cerr = clib.Wallets_updateBalance(ptrContext, ptrChainType, ptrTokenAddress);
+      var cerr = clib.Wallets_updateBalance(ptrContext, ptrNetType, ptrTokenAddress);
       err = Error.fromC(cerr);
       clib.CError_free(cerr);
       TokenAddress.free(ptrTokenAddress);
-      ptrChainType.free();
+      ptrNetType.free();
     }
     return err;
   }

@@ -81,6 +81,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         List<EthChainToken> ethChainTokens = WalletsControl.getInstance().currentWallet().ethChain.tokens.data;
         ethChainTokens.forEach((element) {
           TokenM tokenM = TokenM()
+            ..tokenId = element.chainTokenSharedId
             ..shortName = element.ethChainTokenShared.tokenShared.name
             ..contractAddress = element.contractAddress
             ..decimal = element.ethChainTokenShared.decimal
@@ -163,6 +164,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     try {
       ethTokenList.forEach((element) {
         TokenM tokenM = TokenM()
+          ..tokenId = element.chainTokenSharedId
           ..shortName = element.ethChainTokenShared.tokenShared.symbol
           ..fullName = element.ethChainTokenShared.tokenShared.name
           ..contractAddress = element.contractAddress
@@ -337,10 +339,10 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                     ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
                     ..walletId = WalletsControl.getInstance().currentWallet().id
                     ..balance = 0.toString()
-                    ..addressId = WalletsControl.getInstance()
-                            .getTokenAddressId(WalletsControl.getInstance().currentWallet().id, WalletsControl.getInstance().currentChainType()) ??
-                        "";
-                  bool isUpsertOk = WalletsControl.getInstance().updateBalance(WalletsControl.getInstance().currentChainType(), tokenAddress);
+                    ..addressId = WalletsControl.getInstance().getTokenAddressId(
+                            WalletsControl.getInstance().currentWallet().id, NetType.Main, WalletsControl.getInstance().currentChainType()) ??
+                        ""; // todo NetType dynamic
+                  bool isUpsertOk = WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress);
                   if (!isUpsertOk) {
                     Logger.getInstance().e("updateBalance", "updateBalance failure");
                     Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
@@ -353,66 +355,27 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
                   ..tokenId = displayDigitsList[index].tokenId;
                 if (displayDigitsList[index].isVisible) {
-                  // 本就可见
                   walletTokenStatus.isShow = false.toInt();
-                  bool isChangeOk =
-                      WalletsControl.getInstance().changeTokenStatus(WalletsControl.getInstance().currentChainType(), walletTokenStatus);
+                  bool isChangeOk = WalletsControl.getInstance().changeTokenStatus(NetType.Main, walletTokenStatus); // todo dynamic change netType
                   if (!isChangeOk) {
                     Fluttertoast.showToast(msg: translate("save_digit_model_failure")); // todo change hint info
                     return;
                   }
-                  displayDigitsList[index].isVisible = false;
+                  setState(() {
+                    displayDigitsList[index].isVisible = false;
+                  });
                 } else {
                   // 代币未勾选，不可见状态,执行让显示token
                   walletTokenStatus.isShow = true.toInt();
-                  bool isChangeOk =
-                      WalletsControl.getInstance().changeTokenStatus(WalletsControl.getInstance().currentChainType(), walletTokenStatus);
+                  bool isChangeOk = WalletsControl.getInstance().changeTokenStatus(NetType.Main, walletTokenStatus); // todo dynamic change netType
                   if (!isChangeOk) {
                     Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
                     return;
                   }
-                  displayDigitsList[index].isVisible = true;
-                }
-                setState(() {
-                  displayDigitsList[index].isVisible = displayDigitsList[index].isVisible;
-                });
-
-                /*var isExecutorSuccess = false;
-                if (displayDigitsList[index].isVisible) {
-                  isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.hideDigit(displayDigitsList[index]);
-                } else {
-                  //Invisible, perform visible show operation
-                  bool isDigitExist = false;
-                  var tempDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
-                  for (int i = 0; i < tempDigitList.length; i++) {
-                    var element = tempDigitList[i];
-                    if (element.digitId == displayDigitsList[index].digitId) {
-                      isDigitExist = true;
-                      break;
-                    }
-                  }
-                  if (isDigitExist) {
-                    isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
-                  } else {
-                    // Save to digit under the local Chain (bottom + model)
-                    var addDigitMap = await Wallets.instance.addDigitToChainModel(
-                        Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
-                    int status = addDigitMap["status"];
-                    if (status == null || status != 200) {
-                      Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
-                    } else {
-                      isExecutorSuccess = true;
-                    }
-                    isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
-                  }
-                }
-                if (isExecutorSuccess) {
                   setState(() {
-                    displayDigitsList[index].isVisible = displayDigitsList[index].isVisible;
+                    displayDigitsList[index].isVisible = true;
                   });
-                } else {
-                  Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
-                }*/
+                }
               },
               child: Container(
                 width: ScreenUtil().setWidth(80),

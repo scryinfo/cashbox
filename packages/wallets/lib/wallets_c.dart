@@ -1089,6 +1089,8 @@ typedef _CExtrinsicContext_dFree_Dart = void Function(
 /// C struct `CInitParameters`.
 class CInitParameters extends Struct {
   Pointer<CDbName> dbName;
+  @Uint32()
+  int isMemoryDb;
   Pointer<ffi.Utf8> contextNote;
   static Pointer<CInitParameters> allocate() {
     return ffi.calloc<CInitParameters>();

@@ -181,11 +181,11 @@ class WalletsControl {
     }
   }
 
-  bool changeTokenStatus(ChainType chainType, WalletTokenStatus walletTokenStatus) {
+  bool changeTokenStatus(EnumKit.NetType netType, WalletTokenStatus walletTokenStatus) {
     if (walletTokenStatus == null) {
       return false;
     }
-    Error err = Wallets.mainIsolate().changeTokenStatus(chainType, walletTokenStatus);
+    Error err = Wallets.mainIsolate().changeTokenStatus(netType, walletTokenStatus);
     if (err.isSuccess()) {
       return true;
     }
@@ -193,8 +193,8 @@ class WalletsControl {
     return false;
   }
 
-  bool updateBalance(ChainType chainType, TokenAddress tokenAddress) {
-    Error err = Wallets.mainIsolate().updateBalance(chainType, tokenAddress);
+  bool updateBalance(EnumKit.NetType netType, TokenAddress tokenAddress) {
+    Error err = Wallets.mainIsolate().updateBalance(netType, tokenAddress);
     if (err.isSuccess()) {
       return true;
     }
@@ -253,16 +253,31 @@ class WalletsControl {
     return false;
   }
 
-  String getTokenAddressId(String walletId, ChainType chainType) {
-    List<TokenAddress> tokenAddressList = getTokenAddress(walletId, chainType);
-    if (tokenAddressList != null && tokenAddressList.length > 0) {
-      return tokenAddressList.first.addressId;
+  String getTokenAddressId(String walletId, EnumKit.NetType netType, EnumKit.ChainType chainType) {
+    try {
+      // todo differentiate netType and chainType
+      String tokenAddressId = "";
+      switch (chainType) {
+        case ChainType.EthTest:
+        case ChainType.ETH:
+          tokenAddressId = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.id;
+          break;
+        case ChainType.EeeTest:
+        case ChainType.EEE:
+          tokenAddressId = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address;
+          break;
+        default:
+          tokenAddressId = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
+          break;
+      }
+      return tokenAddressId;
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 
-  List<TokenAddress> getTokenAddress(String walletId, EnumKit.ChainType chainType) {
-    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId, chainType);
+  List<TokenAddress> getTokenAddress(String walletId, EnumKit.NetType netType) {
+    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId, netType);
     if (tokenAddressObj.isSuccess()) {
       return tokenAddressObj.data1;
     }
