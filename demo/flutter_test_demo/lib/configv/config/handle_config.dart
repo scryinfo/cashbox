@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:logger/logger.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -28,10 +28,15 @@ class HandleConfig {
 
   Future<Config> getConfig() async {
     File file = await _getConfigFile(configFileName);
-    String fileContent = await file.readAsString();
-    Map configMap = jsonDecode(fileContent);
-    Config config = Config.fromJson(configMap);
-    return config;
+    Config config = Config();
+    try {
+      String fileContent = file.readAsStringSync();
+      Map configMap = jsonDecode(fileContent);
+      config = Config.fromJson(configMap);
+      return config;
+    } catch (e) {
+      return config;
+    }
   }
 
   Future<bool> saveConfig(final Config config) async {
@@ -48,19 +53,20 @@ class HandleConfig {
     return true;
   }
 
+  // 更新Config里面的vendorConfig，如果参数不为空则更新，为空则不覆盖更新。
   Future<bool> addOrUpdateVendorConfig(final String jsonString) async {
     if (jsonString == null) {
       return false;
     }
     try {
       Config config = await this.getConfig();
-      var applyMap = config.vendorConfig.toJson();
-      VendorConfig.fromJson(json.decode(jsonString)).toJson().forEach((key, value) {
+      var applyMap = config.privateConfig.toJson();
+      PrivateConfig.fromJson(json.decode(jsonString)).toJson().forEach((key, value) {
         if (key.isNotEmpty && value != null && value != "") {
           applyMap[key] = value;
         }
       });
-      config.vendorConfig = VendorConfig.fromJson(applyMap);
+      config.privateConfig = PrivateConfig.fromJson(applyMap);
       this.saveConfig(config);
     } catch (e) {
       return false;
@@ -68,27 +74,30 @@ class HandleConfig {
     return true;
   }
 
+  // 获取Config配置文件
   Future<File> _getConfigFile(String fileName) async {
     String docPath = await _getDirectoryPath();
     final filePath = docPath + "/" + fileName;
     File file = File(filePath);
-    if (!await file.exists()) {
+    if (!file.existsSync() || file.lengthSync() <= 0) {
+      file.createSync();
       String jsonStr = await rootBundle.loadString(defaultConfigFilePath);
-      file.writeAsString(jsonStr, flush: true);
+      await file.writeAsStringSync(jsonStr, flush: true); // creates the file for writing and truncates
     }
     return file;
   }
 
+  // Config配置文件的文件夹路径
   Future<String> _getDirectoryPath() async {
     final filepath = await getApplicationDocumentsDirectory();
     var file = Directory(filepath.path + configDocumentPath);
     try {
-      bool exists = await file.exists();
+      bool exists = file.existsSync();
       if (!exists) {
-        await file.create();
+        file.createSync();
       }
     } catch (e) {
-      print(e);
+      Logger().e("_getDirectoryPath ", e.toString());
     }
     return file.path;
   }

@@ -111,7 +111,7 @@ class WalletsControl {
     return null;
   }
 
-  removeWallet(String walletId, String pwd) {
+  removeWallet(String walletId, Uint8List pwd) {
     Error err = Wallets.mainIsolate().removeWallet(walletId, pwd);
     Logger.getInstance().d("wallet_control ", "removeWallet err --->" + err.toString());
   }
@@ -126,8 +126,8 @@ class WalletsControl {
     Logger.getInstance().d("wallet_control ", "saveCurrentWalletChain err" + err.toString());
   }
 
-  List<TokenAddress> getTokenAddress(String walletId, ChainType chainType) {
-    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId, chainType);
+  List<TokenAddress> getTokenAddress(String walletId, NetType netType) {
+    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId, netType);
     if (!tokenAddressObj.isSuccess()) {
       return null;
     }

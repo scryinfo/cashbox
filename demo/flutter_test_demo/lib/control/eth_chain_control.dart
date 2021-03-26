@@ -6,6 +6,7 @@ import 'package:wallets/kits.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
 
+
 class EthChainControl {
   factory EthChainControl() => getInstance();
 
@@ -102,11 +103,11 @@ class EthChainControl {
     return true;
   }
 
-  addNonAuthDigit(ArrayCEthChainTokenAuth tokens) {
-    var dataObj = Wallets.mainIsolate().chainEth.addNonAuthDigit(tokens);
-    if (!dataObj.isSuccess()) {
-      return false;
-    }
-    return true;
-  }
+  // addNonAuthDigit(ArrayCEthChainTokenNonAuth tokens) {
+  //   var dataObj = Wallets.mainIsolate().chainEth.addNonAuthDigit(tokens);
+  //   if (!dataObj.isSuccess()) {
+  //     return false;
+  //   }
+  //   return true;
+  // }
 }
