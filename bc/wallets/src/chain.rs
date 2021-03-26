@@ -160,7 +160,7 @@ impl ChainTrait for BtcChain {
                 let mut token = MBtcChainToken::default();
                 token.chain_token_shared_id = it.chain_token_shared_id.clone();
                 token.wallet_id = wallet.id.clone();
-                token.chain_type = wallets_types::EeeChain::chain_type(&wallet_type).to_string();
+                token.chain_type = wallets_types::BtcChain::chain_type(&wallet_type).to_string();
                 token.show = CTrue;
                 token.decimal = it.chain_token_shared.decimal;
                 //todo how to

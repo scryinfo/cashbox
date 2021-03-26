@@ -95,7 +95,6 @@ mod test {
 
     #[test]
     pub fn create_address_test() {
-        pub const PASSPHRASE: &str = "";
         let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand trash travel treat";
         let mnemonic = Mnemonic::from_str(words);
         assert_eq!(mnemonic.is_ok(), false);
