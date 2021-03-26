@@ -192,10 +192,10 @@ PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
     ..downloadAppUrl = json['downloadAppUrl'] as String
     ..downloadLatestAppUrl = json['downloadLatestAppUrl'] as String
     ..rateUrl = json['rateUrl'] as String
-    ..authDigitVersion = json['authDigitVersion'] as String
+    ..authDigitVersion = json['authDigitVersion'] as int
     ..authDigitIpList =
         (json['authDigitIpList'] as List)?.map((e) => e as String)?.toList()
-    ..defaultDigitVersion = json['defaultDigitVersion'] as String
+    ..defaultDigitVersion = json['defaultDigitVersion'] as int
     ..defaultDigitIpList =
         (json['defaultDigitIpList'] as List)?.map((e) => e as String)?.toList()
     ..defaultTokens = (json['defaultTokens'] as List)

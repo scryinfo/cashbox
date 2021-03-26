@@ -173,6 +173,8 @@
   "digit_manage": "代币管理",
   "check_data_format": "信息格式检查中，请稍等",
   "save_digit_model_failure": "执行保存失败，请重新退出刷新尝试",
+  "hide_token_model_failure": "隐藏该token失败，请重新退出刷新尝试",
+  "show_token_model_failure": "显示该token失败，请重新退出刷新尝试",
   "input_ca_or_name": "支持搜索代币名、合约地址 ",
   "sign_success_and_uploading": "签名成功！ 交易发送上链中",
   "sign_failure_check_pwd": "交易签名失败,请检查你输入的密码!",

@@ -173,6 +173,8 @@
   "digit_manage": "Token management",
   "check_data_format": "Checking tx data format,please wait a moment",
   "save_digit_model_failure": "save to local failure，please quit and retry it",
+  "hide_token_model_failure": "fail to hide this token，please quit and retry it",
+  "show_token_model_failure": "fail to show this token，please quit and retry it",
   "input_ca_or_name": "support contract address or digit shortname",
   "sign_success_and_uploading": "Sign successful！ Uploading to chain now",
   "sign_failure_check_pwd": "Sign failure！Please check your password",

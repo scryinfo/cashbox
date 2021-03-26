@@ -71,6 +71,12 @@ class AppInfoUtil {
     return appSignInfo;
   }
 
+  Future<String> getAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String appVersion = packageInfo.version;
+    return appVersion;
+  }
+
   DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
   Map<String, dynamic> _deviceData = <String, dynamic>{};
   String deviceId = "";

@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
+import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/net/net_util.dart';
 import 'package:app/model/server_config_model.dart';
@@ -8,6 +11,7 @@ import 'package:app/pages/eee_page.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/app_info_util.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -17,11 +21,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:services/services.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import 'dart:convert' as convert;
 import 'eth_page.dart';
 import 'package:app/net/scryx_net_util.dart';
+import 'package:services/src/rpc_face/base.pb.dart';
+import 'package:services/src/rpc_face/cashbox_config_open.pbgrpc.dart';
+import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
 
 class EntrancePage extends StatefulWidget {
   @override
@@ -70,87 +78,141 @@ class _EntrancePageState extends State<EntrancePage> {
     // handle case : DB upgrade.   DB initial installation already finish in func -> initAppConfigInfo()->initDatabaseAndDefaultDigits()
     Config config = await HandleConfig.instance.getConfig();
 
+    // todo replace update Data interface
     Map resultMap = await Wallets.instance.updateWalletDbData(config.dbVersion);
     if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
       Logger().i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
     }
-    int lastTimeConfigCheck = config.lastTimeConfigCheck;
-    int nowTimeStamp = DateTime.now().millisecondsSinceEpoch;
 
+    // Interval check config
+    {
+      if (config.lastTimeConfigCheck != null &&
+          ((DateTime.now().millisecondsSinceEpoch - config.lastTimeConfigCheck) - config.intervalMilliseconds * 1000 < 0)) {
+        Logger().i("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>",
+            (DateTime.now().millisecondsSinceEpoch - config.lastTimeConfigCheck).toString());
+        return;
+      }
+    }
+
+    LatestConfig serverConfigModel;
+    final cashBoxType = "GA";
+    String signInfo = await AppInfoUtil.instance.getAppSignInfo();
+    String deviceId = await AppInfoUtil.instance.getDeviceId();
+    String apkVersion = await AppInfoUtil.instance.getAppVersion();
+
+    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
+    BasicClientReq basicClientReq = new BasicClientReq();
+    basicClientReq
+      ..cashboxType = cashBoxType
+      ..cashboxVersion = apkVersion
+      ..deviceId = deviceId
+      ..platformType = "aarch64-linux-android" // todo replace platform info
+      ..signature = signInfo;
+    var channel = createClientChannel(refresh.refreshCall);
     // handle case : Config upgrade.
-    try {
-      if (lastTimeConfigCheck == null || ((nowTimeStamp - lastTimeConfigCheck) - config.intervalMilliseconds * 1000 > 0)) {
-        var configVersionObj = await requestWithConfigVersion(config.privateConfig.serverConfigIp);
-        ServerConfigModel serverConfigModel = ServerConfigModel.fromJson(configVersionObj);
-        print("serverConfigModel--->" + serverConfigModel.toString());
-        if (serverConfigModel.code != 0) {
-          Logger().i("_checkServerAppConfig(), serverConfigModel.code error is =======>", serverConfigModel.code.toString());
-          return;
-        }
 
-        ///check and update  EeeChain txVersion and runtimeVersion
-        try {
+    {
+      final configOpenFaceClient = CashboxConfigOpenFaceClient(channel);
+      try {
+        CashboxConfigOpen_LatestConfigRes latestConfigRes = await configOpenFaceClient.latestConfig(basicClientReq);
+        serverConfigModel = LatestConfig.fromJson(json.decode(latestConfigRes.conf));
+      } catch (e) {
+        return;
+      }
+    }
+
+    ///check and update  EeeChain txVersion and runtimeVersion
+    // todo
+    /*try {
           ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
           Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0); // get local default Eee chain info
           if (getSubChainMap == null || !getSubChainMap.containsKey("status") || getSubChainMap["status"] != 200) {
             Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
             Logger().i("updateSubChainBasicInfo  ", "empty case!");
-          } else if (serverConfigModel.data.latestConfig.eeeRuntimeV == null ||
+          } else if (serverConfigModel.eeeRuntimeV == null ||
               getSubChainMap["runtimeVersion"] == null ||
-              serverConfigModel.data.latestConfig.eeeTxV == null ||
+              serverConfigModel.eeeTxV == null ||
               getSubChainMap["txVersion"] == null ||
-              serverConfigModel.data.latestConfig.eeeRuntimeV.toString() != getSubChainMap["runtimeVersion"].toString() ||
-              serverConfigModel.data.latestConfig.eeeTxV != getSubChainMap["txVersion"].toString()) {
+              serverConfigModel.eeeRuntimeV.toString() != getSubChainMap["runtimeVersion"].toString() ||
+              serverConfigModel.eeeTxV != getSubChainMap["txVersion"].toString()) {
             Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
             Logger().i("updateSubChainBasicInfo  ", " finish do updateSubChainBasicInfo");
           }
         } catch (e) {
           Logger().e("updateSubChainBasicInfo error is ---> ", e.toString());
-        }
-        {
-          config.lastTimeConfigCheck = nowTimeStamp;
-          // config.serverAppVersion = serverConfigModel.data.latestConfig.appConfigVersion;
-          config.privateConfig.authDigitVersion = serverConfigModel.data.latestConfig.authTokenListVersion;
-          config.privateConfig.defaultDigitVersion = serverConfigModel.data.latestConfig.defaultTokenListVersion;
-          config.privateConfig.serverApkVersion = serverConfigModel.data.latestConfig.apkVersion;
-          config.privateConfig.rateUrl = serverConfigModel.data.latestConfig.tokenToLegalTenderExchangeRateIp;
-          config.privateConfig.scryXIp = serverConfigModel.data.latestConfig.scryXChainUrl;
-          config.privateConfig.downloadLatestAppUrl = serverConfigModel.data.latestConfig.apkDownloadLink;
-          config.privateConfig.publicIp = serverConfigModel.data.latestConfig.announcementUrl;
-          config.privateConfig.dappOpenUrl = serverConfigModel.data.latestConfig.dappOpenUrl;
-          if (serverConfigModel.data.latestConfig.authTokenUrl != null && serverConfigModel.data.latestConfig.authTokenUrl.length > 0) {
-            config.privateConfig.authDigitIpList = [];
-            serverConfigModel.data.latestConfig.authTokenUrl.forEach((element) {
-              config.privateConfig.authDigitIpList.add(element);
-            });
-          }
-          if (serverConfigModel.data.latestConfig.defaultTokenUrl != null && serverConfigModel.data.latestConfig.defaultTokenUrl.length > 0) {
-            config.privateConfig.defaultDigitIpList = [];
-            serverConfigModel.data.latestConfig.defaultTokenUrl.forEach((element) {
-              config.privateConfig.defaultDigitIpList.add(element);
-            });
-            //update defaultDigitList to native
-            try {
-              var defaultDigitParam = await requestWithDeviceId(config.privateConfig.defaultDigitIpList[0].toString());
-              if (defaultDigitParam["code"] != null && defaultDigitParam["code"] == 0) {
-                String paramString = convert.jsonEncode(defaultDigitParam["data"]);
-                var updateMap = await Wallets.instance.updateDefaultDigitList(paramString);
-                Logger().i("updateDefaultDigitList=====>", updateMap["status"].toString() + updateMap["isUpdateDefaultDigit"].toString());
-              }
-            } catch (e) {
-              Logger().e("updateDefaultDigitList error =====>", e.toString());
-            }
-          }
-          // config.privateConfig.configVersion = serverConfigModel.data.latestConfig.appConfigVersion;
-        }
-        // save changed config
-        HandleConfig.instance.saveConfig(config);
-      } else {
-        Logger().i("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>", (nowTimeStamp - lastTimeConfigCheck).toString());
+        }*/
+
+    UpdateConfigInfo:
+    {
+      config.lastTimeConfigCheck = DateTime.now().millisecondsSinceEpoch;
+      config.privateConfig.authDigitVersion = serverConfigModel.authTokenListVersion;
+      config.privateConfig.defaultDigitVersion = serverConfigModel.defaultTokenListVersion;
+      config.privateConfig.serverApkVersion = serverConfigModel.apkVersion;
+      config.privateConfig.rateUrl = serverConfigModel.tokenToLegalTenderExchangeRateIp;
+      config.privateConfig.scryXIp = serverConfigModel.scryXChainUrl;
+      config.privateConfig.downloadLatestAppUrl = serverConfigModel.apkDownloadLink;
+      config.privateConfig.publicIp = serverConfigModel.announcementUrl;
+      config.privateConfig.dappOpenUrl = serverConfigModel.dappOpenUrl;
+      if (serverConfigModel.authTokenUrl != null && serverConfigModel.authTokenUrl.length > 0) {
+        config.privateConfig.authDigitIpList = [];
+        serverConfigModel.authTokenUrl.forEach((element) {
+          config.privateConfig.authDigitIpList.add(element);
+        });
       }
-    } catch (e) {
-      Logger().e("_checkServerAppConfig(), error is =======>", e.toString());
     }
+
+    UpdateDefaultToken: //update defaultDigitList to native
+    {
+      if (serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
+        break UpdateDefaultToken;
+      }
+      config.privateConfig.defaultDigitIpList = [];
+      serverConfigModel.defaultTokenUrl.forEach((element) {
+        config.privateConfig.defaultDigitIpList.add(element);
+      });
+
+      try {
+        EthTokenOpen_QueryReq openQueryReq = new EthTokenOpen_QueryReq();
+        PageReq pageReq = PageReq();
+        pageReq..page = 0; // 0 mean to load all data. Not divided by several pages
+        openQueryReq
+          ..info = basicClientReq
+          ..page = pageReq
+          ..isDefault = true;
+        final ethTokenClient = EthTokenOpenFaceClient(channel);
+        EthTokenOpen_QueryRes ethTokenOpenQueryRes = await ethTokenClient.query(openQueryReq);
+        if (ethTokenOpenQueryRes == null) {
+          break UpdateDefaultToken;
+        }
+        ArrayCEthChainTokenDefault defaultTokens = ArrayCEthChainTokenDefault();
+        List<EthChainTokenDefault> ethDefaultTokenList = [];
+        ethTokenOpenQueryRes.tokens.forEach((element) {
+          EthChainTokenDefault ethChainTokenDefault = EthChainTokenDefault();
+          ethChainTokenDefault
+            ..chainTokenSharedId = element.id
+            ..ethChainTokenShared.gasLimit = element.gasLimit.toInt()
+            ..netType = element.tokenShared.netType
+            ..ethChainTokenShared.tokenType = element.tokenShared.chainType
+            ..ethChainTokenShared.tokenShared.name = element.tokenShared.name
+            ..ethChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
+            ..ethChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl
+            ..ethChainTokenShared.tokenShared.logoBytes = element.tokenShared.logoBytes
+            ..contractAddress = element.contract
+            ..ethChainTokenShared.decimal = element.decimal
+            ..position = element.position.toInt();
+          ethDefaultTokenList.add(ethChainTokenDefault);
+        });
+        defaultTokens.data = ethDefaultTokenList;
+        bool isUpdateOk = EthChainControl.getInstance().updateDefaultTokenList(defaultTokens);
+        Logger.getInstance().d("updateDefaultTokenList", "isUpdateOk is --->" + isUpdateOk.toString());
+      } catch (e) {
+        Logger.getInstance().e("updateDefaultDigitList error =====>", e.toString());
+        break UpdateDefaultToken;
+      }
+    }
+
+    // save changed config
+    HandleConfig.instance.saveConfig(config);
   }
 
   //Check if a wallet has been created
