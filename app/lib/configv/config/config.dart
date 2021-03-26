@@ -152,9 +152,9 @@ class PrivateConfig {
   String downloadAppUrl;
   String downloadLatestAppUrl;
   String rateUrl;
-  String authDigitVersion;
+  int authDigitVersion;
   List<String> authDigitIpList;
-  String defaultDigitVersion;
+  int defaultDigitVersion;
   List<String> defaultDigitIpList;
   List<Token> defaultTokens;
   String scryXIp;

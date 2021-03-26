@@ -33,8 +33,8 @@ class LatestConfig extends Object {
   LatestConfig();
 
   String tokenToLegalTenderExchangeRateIp;
-  String authTokenListVersion;
-  String defaultTokenListVersion;
+  int authTokenListVersion;
+  int defaultTokenListVersion;
   List<String> authTokenUrl;
   List<String> defaultTokenUrl;
   String announcementUrl;

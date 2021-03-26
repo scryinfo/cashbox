@@ -39,8 +39,8 @@ LatestConfig _$LatestConfigFromJson(Map<String, dynamic> json) {
   return LatestConfig()
     ..tokenToLegalTenderExchangeRateIp =
         json['tokenToLegalTenderExchangeRateIp'] as String
-    ..authTokenListVersion = json['authTokenListVersion'] as String
-    ..defaultTokenListVersion = json['defaultTokenListVersion'] as String
+    ..authTokenListVersion = json['authTokenListVersion'] as int
+    ..defaultTokenListVersion = json['defaultTokenListVersion'] as int
     ..authTokenUrl =
         (json['authTokenUrl'] as List)?.map((e) => e as String)?.toList()
     ..defaultTokenUrl =

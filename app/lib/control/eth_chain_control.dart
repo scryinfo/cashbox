@@ -105,7 +105,7 @@ class EthChainControl {
     return dataObj.data1;
   }
 
-  updateDefaultTokenList(ArrayCEthChainTokenDefault defaultTokens) {
+  bool updateDefaultTokenList(ArrayCEthChainTokenDefault defaultTokens) {
     var dataObj = Wallets.mainIsolate().chainEth.updateDefaultTokenList(defaultTokens);
     if (!dataObj.isSuccess()) {
       return false;

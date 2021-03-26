@@ -344,7 +344,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                         ""; // todo NetType dynamic
                   bool isUpsertOk = WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress);
                   if (!isUpsertOk) {
-                    Logger.getInstance().e("updateBalance", "updateBalance failure");
+                    Logger.getInstance().e("updateBalance", "updateBalance failure ");
                     Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
                     return;
                   }
@@ -355,21 +355,20 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
                   ..tokenId = displayDigitsList[index].tokenId;
                 if (displayDigitsList[index].isVisible) {
-                  walletTokenStatus.isShow = false.toInt();
+                  walletTokenStatus.isShow = false.toInt(); // change to invisible
                   bool isChangeOk = WalletsControl.getInstance().changeTokenStatus(NetType.Main, walletTokenStatus); // todo dynamic change netType
                   if (!isChangeOk) {
-                    Fluttertoast.showToast(msg: translate("save_digit_model_failure")); // todo change hint info
+                    Fluttertoast.showToast(msg: translate("hide_token_model_failure"));
                     return;
                   }
                   setState(() {
                     displayDigitsList[index].isVisible = false;
                   });
                 } else {
-                  // 代币未勾选，不可见状态,执行让显示token
-                  walletTokenStatus.isShow = true.toInt();
+                  walletTokenStatus.isShow = true.toInt(); // change to visible
                   bool isChangeOk = WalletsControl.getInstance().changeTokenStatus(NetType.Main, walletTokenStatus); // todo dynamic change netType
                   if (!isChangeOk) {
-                    Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
+                    Fluttertoast.showToast(msg: translate("show_token_model_failure"));
                     return;
                   }
                   setState(() {
