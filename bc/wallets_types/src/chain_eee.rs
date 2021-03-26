@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use rbatis::crud::CRUDTable;
 
-use mav::{ChainType, NetType, WalletType};
+use mav::{ChainType, NetType, WalletType, CTrue};
 use mav::kits::sql_left_join_get_b;
 use mav::ma::{Dao, MEeeChainToken, MEeeChainTokenDefault, MEeeChainTokenShared, MWallet, MSubChainBasicInfo, MAccountInfoSyncProg, MEeeChainTokenAuth};
 
@@ -243,6 +243,11 @@ impl SubChainBasicInfo {
             .eq(MSubChainBasicInfo::genesis_hash, genesis_hash.to_string())
             .eq(MSubChainBasicInfo::runtime_version, runtime_version)
             .eq(MSubChainBasicInfo::tx_version, tx_version);
+        let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
+        Ok(r)
+    }
+    pub async fn get_default_version(rb: &Rbatis) -> Result<Option<SubChainBasicInfo>, WalletError> {
+        let wrapper = rb.new_wrapper().eq(MSubChainBasicInfo::is_default, CTrue);
         let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)
     }

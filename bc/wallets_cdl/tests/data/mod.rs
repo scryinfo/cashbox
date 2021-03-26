@@ -16,7 +16,7 @@ pub fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
         let mnemonic = {
             let p_mn = CStr_dAlloc();
             {
-                let c_err = Wallets_generateMnemonic(15,p_mn) as *mut CError;
+                let c_err = Wallets_generateMnemonic(18,p_mn) as *mut CError;
                 assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
             }
@@ -54,8 +54,9 @@ pub fn init_wallets_context(c_ctx: *mut *mut CContext) -> *mut CError {
 
 pub fn init_parameters() -> InitParameters {
     let mut p = InitParameters::default();
-    p.is_memory_db=CTrue;
-    let prefix = format!("{}_",uuid());
+   // p.is_memory_db=CTrue;
+    //let prefix = format!("{}_",uuid());
+    let prefix = "test_";
     p.db_name.0 = mav::ma::DbName::new(&prefix, "");
     p.context_note = format!("test_{}", prefix);
     p

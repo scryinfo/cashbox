@@ -6,7 +6,7 @@ use futures::executor::block_on;
 
 use mav::NetType;
 use wallets::Contexts;
-use wallets_types::{Error, WalletError, AccountInfoSyncProg};
+use wallets_types::{Error, WalletError, AccountInfoSyncProg, ChainVersion};
 
 use crate::{kits::CStruct, parameters::CExtrinsicContext};
 use crate::parameters::{CChainVersion, CEeeChainTx};
@@ -319,6 +319,18 @@ pub unsafe extern "C" fn ChainEee_updateBasicInfo(ctx: *mut CContext, netType: *
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+#[no_mangle]
+pub unsafe extern "C" fn ChainEee_getDefaultBasicInfo(ctx: *mut CContext, netType: *mut c_char, basicInfo: *mut *mut CSubChainBasicInfo) -> *const CError {
+    log::debug!("enter ChainEee getDefaultBasicInfo");
+    if ctx.is_null() || basicInfo.is_null() || netType.is_null()  {
+        let err = Error::PARAMETER().append_message(" : ctx or chainVersion or netType is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    (*basicInfo).free();
+    let chain_version = ChainVersion::default();
+    query_chain_version(ctx,netType,chain_version,basicInfo)
+}
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut c_char, chainVersion: *mut CChainVersion, basicInfo: *mut *mut CSubChainBasicInfo) -> *const CError {
@@ -330,6 +342,11 @@ pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut
         return CError::to_c_ptr(&err);
     }
     (*basicInfo).free();
+    let chain_version = CChainVersion::ptr_rust(chainVersion);
+    query_chain_version(ctx,netType,chain_version,basicInfo)
+
+}
+unsafe fn query_chain_version(ctx: *mut CContext,netType: *mut c_char,chain_version:ChainVersion, basicInfo: *mut *mut CSubChainBasicInfo)->*const CError{
     let lock = Contexts::collection().lock();
     let mut contexts = lock.borrow_mut();
     let err = {
@@ -338,7 +355,6 @@ pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut
             Some(wallets) => {
                 let eee_chain = wallets.eee_chain_instance();
                 let net_type = NetType::from(to_str(netType));
-                let chain_version = CChainVersion::ptr_rust(chainVersion);
                 match block_on(eee_chain.get_basic_info(wallets, &net_type, &chain_version.genesis_hash, chain_version.runtime_version, chain_version.tx_version)) {
                     Ok(info) => {
                         *basicInfo = CSubChainBasicInfo::to_c_ptr(&info);
@@ -350,11 +366,9 @@ pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, netType: *mut
             None => Error::NONE().append_message(": can not find the context")
         }
     };
-
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
-
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_saveExtrinsicDetail(ctx: *mut CContext, netType: *mut c_char, extrinsicCtx: *mut CExtrinsicContext) -> *const CError {
     log::debug!("enter ChainEee saveExtrinsicDetail");

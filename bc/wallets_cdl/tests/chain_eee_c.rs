@@ -550,6 +550,25 @@ fn query_eee_default_token_list_test() {
     }
 }
 
+#[test]
+fn query_default_chain_version_test(){
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = data::init_wallets_context(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        eee_basic_info_check(c_ctx).expect("query_default_chain_version_test");
+        let c_basicinfo = wallets_cdl::mem_c::CSubChainBasicInfo_dAlloc();
+        let c_err = chain_eee_c::ChainEee_getDefaultBasicInfo(*c_ctx, to_c_char("Test"), c_basicinfo) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let _chain_basic_info = CSubChainBasicInfo::to_rust(&**c_basicinfo);
+        wallets_cdl::mem_c::CSubChainBasicInfo_dFree(c_basicinfo);
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+
 fn eee_basic_info_check(c_ctx: *mut *mut CContext) -> Result<(), Error> {
     if c_ctx.is_null() {
         return Err(Error::PARAMETER().append_message(" : ctx is null"));
@@ -583,38 +602,6 @@ fn init_basic_info_parameters(chain_version: &ChainVersion, metadata: String) ->
         ..Default::default()
     }
 }
-
-/*fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
-    unsafe {
-        let mnemonic = {
-            let p_mn = CStr_dAlloc();
-            {
-                let c_err = Wallets_generateMnemonic(18,p_mn) as *mut CError;
-                assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-                CError_free(c_err);
-            }
-            let mn = to_str(*p_mn).to_owned();
-            CStr_dFree(p_mn);
-            mn
-        };
-        //invalid parameters
-        let mut c_parameters = CCreateWalletParameters::to_c_ptr(&CreateWalletParameters {
-            name: "test".to_owned(),
-            password: "123456".to_string(),
-            mnemonic: mnemonic.clone(),
-            wallet_type: WalletType::Test.to_string(),
-        });
-        let c_wallet = CWallet_dAlloc();
-        let c_err = Wallets_createWallet(*c_ctx, c_parameters, c_wallet) as *mut CError;
-        c_parameters.free();
-        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-        CError_free(c_err);
-        assert_ne!(null_mut(), *c_wallet);
-        let w = CWallet::to_rust(&**c_wallet);
-        CWallet_dFree(c_wallet);
-        w
-    }
-}*/
 
 fn save_basic_info(c_ctx: *mut *mut CContext, chain_version: &ChainVersion, metadata: String) -> Result<(), String> {
     let m_chain_basic_info = init_basic_info_parameters(chain_version, metadata);

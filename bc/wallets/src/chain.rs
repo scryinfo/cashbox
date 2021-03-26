@@ -5,13 +5,11 @@ use strum::IntoEnumIterator;
 
 use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
 use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth};
-use mav::{NetType, WalletType, CTrue};
+use mav::{NetType, WalletType, CTrue, CFalse};
 use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth};
 
 use codec::Decode;
 use rbatis::plugin::page::PageRequest;
-use bitcoin_wallet::mnemonic::Mnemonic;
-use bitcoin_wallet::error::Error;
 use bitcoin_wallet::account::AccountAddressType;
 use bitcoin::util::psbt::serialize::Serialize;
 
@@ -277,26 +275,42 @@ impl BtcChainTrait for BtcChain {
 impl EeeChainTrait for EeeChain {
     async fn update_basic_info(&self, context: &dyn ContextTrait, net_type: &NetType, basic_info: &mut SubChainBasicInfo) -> Result<(), WalletError> {
         let rb = context.db().data_db(net_type);
+        let mut tx = rb.begin_tx_defer(false).await?;
+        //whether update default chain basic info
+        if basic_info.is_default==CTrue{
+               //update existed default chain basic info
+            if let Some(mut current_default_version)=  SubChainBasicInfo::get_default_version(rb).await?{
+                current_default_version.is_default=CFalse;
+                current_default_version.save_update(rb, &tx.tx_id).await?;
+            }
+        }
 
         let mut save_basic_info = {
-            if let Some(mut info) = SubChainBasicInfo::find_by_version(rb, &basic_info.genesis_hash, basic_info.runtime_version, basic_info.tx_version).await?
+            if let Some(mut existed_info) = SubChainBasicInfo::find_by_version(rb, &basic_info.genesis_hash, basic_info.runtime_version, basic_info.tx_version).await?
             {
-                info.token_decimals = basic_info.token_decimals;
-                info.is_default = basic_info.is_default;
-                info.token_symbol = basic_info.token_symbol.clone();
-                info.ss58_format_prefix = basic_info.ss58_format_prefix;
-                info
+                existed_info.token_decimals = basic_info.token_decimals;
+                existed_info.is_default = basic_info.is_default;
+                existed_info.token_symbol = basic_info.token_symbol.clone();
+                existed_info.ss58_format_prefix = basic_info.ss58_format_prefix;
+                existed_info
             } else {
                 let basic_info = &*basic_info;
                 basic_info.clone()
             }
         };
-        save_basic_info.save_update(rb, "").await?;
+        save_basic_info.save_update(rb, &tx.tx_id).await?;
+        tx.manager = None;
+        rb.commit(&tx.tx_id).await?;
         Ok(())
     }
     async fn get_basic_info(&self, context: &dyn ContextTrait, net_type: &NetType, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<SubChainBasicInfo, WalletError> {
         let rb = context.db().data_db(net_type);
-        if let Some(info) = SubChainBasicInfo::find_by_version(rb, genesis_hash, runtime_version, tx_version).await?
+       let chain_version = if genesis_hash.is_empty()&&runtime_version==0&&tx_version==0 {
+            SubChainBasicInfo::get_default_version(rb).await?
+        }else{
+           SubChainBasicInfo::find_by_version(rb, genesis_hash, runtime_version, tx_version).await?
+       };
+        if let Some(info) = chain_version
         {
             Ok(info)
         } else {
