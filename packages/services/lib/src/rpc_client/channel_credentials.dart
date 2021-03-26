@@ -8,7 +8,7 @@ class ChannelCredentialsEx extends ChannelCredentials {
   List<int> chainBytes;
 
   ChannelCredentialsEx(this.certBytes, this.keyBytes, this.chainBytes,
-      {BadCertificateHandler onBadCertificate})
+      {BadCertificateHandler? onBadCertificate})
       : super.secure(onBadCertificate: onBadCertificate);
 
   @override

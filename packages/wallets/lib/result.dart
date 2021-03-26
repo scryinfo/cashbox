@@ -31,7 +31,7 @@ class DlResult3<T1, T2, T3> {
   T2 data2;
   T3 data3;
 
-  DlResult3(this.data1, this.data2, this.err);
+  DlResult3(this.data1, this.data2, this.data3, this.err);
 
   bool isSuccess() => err.isSuccess();
 }
@@ -42,4 +42,8 @@ class CurrentWallet {
   ChainType chainType;
 
   CurrentWallet(this.walletId, this.chainType);
+
+  factory CurrentWallet.initValue() {
+    return new CurrentWallet("", ChainType.EEE); //null safe, just any type
+  }
 }

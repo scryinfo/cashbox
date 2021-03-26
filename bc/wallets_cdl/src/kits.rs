@@ -16,7 +16,6 @@ pub const CTrue: CBool = mav::CTrue;
 pub fn to_c_char(s: &str) -> *mut c_char {
     match CString::new(s) {
         Err(_e) => {
-            //todo log "Failed to create CString"
             null_mut()
         }
         Ok(cs) => cs.into_raw()
@@ -33,7 +32,7 @@ pub fn free_c_char(cs: &mut *mut c_char) {
     };
 }
 
-// do not free the cs's memory
+/// do not free the cs's memory
 pub fn to_str(cs: *const c_char) -> &'static str {
     let s = unsafe {
         if cs.is_null() {

@@ -1,19 +1,46 @@
+import 'package:logger/logger.dart';
+
 enum ChainType { BTC, BtcTest, ETH, EthTest, EEE, EeeTest }
 
-extension ChainTypeEx on ChainType {
-  static const valueMap = const {
-    ChainType.BTC: 1,
-    ChainType.BtcTest: 2,
-    ChainType.ETH: 3,
-    ChainType.EthTest: 4,
-    ChainType.EEE: 5,
-    ChainType.EeeTest: 6,
-  };
+const _tag = "Wallets";
 
-  int get value => valueMap[this];
+extension ChainTypeEx on ChainType {
+  // static const valueMap = const <ChainType,int> {
+  //   ChainType.BTC: 1,
+  //   ChainType.BtcTest: 2,
+  //   ChainType.ETH: 3,
+  //   ChainType.EthTest: 4,
+  //   ChainType.EEE: 5,
+  //   ChainType.EeeTest: 6,
+  // };
+
+  int get value {
+    int index = 1;
+    switch (this) {
+      case ChainType.BTC:
+        index = 1;
+        break;
+      case ChainType.BtcTest:
+        index = 2;
+        break;
+      case ChainType.ETH:
+        index = 3;
+        break;
+      case ChainType.EthTest:
+        index = 4;
+        break;
+      case ChainType.EEE:
+        index = 5;
+        break;
+      case ChainType.EeeTest:
+        index = 6;
+        break;
+    }
+    return index;
+  }
 
   static ChainType from(String chainType) {
-    ChainType re;
+    ChainType re = ChainType.EEE;
     switch (chainType) {
       case "BTC":
         re = ChainType.BTC;
@@ -35,10 +62,9 @@ extension ChainTypeEx on ChainType {
         break;
       default:
         {
-          //todo log
-          // let err = format!("the str:{} can not be ChainType", chain_type);
-          // log.error!("{}", err);
-          re = null;
+          Logger.getInstance()
+              .f(_tag, "the str:$chainType can not be ChainType");
+          throw new Exception("the str:$chainType can not be ChainType");
         }
     }
     return re;

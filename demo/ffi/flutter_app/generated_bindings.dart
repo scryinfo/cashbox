@@ -25,7 +25,7 @@ class NativeLibrary {
     );
   }
 
-  _dart_cool_function _cool_function;
+  late _dart_cool_function _cool_function;
 }
 
 class CoolStruct extends ffi.Struct {

@@ -7,7 +7,8 @@ import 'package:ffi/ffi.dart' as ffi;
 import 'package:source_gen/source_gen.dart';
 
 enum _FieldType {
-  pointerString,
+  pointerStringUtf8,
+  pointerStringInt8,
   pointerStruct,
   baseType, // int double ...
   pointerNativeType, // Int32 UInt32 Float ...
@@ -44,7 +45,7 @@ import 'kits.dart';
     }
     var typeStruct = TypeChecker.fromRuntime(Struct);
     for (var c in library.classes) {
-      if (typeStruct.isExactly(c.supertype.element)) {
+      if (typeStruct.isExactly(c.supertype!.element)) {
         String classCode;
         if (isArray(c)) {
           classCode = _classArray(c);
@@ -60,7 +61,8 @@ import 'kits.dart';
   String _class(ClassElement c) {
     StringBuffer classCode = new StringBuffer();
     var typePointer = TypeChecker.fromRuntime(Pointer);
-    var typeUtf8 = TypeChecker.fromRuntime(ffi.Utf8);
+    var typeStringUtf8 = TypeChecker.fromRuntime(ffi.Utf8);
+    var typeStringInt8 = TypeChecker.fromRuntime(Int8);
     var typeStruct = TypeChecker.fromRuntime(Struct);
 
     classCode
@@ -68,20 +70,23 @@ import 'kits.dart';
 
     List<_FieldMeta> fieldMetas = [];
     for (var f in c.fields) {
-      if (typePointer.isExactly(f.type.element)) {
-        var parameterized = (f.type as ParameterizedType)?.typeArguments;
+      if (typePointer.isExactly(f.type.element!)) {
+        var parameterized = (f.type as ParameterizedType).typeArguments;
         if (parameterized != null && parameterized.isNotEmpty) {
           var first = parameterized.first;
-          if (typeUtf8.isExactly(first.element)) {
+          if (typeStringUtf8.isExactly(first.element!)) {
             fieldMetas.add(_FieldMeta(
-                _FieldType.pointerString, f.name, first.element.name));
+                _FieldType.pointerStringUtf8, f.name, first.element!.name!));
+          } else if (typeStringInt8.isExactly(first.element!)) {
+            fieldMetas.add(_FieldMeta(
+                _FieldType.pointerStringInt8, f.name, first.element!.name!));
           } else if (typeStruct
-              .isExactly((first.element as ClassElement).supertype.element)) {
+              .isExactly((first.element as ClassElement).supertype!.element)) {
             fieldMetas.add(_FieldMeta(
-                _FieldType.pointerStruct, f.name, first.element.name));
+                _FieldType.pointerStruct, f.name, first.element!.name!));
           } else {
             fieldMetas.add(_FieldMeta(
-                _FieldType.pointerNativeType, f.name, first.element.name));
+                _FieldType.pointerNativeType, f.name, first.element!.name!));
           }
         } else {
           print("can not handle the type ${f.type} in class ${c.name}");
@@ -89,12 +94,12 @@ import 'kits.dart';
       } else {
         var first = f.type;
         if (typeStruct
-            .isExactly((first.element as ClassElement).supertype.element)) {
+            .isExactly((first.element as ClassElement).supertype!.element)) {
           fieldMetas
-              .add(_FieldMeta(_FieldType.struct, f.name, first.element.name));
+              .add(_FieldMeta(_FieldType.struct, f.name, first.element!.name!));
         } else {
           fieldMetas.add(
-              _FieldMeta(_FieldType.baseType, f.name, f.type.element.name));
+              _FieldMeta(_FieldType.baseType, f.name, f.type.element!.name!));
         }
       }
     }
@@ -107,53 +112,73 @@ import 'kits.dart';
       switch (f.fieldType) {
         case _FieldType.baseType:
           {
-            classCode.writeln('${_blankOne}${f.typeName} ${f.name};');
+            if (isString(f.typeName)) {
+              classCode.writeln('${_blankOne}${f.typeName} ${f.name} = "";');
+            } else {
+              classCode.writeln('${_blankOne}${f.typeName} ${f.name} = 0;');
+            }
 
             //base type do not free
 
-            toC.writeln('${_blankTwo}c.${f.name} = ${f.name}??0;');
+            toC.writeln('${_blankTwo}c.${f.name} = ${f.name};');
             toDart.writeln('${_blankTwo}${f.name} = c.${f.name};');
           }
           break;
-        case _FieldType.pointerString:
+        case _FieldType.pointerStringUtf8:
           {
-            classCode.writeln('${_blankOne}String ${f.name};');
+            classCode.writeln('${_blankOne}String ${f.name} = "";');
 
             free.writeln(
-                '${_blankTwo}if (instance.${f.name} != null && instance.${f.name} != nullptr) {ffi.calloc.free(instance.${f.name});}');
+                '${_blankTwo}if (instance.${f.name} != nullptr) {ffi.calloc.free(instance.${f.name});}');
             free.writeln('${_blankTwo}instance.${f.name} = nullptr;');
 
             toC.writeln(
-                '''${_blankTwo}if(c.${f.name} != null && c.${f.name} != nullptr) { ffi.calloc.free(c.${f.name});}''');
-            toC.writeln('${_blankTwo}c.${f.name} = toUtf8Null(${f.name});');
+                '''${_blankTwo}if(c.${f.name} != nullptr) { ffi.calloc.free(c.${f.name});}''');
+            toC.writeln('${_blankTwo}c.${f.name} = ${f.name}.toCPtrUtf8();');
             toDart
-                .writeln('${_blankTwo}${f.name} = fromUtf8Null(c.${f.name});');
+                .writeln('${_blankTwo}${f.name} = c.${f.name}.toDartString();');
+          }
+          break;
+        case _FieldType.pointerStringInt8:
+          {
+            classCode.writeln('${_blankOne}String ${f.name} = "";');
+
+            free.writeln(
+                '${_blankTwo}if (instance.${f.name} != nullptr) {ffi.calloc.free(instance.${f.name});}');
+            free.writeln('${_blankTwo}instance.${f.name} = nullptr;');
+
+            toC.writeln(
+                '''${_blankTwo}if(c.${f.name} != nullptr) { ffi.calloc.free(c.${f.name});}''');
+            toC.writeln('${_blankTwo}c.${f.name} = ${f.name}.toCPtrInt8();');
+            toDart
+                .writeln('${_blankTwo}${f.name} = c.${f.name}.toDartString();');
           }
           break;
         case _FieldType.pointerStruct:
           {
             var className = toClassName(f.typeName);
-            classCode.writeln('${_blankOne}${className} ${f.name};');
+            classCode.writeln(
+                '${_blankOne}${className} ${f.name} = new ${className}();');
 
             free.writeln('${_blankTwo}${className}.free(instance.${f.name});');
             free.writeln('${_blankTwo}instance.${f.name} = nullptr;');
 
             toC.writeln(
-                '${_blankTwo}if (c.${f.name} == null || c.${f.name} == nullptr) {c.${f.name} = allocateZero<clib.${f.typeName}>();}');
+                '${_blankTwo}if (c.${f.name} == nullptr) {c.${f.name} = allocateZero<clib.${f.typeName}>();}');
             toC.writeln('${_blankTwo}${f.name}.toC(c.${f.name});');
             toDart.writeln('${_blankTwo}${f.name} = new ${className}();');
             toDart.writeln('${_blankTwo}${f.name}.toDart(c.${f.name});');
 
-            subStruct.writeln('${_blankTwo}${f.name} = new ${className}();');
+            // subStruct.writeln('${_blankTwo}${f.name} = new ${className}();');
           }
           break;
         case _FieldType.pointerNativeType:
           {
             var className = mapNativeType(f.typeName);
-            classCode.writeln('${_blankOne}${className} ${f.name};');
+            classCode.writeln('${_blankOne}${className} ${f.name} = 0;');
 
             free.writeln(
-                '${_blankTwo}if (instance.${f.name} != null && instance.${f.name} != nullptr) {ffi.calloc.free(instance.${f.name});}');
+                '${_blankTwo}if (instance.${f.name} != nullptr) {ffi.calloc.free(instance.${f.name});}');
             free.writeln('${_blankTwo}instance.${f.name} = nullptr;');
 
             toC.writeln('${_blankTwo}c.${f.name}.value = ${f.name};');
@@ -164,16 +189,15 @@ import 'kits.dart';
           break;
         case _FieldType.struct:
           var className = toClassName(f.typeName);
-          classCode.writeln('${_blankOne}${className} ${f.name};');
+          classCode.writeln(
+              '${_blankOne}${className} ${f.name} = new ${className}();');
           free.writeln(
-              '${_blankTwo}if (instance.${f.name} != null ) {${className}.freeInstance(instance.${f.name});}');
+              '${_blankTwo}${className}.freeInstance(instance.${f.name});');
           // free.writeln('${_blankTwo}instance.${f.name} = null;');
 
           toC.writeln('${_blankTwo}${f.name}.toCInstance(c.${f.name});');
           toDart.writeln('${_blankTwo}${f.name} = new ${className}();');
           toDart.writeln('${_blankTwo}${f.name}.toDartInstance(c.${f.name});');
-
-          subStruct.writeln('${_blankTwo}${f.name} = new ${className}();');
           break;
       }
     }
@@ -189,14 +213,11 @@ ${subStruct.toString()}$_blankOne}
     classCode.writeln('''
 
   static freeInstance(clib.${c.name} instance) {
-    if (instance == null) {
-      return;
-    }
 ${free.toString()}
   }
     
   static free(Pointer<clib.${c.name}> ptr) {
-    if (ptr == null || ptr == nullptr) {
+    if (ptr == nullptr) {
       return;
     }
     freeInstance(ptr.ref);
@@ -208,12 +229,12 @@ ${free.toString()}
     classCode.writeln('''
 
   static ${toClassName(c.name)} fromC(Pointer<clib.${c.name}> ptr) {
-    if (ptr == null || ptr == nullptr) {
-      return null;
+    var d = new ${toClassName(c.name)}();
+    if (ptr == nullptr) {
+      return d ;
     }
-${_blankTwo}var d = new ${toClassName(c.name)}();
-${_blankTwo}d.toDart(ptr);
-${_blankTwo}return d;
+    d.toDart(ptr);
+    return d;
   }
 ''');
 
@@ -228,7 +249,7 @@ ${_blankTwo}return ptr;
 
   @override
   toC(Pointer<clib.${c.name}> c) {
-    if (c == null || c == nullptr) {
+    if (c == nullptr) {
       return;
     }
     toCInstance(c.ref);
@@ -236,15 +257,12 @@ ${_blankTwo}return ptr;
   
   @override
   toCInstance(clib.${c.name} c) {
-    if (c == null) {
-      return;
-    }
 ${toC.toString()}
   }
 
   @override
   toDart(Pointer<clib.${c.name}> c) {
-    if (c == null || c == nullptr) {
+    if (c == nullptr) {
       return;
     }
     toDartInstance(c.ref);
@@ -252,9 +270,6 @@ ${toC.toString()}
 
   @override
   toDartInstance(clib.${c.name} c) {
-    if (c == null) {
-      return;
-    }
 ${toDart.toString()}  }''');
 
     classCode.writeln('}');
@@ -264,41 +279,47 @@ ${toDart.toString()}  }''');
   String _classArray(ClassElement c) {
     StringBuffer classCode = new StringBuffer();
 
-    ClassElement el;
-    bool nativeType = false;
+    ClassElement? el;
     bool nativeTypeArray = false;
+    _FieldType elementType = _FieldType.baseType;
     StringBuffer free = new StringBuffer();
     StringBuffer toC = new StringBuffer();
     StringBuffer toDart = new StringBuffer();
     {
       var typePointer = TypeChecker.fromRuntime(Pointer);
       var typeStruct = TypeChecker.fromRuntime(Struct);
-      var typeUtf8 = TypeChecker.fromRuntime(ffi.Utf8);
+      var typeStringUtf8 = TypeChecker.fromRuntime(ffi.Utf8);
+      var typeStringInt8 = TypeChecker.fromRuntime(Int8);
       for (var f in c.fields) {
         if (f.name == ArrayLen) {
           ;
         } else if (f.name == ArrayCap) {
           ;
         } else if (f.name == ArrayPtr) {
-          if (typePointer.isExactly(f.type.element)) {
-            var parameterized = (f.type as ParameterizedType)?.typeArguments;
+          if (typePointer.isExactly(f.type.element!)) {
+            var parameterized = (f.type as ParameterizedType).typeArguments;
             var first = parameterized != null && parameterized.isNotEmpty
                 ? parameterized.first
                 : null;
             if (first != null) {
-              parameterized = (first as ParameterizedType)?.typeArguments;
+              parameterized = (first as ParameterizedType).typeArguments;
               var firstFirst = parameterized != null && parameterized.isNotEmpty
                   ? parameterized.first
                   : null;
               if (typeStruct.isExactly(
-                  (first.element as ClassElement).supertype.element)) {
+                  (first.element as ClassElement).supertype!.element)) {
                 el = first.element as ClassElement;
-              } else if (typePointer.isExactly(first.element) &&
-                  typeUtf8.isExactly(firstFirst?.element)) {
+                elementType = _FieldType.struct;
+              } else if (typePointer.isExactly(first.element!) &&
+                  typeStringUtf8.isExactly(firstFirst!.element!)) {
                 el = first.element as ClassElement;
-                nativeTypeArray = true;
+                elementType = _FieldType.pointerStringUtf8;
+              } else if (typePointer.isExactly(first.element!) &&
+                  typeStringInt8.isExactly(firstFirst!.element!)) {
+                el = first.element as ClassElement;
+                elementType = _FieldType.pointerStringInt8;
               } else {
-                nativeType = true;
+                elementType = _FieldType.baseType;
                 el = first.element as ClassElement;
               }
             } else {
@@ -307,28 +328,36 @@ ${toDart.toString()}  }''');
           }
         } else {
           //todo not a array
+          print("${c.toString()}: is not array");
         }
       }
     }
 
-    var elName = !nativeType ? toClassName(el.name) : mapNativeType(el.name);
-    var elNameAllocate = el.name;
-    if (nativeTypeArray) {
+    if (el == null) {
+      return "";
+    }
+
+    String elName = mapNativeType(el.name);
+    String elNameAllocate = el.name;
+    if (elementType == _FieldType.struct) {
+      elName = toClassName(el.name);
+      elNameAllocate = "clib." + el.name;
+    } else if (elementType == _FieldType.pointerStringUtf8) {
       elName = "String";
       elNameAllocate = "Pointer<ffi.Utf8>";
-    } else if (!nativeType) {
-      elNameAllocate = "clib." + elNameAllocate;
+    } else if (elementType == _FieldType.pointerStringInt8) {
+      elName = "String";
+      elNameAllocate = "Pointer<Int8>";
+    } else {
+      elName = mapNativeType(el.name);
+      elNameAllocate = el.name;
     }
     var className = toClassName(c.name);
     classCode.writeln('''class ${className} extends DC<clib.${c.name}>{
-  List<$elName> data;
-  
-  ${className}() {
-    data = <$elName>[];
-  }
+  List<$elName> data = <$elName>[];
   
   static free(Pointer<clib.${c.name}> ptr) {
-    if (ptr == null || ptr == nullptr) {
+    if (ptr == nullptr) {
       return;
     }
     freeInstance(ptr.ref);
@@ -336,18 +365,15 @@ ${toDart.toString()}  }''');
   }
   
   static freeInstance(clib.${c.name} instance) {
-    if (instance == null) {
-      return;
-    }
-    ${nativeType ? "instance.ptr.free()" : (nativeTypeArray ? "instance.ptr.free(instance.len)" : elName + ".free(instance.ptr)")};
+    ${elementType == _FieldType.baseType ? "instance.ptr.free()" : (elementType == _FieldType.pointerStringInt8 || elementType == _FieldType.pointerStringUtf8 ? "instance.ptr.free(instance.len)" : elName + ".free(instance.ptr)")};
     instance.ptr = nullptr;
   }
   
   static ${className} fromC(Pointer<clib.${c.name}> ptr) {
-    if (ptr == null || ptr == nullptr) {
-      return null;
-    }
     var d = new ${className}();
+    if (ptr == nullptr) {
+      return d;
+    }
     d.toDart(ptr);
     return d;
   }
@@ -361,7 +387,7 @@ ${toDart.toString()}  }''');
   
   @override
   toC(Pointer<clib.${c.name}> c) {
-    if (c == null || c == nullptr) {
+    if (c == nullptr) {
       return;
     }
     toCInstance(c.ref);
@@ -369,37 +395,30 @@ ${toDart.toString()}  }''');
   
   @override
   toCInstance(clib.${c.name} c) {
-    if (c == null) {
-      return;
-    }
-    if (c.ptr != nullptr && c.ptr != null) {
-      ${nativeType ? "c.ptr.free()" : (nativeTypeArray ? "c.ptr.free(c.len)" : elName + ".free(c.ptr)")};
+    if (c.ptr != nullptr) {
+      ${elementType == _FieldType.baseType ? "c.ptr.free()" : (elementType == _FieldType.pointerStringUtf8 || elementType == _FieldType.pointerStringInt8 ? "c.ptr.free(c.len)" : elName + ".free(c.ptr)")};
       c.ptr = nullptr;
     }
     c.ptr = allocateZero<${elNameAllocate}>(count : data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length;i++) {
-      ${nativeType ? "c.ptr.elementAt(i).value = data[i]" : (nativeTypeArray ? "c.ptr.elementAt(i).value = data[i].toCPtr()" : "data[i].toC(c.ptr.elementAt(i))")};
+      ${elementType == _FieldType.baseType ? "c.ptr.elementAt(i).value = data[i]" : (elementType == _FieldType.pointerStringUtf8 ? "c.ptr.elementAt(i).value = data[i].toCPtr()" : (elementType == _FieldType.pointerStringInt8 ? "c.ptr.elementAt(i).value = data[i].toCPtrInt8()" : "data[i].toC(c.ptr.elementAt(i))"))};
     }
   }
 
   @override
   toDart(Pointer<clib.${c.name}> c) {
-    if (c == null || c == nullptr) {
+    if (c == nullptr) {
       return;
     }
     toDartInstance(c.ref);
   }
   @override
   toDartInstance(clib.${c.name} c) {
-    if (c == null) {
-      return;
-    }
-    data = List.filled(c.len, null);
+    data =  <$elName>[];
     for (var i = 0; i < data.length;i++) {
-      ${!nativeType && !nativeTypeArray ? "data[i] = new $elName();" : ""}
-      ${nativeType ? "data[i] = c.ptr.elementAt(i).value" : (nativeTypeArray ? "data[i] = fromUtf8Null(c.ptr.elementAt(i).value)" : "data[i].toDart(c.ptr.elementAt(i))")};
+      ${elementType == _FieldType.baseType ? "data.add(c.ptr.elementAt(i).value)" : (elementType == _FieldType.pointerStringUtf8 || elementType == _FieldType.pointerStringInt8 ? "data.add(c.ptr.elementAt(i).value.toDartString())" : "data.add(new $elName());      data[i].toDart(c.ptr.elementAt(i))")};
     }
   }
 }
@@ -409,7 +428,7 @@ ${toDart.toString()}  }''');
   }
 
   String mapNativeType(String className) {
-    String t;
+    String t = "";
     switch (className) {
       case "Int8":
         t = "int";
@@ -455,6 +474,10 @@ ${toDart.toString()}  }''');
       return true;
     }
     return false;
+  }
+
+  bool isString(String name) {
+    return name == "String";
   }
 
   String toClassName(String cName) {

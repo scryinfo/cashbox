@@ -30,7 +30,7 @@ void main() {
   group('ClientTransportChannel', () {
     var server1;
     var server2;
-    Server serverRefresh;
+    Server? serverRefresh;
     var refresh = RefreshOpen.get(new ConnectParameter("localhost", serverRefreshPort),
         "", AppPlatformType.any, "", "", "");
     bool odd = true;
@@ -39,11 +39,11 @@ void main() {
       if (odd) {
         odd = false;
         refresh.version = "1";
-        re = await refresh.refreshCall();
+        re = (await refresh.refreshCall())!;
       } else {
         odd = true;
         refresh.version = "";
-        re = await refresh.refreshCall();
+        re = (await refresh.refreshCall())!;
       }
       return re;
     }) as ClientTransportChannel;
@@ -66,7 +66,7 @@ void main() {
       var response = await greeter.sayHello(HelloRequest()..name = name);
       print('Greeter client received: ${response.message}');
       expect(message1, response.message);
-      expect(server1Port, channel.connectParameter.port);
+      expect(server1Port, channel.connectParameter!.port);
     };
 
     var callOkServer2 = () async {
@@ -74,7 +74,7 @@ void main() {
       var response = await greeter.sayHello(HelloRequest()..name = name);
       print('Greeter client received: ${response.message}');
       expect(message2, response.message);
-      expect(server2Port, channel.connectParameter.port);
+      expect(server2Port, channel.connectParameter!.port);
     };
 
     var callException = () async {
@@ -98,7 +98,7 @@ void main() {
 
     tearDown(() async {
       if (serverRefresh != null) {
-        serverRefresh.shutdown();
+        serverRefresh!.shutdown();
         serverRefresh = null;
       }
       killServer1();

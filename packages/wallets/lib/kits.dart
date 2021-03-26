@@ -1,5 +1,6 @@
 import 'dart:ffi';
-
+import 'dart:io';
+import 'package:path/path.dart' as pathLib;
 import 'package:ffi/ffi.dart' as ffi;
 import 'package:wallets/wallets_c.dc.dart';
 
@@ -23,11 +24,13 @@ abstract class DC<C extends NativeType> {
 
   //把数据赋值给指针
   toC(Pointer<C> ptr);
+
   //把数据赋值给指针
   toCInstance(C instance);
 
   //转换到dart，
   toDart(Pointer<C> c);
+
   toDartInstance(C instance);
 }
 
@@ -37,23 +40,23 @@ extension ErrorEx on Error {
 
 //str转换为 Pointer<ffi.Utf8>类型，这里会分配内存，需要调用free释放内存
 Pointer<ffi.Utf8> toUtf8Null(String str) {
-  if (str == null) {
-    return nullptr;
-  }
   return str.toNativeUtf8();
 }
 
 //指针转抽象为string类型
-String fromUtf8Null(Pointer<ffi.Utf8> ptr) {
-  if (ptr == null || ptr == nullptr) {
-    return null;
+String fromInt8Null(Pointer<Int8> ptr) {
+  if (ptr == nullptr) {
+    return "";
   }
-  return ptr.toDartString();
+  return ptr.cast<ffi.Utf8>().toDartString();
 }
 
 extension StringEx on String {
-  Pointer<ffi.Utf8> toCPtr() {
+  Pointer<ffi.Utf8> toCPtrUtf8() {
     return toUtf8Null(this);
+  }
+  Pointer<Int8> toCPtrInt8() {
+    return toUtf8Null(this).cast();
   }
 }
 
@@ -72,25 +75,43 @@ extension Utf8DoublePtrEx on Pointer<Pointer<ffi.Utf8>> {
 //释放内存
 extension Utf8PtrEx on Pointer<ffi.Utf8> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
+  }
+  // String toDataString(){
+  //   return fromUtf8Null(this);
+  // }
+}
+
+//释放指针的指针的内存
+extension Int8DoublePtrEx on Pointer<Pointer<Int8>> {
+  void free(int len) {
+    for (var i = 0; i < len; i++) {
+      Pointer<Int8> el = this.elementAt(i).value;
+      el.free();
+      this.elementAt(i).value = nullptr;
+    }
+    ffi.calloc.free(this);
   }
 }
 
 //释放内存
 extension Int8PtrEx on Pointer<Int8> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
+  }
+  String toDartString(){
+    return fromInt8Null(this);
   }
 }
 
 //释放内存
 extension Int16PtrEx on Pointer<Int16> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
   }
@@ -99,7 +120,7 @@ extension Int16PtrEx on Pointer<Int16> {
 //释放内存
 extension Int32PtrEx on Pointer<Int32> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
   }
@@ -108,7 +129,7 @@ extension Int32PtrEx on Pointer<Int32> {
 //释放内存
 extension Int64PtrEx on Pointer<Int64> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
   }
@@ -117,7 +138,7 @@ extension Int64PtrEx on Pointer<Int64> {
 //释放内存
 extension Uint8PtrEx on Pointer<Uint8> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
   }
@@ -126,7 +147,7 @@ extension Uint8PtrEx on Pointer<Uint8> {
 //释放内存
 extension Uint16PtrEx on Pointer<Uint16> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
   }
@@ -135,7 +156,7 @@ extension Uint16PtrEx on Pointer<Uint16> {
 //释放内存
 extension Uint32PtrEx on Pointer<Uint32> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
   }
@@ -144,7 +165,7 @@ extension Uint32PtrEx on Pointer<Uint32> {
 //释放内存
 extension Uint64PtrEx on Pointer<Uint64> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
   }
@@ -153,7 +174,7 @@ extension Uint64PtrEx on Pointer<Uint64> {
 //释放内存
 extension FloatPtrEx on Pointer<Float> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
   }
@@ -162,7 +183,7 @@ extension FloatPtrEx on Pointer<Float> {
 //释放内存
 extension DoublePtrEx on Pointer<Double> {
   void free() {
-    if (this != null && this != nullptr && this.address != 0) {
+    if (this != nullptr && this.address != 0) {
       ffi.calloc.free(this);
     }
   }
@@ -227,8 +248,8 @@ extension IntEx on int {
   }
 }
 
-extension BoolEx on bool{
-  int toInt() => this ? CTrue:CFalse;
+extension BoolEx on bool {
+  int toInt() => this ? CTrue : CFalse;
 }
 
 //转换指针
@@ -247,30 +268,57 @@ extension DoubleEx on double {
 }
 
 class NoCacheString {
-  StringBuffer buffer;
-
-  NoCacheString() {
-    buffer = new StringBuffer();
-  }
+  StringBuffer buffer = new StringBuffer();
 
   @override
   String toString() {
     return buffer.toString();
   }
 
-  Pointer<ffi.Utf8> toCPtr() {
+  Pointer<ffi.Utf8> toCPtrUtf8() {
     //todo
-    return toString().toCPtr();
+    return toString().toCPtrUtf8();
   }
-
-  static void free(Pointer<ffi.Utf8> str) {
+  Pointer<Int8> toCPtrInt8() {
+    //todo
+    return toString().toCPtrInt8();
+  }
+  static void freeUtf8(Pointer<ffi.Utf8> str) {
     //todo
     if (str != null && str != nullptr) {
       ffi.calloc.free(str);
     }
   }
-
+  static void freeInt8(Pointer<Int8> str) {
+    //todo
+    if (str != null && str != nullptr) {
+      ffi.calloc.free(str);
+    }
+  }
   clean() {
     buffer.clear();
   }
+}
+
+String _platformPath(String name, {String? path}) {
+  if (path == null) path = "";
+  String dlPath = "";
+  if (Platform.isLinux || Platform.isAndroid) {
+    dlPath = pathLib.join(path, "lib" + name + ".so");
+  } else if (Platform.isMacOS) {
+    dlPath = pathLib.join(path, "lib" + name + ".dylib");
+  } else if (Platform.isWindows) {
+    dlPath = pathLib.join(path, name + ".dll");
+  } else {
+    throw Exception("Platform not implemented");
+  }
+  if (!(File(dlPath).existsSync())) {
+    dlPath = Platform.script.resolve(dlPath).path;
+  }
+  return dlPath;
+}
+
+DynamicLibrary dlOpenPlatformSpecific(String name, {String? path}) {
+  String fullPath = _platformPath(name, path: path);
+  return DynamicLibrary.open(fullPath);
 }

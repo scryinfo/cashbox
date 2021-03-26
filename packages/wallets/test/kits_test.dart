@@ -6,7 +6,7 @@ import 'package:wallets/kits.dart';
 
 void main() {
   test("free", () {
-    Pointer<Int32> ptr = null;
+    Pointer<Int32> ptr = nullptr;
     try {
       ffi.calloc.free(ptr);
       expect("", "throw exception");

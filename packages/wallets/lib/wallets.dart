@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart' as ffi;
+import 'package:logger/logger.dart';
 import 'package:wallets/chain_btc.dart';
 import 'package:wallets/chain_eee.dart';
 import 'package:wallets/chain_eth.dart';
@@ -14,50 +15,57 @@ import 'kits.dart';
 import 'result.dart';
 import 'wallets_c.dart' as clib;
 
+const _tag = "Wallets";
+
 class Wallets {
   ///如果失败返回 null，失败的可能性非常小
   static DbName dbName(DbName name) {
-    var ptrOutName = clib.CDbName_dAlloc();
+    var ptrOutName = _cWallets.CDbName_dAlloc();
     Error err;
     {
       var ptrName = name.toCPtr();
-      var cerr = clib.Wallets_dbName(ptrName, ptrOutName);
+      var cerr = _cWallets.Wallets_dbName(ptrName, ptrOutName);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       DbName.free(ptrName);
     }
     DbName outName;
     if (err.isSuccess()) {
       outName = DbName.fromC(ptrOutName.value);
+    } else {
+      Logger().e(_tag, err.toString());
+      outName = new DbName();
     }
-    clib.CDbName_dFree(ptrOutName);
+    _cWallets.CDbName_dFree(ptrOutName);
     return outName;
   }
 
   Error init(InitParameters parameters) {
-    var ptrContext = clib.CContext_dAlloc();
+    var ptrContext = _cWallets.CContext_dAlloc();
     Error err;
     {
       var ptrParameters = parameters.toCPtr();
-      var cerr = clib.Wallets_init(ptrParameters, ptrContext);
+      var cerr = _cWallets.Wallets_init(ptrParameters, ptrContext);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       InitParameters.free(ptrParameters);
     }
     if (err.isSuccess()) {
       var ctx = Context.fromC(ptrContext.value);
       context = ctx;
+    } else {
+      Logger.getInstance().f(_tag, err.message);
     }
-    clib.CContext_dFree(ptrContext);
+    _cWallets.CContext_dFree(ptrContext);
     return err;
   }
 
   Error uninit() {
     Error err;
     {
-      var cerr = clib.Wallets_uninit(ptrContext);
+      var cerr = _cWallets.Wallets_uninit(ptrContext);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
     }
 
     Context.free(ptrContext);
@@ -69,14 +77,14 @@ class Wallets {
     Error err;
     List<Context> contexts = [];
     {
-      var ptrContexts = clib.CArrayCContext_dAlloc();
-      var cerr = clib.Wallets_Contexts(ptrContexts);
+      var ptrContexts = _cWallets.CArrayCContext_dAlloc();
+      var cerr = _cWallets.Wallets_Contexts(ptrContexts);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
         contexts = ArrayCContext.fromC(ptrContexts.value).data;
       }
-      clib.CArrayCContext_dFree(ptrContexts);
+      _cWallets.CArrayCContext_dFree(ptrContexts);
     }
 
     return DlResult1(contexts, err);
@@ -86,14 +94,17 @@ class Wallets {
     Error err;
     Context context;
     {
-      var ptrContext = clib.CContext_dAlloc();
-      var cerr = clib.Wallets_lastContext(ptrContext);
+      var ptrContext = _cWallets.CContext_dAlloc();
+      var cerr = _cWallets.Wallets_lastContext(ptrContext);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
         context = Context.fromC(ptrContext.value);
+      } else {
+        Logger.getInstance().e(_tag, err.message);
+        context = new Context();
       }
-      clib.CContext_dFree(ptrContext);
+      _cWallets.CContext_dFree(ptrContext);
     }
 
     return DlResult1(context, err);
@@ -103,14 +114,17 @@ class Wallets {
     Error err;
     Context context;
     {
-      var ptrContext = clib.CContext_dAlloc();
-      var cerr = clib.Wallets_firstContext(ptrContext);
+      var ptrContext = _cWallets.CContext_dAlloc();
+      var cerr = _cWallets.Wallets_firstContext(ptrContext);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
         context = Context.fromC(ptrContext.value);
+      } else {
+        Logger.getInstance().e(_tag, err.message);
+        context = new Context();
       }
-      clib.CContext_dFree(ptrContext);
+      _cWallets.CContext_dFree(ptrContext);
     }
 
     return DlResult1(context, err);
@@ -119,9 +133,9 @@ class Wallets {
   Error lockRead() {
     Error err;
     {
-      var cerr = clib.Wallets_lockRead(_ptrContext);
+      var cerr = _cWallets.Wallets_lockRead(_ptrContext);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
     }
     return err;
   }
@@ -129,9 +143,9 @@ class Wallets {
   Error unlockRead() {
     Error err;
     {
-      var cerr = clib.Wallets_unlockRead(_ptrContext);
+      var cerr = _cWallets.Wallets_unlockRead(_ptrContext);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
     }
     return err;
   }
@@ -139,9 +153,9 @@ class Wallets {
   Error lockWrite() {
     Error err;
     {
-      var cerr = clib.Wallets_lockWrite(_ptrContext);
+      var cerr = _cWallets.Wallets_lockWrite(_ptrContext);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
     }
     return err;
   }
@@ -149,9 +163,9 @@ class Wallets {
   Error unlockWrite() {
     Error err;
     {
-      var cerr = clib.Wallets_unlockWrite(_ptrContext);
+      var cerr = _cWallets.Wallets_unlockWrite(_ptrContext);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
     }
     return err;
   }
@@ -160,14 +174,14 @@ class Wallets {
     Error err;
     List<Wallet> ws = [];
     {
-      var arrayWallet = clib.CArrayCWallet_dAlloc();
-      var cerr = clib.Wallets_all(ptrContext, arrayWallet);
+      var arrayWallet = _cWallets.CArrayCWallet_dAlloc();
+      var cerr = _cWallets.Wallets_all(ptrContext, arrayWallet);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
         ws = ArrayCWallet.fromC(arrayWallet.value).data;
       }
-      clib.CArrayCWallet_dFree(arrayWallet);
+      _cWallets.CArrayCWallet_dFree(arrayWallet);
     }
 
     return DlResult1(ws, err);
@@ -175,16 +189,16 @@ class Wallets {
 
   DlResult1<String> generateMnemonic(int count) {
     Error err;
-    String mn;
+    String mn = "";
     {
-      var ptr = clib.CStr_dAlloc();
-      var cerr = clib.Wallets_generateMnemonic(count, ptr);
+      var ptr = _cWallets.CStr_dAlloc();
+      var cerr = _cWallets.Wallets_generateMnemonic(count, ptr);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
-        mn = fromUtf8Null(ptr.value);
+        mn = ptr.value.toDartString();
       }
-      clib.CStr_dFree(ptr);
+      _cWallets.CStr_dFree(ptr);
     }
 
     return DlResult1(mn, err);
@@ -194,16 +208,19 @@ class Wallets {
     Error err;
     Wallet wallet;
     {
-      var ptr = clib.CWallet_dAlloc();
+      var ptr = _cWallets.CWallet_dAlloc();
       var ptrParameters = parameters.toCPtr();
-      var cerr = clib.Wallets_createWallet(ptrContext, ptrParameters, ptr);
+      var cerr = _cWallets.Wallets_createWallet(ptrContext, ptrParameters, ptr);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       CreateWalletParameters.free(ptrParameters);
       if (err.isSuccess()) {
         wallet = Wallet.fromC(ptr.value);
+      } else {
+        Logger.getInstance().e(_tag, err.message);
+        wallet = new Wallet();
       }
-      clib.CWallet_dFree(ptr);
+      _cWallets.CWallet_dFree(ptr);
     }
 
     return DlResult1(wallet, err);
@@ -212,11 +229,12 @@ class Wallets {
   Error removeWallet(String walletId, Uint8List password) {
     Error err;
     {
-      var ptrWalletId = walletId.toCPtr();
-      var ptrPassword = String.fromCharCodes(password).toCPtr();
-      var cerr = clib.Wallets_removeWallet(ptrContext, ptrWalletId, ptrPassword);
+      var ptrWalletId = walletId.toCPtrInt8();
+      var ptrPassword = String.fromCharCodes(password).toCPtrInt8();
+      var cerr =
+          _cWallets.Wallets_removeWallet(ptrContext, ptrWalletId, ptrPassword);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       ptrWalletId.free();
       ptrPassword.free();
     }
@@ -227,11 +245,11 @@ class Wallets {
   Error renameWallet(String newName, String walletId) {
     Error err;
     {
-      var ptrNewName = newName.toCPtr();
-      var ptrWalletId = walletId.toCPtr();
-      var cerr = clib.Wallets_renameWallet(ptrContext, ptrNewName, ptrWalletId);
+      var ptrNewName = newName.toCPtrInt8();
+      var ptrWalletId = walletId.toCPtrInt8();
+      var cerr = _cWallets.Wallets_renameWallet(ptrContext, ptrNewName, ptrWalletId);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       ptrWalletId.free();
       ptrNewName.free();
     }
@@ -241,12 +259,12 @@ class Wallets {
   Error resetPwdWallet(String walletId, Uint8List oldPwd, Uint8List newPwd) {
     Error err;
     {
-      var ptrWalletId = walletId.toCPtr();
-      var ptrOldPwd = String.fromCharCodes(oldPwd).toCPtr();
-      var ptrNewPwd = String.fromCharCodes(newPwd).toCPtr();
-      var cerr = clib.Wallets_resetWalletPassword(ptrContext, ptrWalletId, ptrOldPwd, ptrNewPwd);
+      var ptrWalletId = walletId.toCPtrInt8();
+      var ptrOldPwd = String.fromCharCodes(oldPwd).toCPtrInt8();
+      var ptrNewPwd = String.fromCharCodes(newPwd).toCPtrInt8();
+      var cerr = _cWallets.Wallets_resetWalletPassword(ptrContext, ptrWalletId, ptrOldPwd, ptrNewPwd);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       ptrWalletId.free();
       ptrOldPwd.free();
       ptrNewPwd.free();
@@ -258,14 +276,14 @@ class Wallets {
     Error err;
     var mne;
     {
-      var ptrWalletId = walletId.toCPtr();
-      var ptrPwd = String.fromCharCodes(pwd).toCPtr();
-      var ptr = clib.CStr_dAlloc();
-      var cerr = clib.Wallets_exportWallet(ptrContext, ptrWalletId, ptrPwd, ptr);
+      var ptrWalletId = walletId.toCPtrInt8();
+      var ptrPwd = String.fromCharCodes(pwd).toCPtrInt8();
+      var ptr = _cWallets.CStr_dAlloc();
+      var cerr = _cWallets.Wallets_exportWallet(ptrContext, ptrWalletId, ptrPwd, ptr);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
-        mne = fromUtf8Null(ptr.value);
+        mne = ptr.value.toDartString();
       }
       ffi.calloc.free(ptr);
       ptrWalletId.free();
@@ -279,9 +297,9 @@ class Wallets {
     bool re = false;
     {
       var ptr = 0.toBoolPtr();
-      var cerr = clib.Wallets_hasAny(ptrContext, ptr);
+      var cerr = _cWallets.Wallets_hasAny(ptrContext, ptr);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
         re = ptr.value.isTrue();
       }
@@ -294,16 +312,19 @@ class Wallets {
     Error err;
     Wallet wallet;
     {
-      var ptrWalletId = walletId.toCPtr();
-      var ptrWallet = clib.CWallet_dAlloc();
-      var cerr = clib.Wallets_findById(ptrContext, ptrWalletId, ptrWallet);
+      var ptrWalletId = walletId.toCPtrInt8();
+      var ptrWallet = _cWallets.CWallet_dAlloc();
+      var cerr = _cWallets.Wallets_findById(ptrContext, ptrWalletId, ptrWallet);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
         wallet = Wallet.fromC(ptrWallet.value);
+      } else {
+        Logger.getInstance().e(_tag, err.message);
+        wallet = new Wallet();
       }
       ptrWalletId.free();
-      clib.CWallet_dFree(ptrWallet);
+      _cWallets.CWallet_dFree(ptrWallet);
     }
     return DlResult1(wallet, err);
   }
@@ -312,16 +333,17 @@ class Wallets {
     Error err;
     List<Wallet> wallet = [];
     {
-      var ptrName = name.toCPtr();
-      var ptrWallet = clib.CArrayCWallet_dAlloc();
-      var cerr = clib.Wallets_findWalletBaseByName(ptrContext, ptrName, ptrWallet);
+      var ptrName = name.toCPtrInt8();
+      var ptrWallet = _cWallets.CArrayCWallet_dAlloc();
+      var cerr =
+          _cWallets.Wallets_findWalletBaseByName(ptrContext, ptrName, ptrWallet);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
         wallet = ArrayCWallet.fromC(ptrWallet.value).data;
       }
       ptrName.free();
-      clib.CArrayCWallet_dFree(ptrWallet);
+      _cWallets.CArrayCWallet_dFree(ptrWallet);
     }
     return DlResult1(wallet, err);
   }
@@ -330,17 +352,22 @@ class Wallets {
     Error err;
     CurrentWallet wallet;
     {
-      var ptrWalletId = clib.CStr_dAlloc();
-      var ptrChainType = clib.CStr_dAlloc();
-      var cerr = clib.Wallets_currentWalletChain(ptrContext, ptrWalletId, ptrChainType);
+      var ptrWalletId = _cWallets.CStr_dAlloc();
+      var ptrChainType = _cWallets.CStr_dAlloc();
+      var cerr = _cWallets.Wallets_currentWalletChain(
+          ptrContext, ptrWalletId, ptrChainType);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       if (err.isSuccess()) {
-        String chainType = fromUtf8Null(ptrChainType.value);
-        wallet = CurrentWallet(fromUtf8Null(ptrWalletId.value), chainType.toChainType());
+        String chainType = ptrChainType.value.toDartString();
+        wallet = CurrentWallet(
+            ptrWalletId.value.toDartString(), chainType.toChainType());
+      } else {
+        Logger.getInstance().e(_tag, err.message);
+        wallet = CurrentWallet.initValue();
       }
-      clib.CStr_dFree(ptrWalletId);
-      clib.CStr_dFree(ptrChainType);
+      _cWallets.CStr_dFree(ptrWalletId);
+      _cWallets.CStr_dFree(ptrChainType);
     }
     return DlResult1(wallet, err);
   }
@@ -348,11 +375,12 @@ class Wallets {
   Error saveCurrentWalletChain(String walletId, ChainType chainType) {
     Error err;
     {
-      var ptrWalletId = walletId.toCPtr();
-      var ptrChainType = chainType.toEnumString().toCPtr();
-      var cerr = clib.Wallets_saveCurrentWalletChain(ptrContext, ptrWalletId, ptrChainType);
+      var ptrWalletId = walletId.toCPtrInt8();
+      var ptrChainType = chainType.toEnumString().toCPtrInt8();
+      var cerr = _cWallets.Wallets_saveCurrentWalletChain(
+          ptrContext, ptrWalletId, ptrChainType);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
 
       ptrWalletId.free();
       ptrChainType.free();
@@ -364,19 +392,19 @@ class Wallets {
     Error err;
     List<TokenAddress> arrayCTokenAddress = [];
     {
-      var ptrWalletId = walletId.toCPtr();
-      var ptrNetType = netType.toEnumString().toCPtr();
-      var ptrArrayToken = clib.CArrayCTokenAddress_dAlloc();
-      var cerr = clib.Wallets_queryBalance(ptrContext, ptrNetType, ptrWalletId, ptrArrayToken);
+      var ptrWalletId = walletId.toCPtrInt8();
+      var ptrNetType = netType.toEnumString().toCPtrInt8();
+      var ptrArrayToken = _cWallets.CArrayCTokenAddress_dAlloc();
+      var cerr = _cWallets.Wallets_queryBalance(ptrContext, ptrNetType, ptrWalletId, ptrArrayToken);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
 
       if (err.isSuccess()) {
         arrayCTokenAddress = ArrayCTokenAddress.fromC(ptrArrayToken.value).data;
       }
       ptrWalletId.free();
       ptrNetType.free();
-      clib.CArrayCTokenAddress_dFree(ptrArrayToken);
+      _cWallets.CArrayCTokenAddress_dFree(ptrArrayToken);
     }
     return DlResult1(arrayCTokenAddress, err);
   }
@@ -384,11 +412,11 @@ class Wallets {
   Error changeTokenStatus(NetType netType, WalletTokenStatus walletTokenStatus) {
     Error err;
     {
-      var ptrNetType = netType.toEnumString().toCPtr();
+      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrWalletTokenStatus = walletTokenStatus.toCPtr();
-      var cerr = clib.Wallets_changeTokenShowState(ptrContext, ptrNetType, ptrWalletTokenStatus);
+      var cerr = _cWallets.Wallets_changeTokenShowState(ptrContext, ptrNetType, ptrWalletTokenStatus);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       WalletTokenStatus.free(ptrWalletTokenStatus);
       ptrNetType.free();
     }
@@ -398,11 +426,11 @@ class Wallets {
   Error updateBalance(NetType netType, TokenAddress tokenAddress) {
     Error err;
     {
-      var ptrNetType = netType.toEnumString().toCPtr();
+      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrTokenAddress = tokenAddress.toCPtr();
-      var cerr = clib.Wallets_updateBalance(ptrContext, ptrNetType, ptrTokenAddress);
+      var cerr = _cWallets.Wallets_updateBalance(ptrContext, ptrNetType, ptrTokenAddress);
       err = Error.fromC(cerr);
-      clib.CError_free(cerr);
+      _cWallets.CError_free(cerr);
       TokenAddress.free(ptrTokenAddress);
       ptrNetType.free();
     }
@@ -412,9 +440,9 @@ class Wallets {
   static AppPlatformTypes appPlatformType() {
     AppPlatformTypes platformType;
     {
-      var t = clib.Wallets_appPlatformType();
-      var platform = fromUtf8Null(t);
-      clib.CStr_free(t);
+      var t = _cWallets.Wallets_appPlatformType();
+      var platform = t.toDartString();
+      _cWallets.CStr_free(t);
       platformType = platform.toAppPlatformTypes();
     }
     return platformType;
@@ -422,7 +450,7 @@ class Wallets {
 
   //wrapper start
   Error safeRead(void doRead()) {
-    Error err;
+    Error err = new Error();
     try {
       err = lockRead();
       if (err.isSuccess()) {
@@ -437,7 +465,7 @@ class Wallets {
   }
 
   Error safeWrite(void doWrite()) {
-    Error err;
+    Error err = new Error();
     try {
       err = lockWrite();
       if (err.isSuccess()) {
@@ -473,27 +501,29 @@ class Wallets {
   }
 
   //
-  static Wallets _instance;
+  static Wallets _instance = Wallets._internal();
+  static clib.CWallets _cWallets = new clib.CWallets(dlOpenPlatformSpecific("wallets_cdl"));
+  static clib.CWallets get cWallets => _cWallets;
 
   Wallets._internal();
 
-  Pointer<clib.CContext> _ptrContext;
+  Pointer<clib.CContext> _ptrContext = nullptr;
 
   Pointer<clib.CContext> get ptrContext => _ptrContext;
 
-  ChainEth _chainEth;
+  late ChainEth _chainEth;
 
   ChainEth get chainEth => _chainEth;
 
-  ChainEee _chainEee;
+  late ChainEee _chainEee;
 
   ChainEee get chainEee => _chainEee;
 
-  ChainBtc _chainBtc;
+  late ChainBtc _chainBtc;
 
   ChainBtc get chainBtc => _chainBtc;
 
-  Context _context;
+  late Context _context;
 
   Context get context => _context;
 

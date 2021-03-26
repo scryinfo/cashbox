@@ -12,7 +12,7 @@ import 'greeter/server.dart';
 
 void main() {
   test('ClientTransportChannel server tls', () async {
-    Process serverTls1;
+    Process? serverTls1;
     var channel = createClientChannel(() async {
       ConnectParameter re = new ConnectParameter("localhost", 50061);
       re.options = ChannelOptions(
@@ -42,7 +42,7 @@ void main() {
           null, channel.connectParameter); //由于调用失败所以，connectParameter is null
     };
     var killServer1 = () {
-      Process.killPid(serverTls1.pid);
+      Process.killPid(serverTls1!.pid);
       serverTls1 = null;
     };
     serverTls1 = await runGoServer();
@@ -63,7 +63,7 @@ void main() {
   test('ClientTransportChannel Mutual tls', () async {
     //todo 不能成功连接服务端，所以直接返回
     return;
-    Process serverTls1;
+    Process? serverTls1;
     var channel = createClientChannel(() async {
       ConnectParameter re = new ConnectParameter("localhost", 50051);
       var ca = new File('test/greeter/greeter_go/greeter_go/ca.pem')
@@ -94,7 +94,7 @@ void main() {
       expect(message1, response.message);
     };
     var killServer1 = () {
-      Process.killPid(serverTls1.pid);
+      Process.killPid(serverTls1!.pid);
       serverTls1 = null;
     };
     serverTls1 = await runGoServer();

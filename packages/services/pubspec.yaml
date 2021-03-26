@@ -2,15 +2,17 @@ name: services
 description: grpc
 
 environment:
-  sdk: '>=2.10.0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
-  grpc: 2.8.0
-  fixnum: 0.10.11
-  protobuf: ^1.0.1
-  http2: ^1.0.1
+  grpc: ^3.0.0
+  fixnum: ^1.0.0
+  protobuf: ^2.0.0
+  http2: ^2.0.0
   meta: ^1.2.4
   pem: ^1.0.1
+  logger:
+    path: ../logger
 
 dev_dependencies:
   pedantic: ^1.9.0

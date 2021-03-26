@@ -11,6 +11,10 @@
 // AppPlatformType_x86_64_unknown_linux_gnu AppPlatformType = "x86_64-unknown-linux-gnu"
 // )
 
+import 'dart:developer';
+
+import 'package:logger/logger.dart';
+const _tag = "enum_const.dart";
 enum AppPlatformType {
   any,
   aarch64_linux_android,
@@ -23,7 +27,7 @@ enum AppPlatformType {
 
 extension AppPlatformTypeEx on AppPlatformType {
   static AppPlatformType from(String chainType) {
-    AppPlatformType re;
+    AppPlatformType re = AppPlatformType.any;
     switch (chainType) {
       case "any":
         re = AppPlatformType.any;
@@ -48,10 +52,8 @@ extension AppPlatformTypeEx on AppPlatformType {
         break;
       default:
         {
-//todo log
-// let err = format!("the str:{} can not be ChainType", chain_type);
-// log.error!("{}", err);
-          re = null;
+          Logger.getInstance().f(_tag, "not support $chainType");
+          throw new Exception("not support $chainType");
         }
     }
     return re;

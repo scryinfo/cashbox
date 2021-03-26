@@ -107,7 +107,7 @@ macro_rules! promise_c_struct {
         promise_c_struct!($($t2), +);
     };
 }
-promise_c_struct!(c_char, i32, i64, u32, u64, f32, f64);
+promise_c_struct!(c_char, i16,i32, i64, u8,u16,u32, u64, f32, f64);
 /// 实现drop, 要求实现 trait CStruct
 #[macro_export]
 macro_rules! drop_ctype {

@@ -26,18 +26,18 @@ typedef _ReFreshCall = Future<ConnectParameter> Function();
 
 //刷新服务端连接参数
 class _ReFreshParameter extends Function {
-  ConnectParameter _connectParameter;
+  ConnectParameter? _connectParameter;
   final _ReFreshCall _refreshCall;
 
   _ReFreshParameter(this._refreshCall);
 
-  ConnectParameter get connectParameter => _connectParameter;
+  ConnectParameter? get connectParameter => _connectParameter;
 
   void _resetConnectParameter() {
     _connectParameter = null;
   }
 
-  Future<ConnectParameter> _refreshParameter() async {
+  Future<ConnectParameter?> _refreshParameter() async {
     if (_connectParameter != null) {
       return _connectParameter;
     }
@@ -53,7 +53,7 @@ class _ReFreshParameter extends Function {
 @visibleForTesting
 class ClientTransportChannel implements $channel.ClientChannel {
   // TODO: Multiple connections, load balancing.
-  ClientConnection _connection;
+  ClientConnection? _connection;
 
   bool _isShutdown = false;
 
@@ -79,13 +79,13 @@ class ClientTransportChannel implements $channel.ClientChannel {
   Future<void> shutdown() async {
     if (_isShutdown) return;
     _isShutdown = true;
-    if (_connection != null) await _connection.shutdown();
+    if (_connection != null) await _connection!.shutdown();
   }
 
   @override
   Future<void> terminate() async {
     _isShutdown = true;
-    if (_connection != null) await _connection.terminate();
+    if (_connection != null) await _connection!.terminate();
   }
 
   Future<ClientConnection> getConnection() async {
@@ -112,7 +112,7 @@ class ClientTransportChannel implements $channel.ClientChannel {
   }
 
   @visibleForTesting
-  ConnectParameter get connectParameter => _refreshParameter.connectParameter;
+  ConnectParameter? get connectParameter => _refreshParameter.connectParameter;
 
   //连接出错时，reset ConnectParameter
   void _onConnectionError(error) {
@@ -129,7 +129,7 @@ typedef _ErrorCall = void Function(dynamic);
 
 class _ClientCallError<Q, R> extends ClientCall<Q, R> {
   _ErrorCall _errCall;
-  Stream<R> _stream = null;
+  Stream<R>? _stream = null;
 
   _ClientCallError(ClientMethod<Q, R> method, Stream<Q> requests,
       CallOptions options, _ErrorCall this._errCall,
@@ -155,6 +155,6 @@ class _ClientCallError<Q, R> extends ClientCall<Q, R> {
         }
       });
     }
-    return _stream;
+    return _stream!;
   }
 }

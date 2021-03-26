@@ -2,7 +2,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'package:path/path.dart' as pathLib;
 
-String _platformPath(String name, {String path}) {
+String _platformPath(String name, {String? path}) {
   if (path == null) path = "";
   String dlPath = "";
   if (Platform.isLinux || Platform.isAndroid) {
@@ -20,7 +20,7 @@ String _platformPath(String name, {String path}) {
   return dlPath;
 }
 
-DynamicLibrary dlOpenPlatformSpecific(String name, {String path}) {
+DynamicLibrary dlOpenPlatformSpecific(String name, {String? path}) {
   String fullPath = _platformPath(name, path: path);
   return DynamicLibrary.open(fullPath);
 }
