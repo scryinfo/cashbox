@@ -86,7 +86,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             ..contractAddress = element.contractAddress
             ..decimal = element.ethChainTokenShared.decimal
             ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
-            ..isVisible = element.show.isTrue();
+            ..isVisible = element.show_1.isTrue();
           nativeTokenMList.add(tokenM);
         });
         break;

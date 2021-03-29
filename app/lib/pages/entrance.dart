@@ -124,7 +124,7 @@ class _EntrancePageState extends State<EntrancePage> {
     ///check and update  EeeChain txVersion and runtimeVersion
 
     try {
-      SubChainBasicInfo defaultBasicInfo = EthChainControl.getInstance().getDefaultBasicInfo(NetType.Main);
+      SubChainBasicInfo defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo(NetType.Main);
       if (defaultBasicInfo == null ||
           defaultBasicInfo.runtimeVersion == null ||
           defaultBasicInfo.txVersion == null ||

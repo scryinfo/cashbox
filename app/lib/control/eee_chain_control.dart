@@ -51,7 +51,7 @@ class EeeChainControl {
         ..shortName = element.eeeChainTokenShared.tokenShared.symbol ?? ""
         ..urlImg = element.eeeChainTokenShared.tokenShared.logoUrl ?? ""
         // ..contractAddress = element.contractAddress ?? ""
-        ..isVisible = element.show.isTrue()
+        ..isVisible = element.show_1.isTrue()
         // ..tokenId = element.ethChainTokenShared.tokenShared.id
         ..decimal = element.eeeChainTokenShared.decimal ?? 0;
       if (element.eeeChainTokenShared.tokenShared.name.toLowerCase() == "eee") {
