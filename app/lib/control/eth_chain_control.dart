@@ -22,6 +22,22 @@ class EthChainControl {
 
   List<TokenM> _allTokenList = [];
 
+  List<TokenM> getTokenListWithBalance(List<TokenM> tokenList) {
+    tokenList.forEach((element) {
+      // todo getTokenBalance(tokenName)
+      // element.balance = BalanceControl.getInstance().getBalanceByTokenId(); // todo lack element.ethChainTokenShared.tokenShared
+    });
+    return tokenList;
+  }
+
+  List<TokenM> getTokenListWithMoney(List<TokenM> tokenList) {
+    tokenList.forEach((element) {
+      // todo getTokenRate()
+      element.money = TokenRate.instance.getPrice(element).toStringAsFixed(6);
+    });
+    return tokenList;
+  }
+
   List<TokenM> getAllTokenList(Wallet nowWallet) {
     if (nowWallet == null) {
       return [];
@@ -39,21 +55,11 @@ class EthChainControl {
         ..isVisible = element.show.isTrue()
         // ..tokenId = element.ethChainTokenShared.tokenShared.id
         ..decimal = element.ethChainTokenShared.decimal ?? 0;
-
       if (element.ethChainTokenShared.tokenShared.symbol.toLowerCase() == ChainType.ETH.toEnumString().toLowerCase()) {
         newToken.address = nowWallet.ethChain.chainShared.walletAddress.address;
       }
       _allTokenList.add(newToken);
     });
-
-    _allTokenList.forEach((element) {
-      // todo getTokenBalance(tokenName)
-      // element.balance = BalanceControl.getInstance().getBalanceByTokenId(); // todo lack element.ethChainTokenShared.tokenShared
-      // todo .tokenId?
-      // todo getTokenRate()
-      element.money = TokenRate.instance.getPrice(element).toStringAsFixed(6);
-    });
-
     return _allTokenList;
   }
 

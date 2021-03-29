@@ -122,7 +122,24 @@ class _EntrancePageState extends State<EntrancePage> {
     }
 
     ///check and update  EeeChain txVersion and runtimeVersion
-    // todo
+
+    try {
+      SubChainBasicInfo defaultBasicInfo = EthChainControl.getInstance().getDefaultBasicInfo(NetType.Main);
+      if (defaultBasicInfo == null ||
+          defaultBasicInfo.runtimeVersion == null ||
+          defaultBasicInfo.txVersion == null ||
+          serverConfigModel.eeeRuntimeV == null ||
+          serverConfigModel.eeeTxV == null ||
+          defaultBasicInfo.runtimeVersion.toString() != serverConfigModel.eeeRuntimeV.toString() ||
+          defaultBasicInfo.txVersion.toString() != serverConfigModel.eeeTxV.toString()) {
+        ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
+        Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // todo update DefaultBasicInfo()
+        Logger().i("updateSubChainBasicInfo  ", "result map is --->" + map.toString());
+      }
+    } catch (e) {
+      Logger().e("updateSubChainBasicInfo error is ---> ", e.toString());
+    }
+
     /*try {
           ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
           Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0); // get local default Eee chain info
@@ -142,7 +159,6 @@ class _EntrancePageState extends State<EntrancePage> {
           Logger().e("updateSubChainBasicInfo error is ---> ", e.toString());
         }*/
 
-    UpdateConfigInfo:
     {
       config.lastTimeConfigCheck = DateTime.now().millisecondsSinceEpoch;
       config.privateConfig.authDigitVersion = serverConfigModel.authTokenListVersion;
@@ -159,6 +175,12 @@ class _EntrancePageState extends State<EntrancePage> {
           config.privateConfig.authDigitIpList.add(element);
         });
       }
+      config.privateConfig.defaultDigitIpList = [];
+      serverConfigModel.defaultTokenUrl.forEach((element) {
+        config.privateConfig.defaultDigitIpList.add(element);
+      });
+      // save changed config
+      HandleConfig.instance.saveConfig(config);
     }
 
     UpdateDefaultToken: //update defaultDigitList to native
@@ -166,11 +188,6 @@ class _EntrancePageState extends State<EntrancePage> {
       if (serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
         break UpdateDefaultToken;
       }
-      config.privateConfig.defaultDigitIpList = [];
-      serverConfigModel.defaultTokenUrl.forEach((element) {
-        config.privateConfig.defaultDigitIpList.add(element);
-      });
-
       try {
         EthTokenOpen_QueryReq openQueryReq = new EthTokenOpen_QueryReq();
         PageReq pageReq = PageReq();
@@ -210,9 +227,6 @@ class _EntrancePageState extends State<EntrancePage> {
         break UpdateDefaultToken;
       }
     }
-
-    // save changed config
-    HandleConfig.instance.saveConfig(config);
   }
 
   //Check if a wallet has been created

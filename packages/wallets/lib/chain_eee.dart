@@ -128,6 +128,27 @@ class ChainEee {
     return DlResult1(subChainBasicInfo, err);
   }
 
+  DlResult1<SubChainBasicInfo> getDefaultBasicInfo(NetType netType) {
+    Error err;
+    SubChainBasicInfo subChainBasicInfo;
+    {
+      var ptrSubChainBasicInfo = Wallets.cWallets.CSubChainBasicInfo_dAlloc();
+      var ptrNetType = netType.toEnumString().toCPtrInt8();
+      var cerr = Wallets.cWallets.ChainEee_getDefaultBasicInfo(_ptrContext, ptrNetType, ptrSubChainBasicInfo);
+      err = Error.fromC(cerr);
+      Wallets.cWallets.CError_free(cerr);
+      ptrNetType.free();
+
+      if (err.isSuccess()) {
+        subChainBasicInfo = SubChainBasicInfo.fromC(ptrSubChainBasicInfo.value);
+      } else {
+        subChainBasicInfo = new SubChainBasicInfo();
+      }
+      Wallets.cWallets.CSubChainBasicInfo_dFree(ptrSubChainBasicInfo);
+    }
+    return DlResult1(subChainBasicInfo, err);
+  }
+
   DlResult1<String> getStorageKey(
       NetType netType, StorageKeyParameters storageKeyParameters) {
     Error err;

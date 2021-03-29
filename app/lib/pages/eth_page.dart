@@ -33,6 +33,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dart';
 
 class EthPage extends StatefulWidget {
   const EthPage({Key key, this.isForceLoadFromJni}) : super(key: key);
@@ -157,6 +158,18 @@ class _EthPageState extends State<EthPage> {
         if (balance == null || double.parse(balance) == double.parse("0")) {
           continue;
         }
+        // todo verify tokenAddress implement
+        // TokenAddress tokenAddress = TokenAddress()
+        //   ..walletId = WalletsControl
+        //       .getInstance()
+        //       .currentWallet()
+        //       .id
+        //   ..chainType = WalletsControl.getInstance().currentChainType()
+        //   ..tokenId = this.displayTokenMList[index].tokenId
+        //   ..addressid = WalletsControl.getInstance().currentChainAddress()
+        //   ..balance = balance;
+        // WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress)
+
         allVisibleTokenMList[index].balance = balance ?? "0";
         if (mounted) {
           setState(() {

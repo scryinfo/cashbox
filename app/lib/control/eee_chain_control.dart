@@ -21,6 +21,22 @@ class EeeChainControl {
 
   List<TokenM> _allTokenList = [];
 
+  List<TokenM> getTokenListWithBalance(List<TokenM> tokenList) {
+    tokenList.forEach((element) {
+      // todo getTokenBalance(tokenName)
+      // element.balance = BalanceControl.getInstance().getBalanceByTokenId(); // todo lack element.ethChainTokenShared.tokenShared
+    });
+    return tokenList;
+  }
+
+  List<TokenM> getTokenListWithMoney(List<TokenM> tokenList) {
+    tokenList.forEach((element) {
+      // todo getTokenRate()
+      element.money = TokenRate.instance.getPrice(element).toStringAsFixed(6);
+    });
+    return tokenList;
+  }
+
   List<TokenM> getAllTokenList(Wallet nowWallet) {
     if (nowWallet == null) {
       return [];
@@ -43,15 +59,6 @@ class EeeChainControl {
       }
       _allTokenList.add(newToken);
     });
-
-    _allTokenList.forEach((element) {
-      // todo getTokenBalance(tokenName)
-      // element.balance = BalanceControl.getInstance().getBalanceByTokenId(); // todo lack element.ethChainTokenShared.tokenShared
-      // todo .tokenId?
-      // todo getTokenRate()
-      element.money = TokenRate.instance.getPrice(element).toStringAsFixed(6);
-    });
-
     return _allTokenList;
   }
 
@@ -97,6 +104,14 @@ class EeeChainControl {
 
   AccountInfo decodeAccountInfo(NetType netType, DecodeAccountInfoParameters decodeAccountInfoParameters) {
     var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(netType, decodeAccountInfoParameters);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  SubChainBasicInfo getDefaultBasicInfo(NetType netType) {
+    var dataObj = Wallets.mainIsolate().chainEee.getDefaultBasicInfo(netType);
     if (!dataObj.isSuccess()) {
       return null;
     }
