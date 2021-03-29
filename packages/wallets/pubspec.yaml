@@ -34,6 +34,12 @@ ffigen:
   headers:
     entry-points:
       - '../../bc/wallets_cdl/src/wallets_c.h'
-#  llvm-path: 'd:/lang/LLVM/bin'
+#  llvm-path:
+#    - 'd:/lang/LLVM/bin'
+#  compiler-opts:
+#    - '-Id:/lang/LLVM/include -Ld:/lang/LLVM/lib'
+#  compiler-opts-automatic:
+#    macos:
+#      include-c-standard-library: false
 #  typedef-map:
 #    'bool': 'Uint32'

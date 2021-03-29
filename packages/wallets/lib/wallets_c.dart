@@ -17,6 +17,63 @@ class CWallets {
           lookup)
       : _lookup = lookup;
 
+  void __va_start(
+    ffi.Pointer<ffi.Pointer<ffi.Int8>> arg0,
+  ) {
+    return ___va_start(
+      arg0,
+    );
+  }
+
+  late final ___va_start_ptr =
+      _lookup<ffi.NativeFunction<_c___va_start>>('__va_start');
+  late final _dart___va_start ___va_start =
+      ___va_start_ptr.asFunction<_dart___va_start>();
+
+  void __security_init_cookie() {
+    return ___security_init_cookie();
+  }
+
+  late final ___security_init_cookie_ptr =
+      _lookup<ffi.NativeFunction<_c___security_init_cookie>>(
+          '__security_init_cookie');
+  late final _dart___security_init_cookie ___security_init_cookie =
+      ___security_init_cookie_ptr.asFunction<_dart___security_init_cookie>();
+
+  void __security_check_cookie(
+    int _StackCookie,
+  ) {
+    return ___security_check_cookie(
+      _StackCookie,
+    );
+  }
+
+  late final ___security_check_cookie_ptr =
+      _lookup<ffi.NativeFunction<_c___security_check_cookie>>(
+          '__security_check_cookie');
+  late final _dart___security_check_cookie ___security_check_cookie =
+      ___security_check_cookie_ptr.asFunction<_dart___security_check_cookie>();
+
+  void __report_gsfailure(
+    int _StackCookie,
+  ) {
+    return ___report_gsfailure(
+      _StackCookie,
+    );
+  }
+
+  late final ___report_gsfailure_ptr =
+      _lookup<ffi.NativeFunction<_c___report_gsfailure>>('__report_gsfailure');
+  late final _dart___report_gsfailure ___report_gsfailure =
+      ___report_gsfailure_ptr.asFunction<_dart___report_gsfailure>();
+
+  late final ffi.Pointer<ffi.Uint64> ___security_cookie =
+      _lookup<ffi.Uint64>('__security_cookie');
+
+  int get __security_cookie => ___security_cookie.value;
+
+  set __security_cookie(int value) => ___security_cookie.value = value;
+
   /// alloc ** [parameters::CContext]
   ffi.Pointer<ffi.Pointer<CContext>> CContext_dAlloc() {
     return _CContext_dAlloc();
@@ -1670,8 +1727,6 @@ class CWallets {
           _dart_ChainEth_getNonAuthTokenList>();
 }
 
-class __fsid_t extends ffi.Opaque {}
-
 class CContext extends ffi.Struct {
   external ffi.Pointer<ffi.Int8> id;
 
@@ -2344,115 +2399,21 @@ class CEthRawTxPayload extends ffi.Struct {
   external ffi.Pointer<ffi.Int8> rawTx;
 }
 
-const int _STDINT_H = 1;
+const int _SAL_VERSION = 20;
 
-const int _FEATURES_H = 1;
+const int __SAL_H_VERSION = 180000000;
 
-const int _DEFAULT_SOURCE = 1;
+const int _USE_DECLSPECS_FOR_SAL = 0;
 
-const int __GLIBC_USE_ISOC2X = 1;
+const int _USE_ATTRIBUTES_FOR_SAL = 0;
 
-const int __USE_ISOC11 = 1;
+const int _CRT_PACKING = 8;
 
-const int __USE_ISOC99 = 1;
+const int _HAS_EXCEPTIONS = 1;
 
-const int __USE_ISOC95 = 1;
+const int _WCHAR_T_DEFINED = 1;
 
-const int _POSIX_SOURCE = 1;
-
-const int _POSIX_C_SOURCE = 200809;
-
-const int __USE_POSIX = 1;
-
-const int __USE_POSIX2 = 1;
-
-const int __USE_POSIX199309 = 1;
-
-const int __USE_POSIX199506 = 1;
-
-const int __USE_XOPEN2K = 1;
-
-const int __USE_XOPEN2K8 = 1;
-
-const int _ATFILE_SOURCE = 1;
-
-const int __USE_MISC = 1;
-
-const int __USE_ATFILE = 1;
-
-const int __USE_FORTIFY_LEVEL = 0;
-
-const int __GLIBC_USE_DEPRECATED_GETS = 0;
-
-const int __GLIBC_USE_DEPRECATED_SCANF = 0;
-
-const int _STDC_PREDEF_H = 1;
-
-const int __STDC_IEC_559__ = 1;
-
-const int __STDC_IEC_559_COMPLEX__ = 1;
-
-const int __STDC_ISO_10646__ = 201706;
-
-const int __GNU_LIBRARY__ = 6;
-
-const int __GLIBC__ = 2;
-
-const int __GLIBC_MINOR__ = 31;
-
-const int _SYS_CDEFS_H = 1;
-
-const int __glibc_c99_flexarr_available = 1;
-
-const int __WORDSIZE = 64;
-
-const int __WORDSIZE_TIME64_COMPAT32 = 1;
-
-const int __SYSCALL_WORDSIZE = 64;
-
-const int __LONG_DOUBLE_USES_FLOAT128 = 0;
-
-const int __HAVE_GENERIC_SELECTION = 0;
-
-const int __GLIBC_USE_LIB_EXT2 = 1;
-
-const int __GLIBC_USE_IEC_60559_BFP_EXT = 1;
-
-const int __GLIBC_USE_IEC_60559_BFP_EXT_C2X = 1;
-
-const int __GLIBC_USE_IEC_60559_FUNCS_EXT = 1;
-
-const int __GLIBC_USE_IEC_60559_FUNCS_EXT_C2X = 1;
-
-const int __GLIBC_USE_IEC_60559_TYPES_EXT = 1;
-
-const int _BITS_TYPES_H = 1;
-
-const int __TIMESIZE = 64;
-
-const int _BITS_TYPESIZES_H = 1;
-
-const int __OFF_T_MATCHES_OFF64_T = 1;
-
-const int __INO_T_MATCHES_INO64_T = 1;
-
-const int __RLIM_T_MATCHES_RLIM64_T = 1;
-
-const int __STATFS_MATCHES_STATFS64 = 1;
-
-const int __FD_SETSIZE = 1024;
-
-const int _BITS_TIME64_H = 1;
-
-const int _BITS_WCHAR_H = 1;
-
-const int __WCHAR_MAX = 2147483647;
-
-const int __WCHAR_MIN = -2147483648;
-
-const int _BITS_STDINT_INTN_H = 1;
-
-const int _BITS_STDINT_UINTN_H = 1;
+const int NULL = 0;
 
 const int INT8_MIN = -128;
 
@@ -2504,25 +2465,25 @@ const int UINT_LEAST64_MAX = -1;
 
 const int INT_FAST8_MIN = -128;
 
-const int INT_FAST16_MIN = -9223372036854775808;
+const int INT_FAST16_MIN = -2147483648;
 
-const int INT_FAST32_MIN = -9223372036854775808;
+const int INT_FAST32_MIN = -2147483648;
 
 const int INT_FAST64_MIN = -9223372036854775808;
 
 const int INT_FAST8_MAX = 127;
 
-const int INT_FAST16_MAX = 9223372036854775807;
+const int INT_FAST16_MAX = 2147483647;
 
-const int INT_FAST32_MAX = 9223372036854775807;
+const int INT_FAST32_MAX = 2147483647;
 
 const int INT_FAST64_MAX = 9223372036854775807;
 
 const int UINT_FAST8_MAX = 255;
 
-const int UINT_FAST16_MAX = -1;
+const int UINT_FAST16_MAX = 4294967295;
 
-const int UINT_FAST32_MAX = -1;
+const int UINT_FAST32_MAX = 4294967295;
 
 const int UINT_FAST64_MAX = -1;
 
@@ -2542,19 +2503,47 @@ const int PTRDIFF_MIN = -9223372036854775808;
 
 const int PTRDIFF_MAX = 9223372036854775807;
 
+const int SIZE_MAX = -1;
+
 const int SIG_ATOMIC_MIN = -2147483648;
 
 const int SIG_ATOMIC_MAX = 2147483647;
 
-const int SIZE_MAX = -1;
+const int WCHAR_MIN = 0;
 
-const int WCHAR_MIN = -2147483648;
-
-const int WCHAR_MAX = 2147483647;
+const int WCHAR_MAX = 65535;
 
 const int WINT_MIN = 0;
 
-const int WINT_MAX = 4294967295;
+const int WINT_MAX = 65535;
+
+typedef _c___va_start = ffi.Void Function(
+  ffi.Pointer<ffi.Pointer<ffi.Int8>> arg0,
+);
+
+typedef _dart___va_start = void Function(
+  ffi.Pointer<ffi.Pointer<ffi.Int8>> arg0,
+);
+
+typedef _c___security_init_cookie = ffi.Void Function();
+
+typedef _dart___security_init_cookie = void Function();
+
+typedef _c___security_check_cookie = ffi.Void Function(
+  ffi.Uint64 _StackCookie,
+);
+
+typedef _dart___security_check_cookie = void Function(
+  int _StackCookie,
+);
+
+typedef _c___report_gsfailure = ffi.Void Function(
+  ffi.Uint64 _StackCookie,
+);
+
+typedef _dart___report_gsfailure = void Function(
+  int _StackCookie,
+);
 
 typedef _c_CContext_dAlloc = ffi.Pointer<ffi.Pointer<CContext>> Function();
 
