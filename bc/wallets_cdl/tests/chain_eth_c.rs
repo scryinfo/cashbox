@@ -10,7 +10,8 @@ use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
 };
 
 use mav::ma::{EthTokenType};
-use wallets_cdl::mem_c::{CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenDefault_dFree, CArrayCEthChainTokenNonAuth_dAlloc, CArrayCEthChainTokenNonAuth_dFree};
+use wallets_cdl::mem_c::{CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenDefault_dFree, CArrayCEthChainTokenNonAuth_dAlloc, CArrayCEthChainTokenNonAuth_dFree, CArrayCWallet_dAlloc};
+use wallets_cdl::wallets_c::Wallets_all;
 
 mod data;
 
@@ -19,7 +20,7 @@ fn eth_tx_sign_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let wallet =   data::create_wallet(c_ctx);
@@ -51,7 +52,7 @@ fn eth_raw_tx_sign_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let wallet =   data::create_wallet(c_ctx);
@@ -76,7 +77,7 @@ fn eth_decode_addition_data_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let addition_data = wallets_cdl::mem_c::CStr_dAlloc();
@@ -94,7 +95,7 @@ fn eth_update_default_token_list_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         //CEthChainTokenDefault
@@ -140,6 +141,11 @@ fn eth_update_default_token_list_test() {
         let c_err = chain_eth_c::ChainEth_updateDefaultTokenList(*c_ctx, c_tokens) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
+        let _wallet_test = data::create_wallet(c_ctx);
+        let c_array_wallet = CArrayCWallet_dAlloc();
+        let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
         c_tokens.free();
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
@@ -150,7 +156,7 @@ fn eth_update_auth_token_list_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         //CEthChainTokenDefault
@@ -187,7 +193,7 @@ fn query_eth_auth_token_list_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let token_auth = CArrayCEthChainTokenAuth_dAlloc();
@@ -204,7 +210,7 @@ fn query_eth_default_token_list_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let token_default = CArrayCEthChainTokenDefault_dAlloc();
@@ -222,7 +228,7 @@ fn eth_update_non_auth_token_list_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         //CEthChainTokenDefault
@@ -260,7 +266,7 @@ fn query_eth_non_auth_token_list_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
-        let c_err = init_parameters(c_ctx);
+        let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let token_default = CArrayCEthChainTokenNonAuth_dAlloc();

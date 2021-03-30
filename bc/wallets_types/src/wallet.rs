@@ -30,9 +30,12 @@ impl Wallet {
     pub async fn all(context: &dyn ContextTrait) -> Result<Vec<Wallet>, WalletError> {
         let mut ws = Vec::new();
         let dws = MWallet::list(context.db().wallets_db(), "").await?;
+        log::debug!("log output test,wallet size: 1");
+        log::debug!("wallet size:{}",dws.len());
         for dw in &dws {
             let mut w = Wallet::default();
             w.load(context, dw.clone()).await?;
+            log::debug!("wallet detail is {:?}",w);
             ws.push(w);
         }
         Ok(ws)

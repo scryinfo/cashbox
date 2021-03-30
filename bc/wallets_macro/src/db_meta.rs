@@ -162,16 +162,16 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
                         if let Some(GenericArgument::Type(Type::Path(TypePath { path, .. }))) = args.last() {
                             format!("{}<{}>", ident.to_string(), path.segments.last().expect("ident.to_string(),path.segments.last()").ident.to_string())
                         } else {
-                            panic!(format!("generate create table is not support type {} -- {} -- AngleBracketed args is None", type_name, col_name))
+                            panic!("{}",format!("generate create table is not support type {} -- {} -- AngleBracketed args is None", type_name, col_name))
                         }
                     }
-                    PathArguments::Parenthesized(_) => panic!(format!("generate create table is not support type {} -- {} -- Parenthesized", type_name, col_name)),
+                    PathArguments::Parenthesized(_) => panic!("{}",format!("generate create table is not support type {} -- {} -- Parenthesized", type_name, col_name)),
                 }
             } else {
-                panic!(format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
+                panic!("{}",format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
             }
         } else {
-            panic!(format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
+            panic!("{}",format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
         };
 
         let col = match type_name.as_str() {
@@ -208,7 +208,7 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
                 if flatten {
                     format!("{},", tm.set_sub(type_name.as_str()))
                 } else {
-                    panic!(format!("generate create table is not support type {} -- {}", type_name, col_name))
+                    panic!("{}",format!("generate create table is not support type {} -- {}", type_name, col_name))
                 }
             }
         };

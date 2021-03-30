@@ -262,7 +262,8 @@ pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CErro
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut CArray<CWallet>) -> *const CError {
-    log::debug!("enter Wallets_all");
+    //log::debug!("enter Wallets_all");
+    log::debug!("enter Wallets_all******************************");
     if ctx.is_null() || arrayWallet.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or arrayWallet is null");
         log::info!("{}", err);
@@ -278,15 +279,19 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
             Some(wallets) => match block_on(wallets.all()) {
                 Ok(wallet_vec) => {
                     *arrayWallet = CArray::to_c_ptr(&wallet_vec);
+                    log::debug!("convert to c wallet struct size is:{}",wallet_vec.len());
                     Error::SUCCESS()
                 }
-                Err(err) => Error::from(err),
+                Err(err) => {
+                    log::debug!("wallets all error:{:?}",err);
+                    Error::from(err)
+                },
             },
             None => Error::NONE().append_message(": can not find the context"),
         }
     };
 
-    log::debug!("{}", err);
+    log::debug!("Wallets all query over,{}", err);
     CError::to_c_ptr(&err)
 }
 

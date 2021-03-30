@@ -173,11 +173,11 @@ impl Load for BtcChain {
             self.chain_shared.set_addr(context,&wallet_id,&chain_type).await?;
         }
 
-        {//load address
+       /* {//load address
             let mut addr = Address::default();
             addr.load(context,&self.chain_shared.wallet_id,&self.chain_shared.chain_type).await?;
             self.chain_shared.wallet_address= addr;
-        }
+        }*/
         {//load token
             let rb = context.db().data_db( &NetType::from(&mw.net_type));
             let wrapper = rb.new_wrapper()

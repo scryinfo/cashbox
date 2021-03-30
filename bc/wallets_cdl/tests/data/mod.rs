@@ -29,7 +29,7 @@ pub fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
             name: "test".to_owned(),
             password: "123456".to_string(),
             mnemonic: mnemonic.clone(),
-            wallet_type: WalletType::Test.to_string(),
+            wallet_type: WalletType::Normal.to_string(),
         });
         let c_wallet = CWallet_dAlloc();
         let c_err = Wallets_createWallet(*c_ctx, c_parameters, c_wallet) as *mut CError;

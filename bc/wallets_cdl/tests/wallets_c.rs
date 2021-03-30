@@ -183,6 +183,21 @@ fn platform_type_test() {
         CStr_free(ptr);
     }
 }
+#[test]
+fn wallets_all_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = data::init_wallets_context(c_ctx);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let c_array_wallet = CArrayCWallet_dAlloc();
+        let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+    }
+}
+
 
 #[test]
 #[ignore]

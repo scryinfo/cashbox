@@ -7,7 +7,7 @@ cd $batPath/../../../packages/wallets
 outPath=$(pwd)
 
 cd $batPath/..
-cargo build --target $HOST_TAG
+cargo build --release --target $HOST_TAG
 
 cd %batPath%../../target/$HOST_TAG/debug
 cp "wallets_cdl.so" "%outPath%/"
