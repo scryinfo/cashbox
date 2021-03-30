@@ -5,6 +5,10 @@ set cuPath=%cd
 set batPath=%~dp0
 set outPath=%batPath%dl/arm64-v8a
 
+%~d0
+cd "%batPath%"
+mkdir dl\arm64-v8a
+
 call "%batPath%/../cdl/script/%buildFile%"
 %~d0
 cd "%batPath%../target/aarch64-linux-android/release"
@@ -31,6 +35,5 @@ EndLocal
 cd "%batPath%../orm_diesel/target/aarch64-linux-android/release/"
 copy /Y "liborm_diesel.so" "%outPath%"
 
-cd "%cuPath%"
 EndLocal
 

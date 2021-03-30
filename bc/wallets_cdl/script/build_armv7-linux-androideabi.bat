@@ -25,6 +25,4 @@ cargo build --release --target %HOST_TAG%
 cd "$batPath/../../target/%HOST_TAG%/release"
 copy /Y "libwallets_cdl.so" "%outPath%/"
 
-cd "%cuPath%"
-
 EndLocal

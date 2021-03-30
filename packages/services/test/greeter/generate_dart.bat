@@ -7,5 +7,4 @@ cd "%batPath%"
 
 protoc --dart_out=grpc:./ greeter.proto
 
-cd "%batPath%"
 EndLocal

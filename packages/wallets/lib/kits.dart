@@ -4,8 +4,8 @@ import 'package:path/path.dart' as pathLib;
 import 'package:ffi/ffi.dart' as ffi;
 import 'package:wallets/wallets_c.dc.dart';
 
-const int CTrue = 1;
-const int CFalse = 0;
+const int CTrue = 0;
+const int CFalse = 1;
 //分配置内存并清零
 Pointer<T> allocateZero<T extends NativeType>({int count = 1}) {
   final int totalSize = count * sizeOf<T>();
@@ -17,7 +17,7 @@ Pointer<T> allocateZero<T extends NativeType>({int count = 1}) {
   return ptr;
 }
 
-//dart 与 c struct之间相互转换
+//dart <=> c struct
 abstract class DC<C extends NativeType> {
   //把数据转换为指针类型，会分配内存，记得释放内存
   Pointer<C> toCPtr();
@@ -35,28 +35,20 @@ abstract class DC<C extends NativeType> {
 }
 
 extension ErrorEx on Error {
-  bool isSuccess() => this.code == 0;
-}
-
-//str转换为 Pointer<ffi.Utf8>类型，这里会分配内存，需要调用free释放内存
-Pointer<ffi.Utf8> toUtf8Null(String str) {
-  return str.toNativeUtf8();
+  bool isSuccess() => this.code.isTrue();
 }
 
 //指针转抽象为string类型
-String fromInt8Null(Pointer<Int8> ptr) {
-  if (ptr == nullptr) {
-    return "";
-  }
-  return ptr.cast<ffi.Utf8>().toDartString();
+String fromUtf8Null(Pointer<ffi.Utf8> ptr) {
+  return ptr == nullptr ? "" : ptr.toDartString();
 }
 
 extension StringEx on String {
   Pointer<ffi.Utf8> toCPtrUtf8() {
-    return toUtf8Null(this);
+    return this.toNativeUtf8();
   }
   Pointer<Int8> toCPtrInt8() {
-    return toUtf8Null(this).cast();
+    return this.toNativeUtf8().cast();
   }
 }
 
@@ -104,7 +96,7 @@ extension Int8PtrEx on Pointer<Int8> {
     }
   }
   String toDartString(){
-    return fromInt8Null(this);
+    return this == nullptr?"":this.cast<ffi.Utf8>().toDartString();
   }
 }
 
@@ -304,7 +296,8 @@ String _platformPath(String name, {String? path}) {
   if (path == null) path = "";
   String dlPath = "";
   if (Platform.isLinux || Platform.isAndroid) {
-    dlPath = pathLib.join(path, "lib" + name + ".so");
+    // dlPath = pathLib.join(path, "lib" + name + ".so");
+    dlPath = "/home/scry/gopath/src/github.com/scryinfo/cashbox/packages/wallets/libwallets_cdl.so";
   } else if (Platform.isMacOS) {
     dlPath = pathLib.join(path, "lib" + name + ".dylib");
   } else if (Platform.isWindows) {

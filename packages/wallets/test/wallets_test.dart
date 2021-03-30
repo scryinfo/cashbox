@@ -29,31 +29,31 @@ void main() {
       }
       wallets.init(initP);
 
-      expect(true, wallets.ptrContext != null);
-      var id = wallets.ptrContext.ref.id.toDartString();
-      expect(true, id.isNotEmpty);
-      expect("dart_test", wallets.context.contextNote);
+      // expect(nullptr, isNot(equals(wallets.ptrContext)));
+      // var id = wallets.ptrContext.ref.id.toDartString();
+      // expect(true, id.isNotEmpty);
+      // expect("dart_test", wallets.context.contextNote);
     }
-    {
-      var err = wallets.safeRead(() {
-        //...
-      });
-      expect(true, err.isSuccess());
-      err = wallets.safeRead(() {
-        //...
-      });
-      expect(true, err.isSuccess());
-      err = wallets.safeWrite(() {
-        // ...
-      });
-      expect(true, err.isSuccess());
-    }
-
-    {
-      var err = await compute(computeFun, wallets.context);
-      expect(true, err.isSuccess());
-      expect(ChainType.EEE, err.data1.chainType);
-    }
+    // {
+    //   var err = wallets.safeRead(() {
+    //     //...
+    //   });
+    //   expect(true, err.isSuccess());
+    //   err = wallets.safeRead(() {
+    //     //...
+    //   });
+    //   expect(true, err.isSuccess());
+    //   err = wallets.safeWrite(() {
+    //     // ...
+    //   });
+    //   expect(true, err.isSuccess());
+    // }
+    //
+    // {
+    //   var err = await compute(computeFun, wallets.context);
+    //   expect(true, err.isSuccess());
+    //   expect(ChainType.EEE, err.data1.chainType);
+    // }
     {
       var result = wallets.generateMnemonic(12);
       expect(true, result.isSuccess());
@@ -65,11 +65,14 @@ void main() {
         parameters.walletType = WalletType.Normal.toEnumString();
       }
       var wallet = wallets.createWallet(parameters);
-      // expect(true, wallet.isSuccess());
-      // expect(parameters.name, wallet.data1.name);
+      expect(true, wallet.isSuccess());
+      expect(parameters.name, wallet.data1.name);
       // expect(true, wallet.data1.ethChain.tokens.data.isNotEmpty);
       //todo
       // expect(true, wallet.data1?.btcChain?.tokens?.data?.isNotEmpty);
+    }
+    {
+      wallets.all();
     }
     wallets.uninit();
   });

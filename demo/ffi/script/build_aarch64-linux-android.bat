@@ -2,8 +2,6 @@
 set HOST_TAG=aarch64-linux-android
 set NDK=%ANDROID_NDK%
 
-set BUILD_DUMMY_WASM_BINARY=1
-
 set TOOLCHAIN=%NDK%/toolchains/llvm/prebuilt/windows-x86_64
 set AR=%TOOLCHAIN%/bin/%HOST_TAG%-ar.exe
 set LINKER=%TOOLCHAIN%/bin/%HOST_TAG%28-clang.cmd

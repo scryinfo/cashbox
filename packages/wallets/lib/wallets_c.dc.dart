@@ -10,7 +10,7 @@ import 'package:ffi/ffi.dart' as ffi;
 import 'wallets_c.dart' as clib;
 import 'kits.dart';
 
-class Context extends DC<clib.CContext> {
+class Context implements DC<clib.CContext> {
   String id = "";
   String contextNote = "";
 
@@ -84,7 +84,7 @@ class Context extends DC<clib.CContext> {
   }
 }
 
-class ArrayCContext extends DC<clib.CArrayCContext> {
+class ArrayCContext implements DC<clib.CArrayCContext> {
   List<Context> data = <Context>[];
 
   static free(Pointer<clib.CArrayCContext> ptr) {
@@ -149,14 +149,14 @@ class ArrayCContext extends DC<clib.CArrayCContext> {
   @override
   toDartInstance(clib.CArrayCContext c) {
     data = <Context>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new Context());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class Error extends DC<clib.CError> {
+class Error implements DC<clib.CError> {
   int code = 0;
   String message = "";
 
@@ -223,7 +223,7 @@ class Error extends DC<clib.CError> {
   }
 }
 
-class Address extends DC<clib.CAddress> {
+class Address implements DC<clib.CAddress> {
   String id = "";
   String walletId = "";
   String chainType = "";
@@ -333,7 +333,7 @@ class Address extends DC<clib.CAddress> {
   }
 }
 
-class ChainShared extends DC<clib.CChainShared> {
+class ChainShared implements DC<clib.CChainShared> {
   String walletId = "";
   String chainType = "";
   Address walletAddress = new Address();
@@ -416,7 +416,7 @@ class ChainShared extends DC<clib.CChainShared> {
   }
 }
 
-class TokenShared extends DC<clib.CTokenShared> {
+class TokenShared implements DC<clib.CTokenShared> {
   String name = "";
   String symbol = "";
   String logoUrl = "";
@@ -540,7 +540,7 @@ class TokenShared extends DC<clib.CTokenShared> {
   }
 }
 
-class EthChainTokenShared extends DC<clib.CEthChainTokenShared> {
+class EthChainTokenShared implements DC<clib.CEthChainTokenShared> {
   TokenShared tokenShared = new TokenShared();
   String tokenType = "";
   int gasLimit = 0;
@@ -629,7 +629,7 @@ class EthChainTokenShared extends DC<clib.CEthChainTokenShared> {
   }
 }
 
-class EthChainToken extends DC<clib.CEthChainToken> {
+class EthChainToken implements DC<clib.CEthChainToken> {
   String chainTokenSharedId = "";
   int show_1 = 0;
   String contractAddress = "";
@@ -715,7 +715,7 @@ class EthChainToken extends DC<clib.CEthChainToken> {
   }
 }
 
-class ArrayCEthChainToken extends DC<clib.CArrayCEthChainToken> {
+class ArrayCEthChainToken implements DC<clib.CArrayCEthChainToken> {
   List<EthChainToken> data = <EthChainToken>[];
 
   static free(Pointer<clib.CArrayCEthChainToken> ptr) {
@@ -780,14 +780,14 @@ class ArrayCEthChainToken extends DC<clib.CArrayCEthChainToken> {
   @override
   toDartInstance(clib.CArrayCEthChainToken c) {
     data = <EthChainToken>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new EthChainToken());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class EthChain extends DC<clib.CEthChain> {
+class EthChain implements DC<clib.CEthChain> {
   ChainShared chainShared = new ChainShared();
   ArrayCEthChainToken tokens = new ArrayCEthChainToken();
 
@@ -859,7 +859,7 @@ class EthChain extends DC<clib.CEthChain> {
   }
 }
 
-class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
+class EeeChainTokenShared implements DC<clib.CEeeChainTokenShared> {
   TokenShared tokenShared = new TokenShared();
   String tokenType = "";
   int gasLimit = 0;
@@ -948,7 +948,7 @@ class EeeChainTokenShared extends DC<clib.CEeeChainTokenShared> {
   }
 }
 
-class EeeChainToken extends DC<clib.CEeeChainToken> {
+class EeeChainToken implements DC<clib.CEeeChainToken> {
   int show_1 = 0;
   String chainTokenSharedId = "";
   EeeChainTokenShared eeeChainTokenShared = new EeeChainTokenShared();
@@ -1024,7 +1024,7 @@ class EeeChainToken extends DC<clib.CEeeChainToken> {
   }
 }
 
-class ArrayCEeeChainToken extends DC<clib.CArrayCEeeChainToken> {
+class ArrayCEeeChainToken implements DC<clib.CArrayCEeeChainToken> {
   List<EeeChainToken> data = <EeeChainToken>[];
 
   static free(Pointer<clib.CArrayCEeeChainToken> ptr) {
@@ -1089,14 +1089,14 @@ class ArrayCEeeChainToken extends DC<clib.CArrayCEeeChainToken> {
   @override
   toDartInstance(clib.CArrayCEeeChainToken c) {
     data = <EeeChainToken>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new EeeChainToken());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class EeeChain extends DC<clib.CEeeChain> {
+class EeeChain implements DC<clib.CEeeChain> {
   ChainShared chainShared = new ChainShared();
   ArrayCEeeChainToken tokens = new ArrayCEeeChainToken();
 
@@ -1168,7 +1168,7 @@ class EeeChain extends DC<clib.CEeeChain> {
   }
 }
 
-class BtcChainTokenShared extends DC<clib.CBtcChainTokenShared> {
+class BtcChainTokenShared implements DC<clib.CBtcChainTokenShared> {
   TokenShared tokenShared = new TokenShared();
   String tokenType = "";
   int gas = 0;
@@ -1247,7 +1247,7 @@ class BtcChainTokenShared extends DC<clib.CBtcChainTokenShared> {
   }
 }
 
-class BtcChainToken extends DC<clib.CBtcChainToken> {
+class BtcChainToken implements DC<clib.CBtcChainToken> {
   int show_1 = 0;
   String chainTokenSharedId = "";
   BtcChainTokenShared btcChainTokenShared = new BtcChainTokenShared();
@@ -1323,7 +1323,7 @@ class BtcChainToken extends DC<clib.CBtcChainToken> {
   }
 }
 
-class ArrayCBtcChainToken extends DC<clib.CArrayCBtcChainToken> {
+class ArrayCBtcChainToken implements DC<clib.CArrayCBtcChainToken> {
   List<BtcChainToken> data = <BtcChainToken>[];
 
   static free(Pointer<clib.CArrayCBtcChainToken> ptr) {
@@ -1388,14 +1388,14 @@ class ArrayCBtcChainToken extends DC<clib.CArrayCBtcChainToken> {
   @override
   toDartInstance(clib.CArrayCBtcChainToken c) {
     data = <BtcChainToken>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new BtcChainToken());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class BtcChain extends DC<clib.CBtcChain> {
+class BtcChain implements DC<clib.CBtcChain> {
   ChainShared chainShared = new ChainShared();
   ArrayCBtcChainToken tokens = new ArrayCBtcChainToken();
 
@@ -1467,7 +1467,7 @@ class BtcChain extends DC<clib.CBtcChain> {
   }
 }
 
-class Wallet extends DC<clib.CWallet> {
+class Wallet implements DC<clib.CWallet> {
   String id = "";
   String nextId = "";
   String name = "";
@@ -1588,7 +1588,7 @@ class Wallet extends DC<clib.CWallet> {
   }
 }
 
-class ArrayCWallet extends DC<clib.CArrayCWallet> {
+class ArrayCWallet implements DC<clib.CArrayCWallet> {
   List<Wallet> data = <Wallet>[];
 
   static free(Pointer<clib.CArrayCWallet> ptr) {
@@ -1653,14 +1653,14 @@ class ArrayCWallet extends DC<clib.CArrayCWallet> {
   @override
   toDartInstance(clib.CArrayCWallet c) {
     data = <Wallet>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new Wallet());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class DbName extends DC<clib.CDbName> {
+class DbName implements DC<clib.CDbName> {
   String path = "";
   String prefix = "";
   String cashboxWallets = "";
@@ -1794,7 +1794,7 @@ class DbName extends DC<clib.CDbName> {
   }
 }
 
-class ArrayI64 extends DC<clib.CArrayI64> {
+class ArrayI64 implements DC<clib.CArrayI64> {
   List<int> data = <int>[];
 
   static free(Pointer<clib.CArrayI64> ptr) {
@@ -1859,13 +1859,13 @@ class ArrayI64 extends DC<clib.CArrayI64> {
   @override
   toDartInstance(clib.CArrayI64 c) {
     data = <int>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(c.ptr.elementAt(i).value);
     }
   }
 }
 
-class AccountInfoSyncProg extends DC<clib.CAccountInfoSyncProg> {
+class AccountInfoSyncProg implements DC<clib.CAccountInfoSyncProg> {
   String account = "";
   String blockNo = "";
   String blockHash = "";
@@ -1949,7 +1949,7 @@ class AccountInfoSyncProg extends DC<clib.CAccountInfoSyncProg> {
   }
 }
 
-class AccountInfo extends DC<clib.CAccountInfo> {
+class AccountInfo implements DC<clib.CAccountInfo> {
   int nonce = 0;
   int refCount = 0;
   String freeBalance = "";
@@ -2049,7 +2049,7 @@ class AccountInfo extends DC<clib.CAccountInfo> {
   }
 }
 
-class SubChainBasicInfo extends DC<clib.CSubChainBasicInfo> {
+class SubChainBasicInfo implements DC<clib.CSubChainBasicInfo> {
   String genesisHash = "";
   String metadata = "";
   int runtimeVersion = 0;
@@ -2148,7 +2148,7 @@ class SubChainBasicInfo extends DC<clib.CSubChainBasicInfo> {
   }
 }
 
-class ArrayCChar extends DC<clib.CArrayCChar> {
+class ArrayCChar implements DC<clib.CArrayCChar> {
   List<String> data = <String>[];
 
   static free(Pointer<clib.CArrayCChar> ptr) {
@@ -2213,13 +2213,13 @@ class ArrayCChar extends DC<clib.CArrayCChar> {
   @override
   toDartInstance(clib.CArrayCChar c) {
     data = <String>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(c.ptr.elementAt(i).value.toDartString());
     }
   }
 }
 
-class ChainVersion extends DC<clib.CChainVersion> {
+class ChainVersion implements DC<clib.CChainVersion> {
   String genesisHash = "";
   int runtimeVersion = 0;
   int txVersion = 0;
@@ -2289,7 +2289,7 @@ class ChainVersion extends DC<clib.CChainVersion> {
   }
 }
 
-class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
+class ExtrinsicContext implements DC<clib.CExtrinsicContext> {
   ChainVersion chainVersion = new ChainVersion();
   String account = "";
   String blockHash = "";
@@ -2401,7 +2401,7 @@ class ExtrinsicContext extends DC<clib.CExtrinsicContext> {
   }
 }
 
-class ArrayCExtrinsicContext extends DC<clib.CArrayCExtrinsicContext> {
+class ArrayCExtrinsicContext implements DC<clib.CArrayCExtrinsicContext> {
   List<ExtrinsicContext> data = <ExtrinsicContext>[];
 
   static free(Pointer<clib.CArrayCExtrinsicContext> ptr) {
@@ -2467,14 +2467,14 @@ class ArrayCExtrinsicContext extends DC<clib.CArrayCExtrinsicContext> {
   @override
   toDartInstance(clib.CArrayCExtrinsicContext c) {
     data = <ExtrinsicContext>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new ExtrinsicContext());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class TokenAddress extends DC<clib.CTokenAddress> {
+class TokenAddress implements DC<clib.CTokenAddress> {
   String walletId = "";
   String chainType = "";
   String tokenId = "";
@@ -2578,7 +2578,7 @@ class TokenAddress extends DC<clib.CTokenAddress> {
   }
 }
 
-class ArrayCTokenAddress extends DC<clib.CArrayCTokenAddress> {
+class ArrayCTokenAddress implements DC<clib.CArrayCTokenAddress> {
   List<TokenAddress> data = <TokenAddress>[];
 
   static free(Pointer<clib.CArrayCTokenAddress> ptr) {
@@ -2643,14 +2643,14 @@ class ArrayCTokenAddress extends DC<clib.CArrayCTokenAddress> {
   @override
   toDartInstance(clib.CArrayCTokenAddress c) {
     data = <TokenAddress>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new TokenAddress());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class EthChainTokenAuth extends DC<clib.CEthChainTokenAuth> {
+class EthChainTokenAuth implements DC<clib.CEthChainTokenAuth> {
   String chainTokenSharedId = "";
   String netType = "";
   int position = 0;
@@ -2746,7 +2746,7 @@ class EthChainTokenAuth extends DC<clib.CEthChainTokenAuth> {
   }
 }
 
-class ArrayCEthChainTokenAuth extends DC<clib.CArrayCEthChainTokenAuth> {
+class ArrayCEthChainTokenAuth implements DC<clib.CArrayCEthChainTokenAuth> {
   List<EthChainTokenAuth> data = <EthChainTokenAuth>[];
 
   static free(Pointer<clib.CArrayCEthChainTokenAuth> ptr) {
@@ -2812,14 +2812,14 @@ class ArrayCEthChainTokenAuth extends DC<clib.CArrayCEthChainTokenAuth> {
   @override
   toDartInstance(clib.CArrayCEthChainTokenAuth c) {
     data = <EthChainTokenAuth>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new EthChainTokenAuth());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class EthChainTokenNonAuth extends DC<clib.CEthChainTokenNonAuth> {
+class EthChainTokenNonAuth implements DC<clib.CEthChainTokenNonAuth> {
   String chainTokenSharedId = "";
   String netType = "";
   int position = 0;
@@ -2915,7 +2915,8 @@ class EthChainTokenNonAuth extends DC<clib.CEthChainTokenNonAuth> {
   }
 }
 
-class ArrayCEthChainTokenNonAuth extends DC<clib.CArrayCEthChainTokenNonAuth> {
+class ArrayCEthChainTokenNonAuth
+    implements DC<clib.CArrayCEthChainTokenNonAuth> {
   List<EthChainTokenNonAuth> data = <EthChainTokenNonAuth>[];
 
   static free(Pointer<clib.CArrayCEthChainTokenNonAuth> ptr) {
@@ -2981,14 +2982,14 @@ class ArrayCEthChainTokenNonAuth extends DC<clib.CArrayCEthChainTokenNonAuth> {
   @override
   toDartInstance(clib.CArrayCEthChainTokenNonAuth c) {
     data = <EthChainTokenNonAuth>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new EthChainTokenNonAuth());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class EthChainTokenDefault extends DC<clib.CEthChainTokenDefault> {
+class EthChainTokenDefault implements DC<clib.CEthChainTokenDefault> {
   String chainTokenSharedId = "";
   String netType = "";
   int position = 0;
@@ -3084,7 +3085,8 @@ class EthChainTokenDefault extends DC<clib.CEthChainTokenDefault> {
   }
 }
 
-class ArrayCEthChainTokenDefault extends DC<clib.CArrayCEthChainTokenDefault> {
+class ArrayCEthChainTokenDefault
+    implements DC<clib.CArrayCEthChainTokenDefault> {
   List<EthChainTokenDefault> data = <EthChainTokenDefault>[];
 
   static free(Pointer<clib.CArrayCEthChainTokenDefault> ptr) {
@@ -3150,14 +3152,14 @@ class ArrayCEthChainTokenDefault extends DC<clib.CArrayCEthChainTokenDefault> {
   @override
   toDartInstance(clib.CArrayCEthChainTokenDefault c) {
     data = <EthChainTokenDefault>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new EthChainTokenDefault());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class EeeChainTokenDefault extends DC<clib.CEeeChainTokenDefault> {
+class EeeChainTokenDefault implements DC<clib.CEeeChainTokenDefault> {
   String chainTokenSharedId = "";
   String netType = "";
   int position = 0;
@@ -3243,7 +3245,8 @@ class EeeChainTokenDefault extends DC<clib.CEeeChainTokenDefault> {
   }
 }
 
-class ArrayCEeeChainTokenDefault extends DC<clib.CArrayCEeeChainTokenDefault> {
+class ArrayCEeeChainTokenDefault
+    implements DC<clib.CArrayCEeeChainTokenDefault> {
   List<EeeChainTokenDefault> data = <EeeChainTokenDefault>[];
 
   static free(Pointer<clib.CArrayCEeeChainTokenDefault> ptr) {
@@ -3309,14 +3312,14 @@ class ArrayCEeeChainTokenDefault extends DC<clib.CArrayCEeeChainTokenDefault> {
   @override
   toDartInstance(clib.CArrayCEeeChainTokenDefault c) {
     data = <EeeChainTokenDefault>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new EeeChainTokenDefault());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class BtcChainTokenDefault extends DC<clib.CBtcChainTokenDefault> {
+class BtcChainTokenDefault implements DC<clib.CBtcChainTokenDefault> {
   String chainTokenSharedId = "";
   String netType = "";
   int position = 0;
@@ -3402,7 +3405,8 @@ class BtcChainTokenDefault extends DC<clib.CBtcChainTokenDefault> {
   }
 }
 
-class ArrayCBtcChainTokenDefault extends DC<clib.CArrayCBtcChainTokenDefault> {
+class ArrayCBtcChainTokenDefault
+    implements DC<clib.CArrayCBtcChainTokenDefault> {
   List<BtcChainTokenDefault> data = <BtcChainTokenDefault>[];
 
   static free(Pointer<clib.CArrayCBtcChainTokenDefault> ptr) {
@@ -3468,14 +3472,14 @@ class ArrayCBtcChainTokenDefault extends DC<clib.CArrayCBtcChainTokenDefault> {
   @override
   toDartInstance(clib.CArrayCBtcChainTokenDefault c) {
     data = <BtcChainTokenDefault>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new BtcChainTokenDefault());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class EeeChainTokenAuth extends DC<clib.CEeeChainTokenAuth> {
+class EeeChainTokenAuth implements DC<clib.CEeeChainTokenAuth> {
   String chainTokenSharedId = "";
   String netType = "";
   int position = 0;
@@ -3561,7 +3565,7 @@ class EeeChainTokenAuth extends DC<clib.CEeeChainTokenAuth> {
   }
 }
 
-class ArrayCEeeChainTokenAuth extends DC<clib.CArrayCEeeChainTokenAuth> {
+class ArrayCEeeChainTokenAuth implements DC<clib.CArrayCEeeChainTokenAuth> {
   List<EeeChainTokenAuth> data = <EeeChainTokenAuth>[];
 
   static free(Pointer<clib.CArrayCEeeChainTokenAuth> ptr) {
@@ -3627,14 +3631,14 @@ class ArrayCEeeChainTokenAuth extends DC<clib.CArrayCEeeChainTokenAuth> {
   @override
   toDartInstance(clib.CArrayCEeeChainTokenAuth c) {
     data = <EeeChainTokenAuth>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new EeeChainTokenAuth());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class BtcChainTokenAuth extends DC<clib.CBtcChainTokenAuth> {
+class BtcChainTokenAuth implements DC<clib.CBtcChainTokenAuth> {
   String chainTokenSharedId = "";
   String netType = "";
   int position = 0;
@@ -3720,7 +3724,7 @@ class BtcChainTokenAuth extends DC<clib.CBtcChainTokenAuth> {
   }
 }
 
-class ArrayCBtcChainTokenAuth extends DC<clib.CArrayCBtcChainTokenAuth> {
+class ArrayCBtcChainTokenAuth implements DC<clib.CArrayCBtcChainTokenAuth> {
   List<BtcChainTokenAuth> data = <BtcChainTokenAuth>[];
 
   static free(Pointer<clib.CArrayCBtcChainTokenAuth> ptr) {
@@ -3786,14 +3790,14 @@ class ArrayCBtcChainTokenAuth extends DC<clib.CArrayCBtcChainTokenAuth> {
   @override
   toDartInstance(clib.CArrayCBtcChainTokenAuth c) {
     data = <BtcChainTokenAuth>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new BtcChainTokenAuth());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class EeeChainTx extends DC<clib.CEeeChainTx> {
+class EeeChainTx implements DC<clib.CEeeChainTx> {
   String txHash = "";
   String blockHash = "";
   String blockNumber = "";
@@ -3953,7 +3957,7 @@ class EeeChainTx extends DC<clib.CEeeChainTx> {
   }
 }
 
-class ArrayCEeeChainTx extends DC<clib.CArrayCEeeChainTx> {
+class ArrayCEeeChainTx implements DC<clib.CArrayCEeeChainTx> {
   List<EeeChainTx> data = <EeeChainTx>[];
 
   static free(Pointer<clib.CArrayCEeeChainTx> ptr) {
@@ -4018,14 +4022,14 @@ class ArrayCEeeChainTx extends DC<clib.CArrayCEeeChainTx> {
   @override
   toDartInstance(clib.CArrayCEeeChainTx c) {
     data = <EeeChainTx>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new EeeChainTx());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class WalletTokenStatus extends DC<clib.CWalletTokenStatus> {
+class WalletTokenStatus implements DC<clib.CWalletTokenStatus> {
   String walletId = "";
   String chainType = "";
   String tokenId = "";
@@ -4112,7 +4116,7 @@ class WalletTokenStatus extends DC<clib.CWalletTokenStatus> {
   }
 }
 
-class InitParameters extends DC<clib.CInitParameters> {
+class InitParameters implements DC<clib.CInitParameters> {
   DbName dbName = new DbName();
   int isMemoryDb = 0;
   String contextNote = "";
@@ -4188,7 +4192,7 @@ class InitParameters extends DC<clib.CInitParameters> {
   }
 }
 
-class CreateWalletParameters extends DC<clib.CCreateWalletParameters> {
+class CreateWalletParameters implements DC<clib.CCreateWalletParameters> {
   String name = "";
   String password = "";
   String mnemonic = "";
@@ -4284,7 +4288,7 @@ class CreateWalletParameters extends DC<clib.CCreateWalletParameters> {
 }
 
 class DecodeAccountInfoParameters
-    extends DC<clib.CDecodeAccountInfoParameters> {
+    implements DC<clib.CDecodeAccountInfoParameters> {
   String encodeData = "";
   ChainVersion chainVersion = new ChainVersion();
 
@@ -4358,7 +4362,7 @@ class DecodeAccountInfoParameters
   }
 }
 
-class StorageKeyParameters extends DC<clib.CStorageKeyParameters> {
+class StorageKeyParameters implements DC<clib.CStorageKeyParameters> {
   ChainVersion chainVersion = new ChainVersion();
   String module = "";
   String storageItem = "";
@@ -4451,7 +4455,7 @@ class StorageKeyParameters extends DC<clib.CStorageKeyParameters> {
   }
 }
 
-class EeeTransferPayload extends DC<clib.CEeeTransferPayload> {
+class EeeTransferPayload implements DC<clib.CEeeTransferPayload> {
   String fromAccount = "";
   String toAccount = "";
   String value = "";
@@ -4567,7 +4571,7 @@ class EeeTransferPayload extends DC<clib.CEeeTransferPayload> {
   }
 }
 
-class RawTxParam extends DC<clib.CRawTxParam> {
+class RawTxParam implements DC<clib.CRawTxParam> {
   String rawTx = "";
   String walletId = "";
   String password = "";
@@ -4651,7 +4655,7 @@ class RawTxParam extends DC<clib.CRawTxParam> {
   }
 }
 
-class EthTransferPayload extends DC<clib.CEthTransferPayload> {
+class EthTransferPayload implements DC<clib.CEthTransferPayload> {
   String fromAddress = "";
   String toAddress = "";
   String contractAddress = "";
@@ -4788,7 +4792,7 @@ class EthTransferPayload extends DC<clib.CEthTransferPayload> {
   }
 }
 
-class EthRawTxPayload extends DC<clib.CEthRawTxPayload> {
+class EthRawTxPayload implements DC<clib.CEthRawTxPayload> {
   String fromAddress = "";
   String rawTx = "";
 

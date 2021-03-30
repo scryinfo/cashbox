@@ -66,7 +66,7 @@ import 'kits.dart';
     var typeStruct = TypeChecker.fromRuntime(Struct);
 
     classCode
-        .writeln('class ${toClassName(c.name)} extends DC<clib.${c.name}>{');
+        .writeln('class ${toClassName(c.name)} implements DC<clib.${c.name}>{');
 
     List<_FieldMeta> fieldMetas = [];
     for (var f in c.fields) {
@@ -353,7 +353,7 @@ ${toDart.toString()}  }''');
       elNameAllocate = el.name;
     }
     var className = toClassName(c.name);
-    classCode.writeln('''class ${className} extends DC<clib.${c.name}>{
+    classCode.writeln('''class ${className} implements DC<clib.${c.name}>{
   List<$elName> data = <$elName>[];
   
   static free(Pointer<clib.${c.name}> ptr) {
@@ -417,7 +417,7 @@ ${toDart.toString()}  }''');
   @override
   toDartInstance(clib.${c.name} c) {
     data =  <$elName>[];
-    for (var i = 0; i < data.length;i++) {
+    for (var i = 0; i < c.len;i++) {
       ${elementType == _FieldType.baseType ? "data.add(c.ptr.elementAt(i).value)" : (elementType == _FieldType.pointerStringUtf8 || elementType == _FieldType.pointerStringInt8 ? "data.add(c.ptr.elementAt(i).value.toDartString())" : "data.add(new $elName());      data[i].toDart(c.ptr.elementAt(i))")};
     }
   }

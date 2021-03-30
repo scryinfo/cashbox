@@ -107,7 +107,7 @@ macro_rules! promise_c_struct {
         promise_c_struct!($($t2), +);
     };
 }
-promise_c_struct!(c_char, i16,i32, i64, u8,u16,u32, u64, f32, f64);
+promise_c_struct!(c_char, i16,i32, i64, u16,u32, u64, f32, f64);
 /// 实现drop, 要求实现 trait CStruct
 #[macro_export]
 macro_rules! drop_ctype {
@@ -256,6 +256,17 @@ impl CR<*mut c_char, String> for *mut c_char {
         to_str(unsafe { *c }).to_owned()
     }
 }
+
+impl CStruct for Vec<&str>{
+    fn free(&mut self) {
+    }
+}
+
+impl CStruct for Vec<String>{
+    fn free(&mut self) {
+    }
+}
+
 
 
 pub fn d_ptr_alloc<T>() -> *mut *mut T {

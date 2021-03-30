@@ -1,25 +1,50 @@
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../generate_ffi/wallets_c.dart' as lib;
+import '../generate_ffi/cdl_c.dart' as lib;
+import '../generate_ffi/int8_string.dart';
+import '../generate_ffi/kits.dart';
+
+lib.Cdl _cdc = new lib.Cdl(dlOpenPlatformSpecific("cdl"));
 
 void main() async {
   test('test cdl', () {
-    expect(3, lib.add(1, 2));
+    {
+      //dart中字符串与指针转换
+      String str = "string";
+      Pointer<Int8> ptrStr = str.toPointerInt8();
+      expect(str, ptrStr.toDartString());
+      ptrStr.free();//不要忘记释放内存
+
+      //动态库中，从参数返回值
+      Pointer<Pointer<lib.Sample>> ptrPtr = _cdc.Sample_dAlloc();
+      expect(nullptr, isNot(equals(ptrPtr)));
+      _cdc.Sample_create(ptrPtr);
+      if (ptrPtr.value != nullptr) {
+        expect("sample name", ptrPtr.value.ref.name.toDartString());
+        expect(2, ptrPtr.value.ref.list.len);
+        expect("e1", ptrPtr.value.ref.list.ptr.elementAt(0).value.toDartString());
+        expect(<String>["e1", "e2"], ptrPtr.value.ref.list.toList());
+        _cdc.Sample_dFree(ptrPtr);//不要忘记释放内存
+      }
+      ptrPtr = nullptr;
+    }
+    expect(3, _cdc.add(1, 2));
     {
       //test addStr
-      var pStr = "str".toNativeUtf8();
-      var rpStr = lib.addStr(pStr);
+      var pStr = "str".toPointerInt8();
+      var rpStr = _cdc.addStr(pStr);
       calloc.free(pStr);
       var news = rpStr.toDartString();
       expect("str 测试", news);
-      lib.Str_free(rpStr); //rpStr alloc by addStr, so free memory
+      _cdc.Str_free(rpStr); //rpStr alloc by addStr, so free memory
     }
     // test struct
     {
-      var rpData = lib.Data_new();
+      var rpData = _cdc.Data_new();
       var sRef = rpData.ref;
       expect(10, sRef.intType);
       expect("test 测试", sRef.charType.toDartString());
@@ -46,18 +71,18 @@ void main() async {
         expect(3, data.ref.intType);
       }
       //这个函数没有alloc新的内存，简单修改pointData.intType为1
-      lib.Data_use(rpData);
+      _cdc.Data_use(rpData);
       {
         var data = sRef.pointData;
         expect(1, data.ref.intType);
       }
 
-      lib.Data_free(rpData); //释放内存
+      _cdc.Data_free(rpData); //释放内存
 
     }
     {
       //ffi 1.0.0
-      var data = lib.Data_noPtr();
+      var data = _cdc.Data_noPtr();
       expect(10, data.intType);
       expect("test 测试", data.charType.toDartString());
       {

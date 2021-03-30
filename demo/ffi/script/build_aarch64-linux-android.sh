@@ -1,7 +1,6 @@
 #！/bin/bash
 cuPath=$(pwd)
 batPath=$(dirname $(readlink -f "$0"))
-export BUILD_DUMMY_WASM_BINARY=1
 
 export AR=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar
 

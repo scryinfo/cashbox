@@ -16,5 +16,4 @@ cargo build --target %HOST_TAG%
 cd "%batPath%../../target/%HOST_TAG%/debug"
 copy /Y "wallets_cdl.dll" "%outPath%/"
 
-cd "%cuPath%"
 EndLocal

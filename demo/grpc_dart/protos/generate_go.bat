@@ -8,5 +8,4 @@ cd "%batPath%"
 protoc --go_out=plugins=grpc:../server_go greeter.proto
 cd ../server_go/ & go build
 
-cd "%batPath%"
 EndLocal

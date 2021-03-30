@@ -1,10 +1,10 @@
-use std::ffi::CString;
+use std::ffi::{CString};
 use std::os::raw::{
-    c_char, c_int, c_ulonglong,
+    c_char, c_int, c_ulonglong,c_void,
 };
-
-use crate::kits::{CStruct, to_c_char, to_str};
 use std::ptr::null_mut;
+
+use crate::kits::{CStruct, to_c_char, to_str, CArray};
 
 mod kits;
 
@@ -217,13 +217,61 @@ impl Drop for Data {
 
 // struct end
 
+//sample
+#[allow(non_snake_case)]
+#[repr(C)]
+pub struct CSample {
+    len: u32,
+    name: *mut c_char,
+    list: CArray<*mut c_char>,
+}
+
+impl Default for CSample {
+    fn default() -> Self {
+        CSample {len:0,name:null_mut(),list: CArray::default()}
+    }
+}
+impl CStruct for CSample {
+    fn free(&mut self) {
+        self.name.free();
+        //这里可以不调用list的free，因为list不是*mut 类型，它内部的内存由CArray自己管理。
+    }
+}
+crate::drop_ctype!(CSample);//给struct 加上 Drop实现
+
+#[no_mangle]
+pub extern "C" fn CSample_dAlloc() -> *mut *mut CSample {
+    kits::d_ptr_alloc()
+}
+
+#[no_mangle]
+pub extern "C" fn CSample_dFree(ptr: *mut *mut CSample) {
+    let mut temp = ptr;
+    temp.free();
+}
+
+#[no_mangle]
+pub extern "C" fn CSample_create(ptr: *mut *mut CSample) {
+    if !ptr.is_null() {
+        // let mut t = ptr;
+        unsafe { (*ptr).free(); }
+    }
+    let mut sample = Box::new(CSample::default());
+    sample.name = to_c_char("sample name");
+    sample.len = 100;
+    let list = vec!["e1".to_owned(),"e2".to_owned()];
+    let ptr_list = list.clone().into_iter().map(|it| to_c_char(it.as_str())).collect();
+    sample.list.set(ptr_list);
+    unsafe { *ptr = Box::into_raw(sample); }
+}
+
 
 #[cfg(test)]
 mod tests {
     use std::os::raw::c_char;
     use std::ptr::{null, null_mut};
 
-    use crate::{add, addStr, Data_free, Data_new, Data_noPtr, multi_i32, Str_free, to_c_char, to_str, Data};
+    use crate::{add, addStr, Data, Data_free, Data_new, Data_noPtr, multi_i32, Str_free, to_c_char, to_str};
     use crate::kits::{CArray, CR, CStruct, d_ptr_alloc, ptr_alloc};
 
     #[test]

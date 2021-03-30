@@ -4,14 +4,14 @@ extern crate rbatis_macro_driver;
 use std::os::raw::c_char;
 use async_std::task::block_on;
 use rbatis::rbatis::Rbatis;
-use rbatis::crud::{CRUD, CRUDEnable};
+use rbatis::crud::{CRUD, CRUDTable};
 use chrono::NaiveDateTime;
 use rbatis_core::value::DateTimeNow;
 use std::ops::Add;
 use serde::{Deserialize, Serialize};
 use shared::to_str;
 
-#[derive(CRUDEnable, Serialize, Deserialize, Clone, Debug)]
+#[derive(CRUDTable, Serialize, Deserialize, Clone, Debug)]
 pub struct BizActivity {
     pub id: Option<String>,
     pub name: Option<String>,
