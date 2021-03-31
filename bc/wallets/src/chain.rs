@@ -210,7 +210,7 @@ impl ChainTrait for BtcChain {
                     let mut token = MBtcChainToken::default();
                     token.chain_token_shared_id = default_token.chain_token_shared_id.clone();
                     token.wallet_id = wallet.id.clone();
-                    token.chain_type = wallets_types::EeeChain::chain_type(&wallet_type).to_string();
+                    token.chain_type = wallets_types::BtcChain::chain_type(&wallet_type).to_string();
                     //token.chain_type = net_type.to_string();
                     token.show = CTrue;
                     token.decimal = default_token.chain_token_shared.decimal;
@@ -220,7 +220,7 @@ impl ChainTrait for BtcChain {
                     let mut token_address = MTokenAddress::default();
                     token_address.wallet_id = wallet.id.clone();
                     token_address.token_id = default_token.chain_token_shared_id.clone();
-                    token_address.chain_type = wallets_types::EthChain::chain_type(&wallet_type).to_string();
+                    token_address.chain_type = wallets_types::BtcChain::chain_type(&wallet_type).to_string();
                     token_address.address_id = address.id.clone();
                     token_address.balance="0".to_string();
                     token_address.status = 1;

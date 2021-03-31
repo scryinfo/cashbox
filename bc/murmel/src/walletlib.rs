@@ -120,7 +120,7 @@ mod test {
     use std::fmt::Write;
     use std::str::FromStr;
     use wallets::Wallets;
-    use wallets_types::{CreateWalletParameters, InitParameters};
+    use wallets_types::{CreateWalletParameters, InitParameters, Wallet, WalletError};
 
     #[test]
     pub fn fee_test() {
@@ -232,8 +232,7 @@ mod test {
         generate_mnemonic();
     }
 
-    #[test]
-    pub fn create_wallet_try() {
+    pub fn create_wallet() -> Result<Wallet, WalletError>{
         let mut wallet = Wallets::default();
         let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
         let parameters = CreateWalletParameters {
@@ -247,14 +246,19 @@ mod test {
         let mut p = InitParameters::default();
         p.db_name.0 = mav::ma::DbName::new("test_", "");
         p.context_note = format!("test_{}", mav::kits::uuid());
-        let r = block_on(async {
+        block_on(async {
             let r = wallet.init(&p).await;
             r.map_or_else(
                 |e| println!("init error {}", e),
                 |w| println!("init success {:?}", w),
             );
             wallet.create_wallet(parameters).await
-        });
+        })
+    }
+
+    #[test]
+    pub fn create_wallet_try() {
+        let r = create_wallet();
         r.map_or_else(|e| println!("error {}", e), |w| println!("{:#?}", w))
     }
 }
