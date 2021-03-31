@@ -21,6 +21,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/wallets_c.dc.dart';
 
 class TransferEeePage extends StatefulWidget {
   @override
@@ -54,7 +55,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
 
   initEeeChainTxInfo() async {
     ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-    Map eeeStorageKeyMap;
     Config config = await HandleConfig.instance.getConfig();
     if (digitName == null || digitName.isEmpty) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
@@ -69,15 +69,15 @@ class _TransferEeePageState extends State<TransferEeePage> {
         });
       }
     }
-    eeeStorageKeyMap =
+    AccountInfo accountInfo =
         await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.chainAddress);
-    if (!_isMapStatusOk(eeeStorageKeyMap)) {
+    if (accountInfo == null) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return;
     }
-    nonce = eeeStorageKeyMap["nonce"];
+    nonce = accountInfo.nonce;
     try {
-      String eeeFree = eeeStorageKeyMap["free"] ?? "0";
+      String eeeFree = accountInfo.freeBalance ?? "0";
       double eeeFreeBalance = BigInt.parse(eeeFree) / config.eeeUnit;
       digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
     } catch (e) {

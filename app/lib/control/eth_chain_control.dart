@@ -22,10 +22,9 @@ class EthChainControl {
 
   List<TokenM> _allTokenList = [];
 
-  List<TokenM> getTokenListWithBalance(List<TokenM> tokenList) {
+  List<TokenM> getTokensLocalBalance(List<TokenM> tokenList) {
     tokenList.forEach((element) {
-      // todo getTokenBalance(tokenName)
-      // element.balance = BalanceControl.getInstance().getBalanceByTokenId(); // todo lack element.ethChainTokenShared.tokenShared
+      element.balance = BalanceControl.getInstance().getBalanceByTokenId(element.tokenId);
     });
     return tokenList;
   }

@@ -34,6 +34,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dc.dart';
 
 class EeePage extends StatefulWidget {
   const EeePage({Key key, this.isForceLoadFromJni}) : super(key: key);
@@ -78,12 +79,13 @@ class _EeePageState extends State<EeePage> {
     bool isForceLoadFromJni = widget.isForceLoadFromJni;
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;
     this.allVisibleTokenMList = EeeChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
+    //  this.allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
     tokenListFuture = loadDisplayTokenListData();
     if (mounted) {
       setState(() {});
     }
     loadDigitBalance();
-    loadLegalCurrency();
+    // loadLegalCurrency();
     // loadDigitRateInfo();
     // todo AppInfoUtil.instance.checkAppUpgrade();
   }
@@ -153,11 +155,11 @@ class _EeePageState extends State<EeePage> {
         String balance = "0";
 
         if (this.displayTokenMList[index].shortName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
-          Map eeeStorageKeyMap =
+          AccountInfo accountInfo =
               await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, this.displayTokenMList[index].address);
-          if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status") && eeeStorageKeyMap["status"] == 200) {
+          if (accountInfo != null) {
             try {
-              String eeeFree = eeeStorageKeyMap["free"] ?? "0";
+              String eeeFree = accountInfo.freeBalance ?? "0";
               balance = (BigInt.parse(eeeFree) / config.eeeUnit).toStringAsFixed(5) ?? "0";
               if (balance == null || double.parse(balance) == double.parse("0")) {
                 continue;

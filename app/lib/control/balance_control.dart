@@ -34,6 +34,6 @@ class BalanceControl {
     TokenAddress tokenAddress = _tokenAddressList.firstWhere((element) {
       return tokenId == element.tokenId;
     });
-    return tokenAddress.balance ?? "";
+    return tokenAddress.balance ?? "0.0";
   }
 }

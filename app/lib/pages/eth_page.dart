@@ -78,6 +78,7 @@ class _EthPageState extends State<EthPage> {
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;
     this.walletName = WalletsControl.getInstance().currentWallet().name;
     this.allVisibleTokenMList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
+    this.allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
     tokenListFuture = loadDisplayTokenListData();
     loadDigitBalance();
     loadLegalCurrency();

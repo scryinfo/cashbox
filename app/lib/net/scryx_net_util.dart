@@ -1,8 +1,13 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/eee_chain_control.dart';
+import 'package:app/control/eth_chain_control.dart';
 import 'package:app/model/wallets.dart';
 import 'package:logger/logger.dart';
+import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dc.dart';
 import 'net_util.dart';
+import 'package:wallets/kits.dart';
 
 class ScryXNetUtil {
   //todo 待优化
@@ -34,43 +39,60 @@ class ScryXNetUtil {
   }
 
   Future<int> loadEeeChainNonce(String module, String storageItem, String pubKey) async {
-    int eeeNonce = 0;
-    Map eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
-    if (eeeResultMap != null && eeeResultMap.containsKey("nonce")) {
-      return eeeResultMap["nonce"];
+    AccountInfo eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
+    if (eeeResultMap != null) {
+      return eeeResultMap.nonce;
     }
-    return eeeNonce;
+    return 0;
   }
 
   Future<String> loadEeeBalance(String module, String storageItem, String pubKey) async {
-    String eeeBalance = "0";
-    Map eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
-    if (eeeResultMap != null && eeeResultMap.containsKey("free")) {
-      return eeeResultMap["free"];
+    AccountInfo eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
+    if (eeeResultMap != null) {
+      return eeeResultMap.freeBalance;
     }
-    return eeeBalance;
+    return "0";
   }
 
-  Future<Map> loadEeeStorageMap(String module, String storageItem, String accountStr) async {
-    Map eeeResultMap;
+  Future<AccountInfo> loadEeeStorageMap(String module, String storageItem, String accountStr) async {
     String storageKey = await loadEeeStorageKey(module, storageItem, accountStr);
-    if (storageKey != null && storageKey.trim() != "") {
-      Map netFormatMap = await _loadScryXStorage(storageKey);
-      if (netFormatMap != null && netFormatMap.containsKey("result") && netFormatMap["result"] != null) {
-        eeeResultMap = await Wallets.instance.decodeEeeAccountInfo(netFormatMap["result"]);
-      }
+    if (storageKey == null || storageKey.trim() == "") {
+      return null;
     }
-    return eeeResultMap;
+
+    Map netFormatMap = await _loadScryXStorage(storageKey);
+    if (netFormatMap == null || !netFormatMap.containsKey("result") || netFormatMap["result"] == null) {
+      return null;
+    }
+    ChainVersion chainVersion = ChainVersion();
+    DecodeAccountInfoParameters decodeAccountInfoParameters = DecodeAccountInfoParameters();
+    decodeAccountInfoParameters
+      ..encodeData = netFormatMap["result"]
+      ..chainVersion = chainVersion;
+    return EeeChainControl.getInstance().decodeAccountInfo(NetType.Main, decodeAccountInfoParameters);
   }
 
-  Future<String> loadEeeStorageKey(String module, String storageItem, String accountStr) async {
-    Map<dynamic, dynamic> eeeStorageKeyMap = await Wallets.instance.eeeStorageKey(module, storageItem, accountStr);
-    if (eeeStorageKeyMap != null && eeeStorageKeyMap.containsKey("status")) {
-      if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
-        return eeeStorageKeyMap["storageKeyInfo"];
-      }
+  Future<String> loadEeeStorageKey(String module, String storageItem, String accountStr, {bool isEeeChain = true}) async {
+    StorageKeyParameters storageKeyParameters = StorageKeyParameters();
+    ChainVersion chainVersion = ChainVersion();
+    SubChainBasicInfo defaultBasicInfo;
+    if (isEeeChain) {
+      defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo(NetType.Main);
+    } else {
+      defaultBasicInfo = EeeChainControl.getInstance().getBasicInfo(NetType.Main, chainVersion);
     }
-    return null;
+    chainVersion
+      ..genesisHash = defaultBasicInfo.genesisHash
+      ..txVersion = defaultBasicInfo.txVersion
+      ..runtimeVersion = defaultBasicInfo.runtimeVersion;
+    storageKeyParameters
+      ..module = module
+      ..storageItem = storageItem
+      ..account = accountStr
+      ..chainVersion = chainVersion;
+
+    String storageKey = EeeChainControl.getInstance().getStorageKey(NetType.Main, storageKeyParameters);
+    return storageKey;
   }
 
   Future<Map> loadTokenXbalance(String tokenx, String balances, String accountStr) async {
@@ -295,35 +317,34 @@ class ScryXNetUtil {
     }
   }
 
-  Future<Map> updateSubChainBasicInfo(String infoId) async {
+  Future<bool> updateSubChainBasicInfo(String infoId) async {
     Map runtimeMap = await loadScryXRuntimeVersion();
     if (runtimeMap == null || !runtimeMap.containsKey("result")) {
-      return null;
+      return false;
     }
     var runtimeResultMap = runtimeMap["result"];
     if (runtimeResultMap == null || !runtimeResultMap.containsKey("specVersion") || !runtimeResultMap.containsKey("transactionVersion")) {
-      return null;
+      return false;
     }
     int runtimeVersion = runtimeResultMap["specVersion"];
     int txVersion = runtimeResultMap["transactionVersion"];
 
     Map blockHashMap = await loadScryXBlockHash();
     if (blockHashMap == null || !blockHashMap.containsKey("result")) {
-      return null;
+      return false;
     }
     String genesisHash = blockHashMap["result"];
 
     Map metaDataMap = await loadMetadata();
     if (metaDataMap == null || !metaDataMap.containsKey("result")) {
-      return null;
+      return false;
     }
     String metadata = metaDataMap["result"];
 
     Map systemPropertiesMap = await loadSystemProperties();
     if (systemPropertiesMap == null || !systemPropertiesMap.containsKey("result")) {
-      return null;
+      return false;
     }
-    Map resultMap = Map();
     Map propertiesResultMap = systemPropertiesMap["result"];
     int ss58Format = propertiesResultMap["ss58Format"];
     int tokenDecimals = propertiesResultMap["tokenDecimals"];
@@ -335,11 +356,22 @@ class ScryXNetUtil {
         ss58Format != null &&
         tokenDecimals != null &&
         tokenSymbol != null) {
-      Map updateMap = await Wallets.instance
-          .updateSubChainBasicInfo(infoId, runtimeVersion, txVersion, genesisHash, metadata, ss58Format, tokenDecimals, tokenSymbol);
-      return updateMap;
+      SubChainBasicInfo subChainBasicInfo = SubChainBasicInfo();
+      subChainBasicInfo
+        ..runtimeVersion = runtimeVersion
+        ..isDefault = CTrue.toInt()
+        ..txVersion = txVersion
+        ..genesisHash = genesisHash
+        ..metadata = metadata
+        ..ss58FormatPrefix = ss58Format
+        ..tokenDecimals = tokenDecimals
+        ..tokenSymbol = tokenSymbol;
+      bool isUpdateOk = EeeChainControl.getInstance().updateBasicInfo(NetType.Main, subChainBasicInfo);
+      if (!isUpdateOk) {
+        Logger().e("updateSubChainBasicInfo isUpdateOk is ---> ", isUpdateOk.toString());
+      }
+      return isUpdateOk;
     }
-
-    return resultMap;
+    return false;
   }
 }
