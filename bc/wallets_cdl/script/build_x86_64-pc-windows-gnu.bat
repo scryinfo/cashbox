@@ -1,6 +1,7 @@
 Setlocal
 set HOST_TAG=x86_64-pc-windows-gnu
 set VCPKGRS_DYNAMIC=1
+set CC_%HOST_TAG%=x86_64-w64-mingw32-gcc
 set cuPath=%cd%
 set batPath=%~dp0
 %~d0

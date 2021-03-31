@@ -29,10 +29,10 @@ void main() {
       }
       wallets.init(initP);
 
-      // expect(nullptr, isNot(equals(wallets.ptrContext)));
-      // var id = wallets.ptrContext.ref.id.toDartString();
-      // expect(true, id.isNotEmpty);
-      // expect("dart_test", wallets.context.contextNote);
+      expect(nullptr, isNot(equals(wallets.ptrContext)));
+      var id = wallets.ptrContext.ref.id.toDartString();
+      expect(true, id.isNotEmpty);
+      expect("dart_test", wallets.context.contextNote);
     }
     // {
     //   var err = wallets.safeRead(() {
@@ -67,7 +67,7 @@ void main() {
       var wallet = wallets.createWallet(parameters);
       expect(true, wallet.isSuccess());
       expect(parameters.name, wallet.data1.name);
-      // expect(true, wallet.data1.ethChain.tokens.data.isNotEmpty);
+      expect(true, wallet.data1.ethChain.tokens.data.isNotEmpty);
       //todo
       // expect(true, wallet.data1?.btcChain?.tokens?.data?.isNotEmpty);
     }

@@ -4,8 +4,8 @@ import 'package:path/path.dart' as pathLib;
 import 'package:ffi/ffi.dart' as ffi;
 import 'package:wallets/wallets_c.dc.dart';
 
-const int CTrue = 0;
-const int CFalse = 1;
+const int CTrue = 1;
+const int CFalse = 0;
 //分配置内存并清零
 Pointer<T> allocateZero<T extends NativeType>({int count = 1}) {
   final int totalSize = count * sizeOf<T>();
