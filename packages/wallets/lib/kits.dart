@@ -35,7 +35,7 @@ abstract class DC<C extends NativeType> {
 }
 
 extension ErrorEx on Error {
-  bool isSuccess() => this.code.isTrue();
+  bool isSuccess() => this.code == 0;
 }
 
 //指针转抽象为string类型
