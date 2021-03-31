@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/wallet.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/util/qr_scan_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -471,8 +469,6 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     if (_verifyImportWallet()) {
       var walletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mneController.text.codeUnits), EnumKit.WalletType.Normal,
           _walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
-      // var isSuccess = await Wallets.instance.saveWallet(_walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits),
-      //     Uint8List.fromList(_mneController.text.codeUnits), WalletType.WALLET);
       if (walletObj != null) {
         _mneController.text = "";
         _pwdController.text = "";

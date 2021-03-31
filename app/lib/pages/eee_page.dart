@@ -10,6 +10,7 @@ import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
+import 'package:app/model/wallet.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
 import 'package:app/net/scryx_net_util.dart';

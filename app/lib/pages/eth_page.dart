@@ -4,15 +4,13 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/chain.dart';
-import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
 import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/model/wallets.dart';
+import 'package:app/model/wallet.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
-import 'package:app/net/scryx_net_util.dart';
 import 'package:app/pages/left_drawer.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -33,8 +31,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
-import 'package:wallets/wallets_c.dart';
-import 'package:wallets/wallets_c.dc.dart';
+import 'package:wallets/wallets_c.dc.dart' as WalletDy;
 
 class EthPage extends StatefulWidget {
   const EthPage({Key key, this.isForceLoadFromJni}) : super(key: key);
@@ -160,7 +157,7 @@ class _EthPageState extends State<EthPage> {
           continue;
         }
         {
-          TokenAddress tokenAddress = TokenAddress()
+          WalletDy.TokenAddress tokenAddress = WalletDy.TokenAddress()
             ..walletId = WalletsControl.getInstance().currentWallet().id
             ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
             ..tokenId = this.displayTokenMList[index].tokenId
