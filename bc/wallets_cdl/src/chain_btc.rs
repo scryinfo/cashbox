@@ -20,7 +20,7 @@ pub struct CBtcChainToken {
 pub struct CBtcChainTokenShared {
     pub tokenShared: *mut CTokenShared,
     pub tokenType: *mut c_char,
-    pub gas: i64,
+    pub fee_per_byte: i64,
     pub decimal: i32,
 }
 
