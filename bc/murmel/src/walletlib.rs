@@ -119,7 +119,7 @@ mod test {
     use std::collections::HashMap;
     use std::fmt::Write;
     use std::str::FromStr;
-    use wallets::Wallets;
+    use wallets::{Wallets, Contexts};
     use wallets_types::{CreateWalletParameters, InitParameters, Wallet, WalletError};
 
     #[test]
@@ -232,33 +232,47 @@ mod test {
         generate_mnemonic();
     }
 
-    pub fn create_wallet() -> Result<Wallet, WalletError>{
-        let mut wallet = Wallets::default();
+    pub fn wallet_init(p: &InitParameters ) -> Result<&'static Contexts, WalletError> {
+       //let mut wallet = create_wallet_parameters();
+       //let r =  block_on(async {
+            // before create_wallet we must init wallet
+            // wallet.init(p).await;
+        //});
+        //r
+        unimplemented!()
+    }
+
+    pub fn init_parameters() -> InitParameters {
+        let mut p = InitParameters::default();
+        p.db_name.0 = mav::ma::DbName::new("test_", "");
+        p.context_note = format!("test_{}", mav::kits::uuid());
+        p
+    }
+
+    pub fn create_wallet_parameters() -> CreateWalletParameters {
         let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
-        let parameters = CreateWalletParameters {
+        CreateWalletParameters {
             name: "murmel".to_string(),
             password: "".to_string(),
             mnemonic: words.to_string(),
             // 钱包类型 钱包分为正式钱包和测试钱包  链有多条链 现在钱包和链暂时不关联
             // wallet_type 依然有特定的字符串 Test 和 Normal
             wallet_type: WalletType::Test.to_string(),
-        };
-        let mut p = InitParameters::default();
-        p.db_name.0 = mav::ma::DbName::new("test_", "");
-        p.context_note = format!("test_{}", mav::kits::uuid());
-        block_on(async {
-            let r = wallet.init(&p).await;
-            r.map_or_else(
-                |e| println!("init error {}", e),
-                |w| println!("init success {:?}", w),
-            );
-            wallet.create_wallet(parameters).await
-        })
+        }
     }
 
     #[test]
     pub fn create_wallet_try() {
-        let r = create_wallet();
-        r.map_or_else(|e| println!("error {}", e), |w| println!("{:#?}", w))
+        let p = init_parameters();
+        let c = create_wallet_parameters();
+        let context = wallet_init(&p);
+        // r.map_or_else(|e| println!("error {}", e), |w| println!("{:#?}", w))
+    }
+
+    #[test]
+    // data::init_wallets_context(c_ctx);
+    pub fn get_mnemonic_from_address_test() {
+        let init_parameters = init_parameters();
+
     }
 }
