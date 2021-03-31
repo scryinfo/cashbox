@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS m_btc_chain_token_shared (
     -- MTokenShared end
 
     token_type TEXT NOT NULL,
-    gas INTEGER NOT NULL,
+    fee_per_byte INTEGER NOT NULL,
     decimal INTEGER NOT NULL,
     id TEXT PRIMARY KEY,
     create_time INTEGER NOT NULL,

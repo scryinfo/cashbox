@@ -167,7 +167,8 @@ impl ChainTrait for BtcChain {
         {
             addr.chain_type = wallets_types::BtcChain::chain_type(wallet_type).to_string();
             let mn = String::from_utf8(mn.to_vec())?;
-            let mnemonic = bitcoin_wallet::mnemonic::Mnemonic::from_str(&mn).map_err(|e| WalletError::Custom(e.to_string()))?;
+            let mnemonic = bitcoin_wallet::mnemonic::Mnemonic::from_str(&mn)
+                .map_err(|e| WalletError::Custom(e.to_string()))?;
             let network = match wallet_type {
                 WalletType::Normal => { bitcoin::network::constants::Network::Bitcoin }
                 WalletType::Test => { bitcoin::network::constants::Network::Testnet }
@@ -771,7 +772,7 @@ impl EeeChain {
             let mut chain_tx = mav::ma::MEeeChainTx::default();
             chain_tx.from_address = tx_detail.from.clone().unwrap_or_default();
             chain_tx.to_address = tx_detail.to.clone().unwrap_or_default();
-           chain_tx.wallet_account=extrinsic_ctx.account.clone();
+            chain_tx.wallet_account=extrinsic_ctx.account.clone();
             chain_tx.extension = tx_detail.ext_data.clone().unwrap_or_default();
             chain_tx.value = tx_detail.value.unwrap().to_string();
             chain_tx.status = is_successful as u32;

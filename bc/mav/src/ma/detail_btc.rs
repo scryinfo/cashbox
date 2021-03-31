@@ -46,7 +46,7 @@ pub struct MBtcChainTokenShared {
     #[serde(default)]
     pub token_type: String,
     #[serde(default)]
-    pub gas: i64,
+    pub fee_per_byte: i64,
     /// 精度
     #[serde(default)]
     pub decimal: i32,
