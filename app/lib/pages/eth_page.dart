@@ -149,7 +149,7 @@ class _EthPageState extends State<EthPage> {
         String balance = "0";
         if (this.displayTokenMList[index].contractAddress != null && this.displayTokenMList[index].contractAddress.trim() != "") {
           balance = await loadErc20Balance(WalletsControl.getInstance().currentChainAddress() ?? "", this.displayTokenMList[index].contractAddress,
-              Wallets.instance.nowWallet.nowChain.chainType);
+              WalletsControl.getInstance().currentChainType());
         } else if (WalletsControl.getInstance().currentChainAddress() != null && WalletsControl.getInstance().currentChainAddress().trim() != "") {
           balance = await loadEthBalance(WalletsControl.getInstance().currentChainAddress() ?? "", WalletsControl.getInstance().currentChainType());
         } else {}
