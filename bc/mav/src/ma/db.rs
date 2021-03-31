@@ -427,7 +427,7 @@ impl Db {
                 let mut btc = MBtcChainTokenShared::default();
                 btc.token_type = BtcTokenType::Btc.to_string();
                 btc.decimal = 18;
-                btc.gas = 0; //todo
+                btc.fee_per_byte = 19;
 
                 btc.token_shared.name = "Bitcoin".to_owned();
                 btc.token_shared.symbol = "BTC".to_owned();
