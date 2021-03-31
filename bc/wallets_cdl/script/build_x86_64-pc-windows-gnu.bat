@@ -1,16 +1,14 @@
 Setlocal
 set HOST_TAG=x86_64-pc-windows-gnu
-set VCPKGRS_DYNAMIC=1
-set CC_%HOST_TAG%=x86_64-w64-mingw32-gcc
+set CC_%HOST_TAG%=gcc
+::把“-”替换为"_"
+set HOST_TAG_=%HOST_TAG:-=_%
+set CARGO_TARGET_%HOST_TAG_%_LINKER=%RUSTUP_HOME%/toolchains/stable-x86_64-pc-windows-gnu/lib/rustlib/x86_64-pc-windows-gnu/bin/self-contained/x86_64-w64-mingw32-gcc.exe
 set cuPath=%cd%
 set batPath=%~dp0
 %~d0
 cd "%batPath%/../../../packages/wallets"
 set outPath=%cd%
-
-::rustup target add wasm32-unknown-unknown --toolchain nightly-2020-10-05-x86_64-pc-windows-gnu
-
-::rustup default 1.48.0-x86_64-pc-windows-gnu
 cd "%batPath%/.."
 cargo build --target %HOST_TAG%
 
