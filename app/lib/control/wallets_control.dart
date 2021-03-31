@@ -32,11 +32,13 @@ class WalletsControl {
   Future<Wallets> initWallet() async {
     Wallets wallets = Wallets.mainIsolate();
     var initP = new InitParameters();
-    {
+    try {
       Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
       initP.dbName.path = directory.path;
-      initP.dbName.prefix = "test_"; // todo remove
-      initP.dbName = Wallets.dbName(initP.dbName); // todo remove
+      initP.dbName.prefix = "test_"; // todo change
+      initP.dbName = Wallets.dbName(initP.dbName); // todo change
+    } catch (e) {
+      Logger.getInstance().e("Wallets.dbName ", "error is --->" + e.toString());
     }
     var errObj = wallets.init(initP);
     if (errObj.isSuccess()) {
@@ -128,6 +130,7 @@ class WalletsControl {
   bool hasAny() {
     var hasAnyObj = Wallets.mainIsolate().hasAny();
     if (!hasAnyObj.isSuccess()) {
+      Logger.getInstance().e("wallet_control", "hasAnyObj error is --->" + hasAnyObj.err.message.toString());
       return false;
     }
     return hasAnyObj.data1;
@@ -157,11 +160,11 @@ class WalletsControl {
   }
 
   EnumKit.ChainType currentChainType() {
-    var curWalletIdObj = Wallets.mainIsolate().currentWalletChain();
+    DlResult1<CurrentWallet> curWalletIdObj = Wallets.mainIsolate().currentWalletChain();
     if (curWalletIdObj.isSuccess()) {
       return curWalletIdObj.data1.chainType;
     } else {
-      Logger.getInstance().e("wallet_control", "currentWalletChain error is --->" + curWalletIdObj.err.toString());
+      Logger.getInstance().e("wallet_control", "currentWalletChain error is --->" + curWalletIdObj.err.message.toString());
       return null;
     }
   }

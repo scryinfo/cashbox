@@ -88,8 +88,7 @@ class _EntrancePageState extends State<EntrancePage> {
     {
       if (config.lastTimeConfigCheck != null &&
           ((DateTime.now().millisecondsSinceEpoch - config.lastTimeConfigCheck) - config.intervalMilliseconds * 1000 < 0)) {
-        Logger().i("_checkAndUpdateAppConfig() time is not ok, nowTimeStamp=>",
-            (DateTime.now().millisecondsSinceEpoch - config.lastTimeConfigCheck).toString());
+        Logger().i("_checkAndUpdateAppConfig(), nowTimeStamp=>", (DateTime.now().millisecondsSinceEpoch - config.lastTimeConfigCheck).toString());
         return;
       }
     }
@@ -117,49 +116,29 @@ class _EntrancePageState extends State<EntrancePage> {
         CashboxConfigOpen_LatestConfigRes latestConfigRes = await configOpenFaceClient.latestConfig(basicClientReq);
         serverConfigModel = LatestConfig.fromJson(json.decode(latestConfigRes.conf));
       } catch (e) {
+        Logger().e("configOpenFaceClient.latestConfig() ", e.toString());
         return;
       }
     }
 
-    ///check and update  EeeChain txVersion and runtimeVersion
-
+    /// check and update  EeeChain txVersion and runtimeVersion
     try {
       SubChainBasicInfo defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo(NetType.Main);
-      if (defaultBasicInfo == null ||
+      if (serverConfigModel == null ||
+          defaultBasicInfo == null ||
           defaultBasicInfo.runtimeVersion == null ||
           defaultBasicInfo.txVersion == null ||
           serverConfigModel.eeeRuntimeV == null ||
           serverConfigModel.eeeTxV == null ||
           defaultBasicInfo.runtimeVersion.toString() != serverConfigModel.eeeRuntimeV.toString() ||
           defaultBasicInfo.txVersion.toString() != serverConfigModel.eeeTxV.toString()) {
-        ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-        Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // todo update DefaultBasicInfo()
-        Logger().i("updateSubChainBasicInfo  ", "result map is --->" + map.toString());
+        await ScryXNetUtil().updateSubChainBasicInfo("");
       }
     } catch (e) {
       Logger().e("updateSubChainBasicInfo error is ---> ", e.toString());
     }
 
-    /*try {
-          ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-          Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0); // get local default Eee chain info
-          if (getSubChainMap == null || !getSubChainMap.containsKey("status") || getSubChainMap["status"] != 200) {
-            Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
-            Logger().i("updateSubChainBasicInfo  ", "empty case!");
-          } else if (serverConfigModel.eeeRuntimeV == null ||
-              getSubChainMap["runtimeVersion"] == null ||
-              serverConfigModel.eeeTxV == null ||
-              getSubChainMap["txVersion"] == null ||
-              serverConfigModel.eeeRuntimeV.toString() != getSubChainMap["runtimeVersion"].toString() ||
-              serverConfigModel.eeeTxV != getSubChainMap["txVersion"].toString()) {
-            Map map = await scryXNetUtil.updateSubChainBasicInfo(""); // needless save txVersion info to config
-            Logger().i("updateSubChainBasicInfo  ", " finish do updateSubChainBasicInfo");
-          }
-        } catch (e) {
-          Logger().e("updateSubChainBasicInfo error is ---> ", e.toString());
-        }*/
-
-    {
+    try {
       config.lastTimeConfigCheck = DateTime.now().millisecondsSinceEpoch;
       config.privateConfig.authDigitVersion = serverConfigModel.authTokenListVersion;
       config.privateConfig.defaultDigitVersion = serverConfigModel.defaultTokenListVersion;
@@ -180,12 +159,17 @@ class _EntrancePageState extends State<EntrancePage> {
         config.privateConfig.defaultDigitIpList.add(element);
       });
       // save changed config
-      HandleConfig.instance.saveConfig(config);
+      bool isSaveOk = await HandleConfig.instance.saveConfig(config);
+      if (!isSaveOk) {
+        Logger().e("saveConfig  is failure---> ", isSaveOk.toString());
+      }
+    } catch (e) {
+      Logger().e("updateConfig error is ---> ", e.toString());
     }
 
     UpdateDefaultToken: //update defaultDigitList to native
     {
-      if (serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
+      if (serverConfigModel == null || serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
         break UpdateDefaultToken;
       }
       try {

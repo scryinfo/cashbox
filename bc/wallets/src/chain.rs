@@ -167,7 +167,8 @@ impl ChainTrait for BtcChain {
         {
             addr.chain_type = wallets_types::BtcChain::chain_type(wallet_type).to_string();
             let mn = String::from_utf8(mn.to_vec())?;
-            let mnemonic = bitcoin_wallet::mnemonic::Mnemonic::from_str(&mn).map_err(|e| WalletError::Custom(e.to_string()))?;
+            let mnemonic = bitcoin_wallet::mnemonic::Mnemonic::from_str(&mn)
+                .map_err(|e| WalletError::Custom(e.to_string()))?;
             let network = match wallet_type {
                 WalletType::Normal => { bitcoin::network::constants::Network::Bitcoin }
                 WalletType::Test => { bitcoin::network::constants::Network::Testnet }
@@ -209,7 +210,7 @@ impl ChainTrait for BtcChain {
                     let mut token = MBtcChainToken::default();
                     token.chain_token_shared_id = default_token.chain_token_shared_id.clone();
                     token.wallet_id = wallet.id.clone();
-                    token.chain_type = wallets_types::EeeChain::chain_type(&wallet_type).to_string();
+                    token.chain_type = wallets_types::BtcChain::chain_type(&wallet_type).to_string();
                     //token.chain_type = net_type.to_string();
                     token.show = CTrue;
                     token.decimal = default_token.chain_token_shared.decimal;
@@ -219,7 +220,7 @@ impl ChainTrait for BtcChain {
                     let mut token_address = MTokenAddress::default();
                     token_address.wallet_id = wallet.id.clone();
                     token_address.token_id = default_token.chain_token_shared_id.clone();
-                    token_address.chain_type = wallets_types::EthChain::chain_type(&wallet_type).to_string();
+                    token_address.chain_type = wallets_types::BtcChain::chain_type(&wallet_type).to_string();
                     token_address.address_id = address.id.clone();
                     token_address.balance="0".to_string();
                     token_address.status = 1;
@@ -771,7 +772,7 @@ impl EeeChain {
             let mut chain_tx = mav::ma::MEeeChainTx::default();
             chain_tx.from_address = tx_detail.from.clone().unwrap_or_default();
             chain_tx.to_address = tx_detail.to.clone().unwrap_or_default();
-           chain_tx.wallet_account=extrinsic_ctx.account.clone();
+            chain_tx.wallet_account=extrinsic_ctx.account.clone();
             chain_tx.extension = tx_detail.ext_data.clone().unwrap_or_default();
             chain_tx.value = tx_detail.value.unwrap().to_string();
             chain_tx.status = is_successful as u32;

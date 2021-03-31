@@ -312,7 +312,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
     List<Widget> chainsList = List.generate(visibleChains.length, (index) {
       return GestureDetector(
         onTap: () {
-          Logger().e("check chainType ------->", visibleChains[index].chainType.toEnumString());
+          Logger().d("check chainType ------->", visibleChains[index].chainType.toEnumString());
           switch (visibleChains[index].chainType) {
             case Enum.ChainType.EthTest:
               WalletsControl.getInstance().saveCurrentWalletChain(wallet.walletId, Enum.ChainType.EthTest);
