@@ -11,7 +11,7 @@ use mav::ma::{
     BeforeSave, Dao, Db, DbCreateType, DbName, MAddress, MBtcChainToken, MEeeChainToken,
     MEthChainToken, MMnemonic, MTokenAddress, MWallet, SettingType,
 };
-use mav::{ChainType, NetType, WalletType, CTrue, CFalse};
+use mav::{ChainType, NetType, WalletType, CTrue, CFalse, AppPlatformType};
 use scry_crypto::Keccak256;
 use wallets_types::{BtcChainTrait, Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, EthChainTrait, InitParameters, Load, Setting, TokenAddress, Wallet, WalletError, WalletTrait, WalletTokenStatus};
 
@@ -36,7 +36,7 @@ impl Default for Wallets {
         }
     }
 }
-
+build_const::build_const!("constants");
 impl Wallets {
     pub fn lock_read(&mut self) -> bool {
         self.raw_reentrant.lock();
@@ -59,6 +59,22 @@ impl Wallets {
         return true;
     }
 
+    pub fn app_platform_type() -> String {
+        let plat = CARGO_BUILD_TARGET.replace("-", "_");
+        let plat_type = {
+            match AppPlatformType::from(&plat) {
+                Ok(t) => t,
+                Err(_) => {
+                    log::error!("AppPlatformType is not support");
+                    AppPlatformType::any
+                }
+            }
+        };
+        plat_type.to_string()
+    }
+    pub fn package_version() -> String {
+        CARGO_BUILD_VERSION.to_owned()
+    }
     pub fn eee_chain_instance(&self) -> &Box<dyn EeeChainTrait> {
         self.wallet_trait.eee_chain()
     }

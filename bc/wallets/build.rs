@@ -19,4 +19,12 @@ fn main(){
     //     file.flush();
     // }
     consts.add_value("CARGO_BUILD_TARGET","&str",v);
+
+    let v = match std::env::var("CARGO_PKG_VERSION"){
+        Ok(val) => val,
+        Err(_) => {
+            "1.0.0".to_owned()
+        }
+    };
+    consts.add_value("CARGO_BUILD_VERSION","&str",v);
 }

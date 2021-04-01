@@ -2,8 +2,8 @@
 //  Generated code. Do not modify.
 //  source: token_open.proto
 //
-// @dart = 2.3
-// ignore_for_file: camel_case_types,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type
+// @dart = 2.12
+// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
 
 import 'dart:async' as $async;
 
@@ -23,15 +23,14 @@ class EthTokenOpenFaceClient extends $grpc.Client {
               $4.EthTokenOpen_QueryRes.fromBuffer(value));
 
   EthTokenOpenFaceClient($grpc.ClientChannel channel,
-      {$grpc.CallOptions options})
-      : super(channel, options: options);
+      {$grpc.CallOptions? options,
+      $core.Iterable<$grpc.ClientInterceptor>? interceptors})
+      : super(channel, options: options, interceptors: interceptors);
 
   $grpc.ResponseFuture<$4.EthTokenOpen_QueryRes> query(
       $4.EthTokenOpen_QueryReq request,
-      {$grpc.CallOptions options}) {
-    final call = $createCall(_$query, $async.Stream.fromIterable([request]),
-        options: options);
-    return $grpc.ResponseFuture(call);
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$query, request, options: options);
   }
 }
 
@@ -67,15 +66,15 @@ class TokenOpenFaceClient extends $grpc.Client {
           ($core.List<$core.int> value) =>
               $4.TokenOpen_PriceRateRes.fromBuffer(value));
 
-  TokenOpenFaceClient($grpc.ClientChannel channel, {$grpc.CallOptions options})
-      : super(channel, options: options);
+  TokenOpenFaceClient($grpc.ClientChannel channel,
+      {$grpc.CallOptions? options,
+      $core.Iterable<$grpc.ClientInterceptor>? interceptors})
+      : super(channel, options: options, interceptors: interceptors);
 
   $grpc.ResponseFuture<$4.TokenOpen_PriceRateRes> priceRate(
       $0.BasicClientReq request,
-      {$grpc.CallOptions options}) {
-    final call = $createCall(_$priceRate, $async.Stream.fromIterable([request]),
-        options: options);
-    return $grpc.ResponseFuture(call);
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$priceRate, request, options: options);
   }
 }
 

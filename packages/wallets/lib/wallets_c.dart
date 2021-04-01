@@ -1047,6 +1047,7 @@ class CWallets {
       _Wallets_saveCurrentWalletChain = _Wallets_saveCurrentWalletChain_ptr
           .asFunction<_dart_Wallets_saveCurrentWalletChain>();
 
+  /// 返回 AppPlatformType
   ffi.Pointer<ffi.Int8> Wallets_appPlatformType() {
     return _Wallets_appPlatformType();
   }
@@ -1056,6 +1057,17 @@ class CWallets {
           'Wallets_appPlatformType');
   late final _dart_Wallets_appPlatformType _Wallets_appPlatformType =
       _Wallets_appPlatformType_ptr.asFunction<_dart_Wallets_appPlatformType>();
+
+  /// 返回 package version
+  ffi.Pointer<ffi.Int8> Wallets_packageVersion() {
+    return _Wallets_packageVersion();
+  }
+
+  late final _Wallets_packageVersion_ptr =
+      _lookup<ffi.NativeFunction<_c_Wallets_packageVersion>>(
+          'Wallets_packageVersion');
+  late final _dart_Wallets_packageVersion _Wallets_packageVersion =
+      _Wallets_packageVersion_ptr.asFunction<_dart_Wallets_packageVersion>();
 
   ffi.Pointer<CError> Wallets_queryBalance(
     ffi.Pointer<CContext> ctx,
@@ -1884,7 +1896,7 @@ class CBtcChainTokenShared extends ffi.Struct {
   external ffi.Pointer<ffi.Int8> tokenType;
 
   @ffi.Int64()
-  external int gas;
+  external int fee_per_byte;
 
   @ffi.Int32()
   external int decimal;
@@ -2399,6 +2411,8 @@ class CEthRawTxPayload extends ffi.Struct {
   external ffi.Pointer<ffi.Int8> rawTx;
 }
 
+const int _VCRT_COMPILER_PREPROCESSOR = 1;
+
 const int _SAL_VERSION = 20;
 
 const int __SAL_H_VERSION = 180000000;
@@ -2409,11 +2423,19 @@ const int _USE_ATTRIBUTES_FOR_SAL = 0;
 
 const int _CRT_PACKING = 8;
 
+const int _VCRUNTIME_DISABLED_WARNINGS = 4514;
+
 const int _HAS_EXCEPTIONS = 1;
 
 const int _WCHAR_T_DEFINED = 1;
 
 const int NULL = 0;
+
+const int _HAS_CXX17 = 0;
+
+const int _HAS_CXX20 = 0;
+
+const int _HAS_NODISCARD = 1;
 
 const int INT8_MIN = -128;
 
@@ -3101,6 +3123,10 @@ typedef _dart_Wallets_saveCurrentWalletChain = ffi.Pointer<CError> Function(
 typedef _c_Wallets_appPlatformType = ffi.Pointer<ffi.Int8> Function();
 
 typedef _dart_Wallets_appPlatformType = ffi.Pointer<ffi.Int8> Function();
+
+typedef _c_Wallets_packageVersion = ffi.Pointer<ffi.Int8> Function();
+
+typedef _dart_Wallets_packageVersion = ffi.Pointer<ffi.Int8> Function();
 
 typedef _c_Wallets_queryBalance = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,

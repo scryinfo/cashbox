@@ -1171,7 +1171,7 @@ class EeeChain implements DC<clib.CEeeChain> {
 class BtcChainTokenShared implements DC<clib.CBtcChainTokenShared> {
   TokenShared tokenShared = new TokenShared();
   String tokenType = "";
-  int gas = 0;
+  int fee_per_byte = 0;
   int decimal = 0;
 
   static freeInstance(clib.CBtcChainTokenShared instance) {
@@ -1225,7 +1225,7 @@ class BtcChainTokenShared implements DC<clib.CBtcChainTokenShared> {
       ffi.calloc.free(c.tokenType);
     }
     c.tokenType = tokenType.toCPtrInt8();
-    c.gas = gas;
+    c.fee_per_byte = fee_per_byte;
     c.decimal = decimal;
   }
 
@@ -1242,7 +1242,7 @@ class BtcChainTokenShared implements DC<clib.CBtcChainTokenShared> {
     tokenShared = new TokenShared();
     tokenShared.toDart(c.tokenShared);
     tokenType = c.tokenType.toDartString();
-    gas = c.gas;
+    fee_per_byte = c.fee_per_byte;
     decimal = c.decimal;
   }
 }

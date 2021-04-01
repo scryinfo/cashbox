@@ -30,7 +30,7 @@ class RefreshOpen {
             credentials: ChannelCredentials.insecure(),
             connectionTimeout: Duration(minutes: 1)),
       );
-      _instance!._client = new RefreshOpenFaceClient(_instance!._channel);
+      _instance!._client = new RefreshOpenFaceClient(_instance!._channel!);
       BasicClientReq _req = new BasicClientReq();
       _req.cashboxVersion = cashboxVersion;
       _req.platformType = platformType.toEnumString();

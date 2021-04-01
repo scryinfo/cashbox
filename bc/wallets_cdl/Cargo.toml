@@ -41,12 +41,4 @@ tokio-test = "0.4.0"
 reqwest="0.11.0"
 anyhow = "1"
 
-[dependencies.build_const]
-optional = false
-version = "0.2.1"
-
-[build-dependencies.build_const]
-optional = false
-version = "0.2.1"
-
 #[workspace]
