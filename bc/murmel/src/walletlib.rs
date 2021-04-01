@@ -114,6 +114,7 @@ mod test {
     use bitcoin_hashes::Hash;
     use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
     use bitcoin_wallet::mnemonic::Mnemonic;
+    use eee::Crypto;
     use futures::executor::block_on;
     use mav::{kits, WalletType};
     use std::collections::HashMap;
@@ -121,7 +122,6 @@ mod test {
     use std::str::FromStr;
     use wallets::{Contexts, Wallets};
     use wallets_types::{Context, CreateWalletParameters, InitParameters, Wallet, WalletError};
-    use eee::Crypto;
 
     #[test]
     pub fn bitcoin_hash_test() {
@@ -220,7 +220,7 @@ mod test {
     pub fn init_parameters() -> InitParameters {
         let mut p = InitParameters::default();
         p.db_name.0 = mav::ma::DbName::new("test_", "");
-        p.context_note = format!("test_{}", mav::kits::uuid());
+        p.context_note = format!("test_{}", "murmel");
         p
     }
 
@@ -278,10 +278,29 @@ mod test {
             r.map_or_else(
                 |e| println!("create failed {:?}", e),
                 |w| {
-                    let mnemonic = eee::Sr25519::get_mnemonic_context(&w.mnemonic,"".as_bytes());
-                    println!("mnemonic {:#?}", String::from_utf8(mnemonic.unwrap()).unwrap());
-                }
+                    let mnemonic = eee::Sr25519::get_mnemonic_context(&w.mnemonic, "".as_bytes());
+                    println!(
+                        "mnemonic {:#?}",
+                        String::from_utf8(mnemonic.unwrap()).unwrap()
+                    );
+                },
             );
         })
+    }
+
+    #[test]
+    pub fn contexts_try() {
+        let ip = init_parameters();
+        let cp = create_wallet_parameters();
+        let contexts = block_on(async {
+            let lock = Contexts::collection().lock();
+            let mut contexts = lock.borrow_mut();
+            let new_ctx = Context::new(&ip.context_note);
+            let wallets = contexts.new(new_ctx).unwrap();
+            let _ = wallets.init(&ip).await.unwrap();
+            let w = wallets.create_wallet(cp).await.unwrap();
+            // println!("{:#?}", w);
+            println!("contexts {:#?}",contexts.contexts());
+        });
     }
 }
