@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/eee_chain_control.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -70,7 +71,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
       }
     }
     AccountInfo accountInfo =
-        await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.chainAddress);
+        await EeeChainControl.getInstance().loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.chainAddress);
     if (accountInfo == null) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return;
@@ -85,7 +86,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
     }
     if (digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
       Map tokenBalanceMap =
-          await scryXNetUtil.loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+          await EeeChainControl.getInstance().loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
         try {
           double eeeFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;

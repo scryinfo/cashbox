@@ -132,7 +132,7 @@ class _EntrancePageState extends State<EntrancePage> {
           serverConfigModel.eeeTxV == null ||
           defaultBasicInfo.runtimeVersion.toString() != serverConfigModel.eeeRuntimeV.toString() ||
           defaultBasicInfo.txVersion.toString() != serverConfigModel.eeeTxV.toString()) {
-        await ScryXNetUtil().updateSubChainBasicInfo("");
+        await EeeChainControl.getInstance().updateSubChainBasicInfo("");
       }
     } catch (e) {
       Logger().e("updateSubChainBasicInfo error is ---> ", e.toString());

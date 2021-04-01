@@ -2,11 +2,8 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/chain.dart';
 import 'package:app/model/digit.dart';
 import 'package:app/model/rate.dart';
-import 'package:app/model/tx_model/eee_transaction_model.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -20,6 +17,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
+import 'package:wallets/kits.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import '../../res/resources.dart';
 
@@ -33,7 +31,7 @@ class EeeChainTxsHistoryPage extends StatefulWidget {
 class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   List<Digit> walletDataList = [];
   List<Digit> showDataList = [];
-  List<EeeTransactionModel> eeeTxListModel = [];
+  List<EeeChainTx> eeeTxListModel = [];
   String balanceInfo = "0.00";
   String moneyInfo = "0.00";
   String digitName = "";
@@ -61,7 +59,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     }
 
     EeeSyncTxs.startOnce(WalletsControl.getInstance().currentWallet().eeeChain);
-    // EeeSyncTxs.startOnce(Wallets.instance.nowWallet.nowChain);
   }
 
   @override
@@ -318,10 +315,10 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
         onTap: () {
           context.read<TransactionProvide>()
             ..emptyDataRecord()
-            ..setFromAddress(eeeTxListModel[index].from == "" ? eeeTxListModel[index].signer : eeeTxListModel[index].from)
-            ..setToAddress(eeeTxListModel[index].to)
+            ..setFromAddress(eeeTxListModel[index].fromAddress == "" ? eeeTxListModel[index].signer : eeeTxListModel[index].fromAddress)
+            ..setToAddress(eeeTxListModel[index].toAddress)
             ..setHash(eeeTxListModel[index].blockHash)
-            ..setTimeStamp(eeeTxListModel[index].timeStamp)
+            ..setTimeStamp(eeeTxListModel[index].txTimestamp.toString())
             ..setValue(eeeTxListModel[index].value);
           NavigatorUtils.push(context, Routes.eeeTransactionDetailPage);
         },
@@ -341,7 +338,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        eeeTxListModel[index].from == fromAddress || eeeTxListModel[index].signer == fromAddress
+                        eeeTxListModel[index].fromAddress == fromAddress || eeeTxListModel[index].signer == fromAddress
                             ? "-" + eeeTxListModel[index].value ?? ""
                             : "+" + eeeTxListModel[index].value ?? "",
                         style: TextStyle(
@@ -382,9 +379,9 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                       width: ScreenUtil().setWidth(18),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        eeeTxListModel[index].isSuccess ? translate('tx_success') : translate('tx_failure'),
+                        eeeTxListModel[index].status == CTrue ? translate('tx_success') : translate('tx_failure'),
                         style: TextStyle(
-                          color: eeeTxListModel[index].isSuccess ? Colors.white70 : Colors.redAccent,
+                          color: eeeTxListModel[index].status == CTrue ? Colors.white70 : Colors.redAccent,
                           fontSize: ScreenUtil().setSp(2.5),
                         ),
                         textAlign: TextAlign.start,
@@ -394,7 +391,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                     Container(
                       width: ScreenUtil().setWidth(30),
                       child: Text(
-                        eeeTxListModel[index].timeStamp,
+                        DateTime.fromMicrosecondsSinceEpoch(eeeTxListModel[index].txTimestamp).toString() ?? "",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: ScreenUtil().setSp(2.5),
@@ -426,24 +423,19 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     );
   }
 
-  Future<List<EeeTransactionModel>> getTxListData() async {
+  Future<List<EeeChainTx>> getTxListData() async {
     //去加载本地DB已有的交易，进行显示
     Config config = await HandleConfig.instance.getConfig();
     for (; true;) {
       // todo differentiate tokenName
       List<EeeChainTx> eeeChainTxList = EeeChainControl.getInstance().getTxRecord(NetType.Main,
           WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address, (currentPage * this.pageSize), this.pageSize);
-      if (eeeChainTxList == null) {}
-      // todo
-
-      var newData = await Wallets.instance
-          .loadEeeChainTxHistory(Wallets.instance.nowWallet.nowChain.chainAddress, digitName, (currentPage * this.pageSize), this.pageSize);
-      if (newData.isEmpty) {
+      if (eeeChainTxList == null || eeeChainTxList.isEmpty) {
         break;
       }
       var oldSet = eeeTxListModel.map((e) => e.txHash).toSet();
-      var newModel = <EeeTransactionModel>[];
-      newData.forEach((element) {
+      var newModel = <EeeChainTx>[];
+      eeeChainTxList.forEach((element) {
         //去掉相同的交易
         if (!oldSet.contains(element.txHash)) {
           try {

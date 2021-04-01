@@ -156,7 +156,7 @@ class _EeePageState extends State<EeePage> {
 
         if (this.displayTokenMList[index].shortName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
           AccountInfo accountInfo =
-              await scryXNetUtil.loadEeeStorageMap(config.systemSymbol, config.accountSymbol, this.displayTokenMList[index].address);
+              await EeeChainControl.getInstance().loadEeeStorageMap(config.systemSymbol, config.accountSymbol, this.displayTokenMList[index].address);
           if (accountInfo != null) {
             try {
               String eeeFree = accountInfo.freeBalance ?? "0";
@@ -172,7 +172,7 @@ class _EeePageState extends State<EeePage> {
           }
         } else if (this.displayTokenMList[index].shortName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
           Map tokenBalanceMap =
-              await scryXNetUtil.loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, this.displayTokenMList[index].address);
+              await EeeChainControl.getInstance().loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, this.displayTokenMList[index].address);
           if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
             try {
               double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
@@ -189,6 +189,7 @@ class _EeePageState extends State<EeePage> {
         } else {
           Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
         }
+        // todo update balance to local
         if (mounted) {
           setState(() {
             this.displayTokenMList[index].balance = balance ?? "0";

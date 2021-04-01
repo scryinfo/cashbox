@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
@@ -61,9 +62,9 @@ class EeeSyncTxs {
   _start() async {
     Config config = await HandleConfig.instance.getConfig();
     RunParams runParams = new RunParams(_address, _chainType);
-    // todo replace with ffi impl
-    _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
-    _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
+    _eeeStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
+    _tokenXStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
+
     Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0);
     if (getSubChainMap != null && getSubChainMap["status"] == 200) {
       _infoId = getSubChainMap["infoId"];
@@ -107,10 +108,10 @@ class EeeSyncTxs {
 
     {
       if (_eeeStorageKey == null || _eeeStorageKey.isEmpty) {
-        _eeeStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
+        _eeeStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
       }
       if (_tokenXStorageKey == null || _tokenXStorageKey.isEmpty) {
-        _tokenXStorageKey = await _scryXNetUtil.loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
+        _tokenXStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
       }
       if (_eeeStorageKey == null ||
           _eeeStorageKey.isEmpty ||
@@ -123,22 +124,9 @@ class EeeSyncTxs {
     }
     var startBlockHeight = 0;
     {
-      Map eeeSyncMap = await Wallets.instance.getEeeSyncRecord();
-      if (!_isMapStatusOk(eeeSyncMap)) {
-        return;
-      }
-      Map records = eeeSyncMap["records"];
-      if (records != null && records.isNotEmpty) {
-        Map<dynamic, dynamic> recordsMap = eeeSyncMap["records"];
-        for (var v in recordsMap.values) {
-          Map<dynamic, dynamic> accountDetailMap = v;
-          if (accountDetailMap != null &&
-              accountDetailMap.containsKey("account") &&
-              accountDetailMap["account"].toString().toLowerCase().trim() == runParams.address.toLowerCase()) {
-            startBlockHeight = accountDetailMap["blockNum"];
-            break;
-          }
-        }
+      AccountInfoSyncProg accountInfoSyncProg = EeeChainControl.getInstance().getSyncRecord(NetType.Main, WalletsControl().currentChainAddress());
+      if (accountInfoSyncProg != null && accountInfoSyncProg.account.toLowerCase() == runParams.address.toLowerCase()) {
+        startBlockHeight = int.parse(accountInfoSyncProg.blockNo);
       }
     }
 
@@ -207,19 +195,30 @@ class EeeSyncTxs {
         if (loadStorageMap == null || !loadStorageMap.containsKey("result")) {
           return;
         }
-        String extrinsicJson = convert.jsonEncode(extrinsicList);
-        Map saveEeeMap =
-            await Wallets.instance.saveEeeExtrinsicDetail(_infoId, runParams.address, loadStorageMap["result"], element["block"], extrinsicJson);
-        if (!_isMapStatusOk(saveEeeMap)) {
+        ExtrinsicContext extrinsicContext = ExtrinsicContext();
+        ArrayCChar arrayCChar = ArrayCChar()..data = List<String>.from(extrinsicList);
+        extrinsicContext
+          ..account = WalletsControl.getInstance().currentChainAddress()
+          ..blockHash = blockHash
+          ..chainVersion = EeeChainControl.getInstance().getChainVersion(NetType.Main)
+          ..blockNumber = element["block"]
+          ..event = loadStorageMap["result"]
+          ..extrinsics = arrayCChar;
+        bool isSaveOk = EeeChainControl.getInstance().saveExtrinsicDetail(NetType.Main, extrinsicContext);
+        Logger.getInstance().d("saveExtrinsicDetail", "saveExtrinsicDetail result is" + isSaveOk.toString());
+      }
+      {
+        AccountInfoSyncProg accountInfoSyncProg = AccountInfoSyncProg();
+        accountInfoSyncProg
+          ..account = runParams.address
+          ..blockNo = endBlockHeight.toString()
+          ..blockHash = endBlockHash;
+        var isUpdateSyncRecordOk = EeeChainControl.getInstance().updateSyncRecord(NetType.Main, accountInfoSyncProg);
+        if (!isUpdateSyncRecordOk) {
+          Logger().e("updateSyncRecord error blockNo is ", endBlockHeight.toString());
           return;
         }
       }
-      // todo chainType
-      /*Map updateEeeMap = await Wallets.instance.updateEeeSyncRecord(runParams.address, Chain.chainTypeToInt(runParams.chainType), endBlockHeight,
-          endBlockHash);
-      if (!_isMapStatusOk(updateEeeMap)) {
-        return;
-      }*/
     }
   }
 

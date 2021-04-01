@@ -1,5 +1,7 @@
 import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
+import 'package:app/net/scryx_net_util.dart';
+import 'package:logger/logger.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import 'package:wallets/enums.dart';
@@ -118,6 +120,19 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
+  ChainVersion getChainVersion(NetType netType) {
+    SubChainBasicInfo subChainBasicInfo = getDefaultBasicInfo(netType);
+    if (subChainBasicInfo == null) {
+      return null;
+    }
+    ChainVersion chainVersion = ChainVersion();
+    chainVersion
+      ..txVersion = subChainBasicInfo.txVersion
+      ..runtimeVersion = subChainBasicInfo.runtimeVersion
+      ..genesisHash = subChainBasicInfo.genesisHash;
+    return chainVersion;
+  }
+
   SubChainBasicInfo getBasicInfo(NetType netType, ChainVersion chainVersion) {
     var dataObj = Wallets.mainIsolate().chainEee.getBasicInfo(netType, chainVersion);
     if (!dataObj.isSuccess()) {
@@ -197,5 +212,143 @@ class EeeChainControl {
       return null;
     }
     return dataObj.data1;
+  }
+
+  Future<String> loadEeeStorageKey(String module, String storageItem, String accountStr, {bool isEeeChain = true}) async {
+    StorageKeyParameters storageKeyParameters = StorageKeyParameters();
+    ChainVersion chainVersion = ChainVersion();
+    SubChainBasicInfo defaultBasicInfo;
+    if (isEeeChain) {
+      defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo(NetType.Main);
+    } else {
+      defaultBasicInfo = EeeChainControl.getInstance().getBasicInfo(NetType.Main, chainVersion);
+    }
+    chainVersion
+      ..genesisHash = defaultBasicInfo.genesisHash
+      ..txVersion = defaultBasicInfo.txVersion
+      ..runtimeVersion = defaultBasicInfo.runtimeVersion;
+    storageKeyParameters
+      ..module = module
+      ..storageItem = storageItem
+      ..account = accountStr
+      ..chainVersion = chainVersion;
+
+    String storageKey = EeeChainControl.getInstance().getStorageKey(NetType.Main, storageKeyParameters);
+    return storageKey;
+  }
+
+  Future<String> loadEeeBalance(String module, String storageItem, String pubKey) async {
+    AccountInfo eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
+    if (eeeResultMap != null) {
+      return eeeResultMap.freeBalance;
+    }
+    return "0";
+  }
+
+  // todo verify
+  Future<Map> loadTokenXbalance(String tokenx, String balances, String accountStr) async {
+    Map tokenXResultMap;
+    String eeeStorageKey = await loadEeeStorageKey(tokenx, balances, accountStr);
+    if (eeeStorageKey == null || eeeStorageKey.trim() == "") {
+      return null;
+    }
+    Map netFormatMap = await ScryXNetUtil().loadScryXStorage(eeeStorageKey);
+    if (netFormatMap == null || !netFormatMap.containsKey("result") || netFormatMap["result"] == null) {
+      return null;
+    }
+
+    // if (eeeStorageKey != null ) {
+    //   if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
+    //     String storageKeyInfo = eeeStorageKey
+    //     Map netFormatMap = await ScryXNetUtil().loadScryXStorage(storageKeyInfo);
+    //     if (netFormatMap != null && netFormatMap.containsKey("result")) {
+    //       return netFormatMap;
+    //     }
+    //   }
+    // }
+    return tokenXResultMap;
+  }
+
+  Future<AccountInfo> loadEeeStorageMap(String module, String storageItem, String accountStr) async {
+    String storageKey = await loadEeeStorageKey(module, storageItem, accountStr);
+    if (storageKey == null || storageKey.trim() == "") {
+      return null;
+    }
+
+    Map netFormatMap = await ScryXNetUtil().loadScryXStorage(storageKey);
+    if (netFormatMap == null || !netFormatMap.containsKey("result") || netFormatMap["result"] == null) {
+      return null;
+    }
+    DecodeAccountInfoParameters decodeAccountInfoParameters = DecodeAccountInfoParameters();
+    decodeAccountInfoParameters
+      ..encodeData = netFormatMap["result"]
+      ..chainVersion = EeeChainControl.getInstance().getChainVersion(NetType.Main);
+    return EeeChainControl.getInstance().decodeAccountInfo(NetType.Main, decodeAccountInfoParameters);
+  }
+
+  Future<int> loadEeeChainNonce(String module, String storageItem, String pubKey) async {
+    AccountInfo eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
+    if (eeeResultMap != null) {
+      return eeeResultMap.nonce;
+    }
+    return 0;
+  }
+
+  Future<bool> updateSubChainBasicInfo(String infoId) async {
+    Map runtimeMap = await ScryXNetUtil().loadScryXRuntimeVersion();
+    if (runtimeMap == null || !runtimeMap.containsKey("result")) {
+      return false;
+    }
+    var runtimeResultMap = runtimeMap["result"];
+    if (runtimeResultMap == null || !runtimeResultMap.containsKey("specVersion") || !runtimeResultMap.containsKey("transactionVersion")) {
+      return false;
+    }
+    int runtimeVersion = runtimeResultMap["specVersion"];
+    int txVersion = runtimeResultMap["transactionVersion"];
+
+    Map blockHashMap = await ScryXNetUtil().loadScryXBlockHash();
+    if (blockHashMap == null || !blockHashMap.containsKey("result")) {
+      return false;
+    }
+    String genesisHash = blockHashMap["result"];
+
+    Map metaDataMap = await ScryXNetUtil().loadMetadata();
+    if (metaDataMap == null || !metaDataMap.containsKey("result")) {
+      return false;
+    }
+    String metadata = metaDataMap["result"];
+
+    Map systemPropertiesMap = await ScryXNetUtil().loadSystemProperties();
+    if (systemPropertiesMap == null || !systemPropertiesMap.containsKey("result")) {
+      return false;
+    }
+    Map propertiesResultMap = systemPropertiesMap["result"];
+    int ss58Format = propertiesResultMap["ss58Format"];
+    int tokenDecimals = propertiesResultMap["tokenDecimals"];
+    String tokenSymbol = propertiesResultMap["tokenSymbol"];
+    if (runtimeVersion != null &&
+        txVersion != null &&
+        genesisHash != null &&
+        metadata != null &&
+        ss58Format != null &&
+        tokenDecimals != null &&
+        tokenSymbol != null) {
+      SubChainBasicInfo subChainBasicInfo = SubChainBasicInfo();
+      subChainBasicInfo
+        ..runtimeVersion = runtimeVersion
+        ..isDefault = CTrue.toInt()
+        ..txVersion = txVersion
+        ..genesisHash = genesisHash
+        ..metadata = metadata
+        ..ss58FormatPrefix = ss58Format
+        ..tokenDecimals = tokenDecimals
+        ..tokenSymbol = tokenSymbol;
+      bool isUpdateOk = EeeChainControl.getInstance().updateBasicInfo(NetType.Main, subChainBasicInfo);
+      if (!isUpdateOk) {
+        Logger().e("updateSubChainBasicInfo isUpdateOk is ---> ", isUpdateOk.toString());
+      }
+      return isUpdateOk;
+    }
+    return false;
   }
 }
