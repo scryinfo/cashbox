@@ -226,7 +226,10 @@ enum AppPlatformTypes {
   i686_linux_android,
   x86_64_linux_android,
   x86_64_pc_windows_gnu,
-  x86_64_unknown_linux_gnu
+  x86_64_pc_windows_msvc,
+  x86_64_unknown_linux_gnu,
+  aarch64_apple_ios,
+  x86_64_apple_ios
 }
 
 extension AppPlatformTypesEx on AppPlatformTypes {
@@ -251,8 +254,17 @@ extension AppPlatformTypesEx on AppPlatformTypes {
       case "x86_64_pc_windows_gnu":
         re = AppPlatformTypes.x86_64_pc_windows_gnu;
         break;
+      case "x86_64_pc_windows_msvc":
+        re = AppPlatformTypes.x86_64_pc_windows_msvc;
+        break;
       case "x86_64_unknown_linux_gnu":
         re = AppPlatformTypes.x86_64_unknown_linux_gnu;
+        break;
+      case "aarch64_apple_ios":
+        re = AppPlatformTypes.aarch64_apple_ios;
+        break;
+      case "x86_64_apple_ios":
+        re = AppPlatformTypes.x86_64_apple_ios;
         break;
       default:
         re = AppPlatformTypes.any;
@@ -283,8 +295,17 @@ extension AppPlatformTypesEx on AppPlatformTypes {
       case AppPlatformTypes.x86_64_pc_windows_gnu:
         re = "x86_64_pc_windows_gnu";
         break;
+      case AppPlatformTypes.x86_64_pc_windows_msvc:
+        re = "x86_64_pc_windows_msvc";
+        break;
       case AppPlatformTypes.x86_64_unknown_linux_gnu:
         re = "x86_64_unknown_linux_gnu";
+        break;
+      case AppPlatformTypes.aarch64_apple_ios:
+        re = "aarch64_apple_ios";
+        break;
+      case AppPlatformTypes.x86_64_apple_ios:
+        re = "x86_64_apple_ios";
         break;
     }
     return re;

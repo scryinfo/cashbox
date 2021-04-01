@@ -2,14 +2,19 @@
 //  Generated code. Do not modify.
 //  source: cashbox_config_open.proto
 //
-// @dart = 2.3
-// ignore_for_file: camel_case_types,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type
+// @dart = 2.12
+// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields,deprecated_member_use_from_same_package
 
+import 'dart:core' as $core;
+import 'dart:convert' as $convert;
+import 'dart:typed_data' as $typed_data;
+@$core.Deprecated('Use cashboxConfigOpenDescriptor instead')
 const CashboxConfigOpen$json = const {
   '1': 'CashboxConfigOpen',
   '3': const [CashboxConfigOpen_LatestConfigRes$json],
 };
 
+@$core.Deprecated('Use cashboxConfigOpenDescriptor instead')
 const CashboxConfigOpen_LatestConfigRes$json = const {
   '1': 'LatestConfigRes',
   '2': const [
@@ -20,3 +25,5 @@ const CashboxConfigOpen_LatestConfigRes$json = const {
   ],
 };
 
+/// Descriptor for `CashboxConfigOpen`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List cashboxConfigOpenDescriptor = $convert.base64Decode('ChFDYXNoYm94Q29uZmlnT3BlbhqUAQoPTGF0ZXN0Q29uZmlnUmVzEh8KA2VychgBIAEoCzINLnJwY19mYWNlLkVyclIDZXJyEiYKDmNhc2hib3hWZXJzaW9uGAIgASgJUg5jYXNoYm94VmVyc2lvbhIkCg1jb25maWdWZXJzaW9uGAMgASgJUg1jb25maWdWZXJzaW9uEhIKBGNvbmYYBCABKAlSBGNvbmY=');

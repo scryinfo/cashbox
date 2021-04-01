@@ -27,9 +27,8 @@ extension _InitParameters on InitParameters {
 void main() {
   test("InitParameters", () {
     var parameter = new InitParameters();
-    expect(null, parameter.contextNote);
-    expect(true, parameter.dbName != null);
-    expect(null, parameter.dbName.path);
+    expect("", parameter.contextNote);
+    expect("", parameter.dbName.path);
     var ptrParameter = parameter.toCPtr();
     var newParameter = InitParameters.fromC(ptrParameter);
     expect(true, parameter.eq(newParameter));
@@ -37,16 +36,13 @@ void main() {
     ptrParameter = nullptr;
     InitParameters.free(ptrParameter);
     newParameter = InitParameters.fromC(ptrParameter);
-    expect(null, newParameter);
-    ptrParameter = nullptr;
-    InitParameters.free(ptrParameter);
-    newParameter = InitParameters.fromC(ptrParameter);
-    expect(null, newParameter);
+    expect("", newParameter.contextNote);
 
     parameter.dbName.prefix = "";
     parameter.dbName.path = "test";
     ptrParameter = parameter.toCPtr();
     newParameter = InitParameters.fromC(ptrParameter);
-    expect(true, parameter.eq(newParameter));
+    expect(parameter.dbName.path, newParameter.dbName.path);
+    expect(parameter.dbName.prefix, newParameter.dbName.prefix);
   });
 }

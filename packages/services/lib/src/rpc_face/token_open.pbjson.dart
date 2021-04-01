@@ -2,9 +2,13 @@
 //  Generated code. Do not modify.
 //  source: token_open.proto
 //
-// @dart = 2.3
-// ignore_for_file: camel_case_types,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type
+// @dart = 2.12
+// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields,deprecated_member_use_from_same_package
 
+import 'dart:core' as $core;
+import 'dart:convert' as $convert;
+import 'dart:typed_data' as $typed_data;
+@$core.Deprecated('Use tokenSharedOpenDescriptor instead')
 const TokenSharedOpen$json = const {
   '1': 'TokenSharedOpen',
   '2': const [
@@ -21,11 +25,15 @@ const TokenSharedOpen$json = const {
   ],
 };
 
+/// Descriptor for `TokenSharedOpen`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List tokenSharedOpenDescriptor = $convert.base64Decode('Cg9Ub2tlblNoYXJlZE9wZW4SFgoGU3ltYm9sGAEgASgJUgZTeW1ib2wSEgoETmFtZRgCIAEoCVIETmFtZRIcCglQdWJsaXNoZXIYAyABKAlSCVB1Ymxpc2hlchIYCgdQcm9qZWN0GAQgASgJUgdQcm9qZWN0EhgKB0xvZ29VcmwYBSABKAlSB0xvZ29VcmwSHAoJTG9nb0J5dGVzGAYgASgJUglMb2dvQnl0ZXMSHAoJQ2hhaW5UeXBlGAcgASgJUglDaGFpblR5cGUSEgoETWFyaxgIIAEoCVIETWFyaxIYCgdUb2tlbklkGAkgASgJUgdUb2tlbklkEhgKB05ldFR5cGUYCiABKAlSB05ldFR5cGU=');
+@$core.Deprecated('Use ethTokenOpenDescriptor instead')
 const EthTokenOpen$json = const {
   '1': 'EthTokenOpen',
   '3': const [EthTokenOpen_Token$json, EthTokenOpen_QueryReq$json, EthTokenOpen_QueryRes$json],
 };
 
+@$core.Deprecated('Use ethTokenOpenDescriptor instead')
 const EthTokenOpen_Token$json = const {
   '1': 'Token',
   '2': const [
@@ -39,6 +47,7 @@ const EthTokenOpen_Token$json = const {
   ],
 };
 
+@$core.Deprecated('Use ethTokenOpenDescriptor instead')
 const EthTokenOpen_QueryReq$json = const {
   '1': 'QueryReq',
   '2': const [
@@ -48,6 +57,7 @@ const EthTokenOpen_QueryReq$json = const {
   ],
 };
 
+@$core.Deprecated('Use ethTokenOpenDescriptor instead')
 const EthTokenOpen_QueryRes$json = const {
   '1': 'QueryRes',
   '2': const [
@@ -57,11 +67,15 @@ const EthTokenOpen_QueryRes$json = const {
   ],
 };
 
+/// Descriptor for `EthTokenOpen`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List ethTokenOpenDescriptor = $convert.base64Decode('CgxFdGhUb2tlbk9wZW4a5gEKBVRva2VuEg4KAklkGAEgASgJUgJJZBIiCgxUb2tlblNoYXJkSWQYAiABKAlSDFRva2VuU2hhcmRJZBI7CgtUb2tlblNoYXJlZBgDIAEoCzIZLnJwY19mYWNlLlRva2VuU2hhcmVkT3BlblILVG9rZW5TaGFyZWQSGAoHRGVjaW1hbBgEIAEoBVIHRGVjaW1hbBIaCghHYXNMaW1pdBgFIAEoA1IIR2FzTGltaXQSGgoIQ29udHJhY3QYBiABKAlSCENvbnRyYWN0EhoKCFBvc2l0aW9uGAcgASgBUghQb3NpdGlvbhp9CghRdWVyeVJlcRIsCgRpbmZvGAEgASgLMhgucnBjX2ZhY2UuQmFzaWNDbGllbnRSZXFSBGluZm8SHAoJaXNEZWZhdWx0GAIgASgIUglpc0RlZmF1bHQSJQoEcGFnZRgDIAEoCzIRLnJwY19mYWNlLlBhZ2VSZXFSBHBhZ2UaiAEKCFF1ZXJ5UmVzEjQKBnRva2VucxgBIAMoCzIcLnJwY19mYWNlLkV0aFRva2VuT3Blbi5Ub2tlblIGdG9rZW5zEiUKBHBhZ2UYAiABKAsyES5ycGNfZmFjZS5QYWdlUmVzUgRwYWdlEh8KA2VychgDIAEoCzINLnJwY19mYWNlLkVyclIDZXJy');
+@$core.Deprecated('Use tokenOpenDescriptor instead')
 const TokenOpen$json = const {
   '1': 'TokenOpen',
   '3': const [TokenOpen_Price$json, TokenOpen_Rate$json, TokenOpen_PriceRateRes$json],
 };
 
+@$core.Deprecated('Use tokenOpenDescriptor instead')
 const TokenOpen_Price$json = const {
   '1': 'Price',
   '2': const [
@@ -80,6 +94,7 @@ const TokenOpen_Price$json = const {
   ],
 };
 
+@$core.Deprecated('Use tokenOpenDescriptor instead')
 const TokenOpen_Rate$json = const {
   '1': 'Rate',
   '2': const [
@@ -88,6 +103,7 @@ const TokenOpen_Rate$json = const {
   ],
 };
 
+@$core.Deprecated('Use tokenOpenDescriptor instead')
 const TokenOpen_PriceRateRes$json = const {
   '1': 'PriceRateRes',
   '2': const [
@@ -97,3 +113,5 @@ const TokenOpen_PriceRateRes$json = const {
   ],
 };
 
+/// Descriptor for `TokenOpen`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List tokenOpenDescriptor = $convert.base64Decode('CglUb2tlbk9wZW4a2QIKBVByaWNlEg4KAmlkGAEgASgJUgJpZBISCgRyYW5rGAIgASgJUgRyYW5rEhYKBnN5bWJvbBgDIAEoCVIGc3ltYm9sEhIKBG5hbWUYBCABKAlSBG5hbWUSFgoGc3VwcGx5GAUgASgJUgZzdXBwbHkSHAoJbWF4U3VwcGx5GAYgASgJUgltYXhTdXBwbHkSIgoMbWFya2V0Q2FwVXNkGAcgASgJUgxtYXJrZXRDYXBVc2QSJAoNdm9sdW1lVXNkMjRIchgIIAEoCVINdm9sdW1lVXNkMjRIchIaCghwcmljZVVzZBgJIAEoCVIIcHJpY2VVc2QSLAoRY2hhbmdlUGVyY2VudDI0SHIYCiABKAlSEWNoYW5nZVBlcmNlbnQyNEhyEhoKCHZ3YXAyNEhyGAsgASgJUgh2d2FwMjRIchIaCghleHBsb3JlchgMIAEoCVIIZXhwbG9yZXIaMAoEUmF0ZRISCgRuYW1lGAEgASgJUgRuYW1lEhQKBXZhbHVlGAIgASgBUgV2YWx1ZRqSAQoMUHJpY2VSYXRlUmVzEjEKBnByaWNlcxgBIAMoCzIZLnJwY19mYWNlLlRva2VuT3Blbi5QcmljZVIGcHJpY2VzEi4KBXJhdGVzGAIgAygLMhgucnBjX2ZhY2UuVG9rZW5PcGVuLlJhdGVSBXJhdGVzEh8KA2VychgDIAEoCzINLnJwY19mYWNlLkVyclIDZXJy');

@@ -5,7 +5,7 @@ use std::os::raw::{c_char, c_uint};
 
 use futures::executor::block_on;
 
-use mav::{AppPlatformType, ChainType, NetType};
+use mav::{ChainType, NetType};
 use wallets::{Contexts, Wallets};
 use wallets_types::{Context, Error};
 
@@ -628,22 +628,22 @@ pub unsafe extern "C" fn Wallets_saveCurrentWalletChain( ctx: *mut CContext,wall
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
-build_const::build_const!("constants");
+/// 返回 AppPlatformType
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_appPlatformType() -> *const c_char {
     log::debug!("enter Wallets_appPlatformType");
-    let plat = CARGO_BUILD_TARGET.replace("-", "_");
-    let platType = {
-        match AppPlatformType::from(&plat) {
-            Ok(t) => t,
-            Err(_) => {
-                log::error!("AppPlatformType is not support");
-                AppPlatformType::any
-            }
-        }
-    };
-    log::debug!("AppPlatformType: {}", platType.to_string());
-    to_c_char(&platType.to_string())
+    let plat = Wallets::app_platform_type();
+    log::debug!("AppPlatformType: {}", plat);
+    to_c_char(&plat)
+}
+
+/// 返回 package version
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_packageVersion() -> *const c_char {
+    log::debug!("enter Wallets_packageVersion");
+    let version = Wallets::package_version();
+    log::debug!("version: {}", version);
+    to_c_char(&version)
 }
 
 #[no_mangle]

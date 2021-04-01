@@ -2,9 +2,13 @@
 //  Generated code. Do not modify.
 //  source: base.proto
 //
-// @dart = 2.3
-// ignore_for_file: camel_case_types,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type
+// @dart = 2.12
+// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields,deprecated_member_use_from_same_package
 
+import 'dart:core' as $core;
+import 'dart:convert' as $convert;
+import 'dart:typed_data' as $typed_data;
+@$core.Deprecated('Use errDescriptor instead')
 const Err$json = const {
   '1': 'Err',
   '2': const [
@@ -13,6 +17,9 @@ const Err$json = const {
   ],
 };
 
+/// Descriptor for `Err`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List errDescriptor = $convert.base64Decode('CgNFcnISEgoEY29kZRgBIAEoA1IEY29kZRIYCgdtZXNzYWdlGAIgASgJUgdtZXNzYWdl');
+@$core.Deprecated('Use pairDescriptor instead')
 const Pair$json = const {
   '1': 'Pair',
   '2': const [
@@ -21,6 +28,9 @@ const Pair$json = const {
   ],
 };
 
+/// Descriptor for `Pair`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pairDescriptor = $convert.base64Decode('CgRQYWlyEhAKA0tleRgBIAEoCVIDS2V5EhQKBVZhbHVlGAIgASgJUgVWYWx1ZQ==');
+@$core.Deprecated('Use rpcModelBaseDescriptor instead')
 const RpcModelBase$json = const {
   '1': 'RpcModelBase',
   '2': const [
@@ -31,6 +41,9 @@ const RpcModelBase$json = const {
   ],
 };
 
+/// Descriptor for `RpcModelBase`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List rpcModelBaseDescriptor = $convert.base64Decode('CgxScGNNb2RlbEJhc2USDgoCSWQYASABKAlSAklkEh4KClVwZGF0ZVRpbWUYAiABKANSClVwZGF0ZVRpbWUSHgoKQ3JlYXRlVGltZRgDIAEoA1IKQ3JlYXRlVGltZRI0ChVPcHRpbWlzdGljTG9ja1ZlcnNpb24YBCABKANSFU9wdGltaXN0aWNMb2NrVmVyc2lvbg==');
+@$core.Deprecated('Use languageValueDescriptor instead')
 const LanguageValue$json = const {
   '1': 'LanguageValue',
   '2': const [
@@ -39,6 +52,9 @@ const LanguageValue$json = const {
   ],
 };
 
+/// Descriptor for `LanguageValue`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List languageValueDescriptor = $convert.base64Decode('Cg1MYW5ndWFnZVZhbHVlEh4KCkxhbmd1YWdlSWQYASABKAlSCkxhbmd1YWdlSWQSFAoFVmFsdWUYAiABKAlSBVZhbHVl');
+@$core.Deprecated('Use languagesDescriptor instead')
 const Languages$json = const {
   '1': 'Languages',
   '2': const [
@@ -47,6 +63,9 @@ const Languages$json = const {
   ],
 };
 
+/// Descriptor for `Languages`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List languagesDescriptor = $convert.base64Decode('CglMYW5ndWFnZXMSIgoMRGVmYXVsdFZhbHVlGAEgASgJUgxEZWZhdWx0VmFsdWUSLwoGVmFsdWVzGAIgAygLMhcucnBjX2ZhY2UuTGFuZ3VhZ2VWYWx1ZVIGVmFsdWVz');
+@$core.Deprecated('Use pageReqDescriptor instead')
 const PageReq$json = const {
   '1': 'PageReq',
   '2': const [
@@ -55,6 +74,9 @@ const PageReq$json = const {
   ],
 };
 
+/// Descriptor for `PageReq`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pageReqDescriptor = $convert.base64Decode('CgdQYWdlUmVxEhoKCHBhZ2VTaXplGAEgASgFUghwYWdlU2l6ZRISCgRwYWdlGAIgASgFUgRwYWdl');
+@$core.Deprecated('Use pageResDescriptor instead')
 const PageRes$json = const {
   '1': 'PageRes',
   '2': const [
@@ -64,10 +86,16 @@ const PageRes$json = const {
   ],
 };
 
+/// Descriptor for `PageRes`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pageResDescriptor = $convert.base64Decode('CgdQYWdlUmVzEhoKCHBhZ2VTaXplGAEgASgFUghwYWdlU2l6ZRISCgRwYWdlGAIgASgFUgRwYWdlEhQKBXRvdGFsGAMgASgFUgV0b3RhbA==');
+@$core.Deprecated('Use emptyDescriptor instead')
 const Empty$json = const {
   '1': 'Empty',
 };
 
+/// Descriptor for `Empty`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List emptyDescriptor = $convert.base64Decode('CgVFbXB0eQ==');
+@$core.Deprecated('Use errResDescriptor instead')
 const ErrRes$json = const {
   '1': 'ErrRes',
   '2': const [
@@ -75,6 +103,9 @@ const ErrRes$json = const {
   ],
 };
 
+/// Descriptor for `ErrRes`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List errResDescriptor = $convert.base64Decode('CgZFcnJSZXMSHwoDZXJyGAEgASgLMg0ucnBjX2ZhY2UuRXJyUgNlcnI=');
+@$core.Deprecated('Use deleteReqDescriptor instead')
 const DeleteReq$json = const {
   '1': 'DeleteReq',
   '2': const [
@@ -82,6 +113,9 @@ const DeleteReq$json = const {
   ],
 };
 
+/// Descriptor for `DeleteReq`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deleteReqDescriptor = $convert.base64Decode('CglEZWxldGVSZXESEAoDaWRzGAEgAygJUgNpZHM=');
+@$core.Deprecated('Use deleteResDescriptor instead')
 const DeleteRes$json = const {
   '1': 'DeleteRes',
   '2': const [
@@ -89,6 +123,9 @@ const DeleteRes$json = const {
   ],
 };
 
+/// Descriptor for `DeleteRes`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deleteResDescriptor = $convert.base64Decode('CglEZWxldGVSZXMSHwoDZXJyGAEgASgLMg0ucnBjX2ZhY2UuRXJyUgNlcnI=');
+@$core.Deprecated('Use recordStatusReqDescriptor instead')
 const RecordStatusReq$json = const {
   '1': 'RecordStatusReq',
   '2': const [
@@ -97,6 +134,9 @@ const RecordStatusReq$json = const {
   ],
 };
 
+/// Descriptor for `RecordStatusReq`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List recordStatusReqDescriptor = $convert.base64Decode('Cg9SZWNvcmRTdGF0dXNSZXESEAoDaWRzGAEgAygJUgNpZHMSFgoGc3RhdHVzGAIgASgJUgZzdGF0dXM=');
+@$core.Deprecated('Use recordStatusResDescriptor instead')
 const RecordStatusRes$json = const {
   '1': 'RecordStatusRes',
   '2': const [
@@ -104,6 +144,9 @@ const RecordStatusRes$json = const {
   ],
 };
 
+/// Descriptor for `RecordStatusRes`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List recordStatusResDescriptor = $convert.base64Decode('Cg9SZWNvcmRTdGF0dXNSZXMSHwoDZXJyGAEgASgLMg0ucnBjX2ZhY2UuRXJyUgNlcnI=');
+@$core.Deprecated('Use queryReqDescriptor instead')
 const QueryReq$json = const {
   '1': 'QueryReq',
   '2': const [
@@ -111,6 +154,9 @@ const QueryReq$json = const {
   ],
 };
 
+/// Descriptor for `QueryReq`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List queryReqDescriptor = $convert.base64Decode('CghRdWVyeVJlcRIlCgRwYWdlGAEgASgLMhEucnBjX2ZhY2UuUGFnZVJlcVIEcGFnZQ==');
+@$core.Deprecated('Use getByIdReqDescriptor instead')
 const GetByIdReq$json = const {
   '1': 'GetByIdReq',
   '2': const [
@@ -118,6 +164,9 @@ const GetByIdReq$json = const {
   ],
 };
 
+/// Descriptor for `GetByIdReq`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getByIdReqDescriptor = $convert.base64Decode('CgpHZXRCeUlkUmVxEg4KAmlkGAEgASgJUgJpZA==');
+@$core.Deprecated('Use appKeyDescriptor instead')
 const AppKey$json = const {
   '1': 'AppKey',
   '2': const [
@@ -129,6 +178,9 @@ const AppKey$json = const {
   ],
 };
 
+/// Descriptor for `AppKey`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List appKeyDescriptor = $convert.base64Decode('CgZBcHBLZXkSFgoGcHViS2V5GAEgASgJUgZwdWJLZXkSFgoGcHJpS2V5GAIgASgJUgZwcmlLZXkSGAoHa2V5VHlwZRgDIAEoCVIHa2V5VHlwZRIgCgtrZXlBdXRoVHlwZRgEIAEoCVILa2V5QXV0aFR5cGUSFAoFdmFsdWUYBSABKANSBXZhbHVl');
+@$core.Deprecated('Use basicClientReqDescriptor instead')
 const BasicClientReq$json = const {
   '1': 'BasicClientReq',
   '2': const [
@@ -141,3 +193,5 @@ const BasicClientReq$json = const {
   ],
 };
 
+/// Descriptor for `BasicClientReq`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List basicClientReqDescriptor = $convert.base64Decode('Cg5CYXNpY0NsaWVudFJlcRIcCglzaWduYXR1cmUYASABKAlSCXNpZ25hdHVyZRIaCghkZXZpY2VJZBgCIAEoCVIIZGV2aWNlSWQSIAoLY2FzaGJveFR5cGUYAyABKAlSC2Nhc2hib3hUeXBlEiYKDmNhc2hib3hWZXJzaW9uGAQgASgJUg5jYXNoYm94VmVyc2lvbhIiCgxwbGF0Zm9ybVR5cGUYBSABKAlSDHBsYXRmb3JtVHlwZRIcCgl0aW1lc3RhbXAYBiABKANSCXRpbWVzdGFtcA==');

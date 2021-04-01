@@ -25,7 +25,7 @@ use wallets_cdl::{
 
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, WalletTokenStatus, TokenAddress};
 use mav::ma::MTokenAddress;
-use wallets_cdl::wallets_c::{Wallets_updateBalance, Wallets_queryBalance, Wallets_currentWalletChain, Wallets_saveCurrentWalletChain, Wallets_hasAny, Wallets_findWalletBaseByName, Wallets_renameWallet, Wallets_resetWalletPassword, Wallets_exportWallet};
+use wallets_cdl::wallets_c::{Wallets_updateBalance, Wallets_queryBalance, Wallets_currentWalletChain, Wallets_saveCurrentWalletChain, Wallets_hasAny, Wallets_findWalletBaseByName, Wallets_renameWallet, Wallets_resetWalletPassword, Wallets_exportWallet, Wallets_packageVersion};
 use wallets_cdl::mem_c::{CArrayCTokenAddress_dAlloc, CArrayCTokenAddress_dFree, CBool_alloc, CBool_free};
 use wallets_cdl::kits::CTrue;
 
@@ -180,6 +180,19 @@ fn platform_type_test() {
     unsafe {
         let ptr = Wallets_appPlatformType() as *mut c_char;
         assert_ne!(null_mut(), ptr);
+        let plat = to_str(ptr);
+        println!("plat type: {}", plat);
+        CStr_free(ptr);
+    }
+}
+
+#[test]
+fn package_version_test() {
+    unsafe {
+        let ptr = Wallets_packageVersion() as *mut c_char;
+        assert_ne!(null_mut(), ptr);
+        let version = to_str(ptr);
+        assert_eq!("2.3.0", version);
         CStr_free(ptr);
     }
 }

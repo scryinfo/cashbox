@@ -1,4 +1,3 @@
-@Timeout(const Duration(minutes: 10))
 import 'dart:async';
 import 'dart:isolate';
 

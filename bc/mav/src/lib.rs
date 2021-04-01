@@ -159,7 +159,10 @@ pub enum AppPlatformType {
     i686_linux_android,
     x86_64_linux_android,
     x86_64_pc_windows_gnu,
+    x86_64_pc_windows_msvc,
     x86_64_unknown_linux_gnu,
+    aarch64_apple_ios,
+    x86_64_apple_ios,
 }
 
 impl AppPlatformType {
@@ -171,7 +174,10 @@ impl AppPlatformType {
             "i686_linux_android" => Ok(AppPlatformType::i686_linux_android),
             "x86_64_linux_android" => Ok(AppPlatformType::x86_64_linux_android),
             "x86_64_pc_windows_gnu" => Ok(AppPlatformType::x86_64_pc_windows_gnu),
+            "x86_64_pc_windows_msvc" => Ok(AppPlatformType::x86_64_pc_windows_msvc),
             "x86_64_unknown_linux_gnu" => Ok(AppPlatformType::x86_64_unknown_linux_gnu),
+            "aarch64_apple_ios" => Ok(AppPlatformType::aarch64_apple_ios),
+            "x86_64_apple_ios" => Ok(AppPlatformType::x86_64_apple_ios),
             _ => {
                 let err = format!("the str:{} can not be AppPlatformType", plat_type);
                 log::error!("{}", err);
@@ -190,7 +196,10 @@ impl ToString for AppPlatformType {
             AppPlatformType::i686_linux_android => "i686_linux_android".to_owned(),
             AppPlatformType::x86_64_linux_android => "x86_64_linux_android".to_owned(),
             AppPlatformType::x86_64_pc_windows_gnu => "x86_64_pc_windows_gnu".to_owned(),
+            AppPlatformType::x86_64_pc_windows_msvc => "x86_64_pc_windows_msvc".to_owned(),
             AppPlatformType::x86_64_unknown_linux_gnu => "x86_64_unknown_linux_gnu".to_owned(),
+            AppPlatformType::aarch64_apple_ios => "aarch64_apple_ios".to_owned(),
+            AppPlatformType::x86_64_apple_ios => "x86_64_apple_ios".to_owned(),
         }
     }
 }
