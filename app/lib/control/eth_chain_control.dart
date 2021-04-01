@@ -24,7 +24,7 @@ class EthChainControl {
 
   List<TokenM> getTokensLocalBalance(List<TokenM> tokenList) {
     tokenList.forEach((element) {
-      element.balance = BalanceControl.getInstance().getBalanceByTokenId(element.tokenId);
+      element.balance = BalanceControl.getInstance().getBalanceByTokenId(element.tokenId) ?? "0.0";
     });
     return tokenList;
   }
@@ -52,7 +52,7 @@ class EthChainControl {
         ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
         ..contractAddress = element.contractAddress ?? ""
         ..isVisible = element.show_1.isTrue()
-        // ..tokenId = element.ethChainTokenShared.tokenShared.id
+        ..tokenId = element.chainTokenSharedId
         ..decimal = element.ethChainTokenShared.decimal ?? 0;
       if (element.ethChainTokenShared.tokenShared.symbol.toLowerCase() == ChainType.ETH.toEnumString().toLowerCase()) {
         newToken.address = nowWallet.ethChain.chainShared.walletAddress.address;

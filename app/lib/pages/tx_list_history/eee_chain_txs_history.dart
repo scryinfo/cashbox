@@ -391,7 +391,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                     Container(
                       width: ScreenUtil().setWidth(30),
                       child: Text(
-                        DateTime.fromMicrosecondsSinceEpoch(eeeTxListModel[index].txTimestamp).toString() ?? "",
+                        DateTime.fromMillisecondsSinceEpoch(eeeTxListModel[index].txTimestamp).toString() ?? "",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: ScreenUtil().setSp(2.5),

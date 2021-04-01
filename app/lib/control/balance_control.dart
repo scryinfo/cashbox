@@ -32,7 +32,7 @@ class BalanceControl {
       return "";
     }
     TokenAddress tokenAddress = _tokenAddressList.firstWhere((element) {
-      return tokenId == element.tokenId;
+      return tokenId.toLowerCase() == element.tokenId.toLowerCase();
     });
     return tokenAddress.balance ?? "0.0";
   }
