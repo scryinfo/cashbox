@@ -71,6 +71,8 @@ mav = { path = "../mav" }
 # TODO should import murmel to wallets in future.
 wallets = { path = "../wallets" }
 wallets_types = { path = "../wallets_types" }
+# import eee for using eee::Sr25519::get_mnemonic_context should remove this in future
+eee = { path = "../chain/eee"}
 
 [dev-dependencies]
 rustc-serialize = "0.3"

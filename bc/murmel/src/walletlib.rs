@@ -121,6 +121,7 @@ mod test {
     use std::str::FromStr;
     use wallets::{Contexts, Wallets};
     use wallets_types::{Context, CreateWalletParameters, InitParameters, Wallet, WalletError};
+    use eee::Crypto;
 
     #[test]
     pub fn fee_test() {
@@ -274,8 +275,29 @@ mod test {
     }
 
     #[test]
-    // data::init_wallets_context(c_ctx);
-    pub fn get_mnemonic_from_address_test() {
-        let init_parameters = init_parameters();
+    // get_mnemonic_context
+    // get_private_key_from_address
+    pub fn get_mnemonic_from_address_try() {
+        let i = init_parameters();
+        let c = create_wallet_parameters();
+        let mut wallets = Wallets::default();
+        block_on(async {
+            // must init wallet before create wallet
+            let ctx = wallets.init(&i).await;
+            ctx.map_or_else(
+                |e| {
+                    println!("init failed {:?}", e);
+                },
+                |c| println!("init succeeded context {:?}", c),
+            );
+            let r = wallets.create_wallet(c).await;
+            r.map_or_else(
+                |e| println!("create failed {:?}", e),
+                |w| {
+                    let mnemonic = eee::Sr25519::get_mnemonic_context(&w.mnemonic,"".as_bytes());
+                    println!("mnemonic {:#?}", String::from_utf8(mnemonic.unwrap()).unwrap());
+                }
+            );
+        })
     }
 }
