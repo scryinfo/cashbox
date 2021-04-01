@@ -119,8 +119,8 @@ mod test {
     use std::collections::HashMap;
     use std::fmt::Write;
     use std::str::FromStr;
-    use wallets::{Wallets, Contexts};
-    use wallets_types::{CreateWalletParameters, InitParameters, Wallet, WalletError};
+    use wallets::{Contexts, Wallets};
+    use wallets_types::{Context, CreateWalletParameters, InitParameters, Wallet, WalletError};
 
     #[test]
     pub fn fee_test() {
@@ -232,16 +232,6 @@ mod test {
         generate_mnemonic();
     }
 
-    pub fn wallet_init(p: &InitParameters ) -> Result<&'static Contexts, WalletError> {
-       //let mut wallet = create_wallet_parameters();
-       //let r =  block_on(async {
-            // before create_wallet we must init wallet
-            // wallet.init(p).await;
-        //});
-        //r
-        unimplemented!()
-    }
-
     pub fn init_parameters() -> InitParameters {
         let mut p = InitParameters::default();
         p.db_name.0 = mav::ma::DbName::new("test_", "");
@@ -263,16 +253,29 @@ mod test {
 
     #[test]
     pub fn create_wallet_try() {
-        let p = init_parameters();
+        let i = init_parameters();
         let c = create_wallet_parameters();
-        let context = wallet_init(&p);
-        // r.map_or_else(|e| println!("error {}", e), |w| println!("{:#?}", w))
+        let mut wallets = Wallets::default();
+        block_on(async {
+            // must init wallet before create wallet
+            let ctx = wallets.init(&i).await;
+            ctx.map_or_else(
+                |e| {
+                    println!("init failed {:?}", e);
+                },
+                |c| println!("init succeeded context {:?}", c),
+            );
+            let r = wallets.create_wallet(c).await;
+            r.map_or_else(
+                |e| println!("create failed {:?}", e),
+                |w| println!("{:#?}", w),
+            );
+        })
     }
 
     #[test]
     // data::init_wallets_context(c_ctx);
     pub fn get_mnemonic_from_address_test() {
         let init_parameters = init_parameters();
-
     }
 }
