@@ -31,9 +31,13 @@ class BalanceControl {
     if (_tokenAddressList == null || _tokenAddressList.length == 0) {
       return "";
     }
-    TokenAddress tokenAddress = _tokenAddressList.firstWhere((element) {
-      return tokenId == element.tokenId;
-    });
-    return tokenAddress.balance ?? "0.0";
+    try {
+      TokenAddress tokenAddress = _tokenAddressList.firstWhere((element) {
+        return tokenId.toLowerCase() == element.tokenId.toLowerCase();
+      });
+      return tokenAddress.balance ?? "0.0";
+    } catch (e) {
+      return "0.0";
+    }
   }
 }

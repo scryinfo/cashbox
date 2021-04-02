@@ -140,8 +140,7 @@ class _EntrancePageState extends State<EntrancePage> {
 
     try {
       config.lastTimeConfigCheck = DateTime.now().millisecondsSinceEpoch;
-      config.privateConfig.authDigitVersion = serverConfigModel.authTokenListVersion;
-      config.privateConfig.defaultDigitVersion = serverConfigModel.defaultTokenListVersion;
+      // config.privateConfig.authDigitVersion = serverConfigModel.authTokenListVersion; // needless save the value
       config.privateConfig.serverApkVersion = serverConfigModel.apkVersion;
       config.privateConfig.rateUrl = serverConfigModel.tokenToLegalTenderExchangeRateIp;
       config.privateConfig.scryXIp = serverConfigModel.scryXChainUrl;
@@ -172,6 +171,9 @@ class _EntrancePageState extends State<EntrancePage> {
       if (serverConfigModel == null || serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
         break UpdateDefaultToken;
       }
+      if (config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
+        break UpdateDefaultToken;
+      }
       try {
         EthTokenOpen_QueryReq openQueryReq = new EthTokenOpen_QueryReq();
         PageReq pageReq = PageReq();
@@ -198,14 +200,38 @@ class _EntrancePageState extends State<EntrancePage> {
             ..ethChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
             ..ethChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl
             ..ethChainTokenShared.tokenShared.logoBytes = element.tokenShared.logoBytes
-            ..contractAddress = element.contract
-            ..ethChainTokenShared.decimal = element.decimal
+            ..contractAddress = element.contract ?? ""
+            ..ethChainTokenShared.decimal = element.decimal ?? 0
             ..position = element.position.toInt();
           ethDefaultTokenList.add(ethChainTokenDefault);
         });
         defaultTokens.data = ethDefaultTokenList;
         bool isUpdateOk = EthChainControl.getInstance().updateDefaultTokenList(defaultTokens);
-        Logger.getInstance().d("updateDefaultTokenList", "isUpdateOk is --->" + isUpdateOk.toString());
+        if (!isUpdateOk) {
+          Logger.getInstance().e("updateDefaultTokenList", "update not ok,and is --->" + isUpdateOk.toString());
+          break UpdateDefaultToken;
+        }
+        // add to wallet
+        for (var i = 0; i < ethDefaultTokenList.length; i++) {
+          var element = ethDefaultTokenList[i];
+          TokenAddress tokenAddress = TokenAddress()
+            ..tokenId = element.chainTokenSharedId
+            ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+            ..walletId = WalletsControl.getInstance().currentWallet().id
+            ..balance = 0.toString()
+            ..addressId =
+                WalletsControl.getInstance().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, NetType.Main, ChainType.ETH) ?? "";
+          bool isUpdateBalanceOk = WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress);
+          if (!isUpdateBalanceOk) {
+            Logger().e("updateBalance error , tokenAddress info is---> ", tokenAddress.toString());
+          }
+        }
+
+        config.privateConfig.defaultDigitVersion = serverConfigModel.defaultTokenListVersion;
+        bool isSaveOk = await HandleConfig.instance.saveConfig(config);
+        if (!isSaveOk) {
+          Logger().e("saveConfig  is failure---> ", isSaveOk.toString());
+        }
       } catch (e) {
         Logger.getInstance().e("updateDefaultDigitList error =====>", e.toString());
         break UpdateDefaultToken;

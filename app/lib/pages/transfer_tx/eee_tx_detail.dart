@@ -196,7 +196,7 @@ class _EeeTxDetailPageState extends State<EeeTxDetailPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              Provider.of<TransactionProvide>(context).timeStamp,
+              DateTime.fromMillisecondsSinceEpoch(int.parse(Provider.of<TransactionProvide>(context).timeStamp)).toString() ?? "",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil().setSp(3.5),

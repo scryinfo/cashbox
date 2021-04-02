@@ -149,7 +149,6 @@ class _EeePageState extends State<EeePage> {
     }
     Config config = await HandleConfig.instance.getConfig();
     _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
-      ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
       for (var i = 0; i < displayTokenMList.length; i++) {
         int index = i;
         String balance = "0";
