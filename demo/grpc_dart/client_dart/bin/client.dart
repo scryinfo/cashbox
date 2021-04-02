@@ -21,19 +21,20 @@ import 'package:grpc/grpc.dart';
 Future<void> main(List<String> args) async {
   final channel = ClientChannel(
     '192.168.2.5',
-    port: 50051,
-    options: const ChannelOptions(credentials: ChannelCredentials.insecure(), connectionTimeout: Duration(minutes: 1)),
+    port: 50061,
+    options: const ChannelOptions(
+        credentials: ChannelCredentials.insecure(),
+        connectionTimeout: Duration(minutes: 1)),
   );
   final stub = GreeterClient(channel);
 
   final name = args.isNotEmpty ? args[0] : 'world';
 
-  for(;;) {
+  for (;;) {
     try {
       var t = 0;
       //todo 当有一次成功调用后，服务端连接断开，再调用rpc方法，进程会terminate，这种处理方式有问题，不管怎么样，也不能退出进程
-      final response = await stub.sayHello(HelloRequest()
-        ..name = name);
+      final response = await stub.sayHello(HelloRequest()..name = name);
       print('Greeter client received: ${response.message}');
     } catch (e) {
       print('Caught error: $e');

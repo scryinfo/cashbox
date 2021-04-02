@@ -23,7 +23,7 @@ class HelloRequest extends $pb.GeneratedMessage {
   HelloRequest._() : super();
 
   factory HelloRequest({
-    $core.String name,
+    $core.String? name,
   }) {
     final _result = create();
     if (name != null) {
@@ -49,8 +49,8 @@ class HelloRequest extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   HelloRequest copyWith(void Function(HelloRequest) updates) =>
-      super.copyWith((message) =>
-          updates(message as HelloRequest)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as HelloRequest))
+          as HelloRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
@@ -64,7 +64,7 @@ class HelloRequest extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static HelloRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<HelloRequest>(create);
-  static HelloRequest _defaultInstance;
+  static HelloRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get name => $_getSZ(0);
@@ -101,7 +101,7 @@ class HelloReply extends $pb.GeneratedMessage {
   HelloReply._() : super();
 
   factory HelloReply({
-    $core.String message,
+    $core.String? message,
   }) {
     final _result = create();
     if (message != null) {
@@ -127,8 +127,8 @@ class HelloReply extends $pb.GeneratedMessage {
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
   HelloReply copyWith(void Function(HelloReply) updates) =>
-      super.copyWith((message) =>
-          updates(message as HelloReply)); // ignore: deprecated_member_use
+      super.copyWith((message) => updates(message as HelloReply))
+          as HelloReply; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
@@ -141,7 +141,7 @@ class HelloReply extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static HelloReply getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<HelloReply>(create);
-  static HelloReply _defaultInstance;
+  static HelloReply? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get message => $_getSZ(0);

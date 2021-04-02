@@ -1,15 +1,13 @@
-import 'package:app/client.dart';
-import 'package:flutter/material.dart';
-
 import 'package:client_dart/src/generated/greeter.pb.dart';
 import 'package:client_dart/src/generated/greeter.pbgrpc.dart';
+import 'package:flutter/material.dart';
+import 'package:grpc/grpc.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -25,7 +23,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -36,32 +34,60 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   String _replay = "";
-  ClientGreeter client;
 
-  void _incrementCounter() {
-    client.greeterClient.sayHello(HelloRequest()..name = "dart").then((replay) {
-      setState((){
-        _counter++;
-        _replay = replay.message;
-      });
-    }).catchError((e){
-      setState((){
-        _counter++;
-        _replay = e.toString();
-      });
-    });
+  // late Client client;
+
+  void _incrementCounter() async {
+    // try {
+    //   var replay = await client.greeter.sayHello(HelloRequest()
+    //     ..name = "dart");
+    //   setState(() {
+    //     _counter++;
+    //     _replay = replay.message;
+    //   });
+    // }catch(e){
+    //   setState(() {
+    //     _counter++;
+    //     _replay = e.toString();
+    //   });
+    // }
+
+    // clickDone = client.greeter.sayHello(HelloRequest()..name = "dart")
+    //     .then((replay) => {
+    //       setState(() {
+    //         _counter++;
+    //         _replay = replay.message;
+    //       })
+    //     });
+    // await clickDone!;
+    // var t = 0;
+
+    final channel = ClientChannel(
+      '192.168.2.5',
+      port: 50061,
+      options: const ChannelOptions(
+          credentials: ChannelCredentials.insecure(),
+          connectionTimeout: Duration(minutes: 1)),
+    );
+    final stub = GreeterClient(channel);
+    final name = 'world';
+    try {
+      var response =
+          await Future.sync(() => stub.sayHello(HelloRequest()..name = name));
+      print('Greeter client received: ${response.message}');
+    } catch (e) {
+      print('Caught error: $e');
+    }
+    channel.shutdown();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-
         title: Text(widget.title),
       ),
       body: Center(
-
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -85,12 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    client = new ClientGreeter();
-    client.init();
+    // client = new Client();
+    // client.init();
   }
 
   @override
   void dispose() {
-    client.uninit();
+    // client.uninit();
   }
 }
