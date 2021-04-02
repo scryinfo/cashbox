@@ -21,9 +21,9 @@ pub trait ContextTrait: Send + Sync {
 
 #[async_trait]
 pub trait ChainTrait: Send + Sync {
-    fn generate_address(&self, mn: &[u8], wallet_type: &WalletType) -> Result<MAddress, WalletError>;
+    fn generate_address(&self, mn: &[u8], wallet_type: &WalletType,net_type:&NetType) -> Result<MAddress, WalletError>;
     /// 因为trait object的限制，这里需要直接把数据存入数据库中，而不返回范型的参数[see](https://doc.rust-lang.org/error-index.html#E0038)
-    async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress) -> Result<(), WalletError>;
+    async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress,net_type:&NetType) -> Result<(), WalletError>;
 }
 
 pub trait WalletTrait: Send + Sync {

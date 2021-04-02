@@ -1,7 +1,6 @@
 use std::fmt;
 use std::io;
 use std::ops::Add;
-use mav::{CTrue, CFalse};
 
 #[derive(Debug)]
 pub enum WalletError {

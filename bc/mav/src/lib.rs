@@ -19,6 +19,12 @@ pub enum ChainType {
     EthTest = 4,
     EEE = 5,
     EeeTest = 6,
+    BtcPrivate = 7,
+    BtcPrivateTest = 8,
+    EthPrivate = 9,
+    EthPrivateTest = 10,
+    EeePrivate = 11,
+    EeePrivateTest = 12,
 }
 
 impl ChainType {
@@ -26,10 +32,16 @@ impl ChainType {
         match chain_type {
             "BTC" => Ok(ChainType::BTC),
             "BtcTest" => Ok(ChainType::BtcTest),
+            "BtcPrivate" => Ok(ChainType::BtcTest),
+            "BtcPrivateTest" => Ok(ChainType::BtcTest),
             "ETH" => Ok(ChainType::ETH),
             "EthTest" => Ok(ChainType::EthTest),
+            "EthPrivate" => Ok(ChainType::EthPrivate),
+            "EthPrivateTest" => Ok(ChainType::EthPrivateTest),
             "EEE" => Ok(ChainType::EEE),
             "EeeTest" => Ok(ChainType::EeeTest),
+            "EeePrivate" => Ok(ChainType::EeePrivate),
+            "EeePrivateTest" => Ok(ChainType::EeePrivateTest),
             _ => {
                 let err = format!("the chain type:{} currently not supported ", chain_type);
                 log::error!("{}", err);
@@ -44,19 +56,36 @@ impl ToString for ChainType {
         match &self {
             ChainType::BTC => "BTC".to_owned(),
             ChainType::BtcTest => "BtcTest".to_owned(),
+            ChainType::BtcPrivate=>"BtcPrivate".to_owned(),
+            ChainType::BtcPrivateTest=>"BtcPrivateTest".to_owned(),
             ChainType::ETH => "ETH".to_owned(),
             ChainType::EthTest => "EthTest".to_owned(),
+            ChainType::EthPrivate => "EthPrivate".to_owned(),
+            ChainType::EthPrivateTest => "EthPrivateTest".to_owned(),
             ChainType::EEE => "EEE".to_owned(),
             ChainType::EeeTest => "EeeTest".to_owned(),
+            ChainType::EeePrivate => "EeePrivate".to_owned(),
+            ChainType::EeePrivateTest => "EeePrivateTest".to_owned(),
         }
     }
 }
 
 #[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum WalletType {
-    Normal,
-    //钱包
+    Normal, //正式钱包
     Test,  //测试钱包，对应的链为测试链
+}
+
+impl WalletType{
+   pub fn check_chain_type_match(wallet_type: &WalletType,chain_type:&NetType)->bool{
+        if wallet_type.eq(&WalletType::Normal)&&chain_type.eq(&NetType::Main){
+            true
+        }else if wallet_type.eq(&WalletType::Test)&&chain_type.ne(&NetType::Main) {
+            true
+        }else{
+            false
+        }
+    }
 }
 
 impl From<&str> for WalletType {
@@ -148,6 +177,20 @@ impl ToString for NetType {
             NetType::PrivateTest => "PrivateTest".to_owned(),
         }
     }
+}
+
+impl NetType{
+   pub fn from_chain_type(chain_type:&str)->Self{
+       if chain_type.contains("PrivateTest"){
+           NetType::PrivateTest
+       }else if chain_type.contains("Private") {
+           NetType::Private
+       }else if chain_type.contains("Test"){
+           NetType::Test
+       }else {
+           NetType::Main
+       }
+   }
 }
 
 #[allow(non_camel_case_types)]

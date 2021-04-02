@@ -188,31 +188,32 @@ pub struct EthChain {
 }
 
 impl Chain2WalletType for EthChain {
-    fn chain_type(wallet_type: &WalletType) -> ChainType {
-        match wallet_type {
-            WalletType::Normal => ChainType::ETH,
+    fn chain_type(wallet_type: &WalletType,net_type:&NetType) -> ChainType {
+        match (wallet_type,net_type) {
+            (WalletType::Normal,NetType::Main) => ChainType::ETH,
+            (WalletType::Test,NetType::Test) => ChainType::EthTest,
+            (WalletType::Test,NetType::Private) => ChainType::EthPrivate,
+            (WalletType::Test,NetType::PrivateTest) => ChainType::EthPrivateTest,
             _ => ChainType::EthTest,
         }
     }
 
-    fn to_chain_type(&self, wallet_type: &WalletType) -> ChainType {
+   /* fn to_chain_type(&self, wallet_type: &WalletType) -> ChainType {
         EthChain::chain_type(wallet_type)
-    }
+    }*/
 }
 
-#[async_trait]
-impl Load for EthChain {
-    type MType = MWallet;
-
-    async fn load(&mut self, context: &dyn ContextTrait, mw: Self::MType) -> Result<(), WalletError> {
+/*#[async_trait]*/
+impl EthChain {
+   pub async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet,net_type:&NetType) -> Result<(), WalletError> {
         self.chain_shared.set_m(&mw);
-        let wallet_type = WalletType::from(mw.wallet_type.as_str());
-        self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
 
+        let wallet_type = WalletType::from(mw.wallet_type.as_str());
+        let chain_type =  EthChain::chain_type(&wallet_type, &net_type).to_string();
         {//load address
             let wallet_id = self.chain_shared.wallet_id.clone();
-            let chain_type = self.chain_shared.chain_type.clone();
             self.chain_shared.set_addr(context, &wallet_id, &chain_type).await?;
+            self.chain_shared.m.chain_type = chain_type;
         }
         {//load token
 

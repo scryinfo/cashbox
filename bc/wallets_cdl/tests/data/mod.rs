@@ -1,14 +1,15 @@
 use super::*;
 
-use wallets_types::{CreateWalletParameters,Wallet};
+use wallets_types::{CreateWalletParameters, Wallet};
 use wallets_cdl::{
     to_str,
-    mem_c::{CWallet_dFree,CStr_dFree,CStr_dAlloc,CWallet_dAlloc},
-    wallets_c::{Wallets_createWallet,Wallets_generateMnemonic,},
+    mem_c::{CWallet_dFree, CStr_dFree, CStr_dAlloc, CWallet_dAlloc},
+    wallets_c::{Wallets_createWallet, Wallets_generateMnemonic},
     parameters::CCreateWalletParameters,
-    types::CWallet
+    types::CWallet,
 };
-use mav::{WalletType,kits::uuid,CTrue};
+use mav::NetType;
+
 pub mod node_rpc;
 
 pub fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
@@ -16,7 +17,7 @@ pub fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
         let mnemonic = {
             let p_mn = CStr_dAlloc();
             {
-                let c_err = Wallets_generateMnemonic(18,p_mn) as *mut CError;
+                let c_err = Wallets_generateMnemonic(18, p_mn) as *mut CError;
                 assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
                 CError_free(c_err);
             }
@@ -29,7 +30,7 @@ pub fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
             name: "test".to_owned(),
             password: "123456".to_string(),
             mnemonic: mnemonic.clone(),
-            wallet_type: WalletType::Normal.to_string(),
+            wallet_type: mav::WalletType::Normal.to_string(),
         });
         let c_wallet = CWallet_dAlloc();
         let c_err = Wallets_createWallet(*c_ctx, c_parameters, c_wallet) as *mut CError;
@@ -54,8 +55,9 @@ pub fn init_wallets_context(c_ctx: *mut *mut CContext) -> *mut CError {
 
 pub fn init_parameters() -> InitParameters {
     let mut p = InitParameters::default();
-   // p.is_memory_db=CTrue;
-    //let prefix = format!("{}_",uuid());
+    p.net_type="Main".to_string();
+    // p.is_memory_db=mav::CTrue;
+    //let prefix = format!("{}_",kits::uuid());
     let prefix = "test_";
     p.db_name.0 = mav::ma::DbName::new(&prefix, "");
     p.context_note = format!("test_{}", prefix);

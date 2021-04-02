@@ -143,7 +143,7 @@ fn eth_update_default_token_list_test() {
         CError_free(c_err);
         let _wallet_test = data::create_wallet(c_ctx);
         let c_array_wallet = CArrayCWallet_dAlloc();
-        let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
+        let c_err = Wallets_all(*c_ctx, to_c_char("Main"),c_array_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_tokens.free();

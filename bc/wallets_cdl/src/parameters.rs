@@ -18,6 +18,7 @@ pub struct CInitParameters {
     pub dbName: *mut CDbName,
     pub isMemoryDb:CBool,
     pub contextNote: *mut c_char,
+    pub netType:*mut c_char,
 }
 
 #[repr(C)]

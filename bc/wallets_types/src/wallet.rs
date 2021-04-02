@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 use mav::ma::{Dao, MWallet, MAddress};
-use mav::WalletType;
+use mav::{WalletType, NetType};
 
 use crate::{BtcChain, ContextTrait, EeeChain, EthChain, Load, WalletError};
 use crate::deref_type;
@@ -27,35 +27,36 @@ impl Wallet {
         Ok(count)
     }
 
-    pub async fn all(context: &dyn ContextTrait) -> Result<Vec<Wallet>, WalletError> {
-        let mut ws = Vec::new();
-        let dws = MWallet::list(context.db().wallets_db(), "").await?;
-        log::debug!("log output test,wallet size: 1");
-        log::debug!("wallet size:{}",dws.len());
+    pub async fn all(context: &dyn ContextTrait,net_type:&NetType) -> Result<Vec<Wallet>, WalletError> {
+        let mut wallets = Vec::new();
+        let wallet_rb = context.db().wallets_db();
+        let filter_value = if NetType::Main.eq(net_type) {WalletType::Normal.to_string() }else { WalletType::Test.to_string() };
+        let wrapper = wallet_rb.new_wrapper().eq(MWallet::wallet_type,filter_value.as_str());
+        let dws = MWallet::list_by_wrapper(wallet_rb, "",&wrapper).await?;
         for dw in &dws {
-            let mut w = Wallet::default();
-            w.load(context, dw.clone()).await?;
-            log::debug!("wallet detail is {:?}",w);
-            ws.push(w);
+            let mut wallet = Wallet::default();
+            wallet.load(context, dw.clone(),net_type).await?;
+            wallets.push(wallet);
         }
-        Ok(ws)
+        Ok(wallets)
     }
     pub async fn m_wallet_all(context: &dyn ContextTrait) -> Result<Vec<MWallet>, WalletError> {
         let dws = MWallet::list(context.db().wallets_db(), "").await?;
         Ok(dws)
     }
-    pub async fn find_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<Option<Wallet>, WalletError> {
+    pub async fn find_by_id(context: &dyn ContextTrait, wallet_id: &str,net_type:&NetType) -> Result<Option<Wallet>, WalletError> {
         let rb = context.db().wallets_db();
         let m_wallet = MWallet::fetch_by_id(rb, "", &wallet_id.to_owned()).await?;
         match m_wallet {
             Some(m) => {
                 let mut wallet = Wallet::default();
-                wallet.load(context, m).await?;
+                wallet.load(context, m,net_type).await?;
                 Ok(Some(wallet))
             }
             None => Ok(None)
         }
     }
+    //todo 当一个助记词在测试链下多次使用时，会造成一个地址对应多个测试钱包
     pub async fn find_by_address(context: &dyn ContextTrait, address: &str) -> Result<Option<Wallet>, WalletError> {
         let wallet_db = context.db().wallets_db();
         let m_address = {
@@ -66,7 +67,8 @@ impl Wallet {
             return Err(WalletError::Custom(format!("wallet address {} is not exist!", address)));
         }
         let address = m_address.unwrap();
-        Self::find_by_id(context,&address.wallet_id.to_owned()).await
+
+        Self::find_by_id(context,&address.wallet_id.to_owned(),&NetType::from_chain_type(&address.chain_type)).await
     }
     pub async fn m_wallet_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<Option<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
@@ -104,29 +106,34 @@ impl Wallet {
         Ok(ms)
     }
 
-    pub async fn wallet_type_mnemonic_digest(context: &dyn ContextTrait, digest: &str, wallet_type: &WalletType) -> Result<Vec<MWallet>, WalletError> {
+    pub async fn check_duplicate_mnemonic(context: &dyn ContextTrait, digest: &str, wallet_type: &WalletType) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
-        let wrapper = rb.new_wrapper()
-        .eq(MWallet::mnemonic_digest, digest.to_owned())
-        .eq(MWallet::wallet_type, wallet_type.to_string());
+        let wrapper ={
+           let wrapper =   rb.new_wrapper().eq(MWallet::mnemonic_digest, digest.to_owned());
+            if WalletType::Test.eq(wallet_type){
+                //check test wallet mnemonic whether used in normal wallet
+                wrapper.eq(MWallet::wallet_type, WalletType::Normal.to_string())
+            }else {
+                wrapper
+            }
+        };
         let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(ms)
     }
 }
 
-#[async_trait]
-impl Load for Wallet {
-    type MType = MWallet;
-    async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet) -> Result<(), WalletError> {
+/*#[async_trait]*/
+impl  Wallet {
+   pub async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet,net_type:&NetType) -> Result<(), WalletError> {
         self.m = mw;
         {
-            self.eth_chain.load(context, self.m.clone()).await?;
+            self.eth_chain.load(context, self.m.clone(),net_type).await?;
         }
         {
-            self.eee_chain.load(context, self.m.clone()).await?;
+            self.eee_chain.load(context, self.m.clone(),net_type).await?;
         }
         {
-            self.btc_chain.load(context, self.m.clone()).await?;
+            self.btc_chain.load(context, self.m.clone(),net_type).await?;
         }
 
         Ok(())

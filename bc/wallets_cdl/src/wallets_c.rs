@@ -53,7 +53,8 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, context: 
     let err = {
         let parameter = CInitParameters::ptr_rust(parameter);
         let new_ctx = Context::new(&parameter.context_note);
-        if let Some(wallets) = contexts.new(new_ctx) {
+        let net_type = NetType::from(&parameter.net_type);
+        if let Some(wallets) = contexts.new(new_ctx,net_type) {
             match block_on(wallets.init(&parameter)) {
                 Err(err) => Error::from(err),
                 Ok(ctx) => {
@@ -262,8 +263,7 @@ pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CErro
 
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut CArray<CWallet>) -> *const CError {
-    //log::debug!("enter Wallets_all");
-    log::debug!("enter Wallets_all******************************");
+    log::debug!("enter Wallets_all");
     if ctx.is_null() || arrayWallet.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or arrayWallet is null");
         log::info!("{}", err);
@@ -275,15 +275,14 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
     let mut contexts = lock.borrow_mut();
     let err = {
         let ctx = CContext::ptr_rust(ctx);
+        //let net_type = NetType::from(to_str(netType));
         match contexts.get(&ctx.id) {
             Some(wallets) => match block_on(wallets.all()) {
                 Ok(wallet_vec) => {
                     *arrayWallet = CArray::to_c_ptr(&wallet_vec);
-                    log::debug!("convert to c wallet struct size is:{}",wallet_vec.len());
                     Error::SUCCESS()
                 }
                 Err(err) => {
-                    log::debug!("wallets all error:{:?}",err);
                     Error::from(err)
                 },
             },

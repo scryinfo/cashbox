@@ -21,7 +21,7 @@ pub struct Wallets {
     pub(crate) db: Db,
     //for test, make it pub
     stopped: AtomicBool,
-
+    pub net_type:NetType,
     wallet_trait: Box<dyn WalletTrait>,
 }
 
@@ -32,11 +32,13 @@ impl Default for Wallets {
             db: Default::default(),
             raw_reentrant: RawReentrantMutex::INIT,
             stopped: AtomicBool::new(false),
+            net_type:NetType::Main,
             wallet_trait: crate::chain::Wallet::new(),
         }
     }
 }
 build_const::build_const!("constants");
+
 impl Wallets {
     pub fn lock_read(&mut self) -> bool {
         self.raw_reentrant.lock();
@@ -109,7 +111,7 @@ impl Wallets {
     }
 
     pub async fn all(&self) -> Result<Vec<Wallet>, WalletError> {
-        Wallet::all(self).await
+        Wallet::all(self,&self.net_type).await
     }
 
     pub async fn has_any(&self) -> Result<bool, WalletError> {
@@ -117,7 +119,7 @@ impl Wallets {
     }
 
     pub async fn find_by_id(&self, wallet_id: &str) -> Result<Option<Wallet>, WalletError> {
-         Wallet::find_by_id(self, wallet_id).await
+         Wallet::find_by_id(self, wallet_id,&self.net_type).await
 
     }
     ///注：只加载了wallet的id name等直接的基本数据，链数据没有加载
@@ -267,12 +269,17 @@ impl Wallets {
         };
 
         let wallet_type = WalletType::from(&parameters.wallet_type);
-        if wallet_type == WalletType::Normal {
-            let ms =
-                Wallet::wallet_type_mnemonic_digest(context, &hex_mn_digest, &wallet_type).await?;
-            if ms.is_empty().not() {
-                return Err(WalletError::Custom("this wallet is exist".to_owned()));
-            }
+        // normal wallet mnemonic can't be used more than once,test wallet mnemonic can't be used in normal wallet
+        let ms = Wallet::check_duplicate_mnemonic(context, &hex_mn_digest, &wallet_type).await?;
+        if ms.is_empty().not() {
+            let msg ={
+                if wallet_type.eq(&WalletType::Normal){
+                    format!("{} wallet mnemonic can't been reuse",&parameters.wallet_type)
+                }else {
+                    format!("this mnemonic has been used create a {} wallet",WalletType::Normal.to_string())
+                }
+            };
+            return Err(WalletError::Custom(msg));
         }
 
         let mut m_wallet = MWallet::default();
@@ -285,16 +292,23 @@ impl Wallets {
             m_wallet.wallet_type = wallet_type.to_string();
             m_wallet.name = parameters.name.clone();
             m_wallet.show=CTrue;
-            m_wallet.net_type = NetType::default_net_type(&wallet_type).to_string();
+            //m_wallet.net_type = NetType::default_net_type(&wallet_type).to_string();
         }
-        let mut m_addresses = self.generate_address_token(&mut m_wallet, &parameters.mnemonic.as_bytes().to_vec()).await?;
+        for net_type in NetType::iter() {
+            if !WalletType::check_chain_type_match(&wallet_type,&self.net_type){
+               continue
+            }
+            let mut m_addresses = self.generate_address_token(&mut m_wallet, &parameters.mnemonic.as_bytes().to_vec(),&net_type).await?;
+            MAddress::save_batch(rb, "", &mut m_addresses).await?;
+        }
+
         {
             //save to database
             //tx 只处理异常情况下，事务的rollback，所以会在事务提交成功后，调用 tx.manager = None; 阻止 [rbatis::tx::TxGuard]再管理事务
             let mut tx = rb.begin_tx_defer(false).await?;
             {
                 m_wallet.save(rb, &tx.tx_id).await?;
-                MAddress::save_batch(rb, &tx.tx_id, &mut m_addresses).await?;
+                // MAddress::save_batch(rb, &tx.tx_id, &mut m_addresses).await?;
 
                 let mut m_mnemonic = MMnemonic::default();
                 m_mnemonic.from(&m_wallet);
@@ -311,29 +325,29 @@ impl Wallets {
             Setting::save_current_wallet_chain(
                 context,
                 &m_wallet.id,
-                &EeeChain::chain_type(&wallet_type),
+                &EeeChain::chain_type(&wallet_type,&self.net_type),
             ).await?;
         }
         let mut wallet = Wallet::default();
-        wallet.load(self, m_wallet).await?;
+        wallet.load(self, m_wallet,&self.net_type).await?;
         return Ok(wallet);
     }
 
-    async fn generate_address_token(&self,wallet: &mut MWallet,mn: &[u8],) -> Result<Vec<MAddress>, WalletError> {
+    async fn generate_address_token(&self,wallet: &mut MWallet,mn: &[u8],net_type:&NetType) -> Result<Vec<MAddress>, WalletError> {
         if wallet.id.is_empty() {
             //make sure the id is not empty
             wallet.before_save();
         }
-        let chains = self.wallet_trait.chains();
         let mut addrs = Vec::new();
+        let chains = self.wallet_trait.chains();
         let wallet_type = WalletType::from(&wallet.wallet_type);
         for chain in chains {
-            let mut addr = chain.generate_address(mn, &wallet_type)?;
+            let mut addr = chain.generate_address(mn, &wallet_type,net_type)?;
             addr.before_save();
             addr.wallet_id = wallet.id.clone();
             addr.is_wallet_address = CTrue;
             addr.show = CTrue;
-            chain.generate_default_token(self, &wallet, &addr).await?;
+            chain.generate_default_token(self, &wallet, &addr,net_type).await?;
             addrs.push(addr);
         }
         Ok(addrs)
@@ -381,56 +395,39 @@ impl Wallets {
             .eq(&MEthChainToken::chain_type, &wallet_token.chain_type)
             .eq(&MEthChainToken::chain_token_shared_id, &wallet_token.token_id);
 
-       match ChainType::from(&wallet_token.chain_type)?{
-           ChainType::ETH| ChainType::EthTest=> {
-               if let Some(mut target_address) =  MEthChainToken::fetch_by_wrapper(data_rb, "", &chain_token_wrapper).await?{
-                   target_address.show = wallet_token.is_show;
-                   target_address.save_update(data_rb, "").await?;
-                   Ok(())
-               }else {
-                   let msg = format!("wallet {} will hide token {} on chain {} not exist!", wallet_token.wallet_id, wallet_token.token_id,wallet_token.chain_type);
-                   Err(WalletError::Fail(msg))
-               }
-           }
-           ChainType::BTC|ChainType::BtcTest =>{
-               if let Some(mut target_address) =  MBtcChainToken::fetch_by_wrapper(data_rb, "", &chain_token_wrapper).await?{
-                   target_address.show = CFalse;
-                   target_address.save_update(data_rb, "").await?;
-                   Ok(())
-               }else {
-                   let msg = format!("wallet {} will hide token {} not exist!", wallet_token.wallet_id, wallet_token.token_id);
-                   Err(WalletError::Fail(msg))
-               }
-           }
-           ChainType::EEE|ChainType::EeeTest =>{
-               if let Some(mut target_address) =  MEeeChainToken::fetch_by_wrapper(data_rb, "", &chain_token_wrapper).await?{
-                   target_address.show = CFalse;
-                   target_address.save_update(data_rb, "").await?;
-                   Ok(())
-               }else {
-                   let msg = format!("wallet {} will hide token {} not exist!", wallet_token.wallet_id, wallet_token.token_id);
-                   Err(WalletError::Fail(msg))
-               }
-           },
-       }
-       /* if let Some(mut target_address) =
-            MTokenAddress::fetch_by_wrapper(data_rb, "", &chain_token_wrapper).await?
-        {
-            target_address.status = 0;
-            target_address.save_update(data_rb, "").await?;
-            Ok(())
-        } else {
-            let msg = format!(
-                "wallet {} will hide token {} not exist!",
-                token_address.wallet_id, token_address.token_id
-            );
-            Err(WalletError::Fail(msg))
-        }*/
+        match ChainType::from(&wallet_token.chain_type)? {
+            ChainType::ETH | ChainType::EthTest | ChainType::EthPrivate | ChainType::EthPrivateTest => {
+                if let Some(mut target_address) = MEthChainToken::fetch_by_wrapper(data_rb, "", &chain_token_wrapper).await? {
+                    target_address.show = wallet_token.is_show;
+                    target_address.save_update(data_rb, "").await?;
+                    Ok(())
+                } else {
+                    let msg = format!("wallet {} will hide token {} on chain {} not exist!", wallet_token.wallet_id, wallet_token.token_id, wallet_token.chain_type);
+                    Err(WalletError::Fail(msg))
+                }
+            }
+            ChainType::BTC | ChainType::BtcTest | ChainType::BtcPrivate | ChainType::BtcPrivateTest => {
+                if let Some(mut target_address) = MBtcChainToken::fetch_by_wrapper(data_rb, "", &chain_token_wrapper).await? {
+                    target_address.show = CFalse;
+                    target_address.save_update(data_rb, "").await?;
+                    Ok(())
+                } else {
+                    let msg = format!("wallet {} will hide token {} not exist!", wallet_token.wallet_id, wallet_token.token_id);
+                    Err(WalletError::Fail(msg))
+                }
+            }
+            ChainType::EEE | ChainType::EeeTest | ChainType::EeePrivate | ChainType::EeePrivateTest => {
+                if let Some(mut target_address) = MEeeChainToken::fetch_by_wrapper(data_rb, "", &chain_token_wrapper).await? {
+                    target_address.show = CFalse;
+                    target_address.save_update(data_rb, "").await?;
+                    Ok(())
+                } else {
+                    let msg = format!("wallet {} will hide token {} not exist!", wallet_token.wallet_id, wallet_token.token_id);
+                    Err(WalletError::Fail(msg))
+                }
+            },
+        }
     }
-   /* pub async fn update_current_database_version(&self, database_version: &str, ) -> Result<(), WalletError> {
-        let context = self;
-        Setting::save_current_database_version(context, database_version).await
-    }*/
 }
 
 impl ContextTrait for Wallets {

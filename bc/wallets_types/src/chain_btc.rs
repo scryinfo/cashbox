@@ -5,7 +5,7 @@ use mav::{ChainType, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
 use mav::ma::{Dao, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MWallet, MBtcChainTokenAuth};
 
-use crate::{Address,Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
+use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 
 #[derive(Debug, Default)]
 pub struct BtcChainToken {
@@ -147,31 +147,39 @@ pub struct BtcChain {
 }
 
 impl Chain2WalletType for BtcChain {
-    fn chain_type(wallet_type: &WalletType) -> ChainType {
-        match wallet_type {
-            WalletType::Normal => ChainType::BTC,
+    fn chain_type(wallet_type: &WalletType,net_type:&NetType) -> ChainType {
+        match (wallet_type,net_type) {
+            (WalletType::Normal,NetType::Main) => ChainType::BTC,
+            (WalletType::Test,NetType::Test) => ChainType::BtcTest,
+            (WalletType::Test,NetType::Private) => ChainType::BtcPrivate,
+            (WalletType::Test,NetType::PrivateTest) => ChainType::BtcPrivateTest,
             _ => ChainType::BtcTest,
         }
     }
-
-    fn to_chain_type(&self, wallet_type: &WalletType) -> ChainType {
+   /* fn to_chain_type(&self, wallet_type: &WalletType) -> ChainType {
         BtcChain::chain_type(wallet_type)
-    }
+    }*/
 }
 
-#[async_trait]
-impl Load for BtcChain {
-    type MType = MWallet;
-    async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet) -> Result<(), WalletError> {
+/*#[async_trait]*/
+impl BtcChain {
+    pub async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet,net_type:&NetType) -> Result<(), WalletError> {
         self.chain_shared.set_m(&mw);
-        let wallet_type = WalletType::from(&mw.wallet_type);
-        self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
-
+       // let wallet_type = WalletType::from(&mw.wallet_type);
+       // self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
+        let wallet_type = WalletType::from(mw.wallet_type.as_str());
+        let chain_type =  BtcChain::chain_type(&wallet_type, &net_type).to_string();
         {//load address
+            let wallet_id = self.chain_shared.wallet_id.clone();
+            self.chain_shared.set_addr(context, &wallet_id, &chain_type).await?;
+            self.chain_shared.m.chain_type = chain_type;
+        }
+      /*  {//load address
             let wallet_id = self.chain_shared.wallet_id.clone();
             let chain_type = self.chain_shared.chain_type.clone();
             self.chain_shared.set_addr(context,&wallet_id,&chain_type).await?;
-        }
+            self.chain_shared.m.chain_type = chain_type;
+        }*/
 
        /* {//load address
             let mut addr = Address::default();

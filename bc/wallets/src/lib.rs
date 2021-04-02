@@ -1,8 +1,4 @@
-#[cfg(target_os = "android")]
-pub use logger::init_logger_once;
 
-pub use crate::contexts::Contexts;
-pub use crate::wallets::Wallets;
 
 mod chain;
 mod contexts;
@@ -11,3 +7,10 @@ mod wallets;
 
 #[cfg(target_os = "android")]
 mod logger;
+
+pub use contexts::Contexts;
+pub use wallets::Wallets;
+
+#[cfg(target_os = "android")]
+pub use logger::init_logger_once;
+

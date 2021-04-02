@@ -25,6 +25,7 @@ pub struct MWallet {
     #[serde(default)]
     pub wallet_type: String,
     /// [crate::NetType]
+    //todo 钱包的网络类型需要吗？
     #[serde(default)]
     pub net_type: String,
     #[serde(default)]
@@ -71,7 +72,7 @@ pub struct MAddress {
     pub public_key: String,
     /// 是否为钱包地址
     #[serde(default)]
-    pub is_wallet_address: u32, //#[serde(default, deserialize_with = "bool_from_u32", serialize_with = "bool_to_u32")]
+    pub is_wallet_address: u32,
     #[serde(default)]
     pub show: u32,
 }
