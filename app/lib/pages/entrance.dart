@@ -207,14 +207,31 @@ class _EntrancePageState extends State<EntrancePage> {
         });
         defaultTokens.data = ethDefaultTokenList;
         bool isUpdateOk = EthChainControl.getInstance().updateDefaultTokenList(defaultTokens);
-        if (isUpdateOk) {
-          config.privateConfig.defaultDigitVersion = serverConfigModel.defaultTokenListVersion;
-          bool isSaveOk = await HandleConfig.instance.saveConfig(config);
-          if (!isSaveOk) {
-            Logger().e("saveConfig  is failure---> ", isSaveOk.toString());
+        if (!isUpdateOk) {
+          Logger.getInstance().e("updateDefaultTokenList", "update not ok,and is --->" + isUpdateOk.toString());
+          break UpdateDefaultToken;
+        }
+        // add to wallet
+        for (var i = 0; i < ethDefaultTokenList.length; i++) {
+          var element = ethDefaultTokenList[i];
+          TokenAddress tokenAddress = TokenAddress()
+            ..tokenId = element.chainTokenSharedId
+            ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+            ..walletId = WalletsControl.getInstance().currentWallet().id
+            ..balance = 0.toString()
+            ..addressId =
+                WalletsControl.getInstance().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, NetType.Main, ChainType.ETH) ?? "";
+          bool isUpdateBalanceOk = WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress);
+          if (!isUpdateBalanceOk) {
+            Logger().e("updateBalance error , tokenAddress info is---> ", tokenAddress.toString());
           }
         }
-        Logger.getInstance().d("updateDefaultTokenList", "isUpdateOk is --->" + isUpdateOk.toString());
+
+        config.privateConfig.defaultDigitVersion = serverConfigModel.defaultTokenListVersion;
+        bool isSaveOk = await HandleConfig.instance.saveConfig(config);
+        if (!isSaveOk) {
+          Logger().e("saveConfig  is failure---> ", isSaveOk.toString());
+        }
       } catch (e) {
         Logger.getInstance().e("updateDefaultDigitList error =====>", e.toString());
         break UpdateDefaultToken;
