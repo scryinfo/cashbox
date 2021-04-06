@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use mav::ma::{Dao, MWallet, MAddress};
 use mav::{WalletType, NetType};
 
-use crate::{BtcChain, ContextTrait, EeeChain, EthChain, Load, WalletError};
+use crate::{BtcChain, ContextTrait, EeeChain, EthChain, WalletError};
 use crate::deref_type;
 
 #[derive(Debug, Default)]

@@ -45,8 +45,6 @@ impl ChainTrait for EthChain {
 
     async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress, net_type: &NetType) -> Result<(), WalletError> {
         let wallet_type = WalletType::from(&wallet.wallet_type);
-        //这里如果实现并行就好了
-
         let token_rb = context.db().data_db(&net_type);
         let mut tx = token_rb.begin_tx_defer(false).await?;
         let default_tokens = EthChainTokenDefault::list_by_net_type(context, &net_type).await?;
@@ -58,7 +56,6 @@ impl ChainTrait for EthChain {
                 token.chain_token_shared_id = default_token.chain_token_shared_id.clone();
                 token.wallet_id = wallet.id.clone();
                 token.chain_type = wallets_types::EthChain::chain_type(&wallet_type, &net_type).to_string();
-                // token.chain_type = net_type.to_string();
                 token.show = CTrue;
                 token.contract_address = default_token.contract_address.clone();
                 tokens.push(token);

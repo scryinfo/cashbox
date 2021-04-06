@@ -168,7 +168,7 @@ pub struct Error {
 
 #[allow(non_snake_case)]
 impl Error {
-    pub fn SUCCESS() -> Self { Error { code: 0, message: String::from("Success ") } }
+    pub fn SUCCESS() -> Self { Error { code: 0, message: String::from("Success") } }
     pub fn FAIL() -> Error { Error { code: 1, message: "FAIL error ".to_owned() } }
     pub fn IO() -> Error { Error { code: 100, message: "IO error".to_owned() } }
     pub fn DB() -> Error { Error { code: 500, message: "DB error".to_owned() } }

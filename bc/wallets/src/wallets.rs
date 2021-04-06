@@ -13,7 +13,7 @@ use mav::ma::{
 };
 use mav::{ChainType, NetType, WalletType, CTrue, CFalse, AppPlatformType};
 use scry_crypto::Keccak256;
-use wallets_types::{BtcChainTrait, Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, EthChainTrait, InitParameters, Load, Setting, TokenAddress, Wallet, WalletError, WalletTrait, WalletTokenStatus};
+use wallets_types::{BtcChainTrait, Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, EthChainTrait, InitParameters, Setting, TokenAddress, Wallet, WalletError, WalletTrait, WalletTokenStatus};
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
@@ -60,8 +60,8 @@ impl Wallets {
         }
         return true;
     }
-    pub fn change_net_type(&mut self,net_type:NetType){
-        self.net_type=net_type
+    pub fn change_net_type(&mut self, net_type: NetType) {
+        self.net_type = net_type
     }
     pub fn app_platform_type() -> String {
         let plat = CARGO_BUILD_TARGET.replace("-", "_");
@@ -97,7 +97,11 @@ impl Wallets {
         #[cfg(target_os = "android")]
             crate::init_logger_once();
         self.ctx.context_note = parameters.context_note.clone();
-
+        self.net_type = if parameters.net_type.is_empty() {
+            NetType::Main
+        } else {
+            NetType::from(&parameters.net_type)
+        };
         if parameters.is_memory_db == CTrue {
             self.db.init_memory_sql(&parameters.db_name).await?;
         } else {
@@ -266,10 +270,16 @@ impl Wallets {
         let rb = context.db.wallets_db();
         let hex_mn_digest = {
             let hash_first = parameters.mnemonic.as_bytes().keccak256();
-            hex::encode((&hash_first[..]).keccak256())
+            format!("0x{}",hex::encode((&hash_first[..]).keccak256()))
         };
 
         let wallet_type = WalletType::from(&parameters.wallet_type);
+        if !WalletType::check_chain_type_match(&wallet_type, &context.net_type)
+        {
+            let msg = format!(" {} wallet must match {} network,{} wallet can't use {} network",
+                              WalletType::Normal.to_string(), NetType::Main.to_string(),WalletType::Test.to_string(),NetType::Main.to_string());
+            return Err(WalletError::Custom(msg));
+        }
         // normal wallet mnemonic can't be used more than once,test wallet mnemonic can't be used in normal wallet
         let ms = Wallet::check_duplicate_mnemonic(context, &hex_mn_digest, &wallet_type).await?;
         if ms.is_empty().not() {
@@ -301,7 +311,7 @@ impl Wallets {
                     continue;
                 }
                 let mut m_addresses = self.generate_address_token(&mut m_wallet, &parameters.mnemonic.as_bytes().to_vec(), &net_type).await?;
-                MAddress::save_batch(rb,  &tx.tx_id, &mut m_addresses).await?;
+                MAddress::save_batch(rb, &tx.tx_id, &mut m_addresses).await?;
             }
             //save to database
             //tx 只处理异常情况下，事务的rollback，所以会在事务提交成功后，调用 tx.manager = None; 阻止 [rbatis::tx::TxGuard]再管理事务
