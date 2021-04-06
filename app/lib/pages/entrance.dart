@@ -189,7 +189,8 @@ class _EntrancePageState extends State<EntrancePage> {
         }
         ArrayCEthChainTokenDefault defaultTokens = ArrayCEthChainTokenDefault();
         List<EthChainTokenDefault> ethDefaultTokenList = [];
-        ethTokenOpenQueryRes.tokens.forEach((element) {
+        for (var i = 0; i < ethTokenOpenQueryRes.tokens.length; i++) {
+          var element = ethTokenOpenQueryRes.tokens[i];
           EthChainTokenDefault ethChainTokenDefault = EthChainTokenDefault();
           ethChainTokenDefault
             ..chainTokenSharedId = element.id
@@ -204,7 +205,7 @@ class _EntrancePageState extends State<EntrancePage> {
             ..ethChainTokenShared.decimal = element.decimal ?? 0
             ..position = element.position.toInt();
           ethDefaultTokenList.add(ethChainTokenDefault);
-        });
+        }
         defaultTokens.data = ethDefaultTokenList;
         bool isUpdateOk = EthChainControl.getInstance().updateDefaultTokenList(defaultTokens);
         if (!isUpdateOk) {

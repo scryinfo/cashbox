@@ -2,8 +2,8 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/digit.dart';
-import 'package:app/model/rate.dart';
+import 'package:app/model/token.dart';
+import 'package:app/model/token_rate.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -29,8 +29,8 @@ class EeeChainTxsHistoryPage extends StatefulWidget {
 }
 
 class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
-  List<Digit> walletDataList = [];
-  List<Digit> showDataList = [];
+  List<TokenM> walletDataList = [];
+  List<TokenM> showDataList = [];
   List<EeeChainTx> eeeTxListModel = [];
   String balanceInfo = "0.00";
   String moneyInfo = "0.00";
@@ -129,7 +129,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                     text: " ",
                   ),
                   TextSpan(
-                    text: "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
+                    text: "≈" + (TokenRate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
                     style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
                   ),
                 ])),

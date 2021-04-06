@@ -1,4 +1,4 @@
-import 'package:app/model/token_rate.dart';
+import 'token_rate.dart';
 
 class TokenM {
   String tokenId; //Token id
@@ -14,4 +14,20 @@ class TokenM {
   bool isVisible = true; //Is the token visible
   TokenRate tokenRate; //market price
   String lastTxInfo; //The last transaction on the chain
+}
+
+class EeeToken extends TokenM {}
+
+class BtcToken extends TokenM {}
+
+class EthToken extends TokenM {
+  String contractAddress; //Contract address
+
+  @override
+  void set balance(String _balance) {
+    super.balance = _balance;
+  }
+
+  @override
+  String get balance => super.balance;
 }

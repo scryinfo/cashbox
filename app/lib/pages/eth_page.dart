@@ -4,11 +4,9 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/rate.dart';
 import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/model/wallets.dart';
-import 'package:app/model/wallet.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
 import 'package:app/pages/left_drawer.dart';
@@ -52,7 +50,7 @@ class _EthPageState extends State<EthPage> {
   List<TokenM> allVisibleTokenMList = []; //List of all visible tokens in the current chain
   List<TokenM> displayTokenMList = []; //Information about the number of fixed tokens displayed on the current page
   num chainIndex = 0; //Subscript of current chain
-  Rate rateInstance;
+  TokenRate rateInstance;
   Timer _loadingBalanceTimerTask; // is loading balance
   Timer _loadingRateTimerTask; // is loading balance
   Timer _loadingDigitMoneyTask; // is loading balance
@@ -79,16 +77,19 @@ class _EthPageState extends State<EthPage> {
     this.walletName = WalletsControl.getInstance().currentWallet().name;
     this.allVisibleTokenMList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
     this.allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
+    setState(() {
+      this.allVisibleTokenMList = this.allVisibleTokenMList;
+    });
     tokenListFuture = loadDisplayTokenListData();
     loadDigitBalance();
     loadLegalCurrency();
-    // loadDigitRateInfo();
+    loadDigitRateInfo();
     // todo AppInfoUtil.instance.checkAppUpgrade();
   }
 
   //Processing display fiat currency usd, cny, etc.
   loadLegalCurrency() async {
-    Rate rate = await loadRateInstance();
+    TokenRate rate = await loadRateInstance();
     if (rate == null) {
       return;
     }
@@ -113,24 +114,25 @@ class _EthPageState extends State<EthPage> {
       if (rateInstance == null) {
         return;
       }
-      if (true) {
-        List<String> rateKeys = rateInstance.digitRateMap.keys.toList();
-        for (var i = 0; i < displayTokenMList.length; i++) {
-          int index = i;
-          if ((this.displayTokenMList[index].shortName.toUpperCase() != null) &&
-              (rateKeys.contains(this.displayTokenMList[index].shortName.toUpperCase().trim().toString()))) {
-            if (mounted) {
-              setState(() {
-                this.displayTokenMList[index].tokenRate
-                  ..symbol = TokenRate.instance.getSymbol(this.displayTokenMList[index])
-                  ..price = TokenRate.instance.getPrice(this.displayTokenMList[index])
-                  ..changeDaily = TokenRate.instance.getChangeDaily(this.displayTokenMList[index]);
-              });
-            }
-          } else {
-            Logger().w("digitName is not exist===>", this.displayTokenMList[index].shortName);
-          }
+      List<String> rateKeys = rateInstance.tokenRateMap.keys.toList();
+      for (var i = 0; i < displayTokenMList.length; i++) {
+        int index = i;
+        if (this.displayTokenMList[index].shortName == null) {
+          continue;
         }
+        if (!rateKeys.contains(this.displayTokenMList[index].shortName.toUpperCase().trim().toString())) {
+          Logger().w("digitName is not exist===>", this.displayTokenMList[index].shortName);
+          continue;
+        }
+        if (!mounted) {
+          continue;
+        }
+        setState(() {
+          this.displayTokenMList[index].tokenRate
+            ..symbol = TokenRate.instance.getSymbol(this.displayTokenMList[index])
+            ..price = TokenRate.instance.getPrice(this.displayTokenMList[index])
+            ..changeDaily = TokenRate.instance.getChangeDaily(this.displayTokenMList[index]);
+        });
       }
     });
   }
@@ -143,28 +145,19 @@ class _EthPageState extends State<EthPage> {
     if (_loadingBalanceTimerTask != null) {
       _loadingBalanceTimerTask.cancel();
     }
-    Config config = await HandleConfig.instance.getConfig();
     _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
       for (var i = 0; i < displayTokenMList.length; i++) {
         int index = i;
         String balance = "0";
         if (this.displayTokenMList[index].contractAddress != null && this.displayTokenMList[index].contractAddress.trim() != "") {
-          balance = await loadErc20Balance(WalletsControl.getInstance().currentChainAddress() ?? "", this.displayTokenMList[index].contractAddress,
-              WalletsControl.getInstance().currentChainType());
-        } else if (WalletsControl.getInstance().currentChainAddress() != null && WalletsControl.getInstance().currentChainAddress().trim() != "") {
-          balance = await loadEthBalance(WalletsControl.getInstance().currentChainAddress() ?? "", WalletsControl.getInstance().currentChainType());
-        } else {}
+          balance = await loadErc20Balance(
+              WalletsControl().currentChainAddress() ?? "", this.displayTokenMList[index].contractAddress, WalletsControl().currentChainType());
+        }
+        if (WalletsControl().currentChainAddress() != null && WalletsControl().currentChainAddress().trim() != "") {
+          balance = await loadEthBalance(WalletsControl().currentChainAddress() ?? "", WalletsControl().currentChainType());
+        }
         if (balance == null || double.parse(balance) == double.parse("0")) {
           continue;
-        }
-        {
-          WalletDy.TokenAddress tokenAddress = WalletDy.TokenAddress()
-            ..walletId = WalletsControl.getInstance().currentWallet().id
-            ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
-            ..tokenId = this.displayTokenMList[index].tokenId
-            ..addressId = WalletsControl.getInstance().currentChainAddress()
-            ..balance = balance;
-          WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress);
         }
         allVisibleTokenMList[index].balance = balance ?? "0";
         if (mounted) {
@@ -172,6 +165,13 @@ class _EthPageState extends State<EthPage> {
             this.displayTokenMList[index].balance = balance ?? "0";
           });
         }
+        WalletDy.TokenAddress tokenAddress = WalletDy.TokenAddress()
+          ..walletId = WalletsControl.getInstance().currentWallet().id
+          ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+          ..tokenId = this.displayTokenMList[index].tokenId
+          ..addressId = WalletsControl.getInstance().currentChainAddress()
+          ..balance = balance;
+        WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress);
       }
       loadDigitMoney(); //If you have a balance, go to calculate the money value
     });
@@ -185,7 +185,7 @@ class _EthPageState extends State<EthPage> {
     if (_loadingDigitMoneyTask != null) {
       _loadingDigitMoneyTask.cancel();
     }
-    _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
+    _loadingDigitMoneyTask = Timer(const Duration(milliseconds: 1000), () async {
       for (var i = 0; i < displayTokenMList.length; i++) {
         var index = i;
         nowWalletAmount = 0;
@@ -699,7 +699,7 @@ class _EthPageState extends State<EthPage> {
                 icon: Icon(Icons.keyboard_arrow_down),
                 itemBuilder: (BuildContext context) => _makePopMenuList(),
                 onSelected: (String value) async {
-                  Rate.instance.setNowLegalCurrency(value);
+                  TokenRate.instance.setNowLegalCurrency(value);
                   if (mounted) {
                     setState(() {
                       moneyUnitStr = value;

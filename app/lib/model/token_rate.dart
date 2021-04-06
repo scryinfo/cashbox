@@ -14,7 +14,7 @@ class TokenRate {
 
   TokenRate._internal();
 
-  Map<String, DigitRate> digitRateMap = Map<String, DigitRate>();
+  Map<String, TokenRateM> tokenRateMap = Map<String, TokenRateM>();
   Map legalMap = Map<String, double>();
   String nowLegalCurrency = "USD";
   String symbol = "";
@@ -22,7 +22,7 @@ class TokenRate {
   double changeDaily = 0.00;
 
   setDigitRateMap(Map digitRateMap) {
-    this.digitRateMap = digitRateMap;
+    this.tokenRateMap = digitRateMap;
   }
 
   setLegalMap(map) {
@@ -46,33 +46,33 @@ class TokenRate {
   }
 
   double getChangeDaily(TokenM digit) {
-    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
+    if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return this.digitRateMap[digit.shortName.trim().toUpperCase()].changeDaily;
+    return this.tokenRateMap[digit.shortName.trim().toUpperCase()].changeDaily;
   }
 
   String getName(TokenM digit) {
-    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
+    if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return "";
     }
-    return this.digitRateMap[digit.shortName.trim().toUpperCase()].name;
+    return this.tokenRateMap[digit.shortName.trim().toUpperCase()].name;
   }
 
   String getSymbol(TokenM digit) {
-    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
+    if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return "";
     }
-    return this.digitRateMap[digit.shortName.trim().toUpperCase()].symbol;
+    return this.tokenRateMap[digit.shortName.trim().toUpperCase()].symbol;
   }
 
   double getPrice(TokenM digit) {
     //Unit price corresponding to fiat currency
-    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
+    if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return instance.digitRateMap[digit.shortName.trim().toUpperCase()].price * instance.legalMap[getNowLegalCurrency()];
-    //return instance.digitRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[getNowLegalCurrency()];
+    return instance.tokenRateMap[digit.shortName.trim().toUpperCase()].price * instance.legalMap[getNowLegalCurrency()];
+    //return instance.tokenRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[getNowLegalCurrency()];
   }
 
   double getMoney(TokenM digit) {
@@ -83,24 +83,24 @@ class TokenRate {
   }
 
   double getHigh(TokenM digit) {
-    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
+    if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return instance.digitRateMap[digit.shortName.trim().toUpperCase()].high;
-    //return instance.digitRateMap[digit.shortName.toUpperCase()]["high"];
+    return instance.tokenRateMap[digit.shortName.trim().toUpperCase()].high;
+    //return instance.tokenRateMap[digit.shortName.toUpperCase()]["high"];
   }
 
   double getLow(TokenM digit) {
-    if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
+    if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return instance.digitRateMap[digit.shortName.trim().toUpperCase()].low;
-    //return instance.digitRateMap[digit.shortName.toUpperCase()]["low"];
+    return instance.tokenRateMap[digit.shortName.trim().toUpperCase()].low;
+    //return instance.tokenRateMap[digit.shortName.toUpperCase()]["low"];
   }
 }
 
 //API returns the model format is consistent
-class DigitRate {
+class TokenRateM {
   String name = "";
   String symbol = "";
   double price = 0.0;

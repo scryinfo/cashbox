@@ -3,15 +3,9 @@ import 'dart:async';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
-import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/chain.dart';
-import 'package:app/model/digit.dart';
-import 'package:app/model/rate.dart';
 import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
-import 'package:app/model/wallet.dart';
-import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:app/pages/left_drawer.dart';
@@ -54,7 +48,7 @@ class _EeePageState extends State<EeePage> {
   List<TokenM> allVisibleTokenMList = []; //List of all visible tokens in the current chain
   List<TokenM> displayTokenMList = []; //Information about the number of fixed tokens displayed on the current page
   num chainIndex = 0; //Subscript of current chain
-  Rate rateInstance;
+  TokenRate rateInstance;
   Timer _loadingBalanceTimerTask; // is loading balance
   Timer _loadingRateTimerTask; // is loading balance
   Timer _loadingDigitMoneyTask; // is loading balance
@@ -92,7 +86,7 @@ class _EeePageState extends State<EeePage> {
 
   //Processing display fiat currency usd, cny, etc.
   loadLegalCurrency() async {
-    Rate rate = await loadRateInstance();
+    TokenRate rate = await loadRateInstance();
     if (rate == null) {
       return;
     }
@@ -118,7 +112,7 @@ class _EeePageState extends State<EeePage> {
         return;
       }
       if (true) {
-        List<String> rateKeys = rateInstance.digitRateMap.keys.toList();
+        List<String> rateKeys = rateInstance.tokenRateMap.keys.toList();
         for (var i = 0; i < displayTokenMList.length; i++) {
           int index = i;
           if ((this.displayTokenMList[index].shortName.toUpperCase() != null) &&
@@ -719,7 +713,7 @@ class _EeePageState extends State<EeePage> {
                 icon: Icon(Icons.keyboard_arrow_down),
                 itemBuilder: (BuildContext context) => _makePopMenuList(),
                 onSelected: (String value) async {
-                  Rate.instance.setNowLegalCurrency(value);
+                  TokenRate.instance.setNowLegalCurrency(value);
                   if (mounted) {
                     setState(() {
                       moneyUnitStr = value;

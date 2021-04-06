@@ -1,8 +1,6 @@
-import 'package:app/model/chain.dart';
-import 'package:app/model/digit.dart';
-import 'package:app/model/rate.dart';
+import 'package:app/model/token.dart';
+import 'package:app/model/token_rate.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -28,8 +26,8 @@ class EthChainTxsHistoryPage extends StatefulWidget {
 
 class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
   Future txListFuture;
-  List<Digit> walletDataList = [];
-  List<Digit> showDataList = [];
+  List<TokenM> walletDataList = [];
+  List<TokenM> showDataList = [];
   List<EthTransactionModel> ethTxListModel = [];
   String balanceInfo = "0.00";
   String moneyInfo = "0.00";
@@ -127,7 +125,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                     text: " ",
                   ),
                   TextSpan(
-                    text: "≈" + (Rate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
+                    text: "≈" + (TokenRate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
                     style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
                   ),
                 ])),

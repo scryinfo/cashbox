@@ -1,5 +1,6 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/model/token.dart';
 import 'package:app/model/tx_model/eee_transaction_model.dart';
 import 'package:app/model/wallet.dart';
 import 'package:logger/logger.dart';
@@ -9,7 +10,6 @@ import 'package:wallets/enums.dart';
 import 'dart:convert' as convert;
 import 'dart:typed_data';
 import 'chain.dart';
-import 'digit.dart';
 
 //Wallet management
 class Wallets {
@@ -168,9 +168,9 @@ class Wallets {
         List eeeChainDigitList = eeeChain["eeeChainDigitList"];
         for (int j = 0; j < eeeChainDigitList.length; j++) {
           Map digitInfoMap = eeeChainDigitList[j];
-          Digit digitM = EeeDigit();
+          TokenM digitM = EeeToken();
           digitM
-            ..digitId = digitInfoMap["digitId"]
+            ..tokenId = digitInfoMap["digitId"]
             ..chainId = digitInfoMap["chainId"]
             ..contractAddress = digitInfoMap["contractAddress"]
             ..address = eeeChain["chainAddress"] // !attention this differ
@@ -199,9 +199,9 @@ class Wallets {
         if (ethChainDigitList != null && ethChainDigitList.length > 0) {
           for (int j = 0; j < ethChainDigitList.length; j++) {
             Map digitInfoMap = ethChainDigitList[j];
-            Digit digitM = EthDigit();
+            TokenM digitM = EthToken();
             digitM
-              ..digitId = digitInfoMap["digitId"]
+              ..tokenId = digitInfoMap["digitId"]
               ..chainId = digitInfoMap["chainId"]
               ..contractAddress = digitInfoMap["contractAddress"]
               ..address = ethChain["chainAddress"] // !attention this differ
@@ -431,7 +431,7 @@ class Wallets {
     if (status == null || status != 200) {
       Logger().e("updateDigitBalance=>", "error status code is" + status.toString() + "||message is=>" + updateMap["message"].toString());
     } else {
-      var index = this.nowWallet.nowChain.digitsList.indexWhere((element) => (element.digitId == digitId));
+      var index = this.nowWallet.nowChain.digitsList.indexWhere((element) => (element.tokenId == digitId));
       if (index != -1) {
         this.nowWallet.nowChain.digitsList[index].balance = balance;
       }
@@ -571,7 +571,7 @@ class Wallets {
     resultMap["count"] = count;
     resultMap["startItem"] = startItem;
     List authDigitList = updateMap["authDigit"];
-    List<Digit> resultAuthDigitList = [];
+    List<TokenM> resultAuthDigitList = [];
     if (authDigitList == null || authDigitList.length == 0) {
       resultMap["authDigit"] = resultAuthDigitList;
       return resultMap;
@@ -585,12 +585,12 @@ class Wallets {
       switch (chain.chainType) {
         case ChainType.ETH:
         case ChainType.EthTest:
-          Digit ethDigit = new EthDigit();
+          TokenM ethDigit = new EthToken();
           ethDigit.shortName = symbol;
           ethDigit.fullName = fullName;
           ethDigit.decimal = decimal;
           ethDigit.contractAddress = contract;
-          ethDigit.digitId = digitId;
+          ethDigit.tokenId = digitId;
           ethDigit.isVisible =
               false; //Loaded from the token list, set the invisible first, and compare it with the local chain before determining whether it is visible
           resultAuthDigitList.add(ethDigit);
@@ -649,7 +649,7 @@ class Wallets {
       switch (chain.chainType) {
         case ChainType.ETH:
         case ChainType.EthTest:
-          Digit ethDigit = new EthDigit();
+          TokenM ethDigit = new EthToken();
           ethDigit.shortName = symbol;
           ethDigit.fullName = fullName;
           ethDigit.decimal = decimal;

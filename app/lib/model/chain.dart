@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:app/model/token.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 import 'package:wallets/enums.dart';
 
-import 'digit.dart';
 
 
 
@@ -12,13 +12,13 @@ abstract class Chain {
   String walletId; //Wallet Id
   String chainAddress; //Chain address
   String pubKey; //Chain address
-  List<Digit> digitsList = [];
-  List<Digit> _visibleDigitsList = [];
+  List<TokenM> digitsList = [];
+  List<TokenM> _visibleDigitsList = [];
   bool isVisible = true; //The default chain is visible
   ChainType chainType;
 
   //List of visible tokens: digit.isVisible = true type
-  List<Digit> getVisibleDigitList() {
+  List<TokenM> getVisibleDigitList() {
     if (_visibleDigitsList != null && _visibleDigitsList.length != 0) {
       return _visibleDigitsList;
     }
@@ -100,7 +100,7 @@ abstract class Chain {
 
   // Show tokens
   // apiNo:WM14
-  Future<bool> showDigit(Digit digit) async {
+  Future<bool> showDigit(TokenM digit) async {
     /*Map showDigitMap = await WalletManager.showDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
     int status = showDigitMap["status"];
     bool isShowDigit = showDigitMap["isShowDigit"];
@@ -123,7 +123,7 @@ abstract class Chain {
 
   // Hidden tokens
   // apiNo:WM15
-  Future<bool> hideDigit(Digit digit) async {
+  Future<bool> hideDigit(TokenM digit) async {
     /*Map hideDigitMap = await WalletManager.hideDigit(walletId, Chain.chainTypeToInt(chainType), digit.digitId);
     int status = hideDigitMap["status"];
     bool isHideDigit = hideDigitMap["isHideDigit"];

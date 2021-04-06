@@ -1,5 +1,5 @@
 import 'package:app/model/chain.dart';
-import 'package:app/model/digit.dart';
+import 'package:app/model/token.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -25,7 +25,7 @@ class SearchDigitPage extends StatefulWidget {
 }
 
 class _SearchDigitPageState extends State<SearchDigitPage> {
-  List<Digit> displayDigitsList = [];
+  List<TokenM> displayDigitsList = [];
   Wallet nowWalletM;
   Chain nowChain;
   TextEditingController _searchContentController = TextEditingController();
@@ -237,7 +237,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                     var tempDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
                     for (int i = 0; i < tempDigitList.length; i++) {
                       var element = tempDigitList[i];
-                      if (element.digitId == displayDigitsList[index].digitId) {
+                      if (element.tokenId == displayDigitsList[index].tokenId) {
                         isDigitExist = true;
                         break;
                       }
@@ -247,7 +247,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                     } else {
                       // Save to digit under the local Chain (bottom + model)
                       var addDigitMap = await Wallets.instance.addDigitToChainModel(
-                          Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].digitId);
+                          Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].tokenId);
                       int status = addDigitMap["status"];
                       if (status == null || status != 200) {
                         Fluttertoast.showToast(msg: translate('save_digit_model_failure').toString());
@@ -320,7 +320,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
     if (param == null || param.trim() == "") {
       return;
     }
-    List<Digit> tempList = [];
+    List<TokenM> tempList = [];
     Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
       if (element.shortName.toLowerCase() == param.toLowerCase() ||
           element.fullName.toLowerCase() == param.toLowerCase() ||
@@ -341,7 +341,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
     }
     var status = queryMap["status"];
     if (status != null && status == 200) {
-      List<Digit> tempList = List.from(queryMap["authDigit"]);
+      List<TokenM> tempList = List.from(queryMap["authDigit"]);
       if (tempList != null && tempList.length > 0) {
         setState(() {
           this.displayDigitsList = tempList;

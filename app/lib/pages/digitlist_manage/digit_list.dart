@@ -1,6 +1,6 @@
 import 'package:app/model/chain.dart';
-import 'package:app/model/digit.dart';
-import 'package:app/model/rate.dart';
+import 'package:app/model/token.dart';
+import 'package:app/model/token_rate.dart';
 import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
@@ -31,8 +31,8 @@ class _DigitListPageState extends State<DigitListPage> {
   Wallet nowWalletM;
   Chain nowChain;
   String nowChainAddress = "";
-  List<Digit> nowChainDigitsList = [];
-  List<Digit> displayDigitsList = [];
+  List<TokenM> nowChainDigitsList = [];
+  List<TokenM> displayDigitsList = [];
 
   @override
   void initState() {
@@ -198,7 +198,7 @@ class _DigitListPageState extends State<DigitListPage> {
     );
   }
 
-  Future<List<Digit>> loadDisplayDigitListData() async {
+  Future<List<TokenM>> loadDisplayDigitListData() async {
     if (displayDigitsList.length == 0) {
       //No display data
       if (nowChainDigitsList.length < singleDigitCount) {
@@ -221,10 +221,9 @@ class _DigitListPageState extends State<DigitListPage> {
     return displayDigitsList;
   }
 
-  List<Digit> addDigitToDisplayList(int targetCount) {
+  List<TokenM> addDigitToDisplayList(int targetCount) {
     for (var i = displayDigitsList.length; i < targetCount; i++) {
-      var digitRate = DigitRate();
-      Digit digit = EthDigit();
+      TokenM digit = EthToken();
       digit
         ..chainId = nowChainDigitsList[i].chainId
         ..decimal = nowChainDigitsList[i].decimal
@@ -232,8 +231,7 @@ class _DigitListPageState extends State<DigitListPage> {
         ..fullName = nowChainDigitsList[i].fullName
         ..balance = nowChainDigitsList[i].balance
         ..contractAddress = nowChainDigitsList[i].contractAddress
-        ..address = nowChainDigitsList[i].address
-        ..digitRate = digitRate;
+        ..address = nowChainDigitsList[i].address;
       displayDigitsList.add(digit);
     }
     return displayDigitsList;

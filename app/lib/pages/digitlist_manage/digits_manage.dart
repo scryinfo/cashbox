@@ -2,10 +2,7 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/chain.dart';
-import 'package:app/model/digit.dart';
 import 'package:app/model/token.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/net/net_util.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -20,7 +17,6 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:package_info/package_info.dart';
 import 'dart:convert' as convert;
 import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
@@ -82,7 +78,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         ethChainTokens.forEach((element) {
           TokenM tokenM = TokenM()
             ..tokenId = element.chainTokenSharedId
-            ..shortName = element.ethChainTokenShared.tokenShared.name
+            ..shortName = element.ethChainTokenShared.tokenShared.symbol
             ..contractAddress = element.contractAddress
             ..decimal = element.ethChainTokenShared.decimal
             ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
@@ -348,6 +344,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                     Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
                     return;
                   }
+                  //var tokenAddressObj = WalletsControl.getInstance().getTokenAddress(WalletsControl.getInstance().currentWallet().id, NetType.Main);
+                  //Logger.getInstance().d("getTokenAddress", "tokenAddressObj ");
                 }
 
                 WalletTokenStatus walletTokenStatus = WalletTokenStatus()
