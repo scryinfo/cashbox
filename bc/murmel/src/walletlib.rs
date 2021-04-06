@@ -116,7 +116,7 @@ mod test {
     use bitcoin_wallet::mnemonic::Mnemonic;
     use eee::Crypto;
     use futures::executor::block_on;
-    use mav::{kits, WalletType};
+    use mav::{kits, NetType, WalletType};
     use std::collections::HashMap;
     use std::fmt::Write;
     use std::str::FromStr;
@@ -292,15 +292,22 @@ mod test {
     pub fn contexts_try() {
         let ip = init_parameters();
         let cp = create_wallet_parameters();
-        let contexts = block_on(async {
+        block_on(async {
             let lock = Contexts::collection().lock();
             let mut contexts = lock.borrow_mut();
             let new_ctx = Context::new(&ip.context_note);
-            let wallets = contexts.new(new_ctx).unwrap();
-            let _ = wallets.init(&ip).await.unwrap();
-            let w = wallets.create_wallet(cp).await.unwrap();
-            // println!("{:#?}", w);
-            println!("contexts {:#?}",contexts.contexts());
+            let wallets = contexts.new(new_ctx, NetType::Test);
+            if let Some(wallets) = wallets {
+                let _ = wallets.init(&ip).await.unwrap();
+                let w = wallets.create_wallet(cp).await;
+                w.map_or_else(
+                    |e| println!("create failed {:?}", e),
+                    |w| {
+                        println!("contexts {:#?}", contexts.contexts());
+                    },
+                );
+                // println!("{:#?}", w);
+            }
         });
     }
 }
