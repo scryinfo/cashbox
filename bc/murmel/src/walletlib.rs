@@ -116,7 +116,7 @@ mod test {
     use bitcoin_wallet::mnemonic::Mnemonic;
     use eee::Crypto;
     use futures::executor::block_on;
-    use mav::{kits, NetType, WalletType};
+    use mav::{kits, NetType, WalletType, CTrue};
     use std::collections::HashMap;
     use std::fmt::Write;
     use std::str::FromStr;
@@ -219,6 +219,8 @@ mod test {
 
     pub fn init_parameters() -> InitParameters {
         let mut p = InitParameters::default();
+        // p.is_memory_db = CTrue;
+        p.net_type = NetType::Test.to_string();
         p.db_name.0 = mav::ma::DbName::new("test_", "");
         p.context_note = format!("test_{}", "murmel");
         p
@@ -250,11 +252,12 @@ mod test {
                 },
                 |c| println!("init succeeded context {:?}", c),
             );
-            let r = wallets.create_wallet(c).await;
-            r.map_or_else(
-                |e| println!("create failed {:?}", e),
-                |w| println!("{:#?}", w),
-            );
+            let r = wallets.create_wallet(c).await.unwrap();
+            let r = wallets.all().await;
+            match r {
+                Ok(v) => { println!("{:?}", v); }
+                Err(e) => { println!("{}",e); }
+            }
         })
     }
 
