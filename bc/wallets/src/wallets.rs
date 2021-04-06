@@ -21,7 +21,7 @@ pub struct Wallets {
     pub(crate) db: Db,
     //for test, make it pub
     stopped: AtomicBool,
-    pub net_type:NetType,
+    pub net_type: NetType,
     wallet_trait: Box<dyn WalletTrait>,
 }
 
@@ -32,7 +32,7 @@ impl Default for Wallets {
             db: Default::default(),
             raw_reentrant: RawReentrantMutex::INIT,
             stopped: AtomicBool::new(false),
-            net_type:NetType::Main,
+            net_type: NetType::Main,
             wallet_trait: crate::chain::Wallet::new(),
         }
     }
@@ -60,7 +60,9 @@ impl Wallets {
         }
         return true;
     }
-
+    pub fn change_net_type(&mut self,net_type:NetType){
+        self.net_type=net_type
+    }
     pub fn app_platform_type() -> String {
         let plat = CARGO_BUILD_TARGET.replace("-", "_");
         let plat_type = {
@@ -93,12 +95,12 @@ impl Wallets {
 
     pub async fn init(&mut self, parameters: &InitParameters) -> Result<&Context, WalletError> {
         #[cfg(target_os = "android")]
-        crate::init_logger_once();
+            crate::init_logger_once();
         self.ctx.context_note = parameters.context_note.clone();
 
-        if parameters.is_memory_db==CTrue{
+        if parameters.is_memory_db == CTrue {
             self.db.init_memory_sql(&parameters.db_name).await?;
-        }else {
+        } else {
             self.db.connect(&parameters.db_name).await?;
         }
         self.db.init_tables(&DbCreateType::NotExists).await?;
@@ -111,16 +113,15 @@ impl Wallets {
     }
 
     pub async fn all(&self) -> Result<Vec<Wallet>, WalletError> {
-        Wallet::all(self,&self.net_type).await
+        Wallet::all(self, &self.net_type).await
     }
 
     pub async fn has_any(&self) -> Result<bool, WalletError> {
-       Wallet::has_any(self).await
+        Wallet::has_any(self).await
     }
 
     pub async fn find_by_id(&self, wallet_id: &str) -> Result<Option<Wallet>, WalletError> {
-         Wallet::find_by_id(self, wallet_id,&self.net_type).await
-
+        Wallet::find_by_id(self, wallet_id, &self.net_type).await
     }
     ///注：只加载了wallet的id name等直接的基本数据，链数据没有加载
     pub async fn find_wallet_base_by_name(&self, name: &str) -> Result<Vec<Wallet>, WalletError> {
@@ -139,7 +140,7 @@ impl Wallets {
         {
             // check whether is current_wallet
             if let Some(m_setting) =
-                Setting::get_setting(context, &SettingType::CurrentWallet).await?
+            Setting::get_setting(context, &SettingType::CurrentWallet).await?
             {
                 if m_setting.value_str.eq(wallet_id) {
                     return Err(WalletError::Custom(
@@ -196,7 +197,7 @@ impl Wallets {
             }
         }
     }
-    pub async fn reset_wallet_password(&self,wallet_id: &str,old_password: &str, new_password: &str,) -> Result<(), WalletError> {
+    pub async fn reset_wallet_password(&self, wallet_id: &str, old_password: &str, new_password: &str) -> Result<(), WalletError> {
         // let context = self;
         match Wallet::m_wallet_by_id(self, wallet_id).await? {
             None => Err(WalletError::NoRecord(wallet_id.to_owned())),
@@ -221,7 +222,7 @@ impl Wallets {
         }
     }
 
-    pub async fn export_wallet( &self,wallet_id: &str,password: &str, ) -> Result<String, WalletError> {
+    pub async fn export_wallet(&self, wallet_id: &str, password: &str) -> Result<String, WalletError> {
         // let context = self;
         match Wallet::m_wallet_by_id(self, wallet_id).await? {
             None => Err(WalletError::NoRecord(wallet_id.to_owned())),
@@ -233,19 +234,19 @@ impl Wallets {
             }
         }
     }
-    pub async fn rename_wallet( &mut self, name: &str, wallet_id: &str, tx_id: &str,) -> Result<u64, WalletError> {
+    pub async fn rename_wallet(&mut self, name: &str, wallet_id: &str, tx_id: &str) -> Result<u64, WalletError> {
         let context = self;
         match Wallet::m_wallet_by_id(context, wallet_id).await? {
             None => Err(WalletError::NoRecord("".to_owned())),
             Some(mut m_wallet) => {
                 m_wallet.name = name.to_owned();
-              /*  let re = ?;
-                Ok(re)*/
+                /*  let re = ?;
+                  Ok(re)*/
                 Wallet::update_by_id(context, &mut m_wallet, tx_id).await
             }
         }
     }
-    pub async fn save_current_wallet_chain( &mut self, wallet_id: &str,chain_type: &ChainType,) -> Result<(), WalletError> {
+    pub async fn save_current_wallet_chain(&mut self, wallet_id: &str, chain_type: &ChainType) -> Result<(), WalletError> {
         let context = self;
         let _re = Setting::save_current_wallet_chain(context, wallet_id, chain_type).await?;
         Ok(())
@@ -260,7 +261,7 @@ impl Wallets {
     }
 
     /// 如果是正式钱包，一个助记词只能创建一个钱包（test类型的钱包允许有重复的）
-    pub async fn create_wallet( &self,parameters: CreateWalletParameters,) -> Result<Wallet, WalletError> {
+    pub async fn create_wallet(&self, parameters: CreateWalletParameters) -> Result<Wallet, WalletError> {
         let context = self;
         let rb = context.db.wallets_db();
         let hex_mn_digest = {
@@ -272,11 +273,11 @@ impl Wallets {
         // normal wallet mnemonic can't be used more than once,test wallet mnemonic can't be used in normal wallet
         let ms = Wallet::check_duplicate_mnemonic(context, &hex_mn_digest, &wallet_type).await?;
         if ms.is_empty().not() {
-            let msg ={
-                if wallet_type.eq(&WalletType::Normal){
-                    format!("{} wallet mnemonic can't been reuse",&parameters.wallet_type)
-                }else {
-                    format!("this mnemonic has been used create a {} wallet",WalletType::Normal.to_string())
+            let msg = {
+                if wallet_type.eq(&WalletType::Normal) {
+                    format!("{} wallet mnemonic can't been reuse", &parameters.wallet_type)
+                } else {
+                    format!("this mnemonic has been used create a {} wallet", WalletType::Normal.to_string())
                 }
             };
             return Err(WalletError::Custom(msg));
@@ -291,25 +292,22 @@ impl Wallets {
             );
             m_wallet.wallet_type = wallet_type.to_string();
             m_wallet.name = parameters.name.clone();
-            m_wallet.show=CTrue;
-            //m_wallet.net_type = NetType::default_net_type(&wallet_type).to_string();
+            m_wallet.show = CTrue;
         }
-        for net_type in NetType::iter() {
-            if !WalletType::check_chain_type_match(&wallet_type,&self.net_type){
-               continue
-            }
-            let mut m_addresses = self.generate_address_token(&mut m_wallet, &parameters.mnemonic.as_bytes().to_vec(),&net_type).await?;
-            MAddress::save_batch(rb, "", &mut m_addresses).await?;
-        }
-
         {
+            let mut tx = rb.begin_tx_defer(false).await?;
+            for net_type in NetType::iter() {
+                if !WalletType::check_chain_type_match(&wallet_type, &net_type) {
+                    continue;
+                }
+                let mut m_addresses = self.generate_address_token(&mut m_wallet, &parameters.mnemonic.as_bytes().to_vec(), &net_type).await?;
+                MAddress::save_batch(rb,  &tx.tx_id, &mut m_addresses).await?;
+            }
             //save to database
             //tx 只处理异常情况下，事务的rollback，所以会在事务提交成功后，调用 tx.manager = None; 阻止 [rbatis::tx::TxGuard]再管理事务
-            let mut tx = rb.begin_tx_defer(false).await?;
             {
                 m_wallet.save(rb, &tx.tx_id).await?;
                 // MAddress::save_batch(rb, &tx.tx_id, &mut m_addresses).await?;
-
                 let mut m_mnemonic = MMnemonic::default();
                 m_mnemonic.from(&m_wallet);
                 // 现在只出现了2个数据库，所以第二个可以不使用事务，最坏的情况出现助记词保存成功，而cashbox_wallet没有成功的情况，这时不会对程序
@@ -325,15 +323,15 @@ impl Wallets {
             Setting::save_current_wallet_chain(
                 context,
                 &m_wallet.id,
-                &EeeChain::chain_type(&wallet_type,&self.net_type),
+                &EeeChain::chain_type(&wallet_type, &self.net_type),
             ).await?;
         }
         let mut wallet = Wallet::default();
-        wallet.load(self, m_wallet,&self.net_type).await?;
+        wallet.load(self, m_wallet, &self.net_type).await?;
         return Ok(wallet);
     }
 
-    async fn generate_address_token(&self,wallet: &mut MWallet,mn: &[u8],net_type:&NetType) -> Result<Vec<MAddress>, WalletError> {
+    async fn generate_address_token(&self, wallet: &mut MWallet, mn: &[u8], net_type: &NetType) -> Result<Vec<MAddress>, WalletError> {
         if wallet.id.is_empty() {
             //make sure the id is not empty
             wallet.before_save();
@@ -342,17 +340,17 @@ impl Wallets {
         let chains = self.wallet_trait.chains();
         let wallet_type = WalletType::from(&wallet.wallet_type);
         for chain in chains {
-            let mut addr = chain.generate_address(mn, &wallet_type,net_type)?;
+            let mut addr = chain.generate_address(mn, &wallet_type, net_type)?;
             addr.before_save();
             addr.wallet_id = wallet.id.clone();
             addr.is_wallet_address = CTrue;
             addr.show = CTrue;
-            chain.generate_default_token(self, &wallet, &addr,net_type).await?;
+            chain.generate_default_token(self, &wallet, &addr, net_type).await?;
             addrs.push(addr);
         }
         Ok(addrs)
     }
-    pub async fn update_address_balance( &self,net_type: &NetType,token_address: &TokenAddress,) -> Result<(), WalletError> {
+    pub async fn update_address_balance(&self, net_type: &NetType, token_address: &TokenAddress) -> Result<(), WalletError> {
         let data_rb = self.db().data_db(net_type);
         let token_address_wrapper = data_rb
             .new_wrapper()
@@ -361,19 +359,18 @@ impl Wallets {
             .eq(&MTokenAddress::token_id, &token_address.token_id)
             .eq(&MTokenAddress::address_id, &token_address.address_id);
         if let Some(mut target_address) =
-            MTokenAddress::fetch_by_wrapper(data_rb, "", &token_address_wrapper).await?
+        MTokenAddress::fetch_by_wrapper(data_rb, "", &token_address_wrapper).await?
         {
             target_address.balance = token_address.balance.clone();
             target_address.status = 1;
-            target_address.save_update(data_rb, "").await.map(|_|()).map_err(|err|err.into())
+            target_address.save_update(data_rb, "").await.map(|_| ()).map_err(|err| err.into())
         } else {
             let mut token_address_instance = token_address.clone();
             token_address_instance.m.status = 1;
-            token_address_instance.save(data_rb, "").await.map(|_|()).map_err(|err|err.into())
+            token_address_instance.save(data_rb, "").await.map(|_| ()).map_err(|err| err.into())
         }
-
     }
-    pub async fn query_address_balance(&self, net_type: &NetType, wallet_id: &str,) -> Result<Vec<TokenAddress>, WalletError> {
+    pub async fn query_address_balance(&self, net_type: &NetType, wallet_id: &str) -> Result<Vec<TokenAddress>, WalletError> {
         let data_rb = self.db().data_db(net_type);
         let token_address_wrapper = data_rb
             .new_wrapper()
@@ -425,7 +422,7 @@ impl Wallets {
                     let msg = format!("wallet {} will hide token {} not exist!", wallet_token.wallet_id, wallet_token.token_id);
                     Err(WalletError::Fail(msg))
                 }
-            },
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ use wallets_cdl::{
 
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, WalletTokenStatus, TokenAddress};
 use mav::ma::MTokenAddress;
-use wallets_cdl::wallets_c::{Wallets_updateBalance, Wallets_queryBalance, Wallets_currentWalletChain, Wallets_saveCurrentWalletChain, Wallets_hasAny, Wallets_findWalletBaseByName, Wallets_renameWallet, Wallets_resetWalletPassword, Wallets_exportWallet, Wallets_packageVersion};
+use wallets_cdl::wallets_c::{Wallets_updateBalance, Wallets_queryBalance, Wallets_currentWalletChain, Wallets_saveCurrentWalletChain, Wallets_hasAny, Wallets_findWalletBaseByName, Wallets_renameWallet, Wallets_resetWalletPassword, Wallets_exportWallet, Wallets_packageVersion, Wallets_changeNetType};
 use wallets_cdl::mem_c::{CArrayCTokenAddress_dAlloc, CArrayCTokenAddress_dFree, CBool_alloc, CBool_free};
 use wallets_cdl::kits::CTrue;
 
@@ -198,6 +198,21 @@ fn package_version_test() {
 }
 
 #[test]
+fn wallets_change_net_type_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = data::init_wallets_context(c_ctx);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let c_err = Wallets_changeNetType(*c_ctx,to_c_char("Test")) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        CContext_dFree(c_ctx);
+    }
+}
+
+#[test]
 fn wallets_all_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
@@ -209,8 +224,9 @@ fn wallets_all_test() {
         let c_err = Wallets_all(*c_ctx,c_array_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
-        let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+        let _wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
         CArrayCWallet_dFree(c_array_wallet);
+        CContext_dFree(c_ctx);
     }
 }
 

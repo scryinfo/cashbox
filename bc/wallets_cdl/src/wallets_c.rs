@@ -54,7 +54,7 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, context: 
         let parameter = CInitParameters::ptr_rust(parameter);
         let new_ctx = Context::new(&parameter.context_note);
         let net_type = NetType::from(&parameter.net_type);
-        if let Some(wallets) = contexts.new(new_ctx,net_type) {
+        if let Some(wallets) = contexts.new(new_ctx, net_type) {
             match block_on(wallets.init(&parameter)) {
                 Err(err) => Error::from(err),
                 Ok(ctx) => {
@@ -262,6 +262,31 @@ pub unsafe extern "C" fn Wallets_unlockWrite(ctx: *mut CContext) -> *const CErro
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn Wallets_changeNetType(ctx: *mut CContext, netType: *mut c_char) -> *const CError {
+    log::debug!("enter Wallets changeNetType");
+    if ctx.is_null() || netType.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx,netType is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        let net_type = NetType::from(to_str(netType));
+        match contexts.get_mut(&ctx.id) {
+            Some(wallets) =>   {
+               wallets.change_net_type(net_type);
+                Error::SUCCESS()
+            }
+            None => Error::NONE().append_message(": can not find the context"),
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut CArray<CWallet>) -> *const CError {
     log::debug!("enter Wallets_all");
     if ctx.is_null() || arrayWallet.is_null() {
@@ -275,7 +300,6 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
     let mut contexts = lock.borrow_mut();
     let err = {
         let ctx = CContext::ptr_rust(ctx);
-        //let net_type = NetType::from(to_str(netType));
         match contexts.get(&ctx.id) {
             Some(wallets) => match block_on(wallets.all()) {
                 Ok(wallet_vec) => {
@@ -284,7 +308,7 @@ pub unsafe extern "C" fn Wallets_all(ctx: *mut CContext, arrayWallet: *mut *mut 
                 }
                 Err(err) => {
                     Error::from(err)
-                },
+                }
             },
             None => Error::NONE().append_message(": can not find the context"),
         }
@@ -315,7 +339,7 @@ pub unsafe extern "C" fn Wallets_generateMnemonic(mnemonic_num: c_uint, mnemonic
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_createWallet( ctx: *mut CContext,parameters: *mut CCreateWalletParameters, wallet: *mut *mut CWallet) -> *const CError {
+pub unsafe extern "C" fn Wallets_createWallet(ctx: *mut CContext, parameters: *mut CCreateWalletParameters, wallet: *mut *mut CWallet) -> *const CError {
     log::debug!("enter Wallets_createWallet");
     if ctx.is_null() || parameters.is_null() || wallet.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or parameters or wallet is null");
@@ -348,7 +372,7 @@ pub unsafe extern "C" fn Wallets_createWallet( ctx: *mut CContext,parameters: *m
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_removeWallet(ctx: *mut CContext,walletId: *mut c_char,password: *mut c_char,) -> *const CError {
+pub unsafe extern "C" fn Wallets_removeWallet(ctx: *mut CContext, walletId: *mut c_char, password: *mut c_char) -> *const CError {
     log::debug!("enter Wallets_removeWallet");
     if ctx.is_null() || walletId.is_null() || password.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx, walletId,password cannot be null");
@@ -376,7 +400,7 @@ pub unsafe extern "C" fn Wallets_removeWallet(ctx: *mut CContext,walletId: *mut 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_exportWallet(ctx: *mut CContext, walletId: *mut c_char, password: *mut c_char, mnemonic: *mut *mut c_char, ) -> *const CError {
+pub unsafe extern "C" fn Wallets_exportWallet(ctx: *mut CContext, walletId: *mut c_char, password: *mut c_char, mnemonic: *mut *mut c_char) -> *const CError {
     log::debug!("enter Wallets_exportWallet");
     if ctx.is_null() || walletId.is_null() || password.is_null() || mnemonic.is_null() {
         let err =
@@ -392,8 +416,8 @@ pub unsafe extern "C" fn Wallets_exportWallet(ctx: *mut CContext, walletId: *mut
             Some(wallets) => {
                 match block_on(wallets.export_wallet(to_str(walletId), to_str(password))) {
                     Err(err) => Error::from(err),
-                    Ok(words) =>{
-                        *mnemonic=to_c_char(&words);
+                    Ok(words) => {
+                        *mnemonic = to_c_char(&words);
                         Error::SUCCESS()
                     }
                 }
@@ -406,7 +430,7 @@ pub unsafe extern "C" fn Wallets_exportWallet(ctx: *mut CContext, walletId: *mut
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_resetWalletPassword(ctx: *mut CContext,walletId: *mut c_char,oldPsd: *mut c_char,newPsd: *mut c_char, ) -> *const CError {
+pub unsafe extern "C" fn Wallets_resetWalletPassword(ctx: *mut CContext, walletId: *mut c_char, oldPsd: *mut c_char, newPsd: *mut c_char) -> *const CError {
     log::debug!("enter Wallets_resetWalletPassword");
     if ctx.is_null() || walletId.is_null() || oldPsd.is_null() || newPsd.is_null() {
         let err =
@@ -435,7 +459,7 @@ pub unsafe extern "C" fn Wallets_resetWalletPassword(ctx: *mut CContext,walletId
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_renameWallet(ctx: *mut CContext,newName: *mut c_char,walletId: *mut c_char, ) -> *const CError {
+pub unsafe extern "C" fn Wallets_renameWallet(ctx: *mut CContext, newName: *mut c_char, walletId: *mut c_char) -> *const CError {
     log::debug!("enter Wallets_renameWallet");
     if ctx.is_null() || newName.is_null() || walletId.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or newName or walletId is null");
@@ -497,7 +521,7 @@ pub unsafe extern "C" fn Wallets_hasAny(ctx: *mut CContext, hasAny: *mut CBool) 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_findById( ctx: *mut CContext,walletId: *mut c_char,wallet: *mut *mut CWallet,) -> *const CError {
+pub unsafe extern "C" fn Wallets_findById(ctx: *mut CContext, walletId: *mut c_char, wallet: *mut *mut CWallet) -> *const CError {
     log::debug!("enter Wallets_findById");
     if ctx.is_null() || wallet.is_null() || walletId.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or wallet or walletId is null");
@@ -594,7 +618,7 @@ pub unsafe extern "C" fn Wallets_currentWalletChain(ctx: *mut CContext, walletId
 
 ///保存当前wallet 与 chain
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_saveCurrentWalletChain( ctx: *mut CContext,walletId: *mut c_char, chainType: *mut c_char,) -> *const CError {
+pub unsafe extern "C" fn Wallets_saveCurrentWalletChain(ctx: *mut CContext, walletId: *mut c_char, chainType: *mut c_char) -> *const CError {
     log::debug!("enter Wallets_saveCurrentWalletChain");
     if ctx.is_null() || walletId.is_null() || chainType.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or walletId or chainType is null");
@@ -627,6 +651,7 @@ pub unsafe extern "C" fn Wallets_saveCurrentWalletChain( ctx: *mut CContext,wall
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+
 /// 返回 AppPlatformType
 #[no_mangle]
 pub unsafe extern "C" fn Wallets_appPlatformType() -> *const c_char {

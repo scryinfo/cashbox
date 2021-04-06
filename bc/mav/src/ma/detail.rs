@@ -24,10 +24,6 @@ pub struct MWallet {
     /// [crate::WalletType]
     #[serde(default)]
     pub wallet_type: String,
-    /// [crate::NetType]
-    //todo 钱包的网络类型需要吗？
-    #[serde(default)]
-    pub net_type: String,
     #[serde(default)]
     pub show:u32,
 }

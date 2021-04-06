@@ -172,25 +172,13 @@ impl BtcChain {
         {//load address
             let wallet_id = self.chain_shared.wallet_id.clone();
             self.chain_shared.set_addr(context, &wallet_id, &chain_type).await?;
-            self.chain_shared.m.chain_type = chain_type;
+            self.chain_shared.m.chain_type = chain_type.clone();
         }
-      /*  {//load address
-            let wallet_id = self.chain_shared.wallet_id.clone();
-            let chain_type = self.chain_shared.chain_type.clone();
-            self.chain_shared.set_addr(context,&wallet_id,&chain_type).await?;
-            self.chain_shared.m.chain_type = chain_type;
-        }*/
-
-       /* {//load address
-            let mut addr = Address::default();
-            addr.load(context,&self.chain_shared.wallet_id,&self.chain_shared.chain_type).await?;
-            self.chain_shared.wallet_address= addr;
-        }*/
         {//load token
-            let rb = context.db().data_db( &NetType::from(&mw.net_type));
+            let rb = context.db().data_db( &net_type);
             let wrapper = rb.new_wrapper()
                 .eq(MBtcChainToken::wallet_id, mw.id.clone())
-                .eq(MBtcChainToken::chain_type, self.chain_shared.chain_type.clone());
+                .eq(MBtcChainToken::chain_type, chain_type);
             let ms = MBtcChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
             for it in ms {

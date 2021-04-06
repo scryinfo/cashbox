@@ -213,14 +213,14 @@ impl EthChain {
         {//load address
             let wallet_id = self.chain_shared.wallet_id.clone();
             self.chain_shared.set_addr(context, &wallet_id, &chain_type).await?;
-            self.chain_shared.m.chain_type = chain_type;
+            self.chain_shared.m.chain_type = chain_type.clone();
         }
         {//load token
 
-            let rb = context.db().data_db(&NetType::from(&mw.net_type));
+            let rb = context.db().data_db(&net_type);
             let wrapper = rb.new_wrapper()
                 .eq(MEthChainToken::wallet_id, mw.id.clone())
-                .eq(MEthChainToken::chain_type, self.chain_shared.chain_type.clone());
+                .eq(MEthChainToken::chain_type, chain_type);
             let ms = MEthChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
             self.tokens.clear();
             for it in ms {
