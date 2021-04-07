@@ -16,8 +16,7 @@ class ChainEth {
     {
       var ptrAdditionData = Wallets.cWallets.CStr_dAlloc();
       var ptrEncodeData = encodeData.toCPtrInt8();
-      var cerr = Wallets.cWallets.ChainEth_decodeAdditionData(
-          _ptrContext, ptrEncodeData, ptrAdditionData);
+      var cerr = Wallets.cWallets.ChainEth_decodeAdditionData(_ptrContext, ptrEncodeData, ptrAdditionData);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       ptrEncodeData.free();
@@ -30,20 +29,17 @@ class ChainEth {
     return DlResult1(additionData, err);
   }
 
-  DlResult1<String> txSign(
-      NetType netType, EthTransferPayload txPayload, NoCacheString password) {
+  DlResult1<String> txSign(EthTransferPayload txPayload, NoCacheString password) {
     Error err;
     String signResult = "";
     {
       var ptrSignResult = Wallets.cWallets.CStr_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrTxPayload = txPayload.toCPtr();
       var ptrPwd = password.toCPtrInt8();
-      var cerr = Wallets.cWallets.ChainEth_txSign(
-          _ptrContext, ptrNetType, ptrTxPayload, ptrPwd, ptrSignResult);
+      var cerr = Wallets.cWallets.ChainEth_txSign(_ptrContext, ptrTxPayload, ptrPwd, ptrSignResult);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
+
       EthTransferPayload.free(ptrTxPayload);
       NoCacheString.freeInt8(ptrPwd);
 
@@ -56,20 +52,16 @@ class ChainEth {
     return DlResult1(signResult, err);
   }
 
-  DlResult1<String> rawTxSign(
-      NetType netType, EthRawTxPayload rawTxPayload, NoCacheString password) {
+  DlResult1<String> rawTxSign(EthRawTxPayload rawTxPayload, NoCacheString password) {
     Error err;
     String signResult = "";
     {
       var ptrSignResult = Wallets.cWallets.CStr_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrRawTxPayload = rawTxPayload.toCPtr();
       var ptrPwd = password.toCPtrInt8();
-      var cerr = Wallets.cWallets.ChainEth_rawTxSign(
-          _ptrContext, ptrNetType, ptrRawTxPayload, ptrPwd, ptrSignResult);
+      var cerr = Wallets.cWallets.ChainEth_rawTxSign(_ptrContext, ptrRawTxPayload, ptrPwd, ptrSignResult);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
       EthRawTxPayload.free(ptrRawTxPayload);
       NoCacheString.freeInt8(ptrPwd);
 
@@ -95,15 +87,12 @@ class ChainEth {
     return err;
   }
 
-  DlResult1<List<EthChainTokenAuth>> getChainEthAuthTokenList(
-      NetType netType, int startItem, int pageSize) {
+  DlResult1<List<EthChainTokenAuth>> getChainEthAuthTokenList(int startItem, int pageSize) {
     Error err;
     List<EthChainTokenAuth> ect = [];
     {
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var arrayToken = Wallets.cWallets.CArrayCEthChainTokenAuth_dAlloc();
-      var cerr = Wallets.cWallets.ChainEth_getAuthTokenList(
-          _ptrContext, ptrNetType, startItem, pageSize, arrayToken);
+      var cerr = Wallets.cWallets.ChainEth_getAuthTokenList(_ptrContext, startItem, pageSize, arrayToken);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       if (err.isSuccess()) {
@@ -119,8 +108,7 @@ class ChainEth {
     Error err;
     {
       var ptrDefaultTokens = defaultTokens.toCPtr();
-      var cerr =
-          Wallets.cWallets.ChainEth_updateDefaultTokenList(_ptrContext, ptrDefaultTokens);
+      var cerr = Wallets.cWallets.ChainEth_updateDefaultTokenList(_ptrContext, ptrDefaultTokens);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       ArrayCEthChainTokenDefault.free(ptrDefaultTokens);

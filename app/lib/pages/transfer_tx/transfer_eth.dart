@@ -80,7 +80,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       digitBalance = Provider.of<TransactionProvide>(context).balance;
     }
     if (fromAddress == null || fromAddress.trim() == "") {
-      fromAddress = WalletsControl.getInstance().currentChainAddress()??"";
+      fromAddress = WalletsControl.getInstance().currentChainAddress() ?? "";
     }
     if (chainType == null) {
       chainType = WalletsControl.getInstance().currentChainType();
@@ -723,14 +723,6 @@ class _TransferEthPageState extends State<TransferEthPage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            var netType = NetType.Main;
-            switch (chainType) {
-              case ChainType.EthTest:
-                netType = NetType.Test;
-                break;
-              default:
-                netType = NetType.Main;
-            }
             EthTransferPayload ethTransferPayload = EthTransferPayload();
             ethTransferPayload
               ..fromAddress = fromAddress
@@ -742,7 +734,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
               ..gasLimit = mGasLimitValue.toInt().toString()
               ..decimal = decimal;
 
-            String signResult = EthChainControl.getInstance().txSign(netType, ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
+            String signResult = EthChainControl.getInstance().txSign(ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
             if (signResult == null) {
               Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
@@ -808,8 +800,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
           contractAddress.trim() != "" &&
           displayDigitsList[i].contractAddress != null &&
           (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
-        digitBalance = await loadErc20Balance(WalletsControl.getInstance().currentChainAddress()??"",
-            displayDigitsList[i].contractAddress, WalletsControl.getInstance().currentChainType());
+        digitBalance = await loadErc20Balance(WalletsControl.getInstance().currentChainAddress() ?? "", displayDigitsList[i].contractAddress,
+            WalletsControl.getInstance().currentChainType());
         break;
       }
     }
@@ -825,8 +817,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
         return false;
       }
     }
-    ethBalance = await loadEthBalance(
-        WalletsControl.getInstance().currentChainAddress()??"", WalletsControl.getInstance().currentChainType());
+    ethBalance = await loadEthBalance(WalletsControl.getInstance().currentChainAddress() ?? "", WalletsControl.getInstance().currentChainType());
 
     if (ethBalance != null) {
       try {

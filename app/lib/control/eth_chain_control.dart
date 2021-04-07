@@ -78,16 +78,16 @@ class EthChainControl {
     return dataObj.data1;
   }
 
-  String txSign(NetType netType, EthTransferPayload txPayload, NoCacheString password) {
-    var dataObj = Wallets.mainIsolate().chainEth.txSign(netType, txPayload, password);
+  String txSign(EthTransferPayload txPayload, NoCacheString password) {
+    var dataObj = Wallets.mainIsolate().chainEth.txSign(txPayload, password);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  rawTxSign(NetType netType, EthRawTxPayload rawTxPayload, NoCacheString password) {
-    var dataObj = Wallets.mainIsolate().chainEth.rawTxSign(netType, rawTxPayload, password);
+  rawTxSign(EthRawTxPayload rawTxPayload, NoCacheString password) {
+    var dataObj = Wallets.mainIsolate().chainEth.rawTxSign(rawTxPayload, password);
     if (!dataObj.isSuccess()) {
       return null;
     }
@@ -102,8 +102,8 @@ class EthChainControl {
     return true;
   }
 
-  List<EthChainTokenAuth> getChainEthAuthTokenList(NetType netType, int startIndex, int endIndex) {
-    var dataObj = Wallets.mainIsolate().chainEth.getChainEthAuthTokenList(netType, startIndex, endIndex);
+  List<EthChainTokenAuth> getChainEthAuthTokenList(int startIndex, int endIndex) {
+    var dataObj = Wallets.mainIsolate().chainEth.getChainEthAuthTokenList(startIndex, endIndex);
     if (!dataObj.isSuccess()) {
       return null;
     }

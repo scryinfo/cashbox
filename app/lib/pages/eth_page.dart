@@ -151,7 +151,7 @@ class _EthPageState extends State<EthPage> {
           ..tokenId = this.displayTokenMList[index].tokenId
           ..addressId = WalletsControl.getInstance().currentChainAddress()
           ..balance = balance;
-        WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress);
+        WalletsControl.getInstance().updateBalance(tokenAddress);
       }
       loadDigitMoney(); //If you have a balance, go to calculate the money value
     });

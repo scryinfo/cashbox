@@ -72,56 +72,56 @@ class EeeChainControl {
     return visibleList;
   }
 
-  AccountInfo decodeAdditionData(NetType netType, DecodeAccountInfoParameters decodeAccountInfoParameters) {
-    var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(netType, decodeAccountInfoParameters);
+  AccountInfo decodeAdditionData(DecodeAccountInfoParameters decodeAccountInfoParameters) {
+    var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(decodeAccountInfoParameters);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  String txSign(NetType netType, RawTxParam rawTx) {
-    var dataObj = Wallets.mainIsolate().chainEee.txSign(netType, rawTx);
+  String txSign(RawTxParam rawTx) {
+    var dataObj = Wallets.mainIsolate().chainEee.txSign(rawTx);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  String eeeTransfer(NetType netType, EeeTransferPayload txPayload) {
-    var dataObj = Wallets.mainIsolate().chainEee.eeeTransfer(netType, txPayload);
+  String eeeTransfer(EeeTransferPayload txPayload) {
+    var dataObj = Wallets.mainIsolate().chainEee.eeeTransfer(txPayload);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  String tokenXTransfer(NetType netType, EeeTransferPayload txPayload) {
-    var dataObj = Wallets.mainIsolate().chainEee.tokenXTransfer(netType, txPayload);
+  String tokenXTransfer(EeeTransferPayload txPayload) {
+    var dataObj = Wallets.mainIsolate().chainEee.tokenXTransfer(txPayload);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  AccountInfo decodeAccountInfo(NetType netType, DecodeAccountInfoParameters decodeAccountInfoParameters) {
-    var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(netType, decodeAccountInfoParameters);
+  AccountInfo decodeAccountInfo(DecodeAccountInfoParameters decodeAccountInfoParameters) {
+    var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(decodeAccountInfoParameters);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  SubChainBasicInfo getDefaultBasicInfo(NetType netType) {
-    var dataObj = Wallets.mainIsolate().chainEee.getDefaultBasicInfo(netType);
+  SubChainBasicInfo getDefaultBasicInfo() {
+    var dataObj = Wallets.mainIsolate().chainEee.getDefaultBasicInfo();
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  ChainVersion getChainVersion(NetType netType) {
-    SubChainBasicInfo subChainBasicInfo = getDefaultBasicInfo(netType);
+  ChainVersion getChainVersion() {
+    SubChainBasicInfo subChainBasicInfo = getDefaultBasicInfo();
     if (subChainBasicInfo == null) {
       return null;
     }
@@ -133,48 +133,48 @@ class EeeChainControl {
     return chainVersion;
   }
 
-  SubChainBasicInfo getBasicInfo(NetType netType, ChainVersion chainVersion) {
-    var dataObj = Wallets.mainIsolate().chainEee.getBasicInfo(netType, chainVersion);
+  SubChainBasicInfo getBasicInfo(ChainVersion chainVersion) {
+    var dataObj = Wallets.mainIsolate().chainEee.getBasicInfo(chainVersion);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  String getStorageKey(NetType netType, StorageKeyParameters storageKeyParameters) {
-    var dataObj = Wallets.mainIsolate().chainEee.getStorageKey(netType, storageKeyParameters);
+  String getStorageKey(StorageKeyParameters storageKeyParameters) {
+    var dataObj = Wallets.mainIsolate().chainEee.getStorageKey(storageKeyParameters);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  List<EeeChainTx> getTxRecord(NetType netType, String account, int startItem, int pageSize) {
-    var dataObj = Wallets.mainIsolate().chainEee.getTxRecord(netType, account, startItem, pageSize);
+  List<EeeChainTx> getTxRecord(String account, int startItem, int pageSize) {
+    var dataObj = Wallets.mainIsolate().chainEee.getTxRecord(account, startItem, pageSize);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  AccountInfoSyncProg getSyncRecord(NetType netType, String account) {
-    var dataObj = Wallets.mainIsolate().chainEee.getSyncRecord(netType, account);
+  AccountInfoSyncProg getSyncRecord(String account) {
+    var dataObj = Wallets.mainIsolate().chainEee.getSyncRecord(account);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  bool saveExtrinsicDetail(NetType netType, ExtrinsicContext extrinsicContext) {
-    var dataObj = Wallets.mainIsolate().chainEee.saveExtrinsicDetail(netType, extrinsicContext);
+  bool saveExtrinsicDetail(ExtrinsicContext extrinsicContext) {
+    var dataObj = Wallets.mainIsolate().chainEee.saveExtrinsicDetail(extrinsicContext);
     if (!dataObj.isSuccess()) {
       return null;
     }
     return dataObj.data1;
   }
 
-  String txSubmittableSign(NetType netType, RawTxParam rawTxParam) {
-    var dataObj = Wallets.mainIsolate().chainEee.txSubmittableSign(netType, rawTxParam);
+  String txSubmittableSign(RawTxParam rawTxParam) {
+    var dataObj = Wallets.mainIsolate().chainEee.txSubmittableSign(rawTxParam);
     if (!dataObj.isSuccess()) {
       return null;
     }
@@ -189,8 +189,8 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
-  bool updateBasicInfo(NetType netType, SubChainBasicInfo subChainBasicInfo) {
-    var dataObj = Wallets.mainIsolate().chainEee.updateBasicInfo(netType, subChainBasicInfo);
+  bool updateBasicInfo(SubChainBasicInfo subChainBasicInfo) {
+    var dataObj = Wallets.mainIsolate().chainEee.updateBasicInfo(subChainBasicInfo);
     if (!dataObj.isSuccess()) {
       return null;
     }
@@ -205,8 +205,8 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
-  bool updateSyncRecord(NetType netType, AccountInfoSyncProg accountInfoSyncProg) {
-    var dataObj = Wallets.mainIsolate().chainEee.updateSyncRecord(netType, accountInfoSyncProg);
+  bool updateSyncRecord(AccountInfoSyncProg accountInfoSyncProg) {
+    var dataObj = Wallets.mainIsolate().chainEee.updateSyncRecord(accountInfoSyncProg);
 
     if (!dataObj.isSuccess()) {
       return null;
@@ -219,9 +219,9 @@ class EeeChainControl {
     ChainVersion chainVersion = ChainVersion();
     SubChainBasicInfo defaultBasicInfo;
     if (isEeeChain) {
-      defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo(NetType.Main);
+      defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo();
     } else {
-      defaultBasicInfo = EeeChainControl.getInstance().getBasicInfo(NetType.Main, chainVersion);
+      defaultBasicInfo = EeeChainControl.getInstance().getBasicInfo(chainVersion);
     }
     chainVersion
       ..genesisHash = defaultBasicInfo.genesisHash
@@ -233,7 +233,7 @@ class EeeChainControl {
       ..account = accountStr
       ..chainVersion = chainVersion;
 
-    String storageKey = EeeChainControl.getInstance().getStorageKey(NetType.Main, storageKeyParameters);
+    String storageKey = EeeChainControl.getInstance().getStorageKey(storageKeyParameters);
     return storageKey;
   }
 
@@ -282,8 +282,8 @@ class EeeChainControl {
     DecodeAccountInfoParameters decodeAccountInfoParameters = DecodeAccountInfoParameters();
     decodeAccountInfoParameters
       ..encodeData = netFormatMap["result"]
-      ..chainVersion = EeeChainControl.getInstance().getChainVersion(NetType.Main);
-    return EeeChainControl.getInstance().decodeAccountInfo(NetType.Main, decodeAccountInfoParameters);
+      ..chainVersion = EeeChainControl.getInstance().getChainVersion();
+    return EeeChainControl.getInstance().decodeAccountInfo(decodeAccountInfoParameters);
   }
 
   Future<int> loadEeeChainNonce(String module, String storageItem, String pubKey) async {
@@ -343,7 +343,7 @@ class EeeChainControl {
         ..ss58FormatPrefix = ss58Format
         ..tokenDecimals = tokenDecimals
         ..tokenSymbol = tokenSymbol;
-      bool isUpdateOk = EeeChainControl.getInstance().updateBasicInfo(NetType.Main, subChainBasicInfo);
+      bool isUpdateOk = EeeChainControl.getInstance().updateBasicInfo(subChainBasicInfo);
       if (!isUpdateOk) {
         Logger().e("updateSubChainBasicInfo isUpdateOk is ---> ", isUpdateOk.toString());
       }

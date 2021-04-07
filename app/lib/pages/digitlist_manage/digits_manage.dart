@@ -3,7 +3,6 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/token.dart';
-import 'package:app/net/net_util.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -17,7 +16,6 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'dart:convert' as convert;
 import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
 import 'package:services/services.dart';
@@ -101,8 +99,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       return;
     }
     saveToAuthToken(serverTokenList);
-    List<EthChainTokenAuth> ethChainTokenAuthList =
-        EthChainControl.getInstance().getChainEthAuthTokenList(NetType.Main, nativeDigitIndex, onePageOffSet);
+    List<EthChainTokenAuth> ethChainTokenAuthList = EthChainControl.getInstance().getChainEthAuthTokenList(nativeDigitIndex, onePageOffSet);
     {
       if (ethChainTokenAuthList == null || ethChainTokenAuthList.length == 0) {
         isLoadAuthDigitFinish = true;
@@ -291,8 +288,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
               return [];
             }
-            List<EthChainTokenAuth> ethChainTokenAuthList =
-                EthChainControl.getInstance().getChainEthAuthTokenList(NetType.Main, nativeDigitIndex, onePageOffSet);
+            List<EthChainTokenAuth> ethChainTokenAuthList = EthChainControl.getInstance().getChainEthAuthTokenList(nativeDigitIndex, onePageOffSet);
             {
               if (ethChainTokenAuthList == null || ethChainTokenAuthList.length == 0) {
                 isLoadAuthDigitFinish = true;
@@ -335,17 +331,15 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                     ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
                     ..walletId = WalletsControl.getInstance().currentWallet().id
                     ..balance = 0.toString()
-                    ..addressId = WalletsControl.getInstance().getTokenAddressId(
-                            WalletsControl.getInstance().currentWallet().id, NetType.Main, WalletsControl.getInstance().currentChainType()) ??
-                        ""; // todo NetType dynamic
-                  bool isUpsertOk = WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress);
+                    ..addressId = WalletsControl.getInstance()
+                            .getTokenAddressId(WalletsControl.getInstance().currentWallet().id, WalletsControl.getInstance().currentChainType()) ??
+                        "";
+                  bool isUpsertOk = WalletsControl.getInstance().updateBalance(tokenAddress);
                   if (!isUpsertOk) {
                     Logger.getInstance().e("updateBalance", "updateBalance failure ");
                     Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
                     return;
                   }
-                  //var tokenAddressObj = WalletsControl.getInstance().getTokenAddress(WalletsControl.getInstance().currentWallet().id, NetType.Main);
-                  //Logger.getInstance().d("getTokenAddress", "tokenAddressObj ");
                 }
 
                 WalletTokenStatus walletTokenStatus = WalletTokenStatus()
@@ -354,7 +348,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   ..tokenId = displayDigitsList[index].tokenId;
                 if (displayDigitsList[index].isVisible) {
                   walletTokenStatus.isShow = false.toInt(); // change to invisible
-                  bool isChangeOk = WalletsControl.getInstance().changeTokenStatus(NetType.Main, walletTokenStatus); // todo dynamic change netType
+                  bool isChangeOk = WalletsControl.getInstance().changeTokenStatus(walletTokenStatus);
                   if (!isChangeOk) {
                     Fluttertoast.showToast(msg: translate("hide_token_model_failure"));
                     return;
@@ -364,7 +358,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   });
                 } else {
                   walletTokenStatus.isShow = true.toInt(); // change to visible
-                  bool isChangeOk = WalletsControl.getInstance().changeTokenStatus(NetType.Main, walletTokenStatus); // todo dynamic change netType
+                  bool isChangeOk = WalletsControl.getInstance().changeTokenStatus(walletTokenStatus);
                   if (!isChangeOk) {
                     Fluttertoast.showToast(msg: translate("show_token_model_failure"));
                     return;
