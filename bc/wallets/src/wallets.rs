@@ -360,8 +360,8 @@ impl Wallets {
         }
         Ok(addrs)
     }
-    pub async fn update_address_balance(&self, net_type: &NetType, token_address: &TokenAddress) -> Result<(), WalletError> {
-        let data_rb = self.db().data_db(net_type);
+    pub async fn update_address_balance(&self, token_address: &TokenAddress) -> Result<(), WalletError> {
+        let data_rb = self.db().data_db(&self.net_type);
         let token_address_wrapper = data_rb
             .new_wrapper()
             .eq(&MTokenAddress::wallet_id, &token_address.wallet_id)
@@ -380,8 +380,8 @@ impl Wallets {
             token_address_instance.save(data_rb, "").await.map(|_| ()).map_err(|err| err.into())
         }
     }
-    pub async fn query_address_balance(&self, net_type: &NetType, wallet_id: &str) -> Result<Vec<TokenAddress>, WalletError> {
-        let data_rb = self.db().data_db(net_type);
+    pub async fn query_address_balance(&self, wallet_id: &str) -> Result<Vec<TokenAddress>, WalletError> {
+        let data_rb = self.db().data_db(&self.net_type);
         let token_address_wrapper = data_rb
             .new_wrapper()
             .eq(&MTokenAddress::wallet_id, wallet_id)
@@ -395,8 +395,8 @@ impl Wallets {
         Ok(address_ret)
     }
 
-    pub async fn change_wallet_token_show_status(&self, net_type: &NetType, wallet_token: &WalletTokenStatus) -> Result<(), WalletError> {
-        let data_rb = self.db().data_db(net_type);
+    pub async fn change_wallet_token_show_status(&self, wallet_token: &WalletTokenStatus) -> Result<(), WalletError> {
+        let data_rb = self.db().data_db(&self.net_type);
         let chain_token_wrapper = data_rb.new_wrapper()
             .eq(&MEthChainToken::wallet_id, &wallet_token.wallet_id)
             .eq(&MEthChainToken::chain_type, &wallet_token.chain_type)

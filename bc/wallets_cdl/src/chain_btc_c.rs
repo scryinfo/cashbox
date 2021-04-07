@@ -3,15 +3,12 @@
 use futures::executor::block_on;
 use wallets_types::Error;
 use wallets::Contexts;
-use mav::NetType;
 use super::types::CError;
-use super::kits::{CR,CArray};
+use super::kits::{CR,CArray,CStruct};
 
 use crate::types::{CBtcChainTokenDefault, CBtcChainTokenAuth};
 use crate::parameters::CContext;
-use std::os::raw::{c_char, c_uint};
-use crate::{to_str, CStruct};
-
+use std::os::raw::c_uint;
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainBtc_updateDefaultTokenList(ctx: *mut CContext, defaultTokens: *mut CArray<CBtcChainTokenDefault>) -> *const CError {
@@ -75,11 +72,11 @@ pub unsafe extern "C" fn ChainBtc_updateAuthDigitList(ctx: *mut CContext,authTok
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainBtc_getAuthTokenList(ctx: *mut CContext, netType: *mut c_char, startItem: c_uint, pageSize: c_uint, tokens: *mut *mut CArray<CBtcChainTokenAuth>) -> *const CError {
+pub unsafe extern "C" fn ChainBtc_getAuthTokenList(ctx: *mut CContext, startItem: c_uint, pageSize: c_uint, tokens: *mut *mut CArray<CBtcChainTokenAuth>) -> *const CError {
     log::debug!("enter ChainEth getDigitList");
 
-    if ctx.is_null() || tokens.is_null() || netType.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx,tokens,netType is null");
+    if ctx.is_null() || tokens.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or tokens is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
     }
@@ -91,8 +88,7 @@ pub unsafe extern "C" fn ChainBtc_getAuthTokenList(ctx: *mut CContext, netType: 
         match contexts.get(&ctx.id) {
             Some(wallets) => {
                 let btc_chain = wallets.btc_chain_instance();
-                let net_type = NetType::from(to_str(netType));
-                match block_on(btc_chain.get_auth_tokens(wallets, &net_type, startItem as u64, pageSize as u64)) {
+                match block_on(btc_chain.get_auth_tokens(wallets, &wallets.net_type, startItem as u64, pageSize as u64)) {
                     Ok(data) => {
                         *tokens = CArray::to_c_ptr(&data);
                         Error::SUCCESS()
@@ -108,11 +104,11 @@ pub unsafe extern "C" fn ChainBtc_getAuthTokenList(ctx: *mut CContext, netType: 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainBtc_getDefaultTokenList(ctx: *mut CContext, netType: *mut c_char, tokens: *mut *mut CArray<CBtcChainTokenDefault>) -> *const CError {
+pub unsafe extern "C" fn ChainBtc_getDefaultTokenList(ctx: *mut CContext, tokens: *mut *mut CArray<CBtcChainTokenDefault>) -> *const CError {
     log::debug!("enter ChainEth getDigitList");
 
-    if ctx.is_null() || tokens.is_null() || netType.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx,tokens,netType is null");
+    if ctx.is_null() || tokens.is_null()  {
+        let err = Error::PARAMETER().append_message(" : ctx or tokens is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
     }
@@ -124,8 +120,7 @@ pub unsafe extern "C" fn ChainBtc_getDefaultTokenList(ctx: *mut CContext, netTyp
         match contexts.get(&ctx.id) {
             Some(wallets) => {
                 let btc_chain = wallets.btc_chain_instance();
-                let net_type = NetType::from(to_str(netType));
-                match block_on(btc_chain.get_default_tokens(wallets, &net_type)) {
+                match block_on(btc_chain.get_default_tokens(wallets, &wallets.net_type)) {
                     Ok(data) => {
                         *tokens = CArray::to_c_ptr(&data);
                         Error::SUCCESS()

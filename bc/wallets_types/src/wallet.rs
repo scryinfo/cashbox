@@ -61,12 +61,12 @@ impl Wallet {
         let wallet_db = context.db().wallets_db();
         let m_address = {
             let addr_wrapper = wallet_db.new_wrapper().eq(&MAddress::address, address);
-            MAddress::fetch_by_wrapper(wallet_db, "", &addr_wrapper).await?
+            MAddress::list_by_wrapper(wallet_db, "", &addr_wrapper).await?
         };
-        if m_address.is_none() {
+        if m_address.is_empty() {
             return Err(WalletError::Custom(format!("wallet address {} is not exist!", address)));
         }
-        let address = m_address.unwrap();
+        let address = m_address.get(0).unwrap();
 
         Self::find_by_id(context,&address.wallet_id.to_owned(),&NetType::from_chain_type(&address.chain_type)).await
     }

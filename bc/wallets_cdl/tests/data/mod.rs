@@ -30,7 +30,7 @@ pub fn create_wallet(c_ctx: *mut *mut CContext) -> Wallet {
             name: "test".to_owned(),
             password: "123456".to_string(),
             mnemonic: mnemonic.clone(),
-            wallet_type: mav::WalletType::Normal.to_string(),
+            wallet_type: mav::WalletType::Test.to_string(),
         });
         let c_wallet = CWallet_dAlloc();
         let c_err = Wallets_createWallet(*c_ctx, c_parameters, c_wallet) as *mut CError;
@@ -56,7 +56,7 @@ pub fn init_wallets_context(c_ctx: *mut *mut CContext) -> *mut CError {
 pub fn init_parameters() -> InitParameters {
     let mut p = InitParameters::default();
     p.net_type="Test".to_string();
-    //p.is_memory_db=mav::CTrue;
+    p.is_memory_db=mav::CTrue;
     //let prefix = format!("{}_",kits::uuid());
     let prefix = "test_";
     p.db_name.0 = mav::ma::DbName::new(&prefix, "");

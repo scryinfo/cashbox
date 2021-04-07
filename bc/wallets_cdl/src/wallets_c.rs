@@ -625,6 +625,7 @@ pub unsafe extern "C" fn Wallets_saveCurrentWalletChain(ctx: *mut CContext, wall
         log::info!("{}", err);
         return CError::to_c_ptr(&err);
     }
+    //todo check wallet type,chain type constraint relationship
     let chain_type = match ChainType::from(to_str(chainType)) {
         Err(err) => {
             let err = Error::PARAMETER().append_message(err.to_string().as_str());
@@ -671,8 +672,8 @@ pub unsafe extern "C" fn Wallets_packageVersion() -> *const c_char {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_queryBalance(ctx: *mut CContext, netType: *mut c_char, walletId: *mut c_char, tokenAddress: *mut *mut CArray<CTokenAddress>) -> *const CError {
-    if ctx.is_null() || tokenAddress.is_null() || netType.is_null() || walletId.is_null() {
+pub unsafe extern "C" fn Wallets_queryBalance(ctx: *mut CContext, walletId: *mut c_char, tokenAddress: *mut *mut CArray<CTokenAddress>) -> *const CError {
+    if ctx.is_null() || tokenAddress.is_null() || walletId.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,updateBalance is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
@@ -684,8 +685,7 @@ pub unsafe extern "C" fn Wallets_queryBalance(ctx: *mut CContext, netType: *mut 
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
             Some(wallets) => {
-                let net_type = NetType::from(to_str(netType));
-                match block_on(wallets.query_address_balance(&net_type, &to_str(walletId))) {
+                match block_on(wallets.query_address_balance( &to_str(walletId))) {
                     Ok(tokens) => {
                         *tokenAddress = CArray::to_c_ptr(&tokens);
                         Error::SUCCESS()
@@ -701,8 +701,8 @@ pub unsafe extern "C" fn Wallets_queryBalance(ctx: *mut CContext, netType: *mut 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_updateBalance(ctx: *mut CContext, netType: *mut c_char, tokenAddress: *mut CTokenAddress) -> *const CError {
-    if ctx.is_null() || tokenAddress.is_null() || netType.is_null() {
+pub unsafe extern "C" fn Wallets_updateBalance(ctx: *mut CContext,tokenAddress: *mut CTokenAddress) -> *const CError {
+    if ctx.is_null() || tokenAddress.is_null()  {
         let err = Error::PARAMETER().append_message(" : ctx,updateBalance is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
@@ -713,9 +713,8 @@ pub unsafe extern "C" fn Wallets_updateBalance(ctx: *mut CContext, netType: *mut
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
             Some(wallets) => {
-                let net_type = NetType::from(to_str(netType));
                 let token_address = CTokenAddress::ptr_rust(tokenAddress);
-                match block_on(wallets.update_address_balance(&net_type, &token_address)) {
+                match block_on(wallets.update_address_balance(&token_address)) {
                     Ok(_res) => Error::SUCCESS(),
                     Err(err) => Error::from(err),
                 }
@@ -728,8 +727,8 @@ pub unsafe extern "C" fn Wallets_updateBalance(ctx: *mut CContext, netType: *mut
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn Wallets_changeTokenShowState(ctx: *mut CContext, netType: *mut c_char, tokenStatus: *mut CWalletTokenStatus) -> *const CError {
-    if ctx.is_null() || tokenStatus.is_null() || netType.is_null() {
+pub unsafe extern "C" fn Wallets_changeTokenShowState(ctx: *mut CContext, tokenStatus: *mut CWalletTokenStatus) -> *const CError {
+    if ctx.is_null() || tokenStatus.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,hideTokenAddress is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
@@ -740,9 +739,8 @@ pub unsafe extern "C" fn Wallets_changeTokenShowState(ctx: *mut CContext, netTyp
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
             Some(wallets) => {
-                let net_type = NetType::from(to_str(netType));
                 let token_address = CWalletTokenStatus::ptr_rust(tokenStatus);
-                match block_on(wallets.change_wallet_token_show_status(&net_type, &token_address)) {
+                match block_on(wallets.change_wallet_token_show_status(&token_address)) {
                     Ok(_res) => Error::SUCCESS(),
                     Err(err) => Error::from(err),
                 }

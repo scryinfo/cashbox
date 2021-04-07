@@ -1,7 +1,4 @@
 use async_trait::async_trait;
-use strum::IntoEnumIterator;
-
-//use rbatis::crud::CRUDTable;
 
 use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
 use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth, MTokenAddress};
@@ -493,35 +490,37 @@ impl EeeChainTrait for EeeChain {
         //todo 调整通过wallet　id查询wallet的功能
         let wallet_db = context.db().wallets_db();
         // get token decimal by account address
+
         let m_address = {
             let addr_wrapper = wallet_db.new_wrapper()
                 .eq(&MAddress::address, &transfer_payload.from_account);
-            MAddress::fetch_by_wrapper(wallet_db, "", &addr_wrapper).await?
+            MAddress::list_by_wrapper(wallet_db, "", &addr_wrapper).await?
         };
 
-        if m_address.is_none() {
+        if m_address.is_empty() {
             return Err(WalletError::Custom(format!("wallet address {} is not exist!", &transfer_payload.from_account)));
         }
-        let address = m_address.unwrap();
+        //todo 处理在测试网下存在相同地址的情况
+        let address = m_address.get(0).unwrap();
         //query token decimal by address
         let chain_token = {
             let token_wrapper = data_rb.new_wrapper()
-                .eq(&MEeeChainToken::wallet_id, &address.wallet_id.to_owned());
+                .eq(&MEeeChainToken::wallet_id, address.wallet_id.to_owned());
             MEeeChainToken::fetch_by_wrapper(data_rb, "", &token_wrapper).await?
         };
 
         if chain_token.is_none() {
-            return Err(WalletError::Custom(format!("wallet {} chain token is not exist!", &address.wallet_id)));
+            return Err(WalletError::Custom(format!("wallet {} chain token is not exist!", address.wallet_id)));
         }
         let chain_token_shared_id = chain_token.unwrap().chain_token_shared_id;
         let token_shared = MEeeChainTokenShared::fetch_by_id(wallet_db, "", &chain_token_shared_id).await?;
         if token_shared.is_none() {
-            return Err(WalletError::Custom(format!("eee chain token shared id {} is not exist!", &address.wallet_id)));
+            return Err(WalletError::Custom(format!("eee chain token shared id {} is not exist!", address.wallet_id)));
         }
         let decimal = token_shared.unwrap().decimal;
         let m_wallet = MWallet::fetch_by_id(wallet_db, "", &address.wallet_id.to_owned()).await?;
         if m_wallet.is_none() {
-            return Err(WalletError::Custom(format!("wallet {} is not exist!", &address.wallet_id)));
+            return Err(WalletError::Custom(format!("wallet {} is not exist!", address.wallet_id)));
         }
         let mnemonic = eee::Sr25519::get_mnemonic_context(
             &m_wallet.unwrap().mnemonic,
@@ -833,7 +832,7 @@ impl EthChainTrait for EthChain {
             {
                 let token_shared_wrapper = token_rb.new_wrapper()
                     .eq(&MTokenShared::symbol, &token.eth_chain_token_shared.m.token_shared.symbol);
-                if let Some(token_shared) = MEthChainTokenShared::fetch_by_wrapper(token_rb, "", &token_shared_wrapper).await? {
+                if let Some(token_shared) = MEthChainTokenShared::fetch_by_wrapper(token_rb, &tx.tx_id, &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
                 shared.save_update(token_rb, &tx.tx_id).await?;

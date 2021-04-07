@@ -321,7 +321,7 @@ fn wallets_test() {
             name: "test".to_owned(),
             password: "123456".to_string(),
             mnemonic: mnemonic.clone(),
-            wallet_type: WalletType::Normal.to_string(),
+            wallet_type: WalletType::Test.to_string(),
 
         };
 
@@ -441,7 +441,7 @@ fn wallets_update_balance_test() {
             };
 
             let mut c_tokens_address = CTokenAddress::to_c_ptr(&address);
-            let c_err = Wallets_updateBalance(*c_ctx, to_c_char("Test"), c_tokens_address) as *mut CError;
+            let c_err = Wallets_updateBalance(*c_ctx,  c_tokens_address) as *mut CError;
             assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
             CError_free(c_err);
             c_tokens_address.free();
@@ -449,7 +449,7 @@ fn wallets_update_balance_test() {
 
         for wallet in &wallets {
             let c_array_token_address = CArrayCTokenAddress_dAlloc();
-            let c_err = Wallets_queryBalance(*c_ctx, to_c_char("Test"), to_c_char(&wallet.m.id), c_array_token_address);
+            let c_err = Wallets_queryBalance(*c_ctx,  to_c_char(&wallet.m.id), c_array_token_address);
             assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
             let token_address_balance: Vec<TokenAddress> = CArray::to_rust(&**c_array_token_address);
             for address_balance in token_address_balance {
@@ -485,7 +485,7 @@ fn wallet_token_status_change_test() {
                 is_show: 0,
             };
             let mut c_tokens_status = CWalletTokenStatus::to_c_ptr(&tokens_status);
-            let c_err = Wallets_changeTokenShowState(*c_ctx, to_c_char("Test"), c_tokens_status) as *mut CError;
+            let c_err = Wallets_changeTokenShowState(*c_ctx,  c_tokens_status) as *mut CError;
             assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
             CError_free(c_err);
             c_tokens_status.free();

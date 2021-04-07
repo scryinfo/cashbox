@@ -22,7 +22,6 @@ fn btc_update_default_token_list_test() {
             btc.net_type = "Private".to_string();
             btc.btc_chain_token_shared.m.token_type = BtcTokenType::Btc.to_string();
             btc.btc_chain_token_shared.m.decimal = 9;
-            btc.btc_chain_token_shared.m.gas = 0; //todo
 
             btc.btc_chain_token_shared.m.token_shared.name = "Bitcoin".to_owned();
             btc.btc_chain_token_shared.m.token_shared.symbol = "BTC".to_owned();

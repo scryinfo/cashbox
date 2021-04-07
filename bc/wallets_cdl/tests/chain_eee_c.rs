@@ -42,7 +42,7 @@ fn eee_update_sync_record_test() {
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let sync_prog = AccountInfoSyncProg::from(m_sync_prog);
         let mut c_sync_prog = CAccountInfoSyncProg::to_c_ptr(&sync_prog);
-        let c_err = chain_eee_c::ChainEee_updateSyncRecord(*c_ctx, to_c_char("Test"), c_sync_prog) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_updateSyncRecord(*c_ctx,  c_sync_prog) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_sync_prog.free();
@@ -59,7 +59,7 @@ fn get_sync_record_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let c_sync_prog = wallets_cdl::mem_c::CAccountInfoSyncProg_dAlloc();
-        let c_err = chain_eee_c::ChainEee_getSyncRecord(*c_ctx, to_c_char("Test"), to_c_char("5DHob83qDK5KWgz9xeqXcyYpku7bnLWR2cuRzKQpkY4p7BzL"), c_sync_prog) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_getSyncRecord(*c_ctx, to_c_char("5DHob83qDK5KWgz9xeqXcyYpku7bnLWR2cuRzKQpkY4p7BzL"), c_sync_prog) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let sync_prog: AccountInfoSyncProg = CAccountInfoSyncProg::to_rust(&**c_sync_prog);
@@ -90,7 +90,7 @@ fn decode_account_info_test() {
         };
         let mut c_encode_param = wallets_cdl::parameters::CDecodeAccountInfoParameters::to_c_ptr(&encode_param);
         let c_account_info = wallets_cdl::mem_c::CAccountInfo_dAlloc();
-        let c_err = chain_eee_c::ChainEee_decodeAccountInfo(*c_ctx, to_c_char("Test"), c_encode_param, c_account_info) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_decodeAccountInfo(*c_ctx, c_encode_param, c_account_info) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         wallets_cdl::mem_c::CAccountInfo_dFree(c_account_info);
@@ -122,7 +122,7 @@ fn eee_get_storage_key_test() {
         };
         let mut c_storage_param = wallets_cdl::parameters::CStorageKeyParameters::to_c_ptr(&storage_param);
         let final_key = wallets_cdl::mem_c::CStr_dAlloc();
-        let c_err = chain_eee_c::ChainEee_getStorageKey(*c_ctx, to_c_char("Test"), c_storage_param, final_key) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_getStorageKey(*c_ctx, c_storage_param, final_key) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         wallets_cdl::mem_c::CStr_dFree(final_key);
@@ -158,7 +158,7 @@ fn eee_transfer_test() {
         };
         let mut c_payload = wallets_cdl::parameters::CEeeTransferPayload::to_c_ptr(&payload);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
-        let c_err = chain_eee_c::ChainEee_eeeTransfer(*c_ctx, to_c_char("Test"), c_payload, sign_result) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_eeeTransfer(*c_ctx, c_payload, sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         wallets_cdl::mem_c::CStr_dFree(sign_result);
@@ -201,7 +201,7 @@ fn eee_tokenx_transfer_test() {
         };
         let mut c_payload = wallets_cdl::parameters::CEeeTransferPayload::to_c_ptr(&payload);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
-        let c_err = chain_eee_c::ChainEee_tokenXTransfer(*c_ctx, to_c_char("Test"), c_payload, sign_result) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_tokenXTransfer(*c_ctx,  c_payload, sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         wallets_cdl::mem_c::CStr_dFree(sign_result);
@@ -264,7 +264,7 @@ fn eee_tx_sign_test() {
             password: "123456".to_string(),
         };
         let mut c_raw_tx = wallets_cdl::parameters::CRawTxParam::to_c_ptr(&raw_tx_param);
-        let c_err = chain_eee_c::ChainEee_txSign(*c_ctx, to_c_char("Test"), c_raw_tx, sign_result) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_txSign(*c_ctx, c_raw_tx, sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         wallets_cdl::mem_c::CStr_dFree(sign_result);
@@ -379,7 +379,7 @@ async fn eee_tx_explorer_test() {
         let start_block_number =
             {
                 let c_sync_prog = wallets_cdl::mem_c::CAccountInfoSyncProg_dAlloc();
-                let c_err = chain_eee_c::ChainEee_getSyncRecord(*c_ctx, to_c_char("Test"), to_c_char(account_1), c_sync_prog) as *mut CError;
+                let c_err = chain_eee_c::ChainEee_getSyncRecord(*c_ctx,  to_c_char(account_1), c_sync_prog) as *mut CError;
 
                 if Error::SUCCESS().code == (*c_err).code {
                     let account_sync_prog: AccountInfoSyncProg = CAccountInfoSyncProg::to_rust(&**c_sync_prog);
@@ -400,7 +400,7 @@ async fn eee_tx_explorer_test() {
             };
             let mut c_storage_param = wallets_cdl::parameters::CStorageKeyParameters::to_c_ptr(&storage_system_account);
             let storage_key = wallets_cdl::mem_c::CStr_dAlloc();
-            let c_err = chain_eee_c::ChainEee_getStorageKey(*c_ctx, to_c_char("Test"), c_storage_param, storage_key) as *mut CError;
+            let c_err = chain_eee_c::ChainEee_getStorageKey(*c_ctx,  c_storage_param, storage_key) as *mut CError;
             assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
             c_storage_param.free();
             CError_free(c_err);
@@ -441,7 +441,7 @@ async fn eee_tx_explorer_test() {
 
                     let c_basicinfo = wallets_cdl::mem_c::CSubChainBasicInfo_dAlloc();
                     let mut c_chain_version = CChainVersion::to_c_ptr(&chain_version);
-                    let c_err = chain_eee_c::ChainEee_getBasicInfo(*c_ctx, to_c_char("Test"), c_chain_version, c_basicinfo) as *mut CError;
+                    let c_err = chain_eee_c::ChainEee_getBasicInfo(*c_ctx, c_chain_version, c_basicinfo) as *mut CError;
 
                     if Error::SUCCESS().code != (*c_err).code {
                         // query chain metadata detail  by rpc
@@ -472,7 +472,7 @@ async fn eee_tx_explorer_test() {
                         extrinsics: block_content.block.extrinsics,
                     };
                     let mut c_extrinsic_ctx = CExtrinsicContext::to_c_ptr(&extrinsic);
-                    let c_err = chain_eee_c::ChainEee_saveExtrinsicDetail(*c_ctx, to_c_char("Test"), c_extrinsic_ctx) as *mut CError;
+                    let c_err = chain_eee_c::ChainEee_saveExtrinsicDetail(*c_ctx, c_extrinsic_ctx) as *mut CError;
                     assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
                     c_extrinsic_ctx.free();
                 }
@@ -487,7 +487,7 @@ async fn eee_tx_explorer_test() {
 
             let sync_prog = AccountInfoSyncProg::from(m_sync_prog);
             let mut c_sync_prog = CAccountInfoSyncProg::to_c_ptr(&sync_prog);
-            let c_err = chain_eee_c::ChainEee_updateSyncRecord(*c_ctx, to_c_char("Test"), c_sync_prog) as *mut CError;
+            let c_err = chain_eee_c::ChainEee_updateSyncRecord(*c_ctx,  c_sync_prog) as *mut CError;
             assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
             //wallets_cdl::mem_c::CAccountInfoSyncProg_dFree(c_sync_prog);
             c_sync_prog.free();
@@ -505,7 +505,7 @@ fn query_eee_tx_record() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let chain_tx = CArrayCEeeChainTx_dAlloc();
-        let c_err = chain_eee_c::ChainEee_queryChainTxRecord(*c_ctx, to_c_char("Test"), to_c_char("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"), 0, 10, chain_tx) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_queryChainTxRecord(*c_ctx, to_c_char("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"), 0, 10, chain_tx) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let _chain_tx_vec: Vec<EeeChainTx> = CArray::to_rust(&**chain_tx);
@@ -523,7 +523,7 @@ fn query_eee_auth_token_list_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let token_auth = CArrayCEeeChainTokenAuth_dAlloc();
-        let c_err = chain_eee_c::ChainEee_getAuthTokenList(*c_ctx, to_c_char("Private"), 0, 10, token_auth) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_getAuthTokenList(*c_ctx,  0, 10, token_auth) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let _eth_token_auth_vec: Vec<EeeChainTokenAuth> = CArray::to_rust(&**token_auth);
@@ -541,7 +541,7 @@ fn query_eee_default_token_list_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let token_default = CArrayCEeeChainTokenDefault_dAlloc();
-        let c_err = chain_eee_c::ChainEee_getDefaultTokenList(*c_ctx, to_c_char("Private"), token_default) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_getDefaultTokenList(*c_ctx, token_default) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let _eth_token_default_vec: Vec<EeeChainTokenDefault> = CArray::to_rust(&**token_default);
@@ -560,7 +560,7 @@ fn query_default_chain_version_test(){
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         eee_basic_info_check(c_ctx).expect("query_default_chain_version_test");
         let c_basicinfo = wallets_cdl::mem_c::CSubChainBasicInfo_dAlloc();
-        let c_err = chain_eee_c::ChainEee_getDefaultBasicInfo(*c_ctx, to_c_char("Test"), c_basicinfo) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_getDefaultBasicInfo(*c_ctx, c_basicinfo) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let _chain_basic_info = CSubChainBasicInfo::to_rust(&**c_basicinfo);
@@ -608,7 +608,7 @@ fn save_basic_info(c_ctx: *mut *mut CContext, chain_version: &ChainVersion, meta
     let chain_basic_info = SubChainBasicInfo::from(m_chain_basic_info);
     let mut c_basic_info = CSubChainBasicInfo::to_c_ptr(&chain_basic_info);
     unsafe {
-        let c_err = chain_eee_c::ChainEee_updateBasicInfo(*c_ctx, to_c_char("Test"), c_basic_info) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_updateBasicInfo(*c_ctx, c_basic_info) as *mut CError;
         let res = {
             if Error::SUCCESS().code == (*c_err).code {
                 Ok(())
@@ -626,7 +626,7 @@ fn get_chain_basic_info(c_ctx: *mut *mut CContext, chain_version: &ChainVersion)
     unsafe {
         let c_basicinfo = wallets_cdl::mem_c::CSubChainBasicInfo_dAlloc();
         let mut c_chain_version = CChainVersion::to_c_ptr(chain_version);
-        let c_err = chain_eee_c::ChainEee_getBasicInfo(*c_ctx, to_c_char("Test"), c_chain_version, c_basicinfo) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_getBasicInfo(*c_ctx,  c_chain_version, c_basicinfo) as *mut CError;
         let res = {
             if Error::SUCCESS().code == (*c_err).code {
                 let chain_basic_info = CSubChainBasicInfo::to_rust(&**c_basicinfo);
