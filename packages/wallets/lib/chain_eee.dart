@@ -10,18 +10,15 @@ import 'result.dart';
 import 'wallets_c.dart' as clib;
 
 class ChainEee {
-  DlResult1<String> txSign(NetType netType, RawTxParam rawTx) {
+  DlResult1<String> txSign(RawTxParam rawTx) {
     Error err;
     String signResult = "";
     {
       var ptrSignResult = Wallets.cWallets.CStr_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrRawTx = rawTx.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_txSign(
-          _ptrContext, ptrNetType, ptrRawTx, ptrSignResult);
+      var cerr = Wallets.cWallets.ChainEee_txSign(_ptrContext, ptrRawTx, ptrSignResult);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
       RawTxParam.free(ptrRawTx);
 
       if (err.isSuccess()) {
@@ -33,18 +30,15 @@ class ChainEee {
     return DlResult1(signResult, err);
   }
 
-  DlResult1<String> eeeTransfer(NetType netType, EeeTransferPayload txPayload) {
+  DlResult1<String> eeeTransfer(EeeTransferPayload txPayload) {
     Error err;
     String signResult = "";
     {
       var ptrSignResult = Wallets.cWallets.CStr_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrTxPayload = txPayload.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_eeeTransfer(
-          _ptrContext, ptrNetType, ptrTxPayload, ptrSignResult);
+      var cerr = Wallets.cWallets.ChainEee_eeeTransfer(_ptrContext, ptrTxPayload, ptrSignResult);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
       EeeTransferPayload.free(ptrTxPayload);
 
       if (err.isSuccess()) {
@@ -55,19 +49,15 @@ class ChainEee {
     return DlResult1(signResult, err);
   }
 
-  DlResult1<String> tokenXTransfer(
-      NetType netType, EeeTransferPayload txPayload) {
+  DlResult1<String> tokenXTransfer(EeeTransferPayload txPayload) {
     Error err;
     String signResult = "";
     {
       var ptrSignResult = Wallets.cWallets.CStr_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrTxPayload = txPayload.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_tokenXTransfer(
-          _ptrContext, ptrNetType, ptrTxPayload, ptrSignResult);
+      var cerr = Wallets.cWallets.ChainEee_tokenXTransfer(_ptrContext, ptrTxPayload, ptrSignResult);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
       EeeTransferPayload.free(ptrTxPayload);
 
       if (err.isSuccess()) {
@@ -78,19 +68,15 @@ class ChainEee {
     return DlResult1(signResult, err);
   }
 
-  DlResult1<AccountInfo> decodeAccountInfo(NetType netType,
-      DecodeAccountInfoParameters decodeAccountInfoParameters) {
+  DlResult1<AccountInfo> decodeAccountInfo(DecodeAccountInfoParameters decodeAccountInfoParameters) {
     Error err;
     AccountInfo accountInfo;
     {
       var ptrAccountInfo = Wallets.cWallets.CAccountInfo_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrDecodeAccountInfoParameter = decodeAccountInfoParameters.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_decodeAccountInfo(_ptrContext, ptrNetType,
-          ptrDecodeAccountInfoParameter, ptrAccountInfo);
+      var cerr = Wallets.cWallets.ChainEee_decodeAccountInfo(_ptrContext, ptrDecodeAccountInfoParameter, ptrAccountInfo);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
       DecodeAccountInfoParameters.free(ptrDecodeAccountInfoParameter);
 
       if (err.isSuccess()) {
@@ -103,19 +89,15 @@ class ChainEee {
     return DlResult1(accountInfo, err);
   }
 
-  DlResult1<SubChainBasicInfo> getBasicInfo(
-      NetType netType, ChainVersion chainVersion) {
+  DlResult1<SubChainBasicInfo> getBasicInfo(ChainVersion chainVersion) {
     Error err;
     SubChainBasicInfo subChainBasicInfo;
     {
       var ptrSubChainBasicInfo = Wallets.cWallets.CSubChainBasicInfo_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrChainVersion = chainVersion.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_getBasicInfo(
-          _ptrContext, ptrNetType, ptrChainVersion, ptrSubChainBasicInfo);
+      var cerr = Wallets.cWallets.ChainEee_getBasicInfo(_ptrContext, ptrChainVersion, ptrSubChainBasicInfo);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
       ChainVersion.free(ptrChainVersion);
 
       if (err.isSuccess()) {
@@ -128,16 +110,14 @@ class ChainEee {
     return DlResult1(subChainBasicInfo, err);
   }
 
-  DlResult1<SubChainBasicInfo> getDefaultBasicInfo(NetType netType) {
+  DlResult1<SubChainBasicInfo> getDefaultBasicInfo() {
     Error err;
     SubChainBasicInfo subChainBasicInfo;
     {
       var ptrSubChainBasicInfo = Wallets.cWallets.CSubChainBasicInfo_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
-      var cerr = Wallets.cWallets.ChainEee_getDefaultBasicInfo(_ptrContext, ptrNetType, ptrSubChainBasicInfo);
+      var cerr = Wallets.cWallets.ChainEee_getDefaultBasicInfo(_ptrContext, ptrSubChainBasicInfo);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
 
       if (err.isSuccess()) {
         subChainBasicInfo = SubChainBasicInfo.fromC(ptrSubChainBasicInfo.value);
@@ -149,19 +129,15 @@ class ChainEee {
     return DlResult1(subChainBasicInfo, err);
   }
 
-  DlResult1<String> getStorageKey(
-      NetType netType, StorageKeyParameters storageKeyParameters) {
+  DlResult1<String> getStorageKey(StorageKeyParameters storageKeyParameters) {
     Error err;
     String storageKeyResult = "";
     {
       var ptrStorageKey = Wallets.cWallets.CStr_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrStorageKeyParameter = storageKeyParameters.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_getStorageKey(
-          _ptrContext, ptrNetType, ptrStorageKeyParameter, ptrStorageKey);
+      var cerr = Wallets.cWallets.ChainEee_getStorageKey(_ptrContext, ptrStorageKeyParameter, ptrStorageKey);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
       StorageKeyParameters.free(ptrStorageKeyParameter);
 
       if (err.isSuccess()) {
@@ -172,24 +148,19 @@ class ChainEee {
     return DlResult1(storageKeyResult, err);
   }
 
-  DlResult1<AccountInfoSyncProg> getSyncRecord(
-      NetType netType, String account) {
+  DlResult1<AccountInfoSyncProg> getSyncRecord(String account) {
     Error err;
     AccountInfoSyncProg accountInfoSyncProg;
     {
       var ptrAccountInfoSyncProg = Wallets.cWallets.CAccountInfoSyncProg_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrAccount = account.toCPtrInt8();
-      var cerr = Wallets.cWallets.ChainEee_getSyncRecord(
-          _ptrContext, ptrNetType, ptrAccount, ptrAccountInfoSyncProg);
+      var cerr = Wallets.cWallets.ChainEee_getSyncRecord(_ptrContext, ptrAccount, ptrAccountInfoSyncProg);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
       ptrAccount.free();
 
       if (err.isSuccess()) {
-        accountInfoSyncProg =
-            AccountInfoSyncProg.fromC(ptrAccountInfoSyncProg.value);
+        accountInfoSyncProg = AccountInfoSyncProg.fromC(ptrAccountInfoSyncProg.value);
       } else {
         accountInfoSyncProg = new AccountInfoSyncProg();
       }
@@ -198,40 +169,36 @@ class ChainEee {
     return DlResult1(accountInfoSyncProg, err);
   }
 
-  DlResult1<List<EeeChainTx>> getTxRecord(
-      NetType netType, String account, int startItem, int pageSize) {
+  DlResult1<List<EeeChainTx>> getTxRecord(String account, int startItem, int pageSize) {
     Error err;
     List<EeeChainTx> ect = [];
     {
       var ptrAccountInfoSyncProg = Wallets.cWallets.CAccountInfoSyncProg_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrAccount = account.toCPtrInt8();
       var ptrCArrayCEeeChainTx = Wallets.cWallets.CArrayCEeeChainTx_dAlloc();
-      var cerr = Wallets.cWallets.ChainEee_queryChainTxRecord(_ptrContext, ptrNetType,
-          ptrAccount, startItem, pageSize, ptrCArrayCEeeChainTx);
+      var cerr = Wallets.cWallets.ChainEee_queryChainTxRecord(_ptrContext, ptrAccount, startItem, pageSize, ptrCArrayCEeeChainTx);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       if (err.isSuccess()) {
-        ect = ArrayCEeeChainTx.fromC(ptrCArrayCEeeChainTx.value).data;
+        ect = ArrayCEeeChainTx
+            .fromC(ptrCArrayCEeeChainTx.value)
+            .data;
       }
-      ptrNetType.free();
+
       ptrAccount.free();
       Wallets.cWallets.CAccountInfoSyncProg_dFree(ptrAccountInfoSyncProg);
     }
     return DlResult1(ect, err);
   }
 
-  DlResult1<bool> saveExtrinsicDetail(
-      NetType netType, ExtrinsicContext extrinsicContext) {
+  DlResult1<bool> saveExtrinsicDetail(ExtrinsicContext extrinsicContext) {
     Error err;
     {
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrExtrinsicContext = extrinsicContext.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_saveExtrinsicDetail(
-          _ptrContext, ptrNetType, ptrExtrinsicContext);
+      var cerr = Wallets.cWallets.ChainEee_saveExtrinsicDetail(_ptrContext, ptrExtrinsicContext);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
+
       ExtrinsicContext.free(ptrExtrinsicContext);
     }
     if (err.isSuccess()) {
@@ -240,35 +207,32 @@ class ChainEee {
     return DlResult1(false, err);
   }
 
-  DlResult1<String> txSubmittableSign(NetType netType, RawTxParam rawTxParam) {
+  DlResult1<String> txSubmittableSign(RawTxParam rawTxParam) {
     Error err;
     String signedResult = "";
-    {
-      var ptrSignedResult = Wallets.cWallets.CStr_dAlloc();
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
-      var ptrRawTxParam = rawTxParam.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_txSubmittableSign(
-          _ptrContext, ptrNetType, ptrRawTxParam, ptrSignedResult);
-      err = Error.fromC(cerr);
-      Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
-      RawTxParam.free(ptrRawTxParam);
-
-      if (err.isSuccess()) {
-        signedResult = ptrSignedResult.value.toDartString();
-      }
-      Wallets.cWallets.CStr_dFree(ptrSignedResult);
-    }
+    //{
+    //  var ptrSignedResult = Wallets.cWallets.CStr_dAlloc();
+    //  var ptrRawTxParam = rawTxParam.toCPtr();
+    //  var cerr = Wallets.cWallets.ChainEee_txSubmittableSign(_ptrContext, ptrRawTxParam, ptrSignedResult);
+    //  err = Error.fromC(cerr);
+    //  Wallets.cWallets.CError_free(cerr);
+//
+    //  RawTxParam.free(ptrRawTxParam);
+//
+    //  if (err.isSuccess()) {
+    //    signedResult = ptrSignedResult.value.toDartString();
+    //  }
+    //  Wallets.cWallets.CStr_dFree(ptrSignedResult);
+    //}
+    err = Error(); // todo compile remove
     return DlResult1(signedResult, err);
   }
 
-  DlResult1<bool> updateAuthDigitList(
-      ArrayCEeeChainTokenAuth arrayCEeeChainTokenAuth) {
+  DlResult1<bool> updateAuthDigitList(ArrayCEeeChainTokenAuth arrayCEeeChainTokenAuth) {
     Error err;
     {
       var ptrArrayCEeeChainTokenAuth = arrayCEeeChainTokenAuth.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_updateAuthDigitList(
-          _ptrContext, ptrArrayCEeeChainTokenAuth);
+      var cerr = Wallets.cWallets.ChainEee_updateAuthDigitList(_ptrContext, ptrArrayCEeeChainTokenAuth);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       ArrayCEeeChainTokenAuth.free(ptrArrayCEeeChainTokenAuth);
@@ -279,17 +243,14 @@ class ChainEee {
     return DlResult1(false, err);
   }
 
-  DlResult1<bool> updateBasicInfo(
-      NetType netType, SubChainBasicInfo subChainBasicInfo) {
+  DlResult1<bool> updateBasicInfo(SubChainBasicInfo subChainBasicInfo) {
     Error err;
     {
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrSubChainBasicInfo = subChainBasicInfo.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_updateBasicInfo(
-          _ptrContext, ptrNetType, ptrSubChainBasicInfo);
+      var cerr = Wallets.cWallets.ChainEee_updateBasicInfo(_ptrContext, ptrSubChainBasicInfo);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
+
       SubChainBasicInfo.free(ptrSubChainBasicInfo);
     }
     if (err.isSuccess()) {
@@ -298,13 +259,11 @@ class ChainEee {
     return DlResult1(false, err);
   }
 
-  DlResult1<bool> updateDefaultTokenList(
-      ArrayCEeeChainTokenDefault arrayCEeeChainTokenDefault) {
+  DlResult1<bool> updateDefaultTokenList(ArrayCEeeChainTokenDefault arrayCEeeChainTokenDefault) {
     Error err;
     {
       var ptrArrayCEeeChainTokenDefault = arrayCEeeChainTokenDefault.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_updateDefaultTokenList(
-          _ptrContext, ptrArrayCEeeChainTokenDefault);
+      var cerr = Wallets.cWallets.ChainEee_updateDefaultTokenList(_ptrContext, ptrArrayCEeeChainTokenDefault);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       ArrayCEeeChainTokenDefault.free(ptrArrayCEeeChainTokenDefault);
@@ -315,17 +274,13 @@ class ChainEee {
     return DlResult1(false, err);
   }
 
-  DlResult1<bool> updateSyncRecord(
-      NetType netType, AccountInfoSyncProg accountInfoSyncProg) {
+  DlResult1<bool> updateSyncRecord(AccountInfoSyncProg accountInfoSyncProg) {
     Error err;
     {
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
       var ptrAccountInfoSyncProg = accountInfoSyncProg.toCPtr();
-      var cerr = Wallets.cWallets.ChainEee_updateSyncRecord(
-          _ptrContext, ptrNetType, ptrAccountInfoSyncProg);
+      var cerr = Wallets.cWallets.ChainEee_updateSyncRecord(_ptrContext, ptrAccountInfoSyncProg);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
-      ptrNetType.free();
       AccountInfoSyncProg.free(ptrAccountInfoSyncProg);
     }
     if (err.isSuccess()) {

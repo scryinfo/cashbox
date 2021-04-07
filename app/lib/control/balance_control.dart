@@ -14,7 +14,7 @@ class BalanceControl {
     if (!curWalletObj.isSuccess()) {
       return;
     }
-    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(curWalletObj.data1.walletId, NetType.Main); // todo netType dynamic load
+    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(curWalletObj.data1.walletId);
     if (tokenAddressObj.isSuccess()) {
       _tokenAddressList = tokenAddressObj.data1;
     }

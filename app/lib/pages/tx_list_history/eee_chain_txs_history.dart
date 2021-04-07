@@ -428,7 +428,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     Config config = await HandleConfig.instance.getConfig();
     for (; true;) {
       // todo differentiate tokenName
-      List<EeeChainTx> eeeChainTxList = EeeChainControl.getInstance().getTxRecord(NetType.Main,
+      List<EeeChainTx> eeeChainTxList = EeeChainControl.getInstance().getTxRecord(
           WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address, (currentPage * this.pageSize), this.pageSize);
       if (eeeChainTxList == null || eeeChainTxList.isEmpty) {
         break;

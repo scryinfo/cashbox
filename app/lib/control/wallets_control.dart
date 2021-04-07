@@ -184,11 +184,11 @@ class WalletsControl {
     }
   }
 
-  bool changeTokenStatus(EnumKit.NetType netType, WalletTokenStatus walletTokenStatus) {
+  bool changeTokenStatus(WalletTokenStatus walletTokenStatus) {
     if (walletTokenStatus == null) {
       return false;
     }
-    Error err = Wallets.mainIsolate().changeTokenStatus(netType, walletTokenStatus);
+    Error err = Wallets.mainIsolate().changeTokenStatus(walletTokenStatus);
     if (err.isSuccess()) {
       return true;
     }
@@ -196,8 +196,8 @@ class WalletsControl {
     return false;
   }
 
-  bool updateBalance(EnumKit.NetType netType, TokenAddress tokenAddress) {
-    Error err = Wallets.mainIsolate().updateBalance(netType, tokenAddress);
+  bool updateBalance(TokenAddress tokenAddress) {
+    Error err = Wallets.mainIsolate().updateBalance(tokenAddress);
     if (err.isSuccess()) {
       return true;
     }
@@ -256,9 +256,8 @@ class WalletsControl {
     return false;
   }
 
-  String getTokenAddressId(String walletId, EnumKit.NetType netType, EnumKit.ChainType chainType) {
+  String getTokenAddressId(String walletId, EnumKit.ChainType chainType) {
     try {
-      // todo differentiate netType and chainType
       String tokenAddressId = "";
       switch (chainType) {
         case ChainType.EthTest:
@@ -279,8 +278,8 @@ class WalletsControl {
     }
   }
 
-  List<TokenAddress> getTokenAddress(String walletId, EnumKit.NetType netType) {
-    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId, netType);
+  List<TokenAddress> getTokenAddress(String walletId) {
+    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId);
     if (tokenAddressObj.isSuccess()) {
       return tokenAddressObj.data1;
     }

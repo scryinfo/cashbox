@@ -124,7 +124,7 @@ class EeeSyncTxs {
     }
     var startBlockHeight = 0;
     {
-      AccountInfoSyncProg accountInfoSyncProg = EeeChainControl.getInstance().getSyncRecord(NetType.Main, WalletsControl().currentChainAddress());
+      AccountInfoSyncProg accountInfoSyncProg = EeeChainControl.getInstance().getSyncRecord(WalletsControl().currentChainAddress());
       if (accountInfoSyncProg != null && accountInfoSyncProg.account.toLowerCase() == runParams.address.toLowerCase()) {
         startBlockHeight = int.parse(accountInfoSyncProg.blockNo);
       }
@@ -200,11 +200,11 @@ class EeeSyncTxs {
         extrinsicContext
           ..account = WalletsControl.getInstance().currentChainAddress()
           ..blockHash = blockHash
-          ..chainVersion = EeeChainControl.getInstance().getChainVersion(NetType.Main)
+          ..chainVersion = EeeChainControl.getInstance().getChainVersion()
           ..blockNumber = element["block"]
           ..event = loadStorageMap["result"]
           ..extrinsics = arrayCChar;
-        bool isSaveOk = EeeChainControl.getInstance().saveExtrinsicDetail(NetType.Main, extrinsicContext);
+        bool isSaveOk = EeeChainControl.getInstance().saveExtrinsicDetail(extrinsicContext);
         Logger.getInstance().d("saveExtrinsicDetail", "saveExtrinsicDetail result is" + isSaveOk.toString());
       }
       {
@@ -213,7 +213,7 @@ class EeeSyncTxs {
           ..account = runParams.address
           ..blockNo = endBlockHeight.toString()
           ..blockHash = endBlockHash;
-        var isUpdateSyncRecordOk = EeeChainControl.getInstance().updateSyncRecord(NetType.Main, accountInfoSyncProg);
+        var isUpdateSyncRecordOk = EeeChainControl.getInstance().updateSyncRecord(accountInfoSyncProg);
         if (!isUpdateSyncRecordOk) {
           Logger().e("updateSyncRecord error blockNo is ", endBlockHeight.toString());
           return;

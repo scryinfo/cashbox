@@ -123,7 +123,7 @@ class _EntrancePageState extends State<EntrancePage> {
 
     /// check and update  EeeChain txVersion and runtimeVersion
     try {
-      SubChainBasicInfo defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo(NetType.Main);
+      SubChainBasicInfo defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo();
       if (serverConfigModel == null ||
           defaultBasicInfo == null ||
           defaultBasicInfo.runtimeVersion == null ||
@@ -219,9 +219,8 @@ class _EntrancePageState extends State<EntrancePage> {
             ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
             ..walletId = WalletsControl.getInstance().currentWallet().id
             ..balance = 0.toString()
-            ..addressId =
-                WalletsControl.getInstance().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, NetType.Main, ChainType.ETH) ?? "";
-          bool isUpdateBalanceOk = WalletsControl.getInstance().updateBalance(NetType.Main, tokenAddress);
+            ..addressId = WalletsControl.getInstance().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, ChainType.ETH) ?? "";
+          bool isUpdateBalanceOk = WalletsControl.getInstance().updateBalance(tokenAddress);
           if (!isUpdateBalanceOk) {
             Logger().e("updateBalance error , tokenAddress info is---> ", tokenAddress.toString());
           }
