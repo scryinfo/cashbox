@@ -232,7 +232,6 @@ mod test {
             name: "murmel".to_string(),
             password: "".to_string(),
             mnemonic: words.to_string(),
-            // 钱包类型 钱包分为正式钱包和测试钱包  链有多条链 现在钱包和链暂时不关联
             // wallet_type 依然有特定的字符串 Test 和 Normal
             wallet_type: WalletType::Test.to_string(),
         }
@@ -252,10 +251,9 @@ mod test {
                 },
                 |c| println!("init succeeded context {:?}", c),
             );
-            let r = wallets.create_wallet(c).await.unwrap();
-            let r = wallets.all().await;
-            match r {
-                Ok(v) => { println!("{:?}", v); }
+            let w = wallets.create_wallet(c).await;
+            match w {
+                Ok(w) => { println!("{:#?}", w); }
                 Err(e) => { println!("{}",e); }
             }
         })
