@@ -114,26 +114,6 @@ class _EthPageState extends State<EthPage> {
       if (rateInstance == null) {
         return;
       }
-      List<String> rateKeys = rateInstance.tokenRateMap.keys.toList();
-      for (var i = 0; i < displayTokenMList.length; i++) {
-        int index = i;
-        if (this.displayTokenMList[index].shortName == null) {
-          continue;
-        }
-        if (!rateKeys.contains(this.displayTokenMList[index].shortName.toUpperCase().trim().toString())) {
-          Logger().w("digitName is not exist===>", this.displayTokenMList[index].shortName);
-          continue;
-        }
-        if (!mounted) {
-          continue;
-        }
-        setState(() {
-          this.displayTokenMList[index].tokenRate
-            ..symbol = TokenRate.instance.getSymbol(this.displayTokenMList[index])
-            ..price = TokenRate.instance.getPrice(this.displayTokenMList[index])
-            ..changeDaily = TokenRate.instance.getChangeDaily(this.displayTokenMList[index]);
-        });
-      }
     });
   }
 
@@ -211,7 +191,6 @@ class _EthPageState extends State<EthPage> {
         addTokenToDisplayList(allVisibleTokenMList.length);
       } else {
         //Super page, showing singlePageTokenCount.
-        //addDigitToDisplayList(singlePageTokenCount);
         addTokenToDisplayList(singlePageTokenCount);
       }
     } else {
@@ -229,7 +208,6 @@ class _EthPageState extends State<EthPage> {
 
   List<TokenM> addTokenToDisplayList(int targetCount) {
     for (var i = displayTokenMList.length; i < targetCount; i++) {
-      TokenRate tokenRate = TokenRate.instance;
       TokenM tokenM = TokenM();
       tokenM
         ..tokenId = allVisibleTokenMList[i].tokenId
@@ -239,8 +217,7 @@ class _EthPageState extends State<EthPage> {
         ..fullName = allVisibleTokenMList[i].fullName
         ..balance = allVisibleTokenMList[i].balance
         ..contractAddress = allVisibleTokenMList[i].contractAddress
-        ..address = allVisibleTokenMList[i].address
-        ..tokenRate = tokenRate;
+        ..address = allVisibleTokenMList[i].address;
       displayTokenMList.add(tokenM);
     }
     return displayTokenMList;
@@ -485,17 +462,18 @@ class _EthPageState extends State<EthPage> {
                                         " " +
                                         (rateInstance == null
                                             ? ""
-                                            : TokenRate.instance.getPrice(displayTokenMList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
+                                            : rateInstance.getPrice(displayTokenMList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: ScreenUtil().setSp(2.5),
                                     ),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(2.5)),
+                                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(30.5)),
                                     child: Text(
-                                      "0%", //Market price fluctuations
-                                      // todo  displayTokenMList[index].tokenRate.getChangeDaily.toString() ?? "0%", //Market price fluctuations
+                                      rateInstance == null
+                                          ? "0% ↑"
+                                          : rateInstance.decorateChangeDaily(rateInstance.getChangeDaily(displayTokenMList[index])),
                                       style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil().setSp(2.5)),
                                     ),
                                   )

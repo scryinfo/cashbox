@@ -17,9 +17,6 @@ class TokenRate {
   Map<String, TokenRateM> tokenRateMap = Map<String, TokenRateM>();
   Map legalMap = Map<String, double>();
   String nowLegalCurrency = "USD";
-  String symbol = "";
-  double price = 0.0;
-  double changeDaily = 0.00;
 
   setDigitRateMap(Map digitRateMap) {
     this.tokenRateMap = digitRateMap;
@@ -48,8 +45,16 @@ class TokenRate {
   double getChangeDaily(TokenM digit) {
     if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
+    } else {
+      return this.tokenRateMap[digit.shortName.trim().toUpperCase()].changeDaily;
     }
-    return this.tokenRateMap[digit.shortName.trim().toUpperCase()].changeDaily;
+  }
+
+  String decorateChangeDaily(double changeDaily) {
+    if (changeDaily > 0) {
+      return changeDaily.toStringAsFixed(5) + "%" + "↑";
+    }
+    return changeDaily.toStringAsFixed(5) + "%" + "↓";
   }
 
   String getName(TokenM digit) {
@@ -72,7 +77,6 @@ class TokenRate {
       return 0.0;
     }
     return instance.tokenRateMap[digit.shortName.trim().toUpperCase()].price * instance.legalMap[getNowLegalCurrency()];
-    //return instance.tokenRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[getNowLegalCurrency()];
   }
 
   double getMoney(TokenM digit) {
@@ -87,7 +91,6 @@ class TokenRate {
       return 0.0;
     }
     return instance.tokenRateMap[digit.shortName.trim().toUpperCase()].high;
-    //return instance.tokenRateMap[digit.shortName.toUpperCase()]["high"];
   }
 
   double getLow(TokenM digit) {
@@ -95,7 +98,6 @@ class TokenRate {
       return 0.0;
     }
     return instance.tokenRateMap[digit.shortName.trim().toUpperCase()].low;
-    //return instance.tokenRateMap[digit.shortName.toUpperCase()]["low"];
   }
 }
 
@@ -111,11 +113,4 @@ class TokenRateM {
   int timestamps = 0;
   double volume = 0;
   double changeDaily = 0.00;
-
-  String get getChangeDaily {
-    if (changeDaily >= 0) {
-      return (changeDaily * 100.0).toStringAsFixed(5) + "%" + "↑";
-    }
-    return (changeDaily * 100.0).toStringAsFixed(5) + "%" + "↓";
-  }
 }

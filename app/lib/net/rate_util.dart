@@ -43,13 +43,19 @@ Future<TokenRate> loadRateInstance() async {
     // load and save price
     {
       var priceMap = Map<String, TokenRateM>();
-      var digitRate = new TokenRateM();
       priceList.forEach((price) {
+        var digitRate = new TokenRateM();
         digitRate
           ..symbol = price.symbol
           ..name = price.name
-          ..price = double.parse(price.priceUsd)
-          ..changeDaily = double.parse(price.vwap24Hr);
+          ..price = 0.0
+          ..changeDaily = 0.0;
+        if (price.hasChangePercent24Hr()) {
+          digitRate.changeDaily = double.parse(price.changePercent24Hr ?? "0");
+        }
+        if (price.hasPriceUsd()) {
+          digitRate.price = double.parse(price.priceUsd ?? "0");
+        }
         priceMap[price.symbol] = digitRate;
       });
       resultRate.setDigitRateMap(priceMap);

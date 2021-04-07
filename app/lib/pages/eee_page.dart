@@ -111,25 +111,25 @@ class _EeePageState extends State<EeePage> {
       if (rateInstance == null) {
         return;
       }
-      if (true) {
-        List<String> rateKeys = rateInstance.tokenRateMap.keys.toList();
-        for (var i = 0; i < displayTokenMList.length; i++) {
-          int index = i;
-          if ((this.displayTokenMList[index].shortName.toUpperCase() != null) &&
-              (rateKeys.contains(this.displayTokenMList[index].shortName.toUpperCase().trim().toString()))) {
-            if (mounted) {
-              setState(() {
-                this.displayTokenMList[index].tokenRate
-                  ..symbol = TokenRate.instance.getSymbol(this.displayTokenMList[index])
-                  ..price = TokenRate.instance.getPrice(this.displayTokenMList[index])
-                  ..changeDaily = TokenRate.instance.getChangeDaily(this.displayTokenMList[index]);
-              });
-            }
-          } else {
-            Logger().w("digitName is not exist===>", this.displayTokenMList[index].shortName);
-          }
-        }
-      }
+      // if (true) {
+      //   List<String> rateKeys = rateInstance.tokenRateMap.keys.toList();
+      //   for (var i = 0; i < displayTokenMList.length; i++) {
+      //     int index = i;
+      //     if ((this.displayTokenMList[index].shortName.toUpperCase() != null) &&
+      //         (rateKeys.contains(this.displayTokenMList[index].shortName.toUpperCase().trim().toString()))) {
+      //       if (mounted) {
+      //         setState(() {
+      //           this.displayTokenMList[index].tokenRate
+      //             ..symbol = TokenRate.instance.getSymbol(this.displayTokenMList[index])
+      //             ..price = TokenRate.instance.getPrice(this.displayTokenMList[index])
+      //             ..changeDaily = TokenRate.instance.getChangeDaily(this.displayTokenMList[index]);
+      //         });
+      //       }
+      //     } else {
+      //       Logger().w("digitName is not exist===>", this.displayTokenMList[index].shortName);
+      //     }
+      //   }
+      // }
     });
   }
 
@@ -244,7 +244,6 @@ class _EeePageState extends State<EeePage> {
 
   List<TokenM> addTokenToDisplayList(int targetCount) {
     for (var i = displayTokenMList.length; i < targetCount; i++) {
-      TokenRate tokenRate = TokenRate.instance;
       TokenM tokenM = TokenM();
       tokenM
         ..tokenId = allVisibleTokenMList[i].tokenId
@@ -254,8 +253,7 @@ class _EeePageState extends State<EeePage> {
         ..fullName = allVisibleTokenMList[i].fullName
         ..balance = allVisibleTokenMList[i].balance
         ..contractAddress = allVisibleTokenMList[i].contractAddress
-        ..address = allVisibleTokenMList[i].address
-        ..tokenRate = tokenRate;
+        ..address = allVisibleTokenMList[i].address;
       displayTokenMList.add(tokenM);
     }
     return displayTokenMList;

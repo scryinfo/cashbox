@@ -12,7 +12,6 @@ class TokenM {
   String contractAddress = ""; //Token contract address
   String urlImg; //Token icon icon address
   bool isVisible = true; //Is the token visible
-  TokenRate tokenRate; //market price
   String lastTxInfo; //The last transaction on the chain
 }
 

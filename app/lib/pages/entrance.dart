@@ -193,7 +193,6 @@ class _EntrancePageState extends State<EntrancePage> {
           var element = ethTokenOpenQueryRes.tokens[i];
           EthChainTokenDefault ethChainTokenDefault = EthChainTokenDefault();
           ethChainTokenDefault
-            ..chainTokenSharedId = element.id
             ..ethChainTokenShared.gasLimit = element.gasLimit.toInt()
             ..netType = element.tokenShared.netType
             ..ethChainTokenShared.tokenType = element.tokenShared.chainType
