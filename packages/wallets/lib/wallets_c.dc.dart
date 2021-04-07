@@ -4120,6 +4120,7 @@ class InitParameters implements DC<clib.CInitParameters> {
   DbName dbName = new DbName();
   int isMemoryDb = 0;
   String contextNote = "";
+  String netType = "";
 
   static freeInstance(clib.CInitParameters instance) {
     DbName.free(instance.dbName);
@@ -4128,6 +4129,10 @@ class InitParameters implements DC<clib.CInitParameters> {
       ffi.calloc.free(instance.contextNote);
     }
     instance.contextNote = nullptr;
+    if (instance.netType != nullptr) {
+      ffi.calloc.free(instance.netType);
+    }
+    instance.netType = nullptr;
   }
 
   static free(Pointer<clib.CInitParameters> ptr) {
@@ -4173,6 +4178,10 @@ class InitParameters implements DC<clib.CInitParameters> {
       ffi.calloc.free(c.contextNote);
     }
     c.contextNote = contextNote.toCPtrInt8();
+    if (c.netType != nullptr) {
+      ffi.calloc.free(c.netType);
+    }
+    c.netType = netType.toCPtrInt8();
   }
 
   @override
@@ -4189,6 +4198,7 @@ class InitParameters implements DC<clib.CInitParameters> {
     dbName.toDart(c.dbName);
     isMemoryDb = c.isMemoryDb;
     contextNote = c.contextNote.toDartString();
+    netType = c.netType.toDartString();
   }
 }
 

@@ -826,6 +826,22 @@ class CWallets {
   late final _dart_Wallets_unlockWrite _Wallets_unlockWrite =
       _Wallets_unlockWrite_ptr.asFunction<_dart_Wallets_unlockWrite>();
 
+  ffi.Pointer<CError> Wallets_changeNetType(
+    ffi.Pointer<CContext> ctx,
+    ffi.Pointer<ffi.Int8> netType,
+  ) {
+    return _Wallets_changeNetType(
+      ctx,
+      netType,
+    );
+  }
+
+  late final _Wallets_changeNetType_ptr =
+      _lookup<ffi.NativeFunction<_c_Wallets_changeNetType>>(
+          'Wallets_changeNetType');
+  late final _dart_Wallets_changeNetType _Wallets_changeNetType =
+      _Wallets_changeNetType_ptr.asFunction<_dart_Wallets_changeNetType>();
+
   ffi.Pointer<CError> Wallets_all(
     ffi.Pointer<CContext> ctx,
     ffi.Pointer<ffi.Pointer<CArrayCWallet>> arrayWallet,
@@ -1071,13 +1087,11 @@ class CWallets {
 
   ffi.Pointer<CError> Wallets_queryBalance(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<ffi.Int8> walletId,
     ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>> tokenAddress,
   ) {
     return _Wallets_queryBalance(
       ctx,
-      netType,
       walletId,
       tokenAddress,
     );
@@ -1091,12 +1105,10 @@ class CWallets {
 
   ffi.Pointer<CError> Wallets_updateBalance(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CTokenAddress> tokenAddress,
   ) {
     return _Wallets_updateBalance(
       ctx,
-      netType,
       tokenAddress,
     );
   }
@@ -1109,12 +1121,10 @@ class CWallets {
 
   ffi.Pointer<CError> Wallets_changeTokenShowState(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CWalletTokenStatus> tokenStatus,
   ) {
     return _Wallets_changeTokenShowState(
       ctx,
-      netType,
       tokenStatus,
     );
   }
@@ -1162,14 +1172,12 @@ class CWallets {
 
   ffi.Pointer<CError> ChainBtc_getAuthTokenList(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     int startItem,
     int pageSize,
     ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>> tokens,
   ) {
     return _ChainBtc_getAuthTokenList(
       ctx,
-      netType,
       startItem,
       pageSize,
       tokens,
@@ -1185,12 +1193,10 @@ class CWallets {
 
   ffi.Pointer<CError> ChainBtc_getDefaultTokenList(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>> tokens,
   ) {
     return _ChainBtc_getDefaultTokenList(
       ctx,
-      netType,
       tokens,
     );
   }
@@ -1204,12 +1210,10 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_updateSyncRecord(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CAccountInfoSyncProg> syncRecord,
   ) {
     return _ChainEee_updateSyncRecord(
       ctx,
-      netType,
       syncRecord,
     );
   }
@@ -1223,13 +1227,11 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_getSyncRecord(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<ffi.Int8> account,
     ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>> syncRecord,
   ) {
     return _ChainEee_getSyncRecord(
       ctx,
-      netType,
       account,
       syncRecord,
     );
@@ -1243,13 +1245,11 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_decodeAccountInfo(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CDecodeAccountInfoParameters> parameters,
     ffi.Pointer<ffi.Pointer<CAccountInfo>> accountInfo,
   ) {
     return _ChainEee_decodeAccountInfo(
       ctx,
-      netType,
       parameters,
       accountInfo,
     );
@@ -1264,13 +1264,11 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_getStorageKey(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CStorageKeyParameters> parameters,
     ffi.Pointer<ffi.Pointer<ffi.Int8>> key,
   ) {
     return _ChainEee_getStorageKey(
       ctx,
-      netType,
       parameters,
       key,
     );
@@ -1284,13 +1282,11 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_eeeTransfer(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CEeeTransferPayload> transferPayload,
     ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
   ) {
     return _ChainEee_eeeTransfer(
       ctx,
-      netType,
       transferPayload,
       signedResult,
     );
@@ -1304,13 +1300,11 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_tokenXTransfer(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CEeeTransferPayload> transferPayload,
     ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
   ) {
     return _ChainEee_tokenXTransfer(
       ctx,
-      netType,
       transferPayload,
       signedResult,
     );
@@ -1345,13 +1339,11 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_txSign(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CRawTxParam> rawTx,
     ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
   ) {
     return _ChainEee_txSign(
       ctx,
-      netType,
       rawTx,
       signedResult,
     );
@@ -1364,12 +1356,10 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_updateBasicInfo(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CSubChainBasicInfo> basicInfo,
   ) {
     return _ChainEee_updateBasicInfo(
       ctx,
-      netType,
       basicInfo,
     );
   }
@@ -1383,12 +1373,10 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_getDefaultBasicInfo(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> basicInfo,
   ) {
     return _ChainEee_getDefaultBasicInfo(
       ctx,
-      netType,
       basicInfo,
     );
   }
@@ -1402,13 +1390,11 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_getBasicInfo(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CChainVersion> chainVersion,
     ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> basicInfo,
   ) {
     return _ChainEee_getBasicInfo(
       ctx,
-      netType,
       chainVersion,
       basicInfo,
     );
@@ -1422,12 +1408,10 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_saveExtrinsicDetail(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CExtrinsicContext> extrinsicCtx,
   ) {
     return _ChainEee_saveExtrinsicDetail(
       ctx,
-      netType,
       extrinsicCtx,
     );
   }
@@ -1441,7 +1425,6 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_queryChainTxRecord(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<ffi.Int8> account,
     int startItem,
     int pageSize,
@@ -1449,7 +1432,6 @@ class CWallets {
   ) {
     return _ChainEee_queryChainTxRecord(
       ctx,
-      netType,
       account,
       startItem,
       pageSize,
@@ -1466,7 +1448,6 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_queryTokenxTxRecord(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<ffi.Int8> account,
     int startItem,
     int pageSize,
@@ -1474,7 +1455,6 @@ class CWallets {
   ) {
     return _ChainEee_queryTokenxTxRecord(
       ctx,
-      netType,
       account,
       startItem,
       pageSize,
@@ -1525,14 +1505,12 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_getAuthTokenList(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     int startItem,
     int pageSize,
     ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>> tokens,
   ) {
     return _ChainEee_getAuthTokenList(
       ctx,
-      netType,
       startItem,
       pageSize,
       tokens,
@@ -1548,12 +1526,10 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_getDefaultTokenList(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>> tokens,
   ) {
     return _ChainEee_getDefaultTokenList(
       ctx,
-      netType,
       tokens,
     );
   }
@@ -1586,14 +1562,12 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEth_txSign(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CEthTransferPayload> txPayload,
     ffi.Pointer<ffi.Int8> password,
     ffi.Pointer<ffi.Pointer<ffi.Int8>> signResult,
   ) {
     return _ChainEth_txSign(
       ctx,
-      netType,
       txPayload,
       password,
       signResult,
@@ -1607,14 +1581,12 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEth_rawTxSign(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CEthRawTxPayload> rawTxPayload,
     ffi.Pointer<ffi.Int8> password,
     ffi.Pointer<ffi.Pointer<ffi.Int8>> signResult,
   ) {
     return _ChainEth_rawTxSign(
       ctx,
-      netType,
       rawTxPayload,
       password,
       signResult,
@@ -1645,14 +1617,12 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEth_getAuthTokenList(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     int startItem,
     int pageSize,
     ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>> tokens,
   ) {
     return _ChainEth_getAuthTokenList(
       ctx,
-      netType,
       startItem,
       pageSize,
       tokens,
@@ -1685,12 +1655,10 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEth_getDefaultTokenList(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>> tokens,
   ) {
     return _ChainEth_getDefaultTokenList(
       ctx,
-      netType,
       tokens,
     );
   }
@@ -1721,12 +1689,10 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEth_getNonAuthTokenList(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>> tokens,
   ) {
     return _ChainEth_getNonAuthTokenList(
       ctx,
-      netType,
       tokens,
     );
   }
@@ -2331,6 +2297,8 @@ class CInitParameters extends ffi.Struct {
   external int isMemoryDb;
 
   external ffi.Pointer<ffi.Int8> contextNote;
+
+  external ffi.Pointer<ffi.Int8> netType;
 }
 
 class CCreateWalletParameters extends ffi.Struct {
@@ -2978,6 +2946,16 @@ typedef _dart_Wallets_unlockWrite = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
 );
 
+typedef _c_Wallets_changeNetType = ffi.Pointer<CError> Function(
+  ffi.Pointer<CContext> ctx,
+  ffi.Pointer<ffi.Int8> netType,
+);
+
+typedef _dart_Wallets_changeNetType = ffi.Pointer<CError> Function(
+  ffi.Pointer<CContext> ctx,
+  ffi.Pointer<ffi.Int8> netType,
+);
+
 typedef _c_Wallets_all = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
   ffi.Pointer<ffi.Pointer<CArrayCWallet>> arrayWallet,
@@ -3130,39 +3108,33 @@ typedef _dart_Wallets_packageVersion = ffi.Pointer<ffi.Int8> Function();
 
 typedef _c_Wallets_queryBalance = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Int8> walletId,
   ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>> tokenAddress,
 );
 
 typedef _dart_Wallets_queryBalance = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Int8> walletId,
   ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>> tokenAddress,
 );
 
 typedef _c_Wallets_updateBalance = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CTokenAddress> tokenAddress,
 );
 
 typedef _dart_Wallets_updateBalance = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CTokenAddress> tokenAddress,
 );
 
 typedef _c_Wallets_changeTokenShowState = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CWalletTokenStatus> tokenStatus,
 );
 
 typedef _dart_Wallets_changeTokenShowState = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CWalletTokenStatus> tokenStatus,
 );
 
@@ -3188,7 +3160,6 @@ typedef _dart_ChainBtc_updateAuthDigitList = ffi.Pointer<CError> Function(
 
 typedef _c_ChainBtc_getAuthTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Uint32 startItem,
   ffi.Uint32 pageSize,
   ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>> tokens,
@@ -3196,7 +3167,6 @@ typedef _c_ChainBtc_getAuthTokenList = ffi.Pointer<CError> Function(
 
 typedef _dart_ChainBtc_getAuthTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   int startItem,
   int pageSize,
   ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>> tokens,
@@ -3204,94 +3174,80 @@ typedef _dart_ChainBtc_getAuthTokenList = ffi.Pointer<CError> Function(
 
 typedef _c_ChainBtc_getDefaultTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>> tokens,
 );
 
 typedef _dart_ChainBtc_getDefaultTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>> tokens,
 );
 
 typedef _c_ChainEee_updateSyncRecord = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CAccountInfoSyncProg> syncRecord,
 );
 
 typedef _dart_ChainEee_updateSyncRecord = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CAccountInfoSyncProg> syncRecord,
 );
 
 typedef _c_ChainEee_getSyncRecord = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Int8> account,
   ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>> syncRecord,
 );
 
 typedef _dart_ChainEee_getSyncRecord = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Int8> account,
   ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>> syncRecord,
 );
 
 typedef _c_ChainEee_decodeAccountInfo = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CDecodeAccountInfoParameters> parameters,
   ffi.Pointer<ffi.Pointer<CAccountInfo>> accountInfo,
 );
 
 typedef _dart_ChainEee_decodeAccountInfo = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CDecodeAccountInfoParameters> parameters,
   ffi.Pointer<ffi.Pointer<CAccountInfo>> accountInfo,
 );
 
 typedef _c_ChainEee_getStorageKey = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CStorageKeyParameters> parameters,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> key,
 );
 
 typedef _dart_ChainEee_getStorageKey = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CStorageKeyParameters> parameters,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> key,
 );
 
 typedef _c_ChainEee_eeeTransfer = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CEeeTransferPayload> transferPayload,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
 );
 
 typedef _dart_ChainEee_eeeTransfer = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CEeeTransferPayload> transferPayload,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
 );
 
 typedef _c_ChainEee_tokenXTransfer = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CEeeTransferPayload> transferPayload,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
 );
 
 typedef _dart_ChainEee_tokenXTransfer = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CEeeTransferPayload> transferPayload,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
 );
@@ -3312,71 +3268,60 @@ typedef _dart_ChainEee_txSubmittableSign = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEee_txSign = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CRawTxParam> rawTx,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
 );
 
 typedef _dart_ChainEee_txSign = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CRawTxParam> rawTx,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
 );
 
 typedef _c_ChainEee_updateBasicInfo = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CSubChainBasicInfo> basicInfo,
 );
 
 typedef _dart_ChainEee_updateBasicInfo = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CSubChainBasicInfo> basicInfo,
 );
 
 typedef _c_ChainEee_getDefaultBasicInfo = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> basicInfo,
 );
 
 typedef _dart_ChainEee_getDefaultBasicInfo = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> basicInfo,
 );
 
 typedef _c_ChainEee_getBasicInfo = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CChainVersion> chainVersion,
   ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> basicInfo,
 );
 
 typedef _dart_ChainEee_getBasicInfo = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CChainVersion> chainVersion,
   ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> basicInfo,
 );
 
 typedef _c_ChainEee_saveExtrinsicDetail = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CExtrinsicContext> extrinsicCtx,
 );
 
 typedef _dart_ChainEee_saveExtrinsicDetail = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CExtrinsicContext> extrinsicCtx,
 );
 
 typedef _c_ChainEee_queryChainTxRecord = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Int8> account,
   ffi.Uint32 startItem,
   ffi.Uint32 pageSize,
@@ -3385,7 +3330,6 @@ typedef _c_ChainEee_queryChainTxRecord = ffi.Pointer<CError> Function(
 
 typedef _dart_ChainEee_queryChainTxRecord = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Int8> account,
   int startItem,
   int pageSize,
@@ -3394,7 +3338,6 @@ typedef _dart_ChainEee_queryChainTxRecord = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEee_queryTokenxTxRecord = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Int8> account,
   ffi.Uint32 startItem,
   ffi.Uint32 pageSize,
@@ -3403,7 +3346,6 @@ typedef _c_ChainEee_queryTokenxTxRecord = ffi.Pointer<CError> Function(
 
 typedef _dart_ChainEee_queryTokenxTxRecord = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Int8> account,
   int startItem,
   int pageSize,
@@ -3432,7 +3374,6 @@ typedef _dart_ChainEee_updateDefaultTokenList = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEee_getAuthTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Uint32 startItem,
   ffi.Uint32 pageSize,
   ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>> tokens,
@@ -3440,7 +3381,6 @@ typedef _c_ChainEee_getAuthTokenList = ffi.Pointer<CError> Function(
 
 typedef _dart_ChainEee_getAuthTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   int startItem,
   int pageSize,
   ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>> tokens,
@@ -3448,13 +3388,11 @@ typedef _dart_ChainEee_getAuthTokenList = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEee_getDefaultTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>> tokens,
 );
 
 typedef _dart_ChainEee_getDefaultTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>> tokens,
 );
 
@@ -3472,7 +3410,6 @@ typedef _dart_ChainEth_decodeAdditionData = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEth_txSign = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CEthTransferPayload> txPayload,
   ffi.Pointer<ffi.Int8> password,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signResult,
@@ -3480,7 +3417,6 @@ typedef _c_ChainEth_txSign = ffi.Pointer<CError> Function(
 
 typedef _dart_ChainEth_txSign = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CEthTransferPayload> txPayload,
   ffi.Pointer<ffi.Int8> password,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signResult,
@@ -3488,7 +3424,6 @@ typedef _dart_ChainEth_txSign = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEth_rawTxSign = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CEthRawTxPayload> rawTxPayload,
   ffi.Pointer<ffi.Int8> password,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signResult,
@@ -3496,7 +3431,6 @@ typedef _c_ChainEth_rawTxSign = ffi.Pointer<CError> Function(
 
 typedef _dart_ChainEth_rawTxSign = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CEthRawTxPayload> rawTxPayload,
   ffi.Pointer<ffi.Int8> password,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signResult,
@@ -3514,7 +3448,6 @@ typedef _dart_ChainEth_updateAuthTokenList = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEth_getAuthTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Uint32 startItem,
   ffi.Uint32 pageSize,
   ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>> tokens,
@@ -3522,7 +3455,6 @@ typedef _c_ChainEth_getAuthTokenList = ffi.Pointer<CError> Function(
 
 typedef _dart_ChainEth_getAuthTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   int startItem,
   int pageSize,
   ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>> tokens,
@@ -3540,13 +3472,11 @@ typedef _dart_ChainEth_updateDefaultTokenList = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEth_getDefaultTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>> tokens,
 );
 
 typedef _dart_ChainEth_getDefaultTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>> tokens,
 );
 
@@ -3562,12 +3492,10 @@ typedef _dart_ChainEth_updateNonAuthTokenList = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEth_getNonAuthTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>> tokens,
 );
 
 typedef _dart_ChainEth_getNonAuthTokenList = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>> tokens,
 );
