@@ -80,6 +80,7 @@
   "currency_manage": "货币管理",
   "wallet_list": "钱包列表",
   "language_choose": "语言选择",
+  "net_change": "网络切换",
   "clean_cache": "清除缓存",
   "version_update": "版本更新",
   "no_new_version_hint": "当前已是最新版本，暂无更新",

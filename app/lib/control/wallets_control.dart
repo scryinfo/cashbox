@@ -59,6 +59,15 @@ class WalletsControl {
     return mneObj.data1;
   }
 
+  bool changeNetType(NetType netType) {
+    Error err = Wallets.mainIsolate().changeNetType(netType);
+    if (!err.isSuccess()) {
+      Logger.getInstance().e("wallet_control ", "changeNetType error is false --->" + err.message.toString());
+      return false;
+    }
+    return true;
+  }
+
   Wallet createWallet(Uint8List mnemonic, EnumKit.WalletType walletType, String walletName, Uint8List pwd) {
     CreateWalletParameters createWalletParameters = CreateWalletParameters();
     createWalletParameters.walletType = walletType.toEnumString();

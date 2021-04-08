@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:app/model/wallets.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -48,6 +46,7 @@ class _MinePageState extends State<MinePage> {
         //_buildMoneyUnitWidget(),
         _buildWalletListWidget(),
         _buildTestWalletWidget(),
+        _buildChangeNetTypeWidget(),
         _buildLanguageChooseWidget(),
         _buildClearCacheWidget(),
         _buildAboutUsWidget(),
@@ -55,7 +54,6 @@ class _MinePageState extends State<MinePage> {
     );
   }
 
-  //todo 2.0
   Widget _buildMoneyUnitWidget() {
     return GestureDetector(
       onTap: () {},
@@ -120,6 +118,17 @@ class _MinePageState extends State<MinePage> {
       },
       child: ItemOfListWidget(
         leftText: translate('wallet_list'),
+      ),
+    );
+  }
+
+  Widget _buildChangeNetTypeWidget() {
+    return GestureDetector(
+      onTap: () {
+        NavigatorUtils.push(context, Routes.changeNetTypePage);
+      },
+      child: ItemOfListWidget(
+        leftText: translate('net_change'),
       ),
     );
   }

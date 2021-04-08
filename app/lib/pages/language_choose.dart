@@ -54,7 +54,7 @@ class _LanguageChoosePageState extends State<LanguageChoosePage> {
               } else if (snapshot.hasData) {
                 return Column(children: <Widget>[
                   Gaps.scaleVGap(5),
-                  _buildEnglishWidget(context),
+                  _buildLanguageItemWidget(context),
                 ]);
               } else {
                 return Text("no data,please reentry this page");
@@ -62,7 +62,7 @@ class _LanguageChoosePageState extends State<LanguageChoosePage> {
             }));
   }
 
-  _buildEnglishWidget(context) {
+  _buildLanguageItemWidget(context) {
     List<Widget> languageWidgetList = List.generate(languagesList.length, (index) {
       bool isSelectedLanguage = false;
       Locale myLocale = Localizations.localeOf(context);

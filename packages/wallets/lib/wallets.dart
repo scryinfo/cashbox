@@ -204,6 +204,18 @@ class Wallets {
     return DlResult1(mn, err);
   }
 
+  Error changeNetType(NetType netType) {
+    Error err;
+    {
+      var ptrNetType = netType.toEnumString().toCPtrInt8();
+      var cerr = _cWallets.Wallets_changeNetType(ptrContext, ptrNetType);
+      err = Error.fromC(cerr);
+      _cWallets.CError_free(cerr);
+      ptrNetType.free();
+    }
+    return err;
+  }
+
   DlResult1<Wallet> createWallet(CreateWalletParameters parameters) {
     Error err;
     Wallet wallet;

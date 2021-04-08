@@ -14,6 +14,7 @@ import 'package:app/pages/eee_page.dart';
 import 'package:app/pages/entrance.dart';
 import 'package:app/pages/eth_page.dart';
 import 'package:app/pages/language_choose.dart';
+import 'package:app/pages/change_nettype.dart';
 import 'package:app/pages/mine.dart';
 import 'package:app/pages/privacy_statements.dart';
 import 'package:app/pages/public_page.dart';
@@ -139,6 +140,10 @@ Handler walletManagerListPageHandler = Handler(handlerFunc: (BuildContext contex
 
 Handler languageChoosePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return LanguageChoosePage();
+});
+
+Handler changeNetTypePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+  return ChangeNetTypePage();
 });
 
 Handler walletManagerPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

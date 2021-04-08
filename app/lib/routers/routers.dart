@@ -28,6 +28,7 @@ class Routes {
   static String ddd2eeeConfirmPage = '/ddd2eeeconfirmpage';
   static String walletManagerListPage = '/walletmanagerlistpage';
   static String languageChoosePage = '/languagechoosepage';
+  static String changeNetTypePage = '/changenettypeepage';
   static String walletManagerPage = '/walletmanagerpage';
   static String resetPwdPage = '/resetpwdpage';
   static String recoverWalletPage = '/recoverwalletpage';
@@ -71,6 +72,7 @@ class Routes {
     router.define(ddd2eeeConfirmPage, handler: ddd2eeeConfirmPageHandler);
     router.define(walletManagerListPage, handler: walletManagerListPageHandler);
     router.define(languageChoosePage, handler: languageChoosePageHandler);
+    router.define(changeNetTypePage, handler: changeNetTypePageHandler);
     router.define(walletManagerPage, handler: walletManagerPageHandler);
     router.define(resetPwdPage, handler: resetPwdPageHandler);
     router.define(recoverWalletPage, handler: recoverWalletPageHandler);

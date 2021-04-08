@@ -14,6 +14,7 @@ class Config extends Object {
   String currency;
   String locale;
   List<Language> languages;
+  NetType curNetType;
   String serverAppVersion;
   String diamondCa; //diamond Dapp contractAddress
 
@@ -39,6 +40,19 @@ class Config extends Object {
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
   Map<String, dynamic> toJson() => _$ConfigToJson(this);
+}
+
+@JsonSerializable()
+class NetType extends Object {
+  NetType();
+
+  String enumNetType; // EnumKit.NetType
+  String netTypeName;
+  bool isCurNet = false;
+
+  factory NetType.fromJson(Map<String, dynamic> json) => _$NetTypeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$NetTypeToJson(this);
 }
 
 @JsonSerializable()
