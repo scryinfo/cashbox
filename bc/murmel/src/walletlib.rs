@@ -99,6 +99,7 @@ pub fn generate_mnemonic() {
     println!("{}", mnemonic);
 }
 
+#[cfg(test)]
 mod test {
     use crate::db::RB_DETAIL;
     use crate::kit::vec_to_string;

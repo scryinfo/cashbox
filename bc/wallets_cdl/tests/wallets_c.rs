@@ -612,3 +612,44 @@ fn find_by_id_test(c_ctx: *mut CContext, wallet_id: &str) -> Wallet {
     };
     wallet
 }
+
+#[test]
+pub fn init_murmel_try(){
+    // must free all c_err context c parameters
+    // different type have different free() functions
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let init_parameters = {
+           let mut p = InitParameters::default();
+            p.net_type = NetType::Test.to_string();
+            p.is_memory_db = CTrue;
+            let prefix = "test_";
+            p.db_name.0 = mav::ma::DbName::new(&prefix, "");
+            p.context_note = format!("test_{}", prefix);
+            p
+        };
+        let c_init_parameters = CInitParameters::to_c_ptr(&init_parameters);
+        let c_err = Wallets_init(c_init_parameters, c_ctx) as *mut CError;
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+
+        let c_wallet = CWallet_dAlloc();
+        let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
+        let mut c_create_parameters = CCreateWalletParameters::to_c_ptr(&CreateWalletParameters{
+            name: "murmel".to_string(),
+            password: "".to_string(),
+            mnemonic: words.to_string(),
+            wallet_type:  WalletType::Test.to_string(),
+        });
+        let c_err = Wallets_createWallet(*c_ctx, c_create_parameters, c_wallet) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let _w = CWallet::to_rust(&**c_wallet);
+        CWallet_dFree(c_wallet);
+        c_create_parameters.free();
+        CContext_dFree(c_ctx);
+    }
+
+}
