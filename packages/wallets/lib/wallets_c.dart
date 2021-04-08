@@ -1318,13 +1318,11 @@ class CWallets {
 
   ffi.Pointer<CError> ChainEee_txSubmittableSign(
     ffi.Pointer<CContext> ctx,
-    ffi.Pointer<ffi.Int8> netType,
     ffi.Pointer<CRawTxParam> rawTx,
     ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
   ) {
     return _ChainEee_txSubmittableSign(
       ctx,
-      netType,
       rawTx,
       signedResult,
     );
@@ -3254,14 +3252,12 @@ typedef _dart_ChainEee_tokenXTransfer = ffi.Pointer<CError> Function(
 
 typedef _c_ChainEee_txSubmittableSign = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CRawTxParam> rawTx,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
 );
 
 typedef _dart_ChainEee_txSubmittableSign = ffi.Pointer<CError> Function(
   ffi.Pointer<CContext> ctx,
-  ffi.Pointer<ffi.Int8> netType,
   ffi.Pointer<CRawTxParam> rawTx,
   ffi.Pointer<ffi.Pointer<ffi.Int8>> signedResult,
 );
