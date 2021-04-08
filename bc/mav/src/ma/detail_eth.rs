@@ -76,6 +76,8 @@ pub struct MEthChainTokenAuth {
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
+    #[serde(default)]
+    pub status:i64,
     //  ///这个是为了使用方便，它不会生成数据库字段
     /*    #[serde(skip)]
         pub chain_token_shared: MEthChainTokenShared,*/
@@ -94,15 +96,16 @@ pub struct MEthChainTokenDefault {
     /// [crate::db::TokenShared]
     #[serde(default)]
     pub chain_token_shared_id: String,
-
     #[serde(default)]
     pub net_type: String,
-    /// 显示位置，以此从小到大排列
-    #[serde(default)]
-    pub position: i64,
     ///如果是eth，那么合约地址为零长度字符串
     #[serde(default)]
     pub contract_address: String,
+    /// 显示位置，以此从小到大排列
+    #[serde(default)]
+    pub position: i64,
+    #[serde(default)]
+    pub status:i64,
     ///这个是为了使用方便，它不会生成数据库字段
     #[serde(skip)]
     pub chain_token_shared: MEthChainTokenShared,
@@ -126,6 +129,8 @@ pub struct MEthChainTokenNonAuth {
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
+    #[serde(default)]
+    pub status:i64,
    /* #[serde(skip)]
     pub chain_token_shared: MEthChainTokenShared,*/
 }

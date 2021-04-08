@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use rbatis::crud::CRUDTable;
 
-use mav::{ChainType, NetType, WalletType};
+use mav::{ChainType, NetType, WalletType, CTrue};
 use mav::kits::sql_left_join_get_b;
 use mav::ma::{Dao, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MWallet, MBtcChainTokenAuth};
 
@@ -48,7 +48,6 @@ impl Load for BtcChainTokenShared {
     type MType = MBtcChainTokenShared;
     async fn load(&mut self, _: &dyn ContextTrait, m: Self::MType) -> Result<(), WalletError> {
         self.m = m;
-       // self.token_shared.m = self.m.token_shared.clone();
         Ok(())
     }
 }
@@ -84,7 +83,8 @@ impl BtcChainTokenDefault {
         let mut tokens_default = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MBtcChainTokenDefault::net_type, net_type.to_string())
-                
+                .eq(MBtcChainTokenDefault::status, CTrue)
+
                 .order_by(true, &[MBtcChainTokenDefault::position]);
             MBtcChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
@@ -118,6 +118,7 @@ impl BtcChainTokenAuth{
         let mut tokens_auth = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MBtcChainTokenAuth::net_type, net_type.to_string())
+                .eq(MBtcChainTokenAuth::status, CTrue)
                 .order_by(false, &[MBtcChainTokenAuth::create_time]).push_sql(&page_query);
             MBtcChainTokenAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };

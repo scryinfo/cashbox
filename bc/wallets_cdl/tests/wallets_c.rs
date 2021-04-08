@@ -2,10 +2,8 @@ use std::ptr::null_mut;
 use std::time::{Duration, Instant};
 
 use futures::task::SpawnExt;
-
-use mav::{kits, WalletType, NetType};
+use mav::{kits, WalletType};
 use std::os::raw::c_char;
-
 mod data;
 
 use wallets_cdl::{
@@ -453,7 +451,9 @@ fn wallets_update_balance_test() {
             assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
             let token_address_balance: Vec<TokenAddress> = CArray::to_rust(&**c_array_token_address);
             for address_balance in token_address_balance {
-                assert_eq!(address_balance.balance, "1000".to_string());
+                if wallet.eth_chain.chain_shared.chain_type.eq(&address_balance.chain_type) {
+                    assert_eq!(address_balance.balance, "1000".to_string());
+                }
             }
             CArrayCTokenAddress_dFree(c_array_token_address);
         }

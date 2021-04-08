@@ -16,14 +16,16 @@ pub struct Wallet {
 deref_type!(Wallet,MWallet);
 
 impl Wallet {
-    pub async fn has_any(context: &dyn ContextTrait) -> Result<bool, WalletError> {
+    pub async fn has_any(context: &dyn ContextTrait,net_type:&NetType) -> Result<bool, WalletError> {
         let rb = context.db().wallets_db();
-        let r = MWallet::exist_by_wrapper(rb, "", &rb.new_wrapper()).await?;
+        let wrapper = rb.new_wrapper().eq(MWallet::wallet_type,&WalletType::from(net_type).to_string());
+        let r = MWallet::exist_by_wrapper(rb, "", &wrapper).await?;
         Ok(r)
     }
-    pub async fn count(context: &dyn ContextTrait) -> Result<i64, WalletError> {
+    pub async fn count(context: &dyn ContextTrait,net_type:&NetType) -> Result<i64, WalletError> {
         let rb = context.db().wallets_db();
-        let count = MWallet::count_by_wrapper(rb, "", &rb.new_wrapper()).await?;
+        let wrapper = rb.new_wrapper().eq(MWallet::wallet_type,&WalletType::from(net_type).to_string());
+        let count = MWallet::count_by_wrapper(rb, "", &wrapper).await?;
         Ok(count)
     }
 

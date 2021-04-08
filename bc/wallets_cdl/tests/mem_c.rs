@@ -35,27 +35,25 @@ fn array_char_test() {
         CArrayCChar_dFree(ptr);
     }
 }
+
 #[test]
 fn array_context_test() {
-    unsafe {
-        let mut ar = CArray::<CContext>::default();
-
-        {
-            let _a = CArray::<CContext>::default();
-        }
-
-        // {
-        //     let mut a = CArray::<CContext>::default();
-        //     let ss = vec![to_c_char("test"), null_mut()];
-        //     a.set(ss);
-        //     let ss = vec![to_c_char("test"), null_mut()];
-        //     a.set(ss);
-        // }
-        //
-        // let ss = vec!["test2".to_owned(), "".to_owned()];
-        //
-        // let ptr = CArrayCChar_dAlloc();
-        // *ptr = CArray::<*mut c_char>::to_c_ptr(&ss);
-        // CArrayCChar_dFree(ptr);
+    let mut ar = CArray::<CContext>::default();
+    {
+        let _a = CArray::<CContext>::default();
     }
+
+    // {
+    //     let mut a = CArray::<CContext>::default();
+    //     let ss = vec![to_c_char("test"), null_mut()];
+    //     a.set(ss);
+    //     let ss = vec![to_c_char("test"), null_mut()];
+    //     a.set(ss);
+    // }
+    //
+    // let ss = vec!["test2".to_owned(), "".to_owned()];
+    //
+    // let ptr = CArrayCChar_dAlloc();
+    // *ptr = CArray::<*mut c_char>::to_c_ptr(&ss);
+    // CArrayCChar_dFree(ptr);
 }

@@ -50,6 +50,7 @@ pub struct MBtcChainTokenShared {
     /// 精度
     #[serde(default)]
     pub decimal: i32,
+
 }
 
 impl MBtcChainTokenShared {
@@ -69,6 +70,8 @@ pub struct MBtcChainTokenAuth {
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
+    #[serde(default)]
+    pub status:i64,
 }
 
 impl MBtcChainTokenAuth {
@@ -89,7 +92,8 @@ pub struct MBtcChainTokenDefault {
     /// 显示位置，以此从小到大排列
     #[serde(default)]
     pub position: i64,
-
+    #[serde(default)]
+    pub status:i64,
     #[serde(skip)]
     pub chain_token_shared: MBtcChainTokenShared,
 }

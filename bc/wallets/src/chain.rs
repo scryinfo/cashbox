@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
-use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth, MTokenAddress};
+use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth, MTokenAddress, MBtcChainTokenAuth};
 use mav::{NetType, WalletType, CTrue, CFalse};
 use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth};
 
@@ -9,6 +9,7 @@ use codec::Decode;
 use rbatis::plugin::page::PageRequest;
 use bitcoin_wallet::account::AccountAddressType;
 use bitcoin::util::psbt::serialize::Serialize;
+use rbatis::crud::CRUDTable;
 
 #[derive(Default)]
 struct EthChain();
@@ -110,7 +111,6 @@ impl ChainTrait for EeeChain {
                 token.chain_token_shared_id = default_token.chain_token_shared_id.clone();
                 token.wallet_id = wallet.id.clone();
                 token.chain_type = wallets_types::EeeChain::chain_type(&wallet_type, &net_type).to_string();
-                //token.chain_type = net_type.to_string();
                 token.show = CTrue;
                 token.decimal = default_token.chain_token_shared.decimal;
                 tokens.push(token);
@@ -163,7 +163,7 @@ impl ChainTrait for BtcChain {
             let address = instance_key.address.clone().to_string();
             let public_key = instance_key.public.clone();
             let ser = public_key.serialize();
-            let public_key = hex::encode(ser);
+            let public_key = format!("0x{}", hex::encode(ser));
             addr.address = address;
             addr.public_key = public_key;
         }
@@ -249,10 +249,13 @@ impl BtcChainTrait for BtcChain {
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<BtcChainTokenDefault>) -> Result<(), WalletError> {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
-        //delete all exist default tokens
-        let token_default_wrapper = token_rb.new_wrapper().push_sql("1==1;");
-        let count = MBtcChainTokenDefault::remove_by_wrapper(token_rb, &tx.tx_id, &token_default_wrapper).await?;
-        log::debug!("delete MBtcChainTokenDefault row {}", count);
+        //disable all exist default tokens
+        {
+            let token_default_name = MBtcChainTokenDefault::table_name();
+            let col_name = MBtcChainTokenDefault::status;
+            let update_sql = format!("update {} set {} = 0", token_default_name, col_name);
+            token_rb.exec(&tx.tx_id, &update_sql).await?;
+        }
         //insert new tokens shared
         for token in default_tokens {
             let mut shared = token.btc_chain_token_shared.clone();
@@ -264,10 +267,22 @@ impl BtcChainTrait for BtcChain {
                 }
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
-
-            let mut token_default = token.m.clone();
-            token_default.chain_token_shared_id = shared.id;
-            token_default.save(token_rb, &tx.tx_id).await?;
+            {
+                let token_default_wrapper = token_rb.new_wrapper()
+                    .eq(&MBtcChainTokenDefault::chain_token_shared_id, &shared.id)
+                    .eq(&MBtcChainTokenDefault::net_type, &token.net_type);
+                //check if this default is exist!
+                let mut default_token = if let Some(mut token_default) = MBtcChainTokenDefault::fetch_by_wrapper(token_rb, &tx.tx_id, &token_default_wrapper).await? {
+                    token_default.position = token.position;
+                    token_default
+                } else {
+                    let mut token_default = token.m.clone();
+                    token_default.chain_token_shared_id = shared.id;
+                    token_default
+                };
+                default_token.status = 1;
+                default_token.save_update(token_rb, &tx.tx_id).await?;
+            }
         }
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
@@ -276,11 +291,13 @@ impl BtcChainTrait for BtcChain {
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, author_tokens: Vec<BtcChainTokenAuth>) -> Result<(), WalletError> {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
-
-        //delete all exist authority tokens
-        let token_auth_wrapper = token_rb.new_wrapper().push_sql("1==1;");
-        let count = MBtcChainTokenShared::remove_by_wrapper(token_rb, &tx.tx_id, &token_auth_wrapper).await?;
-        log::debug!("delete MBtcChainTokenAuth row {}", count);
+        //disable all exist default tokens
+        {
+            let token_default_name = MBtcChainTokenAuth::table_name();
+            let col_name = MBtcChainTokenAuth::status;
+            let update_sql = format!("update {} set {} = 0", token_default_name, col_name);
+            token_rb.exec(&tx.tx_id, &update_sql).await?;
+        }
         //insert new tokens shared
         for token in author_tokens {
             let mut shared = token.btc_chain_token_shared.clone();
@@ -292,9 +309,23 @@ impl BtcChainTrait for BtcChain {
                 }
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
-            let mut token_auth = token.m.clone();
-            token_auth.chain_token_shared_id = shared.id;
-            token_auth.save(token_rb, &tx.tx_id).await?;
+
+            {
+                let token_auth_wrapper = token_rb.new_wrapper()
+                    .eq(&MBtcChainTokenAuth::chain_token_shared_id, &shared.id)
+                    .eq(&MBtcChainTokenAuth::net_type, &token.net_type);
+                //check if this default is exist!
+                let mut auth_token = if let Some(mut token_auth) = MBtcChainTokenAuth::fetch_by_wrapper(token_rb, &tx.tx_id, &token_auth_wrapper).await? {
+                    token_auth.position = token.position;
+                    token_auth
+                } else {
+                    let mut token_auth = token.m.clone();
+                    token_auth.chain_token_shared_id = shared.id;
+                    token_auth
+                };
+                auth_token.status = 1;
+                auth_token.save_update(token_rb, &tx.tx_id).await?;
+            }
         }
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
@@ -664,11 +695,13 @@ impl EeeChainTrait for EeeChain {
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<EeeChainTokenDefault>) -> Result<(), WalletError> {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
-
-        //delete all exist default tokens
-        let token_default_wrapper = token_rb.new_wrapper().push_sql("1==1;");
-        let count = MEeeChainTokenDefault::remove_by_wrapper(token_rb, &tx.tx_id, &token_default_wrapper).await?;
-        log::debug!("delete MEthChainTokenDefault row {}", count);
+        //disable all exist default tokens
+        {
+            let token_default_name = MEeeChainTokenDefault::table_name();
+            let col_name = MEeeChainTokenDefault::status;
+            let update_sql = format!("update {} set {} = 0", token_default_name, col_name);
+            token_rb.exec(&tx.tx_id, &update_sql).await?;
+        }
         //insert new tokens shared
         for token in default_tokens {
             let mut shared = token.eee_chain_token_shared.clone();
@@ -678,13 +711,24 @@ impl EeeChainTrait for EeeChain {
                 if let Some(token_shared) = MEeeChainTokenShared::fetch_by_wrapper(token_rb, &tx.tx_id, &token_shared_wrapper).await? {
                     shared.id = token_shared.id;
                 }
-
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
-
-            let mut token_default = token.m.clone();
-            token_default.chain_token_shared_id = shared.id;
-            token_default.save(token_rb, &tx.tx_id).await?;
+            {
+                let token_default_wrapper = token_rb.new_wrapper()
+                    .eq(&MEeeChainTokenDefault::chain_token_shared_id, &shared.id)
+                    .eq(&MEeeChainTokenDefault::net_type, &token.net_type);
+                //check if this default is exist!
+                let mut default_token = if let Some(mut token_default) = MEeeChainTokenDefault::fetch_by_wrapper(token_rb, &tx.tx_id, &token_default_wrapper).await? {
+                    token_default.position = token.position;
+                    token_default
+                } else {
+                    let mut token_default = token.m.clone();
+                    token_default.chain_token_shared_id = shared.id;
+                    token_default
+                };
+                default_token.status = 1;
+                default_token.save_update(token_rb, &tx.tx_id).await?;
+            }
         }
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
@@ -694,10 +738,13 @@ impl EeeChainTrait for EeeChain {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
 
-        //delete all exist authority tokens
-        let token_auth_wrapper = token_rb.new_wrapper().push_sql("1==1;");
-        let count = MEeeChainTokenAuth::remove_by_wrapper(token_rb, &tx.tx_id, &token_auth_wrapper).await?;
-        log::debug!("delete MEeeChainTokenAuth row {}", count);
+        //disable all exist default tokens
+        {
+            let token_default_name = MEeeChainTokenAuth::table_name();
+            let col_name = MEeeChainTokenAuth::status;
+            let update_sql = format!("update {} set {} = 0", token_default_name, col_name);
+            token_rb.exec(&tx.tx_id, &update_sql).await?;
+        }
         //insert new tokens shared
         for token in author_tokens {
             let mut shared = token.eee_chain_token_shared.clone();
@@ -709,9 +756,22 @@ impl EeeChainTrait for EeeChain {
                 }
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
-            let mut token_default = token.m.clone();
-            token_default.chain_token_shared_id = shared.id;
-            token_default.save(token_rb, &tx.tx_id).await?;
+            {
+                let token_auth_wrapper = token_rb.new_wrapper()
+                    .eq(&MEeeChainTokenAuth::chain_token_shared_id, &shared.id)
+                    .eq(&MEeeChainTokenAuth::net_type, &token.net_type);
+                //check if this default is exist!
+                let mut token_auth = if let Some(mut token_auth) = MEeeChainTokenAuth::fetch_by_wrapper(token_rb, &tx.tx_id, &token_auth_wrapper).await? {
+                    token_auth.position = token.position;
+                    token_auth
+                } else {
+                    let mut token_auth = token.m.clone();
+                    token_auth.chain_token_shared_id = shared.id;
+                    token_auth
+                };
+                token_auth.status = 1;
+                token_auth.save_update(token_rb, &tx.tx_id).await?;
+            }
         }
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
@@ -822,10 +882,13 @@ impl EthChainTrait for EthChain {
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<EthChainTokenDefault>) -> Result<(), WalletError> {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
-        //delete all exist default tokens
-        let token_default_wrapper = token_rb.new_wrapper().push_sql("1==1;");
-        let count = MEthChainTokenDefault::remove_by_wrapper(token_rb, &tx.tx_id, &token_default_wrapper).await?;
-        log::debug!("delete MEthChainTokenDefault row {}", count);
+        //disable all exist default tokens
+        {
+            let token_default_name = MEthChainTokenDefault::table_name();
+            let col_name = MEthChainTokenDefault::status;
+            let update_sql = format!("update {} set {} = 0", token_default_name, col_name);
+            token_rb.exec(&tx.tx_id, &update_sql).await?;
+        }
         //insert new tokens shared
         for token in default_tokens {
             let mut shared = token.eth_chain_token_shared.clone();
@@ -837,9 +900,23 @@ impl EthChainTrait for EthChain {
                 }
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
-            let mut token_default = token.m.clone();
-            token_default.chain_token_shared_id = shared.id;
-            token_default.save(token_rb, &tx.tx_id).await?;
+            {
+                let token_default_wrapper = token_rb.new_wrapper()
+                    .eq(&MEthChainTokenDefault::chain_token_shared_id, &shared.id)
+                    .eq(&MEthChainTokenDefault::net_type, &token.net_type);
+                //check if this default is exist!
+                let mut default_token = if let Some(mut token_default) = MEthChainTokenDefault::fetch_by_wrapper(token_rb, &tx.tx_id, &token_default_wrapper).await? {
+                    token_default.contract_address = token.contract_address.clone();
+                    token_default.position = token.position;
+                    token_default
+                } else {
+                    let mut token_default = token.m.clone();
+                    token_default.chain_token_shared_id = shared.id;
+                    token_default
+                };
+                default_token.status = 1;
+                default_token.save_update(token_rb, &tx.tx_id).await?;
+            }
         }
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
@@ -854,10 +931,13 @@ impl EthChainTrait for EthChain {
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, author_tokens: Vec<EthChainTokenAuth>) -> Result<(), WalletError> {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
-        //delete all exist authority tokens
-        let token_auth_wrapper = token_rb.new_wrapper().push_sql("1==1;");
-        let count = MEthChainTokenAuth::remove_by_wrapper(token_rb, &tx.tx_id, &token_auth_wrapper).await?;
-        log::debug!("delete MEthChainTokenAuth row {}", count);
+        //disable all exist auth tokens
+        {
+            let token_default_name = MEthChainTokenAuth::table_name();
+            let col_name = MEthChainTokenAuth::status;
+            let update_sql = format!("update {} set {} = 0", token_default_name, col_name);
+            token_rb.exec(&tx.tx_id, &update_sql).await?;
+        }
         //insert new tokens shared
         for token in author_tokens {
             let mut shared = token.eth_chain_token_shared.clone();
@@ -869,9 +949,23 @@ impl EthChainTrait for EthChain {
                 }
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
-            let mut token_auth = token.m.clone();
-            token_auth.chain_token_shared_id = shared.id;
-            token_auth.save(token_rb, &tx.tx_id).await?;
+            {
+                let token_auth_wrapper = token_rb.new_wrapper()
+                    .eq(&MEthChainTokenAuth::chain_token_shared_id, &shared.id)
+                    .eq(&MEthChainTokenAuth::net_type, &token.net_type);
+                //check if this default is exist!
+                let mut token_auth = if let Some(mut token_auth) = MEthChainTokenAuth::fetch_by_wrapper(token_rb, &tx.tx_id, &token_auth_wrapper).await? {
+                    token_auth.contract_address = token.contract_address.clone();
+                    token_auth.position = token.position;
+                    token_auth
+                } else {
+                    let mut token_auth = token.m.clone();
+                    token_auth.chain_token_shared_id = shared.id;
+                    token_auth
+                };
+                token_auth.status = 1;
+                token_auth.save_update(token_rb, &tx.tx_id).await?;
+            }
         }
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
@@ -881,10 +975,13 @@ impl EthChainTrait for EthChain {
     async fn update_non_auth_tokens(&self, context: &dyn ContextTrait, author_tokens: Vec<EthChainTokenNonAuth>) -> Result<(), WalletError> {
         let token_rb = context.db().wallets_db();
         let mut tx = token_rb.begin_tx_defer(false).await?;
-        //delete all exist authority tokens
-        let token_auth_wrapper = token_rb.new_wrapper().push_sql("1==1;");
-        let count = MEthChainTokenNonAuth::remove_by_wrapper(token_rb, &tx.tx_id, &token_auth_wrapper).await?;
-        log::debug!("delete MEthChainTokenNonAuth row {}", count);
+        //disable all exist auth tokens
+        {
+            let token_default_name = MEthChainTokenNonAuth::table_name();
+            let col_name = MEthChainTokenNonAuth::status;
+            let update_sql = format!("update {} set {} = 0", token_default_name, col_name);
+            token_rb.exec(&tx.tx_id, &update_sql).await?;
+        }
         //insert new tokens shared
         for token in author_tokens {
             let mut shared = token.eth_chain_token_shared.clone();
@@ -896,9 +993,23 @@ impl EthChainTrait for EthChain {
                 }
                 shared.save_update(token_rb, &tx.tx_id).await?;
             }
-            let mut token_non_auth = token.m.clone();
-            token_non_auth.chain_token_shared_id = shared.id;
-            token_non_auth.save(token_rb, &tx.tx_id).await?;
+            {
+                let query_wrapper = token_rb.new_wrapper()
+                    .eq(&MEthChainTokenNonAuth::chain_token_shared_id, &shared.id)
+                    .eq(&MEthChainTokenNonAuth::net_type, &token.net_type);
+                //check if this default is exist!
+                let mut new_token = if let Some(mut token_non_auth) = MEthChainTokenNonAuth::fetch_by_wrapper(token_rb, &tx.tx_id, &query_wrapper).await? {
+                    token_non_auth.contract_address = token.contract_address.clone();
+                    token_non_auth.position = token.position;
+                    token_non_auth
+                } else {
+                    let mut token_auth = token.m.clone();
+                    token_auth.chain_token_shared_id = shared.id;
+                    token_auth
+                };
+                new_token.status = 1;
+                new_token.save_update(token_rb, &tx.tx_id).await?;
+            }
         }
         tx.manager = None;
         token_rb.commit(&tx.tx_id).await?;
@@ -925,7 +1036,7 @@ impl EthChain {
 
 impl BtcChain {
     // TODO when sign btc-tx in wallet/chain use this function
-    async fn get_mnemonic_from_address(context: &dyn ContextTrait,address: &str,password: &str) -> Result<Vec<u8>, WalletError> {
+    async fn get_mnemonic_from_address(context: &dyn ContextTrait, address: &str, password: &str) -> Result<Vec<u8>, WalletError> {
         if let Some(wallet) = wallets_types::Wallet::find_by_address(context, address).await? {
             let mnemonic = eee::Sr25519::get_mnemonic_context(&wallet.mnemonic, password.as_bytes())?;
             Ok(mnemonic)

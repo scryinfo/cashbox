@@ -69,7 +69,7 @@ impl EeeChainTokenDefault {
         let tokens_shared: Vec<MEeeChainTokenShared> = {
             let default_name = MEeeChainTokenDefault::table_name();
             let shared_name = MEeeChainTokenShared::table_name();
-            let wrapper =  wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEeeChainTokenDefault::net_type).as_str(), net_type.to_string());
+            let wrapper = wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEeeChainTokenDefault::net_type).as_str(), net_type.to_string());
 
             let sql = {
                 let t = sql_left_join_get_b(&default_name, &MEeeChainTokenDefault::chain_token_shared_id,
@@ -82,6 +82,7 @@ impl EeeChainTokenDefault {
         let mut tokens_default = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MEeeChainTokenDefault::net_type, net_type.to_string())
+                .eq(MEeeChainTokenDefault::status, CTrue)
                 .order_by(true, &[MEeeChainTokenDefault::position]);
             MEeeChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
@@ -92,7 +93,7 @@ impl EeeChainTokenDefault {
                 }
             }
         }
-        let eee_tokens = tokens_default.iter().map(|token|EeeChainTokenDefault{
+        let eee_tokens = tokens_default.iter().map(|token| EeeChainTokenDefault {
             m: token.clone(),
             eee_chain_token_shared: EeeChainTokenShared::from(token.chain_token_shared.clone()),
         }).collect::<Vec<EeeChainTokenDefault>>();
@@ -107,7 +108,7 @@ pub struct EeeChainTokenAuth {
 }
 deref_type!(EeeChainTokenAuth,MEeeChainTokenAuth);
 
-impl EeeChainTokenAuth{
+impl EeeChainTokenAuth {
     pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<EeeChainTokenAuth>, WalletError> {
         let tx_id = "";
         let wallets_db = context.db().wallets_db();
@@ -115,6 +116,7 @@ impl EeeChainTokenAuth{
         let mut tokens_auth = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MEeeChainTokenAuth::net_type, net_type.to_string())
+                .eq(MEeeChainTokenAuth::status, CTrue)
                 .order_by(false, &[MEeeChainTokenAuth::create_time]).push_sql(&page_query);
             MEeeChainTokenAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
@@ -138,39 +140,32 @@ impl EeeChainTokenAuth{
 }
 
 
-
 #[derive(Debug, Default)]
 pub struct EeeChain {
     pub chain_shared: ChainShared,
-  //  pub address: Address,
+    //  pub address: Address,
     pub tokens: Vec<EeeChainToken>,
 }
 
 impl Chain2WalletType for EeeChain {
-    fn chain_type(wallet_type: &WalletType,net_type:&NetType) -> ChainType {
-        match (wallet_type,net_type) {
-            (WalletType::Normal,NetType::Main) => ChainType::EEE,
-            (WalletType::Test,NetType::Test) => ChainType::EeeTest,
-            (WalletType::Test,NetType::Private) => ChainType::EeePrivate,
-            (WalletType::Test,NetType::PrivateTest) => ChainType::EeePrivateTest,
+    fn chain_type(wallet_type: &WalletType, net_type: &NetType) -> ChainType {
+        match (wallet_type, net_type) {
+            (WalletType::Normal, NetType::Main) => ChainType::EEE,
+            (WalletType::Test, NetType::Test) => ChainType::EeeTest,
+            (WalletType::Test, NetType::Private) => ChainType::EeePrivate,
+            (WalletType::Test, NetType::PrivateTest) => ChainType::EeePrivateTest,
             _ => ChainType::EeeTest,
         }
     }
-
-   /* fn to_chain_type(&self, wallet_type: &WalletType) -> ChainType {
-        EeeChain::chain_type(wallet_type)
-    }*/
 }
 
 /*#[async_trait]*/
-impl  EeeChain {
-    pub async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet,net_type:&NetType) -> Result<(), WalletError> {
+impl EeeChain {
+    pub async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet, net_type: &NetType) -> Result<(), WalletError> {
         self.chain_shared.set_m(&mw);
-        //let wallet_type = WalletType::from(&mw.wallet_type);
-       // self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
 
         let wallet_type = WalletType::from(mw.wallet_type.as_str());
-        let chain_type =  EeeChain::chain_type(&wallet_type, &net_type).to_string();
+        let chain_type = EeeChain::chain_type(&wallet_type, &net_type).to_string();
         {//load address
             let wallet_id = self.chain_shared.wallet_id.clone();
             self.chain_shared.set_addr(context, &wallet_id, &chain_type).await?;

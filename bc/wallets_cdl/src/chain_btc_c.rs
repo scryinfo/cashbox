@@ -1,14 +1,14 @@
 #![allow(non_snake_case)]
 
 use futures::executor::block_on;
+use std::os::raw::c_uint;
+
 use wallets_types::Error;
 use wallets::Contexts;
-use super::types::CError;
-use super::kits::{CR,CArray,CStruct};
-
-use crate::types::{CBtcChainTokenDefault, CBtcChainTokenAuth};
+use super::kits::{CR, CArray, CStruct};
+use crate::types::{CBtcChainTokenDefault, CBtcChainTokenAuth,CError};
 use crate::parameters::CContext;
-use std::os::raw::c_uint;
+
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainBtc_updateDefaultTokenList(ctx: *mut CContext, defaultTokens: *mut CArray<CBtcChainTokenDefault>) -> *const CError {
@@ -40,8 +40,9 @@ pub unsafe extern "C" fn ChainBtc_updateDefaultTokenList(ctx: *mut CContext, def
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+
 #[no_mangle]
-pub unsafe extern "C" fn ChainBtc_updateAuthDigitList(ctx: *mut CContext,authTokens: *mut CArray<CBtcChainTokenAuth>) -> *const CError {
+pub unsafe extern "C" fn ChainBtc_updateAuthDigitList(ctx: *mut CContext, authTokens: *mut CArray<CBtcChainTokenAuth>) -> *const CError {
     log::debug!("enter ChainBtc updateDefaultTokenLis");
 
     if ctx.is_null() || authTokens.is_null() {
@@ -107,7 +108,7 @@ pub unsafe extern "C" fn ChainBtc_getAuthTokenList(ctx: *mut CContext, startItem
 pub unsafe extern "C" fn ChainBtc_getDefaultTokenList(ctx: *mut CContext, tokens: *mut *mut CArray<CBtcChainTokenDefault>) -> *const CError {
     log::debug!("enter ChainEth getDigitList");
 
-    if ctx.is_null() || tokens.is_null()  {
+    if ctx.is_null() || tokens.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or tokens is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);

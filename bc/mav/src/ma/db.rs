@@ -8,7 +8,7 @@ use lazy_static::lazy_static;
 
 use crate::kits::Error;
 use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet, MEthChainTokenNonAuth};
-use crate::{kits, NetType};
+use crate::{kits, NetType, CTrue};
 
 /// Note that cashbox is currently on version 1. Version 2 is this version,
 /// when cashbox want to update version we must synchronize this database version value;
@@ -349,8 +349,7 @@ impl Db {
             {
                 //token_default
                 for net_type in NetType::iter() {
-                    let wrapper = rb
-                        .new_wrapper()
+                    let wrapper = rb.new_wrapper()
                         .eq(
                             MEthChainTokenDefault::chain_token_shared_id,
                             token_shared.id.clone(),
@@ -362,6 +361,7 @@ impl Db {
                         token_default.net_type = net_type.to_string();
                         token_default.chain_token_shared_id = token_shared.id.clone();
                         token_default.position = 0;
+                        token_default.status=CTrue as i64;
                         token_default.contract_address = " ".to_owned();
 
                         token_default.save(rb, "").await?;
@@ -402,8 +402,7 @@ impl Db {
             {
                 //token_default
                 for net_type in NetType::iter() {
-                    let wrapper = rb
-                        .new_wrapper()
+                    let wrapper = rb.new_wrapper()
                         .eq(
                             MEeeChainTokenDefault::chain_token_shared_id,
                             token_shared.id.clone(),
@@ -415,6 +414,7 @@ impl Db {
                         token_default.net_type = net_type.to_string();
                         token_default.chain_token_shared_id = token_shared.id.clone();
                         token_default.position = 0;
+                        token_default.status=CTrue as i64;
                         token_default.save(rb, "").await?;
                     }
                 }
@@ -436,12 +436,10 @@ impl Db {
                 btc.token_shared.project_name = "Bitcoin".to_owned();
                 btc.token_shared.project_home = "https://bitcoin.org/en/".to_owned();
                 btc.token_shared.project_note =
-                    "Bitcoin is a global, open-source platform for decentralized applications."
-                        .to_owned();
+                    "Bitcoin is a global, open-source platform for decentralized applications.".to_owned();
 
                 let old_eth = {
-                    let wrapper = rb
-                        .new_wrapper()
+                    let wrapper = rb.new_wrapper()
                         .eq(MBtcChainTokenShared::token_type, &btc.token_type);
                     MBtcChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
                 };
@@ -455,8 +453,7 @@ impl Db {
             {
                 //token_default
                 for net_type in NetType::iter() {
-                    let wrapper = rb
-                        .new_wrapper()
+                    let wrapper = rb.new_wrapper()
                         .eq(
                             MBtcChainTokenDefault::chain_token_shared_id,
                             token_shared.id.clone(),
@@ -468,6 +465,7 @@ impl Db {
                         token_default.net_type = net_type.to_string();
                         token_default.chain_token_shared_id = token_shared.id.clone();
                         token_default.position = 0;
+                        token_default.status=CTrue as i64;
                         token_default.save(rb, "").await?;
                     }
                 }

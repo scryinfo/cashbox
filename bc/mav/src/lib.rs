@@ -100,6 +100,15 @@ impl From<&str> for WalletType {
         }
     }
 }
+impl From<&NetType> for WalletType {
+    fn from(net_type: &NetType) -> Self {
+        if NetType::Main.eq(net_type) {
+            WalletType::Normal
+        }else {
+            WalletType::Test
+        }
+    }
+}
 
 impl From<&String> for WalletType {
     fn from(wallet_type: &String) -> Self {

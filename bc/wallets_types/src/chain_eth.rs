@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use rbatis::crud::CRUDTable;
 
-use mav::{ChainType, NetType, WalletType};
+use mav::{ChainType, NetType, WalletType, CTrue};
 use mav::kits::sql_left_join_get_b;
 use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MWallet, MEthChainTokenNonAuth};
 
@@ -114,6 +114,7 @@ impl EthChainTokenAuth {
         let mut tokens_auth = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MEthChainTokenAuth::net_type, net_type.to_string())
+                .eq(MEthChainTokenAuth::status, CTrue)
                 .order_by(false, &[MEthChainTokenAuth::create_time]).push_sql(&page_query);
             MEthChainTokenAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };
@@ -162,6 +163,7 @@ impl EthChainTokenNonAuth {
         let mut tokens_non_auth = {
             let wrapper = wallets_db.new_wrapper()
                 .eq(MEthChainTokenNonAuth::net_type, net_type.to_string())
+                .eq(MEthChainTokenNonAuth::status, CTrue)
                 .order_by(true, &[MEthChainTokenNonAuth::position]);
             MEthChainTokenNonAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
         };

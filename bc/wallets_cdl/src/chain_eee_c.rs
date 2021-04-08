@@ -4,20 +4,15 @@ use std::os::raw::{c_char, c_uint};
 
 use futures::executor::block_on;
 
-use mav::NetType;
 use wallets::Contexts;
-use wallets_types::{Error, WalletError, AccountInfoSyncProg, ChainVersion};
-
-use crate::{kits::CStruct, parameters::CExtrinsicContext};
-use crate::parameters::{CChainVersion, CEeeChainTx};
-
-use super::chain_eee::{CAccountInfoSyncProg, CSubChainBasicInfo};
-use super::kits::{CR, to_c_char, to_str};
-use super::parameters::{CAccountInfo, CContext, CDecodeAccountInfoParameters, CRawTxParam, CStorageKeyParameters, CEeeTransferPayload};
-use super::types::CError;
-use crate::chain_eee::{CEeeChainTokenDefault, CEeeChainTokenAuth};
-use crate::CArray;
 use mav::ma::EeeTokenType;
+use wallets_types::{Error, WalletError, AccountInfoSyncProg, ChainVersion};
+use super::types::CError;
+use super::kits::{CR,CStruct,CArray, to_c_char, to_str};
+use super::parameters::{CAccountInfo, CContext, CDecodeAccountInfoParameters, CRawTxParam, CStorageKeyParameters,CChainVersion,CExtrinsicContext, CEeeChainTx, CEeeTransferPayload};
+use crate::chain_eee::{CEeeChainTokenDefault, CEeeChainTokenAuth,CAccountInfoSyncProg, CSubChainBasicInfo};
+
+
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_updateSyncRecord(ctx: *mut CContext, syncRecord: *mut CAccountInfoSyncProg) -> *const CError {
@@ -214,7 +209,7 @@ pub unsafe extern "C" fn ChainEee_tokenXTransfer(ctx: *mut CContext, transferPay
 
 //signed result can be send to chain rpc service by json-rpc
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_txSubmittableSign(ctx: *mut CContext, netType: *mut c_char, rawTx: *mut CRawTxParam, signedResult: *mut *mut c_char) -> *const CError {
+pub unsafe extern "C" fn ChainEee_txSubmittableSign(ctx: *mut CContext, rawTx: *mut CRawTxParam, signedResult: *mut *mut c_char) -> *const CError {
     log::debug!("enter ChainEee txSubmittableSign");
     if ctx.is_null() || rawTx.is_null() || signedResult.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,rawTx signedResult is null");
@@ -229,9 +224,8 @@ pub unsafe extern "C" fn ChainEee_txSubmittableSign(ctx: *mut CContext, netType:
         match contexts.get(&ctx.id) {
             Some(wallets) => {
                 let eee_chain = wallets.eee_chain_instance();
-                let net_type = NetType::from(to_str(netType));
                 let raw_tx = CRawTxParam::ptr_rust(rawTx);
-                match block_on(eee_chain.tx_sign(wallets, &net_type, &raw_tx, false)) {
+                match block_on(eee_chain.tx_sign(wallets, &wallets.net_type, &raw_tx, false)) {
                     Ok(res) => {
                         *signedResult = to_c_char(&res);
                         Error::SUCCESS()

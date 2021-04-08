@@ -56,7 +56,7 @@ pub fn init_wallets_context(c_ctx: *mut *mut CContext) -> *mut CError {
 pub fn init_parameters() -> InitParameters {
     let mut p = InitParameters::default();
     p.net_type="Test".to_string();
-    p.is_memory_db=mav::CTrue;
+    //p.is_memory_db=mav::CTrue;
     //let prefix = format!("{}_",kits::uuid());
     let prefix = "test_";
     p.db_name.0 = mav::ma::DbName::new(&prefix, "");

@@ -228,7 +228,7 @@ fn eee_tx_submittable_sign_test() {
         };
         //  wallets_cdl::parameters::CRawTxParam
         let mut c_raw_tx = wallets_cdl::parameters::CRawTxParam::to_c_ptr(&raw_tx_param);
-        let c_err = chain_eee_c::ChainEee_txSubmittableSign(*c_ctx, to_c_char("Test"), c_raw_tx, sign_result) as *mut CError;
+        let c_err = chain_eee_c::ChainEee_txSubmittableSign(*c_ctx, c_raw_tx, sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         wallets_cdl::mem_c::CStr_dFree(sign_result);

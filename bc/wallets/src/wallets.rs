@@ -121,7 +121,7 @@ impl Wallets {
     }
 
     pub async fn has_any(&self) -> Result<bool, WalletError> {
-        Wallet::has_any(self).await
+        Wallet::has_any(self,&self.net_type).await
     }
 
     pub async fn find_by_id(&self, wallet_id: &str) -> Result<Option<Wallet>, WalletError> {
@@ -317,16 +317,15 @@ impl Wallets {
             //tx 只处理异常情况下，事务的rollback，所以会在事务提交成功后，调用 tx.manager = None; 阻止 [rbatis::tx::TxGuard]再管理事务
             {
                 m_wallet.save(rb, &tx.tx_id).await?;
-                // MAddress::save_batch(rb, &tx.tx_id, &mut m_addresses).await?;
                 let mut m_mnemonic = MMnemonic::default();
                 m_mnemonic.from(&m_wallet);
-                // 现在只出现了2个数据库，所以第二个可以不使用事务，最坏的情况出现助记词保存成功，而cashbox_wallet没有成功的情况，这时不会对程序
+                // todo 增加事务的管理
                 m_mnemonic.save(self.db.mnemonic_db(), "").await?;
             }
             rb.commit(&tx.tx_id).await?;
             tx.manager = None;
         }
-        if Wallet::count(context).await? == 1 {
+        if Wallet::count(context,&context.net_type).await? == 1 {
             //是第一个创建的wallet，把它设置为当前钱包
             let wallet_type = WalletType::from(&m_wallet.wallet_type);
             //创建的第一个钱包，的默认链是 eee
