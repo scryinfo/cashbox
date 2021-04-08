@@ -1,10 +1,15 @@
 {
   "isInitedConfig": false,
   "lastTimeConfigCheck": 0,
-  "intervalMilliseconds": 5,
+  "intervalMilliseconds": 10,
   "currency": "USD",
   "locale": "zh",
   "diamondCa": "",
+  "curNetType": {
+    "enumNetType": "Main",
+    "netTypeName": "正式网络",
+    "isCurNet": true
+  },
   "languages": [
     {
       "localeKey": "zh",
@@ -48,18 +53,18 @@
   "balanceSymbol": "Balances",
   "eeeSymbol": "Eee",
   "privateConfig": {
-    "serverConfigIp": "",
+    "serverConfigIp": "http://192.168.2.:8080/inner_api/config/info",
     "serverApkVersion": "2.1.0",
     "configVersion": "1.0.0",
     "downloadAppUrl": "333",
     "downloadLatestAppUrl": "https://atest",
     "rateUrl": "https://cascerate",
-    "authDigitVersion": "1.0",
+    "authDigitVersion": 1,
     "authDigitIp": [
       "authIp_1",
       "authIp_2"
     ],
-    "defaultDigitVersion": "1.0",
+    "defaultDigitVersion": 2,
     "defaultDigitIp": [
       "defaultDigitIp_1",
       "defaultDigitIp_2"
@@ -93,14 +98,14 @@
         "chainType": "EEE"
       }
     ],
-    "scryXIp": "ht3",
+    "scryXIp": "",
     "publicIp": "https://cap/pub",
     "nowDbVersion": "1.1.0",
-    "etherscanKey": "",
+    "etherscanKey": "XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1",
     "dddMainNetCA": "",
     "dddTestNetCA": "",
     "d2eMainNetEthAddress": "",
     "d2eTestNetEthAddress": "",
-    "dappOpenUrl": "https://cashtml"
+    "dappOpenUrl": " "
   }
 }

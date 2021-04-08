@@ -70,7 +70,7 @@ class _EthPageState extends State<EthPage> {
   void initData() async {
     {
       Config config = await HandleConfig.instance.getConfig();
-      moneyUnitStr = config.currency;
+      moneyUnitStr = config.currency ?? "USD";
     }
     bool isForceLoadFromJni = widget.isForceLoadFromJni;
     if (isForceLoadFromJni == null) isForceLoadFromJni = true;

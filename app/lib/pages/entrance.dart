@@ -5,7 +5,6 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/net/net_util.dart';
 import 'package:app/model/server_config_model.dart';
 import 'package:app/pages/eee_page.dart';
 import 'package:app/res/resources.dart';
@@ -24,9 +23,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:services/services.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart';
-import 'dart:convert' as convert;
 import 'eth_page.dart';
-import 'package:app/net/scryx_net_util.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
 import 'package:services/src/rpc_face/cashbox_config_open.pbgrpc.dart';
 import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
@@ -51,6 +48,12 @@ class _EntrancePageState extends State<EntrancePage> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
+    /*  Initialize to local file
+        1. Interface ip, version information, etc. Save to local file
+        2. Database information, etc.
+        3. Default digits
+        4. Application language type (Chinese and English)
+        */
     await initAppConfigInfo(); //case: After deleting the wallet, there is no wallet, return to EntrancePage, check every time
     Config config = await HandleConfig.instance.getConfig();
     _languageTextValue = languageMap[config.locale];
@@ -65,13 +68,6 @@ class _EntrancePageState extends State<EntrancePage> {
       languageMap[element.localeKey] = element.localeValue;
       languagesKeyList.add(element.localeKey);
     });
-    /*  Initialize to local file
-        1. Interface ip, version information, etc. Save to local file
-        2. Database information, etc.
-        3. Default digits
-        4. Application language type (Chinese and English)
-        */
-    await Wallets.instance.initAppConfig();
   }
 
   _checkAndUpdateAppConfig() async {
@@ -108,8 +104,8 @@ class _EntrancePageState extends State<EntrancePage> {
       ..platformType = "aarch64-linux-android" // todo replace platform info
       ..signature = signInfo;
     var channel = createClientChannel(refresh.refreshCall);
-    // handle case : Config upgrade.
 
+    // handle case : Config upgrade.
     {
       final configOpenFaceClient = CashboxConfigOpenFaceClient(channel);
       try {
@@ -121,7 +117,7 @@ class _EntrancePageState extends State<EntrancePage> {
       }
     }
 
-    /// check and update  EeeChain txVersion and runtimeVersion
+    // check and update  EeeChain txVersion and runtimeVersion
     try {
       SubChainBasicInfo defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo();
       if (serverConfigModel == null ||
@@ -163,7 +159,7 @@ class _EntrancePageState extends State<EntrancePage> {
         Logger().e("saveConfig  is failure---> ", isSaveOk.toString());
       }
     } catch (e) {
-      Logger().e("updateConfig error is ---> ", e.toString());
+      Logger().e("updateConfig error is -----> ", e.toString());
     }
 
     UpdateDefaultToken: //update defaultDigitList to native
@@ -212,17 +208,19 @@ class _EntrancePageState extends State<EntrancePage> {
           break UpdateDefaultToken;
         }
         // add to wallet
-        for (var i = 0; i < ethDefaultTokenList.length; i++) {
-          var element = ethDefaultTokenList[i];
-          TokenAddress tokenAddress = TokenAddress()
-            ..tokenId = element.chainTokenSharedId
-            ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
-            ..walletId = WalletsControl.getInstance().currentWallet().id
-            ..balance = 0.toString()
-            ..addressId = WalletsControl.getInstance().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, ChainType.ETH) ?? "";
-          bool isUpdateBalanceOk = WalletsControl.getInstance().updateBalance(tokenAddress);
-          if (!isUpdateBalanceOk) {
-            Logger().e("updateBalance error , tokenAddress info is---> ", tokenAddress.toString());
+        if (WalletsControl.getInstance().hasAny()) {
+          for (var i = 0; i < ethDefaultTokenList.length; i++) {
+            var element = ethDefaultTokenList[i];
+            TokenAddress tokenAddress = TokenAddress()
+              ..tokenId = element.chainTokenSharedId
+              ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+              ..walletId = WalletsControl.getInstance().currentWallet().id
+              ..balance = 0.toString()
+              ..addressId = WalletsControl.getInstance().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, ChainType.ETH) ?? "";
+            bool isUpdateBalanceOk = WalletsControl.getInstance().updateBalance(tokenAddress);
+            if (!isUpdateBalanceOk) {
+              Logger().e("updateBalance error , tokenAddress info is---> ", tokenAddress.toString());
+            }
           }
         }
 
