@@ -80,10 +80,8 @@ impl WalletType{
    pub fn check_chain_type_match(wallet_type: &WalletType,chain_type:&NetType)->bool{
         if wallet_type.eq(&WalletType::Normal)&&chain_type.eq(&NetType::Main){
             true
-        }else if wallet_type.eq(&WalletType::Test)&&chain_type.ne(&NetType::Main) {
-            true
-        }else{
-            false
+        }else {
+            wallet_type.eq(&WalletType::Test)&&chain_type.ne(&NetType::Main)
         }
     }
 }

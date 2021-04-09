@@ -79,7 +79,7 @@ impl<T> Dao<T> for T where
     }
 
     async fn save_batch(rb: &Rbatis, tx_id: &str, ms: &mut [T]) -> Result<DBExecResult> {
-        for it in ms.into_iter() {
+        for it in ms.iter_mut() {
             it.before_save();
         }
         rb.save_batch(tx_id, ms).await

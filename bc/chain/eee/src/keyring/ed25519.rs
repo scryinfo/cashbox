@@ -10,7 +10,7 @@ impl Crypto for Ed25519 {
     type Public = ed25519::Public;
 
     fn seed_from_phrase(phrase: &str, password: Option<&str>) ->Result<Self::Seed,Error> {
-        Ok(Sr25519::seed_from_phrase(phrase, password)?)
+        Sr25519::seed_from_phrase(phrase, password)
     }
     fn pair_from_seed(seed: &Self::Seed) -> Self::Pair { ed25519::Pair::from_seed(&seed.clone()) }
 

@@ -626,8 +626,7 @@ impl Decodable for Vec<u8> {
         if len > MAX_VEC_SIZE {
             return Err(self::Error::OversizedVectorAllocation { requested: len, max: MAX_VEC_SIZE })
         }
-        let mut ret = Vec::with_capacity(len);
-        ret.resize(len, 0);
+        let mut ret = vec![0;len as usize];
         d.read_slice(&mut ret)?;
         Ok(ret)
     }
@@ -686,8 +685,7 @@ impl Decodable for CheckedData {
             });
         }
         let checksum = <[u8; 4]>::consensus_decode(&mut d)?;
-        let mut ret = Vec::with_capacity(len as usize);
-        ret.resize(len as usize, 0);
+        let mut ret = vec![0; len as usize];
         d.read_slice(&mut ret)?;
         let expected_checksum = sha2_checksum(&ret);
         if expected_checksum != checksum {

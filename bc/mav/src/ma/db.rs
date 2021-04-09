@@ -7,7 +7,7 @@ use strum_macros::EnumIter;
 use lazy_static::lazy_static;
 
 use crate::kits::Error;
-use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet, MEthChainTokenNonAuth};
+use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MWallet, MEthChainTokenNonAuth, MTokenShared};
 use crate::{kits, NetType, CTrue};
 
 /// Note that cashbox is currently on version 1. Version 2 is this version,
@@ -32,24 +32,26 @@ pub struct DbName {
 
 impl DbName {
     pub fn new(pre: &str, path: &str) -> DbName {
-        let mut temp = DbName::default();
-        temp.path = path.to_owned();
-        temp.prefix = pre.to_owned();
-        DbName::new_from(&temp)
+        let temp = DbName {
+            path: path.to_owned(),
+            prefix: pre.to_owned(),
+            ..Default::default()
+        };
+        DbName::generate_full_name(&temp)
     }
 
-    pub fn new_from(names: &DbName) -> DbName {
+    pub fn generate_full_name(names: &DbName) -> DbName {
         let path = {
             //todo 需要优化　path 字段若为空，是否抛出错误？
             let path = names.path.clone();
-            if path.ends_with("/") {
-                path.to_owned()
-            } else if path.ends_with("\\") {
+            if path.ends_with('/') {
+                path
+            } else if path.ends_with('\\') {
                 path.replace("\\", "/")
             } else if !path.is_empty() {
-                path.to_owned().add("/") //c
+                path.add("/") //c
             } else {
-                path.to_owned()
+                path
             }
         };
         let pre = names.prefix.clone();
@@ -62,7 +64,7 @@ impl DbName {
                 names.cashbox_wallets.clone()
             },
             cashbox_mnemonic: if names.cashbox_mnemonic.is_empty() {
-                format!("{}{}{}",path,pre,DbNameType::cashbox_mnemonic.to_string())
+                format!("{}{}{}", path, pre, DbNameType::cashbox_mnemonic.to_string())
             } else {
                 names.cashbox_mnemonic.clone()
             },
@@ -82,7 +84,7 @@ impl DbName {
                 names.wallet_testnet.clone()
             },
             wallet_testnet_private: if names.wallet_testnet_private.is_empty() {
-                format!("{}{}{}",path, pre,DbNameType::wallet_testnet_private.to_string())
+                format!("{}{}{}", path, pre, DbNameType::wallet_testnet_private.to_string())
             } else {
                 names.wallet_testnet_private.clone()
             },
@@ -318,21 +320,20 @@ impl Db {
             //eth
             let rb = db.wallets_db();
             let token_shared = {
-                let mut eth = MEthChainTokenShared::default();
-                eth.token_type = EthTokenType::Eth.to_string();
-
-                eth.token_shared.name = "Ethereum".to_owned();
-                eth.token_shared.symbol = "ETH".to_owned();
-                eth.token_shared.logo_url = "".to_owned(); //todo
-                eth.token_shared.logo_bytes = "".to_owned();
-                eth.token_shared.project_name = "ethereum".to_owned();
-                eth.token_shared.project_home = "https://ethereum.org/zh/".to_owned();
-                eth.token_shared.project_note =
-                    "Ethereum is a global, open-source platform for decentralized applications."
-                        .to_owned();
-                eth.decimal = 18;
-                eth.gas_limit = 0; //todo
-                eth.gas_price = "".to_owned(); //todo
+                let mut eth = MEthChainTokenShared{
+                    token_type: EthTokenType::Eth.to_string(),
+                    gas_limit: 0,
+                    decimal: 18,
+                    token_shared: MTokenShared{
+                        name:"Ethereum".to_owned(),
+                        symbol:"ETH".to_owned(),
+                        project_name:"ethereum".to_owned(),
+                        project_home:"https://ethereum.org/zh/".to_owned(),
+                        project_note:"Ethereum is a global, open-source platform for decentralized applications.".to_owned(),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                };
                 let old_eth = {
                     let wrapper = rb
                         .new_wrapper()
@@ -357,13 +358,13 @@ impl Db {
                         .eq(MEthChainTokenDefault::net_type, net_type.to_string());
                     let old = MEthChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
-                        let mut token_default = MEthChainTokenDefault::default();
-                        token_default.net_type = net_type.to_string();
-                        token_default.chain_token_shared_id = token_shared.id.clone();
-                        token_default.position = 0;
-                        token_default.status=CTrue as i64;
-                        token_default.contract_address = " ".to_owned();
-
+                        let mut token_default = MEthChainTokenDefault{
+                            chain_token_shared_id: token_shared.id.clone(),
+                            net_type: net_type.to_string(),
+                            position: 0,
+                            status: CTrue as i64,
+                            ..Default::default()
+                        };
                         token_default.save(rb, "").await?;
                     }
                 }
@@ -373,18 +374,19 @@ impl Db {
             //eee
             let rb = db.wallets_db();
             let token_shared = {
-                let mut eee = MEeeChainTokenShared::default();
-                eee.token_type = EeeTokenType::Eee.to_string();
-                eee.decimal = 15;
-                eee.gas_price = "".to_owned(); //todo
-
-                eee.token_shared.name = "EEE".to_owned();
-                eee.token_shared.symbol = "EEE".to_owned();
-                eee.token_shared.logo_url = "".to_owned(); //todo
-                eee.token_shared.logo_bytes = "".to_owned();
-                eee.token_shared.project_name = "EEE".to_owned();
-                eee.token_shared.project_home = "https://scry.info".to_owned();
-                eee.token_shared.project_note = "EEE is a global".to_owned();
+                let mut eee = MEeeChainTokenShared{
+                    token_type: EeeTokenType::Eee.to_string(),
+                    decimal: 15,
+                    token_shared: MTokenShared{
+                        name:"EEE".to_owned(),
+                        symbol:"EEE".to_owned(),
+                        project_name: "EEE".to_owned(),
+                        project_home:"https://scry.info".to_owned(),
+                        project_note:"EEE is a global".to_owned(),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                };
 
                 let old_eth = {
                     let wrapper = rb
@@ -410,11 +412,12 @@ impl Db {
                         .eq(MEeeChainTokenDefault::net_type, net_type.to_string());
                     let old = MEeeChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
-                        let mut token_default = MEeeChainTokenDefault::default();
-                        token_default.net_type = net_type.to_string();
-                        token_default.chain_token_shared_id = token_shared.id.clone();
-                        token_default.position = 0;
-                        token_default.status=CTrue as i64;
+                        let mut token_default = MEeeChainTokenDefault{
+                            chain_token_shared_id:  token_shared.id.clone(),
+                            net_type: net_type.to_string(),
+                            status: CTrue as i64,
+                            ..Default::default()
+                        };
                         token_default.save(rb, "").await?;
                     }
                 }
@@ -424,20 +427,21 @@ impl Db {
             //btc
             let rb = db.wallets_db();
             let token_shared = {
-                let mut btc = MBtcChainTokenShared::default();
-                btc.token_type = BtcTokenType::Btc.to_string();
-                btc.decimal = 18;
-                btc.fee_per_byte = 19;
-
-                btc.token_shared.name = "Bitcoin".to_owned();
-                btc.token_shared.symbol = "BTC".to_owned();
-                btc.token_shared.logo_url = "".to_owned(); //todo
-                btc.token_shared.logo_bytes = "".to_owned();
-                btc.token_shared.project_name = "Bitcoin".to_owned();
-                btc.token_shared.project_home = "https://bitcoin.org/en/".to_owned();
-                btc.token_shared.project_note =
-                    "Bitcoin is a global, open-source platform for decentralized applications.".to_owned();
-
+                let mut btc = MBtcChainTokenShared{
+                    token_type: BtcTokenType::Btc.to_string(),
+                    fee_per_byte: 19,
+                    decimal: 18,
+                    token_shared: MTokenShared{
+                        name:"Bitcoin".to_owned(),
+                        symbol: "BTC".to_owned(),
+                        project_name: "Bitcoin".to_owned(),
+                        project_home: "https://bitcoin.org/en/".to_owned(),
+                        project_note:  "Bitcoin is a global, open-source platform for decentralized applications.".to_owned(),
+                            ..Default::default()
+                    },
+                    ..Default::default()
+                };
+                
                 let old_eth = {
                     let wrapper = rb.new_wrapper()
                         .eq(MBtcChainTokenShared::token_type, &btc.token_type);
@@ -461,11 +465,13 @@ impl Db {
                         .eq(MBtcChainTokenDefault::net_type, net_type.to_string());
                     let old = MBtcChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
                     if !old {
-                        let mut token_default = MBtcChainTokenDefault::default();
-                        token_default.net_type = net_type.to_string();
-                        token_default.chain_token_shared_id = token_shared.id.clone();
-                        token_default.position = 0;
-                        token_default.status=CTrue as i64;
+                        let mut token_default=  MBtcChainTokenDefault{
+                            net_type: net_type.to_string(),
+                            chain_token_shared_id: token_shared.id.clone(),
+                            position: 0,
+                            status: CTrue as i64,
+                            ..Default::default()
+                        };
                         token_default.save(rb, "").await?;
                     }
                 }

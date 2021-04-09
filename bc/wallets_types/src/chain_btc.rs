@@ -68,11 +68,11 @@ impl BtcChainTokenDefault {
         let tokens_shared: Vec<MBtcChainTokenShared> = {
             let default_name = MBtcChainTokenDefault::table_name();
             let shared_name = MBtcChainTokenShared::table_name();
-            let mut wrapper = wallets_db.new_wrapper()
+            let wrapper = wallets_db.new_wrapper()
                 .eq(format!("{}.{}", default_name, MBtcChainTokenDefault::net_type).as_str(), net_type.to_string());
 
             let sql = {
-                wrapper = wrapper;
+                //wrapper = wrapper;
                 let t = sql_left_join_get_b(&default_name, &MBtcChainTokenDefault::chain_token_shared_id,
                                             &shared_name, &MBtcChainTokenShared::id);
                 format!("{} where {}", t, &wrapper.sql)

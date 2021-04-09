@@ -34,7 +34,7 @@ impl TableMeta {
     fn set_sub(&mut self, type_name: &str) -> String {
         let v = TableMeta::type_name_to_key(type_name);
         self.subs.insert(type_name.to_owned(), v.clone());
-        return v;
+         v
     }
 }
 
@@ -73,7 +73,7 @@ impl DbMeta {
             panic!("do not support sub --> sub struct: {}", tm.type_name);
         }
         tm.is_sub = true;
-        self.sub_struct.insert(tm.type_name.clone(), tm.cols.clone());
+        self.sub_struct.insert(tm.type_name, tm.cols);
         self.full_template();
     }
 
@@ -83,7 +83,7 @@ impl DbMeta {
         for (table_name, tm) in &mut self.table_metas {
             if tm.sql.is_empty() {
                 let mut all = true;
-                for (key, _) in &tm.subs {
+                for key in tm.subs.keys() {
                     if !self.sub_struct.contains_key(key) {
                         all = false;
                         break;
@@ -96,7 +96,7 @@ impl DbMeta {
                         //检查是否是最后一个
                         let mut ex_value = value.clone();
                         ex_value.push(',');
-                        if let Some(_) = sql.find(ex_value.as_str()) {
+                        if  sql.find(ex_value.as_str()).is_some() {
                             let index = cols.rfind("\n  ").expect("cols.rfind('\n')");
                             let mut temp = cols.clone();
                             temp.insert(index, ',');
@@ -142,7 +142,7 @@ impl DbMeta {
 fn gen_table_name(type_name: &str) -> String {
     let mut type_name = type_name.to_owned();
     let names: Vec<&str> = type_name.split("::").collect();
-    type_name = names.get(names.len() - 1).expect("gen_table_name -- names.get(names.len() - 1)").to_string();
+    type_name = names.last().expect("gen_table_name -- names.last()").to_string();
     type_name = to_snake_name(&type_name);
     type_name
 }
@@ -162,16 +162,16 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
                         if let Some(GenericArgument::Type(Type::Path(TypePath { path, .. }))) = args.last() {
                             format!("{}<{}>", ident.to_string(), path.segments.last().expect("ident.to_string(),path.segments.last()").ident.to_string())
                         } else {
-                            panic!("{}",format!("generate create table is not support type {} -- {} -- AngleBracketed args is None", type_name, col_name))
+                            panic!("{}", format!("generate create table is not support type {} -- {} -- AngleBracketed args is None", type_name, col_name))
                         }
                     }
-                    PathArguments::Parenthesized(_) => panic!("{}",format!("generate create table is not support type {} -- {} -- Parenthesized", type_name, col_name)),
+                    PathArguments::Parenthesized(_) => panic!("{}", format!("generate create table is not support type {} -- {} -- Parenthesized", type_name, col_name)),
                 }
             } else {
-                panic!("{}",format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
+                panic!("{}", format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
             }
         } else {
-            panic!("{}",format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
+            panic!("{}", format!("generate create table is not support type {} -- {} -- not TypePath", type_name, col_name))
         };
 
         let col = match type_name.as_str() {
@@ -186,7 +186,7 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
             _ => {
                 //#[serde(skip)]
                 let skip = field.attrs.iter().any(|it| {
-                    if it.path.segments.iter().any(|p| p.ident.to_string() == "serde") {
+                    if it.path.segments.iter().any(|p| p.ident == "serde") {
                         //todo 找到具体的path,而不用整个生成字符串
                         it.tokens.to_string().find("skip").is_some()
                     } else {
@@ -208,7 +208,7 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
                 if flatten {
                     format!("{},", tm.set_sub(type_name.as_str()))
                 } else {
-                    panic!("{}",format!("generate create table is not support type {} -- {}", type_name, col_name))
+                    panic!("{}", format!("generate create table is not support type {} -- {}", type_name, col_name))
                 }
             }
         };
@@ -231,13 +231,7 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
     template.insert_str(0, format!("CREATE TABLE IF NOT EXISTS {} (  \n", gen_table_name(type_name)).as_str());
     template.push_str(" );\n");
     tm.template = template;
-
-    // //test
-    // if type_name == "EeeChainTx" {
-    //     println!(" =============== {:?}\n++++++++++++++++++\n", fields);
-    // }
-
-    return tm;
+    tm
 }
 
 fn recreate_file(script: &str, file_name: &str) {

@@ -225,7 +225,7 @@ pub trait Crypto {
             key.as_slice(),
             iv.as_slice(),
         )
-        .map_err(|err| Error::Custom(err))
+        .map_err( Error::Custom)
     }
     fn sign(phrase: &str, msg: &[u8]) -> Result<[u8; 64], Error>;
 }

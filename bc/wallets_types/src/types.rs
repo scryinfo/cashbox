@@ -45,8 +45,7 @@ impl ChainShared {
         let address = MAddress::fetch_by_wrapper(&wallet_rb, "", &wrapper).await?;
 
         if let Some(address) = address{
-            let mut addr = Address::default();
-            addr.m = address;
+            let addr = Address{m:address};
             self.wallet_address= addr;
         }
         Ok(())

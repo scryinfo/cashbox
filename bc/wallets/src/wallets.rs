@@ -82,15 +82,15 @@ impl Wallets {
     pub fn eee_chain_instance(&self) -> &Box<dyn EeeChainTrait> {
         self.wallet_trait.eee_chain()
     }
-    pub fn eth_chain_instance(&self) -> &Box<dyn EthChainTrait> {
+    pub fn eth_chain_instance(&self) -> &Box<dyn EthChainTrait>{
         self.wallet_trait.eth_chain()
     }
     pub fn btc_chain_instance(&self) -> &Box<dyn BtcChainTrait> {
-        self.wallet_trait.btc_chain()
+      self.wallet_trait.btc_chain()
     }
 
     pub fn db_name(name: &wallets_types::DbName) -> wallets_types::DbName {
-        wallets_types::DbName(DbName::new_from(&name))
+        wallets_types::DbName(DbName::generate_full_name(&name))
     }
 
     pub async fn init(&mut self, parameters: &InitParameters) -> Result<&Context, WalletError> {

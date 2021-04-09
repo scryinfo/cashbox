@@ -48,7 +48,7 @@ pub struct EthTxHelper {
 
 impl EthTxHelper {
     fn load(abi_data: &[u8]) -> Self {
-        let abi = ethabi::Contract::load(&abi_data[..]).expect("input data format not correct!");
+        let abi = ethabi::Contract::load(abi_data).expect("input data format not correct!");
         EthTxHelper {
             abi,
         }
@@ -219,8 +219,7 @@ pub fn convert_token(value: &str, decimal: usize) -> Option<U256> {
         }
         None => {
             let integer_part = U256::from_dec_str(value).unwrap();
-            let integer_part_wei = integer_part.checked_mul(U256::exp10(decimal));
-            integer_part_wei
+           integer_part.checked_mul(U256::exp10(decimal))
         }
     }
 }
@@ -232,7 +231,7 @@ pub fn address_legal(address: &str) -> bool {
     }
     let chars = address.get(2..).unwrap().chars();
     for c in chars {
-        if !(('a' <= c && c <= 'z') || ('0' <= c && c <= '9')) {
+        if !(('a'..='z').contains(&c) || ('0'..='9').contains(&c)) {
             log::error!("illegal {}",c);
             return false;
         }

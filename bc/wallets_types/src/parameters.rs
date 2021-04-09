@@ -229,7 +229,7 @@ impl From<MEeeChainTx> for EeeChainTx{
             extension: chain_tx.extension.clone(),
             status: chain_tx.status as u32,
             tx_timestamp: chain_tx.tx_shared.tx_timestamp,
-            tx_bytes: chain_tx.tx_shared.tx_bytes.clone()
+            tx_bytes: chain_tx.tx_shared.tx_bytes
         }
     }
 }
@@ -248,7 +248,7 @@ impl From<MEeeTokenxTx> for EeeChainTx{
             extension: chain_tx.extension.clone(),
             status: chain_tx.status,
             tx_timestamp: chain_tx.tx_shared.tx_timestamp,
-            tx_bytes: chain_tx.tx_shared.tx_bytes.clone()
+            tx_bytes: chain_tx.tx_shared.tx_bytes
         }
     }
 }

@@ -417,8 +417,8 @@ pub type RuntimeMetadataVersionV11 = RuntimeMetadataV11;
 pub struct ModuleMetadataV11 {
 	pub name: DecodeDifferentStr,
 	pub storage: Option<DecodeDifferent<FnEncode<StorageMetadata>, StorageMetadata>>,
-	pub calls: ODFnA<FunctionMetadata>,
-	pub event: ODFnA<EventMetadata>,
+	pub calls: OdFnA<FunctionMetadata>,
+	pub event: OdFnA<EventMetadata>,
 	pub constants: DFnA<ModuleConstantMetadata>,
 	pub errors: DFnA<ErrorMetadata>,
 }
@@ -429,8 +429,8 @@ pub struct ModuleMetadataV11 {
 pub struct ModuleMetadata {
 	pub name: DecodeDifferentStr,
 	pub storage: Option<DecodeDifferent<FnEncode<StorageMetadata>, StorageMetadata>>,
-	pub calls: ODFnA<FunctionMetadata>,
-	pub event: ODFnA<EventMetadata>,
+	pub calls: OdFnA<FunctionMetadata>,
+	pub event: OdFnA<EventMetadata>,
 	pub constants: DFnA<ModuleConstantMetadata>,
 	pub errors: DFnA<ErrorMetadata>,
 	 /// Define the index of the module, this index will be used for the encoding of module event,
@@ -440,22 +440,23 @@ pub struct ModuleMetadata {
 
 
 
-type ODFnA<T> = Option<DFnA<T>>;
+type OdFnA<T> = Option<DFnA<T>>;
 type DFnA<T> = DecodeDifferent<FnEncode<&'static [T]>, Vec<T>>;
 
-impl Into<sp_core::OpaqueMetadata> for RuntimeMetadataPrefixed {
-	fn into(self) -> sp_core::OpaqueMetadata {
-		sp_core::OpaqueMetadata::new(self.encode())
+impl From<RuntimeMetadataPrefixed> for sp_core::OpaqueMetadata{
+	fn from(meta_prefixed: RuntimeMetadataPrefixed) -> Self {
+		sp_core::OpaqueMetadata::new(meta_prefixed.encode())
 	}
 }
 
-impl Into<RuntimeMetadataPrefixed> for RuntimeMetadataLastVersion {
-	fn into(self) -> RuntimeMetadataPrefixed {
-		RuntimeMetadataPrefixed(META_RESERVED, RuntimeMetadata::V12(self))
+impl From<RuntimeMetadataLastVersion> for RuntimeMetadataPrefixed{
+	fn from(metadata_version: RuntimeMetadataLastVersion) -> Self {
+		Self(META_RESERVED,RuntimeMetadata::V12(metadata_version))
 	}
 }
-impl Into<RuntimeMetadataPrefixed> for RuntimeMetadataVersionV11 {
-	fn into(self) -> RuntimeMetadataPrefixed {
-		RuntimeMetadataPrefixed(META_RESERVED, RuntimeMetadata::V11(self))
+
+impl From<RuntimeMetadataVersionV11> for RuntimeMetadataPrefixed{
+	fn from(metadata_version: RuntimeMetadataVersionV11) -> Self {
+		Self(META_RESERVED,RuntimeMetadata::V11(metadata_version))
 	}
 }

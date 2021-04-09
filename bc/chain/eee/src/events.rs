@@ -234,7 +234,7 @@ impl EventsDecoder {
                            log::debug!("received event has type {} current not support decode", name);
                        }
                        _ =>{
-                           return Err(e.into());
+                           return Err(e);
                        }
                    }
                }

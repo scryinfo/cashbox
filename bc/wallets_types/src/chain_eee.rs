@@ -210,7 +210,7 @@ impl AccountInfoSyncProg {
     pub async fn find_by_account(rb: &Rbatis, account: &str) -> Result<Option<MAccountInfoSyncProg>, WalletError> {
         let wrapper = rb.new_wrapper()
             .eq(MAccountInfoSyncProg::account, account.to_string());
-        let r = MAccountInfoSyncProg::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
+        let r = MAccountInfoSyncProg::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info);
         Ok(r)
     }
 }

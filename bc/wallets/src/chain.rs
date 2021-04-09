@@ -232,12 +232,12 @@ impl WalletTrait for Wallet {
     fn chains(&self) -> &Vec<Box<dyn ChainTrait>> {
         &self.chains
     }
-    fn eee_chain(&self) -> &Box<dyn EeeChainTrait> {
-        &self.eee
-    }
+    fn eee_chain(&self) -> &Box<dyn EeeChainTrait> { &self.eee }
     fn eth_chain(&self) -> &Box<dyn EthChainTrait> { &self.eth }
     fn btc_chain(&self) -> &Box<dyn BtcChainTrait> { &self.btc }
 }
+
+
 
 #[async_trait]
 impl BtcChainTrait for BtcChain {

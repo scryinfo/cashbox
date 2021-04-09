@@ -118,15 +118,17 @@ impl ChainHelper {
         Ok(tx_result)
     }
 
-    pub fn decode_extrinsics(&self, extrinsics: &Vec<String>, target_account: &str) -> Result<HashMap<usize, TransferDetail>, error::Error> {
+    pub fn decode_extrinsics(&self, extrinsics: &[String], target_account: &str) -> Result<HashMap<usize, TransferDetail>, error::Error> {
         let target_account = AccountId::from_ss58check(target_account)?;
         let mut map = HashMap::new();
         for (index, tx_str) in extrinsics.iter().enumerate() {
             let tx = scry_crypto::hexstr_to_vec(tx_str)?;
             let checked_tx = extrinsic::CheckedExtrinsic::decode(&mut &tx[..])?;
             let tx_hash = sp_core::blake2_256(&tx[..]);
-            let mut tx_transfer_detail = TransferDetail::default();
-            tx_transfer_detail.hash = Some(hex::encode(&tx_hash[..]));
+            let mut tx_transfer_detail = TransferDetail{
+                hash: Some(hex::encode(&tx_hash[..])),
+                ..Default::default()
+            };
             let target_module = self.metadata.modules_with_calls().
                 find(|&module| module.index == checked_tx.function.module_index);
             if let Some(target_module) = target_module {
@@ -161,7 +163,7 @@ impl ChainHelper {
         let type_name = std::any::type_name::<T>();
         match type_name {
             "eee::EeeAccountInfoRefU8" => {
-                EeeAccountInfoRefU8::decode(&mut &state_vec.as_slice()[..]).map(|account| {
+                EeeAccountInfoRefU8::decode(&mut state_vec.as_slice()).map(|account| {
                     EeeAccountInfo {
                         nonce: account.nonce,
                         refcount: account.refcount as u32,
@@ -173,7 +175,7 @@ impl ChainHelper {
                 }).map_err(|err| err.into())
             }
             "eee::EeeAccountInfo" => {
-                EeeAccountInfo::decode(&mut &state_vec.as_slice()[..]).map_err(|err| err.into())
+                EeeAccountInfo::decode(&mut state_vec.as_slice()).map_err(|err| err.into())
             }
             _ => {
                 Err(error::Error::Custom(format!("decode type {} not support!", type_name)))
