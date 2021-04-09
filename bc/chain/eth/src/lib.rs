@@ -2,7 +2,7 @@
 extern crate serde_derive;
 
 use ethabi::{Contract,Bytes};
-use ethereum_types::{U256, H160};
+use ethereum_types::{U256, H160, H256};
 use rlp::{RlpStream, DecoderError};
 use secp256k1::{Message, Secp256k1, key::{PublicKey, SecretKey}};
 use bip39::{Mnemonic, Language, Seed};
@@ -201,24 +201,34 @@ pub fn convert_token(value: &str, decimal: usize) -> Option<U256> {
     //Determine whether the number to be converted is a floating point number
     match value.find('.') {
         Some(index) => {
-            let integer_part = value.get(0..index).unwrap();
-            let integer_part_256 = U256::from_dec_str(integer_part).unwrap();
-            let integer_part_wei = integer_part_256.checked_mul(U256::exp10(decimal)).unwrap();
-            //Get the fractional part, only retain the data with the specified precision
+            let integer_part_wei:Option<U256> = {
+                if let Some(integer_part) =  value.get(0..index){
+                    if let Ok(integer_part_256) = U256::from_dec_str(integer_part){
+                       return integer_part_256.checked_mul(U256::exp10(decimal))
+                    }
+                }
+                None
+            };
             let max_distace = if value.len() - index <= decimal {
                 value.len()
             } else {
                 index + 1 + decimal
             };
-            let decimal_part = value.get((index + 1)..max_distace).unwrap();
-            let decimal_part_256 = U256::from_dec_str(decimal_part).unwrap();
-            //After removing the decimal point, you need to add 0 at the end
-            let base = U256::exp10(decimal - decimal_part.len());
-            let decimal_part_wei = decimal_part_256.checked_mul(base).unwrap();
-            integer_part_wei.checked_add(decimal_part_wei)
+            let decimal_part_wei:Option<U256>= {
+                if let Some(decimal_part) = value.get((index + 1)..max_distace){
+                    if let Ok(decimal_part_256) = U256::from_dec_str(decimal_part){
+                        let base = U256::exp10(decimal - decimal_part.len());
+                       return decimal_part_256.checked_mul(base)
+                    }
+                }
+                None
+            } ;
+            let decimal_wei = decimal_part_wei.unwrap_or(U256::from([0u8;32]));
+            integer_part_wei.map(|num| num.checked_add(decimal_wei))
+                .and_then(|data|data)
         }
         None => {
-            let integer_part = U256::from_dec_str(value).unwrap();
+            let integer_part = U256::from_dec_str(value).unwrap_or(U256::from([0u8;32]));
            integer_part.checked_mul(U256::exp10(decimal))
         }
     }

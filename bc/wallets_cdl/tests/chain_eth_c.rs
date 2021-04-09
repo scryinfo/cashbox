@@ -27,11 +27,11 @@ fn eth_tx_sign_test() {
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let transfer_tx = EthTransferPayload {
             from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
-            to_address: "0x00a329c0648769a73afac7f9381e08fb43dbea72".to_string(),
+            to_address: "0xc0c4824527ffb27a51034cea1e37840ed69a5f1e".to_string(),
             contract_address: "".to_string(),
-            value: "3".to_string(),
-            nonce: "0".to_string(),
-            gas_price: "0.00009".to_string(),
+            value: "0.01".to_string(),
+            nonce: "81".to_string(),
+            gas_price: "301".to_string(),
             gas_limit: "21000".to_string(),
             decimal: 18,
             ext_data: "".to_string(),

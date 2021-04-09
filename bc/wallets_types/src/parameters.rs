@@ -145,18 +145,39 @@ pub struct EthTransferPayload {
 }
 
 impl EthTransferPayload {
+  pub fn trim(& self)->Self{
+        EthTransferPayload{
+            from_address: self.from_address.trim().to_string(),
+            to_address: self.to_address.trim().to_string(),
+            contract_address: self.contract_address.trim().to_string(),
+            value: self.value.trim().to_string(),
+            nonce: self.nonce.trim().to_string(),
+            gas_price: self.gas_price.trim().to_string(),
+            gas_limit: self.gas_limit.trim().to_string(),
+            decimal: self.decimal,
+            ext_data: self.ext_data.trim().to_string(),
+            password: self.password.clone()
+        }
+    }
     pub fn decode(&self) -> Result<eth::RawTransaction, WalletError> {
         if self.contract_address.is_empty() && self.to_address.is_empty() {
             return Err(WalletError::Custom("raw tx dest address in empty".into()));
         }
         let decimal = self.decimal as usize;
-        let amount = eth::convert_token(&self.value, decimal).unwrap();
+
+        let amount = eth::convert_token(&self.value, decimal);
+        if amount.is_none(){
+            let error_msg = format!("input value illegal:{}",&self.value);
+            return Err(WalletError::Custom(error_msg));
+        }
+       let  amount = amount.unwrap();
         //Additional parameters
         let data = self.ext_data.as_str().as_bytes().to_vec();
+        log::debug!("to address:{:?},contract_address:{:?}",self.to_address,self.contract_address);
         let (to_address, data) = {
-            if self.to_address.is_empty() {
+            if self.to_address.trim().is_empty() {
                 (None, data)
-            } else if !self.contract_address.is_empty() {
+            } else if !self.contract_address.trim().is_empty() {
                 let contract_address = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.contract_address)?.as_slice());
                 let to = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.to_address)?.as_slice());
                 let mut encode_data = eth::get_erc20_transfer_data(to, amount)?;
@@ -164,22 +185,32 @@ impl EthTransferPayload {
                 (Some(contract_address), encode_data)
             } else {
                 let to = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.to_address)?.as_slice());
+                log::debug!("to address:{:?}",to);
                 (Some(to), data)
             }
         };
         //gas price
-        let gas_price = eth::convert_token(&self.gas_price, decimal).unwrap();
+        let gas_price = if let Some(gas_price) = eth::convert_token(&self.gas_price, decimal){
+            gas_price
+        }else {
+            let error_msg = format!("input gas_price illegal:{}",&self.gas_price);
+            return Err(WalletError::Custom(error_msg));
+        };
         //Allow maximum gas consumption
-        let gas_limit = ethereum_types::U256::from_dec_str(&self.gas_limit).unwrap();
+        let gas_limit = if let Some(gas_limit) = eth::convert_token(&self.gas_limit, decimal){
+            gas_limit
+        }else {
+            let error_msg = format!("input gas_limit illegal:{}",&self.gas_limit);
+            return Err(WalletError::Custom(error_msg));
+        };
         //Nonce value of the current transaction
         let nonce = {
             let nonce = if self.nonce.starts_with("0x") {
-                let nonce_u64 = u64::from_str_radix(&self.nonce[2..], 16);
-                format!("{}", nonce_u64.unwrap())
+                format!("{}", u64::from_str_radix(&self.nonce[2..], 16)?)
             } else {
                 self.nonce.clone()
             };
-            ethereum_types::U256::from_dec_str(&nonce).unwrap()
+            ethereum_types::U256::from_dec_str(&nonce).map_err(|err|WalletError::Custom(err.to_string()))?
         };
 
         Ok(eth::RawTransaction {

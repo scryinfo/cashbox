@@ -853,7 +853,8 @@ impl EthChainTrait for EthChain {
             NetType::Test => 3,
             _ => 17
         };
-        let raw_tx = tx_payload.decode()?;
+        let tx_payload_trim = tx_payload.trim();
+        let raw_tx = tx_payload_trim.decode()?;
         let pri_key = Self::get_private_key_from_address(context, &tx_payload.from_address, password).await?;
         let tx_signed = raw_tx.sign(&pri_key, Some(chain_id));
         Ok(format!("0x{}", hex::encode(tx_signed)))
