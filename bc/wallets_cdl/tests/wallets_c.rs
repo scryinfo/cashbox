@@ -24,7 +24,7 @@ use wallets_cdl::{
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, WalletTokenStatus, TokenAddress};
 use mav::ma::MTokenAddress;
 use wallets_cdl::wallets_c::{Wallets_updateBalance, Wallets_queryBalance, Wallets_currentWalletChain, Wallets_saveCurrentWalletChain, Wallets_hasAny, Wallets_findWalletBaseByName, Wallets_renameWallet, Wallets_resetWalletPassword, Wallets_exportWallet, Wallets_packageVersion, Wallets_changeNetType};
-use wallets_cdl::mem_c::{CArrayCTokenAddress_dAlloc, CArrayCTokenAddress_dFree, CBool_alloc, CBool_free};
+use wallets_cdl::mem_c::{CArrayCTokenAddress_dAlloc, CArrayCTokenAddress_dFree, CBool_alloc, CBool_free, CArrayCContext_dAlloc};
 use wallets_cdl::kits::CTrue;
 
 
@@ -665,5 +665,33 @@ pub fn init_murmel_try(){
         c_id.free();
         CError_free(c_err2);
     }
+}
 
+#[test]
+pub fn init_wallet_once() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_init_parameters = {
+            let mut p = InitParameters::default();
+            p.net_type = NetType::Test.to_string();
+            p.is_memory_db = CFalse;
+            let prefix = "test_";
+            p.db_name.0 = mav::ma::DbName::new(&prefix, "");
+            p.context_note = format!("test_{}", prefix);
+            CInitParameters::to_c_ptr(&p)
+        };
+        let c_err = Wallets_init(c_init_parameters, c_ctx) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let c_array_wallet = CArrayCWallet_dAlloc();
+        let c_err = Wallets_findWalletBaseByName(*c_ctx, to_c_char("murmel"),c_array_wallet) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "Wallets_findWalletBaseByName {:?}", *c_err);
+        let wallets: Vec<Wallet> = CArray::to_rust(&**c_array_wallet);
+        CError_free(c_err);
+        CArrayCWallet_dFree(c_array_wallet);
+        CContext_dFree(c_ctx);
+        assert!(wallets.len() > 0);
+        println!("{:#?}", wallets);
+    }
 }
