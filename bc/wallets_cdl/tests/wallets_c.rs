@@ -2,7 +2,7 @@ use std::ptr::null_mut;
 use std::time::{Duration, Instant};
 
 use futures::task::SpawnExt;
-use mav::{kits, WalletType};
+use mav::{kits, WalletType, NetType, CFalse};
 use std::os::raw::c_char;
 mod data;
 
@@ -623,7 +623,7 @@ pub fn init_murmel_try(){
         let init_parameters = {
            let mut p = InitParameters::default();
             p.net_type = NetType::Test.to_string();
-            p.is_memory_db = CTrue;
+            p.is_memory_db = CFalse;
             let prefix = "test_";
             p.db_name.0 = mav::ma::DbName::new(&prefix, "");
             p.context_note = format!("test_{}", prefix);
@@ -646,10 +646,24 @@ pub fn init_murmel_try(){
         let c_err = Wallets_createWallet(*c_ctx, c_create_parameters, c_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
-        let _w = CWallet::to_rust(&**c_wallet);
+        let w = CWallet::to_rust(&**c_wallet);
+        // find by id
+        let c_wallet2 = CWallet_dAlloc();
+        let mut c_id = to_c_char(&w.id);
+        let c_err2 =  Wallets_findById(*c_ctx,c_id, c_wallet2) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err2).code, "{:?}", *c_err2);
+        let w = CWallet::to_rust(&**c_wallet2);
+        println!("{:?}",w);
+
+        // just for free memory for wallet
         CWallet_dFree(c_wallet);
         c_create_parameters.free();
         CContext_dFree(c_ctx);
+
+        // just free memory for find by id
+        CWallet_dFree(c_wallet2);
+        c_id.free();
+        CError_free(c_err2);
     }
 
 }
