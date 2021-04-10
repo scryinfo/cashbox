@@ -12,7 +12,7 @@ crate-type = ["cdylib"]
 [workspace]
 members = [
     "wallets",
-    "murmel",
+    "chain/btc/murmel",
     "chain/btc/bitcoin",
     "chain/eth",
     "chain/eee",

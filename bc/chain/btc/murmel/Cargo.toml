@@ -66,13 +66,13 @@ async-std = { version = "1.8.0" }
 
 async-trait = "0.1.42"
 config = "0.10.1"
-mav = { path = "../mav" }
+mav = { path = "../../../mav" }
 
 # TODO should import murmel to wallets in future.
-wallets = { path = "../wallets" }
-wallets_types = { path = "../wallets_types" }
+wallets = { path = "../../../wallets" }
+wallets_types = { path = "../../../wallets_types" }
 # import eee for using eee::Sr25519::get_mnemonic_context should remove this in future
-eee = { path = "../chain/eee"}
+eee = { path = "../../eee" }
 
 [dev-dependencies]
 rustc-serialize = "0.3"

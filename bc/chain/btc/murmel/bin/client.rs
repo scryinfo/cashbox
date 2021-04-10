@@ -16,7 +16,7 @@
 
 use bitcoin::network::constants::Network;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use config::Config;
+use config::{Config, ConfigError};
 use log::info;
 use log::Level;
 use mav::ma::MUserAddress;
@@ -48,7 +48,11 @@ pub fn main() {
     }
 
     let mut settings = Config::default();
-    settings.merge(config::File::with_name("Setting")).unwrap();
+    let r = settings.merge(config::File::with_name("../Setting.toml"));
+    match r {
+        Ok(r) => { println!("Setting {:?}",r); }
+        Err(e) => { println!("error: {:?}", e); }
+    }
 
     let log_level = settings.get_str("loglevel");
     if let Ok(log) = log_level {

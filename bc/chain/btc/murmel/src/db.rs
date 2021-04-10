@@ -177,8 +177,8 @@ impl DetailSqlite {
         DetailSqlite::create_btc_chain_tx(rb).await?;
         DetailSqlite::create_local_tx(rb).await?;
         DetailSqlite::create_btc_tx_state(rb).await?;
-        DetailSqlite::create_btc_utxo(rb).await?;
         DetailSqlite::init_state(rb).await?;
+        DetailSqlite::create_btc_utxo(rb).await?;
         Ok(())
     }
 
@@ -267,7 +267,7 @@ impl DetailSqlite {
         let r: Result<MProgress, _> = self.rb.fetch_by_wrapper("", &w).await;
         return match r {
             Ok(r) => Some(r),
-            Err(_) => None,
+            Err(e) => {print!("{:?}",e); None},
         };
     }
 
@@ -399,7 +399,10 @@ impl DetailSqlite {
         let r: Result<MUserAddress, _> = self.rb.fetch_by_wrapper("", &w).await;
         match r {
             Ok(u) => Some(u),
-            Err(_) => None,
+            Err(e) => {
+                println!("{:?}", e);
+                None
+            }
         }
     }
 
