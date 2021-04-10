@@ -191,7 +191,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
     return GestureDetector(
       onTap: () async {
         ScryXNetUtil scryXNetUtil = new ScryXNetUtil();
-        Map submitMap = await scryXNetUtil.submitExtrinsic(Provider.of<TransactionProvide>(context).signInfo);
+        Map submitMap = await scryXNetUtil.submitExtrinsic(Provider.of<TransactionProvide>(context, listen: false).signInfo);
         if (submitMap == null || !submitMap.containsKey("result") || submitMap["result"] == null || submitMap["result"].toString().isEmpty) {
           Fluttertoast.showToast(msg: translate("tx_upload_failure"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
           NavigatorUtils.goBack(context);

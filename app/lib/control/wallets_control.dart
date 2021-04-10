@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/balance_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/model/token_rate.dart';
@@ -9,7 +11,6 @@ import 'package:app/model/wallet.dart' as WalletM;
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallets/enums.dart' as EnumKit;
-import 'package:wallets/enums.dart';
 import 'package:wallets/result.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
@@ -31,12 +32,14 @@ class WalletsControl {
 
   Future<Wallets> initWallet() async {
     Wallets wallets = Wallets.mainIsolate();
+    Config config = await HandleConfig.instance.getConfig();
     var initP = new InitParameters();
     try {
       Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
       initP.dbName.path = directory.path;
       initP.dbName.prefix = "test_"; // todo change
       initP.dbName = Wallets.dbName(initP.dbName); // todo change
+      initP.netType = config != null ? config.curNetType.enumNetType : EnumKit.NetType.Main.toEnumString();
     } catch (e) {
       Logger.getInstance().e("Wallets.dbName ", "error is --->" + e.toString());
     }
@@ -59,7 +62,7 @@ class WalletsControl {
     return mneObj.data1;
   }
 
-  bool changeNetType(NetType netType) {
+  bool changeNetType(EnumKit.NetType netType) {
     Error err = Wallets.mainIsolate().changeNetType(netType);
     if (!err.isSuccess()) {
       Logger.getInstance().e("wallet_control ", "changeNetType error is false --->" + err.message.toString());
@@ -101,14 +104,14 @@ class WalletsControl {
       ChainEEE chainEEE = ChainEEE()..isVisible = true; // todo element.ethChain.chainShared.visible;
       switch (element.walletType.toWalletType()) {
         case EnumKit.WalletType.Test:
-          chainETH..chainType = ChainType.EthTest;
-          chainBTC..chainType = ChainType.BtcTest;
-          chainEEE..chainType = ChainType.EeeTest;
+          chainETH..chainType = EnumKit.ChainType.EthTest;
+          chainBTC..chainType = EnumKit.ChainType.BtcTest;
+          chainEEE..chainType = EnumKit.ChainType.EeeTest;
           break;
         default:
-          chainETH..chainType = ChainType.ETH;
-          chainBTC..chainType = ChainType.BTC;
-          chainEEE..chainType = ChainType.EEE;
+          chainETH..chainType = EnumKit.ChainType.ETH;
+          chainBTC..chainType = EnumKit.ChainType.BTC;
+          chainEEE..chainType = EnumKit.ChainType.EEE;
           break;
       }
       tempWallet.chainList..add(chainETH)..add(chainBTC)..add(chainEEE);
@@ -149,12 +152,12 @@ class WalletsControl {
     try {
       String address = "";
       switch (currentChainType()) {
-        case ChainType.EthTest:
-        case ChainType.ETH:
+        case EnumKit.ChainType.EthTest:
+        case EnumKit.ChainType.ETH:
           address = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
           break;
-        case ChainType.EeeTest:
-        case ChainType.EEE:
+        case EnumKit.ChainType.EeeTest:
+        case EnumKit.ChainType.EEE:
           address = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address;
           break;
         default:
@@ -269,12 +272,12 @@ class WalletsControl {
     try {
       String tokenAddressId = "";
       switch (chainType) {
-        case ChainType.EthTest:
-        case ChainType.ETH:
+        case EnumKit.ChainType.EthTest:
+        case EnumKit.ChainType.ETH:
           tokenAddressId = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.id;
           break;
-        case ChainType.EeeTest:
-        case ChainType.EEE:
+        case EnumKit.ChainType.EeeTest:
+        case EnumKit.ChainType.EEE:
           tokenAddressId = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address;
           break;
         default:

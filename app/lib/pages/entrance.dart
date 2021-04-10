@@ -113,6 +113,8 @@ class _EntrancePageState extends State<EntrancePage> {
         serverConfigModel = LatestConfig.fromJson(json.decode(latestConfigRes.conf));
       } catch (e) {
         Logger().e("configOpenFaceClient.latestConfig() ", e.toString());
+        var isUpdateOk = await EeeChainControl.getInstance().updateSubChainBasicInfo("");
+        Logger.getInstance().i("updateSubChainBasicInfo", isUpdateOk.toString());
         return;
       }
     }

@@ -79,6 +79,7 @@ class _EthPageState extends State<EthPage> {
     this.allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
     setState(() {
       this.allVisibleTokenMList = this.allVisibleTokenMList;
+      this.walletName = this.walletName;
     });
     tokenListFuture = loadDisplayTokenListData();
     loadDigitBalance();

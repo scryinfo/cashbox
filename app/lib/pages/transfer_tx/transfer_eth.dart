@@ -732,7 +732,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
               ..nonce = nonce
               ..gasPrice = mGasPriceValue.toInt().toString()
               ..gasLimit = mGasLimitValue.toInt().toString()
-              ..decimal = decimal;
+              ..decimal = decimal
+              ..extData = _backupMsgController.text.toString();
 
             String signResult = EthChainControl.getInstance().txSign(ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
             if (signResult == null) {

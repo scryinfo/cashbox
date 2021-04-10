@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -70,8 +71,9 @@ class _TransferEeePageState extends State<TransferEeePage> {
         });
       }
     }
-    AccountInfo accountInfo =
-        await EeeChainControl.getInstance().loadEeeStorageMap(config.systemSymbol, config.accountSymbol, Wallets.instance.nowWallet.nowChain.chainAddress);
+
+    AccountInfo accountInfo = await EeeChainControl.getInstance()
+        .loadEeeStorageMap(config.systemSymbol, config.accountSymbol, WalletsControl.getInstance().currentChainAddress());
     if (accountInfo == null) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return;
@@ -85,8 +87,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
       digitBalance = "0";
     }
     if (digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
-      Map tokenBalanceMap =
-          await EeeChainControl.getInstance().loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+      Map tokenBalanceMap = await EeeChainControl.getInstance()
+          .loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
         try {
           double eeeFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
@@ -449,10 +451,24 @@ class _TransferEeePageState extends State<TransferEeePage> {
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             Map eeeTransferMap;
+            String signInfo;
             Config config = await HandleConfig.instance.getConfig();
             if (digitName != null && digitName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
-              eeeTransferMap = await Wallets.instance.eeeTransfer(Wallets.instance.nowWallet.nowChain.chainAddress,
-                  _toAddressController.text.toString(), _txValueController.text.toString(), nonce, Uint8List.fromList(pwd.codeUnits));
+              EeeTransferPayload eeeTransferPayload = EeeTransferPayload();
+              eeeTransferPayload
+                ..fromAccount = WalletsControl.getInstance().currentChainAddress()
+                ..toAccount = _toAddressController.text.toString()
+                ..value = _txValueController.text.toString()
+                ..index = nonce
+                ..password = pwd
+                ..extData = "todo"
+                ..chainVersion = EeeChainControl.getInstance().getChainVersion();
+              signInfo = EeeChainControl.getInstance().eeeTransfer(eeeTransferPayload);
+              if (signInfo == null || signInfo.isEmpty) {
+                Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+                NavigatorUtils.goBack(context);
+                return;
+              }
             } else if (digitName != null && digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
               eeeTransferMap = await Wallets.instance.tokenXTransfer(
                   Wallets.instance.nowWallet.nowChain.chainAddress,
@@ -466,7 +482,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
               NavigatorUtils.goBack(context);
               return;
             }
-            if (!_isMapStatusOk(eeeTransferMap)) {
+            /*if (!_isMapStatusOk(eeeTransferMap)) {
               Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
@@ -476,9 +492,9 @@ class _TransferEeePageState extends State<TransferEeePage> {
               Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
-            }
+            }*/
             context.read<TransactionProvide>()
-              ..setFromAddress(Wallets.instance.nowWallet.nowChain.chainAddress)
+              ..setFromAddress(WalletsControl.getInstance().currentChainAddress())
               ..setValue(_txValueController.text)
               ..setToAddress(_toAddressController.text)
               ..setSignInfo(signInfo);
