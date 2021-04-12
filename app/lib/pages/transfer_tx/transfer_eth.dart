@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
@@ -101,7 +102,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       mGasLimitValue = config.defaultGasLimit.erc20GasLimit;
       mGasPriceValue = config.defaultGasPrice.erc20GasPrice;
     } else {
-      mMaxGasPrice = config.maxGasLimit.ethGasLimit;
+      mMaxGasPrice = config.maxGasPrice.ethGasPrice;
       mMinGasPrice = config.minGasPrice.ethGasPrice;
       mMaxGasLimit = config.maxGasLimit.ethGasLimit;
       mMinGasLimit = config.minGasLimit.ethGasLimit;
@@ -724,17 +725,22 @@ class _TransferEthPageState extends State<TransferEthPage> {
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             EthTransferPayload ethTransferPayload = EthTransferPayload();
-            ethTransferPayload
-              ..fromAddress = fromAddress
-              ..toAddress = _toAddressController.text.toString()
-              ..contractAddress = contractAddress ?? ""
-              ..value = _txValueController.text
-              ..nonce = nonce
-              ..gasPrice = mGasPriceValue.toInt().toString()
-              ..gasLimit = mGasLimitValue.toInt().toString()
-              ..decimal = decimal
-              ..extData = _backupMsgController.text.toString();
-
+            try {
+              ethTransferPayload
+                ..fromAddress = fromAddress
+                ..toAddress = _toAddressController.text.toString()
+                ..contractAddress = contractAddress ?? ""
+                ..value = (double.parse(_txValueController.text) * pow(10, decimal)).toString()
+                ..nonce = nonce
+                ..gasPrice = mGasPriceValue.toInt().toString()
+                ..gasLimit = mGasLimitValue.toInt().toString()
+                ..decimal = 0
+                ..extData = _backupMsgController.text.toString();
+            } catch (e) {
+              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
+              NavigatorUtils.goBack(context);
+              return;
+            }
             String signResult = EthChainControl.getInstance().txSign(ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
             if (signResult == null) {
               Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);

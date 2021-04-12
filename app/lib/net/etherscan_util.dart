@@ -289,6 +289,7 @@ Future<String> sendRawTx(ChainType chainType, String rawTx) async {
     }
     return "";
   } catch (e) {
+    Logger.getInstance().e("sendRawTx", "tx sendRawTx error is " + e.toString());
     return "";
   }
 }
