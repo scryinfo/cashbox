@@ -105,10 +105,10 @@ impl ChainSqlite {
             let r = self.rb.exec("", &sql).await;
             match r {
                 Ok(a) => {
-                    debug!("=== {:?} ===", a);
+                    print!("=== {:?} ===", a);
                 }
                 Err(e) => {
-                    error!("=== {:?} ===", e);
+                    print!("=== {:?} ===", e);
                 }
             }
         }
@@ -395,7 +395,8 @@ impl DetailSqlite {
     }
 
     pub async fn fetch_user_address(&self) -> Option<MUserAddress> {
-        let w = self.rb.new_wrapper().eq("rowid", 1);
+        //let w = self.rb.new_wrapper().eq("rowid", 1);
+        let w = self.rb.new_wrapper().eq(MUserAddress::create_time, "1618038542");
         let r: Result<MUserAddress, _> = self.rb.fetch_by_wrapper("", &w).await;
         match r {
             Ok(u) => Some(u),
@@ -639,4 +640,6 @@ mod test {
     fn test_utxo() {
         block_on(RB_DETAIL.utxo());
     }
+
+    // for test new test
 }
