@@ -190,13 +190,14 @@ impl EthTransferPayload {
                 (Some(to), data)
             }
         };
-        //gas price
-        let gas_price = if let Some(gas_price) = eth::convert_token(&self.gas_price, decimal){
+        //gas price default input unit is gwei
+        let gas_price = if let Some(gas_price) = eth::convert_token(&self.gas_price, 9){
             gas_price
         }else {
             let error_msg = format!("input gas_price illegal:{}",&self.gas_price);
             return Err(WalletError::Custom(error_msg));
         };
+
         //Allow maximum gas consumption
         if self.gas_limit.contains('.') {
             let error_msg = format!("input gas_limit illegal:{}",&self.gas_limit);

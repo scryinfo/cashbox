@@ -23,17 +23,18 @@ fn eth_tx_sign_test() {
         let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-        let wallet =   data::create_wallet(c_ctx);
+     //   let wallet =   data::create_wallet(c_ctx);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let transfer_tx = EthTransferPayload {
-            from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
+          //  from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
+            from_address: "0xb10afe632d498ef89fef6401b23a40a1fcc85546".to_string(),
             to_address: "0xc0c4824527ffb27a51034cea1e37840ed69a5f1e".to_string(),
             contract_address: "".to_string(),
-            value: "0.01".to_string(),
-            nonce: "81".to_string(),
+            value: "2000000000000000".to_string(),
+            nonce: "2".to_string(),
             gas_price: "301".to_string(),
             gas_limit: "21000".to_string(),
-            decimal: 18,
+            decimal: 0,
             ext_data: "".to_string(),
             password: "123456".to_string(),
         };
