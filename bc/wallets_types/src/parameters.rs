@@ -1,6 +1,7 @@
 use failure::_core::ops::{Deref, DerefMut};
 use super::error::WalletError;
 use mav::ma::{MEeeChainTx, MEeeTokenxTx};
+use ethereum_types::U256;
 
 #[derive(Debug, Default, Clone)]
 pub struct InitParameters {
@@ -197,12 +198,12 @@ impl EthTransferPayload {
             return Err(WalletError::Custom(error_msg));
         };
         //Allow maximum gas consumption
-        let gas_limit = if let Some(gas_limit) = eth::convert_token(&self.gas_limit, decimal){
-            gas_limit
-        }else {
+        if self.gas_limit.contains('.') {
             let error_msg = format!("input gas_limit illegal:{}",&self.gas_limit);
             return Err(WalletError::Custom(error_msg));
-        };
+        }
+
+      let gas_limit=  U256::from_dec_str(&self.gas_limit).map_err(|err|WalletError::Custom(err.to_string()))?;
         //Nonce value of the current transaction
         let nonce = {
             let nonce = if self.nonce.starts_with("0x") {
