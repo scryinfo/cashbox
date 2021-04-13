@@ -213,103 +213,103 @@ mod test {
         }
     }
 
-    #[test]
-    pub fn mnemonic_test() {
-        generate_mnemonic();
-    }
-
-    pub fn init_parameters() -> InitParameters {
-        let mut p = InitParameters::default();
-        // p.is_memory_db = CTrue;
-        p.net_type = NetType::Test.to_string();
-        p.db_name.0 = mav::ma::DbName::new("test_", "");
-        p.context_note = format!("test_{}", "murmel");
-        p
-    }
-
-    pub fn create_wallet_parameters() -> CreateWalletParameters {
-        let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
-        CreateWalletParameters {
-            name: "murmel".to_string(),
-            password: "".to_string(),
-            mnemonic: words.to_string(),
-            // wallet_type 依然有特定的字符串 Test 和 Normal
-            wallet_type: WalletType::Test.to_string(),
-        }
-    }
-
-    #[test]
-    pub fn create_wallet_try() {
-        let i = init_parameters();
-        let c = create_wallet_parameters();
-        let mut wallets = Wallets::default();
-        block_on(async {
-            // must init wallet before create wallet
-            let ctx = wallets.init(&i).await;
-            ctx.map_or_else(
-                |e| {
-                    println!("init failed {:?}", e);
-                },
-                |c| println!("init succeeded context {:?}", c),
-            );
-            let w = wallets.create_wallet(c).await;
-            match w {
-                Ok(w) => { println!("{:#?}", w); }
-                Err(e) => { println!("{}",e); }
-            }
-        })
-    }
-
-    #[test]
-    // get_mnemonic_context
-    // get_private_key_from_address
-    pub fn get_mnemonic_from_address_try() {
-        let i = init_parameters();
-        let c = create_wallet_parameters();
-        let mut wallets = Wallets::default();
-        block_on(async {
-            // must init wallet before create wallet
-            let ctx = wallets.init(&i).await;
-            ctx.map_or_else(
-                |e| {
-                    println!("init failed {:?}", e);
-                },
-                |c| println!("init succeeded context {:?}", c),
-            );
-            let r = wallets.create_wallet(c).await;
-            r.map_or_else(
-                |e| println!("create failed {:?}", e),
-                |w| {
-                    let mnemonic = eee::Sr25519::get_mnemonic_context(&w.mnemonic, "".as_bytes());
-                    println!(
-                        "mnemonic {:#?}",
-                        String::from_utf8(mnemonic.unwrap()).unwrap()
-                    );
-                },
-            );
-        })
-    }
-
-    #[test]
-    pub fn contexts_try() {
-        let ip = init_parameters();
-        let cp = create_wallet_parameters();
-        block_on(async {
-            let lock = Contexts::collection().lock();
-            let mut contexts = lock.borrow_mut();
-            let new_ctx = Context::new(&ip.context_note);
-            let wallets = contexts.new(new_ctx, NetType::Test);
-            if let Some(wallets) = wallets {
-                let _ = wallets.init(&ip).await.unwrap();
-                let w = wallets.create_wallet(cp).await;
-                w.map_or_else(
-                    |e| println!("create failed {:?}", e),
-                    |w| {
-                        println!("contexts {:#?}", contexts.contexts());
-                    },
-                );
-                // println!("{:#?}", w);
-            }
-        });
-    }
+    // #[test]
+    // pub fn mnemonic_test() {
+    //     generate_mnemonic();
+    // }
+    //
+    // pub fn init_parameters() -> InitParameters {
+    //     let mut p = InitParameters::default();
+    //     // p.is_memory_db = CTrue;
+    //     p.net_type = NetType::Test.to_string();
+    //     p.db_name.0 = mav::ma::DbName::new("test_", "");
+    //     p.context_note = format!("test_{}", "murmel");
+    //     p
+    // }
+    //
+    // pub fn create_wallet_parameters() -> CreateWalletParameters {
+    //     let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
+    //     CreateWalletParameters {
+    //         name: "murmel".to_string(),
+    //         password: "".to_string(),
+    //         mnemonic: words.to_string(),
+    //         // wallet_type 依然有特定的字符串 Test 和 Normal
+    //         wallet_type: WalletType::Test.to_string(),
+    //     }
+    // }
+    //
+    // #[test]
+    // pub fn create_wallet_try() {
+    //     let i = init_parameters();
+    //     let c = create_wallet_parameters();
+    //     let mut wallets = Wallets::default();
+    //     block_on(async {
+    //         // must init wallet before create wallet
+    //         let ctx = wallets.init(&i).await;
+    //         ctx.map_or_else(
+    //             |e| {
+    //                 println!("init failed {:?}", e);
+    //             },
+    //             |c| println!("init succeeded context {:?}", c),
+    //         );
+    //         let w = wallets.create_wallet(c).await;
+    //         match w {
+    //             Ok(w) => { println!("{:#?}", w); }
+    //             Err(e) => { println!("{}",e); }
+    //         }
+    //     })
+    // }
+    //
+    // #[test]
+    // // get_mnemonic_context
+    // // get_private_key_from_address
+    // pub fn get_mnemonic_from_address_try() {
+    //     let i = init_parameters();
+    //     let c = create_wallet_parameters();
+    //     let mut wallets = Wallets::default();
+    //     block_on(async {
+    //         // must init wallet before create wallet
+    //         let ctx = wallets.init(&i).await;
+    //         ctx.map_or_else(
+    //             |e| {
+    //                 println!("init failed {:?}", e);
+    //             },
+    //             |c| println!("init succeeded context {:?}", c),
+    //         );
+    //         let r = wallets.create_wallet(c).await;
+    //         r.map_or_else(
+    //             |e| println!("create failed {:?}", e),
+    //             |w| {
+    //                 let mnemonic = eee::Sr25519::get_mnemonic_context(&w.mnemonic, "".as_bytes());
+    //                 println!(
+    //                     "mnemonic {:#?}",
+    //                     String::from_utf8(mnemonic.unwrap()).unwrap()
+    //                 );
+    //             },
+    //         );
+    //     })
+    // }
+    //
+    // #[test]
+    // pub fn contexts_try() {
+    //     let ip = init_parameters();
+    //     let cp = create_wallet_parameters();
+    //     block_on(async {
+    //         let lock = Contexts::collection().lock();
+    //         let mut contexts = lock.borrow_mut();
+    //         let new_ctx = Context::new(&ip.context_note);
+    //         let wallets = contexts.new(new_ctx, NetType::Test);
+    //         if let Some(wallets) = wallets {
+    //             let _ = wallets.init(&ip).await.unwrap();
+    //             let w = wallets.create_wallet(cp).await;
+    //             w.map_or_else(
+    //                 |e| println!("create failed {:?}", e),
+    //                 |w| {
+    //                     println!("contexts {:#?}", contexts.contexts());
+    //                 },
+    //             );
+    //             // println!("{:#?}", w);
+    //         }
+    //     });
+    // }
 }

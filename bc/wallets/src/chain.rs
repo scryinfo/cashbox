@@ -1035,6 +1035,7 @@ impl EthChain {
     }
 }
 
+#[allow(dead_code)]
 impl BtcChain {
     // TODO when sign btc-tx in wallet/chain use this function
     async fn get_mnemonic_from_address(context: &dyn ContextTrait, address: &str, password: &str) -> Result<Vec<u8>, WalletError> {
@@ -1045,4 +1046,9 @@ impl BtcChain {
             Err(WalletError::Custom(format!("address {} wallet is not exist!", address)))
         }
     }
+
+    async fn start_murmel(context: &dyn ContextTrait) -> Result<(),WalletError> {
+        unimplemented!()
+    }
+
 }
