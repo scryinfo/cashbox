@@ -15,7 +15,7 @@ pub fn start(net_type: &NetType) {
         _ => Network::Testnet,
     };
 
-    // when test you must ignore this
+    #[cfg(not(test))]
     simple_logger::init_with_level(log::Level::Debug).unwrap();
 
     let port = match network {
