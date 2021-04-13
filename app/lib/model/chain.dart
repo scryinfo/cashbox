@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:app/model/token.dart';
 import 'package:wallet_manager/wallet_manager.dart';
 import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dc.dart';
 
 
 
@@ -11,6 +12,7 @@ abstract class Chain {
   String chainId; //Chain Id
   String walletId; //Wallet Id
   String chainAddress; //Chain address
+  Address walletAddress;
   String pubKey; //Chain address
   List<TokenM> digitsList = [];
   List<TokenM> _visibleDigitsList = [];

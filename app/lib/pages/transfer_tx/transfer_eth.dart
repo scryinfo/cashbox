@@ -737,7 +737,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 ..decimal = 0
                 ..extData = _backupMsgController.text.toString();
             } catch (e) {
-              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
+              Fluttertoast.showToast(msg: translate("balance_is_less"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
               return;
             }

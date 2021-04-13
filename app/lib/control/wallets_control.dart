@@ -94,14 +94,21 @@ class WalletsControl {
     List<WalletM.Wallet> walletMList = [];
     allWalletObj.data1.forEach((element) {
       WalletM.Wallet tempWallet = WalletM.Wallet();
+      tempWallet.walletType = element.walletType.toWalletType();
       tempWallet.walletName = element.name;
       tempWallet.walletId = element.id;
       tempWallet.accountMoney = getWalletMoney(element).toStringAsFixed(6);
 
       // todo isShowChain tempWallet.chainList =
-      ChainETH chainETH = ChainETH()..isVisible = true; // todo element.ethChain.chainShared.visible;
-      ChainBTC chainBTC = ChainBTC()..isVisible = false; // todo element.ethChain.chainShared.visible;
-      ChainEEE chainEEE = ChainEEE()..isVisible = true; // todo element.ethChain.chainShared.visible;
+      ChainETH chainETH = ChainETH()
+        ..isVisible = true // todo element.ethChain.chainShared.visible;
+        ..walletAddress = element.ethChain.chainShared.walletAddress;
+      ChainBTC chainBTC = ChainBTC()
+        ..isVisible = false
+        ..walletAddress = element.btcChain.chainShared.walletAddress; // todo element.ethChain.chainShared.visible;
+      ChainEEE chainEEE = ChainEEE()
+        ..isVisible = true
+        ..walletAddress = element.eeeChain.chainShared.walletAddress; // todo element.ethChain.chainShared.visible;
       switch (element.walletType.toWalletType()) {
         case EnumKit.WalletType.Test:
           chainETH..chainType = EnumKit.ChainType.EthTest;
