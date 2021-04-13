@@ -1047,7 +1047,7 @@ impl BtcChain {
         }
     }
 
-    async fn start_murmel(context: &dyn ContextTrait) -> Result<(),WalletError> {
+    async fn start_murmel(context: &dyn ContextTrait, net_type: &NetType) -> Result<(),WalletError> {
         unimplemented!()
     }
 

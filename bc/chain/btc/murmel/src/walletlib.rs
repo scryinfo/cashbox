@@ -94,16 +94,16 @@ pub fn create_master() -> Transaction {
 
 // create mnemonic from bc/wallet
 // the function is generate_mnemonic
-pub fn generate_mnemonic() {
-    let mnemonic = wallets::Wallets::generate_mnemonic(12);
-    println!("{}", mnemonic);
-}
+// pub fn generate_mnemonic() {
+//     let mnemonic = wallets::Wallets::generate_mnemonic(12);
+//     println!("{}", mnemonic);
+// }
 
 #[cfg(test)]
 mod test {
     use crate::db::RB_DETAIL;
     use crate::kit::vec_to_string;
-    use crate::walletlib::{create_master, generate_mnemonic};
+    use crate::walletlib::{create_master};
     use bitcoin::consensus::serialize as btc_serialize;
     use bitcoin::consensus::{deserialize, serialize};
     use bitcoin::hashes::sha256d;
@@ -115,14 +115,11 @@ mod test {
     use bitcoin_hashes::Hash;
     use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
     use bitcoin_wallet::mnemonic::Mnemonic;
-    use eee::Crypto;
     use futures::executor::block_on;
     use mav::{kits, NetType, WalletType, CTrue};
     use std::collections::HashMap;
     use std::fmt::Write;
     use std::str::FromStr;
-    use wallets::{Contexts, Wallets};
-    use wallets_types::{Context, CreateWalletParameters, InitParameters, Wallet, WalletError};
 
     #[test]
     pub fn bitcoin_hash_test() {
