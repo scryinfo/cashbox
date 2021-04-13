@@ -51,6 +51,7 @@ pub mod timeout;
 pub mod walletlib;
 pub mod path;
 mod kit;
-pub mod satrt;
+mod start;
 
 pub use error::Error;
+pub use start::start;

@@ -15,7 +15,8 @@ pub fn start(net_type: &NetType) {
         _ => Network::Testnet,
     };
 
-    //simple_logger::init_with_level(log::Level::Debug).unwrap();
+    // when test you must ignore this
+    simple_logger::init_with_level(log::Level::Debug).unwrap();
 
     let port = match network {
         Network::Bitcoin => 8333,
@@ -44,7 +45,7 @@ pub fn start(net_type: &NetType) {
 
 #[cfg(test)]
 mod test {
-    use crate::satrt::start;
+    use crate::start::start;
     use mav::NetType;
 
     #[test]
