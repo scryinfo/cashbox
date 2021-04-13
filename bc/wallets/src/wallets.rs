@@ -7,10 +7,7 @@ use parking_lot::lock_api::RawReentrantMutex;
 use parking_lot::{RawMutex, RawThreadId};
 
 use eee::Crypto;
-use mav::ma::{
-    BeforeSave, Dao, Db, DbCreateType, DbName, MAddress, MBtcChainToken, MEeeChainToken,
-    MEthChainToken, MMnemonic, MTokenAddress, MWallet, SettingType,
-};
+use mav::ma::{BeforeSave, Dao, Db, DbCreateType, DbName, MAddress, MBtcChainToken, MEeeChainToken, MEthChainToken, MMnemonic, MTokenAddress, MWallet, SettingType, MEthChainTokenDefault, MEthChainTokenAuth, MEthChainTokenNonAuth};
 use mav::{ChainType, NetType, WalletType, CTrue, CFalse, AppPlatformType};
 use scry_crypto::Keccak256;
 use wallets_types::{BtcChainTrait, Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, EthChainTrait, InitParameters, Setting, TokenAddress, Wallet, WalletError, WalletTrait, WalletTokenStatus};
@@ -82,11 +79,11 @@ impl Wallets {
     pub fn eee_chain_instance(&self) -> &Box<dyn EeeChainTrait> {
         self.wallet_trait.eee_chain()
     }
-    pub fn eth_chain_instance(&self) -> &Box<dyn EthChainTrait>{
+    pub fn eth_chain_instance(&self) -> &Box<dyn EthChainTrait> {
         self.wallet_trait.eth_chain()
     }
     pub fn btc_chain_instance(&self) -> &Box<dyn BtcChainTrait> {
-      self.wallet_trait.btc_chain()
+        self.wallet_trait.btc_chain()
     }
 
     pub fn db_name(name: &wallets_types::DbName) -> wallets_types::DbName {
@@ -121,7 +118,7 @@ impl Wallets {
     }
 
     pub async fn has_any(&self) -> Result<bool, WalletError> {
-        Wallet::has_any(self,&self.net_type).await
+        Wallet::has_any(self, &self.net_type).await
     }
 
     pub async fn find_by_id(&self, wallet_id: &str) -> Result<Option<Wallet>, WalletError> {
@@ -270,14 +267,14 @@ impl Wallets {
         let rb = context.db.wallets_db();
         let hex_mn_digest = {
             let hash_first = parameters.mnemonic.as_bytes().keccak256();
-            format!("0x{}",hex::encode((&hash_first[..]).keccak256()))
+            format!("0x{}", hex::encode((&hash_first[..]).keccak256()))
         };
 
         let wallet_type = WalletType::from(&parameters.wallet_type);
         if !WalletType::check_chain_type_match(&wallet_type, &context.net_type)
         {
             let msg = format!(" {} wallet must match {} network,{} wallet can't use {} network",
-                              WalletType::Normal.to_string(), NetType::Main.to_string(),WalletType::Test.to_string(),NetType::Main.to_string());
+                              WalletType::Normal.to_string(), NetType::Main.to_string(), WalletType::Test.to_string(), NetType::Main.to_string());
             return Err(WalletError::Custom(msg));
         }
         // normal wallet mnemonic can't be used more than once,test wallet mnemonic can't be used in normal wallet
@@ -325,7 +322,7 @@ impl Wallets {
             rb.commit(&tx.tx_id).await?;
             tx.manager = None;
         }
-        if Wallet::count(context,&context.net_type).await? == 1 {
+        if Wallet::count(context, &context.net_type).await? == 1 {
             //是第一个创建的wallet，把它设置为当前钱包
             let wallet_type = WalletType::from(&m_wallet.wallet_type);
             //创建的第一个钱包，的默认链是 eee
@@ -359,8 +356,69 @@ impl Wallets {
         }
         Ok(addrs)
     }
+
+    async fn query_contract_by_shared_id(&self, token_shared_id: &str, net_type: &str) -> Result<String, WalletError> {
+        //通过
+        let wallet_rb = self.db().wallets_db();
+        let token_query_wrapper = wallet_rb.new_wrapper()
+            .eq(&MEthChainTokenDefault::chain_token_shared_id, token_shared_id)
+            .eq(&MEthChainTokenDefault::net_type, net_type);
+            if let Some(token_auth) = MEthChainTokenAuth::fetch_by_wrapper(wallet_rb, "", &token_query_wrapper).await?{
+                Ok(token_auth.contract_address)
+            } else if let Some(token_non_auth) = MEthChainTokenNonAuth::fetch_by_wrapper(wallet_rb, "", &token_query_wrapper).await?{
+                Ok(token_non_auth.contract_address)
+            } else if let Some(token_default) = MEthChainTokenDefault::fetch_by_wrapper(wallet_rb, "", &token_query_wrapper).await? {
+                Ok(token_default.contract_address)
+            }else {
+                let msg = format!("token shared id {},{} not exist in token liberay",token_shared_id,net_type);
+                Err(WalletError::Custom(msg))
+            }
+    }
+
     pub async fn update_address_balance(&self, token_address: &TokenAddress) -> Result<(), WalletError> {
         let data_rb = self.db().data_db(&self.net_type);
+        // use the same field in m_eee_chain_token,m_eth_chain_token,m_btc_chain_token
+        let token_query_wrapper = data_rb.new_wrapper()
+            .eq(&MEthChainToken::wallet_id, &token_address.wallet_id)
+            .eq(&MEthChainToken::chain_type, &token_address.chain_type)
+            .eq(&MEthChainToken::chain_token_shared_id, &token_address.token_id);
+        let mut tx = data_rb.begin_tx_defer(false).await?;
+        let chain_type = ChainType::from(&token_address.chain_type)?;
+        match chain_type {
+            ChainType::EthPrivateTest | ChainType::EthPrivate | ChainType::EthTest | ChainType::ETH => {
+                if MEthChainToken::fetch_by_wrapper(data_rb, &tx.tx_id, &token_query_wrapper).await?.is_none() {
+                    let contract_addr = self.query_contract_by_shared_id(&token_address.token_id,&self.net_type.to_string()).await?;
+                    let mut token = MEthChainToken::default();
+                    token.chain_token_shared_id = token_address.token_id.clone();
+                    token.wallet_id = token_address.wallet_id.clone();
+                    token.chain_type = token_address.chain_type.to_string();
+                    token.show = CTrue;
+                    token.contract_address = contract_addr;
+                    token.save_update(data_rb, &tx.tx_id).await?;
+                }
+            }
+            ChainType::EeePrivateTest | ChainType::EeePrivate | ChainType::EeeTest | ChainType::EEE => {
+                if MEeeChainToken::fetch_by_wrapper(data_rb, &tx.tx_id, &token_query_wrapper).await?.is_none() {
+                    let mut token = MEeeChainToken::default();
+                    token.chain_token_shared_id = token_address.token_id.clone();
+                    token.wallet_id = token_address.wallet_id.clone();
+                    token.chain_type = token_address.chain_type.to_string();
+                    token.show = CTrue;
+                    token.save_update(data_rb, &tx.tx_id).await?;
+                }
+            }
+            ChainType::BtcPrivateTest | ChainType::BtcPrivate | ChainType::BtcTest | ChainType::BTC => {
+                if MBtcChainToken::fetch_by_wrapper(data_rb, &tx.tx_id, &token_query_wrapper).await?.is_none() {
+                    let mut token = MBtcChainToken::default();
+                    token.chain_token_shared_id = token_address.token_id.clone();
+                    token.wallet_id = token_address.wallet_id.clone();
+                    token.chain_type = token_address.chain_type.to_string();
+                    token.show = CTrue;
+                    token.save_update(data_rb, &tx.tx_id).await?;
+                }
+            }
+        }
+
         let token_address_wrapper = data_rb
             .new_wrapper()
             .eq(&MTokenAddress::wallet_id, &token_address.wallet_id)
@@ -368,16 +426,20 @@ impl Wallets {
             .eq(&MTokenAddress::token_id, &token_address.token_id)
             .eq(&MTokenAddress::address_id, &token_address.address_id);
         if let Some(mut target_address) =
-        MTokenAddress::fetch_by_wrapper(data_rb, "", &token_address_wrapper).await?
+        MTokenAddress::fetch_by_wrapper(data_rb, &tx.tx_id, &token_address_wrapper).await?
         {
             target_address.balance = token_address.balance.clone();
             target_address.status = 1;
-            target_address.save_update(data_rb, "").await.map(|_| ()).map_err(|err| err.into())
+            target_address.save_update(data_rb, &tx.tx_id).await?;
         } else {
             let mut token_address_instance = token_address.clone();
             token_address_instance.m.status = 1;
-            token_address_instance.save(data_rb, "").await.map(|_| ()).map_err(|err| err.into())
+            token_address_instance.save(data_rb, &tx.tx_id).await?;
         }
+
+        data_rb.commit(&tx.tx_id).await?;
+        tx.manager = None;
+        Ok(())
     }
     pub async fn query_address_balance(&self, wallet_id: &str) -> Result<Vec<TokenAddress>, WalletError> {
         let data_rb = self.db().data_db(&self.net_type);
