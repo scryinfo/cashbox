@@ -1,11 +1,12 @@
 use std::ptr::null_mut;
-use mav::kits;
+use mav::{kits, NetType, CFalse};
 use mav::ma::BtcTokenType;
 use wallets_types::{InitParameters, Error, BtcChainTokenDefault};
 use wallets_cdl::{CU64, CR, CStruct, CArray,types::CError, wallets_c::Wallets_init, chain_btc_c,
                   parameters::{CContext, CInitParameters,},
                   mem_c::{CContext_dAlloc, CError_free},
 };
+use wallets_cdl::chain_btc_c::ChainBtc_start;
 
 #[test]
 fn btc_update_default_token_list_test() {
@@ -52,4 +53,29 @@ fn init_parameters(c_ctx: *mut *mut CContext) -> *mut CError {
         Wallets_init(c_parameters, c_ctx) as *mut CError
     };
     c_err
+}
+
+#[test]
+fn btc_start_test() {
+    // not create only init
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_init_parameters = {
+            let mut p = InitParameters::default();
+            p.net_type = NetType::Test.to_string();
+            p.is_memory_db = CFalse;
+            let prefix = "test_";
+            p.db_name.0 = mav::ma::DbName::new(&prefix, "");
+            p.context_note = format!("test_{}", prefix);
+            CInitParameters::to_c_ptr(&p)
+        };
+        let c_err = Wallets_init(c_init_parameters, c_ctx) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let c_err = ChainBtc_start(*c_ctx) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
 }

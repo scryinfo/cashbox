@@ -15,7 +15,6 @@ pub fn start(net_type: &NetType) {
         _ => Network::Testnet,
     };
 
-    #[cfg(not(test))]
     simple_logger::init_with_level(log::Level::Debug).unwrap();
 
     let port = match network {
@@ -50,6 +49,7 @@ mod test {
 
     #[test]
     pub fn start_test() {
+        // when you start it be careful, start function also have an init function in it;
         simple_logger::init_with_level(log::Level::Debug).unwrap();
         start(&NetType::Test);
     }

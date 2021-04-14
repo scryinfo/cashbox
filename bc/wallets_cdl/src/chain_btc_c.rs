@@ -3,7 +3,7 @@
 use futures::executor::block_on;
 use std::os::raw::c_uint;
 
-use wallets_types::Error;
+use wallets_types::{Error, WalletError};
 use wallets::Contexts;
 use super::kits::{CR, CArray, CStruct};
 use crate::types::{CBtcChainTokenDefault, CBtcChainTokenAuth,CError};
@@ -132,6 +132,37 @@ pub unsafe extern "C" fn ChainBtc_getDefaultTokenList(ctx: *mut CContext, tokens
             None => Error::NONE().append_message(": can not find the context")
         }
     };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn ChainBtc_start(ctx: *mut CContext) -> *const CError {
+    log::debug!("enter ChainBtc start");
+
+    if ctx.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or tokens is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+
+    let lock  = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let btc_chain = wallets.btc_chain_instance();
+                let r = btc_chain.start_murmel(wallets, &wallets.net_type);
+                match r {
+                    Ok(_) => { Error::SUCCESS() }
+                    Err(err) => { Error::from(err) }
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }

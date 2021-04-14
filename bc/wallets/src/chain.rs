@@ -336,6 +336,11 @@ impl BtcChainTrait for BtcChain {
         let btc_tokens = BtcChainTokenAuth::list_by_net_type(context, net_type, start_item, page_size).await?;
         Ok(btc_tokens)
     }
+
+    fn start_murmel(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<(),WalletError> {
+        murmel::start(&net_type);
+        Ok(())
+    }
 }
 
 #[async_trait]
@@ -1045,11 +1050,6 @@ impl BtcChain {
         } else {
             Err(WalletError::Custom(format!("address {} wallet is not exist!", address)))
         }
-    }
-
-    fn start_murmel(context: &dyn ContextTrait, net_type: &NetType) -> Result<(),WalletError> {
-        murmel::start(&net_type);
-        Ok(())
     }
 
 }
