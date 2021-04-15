@@ -39,6 +39,14 @@ pub enum Token{
     EEE,
     TokenX
 }
+ impl ToString for Token {
+     fn to_string(&self) -> String {
+         match &self {
+             Token::EEE => "EEE".to_owned(),
+             Token::TokenX => "TokenX".to_owned(),
+         }
+     }
+ }
 
 #[derive(Encode, Decode, Debug)]
 pub struct RawTx {
