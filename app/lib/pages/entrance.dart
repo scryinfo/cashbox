@@ -116,6 +116,8 @@ class _EntrancePageState extends State<EntrancePage> {
   }
 
   _updateDbVersion() async {
+    // todo replace update Data interface
+    Config config = await HandleConfig.instance.getConfig();
     Map resultMap = await Wallets.instance.updateWalletDbData(config.dbVersion);
     if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
       Logger().i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
