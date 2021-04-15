@@ -24,9 +24,19 @@ use rbatis::rbatis::Rbatis;
 use rbatis::wrapper::Wrapper;
 use rbatis_core::Error;
 use std::ops::Add;
+use strum_macros::{EnumString, ToString, EnumIter};
 
+// state value in btc database must be one of this enum
+#[derive(Debug, Eq, PartialEq, EnumString, ToString, EnumIter)]
 pub enum BtcTxState {
-
+    #[strum(serialize = "Unknown", to_string = "Unknown")]
+    Unknown,
+    #[strum(serialize = "Spent", to_string = "Spent")]
+    Spent,
+    #[strum(serialize = "Unspent", to_string = "Unspent")]
+    Unspent,
+    #[strum(serialize = "Locked", to_string = "Locked")]
+    Locked,
 }
 
 pub struct ChainSqlite {
@@ -240,7 +250,10 @@ impl DetailSqlite {
         let r: Result<MProgress, _> = self.rb.fetch_by_wrapper("", &w).await;
         return match r {
             Ok(r) => Some(r),
-            Err(e) => {print!("{:?}",e); None},
+            Err(e) => {
+                print!("{:?}", e);
+                None
+            }
         };
     }
 

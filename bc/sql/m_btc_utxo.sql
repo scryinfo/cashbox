@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS m_btc_utxo (
     spent_value INTEGER DEFAULT NULL,
     id TEXT PRIMARY KEY,
     create_time INTEGER NOT NULL,
-    update_time INTEGER NOT NULL,
+    update_time INTEGER NOT NULL
  );
