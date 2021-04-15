@@ -3,6 +3,7 @@ use crate::constructor::Constructor;
 use crate::db::VERIFY;
 use crate::path::BTC_HAMMER_PATH;
 use bitcoin::Network;
+use log::LevelFilter;
 use mav::NetType;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
@@ -15,7 +16,10 @@ pub fn start(net_type: &NetType) {
         _ => Network::Testnet,
     };
 
-    simple_logger::init_with_level(log::Level::Debug).unwrap();
+    simple_logger::SimpleLogger::new()
+        .with_level(LevelFilter::Debug)
+        .init()
+        .unwrap();
 
     let port = match network {
         Network::Bitcoin => 8333,
@@ -45,12 +49,16 @@ pub fn start(net_type: &NetType) {
 #[cfg(test)]
 mod test {
     use crate::start::start;
+    use log::LevelFilter;
     use mav::NetType;
 
     #[test]
     pub fn start_test() {
         // when you start it be careful, start function also have an init function in it;
-        simple_logger::init_with_level(log::Level::Debug).unwrap();
+        simple_logger::SimpleLogger::new()
+            .with_level(LevelFilter::Debug)
+            .init()
+            .unwrap();
         start(&NetType::Test);
     }
 }

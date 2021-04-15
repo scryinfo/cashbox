@@ -22,9 +22,8 @@
 
 use bitcoin::network::constants::Network;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use config::{Config, ConfigError};
-use log::info;
 use log::Level;
+use log::{info, LevelFilter};
 use mav::ma::MUserAddress;
 use murmel::api::{calc_default_address, calc_hash160, calc_pubkey};
 use murmel::constructor::Constructor;
@@ -53,29 +52,22 @@ pub fn main() {
         return;
     }
 
-    let mut settings = Config::default();
-    let r = settings.merge(config::File::with_name("../Setting.toml"));
-    match r {
-        Ok(r) => { println!("Setting {:?}",r); }
-        Err(e) => { println!("error: {:?}", e); }
-    }
-
-    let log_level = settings.get_str("loglevel");
-    if let Ok(log) = log_level {
+    let logger = simple_logger::SimpleLogger::new();
+    if let Some(log) = find_arg("log") {
         match log.as_str() {
-            "error" => simple_logger::init_with_level(Level::Error).unwrap(),
-            "warn" => simple_logger::init_with_level(Level::Warn).unwrap(),
-            "info" => simple_logger::init_with_level(Level::Info).unwrap(),
-            "debug" => simple_logger::init_with_level(Level::Debug).unwrap(),
-            "trace" => simple_logger::init_with_level(Level::Trace).unwrap(),
-            _ => simple_logger::init_with_level(Level::Info).unwrap(),
-        }
+            "error" => logger.with_level(LevelFilter::Error).init().unwrap(),
+            "warn" => logger.with_level(LevelFilter::Warn).init().unwrap(),
+            "info" => logger.with_level(LevelFilter::Info).init().unwrap(),
+            "debug" => logger.with_level(LevelFilter::Debug).init().unwrap(),
+            "trace" => logger.with_level(LevelFilter::Trace).init().unwrap(),
+            _ => logger.with_level(LevelFilter::Debug).init().unwrap(),
+        };
     } else {
-        simple_logger::init_with_level(Level::Debug).unwrap();
-    }
+        logger.with_level(LevelFilter::Debug).init().unwrap();
+    };
 
     let mut network = Network::Testnet;
-    if let Ok(net) = settings.get_str("network") {
+    if let Some(net) = find_arg("network") {
         match net.as_str() {
             "main" => network = Network::Bitcoin,
             "test" => network = Network::Testnet,
