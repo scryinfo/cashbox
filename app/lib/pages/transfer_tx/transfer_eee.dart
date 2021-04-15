@@ -88,10 +88,12 @@ class _TransferEeePageState extends State<TransferEeePage> {
     }
     if (digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
       Map tokenBalanceMap = await EeeChainControl.getInstance()
-          .loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, Wallets.instance.nowWallet.nowChain.pubKey);
+          .loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, WalletsControl.getInstance().currentChainAddress());
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
         try {
-          double eeeFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
+          // double eeeFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
+          double eeeFreeBalance =
+              BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble(); // todo decimal and uint
           digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
         } catch (e) {
           digitBalance = "0";
@@ -470,29 +472,26 @@ class _TransferEeePageState extends State<TransferEeePage> {
                 return;
               }
             } else if (digitName != null && digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
-              eeeTransferMap = await Wallets.instance.tokenXTransfer(
-                  Wallets.instance.nowWallet.nowChain.chainAddress,
-                  _toAddressController.text.toString(),
-                  _txValueController.text.toString(),
-                  Utils.uint8ListToHex(Uint8List.fromList((_backupMsgController.text == "" ? "00" : _backupMsgController.text).codeUnits)),
-                  nonce,
-                  Uint8List.fromList(pwd.codeUnits));
+              EeeTransferPayload eeeTransferPayload = EeeTransferPayload();
+              eeeTransferPayload
+                ..fromAccount = WalletsControl.getInstance().currentChainAddress()
+                ..toAccount = _toAddressController.text.toString()
+                ..value = _txValueController.text.toString()
+                ..index = nonce
+                ..password = pwd
+                ..extData = _backupMsgController.text ?? ""
+                ..chainVersion = EeeChainControl.getInstance().getChainVersion();
+              signInfo = EeeChainControl.getInstance().tokenXTransfer(eeeTransferPayload);
             } else {
               Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
             }
-            /*if (!_isMapStatusOk(eeeTransferMap)) {
-              Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
-              NavigatorUtils.goBack(context);
-              return;
-            }
-            String signInfo = eeeTransferMap["signedInfo"];
             if (signInfo == null || signInfo.isEmpty) {
               Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
-            }*/
+            }
             context.read<TransactionProvide>()
               ..setFromAddress(WalletsControl.getInstance().currentChainAddress())
               ..setValue(_txValueController.text)

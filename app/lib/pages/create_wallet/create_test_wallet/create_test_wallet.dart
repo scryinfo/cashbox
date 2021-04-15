@@ -444,6 +444,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
 
     if (newWalletObj != null) {
       Fluttertoast.showToast(msg: translate('success_create_test_wallet'));
+      WalletsControl.getInstance().saveCurrentWalletChain(newWalletObj.id, EnumKit.ChainType.EthTest);
       NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
     } else {
       Fluttertoast.showToast(msg: translate('failure_create_test_wallet'));

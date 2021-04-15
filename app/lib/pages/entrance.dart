@@ -54,13 +54,13 @@ class _EntrancePageState extends State<EntrancePage> {
         3. Default digits
         4. Application language type (Chinese and English)
         */
-    await initAppConfigInfo(); //case: After deleting the wallet, there is no wallet, return to EntrancePage, check every time
+    await _initAppConfigInfo(); //case: After deleting the wallet, there is no wallet, return to EntrancePage, check every time
     Config config = await HandleConfig.instance.getConfig();
     _languageTextValue = languageMap[config.locale];
     _checkAndUpdateAppConfig();
   }
 
-  initAppConfigInfo() async {
+  _initAppConfigInfo() async {
     languagesKeyList = [];
     languageMap = {};
     Config config = await HandleConfig.instance.getConfig();
@@ -71,22 +71,15 @@ class _EntrancePageState extends State<EntrancePage> {
   }
 
   _checkAndUpdateAppConfig() async {
-    // handle case : DB upgrade.   DB initial installation already finish in func -> initAppConfigInfo()->initDatabaseAndDefaultDigits()
     Config config = await HandleConfig.instance.getConfig();
-
-    // todo replace update Data interface
-    Map resultMap = await Wallets.instance.updateWalletDbData(config.dbVersion);
-    if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
-      Logger().i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
-    }
+    // handle case : Do initial DB and upgrade DB
+    _updateDbVersion(); // todo replace update Data interface
 
     // Interval check config
-    {
-      if (config.lastTimeConfigCheck != null &&
-          ((DateTime.now().millisecondsSinceEpoch - config.lastTimeConfigCheck) - config.intervalMilliseconds * 1000 < 0)) {
-        Logger().i("_checkAndUpdateAppConfig(), nowTimeStamp=>", (DateTime.now().millisecondsSinceEpoch - config.lastTimeConfigCheck).toString());
-        return;
-      }
+    var lastCheckTimeDuration = DateTime.now().millisecondsSinceEpoch - config.lastTimeConfigCheck;
+    if (config.lastTimeConfigCheck != null && (lastCheckTimeDuration - config.intervalMilliseconds * 1000 < 0)) {
+      Logger().i("_checkAndUpdateAppConfig(), nowTimeStamp=>", lastCheckTimeDuration.toString());
+      return;
     }
 
     LatestConfig serverConfigModel;
@@ -94,6 +87,7 @@ class _EntrancePageState extends State<EntrancePage> {
     String signInfo = await AppInfoUtil.instance.getAppSignInfo();
     String deviceId = await AppInfoUtil.instance.getDeviceId();
     String apkVersion = await AppInfoUtil.instance.getAppVersion();
+    // String abiPlatform = await AppInfoUtil.instance.getSupportAbi();
 
     var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
     BasicClientReq basicClientReq = new BasicClientReq();
@@ -101,41 +95,34 @@ class _EntrancePageState extends State<EntrancePage> {
       ..cashboxType = cashBoxType
       ..cashboxVersion = apkVersion
       ..deviceId = deviceId
-      ..platformType = "aarch64-linux-android" // todo replace platform info
+      ..platformType = AppPlatformType.any.toEnumString()
       ..signature = signInfo;
     var channel = createClientChannel(refresh.refreshCall);
-
-    // handle case : Config upgrade.
-    {
-      final configOpenFaceClient = CashboxConfigOpenFaceClient(channel);
-      try {
-        CashboxConfigOpen_LatestConfigRes latestConfigRes = await configOpenFaceClient.latestConfig(basicClientReq);
-        serverConfigModel = LatestConfig.fromJson(json.decode(latestConfigRes.conf));
-      } catch (e) {
-        Logger().e("configOpenFaceClient.latestConfig() ", e.toString());
-        var isUpdateOk = await EeeChainControl.getInstance().updateSubChainBasicInfo("");
-        Logger.getInstance().i("updateSubChainBasicInfo", isUpdateOk.toString());
-        return;
-      }
-    }
-
-    // check and update  EeeChain txVersion and runtimeVersion
+    final configOpenFaceClient = CashboxConfigOpenFaceClient(channel);
     try {
-      SubChainBasicInfo defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo();
-      if (serverConfigModel == null ||
-          defaultBasicInfo == null ||
-          defaultBasicInfo.runtimeVersion == null ||
-          defaultBasicInfo.txVersion == null ||
-          serverConfigModel.eeeRuntimeV == null ||
-          serverConfigModel.eeeTxV == null ||
-          defaultBasicInfo.runtimeVersion.toString() != serverConfigModel.eeeRuntimeV.toString() ||
-          defaultBasicInfo.txVersion.toString() != serverConfigModel.eeeTxV.toString()) {
-        await EeeChainControl.getInstance().updateSubChainBasicInfo("");
-      }
+      CashboxConfigOpen_LatestConfigRes latestConfigRes = await configOpenFaceClient.latestConfig(basicClientReq);
+      serverConfigModel = LatestConfig.fromJson(json.decode(latestConfigRes.conf));
     } catch (e) {
-      Logger().e("updateSubChainBasicInfo error is ---> ", e.toString());
+      Logger.getInstance().e("configOpenFaceClient.latestConfig() ", e.toString());
+      var isUpdateOk = await EeeChainControl.getInstance().updateSubChainBasicInfo("");
+      Logger.getInstance().i("updateSubChainBasicInfo", isUpdateOk.toString());
+      return;
     }
 
+    _updateEeeInfo(serverConfigModel); // check and update  EeeChain txVersion and runtimeVersion
+    _updateLocalConfigInfo(config, serverConfigModel); // handle case : Config upgrade.
+    _updateEthDefaultToken(refresh, basicClientReq, serverConfigModel, config);
+    _updateEeeDefaultToken(refresh, basicClientReq, serverConfigModel, config);
+  }
+
+  _updateDbVersion() async {
+    Map resultMap = await Wallets.instance.updateWalletDbData(config.dbVersion);
+    if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
+      Logger().i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
+    }
+  }
+
+  _updateLocalConfigInfo(Config config, LatestConfig serverConfigModel) async {
     try {
       config.lastTimeConfigCheck = DateTime.now().millisecondsSinceEpoch;
       // config.privateConfig.authDigitVersion = serverConfigModel.authTokenListVersion; // needless save the value
@@ -163,78 +150,177 @@ class _EntrancePageState extends State<EntrancePage> {
     } catch (e) {
       Logger().e("updateConfig error is -----> ", e.toString());
     }
+  }
 
-    UpdateDefaultToken: //update defaultDigitList to native
-    {
-      if (serverConfigModel == null || serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
-        break UpdateDefaultToken;
+  _updateEeeInfo(LatestConfig serverConfigModel) async {
+    try {
+      SubChainBasicInfo defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo();
+      if (serverConfigModel == null ||
+          defaultBasicInfo == null ||
+          defaultBasicInfo.runtimeVersion == null ||
+          defaultBasicInfo.txVersion == null ||
+          serverConfigModel.eeeRuntimeV == null ||
+          serverConfigModel.eeeTxV == null ||
+          defaultBasicInfo.runtimeVersion.toString() != serverConfigModel.eeeRuntimeV.toString() ||
+          defaultBasicInfo.txVersion.toString() != serverConfigModel.eeeTxV.toString()) {
+        await EeeChainControl.getInstance().updateSubChainBasicInfo("");
       }
-      if (config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
-        break UpdateDefaultToken;
-      }
-      try {
-        EthTokenOpen_QueryReq openQueryReq = new EthTokenOpen_QueryReq();
-        PageReq pageReq = PageReq();
-        pageReq..page = 0; // 0 mean to load all data. Not divided by several pages
-        openQueryReq
-          ..info = basicClientReq
-          ..page = pageReq
-          ..isDefault = true;
-        final ethTokenClient = EthTokenOpenFaceClient(channel);
-        EthTokenOpen_QueryRes ethTokenOpenQueryRes = await ethTokenClient.query(openQueryReq);
-        if (ethTokenOpenQueryRes == null) {
-          break UpdateDefaultToken;
-        }
-        ArrayCEthChainTokenDefault defaultTokens = ArrayCEthChainTokenDefault();
-        List<EthChainTokenDefault> ethDefaultTokenList = [];
-        for (var i = 0; i < ethTokenOpenQueryRes.tokens.length; i++) {
-          var element = ethTokenOpenQueryRes.tokens[i];
-          EthChainTokenDefault ethChainTokenDefault = EthChainTokenDefault();
-          ethChainTokenDefault
-            ..ethChainTokenShared.gasLimit = element.gasLimit.toInt()
-            ..netType = element.tokenShared.netType
-            ..ethChainTokenShared.tokenType = element.tokenShared.chainType
-            ..ethChainTokenShared.tokenShared.name = element.tokenShared.name
-            ..ethChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
-            ..ethChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl
-            ..ethChainTokenShared.tokenShared.logoBytes = element.tokenShared.logoBytes
-            ..contractAddress = element.contract ?? ""
-            ..ethChainTokenShared.decimal = element.decimal ?? 0
-            ..position = element.position.toInt();
-          ethDefaultTokenList.add(ethChainTokenDefault);
-        }
-        defaultTokens.data = ethDefaultTokenList;
-        bool isUpdateOk = EthChainControl.getInstance().updateDefaultTokenList(defaultTokens);
-        if (!isUpdateOk) {
-          Logger.getInstance().e("updateDefaultTokenList", "update not ok,and is --->" + isUpdateOk.toString());
-          break UpdateDefaultToken;
-        }
-        // add to wallet
-        if (WalletsControl.getInstance().hasAny()) {
-          for (var i = 0; i < ethDefaultTokenList.length; i++) {
-            var element = ethDefaultTokenList[i];
-            TokenAddress tokenAddress = TokenAddress()
-              ..tokenId = element.chainTokenSharedId
-              ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
-              ..walletId = WalletsControl.getInstance().currentWallet().id
-              ..balance = 0.toString()
-              ..addressId = WalletsControl.getInstance().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, ChainType.ETH) ?? "";
-            bool isUpdateBalanceOk = WalletsControl.getInstance().updateBalance(tokenAddress);
-            if (!isUpdateBalanceOk) {
-              Logger().e("updateBalance error , tokenAddress info is---> ", tokenAddress.toString());
-            }
-          }
-        }
+    } catch (e) {
+      Logger().e("updateSubChainBasicInfo error is ---> ", e.toString());
+    }
+  }
 
-        config.privateConfig.defaultDigitVersion = serverConfigModel.defaultTokenListVersion;
-        bool isSaveOk = await HandleConfig.instance.saveConfig(config);
-        if (!isSaveOk) {
-          Logger().e("saveConfig  is failure---> ", isSaveOk.toString());
-        }
-      } catch (e) {
-        Logger.getInstance().e("updateDefaultDigitList error =====>", e.toString());
-        break UpdateDefaultToken;
+  _updateEthDefaultToken(RefreshOpen refresh, BasicClientReq basicClientReq, LatestConfig serverConfigModel, Config config) async {
+    if (serverConfigModel == null || serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
+      return;
+    }
+    if (config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
+      return;
+    }
+    try {
+      var channel = createClientChannel(refresh.refreshCall);
+      EthTokenOpen_QueryReq openEthQueryReq = new EthTokenOpen_QueryReq();
+      PageReq pageReq = PageReq();
+      pageReq..page = 0; // 0 mean to load all data. Not divided by several pages
+      openEthQueryReq
+        ..info = basicClientReq
+        ..page = pageReq
+        ..isDefault = true;
+      final ethTokenClient = EthTokenOpenFaceClient(channel);
+      EthTokenOpen_QueryRes ethTokenOpenQueryRes = await ethTokenClient.query(openEthQueryReq);
+      if (ethTokenOpenQueryRes == null) {
+        return;
       }
+      ArrayCEthChainTokenDefault defaultTokens = ArrayCEthChainTokenDefault();
+      List<EthChainTokenDefault> ethDefaultTokenList = [];
+      for (var i = 0; i < ethTokenOpenQueryRes.tokens.length; i++) {
+        var element = ethTokenOpenQueryRes.tokens[i];
+        EthChainTokenDefault ethChainTokenDefault = EthChainTokenDefault();
+        ethChainTokenDefault
+          ..ethChainTokenShared.gasLimit = element.gasLimit.toInt()
+          ..netType = element.tokenShared.netType
+          ..ethChainTokenShared.tokenType = element.tokenShared.chainType
+          ..ethChainTokenShared.tokenShared.name = element.tokenShared.name
+          ..ethChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
+          ..ethChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl
+          ..ethChainTokenShared.tokenShared.logoBytes = element.tokenShared.logoBytes
+          ..contractAddress = element.contract ?? ""
+          ..ethChainTokenShared.decimal = element.decimal ?? 0
+          ..position = element.position.toInt();
+        ethDefaultTokenList.add(ethChainTokenDefault);
+      }
+      if (ethDefaultTokenList == null || ethDefaultTokenList.length == 0) {
+        Logger.getInstance().e("updateDefaultTokenList", "ethDefaultTokenList is null --->");
+        return;
+      }
+      defaultTokens.data = ethDefaultTokenList;
+      bool isUpdateOk = EthChainControl.getInstance().updateDefaultTokenList(defaultTokens);
+      if (!isUpdateOk) {
+        Logger.getInstance().e("updateDefaultTokenList", "update not ok,and is --->" + isUpdateOk.toString());
+        return;
+      }
+      // add to wallet
+      // if (WalletsControl.getInstance().hasAny()) {
+      //   for (var i = 0; i < ethDefaultTokenList.length; i++) {
+      //     var element = ethDefaultTokenList[i];
+      //     TokenAddress tokenAddress = TokenAddress()
+      //       ..tokenId = element.chainTokenSharedId
+      //       ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+      //       ..walletId = WalletsControl.getInstance().currentWallet().id
+      //       ..balance = 0.toString()
+      //       ..addressId = WalletsControl.getInstance().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, ChainType.ETH) ?? "";
+      //     bool isUpdateBalanceOk = WalletsControl.getInstance().updateBalance(tokenAddress);
+      //     if (!isUpdateBalanceOk) {
+      //       Logger().e("updateBalance error , tokenAddress info is---> ", tokenAddress.toString());
+      //     }
+      //   }
+      // }
+
+      config.privateConfig.defaultDigitVersion = serverConfigModel.defaultTokenListVersion;
+      bool isSaveOk = await HandleConfig.instance.saveConfig(config);
+      if (!isSaveOk) {
+        Logger().e("saveConfig  is failure---> ", isSaveOk.toString());
+      }
+    } catch (e) {
+      Logger.getInstance().e("updateDefaultDigitList error =====>", e.toString());
+      return;
+    }
+  }
+
+  _updateEeeDefaultToken(RefreshOpen refresh, BasicClientReq basicClientReq, LatestConfig serverConfigModel, Config config) async {
+    if (serverConfigModel == null || serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
+      return;
+    }
+    if (config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
+      return;
+    }
+    try {
+      var channel = createClientChannel(refresh.refreshCall);
+      EeeTokenOpen_QueryReq openEeeQueryReq = new EeeTokenOpen_QueryReq();
+      PageReq pageReq = PageReq();
+      pageReq..page = 0; // 0 mean to load all data. Not divided by several pages
+      openEeeQueryReq
+        ..info = basicClientReq
+        ..page = pageReq
+        ..isDefault = true;
+      final eeeTokenClient = EeeTokenOpenFaceClient(channel);
+      EeeTokenOpen_QueryRes eeeTokenOpenQueryRes = await eeeTokenClient.query(openEeeQueryReq);
+      if (eeeTokenOpenQueryRes == null) {
+        return;
+      }
+      ArrayCEeeChainTokenDefault defaultTokens = ArrayCEeeChainTokenDefault();
+      List<EeeChainTokenDefault> eeeDefaultTokenList = [];
+      for (var i = 0; i < eeeTokenOpenQueryRes.tokens.length; i++) {
+        var element = eeeTokenOpenQueryRes.tokens[i];
+        EeeChainTokenDefault eeeChainTokenDefault = EeeChainTokenDefault();
+        eeeChainTokenDefault
+          ..eeeChainTokenShared.gasLimit = element.gasLimit.toInt()
+          ..netType = element.tokenShared.netType
+          ..eeeChainTokenShared.tokenType = element.tokenShared.chainType
+          ..eeeChainTokenShared.tokenShared.name = element.tokenShared.name
+          ..eeeChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
+          ..eeeChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl
+          ..eeeChainTokenShared.tokenShared.logoBytes = element.tokenShared.logoBytes
+          ..eeeChainTokenShared.decimal = element.decimal ?? 0
+          ..position = element.position.toInt();
+        eeeDefaultTokenList.add(eeeChainTokenDefault);
+      }
+      if (eeeDefaultTokenList == null || eeeDefaultTokenList.length == 0) {
+        Logger.getInstance().e("updateDefaultTokenList", "ethDefaultTokenList is null --->");
+        return;
+      }
+      defaultTokens.data = eeeDefaultTokenList;
+      bool isUpdateOk = EeeChainControl.getInstance().updateDefaultTokenList(defaultTokens);
+      if (!isUpdateOk) {
+        Logger.getInstance().e("updateDefaultTokenList", "update not ok,and is --->" + isUpdateOk.toString());
+        return;
+      }
+      // add to wallet
+      // if (WalletsControl.getInstance().hasAny()) {
+      //   for (var i = 0; i < eeeDefaultTokenList.length; i++) {
+      //     var element = eeeDefaultTokenList[i];
+      //     TokenAddress tokenAddress = TokenAddress()
+      //       ..tokenId = element.chainTokenSharedId
+      //       ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+      //       ..walletId = WalletsControl.getInstance().currentWallet().id
+      //       ..balance = 0.toString()
+      //       ..addressId = WalletsControl.getInstance().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, ChainType.ETH) ?? "";
+      //     bool isUpdateBalanceOk = WalletsControl.getInstance().updateBalance(tokenAddress);
+      //     if (!isUpdateBalanceOk) {
+      //       Logger().e("updateBalance error , tokenAddress info is---> ", tokenAddress.toString());
+      //     }
+      //   }
+      // }
+
+      // when update token ok,change tokenVersion config info
+      config.privateConfig.defaultDigitVersion = serverConfigModel.defaultTokenListVersion;
+      bool isSaveOk = await HandleConfig.instance.saveConfig(config);
+      if (!isSaveOk) {
+        Logger().e("saveConfig  is failure---> ", isSaveOk.toString());
+      }
+    } catch (e) {
+      Logger.getInstance().e("updateDefaultDigitList error =====>", e.toString());
+      return;
     }
   }
 

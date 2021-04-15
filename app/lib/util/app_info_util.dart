@@ -78,8 +78,6 @@ class AppInfoUtil {
   }
 
   DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
-  Map<String, dynamic> _deviceData = <String, dynamic>{};
-  String deviceId = "";
 
   Future<Map<String, dynamic>> _readAndroidBuildData() async {
     var build = await _deviceInfoPlugin.androidInfo;
@@ -133,8 +131,24 @@ class AppInfoUtil {
     };
   }
 
+  Future<dynamic> getSupportAbi() async {
+    Map<String, dynamic> _deviceData = <String, dynamic>{};
+    if (Platform.isAndroid) {
+      _deviceData = await _readAndroidBuildData();
+      if (_deviceData != null) {
+        var abiList = List.castFrom(_deviceData["supportedAbis"]);
+        if (abiList != null && abiList.length > 0) {
+          return abiList[0];
+        }
+      }
+    }
+    return "";
+  }
+
   Future<dynamic> getDeviceId() async {
+    Map<String, dynamic> _deviceData = <String, dynamic>{};
     try {
+      String deviceId = "";
       if (Platform.isAndroid) {
         _deviceData = await _readAndroidBuildData();
         if (_deviceData != null) {

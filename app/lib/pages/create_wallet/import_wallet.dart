@@ -472,6 +472,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
       if (walletObj != null) {
         _mneController.text = "";
         _pwdController.text = "";
+        WalletsControl.getInstance().saveCurrentWalletChain(walletObj.id, EnumKit.ChainType.ETH);
         NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
       } else {
         Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);

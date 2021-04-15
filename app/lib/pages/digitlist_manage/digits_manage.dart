@@ -69,7 +69,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
 
   List<TokenM> loadNativeToken() {
     List<TokenM> nativeTokenMList = [];
-    switch (WalletsControl.getInstance().currentChainType()) {
+    var chainType = WalletsControl.getInstance().currentChainType();
+    switch (chainType) {
       case ChainType.EthTest:
       case ChainType.ETH:
         List<EthChainToken> ethChainTokens = WalletsControl.getInstance().currentWallet().ethChain.tokens.data;
@@ -85,6 +86,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         });
         break;
       default:
+        Logger.getInstance().e("ChainType", "unknown chain type" + chainType.toString());
         break;
     }
 

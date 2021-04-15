@@ -96,6 +96,7 @@ Future<String> loadErc20Balance(String ethAddress, String contractAddress, Chain
       return balance;
     }
   } catch (e) {
+    Logger().e("loadErc20Balance  error ", e.toString());
     return null;
   }
   return null;

@@ -88,7 +88,7 @@ class WalletsControl {
   List<WalletM.Wallet> walletsAll() {
     var allWalletObj = Wallets.mainIsolate().all();
     if (!allWalletObj.isSuccess()) {
-      Logger.getInstance().e("wallet_control", "walletsAll error is ====> " + allWalletObj.err.toString());
+      Logger.getInstance().e("wallet_control", "walletsAll error is ====> " + allWalletObj.err.message.toString());
       return null;
     }
     List<WalletM.Wallet> walletMList = [];

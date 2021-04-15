@@ -35,6 +35,7 @@ class HandleConfig {
       config = Config.fromJson(configMap);
       return config;
     } catch (e) {
+      file.writeAsString("", flush: true);
       return config;
     }
   }
@@ -48,6 +49,7 @@ class HandleConfig {
       String fileString = jsonEncode(config.toJson());
       file.writeAsString(fileString, flush: true);
     } catch (e) {
+      Logger.getInstance().e("saveConfig", "error info is" + e.toString());
       return false;
     }
     return true;

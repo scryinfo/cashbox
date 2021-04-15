@@ -4,7 +4,6 @@ import 'package:app/net/scryx_net_util.dart';
 import 'package:logger/logger.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
-import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 
 class EeeChainControl {
@@ -54,11 +53,10 @@ class EeeChainControl {
         ..urlImg = element.eeeChainTokenShared.tokenShared.logoUrl ?? ""
         // ..contractAddress = element.contractAddress ?? ""
         ..isVisible = element.show_1.isTrue()
-        // ..tokenId = element.ethChainTokenShared.tokenShared.id
+        ..address = nowWallet.eeeChain.chainShared.walletAddress.address
+        ..tokenId = element.chainTokenSharedId
         ..decimal = element.eeeChainTokenShared.decimal ?? 0;
-      if (element.eeeChainTokenShared.tokenShared.name.toLowerCase() == "eee") {
-        newToken.address = nowWallet.eeeChain.chainShared.walletAddress.address;
-      }
+
       _allTokenList.add(newToken);
     });
     return _allTokenList;
@@ -215,18 +213,23 @@ class EeeChainControl {
   }
 
   Future<String> loadEeeStorageKey(String module, String storageItem, String accountStr, {bool isEeeChain = true}) async {
+    if (storageItem == null) {
+      Logger.getInstance().e("loadEeeStorageKey", "storageItem is null");
+      return null;
+    }
     StorageKeyParameters storageKeyParameters = StorageKeyParameters();
     ChainVersion chainVersion = ChainVersion();
     SubChainBasicInfo defaultBasicInfo;
     if (isEeeChain) {
       defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo();
+      chainVersion
+        ..genesisHash = defaultBasicInfo.genesisHash
+        ..txVersion = defaultBasicInfo.txVersion
+        ..runtimeVersion = defaultBasicInfo.runtimeVersion;
     } else {
+      // todo
       defaultBasicInfo = EeeChainControl.getInstance().getBasicInfo(chainVersion);
     }
-    chainVersion
-      ..genesisHash = defaultBasicInfo.genesisHash
-      ..txVersion = defaultBasicInfo.txVersion
-      ..runtimeVersion = defaultBasicInfo.runtimeVersion;
     storageKeyParameters
       ..module = module
       ..storageItem = storageItem
@@ -245,9 +248,7 @@ class EeeChainControl {
     return "0";
   }
 
-  // todo verify
   Future<Map> loadTokenXbalance(String tokenx, String balances, String accountStr) async {
-    Map tokenXResultMap;
     String eeeStorageKey = await loadEeeStorageKey(tokenx, balances, accountStr);
     if (eeeStorageKey == null || eeeStorageKey.trim() == "") {
       return null;
@@ -256,17 +257,7 @@ class EeeChainControl {
     if (netFormatMap == null || !netFormatMap.containsKey("result") || netFormatMap["result"] == null) {
       return null;
     }
-
-    // if (eeeStorageKey != null ) {
-    //   if (eeeStorageKeyMap["status"] != null && eeeStorageKeyMap["status"] == 200 && eeeStorageKeyMap.containsKey("storageKeyInfo")) {
-    //     String storageKeyInfo = eeeStorageKey
-    //     Map netFormatMap = await ScryXNetUtil().loadScryXStorage(storageKeyInfo);
-    //     if (netFormatMap != null && netFormatMap.containsKey("result")) {
-    //       return netFormatMap;
-    //     }
-    //   }
-    // }
-    return tokenXResultMap;
+    return netFormatMap;
   }
 
   Future<AccountInfo> loadEeeStorageMap(String module, String storageItem, String accountStr) async {

@@ -141,7 +141,6 @@ class _EeePageState extends State<EeePage> {
             } catch (e) {
               Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
             }
-            // Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance;
             this.displayTokenMList[index].balance = balance;
           }
         } else if (this.displayTokenMList[index].shortName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
@@ -149,7 +148,8 @@ class _EeePageState extends State<EeePage> {
               await EeeChainControl.getInstance().loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, this.displayTokenMList[index].address);
           if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
             try {
-              double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
+              // double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit; todo
+              double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble();
               balance = tokenBalance.toStringAsFixed(5);
               if (balance == null || double.parse(balance) == double.parse("0")) {
                 continue;
@@ -158,7 +158,6 @@ class _EeePageState extends State<EeePage> {
               Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
             }
             this.displayTokenMList[index].balance = balance ?? "";
-            // Wallets.instance.nowWallet.nowChain.digitsList[index].balance = balance ?? "";
           }
         } else {
           Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
@@ -250,7 +249,7 @@ class _EeePageState extends State<EeePage> {
         brightness: Brightness.light,
         centerTitle: true,
         title: Text(
-          WalletsControl.getInstance().currentWallet().name ?? "",
+          WalletsControl.getInstance().currentWallet()?.name ?? "",
           style: TextStyle(fontSize: 20),
         ),
       ),
