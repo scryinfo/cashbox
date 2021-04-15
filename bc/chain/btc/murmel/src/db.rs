@@ -25,6 +25,10 @@ use rbatis::wrapper::Wrapper;
 use rbatis_core::Error;
 use std::ops::Add;
 
+pub enum BtcTxState {
+
+}
+
 pub struct ChainSqlite {
     rb: Rbatis,
     network: Network,
@@ -176,8 +180,6 @@ impl DetailSqlite {
         DetailSqlite::create_btc_output_tx(rb).await?;
         DetailSqlite::create_btc_chain_tx(rb).await?;
         DetailSqlite::create_local_tx(rb).await?;
-        DetailSqlite::create_btc_tx_state(rb).await?;
-        DetailSqlite::init_state(rb).await?;
         DetailSqlite::create_btc_utxo(rb).await?;
         Ok(())
     }
@@ -206,10 +208,6 @@ impl DetailSqlite {
         rb.exec("", MLocalTxLog::create_table_script()).await
     }
 
-    async fn create_btc_tx_state(rb: &Rbatis) -> Result<DBExecResult, Error> {
-        rb.exec("", MBtcTxState::create_table_script()).await
-    }
-
     async fn create_btc_utxo(rb: &Rbatis) -> Result<DBExecResult, Error> {
         rb.exec("", MBtcUtxo::create_table_script()).await
     }
@@ -225,31 +223,6 @@ impl DetailSqlite {
         );
     }
 
-    // insert statse in m_btc_tx_state
-    async fn init_state(rb: &Rbatis) -> Result<DBExecResult, Error> {
-        let mut state0 = MBtcTxState::default();
-        let mut state1 = MBtcTxState::default();
-        let mut state2 = MBtcTxState::default();
-        let mut state3 = MBtcTxState::default();
-
-        state0.seq = 0;
-        state0.state = "unknown".to_owned();
-        state1.seq = 1;
-        state1.state = "spent".to_owned();
-        state2.seq = 2;
-        state2.state = "unspent".to_owned();
-        state3.seq = 3;
-        state3.state = "locked".to_owned();
-
-        let mut tokens = vec![];
-        tokens.push(state0);
-        tokens.push(state1);
-        tokens.push(state2);
-        tokens.push(state3);
-
-        MBtcTxState::save_batch(&rb, "init_state", &mut tokens).await
-    }
-
     async fn save_progress(&self, header: String, timestamp: String) {
         let mut progress = MProgress::default();
         progress.header = header;
@@ -263,7 +236,7 @@ impl DetailSqlite {
     }
 
     async fn fetch_progress(&self) -> Option<MProgress> {
-        let w = self.rb.new_wrapper().eq("rowid", 1);
+        let w = self.rb.new_wrapper().eq("_ROWID_", 1);
         let r: Result<MProgress, _> = self.rb.fetch_by_wrapper("", &w).await;
         return match r {
             Ok(r) => Some(r),
@@ -396,7 +369,7 @@ impl DetailSqlite {
 
     pub async fn fetch_user_address(&self) -> Option<MUserAddress> {
         //let w = self.rb.new_wrapper().eq("rowid", 1);
-        let w = self.rb.new_wrapper().eq(MUserAddress::create_time, "1618038542");
+        let w = self.rb.new_wrapper().eq("_ROWID_", "1");
         let r: Result<MUserAddress, _> = self.rb.fetch_by_wrapper("", &w).await;
         match r {
             Ok(u) => Some(u),

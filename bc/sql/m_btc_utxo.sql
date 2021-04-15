@@ -10,5 +10,4 @@ CREATE TABLE IF NOT EXISTS m_btc_utxo (
     id TEXT PRIMARY KEY,
     create_time INTEGER NOT NULL,
     update_time INTEGER NOT NULL,
-    FOREIGN KEY(state) REFERENCES m_btc_tx_state(state)
  );
