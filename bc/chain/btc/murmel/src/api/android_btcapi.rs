@@ -1,5 +1,5 @@
 //！ Expose the JNI interface for android functions here is same as btcapi.rs
-#![cfg(target_os = "android")]
+// #![cfg(target_os = "android")]
 #![allow(non_snake_case)]
 
 use super::*;
@@ -27,6 +27,8 @@ use std::str::FromStr;
 use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
+use crate::db::{fetch_scanned_height, RB_CHAIN};
+use futures::executor::block_on;
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -163,12 +165,11 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadMaxBlockNumb
     env: JNIEnv,
     _class: JClass,
 ) -> jstring {
-    let sqlite = lazy_db_default().lock().unwrap();
-    let max_block_number = sqlite.count();
-    let max_block_number = env
-        .new_string(max_block_number.to_string())
+    let h = block_on(RB_CHAIN.fetch_height());
+    let h = env
+        .new_string(h.to_string())
         .expect("Could not create java string!");
-    max_block_number.into_inner()
+    h.into_inner()
 }
 
 #[no_mangle]
@@ -177,13 +178,11 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadNowBlockNumb
     env: JNIEnv,
     class: JClass,
 ) -> jstring {
-    let sqlite = lazy_db_default().lock().unwrap();
-    let height = sqlite.query_scanned_height();
+    let height = fetch_scanned_height();
     let max_block_number = env
         .new_string(height.to_string())
         .expect("Could not create java string!");
-    max_block_number.into_inner()
-}
+    max_block_number.into_inner()}
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -204,80 +203,4 @@ pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcLoadTxHistory(
     offset: JString,
 ) -> jboolean {
     unimplemented!()
-}
-
-// this function don't have any return value。because it will run spv node
-#[no_mangle]
-#[allow(non_snake_case)]
-pub extern "system" fn Java_info_scry_wallet_1manager_BtcLib_btcStart(
-    env: JNIEnv,
-    _class: JClass,
-    network: JString,
-) {
-    // TODO
-    // use testnet for test and default
-    // must change it in future
-    // should def it by network parameter，maybe you should give a wallet id
-    // connections = 1,
-    // peers birth listen all default value
-    // open db and sqlite in default name
-    // use simple_logger in Debug Level
-    simple_logger::init_with_level(Level::Debug).unwrap();
-    let network_str = env.get_string(network).unwrap();
-    let network_str = network_str.to_str().unwrap();
-    let mut network = Network::Testnet;
-
-    match network_str {
-        "Testnet" => {
-            network = Network::Testnet;
-            info!("Start with testnet")
-        }
-        "Bitcoin" => {
-            network = Network::Bitcoin;
-            info!("Start with Bitcoin")
-        }
-        _ => {
-            network = Network::Testnet;
-            info!("Start with testnet")
-        }
-    }
-
-    let mut peers: Vec<SocketAddr> = Vec::new();
-    peers.push(SocketAddr::from(SocketAddrV4::new(
-        Ipv4Addr::new(127, 0, 0, 1),
-        8333,
-    )));
-
-    let connections = 1;
-    let listen: Vec<SocketAddr> = Vec::new();
-    let birth: u64 = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .unwrap()
-        .as_secs();
-    let chaindb = Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap();
-
-    // todo
-    // use mnemonic generate publc address and store it in database
-    let mut filter_message: Option<FilterLoadMessage> = None;
-    {
-        let sqlite = lazy_db_default().lock().unwrap();
-        let pubkey = sqlite.query_compressed_pub_key();
-        if let Some(pubkey) = pubkey {
-            info!("Calc bloomfilter via pubkey {:?}", &pubkey);
-            let filter_load_message = FilterLoadMessage::calculate_filter(pubkey.as_str());
-            filter_message = Some(filter_load_message)
-        } else {
-            info!("Did not have default pubkey in database yet");
-            let default_address = calc_default_address();
-            let address = default_address.to_string();
-            let default_pubkey = calc_pubkey();
-            sqlite.insert_compressed_pub_key(address, default_pubkey.clone());
-            let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
-            filter_message = Some(filter_load_message)
-        }
-    }
-
-    let mut spv = Constructor::new(network, listen, chaindb, filter_message).unwrap();
-    spv.run(network, peers, connections)
-        .expect("can not start node");
 }
