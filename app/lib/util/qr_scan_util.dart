@@ -67,7 +67,7 @@ class QrScanUtil {
       return null;
     }
     //--------------------------Check parameters-----------------------
-    print("paramsMap======>" + paramsMap.toString());
+    Logger.getInstance().i("paramsMap======>", paramsMap.toString());
     if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
       Fluttertoast.showToast(msg: translate('qr_info_is_out_of_date'));
       return null; //There is a problem with the validity period

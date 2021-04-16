@@ -44,7 +44,6 @@ class Routes {
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-      print('ERROR====>ROUTE WAS NOT FONUND!!!');
       Logger().e("Routers error is=>", "noFoundHandler");
     });
 

@@ -165,39 +165,44 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           ..contractAddress = element.contractAddress
           ..decimal = element.ethChainTokenShared.decimal
           ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
-          ..isVisible = false;
-        if (element.ethChainTokenShared.tokenShared.symbol.toLowerCase() == ChainType.ETH.toEnumString().toLowerCase()) {
-          tokenM.address = WalletsControl().currentWallet().ethChain.chainShared.walletAddress.address;
-        }
+          ..isVisible = false
+          ..address = WalletsControl().currentWallet().ethChain.chainShared.walletAddress.address;
         nativeTokenMList.add(tokenM);
       });
       return nativeTokenMList;
     } catch (e) {
-      print("EthTokenOpen_QueryReq  error is ------>" + e.toString());
+      Logger.getInstance().e("formatTokenMList", "error info is ------>" + e.toString());
       return null;
     }
   }
 
   saveToAuthToken(List<EthTokenOpen_Token> ethTokenList) async {
     List<EthChainTokenAuth> ethChainTokenList = [];
-    ethTokenList.forEach((element) {
+    for (var index = 0; index < ethTokenList.length; index++) {
+      var element = ethTokenList[index];
       EthChainTokenAuth ethChainTokenAuth = EthChainTokenAuth();
-      ethChainTokenAuth
-        ..chainTokenSharedId = element.tokenShardId
-        ..position = element.position.toInt()
-        ..contractAddress = element.contract
-        ..netType = element.tokenShared.chainType
-        ..ethChainTokenShared.decimal = element.decimal
-        ..netType = element.tokenShared.netType
-        ..ethChainTokenShared.tokenShared.name = element.tokenShared.name
-        ..ethChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
-        ..ethChainTokenShared.gasLimit = element.gasLimit.toInt()
-        ..ethChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl;
-      ethChainTokenList.add(ethChainTokenAuth);
-    });
+      var chainTypeStr = element.tokenShared.chainType.toLowerCase();
+      if (ChainType.ETH.toEnumString().toLowerCase() == chainTypeStr || ChainType.EthTest.toEnumString().toLowerCase() == chainTypeStr) {
+        ethChainTokenAuth
+          ..chainTokenSharedId = element.tokenShardId
+          ..position = element.position.toInt()
+          ..contractAddress = element.contract
+          ..netType = element.tokenShared.chainType
+          ..ethChainTokenShared.decimal = element.decimal
+          ..netType = element.tokenShared.netType
+          ..ethChainTokenShared.tokenShared.name = element.tokenShared.name
+          ..ethChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
+          ..ethChainTokenShared.gasLimit = element.gasLimit.toInt()
+          ..ethChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl;
+        ethChainTokenList.add(ethChainTokenAuth);
+      }
+    }
+
     ArrayCEthChainTokenAuth arrayCEthChainTokenAuth = ArrayCEthChainTokenAuth();
-    arrayCEthChainTokenAuth.data = ethChainTokenList;
-    EthChainControl.getInstance().updateAuthTokenList(arrayCEthChainTokenAuth);
+    if (ethChainTokenList.length > 0) {
+      arrayCEthChainTokenAuth.data = ethChainTokenList;
+      EthChainControl.getInstance().updateAuthTokenList(arrayCEthChainTokenAuth);
+    }
   }
 
   @override

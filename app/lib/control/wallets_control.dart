@@ -45,10 +45,9 @@ class WalletsControl {
     }
     var errObj = wallets.init(initP);
     if (errObj.isSuccess()) {
-      print("success  initWallet --->" + errObj.toString());
       return wallets;
     } else {
-      print("err initWallet--->" + errObj.toString());
+      Logger.getInstance().e("initWallet ", "errObj is --->" + errObj.toString());
       return null;
     }
   }
