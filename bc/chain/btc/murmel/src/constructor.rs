@@ -57,6 +57,7 @@ use std::{
     path::Path,
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
+use std::borrow::BorrowMut;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 

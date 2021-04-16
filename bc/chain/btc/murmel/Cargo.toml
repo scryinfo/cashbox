@@ -42,7 +42,7 @@ hammersbald = { version = "2.4", features = ["bitcoin_support"] }
 lightning = { version = "0.0.9", optional = true }
 log = "0.4"
 lru-cache = "0.1.1"
-mio = "0.6"
+mio = { version = "=0.6.23"}
 rand = "0.7"
 serde_derive = "1"
 simple_logger = "1.11.0"

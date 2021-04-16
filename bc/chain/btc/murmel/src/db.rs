@@ -222,10 +222,10 @@ impl DetailSqlite {
         rb.exec("", MBtcUtxo::create_table_script()).await
     }
 
-    pub async fn save_state(&self, seq: u16, state: String) {
+    pub async fn save_state(&self, seq: u16, state: BtcTxState) {
         let mut tx_state = MBtcTxState::default();
         tx_state.seq = seq;
-        tx_state.state = state;
+        tx_state.state = state.to_string();
         let r = tx_state.save(&self.rb, "").await;
         r.map_or_else(
             |e| error!("error save_state {:?}", e),
@@ -459,7 +459,7 @@ impl DetailSqlite {
                 match r {
                     None => {
                         let mut utxo = MBtcUtxo::default();
-                        utxo.state = "unspent".to_owned();
+                        utxo.state = BtcTxState::Unspent.to_string();
                         utxo.btc_tx_hash = this_output.btc_tx_hash.clone();
                         utxo.idx = this_output.idx;
                         utxo.btc_tx_hexbytes = this_output.btc_tx_hexbytes;
@@ -469,7 +469,7 @@ impl DetailSqlite {
                     }
                     Some(input) => {
                         let mut utxo = MBtcUtxo::default();
-                        utxo.state = "spent".to_owned();
+                        utxo.state = BtcTxState::Spent.to_string();
                         utxo.btc_tx_hash = this_output.btc_tx_hash.clone();
                         utxo.idx = this_output.idx;
                         utxo.btc_tx_hexbytes = this_output.btc_tx_hexbytes;
