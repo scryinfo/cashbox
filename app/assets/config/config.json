@@ -34,15 +34,15 @@
   },
   "maxGasPrice": {
     "ethGasPrice": 100,
-    "erc20GasPrice": 20
+    "erc20GasPrice": 100
   },
   "minGasPrice": {
-    "ethGasPrice": 2,
-    "erc20GasPrice": 2
+    "ethGasPrice": 10,
+    "erc20GasPrice": 10
   },
   "defaultGasPrice": {
-    "ethGasPrice": 9,
-    "erc20GasPrice": 6
+    "ethGasPrice": 30,
+    "erc20GasPrice": 30
   },
   "dbVersion": "1.1.0",
   "ethUnit": "1000000000000000000",
@@ -101,7 +101,7 @@
     "scryXIp": "",
     "publicIp": "https://cap/pub",
     "nowDbVersion": "1.1.0",
-    "etherscanKey": "XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1",
+    "etherscanKey": "",
     "dddMainNetCA": "",
     "dddTestNetCA": "",
     "d2eMainNetEthAddress": "",

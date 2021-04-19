@@ -1,9 +1,7 @@
-import 'package:app/model/chain.dart';
+import 'package:app/control/eee_chain_control.dart';
+import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/token.dart';
-import 'package:app/model/token_rate.dart';
-import 'package:app/model/wallet.dart';
-import 'package:app/model/wallets.dart';
-import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -28,8 +26,7 @@ class DigitListPage extends StatefulWidget {
 
 class _DigitListPageState extends State<DigitListPage> {
   static int singleDigitCount = 20; //Display 20 items of data on a single page, update and update 20 items at a time
-  Wallet nowWalletM;
-  Chain nowChain;
+
   String nowChainAddress = "";
   List<TokenM> nowChainDigitsList = [];
   List<TokenM> displayDigitsList = [];
@@ -41,12 +38,18 @@ class _DigitListPageState extends State<DigitListPage> {
   }
 
   initData() async {
-    nowWalletM = Wallets.instance.nowWallet;
-    if (nowWalletM != null) {
-      nowChain = nowWalletM.nowChain;
-    }
-    if (nowChain != null) {
-      nowChainDigitsList = nowChain.digitsList;
+    var curChainType = WalletsControl.getInstance().currentChainType();
+    switch (curChainType) {
+      case ChainType.ETH:
+      case ChainType.EthTest:
+        nowChainDigitsList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl().currentWallet());
+        break;
+      case ChainType.EEE:
+      case ChainType.EeeTest:
+        nowChainDigitsList = EeeChainControl.getInstance().getVisibleTokenList(WalletsControl().currentWallet());
+        break;
+      default:
+        break;
     }
     await loadDisplayDigitListData();
   }
@@ -138,13 +141,13 @@ class _DigitListPageState extends State<DigitListPage> {
                   ..setDigitName(displayDigitsList[index].shortName)
                   ..setBalance(displayDigitsList[index].balance)
                   ..setDecimal(displayDigitsList[index].decimal)
-                  ..setFromAddress(nowChain.chainAddress)
-                  ..setChainType(nowChain.chainType)
+                  ..setFromAddress(WalletsControl.getInstance().currentChainAddress())
+                  ..setChainType(WalletsControl.getInstance().currentChainType())
                   ..setContractAddress(displayDigitsList[index].contractAddress ?? "");
               } catch (e) {
                 Logger().e("digit_list_page", e.toString());
               }
-              switch (Wallets.instance.nowWallet.nowChain.chainType) {
+              switch (WalletsControl.getInstance().currentChainType()) {
                 case ChainType.ETH:
                 case ChainType.EthTest:
                   NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);

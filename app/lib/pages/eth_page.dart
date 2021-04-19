@@ -546,7 +546,7 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
             onTap: () {
-              Provider.of<TransactionProvide>(context)..setChainType(Wallets.instance.nowWallet.nowChain.chainType);
+              context.read<TransactionProvide>().setChainType(WalletsControl.getInstance().currentChainType());
               NavigatorUtils.push(context, Routes.digitListPage);
             },
           ),
@@ -568,7 +568,7 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
             onTap: () {
-              _navigatorToQrInfoPage(walletName, translate('chain_address_info'), Wallets.instance.nowWallet.nowChain.chainAddress);
+              _navigatorToQrInfoPage(walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress());
             },
           )
         ],
@@ -719,9 +719,9 @@ class _EthPageState extends State<EthPage> {
           Container(
             child: GestureDetector(
               onTap: () {
-                // if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
-                //   return;
-                // }
+                if (walletName.isEmpty || WalletsControl.getInstance().currentChainAddress().isEmpty) {
+                  return;
+                }
                 _navigatorToQrInfoPage(walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress() ?? "");
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),

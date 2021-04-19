@@ -50,13 +50,11 @@ class EthChainControl {
         ..fullName = element.ethChainTokenShared.tokenShared.name ?? ""
         ..shortName = element.ethChainTokenShared.tokenShared.symbol ?? ""
         ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
+        ..address = nowWallet.ethChain.chainShared.walletAddress.address
         ..contractAddress = element.contractAddress ?? ""
         ..isVisible = element.show_1.isTrue()
         ..tokenId = element.chainTokenSharedId
         ..decimal = element.ethChainTokenShared.decimal ?? 0;
-      if (element.ethChainTokenShared.tokenShared.symbol.toLowerCase() == ChainType.ETH.toEnumString().toLowerCase()) {
-        newToken.address = nowWallet.ethChain.chainShared.walletAddress.address;
-      }
       _allTokenList.add(newToken);
     });
     return _allTokenList;

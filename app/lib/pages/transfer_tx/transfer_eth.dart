@@ -95,7 +95,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
     Config config = await HandleConfig.instance.getConfig();
     if (contractAddress != null && contractAddress.trim() != "") {
-      mMaxGasPrice = config.maxGasLimit.erc20GasLimit;
+      mMaxGasPrice = config.maxGasPrice.erc20GasPrice;
       mMinGasPrice = config.minGasPrice.erc20GasPrice;
       mMaxGasLimit = config.maxGasLimit.erc20GasLimit;
       mMinGasLimit = config.minGasLimit.erc20GasLimit;
