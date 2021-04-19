@@ -45,7 +45,7 @@ class _MinePageState extends State<MinePage> {
         Gaps.scaleVGap(5),
         //_buildMoneyUnitWidget(),
         _buildWalletListWidget(),
-        _buildTestWalletWidget(),
+        // _buildTestWalletWidget(),
         _buildChangeNetTypeWidget(),
         _buildLanguageChooseWidget(),
         _buildClearCacheWidget(),

@@ -51,7 +51,7 @@ class TokenRate {
   }
 
   String decorateChangeDaily(double changeDaily) {
-    if (changeDaily > 0) {
+    if (changeDaily >= 0) {
       return changeDaily.toStringAsFixed(5) + "%" + "↑";
     }
     return changeDaily.toStringAsFixed(5) + "%" + "↓";

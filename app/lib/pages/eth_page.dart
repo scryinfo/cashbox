@@ -425,7 +425,7 @@ class _EthPageState extends State<EthPage> {
                                   (displayTokenMList[index].shortName ?? "") + "  *" + (displayTokenMList[index].balance ?? "0.00"),
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: ScreenUtil().setSp(3.3),
+                                    fontSize: ScreenUtil().setSp(3.5),
                                   ),
                                 ),
                               ),
@@ -439,7 +439,7 @@ class _EthPageState extends State<EthPage> {
                                     maxLines: 2,
                                     overflow: TextOverflow.visible,
                                     textAlign: TextAlign.right,
-                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3.3)),
+                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3.5)),
                                   ),
                                 ),
                               ),
@@ -460,13 +460,13 @@ class _EthPageState extends State<EthPage> {
                                 children: <Widget>[
                                   Container(
                                       color: Colors.transparent,
-                                      width: ScreenUtil().setWidth(22),
+                                      width: ScreenUtil().setWidth(18),
                                       child: Text(
                                           moneyUnitStr +
                                               " " +
                                               (rateInstance == null
                                                   ? ""
-                                                  : rateInstance.getPrice(displayTokenMList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
+                                                  : rateInstance.getPrice(displayTokenMList[index]).toStringAsFixed(3) ?? "0"), //Market unit price
                                           style: TextStyle(
                                             color: Colors.lightBlueAccent,
                                             fontSize: ScreenUtil().setSp(2.3),
