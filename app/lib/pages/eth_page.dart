@@ -413,7 +413,7 @@ class _EthPageState extends State<EthPage> {
                         Container(
                           color: Colors.transparent,
                           padding: EdgeInsets.only(
-                            top: ScreenUtil().setHeight(3),
+                            top: ScreenUtil().setHeight(3.3),
                           ),
                           width: ScreenUtil().setWidth(65),
                           height: ScreenUtil().setHeight(10),
@@ -422,10 +422,10 @@ class _EthPageState extends State<EthPage> {
                               Align(
                                 alignment: new FractionalOffset(0.0, 0.0),
                                 child: Text(
-                                  (displayTokenMList[index].shortName ?? "") + " * " + (displayTokenMList[index].balance ?? "0.00"),
+                                  (displayTokenMList[index].shortName ?? "") + "  *" + (displayTokenMList[index].balance ?? "0.00"),
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: ScreenUtil().setSp(3),
+                                    fontSize: ScreenUtil().setSp(3.3),
                                   ),
                                 ),
                               ),
@@ -439,7 +439,7 @@ class _EthPageState extends State<EthPage> {
                                     maxLines: 2,
                                     overflow: TextOverflow.visible,
                                     textAlign: TextAlign.right,
-                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3)),
+                                    style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(3.3)),
                                   ),
                                 ),
                               ),
@@ -448,7 +448,7 @@ class _EthPageState extends State<EthPage> {
                         ),
                         Container(
                           padding: EdgeInsets.only(
-                            top: ScreenUtil().setHeight(1),
+                            top: ScreenUtil().setHeight(0.5),
                           ),
                           color: Colors.transparent,
                           width: ScreenUtil().setWidth(65),
@@ -458,19 +458,21 @@ class _EthPageState extends State<EthPage> {
                             children: <Widget>[
                               Row(
                                 children: <Widget>[
-                                  Text(
-                                    moneyUnitStr +
-                                        " " +
-                                        (rateInstance == null
-                                            ? ""
-                                            : rateInstance.getPrice(displayTokenMList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
-                                    style: TextStyle(
-                                      color: Colors.lightBlueAccent,
-                                      fontSize: ScreenUtil().setSp(2.5),
-                                    ),
-                                  ),
+                                  Container(
+                                      color: Colors.transparent,
+                                      width: ScreenUtil().setWidth(22),
+                                      child: Text(
+                                          moneyUnitStr +
+                                              " " +
+                                              (rateInstance == null
+                                                  ? ""
+                                                  : rateInstance.getPrice(displayTokenMList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
+                                          style: TextStyle(
+                                            color: Colors.lightBlueAccent,
+                                            fontSize: ScreenUtil().setSp(2.3),
+                                          ))),
                                   Padding(
-                                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(30.5)),
+                                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(0.01)),
                                     child: Text(
                                       rateInstance == null
                                           ? "0% ↑"
@@ -483,7 +485,7 @@ class _EthPageState extends State<EthPage> {
                               Align(
                                   alignment: FractionalOffset.topRight,
                                   child: Opacity(
-                                    opacity: 0,
+                                    opacity: 1,
                                     child: Text(
                                       "0", //Last transaction
                                       style: TextStyle(fontSize: ScreenUtil().setSp(2.5), color: Colors.greenAccent),
