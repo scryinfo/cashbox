@@ -33,7 +33,7 @@
     "erc20GasLimit": 70000
   },
   "maxGasPrice": {
-    "ethGasPrice": 30,
+    "ethGasPrice": 100,
     "erc20GasPrice": 20
   },
   "minGasPrice": {
@@ -53,7 +53,7 @@
   "balanceSymbol": "Balances",
   "eeeSymbol": "Eee",
   "privateConfig": {
-    "serverConfigIp": "http://192.168.2.:8080/inner_api/config/info",
+    "serverConfigIp": "http://192.168.2.57:8080/inner_api/config/info",
     "serverApkVersion": "2.1.0",
     "configVersion": "1.0.0",
     "downloadAppUrl": "333",

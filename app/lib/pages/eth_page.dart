@@ -16,8 +16,6 @@ import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:logger/logger.dart';
-import 'package:app/util/app_info_util.dart';
-import 'package:app/util/utils.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -130,12 +128,15 @@ class _EthPageState extends State<EthPage> {
       for (var i = 0; i < displayTokenMList.length; i++) {
         int index = i;
         String balance = "0";
-        if (this.displayTokenMList[index].contractAddress != null && this.displayTokenMList[index].contractAddress.trim() != "") {
-          balance = await loadErc20Balance(
-              WalletsControl().currentChainAddress() ?? "", this.displayTokenMList[index].contractAddress, WalletsControl().currentChainType());
+        var curChainAddress = WalletsControl().currentChainAddress();
+        var curChainType = WalletsControl().currentChainType();
+        if (curChainAddress == null && curChainAddress.trim() == "") {
+          return;
         }
-        if (WalletsControl().currentChainAddress() != null && WalletsControl().currentChainAddress().trim() != "") {
-          balance = await loadEthBalance(WalletsControl().currentChainAddress() ?? "", WalletsControl().currentChainType());
+        if (this.displayTokenMList[index].contractAddress != null && this.displayTokenMList[index].contractAddress.trim() != "") {
+          balance = await loadErc20Balance(curChainAddress ?? "", this.displayTokenMList[index].contractAddress, curChainType);
+        } else {
+          balance = await loadEthBalance(curChainAddress ?? "", curChainType);
         }
         if (balance == null || double.parse(balance) == double.parse("0")) {
           continue;
@@ -148,9 +149,9 @@ class _EthPageState extends State<EthPage> {
         }
         WalletDy.TokenAddress tokenAddress = WalletDy.TokenAddress()
           ..walletId = WalletsControl.getInstance().currentWallet().id
-          ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+          ..chainType = curChainType.toEnumString()
           ..tokenId = this.displayTokenMList[index].tokenId
-          ..addressId = WalletsControl.getInstance().currentChainAddress()
+          ..addressId = curChainAddress
           ..balance = balance;
         WalletsControl.getInstance().updateBalance(tokenAddress);
       }
@@ -167,16 +168,15 @@ class _EthPageState extends State<EthPage> {
       _loadingDigitMoneyTask.cancel();
     }
     _loadingDigitMoneyTask = Timer(const Duration(milliseconds: 1000), () async {
+      nowWalletAmount = 0;
       for (var i = 0; i < displayTokenMList.length; i++) {
         var index = i;
-        nowWalletAmount = 0;
         var money = TokenRate.instance.getMoney(displayTokenMList[index]).toStringAsFixed(3);
         allVisibleTokenMList[i].money = money;
         if (mounted) {
           setState(() {
-            nowWalletAmount = nowWalletAmount + TokenRate.instance.getMoney(displayTokenMList[index]);
-            // Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
             displayTokenMList[index].money = money;
+            nowWalletAmount = nowWalletAmount + TokenRate.instance.getMoney(displayTokenMList[index]);
           });
         }
       }
