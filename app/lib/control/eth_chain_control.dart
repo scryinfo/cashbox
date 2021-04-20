@@ -84,7 +84,7 @@ class EthChainControl {
     return dataObj.data1;
   }
 
-  rawTxSign(EthRawTxPayload rawTxPayload, NoCacheString password) {
+  String rawTxSign(EthRawTxPayload rawTxPayload, NoCacheString password) {
     var dataObj = Wallets.mainIsolate().chainEth.rawTxSign(rawTxPayload, password);
     if (!dataObj.isSuccess()) {
       return null;

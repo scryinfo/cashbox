@@ -187,14 +187,6 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
-  bool updateBasicInfo(SubChainBasicInfo subChainBasicInfo) {
-    var dataObj = Wallets.mainIsolate().chainEee.updateBasicInfo(subChainBasicInfo);
-    if (!dataObj.isSuccess()) {
-      return null;
-    }
-    return dataObj.data1;
-  }
-
   bool updateDefaultTokenList(ArrayCEeeChainTokenDefault arrayCEeeChainTokenDefault) {
     var dataObj = Wallets.mainIsolate().chainEee.updateDefaultTokenList(arrayCEeeChainTokenDefault);
     if (!dataObj.isSuccess()) {
@@ -283,6 +275,15 @@ class EeeChainControl {
       return eeeResultMap.nonce;
     }
     return 0;
+  }
+
+  bool updateBasicInfo(SubChainBasicInfo subChainBasicInfo) {
+    var dataObj = Wallets.mainIsolate().chainEee.updateBasicInfo(subChainBasicInfo);
+    if (!dataObj.isSuccess()) {
+      Logger.getInstance().e("updateBasicInfo", dataObj.err.message.toString());
+      return false;
+    }
+    return dataObj.data1;
   }
 
   Future<bool> updateSubChainBasicInfo(String infoId) async {

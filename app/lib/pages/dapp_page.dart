@@ -1,11 +1,10 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/model/chain.dart';
-import 'package:app/model/wallet.dart';
-import 'package:app/model/wallets.dart';
+import 'package:app/control/eee_chain_control.dart';
+import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -23,7 +22,9 @@ import 'package:package_info/package_info.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:wallets/kits.dart';
 
 class DappPage extends StatefulWidget {
   @override
@@ -68,7 +69,6 @@ class Message {
 
 class _DappPageState extends State<DappPage> {
   WebViewController _controller;
-  Wallet nowWallet;
   final cookieManager = new CookieManager();
 
   Future<String> _loadDappUrl() async {
@@ -114,61 +114,40 @@ class _DappPageState extends State<DappPage> {
                         return NavigationDecision.navigate;
                       },
                       onPageFinished: (String url) async {
-                        await Wallets.instance.loadAllWalletList(isForceLoadFromJni: false);
-                        nowWallet = Wallets.instance.nowWallet;
-                        // todo chainType
-                        /*{
+                        {
                           //eee
                           String address = '';
-                          {
-                            address = nowWallet.getChainByChainType(ChainType.EEE)?.chainAddress;
-                            if (address == null || address.isEmpty) {
-                              address = nowWallet.getChainByChainType(ChainType.EEE_TEST)?.chainAddress;
-                            }
-                          }
+                          address = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address;
                           if (address != null && address.isNotEmpty) {
-                            // _controller?.evaluateJavascript('nativeChainAddressToJsResult("$address")')?.then((
-                            //     result) {}); //Pass the wallet EEE chain address to DApp record storage, this will be remove
                             String script = 'if(window.$CashboxEeeName){$CashboxEeeName.$setAddress("$address")}';
                             _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                           } else {
-                            print('Page finished loading================================>:eee address is null');
+                            Logger.getInstance().w("dapp interaction ", ':eee address is null');
                           }
-                        }*/
+                        }
 
-                        /*{
+                        {
                           //eth
                           String address = '';
-                          {
-                            address = nowWallet.getChainByChainType(ChainType.ETH)?.chainAddress;
-                            if (address == null || address.isEmpty) {
-                              address = nowWallet.getChainByChainType(ChainType.ETH_TEST)?.chainAddress;
-                            }
-                          }
+                          address = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
                           if (address != null && address.isNotEmpty) {
                             String script = 'if(window.$CashboxEthName){$CashboxEthName.$setAddress("$address")}';
                             _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                           } else {
-                            print('Page finished loading================================>:eth address is null');
+                            Logger.getInstance().w("dapp interaction ", ':eth address is null');
                           }
                         }
-*/
-                        /*{
+                        {
                           //btc
                           String address = '';
-                          {
-                            address = nowWallet.getChainByChainType(ChainType.BTC)?.chainAddress;
-                            if (address == null || address.isEmpty) {
-                              address = nowWallet.getChainByChainType(ChainType.BTC_TEST)?.chainAddress;
-                            }
-                          }
+                          address = address = WalletsControl.getInstance().currentWallet().btcChain.chainShared.walletAddress.address;
                           if (address != null && address.isNotEmpty) {
                             String script = 'if(window.$CashboxBtcName){$CashboxBtcName.$setAddress("$address")}';
                             _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                           } else {
-                            print('Page finished loading================================>:btc address is null');
+                            Logger.getInstance().w("dapp interaction ", ':btc address is null');
                           }
-                        }*/
+                        }
                         print('Page finished loading================================>: $url');
                       },
                     ),
@@ -264,30 +243,24 @@ class _DappPageState extends State<DappPage> {
             builder: (BuildContext context) {
               return PwdDialog(
                 title: translate('wallet_pwd').toString(),
-                hintContent: translate('dapp_sign_hint_content') + nowWallet.walletName ?? "",
+                hintContent: translate('dapp_sign_hint_content') + WalletsControl.getInstance().currentWallet().name ?? "",
                 hintInput: translate('input_pwd_hint').toString(),
                 onPressed: (pwd) async {
-                  var pwdFormat = pwd.codeUnits;
-                  String walletId = await Wallets.instance.getNowWalletId();
                   var msg = Message.fromJson(jsonDecode(message.message));
-                  Map map = await Wallets.instance.eeeTxSign(walletId, Uint8List.fromList(pwdFormat), msg.data);
-                  if (map.containsKey("status")) {
-                    int status = map["status"];
-                    if (status == null || status != 200) {
-                      Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
-                      NavigatorUtils.goBack(context);
-                      return null;
-                    } else {
-                      var signResult = map["signedInfo"];
-                      msg.data = signResult;
-                      Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
-                      this.callPromise(msg);
-                      NavigatorUtils.goBack(context);
-                    }
-                  } else {
+                  RawTxParam rawTxParam = RawTxParam()
+                    ..walletId = WalletsControl.getInstance().currentWallet().id
+                    ..password = pwd
+                    ..rawTx = msg.data;
+                  var signResult = EeeChainControl.getInstance().txSign(rawTxParam);
+                  if (signResult == null || signResult.trim().isEmpty) {
                     Fluttertoast.showToast(msg: translate('tx_sign_failure').toString());
                     NavigatorUtils.goBack(context);
+                    return null;
                   }
+                  msg.data = signResult;
+                  Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
+                  this.callPromise(msg);
+                  NavigatorUtils.goBack(context);
                 },
               );
             },
@@ -306,17 +279,19 @@ class _DappPageState extends State<DappPage> {
           print("NativeSignMsg 从NativeSaveDappChainInfo传回来的参数======>： ${message.message}");
           var subChainInfo = SubChainInfo.fromJson(jsonDecode(message.message));
           print("subChainInfo--->" + subChainInfo.toString());
-          Map updateMap = await Wallets.instance.updateSubChainBasicInfo(
-              "",
-              subChainInfo.specVersion ?? 0,
-              subChainInfo.txVersion ?? 0,
-              subChainInfo.genesisHash ?? "",
-              subChainInfo.metadata ?? "",
-              subChainInfo.ss58Format ?? 0,
-              subChainInfo.tokenDecimals ?? 0,
-              subChainInfo.tokenSymbol ?? "",
-              isDefault: false);
-          print("dapp page updateSubChainBasicInfo--->" + updateMap.toString());
+          SubChainBasicInfo subChainBasicInfo = SubChainBasicInfo()
+            ..runtimeVersion = subChainInfo.specVersion
+            ..txVersion = subChainInfo.txVersion
+            ..genesisHash = subChainInfo.genesisHash
+            ..metadata = subChainInfo.metadata
+            ..ss58FormatPrefix = subChainInfo.ss58Format
+            ..tokenDecimals = subChainInfo.tokenDecimals
+            ..tokenSymbol = subChainInfo.tokenSymbol
+            ..isDefault = false.toInt();
+          bool isUpdateOk = EeeChainControl.getInstance().updateBasicInfo(subChainBasicInfo);
+          if (!isUpdateOk) {
+            Logger.getInstance().e("isUpdateOk", isUpdateOk.toString());
+          }
         }));
 
     jsChannelList.add(JavascriptChannel(
@@ -372,6 +347,7 @@ class _DappPageState extends State<DappPage> {
             msg.err = '';
           } catch (e) {
             msg.err = 'cashboxTextFromClipboard error';
+            Logger.getInstance().e("cashboxTextFromClipboard: ", e.toString());
           }
           this.callPromise(msg);
         }));
@@ -380,18 +356,14 @@ class _DappPageState extends State<DappPage> {
         onMessageReceived: (JavascriptMessage message) async {
           var msg = Message.fromJson(jsonDecode(message.message));
           try {
-            Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
-            ChainType chainType = ChainType.ETH;
-            // if (wallet.walletType == WalletType.TEST_WALLET) {
-            //   chainType = ChainType.ETH_TEST;
-            // }
-            loadTxAccount(wallet.getChainByChainType(chainType).chainAddress, chainType).then((nonce) {
+            EthChain ethChain = WalletsControl.getInstance().currentWallet().ethChain;
+            loadTxAccount(ethChain.chainShared.walletAddress.address, ethChain.chainShared.chainType.toChainType()).then((nonce) {
               msg.data = nonce;
               this.callPromise(msg);
             });
           } catch (e) {
             msg.err = "inner error";
-            print("cashboxEthNonce: " + e.toString());
+            Logger.getInstance().e("cashboxEthNonce: ", e.toString());
             this.callPromise(msg);
           }
         }));
@@ -406,41 +378,27 @@ class _DappPageState extends State<DappPage> {
             builder: (BuildContext context) {
               return PwdDialog(
                 title: translate('wallet_pwd').toString(),
-                hintContent: translate('dapp_sign_hint_content') + nowWallet.walletName ?? "",
+                hintContent: translate('dapp_sign_hint_content') + WalletsControl.getInstance().currentWallet().name ?? "",
                 hintInput: translate('input_pwd_hint').toString(),
                 onPressed: (pwd) async {
                   try {
-                    var pwdFormat = pwd.codeUnits;
-                    Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
-                    ChainType chainType = ChainType.ETH;
-                    // todo
-                    // if (wallet.walletType == WalletType.TEST_WALLET) {
-                    //   chainType = ChainType.ETH_TEST;
-                    // }
-                    /*Wallets.instance
-                        .ethRawTxSign(msg.data, Chain.chainTypeToInt(chainType), wallet.getChainByChainType(chainType).chainAddress,
-                            Uint8List.fromList(pwdFormat))
-                        .then((map) {
-                      int status = map["status"];
-                      if (status == null || status != 200) {
-                        msg.err = map["message"];
-                        if (msg.err == null || msg.err.length < 1) {
-                          msg.err = "result nothing ";
-                        }
-                        msg.data = "";
-                        Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
-                      } else {
-                        var signResult = map["ethSignedInfo"];
-                        msg.err = "";
-                        msg.data = signResult;
-                        Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
-                      }
-                      this.callPromise(msg).then((value) {
-                        NavigatorUtils.goBack(context);
-                      });
-                    });*/
+                    EthChain ethChain = WalletsControl.getInstance().currentWallet().ethChain;
+                    EthRawTxPayload ethRawTxPayload = EthRawTxPayload()
+                      ..rawTx = msg.data
+                      ..fromAddress = ethChain.chainShared.walletAddress.address;
+                    String signResult = EthChainControl.getInstance().rawTxSign(ethRawTxPayload, pwd);
+                    if (signResult == null || signResult.trim().isEmpty) {
+                      Fluttertoast.showToast(msg: translate('tx_sign_failure').toString());
+                      return;
+                    }
+                    msg.err = "";
+                    msg.data = signResult;
+                    Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
+                    this.callPromise(msg).then((value) {
+                      NavigatorUtils.goBack(context);
+                    });
                   } catch (e) {
-                    print("cashboxEthRawTxSign: " + e.toString());
+                    Logger.getInstance().e("cashboxEthRawTxSign: ", e.toString());
                     msg.err = "inner error";
                     this.callPromise(msg).whenComplete(() {
                       NavigatorUtils.goBack(context);
@@ -456,44 +414,33 @@ class _DappPageState extends State<DappPage> {
         name: "cashboxEthSendSignedTx",
         onMessageReceived: (JavascriptMessage message) async {
           var msg = Message.fromJson(jsonDecode(message.message));
-          // todo
-          /*try {
-            Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
-            ChainType chainType = ChainType.ETH;
-            if (wallet.walletType == WalletType.TEST_WALLET) {
-              chainType = ChainType.ETH_TEST;
-            }
+          try {
+            ChainType chainType = WalletsControl.getInstance().currentWallet().ethChain.chainShared.chainType.toChainType();
             sendRawTx(chainType, msg.data).then((str) {
               msg.data = str;
               this.callPromise(msg);
             });
           } catch (e) {
-            Logger().d("cashboxEthSendSignedTx===>", e.toString());
+            Logger().e("cashboxEthSendSignedTx===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
-          }*/
+          }
         }));
 
     jsChannelList.add(JavascriptChannel(
         name: "cashboxEthCall",
         onMessageReceived: (JavascriptMessage message) async {
           var msg = Message.fromJson(jsonDecode(message.message));
-          // todo
-          /*try {
+          try {
             List<String> data = msg.data.split(",");
-
-            Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
-            ChainType chainType = ChainType.ETH;
-            if (wallet.walletType == WalletType.TEST_WALLET) {
-              chainType = ChainType.ETH_TEST;
-            }
+            ChainType chainType = WalletsControl.getInstance().currentWallet().ethChain.chainShared.chainType.toChainType();
             msg.data = await ethCall(chainType, data[0], data[1]);
             this.callPromise(msg);
           } catch (e) {
-            Logger().d("cashboxEthCall===>", e.toString());
+            Logger().e("cashboxEthCall===>", e.toString());
             msg.err = "inner error";
             this.callPromise(msg);
-          }*/
+          }
         }));
 
     //eee start
@@ -507,41 +454,30 @@ class _DappPageState extends State<DappPage> {
             builder: (BuildContext context) {
               return PwdDialog(
                 title: translate('wallet_pwd').toString(),
-                hintContent: translate('dapp_sign_hint_content') + nowWallet.walletName ?? "",
+                hintContent: translate('dapp_sign_hint_content') + WalletsControl.getInstance().currentWallet().name ?? "",
                 hintInput: translate('input_pwd_hint').toString(),
                 onPressed: (pwd) async {
                   try {
-                    var pwdFormat = pwd.codeUnits;
-                    Wallet wallet = await Wallets.instance.getWalletByWalletId(await Wallets.instance.getNowWalletId());
-                    ChainType chainType = ChainType.EEE;
-                    // todo
-                    /*if (wallet.walletType == WalletType.TEST_WALLET) {
-                      chainType = ChainType.EEE_TEST;
+                    RawTxParam rawTxParam = RawTxParam()
+                      ..rawTx = msg.data
+                      ..password = pwd
+                      ..walletId = WalletsControl.getInstance().currentWallet().id;
+                    String signResult = EeeChainControl.getInstance().txSign(rawTxParam);
+                    if (signResult == null || signResult.trim().isEmpty) {
+                      msg.err = 'tx_sign_failure';
+                      print("eeeTxSign: " + msg.err);
+                      msg.data = "";
+                      Fluttertoast.showToast(msg: translate('tx_sign_failure').toString());
+                    } else {
+                      msg.err = "";
+                      msg.data = signResult;
+                      Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
                     }
-                    Wallets.instance.eeeTxSign(wallet.walletId, Uint8List.fromList(pwdFormat), msg.data).then((map) {
-                      int status = map["status"];
-                      if (status == null || status != 200) {
-                        msg.err = map["message"];
-                        if (msg.err == null || msg.err.length < 1) {
-                          msg.err = "result nothing ";
-                        } else {
-                          msg.err = 'tx_sign_failure';
-                          print("eeeTxSign: " + msg.err);
-                        }
-                        msg.data = "";
-                        Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + map["message"]);
-                      } else {
-                        var signResult = map["signedInfo"];
-                        msg.err = "";
-                        msg.data = signResult;
-                        Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
-                      }
-                      this.callPromise(msg).then((value) {
-                        NavigatorUtils.goBack(context);
-                      });
-                    });*/
+                    this.callPromise(msg).then((value) {
+                      NavigatorUtils.goBack(context);
+                    });
                   } catch (e) {
-                    Logger().d("cashboxEeeRawTxSign===>", e.toString());
+                    Logger().e("cashboxEeeRawTxSign===>", e.toString());
                     msg.err = "inner error";
                     this.callPromise(msg).whenComplete(() {
                       NavigatorUtils.goBack(context);
@@ -557,9 +493,16 @@ class _DappPageState extends State<DappPage> {
         name: "cashboxEeePubkey",
         onMessageReceived: (JavascriptMessage message) {
           var msg = Message.fromJson(jsonDecode(message.message));
-          msg.data = Wallets.instance.nowWallet.getChainByChainType(ChainType.EEE).pubKey.toString() ?? "";
-          print("cashboxEeePubkey--->" + msg.data);
-          this.callPromise(msg);
+          try {
+            msg.data = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.publicKey ?? "";
+            Logger.getInstance().i("cashboxEeePubkey--->", msg.data);
+            this.callPromise(msg);
+          } catch (e) {
+            msg.data = "";
+            msg.err = e.toString();
+            Logger.getInstance().e("cashboxEeePubkey error is --->", e.toString());
+            this.callPromise(msg);
+          }
         }));
     jsChannelList.add(JavascriptChannel(
         name: "cashboxEeeSign",
@@ -570,25 +513,20 @@ class _DappPageState extends State<DappPage> {
             builder: (BuildContext context) {
               return PwdDialog(
                 title: translate('wallet_pwd').toString(),
-                hintContent: translate('dapp_sign_hint_content') + nowWallet.walletName ?? "",
+                hintContent: translate('dapp_sign_hint_content') + WalletsControl.getInstance().currentWallet().name ?? "",
                 hintInput: translate('input_pwd_hint').toString(),
                 onPressed: (pwd) async {
                   try {
-                    var pwdFormat = pwd.codeUnits;
-                    var eeeSignMap = await Wallets.instance.eeeSign(Wallets.instance.nowWallet.walletId, Uint8List.fromList(pwdFormat), msg.data);
-                    int status = eeeSignMap["status"];
-                    if (status == null || status != 200) {
-                      msg.err = eeeSignMap["message"];
-                      if (msg.err == null || msg.err.length < 1) {
-                        msg.err = "result nothing ";
-                      } else {
-                        msg.err = 'tx_sign_failure';
-                        print("eeeTxSign: " + msg.err);
-                      }
+                    RawTxParam rawTxParam = RawTxParam()
+                      ..walletId = WalletsControl.getInstance().currentWallet().id
+                      ..password = pwd
+                      ..rawTx = msg.data;
+                    String signResult = EeeChainControl.getInstance().txSign(rawTxParam);
+                    if (signResult == null || signResult.trim().isEmpty) {
+                      msg.err = 'tx_sign_failure';
                       msg.data = "";
-                      Fluttertoast.showToast(msg: translate('tx_sign_failure').toString() + eeeSignMap["message"]);
+                      Fluttertoast.showToast(msg: translate('tx_sign_failure').toString());
                     } else {
-                      var signResult = eeeSignMap["signedInfo"];
                       msg.err = "";
                       msg.data = signResult;
                       Fluttertoast.showToast(msg: translate('tx_sign_success').toString());
