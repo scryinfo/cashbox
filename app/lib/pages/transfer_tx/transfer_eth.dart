@@ -596,7 +596,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                       if (status.isGranted) {
                         _scanQrContent();
                       } else {
-                        Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+                        Map<Permission, PermissionStatus> statuses = await [Permission.camera].request();
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {

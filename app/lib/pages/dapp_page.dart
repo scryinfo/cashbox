@@ -202,7 +202,7 @@ class _DappPageState extends State<DappPage> {
               // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
             });
           } else {
-            Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+            Map<Permission, PermissionStatus> statuses = await [Permission.camera].request();
             if (statuses[Permission.camera] == PermissionStatus.granted) {
               Future<String> qrResult = QrScanUtil.instance.qrscan();
               qrResult.then((t) {
@@ -225,7 +225,7 @@ class _DappPageState extends State<DappPage> {
           if (status.isGranted) {
             _scanNativeQrSignToQR();
           } else {
-            Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+            Map<Permission, PermissionStatus> statuses = await [Permission.camera].request();
             if (statuses[Permission.camera] == PermissionStatus.granted) {
               _scanNativeQrSignToQR();
             } else {
@@ -316,7 +316,7 @@ class _DappPageState extends State<DappPage> {
           if (status.isGranted) {
             _scanCashboxScan(msg);
           } else {
-            Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+            Map<Permission, PermissionStatus> statuses = await [Permission.camera].request();
             if (statuses[Permission.camera] == PermissionStatus.granted) {
               _scanCashboxScan(msg);
             } else {
