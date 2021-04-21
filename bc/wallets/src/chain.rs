@@ -11,6 +11,7 @@ use bitcoin_wallet::account::AccountAddressType;
 use bitcoin::util::psbt::serialize::Serialize;
 use rbatis::crud::CRUDTable;
 use eee::Token::TokenX;
+use futures::executor::block_on;
 
 #[derive(Default)]
 struct EthChain();
@@ -338,10 +339,15 @@ impl BtcChainTrait for BtcChain {
         Ok(btc_tokens)
     }
 
-    fn start_murmel(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<(),WalletError> {
-        let rb = context.db().data_db(&net_type);
-
-        murmel::start(&net_type);
+    fn start_murmel(&self, context: &dyn ContextTrait, wallet_id: &str, net_type: &NetType) -> Result<(),WalletError> {
+        // can't be async function, because in murmel we have a lot block_on
+        let wallet_db = context.db().wallets_db();
+        let m_address = {
+            let w = wallet_db.new_wrapper().eq(&MAddress::wallet_id,wallet_id);
+            block_on( MAddress::list_by_wrapper(wallet_db,wallet_id, &w)).map_err(|e| WalletError::Custom(e.to_string()))
+        };
+        print!("{:?}",m_address);
+        //murmel::start(&net_type);
         Ok(())
     }
 }

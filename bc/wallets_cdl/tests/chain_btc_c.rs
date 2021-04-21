@@ -5,15 +5,9 @@ use wallets_cdl::chain_btc_c::ChainBtc_start;
 use wallets_cdl::mem_c::CWallet_dFree;
 use wallets_cdl::parameters::CCreateWalletParameters;
 use wallets_cdl::wallets_c::Wallets_createWallet;
-use wallets_cdl::{
-    chain_btc_c,
-    mem_c::{CContext_dAlloc, CError_free, CWallet_dAlloc},
-    parameters::{CContext, CInitParameters},
-    types::CError,
-    wallets_c::Wallets_init,
-    CArray, CStruct, CR, CU64,
-};
+use wallets_cdl::{chain_btc_c, mem_c::{CContext_dAlloc, CError_free, CWallet_dAlloc}, parameters::{CContext, CInitParameters}, types::CError, wallets_c::Wallets_init, CArray, CStruct, CR, CU64, to_c_char};
 use wallets_types::{BtcChainTokenDefault, CreateWalletParameters, Error, InitParameters};
+use wallets_cdl::types::CWallet;
 
 #[test]
 fn btc_update_default_token_list_test() {
@@ -97,10 +91,11 @@ fn btc_start_test() {
         };
         let c_err = Wallets_createWallet(*c_ctx, parameters, c_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let r_wallet = CWallet::to_rust(&**c_wallet);
         CError_free(c_err);
         CWallet_dFree(c_wallet);
 
-        let c_err = ChainBtc_start(*c_ctx) as *mut CError;
+        let c_err = ChainBtc_start(*c_ctx, to_c_char(&r_wallet.id)) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);

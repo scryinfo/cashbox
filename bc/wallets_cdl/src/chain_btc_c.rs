@@ -1,13 +1,14 @@
 #![allow(non_snake_case)]
 
 use futures::executor::block_on;
-use std::os::raw::c_uint;
+use std::os::raw::{c_uint, c_char};
 
 use wallets_types::{Error, WalletError};
 use wallets::Contexts;
 use super::kits::{CR, CArray, CStruct};
 use crate::types::{CBtcChainTokenDefault, CBtcChainTokenAuth,CError};
 use crate::parameters::CContext;
+use crate::to_str;
 
 
 #[no_mangle]
@@ -137,11 +138,10 @@ pub unsafe extern "C" fn ChainBtc_getDefaultTokenList(ctx: *mut CContext, tokens
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainBtc_start(ctx: *mut CContext) -> *const CError {
+pub unsafe extern "C" fn ChainBtc_start(ctx: *mut CContext, walletId: *mut c_char) -> *const CError {
     log::debug!("enter ChainBtc start");
-
-    if ctx.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx or tokens is null");
+    if ctx.is_null() || walletId.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or walletId is cannot be null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
     }
@@ -153,7 +153,7 @@ pub unsafe extern "C" fn ChainBtc_start(ctx: *mut CContext) -> *const CError {
         match contexts.get(&ctx.id) {
             Some(wallets) => {
                 let btc_chain = wallets.btc_chain_instance();
-                let r = btc_chain.start_murmel(wallets, &wallets.net_type);
+                let r = btc_chain.start_murmel(wallets, to_str(walletId), &wallets.net_type);
                 match r {
                     Ok(_) => { Error::SUCCESS() }
                     Err(err) => { Error::from(err) }
