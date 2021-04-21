@@ -41,6 +41,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
   int nonce;
   String genesisHash;
   String digitName;
+  int decimal;
   bool isShowTxInput = false;
 
   @override
@@ -52,6 +53,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     digitName = Provider.of<TransactionProvide>(context).digitName;
+    decimal = Provider.of<TransactionProvide>(context).decimal;
     initEeeChainTxInfo();
   }
 
@@ -452,15 +454,15 @@ class _TransferEeePageState extends State<TransferEeePage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            Map eeeTransferMap;
             String signInfo;
             Config config = await HandleConfig.instance.getConfig();
             if (digitName != null && digitName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
               EeeTransferPayload eeeTransferPayload = EeeTransferPayload();
+              var valueMinUint = (double.parse(_txValueController.text) * Utils.mathPow(10, decimal).toInt()).toInt();
               eeeTransferPayload
                 ..fromAccount = WalletsControl.getInstance().currentChainAddress()
                 ..toAccount = _toAddressController.text.toString()
-                ..value = _txValueController.text.toString()
+                ..value = valueMinUint.toString()
                 ..index = nonce
                 ..password = pwd
                 ..extData = "todo"

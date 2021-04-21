@@ -147,8 +147,16 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
-  List<EeeChainTx> getTxRecord(String account, int startItem, int pageSize) {
-    var dataObj = Wallets.mainIsolate().chainEee.getTxRecord(account, startItem, pageSize);
+  List<EeeChainTx> getEeeTxRecord(String account, int startItem, int pageSize) {
+    var dataObj = Wallets.mainIsolate().chainEee.getEeeTxRecord(account, startItem, pageSize);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
+  List<EeeChainTx> getTokenXTxRecord(String account, int startItem, int pageSize) {
+    var dataObj = Wallets.mainIsolate().chainEee.getTokenXTxRecord(account, startItem, pageSize);
     if (!dataObj.isSuccess()) {
       return null;
     }

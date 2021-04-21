@@ -16,7 +16,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import '../../res/resources.dart';
@@ -36,6 +35,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   String moneyInfo = "0.00";
   String digitName = "";
   String fromAddress = "";
+  int decimal = 0;
   int displayTxOffset = 0;
   int refreshAddCount = 20;
 
@@ -52,7 +52,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     super.didChangeDependencies();
     {
       fromAddress = Provider.of<TransactionProvide>(context).fromAddress;
-
+      decimal = Provider.of<TransactionProvide>(context).decimal;
       digitName = Provider.of<TransactionProvide>(context).digitName;
       balanceInfo = Provider.of<TransactionProvide>(context).balance;
       moneyInfo = Provider.of<TransactionProvide>(context).money;
@@ -142,6 +142,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
               onPressed: () {
                 context.read<TransactionProvide>()
                   ..emptyDataRecord()
+                  ..setDecimal(decimal)
                   ..setDigitName(digitName)
                   ..setBalance(balanceInfo);
                 NavigatorUtils.push(context, Routes.transferEeePage);
@@ -315,6 +316,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
         onTap: () {
           context.read<TransactionProvide>()
             ..emptyDataRecord()
+            ..setDecimal(decimal)
             ..setFromAddress(eeeTxListModel[index].fromAddress == "" ? eeeTxListModel[index].signer : eeeTxListModel[index].fromAddress)
             ..setToAddress(eeeTxListModel[index].toAddress)
             ..setHash(eeeTxListModel[index].blockHash)
@@ -428,8 +430,19 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     Config config = await HandleConfig.instance.getConfig();
     for (; true;) {
       // todo differentiate tokenName
-      List<EeeChainTx> eeeChainTxList = EeeChainControl.getInstance().getTxRecord(
-          WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address, (currentPage * this.pageSize), this.pageSize);
+      List<EeeChainTx> eeeChainTxList;
+      switch (digitName.trim().toLowerCase()) {
+        case "eee":
+          eeeChainTxList = EeeChainControl.getInstance().getEeeTxRecord(
+              WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address, (currentPage * this.pageSize), this.pageSize);
+          break;
+        case "tokenx":
+          eeeChainTxList = EeeChainControl.getInstance().getTokenXTxRecord(
+              WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address, (currentPage * this.pageSize), this.pageSize);
+          break;
+        default:
+          break;
+      }
       if (eeeChainTxList == null || eeeChainTxList.isEmpty) {
         break;
       }
