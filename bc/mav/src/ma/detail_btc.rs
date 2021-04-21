@@ -109,6 +109,8 @@ impl MBtcChainTokenDefault {
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MUserAddress {
     #[serde(default)]
+    pub key: String,
+    #[serde(default)]
     pub address: String,
     #[serde(default)]
     pub compressed_pub_key: String,

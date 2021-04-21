@@ -21,16 +21,11 @@
 //
 
 use bitcoin::network::constants::Network;
-use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use log::Level;
-use log::{info, LevelFilter};
-use mav::ma::MUserAddress;
-use murmel::api::{calc_default_address, calc_hash160, calc_pubkey};
-use murmel::constructor::Constructor;
-use murmel::db::{RB_DETAIL, VERIFY};
+use log::LevelFilter;
 use murmel::path::BTC_HAMMER_PATH;
+use murmel::{constructor::Constructor, db::VERIFY};
 use simple_logger;
-use std::collections::HashMap;
+
 use std::{
     env::args,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
@@ -48,7 +43,6 @@ pub fn main() {
         println!("--log debug");
         println!("--nodns");
         println!("--network tetsnet");
-        println!("defaults Setting defined in Setting.toml");
         return;
     }
 

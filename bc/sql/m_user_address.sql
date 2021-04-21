@@ -1,5 +1,6 @@
 -- MUserAddress
-CREATE TABLE IF NOT EXISTS m_user_address (  
+CREATE TABLE IF NOT EXISTS m_user_address (
+    key TEXT NOT NULL,
     address TEXT NOT NULL,
     compressed_pub_key TEXT NOT NULL,
     verify TEXT NOT NULL,

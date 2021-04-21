@@ -24,7 +24,7 @@ use rbatis::rbatis::Rbatis;
 use rbatis::wrapper::Wrapper;
 use rbatis_core::Error;
 use std::ops::Add;
-use strum_macros::{EnumString, ToString, EnumIter};
+use strum_macros::{EnumIter, EnumString, ToString};
 
 // state value in btc database must be one of this enum
 #[derive(Debug, Eq, PartialEq, EnumString, ToString, EnumIter)]
@@ -366,6 +366,7 @@ impl DetailSqlite {
         verify: String,
     ) {
         let mut user_address = MUserAddress::default();
+        user_address.key = MUserAddress::key.to_string();
         user_address.address = address;
         user_address.compressed_pub_key = compressed_pub_key;
         user_address.verify = verify;
@@ -381,8 +382,8 @@ impl DetailSqlite {
     }
 
     pub async fn fetch_user_address(&self) -> Option<MUserAddress> {
-        //let w = self.rb.new_wrapper().eq("rowid", 1);
-        let w = self.rb.new_wrapper().eq("_ROWID_", "1");
+        //use key don't use _ROWID_        key = "key"
+        let w = self.rb.new_wrapper().eq(MUserAddress::key, MUserAddress::key);
         let r: Result<MUserAddress, _> = self.rb.fetch_by_wrapper("", &w).await;
         match r {
             Ok(u) => Some(u),
@@ -626,6 +627,4 @@ mod test {
     fn test_utxo() {
         block_on(RB_DETAIL.utxo());
     }
-
-    // for test new test
 }

@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 use bitcoin::consensus::encode::Error;
 use bitcoin::Transaction;
 use std::fmt::Write;
@@ -34,7 +35,7 @@ pub fn hex_to_tx(str: &str) -> Result<Transaction, Error> {
 /// another website  https://bitcoinfees.earn.com/api/v1/fees/recommended
 ///
 pub fn tx_fee(input_sum: u32, outputs_num: u32) -> u32 {
-    let size = input_sum * 148u32 + outputs_num * 34u32  + 10;
+    let size = input_sum * 148u32 + outputs_num * 34u32 + 10;
     size * 19
 }
 

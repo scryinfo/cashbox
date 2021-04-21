@@ -339,6 +339,8 @@ impl BtcChainTrait for BtcChain {
     }
 
     fn start_murmel(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<(),WalletError> {
+        let rb = context.db().data_db(&net_type);
+
         murmel::start(&net_type);
         Ok(())
     }

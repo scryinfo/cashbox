@@ -49,6 +49,7 @@ use futures::{
 use futures_timer::Interval;
 use parking_lot::Condvar;
 use rand::{thread_rng, RngCore};
+use std::borrow::BorrowMut;
 use std::pin::Pin;
 use std::time::Duration;
 use std::{
@@ -57,7 +58,6 @@ use std::{
     path::Path,
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
-use std::borrow::BorrowMut;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
