@@ -1,12 +1,19 @@
-use std::ptr::null_mut;
-use mav::{kits, NetType, CFalse};
 use mav::ma::BtcTokenType;
-use wallets_types::{InitParameters, Error, BtcChainTokenDefault};
-use wallets_cdl::{CU64, CR, CStruct, CArray,types::CError, wallets_c::Wallets_init, chain_btc_c,
-                  parameters::{CContext, CInitParameters,},
-                  mem_c::{CContext_dAlloc, CError_free},
-};
+use mav::{kits, CFalse, NetType, WalletType};
+use std::ptr::null_mut;
 use wallets_cdl::chain_btc_c::ChainBtc_start;
+use wallets_cdl::mem_c::CWallet_dFree;
+use wallets_cdl::parameters::CCreateWalletParameters;
+use wallets_cdl::wallets_c::Wallets_createWallet;
+use wallets_cdl::{
+    chain_btc_c,
+    mem_c::{CContext_dAlloc, CError_free, CWallet_dAlloc},
+    parameters::{CContext, CInitParameters},
+    types::CError,
+    wallets_c::Wallets_init,
+    CArray, CStruct, CR, CU64,
+};
+use wallets_types::{BtcChainTokenDefault, CreateWalletParameters, Error, InitParameters};
 
 #[test]
 fn btc_update_default_token_list_test() {
@@ -26,11 +33,14 @@ fn btc_update_default_token_list_test() {
 
             btc.btc_chain_token_shared.m.token_shared.name = "Bitcoin".to_owned();
             btc.btc_chain_token_shared.m.token_shared.symbol = "BTC".to_owned();
-            btc.btc_chain_token_shared.m.token_shared.logo_url = "".to_owned();//todo
+            btc.btc_chain_token_shared.m.token_shared.logo_url = "".to_owned(); //todo
             btc.btc_chain_token_shared.m.token_shared.logo_bytes = "".to_owned();
             btc.btc_chain_token_shared.m.token_shared.project_name = "Bitcoin".to_owned();
-            btc.btc_chain_token_shared.m.token_shared.project_home = "https://bitcoin.org/en/".to_owned();
-            btc.btc_chain_token_shared.m.token_shared.project_note = "Bitcoin is a global, open-source platform for decentralized applications.".to_owned();
+            btc.btc_chain_token_shared.m.token_shared.project_home =
+                "https://bitcoin.org/en/".to_owned();
+            btc.btc_chain_token_shared.m.token_shared.project_note =
+                "Bitcoin is a global, open-source platform for decentralized applications."
+                    .to_owned();
             default_tokens.push(btc);
         }
 
@@ -49,9 +59,7 @@ fn init_parameters(c_ctx: *mut *mut CContext) -> *mut CError {
     p.context_note = format!("test_{}", kits::uuid());
     let c_parameters = CInitParameters::to_c_ptr(&p);
 
-    let c_err = unsafe {
-        Wallets_init(c_parameters, c_ctx) as *mut CError
-    };
+    let c_err = unsafe { Wallets_init(c_parameters, c_ctx) as *mut CError };
     c_err
 }
 
@@ -73,6 +81,25 @@ fn btc_start_test() {
         let c_err = Wallets_init(c_init_parameters, c_ctx) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
+
+        // create wallet (now we get mnemonic and address)
+        let c_wallet = CWallet_dAlloc();
+        let parameters = {
+            let mnemonic =
+                "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
+            let mut p = CreateWalletParameters {
+                name: "murmel".to_string(),
+                password: "".to_string(),
+                mnemonic: mnemonic.to_string(),
+                wallet_type: WalletType::Test.to_string(),
+            };
+            CCreateWalletParameters::to_c_ptr(&mut p)
+        };
+        let c_err = Wallets_createWallet(*c_ctx, parameters, c_wallet) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        CWallet_dFree(c_wallet);
+
         let c_err = ChainBtc_start(*c_ctx) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
