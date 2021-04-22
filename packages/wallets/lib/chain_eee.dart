@@ -169,7 +169,7 @@ class ChainEee {
     return DlResult1(accountInfoSyncProg, err);
   }
 
-  DlResult1<List<EeeChainTx>> getTxRecord(String account, int startItem, int pageSize) {
+  DlResult1<List<EeeChainTx>> getEeeTxRecord(String account, int startItem, int pageSize) {
     Error err;
     List<EeeChainTx> ect = [];
     {
@@ -177,6 +177,28 @@ class ChainEee {
       var ptrAccount = account.toCPtrInt8();
       var ptrCArrayCEeeChainTx = Wallets.cWallets.CArrayCEeeChainTx_dAlloc();
       var cerr = Wallets.cWallets.ChainEee_queryChainTxRecord(_ptrContext, ptrAccount, startItem, pageSize, ptrCArrayCEeeChainTx);
+      err = Error.fromC(cerr);
+      Wallets.cWallets.CError_free(cerr);
+      if (err.isSuccess()) {
+        ect = ArrayCEeeChainTx
+            .fromC(ptrCArrayCEeeChainTx.value)
+            .data;
+      }
+
+      ptrAccount.free();
+      Wallets.cWallets.CAccountInfoSyncProg_dFree(ptrAccountInfoSyncProg);
+    }
+    return DlResult1(ect, err);
+  }
+
+  DlResult1<List<EeeChainTx>> getTokenXTxRecord(String account, int startItem, int pageSize) {
+    Error err;
+    List<EeeChainTx> ect = [];
+    {
+      var ptrAccountInfoSyncProg = Wallets.cWallets.CAccountInfoSyncProg_dAlloc();
+      var ptrAccount = account.toCPtrInt8();
+      var ptrCArrayCEeeChainTx = Wallets.cWallets.CArrayCEeeChainTx_dAlloc();
+      var cerr = Wallets.cWallets.ChainEee_queryTokenxTxRecord(_ptrContext, ptrAccount, startItem, pageSize, ptrCArrayCEeeChainTx);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       if (err.isSuccess()) {

@@ -15,6 +15,7 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
+import 'package:app/util/app_info_util.dart';
 import 'package:logger/logger.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +84,7 @@ class _EthPageState extends State<EthPage> {
     loadDigitBalance();
     loadLegalCurrency();
     loadDigitRateInfo();
-    // todo AppInfoUtil.instance.checkAppUpgrade();
+    AppInfoUtil.instance.checkAppUpgrade();
   }
 
   //Processing display fiat currency usd, cny, etc.

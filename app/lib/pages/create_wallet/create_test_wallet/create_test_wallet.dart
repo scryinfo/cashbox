@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:app/configv/config/config.dart';
+import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -43,6 +45,21 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
         appBar: MyAppBar(
           centerTitle: translate('create_test_wallet'),
           backgroundColor: Colors.transparent,
+          actionName: translate('back_main_net'),
+          isBack: false,
+          onPressed: () async {
+            bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetType.Main);
+            if (!isChangeNetOk) {
+              return;
+            }
+            Config config = await HandleConfig.instance.getConfig();
+            NetType netType = NetType()
+              ..enumNetType = EnumKit.NetType.Main.toString()
+              ..isCurNet = true;
+            config.curNetType = netType;
+            HandleConfig.instance.saveConfig(config);
+            NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
+          },
         ),
         body: Container(
           decoration: BoxDecoration(

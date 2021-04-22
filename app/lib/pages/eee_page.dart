@@ -81,7 +81,7 @@ class _EeePageState extends State<EeePage> {
     loadDigitBalance();
     // loadLegalCurrency();
     // loadDigitRateInfo();
-    // todo AppInfoUtil.instance.checkAppUpgrade();
+    AppInfoUtil.instance.checkAppUpgrade();
   }
 
   //Processing display fiat currency usd, cny, etc.

@@ -9,6 +9,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:logger/logger.dart';
+import 'package:material_dialogs/material_dialogs.dart';
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
+import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 import 'package:wallets/enums.dart' as EnumKit;
 
 class ChangeNetTypePage extends StatefulWidget {
@@ -90,25 +94,51 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
       return Container(
         child: GestureDetector(
           onTap: () async {
-            Config config = await HandleConfig.instance.getConfig();
-            netTypeList.forEach((element) {
-              element.isCurNet = false;
-            });
-            netTypeList[index].isCurNet = true;
-            config.curNetType = netTypeList[index];
-            bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetTypeEx.from(netTypeList[index].enumNetType));
-            if (!isChangeNetOk) {
-              return;
-            }
-            HandleConfig.instance.saveConfig(config);
-            setState(() {
-              this.netTypeList = netTypeList;
-            });
-            if (WalletsControl.getInstance().hasAny()) {
-              NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
-            } else {
-              NavigatorUtils.push(context, '${Routes.createTestWalletPage}', clearStack: true);
-            }
+            Dialogs.materialDialog(
+                msg: translate('make_sure_net_change_hint'),
+                title: translate('net_change'),
+                color: Colors.white,
+                msgStyle: TextStyle(fontSize: ScreenUtil().setSp(3)),
+                context: context,
+                actions: [
+                  IconsOutlineButton(
+                    onPressed: () {
+                      NavigatorUtils.goBack(context);
+                    },
+                    text: translate('cancel'),
+                    iconData: Icons.cancel_outlined,
+                    textStyle: TextStyle(color: Colors.grey),
+                    iconColor: Colors.grey,
+                  ),
+                  IconsButton(
+                    onPressed: () async {
+                      Config config = await HandleConfig.instance.getConfig();
+                      netTypeList.forEach((element) {
+                        element.isCurNet = false;
+                      });
+                      netTypeList[index].isCurNet = true;
+                      config.curNetType = netTypeList[index];
+                      bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetTypeEx.from(netTypeList[index].enumNetType));
+                      if (!isChangeNetOk) {
+                        return;
+                      }
+                      HandleConfig.instance.saveConfig(config);
+                      setState(() {
+                        this.netTypeList = netTypeList;
+                      });
+                      if (WalletsControl.getInstance().hasAny()) {
+                        NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
+                      } else {
+                        NavigatorUtils.push(context, '${Routes.createTestWalletPage}', clearStack: true);
+                      }
+                    },
+                    text: translate('confirm'),
+                    iconData: Icons.delete,
+                    color: Colors.red,
+                    textStyle: TextStyle(color: Colors.white),
+                    iconColor: Colors.white,
+                  ),
+                ]);
           },
           child: Container(
             width: ScreenUtil().setWidth(90),
