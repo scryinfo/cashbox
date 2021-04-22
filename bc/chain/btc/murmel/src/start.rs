@@ -8,8 +8,9 @@ use mav::NetType;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::time::SystemTime;
+use mav::ma::MAddress;
 
-pub fn start(net_type: &NetType) {
+pub fn start(net_type: &NetType, address :Vec<&MAddress>) {
     let network = match net_type {
         NetType::Main => Network::Bitcoin,
         NetType::Test => Network::Testnet,

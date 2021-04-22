@@ -2,7 +2,7 @@ use async_trait::async_trait;
 
 use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec, Token};
 use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth, MTokenAddress, MBtcChainTokenAuth};
-use mav::{NetType, WalletType, CTrue, CFalse};
+use mav::{NetType, WalletType, CTrue, CFalse, ChainType};
 use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth};
 
 use codec::Decode;
@@ -344,10 +344,14 @@ impl BtcChainTrait for BtcChain {
         let wallet_db = context.db().wallets_db();
         let m_address = {
             let w = wallet_db.new_wrapper().eq(&MAddress::wallet_id,wallet_id);
-            block_on( MAddress::list_by_wrapper(wallet_db,wallet_id, &w)).map_err(|e| WalletError::Custom(e.to_string()))
+            block_on( MAddress::list_by_wrapper(wallet_db,wallet_id, &w)).map_err(|e| WalletError::Custom(e.to_string()))?
         };
-        print!("{:?}",m_address);
-        //murmel::start(&net_type);
+        let btc_address = m_address.iter().filter(
+            |&a| {
+               a.chain_type.contains("Btc")
+            }
+        ).collect::<Vec<&MAddress>>();
+        murmel::start(&net_type, btc_address);
         Ok(())
     }
 }

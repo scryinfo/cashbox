@@ -23,7 +23,6 @@ use bitcoin::consensus::encode;
 use bitcoin::util;
 use bitcoin::util::bip158;
 use hammersbald;
-use std::convert;
 use std::fmt;
 use std::io;
 
