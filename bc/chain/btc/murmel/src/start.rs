@@ -46,20 +46,3 @@ pub fn start(net_type: &NetType, address :Vec<&MAddress>) {
     spv.run(network, peers, connections)
         .expect("can not start node");
 }
-
-#[cfg(test)]
-mod test {
-    use crate::start::start;
-    use log::LevelFilter;
-    use mav::NetType;
-
-    #[test]
-    pub fn start_test() {
-        // when you start it be careful, start function also have an init function in it;
-        simple_logger::SimpleLogger::new()
-            .with_level(LevelFilter::Debug)
-            .init()
-            .unwrap();
-        start(&NetType::Test);
-    }
-}
