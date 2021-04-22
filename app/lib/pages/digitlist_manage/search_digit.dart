@@ -1,3 +1,4 @@
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/token.dart';
 import 'package:app/model/wallet.dart';
@@ -214,11 +215,11 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                         ..setBalance(displayDigitsList[index].balance)
                         ..setMoney(displayDigitsList[index].money)
                         ..setDecimal(displayDigitsList[index].decimal)
-                        ..setFromAddress(Wallets.instance.nowWallet.nowChain.chainAddress)
-                        ..setChainType(Wallets.instance.nowWallet.nowChain.chainType)
+                        ..setFromAddress(WalletsControl.getInstance().currentChainAddress())
+                        ..setChainType(WalletsControl.getInstance().currentChainType())
                         ..setContractAddress(displayDigitsList[index].contractAddress);
                     }
-                    switch (Wallets.instance.nowWallet.nowChain.chainType) {
+                    switch (WalletsControl.getInstance().currentChainType()) {
                       case ChainType.ETH:
                       case ChainType.EthTest:
                         NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);

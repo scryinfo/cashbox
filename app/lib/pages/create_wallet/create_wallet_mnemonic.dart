@@ -1,8 +1,8 @@
-import 'package:app/model/mnemonic.dart';
-import 'package:app/model/wallets.dart';
+import 'dart:typed_data';
+
+import 'package:app/control/wallets_control.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
-import 'package:app/routers/application.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter/cupertino.dart';
@@ -35,16 +35,16 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
   }
 
   _initMnemonicData() async {
-    var mnemonic = await Wallets.instance.createMnemonic(12);
+    var mnemonic = WalletsControl.getInstance().generateMnemonic(12);
     if (mnemonic == null) {
       Logger().e("CreateWalletMnemonicPage=>", "mnemonic is null");
       return;
     }
     setState(() {
-      mnemonicList = String.fromCharCodes(mnemonic).split(" ");
+      mnemonicList = mnemonic.split(" ");
       walletName = Provider.of<CreateWalletProcessProvide>(context, listen: false).walletName;
     });
-    context.read<CreateWalletProcessProvide>().setMnemonic(mnemonic);
+    context.read<CreateWalletProcessProvide>().setMnemonic(Uint8List.fromList(mnemonic.codeUnits));
     mnemonic = null; /*Mnemonic words, free when used up*/
   }
 

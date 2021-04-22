@@ -1,8 +1,7 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/model/chain.dart';
+import 'package:app/control/eth_chain_control.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
-import 'package:app/model/wallets.dart';
 import 'package:logger/logger.dart';
 import 'package:app/util/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -167,10 +166,8 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
           ..gasUsed = res["result"][i]["gasUsed"]
           ..confirmations = res["result"][i]["confirmations"];
         try {
-          Map map = await Wallets.instance.decodeAdditionData(res["result"][i]["input"].toString());
-          if (map != null && (map["status"] == 200)) {
-            ethTxModel.input = map["inputInfo"].toString();
-          }
+          String inputInfo = EthChainControl.getInstance().decodeAdditionData(res["result"][i]["input"].toString());
+          ethTxModel.input = inputInfo ?? "";
         } catch (e) {
           ethTxModel.input = "";
           Logger().e("etherScanUtil  error ", e.toString());

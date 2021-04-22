@@ -189,7 +189,6 @@ class _EeePageState extends State<EeePage> {
         if (mounted) {
           setState(() {
             nowWalletAmount = nowWalletAmount + TokenRate.instance.getMoney(displayTokenMList[index]);
-            // Wallets.instance.nowWallet.accountMoney = nowWalletAmount.toStringAsFixed(5);
             displayTokenMList[index].money = money;
           });
         }
@@ -624,22 +623,7 @@ class _EeePageState extends State<EeePage> {
                     ),
                   );
                 },
-                onIndexChanged: (index) async {
-                  // bool isSetNowChain = await Wallets.instance.nowWallet.setNowChainType(Wallets.instance.nowWallet.chainList[index]);
-                  // if (isSetNowChain) {
-                  //   if (mounted) {
-                  //     setState(() {
-                  //       this.chainIndex = index;
-                  //       // Wallets.instance.nowWallet.nowChain.chainAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
-                  //       // this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
-                  //       this.displayTokenMList = [];
-                  //       loadDisplayTokenListData();
-                  //     });
-                  //   }
-                  // }
-                  // loadDigitBalance();
-                  // loadDigitRateInfo();
-                },
+                onIndexChanged: (index) async {},
                 index: chainIndex,
                 itemCount: 1,
                 viewportFraction: 0.8,

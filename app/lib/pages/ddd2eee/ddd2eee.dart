@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/model/chain.dart';
-import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';

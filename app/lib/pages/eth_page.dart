@@ -613,23 +613,7 @@ class _EthPageState extends State<EthPage> {
                     ),
                   );
                 },
-                onIndexChanged: (index) async {
-                  // todo 切换页面方式，leftDrawer搞定
-                  bool isSetNowChain = await Wallets.instance.nowWallet.setNowChainType(Wallets.instance.nowWallet.chainList[index]);
-                  if (isSetNowChain) {
-                    if (mounted) {
-                      setState(() {
-                        this.chainIndex = index;
-                        Wallets.instance.nowWallet.nowChain.chainAddress = Wallets.instance.nowWallet.nowChain.chainAddress;
-                        // this.allVisibleDigitsList = Wallets.instance.nowWallet.nowChain.getVisibleDigitList(); //init data
-                        this.displayTokenMList = [];
-                        loadDisplayTokenListData();
-                      });
-                    }
-                  }
-                  loadDigitBalance();
-                  loadDigitRateInfo();
-                },
+                onIndexChanged: (index) async {},
                 index: chainIndex,
                 itemCount: 1,
                 viewportFraction: 0.8,
@@ -738,9 +722,6 @@ class _EthPageState extends State<EthPage> {
             ),
             child: GestureDetector(
               onTap: () {
-                // if (walletName.isEmpty || Wallets.instance.nowWallet.nowChain.chainAddress.isEmpty) {
-                //   return;
-                // }
                 _navigatorToQrInfoPage(walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress() ?? "");
               },
               child: Text(

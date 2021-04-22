@@ -1,8 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:app/model/chain.dart';
-import 'package:app/model/wallet.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/widgets/pwd_dialog.dart';
@@ -108,6 +105,7 @@ class _SignTxPageState extends State<SignTxPage> {
           hintContent: translate('info_sign_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
+           /*
             String walletId = await Wallets.instance.getNowWalletId();
             var pwdFormat = value.codeUnits;
             var separateIndex = _waitToSignInfo.indexOf(";");
@@ -127,7 +125,7 @@ class _SignTxPageState extends State<SignTxPage> {
                 // String chainEEEAddress = wallet.getChainByChainType(ChainType.EEE).chainAddress;
                 String chainEEEAddress = " ";
                 var content =
-                    _waitToSignInfo.replaceFirst(waitToSignInfo, map["signedInfo"]) + ";addr=" + chainEEEAddress; //**// Signature result data
+                    _waitToSignInfo.replaceFirst(waitToSignInfo, map["signedInfo"]) + ";addr=" + chainEEEAddress; // Signature result data
                 context.read<QrInfoProvide>()
                   ..setTitle("签名结果")
                   ..setContent(content)
@@ -137,7 +135,7 @@ class _SignTxPageState extends State<SignTxPage> {
               }
             } else {
               Fluttertoast.showToast(msg: "签名失败，请重新检查您的签名信息和密码");
-            }
+            }*/
           },
         );
       },

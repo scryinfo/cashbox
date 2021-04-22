@@ -55,7 +55,6 @@ class EeeSyncTxs {
   bool _timing = false;
   String _eeeStorageKey = '';
   String _tokenXStorageKey = '';
-  String _infoId = '';
 
   ScryXNetUtil _scryXNetUtil = new ScryXNetUtil();
 
@@ -65,10 +64,6 @@ class EeeSyncTxs {
     _eeeStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
     _tokenXStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
 
-    Map getSubChainMap = await Wallets.instance.getSubChainBasicInfo("", 0, 0);
-    if (getSubChainMap != null && getSubChainMap["status"] == 200) {
-      _infoId = getSubChainMap["infoId"];
-    }
     _threadRun(runParams);
   }
 
