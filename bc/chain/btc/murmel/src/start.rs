@@ -24,6 +24,11 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         _ => (ChainType::BtcTest, Network::Testnet),
     };
 
+    let address = address
+        .iter()
+        .filter(|&&a| a.chain_type.eq(chain_type.to_string().as_str()))
+        .collect::<Vec<&&MAddress>>();
+
     #[cfg(test)]
     simple_logger::SimpleLogger::new()
         .with_level(LevelFilter::Debug)
