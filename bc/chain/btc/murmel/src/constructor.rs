@@ -49,7 +49,6 @@ use futures::{
 use futures_timer::Interval;
 use parking_lot::Condvar;
 use rand::{thread_rng, RngCore};
-use std::borrow::BorrowMut;
 use std::pin::Pin;
 use std::time::Duration;
 use std::{
@@ -58,6 +57,7 @@ use std::{
     path::Path,
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
+use mav::ma::MAddress;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -92,7 +92,7 @@ impl Constructor {
         network: Network,
         listen: Vec<SocketAddr>,
         chaindb: SharedChainDB,
-        filter_load_message: Option<FilterLoadMessage>,
+        address: &MAddress,
     ) -> Result<Constructor, Error> {
         const BACK_PRESSURE: usize = 10;
 
@@ -143,10 +143,12 @@ impl Constructor {
         ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
+        let public_key = &address.public_key.as_str()[2..];    // trim 0x
+        let filter_load = FilterLoadMessage::calculate_filter(public_key);
         dispatcher.add_listener(BloomFilter::new(
             p2p_control.clone(),
             timeout.clone(),
-            filter_load_message,
+            filter_load,
             pair2,
         ));
 

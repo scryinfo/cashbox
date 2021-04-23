@@ -18,7 +18,7 @@ pub struct BloomFilter<T> {
     // send message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-    filter_load_message: Option<FilterLoadMessage>,
+    filter_load: FilterLoadMessage,
     condvar_pair: CondvarPair<T>,
 }
 
@@ -26,14 +26,14 @@ impl<T: Send + 'static + ShowCondition> BloomFilter<T> {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-        filter_load_message: Option<FilterLoadMessage>,
+        filter_load: FilterLoadMessage,
         condvar_pair: CondvarPair<T>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
         let mut bloomfilter = BloomFilter {
             p2p,
             timeout,
-            filter_load_message,
+            filter_load,
             condvar_pair,
         };
 
@@ -82,13 +82,10 @@ impl<T: Send + 'static + ShowCondition> BloomFilter<T> {
 
     // Each node needs to send a filter load message
     fn send_filter(&mut self, peer: PeerId) -> Result<(), Error> {
-        if let Some(filter_load_message) = &self.filter_load_message {
-            info!("send filter loaded message");
-            self.p2p.send_network(
-                peer,
-                NetworkMessage::FilterLoad(filter_load_message.to_owned()),
-            );
-        }
+        self.p2p.send_network(
+            peer,
+            NetworkMessage::FilterLoad(self.filter_load.clone()),
+        );
 
         let ref pair = self.condvar_pair;
         let &(ref lock, ref cvar) = Arc::deref(pair);

@@ -1,6 +1,5 @@
 //! start murmel form here
 use crate::constructor::Constructor;
-use crate::db::VERIFY;
 use crate::path::BTC_HAMMER_PATH;
 use bitcoin::Network;
 use log::LevelFilter;
@@ -55,7 +54,7 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         .as_secs();
 
     let chaindb = Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap();
-    let mut spv = Constructor::new(network, listen, chaindb, VERIFY.0.to_owned()).unwrap();
+    let mut spv = Constructor::new(network, listen, chaindb, *address[0]).unwrap();
     spv.run(network, peers, connections)
         .expect("can not start node");
 }

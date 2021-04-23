@@ -1,7 +1,15 @@
 #[allow(dead_code)]
 use bitcoin::consensus::encode::Error;
 use bitcoin::Transaction;
+use bitcoin_hashes::hex::ToHex;
+use bitcoin_hashes::Hash;
 use std::fmt::Write;
+
+pub fn hash160(str: &str) -> String {
+    let decode: Vec<u8> = bitcoin_hashes::hex::FromHex::from_hex(str).expect("Invalid public key");
+    let hash = bitcoin_hashes::hash160::Hash::hash(&decode[..]);
+    hash.to_hex()
+}
 
 pub fn vec_to_string(vec: Vec<u8>) -> String {
     let mut r = String::new();
@@ -11,7 +19,6 @@ pub fn vec_to_string(vec: Vec<u8>) -> String {
     r
 }
 
-#[allow(dead_code)]
 pub fn tx_to_hex(tx: &Transaction) -> String {
     let ser = bitcoin::consensus::serialize(tx);
     vec_to_string(ser)

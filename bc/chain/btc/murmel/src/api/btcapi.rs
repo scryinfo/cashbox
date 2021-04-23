@@ -8,7 +8,6 @@ use super::*;
 use crate::constructor::Constructor;
 
 use bitcoin::consensus::serialize;
-use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::util::psbt::serialize::Serialize;
 use bitcoin::{Address, Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut};
 use bitcoin_hashes::hex::FromHex;
@@ -22,13 +21,15 @@ use log::info;
 use log::Level;
 
 use crate::db::fetch_scanned_height;
-use crate::db::{RB_CHAIN, VERIFY};
+use crate::db::RB_CHAIN;
 use crate::path::BTC_HAMMER_PATH;
 use futures::executor::block_on;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
 use std::time::SystemTime;
+
+pub const  PASSPHRASE: &str = "";
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -257,30 +258,8 @@ pub extern "system" fn Java_JniApi_btcStart(
         .as_secs();
     let chaindb = Constructor::open_db(Some(&Path::new(BTC_HAMMER_PATH)), network, birth).unwrap();
 
-    // use mnemonic generate publc address and store it in database
-    let mut spv = Constructor::new(network, listen, chaindb, VERIFY.0.to_owned()).unwrap();
-    spv.run(network, peers, connections)
-        .expect("can not start node");
-}
-
-mod test {
-    use crate::api::{calc_bloomfilter, calc_default_address, calc_pubkey};
-
-    #[test]
-    pub fn test_calc_pubkey() {
-        let pubkey = calc_pubkey();
-        println!("calc_pubkey {:?}", pubkey);
-    }
-
-    #[test]
-    pub fn test_calc_bloomfilter() {
-        let filter = calc_bloomfilter();
-        println!("calc_bloomfilter {:#0x?}", filter);
-    }
-
-    #[test]
-    pub fn test_calc_defalut_address() {
-        let address = calc_default_address();
-        println!("address {:?}", address.to_string());
-    }
+    // // use mnemonic generate publc address and store it in database
+    // let mut spv = Constructor::new(network, listen, chaindb, VERIFY.0.to_owned()).unwrap();
+    // spv.run(network, peers, connections)
+    //     .expect("can not start node");
 }

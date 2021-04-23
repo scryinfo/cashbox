@@ -3,8 +3,6 @@
 //!     1. for btc chain database
 //!     2. for user data (utxo address ...)
 //!
-use crate::api::{calc_default_address, calc_hash160, calc_pubkey};
-use crate::kit::hex_to_tx;
 use crate::path::{BTC_CHAIN_PATH, BTC_DETAIL_PATH};
 use async_trait::async_trait;
 use bitcoin::blockdata::constants::genesis_block;
@@ -25,6 +23,7 @@ use rbatis::wrapper::Wrapper;
 use rbatis_core::Error;
 use std::ops::Add;
 use strum_macros::{EnumIter, EnumString, ToString};
+use crate::kit;
 
 // state value in btc database must be one of this enum
 #[derive(Debug, Eq, PartialEq, EnumString, ToString, EnumIter)]
@@ -476,7 +475,7 @@ impl DetailSqlite {
                         utxo.btc_tx_hexbytes = this_output.btc_tx_hexbytes;
                         utxo.value = this_output.value;
 
-                        let input_tx = hex_to_tx(&input.btc_tx_hexbytes);
+                        let input_tx = kit::hex_to_tx(&input.btc_tx_hexbytes);
                         let mut spent_value = 0;
                         if let Ok(tx) = input_tx {
                             let outs = tx.output;
@@ -543,34 +542,6 @@ pub static RB_CHAIN: Lazy<ChainSqlite> =
 
 pub static RB_DETAIL: Lazy<DetailSqlite> =
     Lazy::new(|| DetailSqlite::new(Network::Testnet, BTC_DETAIL_PATH));
-
-pub static VERIFY: Lazy<(Option<FilterLoadMessage>, String)> = Lazy::new(|| {
-    let user_address = block_on(RB_DETAIL.fetch_user_address());
-    match user_address {
-        None => {
-            info!("Did not have pubkey in database yet, calc default address and pubkey");
-            let default_address = calc_default_address();
-            let address = default_address.to_string();
-            let default_pubkey = calc_pubkey();
-            let verify = calc_hash160(default_pubkey.as_str());
-            {
-                block_on(RB_DETAIL.save_user_address(
-                    address,
-                    default_pubkey.clone(),
-                    verify.clone(),
-                ));
-            }
-            let filter_load_message = FilterLoadMessage::calculate_filter(default_pubkey.as_str());
-            (Some(filter_load_message), verify)
-        }
-        Some(u) => {
-            info!("User Address {:?}", &u);
-            let filter_load_message =
-                FilterLoadMessage::calculate_filter(u.compressed_pub_key.as_str());
-            (Some(filter_load_message), u.verify)
-        }
-    }
-});
 
 #[cfg(test)]
 mod test {
