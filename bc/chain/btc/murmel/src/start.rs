@@ -4,19 +4,27 @@ use crate::db::VERIFY;
 use crate::path::BTC_HAMMER_PATH;
 use bitcoin::Network;
 use log::LevelFilter;
-use mav::NetType;
+use mav::ma::MAddress;
+use mav::{ChainType, NetType};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::time::SystemTime;
-use mav::ma::MAddress;
 
-pub fn start(net_type: &NetType, address :Vec<&MAddress>) {
-    let network = match net_type {
-        NetType::Main => Network::Bitcoin,
-        NetType::Test => Network::Testnet,
-        _ => Network::Testnet,
+///
+/// btc now just have three type    </br>
+///     1. Bitcoin Mainnet
+///     2. Testnet
+///     3. Regtest （Private)
+///
+pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
+    let (chain_type, network) = match net_type {
+        NetType::Main => (ChainType::BTC, Network::Bitcoin),
+        NetType::Test => (ChainType::BtcTest, Network::Testnet),
+        NetType::Private => (ChainType::BtcPrivate, Network::Regtest),
+        _ => (ChainType::BtcTest, Network::Testnet),
     };
 
+    #[cfg(test)]
     simple_logger::SimpleLogger::new()
         .with_level(LevelFilter::Debug)
         .init()
