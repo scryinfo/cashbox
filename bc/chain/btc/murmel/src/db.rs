@@ -3,6 +3,7 @@
 //!     1. for btc chain database
 //!     2. for user data (utxo address ...)
 //!
+use crate::kit;
 use crate::path::{BTC_CHAIN_PATH, BTC_DETAIL_PATH};
 use async_trait::async_trait;
 use bitcoin::blockdata::constants::genesis_block;
@@ -11,9 +12,11 @@ use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
-use mav::ma::{Dao, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo};
+use mav::ma::{
+    Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo,
+};
 use mav::ma::{MLocalTxLog, MProgress, MUserAddress};
-use once_cell::sync::Lazy;
+use once_cell::sync::{Lazy, OnceCell};
 use rbatis::core::db::DBExecResult;
 use rbatis::crud::CRUDTable;
 use rbatis::crud::CRUD;
@@ -23,7 +26,6 @@ use rbatis::wrapper::Wrapper;
 use rbatis_core::Error;
 use std::ops::Add;
 use strum_macros::{EnumIter, EnumString, ToString};
-use crate::kit;
 
 // state value in btc database must be one of this enum
 #[derive(Debug, Eq, PartialEq, EnumString, ToString, EnumIter)]
@@ -382,7 +384,10 @@ impl DetailSqlite {
 
     pub async fn fetch_user_address(&self) -> Option<MUserAddress> {
         //use key don't use _ROWID_        key = "key"
-        let w = self.rb.new_wrapper().eq(MUserAddress::key, MUserAddress::key);
+        let w = self
+            .rb
+            .new_wrapper()
+            .eq(MUserAddress::key, MUserAddress::key);
         let r: Result<MUserAddress, _> = self.rb.fetch_by_wrapper("", &w).await;
         match r {
             Ok(u) => Some(u),
@@ -542,6 +547,32 @@ pub static RB_CHAIN: Lazy<ChainSqlite> =
 
 pub static RB_DETAIL: Lazy<DetailSqlite> =
     Lazy::new(|| DetailSqlite::new(Network::Testnet, BTC_DETAIL_PATH));
+
+#[derive(Debug)]
+pub struct Verify {
+    address: String,
+    public_key: String,
+    pub(crate) verify: String,
+    pub(crate) filter: FilterLoadMessage
+}
+
+pub static INSTANCE: OnceCell<Verify> = OnceCell::new();
+
+impl Verify {
+    pub fn global() -> &'static Verify {
+        INSTANCE.get().expect("Verify is not initialized")
+    }
+
+    pub fn from_address(address: MAddress) -> Self {
+        let public_key = &address.public_key.as_str()[2..];    // trim 0x
+        Verify {
+            address: address.address,
+            public_key: public_key.to_string(),
+            verify: kit::hash160(public_key),
+            filter: FilterLoadMessage::calculate_filter(public_key)
+        }
+    }
+}
 
 #[cfg(test)]
 mod test {

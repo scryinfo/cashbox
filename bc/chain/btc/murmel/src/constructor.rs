@@ -58,6 +58,8 @@ use std::{
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
 use mav::ma::MAddress;
+use crate::db::Verify;
+use crate::db;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -143,12 +145,14 @@ impl Constructor {
         ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
-        let public_key = &address.public_key.as_str()[2..];    // trim 0x
-        let filter_load = FilterLoadMessage::calculate_filter(public_key);
+        let verify = Verify::from_address(address.clone());
+        db::INSTANCE.set(verify).unwrap();
+        let verify = Verify::global();
+
         dispatcher.add_listener(BloomFilter::new(
             p2p_control.clone(),
             timeout.clone(),
-            filter_load,
+            verify.filter.clone(),
             pair2,
         ));
 

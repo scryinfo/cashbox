@@ -14,7 +14,7 @@ use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hex::ToHex;
 
 use crate::constructor::CondvarPair;
-use crate::db::{RB_CHAIN, RB_DETAIL};
+use crate::db::{RB_CHAIN, RB_DETAIL, Verify};
 use crate::kit::vec_to_string;
 use bitcoin::consensus::serialize as btc_serialize;
 use futures::executor::block_on;
@@ -191,20 +191,19 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                 iter.next();
                 iter.next();
                 let current_hash_160 = iter.next().unwrap_or(" ");
-                // todo for test  must change
-                // if current_hash_160.eq(&*VERIFY.1) {
-                //     let value = vout.value;
-                //     let btc_tx_hash = tx.bitcoin_hash().to_hex();
-                //     let btc_tx_hexbytes = btc_serialize(tx);
-                //     let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
-                //     block_on(RB_DETAIL.save_btc_output_tx(
-                //         value,
-                //         script.asm(),
-                //         index as u32,
-                //         btc_tx_hash,
-                //         btc_tx_hexbytes,
-                //     ));
-                // }
+                if current_hash_160.eq(&Verify::global().verify) {
+                    let value = vout.value;
+                    let btc_tx_hash = tx.bitcoin_hash().to_hex();
+                    let btc_tx_hexbytes = btc_serialize(tx);
+                    let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
+                    block_on(RB_DETAIL.save_btc_output_tx(
+                        value,
+                        script.asm(),
+                        index as u32,
+                        btc_tx_hash,
+                        btc_tx_hexbytes,
+                    ));
+                }
             }
         }
 
