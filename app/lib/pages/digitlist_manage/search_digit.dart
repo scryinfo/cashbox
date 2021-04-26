@@ -1,7 +1,6 @@
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/token.dart';
-import 'package:app/model/wallet.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
@@ -19,6 +18,8 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
+import 'package:wallets/wallets_c.dc.dart';
+import 'package:wallets/kits.dart';
 
 class SearchDigitPage extends StatefulWidget {
   @override
@@ -27,7 +28,6 @@ class SearchDigitPage extends StatefulWidget {
 
 class _SearchDigitPageState extends State<SearchDigitPage> {
   List<TokenM> displayDigitsList = [];
-  Wallet nowWalletM;
   Chain nowChain;
   TextEditingController _searchContentController = TextEditingController();
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
@@ -243,20 +243,29 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                         break;
                       }
                     }
-                    if (isDigitExist) {
-                      isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
-                    } else {
-                      // Save to digit under the local Chain (bottom + model)
-                      var addDigitMap = await Wallets.instance.addDigitToChainModel(
-                          Wallets.instance.nowWallet.walletId, Wallets.instance.nowWallet.nowChain, displayDigitsList[index].tokenId);
-                      int status = addDigitMap["status"];
-                      if (status == null || status != 200) {
-                        Fluttertoast.showToast(msg: translate('save_digit_model_failure').toString());
-                      } else {
-                        isExecutorSuccess = true;
+                    if (!isDigitExist) {
+                      // save token to local, make sure token exist
+                      TokenAddress tokenAddress = TokenAddress()
+                        ..tokenId = displayDigitsList[index].tokenId
+                        ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+                        ..walletId = WalletsControl.getInstance().currentWallet().id
+                        ..balance = 0.toString()
+                        ..addressId = WalletsControl.getInstance().getTokenAddressId(
+                                WalletsControl.getInstance().currentWallet().id, WalletsControl.getInstance().currentChainType()) ??
+                            "";
+                      bool isUpsertOk = WalletsControl.getInstance().updateBalance(tokenAddress);
+                      if (!isUpsertOk) {
+                        Logger.getInstance().e("updateBalance", "updateBalance failure ");
+                        Fluttertoast.showToast(msg: translate("save_digit_model_failure"));
+                        return;
                       }
-                      isExecutorSuccess = await Wallets.instance.nowWallet.nowChain.showDigit(displayDigitsList[index]);
                     }
+                    WalletTokenStatus walletTokenStatus = WalletTokenStatus()
+                      ..walletId = WalletsControl.getInstance().currentWallet().id
+                      ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
+                      ..tokenId = displayDigitsList[index].tokenId;
+                    walletTokenStatus.isShow = true.toInt(); // change to invisible
+                    isExecutorSuccess = WalletsControl.getInstance().changeTokenStatus(walletTokenStatus);
                   }
                   if (isExecutorSuccess) {
                     setState(() {

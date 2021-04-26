@@ -1,3 +1,4 @@
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -260,7 +261,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            String walletId = await Wallets.instance.getNowWalletId();
+            String walletId = WalletsControl.getInstance().currentWallet().id;
             //todo to be tested
           },
         );

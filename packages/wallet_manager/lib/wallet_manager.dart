@@ -56,25 +56,11 @@ class WalletManager {
     return mnemonicMap;
   }
 
-  //获取当前钱包
-  // apiNo:WM05
-  static Future<String> getNowWalletId() async {
-    String nowWalletId = await _channel.invokeMethod('getNowWallet');
-    return nowWalletId;
-  }
-
   //设置当前钱包 bool是否成功
   //  apiNo:WM06
   static Future<Map<dynamic, dynamic>> setNowWallet(String walletId) async {
     Map<dynamic, dynamic> isSetNowWalletMap = await _channel.invokeMethod('setNowWallet', {"walletId": walletId});
     return isSetNowWalletMap;
-  }
-
-  //删除钱包。 钱包设置可删除，链设置隐藏。
-  // apiNo:WM07
-  static Future<Map> deleteWallet(String walletId, Uint8List pwd) async {
-    Map deleteWalletMap = await _channel.invokeMethod('deleteWallet', {"walletId": walletId, "pwd": pwd});
-    return deleteWalletMap;
   }
 
   // 重置钱包密码。
@@ -120,21 +106,6 @@ class WalletManager {
   static Future<Map<dynamic, dynamic>> setNowChainType(String walletId, int chainType) async {
     Map<dynamic, dynamic> allWalletList = await _channel.invokeMethod('setNowChainType', {"walletId": walletId, "chainType": chainType});
     return allWalletList;
-  }
-
-  // 显示代币
-  // apiNo:WM14
-  static Future<Map<dynamic, dynamic>> showDigit(String walletId, int chainType, String digitId) async {
-    Map<dynamic, dynamic> allWalletList =
-        await _channel.invokeMethod('showDigit', {"walletId": walletId, "chainType": chainType, "digitId": digitId});
-    return allWalletList;
-  }
-
-  // 隐藏代币
-  // apiNo:WM15
-  static Future<Map<dynamic, dynamic>> hideDigit(String walletId, int chainType, String digitId) async {
-    Map<dynamic, dynamic> hideDigitMap = await _channel.invokeMethod('hideDigit', {"walletId": walletId, "chainType": chainType, "digitId": digitId});
-    return hideDigitMap;
   }
 
   // 添加代币

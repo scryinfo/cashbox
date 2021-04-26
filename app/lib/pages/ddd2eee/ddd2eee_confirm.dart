@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -18,6 +20,8 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
+import 'package:wallets/kits.dart';
+import 'package:wallets/wallets_c.dc.dart';
 
 class Ddd2EeeConfirmPage extends StatefulWidget {
   @override
@@ -377,31 +381,32 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            String walletId = await Wallets.instance.getNowWalletId();
+            String walletId = WalletsControl.getInstance().currentWallet().id;
             Config config = await HandleConfig.instance.getConfig();
-
-            Map result = await Wallets.instance.ethTxSign(
-                walletId,
-                5,
-                // todo
-                // Chain.chainTypeToInt(chainType),
-                fromExchangeAddress,
-                toExchangeAddress,
-                chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA,
-                dddAmount,
-                eeeAddress,
-                Uint8List.fromList(pwd.codeUnits),
-                gasPrice,
-                gasLimit,
-                nonce,
-                decimal: decimal);
-            if (result != null && result.containsKey("status") && result["status"] == 200) {
-              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
-              sendRawTx2Chain(result["ethSignedInfo"].toString());
-            } else {
+            EthTransferPayload ethTransferPayload = EthTransferPayload();
+            try {
+              ethTransferPayload
+                ..fromAddress = fromExchangeAddress
+                ..toAddress = toExchangeAddress
+                ..contractAddress = chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA
+                ..value = dddAmount
+                ..nonce = nonce
+                ..gasPrice = gasPrice
+                ..gasLimit = gasLimit
+                ..decimal = 0
+                ..extData = "";
+            } catch (e) {
+              Fluttertoast.showToast(msg: translate("balance_is_less"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
+              NavigatorUtils.goBack(context);
+              return;
+            }
+            String signResult = EthChainControl.getInstance().txSign(ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
+            if (signResult == null) {
               Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
             }
+            Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+            sendRawTx2Chain(signResult);
           },
         );
       },
