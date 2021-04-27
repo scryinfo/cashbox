@@ -171,7 +171,14 @@ impl EthTransferPayload {
             let error_msg = format!("input value illegal:{}",&self.value);
             return Err(WalletError::Custom(error_msg));
         }
-       let  amount = amount.unwrap();
+       let value = {
+           if self.contract_address.trim().is_empty(){
+               amount.unwrap()
+           }else{
+               U256::from(0)
+           }
+       };
+        //let  amount = amount.unwrap();
         //Additional parameters
         let data = self.ext_data.as_str().as_bytes().to_vec();
         log::debug!("to address:{:?},contract_address:{:?}",self.to_address,self.contract_address);
@@ -181,7 +188,7 @@ impl EthTransferPayload {
             } else if !self.contract_address.trim().is_empty() {
                 let contract_address = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.contract_address)?.as_slice());
                 let to = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.to_address)?.as_slice());
-                let mut encode_data = eth::get_erc20_transfer_data(to, amount)?;
+                let mut encode_data = eth::get_erc20_transfer_data(to, amount.unwrap())?;
                 encode_data.extend_from_slice(&data);
                 (Some(contract_address), encode_data)
             } else {
@@ -218,7 +225,7 @@ impl EthTransferPayload {
         Ok(eth::RawTransaction {
             nonce,
             to: to_address,
-            value: amount,
+            value: value,
             gas_price,
             gas: gas_limit,
             data,

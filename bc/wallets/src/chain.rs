@@ -505,15 +505,15 @@ impl EeeChainTrait for EeeChain {
         ).await?
         {
             let genesis_hash = scry_crypto::hexstr_to_vec(&chain_info.genesis_hash)?;
-            let decimal = if chain_info.token_decimals == 0 {
+          /*  let decimal = if chain_info.token_decimals == 0 {
                 15
             } else {
                 chain_info.token_decimals as usize
             };
             let transfer_amount = crate::kits::token_unit_convert(&transfer_payload.value, decimal)
                 .map(|amount| amount.to_string())
-                .ok_or_else(|| WalletError::Custom("input amount is illegal".to_string()));
-            log::info!("transfer eee amount is:{:?}", transfer_amount);
+                .ok_or_else(|| WalletError::Custom("input amount is illegal".to_string()));*/
+            log::info!("transfer eee amount is:{:?}", &transfer_payload.value);
             let chain_helper = eee::SubChainHelper::init(
                 &chain_info.metadata,
                 &genesis_hash[..],
@@ -525,7 +525,7 @@ impl EeeChainTrait for EeeChain {
                 eee::Token::EEE,
                 &mn,
                 &transfer_payload.to_account,
-                &transfer_amount?,
+                &transfer_payload.value,
                 transfer_payload.index,
                 None,
             )?;
@@ -550,17 +550,6 @@ impl EeeChainTrait for EeeChain {
         }
         //todo 处理在测试网下存在相同地址的情况
         let address = m_address.get(0).unwrap();
-        //query token decimal by address
-        let decimal = {
-            let token_shared_wrapper = wallet_db.new_wrapper()
-                .eq(&MTokenShared::symbol, &Token::TokenX.to_string());
-            if let Ok(Some(token_shared)) = MEeeChainTokenShared::fetch_by_wrapper(wallet_db,"",&token_shared_wrapper).await{
-                    token_shared.decimal
-           }else {
-                15
-            }
-        };
-
         let m_wallet = MWallet::fetch_by_id(wallet_db, "", &address.wallet_id.to_owned()).await?;
         if m_wallet.is_none() {
             return Err(WalletError::Custom(format!("wallet {} is not exist!", address.wallet_id)));
@@ -571,11 +560,7 @@ impl EeeChainTrait for EeeChain {
         )?;
         let mn = String::from_utf8(mnemonic)?;
 
-        let ext_vec = scry_crypto::hexstr_to_vec(&transfer_payload.chain_version.genesis_hash)?;
-
-        let transfer_amount = crate::kits::token_unit_convert(&transfer_payload.value, decimal as usize)
-            .map(|amount| amount.to_string())
-            .ok_or_else(|| WalletError::Custom("input amount is illegal".to_string()));
+        let ext_vec = scry_crypto::hexstr_to_vec(&transfer_payload.ext_data)?;
 
         if let Some(chain_info) = SubChainBasicInfo::find_by_version(
             data_rb,
@@ -595,7 +580,7 @@ impl EeeChainTrait for EeeChain {
                 eee::Token::TokenX,
                 &mn,
                 &transfer_payload.to_account,
-                &transfer_amount?,
+                &transfer_payload.value,
                 transfer_payload.index,
                 Some(ext_vec),
             )?;
