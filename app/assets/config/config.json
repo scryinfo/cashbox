@@ -29,7 +29,7 @@
     "erc20GasLimit": 35000
   },
   "defaultGasLimit": {
-    "ethGasLimit": 21000,
+    "ethGasLimit": 25000,
     "erc20GasLimit": 70000
   },
   "maxGasPrice": {
@@ -41,8 +41,8 @@
     "erc20GasPrice": 10
   },
   "defaultGasPrice": {
-    "ethGasPrice": 30,
-    "erc20GasPrice": 30
+    "ethGasPrice": 50,
+    "erc20GasPrice": 50
   },
   "dbVersion": "1.1.0",
   "ethUnit": "1000000000000000000",

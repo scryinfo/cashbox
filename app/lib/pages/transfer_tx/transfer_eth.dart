@@ -79,6 +79,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       decimal = Provider.of<TransactionProvide>(context).decimal;
       chainType = Provider.of<TransactionProvide>(context).chainType;
       digitBalance = Provider.of<TransactionProvide>(context).balance;
+      digitName = Provider.of<TransactionProvide>(context).digitName;
     }
     if (fromAddress == null || fromAddress.trim() == "") {
       fromAddress = WalletsControl.getInstance().currentChainAddress() ?? "";
@@ -193,7 +194,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     alignment: Alignment.topRight,
                     width: ScreenUtil().setWidth(40),
                     child: Text(
-                      Utils.formatDouble(mGasFeeValue, precision: precision).toString() + (digitName ?? ""),
+                      Utils.formatDouble(mGasFeeValue, precision: precision).toString() + " (" + translate('tx_unit') + ":ETH)",
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
                         fontSize: ScreenUtil().setSp(3),
@@ -322,7 +323,12 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   alignment: Alignment.topRight,
                                   width: ScreenUtil().setWidth(40),
                                   child: Text(
-                                    Utils.formatDouble(mGasPriceValue, precision: precision).toString() + " wei",
+                                    Utils.formatDouble(mGasPriceValue, precision: precision).toString() +
+                                        " (" +
+                                        translate('tx_unit') +
+                                        ":" +
+                                        " wei" +
+                                        ")",
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
                                       fontSize: ScreenUtil().setSp(2.5),
@@ -633,12 +639,22 @@ class _TransferEthPageState extends State<TransferEthPage> {
         children: <Widget>[
           Container(
             alignment: Alignment.topLeft,
-            child: Text(
-              translate('transaction_amount'),
-              style: TextStyle(
-                color: Color.fromRGBO(255, 255, 255, 0.5),
-                fontSize: ScreenUtil().setSp(3),
-              ),
+            child: RichText(
+              text: TextSpan(children: <TextSpan>[
+                TextSpan(
+                  text: translate('transaction_amount'),
+                  style: TextStyle(
+                    decoration: TextDecoration.none,
+                    color: Color.fromRGBO(255, 255, 255, 0.5),
+                    fontSize: ScreenUtil().setSp(3),
+                    fontStyle: FontStyle.normal,
+                  ),
+                ),
+                TextSpan(
+                  text: " (" + translate('tx_unit') + ":" + digitName + ")",
+                  style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.35), fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+                ),
+              ]),
             ),
           ),
           Gaps.scaleVGap(2),

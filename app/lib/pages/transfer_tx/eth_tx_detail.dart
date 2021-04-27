@@ -254,7 +254,7 @@ class _EthTxDetailPageState extends State<EthTxDetailPage> {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              translate('gas_price'),
+              translate('gas_price') + " (" + translate('tx_unit') + ":" + "wei)",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.5),
                 fontSize: ScreenUtil().setSp(3.5),
