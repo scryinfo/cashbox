@@ -3,11 +3,10 @@ import 'dart:io';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/util/app_info_util.dart';
+import 'package:flutter_translate/global.dart';
 import 'package:logger/logger.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:device_info/device_info.dart';
-import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 
 Map<String, dynamic> _deviceData = <String, dynamic>{}; //Device Information
@@ -66,7 +65,6 @@ Future requestWithConfigCheckParam(String url, {formData}) async {
 //Access network request, url + parameter object
 Future request(String url, {formData}) async {
   try {
-    // print('开始获取数据...............' + url + "||formData :" + formData.toString());
     Response response;
     Dio dio = new Dio();
     //dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
@@ -78,20 +76,16 @@ Future request(String url, {formData}) async {
         return true;
       };
     };
-    //print("formData ======>"+formData.toString());
     if (formData == null) {
       response = await dio.post(url);
     } else {
       response = await dio.post(url, data: formData);
     }
-    // print("response===>" + response.toString());
     if (response.statusCode == 200) {
-      // print("net 访问返回数据结果是：" + response.data.toString());
       return response.data;
     } else {
-      print("后端接口出现异常，请检测代码和服务器情况.........");
-      Logger().e("后端接口出现异常，请检测代码和服务器情况 ", url.toString());
-      throw Exception('后端接口出现异常，请检测代码和服务器情况.........');
+      Logger().e(translate('server_interface_error'), url.toString());
+      throw Exception(translate('server_interface_error'));
     }
   } catch (e) {
     Logger().e("net_util request() error is", "${e}");

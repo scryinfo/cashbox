@@ -1,5 +1,3 @@
-import 'token_rate.dart';
-
 class TokenM {
   String tokenId; //Token id
   String chainId; //Chain id
@@ -19,14 +17,4 @@ class EeeToken extends TokenM {}
 
 class BtcToken extends TokenM {}
 
-class EthToken extends TokenM {
-  String contractAddress; //Contract address
-
-  @override
-  void set balance(String _balance) {
-    super.balance = _balance;
-  }
-
-  @override
-  String get balance => super.balance;
-}
+class EthToken extends TokenM {}
