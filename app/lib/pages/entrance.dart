@@ -72,8 +72,6 @@ class _EntrancePageState extends State<EntrancePage> {
 
   _checkAndUpdateAppConfig() async {
     Config config = await HandleConfig.instance.getConfig();
-    // handle case : Do initial DB and upgrade DB
-    _updateDbVersion(); // todo replace update Data interface
 
     // Interval check config
     var lastCheckTimeDuration = DateTime.now().millisecondsSinceEpoch - config.lastTimeConfigCheck;
@@ -113,15 +111,6 @@ class _EntrancePageState extends State<EntrancePage> {
     _updateLocalConfigInfo(config, serverConfigModel); // handle case : Config upgrade.
     _updateEthDefaultToken(refresh, basicClientReq, serverConfigModel, config);
     _updateEeeDefaultToken(refresh, basicClientReq, serverConfigModel, config);
-  }
-
-  _updateDbVersion() async {
-    // todo replace update Data interface
-    Config config = await HandleConfig.instance.getConfig();
-    Map resultMap = await Wallets.instance.updateWalletDbData(config.dbVersion);
-    if (resultMap != null && (resultMap["isUpdateDbData"] == true)) {
-      Logger().i("_checkAndUpdateAppConfig is ok =====>", config.dbVersion.toString());
-    }
   }
 
   _updateLocalConfigInfo(Config config, LatestConfig serverConfigModel) async {

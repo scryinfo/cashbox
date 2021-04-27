@@ -24,16 +24,16 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
   List<NetType> netTypeList = [
     NetType()
       ..enumNetType = EnumKit.NetType.Main.toEnumString()
-      ..netTypeName = "正式网络",
+      ..netTypeName = translate("main_net"),
     NetType()
       ..enumNetType = EnumKit.NetType.Test.toEnumString()
-      ..netTypeName = "测试网络",
-    NetType()
+      ..netTypeName = translate("test_net"),
+    /*NetType()
       ..enumNetType = EnumKit.NetType.Private.toEnumString()
-      ..netTypeName = "私有正式网络",
+      ..netTypeName = translate("private_main_net"),
     NetType()
       ..enumNetType = EnumKit.NetType.PrivateTest.toEnumString()
-      ..netTypeName = "私有测试网络",
+      ..netTypeName = translate("private_test_net"),*/
   ];
 
   @override
@@ -127,6 +127,7 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
                         this.netTypeList = netTypeList;
                       });
                       if (WalletsControl.getInstance().hasAny()) {
+                        // todo 切换网络之后设置当前钱包流程 。目前可实现loadAll，然后设置第一个作为当前
                         NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
                       } else {
                         NavigatorUtils.push(context, '${Routes.createTestWalletPage}', clearStack: true);

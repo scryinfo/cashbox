@@ -28,21 +28,6 @@ class Wallets {
     return _instance;
   }
 
-  Future<Map> updateWalletDbData(String newVersion) async {
-    Map resultMap = await WalletManager.updateWalletDbData(newVersion); //Initialize some database data
-    int status = resultMap["status"];
-    if (status == null) {
-      Logger().e("initWalletBasicData error=>", "not find status code");
-      return null;
-    }
-    if (status == 200) {
-      return resultMap;
-    } else {
-      Logger().e("initWalletBasicData=>", "error status is=>" + resultMap["status"].toString() + "||message is=>" + resultMap["message"].toString());
-      return null;
-    }
-  }
-
   // Create mnemonic words, to be verified correctly, the wallet is created by the bottom layer, and the application layer is saved
   // apiNo:MM00
   Future<Uint8List> createMnemonic(int count) async {
