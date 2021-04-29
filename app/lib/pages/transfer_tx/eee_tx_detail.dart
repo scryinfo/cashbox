@@ -187,6 +187,12 @@ class _EeeTxDetailPageState extends State<EeeTxDetailPage> {
   }
 
   Widget _buildBackupInfoWidget() {
+    var backupInfo = "";
+    try {
+      backupInfo = Utf8Decoder().convert(Utils.hexStrToUnitList(Provider.of<TransactionProvide>(context).backup)) ?? "";
+    } catch (e) {
+      backupInfo = "";
+    }
     return Container(
       child: Column(
         children: <Widget>[
@@ -204,7 +210,7 @@ class _EeeTxDetailPageState extends State<EeeTxDetailPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              String.fromCharCodes(Utils.hexStrToUnitList(Provider.of<TransactionProvide>(context).backup)) ?? "",
+              backupInfo ?? "",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil().setSp(3.5),

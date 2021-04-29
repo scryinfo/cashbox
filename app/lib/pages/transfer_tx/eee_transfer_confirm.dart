@@ -55,6 +55,8 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
             Gaps.scaleVGap(5),
             _buildTxValueWidget(),
             Gaps.scaleVGap(5),
+            _buildBackupInfoWidget(),
+            Gaps.scaleVGap(5),
             _buildTransferBtnWidget(),
           ],
         ),
@@ -146,6 +148,36 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
             alignment: Alignment.centerLeft,
             child: Text(
               Provider.of<TransactionProvide>(context).toAddress,
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.8),
+                fontSize: ScreenUtil().setSp(3.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackupInfoWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              translate('extend_msg'),
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil().setSp(3.5),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(1),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              Provider.of<TransactionProvide>(context).backup,
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.8),
                 fontSize: ScreenUtil().setSp(3.5),

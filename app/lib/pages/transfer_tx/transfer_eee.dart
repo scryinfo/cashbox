@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:app/configv/config/config.dart';
@@ -455,6 +456,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
           onPressed: (String pwd) async {
             String signInfo;
             Config config = await HandleConfig.instance.getConfig();
+            Utf8Codec utf = new Utf8Codec();
+            Uint8List buckUpList = utf.encode(_backupMsgController.text ?? "");
             if (digitName != null && digitName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
               EeeTransferPayload eeeTransferPayload = EeeTransferPayload();
               var valueMinUint = (double.parse(_txValueController.text) * Utils.mathPow(10, decimal).toInt()).toInt();
@@ -464,7 +467,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                 ..value = valueMinUint.toString()
                 ..index = nonce
                 ..password = pwd
-                ..extData = Utils.uint8ListToHex(Uint8List.fromList((_backupMsgController.text == "" ? "00" : _backupMsgController.text).codeUnits))
+                ..extData = Utils.uint8ListToHex(buckUpList)
                 ..chainVersion = EeeChainControl.getInstance().getChainVersion();
               signInfo = EeeChainControl.getInstance().eeeTransfer(eeeTransferPayload);
               if (signInfo == null || signInfo.isEmpty) {
@@ -480,7 +483,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                 ..value = _txValueController.text.toString()
                 ..index = nonce
                 ..password = pwd
-                ..extData = Utils.uint8ListToHex(Uint8List.fromList((_backupMsgController.text == "" ? "00" : _backupMsgController.text).codeUnits))
+                ..extData = Utils.uint8ListToHex(buckUpList)
                 ..chainVersion = EeeChainControl.getInstance().getChainVersion();
               signInfo = EeeChainControl.getInstance().tokenXTransfer(eeeTransferPayload);
             } else {
@@ -497,7 +500,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
               ..setFromAddress(WalletsControl.getInstance().currentChainAddress())
               ..setValue(_txValueController.text)
               ..setToAddress(_toAddressController.text)
-              ..setSignInfo(signInfo);
+              ..setSignInfo(signInfo)
+              ..setBackup(_backupMsgController.text);
             NavigatorUtils.push(context, Routes.transferEeeConfirmPage);
           },
         );
