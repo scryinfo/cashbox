@@ -15,7 +15,7 @@ use log::{debug, error, info};
 use mav::ma::{
     Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo,
 };
-use mav::ma::{MLocalTxLog, MProgress, MUserAddress};
+use mav::ma::{MLocalTxLog, MProgress};
 use once_cell::sync::{Lazy, OnceCell};
 use rbatis::core::db::DBExecResult;
 use rbatis::crud::CRUDTable;
@@ -186,7 +186,7 @@ impl DetailSqlite {
 
     async fn init_table(rb: &Rbatis) -> Result<(), Error> {
         DetailSqlite::create_progress(rb).await?;
-        DetailSqlite::create_user_address(rb).await?;
+        DetailSqlite::create_address(rb).await?;
         DetailSqlite::create_btc_input_tx(rb).await?;
         DetailSqlite::create_btc_output_tx(rb).await?;
         DetailSqlite::create_btc_chain_tx(rb).await?;
@@ -195,8 +195,8 @@ impl DetailSqlite {
         Ok(())
     }
 
-    async fn create_user_address(rb: &Rbatis) -> Result<DBExecResult, Error> {
-        rb.exec("", MUserAddress::create_table_script()).await
+    async fn create_address(rb: &Rbatis) -> Result<DBExecResult, Error> {
+        rb.exec("", MAddress::create_table_script()).await
     }
 
     async fn create_btc_input_tx(rb: &Rbatis) -> Result<DBExecResult, Error> {
@@ -357,44 +357,6 @@ impl DetailSqlite {
                 vec![]
             }
             Ok(r) => r,
-        }
-    }
-
-    pub async fn save_user_address(
-        &self,
-        address: String,
-        compressed_pub_key: String,
-        verify: String,
-    ) {
-        let mut user_address = MUserAddress::default();
-        user_address.key = MUserAddress::key.to_string();
-        user_address.address = address;
-        user_address.compressed_pub_key = compressed_pub_key;
-        user_address.verify = verify;
-        let r = user_address.save(&self.rb, "").await;
-        match r {
-            Ok(a) => {
-                debug!("save_tx_input {:?}", a);
-            }
-            Err(e) => {
-                debug!("save_tx_input {:?}", e);
-            }
-        }
-    }
-
-    pub async fn fetch_user_address(&self) -> Option<MUserAddress> {
-        //use key don't use _ROWID_        key = "key"
-        let w = self
-            .rb
-            .new_wrapper()
-            .eq(MUserAddress::key, MUserAddress::key);
-        let r: Result<MUserAddress, _> = self.rb.fetch_by_wrapper("", &w).await;
-        match r {
-            Ok(u) => Some(u),
-            Err(e) => {
-                println!("{:?}", e);
-                None
-            }
         }
     }
 
@@ -617,12 +579,6 @@ mod test {
     fn test_progress() {
         let progress = block_on(RB_DETAIL.progress());
         println!("{:#?}", &progress);
-    }
-
-    #[test]
-    fn test_fetch_user_address() {
-        let u = block_on(RB_DETAIL.fetch_user_address());
-        println!("{:?}", &u);
     }
 
     #[test]
