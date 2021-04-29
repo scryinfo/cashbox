@@ -321,7 +321,8 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
             ..setToAddress(eeeTxListModel[index].toAddress)
             ..setHash(eeeTxListModel[index].blockHash)
             ..setTimeStamp(eeeTxListModel[index].txTimestamp.toString())
-            ..setValue(eeeTxListModel[index].value);
+            ..setValue(eeeTxListModel[index].value)
+            ..setBackup(eeeTxListModel[index].extension_1);
           NavigatorUtils.push(context, Routes.eeeTransactionDetailPage);
         },
         child: Column(

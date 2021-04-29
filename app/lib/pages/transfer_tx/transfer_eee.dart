@@ -464,7 +464,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                 ..value = valueMinUint.toString()
                 ..index = nonce
                 ..password = pwd
-                ..extData = "todo"
+                ..extData = Utils.uint8ListToHex(Uint8List.fromList((_backupMsgController.text == "" ? "00" : _backupMsgController.text).codeUnits))
                 ..chainVersion = EeeChainControl.getInstance().getChainVersion();
               signInfo = EeeChainControl.getInstance().eeeTransfer(eeeTransferPayload);
               if (signInfo == null || signInfo.isEmpty) {

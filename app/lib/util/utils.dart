@@ -34,6 +34,37 @@ class Utils {
     }
   }
 
+  static Uint8List hexStrToUnitList(String originHexString) {
+    var str = originHexString;
+    if (originHexString.toLowerCase().startsWith("0x")) {
+      str = originHexString.substring(2);
+    }
+    int length = str.length;
+    if (length % 2 != 0) {
+      str = "0" + str;
+      length++;
+    }
+    List<int> s = str.toUpperCase().codeUnits;
+    Uint8List bArr = Uint8List(length >> 1);
+    try{
+      for (int i = 0; i < length; i += 2) {
+        bArr[i >> 1] = ((hex(s[i]) << 4) | hex(s[i + 1]));
+      }
+    }catch(e){
+      return bArr;
+    }
+    return bArr;
+  }
+
+  static hex(int c) {
+    if (c >= '0'.codeUnitAt(0) && c <= '9'.codeUnitAt(0)) {
+      return c - '0'.codeUnitAt(0);
+    }
+    if (c >= 'A'.codeUnitAt(0) && c <= 'F'.codeUnitAt(0)) {
+      return (c - 'A'.codeUnitAt(0)) + 10;
+    }
+  }
+
   static String uint8ListToHex(Uint8List bArr) {
     int length;
     if (bArr == null || (length = bArr.length) <= 0) {
@@ -52,7 +83,11 @@ class Utils {
     return new String.fromCharCodes(cArr);
   }
 
-  static int hexToInt(String hex) {
+  static int hexToInt(String originHexString) {
+    var hex = originHexString;
+    if (originHexString.toLowerCase().startsWith("0x")) {
+      hex = originHexString.substring(2);
+    }
     int val = 0;
     int len = hex.length;
     for (int i = 0; i < len; i++) {

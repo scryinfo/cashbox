@@ -287,23 +287,25 @@ class _EeePageState extends State<EeePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Container(
-            color: Color.fromRGBO(26, 141, 198, 0.40),
-            child: FlatButton(
-              child: Text(
-                translate('digit_manage'),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.blue,
-                  letterSpacing: 0.03,
-                  fontSize: ScreenUtil().setSp(3.2),
+          Opacity(
+              opacity: 0,
+              child: Container(
+                color: Color.fromRGBO(26, 141, 198, 0.40),
+                child: FlatButton(
+                  child: Text(
+                    translate('digit_manage'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.blue,
+                      letterSpacing: 0.03,
+                      fontSize: ScreenUtil().setSp(3.2),
+                    ),
+                  ),
+                  onPressed: () {
+                    // NavigatorUtils.push(context, '${Routes.digitManagePage}?isReloadDigitList=true', clearStack: false);
+                  },
                 ),
-              ),
-              onPressed: () {
-                NavigatorUtils.push(context, '${Routes.digitManagePage}?isReloadDigitList=true', clearStack: false);
-              },
-            ),
-          )
+              ))
         ],
       ),
     );

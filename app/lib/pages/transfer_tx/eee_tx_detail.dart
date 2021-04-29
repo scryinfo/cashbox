@@ -1,10 +1,15 @@
+import 'dart:convert';
+
+import 'package:app/control/eee_chain_control.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
+import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/wallets_c.dc.dart';
 
 class EeeTxDetailPage extends StatefulWidget {
   @override
@@ -14,6 +19,7 @@ class EeeTxDetailPage extends StatefulWidget {
 class _EeeTxDetailPageState extends State<EeeTxDetailPage> {
   @override
   Widget build(BuildContext context) {
+    var backUpInfo = Provider.of<TransactionProvide>(context).backup;
     return Container(
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(160),
@@ -50,6 +56,8 @@ class _EeeTxDetailPageState extends State<EeeTxDetailPage> {
             _buildTxValueWidget(),
             Gaps.scaleVGap(5),
             _buildBlockHashWidget(),
+            Gaps.scaleVGap(5),
+            _buildBackupInfoWidget(),
             Gaps.scaleVGap(5),
             _buildTimeStampWidget(),
           ],
@@ -167,6 +175,36 @@ class _EeeTxDetailPageState extends State<EeeTxDetailPage> {
             alignment: Alignment.centerLeft,
             child: Text(
               Provider.of<TransactionProvide>(context).hash,
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9),
+                fontSize: ScreenUtil().setSp(3.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackupInfoWidget() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child: Text(
+              translate('extend_msg'),
+              style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.5),
+                fontSize: ScreenUtil().setSp(3.5),
+              ),
+            ),
+          ),
+          Gaps.scaleVGap(1),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              String.fromCharCodes(Utils.toUnitList(Provider.of<TransactionProvide>(context).backup)) ?? "",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil().setSp(3.5),
