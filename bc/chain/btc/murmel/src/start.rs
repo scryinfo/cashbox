@@ -28,7 +28,7 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         .filter(|&&a| a.chain_type.eq(chain_type.to_string().as_str()))
         .collect::<Vec<&&MAddress>>();
 
-    #[cfg(test)]
+    //#[cfg(test)]
     simple_logger::SimpleLogger::new()
         .with_level(LevelFilter::Debug)
         .init()

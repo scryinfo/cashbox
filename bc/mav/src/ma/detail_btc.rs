@@ -107,25 +107,6 @@ impl MBtcChainTokenDefault {
 //murmel defined
 #[db_append_shared]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
-pub struct MUserAddress {
-    #[serde(default)]
-    pub key: String,
-    #[serde(default)]
-    pub address: String,
-    #[serde(default)]
-    pub compressed_pub_key: String,
-    #[serde(default)]
-    pub verify: String,
-}
-
-impl MUserAddress {
-    pub const fn create_table_script() -> &'static str {
-        std::include_str!("../../../sql/m_user_address.sql")
-    }
-}
-
-#[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
 pub struct MProgress {
     #[serde(default)]
     pub header: String,

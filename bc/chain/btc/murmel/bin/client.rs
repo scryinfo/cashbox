@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// Murmel move into bc/chain/btc/murmel
+// !!!! Murmel move into bc/chain/btc/murmel
 // should not be start herer
-// statr in wallet or wallet_cdl
+// statr in wallet_cdl
 //
 //
 //
