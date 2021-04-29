@@ -204,7 +204,7 @@ class _EeeTxDetailPageState extends State<EeeTxDetailPage> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              String.fromCharCodes(Utils.toUnitList(Provider.of<TransactionProvide>(context).backup)) ?? "",
+              String.fromCharCodes(Utils.hexStrToUnitList(Provider.of<TransactionProvide>(context).backup)) ?? "",
               style: TextStyle(
                 color: Color.fromRGBO(255, 255, 255, 0.9),
                 fontSize: ScreenUtil().setSp(3.5),
