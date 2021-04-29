@@ -58,8 +58,9 @@ use std::{
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
 use mav::ma::MAddress;
-use crate::db::Verify;
+use crate::db::{Verify, RB_DETAIL};
 use crate::db;
+use futures::executor::block_on;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -134,6 +135,7 @@ impl Constructor {
         ));
         let pair2 = Arc::clone(&pair);
         let pair3 = Arc::clone(&pair);
+        let pair4 = Arc::clone(&pair);
 
         dispatcher.add_listener(HeaderDownload::new(
             chaindb.clone(),
@@ -145,6 +147,7 @@ impl Constructor {
         ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
+        block_on(RB_DETAIL.save_address(address.clone()));
         let verify = Verify::from_address(address.clone());
         db::INSTANCE.set(verify).unwrap();
         let verify = Verify::global();
@@ -163,7 +166,7 @@ impl Constructor {
             pair3,
         ));
 
-        // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
+        dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));

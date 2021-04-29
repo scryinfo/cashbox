@@ -293,6 +293,18 @@ impl DetailSqlite {
         }
     }
 
+    pub async fn save_address(&self, ref mut address:MAddress) {
+        let r= address.save(&self.rb,"").await;
+        match r {
+            Ok(a) => {
+                debug!("save address {:?}", a);
+            }
+            Err(e) => {
+                debug!("error save address {:?}", e);
+            }
+        }
+    }
+
     pub async fn save_btc_input_tx(
         &self,
         tx_id: String,
