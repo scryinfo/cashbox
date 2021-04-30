@@ -29,9 +29,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   void initData() async {
     walletList = [];
-    walletList =
-        WalletsControl.getInstance().walletsAll() ?? []; //After the ethHomePage is loaded, the interface has been dropped, just take the cache
-
+    walletList = WalletsControl.getInstance().walletsAll() ?? [];
     setState(() {
       this.walletList = walletList;
     });

@@ -30,7 +30,7 @@ class HandleConfig {
     File file = await _getConfigFile(configFileName);
     Config config = Config();
     try {
-      String fileContent = file.readAsStringSync();
+      String fileContent = await file.readAsString();
       Map configMap = jsonDecode(fileContent);
       config = Config.fromJson(configMap);
       return config;
@@ -47,7 +47,7 @@ class HandleConfig {
     try {
       File file = await _getConfigFile(configFileName);
       String fileString = jsonEncode(config.toJson());
-      file.writeAsString(fileString, flush: true);
+      file.writeAsStringSync(fileString, flush: true);
     } catch (e) {
       Logger.getInstance().e("saveConfig", "error info is" + e.toString());
       return false;
