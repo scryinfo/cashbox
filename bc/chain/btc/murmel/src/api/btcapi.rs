@@ -5,7 +5,6 @@
 #![allow(non_snake_case)]
 
 use super::*;
-use crate::constructor::Constructor;
 
 use bitcoin::consensus::serialize;
 use bitcoin::util::psbt::serialize::Serialize;
@@ -18,18 +17,14 @@ use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::{jboolean, jbyteArray, jint, jstring};
 use jni::JNIEnv;
 use log::info;
-use log::Level;
 
 use crate::db::fetch_scanned_height;
 use crate::db::RB_CHAIN;
-use crate::path::BTC_HAMMER_PATH;
 use futures::executor::block_on;
-use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
-use std::path::Path;
+use std::net::{SocketAddr, SocketAddrV4};
 use std::str::FromStr;
-use std::time::SystemTime;
 
-pub const  PASSPHRASE: &str = "";
+pub const PASSPHRASE: &str = "";
 
 #[no_mangle]
 #[allow(non_snake_case)]
