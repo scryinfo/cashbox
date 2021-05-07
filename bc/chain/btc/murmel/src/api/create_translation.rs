@@ -115,14 +115,6 @@ pub fn create_translation(
     spending_transaction
 }
 
-///Calculation hash160
-pub fn hash160(public_key: &str) -> String {
-    let decode: Vec<u8> = FromHex::from_hex(public_key).expect("Invalid public key");
-    let hash = hash160::Hash::hash(&decode[..]);
-    warn!("HASH160 {:?}", hash.to_hex());
-    hash.to_hex()
-}
-
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_creat_1master(
@@ -210,29 +202,4 @@ pub extern "system" fn Java_JniApi_creat_1transaction(
     }
 
     message_obj.into_inner()
-}
-
-mod test {
-    use crate::api::create_translation::{
-        add_account, create_master_by_mnemonic, create_translation, hash160,
-    };
-    use crate::walletlib::create_master;
-    use bitcoin::consensus::serialize;
-    use bitcoin::{Address, Network};
-    use std::str::FromStr;
-
-    #[test]
-    pub fn tx() {
-        let words = "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
-        let master = create_master_by_mnemonic(words, Network::Testnet);
-
-        add_account(&mut master.unwrap(), (0, 0));
-        // let tx = create_translation(
-        //     21000,
-        //     "n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk",
-        //      &mut master.unwrap(),
-        //     (0, 0),
-        // );
-        // println!("tx {:#?}", tx);
-    }
 }
