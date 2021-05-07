@@ -1,7 +1,6 @@
 import 'package:app/control/balance_control.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/model/token.dart';
-import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
@@ -54,6 +53,8 @@ class EthChainControl {
         ..contractAddress = element.contractAddress ?? ""
         ..isVisible = element.show_1.isTrue()
         ..tokenId = element.chainTokenSharedId
+        ..gasLimit = element.ethChainTokenShared.gasLimit
+        ..gasPrice = element.ethChainTokenShared.gasPrice
         ..decimal = element.ethChainTokenShared.decimal ?? 0;
       _allTokenList.add(newToken);
     });

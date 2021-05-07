@@ -81,9 +81,9 @@ class _EthPageState extends State<EthPage> {
       this.walletName = this.walletName;
     });
     tokenListFuture = loadDisplayTokenListData();
+    loadDigitRateInfo();
     loadDigitBalance();
     loadLegalCurrency();
-    loadDigitRateInfo();
     AppInfoUtil.instance.checkAppUpgrade();
   }
 
@@ -219,6 +219,8 @@ class _EthPageState extends State<EthPage> {
         ..fullName = allVisibleTokenMList[i].fullName
         ..balance = allVisibleTokenMList[i].balance
         ..contractAddress = allVisibleTokenMList[i].contractAddress
+        ..gasPrice = allVisibleTokenMList[i].gasPrice
+        ..gasLimit = allVisibleTokenMList[i].gasLimit
         ..address = allVisibleTokenMList[i].address;
       displayTokenMList.add(tokenM);
     }
@@ -394,6 +396,8 @@ class _EthPageState extends State<EthPage> {
                   ..setDecimal(displayTokenMList[index].decimal)
                   ..setFromAddress(displayTokenMList[index].address)
                   ..setChainType(WalletsControl.getInstance().currentWallet().ethChain.chainShared.chainType.toChainType())
+                  ..setGasPrice(displayTokenMList[index].gasPrice)
+                  ..setGasUsed(displayTokenMList[index].gasLimit.toString())
                   ..setContractAddress(displayTokenMList[index].contractAddress);
               }
               NavigatorUtils.push(context, Routes.ethChainTxHistoryPage);

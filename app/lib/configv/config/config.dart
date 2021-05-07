@@ -22,8 +22,8 @@ class Config extends Object {
   MinGasLimit minGasLimit;
   DefaultGasLimit defaultGasLimit;
 
-  MaxGasPrice maxGasPrice;
-  MinGasPrice minGasPrice;
+  MaxGasPrice maxGasPrice;   // unit：单位 gwei
+  MinGasPrice minGasPrice;   // unit：单位 gwei
   DefaultGasPrice defaultGasPrice;
 
   String dbVersion;

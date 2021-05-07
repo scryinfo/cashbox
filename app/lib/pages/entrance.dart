@@ -189,6 +189,7 @@ class _EntrancePageState extends State<EntrancePage> {
         EthChainTokenDefault ethChainTokenDefault = EthChainTokenDefault();
         ethChainTokenDefault
           ..ethChainTokenShared.gasLimit = element.gasLimit.toInt()
+          ..ethChainTokenShared.gasPrice = element.gasPrice.toString()
           ..netType = element.tokenShared.netType
           ..ethChainTokenShared.tokenType = element.tokenShared.chainType
           ..ethChainTokenShared.tokenShared.name = element.tokenShared.name

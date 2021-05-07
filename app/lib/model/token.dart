@@ -11,6 +11,8 @@ class TokenM {
   String urlImg; //Token icon icon address
   bool isVisible = true; //Is the token visible
   String lastTxInfo; //The last transaction on the chain
+  String gasPrice = "0.0"; // unit: Gwei  sync with server end
+  int gasLimit = 0;
 }
 
 class EeeToken extends TokenM {}

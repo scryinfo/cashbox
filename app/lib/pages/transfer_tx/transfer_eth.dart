@@ -110,6 +110,18 @@ class _TransferEthPageState extends State<TransferEthPage> {
       mGasLimitValue = config.defaultGasLimit.ethGasLimit;
       mGasPriceValue = config.defaultGasPrice.ethGasPrice;
     }
+    try {
+      var gasPrice = double.parse(Provider.of<TransactionProvide>(context, listen: false).gasPrice);
+      var gasUsed = double.parse(Provider.of<TransactionProvide>(context, listen: false).gasUsed);
+      if ((gasPrice != null) && (gasPrice >= mMinGasPrice) && (gasPrice <= mMaxGasPrice)) {
+        mGasPriceValue = gasPrice;
+      }
+      if ((gasUsed != null) && (gasUsed >= mMinGasLimit) && (gasUsed <= mMaxGasLimit)) {
+        mGasLimitValue = gasUsed;
+      }
+    } catch (e) {
+      Logger.getInstance().e("server gas fee config error", e.toString());
+    }
     setState(() {
       this.mMaxGasPrice = mMaxGasPrice;
       this.mMinGasPrice = mMinGasPrice;
@@ -119,7 +131,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       this.mGasPriceValue = mGasPriceValue;
       mMaxGasFee = mMaxGasLimit * mMaxGasPrice / eth2gasUnit;
       mMinGasFee = mMinGasLimit * mMinGasPrice / eth2gasUnit;
-      mGasFeeValue = mGasLimitValue * mGasPriceValue / eth2gasUnit;
+      mGasFeeValue = mGasLimitValue * mGasPriceValue / eth2gasUnit;  // unit:eth = (gwei/(10^8))
     });
   }
 
@@ -327,7 +339,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                         " (" +
                                         translate('tx_unit') +
                                         ":" +
-                                        " wei" +
+                                        "Gwei" +
                                         ")",
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
