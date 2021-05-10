@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{BtcChain, BtcChainToken, BtcChainTokenShared,BtcChainTokenAuth,BtcChainTokenDefault};
+use wallets_types::{BtcChain, BtcChainToken, BtcChainTokenShared,BtcChainTokenAuth,BtcChainTokenDefault,BtcNowLoadBlock};
 
 use crate::kits::{CArray, CBool,CR, CStruct,to_str,to_c_char,Assignment};
 use crate::types::{CChainShared, CTokenShared};
@@ -48,4 +48,12 @@ pub struct CBtcChainTokenAuth {
 pub struct CBtcChain {
     pub chainShared: *mut CChainShared,
     pub tokens: *mut CArray<CBtcChainToken>,
+}
+
+#[repr(C)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
+pub struct CBtcNowLoadBlock{
+    pub height: i64,
+    pub hash: *mut c_char,
+    pub timestamp: *mut c_char,
 }
