@@ -24,9 +24,16 @@ class Logger {
 
   static Logger? _instance;
 
-  factory Logger() => _instance ??= Logger._logger();
+  factory Logger() {
+    if (_instance == null) {
+      _instance = Logger._logger();
+    }
+    return _instance ?? Logger._logger();
+  }
 
-  Logger._logger();
+  Logger._logger() {
+    _registerAndListeningLogThread();
+  }
 
   static Logger getInstance() {
     return _instance ??= Logger();
@@ -44,19 +51,21 @@ class Logger {
   }
 
   _registerAndListeningLogThread() async {
-    final rPort = ReceivePort();
-    if (_sendPort == null) {
-      try {
-        // First time register ok, return ok. Next duplicated register will return false;
-        bool onceRegisterOk = IsolateNameServer.registerPortWithName(rPort.sendPort, _logThreadName);
-        if (onceRegisterOk) {
-          _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);
-        }
-      } catch (e) {
-        print("error!  register thread procedure, error detail is --->" + e.toString());
-      }
+    _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);
+    // make sure only multiThread register once and register to same port
+    if (_sendPort != null) {
+      return;
     }
-
+    ReceivePort rPort = ReceivePort();
+    try {
+      // First time register ok, return ok. Next duplicated register will return false;
+      bool onceRegisterOk = IsolateNameServer.registerPortWithName(rPort.sendPort, _logThreadName);
+      if (onceRegisterOk) {
+        _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);
+      }
+    } catch (e) {
+      print("error!  register thread procedure, error detail is --->" + e.toString());
+    }
     rPort.listen((message) async {
       try {
         File? mainLogFile = (await _logFile(_logFileName));
@@ -132,7 +141,6 @@ class Logger {
 
   void sendToLogThread(String recordInfo) {
     if (_sendPort == null) {
-      _registerAndListeningLogThread();
       _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);
     }
     _sendPort?.send(recordInfo);
