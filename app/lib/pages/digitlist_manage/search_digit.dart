@@ -344,8 +344,8 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
       });
       return;
     }
-
-    Map queryMap = await Wallets.instance.queryDigit(Wallets.instance.nowWallet.nowChain, param);
+    // todo replace  queryDigit
+    /*Map queryMap = await Wallets.instance.queryDigit(Wallets.instance.nowWallet.nowChain, param);
     if (queryMap == null) {
       return;
     }
@@ -361,6 +361,6 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
       }
     } else {
       Logger().d("search appear some error ===>", status.toString());
-    }
+    }*/
   }
 }

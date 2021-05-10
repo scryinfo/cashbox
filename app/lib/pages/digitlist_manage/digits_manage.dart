@@ -228,7 +228,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               style: TextStyle(fontSize: 20),
             ),
             actions: <Widget>[
-              Container(
+              // this version cancel search function
+              /*Container(
                 width: ScreenUtil().setWidth(10),
                 child: Row(
                   children: <Widget>[
@@ -240,7 +241,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                     )
                   ],
                 ),
-              )
+              )*/
             ],
           ),
           body: Container(

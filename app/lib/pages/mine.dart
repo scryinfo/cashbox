@@ -48,7 +48,8 @@ class _MinePageState extends State<MinePage> {
         // _buildTestWalletWidget(),
         _buildChangeNetTypeWidget(),
         _buildLanguageChooseWidget(),
-        _buildClearCacheWidget(),
+        /*  cancel show clear cache function in this version
+        _buildClearCacheWidget(), */
         _buildAboutUsWidget(),
       ]),
     );
@@ -175,7 +176,7 @@ class _MinePageState extends State<MinePage> {
           hintContent: translate('clean_cache_data_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-            Map cleanMap = await Wallets.instance.cleanWalletsDownloadData();
+            /*Map cleanMap = await Wallets.instance.cleanWalletsDownloadData();
             int status = cleanMap["status"];
             bool isCleanWalletsData = cleanMap["isCleanWalletsData"];
             if (status == 200 && isCleanWalletsData) {
@@ -184,7 +185,7 @@ class _MinePageState extends State<MinePage> {
             } else {
               Logger().e("_showClearHintDialog=>", "status is=>" + status.toString() + "message=>" + cleanMap["message"]);
               Fluttertoast.showToast(msg: translate('fail_delete_data'));
-            }
+            }*/
           },
         );
       },
