@@ -74,6 +74,6 @@ pub trait BtcChainTrait: Send + Sync {
     async fn update_default_tokens(&self, context: &dyn ContextTrait, default_tokens: Vec<BtcChainTokenDefault>) -> Result<(), WalletError>;
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, auth_tokens: Vec<BtcChainTokenAuth>) -> Result<(), WalletError>;
     async fn get_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType,start_item:u64,page_size:u64)->Result<Vec<BtcChainTokenAuth>,WalletError>;
-    // start murmel node don't need to be async function
     fn start_murmel(&self, context: &dyn ContextTrait, wallet_id: &str, net_type:&NetType) ->Result<(),WalletError>;
+    fn load_now_blocknumber(&self, context: &dyn ContextTrait) ->Result<u32,WalletError>;
 }

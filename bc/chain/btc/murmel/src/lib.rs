@@ -44,14 +44,12 @@ pub mod error;
 pub mod getdata;
 pub mod headerdownload;
 pub mod hooks;
-pub mod api;
+pub mod wallet;
 pub mod p2p;
 pub mod ping;
 pub mod timeout;
 pub mod walletlib;
 pub mod path;
 mod kit;
-mod start;
 
 pub use error::Error;
-pub use start::start;

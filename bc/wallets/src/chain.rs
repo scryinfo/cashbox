@@ -351,8 +351,12 @@ impl BtcChainTrait for BtcChain {
                a.chain_type.contains("Btc")
             }
         ).collect::<Vec<&MAddress>>();
-        murmel::start(&net_type, btc_address);
+        murmel::wallet::start(&net_type, btc_address);
         Ok(())
+    }
+
+    fn load_now_blocknumber(&self, _context: &dyn ContextTrait) -> Result<u32, WalletError> {
+        murmel::wallet::btc_load_now_blocknumber().map_err(|e| WalletError::RbatisError(e))
     }
 }
 

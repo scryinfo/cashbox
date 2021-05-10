@@ -1,5 +1,7 @@
-//! start murmel form here
+//! api about wallet defined in here
+
 use crate::constructor::Constructor;
+use crate::db;
 use crate::path::BTC_HAMMER_PATH;
 use bitcoin::Network;
 use log::LevelFilter;
@@ -57,4 +59,8 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
     let mut spv = Constructor::new(network, listen, chaindb, *address[0]).unwrap();
     spv.run(network, peers, connections)
         .expect("can not start node");
+}
+
+pub fn btc_load_now_blocknumber() -> Result<u32, rbatis::Error> {
+    db::fetch_scanned_height()
 }

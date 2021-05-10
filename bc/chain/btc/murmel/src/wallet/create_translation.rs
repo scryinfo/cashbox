@@ -24,33 +24,6 @@ use std::str::FromStr;
 const PASSPHRASE: &str = "";
 const RBF: u32 = 0xffffffff - 2;
 
-// mnemonic words
-pub fn create_master_by_mnemonic(
-    mnemonic_str: &str,
-    network: Network,
-) -> Result<MasterAccount, Error> {
-    let mnemonic = Mnemonic::from_str(mnemonic_str).expect("don't have right mnemonic");
-    MasterAccount::from_mnemonic(&mnemonic, 0, network, PASSPHRASE, None)
-}
-
-// add account to master
-// create address by default  path（0，0）；
-// default PASSPHRASE = ""
-// default AccountAddressType = p2pkh
-pub fn add_account(master: &mut MasterAccount, path: (u32, u32)) {
-    let (account_number, sub_account_number) = path;
-    let mut unlocker = Unlocker::new_for_master(master, PASSPHRASE).unwrap();
-    let account = Account::new(
-        &mut unlocker,
-        AccountAddressType::P2PKH,
-        account_number,
-        sub_account_number,
-        10,
-    )
-    .unwrap();
-    master.add_account(account);
-}
-
 //create transaction
 //value : the bitcoin value you want to spend  the unit is "Satoshi"
 //     1 bitcoin == 100 million satoshi  100 000 000

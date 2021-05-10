@@ -1,10 +1,10 @@
 #![allow(non_snake_case)]
 
 use futures::executor::block_on;
-use std::os::raw::{c_uint, c_char};
+use std::os::raw::{c_uint, c_char, c_long};
 
 use wallets_types::{Error, WalletError};
-use wallets::Contexts;
+use wallets::{Contexts, Wallets};
 use super::kits::{CR, CArray, CStruct};
 use crate::types::{CBtcChainTokenDefault, CBtcChainTokenAuth,CError};
 use crate::parameters::CContext;
@@ -163,6 +163,36 @@ pub unsafe extern "C" fn ChainBtc_start(ctx: *mut CContext, walletId: *mut c_cha
         }
     };
 
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn ChainBtc_loadNowBlockNumber(ctx: *mut CContext, number:*mut *mut c_uint) -> *const CError{
+    log::debug!("enter ChainBtc_loadBalance");
+    if ctx.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx is cannot be null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id){
+            Some(wallets) => {
+                let btc_chain = wallets.btc_chain_instance();
+                let r = btc_chain.load_now_blocknumber(wallets);
+                match r {
+                    // todo!
+                    Ok(_) => { Error::SUCCESS() }
+                    Err(err) => { Error::from(err) }
+                }
+            }
+                None => Error::NONE().append_message(": can not find the context")
+        }
+    };
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }

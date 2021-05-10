@@ -132,17 +132,17 @@ impl ChainSqlite {
     }
 
     // how may headers save in block_header table
-    pub async fn fetch_height(&self) -> i64 {
+    pub async fn fetch_height(&self) -> u32 {
         let w = self.rb.new_wrapper();
         let sql = format!("SELECT COUNT(*) FROM {} ", &MBlockHeader::table_name());
-        let r: Result<i64, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
+        let r: Result<u32, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
         match r {
             Ok(r) => r,
             Err(_) => 0,
         }
     }
 
-    pub async fn fetch_header_by_timestamp(&self, timestamp: String) -> i64 {
+    pub async fn fetch_header_by_timestamp(&self, timestamp: String) -> Result<u32, rbatis::Error> {
         let w = self.rb.new_wrapper();
         let sql = format!(
             "SELECT {} FROM {} WHERE timestamp = {}",
@@ -150,14 +150,8 @@ impl ChainSqlite {
             &MBlockHeader::table_name(),
             &timestamp
         );
-        let r: Result<i64, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
-        match r {
-            Ok(r) => r,
-            Err(e) => {
-                info!("=== fetch_header_by_timestamp error {:?} ===", e);
-                0
-            }
-        }
+        let r: Result<u32, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
+        r
     }
 }
 
@@ -293,8 +287,8 @@ impl DetailSqlite {
         }
     }
 
-    pub async fn save_address(&self, ref mut address:MAddress) {
-        let r= address.save(&self.rb,"").await;
+    pub async fn save_address(&self, ref mut address: MAddress) {
+        let r = address.save(&self.rb, "").await;
         match r {
             Ok(a) => {
                 debug!("save address {:?}", a);
@@ -481,7 +475,7 @@ impl DetailSqlite {
     }
 }
 
-pub fn fetch_scanned_height() -> i64 {
+pub fn fetch_scanned_height() -> Result<u32, rbatis::Error> {
     block_on(async {
         let mprogress = RB_DETAIL.progress().await;
         RB_CHAIN
@@ -527,7 +521,7 @@ pub struct Verify {
     address: String,
     public_key: String,
     pub(crate) verify: String,
-    pub(crate) filter: FilterLoadMessage
+    pub(crate) filter: FilterLoadMessage,
 }
 
 pub static INSTANCE: OnceCell<Verify> = OnceCell::new();
@@ -538,12 +532,12 @@ impl Verify {
     }
 
     pub fn from_address(address: MAddress) -> Self {
-        let public_key = &address.public_key.as_str()[2..];    // trim 0x
+        let public_key = &address.public_key.as_str()[2..]; // trim 0x
         Verify {
             address: address.address,
             public_key: public_key.to_string(),
             verify: kit::hash160(public_key),
-            filter: FilterLoadMessage::calculate_filter(public_key)
+            filter: FilterLoadMessage::calculate_filter(public_key),
         }
     }
 }
@@ -564,12 +558,6 @@ mod test {
     #[test]
     fn test_fetch_height() {
         let h = block_on(RB_CHAIN.fetch_height());
-        println!("{}", h)
-    }
-
-    #[test]
-    fn test_fetch_scanned_header_by_timestamp() {
-        let h = block_on(RB_CHAIN.fetch_header_by_timestamp("1368475833".to_owned()));
         println!("{}", h)
     }
 
