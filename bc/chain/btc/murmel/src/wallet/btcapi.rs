@@ -171,19 +171,6 @@ pub extern "system" fn Java_JniApi_btcLoadMaxBlockNumber(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcLoadNowBlockNumber(
-    env: JNIEnv<'_>,
-    _class: JClass<'_>,
-) -> jstring {
-    let height = fetch_scanned_height();
-    let max_block_number = env
-        .new_string(height.to_string())
-        .expect("Could not create java string!");
-    max_block_number.into_inner()
-}
-
-#[no_mangle]
-#[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcIsSyncDataOk(
     _env: JNIEnv<'_>,
     _class: JClass<'_>,
