@@ -30,7 +30,7 @@ impl Setting {
         let net_type_setting = Setting::get_setting(context, &SettingType::CurrentNetType).await?;
         match net_type_setting{
             Some(item)=>Ok(item.value_str),
-            None=>Ok("".to_string()),
+            None=>Ok(NetType::Main.to_string()),
         }
        // net_type_setting.map(|item| item.value_str ).ok_or(WalletError::NotExist)
     }

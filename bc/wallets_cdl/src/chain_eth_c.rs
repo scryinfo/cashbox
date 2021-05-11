@@ -296,3 +296,45 @@ pub unsafe extern "C" fn ChainEth_getNonAuthTokenList(ctx: *mut CContext, tokens
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+#[no_mangle]
+pub unsafe extern "C" fn ChainEth_queryAuthTokenList(ctx: *mut CContext,tokenName: *mut c_char,contract: *mut c_char, startItem: c_uint, pageSize: c_uint,  tokens: *mut *mut CArray<CEthChainTokenAuth>) -> *const CError {
+    log::debug!("enter ChainEth getNonAuthTokenList");
+
+    if ctx.is_null() || tokens.is_null() || tokenName.is_null()|| contract.is_null(){
+        let err = Error::PARAMETER().append_message(" : ctx,tokens is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    (*tokens).free();
+    let token_name = to_str(tokenName);
+    let query_name = if token_name.is_empty(){
+        None
+    }else { Some(token_name.to_string()) };
+
+    let contract = to_str(contract);
+    let query_contract = if contract.is_empty(){
+        None
+    }else { Some(contract.to_string()) };
+
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+
+                let eth_chain = wallets.eth_chain_instance();
+                match block_on(eth_chain.query_auth_tokens(wallets, &wallets.net_type,query_name,query_contract,startItem as u64,pageSize as u64)) {
+                    Ok(data) => {
+                        *tokens = CArray::to_c_ptr(&data);
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}

@@ -50,14 +50,14 @@ pub fn init_wallets_context(c_ctx: *mut *mut CContext) -> *mut CError {
     let c_err = unsafe {
         let c_err = Wallets_init(c_parameters, c_ctx) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-        Wallets_changeNetType(*c_ctx,to_c_char("Test")) as *mut CError
+        Wallets_changeNetType(*c_ctx,to_c_char("Main")) as *mut CError
     };
     c_err
 }
 
 pub fn init_parameters() -> InitParameters {
     let mut p = InitParameters::default();
-    p.is_memory_db=mav::CTrue;
+    //p.is_memory_db=mav::CTrue;
     //let prefix = format!("{}_",kits::uuid());
     let prefix = "test_";
     p.db_name.0 = mav::ma::DbName::new(&prefix, "");

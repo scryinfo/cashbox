@@ -1021,6 +1021,9 @@ impl EthChainTrait for EthChain {
     async fn get_auth_tokens(&self, context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<EthChainTokenAuth>, WalletError> {
         EthChainTokenAuth::list_by_net_type(context, net_type, start_item, page_size).await
     }
+    async fn query_auth_tokens(&self, context: &dyn ContextTrait, net_type: &NetType, name: Option<String>, contract_addr: Option<String>,start_item: u64, page_size: u64) -> Result<Vec<EthChainTokenAuth>, WalletError> {
+        EthChainTokenAuth::query_by_condition(context, net_type, name,contract_addr,start_item, page_size).await
+    }
 }
 
 impl EthChain {
