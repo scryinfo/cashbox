@@ -31,24 +31,23 @@ class WalletsControl {
   }
 
   Future<Wallets> initWallet() async {
-    Wallets wallets = Wallets.mainIsolate();
-    Config config = await HandleConfig.instance.getConfig();
     var initP = new InitParameters();
     try {
       Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
       initP.dbName.path = directory.path;
-      initP.dbName.prefix = "test_"; // todo change
-      initP.dbName = Wallets.dbName(initP.dbName); // todo change
-      initP.netType = config != null ? config.curNetType.enumNetType : EnumKit.NetType.Main.toEnumString();
+      initP.dbName.prefix = "scry_";
+      initP.dbName = Wallets.dbName(initP.dbName);
+      Wallets wallets = Wallets.mainIsolate();
+      var errObj = wallets.init(initP);
+      if (!errObj.isSuccess()) {
+        Logger.getInstance().e("initWallet ", "errObj is --->" + errObj.message.toString());
+        return null;
+      }
+      var curNetType = getCurrentNetType();
+      changeNetType(curNetType);
+      return wallets;
     } catch (e) {
       Logger.getInstance().e("Wallets.dbName ", "error is --->" + e.toString());
-    }
-    var errObj = wallets.init(initP);
-    if (errObj.isSuccess()) {
-      return wallets;
-    } else {
-      Logger.getInstance().e("initWallet ", "errObj is --->" + errObj.toString());
-      return null;
     }
   }
 
@@ -59,6 +58,15 @@ class WalletsControl {
       return null;
     }
     return mneObj.data1;
+  }
+
+  EnumKit.NetType getCurrentNetType() {
+    var curNetTypeObj = Wallets.mainIsolate().getCurrentNetType();
+    if (!curNetTypeObj.isSuccess()) {
+      Logger.getInstance().e("wallet_control ", "getCurrentNetType error is  --->" + curNetTypeObj.err.message.toString());
+      return EnumKit.NetType.Main;
+    }
+    return curNetTypeObj.data1;
   }
 
   bool changeNetType(EnumKit.NetType netType) {

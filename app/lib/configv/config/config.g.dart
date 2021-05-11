@@ -17,9 +17,6 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
         ?.map((e) =>
             e == null ? null : Language.fromJson(e as Map<String, dynamic>))
         ?.toList()
-    ..curNetType = json['curNetType'] == null
-        ? null
-        : NetType.fromJson(json['curNetType'] as Map<String, dynamic>)
     ..serverAppVersion = json['serverAppVersion'] as String
     ..diamondCa = json['diamondCa'] as String
     ..maxGasLimit = json['maxGasLimit'] == null
@@ -64,7 +61,6 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'currency': instance.currency,
       'locale': instance.locale,
       'languages': instance.languages,
-      'curNetType': instance.curNetType,
       'serverAppVersion': instance.serverAppVersion,
       'diamondCa': instance.diamondCa,
       'maxGasLimit': instance.maxGasLimit,
@@ -82,19 +78,6 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'balanceSymbol': instance.balanceSymbol,
       'eeeSymbol': instance.eeeSymbol,
       'privateConfig': instance.privateConfig,
-    };
-
-NetType _$NetTypeFromJson(Map<String, dynamic> json) {
-  return NetType()
-    ..enumNetType = json['enumNetType'] as String
-    ..netTypeName = json['netTypeName'] as String
-    ..isCurNet = json['isCurNet'] as bool;
-}
-
-Map<String, dynamic> _$NetTypeToJson(NetType instance) => <String, dynamic>{
-      'enumNetType': instance.enumNetType,
-      'netTypeName': instance.netTypeName,
-      'isCurNet': instance.isCurNet,
     };
 
 Language _$LanguageFromJson(Map<String, dynamic> json) {

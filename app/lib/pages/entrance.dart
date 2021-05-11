@@ -21,7 +21,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:services/services.dart';
-import 'package:wallets/enums.dart';
+import 'package:wallets/enums.dart' as EnumKit;
 import 'package:wallets/wallets_c.dc.dart';
 import 'eth_page.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
@@ -343,14 +343,14 @@ class _EntrancePageState extends State<EntrancePage> {
             if (snapshot.hasData) {
               bool isContainWallet = snapshot.data;
               if (isContainWallet) {
-                ChainType curChainType = WalletsControl.getInstance().currentChainType();
+                EnumKit.ChainType curChainType = WalletsControl.getInstance().currentChainType();
                 switch (curChainType) {
-                  case ChainType.ETH:
-                  case ChainType.EthTest:
+                  case EnumKit.ChainType.ETH:
+                  case EnumKit.ChainType.EthTest:
                     return EthPage();
                     break;
-                  case ChainType.EEE:
-                  case ChainType.EeeTest:
+                  case EnumKit.ChainType.EEE:
+                  case EnumKit.ChainType.EeeTest:
                     return EeePage();
                     break;
                   default:

@@ -204,6 +204,22 @@ class Wallets {
     return DlResult1(mn, err);
   }
 
+  DlResult1<NetType> getCurrentNetType() {
+    Error err;
+    NetType netType = NetType.Main;
+    {
+      var ptrNetType = _cWallets.CStr_dAlloc();
+      var cerr = _cWallets.Wallets_getCurrentNetType(ptrContext, ptrNetType);
+      err = Error.fromC(cerr);
+      _cWallets.CError_free(cerr);
+      if (err.isSuccess()) {
+        netType = ptrNetType.value.toDartString().toNetType();
+      }
+      _cWallets.CStr_dFree(ptrNetType);
+    }
+    return DlResult1(netType, err);
+  }
+
   Error changeNetType(NetType netType) {
     Error err;
     {

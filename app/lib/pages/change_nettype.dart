@@ -1,5 +1,3 @@
-import 'package:app/configv/config/config.dart';
-import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -21,7 +19,13 @@ class ChangeNetTypePage extends StatefulWidget {
   _ChangeNetTypePageState createState() => _ChangeNetTypePageState();
 }
 
+class NetType extends Object {
+  String enumNetType; // EnumKit.NetType
+  String netTypeName;
+}
+
 class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
+  var curNetTypeString = EnumKit.NetType.Main.toEnumString();
   List<NetType> netTypeList = [
     NetType()
       ..enumNetType = EnumKit.NetType.Main.toEnumString()
@@ -36,6 +40,12 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
       ..enumNetType = EnumKit.NetType.PrivateTest.toEnumString()
       ..netTypeName = translate("private_test_net"),*/
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    curNetTypeString = WalletsControl.getInstance().getCurrentNetType().toEnumString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,38 +66,16 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
     );
   }
 
-  Future<bool> _loadNetType() async {
-    Config config = await HandleConfig.instance.getConfig();
-    for (var i = 0; i < netTypeList.length; i++) {
-      var element = netTypeList[i];
-      if (config.curNetType != null && element.enumNetType == config.curNetType.enumNetType) {
-        element.isCurNet = true;
-        netTypeList[i] = element;
-        break;
-      }
-    }
-    return true;
-  }
-
   Widget _buildNetTypeListWidget(context) {
     return Container(
-        width: ScreenUtil().setWidth(90),
-        height: ScreenUtil().setHeight(160),
-        alignment: Alignment.center,
-        child: FutureBuilder(
-            future: _loadNetType(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Text("something error happen" + snapshot.error.toString());
-              } else if (snapshot.hasData) {
-                return Column(children: <Widget>[
-                  Gaps.scaleVGap(5),
-                  _buildNetItemWidget(context),
-                ]);
-              } else {
-                return Text("no data,please reentry this page");
-              }
-            }));
+      width: ScreenUtil().setWidth(90),
+      height: ScreenUtil().setHeight(160),
+      alignment: Alignment.center,
+      child: Column(children: <Widget>[
+        Gaps.scaleVGap(5),
+        _buildNetItemWidget(context),
+      ]),
+    );
   }
 
   _buildNetItemWidget(context) {
@@ -113,32 +101,11 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
                   ),
                   IconsButton(
                     onPressed: () async {
-                      Config config = await HandleConfig.instance.getConfig();
-                      netTypeList.forEach((element) {
-                        element.isCurNet = false;
-                      });
-                      netTypeList[index].isCurNet = true;
-                      config.curNetType = netTypeList[index];
                       bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetTypeEx.from(netTypeList[index].enumNetType));
                       if (!isChangeNetOk) {
                         return;
                       }
-                      HandleConfig.instance.saveConfig(config);
-                      setState(() {
-                        this.netTypeList = netTypeList;
-                      });
-                      if (WalletsControl.getInstance().hasAny()) {
-                        // loadAll，and use first wallet as default
-                        bool isSaveOk = WalletsControl.getInstance()
-                            .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
-                        if (isSaveOk) {
-                          NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
-                        } else {
-                          Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
-                        }
-                      } else {
-                        NavigatorUtils.push(context, '${Routes.createTestWalletPage}', clearStack: true);
-                      }
+                      _navigateToNextPage();
                     },
                     text: translate('confirm'),
                     iconData: Icons.delete,
@@ -166,7 +133,7 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
                     textAlign: TextAlign.start,
                   ),
                 ),
-                !netTypeList[index].isCurNet
+                netTypeList[index].enumNetType != curNetTypeString
                     ? Text("")
                     : Container(
                         margin: EdgeInsets.only(
@@ -187,5 +154,20 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
     return Column(
       children: netTypesWidgetList,
     );
+  }
+
+  _navigateToNextPage() {
+    if (WalletsControl.getInstance().hasAny()) {
+      // loadAll，and use first wallet as default
+      bool isSaveOk =
+          WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
+      if (!isSaveOk) {
+        Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+        return;
+      }
+      NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
+    } else {
+      NavigatorUtils.push(context, '${Routes.createTestWalletPage}', clearStack: true);
+    }
   }
 }

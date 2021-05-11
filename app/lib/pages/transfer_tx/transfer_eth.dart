@@ -112,12 +112,12 @@ class _TransferEthPageState extends State<TransferEthPage> {
     }
     try {
       var gasPrice = double.parse(Provider.of<TransactionProvide>(context, listen: false).gasPrice);
-      var gasUsed = double.parse(Provider.of<TransactionProvide>(context, listen: false).gasUsed);
+      var gasLimit = double.parse(Provider.of<TransactionProvide>(context, listen: false).gasUsed);
       if ((gasPrice != null) && (gasPrice >= mMinGasPrice) && (gasPrice <= mMaxGasPrice)) {
         mGasPriceValue = gasPrice;
       }
-      if ((gasUsed != null) && (gasUsed >= mMinGasLimit) && (gasUsed <= mMaxGasLimit)) {
-        mGasLimitValue = gasUsed;
+      if ((gasLimit != null) && (gasLimit >= mMinGasLimit) && (gasLimit <= mMaxGasLimit)) {
+        mGasLimitValue = gasLimit;
       }
     } catch (e) {
       Logger.getInstance().e("server gas fee config error", e.toString());
