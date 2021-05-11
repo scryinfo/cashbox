@@ -1,14 +1,14 @@
 #![allow(non_snake_case)]
 
 use futures::executor::block_on;
-use std::os::raw::{c_char, c_long, c_uint};
+use std::os::raw::{c_char, c_uint};
 
 use super::kits::{CArray, CStruct, CR};
 use crate::parameters::{CContext, CBtcNowLoadBlock};
 use crate::to_str;
 use crate::types::{CBtcChainTokenAuth, CBtcChainTokenDefault, CError};
-use wallets::{Contexts, Wallets};
-use wallets_types::{Error, WalletError};
+use wallets::Contexts;
+use wallets_types::Error;
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainBtc_updateDefaultTokenList(

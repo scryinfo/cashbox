@@ -1,6 +1,5 @@
 // mod for creating transaction
 
-#![cfg(target_os="android")]
 #![allow(non_snake_case)]
 use bitcoin::blockdata::opcodes;
 use bitcoin::blockdata::script::Builder;
@@ -28,151 +27,62 @@ const RBF: u32 = 0xffffffff - 2;
 //value : the bitcoin value you want to spend  the unit is "Satoshi"
 //     1 bitcoin == 100 million satoshi  100 000 000
 //target： is the target address string ,means the address you wanna to spend for the transaction
-pub fn create_translation(
-    value: u64,
-    target: &str,
-    master: &mut MasterAccount,
-    path: (u32, u32),
-) -> Transaction {
-    //  Compare the difference between utxo and value
-    //  If not enough, consider reporting an error
-    //  Construct the transaction information of the call fee The first hard-coded txid stands for utxo
-    //  This transaction does not carry a signature
-    let mut unlocker = Unlocker::new_for_master(&master, PASSPHRASE).unwrap();
-    let source = master
-        .get_mut((0, 0))
-        .unwrap()
-        .next_key()
-        .unwrap()
-        .address
-        .clone();
-    let target = Address::from_str(target).unwrap();
-
-    //a transaction that spend spend spend source to target
-    let mut spending_transaction = Transaction {
-        input: vec![TxIn {
-            previous_output: OutPoint {
-                txid: sha256d::Hash::from_hex(
-                    "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
-                )
-                .unwrap(),
-                vout: 1,
-            },
-            sequence: RBF,
-            witness: Vec::new(),
-            script_sig: Script::new(),
-        }],
-        output: vec![TxOut {
-            script_pubkey: target.script_pubkey(),
-            value: 21000,
-        }],
-        lock_time: 0,
-        version: 2,
-    };
-
-    // The script_sig input needs to be assembled
-    master
-        .sign(
-            &mut spending_transaction,
-            SigHashType::All,
-            &(|_| {
-                Some(TxOut {
-                    value: 22000,
-                    script_pubkey: source.script_pubkey(),
-                })
-            }),
-            &mut unlocker,
-        )
-        .expect("can not sign");
-
-    spending_transaction
-}
-
-#[no_mangle]
-#[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_creat_1master(
-    env: JNIEnv,
-    _: JClass,
-    mnemonic_str: JString,
-) -> jobject {
-    let mnemonic_str = env.get_string(mnemonic_str).unwrap();
-
-    let message_class = env
-        .find_class("JniApi$StatusMessage")
-        .expect("can't find class JniApi$StatusCode");
-    let message_obj = env
-        .alloc_object(message_class)
-        .expect("create message instance error");
-
-    env.set_field(message_obj, "code", "I", JValue::Int(200))
-        .expect("set code error");
-    env.set_field(
-        message_obj,
-        "message",
-        "Ljava/lang/String;",
-        JValue::Object(JObject::from(env.new_string("Rust".to_string()).unwrap())),
-    )
-    .expect("set error msg value is error!");
-
-    message_obj.into_inner()
-}
-
-#[no_mangle]
-#[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_creat_1transaction(
-    env: JNIEnv,
-    _: JClass,
-    mnemonic_str: JString,
-    value: jdouble,
-) -> jobject {
-    let mnemonic_str = env.get_string(mnemonic_str).unwrap();
-    let mnemonic_str = mnemonic_str.to_str().unwrap();
-    let master = create_master_by_mnemonic(mnemonic_str, Network::Testnet);
-
-    let message_class = env
-        .find_class("JniApi$StatusMessage")
-        .expect("can't find class JniApi$StatusCode");
-    let message_obj = env
-        .alloc_object(message_class)
-        .expect("create message instance error");
-    match master.unwrap() {
-        ref mut master => {
-            add_account(master, (0, 0));
-            let tx = create_translation(
-                value as u64,
-                "n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk",
-                master,
-                (0, 0),
-            );
-            println!("tx {:#?}", tx);
-            env.set_field(message_obj, "code", "I", JValue::Int(200))
-                .expect("set code error");
-            env.set_field(
-                message_obj,
-                "message",
-                "Ljava/lang/String;",
-                JValue::Object(JObject::from(
-                    env.new_string("Build Transaction success".to_string())
-                        .unwrap(),
-                )),
-            )
-            .expect("set error msg value is error!");
-        }
-        _ => {
-            env.set_field(message_obj, "code", "I", JValue::Int(102))
-                .expect("set code error");
-            env.set_field(
-                message_obj,
-                "message",
-                "Ljava/lang/String;",
-                JValue::Object(JObject::from(
-                    env.new_string("Build Transaction failure".to_string())
-                        .unwrap(),
-                )),
-            )
-            .expect("set error msg value is error!");
-        }
-    }
-
-    message_obj.into_inner()
-}
+// pub fn create_translation(
+//     value: u64,
+//     target: &str,
+//     master: &mut MasterAccount,
+//     path: (u32, u32),
+// ) -> Transaction {
+//     //  Compare the difference between utxo and value
+//     //  If not enough, consider reporting an error
+//     //  Construct the transaction information of the call fee The first hard-coded txid stands for utxo
+//     //  This transaction does not carry a signature
+//     let mut unlocker = Unlocker::new_for_master(&master, PASSPHRASE).unwrap();
+//     let source = master
+//         .get_mut((0, 0))
+//         .unwrap()
+//         .next_key()
+//         .unwrap()
+//         .address
+//         .clone();
+//     let target = Address::from_str(target).unwrap();
+//
+//     //a transaction that spend spend spend source to target
+//     let mut spending_transaction = Transaction {
+//         input: vec![TxIn {
+//             previous_output: OutPoint {
+//                 txid: sha256d::Hash::from_hex(
+//                     "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
+//                 )
+//                 .unwrap(),
+//                 vout: 1,
+//             },
+//             sequence: RBF,
+//             witness: Vec::new(),
+//             script_sig: Script::new(),
+//         }],
+//         output: vec![TxOut {
+//             script_pubkey: target.script_pubkey(),
+//             value: 21000,
+//         }],
+//         lock_time: 0,
+//         version: 2,
+//     };
+//
+//     // The script_sig input needs to be assembled
+//     master
+//         .sign(
+//             &mut spending_transaction,
+//             SigHashType::All,
+//             &(|_| {
+//                 Some(TxOut {
+//                     value: 22000,
+//                     script_pubkey: source.script_pubkey(),
+//                 })
+//             }),
+//             &mut unlocker,
+//         )
+//         .expect("can not sign");
+//
+//     spending_transaction
+// }
