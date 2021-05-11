@@ -10,6 +10,7 @@ use mav::{ChainType, NetType};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::time::SystemTime;
+use wallets_types::BtcNowLoadBlock;
 
 ///
 /// btc now just have three type    </br>
@@ -61,6 +62,6 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         .expect("can not start node");
 }
 
-pub fn btc_load_now_blocknumber() -> Result<u32, rbatis::Error> {
+pub fn btc_load_now_blocknumber() -> Result<BtcNowLoadBlock, rbatis::Error> {
     db::fetch_scanned_height()
 }

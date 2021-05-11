@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec, Token};
 use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth, MTokenAddress, MBtcChainTokenAuth};
 use mav::{NetType, WalletType, CTrue, CFalse, ChainType};
-use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth};
+use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock};
 
 use codec::Decode;
 use rbatis::plugin::page::PageRequest;
@@ -355,7 +355,7 @@ impl BtcChainTrait for BtcChain {
         Ok(())
     }
 
-    fn load_now_blocknumber(&self, _context: &dyn ContextTrait) -> Result<u32, WalletError> {
+    fn load_now_blocknumber(&self, _context: &dyn ContextTrait) -> Result<BtcNowLoadBlock, WalletError> {
         murmel::wallet::btc_load_now_blocknumber().map_err(|e| WalletError::RbatisError(e))
     }
 }

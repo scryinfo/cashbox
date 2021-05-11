@@ -26,6 +26,7 @@ use rbatis::wrapper::Wrapper;
 use rbatis_core::Error;
 use std::ops::Add;
 use strum_macros::{EnumIter, EnumString, ToString};
+use wallets_types::BtcNowLoadBlock;
 
 // state value in btc database must be one of this enum
 #[derive(Debug, Eq, PartialEq, EnumString, ToString, EnumIter)]
@@ -142,7 +143,10 @@ impl ChainSqlite {
         }
     }
 
-    pub async fn fetch_header_by_timestamp(&self, timestamp: String) -> Result<u32, rbatis::Error> {
+    pub async fn fetch_header_by_timestamp(
+        &self,
+        timestamp: &String,
+    ) -> Result<u32, rbatis::Error> {
         let w = self.rb.new_wrapper();
         let sql = format!(
             "SELECT {} FROM {} WHERE timestamp = {}",
@@ -475,12 +479,17 @@ impl DetailSqlite {
     }
 }
 
-pub fn fetch_scanned_height() -> Result<u32, rbatis::Error> {
+pub fn fetch_scanned_height() -> Result<BtcNowLoadBlock, rbatis::Error> {
     block_on(async {
         let mprogress = RB_DETAIL.progress().await;
-        RB_CHAIN
-            .fetch_header_by_timestamp(mprogress.timestamp)
-            .await
+        let height = RB_CHAIN
+            .fetch_header_by_timestamp(&mprogress.timestamp)
+            .await?;
+        Ok(BtcNowLoadBlock {
+            height,
+            header_hash: mprogress.header,
+            timestamp: mprogress.timestamp,
+        })
     })
 }
 

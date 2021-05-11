@@ -67,6 +67,7 @@ async-trait = "0.1.42"
 mav = { path = "../../../mav" }
 strum = "0.20.0"
 strum_macros = "0.20.1"
+wallets_types = { path = "../../../wallets_types" }
 
 [dev-dependencies]
 rustc-serialize = "0.3"

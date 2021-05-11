@@ -187,7 +187,7 @@ pub unsafe extern "C" fn ChainBtc_start(
 #[no_mangle]
 pub unsafe extern "C" fn ChainBtc_loadNowBlockNumber(
     ctx: *mut CContext,
-    btc_now: *mut *mut CBtcNowLoadBlock,
+    block: *mut *mut CBtcNowLoadBlock,
 ) -> *const CError {
     log::debug!("enter ChainBtc_loadBalance");
     if ctx.is_null() {
