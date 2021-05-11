@@ -190,12 +190,12 @@ pub unsafe extern "C" fn ChainBtc_loadNowBlockNumber(
     block: *mut *mut CBtcNowLoadBlock,
 ) -> *const CError {
     log::debug!("enter ChainBtc_loadBalance");
-    if ctx.is_null() {
-        let err = Error::PARAMETER().append_message(" : ctx is cannot be null");
+    if ctx.is_null() || block.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx or block is cannot be null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
     }
-
+    (*block).free();
     let lock = Contexts::collection().lock();
     let mut contexts = lock.borrow_mut();
     let err = {
@@ -205,8 +205,10 @@ pub unsafe extern "C" fn ChainBtc_loadNowBlockNumber(
                 let btc_chain = wallets.btc_chain_instance();
                 let r = btc_chain.load_now_blocknumber(wallets);
                 match r {
-                    // todo!
-                    Ok(_) => Error::SUCCESS(),
+                    Ok(r) => {
+                        *block = CBtcNowLoadBlock::to_c_ptr(&r);
+                        Error::SUCCESS()
+                    },
                     Err(err) => Error::from(err),
                 }
             }
