@@ -6,7 +6,8 @@ use std::os::raw::c_char;
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{
     AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName,
-    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,EeeChainTx,WalletTokenStatus
+    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,EeeChainTx,WalletTokenStatus,
+    BtcNowLoadBlock,
 };
 
 use crate::kits::{to_c_char, to_str, CStruct, CR, CBool,Assignment};
@@ -166,3 +167,11 @@ pub struct CWalletTokenStatus{
     pub isShow: CBool,
 }
 
+
+#[repr(C)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
+pub struct CBtcNowLoadBlock{
+    pub height: i64,
+    pub headerHash: *mut c_char,
+    pub timestamp: *mut c_char,
+}

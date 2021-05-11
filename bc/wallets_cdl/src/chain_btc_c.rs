@@ -4,9 +4,9 @@ use futures::executor::block_on;
 use std::os::raw::{c_char, c_long, c_uint};
 
 use super::kits::{CArray, CStruct, CR};
-use crate::parameters::CContext;
+use crate::parameters::{CContext, CBtcNowLoadBlock};
 use crate::to_str;
-use crate::types::{CBtcChainTokenAuth, CBtcChainTokenDefault, CError, CBtcNowLoadBlock};
+use crate::types::{CBtcChainTokenAuth, CBtcChainTokenDefault, CError};
 use wallets::{Contexts, Wallets};
 use wallets_types::{Error, WalletError};
 
@@ -187,7 +187,7 @@ pub unsafe extern "C" fn ChainBtc_start(
 #[no_mangle]
 pub unsafe extern "C" fn ChainBtc_loadNowBlockNumber(
     ctx: *mut CContext,
-    number: *mut *mut CBtcNowLoadBlock,
+    btc_now: *mut *mut CBtcNowLoadBlock,
 ) -> *const CError {
     log::debug!("enter ChainBtc_loadBalance");
     if ctx.is_null() {
