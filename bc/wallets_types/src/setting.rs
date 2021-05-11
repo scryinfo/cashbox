@@ -1,4 +1,4 @@
-use mav::ChainType;
+use mav::{ChainType, NetType};
 use mav::ma::{Dao, MSetting, SettingType};
 
 use crate::{ContextTrait, WalletError};
@@ -25,6 +25,25 @@ impl Setting {
             }
         }
     }
+
+    pub async fn current_net_type(context: &dyn ContextTrait) -> Result<String, WalletError> {
+        let net_type_setting = Setting::get_setting(context, &SettingType::CurrentNetType).await?;
+        match net_type_setting{
+            Some(item)=>Ok(item.value_str),
+            None=>Ok("".to_string()),
+        }
+       // net_type_setting.map(|item| item.value_str ).ok_or(WalletError::NotExist)
+    }
+
+    pub async fn change_net_type(context: &dyn ContextTrait,net_type:&NetType) -> Result<u64, WalletError> {
+        let rb = context.db().wallets_db();
+        let mut wallet_setting = Setting::get_setting(context, &SettingType::CurrentNetType).await?.unwrap_or_default();
+        wallet_setting.key_str = SettingType::CurrentNetType.to_string();
+        wallet_setting.value_str = net_type.to_string();
+        wallet_setting.save_update(rb, "").await.map(|ret|ret.rows_affected).map_err(|err|WalletError::RbatisError(err))
+    }
+
+
 
     /// save 当前的wallet and chain
     pub async fn save_current_wallet_chain(context: &dyn ContextTrait, wallet_id: &str, chain_type: &ChainType) -> Result<(), WalletError> {

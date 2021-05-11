@@ -51,10 +51,9 @@ impl Contexts {
         Ok(())
     }
     // todo 改写返回值类型
-    pub fn new(&mut self, ctx: Context,net_type:NetType) -> Option<&mut Wallets> {
+    pub fn new(&mut self, ctx: Context) -> Option<&mut Wallets> {
         let mut ws = Wallets::default();
         ws.ctx = ctx;
-        ws.net_type = net_type;
         if self.first_context.is_none() {
             self.first_context = Some(ws.ctx.clone());
         }

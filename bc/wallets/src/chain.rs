@@ -1,8 +1,9 @@
 use async_trait::async_trait;
 
-use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec, Token};
+use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
 use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth, MTokenAddress, MBtcChainTokenAuth};
-use mav::{NetType, WalletType, CTrue, CFalse, ChainType};
+
+use mav::{NetType, WalletType, CTrue, CFalse};
 use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock};
 
 use codec::Decode;
@@ -10,7 +11,6 @@ use rbatis::plugin::page::PageRequest;
 use bitcoin_wallet::account::AccountAddressType;
 use bitcoin::util::psbt::serialize::Serialize;
 use rbatis::crud::CRUDTable;
-use eee::Token::TokenX;
 use futures::executor::block_on;
 
 #[derive(Default)]
@@ -75,7 +75,6 @@ impl ChainTrait for EthChain {
         MTokenAddress::save_batch(token_rb, &tx.tx_id, &mut token_address_balances).await?;
         token_rb.commit(&tx.tx_id).await?;
         tx.manager = None;
-        //}
         Ok(())
     }
 }
@@ -240,7 +239,6 @@ impl WalletTrait for Wallet {
 }
 
 
-
 #[async_trait]
 impl BtcChainTrait for BtcChain {
     async fn get_default_tokens(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<BtcChainTokenDefault>, WalletError> {
@@ -339,16 +337,16 @@ impl BtcChainTrait for BtcChain {
         Ok(btc_tokens)
     }
 
-    fn start_murmel(&self, context: &dyn ContextTrait, wallet_id: &str, net_type: &NetType) -> Result<(),WalletError> {
+    fn start_murmel(&self, context: &dyn ContextTrait, wallet_id: &str, net_type: &NetType) -> Result<(), WalletError> {
         // can't be async function, because in murmel we have a lot block_on
         let wallet_db = context.db().wallets_db();
         let m_address = {
-            let w = wallet_db.new_wrapper().eq(&MAddress::wallet_id,wallet_id);
-            block_on( MAddress::list_by_wrapper(wallet_db,wallet_id, &w)).map_err(|e| WalletError::Custom(e.to_string()))?
+            let w = wallet_db.new_wrapper().eq(&MAddress::wallet_id, wallet_id);
+            block_on(MAddress::list_by_wrapper(wallet_db, wallet_id, &w)).map_err(|e| WalletError::Custom(e.to_string()))?
         };
         let btc_address = m_address.iter().filter(
             |&a| {
-               a.chain_type.contains("Btc")
+                a.chain_type.contains("Btc")
             }
         ).collect::<Vec<&MAddress>>();
         murmel::wallet::start(&net_type, btc_address);
@@ -509,14 +507,14 @@ impl EeeChainTrait for EeeChain {
         ).await?
         {
             let genesis_hash = scry_crypto::hexstr_to_vec(&chain_info.genesis_hash)?;
-          /*  let decimal = if chain_info.token_decimals == 0 {
-                15
-            } else {
-                chain_info.token_decimals as usize
-            };
-            let transfer_amount = crate::kits::token_unit_convert(&transfer_payload.value, decimal)
-                .map(|amount| amount.to_string())
-                .ok_or_else(|| WalletError::Custom("input amount is illegal".to_string()));*/
+            /*  let decimal = if chain_info.token_decimals == 0 {
+                  15
+              } else {
+                  chain_info.token_decimals as usize
+              };
+              let transfer_amount = crate::kits::token_unit_convert(&transfer_payload.value, decimal)
+                  .map(|amount| amount.to_string())
+                  .ok_or_else(|| WalletError::Custom("input amount is illegal".to_string()));*/
             log::info!("transfer eee amount is:{:?}", &transfer_payload.value);
             let chain_helper = eee::SubChainHelper::init(
                 &chain_info.metadata,
@@ -1047,5 +1045,4 @@ impl BtcChain {
             Err(WalletError::Custom(format!("address {} wallet is not exist!", address)))
         }
     }
-
 }

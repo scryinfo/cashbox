@@ -180,7 +180,7 @@ fn eee_tokenx_transfer_test() {
         let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-        eee_basic_info_check(c_ctx).expect("eee_tx_submittable_sign_test");
+        eee_basic_info_check(c_ctx).expect("eee_tokenx_transfer_test");
         let wallet = data::create_wallet(c_ctx);
         let mut c_wallet = CWallet_dAlloc();
         let c_err = Wallets_findById(*c_ctx, to_c_char(&wallet.m.id), c_wallet) as *mut CError;

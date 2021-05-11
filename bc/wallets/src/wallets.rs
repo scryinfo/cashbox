@@ -57,9 +57,7 @@ impl Wallets {
         }
         return true;
     }
-    pub fn change_net_type(&mut self, net_type: NetType) {
-        self.net_type = net_type
-    }
+
     pub fn app_platform_type() -> String {
         let plat = CARGO_BUILD_TARGET.replace("-", "_");
         let plat_type = {
@@ -94,17 +92,19 @@ impl Wallets {
         #[cfg(target_os = "android")]
             crate::init_logger_once();
         self.ctx.context_note = parameters.context_note.clone();
-        self.net_type = if parameters.net_type.is_empty() {
-            NetType::Main
-        } else {
-            NetType::from(&parameters.net_type)
-        };
+       // self.net_type =  NetType::Main;
         if parameters.is_memory_db == CTrue {
             self.db.init_memory_sql(&parameters.db_name).await?;
         } else {
             self.db.connect(&parameters.db_name).await?;
         }
         self.db.init_tables(&DbCreateType::NotExists).await?;
+        let net_type = Setting::current_net_type(self).await?;
+         self.net_type = if net_type.is_empty() {
+           NetType::Main
+       } else {
+           NetType::from(&net_type)
+       };
         Ok(&self.ctx)
     }
 
@@ -241,21 +241,26 @@ impl Wallets {
             None => Err(WalletError::NoRecord("".to_owned())),
             Some(mut m_wallet) => {
                 m_wallet.name = name.to_owned();
-                /*  let re = ?;
-                  Ok(re)*/
                 Wallet::update_by_id(context, &mut m_wallet, tx_id).await
             }
         }
     }
     pub async fn save_current_wallet_chain(&mut self, wallet_id: &str, chain_type: &ChainType) -> Result<(), WalletError> {
-        let context = self;
-        let _re = Setting::save_current_wallet_chain(context, wallet_id, chain_type).await?;
-        Ok(())
+        Setting::save_current_wallet_chain(self, wallet_id, chain_type).await
+
     }
     pub async fn current_wallet_chain(&self) -> Result<Option<(String, ChainType)>, WalletError> {
-        let context = self;
-        let re = Setting::current_wallet_chain(context).await?;
-        Ok(re)
+       Setting::current_wallet_chain(self).await
+
+    }
+    pub async fn change_net_type(&mut self, net_type: NetType)->Result<(),WalletError> {
+        let _effect_row_num = Setting::change_net_type(self,&net_type).await?;
+        self.net_type = net_type;
+        Ok(())
+    }
+    pub async fn current_net_type(&self) -> Result<String, WalletError> {
+        Setting::current_net_type(self).await
+
     }
     pub fn generate_mnemonic(mnemonic_num: u32) -> String {
         eee::Sr25519::generate_phrase(mnemonic_num)

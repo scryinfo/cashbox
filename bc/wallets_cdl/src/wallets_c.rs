@@ -53,8 +53,7 @@ pub unsafe extern "C" fn Wallets_init(parameter: *mut CInitParameters, context: 
     let err = {
         let parameter = CInitParameters::ptr_rust(parameter);
         let new_ctx = Context::new(&parameter.context_note);
-        let net_type = NetType::from(&parameter.net_type);
-        if let Some(wallets) = contexts.new(new_ctx, net_type) {
+        if let Some(wallets) = contexts.new(new_ctx) {
             match block_on(wallets.init(&parameter)) {
                 Err(err) => Error::from(err),
                 Ok(ctx) => {
@@ -275,9 +274,43 @@ pub unsafe extern "C" fn Wallets_changeNetType(ctx: *mut CContext, netType: *mut
         let ctx = CContext::ptr_rust(ctx);
         let net_type = NetType::from(to_str(netType));
         match contexts.get_mut(&ctx.id) {
+            Some(wallets) =>  {
+                match block_on( wallets.change_net_type(net_type)){
+                    Err(err) => Error::from(err),
+                    Ok(_) => {
+                        Error::SUCCESS()
+                    }
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context"),
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn Wallets_getCurrentNetType(ctx: *mut CContext, netType: *mut *mut c_char) -> *const CError {
+    log::debug!("enter Wallets get current net type");
+    if ctx.is_null() || netType.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx,netType is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    (*netType).free();
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get_mut(&ctx.id) {
             Some(wallets) =>   {
-               wallets.change_net_type(net_type);
-                Error::SUCCESS()
+                match block_on(wallets.current_net_type()) {
+                    Err(err) => Error::from(err),
+                    Ok(net_name) => {
+                        *netType = to_c_char(&net_name);
+                        Error::SUCCESS()
+                    }
+                }
             }
             None => Error::NONE().append_message(": can not find the context"),
         }
@@ -501,15 +534,18 @@ pub unsafe extern "C" fn Wallets_hasAny(ctx: *mut CContext, hasAny: *mut CBool) 
     let err = {
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
-            Some(wallets) => match block_on(wallets.has_any()) {
-                Err(err) => Error::from(err),
-                Ok(true) => {
-                    *hasAny = CTrue;
-                    Error::SUCCESS()
-                }
-                Ok(false) => {
-                    *hasAny = CFalse;
-                    Error::SUCCESS()
+            Some(wallets) => {
+                log::debug!("current  net type is:{:?}",wallets.net_type);
+                match block_on(wallets.has_any()) {
+                    Err(err) => Error::from(err),
+                    Ok(true) => {
+                        *hasAny = CTrue;
+                        Error::SUCCESS()
+                    }
+                    Ok(false) => {
+                        *hasAny = CFalse;
+                        Error::SUCCESS()
+                    }
                 }
             },
             None => Error::NONE().append_message(": can not find the context"),

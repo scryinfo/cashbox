@@ -30,6 +30,7 @@ pub enum SettingType {
     CurrentWallet,
     CurrentChain,
     CurrentDbVersion,
+    CurrentNetType,
     Other(String),
 }
 
@@ -39,6 +40,7 @@ impl From<&str> for SettingType {
             "CurrentWallet" => SettingType::CurrentWallet,
             "CurrentChain" => SettingType::CurrentChain,
             "CurrentDbVersion" => SettingType::CurrentDbVersion,
+            "CurrentNetType" => SettingType::CurrentNetType,
             _ => {
                 SettingType::Other(setting_type.to_owned())
             }
@@ -58,6 +60,7 @@ impl ToString for SettingType {
             SettingType::CurrentWallet => "CurrentWallet".to_owned(),
             SettingType::CurrentChain => "CurrentChain".to_owned(),
             SettingType::CurrentDbVersion => "CurrentDbVersion".to_owned(),
+            SettingType::CurrentNetType=>"CurrentNetType".to_owned(),
             SettingType::Other(key) => key.clone(),
         }
     }

@@ -23,7 +23,7 @@ use wallets_cdl::{
 
 use wallets_types::{CreateWalletParameters, Error, InitParameters, Wallet, WalletTokenStatus, TokenAddress};
 use mav::ma::MTokenAddress;
-use wallets_cdl::wallets_c::{Wallets_updateBalance, Wallets_queryBalance, Wallets_currentWalletChain, Wallets_saveCurrentWalletChain, Wallets_hasAny, Wallets_findWalletBaseByName, Wallets_renameWallet, Wallets_resetWalletPassword, Wallets_exportWallet, Wallets_packageVersion, Wallets_changeNetType};
+use wallets_cdl::wallets_c::{Wallets_updateBalance, Wallets_queryBalance, Wallets_currentWalletChain, Wallets_saveCurrentWalletChain, Wallets_hasAny, Wallets_findWalletBaseByName, Wallets_renameWallet, Wallets_resetWalletPassword, Wallets_exportWallet, Wallets_packageVersion, Wallets_changeNetType, Wallets_getCurrentNetType};
 use wallets_cdl::mem_c::{CArrayCTokenAddress_dAlloc, CArrayCTokenAddress_dFree, CBool_alloc, CBool_free, CArrayCContext_dAlloc};
 use wallets_cdl::kits::CTrue;
 
@@ -206,6 +206,12 @@ fn wallets_change_net_type_test() {
         let c_err = Wallets_changeNetType(*c_ctx,to_c_char("Test")) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
+        let net_type = CStr_dAlloc();
+        let c_err = Wallets_getCurrentNetType(*c_ctx,net_type) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        assert_eq!(to_str(*net_type),"Test");
+
         CContext_dFree(c_ctx);
     }
 }
@@ -622,7 +628,6 @@ pub fn init_murmel_try(){
     unsafe {
         let init_parameters = {
            let mut p = InitParameters::default();
-            p.net_type = NetType::Test.to_string();
             p.is_memory_db = CFalse;
             let prefix = "test_";
             p.db_name.0 = mav::ma::DbName::new(&prefix, "");
@@ -632,6 +637,9 @@ pub fn init_murmel_try(){
         let c_init_parameters = CInitParameters::to_c_ptr(&init_parameters);
         let c_err = Wallets_init(c_init_parameters, c_ctx) as *mut CError;
         assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let c_err =  Wallets_changeNetType(*c_ctx,to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
 
@@ -674,7 +682,6 @@ pub fn init_wallet_once() {
     unsafe {
         let c_init_parameters = {
             let mut p = InitParameters::default();
-            p.net_type = NetType::Test.to_string();
             p.is_memory_db = CFalse;
             let prefix = "test_";
             p.db_name.0 = mav::ma::DbName::new(&prefix, "");

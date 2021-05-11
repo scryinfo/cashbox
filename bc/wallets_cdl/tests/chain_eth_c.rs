@@ -16,6 +16,7 @@ use wallets_cdl::wallets_c::Wallets_all;
 mod data;
 
 #[test]
+#[ignore]
 fn eth_tx_sign_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
@@ -278,16 +279,4 @@ fn query_eth_non_auth_token_list_test() {
         CArrayCEthChainTokenNonAuth_dFree(token_default);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
-}
-
-fn init_parameters(c_ctx: *mut *mut CContext) -> *mut CError {
-    let mut p = InitParameters::default();
-    p.db_name.0 = mav::ma::DbName::new("test_", "");
-    p.context_note = format!("test_{}", kits::uuid());
-    let c_parameters = CInitParameters::to_c_ptr(&p);
-
-    let c_err = unsafe {
-        Wallets_init(c_parameters, c_ctx) as *mut CError
-    };
-    c_err
 }

@@ -38,7 +38,7 @@ fn array_char_test() {
 
 #[test]
 fn array_context_test() {
-    let mut ar = CArray::<CContext>::default();
+    let _ar = CArray::<CContext>::default();
     {
         let _a = CArray::<CContext>::default();
     }

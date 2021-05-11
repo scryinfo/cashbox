@@ -8,7 +8,7 @@ pub struct InitParameters {
     pub db_name: DbName,
     pub is_memory_db:u32,
     pub context_note: String,
-    pub net_type:String,
+    //pub net_type:String,
 }
 
 // #[derive(Debug, Default)]

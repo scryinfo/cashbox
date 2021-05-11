@@ -1,5 +1,4 @@
-use async_trait::async_trait;
-
+//use async_trait::async_trait;
 use mav::ma::{Dao, MWallet, MAddress};
 use mav::{WalletType, NetType};
 
