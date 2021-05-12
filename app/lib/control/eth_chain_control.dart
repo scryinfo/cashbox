@@ -117,6 +117,14 @@ class EthChainControl {
     return true;
   }
 
+  bool queryTokenList(ArrayCEthChainTokenDefault defaultTokens) {
+    var dataObj = Wallets.mainIsolate().chainEth.queryAuthTokenList(defaultTokens);
+    if (!dataObj.isSuccess()) {
+      return false;
+    }
+    return true;
+  }
+
   addNonAuthDigit(ArrayCEthChainTokenAuth tokens) {
     // var dataObj = Wallets.mainIsolate().chainEth.updateAuthTokenList(tokens);
     // if (!dataObj.isSuccess()) {
