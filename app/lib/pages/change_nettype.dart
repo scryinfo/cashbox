@@ -182,8 +182,22 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
   _navigateToNextPage() {
     if (WalletsControl.getInstance().hasAny()) {
       // loadAll，and use first wallet as default
-      bool isSaveOk =
-          WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
+      bool isSaveOk = false;
+      var curNetType = WalletsControl.getInstance().getCurrentNetType();
+      switch (curNetType) {
+        case EnumKit.NetType.Main:
+          isSaveOk =
+              WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
+          break;
+        case EnumKit.NetType.Test:
+          isSaveOk = WalletsControl.getInstance()
+              .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.EthTest);
+          break;
+        default:
+          Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+          return;
+          break;
+      }
       if (!isSaveOk) {
         Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
         return;
