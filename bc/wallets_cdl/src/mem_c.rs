@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use crate::kits::{d_ptr_alloc, d_ptr_free, CArray, CBool, CStruct};
-use crate::parameters::{CAccountInfo, CContext, CDbName, CExtrinsicContext, CEeeChainTx, CWalletTokenStatus};
+use crate::parameters::{CAccountInfo, CContext, CDbName, CExtrinsicContext, CEeeChainTx, CWalletTokenStatus, CBtcNowLoadBlock};
 
 use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet,
                    CEthChainTokenDefault, CTokenAddress, CEthChainTokenAuth, CEeeChainTokenAuth, CBtcChainTokenAuth,
@@ -278,6 +278,17 @@ pub extern "C" fn CWalletTokenStatus_dAlloc() -> *mut *mut CWalletTokenStatus{
 pub unsafe extern "C" fn CWalletTokenStatus_dFree(dPtr: *mut *mut CWalletTokenStatus) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CBtcNowLoadBlock_dAlloc() -> *mut *mut CBtcNowLoadBlock{
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CbtcNowLoadBlock_dFree(dPtr: *mut *mut CBtcNowLoadBlock){
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr)
 }
 
 

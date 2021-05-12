@@ -480,16 +480,12 @@ impl DetailSqlite {
 }
 
 pub fn fetch_scanned_height() -> Result<BtcNowLoadBlock, rbatis::Error> {
-    block_on(async {
-        let mprogress = RB_DETAIL.progress().await;
-        let height = RB_CHAIN
-            .fetch_header_by_timestamp(&mprogress.timestamp)
-            .await?;
-        Ok(BtcNowLoadBlock {
-            height,
-            header_hash: mprogress.header,
-            timestamp: mprogress.timestamp,
-        })
+    let mprogress = block_on(RB_DETAIL.progress());
+    let height = block_on(RB_CHAIN.fetch_header_by_timestamp(&mprogress.timestamp))?;
+    Ok(BtcNowLoadBlock {
+        height: height - 1,
+        header_hash: mprogress.header,
+        timestamp: mprogress.timestamp,
     })
 }
 
@@ -553,8 +549,10 @@ impl Verify {
 
 #[cfg(test)]
 mod test {
-    use crate::db::{RB_CHAIN, RB_DETAIL};
+    use crate::db::{fetch_scanned_height, RB_CHAIN, RB_DETAIL};
     use futures::executor::block_on;
+    use rbatis::Error;
+    use wallets_types::BtcNowLoadBlock;
 
     #[test]
     fn test_fetch_scann_header() {
@@ -593,5 +591,18 @@ mod test {
     #[test]
     fn test_utxo() {
         block_on(RB_DETAIL.utxo());
+    }
+
+    #[test]
+    fn test_btc_load_now_block() {
+        let r = fetch_scanned_height();
+        match r {
+            Ok(r) => {
+                println!("{:?}", r)
+            }
+            Err(e) => {
+                println!("{:?}", e)
+            }
+        }
     }
 }
