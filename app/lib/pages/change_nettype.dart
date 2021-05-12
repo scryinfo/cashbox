@@ -83,6 +83,29 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
       return Container(
         child: GestureDetector(
           onTap: () async {
+            {
+              // get back to main net,let it do directly
+              if (netTypeList[index].enumNetType == EnumKit.NetType.Main.toEnumString()) {
+                bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetType.Main);
+                if (!isChangeNetOk) {
+                  return;
+                }
+                if (WalletsControl.getInstance().hasAny()) {
+                  // loadAll，and use first wallet as default
+                  bool isSaveOk = WalletsControl.getInstance()
+                      .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
+                  if (!isSaveOk) {
+                    Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+                    return;
+                  }
+                  NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
+                } else {
+                  NavigatorUtils.push(context, '${Routes.entrancePage}', clearStack: true);
+                }
+                return;
+              }
+            }
+            // hint about test net
             Dialogs.materialDialog(
                 msg: translate('make_sure_net_change_hint'),
                 title: translate('net_change'),
