@@ -13,7 +13,7 @@ use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
 use mav::ma::{
-    Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo,
+    Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcUtxo,
 };
 use mav::ma::{MLocalTxLog, MProgress};
 use once_cell::sync::{Lazy, OnceCell};
@@ -219,17 +219,6 @@ impl DetailSqlite {
 
     async fn create_btc_utxo(rb: &Rbatis) -> Result<DBExecResult, Error> {
         rb.exec("", MBtcUtxo::create_table_script()).await
-    }
-
-    pub async fn save_state(&self, seq: u16, state: BtcTxState) {
-        let mut tx_state = MBtcTxState::default();
-        tx_state.seq = seq;
-        tx_state.state = state.to_string();
-        let r = tx_state.save(&self.rb, "").await;
-        r.map_or_else(
-            |e| error!("error save_state {:?}", e),
-            |r| debug!("save_state {:?}", r),
-        );
     }
 
     async fn save_progress(&self, header: String, timestamp: String) {
