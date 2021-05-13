@@ -234,7 +234,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   }
 
   Future<bool> _verifyMsgAndCreateWallet() async {
-    if (verifyString.isNotEmpty || Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic.length == 0) {
+    if (verifyString.isEmpty) {
       return false;
     }
     if (verifyString.trim() != String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).trim()) {

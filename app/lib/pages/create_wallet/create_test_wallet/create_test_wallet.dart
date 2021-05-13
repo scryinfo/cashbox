@@ -43,6 +43,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           _lastPressedAt = DateTime.now();
           return false; // 不退出
         }
+        _getBackToMainNet(); // not finish create test wallet
         return true; //退出
       },
       child: Container(
