@@ -4,7 +4,6 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';

@@ -1,4 +1,3 @@
-import 'package:app/model/wallets.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';

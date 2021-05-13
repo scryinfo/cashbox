@@ -2,9 +2,7 @@ import 'dart:async';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
@@ -79,9 +77,6 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   }
 
   void initDataConfig() async {
-    if (Wallets.instance.nowWallet == null) {
-      await WalletsControl.getInstance().walletsAll();
-    }
     //case nowChain is not eth or eth_test
     chainType = ChainType.ETH;
     fromAddress = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
