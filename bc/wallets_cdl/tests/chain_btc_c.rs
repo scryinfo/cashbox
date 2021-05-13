@@ -130,8 +130,8 @@ fn btc_load_now_blocknumber_test(){
         let c_err = ChainBtc_loadNowBlockNumber(*c_ctx, c_block) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
-        let block :BtcNowLoadBlock = CBtcNowLoadBlock::to_rust(&**c_block);
-        wallets_cdl::mem_c::CbtcNowLoadBlock_dFree(c_block);
+        let _block :BtcNowLoadBlock = CBtcNowLoadBlock::to_rust(&**c_block);
+        wallets_cdl::mem_c::CBtcNowLoadBlock_dFree(c_block);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 

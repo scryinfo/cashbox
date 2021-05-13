@@ -286,7 +286,7 @@ pub unsafe extern "C" fn CBtcNowLoadBlock_dAlloc() -> *mut *mut CBtcNowLoadBlock
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CbtcNowLoadBlock_dFree(dPtr: *mut *mut CBtcNowLoadBlock){
+pub unsafe extern "C" fn CBtcNowLoadBlock_dFree(dPtr: *mut *mut CBtcNowLoadBlock){
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr)
 }
