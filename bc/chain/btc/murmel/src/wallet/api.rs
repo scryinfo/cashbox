@@ -26,6 +26,9 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         _ => (ChainType::BtcTest, Network::Testnet),
     };
 
+    // test mainnet
+    //let network = Network::Bitcoin;
+
     let address = address
         .iter()
         .filter(|&&a| a.chain_type.eq(chain_type.to_string().as_str()))
@@ -64,4 +67,8 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
 
 pub  fn btc_load_now_blocknumber() -> Result<BtcNowLoadBlock, rbatis::Error> {
     db::fetch_scanned_height()
+}
+
+pub fn btc_load_balance() {
+    
 }

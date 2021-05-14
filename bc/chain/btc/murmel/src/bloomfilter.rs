@@ -8,7 +8,7 @@ use crate::p2p::{
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use log::{error, info, trace};
+use log::{error, trace};
 use std::ops::Deref;
 use std::sync::{mpsc, Arc};
 use std::thread;

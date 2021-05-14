@@ -58,7 +58,6 @@ fn init_parameters(c_ctx: *mut *mut CContext) -> *mut CError {
 }
 
 #[test]
-#[ignore]
 fn btc_start_test() {
     // not create only init
     let c_ctx = CContext_dAlloc();
