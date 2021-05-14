@@ -10,7 +10,7 @@ import 'package:app/pages/eee_page.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/app_info_util.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -81,10 +81,10 @@ class _EntrancePageState extends State<EntrancePage> {
 
     LatestConfig serverConfigModel;
     final cashBoxType = "GA";
-    String signInfo = await AppInfoUtil.instance.getAppSignInfo();
-    String deviceId = await AppInfoUtil.instance.getDeviceId();
-    String apkVersion = await AppInfoUtil.instance.getAppVersion();
-    // String abiPlatform = await AppInfoUtil.instance.getSupportAbi();
+    String signInfo = await AppInfoControl.instance.getAppSignInfo();
+    String deviceId = await AppInfoControl.instance.getDeviceId();
+    String apkVersion = await AppInfoControl.instance.getAppVersion();
+    // String abiPlatform = await AppInfoControl.instance.getSupportAbi();
 
     var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
     BasicClientReq basicClientReq = new BasicClientReq();

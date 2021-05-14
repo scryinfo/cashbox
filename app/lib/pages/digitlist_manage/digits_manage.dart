@@ -6,7 +6,7 @@ import 'package:app/model/token.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/app_info_util.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:logger/logger.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';

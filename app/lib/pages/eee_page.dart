@@ -15,7 +15,7 @@ import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:logger/logger.dart';
-import 'package:app/util/app_info_util.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +81,7 @@ class _EeePageState extends State<EeePage> {
     loadDigitBalance();
     // loadLegalCurrency();
     // loadDigitRateInfo();
-    AppInfoUtil.instance.checkAppUpgrade();
+    AppInfoControl.instance.checkAppUpgrade();
   }
 
   //Processing display fiat currency usd, cny, etc.
