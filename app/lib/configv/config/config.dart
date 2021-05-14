@@ -8,13 +8,11 @@ part 'config.g.dart';
 class Config extends Object {
   Config();
 
-  bool isInitedConfig;
   int lastTimeConfigCheck;
   int intervalMilliseconds;
   String currency;
   String locale;
   List<Language> languages;
-  NetType curNetType;
   String serverAppVersion;
   String diamondCa; //diamond Dapp contractAddress
 
@@ -22,11 +20,10 @@ class Config extends Object {
   MinGasLimit minGasLimit;
   DefaultGasLimit defaultGasLimit;
 
-  MaxGasPrice maxGasPrice;   // unit：单位 gwei
-  MinGasPrice minGasPrice;   // unit：单位 gwei
-  DefaultGasPrice defaultGasPrice;
+  MaxGasPrice maxGasPrice; // 注意：配置文件中的单位 gwei
+  MinGasPrice minGasPrice; // 注意：配置文件中的单位 gwei
+  DefaultGasPrice defaultGasPrice; // 注意：配置文件中的单位 gwei
 
-  String dbVersion;
   BigInt ethUnit;
   BigInt eeeUnit;
   String systemSymbol;
@@ -40,19 +37,6 @@ class Config extends Object {
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
   Map<String, dynamic> toJson() => _$ConfigToJson(this);
-}
-
-@JsonSerializable()
-class NetType extends Object {
-  NetType();
-
-  String enumNetType; // EnumKit.NetType
-  String netTypeName;
-  bool isCurNet = false;
-
-  factory NetType.fromJson(Map<String, dynamic> json) => _$NetTypeFromJson(json);
-
-  Map<String, dynamic> toJson() => _$NetTypeToJson(this);
 }
 
 @JsonSerializable()
@@ -173,7 +157,6 @@ class PrivateConfig {
   List<Token> defaultTokens;
   String scryXIp;
   String publicIp;
-  String nowDbVersion;
   String etherscanKey;
   String dddMainNetCA;
   String dddTestNetCA;

@@ -1,12 +1,10 @@
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/token.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:logger/logger.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -20,6 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import 'package:wallets/kits.dart';
+import 'package:logger/logger.dart';
 
 class SearchDigitPage extends StatefulWidget {
   @override
@@ -235,14 +234,14 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                     return;
                   } else {
                     bool isDigitExist = false;
-                    var tempDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
+                    /*var tempDigitList = Wallets.instance.nowWallet.nowChain.digitsList;
                     for (int i = 0; i < tempDigitList.length; i++) {
                       var element = tempDigitList[i];
                       if (element.tokenId == displayDigitsList[index].tokenId) {
                         isDigitExist = true;
                         break;
                       }
-                    }
+                    }*/
                     if (!isDigitExist) {
                       // save token to local, make sure token exist
                       TokenAddress tokenAddress = TokenAddress()
@@ -331,13 +330,13 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
       return;
     }
     List<TokenM> tempList = [];
-    Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
+    /*Wallets.instance.nowWallet.nowChain.digitsList.forEach((element) {
       if (element.shortName.toLowerCase() == param.toLowerCase() ||
           element.fullName.toLowerCase() == param.toLowerCase() ||
           element.contractAddress.toLowerCase() == param.toLowerCase()) {
         tempList.add(element);
       }
-    });
+    });*/
     if (tempList.length > 0) {
       setState(() {
         this.displayDigitsList = tempList;

@@ -27,7 +27,6 @@ class DigitListPage extends StatefulWidget {
 class _DigitListPageState extends State<DigitListPage> {
   static int singleDigitCount = 20; //Display 20 items of data on a single page, update and update 20 items at a time
 
-  String nowChainAddress = "";
   List<TokenM> nowChainDigitsList = [];
   List<TokenM> displayDigitsList = [];
 

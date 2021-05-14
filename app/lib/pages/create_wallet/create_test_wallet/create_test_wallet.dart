@@ -1,13 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:app/configv/config/config.dart';
-import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:logger/logger.dart';
-import 'package:app/util/qr_scan_util.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,7 +24,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _mnemonicController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-
+  DateTime _lastPressedAt; //上次点击时间
   @override
   void initState() {
     super.initState();
@@ -36,39 +34,48 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      width: ScreenUtil().setWidth(90),
-      height: ScreenUtil().setHeight(160),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: MyAppBar(
-          centerTitle: translate('create_test_wallet'),
+    return WillPopScope(
+      onWillPop: () async {
+        if (_lastPressedAt == null || DateTime.now().difference(_lastPressedAt) > Duration(seconds: 1)) {
+          // 两次点击间隔超过1秒则重新计时
+          _lastPressedAt = DateTime.now();
+          return false; // 不退出
+        }
+        _getBackToMainNet(); // not finish create test wallet
+        return true; //退出
+      },
+      child: Container(
+        alignment: Alignment.center,
+        width: ScreenUtil().setWidth(90),
+        height: ScreenUtil().setHeight(160),
+        child: Scaffold(
           backgroundColor: Colors.transparent,
-          actionName: translate('back_main_net'),
-          isBack: false,
-          onPressed: () async {
-            bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetType.Main);
-            if (!isChangeNetOk) {
-              return;
-            }
-            Config config = await HandleConfig.instance.getConfig();
-            NetType netType = NetType()
-              ..enumNetType = EnumKit.NetType.Main.toString()
-              ..isCurNet = true;
-            config.curNetType = netType;
-            HandleConfig.instance.saveConfig(config);
-            NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
-          },
-        ),
-        body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+          appBar: MyAppBar(
+            centerTitle: translate('create_test_wallet'),
+            backgroundColor: Colors.transparent,
+            actionName: translate('back_main_net'),
+            isBack: false,
+            onPressed: () async {
+              _getBackToMainNet();
+            },
           ),
-          child: _buildTestWalletWidget(),
+          body: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+            ),
+            child: _buildTestWalletWidget(),
+          ),
         ),
       ),
     );
+  }
+
+  _getBackToMainNet() async {
+    bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetType.Main);
+    if (!isChangeNetOk) {
+      return;
+    }
+    NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
   }
 
   Widget _buildTestWalletWidget() {
@@ -182,7 +189,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   }
 
   void _scanQrContent() {
-    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    Future<String> qrResult = QrScanControl.instance.qrscan();
     qrResult.then((t) {
       setState(() {
         _mnemonicController.text = t.toString();
@@ -365,11 +372,9 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                           Checkbox(
                             value: _isChooseEthChain,
                             onChanged: (newValue) {
-                              setState(
-                                () {
-                                  _isChooseEthChain = newValue;
-                                },
-                              );
+                              setState(() {
+                                _isChooseEthChain = newValue;
+                              });
                             },
                           ),
                           Text(
@@ -458,13 +463,17 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
 
     var newWalletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mnemonicController.text.codeUnits), EnumKit.WalletType.Test,
         _nameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
-
-    if (newWalletObj != null) {
-      Fluttertoast.showToast(msg: translate('success_create_test_wallet'));
-      WalletsControl.getInstance().saveCurrentWalletChain(newWalletObj.id, EnumKit.ChainType.EthTest);
-      NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
-    } else {
+    if (newWalletObj == null) {
       Fluttertoast.showToast(msg: translate('failure_create_test_wallet'));
+      return;
     }
+    bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetType.Test);
+    if (!isChangeNetOk) {
+      Fluttertoast.showToast(msg: translate('failure_create_test_wallet'));
+      return;
+    }
+    Fluttertoast.showToast(msg: translate('success_create_test_wallet'));
+    WalletsControl.getInstance().saveCurrentWalletChain(newWalletObj.id, EnumKit.ChainType.EthTest);
+    NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
   }
 }

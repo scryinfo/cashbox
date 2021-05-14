@@ -2,6 +2,7 @@ import 'package:app/control/wallets_control.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/app_bar.dart';
@@ -10,7 +11,7 @@ import 'dart:typed_data';
 import '../../res/styles.dart';
 import '../../routers/routers.dart';
 import 'package:app/routers/fluro_navigator.dart';
-import '../../util/qr_scan_util.dart';
+import '../../control/qr_scan_control.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:wallets/enums.dart' as EnumKit;
 
@@ -116,15 +117,14 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               color: Color.fromRGBO(26, 141, 198, 0.20),
               child: FlatButton(
                 onPressed: () async {
-                  var isSuccess = await _verifyMnemonicSame();
-                  if (isSuccess) {
-                    context.read<CreateWalletProcessProvide>().emptyData();
-                    /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
-                    NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
-                    //NavigatorUtils.push(context, Routes.eeePage, clearStack: true);
-                  } else {
+                  var isSuccess = await _verifyMsgAndCreateWallet();
+                  if (!isSuccess) {
                     Fluttertoast.showToast(msg: translate('mnemonic_order_wrong'));
+                    return;
                   }
+                  context.read<CreateWalletProcessProvide>().emptyData();
+                  /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
+                  NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
                 },
                 child: Text(
                   translate('verify_mnemonic_info'),
@@ -196,7 +196,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   }
 
   void _scanQrContent() {
-    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    Future<String> qrResult = QrScanControl.instance.qrscan();
     qrResult.then((t) {
       setState(() {
         this.verifyString = t.toString();
@@ -233,27 +233,53 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
     return randomWidgetList;
   }
 
-  Future<bool> _verifyMnemonicSame() async {
-    if (verifyString.isNotEmpty && Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic.length != 0) {
-      if (verifyString.trim() == String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).trim()) {
-        var walletObj = WalletsControl.getInstance().createWallet(
+  Future<bool> _verifyMsgAndCreateWallet() async {
+    if (verifyString.isEmpty) {
+      return false;
+    }
+    if (verifyString.trim() != String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).trim()) {
+      return false;
+    }
+    var walletObj;
+    var curNetType = WalletsControl.getInstance().getCurrentNetType();
+    switch (curNetType) {
+      case EnumKit.NetType.Main:
+        walletObj = WalletsControl.getInstance().createWallet(
             Uint8List.fromList(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic),
             EnumKit.WalletType.Normal,
             Provider.of<CreateWalletProcessProvide>(context, listen: false).walletName,
             Uint8List.fromList(Provider.of<CreateWalletProcessProvide>(context, listen: false).pwd));
-        if (walletObj != null) {
-          context.read<CreateWalletProcessProvide>().setMnemonic(null);
-          context.read<CreateWalletProcessProvide>().setPwd(null);
-          return true;
-        } else {
-          Fluttertoast.showToast(msg: translate('unknown_error_in_create_wallet'));
-          return false;
-        }
-      }
-      return false;
-    } else {
+        break;
+      case EnumKit.NetType.Test:
+        walletObj = WalletsControl.getInstance().createWallet(
+            Uint8List.fromList(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic),
+            EnumKit.WalletType.Test,
+            Provider.of<CreateWalletProcessProvide>(context, listen: false).walletName,
+            Uint8List.fromList(Provider.of<CreateWalletProcessProvide>(context, listen: false).pwd));
+        break;
+      default:
+        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+        return false;
+        break;
+    }
+    if (walletObj == null) {
+      Fluttertoast.showToast(msg: translate('unknown_error_in_create_wallet'));
       return false;
     }
+    switch (curNetType) {
+      case EnumKit.NetType.Main:
+        WalletsControl.getInstance().saveCurrentWalletChain(walletObj.id, EnumKit.ChainType.ETH);
+        break;
+      case EnumKit.NetType.Test:
+        WalletsControl.getInstance().saveCurrentWalletChain(walletObj.id, EnumKit.ChainType.EthTest);
+        break;
+      default:
+        Logger.getInstance().e("unknown net type", "import wallet curNetType is unknown");
+        return false;
+    }
+    context.read<CreateWalletProcessProvide>().setMnemonic(null);
+    context.read<CreateWalletProcessProvide>().setPwd(null);
+    return true;
   }
 
   @override

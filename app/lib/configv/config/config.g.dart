@@ -8,7 +8,6 @@ part of 'config.dart';
 
 Config _$ConfigFromJson(Map<String, dynamic> json) {
   return Config()
-    ..isInitedConfig = json['isInitedConfig'] as bool
     ..lastTimeConfigCheck = json['lastTimeConfigCheck'] as int
     ..intervalMilliseconds = json['intervalMilliseconds'] as int
     ..currency = json['currency'] as String
@@ -17,9 +16,6 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
         ?.map((e) =>
             e == null ? null : Language.fromJson(e as Map<String, dynamic>))
         ?.toList()
-    ..curNetType = json['curNetType'] == null
-        ? null
-        : NetType.fromJson(json['curNetType'] as Map<String, dynamic>)
     ..serverAppVersion = json['serverAppVersion'] as String
     ..diamondCa = json['diamondCa'] as String
     ..maxGasLimit = json['maxGasLimit'] == null
@@ -42,7 +38,6 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
         ? null
         : DefaultGasPrice.fromJson(
             json['defaultGasPrice'] as Map<String, dynamic>)
-    ..dbVersion = json['dbVersion'] as String
     ..ethUnit =
         json['ethUnit'] == null ? null : BigInt.parse(json['ethUnit'] as String)
     ..eeeUnit =
@@ -58,13 +53,11 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
-      'isInitedConfig': instance.isInitedConfig,
       'lastTimeConfigCheck': instance.lastTimeConfigCheck,
       'intervalMilliseconds': instance.intervalMilliseconds,
       'currency': instance.currency,
       'locale': instance.locale,
       'languages': instance.languages,
-      'curNetType': instance.curNetType,
       'serverAppVersion': instance.serverAppVersion,
       'diamondCa': instance.diamondCa,
       'maxGasLimit': instance.maxGasLimit,
@@ -73,7 +66,6 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'maxGasPrice': instance.maxGasPrice,
       'minGasPrice': instance.minGasPrice,
       'defaultGasPrice': instance.defaultGasPrice,
-      'dbVersion': instance.dbVersion,
       'ethUnit': instance.ethUnit?.toString(),
       'eeeUnit': instance.eeeUnit?.toString(),
       'systemSymbol': instance.systemSymbol,
@@ -82,19 +74,6 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'balanceSymbol': instance.balanceSymbol,
       'eeeSymbol': instance.eeeSymbol,
       'privateConfig': instance.privateConfig,
-    };
-
-NetType _$NetTypeFromJson(Map<String, dynamic> json) {
-  return NetType()
-    ..enumNetType = json['enumNetType'] as String
-    ..netTypeName = json['netTypeName'] as String
-    ..isCurNet = json['isCurNet'] as bool;
-}
-
-Map<String, dynamic> _$NetTypeToJson(NetType instance) => <String, dynamic>{
-      'enumNetType': instance.enumNetType,
-      'netTypeName': instance.netTypeName,
-      'isCurNet': instance.isCurNet,
     };
 
 Language _$LanguageFromJson(Map<String, dynamic> json) {
@@ -221,7 +200,6 @@ PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
         ?.toList()
     ..scryXIp = json['scryXIp'] as String
     ..publicIp = json['publicIp'] as String
-    ..nowDbVersion = json['nowDbVersion'] as String
     ..etherscanKey = json['etherscanKey'] as String
     ..dddMainNetCA = json['dddMainNetCA'] as String
     ..dddTestNetCA = json['dddTestNetCA'] as String
@@ -245,7 +223,6 @@ Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
       'defaultTokens': instance.defaultTokens,
       'scryXIp': instance.scryXIp,
       'publicIp': instance.publicIp,
-      'nowDbVersion': instance.nowDbVersion,
       'etherscanKey': instance.etherscanKey,
       'dddMainNetCA': instance.dddMainNetCA,
       'dddTestNetCA': instance.dddTestNetCA,

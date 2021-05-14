@@ -1,9 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:app/configv/config/config.dart';
-import 'package:app/configv/config/handle_config.dart';
-import 'package:app/control/balance_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/model/chain.dart';
@@ -31,24 +28,23 @@ class WalletsControl {
   }
 
   Future<Wallets> initWallet() async {
-    Wallets wallets = Wallets.mainIsolate();
-    Config config = await HandleConfig.instance.getConfig();
     var initP = new InitParameters();
     try {
       Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
       initP.dbName.path = directory.path;
-      initP.dbName.prefix = "test_"; // todo change
-      initP.dbName = Wallets.dbName(initP.dbName); // todo change
-      initP.netType = config != null ? config.curNetType.enumNetType : EnumKit.NetType.Main.toEnumString();
+      initP.dbName.prefix = "scry_";
+      initP.dbName = Wallets.dbName(initP.dbName);
+      Wallets wallets = Wallets.mainIsolate();
+      var errObj = wallets.init(initP);
+      if (!errObj.isSuccess()) {
+        Logger.getInstance().e("initWallet ", "errObj is --->" + errObj.message.toString());
+        return null;
+      }
+      var curNetType = getCurrentNetType();
+      changeNetType(curNetType);
+      return wallets;
     } catch (e) {
       Logger.getInstance().e("Wallets.dbName ", "error is --->" + e.toString());
-    }
-    var errObj = wallets.init(initP);
-    if (errObj.isSuccess()) {
-      return wallets;
-    } else {
-      Logger.getInstance().e("initWallet ", "errObj is --->" + errObj.toString());
-      return null;
     }
   }
 
@@ -59,6 +55,15 @@ class WalletsControl {
       return null;
     }
     return mneObj.data1;
+  }
+
+  EnumKit.NetType getCurrentNetType() {
+    var curNetTypeObj = Wallets.mainIsolate().getCurrentNetType();
+    if (!curNetTypeObj.isSuccess()) {
+      Logger.getInstance().e("wallet_control ", "getCurrentNetType error is  --->" + curNetTypeObj.err.message.toString());
+      return EnumKit.NetType.Main;
+    }
+    return curNetTypeObj.data1;
   }
 
   bool changeNetType(EnumKit.NetType netType) {
@@ -98,16 +103,15 @@ class WalletsControl {
       tempWallet.walletId = element.id;
       tempWallet.accountMoney = getWalletMoney(element).toStringAsFixed(6);
 
-      // todo isShowChain tempWallet.chainList =
       ChainETH chainETH = ChainETH()
         ..isVisible = true // todo element.ethChain.chainShared.visible;
         ..walletAddress = element.ethChain.chainShared.walletAddress;
       ChainBTC chainBTC = ChainBTC()
-        ..isVisible = false
-        ..walletAddress = element.btcChain.chainShared.walletAddress; // todo element.ethChain.chainShared.visible;
+        ..isVisible = false // todo element.ethChain.chainShared.visible;
+        ..walletAddress = element.btcChain.chainShared.walletAddress;
       ChainEEE chainEEE = ChainEEE()
-        ..isVisible = true
-        ..walletAddress = element.eeeChain.chainShared.walletAddress; // todo element.ethChain.chainShared.visible;
+        ..isVisible = true // todo element.ethChain.chainShared.visible;
+        ..walletAddress = element.eeeChain.chainShared.walletAddress;
       switch (element.walletType.toWalletType()) {
         case EnumKit.WalletType.Test:
           chainETH..chainType = EnumKit.ChainType.EthTest;
@@ -126,7 +130,6 @@ class WalletsControl {
     return walletMList;
   }
 
-  // todo
   bool isCurWallet(WalletM.Wallet wallet) {
     if (currentWallet().id == wallet.walletId) {
       return true;
@@ -135,7 +138,6 @@ class WalletsControl {
   }
 
   double getWalletMoney(Wallet wallet) {
-    // todo wallet's chain's tokens * price
     double allMoneyValue = 0.0;
     EthChainControl.getInstance().getVisibleTokenList(wallet).forEach((element) {
       allMoneyValue = allMoneyValue + TokenRate.instance.getMoney(element);

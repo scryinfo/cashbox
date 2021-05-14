@@ -66,6 +66,7 @@ pub trait EthChainTrait: Send + Sync {
     async fn update_non_auth_tokens(&self, context: &dyn ContextTrait, non_auth_tokens: Vec<EthChainTokenNonAuth>) -> Result<(), WalletError>;
     async fn get_non_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType)->Result<Vec<EthChainTokenNonAuth>,WalletError>;
     async fn get_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType,start_item:u64,page_size:u64)->Result<Vec<EthChainTokenAuth>,WalletError>;
+    async fn query_auth_tokens(&self, context: &dyn ContextTrait, net_type: &NetType, name: Option<String>, contract_addr: Option<String>, start_item: u64, page_size: u64)->Result<Vec<EthChainTokenAuth>,WalletError>;
 }
 
 #[async_trait]

@@ -1,5 +1,4 @@
 {
-  "isInitedConfig": false,
   "lastTimeConfigCheck": 0,
   "intervalMilliseconds": 10,
   "currency": "USD",
@@ -33,8 +32,8 @@
     "erc20GasLimit": 70000
   },
   "maxGasPrice": {
-    "ethGasPrice": 100,
-    "erc20GasPrice": 100
+    "ethGasPrice": 300,
+    "erc20GasPrice": 300
   },
   "minGasPrice": {
     "ethGasPrice": 10,
@@ -44,7 +43,6 @@
     "ethGasPrice": 50,
     "erc20GasPrice": 50
   },
-  "dbVersion": "1.1.0",
   "ethUnit": "1000000000000000000",
   "eeeUnit": "1000000000000000",
   "systemSymbol": "System",
@@ -100,7 +98,6 @@
     ],
     "scryXIp": "",
     "publicIp": "https://cap/pub",
-    "nowDbVersion": "1.1.0",
     "etherscanKey": "",
     "dddMainNetCA": "",
     "dddTestNetCA": "",

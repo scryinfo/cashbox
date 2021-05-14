@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:app/control/wallets_control.dart';
-import 'package:app/util/qr_scan_util.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -13,6 +13,7 @@ import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:logger/logger.dart';
 
 class ImportWalletPage extends StatefulWidget {
   @override
@@ -195,7 +196,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   }
 
   void _scanQrContent() {
-    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    Future<String> qrResult = QrScanControl.instance.qrscan();
     qrResult.then((t) {
       setState(() {
         _mneController.text = t.toString();
@@ -466,17 +467,43 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
   }
 
   Future _checkAndDoImportWallet() async {
-    if (_verifyImportWallet()) {
-      var walletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mneController.text.codeUnits), EnumKit.WalletType.Normal,
-          _walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
-      if (walletObj != null) {
-        _mneController.text = "";
-        _pwdController.text = "";
-        WalletsControl.getInstance().saveCurrentWalletChain(walletObj.id, EnumKit.ChainType.ETH);
-        NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
-      } else {
-        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
-      }
+    if (!_verifyImportWallet()) {
+      return;
     }
+    var walletObj;
+    var curNetType = WalletsControl.getInstance().getCurrentNetType();
+    switch (curNetType) {
+      case EnumKit.NetType.Main:
+        walletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mneController.text.codeUnits), EnumKit.WalletType.Normal,
+            _walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
+        break;
+      case EnumKit.NetType.Test:
+        walletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mneController.text.codeUnits), EnumKit.WalletType.Test,
+            _walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
+        break;
+      default:
+        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+        return;
+        break;
+    }
+    if (walletObj == null) {
+      Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+      return;
+    }
+    _mneController.text = "";
+    _pwdController.text = "";
+    switch (curNetType) {
+      case EnumKit.NetType.Main:
+        WalletsControl.getInstance().saveCurrentWalletChain(walletObj.id, EnumKit.ChainType.ETH);
+        break;
+      case EnumKit.NetType.Test:
+        WalletsControl.getInstance().saveCurrentWalletChain(walletObj.id, EnumKit.ChainType.EthTest);
+        break;
+      default:
+        Logger.getInstance().e("unknown net type", "import wallet curNetType is unknown");
+        return;
+        break;
+    }
+    NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
   }
 }

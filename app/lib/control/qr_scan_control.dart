@@ -10,22 +10,22 @@ import 'package:provider/provider.dart';
 
 import 'package:logger/logger.dart';
 
-class QrScanUtil {
+class QrScanControl {
   static const methodPlugin = const MethodChannel('qr_scan_channel');
 
   //Factory singleton class implementation
-  factory QrScanUtil() => _getInstance();
+  factory QrScanControl() => _getInstance();
 
-  static QrScanUtil get instance => _getInstance();
-  static QrScanUtil _instance;
+  static QrScanControl get instance => _getInstance();
+  static QrScanControl _instance;
 
-  QrScanUtil._internal() {
+  QrScanControl._internal() {
     //init data
   }
 
-  static QrScanUtil _getInstance() {
+  static QrScanControl _getInstance() {
     if (_instance == null) {
-      _instance = new QrScanUtil._internal();
+      _instance = new QrScanControl._internal();
     }
     return _instance;
   }
@@ -190,7 +190,7 @@ class QrScanUtil {
         break;
       default:
         Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
-        Logger().e("QrScanUtil", "unknown chainType ======>" + chainType);
+        Logger().e("QrScanControl", "unknown chainType ======>" + chainType);
         break;
     }
   }

@@ -6,7 +6,7 @@ import 'package:app/model/token.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/app_info_util.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:logger/logger.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/cupertino.dart';
@@ -125,6 +125,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     final signInfo = "82499105f009f80a1fe2f1db86efdec7";
     final deviceId = "deviceIddddddd";
     final apkVersion = "2.0.0";
+    // todo replace ip with config.Ip
     var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, "eeeddd", cashBoxType);
     var channel = createClientChannel(refresh.refreshCall);
     EthTokenOpen_QueryReq open_queryReq = new EthTokenOpen_QueryReq();

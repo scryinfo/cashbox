@@ -13,7 +13,7 @@ use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
 use mav::ma::{
-    Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcTxState, MBtcUtxo,
+    Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcUtxo,
 };
 use mav::ma::{MLocalTxLog, MProgress};
 use once_cell::sync::{Lazy, OnceCell};
@@ -219,17 +219,6 @@ impl DetailSqlite {
 
     async fn create_btc_utxo(rb: &Rbatis) -> Result<DBExecResult, Error> {
         rb.exec("", MBtcUtxo::create_table_script()).await
-    }
-
-    pub async fn save_state(&self, seq: u16, state: BtcTxState) {
-        let mut tx_state = MBtcTxState::default();
-        tx_state.seq = seq;
-        tx_state.state = state.to_string();
-        let r = tx_state.save(&self.rb, "").await;
-        r.map_or_else(
-            |e| error!("error save_state {:?}", e),
-            |r| debug!("save_state {:?}", r),
-        );
     }
 
     async fn save_progress(&self, header: String, timestamp: String) {
@@ -480,16 +469,12 @@ impl DetailSqlite {
 }
 
 pub fn fetch_scanned_height() -> Result<BtcNowLoadBlock, rbatis::Error> {
-    block_on(async {
-        let mprogress = RB_DETAIL.progress().await;
-        let height = RB_CHAIN
-            .fetch_header_by_timestamp(&mprogress.timestamp)
-            .await?;
-        Ok(BtcNowLoadBlock {
-            height,
-            header_hash: mprogress.header,
-            timestamp: mprogress.timestamp,
-        })
+    let mprogress = block_on(RB_DETAIL.progress());
+    let height = block_on(RB_CHAIN.fetch_header_by_timestamp(&mprogress.timestamp))?;
+    Ok(BtcNowLoadBlock {
+        height: height - 1,
+        header_hash: mprogress.header,
+        timestamp: mprogress.timestamp,
     })
 }
 
@@ -553,8 +538,10 @@ impl Verify {
 
 #[cfg(test)]
 mod test {
-    use crate::db::{RB_CHAIN, RB_DETAIL};
+    use crate::db::{fetch_scanned_height, RB_CHAIN, RB_DETAIL};
     use futures::executor::block_on;
+    use rbatis::Error;
+    use wallets_types::BtcNowLoadBlock;
 
     #[test]
     fn test_fetch_scann_header() {
@@ -593,5 +580,18 @@ mod test {
     #[test]
     fn test_utxo() {
         block_on(RB_DETAIL.utxo());
+    }
+
+    #[test]
+    fn test_btc_load_now_block() {
+        let r = fetch_scanned_height();
+        match r {
+            Ok(r) => {
+                println!("{:?}", r)
+            }
+            Err(e) => {
+                println!("{:?}", e)
+            }
+        }
     }
 }

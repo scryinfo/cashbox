@@ -62,6 +62,6 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         .expect("can not start node");
 }
 
-pub fn btc_load_now_blocknumber() -> Result<BtcNowLoadBlock, rbatis::Error> {
+pub  fn btc_load_now_blocknumber() -> Result<BtcNowLoadBlock, rbatis::Error> {
     db::fetch_scanned_height()
 }

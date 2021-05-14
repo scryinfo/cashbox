@@ -1,7 +1,7 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/token_rate.dart';
-import 'package:app/util/app_info_util.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:logger/logger.dart';
 import 'package:services/services.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
@@ -13,9 +13,9 @@ Future<TokenRate> loadRateInstance() async {
   // Config config = await HandleConfig.instance.getConfig();
   //  String rateIpValue = config.privateConfig.rateUrl;
   final cashBoxType = "GA";
-  String signInfo = await AppInfoUtil.instance.getAppSignInfo();
-  String deviceId = await AppInfoUtil.instance.getDeviceId();
-  String apkVersion = await AppInfoUtil.instance.getAppVersion();
+  String signInfo = await AppInfoControl.instance.getAppSignInfo();
+  String deviceId = await AppInfoControl.instance.getDeviceId();
+  String apkVersion = await AppInfoControl.instance.getAppVersion();
 
   var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
   var channel = createClientChannel(refresh.refreshCall);

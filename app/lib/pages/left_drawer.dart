@@ -198,8 +198,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
                   ),
                 ),
                 onTap: () async {
-                  String qrInfo = await QrScanUtil.instance.qrscan();
-                  QrScanUtil.instance.checkByScryCityTransfer(qrInfo, context);
+                  String qrInfo = await QrScanControl.instance.qrscan();
+                  QrScanControl.instance.checkByScryCityTransfer(qrInfo, context);
                 }),
           ),*/
         ],
@@ -218,13 +218,24 @@ class _LeftDrawerState extends State<LeftDrawer> {
                 color: WalletsControl.getInstance().isCurWallet(walletList[index]) ? Color.fromRGBO(152, 245, 255, 0.5) : Colors.transparent,
                 child: GestureDetector(
                   onTap: () async {
-                    // todo
-                    bool isSaveOk = WalletsControl.getInstance().saveCurrentWalletChain(walletList[index].walletId, ChainType.ETH);
-                    if (isSaveOk) {
-                      NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
-                    } else {
-                      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+                    bool isSaveOk = false;
+                    switch (WalletsControl.getInstance().getCurrentNetType()) {
+                      case NetType.Main:
+                        isSaveOk = WalletsControl.getInstance().saveCurrentWalletChain(walletList[index].walletId, ChainType.ETH);
+                        break;
+                      case NetType.Test:
+                        isSaveOk = WalletsControl.getInstance().saveCurrentWalletChain(walletList[index].walletId, ChainType.EthTest);
+                        break;
+                      default:
+                        Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+                        return;
+                        break;
                     }
+                    if (!isSaveOk) {
+                      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+                      return;
+                    }
+                    NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
                   },
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

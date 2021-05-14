@@ -117,6 +117,19 @@ class ChainEth {
     return err;
   }
 
+  Error queryAuthTokenList(ArrayCEthChainTokenDefault defaultTokens) {
+    Error err;
+    // {
+    //   var ptrDefaultTokens = defaultTokens.toCPtr();
+    //   var cerr = Wallets.cWallets.ChainEth_queryAuthTokenList(_ptrContext, ptrDefaultTokens);
+    //   err = Error.fromC(cerr);
+    //   Wallets.cWallets.CError_free(cerr);
+    //   ArrayCEthChainTokenDefault.free(ptrDefaultTokens);
+    // }
+    // return err;
+    return Error();
+  }
+
   //
   // Error addNonAuthDigit(ArrayCEthChainTokenAuth tokens) {
   //   Error err;

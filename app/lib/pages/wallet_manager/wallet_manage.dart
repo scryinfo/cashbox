@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:wallets/enums.dart' as EnumKit;
 import '../../res/resources.dart';
 import '../../routers/routers.dart';
 import '../../routers/fluro_navigator.dart';
@@ -267,16 +268,51 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           onPressed: (value) async {
             bool isRemoved = WalletsControl.getInstance()
                 .removeWallet(Provider.of<WalletManagerProvide>(context, listen: false).walletId, Uint8List.fromList(value.toString().codeUnits));
-            if (isRemoved) {
-              Fluttertoast.showToast(msg: translate('success_in_delete_wallet'));
-              NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
-            } else {
+            if (!isRemoved) {
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_delete_wallet'));
+              return;
             }
+
+            // if curNetType is NetType.Test, and not exist any left wallet, change it to NetType.Main.
+            var curNetType = WalletsControl.getInstance().getCurrentNetType();
+            if (curNetType == EnumKit.NetType.Test && !WalletsControl.getInstance().hasAny()) {
+              WalletsControl.getInstance().changeNetType(EnumKit.NetType.Main);
+            }
+            Fluttertoast.showToast(msg: translate('success_in_delete_wallet'));
+            _navigateToNextPage();
           },
         );
       },
     );
+  }
+
+  void _navigateToNextPage() {
+    if (!WalletsControl.getInstance().hasAny()) {
+      NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
+      return;
+    }
+    // loadAll，and use first wallet as default
+    bool isSaveOk = false;
+    var curNetType = WalletsControl.getInstance().getCurrentNetType();
+    switch (curNetType) {
+      case EnumKit.NetType.Main:
+        isSaveOk =
+            WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
+        break;
+      case EnumKit.NetType.Test:
+        isSaveOk =
+            WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.EthTest);
+        break;
+      default:
+        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+        return;
+        break;
+    }
+    if (!isSaveOk) {
+      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+      return;
+    }
+    NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
   }
 
   void _showRecoverDialog(BuildContext context) {

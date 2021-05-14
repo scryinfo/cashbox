@@ -5,23 +5,22 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/server_config_model.dart';
+import 'package:app/model/config_model/server_config_model.dart';
 import 'package:app/pages/eee_page.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/app_info_util.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:app/model/wallets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:services/services.dart';
-import 'package:wallets/enums.dart';
+import 'package:wallets/enums.dart' as EnumKit;
 import 'package:wallets/wallets_c.dc.dart';
 import 'eth_page.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
@@ -82,10 +81,10 @@ class _EntrancePageState extends State<EntrancePage> {
 
     LatestConfig serverConfigModel;
     final cashBoxType = "GA";
-    String signInfo = await AppInfoUtil.instance.getAppSignInfo();
-    String deviceId = await AppInfoUtil.instance.getDeviceId();
-    String apkVersion = await AppInfoUtil.instance.getAppVersion();
-    // String abiPlatform = await AppInfoUtil.instance.getSupportAbi();
+    String signInfo = await AppInfoControl.instance.getAppSignInfo();
+    String deviceId = await AppInfoControl.instance.getDeviceId();
+    String apkVersion = await AppInfoControl.instance.getAppVersion();
+    // String abiPlatform = await AppInfoControl.instance.getSupportAbi();
 
     var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
     BasicClientReq basicClientReq = new BasicClientReq();
@@ -343,14 +342,14 @@ class _EntrancePageState extends State<EntrancePage> {
             if (snapshot.hasData) {
               bool isContainWallet = snapshot.data;
               if (isContainWallet) {
-                ChainType curChainType = WalletsControl.getInstance().currentChainType();
+                EnumKit.ChainType curChainType = WalletsControl.getInstance().currentChainType();
                 switch (curChainType) {
-                  case ChainType.ETH:
-                  case ChainType.EthTest:
+                  case EnumKit.ChainType.ETH:
+                  case EnumKit.ChainType.EthTest:
                     return EthPage();
                     break;
-                  case ChainType.EEE:
-                  case ChainType.EeeTest:
+                  case EnumKit.ChainType.EEE:
+                  case EnumKit.ChainType.EeeTest:
                     return EeePage();
                     break;
                   default:
