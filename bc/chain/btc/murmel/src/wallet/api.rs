@@ -26,9 +26,6 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         _ => (ChainType::BtcTest, Network::Testnet),
     };
 
-    // test mainnet
-    //let network = Network::Bitcoin;
-
     let address = address
         .iter()
         .filter(|&&a| a.chain_type.eq(chain_type.to_string().as_str()))

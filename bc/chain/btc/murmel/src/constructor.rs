@@ -22,6 +22,8 @@
 use crate::bloomfilter::BloomFilter;
 use crate::broadcast::Broadcast;
 use crate::chaindb::{ChainDB, SharedChainDB};
+use crate::db;
+use crate::db::{Verify, RB_DETAIL};
 use crate::dispatcher::Dispatcher;
 use crate::dns::dns_seed;
 use crate::downstream::DownStreamDummy;
@@ -40,6 +42,7 @@ use bitcoin::network::constants::Network;
 use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message::RawNetworkMessage;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
+use futures::executor::block_on;
 use futures::{
     executor::{ThreadPool, ThreadPoolBuilder},
     future,
@@ -47,6 +50,7 @@ use futures::{
     Future, FutureExt, Poll as Async, StreamExt,
 };
 use futures_timer::Interval;
+use mav::ma::MAddress;
 use parking_lot::Condvar;
 use rand::{thread_rng, RngCore};
 use std::pin::Pin;
@@ -57,10 +61,6 @@ use std::{
     path::Path,
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
-use mav::ma::MAddress;
-use crate::db::{Verify, RB_DETAIL};
-use crate::db;
-use futures::executor::block_on;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -152,21 +152,21 @@ impl Constructor {
         db::INSTANCE.set(verify).unwrap();
         let verify = Verify::global();
 
-        dispatcher.add_listener(BloomFilter::new(
-            p2p_control.clone(),
-            timeout.clone(),
-            verify.filter.clone(),
-            pair2,
-        ));
-
-        dispatcher.add_listener(GetData::new(
-            p2p_control.clone(),
-            timeout.clone(),
-            hook_receiver,
-            pair3,
-        ));
-
-        dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
+        // dispatcher.add_listener(BloomFilter::new(
+        //     p2p_control.clone(),
+        //     timeout.clone(),
+        //     verify.filter.clone(),
+        //     pair2,
+        // ));
+        //
+        // dispatcher.add_listener(GetData::new(
+        //     p2p_control.clone(),
+        //     timeout.clone(),
+        //     hook_receiver,
+        //     pair3,
+        // ));
+        //
+        // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));

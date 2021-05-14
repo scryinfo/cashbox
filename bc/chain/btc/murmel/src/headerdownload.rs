@@ -79,7 +79,7 @@ impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
 
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
         loop {
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {

@@ -12,9 +12,7 @@ use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
-use mav::ma::{
-    Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcUtxo,
-};
+use mav::ma::{Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcUtxo};
 use mav::ma::{MLocalTxLog, MProgress};
 use once_cell::sync::{Lazy, OnceCell};
 use rbatis::core::db::DBExecResult;
@@ -47,21 +45,13 @@ pub struct ChainSqlite {
 }
 
 impl ChainSqlite {
-    pub fn new(network: Network, db_file_name: &str) -> Self {
-        let rb = block_on(async {
+    pub async fn new(network: Network, db_file_name: &str) -> Result<Self, rbatis::Error> {
+        let rb = {
             let rb = Self::init_rbatis(db_file_name).await;
-            let r = rb.exec("", MBlockHeader::create_table_script()).await;
-            match r {
-                Ok(a) => {
-                    info!("{:?}", a);
-                }
-                Err(e) => {
-                    error!("{:?}", e);
-                }
-            }
+            let r = rb.exec("", MBlockHeader::create_table_script()).await?;
             rb
-        });
-        Self { rb, network }
+        };
+        Ok(Self { rb, network })
     }
 
     pub async fn save_header(
@@ -165,21 +155,13 @@ pub struct DetailSqlite {
 }
 
 impl DetailSqlite {
-    pub fn new(network: Network, db_file_name: &str) -> Self {
-        let rb = block_on(async {
+    pub async fn new(network: Network, db_file_name: &str) -> Result<Self, rbatis::Error> {
+        let rb = {
             let rb = Self::init_rbatis(db_file_name).await;
-            let r = DetailSqlite::init_table(&rb).await;
-            match r {
-                Ok(_) => {
-                    info!("init detail sqlite table successfully {:?}", r)
-                }
-                Err(e) => {
-                    error!("init detail sqlite table failed with error{:?}", e)
-                }
-            }
+            let r = DetailSqlite::init_table(&rb).await?;
             rb
-        });
-        Self { rb, network }
+        };
+        Ok(Self { rb, network })
     }
 
     async fn init_table(rb: &Rbatis) -> Result<(), Error> {
@@ -503,6 +485,30 @@ impl RInit for ChainSqlite {}
 
 #[async_trait]
 impl RInit for DetailSqlite {}
+
+pub struct GlobalRB {
+    chain: Rbatis,
+    detail: Rbatis,
+}
+
+static GLOBAL_RB: OnceCell<GlobalRB> = OnceCell::new();
+
+impl GlobalRB {
+    pub fn global() -> &'static GlobalRB {
+        GLOBAL_RB.get().expect("GlobalRB is not initialized")
+    }
+
+    pub fn from(path: &str, network: Network) -> Result<Self, rbatis::Error> {
+        block_on(async {
+            let chain = ChainSqlite::new(network, path)?;
+            let detail = DetailSqlite::new(network, path)?;
+            Ok(Self{
+                chain,
+                detail
+            })
+        })
+    }
+}
 
 pub static RB_CHAIN: Lazy<ChainSqlite> =
     Lazy::new(|| ChainSqlite::new(Network::Testnet, BTC_CHAIN_PATH));
