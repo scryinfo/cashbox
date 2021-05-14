@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:app/control/eee_chain_control.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/util/utils.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
-import 'package:wallets/wallets_c.dc.dart';
 
 class EeeTxDetailPage extends StatefulWidget {
   @override
@@ -19,7 +17,6 @@ class EeeTxDetailPage extends StatefulWidget {
 class _EeeTxDetailPageState extends State<EeeTxDetailPage> {
   @override
   Widget build(BuildContext context) {
-    var backUpInfo = Provider.of<TransactionProvide>(context).backup;
     return Container(
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(160),

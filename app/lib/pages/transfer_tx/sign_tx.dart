@@ -1,16 +1,10 @@
-import 'dart:typed_data';
-
-import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../res/resources.dart';
-import '../../routers/routers.dart';
-import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
 
@@ -105,7 +99,7 @@ class _SignTxPageState extends State<SignTxPage> {
           hintContent: translate('info_sign_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-           /*
+            /*
             String walletId = await Wallets.instance.getNowWalletId();
             var pwdFormat = value.codeUnits;
             var separateIndex = _waitToSignInfo.indexOf(";");
