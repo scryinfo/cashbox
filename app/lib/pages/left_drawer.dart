@@ -198,8 +198,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
                   ),
                 ),
                 onTap: () async {
-                  String qrInfo = await QrScanUtil.instance.qrscan();
-                  QrScanUtil.instance.checkByScryCityTransfer(qrInfo, context);
+                  String qrInfo = await QrScanControl.instance.qrscan();
+                  QrScanControl.instance.checkByScryCityTransfer(qrInfo, context);
                 }),
           ),*/
         ],

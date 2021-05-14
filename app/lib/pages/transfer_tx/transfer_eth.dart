@@ -25,7 +25,7 @@ import 'package:wallets/wallets_c.dc.dart';
 import '../../res/resources.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
-import 'package:app/util/qr_scan_util.dart';
+import 'package:app/control/qr_scan_control.dart';
 
 class TransferEthPage extends StatefulWidget {
   @override
@@ -635,7 +635,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   void _scanQrContent() async {
     try {
-      String qrResult = await QrScanUtil.instance.qrscan();
+      String qrResult = await QrScanControl.instance.qrscan();
       setState(() {
         _toAddressController.text = qrResult.toString();
       });
