@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/util/app_info_util.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:flutter_translate/global.dart';
 import 'package:logger/logger.dart';
 import 'package:dio/adapter.dart';
@@ -18,14 +18,14 @@ String deviceId = ""; //Device unique ID
 Future requestWithDeviceId(String url, {formData}) async {
   if (_deviceData == null || _deviceData.length == 0 || _deviceData["id"] == null) {
     ///No device information record, go to get
-    var deviceId = await AppInfoUtil.instance.getDeviceId();
+    var deviceId = await AppInfoControl.instance.getDeviceId();
     if (deviceId == null || deviceId == "") {
       return;
     }
   }
   if (appSignInfo == null || appSignInfo.trim() == "") {
     try {
-      appSignInfo = await AppInfoUtil.instance.getAppSignInfo();
+      appSignInfo = await AppInfoControl.instance.getAppSignInfo();
     } catch (e) {
       Logger().e("requestWithDeviceId request() error is", "${e}");
       return;

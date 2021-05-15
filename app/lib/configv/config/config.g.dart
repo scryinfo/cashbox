@@ -8,7 +8,6 @@ part of 'config.dart';
 
 Config _$ConfigFromJson(Map<String, dynamic> json) {
   return Config()
-    ..isInitedConfig = json['isInitedConfig'] as bool
     ..lastTimeConfigCheck = json['lastTimeConfigCheck'] as int
     ..intervalMilliseconds = json['intervalMilliseconds'] as int
     ..currency = json['currency'] as String
@@ -39,7 +38,6 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
         ? null
         : DefaultGasPrice.fromJson(
             json['defaultGasPrice'] as Map<String, dynamic>)
-    ..dbVersion = json['dbVersion'] as String
     ..ethUnit =
         json['ethUnit'] == null ? null : BigInt.parse(json['ethUnit'] as String)
     ..eeeUnit =
@@ -55,7 +53,6 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
-      'isInitedConfig': instance.isInitedConfig,
       'lastTimeConfigCheck': instance.lastTimeConfigCheck,
       'intervalMilliseconds': instance.intervalMilliseconds,
       'currency': instance.currency,
@@ -69,7 +66,6 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'maxGasPrice': instance.maxGasPrice,
       'minGasPrice': instance.minGasPrice,
       'defaultGasPrice': instance.defaultGasPrice,
-      'dbVersion': instance.dbVersion,
       'ethUnit': instance.ethUnit?.toString(),
       'eeeUnit': instance.eeeUnit?.toString(),
       'systemSymbol': instance.systemSymbol,
@@ -204,7 +200,6 @@ PrivateConfig _$PrivateConfigFromJson(Map<String, dynamic> json) {
         ?.toList()
     ..scryXIp = json['scryXIp'] as String
     ..publicIp = json['publicIp'] as String
-    ..nowDbVersion = json['nowDbVersion'] as String
     ..etherscanKey = json['etherscanKey'] as String
     ..dddMainNetCA = json['dddMainNetCA'] as String
     ..dddTestNetCA = json['dddTestNetCA'] as String
@@ -228,7 +223,6 @@ Map<String, dynamic> _$PrivateConfigToJson(PrivateConfig instance) =>
       'defaultTokens': instance.defaultTokens,
       'scryXIp': instance.scryXIp,
       'publicIp': instance.publicIp,
-      'nowDbVersion': instance.nowDbVersion,
       'etherscanKey': instance.etherscanKey,
       'dddMainNetCA': instance.dddMainNetCA,
       'dddTestNetCA': instance.dddTestNetCA,

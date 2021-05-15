@@ -11,7 +11,7 @@ import 'dart:typed_data';
 import '../../res/styles.dart';
 import '../../routers/routers.dart';
 import 'package:app/routers/fluro_navigator.dart';
-import '../../util/qr_scan_util.dart';
+import '../../control/qr_scan_control.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:wallets/enums.dart' as EnumKit;
 
@@ -196,7 +196,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   }
 
   void _scanQrContent() {
-    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    Future<String> qrResult = QrScanControl.instance.qrscan();
     qrResult.then((t) {
       setState(() {
         this.verifyString = t.toString();
@@ -234,7 +234,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
   }
 
   Future<bool> _verifyMsgAndCreateWallet() async {
-    if (verifyString.isNotEmpty || Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic.length == 0) {
+    if (verifyString.isEmpty) {
       return false;
     }
     if (verifyString.trim() != String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).trim()) {

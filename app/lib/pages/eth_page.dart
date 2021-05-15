@@ -6,7 +6,6 @@ import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/net/rate_util.dart';
 import 'package:app/pages/left_drawer.dart';
@@ -15,7 +14,7 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/app_info_util.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:logger/logger.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +83,7 @@ class _EthPageState extends State<EthPage> {
     loadDigitRateInfo();
     loadDigitBalance();
     loadLegalCurrency();
-    AppInfoUtil.instance.checkAppUpgrade();
+    AppInfoControl.instance.checkAppUpgrade();
   }
 
   //Processing display fiat currency usd, cny, etc.
@@ -269,6 +268,9 @@ class _EthPageState extends State<EthPage> {
   }
 
   Widget _buildAddDigitButton() {
+    if (WalletsControl.getInstance().getCurrentNetType() == NetType.Test) {
+      return Text("");
+    }
     return Container(
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(9),

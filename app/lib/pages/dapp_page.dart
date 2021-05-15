@@ -10,7 +10,7 @@ import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:logger/logger.dart';
-import 'package:app/util/qr_scan_util.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -94,11 +94,12 @@ class _DappPageState extends State<DappPage> {
                     child: WebView(
                       // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
                       // initialUrl:"http://192.168.2.57:9010/web_app/dapp/dapp.html",
-                      initialUrl: "https://cashbox.scry.info/web_app/dapp/dapp.html#/",
+                      // initialUrl: "https://cashbox.scry.info/web_app/dapp/dapp.html#/",
+                      // initialUrl: "http://192.168.2.12:9003/open/ui/dapp/dapp.html",
                       // initialUrl: "http://192.168.2.97:8080",
                       // initialUrl: "http://192.168.2.12:9690/dapp.html#/",
                       // initialUrl: "http://59.110.231.223:9010/web_app/dapp/dapp.html#/",
-                      // initialUrl: snapshot.data.toString(),
+                      initialUrl: snapshot.data.toString(),
                       javascriptMode: JavascriptMode.unrestricted,
                       debuggingEnabled: true,
                       userAgent:
@@ -160,9 +161,9 @@ class _DappPageState extends State<DappPage> {
   }
 
   void _scanNativeQrSignToQR() {
-    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    Future<String> qrResult = QrScanControl.instance.qrscan();
     qrResult.then((qrInfo) {
-      Map paramsMap = QrScanUtil.instance.checkQrInfoByDiamondSignAndQr(qrInfo, context);
+      Map paramsMap = QrScanControl.instance.checkQrInfoByDiamondSignAndQr(qrInfo, context);
       if (paramsMap == null) {
         Fluttertoast.showToast(msg: translate('not_follow_diamond_rule').toString());
         NavigatorUtils.goBack(context);
@@ -177,7 +178,7 @@ class _DappPageState extends State<DappPage> {
   }
 
   void _scanCashboxScan(Message msg) {
-    QrScanUtil.instance.qrscan().then((t) {
+    QrScanControl.instance.qrscan().then((t) {
       msg.data = t;
       this.callPromise(msg);
     }).catchError((e) {
@@ -194,7 +195,7 @@ class _DappPageState extends State<DappPage> {
           var status = await Permission.camera.status;
           var msg = Message.fromJson(jsonDecode(message.message));
           if (status.isGranted) {
-            Future<String> qrResult = QrScanUtil.instance.qrscan();
+            Future<String> qrResult = QrScanControl.instance.qrscan();
             qrResult.then((t) {
               msg.data = t;
               this.callPromise(msg);
@@ -204,7 +205,7 @@ class _DappPageState extends State<DappPage> {
           } else {
             Map<Permission, PermissionStatus> statuses = await [Permission.camera].request();
             if (statuses[Permission.camera] == PermissionStatus.granted) {
-              Future<String> qrResult = QrScanUtil.instance.qrscan();
+              Future<String> qrResult = QrScanControl.instance.qrscan();
               qrResult.then((t) {
                 msg.data = t;
                 this.callPromise(msg);

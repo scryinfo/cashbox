@@ -1,10 +1,8 @@
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:logger/logger.dart';
-import 'package:app/util/qr_scan_util.dart';
-import 'package:app/util/utils.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
@@ -163,7 +161,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
 
   void _scanQrContent() async {
     try {
-      String qrResult = await QrScanUtil.instance.qrscan();
+      String qrResult = await QrScanControl.instance.qrscan();
       setState(() {
         _toAddressController.text = qrResult.toString();
       });

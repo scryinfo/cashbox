@@ -3,11 +3,9 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/wallets.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:logger/logger.dart';
 import 'package:app/util/utils.dart';
-import 'dart:convert' as convert;
 
 import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart';

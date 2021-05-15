@@ -90,22 +90,22 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
                 if (!isChangeNetOk) {
                   return;
                 }
-                if (WalletsControl.getInstance().hasAny()) {
-                  // loadAll，and use first wallet as default
-                  bool isSaveOk = WalletsControl.getInstance()
-                      .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
-                  if (!isSaveOk) {
-                    Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
-                    return;
-                  }
-                  NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
-                } else {
+                if (!WalletsControl.getInstance().hasAny()) {
                   NavigatorUtils.push(context, '${Routes.entrancePage}', clearStack: true);
+                  return;
                 }
+                // loadAll，and use first wallet as default
+                bool isSaveOk = WalletsControl.getInstance()
+                    .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
+                if (!isSaveOk) {
+                  Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+                  return;
+                }
+                NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
                 return;
               }
             }
-            // hint about test net
+            // handle TestNet
             Dialogs.materialDialog(
                 msg: translate('make_sure_net_change_hint'),
                 title: translate('net_change'),
@@ -124,11 +124,7 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
                   ),
                   IconsButton(
                     onPressed: () async {
-                      bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetTypeEx.from(netTypeList[index].enumNetType));
-                      if (!isChangeNetOk) {
-                        return;
-                      }
-                      _navigateToNextPage();
+                      _navigateToTestNetPage();
                     },
                     text: translate('confirm'),
                     iconData: Icons.delete,
@@ -179,32 +175,23 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
     );
   }
 
-  _navigateToNextPage() {
-    if (WalletsControl.getInstance().hasAny()) {
-      // loadAll，and use first wallet as default
-      bool isSaveOk = false;
-      var curNetType = WalletsControl.getInstance().getCurrentNetType();
-      switch (curNetType) {
-        case EnumKit.NetType.Main:
-          isSaveOk =
-              WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
-          break;
-        case EnumKit.NetType.Test:
-          isSaveOk = WalletsControl.getInstance()
-              .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.EthTest);
-          break;
-        default:
-          Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
-          return;
-          break;
-      }
-      if (!isSaveOk) {
-        Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
-        return;
-      }
-      NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
-    } else {
-      NavigatorUtils.push(context, '${Routes.createTestWalletPage}', clearStack: true);
+  _navigateToTestNetPage() {
+    bool isChangeNetOk = WalletsControl.getInstance().changeNetType(EnumKit.NetType.Test);
+    if (!isChangeNetOk) {
+      return;
     }
+    if (!WalletsControl.getInstance().hasAny()) {
+      NavigatorUtils.push(context, '${Routes.createTestWalletPage}', clearStack: true);
+      return;
+    }
+    // loadAll，and use first wallet as default
+    bool isSaveOk =
+        WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.EthTest);
+    if (!isSaveOk) {
+      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+      WalletsControl.getInstance().changeNetType(EnumKit.NetType.Main);
+      return;
+    }
+    NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
   }
 }

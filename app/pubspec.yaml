@@ -99,9 +99,6 @@ dependencies:
 
   json_annotation: ^3.1.0
 
-  wallet_manager:
-    path: ../packages/wallet_manager/
-
   wallets:
     path: ../packages/wallets
 

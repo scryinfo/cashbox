@@ -25,7 +25,7 @@ import 'package:wallets/wallets_c.dc.dart';
 import '../../res/resources.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
-import 'package:app/util/qr_scan_util.dart';
+import 'package:app/control/qr_scan_control.dart';
 
 class TransferEthPage extends StatefulWidget {
   @override
@@ -40,7 +40,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   bool isShowExactGas = false;
   int precision = 8; //Decimal precision
   int eth2gasUnit = 1000 * 1000 * 1000; // 1 ETH = 1e9 gwei (10 to the ninth power) = 1e18 wei
-  String Gwei = "Gwei";
+  String gWei = "Gwei";
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
   String arrowIcon = "assets/images/ic_collapse.png";
@@ -131,7 +131,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
       this.mGasPriceValue = mGasPriceValue;
       mMaxGasFee = mMaxGasLimit * mMaxGasPrice / eth2gasUnit;
       mMinGasFee = mMinGasLimit * mMinGasPrice / eth2gasUnit;
-      mGasFeeValue = mGasLimitValue * mGasPriceValue / eth2gasUnit;  // unit:eth = (gwei/(10^8))
+      mGasFeeValue = mGasLimitValue * mGasPriceValue / eth2gasUnit; // unit:eth = (gwei/(10^8))
     });
   }
 
@@ -339,7 +339,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                         " (" +
                                         translate('tx_unit') +
                                         ":" +
-                                        "Gwei" +
+                                        gWei +
                                         ")",
                                     style: TextStyle(
                                       color: Color.fromRGBO(255, 255, 255, 0.5),
@@ -368,7 +368,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 new Text(
-                                  mMinGasPrice.toString() + Gwei,
+                                  mMinGasPrice.toString() + gWei,
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
                                     fontSize: ScreenUtil().setSp(2.3),
@@ -390,7 +390,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                                   value: mGasPriceValue,
                                 )),
                                 new Text(
-                                  mMaxGasPrice.toString() + Gwei,
+                                  mMaxGasPrice.toString() + gWei,
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
                                     fontSize: ScreenUtil().setSp(2.3),
@@ -635,7 +635,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   void _scanQrContent() async {
     try {
-      String qrResult = await QrScanUtil.instance.qrscan();
+      String qrResult = await QrScanControl.instance.qrscan();
       setState(() {
         _toAddressController.text = qrResult.toString();
       });
@@ -840,33 +840,33 @@ class _TransferEthPageState extends State<TransferEthPage> {
         break;
       }
     }
-    if (_txValueController.text.isNotEmpty) {
-      try {
-        if (double.parse(digitBalance) < double.parse(_txValueController.text)) {
-          Fluttertoast.showToast(msg: translate('balance_is_less'));
-          return false;
-        }
-      } catch (e) {
-        Logger().e("digitBalance parse error, error info is ===> ", e.toString());
-        Fluttertoast.showToast(msg: translate('unknown_in_value'));
+    if (_txValueController.text.isEmpty) {
+      Fluttertoast.showToast(msg: translate('unknown_in_value'));
+      return false;
+    }
+    try {
+      if (double.parse(digitBalance) < double.parse(_txValueController.text)) {
+        Fluttertoast.showToast(msg: translate('balance_is_less'));
         return false;
       }
+    } catch (e) {
+      Logger().e("digitBalance parse error, error info is ===> ", e.toString());
+      Fluttertoast.showToast(msg: translate('unknown_in_value'));
+      return false;
     }
     ethBalance = await loadEthBalance(WalletsControl.getInstance().currentChainAddress() ?? "", WalletsControl.getInstance().currentChainType());
-
-    if (ethBalance != null) {
-      try {
-        if (double.parse(ethBalance) <= 0) {
-          Fluttertoast.showToast(msg: translate("not_enough_for_gas"));
-          return false;
-        }
-      } catch (e) {
-        Logger().e("ethBalance error, error info is ===> ", e.toString());
-        Fluttertoast.showToast(msg: translate("eth_balance_error") + e.toString());
+    if (ethBalance == null) {
+      Fluttertoast.showToast(msg: translate("check_gas_state_failure"));
+      return false;
+    }
+    try {
+      if (double.parse(ethBalance) <= 0) {
+        Fluttertoast.showToast(msg: translate("not_enough_for_gas"));
         return false;
       }
-    } else {
-      Fluttertoast.showToast(msg: translate("check_gas_state_failure"));
+    } catch (e) {
+      Logger().e("ethBalance error, error info is ===> ", e.toString());
+      Fluttertoast.showToast(msg: translate("eth_balance_error") + e.toString());
       return false;
     }
     return true;

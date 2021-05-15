@@ -6,22 +6,22 @@ import 'package:device_info/device_info.dart';
 import 'package:logger/logger.dart';
 import 'dart:io';
 
-class AppInfoUtil {
+class AppInfoControl {
   static const appInfoChannel = const MethodChannel('app_info_channel');
   static const UPGRADE_APP_METHOD = "upgrade_app_method";
   static const APP_SIGNINFO_METHOD = "app_signinfo_method";
 
   //Factory singleton class implementation
-  factory AppInfoUtil() => _getInstance();
+  factory AppInfoControl() => _getInstance();
 
-  static AppInfoUtil get instance => _getInstance();
-  static AppInfoUtil _instance;
+  static AppInfoControl get instance => _getInstance();
+  static AppInfoControl _instance;
 
-  AppInfoUtil._internal();
+  AppInfoControl._internal();
 
-  static AppInfoUtil _getInstance() {
+  static AppInfoControl _getInstance() {
     if (_instance == null) {
-      _instance = new AppInfoUtil._internal();
+      _instance = new AppInfoControl._internal();
     }
     return _instance;
   }

@@ -8,7 +8,6 @@ part 'config.g.dart';
 class Config extends Object {
   Config();
 
-  bool isInitedConfig;
   int lastTimeConfigCheck;
   int intervalMilliseconds;
   String currency;
@@ -25,7 +24,6 @@ class Config extends Object {
   MinGasPrice minGasPrice; // 注意：配置文件中的单位 gwei
   DefaultGasPrice defaultGasPrice; // 注意：配置文件中的单位 gwei
 
-  String dbVersion;
   BigInt ethUnit;
   BigInt eeeUnit;
   String systemSymbol;
@@ -159,7 +157,6 @@ class PrivateConfig {
   List<Token> defaultTokens;
   String scryXIp;
   String publicIp;
-  String nowDbVersion;
   String etherscanKey;
   String dddMainNetCA;
   String dddTestNetCA;

@@ -1,13 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:app/configv/config/config.dart';
-import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:logger/logger.dart';
-import 'package:app/util/qr_scan_util.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -43,6 +41,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
           _lastPressedAt = DateTime.now();
           return false; // 不退出
         }
+        _getBackToMainNet(); // not finish create test wallet
         return true; //退出
       },
       child: Container(
@@ -190,7 +189,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   }
 
   void _scanQrContent() {
-    Future<String> qrResult = QrScanUtil.instance.qrscan();
+    Future<String> qrResult = QrScanControl.instance.qrscan();
     qrResult.then((t) {
       setState(() {
         _mnemonicController.text = t.toString();
@@ -373,11 +372,9 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                           Checkbox(
                             value: _isChooseEthChain,
                             onChanged: (newValue) {
-                              setState(
-                                () {
-                                  _isChooseEthChain = newValue;
-                                },
-                              );
+                              setState(() {
+                                _isChooseEthChain = newValue;
+                              });
                             },
                           ),
                           Text(
