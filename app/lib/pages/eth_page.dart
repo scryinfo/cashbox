@@ -70,8 +70,6 @@ class _EthPageState extends State<EthPage> {
       Config config = await HandleConfig.instance.getConfig();
       moneyUnitStr = config.currency ?? "USD";
     }
-    bool isForceLoadFromJni = widget.isForceLoadFromJni;
-    if (isForceLoadFromJni == null) isForceLoadFromJni = true;
     this.walletName = WalletsControl.getInstance().currentWallet().name;
     this.allVisibleTokenMList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
     this.allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
@@ -124,15 +122,16 @@ class _EthPageState extends State<EthPage> {
     if (_loadingBalanceTimerTask != null) {
       _loadingBalanceTimerTask.cancel();
     }
+    var curChainType = WalletsControl().currentChainType();
+    var curChainAddress = WalletsControl().currentChainAddress();
     _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
       for (var i = 0; i < displayTokenMList.length; i++) {
         int index = i;
         String balance = "0";
-        var curChainAddress = WalletsControl().currentChainAddress();
-        var curChainType = WalletsControl().currentChainType();
-        if (curChainAddress == null && curChainAddress.trim() == "") {
+        if (curChainAddress == null || curChainAddress.trim() == "") {
           return;
         }
+        var curAddressId = WalletsControl().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, curChainType);
         if (this.displayTokenMList[index].contractAddress != null && this.displayTokenMList[index].contractAddress.trim() != "") {
           balance = await loadErc20Balance(curChainAddress ?? "", this.displayTokenMList[index].contractAddress, curChainType);
         } else {
@@ -151,7 +150,7 @@ class _EthPageState extends State<EthPage> {
           ..walletId = WalletsControl.getInstance().currentWallet().id
           ..chainType = curChainType.toEnumString()
           ..tokenId = this.displayTokenMList[index].tokenId
-          ..addressId = curChainAddress
+          ..addressId = curAddressId
           ..balance = balance;
         WalletsControl.getInstance().updateBalance(tokenAddress);
       }

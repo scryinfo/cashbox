@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import 'package:wallets/kits.dart';
+import 'balance_control.dart';
 
 class EeeChainControl {
   factory EeeChainControl() => getInstance();
@@ -22,10 +23,9 @@ class EeeChainControl {
 
   List<TokenM> _allTokenList = [];
 
-  List<TokenM> getTokenListWithBalance(List<TokenM> tokenList) {
+  List<TokenM> getTokensLocalBalance(List<TokenM> tokenList) {
     tokenList.forEach((element) {
-      // todo getTokenBalance(tokenName)
-      // element.balance = BalanceControl.getInstance().getBalanceByTokenId(); // todo lack element.ethChainTokenShared.tokenShared
+      element.balance = BalanceControl.getInstance().getBalanceByTokenId(element.tokenId) ?? "0.0";
     });
     return tokenList;
   }
@@ -205,7 +205,6 @@ class EeeChainControl {
 
   bool updateSyncRecord(AccountInfoSyncProg accountInfoSyncProg) {
     var dataObj = Wallets.mainIsolate().chainEee.updateSyncRecord(accountInfoSyncProg);
-
     if (!dataObj.isSuccess()) {
       return null;
     }

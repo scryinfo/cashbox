@@ -27,6 +27,12 @@ class BalanceControl {
     return _instance;
   }
 
+  // when change curWallet ,then need to reload balance info
+  static BalanceControl reloadInstance() {
+    _instance = new BalanceControl._internal();
+    return _instance;
+  }
+
   String getBalanceByTokenId(String tokenId) {
     if (_tokenAddressList == null || _tokenAddressList.length == 0) {
       return "";

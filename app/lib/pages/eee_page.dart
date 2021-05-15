@@ -28,7 +28,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
-import 'package:wallets/wallets_c.dc.dart';
+import 'package:wallets/wallets_c.dc.dart' as WalletDy;
 
 class EeePage extends StatefulWidget {
   const EeePage({Key key, this.isForceLoadFromJni}) : super(key: key);
@@ -44,6 +44,7 @@ class _EeePageState extends State<EeePage> {
   String moneyUnitStr = "";
   num nowWalletAmount = 0.00; //The current total market price of tokens in the wallet
   List<String> moneyUnitList = [];
+  String walletName = "";
   Future tokenListFuture;
   List<TokenM> allVisibleTokenMList = []; //List of all visible tokens in the current chain
   List<TokenM> displayTokenMList = []; //Information about the number of fixed tokens displayed on the current page
@@ -70,13 +71,15 @@ class _EeePageState extends State<EeePage> {
       Config config = await HandleConfig.instance.getConfig();
       moneyUnitStr = config.currency;
     }
-    bool isForceLoadFromJni = widget.isForceLoadFromJni;
-    if (isForceLoadFromJni == null) isForceLoadFromJni = true;
+    this.walletName = WalletsControl.getInstance().currentWallet().name;
     this.allVisibleTokenMList = EeeChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
-    //  this.allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
+    this.allVisibleTokenMList = EeeChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
     tokenListFuture = loadDisplayTokenListData();
     if (mounted) {
-      setState(() {});
+      setState(() {
+        this.allVisibleTokenMList = this.allVisibleTokenMList;
+        this.walletName = this.walletName;
+      });
     }
     loadDigitBalance();
     // loadLegalCurrency();
@@ -123,51 +126,67 @@ class _EeePageState extends State<EeePage> {
       _loadingBalanceTimerTask.cancel();
     }
     Config config = await HandleConfig.instance.getConfig();
+    var curChainType = WalletsControl().currentChainType();
     _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
       for (var i = 0; i < displayTokenMList.length; i++) {
         int index = i;
         String balance = "0";
-
-        if (this.displayTokenMList[index].shortName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
-          AccountInfo accountInfo =
-              await EeeChainControl.getInstance().loadEeeStorageMap(config.systemSymbol, config.accountSymbol, this.displayTokenMList[index].address);
-          if (accountInfo != null) {
-            try {
-              String eeeFree = accountInfo.freeBalance ?? "0";
-              balance = (BigInt.parse(eeeFree) / config.eeeUnit).toStringAsFixed(5) ?? "0";
-              if (balance == null || double.parse(balance) == double.parse("0")) {
+        var curAddressId = WalletsControl().getTokenAddressId(WalletsControl().currentWallet().id, curChainType);
+        switch (this.displayTokenMList[index].shortName.toLowerCase()) {
+          case "eee":
+            {
+              WalletDy.AccountInfo accountInfo = await EeeChainControl.getInstance()
+                  .loadEeeStorageMap(config.systemSymbol, config.accountSymbol, this.displayTokenMList[index].address);
+              if (accountInfo == null) {
                 continue;
               }
-            } catch (e) {
-              Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
+              try {
+                String eeeFree = accountInfo.freeBalance ?? "0";
+                balance = (BigInt.parse(eeeFree) / config.eeeUnit).toStringAsFixed(5) ?? "0";
+                if (balance == null || double.parse(balance) == double.parse("0")) {
+                  continue;
+                }
+              } catch (e) {
+                Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
+              }
+              break;
             }
-            this.displayTokenMList[index].balance = balance;
-          }
-        } else if (this.displayTokenMList[index].shortName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
-          Map tokenBalanceMap =
-              await EeeChainControl.getInstance().loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, this.displayTokenMList[index].address);
-          if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
-            try {
-              // double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit; todo
-              double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble();
-              balance = tokenBalance.toStringAsFixed(5);
-              if (balance == null || double.parse(balance) == double.parse("0")) {
+          case "tokenx":
+            {
+              Map tokenBalanceMap = await EeeChainControl.getInstance()
+                  .loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, this.displayTokenMList[index].address);
+              if (tokenBalanceMap == null || !tokenBalanceMap.containsKey("result")) {
                 continue;
               }
-            } catch (e) {
-              Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
+              try {
+                // double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit; todo
+                double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble();
+                balance = tokenBalance.toStringAsFixed(5);
+                if (balance == null || double.parse(balance) == double.parse("0")) {
+                  continue;
+                }
+              } catch (e) {
+                Logger().e("_loadingBalanceTimerTask error is =>", e.toString());
+              }
+              break;
             }
-            this.displayTokenMList[index].balance = balance ?? "";
-          }
-        } else {
-          Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+          default:
+            Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+            break;
         }
-        // todo update balance to local
         if (mounted) {
           setState(() {
             this.displayTokenMList[index].balance = balance ?? "0";
           });
         }
+        // update balance to local record
+        WalletDy.TokenAddress tokenAddress = WalletDy.TokenAddress()
+          ..walletId = WalletsControl.getInstance().currentWallet().id
+          ..chainType = curChainType.toEnumString()
+          ..tokenId = this.displayTokenMList[index].tokenId
+          ..addressId = curAddressId
+          ..balance = balance;
+        WalletsControl.getInstance().updateBalance(tokenAddress);
       }
     });
   }

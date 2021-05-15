@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:app/control/balance_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/model/chain.dart';
@@ -40,8 +41,7 @@ class WalletsControl {
         Logger.getInstance().e("initWallet ", "errObj is --->" + errObj.message.toString());
         return null;
       }
-      var curNetType = getCurrentNetType();
-      changeNetType(curNetType);
+      changeNetType(getCurrentNetType());
       return wallets;
     } catch (e) {
       Logger.getInstance().e("Wallets.dbName ", "error is --->" + e.toString());
@@ -270,6 +270,7 @@ class WalletsControl {
   bool saveCurrentWalletChain(String walletId, EnumKit.ChainType chainType) {
     Error err = Wallets.mainIsolate().saveCurrentWalletChain(walletId, chainType);
     if (err.isSuccess()) {
+      BalanceControl.reloadInstance(); // change curWallet as well as refresh balance instance to wipe old cache
       return true;
     }
     Logger.getInstance().e("wallet_control ", "saveCurrentWalletChain err is --->" + err.message.toString());
@@ -286,15 +287,15 @@ class WalletsControl {
           break;
         case EnumKit.ChainType.EeeTest:
         case EnumKit.ChainType.EEE:
-          tokenAddressId = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address;
+          tokenAddressId = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.id;
           break;
         default:
-          tokenAddressId = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
+          tokenAddressId = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.id;
           break;
       }
       return tokenAddressId;
     } catch (e) {
-      return null;
+      return "";
     }
   }
 
