@@ -14,7 +14,7 @@ use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hex::ToHex;
 
 use crate::constructor::CondvarPair;
-use crate::db::{RB_CHAIN, RB_DETAIL, Verify};
+use crate::db::{GlobalRB, Verify};
 use crate::kit::vec_to_string;
 use bitcoin::consensus::serialize as btc_serialize;
 use futures::executor::block_on;
@@ -81,7 +81,8 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                                 let timestamp = merkleblock.timestamp;
                                 {
                                     block_on(
-                                        RB_DETAIL
+                                        GlobalRB::global()
+                                            .detail
                                             .update_progress(block_hash, timestamp.to_string()),
                                     );
                                 }
@@ -146,8 +147,8 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         info!("get fillter_ready condition");
 
         let header_vec: Vec<String> = {
-            let p = block_on(RB_DETAIL.progress());
-            block_on(RB_CHAIN.fetch_scan_header(p.timestamp, add))
+            let p = block_on(GlobalRB::global().detail.progress());
+            block_on(GlobalRB::global().chain.fetch_scan_header(p.timestamp, add))
         };
 
         if header_vec.len() == 0 {
@@ -196,7 +197,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                     let btc_tx_hash = tx.bitcoin_hash().to_hex();
                     let btc_tx_hexbytes = btc_serialize(tx);
                     let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
-                    block_on(RB_DETAIL.save_btc_output_tx(
+                    block_on(GlobalRB::global().detail.save_btc_output_tx(
                         value,
                         script.asm(),
                         index as u32,
@@ -207,7 +208,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
             }
         }
 
-        let vec = block_on(RB_DETAIL.list_btc_output_tx());
+        let vec = block_on(GlobalRB::global().detail.list_btc_output_tx());
         let mut output_map = HashMap::new();
         for output in vec {
             output_map.insert(output.btc_tx_hash, output.idx);
@@ -227,7 +228,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
                     let btc_tx_hash = tx.bitcoin_hash().to_hex();
                     let btc_tx_hexbytes = btc_serialize(tx);
                     let btc_tx_hexbytes = vec_to_string(btc_tx_hexbytes);
-                    block_on(RB_DETAIL.save_btc_input_tx(
+                    block_on(GlobalRB::global().detail.save_btc_input_tx(
                         tx_id,
                         vout,
                         sig_script,

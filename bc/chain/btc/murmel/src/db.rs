@@ -39,13 +39,17 @@ pub enum BtcTxState {
     Locked,
 }
 
-pub struct ChainSqlite<'a> {
+#[derive(Debug)]
+pub struct ChainSqlite {
     rb: Rbatis,
-    network: &'a Network,
+    network: Network,
 }
 
-impl<'a> ChainSqlite<'a> {
-    pub async fn new(network: &Network, db_file_name: &str) -> Result<Self, rbatis::Error> {
+impl ChainSqlite {
+    pub async fn new(
+        network: Network,
+        db_file_name: &str,
+    ) -> Result<ChainSqlite, rbatis::Error> {
         let rb = {
             let rb = Self::init_rbatis(db_file_name).await;
             rb.exec("", MBlockHeader::create_table_script()).await?;
@@ -149,13 +153,17 @@ impl<'a> ChainSqlite<'a> {
     }
 }
 
-pub struct DetailSqlite<'a> {
+#[derive(Debug)]
+pub struct DetailSqlite {
     rb: Rbatis,
-    network: &'a Network,
+    network: Network,
 }
 
-impl<'a> DetailSqlite<'a> {
-    pub async fn new(network: &Network, db_file_name: &str) -> Result<Self, rbatis::Error> {
+impl<'a> DetailSqlite {
+    pub async fn new(
+        network: Network,
+        db_file_name: &str,
+    ) -> Result<DetailSqlite, rbatis::Error> {
         let rb = {
             let rb = Self::init_rbatis(db_file_name).await;
             DetailSqlite::init_table(&rb).await?;
@@ -471,33 +479,36 @@ trait RInit {
 }
 
 #[async_trait]
-impl<'a> RInit for ChainSqlite<'a> {}
+impl RInit for ChainSqlite {}
 
 #[async_trait]
-impl<'a> RInit for DetailSqlite<'a> {}
+impl RInit for DetailSqlite {}
 
-pub struct GlobalRB<'a> {
-    chain: ChainSqlite<'a>,
-    detail: DetailSqlite<'a>,
+#[derive(Debug)]
+pub struct GlobalRB {
+    pub chain: ChainSqlite,
+    pub detail: DetailSqlite,
 }
 
-static GLOBAL_RB: OnceCell<GlobalRB> = OnceCell::new();
+pub static GLOBAL_RB: OnceCell<GlobalRB> = OnceCell::new();
 
-impl<'a> GlobalRB<'a> {
-    pub fn global() -> &'static GlobalRB<'a> {
+impl GlobalRB {
+    pub fn global() -> &'static GlobalRB {
         GLOBAL_RB.get().expect("GlobalRB is not initialized")
     }
 
-    pub fn from(path: &str, network: &Network) -> Result<Self, rbatis::Error> {
-        block_on(async {
+    pub fn from(path: &str, network: Network) -> Result<GlobalRB, rbatis::Error> {
+        block_on(async move {
             let prefix = match network {
                 Network::Bitcoin => "main_",
                 Network::Testnet => "test_",
                 Network::Regtest => "private_",
             };
 
-            let chain = ChainSqlite::new(network, &format!("{}{}btc_chain.db", path, prefix))?;
-            let detail = DetailSqlite::new(network, &format!("{}{}btc_detail.db", path, prefix))?;
+            let chain =
+                ChainSqlite::new(network, &format!("{}{}btc_chain.db", path, prefix)).await?;
+            let detail =
+                DetailSqlite::new(network, &format!("{}{}btc_detail.db", path, prefix)).await?;
             Ok(Self { chain, detail })
         })
     }
@@ -529,9 +540,9 @@ impl Verify {
     }
 }
 
-pub fn fetch_scanned_height(network: &Network) -> Result<BtcNowLoadBlock, rbatis::Error> {
+pub fn fetch_scanned_height(network: Network) -> Result<BtcNowLoadBlock, rbatis::Error> {
     let global_rb = GlobalRB::from(PATH, network)?;
-    GLOBAL_RB.set(global_rb);
+    GLOBAL_RB.set(global_rb).unwrap();
     let mprogress = block_on(GlobalRB::global().detail.progress());
     let height = block_on(
         GlobalRB::global()
@@ -553,7 +564,7 @@ mod test {
     use futures::executor::block_on;
 
     fn set_global() {
-        let global_rb = GlobalRB::from(PATH, &Network::Testnet)?;
+        let global_rb = GlobalRB::from(PATH, Network::Testnet)?;
         GLOBAL_RB.set(global_rb);
     }
 
@@ -605,7 +616,7 @@ mod test {
     #[test]
     fn test_btc_load_now_block() {
         set_global();
-        let r = fetch_scanned_height(&Network::Testnet);
+        let r = fetch_scanned_height(Network::Testnet);
         match r {
             Ok(r) => {
                 println!("{:?}", r)

@@ -3,6 +3,7 @@
 use crate::constructor::Constructor;
 use crate::db;
 use crate::path::BTC_HAMMER_PATH;
+use bitcoin::util::amount::Denomination::Bitcoin;
 use bitcoin::Network;
 use log::LevelFilter;
 use mav::ma::MAddress;
@@ -62,10 +63,14 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         .expect("can not start node");
 }
 
-pub  fn btc_load_now_blocknumber() -> Result<BtcNowLoadBlock, rbatis::Error> {
-    db::fetch_scanned_height()
+pub fn btc_load_now_blocknumber(net_type: &NetType) -> Result<BtcNowLoadBlock, rbatis::Error> {
+    let network = match net_type {
+        NetType::Main => Network::Bitcoin,
+        NetType::Test => Network::Testnet,
+        NetType::Private => Network::Regtest,
+        NetType::PrivateTest => Network::Regtest,
+    };
+    db::fetch_scanned_height(network)
 }
 
-pub fn btc_load_balance() {
-    
-}
+pub fn btc_load_balance() {}

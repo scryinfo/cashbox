@@ -23,7 +23,7 @@ use crate::bloomfilter::BloomFilter;
 use crate::broadcast::Broadcast;
 use crate::chaindb::{ChainDB, SharedChainDB};
 use crate::db;
-use crate::db::{Verify, RB_DETAIL};
+use crate::db::{Verify, GlobalRB, GLOBAL_RB};
 use crate::dispatcher::Dispatcher;
 use crate::dns::dns_seed;
 use crate::downstream::DownStreamDummy;
@@ -61,6 +61,7 @@ use std::{
     path::Path,
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
+use crate::path::PATH;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -147,7 +148,9 @@ impl Constructor {
         ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
-        block_on(RB_DETAIL.save_address(address.clone()));
+        let global_rb = GlobalRB::from(PATH, network)?;
+        GLOBAL_RB.set(global_rb).unwrap();
+        block_on(GlobalRB::global().detail.save_address(address.clone()));
         let verify = Verify::from_address(address.clone());
         db::INSTANCE.set(verify).unwrap();
         let verify = Verify::global();

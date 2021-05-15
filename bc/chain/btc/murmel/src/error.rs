@@ -57,7 +57,9 @@ pub enum Error {
     /// lost connection
     Lost(String),
     /// bitcoin_hashes error
-    BitcoinHash(bitcoin_hashes::hex::Error)
+    BitcoinHash(bitcoin_hashes::hex::Error),
+    /// rbatis error
+    Rbatis(rbatis::Error),
 }
 
 impl std::error::Error for Error {
@@ -78,9 +80,9 @@ impl std::error::Error for Error {
             Error::Handshake => None,
             Error::Lost(_) => None,
             Error::BitcoinHash(ref err) => Some(err),
+            Error::Rbatis(ref err) => Some(err),
         }
     }
-
 }
 
 impl fmt::Display for Error {
@@ -92,8 +94,9 @@ impl fmt::Display for Error {
             Error::NoTip => write!(f, "no chain tip found"),
             Error::UnknownUTXO => write!(f, "unknown utxo"),
             Error::NoPeers => write!(f, "no peers"),
-            Error::BadMerkleRoot =>
-                write!(f, "merkle root of header does not match transaction list"),
+            Error::BadMerkleRoot => {
+                write!(f, "merkle root of header does not match transaction list")
+            }
             Error::Handshake => write!(f, "handshake"),
             Error::Lost(ref s) => write!(f, "lost connection: {}", s),
             Error::Downstream(ref s) => write!(f, "downstream error: {}", s),
@@ -103,6 +106,9 @@ impl fmt::Display for Error {
             Error::Hammersbald(ref err) => write!(f, "Hammersbald error: {}", err),
             Error::Serialize(ref err) => write!(f, "Serialize error: {}", err),
             Error::BitcoinHash(ref err) => write!(f, "bitcoin_hashes::hex::Error {}", err),
+            Error::Rbatis(ref err) => {
+                write!(f, "rbatis::Error {}", err)
+            }
         }
     }
 }
@@ -117,9 +123,7 @@ impl From<Error> for io::Error {
     fn from(err: Error) -> io::Error {
         match err {
             Error::IO(e) => e,
-            _ => {
-                io::Error::new(io::ErrorKind::Other, err.to_string())
-            }
+            _ => io::Error::new(io::ErrorKind::Other, err.to_string()),
         }
     }
 }
@@ -129,7 +133,6 @@ impl From<io::Error> for Error {
         Error::IO(err)
     }
 }
-
 
 impl From<util::Error> for Error {
     fn from(err: util::Error) -> Error {
@@ -159,7 +162,7 @@ impl From<bip158::Error> for Error {
     fn from(err: bip158::Error) -> Self {
         match err {
             bip158::Error::Io(io) => Error::IO(io),
-            bip158::Error::UtxoMissing(_) => Error::UnknownUTXO
+            bip158::Error::UtxoMissing(_) => Error::UnknownUTXO,
         }
     }
 }
@@ -167,5 +170,11 @@ impl From<bip158::Error> for Error {
 impl From<bitcoin_hashes::hex::Error> for Error {
     fn from(err: bitcoin_hashes::hex::Error) -> Self {
         Error::BitcoinHash(err)
+    }
+}
+
+impl From<rbatis::Error> for Error {
+    fn from(err: rbatis::Error) -> Self {
+        Error::Rbatis(err)
     }
 }

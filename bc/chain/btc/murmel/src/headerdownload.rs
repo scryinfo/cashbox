@@ -18,7 +18,6 @@
 //!
 use crate::chaindb::SharedChainDB;
 use crate::constructor::CondvarPair;
-use crate::db::RB_CHAIN;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
 use crate::hooks::{HooksMessage, ShowCondition};
@@ -39,6 +38,7 @@ use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use futures::executor::block_on;
 use log::{debug, error, info, trace};
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
+use crate::db::GlobalRB;
 
 pub struct HeaderDownload<T> {
     p2p: P2PControlSender<NetworkMessage>,
@@ -221,7 +221,7 @@ impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
                                 {
                                     let header_c = header.clone();
                                     block_on(async {
-                                        let r = RB_CHAIN
+                                        let r = GlobalRB::global().chain
                                             .save_header(
                                                 header_c.bitcoin_hash().to_hex(),
                                                 header_c.time.to_string(),

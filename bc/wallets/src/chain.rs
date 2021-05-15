@@ -353,8 +353,8 @@ impl BtcChainTrait for BtcChain {
         Ok(())
     }
 
-    fn load_now_blocknumber(&self, _context: &dyn ContextTrait) -> Result<BtcNowLoadBlock, WalletError> {
-        murmel::wallet::btc_load_now_blocknumber().map_err(|e| WalletError::RbatisError(e))
+    fn load_now_blocknumber(&self, _context: &dyn ContextTrait, net_type:&NetType) -> Result<BtcNowLoadBlock, WalletError> {
+        murmel::wallet::btc_load_now_blocknumber(net_type).map_err(|e| WalletError::RbatisError(e))
     }
 }
 

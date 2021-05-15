@@ -19,7 +19,6 @@ use jni::JNIEnv;
 use log::info;
 
 use crate::db::fetch_scanned_height;
-use crate::db::RB_CHAIN;
 use futures::executor::block_on;
 use std::net::{SocketAddr, SocketAddrV4};
 use std::str::FromStr;
