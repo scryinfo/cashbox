@@ -46,10 +46,7 @@ pub struct ChainSqlite {
 }
 
 impl ChainSqlite {
-    pub async fn new(
-        network: Network,
-        db_file_name: &str,
-    ) -> Result<ChainSqlite, rbatis::Error> {
+    pub async fn new(network: Network, db_file_name: &str) -> Result<ChainSqlite, rbatis::Error> {
         let rb = {
             let rb = Self::init_rbatis(db_file_name).await;
             rb.exec("", MBlockHeader::create_table_script()).await?;
@@ -140,7 +137,7 @@ impl ChainSqlite {
     pub async fn fetch_header_by_timestamp(
         &self,
         timestamp: &String,
-    ) -> Result<u32, rbatis::Error> {
+    ) -> Result<i64, rbatis::Error> {
         let w = self.rb.new_wrapper();
         let sql = format!(
             "SELECT {} FROM {} WHERE timestamp = {}",
@@ -148,7 +145,7 @@ impl ChainSqlite {
             &MBlockHeader::table_name(),
             &timestamp
         );
-        let r: Result<u32, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
+        let r: Result<i64, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
         r
     }
 }
@@ -160,10 +157,7 @@ pub struct DetailSqlite {
 }
 
 impl<'a> DetailSqlite {
-    pub async fn new(
-        network: Network,
-        db_file_name: &str,
-    ) -> Result<DetailSqlite, rbatis::Error> {
+    pub async fn new(network: Network, db_file_name: &str) -> Result<DetailSqlite, rbatis::Error> {
         let rb = {
             let rb = Self::init_rbatis(db_file_name).await;
             DetailSqlite::init_table(&rb).await?;
@@ -544,86 +538,14 @@ pub fn fetch_scanned_height(network: Network) -> Result<BtcNowLoadBlock, rbatis:
     let global_rb = GlobalRB::from(PATH, network)?;
     GLOBAL_RB.set(global_rb).unwrap();
     let mprogress = block_on(GlobalRB::global().detail.progress());
-    let height = block_on(
+    let height = block_on({
         GlobalRB::global()
             .chain
-            .fetch_header_by_timestamp(&mprogress.timestamp),
-    )?;
+            .fetch_header_by_timestamp(&mprogress.timestamp)
+    })?;
     Ok(BtcNowLoadBlock {
         height: height - 1,
         header_hash: mprogress.header,
         timestamp: mprogress.timestamp,
     })
-}
-
-#[cfg(test)]
-mod test {
-    use crate::db::{fetch_scanned_height, GlobalRB, GLOBAL_RB};
-    use crate::path::PATH;
-    use bitcoin::Network;
-    use futures::executor::block_on;
-
-    fn set_global() {
-        let global_rb = GlobalRB::from(PATH, Network::Testnet)?;
-        GLOBAL_RB.set(global_rb);
-    }
-
-    #[test]
-    fn test_fetch_scann_header() {
-        set_global();
-        let r = block_on(
-            GlobalRB::global()
-                .chain
-                .fetch_scan_header("1296688928".to_owned(), false),
-        );
-        println!("{:?}", r);
-        let r = block_on(
-            GlobalRB::global()
-                .chain
-                .fetch_scan_header("1296688928".to_owned(), true),
-        );
-        println!("{:?}", r);
-    }
-
-    #[test]
-    fn test_fetch_height() {
-        set_global();
-        let h = block_on(GlobalRB::global().chain.fetch_height());
-        println!("{}", h)
-    }
-
-    #[test]
-    fn test_fetch_process() {
-        let progress = block_on(GlobalRB::global().detail.fetch_progress());
-        println!("{:?}", &progress);
-    }
-
-    #[test]
-    fn test_update_progress() {
-        set_global();
-        block_on(GlobalRB::global().detail.update_progress(
-            "00000000ea6690ba48686a4fa690eb186000d55b6c67f30bd8d4f0a7d7f1f98b".to_owned(),
-            "1337966145".to_owned(),
-        ));
-    }
-
-    #[test]
-    fn test_utxo() {
-        set_global();
-        block_on(GlobalRB::global().detail.utxo());
-    }
-
-    #[test]
-    fn test_btc_load_now_block() {
-        set_global();
-        let r = fetch_scanned_height(Network::Testnet);
-        match r {
-            Ok(r) => {
-                println!("{:?}", r)
-            }
-            Err(e) => {
-                println!("{:?}", e)
-            }
-        }
-    }
 }

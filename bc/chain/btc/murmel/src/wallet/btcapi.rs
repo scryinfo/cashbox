@@ -4,7 +4,6 @@
 #![cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
 #![allow(non_snake_case)]
 
-use super::*;
 
 use bitcoin::consensus::serialize;
 use bitcoin::util::psbt::serialize::Serialize;

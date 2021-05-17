@@ -194,7 +194,7 @@ impl BtcChain {
 
 #[derive(Debug, Default, Clone)]
 pub struct BtcNowLoadBlock{
-    pub height: u32,
+    pub height: i64,
     pub header_hash: String,
     pub timestamp: String,
 }
