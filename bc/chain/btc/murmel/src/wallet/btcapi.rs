@@ -18,8 +18,6 @@ use jni::sys::{jboolean, jbyteArray, jint, jstring};
 use jni::JNIEnv;
 use log::info;
 
-use crate::db::fetch_scanned_height;
-use futures::executor::block_on;
 use std::net::{SocketAddr, SocketAddrV4};
 use std::str::FromStr;
 

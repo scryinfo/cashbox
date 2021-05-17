@@ -3,7 +3,6 @@ pub mod create_translation;
 pub mod api;
 
 use crate::hooks::ApiMessage;
-use bitcoin_hashes::Hash;
 use once_cell::sync::Lazy;
 use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
 use std::sync::{Arc, Mutex};

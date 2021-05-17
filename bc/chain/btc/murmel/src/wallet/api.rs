@@ -3,7 +3,6 @@
 use crate::constructor::Constructor;
 use crate::db;
 use crate::path::BTC_HAMMER_PATH;
-use bitcoin::util::amount::Denomination::Bitcoin;
 use bitcoin::Network;
 use log::LevelFilter;
 use mav::ma::MAddress;
