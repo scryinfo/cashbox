@@ -2,7 +2,6 @@
 //! loadfilter message do not get any response.
 //! we get response here
 use crate::error::Error;
-use crate::hooks::ShowCondition;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
 };
@@ -25,25 +24,25 @@ use std::sync::{mpsc, Arc};
 use std::thread;
 use std::time::Duration;
 
-pub struct GetData<T> {
+pub struct GetData {
     //send a message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-    condvar_pair: CondvarPair<T>,
+    pair: CondvarPair<bool>,
 }
 
-impl<T: Send + 'static + ShowCondition> GetData<T> {
+impl GetData {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-        condvar_pair: CondvarPair<T>,
+        pair: CondvarPair<bool>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
         let mut getdata = GetData {
             p2p,
             timeout,
-            condvar_pair,
+            pair,
         };
 
         thread::Builder::new()
@@ -130,14 +129,14 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
     fn get_data(&mut self, peer: PeerId, add: bool, wait: bool) -> Result<(), Error> {
         if wait {
             error!("wait_for filter condition");
-            let ref pair = self.condvar_pair;
+            let ref pair = self.pair;
             let &(ref lock, ref cvar) = Arc::deref(pair);
             let mut condition = lock.lock();
-            while (*condition).get_filter() == false {
+            while *condition {
                 let r = cvar.wait_for(&mut condition, Duration::from_secs(5));
                 if r.timed_out() {
                     info!("wait_for filter condition timeout");
-                    return Ok(());
+                    break;
                 }
             }
         }

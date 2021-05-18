@@ -23,7 +23,7 @@ use crate::bloomfilter::BloomFilter;
 use crate::broadcast::Broadcast;
 use crate::chaindb::{ChainDB, SharedChainDB};
 use crate::db;
-use crate::db::{Verify, GlobalRB, GLOBAL_RB};
+use crate::db::{GlobalRB, Verify, GLOBAL_RB};
 use crate::dispatcher::Dispatcher;
 use crate::dns::dns_seed;
 use crate::downstream::DownStreamDummy;
@@ -31,11 +31,11 @@ use crate::downstream::SharedDownstream;
 use crate::error::Error;
 use crate::getdata::GetData;
 use crate::headerdownload::HeaderDownload;
-use crate::hooks::Condition;
 #[cfg(feature = "lightning")]
 use crate::lightning::LightningConnector;
 use crate::p2p::BitcoinP2PConfig;
 use crate::p2p::{P2PControl, PeerMessageSender, PeerSource, P2P};
+use crate::path::PATH;
 use crate::ping::Ping;
 use crate::timeout::Timeout;
 use bitcoin::network::constants::Network;
@@ -61,7 +61,6 @@ use std::{
     path::Path,
     sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
 };
-use crate::path::PATH;
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -128,10 +127,7 @@ impl Constructor {
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
 
-        let pair: CondvarPair<Condition> = Arc::new((
-            parking_lot::Mutex::new(Condition::new(false, false)),
-            Condvar::new(),
-        ));
+        let pair = Arc::new((parking_lot::Mutex::new(false), Condvar::new()));
         let pair2 = Arc::clone(&pair);
         let pair3 = Arc::clone(&pair);
         let pair4 = Arc::clone(&pair);
@@ -159,12 +155,8 @@ impl Constructor {
         //     pair2,
         // ));
 
-        dispatcher.add_listener(GetData::new(
-            p2p_control.clone(),
-            timeout.clone(),
-            pair3,
-        ));
-        //
+        dispatcher.add_listener(GetData::new(p2p_control.clone(), timeout.clone(), pair3));
+
         // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
 
         for addr in &listen {

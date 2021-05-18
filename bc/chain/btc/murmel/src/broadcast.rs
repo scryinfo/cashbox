@@ -2,7 +2,6 @@
 
 use crate::constructor::CondvarPair;
 use crate::error::Error;
-use crate::hooks::ShowCondition;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
 };
@@ -15,24 +14,24 @@ use std::sync::{mpsc, Arc};
 use std::thread;
 use std::time::Duration;
 
-pub struct Broadcast<T> {
+pub struct Broadcast {
     //used for Send message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-    condvar_pair: CondvarPair<T>,
+    pair: CondvarPair<bool>,
 }
 
-impl<T: Send + 'static + ShowCondition> Broadcast<T> {
+impl Broadcast {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-        condvar_pair: CondvarPair<T>,
+        pair: CondvarPair<bool>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
         let mut broadcast = Broadcast {
             p2p,
             timeout,
-            condvar_pair,
+            pair,
         };
 
         thread::Builder::new()
@@ -45,10 +44,10 @@ impl<T: Send + 'static + ShowCondition> Broadcast<T> {
     //Loop through messages
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
         {
-            let ref pair = self.condvar_pair;
+            let ref pair = self.pair;
             let &(ref lock, ref cvar) = Arc::deref(pair);
             let mut condition = lock.lock();
-            while !(*condition).get_header() {
+            while !*condition {
                 cvar.wait(&mut condition);
             }
         }

@@ -43,7 +43,6 @@ pub mod downstream;
 pub mod error;
 pub mod getdata;
 pub mod headerdownload;
-pub mod hooks;
 pub mod wallet;
 pub mod p2p;
 pub mod ping;

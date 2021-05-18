@@ -21,7 +21,6 @@ use crate::constructor::CondvarPair;
 use crate::db::GlobalRB;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
-use crate::hooks::ShowCondition;
 use crate::p2p::{
     P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
     SERVICE_BLOCKS,
@@ -40,21 +39,21 @@ use futures::executor::block_on;
 use log::{debug, error, info, trace};
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
 
-pub struct HeaderDownload<T> {
+pub struct HeaderDownload {
     p2p: P2PControlSender<NetworkMessage>,
     chaindb: SharedChainDB,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     downstream: SharedDownstream,
-    condvar_pair: CondvarPair<T>,
+    pair: CondvarPair<bool>,
 }
 
-impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
+impl HeaderDownload {
     pub fn new(
         chaindb: SharedChainDB,
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         downstream: SharedDownstream,
-        condvar_pair: CondvarPair<T>,
+        pair: CondvarPair<bool>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
@@ -63,7 +62,7 @@ impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
             p2p,
             timeout,
             downstream,
-            condvar_pair,
+            pair,
         };
 
         thread::Builder::new()
@@ -282,11 +281,6 @@ impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
                     new_tip,
                     peer
                 );
-                //hooks for new headers
-                // self.hook_sender
-                //     .send(HooksMessage::ReceivedHeaders(peer.clone()))
-                //     .expect("HOOKS ERROR");
-
                 self.p2p.send(P2PControl::Height(height));
             } else {
                 debug!(
