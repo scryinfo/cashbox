@@ -299,6 +299,10 @@ class _EeePageState extends State<EeePage> {
   }
 
   Widget _buildAddDigitButton() {
+    // TestNet not display token Manager Page
+    if (WalletsControl.getInstance().getCurrentNetType() == NetType.Test) {
+      return Text("");
+    }
     return Container(
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(9),
@@ -307,7 +311,7 @@ class _EeePageState extends State<EeePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Opacity(
-              opacity: 0,
+              opacity: 1.0,
               child: Container(
                 color: Color.fromRGBO(26, 141, 198, 0.40),
                 child: FlatButton(
@@ -321,7 +325,7 @@ class _EeePageState extends State<EeePage> {
                     ),
                   ),
                   onPressed: () {
-                    // NavigatorUtils.push(context, '${Routes.digitManagePage}?isReloadDigitList=true', clearStack: false);
+                    NavigatorUtils.push(context, '${Routes.digitManagePage}?isReloadDigitList=true', clearStack: false);
                   },
                 ),
               ))

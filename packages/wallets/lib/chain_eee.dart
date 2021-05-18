@@ -68,6 +68,36 @@ class ChainEee {
     return DlResult1(signResult, err);
   }
 
+  Error updateAuthTokenList(ArrayCEeeChainTokenAuth authTokens) {
+    Error err;
+    {
+      var ptrAuthTokens = authTokens.toCPtr();
+      var cerr = Wallets.cWallets.ChainEee_updateAuthDigitList(_ptrContext, ptrAuthTokens);
+      err = Error.fromC(cerr);
+      Wallets.cWallets.CError_free(cerr);
+      ArrayCEeeChainTokenAuth.free(ptrAuthTokens);
+    }
+
+    return err;
+  }
+
+  DlResult1<List<EeeChainTokenAuth>> getChainEeeAuthTokenList(int startItem, int pageSize) {
+    Error err;
+    List<EeeChainTokenAuth> ect = [];
+    {
+      var arrayToken = Wallets.cWallets.CArrayCEeeChainTokenAuth_dAlloc();
+      var cerr = Wallets.cWallets.ChainEee_getAuthTokenList(_ptrContext, startItem, pageSize, arrayToken);
+      err = Error.fromC(cerr);
+      Wallets.cWallets.CError_free(cerr);
+      if (err.isSuccess()) {
+        ect = ArrayCEeeChainTokenAuth.fromC(arrayToken.value).data;
+      }
+      Wallets.cWallets.CArrayCEeeChainTokenAuth_dFree(arrayToken);
+    }
+
+    return DlResult1(ect, err);
+  }
+
   DlResult1<AccountInfo> decodeAccountInfo(DecodeAccountInfoParameters decodeAccountInfoParameters) {
     Error err;
     AccountInfo accountInfo;
@@ -180,9 +210,7 @@ class ChainEee {
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       if (err.isSuccess()) {
-        ect = ArrayCEeeChainTx
-            .fromC(ptrCArrayCEeeChainTx.value)
-            .data;
+        ect = ArrayCEeeChainTx.fromC(ptrCArrayCEeeChainTx.value).data;
       }
 
       ptrAccount.free();
@@ -202,9 +230,7 @@ class ChainEee {
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       if (err.isSuccess()) {
-        ect = ArrayCEeeChainTx
-            .fromC(ptrCArrayCEeeChainTx.value)
-            .data;
+        ect = ArrayCEeeChainTx.fromC(ptrCArrayCEeeChainTx.value).data;
       }
 
       ptrAccount.free();

@@ -267,6 +267,7 @@ class _EthPageState extends State<EthPage> {
   }
 
   Widget _buildAddDigitButton() {
+    // TestNet not display token Manager Page
     if (WalletsControl.getInstance().getCurrentNetType() == NetType.Test) {
       return Text("");
     }

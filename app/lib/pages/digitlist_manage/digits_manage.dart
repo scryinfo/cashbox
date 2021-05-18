@@ -1,5 +1,6 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/token.dart';
@@ -85,6 +86,19 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           nativeTokenMList.add(tokenM);
         });
         break;
+      case ChainType.EeeTest:
+      case ChainType.EEE:
+        List<EeeChainToken> eeeChainTokens = WalletsControl.getInstance().currentWallet().eeeChain.tokens.data;
+        eeeChainTokens.forEach((element) {
+          TokenM tokenM = TokenM()
+            ..tokenId = element.chainTokenSharedId
+            ..shortName = element.eeeChainTokenShared.tokenShared.symbol
+            ..decimal = element.eeeChainTokenShared.decimal
+            ..urlImg = element.eeeChainTokenShared.tokenShared.logoUrl ?? ""
+            ..isVisible = element.show_1.isTrue();
+          nativeTokenMList.add(tokenM);
+        });
+        break;
       default:
         Logger.getInstance().e("ChainType", "unknown chain type" + chainType.toString());
         break;
@@ -96,57 +110,99 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    List<EthTokenOpen_Token> serverTokenList = await loadServerTokenList();
-    if (serverTokenList == null) {
-      return;
+    var chainType = WalletsControl.getInstance().currentChainType();
+    switch (chainType) {
+      // case ChainType.EthTest: // not load if it's test chain
+      case ChainType.ETH:
+        List<EthTokenOpen_Token> serverEthTokenList = await loadServerEthTokenList();
+        if (serverEthTokenList == null) {
+          return;
+        }
+        saveEthTokenToLocalAuth(serverEthTokenList);
+        List<EthChainTokenAuth> ethChainTokenAuthList = EthChainControl.getInstance().getChainEthAuthTokenList(nativeDigitIndex, onePageOffSet);
+        {
+          if (ethChainTokenAuthList == null || ethChainTokenAuthList.length == 0) {
+            isLoadAuthDigitFinish = true;
+            return;
+          }
+          if (onePageOffSet == ethChainTokenAuthList.length) {
+            this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+          } else {
+            this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+            isLoadAuthDigitFinish = true;
+          }
+        }
+        var authTokenList = formatEthTokenMList(ethChainTokenAuthList);
+        addToAllDigitsList(authTokenList);
+        break;
+      // case ChainType.EeeTest: not load if it's test chain
+      case ChainType.EEE:
+        List<EeeTokenOpen_Token> serverEeeTokenList = await loadServerEeeTokenList();
+        if (serverEeeTokenList == null) {
+          return;
+        }
+        saveEeeTokenToLocalAuth(serverEeeTokenList);
+        List<EeeChainTokenAuth> eeeChainTokenAuthList = EeeChainControl.getInstance().getChainEeeAuthTokenList(nativeDigitIndex, onePageOffSet);
+        {
+          if (eeeChainTokenAuthList == null || eeeChainTokenAuthList.length == 0) {
+            isLoadAuthDigitFinish = true;
+            return;
+          }
+          if (onePageOffSet == eeeChainTokenAuthList.length) {
+            this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+          } else {
+            this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+            isLoadAuthDigitFinish = true;
+          }
+        }
+        var authTokenList = formatEeeTokenMList(eeeChainTokenAuthList);
+        addToAllDigitsList(authTokenList);
+        break;
+      default:
+        break;
     }
-    saveToAuthToken(serverTokenList);
-    List<EthChainTokenAuth> ethChainTokenAuthList = EthChainControl.getInstance().getChainEthAuthTokenList(nativeDigitIndex, onePageOffSet);
-    {
-      if (ethChainTokenAuthList == null || ethChainTokenAuthList.length == 0) {
-        isLoadAuthDigitFinish = true;
-        return;
-      }
-      if (onePageOffSet == ethChainTokenAuthList.length) {
-        this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
-      } else {
-        this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
-        isLoadAuthDigitFinish = true;
-      }
-    }
-
-    var authTokenList = formatTokenMList(ethChainTokenAuthList);
-    addToAllDigitsList(authTokenList);
     pushToDisplayDigitList();
   }
 
-  Future<List<EthTokenOpen_Token>> loadServerTokenList() async {
+  Future<BasicClientReq> getBasicClientReq() async {
     final cashBoxType = "GA";
-    final signInfo = "82499105f009f80a1fe2f1db86efdec7";
-    final deviceId = "deviceIddddddd";
-    final apkVersion = "2.0.0";
-    // todo replace ip with config.Ip
-    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, "eeeddd", cashBoxType);
-    var channel = createClientChannel(refresh.refreshCall);
-    EthTokenOpen_QueryReq open_queryReq = new EthTokenOpen_QueryReq();
-
+    String signInfo = await AppInfoControl.instance.getAppSignInfo();
+    String deviceId = await AppInfoControl.instance.getDeviceId();
+    String apkVersion = await AppInfoControl.instance.getAppVersion();
     BasicClientReq basicClientReq = new BasicClientReq();
     basicClientReq
       ..cashboxType = cashBoxType
       ..cashboxVersion = apkVersion
       ..deviceId = deviceId
-      ..platformType = "aarch64-linux-android"
+      ..platformType = AppPlatformType.any.toEnumString()
       ..signature = signInfo;
+    return basicClientReq;
+  }
 
+  Future<RefreshOpen> getRefreshOpen() async {
+    final cashBoxType = "GA";
+    String signInfo = await AppInfoControl.instance.getAppSignInfo();
+    String deviceId = await AppInfoControl.instance.getDeviceId();
+    String apkVersion = await AppInfoControl.instance.getAppVersion();
+    // todo changeIp online version
+    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
+    return refresh;
+  }
+
+  Future<List<EthTokenOpen_Token>> loadServerEthTokenList() async {
+    var refresh = await getRefreshOpen();
+    BasicClientReq basicClientReq = await getBasicClientReq();
+    var channel = createClientChannel(refresh.refreshCall);
+    EthTokenOpen_QueryReq openQueryReq = new EthTokenOpen_QueryReq();
     PageReq pageReq = PageReq();
     pageReq..page = 0;
-    open_queryReq
+    openQueryReq
       ..info = basicClientReq
       ..page = pageReq
       ..isDefault = false;
     final ethTokenClient = EthTokenOpenFaceClient(channel);
     try {
-      EthTokenOpen_QueryRes ethTokenOpenQueryRes = await ethTokenClient.query(open_queryReq);
+      EthTokenOpen_QueryRes ethTokenOpenQueryRes = await ethTokenClient.query(openQueryReq);
       List<EthTokenOpen_Token> ethTokenList = ethTokenOpenQueryRes.tokens;
       return ethTokenList;
     } catch (e) {
@@ -155,7 +211,50 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     }
   }
 
-  List<TokenM> formatTokenMList(List<EthChainTokenAuth> ethTokenList) {
+  Future<List<EeeTokenOpen_Token>> loadServerEeeTokenList() async {
+    var refresh = await getRefreshOpen();
+    BasicClientReq basicClientReq = await getBasicClientReq();
+    var channel = createClientChannel(refresh.refreshCall);
+    EeeTokenOpen_QueryReq openQueryReq = new EeeTokenOpen_QueryReq();
+    PageReq pageReq = PageReq();
+    pageReq..page = 0;
+    openQueryReq
+      ..info = basicClientReq
+      ..page = pageReq
+      ..isDefault = false;
+    final eeeTokenClient = EeeTokenOpenFaceClient(channel);
+    try {
+      EeeTokenOpen_QueryRes eeeTokenOpenQueryRes = await eeeTokenClient.query(openQueryReq);
+      List<EeeTokenOpen_Token> eeeTokenList = eeeTokenOpenQueryRes.tokens;
+      return eeeTokenList;
+    } catch (e) {
+      Logger.getInstance().e("rpc query error", "e is --->" + e.toString());
+      return null;
+    }
+  }
+
+  List<TokenM> formatEeeTokenMList(List<EeeChainTokenAuth> eeeTokenList) {
+    List<TokenM> nativeTokenMList = [];
+    try {
+      eeeTokenList.forEach((element) {
+        TokenM tokenM = TokenM()
+          ..tokenId = element.chainTokenSharedId
+          ..shortName = element.eeeChainTokenShared.tokenShared.symbol
+          ..fullName = element.eeeChainTokenShared.tokenShared.name
+          ..decimal = element.eeeChainTokenShared.decimal
+          ..urlImg = element.eeeChainTokenShared.tokenShared.logoUrl ?? ""
+          ..isVisible = false
+          ..address = WalletsControl().currentWallet().eeeChain.chainShared.walletAddress.address;
+        nativeTokenMList.add(tokenM);
+      });
+      return nativeTokenMList;
+    } catch (e) {
+      Logger.getInstance().e("formatEeeTokenMList", "error info is ------>" + e.toString());
+      return null;
+    }
+  }
+
+  List<TokenM> formatEthTokenMList(List<EthChainTokenAuth> ethTokenList) {
     List<TokenM> nativeTokenMList = [];
     try {
       ethTokenList.forEach((element) {
@@ -172,12 +271,40 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       });
       return nativeTokenMList;
     } catch (e) {
-      Logger.getInstance().e("formatTokenMList", "error info is ------>" + e.toString());
+      Logger.getInstance().e("formatEthTokenMList", "error info is ------>" + e.toString());
       return null;
     }
   }
 
-  saveToAuthToken(List<EthTokenOpen_Token> ethTokenList) async {
+  saveEeeTokenToLocalAuth(List<EeeTokenOpen_Token> eeeTokenList) async {
+    List<EeeChainTokenAuth> eeeChainTokenList = [];
+    for (var index = 0; index < eeeTokenList.length; index++) {
+      var element = eeeTokenList[index];
+      EeeChainTokenAuth eeeChainTokenAuth = EeeChainTokenAuth();
+      var chainTypeStr = element.tokenShared.chainType.toLowerCase();
+      if (ChainType.EEE.toEnumString().toLowerCase() == chainTypeStr || ChainType.EeeTest.toEnumString().toLowerCase() == chainTypeStr) {
+        eeeChainTokenAuth
+          ..chainTokenSharedId = element.tokenShardId
+          ..position = element.position.toInt()
+          ..netType = element.tokenShared.chainType
+          ..eeeChainTokenShared.decimal = element.decimal
+          ..netType = element.tokenShared.netType
+          ..eeeChainTokenShared.tokenShared.name = element.tokenShared.name
+          ..eeeChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
+          ..eeeChainTokenShared.gasLimit = element.gasLimit.toInt()
+          ..eeeChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl;
+        eeeChainTokenList.add(eeeChainTokenAuth);
+      }
+    }
+
+    ArrayCEeeChainTokenAuth arrayCEeeChainTokenAuth = ArrayCEeeChainTokenAuth();
+    if (eeeChainTokenList.length > 0) {
+      arrayCEeeChainTokenAuth.data = eeeChainTokenList;
+      EeeChainControl.getInstance().updateAuthTokenList(arrayCEeeChainTokenAuth);
+    }
+  }
+
+  saveEthTokenToLocalAuth(List<EthTokenOpen_Token> ethTokenList) async {
     List<EthChainTokenAuth> ethChainTokenList = [];
     for (var index = 0; index < ethTokenList.length; index++) {
       var element = ethTokenList[index];
@@ -209,6 +336,10 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
+      onWillPop: () {
+        _navigateToBackPage();
+        return Future(() => false);
+      },
       child: Container(
         width: ScreenUtil().setWidth(90),
         height: ScreenUtil().setHeight(120),
@@ -217,7 +348,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           appBar: AppBar(
             leading: GestureDetector(
                 onTap: () {
-                  NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
+                  _navigateToBackPage();
                 },
                 child: Image.asset("assets/images/ic_back.png")),
             backgroundColor: Colors.transparent,
@@ -254,10 +385,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               )),
         ),
       ),
-      onWillPop: () {
-        NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
-        return Future(() => false);
-      },
     );
   }
 
@@ -297,21 +424,47 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
               Fluttertoast.showToast(msg: translate('load_finish_wallet_digit').toString());
               return [];
             }
-            List<EthChainTokenAuth> ethChainTokenAuthList = EthChainControl.getInstance().getChainEthAuthTokenList(nativeDigitIndex, onePageOffSet);
-            {
-              if (ethChainTokenAuthList == null || ethChainTokenAuthList.length == 0) {
-                isLoadAuthDigitFinish = true;
-                return [];
-              }
-              if (onePageOffSet == ethChainTokenAuthList.length) {
-                this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
-              } else {
-                this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
-                isLoadAuthDigitFinish = true;
-              }
+            var chainType = WalletsControl.getInstance().currentChainType();
+            switch (chainType) {
+              case ChainType.ETH:
+                List<EthChainTokenAuth> ethChainTokenAuthList =
+                    EthChainControl.getInstance().getChainEthAuthTokenList(nativeDigitIndex, onePageOffSet);
+                {
+                  if (ethChainTokenAuthList == null || ethChainTokenAuthList.length == 0) {
+                    isLoadAuthDigitFinish = true;
+                    return [];
+                  }
+                  if (onePageOffSet == ethChainTokenAuthList.length) {
+                    this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+                  } else {
+                    this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+                    isLoadAuthDigitFinish = true;
+                  }
+                }
+                var authTokenList = formatEthTokenMList(ethChainTokenAuthList);
+                addToAllDigitsList(authTokenList);
+                break;
+              case ChainType.EEE:
+                List<EeeChainTokenAuth> eeeChainTokenAuthList =
+                    EeeChainControl.getInstance().getChainEeeAuthTokenList(nativeDigitIndex, onePageOffSet);
+                {
+                  if (eeeChainTokenAuthList == null || eeeChainTokenAuthList.length == 0) {
+                    isLoadAuthDigitFinish = true;
+                    return [];
+                  }
+                  if (onePageOffSet == eeeChainTokenAuthList.length) {
+                    this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+                  } else {
+                    this.nativeDigitIndex = this.nativeDigitIndex + onePageOffSet;
+                    isLoadAuthDigitFinish = true;
+                  }
+                }
+                var authTokenList = formatEeeTokenMList(eeeChainTokenAuthList);
+                addToAllDigitsList(authTokenList);
+                break;
+              default:
+                break;
             }
-            var authTokenList = formatTokenMList(ethChainTokenAuthList);
-            addToAllDigitsList(authTokenList);
             pushToDisplayDigitList();
           },
         );
@@ -446,6 +599,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
   }
 
   //Add to displayDigitsList
+  // todo optimize by different chainType in the next add chain
   addToAllDigitsList(List<TokenM> newDigitList) {
     if (newDigitList == null || newDigitList.length == 0) {
       return;
@@ -467,19 +621,38 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         if (!isExistErc20) {
           allDigitsList.add(element);
         }
-      } else {
-        bool isExistDigit = false;
-        for (num index = 0; index < allDigitsList.length; index++) {
-          var digit = allDigitsList[index];
-          if ((digit.shortName != null) && (element.shortName != null) && (digit.shortName == element.shortName)) {
-            isExistDigit = true;
-            break;
-          }
-        }
-        if (!isExistDigit) {
-          allDigitsList.add(element);
+        continue;
+      }
+      bool isExistDigit = false;
+      for (num index = 0; index < allDigitsList.length; index++) {
+        var digit = allDigitsList[index];
+        if ((digit.shortName != null) &&
+            (element.shortName != null) &&
+            (digit.shortName.toLowerCase().trim() == element.shortName.toLowerCase().trim())) {
+          isExistDigit = true;
+          break;
         }
       }
+      if (!isExistDigit) {
+        allDigitsList.add(element);
+      }
+    }
+  }
+
+  _navigateToBackPage() {
+    var curChainType = WalletsControl.getInstance().currentChainType();
+    switch (curChainType) {
+      case ChainType.ETH:
+      case ChainType.EthTest:
+        NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
+        break;
+      case ChainType.EEE:
+      case ChainType.EeeTest:
+        NavigatorUtils.push(context, '${Routes.eeeHomePage}?isForceLoadFromJni=true', clearStack: true);
+        break;
+      default:
+        NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true);
+        break;
     }
   }
 }

@@ -102,6 +102,22 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
+  bool updateAuthTokenList(ArrayCEeeChainTokenAuth authTokens) {
+    var dataObj = Wallets.mainIsolate().chainEee.updateAuthTokenList(authTokens);
+    if (!dataObj.isSuccess()) {
+      return false;
+    }
+    return true;
+  }
+
+  List<EeeChainTokenAuth> getChainEeeAuthTokenList(int startIndex, int endIndex) {
+    var dataObj = Wallets.mainIsolate().chainEee.getChainEeeAuthTokenList(startIndex, endIndex);
+    if (!dataObj.isSuccess()) {
+      return null;
+    }
+    return dataObj.data1;
+  }
+
   AccountInfo decodeAccountInfo(DecodeAccountInfoParameters decodeAccountInfoParameters) {
     var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(decodeAccountInfoParameters);
     if (!dataObj.isSuccess()) {
