@@ -18,9 +18,10 @@
 //!
 use crate::chaindb::SharedChainDB;
 use crate::constructor::CondvarPair;
+use crate::db::GlobalRB;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
-use crate::hooks::{HooksMessage, ShowCondition};
+use crate::hooks::ShowCondition;
 use crate::p2p::{
     P2PControl, P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender,
     SERVICE_BLOCKS,
@@ -38,14 +39,12 @@ use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use futures::executor::block_on;
 use log::{debug, error, info, trace};
 use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
-use crate::db::GlobalRB;
 
 pub struct HeaderDownload<T> {
     p2p: P2PControlSender<NetworkMessage>,
     chaindb: SharedChainDB,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     downstream: SharedDownstream,
-    hook_sender: mpsc::SyncSender<HooksMessage>,
     condvar_pair: CondvarPair<T>,
 }
 
@@ -55,7 +54,6 @@ impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         downstream: SharedDownstream,
-        hook_sender: mpsc::SyncSender<HooksMessage>,
         condvar_pair: CondvarPair<T>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
@@ -65,7 +63,6 @@ impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
             p2p,
             timeout,
             downstream,
-            hook_sender,
             condvar_pair,
         };
 
@@ -221,7 +218,8 @@ impl<T: Send + 'static + ShowCondition> HeaderDownload<T> {
                                 {
                                     let header_c = header.clone();
                                     block_on(async {
-                                        let r = GlobalRB::global().chain
+                                        let r = GlobalRB::global()
+                                            .chain
                                             .save_header(
                                                 header_c.bitcoin_hash().to_hex(),
                                                 header_c.time.to_string(),

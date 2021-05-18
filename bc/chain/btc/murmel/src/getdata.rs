@@ -2,7 +2,7 @@
 //! loadfilter message do not get any response.
 //! we get response here
 use crate::error::Error;
-use crate::hooks::{HooksMessage, ShowCondition};
+use crate::hooks::ShowCondition;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
 };
@@ -29,7 +29,6 @@ pub struct GetData<T> {
     //send a message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-    hook_receiver: mpsc::Receiver<HooksMessage>,
     condvar_pair: CondvarPair<T>,
 }
 
@@ -37,7 +36,6 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-        hook_receiver: mpsc::Receiver<HooksMessage>,
         condvar_pair: CondvarPair<T>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
@@ -45,7 +43,6 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         let mut getdata = GetData {
             p2p,
             timeout,
-            hook_receiver,
             condvar_pair,
         };
 
@@ -62,7 +59,7 @@ impl<T: Send + 'static + ShowCondition> GetData<T> {
         let mut merkle_vec = vec![];
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(9000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {

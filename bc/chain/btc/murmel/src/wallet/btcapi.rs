@@ -17,7 +17,6 @@ use jni::sys::{jboolean, jbyteArray, jint, jstring};
 use jni::JNIEnv;
 use log::info;
 
-use std::net::{SocketAddr, SocketAddrV4};
 use std::str::FromStr;
 
 pub const PASSPHRASE: &str = "";

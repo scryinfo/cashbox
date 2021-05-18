@@ -55,7 +55,7 @@ impl<T: Send + 'static + ShowCondition> Broadcast<T> {
 
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(1000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(2000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {

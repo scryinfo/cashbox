@@ -102,8 +102,6 @@ impl Constructor {
 
         let (to_dispatcher, from_p2p) = mpsc::sync_channel(BACK_PRESSURE);
 
-        let (hook_sender, hook_receiver) = mpsc::sync_channel(BACK_PRESSURE);
-
         let p2pconfig = BitcoinP2PConfig {
             network,
             nonce: thread_rng().next_u64(),
@@ -143,7 +141,6 @@ impl Constructor {
             p2p_control.clone(),
             timeout.clone(),
             lightning.clone(),
-            hook_sender,
             pair,
         ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
@@ -161,13 +158,12 @@ impl Constructor {
         //     verify.filter.clone(),
         //     pair2,
         // ));
-        //
-        // dispatcher.add_listener(GetData::new(
-        //     p2p_control.clone(),
-        //     timeout.clone(),
-        //     hook_receiver,
-        //     pair3,
-        // ));
+
+        dispatcher.add_listener(GetData::new(
+            p2p_control.clone(),
+            timeout.clone(),
+            pair3,
+        ));
         //
         // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
 
