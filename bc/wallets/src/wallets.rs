@@ -481,7 +481,7 @@ impl Wallets {
             }
             ChainType::BTC | ChainType::BtcTest | ChainType::BtcPrivate | ChainType::BtcPrivateTest => {
                 if let Some(mut target_address) = MBtcChainToken::fetch_by_wrapper(data_rb, "", &chain_token_wrapper).await? {
-                    target_address.show = CFalse;
+                    target_address.show = wallet_token.is_show;
                     target_address.save_update(data_rb, "").await?;
                     Ok(())
                 } else {
@@ -491,7 +491,7 @@ impl Wallets {
             }
             ChainType::EEE | ChainType::EeeTest | ChainType::EeePrivate | ChainType::EeePrivateTest => {
                 if let Some(mut target_address) = MEeeChainToken::fetch_by_wrapper(data_rb, "", &chain_token_wrapper).await? {
-                    target_address.show = CFalse;
+                    target_address.show = wallet_token.is_show;
                     target_address.save_update(data_rb, "").await?;
                     Ok(())
                 } else {
