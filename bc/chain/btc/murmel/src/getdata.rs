@@ -39,11 +39,7 @@ impl GetData {
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
-        let mut getdata = GetData {
-            p2p,
-            timeout,
-            pair,
-        };
+        let mut getdata = GetData { p2p, timeout, pair };
 
         thread::Builder::new()
             .name("GetData".to_string())
@@ -58,7 +54,7 @@ impl GetData {
         let mut merkle_vec = vec![];
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(3000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(4000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         if self.is_serving_blocks(pid) {
@@ -132,7 +128,7 @@ impl GetData {
             let ref pair = self.pair;
             let &(ref lock, ref cvar) = Arc::deref(pair);
             let mut condition = lock.lock();
-            while *condition {
+            while !*condition {
                 let r = cvar.wait_for(&mut condition, Duration::from_secs(5));
                 if r.timed_out() {
                     info!("wait_for filter condition timeout");

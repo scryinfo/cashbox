@@ -3,11 +3,12 @@ use crate::constructor::CondvarPair;
 use crate::error::Error;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
+    SERVICE_BLOOM,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use log::{error, trace};
+use log::{error, info, trace};
 use std::ops::Deref;
 use std::sync::{mpsc, Arc};
 use std::thread;
@@ -59,7 +60,7 @@ impl BloomFilter {
                             Ok(())
                         }
                     }
-                    // PeerMessage::Disconnected(_, _) => self.reset_filter_condition(),
+                    PeerMessage::Disconnected(_, _) => self.reset_filter_condition(),
                     PeerMessage::Incoming(_pid, msg) => match msg {
                         NetworkMessage::Ping(_) => Ok(()),
                         _ => Ok(()),
@@ -81,6 +82,7 @@ impl BloomFilter {
 
     // Each node needs to send a filter load message
     fn send_filter(&mut self, peer: PeerId) -> Result<(), Error> {
+        info!("send filter_load meessage");
         self.p2p
             .send_network(peer, NetworkMessage::FilterLoad(self.filter_load.clone()));
 
@@ -92,13 +94,13 @@ impl BloomFilter {
         Ok(())
     }
 
-    // when disconnect, reset condition variable （fillter_ready）
-    // fn reset_filter_condition(&self) -> Result<(), Error> {
-    //     let ref pair = self.condvar_pair;
-    //     let &(ref lock, ref cvar) = Arc::deref(pair);
-    //     let mut condition = lock.lock();
-    //     (*condition).set_filter(false);
-    //     cvar.notify_all();
-    //     Ok(())
-    // }
+    // when disconnect, reset condition variable
+    fn reset_filter_condition(&self) -> Result<(), Error> {
+        let ref pair = self.condvar_pair;
+        let &(ref lock, ref cvar) = Arc::deref(pair);
+        let mut condition = lock.lock();
+        *condition = false;
+        cvar.notify_all();
+        Ok(())
+    }
 }
