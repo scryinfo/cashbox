@@ -1,4 +1,4 @@
-#[allow(dead_code)]
+#![allow(dead_code)]
 use bitcoin::consensus::encode::Error;
 use bitcoin::Transaction;
 use bitcoin_hashes::hex::ToHex;

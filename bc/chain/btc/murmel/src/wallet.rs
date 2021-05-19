@@ -4,5 +4,3 @@ pub mod api;
 
 pub use api::start;
 pub use api::btc_load_now_blocknumber;
-
-const BACK_PRESSURE: usize = 10;

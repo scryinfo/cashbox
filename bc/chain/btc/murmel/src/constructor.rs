@@ -148,16 +148,16 @@ impl Constructor {
         db::INSTANCE.set(verify).unwrap();
         let verify = Verify::global();
 
-        // dispatcher.add_listener(BloomFilter::new(
-        //     p2p_control.clone(),
-        //     timeout.clone(),
-        //     verify.filter.clone(),
-        //     pair2,
-        // ));
-
         dispatcher.add_listener(GetData::new(p2p_control.clone(), timeout.clone(), pair3));
 
         // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
+
+        dispatcher.add_listener(BloomFilter::new(
+            p2p_control.clone(),
+            timeout.clone(),
+            verify.filter.clone(),
+            pair2,
+        ));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));
