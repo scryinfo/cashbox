@@ -37,7 +37,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
   var chainAddress = "";
   int runtimeVersion;
   int txVersion;
-  String digitBalance = "0";
+  String curTokenBalance = "0";
   int nonce;
   String genesisHash;
   String digitName;
@@ -83,22 +83,21 @@ class _TransferEeePageState extends State<TransferEeePage> {
     nonce = accountInfo.nonce;
     try {
       String eeeFree = accountInfo.freeBalance ?? "0";
-      double eeeFreeBalance = BigInt.parse(eeeFree) / config.eeeUnit;
-      digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
+      double formatBalance = BigInt.parse(eeeFree) / config.eeeUnit;
+      curTokenBalance = formatBalance.toStringAsFixed(5) ?? "0";
     } catch (e) {
-      digitBalance = "0";
+      curTokenBalance = "0";
     }
     if (digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
       Map tokenBalanceMap = await EeeChainControl.getInstance()
           .loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, WalletsControl.getInstance().currentChainAddress());
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
         try {
-          // double eeeFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit;
-          double eeeFreeBalance =
-              BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble(); // todo decimal and uint
-          digitBalance = eeeFreeBalance.toStringAsFixed(5) ?? "0";
+          double tokenXFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble();
+          var formatBalance = tokenXFreeBalance / Utils.mathPow(10, decimal).toDouble();
+          curTokenBalance = formatBalance.toStringAsFixed(5) ?? "0";
         } catch (e) {
-          digitBalance = "0";
+          curTokenBalance = "0";
         }
       }
     }
@@ -430,7 +429,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
       return false;
     }
     try {
-      if (digitBalance == null || double.parse(_txValueController.text) > double.parse(digitBalance)) {
+      if (curTokenBalance == null || double.parse(_txValueController.text) > double.parse(curTokenBalance)) {
         Fluttertoast.showToast(msg: translate('balance_is_less'));
         return false;
       }
@@ -454,37 +453,28 @@ class _TransferEeePageState extends State<TransferEeePage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            String signInfo;
             Config config = await HandleConfig.instance.getConfig();
-            Utf8Codec utf = new Utf8Codec();
-            Uint8List buckUpList = utf.encode(_backupMsgController.text ?? "");
+            Uint8List buckUpList = Utf8Codec().encode(_backupMsgController.text ?? "");
+            var formatValue;
+            String signInfo;
+            try {
+              formatValue = (double.parse(_txValueController.text) * Utils.mathPow(10, decimal).toInt()).toInt();
+            } catch (e) {
+              Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+              NavigatorUtils.goBack(context);
+              return;
+            }
+            EeeTransferPayload eeeTransferPayload = EeeTransferPayload()
+              ..fromAccount = WalletsControl.getInstance().currentChainAddress()
+              ..toAccount = _toAddressController.text.toString()
+              ..value = formatValue.toString()
+              ..index = nonce
+              ..password = pwd
+              ..extData = Utils.uint8ListToHex(buckUpList)
+              ..chainVersion = EeeChainControl.getInstance().getChainVersion();
             if (digitName != null && digitName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
-              EeeTransferPayload eeeTransferPayload = EeeTransferPayload();
-              var valueMinUint = (double.parse(_txValueController.text) * Utils.mathPow(10, decimal).toInt()).toInt();
-              eeeTransferPayload
-                ..fromAccount = WalletsControl.getInstance().currentChainAddress()
-                ..toAccount = _toAddressController.text.toString()
-                ..value = valueMinUint.toString()
-                ..index = nonce
-                ..password = pwd
-                ..extData = Utils.uint8ListToHex(buckUpList)
-                ..chainVersion = EeeChainControl.getInstance().getChainVersion();
               signInfo = EeeChainControl.getInstance().eeeTransfer(eeeTransferPayload);
-              if (signInfo == null || signInfo.isEmpty) {
-                Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
-                NavigatorUtils.goBack(context);
-                return;
-              }
             } else if (digitName != null && digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
-              EeeTransferPayload eeeTransferPayload = EeeTransferPayload();
-              eeeTransferPayload
-                ..fromAccount = WalletsControl.getInstance().currentChainAddress()
-                ..toAccount = _toAddressController.text.toString()
-                ..value = _txValueController.text.toString()
-                ..index = nonce
-                ..password = pwd
-                ..extData = Utils.uint8ListToHex(buckUpList)
-                ..chainVersion = EeeChainControl.getInstance().getChainVersion();
               signInfo = EeeChainControl.getInstance().tokenXTransfer(eeeTransferPayload);
             } else {
               Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
@@ -507,13 +497,6 @@ class _TransferEeePageState extends State<TransferEeePage> {
         );
       },
     );
-  }
-
-  bool _isMapStatusOk(Map returnMap) {
-    if (returnMap == null || !returnMap.containsKey("status") || returnMap["status"] != 200) {
-      return false;
-    }
-    return true;
   }
 
   @override

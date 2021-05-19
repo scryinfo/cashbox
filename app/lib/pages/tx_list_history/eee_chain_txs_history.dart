@@ -430,7 +430,6 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
     //去加载本地DB已有的交易，进行显示
     Config config = await HandleConfig.instance.getConfig();
     for (; true;) {
-      // todo differentiate tokenName
       List<EeeChainTx> eeeChainTxList;
       switch (digitName.trim().toLowerCase()) {
         case "eee":
