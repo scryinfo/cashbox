@@ -128,7 +128,6 @@ impl Constructor {
         let mut dispatcher = Dispatcher::new(from_p2p);
 
         let pair = Arc::new((parking_lot::Mutex::new(false), Condvar::new()));
-        let pair2 = Arc::clone(&pair);
         let pair3 = Arc::clone(&pair);
         let pair4 = Arc::clone(&pair);
 
@@ -137,27 +136,26 @@ impl Constructor {
             p2p_control.clone(),
             timeout.clone(),
             lightning.clone(),
-            pair,
         ));
         dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
         let global_rb = GlobalRB::from(PATH, network)?;
         GLOBAL_RB.set(global_rb).unwrap();
         block_on(GlobalRB::global().detail.save_address(address.clone()));
+
         let verify = Verify::from_address(address.clone());
         db::INSTANCE.set(verify).unwrap();
         let verify = Verify::global();
-
-        dispatcher.add_listener(GetData::new(p2p_control.clone(), timeout.clone(), pair3));
-
-        // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
 
         dispatcher.add_listener(BloomFilter::new(
             p2p_control.clone(),
             timeout.clone(),
             verify.filter.clone(),
-            pair2,
         ));
+
+        dispatcher.add_listener(GetData::new(p2p_control.clone(), timeout.clone(), pair3));
+
+        dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));

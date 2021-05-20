@@ -1,5 +1,4 @@
 //! This mod is about bloomfilter sender
-use crate::constructor::CondvarPair;
 use crate::error::Error;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
@@ -9,8 +8,7 @@ use crate::timeout::{ExpectedReply, SharedTimeout};
 use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use log::{error, info, trace};
-use std::ops::Deref;
-use std::sync::{mpsc, Arc};
+use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
 
@@ -19,7 +17,6 @@ pub struct BloomFilter {
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     filter_load: FilterLoadMessage,
-    condvar_pair: CondvarPair<bool>,
 }
 
 impl BloomFilter {
@@ -27,14 +24,12 @@ impl BloomFilter {
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         filter_load: FilterLoadMessage,
-        condvar_pair: CondvarPair<bool>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
         let mut bloomfilter = BloomFilter {
             p2p,
             timeout,
             filter_load,
-            condvar_pair,
         };
 
         thread::Builder::new()
@@ -52,6 +47,8 @@ impl BloomFilter {
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(4000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
+                        // wait for GetHeaders message
+                        thread::park_timeout(Duration::from_millis(100));
                         if self.is_serving_blocks(pid) {
                             trace!("serving blocks peer={}", pid);
                             // Initiate request loadfilter
@@ -60,7 +57,6 @@ impl BloomFilter {
                             Ok(())
                         }
                     }
-                    PeerMessage::Disconnected(_, _) => self.reset_filter_condition(),
                     PeerMessage::Incoming(_pid, msg) => match msg {
                         NetworkMessage::Ping(_) => Ok(()),
                         _ => Ok(()),
@@ -83,24 +79,10 @@ impl BloomFilter {
     // Each node needs to send a filter load message
     fn send_filter(&mut self, peer: PeerId) -> Result<(), Error> {
         info!("send filter_load meessage");
+        let peers = self.p2p.peers();
+        error!("peers len = {}", peers.len());
         self.p2p
             .send_network(peer, NetworkMessage::FilterLoad(self.filter_load.clone()));
-
-        let ref pair = self.condvar_pair;
-        let &(ref lock, ref cvar) = Arc::deref(pair);
-        let mut condition = lock.lock();
-        *condition = true;
-        cvar.notify_all();
-        Ok(())
-    }
-
-    // when disconnect, reset condition variable
-    fn reset_filter_condition(&self) -> Result<(), Error> {
-        let ref pair = self.condvar_pair;
-        let &(ref lock, ref cvar) = Arc::deref(pair);
-        let mut condition = lock.lock();
-        *condition = false;
-        cvar.notify_all();
         Ok(())
     }
 }

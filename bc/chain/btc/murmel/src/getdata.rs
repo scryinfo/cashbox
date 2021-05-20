@@ -57,6 +57,8 @@ impl GetData {
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(4000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
+                        // wait for loadfilter
+                        thread::park_timeout(Duration::from_millis(300));
                         if self.is_serving_blocks(pid) {
                             trace!("serving blocks peer={}", pid);
                             //Make a request GetData
@@ -108,6 +110,10 @@ impl GetData {
                     error!("Error processing headers: {}", e);
                 }
             }
+            self.timeout
+                .lock()
+                .unwrap()
+                .check(vec![ExpectedReply::MerkleBlock]);
         }
     }
 
@@ -119,24 +125,15 @@ impl GetData {
     }
 
     // retrieve data
-    // wait -> wait for filter
-    //         use in Connected need wait
-    //         use in other condition don't need wait(ping and get 100 merkleblock)
     fn get_data(&mut self, peer: PeerId, add: bool, wait: bool) -> Result<(), Error> {
-        if wait {
-            error!("wait_for filter condition");
-            let ref pair = self.pair;
-            let &(ref lock, ref cvar) = Arc::deref(pair);
-            let mut condition = lock.lock();
-            while !*condition {
-                let r = cvar.wait_for(&mut condition, Duration::from_secs(5));
-                if r.timed_out() {
-                    info!("wait_for filter condition timeout");
-                    break;
-                }
-            }
+        if self
+            .timeout
+            .lock()
+            .unwrap()
+            .is_busy_with(peer, ExpectedReply::MerkleBlock)
+        {
+            return Ok(());
         }
-        info!("get fillter_ready condition");
 
         let header_vec: Vec<String> = {
             let p = block_on(GlobalRB::global().detail.progress());
@@ -152,7 +149,7 @@ impl GetData {
             let inventory = Inventory::new(InvType::FilteredBlock, header.as_str());
             inventory_vec.push(inventory);
         }
-        info!("send getdata message");
+        error!("send getdata message");
         self.p2p
             .send_network(peer, NetworkMessage::GetData(inventory_vec));
         Ok(())
@@ -163,6 +160,11 @@ impl GetData {
         merkle_vec: &Vec<MerkleBlockMessage>,
         peer: PeerId,
     ) -> Result<(), Error> {
+        self.timeout
+            .lock()
+            .unwrap()
+            .received(peer, 10, ExpectedReply::MerkleBlock);
+
         info!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
         info!("got 100 merkleblock {:#?}", merkleblock);
@@ -172,7 +174,7 @@ impl GetData {
 
     // Handle tx return value
     fn tx(&mut self, tx: &Transaction, _peer: PeerId) -> Result<(), Error> {
-        info!("Tx {:#?}", tx.clone());
+        info!("{:#?}", tx.clone());
         let vouts = tx.clone().output;
         for (index, vout) in vouts.iter().enumerate() {
             let vout = vout.to_owned();

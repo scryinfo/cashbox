@@ -17,7 +17,6 @@
 //! # Download headers
 //!
 use crate::chaindb::SharedChainDB;
-use crate::constructor::CondvarPair;
 use crate::db::GlobalRB;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
@@ -44,7 +43,6 @@ pub struct HeaderDownload {
     chaindb: SharedChainDB,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     downstream: SharedDownstream,
-    pair: CondvarPair<bool>,
 }
 
 impl HeaderDownload {
@@ -53,7 +51,6 @@ impl HeaderDownload {
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         downstream: SharedDownstream,
-        pair: CondvarPair<bool>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
@@ -62,7 +59,6 @@ impl HeaderDownload {
             p2p,
             timeout,
             downstream,
-            pair,
         };
 
         thread::Builder::new()

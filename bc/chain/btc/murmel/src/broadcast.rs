@@ -28,11 +28,7 @@ impl Broadcast {
         pair: CondvarPair<bool>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
-        let mut broadcast = Broadcast {
-            p2p,
-            timeout,
-            pair,
-        };
+        let mut broadcast = Broadcast { p2p, timeout, pair };
 
         thread::Builder::new()
             .name("Broadcast TX".to_string())
