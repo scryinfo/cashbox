@@ -826,7 +826,8 @@ impl EeeChain {
     async fn save_eee_tokenx_tx(rb: &rbatis::rbatis::Rbatis, extrinsic_ctx: &ExtrinsicContext, tx_detail: &eee::TransferDetail, timestamp: u64, is_successful: bool) -> Result<(), WalletError> {
         let query_tx_wrapper = rb.new_wrapper()
             .eq(&mav::ma::TxShared::tx_hash, tx_detail.hash.clone().unwrap_or_default())
-            .eq(&mav::ma::TxShared::signer, tx_detail.signer.clone().unwrap_or_default());
+            .eq(&mav::ma::TxShared::signer, tx_detail.signer.clone().unwrap_or_default())
+            .eq(&MEeeChainTx::wallet_account, extrinsic_ctx.account.clone());
         if let None = MEeeTokenxTx::fetch_by_wrapper(rb, "", &query_tx_wrapper).await? {
             let mut chain_tx = mav::ma::MEeeTokenxTx::default();
             chain_tx.from_address = tx_detail.from.clone().unwrap_or_default();
