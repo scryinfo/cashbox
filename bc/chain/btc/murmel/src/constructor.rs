@@ -65,7 +65,7 @@ use std::{
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
 // CondVar use for sync thread
-pub type CondvarPair<T> = Arc<(parking_lot::Mutex<T>, Condvar)>;
+pub type CondPair<T> = Arc<(parking_lot::Mutex<T>, Condvar)>;
 
 /// The complete stack
 pub struct Constructor {
@@ -127,30 +127,33 @@ impl Constructor {
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);
 
-        let pair = Arc::new((parking_lot::Mutex::new(false), Condvar::new()));
-        let pair3 = Arc::clone(&pair);
-        let pair4 = Arc::clone(&pair);
+        let pair = Arc::new((parking_lot::Mutex::new(0), Condvar::new()));
+        let pair2 = pair.clone();
+        let pair3 = pair.clone();
+        let pair4 = pair.clone();
+
+        let global_rb = GlobalRB::from(PATH, network)?;
+        GLOBAL_RB.set(global_rb).unwrap();
+        block_on(GlobalRB::global().detail.save_address(address.clone()));
+        let verify = Verify::from_address(address.clone());
+        db::INSTANCE.set(verify).unwrap();
+        let verify = Verify::global();
+
+        dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
 
         dispatcher.add_listener(HeaderDownload::new(
             chaindb.clone(),
             p2p_control.clone(),
             timeout.clone(),
             lightning.clone(),
+            pair,
         ));
-        dispatcher.add_listener(Ping::new(p2p_control.clone(), timeout.clone()));
-
-        let global_rb = GlobalRB::from(PATH, network)?;
-        GLOBAL_RB.set(global_rb).unwrap();
-        block_on(GlobalRB::global().detail.save_address(address.clone()));
-
-        let verify = Verify::from_address(address.clone());
-        db::INSTANCE.set(verify).unwrap();
-        let verify = Verify::global();
 
         dispatcher.add_listener(BloomFilter::new(
             p2p_control.clone(),
             timeout.clone(),
             verify.filter.clone(),
+            pair2,
         ));
 
         dispatcher.add_listener(GetData::new(p2p_control.clone(), timeout.clone(), pair3));
@@ -180,7 +183,7 @@ impl Constructor {
     ) -> Result<(), Error> {
         let mut executor = ThreadPoolBuilder::new()
             .name_prefix("bitcoin-connect")
-            .pool_size(2)
+            .pool_size(3)
             .create()
             .expect("can not start futures thread pool");
 

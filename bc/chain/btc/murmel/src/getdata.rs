@@ -12,15 +12,14 @@ use bitcoin::network::message_bloom_filter::MerkleBlockMessage;
 use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hex::ToHex;
 
-use crate::constructor::CondvarPair;
+use crate::constructor::CondPair;
 use crate::db::{GlobalRB, Verify};
 use crate::kit::vec_to_string;
 use bitcoin::consensus::serialize as btc_serialize;
 use futures::executor::block_on;
 use log::{error, info, trace};
 use std::collections::HashMap;
-use std::ops::Deref;
-use std::sync::{mpsc, Arc};
+use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
 
@@ -28,14 +27,14 @@ pub struct GetData {
     //send a message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-    pair: CondvarPair<bool>,
+    pair: CondPair<usize>,
 }
 
 impl GetData {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-        pair: CondvarPair<bool>,
+        pair: CondPair<usize>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
 
@@ -58,7 +57,6 @@ impl GetData {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         // wait for loadfilter
-                        thread::park_timeout(Duration::from_millis(300));
                         if self.is_serving_blocks(pid) {
                             trace!("serving blocks peer={}", pid);
                             //Make a request GetData
@@ -71,6 +69,7 @@ impl GetData {
                     PeerMessage::Incoming(pid, msg) => match msg {
                         NetworkMessage::MerkleBlock(ref merkleblock) => {
                             {
+                                info!("{:#?}", merkleblock);
                                 let block_hash = merkleblock.prev_block.to_hex();
                                 let timestamp = merkleblock.timestamp;
                                 {
@@ -82,26 +81,29 @@ impl GetData {
                                 }
                             }
 
-                            if merkle_vec.len() <= 100 {
+                            if merkle_vec.len() <= 20 {
                                 merkle_vec.push(merkleblock.clone());
                             } else {
-                                if self.is_serving_blocks(pid) {
-                                    self.merkleblock(&merkle_vec, pid)
-                                        .expect("merkle block vector failed");
-                                }
+                                self.merkleblock(&merkle_vec, pid)
+                                    .expect("merkle block vector failed");
                                 merkle_vec.clear();
                             }
                             Ok(())
                         }
                         NetworkMessage::Tx(ref tx) => self.tx(tx, pid),
                         NetworkMessage::Ping(_) => {
-                            if self.is_serving_blocks(pid) {
-                                trace!("serving blocks peer={}", pid);
-                                //Make a request GetData
-                                self.get_data(pid, true, false)
-                            } else {
-                                Ok(())
-                            }
+                            trace!("serving blocks peer={}", pid);
+                            //Make a request GetData
+                            self.get_data(pid, true, false)
+                                .expect("get_data error in ping");
+                            Ok(())
+                        }
+                        NetworkMessage::Inv(_) => {
+                            info!("got inv from peer={}", pid);
+                            //Make a request GetData
+                            self.get_data(pid, true, false)
+                                .expect("get_data error in Inv");
+                            Ok(())
                         }
                         _ => Ok(()),
                     },
@@ -109,11 +111,12 @@ impl GetData {
                 } {
                     error!("Error processing headers: {}", e);
                 }
+
+                self.timeout
+                    .lock()
+                    .unwrap()
+                    .check(vec![ExpectedReply::Nonce]);
             }
-            self.timeout
-                .lock()
-                .unwrap()
-                .check(vec![ExpectedReply::MerkleBlock]);
         }
     }
 
@@ -125,16 +128,23 @@ impl GetData {
     }
 
     // retrieve data
+    // wait -> wait for filter
+    //         use in Connected need wait
+    //         use in other condition don't need wait(ping and get 100 merkleblock)
     fn get_data(&mut self, peer: PeerId, add: bool, wait: bool) -> Result<(), Error> {
-        if self
-            .timeout
-            .lock()
-            .unwrap()
-            .is_busy_with(peer, ExpectedReply::MerkleBlock)
-        {
-            return Ok(());
+        if wait {
+            error!("wait_for filter condition");
+            let &(ref lock, ref cvar) = &*(self.pair);
+            let mut start = lock.lock();
+            while *start == 0 {
+                let r = cvar.wait_for(&mut start, Duration::from_secs(2));
+                if r.timed_out() {
+                    info!("wait_for filter condition timeout");
+                    return Ok(());
+                }
+            }
         }
-
+        info!("get fillter_ready condition");
         let header_vec: Vec<String> = {
             let p = block_on(GlobalRB::global().detail.progress());
             block_on(GlobalRB::global().chain.fetch_scan_header(p.timestamp, add))
@@ -163,18 +173,21 @@ impl GetData {
         self.timeout
             .lock()
             .unwrap()
-            .received(peer, 10, ExpectedReply::MerkleBlock);
-
-        info!("got a vec of 100 merkleblock");
+            .received(peer, 1, ExpectedReply::Nonce);
+        info!("got a vec of 20 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
-        info!("got 100 merkleblock {:#?}", merkleblock);
+        info!("got 20 merkleblock {:#?}", merkleblock);
         self.get_data(peer, true, false)?;
         Ok(())
     }
 
     // Handle tx return value
-    fn tx(&mut self, tx: &Transaction, _peer: PeerId) -> Result<(), Error> {
-        info!("{:#?}", tx.clone());
+    fn tx(&mut self, tx: &Transaction, peer: PeerId) -> Result<(), Error> {
+        self.timeout
+            .lock()
+            .unwrap()
+            .received(peer, 1, ExpectedReply::Nonce);
+        info!("Tx {:#?}", tx.clone());
         let vouts = tx.clone().output;
         for (index, vout) in vouts.iter().enumerate() {
             let vout = vout.to_owned();

@@ -1,6 +1,6 @@
 //! mod for broadcast TX
 
-use crate::constructor::CondvarPair;
+use crate::constructor::CondPair;
 use crate::error::Error;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
@@ -18,14 +18,14 @@ pub struct Broadcast {
     //used for Send message
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-    pair: CondvarPair<bool>,
+    pair: CondPair<usize>,
 }
 
 impl Broadcast {
     pub fn new(
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
-        pair: CondvarPair<bool>,
+        pair: CondPair<usize>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
         let mut broadcast = Broadcast { p2p, timeout, pair };
@@ -42,9 +42,9 @@ impl Broadcast {
         {
             let ref pair = self.pair;
             let &(ref lock, ref cvar) = Arc::deref(pair);
-            let mut condition = lock.lock();
-            while !*condition {
-                cvar.wait(&mut condition);
+            let mut start = lock.lock();
+            while *start < 3 {
+                cvar.wait(&mut start);
             }
         }
 
