@@ -59,7 +59,7 @@ impl Ping {
                     PeerMessage::Disconnected(pid, _) => {
                         self.timeout.lock().unwrap().forget(pid);
                         self.asked.remove(&pid);
-                    }
+                    },
                     PeerMessage::Incoming(pid, msg) => match msg {
                         NetworkMessage::Pong(n) => {
                             if self.asked.remove(&pid) == Some(n) {

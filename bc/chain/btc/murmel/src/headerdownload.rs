@@ -125,6 +125,7 @@ impl HeaderDownload {
 
     // process an incoming inventory announcement
     fn inv(&mut self, v: &Vec<Inventory>, peer: PeerId) -> Result<(), Error> {
+        info!("received inv for peer={}", peer);
         let mut ask_for_headers = false;
         for inventory in v {
             // only care for blocks

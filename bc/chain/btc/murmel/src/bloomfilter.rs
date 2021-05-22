@@ -91,7 +91,7 @@ impl BloomFilter {
         let &(ref lock, ref cvar) = &*(self.pair);
         let mut start = lock.lock();
         *start += 1;
-        cvar.notify_one();
+        cvar.notify_all();
         Ok(())
     }
 

@@ -53,7 +53,7 @@ impl GetData {
         let mut merkle_vec = vec![];
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
-            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(4000)) {
+            while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(6000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
                         // wait for loadfilter
@@ -81,29 +81,26 @@ impl GetData {
                                 }
                             }
 
-                            if merkle_vec.len() <= 20 {
+                            if merkle_vec.len() <= 100 {
                                 merkle_vec.push(merkleblock.clone());
                             } else {
-                                self.merkleblock(&merkle_vec, pid)
-                                    .expect("merkle block vector failed");
+                                if self.is_serving_blocks(pid) {
+                                    self.merkleblock(&merkle_vec, pid)
+                                        .expect("merkle block vector failed");
+                                }
                                 merkle_vec.clear();
                             }
                             Ok(())
                         }
                         NetworkMessage::Tx(ref tx) => self.tx(tx, pid),
                         NetworkMessage::Ping(_) => {
-                            trace!("serving blocks peer={}", pid);
-                            //Make a request GetData
-                            self.get_data(pid, true, false)
-                                .expect("get_data error in ping");
-                            Ok(())
-                        }
-                        NetworkMessage::Inv(_) => {
-                            info!("got inv from peer={}", pid);
-                            //Make a request GetData
-                            self.get_data(pid, true, false)
-                                .expect("get_data error in Inv");
-                            Ok(())
+                            if self.is_serving_blocks(pid) {
+                                trace!("serving blocks peer={}", pid);
+                                //Make a request GetData
+                                self.get_data(pid, true, false)
+                            } else {
+                                Ok(())
+                            }
                         }
                         _ => Ok(()),
                     },
@@ -111,11 +108,6 @@ impl GetData {
                 } {
                     error!("Error processing headers: {}", e);
                 }
-
-                self.timeout
-                    .lock()
-                    .unwrap()
-                    .check(vec![ExpectedReply::Nonce]);
             }
         }
     }
@@ -137,7 +129,7 @@ impl GetData {
             let &(ref lock, ref cvar) = &*(self.pair);
             let mut start = lock.lock();
             while *start == 0 {
-                let r = cvar.wait_for(&mut start, Duration::from_secs(2));
+                let r = cvar.wait_for(&mut start, Duration::from_secs(4));
                 if r.timed_out() {
                     info!("wait_for filter condition timeout");
                     return Ok(());
@@ -170,23 +162,21 @@ impl GetData {
         merkle_vec: &Vec<MerkleBlockMessage>,
         peer: PeerId,
     ) -> Result<(), Error> {
-        self.timeout
-            .lock()
-            .unwrap()
-            .received(peer, 1, ExpectedReply::Nonce);
-        info!("got a vec of 20 merkleblock");
+        info!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
-        info!("got 20 merkleblock {:#?}", merkleblock);
+        info!("got 100 merkleblock {:#?}", merkleblock);
         self.get_data(peer, true, false)?;
         Ok(())
     }
 
+    // fn merkleblock2(&mut self, merkle: &MerkleBlockMessage, peer: PeerId) -> Result<(), Error>{
+    //     info!("got 1 merkleblock {:#?}", merkle);
+    //     self.get_data(peer, true, false)?;
+    //     Ok(())
+    // }
+
     // Handle tx return value
     fn tx(&mut self, tx: &Transaction, peer: PeerId) -> Result<(), Error> {
-        self.timeout
-            .lock()
-            .unwrap()
-            .received(peer, 1, ExpectedReply::Nonce);
         info!("Tx {:#?}", tx.clone());
         let vouts = tx.clone().output;
         for (index, vout) in vouts.iter().enumerate() {

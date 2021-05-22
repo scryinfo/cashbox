@@ -140,7 +140,7 @@ impl ChainSqlite {
     ) -> Result<i64, rbatis::Error> {
         let w = self.rb.new_wrapper();
         let sql = format!(
-            "SELECT {} FROM {} WHERE timestamp = {}",
+            "SELECT {} FROM {} WHERE timestamp = {} LIMIT 1",
             "rowid",
             &MBlockHeader::table_name(),
             &timestamp
@@ -548,4 +548,22 @@ pub fn fetch_scanned_height(network: Network) -> Result<BtcNowLoadBlock, rbatis:
         header_hash: mprogress.header,
         timestamp: mprogress.timestamp,
     })
+}
+
+mod test {
+    use crate::db::fetch_scanned_height;
+    use bitcoin::Network;
+
+    #[test]
+    pub fn test_fetch_scanned_height() {
+        let r = fetch_scanned_height(Network::Testnet);
+        match &r {
+            Ok(r) => {
+                println!("{:?}", r)
+            }
+            Err(e) => {
+                println!("{}", e)
+            }
+        }
+    }
 }

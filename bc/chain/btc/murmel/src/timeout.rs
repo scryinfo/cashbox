@@ -133,6 +133,7 @@ impl<Message: Send + Sync + Clone, Reply: Eq + Hash + std::fmt::Debug> Timeout<M
                 }) {
                     debug!(
                         "too slow answering {:?} requests {:?}, disconnecting peer={}",
+                        //"too slow answering {:?} requests {:?}, ban peer={}",
                         expected,
                         self.expected.get(peer),
                         *peer
