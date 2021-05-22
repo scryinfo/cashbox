@@ -89,17 +89,22 @@ public class MainActivity extends FlutterActivity {
 
 
     private void checkAndUpgradeVersion(String loadUrl, String serverVersion) {
-        ScryLog.v(this, "begin to checkAndUpgradeVersion================>", loadUrl);
         /*
             https://github.com/AlexLiuSheng/CheckVersionLib
             */
-        AllenVersionChecker
-                .getInstance()
-                .downloadOnly(
-                        UIData.create().setTitle(getString(R.string.new_version_title)).setContent(getString(R.string.search_new_version) + serverVersion + getString(R.string.search_new_version_end)).setDownloadUrl(loadUrl)
-                )
-                .setDownloadAPKPath(this.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath() + "/")
-                .executeMission(MainActivity.this);
+        String targetVersionUrl = loadUrl + "?apkVersion=" + serverVersion;
+        ScryLog.v(this, "targetVersionUrl is ================>", targetVersionUrl);
+        try {
+            AllenVersionChecker
+                    .getInstance()
+                    .downloadOnly(
+                            UIData.create().setTitle(getString(R.string.new_version_title)).setContent(getString(R.string.search_new_version) + serverVersion + getString(R.string.search_new_version_end)).setDownloadUrl(targetVersionUrl)
+                    )
+                    .setDownloadAPKPath(this.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath() + "/")
+                    .executeMission(MainActivity.this);
+        } catch (Exception e) {
+            ScryLog.e(this, "checkAndUpgradeVersion appear error", e.toString());
+        }
     }
 
     @Override

@@ -89,5 +89,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.github.yuzhiqiang1993:zxing:2.2.5'
     //实现版本升级 工具库
-    implementation 'com.github.AlexLiuSheng:CheckVersionLib:2.2.3'
+    implementation 'com.github.AlexLiuSheng:CheckVersionLib:2.4.1_androidx'
 }
