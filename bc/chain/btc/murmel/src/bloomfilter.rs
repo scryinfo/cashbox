@@ -1,4 +1,5 @@
 //! This mod is about bloomfilter sender
+use crate::constructor::CondPair;
 use crate::error::Error;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
@@ -17,6 +18,7 @@ pub struct BloomFilter {
     p2p: P2PControlSender<NetworkMessage>,
     timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
     filter_load: FilterLoadMessage,
+    pair: CondPair<usize>,
 }
 
 impl BloomFilter {
@@ -24,12 +26,14 @@ impl BloomFilter {
         p2p: P2PControlSender<NetworkMessage>,
         timeout: SharedTimeout<NetworkMessage, ExpectedReply>,
         filter_load: FilterLoadMessage,
+        pair: CondPair<usize>,
     ) -> PeerMessageSender<NetworkMessage> {
         let (sender, receiver) = mpsc::sync_channel(p2p.back_pressure);
         let mut bloomfilter = BloomFilter {
             p2p,
             timeout,
             filter_load,
+            pair,
         };
 
         thread::Builder::new()
@@ -47,9 +51,8 @@ impl BloomFilter {
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(4000)) {
                 if let Err(e) = match msg {
                     PeerMessage::Connected(pid, _) => {
-                        // wait for GetHeaders message
-                        thread::park_timeout(Duration::from_millis(100));
                         if self.is_serving_blocks(pid) {
+                            // wait for GetHeaders message
                             trace!("serving blocks peer={}", pid);
                             // Initiate request loadfilter
                             self.send_filter(pid)
@@ -57,6 +60,7 @@ impl BloomFilter {
                             Ok(())
                         }
                     }
+                    PeerMessage::Disconnected(_, _) => self.reset_pair(),
                     PeerMessage::Incoming(_pid, msg) => match msg {
                         NetworkMessage::Ping(_) => Ok(()),
                         _ => Ok(()),
@@ -83,6 +87,20 @@ impl BloomFilter {
         error!("peers len = {}", peers.len());
         self.p2p
             .send_network(peer, NetworkMessage::FilterLoad(self.filter_load.clone()));
+
+        let &(ref lock, ref cvar) = &*(self.pair);
+        let mut start = lock.lock();
+        *start += 1;
+        cvar.notify_one();
+        Ok(())
+    }
+
+    // when disconnect, reset condition variable
+    fn reset_pair(&self) -> Result<(), Error> {
+        let &(ref lock, ref cvar) = &*(self.pair);
+        let mut start = lock.lock();
+        *start = 0;
+        cvar.notify_all();
         Ok(())
     }
 }
