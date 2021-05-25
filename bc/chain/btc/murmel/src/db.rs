@@ -77,7 +77,7 @@ impl ChainSqlite {
             .gt("timestamp", &timestamp)
             .and()
             .lt("scanned", 6);
-        let req = PageRequest::new(1, 1000);
+        let req = PageRequest::new(1, 10000);
         let r: Result<Page<MBlockHeader>, _> = self.rb.fetch_page_by_wrapper("", &w, &req).await;
         let block_headers: Vec<MBlockHeader> = match r {
             Ok(page) => {
@@ -101,7 +101,7 @@ impl ChainSqlite {
                         WHERE timestamp >= {}
                         AND scanned <= 5
                         ORDER BY rowid ASC
-                        LIMIT 0, 1000
+                        LIMIT 0, 10000
                     ) tmp
                 )
             "#,

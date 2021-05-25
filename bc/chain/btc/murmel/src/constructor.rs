@@ -41,7 +41,6 @@ use crate::timeout::Timeout;
 use bitcoin::network::constants::Network;
 use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message::RawNetworkMessage;
-use bitcoin::network::message_bloom_filter::FilterLoadMessage;
 use futures::executor::block_on;
 use futures::{
     executor::{ThreadPool, ThreadPoolBuilder},

@@ -102,6 +102,13 @@ impl GetData {
                                 Ok(())
                             }
                         }
+                        NetworkMessage::Inv(ref inv) => {
+                            if self.is_serving_blocks(pid) {
+                                self.inv(inv, pid)
+                            } else {
+                                Ok(())
+                            }
+                        }
                         _ => Ok(()),
                     },
                     _ => Ok(()),
@@ -109,6 +116,10 @@ impl GetData {
                     error!("Error processing headers: {}", e);
                 }
             }
+            self.timeout
+                .lock()
+                .unwrap()
+                .check(vec![ExpectedReply::MerkleBlock]);
         }
     }
 
@@ -157,11 +168,25 @@ impl GetData {
         Ok(())
     }
 
+    fn inv(&mut self, v: &Vec<Inventory>, peer: PeerId) -> Result<(), Error> {
+        info!("received inv for peer={}", peer);
+        for inventory in v {
+            if inventory.inv_type == InvType::Transaction {
+                self.get_data(peer,true,false)?;
+            }
+        }
+        Ok(())
+    }
+
     fn merkleblock(
         &mut self,
         merkle_vec: &Vec<MerkleBlockMessage>,
         peer: PeerId,
     ) -> Result<(), Error> {
+        self.timeout
+            .lock()
+            .unwrap()
+            .received(peer, 100, ExpectedReply::MerkleBlock);
         info!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
         info!("got 100 merkleblock {:#?}", merkleblock);
