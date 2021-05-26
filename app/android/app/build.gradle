@@ -61,6 +61,9 @@ android {
             // `flutter run --release` works.
             // 签名正式发布：https://flutterchina.club/android-release/
             signingConfig signingConfigs.release
+            // 关闭代码混淆
+            minifyEnabled false
+            shrinkResources false
         }
 
         debug {

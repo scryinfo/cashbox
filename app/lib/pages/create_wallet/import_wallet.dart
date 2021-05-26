@@ -83,8 +83,8 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
               width: ScreenUtil().setWidth(41),
               height: ScreenUtil().setHeight(9),
               color: Color.fromRGBO(26, 141, 198, 0.20),
-              child: FlatButton(
-                onPressed: () async {
+              child: TextButton(
+                onPressed: () {
                   _checkAndDoImportWallet();
                 },
                 child: Text(
@@ -466,8 +466,9 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     return true;
   }
 
-  Future _checkAndDoImportWallet() async {
+  _checkAndDoImportWallet() {
     if (!_verifyImportWallet()) {
+      // already do hint inside of func
       return;
     }
     var walletObj;

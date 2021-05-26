@@ -236,7 +236,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
         width: ScreenUtil().setWidth(41),
         height: ScreenUtil().setHeight(9),
         color: Color.fromRGBO(26, 141, 198, 0.20),
-        child: FlatButton(
+        child: TextButton(
           child: Text(
             translate('click_to_transfer'),
             textAlign: TextAlign.center,

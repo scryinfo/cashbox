@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/widgets/app_bar.dart';
@@ -13,7 +14,6 @@ class PublicPage extends StatefulWidget {
 
 class _PublicPageState extends State<PublicPage> {
   WebViewController _controller;
-  String targetUrl = "";
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _PublicPageState extends State<PublicPage> {
 
   Future<String> loadTargetUrl() async {
     Config config = await HandleConfig.instance.getConfig();
-    targetUrl = config.privateConfig.publicIp;
+    String targetUrl = config.privateConfig.publicIp;
     return targetUrl;
   }
 
@@ -68,7 +68,7 @@ class _PublicPageState extends State<PublicPage> {
               }
               if (snapshot.hasData) {
                 return WebView(
-                  initialUrl: targetUrl,
+                  initialUrl: snapshot.data.toString(),
                   javascriptMode: JavascriptMode.unrestricted,
                   //JS execution mode Whether to allow JS execution
                   onWebViewCreated: (controller) {
@@ -88,8 +88,47 @@ class _PublicPageState extends State<PublicPage> {
         name: "NativeLocaleValue",
         onMessageReceived: (JavascriptMessage message) async {
           Config config = await HandleConfig.instance.getConfig();
-          _controller?.evaluateJavascript('nativeLocale("$config.locale")')?.then((result) {});
+          var msg = Message.fromJson(jsonDecode(message.message));
+          if (msg.data == null || msg.data.trim() == "") {
+            msg.data = config.locale;
+            this.callPromise(msg);
+          }
         }));
     return jsChannelList.toSet();
+  }
+
+  Future<String> callPromise(Message msg) {
+    String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
+    return _controller?.evaluateJavascript(call);
+  }
+}
+
+class Message {
+  // message id
+  String id;
+
+  // message data, 自定义格式
+  String data;
+
+  // message 消息完成后调用的函数，此函数直接在window下面
+  String callFun;
+
+  // 出错误信息，没有出错时为零长度字符串
+  String err;
+
+  Message.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    data = json['data'];
+    callFun = json['callFun'];
+    err = json['err'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['data'] = this.data;
+    data['callFun'] = this.callFun;
+    data['err'] = this.err;
+    return data;
   }
 }

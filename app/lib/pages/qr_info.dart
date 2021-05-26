@@ -117,7 +117,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
                 width: ScreenUtil().setWidth(41),
                 height: ScreenUtil().setHeight(9),
                 color: Color.fromRGBO(26, 141, 198, 0.20),
-                child: FlatButton(
+                child: TextButton(
                   onPressed: () {
                     Utils.copyMsg(content);
                     Fluttertoast.showToast(msg: translate('success_to_copy_info'));

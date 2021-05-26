@@ -315,7 +315,7 @@ class _EeePageState extends State<EeePage> {
               opacity: 1.0,
               child: Container(
                 color: Color.fromRGBO(26, 141, 198, 0.40),
-                child: FlatButton(
+                child: TextButton(
                   child: Text(
                     translate('digit_manage'),
                     textAlign: TextAlign.center,

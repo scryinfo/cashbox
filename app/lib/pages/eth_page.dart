@@ -280,7 +280,7 @@ class _EthPageState extends State<EthPage> {
         children: <Widget>[
           Container(
             color: Color.fromRGBO(26, 141, 198, 0.40),
-            child: FlatButton(
+            child: TextButton(
               child: Text(
                 translate('digit_manage'),
                 textAlign: TextAlign.center,

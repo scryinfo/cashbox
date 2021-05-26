@@ -137,7 +137,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
           Gaps.scaleHGap(1),
           Container(
             //height: ScreenUtil().setHeight(8),
-            child: FlatButton(
+            child: TextButton(
               color: Color.fromRGBO(26, 141, 198, 0.2),
               onPressed: () {
                 context.read<TransactionProvide>()

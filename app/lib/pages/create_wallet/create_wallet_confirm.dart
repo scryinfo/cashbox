@@ -115,7 +115,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
               width: ScreenUtil().setWidth(41),
               height: ScreenUtil().setHeight(9),
               color: Color.fromRGBO(26, 141, 198, 0.20),
-              child: FlatButton(
+              child: TextButton(
                 onPressed: () async {
                   var isSuccess = await _verifyMsgAndCreateWallet();
                   if (!isSuccess) {
@@ -211,7 +211,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
       return Container(
         alignment: Alignment.center,
         width: ScreenUtil().setWidth(18.75),
-        child: FlatButton(
+        child: TextButton(
           child: Text(
             mnemonicList[index].toString(),
             maxLines: 1,

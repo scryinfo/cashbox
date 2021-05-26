@@ -172,7 +172,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
               width: ScreenUtil().setWidth(41),
               height: ScreenUtil().setHeight(9),
               color: Color.fromRGBO(26, 141, 198, 0.20),
-              child: FlatButton(
+              child: TextButton(
                 onPressed: () {
                   NavigatorUtils.push(context, Routes.createWalletConfirmPage);
                 },
@@ -198,7 +198,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
         alignment: Alignment.center,
         width: ScreenUtil().setWidth(25),
         color: Colors.black26,
-        child: FlatButton(
+        child: TextButton(
           child: Text(
             mnemonicList[index].toString(),
             maxLines: 1,

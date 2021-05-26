@@ -88,7 +88,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
       width: ScreenUtil().setWidth(41),
       height: ScreenUtil().setHeight(9),
       color: Color.fromRGBO(26, 141, 198, 0.20),
-      child: FlatButton(
+      child: TextButton(
         onPressed: () {
           if (_verifyToCreateWallet()) {
             context.read<CreateWalletProcessProvide>().setWalletName(_nameController.text);

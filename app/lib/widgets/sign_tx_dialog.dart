@@ -150,7 +150,7 @@ class SignTxDialog extends StatelessWidget {
         fontSize: ScreenUtil().setSp(3),
       ),
       actions: <Widget>[
-        new FlatButton(
+        new TextButton(
           child: new Text(translate('confirm')),
           onPressed: () {
             if (_controller.text.isEmpty) {
@@ -160,7 +160,7 @@ class SignTxDialog extends StatelessWidget {
             onPressed(_controller.text);
           },
         ),
-        new FlatButton(
+        new TextButton(
           child: new Text(translate('cancel')),
           onPressed: () {
             Navigator.of(context).pop();
