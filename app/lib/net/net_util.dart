@@ -2,65 +2,11 @@ import 'dart:io';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/control/app_info_control.dart';
+
 import 'package:flutter_translate/global.dart';
 import 'package:logger/logger.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:package_info/package_info.dart';
-
-Map<String, dynamic> _deviceData = <String, dynamic>{}; //Device Information
-String appSignInfo; //Application signature information
-String deviceId = ""; //Device unique ID
-// Add parameters when accessing the background interface
-// 1, device id deviceId
-// 2, application signature information appSignInfo
-Future requestWithDeviceId(String url, {formData}) async {
-  if (_deviceData == null || _deviceData.length == 0 || _deviceData["id"] == null) {
-    ///No device information record, go to get
-    var deviceId = await AppInfoControl.instance.getDeviceId();
-    if (deviceId == null || deviceId == "") {
-      return;
-    }
-  }
-  if (appSignInfo == null || appSignInfo.trim() == "") {
-    try {
-      appSignInfo = await AppInfoControl.instance.getAppSignInfo();
-    } catch (e) {
-      Logger().e("requestWithDeviceId request() error is", "${e}");
-      return;
-    }
-  }
-  if (formData == null) formData = {};
-  formData["deviceId"] = deviceId;
-  formData["signature"] = appSignInfo;
-  return request(url, formData: formData);
-}
-
-Future requestWithConfigVersion(String url, {formData}) async {
-  if (formData == null) formData = {};
-  PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  String apkVersion = packageInfo.version;
-  formData["apkVersion"] = apkVersion;
-
-  Config config = await HandleConfig.instance.getConfig();
-  formData["appConfigVersion"] = config.privateConfig.configVersion;
-  return requestWithDeviceId(url, formData: formData);
-}
-
-Future requestWithConfigCheckParam(String url, {formData}) async {
-  if (formData == null) formData = {};
-  PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  String apkVersion = packageInfo.version;
-  formData["apkVersion"] = apkVersion;
-
-  Config config = await HandleConfig.instance.getConfig();
-  formData["authTokenListVersion"] = config.privateConfig.authDigitVersion;
-  formData["defaultTokenListVersion"] = config.privateConfig.defaultDigitVersion;
-  formData["appConfigVersion"] = config.privateConfig.configVersion;
-
-  return requestWithDeviceId(url, formData: formData);
-}
 
 //Access network request, url + parameter object
 Future request(String url, {formData}) async {

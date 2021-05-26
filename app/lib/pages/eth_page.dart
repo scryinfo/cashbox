@@ -107,8 +107,8 @@ class _EthPageState extends State<EthPage> {
       _loadingRateTimerTask.cancel();
     }
     _loadingRateTimerTask = Timer(const Duration(milliseconds: 1000), () async {
-      rateInstance = await loadRateInstance();
       if (rateInstance == null) {
+        rateInstance = await loadRateInstance();
         return;
       }
     });
