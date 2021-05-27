@@ -186,7 +186,7 @@ impl GetData {
         self.timeout
             .lock()
             .unwrap()
-            .received(peer, 100, ExpectedReply::MerkleBlock);
+            .received(peer, 1, ExpectedReply::MerkleBlock);
         info!("got a vec of 100 merkleblock");
         let merkleblock = merkle_vec.last().unwrap();
         info!("got 100 merkleblock {:#?}", merkleblock);
