@@ -86,11 +86,11 @@ class _EthPageState extends State<EthPage> {
 
   //Processing display fiat currency usd, cny, etc.
   loadLegalCurrency() async {
-    TokenRate rate = await loadRateInstance();
-    if (rate == null) {
+    rateInstance = await loadRateInstance();
+    if (rateInstance == null) {
       return;
     }
-    this.moneyUnitList = rate.getAllSupportLegalCurrency();
+    this.moneyUnitList = rateInstance.getAllSupportLegalCurrency();
     if (mounted) {
       setState(() {
         this.moneyUnitList = this.moneyUnitList;
@@ -492,7 +492,7 @@ class _EthPageState extends State<EthPage> {
                               Align(
                                   alignment: FractionalOffset.topRight,
                                   child: Opacity(
-                                    opacity: 1,
+                                    opacity: 0,
                                     child: Text(
                                       "0", //Last transaction
                                       style: TextStyle(fontSize: ScreenUtil().setSp(2.5), color: Colors.greenAccent),

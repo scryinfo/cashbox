@@ -1,13 +1,7 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:app/control/eee_chain_control.dart';
-import 'package:app/control/eth_chain_control.dart';
-import 'package:app/model/wallets.dart';
 import 'package:logger/logger.dart';
-import 'package:wallets/enums.dart';
-import 'package:wallets/wallets_c.dc.dart';
 import 'net_util.dart';
-import 'package:wallets/kits.dart';
 
 class ScryXNetUtil {
   //todo 待优化

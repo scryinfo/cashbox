@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart';
 import 'package:meta/meta.dart';
@@ -26,9 +27,10 @@ class RefreshOpen {
       _instance!._channel = new ClientChannel(
         parameter.host,
         port: parameter.port,
-        options: const ChannelOptions(
-            credentials: ChannelCredentials.insecure(),
-            connectionTimeout: Duration(minutes: 1)),
+        options: ChannelOptions(
+            credentials:
+                ChannelCredentials.secure(onBadCertificate: (X509Certificate certificate, String host) => certificate.subject.endsWith("scry")),
+            connectionTimeout: Duration(seconds: 30)),
       );
       _instance!._client = new RefreshOpenFaceClient(_instance!._channel!);
       BasicClientReq _req = new BasicClientReq();
@@ -51,14 +53,17 @@ class RefreshOpen {
     if (res.hasErr()) {
       return null;
     }
-    ConnectParameter parameter =
-        new ConnectParameter(res.host, res.port.toInt());
+    ConnectParameter parameter = new ConnectParameter(res.host, res.port.toInt(),
+        options: ChannelOptions(
+            credentials:
+                ChannelCredentials.secure(onBadCertificate: (X509Certificate certificate, String host) => certificate.subject.endsWith("scry")),
+            connectionTimeout: Duration(seconds: 30)));
     return parameter;
   }
 
   shutDown() {
     _client = null;
-    if(_channel != null) {
+    if (_channel != null) {
       _channel!.shutdown();
     }
     _channel = null;
