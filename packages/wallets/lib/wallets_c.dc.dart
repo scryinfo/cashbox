@@ -44,7 +44,7 @@ class Context implements DC<clib.CContext> {
 
   @override
   Pointer<clib.CContext> toCPtr() {
-    var ptr = allocateZero<clib.CContext>();
+    var ptr = allocateZero<clib.CContext>(sizeOf<clib.CContext>());
     toC(ptr);
     return ptr;
   }
@@ -111,7 +111,7 @@ class ArrayCContext implements DC<clib.CArrayCContext> {
 
   @override
   Pointer<clib.CArrayCContext> toCPtr() {
-    var c = allocateZero<clib.CArrayCContext>();
+    var c = allocateZero<clib.CArrayCContext>(sizeOf<clib.CArrayCContext>());
     toC(c);
     return c;
   }
@@ -130,7 +130,8 @@ class ArrayCContext implements DC<clib.CArrayCContext> {
       Context.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CContext>(count: data.length);
+    c.ptr = allocateZero<clib.CContext>(sizeOf<clib.CContext>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -186,7 +187,7 @@ class Error implements DC<clib.CError> {
 
   @override
   Pointer<clib.CError> toCPtr() {
-    var ptr = allocateZero<clib.CError>();
+    var ptr = allocateZero<clib.CError>(sizeOf<clib.CError>());
     toC(ptr);
     return ptr;
   }
@@ -274,7 +275,7 @@ class Address implements DC<clib.CAddress> {
 
   @override
   Pointer<clib.CAddress> toCPtr() {
-    var ptr = allocateZero<clib.CAddress>();
+    var ptr = allocateZero<clib.CAddress>(sizeOf<clib.CAddress>());
     toC(ptr);
     return ptr;
   }
@@ -370,7 +371,7 @@ class ChainShared implements DC<clib.CChainShared> {
 
   @override
   Pointer<clib.CChainShared> toCPtr() {
-    var ptr = allocateZero<clib.CChainShared>();
+    var ptr = allocateZero<clib.CChainShared>(sizeOf<clib.CChainShared>());
     toC(ptr);
     return ptr;
   }
@@ -394,7 +395,7 @@ class ChainShared implements DC<clib.CChainShared> {
     }
     c.chainType = chainType.toCPtrInt8();
     if (c.walletAddress == nullptr) {
-      c.walletAddress = allocateZero<clib.CAddress>();
+      c.walletAddress = allocateZero<clib.CAddress>(sizeOf<clib.CAddress>());
     }
     walletAddress.toC(c.walletAddress);
   }
@@ -475,7 +476,7 @@ class TokenShared implements DC<clib.CTokenShared> {
 
   @override
   Pointer<clib.CTokenShared> toCPtr() {
-    var ptr = allocateZero<clib.CTokenShared>();
+    var ptr = allocateZero<clib.CTokenShared>(sizeOf<clib.CTokenShared>());
     toC(ptr);
     return ptr;
   }
@@ -579,7 +580,8 @@ class EthChainTokenShared implements DC<clib.CEthChainTokenShared> {
 
   @override
   Pointer<clib.CEthChainTokenShared> toCPtr() {
-    var ptr = allocateZero<clib.CEthChainTokenShared>();
+    var ptr = allocateZero<clib.CEthChainTokenShared>(
+        sizeOf<clib.CEthChainTokenShared>());
     toC(ptr);
     return ptr;
   }
@@ -595,7 +597,8 @@ class EthChainTokenShared implements DC<clib.CEthChainTokenShared> {
   @override
   toCInstance(clib.CEthChainTokenShared c) {
     if (c.tokenShared == nullptr) {
-      c.tokenShared = allocateZero<clib.CTokenShared>();
+      c.tokenShared =
+          allocateZero<clib.CTokenShared>(sizeOf<clib.CTokenShared>());
     }
     tokenShared.toC(c.tokenShared);
     if (c.tokenType != nullptr) {
@@ -667,7 +670,7 @@ class EthChainToken implements DC<clib.CEthChainToken> {
 
   @override
   Pointer<clib.CEthChainToken> toCPtr() {
-    var ptr = allocateZero<clib.CEthChainToken>();
+    var ptr = allocateZero<clib.CEthChainToken>(sizeOf<clib.CEthChainToken>());
     toC(ptr);
     return ptr;
   }
@@ -692,7 +695,8 @@ class EthChainToken implements DC<clib.CEthChainToken> {
     }
     c.contractAddress = contractAddress.toCPtrInt8();
     if (c.ethChainTokenShared == nullptr) {
-      c.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>();
+      c.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>(
+          sizeOf<clib.CEthChainTokenShared>());
     }
     ethChainTokenShared.toC(c.ethChainTokenShared);
   }
@@ -742,7 +746,8 @@ class ArrayCEthChainToken implements DC<clib.CArrayCEthChainToken> {
 
   @override
   Pointer<clib.CArrayCEthChainToken> toCPtr() {
-    var c = allocateZero<clib.CArrayCEthChainToken>();
+    var c = allocateZero<clib.CArrayCEthChainToken>(
+        sizeOf<clib.CArrayCEthChainToken>());
     toC(c);
     return c;
   }
@@ -761,7 +766,8 @@ class ArrayCEthChainToken implements DC<clib.CArrayCEthChainToken> {
       EthChainToken.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CEthChainToken>(count: data.length);
+    c.ptr = allocateZero<clib.CEthChainToken>(sizeOf<clib.CEthChainToken>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -817,7 +823,7 @@ class EthChain implements DC<clib.CEthChain> {
 
   @override
   Pointer<clib.CEthChain> toCPtr() {
-    var ptr = allocateZero<clib.CEthChain>();
+    var ptr = allocateZero<clib.CEthChain>(sizeOf<clib.CEthChain>());
     toC(ptr);
     return ptr;
   }
@@ -833,11 +839,13 @@ class EthChain implements DC<clib.CEthChain> {
   @override
   toCInstance(clib.CEthChain c) {
     if (c.chainShared == nullptr) {
-      c.chainShared = allocateZero<clib.CChainShared>();
+      c.chainShared =
+          allocateZero<clib.CChainShared>(sizeOf<clib.CChainShared>());
     }
     chainShared.toC(c.chainShared);
     if (c.tokens == nullptr) {
-      c.tokens = allocateZero<clib.CArrayCEthChainToken>();
+      c.tokens = allocateZero<clib.CArrayCEthChainToken>(
+          sizeOf<clib.CArrayCEthChainToken>());
     }
     tokens.toC(c.tokens);
   }
@@ -898,7 +906,8 @@ class EeeChainTokenShared implements DC<clib.CEeeChainTokenShared> {
 
   @override
   Pointer<clib.CEeeChainTokenShared> toCPtr() {
-    var ptr = allocateZero<clib.CEeeChainTokenShared>();
+    var ptr = allocateZero<clib.CEeeChainTokenShared>(
+        sizeOf<clib.CEeeChainTokenShared>());
     toC(ptr);
     return ptr;
   }
@@ -914,7 +923,8 @@ class EeeChainTokenShared implements DC<clib.CEeeChainTokenShared> {
   @override
   toCInstance(clib.CEeeChainTokenShared c) {
     if (c.tokenShared == nullptr) {
-      c.tokenShared = allocateZero<clib.CTokenShared>();
+      c.tokenShared =
+          allocateZero<clib.CTokenShared>(sizeOf<clib.CTokenShared>());
     }
     tokenShared.toC(c.tokenShared);
     if (c.tokenType != nullptr) {
@@ -981,7 +991,7 @@ class EeeChainToken implements DC<clib.CEeeChainToken> {
 
   @override
   Pointer<clib.CEeeChainToken> toCPtr() {
-    var ptr = allocateZero<clib.CEeeChainToken>();
+    var ptr = allocateZero<clib.CEeeChainToken>(sizeOf<clib.CEeeChainToken>());
     toC(ptr);
     return ptr;
   }
@@ -1002,7 +1012,8 @@ class EeeChainToken implements DC<clib.CEeeChainToken> {
     }
     c.chainTokenSharedId = chainTokenSharedId.toCPtrInt8();
     if (c.eeeChainTokenShared == nullptr) {
-      c.eeeChainTokenShared = allocateZero<clib.CEeeChainTokenShared>();
+      c.eeeChainTokenShared = allocateZero<clib.CEeeChainTokenShared>(
+          sizeOf<clib.CEeeChainTokenShared>());
     }
     eeeChainTokenShared.toC(c.eeeChainTokenShared);
   }
@@ -1051,7 +1062,8 @@ class ArrayCEeeChainToken implements DC<clib.CArrayCEeeChainToken> {
 
   @override
   Pointer<clib.CArrayCEeeChainToken> toCPtr() {
-    var c = allocateZero<clib.CArrayCEeeChainToken>();
+    var c = allocateZero<clib.CArrayCEeeChainToken>(
+        sizeOf<clib.CArrayCEeeChainToken>());
     toC(c);
     return c;
   }
@@ -1070,7 +1082,8 @@ class ArrayCEeeChainToken implements DC<clib.CArrayCEeeChainToken> {
       EeeChainToken.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CEeeChainToken>(count: data.length);
+    c.ptr = allocateZero<clib.CEeeChainToken>(sizeOf<clib.CEeeChainToken>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -1126,7 +1139,7 @@ class EeeChain implements DC<clib.CEeeChain> {
 
   @override
   Pointer<clib.CEeeChain> toCPtr() {
-    var ptr = allocateZero<clib.CEeeChain>();
+    var ptr = allocateZero<clib.CEeeChain>(sizeOf<clib.CEeeChain>());
     toC(ptr);
     return ptr;
   }
@@ -1142,11 +1155,13 @@ class EeeChain implements DC<clib.CEeeChain> {
   @override
   toCInstance(clib.CEeeChain c) {
     if (c.chainShared == nullptr) {
-      c.chainShared = allocateZero<clib.CChainShared>();
+      c.chainShared =
+          allocateZero<clib.CChainShared>(sizeOf<clib.CChainShared>());
     }
     chainShared.toC(c.chainShared);
     if (c.tokens == nullptr) {
-      c.tokens = allocateZero<clib.CArrayCEeeChainToken>();
+      c.tokens = allocateZero<clib.CArrayCEeeChainToken>(
+          sizeOf<clib.CArrayCEeeChainToken>());
     }
     tokens.toC(c.tokens);
   }
@@ -1202,7 +1217,8 @@ class BtcChainTokenShared implements DC<clib.CBtcChainTokenShared> {
 
   @override
   Pointer<clib.CBtcChainTokenShared> toCPtr() {
-    var ptr = allocateZero<clib.CBtcChainTokenShared>();
+    var ptr = allocateZero<clib.CBtcChainTokenShared>(
+        sizeOf<clib.CBtcChainTokenShared>());
     toC(ptr);
     return ptr;
   }
@@ -1218,7 +1234,8 @@ class BtcChainTokenShared implements DC<clib.CBtcChainTokenShared> {
   @override
   toCInstance(clib.CBtcChainTokenShared c) {
     if (c.tokenShared == nullptr) {
-      c.tokenShared = allocateZero<clib.CTokenShared>();
+      c.tokenShared =
+          allocateZero<clib.CTokenShared>(sizeOf<clib.CTokenShared>());
     }
     tokenShared.toC(c.tokenShared);
     if (c.tokenType != nullptr) {
@@ -1280,7 +1297,7 @@ class BtcChainToken implements DC<clib.CBtcChainToken> {
 
   @override
   Pointer<clib.CBtcChainToken> toCPtr() {
-    var ptr = allocateZero<clib.CBtcChainToken>();
+    var ptr = allocateZero<clib.CBtcChainToken>(sizeOf<clib.CBtcChainToken>());
     toC(ptr);
     return ptr;
   }
@@ -1301,7 +1318,8 @@ class BtcChainToken implements DC<clib.CBtcChainToken> {
     }
     c.chainTokenSharedId = chainTokenSharedId.toCPtrInt8();
     if (c.btcChainTokenShared == nullptr) {
-      c.btcChainTokenShared = allocateZero<clib.CBtcChainTokenShared>();
+      c.btcChainTokenShared = allocateZero<clib.CBtcChainTokenShared>(
+          sizeOf<clib.CBtcChainTokenShared>());
     }
     btcChainTokenShared.toC(c.btcChainTokenShared);
   }
@@ -1350,7 +1368,8 @@ class ArrayCBtcChainToken implements DC<clib.CArrayCBtcChainToken> {
 
   @override
   Pointer<clib.CArrayCBtcChainToken> toCPtr() {
-    var c = allocateZero<clib.CArrayCBtcChainToken>();
+    var c = allocateZero<clib.CArrayCBtcChainToken>(
+        sizeOf<clib.CArrayCBtcChainToken>());
     toC(c);
     return c;
   }
@@ -1369,7 +1388,8 @@ class ArrayCBtcChainToken implements DC<clib.CArrayCBtcChainToken> {
       BtcChainToken.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CBtcChainToken>(count: data.length);
+    c.ptr = allocateZero<clib.CBtcChainToken>(sizeOf<clib.CBtcChainToken>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -1425,7 +1445,7 @@ class BtcChain implements DC<clib.CBtcChain> {
 
   @override
   Pointer<clib.CBtcChain> toCPtr() {
-    var ptr = allocateZero<clib.CBtcChain>();
+    var ptr = allocateZero<clib.CBtcChain>(sizeOf<clib.CBtcChain>());
     toC(ptr);
     return ptr;
   }
@@ -1441,11 +1461,13 @@ class BtcChain implements DC<clib.CBtcChain> {
   @override
   toCInstance(clib.CBtcChain c) {
     if (c.chainShared == nullptr) {
-      c.chainShared = allocateZero<clib.CChainShared>();
+      c.chainShared =
+          allocateZero<clib.CChainShared>(sizeOf<clib.CChainShared>());
     }
     chainShared.toC(c.chainShared);
     if (c.tokens == nullptr) {
-      c.tokens = allocateZero<clib.CArrayCBtcChainToken>();
+      c.tokens = allocateZero<clib.CArrayCBtcChainToken>(
+          sizeOf<clib.CArrayCBtcChainToken>());
     }
     tokens.toC(c.tokens);
   }
@@ -1520,7 +1542,7 @@ class Wallet implements DC<clib.CWallet> {
 
   @override
   Pointer<clib.CWallet> toCPtr() {
-    var ptr = allocateZero<clib.CWallet>();
+    var ptr = allocateZero<clib.CWallet>(sizeOf<clib.CWallet>());
     toC(ptr);
     return ptr;
   }
@@ -1552,15 +1574,15 @@ class Wallet implements DC<clib.CWallet> {
     }
     c.walletType = walletType.toCPtrInt8();
     if (c.ethChain == nullptr) {
-      c.ethChain = allocateZero<clib.CEthChain>();
+      c.ethChain = allocateZero<clib.CEthChain>(sizeOf<clib.CEthChain>());
     }
     ethChain.toC(c.ethChain);
     if (c.eeeChain == nullptr) {
-      c.eeeChain = allocateZero<clib.CEeeChain>();
+      c.eeeChain = allocateZero<clib.CEeeChain>(sizeOf<clib.CEeeChain>());
     }
     eeeChain.toC(c.eeeChain);
     if (c.btcChain == nullptr) {
-      c.btcChain = allocateZero<clib.CBtcChain>();
+      c.btcChain = allocateZero<clib.CBtcChain>(sizeOf<clib.CBtcChain>());
     }
     btcChain.toC(c.btcChain);
   }
@@ -1615,7 +1637,7 @@ class ArrayCWallet implements DC<clib.CArrayCWallet> {
 
   @override
   Pointer<clib.CArrayCWallet> toCPtr() {
-    var c = allocateZero<clib.CArrayCWallet>();
+    var c = allocateZero<clib.CArrayCWallet>(sizeOf<clib.CArrayCWallet>());
     toC(c);
     return c;
   }
@@ -1634,7 +1656,8 @@ class ArrayCWallet implements DC<clib.CArrayCWallet> {
       Wallet.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CWallet>(count: data.length);
+    c.ptr =
+        allocateZero<clib.CWallet>(sizeOf<clib.CWallet>(), count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -1724,7 +1747,7 @@ class DbName implements DC<clib.CDbName> {
 
   @override
   Pointer<clib.CDbName> toCPtr() {
-    var ptr = allocateZero<clib.CDbName>();
+    var ptr = allocateZero<clib.CDbName>(sizeOf<clib.CDbName>());
     toC(ptr);
     return ptr;
   }
@@ -1821,7 +1844,7 @@ class ArrayI64 implements DC<clib.CArrayI64> {
 
   @override
   Pointer<clib.CArrayI64> toCPtr() {
-    var c = allocateZero<clib.CArrayI64>();
+    var c = allocateZero<clib.CArrayI64>(sizeOf<clib.CArrayI64>());
     toC(c);
     return c;
   }
@@ -1840,7 +1863,7 @@ class ArrayI64 implements DC<clib.CArrayI64> {
       c.ptr.free();
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<Int64>(count: data.length);
+    c.ptr = allocateZero<Int64>(sizeOf<Int64>(), count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -1904,7 +1927,8 @@ class AccountInfoSyncProg implements DC<clib.CAccountInfoSyncProg> {
 
   @override
   Pointer<clib.CAccountInfoSyncProg> toCPtr() {
-    var ptr = allocateZero<clib.CAccountInfoSyncProg>();
+    var ptr = allocateZero<clib.CAccountInfoSyncProg>(
+        sizeOf<clib.CAccountInfoSyncProg>());
     toC(ptr);
     return ptr;
   }
@@ -1995,7 +2019,7 @@ class AccountInfo implements DC<clib.CAccountInfo> {
 
   @override
   Pointer<clib.CAccountInfo> toCPtr() {
-    var ptr = allocateZero<clib.CAccountInfo>();
+    var ptr = allocateZero<clib.CAccountInfo>(sizeOf<clib.CAccountInfo>());
     toC(ptr);
     return ptr;
   }
@@ -2093,7 +2117,8 @@ class SubChainBasicInfo implements DC<clib.CSubChainBasicInfo> {
 
   @override
   Pointer<clib.CSubChainBasicInfo> toCPtr() {
-    var ptr = allocateZero<clib.CSubChainBasicInfo>();
+    var ptr = allocateZero<clib.CSubChainBasicInfo>(
+        sizeOf<clib.CSubChainBasicInfo>());
     toC(ptr);
     return ptr;
   }
@@ -2175,7 +2200,7 @@ class ArrayCChar implements DC<clib.CArrayCChar> {
 
   @override
   Pointer<clib.CArrayCChar> toCPtr() {
-    var c = allocateZero<clib.CArrayCChar>();
+    var c = allocateZero<clib.CArrayCChar>(sizeOf<clib.CArrayCChar>());
     toC(c);
     return c;
   }
@@ -2194,7 +2219,8 @@ class ArrayCChar implements DC<clib.CArrayCChar> {
       c.ptr.free(c.len);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<Pointer<Int8>>(count: data.length);
+    c.ptr = allocateZero<Pointer<Int8>>(sizeOf<Pointer<Int8>>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -2250,7 +2276,7 @@ class ChainVersion implements DC<clib.CChainVersion> {
 
   @override
   Pointer<clib.CChainVersion> toCPtr() {
-    var ptr = allocateZero<clib.CChainVersion>();
+    var ptr = allocateZero<clib.CChainVersion>(sizeOf<clib.CChainVersion>());
     toC(ptr);
     return ptr;
   }
@@ -2339,7 +2365,8 @@ class ExtrinsicContext implements DC<clib.CExtrinsicContext> {
 
   @override
   Pointer<clib.CExtrinsicContext> toCPtr() {
-    var ptr = allocateZero<clib.CExtrinsicContext>();
+    var ptr =
+        allocateZero<clib.CExtrinsicContext>(sizeOf<clib.CExtrinsicContext>());
     toC(ptr);
     return ptr;
   }
@@ -2355,7 +2382,8 @@ class ExtrinsicContext implements DC<clib.CExtrinsicContext> {
   @override
   toCInstance(clib.CExtrinsicContext c) {
     if (c.chainVersion == nullptr) {
-      c.chainVersion = allocateZero<clib.CChainVersion>();
+      c.chainVersion =
+          allocateZero<clib.CChainVersion>(sizeOf<clib.CChainVersion>());
     }
     chainVersion.toC(c.chainVersion);
     if (c.account != nullptr) {
@@ -2375,7 +2403,7 @@ class ExtrinsicContext implements DC<clib.CExtrinsicContext> {
     }
     c.event = event.toCPtrInt8();
     if (c.extrinsics == nullptr) {
-      c.extrinsics = allocateZero<clib.CArrayCChar>();
+      c.extrinsics = allocateZero<clib.CArrayCChar>(sizeOf<clib.CArrayCChar>());
     }
     extrinsics.toC(c.extrinsics);
   }
@@ -2429,7 +2457,8 @@ class ArrayCExtrinsicContext implements DC<clib.CArrayCExtrinsicContext> {
 
   @override
   Pointer<clib.CArrayCExtrinsicContext> toCPtr() {
-    var c = allocateZero<clib.CArrayCExtrinsicContext>();
+    var c = allocateZero<clib.CArrayCExtrinsicContext>(
+        sizeOf<clib.CArrayCExtrinsicContext>());
     toC(c);
     return c;
   }
@@ -2448,7 +2477,9 @@ class ArrayCExtrinsicContext implements DC<clib.CArrayCExtrinsicContext> {
       ExtrinsicContext.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CExtrinsicContext>(count: data.length);
+    c.ptr = allocateZero<clib.CExtrinsicContext>(
+        sizeOf<clib.CExtrinsicContext>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -2523,7 +2554,7 @@ class TokenAddress implements DC<clib.CTokenAddress> {
 
   @override
   Pointer<clib.CTokenAddress> toCPtr() {
-    var ptr = allocateZero<clib.CTokenAddress>();
+    var ptr = allocateZero<clib.CTokenAddress>(sizeOf<clib.CTokenAddress>());
     toC(ptr);
     return ptr;
   }
@@ -2605,7 +2636,8 @@ class ArrayCTokenAddress implements DC<clib.CArrayCTokenAddress> {
 
   @override
   Pointer<clib.CArrayCTokenAddress> toCPtr() {
-    var c = allocateZero<clib.CArrayCTokenAddress>();
+    var c = allocateZero<clib.CArrayCTokenAddress>(
+        sizeOf<clib.CArrayCTokenAddress>());
     toC(c);
     return c;
   }
@@ -2624,7 +2656,8 @@ class ArrayCTokenAddress implements DC<clib.CArrayCTokenAddress> {
       TokenAddress.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CTokenAddress>(count: data.length);
+    c.ptr = allocateZero<clib.CTokenAddress>(sizeOf<clib.CTokenAddress>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -2693,7 +2726,8 @@ class EthChainTokenAuth implements DC<clib.CEthChainTokenAuth> {
 
   @override
   Pointer<clib.CEthChainTokenAuth> toCPtr() {
-    var ptr = allocateZero<clib.CEthChainTokenAuth>();
+    var ptr = allocateZero<clib.CEthChainTokenAuth>(
+        sizeOf<clib.CEthChainTokenAuth>());
     toC(ptr);
     return ptr;
   }
@@ -2722,7 +2756,8 @@ class EthChainTokenAuth implements DC<clib.CEthChainTokenAuth> {
     }
     c.contractAddress = contractAddress.toCPtrInt8();
     if (c.ethChainTokenShared == nullptr) {
-      c.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>();
+      c.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>(
+          sizeOf<clib.CEthChainTokenShared>());
     }
     ethChainTokenShared.toC(c.ethChainTokenShared);
   }
@@ -2774,7 +2809,8 @@ class ArrayCEthChainTokenAuth implements DC<clib.CArrayCEthChainTokenAuth> {
 
   @override
   Pointer<clib.CArrayCEthChainTokenAuth> toCPtr() {
-    var c = allocateZero<clib.CArrayCEthChainTokenAuth>();
+    var c = allocateZero<clib.CArrayCEthChainTokenAuth>(
+        sizeOf<clib.CArrayCEthChainTokenAuth>());
     toC(c);
     return c;
   }
@@ -2793,7 +2829,9 @@ class ArrayCEthChainTokenAuth implements DC<clib.CArrayCEthChainTokenAuth> {
       EthChainTokenAuth.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CEthChainTokenAuth>(count: data.length);
+    c.ptr = allocateZero<clib.CEthChainTokenAuth>(
+        sizeOf<clib.CEthChainTokenAuth>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -2862,7 +2900,8 @@ class EthChainTokenNonAuth implements DC<clib.CEthChainTokenNonAuth> {
 
   @override
   Pointer<clib.CEthChainTokenNonAuth> toCPtr() {
-    var ptr = allocateZero<clib.CEthChainTokenNonAuth>();
+    var ptr = allocateZero<clib.CEthChainTokenNonAuth>(
+        sizeOf<clib.CEthChainTokenNonAuth>());
     toC(ptr);
     return ptr;
   }
@@ -2891,7 +2930,8 @@ class EthChainTokenNonAuth implements DC<clib.CEthChainTokenNonAuth> {
     }
     c.contractAddress = contractAddress.toCPtrInt8();
     if (c.ethChainTokenShared == nullptr) {
-      c.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>();
+      c.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>(
+          sizeOf<clib.CEthChainTokenShared>());
     }
     ethChainTokenShared.toC(c.ethChainTokenShared);
   }
@@ -2944,7 +2984,8 @@ class ArrayCEthChainTokenNonAuth
 
   @override
   Pointer<clib.CArrayCEthChainTokenNonAuth> toCPtr() {
-    var c = allocateZero<clib.CArrayCEthChainTokenNonAuth>();
+    var c = allocateZero<clib.CArrayCEthChainTokenNonAuth>(
+        sizeOf<clib.CArrayCEthChainTokenNonAuth>());
     toC(c);
     return c;
   }
@@ -2963,7 +3004,9 @@ class ArrayCEthChainTokenNonAuth
       EthChainTokenNonAuth.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CEthChainTokenNonAuth>(count: data.length);
+    c.ptr = allocateZero<clib.CEthChainTokenNonAuth>(
+        sizeOf<clib.CEthChainTokenNonAuth>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -3032,7 +3075,8 @@ class EthChainTokenDefault implements DC<clib.CEthChainTokenDefault> {
 
   @override
   Pointer<clib.CEthChainTokenDefault> toCPtr() {
-    var ptr = allocateZero<clib.CEthChainTokenDefault>();
+    var ptr = allocateZero<clib.CEthChainTokenDefault>(
+        sizeOf<clib.CEthChainTokenDefault>());
     toC(ptr);
     return ptr;
   }
@@ -3061,7 +3105,8 @@ class EthChainTokenDefault implements DC<clib.CEthChainTokenDefault> {
     }
     c.contractAddress = contractAddress.toCPtrInt8();
     if (c.ethChainTokenShared == nullptr) {
-      c.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>();
+      c.ethChainTokenShared = allocateZero<clib.CEthChainTokenShared>(
+          sizeOf<clib.CEthChainTokenShared>());
     }
     ethChainTokenShared.toC(c.ethChainTokenShared);
   }
@@ -3114,7 +3159,8 @@ class ArrayCEthChainTokenDefault
 
   @override
   Pointer<clib.CArrayCEthChainTokenDefault> toCPtr() {
-    var c = allocateZero<clib.CArrayCEthChainTokenDefault>();
+    var c = allocateZero<clib.CArrayCEthChainTokenDefault>(
+        sizeOf<clib.CArrayCEthChainTokenDefault>());
     toC(c);
     return c;
   }
@@ -3133,7 +3179,9 @@ class ArrayCEthChainTokenDefault
       EthChainTokenDefault.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CEthChainTokenDefault>(count: data.length);
+    c.ptr = allocateZero<clib.CEthChainTokenDefault>(
+        sizeOf<clib.CEthChainTokenDefault>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -3197,7 +3245,8 @@ class EeeChainTokenDefault implements DC<clib.CEeeChainTokenDefault> {
 
   @override
   Pointer<clib.CEeeChainTokenDefault> toCPtr() {
-    var ptr = allocateZero<clib.CEeeChainTokenDefault>();
+    var ptr = allocateZero<clib.CEeeChainTokenDefault>(
+        sizeOf<clib.CEeeChainTokenDefault>());
     toC(ptr);
     return ptr;
   }
@@ -3222,7 +3271,8 @@ class EeeChainTokenDefault implements DC<clib.CEeeChainTokenDefault> {
     c.netType = netType.toCPtrInt8();
     c.position = position;
     if (c.eeeChainTokenShared == nullptr) {
-      c.eeeChainTokenShared = allocateZero<clib.CEeeChainTokenShared>();
+      c.eeeChainTokenShared = allocateZero<clib.CEeeChainTokenShared>(
+          sizeOf<clib.CEeeChainTokenShared>());
     }
     eeeChainTokenShared.toC(c.eeeChainTokenShared);
   }
@@ -3274,7 +3324,8 @@ class ArrayCEeeChainTokenDefault
 
   @override
   Pointer<clib.CArrayCEeeChainTokenDefault> toCPtr() {
-    var c = allocateZero<clib.CArrayCEeeChainTokenDefault>();
+    var c = allocateZero<clib.CArrayCEeeChainTokenDefault>(
+        sizeOf<clib.CArrayCEeeChainTokenDefault>());
     toC(c);
     return c;
   }
@@ -3293,7 +3344,9 @@ class ArrayCEeeChainTokenDefault
       EeeChainTokenDefault.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CEeeChainTokenDefault>(count: data.length);
+    c.ptr = allocateZero<clib.CEeeChainTokenDefault>(
+        sizeOf<clib.CEeeChainTokenDefault>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -3357,7 +3410,8 @@ class BtcChainTokenDefault implements DC<clib.CBtcChainTokenDefault> {
 
   @override
   Pointer<clib.CBtcChainTokenDefault> toCPtr() {
-    var ptr = allocateZero<clib.CBtcChainTokenDefault>();
+    var ptr = allocateZero<clib.CBtcChainTokenDefault>(
+        sizeOf<clib.CBtcChainTokenDefault>());
     toC(ptr);
     return ptr;
   }
@@ -3382,7 +3436,8 @@ class BtcChainTokenDefault implements DC<clib.CBtcChainTokenDefault> {
     c.netType = netType.toCPtrInt8();
     c.position = position;
     if (c.btcChainTokenShared == nullptr) {
-      c.btcChainTokenShared = allocateZero<clib.CBtcChainTokenShared>();
+      c.btcChainTokenShared = allocateZero<clib.CBtcChainTokenShared>(
+          sizeOf<clib.CBtcChainTokenShared>());
     }
     btcChainTokenShared.toC(c.btcChainTokenShared);
   }
@@ -3434,7 +3489,8 @@ class ArrayCBtcChainTokenDefault
 
   @override
   Pointer<clib.CArrayCBtcChainTokenDefault> toCPtr() {
-    var c = allocateZero<clib.CArrayCBtcChainTokenDefault>();
+    var c = allocateZero<clib.CArrayCBtcChainTokenDefault>(
+        sizeOf<clib.CArrayCBtcChainTokenDefault>());
     toC(c);
     return c;
   }
@@ -3453,7 +3509,9 @@ class ArrayCBtcChainTokenDefault
       BtcChainTokenDefault.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CBtcChainTokenDefault>(count: data.length);
+    c.ptr = allocateZero<clib.CBtcChainTokenDefault>(
+        sizeOf<clib.CBtcChainTokenDefault>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -3517,7 +3575,8 @@ class EeeChainTokenAuth implements DC<clib.CEeeChainTokenAuth> {
 
   @override
   Pointer<clib.CEeeChainTokenAuth> toCPtr() {
-    var ptr = allocateZero<clib.CEeeChainTokenAuth>();
+    var ptr = allocateZero<clib.CEeeChainTokenAuth>(
+        sizeOf<clib.CEeeChainTokenAuth>());
     toC(ptr);
     return ptr;
   }
@@ -3542,7 +3601,8 @@ class EeeChainTokenAuth implements DC<clib.CEeeChainTokenAuth> {
     c.netType = netType.toCPtrInt8();
     c.position = position;
     if (c.eeeChainTokenShared == nullptr) {
-      c.eeeChainTokenShared = allocateZero<clib.CEeeChainTokenShared>();
+      c.eeeChainTokenShared = allocateZero<clib.CEeeChainTokenShared>(
+          sizeOf<clib.CEeeChainTokenShared>());
     }
     eeeChainTokenShared.toC(c.eeeChainTokenShared);
   }
@@ -3593,7 +3653,8 @@ class ArrayCEeeChainTokenAuth implements DC<clib.CArrayCEeeChainTokenAuth> {
 
   @override
   Pointer<clib.CArrayCEeeChainTokenAuth> toCPtr() {
-    var c = allocateZero<clib.CArrayCEeeChainTokenAuth>();
+    var c = allocateZero<clib.CArrayCEeeChainTokenAuth>(
+        sizeOf<clib.CArrayCEeeChainTokenAuth>());
     toC(c);
     return c;
   }
@@ -3612,7 +3673,9 @@ class ArrayCEeeChainTokenAuth implements DC<clib.CArrayCEeeChainTokenAuth> {
       EeeChainTokenAuth.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CEeeChainTokenAuth>(count: data.length);
+    c.ptr = allocateZero<clib.CEeeChainTokenAuth>(
+        sizeOf<clib.CEeeChainTokenAuth>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -3676,7 +3739,8 @@ class BtcChainTokenAuth implements DC<clib.CBtcChainTokenAuth> {
 
   @override
   Pointer<clib.CBtcChainTokenAuth> toCPtr() {
-    var ptr = allocateZero<clib.CBtcChainTokenAuth>();
+    var ptr = allocateZero<clib.CBtcChainTokenAuth>(
+        sizeOf<clib.CBtcChainTokenAuth>());
     toC(ptr);
     return ptr;
   }
@@ -3701,7 +3765,8 @@ class BtcChainTokenAuth implements DC<clib.CBtcChainTokenAuth> {
     c.netType = netType.toCPtrInt8();
     c.position = position;
     if (c.btcChainTokenShared == nullptr) {
-      c.btcChainTokenShared = allocateZero<clib.CBtcChainTokenShared>();
+      c.btcChainTokenShared = allocateZero<clib.CBtcChainTokenShared>(
+          sizeOf<clib.CBtcChainTokenShared>());
     }
     btcChainTokenShared.toC(c.btcChainTokenShared);
   }
@@ -3752,7 +3817,8 @@ class ArrayCBtcChainTokenAuth implements DC<clib.CArrayCBtcChainTokenAuth> {
 
   @override
   Pointer<clib.CArrayCBtcChainTokenAuth> toCPtr() {
-    var c = allocateZero<clib.CArrayCBtcChainTokenAuth>();
+    var c = allocateZero<clib.CArrayCBtcChainTokenAuth>(
+        sizeOf<clib.CArrayCBtcChainTokenAuth>());
     toC(c);
     return c;
   }
@@ -3771,7 +3837,9 @@ class ArrayCBtcChainTokenAuth implements DC<clib.CArrayCBtcChainTokenAuth> {
       BtcChainTokenAuth.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CBtcChainTokenAuth>(count: data.length);
+    c.ptr = allocateZero<clib.CBtcChainTokenAuth>(
+        sizeOf<clib.CBtcChainTokenAuth>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -3873,7 +3941,7 @@ class EeeChainTx implements DC<clib.CEeeChainTx> {
 
   @override
   Pointer<clib.CEeeChainTx> toCPtr() {
-    var ptr = allocateZero<clib.CEeeChainTx>();
+    var ptr = allocateZero<clib.CEeeChainTx>(sizeOf<clib.CEeeChainTx>());
     toC(ptr);
     return ptr;
   }
@@ -3984,7 +4052,8 @@ class ArrayCEeeChainTx implements DC<clib.CArrayCEeeChainTx> {
 
   @override
   Pointer<clib.CArrayCEeeChainTx> toCPtr() {
-    var c = allocateZero<clib.CArrayCEeeChainTx>();
+    var c =
+        allocateZero<clib.CArrayCEeeChainTx>(sizeOf<clib.CArrayCEeeChainTx>());
     toC(c);
     return c;
   }
@@ -4003,7 +4072,8 @@ class ArrayCEeeChainTx implements DC<clib.CArrayCEeeChainTx> {
       EeeChainTx.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CEeeChainTx>(count: data.length);
+    c.ptr = allocateZero<clib.CEeeChainTx>(sizeOf<clib.CEeeChainTx>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -4069,7 +4139,8 @@ class WalletTokenStatus implements DC<clib.CWalletTokenStatus> {
 
   @override
   Pointer<clib.CWalletTokenStatus> toCPtr() {
-    var ptr = allocateZero<clib.CWalletTokenStatus>();
+    var ptr = allocateZero<clib.CWalletTokenStatus>(
+        sizeOf<clib.CWalletTokenStatus>());
     toC(ptr);
     return ptr;
   }
@@ -4149,7 +4220,8 @@ class InitParameters implements DC<clib.CInitParameters> {
 
   @override
   Pointer<clib.CInitParameters> toCPtr() {
-    var ptr = allocateZero<clib.CInitParameters>();
+    var ptr =
+        allocateZero<clib.CInitParameters>(sizeOf<clib.CInitParameters>());
     toC(ptr);
     return ptr;
   }
@@ -4165,7 +4237,7 @@ class InitParameters implements DC<clib.CInitParameters> {
   @override
   toCInstance(clib.CInitParameters c) {
     if (c.dbName == nullptr) {
-      c.dbName = allocateZero<clib.CDbName>();
+      c.dbName = allocateZero<clib.CDbName>(sizeOf<clib.CDbName>());
     }
     dbName.toC(c.dbName);
     c.isMemoryDb = isMemoryDb;
@@ -4237,7 +4309,8 @@ class CreateWalletParameters implements DC<clib.CCreateWalletParameters> {
 
   @override
   Pointer<clib.CCreateWalletParameters> toCPtr() {
-    var ptr = allocateZero<clib.CCreateWalletParameters>();
+    var ptr = allocateZero<clib.CCreateWalletParameters>(
+        sizeOf<clib.CCreateWalletParameters>());
     toC(ptr);
     return ptr;
   }
@@ -4322,7 +4395,8 @@ class BtcNowLoadBlock implements DC<clib.CBtcNowLoadBlock> {
 
   @override
   Pointer<clib.CBtcNowLoadBlock> toCPtr() {
-    var ptr = allocateZero<clib.CBtcNowLoadBlock>();
+    var ptr =
+        allocateZero<clib.CBtcNowLoadBlock>(sizeOf<clib.CBtcNowLoadBlock>());
     toC(ptr);
     return ptr;
   }
@@ -4398,7 +4472,8 @@ class DecodeAccountInfoParameters
 
   @override
   Pointer<clib.CDecodeAccountInfoParameters> toCPtr() {
-    var ptr = allocateZero<clib.CDecodeAccountInfoParameters>();
+    var ptr = allocateZero<clib.CDecodeAccountInfoParameters>(
+        sizeOf<clib.CDecodeAccountInfoParameters>());
     toC(ptr);
     return ptr;
   }
@@ -4418,7 +4493,8 @@ class DecodeAccountInfoParameters
     }
     c.encodeData = encodeData.toCPtrInt8();
     if (c.chainVersion == nullptr) {
-      c.chainVersion = allocateZero<clib.CChainVersion>();
+      c.chainVersion =
+          allocateZero<clib.CChainVersion>(sizeOf<clib.CChainVersion>());
     }
     chainVersion.toC(c.chainVersion);
   }
@@ -4481,7 +4557,8 @@ class StorageKeyParameters implements DC<clib.CStorageKeyParameters> {
 
   @override
   Pointer<clib.CStorageKeyParameters> toCPtr() {
-    var ptr = allocateZero<clib.CStorageKeyParameters>();
+    var ptr = allocateZero<clib.CStorageKeyParameters>(
+        sizeOf<clib.CStorageKeyParameters>());
     toC(ptr);
     return ptr;
   }
@@ -4497,7 +4574,8 @@ class StorageKeyParameters implements DC<clib.CStorageKeyParameters> {
   @override
   toCInstance(clib.CStorageKeyParameters c) {
     if (c.chainVersion == nullptr) {
-      c.chainVersion = allocateZero<clib.CChainVersion>();
+      c.chainVersion =
+          allocateZero<clib.CChainVersion>(sizeOf<clib.CChainVersion>());
     }
     chainVersion.toC(c.chainVersion);
     if (c.module != nullptr) {
@@ -4585,7 +4663,8 @@ class EeeTransferPayload implements DC<clib.CEeeTransferPayload> {
 
   @override
   Pointer<clib.CEeeTransferPayload> toCPtr() {
-    var ptr = allocateZero<clib.CEeeTransferPayload>();
+    var ptr = allocateZero<clib.CEeeTransferPayload>(
+        sizeOf<clib.CEeeTransferPayload>());
     toC(ptr);
     return ptr;
   }
@@ -4614,7 +4693,8 @@ class EeeTransferPayload implements DC<clib.CEeeTransferPayload> {
     c.value = value.toCPtrInt8();
     c.index = index;
     if (c.chainVersion == nullptr) {
-      c.chainVersion = allocateZero<clib.CChainVersion>();
+      c.chainVersion =
+          allocateZero<clib.CChainVersion>(sizeOf<clib.CChainVersion>());
     }
     chainVersion.toC(c.chainVersion);
     if (c.extData != nullptr) {
@@ -4687,7 +4767,7 @@ class RawTxParam implements DC<clib.CRawTxParam> {
 
   @override
   Pointer<clib.CRawTxParam> toCPtr() {
-    var ptr = allocateZero<clib.CRawTxParam>();
+    var ptr = allocateZero<clib.CRawTxParam>(sizeOf<clib.CRawTxParam>());
     toC(ptr);
     return ptr;
   }
@@ -4797,7 +4877,8 @@ class EthTransferPayload implements DC<clib.CEthTransferPayload> {
 
   @override
   Pointer<clib.CEthTransferPayload> toCPtr() {
-    var ptr = allocateZero<clib.CEthTransferPayload>();
+    var ptr = allocateZero<clib.CEthTransferPayload>(
+        sizeOf<clib.CEthTransferPayload>());
     toC(ptr);
     return ptr;
   }
@@ -4903,7 +4984,8 @@ class EthRawTxPayload implements DC<clib.CEthRawTxPayload> {
 
   @override
   Pointer<clib.CEthRawTxPayload> toCPtr() {
-    var ptr = allocateZero<clib.CEthRawTxPayload>();
+    var ptr =
+        allocateZero<clib.CEthRawTxPayload>(sizeOf<clib.CEthRawTxPayload>());
     toC(ptr);
     return ptr;
   }

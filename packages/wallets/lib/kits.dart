@@ -7,8 +7,8 @@ import 'package:wallets/wallets_c.dc.dart';
 const int CTrue = 1;
 const int CFalse = 0;
 //分配置内存并清零
-Pointer<T> allocateZero<T extends NativeType>({int count = 1}) {
-  final int totalSize = count * sizeOf<T>();
+Pointer<T> allocateZero<T extends NativeType>(int byteCount,{int count = 1}) {
+  final int totalSize = count * byteCount;
   var ptr = ffi.calloc.allocate<T>(totalSize);
   var temp = ptr.cast<Uint8>();
   for (var i = 0; i < totalSize; i++) {

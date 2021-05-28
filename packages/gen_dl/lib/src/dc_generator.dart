@@ -164,7 +164,7 @@ import 'kits.dart';
             free.writeln('${_blankTwo}instance.${f.name} = nullptr;');
 
             toC.writeln(
-                '${_blankTwo}if (c.${f.name} == nullptr) {c.${f.name} = allocateZero<clib.${f.typeName}>();}');
+                '${_blankTwo}if (c.${f.name} == nullptr) {c.${f.name} = allocateZero<clib.${f.typeName}>(sizeOf<clib.${f.typeName}>());}');
             toC.writeln('${_blankTwo}${f.name}.toC(c.${f.name});');
             toDart.writeln('${_blankTwo}${f.name} = new ${className}();');
             toDart.writeln('${_blankTwo}${f.name}.toDart(c.${f.name});');
@@ -242,7 +242,7 @@ ${free.toString()}
     classCode.writeln('''
   @override
   Pointer<clib.${c.name}> toCPtr() {
-${_blankTwo}var ptr = allocateZero<clib.${c.name}>();
+${_blankTwo}var ptr = allocateZero<clib.${c.name}>(sizeOf<clib.${c.name}>());
 ${_blankTwo}toC(ptr);
 ${_blankTwo}return ptr;
   }
@@ -380,7 +380,7 @@ ${toDart.toString()}  }''');
 
   @override
   Pointer<clib.${c.name}> toCPtr() {
-    var c = allocateZero<clib.${c.name}>();
+    var c = allocateZero<clib.${c.name}>(sizeOf<clib.${c.name}>());
     toC(c);
     return c;
   }
@@ -399,7 +399,7 @@ ${toDart.toString()}  }''');
       ${elementType == _FieldType.baseType ? "c.ptr.free()" : (elementType == _FieldType.pointerStringUtf8 || elementType == _FieldType.pointerStringInt8 ? "c.ptr.free(c.len)" : elName + ".free(c.ptr)")};
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<${elNameAllocate}>(count : data.length);
+    c.ptr = allocateZero<${elNameAllocate}>(sizeOf<${elNameAllocate}>(),count : data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length;i++) {
