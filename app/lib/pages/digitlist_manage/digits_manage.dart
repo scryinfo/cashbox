@@ -184,8 +184,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     String signInfo = await AppInfoControl.instance.getAppSignInfo();
     String deviceId = await AppInfoControl.instance.getDeviceId();
     String apkVersion = await AppInfoControl.instance.getAppVersion();
-    // todo changeIp online version
-    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
+    var refresh = RefreshOpen.get(new ConnectParameter("cashbox.scry.info", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
     return refresh;
   }
 

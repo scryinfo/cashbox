@@ -11,6 +11,7 @@ import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/control/app_info_control.dart';
+import 'package:grpc/grpc.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -25,6 +26,7 @@ import 'package:wallets/wallets_c.dc.dart';
 import 'eth_page.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
 import 'package:services/src/rpc_face/cashbox_config_open.pbgrpc.dart';
+import 'package:services/src/rpc_face/cashbox_version_open.pbgrpc.dart';
 import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
 
 class EntrancePage extends StatefulWidget {
@@ -78,7 +80,11 @@ class _EntrancePageState extends State<EntrancePage> {
       Logger().i("_checkAndUpdateAppConfig(), nowTimeStamp=>", lastCheckTimeDuration.toString());
       return;
     }
-
+    config.lastTimeConfigCheck = DateTime.now().millisecondsSinceEpoch;
+    bool isSaveOk = await HandleConfig.instance.saveConfig(config);
+    if (!isSaveOk) {
+      Logger().e("saveConfig  is failure---> ", isSaveOk.toString());
+    }
     LatestConfig serverConfigModel;
     final cashBoxType = "GA";
     String signInfo = await AppInfoControl.instance.getAppSignInfo();
@@ -86,7 +92,8 @@ class _EntrancePageState extends State<EntrancePage> {
     String apkVersion = await AppInfoControl.instance.getAppVersion();
     // String abiPlatform = await AppInfoControl.instance.getSupportAbi();
 
-    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
+    ConnectParameter connectParameter = new ConnectParameter("cashbox.scry.info", 9004);
+    var refresh = RefreshOpen.get(connectParameter, apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
     BasicClientReq basicClientReq = new BasicClientReq();
     basicClientReq
       ..cashboxType = cashBoxType
@@ -95,10 +102,14 @@ class _EntrancePageState extends State<EntrancePage> {
       ..platformType = AppPlatformType.any.toEnumString()
       ..signature = signInfo;
     var channel = createClientChannel(refresh.refreshCall);
+    final configVersionClient = CashboxVersionOpenFaceClient(channel);
     final configOpenFaceClient = CashboxConfigOpenFaceClient(channel);
     try {
       CashboxConfigOpen_LatestConfigRes latestConfigRes = await configOpenFaceClient.latestConfig(basicClientReq);
-      serverConfigModel = LatestConfig.fromJson(json.decode(latestConfigRes.conf));
+      var jsonRes = json.decode(latestConfigRes.conf);
+      serverConfigModel = LatestConfig.fromJson(jsonRes);
+      CashboxVersionOpen_UpgradeRes latestVersionRes = await configVersionClient.upgrade(basicClientReq);
+      config.privateConfig.serverApkVersion = latestVersionRes.upgradeVersion;
     } catch (e) {
       Logger.getInstance().e("configOpenFaceClient.latestConfig() ", e.toString());
       var isUpdateOk = await EeeChainControl.getInstance().updateSubChainBasicInfo("");
@@ -115,8 +126,7 @@ class _EntrancePageState extends State<EntrancePage> {
   _updateLocalConfigInfo(Config config, LatestConfig serverConfigModel) async {
     try {
       config.lastTimeConfigCheck = DateTime.now().millisecondsSinceEpoch;
-      // config.privateConfig.authDigitVersion = serverConfigModel.authTokenListVersion; // needless save the value
-      config.privateConfig.serverApkVersion = serverConfigModel.apkVersion;
+      config.privateConfig.authDigitVersion = serverConfigModel.authTokenListVersion;
       config.privateConfig.rateUrl = serverConfigModel.tokenToLegalTenderExchangeRateIp;
       config.privateConfig.scryXIp = serverConfigModel.scryXChainUrl;
       config.privateConfig.downloadLatestAppUrl = serverConfigModel.apkDownloadLink;
@@ -161,10 +171,7 @@ class _EntrancePageState extends State<EntrancePage> {
   }
 
   _updateEthDefaultToken(RefreshOpen refresh, BasicClientReq basicClientReq, LatestConfig serverConfigModel, Config config) async {
-    if (serverConfigModel == null || serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
-      return;
-    }
-    if (config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
+    if (serverConfigModel == null || config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
       return;
     }
     try {
@@ -239,10 +246,7 @@ class _EntrancePageState extends State<EntrancePage> {
   }
 
   _updateEeeDefaultToken(RefreshOpen refresh, BasicClientReq basicClientReq, LatestConfig serverConfigModel, Config config) async {
-    if (serverConfigModel == null || serverConfigModel.defaultTokenUrl == null || serverConfigModel.defaultTokenUrl.length == 0) {
-      return;
-    }
-    if (config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
+    if (serverConfigModel == null || config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
       return;
     }
     try {
@@ -325,13 +329,11 @@ class _EntrancePageState extends State<EntrancePage> {
   Widget build(BuildContext context) {
     ///Initialize the screen aspect ratio, based on the cashbox cut-out, marked with XXXHDPI@4x
     ScreenUtil.init(context, designSize: Size(90, 160), allowFontScaling: false);
-
     return Container(
       child: FutureBuilder(
           future: _checkIsContainWallet(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              Logger().e("EntrancePage future snapshot.hasError is --->", snapshot.error.toString());
               return Center(
                 child: Text(
                   translate('wallet_load_error'),

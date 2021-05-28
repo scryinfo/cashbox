@@ -1,5 +1,3 @@
-import 'package:app/configv/config/config.dart';
-import 'package:app/configv/config/handle_config.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/control/app_info_control.dart';
 import 'package:logger/logger.dart';
@@ -9,15 +7,12 @@ import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
 
 //Returns Price Object Rate
 Future<TokenRate> loadRateInstance() async {
-  // todo replace Ip
-  // Config config = await HandleConfig.instance.getConfig();
-  //  String rateIpValue = config.privateConfig.rateUrl;
   final cashBoxType = "GA";
   String signInfo = await AppInfoControl.instance.getAppSignInfo();
   String deviceId = await AppInfoControl.instance.getDeviceId();
   String apkVersion = await AppInfoControl.instance.getAppVersion();
 
-  var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
+  var refresh = RefreshOpen.get(new ConnectParameter("cashbox.scry.info", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
   var channel = createClientChannel(refresh.refreshCall);
   BasicClientReq basicClientReq = new BasicClientReq();
   basicClientReq
@@ -62,7 +57,7 @@ Future<TokenRate> loadRateInstance() async {
     }
     return resultRate;
   } catch (e) {
-    Logger.getInstance().e("latestConfigRes  error is --->", e.toString());
+    Logger.getInstance().e("rateUtil  error is --->", e.toString());
     return resultRate;
   }
 }
