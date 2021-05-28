@@ -25,7 +25,7 @@ import 'package:ffi/ffi.dart' as ffi;
 import 'wallets_c.dart' as clib;
 import 'kits.dart';
 
-class Error extends DC<clib.CError> {
+class Error implements DC<clib.CError> {
   int code = 0;
   String message = "";
 
@@ -55,7 +55,7 @@ class Error extends DC<clib.CError> {
 
   @override
   Pointer<clib.CError> toCPtr() {
-    var ptr = allocateZero<clib.CError>();
+    var ptr = allocateZero<clib.CError>(sizeOf<clib.CError>());
     toC(ptr);
     return ptr;
   }
@@ -70,11 +70,11 @@ class Error extends DC<clib.CError> {
 
   @override
   toCInstance(clib.CError c) {
-    c.code = code ?? 0;
+    c.code = code;
     if (c.message != nullptr) {
       ffi.calloc.free(c.message);
     }
-    c.message = toUtf8Null(message);
+    c.message = message.toCPtrUtf8();
   }
 
   @override
@@ -88,11 +88,11 @@ class Error extends DC<clib.CError> {
   @override
   toDartInstance(clib.CError c) {
     code = c.code;
-    message = fromUtf8Null(c.message);
+    message = c.message.toDartString();
   }
 }
 
-class Address extends DC<clib.CAddress> {
+class Address implements DC<clib.CAddress> {
   String name = "";
   Error err = new Error();
   Error instance = new Error();
@@ -128,7 +128,7 @@ class Address extends DC<clib.CAddress> {
 
   @override
   Pointer<clib.CAddress> toCPtr() {
-    var ptr = allocateZero<clib.CAddress>();
+    var ptr = allocateZero<clib.CAddress>(sizeOf<clib.CAddress>());
     toC(ptr);
     return ptr;
   }
@@ -146,9 +146,9 @@ class Address extends DC<clib.CAddress> {
     if (c.name != nullptr) {
       ffi.calloc.free(c.name);
     }
-    c.name = toUtf8Null(name);
+    c.name = name.toCPtrUtf8();
     if (c.err == nullptr) {
-      c.err = allocateZero<clib.CError>();
+      c.err = allocateZero<clib.CError>(sizeOf<clib.CError>());
     }
     err.toC(c.err);
     instance.toCInstance(c.instance);
@@ -165,7 +165,7 @@ class Address extends DC<clib.CAddress> {
 
   @override
   toDartInstance(clib.CAddress c) {
-    name = fromUtf8Null(c.name);
+    name = c.name.toDartString();
     err = new Error();
     err.toDart(c.err);
     instance = new Error();
@@ -175,7 +175,7 @@ class Address extends DC<clib.CAddress> {
   }
 }
 
-class ArrayCAddress extends DC<clib.CArrayCAddress> {
+class ArrayCAddress implements DC<clib.CArrayCAddress> {
   List<Address> data = <Address>[];
 
   static free(Pointer<clib.CArrayCAddress> ptr) {
@@ -202,7 +202,7 @@ class ArrayCAddress extends DC<clib.CArrayCAddress> {
 
   @override
   Pointer<clib.CArrayCAddress> toCPtr() {
-    var c = allocateZero<clib.CArrayCAddress>();
+    var c = allocateZero<clib.CArrayCAddress>(sizeOf<clib.CArrayCAddress>());
     toC(c);
     return c;
   }
@@ -221,7 +221,8 @@ class ArrayCAddress extends DC<clib.CArrayCAddress> {
       Address.free(c.ptr);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<clib.CAddress>(count: data.length);
+    c.ptr = allocateZero<clib.CAddress>(sizeOf<clib.CAddress>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -240,14 +241,14 @@ class ArrayCAddress extends DC<clib.CArrayCAddress> {
   @override
   toDartInstance(clib.CArrayCAddress c) {
     data = <Address>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(new Address());
       data[i].toDart(c.ptr.elementAt(i));
     }
   }
 }
 
-class ArrayInt32 extends DC<clib.CArrayInt32> {
+class ArrayInt32 implements DC<clib.CArrayInt32> {
   List<int> data = <int>[];
 
   static free(Pointer<clib.CArrayInt32> ptr) {
@@ -274,7 +275,7 @@ class ArrayInt32 extends DC<clib.CArrayInt32> {
 
   @override
   Pointer<clib.CArrayInt32> toCPtr() {
-    var c = allocateZero<clib.CArrayInt32>();
+    var c = allocateZero<clib.CArrayInt32>(sizeOf<clib.CArrayInt32>());
     toC(c);
     return c;
   }
@@ -293,7 +294,7 @@ class ArrayInt32 extends DC<clib.CArrayInt32> {
       c.ptr.free();
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<Int32>(count: data.length);
+    c.ptr = allocateZero<Int32>(sizeOf<Int32>(), count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -312,14 +313,14 @@ class ArrayInt32 extends DC<clib.CArrayInt32> {
   @override
   toDartInstance(clib.CArrayInt32 c) {
     data = <int>[];
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < c.len; i++) {
       data.add(c.ptr.elementAt(i).value);
     }
   }
 }
 
-class NativeType extends DC<clib.CNativeType> {
-  int ptrInt8 = 0;
+class NativeType implements DC<clib.CNativeType> {
+  String ptrInt8 = "";
   int ptrInt16 = 0;
   int ptrInt32 = 0;
   int ptrInt64 = 0;
@@ -392,7 +393,7 @@ class NativeType extends DC<clib.CNativeType> {
 
   @override
   Pointer<clib.CNativeType> toCPtr() {
-    var ptr = allocateZero<clib.CNativeType>();
+    var ptr = allocateZero<clib.CNativeType>(sizeOf<clib.CNativeType>());
     toC(ptr);
     return ptr;
   }
@@ -407,7 +408,10 @@ class NativeType extends DC<clib.CNativeType> {
 
   @override
   toCInstance(clib.CNativeType c) {
-    c.ptrInt8.value = ptrInt8;
+    if (c.ptrInt8 != nullptr) {
+      ffi.calloc.free(c.ptrInt8);
+    }
+    c.ptrInt8 = ptrInt8.toCPtrInt8();
     c.ptrInt16.value = ptrInt16;
     c.ptrInt32.value = ptrInt32;
     c.ptrInt64.value = ptrInt64;
@@ -429,7 +433,7 @@ class NativeType extends DC<clib.CNativeType> {
 
   @override
   toDartInstance(clib.CNativeType c) {
-    ptrInt8 = c.ptrInt8.value;
+    ptrInt8 = c.ptrInt8.toDartString();
     ptrInt16 = c.ptrInt16.value;
     ptrInt32 = c.ptrInt32.value;
     ptrInt64 = c.ptrInt64.value;
@@ -442,7 +446,7 @@ class NativeType extends DC<clib.CNativeType> {
   }
 }
 
-class ArrayCChar extends DC<clib.CArrayCChar> {
+class ArrayCChar implements DC<clib.CArrayCChar> {
   List<String> data = <String>[];
 
   static free(Pointer<clib.CArrayCChar> ptr) {
@@ -469,7 +473,7 @@ class ArrayCChar extends DC<clib.CArrayCChar> {
 
   @override
   Pointer<clib.CArrayCChar> toCPtr() {
-    var c = allocateZero<clib.CArrayCChar>();
+    var c = allocateZero<clib.CArrayCChar>(sizeOf<clib.CArrayCChar>());
     toC(c);
     return c;
   }
@@ -488,7 +492,8 @@ class ArrayCChar extends DC<clib.CArrayCChar> {
       c.ptr.free(c.len);
       c.ptr = nullptr;
     }
-    c.ptr = allocateZero<Pointer<ffi.Utf8>>(count: data.length);
+    c.ptr = allocateZero<Pointer<ffi.Utf8>>(sizeOf<Pointer<ffi.Utf8>>(),
+        count: data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length; i++) {
@@ -507,13 +512,13 @@ class ArrayCChar extends DC<clib.CArrayCChar> {
   @override
   toDartInstance(clib.CArrayCChar c) {
     data = <String>[];
-    for (var i = 0; i < data.length; i++) {
-      data.add(fromUtf8Null(c.ptr.elementAt(i).value));
+    for (var i = 0; i < c.len; i++) {
+      data.add(c.ptr.elementAt(i).value.toDartString());
     }
   }
 }
 
-class FieldCArrayCChar extends DC<clib.CFieldCArrayCChar> {
+class FieldCArrayCChar implements DC<clib.CFieldCArrayCChar> {
   ArrayCChar strs = new ArrayCChar();
 
   static freeInstance(clib.CFieldCArrayCChar instance) {
@@ -540,7 +545,8 @@ class FieldCArrayCChar extends DC<clib.CFieldCArrayCChar> {
 
   @override
   Pointer<clib.CFieldCArrayCChar> toCPtr() {
-    var ptr = allocateZero<clib.CFieldCArrayCChar>();
+    var ptr =
+        allocateZero<clib.CFieldCArrayCChar>(sizeOf<clib.CFieldCArrayCChar>());
     toC(ptr);
     return ptr;
   }
@@ -556,7 +562,7 @@ class FieldCArrayCChar extends DC<clib.CFieldCArrayCChar> {
   @override
   toCInstance(clib.CFieldCArrayCChar c) {
     if (c.strs == nullptr) {
-      c.strs = allocateZero<clib.CArrayCChar>();
+      c.strs = allocateZero<clib.CArrayCChar>(sizeOf<clib.CArrayCChar>());
     }
     strs.toC(c.strs);
   }
