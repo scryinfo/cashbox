@@ -159,7 +159,6 @@ class _EeePageState extends State<EeePage> {
                 continue;
               }
               try {
-                // double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16) / config.eeeUnit; todo
                 double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble();
                 var formatBalance = tokenBalance / Utils.mathPow(10, this.displayTokenMList[index].decimal).toDouble();
                 balance = formatBalance.toStringAsFixed(5);
