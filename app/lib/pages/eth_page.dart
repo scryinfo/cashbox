@@ -73,10 +73,12 @@ class _EthPageState extends State<EthPage> {
     this.walletName = WalletsControl.getInstance().currentWallet().name;
     this.allVisibleTokenMList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
     this.allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
-    setState(() {
-      this.allVisibleTokenMList = this.allVisibleTokenMList;
-      this.walletName = this.walletName;
-    });
+    if (mounted) {
+      setState(() {
+        this.allVisibleTokenMList = this.allVisibleTokenMList;
+        this.walletName = this.walletName;
+      });
+    }
     tokenListFuture = loadDisplayTokenListData();
     loadDigitRateInfo();
     loadDigitBalance();
