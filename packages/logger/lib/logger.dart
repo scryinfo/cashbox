@@ -24,11 +24,11 @@ class Logger {
 
   static Logger? _instance;
 
-  factory Logger() {
+  factory Logger() {//todo review factory Logger() 与 static Logger getInstance()功能一样，建议只保留 getInstance函数
     if (_instance == null) {
       _instance = Logger._logger();
     }
-    return _instance ?? Logger._logger();
+    return _instance ?? Logger._logger();//todo review 这里已经包含是否为空的判断，与上面的if 重复
   }
 
   Logger._logger() {
@@ -41,7 +41,7 @@ class Logger {
 
   // return Logger in order to chain style call
   // eg: Logger.setLogLevel(LogLevel.Error).d("tag","msg")
-  Logger setLogLevel(LogLevel filterLevel) {
+  Logger setLogLevel(LogLevel filterLevel) {//todo review,多线程下，此方法只修改当前线程的日志等级，可以在 rPort.listen((message) async {中实现
     _filterLevel = filterLevel;
     return this;
   }
@@ -51,7 +51,7 @@ class Logger {
   }
 
   _registerAndListeningLogThread() async {
-    _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);
+    _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);//todo review 把下面的条件判断提到，第一行来，如果有值就直接返回，没有必须再取一次
     // make sure only multiThread register once and register to same port
     if (_sendPort != null) {
       return;
@@ -62,11 +62,11 @@ class Logger {
       bool onceRegisterOk = IsolateNameServer.registerPortWithName(rPort.sendPort, _logThreadName);
       if (onceRegisterOk) {
         _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);
-      }
+      }//todo review，else 分支时，需要 rPort.close()，且要返回
     } catch (e) {
-      print("error!  register thread procedure, error detail is --->" + e.toString());
+      print("error!  register thread procedure, error detail is --->" + e.toString());//todo review 这里发生的不可恢复的错误，再运行会发生不确定的结果
     }
-    rPort.listen((message) async {
+    rPort.listen((message) async {//todo review 没有创建线程，直接在当前线程中运行，rPort.sendPort与 _sendPort可能不相等
       try {
         File? mainLogFile = (await _logFile(_logFileName));
         if (mainLogFile == null) {
@@ -83,7 +83,7 @@ class Logger {
           mainLogFile.writeAsStringSync(""); // clear the file
           backupLogFile = tempFile.renameSync(mainLogFile.path + ".backup");
         }
-        mainLogFile.writeAsStringSync(message, flush: true, mode: FileMode.append);
+        mainLogFile.writeAsStringSync(message, flush: true, mode: FileMode.append);//todo review flush为false应该会有更好的性能
       } catch (e) {
         print("printOut error is --->" + e.toString());
       }
@@ -91,7 +91,6 @@ class Logger {
   }
 
   Future<File?> _logFile(String fileName) async {
-    //todo 有大量的初始工作，放到一个地方统一初始化
     String directoryPath = "";
     if (Platform.isWindows) {
       directoryPath = pathLib.current;
@@ -99,9 +98,9 @@ class Logger {
       Directory directory = (await getExternalStorageDirectory())!; // path:  Android/data/
       directoryPath = directory.path;
     }
-    String filePath = directoryPath + "/" + fileName;
+    String filePath = directoryPath + "/" + fileName;//todo review 建议使用 join方法，不使用“/”常量，可能会有是两个
     try {
-      if (!File(filePath).existsSync()) {
+      if (!File(filePath).existsSync()) //todo review 下面有三处理使用File(filePath)，定义一个变量
         File(filePath).createSync();
       }
       return File(filePath);
@@ -141,7 +140,7 @@ class Logger {
 
   void sendToLogThread(String recordInfo) {
     if (_sendPort == null) {
-      _sendPort = IsolateNameServer.lookupPortByName(_logThreadName);
+      _sendPort = IsolateNameServer.lookupPortByName(_logThreadName)//todo review 这里可以不用再使用 lookupPortByName，因为在构造时，做过一次。如果为空，可以增加控制台输出
     }
     _sendPort?.send(recordInfo);
   }
