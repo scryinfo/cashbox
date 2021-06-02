@@ -10,7 +10,7 @@ use mav::{ChainType, NetType};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::time::SystemTime;
-use wallets_types::BtcNowLoadBlock;
+use wallets_types::{BtcNowLoadBlock, BtcBalance};
 
 ///
 /// btc now just have three type    </br>
@@ -72,4 +72,6 @@ pub fn btc_load_now_blocknumber(net_type: &NetType) -> Result<BtcNowLoadBlock, r
     db::fetch_scanned_height(network)
 }
 
-pub fn btc_load_balance() {}
+pub fn btc_load_balance() -> Result<BtcBalance, rbatis::Error> {
+    todo!()
+}

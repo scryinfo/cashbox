@@ -198,3 +198,10 @@ pub struct BtcNowLoadBlock{
     pub header_hash: String,
     pub timestamp: String,
 }
+
+#[derive(Debug, Default, Clone)]
+pub struct BtcBalance{
+    pub address: String,
+    pub balance: i64,
+    pub height: i64,
+}

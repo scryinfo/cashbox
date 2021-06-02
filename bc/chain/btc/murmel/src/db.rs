@@ -24,7 +24,7 @@ use rbatis::wrapper::Wrapper;
 use rbatis_core::Error;
 use std::ops::Add;
 use strum_macros::{EnumIter, EnumString, ToString};
-use wallets_types::BtcNowLoadBlock;
+use wallets_types::{BtcNowLoadBlock, BtcBalance};
 
 // state value in btc database must be one of this enum
 #[derive(Debug, Eq, PartialEq, EnumString, ToString, EnumIter)]
@@ -544,10 +544,16 @@ pub fn fetch_scanned_height(network: Network) -> Result<BtcNowLoadBlock, rbatis:
             .fetch_header_by_timestamp(&mprogress.timestamp)
     })?;
     Ok(BtcNowLoadBlock {
-        height: height - 1,
+        height,
         header_hash: mprogress.header,
         timestamp: mprogress.timestamp,
     })
+}
+
+pub fn load_balance(network:Network) -> Result<BtcBalance,rbatis::Error>{
+    let global_rb = GlobalRB::from(PATH, network)?;
+    GLOBAL_RB.set(global_rb).unwrap();
+    todo!()
 }
 
 mod test {
