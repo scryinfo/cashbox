@@ -22,9 +22,10 @@ use rbatis::plugin::page::{IPage, Page, PageRequest};
 use rbatis::rbatis::Rbatis;
 use rbatis::wrapper::Wrapper;
 use rbatis_core::Error;
+use std::collections::HashMap;
 use std::ops::Add;
 use strum_macros::{EnumIter, EnumString, ToString};
-use wallets_types::{BtcNowLoadBlock, BtcBalance};
+use wallets_types::{BtcBalance, BtcNowLoadBlock};
 
 // state value in btc database must be one of this enum
 #[derive(Debug, Eq, PartialEq, EnumString, ToString, EnumIter)]
@@ -343,6 +344,17 @@ impl<'a> DetailSqlite {
         }
     }
 
+    pub async fn list_btc_input_tx(&self) -> Vec<MBtcInputTx> {
+        let r = MBtcInputTx::list(&self.rb, "").await;
+        match r {
+            Err(e) => {
+                error!("{:?}", e);
+                vec![]
+            }
+            Ok(r) => r,
+        }
+    }
+
     pub async fn save_local_tx(
         &self,
         address_from: String,
@@ -537,22 +549,41 @@ impl Verify {
 pub fn fetch_scanned_height(network: Network) -> Result<BtcNowLoadBlock, rbatis::Error> {
     let global_rb = GlobalRB::from(PATH, network)?;
     GLOBAL_RB.set(global_rb).unwrap();
-    let mprogress = block_on(GlobalRB::global().detail.progress());
-    let height = block_on({
-        GlobalRB::global()
+    let r = block_on(async {
+        let mprogress = GlobalRB::global().detail.progress().await;
+        let height = GlobalRB::global()
             .chain
             .fetch_header_by_timestamp(&mprogress.timestamp)
-    })?;
-    Ok(BtcNowLoadBlock {
-        height,
-        header_hash: mprogress.header,
-        timestamp: mprogress.timestamp,
-    })
+            .await?;
+       let r  = BtcNowLoadBlock {
+            height,
+            header_hash: mprogress.header,
+            timestamp: mprogress.timestamp,
+        };
+        Ok(r)
+    });
+    r
 }
 
-pub fn load_balance(network:Network) -> Result<BtcBalance,rbatis::Error>{
+pub fn load_balance(network: Network) -> Result<BtcBalance, rbatis::Error> {
     let global_rb = GlobalRB::from(PATH, network)?;
     GLOBAL_RB.set(global_rb).unwrap();
+    block_on(async {
+        let vec = GlobalRB::global().detail.list_btc_output_tx().await;
+        let mut value_map = HashMap::new();
+        for out in vec {
+            value_map.insert(out.btc_tx_hash, out.value);
+        }
+
+        let vec = GlobalRB::global().detail.list_btc_input_tx().await;
+        let inputs = vec.into_iter().map(|y| y.tx_id).collect::<Vec<String>>();
+        let r = value_map
+            .into_iter()
+            .filter(|x| !inputs.contains(&x.0))
+            .collect::<HashMap<_, _>>();
+        let value = r.iter().map(|x| x.1).sum::<u64>();
+    });
+
     todo!()
 }
 
@@ -561,6 +592,8 @@ mod test {
     use crate::path::PATH;
     use bitcoin::{Network, Transaction};
     use futures::executor::block_on;
+    use log::kv::Source;
+    use std::collections::HashMap;
 
     #[test]
     pub fn test_fetch_scanned_height() {
@@ -573,20 +606,6 @@ mod test {
                 println!("{}", e)
             }
         }
-    }
-
-    #[test]
-    pub fn test_save_btc_output_tx() {
-        let global_rb = GlobalRB::from(PATH, Network::Testnet).unwrap();
-        GLOBAL_RB.set(global_rb).unwrap();
-
-        block_on(GlobalRB::global().detail.save_btc_output_tx(
-            5000u64,
-            "script".to_string(),
-            0u32,
-            "btc_tx_hash".to_string(),
-            "btc_tx_hexbytes".to_string(),
-        ));
     }
 
     #[test]
@@ -613,5 +632,34 @@ mod test {
             println!("3  {}", a.unwrap());
             let current_hash_160 = iter.next().unwrap_or(" ");
         }
+    }
+
+    #[test]
+    pub fn test_load_balane() {
+        let global_rb = GlobalRB::from(PATH, Network::Testnet).unwrap();
+        GLOBAL_RB.set(global_rb).unwrap();
+        block_on(async {
+            let vec = GlobalRB::global().detail.list_btc_output_tx().await;
+            let mut value_map = HashMap::new();
+            for out in vec {
+                value_map.insert(out.btc_tx_hash, out.value);
+            }
+
+            let vec = GlobalRB::global().detail.list_btc_input_tx().await;
+            let inputs = vec.into_iter().map(|y| y.tx_id).collect::<Vec<String>>();
+            let r = value_map
+                .into_iter()
+                .filter(|x| !inputs.contains(&x.0))
+                .collect::<HashMap<_, _>>();
+            let values = r.iter().map(|x| x.1).sum::<u64>();
+            let mprogress = GlobalRB::global().detail.progress().await;
+            let height = GlobalRB::global()
+                .chain
+                .fetch_header_by_timestamp(&mprogress.timestamp)
+                .await
+                .unwrap();
+            println!("{}", height);
+
+        });
     }
 }
