@@ -70,6 +70,7 @@ pub fn btc_load_now_blocknumber(net_type: &NetType) -> Result<BtcNowLoadBlock, r
         NetType::Private => Network::Regtest,
         NetType::PrivateTest => Network::Regtest,
     };
+    #[cfg(test)]
     init_global(network);
     db::fetch_scanned_height()
 }
@@ -81,6 +82,7 @@ pub fn btc_load_balance(net_type: &NetType) -> Result<BtcBalance, rbatis::Error>
         NetType::Private => Network::Regtest,
         NetType::PrivateTest => Network::Regtest,
     };
+    #[cfg(test)]
     init_global(network);
     db::load_balance()
 }
