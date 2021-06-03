@@ -194,14 +194,13 @@ impl BtcChain {
 
 #[derive(Debug, Default, Clone)]
 pub struct BtcNowLoadBlock{
-    pub height: i64,
+    pub height: u64,
     pub header_hash: String,
     pub timestamp: String,
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct BtcBalance{
-    pub address: String,
-    pub balance: i64,
-    pub height: i64,
+    pub balance: u64,
+    pub height: u64,
 }

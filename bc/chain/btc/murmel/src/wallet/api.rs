@@ -2,7 +2,7 @@
 
 use crate::constructor::Constructor;
 use crate::db;
-use crate::path::BTC_HAMMER_PATH;
+use crate::path::{BTC_HAMMER_PATH, PATH};
 use bitcoin::Network;
 use log::LevelFilter;
 use mav::ma::MAddress;
@@ -11,6 +11,7 @@ use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::time::SystemTime;
 use wallets_types::{BtcNowLoadBlock, BtcBalance};
+use crate::db::{GlobalRB, GLOBAL_RB};
 
 ///
 /// btc now just have three type    </br>
@@ -69,9 +70,22 @@ pub fn btc_load_now_blocknumber(net_type: &NetType) -> Result<BtcNowLoadBlock, r
         NetType::Private => Network::Regtest,
         NetType::PrivateTest => Network::Regtest,
     };
-    db::fetch_scanned_height(network)
+    init_global(network);
+    db::fetch_scanned_height()
 }
 
-pub fn btc_load_balance() -> Result<BtcBalance, rbatis::Error> {
-    todo!()
+pub fn btc_load_balance(net_type: &NetType) -> Result<BtcBalance, rbatis::Error> {
+    let network = match net_type {
+        NetType::Main => Network::Bitcoin,
+        NetType::Test => Network::Testnet,
+        NetType::Private => Network::Regtest,
+        NetType::PrivateTest => Network::Regtest,
+    };
+    init_global(network);
+    db::load_balance()
+}
+
+fn init_global(network: Network){
+    let global_rb = GlobalRB::from(PATH, network).unwrap();
+    GLOBAL_RB.set(global_rb).unwrap();
 }

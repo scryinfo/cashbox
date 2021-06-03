@@ -138,7 +138,7 @@ impl ChainSqlite {
     pub async fn fetch_header_by_timestamp(
         &self,
         timestamp: &String,
-    ) -> Result<i64, rbatis::Error> {
+    ) -> Result<u64, rbatis::Error> {
         let w = self.rb.new_wrapper();
         let sql = format!(
             "SELECT {} FROM {} WHERE timestamp = {} LIMIT 1",
@@ -146,7 +146,7 @@ impl ChainSqlite {
             &MBlockHeader::table_name(),
             &timestamp
         );
-        let r: Result<i64, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
+        let r: Result<u64, _> = self.rb.fetch_prepare("", &sql, &w.args).await;
         r
     }
 }
@@ -546,16 +546,14 @@ impl Verify {
     }
 }
 
-pub fn fetch_scanned_height(network: Network) -> Result<BtcNowLoadBlock, rbatis::Error> {
-    let global_rb = GlobalRB::from(PATH, network)?;
-    GLOBAL_RB.set(global_rb).unwrap();
+pub fn fetch_scanned_height() -> Result<BtcNowLoadBlock, rbatis::Error> {
     let r = block_on(async {
         let mprogress = GlobalRB::global().detail.progress().await;
         let height = GlobalRB::global()
             .chain
             .fetch_header_by_timestamp(&mprogress.timestamp)
             .await?;
-       let r  = BtcNowLoadBlock {
+        let r = BtcNowLoadBlock {
             height,
             header_hash: mprogress.header,
             timestamp: mprogress.timestamp,
@@ -565,9 +563,7 @@ pub fn fetch_scanned_height(network: Network) -> Result<BtcNowLoadBlock, rbatis:
     r
 }
 
-pub fn load_balance(network: Network) -> Result<BtcBalance, rbatis::Error> {
-    let global_rb = GlobalRB::from(PATH, network)?;
-    GLOBAL_RB.set(global_rb).unwrap();
+pub fn load_balance() -> Result<BtcBalance, rbatis::Error> {
     block_on(async {
         let vec = GlobalRB::global().detail.list_btc_output_tx().await;
         let mut value_map = HashMap::new();
@@ -582,9 +578,17 @@ pub fn load_balance(network: Network) -> Result<BtcBalance, rbatis::Error> {
             .filter(|x| !inputs.contains(&x.0))
             .collect::<HashMap<_, _>>();
         let value = r.iter().map(|x| x.1).sum::<u64>();
-    });
-
-    todo!()
+        let mprogress = GlobalRB::global().detail.progress().await;
+        let height = GlobalRB::global()
+            .chain
+            .fetch_header_by_timestamp(&mprogress.timestamp)
+            .await?;
+        let r = BtcBalance {
+            balance: value,
+            height,
+        };
+        Ok(r)
+    })
 }
 
 mod test {
@@ -594,19 +598,6 @@ mod test {
     use futures::executor::block_on;
     use log::kv::Source;
     use std::collections::HashMap;
-
-    #[test]
-    pub fn test_fetch_scanned_height() {
-        let r = fetch_scanned_height(Network::Testnet);
-        match &r {
-            Ok(r) => {
-                println!("{:?}", r)
-            }
-            Err(e) => {
-                println!("{}", e)
-            }
-        }
-    }
 
     #[test]
     pub fn test_test_tx() {
@@ -659,7 +650,6 @@ mod test {
                 .await
                 .unwrap();
             println!("{}", height);
-
         });
     }
 }

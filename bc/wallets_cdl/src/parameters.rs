@@ -171,7 +171,7 @@ pub struct CWalletTokenStatus{
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CBtcNowLoadBlock{
-    pub height: i64,
+    pub height: u64,
     pub headerHash: *mut c_char,
     pub timestamp: *mut c_char,
 }
@@ -179,7 +179,6 @@ pub struct CBtcNowLoadBlock{
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CBtcBalance{
-    pub address: *mut c_char,
-    pub balance: i64,
-    pub height: i64,
+    pub balance: u64,
+    pub height: u64,
 }
