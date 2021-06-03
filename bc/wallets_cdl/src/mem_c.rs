@@ -4,7 +4,7 @@
 use std::os::raw::c_char;
 
 use crate::kits::{d_ptr_alloc, d_ptr_free, CArray, CBool, CStruct};
-use crate::parameters::{CAccountInfo, CContext, CDbName, CExtrinsicContext, CEeeChainTx, CWalletTokenStatus, CBtcNowLoadBlock};
+use crate::parameters::{CAccountInfo, CContext, CDbName, CExtrinsicContext, CEeeChainTx, CWalletTokenStatus, CBtcNowLoadBlock, CBtcBalance};
 
 use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet,
                    CEthChainTokenDefault, CTokenAddress, CEthChainTokenAuth, CEeeChainTokenAuth, CBtcChainTokenAuth,
@@ -291,5 +291,15 @@ pub unsafe extern "C" fn CBtcNowLoadBlock_dFree(dPtr: *mut *mut CBtcNowLoadBlock
     d_ptr_free(&mut dPtr)
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn CBtcBalance_dAlloc() -> *mut *mut CBtcBalance{
+    d_ptr_alloc()
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn CBtcBalance_dFree(dPtr: *mut *mut CBtcBalance){
+    let mut dPtr = dPtr;
+    d_ptr_free(&mut dPtr)
+}
 
 // alloc free end

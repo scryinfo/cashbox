@@ -4,7 +4,7 @@ use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
 use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth, MTokenAddress, MBtcChainTokenAuth};
 
 use mav::{NetType, WalletType, CTrue, CFalse};
-use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock};
+use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock, BtcBalance};
 
 use codec::Decode;
 use rbatis::plugin::page::PageRequest;
@@ -355,6 +355,10 @@ impl BtcChainTrait for BtcChain {
 
     fn load_now_blocknumber(&self, _context: &dyn ContextTrait, net_type:&NetType) -> Result<BtcNowLoadBlock, WalletError> {
         murmel::wallet::btc_load_now_blocknumber(net_type).map_err(|e| WalletError::RbatisError(e))
+    }
+
+    fn load_balance(&self, _context: &dyn ContextTrait, net_type: &NetType) -> Result<BtcBalance, WalletError> {
+        murmel::wallet::btc_load_balance(net_type).map_err(|e| WalletError::RbatisError(e))
     }
 }
 

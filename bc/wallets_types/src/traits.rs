@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use mav::ma::{Db, MAddress, MWallet, EeeTokenType};
 use mav::{WalletType, NetType};
 
-use crate::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock};
+use crate::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock, BtcBalance};
 
 #[async_trait]
 pub trait Load {
@@ -77,4 +77,5 @@ pub trait BtcChainTrait: Send + Sync {
     async fn get_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType,start_item:u64,page_size:u64)->Result<Vec<BtcChainTokenAuth>,WalletError>;
     fn start_murmel(&self, context: &dyn ContextTrait, wallet_id: &str, net_type:&NetType) ->Result<(),WalletError>;
     fn load_now_blocknumber(&self, context: &dyn ContextTrait, net_type:&NetType) ->Result<BtcNowLoadBlock,WalletError>;
+    fn load_balance(&self, context: &dyn ContextTrait,net_type: &NetType) -> Result<BtcBalance,WalletError>;
 }
