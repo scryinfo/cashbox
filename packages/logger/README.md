@@ -39,9 +39,10 @@ logger.d("tag999", " message999");
 ```Logger.getInstance().setLogLevel(LogLevel.Debug).d("test  tag", " test message" ); ```
 
 -   方法 setLogLevel(filterLogLevel)
+    -   注意：多线程时，由于dart线程的资源分配方式，每个线程需要自己设置自己线程的LogLevel值
     -   设置限制log输出的日志级别。如level为info的时候，比info级别低的debug级别，就不会输出出来。即>= filterLogLevel的日志可以输出
 
-**备注：日志内容是否最终输出到文件，决定于输出日记级别，是否filterLogLevel参数的筛选条件**
+**备注：日志内容是否最终输出到文件，决定于调用日记位置的级别，是否符合filterLogLevel参数的筛选条件**
 
 -   参数 日志等级 d/i/w/e/f
     -   在flutter中使用时，所有print输出，都会显示在控制台，日志等级是info级别。
@@ -57,5 +58,4 @@ logger.d("tag999", " message999");
 超过限制大小后，重命名cashbox.log为cashbox.log.backup, 生成新的（或者选取已经存在的）cashbox.log文件，清空cashbox.log文件里的数据，后续继续往cashbox.log里面写入。
 
 ### 日志线程说明
-1. 在**多处调用**或**多线程调用** 此日志库时，通过registerPortWithName方法，只会生成一个**唯一日志线程**来处理写日志功能。
-2. 通过 懒加载(lazy register)的方式，注册此唯一的日志线程。   即：在确认是有符合输出日志条件logLevel的时候，才会去注册此唯一日志线程。
+1. 在**多处调用**或**多线程调用** 此日志库时，通过registerPortWithName方法，只会有一个**唯一日志线程**来处理写日志功能。
