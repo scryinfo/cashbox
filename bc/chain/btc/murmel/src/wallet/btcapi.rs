@@ -143,16 +143,6 @@ pub extern "system" fn Java_JniApi_btcTxSignAndBroadcast(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_JniApi_btcLoadBalance(
-    _env: JNIEnv<'_>,
-    _class: JClass<'_>,
-    _address: JString<'_>,
-) -> jstring {
-    unimplemented!()
-}
-
-#[no_mangle]
-#[allow(non_snake_case)]
 pub extern "system" fn Java_JniApi_btcIsSyncDataOk(
     _env: JNIEnv<'_>,
     _class: JClass<'_>,
