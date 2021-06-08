@@ -360,6 +360,10 @@ impl BtcChainTrait for BtcChain {
     fn load_balance(&self, _context: &dyn ContextTrait, net_type: &NetType) -> Result<BtcBalance, WalletError> {
         murmel::wallet::btc_load_balance(net_type).map_err(|e| WalletError::RbatisError(e))
     }
+
+    fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<String, WalletError> {
+        todo!()
+    }
 }
 
 #[async_trait]

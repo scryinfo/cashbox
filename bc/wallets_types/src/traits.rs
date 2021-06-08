@@ -78,4 +78,5 @@ pub trait BtcChainTrait: Send + Sync {
     fn start_murmel(&self, context: &dyn ContextTrait, wallet_id: &str, net_type:&NetType) ->Result<(),WalletError>;
     fn load_now_blocknumber(&self, context: &dyn ContextTrait, net_type:&NetType) ->Result<BtcNowLoadBlock,WalletError>;
     fn load_balance(&self, context: &dyn ContextTrait,net_type: &NetType) -> Result<BtcBalance,WalletError>;
+    fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<String, WalletError>;
 }
