@@ -94,6 +94,11 @@ fn set_global(network: Network) {
     GLOBAL_RB.set(global_rb).unwrap();
 }
 
-pub fn btc_tx_sign(net_type: &NetType, mnemonic: &String) -> Result<String, rbatis::Error> {
+pub fn btc_tx_sign(
+    net_type: &NetType,
+    mnemonic: &String,
+    to_address: &String,
+    value: &String,
+) -> Result<String, rbatis::Error> {
     todo!()
 }
