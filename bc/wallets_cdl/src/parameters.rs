@@ -7,7 +7,7 @@ use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{
     AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName,
     DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,EeeChainTx,WalletTokenStatus,
-    BtcNowLoadBlock,BtcBalance,
+    BtcNowLoadBlock,BtcBalance,BtcTxParam,
 };
 
 use crate::kits::{to_c_char, to_str, CStruct, CR, CBool,Assignment};
@@ -181,4 +181,11 @@ pub struct CBtcNowLoadBlock{
 pub struct CBtcBalance{
     pub balance: u64,
     pub height: u64,
+}
+
+#[repr(C)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
+pub struct CBtcTxParam {
+    pub walletId: *mut c_char,
+    pub password: *mut c_char,
 }

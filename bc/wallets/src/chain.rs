@@ -4,7 +4,7 @@ use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
 use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth, MTokenAddress, MBtcChainTokenAuth};
 
 use mav::{NetType, WalletType, CTrue, CFalse};
-use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock, BtcBalance};
+use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock, BtcBalance, BtcTxParam};
 
 use codec::Decode;
 use rbatis::plugin::page::PageRequest;
@@ -361,8 +361,18 @@ impl BtcChainTrait for BtcChain {
         murmel::wallet::btc_load_balance(net_type).map_err(|e| WalletError::RbatisError(e))
     }
 
-    fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType) -> Result<String, WalletError> {
-        todo!()
+    async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, tx_param: &BtcTxParam) -> Result<String, WalletError> {
+        let wallet_db = context.db().wallets_db();
+        let m_wallet = MWallet::fetch_by_id(wallet_db, "", &tx_param.wallet_id).await?;
+        if m_wallet.is_none() {
+            return Err(WalletError::Custom(format!("wallet {} is not exist!", &tx_param.wallet_id)));
+        }
+        let mnemonic = eee::Sr25519::get_mnemonic_context(
+            &m_wallet.unwrap().mnemonic,
+            tx_param.password.as_bytes(),
+        )?;
+        let mn = String::from_utf8(mnemonic)?;
+        murmel::wallet::btc_tx_sign(net_type,&mn).map_err(|e| WalletError::RbatisError(e))
     }
 }
 

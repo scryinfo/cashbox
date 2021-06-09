@@ -292,3 +292,9 @@ impl From<MEeeTokenxTx> for EeeChainTx{
         }
     }
 }
+
+#[derive(Debug, Default, Clone)]
+pub struct BtcTxParam {
+    pub wallet_id: String,
+    pub password: String,
+}
