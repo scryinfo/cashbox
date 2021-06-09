@@ -64,41 +64,34 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
 }
 
 pub fn btc_load_now_blocknumber(net_type: &NetType) -> Result<BtcNowLoadBlock, rbatis::Error> {
-    let network = match net_type {
-        NetType::Main => Network::Bitcoin,
-        NetType::Test => Network::Testnet,
-        NetType::Private => Network::Regtest,
-        NetType::PrivateTest => Network::Regtest,
-    };
-    if let None = GLOBAL_RB.get() {
-        set_global(network);
-    }
+    set_global(net_type);
     db::fetch_scanned_height()
 }
 
 pub fn btc_load_balance(net_type: &NetType) -> Result<BtcBalance, rbatis::Error> {
-    let network = match net_type {
-        NetType::Main => Network::Bitcoin,
-        NetType::Test => Network::Testnet,
-        NetType::Private => Network::Regtest,
-        NetType::PrivateTest => Network::Regtest,
-    };
-    if let None = GLOBAL_RB.get() {
-        set_global(network);
-    }
+    set_global(net_type);
     db::load_balance()
 }
 
-fn set_global(network: Network) {
-    let global_rb = GlobalRB::from(PATH, network).unwrap();
-    GLOBAL_RB.set(global_rb).unwrap();
+fn set_global(net_type: &NetType) {
+    if let None = GLOBAL_RB.get() {
+        let network = match net_type {
+            NetType::Main => Network::Bitcoin,
+            NetType::Test => Network::Testnet,
+            NetType::Private => Network::Regtest,
+            NetType::PrivateTest => Network::Regtest,
+        };
+        let global_rb = GlobalRB::from(PATH, network).unwrap();
+        GLOBAL_RB.set(global_rb).unwrap();
+    }
 }
 
-pub fn btc_tx_sign(
+pub async fn btc_tx_sign(
     net_type: &NetType,
     mnemonic: &String,
     to_address: &String,
     value: &String,
 ) -> Result<String, rbatis::Error> {
+    set_global(net_type);
     todo!()
 }
