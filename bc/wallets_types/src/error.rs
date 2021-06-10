@@ -20,6 +20,7 @@ pub enum WalletError {
     NoneError(String),
     RbatisError(rbatis_core::Error),
     NotExist,
+    BtcTx(String),
 }
 
 impl fmt::Display for WalletError {
@@ -42,6 +43,7 @@ impl fmt::Display for WalletError {
             WalletError::Decode(err) => write!(f, "wallet decode error: {}", err),
             WalletError::NoneError(err) => err.fmt(f),
             WalletError::RbatisError(err) => err.fmt(f),
+            WalletError::BtcTx(err) => write!(f, "btc transaction error: {}", err),
         }
     }
 }
@@ -184,6 +186,7 @@ impl Error {
     pub fn NONE() -> Error { Error { code: 170, message: "NONE error".to_owned() } }
     pub fn RBATIS() -> Error { Error { code: 180, message: "RBATIS error".to_owned() } }
     pub fn NOT_EXIST() -> Error { Error { code: 190, message: "NOT_EXIST error".to_owned() } }
+    pub fn BTCTX() -> Error { Error { code: 400, message: "BtcTx error".to_owned() } }
 
     pub fn set_code(&self, code: u64) -> Error {
         Error { code, message: self.message.clone() }
@@ -215,6 +218,7 @@ impl From<WalletError> for Error {
             WalletError::NoneError(str) => Self::NONE().set_message(str),
             WalletError::RbatisError(err) => Self::RBATIS().set_message(&err.to_string()),
             WalletError::NotExist => Self::NOT_EXIST(),
+            WalletError::BtcTx(err) => Self::BTCTX().set_message(&err.to_string()),
         }
     }
 }

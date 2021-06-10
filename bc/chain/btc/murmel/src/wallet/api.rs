@@ -91,7 +91,7 @@ pub async fn btc_tx_sign(
     mnemonic: &String,
     to_address: &String,
     value: &String,
-) -> Result<String, rbatis::Error> {
+) -> Result<String, crate::Error> {
     set_global(net_type);
     todo!()
 }

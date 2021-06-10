@@ -60,6 +60,8 @@ pub enum Error {
     BitcoinHash(bitcoin_hashes::hex::Error),
     /// rbatis error
     Rbatis(rbatis::Error),
+    /// btc tx error
+    BtcTx(String),
 }
 
 impl std::error::Error for Error {
@@ -81,6 +83,7 @@ impl std::error::Error for Error {
             Error::Lost(_) => None,
             Error::BitcoinHash(ref err) => Some(err),
             Error::Rbatis(ref err) => Some(err),
+            Error::BtcTx(_) => None,
         }
     }
 }
@@ -109,6 +112,7 @@ impl fmt::Display for Error {
             Error::Rbatis(ref err) => {
                 write!(f, "rbatis::Error {}", err)
             }
+            Error::BtcTx(ref s) => write!(f, "btc tx error: {}", s),
         }
     }
 }

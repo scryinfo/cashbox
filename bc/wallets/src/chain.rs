@@ -12,6 +12,7 @@ use bitcoin_wallet::account::AccountAddressType;
 use bitcoin::util::psbt::serialize::Serialize;
 use rbatis::crud::CRUDTable;
 use futures::executor::block_on;
+use murmel::Error;
 
 #[derive(Default)]
 struct EthChain();
@@ -373,7 +374,13 @@ impl BtcChainTrait for BtcChain {
         )?;
         let mn = String::from_utf8(mnemonic)?;
         let r = murmel::wallet::btc_tx_sign(net_type,&mn, &tx_param.to_address,&tx_param.value).await;
-        r.map_err(|e| WalletError::RbatisError(e))
+        r.map_err(|e|
+            match e {
+                Error::Rbatis(e) => { WalletError::RbatisError(e) },
+                Error::BtcTx(e) => { WalletError::BtcTx(e) },
+                _ => { WalletError::Custom("Nothing but wrong".to_string()) },
+            }
+        )
     }
 }
 
