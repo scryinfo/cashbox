@@ -297,6 +297,7 @@ impl From<MEeeTokenxTx> for EeeChainTx{
 pub struct BtcTxParam {
     pub wallet_id: String,
     pub password: String,
+    pub from_address: String,
     pub to_address: String,
     pub value: String,//unit Btc
 }

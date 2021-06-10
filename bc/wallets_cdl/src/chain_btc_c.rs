@@ -4,8 +4,8 @@ use futures::executor::block_on;
 use std::os::raw::{c_char, c_uint};
 
 use super::kits::{CArray, CStruct, CR};
-use crate::parameters::{CBtcBalance, CBtcNowLoadBlock, CContext};
-use crate::to_str;
+use crate::parameters::{CBtcBalance, CBtcNowLoadBlock, CContext, CBtcTxParam};
+use crate::{to_str, to_c_char};
 use crate::types::{CBtcChainTokenAuth, CBtcChainTokenDefault, CError};
 use wallets::{Contexts, Wallets};
 use wallets_types::Error;
@@ -248,6 +248,42 @@ pub unsafe extern "C" fn ChainBtc_loadBalance(
                 }
             }
             None => Error::NONE().append_message(": can not find the context"),
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn ChainBtc_txSign(
+    ctx: *mut CContext,
+    param: *mut CBtcTxParam,
+    signedResult: *mut *mut c_char
+) -> *const CError {
+    log::debug!("enter ChainBtc_txSign");
+    if ctx.is_null() ||  param.is_null() || signedResult.is_null() {
+        let err = Error::PARAMETER().append_message(" : ctx,param or signedResult is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    (*signedResult).free();
+    let lock  = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let btc_chain = wallets.btc_chain_instance();
+                let param = CBtcTxParam::ptr_rust(param);
+                match block_on(btc_chain.tx_sign(wallets, &wallets.net_type, &param)) {
+                    Ok(res) => {
+                        *signedResult = to_c_char(&res);
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
         }
     };
     log::debug!("{}", err);

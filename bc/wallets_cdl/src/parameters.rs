@@ -188,6 +188,7 @@ pub struct CBtcBalance{
 pub struct CBtcTxParam {
     pub walletId: *mut c_char,
     pub password: *mut c_char,
+    pub from_address: *mut c_char,
     pub to_address: *mut c_char,
     pub value: *mut c_char,
 }

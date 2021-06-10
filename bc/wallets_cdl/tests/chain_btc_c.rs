@@ -166,3 +166,59 @@ fn btc_load_balance_test() {
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }
+
+#[test]
+fn btc_tx_sign_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_eq!(null_mut(), c_ctx);
+    unsafe{
+        let c_init_parameters = {
+            let mut p = InitParameters::default();
+            p.is_memory_db = CFalse;
+            let prefix = "test_";
+            p.db_name.0 = mav::ma::DbName::new(&prefix, "");
+            p.context_note = format!("test_{}", prefix);
+            CInitParameters::to_c_ptr(&p)
+        };
+        let c_err = Wallets_init(c_init_parameters, c_ctx) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+
+        let c_err =  Wallets_changeNetType(*c_ctx,to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        let c_wallet = CWallet_dAlloc();
+        let parameters = {
+            let mnemonic =
+                "lawn duty beauty guilt sample fiction name zero demise disagree cram hand";
+            let mut p = CreateWalletParameters {
+                name: "murmel".to_string(),
+                password: "".to_string(),
+                mnemonic: mnemonic.to_string(),
+                wallet_type: WalletType::Test.to_string(),
+            };
+            CCreateWalletParameters::to_c_ptr(&mut p)
+        };
+        let c_err = Wallets_createWallet(*c_ctx, parameters, c_wallet) as *mut CError;
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        let r_wallet = CWallet::to_rust(&**c_wallet);
+        CError_free(c_err);
+        CWallet_dFree(c_wallet);
+        // sign tx
+        let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
+        let btc_param = wallets_types::BtcTxParam {
+            wallet_id: r_wallet.id.clone(),
+            password: "".to_string(),
+            from_address: "".to_string(),
+            to_address: "".to_string(),
+            value: "".to_string()
+        };
+        let mut c_param = wallets_cdl::parameters::CBtcTxParam::to_c_ptr(&btc_param);
+        let c_err = chain_btc_c::ChainBtc_txSign(*c_ctx,c_param,sign_result) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        wallets_cdl::mem_c::CStr_dFree(sign_result);
+        c_param.free();
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
