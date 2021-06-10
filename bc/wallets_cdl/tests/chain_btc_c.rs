@@ -170,7 +170,7 @@ fn btc_load_balance_test() {
 #[test]
 fn btc_tx_sign_test() {
     let c_ctx = CContext_dAlloc();
-    assert_eq!(null_mut(), c_ctx);
+    assert_ne!(null_mut(), c_ctx);
     unsafe{
         let c_init_parameters = {
             let mut p = InitParameters::default();

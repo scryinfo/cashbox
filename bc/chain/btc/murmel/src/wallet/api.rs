@@ -1,7 +1,7 @@
 //! api about wallet defined in here
 
 use crate::constructor::Constructor;
-use crate::db;
+use crate::{db, Error};
 use crate::db::{GlobalRB, GLOBAL_RB};
 use crate::path::{BTC_HAMMER_PATH, PATH};
 use bitcoin::Network;
@@ -93,5 +93,6 @@ pub async fn btc_tx_sign(
     value: &String,
 ) -> Result<String, crate::Error> {
     set_global(net_type);
-    todo!()
+    let e = Error::BtcTx("value not enough".to_string());
+    Err(e)
 }
