@@ -373,7 +373,14 @@ impl BtcChainTrait for BtcChain {
             tx_param.password.as_bytes(),
         )?;
         let mn = String::from_utf8(mnemonic)?;
-        let r = murmel::wallet::btc_tx_sign(net_type,&mn, &tx_param.to_address,&tx_param.value).await;
+        let r = murmel::wallet::btc_tx_sign(
+            net_type,
+            &mn,
+            &tx_param.from_address,
+            &tx_param.to_address,
+            &tx_param.password,
+            &tx_param.value
+        ).await;
         r.map_err(|e|
             match e {
                 Error::Rbatis(e) => { WalletError::RbatisError(e) },

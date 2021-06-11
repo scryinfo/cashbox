@@ -89,7 +89,7 @@ impl Constructor {
         Ok(Arc::new(RwLock::new(chaindb)))
     }
 
-    /// Construct the stack
+    /// Construct the stack,
     pub fn new(
         network: Network,
         listen: Vec<SocketAddr>,

@@ -1,10 +1,12 @@
 //! api about wallet defined in here
 
 use crate::constructor::Constructor;
-use crate::{db, Error};
 use crate::db::{GlobalRB, GLOBAL_RB};
 use crate::path::{BTC_HAMMER_PATH, PATH};
+use crate::{db, Error};
 use bitcoin::Network;
+use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
+use bitcoin_wallet::mnemonic::Mnemonic;
 use log::LevelFilter;
 use mav::ma::MAddress;
 use mav::{ChainType, NetType};
@@ -89,10 +91,43 @@ fn set_global(net_type: &NetType) {
 pub async fn btc_tx_sign(
     net_type: &NetType,
     mnemonic: &String,
+    from_address: &String,
     to_address: &String,
+    password: &String,
     value: &String,
 ) -> Result<String, crate::Error> {
     set_global(net_type);
-    let e = Error::BtcTx("value not enough".to_string());
-    Err(e)
+    let network = match net_type {
+        NetType::Main => Network::Bitcoin,
+        NetType::Test => Network::Testnet,
+        NetType::Private => Network::Regtest,
+        NetType::PrivateTest => Network::Regtest,
+    };
+
+    let balance = btc_load_balance(net_type)?;
+    let mut value = value.parse::<f64>().unwrap();
+    value = value * 100000000f64;
+    if (value as u64) > balance.balance {
+        let e = Error::BtcTx("value not enough".to_string());
+        return Err(e);
+    }
+
+    let mnemonic = Mnemonic::from_str(&mnemonic).map_err(|e| Error::BtcTx(e.to_string()))?;
+    let mut master = MasterAccount::from_mnemonic(&mnemonic, 0, network, password, None).unwrap();
+    let mut unlocker = Unlocker::new_for_master(&master, password).unwrap();
+    // source
+    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
+    master.add_account(account);
+    let source = master
+        .get_mut((0, 0))
+        .unwrap()
+        .next_key()
+        .unwrap()
+        .address
+        .clone();
+    if !source.to_string().eq(from_address){
+        return Err(Error::BtcTx("form address error".to_string()));
+    }
+
+    Ok("Sign Sucess".to_string())
 }
