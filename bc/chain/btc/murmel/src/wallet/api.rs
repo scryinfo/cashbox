@@ -4,7 +4,7 @@ use crate::constructor::Constructor;
 use crate::db::{GlobalRB, GLOBAL_RB};
 use crate::path::{BTC_HAMMER_PATH, PATH};
 use crate::{db, Error};
-use bitcoin::Network;
+use bitcoin::{Network, Address};
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
 use log::LevelFilter;
@@ -14,6 +14,9 @@ use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::time::SystemTime;
 use wallets_types::{BtcBalance, BtcNowLoadBlock};
+use std::str::FromStr;
+
+const RBF: u32 = 0xffffffff - 2;
 
 ///
 /// btc now just have three type    </br>
@@ -128,6 +131,9 @@ pub async fn btc_tx_sign(
     if !source.to_string().eq(from_address){
         return Err(Error::BtcTx("form address error".to_string()));
     }
+    // target
+    let target = bitcoin::Address::from_str(to_address).unwrap();
+    let target_script = target.script_pubkey();
 
     Ok("Sign Sucess".to_string())
 }
