@@ -1,10 +1,10 @@
 //! api about wallet defined in here
 
 use crate::constructor::Constructor;
-use crate::db::{GlobalRB, GLOBAL_RB};
+use crate::db::{balance_helper, GlobalRB, GLOBAL_RB};
 use crate::path::{BTC_HAMMER_PATH, PATH};
-use crate::{db, Error};
-use bitcoin::{Address, Network};
+use crate::{db, Error, kit};
+use bitcoin::{Address, Network, OutPoint, TxIn, TxOut};
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
 use log::LevelFilter;
@@ -15,6 +15,8 @@ use std::path::Path;
 use std::str::FromStr;
 use std::time::SystemTime;
 use wallets_types::{BtcBalance, BtcNowLoadBlock};
+use bitcoin_hashes::sha256d;
+use bitcoin::hashes::hex::FromHex;
 
 const RBF: u32 = 0xffffffff - 2;
 
@@ -68,7 +70,9 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         .expect("can not start node");
 }
 
-pub async fn btc_load_now_blocknumber(net_type: &NetType) -> Result<BtcNowLoadBlock, rbatis::Error> {
+pub async fn btc_load_now_blocknumber(
+    net_type: &NetType,
+) -> Result<BtcNowLoadBlock, rbatis::Error> {
     set_global(net_type);
     db::fetch_scanned_height().await
 }
@@ -138,7 +142,41 @@ pub async fn btc_tx_sign(
     let target =
         bitcoin::Address::from_str(to_address).map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     let target_script = target.script_pubkey();
-    
+    // utxos
+    let outputs = balance_helper().await;
+    let mut utxos = vec![];
+    let mut total = 0;
+    for output in outputs {
+        if total <= value as u64 {
+            total += output.1.value;
+            utxos.push(output.1);
+        }
+    }
+    //signature
+    let mut txin = vec![];
+    for utxo in utxos {
+        txin.push(TxIn {
+            previous_output: OutPoint {
+                txid: sha256d::Hash::from_hex(
+                    &utxo.btc_tx_hash
+                )
+                    .unwrap(),
+                vout: utxo.idx,
+            },
+            script_sig: Default::default(),
+            sequence: RBF,
+            witness: vec![],
+        });
+    }
+
+    let mut txout = vec![];
+    txout.push(
+        TxOut{
+            value: value as u64,
+            script_pubkey: target_script,
+        }
+    );
+    let fee = kit::tx_fee(utxos.len() as u32,2);
 
     Ok("Sign Sucess".to_string())
 }

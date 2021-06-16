@@ -575,7 +575,7 @@ pub async fn load_balance() -> Result<BtcBalance, rbatis::Error> {
     Ok(r)
 }
 
-async fn balance_helper() -> HashMap<String, MBtcOutputTx> {
+pub async fn balance_helper() -> HashMap<String, MBtcOutputTx> {
     let vec = GlobalRB::global().detail.list_btc_output_tx().await;
     let mut map = HashMap::new();
     for output in vec {
