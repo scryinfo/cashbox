@@ -203,7 +203,7 @@ pub unsafe extern "C" fn ChainBtc_loadNowBlockNumber(
         match contexts.get(&ctx.id) {
             Some(wallets) => {
                 let btc_chain = wallets.btc_chain_instance();
-                let r = btc_chain.load_now_blocknumber(wallets, &wallets.net_type);
+                let r = block_on(btc_chain.load_now_blocknumber(wallets, &wallets.net_type));
                 match r {
                     Ok(r) => {
                         *block = CBtcNowLoadBlock::to_c_ptr(&r);
@@ -238,7 +238,7 @@ pub unsafe extern "C" fn ChainBtc_loadBalance(
         match contexts.get(&ctx.id) {
             Some(wallets) => {
                 let btc_chain = wallets.btc_chain_instance();
-                let r = btc_chain.load_balance(wallets, &wallets.net_type);
+                let r = block_on(btc_chain.load_balance(wallets, &wallets.net_type));
                 match r {
                     Ok(r) => {
                         *balance = CBtcBalance::to_c_ptr(&r);

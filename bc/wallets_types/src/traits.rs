@@ -76,7 +76,7 @@ pub trait BtcChainTrait: Send + Sync {
     async fn update_auth_tokens(&self, context: &dyn ContextTrait, auth_tokens: Vec<BtcChainTokenAuth>) -> Result<(), WalletError>;
     async fn get_auth_tokens(&self,context: &dyn ContextTrait,net_type: &NetType,start_item:u64,page_size:u64)->Result<Vec<BtcChainTokenAuth>,WalletError>;
     fn start_murmel(&self, context: &dyn ContextTrait, wallet_id: &str, net_type:&NetType) ->Result<(),WalletError>;
-    fn load_now_blocknumber(&self, context: &dyn ContextTrait, net_type:&NetType) ->Result<BtcNowLoadBlock,WalletError>;
-    fn load_balance(&self, context: &dyn ContextTrait,net_type: &NetType) -> Result<BtcBalance,WalletError>;
+    async fn load_now_blocknumber(&self, context: &dyn ContextTrait, net_type:&NetType) ->Result<BtcNowLoadBlock,WalletError>;
+    async fn load_balance(&self, context: &dyn ContextTrait,net_type: &NetType) -> Result<BtcBalance,WalletError>;
     async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, tx_param: &BtcTxParam) -> Result<String, WalletError>;
 }

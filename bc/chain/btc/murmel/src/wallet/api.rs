@@ -68,14 +68,14 @@ pub fn start(net_type: &NetType, address: Vec<&MAddress>) {
         .expect("can not start node");
 }
 
-pub fn btc_load_now_blocknumber(net_type: &NetType) -> Result<BtcNowLoadBlock, rbatis::Error> {
+pub async fn btc_load_now_blocknumber(net_type: &NetType) -> Result<BtcNowLoadBlock, rbatis::Error> {
     set_global(net_type);
-    db::fetch_scanned_height()
+    db::fetch_scanned_height().await
 }
 
-pub fn btc_load_balance(net_type: &NetType) -> Result<BtcBalance, rbatis::Error> {
+pub async fn btc_load_balance(net_type: &NetType) -> Result<BtcBalance, rbatis::Error> {
     set_global(net_type);
-    db::load_balance()
+    db::load_balance().await
 }
 
 fn set_global(net_type: &NetType) {
@@ -107,8 +107,10 @@ pub async fn btc_tx_sign(
         NetType::PrivateTest => Network::Regtest,
     };
 
-    let balance = btc_load_balance(net_type)?;
-    let mut value = value.parse::<f64>().map_err(|e| crate::Error::BtcTx(e.to_string()))?;
+    let balance = btc_load_balance(net_type).await?;
+    let mut value = value
+        .parse::<f64>()
+        .map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     value = value * 100000000f64;
     if (value as u64) > balance.balance {
         let e = Error::BtcTx("value not enough".to_string());
@@ -119,7 +121,8 @@ pub async fn btc_tx_sign(
     let mut master = MasterAccount::from_mnemonic(&mnemonic, 0, network, password, None).unwrap();
     let mut unlocker = Unlocker::new_for_master(&master, password).unwrap();
     // source
-    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10).unwrap();
+    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10)
+        .map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     master.add_account(account);
     let source = master
         .get_mut((0, 0))
@@ -132,9 +135,11 @@ pub async fn btc_tx_sign(
         return Err(Error::BtcTx("form address error".to_string()));
     }
     // target
-    let target = bitcoin::Address::from_str(to_address).map_err(|e| crate::Error::BtcTx(e.to_string()))?;
+    let target =
+        bitcoin::Address::from_str(to_address).map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     let target_script = target.script_pubkey();
     println!("{}", target_script.to_string());
+
 
     Ok("Sign Sucess".to_string())
 }

@@ -354,12 +354,13 @@ impl BtcChainTrait for BtcChain {
         Ok(())
     }
 
-    fn load_now_blocknumber(&self, _context: &dyn ContextTrait, net_type:&NetType) -> Result<BtcNowLoadBlock, WalletError> {
-        murmel::wallet::btc_load_now_blocknumber(net_type).map_err(|e| WalletError::RbatisError(e))
+    async fn load_now_blocknumber(&self, _context: &dyn ContextTrait, net_type:&NetType) -> Result<BtcNowLoadBlock, WalletError> {
+        murmel::wallet::btc_load_now_blocknumber(net_type).await.map_err(|e| WalletError::RbatisError(e))
     }
 
-    fn load_balance(&self, _context: &dyn ContextTrait, net_type: &NetType) -> Result<BtcBalance, WalletError> {
-        murmel::wallet::btc_load_balance(net_type).map_err(|e| WalletError::RbatisError(e))
+    async fn load_balance(&self, _context: &dyn ContextTrait, net_type: &NetType) -> Result<BtcBalance, WalletError> {
+        let r = murmel::wallet::btc_load_balance(net_type).await;
+        r.map_err(|e| WalletError::RbatisError(e))
     }
 
     async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, tx_param: &BtcTxParam) -> Result<String, WalletError> {
