@@ -1076,7 +1076,6 @@ impl EthChain {
 
 #[allow(dead_code)]
 impl BtcChain {
-    // TODO when sign btc-tx in wallet/chain use this function
     async fn get_mnemonic_from_address(context: &dyn ContextTrait, address: &str, password: &str) -> Result<Vec<u8>, WalletError> {
         if let Some(wallet) = wallets_types::Wallet::find_by_address(context, address).await? {
             let mnemonic = eee::Sr25519::get_mnemonic_context(&wallet.mnemonic, password.as_bytes())?;

@@ -138,8 +138,7 @@ pub async fn btc_tx_sign(
     let target =
         bitcoin::Address::from_str(to_address).map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     let target_script = target.script_pubkey();
-    println!("{}", target_script.to_string());
-
+    
 
     Ok("Sign Sucess".to_string())
 }

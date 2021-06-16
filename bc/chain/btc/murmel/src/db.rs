@@ -561,19 +561,8 @@ pub async fn fetch_scanned_height() -> Result<BtcNowLoadBlock, rbatis::Error> {
 }
 
 pub async fn load_balance() -> Result<BtcBalance, rbatis::Error> {
-    let vec = GlobalRB::global().detail.list_btc_output_tx().await;
-    let mut value_map = HashMap::new();
-    for out in vec {
-        value_map.insert(out.btc_tx_hash, out.value);
-    }
-
-    let vec = GlobalRB::global().detail.list_btc_input_tx().await;
-    let inputs = vec.into_iter().map(|y| y.tx_id).collect::<Vec<String>>();
-    let r = value_map
-        .into_iter()
-        .filter(|x| !inputs.contains(&x.0))
-        .collect::<HashMap<_, _>>();
-    let value = r.iter().map(|x| x.1).sum::<u64>();
+    let r = balance_helper().await;
+    let value = r.iter().map(|x| x.1.value).sum::<u64>();
     let mprogress = GlobalRB::global().detail.progress().await;
     let height = GlobalRB::global()
         .chain
@@ -584,6 +573,24 @@ pub async fn load_balance() -> Result<BtcBalance, rbatis::Error> {
         height,
     };
     Ok(r)
+}
+
+async fn balance_helper() -> HashMap<String, MBtcOutputTx> {
+    let vec = GlobalRB::global().detail.list_btc_output_tx().await;
+    let mut map = HashMap::new();
+    for output in vec {
+        let clone = output.clone();
+        map.insert(clone.btc_tx_hash, output);
+    }
+
+    let vec = GlobalRB::global().detail.list_btc_input_tx().await;
+    let inputs = vec
+        .into_iter()
+        .map(|input| input.tx_id)
+        .collect::<Vec<String>>();
+    map.into_iter()
+        .filter(|x| !inputs.contains(&x.0))
+        .collect::<HashMap<_, _>>()
 }
 
 mod test {
