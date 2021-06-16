@@ -210,8 +210,9 @@ fn btc_tx_sign_test() {
             wallet_id: r_wallet.id.clone(),
             password: "".to_string(),
             from_address: "mmn7ufSJ4w8uzhGwPnX8e2ENz6x7YBZ78b".to_string(),
-            to_address: "".to_string(),
+            to_address: "n16VXpudZnHLFkkeWrwTc8tr2oG66nScMk".to_string(),
             value: "0.000000001".to_string()
+            //value: "fasf".to_string()
         };
         let mut c_param = wallets_cdl::parameters::CBtcTxParam::to_c_ptr(&btc_param);
         let c_err = chain_btc_c::ChainBtc_txSign(*c_ctx,c_param,sign_result) as *mut CError;

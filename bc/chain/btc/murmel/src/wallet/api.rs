@@ -4,7 +4,7 @@ use crate::constructor::Constructor;
 use crate::db::{GlobalRB, GLOBAL_RB};
 use crate::path::{BTC_HAMMER_PATH, PATH};
 use crate::{db, Error};
-use bitcoin::{Network, Address};
+use bitcoin::{Address, Network};
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
 use log::LevelFilter;
@@ -12,9 +12,9 @@ use mav::ma::MAddress;
 use mav::{ChainType, NetType};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
+use std::str::FromStr;
 use std::time::SystemTime;
 use wallets_types::{BtcBalance, BtcNowLoadBlock};
-use std::str::FromStr;
 
 const RBF: u32 = 0xffffffff - 2;
 
@@ -108,7 +108,7 @@ pub async fn btc_tx_sign(
     };
 
     let balance = btc_load_balance(net_type)?;
-    let mut value = value.parse::<f64>().unwrap();
+    let mut value = value.parse::<f64>().map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     value = value * 100000000f64;
     if (value as u64) > balance.balance {
         let e = Error::BtcTx("value not enough".to_string());
@@ -128,12 +128,13 @@ pub async fn btc_tx_sign(
         .unwrap()
         .address
         .clone();
-    if !source.to_string().eq(from_address){
+    if !source.to_string().eq(from_address) {
         return Err(Error::BtcTx("form address error".to_string()));
     }
     // target
-    let target = bitcoin::Address::from_str(to_address).unwrap();
+    let target = bitcoin::Address::from_str(to_address).map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     let target_script = target.script_pubkey();
+    println!("{}", target_script.to_string());
 
     Ok("Sign Sucess".to_string())
 }
