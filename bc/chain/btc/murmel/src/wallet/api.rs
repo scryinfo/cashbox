@@ -2,9 +2,12 @@
 
 use crate::constructor::Constructor;
 use crate::db::{balance_helper, GlobalRB, GLOBAL_RB};
+use crate::kit::hex_to_tx;
 use crate::path::{BTC_HAMMER_PATH, PATH};
-use crate::{db, Error, kit};
-use bitcoin::{Address, Network, OutPoint, TxIn, TxOut};
+use crate::{db, kit, Error};
+use bitcoin::hashes::hex::FromHex;
+use bitcoin::{Address, Network, OutPoint, SigHashType, Transaction, TxIn, TxOut};
+use bitcoin_hashes::sha256d;
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
 use log::LevelFilter;
@@ -15,8 +18,6 @@ use std::path::Path;
 use std::str::FromStr;
 use std::time::SystemTime;
 use wallets_types::{BtcBalance, BtcNowLoadBlock};
-use bitcoin_hashes::sha256d;
-use bitcoin::hashes::hex::FromHex;
 
 const RBF: u32 = 0xffffffff - 2;
 
@@ -142,7 +143,7 @@ pub async fn btc_tx_sign(
     let target =
         bitcoin::Address::from_str(to_address).map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     let target_script = target.script_pubkey();
-    // utxos
+    // utxos and get idx(index)
     let outputs = balance_helper().await;
     let mut utxos = vec![];
     let mut total = 0;
@@ -152,15 +153,13 @@ pub async fn btc_tx_sign(
             utxos.push(output.1);
         }
     }
+
     //signature
     let mut txin = vec![];
-    for utxo in utxos {
+    for utxo in &utxos {
         txin.push(TxIn {
             previous_output: OutPoint {
-                txid: sha256d::Hash::from_hex(
-                    &utxo.btc_tx_hash
-                )
-                    .unwrap(),
+                txid: sha256d::Hash::from_hex(&utxo.btc_tx_hash).unwrap(),
                 vout: utxo.idx,
             },
             script_sig: Default::default(),
@@ -170,13 +169,39 @@ pub async fn btc_tx_sign(
     }
 
     let mut txout = vec![];
-    txout.push(
-        TxOut{
-            value: value as u64,
-            script_pubkey: target_script,
-        }
-    );
-    let fee = kit::tx_fee(utxos.len() as u32,2);
+    txout.push(TxOut {
+        value: value as u64,
+        script_pubkey: target_script,
+    });
+    let fee = kit::tx_fee(*&txin.len() as u32, 2) as u64;
+    // change to yourself
+    let change_value = total - fee;
+    txout.push(TxOut {
+        value: change_value,
+        script_pubkey: source.script_pubkey(),
+    });
+    let mut spending_transaction = Transaction {
+        input: txin,
+        output: txout,
+        lock_time: 0,
+        version: 2,
+    };
 
+    //get input transaction and idx from utxos vec
+    for utxo in utxos {
+        master
+            .sign(
+                &mut spending_transaction,
+                SigHashType::All,
+                &(|_| {
+                    let input_tx = hex_to_tx(&utxo.btc_tx_hexbytes)
+                        .map_err(|e| crate::Error::BtcTx(e.to_string())).ok()?;
+                    Some(input_tx.output[utxo.idx as usize].clone())
+                }),
+                &mut unlocker,
+            )
+            .map_err(|e| crate::Error::BtcTx(e.to_string()))?;
+    }
+    println!("{:#?}", spending_transaction);
     Ok("Sign Sucess".to_string())
 }
