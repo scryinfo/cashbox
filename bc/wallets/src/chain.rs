@@ -380,7 +380,8 @@ impl BtcChainTrait for BtcChain {
             &tx_param.from_address,
             &tx_param.to_address,
             &tx_param.password,
-            &tx_param.value
+            &tx_param.value,
+            &tx_param.broadcast
         ).await;
         r.map_err(|e|
             match e {

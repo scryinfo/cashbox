@@ -191,4 +191,5 @@ pub struct CBtcTxParam {
     pub from_address: *mut c_char,
     pub to_address: *mut c_char,
     pub value: *mut c_char,
+    pub broadcast: CBool,
 }

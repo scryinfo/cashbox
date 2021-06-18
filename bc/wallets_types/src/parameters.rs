@@ -300,4 +300,5 @@ pub struct BtcTxParam {
     pub from_address: String,
     pub to_address: String,
     pub value: String,//unit Btc
+    pub broadcast: u32,//broadcast or not (in CBtcTxParam it's CBool)
 }

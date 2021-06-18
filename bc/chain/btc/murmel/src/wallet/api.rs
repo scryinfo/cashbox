@@ -103,6 +103,8 @@ pub async fn btc_tx_sign(
     to_address: &String,
     password: &String,
     value: &String,
+    // broadcast or not use CBool
+    broadcast: &u32
 ) -> Result<String, crate::Error> {
     set_global(net_type);
     let network = match net_type {
