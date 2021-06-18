@@ -6,7 +6,7 @@ use crate::kit::hex_to_tx;
 use crate::path::{BTC_HAMMER_PATH, PATH};
 use crate::{db, kit, Error};
 use bitcoin::hashes::hex::FromHex;
-use bitcoin::{Address, Network, OutPoint, SigHashType, Transaction, TxIn, TxOut};
+use bitcoin::{Network, OutPoint, SigHashType, Transaction, TxIn, TxOut};
 use bitcoin_hashes::sha256d;
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
@@ -104,7 +104,7 @@ pub async fn btc_tx_sign(
     password: &String,
     value: &String,
     // broadcast or not use CBool
-    broadcast: &u32
+    broadcast: bool,
 ) -> Result<String, crate::Error> {
     set_global(net_type);
     let network = match net_type {
@@ -197,7 +197,8 @@ pub async fn btc_tx_sign(
                 SigHashType::All,
                 &(|_| {
                     let input_tx = hex_to_tx(&utxo.btc_tx_hexbytes)
-                        .map_err(|e| crate::Error::BtcTx(e.to_string())).ok()?;
+                        .map_err(|e| crate::Error::BtcTx(e.to_string()))
+                        .ok()?;
                     Some(input_tx.output[utxo.idx as usize].clone())
                 }),
                 &mut unlocker,
