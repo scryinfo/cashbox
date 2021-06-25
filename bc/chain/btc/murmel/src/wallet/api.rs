@@ -205,6 +205,5 @@ pub async fn btc_tx_sign(
             )
             .map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     }
-    println!("{:#?}", spending_transaction);
-    Ok("Sign Sucess".to_string())
+    Ok(kit::tx_to_hex(&spending_transaction))
 }
