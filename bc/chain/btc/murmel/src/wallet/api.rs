@@ -205,5 +205,14 @@ pub async fn btc_tx_sign(
             )
             .map_err(|e| crate::Error::BtcTx(e.to_string()))?;
     }
+
+    if broadcast {
+        broadcast(&spending_transaction);
+    }
+
     Ok(kit::tx_to_hex(&spending_transaction))
+}
+
+fn broadcast(tx: &Transaction) {
+    
 }
