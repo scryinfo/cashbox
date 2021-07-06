@@ -19,4 +19,6 @@
 //
 //
 //
-fn main() {}
+fn main() {
+    println!("It works!");
+}

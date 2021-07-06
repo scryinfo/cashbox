@@ -12,7 +12,7 @@ use bitcoin::network::message_bloom_filter::MerkleBlockMessage;
 use bitcoin::{BitcoinHash, Transaction};
 use bitcoin_hashes::hex::ToHex;
 
-use crate::constructor::CondPair;
+use crate::condvar::CondPair;
 use crate::db::{GlobalRB, Verify};
 use crate::kit::vec_to_string;
 use bitcoin::consensus::serialize as btc_serialize;

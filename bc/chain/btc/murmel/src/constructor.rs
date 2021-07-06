@@ -63,9 +63,6 @@ use std::{
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
-// CondVar use for sync thread
-pub type CondPair<T> = Arc<(parking_lot::Mutex<T>, Condvar)>;
-
 /// The complete stack
 pub struct Constructor {
     p2p: Arc<P2P<NetworkMessage, RawNetworkMessage, BitcoinP2PConfig>>,
@@ -156,7 +153,7 @@ impl Constructor {
 
         dispatcher.add_listener(GetData::new(p2p_control.clone(), timeout.clone(), pair3));
 
-        // dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
+        dispatcher.add_listener(Broadcast::new(p2p_control.clone(), timeout.clone(), pair4));
 
         for addr in &listen {
             p2p_control.send(P2PControl::Bind(addr.clone()));

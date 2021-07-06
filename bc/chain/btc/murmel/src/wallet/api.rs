@@ -207,12 +207,12 @@ pub async fn btc_tx_sign(
     }
 
     if broadcast {
-        broadcast(&spending_transaction);
+        broad(&spending_transaction);
     }
 
     Ok(kit::tx_to_hex(&spending_transaction))
 }
 
-fn broadcast(tx: &Transaction) {
+fn broad(tx: &Transaction) {
     
 }
