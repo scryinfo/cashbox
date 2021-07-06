@@ -39,15 +39,6 @@ impl Broadcast {
 
     //Loop through messages
     fn run(&mut self, receiver: PeerMessageReceiver<NetworkMessage>) {
-        {
-            let ref pair = self.pair;
-            let &(ref lock, ref cvar) = Arc::deref(pair);
-            let mut start = lock.lock();
-            while *start < 3 {
-                cvar.wait(&mut start);
-            }
-        }
-
         loop {
             //This method is the message receiving end, that is, an outlet of the channel, a consumption end of the Message
             while let Ok(msg) = receiver.recv_timeout(Duration::from_millis(2000)) {
