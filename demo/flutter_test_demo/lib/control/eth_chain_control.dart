@@ -6,7 +6,6 @@ import 'package:wallets/kits.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
 
-
 class EthChainControl {
   factory EthChainControl() => getInstance();
 
@@ -37,7 +36,7 @@ class EthChainControl {
         ..shortName = element.ethChainTokenShared.tokenShared.symbol ?? ""
         ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
         ..contractAddress = element.contractAddress ?? ""
-        ..isVisible = element.show.isTrue()
+        ..isVisible = element.show_1.isTrue()
         // ..tokenId = element.ethChainTokenShared.tokenShared.id
         ..decimal = element.ethChainTokenShared.decimal ?? 0;
 
@@ -72,19 +71,19 @@ class EthChainControl {
   }
 
   txSign(NetType netType, EthTransferPayload txPayload, NoCacheString password) {
-    var dataObj = Wallets.mainIsolate().chainEth.txSign(netType, txPayload, password);
+    /*var dataObj = Wallets.mainIsolate().chainEth.txSign(netType, txPayload, password);
     if (!dataObj.isSuccess()) {
       return null;
     }
-    return dataObj.data1;
+    return dataObj.data1;*/
   }
 
   rawTxSign(NetType netType, EthRawTxPayload rawTxPayload, NoCacheString password) {
-    var dataObj = Wallets.mainIsolate().chainEth.rawTxSign(netType, rawTxPayload, password);
+    /*var dataObj = Wallets.mainIsolate().chainEth.rawTxSign(netType, rawTxPayload, password);
     if (!dataObj.isSuccess()) {
       return null;
     }
-    return dataObj.data1;
+    return dataObj.data1;*/
   }
 
   bool updateAuthTokenList(ArrayCEthChainTokenAuth authTokens) {
@@ -103,11 +102,11 @@ class EthChainControl {
     return true;
   }
 
-  // addNonAuthDigit(ArrayCEthChainTokenNonAuth tokens) {
-  //   var dataObj = Wallets.mainIsolate().chainEth.addNonAuthDigit(tokens);
-  //   if (!dataObj.isSuccess()) {
-  //     return false;
-  //   }
-  //   return true;
-  // }
+// addNonAuthDigit(ArrayCEthChainTokenNonAuth tokens) {
+//   var dataObj = Wallets.mainIsolate().chainEth.addNonAuthDigit(tokens);
+//   if (!dataObj.isSuccess()) {
+//     return false;
+//   }
+//   return true;
+// }
 }

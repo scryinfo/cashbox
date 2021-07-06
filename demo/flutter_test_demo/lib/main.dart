@@ -2,29 +2,33 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_test_demo/control/eth_chain_control.dart';
 import 'package:flutter_test_demo/control/wallets_control.dart';
+import 'package:flutter_test_demo/demo/uniswap_page.dart';
+import 'package:flutter_test_demo/model/server_config_model.dart';
 import 'package:flutter_test_demo/model/token.dart';
 import 'package:grpc/grpc.dart';
+import 'package:logger/logger.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import 'package:wallets/enums.dart';
-import 'package:logger/logger.dart';
-import 'package:services/services.dart';
-
 import 'configv/config/config.dart';
 import 'configv/config/handle_config.dart';
-
+import 'package:services/services.dart';
 import 'package:services/src/rpc_face/cashbox_config_open.pbgrpc.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
 import 'package:services/src/rpc_face/cashbox_config_open.pbgrpc.dart';
 import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
 import 'package:wallets/wallets_c.dc.dart';
+
+import 'control/eee_chain_control.dart';
 
 void main() {
   runApp(MyApp());
@@ -33,13 +37,15 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: UniSwapPage(),
+      // home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -56,20 +62,26 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   Logger logger = Logger();
+  final Function testInitFunc = initFunc;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    testGrpc();
+    // testGrpc();
   }
+
+  static initFunc() {
+    print("test when initFunc will exec");
+  }
+
 
   testGrpc() async {
     final cashBoxType = "GA";
     final signInfo = "82499105f009f80a1fe2f1db86efdec7";
     final deviceId = "deviceIddddddd";
     final apkVersion = "2.0.0";
-    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), apkVersion, AppPlatformType.any, signInfo, "eeeddd", cashBoxType);
+    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.57", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
     var channel = createClientChannel(refresh.refreshCall);
     EthTokenOpen_QueryReq open_queryReq = new EthTokenOpen_QueryReq();
 
@@ -130,7 +142,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void didChangeDependencies() async {
     super.didChangeDependencies();
     logger.setLogLevel(LogLevel.Debug);
-    testWalletFunc();
+    // testWalletFunc();
+
+    // DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+    // Map<String, dynamic> _deviceData = <String, dynamic>{};
+    // String deviceId = "";
+    // var build = await _deviceInfoPlugin.androidInfo;
+    // print("deficeData is --->" + _deviceData.toString());
   }
 
   testWalletFunc() async {
@@ -169,15 +187,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _incrementCounter() async {
+    testInitFunc();
     setState(() {
       _counter++;
     });
     Config config = await HandleConfig.instance.getConfig();
-    print("before config.vendorConfig.toString()   ===>" + config.vendorConfig.toJson().toString());
+    // print("before config.vendorConfig.toString()   ===>" + config.vendorConfig.toJson().toString());
     String aimString = '''{"serverConfigIp":"测试修改four","configVersion":""}'''; //测属性是否可以是空字串
     await HandleConfig.instance.addOrUpdateVendorConfig(aimString);
     config = await HandleConfig.instance.getConfig();
-    print("after config.vendorConfig.toString()   ===>" + config.vendorConfig.toJson().toString());
+    // print("after config.vendorConfig.toString()   ===>" + config.vendorConfig.toJson().toString());
   }
 
   @override

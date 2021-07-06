@@ -52,7 +52,7 @@ const int _kMaxSmi64 = (1 << 62) - 1;
 const int _kMaxSmi32 = (1 << 30) - 1;
 final int _maxSize = sizeOf<IntPtr>() == 8 ? _kMaxSmi64 : _kMaxSmi32;
 
-class Utf8 extends Struct {
+/*class Utf8 extends Struct {
   static int strLen(Pointer<Utf8> string) {
     final Pointer<Uint8> array = string.cast<Uint8>();
     final Uint8List nativeString = array.asTypedList(_maxSize);
@@ -64,10 +64,10 @@ class Utf8 extends Struct {
     return utf8.decode(Uint8List.view(string.cast<Uint8>().asTypedList(length).buffer, 0, length));
   }
 
-  /*{
+  *//*{
   // todo 字符串数组
     allocate<Pointer<Uint8>>(count: 100);
-  }*/
+  }*//*
   // 将dart中的字符串，转换成 指针
   static Pointer<Utf8> toUtf8(String string) {
     final units = utf8.encode(string); // 算出string在utf8格式下，占得 字节uInt数
@@ -79,34 +79,34 @@ class Utf8 extends Struct {
   }
 
   String toString() => fromUtf8(addressOf);
-}
+}*/
 
 typedef PosixMallocNative = Pointer Function(IntPtr);
 typedef PosixMalloc = Pointer Function(int);
 
-Pointer<T> allocate<T extends NativeType>({int count = 1}) {
-  //调用C的 malloc方法，分配内存大小
-  final PosixMalloc posixMalloc = nativeAddLib.lookupFunction<PosixMallocNative, PosixMalloc>("malloc");
-  final int totalSize = count * sizeOf<T>();
-  Pointer<T> result;
-  if (Platform.isWindows) {
-    // result = winHeapAlloc(processHeap, /*flags=*/ 0, totalSize).cast();
-  } else {
-    result = posixMalloc(totalSize).cast();
-  }
-  if (result.address == 0) {
-    throw ArgumentError("Could not allocate $totalSize bytes.");
-  }
-  return result;
-}
+// Pointer<T> allocate<T extends NativeType>({int count = 1}) {
+//   //调用C的 malloc方法，分配内存大小
+//   final PosixMalloc posixMalloc = nativeAddLib.lookupFunction<PosixMallocNative, PosixMalloc>("malloc");
+//   final int totalSize = count * sizeOf<T>();
+//   Pointer<T> result;
+//   if (Platform.isWindows) {
+//     // result = winHeapAlloc(processHeap, /*flags=*/ 0, totalSize).cast();
+//   } else {
+//     result = posixMalloc(totalSize).cast();
+//   }
+//   if (result.address == 0) {
+//     throw ArgumentError("Could not allocate $totalSize bytes.");
+//   }
+//   return result;
+// }
 
-//写入string类型 log内容
-typedef WriteLogDart = void Function(int, Pointer<Utf8>, int, Pointer<Utf8>, int, int);
-typedef WriteLog = Void Function(Int32, Pointer<Utf8>, Int64, Pointer<Utf8>, Int64, Int64);
-
-void write(int flag, String log, int time, String threadName, int threadId, bool isMainThread) {
-  final writeLogan = nativeAddLib.lookup<NativeFunction<WriteLog>>('writeLog');
-  final write = writeLogan.asFunction<WriteLogDart>();
-  write(flag, Utf8.toUtf8(log), time, Utf8.toUtf8(threadName), threadId, isMainThread ? 0 : 1);
-}
+// //写入string类型 log内容
+// typedef WriteLogDart = void Function(int, Pointer<Utf8>, int, Pointer<Utf8>, int, int);
+// typedef WriteLog = Void Function(Int32, Pointer<Utf8>, Int64, Pointer<Utf8>, Int64, Int64);
+//
+// void write(int flag, String log, int time, String threadName, int threadId, bool isMainThread) {
+//   final writeLogan = nativeAddLib.lookup<NativeFunction<WriteLog>>('writeLog');
+//   final write = writeLogan.asFunction<WriteLogDart>();
+//   write(flag, Utf8.toUtf8(log), time, Utf8.toUtf8(threadName), threadId, isMainThread ? 0 : 1);
+// }
 /*----------------------------------------------end-------------------------------------------------*/

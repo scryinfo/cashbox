@@ -52,3 +52,9 @@ android {
 flutter {
     source '../..'
 }
+
+dependencies {
+    implementation 'com.github.WalletConnect:kotlin-walletconnect-lib:0.9.6'
+    implementation 'com.squareup.moshi:moshi:1.8.0'
+    implementation "com.squareup.okhttp3:okhttp:3.11.0"
+}

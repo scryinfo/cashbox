@@ -127,7 +127,7 @@ class WalletsControl {
   }
 
   List<TokenAddress> getTokenAddress(String walletId, NetType netType) {
-    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId, netType);
+    var tokenAddressObj = Wallets.mainIsolate().getTokenAddress(walletId);
     if (!tokenAddressObj.isSuccess()) {
       return null;
     }

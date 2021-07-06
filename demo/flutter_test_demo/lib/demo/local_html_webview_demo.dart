@@ -60,7 +60,7 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
                   if (status.isGranted) {
                     _scanQrContent();
                   } else {
-                    Map<Permission, PermissionStatus> statuses = await [Permission.camera, Permission.storage].request();
+                    Map<Permission, PermissionStatus> statuses = await [Permission.camera].request();
                     if (statuses[Permission.camera] == PermissionStatus.granted) {
                       _scanQrContent();
                     } else {
@@ -83,7 +83,7 @@ class _LocalHtmlWebViewDemoState extends State<LocalHtmlWebViewDemo> {
   }
 
   void _scanQrContent() {
-    /*Future<String> qrResult = QrScanUtil.instance.qrscan();
+    /*Future<String> qrResult = QrScanControl.instance.qrscan();
     qrResult.then((t) {
       Fluttertoast.showToast(msg: "扫描结果是======> $t");
       _controller?.evaluateJavascript('nativeScanResult("$t")')?.then((result) {});

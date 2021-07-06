@@ -20,8 +20,8 @@ void main() {
   final cashBoxType = "GA";
   final signInfo = "82499105f009f80a1fe2f1db86efdec7";
   final deviceId = "deviceIddddddd";
-  final apkVersion = "2.0.0";
-  var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), "2.0.0", AppPlatformType.any, signInfo, "eee", cashBoxType);
+  final apkVersion = "5.0.0";
+  var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.57", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
   var channel = createClientChannel(refresh.refreshCall);
   BasicClientReq basicClientReq = new BasicClientReq();
   basicClientReq
@@ -35,23 +35,49 @@ void main() {
     try {
       CashboxConfigOpen_LatestConfigRes latestConfigRes = await cashboxConfigOpenFaceClient.latestConfig(basicClientReq);
       print("latestConfigRes  is ------>" + latestConfigRes.toString());
-      print("latestConfigRes  configVersion is ------>" + latestConfigRes.configVersion.toString());
-      print("latestConfigRes  cashboxVersion is ------>" + latestConfigRes.cashboxVersion.toString());
-      print("latestConfigRes  conf is ------>" + latestConfigRes.conf.toString());
       print("latestConfigRes  is ------>" + json.decode(latestConfigRes.conf).toString());
       print("latestConfigRes  url is ------>" + json.decode(latestConfigRes.conf)["scryXChainUrl"].toString());
-      print("latestConfigRes  authTokenListVersion is ------>" + json.decode(latestConfigRes.conf)["authTokenListVersion"].toString());
-      ServerConfigModel serverConfigModel = ServerConfigModel.fromJson(json.decode(latestConfigRes.conf));
+      LatestConfig serverConfigModel = LatestConfig.fromJson(json.decode(latestConfigRes.conf));
       print("latestConfigRes  is ------>" + serverConfigModel.toJson().toString());
+      print("latestConfigRes  is ------>" + serverConfigModel.toString());
     } catch (e) {
       print("latestConfigRes  error is ------>" + e.toString());
     }
   });
+  test('Cashbox Rate Info ', () async {
+    final tokenPriceClient = TokenOpenFaceClient(channel);
+    try {
+      TokenOpen_PriceRateRes priceRes = await tokenPriceClient.priceRate(basicClientReq);
+      print("priceRes  is ------>" + priceRes.toString());
+      List<TokenOpen_Price> priceList = priceRes.prices;
+      List<TokenOpen_Rate> rateList = priceRes.rates;
+
+      print("priceRes.prices.length  is ------>" + priceList.length.toString());
+      print("priceRes.prices  is ------>" + priceRes.prices.toString());
+      priceList.forEach((price) {
+        if (price.hasChangePercent24Hr()) {
+          var changePerHour = double.parse(price.changePercent24Hr);
+          print("change  is ------>" + changePerHour.toString());
+          print("change  is ------>" + price.name);
+        } else {
+          print("这货没有changePercent24Hour  is ------>" + price.name);
+        }
+      });
+
+      print("priceRes.rates  is ------>" + rateList.length.toString());
+      print("priceRes.rates  is ------>" + priceRes.rates[0].toString());
+      print("priceRes err is ------>" + priceRes.err.code.toString() + "||" + priceRes.err.message.toString());
+    } catch (e) {
+      print("latestConfigRes  error is ------>" + e.toString());
+    }
+  });
+
   test('EthTokenOpen_QueryReq ', () async {
     var refresh =
-        RefreshOpen.get(new ConnectParameter("192.168.2.12", 9004), "2.0.0", AppPlatformType.any, "82499105f009f80a1fe2f1db86efdec7", "", "");
+        RefreshOpen.get(new ConnectParameter("192.168.2.57", 9004), "5.0.0", AppPlatformType.any, "82499105f009f80a1fe2f1db86efdec7", "", "");
     var channel = createClientChannel(refresh.refreshCall);
     EthTokenOpen_QueryReq open_queryReq = new EthTokenOpen_QueryReq();
+    EeeTokenOpen_QueryReq open_eee_queryReq = new EeeTokenOpen_QueryReq();
 
     PageReq pageReq = PageReq();
     pageReq..page = 0;
@@ -59,12 +85,26 @@ void main() {
       ..info = basicClientReq
       ..page = pageReq
       ..isDefault = false;
+    open_eee_queryReq
+      ..info = basicClientReq
+      ..page = pageReq
+      ..isDefault = false;
     final ethTokenClient = EthTokenOpenFaceClient(channel);
+    final eeeTokenClient = EeeTokenOpenFaceClient(channel);
     try {
+      EeeTokenOpen_QueryRes eeeTokenOpen_QueryRes = await eeeTokenClient.query(open_eee_queryReq);
+      print("eee TokenOpen_QueryRes.page  is ------>");
+      print("eee TokenOpen_QueryRes.page  is ------>" + eeeTokenOpen_QueryRes.page.toString());
+      List<EeeTokenOpen_Token> eeeTokenList = eeeTokenOpen_QueryRes.tokens;
+      print("eth TokenList.length  is ------>" + eeeTokenList.length.toString());
+      eeeTokenList.forEach((element) {
+        print("element is --->" + element.toString());
+      });
       EthTokenOpen_QueryRes ethTokenOpen_QueryRes = await ethTokenClient.query(open_queryReq);
-      print("ethTokenOpen_QueryRes.page  is ------>" + ethTokenOpen_QueryRes.page.toString());
+      print("eth TokenOpen_QueryRes.page  is ------>" + ethTokenOpen_QueryRes.page.toString());
+
       List<EthTokenOpen_Token> ethTokenList = ethTokenOpen_QueryRes.tokens;
-      print("ethTokenList.length  is ------>" + ethTokenList.length.toString());
+      print("eth TokenList.length  is ------>" + ethTokenList.length.toString());
       List<TokenM> tokenMList = [];
       ArrayCEthChainTokenAuth arrayCEthChainTokenAuth = ArrayCEthChainTokenAuth();
       List<EthChainTokenAuth> ethChainTokenList = [];
