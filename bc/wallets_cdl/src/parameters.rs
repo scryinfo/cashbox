@@ -7,7 +7,7 @@ use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{
     AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName,
     DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,EeeChainTx,WalletTokenStatus,
-    BtcNowLoadBlock,BtcBalance,BtcTxParam,
+    BtcNowLoadBlock,BtcBalance,BtcTxParam,EthWalletConnectTx
 };
 
 use crate::kits::{to_c_char, to_str, CStruct, CR, CBool,Assignment};
@@ -133,6 +133,17 @@ pub struct CEthTransferPayload {
     pub extData: *mut c_char,
 }
 
+#[repr(C)]
+#[derive(Debug, DlStruct, DlDefault, DlCR)]
+pub struct CEthWalletConnectTx{
+    pub from: *mut c_char,
+    pub to: *mut c_char,
+    pub data:  *mut c_char,
+    pub gasPrice: *mut c_char,
+    pub gas: *mut c_char,
+    pub value: *mut c_char,
+    pub nonce: *mut c_char,
+}
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]

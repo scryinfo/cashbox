@@ -2,6 +2,8 @@ use failure::_core::ops::{Deref, DerefMut};
 use super::error::WalletError;
 use mav::ma::{MEeeChainTx, MEeeTokenxTx};
 use ethereum_types::U256;
+use eth::RawTransaction;
+use std::convert::TryInto;
 
 #[derive(Debug, Default, Clone)]
 pub struct InitParameters {
@@ -178,7 +180,6 @@ impl EthTransferPayload {
                U256::from(0)
            }
        };
-        //let  amount = amount.unwrap();
         //Additional parameters
         let data = self.ext_data.as_str().as_bytes().to_vec();
         log::debug!("to address:{:?},contract_address:{:?}",self.to_address,self.contract_address);
@@ -225,9 +226,59 @@ impl EthTransferPayload {
         Ok(eth::RawTransaction {
             nonce,
             to: to_address,
-            value: value,
+            value,
             gas_price,
             gas: gas_limit,
+            data,
+        })
+    }
+}
+#[derive(Debug,Clone,Default)]
+pub struct EthWalletConnectTx{
+    pub from: String,
+    pub to:String,
+    pub data:  String,
+    pub gas_price: String,
+    pub gas:String,
+    pub value: String,
+    pub nonce: String,
+}
+
+impl TryInto<RawTransaction> for EthWalletConnectTx{
+    type Error = WalletError;
+
+    fn try_into(self) -> Result<RawTransaction,Self::Error> {
+        let to = self.to.trim();
+        let to =if to.is_empty(){
+            None
+        }else{
+            let to = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(to)?.as_slice());
+            log::debug!("to address:{:?}",to);
+            Some(to)
+        };
+        //wallet connect data format always is hex
+        let nonce = ethereum_types::U256::from(scry_crypto::hexstr_to_vec(&self.nonce)?.as_slice());
+
+        //user input gas price is decimal
+        let gas_price =  ethereum_types::U256::from_dec_str(&self.gas_price).map_err(|err|WalletError::Custom(err.to_string()))?;
+
+        //Allow maximum gas consumption
+        if self.gas.contains('.') {
+            let error_msg = format!("input gas_limit illegal:{}",&self.gas);
+            return Err(WalletError::Custom(error_msg));
+        }
+        let gas=  U256::from_dec_str(&self.gas).map_err(|err|WalletError::Custom(err.to_string()))?;
+
+        //Additional parameters
+        let data = scry_crypto::hexstr_to_vec(&self.data)?;
+        let value = U256::from(scry_crypto::hexstr_to_vec(&self.value)?.as_slice());
+
+        Ok(eth::RawTransaction {
+            nonce,
+            to,
+            value,
+            gas_price,
+            gas,
             data,
         })
     }

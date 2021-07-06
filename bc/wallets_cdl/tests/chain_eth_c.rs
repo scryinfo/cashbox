@@ -1,6 +1,6 @@
 use std::ptr::null_mut;
 use mav::kits;
-use wallets_types::{InitParameters, Error, EthRawTxPayload, EthTransferPayload, EthChainTokenDefault, EthChainTokenAuth, EthChainTokenNonAuth};
+use wallets_types::{InitParameters, Error, EthRawTxPayload, EthTransferPayload, EthChainTokenDefault, EthChainTokenAuth, EthChainTokenNonAuth, EthWalletConnectTx};
 
 use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
                   parameters::{CContext, CInitParameters, CEthTransferPayload, CEthRawTxPayload},
@@ -12,6 +12,7 @@ use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
 use mav::ma::{EthTokenType};
 use wallets_cdl::mem_c::{CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenDefault_dFree, CArrayCEthChainTokenNonAuth_dAlloc, CArrayCEthChainTokenNonAuth_dFree, CArrayCWallet_dAlloc, CArrayCEthChainTokenAuth_dFree};
 use wallets_cdl::wallets_c::Wallets_all;
+use wallets_cdl::parameters::CEthWalletConnectTx;
 
 mod data;
 
@@ -28,7 +29,7 @@ fn eth_tx_sign_test() {
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let transfer_tx = EthTransferPayload {
           //  from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
-            from_address: "0xb10afe632d498ef89fef6401b23a40a1fcc85546".to_string(),
+            from_address: "0x73c7bcd3bb594d2d4d9b63b818305109ab79df1d".to_string(),
             to_address: "0xc0c4824527ffb27a51034cea1e37840ed69a5f1e".to_string(),
             contract_address: "".to_string(),
             value: "2000000000000000".to_string(),
@@ -69,6 +70,35 @@ fn eth_raw_tx_sign_test() {
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_raw_tx_payload.free();
+        wallets_cdl::mem_c::CStr_dFree(sign_result);
+        wallets_cdl::mem_c::CContext_dFree(c_ctx);
+    }
+}
+#[test]
+fn eth_wallet_connect_tx_sign_test() {
+    let c_ctx = CContext_dAlloc();
+    assert_ne!(null_mut(), c_ctx);
+    unsafe {
+        let c_err = data::init_wallets_context(c_ctx);
+        assert_ne!(null_mut(), c_err);
+        assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
+        //   let wallet =   data::create_wallet(c_ctx);
+        let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
+        let transfer_tx = EthWalletConnectTx {
+            //  from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
+            from: "0x73c7bcd3bb594d2d4d9b63b818305109ab79df1d".to_string(),
+            to: "0xc0c4824527ffb27a51034cea1e37840ed69a5f1e".to_string(),
+            value: "0x9184e72a".to_string(),
+            nonce: "0x01".to_string(),
+            gas_price: "10000000000000".to_string(),
+            gas:"30400".to_string(),
+            data: "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675".to_string(),
+        };
+        let mut c_transfer_tx = CEthWalletConnectTx::to_c_ptr(&transfer_tx);
+        let c_err = chain_eth_c::ChainEth_walletConnectTxSign(*c_ctx,  c_transfer_tx, to_c_char("123456"), sign_result) as *mut CError;
+        assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
+        CError_free(c_err);
+        c_transfer_tx.free();
         wallets_cdl::mem_c::CStr_dFree(sign_result);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }

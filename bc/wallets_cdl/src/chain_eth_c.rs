@@ -7,13 +7,13 @@ use wallets::Contexts;
 use super::types::CError;
 use super::kits::{CR,CArray, to_c_char, to_str};
 
-use crate::parameters::{CContext, CEthTransferPayload, CEthRawTxPayload};
+use crate::parameters::{CContext, CEthTransferPayload, CEthRawTxPayload, CEthWalletConnectTx};
 use crate::CStruct;
 use crate::chain_eth::{CEthChainTokenAuth, CEthChainTokenDefault, CEthChainTokenNonAuth};
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_decodeAdditionData(ctx: *mut CContext, encodeData: *mut c_char, additionData: *mut *mut c_char) -> *const CError {
-    log::debug!("enter ChainEee ChainEth decodeAdditionData");
+    log::debug!("enter ChainEth decodeAdditionData");
 
     if ctx.is_null() || encodeData.is_null() || additionData.is_null() {
         let err = Error::PARAMETER().append_message(" : encodeData or additionData is null");
@@ -45,7 +45,7 @@ pub unsafe extern "C" fn ChainEth_decodeAdditionData(ctx: *mut CContext, encodeD
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_txSign(ctx: *mut CContext, txPayload: *mut CEthTransferPayload, password: *mut c_char, signResult: *mut *mut c_char) -> *const CError {
-    log::debug!("enter ChainEee ChainEth txSign");
+    log::debug!("enter ChainEth txSign");
 
     if ctx.is_null() || txPayload.is_null() || password.is_null() || signResult.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,netType,txPayload,password or signResult is null");
@@ -78,7 +78,7 @@ pub unsafe extern "C" fn ChainEth_txSign(ctx: *mut CContext, txPayload: *mut CEt
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_rawTxSign(ctx: *mut CContext, rawTxPayload: *mut CEthRawTxPayload, password: *mut c_char, signResult: *mut *mut c_char) -> *const CError {
-    log::debug!("enter ChainEee ChainEth rawTxSign");
+    log::debug!("enter ChainEth rawTxSign");
 
     if ctx.is_null() || rawTxPayload.is_null() || password.is_null() || signResult.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,rawTxPayload,password or signResult is null");
@@ -108,11 +108,39 @@ pub unsafe extern "C" fn ChainEth_rawTxSign(ctx: *mut CContext, rawTxPayload: *m
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
-
+#[no_mangle]
+pub unsafe extern "C" fn ChainEth_walletConnectTxSign(ctx: *mut CContext, wallet_connect_tx: *mut CEthWalletConnectTx, password: *mut c_char, signResult: *mut *mut c_char) -> *const CError {
+    log::debug!("enter ChainEth walletConnectSign");
+    if ctx.is_null() || wallet_connect_tx.is_null() || password.is_null(){
+        let err = Error::PARAMETER().append_message(" : ctx,wallet_connect_tx,password is null");
+        log::error!("{}", err);
+        return CError::to_c_ptr(&err);
+    }
+    let lock = Contexts::collection().lock();
+    let mut contexts = lock.borrow_mut();
+    let err = {
+        let ctx = CContext::ptr_rust(ctx);
+        match contexts.get(&ctx.id) {
+            Some(wallets) => {
+                let eth_chain = wallets.eth_chain_instance();
+                let wallet_connect_tx_payload = CEthWalletConnectTx::ptr_rust(wallet_connect_tx);
+                match block_on(eth_chain.wallet_connect_tx_sign(wallets, &wallets.net_type, &wallet_connect_tx_payload, to_str(password))) {
+                    Ok(res) => {
+                        *signResult = to_c_char(&res);
+                        Error::SUCCESS()
+                    }
+                    Err(err) => Error::from(err)
+                }
+            }
+            None => Error::NONE().append_message(": can not find the context")
+        }
+    };
+    log::debug!("{}", err);
+    CError::to_c_ptr(&err)
+}
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_updateAuthTokenList(ctx: *mut CContext, authTokens: *mut CArray<CEthChainTokenAuth>) -> *const CError {
     log::debug!("enter ChainEth updateAuthTokenList");
-
     if ctx.is_null() || authTokens.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,authTokens is null");
         log::error!("{}", err);

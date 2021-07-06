@@ -244,7 +244,7 @@ fn create_wallet_test() {
         name: "test".to_owned(),
         password: "123456".to_string(),
         mnemonic: mnemonic.to_string(),
-        wallet_type: WalletType::Test.to_string(),
+        wallet_type: WalletType::Normal.to_string(),
     });
     unsafe {
         let c_err = data::init_wallets_context(c_ctx);

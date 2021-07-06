@@ -7,7 +7,6 @@ use parking_lot::ReentrantMutex;
 use wallets_types::{Context, WalletError};
 
 use crate::Wallets;
-use mav::NetType;
 
 ///处理所有的wallets实例，
 #[derive(Default)]

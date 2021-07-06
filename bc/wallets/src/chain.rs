@@ -4,7 +4,7 @@ use eee::{Crypto, EeeAccountInfo, EeeAccountInfoRefU8, Ss58Codec};
 use mav::ma::{Dao, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenShared, MTokenShared, MWallet, MEeeTokenxTx, EeeTokenType, MEthChainTokenNonAuth, MTokenAddress, MBtcChainTokenAuth};
 
 use mav::{NetType, WalletType, CTrue, CFalse};
-use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock, BtcBalance, BtcTxParam};
+use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChainTokenDefault, BtcChainTrait, Chain2WalletType, ChainTrait, ContextTrait, DecodeAccountInfoParameters, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTrait, EeeTransferPayload, EthChainTokenAuth, EthChainTokenDefault, EthChainTrait, EthRawTxPayload, EthTransferPayload, ExtrinsicContext, RawTxParam, StorageKeyParameters, SubChainBasicInfo, WalletError, WalletTrait, EeeChainTx, EthChainTokenNonAuth, BtcNowLoadBlock, BtcBalance, BtcTxParam, EthWalletConnectTx};
 
 use codec::Decode;
 use rbatis::plugin::page::PageRequest;
@@ -13,6 +13,8 @@ use bitcoin::util::psbt::serialize::Serialize;
 use rbatis::crud::CRUDTable;
 use futures::executor::block_on;
 use murmel::Error;
+use std::convert::TryInto;
+use eth::RawTransaction;
 
 #[derive(Default)]
 struct EthChain();
@@ -890,30 +892,21 @@ impl EeeChain {
 #[async_trait]
 impl EthChainTrait for EthChain {
     async fn tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, tx_payload: &EthTransferPayload, password: &str) -> Result<String, WalletError> {
-        let chain_id = match net_type {
-            NetType::Main => 1,
-            NetType::Test => 3,
-            _ => 17
-        };
         let tx_payload_trim = tx_payload.trim();
         let raw_tx = tx_payload_trim.decode()?;
-        let pri_key = Self::get_private_key_from_address(context, &tx_payload.from_address, password).await?;
-        let tx_signed = raw_tx.sign(&pri_key, Some(chain_id));
-        Ok(format!("0x{}", hex::encode(tx_signed)))
+        Self::raw_transaction_sign(context,net_type,&raw_tx,&tx_payload.from_address,password).await
     }
 
     async fn raw_tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, raw_tx_payload: &EthRawTxPayload, password: &str) -> Result<String, WalletError> {
-        let chain_id = match net_type {
-            NetType::Main => 1,
-            NetType::Test => 3,
-            _ => 17
-        };
         let tx_encode_data = scry_crypto::hexstr_to_vec(&raw_tx_payload.raw_tx)?;
         let mut raw_tx = eth::RawTransaction::default();
         raw_tx.decode(&tx_encode_data)?;
-        let pri_key = Self::get_private_key_from_address(context, &raw_tx_payload.from_address, password).await?;
-        let tx_signed = raw_tx.sign(&pri_key, Some(chain_id));
-        Ok(format!("0x{}", hex::encode(tx_signed)))
+        Self::raw_transaction_sign(context,net_type,&raw_tx,&raw_tx_payload.from_address,password).await
+    }
+
+    async fn wallet_connect_tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, wallet_connect_tx: &EthWalletConnectTx, password: &str) -> Result<String, WalletError> {
+        let raw_tx = wallet_connect_tx.to_owned().try_into()?;
+        Self::raw_transaction_sign(context,net_type,&raw_tx,&wallet_connect_tx.from,password).await
     }
 
     async fn decode_addition_data(&self, encode_data: &str) -> Result<String, WalletError> {
@@ -1077,6 +1070,16 @@ impl EthChain {
         } else {
             Err(WalletError::Custom(format!("address {} wallet is not exist!", address)))
         }
+    }
+    async fn raw_transaction_sign(context: &dyn ContextTrait,net_type: &NetType, tx_payload: &RawTransaction,address: &str, password: &str)-> Result<String, WalletError>{
+        let chain_id = match net_type {
+            NetType::Main => 1,
+            NetType::Test => 3,
+            _ => 17
+        };
+        let pri_key = Self::get_private_key_from_address(context, address, password).await?;
+        let tx_signed = tx_payload.sign(&pri_key, Some(chain_id));
+        Ok(format!("0x{}", hex::encode(tx_signed)))
     }
 }
 

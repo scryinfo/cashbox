@@ -8,7 +8,7 @@ use parking_lot::{RawMutex, RawThreadId};
 
 use eee::Crypto;
 use mav::ma::{BeforeSave, Dao, Db, DbCreateType, DbName, MAddress, MBtcChainToken, MEeeChainToken, MEthChainToken, MMnemonic, MTokenAddress, MWallet, SettingType, MEthChainTokenDefault, MEthChainTokenAuth, MEthChainTokenNonAuth};
-use mav::{ChainType, NetType, WalletType, CTrue, CFalse, AppPlatformType};
+use mav::{ChainType, NetType, WalletType, CTrue, AppPlatformType};
 use scry_crypto::Keccak256;
 use wallets_types::{BtcChainTrait, Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, EthChainTrait, InitParameters, Setting, TokenAddress, Wallet, WalletError, WalletTrait, WalletTokenStatus};
 
