@@ -17,7 +17,7 @@
 //! # Download headers
 //!
 use crate::chaindb::SharedChainDB;
-use crate::condvar::CondPair;
+use crate::broadcast_queue::CondPair;
 use crate::db::GlobalRB;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;

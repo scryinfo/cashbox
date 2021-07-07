@@ -1,6 +1,6 @@
 //! mod for broadcast TX
 
-use crate::condvar::CondPair;
+use crate::broadcast_queue::{global_q, CondPair, NamedQueue};
 use crate::error::Error;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
@@ -8,9 +8,10 @@ use crate::p2p::{
 use crate::timeout::{ExpectedReply, SharedTimeout};
 use crate::walletlib;
 use bitcoin::network::message::NetworkMessage;
+use bitcoin::Transaction;
 use log::{error, info, trace};
-use std::ops::Deref;
-use std::sync::{mpsc, Arc};
+use parking_lot::MutexGuard;
+use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
 
@@ -74,8 +75,11 @@ impl Broadcast {
     // broadcast tx to bitcoin network
     fn broadcast_tx(&mut self, peer: PeerId) -> Result<(), Error> {
         info!("Broadcast tx message");
-        let tx = walletlib::create_master();
-        self.p2p.send_network(peer, NetworkMessage::Tx(tx));
+        let mut q = global_q("transactions").lock();
+        if let Some(t) = q.pop() {
+            self.p2p.send_network(peer, NetworkMessage::Tx(t));
+            return Ok(());
+        }
         Ok(())
     }
 }

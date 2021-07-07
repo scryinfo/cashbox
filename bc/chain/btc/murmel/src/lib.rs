@@ -50,6 +50,6 @@ pub mod timeout;
 pub mod walletlib;
 pub mod path;
 mod kit;
-pub mod condvar;
+pub mod broadcast_queue;
 
 pub use error::Error;

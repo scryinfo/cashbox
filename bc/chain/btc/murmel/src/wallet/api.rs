@@ -1,5 +1,6 @@
 //! api about wallet defined in here
 
+use crate::broadcast_queue::{NamedQueue, global_q};
 use crate::constructor::Constructor;
 use crate::db::{balance_helper, GlobalRB, GLOBAL_RB};
 use crate::kit::hex_to_tx;
@@ -13,6 +14,7 @@ use bitcoin_wallet::mnemonic::Mnemonic;
 use log::LevelFilter;
 use mav::ma::MAddress;
 use mav::{ChainType, NetType};
+use parking_lot::MutexGuard;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::path::Path;
 use std::str::FromStr;
@@ -213,6 +215,8 @@ pub async fn btc_tx_sign(
     Ok(kit::tx_to_hex(&spending_transaction))
 }
 
+// push tx to broad cast queue
 fn broad(tx: &Transaction) {
-    
+    let mut q: MutexGuard<NamedQueue<Transaction>> = global_q("transactions").lock();
+    q.push(tx.clone());
 }

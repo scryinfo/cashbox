@@ -22,6 +22,7 @@
 use crate::bloomfilter::BloomFilter;
 use crate::broadcast::Broadcast;
 use crate::chaindb::{ChainDB, SharedChainDB};
+use crate::broadcast_queue::{NamedQueue};
 use crate::db;
 use crate::db::{GlobalRB, Verify, GLOBAL_RB};
 use crate::dispatcher::Dispatcher;
@@ -41,6 +42,7 @@ use crate::timeout::Timeout;
 use bitcoin::network::constants::Network;
 use bitcoin::network::message::NetworkMessage;
 use bitcoin::network::message::RawNetworkMessage;
+use bitcoin::Transaction;
 use futures::executor::block_on;
 use futures::{
     executor::{ThreadPool, ThreadPoolBuilder},

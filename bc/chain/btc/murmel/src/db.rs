@@ -598,7 +598,6 @@ mod test {
     use crate::path::PATH;
     use bitcoin::{Network, Transaction};
     use futures::executor::block_on;
-    use log::kv::Source;
     use std::collections::HashMap;
 
     #[test]

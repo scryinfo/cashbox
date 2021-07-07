@@ -1,5 +1,5 @@
 //! This mod is about bloomfilter sender
-use crate::condvar::CondPair;
+use crate::broadcast_queue::CondPair;
 use crate::error::Error;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
