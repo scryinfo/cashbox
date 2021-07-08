@@ -215,7 +215,7 @@ pub async fn btc_tx_sign(
     Ok(kit::tx_to_hex(&spending_transaction))
 }
 
-// push tx to broad cast queue
+// push tx to broadcast queue
 fn broad(tx: &Transaction) {
     let mut q: MutexGuard<NamedQueue<Transaction>> = global_q("transactions").lock();
     q.push(tx.clone());

@@ -2,6 +2,7 @@ use bitcoin::Transaction;
 use once_cell::sync::OnceCell;
 use parking_lot::{Condvar, Mutex};
 use std::sync::Arc;
+use std::collections::VecDeque;
 
 // CondVar use for sync thread
 pub type CondPair<T> = Arc<(parking_lot::Mutex<T>, Condvar)>;
@@ -9,20 +10,20 @@ pub type CondPair<T> = Arc<(parking_lot::Mutex<T>, Condvar)>;
 #[derive(Debug)]
 pub struct NamedQueue<'a, T> {
     name: &'a str,
-    q: Vec<T>,
+    q: VecDeque<T>,
 }
 
 impl<'a, T> NamedQueue<'a, T> {
     pub fn init(name: &'static str) -> NamedQueue<T> {
-        NamedQueue { name, q: vec![] }
+        NamedQueue { name, q: VecDeque::new() }
     }
 
     pub fn push(&mut self, t: T) {
-        self.q.push(t)
+        self.q.push_back(t)
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        self.q.pop()
+        self.q.pop_front()
     }
 }
 
