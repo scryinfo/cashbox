@@ -5,6 +5,7 @@ import '../routers/router_handler.dart';
 
 class Routes {
   static String ethHomePage = '/ethhomePage';
+  static String wcConnectedPage = '/wcconnectedpage';
   static String eeeHomePage = '/eeehomepage';
   static String entrancePage = '/entrancepage';
   static String publicPage = '/publicpage';
@@ -25,6 +26,7 @@ class Routes {
 
   static String minePage = '/minepage';
   static String ddd2eeePage = '/ddd2eeepage';
+  static String wcApprovePage = '/wcapprovepage';
   static String ddd2eeeConfirmPage = '/ddd2eeeconfirmpage';
   static String walletManagerListPage = '/walletmanagerlistpage';
   static String languageChoosePage = '/languagechoosepage';
@@ -48,6 +50,7 @@ class Routes {
     });
 
     router.define(ethHomePage, handler: ethHomePageHandler);
+    router.define(wcConnectedPage, handler: wcConnectedPageHandler);
     router.define(eeeHomePage, handler: eeeHomePageHandler);
     router.define(entrancePage, handler: entrancePageHandler);
     router.define(publicPage, handler: publicPageHandler);
@@ -68,6 +71,7 @@ class Routes {
     router.define(transferBtcPage, handler: transferBtcPageHandler);
     router.define(minePage, handler: minePageHandler);
     router.define(ddd2eeePage, handler: ddd2eeePageHandler);
+    router.define(wcApprovePage, handler: wcApprovePageHandler);
     router.define(ddd2eeeConfirmPage, handler: ddd2eeeConfirmPageHandler);
     router.define(walletManagerListPage, handler: walletManagerListPageHandler);
     router.define(languageChoosePage, handler: languageChoosePageHandler);

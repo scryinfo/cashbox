@@ -52,6 +52,29 @@ class ChainEth {
     return DlResult1(signResult, err);
   }
 
+  DlResult1<String> wcTxSign(EthWalletConnectTx wcTxPayload, NoCacheString password) {
+    Error err;
+    String signResult = "";
+    {
+      var ptrSignResult = Wallets.cWallets.CStr_dAlloc();
+      var ptrTxPayload = wcTxPayload.toCPtr();
+      var ptrPwd = password.toCPtrInt8();
+      var cerr = Wallets.cWallets.ChainEth_walletConnectTxSign(_ptrContext, ptrTxPayload, ptrPwd, ptrSignResult);
+      err = Error.fromC(cerr);
+      Wallets.cWallets.CError_free(cerr);
+
+      EthWalletConnectTx.free(ptrTxPayload);
+      NoCacheString.freeInt8(ptrPwd);
+
+      if (err.isSuccess()) {
+        signResult = ptrSignResult.value.toDartString();
+      }
+      Wallets.cWallets.CStr_dFree(ptrSignResult);
+    }
+
+    return DlResult1(signResult, err);
+  }
+
   DlResult1<String> rawTxSign(EthRawTxPayload rawTxPayload, NoCacheString password) {
     Error err;
     String signResult = "";

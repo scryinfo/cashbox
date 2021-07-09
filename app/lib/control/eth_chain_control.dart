@@ -85,6 +85,15 @@ class EthChainControl {
     return dataObj.data1;
   }
 
+  String wcTxSign(EthWalletConnectTx txPayload, NoCacheString password) {
+    var dataObj = Wallets.mainIsolate().chainEth.wcTxSign(txPayload, password);
+    if (!dataObj.isSuccess()) {
+      print("    dataObj.err" + dataObj.err.message + "||" + dataObj.err.code.toString());
+      return null;
+    }
+    return dataObj.data1;
+  }
+
   String rawTxSign(EthRawTxPayload rawTxPayload, NoCacheString password) {
     var dataObj = Wallets.mainIsolate().chainEth.rawTxSign(rawTxPayload, password);
     if (!dataObj.isSuccess()) {

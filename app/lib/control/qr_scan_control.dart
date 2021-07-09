@@ -30,12 +30,24 @@ class QrScanControl {
     return _instance;
   }
 
+
   Future<String> qrscan() async {
     String callbackResult = await methodPlugin.invokeMethod('qr_scan_method');
     if (callbackResult == null || callbackResult.isEmpty) {
       callbackResult = "";
     }
     return callbackResult;
+  }
+
+  bool checkByWcProtocol(String qrInfo, BuildContext context) {
+    if (qrInfo.isEmpty) {
+      Fluttertoast.showToast(msg: translate('qr_info_is_null'));
+      return false;
+    }
+    if (!qrInfo.startsWith("wc:") || !qrInfo.contains("bridge") || !qrInfo.contains("key")) {
+      return false;
+    }
+    return true;
   }
 
   checkByScryCityTransfer(String qrInfo, BuildContext context) {

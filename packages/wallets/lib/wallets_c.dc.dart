@@ -4187,6 +4187,143 @@ class WalletTokenStatus implements DC<clib.CWalletTokenStatus> {
   }
 }
 
+class BtcNowLoadBlock implements DC<clib.CBtcNowLoadBlock> {
+  int height = 0;
+  String headerHash = "";
+  String timestamp = "";
+
+  static freeInstance(clib.CBtcNowLoadBlock instance) {
+    if (instance.headerHash != nullptr) {
+      ffi.calloc.free(instance.headerHash);
+    }
+    instance.headerHash = nullptr;
+    if (instance.timestamp != nullptr) {
+      ffi.calloc.free(instance.timestamp);
+    }
+    instance.timestamp = nullptr;
+  }
+
+  static free(Pointer<clib.CBtcNowLoadBlock> ptr) {
+    if (ptr == nullptr) {
+      return;
+    }
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
+  }
+
+  static BtcNowLoadBlock fromC(Pointer<clib.CBtcNowLoadBlock> ptr) {
+    var d = new BtcNowLoadBlock();
+    if (ptr == nullptr) {
+      return d;
+    }
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CBtcNowLoadBlock> toCPtr() {
+    var ptr =
+        allocateZero<clib.CBtcNowLoadBlock>(sizeOf<clib.CBtcNowLoadBlock>());
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CBtcNowLoadBlock> c) {
+    if (c == nullptr) {
+      return;
+    }
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CBtcNowLoadBlock c) {
+    c.height = height;
+    if (c.headerHash != nullptr) {
+      ffi.calloc.free(c.headerHash);
+    }
+    c.headerHash = headerHash.toCPtrInt8();
+    if (c.timestamp != nullptr) {
+      ffi.calloc.free(c.timestamp);
+    }
+    c.timestamp = timestamp.toCPtrInt8();
+  }
+
+  @override
+  toDart(Pointer<clib.CBtcNowLoadBlock> c) {
+    if (c == nullptr) {
+      return;
+    }
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CBtcNowLoadBlock c) {
+    height = c.height;
+    headerHash = c.headerHash.toDartString();
+    timestamp = c.timestamp.toDartString();
+  }
+}
+
+class BtcBalance implements DC<clib.CBtcBalance> {
+  int balance = 0;
+  int height = 0;
+
+  static freeInstance(clib.CBtcBalance instance) {}
+
+  static free(Pointer<clib.CBtcBalance> ptr) {
+    if (ptr == nullptr) {
+      return;
+    }
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
+  }
+
+  static BtcBalance fromC(Pointer<clib.CBtcBalance> ptr) {
+    var d = new BtcBalance();
+    if (ptr == nullptr) {
+      return d;
+    }
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CBtcBalance> toCPtr() {
+    var ptr = allocateZero<clib.CBtcBalance>(sizeOf<clib.CBtcBalance>());
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CBtcBalance> c) {
+    if (c == nullptr) {
+      return;
+    }
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CBtcBalance c) {
+    c.balance = balance;
+    c.height = height;
+  }
+
+  @override
+  toDart(Pointer<clib.CBtcBalance> c) {
+    if (c == nullptr) {
+      return;
+    }
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CBtcBalance c) {
+    balance = c.balance;
+    height = c.height;
+  }
+}
+
 class InitParameters implements DC<clib.CInitParameters> {
   DbName dbName = new DbName();
   int isMemoryDb = 0;
@@ -4360,23 +4497,38 @@ class CreateWalletParameters implements DC<clib.CCreateWalletParameters> {
   }
 }
 
-class BtcNowLoadBlock implements DC<clib.CBtcNowLoadBlock> {
-  int height = 0;
-  String headerHash = "";
-  String timestamp = "";
+class BtcTxParam implements DC<clib.CBtcTxParam> {
+  String walletId = "";
+  String password = "";
+  String from_address = "";
+  String to_address = "";
+  String value = "";
+  int broadcast = 0;
 
-  static freeInstance(clib.CBtcNowLoadBlock instance) {
-    if (instance.headerHash != nullptr) {
-      ffi.calloc.free(instance.headerHash);
+  static freeInstance(clib.CBtcTxParam instance) {
+    if (instance.walletId != nullptr) {
+      ffi.calloc.free(instance.walletId);
     }
-    instance.headerHash = nullptr;
-    if (instance.timestamp != nullptr) {
-      ffi.calloc.free(instance.timestamp);
+    instance.walletId = nullptr;
+    if (instance.password != nullptr) {
+      ffi.calloc.free(instance.password);
     }
-    instance.timestamp = nullptr;
+    instance.password = nullptr;
+    if (instance.from_address != nullptr) {
+      ffi.calloc.free(instance.from_address);
+    }
+    instance.from_address = nullptr;
+    if (instance.to_address != nullptr) {
+      ffi.calloc.free(instance.to_address);
+    }
+    instance.to_address = nullptr;
+    if (instance.value != nullptr) {
+      ffi.calloc.free(instance.value);
+    }
+    instance.value = nullptr;
   }
 
-  static free(Pointer<clib.CBtcNowLoadBlock> ptr) {
+  static free(Pointer<clib.CBtcTxParam> ptr) {
     if (ptr == nullptr) {
       return;
     }
@@ -4384,8 +4536,8 @@ class BtcNowLoadBlock implements DC<clib.CBtcNowLoadBlock> {
     ffi.calloc.free(ptr);
   }
 
-  static BtcNowLoadBlock fromC(Pointer<clib.CBtcNowLoadBlock> ptr) {
-    var d = new BtcNowLoadBlock();
+  static BtcTxParam fromC(Pointer<clib.CBtcTxParam> ptr) {
+    var d = new BtcTxParam();
     if (ptr == nullptr) {
       return d;
     }
@@ -4394,15 +4546,14 @@ class BtcNowLoadBlock implements DC<clib.CBtcNowLoadBlock> {
   }
 
   @override
-  Pointer<clib.CBtcNowLoadBlock> toCPtr() {
-    var ptr =
-        allocateZero<clib.CBtcNowLoadBlock>(sizeOf<clib.CBtcNowLoadBlock>());
+  Pointer<clib.CBtcTxParam> toCPtr() {
+    var ptr = allocateZero<clib.CBtcTxParam>(sizeOf<clib.CBtcTxParam>());
     toC(ptr);
     return ptr;
   }
 
   @override
-  toC(Pointer<clib.CBtcNowLoadBlock> c) {
+  toC(Pointer<clib.CBtcTxParam> c) {
     if (c == nullptr) {
       return;
     }
@@ -4410,20 +4561,32 @@ class BtcNowLoadBlock implements DC<clib.CBtcNowLoadBlock> {
   }
 
   @override
-  toCInstance(clib.CBtcNowLoadBlock c) {
-    c.height = height;
-    if (c.headerHash != nullptr) {
-      ffi.calloc.free(c.headerHash);
+  toCInstance(clib.CBtcTxParam c) {
+    if (c.walletId != nullptr) {
+      ffi.calloc.free(c.walletId);
     }
-    c.headerHash = headerHash.toCPtrInt8();
-    if (c.timestamp != nullptr) {
-      ffi.calloc.free(c.timestamp);
+    c.walletId = walletId.toCPtrInt8();
+    if (c.password != nullptr) {
+      ffi.calloc.free(c.password);
     }
-    c.timestamp = timestamp.toCPtrInt8();
+    c.password = password.toCPtrInt8();
+    if (c.from_address != nullptr) {
+      ffi.calloc.free(c.from_address);
+    }
+    c.from_address = from_address.toCPtrInt8();
+    if (c.to_address != nullptr) {
+      ffi.calloc.free(c.to_address);
+    }
+    c.to_address = to_address.toCPtrInt8();
+    if (c.value != nullptr) {
+      ffi.calloc.free(c.value);
+    }
+    c.value = value.toCPtrInt8();
+    c.broadcast = broadcast;
   }
 
   @override
-  toDart(Pointer<clib.CBtcNowLoadBlock> c) {
+  toDart(Pointer<clib.CBtcTxParam> c) {
     if (c == nullptr) {
       return;
     }
@@ -4431,10 +4594,13 @@ class BtcNowLoadBlock implements DC<clib.CBtcNowLoadBlock> {
   }
 
   @override
-  toDartInstance(clib.CBtcNowLoadBlock c) {
-    height = c.height;
-    headerHash = c.headerHash.toDartString();
-    timestamp = c.timestamp.toDartString();
+  toDartInstance(clib.CBtcTxParam c) {
+    walletId = c.walletId.toDartString();
+    password = c.password.toDartString();
+    from_address = c.from_address.toDartString();
+    to_address = c.to_address.toDartString();
+    value = c.value.toDartString();
+    broadcast = c.broadcast;
   }
 }
 
@@ -5022,5 +5188,130 @@ class EthRawTxPayload implements DC<clib.CEthRawTxPayload> {
   toDartInstance(clib.CEthRawTxPayload c) {
     fromAddress = c.fromAddress.toDartString();
     rawTx = c.rawTx.toDartString();
+  }
+}
+
+class EthWalletConnectTx implements DC<clib.CEthWalletConnectTx> {
+  String from = "";
+  String to = "";
+  String data = "";
+  String gasPrice = "";
+  String gas = "";
+  String value = "";
+  String nonce = "";
+
+  static freeInstance(clib.CEthWalletConnectTx instance) {
+    if (instance.from != nullptr) {
+      ffi.calloc.free(instance.from);
+    }
+    instance.from = nullptr;
+    if (instance.to != nullptr) {
+      ffi.calloc.free(instance.to);
+    }
+    instance.to = nullptr;
+    if (instance.data != nullptr) {
+      ffi.calloc.free(instance.data);
+    }
+    instance.data = nullptr;
+    if (instance.gasPrice != nullptr) {
+      ffi.calloc.free(instance.gasPrice);
+    }
+    instance.gasPrice = nullptr;
+    if (instance.gas != nullptr) {
+      ffi.calloc.free(instance.gas);
+    }
+    instance.gas = nullptr;
+    if (instance.value != nullptr) {
+      ffi.calloc.free(instance.value);
+    }
+    instance.value = nullptr;
+    if (instance.nonce != nullptr) {
+      ffi.calloc.free(instance.nonce);
+    }
+    instance.nonce = nullptr;
+  }
+
+  static free(Pointer<clib.CEthWalletConnectTx> ptr) {
+    if (ptr == nullptr) {
+      return;
+    }
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
+  }
+
+  static EthWalletConnectTx fromC(Pointer<clib.CEthWalletConnectTx> ptr) {
+    var d = new EthWalletConnectTx();
+    if (ptr == nullptr) {
+      return d;
+    }
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CEthWalletConnectTx> toCPtr() {
+    var ptr = allocateZero<clib.CEthWalletConnectTx>(
+        sizeOf<clib.CEthWalletConnectTx>());
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEthWalletConnectTx> c) {
+    if (c == nullptr) {
+      return;
+    }
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CEthWalletConnectTx c) {
+    if (c.from != nullptr) {
+      ffi.calloc.free(c.from);
+    }
+    c.from = from.toCPtrInt8();
+    if (c.to != nullptr) {
+      ffi.calloc.free(c.to);
+    }
+    c.to = to.toCPtrInt8();
+    if (c.data != nullptr) {
+      ffi.calloc.free(c.data);
+    }
+    c.data = data.toCPtrInt8();
+    if (c.gasPrice != nullptr) {
+      ffi.calloc.free(c.gasPrice);
+    }
+    c.gasPrice = gasPrice.toCPtrInt8();
+    if (c.gas != nullptr) {
+      ffi.calloc.free(c.gas);
+    }
+    c.gas = gas.toCPtrInt8();
+    if (c.value != nullptr) {
+      ffi.calloc.free(c.value);
+    }
+    c.value = value.toCPtrInt8();
+    if (c.nonce != nullptr) {
+      ffi.calloc.free(c.nonce);
+    }
+    c.nonce = nonce.toCPtrInt8();
+  }
+
+  @override
+  toDart(Pointer<clib.CEthWalletConnectTx> c) {
+    if (c == nullptr) {
+      return;
+    }
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CEthWalletConnectTx c) {
+    from = c.from.toDartString();
+    to = c.to.toDartString();
+    data = c.data.toDartString();
+    gasPrice = c.gasPrice.toDartString();
+    gas = c.gas.toDartString();
+    value = c.value.toDartString();
+    nonce = c.nonce.toDartString();
   }
 }
