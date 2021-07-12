@@ -2,6 +2,7 @@ import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/control/wc_protocol_control.dart';
 import 'package:app/net/etherscan_util.dart';
+import 'package:app/provide/dapp_info_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/router_handler.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_translate/global.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets_c.dc.dart';
@@ -93,8 +95,12 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
         Gaps.scaleVGap(8),
         Image.asset("assets/images/ic_logo.png"),
         Text(
-          "dd",
+          Provider.of<DappInfoProvide>(context).dappName + "已经连接到你的钱包",
           style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+        ),
+        Text(
+          Provider.of<DappInfoProvide>(context).dappUrl ?? "",
+          style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
         ),
       ],
     ));

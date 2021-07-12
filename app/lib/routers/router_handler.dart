@@ -137,7 +137,7 @@ Handler ddd2eeePageHandler = Handler(handlerFunc: (BuildContext context, Map<Str
 });
 
 Handler wcApprovePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return ApproveSessionPage(qrInfo: params['qrInfo'].toString());
+  return ApproveSessionPage();
 });
 
 Handler ddd2eeeConfirmPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

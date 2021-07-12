@@ -45,7 +45,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends FlutterActivity implements Session.Callback {
-
     private final int REQUEST_CODE_QR_SCAN = 0;
     private final String QR_SCAN_METHOD = "qr_scan_method";
     private final String UPGRADE_APP_METHOD = "upgrade_app_method";
@@ -55,7 +54,10 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
     private final String REJECT_LOGIN_METHOD = "rejectLogIn";
     private final String APPROVE_TX_METHOD = "approveTx";
     private MethodChannel.Result mFlutterChannelResult = null;
+    private MethodChannel.Result wcStateChannelResult = null;
+    private MethodChannel.Result wcApproveChannelResult = null;
     private EventChannel.EventSink eventSink = null;
+    private EventChannel.EventSink sessionEventSink = null;
 
     File sessionDir = null;
     File sessionFile = null;
@@ -128,12 +130,12 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
         wcChannel.setMethodCallHandler(
                 (call, result) -> {
                     if (call.method.toString().equals(INIT_SESSION_METHOD)) {
-                        mFlutterChannelResult = result;
+                        wcStateChannelResult = result;
                         doConnectProcedure(call.argument("qrInfo"));
                     }
                     if (call.method.toString().equals(APPROVE_LOGIN_METHOD)) {
                         ScryLog.d(this, "APPROVE_LOGIN_METHOD", call.argument("addr").toString());
-                        mFlutterChannelResult = result;
+                        wcApproveChannelResult = result;
                         List<String> addrList = new ArrayList<>();
                         addrList.add(call.argument("addr"));
                         session.approve(addrList, 3); // 3: rspton , 1: mainnet
@@ -177,9 +179,9 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
                             ScryLog.d(this, "jsonArray toString is ", jsonArray);*/
                             String jsonStr = "[" +
                                     "  { " +
-                                    "    \"from\": \"" +call.argument("from").toString()+"\","+
-                                    "    \"to\": \"" +call.argument("to").toString()+"\","+
-                                    "    \"data\": \"" +call.argument("data").toString()+"\","+
+                                    "    \"from\": \"" + call.argument("from").toString() + "\"," +
+                                    "    \"to\": \"" + call.argument("to").toString() + "\"," +
+                                    "    \"data\": \"" + call.argument("data").toString() + "\"," +
                                     "    \"gas\": \"0x9b2d4\", " +
                                     "    \"gasPrice\": \"0x9184e72a000\"," +
                                     "    \"value\": \"0x9184e72a\", " +
@@ -187,8 +189,8 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
                                     "  }" +
                                     "]";
                             // session.approveRequest(Long.parseLong(call.argument("id")),jsonStr);
-                            session.approveRequest(Long.parseLong(call.argument("id")),call.argument("data").toString());
-                        }catch (Exception e){
+                            session.approveRequest(Long.parseLong(call.argument("id")), call.argument("data").toString());
+                        } catch (Exception e) {
                             ScryLog.e(this, "jsonArray  err is ", e.toString());
                         }
                         runOnUiThread(new Runnable() {
@@ -197,16 +199,25 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
                                 session.performMethodCall(new Session.MethodCall.Custom(Long.parseLong(call.argument("id")), "eth_sendRawTransaction", list), null);
                             }
                         });
-
                     }
                 }
         );
         String WC_EVENT_PROTOCOL_CHANNEL = "wc_event_protocol_channel";
-        wcEventChannel = new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), WC_EVENT_PROTOCOL_CHANNEL);
-        wcEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), WC_EVENT_PROTOCOL_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
             @Override
             public void onListen(Object arguments, EventChannel.EventSink events) {
                 eventSink = events;
+            }
+
+            @Override
+            public void onCancel(Object arguments) {
+            }
+        });
+        String WC_SESSION_INFO_CHANNEL = "wc_session_info_channel";
+        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), WC_SESSION_INFO_CHANNEL).setStreamHandler(new EventChannel.StreamHandler() {
+            @Override
+            public void onListen(Object arguments, EventChannel.EventSink events) {
+                sessionEventSink = events;
             }
 
             @Override
@@ -303,7 +314,7 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mFlutterChannelResult.success("Connected");
+                    wcStateChannelResult.success("Connected");
                 }
             });
         }
@@ -312,7 +323,7 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mFlutterChannelResult.success("Approved");
+                    wcApproveChannelResult.success("Approved");
                 }
             });
         }
@@ -321,10 +332,13 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
         }
         if (Session.Status.Disconnected.INSTANCE.equals(status)) {
             ScryLog.d(MainActivity.this, "MainActivity Session.Status.Disconnected", status.toString());
+            if (wcApproveChannelResult == null) {
+                return;
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mFlutterChannelResult.success("Disconnected");
+                    wcApproveChannelResult.success("Disconnected");
                 }
             });
         }
@@ -338,19 +352,29 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
         String SendTransactionName = Session.MethodCall.SendTransaction.class.getName();
         if (methodClsName.equals(SessionRequestName)) {
             ScryLog.d(MainActivity.this, "MainActivity onMethodCall  SessionRequestName--->", SessionRequestName.toString());
-
-            SessionRequestCls sessionRequestCls = new SessionRequestCls();
-            sessionRequestCls.url = ((Session.MethodCall.SessionRequest) methodCall).component2().getMeta().getUrl();
-            sessionRequestCls.name = ((Session.MethodCall.SessionRequest) methodCall).component2().getMeta().getName();
-            sessionRequestCls.iconList = ((Session.MethodCall.SessionRequest) methodCall).component2().getMeta().getIcons();
-            JSONObject jsonObject = new JSONObject();
+            Map<String, Object> dataMap = new HashMap<>();
+            Session.PeerMeta peerMeta = ((Session.MethodCall.SessionRequest) methodCall).component2().getMeta();
+            if (peerMeta.getIcons().size() > 0) {
+                dataMap.put("iconUrl", peerMeta.getIcons().get(0));
+            }
+            dataMap.put("name", peerMeta.getName());
+            dataMap.put("url", peerMeta.getUrl());
             try {
-                jsonObject.put("url", sessionRequestCls.url);
-                jsonObject.put("name", sessionRequestCls.name);
-                ScryLog.d(MainActivity.this, "MainActivity SessionRequestName", jsonObject.toString());
-                mFlutterChannelResult.success(jsonObject.toString());
+                ScryLog.d(MainActivity.this, "MainActivity SessionRequestName", dataMap.toString());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        sessionEventSink.success(dataMap);
+                    }
+                });
+                // wcStateChannelResult.success(jsonObject.toString());
             } catch (Exception e) {
-                mFlutterChannelResult.success("error");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        sessionEventSink.error("500", e.toString(), "");
+                    }
+                });
             }
         }
         if (methodClsName.equals(SendTransactionName)) {

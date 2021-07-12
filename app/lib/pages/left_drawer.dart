@@ -1,6 +1,9 @@
+import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
+import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -12,6 +15,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
 import 'package:wallets/enums.dart' as Enum;
 import 'package:wallets/enums.dart';
+import 'package:provider/provider.dart';
 
 class LeftDrawer extends StatefulWidget {
   @override
@@ -65,7 +69,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   Widget _drawerAction() {
     return Container(
-      height: ScreenUtil().setHeight(56.75),
+      height: ScreenUtil().setHeight(66.75),
       child: Column(
         children: <Widget>[
           Container(
@@ -182,7 +186,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                   NavigatorUtils.push(context, Routes.ddd2eeePage);
                 }),
           ),*/
-          /*Container(
+          Container(
             alignment: Alignment.center,
             height: ScreenUtil().setHeight(11),
             child: new ListTile(
@@ -199,9 +203,16 @@ class _LeftDrawerState extends State<LeftDrawer> {
                 ),
                 onTap: () async {
                   String qrInfo = await QrScanControl.instance.qrscan();
-                  QrScanControl.instance.checkByScryCityTransfer(qrInfo, context);
+                  Logger.getInstance().d("scan qrInfo", qrInfo);
+                  if (QrScanControl.instance.checkByWcProtocol(qrInfo, context)) {
+                    context.read<QrInfoProvide>().setContent(qrInfo);
+                    NavigatorUtils.push(context, Routes.wcApprovePage, clearStack: true);
+                  } else {
+                    // todo 提示检查格式 失败
+                    Fluttertoast.showToast(msg: "unknown formation");
+                  }
                 }),
-          ),*/
+          )
         ],
       ),
     );

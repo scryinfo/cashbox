@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
@@ -21,8 +22,7 @@ class WcProtocolControl {
     var initSession = "initSession";
     print("initSession --->" + qrInfo);
     Logger.getInstance().d("initSession", "qrInfo is --->" + qrInfo);
-    String callbackResult = await methodPlugin.invokeMethod(initSession, {'qrInfo': qrInfo});
-    Logger().d("initSession", "initSession callbackResult is --->" + callbackResult);
+    return methodPlugin.invokeMethod(initSession, {'qrInfo': qrInfo});
   }
 
   Future<String> approveLogIn(String addr) async {
