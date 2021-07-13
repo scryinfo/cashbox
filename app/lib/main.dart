@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/pages/entrance.dart';
@@ -7,6 +6,7 @@ import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
+import 'package:app/provide/wc_info_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -93,6 +93,9 @@ class _MyApp extends State<MyApp> {
         ),
         ChangeNotifierProvider(
           create: (_) => TransactionProvide(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => WcInfoProvide(),
         ),
       ],
       child: Container(

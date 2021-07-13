@@ -1,9 +1,8 @@
-import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/qr_scan_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/chain.dart';
 import 'package:app/model/wallet.dart';
-import 'package:app/provide/qr_info_provide.dart';
+import 'package:app/provide/wc_info_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
@@ -205,7 +204,9 @@ class _LeftDrawerState extends State<LeftDrawer> {
                   String qrInfo = await QrScanControl.instance.qrscan();
                   Logger.getInstance().d("scan qrInfo", qrInfo);
                   if (QrScanControl.instance.checkByWcProtocol(qrInfo, context)) {
-                    context.read<QrInfoProvide>().setContent(qrInfo);
+                    context.read<WcInfoProvide>()
+                      ..setWcInitUrl(qrInfo)
+                      ..setSessionId(qrInfo.substring(3, qrInfo.indexOf("@")));
                     NavigatorUtils.push(context, Routes.wcApprovePage, clearStack: true);
                   } else {
                     // todo 提示检查格式 失败

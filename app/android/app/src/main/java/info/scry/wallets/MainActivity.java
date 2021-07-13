@@ -56,6 +56,7 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
     private MethodChannel.Result mFlutterChannelResult = null;
     private MethodChannel.Result wcStateChannelResult = null;
     private MethodChannel.Result wcApproveChannelResult = null;
+    private MethodChannel.Result wcDisconnectChannelResult = null;
     private EventChannel.EventSink eventSink = null;
     private EventChannel.EventSink sessionEventSink = null;
 
@@ -142,6 +143,14 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
                     }
                     if (call.method.toString().equals(REJECT_LOGIN_METHOD)) {
                         mFlutterChannelResult = result;
+                        runOnUiThread(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        session.kill();
+                                    }
+                                }
+                        );
                     }
                     if (call.method.toString().equals(APPROVE_TX_METHOD)) {
                         ScryLog.e(this, "call.method is ", APPROVE_TX_METHOD);
@@ -332,13 +341,14 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
         }
         if (Session.Status.Disconnected.INSTANCE.equals(status)) {
             ScryLog.d(MainActivity.this, "MainActivity Session.Status.Disconnected", status.toString());
-            if (wcApproveChannelResult == null) {
+            // todo value the wcDisconnectChannelResult
+            if (wcDisconnectChannelResult == null) {
                 return;
             }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    wcApproveChannelResult.success("Disconnected");
+                    wcDisconnectChannelResult.success("Disconnected");
                 }
             });
         }

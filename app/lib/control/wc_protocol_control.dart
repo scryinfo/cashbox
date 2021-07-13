@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:logger/logger.dart';
 
 class WcProtocolControl {
   static const methodPlugin = const MethodChannel('wc_protocol_channel');
@@ -20,8 +18,6 @@ class WcProtocolControl {
 
   Future<String> initSession(String qrInfo) async {
     var initSession = "initSession";
-    print("initSession --->" + qrInfo);
-    Logger.getInstance().d("initSession", "qrInfo is --->" + qrInfo);
     return methodPlugin.invokeMethod(initSession, {'qrInfo': qrInfo});
   }
 
@@ -44,9 +40,9 @@ class WcProtocolControl {
     return callbackResult;
   }
 
-  Future<String> rejectLogIn() async {
+  Future<String> rejectLogIn(String id) async {
     var rejectLogIn = "rejectLogIn";
-    String callbackResult = await methodPlugin.invokeMethod(rejectLogIn);
+    String callbackResult = await methodPlugin.invokeMethod(rejectLogIn, {'id': id});
     if (callbackResult == null || callbackResult.isEmpty) {
       callbackResult = "";
     }

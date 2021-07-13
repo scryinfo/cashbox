@@ -1,11 +1,9 @@
 import 'package:app/control/wallets_control.dart';
 import 'package:app/control/wc_protocol_control.dart';
-import 'package:app/provide/dapp_info_provide.dart';
-import 'package:app/provide/qr_info_provide.dart';
+import 'package:app/provide/wc_info_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/widgets/app_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +79,9 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    String qrInfo = Provider.of<QrInfoProvide>(context).content;
+    String qrInfo = Provider.of<WcInfoProvide>(context).wcInitUrl;
+    Logger.getInstance().d("initSession", "qrInfo is --->" + qrInfo);
+    Logger.getInstance().d("initSession", " ||sessionId-->" + Provider.of<WcInfoProvide>(context).sessionId);
     sessionStateFuture = WcProtocolControl.getInstance().initSession(qrInfo);
   }
 
@@ -114,18 +114,6 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
   }
 
   Widget _buildApproveWidget() {
-    /*return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          Gaps.scaleVGap(8),
-          _buildHeadIconWidget(),
-          Gaps.scaleVGap(5),
-          _buildPermissionWidget(),
-          Gaps.scaleVGap(5),
-          _buildChooseBtnWidget(),
-        ],
-      ),
-    );*/
     return Container(
       width: ScreenUtil().setWidth(90),
       height: ScreenUtil().setHeight(160),
@@ -188,34 +176,37 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
   Widget _buildDappIconWidget() {
     return CachedNetworkImage(
         imageUrl: dappIconUrl,
+        width: ScreenUtil().setWidth(25),
+        height: ScreenUtil().setHeight(25),
         placeholder: (context, url) => Container(
               alignment: Alignment.center,
-              width: ScreenUtil().setWidth(60),
-              height: ScreenUtil().setHeight(30),
+              width: ScreenUtil().setWidth(25),
+              height: ScreenUtil().setHeight(25),
               child: Center(
                 child: Column(
                   children: [
                     CircularProgressIndicator(
                       strokeWidth: 2,
                     ),
-                    Gaps.scaleVGap(1),
+                    Gaps.scaleVGap(3),
                     Text("Dapp Icon loading"),
                   ],
                 ),
               ),
             ),
         errorWidget: (context, url, error) => Container(
-              width: ScreenUtil().setWidth(30),
-              height: ScreenUtil().setHeight(30),
+              width: ScreenUtil().setWidth(25),
+              height: ScreenUtil().setHeight(25),
               child: Icon(Icons.error),
             ),
-        fit: BoxFit.cover);
+        fit: BoxFit.scaleDown);
   }
 
   Widget _buildHeadIconWidget() {
     return SingleChildScrollView(
         child: Column(
       children: [
+        Gaps.scaleVGap(2),
         _buildDappIconWidget(),
         Text(
           dappName ?? "",
@@ -298,7 +289,7 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
           height: 40,
           onPressed: () async {
             // Do some background task
-            WcProtocolControl.getInstance().rejectLogIn();
+            WcProtocolControl.getInstance().rejectLogIn(Provider.of<WcInfoProvide>(context).sessionId);
             NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
           },
         ),
@@ -310,13 +301,11 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
           onPressed: () async {
             pr.update(message: "同意连接处理中... ");
             pr.show();
-
             String resultStr = await WcProtocolControl.getInstance()
                 .approveLogIn(WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
             if (resultStr == "Approved") {
               pr.hide();
-              DappInfoProvide;
-              context.read<DappInfoProvide>()
+              context.read<WcInfoProvide>()
                 ..setDappName(dappName)
                 ..setDappUrl(dappUrl)
                 ..setDappIconUrl(dappIconUrl);

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class MySeparatorLine extends CustomPainter {
   final Color lineColor;
   final double width;
+  final double height;
 
-  MySeparatorLine({this.lineColor, this.width});
+  MySeparatorLine({this.lineColor, this.width,this.height});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -12,7 +13,7 @@ class MySeparatorLine extends CustomPainter {
       ..color = this.lineColor
       ..strokeCap = StrokeCap.round
       ..isAntiAlias = true
-      ..strokeWidth = 0.1
+      ..strokeWidth = height
       ..style = PaintingStyle.stroke;
     canvas.drawLine(Offset(0, 0.0), Offset(width, 0), _paint);
   }
