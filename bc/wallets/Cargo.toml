@@ -33,6 +33,7 @@ async-trait = "0.1.31"
 
 eth = { path = "../chain/eth" }
 eee = { path = "../chain/eee" }
+btc = { path = "../chain/btc" }
 murmel = { path = "../chain/btc/murmel"}
 scry-crypto = { path = "../util/crypto" }
 

@@ -157,9 +157,6 @@ impl Chain2WalletType for BtcChain {
             _ => ChainType::BtcTest,
         }
     }
-   /* fn to_chain_type(&self, wallet_type: &WalletType) -> ChainType {
-        BtcChain::chain_type(wallet_type)
-    }*/
 }
 
 /*#[async_trait]*/

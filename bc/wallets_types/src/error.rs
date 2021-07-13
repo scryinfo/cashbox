@@ -20,7 +20,7 @@ pub enum WalletError {
     NoneError(String),
     RbatisError(rbatis_core::Error),
     NotExist,
-    BtcTx(String),
+    BtcTx(btc::Error),
 }
 
 impl fmt::Display for WalletError {
@@ -43,7 +43,7 @@ impl fmt::Display for WalletError {
             WalletError::Decode(err) => write!(f, "wallet decode error: {}", err),
             WalletError::NoneError(err) => err.fmt(f),
             WalletError::RbatisError(err) => err.fmt(f),
-            WalletError::BtcTx(err) => write!(f, "btc transaction error: {}", err),
+            WalletError::BtcTx(err) => err.fmt(f),
         }
     }
 }
@@ -79,6 +79,12 @@ impl From<serde_json::error::Error> for WalletError {
 impl From<eth::Error> for WalletError {
     fn from(err: eth::Error) -> WalletError {
         WalletError::EthTx(err)
+    }
+}
+
+impl From<btc::Error> for WalletError {
+    fn from(err: btc::Error) -> WalletError {
+        WalletError::BtcTx(err)
     }
 }
 

@@ -15,6 +15,7 @@ use futures::executor::block_on;
 use murmel::Error;
 use std::convert::TryInto;
 use eth::RawTransaction;
+use murmel::wallet::btc_tx_sign;
 
 #[derive(Default)]
 struct EthChain();
@@ -143,35 +144,15 @@ impl ChainTrait for EeeChain {
 #[async_trait]
 impl ChainTrait for BtcChain {
     fn generate_address(&self, mn: &[u8], wallet_type: &WalletType, net_type: &NetType) -> Result<MAddress, WalletError> {
-        const PASSPHRASE: &str = "";
-        let mut addr = MAddress::default();
-        {
-            addr.chain_type = wallets_types::BtcChain::chain_type(wallet_type, net_type).to_string();
-            let mn = String::from_utf8(mn.to_vec())?;
-            let mnemonic = bitcoin_wallet::mnemonic::Mnemonic::from_str(&mn)
-                .map_err(|e| WalletError::Custom(e.to_string()))?;
-            let network = match wallet_type {
-                WalletType::Normal => { bitcoin::network::constants::Network::Bitcoin }
-                WalletType::Test => { bitcoin::network::constants::Network::Testnet }
-            };
-            let mut master = bitcoin_wallet::account::MasterAccount::from_mnemonic(&mnemonic, 0, network, PASSPHRASE, None)
-                .map_err(|e| WalletError::Custom(e.to_string()))?;
-            let mut unlocker = bitcoin_wallet::account::Unlocker::new_for_master(&master, PASSPHRASE)
-                .map_err(|e| WalletError::Custom(e.to_string()))?;
-            // path(0,0)
-            let account = bitcoin_wallet::account::Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10)
-                .map_err(|e| WalletError::Custom(e.to_string()))?;
-            master.add_account(account);
-            let account = master.get_mut((0, 0)).unwrap();
-            let instance_key = account.next_key().unwrap();
-            let address = instance_key.address.clone().to_string();
-            let public_key = instance_key.public.clone();
-            let ser = public_key.serialize();
-            let public_key = format!("0x{}", hex::encode(ser));
-            addr.address = address;
-            addr.public_key = public_key;
-        }
-        Ok(addr)
+        let mut m_address = MAddress::default();
+        m_address.chain_type = wallets_types::BtcChain::chain_type(&wallet_type, &net_type).to_string();
+        let phrase = String::from_utf8(mn.to_vec())?;
+        // all use tiny-bip39
+        let secret_byte = btc::pri_from_mnemonic(&phrase, None)?;
+        let (addr, puk) = btc::generate_btc_address(&secret_byte)?;
+        m_address.address = addr;
+        m_address.public_key = puk;
+        Ok(m_address)
     }
 
     async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress, net_type: &NetType) -> Result<(), WalletError> {
@@ -393,7 +374,7 @@ impl BtcChainTrait for BtcChain {
         r.map_err(|e|
             match e {
                 Error::Rbatis(e) => { WalletError::RbatisError(e) },
-                Error::BtcTx(e) => { WalletError::BtcTx(e) },
+                Error::BtcTx(e) => { WalletError::BtcTx(btc::Error::Other(e)) },
                 _ => { WalletError::Custom("Nothing but wrong".to_string()) },
             }
         )
