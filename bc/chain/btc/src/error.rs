@@ -4,6 +4,8 @@ use std::io::Error as IoError;
 /// Errors which can occur when attempting to generate resource uri.
 #[derive(Debug, Display, From)]
 pub enum Error {
+    #[display(fmt = "Wallets error:{}", _0)]
+    Wallets(bitcoin_wallet::error::Error),
     /// server is unreachable
     #[display(fmt = "Server is unreachable")]
     Unreachable,
@@ -14,10 +16,6 @@ pub enum Error {
     #[display(fmt = "Got invalid response: {}", _0)]
     #[from(ignore)]
     InvalidResponse(String),
-    /// transport error
-    #[display(fmt = "Transport error: {}", _0)]
-    #[from(ignore)]
-    Transport(String),
     /// io error
     #[display(fmt = "IO error: {}", _0)]
     Io(IoError),
@@ -27,16 +25,9 @@ pub enum Error {
     #[display(fmt = "other lib: {}", _0)]
     #[from(ignore)]
     Other(String),
-    #[display(fmt = "secp256k1 error: {}", _0)]
-    Secp256k1(secp256k1::Error),
 }
 
 
-impl From<tiny_hderive::Error> for Error {
-    fn from(err: tiny_hderive::Error) -> Self {
-        Error::Other(format!("{:?}", err))
-    }
-}
 
 impl From<failure::Error> for Error {
     fn from(err: failure::Error) -> Self {

@@ -8,14 +8,11 @@ use wallets_types::{AccountInfo, AccountInfoSyncProg, BtcChainTokenAuth, BtcChai
 
 use codec::Decode;
 use rbatis::plugin::page::PageRequest;
-use bitcoin_wallet::account::AccountAddressType;
-use bitcoin::util::psbt::serialize::Serialize;
 use rbatis::crud::CRUDTable;
 use futures::executor::block_on;
 use murmel::Error;
 use std::convert::TryInto;
 use eth::RawTransaction;
-use murmel::wallet::btc_tx_sign;
 
 #[derive(Default)]
 struct EthChain();
@@ -145,11 +142,9 @@ impl ChainTrait for EeeChain {
 impl ChainTrait for BtcChain {
     fn generate_address(&self, mn: &[u8], wallet_type: &WalletType, net_type: &NetType) -> Result<MAddress, WalletError> {
         let mut m_address = MAddress::default();
-        m_address.chain_type = wallets_types::BtcChain::chain_type(&wallet_type, &net_type).to_string();
-        let phrase = String::from_utf8(mn.to_vec())?;
-        // all use tiny-bip39
-        let secret_byte = btc::pri_from_mnemonic(&phrase, None)?;
-        let (addr, puk) = btc::generate_btc_address(&secret_byte)?;
+        let chain_type = wallets_types::BtcChain::chain_type(&wallet_type, &net_type).to_string();
+        let (addr, puk) = btc::generate_btc_address(mn,&chain_type)?;
+        m_address.chain_type = chain_type;
         m_address.address = addr;
         m_address.public_key = puk;
         Ok(m_address)
@@ -158,7 +153,6 @@ impl ChainTrait for BtcChain {
     async fn generate_default_token(&self, context: &dyn ContextTrait, wallet: &MWallet, address: &MAddress, net_type: &NetType) -> Result<(), WalletError> {
         let wallet_type = WalletType::from(&wallet.wallet_type);
         //这里如果实现并行就好了
-
 
         let token_rb = context.db().data_db(&net_type);
         let mut tx = token_rb.begin_tx_defer(false).await?;

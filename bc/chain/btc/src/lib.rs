@@ -1,45 +1,41 @@
 pub mod error;
 
-use bip39::{Mnemonic, Language, Seed};
-use tiny_hderive::bip32::ExtendedPrivKey;
-use secp256k1::{Secp256k1, key::{PublicKey, SecretKey}};
+
+use bitcoin_wallet::account::{AccountAddressType, MasterAccount, Account, Unlocker};
+use bitcoin::network::constants::Network;
 
 pub use error::Error;
-
-// private key
-pub fn pri_from_mnemonic(phrase: &str, psd: Option<Vec<u8>>) -> Result<Vec<u8>, error::Error> {
-    let mnemonic = Mnemonic::from_phrase(phrase, Language::English)?;
-    let psd = {
-        match psd {
-            Some(data) => String::from_utf8(data)?,
-            None => String::from(""),
-        }
-    };
-    let seed = Seed::new(&mnemonic, &psd);//
-    let ext_key = ExtendedPrivKey::derive(&seed.as_bytes(), "m/44'/1'/0'/0/0")?;
-    Ok(ext_key.secret().to_vec())
-}
+use bitcoin_wallet::mnemonic::Mnemonic;
+use bitcoin::util::psbt::serialize::Serialize;
 
 //Generate btc address from uncompressed public key
-pub fn generate_btc_address(secret_byte: &[u8]) -> Result<(String, String), error::Error> {
-    let context = Secp256k1::new();
-    let secret = SecretKey::from_slice(&secret_byte)?;
-    let public_key = PublicKey::from_secret_key(&context, &secret);
-    //the uncompressed public key used for address generation
-    let puk_uncompressed = &public_key.serialize_uncompressed()[..];
-    let public_key_hash = keccak(&puk_uncompressed[1..]);
-    let address_str = hex::encode(&public_key_hash[12..]);
-    let puk_str = hex::encode(&public_key.serialize()[..]);
-    Ok((format!("0x{}", address_str), format!("0x{}", puk_str)))
+// bip39 44 32
+pub fn generate_btc_address(
+    mn: &[u8],
+    chain_type: &str,
+) -> Result<(String, String), error::Error> {
+    let mn = String::from_utf8(mn.to_vec())?;
+    let network = match chain_type {
+        "BTC" => Network::Bitcoin,
+        "BtcTest" => Network::Testnet,
+        "BtcPrivate" => Network::Regtest,
+        "BtcPrivateTest" => Network::Regtest,
+        _ => Network::Testnet
+    };
+    let mnemonic = Mnemonic::from_str(&mn)?;
+    let mut master = MasterAccount::from_mnemonic(&mnemonic, 0, network, "", None)?;
+    let mut unlocker = Unlocker::new_for_master(&master, "")?;
+    // path(0,0)
+    let account = Account::new(&mut unlocker, AccountAddressType::P2PKH, 0, 0, 10)?;
+    master.add_account(account);
+    let account = master.get_mut((0, 0)).unwrap();
+    let instance_key = account.next_key().unwrap();
+    let address = instance_key.address.clone().to_string();
+    let public_key = instance_key.public.clone();
+    let ser = public_key.serialize();
+    let public_key = format!("0x{}", hex::encode(ser));
+    Ok((address,public_key))
 }
-
-
-fn keccak(s: &[u8]) -> [u8; 32] {
-    let mut result = [0u8; 32];
-    tiny_keccak::Keccak::keccak256(s, &mut result);
-    result
-}
-
 
 #[cfg(test)]
 mod tests {
