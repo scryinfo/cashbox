@@ -142,12 +142,17 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
                         session.approve(addrList, 3); // 3: rspton , 1: mainnet
                     }
                     if (call.method.toString().equals(REJECT_LOGIN_METHOD)) {
+                        ScryLog.d(this, "REJECT_LOGIN_METHOD--->", call.toString());
                         mFlutterChannelResult = result;
+                        if (session == null) {
+                            return;
+                        }
                         runOnUiThread(
                                 new Runnable() {
                                     @Override
                                     public void run() {
                                         session.kill();
+                                        session = null;
                                     }
                                 }
                         );
@@ -343,14 +348,21 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
             ScryLog.d(MainActivity.this, "MainActivity Session.Status.Disconnected", status.toString());
             // todo value the wcDisconnectChannelResult
             if (wcDisconnectChannelResult == null) {
-                return;
+                ScryLog.e(MainActivity.this, "wcDisconnectChannelResult is null ", "||");
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ScryLog.d(MainActivity.this, "wcDisconnectChannelResult is --> ", "Disconnected");
+                        wcDisconnectChannelResult.success("Disconnected");
+                    }
+                });
             }
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    wcDisconnectChannelResult.success("Disconnected");
-                }
-            });
+        }
+        try {
+            ScryLog.d(MainActivity.this, "wcDisconnectChannelResult unknown --> ", status.toString());
+        } catch (Exception e) {
+            ScryLog.d(MainActivity.this, "wcDisconnectChannelResult unknown is --> ", status.toString());
         }
     }
 
@@ -415,7 +427,9 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
     protected void onDestroy() {
         super.onDestroy();
         ScryLog.d(MainActivity.this, "MainActivity --->", "enter destroy!!!!!!");
-        session.kill();
+        if (session != null) {
+            session.kill();
+        }
     }
 
     private class SessionRequestCls {

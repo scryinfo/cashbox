@@ -9,13 +9,39 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:wallets/enums.dart';
 import 'net_util.dart';
 
-const Eth_Tx_Account = "https://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
-const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=";
-
 Future<String> loadEtherApiKey() async {
   Config config = await HandleConfig.instance.getConfig();
   return config.privateConfig.etherscanKey;
 }
+
+const Eth_Gas_Oracle = "https://api-cn.etherscan.com/api?module=gastracker&action=gasoracle&apikey=";
+const Eth_TestNet_Gas_Oracle = "https://api-ropsten.etherscan.io/api?module=gastracker&action=gasoracle&apikey=";
+
+Future<String> assembleGasOracle(ChainType chainType) async {
+  String apiKey = await loadEtherApiKey();
+  if (chainType == ChainType.ETH) {
+    return Eth_Gas_Oracle + apiKey;
+  } else {
+    return Eth_TestNet_Gas_Oracle + apiKey;
+  }
+}
+
+//GasOracle
+Future<Map> loadGasOracle(ChainType chainType) async {
+  try {
+    var res = await request(await assembleTxAccount(chainType));
+    if (res != null && (res as Map).containsKey("result")) {
+      return res["result"];
+    } else {
+      return null;
+    }
+  } catch (e) {
+    return null;
+  }
+}
+
+const Eth_Tx_Account = "https://api-cn.etherscan.com/api?module=proxy&action=eth_getTransactionCount&address=";
+const Eth_TestNet_Tx_Account = "https://api-ropsten.etherscan.io/api?module=proxy&action=eth_getTransactionCount&address=";
 
 Future<String> assembleTxAccount(String address, ChainType chainType) async {
   String apiKey = await loadEtherApiKey();
@@ -285,6 +311,7 @@ Future<String> sendRawTx(ChainType chainType, String rawTx) async {
     if (res != null && (res as Map).containsKey("result")) {
       return res["result"];
     }
+    Logger.getInstance().d("sendRawTx", "tx sendRawTx error is " + res.toString());
     return "";
   } catch (e) {
     Logger.getInstance().e("sendRawTx", "tx sendRawTx error is " + e.toString());

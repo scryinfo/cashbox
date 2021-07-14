@@ -17,8 +17,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_translate/global.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets_c.dc.dart';
@@ -37,36 +39,25 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
   bool existInputInfo = false;
   double txValueDouble = 0.0;
   int eth2Unit = 1000 * 1000 * 1000 * 1000 * 1000 * 1000; // 1 ETH = 1e18 wei = 1e9 gwei
-  ProgressDialog pr;
+  TextEditingController _gasPriceController = TextEditingController();
+  TextEditingController _gasController = TextEditingController();
+  double allGasFee = 0.0;
 
   @override
   void initState() {
     super.initState();
-    pr = ProgressDialog(context);
-    pr.style(
-        message: 'Downloading file...',
-        borderRadius: 10.0,
-        backgroundColor: Colors.white,
-        progressWidget: CircularProgressIndicator(),
-        elevation: 10.0,
-        insetAnimCurve: Curves.easeInOut,
-        progress: 0.0,
-        maxProgress: 100.0,
-        progressTextStyle: TextStyle(color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
-        messageTextStyle: TextStyle(color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600));
     registryListen();
   }
 
   registryListen() {
     wcEventPlugin.receiveBroadcastStream().listen((event) {
-      print("receiveBoard event ------->" + event.toString());
-      txInfoMap = Map.from(event);
-      Logger().d("wcEventPlugin : txInfoMap is--->", txInfoMap.toString());
-      if (!txInfoMap.containsKey("from") || !txInfoMap.containsKey("to") || !txInfoMap.containsKey("value") || !txInfoMap.containsKey("data")) {
-        Logger().e("txValue txInfoMap not match :", txInfoMap.toString());
-        return;
-      }
       try {
+        txInfoMap = Map.from(event);
+        Logger().d("wcEventPlugin : txInfoMap is--->", txInfoMap.toString());
+        if (!txInfoMap.containsKey("from") || !txInfoMap.containsKey("to") || !txInfoMap.containsKey("value") || !txInfoMap.containsKey("data")) {
+          // todo add Hint
+          return;
+        }
         txValueDouble = Utils.hexToDouble(txInfoMap["value"]) / eth2Unit;
       } catch (e) {
         txValueDouble = 0.0;
@@ -80,29 +71,53 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
     }, onError: (obj) {
       Logger().d("wcEventPlugin", "onError obj is --->" + obj.toString());
     });
+    _gasPriceController.addListener(() {
+      _updateGasFee();
+    });
+    _gasController.addListener(() {
+      _updateGasFee();
+    });
+  }
+
+  _updateGasFee() {
+    if (_gasPriceController.text.toString().isEmpty || _gasController.text.toString().isEmpty) {
+      allGasFee = 0.0;
+      return;
+    }
+    num gasPrice = int.parse(_gasPriceController.text.toString());
+    num gasLimit = int.parse(_gasController.text.toString());
+    allGasFee = gasPrice.toDouble() * gasLimit.toDouble();
+    setState(() {
+      this.allGasFee = allGasFee;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: ScreenUtil().setWidth(90),
-      height: ScreenUtil().setHeight(160),
-      alignment: Alignment.topCenter,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: MyAppBar(
-          centerTitle: "WalletConnect",
+    return WillPopScope(
+      onWillPop: () async {
+        return false; // not back to previous page
+      },
+      child: Container(
+        width: ScreenUtil().setWidth(90),
+        height: ScreenUtil().setHeight(160),
+        alignment: Alignment.topCenter,
+        child: Scaffold(
           backgroundColor: Colors.transparent,
-          isBack: false,
-          onPressed: () async {
-            NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
-          },
-        ),
-        body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+          appBar: MyAppBar(
+            centerTitle: "WalletConnect",
+            backgroundColor: Colors.transparent,
+            isBack: false,
+            onPressed: () async {
+              NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
+            },
           ),
-          child: _buildApproveWidget(),
+          body: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
+            ),
+            child: _buildApproveWidget(),
+          ),
         ),
       ),
     );
@@ -119,7 +134,9 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
             height: ScreenUtil().setHeight(75),
             width: ScreenUtil().setWidth(75),
             alignment: Alignment.center,
-            child: existInputInfo ? _buildInputInfoWidget() : _buildAddressWidget(),
+            // child: existInputInfo ? _buildInputInfoWidget() : _buildAddressWidget(),
+            // child: _buildAddressWidget(),
+            child: _buildInputInfoWidget(),
           ),
           Gaps.scaleVGap(5),
           _buildDisconnectBtnWidget(),
@@ -135,11 +152,11 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
         Gaps.scaleVGap(8),
         _buildDappIconWidget(),
         Text(
-          Provider.of<WcInfoProvide>(context).dappName ?? "" + "已经连接到你的钱包",
+          Provider.of<WcInfoProvide>(context, listen: false).dappName ?? "" + "已经连接到你的钱包",
           style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
         ),
         Text(
-          Provider.of<WcInfoProvide>(context).dappUrl ?? "",
+          Provider.of<WcInfoProvide>(context, listen: false).dappUrl ?? "",
           style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
         ),
       ],
@@ -148,7 +165,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
 
   Widget _buildDappIconWidget() {
     return CachedNetworkImage(
-        imageUrl: Provider.of<WcInfoProvide>(context).dappIconUrl ?? " ",
+        imageUrl: Provider.of<WcInfoProvide>(context, listen: false).dappIconUrl ?? " ",
         width: ScreenUtil().setWidth(25),
         height: ScreenUtil().setHeight(25),
         placeholder: (context, url) => Container(
@@ -187,9 +204,9 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
 
   Widget _buildAddressWidget() {
     return Container(
-      alignment: Alignment.centerLeft,
+      alignment: Alignment.topLeft,
       padding: EdgeInsets.only(
-        top: ScreenUtil().setHeight(0.5),
+        top: ScreenUtil().setHeight(10),
       ),
       child: RichText(
         text: TextSpan(children: [
@@ -353,53 +370,58 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
             ),
           ),
           Container(
-            height: ScreenUtil().setHeight(10),
-            child: Row(
-              children: [
-                Container(
-                  width: ScreenUtil().setWidth(18),
-                  child: Text("矿工费",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: ScreenUtil().setSp(3.7),
-                      )),
-                ),
-                Container(
-                  width: ScreenUtil().setWidth(50),
-                  height: ScreenUtil().setHeight(10),
-                  alignment: Alignment.center,
-                  child: Column(
-                    children: [
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        height: ScreenUtil().setHeight(6),
-                        child: Text("0.00002788 ETH",
-                            maxLines: 2,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: ScreenUtil().setSp(3.5),
-                            )),
+              height: ScreenUtil().setHeight(10),
+              color: Colors.transparent,
+              child: GestureDetector(
+                onTap: () {
+                  _showCustomGasFeeAlert();
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: ScreenUtil().setWidth(18),
+                      child: Text("矿工费",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: ScreenUtil().setSp(3.7),
+                          )),
+                    ),
+                    Container(
+                      width: ScreenUtil().setWidth(50),
+                      height: ScreenUtil().setHeight(10),
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            height: ScreenUtil().setHeight(6),
+                            child: Text((allGasFee.toString() ?? "0.0") + " ETH",
+                                maxLines: 2,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: ScreenUtil().setSp(3.5),
+                                )),
+                          ),
+                          Container(
+                            alignment: Alignment.topLeft,
+                            child: Text("= Gas(" + _gasController.text + ") * Gas Price(" + _gasPriceController.text + "GWEI)",
+                                maxLines: 2,
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: ScreenUtil().setSp(2.8),
+                                )),
+                          ),
+                        ],
                       ),
-                      Container(
-                        alignment: Alignment.topLeft,
-                        child: Text("= Gas(173,782) * Gas Price(1.60 GWEI)",
-                            maxLines: 2,
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: ScreenUtil().setSp(2.8),
-                            )),
-                      ),
-                    ],
-                  ),
+                    ),
+                    Container(
+                      width: ScreenUtil().setWidth(4),
+                      child: Image.asset("assets/images/ic_enter.png"),
+                    )
+                  ],
                 ),
-                Container(
-                  width: ScreenUtil().setWidth(4),
-                  child: Image.asset("assets/images/ic_enter.png"),
-                )
-              ],
-            ),
-          ),
+              )),
           Gaps.scaleVGap(2),
           Container(
             alignment: Alignment.topLeft,
@@ -432,7 +454,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
           progressWidget: const CircularProgressIndicator(),
           onPressed: () async {
             // Do some background task
-            WcProtocolControl.getInstance().rejectLogIn(txInfoMap["id"]);
+            WcProtocolControl.getInstance().rejectTxReq(txInfoMap["id"]);
             NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
           },
         ),
@@ -460,7 +482,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                       }
                       String gas = "206040"; // 0x9b2d4
                       String gasPrice = "10000000000";
-                      if (value.length % 2 != 0) {// assemble
+                      if (value.length % 2 != 0) {
                         value = value.substring(0, 2) + "0" + value.substring(2);
                       }
                       EthWalletConnectTx ethWalletConnectTx = EthWalletConnectTx()
@@ -471,6 +493,13 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                         ..value = value
                         ..gasPrice = gasPrice
                         ..gas = gas;
+                      Logger().d("broadcast is data===>", txInfoMap["data"]);
+                      Logger().d("broadcast  is from===>", txInfoMap["from"]);
+                      Logger().d("broadcast  is to===>", txInfoMap["to"]);
+                      Logger().d("broadcast  is nonce===>", nonce);
+                      Logger().d("broadcast  is value===>", value);
+                      Logger().d("broadcast  is gasPrice===>", gasPrice);
+                      Logger().d("broadcast  is gas===>", gas);
                       var resultObj = EthChainControl.getInstance().wcTxSign(ethWalletConnectTx, NoCacheString()..buffer = StringBuffer(pwd));
                       if (resultObj != null) {
                         Logger().d("wcTxSign  resultObj is -----===>", resultObj.toString());
@@ -497,24 +526,76 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
 
   Widget _buildDisconnectBtnWidget() {
     return Container(
-        alignment: Alignment.center,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Gaps.scaleHGap(8),
-            ProgressButton(
-              width: ScreenUtil().setWidth(75),
-              defaultWidget: const Text('断开连接'),
-              progressWidget: const CircularProgressIndicator(),
-              height: 40,
-              onPressed: () async {
-                // Do some background task
-                WcProtocolControl.getInstance().rejectLogIn(Provider.of<WcInfoProvide>(context, listen: false).sessionId);
-                NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
-              },
+      alignment: Alignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Gaps.scaleHGap(8),
+          ProgressButton(
+            width: ScreenUtil().setWidth(75),
+            defaultWidget: const Text('断开连接'),
+            progressWidget: const CircularProgressIndicator(),
+            height: 40,
+            onPressed: () async {
+              // Do some background task
+              WcProtocolControl.getInstance().rejectLogIn();
+              NavigatorUtils.push(context, Routes.entrancePage, clearStack: false);
+            },
+          ),
+          Gaps.scaleHGap(8),
+        ],
+      ),
+    );
+  }
+
+  _showCustomGasFeeAlert() {
+    Alert(
+        context: context,
+        title: "gas设置",
+        content: Column(
+          children: <Widget>[
+            Container(
+              child: Text(
+                "推荐使用默认值，如要修改，请您仔细确认输入值",
+                style: TextStyle(
+                  // color: Color.fromRGBO(255, 255, 255, 0.5),
+                  fontSize: ScreenUtil().setSp(3.0),
+                ),
+              ),
             ),
-            Gaps.scaleHGap(8),
+            TextField(
+              decoration: InputDecoration(
+                // icon: Icon(Icons.format_list_numbered),
+                labelText: 'Gas Price (单位:gwei)',
+              ),
+              controller: _gasPriceController,
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              decoration: InputDecoration(
+                // icon: Icon(Icons.format_list_numbered),
+                labelText: 'Gas',
+              ),
+              controller: _gasController,
+              keyboardType: TextInputType.number,
+            ),
           ],
-        ));
+        ),
+        buttons: [
+          DialogButton(
+            width: ScreenUtil().setWidth(30),
+            onPressed: () {
+              if (_gasController.text.isEmpty || _gasPriceController.text.isEmpty) {
+                Fluttertoast.showToast(msg: "注意gasFee不能为空");
+                return;
+              }
+              Navigator.pop(context);
+            },
+            child: Text(
+              "确认提交",
+              style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(4)),
+            ),
+          )
+        ]).show();
   }
 }

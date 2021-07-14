@@ -37,10 +37,10 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
     pr = ProgressDialog(context);
     pr.style(
         message: 'Downloading file...',
-        borderRadius: 10.0,
+        borderRadius: 8.0,
         backgroundColor: Colors.white,
         progressWidget: CircularProgressIndicator(),
-        elevation: 10.0,
+        elevation: 8.0,
         insetAnimCurve: Curves.easeInOut,
         progress: 0.0,
         maxProgress: 100.0,
@@ -79,9 +79,9 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    String qrInfo = Provider.of<WcInfoProvide>(context).wcInitUrl;
+    String qrInfo = Provider.of<WcInfoProvide>(context, listen: false).wcInitUrl;
     Logger.getInstance().d("initSession", "qrInfo is --->" + qrInfo);
-    Logger.getInstance().d("initSession", " ||sessionId-->" + Provider.of<WcInfoProvide>(context).sessionId);
+    Logger.getInstance().d("initSession", " ||sessionId-->" + Provider.of<WcInfoProvide>(context, listen: false).sessionId);
     sessionStateFuture = WcProtocolControl.getInstance().initSession(qrInfo);
   }
 
@@ -100,7 +100,8 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
                 NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
               },
               child: Image.asset("assets/images/ic_back.png")),
-          title: Text("WalletConnect"),
+          centerTitle: true,
+          title: Text("WalletConnect", style: TextStyle(fontSize: 20)),
           backgroundColor: Colors.black12,
         ),
         body: Container(
@@ -289,7 +290,7 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
           height: 40,
           onPressed: () async {
             // Do some background task
-            WcProtocolControl.getInstance().rejectLogIn(Provider.of<WcInfoProvide>(context).sessionId);
+            WcProtocolControl.getInstance().rejectLogIn();
             NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
           },
         ),
@@ -317,4 +318,12 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
       ],
     ));
   }
+
+  @override
+  void deactivate() {
+    // TODO: implement deactivate
+    super.deactivate();
+    pr.hide();
+  }
+
 }

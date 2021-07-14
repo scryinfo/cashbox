@@ -40,9 +40,14 @@ class WcProtocolControl {
     return callbackResult;
   }
 
-  Future<String> rejectLogIn(String id) async {
+  Future rejectLogIn() async {
     var rejectLogIn = "rejectLogIn";
-    String callbackResult = await methodPlugin.invokeMethod(rejectLogIn, {'id': id});
+    await methodPlugin.invokeMethod(rejectLogIn);
+  }
+
+  Future<String> rejectTxReq(String txId) async {
+    var rejectLogIn = "rejectTxReq";
+    String callbackResult = await methodPlugin.invokeMethod(rejectLogIn);
     if (callbackResult == null || callbackResult.isEmpty) {
       callbackResult = "";
     }
