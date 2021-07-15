@@ -39,6 +39,12 @@ pub fn generate_btc_address(mn: &[u8], chain_type: &str) -> Result<(String, Stri
     Ok((address, public_key))
 }
 
+// example for how to generate btc address from mnemonic
+// use bip39 for mnemonic and get seed .
+// use bip44 for extend private keys
+// use Secp256k1 for secret key and public key
+// use different prefix for different types of addresses
+// use hash160 and sha256 for checksum and change output to base58。now you get address
 pub fn generate_btc_address2(chain_type: &str) {
     let network = match chain_type {
         "BTC" => Network::Bitcoin,
