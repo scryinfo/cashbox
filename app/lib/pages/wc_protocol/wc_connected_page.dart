@@ -55,7 +55,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
         txInfoMap = Map.from(event);
         Logger().d("wcEventPlugin : txInfoMap is--->", txInfoMap.toString());
         if (!txInfoMap.containsKey("from") || !txInfoMap.containsKey("to") || !txInfoMap.containsKey("value") || !txInfoMap.containsKey("data")) {
-          // todo add Hint
+          Fluttertoast.showToast(msg: translate("wc_tx_format_error"));
           return;
         }
         txValueDouble = Utils.hexToDouble(txInfoMap["value"]) / eth2Unit;
@@ -152,7 +152,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
         Gaps.scaleVGap(8),
         _buildDappIconWidget(),
         Text(
-          Provider.of<WcInfoProvide>(context, listen: false).dappName ?? "" + "已经连接到你的钱包",
+          Provider.of<WcInfoProvide>(context, listen: false).dappName ?? "" + translate("already_connect_wallet") ?? "",
           style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
         ),
         Text(
@@ -211,7 +211,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
       child: RichText(
         text: TextSpan(children: [
           TextSpan(
-            text: "Address is: ",
+            text: translate("chain_address_info"),
             style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
           ),
           TextSpan(
@@ -264,7 +264,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
               children: [
                 Container(
                   width: ScreenUtil().setWidth(18),
-                  child: Text("支付信息",
+                  child: Text(translate("payment_info"),
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: ScreenUtil().setSp(3.7),
@@ -272,7 +272,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                 ),
                 Container(
                   width: ScreenUtil().setWidth(54),
-                  child: Text("ETH转账",
+                  child: Text(translate("eth_transfer"),
                       maxLines: 2,
                       style: TextStyle(
                         color: Colors.blue,
@@ -301,7 +301,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
               children: [
                 Container(
                   width: ScreenUtil().setWidth(18),
-                  child: Text("收款地址",
+                  child: Text(translate("receive_address"),
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: ScreenUtil().setSp(3.7),
@@ -338,7 +338,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
               children: [
                 Container(
                   width: ScreenUtil().setWidth(18),
-                  child: Text("付款地址",
+                  child: Text(translate("pay_address"),
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: ScreenUtil().setSp(3.7),
@@ -380,7 +380,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                   children: [
                     Container(
                       width: ScreenUtil().setWidth(18),
-                      child: Text("矿工费",
+                      child: Text(translate("mine_fee"),
                           style: TextStyle(
                             color: Colors.blue,
                             fontSize: ScreenUtil().setSp(3.7),
@@ -390,6 +390,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                       width: ScreenUtil().setWidth(50),
                       height: ScreenUtil().setHeight(10),
                       alignment: Alignment.center,
+                      color: Colors.transparent,
                       child: Column(
                         children: [
                           Container(
@@ -481,17 +482,19 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                         return;
                       }
                       String gas = "206040"; // 0x9b2d4
-                      String gasPrice = "10000000000";
+                      String gasPrice = "70000000000";
                       if (value.length % 2 != 0) {
                         value = value.substring(0, 2) + "0" + value.substring(2);
                       }
                       EthWalletConnectTx ethWalletConnectTx = EthWalletConnectTx()
+                        ..typeTxId = 2
                         ..data = txInfoMap["data"]
                         ..from = txInfoMap["from"]
                         ..to = txInfoMap["to"]
                         ..nonce = nonce
                         ..value = value
                         ..gasPrice = gasPrice
+                        ..maxPriorityFeePerGas = "28000000000"
                         ..gas = gas;
                       Logger().d("broadcast is data===>", txInfoMap["data"]);
                       Logger().d("broadcast  is from===>", txInfoMap["from"]);
@@ -533,7 +536,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
           Gaps.scaleHGap(8),
           ProgressButton(
             width: ScreenUtil().setWidth(75),
-            defaultWidget: const Text('断开连接'),
+            defaultWidget: Text(translate("disconnect")),
             progressWidget: const CircularProgressIndicator(),
             height: 40,
             onPressed: () async {
@@ -556,7 +559,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
           children: <Widget>[
             Container(
               child: Text(
-                "推荐使用默认值，如要修改，请您仔细确认输入值",
+                translate("recommend_default_hint"),
                 style: TextStyle(
                   // color: Color.fromRGBO(255, 255, 255, 0.5),
                   fontSize: ScreenUtil().setSp(3.0),
@@ -566,7 +569,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
             TextField(
               decoration: InputDecoration(
                 // icon: Icon(Icons.format_list_numbered),
-                labelText: 'Gas Price (单位:gwei)',
+                labelText: 'Gas Price (' + translate("tx_unit") + ':gwei)',
               ),
               controller: _gasPriceController,
               keyboardType: TextInputType.number,
@@ -586,13 +589,13 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
             width: ScreenUtil().setWidth(30),
             onPressed: () {
               if (_gasController.text.isEmpty || _gasPriceController.text.isEmpty) {
-                Fluttertoast.showToast(msg: "注意gasFee不能为空");
+                Fluttertoast.showToast(msg: translate("gas_cannot_empty"));
                 return;
               }
               Navigator.pop(context);
             },
             child: Text(
-              "确认提交",
+              translate("confirm_and_submit"),
               style: TextStyle(color: Colors.white, fontSize: ScreenUtil().setSp(4)),
             ),
           )

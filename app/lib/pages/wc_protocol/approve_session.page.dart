@@ -50,30 +50,30 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
   }
 
   registryListen() {
-    wcSessionPlugin.receiveBroadcastStream().listen((event) {
-      print("receiveBoard event ------->" + event.toString());
-      txInfoMap = Map.from(event);
-      print("txInfoMap------->" + txInfoMap.toString());
-      if (txInfoMap.containsKey("name")) {
-        dappName = txInfoMap["name"];
-      }
-      if (txInfoMap.containsKey("url")) {
-        dappUrl = txInfoMap["url"];
-      }
-      if (txInfoMap.containsKey("iconUrl")) {
-        dappIconUrl = txInfoMap["iconUrl"];
-      }
-      setState(() {
-        this.dappName = dappName;
-        this.dappUrl = dappUrl;
-        this.dappIconUrl = dappIconUrl;
-        print("receiveBoard dappIconUrl------》" + dappIconUrl.toString());
-      });
-    }, onDone: () {
-      print("receiveBoard onDone------》");
-    }, onError: (obj) {
-      print("receiveBoard onError------>" + obj.toString());
-    });
+    wcSessionPlugin.receiveBroadcastStream().listen(
+        (event) {
+          Logger().d("receiveBoard event", event.toString());
+          txInfoMap = Map.from(event);
+          Logger().d("txInfoMap ---> ", txInfoMap.toString());
+          if (txInfoMap.containsKey("name")) {
+            dappName = txInfoMap["name"];
+          }
+          if (txInfoMap.containsKey("url")) {
+            dappUrl = txInfoMap["url"];
+          }
+          if (txInfoMap.containsKey("iconUrl")) {
+            dappIconUrl = txInfoMap["iconUrl"];
+          }
+          setState(() {
+            this.dappName = dappName;
+            this.dappUrl = dappUrl;
+            this.dappIconUrl = dappIconUrl;
+          });
+        },
+        onDone: () {},
+        onError: (obj) {
+          Logger().e("receiveBoard onError", obj.toString());
+        });
   }
 
   @override
@@ -231,7 +231,7 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
             top: ScreenUtil().setHeight(0.5),
           ),
           child: Text(
-            "应用权限申请:",
+            translate("app_permission_ask"),
             textAlign: TextAlign.left,
             style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
           ),
@@ -244,7 +244,7 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
             top: ScreenUtil().setHeight(0.5),
           ),
           child: Text(
-            "允许获取当前钱包地址的链上信息",
+            translate("allow_check_chain_info"),
             textAlign: TextAlign.left,
             style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
           ),
@@ -257,7 +257,8 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
             top: ScreenUtil().setHeight(0.5),
           ),
           child: Text(
-            "允许向您发起交易请求",
+            translate("allow_send_tx_req"),
+            // "允许向您发起交易请求",
             textAlign: TextAlign.left,
             style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
           ),
@@ -269,7 +270,7 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
             top: ScreenUtil().setHeight(0.5),
           ),
           child: Text(
-            "提示：该操作不会泄露您的私钥信息",
+            translate("not_split_hint"),
             textAlign: TextAlign.left,
             style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
           ),
@@ -300,7 +301,7 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
           defaultWidget: const Text('Confirm'),
           progressWidget: const CircularProgressIndicator(),
           onPressed: () async {
-            pr.update(message: "同意连接处理中... ");
+            pr.update(message: translate("handle_allow_connecting"));
             pr.show();
             String resultStr = await WcProtocolControl.getInstance()
                 .approveLogIn(WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
@@ -325,5 +326,4 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
     super.deactivate();
     pr.hide();
   }
-
 }

@@ -4324,6 +4324,144 @@ class BtcBalance implements DC<clib.CBtcBalance> {
   }
 }
 
+class EthWalletConnectTx implements DC<clib.CEthWalletConnectTx> {
+  String from = "";
+  String to = "";
+  String data = "";
+  String gasPrice = "";
+  String gas = "";
+  String value = "";
+  String nonce = "";
+  String maxPriorityFeePerGas = "";
+  int typeTxId = 0;
+
+  static freeInstance(clib.CEthWalletConnectTx instance) {
+    if (instance.from != nullptr) {
+      ffi.calloc.free(instance.from);
+    }
+    instance.from = nullptr;
+    if (instance.to != nullptr) {
+      ffi.calloc.free(instance.to);
+    }
+    instance.to = nullptr;
+    if (instance.data != nullptr) {
+      ffi.calloc.free(instance.data);
+    }
+    instance.data = nullptr;
+    if (instance.gasPrice != nullptr) {
+      ffi.calloc.free(instance.gasPrice);
+    }
+    instance.gasPrice = nullptr;
+    if (instance.gas != nullptr) {
+      ffi.calloc.free(instance.gas);
+    }
+    instance.gas = nullptr;
+    if (instance.value != nullptr) {
+      ffi.calloc.free(instance.value);
+    }
+    instance.value = nullptr;
+    if (instance.nonce != nullptr) {
+      ffi.calloc.free(instance.nonce);
+    }
+    instance.nonce = nullptr;
+    if (instance.maxPriorityFeePerGas != nullptr) {
+      ffi.calloc.free(instance.maxPriorityFeePerGas);
+    }
+    instance.maxPriorityFeePerGas = nullptr;
+  }
+
+  static free(Pointer<clib.CEthWalletConnectTx> ptr) {
+    if (ptr == nullptr) {
+      return;
+    }
+    freeInstance(ptr.ref);
+    ffi.calloc.free(ptr);
+  }
+
+  static EthWalletConnectTx fromC(Pointer<clib.CEthWalletConnectTx> ptr) {
+    var d = new EthWalletConnectTx();
+    if (ptr == nullptr) {
+      return d;
+    }
+    d.toDart(ptr);
+    return d;
+  }
+
+  @override
+  Pointer<clib.CEthWalletConnectTx> toCPtr() {
+    var ptr = allocateZero<clib.CEthWalletConnectTx>(
+        sizeOf<clib.CEthWalletConnectTx>());
+    toC(ptr);
+    return ptr;
+  }
+
+  @override
+  toC(Pointer<clib.CEthWalletConnectTx> c) {
+    if (c == nullptr) {
+      return;
+    }
+    toCInstance(c.ref);
+  }
+
+  @override
+  toCInstance(clib.CEthWalletConnectTx c) {
+    if (c.from != nullptr) {
+      ffi.calloc.free(c.from);
+    }
+    c.from = from.toCPtrInt8();
+    if (c.to != nullptr) {
+      ffi.calloc.free(c.to);
+    }
+    c.to = to.toCPtrInt8();
+    if (c.data != nullptr) {
+      ffi.calloc.free(c.data);
+    }
+    c.data = data.toCPtrInt8();
+    if (c.gasPrice != nullptr) {
+      ffi.calloc.free(c.gasPrice);
+    }
+    c.gasPrice = gasPrice.toCPtrInt8();
+    if (c.gas != nullptr) {
+      ffi.calloc.free(c.gas);
+    }
+    c.gas = gas.toCPtrInt8();
+    if (c.value != nullptr) {
+      ffi.calloc.free(c.value);
+    }
+    c.value = value.toCPtrInt8();
+    if (c.nonce != nullptr) {
+      ffi.calloc.free(c.nonce);
+    }
+    c.nonce = nonce.toCPtrInt8();
+    if (c.maxPriorityFeePerGas != nullptr) {
+      ffi.calloc.free(c.maxPriorityFeePerGas);
+    }
+    c.maxPriorityFeePerGas = maxPriorityFeePerGas.toCPtrInt8();
+    c.typeTxId = typeTxId;
+  }
+
+  @override
+  toDart(Pointer<clib.CEthWalletConnectTx> c) {
+    if (c == nullptr) {
+      return;
+    }
+    toDartInstance(c.ref);
+  }
+
+  @override
+  toDartInstance(clib.CEthWalletConnectTx c) {
+    from = c.from.toDartString();
+    to = c.to.toDartString();
+    data = c.data.toDartString();
+    gasPrice = c.gasPrice.toDartString();
+    gas = c.gas.toDartString();
+    value = c.value.toDartString();
+    nonce = c.nonce.toDartString();
+    maxPriorityFeePerGas = c.maxPriorityFeePerGas.toDartString();
+    typeTxId = c.typeTxId;
+  }
+}
+
 class InitParameters implements DC<clib.CInitParameters> {
   DbName dbName = new DbName();
   int isMemoryDb = 0;
@@ -5188,130 +5326,5 @@ class EthRawTxPayload implements DC<clib.CEthRawTxPayload> {
   toDartInstance(clib.CEthRawTxPayload c) {
     fromAddress = c.fromAddress.toDartString();
     rawTx = c.rawTx.toDartString();
-  }
-}
-
-class EthWalletConnectTx implements DC<clib.CEthWalletConnectTx> {
-  String from = "";
-  String to = "";
-  String data = "";
-  String gasPrice = "";
-  String gas = "";
-  String value = "";
-  String nonce = "";
-
-  static freeInstance(clib.CEthWalletConnectTx instance) {
-    if (instance.from != nullptr) {
-      ffi.calloc.free(instance.from);
-    }
-    instance.from = nullptr;
-    if (instance.to != nullptr) {
-      ffi.calloc.free(instance.to);
-    }
-    instance.to = nullptr;
-    if (instance.data != nullptr) {
-      ffi.calloc.free(instance.data);
-    }
-    instance.data = nullptr;
-    if (instance.gasPrice != nullptr) {
-      ffi.calloc.free(instance.gasPrice);
-    }
-    instance.gasPrice = nullptr;
-    if (instance.gas != nullptr) {
-      ffi.calloc.free(instance.gas);
-    }
-    instance.gas = nullptr;
-    if (instance.value != nullptr) {
-      ffi.calloc.free(instance.value);
-    }
-    instance.value = nullptr;
-    if (instance.nonce != nullptr) {
-      ffi.calloc.free(instance.nonce);
-    }
-    instance.nonce = nullptr;
-  }
-
-  static free(Pointer<clib.CEthWalletConnectTx> ptr) {
-    if (ptr == nullptr) {
-      return;
-    }
-    freeInstance(ptr.ref);
-    ffi.calloc.free(ptr);
-  }
-
-  static EthWalletConnectTx fromC(Pointer<clib.CEthWalletConnectTx> ptr) {
-    var d = new EthWalletConnectTx();
-    if (ptr == nullptr) {
-      return d;
-    }
-    d.toDart(ptr);
-    return d;
-  }
-
-  @override
-  Pointer<clib.CEthWalletConnectTx> toCPtr() {
-    var ptr = allocateZero<clib.CEthWalletConnectTx>(
-        sizeOf<clib.CEthWalletConnectTx>());
-    toC(ptr);
-    return ptr;
-  }
-
-  @override
-  toC(Pointer<clib.CEthWalletConnectTx> c) {
-    if (c == nullptr) {
-      return;
-    }
-    toCInstance(c.ref);
-  }
-
-  @override
-  toCInstance(clib.CEthWalletConnectTx c) {
-    if (c.from != nullptr) {
-      ffi.calloc.free(c.from);
-    }
-    c.from = from.toCPtrInt8();
-    if (c.to != nullptr) {
-      ffi.calloc.free(c.to);
-    }
-    c.to = to.toCPtrInt8();
-    if (c.data != nullptr) {
-      ffi.calloc.free(c.data);
-    }
-    c.data = data.toCPtrInt8();
-    if (c.gasPrice != nullptr) {
-      ffi.calloc.free(c.gasPrice);
-    }
-    c.gasPrice = gasPrice.toCPtrInt8();
-    if (c.gas != nullptr) {
-      ffi.calloc.free(c.gas);
-    }
-    c.gas = gas.toCPtrInt8();
-    if (c.value != nullptr) {
-      ffi.calloc.free(c.value);
-    }
-    c.value = value.toCPtrInt8();
-    if (c.nonce != nullptr) {
-      ffi.calloc.free(c.nonce);
-    }
-    c.nonce = nonce.toCPtrInt8();
-  }
-
-  @override
-  toDart(Pointer<clib.CEthWalletConnectTx> c) {
-    if (c == nullptr) {
-      return;
-    }
-    toDartInstance(c.ref);
-  }
-
-  @override
-  toDartInstance(clib.CEthWalletConnectTx c) {
-    from = c.from.toDartString();
-    to = c.to.toDartString();
-    data = c.data.toDartString();
-    gasPrice = c.gasPrice.toDartString();
-    gas = c.gas.toDartString();
-    value = c.value.toDartString();
-    nonce = c.nonce.toDartString();
   }
 }

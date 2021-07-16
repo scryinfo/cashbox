@@ -307,11 +307,13 @@ class _LeftDrawerState extends State<LeftDrawer> {
               Container(
                 alignment: Alignment.centerLeft,
                 width: ScreenUtil().setWidth(52),
-                height: ScreenUtil().setHeight(0.05),
+                height: ScreenUtil().setHeight(0.02),
+                color: Colors.blueAccent,
                 child: CustomPaint(
                   foregroundPainter: MySeparatorLine(
                     lineColor: Colors.blueAccent,
                     width: ScreenUtil().setWidth(52),
+                    height: ScreenUtil().setHeight(0.02),
                   ),
                 ),
               )

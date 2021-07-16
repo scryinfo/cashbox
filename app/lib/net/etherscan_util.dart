@@ -29,7 +29,7 @@ Future<String> assembleGasOracle(ChainType chainType) async {
 //GasOracle
 Future<Map> loadGasOracle(ChainType chainType) async {
   try {
-    var res = await request(await assembleTxAccount(chainType));
+    var res = await request(await assembleGasOracle(chainType));
     if (res != null && (res as Map).containsKey("result")) {
       return res["result"];
     } else {

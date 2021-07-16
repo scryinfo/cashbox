@@ -53,6 +53,9 @@ class ChainEth {
   }
 
   DlResult1<String> wcTxSign(EthWalletConnectTx wcTxPayload, NoCacheString password) {
+    // EthWalletConnectTx  maxPriorityFeePerGas
+    // typeTxId 2 新方式
+    // 基础费(链上可查) + maxPriorityFeePerGas  < gasPrice
     Error err;
     String signResult = "";
     {
