@@ -7,10 +7,11 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ethabi = "11.0.0"
+ethabi = "14.1.0"
 derive_more = "0.99.1"
 hex="0.4.0"
-ethereum-types = "0.8.0"
+ethereum-types = "0.11.0"
+tiny-keccak = "1.5.0"
 tiny-bip39="0.7.0"
 tiny-hderive="0.2.1"
 serde = { version = "1.0.90", features = ["derive"] }
@@ -19,7 +20,10 @@ serde_derive = "1.0.90"
 failure="0.1.8"
 rustc-hex = "2.0.1"
 arrayvec = "0.5.0"
-rlp = "0.4"
+rlp = "0.5.0"
 log = "0.4.8"
-secp256k1 = {version = "0.15", features = ["recovery"] }
-tiny-keccak = "1.5.0"
+serde_repr = "0.1"
+parity-crypto = {version = "0.9.0",features=["publickey"]}
+parity-util-mem = "0.7"
+secp256k1 = {version = "0.20.3", features = ["recovery"] }
+

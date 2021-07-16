@@ -162,7 +162,7 @@ impl EthChainTokenAuth {
         let mut target_tokens = vec![];
 
         for token_shared in &tokens_shared {
-            let mut tokens_auth = {
+            let tokens_auth = {
                 let wrapper = wallets_db.new_wrapper()
                    .eq(MEthChainTokenAuth::chain_token_shared_id,&token_shared.id)
                     .eq(MEthChainTokenAuth::net_type, net_type.to_string())

@@ -1,14 +1,15 @@
 use failure::_core::ops::{Deref, DerefMut};
 use super::error::WalletError;
 use mav::ma::{MEeeChainTx, MEeeTokenxTx};
-use ethereum_types::U256;
-use eth::RawTransaction;
+use primitive_types::{U256, H160};
+use eth::transaction::{Action, TypedTxId, TypedTransaction, EIP1559TransactionTx, AccessListTx};
 use std::convert::TryInto;
+
 
 #[derive(Debug, Default, Clone)]
 pub struct InitParameters {
     pub db_name: DbName,
-    pub is_memory_db:u32,
+    pub is_memory_db: u32,
     pub context_note: String,
     //pub net_type:String,
 }
@@ -82,6 +83,7 @@ pub struct EeeTransferPayload {
     pub ext_data: String,
     pub password: String,
 }
+
 #[derive(Debug, Default, Clone)]
 pub struct ExtrinsicContext {
     pub chain_version: ChainVersion,
@@ -105,7 +107,7 @@ pub struct AccountInfo {
 
 #[repr(C)]
 #[derive(Debug, Default, Clone)]
-pub struct WalletTokenStatus{
+pub struct WalletTokenStatus {
     pub wallet_id: String,
     pub chain_type: String,
     pub token_id: String,
@@ -138,18 +140,18 @@ pub struct EthTransferPayload {
     pub from_address: String,
     pub to_address: String,
     pub contract_address: String,
-    pub value: String,//unit ETH
+    pub value: String,
+    //unit ETH
     pub nonce: String,
     pub gas_price: String,
     pub gas_limit: String,
     pub decimal: u32,
     pub ext_data: String,
-    pub password: String,
 }
 
 impl EthTransferPayload {
-  pub fn trim(& self)->Self{
-        EthTransferPayload{
+    pub fn trim(&self) -> Self {
+        EthTransferPayload {
             from_address: self.from_address.trim().to_string(),
             to_address: self.to_address.trim().to_string(),
             contract_address: self.contract_address.trim().to_string(),
@@ -159,7 +161,6 @@ impl EthTransferPayload {
             gas_limit: self.gas_limit.trim().to_string(),
             decimal: self.decimal,
             ext_data: self.ext_data.trim().to_string(),
-            password: self.password.clone()
         }
     }
     pub fn decode(&self) -> Result<eth::RawTransaction, WalletError> {
@@ -169,50 +170,50 @@ impl EthTransferPayload {
         let decimal = self.decimal as usize;
 
         let amount = eth::convert_token(&self.value, decimal);
-        if amount.is_none(){
-            let error_msg = format!("input value illegal:{}",&self.value);
+        if amount.is_none() {
+            let error_msg = format!("input value illegal:{}", &self.value);
             return Err(WalletError::Custom(error_msg));
         }
-       let value = {
-           if self.contract_address.trim().is_empty(){
-               amount.unwrap()
-           }else{
-               U256::from(0)
-           }
-       };
+        let value = {
+            if self.contract_address.trim().is_empty() {
+                amount.unwrap()
+            } else {
+                U256::from(0)
+            }
+        };
         //Additional parameters
         let data = self.ext_data.as_str().as_bytes().to_vec();
-        log::debug!("to address:{:?},contract_address:{:?}",self.to_address,self.contract_address);
+        log::debug!("to address:{:?},contract_address:{:?}", self.to_address, self.contract_address);
         let (to_address, data) = {
             if self.to_address.trim().is_empty() {
                 (None, data)
             } else if !self.contract_address.trim().is_empty() {
-                let contract_address = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.contract_address)?.as_slice());
-                let to = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.to_address)?.as_slice());
+                let contract_address = H160::from_slice(scry_crypto::hexstr_to_vec(&self.contract_address)?.as_slice());
+                let to = H160::from_slice(scry_crypto::hexstr_to_vec(&self.to_address)?.as_slice());
                 let mut encode_data = eth::get_erc20_transfer_data(to, amount.unwrap())?;
                 encode_data.extend_from_slice(&data);
                 (Some(contract_address), encode_data)
             } else {
-                let to = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(&self.to_address)?.as_slice());
-                log::debug!("to address:{:?}",to);
+                let to = H160::from_slice(scry_crypto::hexstr_to_vec(&self.to_address)?.as_slice());
+                log::debug!("to address:{:?}", to);
                 (Some(to), data)
             }
         };
         //gas price default input unit is gwei
-        let gas_price = if let Some(gas_price) = eth::convert_token(&self.gas_price, 9){
+        let gas_price = if let Some(gas_price) = eth::convert_token(&self.gas_price, 9) {
             gas_price
-        }else {
-            let error_msg = format!("input gas_price illegal:{}",&self.gas_price);
+        } else {
+            let error_msg = format!("input gas_price illegal:{}", &self.gas_price);
             return Err(WalletError::Custom(error_msg));
         };
 
         //Allow maximum gas consumption
         if self.gas_limit.contains('.') {
-            let error_msg = format!("input gas_limit illegal:{}",&self.gas_limit);
+            let error_msg = format!("input gas_limit illegal:{}", &self.gas_limit);
             return Err(WalletError::Custom(error_msg));
         }
 
-      let gas_limit=  U256::from_dec_str(&self.gas_limit).map_err(|err|WalletError::Custom(err.to_string()))?;
+        let gas_limit = U256::from_dec_str(&self.gas_limit).map_err(|err| WalletError::Custom(err.to_string()))?;
         //Nonce value of the current transaction
         let nonce = {
             let nonce = if self.nonce.starts_with("0x") {
@@ -220,7 +221,7 @@ impl EthTransferPayload {
             } else {
                 self.nonce.clone()
             };
-            ethereum_types::U256::from_dec_str(&nonce).map_err(|err|WalletError::Custom(err.to_string()))?
+            U256::from_dec_str(&nonce).map_err(|err| WalletError::Custom(err.to_string()))?
         };
 
         Ok(eth::RawTransaction {
@@ -233,54 +234,78 @@ impl EthTransferPayload {
         })
     }
 }
-#[derive(Debug,Clone,Default)]
-pub struct EthWalletConnectTx{
+
+#[derive(Debug, Clone, Default)]
+pub struct EthWalletConnectTx {
     pub from: String,
-    pub to:String,
-    pub data:  String,
+    pub to: String,
+    pub data: String,
     pub gas_price: String,
-    pub gas:String,
+    pub gas: String,
     pub value: String,
     pub nonce: String,
+    pub max_priority_fee_per_gas: String,
+    pub type_tx_id: u32,
 }
 
-impl TryInto<RawTransaction> for EthWalletConnectTx{
+impl TryInto<TypedTransaction> for EthWalletConnectTx {
     type Error = WalletError;
 
-    fn try_into(self) -> Result<RawTransaction,Self::Error> {
+    fn try_into(self) -> Result<TypedTransaction, Self::Error> {
         let to = self.to.trim();
-        let to =if to.is_empty(){
-            None
-        }else{
-            let to = ethereum_types::H160::from_slice(scry_crypto::hexstr_to_vec(to)?.as_slice());
-            log::debug!("to address:{:?}",to);
-            Some(to)
+
+        let action = if to.is_empty() {
+            Action::Create
+        } else {
+            let to = H160::from_slice(scry_crypto::hexstr_to_vec(to)?.as_slice());
+            log::debug!("to address:{:?}", to);
+            Action::Call(to)
         };
         //wallet connect data format always is hex
-        let nonce = ethereum_types::U256::from(scry_crypto::hexstr_to_vec(&self.nonce)?.as_slice());
+        let nonce = U256::from(scry_crypto::hexstr_to_vec(&self.nonce)?.as_slice());
 
-        //user input gas price is decimal
-        let gas_price =  ethereum_types::U256::from_dec_str(&self.gas_price).map_err(|err|WalletError::Custom(err.to_string()))?;
+        //user input gas price is decimal (max allow gas price in eip1559 tx)
+        let gas_price = U256::from_dec_str(&self.gas_price).map_err(|err| WalletError::Custom(err.to_string()))?;
 
         //Allow maximum gas consumption
         if self.gas.contains('.') {
-            let error_msg = format!("input gas_limit illegal:{}",&self.gas);
+            let error_msg = format!("input gas_limit illegal:{}", &self.gas);
             return Err(WalletError::Custom(error_msg));
         }
-        let gas=  U256::from_dec_str(&self.gas).map_err(|err|WalletError::Custom(err.to_string()))?;
+        let gas = U256::from_dec_str(&self.gas).map_err(|err| WalletError::Custom(err.to_string()))?;
 
         //Additional parameters
         let data = scry_crypto::hexstr_to_vec(&self.data)?;
         let value = U256::from(scry_crypto::hexstr_to_vec(&self.value)?.as_slice());
-
-        Ok(eth::RawTransaction {
+        let transaction = eth::transaction::Transaction {
             nonce,
-            to,
-            value,
             gas_price,
             gas,
+            action,
+            value,
             data,
-        })
+        };
+        if self.type_tx_id>255{
+            return Err(WalletError::Custom("input type tx id should in the range of 0 to 255".to_string()))
+        }
+        let type_transaction = match TypedTxId::from_u8_id(self.type_tx_id as u8) {
+            Some(TypedTxId::Legacy) => TypedTransaction::Legacy(transaction),
+            Some(TypedTxId::AccessList) => {
+                TypedTransaction::AccessList(AccessListTx {
+                    transaction,
+                    access_list: vec![],
+                })
+            }
+            Some(TypedTxId::EIP1559Transaction) => {
+                let max_priority_fee_per_gas = U256::from_dec_str(&self.max_priority_fee_per_gas).map_err(|err| WalletError::Custom(err.to_string()))?;
+                TypedTransaction::EIP1559Transaction(EIP1559TransactionTx {
+                    transaction: AccessListTx::new(transaction, vec![]),
+                    max_priority_fee_per_gas,
+                })
+            }
+            _ => return Err(WalletError::Custom("unsupport transaction type".to_string())),
+        };
+        Ok(type_transaction)
     }
 }
 
@@ -291,24 +316,24 @@ pub struct EthRawTxPayload {
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct  EeeChainTx{
-    pub tx_hash:String,
-    pub block_hash:String,
-    pub block_number:String,
-    pub signer:String,
-    pub wallet_account:String,
-    pub from_address:String,
-    pub to_address:String,
-    pub value:String,
-    pub extension:String,
-    pub status:u32,
-    pub tx_timestamp:i64,
-    pub tx_bytes:String,
+pub struct EeeChainTx {
+    pub tx_hash: String,
+    pub block_hash: String,
+    pub block_number: String,
+    pub signer: String,
+    pub wallet_account: String,
+    pub from_address: String,
+    pub to_address: String,
+    pub value: String,
+    pub extension: String,
+    pub status: u32,
+    pub tx_timestamp: i64,
+    pub tx_bytes: String,
 }
 
-impl From<MEeeChainTx> for EeeChainTx{
+impl From<MEeeChainTx> for EeeChainTx {
     fn from(chain_tx: MEeeChainTx) -> Self {
-        Self{
+        Self {
             tx_hash: chain_tx.tx_shared.tx_hash.clone(),
             block_hash: chain_tx.tx_shared.block_hash.clone(),
             block_number: chain_tx.tx_shared.block_number.clone(),
@@ -320,14 +345,14 @@ impl From<MEeeChainTx> for EeeChainTx{
             extension: chain_tx.extension.clone(),
             status: chain_tx.status as u32,
             tx_timestamp: chain_tx.tx_shared.tx_timestamp,
-            tx_bytes: chain_tx.tx_shared.tx_bytes
+            tx_bytes: chain_tx.tx_shared.tx_bytes,
         }
     }
 }
 
-impl From<MEeeTokenxTx> for EeeChainTx{
+impl From<MEeeTokenxTx> for EeeChainTx {
     fn from(chain_tx: MEeeTokenxTx) -> Self {
-        Self{
+        Self {
             tx_hash: chain_tx.tx_shared.tx_hash.clone(),
             block_hash: chain_tx.tx_shared.block_hash.clone(),
             block_number: chain_tx.tx_shared.block_number.clone(),
@@ -339,7 +364,7 @@ impl From<MEeeTokenxTx> for EeeChainTx{
             extension: chain_tx.extension.clone(),
             status: chain_tx.status,
             tx_timestamp: chain_tx.tx_shared.tx_timestamp,
-            tx_bytes: chain_tx.tx_shared.tx_bytes
+            tx_bytes: chain_tx.tx_shared.tx_bytes,
         }
     }
 }
@@ -350,6 +375,7 @@ pub struct BtcTxParam {
     pub password: String,
     pub from_address: String,
     pub to_address: String,
-    pub value: String,//unit Btc
+    pub value: String,
+    //unit Btc
     pub broadcast: u32,//broadcast or not (in CBtcTxParam it's CBool)
 }

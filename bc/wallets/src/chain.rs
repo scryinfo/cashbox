@@ -12,7 +12,7 @@ use rbatis::crud::CRUDTable;
 use futures::executor::block_on;
 use murmel::Error;
 use std::convert::TryInto;
-use eth::RawTransaction;
+use eth::{RawTransaction, transaction::TypedTransaction};
 
 #[derive(Default)]
 struct EthChain();
@@ -881,7 +881,7 @@ impl EthChainTrait for EthChain {
 
     async fn wallet_connect_tx_sign(&self, context: &dyn ContextTrait, net_type: &NetType, wallet_connect_tx: &EthWalletConnectTx, password: &str) -> Result<String, WalletError> {
         let raw_tx = wallet_connect_tx.to_owned().try_into()?;
-        Self::raw_transaction_sign(context,net_type,&raw_tx,&wallet_connect_tx.from,password).await
+        Self::typed_transaction_sign(context,net_type,raw_tx,&wallet_connect_tx.from,password).await
     }
 
     async fn decode_addition_data(&self, encode_data: &str) -> Result<String, WalletError> {
@@ -1055,6 +1055,17 @@ impl EthChain {
         let pri_key = Self::get_private_key_from_address(context, address, password).await?;
         let tx_signed = tx_payload.sign(&pri_key, Some(chain_id));
         Ok(format!("0x{}", hex::encode(tx_signed)))
+    }
+    async fn typed_transaction_sign(context: &dyn ContextTrait,net_type: &NetType, tx_payload: TypedTransaction,address: &str, password: &str)-> Result<String, WalletError>{
+       let chain_id = match net_type {
+            NetType::Main => 1,
+            NetType::Test => 3,
+            _ => 17
+        };
+        let pri_key = Self::get_private_key_from_address(context, address, password).await?;
+        let tx_signed = tx_payload.sign(&pri_key, Some(chain_id));
+        let final_data = tx_signed.encode().clone();
+        Ok(format!("0x{}", hex::encode(final_data)))
     }
 }
 

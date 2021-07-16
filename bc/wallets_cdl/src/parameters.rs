@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
 
-use std::os::raw::c_char;
+use std::os::raw::{c_char};
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{
@@ -143,6 +143,8 @@ pub struct CEthWalletConnectTx{
     pub gas: *mut c_char,
     pub value: *mut c_char,
     pub nonce: *mut c_char,
+    pub maxPriorityFeePerGas: *mut c_char,
+    pub typeTxId:u32,
 }
 
 #[repr(C)]

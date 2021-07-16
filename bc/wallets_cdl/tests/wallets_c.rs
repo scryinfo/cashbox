@@ -238,13 +238,13 @@ fn wallets_all_test() {
 fn create_wallet_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
-    let mnemonic = r#"anxiety flip wrestle biology one bench swarm raccoon month bamboo excuse senior flush suspect grape rookie door harbor"#;
+    let mnemonic = r#"pulp second side simple clinic step salad enact only mixed address paddle"#;
     //invalid parameters
     let mut parameters = CCreateWalletParameters::to_c_ptr(&CreateWalletParameters {
         name: "test".to_owned(),
         password: "123456".to_string(),
         mnemonic: mnemonic.to_string(),
-        wallet_type: WalletType::Normal.to_string(),
+        wallet_type: WalletType::Test.to_string(),
     });
     unsafe {
         let c_err = data::init_wallets_context(c_ctx);

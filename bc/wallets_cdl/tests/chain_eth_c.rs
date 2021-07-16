@@ -38,7 +38,6 @@ fn eth_tx_sign_test() {
             gas_limit: "21000".to_string(),
             decimal: 0,
             ext_data: "".to_string(),
-            password: "123456".to_string(),
         };
         let mut c_transfer_tx = CEthTransferPayload::to_c_ptr(&transfer_tx);
         let c_err = chain_eth_c::ChainEth_txSign(*c_ctx,  c_transfer_tx, to_c_char("123456"), sign_result) as *mut CError;
@@ -86,13 +85,15 @@ fn eth_wallet_connect_tx_sign_test() {
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let transfer_tx = EthWalletConnectTx {
             //  from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
-            from: "0x73c7bcd3bb594d2d4d9b63b818305109ab79df1d".to_string(),
-            to: "0xc0c4824527ffb27a51034cea1e37840ed69a5f1e".to_string(),
-            value: "0x9184e72a".to_string(),
-            nonce: "0x01".to_string(),
-            gas_price: "10000000000000".to_string(),
-            gas:"30400".to_string(),
-            data: "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675".to_string(),
+            from: "0x7a535a4e5aba213a4f93c1fe478501ba56f66a3f".to_string(),
+            to: "0x7a535a4e5aba213a4f93c1fe478501ba56f66a3f".to_string(),
+            value: "0xe8d4a51000".to_string(),
+            nonce: "0x0a".to_string(),
+            max_priority_fee_per_gas: "15000000000".to_string(),
+            gas_price: "40000000000".to_string(),
+            gas:"40000".to_string(),
+            data:"0x".to_string(),
+            type_tx_id: 2
         };
         let mut c_transfer_tx = CEthWalletConnectTx::to_c_ptr(&transfer_tx);
         let c_err = chain_eth_c::ChainEth_walletConnectTxSign(*c_ctx,  c_transfer_tx, to_c_char("123456"), sign_result) as *mut CError;
