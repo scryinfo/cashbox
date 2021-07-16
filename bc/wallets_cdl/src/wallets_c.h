@@ -426,6 +426,18 @@ typedef struct CBtcBalance {
     uint64_t height;
 } CBtcBalance;
 
+typedef struct CEthWalletConnectTx {
+    char *from;
+    char *to;
+    char *data;
+    char *gasPrice;
+    char *gas;
+    char *value;
+    char *nonce;
+    char *maxPriorityFeePerGas;
+    uint32_t typeTxId;
+} CEthWalletConnectTx;
+
 typedef struct CInitParameters {
     struct CDbName *dbName;
     CBool isMemoryDb;
@@ -492,16 +504,6 @@ typedef struct CEthRawTxPayload {
     char *fromAddress;
     char *rawTx;
 } CEthRawTxPayload;
-
-typedef struct CEthWalletConnectTx {
-    char *from;
-    char *to;
-    char *data;
-    char *gasPrice;
-    char *gas;
-    char *value;
-    char *nonce;
-} CEthWalletConnectTx;
 
 #ifdef __cplusplus
 extern "C" {
@@ -619,6 +621,10 @@ void CBtcNowLoadBlock_dFree(struct CBtcNowLoadBlock **dPtr);
 struct CBtcBalance **CBtcBalance_dAlloc(void);
 
 void CBtcBalance_dFree(struct CBtcBalance **dPtr);
+
+struct CEthWalletConnectTx **CEthWalletConnectTx_dAlloc(void);
+
+void CEthWalletConnectTx_dFree(struct CEthWalletConnectTx **dPtr);
 
 /**
  * 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名

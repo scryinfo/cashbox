@@ -668,6 +668,32 @@ class CWallets {
   late final _dart_CBtcBalance_dFree _CBtcBalance_dFree =
       _CBtcBalance_dFree_ptr.asFunction<_dart_CBtcBalance_dFree>();
 
+  ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> CEthWalletConnectTx_dAlloc() {
+    return _CEthWalletConnectTx_dAlloc();
+  }
+
+  late final _CEthWalletConnectTx_dAlloc_ptr =
+      _lookup<ffi.NativeFunction<_c_CEthWalletConnectTx_dAlloc>>(
+          'CEthWalletConnectTx_dAlloc');
+  late final _dart_CEthWalletConnectTx_dAlloc _CEthWalletConnectTx_dAlloc =
+      _CEthWalletConnectTx_dAlloc_ptr.asFunction<
+          _dart_CEthWalletConnectTx_dAlloc>();
+
+  void CEthWalletConnectTx_dFree(
+    ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> dPtr,
+  ) {
+    return _CEthWalletConnectTx_dFree(
+      dPtr,
+    );
+  }
+
+  late final _CEthWalletConnectTx_dFree_ptr =
+      _lookup<ffi.NativeFunction<_c_CEthWalletConnectTx_dFree>>(
+          'CEthWalletConnectTx_dFree');
+  late final _dart_CEthWalletConnectTx_dFree _CEthWalletConnectTx_dFree =
+      _CEthWalletConnectTx_dFree_ptr.asFunction<
+          _dart_CEthWalletConnectTx_dFree>();
+
   /// 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名
   /// 如果成功返回 [wallets_types::Error::SUCCESS()]
   ffi.Pointer<CError> Wallets_dbName(
@@ -2424,6 +2450,27 @@ class CBtcBalance extends ffi.Struct {
   external int height;
 }
 
+class CEthWalletConnectTx extends ffi.Struct {
+  external ffi.Pointer<ffi.Int8> from;
+
+  external ffi.Pointer<ffi.Int8> to;
+
+  external ffi.Pointer<ffi.Int8> data;
+
+  external ffi.Pointer<ffi.Int8> gasPrice;
+
+  external ffi.Pointer<ffi.Int8> gas;
+
+  external ffi.Pointer<ffi.Int8> value;
+
+  external ffi.Pointer<ffi.Int8> nonce;
+
+  external ffi.Pointer<ffi.Int8> maxPriorityFeePerGas;
+
+  @ffi.Uint32()
+  external int typeTxId;
+}
+
 class CInitParameters extends ffi.Struct {
   external ffi.Pointer<CDbName> dbName;
 
@@ -2524,22 +2571,6 @@ class CEthRawTxPayload extends ffi.Struct {
   external ffi.Pointer<ffi.Int8> fromAddress;
 
   external ffi.Pointer<ffi.Int8> rawTx;
-}
-
-class CEthWalletConnectTx extends ffi.Struct {
-  external ffi.Pointer<ffi.Int8> from;
-
-  external ffi.Pointer<ffi.Int8> to;
-
-  external ffi.Pointer<ffi.Int8> data;
-
-  external ffi.Pointer<ffi.Int8> gasPrice;
-
-  external ffi.Pointer<ffi.Int8> gas;
-
-  external ffi.Pointer<ffi.Int8> value;
-
-  external ffi.Pointer<ffi.Int8> nonce;
 }
 
 const int _STDINT_H = 1;
@@ -3107,6 +3138,20 @@ typedef _c_CBtcBalance_dFree = ffi.Void Function(
 
 typedef _dart_CBtcBalance_dFree = void Function(
   ffi.Pointer<ffi.Pointer<CBtcBalance>> dPtr,
+);
+
+typedef _c_CEthWalletConnectTx_dAlloc
+    = ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> Function();
+
+typedef _dart_CEthWalletConnectTx_dAlloc
+    = ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> Function();
+
+typedef _c_CEthWalletConnectTx_dFree = ffi.Void Function(
+  ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> dPtr,
+);
+
+typedef _dart_CEthWalletConnectTx_dFree = void Function(
+  ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> dPtr,
 );
 
 typedef _c_Wallets_dbName = ffi.Pointer<CError> Function(
