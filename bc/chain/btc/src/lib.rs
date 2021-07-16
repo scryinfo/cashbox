@@ -3,15 +3,15 @@ pub mod error;
 use bitcoin::network::constants::Network;
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 
+use base58::ToBase58;
 use bip39::Language;
 use bitcoin::secp256k1::{PublicKey, SecretKey};
 use bitcoin::util::psbt::serialize::Serialize;
 use bitcoin_wallet::mnemonic::Mnemonic;
 pub use error::Error;
+use ripemd160::{Digest, Ripemd160};
 use secp256k1::Secp256k1;
-use ripemd160::{Ripemd160, Digest};
 use sha2::Sha256;
-use base58::{ToBase58};
 
 //Generate btc address from uncompressed public key
 // bip39 44 32
@@ -44,7 +44,7 @@ pub fn generate_btc_address(mn: &[u8], chain_type: &str) -> Result<(String, Stri
 // use bip44 for extend private keys
 // use Secp256k1 for secret key and public key
 // use different prefix for different types of addresses
-// use hash160 and sha256 for checksum and change output to base58。now you get address
+// use hash160 and sha256 for checksum and change output to base58. now you get address
 pub fn generate_btc_address2(chain_type: &str) {
     let network = match chain_type {
         "BTC" => Network::Bitcoin,
@@ -58,9 +58,10 @@ pub fn generate_btc_address2(chain_type: &str) {
     let mnemonic = bip39::Mnemonic::from_phrase(phrase, Language::English).unwrap();
     let seed = bip39::Seed::new(&mnemonic, ""); //
     println!("{:?}", &seed);
+    let path = switch_path(&network);
     // mainnet "m/44'/0'/0'/0/0"
     let ext_private =
-        tiny_hderive::bip32::ExtendedPrivKey::derive(seed.as_bytes(), "m/44'/1'/0'/0/0").unwrap();
+        tiny_hderive::bip32::ExtendedPrivKey::derive(seed.as_bytes(), path).unwrap();
 
     let context = Secp256k1::new();
     let secret = SecretKey::from_slice(&ext_private.secret().to_vec()).unwrap();
@@ -84,6 +85,14 @@ pub fn hash160(bytes: &[u8]) -> Vec<u8> {
 
 pub fn checksum(data: &[u8]) -> Vec<u8> {
     Sha256::digest(&Sha256::digest(&data)).to_vec()
+}
+
+pub fn switch_path(network: &Network) -> &str {
+    return match network {
+        Network::Bitcoin => "m/44'/0'/0'/0/0",
+        Network::Testnet => "m/44'/1'/0'/0/0",
+        _ => "m/44'/1'/0'/0/0",
+    };
 }
 
 #[cfg(test)]
