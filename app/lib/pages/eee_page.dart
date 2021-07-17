@@ -546,6 +546,7 @@ class _EeePageState extends State<EeePage> {
             foregroundPainter: MySeparatorLine(
               lineColor: Colors.blueAccent,
               width: ScreenUtil().setWidth(75),
+              height: ScreenUtil().setWidth(0.1),
             ),
           ),
         )

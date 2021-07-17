@@ -207,6 +207,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
               foregroundPainter: MySeparatorLine(
                 lineColor: Colors.blueAccent,
                 width: ScreenUtil().setWidth(90),
+                height: ScreenUtil().setWidth(0.1),
               ),
             ),
           ),
@@ -394,6 +395,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                 foregroundPainter: MySeparatorLine(
                   lineColor: Colors.blueAccent,
                   width: ScreenUtil().setWidth(90),
+                  height: ScreenUtil().setWidth(0.1),
                 ),
               ),
             )

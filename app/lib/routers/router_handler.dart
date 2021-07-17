@@ -33,7 +33,7 @@ import 'package:app/pages/wallet_manager/recover_wallet.dart';
 import 'package:app/pages/wallet_manager/reset_pwd.dart';
 import 'package:app/pages/wallet_manager/wallet_manage.dart';
 import 'package:app/pages/wallet_manager/wallet_manager_list.dart';
-import 'package:app/pages/wc_protocol/approve_session.page.dart';
+import 'package:app/pages/wc_protocol/session_apply_page.dart';
 import 'package:app/pages/wc_protocol/wc_connected_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
@@ -137,7 +137,7 @@ Handler ddd2eeePageHandler = Handler(handlerFunc: (BuildContext context, Map<Str
 });
 
 Handler wcApprovePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-  return ApproveSessionPage();
+  return SessionApplyPage();
 });
 
 Handler ddd2eeeConfirmPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {

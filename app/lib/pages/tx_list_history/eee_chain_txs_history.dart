@@ -216,6 +216,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
               foregroundPainter: MySeparatorLine(
                 lineColor: Colors.blueAccent,
                 width: ScreenUtil().setWidth(90),
+                height: ScreenUtil().setWidth(0.1),
               ),
             ),
           ),
@@ -417,6 +418,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
                 foregroundPainter: MySeparatorLine(
                   lineColor: Colors.blueAccent,
                   width: ScreenUtil().setWidth(90),
+                  height: ScreenUtil().setWidth(0.1),
                 ),
               ),
             )

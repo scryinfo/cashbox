@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:wallets/enums.dart';
 
 class WcProtocolControl {
   static const methodPlugin = const MethodChannel('wc_protocol_channel');
@@ -21,19 +22,18 @@ class WcProtocolControl {
     return methodPlugin.invokeMethod(initSession, {'qrInfo': qrInfo});
   }
 
-  Future<String> approveLogIn(String addr) async {
+  Future<String> approveLogIn(String addr, String chainType) async {
     var approveLogIn = "approveLogIn";
-    String callbackResult = await methodPlugin.invokeMethod(approveLogIn, {'addr': addr});
+    String callbackResult = await methodPlugin.invokeMethod(approveLogIn, {'addr': addr, "chainType": chainType});
     if (callbackResult == null || callbackResult.isEmpty) {
       callbackResult = "";
     }
     return callbackResult;
   }
 
-  Future<String> approveTx(String id, String from, String to, String data, String gas, String gasPrice, String nonce) async {
+  Future<String> approveTx(String id, String data) async {
     var approveTx = "approveTx";
-    String callbackResult = await methodPlugin
-        .invokeMethod(approveTx, {'id': id, 'from': from, 'to': to, 'data': data, 'gas': gas, 'gasPrice': gasPrice, 'nonce': nonce});
+    String callbackResult = await methodPlugin.invokeMethod(approveTx, {'id': id, 'data': data});
     if (callbackResult == null || callbackResult.isEmpty) {
       callbackResult = "";
     }

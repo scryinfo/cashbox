@@ -2,6 +2,7 @@ import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/control/wc_protocol_control.dart';
 import 'package:app/net/etherscan_util.dart';
+import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/wc_info_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -38,8 +39,9 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
   Map txInfoMap = Map();
   bool existInputInfo = false;
   double txValueDouble = 0.0;
+  String defaultGasLimit = "210000"; // default : 21000 * 10
   int eth2Unit = 1000 * 1000 * 1000 * 1000 * 1000 * 1000; // 1 ETH = 1e18 wei = 1e9 gwei
-  TextEditingController _gasPriceController = TextEditingController();
+  TextEditingController _gasPriceController = TextEditingController(); //default :wei from layout input
   TextEditingController _gasController = TextEditingController();
   double allGasFee = 0.0;
 
@@ -50,6 +52,14 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
   }
 
   registryListen() {
+    _gasController.text = defaultGasLimit;
+    _gasPriceController.addListener(() {
+      _updateGasFee();
+    });
+    _gasController.addListener(() {
+      _updateGasFee();
+    });
+    _loadGasOracle();
     wcEventPlugin.receiveBroadcastStream().listen((event) {
       try {
         txInfoMap = Map.from(event);
@@ -71,12 +81,16 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
     }, onError: (obj) {
       Logger().d("wcEventPlugin", "onError obj is --->" + obj.toString());
     });
-    _gasPriceController.addListener(() {
-      _updateGasFee();
-    });
-    _gasController.addListener(() {
-      _updateGasFee();
-    });
+  }
+
+  _loadGasOracle() async {
+    var gasOracleMap = await loadGasOracle(WalletsControl().currentWallet().ethChain.chainShared.chainType.toChainType());
+    if (gasOracleMap == null) {
+      return;
+    }
+    if (gasOracleMap.containsKey("ProposeGasPrice") != null) {
+      _gasPriceController.text = gasOracleMap["ProposeGasPrice"];
+    }
   }
 
   _updateGasFee() {
@@ -87,6 +101,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
     num gasPrice = int.parse(_gasPriceController.text.toString());
     num gasLimit = int.parse(_gasController.text.toString());
     allGasFee = gasPrice.toDouble() * gasLimit.toDouble();
+    allGasFee = allGasFee / (1000 * 1000 * 1000); //gwei to eth
     setState(() {
       this.allGasFee = allGasFee;
     });
@@ -134,9 +149,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
             height: ScreenUtil().setHeight(75),
             width: ScreenUtil().setWidth(75),
             alignment: Alignment.center,
-            // child: existInputInfo ? _buildInputInfoWidget() : _buildAddressWidget(),
-            // child: _buildAddressWidget(),
-            child: _buildInputInfoWidget(),
+            child: existInputInfo ? _buildInputInfoWidget() : _buildAddressWidget(),
           ),
           Gaps.scaleVGap(5),
           _buildDisconnectBtnWidget(),
@@ -204,23 +217,38 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
 
   Widget _buildAddressWidget() {
     return Container(
-      alignment: Alignment.topLeft,
-      padding: EdgeInsets.only(
-        top: ScreenUtil().setHeight(10),
-      ),
-      child: RichText(
-        text: TextSpan(children: [
-          TextSpan(
-            text: translate("chain_address_info"),
-            style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
-          ),
-          TextSpan(
-            text: WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address ?? "",
-            style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
-          )
-        ]),
-      ),
-    );
+        alignment: Alignment.topLeft,
+        padding: EdgeInsets.only(
+          top: ScreenUtil().setHeight(10),
+        ),
+        child: Column(
+          children: [
+            Container(
+              child: Text(
+                translate("success_connect"),
+                style:
+                    TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+              ),
+            ),
+            Gaps.scaleVGap(3),
+            Container(
+              child: RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                    text: translate("chain_address_info"),
+                    style: TextStyle(
+                        decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+                  ),
+                  TextSpan(
+                    text: WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address ?? "",
+                    style: TextStyle(
+                        decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
+                  )
+                ]),
+              ),
+            )
+          ],
+        ));
   }
 
   Widget _buildInputInfoWidget() {
@@ -451,80 +479,78 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
         ProgressButton(
           width: ScreenUtil().setWidth(27),
           height: ScreenUtil().setHeight(9),
-          defaultWidget: const Text('Reject'),
-          progressWidget: const CircularProgressIndicator(),
+          defaultWidget: Text(translate('cancel')),
+          progressWidget: CircularProgressIndicator(),
           onPressed: () async {
-            // Do some background task
+            setState(() {
+              this.existInputInfo = false;
+            });
             WcProtocolControl.getInstance().rejectTxReq(txInfoMap["id"]);
-            NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
           },
         ),
         Gaps.scaleHGap(8),
         ProgressButton(
           width: ScreenUtil().setWidth(27),
           height: ScreenUtil().setHeight(9),
-          defaultWidget: const Text('Confirm'),
+          defaultWidget: Text(translate('confirm')),
           progressWidget: const CircularProgressIndicator(),
           onPressed: () async {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return PwdDialog(
-                  title: translate('wallet_pwd').toString(),
-                  hintContent: translate('dapp_sign_hint_content') + WalletsControl.getInstance().currentWallet().name ?? "",
-                  hintInput: translate('input_pwd_hint').toString(),
-                  onPressed: (pwd) async {
-                    try {
-                      String value = txInfoMap["value"];
-                      String nonce = await loadTxAccount(txInfoMap["from"], WalletsControl.getInstance().currentChainType());
-                      if (nonce == null) {
-                        // todo add toast hint
-                        return;
-                      }
-                      String gas = "206040"; // 0x9b2d4
-                      String gasPrice = "70000000000";
-                      if (value.length % 2 != 0) {
-                        value = value.substring(0, 2) + "0" + value.substring(2);
-                      }
-                      EthWalletConnectTx ethWalletConnectTx = EthWalletConnectTx()
-                        ..typeTxId = 2
-                        ..data = txInfoMap["data"]
-                        ..from = txInfoMap["from"]
-                        ..to = txInfoMap["to"]
-                        ..nonce = nonce
-                        ..value = value
-                        ..gasPrice = gasPrice
-                        ..maxPriorityFeePerGas = "28000000000"
-                        ..gas = gas;
-                      Logger().d("broadcast is data===>", txInfoMap["data"]);
-                      Logger().d("broadcast  is from===>", txInfoMap["from"]);
-                      Logger().d("broadcast  is to===>", txInfoMap["to"]);
-                      Logger().d("broadcast  is nonce===>", nonce);
-                      Logger().d("broadcast  is value===>", value);
-                      Logger().d("broadcast  is gasPrice===>", gasPrice);
-                      Logger().d("broadcast  is gas===>", gas);
-                      var resultObj = EthChainControl.getInstance().wcTxSign(ethWalletConnectTx, NoCacheString()..buffer = StringBuffer(pwd));
-                      if (resultObj != null) {
-                        Logger().d("wcTxSign  resultObj is -----===>", resultObj.toString());
-                        // String txHash = await sendRawTx(ChainType.EthTest, resultObj.toString());
-                        // Logger().d("broadcast txHash is ===>", txHash);
-                        // WcProtocolControl().approveTx(txInfoMap["id"].toString(), from,to,txHash,gas,gasPrice,nonce);
-                        // WcProtocolControl().approveTx(txInfoMap["id"].toString(), from,to,resultObj,gas,gasPrice,nonce);
-                      } else {
-                        Logger().d("wcTxSign  resultObj is null-----===>", resultObj.toString());
-                      }
-                    } catch (e) {
-                      Logger().d("wcTxSign  error is -----===>", e.toString());
-                    }
-                  },
-                );
-              },
-            );
-            // WcProtocolControl.getInstance().approveLogIn(WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
+            _showDialogToSignTx(context);
           },
         ),
       ],
     ));
+  }
+
+  _showDialogToSignTx(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PwdDialog(
+          title: translate('wallet_pwd').toString(),
+          hintContent: translate('dapp_sign_hint_content') + WalletsControl.getInstance().currentWallet().name ?? "",
+          hintInput: translate('input_pwd_hint').toString(),
+          onPressed: (pwd) async {
+            try {
+              String value = txInfoMap["value"];
+              String nonce = await loadTxAccount(txInfoMap["from"], WalletsControl.getInstance().currentChainType());
+              if (nonce == null) {
+                Fluttertoast.showToast(msg: translate("nonce_is_wrong"));
+                return;
+              }
+              if (value.length % 2 != 0) {
+                value = value.substring(0, 2) + "0" + value.substring(2);
+              }
+              num gasPrice = int.parse(_gasPriceController.text.toString()) * (1000 * 1000 * 1000); // gwei---> wei
+              EthWalletConnectTx ethWalletConnectTx = EthWalletConnectTx()
+                ..typeTxId = 0
+                ..data = txInfoMap["data"]
+                ..from = txInfoMap["from"]
+                ..to = txInfoMap["to"]
+                ..nonce = nonce
+                ..value = value
+                ..gasPrice = gasPrice.toString()
+                ..gas = _gasController.text.toString(); // Unit: wei
+              var resultObj = EthChainControl.getInstance().wcTxSign(ethWalletConnectTx, NoCacheString()..buffer = StringBuffer(pwd));
+              setState(() {
+                this.existInputInfo = false;
+              });
+              if (resultObj != null) {
+                String txHash = await sendRawTx(ChainType.EthTest, resultObj.toString());
+                WcProtocolControl().approveTx(txInfoMap["id"].toString(), txHash);
+              } else {
+                Fluttertoast.showToast(
+                  msg: translate("sign_failure_check_pwd"),
+                );
+              }
+              NavigatorUtils.goBack(context);
+            } catch (e) {
+              Logger().d("wcTxSign  error is :", e.toString());
+            }
+          },
+        );
+      },
+    );
   }
 
   Widget _buildDisconnectBtnWidget() {
@@ -540,7 +566,6 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
             progressWidget: const CircularProgressIndicator(),
             height: 40,
             onPressed: () async {
-              // Do some background task
               WcProtocolControl.getInstance().rejectLogIn();
               NavigatorUtils.push(context, Routes.entrancePage, clearStack: false);
             },
@@ -554,21 +579,19 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
   _showCustomGasFeeAlert() {
     Alert(
         context: context,
-        title: "gas设置",
+        title: translate("gas_setting"),
         content: Column(
           children: <Widget>[
             Container(
               child: Text(
                 translate("recommend_default_hint"),
                 style: TextStyle(
-                  // color: Color.fromRGBO(255, 255, 255, 0.5),
                   fontSize: ScreenUtil().setSp(3.0),
                 ),
               ),
             ),
             TextField(
               decoration: InputDecoration(
-                // icon: Icon(Icons.format_list_numbered),
                 labelText: 'Gas Price (' + translate("tx_unit") + ':gwei)',
               ),
               controller: _gasPriceController,
@@ -576,7 +599,6 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
             ),
             TextField(
               decoration: InputDecoration(
-                // icon: Icon(Icons.format_list_numbered),
                 labelText: 'Gas',
               ),
               controller: _gasController,

@@ -151,6 +151,7 @@
   "tx_sign_failure": "Transaction signature failed",
   "tx_sign_success": "Transaction signature succeeded",
   "digit_info_null": "Token info is empty",
+  "gas_setting": "Gas Setting",
   "gas_used": "Gas consume",
   "gas_price": "Gas Price",
   "gas_limit": "Gas Limit",
@@ -229,6 +230,7 @@
   "recommend_default_hint": "recommend to use default value, please check it carefully if you change value",
   "gas_cannot_empty": "gasFee cannot be empty",
   "confirm_and_submit": "confirm and submit",
+  "success_connect": "success connect",
 
   "server_interface_error": "backend exception,please check the server info",
   "wallet_explanation": "Scry Cashbox is a wallet dedicated to providing simplicity and security operated by Scry organization,we will charge nothing and keep upgrading our system to provide more features in next version ",

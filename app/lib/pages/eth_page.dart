@@ -519,6 +519,7 @@ class _EthPageState extends State<EthPage> {
             foregroundPainter: MySeparatorLine(
               lineColor: Colors.blueAccent,
               width: ScreenUtil().setWidth(75),
+              height: ScreenUtil().setWidth(0.1),
             ),
           ),
         )

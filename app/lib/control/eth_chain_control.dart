@@ -1,6 +1,7 @@
 import 'package:app/control/balance_control.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/model/token.dart';
+import 'package:logger/logger.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
@@ -88,7 +89,7 @@ class EthChainControl {
   String wcTxSign(EthWalletConnectTx txPayload, NoCacheString password) {
     var dataObj = Wallets.mainIsolate().chainEth.wcTxSign(txPayload, password);
     if (!dataObj.isSuccess()) {
-      print("    dataObj.err" + dataObj.err.message + "||" + dataObj.err.code.toString());
+      Logger().e("wcTxSign  dataObj.err: " + dataObj.err.message, dataObj.err.code.toString());
       return null;
     }
     return dataObj.data1;

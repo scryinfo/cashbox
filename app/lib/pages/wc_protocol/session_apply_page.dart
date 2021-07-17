@@ -15,14 +15,14 @@ import 'package:flutter_translate/global.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
-class ApproveSessionPage extends StatefulWidget {
-  const ApproveSessionPage() : super();
+class SessionApplyPage extends StatefulWidget {
+  const SessionApplyPage() : super();
 
   @override
-  _ApproveSessionState createState() => _ApproveSessionState();
+  _SessionApplyState createState() => _SessionApplyState();
 }
 
-class _ApproveSessionState extends State<ApproveSessionPage> {
+class _SessionApplyState extends State<SessionApplyPage> {
   Future sessionStateFuture;
   ProgressDialog pr;
   static const wcSessionPlugin = const EventChannel('wc_session_info_channel');
@@ -64,11 +64,13 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
           if (txInfoMap.containsKey("iconUrl")) {
             dappIconUrl = txInfoMap["iconUrl"];
           }
-          setState(() {
-            this.dappName = dappName;
-            this.dappUrl = dappUrl;
-            this.dappIconUrl = dappIconUrl;
-          });
+          if (mounted) {
+            setState(() {
+              this.dappName = dappName;
+              this.dappUrl = dappUrl;
+              this.dappIconUrl = dappIconUrl;
+            });
+          }
         },
         onDone: () {},
         onError: (obj) {
@@ -80,8 +82,6 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     String qrInfo = Provider.of<WcInfoProvide>(context, listen: false).wcInitUrl;
-    Logger.getInstance().d("initSession", "qrInfo is --->" + qrInfo);
-    Logger.getInstance().d("initSession", " ||sessionId-->" + Provider.of<WcInfoProvide>(context, listen: false).sessionId);
     sessionStateFuture = WcProtocolControl.getInstance().initSession(qrInfo);
   }
 
@@ -95,11 +95,12 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           leading: GestureDetector(
-              onTap: () {
-                print("WalletConnect myAppBar clicked");
-                NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
-              },
-              child: Image.asset("assets/images/ic_back.png")),
+            onTap: () {
+              print("WalletConnect myAppBar clicked");
+              NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
+            },
+            child: Image.asset("assets/images/ic_back.png"),
+          ),
           centerTitle: true,
           title: Text("WalletConnect", style: TextStyle(fontSize: 20)),
           backgroundColor: Colors.black12,
@@ -132,10 +133,9 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
             );
           }
           if (snapshot.hasData) {
-            Logger().d("approveWidget future snapshot.data is --->", snapshot.data.toString());
             pr.hide();
             switch (snapshot.data.toString()) {
-              case "Connected":
+              case "Connected": // todo use like Enum
                 {
                   return SingleChildScrollView(
                     child: Column(
@@ -150,20 +150,9 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
                     ),
                   );
                 }
-              case "Approved":
-                {
-                  return Text("Approved");
-                }
-              case "Closed":
-                {
-                  return Text("Closed");
-                }
-              case "Disconnected":
-                {
-                  return Text("Disconnected");
-                }
               default:
                 {
+                  //todo back to main Activity
                   return Text("unknown format info");
                 }
             }
@@ -180,26 +169,22 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
         width: ScreenUtil().setWidth(25),
         height: ScreenUtil().setHeight(25),
         placeholder: (context, url) => Container(
-              alignment: Alignment.center,
-              width: ScreenUtil().setWidth(25),
-              height: ScreenUtil().setHeight(25),
-              child: Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
-                    Gaps.scaleVGap(3),
-                    Text("Dapp Icon loading"),
-                  ],
-                ),
+            alignment: Alignment.center,
+            width: ScreenUtil().setWidth(25),
+            height: ScreenUtil().setHeight(25),
+            child: Center(
+              child: Column(
+                children: [
+                  CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                  Gaps.scaleVGap(3),
+                  Text("Icon loading"),
+                ],
               ),
-            ),
-        errorWidget: (context, url, error) => Container(
-              width: ScreenUtil().setWidth(25),
-              height: ScreenUtil().setHeight(25),
-              child: Icon(Icons.error),
-            ),
+            )),
+        errorWidget: (context, url, error) =>
+            Container(width: ScreenUtil().setWidth(25), height: ScreenUtil().setHeight(25), child: Icon(Icons.error)),
         fit: BoxFit.scaleDown);
   }
 
@@ -227,9 +212,7 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
         Container(
           width: ScreenUtil().setWidth(75),
           alignment: Alignment.centerLeft,
-          padding: EdgeInsets.only(
-            top: ScreenUtil().setHeight(0.5),
-          ),
+          padding: EdgeInsets.only(top: ScreenUtil().setHeight(0.5)),
           child: Text(
             translate("app_permission_ask"),
             textAlign: TextAlign.left,
@@ -258,7 +241,6 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
           ),
           child: Text(
             translate("allow_send_tx_req"),
-            // "允许向您发起交易请求",
             textAlign: TextAlign.left,
             style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
           ),
@@ -303,8 +285,9 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
           onPressed: () async {
             pr.update(message: translate("handle_allow_connecting"));
             pr.show();
-            String resultStr = await WcProtocolControl.getInstance()
-                .approveLogIn(WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
+            String resultStr = await WcProtocolControl.getInstance().approveLogIn(
+                WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
+                WalletsControl.getInstance().currentWallet().ethChain.chainShared.chainType);
             if (resultStr == "Approved") {
               pr.hide();
               context.read<WcInfoProvide>()
@@ -313,7 +296,7 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
                 ..setDappIconUrl(dappIconUrl);
               NavigatorUtils.push(context, Routes.wcConnectedPage, clearStack: false);
             }
-            // WcProtocolControl.getInstance().approveLogIn(WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address);
+            // todo other router
           },
         ),
       ],
@@ -322,8 +305,9 @@ class _ApproveSessionState extends State<ApproveSessionPage> {
 
   @override
   void deactivate() {
-    // TODO: implement deactivate
     super.deactivate();
-    pr.hide();
+    if (pr != null) {
+      pr.hide();
+    }
   }
 }
