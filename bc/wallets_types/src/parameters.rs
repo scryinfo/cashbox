@@ -262,7 +262,14 @@ impl TryInto<TypedTransaction> for EthWalletConnectTx {
             Action::Call(to)
         };
         //wallet connect data format always is hex
-        let nonce = U256::from(scry_crypto::hexstr_to_vec(&self.nonce)?.as_slice());
+        let nonce = {
+            let nonce = if self.nonce.starts_with("0x") {
+                format!("{}", u64::from_str_radix(&self.nonce[2..], 16)?)
+            } else {
+                self.nonce.clone()
+            };
+            U256::from_dec_str(&nonce).map_err(|err| WalletError::Custom(err.to_string()))?
+        };
 
         //user input gas price is decimal (max allow gas price in eip1559 tx)
         let gas_price = U256::from_dec_str(&self.gas_price).map_err(|err| WalletError::Custom(err.to_string()))?;
