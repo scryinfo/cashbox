@@ -8,7 +8,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:progress_dialog/progress_dialog.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_translate/global.dart';
@@ -24,7 +25,6 @@ class SessionApplyPage extends StatefulWidget {
 
 class _SessionApplyState extends State<SessionApplyPage> {
   Future sessionStateFuture;
-  ProgressDialog pr;
   static const wcSessionPlugin = const EventChannel('wc_session_info_channel');
   Map txInfoMap = Map();
   String dappName;
@@ -34,18 +34,6 @@ class _SessionApplyState extends State<SessionApplyPage> {
   @override
   void initState() {
     super.initState();
-    pr = ProgressDialog(context);
-    pr.style(
-        message: 'Downloading file...',
-        borderRadius: 8.0,
-        backgroundColor: Colors.white,
-        progressWidget: CircularProgressIndicator(),
-        elevation: 8.0,
-        insetAnimCurve: Curves.easeInOut,
-        progress: 0.0,
-        maxProgress: 100.0,
-        progressTextStyle: TextStyle(color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
-        messageTextStyle: TextStyle(color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600));
     registryListen();
   }
 
@@ -123,7 +111,6 @@ class _SessionApplyState extends State<SessionApplyPage> {
         future: sessionStateFuture,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            pr.hide();
             Logger().e("approveWidget future snapshot.hasError is +>", snapshot.error.toString());
             return Center(
               child: Text(
@@ -133,7 +120,6 @@ class _SessionApplyState extends State<SessionApplyPage> {
             );
           }
           if (snapshot.hasData) {
-            pr.hide();
             switch (snapshot.data.toString()) {
               case "Connected": // todo use like Enum
                 {
@@ -152,8 +138,9 @@ class _SessionApplyState extends State<SessionApplyPage> {
                 }
               default:
                 {
-                  //todo back to main Activity
-                  return Text("unknown format info");
+                  WcProtocolControl.getInstance().rejectLogIn();
+                  Fluttertoast.showToast(msg: translate("wc_connecting_error"));
+                  NavigatorUtils.push(context, Routes.entrancePage, clearStack: true);
                 }
             }
           }
@@ -283,13 +270,13 @@ class _SessionApplyState extends State<SessionApplyPage> {
           defaultWidget: const Text('Confirm'),
           progressWidget: const CircularProgressIndicator(),
           onPressed: () async {
-            pr.update(message: translate("handle_allow_connecting"));
-            pr.show();
+            ProgressDialog pr = ProgressDialog(context: context);
+            pr.show(msg: translate("handle_allow_connecting"));
             String resultStr = await WcProtocolControl.getInstance().approveLogIn(
                 WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
                 WalletsControl.getInstance().currentWallet().ethChain.chainShared.chainType);
             if (resultStr == "Approved") {
-              pr.hide();
+              pr.close();
               context.read<WcInfoProvide>()
                 ..setDappName(dappName)
                 ..setDappUrl(dappUrl)
@@ -301,13 +288,5 @@ class _SessionApplyState extends State<SessionApplyPage> {
         ),
       ],
     ));
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    if (pr != null) {
-      pr.hide();
-    }
   }
 }

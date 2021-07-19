@@ -191,8 +191,8 @@ class _LeftDrawerState extends State<LeftDrawer> {
             child: new ListTile(
                 leading: new Image.asset(
                   "assets/images/ic_scan_left.png",
-                  width: ScreenUtil().setWidth(4.5),
-                  height: ScreenUtil().setWidth(4.5),
+                  width: ScreenUtil().setWidth(6),
+                  height: ScreenUtil().setWidth(6),
                 ),
                 title: new Text(
                   translate('scan'),
@@ -209,7 +209,6 @@ class _LeftDrawerState extends State<LeftDrawer> {
                       ..setSessionId(qrInfo.substring(3, qrInfo.indexOf("@")));
                     NavigatorUtils.push(context, Routes.wcApprovePage, clearStack: true);
                   } else {
-                    // todo 提示检查格式 失败
                     Fluttertoast.showToast(msg: "unknown formation");
                   }
                 }),

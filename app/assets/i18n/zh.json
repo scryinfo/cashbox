@@ -222,6 +222,7 @@
   "allow_send_tx_req": "允许向您发起交易请求",
   "not_split_hint": "提示：该操作不会泄露您的私钥信息",
   "handle_allow_connecting": "同意连接处理中... ",
+  "wc_connecting_error": "WalletConnect连接失败 ",
   "wc_tx_format_error": "交易请求格式不一致，请检查格式，并尝试重新发送",
   "already_connect_wallet": "已经连接到你的钱包",
   "payment_info": "支付信息",

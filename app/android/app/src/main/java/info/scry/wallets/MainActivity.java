@@ -147,11 +147,11 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
 
                     }
                     if (call.method.toString().equals(REJECT_LOGIN_METHOD)) {
-                        ScryLog.d(this, "REJECT_LOGIN_METHOD--->", call.toString());
-                        mFlutterChannelResult = result;
                         if (session == null) {
                             return;
                         }
+                        ScryLog.d(this, "REJECT_LOGIN_METHOD--->", call.toString());
+                        mFlutterChannelResult = result;
                         runOnUiThread(
                                 new Runnable() {
                                     @Override

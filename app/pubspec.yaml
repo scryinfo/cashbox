@@ -53,7 +53,7 @@ dependencies:
 
   flutter_progress_button: '^0.6.2'
 
-  progress_dialog: ^1.2.4
+  sn_progress_dialog: ^1.0.2
 
   cached_network_image: ^3.0.0
 

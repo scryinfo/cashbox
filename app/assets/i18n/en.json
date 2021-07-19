@@ -221,6 +221,7 @@
   "allow_send_tx_req": "Allow to send transaction request to you:",
   "not_split_hint": "hint:this action will not leak you privacy info",
   "handle_allow_connecting": "handle connecting ... ",
+  "wc_connecting_error": "wallet connect failure",
   "wc_tx_format_error": "the format of transaction is wrong,please check it and retry",
   "already_connect_wallet": "success to connect to you wallet",
   "payment_info": "payment info",
