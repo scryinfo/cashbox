@@ -2,7 +2,6 @@ import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/control/wc_protocol_control.dart';
 import 'package:app/net/etherscan_util.dart';
-import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/wc_info_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -22,10 +21,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets_c.dc.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 
 class WcConnectedPage extends StatefulWidget {
   const WcConnectedPage() : super();
@@ -511,11 +510,14 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
           hintContent: translate('dapp_sign_hint_content') + WalletsControl.getInstance().currentWallet().name ?? "",
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (pwd) async {
+            ProgressDialog prDialog = ProgressDialog(context: context);
             try {
+              prDialog.show(msg: translate("handle_allow_connecting"));
               String value = txInfoMap["value"];
               String nonce = await loadTxAccount(txInfoMap["from"], WalletsControl.getInstance().currentChainType());
               if (nonce == null) {
                 Fluttertoast.showToast(msg: translate("nonce_is_wrong"));
+                prDialog.close();
                 return;
               }
               if (value.length % 2 != 0) {
@@ -537,15 +539,17 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
               });
               if (resultObj != null) {
                 String txHash = await sendRawTx(ChainType.EthTest, resultObj.toString());
+                Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), timeInSecForIosWeb: 5);
                 WcProtocolControl().approveTx(txInfoMap["id"].toString(), txHash);
+                prDialog.close();
               } else {
-                Fluttertoast.showToast(
-                  msg: translate("sign_failure_check_pwd"),
-                );
+                prDialog.close();
+                Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), timeInSecForIosWeb: 5);
               }
               NavigatorUtils.goBack(context);
             } catch (e) {
               Logger().d("wcTxSign  error is :", e.toString());
+              NavigatorUtils.goBack(context);
             }
           },
         );

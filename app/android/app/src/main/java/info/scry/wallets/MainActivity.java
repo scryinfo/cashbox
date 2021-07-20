@@ -151,7 +151,7 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
                             return;
                         }
                         ScryLog.d(this, "REJECT_LOGIN_METHOD--->", call.toString());
-                        mFlutterChannelResult = result;
+                        wcDisconnectChannelResult = result;
                         runOnUiThread(
                                 new Runnable() {
                                     @Override
@@ -308,7 +308,6 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
         }
         if (Session.Status.Disconnected.INSTANCE.equals(status)) {
             ScryLog.d(MainActivity.this, "MainActivity Session.Status.Disconnected", status.toString());
-            // todo value the wcDisconnectChannelResult
             if (wcDisconnectChannelResult == null) {
                 ScryLog.e(MainActivity.this, "wcDisconnectChannelResult is null ", "||");
             } else {
