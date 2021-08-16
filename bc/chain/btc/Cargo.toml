@@ -14,8 +14,8 @@ failure="0.1.8"
 bitcoin = { version = "0.21.0", features = ["serde"] }
 
 tiny-bip39="0.7.0"
-tiny-hderive = "0.2.1"
-secp256k1 = {version = "0.15", features = ["recovery"] }
+tiny-hderive = "0.3.0"
+secp256k1 = {version = "0.20.3", features = ["recovery"] }
 ripemd160 = "0.9.1"
 sha2 = "0.9.5"
 base58 = { version = "0.1" }

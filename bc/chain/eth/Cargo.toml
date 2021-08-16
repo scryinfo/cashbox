@@ -13,7 +13,7 @@ hex="0.4.0"
 ethereum-types = "0.11.0"
 tiny-keccak = "1.5.0"
 tiny-bip39="0.7.0"
-tiny-hderive="0.2.1"
+tiny-hderive = "0.3.0"
 serde = { version = "1.0.90", features = ["derive"] }
 serde_json = "1.0.39"
 serde_derive = "1.0.90"

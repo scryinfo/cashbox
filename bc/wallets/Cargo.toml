@@ -22,7 +22,7 @@ parking_lot = "0.11.1"
 bitcoin = { version = "0.21.0", features = ["serde"] }
 
 uuid = { version = "0.7", features = ["serde", "v4"] }
-secp256k1 = { version = "0.15", features = ["recovery"] }
+secp256k1 = { version = "0.20.3", features = ["recovery"] }
 codec = { package = "parity-scale-codec", version = "1.2.0" }
 rlp = "0.4"
 rbatis = { version = "1.8.75", features = ["async-io-sqlite"] }

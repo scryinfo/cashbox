@@ -5,12 +5,11 @@ use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlock
 
 use base58::ToBase58;
 use bip39::Language;
-use bitcoin::secp256k1::{PublicKey, SecretKey};
+use secp256k1::{Secp256k1,key::{PublicKey, SecretKey}};
 use bitcoin::util::psbt::serialize::Serialize;
 use bitcoin_wallet::mnemonic::Mnemonic;
 pub use error::Error;
 use ripemd160::{Digest, Ripemd160};
-use secp256k1::Secp256k1;
 use sha2::Sha256;
 
 //Generate btc address from uncompressed public key
