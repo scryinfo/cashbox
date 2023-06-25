@@ -1,7 +1,7 @@
 [package]
 name = "bc"
 version = "0.1.0"
-authors = ["Peace <peace@scry.info>"]
+authors = ["Peace"]
 edition = "2018"
 
 [lib]
