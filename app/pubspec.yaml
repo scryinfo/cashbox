@@ -32,7 +32,7 @@ dependencies:
   provider: ^5.0.0
   # 状态管理           https://github.com/rrousselGit/provider
 
-  dio:  ^4.0.0
+  dio: ">=4.0.0 <6.0.0"
   # 网络请求           https://github.com/flutterchina/dio
 
   fluttertoast: ^7.1.1
