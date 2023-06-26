@@ -7,7 +7,7 @@ class DemoSocketWidget extends StatefulWidget {
   final String title;
   final WebSocketChannel socketChannel;
 
-  DemoSocketWidget({Key key, this.title, this.socketChannel}) : super(key: key);
+  DemoSocketWidget({Key? key, required this.title, required this.socketChannel}) : super(key: key);
 
   @override
   _DemoSocketWidgetState createState() =>
@@ -19,23 +19,24 @@ class _DemoSocketWidgetState extends State<DemoSocketWidget> {
   WebSocketChannel socketChannel;
 
   _DemoSocketWidgetState({
-    Key key,
-    this.title,
-    this.socketChannel,
+    Key? key,
+    required this.title,
+    required this.socketChannel,
   });
 
   @override
   void initState() {
     super.initState();
-    socketChannel =
-        IOWebSocketChannel.connect('ws://echo.websocket.org'); //Establish a connection with the server
+    socketChannel = IOWebSocketChannel.connect(
+        'ws://echo.websocket.org'); //Establish a connection with the server
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: new StreamBuilder(
-          stream: widget.socketChannel.stream, //Listen for information from the server Stream
+          stream: widget.socketChannel.stream,
+          //Listen for information from the server Stream
           builder: (context, snapshot) {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 24),

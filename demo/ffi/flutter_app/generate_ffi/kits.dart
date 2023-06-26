@@ -10,7 +10,8 @@ String _platformPath(String name, {String? path}) {
     dlPath = pathLib.join(path, "lib" + name + ".so");
   } else if (Platform.isLinux) {
     dlPath = pathLib.join(path, "lib" + name + ".so");
-    if (!(File(dlPath).existsSync())) {
+    var t = File(dlPath).existsSync();
+    if (t) {
       dlPath = Platform.script.resolve(dlPath).path;
     }
   } else if (Platform.isMacOS) {

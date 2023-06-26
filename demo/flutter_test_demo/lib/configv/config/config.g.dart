@@ -16,7 +16,7 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
     ..languages = (json['languages'] as List)
         ?.map((e) =>
             e == null ? null : Language.fromJson(e as Map<String, dynamic>))
-        ?.toList()
+        !.toList()
     ..serverAppVersion = json['serverAppVersion'] as String
     ..diamondCa = json['diamondCa'] as String
     ..maxGasLimit = json['maxGasLimit'] == null

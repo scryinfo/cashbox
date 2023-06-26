@@ -8,33 +8,33 @@ part 'config.g.dart';
 class Config extends Object {
   Config();
 
-  bool isInitedConfig;
-  int lastTimeConfigCheck;
-  int intervalMilliseconds;
-  String currency;
-  String locale;
-  List<Language> languages;
-  String serverAppVersion;
-  String diamondCa; //diamond Dapp contractAddress
+  bool isInitedConfig = false;
+  int lastTimeConfigCheck = 0;
+  int intervalMilliseconds = 0;
+  String currency = "";
+  String locale = "";
+  List<Language> languages = [];
+  String serverAppVersion = "";
+  String diamondCa = ""; //diamond Dapp contractAddress
 
-  MaxGasLimit maxGasLimit;
-  MinGasLimit minGasLimit;
-  DefaultGasLimit defaultGasLimit;
+  late MaxGasLimit maxGasLimit;
+  late MinGasLimit minGasLimit;
+  late DefaultGasLimit defaultGasLimit;
 
-  MaxGasPrice maxGasPrice;
-  MinGasPrice minGasPrice;
-  DefaultGasPrice defaultGasPrice;
+  late MaxGasPrice maxGasPrice;
+  late MinGasPrice minGasPrice;
+  late DefaultGasPrice defaultGasPrice;
 
-  String dbVersion;
-  BigInt ethUnit;
-  BigInt eeeUnit;
-  String systemSymbol;
-  String accountSymbol;
-  String tokenXSymbol;
-  String balanceSymbol;
-  String eeeSymbol;
+  String dbVersion = "";
+  late BigInt ethUnit;
+  late BigInt eeeUnit;
+  String systemSymbol = "";
+  String accountSymbol = "";
+  String tokenXSymbol = "";
+  String balanceSymbol = "";
+  String eeeSymbol = "";
 
-  PrivateConfig privateConfig;
+  late PrivateConfig privateConfig;
 
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
@@ -45,10 +45,11 @@ class Config extends Object {
 class Language extends Object {
   Language();
 
-  String localeKey;
-  String localeValue;
+  String localeKey = "";
+  String localeValue = "";
 
-  factory Language.fromJson(Map<String, dynamic> json) => _$LanguageFromJson(json);
+  factory Language.fromJson(Map<String, dynamic> json) =>
+      _$LanguageFromJson(json);
 
   Map<String, dynamic> toJson() => _$LanguageToJson(this);
 }
@@ -57,10 +58,11 @@ class Language extends Object {
 class MaxGasLimit extends Object {
   MaxGasLimit();
 
-  double ethGasLimit;
-  double erc20GasLimit;
+  double ethGasLimit = 0.0;
+  double erc20GasLimit = 0.0;
 
-  factory MaxGasLimit.fromJson(Map<String, dynamic> json) => _$MaxGasLimitFromJson(json);
+  factory MaxGasLimit.fromJson(Map<String, dynamic> json) =>
+      _$MaxGasLimitFromJson(json);
 
   Map<String, dynamic> toJson() => _$MaxGasLimitToJson(this);
 }
@@ -69,10 +71,11 @@ class MaxGasLimit extends Object {
 class MinGasLimit extends Object {
   MinGasLimit();
 
-  double ethGasLimit;
-  double erc20GasLimit;
+  double ethGasLimit = 0.0;
+  double erc20GasLimit = 0.0;
 
-  factory MinGasLimit.fromJson(Map<String, dynamic> json) => _$MinGasLimitFromJson(json);
+  factory MinGasLimit.fromJson(Map<String, dynamic> json) =>
+      _$MinGasLimitFromJson(json);
 
   Map<String, dynamic> toJson() => _$MinGasLimitToJson(this);
 }
@@ -81,10 +84,11 @@ class MinGasLimit extends Object {
 class DefaultGasLimit extends Object {
   DefaultGasLimit();
 
-  double ethGasLimit;
-  double erc20GasLimit;
+  double ethGasLimit = 0.0;
+  double erc20GasLimit = 0.0;
 
-  factory DefaultGasLimit.fromJson(Map<String, dynamic> json) => _$DefaultGasLimitFromJson(json);
+  factory DefaultGasLimit.fromJson(Map<String, dynamic> json) =>
+      _$DefaultGasLimitFromJson(json);
 
   Map<String, dynamic> toJson() => _$DefaultGasLimitToJson(this);
 }
@@ -93,10 +97,11 @@ class DefaultGasLimit extends Object {
 class MaxGasPrice extends Object {
   MaxGasPrice();
 
-  double ethGasPrice;
-  double erc20GasPrice;
+  double ethGasPrice = 0.0;
+  double erc20GasPrice = 0.0;
 
-  factory MaxGasPrice.fromJson(Map<String, dynamic> json) => _$MaxGasPriceFromJson(json);
+  factory MaxGasPrice.fromJson(Map<String, dynamic> json) =>
+      _$MaxGasPriceFromJson(json);
 
   Map<String, dynamic> toJson() => _$MaxGasPriceToJson(this);
 }
@@ -105,10 +110,11 @@ class MaxGasPrice extends Object {
 class MinGasPrice extends Object {
   MinGasPrice();
 
-  double ethGasPrice;
-  double erc20GasPrice;
+  double ethGasPrice = 0.0;
+  double erc20GasPrice = 0.0;
 
-  factory MinGasPrice.fromJson(Map<String, dynamic> json) => _$MinGasPriceFromJson(json);
+  factory MinGasPrice.fromJson(Map<String, dynamic> json) =>
+      _$MinGasPriceFromJson(json);
 
   Map<String, dynamic> toJson() => _$MinGasPriceToJson(this);
 }
@@ -117,10 +123,11 @@ class MinGasPrice extends Object {
 class DefaultGasPrice extends Object {
   DefaultGasPrice();
 
-  double ethGasPrice;
-  double erc20GasPrice;
+  double ethGasPrice = 0.0;
+  double erc20GasPrice = 0.0;
 
-  factory DefaultGasPrice.fromJson(Map<String, dynamic> json) => _$DefaultGasPriceFromJson(json);
+  factory DefaultGasPrice.fromJson(Map<String, dynamic> json) =>
+      _$DefaultGasPriceFromJson(json);
 
   Map<String, dynamic> toJson() => _$DefaultGasPriceToJson(this);
 }
@@ -129,13 +136,13 @@ class DefaultGasPrice extends Object {
 class Token extends Object {
   Token();
 
-  String contractAddress;
-  String shortName;
-  String fullName;
-  String urlImg;
-  String id;
-  String decimal;
-  String chainType;
+  String contractAddress = "";
+  String shortName = "";
+  String fullName = "";
+  String urlImg = "";
+  String id = "";
+  String decimal = "";
+  String chainType = "";
 
   factory Token.fromJson(Map<String, dynamic> json) => _$TokenFromJson(json);
 
@@ -146,28 +153,29 @@ class Token extends Object {
 class PrivateConfig {
   PrivateConfig();
 
-  String serverConfigIp;
-  String serverApkVersion;
-  String configVersion;
-  String downloadAppUrl;
-  String downloadLatestAppUrl;
-  String rateUrl;
-  int authDigitVersion;
-  List<String> authDigitIpList;
-  int defaultDigitVersion;
-  List<String> defaultDigitIpList;
-  List<Token> defaultTokens;
-  String scryXIp;
-  String publicIp;
-  String nowDbVersion;
-  String etherscanKey;
-  String dddMainNetCA;
-  String dddTestNetCA;
-  String d2eMainNetEthAddress;
-  String d2eTestNetEthAddress;
-  String dappOpenUrl;
+  String serverConfigIp = "";
+  String serverApkVersion = "";
+  String configVersion = "";
+  String downloadAppUrl = "";
+  String downloadLatestAppUrl = "";
+  String rateUrl = "";
+  int authDigitVersion = 0;
+  List<String> authDigitIpList = [];
+  int defaultDigitVersion = 0;
+  List<String> defaultDigitIpList = [];
+  List<Token> defaultTokens = [];
+  String scryXIp = "";
+  String publicIp = "";
+  String nowDbVersion = "";
+  String etherscanKey = "";
+  String dddMainNetCA = "";
+  String dddTestNetCA = "";
+  String d2eMainNetEthAddress = "";
+  String d2eTestNetEthAddress = "";
+  String dappOpenUrl = "";
 
-  factory PrivateConfig.fromJson(Map<String, dynamic> json) => _$PrivateConfigFromJson(json);
+  factory PrivateConfig.fromJson(Map<String, dynamic> json) =>
+      _$PrivateConfigFromJson(json);
 
   Map<String, dynamic> toJson() => _$PrivateConfigToJson(this);
 }

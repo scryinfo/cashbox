@@ -40,10 +40,12 @@ final DynamicLibrary nativeAddLib = Platform.isAndroid
     ? DynamicLibrary.open("libsome.so") //android目录下 so包名
     : DynamicLibrary.open("some.framework/some");
 
-final int Function(int x, int y) nativeAdd = nativeAddLib.lookup<NativeFunction<Int32 Function(Int32, Int32)>>("native_add").asFunction();
+final int Function(int x, int y) nativeAdd = nativeAddLib
+    .lookup<NativeFunction<Int32 Function(Int32, Int32)>>("native_add")
+    .asFunction();
 
 void testFunc(num a, num b) {
-  nativeAdd(a, b);
+  nativeAdd(a.toInt(), b.toInt());
   Int8 test = Int8();
 }
 
@@ -64,10 +66,10 @@ final int _maxSize = sizeOf<IntPtr>() == 8 ? _kMaxSmi64 : _kMaxSmi32;
     return utf8.decode(Uint8List.view(string.cast<Uint8>().asTypedList(length).buffer, 0, length));
   }
 
-  *//*{
+  */ /*{
   // todo 字符串数组
     allocate<Pointer<Uint8>>(count: 100);
-  }*//*
+  }*/ /*
   // 将dart中的字符串，转换成 指针
   static Pointer<Utf8> toUtf8(String string) {
     final units = utf8.encode(string); // 算出string在utf8格式下，占得 字节uInt数

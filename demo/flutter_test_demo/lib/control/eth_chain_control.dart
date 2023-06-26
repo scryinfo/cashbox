@@ -9,7 +9,7 @@ import 'package:wallets/wallets_c.dc.dart';
 class EthChainControl {
   factory EthChainControl() => getInstance();
 
-  static EthChainControl _instance;
+  static late EthChainControl _instance;
 
   EthChainControl._internal();
 
@@ -65,12 +65,13 @@ class EthChainControl {
   String decodeAdditionData(String encodeData) {
     var dataObj = Wallets.mainIsolate().chainEth.decodeAdditionData(encodeData);
     if (!dataObj.isSuccess()) {
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
 
-  txSign(NetType netType, EthTransferPayload txPayload, NoCacheString password) {
+  txSign(
+      NetType netType, EthTransferPayload txPayload, NoCacheString password) {
     /*var dataObj = Wallets.mainIsolate().chainEth.txSign(netType, txPayload, password);
     if (!dataObj.isSuccess()) {
       return null;
@@ -78,7 +79,8 @@ class EthChainControl {
     return dataObj.data1;*/
   }
 
-  rawTxSign(NetType netType, EthRawTxPayload rawTxPayload, NoCacheString password) {
+  rawTxSign(
+      NetType netType, EthRawTxPayload rawTxPayload, NoCacheString password) {
     /*var dataObj = Wallets.mainIsolate().chainEth.rawTxSign(netType, rawTxPayload, password);
     if (!dataObj.isSuccess()) {
       return null;
@@ -87,7 +89,8 @@ class EthChainControl {
   }
 
   bool updateAuthTokenList(ArrayCEthChainTokenAuth authTokens) {
-    var dataObj = Wallets.mainIsolate().chainEth.updateAuthTokenList(authTokens);
+    var dataObj =
+        Wallets.mainIsolate().chainEth.updateAuthTokenList(authTokens);
     if (!dataObj.isSuccess()) {
       return false;
     }
@@ -95,7 +98,8 @@ class EthChainControl {
   }
 
   updateDefaultTokenList(ArrayCEthChainTokenDefault defaultTokens) {
-    var dataObj = Wallets.mainIsolate().chainEth.updateDefaultTokenList(defaultTokens);
+    var dataObj =
+        Wallets.mainIsolate().chainEth.updateDefaultTokenList(defaultTokens);
     if (!dataObj.isSuccess()) {
       return false;
     }

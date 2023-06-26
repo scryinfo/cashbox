@@ -68,7 +68,8 @@ class TokenRate {
     if (!digitRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return instance.digitRateMap[digit.shortName.trim().toUpperCase()].price * instance.legalMap[getNowLegalCurrency()];
+    return instance.digitRateMap[digit.shortName.trim().toUpperCase()].price *
+        instance.legalMap[getNowLegalCurrency()];
     //return instance.digitRateMap[digit.shortName.toUpperCase()]["price"] * instance.legalMap[getNowLegalCurrency()];
   }
 

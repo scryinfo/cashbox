@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/screenutil.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -13,11 +13,12 @@ class UniSwapPage extends StatefulWidget {
 }
 
 class _UniSwapPageState extends State<UniSwapPage> {
-  WebViewController _controller;
+  late WebViewController _controller;
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.init(context, designSize: Size(90, 160), allowFontScaling: false);
+    ScreenUtil.init(context,
+        designSize: Size(90, 160));
     return Scaffold(
       body: Container(
           width: ScreenUtil().setWidth(90),
@@ -44,11 +45,13 @@ class _UniSwapPageState extends State<UniSwapPage> {
                       },
                       javascriptChannels: makeJsChannelsSet(),
                       navigationDelegate: (NavigationRequest request) {
-                        print("navigationDelegate ===============================>:  $request");
+                        print(
+                            "navigationDelegate ===============================>:  $request");
                         return NavigationDecision.navigate;
                       },
                       onPageFinished: (String url) async {
-                        print('Page finished loading================================>: $url');
+                        print(
+                            'Page finished loading================================>: $url');
                       },
                     ),
                   );

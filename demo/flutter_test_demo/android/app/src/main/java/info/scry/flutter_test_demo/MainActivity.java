@@ -10,6 +10,7 @@ public class MainActivity extends FlutterActivity implements Session.Callback {
     OkHttpClient client = new OkHttpClient.Builder().pingInterval(1000, TimeUnit.MILLISECONDS).build();
     Moshi moshi = new Moshi.Builder().build();
     WCSession session = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

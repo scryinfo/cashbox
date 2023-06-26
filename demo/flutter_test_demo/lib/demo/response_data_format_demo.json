@@ -4,26 +4,38 @@
   btcChain: [],
   walletId: 6e8ad044-4c37-44ad-a758-8e3cebc2026f,
   walletName: thisWall33etName,
-  "nowChainId": "",//todo nowChianId
+  "nowChainId": "",
+  //todo nowChianId
   "creationTime": "",
   eeeChain: {
-    chainType: null,  //""
-    chainAddress: null,//""
-    chainId: 5,  //""
+    chainType: null,
+    //""
+    chainAddress: null,
+    //""
+    chainId: 5,
+    //""
     walletId: 6e8ad044-4c37-44ad-a758-8e3cebc2026f,
     status: 200,
-    isVisible: false,//IsVisible whether to display the logo, the default ture
+    isVisible: false,
+    //IsVisible whether to display the logo, the default ture
     eeeChainDigitList: [
       {
         address: 5FqZzatnNtPB3fsby5pbgExAUp8i3Bozn4rwbzFb1GcYV2by,
-        balance: null, //0
-        chainId: null, //""
-        fullName: null,//"eee"
-        isVisible: false,//IsVisible whether to display the logo, the default ture
+        balance: null,
+        //0
+        chainId: null,
+        //""
+        fullName: null,
+        //"eee"
+        isVisible: false,
+        //IsVisible whether to display the logo, the default ture
         status: 200,
-        digitId: 5, //""
-        shortName: null,//"eee"
-        decimal: 0,//Accuracy 18 digits
+        digitId: 5,
+        //""
+        shortName: null,
+        //"eee"
+        decimal: 0,
+        //Accuracy 18 digits
         imgUrl: null,
         contractAddress: null
       }

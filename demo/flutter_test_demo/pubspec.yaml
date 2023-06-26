@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 2.0.0+2
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=3.0.5 <4.0.0'
 
 dependencies:
   flutter:
@@ -30,75 +30,72 @@ dependencies:
 
   path_provider: ^2.0.1
 
-  json_annotation: ^3.1.0
+  json_annotation: ^4.8.1
 
-  provider: ^3.1.0
+  provider: ^6.0.5
   # 状态管理           https://github.com/rrousselGit/provider
 
-  dio:  ^3.0.9
+  dio: ^5.2.1+1
   # 网络请求           https://github.com/flutterchina/dio
 
-  fluttertoast: ^7.1.1
+  fluttertoast: ^8.2.2
   #                    https://github.com/PonnamKarthik/FlutterToast
 
-  oktoast: ^2.2.0
+  oktoast: ^3.3.1
   # Toast插件 https://github.com/OpenFlutter/flutter_oktoast
 
-  fluro: "^1.7.2"
+  fluro: ^2.0.5
   # 路由管理           https://github.com/theyakka/fluro
 
-  flutter_webview_plugin: ^0.3.11
+  flutter_webview_plugin: ^0.4.0
 
-  webview_flutter: ^0.3.20+2
+  webview_flutter: ^2.8.0
 
-  device_info: ^0.4.2+4
+  device_info: ^2.0.3
   # 获取设备id
 
-  qr_flutter: ^3.0.1
+  qr_flutter: ^4.1.0
   # 生成二维码         https://github.com/lukef/qr.flutter
 
-  flutter_swiper: ^1.1.6
-  #                    https://github.com/jzoom/flutter_swiper
-
-  flutter_screenutil: ^3.1.1
+  flutter_screenutil: ^5.8.4
   # 屏幕适配           https://github.com/OpenFlutter/flutter_screenutil
 
   flutter_easyrefresh: ^2.0.3
   # 上下拉刷新功能     https://github.com/xuelongqy/flutter_easyrefresh
 
-  web_socket_channel: ^1.1.0
+  web_socket_channel: ^2.4.0
   # 通过socket通信     https://pub.dev/packages/web_socket_channel#-installing-tab-
 
   stream_channel: ">=1.1.0 <3.0.0"
 
-  flutter_html: ^0.10.4
+  flutter_html: ^2.2.1
   #flutter_html: ^1.0.2
   #                    https://github.com/Sub6Resources/flutter_html
 
-  shared_preferences: ^0.5.7+1
+  shared_preferences: ^2.1.2
   #https://github.com/flutter/plugins
 
-  package_info: ^0.4.0+18
+  package_info: ^2.0.2
   #yingyongbanben
 
-  permission_handler: ^5.0.1+1
+  permission_handler: ^10.3.0
   # https://github.com/Baseflow/flutter-permission-handler
 
-  json_rpc_2: ^2.1.1
+  json_rpc_2: ^3.0.2
   #         https://github.com/dart-lang/json_rpc_2
 
-  grpc: ^2.3.0
+  grpc: ^3.2.2
   # https://github.com/grpc/grpc-dart
 
-  sqflite: ^1.3.0
+  sqflite: ^2.2.8+4
   # https://github.com/tekartik/sqflite
 
-  flutter_page_tracker: ^1.2.2
+  #  flutter_page_tracker: ^3.0.7
 
-  google_fonts: ^1.1.1
+  google_fonts: ^5.1.0
   # https://github.com/material-foundation/google-fonts-flutter
 
-  ffi: ^1.0.0
+  ffi: ^2.0.2
 
   wallets:
     path: ../../packages/wallets
@@ -111,14 +108,14 @@ dependencies:
 
   async: ^2.2.0
 
-  protobuf: ^1.0.1
+  protobuf: ^3.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  build_runner: ^1.0.0
-  json_serializable: ^3.5.0
+  build_runner: ^2.4.5
+  json_serializable: ^6.7.0
 
 flutter:
   uses-material-design: true

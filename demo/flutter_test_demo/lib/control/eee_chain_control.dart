@@ -1,3 +1,1 @@
-class EeeChainControl{
-
-}
+class EeeChainControl {}

@@ -6,7 +6,7 @@ class CashBoxConfig {
   String rateIp;
   String temp;
 
-  CashBoxConfig({this.rateIp, this.temp});
+  CashBoxConfig({required this.rateIp, required this.temp});
 
   factory CashBoxConfig.fromJson(Map<String, dynamic> json) {
     return CashBoxConfig(
@@ -23,12 +23,13 @@ class CashBoxConfig {
 }
 
 class Test {
-  List expandStateList = List();
+  List expandStateList = [];
 
   void testUse() {
     rootBundle.loadString('assets/data/planTask.json').then((value) {
       List jsonList = json.decode(value);
-      expandStateList.addAll(jsonList.map((m) => CashBoxConfig.fromJson(m)).toList());
+      expandStateList
+          .addAll(jsonList.map((m) => CashBoxConfig.fromJson(m)).toList());
     });
   }
 }

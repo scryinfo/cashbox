@@ -1,7 +1,9 @@
-
-#bindgen in window ( rust )
+# prepare
 1. cargo install bindgen
-2. bindgen wallets_c.h -o wallets_c.rs
+2. cargo install --force cbindgen
+
+# bindgen( rust )
+bindgen wallets_c.h -o wallets_c.rs
 
 #valgrind in ubuntu
 1. cargo install cargo-valgrind

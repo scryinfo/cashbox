@@ -13,7 +13,6 @@ class _FlutterWebViewPluginDemo extends State<FlutterWebViewPluginDemo> {
   final flutterWebviewPlugin = new FlutterWebviewPlugin();
   final CookieManager cookieManager = CookieManager();
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -38,7 +37,8 @@ class _FlutterWebViewPluginDemo extends State<FlutterWebViewPluginDemo> {
         width: ScreenUtil().setWidth(90),
         height: ScreenUtil().setHeight(160),
         color: Colors.blueAccent,
-        child: WebviewScaffold(   //Description: WebViewScaffold cannot interact with js
+        child: WebviewScaffold(
+          //Description: WebViewScaffold cannot interact with js
           //url: "file:///android_asset/flutter_assets/assets/dist/index.html",
           url: "http://192.168.1.4:8080/",
           appBar: AppBar(

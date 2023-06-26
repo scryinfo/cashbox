@@ -10,7 +10,7 @@ class HandleConfig {
   factory HandleConfig() => _getInstance();
 
   static HandleConfig get instance => _getInstance();
-  static HandleConfig _instance;
+  static late HandleConfig _instance;
   static String configDocumentPath = "/scry";
   static String configFileName = "config.json";
   static String defaultConfigFilePath = "assets/config/config.json";
@@ -31,7 +31,7 @@ class HandleConfig {
     Config config = Config();
     try {
       String fileContent = file.readAsStringSync();
-      Map configMap = jsonDecode(fileContent);
+      Map<String,dynamic> configMap = jsonDecode(fileContent);
       config = Config.fromJson(configMap);
       return config;
     } catch (e) {
@@ -61,7 +61,9 @@ class HandleConfig {
     try {
       Config config = await this.getConfig();
       var applyMap = config.privateConfig.toJson();
-      PrivateConfig.fromJson(json.decode(jsonString)).toJson().forEach((key, value) {
+      PrivateConfig.fromJson(json.decode(jsonString))
+          .toJson()
+          .forEach((key, value) {
         if (key.isNotEmpty && value != null && value != "") {
           applyMap[key] = value;
         }
@@ -82,7 +84,8 @@ class HandleConfig {
     if (!file.existsSync() || file.lengthSync() <= 0) {
       file.createSync();
       String jsonStr = await rootBundle.loadString(defaultConfigFilePath);
-      await file.writeAsStringSync(jsonStr, flush: true); // creates the file for writing and truncates
+      file.writeAsStringSync(jsonStr,
+          flush: true); // creates the file for writing and truncates
     }
     return file;
   }

@@ -1,4 +1,3 @@
-class Wallet{
+class Wallet {
   bool isNowWallet;
-
 }

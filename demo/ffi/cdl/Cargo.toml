@@ -18,4 +18,4 @@ name = "units"
 path = "src/lib.rs"
 
 [dependencies]
-libc = "0.2.80"
+libc = "0.2.147"

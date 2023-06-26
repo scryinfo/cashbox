@@ -5,13 +5,12 @@ author:
 homepage:
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=2.0.0"
+  sdk: '>=3.0.5 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  ffi: ^1.0.0
+  ffi: ^2.0.2
   path: ^1.8.0
   logger:
     path: ../logger
@@ -19,8 +18,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  ffigen: ^2.4.0
-  build_runner: ^1.10.3
+  ffigen: ^8.0.2
+  build_runner: ^2.4.5
   gen_dl:
     path: ../gen_dl
   logger:

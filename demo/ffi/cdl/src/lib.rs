@@ -257,8 +257,9 @@ pub extern "C" fn CSample_create(ptr: *mut *mut CSample) {
         unsafe { (*ptr).free(); }
     }
     let mut sample = Box::new(CSample::default());
-    sample.name = to_c_char("sample name");
-    sample.len = 100;
+    let tempStr = "sample name";
+    sample.name = to_c_char(tempStr);
+    sample.len = tempStr.len() as u32;
     let list = vec!["e1".to_owned(),"e2".to_owned()];
     let ptr_list = list.clone().into_iter().map(|it| to_c_char(it.as_str())).collect();
     sample.list.set(ptr_list);

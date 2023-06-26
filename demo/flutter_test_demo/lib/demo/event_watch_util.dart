@@ -13,15 +13,15 @@ class _EventWatchUtilState extends State<EventWatchUtil> {
   @override
   void initState() {
     super.initState();
-    eventChannel.receiveBroadcastStream().listen(_onEvent, onError: _onError);
+    eventChannel.receiveBroadcastStream().listen(_onEvent as void Function(dynamic event)?, onError: _onError);
   }
 
   void _onEvent(Object object) {
-    print("eventchannel _onEvent is=>" + object);
+    print("eventchannel _onEvent is=>" + object.toString());
   }
 
   void _onError(Object object) {
-    print("eventchannel  _onError is=>" + object);
+    print("eventchannel  _onError is=>" + object.toString());
   }
 
   @override

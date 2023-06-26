@@ -12,7 +12,8 @@ class ServerConfigModel extends Object {
   String detail;
   Data data;
 
-  factory ServerConfigModel.fromJson(Map<String, dynamic> json) => _$ServerConfigModelFromJson(json);
+  factory ServerConfigModel.fromJson(Map<String, dynamic> json) =>
+      _$ServerConfigModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$ServerConfigModelToJson(this);
 }
@@ -45,7 +46,8 @@ class LatestConfig extends Object {
   String eeeTxV;
   String eeeRuntimeV;
 
-  factory LatestConfig.fromJson(Map<String, dynamic> json) => _$LatestConfigFromJson(json);
+  factory LatestConfig.fromJson(Map<String, dynamic> json) =>
+      _$LatestConfigFromJson(json);
 
   Map<String, dynamic> toJson() => _$LatestConfigToJson(this);
 }

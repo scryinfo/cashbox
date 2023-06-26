@@ -167,3 +167,4 @@ demo/rbatis_demo/target
 /packages/services/test/greeter/greeter_go/greeter_go/log.log
 /packages/logger/pubspec.lock
 /demo/ffi/cdl/src/wallets_c.h
+/demo/ffi/flutter_app/libcdl.so

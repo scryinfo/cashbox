@@ -13,7 +13,24 @@ void main() {
     int i = 0;
     for (int i2 = 0; i2 < length; i2++) {
       int i3 = i + 1;
-      var cArr2 = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+      var cArr2 = [
+        '0',
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F'
+      ];
       var index = (bArr[i2] >> 4) & 15;
       cArr[i] = cArr2[index].codeUnitAt(0);
       i = i3 + 1;

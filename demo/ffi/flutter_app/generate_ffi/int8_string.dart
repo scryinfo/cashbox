@@ -51,6 +51,18 @@ extension Int8Ex on Pointer<Int8> {
   }
 }
 
+extension CharEx on Pointer<Char> {
+  String toDartString() {
+    return this == nullptr ? "" : this.cast<Utf8>().toDartString();
+  }
+
+  void free() {
+    if (this != nullptr && this.address != 0) {
+      calloc.free(this);
+    }
+  }
+}
+
 extension CArrayCCharEx on CArrayCChar{
   List<String> toList(){
     var list = <String>[];

@@ -1,6 +1,6 @@
 #pragma once
 
-/* Generated with cbindgen:0.18.0 */
+/* Generated with cbindgen:0.24.5 */
 
 #include <stdint.h>
 
@@ -26,17 +26,17 @@ typedef struct CArrayCChar {
     CU64 cap;
 } CArrayCChar;
 
-typedef struct Sample {
+typedef struct CSample {
     uint32_t len;
     char *name;
     struct CArrayCChar list;
-} Sample;
+} CSample;
 
 typedef uint32_t CBool;
 
-#define CFalse 0
+#define CFalse 0u
 
-#define CTrue 1
+#define CTrue 1u
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,11 +58,11 @@ struct Data *Data_use(struct Data *cd);
 
 struct Data Data_noPtr(void);
 
-struct Sample **Sample_dAlloc(void);
+struct CSample **CSample_dAlloc(void);
 
-void Sample_dFree(struct Sample **ptr);
+void CSample_dFree(struct CSample **ptr);
 
-void Sample_create(struct Sample **ptr);
+void CSample_create(struct CSample **ptr);
 
 #ifdef __cplusplus
 } // extern "C"

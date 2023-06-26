@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_test_demo/control/eth_chain_control.dart';
 import 'package:flutter_test_demo/control/wallets_control.dart';
 import 'package:flutter_test_demo/demo/uniswap_page.dart';
@@ -37,7 +36,6 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -51,7 +49,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -75,13 +73,13 @@ class _MyHomePageState extends State<MyHomePage> {
     print("test when initFunc will exec");
   }
 
-
   testGrpc() async {
     final cashBoxType = "GA";
     final signInfo = "82499105f009f80a1fe2f1db86efdec7";
     final deviceId = "deviceIddddddd";
     final apkVersion = "2.0.0";
-    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.57", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
+    var refresh = RefreshOpen.get(new ConnectParameter("192.168.2.57", 9004),
+        apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
     var channel = createClientChannel(refresh.refreshCall);
     EthTokenOpen_QueryReq open_queryReq = new EthTokenOpen_QueryReq();
 
@@ -101,12 +99,16 @@ class _MyHomePageState extends State<MyHomePage> {
       ..isDefault = false;
     final ethTokenClient = EthTokenOpenFaceClient(channel);
     try {
-      EthTokenOpen_QueryRes ethTokenOpen_QueryRes = await ethTokenClient.query(open_queryReq);
-      print("ethTokenOpen_QueryRes  is ------>" + ethTokenOpen_QueryRes.toString());
+      EthTokenOpen_QueryRes ethTokenOpen_QueryRes =
+          await ethTokenClient.query(open_queryReq);
+      print("ethTokenOpen_QueryRes  is ------>" +
+          ethTokenOpen_QueryRes.toString());
       List<EthTokenOpen_Token> ethTokenList = ethTokenOpen_QueryRes.tokens;
-      print("ethTokenOpen_QueryRes.length  is ------>" + ethTokenList.length.toString());
+      print("ethTokenOpen_QueryRes.length  is ------>" +
+          ethTokenList.length.toString());
       List<TokenM> tokenMList = [];
-      ArrayCEthChainTokenAuth arrayCEthChainTokenAuth = ArrayCEthChainTokenAuth();
+      ArrayCEthChainTokenAuth arrayCEthChainTokenAuth =
+          ArrayCEthChainTokenAuth();
       List<EthChainTokenAuth> ethChainTokenList = [];
       ethTokenList.forEach((element) {
         TokenM tokenM = TokenM()
@@ -116,7 +118,12 @@ class _MyHomePageState extends State<MyHomePage> {
           ..decimal = element.decimal
           ..fullName = element.tokenShared.name;
         tokenMList.add(tokenM);
-        print("ethTokenList item is --->" + element.id + "id" + element.tokenShared.name + "||" + element.tokenShared.symbol);
+        print("ethTokenList item is --->" +
+            element.id +
+            "id" +
+            element.tokenShared.name +
+            "||" +
+            element.tokenShared.symbol);
         EthChainTokenAuth ethChainTokenAuth = EthChainTokenAuth();
         ethChainTokenAuth
           ..chainTokenSharedId = element.tokenShardId
@@ -126,12 +133,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ..ethChainTokenShared.tokenShared.name = element.tokenShared.name
           ..ethChainTokenShared.tokenShared.symbol = element.tokenShared.symbol
           ..ethChainTokenShared.gasLimit = element.gasLimit.toInt()
-          ..ethChainTokenShared.tokenShared.logoUrl = element.tokenShared.logoUrl;
+          ..ethChainTokenShared.tokenShared.logoUrl =
+              element.tokenShared.logoUrl;
         ethChainTokenList.add(ethChainTokenAuth);
       });
       arrayCEthChainTokenAuth.data = ethChainTokenList;
       await WalletsControl.getInstance().initWallet();
-      EthChainControl.getInstance().updateAuthTokenList(arrayCEthChainTokenAuth);
+      EthChainControl.getInstance()
+          .updateAuthTokenList(arrayCEthChainTokenAuth);
       print("tokenM item is --->" + tokenMList.toString());
     } catch (e) {
       print("EthTokenOpen_QueryReq  error is ------>" + e.toString());
@@ -163,7 +172,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     String mne = WalletsControl.getInstance().generateMnemonic(12);
     logger.i("wallet test ", "mne is " + mne.toString());
-    Wallet wallet = WalletsControl.getInstance().createWallet(mne, WalletType.Normal, "ggg", Uint8List.fromList("q".toString().codeUnits));
+    Wallet wallet = WalletsControl.getInstance().createWallet(mne,
+        WalletType.Normal, "ggg", Uint8List.fromList("q".toString().codeUnits));
     logger.i("wallet test ", "wallet is " + wallet.toString());
 
     List<Wallet> walletList = WalletsControl.getInstance().walletsAll();
@@ -181,9 +191,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     var allTokenList = EthChainControl.getInstance().getAllTokenList(curWallet);
     var visibleTokenList = EthChainControl.getInstance().getVisibleTokenList();
-    print("wallet test visibleTokenList is --------->" + visibleTokenList.toString());
+    print("wallet test visibleTokenList is --------->" +
+        visibleTokenList.toString());
     var curWalletMoney = WalletsControl.getInstance().getWalletMoney(curWallet);
-    print("wallet test curWalletMoney is --------->" + curWalletMoney.toString());
+    print(
+        "wallet test curWalletMoney is --------->" + curWalletMoney.toString());
   }
 
   void _incrementCounter() async {
@@ -193,7 +205,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     Config config = await HandleConfig.instance.getConfig();
     // print("before config.vendorConfig.toString()   ===>" + config.vendorConfig.toJson().toString());
-    String aimString = '''{"serverConfigIp":"测试修改four","configVersion":""}'''; //测属性是否可以是空字串
+    String aimString =
+        '''{"serverConfigIp":"测试修改four","configVersion":""}'''; //测属性是否可以是空字串
     await HandleConfig.instance.addOrUpdateVendorConfig(aimString);
     config = await HandleConfig.instance.getConfig();
     // print("after config.vendorConfig.toString()   ===>" + config.vendorConfig.toJson().toString());
