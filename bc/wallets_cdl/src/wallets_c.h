@@ -1,6 +1,6 @@
 #pragma once
 
-/* Generated with cbindgen:0.18.0 */
+/* Generated with cbindgen:0.24.5 */
 
 #include <stdint.h>
 
@@ -504,6 +504,10 @@ typedef struct CEthRawTxPayload {
     char *fromAddress;
     char *rawTx;
 } CEthRawTxPayload;
+
+
+
+
 
 #ifdef __cplusplus
 extern "C" {

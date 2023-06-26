@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:grpc/grpc.dart';
 import 'package:grpc/grpc_connection_interface.dart';
 import 'package:grpc/src/client/channel.dart' as $channel;
@@ -17,15 +20,13 @@ class ConnectParameter {
   int port;
   ChannelOptions options;
 
-  ConnectParameter(this.host, this.port,
-      {this.options =
-          const ChannelOptions(credentials: ChannelCredentials.insecure())});
+  ConnectParameter(this.host, this.port, {this.options = const ChannelOptions(credentials: ChannelCredentials.insecure())});
 }
 
 typedef _ReFreshCall = Future<ConnectParameter> Function();
 
 //刷新服务端连接参数
-class _ReFreshParameter extends Function {
+class _ReFreshParameter {
   ConnectParameter? _connectParameter;
   final _ReFreshCall _refreshCall;
 
@@ -54,12 +55,15 @@ class _ReFreshParameter extends Function {
 class ClientTransportChannel implements $channel.ClientChannel {
   // TODO: Multiple connections, load balancing.
   ClientConnection? _connection;
-
+  var _connected = false;
   bool _isShutdown = false;
+  final StreamController<ConnectionState> _connectionStateStreamController = StreamController.broadcast();
+  final void Function()? _channelShutdownHandler;
 
   final _ReFreshParameter _refreshParameter;
 
-  ClientTransportChannel(this._refreshParameter);
+  ClientTransportChannel(this._refreshParameter, {void Function()? channelShutdownHandler})
+      : _channelShutdownHandler = channelShutdownHandler;
 
   Future<ClientConnection> createConnection() async {
     var parameter = _refreshParameter.connectParameter;
@@ -71,8 +75,7 @@ class ClientTransportChannel implements $channel.ClientChannel {
       throw Exception("can not get parameter from RefreshParameter");
     }
 
-    return Http2ClientConnection(
-        parameter.host, parameter.port, parameter.options);
+    return Http2ClientConnection(parameter.host, parameter.port, parameter.options);
   }
 
   @override
@@ -94,16 +97,9 @@ class ClientTransportChannel implements $channel.ClientChannel {
   }
 
   @override
-  ClientCall<Q, R> createCall<Q, R>(
-      ClientMethod<Q, R> method, Stream<Q> requests, CallOptions options) {
-    final call = _ClientCallError(
-        method,
-        requests,
-        options,
-        _onConnectionError,
-        isTimelineLoggingEnabled
-            ? timelineTaskFactory(filterKey: clientTimelineFilterKey)
-            : null);
+  ClientCall<Q, R> createCall<Q, R>(ClientMethod<Q, R> method, Stream<Q> requests, CallOptions options) {
+    final call = _ClientCallError(method, requests, options, _onConnectionError,
+        isTimelineLoggingEnabled ? TimelineTask(filterKey: clientTimelineFilterKey) : null);
     getConnection().then((connection) {
       if (call.isCancelled) return;
       connection.dispatchCall(call);
@@ -123,6 +119,9 @@ class ClientTransportChannel implements $channel.ClientChannel {
       _refreshParameter._resetConnectParameter();
     }
   }
+
+  @override
+  Stream<ConnectionState> get onConnectionStateChanged => _connectionStateStreamController.stream;
 }
 
 typedef _ErrorCall = void Function(dynamic);
@@ -131,8 +130,7 @@ class _ClientCallError<Q, R> extends ClientCall<Q, R> {
   _ErrorCall _errCall;
   Stream<R>? _stream = null;
 
-  _ClientCallError(ClientMethod<Q, R> method, Stream<Q> requests,
-      CallOptions options, _ErrorCall this._errCall,
+  _ClientCallError(ClientMethod<Q, R> method, Stream<Q> requests, CallOptions options, _ErrorCall this._errCall,
       [timelineTask])
       : super(method, requests, options, timelineTask);
 

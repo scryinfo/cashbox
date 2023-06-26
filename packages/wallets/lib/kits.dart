@@ -101,6 +101,18 @@ extension Int8PtrEx on Pointer<Int8> {
 }
 
 //释放内存
+extension CharPtrEx on Pointer<Char> {
+  void free() {
+    if (this != nullptr && this.address != 0) {
+      ffi.calloc.free(this);
+    }
+  }
+  String toDartString(){
+    return this == nullptr?"":this.cast<ffi.Utf8>().toDartString();
+  }
+}
+
+//释放内存
 extension Int16PtrEx on Pointer<Int16> {
   void free() {
     if (this != nullptr && this.address != 0) {

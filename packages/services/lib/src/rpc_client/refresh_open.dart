@@ -28,8 +28,8 @@ class RefreshOpen {
         parameter.host,
         port: parameter.port,
         options: ChannelOptions(
-            credentials:
-                ChannelCredentials.secure(onBadCertificate: (X509Certificate certificate, String host) => certificate.subject.endsWith("scry")),
+            credentials: ChannelCredentials.secure(
+                onBadCertificate: (X509Certificate certificate, String host) => certificate.subject.endsWith("scry")),
             connectionTimeout: Duration(seconds: 30)),
       );
       _instance!._client = new RefreshOpenFaceClient(_instance!._channel!);
@@ -55,8 +55,8 @@ class RefreshOpen {
     }
     ConnectParameter parameter = new ConnectParameter(res.host, res.port.toInt(),
         options: ChannelOptions(
-            credentials:
-                ChannelCredentials.secure(onBadCertificate: (X509Certificate certificate, String host) => certificate.subject.endsWith("scry")),
+            credentials: ChannelCredentials.secure(
+                onBadCertificate: (X509Certificate certificate, String host) => certificate.subject.endsWith("scry")),
             connectionTimeout: Duration(seconds: 30)));
     return parameter;
   }
