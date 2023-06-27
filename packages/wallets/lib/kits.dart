@@ -7,7 +7,7 @@ import 'package:wallets/wallets_c.dc.dart';
 const int CTrue = 1;
 const int CFalse = 0;
 //分配置内存并清零
-Pointer<T> allocateZero<T extends NativeType>(int byteCount,{int count = 1}) {
+Pointer<T> allocateZero<T extends NativeType>(int byteCount, {int count = 1}) {
   final int totalSize = count * byteCount;
   var ptr = ffi.calloc.allocate<T>(totalSize);
   var temp = ptr.cast<Uint8>();
@@ -47,7 +47,12 @@ extension StringEx on String {
   Pointer<ffi.Utf8> toCPtrUtf8() {
     return this.toNativeUtf8();
   }
+
   Pointer<Int8> toCPtrInt8() {
+    return this.toNativeUtf8().cast();
+  }
+
+  Pointer<Char> toCPtrChar() {
     return this.toNativeUtf8().cast();
   }
 }
@@ -71,9 +76,9 @@ extension Utf8PtrEx on Pointer<ffi.Utf8> {
       ffi.calloc.free(this);
     }
   }
-  // String toDataString(){
-  //   return fromUtf8Null(this);
-  // }
+// String toDataString(){
+//   return fromUtf8Null(this);
+// }
 }
 
 //释放指针的指针的内存
@@ -88,6 +93,18 @@ extension Int8DoublePtrEx on Pointer<Pointer<Int8>> {
   }
 }
 
+//释放指针的指针的内存
+extension CharDoublePtrEx on Pointer<Pointer<Char>> {
+  void free(int len) {
+    for (var i = 0; i < len; i++) {
+      Pointer<Char> el = this.elementAt(i).value;
+      el.free();
+      this.elementAt(i).value = nullptr;
+    }
+    ffi.calloc.free(this);
+  }
+}
+
 //释放内存
 extension Int8PtrEx on Pointer<Int8> {
   void free() {
@@ -95,8 +112,9 @@ extension Int8PtrEx on Pointer<Int8> {
       ffi.calloc.free(this);
     }
   }
-  String toDartString(){
-    return this == nullptr?"":this.cast<ffi.Utf8>().toDartString();
+
+  String toDartString() {
+    return this == nullptr ? "" : this.cast<ffi.Utf8>().toDartString();
   }
 }
 
@@ -107,8 +125,9 @@ extension CharPtrEx on Pointer<Char> {
       ffi.calloc.free(this);
     }
   }
-  String toDartString(){
-    return this == nullptr?"":this.cast<ffi.Utf8>().toDartString();
+
+  String toDartString() {
+    return this == nullptr ? "" : this.cast<ffi.Utf8>().toDartString();
   }
 }
 
@@ -283,22 +302,38 @@ class NoCacheString {
     //todo
     return toString().toCPtrUtf8();
   }
+
   Pointer<Int8> toCPtrInt8() {
     //todo
     return toString().toCPtrInt8();
   }
+
+  Pointer<Char> toCPtrChar() {
+    //todo
+    return toString().toCPtrChar();
+  }
+
   static void freeUtf8(Pointer<ffi.Utf8> str) {
     //todo
     if (str != null && str != nullptr) {
       ffi.calloc.free(str);
     }
   }
+
   static void freeInt8(Pointer<Int8> str) {
     //todo
     if (str != null && str != nullptr) {
       ffi.calloc.free(str);
     }
   }
+
+  static void freeChar(Pointer<Char> str) {
+    //todo
+    if (str != null && str != nullptr) {
+      ffi.calloc.free(str);
+    }
+  }
+
   clean() {
     buffer.clear();
   }

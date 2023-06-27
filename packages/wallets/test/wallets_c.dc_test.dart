@@ -17,8 +17,7 @@ extension _InitParameters on InitParameters {
           this.dbName.walletMainnet == other.dbName.walletMainnet &&
           this.dbName.walletPrivate == other.dbName.walletPrivate &&
           this.dbName.walletTestnet == other.dbName.walletTestnet &&
-          this.dbName.walletTestnetPrivate == other.dbName.walletTestnetPrivate)
-        return true;
+          this.dbName.walletTestnetPrivate == other.dbName.walletTestnetPrivate) return true;
     }
     return false;
   }

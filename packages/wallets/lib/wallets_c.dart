@@ -6,28 +6,22 @@ import 'dart:ffi' as ffi;
 
 class CWallets {
   /// Holds the symbol lookup function.
-  final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
-      _lookup;
+  final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName) _lookup;
 
   /// The symbols are looked up in [dynamicLibrary].
   CWallets(ffi.DynamicLibrary dynamicLibrary) : _lookup = dynamicLibrary.lookup;
 
   /// The symbols are looked up with [lookup].
-  CWallets.fromLookup(
-      ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
-          lookup)
-      : _lookup = lookup;
+  CWallets.fromLookup(ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName) lookup) : _lookup = lookup;
 
   /// alloc ** [parameters::CContext]
   ffi.Pointer<ffi.Pointer<CContext>> CContext_dAlloc() {
     return _CContext_dAlloc();
   }
 
-  late final _CContext_dAllocPtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CContext>> Function()>>(
-      'CContext_dAlloc');
-  late final _CContext_dAlloc = _CContext_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CContext>> Function()>();
+  late final _CContext_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CContext>> Function()>>('CContext_dAlloc');
+  late final _CContext_dAlloc = _CContext_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CContext>> Function()>();
 
   /// free ** [parameters::CContext]
   void CContext_dFree(
@@ -38,24 +32,19 @@ class CWallets {
     );
   }
 
-  late final _CContext_dFreePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Pointer<CContext>>)>>('CContext_dFree');
-  late final _CContext_dFree = _CContext_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CContext>>)>();
+  late final _CContext_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CContext>>)>>('CContext_dFree');
+  late final _CContext_dFree = _CContext_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CContext>>)>();
 
   /// alloc ** [CArray]
   ffi.Pointer<ffi.Pointer<CArrayCContext>> CArrayCContext_dAlloc() {
     return _CArrayCContext_dAlloc();
   }
 
-  late final _CArrayCContext_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCContext>>
-              Function()>>('CArrayCContext_dAlloc');
-  late final _CArrayCContext_dAlloc = _CArrayCContext_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CArrayCContext>> Function()>();
+  late final _CArrayCContext_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCContext>> Function()>>('CArrayCContext_dAlloc');
+  late final _CArrayCContext_dAlloc =
+      _CArrayCContext_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCContext>> Function()>();
 
   void CArrayCContext_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCContext>> dPtr,
@@ -65,12 +54,10 @@ class CWallets {
     );
   }
 
-  late final _CArrayCContext_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCContext>>)>>(
-      'CArrayCContext_dFree');
-  late final _CArrayCContext_dFree = _CArrayCContext_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CArrayCContext>>)>();
+  late final _CArrayCContext_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCContext>>)>>('CArrayCContext_dFree');
+  late final _CArrayCContext_dFree =
+      _CArrayCContext_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayCContext>>)>();
 
   void CStr_free(
     ffi.Pointer<ffi.Char> dcs,
@@ -80,11 +67,8 @@ class CWallets {
     );
   }
 
-  late final _CStr_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Char>)>>(
-          'CStr_free');
-  late final _CStr_free =
-      _CStr_freePtr.asFunction<void Function(ffi.Pointer<ffi.Char>)>();
+  late final _CStr_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Char>)>>('CStr_free');
+  late final _CStr_free = _CStr_freePtr.asFunction<void Function(ffi.Pointer<ffi.Char>)>();
 
   void CStr_dFree(
     ffi.Pointer<ffi.Pointer<ffi.Char>> dcs,
@@ -94,21 +78,16 @@ class CWallets {
     );
   }
 
-  late final _CStr_dFreePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('CStr_dFree');
-  late final _CStr_dFree = _CStr_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+  late final _CStr_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('CStr_dFree');
+  late final _CStr_dFree = _CStr_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<ffi.Pointer<ffi.Char>> CStr_dAlloc() {
     return _CStr_dAlloc();
   }
 
-  late final _CStr_dAllocPtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Pointer<ffi.Char>> Function()>>(
-      'CStr_dAlloc');
-  late final _CStr_dAlloc = _CStr_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<ffi.Char>> Function()>();
+  late final _CStr_dAllocPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<ffi.Char>> Function()>>('CStr_dAlloc');
+  late final _CStr_dAlloc = _CStr_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<ffi.Char>> Function()>();
 
   void CBool_free(
     ffi.Pointer<CBool> dcs,
@@ -118,20 +97,15 @@ class CWallets {
     );
   }
 
-  late final _CBool_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<CBool>)>>(
-          'CBool_free');
-  late final _CBool_free =
-      _CBool_freePtr.asFunction<void Function(ffi.Pointer<CBool>)>();
+  late final _CBool_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<CBool>)>>('CBool_free');
+  late final _CBool_free = _CBool_freePtr.asFunction<void Function(ffi.Pointer<CBool>)>();
 
   ffi.Pointer<CBool> CBool_alloc() {
     return _CBool_alloc();
   }
 
-  late final _CBool_allocPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<CBool> Function()>>('CBool_alloc');
-  late final _CBool_alloc =
-      _CBool_allocPtr.asFunction<ffi.Pointer<CBool> Function()>();
+  late final _CBool_allocPtr = _lookup<ffi.NativeFunction<ffi.Pointer<CBool> Function()>>('CBool_alloc');
+  late final _CBool_alloc = _CBool_allocPtr.asFunction<ffi.Pointer<CBool> Function()>();
 
   void CError_free(
     ffi.Pointer<CError> error,
@@ -141,21 +115,16 @@ class CWallets {
     );
   }
 
-  late final _CError_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<CError>)>>(
-          'CError_free');
-  late final _CError_free =
-      _CError_freePtr.asFunction<void Function(ffi.Pointer<CError>)>();
+  late final _CError_freePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<CError>)>>('CError_free');
+  late final _CError_free = _CError_freePtr.asFunction<void Function(ffi.Pointer<CError>)>();
 
   ffi.Pointer<ffi.Pointer<CWallet>> CWallet_dAlloc() {
     return _CWallet_dAlloc();
   }
 
   late final _CWallet_dAllocPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CWallet>> Function()>>(
-          'CWallet_dAlloc');
-  late final _CWallet_dAlloc = _CWallet_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CWallet>> Function()>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CWallet>> Function()>>('CWallet_dAlloc');
+  late final _CWallet_dAlloc = _CWallet_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CWallet>> Function()>();
 
   void CWallet_dFree(
     ffi.Pointer<ffi.Pointer<CWallet>> dPtr,
@@ -165,23 +134,18 @@ class CWallets {
     );
   }
 
-  late final _CWallet_dFreePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Pointer<CWallet>>)>>('CWallet_dFree');
-  late final _CWallet_dFree = _CWallet_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CWallet>>)>();
+  late final _CWallet_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CWallet>>)>>('CWallet_dFree');
+  late final _CWallet_dFree = _CWallet_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CWallet>>)>();
 
   ffi.Pointer<ffi.Pointer<CArrayCWallet>> CArrayCWallet_dAlloc() {
     return _CArrayCWallet_dAlloc();
   }
 
-  late final _CArrayCWallet_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCWallet>>
-              Function()>>('CArrayCWallet_dAlloc');
-  late final _CArrayCWallet_dAlloc = _CArrayCWallet_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CArrayCWallet>> Function()>();
+  late final _CArrayCWallet_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCWallet>> Function()>>('CArrayCWallet_dAlloc');
+  late final _CArrayCWallet_dAlloc =
+      _CArrayCWallet_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCWallet>> Function()>();
 
   void CArrayCWallet_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCWallet>> dPtr,
@@ -191,22 +155,18 @@ class CWallets {
     );
   }
 
-  late final _CArrayCWallet_dFreePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>>('CArrayCWallet_dFree');
-  late final _CArrayCWallet_dFree = _CArrayCWallet_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>();
+  late final _CArrayCWallet_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>>('CArrayCWallet_dFree');
+  late final _CArrayCWallet_dFree =
+      _CArrayCWallet_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>();
 
   ffi.Pointer<ffi.Pointer<CDbName>> CDbName_dAlloc() {
     return _CDbName_dAlloc();
   }
 
   late final _CDbName_dAllocPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CDbName>> Function()>>(
-          'CDbName_dAlloc');
-  late final _CDbName_dAlloc = _CDbName_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CDbName>> Function()>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CDbName>> Function()>>('CDbName_dAlloc');
+  late final _CDbName_dAlloc = _CDbName_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CDbName>> Function()>();
 
   void CDbName_dFree(
     ffi.Pointer<ffi.Pointer<CDbName>> dPtr,
@@ -216,22 +176,17 @@ class CWallets {
     );
   }
 
-  late final _CDbName_dFreePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Pointer<CDbName>>)>>('CDbName_dFree');
-  late final _CDbName_dFree = _CDbName_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CDbName>>)>();
+  late final _CDbName_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CDbName>>)>>('CDbName_dFree');
+  late final _CDbName_dFree = _CDbName_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CDbName>>)>();
 
   ffi.Pointer<ffi.Pointer<CArrayI64>> CArrayInt64_dAlloc() {
     return _CArrayInt64_dAlloc();
   }
 
-  late final _CArrayInt64_dAllocPtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayI64>> Function()>>(
-      'CArrayInt64_dAlloc');
-  late final _CArrayInt64_dAlloc = _CArrayInt64_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CArrayI64>> Function()>();
+  late final _CArrayInt64_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayI64>> Function()>>('CArrayInt64_dAlloc');
+  late final _CArrayInt64_dAlloc = _CArrayInt64_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayI64>> Function()>();
 
   void CArrayInt64_dFree(
     ffi.Pointer<ffi.Pointer<CArrayI64>> dPtr,
@@ -241,23 +196,18 @@ class CWallets {
     );
   }
 
-  late final _CArrayInt64_dFreePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Pointer<CArrayI64>>)>>('CArrayInt64_dFree');
-  late final _CArrayInt64_dFree = _CArrayInt64_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CArrayI64>>)>();
+  late final _CArrayInt64_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayI64>>)>>('CArrayInt64_dFree');
+  late final _CArrayInt64_dFree = _CArrayInt64_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayI64>>)>();
 
   ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>> CAccountInfoSyncProg_dAlloc() {
     return _CAccountInfoSyncProg_dAlloc();
   }
 
-  late final _CAccountInfoSyncProg_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>>
-              Function()>>('CAccountInfoSyncProg_dAlloc');
-  late final _CAccountInfoSyncProg_dAlloc = _CAccountInfoSyncProg_dAllocPtr
-      .asFunction<ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>> Function()>();
+  late final _CAccountInfoSyncProg_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>> Function()>>('CAccountInfoSyncProg_dAlloc');
+  late final _CAccountInfoSyncProg_dAlloc =
+      _CAccountInfoSyncProg_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>> Function()>();
 
   void CAccountInfoSyncProg_dFree(
     ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>> dPtr,
@@ -267,25 +217,19 @@ class CWallets {
     );
   }
 
-  late final _CAccountInfoSyncProg_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>>)>>(
-      'CAccountInfoSyncProg_dFree');
+  late final _CAccountInfoSyncProg_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>>)>>(
+          'CAccountInfoSyncProg_dFree');
   late final _CAccountInfoSyncProg_dFree =
-      _CAccountInfoSyncProg_dFreePtr.asFunction<
-          void Function(ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>>)>();
+      _CAccountInfoSyncProg_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>>)>();
 
   ffi.Pointer<ffi.Pointer<CAccountInfo>> CAccountInfo_dAlloc() {
     return _CAccountInfo_dAlloc();
   }
 
-  late final _CAccountInfo_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CAccountInfo>>
-              Function()>>('CAccountInfo_dAlloc');
-  late final _CAccountInfo_dAlloc = _CAccountInfo_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CAccountInfo>> Function()>();
+  late final _CAccountInfo_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CAccountInfo>> Function()>>('CAccountInfo_dAlloc');
+  late final _CAccountInfo_dAlloc = _CAccountInfo_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CAccountInfo>> Function()>();
 
   void CAccountInfo_dFree(
     ffi.Pointer<ffi.Pointer<CAccountInfo>> dPtr,
@@ -295,23 +239,19 @@ class CWallets {
     );
   }
 
-  late final _CAccountInfo_dFreePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Pointer<CAccountInfo>>)>>('CAccountInfo_dFree');
-  late final _CAccountInfo_dFree = _CAccountInfo_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CAccountInfo>>)>();
+  late final _CAccountInfo_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CAccountInfo>>)>>('CAccountInfo_dFree');
+  late final _CAccountInfo_dFree =
+      _CAccountInfo_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CAccountInfo>>)>();
 
   ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> CSubChainBasicInfo_dAlloc() {
     return _CSubChainBasicInfo_dAlloc();
   }
 
-  late final _CSubChainBasicInfo_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>
-              Function()>>('CSubChainBasicInfo_dAlloc');
-  late final _CSubChainBasicInfo_dAlloc = _CSubChainBasicInfo_dAllocPtr
-      .asFunction<ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> Function()>();
+  late final _CSubChainBasicInfo_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> Function()>>('CSubChainBasicInfo_dAlloc');
+  late final _CSubChainBasicInfo_dAlloc =
+      _CSubChainBasicInfo_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> Function()>();
 
   void CSubChainBasicInfo_dFree(
     ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>> dPtr,
@@ -321,23 +261,19 @@ class CWallets {
     );
   }
 
-  late final _CSubChainBasicInfo_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>>(
-      'CSubChainBasicInfo_dFree');
+  late final _CSubChainBasicInfo_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>>(
+          'CSubChainBasicInfo_dFree');
   late final _CSubChainBasicInfo_dFree =
-      _CSubChainBasicInfo_dFreePtr.asFunction<
-          void Function(ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>();
+      _CSubChainBasicInfo_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>();
 
   ffi.Pointer<ffi.Pointer<CArrayCChar>> CArrayCChar_dAlloc() {
     return _CArrayCChar_dAlloc();
   }
 
-  late final _CArrayCChar_dAllocPtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCChar>> Function()>>(
-      'CArrayCChar_dAlloc');
-  late final _CArrayCChar_dAlloc = _CArrayCChar_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CArrayCChar>> Function()>();
+  late final _CArrayCChar_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCChar>> Function()>>('CArrayCChar_dAlloc');
+  late final _CArrayCChar_dAlloc = _CArrayCChar_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCChar>> Function()>();
 
   void CArrayCChar_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCChar>> dPtr,
@@ -347,24 +283,18 @@ class CWallets {
     );
   }
 
-  late final _CArrayCChar_dFreePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Pointer<CArrayCChar>>)>>('CArrayCChar_dFree');
-  late final _CArrayCChar_dFree = _CArrayCChar_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CArrayCChar>>)>();
+  late final _CArrayCChar_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCChar>>)>>('CArrayCChar_dFree');
+  late final _CArrayCChar_dFree = _CArrayCChar_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayCChar>>)>();
 
   ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>> CExtrinsicContext_dAlloc() {
     return _CExtrinsicContext_dAlloc();
   }
 
-  late final _CExtrinsicContext_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>>
-              Function()>>('CExtrinsicContext_dAlloc');
+  late final _CExtrinsicContext_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>> Function()>>('CExtrinsicContext_dAlloc');
   late final _CExtrinsicContext_dAlloc =
-      _CExtrinsicContext_dAllocPtr.asFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>> Function()>();
+      _CExtrinsicContext_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>> Function()>();
 
   void CExtrinsicContext_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>> dPtr,
@@ -374,24 +304,20 @@ class CWallets {
     );
   }
 
-  late final _CExtrinsicContext_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>>)>>(
-      'CExtrinsicContext_dFree');
-  late final _CExtrinsicContext_dFree = _CExtrinsicContext_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>>)>();
+  late final _CExtrinsicContext_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>>)>>(
+          'CExtrinsicContext_dFree');
+  late final _CExtrinsicContext_dFree =
+      _CExtrinsicContext_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayCExtrinsicContext>>)>();
 
   ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>> CArrayCTokenAddress_dAlloc() {
     return _CArrayCTokenAddress_dAlloc();
   }
 
-  late final _CArrayCTokenAddress_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>>
-              Function()>>('CArrayCTokenAddress_dAlloc');
-  late final _CArrayCTokenAddress_dAlloc = _CArrayCTokenAddress_dAllocPtr
-      .asFunction<ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>> Function()>();
+  late final _CArrayCTokenAddress_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>> Function()>>('CArrayCTokenAddress_dAlloc');
+  late final _CArrayCTokenAddress_dAlloc =
+      _CArrayCTokenAddress_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>> Function()>();
 
   void CArrayCTokenAddress_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>> dPtr,
@@ -401,27 +327,21 @@ class CWallets {
     );
   }
 
-  late final _CArrayCTokenAddress_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>>)>>(
-      'CArrayCTokenAddress_dFree');
+  late final _CArrayCTokenAddress_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>>)>>(
+          'CArrayCTokenAddress_dFree');
   late final _CArrayCTokenAddress_dFree =
-      _CArrayCTokenAddress_dFreePtr.asFunction<
-          void Function(ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>>)>();
+      _CArrayCTokenAddress_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>>)>();
 
-  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>
-      CArrayCEthChainTokenAuth_dAlloc() {
+  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>> CArrayCEthChainTokenAuth_dAlloc() {
     return _CArrayCEthChainTokenAuth_dAlloc();
   }
 
-  late final _CArrayCEthChainTokenAuth_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>
-              Function()>>('CArrayCEthChainTokenAuth_dAlloc');
+  late final _CArrayCEthChainTokenAuth_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>> Function()>>(
+          'CArrayCEthChainTokenAuth_dAlloc');
   late final _CArrayCEthChainTokenAuth_dAlloc =
-      _CArrayCEthChainTokenAuth_dAllocPtr.asFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>> Function()>();
+      _CArrayCEthChainTokenAuth_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>> Function()>();
 
   void CArrayCEthChainTokenAuth_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>> dPtr,
@@ -431,27 +351,21 @@ class CWallets {
     );
   }
 
-  late final _CArrayCEthChainTokenAuth_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>>(
-      'CArrayCEthChainTokenAuth_dFree');
+  late final _CArrayCEthChainTokenAuth_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>>(
+          'CArrayCEthChainTokenAuth_dFree');
   late final _CArrayCEthChainTokenAuth_dFree =
-      _CArrayCEthChainTokenAuth_dFreePtr.asFunction<
-          void Function(ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>();
+      _CArrayCEthChainTokenAuth_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>();
 
-  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>
-      CArrayCEthChainTokenNonAuth_dAlloc() {
+  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>> CArrayCEthChainTokenNonAuth_dAlloc() {
     return _CArrayCEthChainTokenNonAuth_dAlloc();
   }
 
-  late final _CArrayCEthChainTokenNonAuth_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>
-              Function()>>('CArrayCEthChainTokenNonAuth_dAlloc');
+  late final _CArrayCEthChainTokenNonAuth_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>> Function()>>(
+          'CArrayCEthChainTokenNonAuth_dAlloc');
   late final _CArrayCEthChainTokenNonAuth_dAlloc =
-      _CArrayCEthChainTokenNonAuth_dAllocPtr.asFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>> Function()>();
+      _CArrayCEthChainTokenNonAuth_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>> Function()>();
 
   void CArrayCEthChainTokenNonAuth_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>> dPtr,
@@ -461,28 +375,21 @@ class CWallets {
     );
   }
 
-  late final _CArrayCEthChainTokenNonAuth_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>)>>(
-      'CArrayCEthChainTokenNonAuth_dFree');
-  late final _CArrayCEthChainTokenNonAuth_dFree =
-      _CArrayCEthChainTokenNonAuth_dFreePtr.asFunction<
-          void Function(
-              ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>)>();
+  late final _CArrayCEthChainTokenNonAuth_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>)>>(
+          'CArrayCEthChainTokenNonAuth_dFree');
+  late final _CArrayCEthChainTokenNonAuth_dFree = _CArrayCEthChainTokenNonAuth_dFreePtr.asFunction<
+      void Function(ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>)>();
 
-  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>
-      CArrayCEthChainTokenDefault_dAlloc() {
+  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>> CArrayCEthChainTokenDefault_dAlloc() {
     return _CArrayCEthChainTokenDefault_dAlloc();
   }
 
-  late final _CArrayCEthChainTokenDefault_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>
-              Function()>>('CArrayCEthChainTokenDefault_dAlloc');
+  late final _CArrayCEthChainTokenDefault_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>> Function()>>(
+          'CArrayCEthChainTokenDefault_dAlloc');
   late final _CArrayCEthChainTokenDefault_dAlloc =
-      _CArrayCEthChainTokenDefault_dAllocPtr.asFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>> Function()>();
+      _CArrayCEthChainTokenDefault_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>> Function()>();
 
   void CArrayCEthChainTokenDefault_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>> dPtr,
@@ -492,28 +399,21 @@ class CWallets {
     );
   }
 
-  late final _CArrayCEthChainTokenDefault_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>)>>(
-      'CArrayCEthChainTokenDefault_dFree');
-  late final _CArrayCEthChainTokenDefault_dFree =
-      _CArrayCEthChainTokenDefault_dFreePtr.asFunction<
-          void Function(
-              ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>)>();
+  late final _CArrayCEthChainTokenDefault_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>)>>(
+          'CArrayCEthChainTokenDefault_dFree');
+  late final _CArrayCEthChainTokenDefault_dFree = _CArrayCEthChainTokenDefault_dFreePtr.asFunction<
+      void Function(ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>)>();
 
-  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>
-      CArrayCEeeChainTokenDefault_dAlloc() {
+  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>> CArrayCEeeChainTokenDefault_dAlloc() {
     return _CArrayCEeeChainTokenDefault_dAlloc();
   }
 
-  late final _CArrayCEeeChainTokenDefault_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>
-              Function()>>('CArrayCEeeChainTokenDefault_dAlloc');
+  late final _CArrayCEeeChainTokenDefault_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>> Function()>>(
+          'CArrayCEeeChainTokenDefault_dAlloc');
   late final _CArrayCEeeChainTokenDefault_dAlloc =
-      _CArrayCEeeChainTokenDefault_dAllocPtr.asFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>> Function()>();
+      _CArrayCEeeChainTokenDefault_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>> Function()>();
 
   void CArrayCEeeChainTokenDefault_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>> dPtr,
@@ -523,28 +423,21 @@ class CWallets {
     );
   }
 
-  late final _CArrayCEeeChainTokenDefault_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>)>>(
-      'CArrayCEeeChainTokenDefault_dFree');
-  late final _CArrayCEeeChainTokenDefault_dFree =
-      _CArrayCEeeChainTokenDefault_dFreePtr.asFunction<
-          void Function(
-              ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>)>();
+  late final _CArrayCEeeChainTokenDefault_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>)>>(
+          'CArrayCEeeChainTokenDefault_dFree');
+  late final _CArrayCEeeChainTokenDefault_dFree = _CArrayCEeeChainTokenDefault_dFreePtr.asFunction<
+      void Function(ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>)>();
 
-  ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>
-      CArrayCBtcChainTokenDefault_dAlloc() {
+  ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>> CArrayCBtcChainTokenDefault_dAlloc() {
     return _CArrayCBtcChainTokenDefault_dAlloc();
   }
 
-  late final _CArrayCBtcChainTokenDefault_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>
-              Function()>>('CArrayCBtcChainTokenDefault_dAlloc');
+  late final _CArrayCBtcChainTokenDefault_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>> Function()>>(
+          'CArrayCBtcChainTokenDefault_dAlloc');
   late final _CArrayCBtcChainTokenDefault_dAlloc =
-      _CArrayCBtcChainTokenDefault_dAllocPtr.asFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>> Function()>();
+      _CArrayCBtcChainTokenDefault_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>> Function()>();
 
   void CArrayCBtcChainTokenDefault_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>> dPtr,
@@ -554,28 +447,21 @@ class CWallets {
     );
   }
 
-  late final _CArrayCBtcChainTokenDefault_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>)>>(
-      'CArrayCBtcChainTokenDefault_dFree');
-  late final _CArrayCBtcChainTokenDefault_dFree =
-      _CArrayCBtcChainTokenDefault_dFreePtr.asFunction<
-          void Function(
-              ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>)>();
+  late final _CArrayCBtcChainTokenDefault_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>)>>(
+          'CArrayCBtcChainTokenDefault_dFree');
+  late final _CArrayCBtcChainTokenDefault_dFree = _CArrayCBtcChainTokenDefault_dFreePtr.asFunction<
+      void Function(ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>)>();
 
-  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>
-      CArrayCEeeChainTokenAuth_dAlloc() {
+  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>> CArrayCEeeChainTokenAuth_dAlloc() {
     return _CArrayCEeeChainTokenAuth_dAlloc();
   }
 
-  late final _CArrayCEeeChainTokenAuth_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>
-              Function()>>('CArrayCEeeChainTokenAuth_dAlloc');
+  late final _CArrayCEeeChainTokenAuth_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>> Function()>>(
+          'CArrayCEeeChainTokenAuth_dAlloc');
   late final _CArrayCEeeChainTokenAuth_dAlloc =
-      _CArrayCEeeChainTokenAuth_dAllocPtr.asFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>> Function()>();
+      _CArrayCEeeChainTokenAuth_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>> Function()>();
 
   void CArrayCEeeChainTokenAuth_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>> dPtr,
@@ -585,27 +471,21 @@ class CWallets {
     );
   }
 
-  late final _CArrayCEeeChainTokenAuth_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>)>>(
-      'CArrayCEeeChainTokenAuth_dFree');
+  late final _CArrayCEeeChainTokenAuth_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>)>>(
+          'CArrayCEeeChainTokenAuth_dFree');
   late final _CArrayCEeeChainTokenAuth_dFree =
-      _CArrayCEeeChainTokenAuth_dFreePtr.asFunction<
-          void Function(ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>)>();
+      _CArrayCEeeChainTokenAuth_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>)>();
 
-  ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>
-      CArrayCBtcChainTokenAuth_dAlloc() {
+  ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>> CArrayCBtcChainTokenAuth_dAlloc() {
     return _CArrayCBtcChainTokenAuth_dAlloc();
   }
 
-  late final _CArrayCBtcChainTokenAuth_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>
-              Function()>>('CArrayCBtcChainTokenAuth_dAlloc');
+  late final _CArrayCBtcChainTokenAuth_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>> Function()>>(
+          'CArrayCBtcChainTokenAuth_dAlloc');
   late final _CArrayCBtcChainTokenAuth_dAlloc =
-      _CArrayCBtcChainTokenAuth_dAllocPtr.asFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>> Function()>();
+      _CArrayCBtcChainTokenAuth_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>> Function()>();
 
   void CArrayCBtcChainTokenAuth_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>> dPtr,
@@ -615,25 +495,20 @@ class CWallets {
     );
   }
 
-  late final _CArrayCBtcChainTokenAuth_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>)>>(
-      'CArrayCBtcChainTokenAuth_dFree');
+  late final _CArrayCBtcChainTokenAuth_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>)>>(
+          'CArrayCBtcChainTokenAuth_dFree');
   late final _CArrayCBtcChainTokenAuth_dFree =
-      _CArrayCBtcChainTokenAuth_dFreePtr.asFunction<
-          void Function(ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>)>();
+      _CArrayCBtcChainTokenAuth_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>)>();
 
   ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>> CArrayCEeeChainTx_dAlloc() {
     return _CArrayCEeeChainTx_dAlloc();
   }
 
-  late final _CArrayCEeeChainTx_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>
-              Function()>>('CArrayCEeeChainTx_dAlloc');
-  late final _CArrayCEeeChainTx_dAlloc = _CArrayCEeeChainTx_dAllocPtr
-      .asFunction<ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>> Function()>();
+  late final _CArrayCEeeChainTx_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>> Function()>>('CArrayCEeeChainTx_dAlloc');
+  late final _CArrayCEeeChainTx_dAlloc =
+      _CArrayCEeeChainTx_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>> Function()>();
 
   void CArrayCEeeChainTx_dFree(
     ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>> dPtr,
@@ -643,23 +518,20 @@ class CWallets {
     );
   }
 
-  late final _CArrayCEeeChainTx_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>>(
-      'CArrayCEeeChainTx_dFree');
-  late final _CArrayCEeeChainTx_dFree = _CArrayCEeeChainTx_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>();
+  late final _CArrayCEeeChainTx_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>>(
+          'CArrayCEeeChainTx_dFree');
+  late final _CArrayCEeeChainTx_dFree =
+      _CArrayCEeeChainTx_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>();
 
   ffi.Pointer<ffi.Pointer<CWalletTokenStatus>> CWalletTokenStatus_dAlloc() {
     return _CWalletTokenStatus_dAlloc();
   }
 
-  late final _CWalletTokenStatus_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CWalletTokenStatus>>
-              Function()>>('CWalletTokenStatus_dAlloc');
-  late final _CWalletTokenStatus_dAlloc = _CWalletTokenStatus_dAllocPtr
-      .asFunction<ffi.Pointer<ffi.Pointer<CWalletTokenStatus>> Function()>();
+  late final _CWalletTokenStatus_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CWalletTokenStatus>> Function()>>('CWalletTokenStatus_dAlloc');
+  late final _CWalletTokenStatus_dAlloc =
+      _CWalletTokenStatus_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CWalletTokenStatus>> Function()>();
 
   void CWalletTokenStatus_dFree(
     ffi.Pointer<ffi.Pointer<CWalletTokenStatus>> dPtr,
@@ -669,24 +541,20 @@ class CWallets {
     );
   }
 
-  late final _CWalletTokenStatus_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<ffi.Pointer<CWalletTokenStatus>>)>>(
-      'CWalletTokenStatus_dFree');
+  late final _CWalletTokenStatus_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CWalletTokenStatus>>)>>(
+          'CWalletTokenStatus_dFree');
   late final _CWalletTokenStatus_dFree =
-      _CWalletTokenStatus_dFreePtr.asFunction<
-          void Function(ffi.Pointer<ffi.Pointer<CWalletTokenStatus>>)>();
+      _CWalletTokenStatus_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CWalletTokenStatus>>)>();
 
   ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>> CBtcNowLoadBlock_dAlloc() {
     return _CBtcNowLoadBlock_dAlloc();
   }
 
-  late final _CBtcNowLoadBlock_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>>
-              Function()>>('CBtcNowLoadBlock_dAlloc');
-  late final _CBtcNowLoadBlock_dAlloc = _CBtcNowLoadBlock_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>> Function()>();
+  late final _CBtcNowLoadBlock_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>> Function()>>('CBtcNowLoadBlock_dAlloc');
+  late final _CBtcNowLoadBlock_dAlloc =
+      _CBtcNowLoadBlock_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>> Function()>();
 
   void CBtcNowLoadBlock_dFree(
     ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>> dPtr,
@@ -696,22 +564,18 @@ class CWallets {
     );
   }
 
-  late final _CBtcNowLoadBlock_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>>)>>(
-      'CBtcNowLoadBlock_dFree');
-  late final _CBtcNowLoadBlock_dFree = _CBtcNowLoadBlock_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>>)>();
+  late final _CBtcNowLoadBlock_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>>)>>('CBtcNowLoadBlock_dFree');
+  late final _CBtcNowLoadBlock_dFree =
+      _CBtcNowLoadBlock_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>>)>();
 
   ffi.Pointer<ffi.Pointer<CBtcBalance>> CBtcBalance_dAlloc() {
     return _CBtcBalance_dAlloc();
   }
 
-  late final _CBtcBalance_dAllocPtr = _lookup<
-          ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CBtcBalance>> Function()>>(
-      'CBtcBalance_dAlloc');
-  late final _CBtcBalance_dAlloc = _CBtcBalance_dAllocPtr.asFunction<
-      ffi.Pointer<ffi.Pointer<CBtcBalance>> Function()>();
+  late final _CBtcBalance_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CBtcBalance>> Function()>>('CBtcBalance_dAlloc');
+  late final _CBtcBalance_dAlloc = _CBtcBalance_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CBtcBalance>> Function()>();
 
   void CBtcBalance_dFree(
     ffi.Pointer<ffi.Pointer<CBtcBalance>> dPtr,
@@ -721,23 +585,18 @@ class CWallets {
     );
   }
 
-  late final _CBtcBalance_dFreePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Pointer<CBtcBalance>>)>>('CBtcBalance_dFree');
-  late final _CBtcBalance_dFree = _CBtcBalance_dFreePtr.asFunction<
-      void Function(ffi.Pointer<ffi.Pointer<CBtcBalance>>)>();
+  late final _CBtcBalance_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CBtcBalance>>)>>('CBtcBalance_dFree');
+  late final _CBtcBalance_dFree = _CBtcBalance_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CBtcBalance>>)>();
 
   ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> CEthWalletConnectTx_dAlloc() {
     return _CEthWalletConnectTx_dAlloc();
   }
 
-  late final _CEthWalletConnectTx_dAllocPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>>
-              Function()>>('CEthWalletConnectTx_dAlloc');
-  late final _CEthWalletConnectTx_dAlloc = _CEthWalletConnectTx_dAllocPtr
-      .asFunction<ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> Function()>();
+  late final _CEthWalletConnectTx_dAllocPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> Function()>>('CEthWalletConnectTx_dAlloc');
+  late final _CEthWalletConnectTx_dAlloc =
+      _CEthWalletConnectTx_dAllocPtr.asFunction<ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> Function()>();
 
   void CEthWalletConnectTx_dFree(
     ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>> dPtr,
@@ -747,14 +606,11 @@ class CWallets {
     );
   }
 
-  late final _CEthWalletConnectTx_dFreePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Void Function(
-                  ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>>)>>(
-      'CEthWalletConnectTx_dFree');
+  late final _CEthWalletConnectTx_dFreePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>>)>>(
+          'CEthWalletConnectTx_dFree');
   late final _CEthWalletConnectTx_dFree =
-      _CEthWalletConnectTx_dFreePtr.asFunction<
-          void Function(ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>>)>();
+      _CEthWalletConnectTx_dFreePtr.asFunction<void Function(ffi.Pointer<ffi.Pointer<CEthWalletConnectTx>>)>();
 
   /// 生成数据库文件名，只有数据库文件名不存在（为null或“”）时才创建文件名
   /// 如果成功返回 [wallets_types::Error::SUCCESS()]
@@ -768,13 +624,11 @@ class CWallets {
     );
   }
 
-  late final _Wallets_dbNamePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CDbName>,
-              ffi.Pointer<ffi.Pointer<CDbName>>)>>('Wallets_dbName');
+  late final _Wallets_dbNamePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CDbName>, ffi.Pointer<ffi.Pointer<CDbName>>)>>(
+          'Wallets_dbName');
   late final _Wallets_dbName = _Wallets_dbNamePtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CDbName>, ffi.Pointer<ffi.Pointer<CDbName>>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CDbName>, ffi.Pointer<ffi.Pointer<CDbName>>)>();
 
   /// 如果成功返回 [wallets_types::Error::SUCCESS()]
   ffi.Pointer<CError> Wallets_init(
@@ -789,11 +643,9 @@ class CWallets {
 
   late final _Wallets_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CInitParameters>,
-              ffi.Pointer<ffi.Pointer<CContext>>)>>('Wallets_init');
+          ffi.Pointer<CError> Function(ffi.Pointer<CInitParameters>, ffi.Pointer<ffi.Pointer<CContext>>)>>('Wallets_init');
   late final _Wallets_init = _Wallets_initPtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CInitParameters>, ffi.Pointer<ffi.Pointer<CContext>>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CInitParameters>, ffi.Pointer<ffi.Pointer<CContext>>)>();
 
   /// 如果成功返回 [wallets_types::Error::SUCCESS()]
   ffi.Pointer<CError> Wallets_uninit(
@@ -804,12 +656,9 @@ class CWallets {
     );
   }
 
-  late final _Wallets_uninitPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>)>>('Wallets_uninit');
-  late final _Wallets_uninit = _Wallets_uninitPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
+  late final _Wallets_uninitPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>>('Wallets_uninit');
+  late final _Wallets_uninit = _Wallets_uninitPtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
 
   /// 返回所有的Context, 有可能是0个
   /// 如果成功返回 [wallets_types::Error::SUCCESS()]
@@ -821,12 +670,11 @@ class CWallets {
     );
   }
 
-  late final _Wallets_ContextsPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<ffi.Pointer<CArrayCContext>>)>>('Wallets_Contexts');
-  late final _Wallets_Contexts = _Wallets_ContextsPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<ffi.Pointer<CArrayCContext>>)>();
+  late final _Wallets_ContextsPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<ffi.Pointer<CArrayCContext>>)>>(
+          'Wallets_Contexts');
+  late final _Wallets_Contexts =
+      _Wallets_ContextsPtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<ffi.Pointer<CArrayCContext>>)>();
 
   /// 返回最后的Context, 有可能是空值
   /// 如果成功返回 [wallets_types::Error::SUCCESS()]
@@ -838,12 +686,10 @@ class CWallets {
     );
   }
 
-  late final _Wallets_lastContextPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<ffi.Pointer<CContext>>)>>('Wallets_lastContext');
-  late final _Wallets_lastContext = _Wallets_lastContextPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<ffi.Pointer<CContext>>)>();
+  late final _Wallets_lastContextPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<ffi.Pointer<CContext>>)>>('Wallets_lastContext');
+  late final _Wallets_lastContext =
+      _Wallets_lastContextPtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<ffi.Pointer<CContext>>)>();
 
   /// 返回第一个Context, 有可能是空值
   /// 如果成功返回 [wallets_types::Error::SUCCESS()]
@@ -855,12 +701,10 @@ class CWallets {
     );
   }
 
-  late final _Wallets_firstContextPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<ffi.Pointer<CContext>>)>>('Wallets_firstContext');
-  late final _Wallets_firstContext = _Wallets_firstContextPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<ffi.Pointer<CContext>>)>();
+  late final _Wallets_firstContextPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<ffi.Pointer<CContext>>)>>('Wallets_firstContext');
+  late final _Wallets_firstContext =
+      _Wallets_firstContextPtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<ffi.Pointer<CContext>>)>();
 
   ffi.Pointer<CError> Wallets_lockRead(
     ffi.Pointer<CContext> ctx,
@@ -870,12 +714,9 @@ class CWallets {
     );
   }
 
-  late final _Wallets_lockReadPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>)>>('Wallets_lockRead');
-  late final _Wallets_lockRead = _Wallets_lockReadPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
+  late final _Wallets_lockReadPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>>('Wallets_lockRead');
+  late final _Wallets_lockRead = _Wallets_lockReadPtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
 
   ffi.Pointer<CError> Wallets_unlockRead(
     ffi.Pointer<CContext> ctx,
@@ -885,12 +726,9 @@ class CWallets {
     );
   }
 
-  late final _Wallets_unlockReadPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>)>>('Wallets_unlockRead');
-  late final _Wallets_unlockRead = _Wallets_unlockReadPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
+  late final _Wallets_unlockReadPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>>('Wallets_unlockRead');
+  late final _Wallets_unlockRead = _Wallets_unlockReadPtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
 
   ffi.Pointer<CError> Wallets_lockWrite(
     ffi.Pointer<CContext> ctx,
@@ -900,12 +738,9 @@ class CWallets {
     );
   }
 
-  late final _Wallets_lockWritePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>)>>('Wallets_lockWrite');
-  late final _Wallets_lockWrite = _Wallets_lockWritePtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
+  late final _Wallets_lockWritePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>>('Wallets_lockWrite');
+  late final _Wallets_lockWrite = _Wallets_lockWritePtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
 
   ffi.Pointer<CError> Wallets_unlockWrite(
     ffi.Pointer<CContext> ctx,
@@ -915,12 +750,10 @@ class CWallets {
     );
   }
 
-  late final _Wallets_unlockWritePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>)>>('Wallets_unlockWrite');
-  late final _Wallets_unlockWrite = _Wallets_unlockWritePtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
+  late final _Wallets_unlockWritePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>>('Wallets_unlockWrite');
+  late final _Wallets_unlockWrite =
+      _Wallets_unlockWritePtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>)>();
 
   ffi.Pointer<CError> Wallets_changeNetType(
     ffi.Pointer<CContext> ctx,
@@ -932,13 +765,11 @@ class CWallets {
     );
   }
 
-  late final _Wallets_changeNetTypePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>)>>('Wallets_changeNetType');
-  late final _Wallets_changeNetType = _Wallets_changeNetTypePtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>)>();
+  late final _Wallets_changeNetTypePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>)>>(
+          'Wallets_changeNetType');
+  late final _Wallets_changeNetType =
+      _Wallets_changeNetTypePtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>)>();
 
   ffi.Pointer<CError> Wallets_getCurrentNetType(
     ffi.Pointer<CContext> ctx,
@@ -950,15 +781,11 @@ class CWallets {
     );
   }
 
-  late final _Wallets_getCurrentNetTypePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
-      'Wallets_getCurrentNetType');
-  late final _Wallets_getCurrentNetType =
-      _Wallets_getCurrentNetTypePtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+  late final _Wallets_getCurrentNetTypePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
+          'Wallets_getCurrentNetType');
+  late final _Wallets_getCurrentNetType = _Wallets_getCurrentNetTypePtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> Wallets_all(
     ffi.Pointer<CContext> ctx,
@@ -971,12 +798,10 @@ class CWallets {
   }
 
   late final _Wallets_allPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>>('Wallets_all');
+          ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>>(
+      'Wallets_all');
   late final _Wallets_all = _Wallets_allPtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>();
 
   ffi.Pointer<CError> Wallets_generateMnemonic(
     int mnemonic_num,
@@ -988,14 +813,11 @@ class CWallets {
     );
   }
 
-  late final _Wallets_generateMnemonicPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.UnsignedInt,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('Wallets_generateMnemonic');
+  late final _Wallets_generateMnemonicPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.UnsignedInt, ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
+          'Wallets_generateMnemonic');
   late final _Wallets_generateMnemonic =
-      _Wallets_generateMnemonicPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              int, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+      _Wallets_generateMnemonicPtr.asFunction<ffi.Pointer<CError> Function(int, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> Wallets_createWallet(
     ffi.Pointer<CContext> ctx,
@@ -1011,15 +833,11 @@ class CWallets {
 
   late final _Wallets_createWalletPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CCreateWalletParameters>,
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CCreateWalletParameters>,
               ffi.Pointer<ffi.Pointer<CWallet>>)>>('Wallets_createWallet');
   late final _Wallets_createWallet = _Wallets_createWalletPtr.asFunction<
       ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>,
-          ffi.Pointer<CCreateWalletParameters>,
-          ffi.Pointer<ffi.Pointer<CWallet>>)>();
+          ffi.Pointer<CContext>, ffi.Pointer<CCreateWalletParameters>, ffi.Pointer<ffi.Pointer<CWallet>>)>();
 
   ffi.Pointer<CError> Wallets_removeWallet(
     ffi.Pointer<CContext> ctx,
@@ -1036,12 +854,9 @@ class CWallets {
   late final _Wallets_removeWalletPtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>)>>('Wallets_removeWallet');
+              ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>>('Wallets_removeWallet');
   late final _Wallets_removeWallet = _Wallets_removeWalletPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
-          ffi.Pointer<ffi.Char>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   ffi.Pointer<CError> Wallets_exportWallet(
     ffi.Pointer<CContext> ctx,
@@ -1059,14 +874,11 @@ class CWallets {
 
   late final _Wallets_exportWalletPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('Wallets_exportWallet');
   late final _Wallets_exportWallet = _Wallets_exportWalletPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
-          ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+      ffi.Pointer<CError> Function(
+          ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> Wallets_resetWalletPassword(
     ffi.Pointer<CContext> ctx,
@@ -1084,18 +896,11 @@ class CWallets {
 
   late final _Wallets_resetWalletPasswordPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Char>)>>('Wallets_resetWalletPassword');
-  late final _Wallets_resetWalletPassword =
-      _Wallets_resetWalletPasswordPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>)>();
+  late final _Wallets_resetWalletPassword = _Wallets_resetWalletPasswordPtr.asFunction<
+      ffi.Pointer<CError> Function(
+          ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   ffi.Pointer<CError> Wallets_renameWallet(
     ffi.Pointer<CContext> ctx,
@@ -1112,12 +917,9 @@ class CWallets {
   late final _Wallets_renameWalletPtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>)>>('Wallets_renameWallet');
+              ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>>('Wallets_renameWallet');
   late final _Wallets_renameWallet = _Wallets_renameWalletPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
-          ffi.Pointer<ffi.Char>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   /// 只有到CError为 Error::SUCCESS()时返值才有意义
   /// 返回值 hasAny: true表示至少有一个; Fail: false，没有
@@ -1131,13 +933,11 @@ class CWallets {
     );
   }
 
-  late final _Wallets_hasAnyPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<CBool>)>>('Wallets_hasAny');
-  late final _Wallets_hasAny = _Wallets_hasAnyPtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>, ffi.Pointer<CBool>)>();
+  late final _Wallets_hasAnyPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CBool>)>>(
+          'Wallets_hasAny');
+  late final _Wallets_hasAny =
+      _Wallets_hasAnyPtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CBool>)>();
 
   ffi.Pointer<CError> Wallets_findById(
     ffi.Pointer<CContext> ctx,
@@ -1154,12 +954,9 @@ class CWallets {
   late final _Wallets_findByIdPtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<CWallet>>)>>('Wallets_findById');
+              ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<CWallet>>)>>('Wallets_findById');
   late final _Wallets_findById = _Wallets_findByIdPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
-          ffi.Pointer<ffi.Pointer<CWallet>>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<CWallet>>)>();
 
   /// 注：只加载了wallet的id name等直接的基本数据，子对象（如链）的数据没有加载
   ffi.Pointer<CError> Wallets_findWalletBaseByName(
@@ -1175,18 +972,12 @@ class CWallets {
   }
 
   late final _Wallets_findWalletBaseByNamePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>>(
-      'Wallets_findWalletBaseByName');
-  late final _Wallets_findWalletBaseByName =
-      _Wallets_findWalletBaseByNamePtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>>('Wallets_findWalletBaseByName');
+  late final _Wallets_findWalletBaseByName = _Wallets_findWalletBaseByNamePtr.asFunction<
+      ffi.Pointer<CError> Function(
+          ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<CArrayCWallet>>)>();
 
   /// 查询当前wallet 与 chain
   ffi.Pointer<CError> Wallets_currentWalletChain(
@@ -1202,18 +993,12 @@ class CWallets {
   }
 
   late final _Wallets_currentWalletChainPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Pointer<ffi.Char>>,
-                  ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
-      'Wallets_currentWalletChain');
-  late final _Wallets_currentWalletChain =
-      _Wallets_currentWalletChainPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<ffi.Char>>,
+              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('Wallets_currentWalletChain');
+  late final _Wallets_currentWalletChain = _Wallets_currentWalletChainPtr.asFunction<
+      ffi.Pointer<CError> Function(
+          ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<ffi.Char>>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   /// 保存当前wallet 与 chain
   ffi.Pointer<CError> Wallets_saveCurrentWalletChain(
@@ -1231,13 +1016,9 @@ class CWallets {
   late final _Wallets_saveCurrentWalletChainPtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>)>>('Wallets_saveCurrentWalletChain');
-  late final _Wallets_saveCurrentWalletChain =
-      _Wallets_saveCurrentWalletChainPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
+              ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>>('Wallets_saveCurrentWalletChain');
+  late final _Wallets_saveCurrentWalletChain = _Wallets_saveCurrentWalletChainPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 
   /// 返回 AppPlatformType
   ffi.Pointer<ffi.Char> Wallets_appPlatformType() {
@@ -1245,10 +1026,8 @@ class CWallets {
   }
 
   late final _Wallets_appPlatformTypePtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>(
-          'Wallets_appPlatformType');
-  late final _Wallets_appPlatformType = _Wallets_appPlatformTypePtr.asFunction<
-      ffi.Pointer<ffi.Char> Function()>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('Wallets_appPlatformType');
+  late final _Wallets_appPlatformType = _Wallets_appPlatformTypePtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
   /// 返回 package version
   ffi.Pointer<ffi.Char> Wallets_packageVersion() {
@@ -1256,10 +1035,8 @@ class CWallets {
   }
 
   late final _Wallets_packageVersionPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>(
-          'Wallets_packageVersion');
-  late final _Wallets_packageVersion =
-      _Wallets_packageVersionPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('Wallets_packageVersion');
+  late final _Wallets_packageVersion = _Wallets_packageVersionPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
   ffi.Pointer<CError> Wallets_queryBalance(
     ffi.Pointer<CContext> ctx,
@@ -1274,15 +1051,12 @@ class CWallets {
   }
 
   late final _Wallets_queryBalancePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>>)>>(
-      'Wallets_queryBalance');
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>>)>>('Wallets_queryBalance');
   late final _Wallets_queryBalance = _Wallets_queryBalancePtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
-          ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>>)>();
+      ffi.Pointer<CError> Function(
+          ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<CArrayCTokenAddress>>)>();
 
   ffi.Pointer<CError> Wallets_updateBalance(
     ffi.Pointer<CContext> ctx,
@@ -1294,13 +1068,11 @@ class CWallets {
     );
   }
 
-  late final _Wallets_updateBalancePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<CTokenAddress>)>>('Wallets_updateBalance');
+  late final _Wallets_updateBalancePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CTokenAddress>)>>(
+          'Wallets_updateBalance');
   late final _Wallets_updateBalance = _Wallets_updateBalancePtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>, ffi.Pointer<CTokenAddress>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CTokenAddress>)>();
 
   ffi.Pointer<CError> Wallets_changeTokenShowState(
     ffi.Pointer<CContext> ctx,
@@ -1312,15 +1084,11 @@ class CWallets {
     );
   }
 
-  late final _Wallets_changeTokenShowStatePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>, ffi.Pointer<CWalletTokenStatus>)>>(
-      'Wallets_changeTokenShowState');
-  late final _Wallets_changeTokenShowState =
-      _Wallets_changeTokenShowStatePtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<CWalletTokenStatus>)>();
+  late final _Wallets_changeTokenShowStatePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CWalletTokenStatus>)>>(
+          'Wallets_changeTokenShowState');
+  late final _Wallets_changeTokenShowState = _Wallets_changeTokenShowStatePtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CWalletTokenStatus>)>();
 
   ffi.Pointer<CError> ChainBtc_updateDefaultTokenList(
     ffi.Pointer<CContext> ctx,
@@ -1333,14 +1101,11 @@ class CWallets {
   }
 
   late final _ChainBtc_updateDefaultTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<CArrayCBtcChainTokenDefault>)>>(
-      'ChainBtc_updateDefaultTokenList');
-  late final _ChainBtc_updateDefaultTokenList =
-      _ChainBtc_updateDefaultTokenListPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<CArrayCBtcChainTokenDefault>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(
+              ffi.Pointer<CContext>, ffi.Pointer<CArrayCBtcChainTokenDefault>)>>('ChainBtc_updateDefaultTokenList');
+  late final _ChainBtc_updateDefaultTokenList = _ChainBtc_updateDefaultTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCBtcChainTokenDefault>)>();
 
   ffi.Pointer<CError> ChainBtc_updateAuthDigitList(
     ffi.Pointer<CContext> ctx,
@@ -1353,14 +1118,10 @@ class CWallets {
   }
 
   late final _ChainBtc_updateAuthDigitListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<CArrayCBtcChainTokenAuth>)>>(
+          ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCBtcChainTokenAuth>)>>(
       'ChainBtc_updateAuthDigitList');
-  late final _ChainBtc_updateAuthDigitList =
-      _ChainBtc_updateAuthDigitListPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<CArrayCBtcChainTokenAuth>)>();
+  late final _ChainBtc_updateAuthDigitList = _ChainBtc_updateAuthDigitListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCBtcChainTokenAuth>)>();
 
   ffi.Pointer<CError> ChainBtc_getAuthTokenList(
     ffi.Pointer<CContext> ctx,
@@ -1377,17 +1138,11 @@ class CWallets {
   }
 
   late final _ChainBtc_getAuthTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.UnsignedInt,
-                  ffi.UnsignedInt,
-                  ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>)>>(
-      'ChainBtc_getAuthTokenList');
-  late final _ChainBtc_getAuthTokenList =
-      _ChainBtc_getAuthTokenListPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, int, int,
-              ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.UnsignedInt, ffi.UnsignedInt,
+              ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>)>>('ChainBtc_getAuthTokenList');
+  late final _ChainBtc_getAuthTokenList = _ChainBtc_getAuthTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, int, int, ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenAuth>>)>();
 
   ffi.Pointer<CError> ChainBtc_getDefaultTokenList(
     ffi.Pointer<CContext> ctx,
@@ -1400,14 +1155,11 @@ class CWallets {
   }
 
   late final _ChainBtc_getDefaultTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>)>>(
-      'ChainBtc_getDefaultTokenList');
-  late final _ChainBtc_getDefaultTokenList =
-      _ChainBtc_getDefaultTokenListPtr.asFunction<
+      ffi.NativeFunction<
           ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>)>();
+              ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>)>>('ChainBtc_getDefaultTokenList');
+  late final _ChainBtc_getDefaultTokenList = _ChainBtc_getDefaultTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CArrayCBtcChainTokenDefault>>)>();
 
   ffi.Pointer<CError> ChainBtc_start(
     ffi.Pointer<CContext> ctx,
@@ -1419,13 +1171,11 @@ class CWallets {
     );
   }
 
-  late final _ChainBtc_startPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>)>>('ChainBtc_start');
-  late final _ChainBtc_start = _ChainBtc_startPtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>)>();
+  late final _ChainBtc_startPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>)>>(
+          'ChainBtc_start');
+  late final _ChainBtc_start =
+      _ChainBtc_startPtr.asFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>)>();
 
   ffi.Pointer<CError> ChainBtc_loadNowBlockNumber(
     ffi.Pointer<CContext> ctx,
@@ -1438,14 +1188,11 @@ class CWallets {
   }
 
   late final _ChainBtc_loadNowBlockNumberPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>>)>>(
-      'ChainBtc_loadNowBlockNumber');
-  late final _ChainBtc_loadNowBlockNumber =
-      _ChainBtc_loadNowBlockNumberPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(
+              ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>>)>>('ChainBtc_loadNowBlockNumber');
+  late final _ChainBtc_loadNowBlockNumber = _ChainBtc_loadNowBlockNumberPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CBtcNowLoadBlock>>)>();
 
   ffi.Pointer<CError> ChainBtc_loadBalance(
     ffi.Pointer<CContext> ctx,
@@ -1458,12 +1205,10 @@ class CWallets {
   }
 
   late final _ChainBtc_loadBalancePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Pointer<CBtcBalance>>)>>('ChainBtc_loadBalance');
+          ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CBtcBalance>>)>>(
+      'ChainBtc_loadBalance');
   late final _ChainBtc_loadBalance = _ChainBtc_loadBalancePtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CBtcBalance>>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CBtcBalance>>)>();
 
   ffi.Pointer<CError> ChainBtc_txSign(
     ffi.Pointer<CContext> ctx,
@@ -1480,12 +1225,9 @@ class CWallets {
   late final _ChainBtc_txSignPtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CBtcTxParam>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainBtc_txSign');
+              ffi.Pointer<CContext>, ffi.Pointer<CBtcTxParam>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainBtc_txSign');
   late final _ChainBtc_txSign = _ChainBtc_txSignPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-          ffi.Pointer<CBtcTxParam>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CBtcTxParam>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEee_updateSyncRecord(
     ffi.Pointer<CContext> ctx,
@@ -1497,14 +1239,11 @@ class CWallets {
     );
   }
 
-  late final _ChainEee_updateSyncRecordPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<CAccountInfoSyncProg>)>>('ChainEee_updateSyncRecord');
-  late final _ChainEee_updateSyncRecord =
-      _ChainEee_updateSyncRecordPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<CAccountInfoSyncProg>)>();
+  late final _ChainEee_updateSyncRecordPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CAccountInfoSyncProg>)>>(
+          'ChainEee_updateSyncRecord');
+  late final _ChainEee_updateSyncRecord = _ChainEee_updateSyncRecordPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CAccountInfoSyncProg>)>();
 
   ffi.Pointer<CError> ChainEee_getSyncRecord(
     ffi.Pointer<CContext> ctx,
@@ -1519,15 +1258,12 @@ class CWallets {
   }
 
   late final _ChainEee_getSyncRecordPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>>)>>(
-      'ChainEee_getSyncRecord');
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>>)>>('ChainEee_getSyncRecord');
   late final _ChainEee_getSyncRecord = _ChainEee_getSyncRecordPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
-          ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>>)>();
+      ffi.Pointer<CError> Function(
+          ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<CAccountInfoSyncProg>>)>();
 
   ffi.Pointer<CError> ChainEee_decodeAccountInfo(
     ffi.Pointer<CContext> ctx,
@@ -1542,18 +1278,12 @@ class CWallets {
   }
 
   late final _ChainEee_decodeAccountInfoPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<CDecodeAccountInfoParameters>,
-                  ffi.Pointer<ffi.Pointer<CAccountInfo>>)>>(
-      'ChainEee_decodeAccountInfo');
-  late final _ChainEee_decodeAccountInfo =
-      _ChainEee_decodeAccountInfoPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CDecodeAccountInfoParameters>,
-              ffi.Pointer<ffi.Pointer<CAccountInfo>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CDecodeAccountInfoParameters>,
+              ffi.Pointer<ffi.Pointer<CAccountInfo>>)>>('ChainEee_decodeAccountInfo');
+  late final _ChainEee_decodeAccountInfo = _ChainEee_decodeAccountInfoPtr.asFunction<
+      ffi.Pointer<CError> Function(
+          ffi.Pointer<CContext>, ffi.Pointer<CDecodeAccountInfoParameters>, ffi.Pointer<ffi.Pointer<CAccountInfo>>)>();
 
   ffi.Pointer<CError> ChainEee_getStorageKey(
     ffi.Pointer<CContext> ctx,
@@ -1569,15 +1299,11 @@ class CWallets {
 
   late final _ChainEee_getStorageKeyPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CStorageKeyParameters>,
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CStorageKeyParameters>,
               ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEee_getStorageKey');
   late final _ChainEee_getStorageKey = _ChainEee_getStorageKeyPtr.asFunction<
       ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>,
-          ffi.Pointer<CStorageKeyParameters>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<CContext>, ffi.Pointer<CStorageKeyParameters>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEee_eeeTransfer(
     ffi.Pointer<CContext> ctx,
@@ -1593,15 +1319,11 @@ class CWallets {
 
   late final _ChainEee_eeeTransferPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CEeeTransferPayload>,
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CEeeTransferPayload>,
               ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEee_eeeTransfer');
   late final _ChainEee_eeeTransfer = _ChainEee_eeeTransferPtr.asFunction<
       ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>,
-          ffi.Pointer<CEeeTransferPayload>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<CContext>, ffi.Pointer<CEeeTransferPayload>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEee_tokenXTransfer(
     ffi.Pointer<CContext> ctx,
@@ -1617,15 +1339,11 @@ class CWallets {
 
   late final _ChainEee_tokenXTransferPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CEeeTransferPayload>,
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CEeeTransferPayload>,
               ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEee_tokenXTransfer');
   late final _ChainEee_tokenXTransfer = _ChainEee_tokenXTransferPtr.asFunction<
       ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>,
-          ffi.Pointer<CEeeTransferPayload>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<CContext>, ffi.Pointer<CEeeTransferPayload>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEee_txSubmittableSign(
     ffi.Pointer<CContext> ctx,
@@ -1640,16 +1358,11 @@ class CWallets {
   }
 
   late final _ChainEee_txSubmittableSignPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<CRawTxParam>,
-                  ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
-      'ChainEee_txSubmittableSign');
-  late final _ChainEee_txSubmittableSign =
-      _ChainEee_txSubmittableSignPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<CRawTxParam>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CRawTxParam>,
+              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEee_txSubmittableSign');
+  late final _ChainEee_txSubmittableSign = _ChainEee_txSubmittableSignPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CRawTxParam>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEee_txSign(
     ffi.Pointer<CContext> ctx,
@@ -1666,12 +1379,9 @@ class CWallets {
   late final _ChainEee_txSignPtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CRawTxParam>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEee_txSign');
+              ffi.Pointer<CContext>, ffi.Pointer<CRawTxParam>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEee_txSign');
   late final _ChainEee_txSign = _ChainEee_txSignPtr.asFunction<
-      ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-          ffi.Pointer<CRawTxParam>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CRawTxParam>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEee_updateBasicInfo(
     ffi.Pointer<CContext> ctx,
@@ -1683,14 +1393,11 @@ class CWallets {
     );
   }
 
-  late final _ChainEee_updateBasicInfoPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<CSubChainBasicInfo>)>>('ChainEee_updateBasicInfo');
-  late final _ChainEee_updateBasicInfo =
-      _ChainEee_updateBasicInfoPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<CSubChainBasicInfo>)>();
+  late final _ChainEee_updateBasicInfoPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CSubChainBasicInfo>)>>(
+          'ChainEee_updateBasicInfo');
+  late final _ChainEee_updateBasicInfo = _ChainEee_updateBasicInfoPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CSubChainBasicInfo>)>();
 
   ffi.Pointer<CError> ChainEee_getDefaultBasicInfo(
     ffi.Pointer<CContext> ctx,
@@ -1703,14 +1410,11 @@ class CWallets {
   }
 
   late final _ChainEee_getDefaultBasicInfoPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>>(
-      'ChainEee_getDefaultBasicInfo');
-  late final _ChainEee_getDefaultBasicInfo =
-      _ChainEee_getDefaultBasicInfoPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(
+              ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>>('ChainEee_getDefaultBasicInfo');
+  late final _ChainEee_getDefaultBasicInfo = _ChainEee_getDefaultBasicInfoPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>();
 
   ffi.Pointer<CError> ChainEee_getBasicInfo(
     ffi.Pointer<CContext> ctx,
@@ -1725,17 +1429,12 @@ class CWallets {
   }
 
   late final _ChainEee_getBasicInfoPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<CChainVersion>,
-                  ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>>(
-      'ChainEee_getBasicInfo');
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CChainVersion>,
+              ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>>('ChainEee_getBasicInfo');
   late final _ChainEee_getBasicInfo = _ChainEee_getBasicInfoPtr.asFunction<
       ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>,
-          ffi.Pointer<CChainVersion>,
-          ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>();
+          ffi.Pointer<CContext>, ffi.Pointer<CChainVersion>, ffi.Pointer<ffi.Pointer<CSubChainBasicInfo>>)>();
 
   ffi.Pointer<CError> ChainEee_saveExtrinsicDetail(
     ffi.Pointer<CContext> ctx,
@@ -1747,14 +1446,11 @@ class CWallets {
     );
   }
 
-  late final _ChainEee_saveExtrinsicDetailPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<CExtrinsicContext>)>>('ChainEee_saveExtrinsicDetail');
-  late final _ChainEee_saveExtrinsicDetail =
-      _ChainEee_saveExtrinsicDetailPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<CExtrinsicContext>)>();
+  late final _ChainEee_saveExtrinsicDetailPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CExtrinsicContext>)>>(
+          'ChainEee_saveExtrinsicDetail');
+  late final _ChainEee_saveExtrinsicDetail = _ChainEee_saveExtrinsicDetailPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CExtrinsicContext>)>();
 
   ffi.Pointer<CError> ChainEee_queryChainTxRecord(
     ffi.Pointer<CContext> ctx,
@@ -1773,22 +1469,12 @@ class CWallets {
   }
 
   late final _ChainEee_queryChainTxRecordPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.UnsignedInt,
-                  ffi.UnsignedInt,
-                  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>>(
-      'ChainEee_queryChainTxRecord');
-  late final _ChainEee_queryChainTxRecord =
-      _ChainEee_queryChainTxRecordPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              int,
-              int,
-              ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.UnsignedInt, ffi.UnsignedInt,
+              ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>>('ChainEee_queryChainTxRecord');
+  late final _ChainEee_queryChainTxRecord = _ChainEee_queryChainTxRecordPtr.asFunction<
+      ffi.Pointer<CError> Function(
+          ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, int, int, ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>();
 
   ffi.Pointer<CError> ChainEee_queryTokenxTxRecord(
     ffi.Pointer<CContext> ctx,
@@ -1807,22 +1493,12 @@ class CWallets {
   }
 
   late final _ChainEee_queryTokenxTxRecordPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.UnsignedInt,
-                  ffi.UnsignedInt,
-                  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>>(
-      'ChainEee_queryTokenxTxRecord');
-  late final _ChainEee_queryTokenxTxRecord =
-      _ChainEee_queryTokenxTxRecordPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              int,
-              int,
-              ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.UnsignedInt, ffi.UnsignedInt,
+              ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>>('ChainEee_queryTokenxTxRecord');
+  late final _ChainEee_queryTokenxTxRecord = _ChainEee_queryTokenxTxRecordPtr.asFunction<
+      ffi.Pointer<CError> Function(
+          ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, int, int, ffi.Pointer<ffi.Pointer<CArrayCEeeChainTx>>)>();
 
   ffi.Pointer<CError> ChainEee_updateAuthDigitList(
     ffi.Pointer<CContext> ctx,
@@ -1835,14 +1511,10 @@ class CWallets {
   }
 
   late final _ChainEee_updateAuthDigitListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<CArrayCEeeChainTokenAuth>)>>(
+          ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCEeeChainTokenAuth>)>>(
       'ChainEee_updateAuthDigitList');
-  late final _ChainEee_updateAuthDigitList =
-      _ChainEee_updateAuthDigitListPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<CArrayCEeeChainTokenAuth>)>();
+  late final _ChainEee_updateAuthDigitList = _ChainEee_updateAuthDigitListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCEeeChainTokenAuth>)>();
 
   ffi.Pointer<CError> ChainEee_updateDefaultTokenList(
     ffi.Pointer<CContext> ctx,
@@ -1855,14 +1527,11 @@ class CWallets {
   }
 
   late final _ChainEee_updateDefaultTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<CArrayCEeeChainTokenDefault>)>>(
-      'ChainEee_updateDefaultTokenList');
-  late final _ChainEee_updateDefaultTokenList =
-      _ChainEee_updateDefaultTokenListPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<CArrayCEeeChainTokenDefault>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(
+              ffi.Pointer<CContext>, ffi.Pointer<CArrayCEeeChainTokenDefault>)>>('ChainEee_updateDefaultTokenList');
+  late final _ChainEee_updateDefaultTokenList = _ChainEee_updateDefaultTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCEeeChainTokenDefault>)>();
 
   ffi.Pointer<CError> ChainEee_getAuthTokenList(
     ffi.Pointer<CContext> ctx,
@@ -1879,17 +1548,11 @@ class CWallets {
   }
 
   late final _ChainEee_getAuthTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.UnsignedInt,
-                  ffi.UnsignedInt,
-                  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>)>>(
-      'ChainEee_getAuthTokenList');
-  late final _ChainEee_getAuthTokenList =
-      _ChainEee_getAuthTokenListPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, int, int,
-              ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.UnsignedInt, ffi.UnsignedInt,
+              ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>)>>('ChainEee_getAuthTokenList');
+  late final _ChainEee_getAuthTokenList = _ChainEee_getAuthTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, int, int, ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenAuth>>)>();
 
   ffi.Pointer<CError> ChainEee_getDefaultTokenList(
     ffi.Pointer<CContext> ctx,
@@ -1902,14 +1565,11 @@ class CWallets {
   }
 
   late final _ChainEee_getDefaultTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>)>>(
-      'ChainEee_getDefaultTokenList');
-  late final _ChainEee_getDefaultTokenList =
-      _ChainEee_getDefaultTokenListPtr.asFunction<
+      ffi.NativeFunction<
           ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>)>();
+              ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>)>>('ChainEee_getDefaultTokenList');
+  late final _ChainEee_getDefaultTokenList = _ChainEee_getDefaultTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CArrayCEeeChainTokenDefault>>)>();
 
   ffi.Pointer<CError> ChainEth_decodeAdditionData(
     ffi.Pointer<CContext> ctx,
@@ -1924,14 +1584,11 @@ class CWallets {
   }
 
   late final _ChainEth_decodeAdditionDataPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
-      'ChainEth_decodeAdditionData');
-  late final _ChainEth_decodeAdditionData =
-      _ChainEth_decodeAdditionDataPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEth_decodeAdditionData');
+  late final _ChainEth_decodeAdditionData = _ChainEth_decodeAdditionDataPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEth_txSign(
     ffi.Pointer<CContext> ctx,
@@ -1949,16 +1606,10 @@ class CWallets {
 
   late final _ChainEth_txSignPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CEthTransferPayload>,
-              ffi.Pointer<ffi.Char>,
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CEthTransferPayload>, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEth_txSign');
   late final _ChainEth_txSign = _ChainEth_txSignPtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>,
-          ffi.Pointer<CEthTransferPayload>,
-          ffi.Pointer<ffi.Char>,
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CEthTransferPayload>, ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEth_rawTxSign(
@@ -1977,16 +1628,10 @@ class CWallets {
 
   late final _ChainEth_rawTxSignPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CEthRawTxPayload>,
-              ffi.Pointer<ffi.Char>,
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CEthRawTxPayload>, ffi.Pointer<ffi.Char>,
               ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEth_rawTxSign');
   late final _ChainEth_rawTxSign = _ChainEth_rawTxSignPtr.asFunction<
-      ffi.Pointer<CError> Function(
-          ffi.Pointer<CContext>,
-          ffi.Pointer<CEthRawTxPayload>,
-          ffi.Pointer<ffi.Char>,
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CEthRawTxPayload>, ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEth_walletConnectTxSign(
@@ -2004,20 +1649,12 @@ class CWallets {
   }
 
   late final _ChainEth_walletConnectTxSignPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<CEthWalletConnectTx>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
-      'ChainEth_walletConnectTxSign');
-  late final _ChainEth_walletConnectTxSign =
-      _ChainEth_walletConnectTxSignPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<CEthWalletConnectTx>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CEthWalletConnectTx>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('ChainEth_walletConnectTxSign');
+  late final _ChainEth_walletConnectTxSign = _ChainEth_walletConnectTxSignPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CEthWalletConnectTx>, ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
   ffi.Pointer<CError> ChainEth_updateAuthTokenList(
     ffi.Pointer<CContext> ctx,
@@ -2030,14 +1667,10 @@ class CWallets {
   }
 
   late final _ChainEth_updateAuthTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<CArrayCEthChainTokenAuth>)>>(
+          ffi.NativeFunction<ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCEthChainTokenAuth>)>>(
       'ChainEth_updateAuthTokenList');
-  late final _ChainEth_updateAuthTokenList =
-      _ChainEth_updateAuthTokenListPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>, ffi.Pointer<CArrayCEthChainTokenAuth>)>();
+  late final _ChainEth_updateAuthTokenList = _ChainEth_updateAuthTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCEthChainTokenAuth>)>();
 
   ffi.Pointer<CError> ChainEth_getAuthTokenList(
     ffi.Pointer<CContext> ctx,
@@ -2054,17 +1687,11 @@ class CWallets {
   }
 
   late final _ChainEth_getAuthTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.UnsignedInt,
-                  ffi.UnsignedInt,
-                  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>>(
-      'ChainEth_getAuthTokenList');
-  late final _ChainEth_getAuthTokenList =
-      _ChainEth_getAuthTokenListPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, int, int,
-              ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.UnsignedInt, ffi.UnsignedInt,
+              ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>>('ChainEth_getAuthTokenList');
+  late final _ChainEth_getAuthTokenList = _ChainEth_getAuthTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, int, int, ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>();
 
   ffi.Pointer<CError> ChainEth_updateDefaultTokenList(
     ffi.Pointer<CContext> ctx,
@@ -2077,14 +1704,11 @@ class CWallets {
   }
 
   late final _ChainEth_updateDefaultTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<CArrayCEthChainTokenDefault>)>>(
-      'ChainEth_updateDefaultTokenList');
-  late final _ChainEth_updateDefaultTokenList =
-      _ChainEth_updateDefaultTokenListPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<CArrayCEthChainTokenDefault>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(
+              ffi.Pointer<CContext>, ffi.Pointer<CArrayCEthChainTokenDefault>)>>('ChainEth_updateDefaultTokenList');
+  late final _ChainEth_updateDefaultTokenList = _ChainEth_updateDefaultTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCEthChainTokenDefault>)>();
 
   ffi.Pointer<CError> ChainEth_getDefaultTokenList(
     ffi.Pointer<CContext> ctx,
@@ -2097,14 +1721,11 @@ class CWallets {
   }
 
   late final _ChainEth_getDefaultTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>)>>(
-      'ChainEth_getDefaultTokenList');
-  late final _ChainEth_getDefaultTokenList =
-      _ChainEth_getDefaultTokenListPtr.asFunction<
+      ffi.NativeFunction<
           ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>)>();
+              ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>)>>('ChainEth_getDefaultTokenList');
+  late final _ChainEth_getDefaultTokenList = _ChainEth_getDefaultTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenDefault>>)>();
 
   ffi.Pointer<CError> ChainEth_updateNonAuthTokenList(
     ffi.Pointer<CContext> ctx,
@@ -2117,14 +1738,11 @@ class CWallets {
   }
 
   late final _ChainEth_updateNonAuthTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<CArrayCEthChainTokenNonAuth>)>>(
-      'ChainEth_updateNonAuthTokenList');
-  late final _ChainEth_updateNonAuthTokenList =
-      _ChainEth_updateNonAuthTokenListPtr.asFunction<
-          ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<CArrayCEthChainTokenNonAuth>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(
+              ffi.Pointer<CContext>, ffi.Pointer<CArrayCEthChainTokenNonAuth>)>>('ChainEth_updateNonAuthTokenList');
+  late final _ChainEth_updateNonAuthTokenList = _ChainEth_updateNonAuthTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<CArrayCEthChainTokenNonAuth>)>();
 
   ffi.Pointer<CError> ChainEth_getNonAuthTokenList(
     ffi.Pointer<CContext> ctx,
@@ -2137,14 +1755,11 @@ class CWallets {
   }
 
   late final _ChainEth_getNonAuthTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>)>>(
-      'ChainEth_getNonAuthTokenList');
-  late final _ChainEth_getNonAuthTokenList =
-      _ChainEth_getNonAuthTokenListPtr.asFunction<
+      ffi.NativeFunction<
           ffi.Pointer<CError> Function(ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>)>();
+              ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>)>>('ChainEth_getNonAuthTokenList');
+  late final _ChainEth_getNonAuthTokenList = _ChainEth_getNonAuthTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenNonAuth>>)>();
 
   ffi.Pointer<CError> ChainEth_queryAuthTokenList(
     ffi.Pointer<CContext> ctx,
@@ -2165,24 +1780,12 @@ class CWallets {
   }
 
   late final _ChainEth_queryAuthTokenListPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.Pointer<CError> Function(
-                  ffi.Pointer<CContext>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.UnsignedInt,
-                  ffi.UnsignedInt,
-                  ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>>(
-      'ChainEth_queryAuthTokenList');
-  late final _ChainEth_queryAuthTokenList =
-      _ChainEth_queryAuthTokenListPtr.asFunction<
-          ffi.Pointer<CError> Function(
-              ffi.Pointer<CContext>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              int,
-              int,
-              ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>();
+      ffi.NativeFunction<
+          ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, ffi.UnsignedInt,
+              ffi.UnsignedInt, ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>>('ChainEth_queryAuthTokenList');
+  late final _ChainEth_queryAuthTokenList = _ChainEth_queryAuthTokenListPtr.asFunction<
+      ffi.Pointer<CError> Function(ffi.Pointer<CContext>, ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, int, int,
+          ffi.Pointer<ffi.Pointer<CArrayCEthChainTokenAuth>>)>();
 }
 
 final class __fsid_t extends ffi.Struct {

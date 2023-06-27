@@ -183,7 +183,7 @@ class ChainEee {
     AccountInfoSyncProg accountInfoSyncProg;
     {
       var ptrAccountInfoSyncProg = Wallets.cWallets.CAccountInfoSyncProg_dAlloc();
-      var ptrAccount = account.toCPtrInt8();
+      var ptrAccount = account.toCPtrChar();
       var cerr = Wallets.cWallets.ChainEee_getSyncRecord(_ptrContext, ptrAccount, ptrAccountInfoSyncProg);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
@@ -204,9 +204,10 @@ class ChainEee {
     List<EeeChainTx> ect = [];
     {
       var ptrAccountInfoSyncProg = Wallets.cWallets.CAccountInfoSyncProg_dAlloc();
-      var ptrAccount = account.toCPtrInt8();
+      var ptrAccount = account.toCPtrChar();
       var ptrCArrayCEeeChainTx = Wallets.cWallets.CArrayCEeeChainTx_dAlloc();
-      var cerr = Wallets.cWallets.ChainEee_queryChainTxRecord(_ptrContext, ptrAccount, startItem, pageSize, ptrCArrayCEeeChainTx);
+      var cerr =
+          Wallets.cWallets.ChainEee_queryChainTxRecord(_ptrContext, ptrAccount, startItem, pageSize, ptrCArrayCEeeChainTx);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       if (err.isSuccess()) {
@@ -224,9 +225,10 @@ class ChainEee {
     List<EeeChainTx> ect = [];
     {
       var ptrAccountInfoSyncProg = Wallets.cWallets.CAccountInfoSyncProg_dAlloc();
-      var ptrAccount = account.toCPtrInt8();
+      var ptrAccount = account.toCPtrChar();
       var ptrCArrayCEeeChainTx = Wallets.cWallets.CArrayCEeeChainTx_dAlloc();
-      var cerr = Wallets.cWallets.ChainEee_queryTokenxTxRecord(_ptrContext, ptrAccount, startItem, pageSize, ptrCArrayCEeeChainTx);
+      var cerr =
+          Wallets.cWallets.ChainEee_queryTokenxTxRecord(_ptrContext, ptrAccount, startItem, pageSize, ptrCArrayCEeeChainTx);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       if (err.isSuccess()) {

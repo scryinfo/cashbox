@@ -15,7 +15,7 @@ class ChainEth {
     String additionData = "";
     {
       var ptrAdditionData = Wallets.cWallets.CStr_dAlloc();
-      var ptrEncodeData = encodeData.toCPtrInt8();
+      var ptrEncodeData = encodeData.toCPtrChar();
       var cerr = Wallets.cWallets.ChainEth_decodeAdditionData(_ptrContext, ptrEncodeData, ptrAdditionData);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
@@ -35,13 +35,13 @@ class ChainEth {
     {
       var ptrSignResult = Wallets.cWallets.CStr_dAlloc();
       var ptrTxPayload = txPayload.toCPtr();
-      var ptrPwd = password.toCPtrInt8();
+      var ptrPwd = password.toCPtrChar();
       var cerr = Wallets.cWallets.ChainEth_txSign(_ptrContext, ptrTxPayload, ptrPwd, ptrSignResult);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
 
       EthTransferPayload.free(ptrTxPayload);
-      NoCacheString.freeInt8(ptrPwd);
+      NoCacheString.freeChar(ptrPwd);
 
       if (err.isSuccess()) {
         signResult = ptrSignResult.value.toDartString();
@@ -61,13 +61,13 @@ class ChainEth {
     {
       var ptrSignResult = Wallets.cWallets.CStr_dAlloc();
       var ptrTxPayload = wcTxPayload.toCPtr();
-      var ptrPwd = password.toCPtrInt8();
+      var ptrPwd = password.toCPtrChar();
       var cerr = Wallets.cWallets.ChainEth_walletConnectTxSign(_ptrContext, ptrTxPayload, ptrPwd, ptrSignResult);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
 
       EthWalletConnectTx.free(ptrTxPayload);
-      NoCacheString.freeInt8(ptrPwd);
+      NoCacheString.freeChar(ptrPwd);
 
       if (err.isSuccess()) {
         signResult = ptrSignResult.value.toDartString();
@@ -84,12 +84,12 @@ class ChainEth {
     {
       var ptrSignResult = Wallets.cWallets.CStr_dAlloc();
       var ptrRawTxPayload = rawTxPayload.toCPtr();
-      var ptrPwd = password.toCPtrInt8();
+      var ptrPwd = password.toCPtrChar();
       var cerr = Wallets.cWallets.ChainEth_rawTxSign(_ptrContext, ptrRawTxPayload, ptrPwd, ptrSignResult);
       err = Error.fromC(cerr);
       Wallets.cWallets.CError_free(cerr);
       EthRawTxPayload.free(ptrRawTxPayload);
-      NoCacheString.freeInt8(ptrPwd);
+      NoCacheString.freeChar(ptrPwd);
 
       if (err.isSuccess()) {
         signResult = ptrSignResult.value.toDartString();

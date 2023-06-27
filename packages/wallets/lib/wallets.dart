@@ -223,7 +223,7 @@ class Wallets {
   Error changeNetType(NetType netType) {
     Error err;
     {
-      var ptrNetType = netType.toEnumString().toCPtrInt8();
+      var ptrNetType = netType.toEnumString().toCPtrChar();
       var cerr = _cWallets.Wallets_changeNetType(ptrContext, ptrNetType);
       err = Error.fromC(cerr);
       _cWallets.CError_free(cerr);
@@ -257,8 +257,8 @@ class Wallets {
   Error removeWallet(String walletId, Uint8List password) {
     Error err;
     {
-      var ptrWalletId = walletId.toCPtrInt8();
-      var ptrPassword = String.fromCharCodes(password).toCPtrInt8();
+      var ptrWalletId = walletId.toCPtrChar();
+      var ptrPassword = String.fromCharCodes(password).toCPtrChar();
       var cerr = _cWallets.Wallets_removeWallet(ptrContext, ptrWalletId, ptrPassword);
       err = Error.fromC(cerr);
       _cWallets.CError_free(cerr);
@@ -272,8 +272,8 @@ class Wallets {
   Error renameWallet(String newName, String walletId) {
     Error err;
     {
-      var ptrNewName = newName.toCPtrInt8();
-      var ptrWalletId = walletId.toCPtrInt8();
+      var ptrNewName = newName.toCPtrChar();
+      var ptrWalletId = walletId.toCPtrChar();
       var cerr = _cWallets.Wallets_renameWallet(ptrContext, ptrNewName, ptrWalletId);
       err = Error.fromC(cerr);
       _cWallets.CError_free(cerr);
@@ -286,9 +286,9 @@ class Wallets {
   Error resetPwdWallet(String walletId, Uint8List oldPwd, Uint8List newPwd) {
     Error err;
     {
-      var ptrWalletId = walletId.toCPtrInt8();
-      var ptrOldPwd = String.fromCharCodes(oldPwd).toCPtrInt8();
-      var ptrNewPwd = String.fromCharCodes(newPwd).toCPtrInt8();
+      var ptrWalletId = walletId.toCPtrChar();
+      var ptrOldPwd = String.fromCharCodes(oldPwd).toCPtrChar();
+      var ptrNewPwd = String.fromCharCodes(newPwd).toCPtrChar();
       var cerr = _cWallets.Wallets_resetWalletPassword(ptrContext, ptrWalletId, ptrOldPwd, ptrNewPwd);
       err = Error.fromC(cerr);
       _cWallets.CError_free(cerr);
@@ -303,8 +303,8 @@ class Wallets {
     Error err;
     var mne;
     {
-      var ptrWalletId = walletId.toCPtrInt8();
-      var ptrPwd = String.fromCharCodes(pwd).toCPtrInt8();
+      var ptrWalletId = walletId.toCPtrChar();
+      var ptrPwd = String.fromCharCodes(pwd).toCPtrChar();
       var ptr = _cWallets.CStr_dAlloc();
       var cerr = _cWallets.Wallets_exportWallet(ptrContext, ptrWalletId, ptrPwd, ptr);
       err = Error.fromC(cerr);
@@ -339,7 +339,7 @@ class Wallets {
     Error err;
     Wallet wallet;
     {
-      var ptrWalletId = walletId.toCPtrInt8();
+      var ptrWalletId = walletId.toCPtrChar();
       var ptrWallet = _cWallets.CWallet_dAlloc();
       var cerr = _cWallets.Wallets_findById(ptrContext, ptrWalletId, ptrWallet);
       err = Error.fromC(cerr);
@@ -360,7 +360,7 @@ class Wallets {
     Error err;
     List<Wallet> wallet = [];
     {
-      var ptrName = name.toCPtrInt8();
+      var ptrName = name.toCPtrChar();
       var ptrWallet = _cWallets.CArrayCWallet_dAlloc();
       var cerr = _cWallets.Wallets_findWalletBaseByName(ptrContext, ptrName, ptrWallet);
       err = Error.fromC(cerr);
@@ -399,8 +399,8 @@ class Wallets {
   Error saveCurrentWalletChain(String walletId, ChainType chainType) {
     Error err;
     {
-      var ptrWalletId = walletId.toCPtrInt8();
-      var ptrChainType = chainType.toEnumString().toCPtrInt8();
+      var ptrWalletId = walletId.toCPtrChar();
+      var ptrChainType = chainType.toEnumString().toCPtrChar();
       var cerr = _cWallets.Wallets_saveCurrentWalletChain(ptrContext, ptrWalletId, ptrChainType);
       err = Error.fromC(cerr);
       _cWallets.CError_free(cerr);
@@ -415,7 +415,7 @@ class Wallets {
     Error err;
     List<TokenAddress> arrayCTokenAddress = [];
     {
-      var ptrWalletId = walletId.toCPtrInt8();
+      var ptrWalletId = walletId.toCPtrChar();
       var ptrArrayToken = _cWallets.CArrayCTokenAddress_dAlloc();
       var cerr = _cWallets.Wallets_queryBalance(ptrContext, ptrWalletId, ptrArrayToken);
       err = Error.fromC(cerr);

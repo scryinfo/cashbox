@@ -62,8 +62,7 @@ extension ChainTypeEx on ChainType {
         break;
       default:
         {
-          Logger.getInstance()
-              .f(_tag, "the str:$chainType can not be ChainType");
+          Logger.getInstance().f(_tag, "the str:$chainType can not be ChainType");
           throw new Exception("the str:$chainType can not be ChainType");
         }
     }

@@ -9,6 +9,7 @@ import 'package:source_gen/source_gen.dart';
 enum _FieldType {
   pointerStringUtf8,
   pointerStringInt8,
+  pointerStringChar,
   pointerStruct,
   baseType, // int double ...
   pointerNativeType, // Int32 UInt32 Float ...
@@ -45,6 +46,9 @@ import 'kits.dart';
     }
     var typeStruct = TypeChecker.fromRuntime(Struct);
     for (var c in library.classes) {
+      if(c.name.startsWith("__")){
+        continue;
+      }
       if (typeStruct.isExactly(c.supertype!.element)) {
         String classCode;
         if (isArray(c)) {
@@ -63,6 +67,7 @@ import 'kits.dart';
     var typePointer = TypeChecker.fromRuntime(Pointer);
     var typeStringUtf8 = TypeChecker.fromRuntime(ffi.Utf8);
     var typeStringInt8 = TypeChecker.fromRuntime(Int8);
+    var typeStringChar = TypeChecker.fromRuntime(Char);
     var typeStruct = TypeChecker.fromRuntime(Struct);
 
     classCode
@@ -80,7 +85,10 @@ import 'kits.dart';
           } else if (typeStringInt8.isExactly(first.element!)) {
             fieldMetas.add(_FieldMeta(
                 _FieldType.pointerStringInt8, f.name, first.element!.name!));
-          } else if (typeStruct
+          } else if(typeStringChar.isExactly(first.element!)) {
+            fieldMetas.add(_FieldMeta(
+                _FieldType.pointerStringChar, f.name, first.element!.name!));
+          }else if (typeStruct
               .isExactly((first.element as ClassElement).supertype!.element)) {
             fieldMetas.add(_FieldMeta(
                 _FieldType.pointerStruct, f.name, first.element!.name!));
@@ -150,6 +158,21 @@ import 'kits.dart';
             toC.writeln(
                 '''${_blankTwo}if(c.${f.name} != nullptr) { ffi.calloc.free(c.${f.name});}''');
             toC.writeln('${_blankTwo}c.${f.name} = ${f.name}.toCPtrInt8();');
+            toDart
+                .writeln('${_blankTwo}${f.name} = c.${f.name}.toDartString();');
+          }
+          break;
+        case _FieldType.pointerStringChar:
+          {
+            classCode.writeln('${_blankOne}String ${f.name} = "";');
+
+            free.writeln(
+                '${_blankTwo}if (instance.${f.name} != nullptr) {ffi.calloc.free(instance.${f.name});}');
+            free.writeln('${_blankTwo}instance.${f.name} = nullptr;');
+
+            toC.writeln(
+                '''${_blankTwo}if(c.${f.name} != nullptr) { ffi.calloc.free(c.${f.name});}''');
+            toC.writeln('${_blankTwo}c.${f.name} = ${f.name}.toCPtrChar();');
             toDart
                 .writeln('${_blankTwo}${f.name} = c.${f.name}.toDartString();');
           }
@@ -290,6 +313,7 @@ ${toDart.toString()}  }''');
       var typeStruct = TypeChecker.fromRuntime(Struct);
       var typeStringUtf8 = TypeChecker.fromRuntime(ffi.Utf8);
       var typeStringInt8 = TypeChecker.fromRuntime(Int8);
+      var typeStringChar = TypeChecker.fromRuntime(Char);
       for (var f in c.fields) {
         if (f.name == ArrayLen) {
           ;
@@ -318,6 +342,10 @@ ${toDart.toString()}  }''');
                   typeStringInt8.isExactly(firstFirst!.element!)) {
                 el = first.element as ClassElement;
                 elementType = _FieldType.pointerStringInt8;
+              }else if (typePointer.isExactly(first.element!) &&
+                  typeStringChar.isExactly(firstFirst!.element!)) {
+                el = first.element as ClassElement;
+                elementType = _FieldType.pointerStringChar;
               } else {
                 elementType = _FieldType.baseType;
                 el = first.element as ClassElement;
@@ -348,6 +376,9 @@ ${toDart.toString()}  }''');
     } else if (elementType == _FieldType.pointerStringInt8) {
       elName = "String";
       elNameAllocate = "Pointer<Int8>";
+    }else if (elementType == _FieldType.pointerStringChar) {
+      elName = "String";
+      elNameAllocate = "Pointer<Char>";
     } else {
       elName = mapNativeType(el.name);
       elNameAllocate = el.name;
@@ -365,7 +396,7 @@ ${toDart.toString()}  }''');
   }
   
   static freeInstance(clib.${c.name} instance) {
-    ${elementType == _FieldType.baseType ? "instance.ptr.free()" : (elementType == _FieldType.pointerStringInt8 || elementType == _FieldType.pointerStringUtf8 ? "instance.ptr.free(instance.len)" : elName + ".free(instance.ptr)")};
+    ${elementType == _FieldType.baseType ? "instance.ptr.free()" : (elementType == _FieldType.pointerStringInt8 || elementType == _FieldType.pointerStringChar || elementType == _FieldType.pointerStringUtf8 ? "instance.ptr.free(instance.len)" : elName + ".free(instance.ptr)")};
     instance.ptr = nullptr;
   }
   
@@ -396,14 +427,14 @@ ${toDart.toString()}  }''');
   @override
   toCInstance(clib.${c.name} c) {
     if (c.ptr != nullptr) {
-      ${elementType == _FieldType.baseType ? "c.ptr.free()" : (elementType == _FieldType.pointerStringUtf8 || elementType == _FieldType.pointerStringInt8 ? "c.ptr.free(c.len)" : elName + ".free(c.ptr)")};
+      ${elementType == _FieldType.baseType ? "c.ptr.free()" : (elementType == _FieldType.pointerStringUtf8 || elementType == _FieldType.pointerStringInt8 || elementType == _FieldType.pointerStringChar ? "c.ptr.free(c.len)" : elName + ".free(c.ptr)")};
       c.ptr = nullptr;
     }
     c.ptr = allocateZero<${elNameAllocate}>(sizeOf<${elNameAllocate}>(),count : data.length);
     c.len = data.length;
     c.cap = data.length;
     for (var i = 0; i < data.length;i++) {
-      ${elementType == _FieldType.baseType ? "c.ptr.elementAt(i).value = data[i]" : (elementType == _FieldType.pointerStringUtf8 ? "c.ptr.elementAt(i).value = data[i].toCPtr()" : (elementType == _FieldType.pointerStringInt8 ? "c.ptr.elementAt(i).value = data[i].toCPtrInt8()" : "data[i].toC(c.ptr.elementAt(i))"))};
+      ${elementType == _FieldType.baseType ? "c.ptr.elementAt(i).value = data[i]" : (elementType == _FieldType.pointerStringUtf8 ? "c.ptr.elementAt(i).value = data[i].toCPtr()" : (elementType == _FieldType.pointerStringInt8 ? "c.ptr.elementAt(i).value = data[i].toCPtrInt8()" : (elementType == _FieldType.pointerStringChar ? "c.ptr.elementAt(i).value = data[i].toCPtrChar()" : "data[i].toC(c.ptr.elementAt(i))")))};
     }
   }
 
@@ -418,7 +449,7 @@ ${toDart.toString()}  }''');
   toDartInstance(clib.${c.name} c) {
     data =  <$elName>[];
     for (var i = 0; i < c.len;i++) {
-      ${elementType == _FieldType.baseType ? "data.add(c.ptr.elementAt(i).value)" : (elementType == _FieldType.pointerStringUtf8 || elementType == _FieldType.pointerStringInt8 ? "data.add(c.ptr.elementAt(i).value.toDartString())" : "data.add(new $elName());      data[i].toDart(c.ptr.elementAt(i))")};
+      ${elementType == _FieldType.baseType ? "data.add(c.ptr.elementAt(i).value)" : (elementType == _FieldType.pointerStringUtf8 || elementType == _FieldType.pointerStringInt8|| elementType == _FieldType.pointerStringChar ? "data.add(c.ptr.elementAt(i).value.toDartString())" : "data.add(new $elName());      data[i].toDart(c.ptr.elementAt(i))")};
     }
   }
 }
