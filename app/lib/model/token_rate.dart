@@ -46,7 +46,7 @@ class TokenRate {
     if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     } else {
-      return this.tokenRateMap[digit.shortName.trim().toUpperCase()].changeDaily;
+      return this.tokenRateMap[digit.shortName.trim().toUpperCase()]?.changeDaily??0;
     }
   }
 
@@ -61,14 +61,14 @@ class TokenRate {
     if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return "";
     }
-    return this.tokenRateMap[digit.shortName.trim().toUpperCase()].name;
+    return this.tokenRateMap[digit.shortName.trim().toUpperCase()]?.name??"";
   }
 
   String getSymbol(TokenM digit) {
     if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return "";
     }
-    return this.tokenRateMap[digit.shortName.trim().toUpperCase()].symbol;
+    return this.tokenRateMap[digit.shortName.trim().toUpperCase()]?.symbol??"";
   }
 
   double getPrice(TokenM digit) {
@@ -76,7 +76,7 @@ class TokenRate {
     if (!tokenRateMap.containsKey(digit.shortName.trim().toUpperCase())) {
       return 0.0;
     }
-    return instance.tokenRateMap[digit.shortName.trim().toUpperCase()].price * instance.legalMap[getNowLegalCurrency()];
+    return (instance.tokenRateMap[digit.shortName.trim().toUpperCase()]?.price??0) * instance.legalMap[getNowLegalCurrency()];
   }
 
   double getMoney(TokenM digit) {

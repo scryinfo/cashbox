@@ -1,16 +1,5 @@
 name: app
-description: A new Flutter project.
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+description: Wallet Cashbox
 version: 2.3.0+5
 
 environment:
@@ -26,98 +15,56 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
   provider: ^6.0.5
-  # 状态管理           https://github.com/rrousselGit/provider
   dio: ^5.2.1+1
-  # 网络请求           https://github.com/flutterchina/dio
-
   fluttertoast: ^8.2.2
-  #                    https://github.com/PonnamKarthik/FlutterToast
-
   oktoast: ^3.3.1
-  # Toast插件 https://github.com/OpenFlutter/flutter_oktoast
-
   fluro: ^2.0.5
-  # 路由管理           https://github.com/theyakka/fluro
-
   #  flutter_webview_plugin: ^0.3.11
   webview_flutter: ^4.2.2
   flutter_html: ^3.0.0-beta.2
   device_info_plus: ^9.0.2
   #  device_info: ^1.0.0
-  # 获取设备id
-
   #  flutter_progress_button: ^1.0.0
-
   sn_progress_dialog: ^1.0.2
-
-  cached_network_image: ^3.0.0
-
+  cached_network_image: ^3.2.3
   rflutter_alert: ^2.0.2
-
   qr_flutter: ^4.1.0
-  # 生成二维码         https://github.com/lukef/qr.flutter
-
   #  flutter_swiper: ^1.1.6
   flutter_card_swiper: ^6.0.0
   flutter_screenutil: ^5.8.4
   flutter_easyrefresh: ^2.0.3
-  # 上下拉刷新功能     https://github.com/xuelongqy/flutter_easyrefresh
   web_socket_channel: ^2.4.0
-  stream_channel: ">=1.1.0 <3.0.0"
+  stream_channel: ^2.1.1
   path_provider: ^2.0.1
-  #路径信息获取        https://github.com/flutter/plugins
-
   package_info: ^2.0.2
-  #yingyongbanben
-
   permission_handler: ^10.3.0
-  # https://github.com/Baseflow/flutter-permission-handler
-
   json_rpc_2: ^3.0.2
-  #         https://github.com/dart-lang/json_rpc_2
-
-  grpc: ^3.0.0
-  # https://github.com/grpc/grpc-dart
-
-  google_fonts: ^4.0.4
-  # https://github.com/material-foundation/google-fonts-flutter
-
+  grpc: ^3.2.2
+  google_fonts:
   material_dialogs: ^1.0.0
   ffi: ^2.0.2
   json_annotation: ^4.8.1
   wallets:
     path: ../packages/wallets
-
   logger:
     path: ../packages/logger
-
   services:
     path: ../packages/services
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   build_runner: ^2.4.5
   json_serializable: ^6.7.0
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter.
 flutter:
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
   assets:
-
     - assets/config/config.json
-
     - assets/i18n/
-
     - assets/images/
     - assets/images/2.0x/
     - assets/images/3.0x/
