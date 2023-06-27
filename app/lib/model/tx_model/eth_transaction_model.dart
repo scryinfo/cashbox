@@ -1,20 +1,20 @@
 import 'package:app/model/tx_model/base_tx_model.dart';
 
 class EthTransactionModel extends BaseTxModel {
-  String _blockNumber;
-  String _hash;
-  String _nonce;
-  String _blockHash;
-  String _transactionIndex;
-  String _gas;
-  String _gasPrice;
-  String _isError;
-  String _txreceipt_status;
-  String _input;
-  String _contractAddress;
-  String _cumulativeGasUsed;
-  String _gasUsed;
-  String _confirmations;
+  String _blockNumber = "";
+  String _hash = "";
+  String _nonce = "";
+  String _blockHash = "";
+  String _transactionIndex = "";
+  String _gas = "";
+  String _gasPrice = "";
+  String _isError = "";
+  String _txreceipt_status = "";
+  String _input = "";
+  String _contractAddress = "";
+  String _cumulativeGasUsed = "";
+  String _gasUsed = "";
+  String _confirmations = "";
 
   String get blockNumber => _blockNumber;
 

@@ -1,16 +1,16 @@
 import 'dart:typed_data';
 
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:logger/logger.dart';
-import 'package:app/control/qr_scan_control.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wallets/enums.dart' as EnumKit;
 
@@ -175,7 +175,8 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                     if (statuses[Permission.camera] == PermissionStatus.granted) {
                       _scanQrContent();
                     } else {
-                      Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+                      Fluttertoast.showToast(
+                          msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                     }
                   }
                 },
@@ -442,7 +443,10 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
 
   bool _verifyPwdAndMnemonic() {
     //Mnemonic password is not empty
-    if (_pwdController.text.isEmpty || _pwdController.text.length <= 0 || _mnemonicController.text.isEmpty || _mnemonicController.text.length <= 0) {
+    if (_pwdController.text.isEmpty ||
+        _pwdController.text.length <= 0 ||
+        _mnemonicController.text.isEmpty ||
+        _mnemonicController.text.length <= 0) {
       return false;
     } else {
       return true;
@@ -461,8 +465,8 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
       return;
     }
 
-    var newWalletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mnemonicController.text.codeUnits), EnumKit.WalletType.Test,
-        _nameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
+    var newWalletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mnemonicController.text.codeUnits),
+        EnumKit.WalletType.Test, _nameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
     if (newWalletObj == null) {
       Fluttertoast.showToast(msg: translate('failure_create_test_wallet'));
       return;

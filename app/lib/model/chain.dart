@@ -3,15 +3,15 @@ import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart';
 
 abstract class Chain {
-  String chainId; //Chain Id
-  String walletId; //Wallet Id
-  String chainAddress; //Chain address
-  Address walletAddress;
-  String pubKey; //Chain address
+  String chainId = ""; //Chain Id
+  String walletId = ""; //Wallet Id
+  String chainAddress = ""; //Chain address
+  late Address walletAddress;
+  String pubKey = ""; //Chain address
   List<TokenM> digitsList = [];
   List<TokenM> _visibleDigitsList = [];
   bool isVisible = true; //The default chain is visible
-  ChainType chainType;
+  ChainType chainType = ChainType.ETH;
 
   //List of visible tokens: digit.isVisible = true type
   List<TokenM> getVisibleDigitList() {

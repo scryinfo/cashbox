@@ -2,11 +2,10 @@ import 'dart:io';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-
-import 'package:flutter_translate/global.dart';
-import 'package:logger/logger.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_translate/global.dart';
+import 'package:logger/logger.dart';
 
 //Access network request, url + parameter object
 Future request(String url, {formData}) async {

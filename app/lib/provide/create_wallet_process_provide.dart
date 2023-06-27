@@ -1,7 +1,4 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
 
 class CreateWalletProcessProvide with ChangeNotifier {
   String _walletName;

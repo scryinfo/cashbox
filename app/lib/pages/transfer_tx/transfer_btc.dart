@@ -1,16 +1,15 @@
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
-import 'package:logger/logger.dart';
-import 'package:app/control/qr_scan_control.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class TransferBtcPage extends StatefulWidget {
@@ -144,7 +143,10 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+                          Fluttertoast.showToast(
+                              msg: translate("camera_permission_deny"),
+                              toastLength: Toast.LENGTH_LONG,
+                              timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -167,7 +169,8 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
       });
     } catch (e) {
       Logger().e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
-      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+      Fluttertoast.showToast(
+          msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
     }
   }
 
@@ -196,8 +199,8 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
+                contentPadding: EdgeInsets.only(
+                    left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil().setSp(3),

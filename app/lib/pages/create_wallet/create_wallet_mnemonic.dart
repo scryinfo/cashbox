@@ -4,15 +4,15 @@ import 'package:app/control/wallets_control.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
-import 'package:logger/logger.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
-import '../../widgets/app_bar.dart';
+
 import '../../res/styles.dart';
 import '../../routers/routers.dart';
+import '../../widgets/app_bar.dart';
 
 class CreateWalletMnemonicPage extends StatefulWidget {
   @override
@@ -148,7 +148,8 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
                   Container(
                     child: GestureDetector(
                         onTap: () {
-                          _showAddressInQR(context, walletName, translate('mnemonic_qr_info'), mnemonicList.join(" ").toString());
+                          _showAddressInQR(
+                              context, walletName, translate('mnemonic_qr_info'), mnemonicList.join(" ").toString());
                         },
                         child: Container(
                           width: ScreenUtil().setWidth(20),

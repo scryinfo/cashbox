@@ -1,4 +1,3 @@
-import 'package:app/model/chain.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wallets/enums.dart';
 

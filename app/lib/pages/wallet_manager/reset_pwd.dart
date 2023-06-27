@@ -9,10 +9,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/result.dart';
+
 import '../../res/resources.dart';
-import '../../routers/routers.dart';
-import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
+import '../../routers/fluro_navigator.dart';
+import '../../routers/routers.dart';
 import '../../widgets/app_bar.dart';
 
 class ResetPwdPage extends StatefulWidget {
@@ -244,8 +245,8 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
   Future _checkAndResetPwd() async {
     if (_verifyPwdSame()) {
       String walletId = Provider.of<WalletManagerProvide>(context, listen: false).walletId;
-      DlResult1<bool> isResetOkObj = WalletsControl.getInstance()
-          .resetPwd(walletId, Uint8List.fromList(_oldPwdController.text.codeUnits), Uint8List.fromList(_newPwdController.text.codeUnits));
+      DlResult1<bool> isResetOkObj = WalletsControl.getInstance().resetPwd(walletId,
+          Uint8List.fromList(_oldPwdController.text.codeUnits), Uint8List.fromList(_newPwdController.text.codeUnits));
       if (!isResetOkObj.isSuccess()) {
         Fluttertoast.showToast(msg: translate('failure_reset_pwd_hint') + isResetOkObj.err.message.toString());
         return;

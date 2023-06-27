@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
 
 class QrInfoProvide with ChangeNotifier {
   String _title;

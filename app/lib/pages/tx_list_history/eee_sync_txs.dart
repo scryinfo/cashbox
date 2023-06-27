@@ -1,12 +1,12 @@
 import 'dart:async';
+
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/net/scryx_net_util.dart';
-import 'package:logger/logger.dart';
 import 'package:app/util/utils.dart';
-
+import 'package:logger/logger.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart';
 
@@ -59,8 +59,10 @@ class EeeSyncTxs {
   _start() async {
     Config config = await HandleConfig.instance.getConfig();
     RunParams runParams = new RunParams(_address, _chainType);
-    _eeeStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
-    _tokenXStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
+    _eeeStorageKey =
+        await EeeChainControl.getInstance().loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
+    _tokenXStorageKey =
+        await EeeChainControl.getInstance().loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
 
     _threadRun(runParams);
   }
@@ -101,10 +103,12 @@ class EeeSyncTxs {
 
     {
       if (_eeeStorageKey == null || _eeeStorageKey.isEmpty) {
-        _eeeStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
+        _eeeStorageKey = await EeeChainControl.getInstance()
+            .loadEeeStorageKey(config.systemSymbol, config.accountSymbol, runParams.address);
       }
       if (_tokenXStorageKey == null || _tokenXStorageKey.isEmpty) {
-        _tokenXStorageKey = await EeeChainControl.getInstance().loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
+        _tokenXStorageKey = await EeeChainControl.getInstance()
+            .loadEeeStorageKey(config.tokenXSymbol, config.balanceSymbol, runParams.address);
       }
       if (_eeeStorageKey == null ||
           _eeeStorageKey.isEmpty ||
@@ -117,7 +121,8 @@ class EeeSyncTxs {
     }
     var startBlockHeight = 0;
     {
-      AccountInfoSyncProg accountInfoSyncProg = EeeChainControl.getInstance().getSyncRecord(WalletsControl().currentChainAddress());
+      AccountInfoSyncProg accountInfoSyncProg =
+          EeeChainControl.getInstance().getSyncRecord(WalletsControl().currentChainAddress());
       if (accountInfoSyncProg != null && accountInfoSyncProg.account.toLowerCase() == runParams.address.toLowerCase()) {
         startBlockHeight = int.parse(accountInfoSyncProg.blockNo);
       }
@@ -154,7 +159,8 @@ class EeeSyncTxs {
           return;
         }
       }
-      Map queryStorageMap = await _scryXNetUtil.loadQueryStorage([_eeeStorageKey, _tokenXStorageKey], startBlockHash, endBlockHash);
+      Map queryStorageMap =
+          await _scryXNetUtil.loadQueryStorage([_eeeStorageKey, _tokenXStorageKey], startBlockHash, endBlockHash);
       if (queryStorageMap == null || !queryStorageMap.containsKey("result")) {
         return;
       }

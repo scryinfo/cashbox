@@ -1,26 +1,20 @@
-import 'package:logger/logger.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+
 import 'application.dart';
 
 /// Fluro routing jump tool class
 class NavigatorUtils {
-  static push(BuildContext context, String path,
-      {bool replace = false, bool clearStack = false}) {
-    Application.router.navigateTo(context, path,
-        replace: replace,
-        clearStack: clearStack,
-        transition: TransitionType.native);
+  static push(BuildContext context, String path, {bool replace = false, bool clearStack = false}) {
+    Application.router
+        .navigateTo(context, path, replace: replace, clearStack: clearStack, transition: TransitionType.native);
   }
 
-  static pushResult(
-      BuildContext context, String path, Function(Object) function,
+  static pushResult(BuildContext context, String path, Function(Object) function,
       {bool replace = false, bool clearStack = false}) {
     Application.router
-        .navigateTo(context, path,
-            replace: replace,
-            clearStack: clearStack,
-            transition: TransitionType.native)
+        .navigateTo(context, path, replace: replace, clearStack: clearStack, transition: TransitionType.native)
         .then((result) {
       // The page returns result is null
       if (result == null) {

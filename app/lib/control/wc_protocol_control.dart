@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-import 'package:wallets/enums.dart';
 
 class WcProtocolControl {
   static const methodPlugin = const MethodChannel('wc_protocol_channel');

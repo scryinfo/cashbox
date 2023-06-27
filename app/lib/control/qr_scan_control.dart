@@ -6,9 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
-
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 
 class QrScanControl {
   static const methodPlugin = const MethodChannel('qr_scan_channel');
@@ -29,7 +28,6 @@ class QrScanControl {
     }
     return _instance;
   }
-
 
   Future<String> qrscan() async {
     String callbackResult = await methodPlugin.invokeMethod('qr_scan_method');
@@ -188,7 +186,8 @@ class QrScanControl {
       case "66": //substrate chain
         if (paramsMap.containsKey("dt") && paramsMap["dt"] == "0") {
           //0 represents the diamond project
-          var dtt = paramsMap["dtt"]; //Signature operation type ID 01: authorized original address 02: authorized salesperson
+          var dtt =
+              paramsMap["dtt"]; //Signature operation type ID 01: authorized original address 02: authorized salesperson
           var value = paramsMap["v"]; //Transaction information to be signed
           var waitToSignInfo = dtt + value; //Transaction information to be signed
           Fluttertoast.showToast(msg: "waitToSignInfo is ===>" + waitToSignInfo);

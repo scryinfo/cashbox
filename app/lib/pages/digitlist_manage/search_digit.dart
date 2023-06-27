@@ -6,19 +6,17 @@ import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/widgets/my_separator_line.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
-import 'package:wallets/wallets_c.dc.dart';
 import 'package:wallets/kits.dart';
-import 'package:logger/logger.dart';
+import 'package:wallets/wallets_c.dc.dart';
 
 class SearchDigitPage extends StatefulWidget {
   @override
@@ -250,7 +248,8 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                         ..walletId = WalletsControl.getInstance().currentWallet().id
                         ..balance = 0.toString()
                         ..addressId = WalletsControl.getInstance().getTokenAddressId(
-                                WalletsControl.getInstance().currentWallet().id, WalletsControl.getInstance().currentChainType()) ??
+                                WalletsControl.getInstance().currentWallet().id,
+                                WalletsControl.getInstance().currentChainType()) ??
                             "";
                       bool isUpsertOk = WalletsControl.getInstance().updateBalance(tokenAddress);
                       if (!isUpsertOk) {

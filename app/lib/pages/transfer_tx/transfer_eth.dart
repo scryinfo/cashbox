@@ -4,28 +4,28 @@ import 'dart:math';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
-import 'package:logger/logger.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets_c.dc.dart';
+
 import '../../res/resources.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';
-import 'package:app/control/qr_scan_control.dart';
 
 class TransferEthPage extends StatefulWidget {
   @override
@@ -206,7 +206,10 @@ class _TransferEthPageState extends State<TransferEthPage> {
                     alignment: Alignment.topRight,
                     width: ScreenUtil().setWidth(40),
                     child: Text(
-                      Utils.formatDouble(mGasFeeValue, precision: precision).toString() + " (" + translate('tx_unit') + ":ETH)",
+                      Utils.formatDouble(mGasFeeValue, precision: precision).toString() +
+                          " (" +
+                          translate('tx_unit') +
+                          ":ETH)",
                       style: TextStyle(
                         color: Color.fromRGBO(255, 255, 255, 0.5),
                         fontSize: ScreenUtil().setSp(3),
@@ -512,7 +515,9 @@ class _TransferEthPageState extends State<TransferEthPage> {
                               fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                               filled: true,
                               contentPadding: EdgeInsets.only(
-                                  left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
+                                  left: ScreenUtil().setWidth(2),
+                                  top: ScreenUtil().setHeight(3.5),
+                                  bottom: ScreenUtil().setHeight(3.5)),
                               labelStyle: TextStyle(
                                 color: Colors.white,
                               ),
@@ -618,7 +623,10 @@ class _TransferEthPageState extends State<TransferEthPage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+                          Fluttertoast.showToast(
+                              msg: translate("camera_permission_deny"),
+                              toastLength: Toast.LENGTH_LONG,
+                              timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -641,7 +649,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
       });
     } catch (e) {
       Logger().e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
-      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+      Fluttertoast.showToast(
+          msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
     }
   }
 
@@ -664,7 +673,10 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 ),
                 TextSpan(
                   text: " (" + translate('tx_unit') + ":" + digitName + ")",
-                  style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.35), fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+                  style: TextStyle(
+                      color: Color.fromRGBO(255, 255, 255, 0.35),
+                      fontSize: ScreenUtil().setSp(3),
+                      fontStyle: FontStyle.normal),
                 ),
               ]),
             ),
@@ -680,8 +692,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
+                contentPadding: EdgeInsets.only(
+                    left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil().setSp(3),
@@ -765,16 +777,20 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 ..decimal = 0
                 ..extData = _backupMsgController.text.toString();
             } catch (e) {
-              Fluttertoast.showToast(msg: translate("balance_is_less"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
+              Fluttertoast.showToast(
+                  msg: translate("balance_is_less"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
               return;
             }
-            String signResult = EthChainControl.getInstance().txSign(ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
+            String signResult =
+                EthChainControl.getInstance().txSign(ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
             if (signResult == null) {
-              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
+              Fluttertoast.showToast(
+                  msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
             } else {
-              Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+              Fluttertoast.showToast(
+                  msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
               NavigatorUtils.goBack(context);
               sendRawTx2Chain(signResult);
             }
@@ -814,29 +830,33 @@ class _TransferEthPageState extends State<TransferEthPage> {
 
   Future<bool> _verifyTransferInfo() async {
     if (_toAddressController.text.trim() == "") {
-      Fluttertoast.showToast(msg: translate('to_address_null').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+      Fluttertoast.showToast(
+          msg: translate('to_address_null').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
 
     if (!Utils.checkByEthAddressFormat(_toAddressController.text)) {
-      Fluttertoast.showToast(msg: translate("to_address_format_wrong"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+      Fluttertoast.showToast(
+          msg: translate("to_address_format_wrong"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
       return false;
     }
 
     if (_txValueController.text.trim() == "" || double.parse(_txValueController.text.trim()) <= 0) {
-      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+      Fluttertoast.showToast(
+          msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
     //Determine if the balance is greater than the transfer amount
-    List displayDigitsList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
+    List displayDigitsList =
+        EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
     for (var i = 0; i < displayDigitsList.length; i++) {
       if (digitBalance == null &&
           contractAddress != null &&
           contractAddress.trim() != "" &&
           displayDigitsList[i].contractAddress != null &&
           (displayDigitsList[i].contractAddress.toLowerCase() == contractAddress.toLowerCase())) {
-        digitBalance = await loadErc20Balance(WalletsControl.getInstance().currentChainAddress() ?? "", displayDigitsList[i].contractAddress,
-            WalletsControl.getInstance().currentChainType());
+        digitBalance = await loadErc20Balance(WalletsControl.getInstance().currentChainAddress() ?? "",
+            displayDigitsList[i].contractAddress, WalletsControl.getInstance().currentChainType());
         break;
       }
     }
@@ -854,7 +874,8 @@ class _TransferEthPageState extends State<TransferEthPage> {
       Fluttertoast.showToast(msg: translate('unknown_in_value'));
       return false;
     }
-    ethBalance = await loadEthBalance(WalletsControl.getInstance().currentChainAddress() ?? "", WalletsControl.getInstance().currentChainType());
+    ethBalance = await loadEthBalance(
+        WalletsControl.getInstance().currentChainAddress() ?? "", WalletsControl.getInstance().currentChainType());
     if (ethBalance == null) {
       Fluttertoast.showToast(msg: translate("check_gas_state_failure"));
       return false;

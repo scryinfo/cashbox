@@ -12,9 +12,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart' as Enum;
 import 'package:wallets/enums.dart';
-import 'package:provider/provider.dart';
 
 class LeftDrawer extends StatefulWidget {
   @override
@@ -226,24 +226,34 @@ class _LeftDrawerState extends State<LeftDrawer> {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
-                color: WalletsControl.getInstance().isCurWallet(walletList[index]) ? Color.fromRGBO(152, 245, 255, 0.5) : Colors.transparent,
+                color: WalletsControl.getInstance().isCurWallet(walletList[index])
+                    ? Color.fromRGBO(152, 245, 255, 0.5)
+                    : Colors.transparent,
                 child: GestureDetector(
                   onTap: () async {
                     bool isSaveOk = false;
                     switch (WalletsControl.getInstance().getCurrentNetType()) {
                       case NetType.Main:
-                        isSaveOk = WalletsControl.getInstance().saveCurrentWalletChain(walletList[index].walletId, ChainType.ETH);
+                        isSaveOk =
+                            WalletsControl.getInstance().saveCurrentWalletChain(walletList[index].walletId, ChainType.ETH);
                         break;
                       case NetType.Test:
-                        isSaveOk = WalletsControl.getInstance().saveCurrentWalletChain(walletList[index].walletId, ChainType.EthTest);
+                        isSaveOk = WalletsControl.getInstance()
+                            .saveCurrentWalletChain(walletList[index].walletId, ChainType.EthTest);
                         break;
                       default:
-                        Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+                        Fluttertoast.showToast(
+                            msg: translate('failure_to_change_wallet'),
+                            toastLength: Toast.LENGTH_LONG,
+                            timeInSecForIosWeb: 5);
                         return;
                         break;
                     }
                     if (!isSaveOk) {
-                      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+                      Fluttertoast.showToast(
+                          msg: translate('failure_to_change_wallet'),
+                          toastLength: Toast.LENGTH_LONG,
+                          timeInSecForIosWeb: 5);
                       return;
                     }
                     NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);

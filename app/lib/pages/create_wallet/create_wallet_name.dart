@@ -1,17 +1,16 @@
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_translate/flutter_translate.dart';
-import 'package:logger/logger.dart';
-import 'package:provider/provider.dart';
-import '../../widgets/app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../../routers/routers.dart';
-import '../../routers/fluro_navigator.dart';
+import 'package:provider/provider.dart';
+
 import '../../res/styles.dart';
+import '../../routers/fluro_navigator.dart';
+import '../../routers/routers.dart';
+import '../../widgets/app_bar.dart';
 
 class CreateWalletNamePage extends StatefulWidget {
   @override

@@ -1,4 +1,3 @@
-import 'package:wallets/enums.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
 

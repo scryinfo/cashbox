@@ -4,13 +4,12 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/eth_chain_control.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:logger/logger.dart';
-import 'package:app/control/qr_scan_control.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,13 +17,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:package_info/package_info.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
+import 'package:wallets/kits.dart';
 import 'package:wallets/wallets_c.dc.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:wallets/kits.dart';
 
 class DappPage extends StatefulWidget {
   @override
@@ -120,7 +120,9 @@ class _DappPageState extends State<DappPage> {
                           address = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address;
                           if (address != null && address.isNotEmpty) {
                             String script = 'if(window.$CashboxEeeName){$CashboxEeeName.$setAddress("$address")}';
-                            _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                            _controller
+                                ?.evaluateJavascript(script)
+                                ?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                           } else {
                             Logger.getInstance().w("dapp interaction ", ':eee address is null');
                           }
@@ -132,7 +134,9 @@ class _DappPageState extends State<DappPage> {
                           address = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
                           if (address != null && address.isNotEmpty) {
                             String script = 'if(window.$CashboxEthName){$CashboxEthName.$setAddress("$address")}';
-                            _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                            _controller
+                                ?.evaluateJavascript(script)
+                                ?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                           } else {
                             Logger.getInstance().w("dapp interaction ", ':eth address is null');
                           }
@@ -140,10 +144,13 @@ class _DappPageState extends State<DappPage> {
                         {
                           //btc
                           String address = '';
-                          address = address = WalletsControl.getInstance().currentWallet().btcChain.chainShared.walletAddress.address;
+                          address = address =
+                              WalletsControl.getInstance().currentWallet().btcChain.chainShared.walletAddress.address;
                           if (address != null && address.isNotEmpty) {
                             String script = 'if(window.$CashboxBtcName){$CashboxBtcName.$setAddress("$address")}';
-                            _controller?.evaluateJavascript(script)?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
+                            _controller
+                                ?.evaluateJavascript(script)
+                                ?.then((result) {}); //Pass the wallet EEE chain address to DApp record storage
                           } else {
                             Logger.getInstance().w("dapp interaction ", ':btc address is null');
                           }
@@ -212,7 +219,8 @@ class _DappPageState extends State<DappPage> {
                 // Fluttertoast.showToast(msg: translate('scan_qr_unknown_error.toString());
               });
             } else {
-              Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+              Fluttertoast.showToast(
+                  msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
             }
           }
         }));
@@ -229,7 +237,8 @@ class _DappPageState extends State<DappPage> {
             if (statuses[Permission.camera] == PermissionStatus.granted) {
               _scanNativeQrSignToQR();
             } else {
-              Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+              Fluttertoast.showToast(
+                  msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
             }
           }
         }));
@@ -320,7 +329,8 @@ class _DappPageState extends State<DappPage> {
             if (statuses[Permission.camera] == PermissionStatus.granted) {
               _scanCashboxScan(msg);
             } else {
-              Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+              Fluttertoast.showToast(
+                  msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
             }
           }
         }));
@@ -357,7 +367,8 @@ class _DappPageState extends State<DappPage> {
           var msg = Message.fromJson(jsonDecode(message.message));
           try {
             EthChain ethChain = WalletsControl.getInstance().currentWallet().ethChain;
-            loadTxAccount(ethChain.chainShared.walletAddress.address, ethChain.chainShared.chainType.toChainType()).then((nonce) {
+            loadTxAccount(ethChain.chainShared.walletAddress.address, ethChain.chainShared.chainType.toChainType())
+                .then((nonce) {
               msg.data = nonce;
               this.callPromise(msg);
             });

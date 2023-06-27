@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
+
 import '../../res/resources.dart';
 import '../../res/styles.dart';
 import '../../widgets/app_bar.dart';

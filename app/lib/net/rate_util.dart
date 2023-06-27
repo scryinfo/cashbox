@@ -1,5 +1,5 @@
-import 'package:app/model/token_rate.dart';
 import 'package:app/control/app_info_control.dart';
+import 'package:app/model/token_rate.dart';
 import 'package:logger/logger.dart';
 import 'package:services/services.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
@@ -12,7 +12,8 @@ Future<TokenRate> loadRateInstance() async {
   String deviceId = await AppInfoControl.instance.getDeviceId();
   String apkVersion = await AppInfoControl.instance.getAppVersion();
 
-  var refresh = RefreshOpen.get(new ConnectParameter("cashbox.scry.info", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
+  var refresh = RefreshOpen.get(
+      new ConnectParameter("cashbox.scry.info", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
   var channel = createClientChannel(refresh.refreshCall);
   BasicClientReq basicClientReq = new BasicClientReq();
   basicClientReq

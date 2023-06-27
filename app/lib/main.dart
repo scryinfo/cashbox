@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/pages/entrance.dart';
@@ -7,19 +8,20 @@ import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/sign_info_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:app/provide/wc_info_provide.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
-import 'package:fluro/fluro.dart';
+
 import 'provide/transaction_provide.dart';
-import 'routers/routers.dart';
 import 'routers/application.dart';
-import 'package:flutter/rendering.dart';
+import 'routers/routers.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); //Make sure that WidgetsFlutterBinding is initialized. Bind the widget with flutter.
+  WidgetsFlutterBinding
+      .ensureInitialized(); //Make sure that WidgetsFlutterBinding is initialized. Bind the widget with flutter.
   //  debugPaintLayerBordersEnabled=true; //For testing style boundaries
   //  debugPaintBaselinesEnabled=true;
   ///Force portrait
@@ -108,7 +110,11 @@ class _MyApp extends State<MyApp> {
         child: LocalizationProvider(
           state: LocalizationProvider.of(context).state,
           child: MaterialApp(
-            localizationsDelegates: [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, localizationDelegate],
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              localizationDelegate
+            ],
             supportedLocales: localizationDelegate.supportedLocales,
             locale: localizationDelegate.currentLocale,
 

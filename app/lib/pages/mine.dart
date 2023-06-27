@@ -1,14 +1,12 @@
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:logger/logger.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/list_item.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class MinePage extends StatefulWidget {
   @override

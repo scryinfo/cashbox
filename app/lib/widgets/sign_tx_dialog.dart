@@ -14,7 +14,15 @@ class SignTxDialog extends StatelessWidget {
   String hintInput;
   Function onPressed;
 
-  SignTxDialog({this.title, this.nowWalletName, this.fromAddr, this.toAddr, this.value, this.txBackupInfo, this.onPressed, this.hintInput});
+  SignTxDialog(
+      {this.title,
+      this.nowWalletName,
+      this.fromAddr,
+      this.toAddr,
+      this.value,
+      this.txBackupInfo,
+      this.onPressed,
+      this.hintInput});
 
   TextEditingController _controller = TextEditingController();
 

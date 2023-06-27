@@ -1,6 +1,7 @@
-import 'package:logger/logger.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+
 import '../routers/router_handler.dart';
 
 class Routes {

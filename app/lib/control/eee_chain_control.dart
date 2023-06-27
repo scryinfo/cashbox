@@ -2,9 +2,10 @@ import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:logger/logger.dart';
+import 'package:wallets/kits.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
-import 'package:wallets/kits.dart';
+
 import 'balance_control.dart';
 
 class EeeChainControl {
@@ -315,7 +316,9 @@ class EeeChainControl {
       return false;
     }
     var runtimeResultMap = runtimeMap["result"];
-    if (runtimeResultMap == null || !runtimeResultMap.containsKey("specVersion") || !runtimeResultMap.containsKey("transactionVersion")) {
+    if (runtimeResultMap == null ||
+        !runtimeResultMap.containsKey("specVersion") ||
+        !runtimeResultMap.containsKey("transactionVersion")) {
       return false;
     }
     int runtimeVersion = runtimeResultMap["specVersion"];

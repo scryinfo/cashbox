@@ -1,11 +1,11 @@
 import 'package:app/model/tx_model/base_tx_model.dart';
 
 class EeeTransactionModel extends BaseTxModel {
-  String _inputMsg;
-  String _gasFee;
-  String _signer;
-  String _blockHash;
-  bool _isSuccess;
+  String _inputMsg = "";
+  String _gasFee = "";
+  String _signer = "";
+  String _blockHash = "";
+  bool _isSuccess = false;
 
   bool get isSuccess => _isSuccess;
 

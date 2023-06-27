@@ -2,22 +2,21 @@ import 'dart:async';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:logger/logger.dart';
-import 'package:app/control/qr_scan_control.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
@@ -81,10 +80,11 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
     chainType = ChainType.ETH;
     fromAddress = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
     Config config = await HandleConfig.instance.getConfig();
-    toExchangeAddress = chainType == ChainType.ETH ? config.privateConfig.d2eMainNetEthAddress : config.privateConfig.d2eTestNetEthAddress;
+    toExchangeAddress =
+        chainType == ChainType.ETH ? config.privateConfig.d2eMainNetEthAddress : config.privateConfig.d2eTestNetEthAddress;
     ethBalance = await loadEthBalance(fromAddress, chainType);
-    dddBalance = await loadErc20Balance(
-        fromAddress, chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA, chainType);
+    dddBalance = await loadErc20Balance(fromAddress,
+        chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA, chainType);
     setState(() {
       toExchangeAddress = toExchangeAddress;
       if (dddBalance != null) {
@@ -274,8 +274,8 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
+                contentPadding: EdgeInsets.only(
+                    left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil().setSp(3),
@@ -381,7 +381,10 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+                          Fluttertoast.showToast(
+                              msg: translate("camera_permission_deny"),
+                              toastLength: Toast.LENGTH_LONG,
+                              timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -404,7 +407,8 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
       });
     } catch (e) {
       Logger().e("TransferEthPage", "qrscan appear unknow error===>" + e.toString());
-      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+      Fluttertoast.showToast(
+          msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
     }
   }
 
@@ -756,7 +760,8 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
 
   Future<bool> _verifyTransferInfo() async {
     if (_eeeAddressController.text.trim() == "") {
-      Fluttertoast.showToast(msg: translate('to_address_null').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+      Fluttertoast.showToast(
+          msg: translate('to_address_null').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
 
@@ -767,14 +772,17 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
     }*/
 
     if (_dddAmountController.text.trim() == "" || double.parse(_dddAmountController.text.trim()) <= 0) {
-      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+      Fluttertoast.showToast(
+          msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
     if (dddBalance == null || dddBalance == "" || double.parse(dddBalance) <= 0) {
       try {
         Config config = await HandleConfig.instance.getConfig();
-        dddBalance = await loadErc20Balance(WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
-            chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA, chainType);
+        dddBalance = await loadErc20Balance(
+            WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
+            chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA,
+            chainType);
       } catch (e) {
         Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;
@@ -793,7 +801,8 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
     }
     if (ethBalance == null || ethBalance == "" || double.parse(ethBalance) <= 0) {
       try {
-        ethBalance = await loadEthBalance(WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address, chainType);
+        ethBalance = await loadEthBalance(
+            WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address, chainType);
       } catch (e) {
         Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;

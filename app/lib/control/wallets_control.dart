@@ -3,16 +3,16 @@ import 'dart:typed_data';
 
 import 'package:app/control/balance_control.dart';
 import 'package:app/control/eth_chain_control.dart';
-import 'package:app/model/token_rate.dart';
 import 'package:app/model/chain.dart';
+import 'package:app/model/token_rate.dart';
 import 'package:app/model/wallet.dart' as WalletM;
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wallets/enums.dart' as EnumKit;
+import 'package:wallets/kits.dart';
 import 'package:wallets/result.dart';
 import 'package:wallets/wallets.dart';
 import 'package:wallets/wallets_c.dc.dart';
-import 'package:wallets/kits.dart';
 
 class WalletsControl {
   factory WalletsControl() => getInstance();
@@ -124,7 +124,10 @@ class WalletsControl {
           chainEEE..chainType = EnumKit.ChainType.EEE;
           break;
       }
-      tempWallet.chainList..add(chainETH)..add(chainBTC)..add(chainEEE);
+      tempWallet.chainList
+        ..add(chainETH)
+        ..add(chainBTC)
+        ..add(chainEEE);
       walletMList.add(tempWallet);
     });
     return walletMList;
@@ -212,7 +215,8 @@ class WalletsControl {
     if (err.isSuccess()) {
       return true;
     }
-    Logger.getInstance().e("wallet_control ", "changeTokenStatus err is --->" + err.code.toString() + "||" + err.message.toString());
+    Logger.getInstance()
+        .e("wallet_control ", "changeTokenStatus err is --->" + err.code.toString() + "||" + err.message.toString());
     return false;
   }
 
@@ -221,7 +225,8 @@ class WalletsControl {
     if (err.isSuccess()) {
       return true;
     }
-    Logger.getInstance().e("wallet_control ", "changeTokenStatus err is --->" + err.code.toString() + "||" + err.message.toString());
+    Logger.getInstance()
+        .e("wallet_control ", "changeTokenStatus err is --->" + err.code.toString() + "||" + err.message.toString());
     return false;
   }
 
@@ -233,7 +238,8 @@ class WalletsControl {
     if (err.isSuccess()) {
       return true;
     }
-    Logger.getInstance().e("wallet_control ", "removeWallet err is --->" + err.code.toString() + "||" + err.message.toString());
+    Logger.getInstance()
+        .e("wallet_control ", "removeWallet err is --->" + err.code.toString() + "||" + err.message.toString());
     return false;
   }
 
@@ -245,7 +251,8 @@ class WalletsControl {
     if (err.isSuccess()) {
       return true;
     }
-    Logger.getInstance().e("wallet_control ", "renameWallet err is --->" + err.code.toString() + "||" + err.message.toString());
+    Logger.getInstance()
+        .e("wallet_control ", "renameWallet err is --->" + err.code.toString() + "||" + err.message.toString());
     return false;
   }
 

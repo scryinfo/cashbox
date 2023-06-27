@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/token.dart';
@@ -14,8 +15,6 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:logger/logger.dart';
-import 'package:app/control/app_info_control.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +25,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart' as WalletDy;
@@ -72,7 +72,8 @@ class _EeePageState extends State<EeePage> {
       moneyUnitStr = config.currency;
     }
     this.walletName = WalletsControl.getInstance().currentWallet().name;
-    this.allVisibleTokenMList = EeeChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
+    this.allVisibleTokenMList =
+        EeeChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
     this.allVisibleTokenMList = EeeChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
     tokenListFuture = loadDisplayTokenListData();
     if (mounted) {
@@ -159,7 +160,8 @@ class _EeePageState extends State<EeePage> {
                 continue;
               }
               try {
-                double tokenBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble();
+                double tokenBalance =
+                    BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble();
                 var formatBalance = tokenBalance / Utils.mathPow(10, this.displayTokenMList[index].decimal).toDouble();
                 balance = formatBalance.toStringAsFixed(5);
                 if (balance == null) {
@@ -171,7 +173,8 @@ class _EeePageState extends State<EeePage> {
               break;
             }
           default:
-            Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+            Fluttertoast.showToast(
+                msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
             break;
         }
         if (mounted) {
@@ -461,7 +464,9 @@ class _EeePageState extends State<EeePage> {
                               Align(
                                 alignment: new FractionalOffset(0.0, 0.0),
                                 child: Text(
-                                  (displayTokenMList[index].shortName ?? "") + " * " + (displayTokenMList[index].balance ?? "0.00"),
+                                  (displayTokenMList[index].shortName ?? "") +
+                                      " * " +
+                                      (displayTokenMList[index].balance ?? "0.00"),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: ScreenUtil().setSp(3),
@@ -502,7 +507,8 @@ class _EeePageState extends State<EeePage> {
                                         " " +
                                         (rateInstance == null
                                             ? ""
-                                            : TokenRate.instance.getPrice(displayTokenMList[index]).toStringAsFixed(5) ?? "0"), //Market unit price
+                                            : TokenRate.instance.getPrice(displayTokenMList[index]).toStringAsFixed(5) ??
+                                                "0"), //Market unit price
                                     style: TextStyle(
                                       color: Colors.lightBlueAccent,
                                       fontSize: ScreenUtil().setSp(2.5),
@@ -595,7 +601,9 @@ class _EeePageState extends State<EeePage> {
               color: Colors.transparent,
               child: Row(
                 children: <Widget>[
-                  new Padding(padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)), child: Image.asset("assets/images/ic_receive.png")),
+                  new Padding(
+                      padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
+                      child: Image.asset("assets/images/ic_receive.png")),
                   Padding(
                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
                       child: Text(

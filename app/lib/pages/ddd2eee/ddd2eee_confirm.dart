@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:typed_data';
+
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
@@ -9,7 +9,6 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
@@ -387,7 +386,8 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
               ethTransferPayload
                 ..fromAddress = fromExchangeAddress
                 ..toAddress = toExchangeAddress
-                ..contractAddress = chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA
+                ..contractAddress =
+                    chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA
                 ..value = dddAmount
                 ..nonce = nonce
                 ..gasPrice = gasPrice
@@ -395,16 +395,20 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
                 ..decimal = 0
                 ..extData = "";
             } catch (e) {
-              Fluttertoast.showToast(msg: translate("balance_is_less"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
+              Fluttertoast.showToast(
+                  msg: translate("balance_is_less"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
               return;
             }
-            String signResult = EthChainControl.getInstance().txSign(ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
+            String signResult =
+                EthChainControl.getInstance().txSign(ethTransferPayload, NoCacheString()..buffer = StringBuffer(pwd));
             if (signResult == null) {
-              Fluttertoast.showToast(msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
+              Fluttertoast.showToast(
+                  msg: translate("sign_failure_check_pwd"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 6);
               NavigatorUtils.goBack(context);
             }
-            Fluttertoast.showToast(msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+            Fluttertoast.showToast(
+                msg: translate("sign_success_and_uploading"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
             sendRawTx2Chain(signResult);
           },
         );

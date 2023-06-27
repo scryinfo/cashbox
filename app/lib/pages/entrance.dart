@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
@@ -10,24 +11,21 @@ import 'package:app/pages/eee_page.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/control/app_info_control.dart';
-import 'package:grpc/grpc.dart';
-import 'package:logger/logger.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:services/services.dart';
-import 'package:wallets/enums.dart' as EnumKit;
-import 'package:wallets/wallets_c.dc.dart';
-import 'eth_page.dart';
 import 'package:services/src/rpc_face/base.pb.dart';
 import 'package:services/src/rpc_face/cashbox_config_open.pbgrpc.dart';
 import 'package:services/src/rpc_face/cashbox_version_open.pbgrpc.dart';
 import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
+import 'package:wallets/enums.dart' as EnumKit;
+import 'package:wallets/wallets_c.dc.dart';
+
+import 'eth_page.dart';
 
 class EntrancePage extends StatefulWidget {
   @override
@@ -170,8 +168,10 @@ class _EntrancePageState extends State<EntrancePage> {
     }
   }
 
-  _updateEthDefaultToken(RefreshOpen refresh, BasicClientReq basicClientReq, LatestConfig serverConfigModel, Config config) async {
-    if (serverConfigModel == null || config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
+  _updateEthDefaultToken(
+      RefreshOpen refresh, BasicClientReq basicClientReq, LatestConfig serverConfigModel, Config config) async {
+    if (serverConfigModel == null ||
+        config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
       return;
     }
     try {
@@ -245,8 +245,10 @@ class _EntrancePageState extends State<EntrancePage> {
     }
   }
 
-  _updateEeeDefaultToken(RefreshOpen refresh, BasicClientReq basicClientReq, LatestConfig serverConfigModel, Config config) async {
-    if (serverConfigModel == null || config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
+  _updateEeeDefaultToken(
+      RefreshOpen refresh, BasicClientReq basicClientReq, LatestConfig serverConfigModel, Config config) async {
+    if (serverConfigModel == null ||
+        config.privateConfig.defaultDigitVersion == serverConfigModel.defaultTokenListVersion) {
       return;
     }
     try {
@@ -476,7 +478,11 @@ class _EntrancePageState extends State<EntrancePage> {
             Gaps.scaleHGap(2.5),
             Text(
               translate('add_wallet'),
-              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+              style: TextStyle(
+                  decoration: TextDecoration.none,
+                  color: Colors.blue,
+                  fontSize: ScreenUtil().setSp(4),
+                  fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -503,7 +509,11 @@ class _EntrancePageState extends State<EntrancePage> {
             Gaps.scaleHGap(2.5),
             Text(
               translate('import_wallet'),
-              style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+              style: TextStyle(
+                  decoration: TextDecoration.none,
+                  color: Colors.blue,
+                  fontSize: ScreenUtil().setSp(4),
+                  fontStyle: FontStyle.normal),
             ),
           ],
         ),
@@ -536,12 +546,18 @@ class _EntrancePageState extends State<EntrancePage> {
                   TextSpan(
                     text: translate('agree_service_prefix'),
                     style: TextStyle(
-                        decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+                        decoration: TextDecoration.none,
+                        color: Colors.white70,
+                        fontSize: ScreenUtil().setSp(3),
+                        fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
                       text: translate('service_protocol_tag'),
                       style: TextStyle(
-                          decoration: TextDecoration.underline, color: Colors.white70, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+                          decoration: TextDecoration.underline,
+                          color: Colors.white70,
+                          fontSize: ScreenUtil().setSp(3),
+                          fontStyle: FontStyle.normal),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           NavigatorUtils.push(context, Routes.serviceAgreementPage);
@@ -549,12 +565,18 @@ class _EntrancePageState extends State<EntrancePage> {
                   TextSpan(
                     text: "、",
                     style: TextStyle(
-                        decoration: TextDecoration.none, color: Colors.white70, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+                        decoration: TextDecoration.none,
+                        color: Colors.white70,
+                        fontSize: ScreenUtil().setSp(3),
+                        fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
                       text: translate('privacy_protocol_tag'),
                       style: TextStyle(
-                          decoration: TextDecoration.underline, color: Colors.white70, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+                          decoration: TextDecoration.underline,
+                          color: Colors.white70,
+                          fontSize: ScreenUtil().setSp(3),
+                          fontStyle: FontStyle.normal),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           NavigatorUtils.push(context, Routes.privacyStatementPage);

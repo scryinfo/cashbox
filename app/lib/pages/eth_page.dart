@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/model/token.dart';
@@ -14,8 +15,6 @@ import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/control/app_info_control.dart';
-import 'package:logger/logger.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -25,6 +24,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart' as WalletDy;
@@ -71,7 +71,8 @@ class _EthPageState extends State<EthPage> {
       moneyUnitStr = config.currency ?? "USD";
     }
     this.walletName = WalletsControl.getInstance().currentWallet().name;
-    this.allVisibleTokenMList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
+    this.allVisibleTokenMList =
+        EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
     this.allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
     if (mounted) {
       setState(() {
@@ -133,9 +134,12 @@ class _EthPageState extends State<EthPage> {
         if (curChainAddress == null || curChainAddress.trim() == "") {
           return;
         }
-        var curAddressId = WalletsControl().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, curChainType);
-        if (this.displayTokenMList[index].contractAddress != null && this.displayTokenMList[index].contractAddress.trim() != "") {
-          balance = await loadErc20Balance(curChainAddress ?? "", this.displayTokenMList[index].contractAddress, curChainType);
+        var curAddressId =
+            WalletsControl().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, curChainType);
+        if (this.displayTokenMList[index].contractAddress != null &&
+            this.displayTokenMList[index].contractAddress.trim() != "") {
+          balance =
+              await loadErc20Balance(curChainAddress ?? "", this.displayTokenMList[index].contractAddress, curChainType);
         } else {
           balance = await loadEthBalance(curChainAddress ?? "", curChainType);
         }
@@ -431,7 +435,9 @@ class _EthPageState extends State<EthPage> {
                               Align(
                                 alignment: new FractionalOffset(0.0, 0.0),
                                 child: Text(
-                                  (displayTokenMList[index].shortName ?? "") + "  *" + (displayTokenMList[index].balance ?? "0.00"),
+                                  (displayTokenMList[index].shortName ?? "") +
+                                      "  *" +
+                                      (displayTokenMList[index].balance ?? "0.00"),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: ScreenUtil().setSp(3.5),
@@ -475,7 +481,8 @@ class _EthPageState extends State<EthPage> {
                                               " " +
                                               (rateInstance == null
                                                   ? ""
-                                                  : rateInstance.getPrice(displayTokenMList[index]).toStringAsFixed(3) ?? "0"), //Market unit price
+                                                  : rateInstance.getPrice(displayTokenMList[index]).toStringAsFixed(3) ??
+                                                      "0"), //Market unit price
                                           style: TextStyle(
                                             color: Colors.lightBlueAccent,
                                             fontSize: ScreenUtil().setSp(2.3),
@@ -485,7 +492,8 @@ class _EthPageState extends State<EthPage> {
                                     child: Text(
                                       rateInstance == null
                                           ? "0% ↑"
-                                          : rateInstance.decorateChangeDaily(rateInstance.getChangeDaily(displayTokenMList[index])),
+                                          : rateInstance
+                                              .decorateChangeDaily(rateInstance.getChangeDaily(displayTokenMList[index])),
                                       style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil().setSp(2.5)),
                                     ),
                                   )
@@ -569,7 +577,9 @@ class _EthPageState extends State<EthPage> {
               color: Colors.transparent,
               child: Row(
                 children: <Widget>[
-                  new Padding(padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)), child: Image.asset("assets/images/ic_receive.png")),
+                  new Padding(
+                      padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
+                      child: Image.asset("assets/images/ic_receive.png")),
                   Padding(
                       padding: EdgeInsets.only(left: ScreenUtil().setWidth(3.5)),
                       child: Text(
@@ -580,7 +590,8 @@ class _EthPageState extends State<EthPage> {
               ),
             ),
             onTap: () {
-              _navigatorToQrInfoPage(walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress());
+              _navigatorToQrInfoPage(
+                  walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress());
             },
           )
         ],
@@ -718,7 +729,8 @@ class _EthPageState extends State<EthPage> {
                 if (walletName.isEmpty || WalletsControl.getInstance().currentChainAddress().isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress() ?? "");
+                _navigatorToQrInfoPage(
+                    walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress() ?? "");
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
@@ -731,7 +743,8 @@ class _EthPageState extends State<EthPage> {
             ),
             child: GestureDetector(
               onTap: () {
-                _navigatorToQrInfoPage(walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress() ?? "");
+                _navigatorToQrInfoPage(
+                    walletName, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress() ?? "");
               },
               child: Text(
                 WalletsControl.getInstance().currentChainAddress() ?? "",

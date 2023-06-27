@@ -19,39 +19,34 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   flutter_localizations:
     sdk: flutter
-
-  flutter_translate: ^1.6.0
-
+  flutter_translate: ^4.0.4
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
-
-  provider: ^5.0.0
+  provider: ^6.0.5
   # 状态管理           https://github.com/rrousselGit/provider
-
-  dio:  ^4.0.0
+  dio: ^5.2.1+1
   # 网络请求           https://github.com/flutterchina/dio
 
-  fluttertoast: ^7.1.1
+  fluttertoast: ^8.2.2
   #                    https://github.com/PonnamKarthik/FlutterToast
 
-  oktoast: ^2.2.0
+  oktoast: ^3.3.1
   # Toast插件 https://github.com/OpenFlutter/flutter_oktoast
 
-  fluro: "^1.7.2"
+  fluro: ^2.0.5
   # 路由管理           https://github.com/theyakka/fluro
 
-  flutter_webview_plugin: ^0.3.11
-
-  webview_flutter: ^1.0.7
-
-  device_info: ^1.0.0
+  #  flutter_webview_plugin: ^0.3.11
+  webview_flutter: ^4.2.2
+  flutter_html: ^3.0.0-beta.2
+  device_info_plus: ^9.0.2
+  #  device_info: ^1.0.0
   # 获取设备id
 
-  flutter_progress_button: '^0.6.2'
+  #  flutter_progress_button: ^1.0.0
 
   sn_progress_dialog: ^1.0.2
 
@@ -59,51 +54,37 @@ dependencies:
 
   rflutter_alert: ^2.0.2
 
-  qr_flutter: ^3.0.1
+  qr_flutter: ^4.1.0
   # 生成二维码         https://github.com/lukef/qr.flutter
 
-  flutter_swiper: ^1.1.6
-  #                    https://github.com/jzoom/flutter_swiper
-
-  flutter_screenutil: ^3.1.1
-  # 屏幕适配           https://github.com/OpenFlutter/flutter_screenutil
-
+  #  flutter_swiper: ^1.1.6
+  flutter_card_swiper: ^6.0.0
+  flutter_screenutil: ^5.8.4
   flutter_easyrefresh: ^2.0.3
   # 上下拉刷新功能     https://github.com/xuelongqy/flutter_easyrefresh
-
-  web_socket_channel: ^1.1.0
-  # 通过socket通信     https://pub.dev/packages/web_socket_channel#-installing-tab-
-
+  web_socket_channel: ^2.4.0
   stream_channel: ">=1.1.0 <3.0.0"
-
-  flutter_html: ^0.10.4
-  #flutter_html: ^1.0.2
-  #                    https://github.com/Sub6Resources/flutter_html
-
   path_provider: ^2.0.1
   #路径信息获取        https://github.com/flutter/plugins
 
-  package_info: ^0.4.0+18
+  package_info: ^2.0.2
   #yingyongbanben
 
-  permission_handler: ^5.0.1+1
+  permission_handler: ^10.3.0
   # https://github.com/Baseflow/flutter-permission-handler
 
-  json_rpc_2: ^2.1.1
+  json_rpc_2: ^3.0.2
   #         https://github.com/dart-lang/json_rpc_2
 
   grpc: ^3.0.0
   # https://github.com/grpc/grpc-dart
 
-  google_fonts: ^2.0.0
+  google_fonts: ^4.0.4
   # https://github.com/material-foundation/google-fonts-flutter
 
   material_dialogs: ^1.0.0
-
-  ffi: ^1.0.0
-
-  json_annotation: ^3.1.0
-
+  ffi: ^2.0.2
+  json_annotation: ^4.8.1
   wallets:
     path: ../packages/wallets
 
@@ -117,8 +98,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  build_runner: ^1.0.0
-  json_serializable: ^3.5.0
+  build_runner: ^2.4.5
+  json_serializable: ^6.7.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -141,78 +122,78 @@ flutter:
     - assets/images/2.0x/
     - assets/images/3.0x/
 
-#    # 调试本地加载html、js、css资源
-#    - assets/dist/
-#    - assets/dist/index.html
-#    - assets/dist/favicon.ico
-#
-#    - assets/dist/css/
-#    - assets/dist/css/app.de440ad0.css
-#    - assets/dist/css/chunk-2d856f3d.dc0e368a.css
-#    - assets/dist/css/chunk-7bcd7ac3.9a4ee78a.css
-#    - assets/dist/css/chunk-7ca391f8.3c5bd89b.css
-#    - assets/dist/css/chunk-7e477f36.c243b0fa.css
-#    - assets/dist/css/chunk-13a133bc.9c90b3b5.css
-#    - assets/dist/css/chunk-20dd31a9.1363f097.css
-#    - assets/dist/css/chunk-60aefd06.a6e4e6d8.css
-#    - assets/dist/css/chunk-65f6e5ef.7e41f541.css
-#    - assets/dist/css/chunk-79ae0b8e.8b3168c4.css
-#    - assets/dist/css/chunk-260ddaea.1fbaaa38.css
-#    - assets/dist/css/chunk-366a9ded.ae89e3a6.css
-#    - assets/dist/css/chunk-417fe318.f85bc702.css
-#    - assets/dist/css/chunk-488d230c.2d455c8a.css
-#    - assets/dist/css/chunk-7618b7ac.25d3c7fa.css
-#    - assets/dist/css/chunk-7814d7ca.ad6f09bd.css
-#    - assets/dist/css/chunk-9068ef6e.5035bfb1.css
-#    - assets/dist/css/chunk-9658de64.3c42286b.css
-#    - assets/dist/css/chunk-17145e97.f62cfe34.css
-#    - assets/dist/css/chunk-a884be24.30747719.css
-#    - assets/dist/css/chunk-a2453b60.4600b4e4.css
-#    - assets/dist/css/chunk-c3eba2e4.298f99fb.css
-#    - assets/dist/css/chunk-c466b422.b46f9070.css
-#    - assets/dist/css/chunk-vendors.064cd3de.css
-#
-#    - assets/dist/js/
-#    - assets/dist/js/app.c2d43b15.js
-#    - assets/dist/js/chunk-2d0a347d.7d2d1a5b.js
-#    - assets/dist/js/chunk-2d0a5191.ab18a80e.js
-#    - assets/dist/js/chunk-2d0ab4d9.e472b6d6.js
-#    - assets/dist/js/chunk-2d0aba49.80839b5b.js
-#    - assets/dist/js/chunk-2d0ae94a.d73de80d.js
-#    - assets/dist/js/chunk-2d0b3a10.7bfd372e.js
-#    - assets/dist/js/chunk-2d0b211c.34a4e2d4.js
-#    - assets/dist/js/chunk-2d0be08d.2c7664e9.js
-#    - assets/dist/js/chunk-2d0c9500.7b26c656.js
-#    - assets/dist/js/chunk-2d0cbe86.f4945adf.js
-#    - assets/dist/js/chunk-2d0d6783.fc05457e.js
-#    - assets/dist/js/chunk-2d0e48f0.ce106788.js
-#    - assets/dist/js/chunk-2d856f3d.923aa50e.js
-#    - assets/dist/js/chunk-2d2073f4.a4d78a1d.js
-#    - assets/dist/js/chunk-2d221502.c46a4809.js
-#    - assets/dist/js/chunk-2d229052.6ca990cd.js
-#    - assets/dist/js/chunk-7bcd7ac3.f71d9c33.js
-#    - assets/dist/js/chunk-7ca391f8.b08bbeef.js
-#    - assets/dist/js/chunk-7e477f36.d548593b.js
-#    - assets/dist/js/chunk-13a133bc.92655da4.js
-#    - assets/dist/js/chunk-20dd31a9.3777f0e0.js
-#    - assets/dist/js/chunk-60aefd06.82adc59f.js
-#    - assets/dist/js/chunk-65f6e5ef.30b2af6b.js
-#    - assets/dist/js/chunk-79ae0b8e.94fb2697.js
-#    - assets/dist/js/chunk-260ddaea.9d9dd362.js
-#    - assets/dist/js/chunk-366a9ded.87ef3900.js
-#    - assets/dist/js/chunk-417fe318.7fd9cc96.js
-#    - assets/dist/js/chunk-488d230c.94c72c53.js
-#    - assets/dist/js/chunk-7618b7ac.f7e7d444.js
-#    - assets/dist/js/chunk-7814d7ca.248d4688.js
-#    - assets/dist/js/chunk-9068ef6e.7dac95c2.js
-#    - assets/dist/js/chunk-9658de64.842a76a5.js
-#    - assets/dist/js/chunk-17145e97.8c9c1a97.js
-#    - assets/dist/js/chunk-749967f3.764efd36.js
-#    - assets/dist/js/chunk-a884be24.da4633b3.js
-#    - assets/dist/js/chunk-a2453b60.b6ef5a42.js
-#    - assets/dist/js/chunk-c3eba2e4.b8293ca1.js
-#    - assets/dist/js/chunk-c466b422.a1189875.js
-#    - assets/dist/js/chunk-vendors.28fb2c37.js
+  #    # 调试本地加载html、js、css资源
+  #    - assets/dist/
+  #    - assets/dist/index.html
+  #    - assets/dist/favicon.ico
+  #
+  #    - assets/dist/css/
+  #    - assets/dist/css/app.de440ad0.css
+  #    - assets/dist/css/chunk-2d856f3d.dc0e368a.css
+  #    - assets/dist/css/chunk-7bcd7ac3.9a4ee78a.css
+  #    - assets/dist/css/chunk-7ca391f8.3c5bd89b.css
+  #    - assets/dist/css/chunk-7e477f36.c243b0fa.css
+  #    - assets/dist/css/chunk-13a133bc.9c90b3b5.css
+  #    - assets/dist/css/chunk-20dd31a9.1363f097.css
+  #    - assets/dist/css/chunk-60aefd06.a6e4e6d8.css
+  #    - assets/dist/css/chunk-65f6e5ef.7e41f541.css
+  #    - assets/dist/css/chunk-79ae0b8e.8b3168c4.css
+  #    - assets/dist/css/chunk-260ddaea.1fbaaa38.css
+  #    - assets/dist/css/chunk-366a9ded.ae89e3a6.css
+  #    - assets/dist/css/chunk-417fe318.f85bc702.css
+  #    - assets/dist/css/chunk-488d230c.2d455c8a.css
+  #    - assets/dist/css/chunk-7618b7ac.25d3c7fa.css
+  #    - assets/dist/css/chunk-7814d7ca.ad6f09bd.css
+  #    - assets/dist/css/chunk-9068ef6e.5035bfb1.css
+  #    - assets/dist/css/chunk-9658de64.3c42286b.css
+  #    - assets/dist/css/chunk-17145e97.f62cfe34.css
+  #    - assets/dist/css/chunk-a884be24.30747719.css
+  #    - assets/dist/css/chunk-a2453b60.4600b4e4.css
+  #    - assets/dist/css/chunk-c3eba2e4.298f99fb.css
+  #    - assets/dist/css/chunk-c466b422.b46f9070.css
+  #    - assets/dist/css/chunk-vendors.064cd3de.css
+  #
+  #    - assets/dist/js/
+  #    - assets/dist/js/app.c2d43b15.js
+  #    - assets/dist/js/chunk-2d0a347d.7d2d1a5b.js
+  #    - assets/dist/js/chunk-2d0a5191.ab18a80e.js
+  #    - assets/dist/js/chunk-2d0ab4d9.e472b6d6.js
+  #    - assets/dist/js/chunk-2d0aba49.80839b5b.js
+  #    - assets/dist/js/chunk-2d0ae94a.d73de80d.js
+  #    - assets/dist/js/chunk-2d0b3a10.7bfd372e.js
+  #    - assets/dist/js/chunk-2d0b211c.34a4e2d4.js
+  #    - assets/dist/js/chunk-2d0be08d.2c7664e9.js
+  #    - assets/dist/js/chunk-2d0c9500.7b26c656.js
+  #    - assets/dist/js/chunk-2d0cbe86.f4945adf.js
+  #    - assets/dist/js/chunk-2d0d6783.fc05457e.js
+  #    - assets/dist/js/chunk-2d0e48f0.ce106788.js
+  #    - assets/dist/js/chunk-2d856f3d.923aa50e.js
+  #    - assets/dist/js/chunk-2d2073f4.a4d78a1d.js
+  #    - assets/dist/js/chunk-2d221502.c46a4809.js
+  #    - assets/dist/js/chunk-2d229052.6ca990cd.js
+  #    - assets/dist/js/chunk-7bcd7ac3.f71d9c33.js
+  #    - assets/dist/js/chunk-7ca391f8.b08bbeef.js
+  #    - assets/dist/js/chunk-7e477f36.d548593b.js
+  #    - assets/dist/js/chunk-13a133bc.92655da4.js
+  #    - assets/dist/js/chunk-20dd31a9.3777f0e0.js
+  #    - assets/dist/js/chunk-60aefd06.82adc59f.js
+  #    - assets/dist/js/chunk-65f6e5ef.30b2af6b.js
+  #    - assets/dist/js/chunk-79ae0b8e.94fb2697.js
+  #    - assets/dist/js/chunk-260ddaea.9d9dd362.js
+  #    - assets/dist/js/chunk-366a9ded.87ef3900.js
+  #    - assets/dist/js/chunk-417fe318.7fd9cc96.js
+  #    - assets/dist/js/chunk-488d230c.94c72c53.js
+  #    - assets/dist/js/chunk-7618b7ac.f7e7d444.js
+  #    - assets/dist/js/chunk-7814d7ca.248d4688.js
+  #    - assets/dist/js/chunk-9068ef6e.7dac95c2.js
+  #    - assets/dist/js/chunk-9658de64.842a76a5.js
+  #    - assets/dist/js/chunk-17145e97.8c9c1a97.js
+  #    - assets/dist/js/chunk-749967f3.764efd36.js
+  #    - assets/dist/js/chunk-a884be24.da4633b3.js
+  #    - assets/dist/js/chunk-a2453b60.b6ef5a42.js
+  #    - assets/dist/js/chunk-c3eba2e4.b8293ca1.js
+  #    - assets/dist/js/chunk-c466b422.a1189875.js
+  #    - assets/dist/js/chunk-vendors.28fb2c37.js
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

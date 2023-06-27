@@ -4,9 +4,10 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.Signature;
 import android.content.pm.PackageManager;
+
 import java.security.MessageDigest;
 
-public class Utils{
+public class Utils {
     public static byte[] getSignature(Context context) {
         try {
             String pkgname = context.getPackageName();

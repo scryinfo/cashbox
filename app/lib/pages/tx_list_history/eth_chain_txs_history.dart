@@ -5,18 +5,17 @@ import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:logger/logger.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
+
 import '../../res/resources.dart';
 
 class EthChainTxsHistoryPage extends StatefulWidget {
@@ -126,7 +125,8 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                   ),
                   TextSpan(
                     text: "≈" + (TokenRate.instance.getNowLegalCurrency() ?? "") + " " + (moneyInfo ?? "0.0"),
-                    style: TextStyle(color: Colors.lightBlueAccent, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
+                    style: TextStyle(
+                        color: Colors.lightBlueAccent, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
                   ),
                 ])),
               )),
@@ -362,7 +362,9 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
                       child: Text(
                         ethTxListModel[index].isError ?? "",
                         style: TextStyle(
-                          color: (ethTxListModel[index].isError == translate('tx_success')) ? Colors.white70 : Colors.redAccent,
+                          color: (ethTxListModel[index].isError == translate('tx_success'))
+                              ? Colors.white70
+                              : Colors.redAccent,
                           fontSize: ScreenUtil().setSp(2.5),
                         ),
                         textAlign: TextAlign.start,
@@ -411,7 +413,8 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
       if ((contractAddress == null || contractAddress.trim() == "") && (fromAddress != null && fromAddress.trim() != "")) {
         ethTxListModel = await loadEthTxHistory(context, fromAddress, chainType, offset: displayTxOffset.toString());
       } else if (fromAddress.trim() != "") {
-        ethTxListModel = await loadErc20TxHistory(context, fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
+        ethTxListModel =
+            await loadErc20TxHistory(context, fromAddress, contractAddress, chainType, offset: displayTxOffset.toString());
       } else {
         Fluttertoast.showToast(msg: translate('address_empty').toString());
       }

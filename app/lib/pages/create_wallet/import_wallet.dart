@@ -1,19 +1,20 @@
 import 'dart:typed_data';
 
-import 'package:app/control/wallets_control.dart';
 import 'package:app/control/qr_scan_control.dart';
+import 'package:app/control/wallets_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:wallets/enums.dart' as EnumKit;
-import '../../res/resources.dart';
-import '../../routers/routers.dart';
-import '../../routers/fluro_navigator.dart';
-import '../../res/styles.dart';
-import '../../widgets/app_bar.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:logger/logger.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:wallets/enums.dart' as EnumKit;
+
+import '../../res/resources.dart';
+import '../../res/styles.dart';
+import '../../routers/fluro_navigator.dart';
+import '../../routers/routers.dart';
+import '../../widgets/app_bar.dart';
 
 class ImportWalletPage extends StatefulWidget {
   @override
@@ -180,7 +181,10 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+                          Fluttertoast.showToast(
+                              msg: translate("camera_permission_deny"),
+                              toastLength: Toast.LENGTH_LONG,
+                              timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -475,20 +479,22 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
     var curNetType = WalletsControl.getInstance().getCurrentNetType();
     switch (curNetType) {
       case EnumKit.NetType.Main:
-        walletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mneController.text.codeUnits), EnumKit.WalletType.Normal,
-            _walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
+        walletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mneController.text.codeUnits),
+            EnumKit.WalletType.Normal, _walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
         break;
       case EnumKit.NetType.Test:
-        walletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mneController.text.codeUnits), EnumKit.WalletType.Test,
-            _walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
+        walletObj = WalletsControl.getInstance().createWallet(Uint8List.fromList(_mneController.text.codeUnits),
+            EnumKit.WalletType.Test, _walletNameController.text, Uint8List.fromList(_pwdController.text.codeUnits));
         break;
       default:
-        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+        Fluttertoast.showToast(
+            msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
         return;
         break;
     }
     if (walletObj == null) {
-      Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+      Fluttertoast.showToast(
+          msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
       return;
     }
     _mneController.text = "";

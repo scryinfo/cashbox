@@ -1,7 +1,8 @@
-import 'package:logger/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:logger/logger.dart';
+
 import '../res/resources.dart';
 
 class ProgressDialog extends Dialog {
@@ -17,7 +18,9 @@ class ProgressDialog extends Dialog {
         child: Container(
           height: ScreenUtil().setHeight(120),
           width: ScreenUtil().setWidth(75),
-          decoration: ShapeDecoration(color: Color(0xFFD7E5E9), shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0)))),
+          decoration: ShapeDecoration(
+              color: Color(0xFFD7E5E9),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0)))),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -38,7 +41,8 @@ class ProgressDialog extends Dialog {
     try {
       showTransparentDialog(
           context: context,
-          barrierDismissible: outsideDismiss, //Click around, whether to cancel the dialog display. Select false for the progress bar
+          barrierDismissible: outsideDismiss,
+          //Click around, whether to cancel the dialog display. Select false for the progress bar
           builder: (_) {
             return WillPopScope(
               onWillPop: () async {

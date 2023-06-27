@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
 class Mnemonic {
-  Uint8List mn;
-  String mnId;
-  int status;
+  Uint8List mn = Uint8List.fromList([]);
+  String mnId = "";
+  int status = 0;
 
-  Mnemonic({this.mn, this.mnId, this.status});
+  Mnemonic({required this.mn, required this.mnId, required this.status});
 
   Mnemonic.fromJson(Map<String, dynamic> json) {
     mn = json['mn'];

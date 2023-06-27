@@ -1,19 +1,21 @@
+import 'dart:typed_data';
+
 import 'package:app/control/wallets_control.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
+import 'package:app/routers/fluro_navigator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import '../../widgets/app_bar.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'dart:typed_data';
+import 'package:wallets/enums.dart' as EnumKit;
+
+import '../../control/qr_scan_control.dart';
 import '../../res/styles.dart';
 import '../../routers/routers.dart';
-import 'package:app/routers/fluro_navigator.dart';
-import '../../control/qr_scan_control.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:wallets/enums.dart' as EnumKit;
+import '../../widgets/app_bar.dart';
 
 class CreateWalletConfirmPage extends StatefulWidget {
   @override
@@ -37,7 +39,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
 
   initData() {
     setState(() {
-      mnemonicList = String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).split(" ");
+      mnemonicList =
+          String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).split(" ");
       mnemonicList.sort((left, right) => left.length.compareTo(right.length)); //Out of order display Mnemonic
     });
   }
@@ -124,7 +127,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                   }
                   context.read<CreateWalletProcessProvide>().emptyData();
                   /**The creation of the wallet is completed, and the record information about the mnemonic words in the memory is clear*/
-                  NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true', clearStack: true); //Reload walletList
+                  NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=true',
+                      clearStack: true); //Reload walletList
                 },
                 child: Text(
                   translate('verify_mnemonic_info'),
@@ -183,7 +187,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
                   if (statuses[Permission.camera] == PermissionStatus.granted) {
                     _scanQrContent();
                   } else {
-                    Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+                    Fluttertoast.showToast(
+                        msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
                   }
                 }
               },
@@ -237,7 +242,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
     if (verifyString.isEmpty) {
       return false;
     }
-    if (verifyString.trim() != String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).trim()) {
+    if (verifyString.trim() !=
+        String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context, listen: false).mnemonic).trim()) {
       return false;
     }
     var walletObj;
@@ -258,7 +264,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
             Uint8List.fromList(Provider.of<CreateWalletProcessProvide>(context, listen: false).pwd));
         break;
       default:
-        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+        Fluttertoast.showToast(
+            msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
         return false;
         break;
     }

@@ -1,13 +1,12 @@
-
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrInfoPage extends StatefulWidget {

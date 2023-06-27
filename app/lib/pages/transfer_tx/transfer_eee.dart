@@ -1,21 +1,19 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eee_chain_control.dart';
+import 'package:app/control/qr_scan_control.dart';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/net/scryx_net_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/control/qr_scan_control.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -93,7 +91,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
           .loadTokenXbalance(config.tokenXSymbol, config.balanceSymbol, WalletsControl.getInstance().currentChainAddress());
       if (tokenBalanceMap != null && tokenBalanceMap.containsKey("result")) {
         try {
-          double tokenXFreeBalance = BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble();
+          double tokenXFreeBalance =
+              BigInt.parse(Utils.reverseHexValue2SmallEnd(tokenBalanceMap["result"]), radix: 16).toDouble();
           var formatBalance = tokenXFreeBalance / Utils.mathPow(10, decimal).toDouble();
           curTokenBalance = formatBalance.toStringAsFixed(5) ?? "0";
         } catch (e) {
@@ -248,7 +247,10 @@ class _TransferEeePageState extends State<TransferEeePage> {
                         if (statuses[Permission.camera] == PermissionStatus.granted) {
                           _scanQrContent();
                         } else {
-                          Fluttertoast.showToast(msg: translate("camera_permission_deny"), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 8);
+                          Fluttertoast.showToast(
+                              msg: translate("camera_permission_deny"),
+                              toastLength: Toast.LENGTH_LONG,
+                              timeInSecForIosWeb: 8);
                         }
                       }
                     },
@@ -270,7 +272,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
         _toAddressController.text = qrResult.toString();
       });
     } catch (e) {
-      Fluttertoast.showToast(msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+      Fluttertoast.showToast(
+          msg: translate('unknown_error_in_scan_qr_code'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
     }
   }
 
@@ -293,7 +296,10 @@ class _TransferEeePageState extends State<TransferEeePage> {
                 ),
                 TextSpan(
                   text: " (" + translate('tx_unit') + digitName + ")",
-                  style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.35), fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+                  style: TextStyle(
+                      color: Color.fromRGBO(255, 255, 255, 0.35),
+                      fontSize: ScreenUtil().setSp(3),
+                      fontStyle: FontStyle.normal),
                 ),
               ]),
             ),
@@ -309,8 +315,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
+                contentPadding: EdgeInsets.only(
+                    left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil().setSp(3),
@@ -363,8 +369,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
               decoration: InputDecoration(
                 fillColor: Color.fromRGBO(101, 98, 98, 0.50),
                 filled: true,
-                contentPadding:
-                    EdgeInsets.only(left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
+                contentPadding: EdgeInsets.only(
+                    left: ScreenUtil().setWidth(2), top: ScreenUtil().setHeight(3.5), bottom: ScreenUtil().setHeight(3.5)),
                 labelStyle: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil().setSp(3),
@@ -421,11 +427,13 @@ class _TransferEeePageState extends State<TransferEeePage> {
 
   bool _verifyDataFormat() {
     if (_toAddressController.text.trim() == "") {
-      Fluttertoast.showToast(msg: translate('to_address_null').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+      Fluttertoast.showToast(
+          msg: translate('to_address_null').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
     if (_txValueController.text.trim() == "") {
-      Fluttertoast.showToast(msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+      Fluttertoast.showToast(
+          msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
     try {
@@ -460,7 +468,8 @@ class _TransferEeePageState extends State<TransferEeePage> {
             try {
               formatValue = (double.parse(_txValueController.text) * Utils.mathPow(10, decimal).toInt()).toInt();
             } catch (e) {
-              Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+              Fluttertoast.showToast(
+                  msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
             }
@@ -477,12 +486,14 @@ class _TransferEeePageState extends State<TransferEeePage> {
             } else if (digitName != null && digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
               signInfo = EeeChainControl.getInstance().tokenXTransfer(eeeTransferPayload);
             } else {
-              Fluttertoast.showToast(msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+              Fluttertoast.showToast(
+                  msg: translate('eee_config_error').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
             }
             if (signInfo == null || signInfo.isEmpty) {
-              Fluttertoast.showToast(msg: translate('tx_sign_failure').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
+              Fluttertoast.showToast(
+                  msg: translate('tx_sign_failure').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
               NavigatorUtils.goBack(context);
               return;
             }

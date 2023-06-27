@@ -3,12 +3,10 @@ import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/widgets/app_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:logger/logger.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
@@ -95,10 +93,11 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
                   return;
                 }
                 // loadAll，and use first wallet as default
-                bool isSaveOk = WalletsControl.getInstance()
-                    .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
+                bool isSaveOk = WalletsControl.getInstance().saveCurrentWalletChain(
+                    WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
                 if (!isSaveOk) {
-                  Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+                  Fluttertoast.showToast(
+                      msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
                   return;
                 }
                 NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
@@ -185,10 +184,11 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
       return;
     }
     // loadAll，and use first wallet as default
-    bool isSaveOk =
-        WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.EthTest);
+    bool isSaveOk = WalletsControl.getInstance()
+        .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.EthTest);
     if (!isSaveOk) {
-      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+      Fluttertoast.showToast(
+          msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
       WalletsControl.getInstance().changeNetType(EnumKit.NetType.Main);
       return;
     }

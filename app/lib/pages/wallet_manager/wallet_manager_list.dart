@@ -4,10 +4,11 @@ import 'package:app/provide/wallet_manager_provide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
+
 import '../../res/resources.dart';
-import '../../routers/routers.dart';
-import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
+import '../../routers/fluro_navigator.dart';
+import '../../routers/routers.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/list_item.dart';
 

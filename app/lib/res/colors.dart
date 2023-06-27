@@ -13,8 +13,7 @@ class Colours {
   static const Color line = Color(0xFFEEEEEE);
   static const Color order_line = Color(0xFFDDDDDD);
   static const Color text_red = Color(0xFFFF4759);
-  
+
   static const Color login_text_disabled = Color(0xFFD4E2FA);
   static const Color login_button_disabled = Color(0xFF96BBFA);
 }
-

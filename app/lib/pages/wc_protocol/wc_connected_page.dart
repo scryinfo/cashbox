@@ -11,7 +11,6 @@ import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
@@ -63,7 +62,10 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
       try {
         txInfoMap = Map.from(event);
         Logger().d("wcEventPlugin : txInfoMap is--->", txInfoMap.toString());
-        if (!txInfoMap.containsKey("from") || !txInfoMap.containsKey("to") || !txInfoMap.containsKey("value") || !txInfoMap.containsKey("data")) {
+        if (!txInfoMap.containsKey("from") ||
+            !txInfoMap.containsKey("to") ||
+            !txInfoMap.containsKey("value") ||
+            !txInfoMap.containsKey("data")) {
           Fluttertoast.showToast(msg: translate("wc_tx_format_error"));
           return;
         }
@@ -165,11 +167,19 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
         _buildDappIconWidget(),
         Text(
           Provider.of<WcInfoProvide>(context, listen: false).dappName ?? "" + translate("already_connect_wallet") ?? "",
-          style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+          style: TextStyle(
+              decoration: TextDecoration.none,
+              color: Colors.blue,
+              fontSize: ScreenUtil().setSp(4),
+              fontStyle: FontStyle.normal),
         ),
         Text(
           Provider.of<WcInfoProvide>(context, listen: false).dappUrl ?? "",
-          style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+          style: TextStyle(
+              decoration: TextDecoration.none,
+              color: Colors.blueGrey,
+              fontSize: ScreenUtil().setSp(3),
+              fontStyle: FontStyle.normal),
         ),
       ],
     ));
@@ -225,8 +235,11 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
             Container(
               child: Text(
                 translate("success_connect"),
-                style:
-                    TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+                style: TextStyle(
+                    decoration: TextDecoration.none,
+                    color: Colors.blueGrey,
+                    fontSize: ScreenUtil().setSp(4),
+                    fontStyle: FontStyle.normal),
               ),
             ),
             Gaps.scaleVGap(3),
@@ -236,12 +249,18 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                   TextSpan(
                     text: translate("chain_address_info"),
                     style: TextStyle(
-                        decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+                        decoration: TextDecoration.none,
+                        color: Colors.blueGrey,
+                        fontSize: ScreenUtil().setSp(4),
+                        fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
                     text: WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address ?? "",
                     style: TextStyle(
-                        decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
+                        decoration: TextDecoration.none,
+                        color: Colors.blueGrey,
+                        fontSize: ScreenUtil().setSp(3.5),
+                        fontStyle: FontStyle.normal),
                   )
                 ]),
               ),
@@ -433,12 +452,13 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                           ),
                           Container(
                             alignment: Alignment.topLeft,
-                            child: Text("= Gas(" + _gasController.text + ") * Gas Price(" + _gasPriceController.text + "GWEI)",
-                                maxLines: 2,
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: ScreenUtil().setSp(2.8),
-                                )),
+                            child:
+                                Text("= Gas(" + _gasController.text + ") * Gas Price(" + _gasPriceController.text + "GWEI)",
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontSize: ScreenUtil().setSp(2.8),
+                                    )),
                           ),
                         ],
                       ),
@@ -533,7 +553,8 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                 ..value = value
                 ..gasPrice = gasPrice.toString()
                 ..gas = _gasController.text.toString(); // Unit: wei
-              var resultObj = EthChainControl.getInstance().wcTxSign(ethWalletConnectTx, NoCacheString()..buffer = StringBuffer(pwd));
+              var resultObj =
+                  EthChainControl.getInstance().wcTxSign(ethWalletConnectTx, NoCacheString()..buffer = StringBuffer(pwd));
               setState(() {
                 this.existInputInfo = false;
               });

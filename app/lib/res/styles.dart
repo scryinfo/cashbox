@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'colors.dart';
 import 'dimens.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TextStyles {
   static const TextStyle textMain12 = TextStyle(
@@ -29,22 +29,14 @@ class TextStyles {
     fontSize: Dimens.font_sp16,
     color: Colours.text_dark,
   );
-  static const TextStyle textBoldDark14 = TextStyle(
-      fontSize: Dimens.font_sp14,
-      color: Colours.text_dark,
-      fontWeight: FontWeight.bold);
-  static const TextStyle textBoldDark16 = TextStyle(
-      fontSize: Dimens.font_sp16,
-      color: Colours.text_dark,
-      fontWeight: FontWeight.bold);
-  static const TextStyle textBoldDark18 = TextStyle(
-      fontSize: Dimens.font_sp18,
-      color: Colours.text_dark,
-      fontWeight: FontWeight.bold);
-  static const TextStyle textBoldDark24 = TextStyle(
-      fontSize: 24.0, color: Colours.text_dark, fontWeight: FontWeight.bold);
-  static const TextStyle textBoldDark26 = TextStyle(
-      fontSize: 26.0, color: Colours.text_dark, fontWeight: FontWeight.bold);
+  static const TextStyle textBoldDark14 =
+      TextStyle(fontSize: Dimens.font_sp14, color: Colours.text_dark, fontWeight: FontWeight.bold);
+  static const TextStyle textBoldDark16 =
+      TextStyle(fontSize: Dimens.font_sp16, color: Colours.text_dark, fontWeight: FontWeight.bold);
+  static const TextStyle textBoldDark18 =
+      TextStyle(fontSize: Dimens.font_sp18, color: Colours.text_dark, fontWeight: FontWeight.bold);
+  static const TextStyle textBoldDark24 = TextStyle(fontSize: 24.0, color: Colours.text_dark, fontWeight: FontWeight.bold);
+  static const TextStyle textBoldDark26 = TextStyle(fontSize: 26.0, color: Colours.text_dark, fontWeight: FontWeight.bold);
   static const TextStyle textGray10 = TextStyle(
     fontSize: Dimens.font_sp10,
     color: Colours.text_gray,

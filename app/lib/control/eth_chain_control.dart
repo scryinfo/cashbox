@@ -1,6 +1,6 @@
 import 'package:app/control/balance_control.dart';
-import 'package:app/model/token_rate.dart';
 import 'package:app/model/token.dart';
+import 'package:app/model/token_rate.dart';
 import 'package:logger/logger.dart';
 import 'package:wallets/kits.dart';
 import 'package:wallets/wallets.dart';

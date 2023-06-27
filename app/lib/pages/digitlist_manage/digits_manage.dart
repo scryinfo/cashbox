@@ -1,5 +1,4 @@
-import 'package:app/configv/config/config.dart';
-import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/wallets_control.dart';
@@ -7,22 +6,19 @@ import 'package:app/model/token.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/control/app_info_control.dart';
-import 'package:logger/logger.dart';
 import 'package:app/widgets/my_separator_line.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
-import 'package:services/src/rpc_face/base.pb.dart';
+import 'package:logger/logger.dart';
 import 'package:services/services.dart';
+import 'package:services/src/rpc_face/base.pb.dart';
+import 'package:services/src/rpc_face/token_open.pbgrpc.dart';
 import 'package:wallets/enums.dart';
-import 'package:wallets/wallets_c.dc.dart';
 import 'package:wallets/kits.dart';
+import 'package:wallets/wallets_c.dc.dart';
 
 class DigitsManagePage extends StatefulWidget {
   const DigitsManagePage({Key key, this.isReloadDigitList}) : super(key: key);
@@ -119,7 +115,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           return;
         }
         saveEthTokenToLocalAuth(serverEthTokenList);
-        List<EthChainTokenAuth> ethChainTokenAuthList = EthChainControl.getInstance().getChainEthAuthTokenList(nativeDigitIndex, onePageOffSet);
+        List<EthChainTokenAuth> ethChainTokenAuthList =
+            EthChainControl.getInstance().getChainEthAuthTokenList(nativeDigitIndex, onePageOffSet);
         {
           if (ethChainTokenAuthList == null || ethChainTokenAuthList.length == 0) {
             isLoadAuthDigitFinish = true;
@@ -142,7 +139,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           return;
         }
         saveEeeTokenToLocalAuth(serverEeeTokenList);
-        List<EeeChainTokenAuth> eeeChainTokenAuthList = EeeChainControl.getInstance().getChainEeeAuthTokenList(nativeDigitIndex, onePageOffSet);
+        List<EeeChainTokenAuth> eeeChainTokenAuthList =
+            EeeChainControl.getInstance().getChainEeeAuthTokenList(nativeDigitIndex, onePageOffSet);
         {
           if (eeeChainTokenAuthList == null || eeeChainTokenAuthList.length == 0) {
             isLoadAuthDigitFinish = true;
@@ -184,7 +182,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     String signInfo = await AppInfoControl.instance.getAppSignInfo();
     String deviceId = await AppInfoControl.instance.getDeviceId();
     String apkVersion = await AppInfoControl.instance.getAppVersion();
-    var refresh = RefreshOpen.get(new ConnectParameter("cashbox.scry.info", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
+    var refresh = RefreshOpen.get(
+        new ConnectParameter("cashbox.scry.info", 9004), apkVersion, AppPlatformType.any, signInfo, deviceId, cashBoxType);
     return refresh;
   }
 
@@ -281,7 +280,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       var element = eeeTokenList[index];
       EeeChainTokenAuth eeeChainTokenAuth = EeeChainTokenAuth();
       var chainTypeStr = element.tokenShared.chainType.toLowerCase();
-      if (ChainType.EEE.toEnumString().toLowerCase() == chainTypeStr || ChainType.EeeTest.toEnumString().toLowerCase() == chainTypeStr) {
+      if (ChainType.EEE.toEnumString().toLowerCase() == chainTypeStr ||
+          ChainType.EeeTest.toEnumString().toLowerCase() == chainTypeStr) {
         eeeChainTokenAuth
           ..chainTokenSharedId = element.tokenShardId
           ..position = element.position.toInt()
@@ -309,7 +309,8 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       var element = ethTokenList[index];
       EthChainTokenAuth ethChainTokenAuth = EthChainTokenAuth();
       var chainTypeStr = element.tokenShared.chainType.toLowerCase();
-      if (ChainType.ETH.toEnumString().toLowerCase() == chainTypeStr || ChainType.EthTest.toEnumString().toLowerCase() == chainTypeStr) {
+      if (ChainType.ETH.toEnumString().toLowerCase() == chainTypeStr ||
+          ChainType.EthTest.toEnumString().toLowerCase() == chainTypeStr) {
         ethChainTokenAuth
           ..chainTokenSharedId = element.tokenShardId
           ..position = element.position.toInt()
@@ -492,8 +493,9 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                     ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
                     ..walletId = WalletsControl.getInstance().currentWallet().id
                     ..balance = 0.toString()
-                    ..addressId = WalletsControl.getInstance()
-                            .getTokenAddressId(WalletsControl.getInstance().currentWallet().id, WalletsControl.getInstance().currentChainType()) ??
+                    ..addressId = WalletsControl.getInstance().getTokenAddressId(
+                            WalletsControl.getInstance().currentWallet().id,
+                            WalletsControl.getInstance().currentChainType()) ??
                         "";
                   bool isUpsertOk = WalletsControl.getInstance().updateBalance(tokenAddress);
                   if (!isUpsertOk) {

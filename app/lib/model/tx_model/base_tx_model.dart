@@ -1,9 +1,9 @@
-class BaseTxModel{
-  String _from;
-  String _to;
-  String _value;
-  String _timeStamp;
-  String txHash;
+class BaseTxModel {
+  String _from = "";
+  String _to = "";
+  String _value = "";
+  String _timeStamp = "";
+  String txHash = "";
 
   String get timeStamp => _timeStamp;
 

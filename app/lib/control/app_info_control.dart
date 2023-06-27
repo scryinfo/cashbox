@@ -1,10 +1,11 @@
+import 'dart:io';
+
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:flutter/services.dart';
-import 'package:package_info/package_info.dart';
 import 'package:device_info/device_info.dart';
+import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
-import 'dart:io';
+import 'package:package_info/package_info.dart';
 
 class AppInfoControl {
   static const appInfoChannel = const MethodChannel('app_info_channel');

@@ -1,11 +1,10 @@
+import 'package:app/control/app_info_control.dart';
 import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
-import 'package:app/control/app_info_control.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/list_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -69,8 +68,11 @@ class _AboutUsPageState extends State<AboutUsPage> {
           Container(
             child: Text(
               appVersion,
-              style:
-                  TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+              style: TextStyle(
+                  decoration: TextDecoration.none,
+                  color: Colors.blue,
+                  fontSize: ScreenUtil().setSp(4),
+                  fontStyle: FontStyle.normal),
             ),
           ),
           Gaps.scaleVGap(8),

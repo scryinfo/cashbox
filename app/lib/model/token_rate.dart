@@ -2,7 +2,7 @@ import 'package:app/model/token.dart';
 
 class TokenRate {
   static TokenRate get instance => _getInstance();
-  static TokenRate _instance; //private
+  static late TokenRate _instance; //private
 
   static _getInstance() {
     if (_instance == null) {
@@ -18,7 +18,7 @@ class TokenRate {
   Map legalMap = Map<String, double>();
   String nowLegalCurrency = "USD";
 
-  setDigitRateMap(Map digitRateMap) {
+  setDigitRateMap(Map<String, TokenRateM> digitRateMap) {
     this.tokenRateMap = digitRateMap;
   }
 

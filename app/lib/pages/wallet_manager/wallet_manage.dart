@@ -3,17 +3,18 @@ import 'dart:typed_data';
 import 'package:app/control/wallets_control.dart';
 import 'package:app/provide/create_wallet_process_provide.dart';
 import 'package:app/provide/wallet_manager_provide.dart';
-import 'package:logger/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart' as EnumKit;
+
 import '../../res/resources.dart';
-import '../../routers/routers.dart';
-import '../../routers/fluro_navigator.dart';
 import '../../res/styles.dart';
+import '../../routers/fluro_navigator.dart';
+import '../../routers/routers.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/list_item.dart';
 import '../../widgets/pwd_dialog.dart';
@@ -156,8 +157,8 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                           Logger().d("getWalletByWalletId error ===>", "wallet name is null");
                           return;
                         }
-                        bool isRenameOk = WalletsControl.getInstance()
-                            .renameWallet(Provider.of<WalletManagerProvide>(context, listen: false).walletId, _walletNameController.text);
+                        bool isRenameOk = WalletsControl.getInstance().renameWallet(
+                            Provider.of<WalletManagerProvide>(context, listen: false).walletId, _walletNameController.text);
                         if (!isRenameOk) {
                           Fluttertoast.showToast(msg: translate('failure_change_wallet_name').toString());
                           return;
@@ -238,7 +239,8 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
       onTap: () {
         var curWallet = WalletsControl.getInstance().currentWallet();
         if (curWallet.id == Provider.of<WalletManagerProvide>(context, listen: false).walletId) {
-          Fluttertoast.showToast(msg: translate('prefix_abandon_del_wallet') + curWallet.name + translate('suffix_abandon_del_wallet'));
+          Fluttertoast.showToast(
+              msg: translate('prefix_abandon_del_wallet') + curWallet.name + translate('suffix_abandon_del_wallet'));
           return;
         }
 
@@ -266,8 +268,9 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           hintContent: translate('delete_wallet_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-            bool isRemoved = WalletsControl.getInstance()
-                .removeWallet(Provider.of<WalletManagerProvide>(context, listen: false).walletId, Uint8List.fromList(value.toString().codeUnits));
+            bool isRemoved = WalletsControl.getInstance().removeWallet(
+                Provider.of<WalletManagerProvide>(context, listen: false).walletId,
+                Uint8List.fromList(value.toString().codeUnits));
             if (!isRemoved) {
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_delete_wallet'));
               return;
@@ -296,20 +299,22 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
     var curNetType = WalletsControl.getInstance().getCurrentNetType();
     switch (curNetType) {
       case EnumKit.NetType.Main:
-        isSaveOk =
-            WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
+        isSaveOk = WalletsControl.getInstance()
+            .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.ETH);
         break;
       case EnumKit.NetType.Test:
-        isSaveOk =
-            WalletsControl.getInstance().saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.EthTest);
+        isSaveOk = WalletsControl.getInstance()
+            .saveCurrentWalletChain(WalletsControl.getInstance().walletsAll().first.walletId, EnumKit.ChainType.EthTest);
         break;
       default:
-        Fluttertoast.showToast(msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+        Fluttertoast.showToast(
+            msg: translate('verify_failure_to_mnemonic'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
         return;
         break;
     }
     if (!isSaveOk) {
-      Fluttertoast.showToast(msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
+      Fluttertoast.showToast(
+          msg: translate('failure_to_change_wallet'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 5);
       return;
     }
     NavigatorUtils.push(context, '${Routes.ethHomePage}?isForceLoadFromJni=false', clearStack: true);
@@ -324,8 +329,9 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
           hintContent: translate('recover_wallet_hint'),
           hintInput: translate('pls_input_wallet_pwd'),
           onPressed: (value) async {
-            String mne = WalletsControl.getInstance()
-                .exportWallet(Provider.of<WalletManagerProvide>(context, listen: false).walletId, Uint8List.fromList(value.toString().codeUnits));
+            String mne = WalletsControl.getInstance().exportWallet(
+                Provider.of<WalletManagerProvide>(context, listen: false).walletId,
+                Uint8List.fromList(value.toString().codeUnits));
             if (mne == null) {
               Logger.getInstance().e("_buildRecoverWalletWidget=>", "exportWallet is failure =>");
               Fluttertoast.showToast(msg: translate('wrong_pwd_failure_in_recover_wallet_hint'));

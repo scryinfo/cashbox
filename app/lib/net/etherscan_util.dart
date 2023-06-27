@@ -2,11 +2,12 @@ import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/model/tx_model/eth_transaction_model.dart';
-import 'package:logger/logger.dart';
 import 'package:app/util/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:logger/logger.dart';
 import 'package:wallets/enums.dart';
+
 import 'net_util.dart';
 
 Future<String> loadEtherApiKey() async {
@@ -58,7 +59,8 @@ Future<String> loadTxAccount(String address, ChainType chainType) async {
     var res = await request(await assembleTxAccount(address, chainType));
     if (res != null && (res as Map).containsKey("result")) {
       //Note that due to infura||etherscan, the interface currently returns a format like 0x085f. Need to deal with the beginning 0x. Back to Hexadecimal to Decimal
-      if (res["result"] != null && (res["result"].toString().startsWith("0x") || res["result"].toString().startsWith("0X"))) {
+      if (res["result"] != null &&
+          (res["result"].toString().startsWith("0x") || res["result"].toString().startsWith("0X"))) {
         return Utils.hexToInt(res["result"].toString().substring("0x".length)).toString();
       } else {
         return null;
@@ -167,7 +169,8 @@ Future<String> assembleEthTxListUrl(String address,
   }
 }
 
-Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String address, ChainType chainType, {String offset}) async {
+Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String address, ChainType chainType,
+    {String offset}) async {
   List<EthTransactionModel> modelArray = [];
   Config config = await HandleConfig.instance.getConfig();
   try {
@@ -198,7 +201,8 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
           ethTxModel.input = "";
           Logger().e("etherScanUtil  error ", e.toString());
         }
-        ethTxModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
+        ethTxModel.timeStamp =
+            DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
         if (res["result"][i]["from"].trim().toLowerCase() == address.trim().toLowerCase()) {
           ethTxModel.value = "-" + (double.parse(res["result"][i]["value"]) / config.ethUnit.toDouble()).toString();
         } else {
@@ -224,7 +228,8 @@ Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String 
 const Erc20_Tx_List = "http://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=";
 const Erc20_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=";
 
-Future<String> assembleErc20TxListUrl(String address, {ChainType chainType, String contractAddress, String page = "1", String offset = "20"}) async {
+Future<String> assembleErc20TxListUrl(String address,
+    {ChainType chainType, String contractAddress, String page = "1", String offset = "20"}) async {
   String apiKey = await loadEtherApiKey();
   if (chainType.toString() == ChainType.EthTest.toString()) {
     return Erc20_TestNet_Tx_List +
@@ -251,12 +256,14 @@ Future<String> assembleErc20TxListUrl(String address, {ChainType chainType, Stri
   }
 }
 
-Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, String address, String contractAddress, ChainType chainType,
+Future<List<EthTransactionModel>> loadErc20TxHistory(
+    BuildContext context, String address, String contractAddress, ChainType chainType,
     {String offset}) async {
   List<EthTransactionModel> modelArray = [];
   Config config = await HandleConfig.instance.getConfig();
   try {
-    var res = await request(await assembleErc20TxListUrl(address, contractAddress: contractAddress, chainType: chainType, offset: offset));
+    var res = await request(
+        await assembleErc20TxListUrl(address, contractAddress: contractAddress, chainType: chainType, offset: offset));
     if (res != null && (res as Map).containsKey("result")) {
       for (var i = 0; i < res["result"].length; i++) {
         var ethTxModel = new EthTransactionModel();
@@ -276,7 +283,8 @@ Future<List<EthTransactionModel>> loadErc20TxHistory(BuildContext context, Strin
           ..cumulativeGasUsed = res["result"][i]["cumulativeGasUsed"]
           ..gasUsed = res["result"][i]["gasUsed"]
           ..confirmations = res["result"][i]["confirmations"];
-        ethTxModel.timeStamp = DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
+        ethTxModel.timeStamp =
+            DateTime.fromMillisecondsSinceEpoch(int.parse(res["result"][i]["timeStamp"]) * 1000).toString();
         if (res["result"][i]["from"].trim().toLowerCase() == address.trim().toLowerCase()) {
           ethTxModel.value = "-" + (double.parse(res["result"][i]["value"]) / config.ethUnit.toDouble()).toString();
         } else {

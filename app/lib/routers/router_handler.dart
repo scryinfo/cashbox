@@ -1,4 +1,5 @@
 import 'package:app/pages/about_us.dart';
+import 'package:app/pages/change_nettype.dart';
 import 'package:app/pages/create_wallet/create_test_wallet/create_test_wallet.dart';
 import 'package:app/pages/create_wallet/create_wallet_confirm.dart';
 import 'package:app/pages/create_wallet/create_wallet_mnemonic.dart';
@@ -14,14 +15,13 @@ import 'package:app/pages/eee_page.dart';
 import 'package:app/pages/entrance.dart';
 import 'package:app/pages/eth_page.dart';
 import 'package:app/pages/language_choose.dart';
-import 'package:app/pages/change_nettype.dart';
 import 'package:app/pages/mine.dart';
 import 'package:app/pages/privacy_statements.dart';
 import 'package:app/pages/public_page.dart';
 import 'package:app/pages/qr_info.dart';
 import 'package:app/pages/service_agreement.dart';
-import 'package:app/pages/transfer_tx/eee_tx_detail.dart';
 import 'package:app/pages/transfer_tx/eee_transfer_confirm.dart';
+import 'package:app/pages/transfer_tx/eee_tx_detail.dart';
 import 'package:app/pages/transfer_tx/eth_tx_detail.dart';
 import 'package:app/pages/transfer_tx/sign_tx.dart';
 import 'package:app/pages/transfer_tx/transfer_btc.dart';
@@ -35,8 +35,8 @@ import 'package:app/pages/wallet_manager/wallet_manage.dart';
 import 'package:app/pages/wallet_manager/wallet_manager_list.dart';
 import 'package:app/pages/wc_protocol/session_apply_page.dart';
 import 'package:app/pages/wc_protocol/wc_connected_page.dart';
-import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
+import 'package:flutter/material.dart';
 
 Handler entrancePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
   return EntrancePage();

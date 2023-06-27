@@ -1,6 +1,7 @@
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:logger/logger.dart';
+
 import 'net_util.dart';
 
 class ScryXNetUtil {
@@ -217,6 +218,4 @@ class ScryXNetUtil {
       return null;
     }
   }
-
-
 }

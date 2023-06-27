@@ -5,16 +5,15 @@ import 'package:app/res/styles.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_translate/global.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 class SessionApplyPage extends StatefulWidget {
   const SessionApplyPage() : super();
@@ -183,11 +182,19 @@ class _SessionApplyState extends State<SessionApplyPage> {
         _buildDappIconWidget(),
         Text(
           dappName ?? "",
-          style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+          style: TextStyle(
+              decoration: TextDecoration.none,
+              color: Colors.blue,
+              fontSize: ScreenUtil().setSp(4),
+              fontStyle: FontStyle.normal),
         ),
         Text(
           dappUrl ?? "",
-          style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+          style: TextStyle(
+              decoration: TextDecoration.none,
+              color: Colors.blueGrey,
+              fontSize: ScreenUtil().setSp(3),
+              fontStyle: FontStyle.normal),
         ),
       ],
     ));
@@ -203,7 +210,11 @@ class _SessionApplyState extends State<SessionApplyPage> {
           child: Text(
             translate("app_permission_ask"),
             textAlign: TextAlign.left,
-            style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(4), fontStyle: FontStyle.normal),
+            style: TextStyle(
+                decoration: TextDecoration.none,
+                color: Colors.blueGrey,
+                fontSize: ScreenUtil().setSp(4),
+                fontStyle: FontStyle.normal),
           ),
         ),
         Gaps.scaleVGap(1),
@@ -216,7 +227,11 @@ class _SessionApplyState extends State<SessionApplyPage> {
           child: Text(
             translate("allow_check_chain_info"),
             textAlign: TextAlign.left,
-            style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
+            style: TextStyle(
+                decoration: TextDecoration.none,
+                color: Colors.blue,
+                fontSize: ScreenUtil().setSp(3.5),
+                fontStyle: FontStyle.normal),
           ),
         ),
         Gaps.scaleVGap(0.5),
@@ -229,7 +244,11 @@ class _SessionApplyState extends State<SessionApplyPage> {
           child: Text(
             translate("allow_send_tx_req"),
             textAlign: TextAlign.left,
-            style: TextStyle(decoration: TextDecoration.none, color: Colors.blue, fontSize: ScreenUtil().setSp(3.5), fontStyle: FontStyle.normal),
+            style: TextStyle(
+                decoration: TextDecoration.none,
+                color: Colors.blue,
+                fontSize: ScreenUtil().setSp(3.5),
+                fontStyle: FontStyle.normal),
           ),
         ),
         Container(
@@ -241,7 +260,11 @@ class _SessionApplyState extends State<SessionApplyPage> {
           child: Text(
             translate("not_split_hint"),
             textAlign: TextAlign.left,
-            style: TextStyle(decoration: TextDecoration.none, color: Colors.blueGrey, fontSize: ScreenUtil().setSp(3), fontStyle: FontStyle.normal),
+            style: TextStyle(
+                decoration: TextDecoration.none,
+                color: Colors.blueGrey,
+                fontSize: ScreenUtil().setSp(3),
+                fontStyle: FontStyle.normal),
           ),
         ),
       ],

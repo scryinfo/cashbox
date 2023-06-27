@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:logger/logger.dart';
+
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Utils {
@@ -12,7 +12,11 @@ class Utils {
 
   ///Paste information
   static Future<ClipboardData> getCopyMsg() async {
-    return Clipboard.getData(Clipboard.kTextPlain);
+    var t = await Clipboard.getData(Clipboard.kTextPlain);
+    if (t == null) {
+      t = ClipboardData(text: "");
+    }
+    return t;
   }
 
   //Time-consuming execution of the recording method
@@ -46,11 +50,11 @@ class Utils {
     }
     List<int> s = str.toUpperCase().codeUnits;
     Uint8List bArr = Uint8List(length >> 1);
-    try{
+    try {
       for (int i = 0; i < length; i += 2) {
         bArr[i >> 1] = ((hex(s[i]) << 4) | hex(s[i + 1]));
       }
-    }catch(e){
+    } catch (e) {
       return bArr;
     }
     return bArr;
