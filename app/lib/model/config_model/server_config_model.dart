@@ -7,10 +7,10 @@ part 'server_config_model.g.dart';
 class ServerConfigModel extends Object {
   ServerConfigModel();
 
-  int code;
-  String message;
-  String detail;
-  Data data;
+  int code = 0;
+  String message = "";
+  String detail = "";
+  Data data = Data();
 
   factory ServerConfigModel.fromJson(Map<String, dynamic> json) => _$ServerConfigModelFromJson(json);
 
@@ -21,7 +21,7 @@ class ServerConfigModel extends Object {
 class Data extends Object {
   Data();
 
-  LatestConfig latestConfig;
+  LatestConfig latestConfig = LatestConfig();
 
   factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
 
@@ -32,18 +32,18 @@ class Data extends Object {
 class LatestConfig extends Object {
   LatestConfig();
 
-  String tokenToLegalTenderExchangeRateIp;
-  int authTokenListVersion;
-  int defaultTokenListVersion;
-  List<String> authTokenUrl;
-  List<String> defaultTokenUrl;
-  String announcementUrl;
-  String scryXChainUrl;
-  String apkVersion;
-  String apkDownloadLink;
-  String dappOpenUrl;
-  String eeeTxV;
-  String eeeRuntimeV;
+  String tokenToLegalTenderExchangeRateIp = "";
+  int authTokenListVersion = 0;
+  int defaultTokenListVersion = 0;
+  List<String> authTokenUrl = [];
+  List<String> defaultTokenUrl = [];
+  String announcementUrl = "";
+  String scryXChainUrl = "";
+  String apkVersion = "";
+  String apkDownloadLink = "";
+  String dappOpenUrl = "";
+  String eeeTxV = "";
+  String eeeRuntimeV = "";
 
   factory LatestConfig.fromJson(Map<String, dynamic> json) => _$LatestConfigFromJson(json);
 
