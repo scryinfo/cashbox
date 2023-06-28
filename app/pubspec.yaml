@@ -23,6 +23,7 @@ dependencies:
   webview_flutter: ^4.2.2
   flutter_html: ^3.0.0-beta.2
   device_info_plus: ^9.0.2
+  platform_device_id: ^1.0.1
   #  device_info: ^1.0.0
   #  flutter_progress_button: ^1.0.0
   sn_progress_dialog: ^1.0.2
@@ -44,6 +45,8 @@ dependencies:
   material_dialogs: ^1.0.0
   ffi: ^2.0.2
   json_annotation: ^4.8.1
+  shared_preferences: ^2.1.2
+  uuid: ^3.0.7
   wallets:
     path: ../packages/wallets
   logger:
@@ -57,7 +60,6 @@ dev_dependencies:
   json_serializable: ^6.7.0
 
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

@@ -2,10 +2,13 @@ import 'dart:io';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info/package_info.dart';
+import 'package:platform_device_id/platform_device_id.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class AppInfoControl {
   static const appInfoChannel = const MethodChannel('app_info_channel');
@@ -75,96 +78,45 @@ class AppInfoControl {
     return appVersion;
   }
 
-  DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
-
-  Future<Map<String, dynamic>> _readAndroidBuildData() async {
-    var build = await _deviceInfoPlugin.androidInfo;
-    return <String, dynamic>{
-      'version.securityPatch': build.version.securityPatch,
-      'version.sdkInt': build.version.sdkInt,
-      'version.release': build.version.release,
-      'version.previewSdkInt': build.version.previewSdkInt,
-      'version.incremental': build.version.incremental,
-      'version.codename': build.version.codename,
-      'version.baseOS': build.version.baseOS,
-      'board': build.board,
-      'bootloader': build.bootloader,
-      'brand': build.brand,
-      'device': build.device,
-      'display': build.display,
-      'fingerprint': build.fingerprint,
-      'hardware': build.hardware,
-      'host': build.host,
-      'id': build.id,
-      'manufacturer': build.manufacturer,
-      'model': build.model,
-      'product': build.product,
-      'supported32BitAbis': build.supported32BitAbis,
-      'supported64BitAbis': build.supported64BitAbis,
-      'supportedAbis': build.supportedAbis,
-      'tags': build.tags,
-      'type': build.type,
-      'isPhysicalDevice': build.isPhysicalDevice,
-      'androidId': build.androidId,
-      'systemFeatures': build.systemFeatures,
-    };
-  }
-
-//Record ios device information
-  Future<Map<String, dynamic>> _readIosDeviceInfo() async {
-    var data = await _deviceInfoPlugin.iosInfo;
-    return <String, dynamic>{
-      'name': data.name,
-      'systemName': data.systemName,
-      'systemVersion': data.systemVersion,
-      'model': data.model,
-      'localizedModel': data.localizedModel,
-      'identifierForVendor': data.identifierForVendor,
-      'isPhysicalDevice': data.isPhysicalDevice,
-      'utsname.sysname:': data.utsname.sysname,
-      'utsname.nodename:': data.utsname.nodename,
-      'utsname.release:': data.utsname.release,
-      'utsname.version:': data.utsname.version,
-      'utsname.machine:': data.utsname.machine,
-    };
-  }
-
-  Future<dynamic> getSupportAbi() async {
-    Map<String, dynamic> _deviceData = <String, dynamic>{};
-    if (Platform.isAndroid) {
-      _deviceData = await _readAndroidBuildData();
-      if (_deviceData != null) {
-        var abiList = List.castFrom(_deviceData["supportedAbis"]);
-        if (abiList != null && abiList.length > 0) {
-          return abiList[0];
-        }
-      }
-    }
-    return "";
-  }
-
-  Future<dynamic> getDeviceId() async {
-    Map<String, dynamic> _deviceData = <String, dynamic>{};
+  /// [Best practices for unique identifiers](https://developer.android.com/training/articles/user-data-ids)
+  /// get unique id from api, if not then generate a uuid
+  Future<String> getDeviceId() async {
+    final uniqueId = "dev_unique_id";
     try {
       String deviceId = "";
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? tid = await prefs.getString(uniqueId);
+      if (tid != null) {
+        deviceId = tid;
+        return deviceId;
+      }
       if (Platform.isAndroid) {
-        _deviceData = await _readAndroidBuildData();
-        if (_deviceData != null) {
-          deviceId = _deviceData["androidId"];
-          //At present, each Android product device has a unique identification value. If you do not agree, temporarily take the value of androidId.
+        var tid = await PlatformDeviceId.getDeviceId;
+        if (tid == null) {
+          DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+          var info = await _deviceInfoPlugin.androidInfo;
+          tid = info.serialNumber;
         }
+        if (tid == null) {
+          tid = Uuid().v4().toString();
+        }
+        deviceId = tid;
+        prefs.setString(uniqueId, deviceId);
       } else if (Platform.isIOS) {
-        _deviceData = await _readIosDeviceInfo();
-        deviceId = _deviceData["utsname.machine"];
+        DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+        var info = await _deviceInfoPlugin.iosInfo;
+        var tid = info.identifierForVendor;
+        if (tid == null) {
+          tid = await PlatformDeviceId.getDeviceId;
+        }
+        if (tid != null) {
+          deviceId = tid;
+        }
       }
       return deviceId;
-    } on PlatformException {
-      _deviceData = <String, dynamic>{'Error:': 'Failed to get platform version.'};
-      Logger().e("requestWithDeviceId", "unknown target platform");
-      return null;
     } catch (e) {
       Logger().e("requestWithDeviceId", "${e}");
-      return null;
+      return "";
     }
   }
 }
