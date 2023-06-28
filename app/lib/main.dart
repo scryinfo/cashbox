@@ -58,9 +58,7 @@ class MyApp extends StatefulWidget {
 
 class _MyApp extends State<MyApp> {
   _MyApp() {
-    final router = FluroRouter();
-    Routes.configureRoutes(router);
-    Application.router = router;
+    Routes.configureRoutes(Application.router);
   }
 
   @override

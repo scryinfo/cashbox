@@ -46,8 +46,9 @@ class Routes {
   static String signTxPage = '/signtxpage';
 
   static void configureRoutes(FluroRouter router) {
-    router.notFoundHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    router.notFoundHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
       Logger().e("Routers error is=>", "noFoundHandler");
+      return null;
     });
 
     router.define(ethHomePage, handler: ethHomePageHandler);

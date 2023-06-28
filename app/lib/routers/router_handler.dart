@@ -38,69 +38,63 @@ import 'package:app/pages/wc_protocol/wc_connected_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-Handler entrancePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler entrancePageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return EntrancePage();
 });
 
-Handler ethHomePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler ethHomePageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   bool isForceLoadFromJni = false;
-  if (params['isForceLoadFromJni'] == null || params['isForceLoadFromJni'].first == null) {
-    isForceLoadFromJni = false;
-  } else {
-    isForceLoadFromJni = params['isForceLoadFromJni'].first == 'true';
+  if (params['isForceLoadFromJni']?.first != null) {
+    isForceLoadFromJni = params['isForceLoadFromJni']?.first == 'true';
   }
   return EthPage(isForceLoadFromJni: isForceLoadFromJni);
 });
 
-Handler wcConnectedPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler wcConnectedPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return WcConnectedPage();
 });
 
-Handler eeeHomePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler eeeHomePageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   bool isForceLoadFromJni = false;
-  if (params['isForceLoadFromJni'] == null || params['isForceLoadFromJni'].first == null) {
-    isForceLoadFromJni = false;
-  } else {
-    isForceLoadFromJni = params['isForceLoadFromJni'].first == 'true';
+  if (params['isForceLoadFromJni']?.first != null) {
+    isForceLoadFromJni = params['isForceLoadFromJni']?.first == 'true';
   }
   return EeePage(isForceLoadFromJni: isForceLoadFromJni);
 });
 
-Handler publicPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler publicPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return PublicPage();
 });
 
-Handler dappPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler dappPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return DappPage();
 });
 
-Handler createWalletPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler createWalletPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return CreateWalletNamePage();
 });
 
-Handler digitListPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler digitListPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return DigitListPage();
 });
 
-Handler digitManageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler digitManageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   bool isReloadDigitList = false;
-  if (params['isReloadDigitList'] == null || params['isReloadDigitList'].first == null) {
-    isReloadDigitList = false;
-  } else {
-    isReloadDigitList = params['isReloadDigitList'].first == 'true';
+  if (params['isReloadDigitList']?.first != null) {
+    isReloadDigitList = params['isReloadDigitList']?.first == 'true';
   }
   return DigitsManagePage(isReloadDigitList: isReloadDigitList);
 });
 
-Handler searchDigitPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler searchDigitPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return SearchDigitPage();
 });
 
-Handler createWalletMnemonicPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler createWalletMnemonicPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return CreateWalletMnemonicPage();
 });
 
-Handler createWalletConfirmPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler createWalletConfirmPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return CreateWalletConfirmPage();
 });
 
@@ -108,97 +102,97 @@ Handler qrInfoPageHandler = Handler(handlerFunc: (context, params) {
   return QrInfoPage();
 });
 
-Handler importWalletPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler importWalletPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return ImportWalletPage();
 });
 
-Handler transferEthPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler transferEthPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return TransferEthPage();
 });
 
-Handler transferEeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler transferEeePageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return TransferEeePage();
 });
 
-Handler transferEeeConfirmPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler transferEeeConfirmPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return EeeTransferConfirmPage();
 });
 
-Handler transferBtcPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler transferBtcPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return TransferBtcPage();
 });
 
-Handler minePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler minePageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return MinePage();
 });
 
-Handler ddd2eeePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler ddd2eeePageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return Ddd2EeePage();
 });
 
-Handler wcApprovePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler wcApprovePageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return SessionApplyPage();
 });
 
-Handler ddd2eeeConfirmPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler ddd2eeeConfirmPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return Ddd2EeeConfirmPage();
 });
 
-Handler walletManagerListPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler walletManagerListPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return WalletManagerListPage();
 });
 
-Handler languageChoosePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler languageChoosePageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return LanguageChoosePage();
 });
 
-Handler changeNetTypePageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler changeNetTypePageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return ChangeNetTypePage();
 });
 
-Handler walletManagerPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler walletManagerPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return WalletManagerPage();
 });
 
-Handler resetPwdPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler resetPwdPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return ResetPwdPage();
 });
 
-Handler recoverWalletPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler recoverWalletPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return RecoverWalletPage();
 });
 
-Handler privacyStatementHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler privacyStatementHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return PrivacyStatementPage();
 });
 
-Handler serviceAgreementHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler serviceAgreementHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return ServiceAgreementPage();
 });
 
-Handler ethChainTxHistoryHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler ethChainTxHistoryHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return EthChainTxsHistoryPage();
 });
 
-Handler eeeChainTxHistoryHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler eeeChainTxHistoryHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return EeeChainTxsHistoryPage();
 });
 
-Handler ethTransactionDetailHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler ethTransactionDetailHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return EthTxDetailPage();
 });
 
-Handler eeeTransactionDetailHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler eeeTransactionDetailHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return EeeTxDetailPage();
 });
 
-Handler aboutUsPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler aboutUsPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return AboutUsPage();
 });
 
-Handler createTestWalletHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler createTestWalletHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return CreateTestWalletPage();
 });
-Handler signTxPageHandler = Handler(handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+Handler signTxPageHandler = Handler(handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return SignTxPage();
 });
