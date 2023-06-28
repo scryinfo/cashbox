@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 
 class CreateWalletProcessProvide with ChangeNotifier {
-  String _walletName;
-  Uint8List _pwd;
-  Uint8List _mnemonic;
+  String _walletName = "";
+  Uint8List _pwd = Uint8List(0);
+  Uint8List _mnemonic = Uint8List(0);
 
   get walletName => _walletName;
 
@@ -13,9 +13,9 @@ class CreateWalletProcessProvide with ChangeNotifier {
 
   /*Check the completion of each call, clean up the data record*/
   void emptyData() {
-    this._walletName = null;
-    this._pwd = null;
-    this._mnemonic = null;
+    this._walletName = "";
+    this._pwd = Uint8List(0);
+    this._mnemonic = Uint8List(0);
   }
 
   void setWalletName(String walletName) {

@@ -2,25 +2,25 @@ import 'package:flutter/foundation.dart';
 import 'package:wallets/enums.dart';
 
 class TransactionProvide with ChangeNotifier {
-  String _toAddress;
-  String _txValue;
-  String _backup;
-  String _digitName;
-  String _fromAddress;
-  String _gas;
-  String _gasPrice;
-  String _timeStamp;
-  String _nonce;
-  String _hash;
-  int _decimal;
-  String _contractAddress;
-  String _cumulativeGasUsed;
-  String _gasUsed;
-  String _confirmations;
-  String _balance;
-  String _money;
-  String _signInfo;
-  ChainType _chainType;
+  String _toAddress = "";
+  String _txValue = "";
+  String _backup = "";
+  String _digitName = "";
+  String _fromAddress = "";
+  String _gas = "";
+  String _gasPrice = "";
+  String _timeStamp = "";
+  String _nonce = "";
+  String _hash = "";
+  int _decimal = 0;
+  String _contractAddress = "";
+  String _cumulativeGasUsed = "";
+  String _gasUsed = "";
+  String _confirmations = "";
+  String _balance = "";
+  String _money = "";
+  String _signInfo = "";
+  ChainType _chainType = ChainType.ETH;
 
   void emptyDataRecord() {
     _toAddress = "";

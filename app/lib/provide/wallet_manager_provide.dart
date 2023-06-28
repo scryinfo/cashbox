@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 
 class WalletManagerProvide with ChangeNotifier {
-  String _walletName;
-  String _walletId;
+  String _walletName = "";
+  String _walletId = "";
   String _locale = ''; //Application language selection
 
   get walletName => _walletName;
@@ -13,8 +13,8 @@ class WalletManagerProvide with ChangeNotifier {
 
   /*Check the completion of each call, clean up the data record*/
   void emptyData() {
-    this._walletName = null;
-    this._walletId = null;
+    this._walletName = "";
+    this._walletId = "";
   }
 
   void setWalletName(String walletName) {

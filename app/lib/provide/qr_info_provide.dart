@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 class QrInfoProvide with ChangeNotifier {
-  String _title;
-  String _hintInfo;
-  String _content;
-  String _btnContent;
+  String _title = "";
+  String _hintInfo = "";
+  String _content = "";
+  String _btnContent = "";
 
   get title => _title;
 
@@ -16,10 +16,10 @@ class QrInfoProvide with ChangeNotifier {
 
   /*Check the completion of each call, clean up the data record*/
   void emptyData() {
-    this._title = null;
-    this._hintInfo = null;
-    this._content = null;
-    this._btnContent = null;
+    this._title = "";
+    this._hintInfo = "";
+    this._content = "";
+    this._btnContent = "";
   }
 
   void setTitle(String title) {

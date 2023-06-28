@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 
 class WcInfoProvide with ChangeNotifier {
-  String _dappName;
-  String _dappUrl;
-  String _dappIconUrl;
-  String _wcInitUrl;
-  String _sessionId;
+  String _dappName = "";
+  String _dappUrl = "";
+  String _dappIconUrl = "";
+  String _wcInitUrl = "";
+  String _sessionId = "";
 
   get dappName => _dappName;
 
@@ -19,11 +19,11 @@ class WcInfoProvide with ChangeNotifier {
 
   /*Check the completion of each call, clean up the data record*/
   void emptyData() {
-    this._dappName = null;
-    this._dappUrl = null;
-    this._dappIconUrl = null;
-    this._wcInitUrl = null;
-    this._sessionId = null;
+    this._dappName = "";
+    this._dappUrl = "";
+    this._dappIconUrl = "";
+    this._wcInitUrl = "";
+    this._sessionId = "";
   }
 
   void setDappName(String info) {

@@ -7,9 +7,9 @@ import 'package:app/routers/routers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_progress_button/flutter_progress_button.dart';
-import 'package:flutter_screenutil/screenutil.dart';
-import 'package:flutter_translate/global.dart';
+// import 'package:flutter_progress_button/flutter_progress_button.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -23,12 +23,12 @@ class SessionApplyPage extends StatefulWidget {
 }
 
 class _SessionApplyState extends State<SessionApplyPage> {
-  Future sessionStateFuture;
+  late Future sessionStateFuture;
   static const wcSessionPlugin = const EventChannel('wc_session_info_channel');
   Map txInfoMap = Map();
-  String dappName;
-  String dappUrl;
-  String dappIconUrl;
+  String dappName = "";
+  String dappUrl = "";
+  String dappIconUrl = "";
 
   @override
   void initState() {
