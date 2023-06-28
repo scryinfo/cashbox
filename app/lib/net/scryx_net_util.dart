@@ -16,7 +16,7 @@ class ScryXNetUtil {
     String netUrl = await _loadScryXIp();
     Map resultMap = new Map();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {
       "method": "state_getStorage",
@@ -29,7 +29,7 @@ class ScryXNetUtil {
       return resultMap;
     } catch (e) {
       Logger().e("loadScryXStorage error is  ", e.toString());
-      return null;
+      return {};
     }
   }
 
@@ -37,7 +37,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {"method": "state_getRuntimeVersion", "params": [], "id": 1, "jsonrpc": "2.0"};
     try {
@@ -45,7 +45,7 @@ class ScryXNetUtil {
       return resultMap;
     } catch (e) {
       Logger().e("loadScryXRuntimeVersion error is  ", e.toString());
-      return null;
+      return {};
     }
   }
 
@@ -53,7 +53,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {
       "method": "chain_getBlockHash",
@@ -66,7 +66,7 @@ class ScryXNetUtil {
       return resultMap;
     } catch (e) {
       Logger().e("loadScryXBlockHash error is  ", e.toString());
-      return null;
+      return {};
     }
   }
 
@@ -74,7 +74,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {"method": "chain_getHeader", "params": [], "id": 1, "jsonrpc": "2.0"};
     try {
@@ -82,7 +82,7 @@ class ScryXNetUtil {
       return resultMap;
     } catch (e) {
       Logger().e("loadChainHeader error is  ", e.toString());
-      return null;
+      return {};
     }
   }
 
@@ -90,7 +90,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {
       "method": "chain_getBlockHash",
@@ -102,7 +102,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      return null;
+      return {};
     }
   }
 
@@ -110,7 +110,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {
       "method": "state_queryStorage",
@@ -122,7 +122,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      return null;
+      return {};
     }
   }
 
@@ -130,7 +130,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {
       "method": "chain_getBlock",
@@ -142,7 +142,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      return null;
+      return {};
     }
   }
 
@@ -150,7 +150,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {
       "method": "state_getStorage",
@@ -162,7 +162,7 @@ class ScryXNetUtil {
       resultMap = await request(netUrl, formData: paramObj);
       return resultMap;
     } catch (e) {
-      return null;
+      return {};
     }
   }
 
@@ -170,7 +170,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {
       "method": "author_submitExtrinsic", // author_submitExtrinsic
@@ -183,7 +183,7 @@ class ScryXNetUtil {
       return resultMap;
     } catch (e) {
       Logger().e("submitExtrinsic error is  ", e.toString());
-      return null;
+      return {};
     }
   }
 
@@ -191,7 +191,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {"method": "state_getMetadata", "params": [], "id": 1, "jsonrpc": "2.0"};
     try {
@@ -199,7 +199,7 @@ class ScryXNetUtil {
       return resultMap;
     } catch (e) {
       Logger().e("getMetadata error is  ", e.toString());
-      return null;
+      return {};
     }
   }
 
@@ -207,7 +207,7 @@ class ScryXNetUtil {
     Map resultMap = new Map();
     String netUrl = await _loadScryXIp();
     if (netUrl == null || netUrl.isEmpty) {
-      return null;
+      return {};
     }
     var paramObj = {"method": "system_properties", "params": [], "id": 1, "jsonrpc": "2.0"};
     try {
@@ -215,7 +215,7 @@ class ScryXNetUtil {
       return resultMap;
     } catch (e) {
       Logger().e("loadSystemProperties error is  ", e.toString());
-      return null;
+      return {};
     }
   }
 }

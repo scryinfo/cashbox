@@ -1,5 +1,3 @@
-
-
 class RpcUtil {
   doSomething() {
     /*StreamChannel socket = HtmlWebSocketChannel.connect(GlobalConfig.ipAddress);

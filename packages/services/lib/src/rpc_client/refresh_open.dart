@@ -47,11 +47,13 @@ class RefreshOpen {
   @visibleForTesting
   set version(String v) => _req.cashboxVersion = v;
 
-  Future<ConnectParameter?> refreshCall() async {
+  Future<ConnectParameter> refreshCall() async {
     _req.timestamp = new Int64(DateTime.now().millisecondsSinceEpoch ~/ 1000);
     var res = await _client!.connectParameter(_req);
     if (res.hasErr()) {
-      return null;
+      //todo
+      res.host = "http://cashbox.scry.info";
+      res.port = 80 as Int64;
     }
     ConnectParameter parameter = new ConnectParameter(res.host, res.port.toInt(),
         options: ChannelOptions(

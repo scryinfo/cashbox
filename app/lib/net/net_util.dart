@@ -1,10 +1,8 @@
 import 'dart:io';
 
-import 'package:app/configv/config/config.dart';
-import 'package:app/configv/config/handle_config.dart';
-import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_translate/global.dart';
+import 'package:dio/io.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:logger/logger.dart';
 
 //Access network request, url + parameter object
@@ -16,10 +14,12 @@ Future request(String url, {formData}) async {
     //String cerData = await rootBundle.loadString("assets/crt.pem"); ///加入 可信证书 （可自签）
 
     //不验证证书实现方式
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+    (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      var client = HttpClient();
       client.badCertificateCallback = (X509Certificate cert, String host, int port) {
         return true;
       };
+      return client;
     };
     if (formData == null) {
       response = await dio.post(url);

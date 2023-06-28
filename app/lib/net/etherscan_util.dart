@@ -34,10 +34,10 @@ Future<Map> loadGasOracle(ChainType chainType) async {
     if (res != null && (res as Map).containsKey("result")) {
       return res["result"];
     } else {
-      return null;
+      return {};
     }
   } catch (e) {
-    return null;
+    return {};
   }
 }
 
@@ -63,13 +63,13 @@ Future<String> loadTxAccount(String address, ChainType chainType) async {
           (res["result"].toString().startsWith("0x") || res["result"].toString().startsWith("0X"))) {
         return Utils.hexToInt(res["result"].toString().substring("0x".length)).toString();
       } else {
-        return null;
+        return "";
       }
     } else {
-      return null;
+      return "";
     }
   } catch (e) {
-    return null;
+    return "";
   }
 }
 
@@ -96,9 +96,9 @@ Future<String> loadEthBalance(String address, ChainType chainType) async {
     }
   } catch (e) {
     Logger().e("loadEthBalance  error ", e.toString());
-    return null;
+    return "";
   }
-  return null;
+  return "";
 }
 
 const Erc20_Balance = "https://api-cn.etherscan.com/api?module=account&action=tokenbalance&contractaddress=";
@@ -124,16 +124,16 @@ Future<String> loadErc20Balance(String ethAddress, String contractAddress, Chain
     }
   } catch (e) {
     Logger().e("loadErc20Balance  error ", e.toString());
-    return null;
+    return "";
   }
-  return null;
+  return "";
 }
 
 const Eth_Tx_List = "https://api-cn.etherscan.com/api?module=account&action=txlist&address=";
 const Eth_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=";
 
 Future<String> assembleEthTxListUrl(String address,
-    {String contractAddress,
+    {String contractAddress = "",
     ChainType chainType = ChainType.ETH,
     String startBlock = "0",
     String endBlock = "99999999",
@@ -170,7 +170,7 @@ Future<String> assembleEthTxListUrl(String address,
 }
 
 Future<List<EthTransactionModel>> loadEthTxHistory(BuildContext context, String address, ChainType chainType,
-    {String offset}) async {
+    {String offset = ""}) async {
   List<EthTransactionModel> modelArray = [];
   Config config = await HandleConfig.instance.getConfig();
   try {
@@ -229,7 +229,7 @@ const Erc20_Tx_List = "http://api-cn.etherscan.com/api?module=account&action=tok
 const Erc20_TestNet_Tx_List = "https://api-ropsten.etherscan.io/api?module=account&action=tokentx&contractaddress=";
 
 Future<String> assembleErc20TxListUrl(String address,
-    {ChainType chainType, String contractAddress, String page = "1", String offset = "20"}) async {
+    {required ChainType chainType, required String contractAddress, String page = "1", String offset = "20"}) async {
   String apiKey = await loadEtherApiKey();
   if (chainType.toString() == ChainType.EthTest.toString()) {
     return Erc20_TestNet_Tx_List +
@@ -258,7 +258,7 @@ Future<String> assembleErc20TxListUrl(String address,
 
 Future<List<EthTransactionModel>> loadErc20TxHistory(
     BuildContext context, String address, String contractAddress, ChainType chainType,
-    {String offset}) async {
+    {required String offset}) async {
   List<EthTransactionModel> modelArray = [];
   Config config = await HandleConfig.instance.getConfig();
   try {
