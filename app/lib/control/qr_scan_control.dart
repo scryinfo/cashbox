@@ -16,16 +16,13 @@ class QrScanControl {
   factory QrScanControl() => _getInstance();
 
   static QrScanControl get instance => _getInstance();
-  static QrScanControl _instance;
+  static final QrScanControl _instance = new QrScanControl._internal();
 
   QrScanControl._internal() {
     //init data
   }
 
   static QrScanControl _getInstance() {
-    if (_instance == null) {
-      _instance = new QrScanControl._internal();
-    }
     return _instance;
   }
 
@@ -124,13 +121,13 @@ class QrScanControl {
   Map checkQrInfoByDiamondSignAndQr(String qrInfo, BuildContext context) {
     if (qrInfo.isEmpty) {
       Fluttertoast.showToast(msg: translate('qr_info_is_null'));
-      return null;
+      return {};
     }
     //------------Assemble the parameters in the url------------
     var paramIndex = qrInfo.indexOf("?");
     if (paramIndex <= 0 || paramIndex == qrInfo.length - 1) {
       Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //Not in the message? Or just one?
-      return null;
+      return {};
     }
     List paramsList = qrInfo.substring(paramIndex + 1).split("&");
     Map paramsMap = Map();
@@ -148,31 +145,31 @@ class QrScanControl {
 
     if (paramsMap.isEmpty) {
       Fluttertoast.showToast(msg: translate('qr_info_is_wrong')); //Not in the message? Or just one?
-      return null;
+      return {};
     }
     //------------Check parameters------------
     if (!paramsMap.containsKey("tl") || !verifyTimeStamp(paramsMap["tl"])) {
       Fluttertoast.showToast(msg: translate('qr_info_is_out_of_date'));
-      return null; //There is a problem with the validity period
+      return {}; //There is a problem with the validity period
     }
     if (!paramsMap.containsKey("ct")) {
       Fluttertoast.showToast(msg: translate('not_sure_chain_type'));
-      return null; //Don't know which chain
+      return {}; //Don't know which chain
     }
     if (!paramsMap.containsKey("v")) {
       //Fluttertoast.showToast(msg: translate('not_sure_operation_type);
-      return null; //Don't know what the content is
+      return {}; //Don't know what the content is
     }
     if (!paramsMap.containsKey("ot")) {
       Fluttertoast.showToast(msg: translate('not_sure_operation_type'));
-      return null; //Don't know what to do
+      return {}; //Don't know what to do
     }
     var operationType = paramsMap["ot"];
     if (operationType == "ds" && paramsMap.containsKey("dtt") && paramsMap.containsKey("v")) {
       //Confirm that it is a signature type and the information is sufficient
       return paramsMap;
     }
-    return null;
+    return {};
   }
 
   //Signature abandon (redesigned to give you a single, scanning function class is only responsible for scanning code)

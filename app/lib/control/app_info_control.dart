@@ -16,14 +16,11 @@ class AppInfoControl {
   factory AppInfoControl() => _getInstance();
 
   static AppInfoControl get instance => _getInstance();
-  static AppInfoControl _instance;
+  static final AppInfoControl _instance = new AppInfoControl._internal();
 
   AppInfoControl._internal();
 
   static AppInfoControl _getInstance() {
-    if (_instance == null) {
-      _instance = new AppInfoControl._internal();
-    }
     return _instance;
   }
 

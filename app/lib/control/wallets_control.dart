@@ -17,21 +17,21 @@ import 'package:wallets/wallets_c.dc.dart';
 class WalletsControl {
   factory WalletsControl() => getInstance();
 
-  static WalletsControl _instance;
+  static final WalletsControl _instance = new WalletsControl._internal();
 
   WalletsControl._internal();
 
   static WalletsControl getInstance() {
-    if (_instance == null) {
-      _instance = new WalletsControl._internal();
-    }
     return _instance;
   }
 
-  Future<Wallets> initWallet() async {
+  Future<void> initWallet() async {
     var initP = new InitParameters();
     try {
-      Directory directory = await getExternalStorageDirectory(); // path:  Android/data/
+      Directory? directory = await getExternalStorageDirectory(); // path:  Android/data/
+      if (directory == null) {
+        return;
+      }
       initP.dbName.path = directory.path;
       initP.dbName.prefix = "scry_";
       initP.dbName = Wallets.dbName(initP.dbName);
@@ -39,10 +39,10 @@ class WalletsControl {
       var errObj = wallets.init(initP);
       if (!errObj.isSuccess()) {
         Logger.getInstance().e("initWallet ", "errObj is --->" + errObj.message.toString());
-        return null;
+        return;
       }
       changeNetType(getCurrentNetType());
-      return wallets;
+      return;
     } catch (e) {
       Logger.getInstance().e("Wallets.dbName ", "error is --->" + e.toString());
     }
@@ -52,7 +52,7 @@ class WalletsControl {
     var mneObj = Wallets.mainIsolate().generateMnemonic(count);
     if (!mneObj.isSuccess()) {
       Logger.getInstance().e("wallet_control ", "generateMnemonic error is false --->" + mneObj.err.toString());
-      return null;
+      return "";
     }
     return mneObj.data1;
   }
@@ -93,7 +93,7 @@ class WalletsControl {
     var allWalletObj = Wallets.mainIsolate().all();
     if (!allWalletObj.isSuccess()) {
       Logger.getInstance().e("wallet_control", "walletsAll error is ====> " + allWalletObj.err.message.toString());
-      return null;
+      return [];
     }
     List<WalletM.Wallet> walletMList = [];
     allWalletObj.data1.forEach((element) {
@@ -178,7 +178,7 @@ class WalletsControl {
       return address;
     } catch (e) {
       Logger.getInstance().e("wallet_control", "currentChainAddress error is --->" + e.toString());
-      return null;
+      return "";
     }
   }
 
@@ -271,7 +271,7 @@ class WalletsControl {
       return resultObj.data1;
     }
     Logger.getInstance().e("wallet_control", "exportWallet err is --->" + resultObj.err.message.toString());
-    return null;
+    return "";
   }
 
   bool saveCurrentWalletChain(String walletId, EnumKit.ChainType chainType) {
@@ -312,6 +312,6 @@ class WalletsControl {
       return tokenAddressObj.data1;
     }
     Logger.getInstance().e("wallet_control ", "getTokenAddress err is --->" + tokenAddressObj.err.message.toString());
-    return null;
+    return [];
   }
 }

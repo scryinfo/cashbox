@@ -5,18 +5,15 @@ class WcProtocolControl {
 
   factory WcProtocolControl() => getInstance();
 
-  static WcProtocolControl _instance;
+  static final WcProtocolControl _instance = new WcProtocolControl._internal();
 
   WcProtocolControl._internal();
 
   static WcProtocolControl getInstance() {
-    if (_instance == null) {
-      _instance = new WcProtocolControl._internal();
-    }
     return _instance;
   }
 
-  Future<String> initSession(String qrInfo) async {
+  Future<String?> initSession(String qrInfo) async {
     var initSession = "initSession";
     return methodPlugin.invokeMethod(initSession, {'qrInfo': qrInfo});
   }

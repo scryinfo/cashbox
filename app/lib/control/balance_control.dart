@@ -6,7 +6,7 @@ class BalanceControl {
 
   factory BalanceControl() => getInstance();
 
-  static BalanceControl _instance;
+  static BalanceControl _instance = new BalanceControl._internal();
 
   BalanceControl._internal() {
     var curWalletObj = Wallets.mainIsolate().currentWalletChain();
@@ -20,9 +20,6 @@ class BalanceControl {
   }
 
   static BalanceControl getInstance() {
-    if (_instance == null) {
-      _instance = new BalanceControl._internal();
-    }
     return _instance;
   }
 

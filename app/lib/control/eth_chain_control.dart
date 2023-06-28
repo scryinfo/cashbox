@@ -9,14 +9,11 @@ import 'package:wallets/wallets_c.dc.dart';
 class EthChainControl {
   factory EthChainControl() => getInstance();
 
-  static EthChainControl _instance;
+  static final EthChainControl _instance = new EthChainControl._internal();
 
   EthChainControl._internal();
 
   static EthChainControl getInstance() {
-    if (_instance == null) {
-      _instance = new EthChainControl._internal();
-    }
     return _instance;
   }
 

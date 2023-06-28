@@ -11,14 +11,11 @@ import 'balance_control.dart';
 class EeeChainControl {
   factory EeeChainControl() => getInstance();
 
-  static EeeChainControl _instance;
+  static final EeeChainControl _instance = new EeeChainControl._internal();
 
   EeeChainControl._internal();
 
   static EeeChainControl getInstance() {
-    if (_instance == null) {
-      _instance = new EeeChainControl._internal();
-    }
     return _instance;
   }
 
