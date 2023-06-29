@@ -24,6 +24,7 @@ class _LanguageChoosePageState extends State<LanguageChoosePage> {
         appBar: MyAppBar(
           centerTitle: translate('language_choose'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           decoration: BoxDecoration(

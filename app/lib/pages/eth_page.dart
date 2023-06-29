@@ -30,7 +30,7 @@ import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart' as WalletDy;
 
 class EthPage extends StatefulWidget {
-  const EthPage({Key key, this.isForceLoadFromJni}) : super(key: key);
+  const EthPage({Key? key, required this.isForceLoadFromJni}) : super(key: key);
 
   final bool isForceLoadFromJni; //Whether to force reload of wallet information
 

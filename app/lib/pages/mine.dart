@@ -22,6 +22,7 @@ class _MinePageState extends State<MinePage> {
         appBar: MyAppBar(
           centerTitle: translate('mine'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           decoration: BoxDecoration(

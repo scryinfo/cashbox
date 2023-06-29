@@ -11,6 +11,7 @@ class ServiceAgreementPage extends StatelessWidget {
       appBar: MyAppBar(
         centerTitle: translate('service_protocol_title'),
         backgroundColor: Colors.transparent,
+        onPressed: () {},
       ),
       body: _buildUserService(),
     );

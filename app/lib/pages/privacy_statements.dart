@@ -11,6 +11,7 @@ class PrivacyStatementPage extends StatelessWidget {
       appBar: MyAppBar(
         centerTitle: translate('privacy_protocol_title'),
         backgroundColor: Colors.transparent,
+        onPressed: () {},
       ),
       body: _buildPrivacyProtocolHtml(),
     );
@@ -24,11 +25,11 @@ class PrivacyStatementPage extends StatelessWidget {
       child: SingleChildScrollView(
         child: Html(
           data: translate('privacy_protocol'),
-          padding: EdgeInsets.all(8.0),
-          defaultTextStyle: TextStyle(fontFamily: 'serif', color: Colors.white70),
-          linkStyle: const TextStyle(
-            color: Colors.redAccent,
-          ),
+          // padding: EdgeInsets.all(8.0),
+          // defaultTextStyle: TextStyle(fontFamily: 'serif', color: Colors.white70),
+          // linkStyle: const TextStyle(
+          //   color: Colors.redAccent,
+          // ),
         ),
       ),
     );

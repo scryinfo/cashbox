@@ -55,7 +55,7 @@ class _EntrancePageState extends State<EntrancePage> {
         */
     await _initAppConfigInfo(); //case: After deleting the wallet, there is no wallet, return to EntrancePage, check every time
     Config config = await HandleConfig.instance.getConfig();
-    _languageTextValue = languageMap[config.locale];
+    _languageTextValue = languageMap[config.locale] ?? "";
     _checkAndUpdateAppConfig();
   }
 
@@ -330,7 +330,7 @@ class _EntrancePageState extends State<EntrancePage> {
   @override
   Widget build(BuildContext context) {
     ///Initialize the screen aspect ratio, based on the cashbox cut-out, marked with XXXHDPI@4x
-    ScreenUtil.init(context, designSize: Size(90, 160), allowFontScaling: false);
+    ScreenUtil.init(context, designSize: Size(90, 160));
     return Container(
       child: FutureBuilder(
           future: _checkIsContainWallet(),
@@ -344,20 +344,22 @@ class _EntrancePageState extends State<EntrancePage> {
               );
             }
             if (snapshot.hasData) {
-              bool isContainWallet = snapshot.data;
+              bool isContainWallet = snapshot.data ?? false;
               if (isContainWallet) {
                 EnumKit.ChainType curChainType = WalletsControl.getInstance().currentChainType();
                 switch (curChainType) {
                   case EnumKit.ChainType.ETH:
                   case EnumKit.ChainType.EthTest:
-                    return EthPage();
+                    return EthPage(isForceLoadFromJni: false);
                     break;
                   case EnumKit.ChainType.EEE:
                   case EnumKit.ChainType.EeeTest:
                     return EeePage();
                     break;
                   default:
-                    return EthPage();
+                    return EthPage(
+                      isForceLoadFromJni: false,
+                    );
                     break;
                 }
               } else {
@@ -420,7 +422,7 @@ class _EntrancePageState extends State<EntrancePage> {
             itemBuilder: (BuildContext context) => _makePopMenuList(),
             onSelected: (String value) async {
               setState(() {
-                this._languageTextValue = languageMap[value];
+                this._languageTextValue = languageMap[value] ?? "";
               });
               {
                 changeLocale(context, value);
@@ -532,7 +534,7 @@ class _EntrancePageState extends State<EntrancePage> {
             onChanged: (newValue) {
               setState(
                 () {
-                  _agreeServiceProtocol = newValue;
+                  _agreeServiceProtocol = newValue ?? false;
                 },
               );
             },

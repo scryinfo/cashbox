@@ -37,6 +37,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
         appBar: MyAppBar(
           centerTitle: title ?? "",
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           width: ScreenUtil().setWidth(90),
@@ -81,7 +82,7 @@ class _QrInfoPageState extends State<QrInfoPage> {
                         margin: EdgeInsets.only(
                           top: ScreenUtil().setHeight(3.75),
                         ),
-                        child: QrImageView(data: content??" ",size: ScreenUtil().setWidth(52.25)),
+                        child: QrImageView(data: content ?? " ", size: ScreenUtil().setWidth(52.25)),
                         // child: QrImage(
                         //   data: content ?? " ",
                         //   size: ScreenUtil().setWidth(52.25),
