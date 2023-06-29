@@ -68,7 +68,7 @@ class EeeChainControl {
     return visibleList;
   }
 
-  AccountInfo decodeAdditionData(DecodeAccountInfoParameters decodeAccountInfoParameters) {
+  AccountInfo? decodeAdditionData(DecodeAccountInfoParameters decodeAccountInfoParameters) {
     var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(decodeAccountInfoParameters);
     if (!dataObj.isSuccess()) {
       return null;
@@ -116,7 +116,7 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
-  AccountInfo decodeAccountInfo(DecodeAccountInfoParameters decodeAccountInfoParameters) {
+  AccountInfo? decodeAccountInfo(DecodeAccountInfoParameters decodeAccountInfoParameters) {
     var dataObj = Wallets.mainIsolate().chainEee.decodeAccountInfo(decodeAccountInfoParameters);
     if (!dataObj.isSuccess()) {
       return null;
@@ -124,7 +124,7 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
-  SubChainBasicInfo getDefaultBasicInfo() {
+  SubChainBasicInfo? getDefaultBasicInfo() {
     var dataObj = Wallets.mainIsolate().chainEee.getDefaultBasicInfo();
     if (!dataObj.isSuccess()) {
       return null;
@@ -132,8 +132,8 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
-  ChainVersion getChainVersion() {
-    SubChainBasicInfo subChainBasicInfo = getDefaultBasicInfo();
+  ChainVersion? getChainVersion() {
+    SubChainBasicInfo? subChainBasicInfo = getDefaultBasicInfo();
     if (subChainBasicInfo == null) {
       return null;
     }
@@ -145,7 +145,7 @@ class EeeChainControl {
     return chainVersion;
   }
 
-  SubChainBasicInfo getBasicInfo(ChainVersion chainVersion) {
+  SubChainBasicInfo? getBasicInfo(ChainVersion chainVersion) {
     var dataObj = Wallets.mainIsolate().chainEee.getBasicInfo(chainVersion);
     if (!dataObj.isSuccess()) {
       return null;
@@ -177,7 +177,7 @@ class EeeChainControl {
     return dataObj.data1;
   }
 
-  AccountInfoSyncProg getSyncRecord(String account) {
+  AccountInfoSyncProg? getSyncRecord(String account) {
     var dataObj = Wallets.mainIsolate().chainEee.getSyncRecord(account);
     if (!dataObj.isSuccess()) {
       return null;
@@ -226,35 +226,41 @@ class EeeChainControl {
   }
 
   Future<String> loadEeeStorageKey(String module, String storageItem, String accountStr, {bool isEeeChain = true}) async {
-    if (storageItem == null) {
+    if (storageItem.isEmpty) {
       Logger.getInstance().e("loadEeeStorageKey", "storageItem is null");
-      return null;
+      return "";
     }
     StorageKeyParameters storageKeyParameters = StorageKeyParameters();
     ChainVersion chainVersion = ChainVersion();
-    SubChainBasicInfo defaultBasicInfo;
+    SubChainBasicInfo? defaultBasicInfo;
     if (isEeeChain) {
       defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo();
-      chainVersion
-        ..genesisHash = defaultBasicInfo.genesisHash
-        ..txVersion = defaultBasicInfo.txVersion
-        ..runtimeVersion = defaultBasicInfo.runtimeVersion;
+      if (defaultBasicInfo != null) {
+        chainVersion
+          ..genesisHash = defaultBasicInfo.genesisHash
+          ..txVersion = defaultBasicInfo.txVersion
+          ..runtimeVersion = defaultBasicInfo.runtimeVersion;
+      }
     } else {
       // todo
       defaultBasicInfo = EeeChainControl.getInstance().getBasicInfo(chainVersion);
     }
-    storageKeyParameters
-      ..module = module
-      ..storageItem = storageItem
-      ..account = accountStr
-      ..chainVersion = chainVersion;
+    if (defaultBasicInfo != null) {
+      storageKeyParameters
+        ..module = module
+        ..storageItem = storageItem
+        ..account = accountStr
+        ..chainVersion = chainVersion;
 
-    String storageKey = EeeChainControl.getInstance().getStorageKey(storageKeyParameters);
-    return storageKey;
+      String storageKey = EeeChainControl.getInstance().getStorageKey(storageKeyParameters);
+      return storageKey;
+    } else {
+      return "";
+    }
   }
 
   Future<String> loadEeeBalance(String module, String storageItem, String pubKey) async {
-    AccountInfo eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
+    AccountInfo? eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
     if (eeeResultMap != null) {
       return eeeResultMap.freeBalance;
     }
@@ -273,7 +279,7 @@ class EeeChainControl {
     return netFormatMap;
   }
 
-  Future<AccountInfo> loadEeeStorageMap(String module, String storageItem, String accountStr) async {
+  Future<AccountInfo?> loadEeeStorageMap(String module, String storageItem, String accountStr) async {
     String storageKey = await loadEeeStorageKey(module, storageItem, accountStr);
     if (storageKey == null || storageKey.trim() == "") {
       return null;
@@ -284,14 +290,18 @@ class EeeChainControl {
       return null;
     }
     DecodeAccountInfoParameters decodeAccountInfoParameters = DecodeAccountInfoParameters();
-    decodeAccountInfoParameters
-      ..encodeData = netFormatMap["result"]
-      ..chainVersion = EeeChainControl.getInstance().getChainVersion();
+    decodeAccountInfoParameters.encodeData = netFormatMap["result"];
+    {
+      var v = EeeChainControl.getInstance().getChainVersion();
+      if (v != null) {
+        decodeAccountInfoParameters.chainVersion = v;
+      }
+    }
     return EeeChainControl.getInstance().decodeAccountInfo(decodeAccountInfoParameters);
   }
 
   Future<int> loadEeeChainNonce(String module, String storageItem, String pubKey) async {
-    AccountInfo eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
+    AccountInfo? eeeResultMap = await loadEeeStorageMap(module, storageItem, pubKey);
     if (eeeResultMap != null) {
       return eeeResultMap.nonce;
     }

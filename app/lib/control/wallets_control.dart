@@ -75,7 +75,7 @@ class WalletsControl {
     return true;
   }
 
-  Wallet createWallet(Uint8List mnemonic, EnumKit.WalletType walletType, String walletName, Uint8List pwd) {
+  Wallet? createWallet(Uint8List mnemonic, EnumKit.WalletType walletType, String walletName, Uint8List pwd) {
     CreateWalletParameters createWalletParameters = CreateWalletParameters();
     createWalletParameters.walletType = walletType.toEnumString();
     createWalletParameters.mnemonic = String.fromCharCodes(mnemonic);
@@ -134,7 +134,7 @@ class WalletsControl {
   }
 
   bool isCurWallet(WalletM.Wallet wallet) {
-    if (currentWallet().id == wallet.walletId) {
+    if (currentWallet()?.id == wallet.walletId) {
       return true;
     }
     return false;
@@ -162,18 +162,21 @@ class WalletsControl {
   String currentChainAddress() {
     try {
       String address = "";
-      switch (currentChainType()) {
-        case EnumKit.ChainType.EthTest:
-        case EnumKit.ChainType.ETH:
-          address = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
-          break;
-        case EnumKit.ChainType.EeeTest:
-        case EnumKit.ChainType.EEE:
-          address = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address;
-          break;
-        default:
-          address = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
-          break;
+      var w = WalletsControl.getInstance().currentWallet();
+      if (w != null) {
+        switch (currentChainType()) {
+          case EnumKit.ChainType.EthTest:
+          case EnumKit.ChainType.ETH:
+            address = w.ethChain.chainShared.walletAddress.address;
+            break;
+          case EnumKit.ChainType.EeeTest:
+          case EnumKit.ChainType.EEE:
+            address = w.eeeChain.chainShared.walletAddress.address;
+            break;
+          default:
+            address = w.ethChain.chainShared.walletAddress.address;
+            break;
+        }
       }
       return address;
     } catch (e) {
@@ -188,11 +191,11 @@ class WalletsControl {
       return curWalletIdObj.data1.chainType;
     } else {
       Logger.getInstance().e("wallet_control", "currentWalletChain error is --->" + curWalletIdObj.err.message.toString());
-      return null;
+      return EnumKit.ChainType.None;
     }
   }
 
-  Wallet currentWallet() {
+  Wallet? currentWallet() {
     var curWalletIdObj = Wallets.mainIsolate().currentWalletChain();
     if (!curWalletIdObj.isSuccess()) {
       Logger.getInstance().e("wallet_control", "currentWalletChain error is --->" + curWalletIdObj.err.toString());
@@ -287,18 +290,21 @@ class WalletsControl {
   String getTokenAddressId(String walletId, EnumKit.ChainType chainType) {
     try {
       String tokenAddressId = "";
-      switch (chainType) {
-        case EnumKit.ChainType.EthTest:
-        case EnumKit.ChainType.ETH:
-          tokenAddressId = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.id;
-          break;
-        case EnumKit.ChainType.EeeTest:
-        case EnumKit.ChainType.EEE:
-          tokenAddressId = WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.id;
-          break;
-        default:
-          tokenAddressId = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.id;
-          break;
+      var w = WalletsControl.getInstance().currentWallet();
+      if (w != null) {
+        switch (chainType) {
+          case EnumKit.ChainType.EthTest:
+          case EnumKit.ChainType.ETH:
+            tokenAddressId = w.ethChain.chainShared.walletAddress.id;
+            break;
+          case EnumKit.ChainType.EeeTest:
+          case EnumKit.ChainType.EEE:
+            tokenAddressId = w.eeeChain.chainShared.walletAddress.id;
+            break;
+          default:
+            tokenAddressId = w.ethChain.chainShared.walletAddress.id;
+            break;
+        }
       }
       return tokenAddressId;
     } catch (e) {

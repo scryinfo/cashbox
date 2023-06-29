@@ -69,7 +69,7 @@ class EthChainControl {
 
   String decodeAdditionData(String encodeData) {
     var dataObj = Wallets.mainIsolate().chainEth.decodeAdditionData(encodeData);
-    if (!dataObj.isSuccess()) {
+    if (dataObj == null || !dataObj.isSuccess()) {
       return "";
     }
     return dataObj.data1;

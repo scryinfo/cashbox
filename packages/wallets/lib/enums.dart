@@ -1,6 +1,6 @@
 import 'package:logger/logger.dart';
 
-enum ChainType { BTC, BtcTest, ETH, EthTest, EEE, EeeTest }
+enum ChainType { BTC, BtcTest, ETH, EthTest, EEE, EeeTest,None }
 
 const _tag = "Wallets";
 
@@ -34,6 +34,9 @@ extension ChainTypeEx on ChainType {
         break;
       case ChainType.EeeTest:
         index = 6;
+        break;
+      case ChainType.None:
+        index = 0;
         break;
     }
     return index;
@@ -89,6 +92,9 @@ extension ChainTypeEx on ChainType {
         break;
       case ChainType.EeeTest:
         re = "EeeTest";
+        break;
+      case ChainType.None:
+        re = "None";
         break;
     }
     return re;
