@@ -50,7 +50,7 @@ class EeeChainControl {
         ..shortName = element.eeeChainTokenShared.tokenShared.symbol ?? ""
         ..urlImg = element.eeeChainTokenShared.tokenShared.logoUrl ?? ""
         // ..contractAddress = element.contractAddress ?? ""
-        ..isVisible = element.show_1.isTrue()
+        ..isVisible = element.show1.isTrue()
         ..address = nowWallet.eeeChain.chainShared.walletAddress.address
         ..tokenId = element.chainTokenSharedId
         ..decimal = element.eeeChainTokenShared.decimal ?? 0;
@@ -79,7 +79,7 @@ class EeeChainControl {
   String txSign(RawTxParam rawTx) {
     var dataObj = Wallets.mainIsolate().chainEee.txSign(rawTx);
     if (!dataObj.isSuccess()) {
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
@@ -87,7 +87,7 @@ class EeeChainControl {
   String eeeTransfer(EeeTransferPayload txPayload) {
     var dataObj = Wallets.mainIsolate().chainEee.eeeTransfer(txPayload);
     if (!dataObj.isSuccess()) {
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
@@ -95,7 +95,7 @@ class EeeChainControl {
   String tokenXTransfer(EeeTransferPayload txPayload) {
     var dataObj = Wallets.mainIsolate().chainEee.tokenXTransfer(txPayload);
     if (!dataObj.isSuccess()) {
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
@@ -111,7 +111,7 @@ class EeeChainControl {
   List<EeeChainTokenAuth> getChainEeeAuthTokenList(int startIndex, int endIndex) {
     var dataObj = Wallets.mainIsolate().chainEee.getChainEeeAuthTokenList(startIndex, endIndex);
     if (!dataObj.isSuccess()) {
-      return null;
+      return [];
     }
     return dataObj.data1;
   }
@@ -156,7 +156,7 @@ class EeeChainControl {
   String getStorageKey(StorageKeyParameters storageKeyParameters) {
     var dataObj = Wallets.mainIsolate().chainEee.getStorageKey(storageKeyParameters);
     if (!dataObj.isSuccess()) {
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
@@ -164,7 +164,7 @@ class EeeChainControl {
   List<EeeChainTx> getEeeTxRecord(String account, int startItem, int pageSize) {
     var dataObj = Wallets.mainIsolate().chainEee.getEeeTxRecord(account, startItem, pageSize);
     if (!dataObj.isSuccess()) {
-      return null;
+      return [];
     }
     return dataObj.data1;
   }
@@ -172,7 +172,7 @@ class EeeChainControl {
   List<EeeChainTx> getTokenXTxRecord(String account, int startItem, int pageSize) {
     var dataObj = Wallets.mainIsolate().chainEee.getTokenXTxRecord(account, startItem, pageSize);
     if (!dataObj.isSuccess()) {
-      return null;
+      return [];
     }
     return dataObj.data1;
   }
@@ -188,7 +188,7 @@ class EeeChainControl {
   bool saveExtrinsicDetail(ExtrinsicContext extrinsicContext) {
     var dataObj = Wallets.mainIsolate().chainEee.saveExtrinsicDetail(extrinsicContext);
     if (!dataObj.isSuccess()) {
-      return null;
+      return false;
     }
     return dataObj.data1;
   }
@@ -196,7 +196,7 @@ class EeeChainControl {
   String txSubmittableSign(RawTxParam rawTxParam) {
     var dataObj = Wallets.mainIsolate().chainEee.txSubmittableSign(rawTxParam);
     if (!dataObj.isSuccess()) {
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
@@ -204,7 +204,7 @@ class EeeChainControl {
   bool updateAuthDigitList(ArrayCEeeChainTokenAuth arrayCEeeChainTokenAuth) {
     var dataObj = Wallets.mainIsolate().chainEee.updateAuthDigitList(arrayCEeeChainTokenAuth);
     if (!dataObj.isSuccess()) {
-      return null;
+      return false;
     }
     return dataObj.data1;
   }
@@ -212,7 +212,7 @@ class EeeChainControl {
   bool updateDefaultTokenList(ArrayCEeeChainTokenDefault arrayCEeeChainTokenDefault) {
     var dataObj = Wallets.mainIsolate().chainEee.updateDefaultTokenList(arrayCEeeChainTokenDefault);
     if (!dataObj.isSuccess()) {
-      return null;
+      return false;
     }
     return dataObj.data1;
   }
@@ -220,7 +220,7 @@ class EeeChainControl {
   bool updateSyncRecord(AccountInfoSyncProg accountInfoSyncProg) {
     var dataObj = Wallets.mainIsolate().chainEee.updateSyncRecord(accountInfoSyncProg);
     if (!dataObj.isSuccess()) {
-      return null;
+      return false;
     }
     return dataObj.data1;
   }
@@ -264,11 +264,11 @@ class EeeChainControl {
   Future<Map> loadTokenXbalance(String tokenx, String balances, String accountStr) async {
     String eeeStorageKey = await loadEeeStorageKey(tokenx, balances, accountStr);
     if (eeeStorageKey == null || eeeStorageKey.trim() == "") {
-      return null;
+      return {};
     }
     Map netFormatMap = await ScryXNetUtil().loadScryXStorage(eeeStorageKey);
     if (netFormatMap == null || !netFormatMap.containsKey("result") || netFormatMap["result"] == null) {
-      return null;
+      return {};
     }
     return netFormatMap;
   }

@@ -1,16 +1,19 @@
 import 'package:flutter/cupertino.dart';
+import 'package:logger/logger.dart';
 
 //According to the key change, the component used to restart the application or widget
 class RestartWidget extends StatefulWidget {
   final Widget childWidget;
 
-  RestartWidget({Key key, @required this.childWidget})
-      : assert(childWidget != null),
-        super(key: key);
+  RestartWidget({Key? key, required this.childWidget}) : super(key: key);
 
   static restartApp(BuildContext context) {
-    final _RestartWidgetState state = context.findAncestorStateOfType<_RestartWidgetState>();
-    state.restartApp();
+    final _RestartWidgetState? state = context.findAncestorStateOfType<_RestartWidgetState>();
+    if (state != null) {
+      state.restartApp();
+    } else {
+      Logger().e("restartApp get null", "");
+    }
   }
 
   @override

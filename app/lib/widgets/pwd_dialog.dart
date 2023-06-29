@@ -11,7 +11,7 @@ class PwdDialog extends StatelessWidget {
   final String hintInput;
   final Function onPressed;
 
-  PwdDialog({this.title, this.hintContent, this.hintInput, this.onPressed});
+  PwdDialog({required this.title, required this.hintContent, required this.hintInput, required this.onPressed});
 
   TextEditingController _controller = TextEditingController();
 

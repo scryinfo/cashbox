@@ -6,14 +6,14 @@ import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MyAppBar(
-      {Key key,
-      this.backgroundColor: Colors.white,
-      this.title: "",
-      this.centerTitle: "",
-      this.actionName: "",
-      this.backImg: "assets/images/ic_back_black.png",
-      this.onPressed,
-      this.isBack: true})
+      {Key? key,
+      this.backgroundColor = Colors.white,
+      this.title = "",
+      this.centerTitle = "",
+      this.actionName = "",
+      this.backImg = "assets/images/ic_back_black.png",
+      required this.onPressed,
+      this.isBack = true})
       : super(key: key);
 
   final Color backgroundColor;

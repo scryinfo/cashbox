@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ItemOfListWidget extends StatefulWidget {
   final String leftText;
 
-  ItemOfListWidget({Key key, @required this.leftText}) : super(key: key);
+  ItemOfListWidget({Key? key, required this.leftText}) : super(key: key);
 
   @override
   _ItemOfListWidgetState createState() => _ItemOfListWidgetState(leftText: leftText);
@@ -14,7 +14,7 @@ class _ItemOfListWidgetState extends State<ItemOfListWidget> {
   String leftText;
 
   _ItemOfListWidgetState({
-    @required this.leftText,
+    required this.leftText,
   });
 
   @override

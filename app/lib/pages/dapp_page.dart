@@ -39,16 +39,16 @@ const setAddress = 'setAddress';
 
 class Message {
   // message id
-  String id;
+  String id = "";
 
   // message data, 自定义格式
-  String data;
+  String data = "";
 
   // message 消息完成后调用的函数，此函数直接在window下面
-  String callFun;
+  String callFun = "";
 
   // 出错误信息，没有出错时为零长度字符串
-  String err;
+  String err = "";
 
   Message.fromJson(Map<String, dynamic> json) {
     id = json['id'];

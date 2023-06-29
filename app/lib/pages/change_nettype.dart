@@ -4,7 +4,7 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/screenutil.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_dialogs/material_dialogs.dart';
@@ -18,8 +18,8 @@ class ChangeNetTypePage extends StatefulWidget {
 }
 
 class NetType extends Object {
-  String enumNetType; // EnumKit.NetType
-  String netTypeName;
+  String enumNetType = ""; // EnumKit.NetType
+  String netTypeName = "";
 }
 
 class _ChangeNetTypePageState extends State<ChangeNetTypePage> {

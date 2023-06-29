@@ -24,14 +24,14 @@ class ServiceAgreementPage extends StatelessWidget {
       child: SingleChildScrollView(
         child: Html(
           data: translate('service_agreement'),
-          padding: EdgeInsets.all(8.0),
-          defaultTextStyle: TextStyle(fontFamily: 'serif', color: Colors.white70),
-          linkStyle: const TextStyle(
-            color: Colors.redAccent,
-          ),
-          onLinkTap: (url) {
-            // open url in a webview
-          },
+          // padding: EdgeInsets.all(8.0),
+          // defaultTextStyle: TextStyle(fontFamily: 'serif', color: Colors.white70),
+          // linkStyle: const TextStyle(
+          //   color: Colors.redAccent,
+          // ),
+          // onLinkTap: (url) {
+          //   // open url in a webview
+          // },
         ),
       ),
     );

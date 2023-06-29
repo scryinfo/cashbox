@@ -194,7 +194,7 @@ class QrScanControl {
           context.read<SignInfoProvide>().setWaitToSignInfo(waitSignTx);
         }
         NavigatorUtils.push(context, Routes.signTxPage);
-        paramsMap = null; //Blank scan data
+        paramsMap = {}; //Blank scan data
         break;
       default:
         Fluttertoast.showToast(msg: translate('not_sure_chain_type'));

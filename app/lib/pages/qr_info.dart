@@ -15,10 +15,10 @@ class QrInfoPage extends StatefulWidget {
 }
 
 class _QrInfoPageState extends State<QrInfoPage> {
-  String title;
-  String hintInfo;
-  String content;
-  String btnContent;
+  String title = "";
+  String hintInfo = "";
+  String content = "";
+  String btnContent = "";
 
   @override
   void didChangeDependencies() {
@@ -81,10 +81,11 @@ class _QrInfoPageState extends State<QrInfoPage> {
                         margin: EdgeInsets.only(
                           top: ScreenUtil().setHeight(3.75),
                         ),
-                        child: QrImage(
-                          data: content ?? " ",
-                          size: ScreenUtil().setWidth(52.25),
-                        ),
+                        child: QrImageView(data: content??" ",size: ScreenUtil().setWidth(52.25)),
+                        // child: QrImage(
+                        //   data: content ?? " ",
+                        //   size: ScreenUtil().setWidth(52.25),
+                        // ),
                       ),
                       Container(
                         margin: EdgeInsets.only(

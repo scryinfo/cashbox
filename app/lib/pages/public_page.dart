@@ -14,7 +14,7 @@ class PublicPage extends StatefulWidget {
 }
 
 class _PublicPageState extends State<PublicPage> {
-  WebViewController _controller;
+  WebViewController? _controller;
 
   @override
   void initState() {

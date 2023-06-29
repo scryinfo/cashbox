@@ -5,7 +5,7 @@ class MySeparatorLine extends CustomPainter {
   final double width;
   final double height;
 
-  MySeparatorLine({this.lineColor, this.width, this.height});
+  MySeparatorLine({required this.lineColor, required this.width, required this.height});
 
   @override
   void paint(Canvas canvas, Size size) {

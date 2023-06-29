@@ -6,7 +6,7 @@ import 'package:logger/logger.dart';
 import '../res/resources.dart';
 
 class ProgressDialog extends Dialog {
-  ProgressDialog({Key key, this.hintText}) : super(key: key);
+  ProgressDialog({Key? key, required this.hintText}) : super(key: key);
 
   final String hintText;
 
@@ -37,7 +37,7 @@ class ProgressDialog extends Dialog {
     );
   }
 
-  static void showProgressDialog(context, message, {bool outsideDismiss: false, bool backKeyPop: true}) {
+  static void showProgressDialog(context, message, {bool outsideDismiss = false, bool backKeyPop = true}) {
     try {
       showTransparentDialog(
           context: context,
@@ -53,15 +53,15 @@ class ProgressDialog extends Dialog {
             );
           });
     } catch (e) {
-      Logger().e("showProgressDialog error is =>", e);
+      Logger().e("showProgressDialog error is =>", e.toString());
     }
   }
 
   /// The default dialog background color is translucent black. Here, the source code is changed to transparent
-  static Future<T> showTransparentDialog<T>({
-    @required BuildContext context,
+  static Future<T?> showTransparentDialog<T>({
+    required BuildContext context,
     bool barrierDismissible = true,
-    WidgetBuilder builder,
+    required WidgetBuilder builder,
   }) {
     final ThemeData theme = Theme.of(context); // Theme.of(context, shadowThemeOnly: true);
     return showGeneralDialog(

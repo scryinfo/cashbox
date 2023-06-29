@@ -49,7 +49,7 @@ class EthChainControl {
         ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
         ..address = nowWallet.ethChain.chainShared.walletAddress.address
         ..contractAddress = element.contractAddress ?? ""
-        ..isVisible = element.show_1.isTrue()
+        ..isVisible = element.show1.isTrue()
         ..tokenId = element.chainTokenSharedId
         ..gasLimit = element.ethChainTokenShared.gasLimit
         ..gasPrice = element.ethChainTokenShared.gasPrice
@@ -70,7 +70,7 @@ class EthChainControl {
   String decodeAdditionData(String encodeData) {
     var dataObj = Wallets.mainIsolate().chainEth.decodeAdditionData(encodeData);
     if (!dataObj.isSuccess()) {
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
@@ -78,7 +78,7 @@ class EthChainControl {
   String txSign(EthTransferPayload txPayload, NoCacheString password) {
     var dataObj = Wallets.mainIsolate().chainEth.txSign(txPayload, password);
     if (!dataObj.isSuccess()) {
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
@@ -87,7 +87,7 @@ class EthChainControl {
     var dataObj = Wallets.mainIsolate().chainEth.wcTxSign(txPayload, password);
     if (!dataObj.isSuccess()) {
       Logger().e("wcTxSign  dataObj.err: " + dataObj.err.message, dataObj.err.code.toString());
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
@@ -95,7 +95,7 @@ class EthChainControl {
   String rawTxSign(EthRawTxPayload rawTxPayload, NoCacheString password) {
     var dataObj = Wallets.mainIsolate().chainEth.rawTxSign(rawTxPayload, password);
     if (!dataObj.isSuccess()) {
-      return null;
+      return "";
     }
     return dataObj.data1;
   }
@@ -111,7 +111,7 @@ class EthChainControl {
   List<EthChainTokenAuth> getChainEthAuthTokenList(int startIndex, int endIndex) {
     var dataObj = Wallets.mainIsolate().chainEth.getChainEthAuthTokenList(startIndex, endIndex);
     if (!dataObj.isSuccess()) {
-      return null;
+      return [];
     }
     return dataObj.data1;
   }
