@@ -27,6 +27,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
         appBar: MyAppBar(
           centerTitle: translate('transaction_confirm'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           child: _buildEeeTransferConfirmWidget(),
@@ -244,6 +245,7 @@ class _EeeTransferConfirmPageState extends State<EeeTransferConfirmPage> {
         height: ScreenUtil().setHeight(9),
         color: Color.fromRGBO(26, 141, 198, 0.20),
         child: TextButton(
+          onPressed: () {},
           child: Text(
             translate('click_to_up_chain'),
             textAlign: TextAlign.center,

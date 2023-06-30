@@ -56,8 +56,12 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
       balanceInfo = Provider.of<TransactionProvide>(context).balance;
       moneyInfo = Provider.of<TransactionProvide>(context).money;
     }
-
-    EeeSyncTxs.startOnce(WalletsControl.getInstance().currentWallet().eeeChain);
+    {
+      var w = WalletsControl.getInstance().currentWallet();
+      if (w != null) {
+        EeeSyncTxs.startOnce(w.eeeChain);
+      }
+    }
   }
 
   @override
@@ -70,6 +74,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
         appBar: MyAppBar(
           centerTitle: translate('transaction_history'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           child: _buildTxHistoryLayout(),
@@ -137,7 +142,8 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
           Gaps.scaleHGap(1),
           Container(
             //height: ScreenUtil().setHeight(8),
-            child: FlatButton(
+            child: MaterialButton(
+              // style: ElevatedButton.styleFrom(),
               color: Color.fromRGBO(26, 141, 198, 0.2),
               onPressed: () {
                 context.read<TransactionProvide>()
@@ -324,7 +330,7 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
             ..setHash(eeeTxListModel[index].blockHash)
             ..setTimeStamp(eeeTxListModel[index].txTimestamp.toString())
             ..setValue(eeeTxListModel[index].value)
-            ..setBackup(eeeTxListModel[index].extension_1);
+            ..setBackup(eeeTxListModel[index].extension1);
           NavigatorUtils.push(context, Routes.eeeTransactionDetailPage);
         },
         child: Column(
@@ -432,25 +438,25 @@ class _EeeChainTxsHistoryPageState extends State<EeeChainTxsHistoryPage> {
   Future<List<EeeChainTx>> getTxListData() async {
     //去加载本地DB已有的交易，进行显示
     Config config = await HandleConfig.instance.getConfig();
+    var w = WalletsControl.getInstance().currentWallet();
+    if (w == null) {
+      return eeeTxListModel;
+    }
     for (; true;) {
-      List<EeeChainTx> eeeChainTxList;
+      List<EeeChainTx> eeeChainTxList = [];
       switch (digitName.trim().toLowerCase()) {
         case "eee":
-          eeeChainTxList = EeeChainControl.getInstance().getEeeTxRecord(
-              WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address,
-              (currentPage * this.pageSize),
-              this.pageSize);
+          eeeChainTxList = EeeChainControl.getInstance()
+              .getEeeTxRecord(w.eeeChain.chainShared.walletAddress.address, (currentPage * this.pageSize), this.pageSize);
           break;
         case "tokenx":
           eeeChainTxList = EeeChainControl.getInstance().getTokenXTxRecord(
-              WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address,
-              (currentPage * this.pageSize),
-              this.pageSize);
+              w.eeeChain.chainShared.walletAddress.address, (currentPage * this.pageSize), this.pageSize);
           break;
         default:
           break;
       }
-      if (eeeChainTxList == null || eeeChainTxList.isEmpty) {
+      if (eeeChainTxList.isEmpty) {
         break;
       }
       var oldSet = eeeTxListModel.map((e) => e.txHash).toSet();

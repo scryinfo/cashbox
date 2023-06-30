@@ -13,6 +13,7 @@ import 'package:app/util/utils.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -29,7 +30,7 @@ class Ddd2EeePage extends StatefulWidget {
 class _Ddd2EeePageState extends State<Ddd2EeePage> {
   TextEditingController _eeeAddressController = TextEditingController();
   TextEditingController _dddAmountController = TextEditingController();
-  ChainType chainType;
+  ChainType chainType = ChainType.None;
   bool isShowExactGas = false;
   int precision = 8; //Decimal precision
   int eth2gasUnit = 1000 * 1000 * 1000; // 1 ETH = 1e9 gwei (10 to the ninth power) = 1e18 wei
@@ -37,15 +38,15 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
   String arrowIcon = "assets/images/ic_collapse.png";
-  double mMaxGasPrice;
-  double mMinGasPrice;
-  double mMaxGasLimit;
-  double mMinGasLimit;
-  double mGasPriceValue;
-  double mGasLimitValue;
-  double mMaxGasFee;
-  double mMinGasFee;
-  double mGasFeeValue;
+  double mMaxGasPrice = 0.0;
+  double mMinGasPrice = 0.0;
+  double mMaxGasLimit = 0.0;
+  double mMinGasLimit = 0.0;
+  double mGasPriceValue = 0.0;
+  double mGasLimitValue = 0.0;
+  double mMaxGasFee = 0.0;
+  double mMinGasFee = 0.0;
+  double mGasFeeValue = 0.0;
   String dddBalance = "";
   String ethBalance = "";
   String fromAddress = "";
@@ -78,7 +79,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
   void initDataConfig() async {
     //case nowChain is not eth or eth_test
     chainType = ChainType.ETH;
-    fromAddress = WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address;
+    fromAddress = WalletsControl.getInstance().currentWallet()?.ethChain.chainShared.walletAddress.address ?? "";
     Config config = await HandleConfig.instance.getConfig();
     toExchangeAddress =
         chainType == ChainType.ETH ? config.privateConfig.d2eMainNetEthAddress : config.privateConfig.d2eTestNetEthAddress;
@@ -104,6 +105,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         appBar: MyAppBar(
           centerTitle: translate('token_exchange'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           width: ScreenUtil().setWidth(90),
@@ -293,9 +295,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
                 ),
               ),
               controller: _dddAmountController,
-              inputFormatters: [
-                WhitelistingTextInputFormatter(RegExp("[0-9.]")), //Enter only numbers or decimal point.
-              ],
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ),
         ],
@@ -745,6 +745,7 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         height: ScreenUtil().setHeight(9),
         color: Color.fromRGBO(26, 141, 198, 0.20),
         child: TextButton(
+          onPressed: () {},
           child: Text(
             translate('click_to_exchange'),
             textAlign: TextAlign.center,
@@ -776,13 +777,15 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
           msg: translate('tx_value_is_0').toString(), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
       return false;
     }
-    if (dddBalance == null || dddBalance == "" || double.parse(dddBalance) <= 0) {
+    if (dddBalance.isEmpty || double.parse(dddBalance) <= 0) {
+      var c = WalletsControl.getInstance().currentWallet();
+      if (c == null) {
+        return false;
+      }
       try {
         Config config = await HandleConfig.instance.getConfig();
-        dddBalance = await loadErc20Balance(
-            WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
-            chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA,
-            chainType);
+        dddBalance = await loadErc20Balance(c.ethChain.chainShared.walletAddress.address,
+            chainType == ChainType.ETH ? config.privateConfig.dddMainNetCA : config.privateConfig.dddTestNetCA, chainType);
       } catch (e) {
         Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;
@@ -799,16 +802,19 @@ class _Ddd2EeePageState extends State<Ddd2EeePage> {
         return false;
       }
     }
-    if (ethBalance == null || ethBalance == "" || double.parse(ethBalance) <= 0) {
+    if (ethBalance.isEmpty || double.parse(ethBalance) <= 0) {
+      var c = WalletsControl.getInstance().currentWallet();
+      if (c == null) {
+        return false;
+      }
       try {
-        ethBalance = await loadEthBalance(
-            WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address, chainType);
+        ethBalance = await loadEthBalance(c.ethChain.chainShared.walletAddress.address, chainType);
       } catch (e) {
         Fluttertoast.showToast(msg: translate('unknown_in_value'));
         return false;
       }
     }
-    if (ethBalance != null && ethBalance.isNotEmpty) {
+    if (ethBalance.isNotEmpty) {
       try {
         if (double.parse(ethBalance) <= 0) {
           Fluttertoast.showToast(msg: translate("not_enough_for_gas"));

@@ -48,6 +48,7 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
         appBar: MyAppBar(
           centerTitle: translate('import_wallet'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           width: ScreenUtil().setWidth(90),
@@ -375,11 +376,13 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                 Checkbox(
                   value: _ethChainChoose,
                   onChanged: (newValue) {
-                    setState(
-                      () {
-                        _ethChainChoose = newValue;
-                      },
-                    );
+                    if (newValue != null) {
+                      setState(
+                        () {
+                          _ethChainChoose = newValue;
+                        },
+                      );
+                    }
                   },
                 ),
                 Text(
@@ -398,11 +401,13 @@ class _ImportWalletPageState extends State<ImportWalletPage> {
                 Checkbox(
                   value: _eeeChainChoose,
                   onChanged: (newValue) {
-                    setState(
-                      () {
-                        _eeeChainChoose = newValue;
-                      },
-                    );
+                    if (newValue != null) {
+                      setState(
+                        () {
+                          _eeeChainChoose = newValue;
+                        },
+                      );
+                    }
                   },
                 ),
                 Text(

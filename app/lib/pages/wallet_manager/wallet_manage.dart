@@ -144,7 +144,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                   padding: EdgeInsets.all(0),
                   child: Opacity(
                     opacity: isNameEditable ? 1 : 0.8,
-                    child: RaisedButton(
+                    child: ElevatedButton(
                       onPressed: () async {
                         if (!isNameEditable) {
                           setState(() {
@@ -169,7 +169,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
                           walletName = _walletNameController.text;
                         });
                       },
-                      color: Colors.white30,
+                      // color: Colors.white30,
                       child: isNameEditable
                           ? Text(
                               translate('confirm'),

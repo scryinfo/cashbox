@@ -133,7 +133,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
           Gaps.scaleHGap(1),
           Container(
             //height: ScreenUtil().setHeight(8),
-            child: FlatButton(
+            child: MaterialButton(
               color: Color.fromRGBO(26, 141, 198, 0.2),
               onPressed: () {
                 NavigatorUtils.push(context, Routes.transferEthPage);

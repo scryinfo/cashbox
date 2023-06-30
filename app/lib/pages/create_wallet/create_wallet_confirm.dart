@@ -56,6 +56,7 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
         appBar: MyAppBar(
           centerTitle: translate('verify_wallet'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: _buildConfirmMnemonic(),
       ),
@@ -284,8 +285,8 @@ class _CreateWalletConfirmPageState extends State<CreateWalletConfirmPage> {
         Logger.getInstance().e("unknown net type", "import wallet curNetType is unknown");
         return false;
     }
-    context.read<CreateWalletProcessProvide>().setMnemonic(null);
-    context.read<CreateWalletProcessProvide>().setPwd(null);
+    context.read<CreateWalletProcessProvide>().setMnemonic(Uint8List(0));
+    context.read<CreateWalletProcessProvide>().setPwd(Uint8List(0));
     return true;
   }
 

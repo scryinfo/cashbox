@@ -21,7 +21,7 @@ import 'package:wallets/kits.dart';
 import 'package:wallets/wallets_c.dc.dart';
 
 class DigitsManagePage extends StatefulWidget {
-  const DigitsManagePage({Key key, this.isReloadDigitList}) : super(key: key);
+  const DigitsManagePage({Key? key, required this.isReloadDigitList}) : super(key: key);
 
   final bool isReloadDigitList; //Whether to force reload of wallet digitList
 
@@ -49,7 +49,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
 
   initData() async {
     bool isReloadDigitList = widget.isReloadDigitList;
-    if (isReloadDigitList == null) isReloadDigitList = true;
+    // if (isReloadDigitList == null) isReloadDigitList = true;
     if (isReloadDigitList) {
       List<TokenM> allNativeDigitList = loadNativeToken();
       allNativeDigitList.sort((left, right) {
@@ -78,7 +78,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             ..contractAddress = element.contractAddress
             ..decimal = element.ethChainTokenShared.decimal
             ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
-            ..isVisible = element.show_1.isTrue();
+            ..isVisible = element.show1.isTrue();
           nativeTokenMList.add(tokenM);
         });
         break;
@@ -91,7 +91,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
             ..shortName = element.eeeChainTokenShared.tokenShared.symbol
             ..decimal = element.eeeChainTokenShared.decimal
             ..urlImg = element.eeeChainTokenShared.tokenShared.logoUrl ?? ""
-            ..isVisible = element.show_1.isTrue();
+            ..isVisible = element.show1.isTrue();
           nativeTokenMList.add(tokenM);
         });
         break;

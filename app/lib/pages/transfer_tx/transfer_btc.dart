@@ -1,11 +1,11 @@
 import 'package:app/control/qr_scan_control.dart';
-import 'package:app/control/wallets_control.dart';
 import 'package:app/res/resources.dart';
 import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -34,6 +34,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
         appBar: MyAppBar(
           centerTitle: translate('wallet_transfer'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           width: ScreenUtil().setWidth(90),
@@ -218,9 +219,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
                 ),
               ),
               controller: _txValueController,
-              inputFormatters: [
-                WhitelistingTextInputFormatter(RegExp("[0-9.]")), //Only numbers or decimal points can be entered.
-              ],
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ),
         ],
@@ -240,6 +239,7 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
         height: ScreenUtil().setHeight(9),
         color: Color.fromRGBO(26, 141, 198, 0.20),
         child: TextButton(
+          onPressed: () {},
           child: Text(
             translate('click_to_transfer'),
             textAlign: TextAlign.center,
@@ -262,7 +262,6 @@ class _TransferBtcPageState extends State<TransferBtcPage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            String walletId = WalletsControl.getInstance().currentWallet().id;
             //todo to be tested
           },
         );

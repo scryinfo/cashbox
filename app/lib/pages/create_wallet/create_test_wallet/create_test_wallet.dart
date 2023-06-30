@@ -24,7 +24,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _mnemonicController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  DateTime _lastPressedAt; //上次点击时间
+  DateTime? _lastPressedAt; //上次点击时间
   @override
   void initState() {
     super.initState();
@@ -36,7 +36,7 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_lastPressedAt == null || DateTime.now().difference(_lastPressedAt) > Duration(seconds: 1)) {
+        if (_lastPressedAt == null || DateTime.now().difference(_lastPressedAt!) > Duration(seconds: 1)) {
           // 两次点击间隔超过1秒则重新计时
           _lastPressedAt = DateTime.now();
           return false; // 不退出
@@ -373,9 +373,11 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
                           Checkbox(
                             value: _isChooseEthChain,
                             onChanged: (newValue) {
-                              setState(() {
-                                _isChooseEthChain = newValue;
-                              });
+                              if (newValue != null) {
+                                setState(() {
+                                  _isChooseEthChain = newValue;
+                                });
+                              }
                             },
                           ),
                           Text(
@@ -423,13 +425,13 @@ class _CreateTestWalletPageState extends State<CreateTestWalletPage> {
 
   void changeMnemonic() async {
     String mneStr = WalletsControl.getInstance().generateMnemonic(12);
-    if (mneStr == null) {
+    if (mneStr.isEmpty) {
       Logger().e("CreateWalletMnemonicPage=>", "mnemonic is null");
       return;
     }
     setState(() {
       _mnemonicController.text = mneStr;
-      mneStr = null;
+      mneStr = "";
     });
   }
 

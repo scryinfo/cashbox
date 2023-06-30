@@ -50,6 +50,7 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
         appBar: MyAppBar(
           centerTitle: translate('create_wallet'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: _buildCreateWalletLayout(),
       ),
@@ -276,11 +277,13 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 Checkbox(
                   value: _ethChainChoose,
                   onChanged: (newValue) {
-                    setState(
-                      () {
-                        _ethChainChoose = newValue;
-                      },
-                    );
+                    if (newValue != null) {
+                      setState(
+                        () {
+                          _ethChainChoose = newValue;
+                        },
+                      );
+                    }
                   },
                 ),
                 Text(
@@ -299,11 +302,13 @@ class _CreateWalletNamePageState extends State<CreateWalletNamePage> {
                 Checkbox(
                   value: _eeeChainChoose,
                   onChanged: (newValue) {
-                    setState(
-                      () {
-                        _eeeChainChoose = newValue;
-                      },
-                    );
+                    if (newValue != null) {
+                      setState(
+                        () {
+                          _eeeChainChoose = newValue;
+                        },
+                      );
+                    }
                   },
                 ),
                 Text(

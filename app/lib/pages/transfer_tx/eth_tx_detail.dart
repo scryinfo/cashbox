@@ -24,6 +24,7 @@ class _EthTxDetailPageState extends State<EthTxDetailPage> {
         appBar: MyAppBar(
           centerTitle: translate('transaction_detail'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           child: _buildTxDetailWidget(),

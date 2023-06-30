@@ -19,7 +19,7 @@ class RunParams {
 
 class EeeSyncTxs {
   static EeeSyncTxs startOnce(EeeChain chain) => _getInstance(chain); //此方法可以多次调用，但只运行一个线程
-  static Map<String, EeeSyncTxs> _instance;
+  static final Map<String, EeeSyncTxs> _instance = {};
 
   EeeSyncTxs._internal(EeeChain chain)
       : _address = chain.chainShared.walletAddress.address,
@@ -28,28 +28,27 @@ class EeeSyncTxs {
   }
 
   static EeeSyncTxs _getInstance(EeeChain chain) {
-    if (_instance == null) {
-      _instance = <String, EeeSyncTxs>{};
+    for (var key in _instance.keys.toList()) {
+      var it = _instance[key];
+      if (it != null) {
+        if (it._address != chain.chainShared.walletAddress.address) {
+          it.stop();
+          _instance.remove(key);
+        }
+      }
     }
+
     if (!_instance.containsKey(chain.chainShared.walletAddress.address)) {
       var newOne = EeeSyncTxs._internal(chain);
       _instance[chain.chainShared.walletAddress.address] = newOne;
       newOne._start();
     }
-    for (var key in _instance.keys.toList()) {
-      var it = _instance[key];
-      if (it._address != chain.chainShared.walletAddress.address) {
-        it.stop();
-        _instance.remove(key);
-      }
-    }
-
-    return _instance[chain.chainShared.walletAddress.address];
+    return _instance[chain.chainShared.walletAddress.address]!;
   }
 
   final String _address;
   final ChainType _chainType;
-  Timer _timer;
+  Timer? _timer = null;
   bool _timing = false;
   String _eeeStorageKey = '';
   String _tokenXStorageKey = '';
@@ -69,7 +68,7 @@ class EeeSyncTxs {
 
   stop() {
     if (_timer != null) {
-      _timer.cancel();
+      _timer!.cancel();
       _timer = null;
     }
   }

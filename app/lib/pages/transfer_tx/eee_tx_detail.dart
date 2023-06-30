@@ -26,6 +26,7 @@ class _EeeTxDetailPageState extends State<EeeTxDetailPage> {
         appBar: MyAppBar(
           centerTitle: translate('transaction_detail'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           child: _buildTxDetailWidget(),

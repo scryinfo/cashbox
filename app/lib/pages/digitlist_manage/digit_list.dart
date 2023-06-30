@@ -39,11 +39,18 @@ class _DigitListPageState extends State<DigitListPage> {
     switch (curChainType) {
       case ChainType.ETH:
       case ChainType.EthTest:
-        nowChainDigitsList = EthChainControl.getInstance().getVisibleTokenList(WalletsControl().currentWallet());
+        var w = WalletsControl().currentWallet();
+        if (w != null) {
+          nowChainDigitsList = EthChainControl.getInstance().getVisibleTokenList(w);
+        }
         break;
       case ChainType.EEE:
       case ChainType.EeeTest:
-        nowChainDigitsList = EeeChainControl.getInstance().getVisibleTokenList(WalletsControl().currentWallet());
+        var w = WalletsControl().currentWallet();
+        if (w != null) {
+          nowChainDigitsList = EeeChainControl.getInstance().getVisibleTokenList(w);
+        }
+
         break;
       default:
         break;
@@ -61,6 +68,7 @@ class _DigitListPageState extends State<DigitListPage> {
         appBar: MyAppBar(
           centerTitle: translate('digit_list_title'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
             child: Column(

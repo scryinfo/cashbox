@@ -15,7 +15,7 @@ class SignTxPage extends StatefulWidget {
 }
 
 class _SignTxPageState extends State<SignTxPage> {
-  String _waitToSignInfo;
+  String _waitToSignInfo = "";
 
   @override
   void didChangeDependencies() {
@@ -30,6 +30,7 @@ class _SignTxPageState extends State<SignTxPage> {
       appBar: MyAppBar(
         centerTitle: translate('info_sign'),
         backgroundColor: Colors.transparent,
+        onPressed: () {},
       ),
       body: _buildWaitToSignLayout(),
     );
@@ -71,11 +72,11 @@ class _SignTxPageState extends State<SignTxPage> {
           Container(
             width: ScreenUtil().setWidth(41),
             height: ScreenUtil().setHeight(9),
-            child: RaisedButton(
+            child: ElevatedButton(
               onPressed: () {
                 _showPwdDialog();
               },
-              color: Color.fromRGBO(26, 141, 198, 0.20),
+              // color: Color.fromRGBO(26, 141, 198, 0.20),
               child: Text(
                 translate('click_to_sign'),
                 style: TextStyle(

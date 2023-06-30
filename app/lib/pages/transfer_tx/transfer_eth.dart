@@ -6,6 +6,7 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/qr_scan_control.dart';
 import 'package:app/control/wallets_control.dart';
+import 'package:app/model/token.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/routers/fluro_navigator.dart';
@@ -13,6 +14,7 @@ import 'package:app/util/utils.dart';
 import 'package:app/widgets/progress_dialog.dart';
 import 'package:app/widgets/pwd_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -36,7 +38,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
   TextEditingController _toAddressController = TextEditingController();
   TextEditingController _txValueController = TextEditingController();
   TextEditingController _backupMsgController = TextEditingController();
-  ChainType chainType;
+  ChainType chainType = ChainType.None;
   bool isShowExactGas = false;
   int precision = 8; //Decimal precision
   int eth2gasUnit = 1000 * 1000 * 1000; // 1 ETH = 1e9 gwei (10 to the ninth power) = 1e18 wei
@@ -44,14 +46,14 @@ class _TransferEthPageState extends State<TransferEthPage> {
   String arrowDownIcon = "assets/images/ic_expand.png";
   String arrowUpIcon = "assets/images/ic_collapse.png";
   String arrowIcon = "assets/images/ic_collapse.png";
-  double mMaxGasPrice;
-  double mMinGasPrice;
-  double mMaxGasLimit;
-  double mMinGasLimit;
-  double mGasPriceValue;
-  double mGasLimitValue;
-  double mMaxGasFee;
-  double mMinGasFee;
+  double mMaxGasPrice = 0.0;
+  double mMinGasPrice = 0.0;
+  double mMaxGasLimit = 0.0;
+  double mMinGasLimit = 0.0;
+  double mGasPriceValue = 0.0;
+  double mGasLimitValue = 0.0;
+  double mMaxGasFee = 0.0;
+  double mMinGasFee = 0.0;
   double mGasFeeValue = 0;
   String digitBalance = "";
   String ethBalance = "";
@@ -146,6 +148,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
         appBar: MyAppBar(
           centerTitle: translate('wallet_transfer'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           width: ScreenUtil().setWidth(90),
@@ -711,9 +714,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
                 ),
               ),
               controller: _txValueController,
-              inputFormatters: [
-                WhitelistingTextInputFormatter(RegExp("[0-9.]")), //Enter only numbers or decimal point.
-              ],
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ),
         ],
@@ -742,6 +743,7 @@ class _TransferEthPageState extends State<TransferEthPage> {
         height: ScreenUtil().setHeight(9),
         color: Color.fromRGBO(26, 141, 198, 0.20),
         child: TextButton(
+          onPressed: () {},
           child: Text(
             translate('click_to_transfer'),
             textAlign: TextAlign.center,
@@ -847,8 +849,14 @@ class _TransferEthPageState extends State<TransferEthPage> {
       return false;
     }
     //Determine if the balance is greater than the transfer amount
-    List displayDigitsList =
-        EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
+    List<TokenM> displayDigitsList = [];
+    {
+      var w = WalletsControl.getInstance().currentWallet();
+      if (w != null) {
+        displayDigitsList = EthChainControl.getInstance().getVisibleTokenList(w);
+      }
+    }
+
     for (var i = 0; i < displayDigitsList.length; i++) {
       if (digitBalance == null &&
           contractAddress != null &&

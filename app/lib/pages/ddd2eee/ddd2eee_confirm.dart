@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
 import 'package:app/control/eth_chain_control.dart';
-import 'package:app/control/wallets_control.dart';
 import 'package:app/net/etherscan_util.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
@@ -36,7 +35,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
   String gasLimit = "";
   String nonce = "";
   int decimal = 18;
-  ChainType chainType;
+  ChainType chainType = ChainType.None;
 
   @override
   void didChangeDependencies() {
@@ -67,6 +66,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
         appBar: MyAppBar(
           centerTitle: translate('token_exchange'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           width: ScreenUtil().setWidth(90),
@@ -348,6 +348,7 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
         height: ScreenUtil().setHeight(9),
         color: Color.fromRGBO(26, 141, 198, 0.20),
         child: TextButton(
+          onPressed: () {},
           child: Text(
             translate('click_to_exchange'),
             textAlign: TextAlign.center,
@@ -379,7 +380,6 @@ class _Ddd2EeeConfirmPageState extends State<Ddd2EeeConfirmPage> {
           hintContent: translate('input_pwd_hint_detail').toString(),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
-            String walletId = WalletsControl.getInstance().currentWallet().id;
             Config config = await HandleConfig.instance.getConfig();
             EthTransferPayload ethTransferPayload = EthTransferPayload();
             try {

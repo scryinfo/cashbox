@@ -36,7 +36,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
 
   _initMnemonicData() async {
     var mnemonic = WalletsControl.getInstance().generateMnemonic(12);
-    if (mnemonic == null) {
+    if (mnemonic.isEmpty) {
       Logger().e("CreateWalletMnemonicPage=>", "mnemonic is null");
       return;
     }
@@ -45,7 +45,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
       walletName = Provider.of<CreateWalletProcessProvide>(context, listen: false).walletName;
     });
     context.read<CreateWalletProcessProvide>().setMnemonic(Uint8List.fromList(mnemonic.codeUnits));
-    mnemonic = null; /*Mnemonic words, free when used up*/
+    mnemonic = ""; /*Mnemonic words, free when used up*/
   }
 
   @override
@@ -59,6 +59,7 @@ class _CreateWalletMnemonicPageState extends State<CreateWalletMnemonicPage> {
         appBar: MyAppBar(
           centerTitle: translate('create_wallet'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: _buildCreateWalletMnemonic(),
       ),

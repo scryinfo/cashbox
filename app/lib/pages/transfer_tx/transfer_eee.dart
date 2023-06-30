@@ -33,13 +33,13 @@ class _TransferEeePageState extends State<TransferEeePage> {
   TextEditingController _txValueController = TextEditingController();
   TextEditingController _backupMsgController = TextEditingController();
   var chainAddress = "";
-  int runtimeVersion;
-  int txVersion;
+  int runtimeVersion = 0;
+  int txVersion = 0;
   String curTokenBalance = "0";
-  int nonce;
-  String genesisHash;
-  String digitName;
-  int decimal;
+  int nonce = 0;
+  String genesisHash = "";
+  String digitName = "";
+  int decimal = 0;
   bool isShowTxInput = false;
 
   @override
@@ -72,7 +72,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
       }
     }
 
-    AccountInfo accountInfo = await EeeChainControl.getInstance()
+    AccountInfo? accountInfo = await EeeChainControl.getInstance()
         .loadEeeStorageMap(config.systemSymbol, config.accountSymbol, WalletsControl.getInstance().currentChainAddress());
     if (accountInfo == null) {
       Fluttertoast.showToast(msg: translate('eee_config_error'), toastLength: Toast.LENGTH_LONG, timeInSecForIosWeb: 3);
@@ -136,6 +136,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
         appBar: MyAppBar(
           centerTitle: translate('wallet_transfer'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           width: ScreenUtil().setWidth(90),
@@ -334,9 +335,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
                 ),
               ),
               controller: _txValueController,
-              inputFormatters: [
-                WhitelistingTextInputFormatter(RegExp("[0-9.]")), //Only numbers or decimal points can be entered.
-              ],
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ),
         ],
@@ -412,6 +411,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
         height: ScreenUtil().setHeight(9),
         color: Color.fromRGBO(26, 141, 198, 0.20),
         child: TextButton(
+          onPressed: () {},
           child: Text(
             translate('click_to_transfer'),
             textAlign: TextAlign.center,
@@ -462,7 +462,7 @@ class _TransferEeePageState extends State<TransferEeePage> {
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (String pwd) async {
             Config config = await HandleConfig.instance.getConfig();
-            Uint8List buckUpList = Utf8Codec().encode(_backupMsgController.text ?? "");
+            Uint8List buckUpList = Uint8List.fromList(Utf8Codec().encode(_backupMsgController.text ?? ""));
             var formatValue;
             String signInfo;
             try {
@@ -479,8 +479,11 @@ class _TransferEeePageState extends State<TransferEeePage> {
               ..value = formatValue.toString()
               ..index = nonce
               ..password = pwd
-              ..extData = Utils.uint8ListToHex(buckUpList)
-              ..chainVersion = EeeChainControl.getInstance().getChainVersion();
+              ..extData = Utils.uint8ListToHex(buckUpList);
+
+            if (EeeChainControl.getInstance().getChainVersion() != null) {
+              eeeTransferPayload.chainVersion = EeeChainControl.getInstance().getChainVersion()!;
+            }
             if (digitName != null && digitName.toLowerCase() == config.eeeSymbol.toLowerCase()) {
               signInfo = EeeChainControl.getInstance().eeeTransfer(eeeTransferPayload);
             } else if (digitName != null && digitName.toLowerCase() == config.tokenXSymbol.toLowerCase()) {
