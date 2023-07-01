@@ -69,7 +69,7 @@ class Message {
 
 class _DappPageState extends State<DappPage> {
   WebViewController _controller;
-  final cookieManager = new CookieManager();
+  final cookieManager = new WebViewCookieManager();
 
   Future<String> _loadDappUrl() async {
     Config config = await HandleConfig.instance.getConfig();
@@ -91,7 +91,7 @@ class _DappPageState extends State<DappPage> {
                 if (snapshot.hasData) {
                   return Container(
                     margin: EdgeInsets.only(top: ScreenUtil().setHeight(4.5)),
-                    child: WebView(
+                    child: WebViewWidget(
                       // initialUrl: "https://cashbox.scry.info/web_app/dapp/eth_tools.html#/",
                       // initialUrl:"http://192.168.2.57:9010/web_app/dapp/dapp.html",
                       // initialUrl: "https://cashbox.scry.info/web_app/dapp/dapp.html#/",

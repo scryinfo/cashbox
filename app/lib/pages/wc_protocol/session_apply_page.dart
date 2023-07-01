@@ -12,6 +12,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
+import 'package:progress_loading_button/progress_loading_button.dart';
 import 'package:provider/provider.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
@@ -276,10 +277,11 @@ class _SessionApplyState extends State<SessionApplyPage> {
         child: Row(
       children: [
         Gaps.scaleHGap(8),
-        ProgressButton(
+        LoadingButton(
+          // ProgressButton(
           width: ScreenUtil().setWidth(30),
           defaultWidget: const Text('Cancel'),
-          progressWidget: const CircularProgressIndicator(),
+          loadingWidget: const CircularProgressIndicator(),
           height: 40,
           onPressed: () async {
             // Do some background task
@@ -288,16 +290,17 @@ class _SessionApplyState extends State<SessionApplyPage> {
           },
         ),
         Gaps.scaleHGap(8),
-        ProgressButton(
+        LoadingButton(
+          // ProgressButton(
           width: ScreenUtil().setWidth(30),
           defaultWidget: const Text('Confirm'),
-          progressWidget: const CircularProgressIndicator(),
+          loadingWidget: const CircularProgressIndicator(),
           onPressed: () async {
             ProgressDialog pr = ProgressDialog(context: context);
             pr.show(msg: translate("handle_allow_connecting"));
             String resultStr = await WcProtocolControl.getInstance().approveLogIn(
-                WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address,
-                WalletsControl.getInstance().currentWallet().ethChain.chainShared.chainType);
+                WalletsControl.getInstance().currentWallet()?.ethChain.chainShared.walletAddress.address ?? "",
+                WalletsControl.getInstance().currentWallet()?.ethChain.chainShared.chainType ?? "");
             if (resultStr == "Approved") {
               pr.close();
               context.read<WcInfoProvide>()

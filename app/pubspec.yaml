@@ -26,6 +26,7 @@ dependencies:
   platform_device_id: ^1.0.1
   #  device_info: ^1.0.0
   #  flutter_progress_button: ^1.0.0
+  progress_loading_button: ^2.0.2
   sn_progress_dialog: ^1.0.2
   cached_network_image: ^3.2.3
   rflutter_alert: ^2.0.2

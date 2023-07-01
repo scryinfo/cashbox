@@ -13,11 +13,11 @@ import 'package:app/widgets/pwd_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_progress_button/flutter_progress_button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
+import 'package:progress_loading_button/progress_loading_button.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -85,7 +85,8 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
   }
 
   _loadGasOracle() async {
-    var gasOracleMap = await loadGasOracle(WalletsControl().currentWallet().ethChain.chainShared.chainType.toChainType());
+    var gasOracleMap = await loadGasOracle(
+        WalletsControl().currentWallet()?.ethChain.chainShared.chainType.toChainType() ?? ChainType.None);
     if (gasOracleMap == null) {
       return;
     }
@@ -495,11 +496,12 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
         child: Row(
       children: [
         Gaps.scaleHGap(5),
-        ProgressButton(
+        LoadingButton(
+          //)ProgressButton(
           width: ScreenUtil().setWidth(27),
           height: ScreenUtil().setHeight(9),
           defaultWidget: Text(translate('cancel')),
-          progressWidget: CircularProgressIndicator(),
+          loadingWidget: CircularProgressIndicator(),
           onPressed: () async {
             setState(() {
               this.existInputInfo = false;
@@ -508,11 +510,12 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
           },
         ),
         Gaps.scaleHGap(8),
-        ProgressButton(
+        LoadingButton(
+          //)ProgressButton(
           width: ScreenUtil().setWidth(27),
           height: ScreenUtil().setHeight(9),
           defaultWidget: Text(translate('confirm')),
-          progressWidget: const CircularProgressIndicator(),
+          loadingWidget: const CircularProgressIndicator(),
           onPressed: () async {
             _showDialogToSignTx(context);
           },
@@ -527,7 +530,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
       builder: (BuildContext context) {
         return PwdDialog(
           title: translate('wallet_pwd').toString(),
-          hintContent: translate('dapp_sign_hint_content') + WalletsControl.getInstance().currentWallet().name ?? "",
+          hintContent: translate('dapp_sign_hint_content') + (WalletsControl.getInstance().currentWallet()?.name ?? ""),
           hintInput: translate('input_pwd_hint').toString(),
           onPressed: (pwd) async {
             ProgressDialog prDialog = ProgressDialog(context: context);
@@ -585,10 +588,11 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Gaps.scaleHGap(8),
-          ProgressButton(
+          LoadingButton(
+            //ProgressButton(
             width: ScreenUtil().setWidth(75),
             defaultWidget: Text(translate("disconnect")),
-            progressWidget: const CircularProgressIndicator(),
+            loadingWidget: const CircularProgressIndicator(),
             height: 40,
             onPressed: () async {
               WcProtocolControl.getInstance().rejectLogIn();
