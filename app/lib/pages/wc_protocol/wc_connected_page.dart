@@ -14,8 +14,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_button/flutter_progress_button.dart';
-import 'package:flutter_screenutil/screenutil.dart';
-import 'package:flutter_translate/global.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -255,7 +255,7 @@ class _WcConnectedPageState extends State<WcConnectedPage> {
                         fontStyle: FontStyle.normal),
                   ),
                   TextSpan(
-                    text: WalletsControl.getInstance().currentWallet().ethChain.chainShared.walletAddress.address ?? "",
+                    text: WalletsControl.getInstance().currentWallet()?.ethChain.chainShared.walletAddress.address ?? "",
                     style: TextStyle(
                         decoration: TextDecoration.none,
                         color: Colors.blueGrey,

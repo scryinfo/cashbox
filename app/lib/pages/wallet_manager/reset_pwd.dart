@@ -34,6 +34,7 @@ class _ResetPwdPageState extends State<ResetPwdPage> {
         appBar: MyAppBar(
           centerTitle: translate('reset_pwd'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           decoration: BoxDecoration(

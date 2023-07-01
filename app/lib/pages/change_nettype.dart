@@ -53,6 +53,7 @@ class _ChangeNetTypePageState extends State<ChangeNetTypePage> {
         appBar: MyAppBar(
           centerTitle: translate('net_change'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           decoration: BoxDecoration(

@@ -24,7 +24,8 @@ class EthChainTxsHistoryPage extends StatefulWidget {
 }
 
 class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
-  Future txListFuture;
+  // Future txListFuture;
+  Future<List<EthTransactionModel>> txListFuture = Future(() => []);
   List<TokenM> walletDataList = [];
   List<TokenM> showDataList = [];
   List<EthTransactionModel> ethTxListModel = [];
@@ -66,6 +67,7 @@ class _EthChainTxsHistoryPageState extends State<EthChainTxsHistoryPage> {
         appBar: MyAppBar(
           centerTitle: translate('transaction_history'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           child: _buildTxHistoryLayout(),

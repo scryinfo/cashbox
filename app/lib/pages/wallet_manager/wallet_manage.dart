@@ -27,7 +27,7 @@ class WalletManagerPage extends StatefulWidget {
 class _WalletManagerPageState extends State<WalletManagerPage> {
   TextEditingController _walletNameController = TextEditingController();
   FocusNode _walletNameFocus = FocusNode();
-  String walletName;
+  String walletName = "";
   bool isNameEditable = false;
 
   @override
@@ -58,6 +58,7 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
         appBar: MyAppBar(
           centerTitle: translate('wallet_manager'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: GestureDetector(
           onTap: () async {
@@ -238,9 +239,9 @@ class _WalletManagerPageState extends State<WalletManagerPage> {
     return GestureDetector(
       onTap: () {
         var curWallet = WalletsControl.getInstance().currentWallet();
-        if (curWallet.id == Provider.of<WalletManagerProvide>(context, listen: false).walletId) {
+        if (curWallet?.id == Provider.of<WalletManagerProvide>(context, listen: false).walletId) {
           Fluttertoast.showToast(
-              msg: translate('prefix_abandon_del_wallet') + curWallet.name + translate('suffix_abandon_del_wallet'));
+              msg: translate('prefix_abandon_del_wallet') + curWallet!.name + translate('suffix_abandon_del_wallet'));
           return;
         }
 

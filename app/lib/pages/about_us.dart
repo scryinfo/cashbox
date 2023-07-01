@@ -43,6 +43,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
         appBar: MyAppBar(
           centerTitle: translate('about_us_title'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           decoration: BoxDecoration(

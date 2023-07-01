@@ -1,5 +1,4 @@
 import 'package:app/control/wallets_control.dart';
-import 'package:app/model/chain.dart';
 import 'package:app/model/token.dart';
 import 'package:app/provide/transaction_provide.dart';
 import 'package:app/res/resources.dart';
@@ -8,6 +7,7 @@ import 'package:app/routers/routers.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -25,7 +25,8 @@ class SearchDigitPage extends StatefulWidget {
 
 class _SearchDigitPageState extends State<SearchDigitPage> {
   List<TokenM> displayDigitsList = [];
-  Chain nowChain;
+
+  // Chain nowChain;
   TextEditingController _searchContentController = TextEditingController();
   Widget checkedWidget = Image.asset("assets/images/ic_checked.png");
   Widget addWidget = Image.asset("assets/images/ic_plus.png");
@@ -48,10 +49,10 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
               title: buildSearchInputWidget(),
               backgroundColor: Colors.transparent,
               elevation: 0,
-              brightness: Brightness.light,
               actions: <Widget>[
                 buildCancelWidget(),
-              ]),
+              ],
+              systemOverlayStyle: SystemUiOverlayStyle.dark),
           body: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(image: AssetImage("assets/images/bg_graduate.png"), fit: BoxFit.fill),
@@ -245,10 +246,10 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                       TokenAddress tokenAddress = TokenAddress()
                         ..tokenId = displayDigitsList[index].tokenId
                         ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
-                        ..walletId = WalletsControl.getInstance().currentWallet().id
+                        ..walletId = WalletsControl.getInstance().currentWallet()?.id ?? ""
                         ..balance = 0.toString()
                         ..addressId = WalletsControl.getInstance().getTokenAddressId(
-                                WalletsControl.getInstance().currentWallet().id,
+                                WalletsControl.getInstance().currentWallet()?.id ?? "",
                                 WalletsControl.getInstance().currentChainType()) ??
                             "";
                       bool isUpsertOk = WalletsControl.getInstance().updateBalance(tokenAddress);
@@ -259,7 +260,7 @@ class _SearchDigitPageState extends State<SearchDigitPage> {
                       }
                     }
                     WalletTokenStatus walletTokenStatus = WalletTokenStatus()
-                      ..walletId = WalletsControl.getInstance().currentWallet().id
+                      ..walletId = WalletsControl.getInstance().currentWallet()?.id ?? ""
                       ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
                       ..tokenId = displayDigitsList[index].tokenId;
                     walletTokenStatus.isShow = true.toInt(); // change to invisible

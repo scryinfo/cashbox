@@ -120,7 +120,7 @@ class EeeSyncTxs {
     }
     var startBlockHeight = 0;
     {
-      AccountInfoSyncProg accountInfoSyncProg =
+      AccountInfoSyncProg? accountInfoSyncProg =
           EeeChainControl.getInstance().getSyncRecord(WalletsControl().currentChainAddress());
       if (accountInfoSyncProg != null && accountInfoSyncProg.account.toLowerCase() == runParams.address.toLowerCase()) {
         startBlockHeight = int.parse(accountInfoSyncProg.blockNo);
@@ -198,7 +198,7 @@ class EeeSyncTxs {
         extrinsicContext
           ..account = WalletsControl.getInstance().currentChainAddress()
           ..blockHash = blockHash
-          ..chainVersion = EeeChainControl.getInstance().getChainVersion()
+          ..chainVersion = EeeChainControl.getInstance().getChainVersion() ?? ChainVersion()
           ..blockNumber = element["block"]
           ..event = loadStorageMap["result"]
           ..extrinsics = arrayCChar;

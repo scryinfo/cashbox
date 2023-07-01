@@ -8,6 +8,7 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -70,7 +71,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     switch (chainType) {
       case ChainType.EthTest:
       case ChainType.ETH:
-        List<EthChainToken> ethChainTokens = WalletsControl.getInstance().currentWallet().ethChain.tokens.data;
+        List<EthChainToken> ethChainTokens = WalletsControl.getInstance().currentWallet()?.ethChain.tokens.data ?? [];
         ethChainTokens.forEach((element) {
           TokenM tokenM = TokenM()
             ..tokenId = element.chainTokenSharedId
@@ -84,7 +85,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         break;
       case ChainType.EeeTest:
       case ChainType.EEE:
-        List<EeeChainToken> eeeChainTokens = WalletsControl.getInstance().currentWallet().eeeChain.tokens.data;
+        List<EeeChainToken> eeeChainTokens = WalletsControl.getInstance().currentWallet()?.eeeChain.tokens.data ?? [];
         eeeChainTokens.forEach((element) {
           TokenM tokenM = TokenM()
             ..tokenId = element.chainTokenSharedId
@@ -205,7 +206,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       return ethTokenList;
     } catch (e) {
       Logger.getInstance().e("rpc query error", "e is --->" + e.toString());
-      return null;
+      return [];
     }
   }
 
@@ -227,7 +228,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
       return eeeTokenList;
     } catch (e) {
       Logger.getInstance().e("rpc query error", "e is --->" + e.toString());
-      return null;
+      return [];
     }
   }
 
@@ -242,13 +243,13 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           ..decimal = element.eeeChainTokenShared.decimal
           ..urlImg = element.eeeChainTokenShared.tokenShared.logoUrl ?? ""
           ..isVisible = false
-          ..address = WalletsControl().currentWallet().eeeChain.chainShared.walletAddress.address;
+          ..address = WalletsControl().currentWallet()?.eeeChain.chainShared.walletAddress.address ?? "";
         nativeTokenMList.add(tokenM);
       });
       return nativeTokenMList;
     } catch (e) {
       Logger.getInstance().e("formatEeeTokenMList", "error info is ------>" + e.toString());
-      return null;
+      return [];
     }
   }
 
@@ -264,13 +265,13 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
           ..decimal = element.ethChainTokenShared.decimal
           ..urlImg = element.ethChainTokenShared.tokenShared.logoUrl ?? ""
           ..isVisible = false
-          ..address = WalletsControl().currentWallet().ethChain.chainShared.walletAddress.address;
+          ..address = WalletsControl().currentWallet()?.ethChain.chainShared.walletAddress.address ?? "";
         nativeTokenMList.add(tokenM);
       });
       return nativeTokenMList;
     } catch (e) {
       Logger.getInstance().e("formatEthTokenMList", "error info is ------>" + e.toString());
-      return null;
+      return [];
     }
   }
 
@@ -353,7 +354,6 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                 child: Image.asset("assets/images/ic_back.png")),
             backgroundColor: Colors.transparent,
             elevation: 0,
-            brightness: Brightness.light,
             centerTitle: true,
             title: Text(
               translate('digit_list_title') ?? "",
@@ -375,6 +375,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                 ),
               )*/
             ],
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
           ),
           body: Container(
               decoration: BoxDecoration(
@@ -491,10 +492,10 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                   TokenAddress tokenAddress = TokenAddress()
                     ..tokenId = displayDigitsList[index].tokenId
                     ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
-                    ..walletId = WalletsControl.getInstance().currentWallet().id
+                    ..walletId = WalletsControl.getInstance().currentWallet()?.id ?? ""
                     ..balance = 0.toString()
                     ..addressId = WalletsControl.getInstance().getTokenAddressId(
-                            WalletsControl.getInstance().currentWallet().id,
+                            WalletsControl.getInstance().currentWallet()?.id ?? "",
                             WalletsControl.getInstance().currentChainType()) ??
                         "";
                   bool isUpsertOk = WalletsControl.getInstance().updateBalance(tokenAddress);
@@ -506,7 +507,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
                 }
 
                 WalletTokenStatus walletTokenStatus = WalletTokenStatus()
-                  ..walletId = WalletsControl.getInstance().currentWallet().id
+                  ..walletId = WalletsControl.getInstance().currentWallet()?.id ?? ""
                   ..chainType = WalletsControl.getInstance().currentChainType().toEnumString()
                   ..tokenId = displayDigitsList[index].tokenId;
                 if (displayDigitsList[index].isVisible) {
@@ -606,12 +607,12 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
     if (newDigitList == null || newDigitList.length == 0) {
       return;
     }
-    for (num i = 0; i < newDigitList.length; i++) {
+    for (int i = 0; i < newDigitList.length; i++) {
       var element = newDigitList[i];
       if (element.contractAddress != null && element.contractAddress.isNotEmpty) {
         //erc20
         bool isExistErc20 = false;
-        for (num index = 0; index < allDigitsList.length; index++) {
+        for (int index = 0; index < allDigitsList.length; index++) {
           var digit = allDigitsList[index];
           if ((digit.contractAddress != null) &&
               (element.contractAddress != null) &&
@@ -626,7 +627,7 @@ class _DigitsManagePageState extends State<DigitsManagePage> {
         continue;
       }
       bool isExistDigit = false;
-      for (num index = 0; index < allDigitsList.length; index++) {
+      for (int index = 0; index < allDigitsList.length; index++) {
         var digit = allDigitsList[index];
         if ((digit.shortName != null) &&
             (element.shortName != null) &&

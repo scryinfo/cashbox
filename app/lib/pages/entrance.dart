@@ -152,7 +152,7 @@ class _EntrancePageState extends State<EntrancePage> {
 
   _updateEeeInfo(LatestConfig serverConfigModel) async {
     try {
-      SubChainBasicInfo defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo();
+      SubChainBasicInfo? defaultBasicInfo = EeeChainControl.getInstance().getDefaultBasicInfo();
       if (serverConfigModel == null ||
           defaultBasicInfo == null ||
           defaultBasicInfo.runtimeVersion == null ||

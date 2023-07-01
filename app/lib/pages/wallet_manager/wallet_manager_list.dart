@@ -47,6 +47,7 @@ class _WalletManagerListPageState extends State<WalletManagerListPage> {
         appBar: MyAppBar(
           centerTitle: translate('wallet_list'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           child: SingleChildScrollView(

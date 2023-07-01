@@ -25,6 +25,7 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
         appBar: MyAppBar(
           centerTitle: translate('backup_wallet'),
           backgroundColor: Colors.transparent,
+          onPressed: () {},
         ),
         body: Container(
           alignment: Alignment.center,
@@ -92,7 +93,7 @@ class _RecoverWalletPageState extends State<RecoverWalletPage> {
           ),
           Gaps.scaleVGap(8),
           Container(
-            child: QrImage(
+            child: QrImageView(
               data: String.fromCharCodes(Provider.of<CreateWalletProcessProvide>(context).mnemonic),
               size: ScreenUtil().setWidth(38),
               backgroundColor: Colors.white,
