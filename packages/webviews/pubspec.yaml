@@ -1,0 +1,21 @@
+name: webviews
+description: cross platform webview, support android ios linux window mac
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: '>=3.0.5 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.2.2
+  webview_flutter_platform_interface: ^2.3.1
+  desktop_webview_window: ^0.2.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:

@@ -17,10 +17,10 @@ dependencies:
   provider: ^6.0.5
   dio: ^5.2.1+1
   fluttertoast: ^8.2.2
-  oktoast: ^3.3.1
   fluro: ^2.0.5
   #  flutter_webview_plugin: ^0.3.11
   webview_flutter: ^4.2.2
+
   flutter_html: ^3.0.0-beta.2
   device_info_plus: ^9.0.2
   platform_device_id: ^1.0.1
