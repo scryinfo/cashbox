@@ -8,3 +8,6 @@ sudo apt install libwebkit2gtk-4.1-dev
 sudo apt install webkit2gtk-4.1
 
 sudo aptitude install libwebkit2gtk-4.1-dev webkit2gtk-4.1
+
+
+pkg-config --cflags -- gtk+-3.0 webkit2gtk-4.1
