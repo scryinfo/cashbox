@@ -17,11 +17,11 @@ import 'package:app/routers/fluro_navigator.dart';
 import 'package:app/routers/routers.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_swiper_view/flutter_swiper_view.dart';
+// import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
@@ -44,14 +44,14 @@ class _EthPageState extends State<EthPage> {
   num nowWalletAmount = 0.00; //The current total market price of tokens in the wallet
   List<String> moneyUnitList = [];
   String walletName = "";
-  Future tokenListFuture;
+  late Future<List<TokenM>> tokenListFuture;
   List<TokenM> allVisibleTokenMList = []; //List of all visible tokens in the current chain
   List<TokenM> displayTokenMList = []; //Information about the number of fixed tokens displayed on the current page
-  num chainIndex = 0; //Subscript of current chain
-  TokenRate rateInstance;
-  Timer _loadingBalanceTimerTask; // is loading balance
-  Timer _loadingRateTimerTask; // is loading balance
-  Timer _loadingDigitMoneyTask; // is loading balance
+  int chainIndex = 0; //Subscript of current chain
+  TokenRate? rateInstance;
+  Timer? _loadingBalanceTimerTask; // is loading balance
+  Timer? _loadingRateTimerTask; // is loading balance
+  Timer? _loadingDigitMoneyTask; // is loading balance
 
   @override
   void initState() {
@@ -70,15 +70,19 @@ class _EthPageState extends State<EthPage> {
       Config config = await HandleConfig.instance.getConfig();
       moneyUnitStr = config.currency ?? "USD";
     }
-    this.walletName = WalletsControl.getInstance().currentWallet().name;
-    this.allVisibleTokenMList =
-        EthChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
-    this.allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
+    {
+      var w = WalletsControl.getInstance().currentWallet();
+      if (w == null) {
+        walletName = "";
+        allVisibleTokenMList = [];
+      } else {
+        walletName = w.name;
+        allVisibleTokenMList = EthChainControl.getInstance().getVisibleTokenList(w);
+      }
+    }
+    allVisibleTokenMList = EthChainControl.getInstance().getTokensLocalBalance(allVisibleTokenMList);
     if (mounted) {
-      setState(() {
-        this.allVisibleTokenMList = this.allVisibleTokenMList;
-        this.walletName = this.walletName;
-      });
+      setState(() {});
     }
     tokenListFuture = loadDisplayTokenListData();
     loadDigitRateInfo();
@@ -93,7 +97,7 @@ class _EthPageState extends State<EthPage> {
     if (rateInstance == null) {
       return;
     }
-    this.moneyUnitList = rateInstance.getAllSupportLegalCurrency();
+    this.moneyUnitList = rateInstance!.getAllSupportLegalCurrency();
     if (mounted) {
       setState(() {
         this.moneyUnitList = this.moneyUnitList;
@@ -107,7 +111,7 @@ class _EthPageState extends State<EthPage> {
       return;
     }
     if (_loadingRateTimerTask != null) {
-      _loadingRateTimerTask.cancel();
+      _loadingRateTimerTask!.cancel();
     }
     _loadingRateTimerTask = Timer(const Duration(milliseconds: 1000), () async {
       if (rateInstance == null) {
@@ -123,7 +127,7 @@ class _EthPageState extends State<EthPage> {
       return;
     }
     if (_loadingBalanceTimerTask != null) {
-      _loadingBalanceTimerTask.cancel();
+      _loadingBalanceTimerTask!.cancel();
     }
     var curChainType = WalletsControl().currentChainType();
     var curChainAddress = WalletsControl().currentChainAddress();
@@ -135,11 +139,9 @@ class _EthPageState extends State<EthPage> {
           return;
         }
         var curAddressId =
-            WalletsControl().getTokenAddressId(WalletsControl.getInstance().currentWallet().id, curChainType);
-        if (this.displayTokenMList[index].contractAddress != null &&
-            this.displayTokenMList[index].contractAddress.trim() != "") {
-          balance =
-              await loadErc20Balance(curChainAddress ?? "", this.displayTokenMList[index].contractAddress, curChainType);
+            WalletsControl().getTokenAddressId(WalletsControl.getInstance().currentWallet()?.id ?? "", curChainType);
+        if (displayTokenMList[index].contractAddress != null && displayTokenMList[index].contractAddress.trim() != "") {
+          balance = await loadErc20Balance(curChainAddress ?? "", displayTokenMList[index].contractAddress, curChainType);
         } else {
           balance = await loadEthBalance(curChainAddress ?? "", curChainType);
         }
@@ -153,7 +155,7 @@ class _EthPageState extends State<EthPage> {
           });
         }
         WalletDy.TokenAddress tokenAddress = WalletDy.TokenAddress()
-          ..walletId = WalletsControl.getInstance().currentWallet().id
+          ..walletId = WalletsControl.getInstance().currentWallet()?.id ?? ""
           ..chainType = curChainType.toEnumString()
           ..tokenId = this.displayTokenMList[index].tokenId
           ..addressId = curAddressId
@@ -170,7 +172,7 @@ class _EthPageState extends State<EthPage> {
       return;
     }
     if (_loadingDigitMoneyTask != null) {
-      _loadingDigitMoneyTask.cancel();
+      _loadingDigitMoneyTask!.cancel();
     }
     _loadingDigitMoneyTask = Timer(const Duration(milliseconds: 1000), () async {
       nowWalletAmount = 0;
@@ -238,12 +240,12 @@ class _EthPageState extends State<EthPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        brightness: Brightness.light,
         centerTitle: true,
         title: Text(
           walletName ?? "",
           style: TextStyle(fontSize: 20),
         ),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       drawer: LeftDrawer(), //Left drawer
       body: Container(
@@ -403,7 +405,9 @@ class _EthPageState extends State<EthPage> {
                   ..setMoney(displayTokenMList[index].money)
                   ..setDecimal(displayTokenMList[index].decimal)
                   ..setFromAddress(displayTokenMList[index].address)
-                  ..setChainType(WalletsControl.getInstance().currentWallet().ethChain.chainShared.chainType.toChainType())
+                  ..setChainType(
+                      WalletsControl.getInstance().currentWallet()?.ethChain.chainShared.chainType.toChainType() ??
+                          ChainType.None)
                   ..setGasPrice(displayTokenMList[index].gasPrice)
                   ..setGasUsed(displayTokenMList[index].gasLimit.toString())
                   ..setContractAddress(displayTokenMList[index].contractAddress);
@@ -481,7 +485,7 @@ class _EthPageState extends State<EthPage> {
                                               " " +
                                               (rateInstance == null
                                                   ? ""
-                                                  : rateInstance.getPrice(displayTokenMList[index]).toStringAsFixed(3) ??
+                                                  : rateInstance!.getPrice(displayTokenMList[index]).toStringAsFixed(3) ??
                                                       "0"), //Market unit price
                                           style: TextStyle(
                                             color: Colors.lightBlueAccent,
@@ -492,8 +496,8 @@ class _EthPageState extends State<EthPage> {
                                     child: Text(
                                       rateInstance == null
                                           ? "0% ↑"
-                                          : rateInstance
-                                              .decorateChangeDaily(rateInstance.getChangeDaily(displayTokenMList[index])),
+                                          : rateInstance!
+                                              .decorateChangeDaily(rateInstance!.getChangeDaily(displayTokenMList[index])),
                                       style: TextStyle(color: Colors.yellowAccent, fontSize: ScreenUtil().setSp(2.5)),
                                     ),
                                   )

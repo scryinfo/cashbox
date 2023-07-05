@@ -8,7 +8,6 @@ import 'package:app/control/wallets_control.dart';
 import 'package:app/model/token.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/net/rate_util.dart';
-import 'package:app/net/scryx_net_util.dart';
 import 'package:app/pages/left_drawer.dart';
 import 'package:app/provide/qr_info_provide.dart';
 import 'package:app/provide/transaction_provide.dart';
@@ -18,11 +17,11 @@ import 'package:app/routers/routers.dart';
 import 'package:app/util/utils.dart';
 import 'package:app/widgets/my_separator_line.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_swiper_view/flutter_swiper_view.dart';
+// import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
@@ -31,7 +30,7 @@ import 'package:wallets/enums.dart';
 import 'package:wallets/wallets_c.dc.dart' as WalletDy;
 
 class EeePage extends StatefulWidget {
-  const EeePage({Key key, this.isForceLoadFromJni}) : super(key: key);
+  const EeePage({Key? key, this.isForceLoadFromJni = false}) : super(key: key);
 
   final bool isForceLoadFromJni; //Whether to force reload of wallet information
 
@@ -45,14 +44,14 @@ class _EeePageState extends State<EeePage> {
   num nowWalletAmount = 0.00; //The current total market price of tokens in the wallet
   List<String> moneyUnitList = [];
   String walletName = "";
-  Future tokenListFuture;
+  late Future<List<TokenM>> tokenListFuture;
   List<TokenM> allVisibleTokenMList = []; //List of all visible tokens in the current chain
   List<TokenM> displayTokenMList = []; //Information about the number of fixed tokens displayed on the current page
-  num chainIndex = 0; //Subscript of current chain
-  TokenRate rateInstance;
-  Timer _loadingBalanceTimerTask; // is loading balance
-  Timer _loadingRateTimerTask; // is loading balance
-  Timer _loadingDigitMoneyTask; // is loading balance
+  int chainIndex = 0; //Subscript of current chain
+  TokenRate? rateInstance;
+  Timer? _loadingBalanceTimerTask; // is loading balance
+  Timer? _loadingRateTimerTask; // is loading balance
+  Timer? _loadingDigitMoneyTask; // is loading balance
 
   @override
   void initState() {
@@ -71,10 +70,17 @@ class _EeePageState extends State<EeePage> {
       Config config = await HandleConfig.instance.getConfig();
       moneyUnitStr = config.currency;
     }
-    this.walletName = WalletsControl.getInstance().currentWallet().name;
-    this.allVisibleTokenMList =
-        EeeChainControl.getInstance().getVisibleTokenList(WalletsControl.getInstance().currentWallet());
-    this.allVisibleTokenMList = EeeChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
+    {
+      var w = WalletsControl.getInstance().currentWallet();
+      if (w == null) {
+        this.walletName = "";
+        this.allVisibleTokenMList = [];
+      } else {
+        this.walletName = w.name;
+        this.allVisibleTokenMList = EeeChainControl.getInstance().getVisibleTokenList(w);
+      }
+      this.allVisibleTokenMList = EeeChainControl.getInstance().getTokensLocalBalance(this.allVisibleTokenMList);
+    }
     tokenListFuture = loadDisplayTokenListData();
     if (mounted) {
       setState(() {
@@ -108,7 +114,7 @@ class _EeePageState extends State<EeePage> {
       return;
     }
     if (_loadingRateTimerTask != null) {
-      _loadingRateTimerTask.cancel();
+      _loadingRateTimerTask!.cancel();
     }
     _loadingRateTimerTask = Timer(const Duration(milliseconds: 1000), () async {
       rateInstance = await loadRateInstance();
@@ -124,7 +130,7 @@ class _EeePageState extends State<EeePage> {
       return;
     }
     if (_loadingBalanceTimerTask != null) {
-      _loadingBalanceTimerTask.cancel();
+      _loadingBalanceTimerTask!.cancel();
     }
     Config config = await HandleConfig.instance.getConfig();
     var curChainType = WalletsControl().currentChainType();
@@ -132,11 +138,11 @@ class _EeePageState extends State<EeePage> {
       for (var i = 0; i < displayTokenMList.length; i++) {
         int index = i;
         String balance = "0";
-        var curAddressId = WalletsControl().getTokenAddressId(WalletsControl().currentWallet().id, curChainType);
+        var curAddressId = WalletsControl().getTokenAddressId(WalletsControl().currentWallet()?.id ?? "", curChainType);
         switch (this.displayTokenMList[index].shortName.toLowerCase()) {
           case "eee":
             {
-              WalletDy.AccountInfo accountInfo = await EeeChainControl.getInstance()
+              WalletDy.AccountInfo? accountInfo = await EeeChainControl.getInstance()
                   .loadEeeStorageMap(config.systemSymbol, config.accountSymbol, this.displayTokenMList[index].address);
               if (accountInfo == null) {
                 continue;
@@ -184,7 +190,7 @@ class _EeePageState extends State<EeePage> {
         }
         // update balance to local record
         WalletDy.TokenAddress tokenAddress = WalletDy.TokenAddress()
-          ..walletId = WalletsControl.getInstance().currentWallet().id
+          ..walletId = WalletsControl.getInstance().currentWallet()?.id ?? ""
           ..chainType = curChainType.toEnumString()
           ..tokenId = this.displayTokenMList[index].tokenId
           ..addressId = curAddressId
@@ -200,7 +206,7 @@ class _EeePageState extends State<EeePage> {
       return;
     }
     if (_loadingDigitMoneyTask != null) {
-      _loadingDigitMoneyTask.cancel();
+      _loadingDigitMoneyTask!.cancel();
     }
     _loadingBalanceTimerTask = Timer(const Duration(milliseconds: 1000), () async {
       for (var i = 0; i < displayTokenMList.length; i++) {
@@ -267,12 +273,12 @@ class _EeePageState extends State<EeePage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        brightness: Brightness.light,
         centerTitle: true,
         title: Text(
           WalletsControl.getInstance().currentWallet()?.name ?? "",
           style: TextStyle(fontSize: 20),
         ),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       drawer: LeftDrawer(), //Left drawer
       body: Container(
@@ -614,8 +620,8 @@ class _EeePageState extends State<EeePage> {
               ),
             ),
             onTap: () {
-              _navigatorToQrInfoPage(WalletsControl.getInstance().currentWallet().name, translate('chain_address_info'),
-                  WalletsControl.getInstance().currentChainAddress());
+              _navigatorToQrInfoPage(WalletsControl.getInstance().currentWallet()?.name ?? "",
+                  translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress());
             },
           )
         ],
@@ -750,11 +756,12 @@ class _EeePageState extends State<EeePage> {
           Container(
             child: GestureDetector(
               onTap: () {
-                if (WalletsControl.getInstance().currentWallet().name.isEmpty) {
+                var w = WalletsControl.getInstance().currentWallet();
+                if (w == null || w.name.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(WalletsControl.getInstance().currentWallet().name, translate('chain_address_info'),
-                    WalletsControl.getInstance().currentChainAddress() ?? "");
+                _navigatorToQrInfoPage(
+                    w.name, translate('chain_address_info'), WalletsControl.getInstance().currentChainAddress() ?? "");
               },
               child: Image.asset("assets/images/ic_card_qrcode.png"),
             ),
@@ -767,14 +774,15 @@ class _EeePageState extends State<EeePage> {
             ),
             child: GestureDetector(
               onTap: () {
-                if (WalletsControl.getInstance().currentWallet().name.isEmpty) {
+                var w = WalletsControl.getInstance().currentWallet();
+                if (w == null || w.name.isEmpty) {
                   return;
                 }
-                _navigatorToQrInfoPage(WalletsControl.getInstance().currentWallet().name, translate('chain_address_info'),
-                    WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address);
+                _navigatorToQrInfoPage(
+                    w.name, translate('chain_address_info'), w.eeeChain.chainShared.walletAddress.address);
               },
               child: Text(
-                WalletsControl.getInstance().currentWallet().eeeChain.chainShared.walletAddress.address ?? "",
+                WalletsControl.getInstance().currentWallet()?.eeeChain.chainShared.walletAddress.address ?? "",
                 textAlign: TextAlign.start,
                 style: TextStyle(color: Colors.lightBlueAccent),
                 maxLines: 1,

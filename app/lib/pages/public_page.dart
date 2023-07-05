@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webviews/webviews.dart';
 
 class PublicPage extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class PublicPage extends StatefulWidget {
 }
 
 class _PublicPageState extends State<PublicPage> {
-  WebViewController? _controller;
+  WebviewScryController _controller = WebviewScryController.create();
 
   @override
   void initState() {
@@ -24,6 +25,9 @@ class _PublicPageState extends State<PublicPage> {
 
   initData() async {
     super.didChangeDependencies();
+    for (var it in makeJsChannelsSet().entries) {
+      _controller.addJavaScriptChannel(it.key, onMessageReceived: it.value);
+    }
   }
 
   Future<String> loadTargetUrl() async {
@@ -69,39 +73,33 @@ class _PublicPageState extends State<PublicPage> {
                 return Text("sorry,some error happen!");
               }
               if (snapshot.hasData) {
-                return WebView(
-                  initialUrl: snapshot.data.toString(),
-                  javascriptMode: JavascriptMode.unrestricted,
-                  //JS execution mode Whether to allow JS execution
-                  onWebViewCreated: (controller) {
-                    _controller = controller;
-                  },
-                  javascriptChannels: makeJsChannelsSet(),
-                  onPageFinished: (String url) {},
-                );
+                return _controller.makeWebview();
               }
               return Text("");
             }));
   }
 
-  Set<JavascriptChannel> makeJsChannelsSet() {
-    List<JavascriptChannel> jsChannelList = [];
-    jsChannelList.add(JavascriptChannel(
-        name: "NativeLocaleValue",
-        onMessageReceived: (JavascriptMessage message) async {
-          Config config = await HandleConfig.instance.getConfig();
-          var msg = Message.fromJson(jsonDecode(message.message));
-          if (msg.data == null || msg.data.trim() == "") {
-            msg.data = config.locale;
-            this.callPromise(msg);
-          }
-        }));
-    return jsChannelList.toSet();
+  Map<String, void Function(JavaScriptMessage message)> makeJsChannelsSet() {
+    Map<String, void Function(JavaScriptMessage message)> jsChannelList = {};
+    jsChannelList["NativeLocaleValue"] = (JavaScriptMessage message) async {
+      Config config = await HandleConfig.instance.getConfig();
+      var msg = Message.fromJson(jsonDecode(message.message));
+      if (msg.data == null || msg.data.trim() == "") {
+        msg.data = config.locale;
+        this.callPromise(msg);
+      }
+    };
+    return jsChannelList;
   }
 
-  Future<String> callPromise(Message msg) {
+  Future<String> callPromise(Message msg) async {
     String call = "${msg.callFun}(\'${jsonEncode(msg)}\')";
-    return _controller?.evaluateJavascript(call);
+    var r = await _controller.runJavaScriptReturningResult(call);
+    if (r == null) {
+      return "";
+    } else {
+      return r.toString();
+    }
   }
 }
 
