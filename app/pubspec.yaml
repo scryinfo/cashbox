@@ -54,6 +54,8 @@ dependencies:
     path: ../packages/logger
   services:
     path: ../packages/services
+  webviews:
+    path: ../packages/webviews
 dev_dependencies:
   flutter_test:
     sdk: flutter

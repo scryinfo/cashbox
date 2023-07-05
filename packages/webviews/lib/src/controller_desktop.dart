@@ -1,5 +1,6 @@
 import 'package:desktop_webview_window/desktop_webview_window.dart' as desktop_webview;
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'webview_scry_controller.dart';
 
@@ -7,15 +8,17 @@ class ControllerDesktop extends WebviewScryController {
   desktop_webview.Webview? weview;
 
   @override
-  Future<void> go({required Uri uri}) {
-    // TODO: implement go
-    throw UnimplementedError();
+  Future<void> go({required Uri uri}) async {
+    if (weview != null) {
+      weview!.launch(uri.toString());
+    }
   }
 
   @override
-  Future<void> goBack() {
-    // TODO: implement goBack
-    throw UnimplementedError();
+  Future<void> goBack() async {
+    if (weview != null) {
+      weview!.back();
+    }
   }
 
   @override
@@ -38,5 +41,31 @@ class ControllerDesktop extends WebviewScryController {
     }
 
     return const SizedBox.shrink();
+  }
+
+  @override
+  Future<void> addJavaScriptChannel(
+    String name, {
+    required void Function(JavaScriptMessage) onMessageReceived,
+  }) async {
+    if (weview != null) {
+      weview!.registerJavaScriptMessageHandler(name, (name, body) {
+        onMessageReceived(JavaScriptMessage(message: body));
+      });
+    }
+  }
+
+  @override
+  Future<void> removeJavaScriptChannel(String javaScriptChannelName) async {
+    if (weview != null) {
+      weview!.unregisterJavaScriptMessageHandler(javaScriptChannelName);
+    }
+  }
+
+  @override
+  Future<void> close() async {
+    if (weview != null) {
+      weview!.close();
+    }
   }
 }
