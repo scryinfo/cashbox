@@ -32,7 +32,7 @@ dependencies:
   rflutter_alert: ^2.0.2
   qr_flutter: ^4.1.0
   #  flutter_swiper: ^1.1.6
-#  flutter_card_swiper: ^6.0.0
+  #  flutter_card_swiper: ^6.0.0
   flutter_swiper_view: ^1.1.8
   flutter_screenutil: ^5.8.4
   flutter_easyrefresh: ^2.0.3
