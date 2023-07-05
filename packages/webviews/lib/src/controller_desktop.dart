@@ -1,7 +1,11 @@
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:webviews/src/webview_scry_controller.dart';
+import 'package:desktop_webview_window/desktop_webview_window.dart' as desktop_webview;
+import 'package:flutter/material.dart';
+
+import 'webview_scry_controller.dart';
 
 class ControllerDesktop extends WebviewScryController {
+  desktop_webview.Webview? weview;
+
   @override
   Future<void> go({required Uri uri}) {
     // TODO: implement go
@@ -22,7 +26,17 @@ class ControllerDesktop extends WebviewScryController {
 
   @override
   Widget makeWebview() {
-    // TODO: implement makeWebview
-    throw UnimplementedError();
+    if (!isInit) {
+      isInit = true;
+      () async {
+        try {
+          weview = await desktop_webview.WebviewWindow.create();
+        } catch (e) {
+          isInit = false;
+        }
+      }();
+    }
+
+    return const SizedBox.shrink();
   }
 }

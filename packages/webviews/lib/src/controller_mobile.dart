@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart' as webview_flutter;
 import 'package:webviews/src/webview_scry_controller.dart';
 
 class ControllerMobile extends WebviewScryController {
-  late WebViewController _webViewController;
+  webview_flutter.WebViewController? _webViewController;
 
   @override
   Future<void> go({required Uri uri}) {
@@ -25,11 +25,7 @@ class ControllerMobile extends WebviewScryController {
 
   @override
   Widget makeWebview() {
-    if (isInit) {
-      return const SizedBox.shrink();
-    }
-    return WebViewWidget(
-      controller: _webViewController,
-    );
+    _webViewController ??= webview_flutter.WebViewController();
+    return webview_flutter.WebViewWidget(controller: _webViewController!);
   }
 }

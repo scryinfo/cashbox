@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:webviews/webviews.dart';
 
-class WebViewScry extends StatelessWidget {
+class WebviewScry extends StatelessWidget {
   final WebviewScryController controller;
 
-  WebViewScry({
+  WebviewScry({
     super.key,
     required this.controller,
   });

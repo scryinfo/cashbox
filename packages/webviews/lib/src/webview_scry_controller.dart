@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'controller_desktop.dart';
 import 'controller_mobile.dart';
+import 'webview_scry_widget.dart';
 
 abstract class WebviewScryController {
   static WebviewScryController create() {
@@ -17,7 +18,12 @@ abstract class WebviewScryController {
 
   bool isInit = false;
 
-  Widget makeWebview();
+  @override
+  Widget makeWebview() {
+    return WebviewScry(
+      controller: this,
+    );
+  }
 
   Future<void> goBack() async {}
 
