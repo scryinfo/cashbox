@@ -82,6 +82,12 @@ impl From<failure::Error> for Error {
     }
 }
 
+impl From<anyhow::Error> for Error {
+    fn from(err: anyhow::Error) -> Self {
+        Error::Other(format!("{:?}", err))
+    }
+}
+
 impl Clone for Error {
     fn clone(&self) -> Self {
         use self::Error::*;

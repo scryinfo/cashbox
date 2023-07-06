@@ -6,7 +6,7 @@ use ethabi::{Bytes, Contract};
 use ethereum_types::{H160, H256, U256};
 use parity_crypto::Keccak256;
 use rlp::{self, DecoderError, RlpStream};
-use secp256k1::{PublicKey, SecretKey, Message, Secp256k1};
+use secp256k1::{Message, PublicKey, Secp256k1, SecretKey};
 use tiny_hderive::bip32::ExtendedPrivKey;
 
 pub use error::Error;
@@ -225,7 +225,7 @@ fn ecdsa_sign(hash: &[u8], private_key: &[u8], chain_id: u64) -> EcdsaSig {
     let s = Secp256k1::signing_only();
     let msg = Message::from_slice(hash).unwrap();
     let key = SecretKey::from_slice(private_key).unwrap();
-    let (v, sig_bytes) = s.sign_recoverable(&msg, &key).serialize_compact();
+    let (v, sig_bytes) = s.sign_ecdsa_recoverable(&msg, &key).serialize_compact();
 
     EcdsaSig {
         v: v.to_i32() as u64 + chain_id * 2 + 35,
@@ -238,7 +238,7 @@ fn typed_tx_data_ecdsa_sign(hash: &[u8], private_key: &[u8]) -> EcdsaSig {
     let s = Secp256k1::signing_only();
     let msg = Message::from_slice(hash).unwrap();
     let key = SecretKey::from_slice(private_key).unwrap();
-    let (v, sig_bytes) = s.sign_recoverable(&msg, &key).serialize_compact();
+    let (v, sig_bytes) = s.sign_ecdsa_recoverable(&msg, &key).serialize_compact();
 
     EcdsaSig {
         v: v.to_i32() as u64,

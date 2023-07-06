@@ -1,6 +1,12 @@
 use std::io::Write;
 
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
+///
+/// # Content types
+///
+use error::Error;
+use pref::PRef;
+
 //
 // Copyright 2018-2019 Tamas Blummer
 //
@@ -15,12 +21,6 @@ use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-///
-/// # Content types
-///
-use error::Error;
-use pref::PRef;
 
 /// Content envelope wrapping in data file
 pub struct Envelope {

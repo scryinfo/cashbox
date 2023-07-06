@@ -29,9 +29,9 @@ use crate::broadcast_queue::CondPair;
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//!
-//! # Download headers
-//!
+///
+/// # Download headers
+///
 use crate::chaindb::SharedChainDB;
 use crate::db::GlobalRB;
 use crate::downstream::SharedDownstream;

@@ -5,6 +5,21 @@ use std::sync::RwLock;
 
 use bitcoin_hashes::siphash24;
 use datafile::{DataFile, EnvelopeIterator};
+///
+/// # The memtable
+/// Specific implementation details to in-memory index of the db
+///
+///
+use error::Error;
+use format::{Envelope, Link, Payload};
+use logfile::LogFile;
+use page::Page;
+use page::PAGE_SIZE;
+use pagedfile::PagedFile;
+use pref::PRef;
+use rand::{RngCore, thread_rng};
+use tablefile::{BUCKET_SIZE, BUCKETS_FIRST_PAGE, BUCKETS_PER_PAGE, FIRST_PAGE_HEAD, TableFile};
+
 //
 // Copyright 2018-2019 Tamas Blummer
 //
@@ -20,21 +35,6 @@ use datafile::{DataFile, EnvelopeIterator};
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
-///
-/// # The memtable
-/// Specific implementation details to in-memory index of the db
-///
-///
-use error::Error;
-use format::{Envelope, Link, Payload};
-use logfile::LogFile;
-use page::Page;
-use page::PAGE_SIZE;
-use pagedfile::PagedFile;
-use pref::PRef;
-use rand::{RngCore, thread_rng};
-use tablefile::{BUCKET_SIZE, BUCKETS_FIRST_PAGE, BUCKETS_PER_PAGE, FIRST_PAGE_HEAD, TableFile};
 
 const INIT_BUCKETS: usize = 512;
 const INIT_LOGMOD: usize = 8;

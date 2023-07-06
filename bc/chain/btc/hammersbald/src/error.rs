@@ -3,6 +3,12 @@ use std::fmt;
 use std::io;
 use std::sync;
 
+/// # Error type
+///
+///
+#[cfg(feature = "bitcoin_support")]
+use bitcoin::consensus::encode;
+
 //
 // Copyright 2018-2019 Tamas Blummer
 //
@@ -18,12 +24,6 @@ use std::sync;
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
-/// # Error type
-///
-///
-#[cfg(feature = "bitcoin_support")]
-use bitcoin::consensus::encode;
 
 /// Errors returned by this library
 pub enum Error {
