@@ -1,4 +1,13 @@
 //! This mod is about bloomfilter sender
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
+
+use log::{error, info, trace};
+
+use bitcoin::network::message::NetworkMessage;
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
+
 use crate::broadcast_queue::CondPair;
 use crate::error::Error;
 use crate::p2p::{
@@ -6,12 +15,6 @@ use crate::p2p::{
     SERVICE_BLOOM,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
-use bitcoin::network::message::NetworkMessage;
-use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use log::{error, info, trace};
-use std::sync::mpsc;
-use std::thread;
-use std::time::Duration;
 
 pub struct BloomFilter {
     // send message

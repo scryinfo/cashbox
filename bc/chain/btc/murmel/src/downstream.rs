@@ -17,17 +17,17 @@
 //! # Connector to downstream modules
 //!
 
+use std::sync::{Arc, Mutex};
+
 use bitcoin::{
     blockdata::{
         block::{Block, BlockHeader}
     },
 };
 
-use std::sync::{Arc, Mutex};
-
 pub type SharedDownstream = Arc<Mutex<dyn Downstream>>;
 
-pub trait Downstream : Send + Sync {
+pub trait Downstream: Send + Sync {
     /// called by the node if new block added to trunk (longest chain)
     fn block_connected(&mut self, block: &Block, height: u32);
 

@@ -1,27 +1,29 @@
 //! after send loadfilter message in bloomfilter mod we can get merkleblock in this mod and get
 //! loadfilter message do not get any response.
 //! we get response here
-use crate::error::Error;
-use crate::p2p::{
-    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
-};
-use crate::timeout::{ExpectedReply, SharedTimeout};
-use bitcoin::network::message::NetworkMessage;
-use bitcoin::network::message_blockdata::{InvType, Inventory};
-use bitcoin::network::message_bloom_filter::MerkleBlockMessage;
-use bitcoin::{BitcoinHash, Transaction};
-use bitcoin_hashes::hex::ToHex;
-
-use crate::broadcast_queue::CondPair;
-use crate::db::{GlobalRB, Verify};
-use crate::kit::vec_to_string;
-use bitcoin::consensus::serialize as btc_serialize;
-use futures::executor::block_on;
-use log::{error, info, trace};
 use std::collections::HashMap;
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
+
+use bitcoin_hashes::hex::ToHex;
+use futures::executor::block_on;
+use log::{error, info, trace};
+
+use bitcoin::{BitcoinHash, Transaction};
+use bitcoin::consensus::serialize as btc_serialize;
+use bitcoin::network::message::NetworkMessage;
+use bitcoin::network::message_blockdata::{Inventory, InvType};
+use bitcoin::network::message_bloom_filter::MerkleBlockMessage;
+
+use crate::broadcast_queue::CondPair;
+use crate::db::{GlobalRB, Verify};
+use crate::error::Error;
+use crate::kit::vec_to_string;
+use crate::p2p::{
+    P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
+};
+use crate::timeout::{ExpectedReply, SharedTimeout};
 
 pub struct GetData {
     //send a message
@@ -172,7 +174,7 @@ impl GetData {
         info!("received inv for peer={}", peer);
         for inventory in v {
             if inventory.inv_type == InvType::Transaction {
-                self.get_data(peer,true,false)?;
+                self.get_data(peer, true, false)?;
             }
         }
         Ok(())
@@ -268,7 +270,6 @@ impl GetData {
 }
 
 mod test {
-
     #[test]
     pub fn test_calc_sig() {
         use bitcoin_hashes::hash160;

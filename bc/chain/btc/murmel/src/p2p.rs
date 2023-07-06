@@ -19,26 +19,6 @@
 //! This module establishes network connections and routes messages between the P2P network and this node
 //!
 
-use bitcoin::consensus::{encode, Decodable};
-use bitcoin::network::{
-    address::Address,
-    constants::Network,
-    message::{NetworkMessage, RawNetworkMessage},
-    message_network::VersionMessage,
-};
-
-use crate::error::Error;
-use bitcoin::consensus::serialize;
-use futures::task::{Spawn, SpawnExt};
-use futures::{future, task::Waker, Future, FutureExt, Poll as Async, TryFutureExt};
-use log::{debug, error, info, trace};
-use mio::{
-    net::{TcpListener, TcpStream},
-    unix::UnixReady,
-    Event, Events, Poll, PollOpt, Ready, Token,
-};
-use rand::{thread_rng, RngCore};
-use std::marker::PhantomData;
 use std::{
     cmp::{max, min},
     collections::{HashMap, VecDeque},
@@ -47,12 +27,34 @@ use std::{
     net::{Shutdown, SocketAddr},
     str::FromStr,
     sync::{
-        atomic::{AtomicBool, AtomicUsize, Ordering},
-        mpsc, Arc, Mutex, RwLock,
+        Arc,
+        atomic::{AtomicBool, AtomicUsize, Ordering}, mpsc, Mutex, RwLock,
     },
     thread,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+use std::marker::PhantomData;
+
+use futures::{future, Future, FutureExt, Poll as Async, task::Waker, TryFutureExt};
+use futures::task::{Spawn, SpawnExt};
+use log::{debug, error, info, trace};
+use mio::{
+    Event,
+    Events,
+    net::{TcpListener, TcpStream}, Poll, PollOpt, Ready, Token, unix::UnixReady,
+};
+use rand::{RngCore, thread_rng};
+
+use bitcoin::consensus::{Decodable, encode};
+use bitcoin::consensus::serialize;
+use bitcoin::network::{
+    address::Address,
+    constants::Network,
+    message::{NetworkMessage, RawNetworkMessage},
+    message_network::VersionMessage,
+};
+
+use crate::error::Error;
 
 const IO_BUFFER_SIZE: usize = 1024 * 1024;
 const EVENT_BUFFER_SIZE: usize = 1024;
@@ -66,6 +68,7 @@ pub const SERVICE_WITNESS: u64 = 1 << 3;
 /// require filters
 pub const SERVICE_FILTERS: u64 = 1 << 6;
 pub const SERVICE_BLOOM: u64 = 1 << 2;
+
 /// A peer's Id
 #[derive(Hash, Eq, PartialEq, Copy, Clone)]
 pub struct PeerId {
@@ -80,6 +83,7 @@ impl fmt::Display for PeerId {
         Ok(())
     }
 }
+
 type PeerMap<Message> = HashMap<PeerId, Mutex<Peer<Message>>>;
 
 /// A message from network to downstream
@@ -461,10 +465,10 @@ pub struct P2P<
 }
 
 impl<
-        Message: Version + Send + Sync + Clone,
-        Envelope: Command + Send + Sync,
-        Config: P2PConfig<Message, Envelope> + Send + Sync,
-    > P2P<Message, Envelope, Config>
+    Message: Version + Send + Sync + Clone,
+    Envelope: Command + Send + Sync,
+    Config: P2PConfig<Message, Envelope> + Send + Sync,
+> P2P<Message, Envelope, Config>
 {
     /// create a new P2P network controller
     pub fn new(
@@ -576,7 +580,7 @@ impl<
         &self,
         network: &'static str,
         source: PeerSource,
-    ) -> impl Future<Output = Result<SocketAddr, Error>> + Send {
+    ) -> impl Future<Output=Result<SocketAddr, Error>> + Send {
         // new token, never re-using previously connected peer's id
         // so log messages are easier to follow
         let token = Token(self.next_peer_id.fetch_add(1, Ordering::Relaxed));
@@ -615,7 +619,7 @@ impl<
         &self,
         pid: PeerId,
         source: PeerSource,
-    ) -> impl Future<Output = Result<SocketAddr, Error>> + Send {
+    ) -> impl Future<Output=Result<SocketAddr, Error>> + Send {
         let version = self.config.version(
             &SocketAddr::from_str("127.0.0.1:8333").unwrap(), // TODO wrong address
             self.config.max_protocol_version(),
@@ -637,26 +641,26 @@ impl<
                 Err(e) => Async::Ready(Err(e)),
             }
         })
-        .and_then(move |addr| {
-            use futures_timer::TryFutureExt;
+            .and_then(move |addr| {
+                use futures_timer::TryFutureExt;
 
-            future::poll_fn(move |ctx| {
-                if let Some(peer) = peers2.read().unwrap().get(&pid) {
-                    // return pid if peer is connected (handshake perfect)
-                    if peer.lock().unwrap().connected {
-                        trace!("woke up to handshake");
-                        Async::Ready(Ok(addr))
+                future::poll_fn(move |ctx| {
+                    if let Some(peer) = peers2.read().unwrap().get(&pid) {
+                        // return pid if peer is connected (handshake perfect)
+                        if peer.lock().unwrap().connected {
+                            trace!("woke up to handshake");
+                            Async::Ready(Ok(addr))
+                        } else {
+                            waker.lock().unwrap().insert(pid, ctx.waker().clone());
+                            Async::Pending
+                        }
                     } else {
-                        waker.lock().unwrap().insert(pid, ctx.waker().clone());
-                        Async::Pending
+                        // rejected or failed handshake
+                        Async::Ready(Err(Error::Handshake))
                     }
-                } else {
-                    // rejected or failed handshake
-                    Async::Ready(Err(Error::Handshake))
-                }
+                })
+                    .timeout(Duration::from_secs(CONNECT_TIMEOUT_SECONDS))
             })
-            .timeout(Duration::from_secs(CONNECT_TIMEOUT_SECONDS))
-        })
     }
 
     // initiate connection to peer
@@ -906,7 +910,7 @@ impl<
                                                 if version.version
                                                     < self.config.min_protocol_version()
                                                     || (needed_services & version.services)
-                                                        != needed_services
+                                                    != needed_services
                                                 {
                                                     debug!("rejecting peer of version {} and services {:b} peer={}", version.version, version.services, pid);
                                                     disconnect = true;

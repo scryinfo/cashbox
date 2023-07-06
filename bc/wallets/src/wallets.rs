@@ -1,16 +1,16 @@
 use std::ops::Not;
 use std::sync::atomic::AtomicBool;
-use strum::IntoEnumIterator;
 
 use failure::_core::sync::atomic::Ordering;
-use parking_lot::lock_api::RawReentrantMutex;
 use parking_lot::{RawMutex, RawThreadId};
+use parking_lot::lock_api::RawReentrantMutex;
+use strum::IntoEnumIterator;
 
 use eee::Crypto;
-use mav::ma::{BeforeSave, Dao, Db, DbCreateType, DbName, MAddress, MBtcChainToken, MEeeChainToken, MEthChainToken, MMnemonic, MTokenAddress, MWallet, SettingType, MEthChainTokenDefault, MEthChainTokenAuth, MEthChainTokenNonAuth};
-use mav::{ChainType, NetType, WalletType, CTrue, AppPlatformType};
+use mav::{AppPlatformType, ChainType, CTrue, NetType, WalletType};
+use mav::ma::{BeforeSave, Dao, Db, DbCreateType, DbName, MAddress, MBtcChainToken, MEeeChainToken, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenNonAuth, MMnemonic, MTokenAddress, MWallet, SettingType};
 use scry_crypto::Keccak256;
-use wallets_types::{BtcChainTrait, Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, EthChainTrait, InitParameters, Setting, TokenAddress, Wallet, WalletError, WalletTrait, WalletTokenStatus};
+use wallets_types::{BtcChainTrait, Chain2WalletType, Context, ContextTrait, CreateWalletParameters, EeeChain, EeeChainTrait, EthChainTrait, InitParameters, Setting, TokenAddress, Wallet, WalletError, WalletTokenStatus, WalletTrait};
 
 pub struct Wallets {
     raw_reentrant: RawReentrantMutex<RawMutex, RawThreadId>,
@@ -90,9 +90,9 @@ impl Wallets {
 
     pub async fn init(&mut self, parameters: &InitParameters) -> Result<&Context, WalletError> {
         #[cfg(target_os = "android")]
-            crate::init_logger_once();
+        crate::init_logger_once();
         self.ctx.context_note = parameters.context_note.clone();
-       // self.net_type =  NetType::Main;
+        // self.net_type =  NetType::Main;
         if parameters.is_memory_db == CTrue {
             self.db.init_memory_sql(&parameters.db_name).await?;
         } else {
@@ -100,11 +100,11 @@ impl Wallets {
         }
         self.db.init_tables(&DbCreateType::NotExists).await?;
         let net_type = Setting::current_net_type(self).await?;
-         self.net_type = if net_type.is_empty() {
-           NetType::Main
-       } else {
-           NetType::from(&net_type)
-       };
+        self.net_type = if net_type.is_empty() {
+            NetType::Main
+        } else {
+            NetType::from(&net_type)
+        };
         Ok(&self.ctx)
     }
 
@@ -141,7 +141,7 @@ impl Wallets {
         {
             // check whether is current_wallet
             if let Some(m_setting) =
-            Setting::get_setting(context, &SettingType::CurrentWallet).await?
+                Setting::get_setting(context, &SettingType::CurrentWallet).await?
             {
                 if m_setting.value_str.eq(wallet_id) {
                     return Err(WalletError::Custom(
@@ -247,20 +247,17 @@ impl Wallets {
     }
     pub async fn save_current_wallet_chain(&mut self, wallet_id: &str, chain_type: &ChainType) -> Result<(), WalletError> {
         Setting::save_current_wallet_chain(self, wallet_id, chain_type).await
-
     }
     pub async fn current_wallet_chain(&self) -> Result<Option<(String, ChainType)>, WalletError> {
-       Setting::current_wallet_chain(self).await
-
+        Setting::current_wallet_chain(self).await
     }
-    pub async fn change_net_type(&mut self, net_type: NetType)->Result<(),WalletError> {
-        let _effect_row_num = Setting::change_net_type(self,&net_type).await?;
+    pub async fn change_net_type(&mut self, net_type: NetType) -> Result<(), WalletError> {
+        let _effect_row_num = Setting::change_net_type(self, &net_type).await?;
         self.net_type = net_type;
         Ok(())
     }
     pub async fn current_net_type(&self) -> Result<String, WalletError> {
         Setting::current_net_type(self).await
-
     }
     pub fn generate_mnemonic(mnemonic_num: u32) -> String {
         eee::Sr25519::generate_phrase(mnemonic_num)
@@ -368,16 +365,16 @@ impl Wallets {
         let token_query_wrapper = wallet_rb.new_wrapper()
             .eq(&MEthChainTokenDefault::chain_token_shared_id, token_shared_id)
             .eq(&MEthChainTokenDefault::net_type, net_type);
-            if let Some(token_auth) = MEthChainTokenAuth::fetch_by_wrapper(wallet_rb, "", &token_query_wrapper).await?{
-                Ok(token_auth.contract_address)
-            } else if let Some(token_non_auth) = MEthChainTokenNonAuth::fetch_by_wrapper(wallet_rb, "", &token_query_wrapper).await?{
-                Ok(token_non_auth.contract_address)
-            } else if let Some(token_default) = MEthChainTokenDefault::fetch_by_wrapper(wallet_rb, "", &token_query_wrapper).await? {
-                Ok(token_default.contract_address)
-            }else {
-                let msg = format!("token shared id {},{} not exist in token liberay",token_shared_id,net_type);
-                Err(WalletError::Custom(msg))
-            }
+        if let Some(token_auth) = MEthChainTokenAuth::fetch_by_wrapper(wallet_rb, "", &token_query_wrapper).await? {
+            Ok(token_auth.contract_address)
+        } else if let Some(token_non_auth) = MEthChainTokenNonAuth::fetch_by_wrapper(wallet_rb, "", &token_query_wrapper).await? {
+            Ok(token_non_auth.contract_address)
+        } else if let Some(token_default) = MEthChainTokenDefault::fetch_by_wrapper(wallet_rb, "", &token_query_wrapper).await? {
+            Ok(token_default.contract_address)
+        } else {
+            let msg = format!("token shared id {},{} not exist in token liberay", token_shared_id, net_type);
+            Err(WalletError::Custom(msg))
+        }
     }
 
     pub async fn update_address_balance(&self, token_address: &TokenAddress) -> Result<(), WalletError> {
@@ -392,7 +389,7 @@ impl Wallets {
         match chain_type {
             ChainType::EthPrivateTest | ChainType::EthPrivate | ChainType::EthTest | ChainType::ETH => {
                 if MEthChainToken::fetch_by_wrapper(data_rb, &tx.tx_id, &token_query_wrapper).await?.is_none() {
-                    let contract_addr = self.query_contract_by_shared_id(&token_address.token_id,&self.net_type.to_string()).await?;
+                    let contract_addr = self.query_contract_by_shared_id(&token_address.token_id, &self.net_type.to_string()).await?;
                     let mut token = MEthChainToken::default();
                     token.chain_token_shared_id = token_address.token_id.clone();
                     token.wallet_id = token_address.wallet_id.clone();
@@ -431,7 +428,7 @@ impl Wallets {
             .eq(&MTokenAddress::token_id, &token_address.token_id)
             .eq(&MTokenAddress::address_id, &token_address.address_id);
         if let Some(mut target_address) =
-        MTokenAddress::fetch_by_wrapper(data_rb, &tx.tx_id, &token_address_wrapper).await?
+            MTokenAddress::fetch_by_wrapper(data_rb, &tx.tx_id, &token_address_wrapper).await?
         {
             target_address.balance = token_address.balance.clone();
             target_address.status = 1;

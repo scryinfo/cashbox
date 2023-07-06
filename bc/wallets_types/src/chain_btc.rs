@@ -1,9 +1,9 @@
 use async_trait::async_trait;
 use rbatis::crud::CRUDTable;
 
-use mav::{ChainType, NetType, WalletType, CTrue};
+use mav::{ChainType, CTrue, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MBtcChainToken, MBtcChainTokenDefault, MBtcChainTokenShared, MWallet, MBtcChainTokenAuth};
+use mav::ma::{Dao, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MWallet};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 
@@ -95,13 +95,14 @@ impl BtcChainTokenDefault {
                 }
             }
         }
-        let btc_tokens = tokens_default.iter().map(|token|BtcChainTokenDefault{
+        let btc_tokens = tokens_default.iter().map(|token| BtcChainTokenDefault {
             m: token.clone(),
             btc_chain_token_shared: BtcChainTokenShared::from(token.chain_token_shared.clone()),
         }).collect::<Vec<BtcChainTokenDefault>>();
         Ok(btc_tokens)
     }
 }
+
 #[derive(Debug, Default)]
 pub struct BtcChainTokenAuth {
     pub m: MBtcChainTokenAuth,
@@ -110,7 +111,7 @@ pub struct BtcChainTokenAuth {
 deref_type!(BtcChainTokenAuth,MBtcChainTokenAuth);
 
 
-impl BtcChainTokenAuth{
+impl BtcChainTokenAuth {
     pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<BtcChainTokenAuth>, WalletError> {
         let tx_id = "";
         let wallets_db = context.db().wallets_db();
@@ -148,12 +149,12 @@ pub struct BtcChain {
 }
 
 impl Chain2WalletType for BtcChain {
-    fn chain_type(wallet_type: &WalletType,net_type:&NetType) -> ChainType {
-        match (wallet_type,net_type) {
-            (WalletType::Normal,NetType::Main) => ChainType::BTC,
-            (WalletType::Test,NetType::Test) => ChainType::BtcTest,
-            (WalletType::Test,NetType::Private) => ChainType::BtcPrivate,
-            (WalletType::Test,NetType::PrivateTest) => ChainType::BtcPrivateTest,
+    fn chain_type(wallet_type: &WalletType, net_type: &NetType) -> ChainType {
+        match (wallet_type, net_type) {
+            (WalletType::Normal, NetType::Main) => ChainType::BTC,
+            (WalletType::Test, NetType::Test) => ChainType::BtcTest,
+            (WalletType::Test, NetType::Private) => ChainType::BtcPrivate,
+            (WalletType::Test, NetType::PrivateTest) => ChainType::BtcPrivateTest,
             _ => ChainType::BtcTest,
         }
     }
@@ -161,19 +162,19 @@ impl Chain2WalletType for BtcChain {
 
 /*#[async_trait]*/
 impl BtcChain {
-    pub async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet,net_type:&NetType) -> Result<(), WalletError> {
+    pub async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet, net_type: &NetType) -> Result<(), WalletError> {
         self.chain_shared.set_m(&mw);
-       // let wallet_type = WalletType::from(&mw.wallet_type);
-       // self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
+        // let wallet_type = WalletType::from(&mw.wallet_type);
+        // self.chain_shared.m.chain_type = self.to_chain_type(&wallet_type).to_string();
         let wallet_type = WalletType::from(mw.wallet_type.as_str());
-        let chain_type =  BtcChain::chain_type(&wallet_type, &net_type).to_string();
+        let chain_type = BtcChain::chain_type(&wallet_type, &net_type).to_string();
         {//load address
             let wallet_id = self.chain_shared.wallet_id.clone();
             self.chain_shared.set_addr(context, &wallet_id, &chain_type).await?;
             self.chain_shared.m.chain_type = chain_type.clone();
         }
         {//load token
-            let rb = context.db().data_db( &net_type);
+            let rb = context.db().data_db(&net_type);
             let wrapper = rb.new_wrapper()
                 .eq(MBtcChainToken::wallet_id, mw.id.clone())
                 .eq(MBtcChainToken::chain_type, chain_type);
@@ -190,14 +191,14 @@ impl BtcChain {
 }
 
 #[derive(Debug, Default, Clone)]
-pub struct BtcNowLoadBlock{
+pub struct BtcNowLoadBlock {
     pub height: u64,
     pub header_hash: String,
     pub timestamp: String,
 }
 
 #[derive(Debug, Default, Clone)]
-pub struct BtcBalance{
+pub struct BtcBalance {
     pub balance: u64,
     pub height: u64,
 }

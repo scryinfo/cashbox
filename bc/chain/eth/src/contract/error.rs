@@ -1,9 +1,9 @@
 //! Contract call/query error.
 
+use derive_more::{Display, From};
 use ethabi::Error as EthError;
 
 use crate::error::Error as ApiError;
-use derive_more::{Display, From};
 
 /// Contract error.
 #[derive(Debug, Display, From)]
@@ -30,9 +30,10 @@ impl std::error::Error for Error {
 }
 
 pub mod deploy {
+    use derive_more::{Display, From};
+
     use crate::error::Error as ApiError;
     use crate::types::H256;
-    use derive_more::{Display, From};
 
     /// Contract deployment error.
     #[derive(Debug, Display, From)]

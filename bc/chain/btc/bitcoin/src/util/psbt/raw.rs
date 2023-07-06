@@ -19,7 +19,7 @@
 
 use std::{fmt, io};
 
-use consensus::encode::{self, Decodable, Encodable, VarInt, MAX_VEC_SIZE};
+use consensus::encode::{self, Decodable, Encodable, MAX_VEC_SIZE, VarInt};
 use util::psbt::Error;
 
 /// A PSBT key in its raw byte form.
@@ -65,7 +65,7 @@ impl Decodable for Key {
             return Err(encode::Error::OversizedVectorAllocation {
                 requested: key_byte_size as usize,
                 max: MAX_VEC_SIZE,
-            })
+            });
         }
 
         let type_value: u8 = Decodable::consensus_decode(&mut d)?;

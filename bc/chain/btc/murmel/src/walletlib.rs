@@ -1,16 +1,16 @@
 //! mod for rust-wallet
 
-use bitcoin::blockdata::opcodes;
-use bitcoin::blockdata::script::Builder;
-
-use bitcoin::hashes::hex::FromHex;
-use bitcoin::util::psbt::serialize::Serialize;
-use bitcoin::{Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut};
 use bitcoin_hashes::sha256d;
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
 use hex::decode as hex_decode;
 use log::error;
+
+use bitcoin::{Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut};
+use bitcoin::blockdata::opcodes;
+use bitcoin::blockdata::script::Builder;
+use bitcoin::hashes::hex::FromHex;
+use bitcoin::util::psbt::serialize::Serialize;
 
 const PASSPHRASE: &str = "";
 
@@ -51,7 +51,7 @@ pub fn create_master() -> Transaction {
                 txid: sha256d::Hash::from_hex(
                     "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
                 )
-                .unwrap(),
+                    .unwrap(),
                 vout: 1,
             },
             sequence: RBF,
@@ -101,26 +101,29 @@ pub fn create_master() -> Transaction {
 
 #[cfg(test)]
 mod test {
-    use crate::db::{GlobalRB, GLOBAL_RB};
-    use crate::kit::vec_to_string;
-    use crate::path::PATH;
-    use crate::walletlib::create_master;
-    use bitcoin::consensus::serialize as btc_serialize;
-    use bitcoin::consensus::{deserialize, serialize};
-    use bitcoin::hashes::sha256d;
-    use bitcoin::util::misc::hex_bytes;
-    use bitcoin::{
-        Address, BitcoinHash, Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut,
-    };
-    use bitcoin_hashes::hex::ToHex;
-    use bitcoin_hashes::Hash;
-    use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
-    use bitcoin_wallet::mnemonic::Mnemonic;
-    use futures::executor::block_on;
-    use mav::{kits, CTrue, NetType, WalletType};
     use std::collections::HashMap;
     use std::fmt::Write;
     use std::str::FromStr;
+
+    use bitcoin_hashes::Hash;
+    use bitcoin_hashes::hex::ToHex;
+    use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
+    use bitcoin_wallet::mnemonic::Mnemonic;
+    use futures::executor::block_on;
+
+    use bitcoin::{
+        Address, BitcoinHash, Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut,
+    };
+    use bitcoin::consensus::{deserialize, serialize};
+    use bitcoin::consensus::serialize as btc_serialize;
+    use bitcoin::hashes::sha256d;
+    use bitcoin::util::misc::hex_bytes;
+    use mav::{CTrue, kits, NetType, WalletType};
+
+    use crate::db::{GLOBAL_RB, GlobalRB};
+    use crate::kit::vec_to_string;
+    use crate::path::PATH;
+    use crate::walletlib::create_master;
 
     #[test]
     pub fn bitcoin_hash_test() {
@@ -208,7 +211,6 @@ mod test {
         let tx: Result<Transaction, _> = deserialize(&hex_tx);
         let tx = tx.unwrap();
         println!("{:#?}", tx);
-
     }
 
     // #[test]

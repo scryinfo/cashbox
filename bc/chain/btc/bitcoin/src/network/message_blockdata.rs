@@ -18,12 +18,13 @@
 //! Bitcoin data (blocks and transactions) around.
 //!
 
-use network::constants;
-use consensus::encode::{self, Decodable, Encodable};
+use std::io;
+
+use hashes::hex::FromHex;
 use hashes::sha256d;
 
-use std::io;
-use hashes::hex::FromHex;
+use consensus::encode::{self, Decodable, Encodable};
+use network::constants;
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 /// The type of an inventory object
@@ -156,12 +157,13 @@ impl Decodable for Inventory {
 
 #[cfg(test)]
 mod tests {
-    use super::{GetHeadersMessage, GetBlocksMessage};
+    use std::default::Default;
 
     use hex::decode as hex_decode;
 
     use consensus::encode::{deserialize, serialize};
-    use std::default::Default;
+
+    use super::{GetBlocksMessage, GetHeadersMessage};
 
     #[test]
     fn getblocks_message_test() {

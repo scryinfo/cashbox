@@ -60,7 +60,7 @@ impl ToString for SettingType {
             SettingType::CurrentWallet => "CurrentWallet".to_owned(),
             SettingType::CurrentChain => "CurrentChain".to_owned(),
             SettingType::CurrentDbVersion => "CurrentDbVersion".to_owned(),
-            SettingType::CurrentNetType=>"CurrentNetType".to_owned(),
+            SettingType::CurrentNetType => "CurrentNetType".to_owned(),
             SettingType::Other(key) => key.clone(),
         }
     }

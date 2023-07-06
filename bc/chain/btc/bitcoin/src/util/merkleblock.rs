@@ -58,13 +58,13 @@
 use std::collections::HashSet;
 use std::io;
 
-use hashes::{sha256d, Hash};
+use hashes::{Hash, sha256d};
 
+use {Block, BlockHeader};
 use blockdata::constants::{MAX_BLOCK_WEIGHT, MIN_TRANSACTION_WEIGHT};
 use consensus::encode::{self, Decodable, Encodable};
 use util::hash::BitcoinHash;
 use util::merkleblock::MerkleBlockError::*;
-use {Block, BlockHeader};
 
 /// An error when verifying the merkle block
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -495,14 +495,14 @@ impl Decodable for MerkleBlock {
 mod tests {
     use std::cmp::min;
 
+    use hashes::{Hash, sha256d};
     use hashes::hex::{FromHex, ToHex};
-    use hashes::{sha256d, Hash};
     use secp256k1::rand::prelude::*;
 
+    use {Block, hex};
     use consensus::encode::{deserialize, serialize};
     use util::hash::{bitcoin_merkle_root, BitcoinHash};
     use util::merkleblock::{MerkleBlock, PartialMerkleTree};
-    use {hex, Block};
 
     #[test]
     fn pmt_tests() {
@@ -632,9 +632,9 @@ mod tests {
             "74d681e0e03bafa802c8aa084379aa98d9fcd632ddc2ed9782b586ec87451f20",
             "f9fc751cb7dc372406a9f8d738d5e6f8f63bab71986a39cf36ee70ee17036d07",
         ]
-        .iter()
-        .map(|hex| sha256d::Hash::from_hex(hex).unwrap())
-        .collect();
+            .iter()
+            .map(|hex| sha256d::Hash::from_hex(hex).unwrap())
+            .collect();
 
         let txid1 = txids[0];
         let txid2 = txids[1];

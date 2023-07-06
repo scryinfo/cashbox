@@ -1,14 +1,17 @@
 #![allow(non_snake_case)]
 
-use futures::executor::block_on;
 use std::os::raw::{c_char, c_uint};
 
-use super::kits::{CArray, CStruct, CR};
-use crate::parameters::{CBtcBalance, CBtcNowLoadBlock, CContext, CBtcTxParam};
-use crate::{to_str, to_c_char};
-use crate::types::{CBtcChainTokenAuth, CBtcChainTokenDefault, CError};
+use futures::executor::block_on;
+
 use wallets::{Contexts, Wallets};
 use wallets_types::Error;
+
+use crate::{to_c_char, to_str};
+use crate::parameters::{CBtcBalance, CBtcNowLoadBlock, CBtcTxParam, CContext};
+use crate::types::{CBtcChainTokenAuth, CBtcChainTokenDefault, CError};
+
+use super::kits::{CArray, CR, CStruct};
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainBtc_updateDefaultTokenList(
@@ -258,16 +261,16 @@ pub unsafe extern "C" fn ChainBtc_loadBalance(
 pub unsafe extern "C" fn ChainBtc_txSign(
     ctx: *mut CContext,
     param: *mut CBtcTxParam,
-    signedResult: *mut *mut c_char
+    signedResult: *mut *mut c_char,
 ) -> *const CError {
     log::debug!("enter ChainBtc_txSign");
-    if ctx.is_null() ||  param.is_null() || signedResult.is_null() {
+    if ctx.is_null() || param.is_null() || signedResult.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,param or signedResult is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
     }
     (*signedResult).free();
-    let lock  = Contexts::collection().lock();
+    let lock = Contexts::collection().lock();
     let mut contexts = lock.borrow_mut();
     let err = {
         let ctx = CContext::ptr_rust(ctx);

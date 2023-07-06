@@ -44,7 +44,7 @@ use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
 
 use bech32;
-use hashes::{hash160, sha256, Hash};
+use hashes::{Hash, hash160, sha256};
 
 use blockdata::opcodes;
 use blockdata::script;
@@ -223,7 +223,7 @@ impl Payload {
                 script::Builder::new().push_opcode(verop.into()).push_slice(&prog)
             }
         }
-        .into_script()
+            .into_script()
     }
 }
 
@@ -505,7 +505,7 @@ mod tests {
     use std::str::FromStr;
     use std::string::ToString;
 
-    use hashes::{hash160, Hash};
+    use hashes::{Hash, hash160};
     use hex::{decode as hex_decode, encode as hex_encode};
 
     use blockdata::script::Script;

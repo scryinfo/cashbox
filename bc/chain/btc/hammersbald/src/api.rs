@@ -1,3 +1,12 @@
+use std::{
+    io,
+    io::{Cursor, Read, Write},
+};
+
+use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
+use datafile::{DataFile, EnvelopeIterator};
+use error::Error;
+use format::{Envelope, Payload};
 //
 // Copyright 2018-2019 Tamas Blummer
 //
@@ -17,44 +26,34 @@
 //! # Hammersbald API
 //!
 use logfile::LogFile;
-use tablefile::TableFile;
-use datafile::{DataFile, EnvelopeIterator};
 use memtable::MemTable;
-use format::{Payload,Envelope};
 use persistent::Persistent;
-use transient::Transient;
 use pref::PRef;
-use error::Error;
-
-use byteorder::{WriteBytesExt, ReadBytesExt, BigEndian};
-
-use std::{
-    io,
-    io::{Cursor, Read, Write}
-};
+use tablefile::TableFile;
+use transient::Transient;
 
 /// Hammersbald
 pub struct Hammersbald {
-    mem: MemTable
+    mem: MemTable,
 }
 
 /// create or open a persistent db
 pub fn persistent(name: &str, cached_data_pages: usize, bucket_fill_target: usize) -> Result<Box<dyn HammersbaldAPI>, Error> {
-    Persistent::new_db(name, cached_data_pages,bucket_fill_target)
+    Persistent::new_db(name, cached_data_pages, bucket_fill_target)
 }
 
 /// create a transient db
 pub fn transient(bucket_fill_target: usize) -> Result<Box<dyn HammersbaldAPI>, Error> {
-    Transient::new_db("",0,bucket_fill_target)
+    Transient::new_db("", 0, bucket_fill_target)
 }
 
 /// public API to Hammersbald
-pub trait HammersbaldAPI : Send + Sync {
+pub trait HammersbaldAPI: Send + Sync {
     /// end current batch and start a new batch
-    fn batch (&mut self)  -> Result<(), Error>;
+    fn batch(&mut self) -> Result<(), Error>;
 
     /// stop background writer
-    fn shutdown (&mut self);
+    fn shutdown(&mut self);
 
     /// store data accessible with key
     /// returns a persistent reference to stored data
@@ -86,17 +85,17 @@ pub trait HammersbaldAPI : Send + Sync {
 
 /// A helper to build Hammersbald data elements
 pub struct HammersbaldDataWriter {
-    data: Vec<u8>
+    data: Vec<u8>,
 }
 
 impl HammersbaldDataWriter {
     /// create a new builder
-    pub fn new () -> HammersbaldDataWriter {
+    pub fn new() -> HammersbaldDataWriter {
         HammersbaldDataWriter { data: vec!() }
     }
 
     /// serialized data
-    pub fn as_slice<'a> (&'a self) -> &'a [u8] {
+    pub fn as_slice<'a>(&'a self) -> &'a [u8] {
         self.data.as_slice()
     }
 
@@ -123,17 +122,17 @@ impl Write for HammersbaldDataWriter {
 
 /// Helper to read Hammersbald data elements
 pub struct HammersbaldDataReader<'a> {
-    reader: Cursor<&'a [u8]>
+    reader: Cursor<&'a [u8]>,
 }
 
 impl<'a> HammersbaldDataReader<'a> {
     /// create a new reader
-    pub fn new (data: &'a [u8]) -> HammersbaldDataReader<'a> {
-        HammersbaldDataReader{ reader: Cursor::new(data) }
+    pub fn new(data: &'a [u8]) -> HammersbaldDataReader<'a> {
+        HammersbaldDataReader { reader: Cursor::new(data) }
     }
 
     /// read a persistent reference
-    pub fn read_ref (&mut self) -> Result<PRef, io::Error> {
+    pub fn read_ref(&mut self) -> Result<PRef, io::Error> {
         Ok(PRef::from(self.reader.read_u48::<BigEndian>()?))
     }
 }
@@ -146,7 +145,7 @@ impl<'a> Read for HammersbaldDataReader<'a> {
 
 impl Hammersbald {
     /// create a new db with key and data file
-    pub fn new(log: LogFile, table: TableFile, data: DataFile, link: DataFile, bucket_fill_target :usize) -> Result<Hammersbald, Error> {
+    pub fn new(log: LogFile, table: TableFile, data: DataFile, link: DataFile, bucket_fill_target: usize) -> Result<Hammersbald, Error> {
         let mem = MemTable::new(log, table, data, link, bucket_fill_target);
         let mut db = Hammersbald { mem };
         db.recover()?;
@@ -165,22 +164,22 @@ impl Hammersbald {
     }
 
     /// get hash table bucket iterator
-    pub fn slots<'a> (&'a self) -> impl Iterator<Item=Vec<(u32, PRef)>> +'a {
+    pub fn slots<'a>(&'a self) -> impl Iterator<Item=Vec<(u32, PRef)>> + 'a {
         self.mem.slots()
     }
 
     /// get hash table pointers
-    pub fn buckets<'a> (&'a self) -> impl Iterator<Item=PRef> +'a {
+    pub fn buckets<'a>(&'a self) -> impl Iterator<Item=PRef> + 'a {
         self.mem.buckets()
     }
 
     /// return an iterator of all payloads
-    pub fn data_envelopes<'a>(&'a self) -> impl Iterator<Item=(PRef, Envelope)> +'a {
+    pub fn data_envelopes<'a>(&'a self) -> impl Iterator<Item=(PRef, Envelope)> + 'a {
         self.mem.data_envelopes()
     }
 
     /// return an iterator of all links
-    pub fn link_envelopes<'a>(&'a self) -> impl Iterator<Item=(PRef, Envelope)> +'a {
+    pub fn link_envelopes<'a>(&'a self) -> impl Iterator<Item=(PRef, Envelope)> + 'a {
         self.mem.link_envelopes()
     }
 
@@ -191,12 +190,11 @@ impl Hammersbald {
 }
 
 impl HammersbaldAPI for Hammersbald {
-
-    fn batch (&mut self)  -> Result<(), Error> {
+    fn batch(&mut self) -> Result<(), Error> {
         self.mem.batch()
     }
 
-    fn shutdown (&mut self) {
+    fn shutdown(&mut self) {
         self.mem.shutdown()
     }
 
@@ -239,13 +237,13 @@ impl HammersbaldAPI for Hammersbald {
     }
 
     fn iter(&self) -> HammersbaldIterator {
-        HammersbaldIterator{ ei: self.mem.data_envelopes()}
+        HammersbaldIterator { ei: self.mem.data_envelopes() }
     }
 }
 
 /// iterate data content
 pub struct HammersbaldIterator<'a> {
-    ei: EnvelopeIterator<'a>
+    ei: EnvelopeIterator<'a>,
 }
 
 impl<'a> Iterator for HammersbaldIterator<'a> {
@@ -255,11 +253,11 @@ impl<'a> Iterator for HammersbaldIterator<'a> {
         if let Some((pref, envelope)) = self.ei.next() {
             match Payload::deserialize(envelope.payload()).unwrap() {
                 Payload::Indexed(indexed) => {
-                    return Some((pref, indexed.key.to_vec(), indexed.data.data.to_vec()))
-                },
+                    return Some((pref, indexed.key.to_vec(), indexed.data.data.to_vec()));
+                }
                 Payload::Referred(referred) => {
-                    return Some((pref, vec!(), referred.data.to_vec()))
-                },
+                    return Some((pref, vec!(), referred.data.to_vec()));
+                }
                 _ => return None
             }
         }
@@ -272,23 +270,24 @@ mod test {
     extern crate rand;
     extern crate hex;
 
+    use std::collections::HashMap;
+
+    use api::test::rand::RngCore;
     use transient::Transient;
 
     use self::rand::thread_rng;
-    use std::collections::HashMap;
-    use api::test::rand::RngCore;
 
     #[test]
-    fn test_two_batches () {
+    fn test_two_batches() {
         let mut db = Transient::new_db("first", 1, 1).unwrap();
 
         let mut rng = thread_rng();
 
         let mut check = HashMap::new();
-        let mut key = [0x0u8;32];
-        let mut data = [0x0u8;40];
+        let mut key = [0x0u8; 32];
+        let mut data = [0x0u8; 40];
 
-        for _ in 0 .. 10000 {
+        for _ in 0..10000 {
             rng.fill_bytes(&mut key);
             rng.fill_bytes(&mut data);
             let pref = db.put_keyed(&key, &data).unwrap();
@@ -300,7 +299,7 @@ mod test {
             assert_eq!(db.get_keyed(&k[..]).unwrap(), Some((*o, v.to_vec())));
         }
 
-        for _ in 0 .. 10000 {
+        for _ in 0..10000 {
             rng.fill_bytes(&mut key);
             rng.fill_bytes(&mut data);
             let pref = db.put_keyed(&key, &data).unwrap();

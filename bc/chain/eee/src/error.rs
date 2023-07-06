@@ -1,5 +1,6 @@
-use super::*;
 use derive_more::Display;
+
+use super::*;
 
 #[derive(Debug, Display)]
 pub enum Error {
@@ -11,6 +12,8 @@ pub enum Error {
     Public(sp_core::crypto::PublicError),
     #[display(fmt = "substrate_bip39 error: {:?}", _0)]
     Bip39(substrate_bip39::Error),
+    #[display(fmt = "any error: {:?}", _0)]
+    Any(anyhow::Error),
     #[display(fmt = "hex FromHexError error: {:?}", _0)]
     HexError(hex::FromHexError),
     #[display(fmt = "serde json error: {:?}", _0)]
@@ -43,6 +46,12 @@ impl From<failure::Error> for Error {
 impl From<substrate_bip39::Error> for Error {
     fn from(err: substrate_bip39::Error) -> Self {
         Error::Bip39(err)
+    }
+}
+
+impl From<anyhow::Error> for Error {
+    fn from(err: anyhow::Error) -> Self {
+        Error::Any(err)
     }
 }
 
@@ -88,6 +97,6 @@ impl From<node_metadata::MetadataError> for Error {
     }
 }
 
-impl From<events::EventsError> for Error{
-    fn from(err:events::EventsError)->Self{Error::EventsError(err)}
+impl From<events::EventsError> for Error {
+    fn from(err: events::EventsError) -> Self { Error::EventsError(err) }
 }

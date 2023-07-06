@@ -17,11 +17,14 @@
 //! # regularly ping peers
 //!
 
+use std::{collections::HashMap, sync::mpsc, thread, time::Duration};
+
+use rand::{RngCore, thread_rng};
+
+use bitcoin::network::message::NetworkMessage;
+
 use crate::p2p::{P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender};
 use crate::timeout::{ExpectedReply, SharedTimeout};
-use bitcoin::network::message::NetworkMessage;
-use rand::{thread_rng, RngCore};
-use std::{collections::HashMap, sync::mpsc, thread, time::Duration};
 
 // ping peers every SECS seconds if not asked anything else in the meanwhile
 const SECS: u64 = 60;
@@ -59,7 +62,7 @@ impl Ping {
                     PeerMessage::Disconnected(pid, _) => {
                         self.timeout.lock().unwrap().forget(pid);
                         self.asked.remove(&pid);
-                    },
+                    }
                     PeerMessage::Incoming(pid, msg) => match msg {
                         NetworkMessage::Pong(n) => {
                             if self.asked.remove(&pid) == Some(n) {

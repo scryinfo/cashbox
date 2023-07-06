@@ -47,29 +47,29 @@
   "eeeUnit": "1000000000000000",
   "systemSymbol": "System",
   "accountSymbol": "Account",
-  "tokenXSymbol": "TokenX",
+  "tokenXSymbol": "Tokenx",
   "balanceSymbol": "Balances",
   "eeeSymbol": "Eee",
   "privateConfig": {
-    "serverConfigIp": "http://192.168.2.57:8080/inner_api/config/info",
-    "serverApkVersion": "2.1.0",
+    "serverConfigIp": "https://cashbox.scry.info/inner_api/config/check",
+    "serverApkVersionKey": "2.1.0",
     "configVersion": "1.0.0",
-    "downloadAppUrl": "333",
-    "downloadLatestAppUrl": "https://atest",
-    "rateUrl": "https://cascerate",
+    "downloadAppUrl": "https://cashbox.scry.info/cashbox/api/apk/download",
+    "downloadLatestAppUrl": "https://cashbox.scry.info/cashbox/api/apk/downloadlatest",
+    "rateUrl": "https://cashbox.scry.info/inner_api/market/pricerate",
     "authDigitVersion": 1,
     "authDigitIp": [
-      "authIp_1",
+      "https://cashbox.scry.info/inner_api/token/erc20/authlist",
       "authIp_2"
     ],
     "defaultDigitVersion": 2,
     "defaultDigitIp": [
-      "defaultDigitIp_1",
+      "https://cashbox.scry.info/inner_api/token/erc20/defaultlist",
       "defaultDigitIp_2"
     ],
     "defaultTokens": [
       {
-        "contractAddress": "",
+        "contractAddress": "0x9F5F3CFD7a32700C93F971637407ff17b91c7342",
         "shortName": "DDD",
         "fullName": "DDD",
         "urlImg": "locale://ic_ddd.png",
@@ -78,7 +78,7 @@
         "chainType": "ETH"
       },
       {
-        "contractAddress": "",
+        "contractAddress": "0xaa638fca332190b63be1605baefde1df0b3b031e",
         "shortName": "DDD",
         "fullName": "DDD",
         "urlImg": "locale://ic_ddd.png",
@@ -96,13 +96,13 @@
         "chainType": "EEE"
       }
     ],
-    "scryXIp": "",
-    "publicIp": "https://cap/pub",
-    "etherscanKey": "",
-    "dddMainNetCA": "",
-    "dddTestNetCA": "",
+    "scryXIp": "https://118.178.197.108/rpc",
+    "publicIp": "https://cashbox.scry.info/web_app/pub",
+    "etherscanKey": "XGB9RHEF6XKHIB37G5S33CWFK89XQJ5EU1",
+    "dddMainNetCA": "0x9F5F3CFD7a32700C93F971637407ff17b91c7342",
+    "dddTestNetCA": "0xaa638fcA332190b63Be1605bAeFDE1df0b3b031e",
     "d2eMainNetEthAddress": "",
-    "d2eTestNetEthAddress": "",
-    "dappOpenUrl": " "
+    "d2eTestNetEthAddress": "0x126f710cd7d52665a478c28556a77bd93cc43747",
+    "dappOpenUrl": "https://cashbox.scry.info/web_app/dapp/dapp.html"
   }
 }

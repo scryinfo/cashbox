@@ -7,7 +7,7 @@ homepage = "https://github.com/rust-bitcoin/murmel/"
 repository = "https://github.com/rust-bitcoin/murmel/"
 documentation = "https://github.com/rust-bitcoin/murmel/"
 description = "Murmel Bitcoin node"
-keywords = [ "bitcoin" ]
+keywords = ["bitcoin"]
 readme = "README.md"
 
 [lib]
@@ -15,10 +15,10 @@ name = "murmel"
 path = "src/lib.rs"
 
 [dependencies]
-lightning = { version ="0.0.9", optional=true }
-bitcoin = { version= "0.21", features=["serde"]}
+lightning = { version = "0.0.9", optional = true }
+bitcoin = { version = "0.21", features = ["serde"] }
 bitcoin_hashes = "0.7"
-hammersbald = { version= "2.4", features=["bitcoin_support"]}
+hammersbald = { version = "2.4", features = ["bitcoin_support"] }
 mio = "0.6"
 rand = "0.7"
 log = "0.4"
@@ -27,8 +27,8 @@ byteorder = "1.2"
 lru-cache = "0.1.1"
 futures-preview = "=0.3.0-alpha.18"
 futures-timer = "0.3"
-serde="1"
-serde_derive="1"
+serde = "1"
+serde_derive = "1"
 
 [dev-dependencies]
 rustc-serialize = "0.3"

@@ -1,8 +1,10 @@
-use bitcoin::Transaction;
+use std::collections::VecDeque;
+use std::sync::Arc;
+
 use once_cell::sync::OnceCell;
 use parking_lot::{Condvar, Mutex};
-use std::sync::Arc;
-use std::collections::VecDeque;
+
+use bitcoin::Transaction;
 
 // CondVar use for sync thread
 pub type CondPair<T> = Arc<(parking_lot::Mutex<T>, Condvar)>;

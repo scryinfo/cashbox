@@ -1,23 +1,20 @@
 #[macro_use]
 extern crate serde_derive;
 
-use ethabi::{Contract, Bytes};
-use ethereum_types::{U256, H160, H256};
-use rlp::{self, RlpStream, DecoderError};
-
-use secp256k1::{Message, Secp256k1, key::{PublicKey, SecretKey}};
-use bip39::{Mnemonic, Language, Seed};
+use bip39::{Language, Mnemonic, Seed};
+use ethabi::{Bytes, Contract};
+use ethereum_types::{H160, H256, U256};
+use rlp::{self, DecoderError, RlpStream};
+use secp256k1::{key::{PublicKey, SecretKey}, Message, Secp256k1};
 use tiny_hderive::bip32::ExtendedPrivKey;
+
+pub use error::Error;
 
 mod contract;
 mod types;
 mod error;
 
 pub mod transaction;
-
-pub use error::Error;
-
-
 
 // Recover private key from mnemonic
 pub fn pri_from_mnemonic(phrase: &str, psd: Option<Vec<u8>>) -> Result<Vec<u8>, error::Error> {
@@ -207,7 +204,8 @@ pub struct EcdsaSig {
     r: Vec<u8>,
     s: Vec<u8>,
 }
-impl EcdsaSig{
+
+impl EcdsaSig {
     pub fn r(&self) -> &[u8] {
         &self.r.as_slice()
     }
@@ -235,6 +233,7 @@ fn ecdsa_sign(hash: &[u8], private_key: &[u8], chain_id: u64) -> EcdsaSig {
         s: sig_bytes[32..64].to_vec(),
     }
 }
+
 fn typed_tx_data_ecdsa_sign(hash: &[u8], private_key: &[u8]) -> EcdsaSig {
     let s = Secp256k1::signing_only();
     let msg = Message::from_slice(hash).unwrap();
@@ -460,7 +459,7 @@ fn eth_rawtx_sign_test() {
     let words = "pulp second side simple clinic step salad enact only mixed address paddle";
     let pri_from_mn = pri_from_mnemonic(words, None).unwrap();
     assert_eq!("c6e2fcde7a2713e20cb92f23e11f6d7ac5601124d38ba0eea3bf538a030c9365".to_string(), hex::encode(pri_from_mn));
-  //  let pri = "c6e2fcde7a2713e20cb92f23e11f6d7ac5601124d38ba0eea3bf538a030c9365";
+    //  let pri = "c6e2fcde7a2713e20cb92f23e11f6d7ac5601124d38ba0eea3bf538a030c9365";
     let pri = "4d5db4107d237df6a3d58ee5f70ae63d73d7658d4026f2eefd2f204c81682cb7";
     let signed_data = rawtx.sign(&hex::decode(pri).unwrap(), chain_id);
     assert_eq!("f86d068504a817c800837a1200941c9baedc94600b2d1c8a6d2bad1744e6182f300e880de0b6b3a76400008046a07e2c71664464b95fab4b1706785c244d86cef96b5e5c186a314c63306cfe9c54a0637c605b6004bb244cbea9bc69e18b7bd18b491c3794e17e31a0c932592bb476".to_string(), hex::encode(signed_data))

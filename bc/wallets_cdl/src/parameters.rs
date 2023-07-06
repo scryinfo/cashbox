@@ -1,23 +1,23 @@
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
 
-use std::os::raw::{c_char};
+use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
 use wallets_types::{
-    AccountInfo, ChainVersion, Context, CreateWalletParameters, DbName,
-    DecodeAccountInfoParameters, InitParameters, RawTxParam, StorageKeyParameters, EeeTransferPayload, EthTransferPayload, EthRawTxPayload, ExtrinsicContext,EeeChainTx,WalletTokenStatus,
-    BtcNowLoadBlock,BtcBalance,BtcTxParam,EthWalletConnectTx
+    AccountInfo, BtcBalance, BtcNowLoadBlock, BtcTxParam, ChainVersion,
+    Context, CreateWalletParameters, DbName, DecodeAccountInfoParameters, EeeChainTx, EeeTransferPayload, EthRawTxPayload, EthTransferPayload, EthWalletConnectTx, ExtrinsicContext,
+    InitParameters, RawTxParam, StorageKeyParameters, WalletTokenStatus,
 };
 
-use crate::kits::{to_c_char, to_str, CStruct, CR, CBool,Assignment};
 use crate::CArray;
+use crate::kits::{Assignment, CBool, CR, CStruct, to_c_char, to_str};
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CInitParameters {
     pub dbName: *mut CDbName,
-    pub isMemoryDb:CBool,
+    pub isMemoryDb: CBool,
     pub contextNote: *mut c_char,
     //pub netType:*mut c_char,
 }
@@ -135,16 +135,16 @@ pub struct CEthTransferPayload {
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
-pub struct CEthWalletConnectTx{
+pub struct CEthWalletConnectTx {
     pub from: *mut c_char,
     pub to: *mut c_char,
-    pub data:  *mut c_char,
+    pub data: *mut c_char,
     pub gasPrice: *mut c_char,
     pub gas: *mut c_char,
     pub value: *mut c_char,
     pub nonce: *mut c_char,
     pub maxPriorityFeePerGas: *mut c_char,
-    pub typeTxId:u32,
+    pub typeTxId: u32,
 }
 
 #[repr(C)]
@@ -153,27 +153,28 @@ pub struct CEthRawTxPayload {
     pub fromAddress: *mut c_char,
     pub rawTx: *mut c_char,
 }
+
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
-pub struct  CEeeChainTx{
-    pub txHash:*mut c_char,
-    pub blockHash:*mut c_char,
-    pub blockNumber:*mut c_char,
-    pub signer:*mut c_char,
-    pub walletAccount:*mut  c_char,
-    pub fromAddress:*mut c_char,
-    pub toAddress:*mut c_char,
-    pub value:*mut c_char,
-    pub extension:*mut c_char,
-    pub status:CBool,
-    pub txTimestamp:i64,
-    pub txBytes:*mut c_char,
+pub struct CEeeChainTx {
+    pub txHash: *mut c_char,
+    pub blockHash: *mut c_char,
+    pub blockNumber: *mut c_char,
+    pub signer: *mut c_char,
+    pub walletAccount: *mut c_char,
+    pub fromAddress: *mut c_char,
+    pub toAddress: *mut c_char,
+    pub value: *mut c_char,
+    pub extension: *mut c_char,
+    pub status: CBool,
+    pub txTimestamp: i64,
+    pub txBytes: *mut c_char,
 }
 
 
 #[repr(C)]
 #[derive(Debug, Clone, DlStruct, DlDefault, DlCR)]
-pub struct CWalletTokenStatus{
+pub struct CWalletTokenStatus {
     pub walletId: *mut c_char,
     pub chainType: *mut c_char,
     pub tokenId: *mut c_char,
@@ -183,7 +184,7 @@ pub struct CWalletTokenStatus{
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
-pub struct CBtcNowLoadBlock{
+pub struct CBtcNowLoadBlock {
     pub height: u64,
     pub headerHash: *mut c_char,
     pub timestamp: *mut c_char,
@@ -191,7 +192,7 @@ pub struct CBtcNowLoadBlock{
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
-pub struct CBtcBalance{
+pub struct CBtcBalance {
     pub balance: u64,
     pub height: u64,
 }

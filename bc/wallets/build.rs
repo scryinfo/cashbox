@@ -1,12 +1,12 @@
 //use std::fs::OpenOptions;
 //use std::io::Write;
 
-fn main(){
+fn main() {
     let mut consts = build_const::ConstWriter::for_build("constants").unwrap().finish_dependencies();
-    let v = match std::env::var("CARGO_BUILD_TARGET"){
+    let v = match std::env::var("CARGO_BUILD_TARGET") {
         Ok(val) => val,
         Err(_) => {
-            match std::env::var("TARGET"){
+            match std::env::var("TARGET") {
                 Ok(val) => val,
                 Err(_) => "any".to_owned(),
             }
@@ -18,13 +18,13 @@ fn main(){
     //     file.write(v.as_bytes());
     //     file.flush();
     // }
-    consts.add_value("CARGO_BUILD_TARGET","&str",v);
+    consts.add_value("CARGO_BUILD_TARGET", "&str", v);
 
-    let v = match std::env::var("CARGO_PKG_VERSION"){
+    let v = match std::env::var("CARGO_PKG_VERSION") {
         Ok(val) => val,
         Err(_) => {
             "1.0.0".to_owned()
         }
     };
-    consts.add_value("CARGO_BUILD_VERSION","&str",v);
+    consts.add_value("CARGO_BUILD_VERSION", "&str", v);
 }

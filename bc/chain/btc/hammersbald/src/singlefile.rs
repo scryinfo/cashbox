@@ -18,33 +18,33 @@
 //!
 //!
 
-use error::Error;
-use pagedfile::PagedFile;
-use page::{PAGE_SIZE, Page};
-use pref::PRef;
-
-use std::sync::Mutex;
-use std::fs::File;
-use std::io::{Read,Write,Seek,SeekFrom};
 use std::cmp::max;
+use std::fs::File;
+use std::io::{Read, Seek, SeekFrom, Write};
+use std::sync::Mutex;
+
+use error::Error;
+use page::{Page, PAGE_SIZE};
+use pagedfile::PagedFile;
+use pref::PRef;
 
 pub struct SingleFile {
     file: Mutex<File>,
     base: u64,
     len: u64,
-    chunk_size: u64
+    chunk_size: u64,
 }
 
 impl SingleFile {
     #[allow(unused)]
-    pub fn new (mut file: File) -> Result<SingleFile, Error> {
+    pub fn new(mut file: File) -> Result<SingleFile, Error> {
         let len = file.seek(SeekFrom::End(0))?;
-        Ok(SingleFile{file: Mutex::new(file), base: 0, len, chunk_size: 1 << 47})
+        Ok(SingleFile { file: Mutex::new(file), base: 0, len, chunk_size: 1 << 47 })
     }
 
-    pub fn new_chunk (mut file: File, base: u64, chunk_size: u64) -> Result<SingleFile, Error> {
+    pub fn new_chunk(mut file: File, base: u64, chunk_size: u64) -> Result<SingleFile, Error> {
         let len = file.seek(SeekFrom::End(0))?;
-        Ok(SingleFile{file: Mutex::new(file), base, len, chunk_size})
+        Ok(SingleFile { file: Mutex::new(file), base, len, chunk_size })
     }
 }
 
@@ -78,7 +78,7 @@ impl PagedFile for SingleFile {
         Ok(self.file.lock().unwrap().sync_data()?)
     }
 
-    fn shutdown (&mut self) {}
+    fn shutdown(&mut self) {}
 
     fn append_page(&mut self, page: Page) -> Result<(), Error> {
         let mut file = self.file.lock().unwrap();

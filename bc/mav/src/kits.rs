@@ -1,10 +1,10 @@
 use std::{fmt, fs, io, path};
 use std::ops::Add;
+use std::sync::Arc;
 
+use rbatis::plugin::log::{LogPlugin, RbatisLogPlugin};
 use rbatis::rbatis::{Rbatis, RbatisOption};
 use uuid::Uuid;
-use rbatis::plugin::log::{RbatisLogPlugin, LogPlugin};
-use std::sync::Arc;
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Error {

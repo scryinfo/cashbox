@@ -1,15 +1,18 @@
-use sp_core::crypto::{AccountId32 as AccountId,Ss58Codec};
-use std::sync::mpsc::channel;
-use eee::node_metadata::Metadata;
-use eee::chain_helper::ChainHelper;
-use frame_metadata::RuntimeMetadataPrefixed;
-use codec::{Encode, Decode, Compact};
 use std::convert::TryFrom;
+use std::sync::mpsc::channel;
+
+use codec::{Compact, Decode, Encode};
+use sp_core::crypto::{AccountId32 as AccountId, Ss58Codec};
+
+use eee::chain_helper::ChainHelper;
+use eee::node_metadata::Metadata;
+use frame_metadata::RuntimeMetadataPrefixed;
 
 const TX_VERSION: u32 = 1;
 const RUNTIME_VERSION: u32 = 6;
 const URL: &'static str = "ws://127.0.0.1:9945";
-const GENESIS_HASH: &'static str = "0xc68cadef9d04fd235d7deb94db1332767f3da2a1bf5462c75dba3a2047f8c15d";//0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973
+const GENESIS_HASH: &'static str = "0xc68cadef9d04fd235d7deb94db1332767f3da2a1bf5462c75dba3a2047f8c15d";
+//0x2fc77f8d90e56afbc241f36efa4f9db28ae410c71b20fd960194ea9d1dabb973
 const METADATA_REQ: &'static str = r#"{"id":1,"jsonrpc":"2.0","method":"state_getMetadata","params":[]}"#;
 
 pub mod rpc;

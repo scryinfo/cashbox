@@ -1,10 +1,14 @@
-use crate::error::Error;
 use bip39::{Language, Mnemonic, MnemonicType};
-use rand::{rngs::OsRng, RngCore};
-use scry_crypto::aes;
-use scrypt::{scrypt, ScryptParams};
+use rand::{RngCore, rngs::OsRng};
+use scrypt::{Params as ScryptParams, scrypt};
 use sp_core::{crypto::Ss58Codec, hexdisplay::HexDisplay, Pair, Public};
-use tiny_keccak::Keccak;
+use tiny_keccak::{Hasher, Keccak};
+
+pub use ed25519::Ed25519;
+use scry_crypto::aes;
+pub use sr25519::Sr25519;
+
+use crate::error::Error;
 
 pub const SCRYPT_LOG_N: u8 = 5;
 //Debug Reduce the number of iterations
@@ -49,7 +53,7 @@ struct KdfParams {
 
 pub trait Crypto {
     type Seed: AsRef<[u8]> + AsMut<[u8]> + Sized + Default;
-    type Pair: Pair<Public = Self::Public>;
+    type Pair: Pair<Public=Self::Public>;
     type Public: Public + Ss58Codec + AsRef<[u8]> + std::hash::Hash;
 
     fn generate_phrase(num: u32) -> String {
@@ -82,7 +86,7 @@ pub trait Crypto {
     }
     fn ss58_from_pair(pair: &Self::Pair, ss58_version: u8) -> String;
     fn public_from_pair(pair: &Self::Pair) -> Vec<u8>;
-    fn seed_from_pair(_pair: &Self::Pair) -> Option<&Self::Seed> {
+    fn seed_from_pair(_pair: &Self::Pair) -> Option<Self::Seed> {
         None
     }
     fn print_from_seed(seed: &Self::Seed, ss58_version: u8) {
@@ -102,7 +106,7 @@ pub trait Crypto {
                          phrase,
                          HexDisplay::from(&seed.as_ref()),
                          HexDisplay::from(&Self::public_from_pair(&pair)),
-                         Self::ss58_from_pair(&pair,ss58_version)
+                         Self::ss58_from_pair(&pair, ss58_version)
                 );
             }
             Err(e) => {
@@ -111,8 +115,8 @@ pub trait Crypto {
         }
     }
     fn print_from_uri(uri: &str, password: Option<&str>, ss58_version: u8)
-    where
-        <Self::Pair as Pair>::Public: Sized + Ss58Codec + AsRef<[u8]>,
+        where
+            <Self::Pair as Pair>::Public: Sized + Ss58Codec + AsRef<[u8]>,
     {
         if let Ok(pair) = Self::Pair::from_string(uri, password) {
             let seed_text = Self::seed_from_pair(&pair).map_or_else(Default::default, |s| {
@@ -137,7 +141,7 @@ pub trait Crypto {
     }
 
     fn encrypt_mnemonic(mn: &[u8], password: &[u8]) -> String {
-        let params = ScryptParams::new(SCRYPT_LOG_N, SCRYPT_R, SCRYPT_P).unwrap();
+        let params = ScryptParams::new(SCRYPT_LOG_N, SCRYPT_R, SCRYPT_P, ScryptParams::RECOMMENDED_LEN).unwrap();
         let mut salt = [0u8; 32];
         let mut iv = [0u8; 16];
         let mut dk = [0u8; SCRYPT_DKLEN];
@@ -151,7 +155,7 @@ pub trait Crypto {
         //The 16- to 32-bit data of the derived key is concatenated with the encrypted content to calculate the digest value
         let mut hex_mac = [0u8; 32];
         {
-            let mut keccak = tiny_keccak::Keccak::new_keccak256();
+            let mut keccak = tiny_keccak::Keccak::v256();
             keccak.update(&dk[16..]);
             keccak.update(&ciphertext[..]);
             keccak.finalize(&mut hex_mac);
@@ -193,7 +197,7 @@ pub trait Crypto {
         let mut key = vec![0u8; 32];
         {
             let kdfparams: KdfParams = crypto.kdfparams;
-            let params = ScryptParams::new(kdfparams.n, kdfparams.r, kdfparams.p).unwrap();
+            let params = ScryptParams::new(kdfparams.n, kdfparams.r, kdfparams.p, ScryptParams::RECOMMENDED_LEN).unwrap();
             let salt = hex::decode(kdfparams.salt)?;
             scrypt(password, salt.as_slice(), &params, &mut key)
                 .expect("32 bytes always satisfy output length requirements");
@@ -203,7 +207,7 @@ pub trait Crypto {
         //Start constructing the parameters needed for symmetric decryption
         let ciphertext = hex::decode(&crypto.ciphertext)?;
         {
-            let mut keccak = Keccak::new_keccak256();
+            let mut keccak = Keccak::v256();
             keccak.update(&key[16..]);
             keccak.update(&ciphertext[..]);
             keccak.finalize(&mut hex_mac_from_password);
@@ -225,7 +229,7 @@ pub trait Crypto {
             key.as_slice(),
             iv.as_slice(),
         )
-        .map_err( Error::Custom)
+            .map_err(Error::Custom)
     }
     fn sign(phrase: &str, msg: &[u8]) -> Result<[u8; 64], Error>;
 }
@@ -233,5 +237,3 @@ pub trait Crypto {
 mod ed25519;
 mod sr25519;
 
-pub use ed25519::Ed25519;
-pub use sr25519::Sr25519;

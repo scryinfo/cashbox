@@ -71,7 +71,7 @@ pub struct MBtcChainTokenAuth {
     #[serde(default)]
     pub position: i64,
     #[serde(default)]
-    pub status:i64,
+    pub status: i64,
 }
 
 impl MBtcChainTokenAuth {
@@ -93,7 +93,7 @@ pub struct MBtcChainTokenDefault {
     #[serde(default)]
     pub position: i64,
     #[serde(default)]
-    pub status:i64,
+    pub status: i64,
     #[serde(skip)]
     pub chain_token_shared: MBtcChainTokenShared,
 }

@@ -4,20 +4,20 @@ use std::os::raw::{c_char, c_uint};
 
 use futures::executor::block_on;
 
-use wallets::Contexts;
 use mav::ma::EeeTokenType;
-use wallets_types::{Error, WalletError, AccountInfoSyncProg, ChainVersion};
+use wallets::Contexts;
+use wallets_types::{AccountInfoSyncProg, ChainVersion, Error, WalletError};
+
+use crate::chain_eee::{CAccountInfoSyncProg, CEeeChainTokenAuth, CEeeChainTokenDefault, CSubChainBasicInfo};
+
+use super::kits::{CArray, CR, CStruct, to_c_char, to_str};
+use super::parameters::{CAccountInfo, CChainVersion, CContext, CDecodeAccountInfoParameters, CEeeChainTx, CEeeTransferPayload, CExtrinsicContext, CRawTxParam, CStorageKeyParameters};
 use super::types::CError;
-use super::kits::{CR,CStruct,CArray, to_c_char, to_str};
-use super::parameters::{CAccountInfo, CContext, CDecodeAccountInfoParameters, CRawTxParam, CStorageKeyParameters,CChainVersion,CExtrinsicContext, CEeeChainTx, CEeeTransferPayload};
-use crate::chain_eee::{CEeeChainTokenDefault, CEeeChainTokenAuth,CAccountInfoSyncProg, CSubChainBasicInfo};
-
-
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_updateSyncRecord(ctx: *mut CContext, syncRecord: *mut CAccountInfoSyncProg) -> *const CError {
     log::debug!("enter ChainEee updateSyncRecord");
-    if ctx.is_null() ||  syncRecord.is_null() {
+    if ctx.is_null() || syncRecord.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or netType or syncRecord is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
@@ -47,7 +47,7 @@ pub unsafe extern "C" fn ChainEee_updateSyncRecord(ctx: *mut CContext, syncRecor
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_getSyncRecord(ctx: *mut CContext, account: *mut c_char, syncRecord: *mut *mut CAccountInfoSyncProg) -> *const CError {
     log::debug!("enter ChainEee getSyncRecord");
-    if ctx.is_null() ||account.is_null()|| syncRecord.is_null() {
+    if ctx.is_null() || account.is_null() || syncRecord.is_null() {
         let err = Error::PARAMETER().append_message("  : ctx,account or syncRecord is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
@@ -64,8 +64,8 @@ pub unsafe extern "C" fn ChainEee_getSyncRecord(ctx: *mut CContext, account: *mu
                     Ok(res) => {
                         *syncRecord = CAccountInfoSyncProg::to_c_ptr(&res);
                         Error::SUCCESS()
-                    },
-                    Err(WalletError::NotExist)=>{
+                    }
+                    Err(WalletError::NotExist) => {
                         *syncRecord = CAccountInfoSyncProg::to_c_ptr(&AccountInfoSyncProg::default());
                         Error::SUCCESS()
                     }
@@ -82,7 +82,7 @@ pub unsafe extern "C" fn ChainEee_getSyncRecord(ctx: *mut CContext, account: *mu
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_decodeAccountInfo(ctx: *mut CContext, parameters: *mut CDecodeAccountInfoParameters, accountInfo: *mut *mut CAccountInfo) -> *const CError {
     log::debug!("enter ChainEee decodeAccountInfo");
-    if ctx.is_null()  || parameters.is_null() || accountInfo.is_null() {
+    if ctx.is_null() || parameters.is_null() || accountInfo.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx，parameters or accountInfo is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
@@ -242,9 +242,9 @@ pub unsafe extern "C" fn ChainEee_txSubmittableSign(ctx: *mut CContext, rawTx: *
 
 //signed result only used for construct ExtrinsicPayload object in typescript
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_txSign(ctx: *mut CContext,rawTx: *mut CRawTxParam, signedResult: *mut *mut c_char) -> *const CError {
+pub unsafe extern "C" fn ChainEee_txSign(ctx: *mut CContext, rawTx: *mut CRawTxParam, signedResult: *mut *mut c_char) -> *const CError {
     log::debug!("enter ChainEee updateBasicInfo");
-    if ctx.is_null() ||  rawTx.is_null() || signedResult.is_null() {
+    if ctx.is_null() || rawTx.is_null() || signedResult.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,rawTx or signedResult is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
@@ -304,8 +304,9 @@ pub unsafe extern "C" fn ChainEee_updateBasicInfo(ctx: *mut CContext, basicInfo:
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_getDefaultBasicInfo(ctx: *mut CContext,  basicInfo: *mut *mut CSubChainBasicInfo) -> *const CError {
+pub unsafe extern "C" fn ChainEee_getDefaultBasicInfo(ctx: *mut CContext, basicInfo: *mut *mut CSubChainBasicInfo) -> *const CError {
     log::debug!("enter ChainEee getDefaultBasicInfo");
     if ctx.is_null() || basicInfo.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or basicInfo is null");
@@ -314,7 +315,7 @@ pub unsafe extern "C" fn ChainEee_getDefaultBasicInfo(ctx: *mut CContext,  basic
     }
     (*basicInfo).free();
     let chain_version = ChainVersion::default();
-    query_chain_version(ctx,chain_version,basicInfo)
+    query_chain_version(ctx, chain_version, basicInfo)
 }
 
 #[no_mangle]
@@ -328,10 +329,10 @@ pub unsafe extern "C" fn ChainEee_getBasicInfo(ctx: *mut CContext, chainVersion:
     }
     (*basicInfo).free();
     let chain_version = CChainVersion::ptr_rust(chainVersion);
-    query_chain_version(ctx,chain_version,basicInfo)
-
+    query_chain_version(ctx, chain_version, basicInfo)
 }
-unsafe fn query_chain_version(ctx: *mut CContext,chain_version:ChainVersion, basicInfo: *mut *mut CSubChainBasicInfo)->*const CError{
+
+unsafe fn query_chain_version(ctx: *mut CContext, chain_version: ChainVersion, basicInfo: *mut *mut CSubChainBasicInfo) -> *const CError {
     let lock = Contexts::collection().lock();
     let mut contexts = lock.borrow_mut();
     let err = {
@@ -353,6 +354,7 @@ unsafe fn query_chain_version(ctx: *mut CContext,chain_version:ChainVersion, bas
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+
 #[no_mangle]
 pub unsafe extern "C" fn ChainEee_saveExtrinsicDetail(ctx: *mut CContext, extrinsicCtx: *mut CExtrinsicContext) -> *const CError {
     log::debug!("enter ChainEee saveExtrinsicDetail");
@@ -385,7 +387,7 @@ pub unsafe extern "C" fn ChainEee_saveExtrinsicDetail(ctx: *mut CContext, extrin
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_queryChainTxRecord(ctx: *mut CContext,account: *mut c_char, startItem: c_uint, pageSize: c_uint, records: *mut *mut CArray<CEeeChainTx>) -> *const CError {
+pub unsafe extern "C" fn ChainEee_queryChainTxRecord(ctx: *mut CContext, account: *mut c_char, startItem: c_uint, pageSize: c_uint, records: *mut *mut CArray<CEeeChainTx>) -> *const CError {
     log::debug!("enter ChainEee queryChainTxRecord");
 
     if ctx.is_null() || records.is_null() {
@@ -404,7 +406,7 @@ pub unsafe extern "C" fn ChainEee_queryChainTxRecord(ctx: *mut CContext,account:
                 let account = if to_str(account).is_empty() {
                     None
                 } else { Some(to_str(account).to_string()) };
-                match block_on(eee_chain.get_tx_record(wallets, &wallets.net_type,EeeTokenType::Eee, account,startItem as u64, pageSize as u64)) {
+                match block_on(eee_chain.get_tx_record(wallets, &wallets.net_type, EeeTokenType::Eee, account, startItem as u64, pageSize as u64)) {
                     Ok(data) => {
                         *records = CArray::to_c_ptr(&data);
                         Error::SUCCESS()
@@ -420,7 +422,7 @@ pub unsafe extern "C" fn ChainEee_queryChainTxRecord(ctx: *mut CContext,account:
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ChainEee_queryTokenxTxRecord(ctx: *mut CContext,account: *mut c_char, startItem: c_uint, pageSize: c_uint, records: *mut *mut CArray<CEeeChainTx>) -> *const CError {
+pub unsafe extern "C" fn ChainEee_queryTokenxTxRecord(ctx: *mut CContext, account: *mut c_char, startItem: c_uint, pageSize: c_uint, records: *mut *mut CArray<CEeeChainTx>) -> *const CError {
     log::debug!("enter ChainEee queryTokenxTxRecord");
 
     if ctx.is_null() || records.is_null() {
@@ -439,7 +441,7 @@ pub unsafe extern "C" fn ChainEee_queryTokenxTxRecord(ctx: *mut CContext,account
                 let account = if to_str(account).is_empty() {
                     None
                 } else { Some(to_str(account).to_string()) };
-                match block_on(eee_chain.get_tx_record(wallets, &wallets.net_type, EeeTokenType::TokenX, account,startItem as u64, pageSize as u64)) {
+                match block_on(eee_chain.get_tx_record(wallets, &wallets.net_type, EeeTokenType::TokenX, account, startItem as u64, pageSize as u64)) {
                     Ok(data) => {
                         *records = CArray::to_c_ptr(&data);
                         Error::SUCCESS()
@@ -519,7 +521,7 @@ pub unsafe extern "C" fn ChainEee_updateDefaultTokenList(ctx: *mut CContext, def
 pub unsafe extern "C" fn ChainEee_getAuthTokenList(ctx: *mut CContext, startItem: c_uint, pageSize: c_uint, tokens: *mut *mut CArray<CEeeChainTokenAuth>) -> *const CError {
     log::debug!("enter ChainEee getAuthTokenList");
 
-    if ctx.is_null() || tokens.is_null()  {
+    if ctx.is_null() || tokens.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,tokens cannot be null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
@@ -551,7 +553,7 @@ pub unsafe extern "C" fn ChainEee_getAuthTokenList(ctx: *mut CContext, startItem
 pub unsafe extern "C" fn ChainEee_getDefaultTokenList(ctx: *mut CContext, tokens: *mut *mut CArray<CEeeChainTokenDefault>) -> *const CError {
     log::debug!("enter ChainEee getDefaultTokenList");
 
-    if ctx.is_null() || tokens.is_null()  {
+    if ctx.is_null() || tokens.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx or tokens cannot be null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);

@@ -17,9 +17,11 @@
 
 use std::sync::mpsc::Sender as ThreadOut;
 use std::thread;
-pub use client::XtStatus;
-use client::*;
+
 use ws::connect;
+
+use client::*;
+pub use client::XtStatus;
 
 mod client;
 pub mod json_req;
@@ -75,7 +77,7 @@ fn start_rpc_client_thread(
                 result: result_in.clone(),
                 on_message_fn,
             })
-            .unwrap()
+                .unwrap()
         })
         .unwrap();
 }

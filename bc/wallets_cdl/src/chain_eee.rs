@@ -3,16 +3,16 @@
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{AccountInfoSyncProg, EeeChain, EeeChainToken, EeeChainTokenShared,EeeChainTokenAuth,EeeChainTokenDefault, SubChainBasicInfo};
+use wallets_types::{AccountInfoSyncProg, EeeChain, EeeChainToken, EeeChainTokenAuth, EeeChainTokenDefault, EeeChainTokenShared, SubChainBasicInfo};
 
-use crate::kits::{CArray, CBool, CR, CStruct, to_c_char, to_str,Assignment};
+use crate::kits::{Assignment, CArray, CBool, CR, CStruct, to_c_char, to_str};
 use crate::types::{CChainShared, CTokenShared};
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainToken {
-    pub show:CBool,
-    pub chainTokenSharedId:*mut c_char,
+    pub show: CBool,
+    pub chainTokenSharedId: *mut c_char,
     pub eeeChainTokenShared: *mut CEeeChainTokenShared,
 }
 
@@ -25,11 +25,12 @@ pub struct CEeeChainTokenShared {
     pub gasPrice: *mut c_char,
     pub decimal: i32,
 }
+
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainTokenDefault {
-    pub chainTokenSharedId:  *mut c_char,
-    pub netType:  *mut c_char,
+    pub chainTokenSharedId: *mut c_char,
+    pub netType: *mut c_char,
     pub position: i64,
     pub eeeChainTokenShared: *mut CEeeChainTokenShared,
 }
@@ -37,8 +38,8 @@ pub struct CEeeChainTokenDefault {
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChainTokenAuth {
-    pub chainTokenSharedId:  *mut c_char,
-    pub netType:  *mut c_char,
+    pub chainTokenSharedId: *mut c_char,
+    pub netType: *mut c_char,
     pub position: i64,
     pub eeeChainTokenShared: *mut CEeeChainTokenShared,
 }
@@ -47,7 +48,7 @@ pub struct CEeeChainTokenAuth {
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
 pub struct CEeeChain {
     pub chainShared: *mut CChainShared,
-   // pub address: *mut CAddress,
+    // pub address: *mut CAddress,
     pub tokens: *mut CArray<CEeeChainToken>,
 }
 

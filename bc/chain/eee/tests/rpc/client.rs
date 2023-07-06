@@ -15,8 +15,9 @@
 
 */
 
-use log::{debug, error, info, warn};
 use std::sync::mpsc::Sender as ThreadOut;
+
+use log::{debug, error, info, warn};
 use ws::{CloseCode, Handler, Handshake, Message, Result, Sender};
 
 #[derive(Debug, PartialEq)]

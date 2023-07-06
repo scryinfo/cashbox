@@ -50,8 +50,8 @@ use std::error;
 use std::fmt::{Display, Formatter};
 use std::io::Cursor;
 
-use hashes::{Hash, sha256d, siphash24};
 use byteorder::{ByteOrder, LittleEndian};
+use hashes::{Hash, sha256d, siphash24};
 
 use blockdata::block::Block;
 use blockdata::script::Script;
@@ -101,7 +101,7 @@ impl From<io::Error> for Error {
 /// a computed or read block filter
 pub struct BlockFilter {
     /// Golomb encoded filter
-    pub content: Vec<u8>
+    pub content: Vec<u8>,
 }
 
 impl BlockFilter {
@@ -115,7 +115,7 @@ impl BlockFilter {
     }
 
     /// create a new filter from pre-computed data
-    pub fn new (content: &[u8]) -> BlockFilter {
+    pub fn new(content: &[u8]) -> BlockFilter {
         BlockFilter { content: content.to_vec() }
     }
 
@@ -201,7 +201,7 @@ impl<'a> BlockFilterWriter<'a> {
 
 /// Reads and interpret a block filter
 pub struct BlockFilterReader {
-    reader: GCSFilterReader
+    reader: GCSFilterReader,
 }
 
 impl BlockFilterReader {
@@ -228,7 +228,7 @@ impl BlockFilterReader {
 /// Golomb-Rice encoded filter reader
 pub struct GCSFilterReader {
     filter: GCSFilter,
-    m: u64
+    m: u64,
 }
 
 impl GCSFilterReader {
@@ -342,7 +342,7 @@ pub struct GCSFilterWriter<'a> {
     filter: GCSFilter,
     writer: &'a mut io::Write,
     elements: HashSet<Vec<u8>>,
-    m: u64
+    m: u64,
 }
 
 impl<'a> GCSFilterWriter<'a> {
@@ -352,7 +352,7 @@ impl<'a> GCSFilterWriter<'a> {
             filter: GCSFilter::new(k0, k1, p),
             writer,
             elements: HashSet::new(),
-            m
+            m,
         }
     }
 
@@ -391,9 +391,11 @@ impl<'a> GCSFilterWriter<'a> {
 
 /// Golomb Coded Set Filter
 struct GCSFilter {
-    k0: u64, // sip hash key
-    k1: u64, // sip hash key
-    p: u8
+    k0: u64,
+    // sip hash key
+    k1: u64,
+    // sip hash key
+    p: u8,
 }
 
 impl GCSFilter {
@@ -520,18 +522,19 @@ impl<'a> BitStreamWriter<'a> {
 
 #[cfg(test)]
 mod test {
-    use std::collections::{HashSet, HashMap};
+    use std::collections::{HashMap, HashSet};
     use std::io::Cursor;
 
     use hashes::hex::FromHex;
 
+    use consensus::encode::deserialize;
+
     use super::*;
+
+    use self::serde_json::Value;
 
     extern crate hex;
     extern crate serde_json;
-    use self::serde_json::{Value};
-
-    use consensus::encode::deserialize;
 
     #[test]
     fn test_blockfilters() {
@@ -572,11 +575,11 @@ mod test {
             }
 
             let filter = BlockFilter::new_script_filter(&block,
-                                        |o| if let Some(s) = txmap.get(o) {
-                                            Ok(s.clone())
-                                        } else {
-                                            Err(Error::UtxoMissing(o.clone()))
-                                        }).unwrap();
+                                                        |o| if let Some(s) = txmap.get(o) {
+                                                            Ok(s.clone())
+                                                        } else {
+                                                            Err(Error::UtxoMissing(o.clone()))
+                                                        }).unwrap();
 
             let test_filter = BlockFilter::new(filter_content.as_slice());
 
@@ -588,7 +591,7 @@ mod test {
 
             for (_, script) in &txmap {
                 let query = vec![script];
-                if !script.is_empty () {
+                if !script.is_empty() {
                     assert!(filter.match_any(&block_hash, &mut query.iter()
                         .map(|s| s.as_bytes())).unwrap());
                 }
@@ -599,7 +602,7 @@ mod test {
     }
 
     #[test]
-    fn test_filter () {
+    fn test_filter() {
         let mut patterns = HashSet::new();
 
         patterns.insert(hex::decode("000000").unwrap());

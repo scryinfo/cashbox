@@ -318,6 +318,7 @@ impl CR<*mut c_char, String> for *mut c_char {
 pub fn d_ptr_alloc<T>() -> *mut *mut T {
     Box::into_raw(Box::new(null_mut()))
 }
+
 /// d表示 指针的指针
 pub fn d_ptr_free<T: CStruct + Any>(d_ptr: &mut *mut *mut T) {
     (*d_ptr).free();
@@ -328,7 +329,7 @@ mod tests {
     use std::os::raw::c_char;
     use std::ptr::null_mut;
 
-    use wallets_macro::{DlDefault, DlStruct, DlDrop};
+    use wallets_macro::{DlDefault, DlDrop, DlStruct};
 
     use crate::kits::{CArray, CStruct, d_ptr_alloc, d_ptr_free, to_c_char};
 

@@ -1,16 +1,15 @@
-use super::*;
-
-use parity_crypto::publickey::{self, recover, Public, Signature};
-use ethereum_types::{Address, BigEndianHash, U256, H256};
-use parity_crypto::Keccak256;
-use rlp::{self, Rlp, RlpStream, DecoderError};
 use std::{cmp::min, ops::Deref};
+
 use ethabi::Bytes;
-use super::transaction_id::TypedTxId;
+use ethereum_types::{Address, BigEndianHash, H256, U256};
+use parity_crypto::Keccak256;
+use parity_crypto::publickey::{self, Public, recover, Signature};
+use rlp::{self, DecoderError, Rlp, RlpStream};
+
 use crate::{EcdsaSig, keccak};
 
-
-
+use super::*;
+use super::transaction_id::TypedTxId;
 
 /// A `UnverifiedTransaction` with successfully recovered `sender`.
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -739,7 +738,6 @@ impl EIP1559TransactionTx {
 }
 
 
-
 /// Replay protection logic for v part of transaction's signature
 pub mod signature {
     /// Adds chain id into v
@@ -866,7 +864,7 @@ impl UnverifiedTransaction {
         self.signature.r.is_zero() && self.signature.s.is_zero()
     }
 
-    ///	Reference to unsigned part of this transaction.
+    ///    Reference to unsigned part of this transaction.
     pub fn as_unsigned(&self) -> &TypedTransaction {
         &self.unsigned
     }

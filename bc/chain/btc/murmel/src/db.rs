@@ -3,29 +3,32 @@
 //!     1. for btc chain database
 //!     2. for user data (utxo address ...)
 //!
-use crate::kit;
-use crate::path::PATH;
+use std::collections::HashMap;
+use std::ops::Add;
+
 use async_trait::async_trait;
-use bitcoin::blockdata::constants::genesis_block;
-use bitcoin::hashes::hex::ToHex;
-use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use bitcoin::{BitcoinHash, Network};
 use futures::executor::block_on;
 use log::{debug, error, info};
-use mav::ma::{Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcUtxo};
-use mav::ma::{MLocalTxLog, MProgress};
 use once_cell::sync::OnceCell;
 use rbatis::core::db::DBExecResult;
-use rbatis::crud::CRUDTable;
 use rbatis::crud::CRUD;
+use rbatis::crud::CRUDTable;
 use rbatis::plugin::page::{IPage, Page, PageRequest};
 use rbatis::rbatis::Rbatis;
 use rbatis::wrapper::Wrapper;
 use rbatis_core::Error;
-use std::collections::HashMap;
-use std::ops::Add;
 use strum_macros::{EnumIter, EnumString, ToString};
+
+use bitcoin::{BitcoinHash, Network};
+use bitcoin::blockdata::constants::genesis_block;
+use bitcoin::hashes::hex::ToHex;
+use bitcoin::network::message_bloom_filter::FilterLoadMessage;
+use mav::ma::{Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcUtxo};
+use mav::ma::{MLocalTxLog, MProgress};
 use wallets_types::{BtcBalance, BtcNowLoadBlock};
+
+use crate::kit;
+use crate::path::PATH;
 
 // state value in btc database must be one of this enum
 #[derive(Debug, Eq, PartialEq, EnumString, ToString, EnumIter)]
@@ -594,11 +597,14 @@ pub async fn balance_helper() -> HashMap<String, MBtcOutputTx> {
 }
 
 mod test {
-    use crate::db::{fetch_scanned_height, GlobalRB, Verify, GLOBAL_RB};
-    use crate::path::PATH;
-    use bitcoin::{Network, Transaction};
-    use futures::executor::block_on;
     use std::collections::HashMap;
+
+    use futures::executor::block_on;
+
+    use bitcoin::{Network, Transaction};
+
+    use crate::db::{fetch_scanned_height, GLOBAL_RB, GlobalRB, Verify};
+    use crate::path::PATH;
 
     #[test]
     pub fn test_test_tx() {

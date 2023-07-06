@@ -1,7 +1,6 @@
+pub use xt_primitives::{CheckedExtrinsic, GenericExtra, get_func_prefix_len, RawExtrinsic, UncheckedExtrinsicFromOuter, UncheckedExtrinsicV4};
 
 pub mod xt_primitives;
-
-pub use xt_primitives::{GenericExtra, UncheckedExtrinsicV4, UncheckedExtrinsicFromOuter, CheckedExtrinsic, get_func_prefix_len, RawExtrinsic};
 
 /// Generates the extrinsic's call field for a given module and call passed as &str
 /// # Arguments

@@ -3,14 +3,12 @@
 
 use std::os::raw::c_char;
 
-use crate::kits::{d_ptr_alloc, d_ptr_free, CArray, CBool, CStruct};
-use crate::parameters::{CAccountInfo, CContext, CDbName, CExtrinsicContext, CEeeChainTx, CWalletTokenStatus, CBtcNowLoadBlock, CBtcBalance, CEthWalletConnectTx};
-
-use crate::types::{CAccountInfoSyncProg, CError, CSubChainBasicInfo, CWallet,
-                   CEthChainTokenDefault, CTokenAddress, CEthChainTokenAuth, CEeeChainTokenAuth, CBtcChainTokenAuth,
-                   CEeeChainTokenDefault, CBtcChainTokenDefault};
 use crate::chain_eth::CEthChainTokenNonAuth;
-
+use crate::kits::{CArray, CBool, CStruct, d_ptr_alloc, d_ptr_free};
+use crate::parameters::{CAccountInfo, CBtcBalance, CBtcNowLoadBlock, CContext, CDbName, CEeeChainTx, CEthWalletConnectTx, CExtrinsicContext, CWalletTokenStatus};
+use crate::types::{CAccountInfoSyncProg, CBtcChainTokenAuth, CBtcChainTokenDefault, CEeeChainTokenAuth,
+                   CEeeChainTokenDefault, CError, CEthChainTokenAuth, CEthChainTokenDefault, CSubChainBasicInfo,
+                   CTokenAddress, CWallet};
 
 /// alloc ** [parameters::CContext]
 #[no_mangle]
@@ -270,7 +268,7 @@ pub unsafe extern "C" fn CArrayCEeeChainTx_dFree(dPtr: *mut *mut CArray<CEeeChai
 }
 
 #[no_mangle]
-pub extern "C" fn CWalletTokenStatus_dAlloc() -> *mut *mut CWalletTokenStatus{
+pub extern "C" fn CWalletTokenStatus_dAlloc() -> *mut *mut CWalletTokenStatus {
     d_ptr_alloc()
 }
 
@@ -281,34 +279,34 @@ pub unsafe extern "C" fn CWalletTokenStatus_dFree(dPtr: *mut *mut CWalletTokenSt
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CBtcNowLoadBlock_dAlloc() -> *mut *mut CBtcNowLoadBlock{
+pub unsafe extern "C" fn CBtcNowLoadBlock_dAlloc() -> *mut *mut CBtcNowLoadBlock {
     d_ptr_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CBtcNowLoadBlock_dFree(dPtr: *mut *mut CBtcNowLoadBlock){
+pub unsafe extern "C" fn CBtcNowLoadBlock_dFree(dPtr: *mut *mut CBtcNowLoadBlock) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CBtcBalance_dAlloc() -> *mut *mut CBtcBalance{
+pub unsafe extern "C" fn CBtcBalance_dAlloc() -> *mut *mut CBtcBalance {
     d_ptr_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CBtcBalance_dFree(dPtr: *mut *mut CBtcBalance){
+pub unsafe extern "C" fn CBtcBalance_dFree(dPtr: *mut *mut CBtcBalance) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr)
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CEthWalletConnectTx_dAlloc() -> *mut *mut CEthWalletConnectTx{
+pub unsafe extern "C" fn CEthWalletConnectTx_dAlloc() -> *mut *mut CEthWalletConnectTx {
     d_ptr_alloc()
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn CEthWalletConnectTx_dFree(dPtr: *mut *mut CEthWalletConnectTx){
+pub unsafe extern "C" fn CEthWalletConnectTx_dFree(dPtr: *mut *mut CEthWalletConnectTx) {
     let mut dPtr = dPtr;
     d_ptr_free(&mut dPtr)
 }

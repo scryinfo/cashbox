@@ -25,7 +25,7 @@ pub struct MWallet {
     #[serde(default)]
     pub wallet_type: String,
     #[serde(default)]
-    pub show:u32,
+    pub show: u32,
 }
 
 impl MWallet {

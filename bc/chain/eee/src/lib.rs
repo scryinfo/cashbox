@@ -1,24 +1,23 @@
 #[macro_use]
 extern crate serde_derive;
 
-use std::collections::HashMap;
+use codec::{Compact, Decode, Encode};
 pub use sp_core::{
+    crypto::{AccountId32 as AccountId, Pair, Ss58Codec},
     H256 as Hash,
-    crypto::{Pair, Ss58Codec,AccountId32 as AccountId},
 };
-
-use sp_runtime::{
-    MultiSignature,
-    generic::Era,
-};
-use codec::{Encode, Decode, Compact};
-use system::Phase;
-use events::{EventsDecoder, RuntimeEvent, SystemEvent};
-
-use extrinsic::xt_primitives::{GenericAddress, GenericExtra};//AdditionalSigned
-pub use chain_helper::ChainHelper as SubChainHelper;
-pub use keyring::{Sr25519, Ed25519, Crypto};
 use sp_core::H256;
+use sp_runtime::{
+    generic::Era,
+    MultiSignature,
+};
+use system::Phase;
+
+//AdditionalSigned
+pub use chain_helper::ChainHelper as SubChainHelper;
+use events::{EventsDecoder, RuntimeEvent, SystemEvent};
+use extrinsic::xt_primitives::{GenericAddress, GenericExtra};
+pub use keyring::{Crypto, Ed25519, Sr25519};
 
 mod keyring;
 pub mod extrinsic;
@@ -35,26 +34,27 @@ pub type Balance = u128;
 
 
 #[derive(Clone, Debug, Decode)]
-pub enum Token{
+pub enum Token {
     EEE,
-    TokenX
+    TokenX,
 }
- impl ToString for Token {
-     fn to_string(&self) -> String {
-         match &self {
-             Token::EEE => "EEE".to_owned(),
-             Token::TokenX => "TokenX".to_owned(),
-         }
-     }
- }
+
+impl ToString for Token {
+    fn to_string(&self) -> String {
+        match &self {
+            Token::EEE => "EEE".to_owned(),
+            Token::TokenX => "TokenX".to_owned(),
+        }
+    }
+}
 
 #[derive(Encode, Decode, Debug)]
 pub struct RawTx {
-   pub func_data: Vec<u8>,
-   pub index: u32,
-   pub genesis_hash: H256,
-   pub spec_version: u32,
-   pub tx_version:u32,
+    pub func_data: Vec<u8>,
+    pub index: u32,
+    pub genesis_hash: H256,
+    pub spec_version: u32,
+    pub tx_version: u32,
 }
 
 /// Used to transfer the decoded result of account information, use the default unit here?

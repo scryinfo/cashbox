@@ -55,7 +55,7 @@ impl Persistent {
 
         let table = TableFile::new(
             Box::new(CachedFile::new(
-            Box::new(RolledFile::new(name, "tb", false, TABLE_CHUNK_SIZE)?), cached_data_pages)?))?;
+                Box::new(RolledFile::new(name, "tb", false, TABLE_CHUNK_SIZE)?), cached_data_pages)?))?;
 
         Ok(Box::new(Hammersbald::new(log, table, data, link, bucket_fill_target)?))
     }

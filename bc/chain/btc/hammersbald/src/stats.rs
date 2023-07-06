@@ -1,3 +1,5 @@
+use std::collections::{HashMap, HashSet};
+
 //
 // Copyright 2018-2019 Tamas Blummer
 //
@@ -18,11 +20,8 @@
 //!
 //!
 use api::Hammersbald;
-use format::Payload;
-
 use bitcoin_hashes::siphash24;
-
-use std::collections::{HashMap, HashSet};
+use format::Payload;
 
 /// print some statistics on a db
 #[allow(unused)]
@@ -42,8 +41,8 @@ fn stats(db: &Hammersbald) {
         match Payload::deserialize(envelope.payload()).unwrap() {
             Payload::Link(_) => {
                 n_links += 1;
-                pointer.remove (&pos);
-            },
+                pointer.remove(&pos);
+            }
             _ => panic!("Unexpected payload type link at {}", pos)
         }
     }
@@ -64,8 +63,8 @@ fn stats(db: &Hammersbald) {
             roots.entry(slot.1).or_insert(Vec::new()).push(slot.0);
         }
     }
-    println!("Used buckets: {} {:.1} % avg. slots per bucket: {:.1}", used_buckets, 100.0*(used_buckets as f32/blen as f32), ndata as f32/used_buckets as f32);
-    println!("Data: indexed: {}, hash collisions {:.2} %", ndata, (1.0-(roots.len() as f32)/(ndata as f32))*100.0);
+    println!("Used buckets: {} {:.1} % avg. slots per bucket: {:.1}", used_buckets, 100.0 * (used_buckets as f32 / blen as f32), ndata as f32 / used_buckets as f32);
+    println!("Data: indexed: {}, hash collisions {:.2} %", ndata, (1.0 - (roots.len() as f32) / (ndata as f32)) * 100.0);
 
     let mut indexed_garbage = 0;
     let mut referred_garbage = 0;
@@ -81,10 +80,10 @@ fn stats(db: &Hammersbald) {
                 } else {
                     indexed_garbage += 1;
                 }
-            },
+            }
             Payload::Referred(data) => {
                 referred += 1;
-            },
+            }
             _ => panic!("Unexpected payload type in data at {}", pos)
         }
     }
@@ -96,6 +95,6 @@ fn stats(db: &Hammersbald) {
 }
 
 
-fn hash (key: &[u8], sip0: u64, sip1: u64) -> u32 {
+fn hash(key: &[u8], sip0: u64, sip1: u64) -> u32 {
     siphash24::Hash::hash_to_u64_with_keys(sip0, sip1, key) as u32
 }

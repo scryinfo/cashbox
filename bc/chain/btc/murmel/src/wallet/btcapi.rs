@@ -5,19 +5,20 @@
 #![allow(non_snake_case)]
 
 
-use bitcoin::consensus::serialize;
-use bitcoin::util::psbt::serialize::Serialize;
-use bitcoin::{Address, Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut};
+use std::str::FromStr;
+
 use bitcoin_hashes::hex::FromHex;
 use bitcoin_hashes::sha256d;
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
+use jni::JNIEnv;
 use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::{jboolean, jbyteArray, jint, jstring};
-use jni::JNIEnv;
 use log::info;
 
-use std::str::FromStr;
+use bitcoin::{Address, Network, OutPoint, Script, SigHashType, Transaction, TxIn, TxOut};
+use bitcoin::consensus::serialize;
+use bitcoin::util::psbt::serialize::Serialize;
 
 pub const PASSPHRASE: &str = "";
 
@@ -78,7 +79,7 @@ pub extern "system" fn Java_JniApi_btcTxSign(
                 txid: sha256d::Hash::from_hex(
                     "d2730654899df6efb557e5cd99b00bcd42ad448d4334cafe88d3a7b9ce89b916",
                 )
-                .unwrap(),
+                    .unwrap(),
                 vout: 1,
             },
             sequence: RBF,

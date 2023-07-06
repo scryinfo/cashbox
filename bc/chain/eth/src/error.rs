@@ -1,7 +1,8 @@
 //! Web3 Error
+use std::io::Error as IoError;
+
 use derive_more::{Display, From};
 use serde_json::Error as SerdeError;
-use std::io::Error as IoError;
 
 /// Errors which can occur when attempting to generate resource uri.
 #[derive(Debug, Display, From)]

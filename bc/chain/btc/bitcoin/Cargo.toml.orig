@@ -7,7 +7,7 @@ homepage = "https://github.com/rust-bitcoin/rust-bitcoin/"
 repository = "https://github.com/rust-bitcoin/rust-bitcoin/"
 documentation = "https://docs.rs/bitcoin/"
 description = "General purpose library for using and interoperating with Bitcoin and other cryptocurrencies."
-keywords = [ "crypto", "bitcoin" ]
+keywords = ["crypto", "bitcoin"]
 readme = "README.md"
 
 [lib]

@@ -179,7 +179,7 @@ impl<T> Dao<T> for T where
 }
 
 pub fn bool_from_u32<'de, D>(deserializer: D) -> std::result::Result<bool, D::Error>
-    where  D: Deserializer<'de>,
+    where D: Deserializer<'de>,
 {
     match u32::deserialize(deserializer)? {
         crate::CFalse => Ok(false),

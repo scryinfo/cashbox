@@ -1,5 +1,6 @@
-use derive_more::{Display, From};
 use std::io::Error as IoError;
+
+use derive_more::{Display, From};
 
 /// Errors which can occur when attempting to generate resource uri.
 #[derive(Debug, Display, From)]
@@ -26,7 +27,6 @@ pub enum Error {
     #[from(ignore)]
     Other(String),
 }
-
 
 
 impl From<failure::Error> for Error {

@@ -30,23 +30,21 @@
 //!
 
 use std::{mem, u32};
-
 use std::error;
 use std::fmt;
 use std::io;
 use std::io::{Cursor, Read, Write};
-use byteorder::{LittleEndian, WriteBytesExt, ReadBytesExt};
-use hex::encode as hex_encode;
 
-use hashes::{sha256d, Hash as HashTrait};
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use hashes::{Hash as HashTrait, sha256d};
+use hex::encode as hex_encode;
 use secp256k1;
 
+use blockdata::transaction::{Transaction, TxIn, TxOut};
+use network::address::Address;
+use network::message_blockdata::Inventory;
 use util::base58;
 use util::psbt;
-
-use blockdata::transaction::{TxOut, Transaction, TxIn};
-use network::message_blockdata::Inventory;
-use network::address::Address;
 
 /// Encoding error
 #[derive(Debug)]
@@ -69,7 +67,7 @@ pub enum Error {
         actual: u32,
     },
     /// Tried to allocate an oversized vector
-    OversizedVectorAllocation{
+    OversizedVectorAllocation {
         /// The capacity requested
         requested: usize,
         /// The maximum capacity
@@ -308,7 +306,7 @@ impl<W: Write> WriteExt for W {
     }
     #[inline]
     fn emit_bool(&mut self, v: bool) -> Result<(), Error> {
-        self.write_i8(if v {1} else {0}).map_err(Error::Io)
+        self.write_i8(if v { 1 } else { 0 }).map_err(Error::Io)
     }
     #[inline]
     fn emit_slice(&mut self, v: &[u8]) -> Result<(), Error> {
@@ -368,7 +366,7 @@ pub struct VarInt(pub u64);
 pub struct CheckedData(pub Vec<u8>);
 
 // Primitive types
-macro_rules! impl_int_encodable{
+macro_rules! impl_int_encodable {
     ($ty:ident, $meth_dec:ident, $meth_enc:ident) => (
         impl Decodable for $ty {
             #[inline]
@@ -406,10 +404,10 @@ impl VarInt {
     #[inline]
     pub fn len(&self) -> usize {
         match self.0 {
-            0...0xFC             => { 1 }
-            0xFD...0xFFFF        => { 3 }
+            0...0xFC => { 1 }
+            0xFD...0xFFFF => { 3 }
             0x10000...0xFFFFFFFF => { 5 }
-            _                    => { 9 }
+            _ => { 9 }
         }
     }
 }
@@ -421,22 +419,22 @@ impl Encodable for VarInt {
             0...0xFC => {
                 (self.0 as u8).consensus_encode(s)?;
                 Ok(1)
-            },
+            }
             0xFD...0xFFFF => {
                 s.emit_u8(0xFD)?;
                 (self.0 as u16).consensus_encode(s)?;
                 Ok(3)
-            },
+            }
             0x10000...0xFFFFFFFF => {
                 s.emit_u8(0xFE)?;
                 (self.0 as u32).consensus_encode(s)?;
                 Ok(5)
-            },
+            }
             _ => {
                 s.emit_u8(0xFF)?;
                 (self.0 as u64).consensus_encode(s)?;
                 Ok(9)
-            },
+            }
         }
     }
 }
@@ -480,7 +478,7 @@ impl Decodable for VarInt {
 impl Encodable for bool {
     #[inline]
     fn consensus_encode<S: WriteExt>(&self, mut s: S) -> Result<usize, Error> {
-        s.emit_u8(if *self {1} else {0})?;
+        s.emit_u8(if *self { 1 } else { 0 })?;
         Ok(1)
     }
 }
@@ -624,9 +622,9 @@ impl Decodable for Vec<u8> {
     fn consensus_decode<D: io::Read>(mut d: D) -> Result<Self, Error> {
         let len = VarInt::consensus_decode(&mut d)?.0 as usize;
         if len > MAX_VEC_SIZE {
-            return Err(self::Error::OversizedVectorAllocation { requested: len, max: MAX_VEC_SIZE })
+            return Err(self::Error::OversizedVectorAllocation { requested: len, max: MAX_VEC_SIZE });
         }
-        let mut ret = vec![0;len as usize];
+        let mut ret = vec![0; len as usize];
         d.read_slice(&mut ret)?;
         Ok(ret)
     }
@@ -647,7 +645,7 @@ impl Decodable for Box<[u8]> {
         let len = VarInt::consensus_decode(&mut d)?.0;
         let len = len as usize;
         if len > MAX_VEC_SIZE {
-            return Err(self::Error::OversizedVectorAllocation { requested: len, max: MAX_VEC_SIZE })
+            return Err(self::Error::OversizedVectorAllocation { requested: len, max: MAX_VEC_SIZE });
         }
         let mut ret = Vec::with_capacity(len);
         ret.resize(len, 0);
@@ -681,7 +679,7 @@ impl Decodable for CheckedData {
         if len > MAX_VEC_SIZE as u32 {
             return Err(self::Error::OversizedVectorAllocation {
                 requested: len as usize,
-                max: MAX_VEC_SIZE
+                max: MAX_VEC_SIZE,
             });
         }
         let checksum = <[u8; 4]>::consensus_decode(&mut d)?;
@@ -748,8 +746,7 @@ impl Decodable for sha256d::Hash {
 #[cfg(test)]
 mod tests {
     use super::{CheckedData, VarInt};
-
-    use super::{deserialize, serialize, Error};
+    use super::{deserialize, Error, serialize};
 
     #[test]
     fn serialize_int_test() {
@@ -813,27 +810,27 @@ mod tests {
     #[test]
     fn deserialize_nonminimal_vec() {
         match deserialize::<Vec<u8>>(&[0xfd, 0x00, 0x00]) {
-            Err(Error::ParseFailed("non-minimal varint")) => {},
+            Err(Error::ParseFailed("non-minimal varint")) => {}
             x => panic!(x)
         }
         match deserialize::<Vec<u8>>(&[0xfd, 0xfc, 0x00]) {
-            Err(Error::ParseFailed("non-minimal varint")) => {},
+            Err(Error::ParseFailed("non-minimal varint")) => {}
             x => panic!(x)
         }
         match deserialize::<Vec<u8>>(&[0xfe, 0xff, 0x00, 0x00, 0x00]) {
-            Err(Error::ParseFailed("non-minimal varint")) => {},
+            Err(Error::ParseFailed("non-minimal varint")) => {}
             x => panic!(x)
         }
         match deserialize::<Vec<u8>>(&[0xfe, 0xff, 0xff, 0x00, 0x00]) {
-            Err(Error::ParseFailed("non-minimal varint")) => {},
+            Err(Error::ParseFailed("non-minimal varint")) => {}
             x => panic!(x)
         }
         match deserialize::<Vec<u8>>(&[0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]) {
-            Err(Error::ParseFailed("non-minimal varint")) => {},
+            Err(Error::ParseFailed("non-minimal varint")) => {}
             x => panic!(x)
         }
         match deserialize::<Vec<u8>>(&[0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00]) {
-            Err(Error::ParseFailed("non-minimal varint")) => {},
+            Err(Error::ParseFailed("non-minimal varint")) => {}
             x => panic!(x)
         }
 
@@ -914,7 +911,7 @@ mod tests {
         assert_eq!(deserialize(&[3u8, 2, 3, 4]).ok(), Some(vec![2u8, 3, 4]));
         assert!((deserialize(&[4u8, 2, 3, 4, 5, 6]) as Result<Vec<u8>, _>).is_err());
         // found by cargo fuzz
-        assert!(deserialize::<Vec<u64>>(&[0xff,0xff,0xff,0xff,0x6b,0x6b,0x6b,0x6b,0x6b,0x6b,0x6b,0x6b,0x6b,0x6b,0x6b,0x6b,0xa,0xa,0x3a]).is_err());
+        assert!(deserialize::<Vec<u64>>(&[0xff, 0xff, 0xff, 0xff, 0x6b, 0x6b, 0x6b, 0x6b, 0x6b, 0x6b, 0x6b, 0x6b, 0x6b, 0x6b, 0x6b, 0x6b, 0xa, 0xa, 0x3a]).is_err());
     }
 
     #[test]

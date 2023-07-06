@@ -20,11 +20,11 @@ chrono = { version = "0.4", features = ["serde"] }
 bigdecimal = "0.2"
 rbatis-core = { version = "1.8.70", features = ["async-io-sqlite"] }
 rbatis = { version = "1.8.75", features = ["async-io-sqlite"] }
-rbatis-macro-driver = { version = "1.8.74"}
+rbatis-macro-driver = { version = "1.8.74" }
 
 async-trait = "0.1.31"
 
-wallets_macro = { path = "../wallets_macro", features = ["db_meta",] }
+wallets_macro = { path = "../wallets_macro", features = ["db_meta", ] }
 
 [dev-dependencies]
 once_cell = "1.5.2"

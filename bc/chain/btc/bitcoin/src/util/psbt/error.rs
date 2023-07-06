@@ -81,7 +81,7 @@ impl error::Error for Error {
             }
             Error::NoMorePairs => "no more key-value pairs for this psbt map",
             Error::UnexpectedUnsignedTx { .. } => "different unsigned transaction",
-            Error::NonStandardSigHashType(..) =>  "non-standard sighash type",
+            Error::NonStandardSigHashType(..) => "non-standard sighash type",
         }
     }
 }

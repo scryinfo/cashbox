@@ -16,6 +16,11 @@
 //!
 //! Functions needed by all parts of the Bitcoin library
 
+use std::{error, fmt};
+
+use consensus::encode;
+use network;
+
 pub mod key;
 pub mod address;
 pub mod amount;
@@ -29,11 +34,6 @@ pub mod misc;
 pub mod psbt;
 pub mod uint;
 pub mod bip158;
-
-use std::{error, fmt};
-
-use network;
-use consensus::encode;
 
 /// A trait which allows numbers to act as fixed-size bit arrays
 pub trait BitArray {

@@ -22,9 +22,11 @@
 //!
 //!
 
-use bitcoin::network::constants::Network;
-use log::{info, trace};
 use std::net::{SocketAddr, ToSocketAddrs};
+
+use log::{info, trace};
+
+use bitcoin::network::constants::Network;
 
 const MAIN_SEEDER: [&str; 9] = [
     "seed.bitcoin.sipa.be",

@@ -17,26 +17,25 @@
 //! # read cached file
 //!
 
+use std::cmp::max;
+use std::sync::{Arc, Mutex};
+
+use error::Error;
+use lru_cache::LruCache;
 use page::{Page, PAGE_SIZE};
 use pagedfile::PagedFile;
 use pref::PRef;
-use error::Error;
-
-use lru_cache::LruCache;
-
-use std::sync::{Arc, Mutex};
-use std::cmp::max;
 
 pub struct CachedFile {
     file: Box<dyn PagedFile>,
-    cache: Mutex<Cache>
+    cache: Mutex<Cache>,
 }
 
 impl CachedFile {
     /// create a read cached file with a page cache of given size
-    pub fn new (file: Box<dyn PagedFile>, pages: usize) -> Result<CachedFile, Error> {
+    pub fn new(file: Box<dyn PagedFile>, pages: usize) -> Result<CachedFile, Error> {
         let len = file.len()?;
-        Ok(CachedFile{file, cache: Mutex::new(Cache::new(len, pages))})
+        Ok(CachedFile { file, cache: Mutex::new(Cache::new(len, pages)) })
     }
 }
 
@@ -46,7 +45,7 @@ impl PagedFile for CachedFile {
         if let Some(page) = cache.get(pref) {
             return Ok(Some(page));
         }
-        if let Some(page) = self.file.read_page (pref)? {
+        if let Some(page) = self.file.read_page(pref)? {
             cache.cache(pref, Arc::new(page.clone()));
             return Ok(Some(page));
         }
@@ -91,11 +90,11 @@ impl PagedFile for CachedFile {
 
 pub struct Cache {
     reads: LruCache<PRef, Arc<Page>>,
-    len: u64
+    len: u64,
 }
 
 impl Cache {
-    pub fn new (len: u64, size: usize) -> Cache {
+    pub fn new(len: u64, size: usize) -> Cache {
         Cache { reads: LruCache::new(size), len }
     }
 
@@ -107,7 +106,7 @@ impl Cache {
         self.reads.clear();
     }
 
-    pub fn append (&mut self, page: Page) ->u64 {
+    pub fn append(&mut self, page: Page) -> u64 {
         let pref = PRef::from(self.len);
         let page = Arc::new(page);
         self.cache(pref, page);
@@ -115,7 +114,7 @@ impl Cache {
         self.len
     }
 
-    pub fn update (&mut self, page: Page) ->u64 {
+    pub fn update(&mut self, page: Page) -> u64 {
         let pref = page.pref();
         let page = Arc::new(page);
         self.cache(pref, page);
@@ -126,7 +125,7 @@ impl Cache {
     pub fn get(&mut self, pref: PRef) -> Option<Page> {
         use std::ops::Deref;
         if let Some(content) = self.reads.get_mut(&pref) {
-            return Some(content.clone().deref().clone())
+            return Some(content.clone().deref().clone());
         }
         None
     }
@@ -138,8 +137,7 @@ impl Cache {
                 let l = o.as_u64();
                 if l >= len {
                     Some(l)
-                }
-                else {
+                } else {
                     None
                 }
             }).collect();

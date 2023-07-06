@@ -1,16 +1,16 @@
-pub mod error;
-
-use bitcoin::network::constants::Network;
-use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
-
 use base58::ToBase58;
 use bip39::Language;
-use secp256k1::{Secp256k1,key::{PublicKey, SecretKey}};
-use bitcoin::util::psbt::serialize::Serialize;
+use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
-pub use error::Error;
 use ripemd160::{Digest, Ripemd160};
+use secp256k1::{key::{PublicKey, SecretKey}, Secp256k1};
 use sha2::Sha256;
+
+use bitcoin::network::constants::Network;
+use bitcoin::util::psbt::serialize::Serialize;
+pub use error::Error;
+
+pub mod error;
 
 //Generate btc address from uncompressed public key
 // bip39 44 32

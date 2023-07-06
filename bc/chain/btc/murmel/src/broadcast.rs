@@ -1,16 +1,19 @@
 //! mod for broadcast TX
 
-use crate::broadcast_queue::{global_q, CondPair, NamedQueue};
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
+
+use log::{error, info, trace};
+
+use bitcoin::network::message::NetworkMessage;
+
+use crate::broadcast_queue::{CondPair, global_q, NamedQueue};
 use crate::error::Error;
 use crate::p2p::{
     P2PControlSender, PeerId, PeerMessage, PeerMessageReceiver, PeerMessageSender, SERVICE_BLOCKS,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
-use bitcoin::network::message::NetworkMessage;
-use log::{error, info, trace};
-use std::sync::mpsc;
-use std::thread;
-use std::time::Duration;
 
 pub struct Broadcast {
     //used for Send message

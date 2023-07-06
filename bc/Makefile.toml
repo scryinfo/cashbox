@@ -18,5 +18,5 @@ command = "cargo"
 args = ["test --no-run"]
 
 [tasks.before]
-dependencies=["clippy","fmt"]
-run_task=[{name="build_test"}]
+dependencies = ["clippy", "fmt"]
+run_task = [{ name = "build_test" }]

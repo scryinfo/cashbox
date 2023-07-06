@@ -101,8 +101,9 @@ impl Network {
 
 #[cfg(test)]
 mod tests {
-    use super::Network;
     use consensus::encode::{deserialize, serialize};
+
+    use super::Network;
 
     #[test]
     fn serialize_test() {
@@ -133,16 +134,16 @@ mod tests {
         );
     }
 
-  #[test]
-  fn string_test() {
-      assert_eq!(Network::Bitcoin.to_string(), "bitcoin");
-      assert_eq!(Network::Testnet.to_string(), "testnet");
-      assert_eq!(Network::Regtest.to_string(), "regtest");
+    #[test]
+    fn string_test() {
+        assert_eq!(Network::Bitcoin.to_string(), "bitcoin");
+        assert_eq!(Network::Testnet.to_string(), "testnet");
+        assert_eq!(Network::Regtest.to_string(), "regtest");
 
-      assert_eq!("bitcoin".parse::<Network>().unwrap(), Network::Bitcoin);
-      assert_eq!("testnet".parse::<Network>().unwrap(), Network::Testnet);
-      assert_eq!("regtest".parse::<Network>().unwrap(), Network::Regtest);
-      assert!("fakenet".parse::<Network>().is_err());
-  }
+        assert_eq!("bitcoin".parse::<Network>().unwrap(), Network::Bitcoin);
+        assert_eq!("testnet".parse::<Network>().unwrap(), Network::Testnet);
+        assert_eq!("regtest".parse::<Network>().unwrap(), Network::Regtest);
+        assert!("fakenet".parse::<Network>().is_err());
+    }
 }
 

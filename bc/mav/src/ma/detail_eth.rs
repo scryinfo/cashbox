@@ -77,7 +77,7 @@ pub struct MEthChainTokenAuth {
     #[serde(default)]
     pub position: i64,
     #[serde(default)]
-    pub status:i64,
+    pub status: i64,
     //  ///这个是为了使用方便，它不会生成数据库字段
     /*    #[serde(skip)]
         pub chain_token_shared: MEthChainTokenShared,*/
@@ -105,7 +105,7 @@ pub struct MEthChainTokenDefault {
     #[serde(default)]
     pub position: i64,
     #[serde(default)]
-    pub status:i64,
+    pub status: i64,
     ///这个是为了使用方便，它不会生成数据库字段
     #[serde(skip)]
     pub chain_token_shared: MEthChainTokenShared,
@@ -130,9 +130,9 @@ pub struct MEthChainTokenNonAuth {
     #[serde(default)]
     pub position: i64,
     #[serde(default)]
-    pub status:i64,
-   /* #[serde(skip)]
-    pub chain_token_shared: MEthChainTokenShared,*/
+    pub status: i64,
+    /* #[serde(skip)]
+     pub chain_token_shared: MEthChainTokenShared,*/
 }
 
 impl MEthChainTokenNonAuth {
@@ -151,7 +151,7 @@ mod tests {
     use strum::IntoEnumIterator;
 
     use crate::kits::test::make_memory_rbatis_test;
-    use crate::ma::{Dao, Db, DbCreateType, EthTokenType, MEthChainTokenAuth, MEthChainTokenDefault, MEeeChainTokenShared};
+    use crate::ma::{Dao, Db, DbCreateType, EthTokenType, MEeeChainTokenShared, MEthChainTokenAuth, MEthChainTokenDefault};
     use crate::NetType;
 
     #[test]

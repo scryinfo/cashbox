@@ -18,8 +18,8 @@
 use serde::Serialize;
 use serde_json::{json, to_value, Value};
 use sp_core::{
+    H256 as Hash,
     storage::StorageKey,
-    H256 as Hash
 };
 
 pub const REQUEST_TRANSFER: u32 = 3;

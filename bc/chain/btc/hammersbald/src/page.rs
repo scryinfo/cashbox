@@ -20,8 +20,8 @@
 //!
 //!
 
+use byteorder::{BigEndian, ByteOrder};
 use pref::PRef;
-use byteorder::{ByteOrder, BigEndian};
 
 pub const PAGE_SIZE: usize = 4096;
 pub const PAGE_PAYLOAD_SIZE: usize = 4090;
@@ -35,63 +35,63 @@ pub struct Page {
 impl Page {
     /// create an empty page for a position in the table file
     pub fn new_table_page(pref: PRef) -> Page {
-        let mut page = Page{ content: [0u8; PAGE_SIZE] };
+        let mut page = Page { content: [0u8; PAGE_SIZE] };
         page.write_pref(PAGE_PAYLOAD_SIZE, pref);
         page
     }
 
     /// create an empty page
     pub fn new() -> Page {
-        Page{ content: [0u8; PAGE_SIZE] }
+        Page { content: [0u8; PAGE_SIZE] }
     }
 
     /// create a Page from read buffer
-    pub fn from_buf (content: [u8; PAGE_SIZE]) -> Page {
-        Page{ content }
+    pub fn from_buf(content: [u8; PAGE_SIZE]) -> Page {
+        Page { content }
     }
 
     /// interpret the last 6 bytes as an pref
-    pub fn pref (&self) -> PRef {
+    pub fn pref(&self) -> PRef {
         self.read_pref(PAGE_PAYLOAD_SIZE)
     }
 
     /// write slice at a position
     pub fn write(&mut self, pos: usize, slice: &[u8]) {
-        self.content[pos .. pos + slice.len()].copy_from_slice(slice)
+        self.content[pos..pos + slice.len()].copy_from_slice(slice)
     }
 
     /// read at position
-    pub fn read (&self, pos: usize, buf: &mut [u8]) {
+    pub fn read(&self, pos: usize, buf: &mut [u8]) {
         let len = buf.len();
-        buf.copy_from_slice(&self.content[pos .. pos+len])
+        buf.copy_from_slice(&self.content[pos..pos + len])
     }
 
     /// write a pref into the page
     pub fn write_pref(&mut self, pos: usize, pref: PRef) {
         let mut buf = [0u8; 6];
         BigEndian::write_u48(&mut buf, pref.as_u64());
-        self.content[pos..pos+6].copy_from_slice(&buf[..]);
+        self.content[pos..pos + 6].copy_from_slice(&buf[..]);
     }
 
     /// read a pref at a page position
     pub fn read_pref(&self, pos: usize) -> PRef {
-        PRef::from(BigEndian::read_u48(&self.content[pos..pos+6]))
+        PRef::from(BigEndian::read_u48(&self.content[pos..pos + 6]))
     }
 
     /// write an pref into the page
-    pub fn write_u64 (&mut self, pos: usize, n: u64) {
+    pub fn write_u64(&mut self, pos: usize, n: u64) {
         let mut buf = [0u8; 8];
         BigEndian::write_u64(&mut buf, n);
-        self.content[pos..pos+8].copy_from_slice(&buf[..]);
+        self.content[pos..pos + 8].copy_from_slice(&buf[..]);
     }
 
     /// read an pref at a page position
     pub fn read_u64(&self, pos: usize) -> u64 {
-        BigEndian::read_u64(&self.content[pos..pos+8])
+        BigEndian::read_u64(&self.content[pos..pos + 8])
     }
 
     /// into write buffer
-    pub fn into_buf (self) -> [u8; PAGE_SIZE] {
+    pub fn into_buf(self) -> [u8; PAGE_SIZE] {
         self.content
     }
 }

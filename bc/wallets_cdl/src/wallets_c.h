@@ -506,9 +506,6 @@ typedef struct CEthRawTxPayload {
 } CEthRawTxPayload;
 
 
-
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -680,7 +677,8 @@ const struct CError *Wallets_all(struct CContext *ctx, struct CArrayCWallet **ar
 
 const struct CError *Wallets_generateMnemonic(unsigned int mnemonic_num, char **mnemonic);
 
-const struct CError *Wallets_createWallet(struct CContext *ctx, struct CCreateWalletParameters *parameters, struct CWallet **wallet);
+const struct CError *
+Wallets_createWallet(struct CContext *ctx, struct CCreateWalletParameters *parameters, struct CWallet **wallet);
 
 const struct CError *Wallets_removeWallet(struct CContext *ctx, char *walletId, char *password);
 
@@ -729,11 +727,13 @@ const struct CError *Wallets_updateBalance(struct CContext *ctx, struct CTokenAd
 
 const struct CError *Wallets_changeTokenShowState(struct CContext *ctx, struct CWalletTokenStatus *tokenStatus);
 
-const struct CError *ChainBtc_updateDefaultTokenList(struct CContext *ctx, struct CArrayCBtcChainTokenDefault *defaultTokens);
+const struct CError *
+ChainBtc_updateDefaultTokenList(struct CContext *ctx, struct CArrayCBtcChainTokenDefault *defaultTokens);
 
 const struct CError *ChainBtc_updateAuthDigitList(struct CContext *ctx, struct CArrayCBtcChainTokenAuth *authTokens);
 
-const struct CError *ChainBtc_getAuthTokenList(struct CContext *ctx, unsigned int startItem, unsigned int pageSize, struct CArrayCBtcChainTokenAuth **tokens);
+const struct CError *ChainBtc_getAuthTokenList(struct CContext *ctx, unsigned int startItem, unsigned int pageSize,
+                                               struct CArrayCBtcChainTokenAuth **tokens);
 
 const struct CError *ChainBtc_getDefaultTokenList(struct CContext *ctx, struct CArrayCBtcChainTokenDefault **tokens);
 
@@ -749,13 +749,16 @@ const struct CError *ChainEee_updateSyncRecord(struct CContext *ctx, struct CAcc
 
 const struct CError *ChainEee_getSyncRecord(struct CContext *ctx, char *account, struct CAccountInfoSyncProg **syncRecord);
 
-const struct CError *ChainEee_decodeAccountInfo(struct CContext *ctx, struct CDecodeAccountInfoParameters *parameters, struct CAccountInfo **accountInfo);
+const struct CError *ChainEee_decodeAccountInfo(struct CContext *ctx, struct CDecodeAccountInfoParameters *parameters,
+                                                struct CAccountInfo **accountInfo);
 
 const struct CError *ChainEee_getStorageKey(struct CContext *ctx, struct CStorageKeyParameters *parameters, char **key);
 
-const struct CError *ChainEee_eeeTransfer(struct CContext *ctx, struct CEeeTransferPayload *transferPayload, char **signedResult);
+const struct CError *
+ChainEee_eeeTransfer(struct CContext *ctx, struct CEeeTransferPayload *transferPayload, char **signedResult);
 
-const struct CError *ChainEee_tokenXTransfer(struct CContext *ctx, struct CEeeTransferPayload *transferPayload, char **signedResult);
+const struct CError *
+ChainEee_tokenXTransfer(struct CContext *ctx, struct CEeeTransferPayload *transferPayload, char **signedResult);
 
 const struct CError *ChainEee_txSubmittableSign(struct CContext *ctx, struct CRawTxParam *rawTx, char **signedResult);
 
@@ -765,35 +768,48 @@ const struct CError *ChainEee_updateBasicInfo(struct CContext *ctx, struct CSubC
 
 const struct CError *ChainEee_getDefaultBasicInfo(struct CContext *ctx, struct CSubChainBasicInfo **basicInfo);
 
-const struct CError *ChainEee_getBasicInfo(struct CContext *ctx, struct CChainVersion *chainVersion, struct CSubChainBasicInfo **basicInfo);
+const struct CError *
+ChainEee_getBasicInfo(struct CContext *ctx, struct CChainVersion *chainVersion, struct CSubChainBasicInfo **basicInfo);
 
 const struct CError *ChainEee_saveExtrinsicDetail(struct CContext *ctx, struct CExtrinsicContext *extrinsicCtx);
 
-const struct CError *ChainEee_queryChainTxRecord(struct CContext *ctx, char *account, unsigned int startItem, unsigned int pageSize, struct CArrayCEeeChainTx **records);
+const struct CError *
+ChainEee_queryChainTxRecord(struct CContext *ctx, char *account, unsigned int startItem, unsigned int pageSize,
+                            struct CArrayCEeeChainTx **records);
 
-const struct CError *ChainEee_queryTokenxTxRecord(struct CContext *ctx, char *account, unsigned int startItem, unsigned int pageSize, struct CArrayCEeeChainTx **records);
+const struct CError *
+ChainEee_queryTokenxTxRecord(struct CContext *ctx, char *account, unsigned int startItem, unsigned int pageSize,
+                             struct CArrayCEeeChainTx **records);
 
 const struct CError *ChainEee_updateAuthDigitList(struct CContext *ctx, struct CArrayCEeeChainTokenAuth *authTokens);
 
-const struct CError *ChainEee_updateDefaultTokenList(struct CContext *ctx, struct CArrayCEeeChainTokenDefault *defaultTokens);
+const struct CError *
+ChainEee_updateDefaultTokenList(struct CContext *ctx, struct CArrayCEeeChainTokenDefault *defaultTokens);
 
-const struct CError *ChainEee_getAuthTokenList(struct CContext *ctx, unsigned int startItem, unsigned int pageSize, struct CArrayCEeeChainTokenAuth **tokens);
+const struct CError *ChainEee_getAuthTokenList(struct CContext *ctx, unsigned int startItem, unsigned int pageSize,
+                                               struct CArrayCEeeChainTokenAuth **tokens);
 
 const struct CError *ChainEee_getDefaultTokenList(struct CContext *ctx, struct CArrayCEeeChainTokenDefault **tokens);
 
 const struct CError *ChainEth_decodeAdditionData(struct CContext *ctx, char *encodeData, char **additionData);
 
-const struct CError *ChainEth_txSign(struct CContext *ctx, struct CEthTransferPayload *txPayload, char *password, char **signResult);
+const struct CError *
+ChainEth_txSign(struct CContext *ctx, struct CEthTransferPayload *txPayload, char *password, char **signResult);
 
-const struct CError *ChainEth_rawTxSign(struct CContext *ctx, struct CEthRawTxPayload *rawTxPayload, char *password, char **signResult);
+const struct CError *
+ChainEth_rawTxSign(struct CContext *ctx, struct CEthRawTxPayload *rawTxPayload, char *password, char **signResult);
 
-const struct CError *ChainEth_walletConnectTxSign(struct CContext *ctx, struct CEthWalletConnectTx *wallet_connect_tx, char *password, char **signResult);
+const struct CError *
+ChainEth_walletConnectTxSign(struct CContext *ctx, struct CEthWalletConnectTx *wallet_connect_tx, char *password,
+                             char **signResult);
 
 const struct CError *ChainEth_updateAuthTokenList(struct CContext *ctx, struct CArrayCEthChainTokenAuth *authTokens);
 
-const struct CError *ChainEth_getAuthTokenList(struct CContext *ctx, unsigned int startItem, unsigned int pageSize, struct CArrayCEthChainTokenAuth **tokens);
+const struct CError *ChainEth_getAuthTokenList(struct CContext *ctx, unsigned int startItem, unsigned int pageSize,
+                                               struct CArrayCEthChainTokenAuth **tokens);
 
-const struct CError *ChainEth_updateDefaultTokenList(struct CContext *ctx, struct CArrayCEthChainTokenDefault *defaultTokens);
+const struct CError *
+ChainEth_updateDefaultTokenList(struct CContext *ctx, struct CArrayCEthChainTokenDefault *defaultTokens);
 
 const struct CError *ChainEth_getDefaultTokenList(struct CContext *ctx, struct CArrayCEthChainTokenDefault **tokens);
 
@@ -801,7 +817,9 @@ const struct CError *ChainEth_updateNonAuthTokenList(struct CContext *ctx, struc
 
 const struct CError *ChainEth_getNonAuthTokenList(struct CContext *ctx, struct CArrayCEthChainTokenNonAuth **tokens);
 
-const struct CError *ChainEth_queryAuthTokenList(struct CContext *ctx, char *tokenName, char *contract, unsigned int startItem, unsigned int pageSize, struct CArrayCEthChainTokenAuth **tokens);
+const struct CError *
+ChainEth_queryAuthTokenList(struct CContext *ctx, char *tokenName, char *contract, unsigned int startItem,
+                            unsigned int pageSize, struct CArrayCEthChainTokenAuth **tokens);
 
 #ifdef __cplusplus
 } // extern "C"

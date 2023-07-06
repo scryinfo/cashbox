@@ -18,14 +18,16 @@
 //! defined at https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki
 //! except we define PSBTs containing non-standard SigHash types as invalid.
 
-use blockdata::script::Script;
-use blockdata::transaction::Transaction;
-use consensus::{encode, Encodable, Decodable};
-
 use std::io;
 
-mod error;
+use blockdata::script::Script;
+use blockdata::transaction::Transaction;
+use consensus::{Decodable, Encodable, encode};
+
 pub use self::error::Error;
+pub use self::map::{Global, Input, Map, Output};
+
+mod error;
 
 pub mod raw;
 
@@ -35,7 +37,6 @@ mod macros;
 pub mod serialize;
 
 mod map;
-pub use self::map::{Map, Global, Input, Output};
 
 /// A Partially Signed Transaction.
 #[derive(Debug, Clone, PartialEq)]
@@ -162,19 +163,17 @@ impl Decodable for PartiallySignedTransaction {
 
 #[cfg(test)]
 mod tests {
-    use hashes::hex::FromHex;
-    use hashes::sha256d;
-
     use std::collections::BTreeMap;
 
+    use hashes::hex::FromHex;
+    use hashes::sha256d;
     use hex::decode as hex_decode;
-
     use secp256k1::Secp256k1;
 
     use blockdata::script::Script;
-    use blockdata::transaction::{Transaction, TxIn, TxOut, OutPoint};
-    use network::constants::Network::Bitcoin;
+    use blockdata::transaction::{OutPoint, Transaction, TxIn, TxOut};
     use consensus::encode::{deserialize, serialize, serialize_hex};
+    use network::constants::Network::Bitcoin;
     use util::bip32::{ChildNumber, DerivationPath, ExtendedPrivKey, ExtendedPubKey, Fingerprint};
     use util::key::PublicKey;
     use util::psbt::map::{Global, Output};
@@ -312,17 +311,16 @@ mod tests {
     mod bip_vectors {
         use std::collections::BTreeMap;
 
-        use hex::decode as hex_decode;
-
         use hashes::hex::FromHex;
         use hashes::sha256d;
+        use hex::decode as hex_decode;
 
         use blockdata::script::Script;
-        use blockdata::transaction::{SigHashType, Transaction, TxIn, TxOut, OutPoint};
+        use blockdata::transaction::{OutPoint, SigHashType, Transaction, TxIn, TxOut};
         use consensus::encode::serialize_hex;
-        use util::psbt::map::{Map, Global, Input, Output};
-        use util::psbt::raw;
+        use util::psbt::map::{Global, Input, Map, Output};
         use util::psbt::PartiallySignedTransaction;
+        use util::psbt::raw;
 
         #[test]
         fn invalid_vector_1() {
@@ -403,20 +401,20 @@ mod tests {
                                 hex_decode("03d2e15674941bad4a996372cb87e1856d3652606d98562fe39c5e9e7e413f2105").unwrap(),
                             ],
                         },
-                        TxIn {
-                            previous_output: OutPoint {
-                                txid: sha256d::Hash::from_hex(
-                                    "b490486aec3ae671012dddb2bb08466bef37720a533a894814ff1da743aaf886",
-                                ).unwrap(),
-                                vout: 1,
-                            },
-                            script_sig: hex_script!("160014fe3e9ef1a745e974d902c4355943abcb34bd5353"),
-                            sequence: 4294967295,
-                            witness: vec![
-                                hex_decode("3045022100d12b852d85dcd961d2f5f4ab660654df6eedcc794c0c33ce5cc309ffb5fce58d022067338a8e0e1725c197fb1a88af59f51e44e4255b20167c8684031c05d1f2592a01").unwrap(),
-                                hex_decode("0223b72beef0965d10be0778efecd61fcac6f79a4ea169393380734464f84f2ab3").unwrap(),
-                            ],
-                        }],
+                                    TxIn {
+                                        previous_output: OutPoint {
+                                            txid: sha256d::Hash::from_hex(
+                                                "b490486aec3ae671012dddb2bb08466bef37720a533a894814ff1da743aaf886",
+                                            ).unwrap(),
+                                            vout: 1,
+                                        },
+                                        script_sig: hex_script!("160014fe3e9ef1a745e974d902c4355943abcb34bd5353"),
+                                        sequence: 4294967295,
+                                        witness: vec![
+                                            hex_decode("3045022100d12b852d85dcd961d2f5f4ab660654df6eedcc794c0c33ce5cc309ffb5fce58d022067338a8e0e1725c197fb1a88af59f51e44e4255b20167c8684031c05d1f2592a01").unwrap(),
+                                            hex_decode("0223b72beef0965d10be0778efecd61fcac6f79a4ea169393380734464f84f2ab3").unwrap(),
+                                        ],
+                                    }],
                         output: vec![
                             TxOut {
                                 value: 200000000,
@@ -429,7 +427,7 @@ mod tests {
                         ],
                     }),
                     ..Default::default()
-                },],
+                }, ],
                 outputs: vec![
                     Output {
                         ..Default::default()

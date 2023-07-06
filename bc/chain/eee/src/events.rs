@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with substrate-subxt.  If not, see <http://www.gnu.org/licenses/>.
 
-use super::*;
 use std::{
     collections::{HashMap, HashSet},
     convert::TryFrom,
@@ -22,12 +21,14 @@ use std::{
 };
 
 use codec::{Codec, Compact, Decode, Encode, Error as CodecError, Input, Output};
+use sp_core::ByteArray;
 use sp_runtime::DispatchError;
-use support::weights::DispatchInfo;
-
+use support::dispatch::DispatchInfo;
 use system::Phase;
 
 use crate::node_metadata::{EventArg, Metadata, MetadataError};
+
+use super::*;
 
 /// Event for the System module.
 #[derive(Clone, Debug, Decode)]
@@ -106,7 +107,7 @@ impl TryFrom<Metadata> for EventsDecoder {
         decoder.register_type_size::<u32>("MemberCount")?;
         decoder.register_type_size::<u128>("TokenXQuantity")?;
         decoder.register_type_size::<u32>("OriginalNonce")?;
-        decoder.register_type_size::<crate::AccountId>("AccountId")?;
+        decoder.register_type_size_by_account_id("AccountId")?;
         decoder.register_type_size::<crate::BlockNumber>("BlockNumber")?;
         decoder.register_type_size::<crate::Moment>("Moment")?;
         decoder.register_type_size::<crate::Hash>("Hash")?;
@@ -120,8 +121,8 @@ impl TryFrom<Metadata> for EventsDecoder {
 
 impl EventsDecoder {
     pub fn register_type_size<U>(&mut self, name: &str) -> Result<usize, EventsError>
-    where
-        U: Default + Codec + Send + 'static,
+        where
+            U: Default + Codec + Send + 'static,
     {
         let size = U::default().encode().len();
         if size > 0 {
@@ -131,6 +132,18 @@ impl EventsDecoder {
             Err(EventsError::TypeSizeUnavailable(name.to_owned()))
         }
     }
+
+    pub fn register_type_size_by_account_id(&mut self, name: &str) -> Result<usize, EventsError>
+    {
+        let size = AccountId::LEN;
+        if size > 0 {
+            self.type_sizes.insert(name.to_string(), size);
+            Ok(size)
+        } else {
+            Err(EventsError::TypeSizeUnavailable(name.to_owned()))
+        }
+    }
+
 
     pub fn check_missing_type_sizes(&self) {
         let mut missing = HashSet::new();
@@ -223,21 +236,21 @@ impl EventsDecoder {
                 let event_metadata = module.event(event_variant)?;
                 log::debug!("decoding event '{}::{}'", module.name(),event_metadata.name);
                 let mut event_data = Vec::<u8>::new();
-               if let Err(e) = self.decode_raw_bytes(&event_metadata.arguments(), input, &mut event_data){
-                   match e {
-                       EventsError::TypeSizeUnavailable(name)=>{
-                           // result 0 correct, 1  error
-                           if 1==input.read_byte()?{
-                               let mut err_detail = [0u8;2];
-                               let _ = Input::read(input,&mut err_detail[..]);
-                           }
-                           log::debug!("received event has type {} current not support decode", name);
-                       }
-                       _ =>{
-                           return Err(e);
-                       }
-                   }
-               }
+                if let Err(e) = self.decode_raw_bytes(&event_metadata.arguments(), input, &mut event_data) {
+                    match e {
+                        EventsError::TypeSizeUnavailable(name) => {
+                            // result 0 correct, 1  error
+                            if 1 == input.read_byte()? {
+                                let mut err_detail = [0u8; 2];
+                                let _ = Input::read(input, &mut err_detail[..]);
+                            }
+                            log::debug!("received event has type {} current not support decode", name);
+                        }
+                        _ => {
+                            return Err(e);
+                        }
+                    }
+                }
 
                 log::debug!(
                     "received event '{}::{}', raw bytes: {}",

@@ -18,49 +18,49 @@
 //!
 //! Implements in-memory Read and Write for tests
 
-use error::Error;
-use logfile::LogFile;
-use api::{Hammersbald, HammersbaldAPI};
-use tablefile::TableFile;
-use datafile::DataFile;
-use pref::PRef;
-use page::{Page,PAGE_SIZE};
-use pagedfile::PagedFile;
-use asyncfile::AsyncFile;
-use cachedfile::CachedFile;
-
+use std::cmp::min;
+use std::io;
 use std::io::Read;
-use std::io::Write;
 use std::io::Seek;
 use std::io::SeekFrom;
-use std::io;
-use std::cmp::min;
+use std::io::Write;
 use std::sync::Mutex;
+
+use api::{Hammersbald, HammersbaldAPI};
+use asyncfile::AsyncFile;
+use cachedfile::CachedFile;
+use datafile::DataFile;
+use error::Error;
+use logfile::LogFile;
+use page::{Page, PAGE_SIZE};
+use pagedfile::PagedFile;
+use pref::PRef;
+use tablefile::TableFile;
 
 /// in memory representation of a file
 pub struct Transient {
-    inner: Mutex<Inner>
+    inner: Mutex<Inner>,
 }
 
 struct Inner {
     data: Vec<u8>,
     pos: usize,
-    append: bool
+    append: bool,
 }
 
 impl Transient {
     /// create a new file
-    fn new (append: bool) -> Transient {
-        Transient {inner: Mutex::new(Inner{data: Vec::new(), pos: 0, append})}
+    fn new(append: bool) -> Transient {
+        Transient { inner: Mutex::new(Inner { data: Vec::new(), pos: 0, append }) }
     }
 
-    pub fn new_db (_name: &str, cached_data_pages: usize, bucket_fill_target: usize) -> Result<Box<dyn HammersbaldAPI>, Error> {
+    pub fn new_db(_name: &str, cached_data_pages: usize, bucket_fill_target: usize) -> Result<Box<dyn HammersbaldAPI>, Error> {
         let log = LogFile::new(
             Box::new(AsyncFile::new(
-            Box::new(Transient::new(true)))?));
+                Box::new(Transient::new(true)))?));
         let table = TableFile::new(
             Box::new(CachedFile::new(
-            Box::new(Transient::new(false)), cached_data_pages)?))?;
+                Box::new(Transient::new(false)), cached_data_pages)?))?;
         let data = DataFile::new(
             Box::new(CachedFile::new(
                 Box::new(AsyncFile::new(Box::new(Transient::new(true)))?),
@@ -102,8 +102,7 @@ impl PagedFile for Transient {
 
     fn sync(&self) -> Result<(), Error> { Ok(()) }
 
-    fn shutdown (&mut self) {
-    }
+    fn shutdown(&mut self) {}
 
     fn append_page(&mut self, page: Page) -> Result<(), Error> {
         let mut inner = self.inner.lock().unwrap();
@@ -118,16 +117,16 @@ impl PagedFile for Transient {
         Ok(inner.data.len() as u64)
     }
 
-    fn flush(&mut self) -> Result<(), Error> {Ok(())}
+    fn flush(&mut self) -> Result<(), Error> { Ok(()) }
 }
 
 impl Read for Inner {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, io::Error> {
         let buflen = buf.len();
-        if self.pos + buflen > self.data.len () {
+        if self.pos + buflen > self.data.len() {
             return Err(io::Error::from(io::ErrorKind::NotFound));
         }
-        buf.copy_from_slice(&self.data.as_slice()[self.pos .. self.pos + buflen]);
+        buf.copy_from_slice(&self.data.as_slice()[self.pos..self.pos + buflen]);
         self.pos += buflen;
         Ok(buflen)
     }
@@ -138,8 +137,7 @@ impl Write for Inner {
         let buflen = buf.len();
         if self.append {
             self.data.extend_from_slice(buf);
-        }
-        else {
+        } else {
             let len = self.data.len();
             let pos = self.pos;
             let have = min(buflen, len - pos);
@@ -162,21 +160,21 @@ impl Seek for Inner {
         match pos {
             SeekFrom::Start(o) => {
                 if o > self.data.len() as u64 {
-                    return Err(io::Error::from(io::ErrorKind::UnexpectedEof))
+                    return Err(io::Error::from(io::ErrorKind::UnexpectedEof));
                 }
                 self.pos = o as usize;
             }
             SeekFrom::Current(o) => {
                 let newpos = o + self.pos as i64;
-                if newpos < 0 || newpos > self.data.len () as i64 {
-                    return Err(io::Error::from(io::ErrorKind::UnexpectedEof))
+                if newpos < 0 || newpos > self.data.len() as i64 {
+                    return Err(io::Error::from(io::ErrorKind::UnexpectedEof));
                 }
                 self.pos = newpos as usize;
             }
             SeekFrom::End(o) => {
                 let newpos = o + self.data.len() as i64;
-                if newpos < 0 || newpos > self.data.len () as i64 {
-                    return Err(io::Error::from(io::ErrorKind::UnexpectedEof))
+                if newpos < 0 || newpos > self.data.len() as i64 {
+                    return Err(io::Error::from(io::ErrorKind::UnexpectedEof));
                 }
                 self.pos = newpos as usize;
             }

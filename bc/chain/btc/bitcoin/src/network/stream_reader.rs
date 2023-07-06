@@ -23,7 +23,7 @@
 use std::fmt;
 use std::io::{self, Read};
 
-use consensus::{encode, Decodable};
+use consensus::{Decodable, encode};
 
 /// Struct used to configure stream reader function
 pub struct StreamReader<R: Read> {
@@ -32,7 +32,7 @@ pub struct StreamReader<R: Read> {
     /// I/O buffer
     data: Vec<u8>,
     /// Buffer containing unparsed message part
-    unparsed: Vec<u8>
+    unparsed: Vec<u8>,
 }
 
 impl<R: Read> fmt::Debug for StreamReader<R> {
@@ -49,7 +49,7 @@ impl<R: Read> StreamReader<R> {
         StreamReader {
             stream,
             data: vec![0u8; buffer_size.unwrap_or(64 * 1024)],
-            unparsed: vec![]
+            unparsed: vec![],
         }
     }
 
@@ -59,21 +59,20 @@ impl<R: Read> StreamReader<R> {
         loop {
             match encode::deserialize_partial::<D>(&self.unparsed) {
                 // In this case we just have an incomplete data, so we need to read more
-                Err(encode::Error::Io(ref err)) if err.kind () == io::ErrorKind::UnexpectedEof => {
+                Err(encode::Error::Io(ref err)) if err.kind() == io::ErrorKind::UnexpectedEof => {
                     let count = self.stream.read(&mut self.data)?;
                     if count > 0 {
                         self.unparsed.extend(self.data[0..count].iter());
-                    }
-                    else {
+                    } else {
                         return Err(encode::Error::Io(io::Error::from(io::ErrorKind::UnexpectedEof)));
                     }
-                },
+                }
                 Err(err) => return Err(err),
                 // We have successfully read from the buffer
                 Ok((message, index)) => {
                     self.unparsed.drain(..index);
-                    return Ok(message)
-                },
+                    return Ok(message);
+                }
             }
         }
     }
@@ -81,14 +80,15 @@ impl<R: Read> StreamReader<R> {
 
 #[cfg(test)]
 mod test {
-    use std::thread;
-    use std::time::Duration;
     use std::io::{self, BufReader, Write};
-    use std::net::{TcpListener, TcpStream, Shutdown};
+    use std::net::{Shutdown, TcpListener, TcpStream};
+    use std::thread;
     use std::thread::JoinHandle;
+    use std::time::Duration;
+
+    use network::message::{NetworkMessage, RawNetworkMessage};
 
     use super::StreamReader;
-    use network::message::{NetworkMessage, RawNetworkMessage};
 
     // First, let's define some byte arrays for sample messages - dumps are taken from live
     // Bitcoin Core node v0.17.1 with Wireshark
@@ -260,7 +260,7 @@ mod test {
         let istream = TcpStream::connect(format!("127.0.0.1:{}", port)).unwrap();
         let reader = BufReader::new(istream);
 
-        return (handle, reader)
+        return (handle, reader);
     }
 
     #[test]
@@ -268,7 +268,7 @@ mod test {
         // Setting up TCP connection emulation
         let (handle, istream) = serve_tcp(vec![
             // single message split in two parts to emulate real network conditions
-            MSG_VERSION[..24].to_vec(), MSG_VERSION[24..].to_vec()
+            MSG_VERSION[..24].to_vec(), MSG_VERSION[24..].to_vec(),
         ]);
         let stream = istream;
         let mut reader = StreamReader::new(stream, None);
@@ -288,7 +288,7 @@ mod test {
             // Real-world Bitcoin core communication case for /Satoshi:0.17.1/
             MSG_VERSION[..23].to_vec(), MSG_VERSION[23..].to_vec(),
             MSG_VERACK.to_vec(),
-            MSG_ALERT[..24].to_vec(), MSG_ALERT[24..].to_vec()
+            MSG_ALERT[..24].to_vec(), MSG_ALERT[24..].to_vec(),
         ]);
         let stream = istream;
         let mut reader = StreamReader::new(stream, None);

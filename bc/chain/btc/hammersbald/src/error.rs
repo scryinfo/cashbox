@@ -1,3 +1,8 @@
+use std::convert;
+use std::fmt;
+use std::io;
+use std::sync;
+
 //
 // Copyright 2018-2019 Tamas Blummer
 //
@@ -17,13 +22,8 @@
 //! # Error type
 //!
 //!
-#[cfg(feature="bitcoin_support")]
+#[cfg(feature = "bitcoin_support")]
 use bitcoin::consensus::encode;
-
-use std::convert;
-use std::fmt;
-use std::io;
-use std::sync;
 
 /// Errors returned by this library
 pub enum Error {
@@ -36,12 +36,12 @@ pub enum Error {
     /// wrapped IO error
     IO(io::Error),
     /// Wrapped bitcoin util error
-    #[cfg(feature="bitcoin_support")]
+    #[cfg(feature = "bitcoin_support")]
     BitcoinSerialize(encode::Error),
     /// Lock poisoned
     Poisoned(String),
     /// Queue error
-    Queue(String)
+    Queue(String),
 }
 
 impl std::error::Error for Error {
@@ -53,9 +53,9 @@ impl std::error::Error for Error {
         match *self {
             Error::InvalidOffset => None,
             Error::KeyTooLong => None,
-            Error::Corrupted (_) => None,
+            Error::Corrupted(_) => None,
             Error::IO(ref e) => Some(e),
-            #[cfg(feature="bitcoin_support")]
+            #[cfg(feature = "bitcoin_support")]
             Error::BitcoinSerialize(ref e) => Some(e),
             Error::Poisoned(_) => None,
             Error::Queue(_) => None

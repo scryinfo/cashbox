@@ -18,20 +18,22 @@
 //!
 //!
 
+use std::path::Path;
+use std::sync::{Arc, RwLock};
+
+use bitcoin_hashes::sha256d;
+use hammersbald::{BitcoinAdaptor, HammersbaldAPI, persistent, transient};
+use log::{error, info};
+use serde_derive::{Deserialize, Serialize};
+
 use bitcoin::{
+    BitcoinHash,
     blockdata::{block::BlockHeader, constants::genesis_block},
     network::constants::Network,
-    BitcoinHash,
 };
 
 use crate::error::Error;
 use crate::headercache::{CachedHeader, HeaderCache};
-use bitcoin_hashes::sha256d;
-use hammersbald::{persistent, transient, BitcoinAdaptor, HammersbaldAPI};
-use log::{error, info};
-use serde_derive::{Deserialize, Serialize};
-use std::path::Path;
-use std::sync::{Arc, RwLock};
 
 /// Shared handle to a database storing the block chain
 /// protected by an RwLock
@@ -141,7 +143,7 @@ impl ChainDB {
     }
 
     /// iterate trunk [from .. tip]
-    pub fn iter_trunk<'a>(&'a self, from: u32) -> impl Iterator<Item = &'a CachedHeader> + 'a {
+    pub fn iter_trunk<'a>(&'a self, from: u32) -> impl Iterator<Item=&'a CachedHeader> + 'a {
         self.headercache.iter_trunk(from)
     }
 
@@ -149,7 +151,7 @@ impl ChainDB {
     pub fn iter_trunk_rev<'a>(
         &'a self,
         from: Option<u32>,
-    ) -> impl Iterator<Item = &'a CachedHeader> + 'a {
+    ) -> impl Iterator<Item=&'a CachedHeader> + 'a {
         self.headercache.iter_trunk_rev(from)
     }
 

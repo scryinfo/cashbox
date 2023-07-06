@@ -34,7 +34,7 @@ impl TableMeta {
     fn set_sub(&mut self, type_name: &str) -> String {
         let v = TableMeta::type_name_to_key(type_name);
         self.subs.insert(type_name.to_owned(), v.clone());
-         v
+        v
     }
 }
 
@@ -96,7 +96,7 @@ impl DbMeta {
                         //检查是否是最后一个
                         let mut ex_value = value.clone();
                         ex_value.push(',');
-                        if  sql.find(ex_value.as_str()).is_some() {
+                        if sql.find(ex_value.as_str()).is_some() {
                             let index = cols.rfind("\n  ").expect("cols.rfind('\n')");
                             let mut temp = cols.clone();
                             temp.insert(index, ',');

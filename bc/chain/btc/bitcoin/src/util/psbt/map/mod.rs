@@ -16,6 +16,10 @@ use consensus::encode;
 use util::psbt;
 use util::psbt::raw;
 
+pub use self::global::Global;
+pub use self::input::Input;
+pub use self::output::Output;
+
 /// A trait that describes a PSBT key-value map.
 pub trait Map {
     /// Attempt to insert a key-value pair.
@@ -33,6 +37,3 @@ mod global;
 mod input;
 mod output;
 
-pub use self::global::Global;
-pub use self::input::Input;
-pub use self::output::Output;

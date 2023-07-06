@@ -1,18 +1,17 @@
 use std::ptr::null_mut;
-use mav::kits;
-use wallets_types::{InitParameters, Error, EthRawTxPayload, EthTransferPayload, EthChainTokenDefault, EthChainTokenAuth, EthChainTokenNonAuth, EthWalletConnectTx};
 
-use wallets_cdl::{CU64, chain_eth_c, to_c_char, CR, CStruct, CArray,
-                  parameters::{CContext, CInitParameters, CEthTransferPayload, CEthRawTxPayload},
-                  mem_c::{CContext_dAlloc, CError_free},
+use mav::kits;
+use mav::ma::EthTokenType;
+use wallets_cdl::{CArray, chain_eth_c, CR, CStruct, CU64, mem_c::{CContext_dAlloc, CError_free},
+                  parameters::{CContext, CEthRawTxPayload, CEthTransferPayload, CInitParameters},
+                  to_c_char,
                   types::CError,
                   wallets_c::Wallets_init,
 };
-
-use mav::ma::{EthTokenType};
-use wallets_cdl::mem_c::{CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenDefault_dFree, CArrayCEthChainTokenNonAuth_dAlloc, CArrayCEthChainTokenNonAuth_dFree, CArrayCWallet_dAlloc, CArrayCEthChainTokenAuth_dFree};
-use wallets_cdl::wallets_c::Wallets_all;
+use wallets_cdl::mem_c::{CArrayCEthChainTokenAuth_dAlloc, CArrayCEthChainTokenAuth_dFree, CArrayCEthChainTokenDefault_dAlloc, CArrayCEthChainTokenDefault_dFree, CArrayCEthChainTokenNonAuth_dAlloc, CArrayCEthChainTokenNonAuth_dFree, CArrayCWallet_dAlloc};
 use wallets_cdl::parameters::CEthWalletConnectTx;
+use wallets_cdl::wallets_c::Wallets_all;
+use wallets_types::{Error, EthChainTokenAuth, EthChainTokenDefault, EthChainTokenNonAuth, EthRawTxPayload, EthTransferPayload, EthWalletConnectTx, InitParameters};
 
 mod data;
 
@@ -25,10 +24,10 @@ fn eth_tx_sign_test() {
         let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-     //   let wallet =   data::create_wallet(c_ctx);
+        //   let wallet =   data::create_wallet(c_ctx);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
         let transfer_tx = EthTransferPayload {
-          //  from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
+            //  from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
             from_address: "0x73c7bcd3bb594d2d4d9b63b818305109ab79df1d".to_string(),
             to_address: "0xc0c4824527ffb27a51034cea1e37840ed69a5f1e".to_string(),
             contract_address: "".to_string(),
@@ -40,7 +39,7 @@ fn eth_tx_sign_test() {
             ext_data: "".to_string(),
         };
         let mut c_transfer_tx = CEthTransferPayload::to_c_ptr(&transfer_tx);
-        let c_err = chain_eth_c::ChainEth_txSign(*c_ctx,  c_transfer_tx, to_c_char("123456"), sign_result) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_txSign(*c_ctx, c_transfer_tx, to_c_char("123456"), sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_transfer_tx.free();
@@ -57,15 +56,15 @@ fn eth_raw_tx_sign_test() {
         let c_err = data::init_wallets_context(c_ctx);
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
-        let wallet =   data::create_wallet(c_ctx);
+        let wallet = data::create_wallet(c_ctx);
         let sign_result = wallets_cdl::mem_c::CStr_dAlloc();
 
         let raw_tx_payload = EthRawTxPayload {
-            from_address:  wallet.eth_chain.chain_shared.wallet_address.address.clone(),
+            from_address: wallet.eth_chain.chain_shared.wallet_address.address.clone(),
             raw_tx: "0xf86d068504a817c800837a1200941c9baedc94600b2d1c8a6d2bad1744e6182f300e880de0b6b3a76400008046a07e2c71664464b95fab4b1706785c244d86cef96b5e5c186a314c63306cfe9c54a0637c605b6004bb244cbea9bc69e18b7bd18b491c3794e17e31a0c932592bb476".to_string(),
         };
         let mut c_raw_tx_payload = CEthRawTxPayload::to_c_ptr(&raw_tx_payload);
-        let c_err = chain_eth_c::ChainEth_rawTxSign(*c_ctx,  c_raw_tx_payload, to_c_char("123456"), sign_result) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_rawTxSign(*c_ctx, c_raw_tx_payload, to_c_char("123456"), sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_raw_tx_payload.free();
@@ -73,6 +72,7 @@ fn eth_raw_tx_sign_test() {
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }
+
 #[test]
 fn eth_wallet_connect_tx_sign_test() {
     let c_ctx = CContext_dAlloc();
@@ -91,12 +91,12 @@ fn eth_wallet_connect_tx_sign_test() {
             nonce: "0x0a".to_string(),
             max_priority_fee_per_gas: "15000000000".to_string(),
             gas_price: "40000000000".to_string(),
-            gas:"40000".to_string(),
-            data:"0x".to_string(),
-            type_tx_id: 2
+            gas: "40000".to_string(),
+            data: "0x".to_string(),
+            type_tx_id: 2,
         };
         let mut c_transfer_tx = CEthWalletConnectTx::to_c_ptr(&transfer_tx);
-        let c_err = chain_eth_c::ChainEth_walletConnectTxSign(*c_ctx,  c_transfer_tx, to_c_char("123456"), sign_result) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_walletConnectTxSign(*c_ctx, c_transfer_tx, to_c_char("123456"), sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_transfer_tx.free();
@@ -176,7 +176,7 @@ fn eth_update_default_token_list_test() {
         CError_free(c_err);
         let _wallet_test = data::create_wallet(c_ctx);
         let c_array_wallet = CArrayCWallet_dAlloc();
-        let c_err = Wallets_all(*c_ctx,c_array_wallet) as *mut CError;
+        let c_err = Wallets_all(*c_ctx, c_array_wallet) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         c_tokens.free();
@@ -221,6 +221,7 @@ fn eth_update_auth_token_list_test() {
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }
+
 #[test]
 fn get_eth_auth_token_list_test() {
     let c_ctx = CContext_dAlloc();
@@ -230,7 +231,7 @@ fn get_eth_auth_token_list_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let token_auth = CArrayCEthChainTokenAuth_dAlloc();
-        let c_err =  chain_eth_c::ChainEth_getAuthTokenList(*c_ctx,0,10,token_auth) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_getAuthTokenList(*c_ctx, 0, 10, token_auth) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let _eth_token_auth_vec: Vec<EthChainTokenAuth> = CArray::to_rust(&**token_auth);
@@ -238,6 +239,7 @@ fn get_eth_auth_token_list_test() {
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
 }
+
 #[test]
 fn query_eth_auth_token_list_test() {
     let c_ctx = CContext_dAlloc();
@@ -247,7 +249,7 @@ fn query_eth_auth_token_list_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let token_auth = CArrayCEthChainTokenAuth_dAlloc();
-        let c_err =  chain_eth_c::ChainEth_queryAuthTokenList(*c_ctx,to_c_char("HT"),to_c_char(""),0,10,token_auth) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_queryAuthTokenList(*c_ctx, to_c_char("HT"), to_c_char(""), 0, 10, token_auth) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let _eth_token_auth_vec: Vec<EthChainTokenAuth> = CArray::to_rust(&**token_auth);
@@ -265,7 +267,7 @@ fn query_eth_default_token_list_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let token_default = CArrayCEthChainTokenDefault_dAlloc();
-        let c_err =  chain_eth_c::ChainEth_getDefaultTokenList(*c_ctx,token_default) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_getDefaultTokenList(*c_ctx, token_default) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let _eth_token_default_vec: Vec<EthChainTokenDefault> = CArray::to_rust(&**token_default);
@@ -321,7 +323,7 @@ fn query_eth_non_auth_token_list_test() {
         assert_ne!(null_mut(), c_err);
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         let token_default = CArrayCEthChainTokenNonAuth_dAlloc();
-        let c_err =  chain_eth_c::ChainEth_getNonAuthTokenList(*c_ctx,token_default) as *mut CError;
+        let c_err = chain_eth_c::ChainEth_getNonAuthTokenList(*c_ctx, token_default) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let _eth_token_non_auth_vec: Vec<EthChainTokenNonAuth> = CArray::to_rust(&**token_default);

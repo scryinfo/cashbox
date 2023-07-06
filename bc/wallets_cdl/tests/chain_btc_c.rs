@@ -1,13 +1,14 @@
-use mav::ma::BtcTokenType;
-use mav::{kits, CFalse, NetType, WalletType};
 use std::ptr::null_mut;
-use wallets_cdl::chain_btc_c::{ChainBtc_start, ChainBtc_loadNowBlockNumber, ChainBtc_loadBalance};
-use wallets_cdl::mem_c::{CWallet_dFree, CBtcNowLoadBlock_dAlloc, CBtcBalance_dAlloc};
-use wallets_cdl::parameters::{CCreateWalletParameters, CBtcNowLoadBlock, CBtcBalance};
-use wallets_cdl::wallets_c::{Wallets_createWallet, Wallets_changeNetType};
-use wallets_cdl::{chain_btc_c, mem_c::{CContext_dAlloc, CError_free, CWallet_dAlloc}, parameters::{CContext, CInitParameters}, types::CError, wallets_c::Wallets_init, CArray, CStruct, CR, CU64, to_c_char};
-use wallets_types::{BtcChainTokenDefault, CreateWalletParameters, Error, InitParameters, BtcNowLoadBlock, BtcBalance};
+
+use mav::{CFalse, kits, NetType, WalletType};
+use mav::ma::BtcTokenType;
+use wallets_cdl::{CArray, chain_btc_c, CR, CStruct, CU64, mem_c::{CContext_dAlloc, CError_free, CWallet_dAlloc}, parameters::{CContext, CInitParameters}, to_c_char, types::CError, wallets_c::Wallets_init};
+use wallets_cdl::chain_btc_c::{ChainBtc_loadBalance, ChainBtc_loadNowBlockNumber, ChainBtc_start};
+use wallets_cdl::mem_c::{CBtcBalance_dAlloc, CBtcNowLoadBlock_dAlloc, CWallet_dFree};
+use wallets_cdl::parameters::{CBtcBalance, CBtcNowLoadBlock, CCreateWalletParameters};
 use wallets_cdl::types::CWallet;
+use wallets_cdl::wallets_c::{Wallets_changeNetType, Wallets_createWallet};
+use wallets_types::{BtcBalance, BtcChainTokenDefault, BtcNowLoadBlock, CreateWalletParameters, Error, InitParameters};
 
 #[test]
 fn btc_update_default_token_list_test() {
@@ -76,7 +77,7 @@ fn btc_start_test() {
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
 
-        let c_err =  Wallets_changeNetType(*c_ctx,to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
+        let c_err = Wallets_changeNetType(*c_ctx, to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         // create wallet (now we get mnemonic and address)
@@ -106,7 +107,7 @@ fn btc_start_test() {
 }
 
 #[test]
-fn btc_load_now_blocknumber_test(){
+fn btc_load_now_blocknumber_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
     unsafe {
@@ -122,7 +123,7 @@ fn btc_load_now_blocknumber_test(){
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
 
-        let c_err =  Wallets_changeNetType(*c_ctx,to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
+        let c_err = Wallets_changeNetType(*c_ctx, to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
 
@@ -130,7 +131,7 @@ fn btc_load_now_blocknumber_test(){
         let c_err = ChainBtc_loadNowBlockNumber(*c_ctx, c_block) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
-        let _block :BtcNowLoadBlock = CBtcNowLoadBlock::to_rust(&**c_block);
+        let _block: BtcNowLoadBlock = CBtcNowLoadBlock::to_rust(&**c_block);
         wallets_cdl::mem_c::CBtcNowLoadBlock_dFree(c_block);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
@@ -153,7 +154,7 @@ fn btc_load_balance_test() {
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
 
-        let c_err =  Wallets_changeNetType(*c_ctx,to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
+        let c_err = Wallets_changeNetType(*c_ctx, to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
 
@@ -161,7 +162,7 @@ fn btc_load_balance_test() {
         let c_err = ChainBtc_loadBalance(*c_ctx, c_balance) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
-        let _balance :BtcBalance = CBtcBalance::to_rust(&**c_balance);
+        let _balance: BtcBalance = CBtcBalance::to_rust(&**c_balance);
         wallets_cdl::mem_c::CBtcBalance_dFree(c_balance);
         wallets_cdl::mem_c::CContext_dFree(c_ctx);
     }
@@ -171,7 +172,7 @@ fn btc_load_balance_test() {
 fn btc_tx_sign_test() {
     let c_ctx = CContext_dAlloc();
     assert_ne!(null_mut(), c_ctx);
-    unsafe{
+    unsafe {
         let c_init_parameters = {
             let mut p = InitParameters::default();
             p.is_memory_db = CFalse;
@@ -184,7 +185,7 @@ fn btc_tx_sign_test() {
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
 
-        let c_err =  Wallets_changeNetType(*c_ctx,to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
+        let c_err = Wallets_changeNetType(*c_ctx, to_c_char(NetType::Test.to_string().as_str())) as *mut CError;
         assert_eq!(0 as CU64, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         let c_wallet = CWallet_dAlloc();
@@ -216,7 +217,7 @@ fn btc_tx_sign_test() {
             broadcast: CFalse,
         };
         let mut c_param = wallets_cdl::parameters::CBtcTxParam::to_c_ptr(&btc_param);
-        let c_err = chain_btc_c::ChainBtc_txSign(*c_ctx,c_param,sign_result) as *mut CError;
+        let c_err = chain_btc_c::ChainBtc_txSign(*c_ctx, c_param, sign_result) as *mut CError;
         assert_eq!(Error::SUCCESS().code, (*c_err).code, "{:?}", *c_err);
         CError_free(c_err);
         wallets_cdl::mem_c::CStr_dFree(sign_result);

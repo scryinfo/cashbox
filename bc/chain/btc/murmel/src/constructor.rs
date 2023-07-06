@@ -19,12 +19,38 @@
 //! Assembles modules of this library to a complete service
 //!
 
+use std::{
+    collections::HashSet,
+    net::SocketAddr,
+    path::Path,
+    sync::{Arc, atomic::AtomicUsize, mpsc, Mutex, RwLock},
+};
+use std::pin::Pin;
+use std::time::Duration;
+
+use futures::{
+    executor::{ThreadPool, ThreadPoolBuilder},
+    future,
+    Future,
+    FutureExt, Poll as Async, StreamExt, task::{Context, SpawnExt},
+};
+use futures::executor::block_on;
+use futures_timer::Interval;
+use parking_lot::Condvar;
+use rand::{RngCore, thread_rng};
+
+use bitcoin::network::constants::Network;
+use bitcoin::network::message::NetworkMessage;
+use bitcoin::network::message::RawNetworkMessage;
+use bitcoin::Transaction;
+use mav::ma::MAddress;
+
 use crate::bloomfilter::BloomFilter;
 use crate::broadcast::Broadcast;
+use crate::broadcast_queue::NamedQueue;
 use crate::chaindb::{ChainDB, SharedChainDB};
-use crate::broadcast_queue::{NamedQueue};
 use crate::db;
-use crate::db::{GlobalRB, Verify, GLOBAL_RB};
+use crate::db::{GLOBAL_RB, GlobalRB, Verify};
 use crate::dispatcher::Dispatcher;
 use crate::dns::dns_seed;
 use crate::downstream::DownStreamDummy;
@@ -34,34 +60,11 @@ use crate::getdata::GetData;
 use crate::headerdownload::HeaderDownload;
 #[cfg(feature = "lightning")]
 use crate::lightning::LightningConnector;
+use crate::p2p::{P2P, P2PControl, PeerMessageSender, PeerSource};
 use crate::p2p::BitcoinP2PConfig;
-use crate::p2p::{P2PControl, PeerMessageSender, PeerSource, P2P};
 use crate::path::PATH;
 use crate::ping::Ping;
 use crate::timeout::Timeout;
-use bitcoin::network::constants::Network;
-use bitcoin::network::message::NetworkMessage;
-use bitcoin::network::message::RawNetworkMessage;
-use bitcoin::Transaction;
-use futures::executor::block_on;
-use futures::{
-    executor::{ThreadPool, ThreadPoolBuilder},
-    future,
-    task::{Context, SpawnExt},
-    Future, FutureExt, Poll as Async, StreamExt,
-};
-use futures_timer::Interval;
-use mav::ma::MAddress;
-use parking_lot::Condvar;
-use rand::{thread_rng, RngCore};
-use std::pin::Pin;
-use std::time::Duration;
-use std::{
-    collections::HashSet,
-    net::SocketAddr,
-    path::Path,
-    sync::{atomic::AtomicUsize, mpsc, Arc, Mutex, RwLock},
-};
 
 const MAX_PROTOCOL_VERSION: u32 = 70001;
 
@@ -115,12 +118,12 @@ impl Constructor {
         );
 
         #[cfg(feature = "lightning")]
-        let lightning = Arc::new(Mutex::new(LightningConnector::new(
+            let lightning = Arc::new(Mutex::new(LightningConnector::new(
             network,
             p2p_control.clone(),
         )));
         #[cfg(not(feature = "lightning"))]
-        let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
+            let lightning = Arc::new(Mutex::new(DownStreamDummy {}));
 
         let timeout = Arc::new(Mutex::new(Timeout::new(p2p_control.clone())));
         let mut dispatcher = Dispatcher::new(from_p2p);

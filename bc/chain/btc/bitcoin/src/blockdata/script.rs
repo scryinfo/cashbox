@@ -24,18 +24,21 @@
 //! This module provides the structures and functions needed to support scripts.
 //!
 
-use std::default::Default;
 use std::{error, fmt, io};
+#[cfg(feature = "bitcoinconsensus")]
+use std::convert;
+use std::default::Default;
 
-#[cfg(feature = "serde")] use serde;
+#[cfg(feature = "bitcoinconsensus")]
+use bitcoinconsensus;
+use hashes::{Hash, hash160, sha256};
+#[cfg(feature = "serde")]
+use serde;
 
 use blockdata::opcodes;
-use consensus::{encode, Decodable, Encodable};
-use hashes::{hash160, sha256, Hash};
-#[cfg(feature="bitcoinconsensus")] use bitcoinconsensus;
-#[cfg(feature="bitcoinconsensus")] use std::convert;
-#[cfg(feature="bitcoinconsensus")] use OutPoint;
-
+use consensus::{Decodable, Encodable, encode};
+#[cfg(feature = "bitcoinconsensus")]
+use OutPoint;
 use util::key::PublicKey;
 
 #[derive(Clone, Default, PartialOrd, Ord, PartialEq, Eq, Hash)]
@@ -91,15 +94,15 @@ pub enum Error {
     EarlyEndOfScript,
     /// Tried to read an array off the stack as a number when it was more than 4 bytes
     NumericOverflow,
-    #[cfg(feature="bitcoinconsensus")]
+    #[cfg(feature = "bitcoinconsensus")]
     /// Error validating the script with bitcoinconsensus library
     BitcoinConsensus(bitcoinconsensus::Error),
-    #[cfg(feature="bitcoinconsensus")]
+    #[cfg(feature = "bitcoinconsensus")]
     /// Can not find the spent output
     UnknownSpentOutput(OutPoint),
-    #[cfg(feature="bitcoinconsensus")]
+    #[cfg(feature = "bitcoinconsensus")]
     /// Can not serialize the spending transaction
-    SerializationError
+    SerializationError,
 }
 
 impl fmt::Display for Error {
@@ -116,17 +119,17 @@ impl error::Error for Error {
             Error::NonMinimalPush => "non-minimal datapush",
             Error::EarlyEndOfScript => "unexpected end of script",
             Error::NumericOverflow => "numeric overflow (number on stack larger than 4 bytes)",
-            #[cfg(feature="bitcoinconsensus")]
+            #[cfg(feature = "bitcoinconsensus")]
             Error::BitcoinConsensus(ref _n) => "bitcoinconsensus verification failed",
-            #[cfg(feature="bitcoinconsensus")]
+            #[cfg(feature = "bitcoinconsensus")]
             Error::UnknownSpentOutput(ref _point) => "unknown spent output Transaction::verify()",
-            #[cfg(feature="bitcoinconsensus")]
+            #[cfg(feature = "bitcoinconsensus")]
             Error::SerializationError => "can not serialize the spending transaction in Transaction::verify()",
         }
     }
 }
 
-#[cfg(feature="bitcoinconsensus")]
+#[cfg(feature = "bitcoinconsensus")]
 #[doc(hidden)]
 impl convert::From<bitcoinconsensus::Error> for Error {
     fn from(err: bitcoinconsensus::Error) -> Error {
@@ -135,9 +138,10 @@ impl convert::From<bitcoinconsensus::Error> for Error {
         }
     }
 }
+
 /// Helper to encode an integer in script format
 fn build_scriptint(n: i64) -> Vec<u8> {
-    if n == 0 { return vec![] }
+    if n == 0 { return vec![]; }
 
     let neg = n < 0;
 
@@ -181,7 +185,7 @@ pub fn read_scriptint(v: &[u8]) -> Result<i64, Error> {
     if len > 4 { return Err(Error::NumericOverflow); }
 
     let (mut ret, sh) = v.iter()
-                         .fold((0, 0), |(acc, sh), n| (acc + ((*n as i64) << sh), sh + 8));
+        .fold((0, 0), |(acc, sh), n| (acc + ((*n as i64) << sh), sh + 8));
     if v[len - 1] & 0x80 != 0 {
         ret &= (1 << (sh - 1)) - 1;
         ret = -ret;
@@ -195,7 +199,7 @@ pub fn read_scriptint(v: &[u8]) -> Result<i64, Error> {
 pub fn read_scriptbool(v: &[u8]) -> bool {
     !(v.is_empty() ||
         ((v[v.len() - 1] == 0 || v[v.len() - 1] == 0x80) &&
-         v.iter().rev().skip(1).all(|&w| w == 0)))
+            v.iter().rev().skip(1).all(|&w| w == 0)))
 }
 
 /// Read a script-encoded unsigned integer
@@ -233,37 +237,37 @@ impl Script {
     /// Compute the P2SH output corresponding to this redeem script
     pub fn to_p2sh(&self) -> Script {
         Builder::new().push_opcode(opcodes::all::OP_HASH160)
-                      .push_slice(&hash160::Hash::hash(&self.0)[..])
-                      .push_opcode(opcodes::all::OP_EQUAL)
-                      .into_script()
+            .push_slice(&hash160::Hash::hash(&self.0)[..])
+            .push_opcode(opcodes::all::OP_EQUAL)
+            .into_script()
     }
 
     /// Compute the P2WSH output corresponding to this witnessScript (aka the "witness redeem
     /// script")
     pub fn to_v0_p2wsh(&self) -> Script {
         Builder::new().push_int(0)
-                      .push_slice(&sha256::Hash::hash(&self.0)[..])
-                      .into_script()
+            .push_slice(&sha256::Hash::hash(&self.0)[..])
+            .into_script()
     }
 
     /// Checks whether a script pubkey is a p2sh output
     #[inline]
     pub fn is_p2sh(&self) -> bool {
         self.0.len() == 23 &&
-        self.0[0] == opcodes::all::OP_HASH160.into_u8() &&
-        self.0[1] == opcodes::all::OP_PUSHBYTES_20.into_u8() &&
-        self.0[22] == opcodes::all::OP_EQUAL.into_u8()
+            self.0[0] == opcodes::all::OP_HASH160.into_u8() &&
+            self.0[1] == opcodes::all::OP_PUSHBYTES_20.into_u8() &&
+            self.0[22] == opcodes::all::OP_EQUAL.into_u8()
     }
 
     /// Checks whether a script pubkey is a p2pkh output
     #[inline]
     pub fn is_p2pkh(&self) -> bool {
         self.0.len() == 25 &&
-        self.0[0] == opcodes::all::OP_DUP.into_u8() &&
-        self.0[1] == opcodes::all::OP_HASH160.into_u8() &&
-        self.0[2] == opcodes::all::OP_PUSHBYTES_20.into_u8() &&
-        self.0[23] == opcodes::all::OP_EQUALVERIFY.into_u8() &&
-        self.0[24] == opcodes::all::OP_CHECKSIG.into_u8()
+            self.0[0] == opcodes::all::OP_DUP.into_u8() &&
+            self.0[1] == opcodes::all::OP_HASH160.into_u8() &&
+            self.0[2] == opcodes::all::OP_PUSHBYTES_20.into_u8() &&
+            self.0[23] == opcodes::all::OP_EQUALVERIFY.into_u8() &&
+            self.0[24] == opcodes::all::OP_CHECKSIG.into_u8()
     }
 
     /// Checks whether a script pubkey is a p2pk output
@@ -272,7 +276,7 @@ impl Script {
         (self.0.len() == 67 &&
             self.0[0] == opcodes::all::OP_PUSHBYTES_65.into_u8() &&
             self.0[66] == opcodes::all::OP_CHECKSIG.into_u8())
-     || (self.0.len() == 35 &&
+            || (self.0.len() == 35 &&
             self.0[0] == opcodes::all::OP_PUSHBYTES_33.into_u8() &&
             self.0[34] == opcodes::all::OP_CHECKSIG.into_u8())
     }
@@ -301,8 +305,8 @@ impl Script {
     #[inline]
     pub fn is_v0_p2wsh(&self) -> bool {
         self.0.len() == 34 &&
-        self.0[0] == opcodes::all::OP_PUSHBYTES_0.into_u8() &&
-        self.0[1] == opcodes::all::OP_PUSHBYTES_32.into_u8()
+            self.0[0] == opcodes::all::OP_PUSHBYTES_0.into_u8() &&
+            self.0[1] == opcodes::all::OP_PUSHBYTES_32.into_u8()
     }
 
     /// Checks whether a script pubkey is a p2wpkh output
@@ -314,14 +318,14 @@ impl Script {
     }
 
     /// Check if this is an OP_RETURN output
-    pub fn is_op_return (&self) -> bool {
+    pub fn is_op_return(&self) -> bool {
         !self.0.is_empty() && (opcodes::All::from(self.0[0]) == opcodes::all::OP_RETURN)
     }
 
     /// Whether a script can be proven to have no satisfying input
     pub fn is_provably_unspendable(&self) -> bool {
         !self.0.is_empty() && (opcodes::All::from(self.0[0]).classify() == opcodes::Class::ReturnOp ||
-                               opcodes::All::from(self.0[0]).classify() == opcodes::Class::IllegalOp)
+            opcodes::All::from(self.0[0]).classify() == opcodes::Class::IllegalOp)
     }
 
     /// Iterate over the script in the form of `Instruction`s, which are an enum covering
@@ -335,14 +339,14 @@ impl Script {
         }
     }
 
-    #[cfg(feature="bitcoinconsensus")]
+    #[cfg(feature = "bitcoinconsensus")]
     /// verify spend of an input script
     /// # Parameters
     ///  * index - the input index in spending which is spending this transaction
     ///  * amount - the amount this script guards
     ///  * spending - the transaction that attempts to spend the output holding this script
-    pub fn verify (&self, index: usize, amount: u64, spending: &[u8]) -> Result<(), Error> {
-        Ok(bitcoinconsensus::verify (&self.0[..], amount, spending, index)?)
+    pub fn verify(&self, index: usize, amount: u64, spending: &[u8]) -> Result<(), Error> {
+        Ok(bitcoinconsensus::verify(&self.0[..], amount, spending, index)?)
     }
 
     /// Write the assembly decoding of the script to the formatter.
@@ -362,8 +366,14 @@ impl Script {
                             break;
                         }
                         match read_uint(&self.0[index..], 1) {
-                            Ok(n) => { index += 1; n as usize }
-                            Err(_) => { f.write_str("<bad length>")?; break; }
+                            Ok(n) => {
+                                index += 1;
+                                n as usize
+                            }
+                            Err(_) => {
+                                f.write_str("<bad length>")?;
+                                break;
+                            }
                         }
                     }
                     opcodes::all::OP_PUSHDATA2 => {
@@ -372,8 +382,14 @@ impl Script {
                             break;
                         }
                         match read_uint(&self.0[index..], 2) {
-                            Ok(n) => { index += 2; n as usize }
-                            Err(_) => { f.write_str("<bad length>")?; break; }
+                            Ok(n) => {
+                                index += 2;
+                                n as usize
+                            }
+                            Err(_) => {
+                                f.write_str("<bad length>")?;
+                                break;
+                            }
                         }
                     }
                     opcodes::all::OP_PUSHDATA4 => {
@@ -382,8 +398,14 @@ impl Script {
                             break;
                         }
                         match read_uint(&self.0[index..], 4) {
-                            Ok(n) => { index += 4; n as usize }
-                            Err(_) => { f.write_str("<bad length>")?; break; }
+                            Ok(n) => {
+                                index += 4;
+                                n as usize
+                            }
+                            Err(_) => {
+                                f.write_str("<bad length>")?;
+                                break;
+                            }
                         }
                     }
                     _ => 0
@@ -402,7 +424,7 @@ impl Script {
                 f.write_str(" ")?;
                 if index + data_len <= self.0.len() {
                     for ch in &self.0[index..index + data_len] {
-                            write!(f, "{:02x}", ch)?;
+                        write!(f, "{:02x}", ch)?;
                     }
                     index += data_len;
                 } else {
@@ -437,7 +459,7 @@ pub enum Instruction<'a> {
     /// Some non-push opcode
     Op(opcodes::All),
     /// An opcode we were unable to parse
-    Error(Error)
+    Error(Error),
 }
 
 /// Iterator over a script returning parsed opcodes
@@ -467,7 +489,7 @@ impl<'a> Iterator for Instructions<'a> {
                         return Some(Instruction::Error(Error::NonMinimalPush));
                     }
                 }
-                let ret = Some(Instruction::PushBytes(&self.data[1..n+1]));
+                let ret = Some(Instruction::PushBytes(&self.data[1..n + 1]));
                 self.data = &self.data[n + 1..];
                 ret
             }
@@ -491,7 +513,7 @@ impl<'a> Iterator for Instructions<'a> {
                     self.data = &[];
                     return Some(Instruction::Error(Error::NonMinimalPush));
                 }
-                let ret = Some(Instruction::PushBytes(&self.data[2..n+2]));
+                let ret = Some(Instruction::PushBytes(&self.data[2..n + 2]));
                 self.data = &self.data[n + 2..];
                 ret
             }
@@ -594,16 +616,16 @@ impl Builder {
     pub fn push_slice(mut self, data: &[u8]) -> Builder {
         // Start with a PUSH opcode
         match data.len() as u64 {
-            n if n < opcodes::Ordinary::OP_PUSHDATA1 as u64 => { self.0.push(n as u8); },
+            n if n < opcodes::Ordinary::OP_PUSHDATA1 as u64 => { self.0.push(n as u8); }
             n if n < 0x100 => {
                 self.0.push(opcodes::Ordinary::OP_PUSHDATA1.into_u8());
                 self.0.push(n as u8);
-            },
+            }
             n if n < 0x10000 => {
                 self.0.push(opcodes::Ordinary::OP_PUSHDATA2.into_u8());
                 self.0.push((n % 0x100) as u8);
                 self.0.push((n / 0x100) as u8);
-            },
+            }
             n if n < 0x100000000 => {
                 self.0.push(opcodes::Ordinary::OP_PUSHDATA4.into_u8());
                 self.0.push((n % 0x100) as u8);
@@ -643,19 +665,19 @@ impl Builder {
             Some(opcodes::all::OP_EQUAL) => {
                 self.0.pop();
                 self.push_opcode(opcodes::all::OP_EQUALVERIFY)
-            },
+            }
             Some(opcodes::all::OP_NUMEQUAL) => {
                 self.0.pop();
                 self.push_opcode(opcodes::all::OP_NUMEQUALVERIFY)
-            },
+            }
             Some(opcodes::all::OP_CHECKSIG) => {
                 self.0.pop();
                 self.push_opcode(opcodes::all::OP_CHECKSIGVERIFY)
-            },
+            }
             Some(opcodes::all::OP_CHECKMULTISIG) => {
                 self.0.pop();
                 self.push_opcode(opcodes::all::OP_CHECKMULTISIGVERIFY)
-            },
+            }
             _ => self.push_opcode(opcodes::all::OP_VERIFY),
         }
     }
@@ -688,8 +710,8 @@ impl_index_newtype!(Builder, u8);
 #[cfg(feature = "serde")]
 impl<'de> serde::Deserialize<'de> for Script {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
+        where
+            D: serde::Deserializer<'de>,
     {
         use std::fmt::Formatter;
 
@@ -702,23 +724,23 @@ impl<'de> serde::Deserialize<'de> for Script {
             }
 
             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
+                where
+                    E: serde::de::Error,
             {
                 let v: Vec<u8> = ::hex::decode(v).map_err(E::custom)?;
                 Ok(Script::from(v))
             }
 
             fn visit_borrowed_str<E>(self, v: &'de str) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
+                where
+                    E: serde::de::Error,
             {
                 self.visit_str(v)
             }
 
             fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
+                where
+                    E: serde::de::Error,
             {
                 self.visit_str(&v)
             }
@@ -732,8 +754,8 @@ impl<'de> serde::Deserialize<'de> for Script {
 impl serde::Serialize for Script {
     /// User-facing serialization for `Script`.
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
+        where
+            S: serde::Serializer,
     {
         serializer.serialize_str(&format!("{:x}", self))
     }
@@ -760,15 +782,16 @@ impl Decodable for Script {
 #[cfg(test)]
 mod test {
     use std::str::FromStr;
+
+    use hashes::hex::ToHex;
     use hex::decode as hex_decode;
+
+    use blockdata::opcodes;
+    use consensus::encode::{deserialize, serialize};
+    use util::key::PublicKey;
 
     use super::*;
     use super::build_scriptint;
-
-    use consensus::encode::{deserialize, serialize};
-    use blockdata::opcodes;
-    use util::key::PublicKey;
-    use hashes::hex::ToHex;
 
     #[test]
     fn script() {
@@ -777,44 +800,72 @@ mod test {
         assert_eq!(&script[..], &comp[..]);
 
         // small ints
-        script = script.push_int(1);  comp.push(81u8); assert_eq!(&script[..], &comp[..]);
-        script = script.push_int(0);  comp.push(0u8);  assert_eq!(&script[..], &comp[..]);
-        script = script.push_int(4);  comp.push(84u8); assert_eq!(&script[..], &comp[..]);
-        script = script.push_int(-1); comp.push(79u8); assert_eq!(&script[..], &comp[..]);
+        script = script.push_int(1);
+        comp.push(81u8);
+        assert_eq!(&script[..], &comp[..]);
+        script = script.push_int(0);
+        comp.push(0u8);
+        assert_eq!(&script[..], &comp[..]);
+        script = script.push_int(4);
+        comp.push(84u8);
+        assert_eq!(&script[..], &comp[..]);
+        script = script.push_int(-1);
+        comp.push(79u8);
+        assert_eq!(&script[..], &comp[..]);
         // forced scriptint
-        script = script.push_scriptint(4); comp.extend([1u8, 4].iter().cloned()); assert_eq!(&script[..], &comp[..]);
+        script = script.push_scriptint(4);
+        comp.extend([1u8, 4].iter().cloned());
+        assert_eq!(&script[..], &comp[..]);
         // big ints
-        script = script.push_int(17); comp.extend([1u8, 17].iter().cloned()); assert_eq!(&script[..], &comp[..]);
-        script = script.push_int(10000); comp.extend([2u8, 16, 39].iter().cloned()); assert_eq!(&script[..], &comp[..]);
+        script = script.push_int(17);
+        comp.extend([1u8, 17].iter().cloned());
+        assert_eq!(&script[..], &comp[..]);
+        script = script.push_int(10000);
+        comp.extend([2u8, 16, 39].iter().cloned());
+        assert_eq!(&script[..], &comp[..]);
         // notice the sign bit set here, hence the extra zero/128 at the end
-        script = script.push_int(10000000); comp.extend([4u8, 128, 150, 152, 0].iter().cloned()); assert_eq!(&script[..], &comp[..]);
-        script = script.push_int(-10000000); comp.extend([4u8, 128, 150, 152, 128].iter().cloned()); assert_eq!(&script[..], &comp[..]);
+        script = script.push_int(10000000);
+        comp.extend([4u8, 128, 150, 152, 0].iter().cloned());
+        assert_eq!(&script[..], &comp[..]);
+        script = script.push_int(-10000000);
+        comp.extend([4u8, 128, 150, 152, 128].iter().cloned());
+        assert_eq!(&script[..], &comp[..]);
 
         // data
-        script = script.push_slice("NRA4VR".as_bytes()); comp.extend([6u8, 78, 82, 65, 52, 86, 82].iter().cloned()); assert_eq!(&script[..], &comp[..]);
+        script = script.push_slice("NRA4VR".as_bytes());
+        comp.extend([6u8, 78, 82, 65, 52, 86, 82].iter().cloned());
+        assert_eq!(&script[..], &comp[..]);
 
         // keys
         let keystr = "21032e58afe51f9ed8ad3cc7897f634d881fdbe49a81564629ded8156bebd2ffd1af";
         let key = PublicKey::from_str(&keystr[2..]).unwrap();
-        script = script.push_key(&key); comp.extend(hex_decode(keystr).unwrap().iter().cloned()); assert_eq!(&script[..], &comp[..]);
+        script = script.push_key(&key);
+        comp.extend(hex_decode(keystr).unwrap().iter().cloned());
+        assert_eq!(&script[..], &comp[..]);
         let keystr = "41042e58afe51f9ed8ad3cc7897f634d881fdbe49a81564629ded8156bebd2ffd1af191923a2964c177f5b5923ae500fca49e99492d534aa3759d6b25a8bc971b133";
         let key = PublicKey::from_str(&keystr[2..]).unwrap();
-        script = script.push_key(&key); comp.extend(hex_decode(keystr).unwrap().iter().cloned()); assert_eq!(&script[..], &comp[..]);
+        script = script.push_key(&key);
+        comp.extend(hex_decode(keystr).unwrap().iter().cloned());
+        assert_eq!(&script[..], &comp[..]);
 
         // opcodes
-        script = script.push_opcode(opcodes::all::OP_CHECKSIG); comp.push(0xACu8); assert_eq!(&script[..], &comp[..]);
-        script = script.push_opcode(opcodes::all::OP_CHECKSIG); comp.push(0xACu8); assert_eq!(&script[..], &comp[..]);
+        script = script.push_opcode(opcodes::all::OP_CHECKSIG);
+        comp.push(0xACu8);
+        assert_eq!(&script[..], &comp[..]);
+        script = script.push_opcode(opcodes::all::OP_CHECKSIG);
+        comp.push(0xACu8);
+        assert_eq!(&script[..], &comp[..]);
     }
 
     #[test]
     fn script_builder() {
         // from txid 3bb5e6434c11fb93f64574af5d116736510717f2c595eb45b52c28e31622dfff which was in my mempool when I wrote the test
         let script = Builder::new().push_opcode(opcodes::all::OP_DUP)
-                                   .push_opcode(opcodes::all::OP_HASH160)
-                                   .push_slice(&hex_decode("16e1ae70ff0fa102905d4af297f6912bda6cce19").unwrap())
-                                   .push_opcode(opcodes::all::OP_EQUALVERIFY)
-                                   .push_opcode(opcodes::all::OP_CHECKSIG)
-                                   .into_script();
+            .push_opcode(opcodes::all::OP_HASH160)
+            .push_slice(&hex_decode("16e1ae70ff0fa102905d4af297f6912bda6cce19").unwrap())
+            .push_opcode(opcodes::all::OP_EQUALVERIFY)
+            .push_opcode(opcodes::all::OP_CHECKSIG)
+            .into_script();
         assert_eq!(&format!("{:x}", script), "76a91416e1ae70ff0fa102905d4af297f6912bda6cce1988ac");
     }
 
@@ -888,7 +939,7 @@ mod test {
             .push_verify()
             .into_script();
         assert_eq!(format!("{:x}", trick_slice2), "01ae69");
-   }
+    }
 
     #[test]
     fn script_serialize() {
@@ -906,7 +957,7 @@ mod test {
         assert_eq!(build_scriptint(257), vec![1, 1]);
         assert_eq!(build_scriptint(511), vec![255, 1]);
         for &i in [10, 100, 255, 256, 1000, 10000, 25000, 200000, 5000000, 1000000000,
-                             (1 << 31) - 1, -((1 << 31) - 1)].iter() {
+            (1 << 31) - 1, -((1 << 31) - 1)].iter() {
             assert_eq!(Ok(i), read_scriptint(&build_scriptint(i)));
             assert_eq!(Ok(-i), read_scriptint(&build_scriptint(-i)));
         }
@@ -1059,9 +1110,9 @@ mod test {
         assert_eq!(v_nonmin_alt, slop_v_nonmin_alt);
     }
 
-	#[test]
+    #[test]
     fn script_ord() {
-        let script_1 = Builder::new().push_slice(&[1,2,3,4]).into_script();
+        let script_1 = Builder::new().push_slice(&[1, 2, 3, 4]).into_script();
         let script_2 = Builder::new().push_int(10).into_script();
         let script_3 = Builder::new().push_int(15).into_script();
         let script_4 = Builder::new().push_opcode(opcodes::all::OP_RETURN).into_script();
@@ -1078,25 +1129,25 @@ mod test {
         assert!(script_2 > script_1);
     }
 
-	#[test]
-	#[cfg(feature="bitcoinconsensus")]
-	fn test_bitcoinconsensus () {
-		// a random segwit transaction from the blockchain using native segwit
-		let spent = Builder::from(hex_decode("0020701a8d401c84fb13e6baf169d59684e17abd9fa216c8cc5b9fc63d622ff8c58d").unwrap()).into_script();
-		let spending = hex_decode("010000000001011f97548fbbe7a0db7588a66e18d803d0089315aa7d4cc28360b6ec50ef36718a0100000000ffffffff02df1776000000000017a9146c002a686959067f4866b8fb493ad7970290ab728757d29f0000000000220020701a8d401c84fb13e6baf169d59684e17abd9fa216c8cc5b9fc63d622ff8c58d04004730440220565d170eed95ff95027a69b313758450ba84a01224e1f7f130dda46e94d13f8602207bdd20e307f062594022f12ed5017bbf4a055a06aea91c10110a0e3bb23117fc014730440220647d2dc5b15f60bc37dc42618a370b2a1490293f9e5c8464f53ec4fe1dfe067302203598773895b4b16d37485cbe21b337f4e4b650739880098c592553add7dd4355016952210375e00eb72e29da82b89367947f29ef34afb75e8654f6ea368e0acdfd92976b7c2103a1b26313f430c4b15bb1fdce663207659d8cac749a0e53d70eff01874496feff2103c96d495bfdd5ba4145e3e046fee45e84a8a48ad05bd8dbb395c011a32cf9f88053ae00000000").unwrap();
-		spent.verify(0, 18393430, spending.as_slice()).unwrap();
-	}
+    #[test]
+    #[cfg(feature = "bitcoinconsensus")]
+    fn test_bitcoinconsensus() {
+        // a random segwit transaction from the blockchain using native segwit
+        let spent = Builder::from(hex_decode("0020701a8d401c84fb13e6baf169d59684e17abd9fa216c8cc5b9fc63d622ff8c58d").unwrap()).into_script();
+        let spending = hex_decode("010000000001011f97548fbbe7a0db7588a66e18d803d0089315aa7d4cc28360b6ec50ef36718a0100000000ffffffff02df1776000000000017a9146c002a686959067f4866b8fb493ad7970290ab728757d29f0000000000220020701a8d401c84fb13e6baf169d59684e17abd9fa216c8cc5b9fc63d622ff8c58d04004730440220565d170eed95ff95027a69b313758450ba84a01224e1f7f130dda46e94d13f8602207bdd20e307f062594022f12ed5017bbf4a055a06aea91c10110a0e3bb23117fc014730440220647d2dc5b15f60bc37dc42618a370b2a1490293f9e5c8464f53ec4fe1dfe067302203598773895b4b16d37485cbe21b337f4e4b650739880098c592553add7dd4355016952210375e00eb72e29da82b89367947f29ef34afb75e8654f6ea368e0acdfd92976b7c2103a1b26313f430c4b15bb1fdce663207659d8cac749a0e53d70eff01874496feff2103c96d495bfdd5ba4145e3e046fee45e84a8a48ad05bd8dbb395c011a32cf9f88053ae00000000").unwrap();
+        spent.verify(0, 18393430, spending.as_slice()).unwrap();
+    }
 
     #[test]
     fn build_script_test() {
         // Test your own script "dfaxxx" calculates the result for hash160
         let script = Builder::new().push_opcode(opcodes::all::OP_DUP)
-                                   .push_opcode(opcodes::all::OP_HASH160)
-                                   .push_slice(&hex_decode("dfa0d6f68ada97595dac908c2d9821650e385a10").unwrap())
-                                   .push_opcode(opcodes::all::OP_EQUALVERIFY)
-                                   .push_opcode(opcodes::all::OP_CHECKSIG)
-                                   .into_script();
-        println!("{:?}",script.to_hex());
+            .push_opcode(opcodes::all::OP_HASH160)
+            .push_slice(&hex_decode("dfa0d6f68ada97595dac908c2d9821650e385a10").unwrap())
+            .push_opcode(opcodes::all::OP_EQUALVERIFY)
+            .push_opcode(opcodes::all::OP_CHECKSIG)
+            .into_script();
+        println!("{:?}", script.to_hex());
     }
 }
 

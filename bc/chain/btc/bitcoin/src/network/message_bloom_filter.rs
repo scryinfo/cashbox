@@ -1,12 +1,14 @@
 //! mod for bloom filter message
-use bitvec::prelude::*;
-use consensus::Encodable;
-use hashes::{sha256d, Hash};
-use hex::decode as hex_decode;
 use std::f64::consts::{E, LN_2};
-use std::num::Wrapping;
-use BitcoinHash;
 use std::io::{Cursor, Read};
+use std::num::Wrapping;
+
+use bitvec::prelude::*;
+use hashes::{Hash, sha256d};
+use hex::decode as hex_decode;
+
+use BitcoinHash;
+use consensus::Encodable;
 
 ///the message filterload
 /// n_flags

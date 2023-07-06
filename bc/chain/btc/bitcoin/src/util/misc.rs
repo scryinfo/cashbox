@@ -16,7 +16,8 @@
 //!
 //! Various utility functions
 
-use hashes::{sha256d, Hash};
+use hashes::{Hash, sha256d};
+
 use blockdata::opcodes;
 use consensus::encode;
 
@@ -26,9 +27,9 @@ static MSG_SIGN_PREFIX: &'static [u8] = b"\x18Bitcoin Signed Message:\n";
 #[inline]
 fn hex_val(c: u8) -> Result<u8, encode::Error> {
     let res = match c {
-        b'0' ... b'9' => c - '0' as u8,
-        b'a' ... b'f' => c - 'a' as u8 + 10,
-        b'A' ... b'F' => c - 'A' as u8 + 10,
+        b'0'...b'9' => c - '0' as u8,
+        b'a'...b'f' => c - 'a' as u8 + 10,
+        b'A'...b'F' => c - 'A' as u8 + 10,
         _ => return Err(encode::Error::UnexpectedHexDigit(c as char)),
     };
     Ok(res)
@@ -118,16 +119,18 @@ pub fn signed_msg_hash(msg: &str) -> sha256d::Hash {
             &encode::serialize(&encode::VarInt(msg.len() as u64)),
             msg.as_bytes(),
         ]
-        .concat(),
+            .concat(),
     )
 }
 
-#[cfg(all(test, feature="unstable"))]
+#[cfg(all(test, feature = "unstable"))]
 mod benches {
+    use test::Bencher;
+
     use secp256k1::rand::{Rng, thread_rng};
     use secp256k1::rand::distributions::Standard;
+
     use super::hex_bytes;
-    use test::Bencher;
 
     fn join<I: Iterator<Item=IT>, IT: AsRef<str>>(iter: I, expected_len: usize) -> String {
         let mut res = String::with_capacity(expected_len);
@@ -175,8 +178,9 @@ mod benches {
 #[cfg(test)]
 mod tests {
     use hashes::hex::ToHex;
-    use super::script_find_and_remove;
+
     use super::hex_bytes;
+    use super::script_find_and_remove;
     use super::signed_msg_hash;
 
     #[test]

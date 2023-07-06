@@ -1,14 +1,15 @@
-use sp_std::prelude::*;
-
 #[cfg(feature = "std")]
 use std::fmt;
-use codec::{Compact, Decode, Encode, Error, Input};
 
-use sp_core::{blake2_256,H256,};
-use sp_runtime::{generic::Era, MultiSignature,AccountId32 as AccountId};
+use codec::{Compact, Decode, Encode, Error, Input};
+use sp_core::{blake2_256, H256};
+use sp_runtime::{generic::Era, MultiSignature};
+use sp_std::prelude::*;
+
+use crate::AccountId;
 
 pub type AccountIndex = u64;
-pub type GenericAddress =AccountId; // crate::multiaddress::MultiAddress<AccountId, ()>
+pub type GenericAddress = AccountId; // crate::multiaddress::MultiAddress<AccountId, ()>
 
 /// Simple generic extra mirroring the SignedExtra currently used in extrinsics. Does not implement
 /// the SignedExtension trait. It simply encodes to the same bytes as the real SignedExtra. The
@@ -23,7 +24,7 @@ impl GenericExtra {
     pub fn new(era: Era, nonce: u32) -> GenericExtra {
         GenericExtra(era, Compact(nonce), Compact(0_u128))
     }
-   pub fn get_nonce(&self)->u32{
+    pub fn get_nonce(&self) -> u32 {
         self.1.0
     }
 }
@@ -32,7 +33,6 @@ impl Default for GenericExtra {
     fn default() -> Self {
         Self::new(Era::Immortal, 0)
     }
-
 }
 
 /// additionalSigned fields of the respective SignedExtra fields.
@@ -43,8 +43,8 @@ pub type AdditionalSigned = (u32, u32, H256, H256, (), (), ());
 pub struct SignedPayload<Call>((Call, GenericExtra, AdditionalSigned));
 
 impl<Call> SignedPayload<Call>
-where
-    Call: Encode,
+    where
+        Call: Encode,
 {
     pub fn from_raw(call: Call, extra: GenericExtra, additional_signed: AdditionalSigned) -> Self {
         Self((call, extra, additional_signed))
@@ -74,8 +74,8 @@ pub struct UncheckedExtrinsicV4<Call> {
 }
 
 impl<Call> UncheckedExtrinsicV4<Call>
-where
-    Call: Encode,
+    where
+        Call: Encode,
 {
     pub fn new_signed(
         function: Call,
@@ -99,8 +99,8 @@ where
 
 #[cfg(feature = "std")]
 impl<Call> fmt::Debug for UncheckedExtrinsicV4<Call>
-where
-    Call: fmt::Debug,
+    where
+        Call: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
@@ -115,8 +115,8 @@ where
 const V4: u8 = 4;
 
 impl<Call> Encode for UncheckedExtrinsicV4<Call>
-where
-    Call: Encode,
+    where
+        Call: Encode,
 {
     fn encode(&self) -> Vec<u8> {
         encode_with_vec_prefix::<Self, _>(|v| {
@@ -135,8 +135,8 @@ where
 }
 
 impl<Call> Decode for UncheckedExtrinsicV4<Call>
-where
-    Call: Decode + Encode,
+    where
+        Call: Decode + Encode,
 {
     fn decode<I: Input>(input: &mut I) -> Result<Self, Error> {
         // This is a little more complicated than usual since the binary format must be compatible
@@ -163,26 +163,29 @@ where
         })
     }
 }
+
 #[derive(Debug)]
 pub struct RawExtrinsic {
-   pub module_index:u8,
-   pub call_index:u8,
-   pub args:Vec<u8>,
+    pub module_index: u8,
+    pub call_index: u8,
+    pub args: Vec<u8>,
 }
 
 #[derive(Debug)]
-pub struct CheckedExtrinsic{
+pub struct CheckedExtrinsic {
     pub signature: Option<(GenericAddress, MultiSignature, GenericExtra)>,
     pub function: RawExtrinsic,
 }
+
 /// Mirrors the currently used Extrinsic format from substrate UncheckedExtrinsicV4. Has less traits and methods though.
 /// The SingedExtra used does not need to implement SingedExtension here.
 /// Construct a data format that meets the requirements of the chain through transactions constructed by external methods.
 #[derive(Clone, PartialEq)]
-pub struct UncheckedExtrinsicFromOuter{
+pub struct UncheckedExtrinsicFromOuter {
     pub signature: Option<(GenericAddress, MultiSignature, GenericExtra)>,
     pub function: Vec<u8>,
 }
+
 impl UncheckedExtrinsicFromOuter
 {
     pub fn new_signed(
@@ -232,7 +235,7 @@ impl Encode for UncheckedExtrinsicFromOuter
             }
             let func_len = self.function.len();
             let func_encode_vec = self.function.encode();
-            let offset_start = func_encode_vec.len()-func_len;
+            let offset_start = func_encode_vec.len() - func_len;
             v.extend_from_slice(&func_encode_vec[offset_start..]);
         })
     }
@@ -254,40 +257,40 @@ impl Decode for CheckedExtrinsic
             return Err("Invalid transaction version".into());
         }
 
-        let  sig =  if is_signed {
-            let sig : (GenericAddress, MultiSignature, GenericExtra) = Decode::decode(input)?;
+        let sig = if is_signed {
+            let sig: (GenericAddress, MultiSignature, GenericExtra) = Decode::decode(input)?;
             Some(sig)
-        }else {
+        } else {
             None
         };
 
         let module_index = input.read_byte()?;
         let call_index = input.read_byte()?;
         let len = input.remaining_len().unwrap().unwrap();
-        let mut func_args = vec![0u8;len];
-        input.read( &mut func_args)?;
-      //  func_args.clone_from_slice(input.);
-        let raw_tx = RawExtrinsic{
+        let mut func_args = vec![0u8; len];
+        input.read(&mut func_args)?;
+        //  func_args.clone_from_slice(input.);
+        let raw_tx = RawExtrinsic {
             module_index,
             call_index,
-            args: func_args
+            args: func_args,
         };
-        let checked_tx = CheckedExtrinsic{
-            signature:sig,
-            function:raw_tx,
+        let checked_tx = CheckedExtrinsic {
+            signature: sig,
+            function: raw_tx,
         };
         Ok(checked_tx)
     }
 }
 
-pub fn get_func_prefix_len(func_data:&[u8])->usize{
-    let len = match func_data.len(){
+pub fn get_func_prefix_len(func_data: &[u8]) -> usize {
+    let len = match func_data.len() {
         1..=0b0100_0000 => 1,//1-64 real func data range is 0-63
         0b0100_0010..=0b0100_0000_0000_0001 => 2,// 66-(2**14+1)  real func data range is 64-(2**14-1)
         _ => 4,
     };
     // prefix = array length + version code
-    len+1
+    len + 1
 }
 
 /// Same function as in primitives::generic. Needed to be copied as it is private there.
@@ -315,9 +318,11 @@ fn encode_with_vec_prefix<T: Encode, F: Fn(&mut Vec<u8>)>(encoder: F) -> Vec<u8>
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::extrinsic::xt_primitives::{GenericAddress, GenericExtra};
     use sp_runtime::MultiSignature;
+
+    use crate::extrinsic::xt_primitives::{GenericAddress, GenericExtra};
+
+    use super::*;
 
     #[test]
     fn encode_decode_roundtrip_works() {

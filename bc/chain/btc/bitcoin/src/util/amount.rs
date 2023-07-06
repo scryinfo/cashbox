@@ -447,6 +447,7 @@ impl PartialEq for Amount {
         PartialEq::eq(&self.0, &other.0)
     }
 }
+
 impl Eq for Amount {}
 
 impl PartialOrd for Amount {
@@ -780,6 +781,7 @@ impl PartialEq for SignedAmount {
         PartialEq::eq(&self.0, &other.0)
     }
 }
+
 impl Eq for SignedAmount {}
 
 impl PartialOrd for SignedAmount {
@@ -909,6 +911,7 @@ pub mod serde {
     //! ```
 
     use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
     use util::amount::{Amount, Denomination, SignedAmount};
 
     /// This trait is used only to avoid code duplication and naming collisions
@@ -957,6 +960,7 @@ pub mod serde {
         //! Use with `#[serde(with = "amount::serde::as_sat")]`.
 
         use serde::{Deserializer, Serializer};
+
         use util::amount::serde::SerdeAmount;
 
         pub fn serialize<A: SerdeAmount, S: Serializer>(a: &A, s: S) -> Result<S::Ok, S::Error> {
@@ -972,6 +976,7 @@ pub mod serde {
             //! Use with `#[serde(default, with = "amount::serde::as_sat::opt")]`.
 
             use serde::{Deserializer, Serializer};
+
             use util::amount::serde::SerdeAmount;
 
             pub fn serialize<A: SerdeAmount, S: Serializer>(
@@ -997,6 +1002,7 @@ pub mod serde {
         //! Use with `#[serde(with = "amount::serde::as_btc")]`.
 
         use serde::{Deserializer, Serializer};
+
         use util::amount::serde::SerdeAmount;
 
         pub fn serialize<A: SerdeAmount, S: Serializer>(a: &A, s: S) -> Result<S::Ok, S::Error> {
@@ -1012,6 +1018,7 @@ pub mod serde {
             //! Use with `#[serde(default, with = "amount::serde::as_btc::opt")]`.
 
             use serde::{Deserializer, Serializer};
+
             use util::amount::serde::SerdeAmount;
 
             pub fn serialize<A: SerdeAmount, S: Serializer>(
@@ -1035,12 +1042,13 @@ pub mod serde {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::panic;
     use std::str::FromStr;
 
     #[cfg(feature = "serde")]
     use serde_test;
+
+    use super::*;
 
     #[test]
     fn add_sub_mul_div() {
@@ -1247,7 +1255,6 @@ mod tests {
     #[cfg(feature = "serde")]
     #[test]
     fn serde_as_sat() {
-
         #[derive(Serialize, Deserialize, PartialEq, Debug)]
         struct T {
             #[serde(with = "::util::amount::serde::as_sat")]

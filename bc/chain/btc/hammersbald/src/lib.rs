@@ -27,13 +27,29 @@
 #![deny(unused_must_use)]
 #![forbid(unsafe_code)]
 
-#[cfg(feature="bitcoin_support")]extern crate bitcoin;
-#[cfg(feature="bitcoin_support")]extern crate serde;
-#[cfg(feature="bitcoin_support")]extern crate serde_cbor;
+#[cfg(feature = "bitcoin_support")]
+extern crate bitcoin;
 extern crate bitcoin_hashes;
-extern crate rand;
 extern crate byteorder;
 extern crate lru_cache;
+extern crate rand;
+#[cfg(feature = "bitcoin_support")]
+extern crate serde;
+#[cfg(feature = "bitcoin_support")]
+extern crate serde_cbor;
+
+pub use api::{
+    HammersbaldAPI,
+    HammersbaldDataReader,
+    HammersbaldDataWriter,
+    HammersbaldIterator,
+    persistent,
+    transient,
+};
+#[cfg(feature = "bitcoin_support")]
+pub use bitcoin_adaptor::BitcoinAdaptor;
+pub use error::Error;
+pub use pref::PRef;
 
 mod page;
 mod pagedfile;
@@ -53,19 +69,6 @@ mod error;
 mod stats;
 mod api;
 
-pub use pref::PRef;
-pub use error::Error;
-pub use api::{
-    HammersbaldAPI,
-    HammersbaldDataWriter,
-    HammersbaldDataReader,
-    HammersbaldIterator,
-    persistent,
-    transient
-};
-
-#[cfg(feature="bitcoin_support")]
+#[cfg(feature = "bitcoin_support")]
 mod bitcoin_adaptor;
 
-#[cfg(feature="bitcoin_support")]
-pub use bitcoin_adaptor::BitcoinAdaptor;

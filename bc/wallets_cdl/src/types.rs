@@ -5,13 +5,13 @@ use std::fmt;
 use std::os::raw::c_char;
 
 use wallets_macro::{DlCR, DlDefault, DlStruct};
-use wallets_types::{Address, ChainShared, Error, TokenShared, Wallet,TokenAddress};
+use wallets_types::{Address, ChainShared, Error, TokenAddress, TokenShared, Wallet};
 
 pub use crate::chain::*;
 pub use crate::chain_btc::*;
 pub use crate::chain_eee::*;
 pub use crate::chain_eth::*;
-use crate::kits::{to_c_char, to_str, CStruct, CBool,Assignment};
+use crate::kits::{Assignment, CBool, CStruct, to_c_char, to_str};
 pub use crate::kits::{CR, CU64};
 pub use crate::types_btc::*;
 pub use crate::types_eee::*;
@@ -55,8 +55,8 @@ pub struct CAddress {
     pub chainType: *mut c_char,
     pub address: *mut c_char,
     pub publicKey: *mut c_char,
-    pub isWalletAddress:CBool,
-    pub show:CBool,
+    pub isWalletAddress: CBool,
+    pub show: CBool,
 }
 
 #[repr(C)]
@@ -82,7 +82,7 @@ pub struct CChainShared {
 
 #[repr(C)]
 #[derive(Debug, DlStruct, DlDefault, DlCR)]
-pub struct CTokenAddress{
+pub struct CTokenAddress {
     pub walletId: *mut c_char,
     pub chainType: *mut c_char,
     pub tokenId: *mut c_char,

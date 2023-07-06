@@ -56,8 +56,8 @@ impl ToString for ChainType {
         match &self {
             ChainType::BTC => "BTC".to_owned(),
             ChainType::BtcTest => "BtcTest".to_owned(),
-            ChainType::BtcPrivate=>"BtcPrivate".to_owned(),
-            ChainType::BtcPrivateTest=>"BtcPrivateTest".to_owned(),
+            ChainType::BtcPrivate => "BtcPrivate".to_owned(),
+            ChainType::BtcPrivateTest => "BtcPrivateTest".to_owned(),
             ChainType::ETH => "ETH".to_owned(),
             ChainType::EthTest => "EthTest".to_owned(),
             ChainType::EthPrivate => "EthPrivate".to_owned(),
@@ -72,16 +72,17 @@ impl ToString for ChainType {
 
 #[derive(PartialEq, Clone, Debug, EnumIter)]
 pub enum WalletType {
-    Normal, //正式钱包
+    Normal,
+    //正式钱包
     Test,  //测试钱包，对应的链为测试链
 }
 
-impl WalletType{
-   pub fn check_chain_type_match(wallet_type: &WalletType,chain_type:&NetType)->bool{
-        if wallet_type.eq(&WalletType::Normal)&&chain_type.eq(&NetType::Main){
+impl WalletType {
+    pub fn check_chain_type_match(wallet_type: &WalletType, chain_type: &NetType) -> bool {
+        if wallet_type.eq(&WalletType::Normal) && chain_type.eq(&NetType::Main) {
             true
-        }else {
-            wallet_type.eq(&WalletType::Test)&&chain_type.ne(&NetType::Main)
+        } else {
+            wallet_type.eq(&WalletType::Test) && chain_type.ne(&NetType::Main)
         }
     }
 }
@@ -98,11 +99,12 @@ impl From<&str> for WalletType {
         }
     }
 }
+
 impl From<&NetType> for WalletType {
     fn from(net_type: &NetType) -> Self {
         if NetType::Main.eq(net_type) {
             WalletType::Normal
-        }else {
+        } else {
             WalletType::Test
         }
     }
@@ -186,18 +188,18 @@ impl ToString for NetType {
     }
 }
 
-impl NetType{
-   pub fn from_chain_type(chain_type:&str)->Self{
-       if chain_type.contains("PrivateTest"){
-           NetType::PrivateTest
-       }else if chain_type.contains("Private") {
-           NetType::Private
-       }else if chain_type.contains("Test"){
-           NetType::Test
-       }else {
-           NetType::Main
-       }
-   }
+impl NetType {
+    pub fn from_chain_type(chain_type: &str) -> Self {
+        if chain_type.contains("PrivateTest") {
+            NetType::PrivateTest
+        } else if chain_type.contains("Private") {
+            NetType::Private
+        } else if chain_type.contains("Test") {
+            NetType::Test
+        } else {
+            NetType::Main
+        }
+    }
 }
 
 #[allow(non_camel_case_types)]
@@ -258,7 +260,7 @@ impl ToString for AppPlatformType {
 mod tests {
     use strum::IntoEnumIterator;
 
-    use crate::{ChainType, NetType, WalletType, AppPlatformType};
+    use crate::{AppPlatformType, ChainType, NetType, WalletType};
 
     #[test]
     fn net_type_test() {

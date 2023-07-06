@@ -17,11 +17,11 @@
 //! # Reference to persistent data
 //! allows reference of a data space of 2^48
 
-use page::PAGE_SIZE;
-
 use std::cmp::Ordering;
 use std::fmt;
 use std::ops;
+
+use page::PAGE_SIZE;
 
 const INVALID: u64 = 0xffffffffffff;
 
@@ -101,28 +101,28 @@ impl ops::SubAssign<u64> for PRef {
 
 impl PRef {
     /// construct an invalid pref
-    pub fn invalid () -> PRef {
+    pub fn invalid() -> PRef {
         PRef(INVALID)
     }
 
     /// is this a valid pref?
-    pub fn is_valid (&self) -> bool {
+    pub fn is_valid(&self) -> bool {
         self.0 < INVALID
     }
 
     /// convert to a number
-    pub fn as_u64 (&self) -> u64 {
+    pub fn as_u64(&self) -> u64 {
         return self.0;
     }
 
     /// pref of the page of this pref
     pub fn this_page(&self) -> PRef {
-        PRef::from((self.0/ PAGE_SIZE as u64)* PAGE_SIZE as u64)
+        PRef::from((self.0 / PAGE_SIZE as u64) * PAGE_SIZE as u64)
     }
 
     /// compute page number of an pref
     pub fn page_number(&self) -> u64 {
-        self.0/PAGE_SIZE as u64
+        self.0 / PAGE_SIZE as u64
     }
 
     /// position within the pref's page
@@ -132,21 +132,21 @@ impl PRef {
 
     /// number of pages from this until an other
     pub fn pages_until(&self, other: PRef) -> usize {
-        ((other.0 - self.0)/PAGE_SIZE as u64) as usize
+        ((other.0 - self.0) / PAGE_SIZE as u64) as usize
     }
 
     /// next page
-    pub fn next_page (&self) -> PRef {
+    pub fn next_page(&self) -> PRef {
         PRef(self.0 + PAGE_SIZE as u64)
     }
 
     /// previous page
-    pub fn prev_page (&self) -> PRef {
+    pub fn prev_page(&self) -> PRef {
         PRef(self.0 - PAGE_SIZE as u64)
     }
 
     /// add n pages
     pub fn add_pages(&self, n: usize) -> PRef {
-        PRef(self.0 + n as u64 *PAGE_SIZE as u64)
+        PRef(self.0 + n as u64 * PAGE_SIZE as u64)
     }
 }

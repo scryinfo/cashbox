@@ -3,12 +3,12 @@ name = "wallets"
 version = "2.3.0"
 authors = ["jeremy <jm140915@hotmail.com>"]
 edition = "2018"
-build="build.rs"
+build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 log = "0.4.11"
-tiny-keccak = "1.5.0"
+tiny-keccak = "2.0"
 hex = "0.3.2"
 serde_derive = "1.0.98"
 serde = "1.0"
@@ -23,7 +23,7 @@ bitcoin = { version = "0.21.0", features = ["serde"] }
 
 uuid = { version = "0.7", features = ["serde", "v4"] }
 secp256k1 = { version = "0.20.3", features = ["recovery"] }
-codec = { package = "parity-scale-codec", version = "1.2.0" }
+codec = { package = "parity-scale-codec", version = "3.6.3" }
 rlp = "0.4"
 rbatis = { version = "1.8.75", features = ["async-io-sqlite"] }
 futures = "0.3.8"
@@ -33,7 +33,7 @@ async-trait = "0.1.31"
 eth = { path = "../chain/eth" }
 eee = { path = "../chain/eee" }
 btc = { path = "../chain/btc" }
-murmel = { path = "../chain/btc/murmel"}
+murmel = { path = "../chain/btc/murmel" }
 scry-crypto = { path = "../util/crypto" }
 
 wallets_types = { path = "../wallets_types" }

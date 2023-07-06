@@ -19,9 +19,9 @@ use consensus::encode;
 use util::bip32::{DerivationPath, Fingerprint};
 use util::key::PublicKey;
 use util::psbt;
+use util::psbt::Error;
 use util::psbt::map::Map;
 use util::psbt::raw;
-use util::psbt::Error;
 
 /// A key-value map for an output of the corresponding index in the unsigned
 /// transaction.

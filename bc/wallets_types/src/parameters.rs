@@ -1,10 +1,12 @@
-use failure::_core::ops::{Deref, DerefMut};
-use super::error::WalletError;
-use mav::ma::{MEeeChainTx, MEeeTokenxTx};
-use primitive_types::{U256, H160};
-use eth::transaction::{Action, TypedTxId, TypedTransaction, EIP1559TransactionTx, AccessListTx};
 use std::convert::TryInto;
 
+use failure::_core::ops::{Deref, DerefMut};
+use primitive_types::{H160, U256};
+
+use eth::transaction::{AccessListTx, Action, EIP1559TransactionTx, TypedTransaction, TypedTxId};
+use mav::ma::{MEeeChainTx, MEeeTokenxTx};
+
+use super::error::WalletError;
 
 #[derive(Debug, Default, Clone)]
 pub struct InitParameters {
@@ -292,8 +294,8 @@ impl TryInto<TypedTransaction> for EthWalletConnectTx {
             value,
             data,
         };
-        if self.type_tx_id>255{
-            return Err(WalletError::Custom("input type tx id should in the range of 0 to 255".to_string()))
+        if self.type_tx_id > 255 {
+            return Err(WalletError::Custom("input type tx id should in the range of 0 to 255".to_string()));
         }
         let type_transaction = match TypedTxId::from_u8_id(self.type_tx_id as u8) {
             Some(TypedTxId::Legacy) => TypedTransaction::Legacy(transaction),

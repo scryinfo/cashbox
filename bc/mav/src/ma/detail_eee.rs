@@ -76,7 +76,7 @@ pub struct MEeeChainTokenAuth {
     #[serde(default)]
     pub position: i64,
     #[serde(default)]
-    pub status:i64,
+    pub status: i64,
 }
 
 impl MEeeChainTokenAuth {
@@ -98,7 +98,7 @@ pub struct MEeeChainTokenDefault {
     #[serde(default)]
     pub position: i64,
     #[serde(default)]
-    pub status:i64,
+    pub status: i64,
     #[serde(skip)]
     pub chain_token_shared: MEeeChainTokenShared,
 }

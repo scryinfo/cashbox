@@ -19,33 +19,30 @@
 //! This implements an interface to higher level applications
 //!
 
+use std::sync::{Arc, Mutex, Weak};
+
+use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use lightning::{
+    chain::chaininterface::{ChainError, ChainListener, ChainWatchInterface, ChainWatchInterfaceUtil},
+    util::logger::{Level, Logger, Record},
+};
+
 use bitcoin::{
     blockdata::{
         block::{Block, BlockHeader},
-        transaction::Transaction,
         script::Script,
+        transaction::Transaction,
     },
     network::{
+        constants::Network,
         message::NetworkMessage,
-        constants::Network
-    }
+    },
 };
-
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
-
-use lightning::{
-    chain::chaininterface::{ChainListener, ChainWatchInterface, ChainWatchInterfaceUtil,ChainError},
-    util::logger::{Level, Logger, Record}
-};
-
 use downstream::Downstream;
-
 use p2p::P2PControlSender;
 
-use std::sync::{Arc, Weak, Mutex};
-
-struct LightningLogger{
-    level: Level
+struct LightningLogger {
+    level: Level,
 }
 
 impl Logger for LightningLogger {
@@ -61,7 +58,7 @@ pub type SharedLightningConnector = Arc<Mutex<LightningConnector>>;
 /// connector to lightning network
 pub struct LightningConnector {
     util: ChainWatchInterfaceUtil,
-    p2p: P2PControlSender
+    p2p: P2PControlSender,
 }
 
 impl Downstream for LightningConnector {
@@ -82,21 +79,20 @@ impl Downstream for LightningConnector {
 
 impl LightningConnector {
     /// create a connector
-    pub fn new (network: Network, p2p: P2PControlSender) -> LightningConnector {
+    pub fn new(network: Network, p2p: P2PControlSender) -> LightningConnector {
         LightningConnector {
-            util: ChainWatchInterfaceUtil::new(network, Arc::new(LightningLogger{level: Level::Info})),
-            p2p
+            util: ChainWatchInterfaceUtil::new(network, Arc::new(LightningLogger { level: Level::Info })),
+            p2p,
         }
     }
 
     /// broadcast transaction to all connected peers
-    pub fn broadcast (&self, tx: Transaction) {
+    pub fn broadcast(&self, tx: Transaction) {
         self.p2p.broadcast(NetworkMessage::Tx(tx))
     }
 }
 
 impl ChainWatchInterface for LightningConnector {
-
     fn install_watch_tx(&self, _txid: &Sha256dHash, _script_pub_key: &Script) {
         unimplemented!()
     }

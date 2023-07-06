@@ -20,17 +20,17 @@
 //! these blocks and the blockchain.
 //!
 
-use hashes::{sha256d, Hash};
+use hashes::{Hash, sha256d};
+use hashes::HashEngine;
 
-use util;
-use util::Error::{BlockBadTarget, BlockBadProofOfWork};
-use util::hash::{BitcoinHash, MerkleRoot, bitcoin_merkle_root};
-use util::uint::Uint256;
+use blockdata::constants::max_target;
+use blockdata::transaction::Transaction;
 use consensus::encode::Encodable;
 use network::constants::Network;
-use blockdata::transaction::Transaction;
-use blockdata::constants::max_target;
-use hashes::HashEngine;
+use util;
+use util::Error::{BlockBadProofOfWork, BlockBadTarget};
+use util::hash::{bitcoin_merkle_root, BitcoinHash, MerkleRoot};
+use util::uint::Uint256;
 
 /// A block header, which contains all the block's information except
 /// the actual transactions
@@ -58,12 +58,12 @@ pub struct Block {
     /// The block header
     pub header: BlockHeader,
     /// List of transactions contained in the block
-    pub txdata: Vec<Transaction>
+    pub txdata: Vec<Transaction>,
 }
 
 impl Block {
     /// check if merkle root of header matches merkle root of the transaction list
-    pub fn check_merkle_root (&self) -> bool {
+    pub fn check_merkle_root(&self) -> bool {
         self.header.merkle_root == self.merkle_root()
     }
 
@@ -80,13 +80,14 @@ impl Block {
                 // commitment is in the last output that starts with below magic
                 if let Some(pos) = coinbase.output.iter()
                     .rposition(|o| {
-                        o.script_pubkey.len () >= 38 &&
-                        o.script_pubkey[0..6] == [0x6a, 0x24, 0xaa, 0x21, 0xa9, 0xed] }) {
+                        o.script_pubkey.len() >= 38 &&
+                            o.script_pubkey[0..6] == [0x6a, 0x24, 0xaa, 0x21, 0xa9, 0xed]
+                    }) {
                     let commitment = sha256d::Hash::from_slice(&coinbase.output[pos].script_pubkey.as_bytes()[6..38]).unwrap();
                     // witness reserved value is in coinbase input witness
                     if coinbase.input[0].witness.len() == 1 && coinbase.input[0].witness[0].len() == 32 {
                         let witness_root = self.witness_root();
-                        return commitment == Self::compute_witness_commitment(&witness_root, coinbase.input[0].witness[0].as_slice())
+                        return commitment == Self::compute_witness_commitment(&witness_root, coinbase.input[0].witness[0].as_slice());
                     }
                 }
             }
@@ -95,7 +96,7 @@ impl Block {
     }
 
     /// compute witness commitment for the transaction list
-    pub fn compute_witness_commitment (witness_root: &sha256d::Hash, witness_reserved_value: &[u8]) -> sha256d::Hash {
+    pub fn compute_witness_commitment(witness_root: &sha256d::Hash, witness_reserved_value: &[u8]) -> sha256d::Hash {
         let mut encoder = sha256d::Hash::engine();
         witness_root.consensus_encode(&mut encoder).unwrap();
         encoder.input(witness_reserved_value);
@@ -105,7 +106,7 @@ impl Block {
     /// Merkle root of transactions hashed for witness
     pub fn witness_root(&self) -> sha256d::Hash {
         let mut txhashes = vec!(sha256d::Hash::default());
-        txhashes.extend(self.txdata.iter().skip(1).map(|t|t.bitcoin_hash()));
+        txhashes.extend(self.txdata.iter().skip(1).map(|t| t.bitcoin_hash()));
         bitcoin_merkle_root(txhashes)
     }
 }

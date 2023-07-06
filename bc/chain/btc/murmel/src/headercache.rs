@@ -16,15 +16,18 @@
 //! # Cache of headers and the chain with most work
 //!
 
+use std::collections::HashMap;
+
+use bitcoin_hashes::Hash;
+use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use log::trace;
+
+use bitcoin::{
+    BitcoinHash, blockdata::block::BlockHeader, network::constants::Network, util::uint::Uint256,
+};
+
 use crate::chaindb::StoredHeader;
 use crate::error::Error;
-use bitcoin::{
-    blockdata::block::BlockHeader, network::constants::Network, util::uint::Uint256, BitcoinHash,
-};
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
-use bitcoin_hashes::Hash;
-use log::trace;
-use std::collections::HashMap;
 
 #[derive(Clone)]
 pub struct CachedHeader {
@@ -225,7 +228,7 @@ impl HeaderCache {
         const TARGET_BLOCK_SPACING: u32 = 600;
 
         let required_work =
-        // Compute required difficulty if this is a diffchange block
+            // Compute required difficulty if this is a diffchange block
             if (prev.stored.height + 1) % DIFFCHANGE_INTERVAL == 0 {
                 let timespan = {
                     // Scan back DIFFCHANGE_INTERVAL blocks
@@ -415,7 +418,7 @@ impl HeaderCache {
         }
     }
 
-    pub fn iter_trunk<'a>(&'a self, from: u32) -> Box<dyn Iterator<Item = &'a CachedHeader> + 'a> {
+    pub fn iter_trunk<'a>(&'a self, from: u32) -> Box<dyn Iterator<Item=&'a CachedHeader> + 'a> {
         Box::new(
             self.trunk
                 .iter()
@@ -427,7 +430,7 @@ impl HeaderCache {
     pub fn iter_trunk_rev<'a>(
         &'a self,
         from: Option<u32>,
-    ) -> Box<dyn Iterator<Item = &'a CachedHeader> + 'a> {
+    ) -> Box<dyn Iterator<Item=&'a CachedHeader> + 'a> {
         let len = self.trunk.len();
         if let Some(from) = from {
             Box::new(

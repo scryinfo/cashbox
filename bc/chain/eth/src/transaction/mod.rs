@@ -1,11 +1,12 @@
+use ethereum_types::Address;
+
+pub use transaction::{AccessListTx, Action, EIP1559TransactionTx, Transaction, TypedTransaction};
+pub use transaction_id::TypedTxId;
+
 use super::*;
-use ethereum_types::{Address};
 
 mod transaction;
 mod transaction_id;
-
-pub use transaction_id::TypedTxId;
-pub use transaction::{Action,TypedTransaction,EIP1559TransactionTx,AccessListTx,Transaction};
 
 pub type AccessListItem = (H160, Vec<H256>);
 pub type AccessList = Vec<AccessListItem>;

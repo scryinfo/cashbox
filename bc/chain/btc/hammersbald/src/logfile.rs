@@ -18,25 +18,25 @@
 //! The writer of the log file.
 //!
 
+use std::collections::HashSet;
+
+use error::Error;
 use page::Page;
 use pagedfile::{PagedFile, PagedFileIterator};
-use error::Error;
 use pref::PRef;
-
-use std::collections::HashSet;
 
 pub struct LogFile {
     file: Box<dyn PagedFile>,
     logged: HashSet<PRef>,
-    source_len: u64
+    source_len: u64,
 }
 
 impl LogFile {
     pub fn new(rw: Box<dyn PagedFile>) -> LogFile {
-        LogFile { file: rw, logged: HashSet::new(), source_len:0 }
+        LogFile { file: rw, logged: HashSet::new(), source_len: 0 }
     }
 
-    pub fn init (&mut self, data_len: u64, table_len: u64, link_len: u64) -> Result<(), Error> {
+    pub fn init(&mut self, data_len: u64, table_len: u64, link_len: u64) -> Result<(), Error> {
         self.truncate(0)?;
         let mut first = Page::new();
         first.write_pref(0, PRef::from(data_len));
@@ -48,11 +48,11 @@ impl LogFile {
         Ok(())
     }
 
-    pub fn page_iter (&self) -> PagedFileIterator {
+    pub fn page_iter(&self) -> PagedFileIterator {
         PagedFileIterator::new(self, PRef::from(0))
     }
 
-    pub fn log_page(&mut self, pref: PRef, source: &dyn PagedFile) -> Result<(), Error>{
+    pub fn log_page(&mut self, pref: PRef, source: &dyn PagedFile) -> Result<(), Error> {
         if pref.as_u64() < self.source_len && self.logged.insert(pref) {
             if let Some(page) = source.read_page(pref)? {
                 self.append_page(page)?;
@@ -68,7 +68,7 @@ impl LogFile {
 }
 
 impl PagedFile for LogFile {
-    fn read_page (&self, pref: PRef) -> Result<Option<Page>, Error> {
+    fn read_page(&self, pref: PRef) -> Result<Option<Page>, Error> {
         self.file.read_page(pref)
     }
 
@@ -84,7 +84,7 @@ impl PagedFile for LogFile {
         self.file.sync()
     }
 
-    fn shutdown (&mut self) {}
+    fn shutdown(&mut self) {}
 
     fn append_page(&mut self, page: Page) -> Result<(), Error> {
         self.file.append_page(page)

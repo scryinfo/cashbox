@@ -17,11 +17,12 @@
 //! # Messsage dispatcher
 //!
 
-use crate::p2p::{PeerMessageReceiver, PeerMessageSender};
 use std::{
     sync::{Arc, Mutex},
     thread,
 };
+
+use crate::p2p::{PeerMessageReceiver, PeerMessageSender};
 
 /// Dispatcher of incoming messages
 pub struct Dispatcher<Message: Send + Sync + Clone> {

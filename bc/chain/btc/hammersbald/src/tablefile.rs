@@ -20,42 +20,41 @@
 
 use std::cmp::max;
 
-use page::{Page, PAGE_SIZE, PAGE_PAYLOAD_SIZE};
-use pagedfile::PagedFile;
-use memtable::MemTable;
 use error::Error;
+use memtable::MemTable;
+use page::{Page, PAGE_PAYLOAD_SIZE, PAGE_SIZE};
+use pagedfile::PagedFile;
 use pref::PRef;
 
-pub const FIRST_PAGE_HEAD:usize = 28;
+pub const FIRST_PAGE_HEAD: usize = 28;
 pub const BUCKET_SIZE: usize = 6;
-pub const BUCKETS_PER_PAGE:usize = PAGE_PAYLOAD_SIZE/BUCKET_SIZE;
-pub const BUCKETS_FIRST_PAGE:usize = (PAGE_PAYLOAD_SIZE - FIRST_PAGE_HEAD)/BUCKET_SIZE;
+pub const BUCKETS_PER_PAGE: usize = PAGE_PAYLOAD_SIZE / BUCKET_SIZE;
+pub const BUCKETS_FIRST_PAGE: usize = (PAGE_PAYLOAD_SIZE - FIRST_PAGE_HEAD) / BUCKET_SIZE;
 
 /// The key file
 pub struct TableFile {
     file: Box<dyn PagedFile>,
-    initialized_until: PRef
+    initialized_until: PRef,
 }
 
 impl TableFile {
-    pub fn new (file: Box<dyn PagedFile>) -> Result<TableFile, Error> {
+    pub fn new(file: Box<dyn PagedFile>) -> Result<TableFile, Error> {
         let initialized_until = PRef::from(file.len()?);
-        Ok(TableFile {file, initialized_until})
+        Ok(TableFile { file, initialized_until })
     }
 
-    pub fn table_offset (bucket: usize) -> PRef {
+    pub fn table_offset(bucket: usize) -> PRef {
         if (bucket as u64) < BUCKETS_FIRST_PAGE as u64 {
             PRef::from((bucket * BUCKET_SIZE + FIRST_PAGE_HEAD) as u64)
-        }
-        else {
+        } else {
             PRef::from(
-                ((bucket - BUCKETS_FIRST_PAGE)/BUCKETS_PER_PAGE + 1) as u64 * PAGE_SIZE as u64
-                + (bucket % BUCKETS_PER_PAGE) as u64 * BUCKET_SIZE as u64)
+                ((bucket - BUCKETS_FIRST_PAGE) / BUCKETS_PER_PAGE + 1) as u64 * PAGE_SIZE as u64
+                    + (bucket % BUCKETS_PER_PAGE) as u64 * BUCKET_SIZE as u64)
         }
     }
 
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item=PRef> +'a {
-        BucketIterator{file: self, n:0}
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item=PRef> + 'a {
+        BucketIterator { file: self, n: 0 }
     }
 }
 
@@ -77,7 +76,7 @@ impl PagedFile for TableFile {
         self.file.sync()
     }
 
-    fn shutdown (&mut self) {}
+    fn shutdown(&mut self) {}
 
     fn read_page(&self, pref: PRef) -> Result<Option<Page>, Error> {
         let result = self.file.read_page(pref)?;
@@ -100,14 +99,14 @@ impl PagedFile for TableFile {
                 self.initialized_until = self.initialized_until.add_pages(1);
             }
         }
-        self.initialized_until = max(self.initialized_until,page.pref().add_pages(1));
+        self.initialized_until = max(self.initialized_until, page.pref().add_pages(1));
         self.file.update_page(page)
     }
 }
 
 struct BucketIterator<'a> {
     file: &'a TableFile,
-    n: usize
+    n: usize,
 }
 
 impl<'a> Iterator for BucketIterator<'a> {
@@ -117,7 +116,7 @@ impl<'a> Iterator for BucketIterator<'a> {
         let table_offset = TableFile::table_offset(self.n);
         if let Ok(Some(page)) = self.file.read_page(table_offset.this_page()) {
             self.n += 1;
-            return Some(page.read_pref(table_offset.in_page_pos()))
+            return Some(page.read_pref(table_offset.in_page_pos()));
         }
         None
     }

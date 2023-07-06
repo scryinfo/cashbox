@@ -17,15 +17,17 @@
 //! # Keep track of peer timeouts
 //!
 
-use crate::p2p::{P2PControl, P2PControlSender, PeerId};
-use log::debug;
-use std::hash::Hash;
 use std::{
     cmp::min,
     collections::HashMap,
     sync::{Arc, Mutex},
     time::{SystemTime, UNIX_EPOCH},
 };
+use std::hash::Hash;
+
+use log::debug;
+
+use crate::p2p::{P2PControl, P2PControlSender, PeerId};
 
 pub type SharedTimeout<Message, Reply> = Arc<Mutex<Timeout<Message, Reply>>>;
 

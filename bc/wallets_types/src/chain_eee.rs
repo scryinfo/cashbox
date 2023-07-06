@@ -1,12 +1,12 @@
 use async_trait::async_trait;
 use rbatis::crud::CRUDTable;
+use rbatis::rbatis::Rbatis;
 
-use mav::{ChainType, NetType, WalletType, CTrue};
+use mav::{ChainType, CTrue, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MEeeChainToken, MEeeChainTokenDefault, MEeeChainTokenShared, MWallet, MSubChainBasicInfo, MAccountInfoSyncProg, MEeeChainTokenAuth};
+use mav::ma::{Dao, MAccountInfoSyncProg, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MSubChainBasicInfo, MWallet};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
-use rbatis::rbatis::Rbatis;
 
 #[derive(Debug, Default)]
 pub struct EeeChainToken {
@@ -192,7 +192,7 @@ impl EeeChain {
 
 #[derive(Debug, Default, Clone)]
 pub struct AccountInfoSyncProg {
-    m: MAccountInfoSyncProg
+    m: MAccountInfoSyncProg,
 }
 deref_type!(AccountInfoSyncProg,MAccountInfoSyncProg);
 
@@ -217,7 +217,7 @@ impl AccountInfoSyncProg {
 
 #[derive(Debug, Default, Clone)]
 pub struct SubChainBasicInfo {
-    m: MSubChainBasicInfo
+    m: MSubChainBasicInfo,
 }
 deref_type!(SubChainBasicInfo,MSubChainBasicInfo);
 

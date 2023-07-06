@@ -17,14 +17,14 @@
 use std::{collections::HashMap, convert::TryFrom, marker::PhantomData, str::FromStr};
 
 use codec::{Decode, Encode};
-
 use log::*;
-use frame_metadata::{
-    DecodeDifferent, RuntimeMetadata, RuntimeMetadataPrefixed, StorageEntryModifier,
-    StorageEntryType, StorageHasher, META_RESERVED,StorageEntryMetadata,EventMetadata,
-};
 use serde::ser::Serialize;
 use sp_core::storage::StorageKey;
+
+use frame_metadata::{
+    DecodeDifferent, EventMetadata, META_RESERVED, RuntimeMetadata,
+    RuntimeMetadataPrefixed, StorageEntryMetadata, StorageEntryModifier, StorageEntryType, StorageHasher,
+};
 
 #[derive(Debug, thiserror::Error)]
 pub enum MetadataError {
@@ -55,8 +55,8 @@ pub struct Metadata {
 
 impl Metadata {
     pub fn module<S>(&self, name: S) -> Result<&ModuleMetadata, MetadataError>
-    where
-        S: ToString,
+        where
+            S: ToString,
     {
         let name = name.to_string();
         self.modules
@@ -64,13 +64,13 @@ impl Metadata {
             .ok_or(MetadataError::ModuleNotFound(name))
     }
 
-    pub fn modules_with_calls(&self) -> impl Iterator<Item = &ModuleWithCalls> {
+    pub fn modules_with_calls(&self) -> impl Iterator<Item=&ModuleWithCalls> {
         self.modules_with_calls.values()
     }
 
     pub fn module_with_calls<S>(&self, name: S) -> Result<&ModuleWithCalls, MetadataError>
-    where
-        S: ToString,
+        where
+            S: ToString,
     {
         let name = name.to_string();
         self.modules_with_calls
@@ -78,13 +78,13 @@ impl Metadata {
             .ok_or(MetadataError::ModuleNotFound(name))
     }
 
-    pub fn modules_with_events(&self) -> impl Iterator<Item = &ModuleWithEvents> {
+    pub fn modules_with_events(&self) -> impl Iterator<Item=&ModuleWithEvents> {
         self.modules_with_events.values()
     }
 
     pub fn module_with_events_by_name<S>(&self, name: S) -> Result<&ModuleWithEvents, MetadataError>
-    where
-        S: ToString,
+        where
+            S: ToString,
     {
         let name = name.to_string();
         self.modules_with_events
@@ -149,7 +149,7 @@ impl Metadata {
 
     pub fn storage_value_key(
         &self,
-        storage_prefix: & str,
+        storage_prefix: &str,
         storage_key_name: &str,
     ) -> Result<StorageKey, MetadataError> {
         Ok(self
@@ -246,7 +246,7 @@ impl ModuleWithEvents {
         &self.name
     }
 
-    pub fn events(&self) -> impl Iterator<Item = &ModuleEventMetadata> {
+    pub fn events(&self) -> impl Iterator<Item=&ModuleEventMetadata> {
         self.events.values()
     }
 
@@ -520,10 +520,10 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
         let mut modules_with_events = HashMap::new();
 
 
-       match metadata.1 {
+        match metadata.1 {
             RuntimeMetadata::V12(meta) => {
                 for module in convert(meta.modules)?.into_iter() {
-                    let module_name = convert(module.name.clone())?;
+                    let module_name = convert(module.name.clone())?.to_string();
 
                     let mut storage_map = HashMap::new();
                     if let Some(storage) = module.storage {
@@ -532,15 +532,15 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                         for entry in convert(storage.entries)?.into_iter() {
                             let storage_prefix = convert(entry.name.clone())?;
                             let entry =
-                                convert_entry(module_prefix.clone(), storage_prefix.clone(), entry)?;
-                            storage_map.insert(storage_prefix, entry);
+                                convert_entry(module_prefix.clone().to_string(), storage_prefix.clone().to_string(), entry)?;
+                            storage_map.insert(storage_prefix.to_string(), entry);
                         }
                     }
                     modules.insert(
                         module_name.clone(),
                         ModuleMetadata {
                             index: module.index,
-                            name: module_name.clone(),
+                            name: module_name.to_string(),
                             storage: storage_map,
                         },
                     );
@@ -549,7 +549,7 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                         let mut call_map = HashMap::new();
                         for (index, call) in convert(calls)?.into_iter().enumerate() {
                             let name = convert(call.name)?;
-                            call_map.insert(name, index as u8);
+                            call_map.insert(name.to_string(), index as u8);
                         }
                         modules_with_calls.insert(
                             module_name.clone(),
@@ -569,20 +569,20 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                             module_name.clone(),
                             ModuleWithEvents {
                                 index: module.index,
-                                name: module_name.clone(),
+                                name: module_name.clone().to_string(),
                                 events: event_map,
                             },
                         );
                     }
                 }
-            },
-            RuntimeMetadata::V11(metav11)=>{
+            }
+            RuntimeMetadata::V11(metav11) => {
                 let mut event_module_index = 0;
                 let mut call_module_index = 0;
                 //let mut module_index = 0;
-                for (module_index, module) in convert(metav11.modules)?.into_iter().enumerate(){
-                // for module in convert(metav11.modules)?.into_iter() {
-                    let module_name = convert(module.name.clone())?;
+                for (module_index, module) in convert(metav11.modules)?.into_iter().enumerate() {
+                    // for module in convert(metav11.modules)?.into_iter() {
+                    let module_name = convert(module.name.clone())?.to_string();
 
                     let mut storage_map = HashMap::new();
                     if let Some(storage) = module.storage {
@@ -591,8 +591,8 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                         for entry in convert(storage.entries)?.into_iter() {
                             let storage_prefix = convert(entry.name.clone())?;
                             let entry =
-                                convert_entry(module_prefix.clone(), storage_prefix.clone(), entry)?;
-                            storage_map.insert(storage_prefix, entry);
+                                convert_entry(module_prefix.clone().to_string(), storage_prefix.clone().to_string(), entry)?;
+                            storage_map.insert(storage_prefix.to_string(), entry);
                         }
                     }
                     modules.insert(
@@ -603,13 +603,13 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                             storage: storage_map,
                         },
                     );
-                   // module_index +=1;
+                    // module_index +=1;
 
                     if let Some(calls) = module.calls {
                         let mut call_map = HashMap::new();
                         for (index, call) in convert(calls)?.into_iter().enumerate() {
                             let name = convert(call.name)?;
-                            call_map.insert(name, index as u8);
+                            call_map.insert(name.to_string(), index as u8);
                         }
                         modules_with_calls.insert(
                             module_name.clone(),
@@ -627,17 +627,17 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                             event_map.insert(index as u8, convert_event(event)?);
                         }
                         modules_with_events.insert(
-                            module_name.clone(),
+                            module_name.clone().to_string(),
                             ModuleWithEvents {
                                 index: event_module_index,
-                                name: module_name.clone(),
+                                name: module_name.clone().to_string(),
                                 events: event_map,
                             },
                         );
-                         event_module_index +=1;
+                        event_module_index += 1;
                     }
                 }
-            },
+            }
             _ => return Err(ConversionError::InvalidVersion.into()),
         };
 
@@ -658,7 +658,7 @@ fn convert<B: 'static, O: 'static>(dd: DecodeDifferent<B, O>) -> Result<O, Conve
 }
 
 fn convert_event(event: EventMetadata) -> Result<ModuleEventMetadata, ConversionError> {
-    let name = convert(event.name)?;
+    let name = convert(event.name)?.to_string();
     let mut arguments = Vec::new();
     for arg in convert(event.arguments)? {
         let arg = arg.parse::<EventArg>()?;

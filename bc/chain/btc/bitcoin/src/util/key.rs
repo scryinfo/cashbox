@@ -16,11 +16,12 @@
 //! Keys used in Bitcoin that can be roundtrip (de)serialized.
 //!
 
-use std::fmt::{self, Write};
 use std::{io, ops};
+use std::fmt::{self, Write};
 use std::str::FromStr;
 
 use secp256k1::{self, Secp256k1};
+
 use consensus::encode;
 use network::constants::Network;
 use util::base58;
@@ -57,7 +58,7 @@ impl PublicKey {
         let compressed: bool = match data.len() {
             33 => true,
             65 => false,
-            len =>  { return Err(base58::Error::InvalidLength(len).into()); },
+            len => { return Err(base58::Error::InvalidLength(len).into()); }
         };
 
         Ok(PublicKey {
@@ -93,7 +94,7 @@ impl FromStr for PublicKey {
         let key = secp256k1::PublicKey::from_str(s)?;
         Ok(PublicKey {
             key: key,
-            compressed: s.len() == 66
+            compressed: s.len() == 66,
         })
     }
 }
@@ -114,7 +115,7 @@ impl PrivateKey {
     pub fn public_key<C: secp256k1::Signing>(&self, secp: &Secp256k1<C>) -> PublicKey {
         PublicKey {
             compressed: self.compressed,
-            key: secp256k1::PublicKey::from_secret_key(secp, &self.key)
+            key: secp256k1::PublicKey::from_secret_key(secp, &self.key),
         }
     }
 
@@ -161,7 +162,7 @@ impl PrivateKey {
         let network = match data[0] {
             128 => Network::Bitcoin,
             239 => Network::Testnet,
-            x   => { return Err(encode::Error::Base58(base58::Error::InvalidVersion(vec![x]))); }
+            x => { return Err(encode::Error::Base58(base58::Error::InvalidVersion(vec![x]))); }
         };
 
         Ok(PrivateKey {
@@ -218,8 +219,8 @@ impl<'de> ::serde::Deserialize<'de> for PrivateKey {
             }
 
             fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
-            where
-                E: ::serde::de::Error,
+                where
+                    E: ::serde::de::Error,
             {
                 if let Ok(s) = ::std::str::from_utf8(v) {
                     PrivateKey::from_str(s).map_err(E::custom)
@@ -229,8 +230,8 @@ impl<'de> ::serde::Deserialize<'de> for PrivateKey {
             }
 
             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-            where
-                E: ::serde::de::Error,
+                where
+                    E: ::serde::de::Error,
             {
                 PrivateKey::from_str(v).map_err(E::custom)
             }
@@ -269,8 +270,8 @@ impl<'de> ::serde::Deserialize<'de> for PublicKey {
                 }
 
                 fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
-                where
-                    E: ::serde::de::Error,
+                    where
+                        E: ::serde::de::Error,
                 {
                     if let Ok(hex) = ::std::str::from_utf8(v) {
                         PublicKey::from_str(hex).map_err(E::custom)
@@ -280,8 +281,8 @@ impl<'de> ::serde::Deserialize<'de> for PublicKey {
                 }
 
                 fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-                where
-                    E: ::serde::de::Error,
+                    where
+                        E: ::serde::de::Error,
                 {
                     PublicKey::from_str(v).map_err(E::custom)
                 }
@@ -298,8 +299,8 @@ impl<'de> ::serde::Deserialize<'de> for PublicKey {
                 }
 
                 fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
-                where
-                    E: ::serde::de::Error,
+                    where
+                        E: ::serde::de::Error,
                 {
                     PublicKey::from_slice(v).map_err(E::custom)
                 }
@@ -312,12 +313,15 @@ impl<'de> ::serde::Deserialize<'de> for PublicKey {
 
 #[cfg(test)]
 mod tests {
-    use super::{PrivateKey, PublicKey};
-    use secp256k1::Secp256k1;
     use std::str::FromStr;
-    use network::constants::Network::Testnet;
+
+    use secp256k1::Secp256k1;
+
     use network::constants::Network::Bitcoin;
+    use network::constants::Network::Testnet;
     use util::address::Address;
+
+    use super::{PrivateKey, PublicKey};
 
     #[test]
     fn test_key_derivation() {
@@ -358,7 +362,7 @@ mod tests {
     #[cfg(feature = "serde")]
     #[test]
     fn test_key_serde() {
-        use serde_test::{Configure, Token, assert_tokens};
+        use serde_test::{assert_tokens, Configure, Token};
 
         static KEY_WIF: &'static str = "cVt4o7BGAig1UXywgGSmARhxMdzP5qvQsxKkSsc1XEkw3tDTQFpy";
         static PK_STR: &'static str = "039b6347398505f5ec93826dc61c19f47c66c0283ee9be980e29ce325a0f4679ef";

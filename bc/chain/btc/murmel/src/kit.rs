@@ -1,9 +1,12 @@
 #![allow(dead_code)]
+
+use std::fmt::Write;
+
+use bitcoin_hashes::Hash;
+use bitcoin_hashes::hex::ToHex;
+
 use bitcoin::consensus::encode::Error;
 use bitcoin::Transaction;
-use bitcoin_hashes::hex::ToHex;
-use bitcoin_hashes::Hash;
-use std::fmt::Write;
 
 pub fn hash160(str: &str) -> String {
     let decode: Vec<u8> = bitcoin_hashes::hex::FromHex::from_hex(str).expect("Invalid public key");

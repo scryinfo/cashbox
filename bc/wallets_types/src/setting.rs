@@ -28,21 +28,20 @@ impl Setting {
 
     pub async fn current_net_type(context: &dyn ContextTrait) -> Result<String, WalletError> {
         let net_type_setting = Setting::get_setting(context, &SettingType::CurrentNetType).await?;
-        match net_type_setting{
-            Some(item)=>Ok(item.value_str),
-            None=>Ok(NetType::Main.to_string()),
+        match net_type_setting {
+            Some(item) => Ok(item.value_str),
+            None => Ok(NetType::Main.to_string()),
         }
-       // net_type_setting.map(|item| item.value_str ).ok_or(WalletError::NotExist)
+        // net_type_setting.map(|item| item.value_str ).ok_or(WalletError::NotExist)
     }
 
-    pub async fn change_net_type(context: &dyn ContextTrait,net_type:&NetType) -> Result<u64, WalletError> {
+    pub async fn change_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<u64, WalletError> {
         let rb = context.db().wallets_db();
         let mut wallet_setting = Setting::get_setting(context, &SettingType::CurrentNetType).await?.unwrap_or_default();
         wallet_setting.key_str = SettingType::CurrentNetType.to_string();
         wallet_setting.value_str = net_type.to_string();
-        wallet_setting.save_update(rb, "").await.map(|ret|ret.rows_affected).map_err(|err|WalletError::RbatisError(err))
+        wallet_setting.save_update(rb, "").await.map(|ret| ret.rows_affected).map_err(|err| WalletError::RbatisError(err))
     }
-
 
 
     /// save 当前的wallet and chain
@@ -64,19 +63,19 @@ impl Setting {
         Ok(())
     }
 
-    pub async fn save_current_database_version(context: &dyn ContextTrait, version_value: &str, )->Result<(),WalletError>{
+    pub async fn save_current_database_version(context: &dyn ContextTrait, version_value: &str) -> Result<(), WalletError> {
         let rb = context.db().wallets_db();
         let mut wallet_setting = Setting::get_setting(context, &SettingType::CurrentDbVersion).await?.unwrap_or_default();
-        wallet_setting.key_str=SettingType::CurrentDbVersion.to_string();
-        wallet_setting.value_str=version_value.to_string();
+        wallet_setting.key_str = SettingType::CurrentDbVersion.to_string();
+        wallet_setting.value_str = version_value.to_string();
         wallet_setting.save_update(rb, "").await?;
-       Ok(())
+        Ok(())
     }
 
     ///如果没有找到返回 none
     pub async fn get_setting(context: &dyn ContextTrait, key: &SettingType) -> Result<Option<MSetting>, WalletError> {
         let rb = context.db().wallets_db();
-        let  wrapper = rb.new_wrapper().eq(MSetting::key_str, key.to_string());
+        let wrapper = rb.new_wrapper().eq(MSetting::key_str, key.to_string());
         let r = MSetting::fetch_by_wrapper(rb, "", &wrapper).await?;
         Ok(r)
     }

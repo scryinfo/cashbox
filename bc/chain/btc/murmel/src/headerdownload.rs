@@ -1,3 +1,19 @@
+use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
+
+use bitcoin_hashes::hex::ToHex;
+use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use futures::executor::block_on;
+use log::{debug, error, info, trace};
+
+use bitcoin::{
+    BitcoinHash,
+    BlockHeader, network::{
+        message::NetworkMessage,
+        message_blockdata::{GetHeadersMessage, Inventory, InvType},
+    },
+};
+
+use crate::broadcast_queue::CondPair;
 //
 // Copyright 2018-2019 Tamas Blummer
 //
@@ -17,7 +33,6 @@
 //! # Download headers
 //!
 use crate::chaindb::SharedChainDB;
-use crate::broadcast_queue::CondPair;
 use crate::db::GlobalRB;
 use crate::downstream::SharedDownstream;
 use crate::error::Error;
@@ -26,18 +41,6 @@ use crate::p2p::{
     SERVICE_BLOCKS,
 };
 use crate::timeout::{ExpectedReply, SharedTimeout};
-use bitcoin::{
-    network::{
-        message::NetworkMessage,
-        message_blockdata::{GetHeadersMessage, InvType, Inventory},
-    },
-    BitcoinHash, BlockHeader,
-};
-use bitcoin_hashes::hex::ToHex;
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
-use futures::executor::block_on;
-use log::{debug, error, info, trace};
-use std::{collections::VecDeque, sync::mpsc, thread, time::Duration};
 
 pub struct HeaderDownload {
     p2p: P2PControlSender<NetworkMessage>,

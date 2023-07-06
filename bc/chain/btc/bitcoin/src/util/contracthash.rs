@@ -18,15 +18,15 @@
 //! at http://blockstream.com/sidechains.pdf for details of
 //! what this does.
 
-use secp256k1::{self, Secp256k1};
-use PrivateKey;
-use PublicKey;
-use hashes::{hash160, sha256, Hash, HashEngine, Hmac, HmacEngine};
-use blockdata::{opcodes, script};
-
 use std::{error, fmt};
 
+use hashes::{Hash, hash160, HashEngine, Hmac, HmacEngine, sha256};
+use secp256k1::{self, Secp256k1};
+
+use blockdata::{opcodes, script};
 use network::constants::Network;
+use PrivateKey;
+use PublicKey;
 use util::address;
 
 /// Encoding of "pubkey here" in script; from Bitcoin Core `src/script/script.h`
@@ -51,7 +51,7 @@ pub enum Error {
     /// Did not have enough keys to instantiate a script template
     TooFewKeys(usize),
     /// Had too many keys; template does not match key list
-    TooManyKeys(usize)
+    TooManyKeys(usize),
 }
 
 impl fmt::Display for Error {
@@ -94,7 +94,7 @@ impl error::Error for Error {
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 enum TemplateElement {
     Op(opcodes::All),
-    Key
+    Key,
 }
 
 /// A script template
@@ -198,18 +198,18 @@ pub fn tweak_secret_key<C: secp256k1::Signing>(secp: &Secp256k1<C>, key: &Privat
 
 /// Takes a contract, template and key set and runs through all the steps
 pub fn create_address<C: secp256k1::Verification>(secp: &Secp256k1<C>,
-                      network: Network,
-                      contract: &[u8],
-                      keys: &[PublicKey],
-                      template: &Template)
-                      -> Result<address::Address, Error> {
+                                                  network: Network,
+                                                  contract: &[u8],
+                                                  keys: &[PublicKey],
+                                                  template: &Template)
+                                                  -> Result<address::Address, Error> {
     let keys = tweak_keys(secp, keys, contract);
     let script = template.to_script(&keys)?;
     Ok(address::Address {
         network: network,
         payload: address::Payload::ScriptHash(
             hash160::Hash::hash(&script[..])
-        )
+        ),
     })
 }
 
@@ -222,7 +222,7 @@ pub fn untemplate(script: &script::Script) -> Result<(Template, Vec<PublicKey>),
     enum Mode {
         SeekingKeys,
         CopyingKeys,
-        SeekingCheckMulti
+        SeekingCheckMulti,
     }
 
     let mut mode = Mode::SeekingKeys;
@@ -243,7 +243,7 @@ pub fn untemplate(script: &script::Script) -> Result<(Template, Vec<PublicKey>),
                         // Otherwise we have to wait for a N CHECKSIG pair.
                         match mode {
                             Mode::SeekingKeys => { ret.push_slice(data) }
-                            Mode::CopyingKeys => { return Err(Error::ExpectedKey); },
+                            Mode::CopyingKeys => { return Err(Error::ExpectedKey); }
                             Mode::SeekingCheckMulti => { return Err(Error::ExpectedChecksig); }
                         }
                     }
@@ -282,21 +282,22 @@ pub fn untemplate(script: &script::Script) -> Result<(Template, Vec<PublicKey>),
 
 #[cfg(test)]
 mod tests {
-    use secp256k1::Secp256k1;
+    use std::str::FromStr;
+
     use hex::decode as hex_decode;
     use secp256k1::rand::thread_rng;
-    use std::str::FromStr;
+    use secp256k1::Secp256k1;
 
     use blockdata::script::Script;
     use network::constants::Network;
+    use PublicKey;
 
     use super::*;
-    use PublicKey;
 
     macro_rules! hex (($hex:expr) => (hex_decode($hex).unwrap()));
     macro_rules! hex_key (($hex:expr) => (PublicKey::from_slice(&hex!($hex)).unwrap()));
-    macro_rules! alpha_template(() => (Template::from(&hex!("55fefefefefefefe57AE")[..])));
-    macro_rules! alpha_keys(() => (
+    macro_rules! alpha_template (() => (Template::from(&hex!("55fefefefefefefe57AE")[..])));
+    macro_rules! alpha_keys (() => (
         &[hex_key!("0269992fb441ae56968e5b77d46a3e53b69f136444ae65a94041fc937bdb28d933"),
           hex_key!("021df31471281d4478df85bfce08a10aab82601dca949a79950f8ddf7002bd915a"),
           hex_key!("02174c82021492c2c6dfcbfa4187d10d38bed06afb7fdcd72c880179fddd641ea1"),

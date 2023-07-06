@@ -1,15 +1,18 @@
 #![allow(non_snake_case)]
 
 use std::os::raw::{c_char, c_uint};
-use futures::executor::block_on;
-use wallets_types::{Error};
-use wallets::Contexts;
-use super::types::CError;
-use super::kits::{CR,CArray, to_c_char, to_str};
 
-use crate::parameters::{CContext, CEthTransferPayload, CEthRawTxPayload, CEthWalletConnectTx};
-use crate::CStruct;
+use futures::executor::block_on;
+
+use wallets::Contexts;
+use wallets_types::Error;
+
 use crate::chain_eth::{CEthChainTokenAuth, CEthChainTokenDefault, CEthChainTokenNonAuth};
+use crate::CStruct;
+use crate::parameters::{CContext, CEthRawTxPayload, CEthTransferPayload, CEthWalletConnectTx};
+
+use super::kits::{CArray, CR, to_c_char, to_str};
+use super::types::CError;
 
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_decodeAdditionData(ctx: *mut CContext, encodeData: *mut c_char, additionData: *mut *mut c_char) -> *const CError {
@@ -108,10 +111,11 @@ pub unsafe extern "C" fn ChainEth_rawTxSign(ctx: *mut CContext, rawTxPayload: *m
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_walletConnectTxSign(ctx: *mut CContext, wallet_connect_tx: *mut CEthWalletConnectTx, password: *mut c_char, signResult: *mut *mut c_char) -> *const CError {
     log::debug!("enter ChainEth walletConnectSign");
-    if ctx.is_null() || wallet_connect_tx.is_null() || password.is_null(){
+    if ctx.is_null() || wallet_connect_tx.is_null() || password.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,wallet_connect_tx,password is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
@@ -138,6 +142,7 @@ pub unsafe extern "C" fn ChainEth_walletConnectTxSign(ctx: *mut CContext, wallet
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+
 #[no_mangle]
 pub unsafe extern "C" fn ChainEth_updateAuthTokenList(ctx: *mut CContext, authTokens: *mut CArray<CEthChainTokenAuth>) -> *const CError {
     log::debug!("enter ChainEth updateAuthTokenList");
@@ -324,25 +329,26 @@ pub unsafe extern "C" fn ChainEth_getNonAuthTokenList(ctx: *mut CContext, tokens
     log::debug!("{}", err);
     CError::to_c_ptr(&err)
 }
+
 #[no_mangle]
-pub unsafe extern "C" fn ChainEth_queryAuthTokenList(ctx: *mut CContext,tokenName: *mut c_char,contract: *mut c_char, startItem: c_uint, pageSize: c_uint,  tokens: *mut *mut CArray<CEthChainTokenAuth>) -> *const CError {
+pub unsafe extern "C" fn ChainEth_queryAuthTokenList(ctx: *mut CContext, tokenName: *mut c_char, contract: *mut c_char, startItem: c_uint, pageSize: c_uint, tokens: *mut *mut CArray<CEthChainTokenAuth>) -> *const CError {
     log::debug!("enter ChainEth getNonAuthTokenList");
 
-    if ctx.is_null() || tokens.is_null() || tokenName.is_null()|| contract.is_null(){
+    if ctx.is_null() || tokens.is_null() || tokenName.is_null() || contract.is_null() {
         let err = Error::PARAMETER().append_message(" : ctx,tokens is null");
         log::error!("{}", err);
         return CError::to_c_ptr(&err);
     }
     (*tokens).free();
     let token_name = to_str(tokenName);
-    let query_name = if token_name.is_empty(){
+    let query_name = if token_name.is_empty() {
         None
-    }else { Some(token_name.to_string()) };
+    } else { Some(token_name.to_string()) };
 
     let contract = to_str(contract);
-    let query_contract = if contract.is_empty(){
+    let query_contract = if contract.is_empty() {
         None
-    }else { Some(contract.to_string()) };
+    } else { Some(contract.to_string()) };
 
     let lock = Contexts::collection().lock();
     let mut contexts = lock.borrow_mut();
@@ -350,9 +356,8 @@ pub unsafe extern "C" fn ChainEth_queryAuthTokenList(ctx: *mut CContext,tokenNam
         let ctx = CContext::ptr_rust(ctx);
         match contexts.get(&ctx.id) {
             Some(wallets) => {
-
                 let eth_chain = wallets.eth_chain_instance();
-                match block_on(eth_chain.query_auth_tokens(wallets, &wallets.net_type,query_name,query_contract,startItem as u64,pageSize as u64)) {
+                match block_on(eth_chain.query_auth_tokens(wallets, &wallets.net_type, query_name, query_contract, startItem as u64, pageSize as u64)) {
                     Ok(data) => {
                         *tokens = CArray::to_c_ptr(&data);
                         Error::SUCCESS()

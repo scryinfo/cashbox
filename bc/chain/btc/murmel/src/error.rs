@@ -19,12 +19,14 @@
 //! All modules of this library use this error class to indicate problems.
 //!
 
+use std::fmt;
+use std::io;
+
+use hammersbald;
+
 use bitcoin::consensus::encode;
 use bitcoin::util;
 use bitcoin::util::bip158;
-use hammersbald;
-use std::fmt;
-use std::io;
 
 /// An error class to offer a unified error interface upstream
 pub enum Error {

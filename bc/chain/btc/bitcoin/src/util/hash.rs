@@ -18,7 +18,7 @@
 use std::cmp::min;
 use std::default::Default;
 
-use hashes::{sha256d, Hash};
+use hashes::{Hash, sha256d};
 
 use consensus::encode::Encodable;
 

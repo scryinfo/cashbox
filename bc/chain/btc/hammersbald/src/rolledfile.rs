@@ -1,3 +1,8 @@
+use std::cmp::max;
+use std::collections::HashMap;
+use std::fs::{self, File, OpenOptions};
+use std::path::Path;
+
 //
 // Copyright 2018-2019 Tamas Blummer
 //
@@ -19,33 +24,28 @@
 //! A file that is split into chunks
 //!
 use error::Error;
-use pref::PRef;
 use page::{Page, PAGE_SIZE};
 use pagedfile::PagedFile;
+use pref::PRef;
 use singlefile::SingleFile;
-
-use std::collections::HashMap;
-use std::fs::{self, File, OpenOptions};
-use std::path::Path;
-use std::cmp::max;
 
 pub struct RolledFile {
     name: String,
     extension: String,
-    files: HashMap<u16,SingleFile>,
+    files: HashMap<u16, SingleFile>,
     len: u64,
     append_only: bool,
-    chunk_size: u64
+    chunk_size: u64,
 }
 
 impl RolledFile {
-    pub fn new (name: &str, extension: &str, append_only: bool, chunk_size: u64) -> Result<RolledFile, Error> {
-        let mut rolled = RolledFile { name: name.to_string(), extension: extension.to_string(), files: HashMap::new(), len: 0, append_only, chunk_size};
+    pub fn new(name: &str, extension: &str, append_only: bool, chunk_size: u64) -> Result<RolledFile, Error> {
+        let mut rolled = RolledFile { name: name.to_string(), extension: extension.to_string(), files: HashMap::new(), len: 0, append_only, chunk_size };
         rolled.open()?;
         Ok(rolled)
     }
 
-    fn open (&mut self) -> Result<(), Error> {
+    fn open(&mut self) -> Result<(), Error> {
         // interesting file names are:
         // name.index.extension
         // where index is a number
@@ -74,7 +74,7 @@ impl RolledFile {
                                                     let file = Self::open_file(self.append_only, filename)?;
                                                     self.files.insert(number,
                                                                       SingleFile::new_chunk(file, number as u64 * self.chunk_size, self.chunk_size)?);
-                                                    if let Some (file) = self.files.get(&number) {
+                                                    if let Some(file) = self.files.get(&number) {
                                                         if file.len().unwrap() > 0 {
                                                             highest_chunk = max(highest_chunk, number);
                                                         }
@@ -89,23 +89,21 @@ impl RolledFile {
                     }
                 }
             }
-            if let Some (file) = self.files.get(&highest_chunk) {
+            if let Some(file) = self.files.get(&highest_chunk) {
                 self.len = highest_chunk as u64 * self.chunk_size + file.len()?;
             }
-        }
-        else {
+        } else {
             return Err(Error::Corrupted("invalid db name".to_string()));
         }
         Ok(())
     }
 
-    fn open_file (append: bool, path: String) -> Result<File, Error> {
+    fn open_file(append: bool, path: String) -> Result<File, Error> {
         let mut open_mode = OpenOptions::new();
 
         if append {
             open_mode.read(true).append(true).create(true);
-        }
-        else{
+        } else {
             open_mode.read(true).write(true).create(true);
         };
         Ok(open_mode.open(path)?)
@@ -137,7 +135,7 @@ impl PagedFile for RolledFile {
                 file.truncate(0)?;
             }
         }
-        if let Some (last) = self.files.get_mut(&chunk) {
+        if let Some(last) = self.files.get_mut(&chunk) {
             last.truncate(new_len % self.chunk_size)?;
         }
         self.len = new_len;
@@ -151,9 +149,9 @@ impl PagedFile for RolledFile {
         Ok(())
     }
 
-    fn shutdown (&mut self) {}
+    fn shutdown(&mut self) {}
 
-    fn append_page (&mut self, page: Page) -> Result<(), Error> {
+    fn append_page(&mut self, page: Page) -> Result<(), Error> {
         let chunk = (self.len / self.chunk_size) as u16;
 
         if self.len % self.chunk_size == 0 && !self.files.contains_key(&chunk) {
@@ -162,11 +160,10 @@ impl PagedFile for RolledFile {
             self.files.insert(chunk, SingleFile::new_chunk(file, self.len, self.chunk_size)?);
         }
 
-        if let Some (file) = self.files.get_mut(&chunk) {
+        if let Some(file) = self.files.get_mut(&chunk) {
             file.append_page(page)?;
             self.len += PAGE_SIZE as u64;
-        }
-        else {
+        } else {
             return Err(Error::Corrupted(format!("missing chunk in append {}", chunk)));
         }
         Ok(())
@@ -179,11 +176,11 @@ impl PagedFile for RolledFile {
         if !self.files.contains_key(&chunk) {
             let file = Self::open_file(self.append_only, (((self.name.clone() + ".")
                 + chunk.to_string().as_str()) + ".") + self.extension.as_str())?;
-            self.files.insert(chunk, SingleFile::new_chunk(file, (n_offset/self.chunk_size) * self.chunk_size, self.chunk_size)?);
+            self.files.insert(chunk, SingleFile::new_chunk(file, (n_offset / self.chunk_size) * self.chunk_size, self.chunk_size)?);
         }
 
         if let Some(file) = self.files.get_mut(&chunk) {
-            self.len = max(self.len, file.update_page(page)?  + chunk as u64 * self.chunk_size);
+            self.len = max(self.len, file.update_page(page)? + chunk as u64 * self.chunk_size);
             Ok(self.len)
         } else {
             return Err(Error::Corrupted(format!("missing chunk in write {}", chunk)));

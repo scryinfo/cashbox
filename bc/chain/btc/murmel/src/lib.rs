@@ -28,6 +28,8 @@
 #![allow(ellipsis_inclusive_range_patterns)]
 #![allow(incomplete_include)]
 
+pub use error::Error;
+
 mod headercache;
 #[cfg(feature = "lightning")]
 mod lightning;
@@ -52,4 +54,3 @@ pub mod path;
 mod kit;
 pub mod broadcast_queue;
 
-pub use error::Error;

@@ -1,7 +1,24 @@
-use super::*;
+use std::collections::HashMap;
 use std::convert::TryFrom;
+
+use codec::{Compact, Decode, Encode};
+use sp_core::crypto::Ss58Codec;
+use sp_core::Pair;
+use sp_runtime::generic::Era;
+use sp_runtime::MultiSignature;
+// use sp_runtime::MultiSignature;
+use system::Phase;
+
 use frame_metadata::RuntimeMetadataPrefixed;
-use node_metadata::Metadata;
+
+use crate::{AccountId, compose_call, compose_extrinsic_offline, Crypto, EeeAccountInfo, EeeAccountInfoRefU8, error, extrinsic, Hash, keyring, Token, TransferDetail};
+// use node_metadata::Metadata;
+use crate::events::{EventsDecoder, RuntimeEvent, SystemEvent};
+use crate::extrinsic::GenericExtra;
+use crate::extrinsic::xt_primitives::GenericAddress;
+use crate::node_metadata::Metadata;
+
+// use super::*;
 
 pub struct ChainHelper {
     metadata: Metadata,
@@ -70,7 +87,7 @@ impl ChainHelper {
             let xt = extrinsic::UncheckedExtrinsicFromOuter::new_signed(
                 func_data.to_vec(),
                 GenericAddress::from(signer.public().0),
-                MultiSignature::from(signature),
+                MultiSignature::Sr25519(signature),
                 GenericExtra::new(Era::Immortal, index),
             );
             Ok(xt.hex_encode())
@@ -125,7 +142,7 @@ impl ChainHelper {
             let tx = scry_crypto::hexstr_to_vec(tx_str)?;
             let checked_tx = extrinsic::CheckedExtrinsic::decode(&mut &tx[..])?;
             let tx_hash = sp_core::blake2_256(&tx[..]);
-            let mut tx_transfer_detail = TransferDetail{
+            let mut tx_transfer_detail = TransferDetail {
                 hash: Some(hex::encode(&tx_hash[..])),
                 ..Default::default()
             };
@@ -204,7 +221,7 @@ impl ChainHelper {
     fn decode_balance_transfer_tx(&self, target_account: &AccountId, checked_extrinsic: &extrinsic::CheckedExtrinsic, detail: &mut TransferDetail) -> Result<(), error::Error> {
         let func_args: (AccountId, Compact<u128>) = Decode::decode(&mut &checked_extrinsic.function.args[..])?;
         if let Some((account, _signature, extra)) = &checked_extrinsic.signature {
-            if target_account.eq(&func_args.0) || target_account.eq(&account) {
+            if target_account.eq(&func_args.0) || target_account.eq(account) {
                 detail.value = Some(func_args.1.0);
                 detail.to = Some(func_args.0.to_ss58check());
                 detail.signer = Some(account.to_ss58check());
@@ -218,7 +235,7 @@ impl ChainHelper {
     fn decode_tokenx_transfer_tx(&self, target_account: &AccountId, checked_extrinsic: &extrinsic::CheckedExtrinsic, detail: &mut TransferDetail) -> Result<(), error::Error> {
         let func_args: (AccountId, Compact<u128>, Vec<u8>) = Decode::decode(&mut &checked_extrinsic.function.args[..])?;
         if let Some((account, _signature, extra)) = &checked_extrinsic.signature {
-            if target_account.eq(&func_args.0) || target_account.eq(&account) {
+            if target_account.eq(&func_args.0) || target_account.eq(account) {
                 detail.value = Some(func_args.1.0);
                 detail.to = Some(func_args.0.to_ss58check());
                 detail.signer = Some(account.to_ss58check());
@@ -244,7 +261,7 @@ impl ChainHelper {
     fn decode_tokenx_transfer_from_tx(&self, target_account: &AccountId, checked_extrinsic: &extrinsic::CheckedExtrinsic, detail: &mut TransferDetail) -> Result<(), error::Error> {
         let func_args: (AccountId, AccountId, Compact<u128>, Vec<u8>) = Decode::decode(&mut &checked_extrinsic.function.args[..])?;
         if let Some((account, _signature, extra)) = &checked_extrinsic.signature {
-            if target_account.eq(&func_args.0) || target_account.eq(&account) {
+            if target_account.eq(&func_args.0) || target_account.eq(account) {
                 detail.value = Some(func_args.2.0);
                 detail.to = Some(func_args.1.to_ss58check());
                 detail.from = Some(func_args.0.to_ss58check());

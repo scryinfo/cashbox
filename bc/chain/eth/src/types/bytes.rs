@@ -1,7 +1,8 @@
-use rustc_hex::{FromHex, ToHex};
-use serde::de::{Error, Unexpected, Visitor};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
+
+use rustc_hex::{FromHex, ToHex};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::de::{Error, Unexpected, Visitor};
 
 /// Raw bytes wrapper
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
@@ -15,8 +16,8 @@ impl<T: Into<Vec<u8>>> From<T> for Bytes {
 
 impl Serialize for Bytes {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         let mut serialized = "0x".to_owned();
         serialized.push_str(self.0.to_hex::<String>().as_ref());
@@ -26,8 +27,8 @@ impl Serialize for Bytes {
 
 impl<'a> Deserialize<'a> for Bytes {
     fn deserialize<D>(deserializer: D) -> Result<Bytes, D::Error>
-    where
-        D: Deserializer<'a>,
+        where
+            D: Deserializer<'a>,
     {
         deserializer.deserialize_identifier(BytesVisitor)
     }
@@ -43,8 +44,8 @@ impl<'a> Visitor<'a> for BytesVisitor {
     }
 
     fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-    where
-        E: Error,
+        where
+            E: Error,
     {
         if value.len() >= 2 && &value[0..2] == "0x" {
             let bytes = FromHex::from_hex(&value[2..]).map_err(|e| Error::custom(format!("Invalid hex: {}", e)))?;
@@ -55,8 +56,8 @@ impl<'a> Visitor<'a> for BytesVisitor {
     }
 
     fn visit_string<E>(self, value: String) -> Result<Self::Value, E>
-    where
-        E: Error,
+        where
+            E: Error,
     {
         self.visit_str(value.as_ref())
     }

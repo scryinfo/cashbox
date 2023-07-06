@@ -397,8 +397,8 @@ impl Uint256 {
 #[cfg(test)]
 mod tests {
     use consensus::{deserialize, serialize};
-    use util::uint::Uint256;
     use util::BitArray;
+    use util::uint::Uint256;
 
     #[test]
     pub fn uint256_bits_test() {
@@ -433,7 +433,7 @@ mod tests {
                    "0x000000000000000000000000000000000000000000000000ffffffffffffffff");
 
         let max_val = Uint256([0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
-                               0xFFFFFFFFFFFFFFFF]);
+            0xFFFFFFFFFFFFFFFF]);
         assert_eq!(format!("{}", max_val),
                    "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
     }
@@ -479,7 +479,7 @@ mod tests {
         assert_eq!(mult, Uint256([0x8C8C3EE70C644118u64, 0x0209E7378231E632, 0, 0]));
         // Division
         assert_eq!(Uint256::from_u64(105).unwrap() /
-                   Uint256::from_u64(5).unwrap(),
+                       Uint256::from_u64(5).unwrap(),
                    Uint256::from_u64(21).unwrap());
         let div = mult / Uint256::from_u64(300).unwrap();
         assert_eq!(div, Uint256([0x9F30411021524112u64, 0x0001BD5B7DDFBD5A, 0, 0]));
@@ -516,7 +516,7 @@ mod tests {
         let u256_res = u128_res * u128_res;
 
         assert_eq!(u256_res, Uint256([0xF4E166AAD40D0A41u64, 0xF5CF7F3618C2C886u64,
-                                      0x4AFCFF6F0375C608u64, 0x928D92B4D7F5DF33u64]));
+            0x4AFCFF6F0375C608u64, 0x928D92B4D7F5DF33u64]));
     }
 
     #[test]

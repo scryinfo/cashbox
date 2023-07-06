@@ -1,6 +1,6 @@
+use mav::{NetType, WalletType};
 //use async_trait::async_trait;
-use mav::ma::{Dao, MWallet, MAddress};
-use mav::{WalletType, NetType};
+use mav::ma::{Dao, MAddress, MWallet};
 
 use crate::{BtcChain, ContextTrait, EeeChain, EthChain, WalletError};
 use crate::deref_type;
@@ -15,28 +15,28 @@ pub struct Wallet {
 deref_type!(Wallet,MWallet);
 
 impl Wallet {
-    pub async fn has_any(context: &dyn ContextTrait,net_type:&NetType) -> Result<bool, WalletError> {
+    pub async fn has_any(context: &dyn ContextTrait, net_type: &NetType) -> Result<bool, WalletError> {
         let rb = context.db().wallets_db();
-        let wrapper = rb.new_wrapper().eq(MWallet::wallet_type,&WalletType::from(net_type).to_string());
+        let wrapper = rb.new_wrapper().eq(MWallet::wallet_type, &WalletType::from(net_type).to_string());
         let r = MWallet::exist_by_wrapper(rb, "", &wrapper).await?;
         Ok(r)
     }
-    pub async fn count(context: &dyn ContextTrait,net_type:&NetType) -> Result<i64, WalletError> {
+    pub async fn count(context: &dyn ContextTrait, net_type: &NetType) -> Result<i64, WalletError> {
         let rb = context.db().wallets_db();
-        let wrapper = rb.new_wrapper().eq(MWallet::wallet_type,&WalletType::from(net_type).to_string());
+        let wrapper = rb.new_wrapper().eq(MWallet::wallet_type, &WalletType::from(net_type).to_string());
         let count = MWallet::count_by_wrapper(rb, "", &wrapper).await?;
         Ok(count)
     }
 
-    pub async fn all(context: &dyn ContextTrait,net_type:&NetType) -> Result<Vec<Wallet>, WalletError> {
+    pub async fn all(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<Wallet>, WalletError> {
         let mut wallets = Vec::new();
         let wallet_rb = context.db().wallets_db();
-        let filter_value = if NetType::Main.eq(net_type) {WalletType::Normal.to_string() }else { WalletType::Test.to_string() };
-        let wrapper = wallet_rb.new_wrapper().eq(MWallet::wallet_type,filter_value.as_str());
-        let dws = MWallet::list_by_wrapper(wallet_rb, "",&wrapper).await?;
+        let filter_value = if NetType::Main.eq(net_type) { WalletType::Normal.to_string() } else { WalletType::Test.to_string() };
+        let wrapper = wallet_rb.new_wrapper().eq(MWallet::wallet_type, filter_value.as_str());
+        let dws = MWallet::list_by_wrapper(wallet_rb, "", &wrapper).await?;
         for dw in &dws {
             let mut wallet = Wallet::default();
-            wallet.load(context, dw.clone(),net_type).await?;
+            wallet.load(context, dw.clone(), net_type).await?;
             wallets.push(wallet);
         }
         Ok(wallets)
@@ -45,13 +45,13 @@ impl Wallet {
         let dws = MWallet::list(context.db().wallets_db(), "").await?;
         Ok(dws)
     }
-    pub async fn find_by_id(context: &dyn ContextTrait, wallet_id: &str,net_type:&NetType) -> Result<Option<Wallet>, WalletError> {
+    pub async fn find_by_id(context: &dyn ContextTrait, wallet_id: &str, net_type: &NetType) -> Result<Option<Wallet>, WalletError> {
         let rb = context.db().wallets_db();
         let m_wallet = MWallet::fetch_by_id(rb, "", &wallet_id.to_owned()).await?;
         match m_wallet {
             Some(m) => {
                 let mut wallet = Wallet::default();
-                wallet.load(context, m,net_type).await?;
+                wallet.load(context, m, net_type).await?;
                 Ok(Some(wallet))
             }
             None => Ok(None)
@@ -69,7 +69,7 @@ impl Wallet {
         }
         let address = m_address.get(0).unwrap();
 
-        Self::find_by_id(context,&address.wallet_id.to_owned(),&NetType::from_chain_type(&address.chain_type)).await
+        Self::find_by_id(context, &address.wallet_id.to_owned(), &NetType::from_chain_type(&address.chain_type)).await
     }
     pub async fn m_wallet_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<Option<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
@@ -95,26 +95,26 @@ impl Wallet {
 
     pub async fn m_wallet_by_name(context: &dyn ContextTrait, name: &str) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
-        let  wrapper = rb.new_wrapper().eq(&MWallet::name, name);
+        let wrapper = rb.new_wrapper().eq(&MWallet::name, name);
         let dws = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(dws)
     }
 
     pub async fn mnemonic_digest(context: &dyn ContextTrait, digest: &str) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
-        let  wrapper = rb.new_wrapper().eq(MWallet::mnemonic_digest, digest);
+        let wrapper = rb.new_wrapper().eq(MWallet::mnemonic_digest, digest);
         let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(ms)
     }
 
     pub async fn check_duplicate_mnemonic(context: &dyn ContextTrait, digest: &str, wallet_type: &WalletType) -> Result<Vec<MWallet>, WalletError> {
         let rb = context.db().wallets_db();
-        let wrapper ={
-           let wrapper =   rb.new_wrapper().eq(MWallet::mnemonic_digest, digest.to_owned());
-            if WalletType::Test.eq(wallet_type){
+        let wrapper = {
+            let wrapper = rb.new_wrapper().eq(MWallet::mnemonic_digest, digest.to_owned());
+            if WalletType::Test.eq(wallet_type) {
                 //check test wallet mnemonic whether used in normal wallet
                 wrapper.eq(MWallet::wallet_type, WalletType::Normal.to_string())
-            }else {
+            } else {
                 wrapper
             }
         };
@@ -124,17 +124,17 @@ impl Wallet {
 }
 
 /*#[async_trait]*/
-impl  Wallet {
-   pub async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet,net_type:&NetType) -> Result<(), WalletError> {
+impl Wallet {
+    pub async fn load(&mut self, context: &dyn ContextTrait, mw: MWallet, net_type: &NetType) -> Result<(), WalletError> {
         self.m = mw;
         {
-            self.eth_chain.load(context, self.m.clone(),net_type).await?;
+            self.eth_chain.load(context, self.m.clone(), net_type).await?;
         }
         {
-            self.eee_chain.load(context, self.m.clone(),net_type).await?;
+            self.eee_chain.load(context, self.m.clone(), net_type).await?;
         }
         {
-            self.btc_chain.load(context, self.m.clone(),net_type).await?;
+            self.btc_chain.load(context, self.m.clone(), net_type).await?;
         }
 
         Ok(())
