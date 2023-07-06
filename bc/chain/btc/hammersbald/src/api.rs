@@ -22,9 +22,9 @@ use format::{Envelope, Payload};
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//!
-//! # Hammersbald API
-//!
+///
+/// # Hammersbald API
+///
 use logfile::LogFile;
 use memtable::MemTable;
 use persistent::Persistent;

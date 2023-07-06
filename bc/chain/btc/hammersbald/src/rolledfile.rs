@@ -18,11 +18,11 @@ use std::path::Path;
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//!
-//! # Rolled file
-//!
-//! A file that is split into chunks
-//!
+///
+/// # Rolled file
+///
+/// A file that is split into chunks
+///
 use error::Error;
 use page::{Page, PAGE_SIZE};
 use pagedfile::PagedFile;

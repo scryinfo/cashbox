@@ -180,7 +180,7 @@ impl EthTransferPayload {
             if self.contract_address.trim().is_empty() {
                 amount.unwrap()
             } else {
-                U256::from(0)
+                primitive_types::U256::from(0)
             }
         };
         //Additional parameters

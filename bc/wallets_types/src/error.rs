@@ -142,11 +142,11 @@ impl From<eee::error::Error> for WalletError {
     }
 }
 
-impl From<semver::SemVerError> for WalletError {
-    fn from(err: semver::SemVerError) -> Self {
-        WalletError::Custom(format!("{:?}", err))
-    }
-}
+// impl From<semver::SemVerError> for WalletError {
+//     fn from(err: semver::SemVerError) -> Self {
+//         WalletError::Custom(format!("{:?}", err))
+//     }
+// }
 
 // impl From<failure::NoneError> for WalletError{
 //     fn from(err: failure::NoneError) -> Self {

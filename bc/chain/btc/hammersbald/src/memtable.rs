@@ -20,11 +20,12 @@ use datafile::{DataFile, EnvelopeIterator};
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//!
-//! # The memtable
-//! Specific implementation details to in-memory index of the db
-//!
-//!
+
+///
+/// # The memtable
+/// Specific implementation details to in-memory index of the db
+///
+///
 use error::Error;
 use format::{Envelope, Link, Payload};
 use logfile::LogFile;

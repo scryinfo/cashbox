@@ -6,7 +6,7 @@ use ethabi::{Bytes, Contract};
 use ethereum_types::{H160, H256, U256};
 use parity_crypto::Keccak256;
 use rlp::{self, DecoderError, RlpStream};
-use secp256k1::{key::{PublicKey, SecretKey}, Message, Secp256k1};
+use secp256k1::{PublicKey, SecretKey, Message, Secp256k1};
 use tiny_hderive::bip32::ExtendedPrivKey;
 
 pub use error::Error;

@@ -15,10 +15,10 @@ use std::collections::{HashMap, HashSet};
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//!
-//! # Statistics for a Hammersbald db
-//!
-//!
+///
+/// # Statistics for a Hammersbald db
+///
+///
 use api::Hammersbald;
 use bitcoin_hashes::siphash24;
 use format::Payload;

@@ -18,10 +18,10 @@ use std::sync;
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//!
-//! # Error type
-//!
-//!
+
+/// # Error type
+///
+///
 #[cfg(feature = "bitcoin_support")]
 use bitcoin::consensus::encode;
 
