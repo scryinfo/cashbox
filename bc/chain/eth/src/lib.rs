@@ -4,6 +4,7 @@ extern crate serde_derive;
 use bip39::{Language, Mnemonic, Seed};
 use ethabi::{Bytes, Contract};
 use ethereum_types::{H160, H256, U256};
+use parity_crypto::Keccak256;
 use rlp::{self, DecoderError, RlpStream};
 use secp256k1::{key::{PublicKey, SecretKey}, Message, Secp256k1};
 use tiny_hderive::bip32::ExtendedPrivKey;
@@ -194,8 +195,7 @@ impl RawTransaction {
 }
 
 fn keccak(s: &[u8]) -> [u8; 32] {
-    let mut result = [0u8; 32];
-    tiny_keccak::Keccak::keccak256(s, &mut result);
+    let result = s.keccak256();
     result
 }
 
