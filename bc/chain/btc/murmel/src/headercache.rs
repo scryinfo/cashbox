@@ -25,6 +25,7 @@ use log::trace;
 use bitcoin::{
     BitcoinHash, blockdata::block::BlockHeader, network::constants::Network, util::uint::Uint256,
 };
+use bitcoin::util::BitArray;
 
 use crate::chaindb::StoredHeader;
 use crate::error::Error;

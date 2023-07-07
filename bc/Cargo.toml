@@ -14,6 +14,7 @@ members = [
     "wallets",
     "chain/btc/murmel",
     "chain/btc/bitcoin",
+    "chain/btc/hammersbald",
     "chain/eth",
     "chain/eee",
     "chain/eee/frame-metadata",

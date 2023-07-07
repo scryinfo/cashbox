@@ -38,11 +38,8 @@ use std::marker::PhantomData;
 use futures::{future, Future, FutureExt, Poll as Async, task::Waker, TryFutureExt};
 use futures::task::{Spawn, SpawnExt};
 use log::{debug, error, info, trace};
-use mio::{
-    Event,
-    Events,
-    net::{TcpListener, TcpStream}, Poll, PollOpt, Ready, Token, unix::UnixReady,
-};
+use mio::{Events, Poll, Token, net::{TcpListener, TcpStream}, Interest};
+use mio::event::Event;
 use rand::{RngCore, thread_rng};
 
 use bitcoin::consensus::{Decodable, encode};
@@ -487,14 +484,14 @@ impl<
             dispatcher,
             config,
             peers: peers.clone(),
-            poll: Arc::new(Poll::new().unwrap()),
+            poll: Arc::new(Poll ::new().unwrap()),
             next_peer_id: AtomicUsize::new(0),
             waker: Arc::new(Mutex::new(HashMap::new())),
             listener: Arc::new(Mutex::new(HashMap::new())),
             e: PhantomData {},
         });
 
-        let p2p2 = p2p.clone();
+        let mut p2p2 = p2p.clone();
 
         thread::Builder::new()
             .name("p2pcntrl".to_string())
@@ -526,7 +523,7 @@ impl<
         self.peers.read().unwrap().len()
     }
 
-    fn control_loop(&self, receiver: P2PControlReceiver<Message>) {
+    fn control_loop(&mut self, receiver: P2PControlReceiver<Message>) {
         while let Ok(control) = receiver.recv() {
             match control {
                 P2PControl::Ban(peer_id, score) => {
@@ -563,11 +560,10 @@ impl<
         panic!("P2P Control loop failed");
     }
 
-    fn add_listener(&self, bind: &SocketAddr) -> Result<(), io::Error> {
-        let listener = TcpListener::bind(bind)?;
+    fn add_listener(&mut self, bind: &SocketAddr) -> Result<(), io::Error> {
+        let mut listener = TcpListener::bind(bind.clone())?;
         let token = Token(self.next_peer_id.fetch_add(1, Ordering::Relaxed));
-        self.poll
-            .register(&listener, token, Ready::readable(), PollOpt::edge())?;
+        self.poll.registry().register(&mut listener, token, Interest::READABLE)?;
         self.listener
             .lock()
             .unwrap()
@@ -692,7 +688,7 @@ impl<
                 addr = a;
                 outgoing = true;
                 info!("trying outgoing connect to {} peer={}", addr, pid);
-                stream = TcpStream::connect(&addr)?;
+                stream = TcpStream::connect(addr)?;
             }
             PeerSource::Incoming(listener) => {
                 let (s, a) = listener.accept()?;
@@ -786,16 +782,15 @@ impl<
         needed_services: u64,
         iobuf: &mut [u8],
     ) -> Result<(), Error> {
-        let readiness = UnixReady::from(event.readiness());
         // check for error first
-        if readiness.is_hup() || readiness.is_error() {
+        if event.is_error() || event.is_read_closed() || event.is_write_closed() {
             info!("left us peer={}", pid);
             self.disconnect(pid, false);
         } else {
             // check for ability to write before read, to get rid of data before buffering more read
             // token should only be registered for write if there is a need to write
             // to avoid superfluous wakeups from poll
-            if readiness.contains(Ready::writable()) {
+            if event.is_writable() {
                 trace!("writeable peer={}", pid);
 
                 // figure peer's entry in the peer map, provided it is still connected, ignore event if not
@@ -848,7 +843,7 @@ impl<
                 }
             }
             // is peer readable ?
-            if readiness.contains(Ready::readable()) {
+            if event.is_readable(){
                 trace!("readable peer={}", pid);
                 // collect incoming messages here
                 // incoming messages are collected here for processing after release
@@ -1031,7 +1026,7 @@ impl<
     /// run the message dispatcher loop
     /// this method does not return unless there is an error obtaining network events
     /// run in its own thread, which will process all network events
-    pub fn poll_events(&self, network: &'static str, needed_services: u64, spawn: &mut dyn Spawn) {
+    pub fn poll_events(&mut self, network: &'static str, needed_services: u64, spawn: &mut dyn Spawn) {
         // events buffer
         let mut events = Events::with_capacity(EVENT_BUFFER_SIZE);
         // IO buffer
@@ -1061,7 +1056,7 @@ impl<
                         token: event.token(),
                     };
                     if let Err(error) =
-                        self.event_processor(event, pid, needed_services, iobuf.as_mut_slice())
+                        self.event_processor(event.clone(), pid, needed_services, iobuf.as_mut_slice())
                     {
                         use std::error::Error;
 
@@ -1139,34 +1134,32 @@ impl<Message> Peer<Message> {
     }
 
     // re-register for peer readable events
-    fn reregister_read(&self) -> Result<(), Error> {
+    fn reregister_read(&mut self) -> Result<(), Error> {
         if self.writeable.swap(false, Ordering::Acquire) {
             trace!("re-register for read peer={}", self.pid);
-            self.poll.reregister(
-                &self.stream,
+            self.poll.registry().reregister(
+                &mut self.stream,
                 self.pid.token,
-                Ready::readable() | UnixReady::error() | UnixReady::hup(),
-                PollOpt::level(),
+                Interest::READABLE,// | UnixReady::error() | UnixReady::hup(),
             )?;
         }
         Ok(())
     }
 
     // register for peer readable events
-    fn register_read(&self) -> Result<(), Error> {
+    fn register_read(&mut self) -> Result<(), Error> {
         trace!("register for read peer={}", self.pid);
-        self.poll.register(
-            &self.stream,
+        self.poll.registry().register(
+            &mut self.stream,
             self.pid.token,
-            Ready::readable() | UnixReady::error() | UnixReady::hup(),
-            PollOpt::level(),
+            Interest::READABLE,// | UnixReady::error() | UnixReady::hup(),
         )?;
         self.writeable.store(false, Ordering::Relaxed);
         Ok(())
     }
 
     /// send a message to P2P network
-    pub fn send(&self, msg: Message) -> Result<(), Error> {
+    pub fn send(&mut self, msg: Message) -> Result<(), Error> {
         // send to outgoing message channel
         self.sender
             .send(msg)
@@ -1177,27 +1170,25 @@ impl<Message> Peer<Message> {
     }
 
     // register for peer writable events
-    fn reregister_write(&self) -> Result<(), Error> {
+    fn reregister_write(&mut self) -> Result<(), Error> {
         if !self.writeable.swap(true, Ordering::Acquire) {
             trace!("re-register for write peer={}", self.pid);
-            self.poll.reregister(
-                &self.stream,
+            self.poll.registry().reregister(
+                &mut self.stream,
                 self.pid.token,
-                Ready::writable() | UnixReady::error() | UnixReady::hup(),
-                PollOpt::level(),
+                Interest::WRITABLE,// | UnixReady::error() | UnixReady::hup(),
             )?;
         }
         Ok(())
     }
 
     // register for peer writable events
-    fn register_write(&self) -> Result<(), Error> {
+    fn register_write(&mut self) -> Result<(), Error> {
         trace!("register for write peer={}", self.pid);
-        self.poll.register(
-            &self.stream,
+        self.poll.registry().register(
+            &mut self.stream,
             self.pid.token,
-            Ready::writable() | UnixReady::error() | UnixReady::hup(),
-            PollOpt::level(),
+            Interest::WRITABLE,// | UnixReady::error() | UnixReady::hup()
         )?;
         self.writeable.store(true, Ordering::Relaxed);
         Ok(())
