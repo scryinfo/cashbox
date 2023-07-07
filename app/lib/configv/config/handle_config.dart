@@ -11,7 +11,7 @@ class HandleConfig {
   factory HandleConfig() => _getInstance();
 
   static HandleConfig get instance => _getInstance();
-  static late HandleConfig _instance;
+  static final HandleConfig _instance = HandleConfig._internal();
   static String configDocumentPath = "/scry";
   static String configFileName = "config.json";
   static String defaultConfigFilePath = "assets/config/config.json";
@@ -21,9 +21,6 @@ class HandleConfig {
   }
 
   static HandleConfig _getInstance() {
-    if (_instance == null) {
-      _instance = new HandleConfig._internal();
-    }
     return _instance;
   }
 

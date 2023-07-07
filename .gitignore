@@ -168,3 +168,4 @@ demo/rbatis_demo/target
 /packages/logger/pubspec.lock
 /demo/ffi/cdl/src/wallets_c.h
 /demo/ffi/flutter_app/libcdl.so
+app/wallets_cdl.dll

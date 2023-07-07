@@ -343,8 +343,8 @@ String _platformPath(String name, {String? path}) {
   if (path == null) path = "";
   String dlPath = "";
   if (Platform.isLinux || Platform.isAndroid) {
-    // dlPath = pathLib.join(path, "lib" + name + ".so");
-    dlPath = "/home/scry/gopath/src/github.com/scryinfo/cashbox/packages/wallets/libwallets_cdl.so";
+    dlPath = pathLib.join(path, "lib" + name + ".so");
+    // dlPath = "/home/scry/gopath/src/github.com/scryinfo/cashbox/packages/wallets/libwallets_cdl.so";
   } else if (Platform.isMacOS) {
     dlPath = pathLib.join(path, "lib" + name + ".dylib");
   } else if (Platform.isWindows) {
