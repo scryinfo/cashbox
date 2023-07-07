@@ -22,7 +22,6 @@ use std::path::Path;
 use std::sync::{Arc, RwLock};
 
 use bitcoin_hashes::sha256d;
-use hammersbald::{BitcoinAdaptor, HammersbaldAPI, persistent, transient};
 use log::{error, info};
 use serde_derive::{Deserialize, Serialize};
 
@@ -31,6 +30,7 @@ use bitcoin::{
     blockdata::{block::BlockHeader, constants::genesis_block},
     network::constants::Network,
 };
+use hammersbald::{BitcoinAdaptor, HammersbaldAPI, persistent, transient};
 
 use crate::error::Error;
 use crate::headercache::{CachedHeader, HeaderCache};

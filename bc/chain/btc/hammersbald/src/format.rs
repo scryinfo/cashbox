@@ -1,6 +1,7 @@
 use std::io::Write;
 
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
+
 ///
 /// # Content types
 ///

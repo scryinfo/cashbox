@@ -20,8 +20,9 @@
 use std::cmp::max;
 use std::sync::{Arc, Mutex};
 
-use error::Error;
 use lru_cache::LruCache;
+
+use error::Error;
 use page::{Page, PAGE_SIZE};
 use pagedfile::PagedFile;
 use pref::PRef;

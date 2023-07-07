@@ -1,5 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
+use bitcoin_hashes::siphash24;
+
 //
 // Copyright 2018-2019 Tamas Blummer
 //
@@ -20,7 +22,6 @@ use std::collections::{HashMap, HashSet};
 ///
 ///
 use api::Hammersbald;
-use bitcoin_hashes::siphash24;
 use format::Payload;
 
 /// print some statistics on a db

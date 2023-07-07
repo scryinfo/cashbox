@@ -4,6 +4,8 @@ use std::fmt;
 use std::sync::RwLock;
 
 use bitcoin_hashes::siphash24;
+use rand::{RngCore, thread_rng};
+
 use datafile::{DataFile, EnvelopeIterator};
 ///
 /// # The memtable
@@ -17,7 +19,6 @@ use page::Page;
 use page::PAGE_SIZE;
 use pagedfile::PagedFile;
 use pref::PRef;
-use rand::{RngCore, thread_rng};
 use tablefile::{BUCKET_SIZE, BUCKETS_FIRST_PAGE, BUCKETS_PER_PAGE, FIRST_PAGE_HEAD, TableFile};
 
 //

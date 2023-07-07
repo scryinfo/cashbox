@@ -4,6 +4,7 @@ use std::{
 };
 
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
+
 use datafile::{DataFile, EnvelopeIterator};
 use error::Error;
 use format::{Envelope, Payload};

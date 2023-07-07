@@ -19,6 +19,7 @@
 //!
 
 use byteorder::{BigEndian, ByteOrder};
+
 use error::Error;
 use format::{Data, Envelope, IndexedData, Link, Payload};
 use page::PAGE_SIZE;

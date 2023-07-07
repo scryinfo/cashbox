@@ -21,13 +21,13 @@ use std::error::Error;
 use std::marker::PhantomData;
 
 use bitcoin_hashes::sha256d;
-use HammersbaldAPI;
-use HammersbaldIterator;
-use PRef;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 use bitcoin::BitcoinHash;
+use HammersbaldAPI;
+use HammersbaldIterator;
+use PRef;
 
 /// Bitcoin adaptor
 pub struct BitcoinAdaptor {

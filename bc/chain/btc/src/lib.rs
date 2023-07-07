@@ -2,8 +2,8 @@ use base58::ToBase58;
 use bip39::Language;
 use bitcoin_wallet::account::{Account, AccountAddressType, MasterAccount, Unlocker};
 use bitcoin_wallet::mnemonic::Mnemonic;
-use ripemd160::{Digest, Ripemd160};
-use secp256k1::{key::{PublicKey, SecretKey}, Secp256k1};
+use ripemd::{Digest, Ripemd160};
+use secp256k1::{PublicKey, SecretKey, Secp256k1};
 use sha2::Sha256;
 
 use bitcoin::network::constants::Network;

@@ -208,7 +208,7 @@ impl Constructor {
             .spawn(Interval::new(Duration::new(10, 0)).for_each(move |_| keep_connected.clone()))
             .expect("can not keep connected");
 
-        let mut p2p = self.p2p.clone();
+        let p2p = self.p2p.clone();
         let mut cex = executor.clone();
         executor.run(future::poll_fn(move |_| {
             let needed_services = 0;
