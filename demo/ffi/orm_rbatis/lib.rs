@@ -1,17 +1,15 @@
 #[macro_use]
-extern crate rbatis_macro_driver;
+extern crate rbatis;
 
 use std::os::raw::c_char;
 use async_std::task::block_on;
-use rbatis::rbatis::Rbatis;
-use rbatis::crud::{CRUD, CRUDTable};
-use chrono::NaiveDateTime;
-use rbatis_core::value::DateTimeNow;
 use std::ops::Add;
+use rbatis::RBatis;
+use rbatis::rbdc::datetime::DateTime;
 use serde::{Deserialize, Serialize};
 use shared::to_str;
 
-#[derive(CRUDTable, Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct BizActivity {
     pub id: Option<String>,
     pub name: Option<String>,
@@ -22,12 +20,13 @@ pub struct BizActivity {
     pub sort: Option<String>,
     pub status: Option<i32>,
     pub remark: Option<String>,
-    pub create_time: Option<NaiveDateTime>,
+    pub create_time: Option<DateTime>,
     pub version: Option<i32>,
     pub delete_flag: Option<i32>,
 }
+crud!(BizActivity{});
 
-async fn init_rbatis(db_file_name: &str) -> Rbatis {
+async fn init_rbatis(db_file_name: &str) -> RBatis {
     log::info!("init_rbatis");
     if std::fs::metadata(db_file_name).is_err() {
         let file = std::fs::File::create(db_file_name);
@@ -35,10 +34,10 @@ async fn init_rbatis(db_file_name: &str) -> Rbatis {
             log::info!("{:?}",file.err().unwrap());
         }
     }
-    let rb = Rbatis::new();
+    let rb = RBatis::new();
     let url = "sqlite://".to_owned().add(db_file_name);
     log::info!("{:?}",url);
-    let r = rb.link(url.as_str()).await;
+    let r = rb.link(rbdc_sqlite::driver::SqliteDriver {}, url.as_str()).await;
     if r.is_err() {
         log::info!("{:?}",r.err().unwrap());
     }
@@ -51,7 +50,7 @@ pub extern "C" fn tryRbatis(name: *mut c_char) {
     #[cfg(target_os = "android")]shared::init_logger_once();
     log::info!("start");
 
-    let rb = block_on(init_rbatis(to_str(name)));
+    let mut rb = block_on(init_rbatis(to_str(name)));
     let sql = "\
         CREATE TABLE `biz_activity` (
                                 `id` varchar(50) NOT NULL DEFAULT '',
@@ -67,7 +66,7 @@ pub extern "C" fn tryRbatis(name: *mut c_char) {
                                 `pc_banner_img` varchar(255) DEFAULT NULL,
                                 `h5_banner_img` varchar(255) DEFAULT NULL,
                                 PRIMARY KEY (`id`) ) ;";
-    let r = block_on(rb.exec("", sql));
+    let r = block_on(rb.exec(sql,vec![]));
     if r.is_err() {
         log::info!("{:?}",r.err().unwrap());
     }
@@ -81,16 +80,16 @@ pub extern "C" fn tryRbatis(name: *mut c_char) {
         sort: Some("1".to_string()),
         status: Some(1),
         remark: None,
-        create_time: Some(NaiveDateTime::now()),
+        create_time: Some(DateTime::now()),
         version: Some(1),
         delete_flag: Some(1),
     };
-    let r = block_on(rb.save("", &activity));
+    let r = block_on(BizActivity::insert(&mut rb,&activity));
     if r.is_err() {
         log::info!("{:?}",r.err().unwrap());
     }
     let sql = "select count(*) from biz_activity";
-    let r = block_on(rb.exec("", sql));
+    let r = block_on(rb.exec(sql, vec![]));
     match r {
         Ok(a) => {
             log::info!("{:?}",a);
