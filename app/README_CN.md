@@ -43,3 +43,10 @@
 
 - [视频教程一](https://v.qq.com/x/page/y3126jrbjzz.html)
 - [视频教程二](https://v.qq.com/x/page/v3129z5fsci.html)
+
+## 开发环境说明
+### Linux
+不使用 snap安装flutter, 可能会出现无法编译 desktop_webview_window, [参见](https://docs.flutter.dev/get-started/install/linux#install-flutter-manually)  
+安装完成后再安装： sudo apt install libstdc++-12-dev
+
+### Window
